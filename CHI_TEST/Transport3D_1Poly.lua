@@ -109,8 +109,8 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
-pqaud2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
+pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
 
 --========== Groupset def
 gs0 = chiNPTCreateGroupset(phys1)
@@ -161,7 +161,31 @@ fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
 --    chiFFInterpolationExportPython(slices[k])
 --end
 
-if (chi_location_id == 0) then
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value1=%.5e", maxval))
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[20])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
+
+if (chi_location_id == 0 and master_export == nil) then
 
     --os.execute("python ZPFFI00.py")
     ----os.execute("python ZPFFI11.py")
@@ -169,4 +193,7 @@ if (chi_location_id == 0) then
     print("Execution completed")
 end
 
-chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
+if (master_export == nil) then
+    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
+end
+

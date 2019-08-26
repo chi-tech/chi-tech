@@ -53,6 +53,8 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
   int counter=-1;
   double total_volume = 0.0;
   op_value = 0.0;
+  double max_value = 0.0;
+  bool max_set = false;
   size_t num_local_cells = grid_view->local_cell_glob_indices.size();
   for (int lc=0; lc<num_local_cells; lc++)
   {
@@ -85,6 +87,16 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
           op_value += value*cell_fe_view->IntV_shapeI[i];
           total_volume += cell_fe_view->IntV_shapeI[i];
 
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
 
         }//for dof
       }//if slab
@@ -108,7 +120,16 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
           op_value += value*cell_fe_view->IntV_shapeI[i];
           total_volume += cell_fe_view->IntV_shapeI[i];
 
-
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
         }//for dof
       }//if polygon
 
@@ -131,7 +152,16 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
           op_value += value*cell_fe_view->IntV_shapeI[i];
           total_volume += cell_fe_view->IntV_shapeI[i];
 
-
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
         }//for dof
       }//if Polyhedron
     }//if inside logicalVol
@@ -140,12 +170,17 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
 
   double all_value=0.0;
   double all_total_volume = 0.0;
+  double all_max_value=0.0;
 
   MPI_Allreduce(&op_value,&all_value,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
   MPI_Allreduce(&total_volume,&all_total_volume,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+  MPI_Allreduce(&max_value,&all_max_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
 
   if (op_type == OP_AVG)
     op_value = all_value/total_volume;
+
+  if (op_type == OP_MAX)
+    op_value = all_max_value;
 }
 
 
@@ -160,6 +195,8 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 
   int counter=-1;
   op_value = 0.0;
+  double max_value = 0.0;
+  bool max_set = false;
   double total_volume = 0.0;
   size_t num_local_cells = grid_view->local_cell_glob_indices.size();
   for (int lc=0; lc<num_local_cells; lc++)
@@ -174,6 +211,68 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 
     if (inside_logvolume)
     {
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+      {
+        chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
+        SlabFEView* cell_fe_view =
+          (SlabFEView*)discretization->MapFeView(cell_glob_index);
+
+        for (int i=0; i<2; i++)
+        {
+          double value = 0.0;
+          int ir = -1;
+
+          counter++;
+          ir = mapping[counter];
+          value = field[ir];
+
+          op_value += value*cell_fe_view->IntV_shapeI[i];
+          total_volume += cell_fe_view->IntV_shapeI[i];
+
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
+        }//for dof
+      }//if slab
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+      {
+        chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
+        PolygonFEView* cell_fe_view =
+          (PolygonFEView*)discretization->MapFeView(cell_glob_index);
+
+        for (int i=0; i<poly_cell->v_indices.size(); i++)
+        {
+          double value = 0.0;
+          int ir = -1;
+
+          counter++;
+          ir = mapping[counter];
+          value = field[ir];
+
+          op_value += value*cell_fe_view->IntV_shapeI[i];
+          total_volume += cell_fe_view->IntV_shapeI[i];
+
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
+        }//for dof
+      }//if Polygon
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
       if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
       {
@@ -193,6 +292,16 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
           op_value += value*cell_fe_view->IntV_shapeI[i];
           total_volume += cell_fe_view->IntV_shapeI[i];
 
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
         }//for dof
       }//if Polyhedron
     }//if inside logicalVol
@@ -201,12 +310,17 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 
   double all_value=0.0;
   double all_total_volume = 0.0;
+  double all_max_value;
 
   MPI_Allreduce(&op_value,&all_value,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
   MPI_Allreduce(&total_volume,&all_total_volume,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+  MPI_Allreduce(&max_value,&all_max_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
 
   if (op_type == OP_AVG)
     op_value = all_value/total_volume;
   else
     op_value = all_value;
+
+  if (op_type == OP_MAX)
+    op_value = all_max_value;
 }

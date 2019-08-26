@@ -221,6 +221,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(OPERATION,   5);
         RegisterConstant(OP_SUM,   10);
         RegisterConstant(OP_AVG,   11);
+        RegisterConstant(OP_MAX,   12);
 RegisterConstant(LOGICAL_VOLUME,   8);
 RegisterConstant(LINE_FIRSTPOINT,   11);
 RegisterConstant(LINE_SECONDPOINT,   12);

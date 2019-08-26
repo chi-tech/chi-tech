@@ -14,6 +14,7 @@
 
 #define OP_SUM 10
 #define OP_AVG 11
+#define OP_MAX 12
 
 //###################################################################
 /** Base class for field-function interpolation objects.*/

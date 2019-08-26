@@ -78,7 +78,7 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_CHEBYSHEV,64)
+pquad = chiCreateProductQuadrature(GAUSS_CHEBYSHEV,2)
 
 --========== Groupset def
 gs0 = chiNPTCreateGroupset(phys1)
@@ -123,8 +123,33 @@ chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fflist[1])
 
 chiFFInterpolationInitialize(slice2)
 chiFFInterpolationExecute(slice2)
-chiFFInterpolationExportPython(slice2)
 
-if (chi_location_id == 0) then
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value1=%.5f", maxval))
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[160])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
+
+if (chi_location_id == 0 and master_export == nil) then
+    chiFFInterpolationExportPython(slice2)
     local handle = io.popen("python ZPFFI00.py")
 end

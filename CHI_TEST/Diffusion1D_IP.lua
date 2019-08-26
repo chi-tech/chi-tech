@@ -7,7 +7,7 @@ print("############################################### LuaTest")
 chiMeshHandlerCreate()
 
 mesh={}
-N=10000
+N=100
 L=2.0
 xmin = -1.0
 dx = L/N
@@ -52,7 +52,7 @@ phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 fftemp = chiSolverAddFieldFunction(phys1,"Temperature")
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLD_MIP);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
+chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
 
 
 
@@ -72,10 +72,23 @@ chiFFInterpolationSetProperty(line0,ADD_FIELDFUNCTION,fftemp)
 
 chiFFInterpolationInitialize(line0)
 chiFFInterpolationExecute(line0)
-chiFFInterpolationExportPython(line0)
+--chiFFInterpolationExportPython(line0)
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value=%.10f", maxval))
 --
-if (chi_location_id == 0) then
+if ((chi_location_id == 0) and (master_export == nil)) then
+    chiFFInterpolationExportPython(line0)
     local handle = io.popen("python ZLFFI00.py")
 end
 
-chiExportFieldFunctionToVTK(fftemp,"ZPhi1D")
+--chiExportFieldFunctionToVTK(fftemp,"ZPhi1D")

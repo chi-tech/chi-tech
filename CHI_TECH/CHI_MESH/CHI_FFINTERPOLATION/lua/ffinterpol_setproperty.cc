@@ -41,6 +41,8 @@ For volume interpolations, computes the volume integral.\n
 \n
 OP_AVG\n
 For volume interpolations, computes the volume average.\n
+OP_MAX\n
+For volume interpolations, computes the volume max.\n
 
 
 
@@ -232,7 +234,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     int op_type = lua_tonumber(L,3);
 
-    if (!((op_type>=OP_SUM) && (op_type<=OP_AVG)))
+    if (!((op_type>=OP_SUM) && (op_type<=OP_MAX)))
     {
       chi_log.Log(LOG_ALLERROR)
         << "Volume property FFI_PROP_OPERATION"

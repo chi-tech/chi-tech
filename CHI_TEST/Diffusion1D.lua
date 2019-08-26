@@ -58,19 +58,35 @@ chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
 chiDiffusionInitialize(phys1)
 --############################################### Set boundary conditions
 --chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_DIRICHLET,0.0)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_DIRICHLET,0.0)
+--chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_DIRICHLET,1.0)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_VACUUM)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_VACUUM)
 
 chiDiffusionExecute(phys1)
-line0 = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(line0,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
-chiFFInterpolationSetProperty(line0,LINE_SECONDPOINT,0.0,0.0, 2.0+xmin)
-chiFFInterpolationSetProperty(line0,LINE_NUMBEROFPOINTS, 1000)
-chiFFInterpolationSetProperty(line0,ADD_FIELDFUNCTION,fftemp)
+ffi0 = chiFFInterpolationCreate(LINE)
+curffi = ffi0;
+chiFFInterpolationSetProperty(curffi,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
+chiFFInterpolationSetProperty(curffi,LINE_SECONDPOINT,0.0,0.0, 2.0+xmin)
+chiFFInterpolationSetProperty(curffi,LINE_NUMBEROFPOINTS, 1000)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
 
-chiFFInterpolationInitialize(line0)
-chiFFInterpolationExecute(line0)
-chiFFInterpolationExportPython(line0)
---
---local handle = io.popen("python ZLFFI00.py")
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
+
+if (master_export == nil) then
+    chiFFInterpolationExportPython(ffi0)
+
+    local handle = io.popen("python ZLFFI00.py")
+end

@@ -10,7 +10,7 @@ end
 chiMeshHandlerCreate()
 
 mesh={}
-N=5000
+N=100
 L=30.0
 xmin = 0.0
 dx = L/N
@@ -29,7 +29,7 @@ chiRegionAddLineBoundary(region1,line_mesh);
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
 
-chiVolumeMesherSetProperty(PARTITION_Z,4)
+chiVolumeMesherSetProperty(PARTITION_Z,3)
 
 --############################################### Execute meshing
 chiSurfaceMesherExecute();
@@ -81,7 +81,7 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE,40)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,40)
 
 --========== Groupset def
 gs0 = chiNPTCreateGroupset(phys1)
@@ -133,12 +133,34 @@ end
 
 chiFFInterpolationInitialize(cline)
 chiFFInterpolationExecute(cline)
-chiFFInterpolationExportPython(cline)
 
 
---
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value1=%.5f", maxval))
+
+ffi2 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi2
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[160])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
 
-if (chi_location_id == 0) then
+if (chi_location_id == 0 and master_export == nil) then
+    chiFFInterpolationExportPython(cline)
     local handle = io.popen("python ZLFFI00.py")
 end

@@ -85,21 +85,24 @@ chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp)
 
 chiFFInterpolationInitialize(slice2)
 chiFFInterpolationExecute(slice2)
-chiFFInterpolationExportPython(slice2)
---
---line0 = chiFFInterpolationCreate(LINE)
---chiFFInterpolationSetProperty(line0,LINE_FIRSTPOINT,-1.0,0.1,0.0)
---chiFFInterpolationSetProperty(line0,LINE_SECONDPOINT, 1.0,0.1,0.0)
---chiFFInterpolationSetProperty(line0,LINE_NUMBEROFPOINTS, 100)
---chiFFInterpolationSetProperty(line0,ADD_FIELDFUNCTION,fftemp)
---
---chiFFInterpolationInitialize(line0)
---chiFFInterpolationExecute(line0)
---chiFFInterpolationExportPython(line0)
---
-if (chi_location_id == 0) then
-    local handle = io.popen("python ZPFFI00.py")
-end
---local handle = io.popen("python ZLFFI10.py")
 
-chiExportFieldFunctionToVTK(fftemp,"ZPhi")
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+maxval = chiFFInterpolationGetValue(curffi)
+
+chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
+
+if (chi_location_id == 0 and master_export == nil) then
+    chiFFInterpolationExportPython(slice2)
+    local handle = io.popen("python ZPFFI00.py")
+    chiExportFieldFunctionToVTK(fftemp,"ZPhi")
+end
+
+

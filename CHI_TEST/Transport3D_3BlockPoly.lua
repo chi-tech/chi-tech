@@ -176,7 +176,7 @@ end
 
 
 
-if (chi_location_id == 0) then
+if (chi_location_id == 0 and master_export == nil) then
 
     --os.execute("python ZPFFI00.py")
     ----os.execute("python ZPFFI11.py")
@@ -186,4 +186,6 @@ if (chi_location_id == 0) then
     print("Execution completed")
 end
 
-chiExportFieldFunctionToVTKG(fflist[1],"ZPhi","Phi")
+if (master_export == nil) then
+    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi","Phi")
+end

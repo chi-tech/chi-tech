@@ -36,7 +36,7 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
     double rhsvalue =0.0;
 
     int ir_boundary_type;
-    if (!ApplyDirichletI(ir,&ir_boundary_type,ig))
+    //if (!ApplyDirichletI(ir,&ir_boundary_type,ig))
     {
       //====================== Develop matrix entry
       for (int j=0; j<fe_view->dofs; j++)
@@ -50,7 +50,7 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
           siga[j]*fe_view->IntV_shapeI_shapeJ[i][j];
 
         int jr_boundary_type;
-        if (!ApplyDirichletJ(jr,ir,jr_mat_entry,&jr_boundary_type,jg))
+        //if (!ApplyDirichletJ(jr,ir,jr_mat_entry,&jr_boundary_type,jg))
         {
           MatSetValue(Aref,ir,jr,jr_mat_entry,ADD_VALUES);
         }
@@ -139,12 +139,14 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
         {
           int j  = fj;
           int jr = cell_ip_view->MapDof(j);
+          int jmap  = MapCellDof(adj_cell,slab_cell->v_indices[fj]);
+          int jrmap = adj_ip_view->MapDof(jmap);
 
           double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
 
 
-          MatSetValue(Aref,ir    ,jr, aij,ADD_VALUES);
-          MatSetValue(Aref,irstar,jr,-aij,ADD_VALUES);
+          MatSetValue(Aref,ir    ,jr   , aij,ADD_VALUES);
+          MatSetValue(Aref,ir    ,jrmap,-aij,ADD_VALUES);
         }//for fj
 
       }//for fi
@@ -179,23 +181,42 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
       }//for i
 
       // - Di^+ bj^-
-      for (int imap=0; imap<adj_fe_view->dofs; imap++)
-      {
-        int irmap = adj_ip_view->MapDof(imap);
+//      for (int imap=0; imap<adj_fe_view->dofs; imap++)
+//      {
+//        int irmap = adj_ip_view->MapDof(imap);
+//
+//        for (int fj=f; fj<(f+1); fj++)
+//        {
+//          int jmap  = MapCellDof(adj_cell,slab_cell->v_indices[fj]);
+//          int j     = MapCellDof(slab_cell,slab_cell->v_indices[fj]);
+//          int jr    = cell_ip_view->MapDof(j);
+//
+//          double gij =
+//            n.Dot(adj_fe_view->IntS_shapeI_gradshapeJ[fmap][jmap][imap]);
+//          double aij = -0.5*adj_D[f]*gij;
+//
+//          MatSetValue(Aref,irmap,jr,aij,ADD_VALUES);
+//        }//for j
+//      }//for i
 
-        for (int fj=f; fj<(f+1); fj++)
+      //+ Di^- bj^+
+      for (int fj=0; fj<2; fj++)
+      {
+        int j     = MapCellDof(slab_cell,slab_cell->v_indices[fj]);
+        int jmap  = MapCellDof(adj_cell,slab_cell->v_indices[fj]);
+        int jrmap = adj_ip_view->MapDof(jmap);
+
+        for (int i=0; i<fe_view->dofs; i++)
         {
-          int jmap  = MapCellDof(adj_cell,slab_cell->v_indices[fj]);
-          int j     = MapCellDof(slab_cell,slab_cell->v_indices[fj]);
-          int jr    = cell_ip_view->MapDof(j);
+          int ir = cell_ip_view->MapDof(i);
 
           double gij =
-            n.Dot(adj_fe_view->IntS_shapeI_gradshapeJ[fmap][jmap][imap]);
-          double aij = -0.5*adj_D[f]*gij;
+            n.Dot(fe_view->IntS_shapeI_gradshapeJ[f][j][i]);
+          double aij = 0.5*D[f]*gij;
 
-          MatSetValue(Aref,irmap,jr,aij,ADD_VALUES);
-        }//for j
-      }//for i
+          MatSetValue(Aref,ir,jrmap,aij,ADD_VALUES);
+        }//for i
+      }//for fj
 
       // - Dj^+ bi^-
       for (int jmap=0; jmap<adj_fe_view->dofs; jmap++)
@@ -226,6 +247,9 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
 
       if (ir_boundary_type == DIFFUSION_DIRICHLET)
       {
+        chi_diffusion::BoundaryDirichlet* dc_boundary =
+          (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
+
         //========================= Compute penalty coefficient
         double hm = fe_view->h/2.0;
         double kappa = fmax(4.0*D[f]/hm,0.25);
@@ -244,6 +268,7 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
             double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
 
             MatSetValue(Aref,ir    ,jr, aij,ADD_VALUES);
+            VecSetValue(bref,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
           }//for fj
 
         }//for fi
@@ -268,6 +293,7 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
             double aij = -0.5*D[f]*gij;
 
             MatSetValue(Aref,ir,jr,aij,ADD_VALUES);
+            VecSetValue(bref,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
           }//for j
         }//for i
 
@@ -334,7 +360,7 @@ void chi_diffusion::Solver::PWLD_b_Slab(int cell_glob_index,
     double rhsvalue =0.0;
 
     int ir_boundary_type;
-    if (!ApplyDirichletI(ir,&ir_boundary_type,ig))
+    //if (!ApplyDirichletI(ir,&ir_boundary_type,ig))
     {
       //====================== Develop matrix entry
       for (int j=0; j<fe_view->dofs; j++)
