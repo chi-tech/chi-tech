@@ -47,21 +47,6 @@ endif()
 #set(VTK_VERSION "-8.2")
 
 
-option(USE_GRAPHICS "USE_GRAPHICS" OFF)
-#set(CHI_USEGRAPHICS ON)
-set(CHI_USESURFACEREMESHER OFF)  #pending fix for CHIVECTOR
-
-
-
-if (APPLE)
-    if (${USE_GRAPHICS})
-        set(CHI_USEGRAPHICS ON)
-    endif()
-else()
-  if (${USE_GRAPHICS})
-   set(CHI_USEGRAPHICS ON)
-  endif()
-endif()
 
 
 #================================================ Set project targets
@@ -93,14 +78,9 @@ include(Filter)
 #================================================ Precompiler flags
 #LUA CONSOLE
 add_definitions(-DNO_FONTGENESIS)
-#add_definitions(-DLUA_STATIC)
 add_definitions(-Wall -Wno-unused-value)
-if (${CHI_USEGRAPHICS})
-    add_definitions(-DCHI_USEGRAPHICS)
-endif()
-if (${CHI_USESURFACEREMESHER})
-    add_definitions(-DCHI_USESURFACEREMESHER)
-endif()
+
+
 
 
 #================================================ Compiler flags
@@ -111,9 +91,6 @@ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-strict-aliasing"
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=0")
 add_definitions(-fpermissive)
-if (${CHI_USEGRAPHICS})
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -g -fopenmp")
-endif()
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
@@ -131,7 +108,7 @@ include_directories("${VTK_ROOT}/include/vtk${VTK_VERSION}")
 link_directories("${LUA_ROOT}/lib")
 link_directories("${TRIANGLE_ROOT}")
 link_directories("${PETSC_ROOT}/lib")
-link_directories("${BOOST_ROOT}/lib")
+#link_directories("${BOOST_ROOT}/lib")
 
 link_directories("${VTK_ROOT}/lib")
 link_directories("${VTK_ROOT}/lib64")
@@ -143,33 +120,6 @@ set(LIBS ${LIBS} vtkCommonCore${VTK_VERSION} vtkCommonDataModel${VTK_VERSION})
 set(LIBS ${LIBS} vtkIOLegacy${VTK_VERSION} vtkIOCore${VTK_VERSION})
 set(LIBS ${LIBS} vtkIOXML${VTK_VERSION} vtkParallelCore${VTK_VERSION} )
 set(LIBS ${LIBS} vtkIOParallelXML${VTK_VERSION})
-
-if (${CHI_USEGRAPHICS})
-    # OpenGL Lib
-    find_package(OpenGL REQUIRED)
-    include_directories(${OPENGL_INCLUDE_DIR})
-
-
-
-    if (APPLE)
-        include_directories("/opt/X11/include")
-        link_directories("/opt/X11/lib")
-        #set(GLEW_DIR "/usr/local")
-        set(GLEW_DIR "${CHI_TECH_DEP}/glew-2.1.0")
-        include_directories(${GLEW_DIR}/include)
-        link_directories(${GLEW_DIR}/lib)
-        add_definitions(-DGLEW_STATIC)
-        set(LIBS ${LIBS} X11 GLEW GL GLU gomp )
-        set (CMAKE_EXE_LINKER_FLAGS "-Wl,-undefined,dynamic_lookup,-no_pie -O3 -DNDEBUG")
-    else()
-        set(GLEW_DIR "${CHI_TECH_DEP}/GLEW")
-        include_directories(${GLEW_DIR}/include)
-        add_definitions(-DGLEW_STATIC)
-        set(LIBS ${LIBS} X11 GLEW GL GLU gomp)
-    endif()
-
-
-endif()
 
 
 #================================================ Default include directories
@@ -197,16 +147,6 @@ add_subdirectory("${CHI_TECH_MOD}/CHI_DIFFUSION")
 add_subdirectory("${CHI_TECH_MOD}/CHI_NPTRANSPORT")
 
 
-
-if (${CHI_USEGRAPHICS})
-    add_subdirectory("${CHI_TECH_DIR}/CHI_GRAPHICS")
-    add_subdirectory("${CHI_TECH_DIR}/CHI_WINDOWMANAGER")
-    #add_subdirectory("${CHI_TECH_DIR}/CHI_SURFACE")
-endif()
-
-if(${CHI_USESURFACEREMESHER})
-    add_subdirectory("${CHI_TECH_MOD}/CHI_SURFACEREMESHER")
-endif()
 
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET} ${LIBS} ${TRIANGLE})
