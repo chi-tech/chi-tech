@@ -73,4 +73,4 @@ chiFFInterpolationInitialize(line0)
 chiFFInterpolationExecute(line0)
 chiFFInterpolationExportPython(line0)
 --
-local handle = io.popen("python ZLFFI00.py")
+--local handle = io.popen("python ZLFFI00.py")
