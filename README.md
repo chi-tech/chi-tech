@@ -16,4 +16,3 @@ is periodically updated at the following link:
 
 [Online Documentation](https://chi-tech.github.io)
 
-## 
