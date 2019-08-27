@@ -99,13 +99,13 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
 
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSransportCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}
 for g=1,num_groups do
-    grp[g] = chiNPTCreateGroup(phys1)
+    grp[g] = chiLBSCreateGroup(phys1)
 end
 
 --========== ProdQuad
@@ -113,13 +113,13 @@ pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
 pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
 
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
-chiNPTGroupsetAddGroups(phys1,gs0,0,20)
-chiNPTGroupsetSetQuadrature(phys1,gs0,pquad)
+gs0 = chiLBSCreateGroupset(phys1)
+chiLBSGroupsetAddGroups(phys1,gs0,0,20)
+chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 --
---gs1 = chiNPTCreateGroupset(phys1)
---chiNPTGroupsetAddGroups(phys1,gs1,63,167)
---chiNPTGroupsetSetQuadrature(phys1,gs1,pquad)
+--gs1 = chiLBSCreateGroupset(phys1)
+--chiLBSGroupsetAddGroups(phys1,gs1,63,167)
+--chiLBSGroupsetSetQuadrature(phys1,gs1,pquad)
 
 --========== Boundary conditions
 bsrc={}
@@ -127,27 +127,27 @@ for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/4.0/math.pi;
-chiNPTSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
-chiNPTSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
---chiNPTSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_CLASSICRICHARDSON)
---chiNPTSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,NPT_CLASSICRICHARDSON)
-chiNPTSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
---chiNPTSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
-chiNPTSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
---chiNPTSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
+chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+--chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,LBS_CLASSICRICHARDSON)
+--chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,LBS_CLASSICRICHARDSON)
+chiLBSSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
+--chiLBSSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
+chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
+--chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
 
-chiNPTSetProperty(phys1,GROUPSET_SUBSETS,gs0,3)
---chiNPTSetProperty(phys1,GROUPSET_SUBSETS,gs1,5)
+chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs0,3)
+--chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs1,5)
 
-chiNPTInitialize(phys1)
-chiNPTExecute(phys1)
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
 
 
 
-fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 --slices = {}
 --for k=1,count do
 --    slices[k] = chiFFInterpolationCreate(SLICE)

@@ -102,17 +102,17 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 --############################################### Setup Physics
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSransportCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
-chiNPTSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
-chiNPTSetProperty(phys1,SCATTERING_ORDER,1)
+chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
 --========== Groups
 grp = {}
 for g=1,num_groups do
-    grp[g] = chiNPTCreateGroup(phys1)
+    grp[g] = chiLBSCreateGroup(phys1)
 end
 
 --========== ProdQuad
@@ -120,34 +120,34 @@ pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2,false)
 pquad1 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8,false)
 
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
+gs0 = chiLBSCreateGroupset(phys1)
 
 cur_gs = gs0
-chiNPTGroupsetAddGroups(phys1,cur_gs,0,62)
-chiNPTGroupsetSetQuadrature(phys1,cur_gs,pquad0)
-chiNPTGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiNPTGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-chiNPTGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiNPTGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiNPTGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
---chiNPTGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4)
---chiNPTGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,LBS_GMRES)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
+--chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4)
+--chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 
-gs1 = chiNPTCreateGroupset(phys1)
+gs1 = chiLBSCreateGroupset(phys1)
 
 cur_gs = gs1
-chiNPTGroupsetAddGroups(phys1,cur_gs,63,num_groups-1)
-chiNPTGroupsetSetQuadrature(phys1,cur_gs,pquad0)
-chiNPTGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiNPTGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-chiNPTGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiNPTGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiNPTGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
---chiNPTGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
---chiNPTGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetAddGroups(phys1,cur_gs,63,num_groups-1)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,LBS_GMRES)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
+--chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+--chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 --========== Boundary conditions
 bsrc={}
@@ -156,17 +156,17 @@ for g=1,num_groups do
 end
 bsrc[1] = 1.0/4.0/math.pi;
 --bsrc[1] = 1.0
-chiNPTSetProperty(phys1,BOUNDARY_CONDITION,XMIN,INCIDENT_ISOTROPIC,bsrc);
---chiNPTSetProperty(phys1,BOUNDARY_CONDITION,XMAX,INCIDENT_ISOTROPIC,bsrc);
---chiNPTSetProperty(phys1,BOUNDARY_CONDITION,YMIN,INCIDENT_ISOTROPIC,bsrc);
---chiNPTSetProperty(phys1,BOUNDARY_CONDITION,YMAX,INCIDENT_ISOTROPIC,bsrc);
---chiNPTSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
---chiNPTSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,INCIDENT_ISOTROPIC,bsrc);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMAX,INCIDENT_ISOTROPIC,bsrc);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,INCIDENT_ISOTROPIC,bsrc);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMAX,INCIDENT_ISOTROPIC,bsrc);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,INCIDENT_ISOTROPIC,bsrc);
 
 
 
-chiNPTInitialize(phys1)
-chiNPTExecute(phys1)
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
 
-fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 chiExportFieldFunctionToVTKG(fflist[1],"ZPhi","Phi")

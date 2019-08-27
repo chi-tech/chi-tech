@@ -100,31 +100,31 @@ chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_gr
 
 --############################################### Setup Physics
 
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSransportCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}
-grp[0] = chiNPTCreateGroup(phys1)
-grp[1] = chiNPTCreateGroup(phys1)
+grp[0] = chiLBSCreateGroup(phys1)
+grp[1] = chiLBSCreateGroup(phys1)
 
 --========== ProdQuad
 pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8)
 
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
-chiNPTGroupsetAddGroups(phys1,gs0,0,1)
-chiNPTGroupsetSetQuadrature(phys1,gs0,pquad)
+gs0 = chiLBSCreateGroupset(phys1)
+chiLBSGroupsetAddGroups(phys1,gs0,0,1)
+chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 
 
-chiNPTSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 
 
-chiNPTInitialize(phys1)
-chiNPTExecute(phys1)
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
 
-fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 slices = {}
 for k=1,count do
     slices[k] = chiFFInterpolationCreate(SLICE)

@@ -48,6 +48,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (abs(test_val-2.5) < 1.0e-10):
         test_passed = True
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -82,6 +84,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (abs(test_val-0.5006523128) < 1.0e-4):
         test_passed = True
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -116,6 +120,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (abs(test_val-0.29480) < 1.0e-4):
         test_passed = True
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -150,6 +156,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (abs(test_val-2.5) < 1.0e-4):
         test_passed = True
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -184,6 +192,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (abs(test_val-0.29480) < 1.0e-4):
         test_passed = True
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -218,6 +228,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (abs(test_val-0.29492) < 1.0e-4):
         test_passed = True
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -252,6 +264,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (not abs(test_val-0.49903) < 1.0e-4):
         test_passed = False
+else:
+    test_passed = False
 
 #string to find in output
 find_str          = "[0]  Max-value2="
@@ -268,6 +282,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (not abs(test_val-7.18243e-4) < 1.0e-4):
         test_passed = False
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -302,6 +318,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (not abs(test_val-0.50337) < 1.0e-4):
         test_passed = False
+else:
+    test_passed = False
 
 #string to find in output
 find_str          = "[0]  Max-value2="
@@ -318,6 +336,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (not abs(test_val-5.00978e-05) < 1.0e-4):
         test_passed = False
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
@@ -352,6 +372,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (not abs(test_val-5.27450e-01) < 1.0e-4):
         test_passed = False
+else:
+    test_passed = False
 
 #string to find in output
 find_str          = "[0]  Max-value2="
@@ -368,6 +390,8 @@ if (test_str_start >= 0):
     test_val = float(out[test_str_end:test_str_line_end])
     if (not abs(test_val-3.76339e-04) < 1.0e-4):
         test_passed = False
+else:
+    test_passed = False
 
 if (test_passed):
     print(" - Passed")
