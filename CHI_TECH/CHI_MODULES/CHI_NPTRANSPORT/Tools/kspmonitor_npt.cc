@@ -1,5 +1,5 @@
 #include "kspmonitor_npt.h"
-#include "../chi_nptransport.h"
+#include "CHI_MODULES/CHI_NPTRANSPORT/lbs_linear_boltzman_solver.h"
 
 #include "ksp_data_context.h"
 

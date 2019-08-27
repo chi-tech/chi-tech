@@ -5,7 +5,7 @@
  * objects needed in matrix free operations.*/
 struct KSP_DATA_CONTEXT
 {
-  CHI_NPTRANSPORT* solver;
+  LinearBoltzmanSolver* solver;
   SweepChunk*      sweep_chunk;
   int              group_set_num;
   NPT_GROUPSET*    groupset;
