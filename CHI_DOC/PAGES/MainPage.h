@@ -82,16 +82,16 @@ now we have only a couple of tutorials.\n
 ### Linear Boltzman Solver
  
 <table>
-<tr><td width="33%">chiNPTransportCreateSolver()</td><td width="33%">chiNPTSetProperty()</td><td width="33%">chiNPTInitialize()</td></tr>
-<tr><td width="33%">chiNPTExecute()</td><td width="33%">chiNPTGetFieldFunctionList()</td><td width="33%">chiNPTGetScalarFieldFunctionList()</td></tr>
+<tr><td width="33%">chiLBSransportCreateSolver()</td><td width="33%">chiLBSSetProperty()</td><td width="33%">chiLBSInitialize()</td></tr>
+<tr><td width="33%">chiLBSExecute()</td><td width="33%">chiLBSGetFieldFunctionList()</td><td width="33%">chiLBSGetScalarFieldFunctionList()</td></tr>
 </table>
 ### Linear Boltzman Solver - Groupset manipulation
 \ref LuaLBSGroupsets Main page
 <table>
-<tr><td width="33%">chiNPTCreateGroup()</td><td width="33%">chiNPTCreateGroupset()</td><td width="33%">chiNPTGroupsetAddGroups()</td></tr>
-<tr><td width="33%">chiNPTGroupsetSetQuadrature()</td><td width="33%">chiNPTGroupsetSetAngleAggDiv()</td><td width="33%">chiNPTGroupsetSetGroupSubsets()</td></tr>
-<tr><td width="33%">chiNPTGroupsetSetIterativeMethod()</td><td width="33%">chiNPTGroupsetSetResidualTolerance()</td><td width="33%">chiNPTGroupsetSetMaxIterations()</td></tr>
-<tr><td width="33%">chiNPTGroupsetSetGMRESRestartIntvl()</td><td width="33%">chiNPTGroupsetSetWGDSA()</td><td width="33%">chiNPTGroupsetSetTGDSA()</td></tr>
+<tr><td width="33%">chiLBSCreateGroup()</td><td width="33%">chiLBSCreateGroupset()</td><td width="33%">chiLBSGroupsetAddGroups()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetQuadrature()</td><td width="33%">chiLBSGroupsetSetAngleAggDiv()</td><td width="33%">chiLBSGroupsetSetGroupSubsets()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetIterativeMethod()</td><td width="33%">chiLBSGroupsetSetResidualTolerance()</td><td width="33%">chiLBSGroupsetSetMaxIterations()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetGMRESRestartIntvl()</td><td width="33%">chiLBSGroupsetSetWGDSA()</td><td width="33%">chiLBSGroupsetSetTGDSA()</td></tr>
 </table>
 
 

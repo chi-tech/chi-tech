@@ -319,9 +319,9 @@ RegisterFunction(chiDiffusionSetProperty)
   RegisterConstant(PROPERTY_SIGMAA_MAP,     7);
 
 //module:Linear Boltzman Solver
-RegisterFunction(chiNPTransportCreateSolver)
+RegisterFunction(chiLBSransportCreateSolver)
 
-RegisterFunction(chiNPTSetProperty)
+RegisterFunction(chiLBSSetProperty)
 RegisterConstant(DISCRETIZATION_METHOD,   1);
   RegisterConstant(PWLD1D,   4);
   RegisterConstant(PWLD2D,   5);
@@ -356,25 +356,39 @@ RegisterConstant(GROUPSET_TGDSA_TOLERANCE,111);
 RegisterConstant(SCATTERING_ORDER,   4);
 RegisterConstant(SWEEP_EAGER_LIMIT,   5);
 
-RegisterFunction(chiNPTInitialize)
-RegisterFunction(chiNPTExecute)
-RegisterFunction(chiNPTGetFieldFunctionList)
-RegisterFunction(chiNPTGetScalarFieldFunctionList)
+RegisterFunction(chiLBSInitialize)
+
+RegisterFunction(chiLBSExecute)
+
+RegisterFunction(chiLBSGetFieldFunctionList)
+
+RegisterFunction(chiLBSGetScalarFieldFunctionList)
 
 //module:Linear Boltzman Solver - Groupset manipulation
 //\ref LuaLBSGroupsets Main page
-RegisterFunction(chiNPTCreateGroup)
-RegisterFunction(chiNPTCreateGroupset)
-RegisterFunction(chiNPTGroupsetAddGroups)
-RegisterFunction(chiNPTGroupsetSetQuadrature)
-RegisterFunction(chiNPTGroupsetSetAngleAggDiv)
-RegisterFunction(chiNPTGroupsetSetGroupSubsets)
-RegisterFunction(chiNPTGroupsetSetIterativeMethod)
-RegisterFunction(chiNPTGroupsetSetResidualTolerance)
-RegisterFunction(chiNPTGroupsetSetMaxIterations)
-RegisterFunction(chiNPTGroupsetSetGMRESRestartIntvl)
-RegisterFunction(chiNPTGroupsetSetWGDSA)
-RegisterFunction(chiNPTGroupsetSetTGDSA)
+RegisterFunction(chiLBSCreateGroup)
+
+RegisterFunction(chiLBSCreateGroupset)
+
+RegisterFunction(chiLBSGroupsetAddGroups)
+
+RegisterFunction(chiLBSGroupsetSetQuadrature)
+
+RegisterFunction(chiLBSGroupsetSetAngleAggDiv)
+
+RegisterFunction(chiLBSGroupsetSetGroupSubsets)
+
+RegisterFunction(chiLBSGroupsetSetIterativeMethod)
+
+RegisterFunction(chiLBSGroupsetSetResidualTolerance)
+
+RegisterFunction(chiLBSGroupsetSetMaxIterations)
+
+RegisterFunction(chiLBSGroupsetSetGMRESRestartIntvl)
+
+RegisterFunction(chiLBSGroupsetSetWGDSA)
+
+RegisterFunction(chiLBSGroupsetSetTGDSA)
 
 #ifdef WITH_CHI_PI3
 RegisterFunction(chiPieExportPin)

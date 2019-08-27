@@ -61,10 +61,9 @@
 ../CHI_MODULES/CHI_DIFFUSION/lua/diffusion_createsolver.cc
 ../CHI_MODULES/CHI_DIFFUSION/lua/diffusion_initialize.cc
 ../CHI_MODULES/CHI_DIFFUSION/lua/diffusion_execute.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_initialize.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_solvercreate.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_getfieldfuncs.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_material.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_setproperty.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_groupset_ops.cc
-../CHI_MODULES/LinearBoltzmanSolver/lua/npt_execute.cc
+../CHI_MODULES/LinearBoltzmanSolver/lua/lbs_setproperty.cc
+../CHI_MODULES/LinearBoltzmanSolver/lua/lbs_groupset_ops.cc
+../CHI_MODULES/LinearBoltzmanSolver/lua/lbs_initialize.cc
+../CHI_MODULES/LinearBoltzmanSolver/lua/lbs_getfieldfuncs.cc
+../CHI_MODULES/LinearBoltzmanSolver/lua/lbs_solvercreate.cc
+../CHI_MODULES/LinearBoltzmanSolver/lua/lbs_execute.cc

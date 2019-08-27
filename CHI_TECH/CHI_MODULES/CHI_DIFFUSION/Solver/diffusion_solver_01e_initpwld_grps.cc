@@ -4,7 +4,7 @@
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 
-#include <CHI_MODULES/CHI_NPTRANSPORT/Tools/kspmonitor_npt.h>
+#include <CHI_MODULES/LinearBoltzmanSolver/Tools/kspmonitor_npt.h>
 
 
 #include <CHI_TIMER/chi_timer.h>

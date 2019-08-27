@@ -30,4 +30,4 @@ Add_Folder("../CHI_PHYSICS/lua")
 
 Add_Folder("../CHI_MODULES/CHI_MONTECARLON/lua")
 Add_Folder("../CHI_MODULES/CHI_DIFFUSION/lua")
-Add_Folder("../CHI_MODULES/CHI_NPTRANSPORT/lua")
+Add_Folder("../CHI_MODULES/LinearBoltzmanSolver/lua")

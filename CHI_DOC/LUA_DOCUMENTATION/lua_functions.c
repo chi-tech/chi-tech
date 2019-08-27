@@ -632,6 +632,8 @@ For volume interpolations, computes the volume integral.\n
 \n
 OP_AVG\n
 For volume interpolations, computes the volume average.\n
+OP_MAX\n
+For volume interpolations, computes the volume max.\n
 \return Handle int Handle to the created interpolation.
 \ingroup LuaFFInterpol
 \author Jan*/
@@ -1082,58 +1084,6 @@ int CHI_LUA::chiDiffusionInitialize(int SolverHandle)
 \author Jan*/
 int CHI_LUA::chiDiffusionExecute(int SolverHandle, int SolverHandle)
 {return;} 
-/**Initializes the solver.
-\param SolverIndex int Handle to the solver.
- \ingroup LuaNPT
- */
-int CHI_LUA::chiNPTInitialize(int SolverIndex)
-{return;} 
-/** \defgroup LuaNPT Neutral Particle Transport
- * \ingroup LuaModules*/
-/**Creates a Neutral Particle Transport solver.
-\return SolverHandle int Handle to the solver created.
-\code
-\endcode
-\ingroup LuaNPT
- */
-int CHI_LUA::chiNPTransportCreateSolver()
-{return;} 
-/**Obtains a list of field functions from the transport solver.
- *
-\param SolverIndex int Handle to the solver for which the list is to be obtained.
-\return table,count Returns an array of handles and the amount of elements in
-        it (indexed from 1).
-\ingroup LuaNPT
-\author Jan*/
-int CHI_LUA::chiNPTGetFieldFunctionList(int SolverIndex)
-{return;} 
-/**Obtains a list of field functions, related only to scalar flux,
-from the transport solver.
-\param SolverIndex int Handle to the solver for which the list is to be obtained.
-\return table,count Returns an array of handles and the amount of elements in
-        it (indexed from 1).
-\ingroup LuaNPT
-\author Jan*/
-int CHI_LUA::chiNPTGetScalarFieldFunctionList(int SolverIndex)
-{return;} 
-///**Create an empty material.
-//\param SolverIndex int Handle to the solver for which the material
-// is to be created.
-//\ingroup LuaNPT
-//*/
-int CHI_LUA::chiNPTCreateMaterial(int SolverIndex)
-{return;} 
-///**Set the material as a pure absorber.
-//\param SolverIndex int Handle to the solver for which the material
-// is to be created.
-//\param MaterialIndex int Handle to the material in question.
-//\param NumberOfGroups int Number of groups for the material.
-//\param ScatOrder int Maximum scattering order of the material.
-//\param Sigma_t=1.0 double (Optional) Total cross-section to be used.
-//\ingroup LuaNPT
-//*/
-int CHI_LUA::chiNPTMaterialSetPureAbsorber(int SolverIndex, int MaterialIndex, int NumberOfGroups, int ScatOrder, double Sigma_t=1.0)
-{return;} 
 /**Set NPT property.
 \param SolverIndex int Handle to the solver for which the set is to be created.
 \param PropertyIndex int Code for a specific property.
@@ -1220,7 +1170,7 @@ on the given platform will start to suffer. One can gain a small amount of
 parallel efficiency by lowering this limit, however, there is a point where
 the parallel efficiency will actually get worse so use with caution.
 \ingroup LuaNPT*/
-int CHI_LUA::chiNPTSetProperty(int SolverIndex, int PropertyIndex)
+int CHI_LUA::chiLBSSetProperty(int SolverIndex, int PropertyIndex)
 {return;} 
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 The code below is an example of a complete specification of a groupset.
@@ -1266,7 +1216,7 @@ gs0 = chiNPTCreateGroupset(phys1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTCreateGroupset(int SolverIndex)
+int CHI_LUA::chiLBSCreateGroupset(int SolverIndex)
 {return;} 
 /**Create a group.
 \param SolverIndex int Handle to the solver for which the group
@@ -1278,7 +1228,7 @@ grp[g] = chiNPTCreateGroup(phys1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTCreateGroup(int SolverIndex)
+int CHI_LUA::chiLBSCreateGroup(int SolverIndex)
 {return;} 
 /**Adds a block of groups to a groupset.
 \param SolverIndex int Handle to the solver for which the group
@@ -1298,7 +1248,7 @@ chiNPTGroupsetAddGroups(phys1,cur_gs,0,15)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetAddGroups(int SolverIndex, int GroupsetIndex, int FromIndex, int ToIndex)
+int CHI_LUA::chiLBSGroupsetAddGroups(int SolverIndex, int GroupsetIndex, int FromIndex, int ToIndex)
 {return;} 
 /**Sets the product quadrature used for the groupset
 \param SolverIndex int Handle to the solver for which the group
@@ -1315,7 +1265,7 @@ chiNPTGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetQuadrature(int SolverIndex, int GroupsetIndex, int QuadratureIndex)
+int CHI_LUA::chiLBSGroupsetSetQuadrature(int SolverIndex, int GroupsetIndex, int QuadratureIndex)
 {return;} 
 /**Sets the angle aggregation divisions
 \param SolverIndex int Handle to the solver for which the group
@@ -1338,7 +1288,7 @@ chiNPTGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetAngleAggDiv(int SolverIndex, int GroupsetIndex, int NumDiv)
+int CHI_LUA::chiLBSGroupsetSetAngleAggDiv(int SolverIndex, int GroupsetIndex, int NumDiv)
 {return;} 
 /**Sets the number of group-subsets to use for groupset. Default 1.
 \param SolverIndex int Handle to the solver for which the group
@@ -1353,7 +1303,7 @@ chiNPTGroupsetSetGroupSubsets(phys1,cur_gs,1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetGroupSubsets(int SolverIndex, int GroupsetIndex, int NumDiv)
+int CHI_LUA::chiLBSGroupsetSetGroupSubsets(int SolverIndex, int GroupsetIndex, int NumDiv)
 {return;} 
 /**Sets the number of group-subsets to use for groupset. Default 1.
 \param SolverIndex int Handle to the solver for which the group
@@ -1374,7 +1324,7 @@ chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetIterativeMethod(int SolverIndex, int GroupsetIndex, int IterativeMethod)
+int CHI_LUA::chiLBSGroupsetSetIterativeMethod(int SolverIndex, int GroupsetIndex, int IterativeMethod)
 {return;} 
 /**Sets the residual tolerance for the iterative method of the groupset.
  *
@@ -1392,7 +1342,7 @@ chiNPTGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetResidualTolerance(int SolverIndex, int GroupsetIndex, float ResidualTol)
+int CHI_LUA::chiLBSGroupsetSetResidualTolerance(int SolverIndex, int GroupsetIndex, float ResidualTol)
 {return;} 
 /**Sets the maximum number of iterations for the groupset iterative method.
 \param SolverIndex int Handle to the solver for which the group
@@ -1407,7 +1357,7 @@ chiNPTGroupsetSetMaxIterations(phys1,cur_gs,200)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetMaxIterations(int SolverIndex, int GroupsetIndex, int Numiter)
+int CHI_LUA::chiLBSGroupsetSetMaxIterations(int SolverIndex, int GroupsetIndex, int Numiter)
 {return;} 
 /**Sets the restart interval for GMRES if applied to the groupset.
 \param SolverIndex int Handle to the solver for which the group
@@ -1422,7 +1372,7 @@ chiNPTGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetGMRESRestartIntvl(int SolverIndex, int GroupsetIndex, int Intvl)
+int CHI_LUA::chiLBSGroupsetSetGMRESRestartIntvl(int SolverIndex, int GroupsetIndex, int Intvl)
 {return;} 
 /**Sets the Within-Group Diffusion Synthetic Acceleration parameters
  * for this groupset. If this call is being made then it is assumed
@@ -1448,7 +1398,7 @@ chiNPTGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetWGDSA(int SolverIndex, int GroupsetIndex, int MaxIters, float ResTol, bool Verbose, char PETSCString)
+int CHI_LUA::chiLBSGroupsetSetWGDSA(int SolverIndex, int GroupsetIndex, int MaxIters, float ResTol, bool Verbose, char PETSCString)
 {return;} 
 /**Sets the Two-Grid Diffusion Synthetic Acceleration parameters
  * for this groupset. If this call is being made then it is assumed
@@ -1474,11 +1424,45 @@ chiNPTGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 \endcode
 \ingroup LuaLBSGroupsets
 */
-int CHI_LUA::chiNPTGroupsetSetTGDSA(int SolverIndex, int GroupsetIndex, int MaxIters, float ResTol, bool Verbose, char PETSCString)
+int CHI_LUA::chiLBSGroupsetSetTGDSA(int SolverIndex, int GroupsetIndex, int MaxIters, float ResTol, bool Verbose, char PETSCString)
+{return;} 
+/**Initializes the solver.
+\param SolverIndex int Handle to the solver.
+ \ingroup LuaNPT
+ */
+int CHI_LUA::chiLBSInitialize(int SolverIndex)
+{return;} 
+/**Obtains a list of field functions from the transport solver.
+ *
+\param SolverIndex int Handle to the solver for which the list is to be obtained.
+\return table,count Returns an array of handles and the amount of elements in
+        it (indexed from 1).
+\ingroup LuaNPT
+\author Jan*/
+int CHI_LUA::chiLBSGetFieldFunctionList(int SolverIndex)
+{return;} 
+/**Obtains a list of field functions, related only to scalar flux,
+from the transport solver.
+\param SolverIndex int Handle to the solver for which the list is to be obtained.
+\return table,count Returns an array of handles and the amount of elements in
+        it (indexed from 1).
+\ingroup LuaNPT
+\author Jan*/
+int CHI_LUA::chiLBSGetScalarFieldFunctionList(int SolverIndex)
+{return;} 
+/** \defgroup LuaNPT Neutral Particle Transport
+ * \ingroup LuaModules*/
+/**Creates a Neutral Particle Transport solver.
+\return SolverHandle int Handle to the solver created.
+\code
+\endcode
+\ingroup LuaNPT
+ */
+int CHI_LUA::chiLBSransportCreateSolver()
 {return;} 
 /**Executes the NPT solver.
 \param SolverIndex int Handle to the solver.
  \ingroup LuaNPT
  */
-int CHI_LUA::chiNPTExecute(int SolverIndex)
+int CHI_LUA::chiLBSExecute(int SolverIndex)
 {return;} 

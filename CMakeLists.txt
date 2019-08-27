@@ -144,7 +144,7 @@ add_subdirectory("${CHI_TECH_DIR}/CHI_LOG")
 
 add_subdirectory("${CHI_TECH_MOD}/CHI_MONTECARLON")
 add_subdirectory("${CHI_TECH_MOD}/CHI_DIFFUSION")
-add_subdirectory("${CHI_TECH_MOD}/CHI_NPTRANSPORT")
+add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
 
 
