@@ -25,8 +25,10 @@ public:
   friend std::ostream& operator<<(std::ostream& os,  SurfaceMesh& dt);
   //01
   int   ImportFromOBJFile(const char* fileName,bool as_poly);
+  int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
   void  UpdateInternalConnectivity();
   void  ExportToOBJFile(const char* fileName);
+  void  ExportToPolyFile(const char* fileName);
 
   //02
   bool  CheckNegativeSense(double x, double y, double z);

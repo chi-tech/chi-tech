@@ -6,16 +6,33 @@ print("############################################### LuaTest")
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/PolyFile.obj")
+if (chi_location_id == 0) then
+    tempSurfMesh = chiSurfaceMeshCreate();
+    chiSurfaceMeshImportFromOBJFile(tempSurfMesh,
+            "CHI_RESOURCES/TestObjects/PolyFile.obj")
+    chiSurfaceMeshExportPolyFile(tempSurfMesh,"ZTestPoly.poly")
+    command = "CHI_RESOURCES/Dependencies/triangle/triangle -pqa0.000625 "
+    command = command .. "ZTestPoly.poly"
+    os.execute(command)
+
+    --chiSurfaceMesherExportToObj(meshedSurfMesh,"ZRemeshedSurface.obj")
+end
+chiMPIBarrier()
+meshedSurfMesh = chiSurfaceMeshCreate();
+print("Creating surface mersh")
+chiSurfaceMeshImportFromTriangleFiles(meshedSurfMesh,"ZTestPoly")
+--newSurfMesh = chiSurfaceMeshCreate();
+--chiSurfaceMeshImportFromOBJFile(newSurfMesh,
+--        "CHI_RESOURCES/TestObjects/PolyFile.obj")
+newSurfMesh = meshedSurfMesh
+
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
 --############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_TRIANGLE);
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
 
 chiSurfaceMesherSetProperty(MAX_AREA,1/20/20/4)
@@ -77,6 +94,6 @@ chiFFInterpolationExecute(line0)
 chiFFInterpolationExportPython(line0)
 
 if (chi_location_id == 0) then
-    local handle = io.popen("python ZLFFI10.py")
+    local handle = io.popen("python ZPFFI00.py")
 end
 
