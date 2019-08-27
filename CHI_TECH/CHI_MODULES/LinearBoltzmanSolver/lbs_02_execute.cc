@@ -1,5 +1,5 @@
 #include "lbs_linear_boltzman_solver.h"
-#include "CHI_MODULES/CHI_NPTRANSPORT/IterativeMethods/lbs_iterativemethods.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/IterativeMethods/lbs_iterativemethods.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -46,7 +46,7 @@ void LinearBoltzmanSolver::Execute()
 /**Solves a single groupset.*/
 void LinearBoltzmanSolver::SolveGroupset(int group_set_num)
 {
-  NPT_GROUPSET* group_set = group_sets[group_set_num];
+  LBS_GROUPSET* group_set = group_sets[group_set_num];
   if (group_set->iterative_method == NPT_CLASSICRICHARDSON)
   {
     ClassicRichardson(group_set_num);

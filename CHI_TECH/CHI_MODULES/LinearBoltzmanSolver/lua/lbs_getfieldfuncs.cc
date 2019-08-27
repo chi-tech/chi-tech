@@ -1,6 +1,6 @@
 #include "../../../CHI_LUA/chi_lua.h"
 
-#include "CHI_MODULES/CHI_NPTRANSPORT/lbs_linear_boltzman_solver.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 
 #include "../../../CHI_PHYSICS/chi_physics.h"
 extern CHI_PHYSICS chi_physics_handler;
@@ -17,7 +17,7 @@ extern CHI_LOG chi_log;
         it (indexed from 1).
 \ingroup LuaNPT
 \author Jan*/
-int chiNPTGetFieldFunctionList(lua_State* L)
+int chiLBSGetFieldFunctionList(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
 
@@ -35,7 +35,7 @@ int chiNPTGetFieldFunctionList(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
       <<"ERROR: Incorrect solver-type"
-        "in chiNPTSetProperty\n";
+        "in chiLBSSetProperty\n";
       exit(EXIT_FAILURE);
     }
   }
@@ -43,7 +43,7 @@ int chiNPTGetFieldFunctionList(lua_State* L)
   {
     chi_log.Log(LOG_ALLERROR)
       <<"ERROR: Invalid handle to solver"
-        "in chiNPTSetProperty\n";
+        "in chiLBSSetProperty\n";
     exit(EXIT_FAILURE);
   }
 
@@ -74,7 +74,7 @@ from the transport solver.
         it (indexed from 1).
 \ingroup LuaNPT
 \author Jan*/
-int chiNPTGetScalarFieldFunctionList(lua_State* L)
+int chiLBSGetScalarFieldFunctionList(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
 
@@ -91,14 +91,14 @@ int chiNPTGetScalarFieldFunctionList(lua_State* L)
     else
     {
       fprintf(stderr,"ERROR: Incorrect solver-type"
-                     "in chiNPTSetProperty\n");
+                     "in chiLBSSetProperty\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiNPTSetProperty\n");
+                   "in chiLBSSetProperty\n");
     exit(EXIT_FAILURE);
   }
 

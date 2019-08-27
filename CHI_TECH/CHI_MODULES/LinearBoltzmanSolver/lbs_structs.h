@@ -1,5 +1,5 @@
-#ifndef _chi_npt_structs_h
-#define _chi_npt_structs_h
+#ifndef _lbs_structs_h
+#define _lbs_structs_h
 
 #include "../../../CHI_RESOURCES/Dependencies/Eigen/Dense"
 
@@ -8,13 +8,13 @@
 #define PARTITION_METHOD_FROM_SURFACE  2
 
 /**Struct for storing NPT options.*/
-struct NPT_OPTIONS
+struct LBS_OPTIONS
 {
   int scattering_order;
   int partition_method;
   int sweep_eager_limit;
 
-  NPT_OPTIONS()
+  LBS_OPTIONS()
   {
     scattering_order = 0;
     partition_method = PARTITION_METHOD_SERIAL;
@@ -22,7 +22,7 @@ struct NPT_OPTIONS
   }
 };
 
-class NPT_CELLVIEW
+class LBS_CELLVIEW
 {
 public:
   std::vector<int> node_dof_mapping;
@@ -31,7 +31,7 @@ public:
 
 
 /**Transport view of a cell*/
-class NPT_CELLVIEW_FULL : public NPT_CELLVIEW
+class LBS_CELLVIEW_FULL : public LBS_CELLVIEW
 {
 public:
   std::vector<bool>  face_f_upwind_flag;
@@ -47,7 +47,7 @@ private:
   int num_moms;
 
 public:
-  NPT_CELLVIEW_FULL(int in_dofs,int num_G, int num_m)
+  LBS_CELLVIEW_FULL(int in_dofs,int num_G, int num_m)
   {
     dof_phi_map_start = -1;
     dofs = in_dofs;

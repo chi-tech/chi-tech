@@ -1,6 +1,6 @@
 #include "../../../CHI_LUA/chi_lua.h"
 
-#include "CHI_MODULES/CHI_NPTRANSPORT/lbs_linear_boltzman_solver.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 #include "../../../CHI_PHYSICS/chi_physics.h"
 #include "../../../CHI_MATH/chi_math.h"
 #include <chi_log.h>
@@ -67,7 +67,7 @@ gs0 = chiNPTCreateGroupset(phys1)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTCreateGroupset(lua_State *L)
+int chiLBSCreateGroupset(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
 
@@ -84,19 +84,19 @@ int chiNPTCreateGroupset(lua_State *L)
     else
     {
       fprintf(stderr,"ERROR: Incorrect solver-type"
-                     "in chiNPTCreateGroupset\n");
+                     "in chiLBSCreateGroupset\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiNPTCreateGroupset\n");
+                   "in chiLBSCreateGroupset\n");
     exit(EXIT_FAILURE);
   }
 
   //============================================= Create groupset
-  NPT_GROUPSET* newgs = new NPT_GROUPSET;
+  LBS_GROUPSET* newgs = new LBS_GROUPSET;
   solver->group_sets.push_back(newgs);
 
   lua_pushnumber(L,solver->group_sets.size()-1);
@@ -119,7 +119,7 @@ grp[g] = chiNPTCreateGroup(phys1)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTCreateGroup(lua_State *L)
+int chiLBSCreateGroup(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
 
@@ -136,19 +136,19 @@ int chiNPTCreateGroup(lua_State *L)
     else
     {
       fprintf(stderr,"ERROR: Incorrect solver-type"
-                     "in chiNPTCreateGroup\n");
+                     "in chiLBSCreateGroup\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiNPTCreateGroup\n");
+                   "in chiLBSCreateGroup\n");
     exit(EXIT_FAILURE);
   }
 
   //============================================= Create groupset
-  NPT_GROUP* newgs = new NPT_GROUP;
+  LBS_GROUP* newgs = new LBS_GROUP;
   solver->groups.push_back(newgs);
   newgs->id = solver->groups.size()-1;
   lua_pushnumber(L,newgs->id);
@@ -183,14 +183,14 @@ chiNPTGroupsetAddGroups(phys1,cur_gs,0,15)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetAddGroups(lua_State *L)
+int chiLBSGroupsetAddGroups(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 4)
   {
     fprintf(stderr,"ERROR: Invalid amount of arguments, %d,"
-                   "in chiNPTGroupsetAddGroups"
+                   "in chiLBSGroupsetAddGroups"
                    " (4 required)\n",num_args);
     exit(EXIT_FAILURE);
   }
@@ -212,26 +212,26 @@ int chiNPTGroupsetAddGroups(lua_State *L)
     else
     {
       fprintf(stderr,"ERROR: Incorrect solver-type in "
-                     "chiNPTGroupsetAddGroups\n");
+                     "chiLBSGroupsetAddGroups\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiNPTGroupsetAddGroups\n");
+                   "in chiLBSGroupsetAddGroups\n");
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
   catch (std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to groupset"
-                   "in chiNPTGroupsetAddGroups\n");
+                   "in chiLBSGroupsetAddGroups\n");
     exit(EXIT_FAILURE);
   }
 
@@ -239,7 +239,7 @@ int chiNPTGroupsetAddGroups(lua_State *L)
   if (to<from)
   {
     chi_log.Log(LOG_0ERROR)
-    << "No groups added to groupset in chiNPTGroupsetAddGroups. "
+    << "No groups added to groupset in chiLBSGroupsetAddGroups. "
        "This is triggered when groups are added with the \"to\" "
        "field being less than the \"from\" field.";
     exit(EXIT_FAILURE);
@@ -248,7 +248,7 @@ int chiNPTGroupsetAddGroups(lua_State *L)
 
   for (unsigned k=from; k<=to; k++)
   {
-    NPT_GROUP* group;
+    LBS_GROUP* group;
     //================================= Check valid group
     try {
       group = solver->groups.at(k);
@@ -256,7 +256,7 @@ int chiNPTGroupsetAddGroups(lua_State *L)
     catch (std::out_of_range o)
     {
       fprintf(stderr,"ERROR: Invalid group added to groupset"
-                     "in chiNPTGroupsetAddGroups\n");
+                     "in chiLBSGroupsetAddGroups\n");
       exit(EXIT_FAILURE);
     }
 
@@ -289,16 +289,16 @@ chiNPTGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetQuadrature(lua_State *L)
+int chiLBSGroupsetSetQuadrature(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetQuadrature",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetQuadrature",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetQuadrature",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetQuadrature",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetQuadrature",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetQuadrature",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetQuadrature",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetQuadrature",L,3);
 
 
   int solver_index = lua_tonumber(L,1);
@@ -318,26 +318,26 @@ int chiNPTGroupsetSetQuadrature(lua_State *L)
     else
     {
       fprintf(stderr,"ERROR: Incorrect solver-type"
-                     "in chiNPTGroupsetSetQuadrature\n");
+                     "in chiLBSGroupsetSetQuadrature\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiNPTGroupsetSetQuadrature\n");
+                   "in chiLBSGroupsetSetQuadrature\n");
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
   catch (std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to groupset"
-                   "in chiNPTGroupsetSetQuadrature\n");
+                   "in chiLBSGroupsetSetQuadrature\n");
     exit(EXIT_FAILURE);
   }
 
@@ -349,7 +349,7 @@ int chiNPTGroupsetSetQuadrature(lua_State *L)
   catch (std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to Product Quadrature"
-                   "in chiNPTGroupsetSetQuadrature\n");
+                   "in chiLBSGroupsetSetQuadrature\n");
     exit(EXIT_FAILURE);
   }
 
@@ -393,16 +393,16 @@ chiNPTGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetAngleAggDiv(lua_State *L)
+int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetAngleAggDiv",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetAngleAggDiv",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetAngleAggDiv",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetAngleAggDiv",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetAngleAggDiv",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggDiv",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggDiv",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggDiv",L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
@@ -421,7 +421,7 @@ int chiNPTGroupsetSetAngleAggDiv(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetAngleAggDiv";
+        << "in call to chiLBSGroupsetSetAngleAggDiv";
       exit(EXIT_FAILURE);
     }
   }
@@ -429,12 +429,12 @@ int chiNPTGroupsetSetAngleAggDiv(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetAngleAggDiv";
+      << "in call to chiLBSGroupsetSetAngleAggDiv";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -442,7 +442,7 @@ int chiNPTGroupsetSetAngleAggDiv(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetAngleAggDiv";
+      << "in call to chiLBSGroupsetSetAngleAggDiv";
     exit(EXIT_FAILURE);
   }
 
@@ -451,7 +451,7 @@ int chiNPTGroupsetSetAngleAggDiv(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid number of divisions "
-      << "in call to chiNPTGroupsetSetAngleAggDiv. Must be >= 1.";
+      << "in call to chiLBSGroupsetSetAngleAggDiv. Must be >= 1.";
   }
 
   groupset->master_num_ang_subsets = num_div;
@@ -481,16 +481,16 @@ chiNPTGroupsetSetGroupSubsets(phys1,cur_gs,1)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetGroupSubsets(lua_State *L)
+int chiLBSGroupsetSetGroupSubsets(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetGroupSubsets",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetGroupSubsets",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetGroupSubsets",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetGroupSubsets",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetGroupSubsets",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetGroupSubsets",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetGroupSubsets",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetGroupSubsets",L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
@@ -509,7 +509,7 @@ int chiNPTGroupsetSetGroupSubsets(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetGroupSubsets";
+        << "in call to chiLBSGroupsetSetGroupSubsets";
       exit(EXIT_FAILURE);
     }
   }
@@ -517,12 +517,12 @@ int chiNPTGroupsetSetGroupSubsets(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetGroupSubsets";
+      << "in call to chiLBSGroupsetSetGroupSubsets";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -530,7 +530,7 @@ int chiNPTGroupsetSetGroupSubsets(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetGroupSubsets";
+      << "in call to chiLBSGroupsetSetGroupSubsets";
     exit(EXIT_FAILURE);
   }
 
@@ -539,7 +539,7 @@ int chiNPTGroupsetSetGroupSubsets(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid number of subsets "
-      << "in call to chiNPTGroupsetSetGroupSubsets. Must be >= 1.";
+      << "in call to chiLBSGroupsetSetGroupSubsets. Must be >= 1.";
   }
 
   groupset->master_num_grp_subsets = num_div;
@@ -577,16 +577,16 @@ chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetIterativeMethod(lua_State *L)
+int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetIterativeMethod",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetIterativeMethod",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetIterativeMethod",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetIterativeMethod",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetIterativeMethod",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetIterativeMethod",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetIterativeMethod",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetIterativeMethod",L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int iter_method  = lua_tonumber(L,3);
@@ -605,7 +605,7 @@ int chiNPTGroupsetSetIterativeMethod(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetGroupSubsets";
+        << "in call to chiLBSGroupsetSetGroupSubsets";
       exit(EXIT_FAILURE);
     }
   }
@@ -613,12 +613,12 @@ int chiNPTGroupsetSetIterativeMethod(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetGroupSubsets";
+      << "in call to chiLBSGroupsetSetGroupSubsets";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -626,7 +626,7 @@ int chiNPTGroupsetSetIterativeMethod(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetGroupSubsets";
+      << "in call to chiLBSGroupsetSetGroupSubsets";
     exit(EXIT_FAILURE);
   }
 
@@ -642,7 +642,7 @@ int chiNPTGroupsetSetIterativeMethod(lua_State *L)
   {
     chi_log.Log(LOG_0ERROR)
       << "Unsupported iterative method specified in call to "
-      << "chiNPTGroupsetSetIterativeMethod.";
+      << "chiLBSGroupsetSetIterativeMethod.";
     exit(EXIT_FAILURE);
   }
 
@@ -671,16 +671,16 @@ chiNPTGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetResidualTolerance(lua_State *L)
+int chiLBSGroupsetSetResidualTolerance(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetResidualTolerance",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetResidualTolerance",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetResidualTolerance",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetResidualTolerance",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetResidualTolerance",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetResidualTolerance",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetResidualTolerance",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetResidualTolerance",L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   double resid_tol = lua_tonumber(L,3);
@@ -699,7 +699,7 @@ int chiNPTGroupsetSetResidualTolerance(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetGroupSubsets";
+        << "in call to chiLBSGroupsetSetGroupSubsets";
       exit(EXIT_FAILURE);
     }
   }
@@ -707,12 +707,12 @@ int chiNPTGroupsetSetResidualTolerance(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetGroupSubsets";
+      << "in call to chiLBSGroupsetSetGroupSubsets";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -720,7 +720,7 @@ int chiNPTGroupsetSetResidualTolerance(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetGroupSubsets";
+      << "in call to chiLBSGroupsetSetGroupSubsets";
     exit(EXIT_FAILURE);
   }
 
@@ -762,16 +762,16 @@ chiNPTGroupsetSetMaxIterations(phys1,cur_gs,200)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetMaxIterations(lua_State *L)
+int chiLBSGroupsetSetMaxIterations(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetMaxIterations",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetMaxIterations",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetMaxIterations",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetMaxIterations",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetMaxIterations",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetMaxIterations",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetMaxIterations",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetMaxIterations",L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_iter = lua_tonumber(L,3);
@@ -790,7 +790,7 @@ int chiNPTGroupsetSetMaxIterations(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetMaxIterations";
+        << "in call to chiLBSGroupsetSetMaxIterations";
       exit(EXIT_FAILURE);
     }
   }
@@ -798,12 +798,12 @@ int chiNPTGroupsetSetMaxIterations(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetMaxIterations";
+      << "in call to chiLBSGroupsetSetMaxIterations";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -811,7 +811,7 @@ int chiNPTGroupsetSetMaxIterations(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetMaxIterations";
+      << "in call to chiLBSGroupsetSetMaxIterations";
     exit(EXIT_FAILURE);
   }
 
@@ -820,7 +820,7 @@ int chiNPTGroupsetSetMaxIterations(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid number of iterations "
-      << "in call to chiNPTGroupsetSetMaxIterations. Must be >= 0.";
+      << "in call to chiLBSGroupsetSetMaxIterations. Must be >= 0.";
   }
 
   groupset->max_iterations = num_iter;
@@ -850,16 +850,16 @@ chiNPTGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetGMRESRestartIntvl(lua_State *L)
+int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiNPTGroupsetSetGMRESRestartIntvl",3,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetGMRESRestartIntvl",3,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetGMRESRestartIntvl",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetGMRESRestartIntvl",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetGMRESRestartIntvl",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetGMRESRestartIntvl",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetGMRESRestartIntvl",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetGMRESRestartIntvl",L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int restart_intvl = lua_tonumber(L,3);
@@ -878,7 +878,7 @@ int chiNPTGroupsetSetGMRESRestartIntvl(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetGMRESRestartIntvl";
+        << "in call to chiLBSGroupsetSetGMRESRestartIntvl";
       exit(EXIT_FAILURE);
     }
   }
@@ -886,12 +886,12 @@ int chiNPTGroupsetSetGMRESRestartIntvl(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetGMRESRestartIntvl";
+      << "in call to chiLBSGroupsetSetGMRESRestartIntvl";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -899,7 +899,7 @@ int chiNPTGroupsetSetGMRESRestartIntvl(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetGMRESRestartIntvl";
+      << "in call to chiLBSGroupsetSetGMRESRestartIntvl";
     exit(EXIT_FAILURE);
   }
 
@@ -908,7 +908,7 @@ int chiNPTGroupsetSetGMRESRestartIntvl(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid GMRES restart interval specified "
-      << "in call to chiNPTGroupsetSetGMRESRestartIntvl. Must be >= 3.";
+      << "in call to chiLBSGroupsetSetGMRESRestartIntvl. Must be >= 3.";
   }
 
   groupset->gmres_restart_intvl = restart_intvl;
@@ -952,17 +952,17 @@ chiNPTGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetWGDSA(lua_State *L)
+int chiLBSGroupsetSetWGDSA(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError("chiNPTGroupsetSetWGDSA",4,num_args);
+    LuaPostArgAmountError("chiLBSGroupsetSetWGDSA",4,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetWGDSA",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetWGDSA",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetWGDSA",L,3);
-  LuaCheckNilValue("chiNPTGroupsetSetWGDSA",L,4);
+  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,4);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
@@ -990,7 +990,7 @@ int chiNPTGroupsetSetWGDSA(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetWGDSA";
+        << "in call to chiLBSGroupsetSetWGDSA";
       exit(EXIT_FAILURE);
     }
   }
@@ -998,12 +998,12 @@ int chiNPTGroupsetSetWGDSA(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetWGDSA";
+      << "in call to chiLBSGroupsetSetWGDSA";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -1011,7 +1011,7 @@ int chiNPTGroupsetSetWGDSA(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetWGDSA";
+      << "in call to chiLBSGroupsetSetWGDSA";
     exit(EXIT_FAILURE);
   }
 
@@ -1062,17 +1062,17 @@ chiNPTGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 
 \ingroup LuaLBSGroupsets
 */
-int chiNPTGroupsetSetTGDSA(lua_State *L)
+int chiLBSGroupsetSetTGDSA(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args < 4)
     LuaPostArgAmountError("TGDSA",4,num_args);
 
-  LuaCheckNilValue("chiNPTGroupsetSetTGDSA",L,1);
-  LuaCheckNilValue("chiNPTGroupsetSetTGDSA",L,2);
-  LuaCheckNilValue("chiNPTGroupsetSetTGDSA",L,3);
-  LuaCheckNilValue("chiNPTGroupsetSetTGDSA",L,4);
+  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,3);
+  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,4);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
@@ -1100,7 +1100,7 @@ int chiNPTGroupsetSetTGDSA(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Incorrect solver-type "
-        << "in call to chiNPTGroupsetSetTGDSA";
+        << "in call to chiLBSGroupsetSetTGDSA";
       exit(EXIT_FAILURE);
     }
   }
@@ -1108,12 +1108,12 @@ int chiNPTGroupsetSetTGDSA(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
-      << "in call to chiNPTGroupsetSetTGDSA";
+      << "in call to chiLBSGroupsetSetTGDSA";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to groupset
-  NPT_GROUPSET* groupset;
+  LBS_GROUPSET* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -1121,7 +1121,7 @@ int chiNPTGroupsetSetTGDSA(lua_State *L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
-      << "in call to chiNPTGroupsetSetTGDSA";
+      << "in call to chiLBSGroupsetSetTGDSA";
     exit(EXIT_FAILURE);
   }
 

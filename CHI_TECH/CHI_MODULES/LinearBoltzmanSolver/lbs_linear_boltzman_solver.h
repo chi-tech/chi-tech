@@ -1,9 +1,9 @@
-#ifndef _chi_nptransport_h
-#define _chi_nptransport_h
+#ifndef _lbs_linearboltzmansolver_h
+#define _lbs_linearboltzmansolver_h
 
 #include "../../CHI_PHYSICS/CHI_SOLVER/chi_solver.h"
 
-#include "CHI_MODULES/CHI_NPTRANSPORT/GroupSet/lbs_groupset.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/GroupSet/lbs_groupset.h"
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property11_isotropic_mg_src.h>
 #include"../../CHI_MATH/CHI_DISCRETIZATION/chi_discretization.h"
@@ -27,12 +27,12 @@ typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
 class LinearBoltzmanSolver : public chi_physics::Solver
 {
 public:
-  NPT_OPTIONS options;    //In chi_npt_structs.h
+  LBS_OPTIONS options;    //In chi_npt_structs.h
 
   int num_moments;
 
-  std::vector<NPT_GROUP*>                            groups;
-  std::vector<NPT_GROUPSET*>                         group_sets;
+  std::vector<LBS_GROUP*>                            groups;
+  std::vector<LBS_GROUPSET*>                         group_sets;
   std::vector<chi_physics::TransportCrossSections*>  material_xs;
   std::vector<chi_physics::IsotropicMultiGrpSource*> material_srcs;
   std::vector<int>                                   matid_to_xs_map;
@@ -41,7 +41,7 @@ public:
 
   CHI_DISCRETIZATION*                                discretization;
   chi_mesh::MeshContinuum*                           grid;
-  std::vector<NPT_CELLVIEW*>                         cell_transport_views;
+  std::vector<LBS_CELLVIEW*>                         cell_transport_views;
 
   std::vector<int>                                   local_cell_indices;
 
@@ -91,28 +91,28 @@ public:
   void SolveGroupset(int group_set_num);
 
   //03a
-  void ComputeSweepOrderings(NPT_GROUPSET *groupset);
+  void ComputeSweepOrderings(LBS_GROUPSET *groupset);
   //03b
-  void InitFluxDataStructures(NPT_GROUPSET *groupset);
+  void InitFluxDataStructures(LBS_GROUPSET *groupset);
   //03c
-  void InitAngleAggPolar(NPT_GROUPSET *groupset);
-  void InitAngleAggSingle(NPT_GROUPSET *groupset);
+  void InitAngleAggPolar(LBS_GROUPSET *groupset);
+  void InitAngleAggSingle(LBS_GROUPSET *groupset);
   //03d
-  void InitWGDSA(NPT_GROUPSET *groupset);
-  void AssembleWGDSADeltaPhiVector(NPT_GROUPSET *groupset, double *ref_phi_old,
+  void InitWGDSA(LBS_GROUPSET *groupset);
+  void AssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset, double *ref_phi_old,
                                    double *ref_phi_new);
-  void DisAssembleWGDSADeltaPhiVector(NPT_GROUPSET *groupset,
+  void DisAssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
                                       double *ref_phi_new);
   //04d
-  void InitTGDSA(NPT_GROUPSET* groupset);
-  void AssembleTGDSADeltaPhiVector(NPT_GROUPSET *groupset, double *ref_phi_old,
+  void InitTGDSA(LBS_GROUPSET* groupset);
+  void AssembleTGDSADeltaPhiVector(LBS_GROUPSET *groupset, double *ref_phi_old,
                                    double *ref_phi_new);
-  void DisAssembleTGDSADeltaPhiVector(NPT_GROUPSET *groupset,
+  void DisAssembleTGDSADeltaPhiVector(LBS_GROUPSET *groupset,
                                       double *ref_phi_new);
 
 
   //04c
-  void ResetSweepOrderings(NPT_GROUPSET *groupset);
+  void ResetSweepOrderings(LBS_GROUPSET *groupset);
 
 
 
@@ -120,14 +120,14 @@ public:
   void        SetSource(int group_set_num,
                         bool apply_mat_src=false,
                         bool suppress_phi_old=false);
-  double      ComputePiecewiseChange(NPT_GROUPSET* groupset);
+  double      ComputePiecewiseChange(LBS_GROUPSET* groupset);
   SweepChunk* SetSweepChunk(int group_set_num);
   void        ClassicRichardson(int group_set_num);
   void        GMRES(int group_set_num);
-  void        AssembleVectors(NPT_GROUPSET *groupset);
-  void        AssembleVector(NPT_GROUPSET *groupset, Vec x, double *y);
-  void        DisAssembleVector(NPT_GROUPSET *groupset, Vec x_src, double *y);
-  void        DisAssembleVectorLocalToLocal(NPT_GROUPSET *groupset, double* x_src, double *y);
+  void        AssembleVectors(LBS_GROUPSET *groupset);
+  void        AssembleVector(LBS_GROUPSET *groupset, Vec x, double *y);
+  void        DisAssembleVector(LBS_GROUPSET *groupset, Vec x_src, double *y);
+  void        DisAssembleVectorLocalToLocal(LBS_GROUPSET *groupset, double* x_src, double *y);
 };
 
 #endif

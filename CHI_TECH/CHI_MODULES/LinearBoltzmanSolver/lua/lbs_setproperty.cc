@@ -1,6 +1,6 @@
 #include "../../../CHI_LUA/chi_lua.h"
 
-#include "CHI_MODULES/CHI_NPTRANSPORT/lbs_linear_boltzman_solver.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 #include "../../../CHI_PHYSICS/chi_physics.h"
 #include "../../../CHI_MATH/chi_math.h"
 
@@ -153,7 +153,7 @@ parallel efficiency by lowering this limit, however, there is a point where
 the parallel efficiency will actually get worse so use with caution.
 
 \ingroup LuaNPT*/
-int chiNPTSetProperty(lua_State* L)
+int chiLBSSetProperty(lua_State *L)
 {
   int numArgs = lua_gettop(L);
   int solver_index = lua_tonumber(L,1);
@@ -171,14 +171,14 @@ int chiNPTSetProperty(lua_State* L)
     else
     {
       fprintf(stderr,"ERROR: Incorrect solver-type"
-                     "in chiNPTSetProperty\n");
+                     "in chiLBSSetProperty\n");
       exit(EXIT_FAILURE);
     }
   }
   catch(std::out_of_range o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiNPTSetProperty\n");
+                   "in chiLBSSetProperty\n");
     exit(EXIT_FAILURE);
   }
 
@@ -207,7 +207,7 @@ int chiNPTSetProperty(lua_State* L)
     else
     {
       std::cerr << "Invalid option for Discretization method in "
-                   "chiNPTSetProperty.\n";
+                   "chiLBSSetProperty.\n";
       exit(EXIT_FAILURE);
     }
   }
@@ -220,7 +220,7 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == BOUNDARY_CONDITION)
   {
     if (numArgs<4)
-      LuaPostArgAmountError("chiNPTSetProperty",4,numArgs);
+      LuaPostArgAmountError("chiLBSSetProperty",4,numArgs);
 
     int bident = lua_tonumber(L,3);
     int btype  = lua_tonumber(L,4);
@@ -229,7 +229,7 @@ int chiNPTSetProperty(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Unknown boundary identifier encountered "
-           "in call to chiNPTSetProperty";
+           "in call to chiLBSSetProperty";
       exit(EXIT_FAILURE);
     }
 
@@ -242,12 +242,12 @@ int chiNPTSetProperty(lua_State* L)
     else if (btype == INCIDENT_ISOTROPIC)
     {
       if (numArgs!=5)
-        LuaPostArgAmountError("chiNPTSetProperty",5,numArgs);
+        LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
 
       if (solver->groups.size() == 0)
       {
         chi_log.Log(LOG_0ERROR)
-          << "In call to chiNPTSetProperty, setting "
+          << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: Number of solver groups"
           << " is zero. Boundary fluxes can only be set after group structure"
           << " has been defined.";
@@ -257,7 +257,7 @@ int chiNPTSetProperty(lua_State* L)
       if (!lua_istable(L,5))
       {
         chi_log.Log(LOG_ALLERROR)
-          << "In call to chiNPTSetProperty, setting "
+          << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type,"
           << " argument 5 should be a lua table and was detected as"
              " not being one.";
@@ -278,7 +278,7 @@ int chiNPTSetProperty(lua_State* L)
       if (table_len != solver->groups.size())
       {
         chi_log.Log(LOG_0ERROR)
-          << "In call to chiNPTSetProperty, setting "
+          << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: "
           << "Number of groups in boundary flux specification is "
           << table_len << " but solver has a total of "
@@ -302,7 +302,7 @@ int chiNPTSetProperty(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Unsupported boundary type encountered "
-           "in call to chiNPTSetProperty";
+           "in call to chiLBSSetProperty";
       exit(EXIT_FAILURE);
     }
 
@@ -310,18 +310,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_ITERATIVEMETHOD)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_ITERATIVEMETHOD",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_ITERATIVEMETHOD.";
+        << "chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD.";
       exit(EXIT_FAILURE);
     }
 
@@ -339,7 +339,7 @@ int chiNPTSetProperty(lua_State* L)
     {
       chi_log.Log(LOG_0ERROR)
         << "Unsupported iterative method specified in call to "
-        << "chiNPTSetProperty:GROUPSET_ITERATIVEMETHOD.";
+        << "chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD.";
       exit(EXIT_FAILURE);
     }
 
@@ -347,18 +347,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_TOLERANCE)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_TOLERANCE",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TOLERANCE",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_TOLERANCE.";
+        << "chiLBSSetProperty:GROUPSET_TOLERANCE.";
       exit(EXIT_FAILURE);
     }
 
@@ -367,18 +367,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_MAXITERATIONS)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_MAXITERATIONS",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_MAXITERATIONS",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_MAXITERATIONS.";
+        << "chiLBSSetProperty:GROUPSET_MAXITERATIONS.";
       exit(EXIT_FAILURE);
     }
 
@@ -387,18 +387,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_GMRESRESTART_INTVL)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_GMRESRESTART_INTVL",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_GMRESRESTART_INTVL",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_GMRESRESTART_INTVL.";
+        << "chiLBSSetProperty:GROUPSET_GMRESRESTART_INTVL.";
       exit(EXIT_FAILURE);
     }
 
@@ -407,18 +407,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_SUBSETS)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_SUBSETS",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_SUBSETS",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_SUBSETS.";
+        << "chiLBSSetProperty:GROUPSET_SUBSETS.";
       exit(EXIT_FAILURE);
     }
 
@@ -427,18 +427,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_WGDSA)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_WGDSA",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_WGDSA",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_WGDSA.";
+        << "chiLBSSetProperty:GROUPSET_WGDSA.";
       exit(EXIT_FAILURE);
     }
 
@@ -446,7 +446,7 @@ int chiNPTSetProperty(lua_State* L)
     {
       chi_log.Log(LOG_0ERROR)
         << "Invalid datatype supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_WGDSA. Boolean expected.";
+        << "chiLBSSetProperty:GROUPSET_WGDSA. Boolean expected.";
       exit(EXIT_FAILURE);
     }
 
@@ -455,18 +455,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_TGDSA)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_TGDSA",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TGDSA",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_TGDSA.";
+        << "chiLBSSetProperty:GROUPSET_TGDSA.";
       exit(EXIT_FAILURE);
     }
 
@@ -474,7 +474,7 @@ int chiNPTSetProperty(lua_State* L)
     {
       chi_log.Log(LOG_0ERROR)
         << "Invalid datatype supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_TGDSA. Boolean expected.";
+        << "chiLBSSetProperty:GROUPSET_TGDSA. Boolean expected.";
       exit(EXIT_FAILURE);
     }
 
@@ -483,18 +483,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_WGDSA_MAXITERATIONS)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_WGDSA_MAXITERATIONS",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_WGDSA_MAXITERATIONS",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_WGDSA_MAXITERATIONS.";
+        << "chiLBSSetProperty:GROUPSET_WGDSA_MAXITERATIONS.";
       exit(EXIT_FAILURE);
     }
 
@@ -503,18 +503,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_TGDSA_MAXITERATIONS)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_TGDSA_MAXITERATIONS",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TGDSA_MAXITERATIONS",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_TGDSA_MAXITERATIONS.";
+        << "chiLBSSetProperty:GROUPSET_TGDSA_MAXITERATIONS.";
       exit(EXIT_FAILURE);
     }
 
@@ -523,18 +523,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_WGDSA_TOLERANCE)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_WGDSA_TOLERANCE",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_WGDSA_TOLERANCE",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_WGDSA_TOLERANCE.";
+        << "chiLBSSetProperty:GROUPSET_WGDSA_TOLERANCE.";
       exit(EXIT_FAILURE);
     }
 
@@ -543,18 +543,18 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == GROUPSET_TGDSA_TOLERANCE)
   {
     if (numArgs!=4)
-      LuaPostArgAmountError("chiNPTSetProperty:GROUPSET_TGDSA_TOLERANCE",
+      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TGDSA_TOLERANCE",
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    NPT_GROUPSET* groupset;
+    LBS_GROUPSET* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
     catch(std::out_of_range o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
-        << "chiNPTSetProperty:GROUPSET_TGDSA_TOLERANCE.";
+        << "chiLBSSetProperty:GROUPSET_TGDSA_TOLERANCE.";
       exit(EXIT_FAILURE);
     }
 
@@ -568,7 +568,7 @@ int chiNPTSetProperty(lua_State* L)
     {
       chi_log.Log(LOG_0ERROR)
         << "Invalid scattering order in call to "
-        << "chiNPTSetProperty:SCATTERING_ORDER. "
+        << "chiLBSSetProperty:SCATTERING_ORDER. "
            "Value must be > 0.";
       exit(EXIT_FAILURE);
     }
@@ -578,7 +578,7 @@ int chiNPTSetProperty(lua_State* L)
   else if (property == SWEEP_EAGER_LIMIT)
   {
     if (numArgs!=3)
-      LuaPostArgAmountError("chiNPTSetProperty:SWEEP_EAGER_LIMIT",
+      LuaPostArgAmountError("chiLBSSetProperty:SWEEP_EAGER_LIMIT",
                             3,numArgs);
 
     int limit = lua_tonumber(L,3);
@@ -589,7 +589,7 @@ int chiNPTSetProperty(lua_State* L)
   }
   else
   {
-    std::cerr << "Invalid property in chiNPTSetProperty.\n";
+    std::cerr << "Invalid property in chiLBSSetProperty.\n";
     exit(EXIT_FAILURE);
   }
 

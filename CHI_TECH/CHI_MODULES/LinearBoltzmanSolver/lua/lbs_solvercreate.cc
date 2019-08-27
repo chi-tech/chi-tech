@@ -1,5 +1,5 @@
 #include "../../../CHI_LUA/chi_lua.h"
-#include "CHI_MODULES/CHI_NPTRANSPORT/lbs_linear_boltzman_solver.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 #include "../../../CHI_PHYSICS/chi_physics.h"
 #include <chi_log.h>
 
@@ -21,7 +21,7 @@ extern CHI_LOG chi_log;
 
 \ingroup LuaNPT
  */
-int chiNPTransportCreateSolver(lua_State *L)
+int chiLBSransportCreateSolver(lua_State *L)
 {
   chi_log.Log(LOG_ALLVERBOSE_1)
   << "Creating NPTransport solver";

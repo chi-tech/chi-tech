@@ -19,7 +19,7 @@ typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;
 
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
-void LinearBoltzmanSolver::InitAngleAggPolar(NPT_GROUPSET *groupset)
+void LinearBoltzmanSolver::InitAngleAggPolar(LBS_GROUPSET *groupset)
 {
   chi_log.Log(LOG_0) << "Initializing angle aggregation: Polar";
 
@@ -111,7 +111,7 @@ void LinearBoltzmanSolver::InitAngleAggPolar(NPT_GROUPSET *groupset)
 
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
-void LinearBoltzmanSolver::InitAngleAggSingle(NPT_GROUPSET *groupset)
+void LinearBoltzmanSolver::InitAngleAggSingle(LBS_GROUPSET *groupset)
 {
   chi_log.Log(LOG_0) << "Initializing angle aggregation: Single";
 

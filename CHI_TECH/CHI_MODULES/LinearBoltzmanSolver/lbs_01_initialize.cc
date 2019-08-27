@@ -35,7 +35,7 @@ void LinearBoltzmanSolver::Initialize()
 
   if (chi_mpi.location_id == 0)
   {
-    chi_log.Log(LOG_0) << "Initializing NPT Solver\n";
+    chi_log.Log(LOG_0) << "Initializing LBS Solver\n";
     chi_log.Log(LOG_0) << "Scattering order    : "
                        << options.scattering_order << std::endl;
     chi_log.Log(LOG_0) << "Number of Groups    : "
@@ -158,8 +158,8 @@ void LinearBoltzmanSolver::Initialize()
     //here is that it holds the means to know where a given cell's
     //transport quantities are located in the unknown vectors (i.e. phi)
     CellFEView* cell_fe_view = pwl_discretization->MapFeView(cell_g_index);
-    NPT_CELLVIEW_FULL* full_cell_view =
-      new NPT_CELLVIEW_FULL(cell_fe_view->dofs, groups.size(), num_moments);
+    LBS_CELLVIEW_FULL* full_cell_view =
+      new LBS_CELLVIEW_FULL(cell_fe_view->dofs, groups.size(), num_moments);
     cell_transport_views.push_back(full_cell_view);
 
     //For PWLD, for a given cell, within a given sweep chunk,

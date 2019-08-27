@@ -1,7 +1,7 @@
-#include "CHI_MODULES/CHI_NPTRANSPORT/lbs_linear_boltzman_solver.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 
 #include "CHI_MESH/CHI_SWEEP/chi_sweepscheduler.h"
-#include "CHI_MODULES/CHI_NPTRANSPORT/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
+#include "CHI_MODULES/LinearBoltzmanSolver/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include <CHI_MODULES/CHI_DIFFUSION/Solver/diffusion_solver.h>
 
 #include <CHI_TIMER/chi_timer.h>
@@ -29,7 +29,7 @@ void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
     << " with Classic-Richardson.\n\n";
 
   //================================================== Obtain groupset
-  NPT_GROUPSET* groupset = group_sets[group_set_num];
+  LBS_GROUPSET* groupset = group_sets[group_set_num];
   int groupset_numgrps = groupset->groups.size();
   chi_log.Log(LOG_0)
     << "Quadrature number of angles: "
