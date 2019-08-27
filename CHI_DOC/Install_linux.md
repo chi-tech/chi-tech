@@ -155,7 +155,7 @@ In your projects folder install VTK using the following commands:
     cd VTK-8.2.0
     mkdir build
     cd build     
-    cmake -DCMAKE_INSTALL_PREFIX=$PWD/../install \
+    cmake -DCMAKE_INSTALL_PREFIX=$PWD/install \
     -DBUILD_SHARED_LIBS:BOOL=ON \
     -DVTK_Group_MPI:BOOL=ON \
     -DCMAKE_BUILD_TYPE=Release \
