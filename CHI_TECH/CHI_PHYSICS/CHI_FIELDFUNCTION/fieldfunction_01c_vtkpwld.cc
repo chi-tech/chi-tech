@@ -270,62 +270,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
   //============================================= Parallel summary file
   if (chi_mpi.location_id == 0)
   {
-    std::string summary_file_name = base_filename + std::string(".pvtu");
-    vtkXMLPUnstructuredGridWriter* pgrid_writer =
-      vtkXMLPUnstructuredGridWriter::New();
-
-    pgrid_writer->SetInputData(ugrid);
-    pgrid_writer->SetFileName(summary_file_name.c_str());
-
-    pgrid_writer->SetNumberOfPieces(chi_mpi.process_count);
-    pgrid_writer->SetStartPiece(0);
-    pgrid_writer->SetEndPiece(0);
-
-    pgrid_writer->Write();
-
-    //=========================================== Modify summary file
-    std::vector<std::string> file_lines;
-
-    std::ifstream summary_file;
-    summary_file.open(summary_file_name);
-    char rawline[250];
-
-    while (!summary_file.eof())
-    {
-      summary_file.getline(rawline,250);
-      std::string file_line(rawline);
-      file_lines.push_back(file_line);
-
-      size_t piece_tag = file_line.find("Piece");
-
-      if (piece_tag != std::string::npos)
-      {
-        for (int p=1; p<chi_mpi.process_count; p++)
-        {
-          std::string piece =
-            file_line.substr(0,piece_tag) +
-            std::string("Piece Source=\"") +
-            base_filename +
-            std::string("_") +
-            std::to_string(p) +
-            std::string(".vtu\"/>");
-          file_lines.push_back(piece);
-        }
-      }
-
-    }
-
-    summary_file.close();
-
-    std::ofstream ofile;
-    ofile.open(summary_file_name);
-
-    for (int l=0; l<file_lines.size(); l++)
-    {
-      ofile << file_lines[l] << "\n";
-    }
-
-    ofile.close();
+      WritePVTU(base_filename, field_name);
   }
 }
 
@@ -589,69 +534,15 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
   grid_writer->SetFileName(location_filename.c_str());
 
   /*It seems that cluster systems throw an error when the pvtu file
-   * also tries to write to the serial file.*/
+   * also tries to write to the serial file.
   if (chi_mpi.location_id != 0)
+   */
     grid_writer->Write();
+
 
   //============================================= Parallel summary file
   if (chi_mpi.location_id == 0)
   {
-    std::string summary_file_name = base_filename + std::string(".pvtu");
-    vtkXMLPUnstructuredGridWriter* pgrid_writer =
-      vtkXMLPUnstructuredGridWriter::New();
-
-    pgrid_writer->SetInputData(ugrid);
-    pgrid_writer->SetFileName(summary_file_name.c_str());
-
-//    pgrid_writer->SetNumberOfPieces(chi_mpi.process_count);
-    pgrid_writer->SetNumberOfPieces(1);
-    pgrid_writer->SetStartPiece(0);
-    pgrid_writer->SetEndPiece(0);
-
-    pgrid_writer->Write();
-
-    //=========================================== Modify summary file
-    std::vector<std::string> file_lines;
-
-    std::ifstream summary_file;
-    summary_file.open(summary_file_name);
-    char rawline[250];
-
-    while (!summary_file.eof())
-    {
-      summary_file.getline(rawline,250);
-      std::string file_line(rawline);
-      file_lines.push_back(file_line);
-
-      size_t piece_tag = file_line.find("Piece");
-
-      if (piece_tag != std::string::npos)
-      {
-        for (int p=1; p<chi_mpi.process_count; p++)
-        {
-          std::string piece =
-            file_line.substr(0,piece_tag) +
-            std::string("Piece Source=\"") +
-            base_filename +
-            std::string("_") +
-            std::to_string(p) +
-            std::string(".vtu\"/>");
-          file_lines.push_back(piece);
-        }
-      }
-
-    }
-
-    summary_file.close();
-
-    std::ofstream ofile;
-    ofile.open(summary_file_name);
-
-    for (int l=0; l<file_lines.size(); l++)
-    {
-      ofile << file_lines[l] << "\n";
-    }
-
-    ofile.close();
+      WritePVTU(base_filename, field_name, num_grps);
   }
 }
