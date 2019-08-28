@@ -51,6 +51,12 @@ void chi_physics::FieldFunction::ExportToVTKG(std::string base_name,
 
 }
 
+/** Writes the VTK "Assembly file" for multiple vtu files.
+
+\param base_filename Base name for all vtu file. .pvtu will get appended to it.
+\param field_name Name of the field to be exported
+\param num_grps Optional. Defaults to 0. If greater than zero then exports groups.
+\author Jason*/
 void chi_physics::FieldFunction::WritePVTU(std::string base_filename,
                                            std::string field_name,
                                            int num_grps=0)
