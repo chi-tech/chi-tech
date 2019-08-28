@@ -394,6 +394,160 @@ int chi_mesh::SurfaceMesh::
   return 0;
 }
 
+//#########################################################
+/** Loads a surface mesh from triangle's file format.*/
+int chi_mesh::SurfaceMesh::
+ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
+{
+  std::string node_filename = std::string(fileName) +
+                              std::string(".1.node");
+  std::string tria_filename = std::string(fileName) +
+                              std::string(".1.ele");
+
+  //===================================================== Opening the node file
+  std::ifstream file;
+  file.open(node_filename);
+  if (!file.is_open())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Failed to open file: "<< node_filename <<" in call "
+      << "to ImportFromOBJFile \n";
+    exit(EXIT_FAILURE);
+  }
+
+  int num_verts;
+  char line[250];
+  file >> num_verts;
+  file.getline(line,250);
+  for (int v=1; v<=num_verts; v++)
+  {
+    int vert_index;
+    chi_mesh::Vertex vertex;
+    file >> vert_index >> vertex.x >> vertex.y;
+    file.getline(line,250);
+
+    vertices.push_back(vertex);
+  }
+
+  file.close();
+
+  //===================================================== Opening the ele file
+  file.open(tria_filename);
+  if (!file.is_open())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Failed to open file: "<< tria_filename <<" in call "
+      << "to ImportFromOBJFile \n";
+    exit(EXIT_FAILURE);
+  }
+
+  int num_tris;
+
+  file >> num_tris;
+  file.getline(line,250);
+  for (int v=1; v<=num_tris; v++)
+  {
+    int tri_index;
+    chi_mesh::PolyFace* newFace = new chi_mesh::PolyFace;
+
+    int v0,v1,v2;
+    file >> tri_index >> v0 >> v1 >> v2;
+    file.getline(line,250);
+
+
+    newFace->v_indices.resize(3);
+    newFace->v_indices[0] = v0-1;
+    newFace->v_indices[1] = v1-1;
+    newFace->v_indices[2] = v2-1;
+
+    for (int e=0; e<3; e++)
+    {
+      int* side_indices = new int[4];
+
+      if (e<2)
+      {
+        side_indices[0] = newFace->v_indices[e];
+        side_indices[1] = newFace->v_indices[e+1];
+        side_indices[2] = -1;
+        side_indices[3] = -1;
+      }
+      else
+      {
+        side_indices[0] = newFace->v_indices[e];
+        side_indices[1] = newFace->v_indices[0];
+        side_indices[2] = -1;
+        side_indices[3] = -1;
+      }
+      newFace->edges.push_back(side_indices);
+    }
+
+    poly_faces.push_back(newFace);
+  }
+
+  file.close();
+
+  //======================================================= Calculate face properties
+  std::vector<chi_mesh::Face>::iterator curFace;
+  for (curFace = this->faces.begin(); curFace!=this->faces.end(); curFace++)
+  {
+    //=========================================== Calculate geometrical normal
+    chi_mesh::Vertex vA = this->vertices.at(curFace->v_index[0]);
+    chi_mesh::Vertex vB = this->vertices.at(curFace->v_index[1]);
+    chi_mesh::Vertex vC = this->vertices.at(curFace->v_index[2]);
+
+    chi_mesh::Vector vAB = vB-vA;
+    chi_mesh::Vector vBC = vC-vB;
+
+    curFace->geometric_normal = vAB.Cross(vBC);
+    curFace->geometric_normal = curFace->geometric_normal/curFace->geometric_normal.Norm();
+
+    //=========================================== Calculate Assigned normal
+    chi_mesh::Vertex nA = this->normals.at(curFace->n_index[0]);
+    chi_mesh::Vertex nB = this->normals.at(curFace->n_index[1]);
+    chi_mesh::Vertex nC = this->normals.at(curFace->n_index[2]);
+
+    chi_mesh::Vector nAvg = (nA+nB+nC)/3.0;
+    nAvg = nAvg/nAvg.Norm();
+
+    curFace->assigned_normal = nAvg;
+
+    //=========================================== Compute face center
+    curFace->face_centroid = (vA+vB+vC)/3.0;
+  }
+  std::vector<chi_mesh::PolyFace*>::iterator curPFace;
+  for (curPFace = this->poly_faces.begin();
+       curPFace!=this->poly_faces.end();
+       curPFace++)
+  {
+    chi_mesh::Vector centroid;
+    int num_verts = (*curPFace)->v_indices.size();
+    for (int v=0; v<num_verts; v++)
+      centroid = centroid + vertices[(*curPFace)->v_indices[v]];
+
+    centroid = centroid/num_verts;
+
+    (*curPFace)->face_centroid = centroid;
+
+    chi_mesh::Vector n = (vertices[(*curPFace)->v_indices[1]] -
+                          vertices[(*curPFace)->v_indices[0]]).Cross(
+      centroid - vertices[(*curPFace)->v_indices[1]]);
+    n = n/n.Norm();
+
+    (*curPFace)->geometric_normal = n;
+  }
+
+  UpdateInternalConnectivity();
+
+  //============================================= Check each vertex is accounted
+  chi_log.Log(LOG_0)
+    << "Surface mesh loaded with "
+    << this->faces.size() << " triangle faces and "
+    << this->poly_faces.size() << " polygon faces.";
+  //exit(EXIT_FAILURE);
+
+  return 0;
+}
+
 
 
 //#########################################################
@@ -523,6 +677,55 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
               cur_face->v_index[2]+1);
     }
   }
+  if (poly_faces.size()>0)
+  {
+    chi_mesh::PolyFace* first_face = this->poly_faces.front();
+    fprintf(outputFile,"vn %.4f %.4f %.4f\n", first_face->geometric_normal.x,
+            first_face->geometric_normal.y,
+            first_face->geometric_normal.z);
+    fprintf(outputFile,"s off\n");
+
+    for (int f=0; f<poly_faces.size(); f++)
+    {
+      fprintf(outputFile,"f ");
+      for (int v=0; v<poly_faces[f]->v_indices.size(); v++)
+      {
+        fprintf(outputFile,"%d//1 ",poly_faces[f]->v_indices[v]+1);
+      }
+      fprintf(outputFile,"\n");
+    }
+  }
+
+
+  fclose(outputFile);
+  printf("Exported mesh to %s\n",fileName);
+}
+
+//#########################################################
+/**Exports a PSLG to triangle1.6's .poly format.*/
+void chi_mesh::SurfaceMesh::ExportToPolyFile(const char *fileName)
+{
+  FILE* outputFile = fopen(fileName,"w");
+  if (outputFile==NULL)
+  {
+    printf("Error creating file %s!\n",fileName);
+    return;
+  }
+
+  fprintf(outputFile,"%d 2 0 0\n", vertices.size());
+  for (int v=0; v<vertices.size(); v++)
+  {
+    fprintf(outputFile,"%d %.15f %.15f 0\n",v+1,vertices[v].x,vertices[v].y);
+  }
+
+  fprintf(outputFile,"%d 0\n", lines.size());
+  for (int e=0; e<lines.size(); e++)
+  {
+    fprintf(outputFile,"%d %d %d\n",e+1,lines[e].v_index[0]+1,
+                                      lines[e].v_index[1]+1);
+  }
+
+  fprintf(outputFile,"0");
 
 
   fclose(outputFile);

@@ -247,6 +247,22 @@ for k=1,loop_count do
 end
 \endcode
 */
+/** Exports mesh as a .obj format.
+ *
+\param SurfaceHandle int Handle to the surface on which the operation is to be performed.
+\param FileName char* Path to the file to be exported.
+\ingroup LuaSurfaceMesh
+\author Jan*/
+int CHI_LUA::chiSurfaceMeshExportToObj(int SurfaceHandle, char* FileName)
+{return;} 
+/** Exports mesh as a .poly format.
+ *
+\param SurfaceHandle int Handle to the surface on which the operation is to be performed.
+\param FileName char* Path and basename to the file to be exported.
+\ingroup LuaSurfaceMesh
+\author Jan*/
+int CHI_LUA::chiSurfaceMeshExportPolyFile(int SurfaceHandle, char* FileName)
+{return;} 
 /** \defgroup LuaSurfaceMesh Surface Meshes
  * \ingroup LuaMesh
 */
@@ -267,6 +283,18 @@ int CHI_LUA::chiSurfaceMeshCreate()
 \ingroup LuaSurfaceMesh
 \author Jan*/
 int CHI_LUA::chiSurfaceMeshImportFromOBJFile(int SurfaceHandle, char* FileName, bool polyflag)
+{return;} 
+/** Loads mesh data from a wavefront object.
+ *
+\param SurfaceHandle int Handle to the surface on which the operation is to be performed.
+\param FileName char* Path to the file to be imported.
+\param polyflag bool (Optional)Flag indicating whether triangles
+ are to be read as polygons. [Default: true)
+\return success bool Return true if file was successfully loaded and false
+ otherwise.
+\ingroup LuaSurfaceMesh
+\author Jan*/
+int CHI_LUA::chiSurfaceMeshImportFromTriangleFiles(int SurfaceHandle, char* FileName, bool polyflag)
 {return;} 
 /** Exports all open edges of a surface mesh to file. This is used mostly
  * for graphical error checking.
@@ -1084,7 +1112,7 @@ int CHI_LUA::chiDiffusionInitialize(int SolverHandle)
 \author Jan*/
 int CHI_LUA::chiDiffusionExecute(int SolverHandle, int SolverHandle)
 {return;} 
-/**Set NPT property.
+/**Set LBS property.
 \param SolverIndex int Handle to the solver for which the set is to be created.
 \param PropertyIndex int Code for a specific property.
 ##_
@@ -1132,14 +1160,14 @@ SWEEP_EAGER_LIMIT\n
 ###BoundaryIdentify
 This value follows the argument BOUNDARY_CONDITION and identifies which
 boundary is under consideration. Right now only boundaries aligned with
-cartesian axes are considered. Followed by NPTBoundaryType.\n
+cartesian axes are considered. Followed by LBSBoundaryType.\n
 XMAX = Right boundary \n
 XMIN = Left boundary \n
 YMAX = Front boundary \n
 YMIN = Back boundary \n
 ZMAX = Top boundary \n
 ZMIN = Bottom boundary \n
-###NPTBoundaryType
+###LBSBoundaryType
 Specifies the type of boundary. Depending on the type this argument needs
 to be followed by one or more values. Note: By default all boundaries are
 type VACUUM.\n
@@ -1176,31 +1204,31 @@ int CHI_LUA::chiLBSSetProperty(int SolverIndex, int PropertyIndex)
 The code below is an example of a complete specification of a groupset.
 \code
 --===================================== Setup physics
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSransportCreateSolver()
 chiSolverAddRegion(phys1,region1)
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
-chiNPTSetProperty(phys1,SCATTERING_ORDER,1)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 --========== Groups
 grp = {}
 for g=1,num_groups do
-    grp[g] = chiNPTCreateGroup(phys1)
+    grp[g] = chiLBSCreateGroup(phys1)
 end
 --========== ProdQuad
 pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
 pquad1 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8)
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
+gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
-chiNPTGroupsetAddGroups(phys1,cur_gs,0,15)
-chiNPTGroupsetSetQuadrature(phys1,cur_gs,pquad0)
-chiNPTGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiNPTGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-chiNPTGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiNPTGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiNPTGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
-chiNPTGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
-chiNPTGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,15)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 \endcode
 Groupsets segregate the code into pieces arranged by the number of groups
 it contains. A great deal of care must be taken with intergroupset transfer
@@ -1212,7 +1240,7 @@ will be available to them.
 ##_
 Example:
 \code
-gs0 = chiNPTCreateGroupset(phys1)
+gs0 = chiLBSCreateGroupset(phys1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1224,7 +1252,7 @@ is to be created.
 ##_
 Example:
 \code
-grp[g] = chiNPTCreateGroup(phys1)
+grp[g] = chiLBSCreateGroup(phys1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1242,9 +1270,9 @@ Example:
 \code
 grp = {}
 for g=1,num_groups do
-    grp[g] = chiNPTCreateGroup(phys1)
+    grp[g] = chiLBSCreateGroup(phys1)
 end
-chiNPTGroupsetAddGroups(phys1,cur_gs,0,15)
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,15)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1261,7 +1289,7 @@ is to be created.
 Example:
 \code
 pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
-chiNPTGroupsetSetQuadrature(phys1,cur_gs,pquad0)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1284,7 +1312,7 @@ Note: by default polar aggregation will combine all polar angles in a hemisphere
 ##_
 Example:
 \code
-chiNPTGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1299,7 +1327,7 @@ is to be created.
 ##_
 Example:
 \code
-chiNPTGroupsetSetGroupSubsets(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1319,8 +1347,8 @@ NPT_GMRES\n
 Generalized Minimal Residual formulation for iterations.\n\n
 Example:
 \code
-chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
-chiNPTGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1338,7 +1366,7 @@ tolerance.
 ##_
 Example:
 \code
-chiNPTGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1353,7 +1381,7 @@ is to be created.
 ##_
 Example:
 \code
-chiNPTGroupsetSetMaxIterations(phys1,cur_gs,200)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,200)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1368,7 +1396,7 @@ is to be created.
 ##_
 Example:
 \code
-chiNPTGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1394,7 +1422,7 @@ Example:
 \code
 petsc_options =                  " -pc_hypre_boomeramg_strong_threshold 0.8"
 petsc_options = petsc_options .. " -pc_hypre_boomeramg_max_levels 25"
-chiNPTGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1420,7 +1448,7 @@ Example:
 \code
 petsc_options =                  " -pc_hypre_boomeramg_strong_threshold 0.8"
 petsc_options = petsc_options .. " -pc_hypre_boomeramg_max_levels 25"
-chiNPTGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 \endcode
 \ingroup LuaLBSGroupsets
 */
@@ -1450,17 +1478,29 @@ from the transport solver.
 \author Jan*/
 int CHI_LUA::chiLBSGetScalarFieldFunctionList(int SolverIndex)
 {return;} 
-/** \defgroup LuaNPT Neutral Particle Transport
+/** \defgroup LuaNPT Linear Boltzman Solver
  * \ingroup LuaModules*/
 /**Creates a Neutral Particle Transport solver.
 \return SolverHandle int Handle to the solver created.
 \code
+phys1 = chiLBSransportCreateSolver()
+chiSolverAddRegion(phys1,region1)
+--
+-- Add Groupset construction here
+--
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
+--
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
+--
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 \endcode
 \ingroup LuaNPT
  */
 int CHI_LUA::chiLBSransportCreateSolver()
 {return;} 
-/**Executes the NPT solver.
+/**Executes the LBS solver.
 \param SolverIndex int Handle to the solver.
  \ingroup LuaNPT
  */

@@ -11,6 +11,7 @@
 ../CHI_MATH/Quadratures/LegendrePoly/lua/legendre.cc
 ../CHI_MESH/lua/mesh_splitedgeloopbyangle.cc
 ../CHI_MESH/lua/mesh_maindoc_page.cc
+../CHI_MESH/CHI_SURFACEMESH/lua/surfacemesh_export.cc
 ../CHI_MESH/CHI_SURFACEMESH/lua/surfacemesh_create.cc
 ../CHI_MESH/CHI_SURFACEMESH/lua/surfacemesh_load.cc
 ../CHI_MESH/CHI_SURFACEMESH/lua/surfacemesh_extractopenedges.cc

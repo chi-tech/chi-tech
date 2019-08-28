@@ -38,10 +38,11 @@ now we have only a couple of tutorials.\n
 <tr><td width="33%">chiMeshHandlerSetCurrent()</td><td width="33%">chiRegionCreate()</td><td width="33%">chiRegionAddSurfaceBoundary()</td></tr>
 <tr><td width="33%">chiRegionAddLineBoundary()</td><td width="33%">chiRegionGetBoundarySurfaceMesh()</td><td width="33%">chiRegionExportMeshToPython()</td></tr>
 <tr><td width="33%">chiRegionExportMeshToObj()</td><td width="33%">chiRegionExportMeshToVTK()</td><td width="33%">chiSurfaceMeshCreate()</td></tr>
-<tr><td width="33%">chiSurfaceMeshImportFromOBJFile()</td><td width="33%">chiSurfaceMesherExportToObj()</td><td width="33%">chiSurfaceMeshGetEdgeLoops()</td></tr>
-<tr><td width="33%">chiSurfaceMeshGetEdgeLoopsPoly()</td><td width="33%">chiSurfaceMeshSplitByPatch()</td><td width="33%">chiSurfaceMeshExtractOpenEdgesToObj()</td></tr>
-<tr><td width="33%">chiSurfaceMeshCheckCycles()</td><td width="33%">chiSurfaceMesherCreate()</td><td width="33%">chiSurfaceMesherExecute()</td></tr>
-<tr><td width="33%">chiSurfaceMesherSetProperty()</td><td width="33%">chiVolumeMesherCreate()</td><td width="33%">chiVolumeMesherExecute()</td></tr>
+<tr><td width="33%">chiSurfaceMeshImportFromOBJFile()</td><td width="33%">chiSurfaceMeshImportFromTriangleFiles()</td><td width="33%">chiSurfaceMeshExportToObj()</td></tr>
+<tr><td width="33%">chiSurfaceMeshExportPolyFile()</td><td width="33%">chiSurfaceMeshGetEdgeLoops()</td><td width="33%">chiSurfaceMeshGetEdgeLoopsPoly()</td></tr>
+<tr><td width="33%">chiSurfaceMeshSplitByPatch()</td><td width="33%">chiSurfaceMeshExtractOpenEdgesToObj()</td><td width="33%">chiSurfaceMeshCheckCycles()</td></tr>
+<tr><td width="33%">chiSurfaceMesherCreate()</td><td width="33%">chiSurfaceMesherExecute()</td><td width="33%">chiSurfaceMesherSetProperty()</td></tr>
+<tr><td width="33%">chiSurfaceMesherExportToObj()</td><td width="33%">chiVolumeMesherCreate()</td><td width="33%">chiVolumeMesherExecute()</td></tr>
 <tr><td width="33%">chiVolumeMesherSetProperty()</td><td width="33%">chiDomDecompose2D()</td><td width="33%">chiDecomposeSurfaceMeshPxPy()</td></tr>
 </table>
 ### Field-function Manipulation

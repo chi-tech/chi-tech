@@ -184,9 +184,9 @@ void chi_mesh::SurfaceMesherTriangle::MeshBoundary(chi_mesh::Boundary *boundary)
 
 
     //report(&in, 0, 0, 0, 0, 0, 0);
-
+    chi_log.Log(LOG_0VERBOSE_1) << "Generating delaunay triangulation";
     triangulate("zcDpQ", &in, &mid, NULL);
-
+    chi_log.Log(LOG_0VERBOSE_1) << "Completed delaunay triangulation";
     //report(&mid, 0, 1, 0, 1, 0, 0);
 
 
@@ -207,9 +207,9 @@ void chi_mesh::SurfaceMesherTriangle::MeshBoundary(chi_mesh::Boundary *boundary)
 
     out.segmentlist = (int *) NULL;
     out.segmentmarkerlist = (int *) NULL;
-
+    chi_log.Log(LOG_0VERBOSE_1) << "Generating triangulation refinement";
     triangulate("zcarsDpQq", &mid, &out, NULL);
-
+    chi_log.Log(LOG_0VERBOSE_1) << "Completed triangulation refinement";
     //report(&out, 0, 1, 0, 1, 0, 0);
 
     output = &out;

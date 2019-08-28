@@ -5,7 +5,7 @@
 extern CHI_PHYSICS chi_physics_handler;
 
 //###################################################################
-/**Executes the NPT solver.
+/**Executes the LBS solver.
 \param SolverIndex int Handle to the solver.
  \ingroup LuaNPT
  */
