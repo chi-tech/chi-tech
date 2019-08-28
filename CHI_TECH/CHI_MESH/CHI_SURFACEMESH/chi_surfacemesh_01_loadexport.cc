@@ -677,6 +677,24 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
               cur_face->v_index[2]+1);
     }
   }
+  if (poly_faces.size()>0)
+  {
+    chi_mesh::PolyFace* first_face = this->poly_faces.front();
+    fprintf(outputFile,"vn %.4f %.4f %.4f\n", first_face->geometric_normal.x,
+            first_face->geometric_normal.y,
+            first_face->geometric_normal.z);
+    fprintf(outputFile,"s off\n");
+
+    for (int f=0; f<poly_faces.size(); f++)
+    {
+      fprintf(outputFile,"f ");
+      for (int v=0; v<poly_faces[f]->v_indices.size(); v++)
+      {
+        fprintf(outputFile,"%d//1 ",poly_faces[f]->v_indices[v]+1);
+      }
+      fprintf(outputFile,"\n");
+    }
+  }
 
 
   fclose(outputFile);

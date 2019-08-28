@@ -175,7 +175,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiSurfaceMeshCreate)
     RegisterFunction(chiSurfaceMeshImportFromOBJFile)
     RegisterFunction(chiSurfaceMeshImportFromTriangleFiles)
-    RegisterFunction(chiSurfaceMesherExportToObj)
+    RegisterFunction(chiSurfaceMeshExportToObj)
     RegisterFunction(chiSurfaceMeshExportPolyFile)
     RegisterFunction(chiSurfaceMeshGetEdgeLoops)
     RegisterFunction(chiSurfaceMeshGetEdgeLoopsPoly)
@@ -194,6 +194,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(PARTITION_Y,   3);
       RegisterConstant(CUT_X,   4);
       RegisterConstant(CUT_Y,   5);
+    RegisterFunction(chiSurfaceMesherExportToObj)
 //  VolumeMesher
     RegisterFunction(chiVolumeMesherCreate)
       RegisterConstant(VOLUMEMESHER_LINEMESH1D,   1);
