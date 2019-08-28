@@ -45,7 +45,7 @@ extern CHI_MATH    chi_math_handler;
 
 
 //###################################################################
-/**Set NPT property.
+/**Set LBS property.
 \param SolverIndex int Handle to the solver for which the set is to be created.
 \param PropertyIndex int Code for a specific property.
 
@@ -111,7 +111,7 @@ SWEEP_EAGER_LIMIT\n
 ###BoundaryIdentify
 This value follows the argument BOUNDARY_CONDITION and identifies which
 boundary is under consideration. Right now only boundaries aligned with
-cartesian axes are considered. Followed by NPTBoundaryType.\n
+cartesian axes are considered. Followed by LBSBoundaryType.\n
 XMAX = Right boundary \n
 XMIN = Left boundary \n
 YMAX = Front boundary \n
@@ -119,7 +119,7 @@ YMIN = Back boundary \n
 ZMAX = Top boundary \n
 ZMIN = Bottom boundary \n
 
-###NPTBoundaryType
+###LBSBoundaryType
 Specifies the type of boundary. Depending on the type this argument needs
 to be followed by one or more values. Note: By default all boundaries are
 type VACUUM.\n
