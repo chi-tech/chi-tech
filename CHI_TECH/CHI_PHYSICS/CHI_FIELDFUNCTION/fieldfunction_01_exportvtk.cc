@@ -59,7 +59,7 @@ void chi_physics::FieldFunction::ExportToVTKG(std::string base_name,
 \author Jason*/
 void chi_physics::FieldFunction::WritePVTU(std::string base_filename,
                                            std::string field_name,
-                                           int num_grps=0)
+                                           int num_grps)
 {
     std::string summary_file_name = base_filename + std::string(".pvtu");
     std::ofstream ofile;

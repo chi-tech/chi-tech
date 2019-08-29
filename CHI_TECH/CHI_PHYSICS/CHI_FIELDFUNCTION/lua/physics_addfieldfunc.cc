@@ -1,9 +1,9 @@
-#include "../../CHI_LUA/chi_lua.h"
+#include "CHI_LUA/chi_lua.h"
 #include<iostream>
-#include "../chi_physics.h"
-#include "../../CHI_MESH/CHI_REGION/chi_region.h"
-#include "../../CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../CHI_FIELDFUNCTION/chi_fieldfunction.h"
+#include "CHI_PHYSICS/chi_physics.h"
+#include "CHI_MESH/CHI_REGION/chi_region.h"
+#include "CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
+#include "CHI_PHYSICS/CHI_FIELDFUNCTION/chi_fieldfunction.h"
 
 #include <chi_log.h>
 

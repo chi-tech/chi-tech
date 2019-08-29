@@ -266,6 +266,7 @@ RegisterFunction(chiSolverAddFieldFunction)
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)
 RegisterFunction(chiExportFieldFunctionToVTKG)
+RegisterFunction(chiExportMultiFieldFunctionToVTKG)
 
 
 //Property indices

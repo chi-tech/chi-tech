@@ -1,6 +1,6 @@
 #include <CHI_LUA/chi_lua.h>
 
-#include "../chi_physics.h"
+#include "CHI_PHYSICS/chi_physics.h"
 
 #include <chi_log.h>
 
