@@ -1,7 +1,8 @@
 #include "legendrepoly.h"
 #include <math.h>
 //###################################################################
-/**Provides the function evaluation of Pn at value x.
+/**Provides the function evaluation of the Legendre polynomial
+ * P_N at value x.
 
  \param N int The Legendre polynomial.
  \param x double The evaluation point.*/
