@@ -9,26 +9,38 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-mesh={}
-N=50
-L=30.0
-xmin = 0.0
-dx = L/N
-for i=1,(N+1) do
-    k=i-1
-    mesh[i] = xmin + k*dx
+newSurfMesh = chiSurfaceMeshCreate();
+chiSurfaceMeshImportFromOBJFile(newSurfMesh,
+        "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
+
+--############################################### Extract edges from surface mesh
+loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
+
+line_mesh = {};
+line_mesh_count = 0;
+
+for k=1,loop_count do
+    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
+    for m=1,split_count do
+        line_mesh_count = line_mesh_count + 1;
+        line_mesh[line_mesh_count] =
+        chiLineMeshCreateFromLoop(split_loops,m-1);
+    end
+
 end
-line_mesh = chiLineMeshCreateFromArray(mesh)
 
-
+--############################################### Setup Regions
 region1 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
+chiRegionAddSurfaceBoundary(region1,newSurfMesh);
+for k=1,line_mesh_count do
+    chiRegionAddLineBoundary(region1,line_mesh[k]);
+end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
+chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
 
+chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
 chiVolumeMesherSetProperty(MESH_GLOBAL,true)
 
 --############################################### Execute meshing
@@ -75,13 +87,13 @@ chiSolverAddRegion(phys1,region1)
 
 chiMonteCarlonCreateSource(phys1,MC_BNDRY_SRC,1);
 
-chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,2e6)
+chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,100e3)
 chiMonteCarlonSetProperty(phys1,MC_TFC_UPDATE_INTVL,10e3)
-chiMonteCarlonSetProperty(phys1,MC_TALLY_MERGE_INTVL,1e5)
+chiMonteCarlonSetProperty(phys1,MC_TALLY_MERGE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
 chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
-chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,0.5)
+chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,1.0)
 
 chiMonteCarlonInitialize(phys1)
 chiMonteCarlonExecute(phys1)
@@ -89,8 +101,8 @@ chiMonteCarlonExecute(phys1)
 
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
-chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,0.0, 30.0+xmin)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0, 0.0)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,1.0, 0.0)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 50)
 
 for k=1,2 do
@@ -110,4 +122,4 @@ if (chi_location_id == 0) then
     local handle = io.popen("python ZLFFI00.py")
 end
 
-chiExportFieldFunctionToVTK(0,"ZPhiMC")
+chiExportFieldFunctionToVTKG(0,"ZPhiMC")

@@ -127,22 +127,22 @@ chiMonteCarlonExecute(phys0)
 
 --############################################### Setup Physics
 chiMeshHandlerSetCurrent(tmesh)
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSransportCreateSolver()
 chiSolverAddRegion(phys1,region0)
 
 --========== Groups
 grp = {}
 for g=1,num_groups do
-    grp[g] = chiNPTCreateGroup(phys1)
+    grp[g] = chiLBSCreateGroup(phys1)
 end
 
 --========== ProdQuad
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE,40)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,40)
 
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
-chiNPTGroupsetAddGroups(phys1,gs0,0,num_groups-1)
-chiNPTGroupsetSetQuadrature(phys1,gs0,pquad)
+gs0 = chiLBSCreateGroupset(phys1)
+chiLBSGroupsetAddGroups(phys1,gs0,0,num_groups-1)
+chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 
 --========== Boundary conditions
 bsrc={}
@@ -150,32 +150,32 @@ for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/2
-chiNPTSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
-chiNPTSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
-chiNPTSetProperty(phys1,SCATTERING_ORDER,5)
---chiNPTSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_CLASSICRICHARDSON)
---chiNPTSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,NPT_CLASSICRICHARDSON)
-chiNPTSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
---chiNPTSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
-chiNPTSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
-chiNPTSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
-chiNPTSetProperty(phys1,SWEEP_EAGER_LIMIT,62000)
+chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,5)
+--chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,LBS_CLASSICRICHARDSON)
+--chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,NPT_CLASSICRICHARDSON)
+chiLBSSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
+--chiLBSSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
+chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
+chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
+chiLBSSetProperty(phys1,SWEEP_EAGER_LIMIT,62000)
 
-chiNPTSetProperty(phys1,GROUPSET_SUBSETS,gs0,5)
-chiNPTSetProperty(phys1,GROUPSET_SUBSETS,gs1,7)
+chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs0,5)
+chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs1,7)
 
-chiNPTInitialize(phys1)
-chiNPTExecute(phys1)
-
-
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
 
 
 
 
-fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
+
+
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)

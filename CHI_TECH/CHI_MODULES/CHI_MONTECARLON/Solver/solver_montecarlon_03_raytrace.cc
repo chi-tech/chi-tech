@@ -63,6 +63,12 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
       << "d_to_interact corrupt.";
     exit(EXIT_FAILURE);
   }
+  if (isnan(d_to_surface))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "d_to_surface corrupt.";
+    exit(EXIT_FAILURE);
+  }
 
 //  chi_log.Log(LOG_0)
 //  << "d2s=" << d_to_surface << " "

@@ -45,14 +45,14 @@ ProcessScattering(chi_montecarlon::Particle *prtcl,
     chi_mesh::Vector tangent = prtcl->dir.Cross(khat);
     chi_mesh::Vector binorm = prtcl->dir.Cross(tangent);
 
-    R.SetRowIVec(0,tangent/tangent.Norm());
-    R.SetRowIVec(1,binorm/binorm.Norm());
-    R.SetRowIVec(2,prtcl->dir);
+    R.SetColJVec(0,tangent/tangent.Norm());
+    R.SetColJVec(1,binorm/binorm.Norm());
+    R.SetColJVec(2,prtcl->dir);
   } else
   {
-    R.SetRowIVec(0,chi_mesh::Vector(1,0,0));
-    R.SetRowIVec(1,chi_mesh::Vector(0,1,0));
-    R.SetRowIVec(2,chi_mesh::Vector(0,0,1));
+    R.SetColJVec(0,chi_mesh::Vector(1,0,0));
+    R.SetColJVec(1,chi_mesh::Vector(0,1,0));
+    R.SetColJVec(2,chi_mesh::Vector(0,0,1));
   }
 
   //=================================== Apply rotation matrix

@@ -14,6 +14,14 @@
  *
  * The speed-up for cdfs of >1000 bins is more than a factor 100.
  *
+ * In order to use this sampler for repeated sampling calls make
+ * sure to initialize it outside the phases that will repeatedly sample
+ * it because it has some over-head to it that gets executed in the constructor.
+ *
+ \code
+ chi_math::CDFSampler sampler(in_cdf);
+ \endcode
+ *
  * */
 class chi_math::CDFSampler
 {

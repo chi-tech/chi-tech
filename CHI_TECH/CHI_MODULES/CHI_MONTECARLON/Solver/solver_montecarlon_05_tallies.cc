@@ -1,6 +1,10 @@
 #include "solver_montecarlon.h"
 
 #include <CHI_MESH/CHI_CELL/cell_slab.h>
+#include <CHI_MESH/CHI_CELL/cell_polygon.h>
+
+#include <CHI_DISCRETIZATION_FV/CellViews/fv_slab.h>
+#include <CHI_DISCRETIZATION_FV/CellViews/fv_polygon.h>
 
 typedef unsigned long long TULL;
 
@@ -49,11 +53,22 @@ void chi_montecarlon::Solver::ComputeTallySqr()
     double V = 1.0;
     if (typeid(*cell) == typeid(chi_mesh::CellSlab))
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      int v0i = slab_cell->v_indices[0];
-      int v1i = slab_cell->v_indices[1];
-
-      V = (*grid->nodes[v1i] - *grid->nodes[v0i]).Norm();
+      auto cell_fv_view =
+        (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+      V = cell_fv_view->volume;
+    }
+    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    {
+      auto cell_fv_view =
+        (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+      V = cell_fv_view->volume;
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported cell type encountered in call to "
+        << "chi_montecarlon::Solver::ComputeTallySqr.";
+      exit(EXIT_FAILURE);
     }
 
     int hi = 0;

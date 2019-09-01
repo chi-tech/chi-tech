@@ -4,6 +4,7 @@
 #include "CHI_MODULES/CHI_MONTECARLON/Source/mc_base_source.h"
 
 #include <CHI_MESH/chi_meshmatrix3x3.h>
+#include <CHI_MATH/chi_math.h>
 
 
 //###################################################################
@@ -29,6 +30,7 @@ private:
   };
   std::vector<FACE_REF*> ref_cell_faces;
   std::vector<double>    face_cdf;
+  chi_math::CDFSampler*  surface_sampler;
 public:
   BoundarySource();
 

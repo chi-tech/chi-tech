@@ -32,8 +32,20 @@ void chi_montecarlon::Solver::Execute()
       nps_last++;
       chi_montecarlon::Particle prtcl = src->CreateParticle(&rng0);
 
+//      chi_log.Log(LOG_0)
+//        << "Src particle " << prtcl.pos.PrintS()
+//        << " " << prtcl.dir << " " << prtcl.cur_cell_ind;
+//      usleep(100000);
+
       while (prtcl.alive)
+      {
         Raytrace(&prtcl);
+//        chi_log.Log(LOG_0)
+//          << "Ray particle " << prtcl.pos.PrintS()
+//          << " " << prtcl.dir << " " << prtcl.cur_cell_ind;
+//        usleep(100000);
+      }
+
 
       ComputeTallySqr();
     }//for pi in batch

@@ -14,6 +14,8 @@
 #include <CHI_DISCRETIZATION_FV/CellViews/fv_slab.h>
 #include <CHI_DISCRETIZATION_FV/CellViews/fv_polygon.h>
 
+#include <CHI_MATH/Statistics/cdfsampler.h>
+
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
@@ -115,9 +117,9 @@ void chi_montecarlon::BoundarySource::
             chi_mesh::Vector tangent = binorm.Cross(n);
             tangent = tangent/tangent.Norm();
 
-            R.SetRowIVec(0,tangent);
-            R.SetRowIVec(1,binorm);
-            R.SetRowIVec(2,n);
+            R.SetColJVec(0,tangent);
+            R.SetColJVec(1,binorm);
+            R.SetColJVec(2,n);
           }
 
           new_face_ref->area = cell_fv_view->face_area[f];
@@ -133,6 +135,17 @@ void chi_montecarlon::BoundarySource::
           chi_mesh::Vector n = poly_cell->edgenormals[f]*-1.0;
           chi_mesh::Vector khat(0.0,0.0,1.0);
 
+          int v0i = poly_cell->edges[f][0];
+          int v1i = poly_cell->edges[f][1];
+
+          chi_mesh::Node v0 = *grid->nodes[v0i];
+          chi_mesh::Node v1 = *grid->nodes[v1i];
+
+//          chi_log.Log(LOG_0) << v0.PrintS();
+//          chi_log.Log(LOG_0) << v1.PrintS();
+//
+//          chi_log.Log(LOG_0) << n.PrintS();
+
           if (n.Dot(khat) > 0.9999)
             R.SetDiagonalVec(1.0,1.0,1.0);
           else
@@ -143,10 +156,12 @@ void chi_montecarlon::BoundarySource::
             chi_mesh::Vector tangent = binorm.Cross(n);
             tangent = tangent/tangent.Norm();
 
-            R.SetRowIVec(0,tangent);
-            R.SetRowIVec(1,binorm);
-            R.SetRowIVec(2,n);
+            R.SetColJVec(0,tangent);
+            R.SetColJVec(1,binorm);
+            R.SetColJVec(2,n);
           }
+//
+//          chi_log.Log(LOG_0) << R.PrintS();
 
           new_face_ref->area = cell_fv_view->face_area[f];
 
@@ -177,6 +192,8 @@ void chi_montecarlon::BoundarySource::
     intgl += ref_cell_faces[rf]->area;
     face_cdf[rf] = intgl/total_area;
   }
+
+  surface_sampler = new chi_math::CDFSampler(face_cdf);
 }
 
 //###################################################################
@@ -224,9 +241,49 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     return new_particle;
   }//Slab cells
+  else if (typeid(*grid->cells[0]) == typeid(chi_mesh::CellPolygon))
+  {
+    int f = surface_sampler->Sample(rng->Rand());
+
+    FACE_REF* face_ref = ref_cell_faces[f];
+    auto poly_cell =
+      (chi_mesh::CellPolygon*)grid->cells[face_ref->cell_glob_index];
+
+    int* ref_edge = poly_cell->edges[face_ref->face_num];
+
+    chi_mesh::Vertex v0 = *grid->nodes[ref_edge[0]];
+    chi_mesh::Vertex v1 = *grid->nodes[ref_edge[1]];
+
+    //====================================== Sample direction
+    double costheta = rng->Rand();     //Sample half-range only
+    double theta    = acos(costheta);
+    double varphi   = rng->Rand()*2.0*M_PI;
+
+    chi_mesh::Vector ref_dir;
+    ref_dir.x = sin(theta)*cos(varphi);
+    ref_dir.y = sin(theta)*sin(varphi);
+    ref_dir.z = cos(theta);
+
+//    chi_log.Log(LOG_0) << v0.PrintS();
+//    chi_log.Log(LOG_0) << v1.PrintS();
+
+    //====================================== Set quantities
+    double w = rng->Rand();
+    new_particle.pos = v0*w + v1*(1.0-w);
+    new_particle.dir = face_ref->RotMatrix*ref_dir;
+
+    new_particle.egrp = 0;
+    new_particle.w = costheta;
+    new_particle.cur_cell_ind = face_ref->cell_glob_index;
+
+    return new_particle;
+  }
   else
   {
-
+    chi_log.Log(LOG_ALLERROR)
+      << "chi_montecarlon: Unsupported cell type encountered in "
+      << "call to BoundarySource::CreateParticle.";
+    exit(EXIT_FAILURE);
   }
 
 

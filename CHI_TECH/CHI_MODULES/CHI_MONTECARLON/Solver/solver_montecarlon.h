@@ -9,6 +9,7 @@
 #include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
 #include <CHI_DISCRETIZATION_FV/fv.h>
+#include <CHI_MATH/chi_math.h>
 
 #define MC_NUM_PARTICLES     1
 #define MC_TFC_UPDATE_INTVL  2
@@ -44,12 +45,14 @@ private:
   std::vector<double>                   phi_local_relsigma;
 
   //runtime quantities
-  int                current_batch;
-  unsigned long long nps;
-  unsigned long long nps_global;
-  double             max_relative_error;
-  double             max_relative_error2;
-  double             max_relative_error3;
+  int                                   current_batch;
+  unsigned long long                    nps;
+  unsigned long long                    nps_global;
+  double                                max_relative_error;
+  double                                max_relative_error2;
+  double                                max_relative_error3;
+  chi_math::CDFSampler*                 surface_source_sampler;
+
 
 public:
   RandomNumberGenerator                 rng0;

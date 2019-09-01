@@ -130,53 +130,6 @@ bool chi_montecarlon::Solver::Initialize()
     field_functions.push_back(group_ff);
   }
 
-  if (chi_mpi.location_id == 0)
-  {
-    chi_log.Log(LOG_0)
-      << "Testing CDF sampling";
-
-    int Ntest = 300000;
-    double T = 0.0;
-    std::vector<double> base_cdf(Ntest,0.0);
-    std::vector<double> test_cdf(Ntest,0.0);
-
-    for (int k=0; k<Ntest; k++)
-    {
-      base_cdf[k] = rng0.Rand()*100;
-      T += base_cdf[k];
-    }
-    test_cdf[0] = base_cdf[0];
-    for (int k=1; k<Ntest; k++)
-      test_cdf[k] = test_cdf[k-1] + base_cdf[k];
-
-    chi_log.Log(LOG_0) << "T=" << T;
-
-    for (int k=0; k<Ntest; k++)
-      test_cdf[k] /= T;
-
-    chi_math::CDFSampler sampler(test_cdf,20);
-
-    std::vector<double> tally(Ntest,0.0);
-
-    CHI_TIMER t_sampling;
-
-    int N = 1000000;
-    for (int i=0; i<N; i++)
-    {
-//      int sample = sampler.Sample(rng0.Rand());
-      int sample = chi_math::SampleCDF(rng0.Rand(),test_cdf);
-
-      tally[sample] += 1.0;
-    }
-    chi_log.Log(LOG_0) << "Timing=" << t_sampling.GetTime();
-
-//    double total = 0.0;
-//    for (int k=0; k<Ntest; k++)
-//      total += tally[k];
-//
-//    for (int k=0; k<Ntest; k++)
-//      chi_log.Log(LOG_0) << tally[k]*T/total;
-  }
 
 
   MPI_Barrier(MPI_COMM_WORLD);
