@@ -13,7 +13,7 @@ else()
     add_definitions(-DWINDOWS_ENV)
 endif()
 
-#------------------------------------------------ DEPENDECIES
+#------------------------------------------------ DEPENDENCIES
 if (NOT (DEFINED ENV{BOOST_ROOT}))
     message(FATAL_ERROR "***** BOOST_ROOT is not set *****")
 else()
@@ -27,26 +27,6 @@ else()
     set(PETSC_ROOT    "$ENV{PETSC_ROOT}")
     message(STATUS "PETSC_ROOT set to ${PETSC_ROOT}")
 endif()
-
-if (NOT (DEFINED ENV{VTK_ROOT}))
-    message(FATAL_ERROR "***** VTK_ROOT is not set *****")
-else()
-    set(VTK_ROOT    "$ENV{VTK_ROOT}")
-    message(STATUS "VTK_ROOT set to ${VTK_ROOT}")
-endif()
-
-if (NOT (DEFINED ENV{VTK_VERSION}))
-    message(FATAL_ERROR "***** VTK_VERSION is not set *****")
-else()
-    set(VTK_VERSION    "$ENV{VTK_VERSION}")
-    message(STATUS "VTK_VERSION set to ${VTK_VERSION}")
-endif()
-
-
-#set(VTK_ROOT "/usr/local/Cellar/vtk/8.2.0")
-#set(VTK_VERSION "-8.2")
-
-
 
 
 #================================================ Set project targets
@@ -100,9 +80,8 @@ include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/CHI_MATH/CHI_DISCRETIZATION")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 include_directories("${PETSC_ROOT}/include")
-include_directories("${BOOST_ROOT}/include")
+include_directories(SYSTEM "${BOOST_ROOT}/include")
 
-include_directories("${VTK_ROOT}/include/vtk${VTK_VERSION}")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
@@ -110,16 +89,34 @@ link_directories("${TRIANGLE_ROOT}")
 link_directories("${PETSC_ROOT}/lib")
 #link_directories("${BOOST_ROOT}/lib")
 
-link_directories("${VTK_ROOT}/lib")
-link_directories("${VTK_ROOT}/lib64")
-
 set(TRIANGLE "${TRIANGLE_ROOT}/triangle.o")
 
-set(LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc)
-set(LIBS ${LIBS} vtkCommonCore${VTK_VERSION} vtkCommonDataModel${VTK_VERSION})
-set(LIBS ${LIBS} vtkIOLegacy${VTK_VERSION} vtkIOCore${VTK_VERSION})
-set(LIBS ${LIBS} vtkIOXML${VTK_VERSION} vtkParallelCore${VTK_VERSION} )
-set(LIBS ${LIBS} vtkIOParallelXML${VTK_VERSION})
+# --------------------------- VTK
+find_package(VTK COMPONENTS
+  vtkCommonCore
+  vtkCommonDataModel
+	vtkIOLegacy vtkIOCore 
+	vtkIOXML vtkParallelCore
+	vtkIOParallelXML QUIET)
+if (NOT VTK_FOUND)
+	message("VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
+  return ()
+endif()
+
+message (STATUS "VTK_VERSION: ${VTK_VERSION}")
+
+if (VTK_VERSION VERSION_LESS "8.90.0")
+  # old system
+  include(${VTK_USE_FILE})
+else ()
+  # vtk_module_autoinit is needed
+  vtk_module_autoinit(
+		TARGETS ${TARGET}
+    MODULES ${VTK_LIBRARIES}
+    )
+endif()
+
+set(LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 
 #================================================ Default include directories
