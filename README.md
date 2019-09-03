@@ -5,14 +5,14 @@ as part of a research study.
 
 ## Installation instructions
 
-For linux machines - [Linux installation instructions](CHI_DOC/Install_linux.md)\
+For Linux machines - [Linux installation instructions](CHI_DOC/Install_linux.md)
 For MacOS machines - [MacOS installation instructions](CHI_DOC/Install_macos.md)
 
 ## Documentation
 
 The preferred method of accessing the documentation is to clone the repo and
-build the doxygen-based documentation. However the documentation for recent 
-is periodically updated at the following link:
+build the doxygen-based documentation. However the documentation
+is also periodically updated at the following link:
 
 [Online Documentation](https://chi-tech.github.io)
 
