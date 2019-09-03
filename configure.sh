@@ -41,13 +41,13 @@ if [ ! -d "CHI_RESOURCES/Dependencies/ncurses" ]; then
   export CPATH=$CPATH:"$PWD/readline/build/include"
 
   cd lua-5.3.5
-  if [ "$(uname)" == "Darwin" ]; then
+  if [ "$(uname)" = "Darwin" ]; then
       make macosx MYLIBS=-lncurses      
-  elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+  elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
       make linux MYLIBS=-lncurses
-  elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+  elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
       make mingw MYLIBS=-lncurses
-  elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+  elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
       make mingw MYLIBS=-lncurses
   fi
   
@@ -55,13 +55,13 @@ if [ ! -d "CHI_RESOURCES/Dependencies/ncurses" ]; then
 
   cd ../
   if [ ! -d "triangle" ]; then
-    if [ "$(uname)" == "Darwin" ]; then
+    if [ "$(uname)" = "Darwin" ]; then
         tar -zxf trianglemac.tar.gz  triangle/  
-    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
         tar -zxf triangle.tar.gz
-    elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+    elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
         tar -zxf triangle.tar.gz
-    elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+    elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
         tar -zxf triangle.tar.gz
     fi
   fi
