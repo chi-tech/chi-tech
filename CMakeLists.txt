@@ -97,7 +97,7 @@ find_package(VTK COMPONENTS
   vtkCommonDataModel
 	vtkIOLegacy vtkIOCore 
 	vtkIOXML vtkParallelCore
-	vtkIOParallelXML QUIET)
+	vtkIOParallelXML REQUIRED)
 if (NOT VTK_FOUND)
 	message("VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
   return ()
