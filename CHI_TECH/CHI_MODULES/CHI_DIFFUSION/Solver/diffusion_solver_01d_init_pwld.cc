@@ -47,6 +47,8 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
   }
+
+
   //================================================== Initialize field function
   //                                                   if empty
   pwld_phi_local.resize(pwld_local_dof_count);
@@ -90,7 +92,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
     }
   }
 
-  //================================================== Setup timer
+  //================================================== Setup timers
   if (verbose)
     chi_log.Log(LOG_0) << "Determining nodal connections";
   CHI_TIMER t_connect; t_connect.Reset();

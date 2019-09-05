@@ -161,6 +161,7 @@ public:
                        int* ir_boundary_type, int iref=-1);
   //01a
   void InitializeCommonItems();
+  void PWLDBuildSparsityPattern();
   //01b
   int Initialize(bool verbose=true);
   //01c
