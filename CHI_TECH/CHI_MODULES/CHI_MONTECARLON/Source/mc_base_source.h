@@ -13,6 +13,7 @@
 #define MC_BNDRY_SRC    2
 #define    MC_ALL_BOUNDARIES -1
 #define MC_LOGICVOL_SRC 3
+#define MC_RESID_SRC    4
 
 //######################################################### Class Def
 /**Parent Monte carlo source.
