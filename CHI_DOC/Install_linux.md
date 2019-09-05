@@ -1,14 +1,20 @@
-## Compiling on Personal Linux Machines
+# Compiling on Personal Linux Machines
 
-### Step 1 - Installing gcc, gfortran and the basic environment
+The following instructions were tested on Ubuntu 18.04 LTS; other Linux distributions might require some minor tweaking.
 
-GCC is used to install and run ChiTech. Gfortran is used 
-during the installation of PETSc and therefore also needs to 
-be installed. 
+### Step 1 - Installing GCC, GFortran and the basic environment
+
+GCC is used to build and install ChiTech. 
+GFortran and Python is used during the installation of PETSc 
+(which ChiTech uses as a linear algebra backend) and 
+OpenGL is required by VTK (used by ChiTech for visualization). 
+These packages will therefore also need to be installed.
 
 Check to see if gcc is installed
 
-    gcc --version
+```bash
+gcc --version
+```
 
 This should display something like this:
 
@@ -20,34 +26,41 @@ This should display something like this:
 
 If this is not displayed then install gcc using the following command:
 
-    sudo apt-get install build-essential gfortran
-    
+```bash
+sudo apt-get install build-essential gfortran
+```
+
 If you still do not get the appropriate version when running either ``gcc --version``
 or ``gfortran --version`` then there are many online resources which may be able to
 assist you.
 
-Install other packages:
+Now, install the remaining packages needed to build ChiTech and its dependencies:
 
-    sudo apt-get install cmake libx11-dev
-    sudo apt-get install doxygen zlib1g-dev
-    sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
-    sudo apt-get install python python3
-    sudo apt-get install git
+```bash
+sudo apt-get install cmake python git zlib1g-dev libx11-dev
+sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+```
 
+<u>NOTE</u>: *The recommended version of PETSc requires Python 2.6+; Python 3.x, typically 
+pre-installed on modern Linux systems, will not work (Step 4 below provides more
+details if you need to use `python3`) .*
 
 ### Step 2 - An MPI flavor
 
-Install either OpenMPI or MPICH. If you have MOOSE or deal.ii 
-installed then you are probably already set to go. **MPICH** is recommended for 
-better performance.
+Install either OpenMPI or MPICH. If you have MOOSE or deal.ii installed then you
+are probably already set to go. **MPICH** is recommended for better performance.
 
-    sudo apt-get install mpich
+```bash
+sudo apt-get install mpich
+```
 
 To check if this is working properly, simply do the mpi version of checking for 
-a c++ compiler:
+a C++ compiler:
 
-    mpicc --version
-    
+```bash
+mpicc --version
+```
+
 Which should display the same message the gcc call did, i.e.
 
     $ mpicc --version
@@ -56,158 +69,209 @@ Which should display the same message the gcc call did, i.e.
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-
 ### Step 3 - Boost 1.63+
+
 Download and unpack boost. Eventually ChiTech needs the location where the 
 "include" directory is so just follow online instructions for this. 
 
 Alternatively, just make a *projects* directory and download boost there,
 like the following:
 
-    mkdir projects 
-    cd projects
-    mkdir boost
-    cd boost
-    wget https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
-    tar -zxf boost_1_71_0.tar.gz
-    cd boost_1_17_0
-    ./bootstrap.sh
-    ./b2 headers
-    mkdir include
-    cp -r boost include/
-    
+```bash
+mkdir projects 
+cd projects
+mkdir boost
+cd boost
+wget https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
+tar -zxf boost_1_71_0.tar.gz
+cd boost_1_71_0
+./bootstrap.sh
+./b2 headers
+mkdir include
+cp -r boost include/
+rm boost_1_71_0.tar.gz
+```
+
+(you can find the latest version of boost [here](https://www.boost.org/users/download/)).
+
 The current directory will now be your *BOOST_ROOT* folder.
 
-    export BOOST_ROOT=$PWD
-    
-You probably want to permanently add this to your bash profile file. 
-This is done in different ways depending on your platform.
+```bash
+export BOOST_ROOT=$PWD
+```
 
-### Step 4 - PetSc
+You probably want to permanently add this to your bash profile file (using the
+actual path obtained from `$PWD`), so that you don't have to execute the above
+command every time you open a new terminal. This is typically done by adding
+the line to the file `.profile` in your home directory.
+
+### Step 4 - PETSc
 
 The best performance thus far tested is with 
-[petsc version 3.9.4](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz)
-it is recommended to use this version.
+[petsc version 3.9.4](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz) .
+It is recommended to use this version.
 
 Return to your *projects* folder (or whatever you chose to place stuff). Run 
 the following
 
-    wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz
-    tar -zxf petsc-3.9.4.tar.gz
-    cd petsc-3.9.4
+```bash
+wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz
+tar -zxf petsc-3.9.4.tar.gz
+cd petsc-3.9.4
+```
 
 Download and extract the archive file to a folder of your choice then navigate
 into the directory containing the "configure" script and execute the following:
-   
-    ./configure --prefix=$PWD/install \
-    --download-hypre=1 \
-    --with-ssl=0 \
-    --with-debugging=0 \
-    --with-pic=1 \
-    --with-shared-libraries=1 \
-    --with-cc=mpicc \
-    --with-cxx=mpicxx \
-    --with-fc=mpif90 \
-    --download-fblaslapack=1 \
-    --download-metis=1 \
-    --download-parmetis=1 \
-    --download-superlu_dist=1 \
-    --with-cxx-dialect=C++11 \
-    CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 \
-    CFLAGS='-fPIC -fopenmp' \
-    CXXFLAGS='-fPIC -fopenmp' \
-    FFLAGS='-fPIC -fopenmp' \
-    FCFLAGS='-fPIC -fopenmp' \
-    F90FLAGS='-fPIC -fopenmp' \
-    F77FLAGS='-fPIC -fopenmp' \
-    COPTFLAGS='-O3 -march=native -mtune=native' \
-    CXXOPTFLAGS='-O3 -march=native -mtune=native' \
-    FOPTFLAGS='-O3 -march=native -mtune=native' \
-    PETSC_DIR=$PWD 
-    
-If the configuration fails then consult PetSc's user documentation.
 
-Upon completion of the configure step, petsc will provide the make command
+```bash
+./configure --prefix=$PWD/install \
+--download-hypre=1 \
+--with-ssl=0 \
+--with-debugging=0 \
+--with-pic=1 \
+--with-shared-libraries=1 \
+--with-cc=mpicc \
+--with-cxx=mpicxx \
+--with-fc=mpif90 \
+--download-fblaslapack=1 \
+--download-metis=1 \
+--download-parmetis=1 \
+--download-superlu_dist=1 \
+--with-cxx-dialect=C++11 \
+CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 \
+CFLAGS='-fPIC -fopenmp' \
+CXXFLAGS='-fPIC -fopenmp' \
+FFLAGS='-fPIC -fopenmp' \
+FCFLAGS='-fPIC -fopenmp' \
+F90FLAGS='-fPIC -fopenmp' \
+F77FLAGS='-fPIC -fopenmp' \
+COPTFLAGS='-O3 -march=native -mtune=native' \
+CXXOPTFLAGS='-O3 -march=native -mtune=native' \
+FOPTFLAGS='-O3 -march=native -mtune=native' \
+PETSC_DIR=$PWD 
+```
+
+If the configuration fails then consult PETSc's user documentation.
+
+<u>NOTE:</u> *The recommended version of PETSc requires Python 2.6+ for its configuration. 
+If you need to use Python 3.4+ (which is typically pre-installed on modern Linux systems as
+`python3`), you will need to download PETSc 3.11 (current most recent version is 3.11.3)
+and run the above configure script as `python3 ./configure ...`*
+
+Upon completion of the configure step, PETSc will provide the make command
 that you should use. Execute this command.
 
-After a successful make petsc should indicate the command used to install
+After a successful make PETSc should indicate the command used to install
 the header files and libraries. Execute the associated command as well.
 
 To test whether the system has been installed correctly execute:
 
-    make all test
+```bash
+make test
+```
 
 The final step is to generate the environment variable for the install 
 directory of PETSc:
 
-    export PETSC_ROOT=$PWD/install
-    
+```bash
+export PETSC_ROOT=$PWD/install
+```
+
 Again, this is also something you'd like to add to your bash profile.
 
-### Step 5 Install the Visualization Tool Kit
+### Step 5 - Install the Visualization Tool Kit
 
 In your projects folder install VTK using the following commands:
 
-    mkdir VTK
-    cd VTK
-    wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
-    tar -zxf VTK-8.2.0.tar.gz
-    cd VTK-8.2.0
-    mkdir build
-    cd build     
-    cmake -DCMAKE_INSTALL_PREFIX=$PWD/install \
-    -DBUILD_SHARED_LIBS:BOOL=ON \
-    -DVTK_Group_MPI:BOOL=ON \
-    -DCMAKE_BUILD_TYPE=Release \
-     ../
-    
+```bash
+mkdir VTK
+cd VTK
+wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
+tar -zxf VTK-8.2.0.tar.gz
+cd VTK-8.2.0
+mkdir build
+cd build     
+cmake -DCMAKE_INSTALL_PREFIX=$PWD/install \
+-DBUILD_SHARED_LIBS:BOOL=ON \
+-DVTK_Group_MPI:BOOL=ON \
+-DCMAKE_BUILD_TYPE=Release \
+ ../
+```
+
 This will take a while after which you need to execute:
 
-    make -j4 && make install
-    
-This will also take a while. Finally export the *VTK_ROOT* environment 
-variable as well as the version:
+```bash
+make -j4 && make install
+```
 
-    export VTK_ROOT=$PWD/install
-    export VTK_VERSION=-8.2
+This will also take a while. Finally, export the *VTK_DIR* variable:
 
-### Step 6 Configure ChiTech
+```bash
+export VTK_DIR=$PWD/install
+```
+
+Again, this is also something you'd like to add to your bash profile.
+
+### Step 6 - Build ChiTech
+
+#### Configure
+
 Clone the repository. Go the folder where you want to keep ChiTech relevant stuff:
 
-    git clone https://github.com/chi-tech/chi-tech
+```bash
+git clone https://github.com/chi-tech/chi-tech
+```
 
-Go to the chi_tech_2 folder and type
+Go to the chi-tech folder and type
 
-    ./configure.sh
+```bash
+cd chi-tech
+./configure.sh
+```
 
 If all goes well it will automatically install 4 things
  - The readline library,
  - The ncurses library,
  - Lua 5.3.5, and
  - Triangle 1.6
- 
+
 If problems are encountered here please see 
-[troubleshooting installation](CHI_DOC/TroubleShootingInstall.md)
+[troubleshooting installation](TroubleShootingInstall.md)
 
+#### Build
 
+In the main directory (i.e. *chi-tech/*), execute
 
-### Step 7 - Build ChiTech
-
-Navigate to the main directory (i.e. *chi_tech_2/*)
-
-    ./configure.sh
-    make -j4
+```bash
+make -j4
+```
 
 You can also use -j8 even if you don't have 8 processors, the make command 
 will use threading where possible.
 
-### Step 8 - Generate the documentation
+### Step 7 - ChiTech documentation
 
-Google and follow online instructions for installing doxygen then
+You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally. 
 
-    cd CHI_DOC/
-    ./YReGenerateDocumentation.sh 
-    
-Open the documentation index file at 
+To generate the documentation from your local working copy, first make sure 
+Doxygen and LaTeX is installed:
 
-    CHI_DOC/HTMLdocs/html/index.html
+```bash
+sudo apt-get install doxygen texlive
+```
+
+The documentation is contained in the *CHI_DOC* folder and can be generated
+using a script provided in that folder:
+
+```bash
+cd CHI_DOC/
+./YReGenerateDocumentation.sh 
+```
+
+Once finished, you can view the generated documentation by opening
+
+```bash
+CHI_DOC/HTMLdocs/html/index.html
+```
+
+in your favorite browser.
