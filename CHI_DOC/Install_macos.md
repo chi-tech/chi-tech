@@ -1,6 +1,6 @@
 ## Compiling on macOS
 ___
-### Compiling with the Apple toolchain
+### Compiling with the Apple Toolchain
 ___
 
 The following instructions assume that all of the prerequisite software packages will be installed by hand.  These packages may also be installed via **Brew** or **MacPorts**.
