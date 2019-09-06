@@ -1,5 +1,6 @@
 #include "legendrepoly.h"
 #include <math.h>
+#include <stdlib.h>
 
 //###################################################################
 /**Provides the function evaluation of the associated Legendre polynomial at value x.

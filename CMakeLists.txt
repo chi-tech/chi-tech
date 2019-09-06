@@ -58,19 +58,21 @@ include(Filter)
 #================================================ Precompiler flags
 #LUA CONSOLE
 add_definitions(-DNO_FONTGENESIS)
-add_definitions(-Wall -Wno-unused-value)
-
-
 
 
 #================================================ Compiler flags
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-format -Wno-unused-but-set-variable")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-write-strings")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-strict-aliasing")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=0")
-add_definitions(-fpermissive)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -std=c++11 -O3 -DNDEBUG")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-format -Wno-unused-but-set-variable")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-write-strings")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-strict-aliasing")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=0")
+#elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+#elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+endif()
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")

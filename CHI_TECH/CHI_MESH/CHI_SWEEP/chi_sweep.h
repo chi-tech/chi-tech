@@ -8,7 +8,9 @@
 extern CHI_LOG chi_log;
 
 //###################################################################
-namespace chi_mesh::SweepManagement
+namespace chi_mesh
+{
+namespace SweepManagement
 {
   struct STDG;   ///< Global Sweep Plane Ordering
   struct SPLS;   ///< Sweep Plane Local Subgrid
@@ -39,7 +41,7 @@ namespace chi_mesh::SweepManagement
   void PrintSweepOrdering(SPDS* sweep_order,
                           MeshContinuum* vol_continuum);
 }
-
+}
 
 #include "chi_sweepchunk_base.h"
 

@@ -29,8 +29,9 @@
  * The octant based seperation is achieved via the notion of "AngleSetGroup"
  * which will of a group of angle sets for each quadrant or octant
  * (depenending on 2D or 3D).*/
-struct chi_mesh::SweepManagement::AngleAggregation
+class chi_mesh::SweepManagement::AngleAggregation
 {
+public:
   std::vector<AngleSetGroup*> angle_set_groups;
 };
 
