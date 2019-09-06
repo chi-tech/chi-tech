@@ -46,6 +46,7 @@ public:
 					CHI_TIMER();
     //01
 	void			Reset();
+	std::string GetTimeString();
 	double			GetTime();
 };
 #endif

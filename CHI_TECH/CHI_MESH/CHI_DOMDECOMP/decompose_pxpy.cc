@@ -7,10 +7,12 @@ typedef std::vector<double> DblVec;
 typedef std::vector<int>    IntVec;
 
 //================================================== Define LBF-Calc funtion
-/**Makes a centroid based load balance factor calculation.*/
-double chi_mesh::ComputeLBF(std::vector<chi_mesh::Vector>& points,
-                            DblVec& x_cuts,
-                            DblVec& y_cuts)
+/**Makes a centroid based load balance factor calculation.
+ *
+ * \author Jan*/
+double chi_mesh::ComputeLBF(std::vector<Vector>& points,
+                            std::vector<double>& x_cuts,
+                            std::vector<double>& y_cuts)
 {
   std::vector<IntVec> balance_matrix(x_cuts.size()+1,
                                      IntVec(y_cuts.size()+1,0));
