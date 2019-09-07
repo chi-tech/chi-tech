@@ -9,16 +9,16 @@
 
 
 /**Cell pointer struct.*/
-struct GRAPH_CELL_INFO
+struct GraphCellInfo
 {
   chi_mesh::Cell* cell_ptr;
 
-  GRAPH_CELL_INFO()
+  GraphCellInfo()
   {
     cell_ptr = nullptr;
   }
 
-  GRAPH_CELL_INFO& operator=(const GRAPH_CELL_INFO& other)
+  GraphCellInfo& operator=(const GraphCellInfo& other)
   {
     cell_ptr = other.cell_ptr;
     return *this;
@@ -27,7 +27,7 @@ struct GRAPH_CELL_INFO
 
 typedef boost::property<boost::vertex_degree_t,
   int,
-  GRAPH_CELL_INFO> vertex_deg_prop;
+  GraphCellInfo> vertex_deg_prop;
 typedef boost::property<boost::vertex_color_t,
                         boost::default_color_type,
                         vertex_deg_prop> vertexProperties;

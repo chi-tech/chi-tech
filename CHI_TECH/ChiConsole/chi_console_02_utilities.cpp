@@ -9,7 +9,7 @@
 //############################################################################# Initialize event
 /** Registers an event for further use.
 \author Jan */
-void CHI_CONSOLE::InitializeLuaEvent(const char* eventTitle)
+void ChiConsole::InitializeLuaEvent(const char* eventTitle)
 {
 	lua_State* L = this->consoleState;
 	CST_EVENT defaultEvent;
@@ -56,7 +56,7 @@ void CHI_CONSOLE::InitializeLuaEvent(const char* eventTitle)
 //############################################################################# Execute file
 /** Executes the given file in the Lua engine.
 \author Jan*/
-void CHI_CONSOLE::ExecuteFile(const char* fileName,int argc, char** argv)
+void ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv)
 {
 	lua_State* L = this->consoleState;
 	if (fileName!=NULL)
@@ -87,7 +87,7 @@ void CHI_CONSOLE::ExecuteFile(const char* fileName,int argc, char** argv)
 /**Posts an event and all of its parameters to the lua-state.
 
 \author CHI Vermaak*/
-void CHI_CONSOLE::PostEventToConsole(CST_EVENT* inputEvent)
+void ChiConsole::PostEventToConsole(CST_EVENT* inputEvent)
 {
 	lua_State* L = this->consoleState;
 	lua_newtable(L);
@@ -131,7 +131,7 @@ void CHI_CONSOLE::PostEventToConsole(CST_EVENT* inputEvent)
 
 //################################################################### Parses MPI
 /**Pushes location id and number of processes to lua state.*/
-void CHI_CONSOLE::PostMPIInfo(int location_id, int number_of_processes)
+void ChiConsole::PostMPIInfo(int location_id, int number_of_processes)
 {
   lua_State* L = this->consoleState;
 

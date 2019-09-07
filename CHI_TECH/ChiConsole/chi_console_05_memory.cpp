@@ -9,7 +9,7 @@
 
 //###################################################################
 /**Gets the current memory usage.*/
-CST_MEMORY CHI_CONSOLE::GetMemoryUsage()
+CST_MEMORY ChiConsole::GetMemoryUsage()
 {
   double mem = 0.0;
 #if defined(__MACH__)
@@ -56,7 +56,7 @@ CST_MEMORY CHI_CONSOLE::GetMemoryUsage()
 
 //###################################################################
 /**Gets the current memory usage in megabytes.*/
-double CHI_CONSOLE::GetMemoryUsageInMB()
+double ChiConsole::GetMemoryUsageInMB()
 {
   CST_MEMORY mem_struct = GetMemoryUsage();
 
@@ -65,7 +65,7 @@ double CHI_CONSOLE::GetMemoryUsageInMB()
 
 //###################################################################
 /**Gets the current memory usage in megabytes.*/
-double CHI_CONSOLE::GetMemoryUsageInBytes()
+double ChiConsole::GetMemoryUsageInBytes()
 {
   CST_MEMORY mem_struct = GetMemoryUsage();
 

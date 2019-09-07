@@ -14,7 +14,7 @@ extern "C"
 
 //############################################################################# CLASS DEF
 /** Class for handling the console and scripting.*/
-class CHI_CONSOLE
+class ChiConsole
 {
     public:
 	lua_State*							consoleState;             	///< Pointer to lua console state
@@ -27,7 +27,7 @@ class CHI_CONSOLE
 	int                     xSize;
     public:
 	//00
-						  CHI_CONSOLE();
+						  ChiConsole();
   //01 Loop
   void        RunConsoleLoop(char* fileName=NULL);
   //02 Utilities

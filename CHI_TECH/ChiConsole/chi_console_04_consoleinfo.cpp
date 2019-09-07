@@ -12,7 +12,7 @@
 //############################################################################# Read console size
 /** Gets the amount of characters in the current buffer.
 \author Jan*/
-int CHI_CONSOLE::GetNumCharsInConsoleBuffer()
+int ChiConsole::GetNumCharsInConsoleBuffer()
 {
 #ifdef WINDOWS_ENV
 	CONSOLE_SCREEN_BUFFER_INFO buffer_info;
@@ -32,7 +32,7 @@ int CHI_CONSOLE::GetNumCharsInConsoleBuffer()
 //############################################################################# Provides a copy of the console
 /**
 \author Jan*/
-void CHI_CONSOLE::CopyConsole(char* destination, int lineNumber,int xSize)
+void ChiConsole::CopyConsole(char* destination, int lineNumber,int xSize)
 {
 #ifdef WINDOWS_ENV
 	DWORD num_character_read = 0;

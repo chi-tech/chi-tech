@@ -11,7 +11,7 @@ extern ChiTimer        chi_program_timer;
 /* This function sends the commands contained in the input buffer to
 the lua state from where it is executed.
 */
-void CHI_CONSOLE::flushConsole()
+void ChiConsole::flushConsole()
 {
 
 	return;

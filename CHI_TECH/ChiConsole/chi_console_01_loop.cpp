@@ -18,7 +18,7 @@ extern bool chi_termination_posted;
 
 //############################################################################# Run Console loop
 /** Executes the loop for the console.*/
-void CHI_CONSOLE::RunConsoleLoop(char* fileName)
+void ChiConsole::RunConsoleLoop(char* fileName)
 {
 
     printf("Console loop started.\n");

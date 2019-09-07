@@ -4,7 +4,7 @@
 
 //############################################################################# Default constructor
 /** Default constructor for the console*/
-CHI_CONSOLE::CHI_CONSOLE()
+ChiConsole::ChiConsole()
 {
 
 	this->currentSize=0;
