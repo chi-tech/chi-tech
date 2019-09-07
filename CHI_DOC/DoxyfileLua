@@ -114,7 +114,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "CHI_DOC/LUA_DOCUMENTATION" "CHI_RESOURCES/Scripts/chil" "CHI_TECH" "CHI_DOC/PAGES"
+INPUT                  = "CHI_DOC/LUA_DOCUMENTATION" "CHI_TECH" "CHI_DOC/PAGES"
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          =
 RECURSIVE              = YES
@@ -127,6 +127,7 @@ EXCLUDE               += "CHI_TECH/CHI_MESH/CHI_REGION/lua"
 EXCLUDE               += "CHI_TECH/CHI_MESH/CHI_MESHHANDLER/lua"
 EXCLUDE               += "CHI_TECH/CHI_MESH/CHI_LINEMESH/lua"
 EXCLUDE               += "CHI_TECH/CHI_MESH/CHI_FFINTERPOLATION/lua"
+EXCLUDE               += "CHI_TECH/CHI_MESH/CHI_DOMDECOMP/lua"
 EXCLUDE               += "CHI_TECH/CHI_MATH/Quadratures/lua"
 EXCLUDE               += "CHI_TECH/CHI_MATH/Quadratures/LegendrePoly/lua"
 EXCLUDE               += "CHI_TECH/CHI_MODULES/CHI_DIFFUSION/lua"
@@ -212,9 +213,9 @@ GENERATE_TREEVIEW      = YES
 ENUM_VALUES_PER_LINE   = 4
 TREEVIEW_WIDTH         = 300
 EXT_LINKS_IN_WINDOW    = NO
-FORMULA_FONTSIZE       = 10
+FORMULA_FONTSIZE       = 12
 FORMULA_TRANSPARENT    = YES
-USE_MATHJAX            = YES
+USE_MATHJAX            = FALSE
 MATHJAX_FORMAT         = HTML-CSS
 MATHJAX_RELPATH        = http://cdn.mathjax.org/mathjax/latest
 MATHJAX_EXTENSIONS     =

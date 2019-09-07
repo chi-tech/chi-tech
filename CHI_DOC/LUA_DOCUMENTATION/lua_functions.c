@@ -750,35 +750,10 @@ materials[0] = chiPhysicsAddMaterial("Test Material");
 \author Jan*/
 int CHI_LUA::chiPhysicsAddMaterial(char Name)
 {return;} 
-/** Exports a field function to VTK format.
- *
-\param FFHandle int Global handle to the field function.
-\param BaseName char Base name for the exported file.
-\ingroup LuaFieldFunc
-\author Jan*/
-int CHI_LUA::chiExportFieldFunctionToVTK(int FFHandle, char BaseName)
-{return;} 
-/** Exports all the groups in a field function to VTK format.
- *
-\param FFHandle int Global handle to the field function.
-\param BaseName char Base name for the exported file.
-\ingroup LuaFieldFunc
-\author Jan*/
-int CHI_LUA::chiExportFieldFunctionToVTKG(int FFHandle, char BaseName)
-{return;} 
 /** Adds a region to a solver.
 \ingroup LuaSolver
 \author Jan*/
 int CHI_LUA::chiSolverExecute()
-{return;} 
-/** Adds a field function to a solver.
- *
-\param SolverHandle int Handle to the solver.
-\param Name char String name for the field function.
-\return FFHandle int Global Handle to the field function.
-\ingroup LuaSolver
-\author Jan*/
-int CHI_LUA::chiSolverAddFieldFunction(int SolverHandle, char Name)
 {return;} 
 /** Adds a material property to a material.
  *
@@ -901,12 +876,6 @@ Checklist for adding a new material property:
 \author Jan*/
 int CHI_LUA::chiPhysicsMaterialSetProperty(int MaterialHandle, int PropertyIndex, int OperationIndex, varying Information)
 {return;} 
-/**Obtains a named list of the field functions associated with a solver.
- *
- * \param SolverHandle int A handle to the reference solver.
- \ingroup LuaSolver */
-int CHI_LUA::chiGetFieldFunctionList(SolverHandle \param)
-{return;} 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
 /** Adds a region to a solver.
@@ -929,8 +898,11 @@ int CHI_LUA::chiMonteCarlonCreateSolver()
 \param SourceType int Source type identifier. See SourceType below.
 ##_
 ###PropertyIndex\n
-BOUNDARY_SOURCE\n
+MC_BNDRY_SRC\n
  Source on a surface boundary. Expects to be followed by the boundary number.\n\n
+MC_RESID_SRC\n
+ Uses a residual source from a field function. Expects to be followed by a
+ field function handle.
 \return Handle int Handle to the created source.
 \ingroup LuaMonteCarlon
 \author Jan*/

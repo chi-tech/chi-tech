@@ -7,7 +7,6 @@ function Add_Folder(folderPath)
 end
 
 Add_Folder("../CHI_MODULES/CHI_PI3/lua")
-Add_Folder("../CHI_MODULES/CHI_AUDIO/lua")
 Add_Folder("../CHI_MODULES/CHI_THERMOALPHA/lua")
 
 Add_Folder("../CHI_MATH/Quadratures/lua")
