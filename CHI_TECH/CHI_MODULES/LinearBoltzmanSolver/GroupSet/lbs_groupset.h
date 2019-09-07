@@ -4,8 +4,8 @@
 #include "lbs_group.h"
 #include "CHI_MODULES/LinearBoltzmanSolver/IterativeMethods/lbs_iterativemethods.h"
 
-#include <CHI_MATH/Quadratures/LegendrePoly/legendrepoly.h>
-#include <CHI_MATH/Quadratures/product_quadrature.h>
+#include <ChiMath/Quadratures/LegendrePoly/legendrepoly.h>
+#include <ChiMath/Quadratures/product_quadrature.h>
 #include <CHI_MESH/CHI_SWEEP/chi_angleaggregation.h>
 
 #include <CHI_PHYSICS/chi_physics_namespace.h>

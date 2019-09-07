@@ -2,7 +2,7 @@
 
 #include "CHI_MODULES/LinearBoltzmanSolver/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include "CHI_MESH/CHI_SWEEP/chi_SPDS.h"
-#include "CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
 #include <CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h>
 #include <CHI_MESH/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>

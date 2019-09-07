@@ -11,7 +11,7 @@
 extern CHI_PHYSICS chi_physics_handler;
 extern CHI_LOG chi_log;
 
-#include "../../../CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "../../../ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
 #define DISCRETIZATION_METHOD 1
 #define MAX_ITERS             2

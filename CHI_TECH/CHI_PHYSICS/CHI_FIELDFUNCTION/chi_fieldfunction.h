@@ -3,7 +3,7 @@
 
 #include "../chi_physics_namespace.h"
 #include "../../CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h"
-#include "CHI_MATH/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 #include <petscksp.h>
 

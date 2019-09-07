@@ -2,11 +2,11 @@
 
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 #include "../../../CHI_PHYSICS/chi_physics.h"
-#include "../../../CHI_MATH/chi_math.h"
+#include "../../../ChiMath/chi_math.h"
 #include <chi_log.h>
 
 extern CHI_PHYSICS chi_physics_handler;
-extern CHI_MATH    chi_math_handler;
+extern ChiMath    chi_math_handler;
 extern CHI_LOG     chi_log;
 
 /** \defgroup LuaLBSGroupsets LBS Groupsets

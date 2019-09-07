@@ -3,7 +3,7 @@
 
 //############################################################################# GAUSS ELIMINATION
 /** Gauss Elimination without pivoting.*/
-void CHI_MATH::GaussElimination(std::vector<std::vector<double> > &A,
+void ChiMath::GaussElimination(std::vector<std::vector<double> > &A,
 	                              std::vector<double> &b, int n)
 {
 	// Forward elimination

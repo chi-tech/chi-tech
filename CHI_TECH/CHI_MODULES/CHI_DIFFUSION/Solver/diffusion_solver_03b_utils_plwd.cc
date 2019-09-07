@@ -9,9 +9,9 @@
 #include "../../../CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h"
 #include "../../../CHI_TIMER/chi_timer.h"
 
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
 #include <boost/mpi.hpp>
 #include <boost/mpi/environment.hpp>

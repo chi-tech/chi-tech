@@ -1,7 +1,7 @@
 #ifndef _chi_discretization_fv_h
 #define _chi_discretization_fv_h
 
-#include "CHI_MATH/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "CellViews/fv_cellbase.h"
 
 //###################################################################

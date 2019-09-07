@@ -3,7 +3,7 @@
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/chi_physicsmaterial.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
 
-#include <CHI_MATH/Statistics/cdfsampler.h>
+#include <ChiMath/Statistics/cdfsampler.h>
 
 extern CHI_PHYSICS chi_physics_handler;
 

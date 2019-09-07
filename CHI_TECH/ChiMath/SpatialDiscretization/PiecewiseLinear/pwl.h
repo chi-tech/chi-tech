@@ -1,7 +1,7 @@
 #ifndef _chi_discretization_pwl_h
 #define _chi_discretization_pwl_h
 
-#include"CHI_MATH/SpatialDiscretization/spatial_discretization.h"
+#include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include"../../../CHI_MESH/CHI_REGION/chi_region.h"
 #include "CellViews/pwl_cellbase.h"
 #include "../../Quadratures/quadrature_triangle.h"

@@ -1,7 +1,7 @@
 #include "../property10_transportxsections.h"
 
-#include <CHI_MATH/GolubFischer/GolubFischer.h>
-#include <CHI_MATH/chi_math.h>
+#include <ChiMath/GolubFischer/GolubFischer.h>
+#include <ChiMath/chi_math.h>
 
 #include <chi_log.h>
 

@@ -23,7 +23,7 @@
 
 #include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
 
-#include <CHI_MATH/Statistics/cdfsampler.h>
+#include <ChiMath/Statistics/cdfsampler.h>
 
 #include <CHI_PHYSICS/chi_physics.h>
 #include <chi_log.h>

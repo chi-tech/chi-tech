@@ -2,7 +2,7 @@
 #define _chi_physics_transportxsections_h
 
 #include "chi_physicsmaterial.h"
-#include <CHI_MATH/SparseMatrix/chi_math_sparse_matrix.h>
+#include <ChiMath/SparseMatrix/chi_math_sparse_matrix.h>
 
 #define E_COLLAPSE_PARTIAL_JACOBI 1
 #define E_COLLAPSE_JACOBI         2

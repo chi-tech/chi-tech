@@ -2,10 +2,10 @@
 #include "../../CHI_CELL/cell_slab.h"
 #include "../../CHI_CELL/cell_polygon.h"
 #include "../../CHI_CELL/cell_polyhedron.h"
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h>
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
 
 #include <chi_mpi.h>
 

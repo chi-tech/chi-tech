@@ -1,4 +1,4 @@
-#include <CHI_MATH/chi_math.h>
+#include <ChiMath/chi_math.h>
 
 #include "cdfsampler.h"
 

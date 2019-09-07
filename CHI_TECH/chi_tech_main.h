@@ -5,10 +5,10 @@
 #include"CHI_CONSOLE/chi_console.h"
 CHI_CONSOLE       chi_console;
 
-#include "CHI_MATH/chi_math.h"
+#include "ChiMath/chi_math.h"
 #include "CHI_PHYSICS/chi_physics.h"
 #include "CHI_TIMER/chi_timer.h"
-CHI_MATH    chi_math_handler;
+ChiMath    chi_math_handler;
 CHI_PHYSICS chi_physics_handler;
 CHI_TIMER   chi_program_timer;
 

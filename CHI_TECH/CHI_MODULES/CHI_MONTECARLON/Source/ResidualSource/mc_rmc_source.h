@@ -5,7 +5,7 @@
 
 #include <CHI_PHYSICS/chi_physics.h>
 
-#include <CHI_MATH/chi_math.h>
+#include <ChiMath/chi_math.h>
 
 //###################################################################
 /**Residual source class.*/

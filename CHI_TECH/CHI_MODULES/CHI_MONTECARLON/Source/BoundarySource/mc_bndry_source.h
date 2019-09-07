@@ -4,7 +4,7 @@
 #include "CHI_MODULES/CHI_MONTECARLON/Source/mc_base_source.h"
 
 #include <CHI_MESH/chi_meshmatrix3x3.h>
-#include <CHI_MATH/chi_math.h>
+#include <ChiMath/chi_math.h>
 
 
 //###################################################################

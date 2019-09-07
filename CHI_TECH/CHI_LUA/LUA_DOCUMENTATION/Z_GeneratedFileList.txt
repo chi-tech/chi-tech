@@ -5,9 +5,9 @@
 ../CHI_MODULES/CHI_THERMOALPHA/lua/thermoalpha_02_hydro_boundary.cpp
 ../CHI_MODULES/CHI_THERMOALPHA/lua/thermoalpha_05_getproperty.cpp
 ../CHI_MODULES/CHI_THERMOALPHA/lua/thermoalpha_03_hydro_sjunction.cpp
-../CHI_MATH/Quadratures/lua/createprodquadrature.cc
-../CHI_MATH/Quadratures/lua/createquadrature.cc
-../CHI_MATH/Quadratures/LegendrePoly/lua/legendre.cc
+../ChiMath/Quadratures/lua/createprodquadrature.cc
+../ChiMath/Quadratures/lua/createquadrature.cc
+../ChiMath/Quadratures/LegendrePoly/lua/legendre.cc
 ../CHI_MESH/lua/mesh_splitedgeloopbyangle.cc
 ../CHI_MESH/lua/mesh_maindoc_page.cc
 ../CHI_MESH/CHI_SURFACEMESH/lua/surfacemesh_export.cc

@@ -14,7 +14,7 @@
 #include <FiniteVolume/CellViews/fv_slab.h>
 #include <FiniteVolume/CellViews/fv_polygon.h>
 
-#include <CHI_MATH/Statistics/cdfsampler.h>
+#include <ChiMath/Statistics/cdfsampler.h>
 
 #include <chi_log.h>
 

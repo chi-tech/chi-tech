@@ -12,9 +12,9 @@
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 #include <CHI_PHYSICS/chi_physics.h>
 
-#include <CHI_MATH/chi_math.h>
+#include <ChiMath/chi_math.h>
 #include "CHI_MODULES/LinearBoltzmanSolver/GroupSet/lbs_groupset.h"
-#include <CHI_MATH/Quadratures/product_quadrature.h>
+#include <ChiMath/Quadratures/product_quadrature.h>
 
 #include <CHI_MESH/CHI_SWEEP/chi_SPDS.h>
 #include <CHI_MESH/CHI_SWEEP/chi_angleaggregation.h>
@@ -24,7 +24,7 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern CHI_MATH    chi_math_handler;
+extern ChiMath    chi_math_handler;
 extern CHI_MPI     chi_mpi;
 extern CHI_LOG     chi_log;
 

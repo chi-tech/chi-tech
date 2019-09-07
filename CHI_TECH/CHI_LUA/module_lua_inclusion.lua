@@ -8,8 +8,8 @@ end
 
 Add_Folder("../CHI_MODULES/CHI_THERMOALPHA/lua")
 
-Add_Folder("../CHI_MATH/Quadratures/lua")
-Add_Folder("../CHI_MATH/Quadratures/LegendrePoly/lua")
+Add_Folder("../ChiMath/Quadratures/lua")
+Add_Folder("../ChiMath/Quadratures/LegendrePoly/lua")
 
 Add_Folder("../CHI_MESH/lua")
 Add_Folder("../CHI_MESH/CHI_SURFACEMESH/lua")

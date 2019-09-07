@@ -3,7 +3,7 @@
 #include "../quadrature_gausslegendre.h"
 #include "../quadrature_gausschebyshev.h"
 
-extern CHI_MATH    chi_math_handler;
+extern ChiMath    chi_math_handler;
 
 
 /**\defgroup LuaQuadrature Quadrature rules

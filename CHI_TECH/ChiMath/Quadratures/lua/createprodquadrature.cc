@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern CHI_MATH    chi_math_handler;
+extern ChiMath    chi_math_handler;
 extern CHI_LOG     chi_log;
 
 //########################################################## Create empty system

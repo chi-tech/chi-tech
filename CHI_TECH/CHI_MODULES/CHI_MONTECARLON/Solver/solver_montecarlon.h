@@ -9,7 +9,7 @@
 #include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
 #include <FiniteVolume/fv.h>
-#include <CHI_MATH/chi_math.h>
+#include <ChiMath/chi_math.h>
 
 #define MC_NUM_PARTICLES     1
 #define MC_TFC_UPDATE_INTVL  2

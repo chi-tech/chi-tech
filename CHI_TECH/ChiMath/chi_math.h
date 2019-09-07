@@ -16,18 +16,18 @@
 More information of solvers can be obtained from:
 [HERE](http://www.maa.org/press/periodicals/loci/joma/iterative-methods-for-solving-iaxi-ibi-the-sor-method)
 */
-class CHI_MATH
+class ChiMath
 {
 public:
 	std::vector<chi_math::Quadrature*> quadratures;
 	std::vector<chi_math::ProductQuadrature*> product_quadratures;
 public:
 	//00 Constructor
-						CHI_MATH();
+	ChiMath();
 	//01 Utility
 
 	//02 Linear system solvers
-	void                GaussElimination(std::vector<std::vector<double> >& A, std::vector<double>& b, int n);
+	void GaussElimination(std::vector<std::vector<double> >& A, std::vector<double>& b, int n);
 };
 
 namespace chi_math
