@@ -9,7 +9,7 @@
 #include "../CHI_MESHCONTINUUM/chi_meshcontinuum.h"
 #include "../CHI_VOLUMEMESHER/chi_volumemesher.h"
 
-#include "../../CHI_GRAPH/chi_graph.h"
+#include "../../ChiGraph/chi_graph.h"
 
 #include "chi_SPDS.h"
 
@@ -19,15 +19,15 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
-#include "../../CHI_CONSOLE/chi_console.h"
+#include "../../ChiConsole/chi_console.h"
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 #include <ChiTimer/chi_timer.h>
 
 extern ChiTimer   chi_program_timer;
 
-#include <CHI_GRAPH/chi_directed_graph.h>
+#include <ChiGraph/chi_directed_graph.h>
 
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned

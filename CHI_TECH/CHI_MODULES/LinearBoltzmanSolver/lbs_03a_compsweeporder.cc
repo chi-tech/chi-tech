@@ -16,9 +16,9 @@ typedef chi_mesh::SweepManagement::AngleSet TAngleSet;
 typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;
 
 #include <iomanip>
-#include "../../CHI_CONSOLE/chi_console.h"
+#include "../../ChiConsole/chi_console.h"
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/

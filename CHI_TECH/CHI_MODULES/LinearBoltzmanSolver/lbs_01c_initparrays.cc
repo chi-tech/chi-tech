@@ -13,9 +13,9 @@ extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
 
 #include <iomanip>
-#include "../../CHI_CONSOLE/chi_console.h"
+#include "../../ChiConsole/chi_console.h"
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 //###################################################################
 /**Initializes p_arrays.\n

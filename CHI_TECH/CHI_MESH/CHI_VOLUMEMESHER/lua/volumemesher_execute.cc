@@ -9,8 +9,8 @@
 extern ChiLog chi_log;
 extern ChiTimer chi_program_timer;
 
-#include "../../../CHI_CONSOLE/chi_console.h"
-extern CHI_CONSOLE       chi_console;
+#include "../../../ChiConsole/chi_console.h"
+extern ChiConsole       chi_console;
 
 #include <iomanip>
 

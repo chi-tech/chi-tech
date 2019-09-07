@@ -3,11 +3,11 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
-#include <CHI_CONSOLE/chi_console.h>
+#include <ChiConsole/chi_console.h>
 
 extern ChiMPI     chi_mpi;
 extern ChiLog     chi_log;
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 //###################################################################
 /**Execute the solver.*/

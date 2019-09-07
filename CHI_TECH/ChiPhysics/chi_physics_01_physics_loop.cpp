@@ -3,9 +3,9 @@
 
 #include "chi_physics.h"
 #include"../ChiTimer/chi_timer.h"
-#include"../CHI_CONSOLE/chi_console.h"
+#include"../ChiConsole/chi_console.h"
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 extern bool    chi_termination_posted;
 

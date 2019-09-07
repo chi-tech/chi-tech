@@ -1,6 +1,6 @@
 #include "chi_surfacemesh.h"
 
-#include <CHI_GRAPH/chi_graph.h>
+#include <ChiGraph/chi_graph.h>
 
 #include <chi_log.h>
 

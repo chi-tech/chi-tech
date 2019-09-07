@@ -2,8 +2,8 @@
 #define _chi_tech_main_h
 
 
-#include"CHI_CONSOLE/chi_console.h"
-CHI_CONSOLE       chi_console;
+#include"ChiConsole/chi_console.h"
+ChiConsole       chi_console;
 
 #include "ChiMath/chi_math.h"
 #include "ChiPhysics/chi_physics.h"

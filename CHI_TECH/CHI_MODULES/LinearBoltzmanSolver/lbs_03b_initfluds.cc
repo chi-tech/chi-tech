@@ -1,5 +1,5 @@
 #include "lbs_linear_boltzman_solver.h"
-#include "../../CHI_CONSOLE/chi_console.h"
+#include "../../ChiConsole/chi_console.h"
 
 #include <CHI_MESH/CHI_SWEEP/chi_FLUDS.h>
 #include <CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h>
@@ -12,7 +12,7 @@
 
 #include <iomanip>
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 extern ChiLog     chi_log;
 extern ChiMPI     chi_mpi;
 

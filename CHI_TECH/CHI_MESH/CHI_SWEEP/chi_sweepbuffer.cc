@@ -6,11 +6,11 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-#include <CHI_CONSOLE/chi_console.h>
+#include <ChiConsole/chi_console.h>
 
 extern ChiLog     chi_log;
 extern ChiMPI     chi_mpi;
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 #define VACUUM             301
 #define INCIDENT_ISOTROPIC 302

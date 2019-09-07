@@ -1,9 +1,9 @@
 #include "lbs_linear_boltzman_solver.h"
 
-#include <CHI_CONSOLE/chi_console.h>
+#include <ChiConsole/chi_console.h>
 #include <chi_mpi.h>
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 extern ChiMPI chi_mpi;
 
 extern double chi_global_timings[20];

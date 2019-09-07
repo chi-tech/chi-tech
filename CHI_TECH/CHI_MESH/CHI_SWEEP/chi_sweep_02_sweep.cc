@@ -8,7 +8,7 @@
 #include "../CHI_MESHCONTINUUM/chi_meshcontinuum.h"
 #include "../CHI_VOLUMEMESHER/chi_volumemesher.h"
 
-#include "../../CHI_GRAPH/chi_graph.h"
+#include "../../ChiGraph/chi_graph.h"
 
 #include "chi_SPDS.h"
 #include "chi_angleaggregation.h"

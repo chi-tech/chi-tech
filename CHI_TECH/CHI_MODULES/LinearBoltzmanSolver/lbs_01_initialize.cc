@@ -11,9 +11,9 @@ extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
 #include <iomanip>
-#include "../../CHI_CONSOLE/chi_console.h"
+#include "../../ChiConsole/chi_console.h"
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 
 
 

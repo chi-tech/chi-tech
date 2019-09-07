@@ -3,7 +3,7 @@
 
 #include "../chi_mesh.h"
 #include <boost/graph/adjacency_list.hpp>
-#include "../../CHI_GRAPH/chi_graph.h"
+#include "../../ChiGraph/chi_graph.h"
 
 
 //######################################################### Class Definition

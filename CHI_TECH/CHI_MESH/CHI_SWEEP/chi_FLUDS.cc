@@ -1,6 +1,6 @@
 #include "chi_FLUDS.h"
 
-#include "../../CHI_CONSOLE/chi_console.h"
+#include "../../ChiConsole/chi_console.h"
 #include "chi_SPDS.h"
 
 #include "../../CHI_MESH/CHI_CELL/cell.h"
@@ -13,7 +13,7 @@
 
 #include <iomanip>
 
-extern CHI_CONSOLE chi_console;
+extern ChiConsole chi_console;
 extern ChiLog     chi_log;
 extern ChiMPI     chi_mpi;
 
