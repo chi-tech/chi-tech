@@ -1,9 +1,9 @@
-#include "chi_fieldfunction.h"
+#include "fieldfunction.h"
 
 #include <CHI_MESH/CHI_CELL/cell_slab.h>
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 
 #include <PiecewiseLinear/pwl.h>
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
@@ -17,7 +17,7 @@
 
 extern CHI_LOG chi_log;
 extern CHI_MPI chi_mpi;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>

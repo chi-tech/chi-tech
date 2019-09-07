@@ -8,7 +8,7 @@
 #include <ChiMath/Quadratures/product_quadrature.h>
 #include <CHI_MESH/CHI_SWEEP/chi_angleaggregation.h>
 
-#include <CHI_PHYSICS/chi_physics_namespace.h>
+#include <ChiPhysics/chi_physics_namespace.h>
 
 typedef chi_mesh::SweepManagement::AngleAggregation AngleAgg;
 

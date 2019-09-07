@@ -1,6 +1,6 @@
 #include "../../../CHI_LUA/chi_lua.h"
 #include "../../CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../../../CHI_PHYSICS/chi_physics.h"
+#include "../../../ChiPhysics/chi_physics.h"
 #include "../chi_ffinterpolation.h"
 #include "../Slice/chi_ffinter_slice.h"
 #include "../Line/chi_ffinter_line.h"
@@ -8,7 +8,7 @@
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 //###################################################################
 /** Export interpolation to python contour plot.

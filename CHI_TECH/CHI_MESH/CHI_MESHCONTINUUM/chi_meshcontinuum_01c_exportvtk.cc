@@ -3,14 +3,14 @@
 #include "../CHI_CELL/cell_slab.h"
 #include "../CHI_CELL/cell_polygon.h"
 #include "../CHI_CELL/cell_polyhedron.h"
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 
 #include <chi_log.h>
 #include <chi_mpi.h>
 
 extern CHI_LOG chi_log;
 extern CHI_MPI chi_mpi;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>

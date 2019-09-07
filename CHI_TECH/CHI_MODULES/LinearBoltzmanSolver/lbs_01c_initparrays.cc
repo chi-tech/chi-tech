@@ -6,11 +6,11 @@
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
 #include <PiecewiseLinear/CellViews/pwl_polygon.h>
 #include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <iomanip>
 #include "../../CHI_CONSOLE/chi_console.h"

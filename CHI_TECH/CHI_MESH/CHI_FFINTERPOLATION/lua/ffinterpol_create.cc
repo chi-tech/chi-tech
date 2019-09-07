@@ -3,7 +3,7 @@
 #include "../../CHI_FFINTERPOLATION/Slice/chi_ffinter_slice.h"
 #include "../../CHI_FFINTERPOLATION/Line/chi_ffinter_line.h"
 #include "../../CHI_FFINTERPOLATION/Volume/chi_ffinter_volume.h"
-#include "../../../CHI_PHYSICS/chi_physics.h"
+#include "../../../ChiPhysics/chi_physics.h"
 
 /** \defgroup LuaFFInterpol Field Function Interpolation
  * \ingroup LuaMesh
@@ -12,7 +12,7 @@
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 
 

@@ -4,12 +4,12 @@
 #include "../../CHI_FFINTERPOLATION/Line/chi_ffinter_line.h"
 #include "../../CHI_FFINTERPOLATION/Volume/chi_ffinter_volume.h"
 #include <CHI_MESH/CHI_LOGICALVOLUME/chi_mesh_logicalvolume.h>
-#include "../../../CHI_PHYSICS/chi_physics.h"
+#include "../../../ChiPhysics/chi_physics.h"
 
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 //#############################################################################
 /** Gets the value(s) associated with an interpolation.

@@ -3,7 +3,7 @@
 
 #include "../mc_base_source.h"
 
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 
 #include <ChiMath/chi_math.h>
 

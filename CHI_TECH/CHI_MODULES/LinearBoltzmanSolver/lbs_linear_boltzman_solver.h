@@ -1,11 +1,11 @@
 #ifndef _lbs_linearboltzmansolver_h
 #define _lbs_linearboltzmansolver_h
 
-#include "../../CHI_PHYSICS/CHI_SOLVER/chi_solver.h"
+#include "../../ChiPhysics/SolverBase/chi_solver.h"
 
 #include "CHI_MODULES/LinearBoltzmanSolver/GroupSet/lbs_groupset.h"
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property11_isotropic_mg_src.h>
+#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
+#include <ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h>
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
 #include "../../CHI_MESH/CHI_SWEEP/chi_sweep.h"

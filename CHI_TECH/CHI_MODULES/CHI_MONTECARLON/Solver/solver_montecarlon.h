@@ -3,11 +3,11 @@
 #include<iostream>
 
 #include"../chi_montecarlon.h"
-#include"../../../CHI_PHYSICS/CHI_SOLVER/chi_solver.h"
+#include"../../../ChiPhysics/SolverBase/chi_solver.h"
 #include "../RandomNumberGenerator/montecarlon_rng.h"
 #include "CHI_MODULES/CHI_MONTECARLON/Source/mc_base_source.h"
 #include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
+#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <FiniteVolume/fv.h>
 #include <ChiMath/chi_math.h>
 

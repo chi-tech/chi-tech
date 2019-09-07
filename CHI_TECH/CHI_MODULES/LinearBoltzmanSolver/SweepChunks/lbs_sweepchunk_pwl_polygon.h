@@ -9,7 +9,7 @@
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
 
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 
 #include <ChiMath/chi_math.h>
 #include "CHI_MODULES/LinearBoltzmanSolver/GroupSet/lbs_groupset.h"

@@ -13,10 +13,10 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 extern CHI_MPI chi_mpi;
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 
 //###################################################################

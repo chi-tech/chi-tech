@@ -1,10 +1,10 @@
 #include "lbs_linear_boltzman_solver.h"
 
-#include <CHI_PHYSICS/chi_physics.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/chi_physicsmaterial.h>
+#include <ChiPhysics/chi_physics.h>
+#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <chi_log.h>
 #include <chi_mpi.h>

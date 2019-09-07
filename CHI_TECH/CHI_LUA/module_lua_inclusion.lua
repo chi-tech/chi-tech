@@ -24,7 +24,7 @@ Add_Folder("../CHI_MESH/CHI_FFINTERPOLATION/lua")
 Add_Folder("../CHI_MPI/lua")
 Add_Folder("../CHI_LOG/lua")
 
-Add_Folder("../CHI_PHYSICS/lua")
+Add_Folder("../ChiPhysics/lua")
 
 Add_Folder("../CHI_MODULES/CHI_MONTECARLON/lua")
 Add_Folder("../CHI_MODULES/CHI_DIFFUSION/lua")
