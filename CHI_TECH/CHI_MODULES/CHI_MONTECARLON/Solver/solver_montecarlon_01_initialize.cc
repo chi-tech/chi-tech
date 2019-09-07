@@ -84,14 +84,15 @@ bool chi_montecarlon::Solver::Initialize()
 
 
   //=================================== Initialize tallies
-  phi_tally_contrib.resize(num_grps*grid->local_cell_glob_indices.size(),0.0);
-  phi_tally.resize(num_grps*grid->local_cell_glob_indices.size(),0.0);
-  phi_tally_sqr.resize(num_grps*grid->local_cell_glob_indices.size(),0.0);
+  size_t tally_size = num_grps*grid->local_cell_glob_indices.size();
+  phi_tally_contrib.resize(tally_size,0.0);
+  phi_tally.resize(tally_size,0.0);
+  phi_tally_sqr.resize(tally_size,0.0);
 
-  phi_global.resize(num_grps*grid->local_cell_glob_indices.size(),0.0);
-  phi_global_tally_sqr.resize(num_grps*grid->local_cell_glob_indices.size(),0.0);
+  phi_global.resize(tally_size,0.0);
+  phi_global_tally_sqr.resize(tally_size,0.0);
 
-  phi_local_relsigma.resize(num_grps*grid->local_cell_glob_indices.size(),0.0);
+  phi_local_relsigma.resize(tally_size,0.0);
 
   //=================================== Initialize discretization
   fv_discretization = new CHI_DISCRETIZATION_FV;

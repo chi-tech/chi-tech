@@ -44,12 +44,9 @@
 ../CHI_MPI/lua/mpi_barrier.cc
 ../CHI_LOG/lua/log.cc
 ../CHI_PHYSICS/lua/physics_addmaterial.cc
-../CHI_PHYSICS/lua/physics_exportfieldfunc.cc
 ../CHI_PHYSICS/lua/physics_maindoc_page.cc
 ../CHI_PHYSICS/lua/physics_solverexecute.cc
-../CHI_PHYSICS/lua/physics_addfieldfunc.cc
 ../CHI_PHYSICS/lua/physics_materialproperties.cc
-../CHI_PHYSICS/lua/physics_getfieldfunclist.cc
 ../CHI_PHYSICS/lua/physics_addregion.cc
 ../CHI_MODULES/CHI_MONTECARLON/lua/montecarlon_createsolver.cc
 ../CHI_MODULES/CHI_MONTECARLON/lua/montecarlon_create_source.cc

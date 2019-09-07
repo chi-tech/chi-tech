@@ -9,6 +9,8 @@ namespace chi_montecarlon
   class RandomNumberGenerator;
   class Source;
   class BoundarySource;
+  class VolumetricSource;
+  class ResidualSource;
 
 
   class Solver;

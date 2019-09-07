@@ -67,6 +67,7 @@ now we have only a couple of tutorials.\n
 <tr><td width="33%">chiSolverAddRegion()</td><td width="33%">chiSolverExecute()</td><td width="33%">chiPhysicsAddMaterial()</td></tr>
 <tr><td width="33%">chiPhysicsMaterialAddProperty()</td><td width="33%">chiPhysicsMaterialSetProperty()</td><td width="33%">chiSolverAddFieldFunction()</td></tr>
 <tr><td width="33%">chiGetFieldFunctionList()</td><td width="33%">chiExportFieldFunctionToVTK()</td><td width="33%">chiExportFieldFunctionToVTKG()</td></tr>
+<tr><td width="33%">chiExportMultiFieldFunctionToVTKG()</td></tr>
 </table>
 ### Monte-carlo Utilities
  
