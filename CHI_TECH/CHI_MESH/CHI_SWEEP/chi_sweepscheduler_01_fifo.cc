@@ -2,7 +2,7 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 extern CHI_MPI chi_mpi;
 extern CHI_LOG chi_log;
@@ -13,7 +13,7 @@ extern double chi_global_timings[20];
 /**Applies a First-In-First-Out sweep scheduling.*/
 void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoFIFO()
 {
-  CHI_TIMER t16_sweeptime; t16_sweeptime.Reset();
+  ChiTimer t16_sweeptime; t16_sweeptime.Reset();
   //================================================== Loop over AngleSetGroups
   // For 3D geometry this will be 8, one for each octant.
   // For 2D geometry this will be 4, one for each quadrant.

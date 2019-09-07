@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 #include "chi_physics.h"
-#include"../CHI_TIMER/chi_timer.h"
+#include"../ChiTimer/chi_timer.h"
 #include"../CHI_CONSOLE/chi_console.h"
 
 extern CHI_CONSOLE chi_console;
@@ -13,8 +13,8 @@ extern bool    chi_termination_posted;
 /** Timed loop executing all physics events.*/
 void CHI_PHYSICS::RunPhysicsLoop()
 {
-	CHI_TIMER physicsTiming;
-	CHI_TIMER profilingTimer;
+	ChiTimer physicsTiming;
+	ChiTimer profilingTimer;
 	double    physicsTime=0.0;
 	double    physicsOldTime=0.0;
 	int       cycleCollected=0;

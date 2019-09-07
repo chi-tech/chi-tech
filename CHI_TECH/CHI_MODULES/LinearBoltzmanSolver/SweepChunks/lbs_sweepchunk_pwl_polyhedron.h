@@ -18,7 +18,7 @@
 #include "../../../CHI_MESH/CHI_SWEEP/chi_SPDS.h"
 #include "../../../CHI_MESH/CHI_SWEEP/chi_angleaggregation.h"
 
-#include "../../../CHI_TIMER/chi_timer.h"
+#include "../../../ChiTimer/chi_timer.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>

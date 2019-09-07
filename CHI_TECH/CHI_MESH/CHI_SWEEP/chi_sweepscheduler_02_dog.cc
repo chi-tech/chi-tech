@@ -2,7 +2,7 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 extern CHI_MPI chi_mpi;
 extern CHI_LOG chi_log;
@@ -153,7 +153,7 @@ void chi_mesh::SweepManagement::SweepScheduler::InitializeAlgoDOG()
 /**Executes the Depth-Of-Graph algorithm.*/
 void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoDOG()
 {
-  CHI_TIMER t16_sweeptime; t16_sweeptime.Reset();
+  ChiTimer t16_sweeptime; t16_sweeptime.Reset();
 
   //==================================================== Loop till done
   bool completion_status = FLAG_FINISHED;

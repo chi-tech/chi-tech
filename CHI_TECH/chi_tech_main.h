@@ -7,10 +7,10 @@ CHI_CONSOLE       chi_console;
 
 #include "ChiMath/chi_math.h"
 #include "CHI_PHYSICS/chi_physics.h"
-#include "CHI_TIMER/chi_timer.h"
+#include "ChiTimer/chi_timer.h"
 ChiMath    chi_math_handler;
 CHI_PHYSICS chi_physics_handler;
-CHI_TIMER   chi_program_timer;
+ChiTimer   chi_program_timer;
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -19,8 +19,6 @@ CHI_LOG chi_log;
 
 
 //=============================================== Stacks
-
-#include"CHI_TOOLS/CHI_TRANSFORM/chi_transform.h"
 #include"CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
 
 

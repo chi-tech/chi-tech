@@ -16,7 +16,7 @@
 #include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
 
 #include <CHI_PHYSICS/CHI_FIELDFUNCTION/chi_fieldfunction.h>
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 #include <petscksp.h>
 
@@ -69,8 +69,8 @@ typedef std::vector<std::vector<DIFFUSION_IP_VIEW*>>       IP_BORDERIPVIEWS;
 class chi_diffusion::Solver : public chi_physics::Solver
 {
 private:
-  CHI_TIMER t_assembly;
-  CHI_TIMER t_solve;
+  ChiTimer t_assembly;
+  ChiTimer t_solve;
 
   double time_assembly, time_solve;
   bool verbose;

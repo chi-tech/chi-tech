@@ -5,10 +5,10 @@
 
 #include <iomanip>
 #include <chi_log.h>
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 extern CHI_LOG     chi_log;
-extern CHI_TIMER   chi_program_timer;
+extern ChiTimer   chi_program_timer;
 
 //###################################################################
 /**Customized monitor for PETSc Krylov sub-space solvers.*/

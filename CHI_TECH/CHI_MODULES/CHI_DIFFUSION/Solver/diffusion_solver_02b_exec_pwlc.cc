@@ -9,7 +9,7 @@
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>

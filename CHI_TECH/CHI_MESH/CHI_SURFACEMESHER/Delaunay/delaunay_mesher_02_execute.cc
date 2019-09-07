@@ -1,7 +1,7 @@
 #include "delaunay_mesher.h"
 #include "../../CHI_MESHHANDLER/chi_meshhandler.h"
 #include "../../CHI_REGION/chi_region.h"
-#include "../../../CHI_TIMER/chi_timer.h"
+#include "../../../ChiTimer/chi_timer.h"
 #include "../../CHI_BOUNDARY/chi_boundary.h"
 #include "../../CHI_MESHCONTINUUM/chi_meshcontinuum.h"
 
@@ -29,7 +29,7 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
   std::cout << std::endl;
 
   //================================================== Start timer
-  CHI_TIMER tmesh_timer;
+  ChiTimer tmesh_timer;
   tmesh_timer.Reset();
 
   //================================================== Get the current handler

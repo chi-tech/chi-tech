@@ -15,7 +15,7 @@ extern CHI_MPI chi_mpi;
 
 typedef unsigned long long TULL;
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 /**Initialize the solver*/
 bool chi_montecarlon::Solver::Initialize()

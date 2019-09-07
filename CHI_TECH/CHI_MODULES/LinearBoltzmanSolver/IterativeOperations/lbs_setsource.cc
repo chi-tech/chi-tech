@@ -9,7 +9,7 @@
 #include <CHI_MESH/CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h>
 #include <CHI_MESH/CHI_VOLUMEMESHER/Predefined2D/volmesher_predefined2d.h>
 
-#include "CHI_TIMER/chi_timer.h"
+#include "ChiTimer/chi_timer.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -44,7 +44,7 @@ void LinearBoltzmanSolver::SetSource(int group_set_num,
     OneD_Slab = true;
 
 
-  CHI_TIMER t18_setsrctime; t18_setsrctime.Reset();
+  ChiTimer t18_setsrctime; t18_setsrctime.Reset();
 
   //================================================== Get reference to groupset
   LBS_GROUPSET* groupset = group_sets[group_set_num];

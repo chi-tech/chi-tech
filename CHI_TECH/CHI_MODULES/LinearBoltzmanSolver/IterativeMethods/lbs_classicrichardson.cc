@@ -4,7 +4,7 @@
 #include "CHI_MODULES/LinearBoltzmanSolver/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include <CHI_MODULES/CHI_DIFFUSION/Solver/diffusion_solver.h>
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 
 #include <chi_log.h>
@@ -16,7 +16,7 @@ extern double chi_global_timings[20];
 typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
 typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
 
-extern CHI_TIMER chi_program_timer;
+extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/

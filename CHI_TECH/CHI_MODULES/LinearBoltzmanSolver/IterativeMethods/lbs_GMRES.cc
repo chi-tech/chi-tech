@@ -3,7 +3,7 @@
 #include "CHI_MESH/CHI_SWEEP/chi_sweepscheduler.h"
 #include "CHI_MODULES/LinearBoltzmanSolver/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 
-#include "../../../CHI_TIMER/chi_timer.h"
+#include "../../../ChiTimer/chi_timer.h"
 #include "../Tools/kspmonitor_npt.h"
 #include "../Tools/ksp_data_context.h"
 #include "CHI_MODULES/LinearBoltzmanSolver/IterativeOperations/lbs_matrixaction_Ax.h"

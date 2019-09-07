@@ -7,7 +7,7 @@
 #include <CHI_MODULES/LinearBoltzmanSolver/Tools/kspmonitor_npt.h>
 
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -20,7 +20,7 @@ extern CHI_PHYSICS chi_physics_handler;
 #include<fstream>
 #include <unistd.h>
 
-extern CHI_TIMER chi_program_timer;
+extern ChiTimer chi_program_timer;
 
 PetscErrorCode
 DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
@@ -39,7 +39,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
 
   //================================================== Reorder nodes
   chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
-  CHI_TIMER t_reorder; t_reorder.Reset();
+  ChiTimer t_reorder; t_reorder.Reset();
   this->ReorderNodesPWLD();
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -94,7 +94,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
 
   //================================================== Setup timer
   chi_log.Log(LOG_0) << "Determining nodal connections";
-  CHI_TIMER t_connect; t_connect.Reset();
+  ChiTimer t_connect; t_connect.Reset();
   double t0 = 0.0;
 
 

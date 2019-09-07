@@ -4,7 +4,7 @@
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -35,7 +35,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
-  CHI_TIMER t_reorder; t_reorder.Reset();
+  ChiTimer t_reorder; t_reorder.Reset();
   this->ReorderNodesPWLD();
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -92,7 +92,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   //================================================== Setup timers
   if (verbose)
     chi_log.Log(LOG_0) << "Determining nodal connections";
-  CHI_TIMER t_connect; t_connect.Reset();
+  ChiTimer t_connect; t_connect.Reset();
   double t0 = 0.0;
 
 

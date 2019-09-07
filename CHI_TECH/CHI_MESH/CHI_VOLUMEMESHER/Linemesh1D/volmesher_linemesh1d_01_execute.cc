@@ -12,8 +12,8 @@
 extern CHI_MPI chi_mpi;
 extern CHI_LOG chi_log;
 
-#include <CHI_TIMER/chi_timer.h>
-extern CHI_TIMER chi_program_timer;
+#include <ChiTimer/chi_timer.h>
+extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Executes the One dimensional mesher process.*/

@@ -7,7 +7,7 @@
 #include "../../../CHI_MESH/CHI_CELL/cell_polygon.h"
 #include "../../../CHI_MESH/CHI_CELL/cell_polyhedron.h"
 #include "../../../CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h"
-#include "../../../CHI_TIMER/chi_timer.h"
+#include "../../../ChiTimer/chi_timer.h"
 
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
@@ -30,7 +30,7 @@ extern CHI_MPI chi_mpi;
  * assembly specific to PWLD methods.*/
 void chi_diffusion::Solver::ReorderNodesPWLD()
 {
-  CHI_TIMER t_stage[6];
+  ChiTimer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Get reference to continuum

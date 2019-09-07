@@ -4,7 +4,7 @@
 
 //################################################################### Reset
 /** Resets the timer to zero.*/
-void CHI_TIMER::Reset()
+void ChiTimer::Reset()
 {
     #ifdef UNIX_ENV
 	     clock_gettime(CLOCK_MONOTONIC,&this->startTime);
@@ -16,7 +16,7 @@ void CHI_TIMER::Reset()
 
 //################################################################### Get time
 /** Gets the current timer value in milliseconds.*/
-double CHI_TIMER::GetTime()
+double ChiTimer::GetTime()
 {
     #ifdef UNIX_ENV
 	     timespec  newTime;
@@ -40,7 +40,7 @@ double CHI_TIMER::GetTime()
  * \param time_milli Time in milliseconds.
  *
  * */
-std::string CHI_TIMER::GetTimeString()
+std::string ChiTimer::GetTimeString()
 {
   double time_sec = this->GetTime()/1000.0;
   int    hours    = std::floor(time_sec/60/60);
@@ -57,7 +57,7 @@ std::string CHI_TIMER::GetTimeString()
 #ifdef UNIX_ENV
 //################################################################### Get Difference
 /** Determines the difference between two time calls.*/
-timespec CHI_TIMER::GetDifference(timespec start, timespec end)
+timespec ChiTimer::GetDifference(timespec start, timespec end)
 {
 
 	timespec temp;

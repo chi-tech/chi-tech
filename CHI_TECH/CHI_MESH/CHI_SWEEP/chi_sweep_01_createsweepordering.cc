@@ -23,9 +23,9 @@ extern CHI_LOG chi_log;
 
 extern CHI_CONSOLE chi_console;
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
-extern CHI_TIMER   chi_program_timer;
+extern ChiTimer   chi_program_timer;
 
 #include <CHI_GRAPH/chi_directed_graph.h>
 

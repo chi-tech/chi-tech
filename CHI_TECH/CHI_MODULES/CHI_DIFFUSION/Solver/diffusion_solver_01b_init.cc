@@ -7,13 +7,13 @@
 #include "../../../CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
 #include "../../../CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h"
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 #include <chi_mpi.h>
 #include <chi_log.h>
 
 extern CHI_MPI chi_mpi;
 extern CHI_LOG chi_log;
-extern CHI_TIMER chi_program_timer;
+extern ChiTimer chi_program_timer;
 
 #include<fstream>
 #include <unistd.h>
@@ -30,7 +30,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   if (not common_items_initialized)
     InitializeCommonItems();
 
-  CHI_TIMER t_init; t_init.Reset();
+  ChiTimer t_init; t_init.Reset();
 
   //================================================== Initialize discretization
   //                                                   method

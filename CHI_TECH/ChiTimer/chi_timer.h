@@ -16,13 +16,13 @@
 #ifdef UNIX_ENV
 //############################################################################# CLASS DEF
 /** Timer object.*/
-class CHI_TIMER
+class ChiTimer
 {
 public:
 	timespec  	startTime;
 public:
 	//00
-				CHI_TIMER();
+				ChiTimer();
 	//01
 	void   		Reset();
 	double 		GetTime();
@@ -33,7 +33,7 @@ public:
 
 //######################################################### CLASS DEFINITION
 /** Timer object.*/
-class CHI_TIMER
+class ChiTimer
 {
 public:
 	double			PCFreq;								///< Computer tick frequency in Hz
@@ -43,7 +43,7 @@ public:
 
 public:
     //00
-					CHI_TIMER();
+					ChiTimer();
     //01
 	void			Reset();
 	std::string GetTimeString();

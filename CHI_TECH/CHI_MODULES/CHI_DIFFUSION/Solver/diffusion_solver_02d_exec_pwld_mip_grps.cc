@@ -4,7 +4,7 @@
 #include <PiecewiseLinear/CellViews/pwl_polygon.h>
 #include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
-#include <CHI_TIMER/chi_timer.h>
+#include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -14,7 +14,7 @@ extern CHI_MPI chi_mpi;
 extern CHI_LOG chi_log;
 extern CHI_PHYSICS chi_physics_handler;
 
-extern CHI_TIMER chi_program_timer;
+extern ChiTimer chi_program_timer;
 
 
 //###################################################################

@@ -1,5 +1,5 @@
 #include "triangle_mesher.h"
-#include "../../../CHI_TIMER/chi_timer.h"
+#include "../../../ChiTimer/chi_timer.h"
 #include "../../CHI_MESHHANDLER/chi_meshhandler.h"
 #include "../../CHI_REGION/chi_region.h"
 #include "../../CHI_BOUNDARY/chi_boundary.h"
@@ -15,7 +15,7 @@ void chi_mesh::SurfaceMesherTriangle::Execute()
   chi_log.Log(LOG_0) << "SurfaceMesherTriangle executed";
 
   //================================================== Start timer
-  CHI_TIMER tmesh_timer;
+  ChiTimer tmesh_timer;
   tmesh_timer.Reset();
 
   //================================================== Get the current handler

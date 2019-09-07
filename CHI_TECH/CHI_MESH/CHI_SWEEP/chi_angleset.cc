@@ -6,7 +6,7 @@
 
 extern CHI_MPI chi_mpi;
 
-#include "../../CHI_TIMER/chi_timer.h"
+#include "../../ChiTimer/chi_timer.h"
 
 
 //###################################################################
