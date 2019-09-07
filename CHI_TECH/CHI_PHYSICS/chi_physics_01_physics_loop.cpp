@@ -6,7 +6,6 @@
 #include"../CHI_CONSOLE/chi_console.h"
 
 extern CHI_CONSOLE chi_console;
-extern CHI_VECTOR<char> chiconsoleInputBuffer;
 
 extern bool    chi_termination_posted;
 
@@ -38,15 +37,15 @@ void CHI_PHYSICS::RunPhysicsLoop()
 
 			//============================================= Flushes the console
 			chi_console.flushConsole();
-			for (int k=0;k<chiconsoleInputBuffer.itemCount;k++)
-			{
-         int error = luaL_dostring(chi_console.consoleState, chiconsoleInputBuffer.GetItem(k));
-         if (error > 0)
-         {
-             printf("%s\n", lua_tostring(chi_console.consoleState, -1));
-         }
-			}
-			chiconsoleInputBuffer.ClearVector();
+//			for (int k=0;k<chiconsoleInputBuffer.itemCount;k++)
+//			{
+//         int error = luaL_dostring(chi_console.consoleState, chiconsoleInputBuffer.GetItem(k));
+//         if (error > 0)
+//         {
+//             printf("%s\n", lua_tostring(chi_console.consoleState, -1));
+//         }
+//			}
+//			chiconsoleInputBuffer.ClearVector();
 
 			cycleCollected++;
 			timeCollected = timeCollected+profilingTimer.GetTime();

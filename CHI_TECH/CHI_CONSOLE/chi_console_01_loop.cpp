@@ -14,7 +14,6 @@ extern CHI_WINDOWMANAGER       chiwindowManager;
 //#define CHI_INTERACTIVE
 
 extern bool chi_termination_posted;
-extern CHI_VECTOR<char>  chiconsoleInputBuffer;
 
 
 //############################################################################# Run Console loop
@@ -24,21 +23,7 @@ void CHI_CONSOLE::RunConsoleLoop(char* fileName)
 
     printf("Console loop started.\n");
 	exitLoop = false;
-#ifdef CHI_USEGRAPHICS
-    while ((!exitLoop) || (!chi_termination_posted))
-	{
-        char* newConsoleInput = new char[200];
-        fgets (newConsoleInput, 200, stdin);
 
-        //if (CHI_LIB::StringCompare(newConsoleInput,"exit\n"))
-        {
-            exitLoop=true;
-        }
-        chiconsoleInputBuffer.PushItem(newConsoleInput);
-		
-		
-	}
-#else
   while ((!exitLoop) || (!chi_termination_posted))
   {
 //    char* newConsoleInput = new char[200];
@@ -50,10 +35,10 @@ void CHI_CONSOLE::RunConsoleLoop(char* fileName)
     if (console_input == "exit")
       exitLoop=true;
 
-    chiconsoleInputBuffer.PushItem((char*)console_input.data());
+    //chiconsoleInputBuffer.PushItem((char*)console_input.data());
 
   }
   chi_termination_posted = true;
-#endif
+
     printf("Console loop stopped successfully\n");
 }

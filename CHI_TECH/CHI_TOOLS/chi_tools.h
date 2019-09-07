@@ -3,7 +3,6 @@
 
 
 #include "CHI_TRANSFORM/chi_transform.h"
-#include "../CHI_VECTOR/chi_vector.h"
 
 //template class CHI_VECTOR<CHI_TRANSFORM>;
 

@@ -1,7 +1,6 @@
 #ifndef CHI_CONSOLE_H
 #define CHI_CONSOLE_H
 
-#include "../CHI_VECTOR/chi_vector.h"
 extern "C"
 {
 #include<lua.h>
@@ -19,7 +18,6 @@ class CHI_CONSOLE
 {
     public:
 	lua_State*							consoleState;             	///< Pointer to lua console state
-	CHI_VECTOR<CST_EVENT>		eventsStack;         		///< A vector of all events occurring
 	bool                    exitLoop;
 	bool                    runDeveloper;
 	long                    currentSize;

@@ -3,13 +3,10 @@
 
 #include "chi_math_incdef.h"
 
-#include "SparseMatrix/chi_math_sparse_matrix_v1.h"
 
 #include "Quadratures/quadrature.h"
 #include "Quadratures/product_quadrature.h"
 
-
-#include "../CHI_VECTOR/chi_vector.h"
 #include "chi_math_structs.h"
 
 /**\defgroup LuaMath B Math*/

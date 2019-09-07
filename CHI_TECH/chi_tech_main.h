@@ -4,22 +4,6 @@
 
 #include"CHI_CONSOLE/chi_console.h"
 CHI_CONSOLE       chi_console;
-CHI_VECTOR<char>  chiconsoleInputBuffer;
-
-#ifdef CHI_USEGRAPHICS
-  #include <omp.h>
-  #include "CHI_GRAPHICS/chi_graphics.h"
-  #include "CHI_WINDOWMANAGER/chi_windowmanager.h"
-  CHI_GRAPHICS chigraphics;
-  CHI_WINDOWMANAGER chiwindowManager;
-
-  #include"CHI_GRAPHICS/CHI_MATERIAL/chi_material.h"
-  #include"CHI_GRAPHICS/CHI_OBJECT/chi_object.h"
-  #include"CHI_GRAPHICS/CHI_SURFACE/chi_surface.h"
-  CHI_VECTOR<CHI_MATERIAL>        chimaterialStack;
-  CHI_VECTOR<CHI_OBJECT>          chiobjectStack;
-  CHI_VECTOR<CHI_SURFACE>         chisurfaceMeshStack;
-#endif
 
 #include "CHI_MATH/chi_math.h"
 #include "CHI_PHYSICS/chi_physics.h"
@@ -45,19 +29,6 @@ int                                  chi_current_mesh_handler=-1;
 
 
 //###################################################################
-
-
-
-
-
-//CHI_VECTOR<CHI_TRANSFORM>       chitoolstransformStack;
-#ifdef CHI_USESURFACEREMESHER
-    #ifdef CHI_USEGRAPHICS
-      #include"CHI_MODULES/CHI_SURFACEREMESHER/chi_surfaceremesher.h"
-      CHI_VECTOR<CHI_SURFACEREMESHER> chisurfaceRemesherStack;
-    #endif
-
-#endif
 
 //=============================================== Global variables
 bool            chi_termination_posted = false;
