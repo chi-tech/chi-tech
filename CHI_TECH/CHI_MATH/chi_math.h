@@ -7,7 +7,6 @@
 #include "Quadratures/quadrature.h"
 #include "Quadratures/product_quadrature.h"
 
-#include "chi_math_structs.h"
 
 /**\defgroup LuaMath B Math*/
 

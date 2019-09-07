@@ -10,13 +10,13 @@
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 
-#include <CHI_DISCRETIZATION_FV/fv.h>
-#include <CHI_DISCRETIZATION_FV/CellViews/fv_slab.h>
-#include <CHI_DISCRETIZATION_FV/CellViews/fv_polygon.h>
+#include <FiniteVolume/fv.h>
+#include <FiniteVolume/CellViews/fv_slab.h>
+#include <FiniteVolume/CellViews/fv_polygon.h>
 
-#include <CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
+#include <PiecewiseLinear/pwl.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_polygon.h>
 
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property11_isotropic_mg_src.h>
@@ -46,7 +46,7 @@ chi_montecarlon::ResidualSource::
  * to */
 void chi_montecarlon::ResidualSource::
   Initialize(chi_mesh::MeshContinuum *ref_grid,
-             CHI_DISCRETIZATION_FV *ref_fv_sdm)
+             SpatialDiscretization_FV *ref_fv_sdm)
 {
   chi_log.Log(LOG_0) << "Initializing RMC Source";
   grid = ref_grid;
@@ -66,12 +66,12 @@ void chi_montecarlon::ResidualSource::
     exit(EXIT_FAILURE);
   }
 
-  CHI_DISCRETIZATION_PWL* resid_sdm_pwl = nullptr;
+  SpatialDiscretization_PWL* resid_sdm_pwl = nullptr;
   if (typeid(*resid_ff->spatial_discretization) ==
-      typeid(CHI_DISCRETIZATION_PWL))
+      typeid(SpatialDiscretization_PWL))
   {
     resid_sdm_pwl =
-      (CHI_DISCRETIZATION_PWL*)resid_ff->spatial_discretization;
+      (SpatialDiscretization_PWL*)resid_ff->spatial_discretization;
   }
   else
   {

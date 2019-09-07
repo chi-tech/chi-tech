@@ -1,7 +1,7 @@
 #include "lbs_linear_boltzman_solver.h"
 #include "../../CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
 #include "../../CHI_MESH/CHI_CELL/cell.h"
-#include "../../CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/pwl.h"
+#include "../../CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
 
 #include <chi_mpi.h>
@@ -135,8 +135,8 @@ void LinearBoltzmanSolver::Initialize()
 
 
   //================================================== Add transport views
-  CHI_DISCRETIZATION_PWL* pwl_discretization =
-    (CHI_DISCRETIZATION_PWL*)discretization;
+  SpatialDiscretization_PWL* pwl_discretization =
+    (SpatialDiscretization_PWL*)discretization;
 
   std::set<int> unique_material_ids;
   int invalid_mat_cell_count = 0;

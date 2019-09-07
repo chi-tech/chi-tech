@@ -3,8 +3,8 @@
 #include <CHI_MESH/CHI_CELL/cell_slab.h>
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 
-#include <CHI_DISCRETIZATION_FV/CellViews/fv_slab.h>
-#include <CHI_DISCRETIZATION_FV/CellViews/fv_polygon.h>
+#include <FiniteVolume/CellViews/fv_slab.h>
+#include <FiniteVolume/CellViews/fv_polygon.h>
 
 typedef unsigned long long TULL;
 

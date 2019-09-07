@@ -4,7 +4,7 @@
 #include "../../../CHI_PHYSICS/chi_physics.h"
 #include "../../../CHI_MATH/chi_math.h"
 
-#include "../../../CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/pwl.h"
+#include "../../../CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
 extern CHI_PHYSICS chi_physics_handler;
 extern CHI_MATH    chi_math_handler;
@@ -191,17 +191,17 @@ int chiLBSSetProperty(lua_State *L)
     int method = lua_tonumber(L,3);
     if (method == PWLD1D)
     {
-      CHI_DISCRETIZATION_PWL* discretization = new CHI_DISCRETIZATION_PWL(1);
+      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL(1);
       solver->discretization = discretization;
     }
     else if (method == PWLD2D)
     {
-      CHI_DISCRETIZATION_PWL* discretization = new CHI_DISCRETIZATION_PWL(2);
+      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL(2);
       solver->discretization = discretization;
     }
     else if (method == PWLD3D)
     {
-      CHI_DISCRETIZATION_PWL* discretization = new CHI_DISCRETIZATION_PWL(3);
+      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL(3);
       solver->discretization = discretization;
     }
     else

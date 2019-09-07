@@ -1,6 +1,6 @@
-#include"chi_discretization.h"
+#include"spatial_discretization.h"
 
-void CHI_DISCRETIZATION::AddViewOfLocalContinuum(
+void SpatialDiscretization::AddViewOfLocalContinuum(
   chi_mesh::MeshContinuum* vol_continuum,
   int num_cells,
   int* cell_indices)

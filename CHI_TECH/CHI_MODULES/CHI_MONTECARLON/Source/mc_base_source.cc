@@ -11,7 +11,7 @@ chi_montecarlon::Source::Source()
 }
 
 void chi_montecarlon::Source::Initialize(chi_mesh::MeshContinuum* ref_grid,
-                                         CHI_DISCRETIZATION_FV*   ref_fv_sdm)
+                                         SpatialDiscretization_FV*   ref_fv_sdm)
 {
   grid = ref_grid;
   fv_sdm = ref_fv_sdm;

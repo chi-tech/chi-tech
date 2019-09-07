@@ -6,7 +6,7 @@
 
  \param N int The Legendre polynomial.
  \param x double The evaluation point.*/
-double CHI_LEGENDRE_POLYNOMIALS::Legendre(int N, double x)
+double chi_math::Legendre(int N, double x)
 {
   double Pnm1 = 1;
   double Pn   = x;
@@ -32,7 +32,7 @@ double CHI_LEGENDRE_POLYNOMIALS::Legendre(int N, double x)
 
  \param N int The Legendre polynomial.
  \param x double The evaluation point.*/
-double CHI_LEGENDRE_POLYNOMIALS::dLegendredx(int N, double x)
+double chi_math::dLegendredx(int N, double x)
 {
   if (N==0) {return 0;}
 

@@ -2,10 +2,10 @@
 #include "../../CHI_CELL/cell_slab.h"
 #include "../../CHI_CELL/cell_polygon.h"
 #include "../../CHI_CELL/cell_polyhedron.h"
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
 
 #include <chi_mpi.h>
 
@@ -47,8 +47,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 void chi_mesh::FieldFunctionInterpolationVolume::
 CFEMInterpolate(Vec field, std::vector<int> &mapping)
 {
-  CHI_DISCRETIZATION_PWL* discretization =
-    (CHI_DISCRETIZATION_PWL*) field_functions[0]->spatial_discretization;
+  SpatialDiscretization_PWL* discretization =
+    (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
 
   int counter=-1;
   double total_volume = 0.0;
@@ -190,8 +190,8 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
 void chi_mesh::FieldFunctionInterpolationVolume::
 PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 {
-  CHI_DISCRETIZATION_PWL* discretization =
-    (CHI_DISCRETIZATION_PWL*) field_functions[0]->spatial_discretization;
+  SpatialDiscretization_PWL* discretization =
+    (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
 
   int counter=-1;
   op_value = 0.0;

@@ -1,8 +1,8 @@
 #include "diffusion_solver.h"
 
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
 #include <CHI_TIMER/chi_timer.h>
 
@@ -22,7 +22,7 @@ extern CHI_TIMER chi_program_timer;
 int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
                                            bool suppress_solve)
 {
-  pwl_discr = ((CHI_DISCRETIZATION_PWL*)(this->discretization));
+  pwl_discr = ((SpatialDiscretization_PWL*)(this->discretization));
 
   //=================================== Verbose print solver info
   if (chi_log.GetVerbosity()>=LOG_0VERBOSE_1)

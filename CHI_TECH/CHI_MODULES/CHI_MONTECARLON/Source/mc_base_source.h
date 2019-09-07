@@ -6,7 +6,7 @@
 #include"../chi_montecarlon_particle.h"
 
 #include <CHI_MESH/chi_mesh.h>
-#include <CHI_DISCRETIZATION_FV/fv.h>
+#include <FiniteVolume/fv.h>
 
 #define MC_BASE_SRC     0
 #define MC_POINT_SRC    1
@@ -22,7 +22,7 @@ class chi_montecarlon::Source
 {
 public:
   chi_mesh::MeshContinuum* grid;
-  CHI_DISCRETIZATION_FV*   fv_sdm;
+  SpatialDiscretization_FV*   fv_sdm;
   int type_index;
 
 public:
@@ -30,7 +30,7 @@ public:
           Source();
   //01
   virtual void Initialize(chi_mesh::MeshContinuum* ref_grid,
-                          CHI_DISCRETIZATION_FV*   ref_fv_sdm);
+                          SpatialDiscretization_FV*   ref_fv_sdm);
   virtual chi_montecarlon::Particle
           CreateParticle(chi_montecarlon::RandomNumberGenerator* rng);
 

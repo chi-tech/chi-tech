@@ -8,7 +8,7 @@
 #include "CHI_MODULES/CHI_MONTECARLON/Source/mc_base_source.h"
 #include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
-#include <CHI_DISCRETIZATION_FV/fv.h>
+#include <FiniteVolume/fv.h>
 #include <CHI_MATH/chi_math.h>
 
 #define MC_NUM_PARTICLES     1
@@ -26,7 +26,7 @@ class chi_montecarlon::Solver : public chi_physics::Solver
 {
 private:
   chi_mesh::MeshContinuum*              grid;
-  CHI_DISCRETIZATION_FV*                fv_discretization;
+  SpatialDiscretization_FV*                fv_discretization;
 
   std::vector<int>                      matid_xs_map;
 

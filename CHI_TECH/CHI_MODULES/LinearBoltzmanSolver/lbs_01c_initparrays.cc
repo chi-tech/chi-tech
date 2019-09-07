@@ -2,10 +2,10 @@
 #include <CHI_MESH/CHI_CELL/cell_slab.h>
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
-#include <CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <PiecewiseLinear/pwl.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 #include <CHI_PHYSICS/chi_physics.h>
 #include <chi_log.h>
 
@@ -58,12 +58,12 @@ int LinearBoltzmanSolver::InitializeParrays()
 //  PetscErrorCode ierr;
 //  PetscMPIInt    size;
 
-  CHI_DISCRETIZATION_PWL* pwl_discretization =
-    (CHI_DISCRETIZATION_PWL*)discretization;
+  SpatialDiscretization_PWL* pwl_discretization =
+    (SpatialDiscretization_PWL*)discretization;
 
   //================================================== Compute local # of dof
   local_dof_count=0;
-  if (typeid(*discretization) == typeid(CHI_DISCRETIZATION_PWL))
+  if (typeid(*discretization) == typeid(SpatialDiscretization_PWL))
   {
     size_t num_cell_views = pwl_discretization->cell_fe_views.size();
     for (int c=0; c<num_cell_views; c++)

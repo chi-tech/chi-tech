@@ -1,6 +1,6 @@
 #include "diffusion_solver.h"
 
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
 
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"

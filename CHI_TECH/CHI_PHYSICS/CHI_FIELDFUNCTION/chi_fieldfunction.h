@@ -3,7 +3,7 @@
 
 #include "../chi_physics_namespace.h"
 #include "../../CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h"
-#include "../../CHI_MATH/CHI_DISCRETIZATION/chi_discretization.h"
+#include "CHI_MATH/SpatialDiscretization/spatial_discretization.h"
 
 #include <petscksp.h>
 
@@ -21,7 +21,7 @@ public:
   int                      grp, mom;
 
   chi_mesh::MeshContinuum* grid;
-  CHI_DISCRETIZATION*      spatial_discretization;
+  SpatialDiscretization*      spatial_discretization;
   Vec                      field_vector;
   std::vector<double>*     field_vector_local;
 

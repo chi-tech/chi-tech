@@ -17,7 +17,7 @@ double fac(int x)
  * This code has a whitepaper associated with it
  * <a href="SphericalHarmonics.pdf" target="_blank"><b>Spherical Harmonics</b></a>
  * */
-double CHI_LEGENDRE_POLYNOMIALS::Ylm(int ell, int m, double varphi, double theta)
+double chi_math::Ylm(int ell, int m, double varphi, double theta)
 {
   double el = 1.0*ell;
   double em = 1.0*m;

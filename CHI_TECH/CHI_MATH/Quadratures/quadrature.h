@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <vector>
 
+namespace chi_math
+{
+  struct QPointXY;
+  struct QPointXYZ;
+  class CHI_QUADRATURE;
+}
+
 struct QPointXY
 {
   double x;

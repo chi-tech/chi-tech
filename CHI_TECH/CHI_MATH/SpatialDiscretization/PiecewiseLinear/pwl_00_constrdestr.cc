@@ -2,8 +2,8 @@
 #include "../../Quadratures/quadrature_triangle.h"
 #include "../../Quadratures/quadrature_tetrahedron.h"
 
-CHI_DISCRETIZATION_PWL::CHI_DISCRETIZATION_PWL(int dim)
-  : CHI_DISCRETIZATION(dim)
+SpatialDiscretization_PWL::SpatialDiscretization_PWL(int dim)
+  : SpatialDiscretization(dim)
 {
   CHI_QUADRATURE_TRIANGLE* new_triquad;
 

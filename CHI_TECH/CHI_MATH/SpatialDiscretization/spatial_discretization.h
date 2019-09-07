@@ -9,14 +9,14 @@
 #define DEG3_SURFACE 2
 
 
-class CHI_DISCRETIZATION
+class SpatialDiscretization
 {
 public:
   int dim;
 
 public:
   //00
-  CHI_DISCRETIZATION(int dim);
+  SpatialDiscretization(int dim);
 
   //01
   virtual void AddViewOfLocalContinuum(

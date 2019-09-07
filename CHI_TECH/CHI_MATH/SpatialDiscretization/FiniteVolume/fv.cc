@@ -14,15 +14,15 @@ extern CHI_LOG chi_log;
 
 //###################################################################
 /**Only constructor for this method.*/
-CHI_DISCRETIZATION_FV::CHI_DISCRETIZATION_FV(int dim)
-  : CHI_DISCRETIZATION(dim)
+SpatialDiscretization_FV::SpatialDiscretization_FV(int dim)
+  : SpatialDiscretization(dim)
 {
   mapping_initialized = false;
 }
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void CHI_DISCRETIZATION_FV::AddViewOfLocalContinuum(
+void SpatialDiscretization_FV::AddViewOfLocalContinuum(
   chi_mesh::MeshContinuum* vol_continuum,
   int num_cells,
   int* cell_indices)
@@ -107,7 +107,7 @@ void CHI_DISCRETIZATION_FV::AddViewOfLocalContinuum(
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVView* CHI_DISCRETIZATION_FV::MapFeView(int cell_glob_index)
+CellFVView* SpatialDiscretization_FV::MapFeView(int cell_glob_index)
 {
   CellFVView* value = cell_fv_views.at(cell_fv_views_mapping[cell_glob_index]);
   return value;

@@ -1,8 +1,8 @@
 #include "diffusion_solver.h"
 
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 #include <CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h>
 #include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
 
@@ -26,7 +26,7 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher    = mesh_handler->volume_mesher;
-  pwl_discr = ((CHI_DISCRETIZATION_PWL*)(this->discretization));
+  pwl_discr = ((SpatialDiscretization_PWL*)(this->discretization));
 
   //################################################## Assemble Amatrix
   chi_log.Log(LOG_0) << "Diffusion Solver: Assembling A and b";

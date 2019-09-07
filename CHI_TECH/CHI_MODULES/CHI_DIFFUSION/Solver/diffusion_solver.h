@@ -10,8 +10,8 @@
 
 #include "../chi_diffusion.h"
 #include <CHI_PHYSICS/CHI_SOLVER/chi_solver.h>
-#include <chi_discretization.h>
-#include <CHI_DISCRETIZATION_PWL/pwl.h>
+#include <spatial_discretization.h>
+#include <PiecewiseLinear/pwl.h>
 
 #include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
 
@@ -78,8 +78,8 @@ public:
   std::string                              solver_name;
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuum*                 grid;
-  CHI_DISCRETIZATION*                      discretization;
-  CHI_DISCRETIZATION_PWL*                  pwl_discr;
+  SpatialDiscretization*                      discretization;
+  SpatialDiscretization_PWL*                  pwl_discr;
   chi_mesh::VolumeMesher*                  mesher;
   int fem_method;
 

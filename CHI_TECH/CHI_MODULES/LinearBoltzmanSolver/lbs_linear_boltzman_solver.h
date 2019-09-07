@@ -6,7 +6,7 @@
 #include "CHI_MODULES/LinearBoltzmanSolver/GroupSet/lbs_groupset.h"
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
 #include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property11_isotropic_mg_src.h>
-#include"../../CHI_MATH/CHI_DISCRETIZATION/chi_discretization.h"
+#include"CHI_MATH/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
 #include "../../CHI_MESH/CHI_SWEEP/chi_sweep.h"
 #include "../../CHI_MATH/SparseMatrix/chi_math_sparse_matrix.h"
@@ -39,7 +39,7 @@ public:
   std::vector<int>                                   matid_to_src_map;
 
 
-  CHI_DISCRETIZATION*                                discretization;
+  SpatialDiscretization*                                discretization;
   chi_mesh::MeshContinuum*                           grid;
   std::vector<LBS_CELLVIEW*>                         cell_transport_views;
 

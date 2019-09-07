@@ -2,7 +2,7 @@
 #include "LegendrePoly/legendrepoly.h"
 #include <math.h>
 
-using namespace CHI_LEGENDRE_POLYNOMIALS;
+using namespace chi_math;
 
 void CHI_QUADRATURE_GAUSSLEGENDRE::
     Initialize(int N, int maxiters,

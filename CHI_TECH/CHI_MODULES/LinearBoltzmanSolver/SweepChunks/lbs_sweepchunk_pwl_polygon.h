@@ -4,9 +4,9 @@
 
 #include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
 #include <CHI_MESH/CHI_SWEEP/chi_sweep.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/chi_discretization.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
+#include <CHI_MATH/SpatialDiscretization/spatial_discretization.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
 
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_PHYSICS/chi_physics.h>
@@ -35,7 +35,7 @@ class LBS_SWEEP_PWL_POLYGON : public chi_mesh::SweepManagement::SweepChunk
 {
 private:
   chi_mesh::MeshContinuum*    grid_view;
-  CHI_DISCRETIZATION_PWL*     grid_fe_view;
+  SpatialDiscretization_PWL*     grid_fe_view;
   std::vector<LBS_CELLVIEW*>* grid_transport_view;
 //std::vector<double>*        x;                   BASE CLASS
   std::vector<double>*        q_moments;
@@ -71,7 +71,7 @@ private:
 public:
   //################################################## Constructor
   LBS_SWEEP_PWL_POLYGON(chi_mesh::MeshContinuum* vol_continuum,
-                             CHI_DISCRETIZATION_PWL* discretization,
+                             SpatialDiscretization_PWL* discretization,
                              std::vector<LBS_CELLVIEW*>* cell_transport_views,
                              std::vector<double>* destination_phi,
                              std::vector<double>* source_moments,

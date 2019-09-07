@@ -5,10 +5,10 @@
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 #include <CHI_PHYSICS/chi_physics.h>
 
-#include <CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <PiecewiseLinear/pwl.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
 #include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
 

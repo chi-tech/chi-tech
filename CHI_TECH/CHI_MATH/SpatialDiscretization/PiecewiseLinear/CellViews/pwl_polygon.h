@@ -84,7 +84,7 @@ public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonFEView(chi_mesh::CellPolygon* poly_cell,
                 chi_mesh::MeshContinuum* vol_continuum,
-                CHI_DISCRETIZATION_PWL *discretization);
+                SpatialDiscretization_PWL *discretization);
 
   double Shape_xy(int i, chi_mesh::Vector xyz);
   chi_mesh::Vector GradShape_xy(int i, chi_mesh::Vector xyz);

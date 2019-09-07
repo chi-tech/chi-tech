@@ -2,7 +2,7 @@
 
 PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
                              chi_mesh::MeshContinuum* vol_continuum,
-                             CHI_DISCRETIZATION_PWL *discretization) :
+                             SpatialDiscretization_PWL *discretization) :
                              CellFEView(poly_cell->v_indices.size())
 {
   precomputed = false;

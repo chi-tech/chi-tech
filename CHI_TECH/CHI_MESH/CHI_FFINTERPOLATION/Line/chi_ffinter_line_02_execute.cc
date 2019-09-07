@@ -2,10 +2,10 @@
 #include "../../CHI_CELL/cell_slab.h"
 #include "../../CHI_CELL/cell_polygon.h"
 #include "../../CHI_CELL/cell_polyhedron.h"
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/pwl.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
 //###################################################################
 /**Executes the interpolation.*/
@@ -83,8 +83,8 @@ CFEMInterpolate(Vec field,
                 std::vector<int> &mapping,
                 FIELD_FUNCTION_CONTEXT* ff_ctx)
 {
-  CHI_DISCRETIZATION_PWL* spatial_dm   =
-    (CHI_DISCRETIZATION_PWL*)ff_ctx->ref_ff->spatial_discretization;
+  SpatialDiscretization_PWL* spatial_dm   =
+    (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;
 
   //================================================== Loop over node indices
   //                                                   that
@@ -193,8 +193,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
   PWLDInterpolate(std::vector<int> &mapping,
                   FIELD_FUNCTION_CONTEXT* ff_ctx)
 {
-  CHI_DISCRETIZATION_PWL* spatial_dm   =
-    (CHI_DISCRETIZATION_PWL*)ff_ctx->ref_ff->spatial_discretization;
+  SpatialDiscretization_PWL* spatial_dm   =
+    (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;
 
   std::vector<double>& field = *ff_ctx->ref_ff->field_vector_local;
 

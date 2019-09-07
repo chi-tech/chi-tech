@@ -10,9 +10,9 @@
 #include <CHI_MESH/CHI_CELL/cell_polygon.h>
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 
-#include <CHI_DISCRETIZATION_FV/fv.h>
-#include <CHI_DISCRETIZATION_FV/CellViews/fv_slab.h>
-#include <CHI_DISCRETIZATION_FV/CellViews/fv_polygon.h>
+#include <FiniteVolume/fv.h>
+#include <FiniteVolume/CellViews/fv_slab.h>
+#include <FiniteVolume/CellViews/fv_polygon.h>
 
 #include <CHI_MATH/Statistics/cdfsampler.h>
 
@@ -39,7 +39,7 @@ chi_montecarlon::BoundarySource::BoundarySource()
  * that needs to be sampled.*/
 void chi_montecarlon::BoundarySource::
   Initialize(chi_mesh::MeshContinuum* ref_grid,
-             CHI_DISCRETIZATION_FV*   ref_fv_sdm)
+             SpatialDiscretization_FV*   ref_fv_sdm)
 {
   grid = ref_grid;
   fv_sdm = ref_fv_sdm;

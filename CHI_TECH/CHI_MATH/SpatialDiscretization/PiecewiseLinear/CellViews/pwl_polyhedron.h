@@ -121,7 +121,7 @@ private:
 public:
   PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
                    chi_mesh::MeshContinuum* vol_continuum,
-                   CHI_DISCRETIZATION_PWL* discretization= nullptr);
+                   SpatialDiscretization_PWL* discretization= nullptr);
 
 
   //################################################## Define standard

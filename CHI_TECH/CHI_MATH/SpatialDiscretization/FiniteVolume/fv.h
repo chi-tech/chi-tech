@@ -1,13 +1,13 @@
 #ifndef _chi_discretization_fv_h
 #define _chi_discretization_fv_h
 
-#include "../chi_discretization.h"
+#include "CHI_MATH/SpatialDiscretization/spatial_discretization.h"
 #include "CellViews/fv_cellbase.h"
 
 //###################################################################
 /**Spatial discretizations supporting Finite Volume representations.
  * */
-class CHI_DISCRETIZATION_FV : public CHI_DISCRETIZATION
+class SpatialDiscretization_FV : public SpatialDiscretization
 {
 private:
   std::vector<CellFVView*> cell_fv_views;
@@ -18,7 +18,7 @@ private:
 
 
 public:
-  CHI_DISCRETIZATION_FV(int dim=0);
+  SpatialDiscretization_FV(int dim=0);
 
   void AddViewOfLocalContinuum(
     chi_mesh::MeshContinuum* vol_continuum,

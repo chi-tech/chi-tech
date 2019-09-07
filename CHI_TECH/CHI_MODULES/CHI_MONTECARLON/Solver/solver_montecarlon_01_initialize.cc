@@ -95,7 +95,7 @@ bool chi_montecarlon::Solver::Initialize()
   phi_local_relsigma.resize(tally_size,0.0);
 
   //=================================== Initialize discretization
-  fv_discretization = new CHI_DISCRETIZATION_FV;
+  fv_discretization = new SpatialDiscretization_FV;
 
   fv_discretization->
   AddViewOfLocalContinuum(grid,

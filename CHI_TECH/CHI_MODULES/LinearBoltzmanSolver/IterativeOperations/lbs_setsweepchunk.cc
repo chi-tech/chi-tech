@@ -30,7 +30,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
     sweep_chunk =
       new LBS_SWEEP_PWL_SLAB(
         grid,                                    //Spatial grid of cells
-        (CHI_DISCRETIZATION_PWL*)discretization, //Spatial discretization
+        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
         &phi_new_local,                          //Destination phi
         &q_moments_local,                        //Source moments
@@ -43,7 +43,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
     sweep_chunk =
       new LBS_SWEEP_PWL_POLYGON(
         grid,                                    //Spatial grid of cells
-        (CHI_DISCRETIZATION_PWL*)discretization, //Spatial discretization
+        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
         &phi_new_local,                          //Destination phi
         &q_moments_local,                        //Source moments
@@ -56,7 +56,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
     sweep_chunk =
       new LBS_SWEEP_PWL_POLYHEDRON(
         grid,                                    //Spatial grid of cells
-        (CHI_DISCRETIZATION_PWL*)discretization, //Spatial discretization
+        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
         &phi_new_local,                          //Destination phi
         &q_moments_local,                        //Source moments

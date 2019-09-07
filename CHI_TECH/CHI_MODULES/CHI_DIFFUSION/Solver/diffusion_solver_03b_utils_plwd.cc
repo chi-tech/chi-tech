@@ -9,9 +9,9 @@
 #include "../../../CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h"
 #include "../../../CHI_TIMER/chi_timer.h"
 
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_MATH/CHI_DISCRETIZATION/CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <CHI_MATH/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
 #include <boost/mpi.hpp>
 #include <boost/mpi/environment.hpp>
@@ -435,7 +435,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
     PolygonFEView* fe_view =
-      new PolygonFEView(cell, grid, (CHI_DISCRETIZATION_PWL*)discretization);
+      new PolygonFEView(cell, grid, (SpatialDiscretization_PWL*)discretization);
 
     fe_view->PreCompute();
 
@@ -500,7 +500,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
     PolyhedronFEView* fe_view =
-      new PolyhedronFEView(cell,grid,(CHI_DISCRETIZATION_PWL*)discretization);
+      new PolyhedronFEView(cell,grid,(SpatialDiscretization_PWL*)discretization);
 
     fe_view->PreCompute();
 

@@ -5,10 +5,10 @@
 #include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
 #include <CHI_PHYSICS/chi_physics.h>
 
-#include <CHI_DISCRETIZATION_PWL/pwl.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_slab.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polygon.h>
-#include <CHI_DISCRETIZATION_PWL/CellViews/pwl_polyhedron.h>
+#include <PiecewiseLinear/pwl.h>
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+#include <PiecewiseLinear/CellViews/pwl_polygon.h>
+#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
 #include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
 
@@ -45,8 +45,8 @@ extern CHI_PHYSICS chi_physics_handler;
 void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
                                                  std::string field_name)
 {
-  CHI_DISCRETIZATION_PWL* pwl_sdm =
-    (CHI_DISCRETIZATION_PWL*)spatial_discretization;
+  SpatialDiscretization_PWL* pwl_sdm =
+    (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
   ff_interpol.grid_view = grid;
@@ -308,8 +308,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
 void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
                                                  std::string field_name)
 {
-  CHI_DISCRETIZATION_PWL* pwl_sdm =
-    (CHI_DISCRETIZATION_PWL*)spatial_discretization;
+  SpatialDiscretization_PWL* pwl_sdm =
+    (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
   ff_interpol.grid_view = grid;

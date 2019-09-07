@@ -3,7 +3,7 @@
 
 //###################################################################
 /**Container object for functions relating to Legendre polynomials.*/
-namespace CHI_LEGENDRE_POLYNOMIALS
+namespace chi_math
 {
   double Legendre(int N, double x);
   double dLegendredx(int N, double x);
