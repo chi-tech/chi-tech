@@ -1,5 +1,4 @@
 ./chi_lua.cc
-../CHI_MODULES/CHI_PI3/lua/lua_pie.cpp
 ../CHI_MODULES/CHI_THERMOALPHA/lua/thermoalpha_04_setproperty.cpp
 ../CHI_MODULES/CHI_THERMOALPHA/lua/thermoalpha_01_hydro_volume.cpp
 ../CHI_MODULES/CHI_THERMOALPHA/lua/thermoalpha_00_basic.cpp

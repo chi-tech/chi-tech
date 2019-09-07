@@ -6,7 +6,6 @@ function Add_Folder(folderPath)
     moduleFolders[moduleFolders.itemCount]=folderPath;
 end
 
-Add_Folder("../CHI_MODULES/CHI_PI3/lua")
 Add_Folder("../CHI_MODULES/CHI_THERMOALPHA/lua")
 
 Add_Folder("../CHI_MATH/Quadratures/lua")

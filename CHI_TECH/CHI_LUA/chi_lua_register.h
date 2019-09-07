@@ -3,134 +3,7 @@
 
 
 
-#ifdef CHI_USEGRAPHICS
-  //A00 General
-  RegisterFunction(chiSleep)
 
-  RegisterFunction(chiSet2D)
-  RegisterFunction(chiSet3D)
-  RegisterFunction(chiBindScene)
-  RegisterFunction(chiGetScene)
-  RegisterFunction(chiGetSceneCount)
-  RegisterFunction(chiCreateScene)
-  RegisterFunction(chiRequestSceneRefresh)
-  RegisterFunction(chiSetSceneUpdateMode)
-
-  RegisterFunction(chiDisplayerCreate)
-  RegisterFunction(chiDisplayerSetViewport)
-  RegisterFunction(chiDisplayerGetViewport)
-
-  //A01 Windows
-  RegisterFunction(chiWindowCreate)
-  RegisterFunction(chiSetWindowProperties)
-  RegisterFunction(chiSetWindowScene)
-  RegisterFunction(chiGetWindowProperties)
-  RegisterFunction(chiWindowMaximize)
-  RegisterFunction(chiWindowNormalize)
-  RegisterFunction(chiWindowSetCursor)
-
-  //A03 Points
-  RegisterFunction(chiPointCreate)
-  RegisterFunction(chiPointAddVertex)
-  RegisterFunction(chiPointChangeVertex)
-
-  RegisterFunction(chi3DPointCreate)
-  RegisterFunction(chi3DPointAddVertex)
-  RegisterFunction(chi3DPointChangeVertex)
-  RegisterFunction(chi3DPointSetTransform)
-
-  RegisterFunction(chiScreenTo3DPoint)
-  RegisterFunction(chi3DPointToScreen)
-
-  //A06 2D Labels
-  RegisterFunction(chiSetLabel)
-  RegisterFunction(chiSetLabelProperty)
-
-  //A07 Text
-  RegisterFunction(chiTextCreate)
-  RegisterFunction(chiTextSetProperty)
-    RegisterConstant(TEXT_VALUE,   1);
-    RegisterConstant(TEXT_POSITION,2);
-    RegisterConstant(TEXT_COLOR,   3);
-    RegisterConstant(TEXT_FONT,    4);
-    RegisterConstant(TEXT_SCALE,   5);
-
-  //A08 2D Lines
-  RegisterFunction(chiLineAddVertex)
-  RegisterFunction(chiLineChangeColor)
-  RegisterFunction(chiLineChangeVertex)
-  RegisterFunction(chiLineCreate)
-  RegisterFunction(chiLineSetStipple)
-  RegisterFunction(chiLineSetviewport)
-
-  //A09 3D Lines
-  RegisterFunction(chi3DLineAddVertex)
-  RegisterFunction(chi3DLineChangeColor)
-  RegisterFunction(chi3DLineChangeVertex)
-  RegisterFunction(chi3DLineCreate)
-  RegisterFunction(chi3DLineCreateFromLineMesh)
-  RegisterFunction(chi3DLineSetStipple)
-  RegisterFunction(chi3DLineSetTransform)
-  RegisterFunction(chi3DLineSetviewport)
-
-  //A10 Viewports
-  RegisterFunction(chiViewportCreate)
-  RegisterFunction(chiViewportSetProperty)
-
-  //A11 Transforms
-  RegisterFunction(chiTransformCreate)
-  RegisterFunction(chiTransformGet)
-  RegisterFunction(chiTransformSetParent)
-  RegisterFunction(chiTransformQuery)
-  RegisterFunction(chiTransformSetRotation)
-  RegisterFunction(chiTransformSetRotationPoint)
-  RegisterFunction(chiTransformSetScale)
-  RegisterFunction(chiTransformSetTranslation)
-
-  //A12 Shaders
-  RegisterFunction(chiShaderQuery)
-  RegisterFunction(chiReloadShader)
-
-  //A13 Materials
-  RegisterFunction(chiMaterialCreate)
-  RegisterFunction(chiMaterialGeneratePreview)
-  RegisterFunction(chiMaterialSetProperty)
-  RegisterFunction(chiMaterialQuery)
-  RegisterFunction(chiMaterialUpdate)
-
-  //A14 Shadows
-  RegisterFunction(chiShadowsEnable)
-  RegisterFunction(chiShadowsDisable)
-
-  //A15 Lights
-  RegisterFunction(chiLightCreate)
-  RegisterFunction(chiLightSetProperty)
-
-  //A16 Cameras
-  RegisterFunction(chiGraphicsCameraFOV)
-  RegisterFunction(chiGraphicsOrientCamera)
-  RegisterFunction(chiGraphicsCameraOrthoWidth)
-  RegisterFunction(chiGraphicsPositionCamera)
-  RegisterFunction(chiGraphicsGetCameraPosition)
-  RegisterFunction(chiGraphicsRotateCamera)
-  RegisterFunction(chiGraphicsGetCameraRotation)
-  RegisterFunction(chiGraphicsTranslateCamera)
-  RegisterFunction(chiGraphicsCameraType)
-
-
-  //A17 Objects
-  RegisterFunction(chiObjectAddSurface)
-  RegisterFunction(chiObjectCreate)
-  RegisterFunction(chiObjectGetCentroid)
-  RegisterFunction(chiObjectLoadSurface)
-  RegisterFunction(chiObjectLoadSurfaceFromSurfaceMesh)
-  RegisterFunction(chiObjectQuery)
-  RegisterFunction(chiObjectSetProperty)
-  RegisterFunction(chiObjectExportSurface)
-
-  //A18 Textures
-  RegisterFunction(chiTextureLoad)
-#endif
 //#################################### MODULES
 //module:Math Utilities
 RegisterFunction(chiLegendre)
@@ -225,10 +98,10 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
         RegisterConstant(OP_SUM,   10);
         RegisterConstant(OP_AVG,   11);
         RegisterConstant(OP_MAX,   12);
-RegisterConstant(LOGICAL_VOLUME,   8);
-RegisterConstant(LINE_FIRSTPOINT,   11);
-RegisterConstant(LINE_SECONDPOINT,   12);
-RegisterConstant(LINE_NUMBEROFPOINTS,   13);
+    RegisterConstant(LOGICAL_VOLUME,   8);
+    RegisterConstant(LINE_FIRSTPOINT,   11);
+    RegisterConstant(LINE_SECONDPOINT,   12);
+    RegisterConstant(LINE_NUMBEROFPOINTS,   13);
     RegisterFunction(chiFFInterpolationInitialize)
     RegisterFunction(chiFFInterpolationExecute)
     RegisterFunction(chiFFInterpolationExportPython)
@@ -395,44 +268,4 @@ RegisterFunction(chiLBSGroupsetSetWGDSA)
 
 RegisterFunction(chiLBSGroupsetSetTGDSA)
 
-#ifdef WITH_CHI_PI3
-RegisterFunction(chiPieExportPin)
-RegisterFunction(chiPieSetPinMode)
-RegisterFunction(chiPieSetPinValue)
-RegisterFunction(chiPieGetPinValue)
-RegisterFunction(chiPieInitSPI)
-RegisterFunction(chiPieReadSPIChannel)
-RegisterFunction(chiPieSetSPIBuffer)
-RegisterFunction(chiPieGetSPIBuffer)
-RegisterFunction(chiPieInitializeSerial)
-RegisterFunction(chiPieSerialWrite)
-RegisterFunction(chiPieSerialRead)
-#endif
 
-#ifdef CHI_USETHERMOALPA
-RegisterFunction(chiThermoCreateSystem)
-
-RegisterFunction(chiThermoCreateVolumeFromCoordinates)
-RegisterFunction(chiThermoCreateBC)
-RegisterFunction(chiThermoCreateSJunction)
-RegisterFunction(chiThermoConnectTwoComponents)
-RegisterFunction(chiThermoInitialize)
-
-RegisterFunction(chiThermoSetComponentProperty)
-RegisterFunction(chiThermoGetComponentProperty)
-#endif
-
-
-//=========================== Surface remesher
-#ifdef CHI_USESURFACEREMESHER
-#ifdef CHI_USEGRAPHICS
-RegisterFunction(chiSurfaceRemesherCreate)
-RegisterFunction(chiSurfaceRemesherExecuteMeshing)
-RegisterFunction(chiSurfaceRemesherSetProperty)
-#endif
-#endif
-
-//=========================== Deal ii
-#ifdef WITH_DEALII
-RegisterFunction(chiRunDealTest)
-#endif

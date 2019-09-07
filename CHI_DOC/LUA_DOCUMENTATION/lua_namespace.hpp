@@ -1,16 +1,5 @@
 namespace CHI_LUA 
  {
-int chiPieExportPin(int pinNumber);
-int chiPieSetPinMode(int pinNumber, int mode);
-int chiPieSetPinValue(int pinNumber, int mode);
-int chiPieGetPinValue(int pinNumber);
-int chiPieInitSPI();
-int chiPieReadSPIChannel(int channelNumber);
-int chiPieSetSPIBuffer(int channelNumber, bool bufferFlag);
-int chiPieGetSPIBuffer(int channelNumber, int bufferPos);
-int chiPieInitializeSerial(int baudrate);
-int chiPieSerialWrite(char message);
-int chiPieSerialRead();
 int chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode);
 int chiThermoCreateVolumeFromCoordinates(int systemHandle, Table point1, Table point2);
 int chiThermoCreateSystem();
