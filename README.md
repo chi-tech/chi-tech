@@ -5,7 +5,7 @@ as part of a research study.
 
 ## Installation instructions
 
-For Linux machines - [Linux installation instructions](CHI_DOC/Install_linux.md)
+For Linux machines - [Linux installation instructions](CHI_DOC/Install_linux.md)  
 For MacOS machines - [MacOS installation instructions](CHI_DOC/Install_macos.md)
 
 ## Documentation
