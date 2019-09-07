@@ -9,7 +9,7 @@ double PolygonFEView::PreShape(int s, int i, int qpoint_index, bool on_surface)
   double eta = 0.0;
   if (!on_surface)
   {
-    QPointXY* qpoint = vol_quadrature->qpoints.at(qpoint_index);
+    chi_math::QuadraturePointXY* qpoint = vol_quadrature->qpoints.at(qpoint_index);
 
     xi = qpoint->x;
     eta= qpoint->y;

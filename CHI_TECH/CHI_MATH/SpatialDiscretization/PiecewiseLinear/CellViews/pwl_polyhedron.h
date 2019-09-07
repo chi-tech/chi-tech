@@ -111,7 +111,7 @@ public:
   std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntS_shapeI_gradshapeJ;
 
 private:
-  std::vector<CHI_QUADRATURE_TETRAHEDRON*> quadratures;
+  std::vector<chi_math::QuadratureTetrahedron*> quadratures;
   chi_mesh::MeshContinuum* grid;
 
   double alphac;

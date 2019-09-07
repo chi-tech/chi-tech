@@ -7,9 +7,9 @@
 //#########################################################
 /**Initializes the quadrature with Gauss-Legendre for
  * the polar angles only.*/
-void CHI_PRODUCT_QUADRATURE::InitializeWithGL(int Np, bool verbose)
+void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
 {
-  CHI_QUADRATURE_GAUSSLEGENDRE* gl_polar = new CHI_QUADRATURE_GAUSSLEGENDRE;
+  chi_math::QuadratureGaussLegendre* gl_polar = new chi_math::QuadratureGaussLegendre;
 
   gl_polar->Initialize(Np*2);
 
@@ -30,7 +30,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGL(int Np, bool verbose)
   {
     for (unsigned j=0; j<(Np*2); j++)
     {
-      QPOINT_PHITHETA* new_pair = new QPOINT_PHITHETA;
+      chi_math::QuadraturePointPhiTheta* new_pair = new chi_math::QuadraturePointPhiTheta;
 
       new_pair->phi   = 0.0;
       new_pair->theta = M_PI-acos(gl_polar->abscissae[j]);
@@ -55,7 +55,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGL(int Np, bool verbose)
   //================================================== Create omega list
   for (int n=0; n<abscissae.size(); n++)
   {
-    QPOINT_PHITHETA* qpoint = abscissae[n];
+    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
     chi_mesh::Vector* new_omega = new chi_mesh::Vector;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
@@ -76,9 +76,9 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGL(int Np, bool verbose)
 //###################################################################
 /**Initializes the quadrature with Gauss-Legendre for the polar
  * angles and Gauss-Chebyshev for the azimuthal.*/
-void CHI_PRODUCT_QUADRATURE::InitializeWithGC(int Na, bool verbose)
+void chi_math::ProductQuadrature::InitializeWithGC(int Na, bool verbose)
 {
-  CHI_QUADRATURE_GAUSSCHEBYSHEV* gl_azimu = new CHI_QUADRATURE_GAUSSCHEBYSHEV;
+  chi_math::QuadratureGaussChebyshev* gl_azimu = new chi_math::QuadratureGaussChebyshev;
 
   gl_azimu->Initialize(Na*4);
 
@@ -99,7 +99,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGC(int Na, bool verbose)
   {
     for (unsigned j=0; j<(1); j++)
     {
-      QPOINT_PHITHETA* new_pair = new QPOINT_PHITHETA;
+      chi_math::QuadraturePointPhiTheta* new_pair = new chi_math::QuadraturePointPhiTheta;
 
       new_pair->phi   = M_PI*(2*(i+1)-1)/(Na*4);
       new_pair->theta = 0.5*M_PI;
@@ -125,7 +125,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGC(int Na, bool verbose)
   //================================================== Create omega list
   for (int n=0; n<abscissae.size(); n++)
   {
-    QPOINT_PHITHETA* qpoint = abscissae[n];
+    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
     chi_mesh::Vector* new_omega = new chi_mesh::Vector;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
@@ -142,10 +142,10 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGC(int Na, bool verbose)
 //#########################################################
 /**Initializes the quadrature with Gauss-Legendre for
  * both the polar and azimuthal angles.*/
-void CHI_PRODUCT_QUADRATURE::InitializeWithGLL(int Na, int Np, bool verbose)
+void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose)
 {
-  CHI_QUADRATURE_GAUSSLEGENDRE* gl_polar = new CHI_QUADRATURE_GAUSSLEGENDRE;
-  CHI_QUADRATURE_GAUSSLEGENDRE* gl_azimu = new CHI_QUADRATURE_GAUSSLEGENDRE;
+  chi_math::QuadratureGaussLegendre* gl_polar = new chi_math::QuadratureGaussLegendre;
+  chi_math::QuadratureGaussLegendre* gl_azimu = new chi_math::QuadratureGaussLegendre;
 
   gl_polar->Initialize(Np*2);
   gl_azimu->Initialize(Na*4);
@@ -170,7 +170,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGLL(int Na, int Np, bool verbose)
   {
     for (unsigned j=0; j<(Np*2); j++)
     {
-      QPOINT_PHITHETA* new_pair = new QPOINT_PHITHETA;
+      chi_math::QuadraturePointPhiTheta* new_pair = new chi_math::QuadraturePointPhiTheta;
 
       new_pair->phi   = M_PI*gl_azimu->abscissae[i] + M_PI;
       new_pair->theta = M_PI-acos(gl_polar->abscissae[j]);
@@ -195,7 +195,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGLL(int Na, int Np, bool verbose)
   //================================================== Create omega list
   for (int n=0; n<abscissae.size(); n++)
   {
-    QPOINT_PHITHETA* qpoint = abscissae[n];
+    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
     chi_mesh::Vector* new_omega = new chi_mesh::Vector;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
@@ -213,10 +213,10 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGLL(int Na, int Np, bool verbose)
 //###################################################################
 /**Initializes the quadrature with Gauss-Legendre for the polar
  * angles and Gauss-Chebyshev for the azimuthal.*/
-void CHI_PRODUCT_QUADRATURE::InitializeWithGLC(int Na, int Np, bool verbose)
+void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose)
 {
-  CHI_QUADRATURE_GAUSSLEGENDRE* gl_polar = new CHI_QUADRATURE_GAUSSLEGENDRE;
-  CHI_QUADRATURE_GAUSSCHEBYSHEV* gl_azimu = new CHI_QUADRATURE_GAUSSCHEBYSHEV;
+  chi_math::QuadratureGaussLegendre* gl_polar = new chi_math::QuadratureGaussLegendre;
+  chi_math::QuadratureGaussChebyshev* gl_azimu = new chi_math::QuadratureGaussChebyshev;
 
   gl_polar->Initialize(Np*2);
   gl_azimu->Initialize(Na*4);
@@ -241,7 +241,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGLC(int Na, int Np, bool verbose)
   {
     for (unsigned j=0; j<(Np*2); j++)
     {
-      QPOINT_PHITHETA* new_pair = new QPOINT_PHITHETA;
+      chi_math::QuadraturePointPhiTheta* new_pair = new chi_math::QuadraturePointPhiTheta;
 
       new_pair->phi   = M_PI*(2*(i+1)-1)/(Na*4);
       new_pair->theta = M_PI-acos(gl_polar->abscissae[j]);
@@ -267,7 +267,7 @@ void CHI_PRODUCT_QUADRATURE::InitializeWithGLC(int Na, int Np, bool verbose)
   //================================================== Create omega list
   for (int n=0; n<abscissae.size(); n++)
   {
-    QPOINT_PHITHETA* qpoint = abscissae[n];
+    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
     chi_mesh::Vector* new_omega = new chi_mesh::Vector;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);

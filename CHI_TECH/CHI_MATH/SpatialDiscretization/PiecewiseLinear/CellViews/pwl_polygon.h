@@ -45,8 +45,8 @@ class PolygonFEView : public CellFEView
 {
 private:
   std::vector<FEside_data2d*> sides;
-  CHI_QUADRATURE_TRIANGLE* vol_quadrature;
-  CHI_QUADRATURE_TRIANGLE* surf_quadrature;
+  chi_math::QuadratureTriangle* vol_quadrature;
+  chi_math::QuadratureTriangle* surf_quadrature;
 public:
   int      num_of_subtris;
   double   beta;
@@ -57,7 +57,7 @@ public:
   std::vector<std::vector<int>> edge_dof_mappings;
 
 
-//  std::vector<QPointXY*> qpoints;
+//  std::vector<chi_math::QuadraturePointXY*> qpoints;
 //  std::vector<double> w;
 
 public:

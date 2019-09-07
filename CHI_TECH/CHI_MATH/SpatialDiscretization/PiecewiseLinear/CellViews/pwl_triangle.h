@@ -10,7 +10,7 @@
 class TriangleFEView : public CellFEView
 {
 public:
-  std::vector<QPointXY*> qpoints;
+  std::vector<chi_math::QuadraturePointXY*> qpoints;
   std::vector<double> w;
   double detJ;
   chi_mesh::Vector v01;
@@ -20,19 +20,19 @@ public:
                  chi_mesh::MeshContinuum* vol_continuum) : CellFEView(3)
   {
     //=========================================== Create the single quad point
-    QPointXY* new_qpoint = new QPointXY;
+    chi_math::QuadraturePointXY* new_qpoint = new chi_math::QuadraturePointXY;
     new_qpoint->x = 1.0/6.0;
     new_qpoint->y = 1.0/6.0;
     qpoints.push_back(new_qpoint);
     w.push_back(1.0/6.0);
 
-    new_qpoint = new QPointXY;
+    new_qpoint = new chi_math::QuadraturePointXY;
     new_qpoint->x = 4.0/6.0;
     new_qpoint->y = 1.0/6.0;
     qpoints.push_back(new_qpoint);
     w.push_back(1.0/6.0);
 
-    new_qpoint = new QPointXY;
+    new_qpoint = new chi_math::QuadraturePointXY;
     new_qpoint->x = 1.0/6.0;
     new_qpoint->y = 4.0/6.0;
     qpoints.push_back(new_qpoint);
@@ -59,17 +59,17 @@ public:
   {
     if (index==0)
     {
-      QPointXY* qpoint = qpoints.at(qpoint_index);
+      chi_math::QuadraturePointXY* qpoint = qpoints.at(qpoint_index);
       return 1.0 - qpoint->x - qpoint->y;
     }
     if (index==1)
     {
-      QPointXY* qpoint = qpoints.at(qpoint_index);
+      chi_math::QuadraturePointXY* qpoint = qpoints.at(qpoint_index);
       return qpoint->x;
     }
     if (index==2)
     {
-      QPointXY* qpoint = qpoints.at(qpoint_index);
+      chi_math::QuadraturePointXY* qpoint = qpoints.at(qpoint_index);
       return qpoint->y;
     }
     return 0;

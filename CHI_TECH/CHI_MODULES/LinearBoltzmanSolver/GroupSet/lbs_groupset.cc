@@ -28,7 +28,7 @@ void LBS_GROUPSET::BuildDiscMomOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          QPOINT_PHITHETA* cur_angle = quadrature->abscissae[n];
+          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
                                                        cur_angle->phi,
                                                        cur_angle->theta);
@@ -53,7 +53,7 @@ void LBS_GROUPSET::BuildDiscMomOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          QPOINT_PHITHETA* cur_angle = quadrature->abscissae[n];
+          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
                                                        cur_angle->phi,
                                                        cur_angle->theta);
@@ -78,7 +78,7 @@ void LBS_GROUPSET::BuildDiscMomOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          QPOINT_PHITHETA* cur_angle = quadrature->abscissae[n];
+          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
                                                        cur_angle->phi,
                                                        cur_angle->theta);
@@ -133,7 +133,7 @@ void LBS_GROUPSET::BuildMomDiscOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          QPOINT_PHITHETA* cur_angle = quadrature->abscissae[n];
+          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = ((2.0*ell+1.0)/2.0)*
                          chi_math::Ylm(ell,m,
                                                        cur_angle->phi,
@@ -159,7 +159,7 @@ void LBS_GROUPSET::BuildMomDiscOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          QPOINT_PHITHETA* cur_angle = quadrature->abscissae[n];
+          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = ((2.0*ell+1.0)/2.0/M_PI)*
                          chi_math::Ylm(ell,m,
                                                        cur_angle->phi,
@@ -185,7 +185,7 @@ void LBS_GROUPSET::BuildMomDiscOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          QPOINT_PHITHETA* cur_angle = quadrature->abscissae[n];
+          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = ((2.0*ell+1.0)/4.0/M_PI)*
                          chi_math::Ylm(ell,m,
                                                        cur_angle->phi,

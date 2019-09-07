@@ -50,7 +50,7 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 3)
       verbose = lua_toboolean(L,3);
 
-    CHI_PRODUCT_QUADRATURE* new_quad = new CHI_PRODUCT_QUADRATURE;
+    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
     new_quad->InitializeWithGL(Np,verbose);
     chi_math_handler.product_quadratures.push_back(new_quad);
     int index = chi_math_handler.product_quadratures.size()-1;
@@ -77,7 +77,7 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 3)
       verbose = lua_toboolean(L,3);
 
-    CHI_PRODUCT_QUADRATURE* new_quad = new CHI_PRODUCT_QUADRATURE;
+    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
     new_quad->InitializeWithGC(Na,verbose);
     chi_math_handler.product_quadratures.push_back(new_quad);
     int index = chi_math_handler.product_quadratures.size()-1;
@@ -105,7 +105,7 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 4)
       verbose = lua_toboolean(L,4);
 
-    CHI_PRODUCT_QUADRATURE* new_quad = new CHI_PRODUCT_QUADRATURE;
+    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
     new_quad->InitializeWithGLL(Np,Na,verbose);
     chi_math_handler.product_quadratures.push_back(new_quad);
     int index = chi_math_handler.product_quadratures.size()-1;
@@ -133,7 +133,7 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 4)
       verbose = lua_toboolean(L,4);
 
-    CHI_PRODUCT_QUADRATURE* new_quad = new CHI_PRODUCT_QUADRATURE;
+    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
     new_quad->InitializeWithGLC(Np,Na,verbose);
     chi_math_handler.product_quadratures.push_back(new_quad);
     int index = chi_math_handler.product_quadratures.size()-1;

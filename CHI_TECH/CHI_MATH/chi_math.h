@@ -19,8 +19,8 @@ More information of solvers can be obtained from:
 class CHI_MATH
 {
 public:
-	std::vector<CHI_QUADRATURE*> quadratures;
-	std::vector<CHI_PRODUCT_QUADRATURE*> product_quadratures;
+	std::vector<chi_math::Quadrature*> quadratures;
+	std::vector<chi_math::ProductQuadrature*> product_quadratures;
 public:
 	//00 Constructor
 						CHI_MATH();

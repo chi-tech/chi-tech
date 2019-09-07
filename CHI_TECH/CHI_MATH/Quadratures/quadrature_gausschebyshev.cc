@@ -1,7 +1,7 @@
 #include "quadrature_gausschebyshev.h"
 #include <math.h>
 
-void CHI_QUADRATURE_GAUSSCHEBYSHEV::Initialize(int N,bool verbose)
+void chi_math::QuadratureGaussChebyshev::Initialize(int N,bool verbose)
 {
   if (verbose)
   {

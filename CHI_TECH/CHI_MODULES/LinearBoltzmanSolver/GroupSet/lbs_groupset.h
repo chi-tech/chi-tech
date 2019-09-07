@@ -26,7 +26,7 @@ class LBS_GROUPSET
 {
 public:
   std::vector<LBS_GROUP*>                      groups;
-  CHI_PRODUCT_QUADRATURE*                      quadrature;
+  chi_math::ProductQuadrature*                      quadrature;
   int                                          iterative_method;
   int                                          angleagg_method;
   std::vector<std::vector<double>>             d2m_op;

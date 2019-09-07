@@ -6,18 +6,18 @@
 
 namespace chi_math
 {
-  struct QPointXY;
-  struct QPointXYZ;
-  class CHI_QUADRATURE;
+  struct QuadraturePointXY;
+  struct QuadraturePointXYZ;
+  class Quadrature;
 }
 
-struct QPointXY
+struct chi_math::QuadraturePointXY
 {
   double x;
   double y;
 };
 
-struct QPointXYZ
+struct chi_math::QuadraturePointXYZ
 {
   double x;
   double y;
@@ -26,7 +26,7 @@ struct QPointXYZ
 
 //######################################################### Class def
 /**Parent class for quadratures.*/
-class CHI_QUADRATURE
+class chi_math::Quadrature
 {
 public:
   std::vector<double> abscissae;

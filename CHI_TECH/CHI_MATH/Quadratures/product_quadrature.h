@@ -9,7 +9,13 @@
 #define GAUSS_LEGENDRE_LEGENDRE  3
 #define GAUSS_LEGENDRE_CHEBYSHEV 4
 
-struct QPOINT_PHITHETA
+namespace chi_math
+{
+  struct QuadraturePointPhiTheta;
+  class ProductQuadrature;
+}
+
+struct chi_math::QuadraturePointPhiTheta
 {
   double phi;
   double theta;
@@ -17,10 +23,10 @@ struct QPOINT_PHITHETA
 
 //######################################################### Class def
 /** Parent class for product quadratures*/
-class CHI_PRODUCT_QUADRATURE
+class chi_math::ProductQuadrature
 {
 public:
-  std::vector<QPOINT_PHITHETA*> abscissae;
+  std::vector<chi_math::QuadraturePointPhiTheta*> abscissae;
   std::vector<double>           polar_ang;
   std::vector<double>           azimu_ang;
   std::vector<double>           weights;

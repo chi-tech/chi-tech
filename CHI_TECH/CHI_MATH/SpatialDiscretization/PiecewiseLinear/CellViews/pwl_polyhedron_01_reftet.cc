@@ -4,7 +4,7 @@ double PolyhedronFEView::TetShape(int index,
                                   int qpoint_index,
                                   bool on_surface)
 {
-  QPointXYZ* qpoint;
+  chi_math::QuadraturePointXYZ* qpoint;
   if (!on_surface)
     qpoint = quadratures[DEG3]->qpoints.at(qpoint_index);
   else

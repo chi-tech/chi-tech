@@ -74,7 +74,7 @@ void LinearBoltzmanSolver::Initialize()
       chi_log.Log(LOG_0) << outstr << "\n\n";
 
 
-      CHI_PRODUCT_QUADRATURE* quad = group_sets[gs]->quadrature;
+      chi_math::ProductQuadrature* quad = group_sets[gs]->quadrature;
       chi_log.Log(LOG_0VERBOSE_1) << "Product Quadrature polar angles:\n";
       outstr = std::string("");
       counter = 0;

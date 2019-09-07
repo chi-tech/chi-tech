@@ -33,7 +33,7 @@ int chiCreateQuadrature(lua_State *L)
   if (ident == 1) //GAUSS_LEGENDRE
   {
     printf("Creating Gauss-Legendre Quadrature\n");
-    CHI_QUADRATURE_GAUSSLEGENDRE* new_quad = new CHI_QUADRATURE_GAUSSLEGENDRE;
+    chi_math::QuadratureGaussLegendre* new_quad = new chi_math::QuadratureGaussLegendre;
     new_quad->Initialize(N,1000,1.0e-10,true);
     chi_math_handler.quadratures.push_back(new_quad);
     int index = chi_math_handler.quadratures.size()-1;
@@ -43,7 +43,7 @@ int chiCreateQuadrature(lua_State *L)
   else if (ident == 2) //GAUSS_CHEBYSHEV
   {
     printf("Creating Gauss-Chebyshev Quadrature\n");
-    CHI_QUADRATURE_GAUSSCHEBYSHEV* new_quad = new CHI_QUADRATURE_GAUSSCHEBYSHEV;
+    chi_math::QuadratureGaussChebyshev* new_quad = new chi_math::QuadratureGaussChebyshev;
     new_quad->Initialize(N,true);
     chi_math_handler.quadratures.push_back(new_quad);
     int index = chi_math_handler.quadratures.size()-1;

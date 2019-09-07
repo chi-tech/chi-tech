@@ -22,11 +22,11 @@ public:
   std::vector<CellFEView*> cell_fe_views;
   std::vector<int>         cell_fe_views_mapping;
   bool mapping_initialized;
-  CHI_QUADRATURE_TRIANGLE*    tri_quad_deg5;
-  CHI_QUADRATURE_TRIANGLE*    tri_quad_deg3_surf;
-  CHI_QUADRATURE_TETRAHEDRON* tet_quad_deg1;
-  CHI_QUADRATURE_TETRAHEDRON* tet_quad_deg3;
-  CHI_QUADRATURE_TETRAHEDRON* tet_quad_deg3_surface;
+  chi_math::QuadratureTriangle*    tri_quad_deg5;
+  chi_math::QuadratureTriangle*    tri_quad_deg3_surf;
+  chi_math::QuadratureTetrahedron* tet_quad_deg1;
+  chi_math::QuadratureTetrahedron* tet_quad_deg3;
+  chi_math::QuadratureTetrahedron* tet_quad_deg3_surface;
 
 public:
   //00

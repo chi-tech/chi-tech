@@ -4,7 +4,7 @@
 
 using namespace chi_math;
 
-void CHI_QUADRATURE_GAUSSLEGENDRE::
+void chi_math::QuadratureGaussLegendre::
     Initialize(int N, int maxiters,
                double tol,bool verbose)
 {

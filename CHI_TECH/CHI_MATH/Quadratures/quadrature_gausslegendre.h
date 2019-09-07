@@ -4,9 +4,14 @@
 #include "quadrature.h"
 #include <stdio.h>
 
+namespace chi_math
+{
+  class QuadratureGaussLegendre;
+}
+
 //######################################################### Class Def
 /**Gauss-Legendre quadrature.*/
-class CHI_QUADRATURE_GAUSSLEGENDRE : public CHI_QUADRATURE
+class chi_math::QuadratureGaussLegendre : public chi_math::Quadrature
 {
 public:
   //01

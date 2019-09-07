@@ -3,9 +3,14 @@
 
 #include "quadrature.h"
 
+namespace chi_math
+{
+  class QuadratureGaussChebyshev;
+}
+
 //######################################################### Class Def
 /**Gauss-Chebyshev quadrature.*/
-class CHI_QUADRATURE_GAUSSCHEBYSHEV : public CHI_QUADRATURE
+class chi_math::QuadratureGaussChebyshev : public chi_math::Quadrature
 {
 public:
   //01

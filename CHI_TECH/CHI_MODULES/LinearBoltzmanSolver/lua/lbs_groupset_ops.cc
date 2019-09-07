@@ -342,7 +342,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   }
 
   //============================================= Obtain pointer to quadrature
-  CHI_PRODUCT_QUADRATURE* prodquad;
+  chi_math::ProductQuadrature* prodquad;
   try{
     prodquad = chi_math_handler.product_quadratures.at(prquad_index);
   }
