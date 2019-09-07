@@ -11,7 +11,7 @@ extern ChiPhysics chi_physics_handler;
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 
 //#############################################################################

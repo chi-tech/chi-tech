@@ -52,7 +52,7 @@ public:
   std::vector<std::vector<double>>                   incident_P0_mg_boundaries;
   std::vector<chi_mesh::SweepManagement::SPDS*>      sweep_orderings;
 
-  CHI_MPI_COMMUNICATOR_SET                           comm_set;
+  ChiMPICommunicatorSet                           comm_set;
 
   int max_cell_dof_count;
   unsigned long long local_dof_count;

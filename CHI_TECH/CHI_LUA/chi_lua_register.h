@@ -109,8 +109,6 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
 
 
 //module:MPI Utilities
-RegisterFunction(chiMPIBroadcastCellsets)
-RegisterFunction(chiMPIReceiveCellsets)
 RegisterFunction(chiMPIBarrier)
 
 //module:Logging Utilities

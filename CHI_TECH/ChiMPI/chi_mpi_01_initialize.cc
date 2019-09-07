@@ -3,7 +3,7 @@
 
 //###################################################################
 /** This function initializes MPI datastructures.*/
-void CHI_MPI::Initialize()
+void ChiMPI::Initialize()
 {
   MPI_Datatype* data_types;
   int*          block_lengths;

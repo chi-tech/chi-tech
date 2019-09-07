@@ -5,7 +5,7 @@
 #include <chi_log.h>
 
 extern ChiMath    chi_math_handler;
-extern CHI_LOG     chi_log;
+extern ChiLog     chi_log;
 
 //########################################################## Create empty system
 /** Creates a Product-quadrature.

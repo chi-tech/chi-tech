@@ -5,7 +5,7 @@
 #include <chi_log.h>
 
 extern ChiPhysics chi_physics_handler;
-extern CHI_LOG     chi_log;
+extern ChiLog     chi_log;
 
 //###################################################################
 /**Obtains a named list of the field functions associated with a solver.

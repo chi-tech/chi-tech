@@ -1,10 +1,10 @@
 #include "chi_diffusion.h"
 
-#include "../../CHI_MPI/chi_mpi.h"
+#include "../../ChiMPI/chi_mpi.h"
 #include <chi_log.h>
 
-extern CHI_MPI chi_mpi;
-extern CHI_LOG chi_log;
+extern ChiMPI chi_mpi;
+extern ChiLog chi_log;
 
 //###################################################################
 /**Customized monitor for PETSc Krylov sub-space solvers.*/

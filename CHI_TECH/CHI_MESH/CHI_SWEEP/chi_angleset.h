@@ -30,7 +30,7 @@ public:
            std::vector<std::pair<int,int>>* sim_boundary_types,
            std::vector<std::vector<double>>* incident_P0_mg_boundaries,
            int sweep_eager_limit,
-           CHI_MPI_COMMUNICATOR_SET* in_comm_set):
+           ChiMPICommunicatorSet* in_comm_set):
            sweep_buffer(this,sweep_eager_limit,in_comm_set)
   {
     num_grps = in_numgrps;

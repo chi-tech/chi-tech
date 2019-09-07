@@ -21,7 +21,7 @@ Add_Folder("../CHI_MESH/CHI_SURFACEMESHER/lua")
 Add_Folder("../CHI_MESH/CHI_VOLUMEMESHER/lua")
 Add_Folder("../CHI_MESH/CHI_FFINTERPOLATION/lua")
 
-Add_Folder("../CHI_MPI/lua")
+Add_Folder("../ChiMPI/lua")
 Add_Folder("../CHI_LOG/lua")
 
 Add_Folder("../ChiPhysics/lua")

@@ -5,8 +5,8 @@
 //#include <iostream>
 #include <fstream>
 
-extern CHI_LOG chi_log;
-extern CHI_MPI chi_mpi;
+extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Exports a field function to VTK format.

@@ -8,13 +8,13 @@
 #include "../CHI_CELL/cell_polygon.h"
 #include "../CHI_CELL/cell_polyhedron.h"
 #include "../CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../../CHI_MPI/chi_mpi.h"
+#include "../../ChiMPI/chi_mpi.h"
 #include "../CHI_LOGICALVOLUME/chi_mesh_logicalvolume.h"
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
-extern CHI_MPI chi_mpi;
+extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Creates 2D Triangle cells for each face of a surface mesh.*/

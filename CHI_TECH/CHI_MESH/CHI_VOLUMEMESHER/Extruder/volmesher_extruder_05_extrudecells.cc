@@ -4,9 +4,9 @@
 #include "../../CHI_CELL/cell_polygon.h"
 #include "../../CHI_MESHHANDLER/chi_meshhandler.h"
 #include "../../CHI_SURFACEMESHER/surfacemesher.h"
-#include "../../../CHI_MPI/chi_mpi.h"
+#include "../../../ChiMPI/chi_mpi.h"
 
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Extrude template cells into polygons.*/

@@ -3,15 +3,16 @@
 
 #include "../chi_mpi.h"
 
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 //#############################################################################
-/** Receive mesh from parent process.
+/** Blocks until all processes in the communicator have reached this routine.
 
 \ingroup chiMPI
 \author Jan*/
-int chiMPIReceiveCellsets(lua_State *L)
+int chiMPIBarrier(lua_State *L)
 {
-  chi_mpi.ReceiveCellSets();
+
+  MPI_Barrier(MPI_COMM_WORLD);
   return 0;
 }

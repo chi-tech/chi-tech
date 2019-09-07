@@ -4,7 +4,7 @@
 #include "../chi_meshhandler.h"
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 extern std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
 extern int                                  chi_current_mesh_handler;

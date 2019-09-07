@@ -3,7 +3,7 @@
 //###################################################################
 /**This function broadcast a set of triangle faces to all child
  * processes.*/
-void CHI_MPI::BroadcastTriFaces(std::vector<chi_mesh::Face> *faces)
+void ChiMPI::BroadcastTriFaces(std::vector<chi_mesh::Face> *faces)
 {
   struct FACE_INFO
   {
@@ -48,7 +48,7 @@ void CHI_MPI::BroadcastTriFaces(std::vector<chi_mesh::Face> *faces)
 
 //###################################################################
 /**This function receives a set of triangle faces from the master.*/
-void CHI_MPI::ReceiveTriFaces(std::vector<chi_mesh::Face> *faces)
+void ChiMPI::ReceiveTriFaces(std::vector<chi_mesh::Face> *faces)
 {
 //================================================== Find amount of item_id to
   //                                                   be received

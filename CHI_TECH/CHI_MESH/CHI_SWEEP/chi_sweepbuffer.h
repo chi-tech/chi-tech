@@ -40,13 +40,13 @@ private:
 
   std::vector<std::vector<MPI_Request>> deplocI_message_request;
 
-  CHI_MPI_COMMUNICATOR_SET*   comm_set;
+  ChiMPICommunicatorSet*   comm_set;
 
 
 public:
   SweepBuffer(chi_mesh::SweepManagement::AngleSet* ref_angleset,
               int sweep_eager_limit,
-              CHI_MPI_COMMUNICATOR_SET* in_comm_set);
+              ChiMPICommunicatorSet* in_comm_set);
   void CheckInitialized();
   void InitializeBuffers();
   void SendDownstreamPsi(int angle_set_num);

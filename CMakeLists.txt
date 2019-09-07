@@ -118,13 +118,12 @@ set(LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 #================================================ Default include directories
 include_directories("${CHI_TECH_DIR}/CHI_LUA")
-include_directories("${CHI_TECH_DIR}/CHI_MPI")
+include_directories("${CHI_TECH_DIR}/ChiMPI")
 include_directories("${CHI_TECH_DIR}/CHI_LOG")
 
 #================================================ Define source directories
 set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc")
 add_subdirectory("${CHI_TECH_DIR}/CHI_CONSOLE")
-add_subdirectory("${CHI_TECH_DIR}/CHI_LIB")
 add_subdirectory("${CHI_TECH_DIR}/CHI_LUA")
 add_subdirectory("${CHI_TECH_DIR}/ChiMath")
 add_subdirectory("${CHI_TECH_DIR}/ChiPhysics")
@@ -132,7 +131,7 @@ add_subdirectory("${CHI_TECH_DIR}/CHI_GRAPH")
 
 add_subdirectory("${CHI_TECH_DIR}/ChiTimer")
 add_subdirectory("${CHI_TECH_DIR}/CHI_MESH")
-add_subdirectory("${CHI_TECH_DIR}/CHI_MPI")
+add_subdirectory("${CHI_TECH_DIR}/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/CHI_LOG")
 
 add_subdirectory("${CHI_TECH_MOD}/CHI_MONTECARLON")

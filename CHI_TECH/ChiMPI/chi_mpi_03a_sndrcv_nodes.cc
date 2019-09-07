@@ -2,7 +2,7 @@
 
 //###################################################################
 /**This function sends a vector of nodes to all child processes*/
-void CHI_MPI::BroadcastNodes(std::vector<chi_mesh::Vertex> *nodes)
+void ChiMPI::BroadcastNodes(std::vector<chi_mesh::Vertex> *nodes)
 {
   struct NODE_INFO
   {
@@ -28,7 +28,7 @@ void CHI_MPI::BroadcastNodes(std::vector<chi_mesh::Vertex> *nodes)
 
 //###################################################################
 /**This function receives nodes from the master.*/
-void CHI_MPI::ReceiveNodes(std::vector<chi_mesh::Vertex> *nodes)
+void ChiMPI::ReceiveNodes(std::vector<chi_mesh::Vertex> *nodes)
 {
   //================================================== Find amount of nodes to
   //                                                   be received

@@ -9,7 +9,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 //#############################################################################
 /** Splits an edge loop into edges if they differ by a certain angle.

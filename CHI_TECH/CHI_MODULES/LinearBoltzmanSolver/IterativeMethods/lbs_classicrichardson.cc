@@ -9,7 +9,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 extern double chi_global_timings[20];
 

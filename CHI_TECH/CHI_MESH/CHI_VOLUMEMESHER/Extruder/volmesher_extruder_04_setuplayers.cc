@@ -1,7 +1,7 @@
 #include "volmesher_extruder.h"
 
 #include <chi_log.h>
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 //###################################################################
 /** Creates actual z-levels for the input layer specification.*/

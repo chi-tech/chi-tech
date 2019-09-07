@@ -3,11 +3,11 @@
 #include "../../CHI_MESHHANDLER/chi_meshhandler.h"
 #include "../../CHI_REGION/chi_region.h"
 #include "../../CHI_BOUNDARY/chi_boundary.h"
-#include "../../../CHI_MPI/chi_mpi.h"
+#include "../../../ChiMPI/chi_mpi.h"
 #include <chi_log.h>
 
-extern CHI_MPI chi_mpi;
-extern CHI_LOG chi_log;
+extern ChiMPI chi_mpi;
+extern ChiLog chi_log;
 
 /**Executes the triangle mesher*/
 void chi_mesh::SurfaceMesherTriangle::Execute()

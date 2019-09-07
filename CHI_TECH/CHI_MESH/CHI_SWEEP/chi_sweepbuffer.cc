@@ -8,8 +8,8 @@
 #include <chi_mpi.h>
 #include <CHI_CONSOLE/chi_console.h>
 
-extern CHI_LOG     chi_log;
-extern CHI_MPI     chi_mpi;
+extern ChiLog     chi_log;
+extern ChiMPI     chi_mpi;
 extern CHI_CONSOLE chi_console;
 
 #define VACUUM             301
@@ -22,7 +22,7 @@ extern double chi_global_timings[20];
 chi_mesh::SweepManagement::SweepBuffer::
   SweepBuffer(chi_mesh::SweepManagement::AngleSet* ref_angleset,
               int sweep_eager_limit,
-              CHI_MPI_COMMUNICATOR_SET* in_comm_set)
+              ChiMPICommunicatorSet* in_comm_set)
 {
   angleset = ref_angleset;
   initialized = false;

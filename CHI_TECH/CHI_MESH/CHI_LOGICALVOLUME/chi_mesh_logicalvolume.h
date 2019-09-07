@@ -4,7 +4,7 @@
 #include "../chi_mesh.h"
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 #define SPHERE        1
 #define SPHERE_ORIGIN 2

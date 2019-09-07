@@ -5,7 +5,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 //#########################################################
 /** Loads a surface mesh from a wavefront .obj file.*/

@@ -6,7 +6,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 void chi_mesh::SurfaceMesherPredefined::Execute()
 {

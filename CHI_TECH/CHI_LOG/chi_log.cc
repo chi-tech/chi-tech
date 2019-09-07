@@ -2,11 +2,11 @@
 #include <chi_mpi.h>
 
 
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 //###################################################################
 /** Default constructor*/
-CHI_LOG::CHI_LOG()
+ChiLog::ChiLog()
 {
   verbosity = LOG_0VERBOSE_0;
 
@@ -14,7 +14,7 @@ CHI_LOG::CHI_LOG()
 
 //###################################################################
 /** Makes a log entry.*/
-CHI_LOG_STREAM CHI_LOG::Log(LOG_LVL level)
+CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
 {
 
 
@@ -119,7 +119,7 @@ CHI_LOG_STREAM CHI_LOG::Log(LOG_LVL level)
 
 //###################################################################
 /** Sets the verbosity level.*/
-void CHI_LOG::SetVerbosity(int int_level)
+void ChiLog::SetVerbosity(int int_level)
 {
   if (int_level == 0)
   {
@@ -137,7 +137,7 @@ void CHI_LOG::SetVerbosity(int int_level)
 
 //###################################################################
 /** Gets the current verbosity level.*/
-int CHI_LOG::GetVerbosity()
+int ChiLog::GetVerbosity()
 {
   return verbosity;
 }

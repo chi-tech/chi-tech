@@ -4,7 +4,9 @@
 #include <mpi.h>
 #include "../CHI_MESH/chi_mesh.h"
 
-class CHI_MPI_COMMUNICATOR_SET
+//################################################################### Class def
+/**Simple implementation a communicator set.*/
+class ChiMPICommunicatorSet
 {
 public:
   std::vector<MPI_Comm>  communicators;
@@ -24,7 +26,7 @@ public:
 
 //################################################################### Class def
 /**An object for storing various MPI states.*/
-class CHI_MPI
+class ChiMPI
 {
 public:
   int location_id;
@@ -36,7 +38,7 @@ public:
   MPI_Datatype LOC_SWP_DEP_C;
 
 public:
-  CHI_MPI()
+  ChiMPI()
   {
     location_id = 0;
     process_count = 1;
@@ -45,8 +47,8 @@ public:
   void Initialize();
 
   //02
-  void BroadcastCellSets();
-  void ReceiveCellSets();
+//  void BroadcastCellSets();
+//  void ReceiveCellSets();
 
   //03a
   void BroadcastNodes(std::vector<chi_mesh::Vertex>* nodes);
@@ -57,8 +59,8 @@ public:
   void ReceiveTriFaces(std::vector<chi_mesh::Face>* faces);
 
   //03c
-  void SendSweepDependency(int dest, std::vector<int>* dependencies);
-  void ReceiveSweepDependency(int sorc, std::vector<int>* dependencies);
+//  void SendSweepDependency(int dest, std::vector<int>* dependencies);
+//  void ReceiveSweepDependency(int sorc, std::vector<int>* dependencies);
 };
 
 

@@ -14,8 +14,8 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern CHI_MPI chi_mpi;
-extern CHI_LOG chi_log;
+extern ChiMPI chi_mpi;
+extern ChiLog chi_log;
 
 extern double chi_global_timings[20];
 

@@ -7,7 +7,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 //#############################################################################
 /** Gets a list of edge loops for the given surface mesh.

@@ -14,8 +14,8 @@ ChiTimer   chi_program_timer;
 
 #include <chi_mpi.h>
 #include <chi_log.h>
-CHI_MPI chi_mpi;
-CHI_LOG chi_log;
+ChiMPI chi_mpi;
+ChiLog chi_log;
 
 
 //=============================================== Stacks

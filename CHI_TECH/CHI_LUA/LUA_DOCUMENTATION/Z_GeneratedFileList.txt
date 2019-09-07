@@ -38,10 +38,10 @@
 ../CHI_MESH/CHI_FFINTERPOLATION/lua/ffinterpol_create.cc
 ../CHI_MESH/CHI_FFINTERPOLATION/lua/ffinterpol_setproperty.cc
 ../CHI_MESH/CHI_FFINTERPOLATION/lua/ffinterpol_export.cc
-../CHI_MPI/lua/mpi_receive_cellsets.cc
-../CHI_MPI/lua/mpi_broadcast_cellsets.cc
-../CHI_MPI/lua/mpi_barrier.cc
-../CHI_LOG/lua/log.cc
+../ChiMPI/lua/mpi_receive_cellsets.cc
+../ChiMPI/lua/mpi_broadcast_cellsets.cc
+../ChiMPI/lua/mpi_barrier.cc
+../ChiLog/lua/log.cc
 ../ChiPhysics/lua/physics_addmaterial.cc
 ../ChiPhysics/lua/physics_maindoc_page.cc
 ../ChiPhysics/lua/physics_solverexecute.cc

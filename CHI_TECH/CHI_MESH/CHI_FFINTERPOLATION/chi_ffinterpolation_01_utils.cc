@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 //###################################################################
 /** This functions checks the intersection of a plane with a tetrahedron.

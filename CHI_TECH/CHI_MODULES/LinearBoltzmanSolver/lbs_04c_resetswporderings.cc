@@ -4,7 +4,7 @@
 #include <chi_mpi.h>
 
 extern CHI_CONSOLE chi_console;
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 extern double chi_global_timings[20];
 

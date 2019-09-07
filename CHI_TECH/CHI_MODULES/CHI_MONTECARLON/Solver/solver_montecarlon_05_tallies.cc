@@ -11,8 +11,8 @@ typedef unsigned long long TULL;
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern CHI_LOG chi_log;
-extern CHI_MPI chi_mpi;
+extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Makes a contribution to tallies*/

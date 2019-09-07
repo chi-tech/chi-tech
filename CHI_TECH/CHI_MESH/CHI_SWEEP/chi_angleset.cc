@@ -4,7 +4,7 @@
 
 #include <chi_mpi.h>
 
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 #include "../../ChiTimer/chi_timer.h"
 

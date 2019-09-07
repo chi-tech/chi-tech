@@ -4,7 +4,7 @@
 #include <chi_log.h>
 
 extern ChiPhysics chi_physics_handler;
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 /** \defgroup LuaNPT Linear Boltzman Solver
  * \ingroup LuaModules*/

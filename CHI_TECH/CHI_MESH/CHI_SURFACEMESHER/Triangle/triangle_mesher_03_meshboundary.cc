@@ -1,11 +1,11 @@
 #include "triangle_mesher.h"
-#include "../../../CHI_MPI/chi_mpi.h"
+#include "../../../ChiMPI/chi_mpi.h"
 
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 extern "C"
 {

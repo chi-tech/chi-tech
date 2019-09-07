@@ -10,7 +10,7 @@
 
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 
 typedef chi_mesh::SweepManagement::AngleSet TAngleSet;
 typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;

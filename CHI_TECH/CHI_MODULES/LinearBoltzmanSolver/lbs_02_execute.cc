@@ -5,8 +5,8 @@
 #include <chi_log.h>
 #include <CHI_CONSOLE/chi_console.h>
 
-extern CHI_MPI     chi_mpi;
-extern CHI_LOG     chi_log;
+extern ChiMPI     chi_mpi;
+extern ChiLog     chi_log;
 extern CHI_CONSOLE chi_console;
 
 //###################################################################

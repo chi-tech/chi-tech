@@ -25,7 +25,7 @@ enum LOG_LVL {LOG_0=1,                //Used only for location 0
  * be set on the command line via the switch -v followed by a
  * space and the number for the verbosity (0,1 or 2). The lua command
  * chiLogSetVerbosity(int_level) achieves the same.*/
-class CHI_LOG
+class ChiLog
 {
 private:
   DummyStream dummy_stream;
@@ -33,7 +33,7 @@ private:
 
 public:
   //00
-                  CHI_LOG();
+                  ChiLog();
   //01
   CHI_LOG_STREAM  Log(LOG_LVL level);
   void            SetVerbosity(int int_level);

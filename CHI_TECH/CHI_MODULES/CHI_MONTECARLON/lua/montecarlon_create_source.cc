@@ -10,7 +10,7 @@
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
 
 
