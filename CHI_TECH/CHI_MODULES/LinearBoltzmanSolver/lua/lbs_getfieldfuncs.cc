@@ -2,8 +2,8 @@
 
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 
-#include "../../../CHI_PHYSICS/chi_physics.h"
-extern CHI_PHYSICS chi_physics_handler;
+#include "../../../ChiPhysics/chi_physics.h"
+extern ChiPhysics chi_physics_handler;
 
 #include <chi_log.h>
 extern CHI_LOG chi_log;

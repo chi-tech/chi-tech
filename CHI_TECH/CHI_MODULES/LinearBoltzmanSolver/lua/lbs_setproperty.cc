@@ -1,12 +1,12 @@
 #include "../../../CHI_LUA/chi_lua.h"
 
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
-#include "../../../CHI_PHYSICS/chi_physics.h"
+#include "../../../ChiPhysics/chi_physics.h"
 #include "../../../ChiMath/chi_math.h"
 
 #include "../../../ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 extern ChiMath    chi_math_handler;
 
 #define DISCRETIZATION_METHOD 1

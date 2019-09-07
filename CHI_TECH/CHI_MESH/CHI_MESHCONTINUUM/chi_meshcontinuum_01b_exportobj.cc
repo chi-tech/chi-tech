@@ -2,11 +2,11 @@
 #include <fstream>
 #include "../CHI_CELL/cell_polyhedron.h"
 #include "../CHI_CELL/cell_polygon.h"
-#include <CHI_PHYSICS/chi_physics.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/chi_physicsmaterial.h>
+#include <ChiPhysics/chi_physics.h>
+#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <chi_mpi.h>
 #include <chi_log.h>

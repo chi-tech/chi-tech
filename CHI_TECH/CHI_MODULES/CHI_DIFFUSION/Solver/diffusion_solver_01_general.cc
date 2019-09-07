@@ -1,12 +1,12 @@
 #include "diffusion_solver.h"
 
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/chi_physicsmaterial.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property00_thermconductivity.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property01_scalarvalue.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
+#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
+#include <ChiPhysics/PhysicsMaterial/property00_thermconductivity.h>
+#include <ChiPhysics/PhysicsMaterial/property01_scalarvalue.h>
+#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
-#include <CHI_PHYSICS/chi_physics.h>
-extern CHI_PHYSICS chi_physics_handler;
+#include <ChiPhysics/chi_physics.h>
+extern ChiPhysics chi_physics_handler;
 
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"

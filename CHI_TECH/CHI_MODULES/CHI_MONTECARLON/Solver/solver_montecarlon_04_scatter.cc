@@ -1,13 +1,13 @@
 #include "solver_montecarlon.h"
 
 #include <CHI_MESH/CHI_CELL/cell.h>
-#include <CHI_PHYSICS/chi_physics.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/chi_physicsmaterial.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
+#include <ChiPhysics/chi_physics.h>
+#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
+#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 
 #include <chi_log.h>
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 extern CHI_LOG chi_log;
 
 #include<iostream>

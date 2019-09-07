@@ -6,7 +6,7 @@
 /** Prints the performance data array to file
 
 \author Jan*/
-void CHI_PHYSICS::PrintPerformanceData(char* fileName)
+void ChiPhysics::PrintPerformanceData(char* fileName)
 {
 	  std::ofstream file;
 	  file.open(fileName);

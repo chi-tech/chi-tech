@@ -1,4 +1,4 @@
-#include "CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
 
 void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 {

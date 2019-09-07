@@ -18,18 +18,18 @@
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
 #include <PiecewiseLinear/CellViews/pwl_polygon.h>
 
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h>
-#include <CHI_PHYSICS/CHI_PHYSICSMATERIAL/property11_isotropic_mg_src.h>
+#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
+#include <ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h>
 
 #include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
 
 #include <ChiMath/Statistics/cdfsampler.h>
 
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 //###################################################################
 /**Constructor for residual source.*/

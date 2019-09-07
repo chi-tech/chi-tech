@@ -127,7 +127,7 @@ add_subdirectory("${CHI_TECH_DIR}/CHI_CONSOLE")
 add_subdirectory("${CHI_TECH_DIR}/CHI_LIB")
 add_subdirectory("${CHI_TECH_DIR}/CHI_LUA")
 add_subdirectory("${CHI_TECH_DIR}/ChiMath")
-add_subdirectory("${CHI_TECH_DIR}/CHI_PHYSICS")
+add_subdirectory("${CHI_TECH_DIR}/ChiPhysics")
 add_subdirectory("${CHI_TECH_DIR}/CHI_GRAPH")
 
 add_subdirectory("${CHI_TECH_DIR}/ChiTimer")

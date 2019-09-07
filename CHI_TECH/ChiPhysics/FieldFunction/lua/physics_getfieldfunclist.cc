@@ -1,10 +1,10 @@
 #include <CHI_LUA/chi_lua.h>
 
-#include "CHI_PHYSICS/chi_physics.h"
+#include "ChiPhysics/chi_physics.h"
 
 #include <chi_log.h>
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 extern CHI_LOG     chi_log;
 
 //###################################################################

@@ -4,7 +4,7 @@
 #include "../chi_physics_namespace.h"
 #include "../../CHI_MESH/CHI_REGION/chi_region.h"
 
-#include "../CHI_FIELDFUNCTION/chi_fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 
 /**\defgroup LuaSolver Solvers

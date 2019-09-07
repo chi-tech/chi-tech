@@ -11,7 +11,7 @@ extern bool    chi_termination_posted;
 
 //############################################################################# Run physics loop
 /** Timed loop executing all physics events.*/
-void CHI_PHYSICS::RunPhysicsLoop()
+void ChiPhysics::RunPhysicsLoop()
 {
 	ChiTimer physicsTiming;
 	ChiTimer profilingTimer;

@@ -2,16 +2,16 @@
 
 #include"../Solver/solver_montecarlon.h"
 
-#include"../../../CHI_PHYSICS/CHI_SOLVER/chi_solver.h"
+#include"../../../ChiPhysics/SolverBase/chi_solver.h"
 #include <CHI_MODULES/CHI_MONTECARLON/Source/mc_base_source.h>
 #include <CHI_MODULES/CHI_MONTECARLON/Source/BoundarySource/mc_bndry_source.h>
 #include <CHI_MODULES/CHI_MONTECARLON/Source/ResidualSource/mc_rmc_source.h>
 
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
 extern CHI_LOG chi_log;
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 
 

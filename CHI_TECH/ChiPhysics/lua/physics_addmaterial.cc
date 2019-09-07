@@ -1,9 +1,9 @@
 #include "../../CHI_LUA/chi_lua.h"
 #include<iostream>
 #include "../chi_physics.h"
-#include "../CHI_PHYSICSMATERIAL/chi_physicsmaterial.h"
+#include "../PhysicsMaterial/chi_physicsmaterial.h"
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <chi_log.h>
 

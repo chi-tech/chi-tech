@@ -4,14 +4,14 @@
 #include<iostream>
 
 
-#include "CHI_SOLVER/chi_solver.h"
-#include "CHI_PHYSICSMATERIAL/chi_physicsmaterial.h"
-#include "CHI_FIELDFUNCTION/chi_fieldfunction.h"
+#include "SolverBase/chi_solver.h"
+#include "PhysicsMaterial/chi_physicsmaterial.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 
 //############################################################################# CLASS DEF
 /** Object for controlling real-time physics.*/
-class CHI_PHYSICS
+class ChiPhysics
 {
 	public:
 	double    					physicsTimestep;
@@ -24,7 +24,7 @@ class CHI_PHYSICS
 
 	public:
 	//00
-			CHI_PHYSICS();
+			ChiPhysics();
 	int  InitPetSc(int argc, char** argv);
 	//01
 	void	RunPhysicsLoop();

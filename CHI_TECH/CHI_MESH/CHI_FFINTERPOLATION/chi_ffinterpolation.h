@@ -3,7 +3,7 @@
 
 #include "../CHI_MESHCONTINUUM/chi_meshcontinuum.h"
 #include "../chi_mesh.h"
-#include "../../CHI_PHYSICS/CHI_FIELDFUNCTION/chi_fieldfunction.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #define FFI_SLICE 1
 #define FFI_LINE 2

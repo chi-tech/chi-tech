@@ -1,4 +1,4 @@
-#include "chi_fieldfunction.h"
+#include "fieldfunction.h"
 
 #include <chi_log.h>
 #include <chi_mpi.h>

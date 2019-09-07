@@ -1,13 +1,13 @@
 #include "../../CHI_LUA/chi_lua.h"
 #include<iostream>
 #include "../chi_physics.h"
-#include "../CHI_PHYSICSMATERIAL/chi_physicsmaterial.h"
-#include "CHI_PHYSICS/CHI_PHYSICSMATERIAL/property00_thermconductivity.h"
-#include "CHI_PHYSICS/CHI_PHYSICSMATERIAL/property01_scalarvalue.h"
-#include "CHI_PHYSICS/CHI_PHYSICSMATERIAL/property10_transportxsections.h"
-#include "CHI_PHYSICS/CHI_PHYSICSMATERIAL/property11_isotropic_mg_src.h"
+#include "../PhysicsMaterial/chi_physicsmaterial.h"
+#include "ChiPhysics/PhysicsMaterial/property00_thermconductivity.h"
+#include "ChiPhysics/PhysicsMaterial/property01_scalarvalue.h"
+#include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h"
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 
 #include <chi_log.h>
 
@@ -38,9 +38,9 @@ ISOTROPIC_MG_SOURCE\n
 ### Developer Info
 Checklist for adding a new material property:
  - Create your property class in its own header file. i.e.
-   "CHI_PHYSICS/CHI_PHYSICSMATERIAL/property_xx_myproperty.h"
+   "ChiPhysics/PhysicsMaterial/property_xx_myproperty.h"
  - Add the property to the physics namespace
-   ("CHI_PHYSICS/chi_physics_namespace.h"). Make sure to derive from the base
+   ("ChiPhysics/chi_physics_namespace.h"). Make sure to derive from the base
    class.
  - Go define the integer to be associated with your new property in
    chi_physicsmaterial.h

@@ -6,10 +6,10 @@
 CHI_CONSOLE       chi_console;
 
 #include "ChiMath/chi_math.h"
-#include "CHI_PHYSICS/chi_physics.h"
+#include "ChiPhysics/chi_physics.h"
 #include "ChiTimer/chi_timer.h"
 ChiMath    chi_math_handler;
-CHI_PHYSICS chi_physics_handler;
+ChiPhysics chi_physics_handler;
 ChiTimer   chi_program_timer;
 
 #include <chi_mpi.h>

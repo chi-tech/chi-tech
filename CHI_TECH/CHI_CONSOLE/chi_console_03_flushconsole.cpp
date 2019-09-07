@@ -4,9 +4,9 @@
 
 
 #include "../CHI_LIB/chi_lib.h"
-#include "../CHI_PHYSICS/chi_physics.h"
+#include "../ChiPhysics/chi_physics.h"
 #include "../ChiTimer/chi_timer.h"
-extern CHI_PHYSICS  		chi_physics_handler;
+extern ChiPhysics  		chi_physics_handler;
 extern ChiTimer        chi_program_timer;
 
 //############################################################################# Flush console

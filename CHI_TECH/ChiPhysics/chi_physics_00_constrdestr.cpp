@@ -3,7 +3,7 @@
 
 //############################################################################# Default constructor
 /** Default constructor.*/
-CHI_PHYSICS::CHI_PHYSICS()
+ChiPhysics::ChiPhysics()
 {
 	this->physicsTimestep=16.66667;
 	//this->physicsTimestep=1000;
@@ -16,7 +16,7 @@ CHI_PHYSICS::CHI_PHYSICS()
 }
 
 /**Initializes PetSc for use by all entities.*/
-int CHI_PHYSICS::InitPetSc(int argc, char** argv)
+int ChiPhysics::InitPetSc(int argc, char** argv)
 {
 	PetscErrorCode ierr;
 	PetscMPIInt    size;

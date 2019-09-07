@@ -9,13 +9,13 @@
 #include "../Boundaries/chi_diffusion_bndry.h"
 
 #include "../chi_diffusion.h"
-#include <CHI_PHYSICS/CHI_SOLVER/chi_solver.h>
+#include <ChiPhysics/SolverBase/chi_solver.h>
 #include <spatial_discretization.h>
 #include <PiecewiseLinear/pwl.h>
 
 #include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
 
-#include <CHI_PHYSICS/CHI_FIELDFUNCTION/chi_fieldfunction.h>
+#include <ChiPhysics/FieldFunction/fieldfunction.h>
 #include <ChiTimer/chi_timer.h>
 
 #include <petscksp.h>
