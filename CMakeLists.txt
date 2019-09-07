@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
 #set(CMAKE_VERBOSE_MAKEFILE ON)
-find_program(GNU_CXX_COMPILER NAMES gcc)
-message(STATUS ${GNU_COMPILER})
-
 if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX_ENV)
 elseif(APPLE)
@@ -30,7 +27,6 @@ endif()
 
 
 #================================================ Set project targets
-SET( CMAKE_BUILD_TYPE Release ... FORCE )
 SET(TARGET ChiTech)
 project(${TARGET} C CXX)
 
@@ -46,9 +42,10 @@ set(LUA_ROOT      "${CHI_TECH_DEP}/lua-5.3.5/install")
 #================================================ Set cmake variables
 find_package(MPI)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CHI_RESOURCES/Macros")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
-set(CMAKE_CXX_COMPILER ${GNU_COMPILER})
 
+if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+endif()
 
 
 #================================================ Include macros
@@ -58,19 +55,19 @@ include(Filter)
 #================================================ Precompiler flags
 #LUA CONSOLE
 add_definitions(-DNO_FONTGENESIS)
-add_definitions(-Wall -Wno-unused-value)
-
-
-
 
 #================================================ Compiler flags
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-format -Wno-unused-but-set-variable")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-write-strings")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-strict-aliasing")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=0")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-value")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 add_definitions(-fpermissive)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
@@ -144,10 +141,9 @@ add_subdirectory("${CHI_TECH_MOD}/CHI_DIFFUSION")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
 
-
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET} ${LIBS} ${TRIANGLE})
 
 # |------------ Write Makefile to root directory
-file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build -s\n\n"
-        "clean:\n\t$(MAKE) -C chi_build -s clean\n")
+file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
+        "clean:\n\t$(MAKE) -C chi_build clean\n")
