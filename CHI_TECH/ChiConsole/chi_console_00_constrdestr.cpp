@@ -1,5 +1,5 @@
 #include "chi_console.h"
-//#include "../CHI_LUA/chi_lua.h"
+//#include "../ChiLua/chi_lua.h"
 
 
 //############################################################################# Default constructor
@@ -22,7 +22,7 @@ ChiConsole::ChiConsole()
 
 	
 	//========================================== Registering functions
-	#include"../CHI_LUA/chi_lua_register.h"
+	#include"../ChiLua/chi_lua_register.h"
 
 	//========================================== Registering events
 	this->InitializeLuaEvent("WM_LBUTTONDOWN");

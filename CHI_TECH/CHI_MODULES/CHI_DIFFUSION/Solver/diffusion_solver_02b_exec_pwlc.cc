@@ -3,8 +3,8 @@
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
 #include <PiecewiseLinear/CellViews/pwl_polygon.h>
 #include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
-#include <CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h>
-#include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
+#include <ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h>
+#include <ChiMesh/CHI_VOLUMEMESHER/chi_volumemesher.h>
 
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"

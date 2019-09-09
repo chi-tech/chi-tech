@@ -1,4 +1,4 @@
-#include"../../../CHI_LUA/chi_lua.h"
+#include"../../../ChiLua/chi_lua.h"
 
 #include"CHI_MODULES/CHI_DIFFUSION/Solver/diffusion_solver.h"
 

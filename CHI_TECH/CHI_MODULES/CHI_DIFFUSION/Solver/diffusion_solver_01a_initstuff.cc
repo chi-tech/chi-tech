@@ -1,15 +1,15 @@
 #include "diffusion_solver.h"
 
-#include "../../../CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../../../CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h"
-#include "../../../CHI_MESH/CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h"
-#include <CHI_MESH/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
+#include "../../../ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h"
+#include "../../../ChiMesh/CHI_VOLUMEMESHER/chi_volumemesher.h"
+#include "../../../ChiMesh/CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h"
+#include <ChiMesh/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 
-#include <CHI_MESH/CHI_CELL/cell_slab.h>
-#include <CHI_MESH/CHI_CELL/cell_polygon.h>
-#include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/CHI_CELL/cell_slab.h>
+#include <ChiMesh/CHI_CELL/cell_polygon.h>
+#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>

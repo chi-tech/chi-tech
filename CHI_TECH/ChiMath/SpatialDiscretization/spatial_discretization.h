@@ -1,7 +1,7 @@
 #ifndef _chi_discretization_h
 #define _chi_discretization_h
 
-#include "../../CHI_MESH/chi_mesh.h"
+#include "../../ChiMesh/chi_mesh.h"
 #include "../Quadratures/quadrature.h"
 
 #define DEG1         0

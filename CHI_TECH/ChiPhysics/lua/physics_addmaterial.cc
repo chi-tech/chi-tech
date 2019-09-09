@@ -1,4 +1,4 @@
-#include "../../CHI_LUA/chi_lua.h"
+#include "../../ChiLua/chi_lua.h"
 #include<iostream>
 #include "../chi_physics.h"
 #include "../PhysicsMaterial/chi_physicsmaterial.h"

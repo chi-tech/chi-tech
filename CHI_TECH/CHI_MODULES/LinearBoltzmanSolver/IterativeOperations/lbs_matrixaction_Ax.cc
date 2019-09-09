@@ -1,6 +1,6 @@
 #include "lbs_matrixaction_Ax.h"
 #include "../Tools/ksp_data_context.h"
-#include "CHI_MESH/CHI_SWEEP/chi_sweepscheduler.h"
+#include "ChiMesh/CHI_SWEEP/chi_sweepscheduler.h"
 
 #include <CHI_MODULES/CHI_DIFFUSION/Solver/diffusion_solver.h>
 

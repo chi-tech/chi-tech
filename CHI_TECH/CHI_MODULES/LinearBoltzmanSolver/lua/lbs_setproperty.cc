@@ -1,4 +1,4 @@
-#include "../../../CHI_LUA/chi_lua.h"
+#include "../../../ChiLua/chi_lua.h"
 
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 #include "../../../ChiPhysics/chi_physics.h"

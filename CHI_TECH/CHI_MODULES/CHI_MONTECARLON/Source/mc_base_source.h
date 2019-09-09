@@ -5,7 +5,7 @@
 #include "mc_base_source.h"
 #include"../chi_montecarlon_particle.h"
 
-#include <CHI_MESH/chi_mesh.h>
+#include <ChiMesh/chi_mesh.h>
 #include <FiniteVolume/fv.h>
 
 #define MC_BASE_SRC     0

@@ -1,4 +1,4 @@
-namespace CHI_LUA 
+namespace chi_lua 
  {
 int chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode);
 int chiThermoCreateVolumeFromCoordinates(int systemHandle, Table point1, Table point2);
@@ -50,8 +50,6 @@ int chiFFInterpolationGetValue(int FFIHandle);
 int chiFFInterpolationCreate(int FFITypeIndex);
 int chiFFInterpolationSetProperty(int FFIHandle, int PropertyIndex);
 int chiFFInterpolationExportPython(int FFIHandle, char BaseName);
-int chiMPIReceiveCellsets();
-int chiMPIBroadcastCellsets();
 int chiMPIBarrier();
 int chiLogSetVerbosity(int int_level);
 int chiLog(int LogType);

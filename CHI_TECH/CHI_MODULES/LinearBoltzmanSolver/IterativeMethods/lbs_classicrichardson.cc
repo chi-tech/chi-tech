@@ -1,6 +1,6 @@
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 
-#include "CHI_MESH/CHI_SWEEP/chi_sweepscheduler.h"
+#include "ChiMesh/CHI_SWEEP/chi_sweepscheduler.h"
 #include "CHI_MODULES/LinearBoltzmanSolver/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include <CHI_MODULES/CHI_DIFFUSION/Solver/diffusion_solver.h>
 

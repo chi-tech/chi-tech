@@ -2,7 +2,7 @@
 #define _chi_solver_h
 #include<iostream>
 #include "../chi_physics_namespace.h"
-#include "../../CHI_MESH/CHI_REGION/chi_region.h"
+#include "../../ChiMesh/CHI_REGION/chi_region.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 

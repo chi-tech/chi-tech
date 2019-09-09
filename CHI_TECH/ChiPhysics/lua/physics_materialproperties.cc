@@ -1,4 +1,4 @@
-#include "../../CHI_LUA/chi_lua.h"
+#include "../../ChiLua/chi_lua.h"
 #include<iostream>
 #include "../chi_physics.h"
 #include "../PhysicsMaterial/chi_physicsmaterial.h"
@@ -45,7 +45,7 @@ Checklist for adding a new material property:
  - Go define the integer to be associated with your new property in
    chi_physicsmaterial.h
  - Include the header file for your property in this file (i.e. at the top).
- - Add this property integer in the lua register (CHI_LUA/chi_lua_register.h).
+ - Add this property integer in the lua register (ChiLua/chi_lua_register.h).
    For testing you can just use the integer value but eventually you'd want
    to supply an easier way for users to enter it.
  - Add another else-if for your property. Just have a look at how the others
@@ -298,7 +298,7 @@ chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 ### Developer Info
 Checklist for adding a new material property:
  - Make sure you followed the steps depicted in the developer info section for
-   the CHI_LUA::chiPhysicsMaterialAddProperty function.
+   the ChiLua::chiPhysicsMaterialAddProperty function.
  - Now under the "If user supplied name then find property index"-section
    add the appropriate code for setting the property index.
  - Add an else-if block for your property similar to the others. It should be

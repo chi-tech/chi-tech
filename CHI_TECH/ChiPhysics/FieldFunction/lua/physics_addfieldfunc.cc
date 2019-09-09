@@ -1,8 +1,8 @@
-#include "CHI_LUA/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 #include<iostream>
 #include "ChiPhysics/chi_physics.h"
-#include "CHI_MESH/CHI_REGION/chi_region.h"
-#include "CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
+#include "ChiMesh/CHI_REGION/chi_region.h"
+#include "ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include <chi_log.h>

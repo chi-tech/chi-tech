@@ -1,6 +1,6 @@
 #include "pwl.h"
 
-#include "../../../CHI_MESH/CHI_CELL/cell_triangle.h"
+#include "../../../ChiMesh/CHI_CELL/cell_triangle.h"
 #include "CellViews/pwl_slab.h"
 #include "CellViews/pwl_triangle.h"
 #include "CellViews/pwl_polygon.h"

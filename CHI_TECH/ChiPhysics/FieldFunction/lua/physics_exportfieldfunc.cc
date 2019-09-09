@@ -1,4 +1,4 @@
-#include "CHI_LUA/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 
 #include "ChiPhysics/chi_physics.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"

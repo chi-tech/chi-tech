@@ -1,6 +1,6 @@
 #include "lbs_linear_boltzman_solver.h"
-#include "../../CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../../CHI_MESH/CHI_CELL/cell.h"
+#include "../../ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h"
+#include "../../ChiMesh/CHI_CELL/cell.h"
 #include "../../ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
 

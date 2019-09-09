@@ -2,7 +2,7 @@
 #define _chi_field_function_h
 
 #include "../chi_physics_namespace.h"
-#include "../../CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h"
+#include "../../ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 #include <petscksp.h>

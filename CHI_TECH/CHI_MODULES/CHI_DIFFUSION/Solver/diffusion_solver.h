@@ -13,7 +13,7 @@
 #include <spatial_discretization.h>
 #include <PiecewiseLinear/pwl.h>
 
-#include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
+#include <ChiMesh/CHI_VOLUMEMESHER/chi_volumemesher.h>
 
 #include <ChiPhysics/FieldFunction/fieldfunction.h>
 #include <ChiTimer/chi_timer.h>

@@ -2,8 +2,8 @@
 #define _fv_polygon_h
 
 #include "fv_cellbase.h"
-#include <CHI_MESH/CHI_CELL/cell_polygon.h>
-#include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
+#include <ChiMesh/CHI_CELL/cell_polygon.h>
+#include <ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
 
 //################################################################### Class def
 /**Finite Volume implementation for a polygon.

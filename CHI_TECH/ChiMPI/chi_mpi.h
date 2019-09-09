@@ -2,7 +2,7 @@
 #define _chi_mpi_h
 
 #include <mpi.h>
-#include "../CHI_MESH/chi_mesh.h"
+#include "../ChiMesh/chi_mesh.h"
 
 //################################################################### Class def
 /**Simple implementation a communicator set.*/

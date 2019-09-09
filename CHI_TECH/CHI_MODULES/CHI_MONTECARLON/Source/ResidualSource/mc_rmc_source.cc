@@ -2,13 +2,13 @@
 
 #include "../../RandomNumberGenerator/montecarlon_rng.h"
 
-#include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
-#include <CHI_MESH/CHI_MESHHANDLER/chi_meshhandler.h>
-#include <CHI_MESH/CHI_VOLUMEMESHER/chi_volumemesher.h>
-#include <CHI_MESH/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
-#include <CHI_MESH/CHI_CELL/cell_slab.h>
-#include <CHI_MESH/CHI_CELL/cell_polygon.h>
-#include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
+#include <ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h>
+#include <ChiMesh/CHI_VOLUMEMESHER/chi_volumemesher.h>
+#include <ChiMesh/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
+#include <ChiMesh/CHI_CELL/cell_slab.h>
+#include <ChiMesh/CHI_CELL/cell_polygon.h>
+#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
 
 #include <FiniteVolume/fv.h>
 #include <FiniteVolume/CellViews/fv_slab.h>
@@ -21,7 +21,7 @@
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h>
 
-#include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
+#include <ChiMesh/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
 
 #include <ChiMath/Statistics/cdfsampler.h>
 

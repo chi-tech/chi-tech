@@ -1,9 +1,9 @@
 #include "fv.h"
 
-#include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
-#include <CHI_MESH/CHI_CELL/cell_slab.h>
-#include <CHI_MESH/CHI_CELL/cell_polygon.h>
-#include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
+#include <ChiMesh/CHI_CELL/cell_slab.h>
+#include <ChiMesh/CHI_CELL/cell_polygon.h>
+#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
 
 #include "CellViews/fv_slab.h"
 #include "CellViews/fv_polygon.h"

@@ -1,7 +1,7 @@
 #ifndef _chi_graph_h
 #define _chi_graph_h
 
-#include "../CHI_MESH/chi_mesh.h"
+#include "../ChiMesh/chi_mesh.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/geometry.hpp>

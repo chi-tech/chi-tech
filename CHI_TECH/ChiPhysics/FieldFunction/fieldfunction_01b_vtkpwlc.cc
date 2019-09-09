@@ -1,8 +1,8 @@
 #include "fieldfunction.h"
 
-#include <CHI_MESH/CHI_CELL/cell_slab.h>
-#include <CHI_MESH/CHI_CELL/cell_polygon.h>
-#include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/CHI_CELL/cell_slab.h>
+#include <ChiMesh/CHI_CELL/cell_polygon.h>
+#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
 #include <ChiPhysics/chi_physics.h>
 
 #include <PiecewiseLinear/pwl.h>
@@ -10,7 +10,7 @@
 #include <PiecewiseLinear/CellViews/pwl_polygon.h>
 #include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
-#include <CHI_MESH/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
+#include <ChiMesh/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
 
 #include <chi_log.h>
 #include <chi_mpi.h>

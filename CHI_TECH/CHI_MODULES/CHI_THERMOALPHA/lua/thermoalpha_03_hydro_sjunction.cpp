@@ -1,4 +1,4 @@
-#include "../../../CHI_LUA/chi_lua.h"
+#include "../../../ChiLua/chi_lua.h"
 #include "../chi_thermoalpha.h"
 #include<math.h>
 

@@ -2,7 +2,7 @@
 #define _product_quadrature_h
 
 #include <vector>
-#include "../../CHI_MESH/chi_mesh.h"
+#include "../../ChiMesh/chi_mesh.h"
 
 #define GAUSS_LEGENDRE           1
 #define GAUSS_CHEBYSHEV          2

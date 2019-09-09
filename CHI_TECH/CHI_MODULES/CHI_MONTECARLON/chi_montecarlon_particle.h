@@ -1,7 +1,7 @@
 #ifndef _chi_montecarlon_particle_h
 #define _chi_montecarlon_particle_h
 
-#include <CHI_MESH/chi_mesh.h>
+#include <ChiMesh/chi_mesh.h>
 
 /**Structure for storing particle information.*/
 struct chi_montecarlon::Particle

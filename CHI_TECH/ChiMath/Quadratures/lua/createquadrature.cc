@@ -1,4 +1,4 @@
-#include "../../../CHI_LUA/chi_lua.h"
+#include "../../../ChiLua/chi_lua.h"
 #include "../../chi_math.h"
 #include "../quadrature_gausslegendre.h"
 #include "../quadrature_gausschebyshev.h"

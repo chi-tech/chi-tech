@@ -54,7 +54,7 @@ now we have only a couple of tutorials.\n
 ### MPI Utilities
  
 <table>
-<tr><td width="33%">chiMPIBroadcastCellsets()</td><td width="33%">chiMPIReceiveCellsets()</td><td width="33%">chiMPIBarrier()</td></tr>
+<tr><td width="33%">chiMPIBarrier()</td></tr>
 </table>
 ### Logging Utilities
  

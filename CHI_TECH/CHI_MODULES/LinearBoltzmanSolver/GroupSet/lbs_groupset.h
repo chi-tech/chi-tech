@@ -6,7 +6,7 @@
 
 #include <ChiMath/Quadratures/LegendrePoly/legendrepoly.h>
 #include <ChiMath/Quadratures/product_quadrature.h>
-#include <CHI_MESH/CHI_SWEEP/chi_angleaggregation.h>
+#include <ChiMesh/CHI_SWEEP/chi_angleaggregation.h>
 
 #include <ChiPhysics/chi_physics_namespace.h>
 

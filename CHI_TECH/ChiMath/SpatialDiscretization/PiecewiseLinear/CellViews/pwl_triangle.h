@@ -4,7 +4,7 @@
 #include "../pwl.h"
 #include <vector>
 #include "../../../Quadratures/quadrature.h"
-#include "../../../../CHI_MESH/CHI_CELL/cell_triangle.h"
+#include "../../../../ChiMesh/CHI_CELL/cell_triangle.h"
 
 
 class TriangleFEView : public CellFEView

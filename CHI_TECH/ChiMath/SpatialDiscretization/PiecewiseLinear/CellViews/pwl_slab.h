@@ -3,7 +3,7 @@
 
 #include "../pwl.h"
 #include <vector>
-#include <CHI_MESH/CHI_CELL/cell_slab.h>
+#include <ChiMesh/CHI_CELL/cell_slab.h>
 
 //###################################################################
 /**Object for handling slab shaped piecewise linear shape functions.*/

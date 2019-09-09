@@ -2,22 +2,22 @@
 #define _npt_sweepchunk_pwl_slab_h
 
 
-#include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
-#include <CHI_MESH/CHI_SWEEP/chi_sweep.h>
+#include <ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
+#include <ChiMesh/CHI_SWEEP/chi_sweep.h>
 #include <spatial_discretization.h>
 #include <PiecewiseLinear/pwl.h>
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
 #include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
-#include <CHI_MESH/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
 #include <ChiPhysics/chi_physics.h>
 
 #include <ChiMath/chi_math.h>
 #include "CHI_MODULES/LinearBoltzmanSolver/GroupSet/lbs_groupset.h"
 #include <ChiMath/Quadratures/product_quadrature.h>
 
-#include <CHI_MESH/CHI_SWEEP/chi_SPDS.h>
-#include <CHI_MESH/CHI_SWEEP/chi_angleaggregation.h>
+#include <ChiMesh/CHI_SWEEP/chi_SPDS.h>
+#include <ChiMesh/CHI_SWEEP/chi_angleaggregation.h>
 
 #include <ChiTimer/chi_timer.h>
 

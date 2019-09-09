@@ -6,7 +6,7 @@
 #include"../../../ChiPhysics/SolverBase/chi_solver.h"
 #include "../RandomNumberGenerator/montecarlon_rng.h"
 #include "CHI_MODULES/CHI_MONTECARLON/Source/mc_base_source.h"
-#include <CHI_MESH/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
+#include <ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <FiniteVolume/fv.h>
 #include <ChiMath/chi_math.h>
