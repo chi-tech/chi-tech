@@ -30,7 +30,7 @@
 /**Object for controlling thermodynamic system.
 
 \author Jan*/
-class CHI_THERMOSYSTEM
+class ThermoAlpha
 {
 public:
 	int fluidOption;
@@ -42,7 +42,7 @@ public:
 	
 public:
 	//00
-			CHI_THERMOSYSTEM();
+			ThermoAlpha();
 	//01
 	bool    Initialize();
 	//02

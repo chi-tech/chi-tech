@@ -128,7 +128,16 @@ enum AlternateUrlTableErrors {
  convey the algorithm. Every class, structure or function should be
  supplied with doxygen comment styles at the top of the item.
 
-\include "../../CHI_TECH/CHI_MODULES/CHI_DIFFUSION/lua/diffusion_execute.cc"
+\include "../../Modules/DiffusionSolver/lua/diffusion_execute.cc"
+
+## Annotating Class-declerations:
+<B>MAXIMIZE SCOPE MINIMIZE SPACE</B>.
+Class declerations must always happen within header files and should aim to
+provide the maximum amount of scope <B>within the minimum amount of vertical
+space.</B> Member variables/structures should be on the top portion of the
+class decleration and methods should be on the bottom.
+
+\include "../../CHI_TECH/ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 
  \section devman1_sec1 Header files
 

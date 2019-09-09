@@ -5,8 +5,8 @@
 #include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/Cell/cell_polyhedron.h>
 
-#include "../CHI_DIFFUSION/Solver/diffusion_solver.h"
-#include "../CHI_DIFFUSION/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "../DiffusionSolver/Solver/diffusion_solver.h"
+#include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 

@@ -122,7 +122,7 @@ include_directories("${CHI_TECH_DIR}/ChiLog")
 include_directories("${PROJECT_SOURCE_DIR}/Modules")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc")
+set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc" "${CHI_TECH_DIR}/lua_test.cc")
 add_subdirectory("${CHI_TECH_DIR}/ChiConsole")
 add_subdirectory("${CHI_TECH_DIR}/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/ChiMath")
@@ -134,8 +134,8 @@ add_subdirectory("${CHI_TECH_DIR}/ChiMesh")
 add_subdirectory("${CHI_TECH_DIR}/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/ChiLog")
 
-add_subdirectory("${CHI_TECH_MOD}/CHI_MONTECARLON")
-add_subdirectory("${CHI_TECH_MOD}/CHI_DIFFUSION")
+add_subdirectory("${CHI_TECH_MOD}/MonteCarlon")
+add_subdirectory("${CHI_TECH_MOD}/DiffusionSolver")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
 

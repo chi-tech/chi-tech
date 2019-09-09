@@ -2,7 +2,7 @@
 
 #include "ChiMesh/SweepUtilities/chi_sweepscheduler.h"
 #include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
-#include "../../CHI_DIFFUSION/Solver/diffusion_solver.h"
+#include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
 #include <ChiTimer/chi_timer.h>
 

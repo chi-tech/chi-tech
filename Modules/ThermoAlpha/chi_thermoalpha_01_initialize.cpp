@@ -8,7 +8,7 @@
  *
  * \return Returns true when success.
 \author Jan*/
-bool CHI_THERMOSYSTEM::Initialize()
+bool ThermoAlpha::Initialize()
 {
 	//=========================================== Assigning fluid properties
 	switch (fluidOption)

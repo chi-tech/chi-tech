@@ -1,73 +1,3 @@
-/** bool chiThermoSetComponentProperty() Sets the property of a component.
- *
-\param sysHndle  Handle to the system being referenced.
-\param compHndle Handle to the component being referenced.
-\param propCode  Property code.
- 
- \return Success=true
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode)
-{return;} 
-/** int chiThermoCreateVolumeFromCoordinates() Creates a hydrodynamic volume using a start and end coordinate.
-\params systemHandle int Handle to the system to which the volume belongs.
-\params point1		 Table Table with fields {x,y,z} containing the start location.
-\params point2		 Table Table with fields {x,y,z} containing the end location.
-\return Returns a unique handle for the created volume. (int)
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoCreateVolumeFromCoordinates(int systemHandle, Table point1, Table point2)
-{return;} 
-/** \defgroup LuaThermoalpha Thermoalpha
- * \ingroup LuaModules*/
-/** void chiThermoCreateSystem() Generate an empty Thermal-hydraulic system.
-\return Returns a unique handle for the created system.
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoCreateSystem()
-{return;} 
-/** void chiThermoConnectTwoComponents() Connect two hydrodynamic components using a single junction.
-\param systemHandle  Handle to the system to which all the components belong.
-\param leftComponent Component to be connected to the left of the junction.
-\param sjunc Single junction to be used for the connection.
-\param rigtComponent Component to be connected to the right of the junction.
-\param mode 0=end-begin, 1=begin-end, 2=end-end,
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoConnectTwoComponents(Handle systemHandle, Component leftComponent, Single sjunc, Component rigtComponent, 0=end-begin, mode)
-{return;} 
-/** bool chiThermoInitialize() Initializes system.
-\param systemHandle int Handle to the system which should be initialized.
-\return Returns true if successfully initialized and false otherwise.
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoInitialize(int systemHandle)
-{return;} 
-/** int chiThermoCreateBC() Creates a hydrodynamic boundary condition.
-\params systemHandle int Handle to the system to which the volume belongs.
-\return Returns a unique handle for the created boundary condition.
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoCreateBC(int systemHandle)
-{return;} 
-/** bool chiThermoGetComponentProperty() Sets the property of a component.
- *
-\param sysHndle  Handle to the system being referenced.
-\param compHndle Handle to the component being referenced.
-\param propCode  Property code.
- 
- \return Success=true
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoGetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode)
-{return;} 
-/** int chiThermoCreateSJunction() Creates a hydrodynamic single junction.
-\params systemHandle Handle to the system to which the volume belongs.
-\return Returns a unique handle for the created single junction.
-\ingroup LuaThermoalpha
-\author Jan*/
-int chi_lua::chiThermoCreateSJunction(Handle systemHandle)
-{return;} 
 /** Creates a Product-quadrature.
  *
 \param QuadratureType int Quadrature identifier.
@@ -1014,7 +944,7 @@ int chi_lua::chiDiffusionInitialize(int SolverHandle)
 \return Success bool Returns if initialization failed.
 \ingroup LuaDiffusion
 \author Jan*/
-int chi_lua::chiDiffusionExecute(int SolverHandle, int SolverHandle)
+int chi_lua::chiDiffusionExecute(int SolverHandle)
 {return;} 
 /**Set LBS property.
 \param SolverIndex int Handle to the solver for which the set is to be created.
@@ -1108,7 +1038,7 @@ int chi_lua::chiLBSSetProperty(int SolverIndex, int PropertyIndex)
 The code below is an example of a complete specification of a groupset.
 \code
 --===================================== Setup physics
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
@@ -1387,7 +1317,7 @@ int chi_lua::chiLBSGetScalarFieldFunctionList(int SolverIndex)
 /**Creates a Neutral Particle Transport solver.
 \return SolverHandle int Handle to the solver created.
 \code
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 --
 -- Add Groupset construction here
@@ -1402,7 +1332,7 @@ fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 \endcode
 \ingroup LuaNPT
  */
-int chi_lua::chiLBSransportCreateSolver()
+int chi_lua::chiLBSCreateSolver()
 {return;} 
 /**Executes the LBS solver.
 \param SolverIndex int Handle to the solver.

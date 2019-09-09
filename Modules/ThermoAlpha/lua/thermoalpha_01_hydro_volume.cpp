@@ -5,7 +5,7 @@
 #include "../hydro_volume/hydro_volume.h"
 #include "../hydro_boundary/hydro_boundary.h"
 
-extern CHI_VECTOR<CHI_THERMOSYSTEM> chithermoSystemStack;
+extern CHI_VECTOR<ThermoAlpha> chithermoSystemStack;
 
 //########################################################## Create volume with coordinates
 /** int chiThermoCreateVolumeFromCoordinates() Creates a hydrodynamic volume using a start and end coordinate.
@@ -21,7 +21,7 @@ extern CHI_VECTOR<CHI_THERMOSYSTEM> chithermoSystemStack;
 int chiThermoCreateVolumeFromCoordinates(lua_State *L)
 {
 	int systemHandle = lua_tonumber(L,1);
-	CHI_THERMOSYSTEM* curSystem = chithermoSystemStack.GetItem(systemHandle);
+	ThermoAlpha* curSystem = chithermoSystemStack.GetItem(systemHandle);
 	
 	if (curSystem == NULL) {return 0;}
 	

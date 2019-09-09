@@ -6,9 +6,10 @@
 
 #include"../chi_mesh.h"
 
-
-
-/**Generic surface mesh class.*/
+//###################################################################
+/** Generic surface mesh class.
+This class facilitates many functions within the mesh environment including
+logically determining volumes.*/
 class chi_mesh::SurfaceMesh
 {
 public:
@@ -17,6 +18,9 @@ public:
   std::vector<chi_mesh::Normal>   normals;
   std::vector<chi_mesh::Face>     faces;
   std::vector<chi_mesh::Edge>     lines;
+  /*
+   * DO NOT PLACE COMMENTS HERE UNLESS REALLY NECESSARY
+   */
   std::vector<chi_mesh::PolyFace*> poly_faces;
 
 public:

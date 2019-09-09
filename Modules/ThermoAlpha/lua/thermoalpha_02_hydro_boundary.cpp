@@ -5,7 +5,7 @@
 #include "../hydro_volume/hydro_volume.h"
 #include "../hydro_boundary/hydro_boundary.h"
 
-extern CHI_VECTOR<CHI_THERMOSYSTEM> chithermoSystemStack;
+extern CHI_VECTOR<ThermoAlpha> chithermoSystemStack;
 
 //########################################################## Create boundary condition
 /** int chiThermoCreateBC() Creates a hydrodynamic boundary condition.
@@ -21,7 +21,7 @@ int chiThermoCreateBC(lua_State *L)
 	HYDRO_BOUNDARY* newBoundary = new HYDRO_BOUNDARY;
 	
 	int systemHandle = lua_tonumber(L,1);
-	CHI_THERMOSYSTEM* curSystem = chithermoSystemStack.GetItem(systemHandle);
+	ThermoAlpha* curSystem = chithermoSystemStack.GetItem(systemHandle);
 	
 	if (curSystem == NULL) {return 0;}
 	

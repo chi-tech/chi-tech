@@ -8,7 +8,7 @@
 #include "../Tools/ksp_data_context.h"
 #include "../IterativeOperations/lbs_matrixaction_Ax.h"
 
-#include "../../CHI_DIFFUSION/Solver/diffusion_solver.h"
+#include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
 #include <chi_log.h>
 

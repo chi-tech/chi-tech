@@ -6,7 +6,7 @@ function Add_Folder(folderPath)
     moduleFolders[moduleFolders.itemCount]=folderPath;
 end
 
-Add_Folder("../CHI_MODULES/CHI_THERMOALPHA/lua")
+--Add_Folder("../CHI_MODULES/CHI_THERMOALPHA/lua")
 
 Add_Folder("../ChiMath/Quadratures/lua")
 Add_Folder("../ChiMath/Quadratures/LegendrePoly/lua")
@@ -27,6 +27,6 @@ Add_Folder("../ChiLog/lua")
 
 Add_Folder("../ChiPhysics/lua")
 
-Add_Folder("../CHI_MODULES/CHI_MONTECARLON/lua")
-Add_Folder("../CHI_MODULES/CHI_DIFFUSION/lua")
-Add_Folder("../CHI_MODULES/LinearBoltzmanSolver/lua")
+Add_Folder("../../Modules/MonteCarlon/lua")
+Add_Folder("../../Modules/DiffusionSolver/lua")
+Add_Folder("../../Modules/LinearBoltzmanSolver/lua")

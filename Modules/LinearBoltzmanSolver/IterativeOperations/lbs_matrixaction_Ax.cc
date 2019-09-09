@@ -2,7 +2,7 @@
 #include "../Tools/ksp_data_context.h"
 #include "ChiMesh/SweepUtilities/chi_sweepscheduler.h"
 
-#include "../../CHI_DIFFUSION/Solver/diffusion_solver.h"
+#include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
 typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
 //###################################################################

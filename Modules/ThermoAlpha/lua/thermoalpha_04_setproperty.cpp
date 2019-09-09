@@ -5,7 +5,7 @@
 #include "../hydro_volume/hydro_volume.h"
 #include "../hydro_boundary/hydro_boundary.h"
 
-extern CHI_VECTOR<CHI_THERMOSYSTEM> chithermoSystemStack;
+extern CHI_VECTOR<ThermoAlpha> chithermoSystemStack;
 
 //######################################################### Set property
 /** bool chiThermoSetComponentProperty() Sets the property of a component.
@@ -21,7 +21,7 @@ int chiThermoSetComponentProperty(lua_State *L)
 {
 	//===================================================== Getting the system
 	int systemHandle = lua_tonumber(L,1);
-	CHI_THERMOSYSTEM* curSystem = chithermoSystemStack.GetItem(systemHandle);
+	ThermoAlpha* curSystem = chithermoSystemStack.GetItem(systemHandle);
 	
 	if (curSystem == NULL)
 	{

@@ -5,7 +5,7 @@
 #include "../hydro_volume/hydro_volume.h"
 #include "../hydro_boundary/hydro_boundary.h"
 
-extern CHI_VECTOR<CHI_THERMOSYSTEM> chithermoSystemStack;
+extern CHI_VECTOR<ThermoAlpha> chithermoSystemStack;
 
 /** \defgroup LuaThermoalpha Thermoalpha
  * \ingroup LuaModules*/
@@ -19,7 +19,7 @@ extern CHI_VECTOR<CHI_THERMOSYSTEM> chithermoSystemStack;
 \author Jan*/
 int chiThermoCreateSystem(lua_State *L)
 {
-	CHI_THERMOSYSTEM* newSystem = new CHI_THERMOSYSTEM;
+	ThermoAlpha* newSystem = new ThermoAlpha;
 	
 	int index = chithermoSystemStack.PushItem(newSystem);
 	
@@ -52,7 +52,7 @@ int chiThermoConnectTwoComponents(lua_State *L)
 {
 	//===================================================== Getting the system
 	int systemHandle = lua_tonumber(L,1);
-	CHI_THERMOSYSTEM* curSystem = chithermoSystemStack.GetItem(systemHandle);
+	ThermoAlpha* curSystem = chithermoSystemStack.GetItem(systemHandle);
 	
 	if (curSystem == NULL) {return 0;}
 	
@@ -120,7 +120,7 @@ int chiThermoInitialize(lua_State *L)
 {
 	//===================================================== Getting the system
 	int systemHandle = lua_tonumber(L,1);
-	CHI_THERMOSYSTEM* curSystem = chithermoSystemStack.GetItem(systemHandle);
+	ThermoAlpha* curSystem = chithermoSystemStack.GetItem(systemHandle);
 	
 	
 	lua_pushboolean(L,curSystem->Initialize());

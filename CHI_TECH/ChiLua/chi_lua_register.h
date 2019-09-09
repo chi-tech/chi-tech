@@ -243,27 +243,18 @@ RegisterFunction(chiLBSGetScalarFieldFunctionList)
 //module:Linear Boltzman Solver - Groupset manipulation
 //\ref LuaLBSGroupsets Main page
 RegisterFunction(chiLBSCreateGroup)
-
 RegisterFunction(chiLBSCreateGroupset)
-
 RegisterFunction(chiLBSGroupsetAddGroups)
-
 RegisterFunction(chiLBSGroupsetSetQuadrature)
-
 RegisterFunction(chiLBSGroupsetSetAngleAggDiv)
-
 RegisterFunction(chiLBSGroupsetSetGroupSubsets)
-
 RegisterFunction(chiLBSGroupsetSetIterativeMethod)
-
 RegisterFunction(chiLBSGroupsetSetResidualTolerance)
-
 RegisterFunction(chiLBSGroupsetSetMaxIterations)
-
 RegisterFunction(chiLBSGroupsetSetGMRESRestartIntvl)
-
 RegisterFunction(chiLBSGroupsetSetWGDSA)
-
 RegisterFunction(chiLBSGroupsetSetTGDSA)
 
+//module:Test scripts
+RegisterFunction(chiLuaTest)
 

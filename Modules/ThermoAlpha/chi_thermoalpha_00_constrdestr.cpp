@@ -3,7 +3,7 @@
 //######################################################### Default constructor
 /** Default constructor for a thermo system
 \author Jan*/
-CHI_THERMOSYSTEM::CHI_THERMOSYSTEM()
+ThermoAlpha::ThermoAlpha()
 {
 	fluidOption = TA_FLUID_WATER;
 }

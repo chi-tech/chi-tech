@@ -1,13 +1,5 @@
 namespace chi_lua 
  {
-int chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode);
-int chiThermoCreateVolumeFromCoordinates(int systemHandle, Table point1, Table point2);
-int chiThermoCreateSystem();
-int chiThermoConnectTwoComponents(Handle systemHandle, Component leftComponent, Single sjunc, Component rigtComponent, 0=end-begin, mode);
-int chiThermoInitialize(int systemHandle);
-int chiThermoCreateBC(int systemHandle);
-int chiThermoGetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode);
-int chiThermoCreateSJunction(Handle systemHandle);
 int chiCreateProductQuadrature(int QuadratureType, int Np, int Na);
 int chiCreateQuadrature(int QuadratureType, int NumberOfPoints);
 int chiLegendre(int N, double x);
@@ -68,7 +60,7 @@ int chiMonteCarlonExecute(int SolverHandle);
 int chiDiffusionSetProperty(int SolverHandle, int PropertyIndex, varying Values);
 int chiDiffusionCreateSolver();
 int chiDiffusionInitialize(int SolverHandle);
-int chiDiffusionExecute(int SolverHandle, int SolverHandle);
+int chiDiffusionExecute(int SolverHandle);
 int chiLBSSetProperty(int SolverIndex, int PropertyIndex);
 int chiLBSCreateGroupset(int SolverIndex);
 int chiLBSCreateGroup(int SolverIndex);
@@ -85,6 +77,6 @@ int chiLBSGroupsetSetTGDSA(int SolverIndex, int GroupsetIndex, int MaxIters, flo
 int chiLBSInitialize(int SolverIndex);
 int chiLBSGetFieldFunctionList(int SolverIndex);
 int chiLBSGetScalarFieldFunctionList(int SolverIndex);
-int chiLBSransportCreateSolver();
+int chiLBSCreateSolver();
 int chiLBSExecute(int SolverIndex);
 }
