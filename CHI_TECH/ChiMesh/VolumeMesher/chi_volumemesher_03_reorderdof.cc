@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../CHI_REGION/chi_region.h"
+#include "../Region/chi_region.h"
 #include "../Cell/cell_triangle.h"
 #include "../Cell/cell_polygon.h"
 #include "../Cell/cell_polyhedron.h"

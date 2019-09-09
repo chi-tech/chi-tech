@@ -1,6 +1,6 @@
 #include "chi_ffinterpolation.h"
-#include "../CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../CHI_VOLUMEMESHER/chi_volumemesher.h"
+#include "../MeshHandler/chi_meshhandler.h"
+#include "../VolumeMesher/chi_volumemesher.h"
 
 #include <chi_log.h>
 

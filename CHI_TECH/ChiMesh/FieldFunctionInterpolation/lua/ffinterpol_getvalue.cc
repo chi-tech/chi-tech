@@ -1,9 +1,9 @@
 #include "../../../ChiLua/chi_lua.h"
-#include "../../CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../../CHI_FFINTERPOLATION/Slice/chi_ffinter_slice.h"
-#include "../../CHI_FFINTERPOLATION/Line/chi_ffinter_line.h"
-#include "../../CHI_FFINTERPOLATION/Volume/chi_ffinter_volume.h"
-#include <ChiMesh/CHI_LOGICALVOLUME/chi_mesh_logicalvolume.h>
+#include "../../MeshHandler/chi_meshhandler.h"
+#include "../../FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
+#include "../../FieldFunctionInterpolation/Line/chi_ffinter_line.h"
+#include "../../FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
+#include <ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h>
 #include "../../../ChiPhysics/chi_physics.h"
 
 #include <chi_log.h>

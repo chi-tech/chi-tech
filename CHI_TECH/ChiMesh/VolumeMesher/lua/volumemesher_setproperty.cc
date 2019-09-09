@@ -3,7 +3,7 @@
 #include "../Predefined2D/volmesher_predefined2d.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
-#include "../../CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h"
+#include "../../VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include <chi_log.h>
 extern ChiLog chi_log;

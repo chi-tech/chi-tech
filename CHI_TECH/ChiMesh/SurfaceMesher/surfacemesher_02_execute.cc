@@ -1,6 +1,6 @@
 #include "surfacemesher.h"
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../CHI_REGION/chi_region.h"
+#include "../Region/chi_region.h"
 #include "../Boundary/chi_boundary.h"
 #include<iostream>
 

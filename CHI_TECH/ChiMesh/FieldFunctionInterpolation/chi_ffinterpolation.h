@@ -1,7 +1,7 @@
 #ifndef _chi_ffinterpolation_h
 #define _chi_ffinterpolation_h
 
-#include "../CHI_MESHCONTINUUM/chi_meshcontinuum.h"
+#include "../MeshContinuum/chi_meshcontinuum.h"
 #include "../chi_mesh.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 

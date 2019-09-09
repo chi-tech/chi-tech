@@ -1,8 +1,8 @@
 #include "../../../ChiLua/chi_lua.h"
-#include "../../CHI_MESHHANDLER/chi_meshhandler.h"
-#include "../../CHI_FFINTERPOLATION/Slice/chi_ffinter_slice.h"
-#include "../../CHI_FFINTERPOLATION/Line/chi_ffinter_line.h"
-#include "../../CHI_FFINTERPOLATION/Volume/chi_ffinter_volume.h"
+#include "../../MeshHandler/chi_meshhandler.h"
+#include "../../FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
+#include "../../FieldFunctionInterpolation/Line/chi_ffinter_line.h"
+#include "../../FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
 #include "../../../ChiPhysics/chi_physics.h"
 
 /** \defgroup LuaFFInterpol Field Function Interpolation

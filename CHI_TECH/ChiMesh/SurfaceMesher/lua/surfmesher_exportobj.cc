@@ -2,7 +2,7 @@
 #include "../surfacemesher.h"
 
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/CHI_REGION/chi_region.h>
+#include <ChiMesh/Region/chi_region.h>
 #include <ChiMesh/Boundary/chi_boundary.h>
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 

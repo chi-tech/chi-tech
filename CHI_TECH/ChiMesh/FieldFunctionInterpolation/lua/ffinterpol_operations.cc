@@ -1,5 +1,5 @@
 #include "../../../ChiLua/chi_lua.h"
-#include "../../CHI_MESHHANDLER/chi_meshhandler.h"
+#include "../../MeshHandler/chi_meshhandler.h"
 #include "../../../ChiPhysics/chi_physics.h"
 #include "../chi_ffinterpolation.h"
 
