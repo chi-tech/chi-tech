@@ -195,7 +195,7 @@ RegisterFunction(chiDiffusionSetProperty)
   RegisterConstant(PROPERTY_SIGMAA_MAP,     7);
 
 //module:Linear Boltzman Solver
-RegisterFunction(chiLBSransportCreateSolver)
+RegisterFunction(chiLBSCreateSolver)
 
 RegisterFunction(chiLBSSetProperty)
 RegisterConstant(DISCRETIZATION_METHOD,   1);

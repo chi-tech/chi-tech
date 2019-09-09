@@ -32,7 +32,7 @@ project(${TARGET} C CXX)
 
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/CHI_TECH")
-set(CHI_TECH_MOD "${PROJECT_SOURCE_DIR}/CHI_TECH/CHI_MODULES")
+set(CHI_TECH_MOD "Modules")
 set(CHI_TECH_DEP "${PROJECT_SOURCE_DIR}/CHI_RESOURCES/Dependencies")
 
 set(TRIANGLE_ROOT "${CHI_TECH_DEP}/triangle")
@@ -53,8 +53,7 @@ include(GNUInstallDirs)
 include(Filter)
 
 #================================================ Precompiler flags
-#LUA CONSOLE
-add_definitions(-DNO_FONTGENESIS)
+
 
 #================================================ Compiler flags
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
@@ -120,6 +119,7 @@ set(LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 include_directories("${CHI_TECH_DIR}/ChiLua")
 include_directories("${CHI_TECH_DIR}/ChiMPI")
 include_directories("${CHI_TECH_DIR}/ChiLog")
+include_directories("${PROJECT_SOURCE_DIR}/Modules")
 
 #================================================ Define source directories
 set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc")
