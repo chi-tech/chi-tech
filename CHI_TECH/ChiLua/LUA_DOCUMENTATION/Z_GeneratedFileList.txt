@@ -38,6 +38,7 @@
 ../ChiMesh/FieldFunctionInterpolation/lua/ffinterpol_create.cc
 ../ChiMesh/FieldFunctionInterpolation/lua/ffinterpol_setproperty.cc
 ../ChiMesh/FieldFunctionInterpolation/lua/ffinterpol_export.cc
+../ChiMesh/DomainDecomposition/lua/decomp2ddomain.cc
 ../ChiMPI/lua/mpi_barrier.cc
 ../ChiLog/lua/log.cc
 ../ChiPhysics/lua/physics_addmaterial.cc

@@ -20,6 +20,7 @@ Add_Folder("../ChiMesh/LineMesh/lua")
 Add_Folder("../ChiMesh/SurfaceMesher/lua")
 Add_Folder("../ChiMesh/VolumeMesher/lua")
 Add_Folder("../ChiMesh/FieldFunctionInterpolation/lua")
+Add_Folder("../ChiMesh/DomainDecomposition/lua")
 
 Add_Folder("../ChiMPI/lua")
 Add_Folder("../ChiLog/lua")

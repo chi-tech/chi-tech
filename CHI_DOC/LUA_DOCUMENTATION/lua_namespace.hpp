@@ -50,6 +50,8 @@ int chiFFInterpolationGetValue(int FFIHandle);
 int chiFFInterpolationCreate(int FFITypeIndex);
 int chiFFInterpolationSetProperty(int FFIHandle, int PropertyIndex);
 int chiFFInterpolationExportPython(int FFIHandle, char BaseName);
+int chiDomDecompose2D(int Px, int Py, int RegionHandle);
+int chiDecomposeSurfaceMeshPxPy(mesh Surface, int Px, int Py);
 int chiMPIBarrier();
 int chiLogSetVerbosity(int int_level);
 int chiLog(int LogType);

@@ -594,6 +594,29 @@ int chi_lua::chiFFInterpolationSetProperty(int FFIHandle, int PropertyIndex)
 \author Jan*/
 int chi_lua::chiFFInterpolationExportPython(int FFIHandle, char BaseName)
 {return;} 
+/** \defgroup LuaDomainDecomposition Domain decomposition
+ * \ingroup LuaMesh
+*/
+/** Decomposes a region domain and stores a collection of lists that indicates
+ * which cells go to which process.
+ *
+\param Px int Number of divisions in x.
+\param Py int Number of divisions in y.
+\param RegionHandle int Handle to the region that is to be decomposed.
+\return Handle int Handle to the created collecion.
+\ingroup LuaDomainDecomposition
+\author Jan*/
+int chi_lua::chiDomDecompose2D(int Px, int Py, int RegionHandle)
+{return;} 
+/** Decomposes a surface mesh into block px py elements.
+ *
+\param Surface mesh handler
+\param Px int Number of divisions in x.
+\param Py int Number of divisions in y.
+\ingroup LuaDomainDecomposition
+\author Jan*/
+int chi_lua::chiDecomposeSurfaceMeshPxPy(mesh Surface, int Px, int Py)
+{return;} 
 /** \defgroup chiMPI E MPI Utilities
 ## Lua available variables
 - *chi_location_id* - (int) Process number for current process
