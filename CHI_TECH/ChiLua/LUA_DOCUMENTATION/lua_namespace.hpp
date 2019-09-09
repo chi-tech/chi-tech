@@ -1,4 +1,4 @@
-namespace CHI_LUA 
+namespace ChiLua
  {
 int chiTextSetProperty(int handle, int property, varying value);
 int chiTextCreate(char* name);

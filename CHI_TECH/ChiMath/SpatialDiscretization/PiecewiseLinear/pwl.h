@@ -2,7 +2,7 @@
 #define _chi_discretization_pwl_h
 
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include"../../../ChiMesh/CHI_REGION/chi_region.h"
+#include"../../../ChiMesh/Region/chi_region.h"
 #include "CellViews/pwl_cellbase.h"
 #include "../../Quadratures/quadrature_triangle.h"
 #include "../../Quadratures/quadrature_tetrahedron.h"

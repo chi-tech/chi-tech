@@ -1,8 +1,8 @@
 #include "../../ChiLua/chi_lua.h"
 #include<iostream>
 #include "../chi_physics.h"
-#include "../../ChiMesh/CHI_REGION/chi_region.h"
-#include "../../ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h"
+#include "../../ChiMesh/Region/chi_region.h"
+#include "../../ChiMesh/MeshHandler/chi_meshhandler.h"
 
 extern ChiPhysics chi_physics_handler;
 

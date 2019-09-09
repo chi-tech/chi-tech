@@ -1,6 +1,6 @@
 #include "solver_montecarlon.h"
 
-#include <ChiMesh/CHI_CELL/cell.h>
+#include <ChiMesh/Cell/cell.h>
 #include <ChiPhysics/chi_physics.h>
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>

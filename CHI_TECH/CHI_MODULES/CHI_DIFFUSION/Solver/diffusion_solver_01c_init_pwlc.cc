@@ -1,11 +1,11 @@
 #include "diffusion_solver.h"
 
-#include <ChiMesh/CHI_CELL/cell_slab.h>
-#include <ChiMesh/CHI_CELL/cell_triangle.h>
-#include <ChiMesh/CHI_CELL/cell_polygon.h>
-#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
-#include <ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/chi_volumemesher.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_triangle.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
+#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
 
 #include <ChiTimer/chi_timer.h>
 

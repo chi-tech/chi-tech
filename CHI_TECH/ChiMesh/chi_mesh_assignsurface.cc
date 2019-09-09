@@ -1,6 +1,6 @@
 #include"chi_mesh.h"
-#include"CHI_SURFACEMESH/chi_surfacemesh.h"
-#include"CHI_BOUNDARY/chi_boundary.h"
+#include"SurfaceMesh/chi_surfacemesh.h"
+#include"Boundary/chi_boundary.h"
 
 
 chi_mesh::Boundary* chi_mesh::AssignSurfaceToBoundary(chi_mesh::SurfaceMesh *surface)

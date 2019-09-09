@@ -8,7 +8,7 @@
 #include <ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h>
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
-#include "../../ChiMesh/CHI_SWEEP/chi_sweep.h"
+#include "../../ChiMesh/SweepUtilities/chi_sweep.h"
 #include "../../ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 
 #include <petscksp.h>

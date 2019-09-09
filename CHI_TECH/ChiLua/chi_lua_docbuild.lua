@@ -122,7 +122,7 @@ function searchCXXFile(fileContent)
 			local fLine3 = string.sub(fLine,1,cBegin-1);
 
             
-			wTable[wIndex] 	= wTable[wIndex].."int CHI_LUA::"..fLine3.."("..fParam..")\n".."{return;} \n";
+			wTable[wIndex] 	= wTable[wIndex].."int chi_lua::"..fLine3.."("..fParam..")\n".."{return;} \n";
             
 			--print(fParam)
 			inFunction 		= false;
@@ -357,7 +357,7 @@ end
 --newFile2 = io.open("LUA_DOCUMENTATION/lua_namespace.hpp","w");
 newFile = io.open("../../CHI_DOC/LUA_DOCUMENTATION/lua_functions.c","w");
 newFile2 = io.open("../../CHI_DOC/LUA_DOCUMENTATION/lua_namespace.hpp","w");
-newFile2:write("namespace CHI_LUA \n {\n");
+newFile2:write("namespace chi_lua \n {\n");
 readCXXFile()
 newFile2:write("}\n");
 newFile2:close();

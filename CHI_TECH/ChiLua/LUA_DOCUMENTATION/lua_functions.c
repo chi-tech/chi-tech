@@ -12,28 +12,28 @@ Property numbers\n
 Note if only xscale is provided then it is uniformly applied to yscale and zscale.
 \ingroup LuaText
 \author Jan */
-int CHI_LUA::chiTextSetProperty(int handle, int property, varying value)
+int ChiLua::chiTextSetProperty(int handle, int property, varying value)
 {return;} 
 /** Creates a text object.
 \param name char* Generic name for the object. Doesn't really do anything.
 \return handle int Handle to the text object.
 \ingroup LuaText
 \author Jan */
-int CHI_LUA::chiTextCreate(char* name)
+int ChiLua::chiTextCreate(char* name)
 {return;} 
 /** \brief Assigns a transform to the lines.
 \param index  int Index of the line.
 \param transformIndex  int Index of the transform.
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineSetTransform(int index, int transformIndex)
+int ChiLua::chi3DLineSetTransform(int index, int transformIndex)
 {return;} 
 /** \brief Sets the viewport for the lines.
 \param index  int Index of the line.
 \param viewportIndex  int Index of the viewport.
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineSetviewport(int index, int viewportIndex)
+int ChiLua::chi3DLineSetviewport(int index, int viewportIndex)
 {return;} 
 /** \brief Adjusts line color.
 \param index  int Index of the line.
@@ -43,7 +43,7 @@ int CHI_LUA::chi3DLineSetviewport(int index, int viewportIndex)
 \param a float A Color component.
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineChangeColor(int index, float r, float g, float b, float a)
+int ChiLua::chi3DLineChangeColor(int index, float r, float g, float b, float a)
 {return;} 
 /** \defgroup LuaLine3D 3D Lines
  * Hallo*/
@@ -54,7 +54,7 @@ int CHI_LUA::chi3DLineChangeColor(int index, float r, float g, float b, float a)
 \param z float Z-location.
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineAddVertex(int index, float x, float y, float z)
+int ChiLua::chi3DLineAddVertex(int index, float x, float y, float z)
 {return;} 
 /** \brief Adjusts a specific vertex position.
 \param index  int Index of the line.
@@ -64,7 +64,7 @@ int CHI_LUA::chi3DLineAddVertex(int index, float x, float y, float z)
 \param z float Z-location.
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineChangeVertex(int index, int vertNum, float x, float y, float z)
+int ChiLua::chi3DLineChangeVertex(int index, int vertNum, float x, float y, float z)
 {return;} 
 /** \brief Adjusts stipple options including line width.
 \param index  int Index of the line.
@@ -73,19 +73,19 @@ int CHI_LUA::chi3DLineChangeVertex(int index, int vertNum, float x, float y, flo
 \param lineWidth float Line width.
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineSetStipple(int index, bool stippleFlag, int stippleFactor, float lineWidth)
+int ChiLua::chi3DLineSetStipple(int index, bool stippleFlag, int stippleFactor, float lineWidth)
 {return;} 
 /** \brief Creates a 3D line.
 \param name   char*  Line name
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineCreate(char* name)
+int ChiLua::chi3DLineCreate(char* name)
 {return;} 
 /** \brief Creates a 3D line from a chi_mesh::LineMesh.
 \param name   char*  Line name
 \ingroup LuaLine3D
 \author Jan*/
-int CHI_LUA::chi3DLineCreateFromLineMesh(char* name)
+int ChiLua::chi3DLineCreateFromLineMesh(char* name)
 {return;} 
 /** chiLightSetProperty(char* lightName, char* propertyName, variant value).
 - lightName. Name of the object.
@@ -93,25 +93,25 @@ int CHI_LUA::chi3DLineCreateFromLineMesh(char* name)
 - value. Value the property should take.
 \ingroup LuaLights
 \author Jan*/
-int CHI_LUA::chiLightSetProperty()
+int ChiLua::chiLightSetProperty()
 {return;} 
 /**\ingroup LuaLights Lights*/
 /** chiLightCreate(char* name). Creates a new light.
  \ingroup LuaLights
 \author Jan*/
-int CHI_LUA::chiLightCreate()
+int ChiLua::chiLightCreate()
 {return;} 
 /**\defgroup LuaShadows Shadows*/
 /** Simple function to turn on shadows.
  *
 \ingroup LuaShadows
 \author Jan*/
-int CHI_LUA::chiShadowsEnable()
+int ChiLua::chiShadowsEnable()
 {return;} 
 /** Simple function to turn on shadows.
 \ingroup LuaShadows
 \author Jan*/
-int CHI_LUA::chiShadowsDisable()
+int ChiLua::chiShadowsDisable()
 {return;} 
 /** \brief Adds a vertex to the line vertex stack.
 \param index  int Index of the line.
@@ -120,7 +120,7 @@ int CHI_LUA::chiShadowsDisable()
 \param z float Z-location.
 \ingroup LuaLine
 \author Jan*/
-int CHI_LUA::chiLineAddVertex(int index, float x, float y, float z)
+int ChiLua::chiLineAddVertex(int index, float x, float y, float z)
 {return;} 
 /** \brief Adjusts line color.
 \param index  int Index of the line.
@@ -130,7 +130,7 @@ int CHI_LUA::chiLineAddVertex(int index, float x, float y, float z)
 \param a float A Color component.
 \ingroup LuaLine
 \author Jan*/
-int CHI_LUA::chiLineChangeColor(int index, float r, float g, float b, float a)
+int ChiLua::chiLineChangeColor(int index, float r, float g, float b, float a)
 {return;} 
 /** \brief Adjusts stipple options including line width.
 \param index  int Index of the line.
@@ -139,14 +139,14 @@ int CHI_LUA::chiLineChangeColor(int index, float r, float g, float b, float a)
 \param lineWidth float Line width.
 \ingroup LuaLine
 \author Jan*/
-int CHI_LUA::chiLineSetStipple(int index, bool stippleFlag, int stippleFactor, float lineWidth)
+int ChiLua::chiLineSetStipple(int index, bool stippleFlag, int stippleFactor, float lineWidth)
 {return;} 
 /** \brief Sets the viewport for the lines.
 \param index  int Index of the line.
 \param viewportIndex  int Index of the viewport.
 \ingroup LuaLine
 \author Jan*/
-int CHI_LUA::chiLineSetviewport(int index, int viewportIndex)
+int ChiLua::chiLineSetviewport(int index, int viewportIndex)
 {return;} 
 /** \defgroup LuaLine 2D Lines
  * Hallo*/
@@ -154,7 +154,7 @@ int CHI_LUA::chiLineSetviewport(int index, int viewportIndex)
 \param name   char*  Line name
 \ingroup LuaLine
 \author Jan*/
-int CHI_LUA::chiLineCreate(char* name)
+int ChiLua::chiLineCreate(char* name)
 {return;} 
 /** \brief Adjusts a specific vertex position.
 \param index  int Index of the line.
@@ -164,32 +164,32 @@ int CHI_LUA::chiLineCreate(char* name)
 \param z float Z-location.
 \ingroup LuaLine
 \author Jan*/
-int CHI_LUA::chiLineChangeVertex(int index, int vertNum, float x, float y, float z)
+int ChiLua::chiLineChangeVertex(int index, int vertNum, float x, float y, float z)
 {return;} 
 /** chiCreateObject(char* name). Loads a surface mesh from a file.
 - name. Name of the object (null by default).
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectCreate()
+int ChiLua::chiObjectCreate()
 {return;} 
 /**\defgroup LuaObjects Objects*/
 /** Exports a graphical surface to a wavefront .obj file.
 \param SurfaceHandle int Handle to the surface to be exported.
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectExportSurface(int SurfaceHandle)
+int ChiLua::chiObjectExportSurface(int SurfaceHandle)
 {return;} 
 /** chiLoadSurface(char* fileName). Loads a surface mesh from a file.
 - fileName. Name of the .obj file that contains the surface mesh.
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectLoadSurface()
+int ChiLua::chiObjectLoadSurface()
 {return;} 
 /** Loads a surface mesh from a chi_mesh::SurfaceMesh object.
 \param Handle int Handle to the surface mesh.
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectLoadSurfaceFromSurfaceMesh(int Handle)
+int ChiLua::chiObjectLoadSurfaceFromSurfaceMesh(int Handle)
 {return;} 
 /**\defgroup LuaObjects Objects*/
 /** chiObjectAddSurface(int objectIndex, int surfaceIndex). Loads a surface mesh from a file.
@@ -197,13 +197,13 @@ int CHI_LUA::chiObjectLoadSurfaceFromSurfaceMesh(int Handle)
 - surfaceIndex. Numerical index of the surface in the surfaceMesh stack.
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectAddSurface()
+int ChiLua::chiObjectAddSurface()
 {return;} 
 /**chiObjectQuery(int query, var param1, ..., var param N). Queries the
 object stack for miscellaneous properties.
  \ingroup LuaObjects
 \author G-mo*/
-int CHI_LUA::chiObjectQuery()
+int ChiLua::chiObjectQuery()
 {return;} 
 /** chiObjectSetProperty(char* objectName, char* propertyName, variant value). Creates a material with default properties.
 - objectName. Name of the object.
@@ -211,13 +211,13 @@ int CHI_LUA::chiObjectQuery()
 - value. Value the property should take.
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectSetProperty()
+int ChiLua::chiObjectSetProperty()
 {return;} 
 /** chiObjectGetCentroid(char* surfaceName). Determines the centroid of a surface.
 Returns x,y,z.
 \ingroup LuaObjects
 \author Jan */
-int CHI_LUA::chiObjectGetCentroid()
+int ChiLua::chiObjectGetCentroid()
 {return;} 
 /**\defgroup LuaTextures Textures */
 /** chiTextureLoad(char* filePath). Loads a texture to the graphics
@@ -225,7 +225,7 @@ int CHI_LUA::chiObjectGetCentroid()
 - filePath. 	Path to the file.
 \ingroup LuaTextures
 \author Jan*/
-int CHI_LUA::chiTextureLoad()
+int ChiLua::chiTextureLoad()
 {return;} 
 /** \defgroup Lua_General General
 */
@@ -233,7 +233,7 @@ int CHI_LUA::chiTextureLoad()
 \param time int Time to sleep in milliseconds.
 \ingroup Lua_General
 \author Jan*/
-int CHI_LUA::chiSleep(int time)
+int ChiLua::chiSleep(int time)
 {return;} 
 /** \defgroup LuaDisplayerControl Displayer Control
  * */
@@ -241,7 +241,7 @@ int CHI_LUA::chiSleep(int time)
 \ingroup LuaDisplayerControl
 \return int Displayer handle.
 \author Jan*/
-int CHI_LUA::chiDisplayerCreate()
+int ChiLua::chiDisplayerCreate()
 {return;} 
 /**Sets the viewport coordinates of the currently active displayer.
 \param xmin double
@@ -250,14 +250,14 @@ int CHI_LUA::chiDisplayerCreate()
 \param ymax double
 \ingroup LuaDisplayerControl
 \author Jan*/
-int CHI_LUA::chiDisplayerSetViewport(double xmin, double ymin, double xmax, double ymax)
+int ChiLua::chiDisplayerSetViewport(double xmin, double ymin, double xmax, double ymax)
 {return;} 
 /**Gets the viewport coordinates of the currently active displayer.
  *
 \return xmin,ymin,xmax,ymax float Viewport dimensions.
 \ingroup LuaDisplayerControl
 \author Jan*/
-int CHI_LUA::chiDisplayerGetViewport()
+int ChiLua::chiDisplayerGetViewport()
 {return;} 
 /** \defgroup LuaSceneControl Scene control
  * Hallo*/
@@ -265,7 +265,7 @@ int CHI_LUA::chiDisplayerGetViewport()
 \param flag bool Flag choice for 2D option. true=scene is 2D.
 \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiSet2D(bool flag)
+int ChiLua::chiSet2D(bool flag)
 {return;} 
 /** \brief Simple function to enable a scene's 3D content.
  *
@@ -273,14 +273,14 @@ int CHI_LUA::chiSet2D(bool flag)
  *
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiSet3D(bool flag)
+int ChiLua::chiSet3D(bool flag)
 {return;} 
 /** \brief Binds the scene for new object creation.
  *
 \param number int Scene number to bind.
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiBindScene(int number)
+int ChiLua::chiBindScene(int number)
 {return;} 
 /** \brief Gets the currently bound scene.
  *
@@ -288,21 +288,21 @@ int CHI_LUA::chiBindScene(int number)
  * \return displayer   int Displayer number of the displayer currently selected.
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiGetScene()
+int ChiLua::chiGetScene()
 {return;} 
 /** \brief Gets the number of scene currently available.
  *
  * \return sceneCount int the number of scenes available.
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiGetSceneCount()
+int ChiLua::chiGetSceneCount()
 {return;} 
 /** \brief Creates a new scene.
  *
  * \return sceneNumber int The number index of the newly created scene.
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiCreateScene()
+int ChiLua::chiCreateScene()
 {return;} 
 /** \brief Requests a refresh of the scene.
  *
@@ -310,14 +310,14 @@ int CHI_LUA::chiCreateScene()
  *
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiRequestSceneRefresh(int sceneNumber)
+int ChiLua::chiRequestSceneRefresh(int sceneNumber)
 {return;} 
 /** \brief Set the refresh mode of a scene.
  *
 \param sceneMode int Update mode of the scene.
  * \ingroup LuaSceneControl
 \author Jan*/
-int CHI_LUA::chiSetSceneUpdateMode(int sceneMode)
+int ChiLua::chiSetSceneUpdateMode(int sceneMode)
 {return;} 
 /** bool chiViewportSetProperty() Set viewport dimensions.
  * Creates a viewport.
@@ -327,7 +327,7 @@ int CHI_LUA::chiSetSceneUpdateMode(int sceneMode)
 \param ymax   double  Viewport y max
 \ingroup LuaViewports
 \author Gmo */
-int CHI_LUA::chiViewportSetProperty(double xmin, double ymin, double xmax, double ymax)
+int ChiLua::chiViewportSetProperty(double xmin, double ymin, double xmax, double ymax)
 {return;} 
 /** \defgroup LuaViewports Viewports*/
 /** int chiViewportCreate() Creates a viewport.
@@ -337,31 +337,31 @@ int CHI_LUA::chiViewportSetProperty(double xmin, double ymin, double xmax, doubl
 \return viewportIndex int Index of the newly created viewport.
 \ingroup LuaViewports
 \author Gmo */
-int CHI_LUA::chiViewportCreate(str name)
+int ChiLua::chiViewportCreate(str name)
 {return;} 
 /** chiGraphicsTranslateCamera(char* name). Allows the camera to change its orientation.
 \ingroup LuaCameras
 \author Jan, GMO */
-int CHI_LUA::chiGraphicsOrientCamera()
+int ChiLua::chiGraphicsOrientCamera()
 {return;} 
 /** chiGraphicsCameraType(float value). Sets camera type (1=Perspective,!1=Orthographic).
 \ingroup LuaCameras
 \author Jan */
-int CHI_LUA::chiGraphicsCameraType()
+int ChiLua::chiGraphicsCameraType()
 {return;} 
 /** chiGraphicsTranslateCamera(char* name). Manual changes the camera's rotation.
 \ingroup LuaCameras
 \author Jan, GMO */
-int CHI_LUA::chiGraphicsRotateCamera()
+int ChiLua::chiGraphicsRotateCamera()
 {return;} 
 /** chiGraphicsGetCameraPosition(char* name). Retrieves the camera's rotation.
 \author GMO */
-int CHI_LUA::chiGraphicsGetCameraRotation()
+int ChiLua::chiGraphicsGetCameraRotation()
 {return;} 
 /** chiGraphicsTranslateCamera(char* name). Allows the translation of the camera according to the normal.
 \ingroup LuaCameras
 \author Jan, GMO */
-int CHI_LUA::chiGraphicsTranslateCamera()
+int ChiLua::chiGraphicsTranslateCamera()
 {return;} 
 /** chiGraphicsCameraOrthoWidth(float value). Sets camera orthographic width.
 \param orthoWidth float       Width of the orthographic window.
@@ -369,22 +369,22 @@ int CHI_LUA::chiGraphicsTranslateCamera()
 \note If the camera is part of a setup for displaying text then orthoRound should be set to true.
 \ingroup LuaCameras
 \author Jan */
-int CHI_LUA::chiGraphicsCameraOrthoWidth(float orthoWidth, bool orthoRound=false)
+int ChiLua::chiGraphicsCameraOrthoWidth(float orthoWidth, bool orthoRound=false)
 {return;} 
 /**\defgroup LuaCameras Cameras*/
 /** chiGraphicsCameraFOV(char* name). Sets camera FOV.
 \ingroup LuaCameras
 \author Jan */
-int CHI_LUA::chiGraphicsCameraFOV()
+int ChiLua::chiGraphicsCameraFOV()
 {return;} 
 /** chiGraphicsTranslateCamera(char* name). Allows for a camera to be set.
 \ingroup LuaCameras
 \author Jan, GMO */
-int CHI_LUA::chiGraphicsPositionCamera()
+int ChiLua::chiGraphicsPositionCamera()
 {return;} 
 /** chiGraphicsGetCameraPosition(char* name). Retrieves the camera's position.
 \author GMO */
-int CHI_LUA::chiGraphicsGetCameraPosition()
+int ChiLua::chiGraphicsGetCameraPosition()
 {return;} 
 /** \defgroup LuaWindowControl Window control
  * Hallo*/
@@ -395,7 +395,7 @@ int CHI_LUA::chiGraphicsGetCameraPosition()
 \return newSceneNumber int Handle to the new scene
 \ingroup LuaWindowControl
 \author Jan*/
-int CHI_LUA::chiWindowCreate(char name, bool defer)
+int ChiLua::chiWindowCreate(char name, bool defer)
 {return;} 
 /** chiSetWindowProperties(int xSize, int ySize, [int xPos], [int yPos]). Sets the window size for the
  * current scene. This does not change any displayers.
@@ -405,57 +405,57 @@ int CHI_LUA::chiWindowCreate(char name, bool defer)
 - yPos,  the y position of the window in pixels. (If omitted, current y location is used)
 \ingroup LuaWindowControl
 \author Jan */
-int CHI_LUA::chiSetWindowProperties()
+int ChiLua::chiSetWindowProperties()
 {return;} 
 /** Sets the scene for the selected window.
 \author Jan */
-int CHI_LUA::chiSetWindowScene()
+int ChiLua::chiSetWindowScene()
 {return;} 
 /** chiGetWindowProperties(). Gets the window size.
 \author Jan */
-int CHI_LUA::chiGetWindowProperties()
+int ChiLua::chiGetWindowProperties()
 {return;} 
 /** Maximizes a window.
 \author Jan.*/
-int CHI_LUA::chiWindowMaximize()
+int ChiLua::chiWindowMaximize()
 {return;} 
 /** Normal displays a window (i.e. Not-maximized or Not-minimized).
 \author Jan.*/
-int CHI_LUA::chiWindowNormalize()
+int ChiLua::chiWindowNormalize()
 {return;} 
-int CHI_LUA::chiWindowSetCursor()
+int ChiLua::chiWindowSetCursor()
 {return;} 
 /** \defgroup LuaText Text control
  * Hallo*/
 /** chiSetLabel(char* name, char* string,int x,int y, [color_r,color_g,color_b,scale,font]).
 Sets a label to be displayed.
 */
-int CHI_LUA::chiSetLabel()
+int ChiLua::chiSetLabel()
 {return;} 
 /** chiSetLabel(char* name, char* string,int x,int y, [color_r,color_g,color_b,scale,font]).
 Sets a label to be displayed.
 */
-int CHI_LUA::chiSetLabelProperty()
+int ChiLua::chiSetLabelProperty()
 {return;} 
 /**chiObjectQuery(int query, var param1, ..., var param N). Queries the
 object stack for miscellaneous properties.
 \param queryNumber int Number of the query.
 \ingroup LuaTransforms
 \author G-mo*/
-int CHI_LUA::chiTransformQuery(int queryNumber)
+int ChiLua::chiTransformQuery(int queryNumber)
 {return;} 
 /** chiTransformGet(). Get Transform parameters.
 \param transformIndex int Index number of the transform.
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformGet(int transformIndex)
+int ChiLua::chiTransformGet(int transformIndex)
 {return;} 
 /** \defgroup LuaTransforms Transforms*/
 /** CreateTransform(char* name). Creates a transform and places it on the tool transform-stack.
 \param name char* Name of the transform.
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformCreate(char* name)
+int ChiLua::chiTransformCreate(char* name)
 {return;} 
 /** chiTransformSetScale(). Sets Transform scale
 \param transformHandle int Handle to the transform
@@ -464,7 +464,7 @@ int CHI_LUA::chiTransformCreate(char* name)
 \param dz double Scale factor z
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformSetScale(int transformHandle, double dx, double dy, double dz)
+int ChiLua::chiTransformSetScale(int transformHandle, double dx, double dy, double dz)
 {return;} 
 /** chiTransformSetRotationPoint(char*\int transformName, double dx, double dy, double dz). Sets Transform rotation point.
 \param transformHandle int Handle to the transform
@@ -473,7 +473,7 @@ int CHI_LUA::chiTransformSetScale(int transformHandle, double dx, double dy, dou
 \param dz double Rotation point z
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformSetRotationPoint(int transformHandle, double dx, double dy, double dz)
+int ChiLua::chiTransformSetRotationPoint(int transformHandle, double dx, double dy, double dz)
 {return;} 
 /** chiTransformSetRotation(char*\int transformName, double dx, double dy, double dz). Sets Transform rotation
 \param transformHandle int Handle to the transform
@@ -482,14 +482,14 @@ int CHI_LUA::chiTransformSetRotationPoint(int transformHandle, double dx, double
 \param dz double Rotation in degrees around axis
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformSetRotation(int transformHandle, double dx, double dy, double dz)
+int ChiLua::chiTransformSetRotation(int transformHandle, double dx, double dy, double dz)
 {return;} 
 /** chiTransformSetParent() Sets the parent of an equation.
 \param childIndex int Index of the child.
 \param parentIndex int Index of the parent.
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformSetParent(int childIndex, int parentIndex)
+int ChiLua::chiTransformSetParent(int childIndex, int parentIndex)
 {return;} 
 /** chiTransformSetTranslation(char*\int transformName, double dx, double dy, double dz). Sets Transform translation
 \param transformHandle int Handle to the transform
@@ -498,26 +498,26 @@ int CHI_LUA::chiTransformSetParent(int childIndex, int parentIndex)
 \param dz double Translation distance in z
 \ingroup LuaTransforms
 \author Jan*/
-int CHI_LUA::chiTransformSetTranslation(int transformHandle, double dx, double dy, double dz)
+int ChiLua::chiTransformSetTranslation(int transformHandle, double dx, double dy, double dz)
 {return;} 
 /**chiMaterialQuery(int query, var param1, ..., var param N). Queries the
 material stack for miscellaneous properties.
 \ingroup LuaMaterials
 \author Jan*/
-int CHI_LUA::chiMaterialQuery()
+int ChiLua::chiMaterialQuery()
 {return;} 
 /** chiMaterialGeneratePreview().
  *
 \ingroup LuaMaterials
 \author G-mo*/
-int CHI_LUA::chiMaterialGeneratePreview()
+int ChiLua::chiMaterialGeneratePreview()
 {return;} 
 /**\defgroup LuaMaterials Materials*/
 /** chiCreateMaterial(char* name). Creates a material with default properties.
 - name. Name of the material (null by default).
 \ingroup LuaMaterials
 \author Jan*/
-int CHI_LUA::chiMaterialCreate()
+int ChiLua::chiMaterialCreate()
 {return;} 
 /** chiMaterialSetProperty(char* materialName, char* propertyName, variant value). Creates a material with default properties.
 - materialName. Name of the material.
@@ -534,13 +534,13 @@ int CHI_LUA::chiMaterialCreate()
 |EmissiveTexture		   |Name of the texture (normally the actual filepath) for the Emissive texture.   [char*] |
 \ingroup LuaMaterials
 \author Jan & Reptation*/
-int CHI_LUA::chiMaterialSetProperty()
+int ChiLua::chiMaterialSetProperty()
 {return;} 
 /**chiMaterialUpdate(int matlIndex, luatable materialTable). Assigns the
 indicated material properties to the given table.
 \ingroup LuaMaterials
 \author Jan*/
-int CHI_LUA::chiMaterialUpdate()
+int ChiLua::chiMaterialUpdate()
 {return;} 
 /** Converts a 3D point to window space.
 x,y,z
@@ -551,14 +551,14 @@ returns x,y;
 12 13 14 15
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chi3DPointToScreen()
+int ChiLua::chi3DPointToScreen()
 {return;} 
 /** \defgroup LuaPoints Manipulating points */
 /** Creates a point collection.
 name    Line name
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chiPointCreate()
+int ChiLua::chiPointCreate()
 {return;} 
 /** Adds a vertex to the point collection vertex stack.
 name     Line name
@@ -567,7 +567,7 @@ float    y
 float    z
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chiPointAddVertex()
+int ChiLua::chiPointAddVertex()
 {return;} 
 /** Adjusts a specific vertex position.
 name     Line name
@@ -577,7 +577,7 @@ float    y
 float    z
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chiPointChangeVertex()
+int ChiLua::chiPointChangeVertex()
 {return;} 
 /** Converts a 3D point to window space.
 x,y,z
@@ -588,13 +588,13 @@ returns x,y;
 12 13 14 15
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chiScreenTo3DPoint()
+int ChiLua::chiScreenTo3DPoint()
 {return;} 
 /** Creates a point collection.
 name    Line name
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chi3DPointCreate()
+int ChiLua::chi3DPointCreate()
 {return;} 
 /** Adds a vertex to the point collection vertex stack.
 name     Line name
@@ -603,7 +603,7 @@ float    y
 float    z
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chi3DPointAddVertex()
+int ChiLua::chi3DPointAddVertex()
 {return;} 
 /** Adjusts a specific vertex position.
 name     Line name
@@ -613,27 +613,27 @@ float    y
 float    z
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chi3DPointChangeVertex()
+int ChiLua::chi3DPointChangeVertex()
 {return;} 
 /** Assigns a transform to the line
 name     Line name
 name     Transform name
 \ingroup LuaPoints
 \author Jan*/
-int CHI_LUA::chi3DPointSetTransform()
+int ChiLua::chi3DPointSetTransform()
 {return;} 
 /** Reloads the shaders
  *
  \ingroup LuaShaders
 \author Gmo*/
-int CHI_LUA::chiReloadShader()
+int ChiLua::chiReloadShader()
 {return;} 
 /**\defgroup LuaShaders Shaders*/
 /**chiObjectQuery(int query, var param1, ..., var param N). Queries the
 object stack for miscellaneous properties.
  \ingroup LuaShaders
 \author G-mo*/
-int CHI_LUA::chiShaderQuery()
+int ChiLua::chiShaderQuery()
 {return;} 
 /** \defgroup LuaPie Raspberry Pie
  * Hallo*/
@@ -641,52 +641,52 @@ int CHI_LUA::chiShaderQuery()
 \param pinNumber int GPIO pin number to be exported.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieExportPin(int pinNumber)
+int ChiLua::chiPieExportPin(int pinNumber)
 {return;} 
 /** \brief Sets a pin to READ or WRITE.
 \param pinNumber int GPIO pin number.
 \param mode int 0=Read, 1=Write.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieSetPinMode(int pinNumber, int mode)
+int ChiLua::chiPieSetPinMode(int pinNumber, int mode)
 {return;} 
 /** \brief Sets a pin to HIGH or LOW.
 \param pinNumber int GPIO pin number.
 \param mode int 0=Low, 1=High
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieSetPinValue(int pinNumber, int mode)
+int ChiLua::chiPieSetPinValue(int pinNumber, int mode)
 {return;} 
 /** \brief Reads a pin.
 \param pinNumber int GPIO pin number.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieGetPinValue(int pinNumber)
+int ChiLua::chiPieGetPinValue(int pinNumber)
 {return;} 
 /** \brief Initializes SPI.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieInitSPI()
+int ChiLua::chiPieInitSPI()
 {return;} 
 /** \brief Reads an SPI MCP3008 chip unbuffered.
 \param channelNumber int Channel 0-7 to be read off the MCP3008 chip.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieReadSPIChannel(int channelNumber)
+int ChiLua::chiPieReadSPIChannel(int channelNumber)
 {return;} 
 /** \brief Sets an SPI MCP3008 chip to either be buffered or not.
 \param channelNumber int Channel 0-7 to be read off the MCP3008 chip.
 \param bufferFlag bool true=Is buffered, false= Not buffered.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieSetSPIBuffer(int channelNumber, bool bufferFlag)
+int ChiLua::chiPieSetSPIBuffer(int channelNumber, bool bufferFlag)
 {return;} 
 /** \brief Reads an SPI MCP3008 chip buffer.
 \param channelNumber int Channel 0-7 to be read off the MCP3008 chip.
 \param bufferPos int Buffer position (0 to 999).
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieGetSPIBuffer(int channelNumber, int bufferPos)
+int ChiLua::chiPieGetSPIBuffer(int channelNumber, int bufferPos)
 {return;} 
 /** \brief Initializes the Pi's UART serial communication.
 \param baudrate   int Can be any of the <I>Serial Options</I>.
@@ -703,18 +703,18 @@ chipie.InitializeSerial(PI3_BAUD_9600);
 \endexample
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieInitializeSerial(int baudrate)
+int ChiLua::chiPieInitializeSerial(int baudrate)
 {return;} 
 /** \brief Writes a message to the serial port.
 \param message char Message to be sent.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieSerialWrite(char message)
+int ChiLua::chiPieSerialWrite(char message)
 {return;} 
 /** \brief Reads a message from the serial port.
 \ingroup LuaPie
 \author Jan*/
-int CHI_LUA::chiPieSerialRead()
+int ChiLua::chiPieSerialRead()
 {return;} 
 /** bool chiThermoSetComponentProperty() Sets the property of a component.
  *
@@ -725,7 +725,7 @@ int CHI_LUA::chiPieSerialRead()
  \return Success=true
 \ingroup LuaThermoalpha
 \author Jan*/
-int CHI_LUA::chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode)
+int ChiLua::chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode)
 {return;} 
 /** bool chiThermoGetComponentProperty() Sets the property of a component.
  *
@@ -736,7 +736,7 @@ int CHI_LUA::chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Pr
  \return Success=true
 \ingroup LuaThermoalpha
 \author Jan*/
-int CHI_LUA::chiThermoGetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode)
+int ChiLua::chiThermoGetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode)
 {return;} 
 /** \defgroup LuaThermoalpha Thermoalpha
  * Hallo*/
@@ -744,7 +744,7 @@ int CHI_LUA::chiThermoGetComponentProperty(Handle sysHndle, Handle compHndle, Pr
 \return Returns a unique handle for the created system.
 \ingroup LuaThermoalpha
 \author Jan*/
-int CHI_LUA::chiThermoCreateSystem()
+int ChiLua::chiThermoCreateSystem()
 {return;} 
 /** void chiThermoConnectTwoComponents() Connect two hydrodynamic components using a single junction.
 \param systemHandle  Handle to the system to which all the components belong.
@@ -754,14 +754,14 @@ int CHI_LUA::chiThermoCreateSystem()
 \param mode 0=end-begin, 1=begin-end, 2=end-end,
 \ingroup LuaThermoalpha
 \author Jan*/
-int CHI_LUA::chiThermoConnectTwoComponents(Handle systemHandle, Component leftComponent, Single sjunc, Component rigtComponent, 0=end-begin, mode)
+int ChiLua::chiThermoConnectTwoComponents(Handle systemHandle, Component leftComponent, Single sjunc, Component rigtComponent, 0=end-begin, mode)
 {return;} 
 /** bool chiThermoInitialize() Initializes system.
 \param systemHandle int Handle to the system which should be initialized.
 \return Returns true if successfully initialized and false otherwise.
 \ingroup LuaThermoalpha
 \author Jan*/
-int CHI_LUA::chiThermoInitialize(int systemHandle)
+int ChiLua::chiThermoInitialize(int systemHandle)
 {return;} 
 /** int chiThermoCreateVolumeFromCoordinates() Creates a hydrodynamic volume using a start and end coordinate.
 \params systemHandle int Handle to the system to which the volume belongs.

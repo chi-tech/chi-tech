@@ -1,10 +1,10 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Predefined2D/volmesher_predefined2d.h>
-#include <ChiMesh/CHI_SURFACEMESHER/Triangle/triangle_mesher.h>
-#include <ChiMesh/CHI_SURFACEMESHER/Predefined/surfmesher_predefined.h>
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
+#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
+#include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
+#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/SurfaceMesher/Triangle/triangle_mesher.h>
+#include <ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h>
 
 #include <chi_log.h>
 

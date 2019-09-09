@@ -4,7 +4,7 @@
 #include <ChiPhysics/PhysicsMaterial/property00_thermconductivity.h>
 #include <ChiPhysics/PhysicsMaterial/property01_scalarvalue.h>
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
-#include <ChiMesh/CHI_FFINTERPOLATION/chi_ffinterpolation.h>
+#include <ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h>
 #include <ChiPhysics/chi_physics.h>
 extern ChiPhysics chi_physics_handler;
 

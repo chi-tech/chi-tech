@@ -1,8 +1,8 @@
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
-#include <ChiMesh/CHI_CELL/cell.h>
-#include <ChiMesh/CHI_CELL/cell_slab.h>
-#include <ChiMesh/CHI_CELL/cell_polygon.h>
-#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
 
 //###################################################################
 /**Computes the point wise change between phi_new and phi_old.*/

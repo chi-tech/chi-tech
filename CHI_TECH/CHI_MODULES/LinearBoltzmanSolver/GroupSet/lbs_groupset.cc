@@ -1,9 +1,9 @@
 #include "lbs_groupset.h"
 
-#include <ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
+#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
+#include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
+#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
 //###################################################################
 /**Computes the discrete to moment operator.*/

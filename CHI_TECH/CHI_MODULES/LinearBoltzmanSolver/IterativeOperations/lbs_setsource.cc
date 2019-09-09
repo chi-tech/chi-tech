@@ -1,13 +1,13 @@
 #include "CHI_MODULES/LinearBoltzmanSolver/lbs_linear_boltzman_solver.h"
 
 #include "CHI_MODULES/LinearBoltzmanSolver/SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
-#include "ChiMesh/CHI_SWEEP/chi_SPDS.h"
+#include "ChiMesh/SweepUtilities/chi_SPDS.h"
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
-#include <ChiMesh/CHI_MESHHANDLER/chi_meshhandler.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Extruder/volmesher_extruder.h>
-#include <ChiMesh/CHI_VOLUMEMESHER/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
+#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
+#include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
+#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
 #include "ChiTimer/chi_timer.h"
 

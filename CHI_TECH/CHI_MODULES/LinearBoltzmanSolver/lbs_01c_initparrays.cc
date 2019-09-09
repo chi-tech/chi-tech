@@ -1,7 +1,7 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/CHI_CELL/cell_slab.h>
-#include <ChiMesh/CHI_CELL/cell_polygon.h>
-#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
 #include <PiecewiseLinear/pwl.h>
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
 #include <PiecewiseLinear/CellViews/pwl_polygon.h>

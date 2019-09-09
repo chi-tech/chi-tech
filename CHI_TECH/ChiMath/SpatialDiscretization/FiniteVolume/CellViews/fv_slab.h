@@ -2,8 +2,8 @@
 #define _fv_slab_h
 
 #include "fv_cellbase.h"
-#include <ChiMesh/CHI_CELL/cell_slab.h>
-#include <ChiMesh/CHI_MESHCONTINUUM/chi_meshcontinuum.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 
 //######################################################### Class def

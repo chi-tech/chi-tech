@@ -4,8 +4,8 @@
 #include "../pwl.h"
 #include <vector>
 #include "../../../Quadratures/quadrature.h"
-#include "../../../../ChiMesh/CHI_CELL/cell_polyhedron.h"
-#include "../../../../ChiMesh/CHI_LOGICALVOLUME/chi_mesh_logicalvolume.h"
+#include "../../../../ChiMesh/Cell/cell_polyhedron.h"
+#include "../../../../ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #define ON_SURFACE true
 

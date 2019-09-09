@@ -3,7 +3,7 @@
 
 #include "../pwl.h"
 #include <vector>
-#include "../../../../ChiMesh/CHI_CELL/cell_polygon.h"
+#include "../../../../ChiMesh/Cell/cell_polygon.h"
 
 /**For a given side(triangle), this structure holds the values of
  * shape functions at each quadrature point.*/

@@ -1,7 +1,7 @@
 #include "chi_mesh.h"
 #include<iostream>
 
-#include "CHI_MESHHANDLER/chi_meshhandler.h"
+#include "MeshHandler/chi_meshhandler.h"
 
 extern std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
 extern int                                  chi_current_mesh_handler;

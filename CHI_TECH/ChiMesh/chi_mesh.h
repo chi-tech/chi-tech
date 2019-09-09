@@ -136,7 +136,7 @@ namespace chi_mesh
 #include"chi_mesh_interface.h"
 #include "chi_mesh_cellset.h"
 
-#include "CHI_SWEEP/chi_sweep.h"
+#include "SweepUtilities/chi_sweep.h"
 
 
 

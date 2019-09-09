@@ -1,8 +1,8 @@
 #include "diffusion_solver.h"
 
-#include <ChiMesh/CHI_CELL/cell_slab.h>
-#include <ChiMesh/CHI_CELL/cell_polygon.h>
-#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <CHI_MODULES/LinearBoltzmanSolver/Tools/kspmonitor_npt.h>
 

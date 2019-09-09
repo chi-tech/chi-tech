@@ -4,7 +4,7 @@
 
 
 
-#include "../CHI_MESHHANDLER/chi_meshhandler.h"
+#include "../MeshHandler/chi_meshhandler.h"
 #include "../chi_mesh_edgeloops.h"
 
 #include <chi_log.h>

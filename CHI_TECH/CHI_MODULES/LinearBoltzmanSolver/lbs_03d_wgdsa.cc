@@ -1,9 +1,9 @@
 #include "lbs_linear_boltzman_solver.h"
 
-#include <ChiMesh/CHI_CELL/cell.h>
-#include <ChiMesh/CHI_CELL/cell_slab.h>
-#include <ChiMesh/CHI_CELL/cell_polygon.h>
-#include <ChiMesh/CHI_CELL/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <CHI_MODULES/CHI_DIFFUSION/Solver/diffusion_solver.h>
 #include <CHI_MODULES/CHI_DIFFUSION/Boundaries/chi_diffusion_bndry_dirichlet.h>
