@@ -3,13 +3,13 @@
 
 //################################################################### Class def
 /**Object holding a grouping.*/
-class LBS_GROUP
+class LBSGroup
 {
 public:
   int id;
 
 public:
-  LBS_GROUP()
+  LBSGroup()
   {
     id = -1;
   }

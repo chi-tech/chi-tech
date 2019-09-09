@@ -9,12 +9,12 @@ typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
 /**Computes the action of the transport matrix on a vector.*/
 int NPTMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 {
-  KSP_DATA_CONTEXT* context;
+  KSPDataContext* context;
   MatShellGetContext(matrix,&context);
 
   LinearBoltzmanSolver* solver = context->solver;
   SweepChunk* sweep_chunk = context->sweep_chunk;
-  LBS_GROUPSET* groupset  = context->groupset;
+  LBSGroupset* groupset  = context->groupset;
   MainSweepScheduler* sweepScheduler = context->sweepScheduler;
 
   //============================================= Copy krylov vector into local

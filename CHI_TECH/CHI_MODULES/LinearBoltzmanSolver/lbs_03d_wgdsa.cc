@@ -15,7 +15,7 @@ extern ChiPhysics chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void LinearBoltzmanSolver::InitWGDSA(LBS_GROUPSET *groupset)
+void LinearBoltzmanSolver::InitWGDSA(LBSGroupset *groupset)
 {
   if (groupset->apply_wgdsa)
   {
@@ -101,7 +101,7 @@ void LinearBoltzmanSolver::InitWGDSA(LBS_GROUPSET *groupset)
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
+void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
                                                   double *ref_phi_old,
                                                   double *ref_phi_new)
 {
@@ -119,8 +119,8 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
     if (typeid(*cell) == typeid(chi_mesh::CellSlab))
     {
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
@@ -147,8 +147,8 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
@@ -175,8 +175,8 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
@@ -212,7 +212,7 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
 
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset,
+void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
                                                      double *ref_phi_new)
 {
   int gsi = groupset->groups[0]->id;
@@ -230,8 +230,8 @@ void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
     if (typeid(*cell) == typeid(chi_mesh::CellSlab))
     {
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<2; i++)
       {
@@ -251,8 +251,8 @@ void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<poly_cell->v_indices.size(); i++)
       {
@@ -272,8 +272,8 @@ void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBS_GROUPSET *groupset
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
       {

@@ -46,7 +46,7 @@ void LinearBoltzmanSolver::Execute()
 /**Solves a single groupset.*/
 void LinearBoltzmanSolver::SolveGroupset(int group_set_num)
 {
-  LBS_GROUPSET* group_set = group_sets[group_set_num];
+  LBSGroupset* group_set = group_sets[group_set_num];
   if (group_set->iterative_method == NPT_CLASSICRICHARDSON)
   {
     ClassicRichardson(group_set_num);

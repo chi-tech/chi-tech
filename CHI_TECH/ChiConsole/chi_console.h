@@ -10,7 +10,7 @@ extern "C"
 #include "chi_console_structs.h"
 
 
-//template class CHI_VECTOR<CST_EVENT>;
+//template class CHI_VECTOR<CSTEvent>;
 
 //############################################################################# CLASS DEF
 /** Class for handling the console and scripting.*/
@@ -33,7 +33,7 @@ class ChiConsole
   //02 Utilities
   void        InitializeLuaEvent(const char* eventTitle);
   void        ExecuteFile(const char* fileName,int argc, char** argv);
-  void				PostEventToConsole(CST_EVENT* inputEvent);
+  void				PostEventToConsole(CSTEvent* inputEvent);
   void        PostMPIInfo(int location_id, int number_of_processes);
   //03
   void        flushConsole();
@@ -41,7 +41,7 @@ class ChiConsole
   int         GetNumCharsInConsoleBuffer();
   void        CopyConsole(char* destination,int lineNumber=0,int xSize=80);
   //05 Memory
-  CST_MEMORY  GetMemoryUsage();
+  CSTMemory  GetMemoryUsage();
   double      GetMemoryUsageInMB();
   double      GetMemoryUsageInBytes();
 

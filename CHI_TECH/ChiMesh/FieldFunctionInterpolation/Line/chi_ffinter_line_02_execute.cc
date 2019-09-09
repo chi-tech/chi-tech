@@ -15,7 +15,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
   for (int ff=0; ff<field_functions.size(); ff++)
   {
     grid_view = field_functions[ff]->grid;
-    FIELD_FUNCTION_CONTEXT* ff_ctx = ff_contexts[ff];
+    FieldFunctionContext* ff_ctx = ff_contexts[ff];
 
     if (field_functions[ff]->type == FF_SDM_CFEM)
     {
@@ -65,7 +65,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationLine::
   FVInterpolate(std::vector<int> &mapping,
-                FIELD_FUNCTION_CONTEXT *ff_ctx)
+                FieldFunctionContext *ff_ctx)
 {
   ff_ctx->interpolation_points_values.resize(interpolation_points.size(),0.0);
 
@@ -81,7 +81,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
 void chi_mesh::FieldFunctionInterpolationLine::
 CFEMInterpolate(Vec field,
                 std::vector<int> &mapping,
-                FIELD_FUNCTION_CONTEXT* ff_ctx)
+                FieldFunctionContext* ff_ctx)
 {
   SpatialDiscretization_PWL* spatial_dm   =
     (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;
@@ -191,7 +191,7 @@ CFEMInterpolate(Vec field,
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationLine::
   PWLDInterpolate(std::vector<int> &mapping,
-                  FIELD_FUNCTION_CONTEXT* ff_ctx)
+                  FieldFunctionContext* ff_ctx)
 {
   SpatialDiscretization_PWL* spatial_dm   =
     (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;

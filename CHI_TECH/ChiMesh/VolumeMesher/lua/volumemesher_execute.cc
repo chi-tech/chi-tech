@@ -25,12 +25,12 @@ int chiVolumeMesherExecute(lua_State *L)
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //Get memory before
-  CST_MEMORY mem_before = chi_console.GetMemoryUsage();
+  CSTMemory mem_before = chi_console.GetMemoryUsage();
 
   cur_hndlr->volume_mesher->Execute();
 
   //Get memory usage
-  CST_MEMORY mem_after = chi_console.GetMemoryUsage();
+  CSTMemory mem_after = chi_console.GetMemoryUsage();
 
   std::stringstream mem_string;
   mem_string

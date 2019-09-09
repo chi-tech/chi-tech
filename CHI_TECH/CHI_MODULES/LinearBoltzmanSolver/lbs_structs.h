@@ -8,13 +8,13 @@
 #define PARTITION_METHOD_FROM_SURFACE  2
 
 /**Struct for storing NPT options.*/
-struct LBS_OPTIONS
+struct LBSOptions
 {
   int scattering_order;
   int partition_method;
   int sweep_eager_limit;
 
-  LBS_OPTIONS()
+  LBSOptions()
   {
     scattering_order = 0;
     partition_method = PARTITION_METHOD_SERIAL;
@@ -22,7 +22,7 @@ struct LBS_OPTIONS
   }
 };
 
-class LBS_CELLVIEW
+class LBSCellViewBase
 {
 public:
   std::vector<int> node_dof_mapping;
@@ -31,7 +31,7 @@ public:
 
 
 /**Transport view of a cell*/
-class LBS_CELLVIEW_FULL : public LBS_CELLVIEW
+class LBSCellViewFull : public LBSCellViewBase
 {
 public:
   std::vector<bool>  face_f_upwind_flag;
@@ -47,7 +47,7 @@ private:
   int num_moms;
 
 public:
-  LBS_CELLVIEW_FULL(int in_dofs,int num_G, int num_m)
+  LBSCellViewFull(int in_dofs,int num_G, int num_m)
   {
     dof_phi_map_start = -1;
     dofs = in_dofs;

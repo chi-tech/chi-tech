@@ -14,7 +14,7 @@ ChiLog::ChiLog()
 
 //###################################################################
 /** Makes a log entry.*/
-CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
+LogStream ChiLog::Log(LOG_LVL level)
 {
 
 
@@ -25,12 +25,12 @@ CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
       if (chi_mpi.location_id == 0)
       {
         std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-        return CHI_LOG_STREAM(&std::cout, header);
+        return LogStream(&std::cout, header);
       }
       else
       {
         std::string header = " ";
-        return CHI_LOG_STREAM(&dummy_stream, header);
+        return LogStream(&dummy_stream, header);
       }
     }
     case LOG_0WARNING:
@@ -39,12 +39,12 @@ CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
       {
         std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
         header += "**WARNING** ";
-        return CHI_LOG_STREAM(&std::cout, header);
+        return LogStream(&std::cout, header);
       }
       else
       {
         std::string header = " ";
-        return CHI_LOG_STREAM(&dummy_stream, header);
+        return LogStream(&dummy_stream, header);
       }
     }
     case LOG_0ERROR:
@@ -53,12 +53,12 @@ CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
       {
         std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
         header += "**!**ERROR**!** ";
-        return CHI_LOG_STREAM(&std::cerr, header);
+        return LogStream(&std::cerr, header);
       }
       else
       {
         std::string header = " ";
-        return CHI_LOG_STREAM(&dummy_stream, header);
+        return LogStream(&dummy_stream, header);
       }
     }
     case LOG_0VERBOSE_0:
@@ -68,30 +68,30 @@ CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
       if ((chi_mpi.location_id == 0) && (verbosity >= level))
       {
         std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-        return CHI_LOG_STREAM(&std::cout, header);
+        return LogStream(&std::cout, header);
       }
       else
       {
         std::string header = " ";
-        return CHI_LOG_STREAM(&dummy_stream, header);
+        return LogStream(&dummy_stream, header);
       }
     }
     case LOG_ALL:
     {
       std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-      return CHI_LOG_STREAM(&std::cout, header);
+      return LogStream(&std::cout, header);
     }
     case LOG_ALLWARNING:
     {
       std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
       header += "**WARNING** ";
-      return CHI_LOG_STREAM(&std::cout, header);
+      return LogStream(&std::cout, header);
     }
     case LOG_ALLERROR:
     {
       std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
       header += "**!**ERROR**!** ";
-      return CHI_LOG_STREAM(&std::cerr, header);
+      return LogStream(&std::cerr, header);
     }
 
     case LOG_ALLVERBOSE_0:
@@ -101,19 +101,19 @@ CHI_LOG_STREAM ChiLog::Log(LOG_LVL level)
       if (verbosity >= (level-6))
       {
         std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-        return CHI_LOG_STREAM(&std::cout, header);
+        return LogStream(&std::cout, header);
       }
       else
       {
         std::string header = " ";
-        return CHI_LOG_STREAM(&dummy_stream, header);
+        return LogStream(&dummy_stream, header);
       }
     }
   }
 
 
   std::string header = " ";
-  return CHI_LOG_STREAM(&dummy_stream, header);
+  return LogStream(&dummy_stream, header);
 }
 
 

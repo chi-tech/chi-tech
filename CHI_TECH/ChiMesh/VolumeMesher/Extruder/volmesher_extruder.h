@@ -3,7 +3,7 @@
 
 #include "../chi_volumemesher.h"
 
-struct MESH_LAYER
+struct MeshLayer
 {
   std::string name;
   double height;
@@ -17,7 +17,7 @@ struct MESH_LAYER
 class chi_mesh::VolumeMesherExtruder : public chi_mesh::VolumeMesher
 {
 public:
-  std::vector<MESH_LAYER*> input_layers;
+  std::vector<MeshLayer*> input_layers;
   std::vector<double> vertex_layers;
   int node_z_index_incr;
 

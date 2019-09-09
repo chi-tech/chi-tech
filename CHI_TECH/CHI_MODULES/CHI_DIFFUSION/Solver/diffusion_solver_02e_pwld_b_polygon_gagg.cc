@@ -10,7 +10,7 @@
 /**Assembles A and b PWLD for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Ab_Polygon_GAGG(int cell_glob_index,
                                             chi_mesh::Cell *cell,
-                                            DIFFUSION_IP_VIEW* cell_ip_view)
+                                            DiffusionIPCellView* cell_ip_view)
 {
   chi_mesh::CellPolygon* poly_cell =
     (chi_mesh::CellPolygon*)(cell);
@@ -84,7 +84,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon_GAGG(int cell_glob_index,
       {
         chi_mesh::CellPolygon* adj_cell = nullptr;
         PolygonFEView*         adj_fe_view = nullptr;
-        DIFFUSION_IP_VIEW*     adj_ip_view = nullptr;
+        DiffusionIPCellView*     adj_ip_view = nullptr;
 
         //========================= Get adj cell information
         if (grid->IsCellLocal(neighbor))  //Local
@@ -356,7 +356,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon_GAGG(int cell_glob_index,
 void chi_diffusion::Solver::PWLD_b_Polygon_GAGG(
                                     int cell_glob_index,
                                     chi_mesh::Cell *cell,
-                                    DIFFUSION_IP_VIEW* cell_ip_view)
+                                    DiffusionIPCellView* cell_ip_view)
 {
   chi_mesh::CellPolygon* poly_cell =
     (chi_mesh::CellPolygon*)(cell);

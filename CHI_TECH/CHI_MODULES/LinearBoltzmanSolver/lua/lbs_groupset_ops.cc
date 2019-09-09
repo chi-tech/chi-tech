@@ -96,7 +96,7 @@ int chiLBSCreateGroupset(lua_State *L)
   }
 
   //============================================= Create groupset
-  LBS_GROUPSET* newgs = new LBS_GROUPSET;
+  LBSGroupset* newgs = new LBSGroupset;
   solver->group_sets.push_back(newgs);
 
   lua_pushnumber(L,solver->group_sets.size()-1);
@@ -148,7 +148,7 @@ int chiLBSCreateGroup(lua_State *L)
   }
 
   //============================================= Create groupset
-  LBS_GROUP* newgs = new LBS_GROUP;
+  LBSGroup* newgs = new LBSGroup;
   solver->groups.push_back(newgs);
   newgs->id = solver->groups.size()-1;
   lua_pushnumber(L,newgs->id);
@@ -224,7 +224,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -248,7 +248,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
 
   for (unsigned k=from; k<=to; k++)
   {
-    LBS_GROUP* group;
+    LBSGroup* group;
     //================================= Check valid group
     try {
       group = solver->groups.at(k);
@@ -330,7 +330,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -434,7 +434,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -522,7 +522,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -618,7 +618,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -712,7 +712,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -803,7 +803,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -891,7 +891,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -1003,7 +1003,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
@@ -1113,7 +1113,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
   }
 
   //============================================= Obtain pointer to groupset
-  LBS_GROUPSET* groupset;
+  LBSGroupset* groupset;
   try{
     groupset = solver->group_sets.at(grpset_index);
   }

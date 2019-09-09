@@ -98,7 +98,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
-      DIFFUSION_IP_VIEW* ip_view = new DIFFUSION_IP_VIEW;
+      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
       ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
       pwld_cell_dof_array_address.push_back(dof_count);
       ip_cell_views.push_back(ip_view);
@@ -140,7 +140,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
-      DIFFUSION_IP_VIEW* ip_view = new DIFFUSION_IP_VIEW;
+      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
       ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
       pwld_cell_dof_array_address.push_back(dof_count);
       ip_cell_views.push_back(ip_view);
@@ -192,7 +192,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
-      DIFFUSION_IP_VIEW* ip_view = new DIFFUSION_IP_VIEW;
+      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
       ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
       pwld_cell_dof_array_address.push_back(dof_count);
       ip_cell_views.push_back(ip_view);
@@ -284,7 +284,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     int cell_glob_index = grid->local_cell_glob_indices[local_cell_index];
 
     auto cell = grid->cells[cell_glob_index];
-    DIFFUSION_IP_VIEW* ip_view = ip_cell_views[local_cell_index];
+    DiffusionIPCellView* ip_view = ip_cell_views[local_cell_index];
 
     border_cell_info.push_back(cell_glob_index);         //cell_glob_index
     border_cell_info.push_back(ip_view->cell_dof_start); //cell_dof_start
@@ -419,7 +419,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     int k=0;
     while (k<locI_info_size[locI])
     {
-      DIFFUSION_IP_BORDERCELL* border_cell = new DIFFUSION_IP_BORDERCELL;
+      DiffusionIPBorderCell* border_cell = new DiffusionIPBorderCell;
       border_cell->cell_glob_index = locI_border_cell_info[locI][k]; k++;
       border_cell->cell_dof_start  = locI_border_cell_info[locI][k]; k++;
       border_cell->cell_type       = locI_border_cell_info[locI][k]; k++;

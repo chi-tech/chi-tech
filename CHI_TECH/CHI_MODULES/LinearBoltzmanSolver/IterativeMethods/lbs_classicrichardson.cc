@@ -29,7 +29,7 @@ void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
     << " with Classic-Richardson.\n\n";
 
   //================================================== Obtain groupset
-  LBS_GROUPSET* groupset = group_sets[group_set_num];
+  LBSGroupset* groupset = group_sets[group_set_num];
   int groupset_numgrps = groupset->groups.size();
   chi_log.Log(LOG_0)
     << "Quadrature number of angles: "

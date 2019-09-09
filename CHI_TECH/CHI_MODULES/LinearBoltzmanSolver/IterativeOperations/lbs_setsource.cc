@@ -47,7 +47,7 @@ void LinearBoltzmanSolver::SetSource(int group_set_num,
   ChiTimer t18_setsrctime; t18_setsrctime.Reset();
 
   //================================================== Get reference to groupset
-  LBS_GROUPSET* groupset = group_sets[group_set_num];
+  LBSGroupset* groupset = group_sets[group_set_num];
 
   int gs_i = groupset->groups[0]->id;
   int gs_f = groupset->groups.back()->id;
@@ -64,8 +64,8 @@ void LinearBoltzmanSolver::SetSource(int group_set_num,
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
-    LBS_CELLVIEW_FULL* full_cell_view =
-      (LBS_CELLVIEW_FULL*)cell_transport_views[cell->cell_local_id];
+    LBSCellViewFull* full_cell_view =
+      (LBSCellViewFull*)cell_transport_views[cell->cell_local_id];
 
     //=========================================== Obtain cross-section and src
     int cell_matid = cell->material_id;

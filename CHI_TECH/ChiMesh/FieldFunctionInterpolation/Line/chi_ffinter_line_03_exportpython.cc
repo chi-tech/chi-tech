@@ -64,7 +64,7 @@ ExportPython(std::string base_name)
 
   for (int ff=0; ff<field_functions.size(); ff++)
   {
-    FIELD_FUNCTION_CONTEXT* ff_ctx =
+    FieldFunctionContext* ff_ctx =
       ff_contexts[ff];
 
     if (chi_mpi.process_count>1 and chi_mpi.location_id!=0)

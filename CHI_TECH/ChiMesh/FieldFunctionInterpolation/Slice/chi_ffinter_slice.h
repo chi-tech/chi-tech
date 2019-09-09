@@ -13,7 +13,7 @@
 #define FFI_PROP_OPERATION 5
 #define FFI_PROP_LOGICAL_VOLUME 8
 
-struct FFI_FACE_EDGE_INTERSECTION
+struct FFIFaceEdgeIntersection
 {
   int v0_g_index, v1_g_index;
   int v0_dofindex_cell, v1_dofindex_cell;
@@ -22,21 +22,21 @@ struct FFI_FACE_EDGE_INTERSECTION
   std::pair<double,double> weights;
   double point_value;
 
-  FFI_FACE_EDGE_INTERSECTION()
+  FFIFaceEdgeIntersection()
   {
     point_value = 0.0;
   }
 };
 
-struct FFI_CELL_INTERSECTION
+struct FFICellIntersection
 {
   int cell_global_index;
-  std::vector<FFI_FACE_EDGE_INTERSECTION*> intersections;
+  std::vector<FFIFaceEdgeIntersection*> intersections;
   chi_mesh::Vector intersection_centre;
   chi_mesh::Vector intersection_2d_centre;
   double cell_avg_value;
 
-  FFI_CELL_INTERSECTION()
+  FFICellIntersection()
   {
     cell_avg_value = 0.0;
   }
@@ -61,7 +61,7 @@ public:
 
 private:
   std::vector<int>                    intersecting_cell_indices;
-  std::vector<FFI_CELL_INTERSECTION*> cell_intersections;
+  std::vector<FFICellIntersection*> cell_intersections;
   std::vector<int>                    cfem_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_cells_needed_unmapped;

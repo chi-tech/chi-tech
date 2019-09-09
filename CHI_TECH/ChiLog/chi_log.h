@@ -35,7 +35,7 @@ public:
   //00
                   ChiLog();
   //01
-  CHI_LOG_STREAM  Log(LOG_LVL level);
+  LogStream  Log(LOG_LVL level);
   void            SetVerbosity(int int_level);
   int             GetVerbosity();
 };

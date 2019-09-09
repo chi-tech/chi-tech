@@ -12,7 +12,7 @@
 void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
                                                int cell_glob_index,
                                                chi_mesh::Cell *cell,
-                                               DIFFUSION_IP_VIEW* cell_ip_view)
+                                               DiffusionIPCellView* cell_ip_view)
 {
   chi_mesh::CellPolyhedron* polyh_cell =
     (chi_mesh::CellPolyhedron*)(cell);
@@ -82,7 +82,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
       {
         chi_mesh::CellPolyhedron* adj_cell    = nullptr;
         PolyhedronFEView*         adj_fe_view = nullptr;
-        DIFFUSION_IP_VIEW*     adj_ip_view    = nullptr;
+        DiffusionIPCellView*     adj_ip_view    = nullptr;
         int                              fmap = -1;
 
         //========================= Get adj cell information
@@ -393,7 +393,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
 void chi_diffusion::Solver::PWLD_b_Polyhedron_GAGG(
                                                int cell_glob_index,
                                                chi_mesh::Cell *cell,
-                                               DIFFUSION_IP_VIEW* cell_ip_view)
+                                               DiffusionIPCellView* cell_ip_view)
 {
   chi_mesh::CellPolyhedron* polyh_cell =
     (chi_mesh::CellPolyhedron*)(cell);

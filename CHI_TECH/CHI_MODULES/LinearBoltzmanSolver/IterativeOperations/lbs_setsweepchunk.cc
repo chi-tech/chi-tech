@@ -16,7 +16,7 @@ typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
 SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
 {
   //================================================== Obtain groupset
-  LBS_GROUPSET* groupset = group_sets[group_set_num];
+  LBSGroupset* groupset = group_sets[group_set_num];
 
   //================================================== Obtain the mesher
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
@@ -28,7 +28,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
   if      (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
   {
     sweep_chunk =
-      new LBS_SWEEP_PWL_SLAB(
+      new LBSSweepChunkPWLSlab(
         grid,                                    //Spatial grid of cells
         (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
@@ -41,7 +41,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
   else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
   {
     sweep_chunk =
-      new LBS_SWEEP_PWL_POLYGON(
+      new LBSSweepChunkPWLPolygon(
         grid,                                    //Spatial grid of cells
         (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
@@ -54,7 +54,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
   else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
   {
     sweep_chunk =
-      new LBS_SWEEP_PWL_POLYHEDRON(
+      new LBSSweepChunkPWLPolyhedron(
         grid,                                    //Spatial grid of cells
         (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views

@@ -82,7 +82,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         subdivisions = lua_tonumber(L,3);
       }
-      MESH_LAYER* new_layer = new MESH_LAYER;
+      MeshLayer* new_layer = new MeshLayer;
       new_layer->height = layer_height;
       new_layer->sub_divisions = subdivisions;
 

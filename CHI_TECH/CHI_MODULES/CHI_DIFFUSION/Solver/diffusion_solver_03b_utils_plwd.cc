@@ -114,7 +114,7 @@ int chi_diffusion::Solver::MapBorderCell(int locI, int neighbor, int vglob_i)
 {
   for (int c=0; c<ip_locI_bordercell_info[locI].size(); c++)
   {
-    DIFFUSION_IP_BORDERCELL* border_cell = ip_locI_bordercell_info[locI][c];
+    DiffusionIPBorderCell* border_cell = ip_locI_bordercell_info[locI][c];
 
     if (border_cell->cell_glob_index == neighbor)
     {
@@ -286,7 +286,7 @@ int chi_diffusion::Solver::MapCellFace(chi_mesh::CellPolyhedron* polyh_cell,
 
 
 /**Obtains a reference to a Interior Penalty view of a cell.*/
-DIFFUSION_IP_VIEW* chi_diffusion::Solver::GetBorderIPView(int locI,
+DiffusionIPCellView* chi_diffusion::Solver::GetBorderIPView(int locI,
                                                           int cell_glob_index)
 {
   int cell_border_index=-1;
@@ -380,11 +380,11 @@ chi_mesh::Cell* chi_diffusion::Solver::GetBorderCell(int locI,
 void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 {
   //============================================= Obtain the border cell info
-  DIFFUSION_IP_BORDERCELL* cell_info =
+  DiffusionIPBorderCell* cell_info =
     ip_locI_bordercell_info[locI][cell_border_index];
 
   //============================================= Create IP view
-  DIFFUSION_IP_VIEW* ip_view = new DIFFUSION_IP_VIEW;
+  DiffusionIPCellView* ip_view = new DiffusionIPCellView;
   ip_view->cell_dof_start = cell_info->cell_dof_start;
   ip_locI_borderipviews[locI][cell_border_index] = ip_view;
 

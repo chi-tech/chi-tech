@@ -6,7 +6,7 @@
 
 //###################################################################
 /**Computes the point wise change between phi_new and phi_old.*/
-double LinearBoltzmanSolver::ComputePiecewiseChange(LBS_GROUPSET* groupset)
+double LinearBoltzmanSolver::ComputePiecewiseChange(LBSGroupset* groupset)
 {
   double pw_change = 0.0;
   double sum_m0 = 0.0;
@@ -25,8 +25,8 @@ double LinearBoltzmanSolver::ComputePiecewiseChange(LBS_GROUPSET* groupset)
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<2; i++)
       {
@@ -61,8 +61,8 @@ double LinearBoltzmanSolver::ComputePiecewiseChange(LBS_GROUPSET* groupset)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<poly_cell->v_indices.size(); i++)
       {
@@ -97,8 +97,8 @@ double LinearBoltzmanSolver::ComputePiecewiseChange(LBS_GROUPSET* groupset)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
       {

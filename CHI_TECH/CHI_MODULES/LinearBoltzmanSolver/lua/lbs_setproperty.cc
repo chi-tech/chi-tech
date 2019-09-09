@@ -314,7 +314,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -351,7 +351,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -371,7 +371,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -391,7 +391,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -411,7 +411,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -431,7 +431,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -459,7 +459,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -487,7 +487,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -507,7 +507,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -527,7 +527,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
@@ -547,7 +547,7 @@ int chiLBSSetProperty(lua_State *L)
                             4,numArgs);
 
     int groupset_num = lua_tonumber(L,3);
-    LBS_GROUPSET* groupset;
+    LBSGroupset* groupset;
     try {
       groupset = solver->group_sets.at(groupset_num);
     }

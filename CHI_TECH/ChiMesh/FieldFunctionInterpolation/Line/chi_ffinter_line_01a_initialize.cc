@@ -49,7 +49,7 @@ Initialize()
   //====================================================== Loop over contexts
   for (int ff=0; ff<field_functions.size(); ff++)
   {
-    auto ff_context = new FIELD_FUNCTION_CONTEXT;
+    auto ff_context = new FieldFunctionContext;
     ff_contexts.push_back(ff_context);
 
     ff_context->ref_ff = field_functions[ff];

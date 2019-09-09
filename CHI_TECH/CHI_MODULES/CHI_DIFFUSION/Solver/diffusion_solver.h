@@ -32,7 +32,7 @@
 #define DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF_JPART    13
 #define DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF_JFULL    14
 
-struct DIFFUSION_IP_VIEW
+struct DiffusionIPCellView
 {
   int cell_dof_start;
   //std::vector<std::vector<int>> adj_dof_mapping;
@@ -43,7 +43,7 @@ struct DIFFUSION_IP_VIEW
   }
 };
 
-struct DIFFUSION_IP_BORDERCELL
+struct DiffusionIPBorderCell
 {
   int cell_glob_index;
   int cell_dof_start;
@@ -56,10 +56,10 @@ struct DIFFUSION_IP_BORDERCELL
   std::vector<std::vector<int>> face_v_indices;
 };
 
-typedef std::vector<std::vector<DIFFUSION_IP_BORDERCELL*>> IP_BORDERCELL_INFO;
+typedef std::vector<std::vector<DiffusionIPBorderCell*>> IP_BORDERCELL_INFO;
 typedef std::vector<std::vector<chi_mesh::Cell*>>          IP_BORDERCELLS;
 typedef std::vector<std::vector<CellFEView*>>              IP_BORDERFEVIEWS;
-typedef std::vector<std::vector<DIFFUSION_IP_VIEW*>>       IP_BORDERIPVIEWS;
+typedef std::vector<std::vector<DiffusionIPCellView*>>       IP_BORDERIPVIEWS;
 
 //######################################################### Class def
 /**Solver for the general diffusion problem.
@@ -122,7 +122,7 @@ public:
   int                            pwld_local_dof_count;
   int                            pwld_global_dof_count;
   int                            pwld_local_dof_start;
-  std::vector<DIFFUSION_IP_VIEW*> ip_cell_views;
+  std::vector<DiffusionIPCellView*> ip_cell_views;
   IP_BORDERCELL_INFO             ip_locI_bordercell_info;
   IP_BORDERCELLS                 ip_locI_bordercells;
   IP_BORDERFEVIEWS               ip_locI_borderfeviews;
@@ -197,19 +197,19 @@ public:
                       bool suppress_solve = false);
   //02c_a
   void PWLD_Ab_Slab(int cell_glob_index, chi_mesh::Cell *cell,
-                    DIFFUSION_IP_VIEW* cell_ip_view, int group=0);
+                    DiffusionIPCellView* cell_ip_view, int group=0);
   void PWLD_b_Slab(int cell_glob_index, chi_mesh::Cell *cell,
-                    DIFFUSION_IP_VIEW* cell_ip_view, int group=0);
+                    DiffusionIPCellView* cell_ip_view, int group=0);
   //02c_b
   void PWLD_Ab_Polygon(int cell_glob_index, chi_mesh::Cell *cell,
-                       DIFFUSION_IP_VIEW* cell_ip_view, int group=0);
+                       DiffusionIPCellView* cell_ip_view, int group=0);
   void PWLD_b_Polygon(int cell_glob_index, chi_mesh::Cell *cell,
-                       DIFFUSION_IP_VIEW* cell_ip_view, int group=0);
+                       DiffusionIPCellView* cell_ip_view, int group=0);
   //02c_c
   void PWLD_Ab_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell,
-                          DIFFUSION_IP_VIEW* cell_ip_view, int group=0);
+                          DiffusionIPCellView* cell_ip_view, int group=0);
   void PWLD_b_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell,
-                          DIFFUSION_IP_VIEW* cell_ip_view, int group=0);
+                          DiffusionIPCellView* cell_ip_view, int group=0);
 
   //02d
   int ExecutePWLD_MIP_GRPS(bool suppress_assembly = false,
@@ -221,19 +221,19 @@ public:
                            bool suppress_solve = false);
   //02e_a
   void PWLD_Ab_Slab_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                         DIFFUSION_IP_VIEW* cell_ip_view);
+                         DiffusionIPCellView* cell_ip_view);
   void PWLD_b_Slab_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                         DIFFUSION_IP_VIEW* cell_ip_view);
+                         DiffusionIPCellView* cell_ip_view);
   //02e_b
   void PWLD_Ab_Polygon_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                            DIFFUSION_IP_VIEW* cell_ip_view);
+                            DiffusionIPCellView* cell_ip_view);
   void PWLD_b_Polygon_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                            DIFFUSION_IP_VIEW* cell_ip_view);
+                            DiffusionIPCellView* cell_ip_view);
   //02e_c
   void PWLD_Ab_Polyhedron_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                               DIFFUSION_IP_VIEW* cell_ip_view);
+                               DiffusionIPCellView* cell_ip_view);
   void PWLD_b_Polyhedron_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                              DIFFUSION_IP_VIEW* cell_ip_view);
+                              DiffusionIPCellView* cell_ip_view);
 
 
 
@@ -253,7 +253,7 @@ public:
   int MapCellFace(chi_mesh::CellPolyhedron* polyh_cell,
                   chi_mesh::CellPolyhedron* adjph_cell, int f);
 
-  DIFFUSION_IP_VIEW* GetBorderIPView(int locI, int cell_glob_index);
+  DiffusionIPCellView* GetBorderIPView(int locI, int cell_glob_index);
   CellFEView* GetBorderFEView(int locI, int cell_glob_index);
   chi_mesh::Cell* GetBorderCell(int locI, int cell_glob_index);
 };

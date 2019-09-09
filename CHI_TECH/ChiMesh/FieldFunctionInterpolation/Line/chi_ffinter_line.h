@@ -10,7 +10,7 @@
 #define FFI_LINE_SECONDPOINT 12
 #define FFI_LINE_NUMBEROFPOINTS 13
 
-struct FIELD_FUNCTION_CONTEXT
+struct FieldFunctionContext
 {
   chi_physics::FieldFunction*    ref_ff;
   std::vector<double>            interpolation_points_values;
@@ -38,7 +38,7 @@ private:
   std::vector<int>               pwld_local_cells_needed_unmapped;
   std::vector<int>               interpolation_points_ass_cell;
 
-  std::vector<FIELD_FUNCTION_CONTEXT*> ff_contexts;
+  std::vector<FieldFunctionContext*> ff_contexts;
 public:
   FieldFunctionInterpolationLine()
   {
@@ -56,11 +56,11 @@ private:
 
   void CFEMInterpolate(Vec field,
                        std::vector<int> &mapping,
-                       FIELD_FUNCTION_CONTEXT* ff_ctx);
+                       FieldFunctionContext* ff_ctx);
   void PWLDInterpolate(std::vector<int> &mapping,
-                       FIELD_FUNCTION_CONTEXT* ff_ctx);
+                       FieldFunctionContext* ff_ctx);
   void FVInterpolate(std::vector<int> &mapping,
-                     FIELD_FUNCTION_CONTEXT* ff_ctx);
+                     FieldFunctionContext* ff_ctx);
 public:
   void ExportPython(std::string base_name);
 };

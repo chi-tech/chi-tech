@@ -74,7 +74,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
       int glob_cell_index = grid->local_cell_glob_indices[lc];
       chi_mesh::Cell* cell = grid->cells[glob_cell_index];
 
-      DIFFUSION_IP_VIEW* cell_ip_view = ip_cell_views[lc];
+      DiffusionIPCellView* cell_ip_view = ip_cell_views[lc];
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If SLAB
       if (typeid(*cell) == typeid(chi_mesh::CellSlab))

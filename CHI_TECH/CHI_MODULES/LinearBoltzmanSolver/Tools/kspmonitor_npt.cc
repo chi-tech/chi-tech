@@ -36,7 +36,7 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
                       KSPConvergedReason* convergedReason, void *monitordestroy)
 {
   //======================================== Get data context
-  KSP_DATA_CONTEXT* context;
+  KSPDataContext* context;
   KSPGetApplicationContext(ksp,&context);
 
   //======================================== Compute rhs norm

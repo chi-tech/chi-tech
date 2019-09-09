@@ -11,7 +11,7 @@ extern double chi_global_timings[20];
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for
  * another.*/
-void LinearBoltzmanSolver::ResetSweepOrderings(LBS_GROUPSET *groupset)
+void LinearBoltzmanSolver::ResetSweepOrderings(LBSGroupset *groupset)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "Resetting SPDS and FLUDS";

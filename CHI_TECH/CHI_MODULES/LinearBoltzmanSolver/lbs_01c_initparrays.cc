@@ -127,8 +127,8 @@ int LinearBoltzmanSolver::InitializeParrays()
         (chi_mesh::CellSlab*)cell;
       SlabFEView* slab_fe_view =
         (SlabFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBS_CELLVIEW_FULL* full_cell_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[slab_cell->cell_local_id];
+      LBSCellViewFull* full_cell_view =
+        (LBSCellViewFull*)cell_transport_views[slab_cell->cell_local_id];
 
       int mat_id = cell->material_id;
 
@@ -185,8 +185,8 @@ int LinearBoltzmanSolver::InitializeParrays()
         (chi_mesh::CellPolygon*)cell;
       PolygonFEView* poly_fe_view =
         (PolygonFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBS_CELLVIEW_FULL* full_cell_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[poly_cell->cell_local_id];
+      LBSCellViewFull* full_cell_view =
+        (LBSCellViewFull*)cell_transport_views[poly_cell->cell_local_id];
 
       int mat_id = cell->material_id;
 
@@ -243,8 +243,8 @@ int LinearBoltzmanSolver::InitializeParrays()
         (chi_mesh::CellPolyhedron*)cell;
       PolyhedronFEView* polyh_fe_view =
         (PolyhedronFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBS_CELLVIEW_FULL* full_cell_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[polyh_cell->cell_local_id];
+      LBSCellViewFull* full_cell_view =
+        (LBSCellViewFull*)cell_transport_views[polyh_cell->cell_local_id];
 
       int mat_id = cell->material_id;
 

@@ -31,15 +31,15 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 
 //###################################################################
 /**Sweep chunk to compute the fixed source.*/
-class LBS_SWEEP_PWL_POLYHEDRON : public chi_mesh::SweepManagement::SweepChunk
+class LBSSweepChunkPWLPolyhedron : public chi_mesh::SweepManagement::SweepChunk
 {
 private:
   chi_mesh::MeshContinuum*    grid_view;
   SpatialDiscretization_PWL*     grid_fe_view;
-  std::vector<LBS_CELLVIEW*>* grid_transport_view;
+  std::vector<LBSCellViewBase*>* grid_transport_view;
 //std::vector<double>*        x;                   BASE CLASS
   std::vector<double>*        q_moments;
-  LBS_GROUPSET*               groupset;
+  LBSGroupset*               groupset;
   TCrossSections*             xsections;
   int                         num_moms;
 
@@ -70,12 +70,12 @@ private:
 
 public:
   //################################################## Constructor
-  LBS_SWEEP_PWL_POLYHEDRON(chi_mesh::MeshContinuum* vol_continuum,
+  LBSSweepChunkPWLPolyhedron(chi_mesh::MeshContinuum* vol_continuum,
                              SpatialDiscretization_PWL* discretization,
-                             std::vector<LBS_CELLVIEW*>* cell_transport_views,
+                             std::vector<LBSCellViewBase*>* cell_transport_views,
                              std::vector<double>* destination_phi,
                              std::vector<double>* source_moments,
-                             LBS_GROUPSET* in_groupset,
+                             LBSGroupset* in_groupset,
                              TCrossSections* in_xsections,
                              int in_num_moms,
                              int in_max_cell_dofs)
@@ -154,8 +154,8 @@ public:
         (chi_mesh::CellPolyhedron*)cell;
       PolyhedronFEView* cell_fe_view =
         (PolyhedronFEView*)grid_fe_view->MapFeView(cell_g_index);
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)(*grid_transport_view)[polyh_cell->cell_local_id];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)(*grid_transport_view)[polyh_cell->cell_local_id];
 
       int     cell_dofs    = cell_fe_view->dofs;
       int     xs_id        = transport_view->xs_id;

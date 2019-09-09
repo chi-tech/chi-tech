@@ -4,7 +4,7 @@
 
 //=============================================================================
 /**Stores data relevant to events*/
-struct CST_EVENT
+struct CSTEvent
 {
 	char	eventTitle[100];
 	char 	sPar[6][100];
@@ -12,7 +12,7 @@ struct CST_EVENT
 	float   fPar[6];
 	bool	bPar[6];
 
-	CST_EVENT()
+	CSTEvent()
 	{
 		eventTitle[0] = '\0';
 		for (int k = 0; k<6; k++)
@@ -27,14 +27,14 @@ struct CST_EVENT
 
 //=============================================================================
 /**Simple structure for memory usage.*/
-struct CST_MEMORY
+struct CSTMemory
 {
 	double memory_bytes;
 	double memory_kbytes;
 	double memory_mbytes;
 	double memory_gbytes;
 
-	CST_MEMORY()
+	CSTMemory()
 	{
 		memory_bytes  = 0.0;
 		memory_kbytes = 0.0;
@@ -42,7 +42,7 @@ struct CST_MEMORY
 		memory_gbytes = 0.0;
 	}
 
-	CST_MEMORY(double in_mem)
+	CSTMemory(double in_mem)
 	{
 		memory_bytes  = in_mem;
 		memory_kbytes = in_mem/1024.0;
@@ -50,7 +50,7 @@ struct CST_MEMORY
 		memory_gbytes = in_mem/1024.0/1024.0;
 	}
 
-	void operator=(const CST_MEMORY& in_struct)
+	void operator=(const CSTMemory& in_struct)
 	{
 		memory_bytes  = in_struct.memory_bytes ;
 		memory_kbytes = in_struct.memory_kbytes;

@@ -30,7 +30,7 @@ void LinearBoltzmanSolver::GMRES(int group_set_num)
     << " with GMRES.\n\n";
 
   //================================================== Obtain groupset
-  LBS_GROUPSET* groupset = group_sets[group_set_num];
+  LBSGroupset* groupset = group_sets[group_set_num];
   int groupset_numgrps = groupset->groups.size();
   chi_log.Log(LOG_0)
     << "Quadrature number of angles: "
@@ -49,7 +49,7 @@ void LinearBoltzmanSolver::GMRES(int group_set_num)
   //=================================================== Create Data context
   //                                                    available inside
   //                                                    Action
-  KSP_DATA_CONTEXT data_context;
+  KSPDataContext data_context;
   data_context.solver         = this;
   data_context.sweep_chunk    = sweep_chunk;
   data_context.group_set_num  = group_set_num;

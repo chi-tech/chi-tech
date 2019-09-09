@@ -8,7 +8,7 @@
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmanSolver::
-AssembleVector(LBS_GROUPSET *groupset, Vec x, double *y)
+AssembleVector(LBSGroupset *groupset, Vec x, double *y)
 {
   double* x_ref;
   VecGetArray(x,&x_ref);
@@ -26,8 +26,8 @@ AssembleVector(LBS_GROUPSET *groupset, Vec x, double *y)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (typeid(*cell) == typeid(chi_mesh::CellSlab))
     {
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<2; i++)
       {
@@ -49,8 +49,8 @@ AssembleVector(LBS_GROUPSET *groupset, Vec x, double *y)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<poly_cell->v_indices.size(); i++)
       {
@@ -72,8 +72,8 @@ AssembleVector(LBS_GROUPSET *groupset, Vec x, double *y)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
       {
@@ -98,7 +98,7 @@ AssembleVector(LBS_GROUPSET *groupset, Vec x, double *y)
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmanSolver::
-DisAssembleVector(LBS_GROUPSET *groupset, Vec x_src, double *y)
+DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
 {
   const double* x_ref;
   VecGetArrayRead(x_src,&x_ref);
@@ -116,8 +116,8 @@ DisAssembleVector(LBS_GROUPSET *groupset, Vec x_src, double *y)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (typeid(*cell) == typeid(chi_mesh::CellSlab))
     {
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<2; i++)
       {
@@ -139,8 +139,8 @@ DisAssembleVector(LBS_GROUPSET *groupset, Vec x_src, double *y)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<poly_cell->v_indices.size(); i++)
       {
@@ -162,8 +162,8 @@ DisAssembleVector(LBS_GROUPSET *groupset, Vec x_src, double *y)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
       {
@@ -189,7 +189,7 @@ DisAssembleVector(LBS_GROUPSET *groupset, Vec x_src, double *y)
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmanSolver::
-DisAssembleVectorLocalToLocal(LBS_GROUPSET *groupset, double* x_src, double *y)
+DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
 {
   const double* x_ref=x_src;
 
@@ -206,8 +206,8 @@ DisAssembleVectorLocalToLocal(LBS_GROUPSET *groupset, double* x_src, double *y)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (typeid(*cell) == typeid(chi_mesh::CellSlab))
     {
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<2; i++)
       {
@@ -230,8 +230,8 @@ DisAssembleVectorLocalToLocal(LBS_GROUPSET *groupset, double* x_src, double *y)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<poly_cell->v_indices.size(); i++)
       {
@@ -254,8 +254,8 @@ DisAssembleVectorLocalToLocal(LBS_GROUPSET *groupset, double* x_src, double *y)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBS_CELLVIEW_FULL* transport_view =
-        (LBS_CELLVIEW_FULL*)cell_transport_views[c];
+      LBSCellViewFull* transport_view =
+        (LBSCellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
       {

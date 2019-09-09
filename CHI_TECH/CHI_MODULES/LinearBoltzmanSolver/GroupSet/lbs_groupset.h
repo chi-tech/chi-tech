@@ -22,10 +22,10 @@ typedef std::pair<int,int> AngSubSet;
 
 //################################################################### Class def
 /**Group set functioning as a collection of groups*/
-class LBS_GROUPSET
+class LBSGroupset
 {
 public:
-  std::vector<LBS_GROUP*>                      groups;
+  std::vector<LBSGroup*>                      groups;
   chi_math::ProductQuadrature*                      quadrature;
   int                                          iterative_method;
   int                                          angleagg_method;
@@ -61,7 +61,7 @@ public:
   std::vector<int>                             wgdsa_cell_dof_array_address;
 
 
-  LBS_GROUPSET()
+  LBSGroupset()
   {
     quadrature = nullptr;
     iterative_method = NPT_GMRES;

@@ -10,7 +10,7 @@
 /**Assembles A and b PWLD for slab cells.*/
 void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
                                             chi_mesh::Cell *cell,
-                                            DIFFUSION_IP_VIEW* cell_ip_view,
+                                            DiffusionIPCellView* cell_ip_view,
                                             int group)
 {
   chi_mesh::CellSlab* slab_cell =
@@ -80,7 +80,7 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
     {
       chi_mesh::CellSlab*    adj_cell = nullptr;
       SlabFEView*         adj_fe_view = nullptr;
-      DIFFUSION_IP_VIEW*  adj_ip_view = nullptr;
+      DiffusionIPCellView*  adj_ip_view = nullptr;
 
       //========================= Get adj cell information
       if (grid->IsCellLocal(neighbor))  //Local
@@ -335,7 +335,7 @@ void chi_diffusion::Solver::PWLD_Ab_Slab(int cell_glob_index,
 /**Assembles b PWLD for slab cells.*/
 void chi_diffusion::Solver::PWLD_b_Slab(int cell_glob_index,
                                          chi_mesh::Cell *cell,
-                                         DIFFUSION_IP_VIEW* cell_ip_view,
+                                         DiffusionIPCellView* cell_ip_view,
                                          int group)
 {
   chi_mesh::CellSlab* slab_cell =

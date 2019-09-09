@@ -23,48 +23,49 @@
 \author Jan*/
 int chiDomDecompose2D(lua_State *L)
 {
-  //================================================== Get current handler
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
-
-  //================================================== Extract arguments
-  int px           = lua_tonumber(L,1);
-  int py           = lua_tonumber(L,2);
-  int region_index = lua_tonumber(L,3);
-
-  chi_mesh::Region* cur_region;
-  try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
-  }
-  catch(const std::invalid_argument& ia)
-  {
-    std::cerr << "ERROR: Invalid index to region.\n";
-    exit(EXIT_FAILURE);
-  }
-
-  fprintf(stdout,"Decomposing region %d\n",region_index);
-
-  //================================================== Get surface mesher
-  if (typeid(*cur_hndlr->surface_mesher) ==
-      typeid(chi_mesh::SurfaceMesherTriangle))
-  {
-    chi_mesh::Decompose2DDomain(px,py,
-      (chi_mesh::SurfaceMesherTriangle*)cur_hndlr->surface_mesher,
-      cur_region);
-  }
-  else
-  {
-    fprintf(stderr,"Invalid mesher used to perform domain decompisition\n");
-    exit(EXIT_FAILURE);
-  }
-
-
-
-
-
-
-  fprintf(stdout,"Domain decomposition completed, collection index %d\n",region_index);
-
-  return 1;
+//  //================================================== Get current handler
+//  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+//
+//  //================================================== Extract arguments
+//  int px           = lua_tonumber(L,1);
+//  int py           = lua_tonumber(L,2);
+//  int region_index = lua_tonumber(L,3);
+//
+//  chi_mesh::Region* cur_region;
+//  try{
+//    cur_region = cur_hndlr->region_stack.at(region_index);
+//  }
+//  catch(const std::invalid_argument& ia)
+//  {
+//    std::cerr << "ERROR: Invalid index to region.\n";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  fprintf(stdout,"Decomposing region %d\n",region_index);
+//
+//  //================================================== Get surface mesher
+//  if (typeid(*cur_hndlr->surface_mesher) ==
+//      typeid(chi_mesh::SurfaceMesherTriangle))
+//  {
+//    chi_mesh::Decompose2DDomain(px,py,
+//      (chi_mesh::SurfaceMesherTriangle*)cur_hndlr->surface_mesher,
+//      cur_region);
+//  }
+//  else
+//  {
+//    fprintf(stderr,"Invalid mesher used to perform domain decompisition\n");
+//    exit(EXIT_FAILURE);
+//  }
+//
+//
+//
+//
+//
+//
+//  fprintf(stdout,"Domain decomposition completed, collection index %d\n",region_index);
+//
+//  return 1;
+  return 0;
 }
 
 //#############################################################################

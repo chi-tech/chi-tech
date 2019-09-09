@@ -6,7 +6,7 @@
 
 //###################################################################
 /** Log stream for adding header information to a string stream.*/
-class CHI_LOG_STREAM : public std::stringstream
+class LogStream : public std::stringstream
 {
 private:
   std::ostream* log_stream;
@@ -14,13 +14,13 @@ private:
 
 public:
   /** Creates a string stream.*/
-  CHI_LOG_STREAM(std::ostream* output_stream, std::string header)
+  LogStream(std::ostream* output_stream, std::string header)
   : log_stream(output_stream),
     log_header(std::move(header))
   { }
 
   /** Flushes the broken-up/headered stream to the output.*/
-  virtual ~CHI_LOG_STREAM()
+  virtual ~LogStream()
   {
     std::string line, oline;
     while (std::getline(*this, line))
@@ -32,7 +32,7 @@ public:
       *log_stream << oline << std::flush;
   }
 
-  CHI_LOG_STREAM(const CHI_LOG_STREAM& other)
+  LogStream(const LogStream& other)
   {
     log_stream = other.log_stream;
     log_header = other.log_header;

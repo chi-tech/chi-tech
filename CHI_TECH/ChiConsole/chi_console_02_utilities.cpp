@@ -12,7 +12,7 @@
 void ChiConsole::InitializeLuaEvent(const char* eventTitle)
 {
 	lua_State* L = this->consoleState;
-	CST_EVENT defaultEvent;
+	CSTEvent defaultEvent;
 	lua_newtable(L);
 
 	//===================================================== Pushing status
@@ -87,7 +87,7 @@ void ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv)
 /**Posts an event and all of its parameters to the lua-state.
 
 \author CHI Vermaak*/
-void ChiConsole::PostEventToConsole(CST_EVENT* inputEvent)
+void ChiConsole::PostEventToConsole(CSTEvent* inputEvent)
 {
 	lua_State* L = this->consoleState;
 	lua_newtable(L);

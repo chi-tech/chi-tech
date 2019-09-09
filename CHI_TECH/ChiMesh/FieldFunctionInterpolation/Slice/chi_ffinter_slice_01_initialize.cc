@@ -103,15 +103,15 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
       //========================================= Initialize cell intersection
       //                                          data structure
-      FFI_CELL_INTERSECTION* cell_isds = new FFI_CELL_INTERSECTION;
+      FFICellIntersection* cell_isds = new FFICellIntersection;
       cell_isds->cell_global_index = cell_glob_index;
       cell_intersections.push_back(cell_isds);
 
       //========================================= Loop over vertices
       for (int v=0; v<poly_cell->v_indices.size(); v++)
       {
-        FFI_FACE_EDGE_INTERSECTION* face_isds =
-          new FFI_FACE_EDGE_INTERSECTION;
+        FFIFaceEdgeIntersection* face_isds =
+          new FFIFaceEdgeIntersection;
 
         int v0gi = poly_cell->v_indices[v];
 
@@ -161,7 +161,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
       //========================================= Initialize cell intersection
       //                                          data structure
-      FFI_CELL_INTERSECTION* cell_isds = new FFI_CELL_INTERSECTION;
+      FFICellIntersection* cell_isds = new FFICellIntersection;
       cell_isds->cell_global_index = cell_glob_index;
       cell_intersections.push_back(cell_isds);
 
@@ -191,7 +191,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
             bool duplicate_found = false;
             for (int is=0; is<cell_isds->intersections.size(); is++)
             {
-              FFI_FACE_EDGE_INTERSECTION* existing_face_isds =
+              FFIFaceEdgeIntersection* existing_face_isds =
                 cell_isds->intersections[is];
 
               double dif = (existing_face_isds->point -
@@ -206,8 +206,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
             //==================== No duplicate
             if (!duplicate_found)
             {
-              FFI_FACE_EDGE_INTERSECTION* face_isds =
-                new FFI_FACE_EDGE_INTERSECTION;
+              FFIFaceEdgeIntersection* face_isds =
+                new FFIFaceEdgeIntersection;
 
               //Find vertex 0 dof index
               face_isds->v0_g_index = v0gi;
@@ -268,7 +268,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       cell_isds->intersection_2d_centre.z = vref.Dot(normal);
 
       //==================================== Points
-      std::vector<FFI_FACE_EDGE_INTERSECTION*> unsorted_points;
+      std::vector<FFIFaceEdgeIntersection*> unsorted_points;
       for (int p=0; p<num_points; p++)
       {
         chi_mesh::Vector vref = cell_isds->intersections[p]->point-this->point;

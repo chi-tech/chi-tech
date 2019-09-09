@@ -19,7 +19,7 @@ extern ChiMPI     chi_mpi;
 
 //###################################################################
 /**Initializes fluds data structures.*/
-void LinearBoltzmanSolver::InitFluxDataStructures(LBS_GROUPSET *groupset)
+void LinearBoltzmanSolver::InitFluxDataStructures(LBSGroupset *groupset)
 {
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* mesher = handler->volume_mesher;

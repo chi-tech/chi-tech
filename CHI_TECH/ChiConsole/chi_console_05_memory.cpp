@@ -9,7 +9,7 @@
 
 //###################################################################
 /**Gets the current memory usage.*/
-CST_MEMORY ChiConsole::GetMemoryUsage()
+CSTMemory ChiConsole::GetMemoryUsage()
 {
   double mem = 0.0;
 #if defined(__MACH__)
@@ -49,7 +49,7 @@ CST_MEMORY ChiConsole::GetMemoryUsage()
   //mem = llmem * (long long int)sysconf(_SC_PAGESIZE);
 #endif
 
-  CST_MEMORY mem_struct(mem);
+  CSTMemory mem_struct(mem);
 
   return mem_struct;
 }
@@ -58,7 +58,7 @@ CST_MEMORY ChiConsole::GetMemoryUsage()
 /**Gets the current memory usage in megabytes.*/
 double ChiConsole::GetMemoryUsageInMB()
 {
-  CST_MEMORY mem_struct = GetMemoryUsage();
+  CSTMemory mem_struct = GetMemoryUsage();
 
   return  mem_struct.memory_mbytes;
 }
@@ -67,7 +67,7 @@ double ChiConsole::GetMemoryUsageInMB()
 /**Gets the current memory usage in megabytes.*/
 double ChiConsole::GetMemoryUsageInBytes()
 {
-  CST_MEMORY mem_struct = GetMemoryUsage();
+  CSTMemory mem_struct = GetMemoryUsage();
 
   return  mem_struct.memory_bytes;
 }

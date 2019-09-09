@@ -7,7 +7,7 @@
 
 //###################################################################
 /**Computes the discrete to moment operator.*/
-void LBS_GROUPSET::BuildDiscMomOperator(int scatt_order)
+void LBSGroupset::BuildDiscMomOperator(int scatt_order)
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
@@ -112,7 +112,7 @@ void LBS_GROUPSET::BuildDiscMomOperator(int scatt_order)
 
 //###################################################################
 /**Computes the moment to discrete operator.*/
-void LBS_GROUPSET::BuildMomDiscOperator(int scatt_order)
+void LBSGroupset::BuildMomDiscOperator(int scatt_order)
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
@@ -220,7 +220,7 @@ void LBS_GROUPSET::BuildMomDiscOperator(int scatt_order)
 
 //###################################################################
 /**Constructs the groupset subsets.*/
-void LBS_GROUPSET::BuildSubsets()
+void LBSGroupset::BuildSubsets()
 {
   //=================================== Groupset subsets
   int num_gs_subsets = 1;
