@@ -712,7 +712,7 @@ void chi_mesh::SurfaceMesh::ExportToPolyFile(const char *fileName)
     return;
   }
 
-  fprintf(outputFile,"%ld 2 0 0\n", vertices.size());
+  fprintf(outputFile,"%lu 2 0 0\n", vertices.size());
   for (int v=0; v<vertices.size(); v++)
   {
     fprintf(outputFile,"%d %.15f %.15f 0\n",v+1,vertices[v].x,vertices[v].y);
