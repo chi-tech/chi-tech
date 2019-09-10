@@ -54,7 +54,7 @@ now we have only a couple of tutorials.\n
 ### MPI Utilities
  
 <table>
-<tr><td width="33%">chiMPIBroadcastCellsets()</td><td width="33%">chiMPIReceiveCellsets()</td><td width="33%">chiMPIBarrier()</td></tr>
+<tr><td width="33%">chiMPIBarrier()</td></tr>
 </table>
 ### Logging Utilities
  
@@ -84,7 +84,7 @@ now we have only a couple of tutorials.\n
 ### Linear Boltzman Solver
  
 <table>
-<tr><td width="33%">chiLBSransportCreateSolver()</td><td width="33%">chiLBSSetProperty()</td><td width="33%">chiLBSInitialize()</td></tr>
+<tr><td width="33%">chiLBSCreateSolver()</td><td width="33%">chiLBSSetProperty()</td><td width="33%">chiLBSInitialize()</td></tr>
 <tr><td width="33%">chiLBSExecute()</td><td width="33%">chiLBSGetFieldFunctionList()</td><td width="33%">chiLBSGetScalarFieldFunctionList()</td></tr>
 </table>
 ### Linear Boltzman Solver - Groupset manipulation
@@ -94,6 +94,11 @@ now we have only a couple of tutorials.\n
 <tr><td width="33%">chiLBSGroupsetSetQuadrature()</td><td width="33%">chiLBSGroupsetSetAngleAggDiv()</td><td width="33%">chiLBSGroupsetSetGroupSubsets()</td></tr>
 <tr><td width="33%">chiLBSGroupsetSetIterativeMethod()</td><td width="33%">chiLBSGroupsetSetResidualTolerance()</td><td width="33%">chiLBSGroupsetSetMaxIterations()</td></tr>
 <tr><td width="33%">chiLBSGroupsetSetGMRESRestartIntvl()</td><td width="33%">chiLBSGroupsetSetWGDSA()</td><td width="33%">chiLBSGroupsetSetTGDSA()</td></tr>
+</table>
+### Test scripts
+\ref LuaLBSGroupsets Main page
+<table>
+<tr><td width="33%">chiLuaTest()</td></tr>
 </table>
 
 

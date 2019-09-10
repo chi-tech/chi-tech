@@ -33,20 +33,20 @@
    - classname_01_init.cc for an initialize call
    - classname_02_ops.cc for numerous small operations.
 
-\image html "devman_Filenames.png" "Example 1" width=300px
+\image html "DevMan_Filenames.png" "Example 1" width=300px
 
  - If the class is really small then it should have a header file and an
    associated .cc file
 
-  \image html "devman_Filenames1.png" "Example 2" width=350px
+  \image html "DevMan_Filenames1.png" "Example 2" width=350px
 
 \subsection devman1_sec0_2 General code
 
  - <B>Variables</B> must use lower case and include "_" between words. i.e.
-    num_faces.
+    num_faces. Variable must not start or end with an underscore.
  - <B>Namespaces</B> should be lower case and may include underscores
  - <B>FunctionNames</B> have no underscores and each word starts with a capital
-   letter.
+   letter. Underscores can be allowed in some circumstances.
  - <B>Classes and structures</B> have each
    word start with a capital letter. For example chi_mesh::Vector is a structure
    called Vector and is defined in the namespace chi_mesh.
@@ -99,22 +99,14 @@ split-screen configurations.
 
 \subsection devman1_sec0_4 Constants and Enumerators
 
-Constants should either look like variable names with a "k" prepended to them
-or look like macros. Constants can be defined in macros, enumerations or within
+Constants should look like macros. Constants can be defined in macros, enumerations or within
 code segments.
 
 \code
 #define   PI       3.1415926535898
-#define k_pi       3.1415926535898;
 
 int DEFAULT_SETTING1   = 1;
-int k_default_setting2 = 2;
 
-enum UrlTableErrors {
-  kOK = 0,
-  kErrorOutOfMemory,
-  kErrorMalformedInput,
-};
 enum AlternateUrlTableErrors {
   OK = 0,
   OUT_OF_MEMORY = 1,
@@ -128,7 +120,16 @@ enum AlternateUrlTableErrors {
  convey the algorithm. Every class, structure or function should be
  supplied with doxygen comment styles at the top of the item.
 
-\include "../../CHI_TECH/CHI_MODULES/CHI_DIFFUSION/lua/diffusion_execute.cc"
+\include "../../Modules/DiffusionSolver/lua/diffusion_execute.cc"
+
+## Annotating Class-declerations:
+<B>MAXIMIZE SCOPE MINIMIZE SPACE</B>.
+Class declerations must always happen within header files and should aim to
+provide the maximum amount of scope <B>within the minimum amount of vertical
+space.</B> Member variables/structures should be on the top portion of the
+class decleration and methods should be on the bottom.
+
+\include "../../CHI_TECH/ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 
  \section devman1_sec1 Header files
 

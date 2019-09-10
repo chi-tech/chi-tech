@@ -1,29 +1,10 @@
-namespace CHI_LUA 
+namespace chi_lua 
  {
-int chiPieExportPin(int pinNumber);
-int chiPieSetPinMode(int pinNumber, int mode);
-int chiPieSetPinValue(int pinNumber, int mode);
-int chiPieGetPinValue(int pinNumber);
-int chiPieInitSPI();
-int chiPieReadSPIChannel(int channelNumber);
-int chiPieSetSPIBuffer(int channelNumber, bool bufferFlag);
-int chiPieGetSPIBuffer(int channelNumber, int bufferPos);
-int chiPieInitializeSerial(int baudrate);
-int chiPieSerialWrite(char message);
-int chiPieSerialRead();
-int chiThermoSetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode);
-int chiThermoCreateVolumeFromCoordinates(int systemHandle, Table point1, Table point2);
-int chiThermoCreateSystem();
-int chiThermoConnectTwoComponents(Handle systemHandle, Component leftComponent, Single sjunc, Component rigtComponent, 0=end-begin, mode);
-int chiThermoInitialize(int systemHandle);
-int chiThermoCreateBC(int systemHandle);
-int chiThermoGetComponentProperty(Handle sysHndle, Handle compHndle, Property propCode);
-int chiThermoCreateSJunction(Handle systemHandle);
 int chiCreateProductQuadrature(int QuadratureType, int Np, int Na);
 int chiCreateQuadrature(int QuadratureType, int NumberOfPoints);
 int chiLegendre(int N, double x);
 int chiLegendreDerivative(int N, double x);
-int chiYlm(ell \param, m \param, theta \param, varphi \param);
+int chiYlm(int ell, int m, double theta, double varphi);
 int chiEdgeLoopSplitByAngle(int LoopCollectionHandle, int LoopHandle, double Angle);
 int chiSurfaceMeshExportToObj(int SurfaceHandle, char* FileName);
 int chiSurfaceMeshExportPolyFile(int SurfaceHandle, char* FileName);
@@ -61,8 +42,8 @@ int chiFFInterpolationGetValue(int FFIHandle);
 int chiFFInterpolationCreate(int FFITypeIndex);
 int chiFFInterpolationSetProperty(int FFIHandle, int PropertyIndex);
 int chiFFInterpolationExportPython(int FFIHandle, char BaseName);
-int chiMPIReceiveCellsets();
-int chiMPIBroadcastCellsets();
+int chiDomDecompose2D(int Px, int Py, int RegionHandle);
+int chiDecomposeSurfaceMeshPxPy(mesh Surface, int Px, int Py);
 int chiMPIBarrier();
 int chiLogSetVerbosity(int int_level);
 int chiLog(int LogType);
@@ -79,7 +60,7 @@ int chiMonteCarlonExecute(int SolverHandle);
 int chiDiffusionSetProperty(int SolverHandle, int PropertyIndex, varying Values);
 int chiDiffusionCreateSolver();
 int chiDiffusionInitialize(int SolverHandle);
-int chiDiffusionExecute(int SolverHandle, int SolverHandle);
+int chiDiffusionExecute(int SolverHandle);
 int chiLBSSetProperty(int SolverIndex, int PropertyIndex);
 int chiLBSCreateGroupset(int SolverIndex);
 int chiLBSCreateGroup(int SolverIndex);
@@ -96,6 +77,7 @@ int chiLBSGroupsetSetTGDSA(int SolverIndex, int GroupsetIndex, int MaxIters, flo
 int chiLBSInitialize(int SolverIndex);
 int chiLBSGetFieldFunctionList(int SolverIndex);
 int chiLBSGetScalarFieldFunctionList(int SolverIndex);
-int chiLBSransportCreateSolver();
+int chiLBSCreateSolver();
 int chiLBSExecute(int SolverIndex);
+int chiLuaTest(Any argument1);
 }

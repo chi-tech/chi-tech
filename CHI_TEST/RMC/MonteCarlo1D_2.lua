@@ -111,7 +111,7 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Transport Physics
 chiMeshHandlerSetCurrent(tmesh)
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region0)
 
 --========== Groups

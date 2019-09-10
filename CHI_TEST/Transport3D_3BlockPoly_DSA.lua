@@ -84,10 +84,10 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
 num_groups = 168
---chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
---chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
-chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_air50RH.data")
+chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
+chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
 
 src={}
 for g=1,num_groups do
@@ -102,7 +102,7 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 --############################################### Setup Physics
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
