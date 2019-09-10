@@ -84,8 +84,10 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
 num_groups = 32
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
-chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
+chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_RESOURCES/CrossSections/xs_graphite_pure.data")
+chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_RESOURCES/CrossSections/xs_graphite_pure.data")
 
 src={}
 for g=1,num_groups do
@@ -109,8 +111,8 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
-pqaud2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
+pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
