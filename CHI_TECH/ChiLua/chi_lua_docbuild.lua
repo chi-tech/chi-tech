@@ -13,7 +13,7 @@ function readCXXFile()
 	for index,value in pairs(fTable) do
 		fName = io.open(value, 'r+');
 		fContent = fName:read("*all");
-		--print("Searching: "..value)
+		print("Searching: "..value)
 		searchCXXFile(fContent);
 		fName:close();
 	end
@@ -125,6 +125,7 @@ function searchCXXFile(fileContent)
 			wTable[wIndex] 	= wTable[wIndex].."int chi_lua::"..fLine3.."("..fParam..")\n".."{return;} \n";
             
 			--print(fParam)
+			--print(wTable[wIndex])
 			inFunction 		= false;
 
 			lBegin, lEnd, cBegin = 0,0,0;

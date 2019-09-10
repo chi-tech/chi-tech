@@ -4,7 +4,7 @@ int chiCreateProductQuadrature(int QuadratureType, int Np, int Na);
 int chiCreateQuadrature(int QuadratureType, int NumberOfPoints);
 int chiLegendre(int N, double x);
 int chiLegendreDerivative(int N, double x);
-int chiYlm(ell \param, m \param, theta \param, varphi \param);
+int chiYlm(int ell, int m, double theta, double varphi);
 int chiEdgeLoopSplitByAngle(int LoopCollectionHandle, int LoopHandle, double Angle);
 int chiSurfaceMeshExportToObj(int SurfaceHandle, char* FileName);
 int chiSurfaceMeshExportPolyFile(int SurfaceHandle, char* FileName);
@@ -79,4 +79,5 @@ int chiLBSGetFieldFunctionList(int SolverIndex);
 int chiLBSGetScalarFieldFunctionList(int SolverIndex);
 int chiLBSCreateSolver();
 int chiLBSExecute(int SolverIndex);
+int chiLuaTest(Any argument1);
 }

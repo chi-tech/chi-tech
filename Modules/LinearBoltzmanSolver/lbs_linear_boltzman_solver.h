@@ -78,7 +78,6 @@ public:
   //01
   void Initialize();
   //01a
-  void SetPartitioning();
   void ComputeNumberOfMoments();
   //01b
   void InitMaterials(std::set<int>& material_ids);

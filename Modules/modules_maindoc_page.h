@@ -8,6 +8,10 @@ some modules can eventually be incorporated into the utilities category.
 An additional function of modules is to allow us to segregate open source
  modules from export controlled or classified software.
 
+<sub>Group name: LuaModules</sub>
+
  */
 
-/**\defgroup LuaGeneralUtilities G General utilities*/
+/**\defgroup LuaGeneralUtilities G General utilities
+
+<sub>Group name: LuaGeneralUtilities</sub>*/

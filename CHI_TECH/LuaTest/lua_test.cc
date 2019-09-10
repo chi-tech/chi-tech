@@ -2,8 +2,10 @@
 #include <iostream>
 
 //###################################################################
-///This is a lua test function.
-///\param argument1 Any Argument of any type.
+/**This is a lua test function.
+\param argument1 Any Argument of any type.
+\ingroup LuaGeneralUtilities
+ */
 int chiLuaTest(lua_State* L)
 {
   //============================== Optional argument protection

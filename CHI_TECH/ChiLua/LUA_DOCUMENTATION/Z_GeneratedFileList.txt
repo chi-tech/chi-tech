@@ -57,3 +57,4 @@
 ../../Modules/LinearBoltzmanSolver/lua/lbs_getfieldfuncs.cc
 ../../Modules/LinearBoltzmanSolver/lua/lbs_solvercreate.cc
 ../../Modules/LinearBoltzmanSolver/lua/lbs_execute.cc
+../LuaTest/lua_test.cc

@@ -30,3 +30,5 @@ Add_Folder("../ChiPhysics/lua")
 Add_Folder("../../Modules/MonteCarlon/lua")
 Add_Folder("../../Modules/DiffusionSolver/lua")
 Add_Folder("../../Modules/LinearBoltzmanSolver/lua")
+
+Add_Folder("../LuaTest")

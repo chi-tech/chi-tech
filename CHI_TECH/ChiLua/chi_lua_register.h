@@ -231,13 +231,9 @@ RegisterConstant(GROUPSET_TGDSA_TOLERANCE,111);
 
 RegisterConstant(SCATTERING_ORDER,   4);
 RegisterConstant(SWEEP_EAGER_LIMIT,   5);
-
 RegisterFunction(chiLBSInitialize)
-
 RegisterFunction(chiLBSExecute)
-
 RegisterFunction(chiLBSGetFieldFunctionList)
-
 RegisterFunction(chiLBSGetScalarFieldFunctionList)
 
 //module:Linear Boltzman Solver - Groupset manipulation

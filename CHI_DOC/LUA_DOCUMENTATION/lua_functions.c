@@ -45,17 +45,14 @@ int chi_lua::chiLegendre(int N, double x)
 int chi_lua::chiLegendreDerivative(int N, double x)
 {return;} 
 /**Provides the function evaluation of the spherical harmonics.
- *
- * \param ell int The \f$ \ell \f$-th order of the harmonic.
- * \param m   int The \f$ m \f$-th moment of the harmonic.
- * \param theta double Radian polar angle \f$ \theta \f$.
- * \param varphi double Radian azimuthal angle \f$ \varphi \f$.
- *
- * This code has a whitepaper associated with it
- * <a href="SphericalHarmonics.pdf" target="_blank"><b>Spherical Harmonics</b></a>
- *
- * \ingroup LuaMath*/
-int chi_lua::chiYlm(ell \param, m \param, theta \param, varphi \param)
+\param ell int The \f$ \ell \f$-th order of the harmonic.
+\param m   int The \f$ m \f$-th moment of the harmonic.
+\param theta double Radian polar angle \f$ \theta \f$.
+\param varphi double Radian azimuthal angle \f$ \varphi \f$.
+This code has a whitepaper associated with it
+<a href="SphericalHarmonics.pdf" target="_blank"><b>Spherical Harmonics</b></a>
+\ingroup LuaMath*/
+int chi_lua::chiYlm(int ell, int m, double theta, double varphi)
 {return;} 
 /** Splits an edge loop into edges if they differ by a certain angle.
 \param LoopCollectionHandle int Handle to the Loop collection.
@@ -1339,4 +1336,10 @@ int chi_lua::chiLBSCreateSolver()
  \ingroup LuaNPT
  */
 int chi_lua::chiLBSExecute(int SolverIndex)
+{return;} 
+/**This is a lua test function.
+\param argument1 Any Argument of any type.
+\ingroup LuaGeneralUtilities
+ */
+int chi_lua::chiLuaTest(Any argument1)
 {return;} 

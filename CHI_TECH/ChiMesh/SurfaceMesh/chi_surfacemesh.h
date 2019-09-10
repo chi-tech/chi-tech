@@ -14,42 +14,42 @@ class chi_mesh::SurfaceMesh
 {
 public:
   std::vector<chi_mesh::Vertex>   vertices;
-  std::vector<chi_mesh::Vertex>   tex_vertices;
+  std::vector<chi_mesh::Vertex>   tex_vertices; ///< Texture vertices
   std::vector<chi_mesh::Normal>   normals;
   std::vector<chi_mesh::Face>     faces;
   std::vector<chi_mesh::Edge>     lines;
   /*
    * DO NOT PLACE COMMENTS HERE UNLESS REALLY NECESSARY
    */
-  std::vector<chi_mesh::PolyFace*> poly_faces;
+  std::vector<chi_mesh::PolyFace*> poly_faces; ///<Polygonal faces
 
 public:
-  //00
+  //constrdestr.cc
         SurfaceMesh();
   friend std::ostream& operator<<(std::ostream& os,  SurfaceMesh& dt);
-  //01
+  //loadexport.cc
   int   ImportFromOBJFile(const char* fileName,bool as_poly);
   int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
   void  UpdateInternalConnectivity();
   void  ExportToOBJFile(const char* fileName);
   void  ExportToPolyFile(const char* fileName);
 
-  //02
+  //checksense.cc
   bool  CheckNegativeSense(double x, double y, double z);
 
-  //03
+  //maingetedgeloops.cc
   EdgeLoopCollection*  GetEdgeLoops();
   EdgeLoopCollection*  GetCoLinearEdges(EdgeLoopCollection* in_loop);
-  //03b
+  //getedgeloopspoly.cc
   EdgeLoopCollection*  GetEdgeLoopsPoly();
 
-  //04
+  //splitbypatch.cc
   void  SplitByPatch(std::vector<chi_mesh::SurfaceMesh*>& patches);
 
-  //05
+  //extractopenedges.cc
   void  ExtractOpenEdgesToObj(const char* fileName);
 
-  //06
+  //meshstats.cc
   void  CheckCyclicDependencies(int num_angles);
   void  GetMeshStats();
 

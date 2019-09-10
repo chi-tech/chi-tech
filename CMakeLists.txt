@@ -122,7 +122,7 @@ include_directories("${CHI_TECH_DIR}/ChiLog")
 include_directories("${PROJECT_SOURCE_DIR}/Modules")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc" "${CHI_TECH_DIR}/lua_test.cc")
+set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc" "${CHI_TECH_DIR}/LuaTest/lua_test.cc")
 add_subdirectory("${CHI_TECH_DIR}/ChiConsole")
 add_subdirectory("${CHI_TECH_DIR}/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/ChiMath")
