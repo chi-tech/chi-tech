@@ -52,10 +52,10 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
   }
 
   //For now we can only support scalar values so lets check that
-  if ( (typeid(*material->properties[property_map_D]) ==
-        typeid(chi_physics::ScalarValue)) ||
-       (typeid(*material->properties[property_map_D]) ==
-        typeid(chi_physics::ThermalConductivity))           )
+  if (dynamic_cast<chi_physics::ScalarValue*>
+      (material->properties[property_map_D]) ||
+      dynamic_cast<chi_physics::ThermalConductivity*>
+      (material->properties[property_map_D]))
   {
     diffCoeff = material->properties[property_map_D]->GetScalarValue();
   }
@@ -75,8 +75,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
   if ((property_map_q < material->properties.size()) &&
       (property_map_q >= 0))
   {
-    if ( (typeid(*material->properties[property_map_q]) ==
-          typeid(chi_physics::ScalarValue))            )
+    if (dynamic_cast<chi_physics::ScalarValue*>
+        (material->properties[property_map_q]))
     {
       sourceQ = material->properties[property_map_q]->GetScalarValue();
     }
@@ -159,10 +159,10 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     }
 
     //For now we can only support scalar values so lets check that
-    if ( (typeid(*material->properties[property_map_D]) ==
-          typeid(chi_physics::ScalarValue)) ||
-         (typeid(*material->properties[property_map_D]) ==
-          typeid(chi_physics::ThermalConductivity))           )
+    if (dynamic_cast<chi_physics::ScalarValue*>
+        (material->properties[property_map_D]) ||
+        dynamic_cast<chi_physics::ThermalConductivity*>
+        (material->properties[property_map_D]))
     {
       diffCoeff.assign(cell_dofs,
                        material->properties[property_map_D]->GetScalarValue());
@@ -183,8 +183,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     if ((property_map_q < material->properties.size()) &&
         (property_map_q >= 0))
     {
-      if ( (typeid(*material->properties[property_map_q]) ==
-            typeid(chi_physics::ScalarValue))            )
+      if (dynamic_cast<chi_physics::ScalarValue*>
+          (material->properties[property_map_q]))
       {
         sourceQ.assign(cell_dofs,
                        material->properties[property_map_q]->GetScalarValue());
@@ -219,8 +219,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (typeid(*material->properties[p]) ==
-          typeid(chi_physics::TransportCrossSections))
+      if (dynamic_cast<chi_physics::TransportCrossSections*>
+          (material->properties[p]))
       {
         auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
 
@@ -245,8 +245,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     if ((property_map_q < material->properties.size()) &&
         (property_map_q >= 0))
     {
-      if ( (typeid(*material->properties[property_map_q]) ==
-            typeid(chi_physics::ScalarValue))            )
+      if (dynamic_cast<chi_physics::ScalarValue*>
+          (material->properties[property_map_q]))
       {
         sourceQ.assign(cell_dofs,
                        material->properties[property_map_q]->GetScalarValue());
@@ -273,8 +273,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (typeid(*material->properties[p]) ==
-          typeid(chi_physics::TransportCrossSections))
+      if (dynamic_cast<chi_physics::TransportCrossSections*>
+          (material->properties[p]))
       {
         auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
 
@@ -356,8 +356,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (typeid(*material->properties[p]) ==
-          typeid(chi_physics::TransportCrossSections))
+      if (dynamic_cast<chi_physics::TransportCrossSections*>
+          (material->properties[p]))
       {
         auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
 
@@ -439,8 +439,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (typeid(*material->properties[p]) ==
-          typeid(chi_physics::TransportCrossSections))
+      if (dynamic_cast<chi_physics::TransportCrossSections*>
+          (material->properties[p]))
       {
         auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
 

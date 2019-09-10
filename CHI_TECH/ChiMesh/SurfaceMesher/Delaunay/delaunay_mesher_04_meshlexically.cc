@@ -60,7 +60,7 @@ void chi_mesh::SurfaceMesherDelaunay::MeshLexically(
                                               curedge->vertices[1].x,
                                               curedge->vertices[1].y);
     }
-    printf("Number of unused vertices = %d\n",del_patch.unused_vs.size());
+    printf("Number of unused vertices = %lu\n",del_patch.unused_vs.size());
 
   }
 

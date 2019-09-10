@@ -84,7 +84,7 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
        region_context != region_contexts.end();
        region_context++)
   {
-    printf("Meshing region %d\n",std::distance(region_contexts.begin(),region_context));
+    printf("Meshing region %lu\n",std::distance(region_contexts.begin(),region_context));
     MeshRegion(*(*region_context));
   }
 
@@ -106,7 +106,7 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
         //============================= Create and assign new mesh continua
         MeshContinuum* new_mesh_cont = new MeshContinuum;
         new_mesh_cont->surface_mesh = cur_region_context->at(b)->remeshed_surface_mesh;
-        printf("Surface mesh copied with %d triangles and %d vertices\n", new_mesh_cont->surface_mesh->faces.size(),
+        printf("Surface mesh copied with %lu triangles and %lu vertices\n", new_mesh_cont->surface_mesh->faces.size(),
                new_mesh_cont->surface_mesh->vertices.size());
         cur_region->boundaries[b]->mesh_continua.push_back(new_mesh_cont);
       }
