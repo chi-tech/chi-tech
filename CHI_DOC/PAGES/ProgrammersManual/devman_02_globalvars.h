@@ -5,11 +5,11 @@
 The major global variables are defined in "chi_tech_main.h"
 
 They are:
- - CHI_CONSOLE chi_console The link to the lua scripting engine.
- - CHI_MATH chi_math_handler A handler of math related entities
- - CHI_PHYSICS chi_physics_handler A handler of physics related items
- - CHI_MPI chi_mpi A handler for parallel related items.
- - CHI_LOG chi_log A handler for parallel logging events and verbosity.
+ - ChiConsole chi_console The link to the lua scripting engine.
+ - ChiMath chi_math_handler A handler of math related entities
+ - ChiPhysics chi_physics_handler A handler of physics related items
+ - ChiMPI chi_mpi A handler for parallel related items.
+ - ChiLog chi_log A handler for parallel logging events and verbosity.
 
 
 
@@ -18,17 +18,17 @@ They are:
 
 The physics handler maintains a number of data structures, most notably
  are the following three:
- - CHI_PHYSICS::solver_stack Solvers are pushed here
- - CHI_PHYSICS::material_stack Materials are pushed here
- - CHI_PHYSICS::fieldfunc_stack Field functions are pushed here
+ - ChiPhysics::solver_stack Solvers are pushed here
+ - ChiPhysics::material_stack Materials are pushed here
+ - ChiPhysics::fieldfunc_stack Field functions are pushed here
 
 To access chi_physics_handler include the following code at the top of your
  code
 
 \code
-#include <CHI_PHYSICS/chi_physics.h>
+#include <ChiPhysics/chi_physics.h>
 
-extern CHI_PHYSICS chi_physics_handler;
+extern ChiPhysics chi_physics_handler;
 \endcode
 
 
@@ -37,8 +37,8 @@ extern CHI_PHYSICS chi_physics_handler;
 
 General MPI information like the current location id and the total amount
  of parallel processes is contained in CHI_MPI:
- - CHI_MPI::location_id
- - CHI_MPI::process_count
+ - ChiMPI::location_id
+ - ChiMPI::process_count
 
 Additionally, by including the headers for chi_mpi, developers have access to
  all the classic mpi headers.
@@ -46,7 +46,7 @@ Additionally, by including the headers for chi_mpi, developers have access to
 \code
 #include <chi_mpi.h>
 
-extern CHI_MPI chi_mpi;
+extern ChiMPI chi_mpi;
 
 if (chi_mpi.location_id == 1)
  printf("This is process 1, Dab!");
@@ -60,13 +60,13 @@ Printing information in a parallel environment can be a very involved
 process. One can't simply use "std::cout <<" on every process otherwise
 the output to the log will be chaotic. For this reason we employ a common
  logging utility which return an output string stream using the function
- call CHI_LOG::Log.
+ call ChiLog::Log.
 
 Connecting to chi_log is done as follows
 \code
 #include <chi_log.h>
 
-extern CHI_LOG chi_log;
+extern ChiLog chi_log;
 \endcode
 
 The logger needs to be supplied with an enumeration (LOG_LVL) indicating

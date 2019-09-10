@@ -340,7 +340,7 @@ D \ \hat{n} \cdot \int_{\partial \bOmega}
 \end{aligned}
 \end{equation*}
 \newline
-By using the same shape functions for the test functions as was used for the basis functions we have the following, Galerkin, form of the equations
+By using the same shape functions for the test functions as was used for the basis functions, $\varphi_i = N_i$, we have the following, Galerkin-form of the equations
 \begin{equation}
 \begin{aligned}
 \therefore
@@ -383,22 +383,26 @@ With each trial space representing an equation, we can assemble a row of a matri
  
 \vspace{0.25cm}
 \textbf{For each element k, for each DOF-$i$, for each DOF-$j$}
-\begin{equation*}
+\begin{equation}
 \begin{aligned}
 a_{ij} &=a_{ij} +  D \int_{\bOmega_i} \nabla N_i  \cdot  \nabla N_j .dV + 
 \sigma_a \int_{\bOmega_i} N_i N_j.dV -
-D \  \hat{n} \cdot \int_{\partial \bOmega} N_i  \nabla N_j .dA \\
+D \  \hat{n} \cdot \int_{\partial \bOmega} N_i  \nabla N_j .dA 
+\end{aligned}
+\end{equation}
+\begin{equation}
+\begin{aligned}
 b_i &= b_i 
 + q_{nc,j} \int_{\bOmega_i}  N_i  N_j .dV
 \end{aligned}
-\end{equation*}
+\end{equation}
 
 \textbf{For each element k, for each DOF-$i$}
-\begin{equation*}
+\begin{equation}
 \begin{aligned}
 b_i &= b_i + q_c \int_{\bOmega_i} N_i   .dV 
 \end{aligned}
-\end{equation*}
+\end{equation}
 
 \subsection{Boundary conditions}
 There are 2 primary types of boundary conditions implemented in ChiTech; \textbf{Dirichlet} type boundary conditions and \textbf{Robin} type boundary conditions.

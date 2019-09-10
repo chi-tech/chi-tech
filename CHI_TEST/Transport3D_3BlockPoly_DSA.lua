@@ -102,7 +102,7 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 --############################################### Setup Physics
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
@@ -127,11 +127,11 @@ chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,LBS_GMRES)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4)
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 
@@ -142,12 +142,12 @@ chiLBSGroupsetAddGroups(phys1,cur_gs,63,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,LBS_GMRES)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 --========== Boundary conditions
 bsrc={}

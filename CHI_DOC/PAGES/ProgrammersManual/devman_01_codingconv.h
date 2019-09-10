@@ -2,42 +2,54 @@
 
  \section sec0 Coding conventions
 
- Let us say it here explicitly, <B>names should be descriptive</B>,
+ In general we follow the
+ <a href="https://google.github.io/styleguide/cppguide.html">Google C++ style guide</a>.
+ We now will dictate a few specific items.
+ \n\n
+ Let us say it here explicitly, <B>all variable-, function-, method- names should be descriptive</B>,
  avoid abbreviation, rather sacrifice horizontal space for readability.
 
  \subsection devman1_sec0_1 File names
 
- - <B>Classes</B> should be contained in their own folder unless they are simple.
  - <B>Filenames</B> should be all lower case and may include "_" underscores. i.e.
    chi_tech_main.cc
- - Within a class folder the class declaration should be contained in its own
-   header file.
+ - Do not uses dashes `-` in file names
+ - Do not use filenames that already exist in `/usr/include`
+ - In general, make your filenames very specific. For example, use
+   `http_server_logs.h` rather than `logs.h`. A very common case is to have a pair
+   of files called, e.g., `foo_bar.h` and `foo_bar.cc`, defining a
+   class called `FooBar`
+ - Header files have a `.h` extension, c/c++ code files have a `.cc` extension.
+ - Classes and Categorical functions should be contained in their own folder
+   unless they are simple.
+ - Folder depth shall be kept to a minimum and not exceed a depth of 3
+   sub-levels unless very well justified, i.e. `ChiMath/Discretization/PWL`
+ - Within a class folder the class declaration must be contained in its own
+   header file. Exceptions to this are allowed for templates and in-line
+   functions
  - When the member methods/functions become very large, consider functionally
    splitting them. I.e. use:
    - classname_00_constrdestr.cc for the constructor and destructor
    - classname_01_init.cc for an initialize call
    - classname_02_ops.cc for numerous small operations.
 
-\image html "devman_Filenames.png" width=300px
+\image html "DevMan_Filenames.png" "Example 1" width=300px
 
  - If the class is really small then it should have a header file and an
    associated .cc file
 
-  \image html "devman_Filenames1.png" width=350px
+  \image html "DevMan_Filenames1.png" "Example 2" width=350px
 
 \subsection devman1_sec0_2 General code
 
- - <B>Variables</B> should use lower case and include "_" between words. i.e.
-    num_faces.
+ - <B>Variables</B> must use lower case and include "_" between words. i.e.
+    num_faces. Variable must not start or end with an underscore.
  - <B>Namespaces</B> should be lower case and may include underscores
- - <B>FunctionNames</B> have no underscores and each word start with a capital
-   letter.
- - <B>Standalone classes and structures</B> should be all caps. For example
-   CHI_DISCRETIZATION_PWL.
- - <B>General classes and structures</B> which are part of namespaces have each
-   word start with
-   a capital letter. For example chi_mesh::Vector is a structure called Vector
-   and is defined in the namespace chi_mesh.
+ - <B>FunctionNames</B> have no underscores and each word starts with a capital
+   letter. Underscores can be allowed in some circumstances.
+ - <B>Classes and structures</B> have each
+   word start with a capital letter. For example chi_mesh::Vector is a structure
+   called Vector and is defined in the namespace chi_mesh.
 
 \code
 int good_variable_name;    // Good variable name
@@ -49,7 +61,7 @@ void ThisIsAFunctionName(int parameter1)
   return;
 }
 
-class COOL_DATA_STRUCTURE     // Standalone class declaration
+class CoolDataStructure     // Standalone class declaration
 {
 public:
   int data;
@@ -66,31 +78,35 @@ class my_space::CoolerDataStructure
 public:
   int data;
 };
+
+class my_space::CoolerDataStructure {
+public:
+  int data;
+};
 \endcode
 
-\subsection devman1_sec0_3 Tabs and spaces
+\subsection devman1_sec0_3 Tabs, spaces and braces
 
 In order to save horizontal space standard indents are to be 2 spaces instead
-of 4 space equivalent tabs. Other than this the convention is flexible.
+of 4 space equivalent tabs. Other than this the convention is flexible.\n\n
 
-\subsection devman1_sec0_4 Constants
+Curly braces, parentheses and block braces does not have a specific requirement
+other than being used in a sense that is optimal with respect to readibility.\n\n
 
-Constants should either look like variable names with a "k" prepended to them
-or look like macros. Constants can be defined in macros, enumerations or within
+Generally we require that code span a maximum of 80 characters. This is not
+a hard rule but will greatly enhance code reliability. Especially in
+split-screen configurations.
+
+\subsection devman1_sec0_4 Constants and Enumerators
+
+Constants should look like macros. Constants can be defined in macros, enumerations or within
 code segments.
 
 \code
 #define   PI       3.1415926535898
-#define k_pi       3.1415926535898;
 
 int DEFAULT_SETTING1   = 1;
-int k_default_setting2 = 2;
 
-enum UrlTableErrors {
-  kOK = 0,
-  kErrorOutOfMemory,
-  kErrorMalformedInput,
-};
 enum AlternateUrlTableErrors {
   OK = 0,
   OUT_OF_MEMORY = 1,
@@ -104,7 +120,16 @@ enum AlternateUrlTableErrors {
  convey the algorithm. Every class, structure or function should be
  supplied with doxygen comment styles at the top of the item.
 
-\include "../../CHI_TECH/CHI_MODULES/CHI_DIFFUSION/lua/diffusion_execute.cc"
+\include "../../Modules/DiffusionSolver/lua/diffusion_execute.cc"
+
+## Annotating Class-declerations:
+<B>MAXIMIZE SCOPE MINIMIZE SPACE</B>.
+Class declerations must always happen within header files and should aim to
+provide the maximum amount of scope <B>within the minimum amount of vertical
+space.</B> Member variables/structures should be on the top portion of the
+class decleration and methods should be on the bottom.
+
+\include "../../CHI_TECH/ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 
  \section devman1_sec1 Header files
 
