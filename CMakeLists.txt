@@ -32,7 +32,7 @@ project(${TARGET} C CXX)
 
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/CHI_TECH")
-set(CHI_TECH_MOD "${PROJECT_SOURCE_DIR}/CHI_TECH/CHI_MODULES")
+set(CHI_TECH_MOD "Modules")
 set(CHI_TECH_DEP "${PROJECT_SOURCE_DIR}/CHI_RESOURCES/Dependencies")
 
 set(TRIANGLE_ROOT "${CHI_TECH_DEP}/triangle")
@@ -53,8 +53,7 @@ include(GNUInstallDirs)
 include(Filter)
 
 #================================================ Precompiler flags
-#LUA CONSOLE
-add_definitions(-DNO_FONTGENESIS)
+
 
 #================================================ Compiler flags
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
@@ -74,7 +73,7 @@ include_directories("${LUA_ROOT}/include")
 include_directories("${CHI_TECH_DEP}/Random123/include")
 include_directories("${TRIANGLE_ROOT}")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
-include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/CHI_MATH/CHI_DISCRETIZATION")
+include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 include_directories("${PETSC_ROOT}/include")
 include_directories(SYSTEM "${BOOST_ROOT}/include")
@@ -117,27 +116,26 @@ set(LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 
 #================================================ Default include directories
-include_directories("${CHI_TECH_DIR}/CHI_LUA")
-include_directories("${CHI_TECH_DIR}/CHI_MPI")
-include_directories("${CHI_TECH_DIR}/CHI_LOG")
+include_directories("${CHI_TECH_DIR}/ChiLua")
+include_directories("${CHI_TECH_DIR}/ChiMPI")
+include_directories("${CHI_TECH_DIR}/ChiLog")
+include_directories("${PROJECT_SOURCE_DIR}/Modules")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc")
-add_subdirectory("${CHI_TECH_DIR}/CHI_CONSOLE")
-add_subdirectory("${CHI_TECH_DIR}/CHI_LIB")
-add_subdirectory("${CHI_TECH_DIR}/CHI_LUA")
-add_subdirectory("${CHI_TECH_DIR}/CHI_MATH")
-add_subdirectory("${CHI_TECH_DIR}/CHI_PHYSICS")
-add_subdirectory("${CHI_TECH_DIR}/CHI_GRAPH")
+set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc" "${CHI_TECH_DIR}/LuaTest/lua_test.cc")
+add_subdirectory("${CHI_TECH_DIR}/ChiConsole")
+add_subdirectory("${CHI_TECH_DIR}/ChiLua")
+add_subdirectory("${CHI_TECH_DIR}/ChiMath")
+add_subdirectory("${CHI_TECH_DIR}/ChiPhysics")
+add_subdirectory("${CHI_TECH_DIR}/ChiGraph")
 
-add_subdirectory("${CHI_TECH_DIR}/CHI_TIMER")
-add_subdirectory("${CHI_TECH_DIR}/CHI_TOOLS")
-add_subdirectory("${CHI_TECH_DIR}/CHI_MESH")
-add_subdirectory("${CHI_TECH_DIR}/CHI_MPI")
-add_subdirectory("${CHI_TECH_DIR}/CHI_LOG")
+add_subdirectory("${CHI_TECH_DIR}/ChiTimer")
+add_subdirectory("${CHI_TECH_DIR}/ChiMesh")
+add_subdirectory("${CHI_TECH_DIR}/ChiMPI")
+add_subdirectory("${CHI_TECH_DIR}/ChiLog")
 
-add_subdirectory("${CHI_TECH_MOD}/CHI_MONTECARLON")
-add_subdirectory("${CHI_TECH_MOD}/CHI_DIFFUSION")
+add_subdirectory("${CHI_TECH_MOD}/MonteCarlon")
+add_subdirectory("${CHI_TECH_MOD}/DiffusionSolver")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
 

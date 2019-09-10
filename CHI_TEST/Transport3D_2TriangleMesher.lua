@@ -100,7 +100,7 @@ chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_gr
 
 --############################################### Setup Physics
 
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
 --========== Groups

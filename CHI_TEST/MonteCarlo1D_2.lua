@@ -127,7 +127,7 @@ chiMonteCarlonExecute(phys0)
 
 --############################################### Setup Physics
 chiMeshHandlerSetCurrent(tmesh)
-phys1 = chiLBSransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region0)
 
 --========== Groups
