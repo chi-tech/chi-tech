@@ -24,6 +24,10 @@ CHI_RESOURCES/Dependencies/glew-2.1.0/
 *.synctex.gz
 *.toc
 
+# All vtk mesh files
+*.vtu
+*.pvtu
+
 CHI_RESOURCES/Dependencies/\.DS_Store
 
 CHI_RESOURCES/\.DS_Store
