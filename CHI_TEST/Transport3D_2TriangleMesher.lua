@@ -92,11 +92,11 @@ chiPhysicsMaterialSetProperty(materials[1],THERMAL_CONDUCTIVITY,SINGLE_VALUE,0.5
 
 chiPhysicsMaterialAddProperty(materials[0],TRANSPORT_XSECTIONS)
 chiPhysicsMaterialSetProperty(materials[0],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"CHI_RESOURCES/CrossSections/xs_graphite_pure.data")
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 
 chiPhysicsMaterialAddProperty(materials[1],TRANSPORT_XSECTIONS)
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"CHI_RESOURCES/CrossSections/xs_graphite_pure.data")
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 
 
 

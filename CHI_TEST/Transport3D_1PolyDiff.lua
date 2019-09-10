@@ -99,9 +99,9 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 21
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"CHI_RESOURCES/CrossSections/xs_graphite_pure.data")
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"CHI_RESOURCES/CrossSections/xs_graphite_pure.data")
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 
 src={}
 for g=1,num_groups do
