@@ -1,6 +1,6 @@
 ## Compiling on macOS
 ___
-### Compiling with the Apple Toolchain
+### Compiling with the Apple Tdoolchain
 ___
 
 The following instructions assume that all of the prerequisite software packages will be installed by hand.  These packages may also be installed via **Brew** or **MacPorts**.
@@ -44,7 +44,7 @@ Once the installation is complete, set the BOOST_ROOT environment variable:
 
     $ export BOOST_ROOT=/Path/to/Boost
 
-#### Step 4 - Install PetSc
+#### Step 4 - Install PETSc
 
 Download and extract **PETSc** from https://www.mcs.anl.gov/petsc.  **PETSc** v3.9.4 is recommended for performance reasons.  Configure and install as follows:
 
@@ -156,9 +156,7 @@ If this is not displayed then install gcc using the following command:
 
     sudo apt-get install build-essential gfortran
 
-If you still do not get the appropriate version when running either ``gcc --version``
-or ``gfortran --version`` then there are many online resources which may be able to
-assist you.
+If you still do not get the appropriate version when running either ``gcc --version`` or ``gfortran --version`` then there are many online resources which may be able to assist you.
 
 Install other packages:
 
