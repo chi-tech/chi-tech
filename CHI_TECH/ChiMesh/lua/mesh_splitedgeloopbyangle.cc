@@ -32,7 +32,7 @@ int chiEdgeLoopSplitByAngle(lua_State *L)
   try{
     cur_coll = cur_hndlr->edge_loop_collections.at(loop_coll_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cerr << "ERROR: Invalid loop collection handle." << std::endl;
     exit(EXIT_FAILURE);
@@ -45,7 +45,7 @@ int chiEdgeLoopSplitByAngle(lua_State *L)
   try{
     cur_loop = cur_coll->at(loop_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cerr << "ERROR: Invalid loop handle." << std::endl;
     exit(EXIT_FAILURE);

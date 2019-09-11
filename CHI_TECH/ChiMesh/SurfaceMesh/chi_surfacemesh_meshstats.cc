@@ -67,7 +67,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
     try{
       boost::topological_sort(G,std::back_inserter(sorted_list));
     }
-    catch (boost::bad_graph exc)
+    catch (const boost::bad_graph& exc)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Function CheckCyclicDependencies. Detected cyclic depency.";
