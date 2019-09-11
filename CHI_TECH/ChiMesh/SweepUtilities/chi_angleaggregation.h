@@ -26,9 +26,9 @@
  * have multiple indices associated with the same azimuthal angle but
  * different polar angles. We call this manifestation a "AngleSet".
  *
- * The octant based seperation is achieved via the notion of "AngleSetGroup"
- * which will of a group of angle sets for each quadrant or octant
- * (depenending on 2D or 3D).*/
+ * The octant based separation is achieved via the notion of "AngleSetGroup"
+ * which will group angle sets for each quadrant or octant
+ * (depending on 2D or 3D).*/
 class chi_mesh::SweepManagement::AngleAggregation
 {
 public:
