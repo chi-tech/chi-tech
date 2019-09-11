@@ -26,7 +26,7 @@ void chi_mesh::SurfaceMesherDelaunay::MeshRegion(
     {
       //========================================= Split by patch
       (*delaunay_context)->context_surface_mesh->SplitByPatch((*delaunay_context)->patches);
-      printf("Number of surfaces =%d\n",(*delaunay_context)->patches.size());
+      printf("Number of surfaces =%lu\n",(*delaunay_context)->patches.size());
 
       //========================================= Mesh each patch
       std::vector<chi_mesh::SurfaceMesh*>::iterator patch;
@@ -65,7 +65,7 @@ void chi_mesh::SurfaceMesherDelaunay::MeshRegion(
           int new_index;
         };
         std::vector<vhist*> vertex_add_hist;
-        printf("Number of triangles in patch %d\n",curPatch->triangles.size());
+        printf("Number of triangles in patch %lu\n",curPatch->triangles.size());
 
         //======================================= Loop over all triangles
         for (unsigned t=0; t<curPatch->triangles.size(); t++)

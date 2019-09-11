@@ -69,7 +69,7 @@ void chi_mesh::SurfaceMesh::SplitByPatch(
     }
   }
 
-  printf("Number of co-planar collections=%d\n",co_planar_lists.size());
+  printf("Number of co-planar collections=%lu\n",co_planar_lists.size());
 
   FaceListCollection patch_list_collection;
 
@@ -164,7 +164,7 @@ void chi_mesh::SurfaceMesh::SplitByPatch(
 
   }
 
-  printf("Number of patches = %d\n", patch_list_collection.size());
+  printf("Number of patches = %lu\n", patch_list_collection.size());
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Create surfaces for each patch
   FaceListCollection::iterator outer_patch;

@@ -1,6 +1,6 @@
 #include"chi_timer.h"
 
-#include <math.h>
+#include <cmath>
 
 //################################################################### Reset
 /** Resets the timer to zero.*/

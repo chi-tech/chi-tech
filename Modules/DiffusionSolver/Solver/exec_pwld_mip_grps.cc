@@ -192,7 +192,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
 
 
       //=================================== Location wise view
-      if ((chi_mpi.location_id == 0))
+      if (chi_mpi.location_id == 0)
       {
         int its;
         ierr = KSPGetIterationNumber(kspg[gr],&its);

@@ -363,7 +363,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
           if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
           {
-            printf("Z-Cut %d, %g\n",vol_mesher->zcuts.size(),
+            printf("Z-Cut %lu, %g\n",vol_mesher->zcuts.size(),
                    extruder->vertex_layers[layer_index]);
           }
         }
@@ -464,7 +464,7 @@ void chi_mesh::VolumeMesher::
       }
     }//if typeid
   }//for local item_id
-  printf("Number of boundary item_id: %d\n",vol_continuum->boundary_cell_indices.size());
+  printf("Number of boundary item_id: %lu\n",vol_continuum->boundary_cell_indices.size());
 
   vol_continuum->ExportCellsToPython(
     "BoundaryCells.py",true,

@@ -71,7 +71,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         //####################### LOCAL CELL ###############################
       else
       {
-        delete [] tcell;
+        delete tcell;
         //========================================= Create polyhedron
         chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
         cell->xyz_partition_indices = tcell->xyz_partition_indices;
