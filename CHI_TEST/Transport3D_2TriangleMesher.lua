@@ -91,10 +91,12 @@ chiPhysicsMaterialSetProperty(materials[1],THERMAL_CONDUCTIVITY,SINGLE_VALUE,0.5
 --chiPhysicsMaterialSetProperty(materials[0],THERMAL_CONDUCTIVITY,FROM_TABLE,12.7)
 
 chiPhysicsMaterialAddProperty(materials[0],TRANSPORT_XSECTIONS)
-chiPhysicsMaterialSetProperty(materials[0],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
+chiPhysicsMaterialSetProperty(materials[0],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 
 chiPhysicsMaterialAddProperty(materials[1],TRANSPORT_XSECTIONS)
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_graphite_pure.data")
+chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 
 
 
@@ -109,7 +111,7 @@ grp[0] = chiLBSCreateGroup(phys1)
 grp[1] = chiLBSCreateGroup(phys1)
 
 --========== ProdQuad
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
@@ -119,6 +121,14 @@ chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+
+bsrc={}
+for g=1,2 do
+    bsrc[g] = 0.0
+end
+bsrc[1] = 1.0/4.0/math.pi;
+--bsrc[1] = 1.0
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,INCIDENT_ISOTROPIC,bsrc);
 
 
 chiLBSInitialize(phys1)

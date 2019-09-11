@@ -90,8 +90,10 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
 num_groups = 168
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_3_170.data")
-chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,PDT_XSFILE,"xs_3_170.data")
+chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_TEST/xs_3_170.data")
+chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
+        PDT_XSFILE,"CHI_TEST/xs_3_170.data")
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 
