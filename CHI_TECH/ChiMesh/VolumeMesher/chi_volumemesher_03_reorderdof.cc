@@ -160,22 +160,24 @@ int chi_mesh::VolumeMesher::
         chi_mesh::CellPolyhedron* polyh_cell;
         int cell_type;
 
-        if (typeid(*vol_continuum->cells.at(old_index)) ==
-            typeid(chi_mesh::CellTriangle))
+        if (dynamic_cast<chi_mesh::CellTriangle*>
+            (vol_continuum->cells.at(old_index)))
+        //if (typeid(*vol_continuum->cells.at(old_index)) ==
+        //    typeid(chi_mesh::CellTriangle))
         {
           tri_cell = (chi_mesh::CellTriangle*)vol_continuum->cells.at(
                                old_index);
           cell_type = CELL_TYPE_TRIANGLE;
         }
-        else if (typeid(*vol_continuum->cells.at(old_index)) ==
-                 typeid(chi_mesh::CellPolygon))
+        else if (dynamic_cast<chi_mesh::CellPolygon*>
+                 (vol_continuum->cells.at(old_index)))
         {
           poly_cell = (chi_mesh::CellPolygon*)vol_continuum->cells.at(
                                old_index);
           cell_type = CELL_TYPE_POLYGON;
         }
-        else if (typeid(*vol_continuum->cells.at(old_index)) ==
-                 typeid(chi_mesh::CellPolyhedron))
+        else if (dynamic_cast<chi_mesh::CellPolyhedron*>
+                 (vol_continuum->cells.at(old_index)))
         {
           polyh_cell = (chi_mesh::CellPolyhedron*)vol_continuum->cells.at(
                                old_index);

@@ -280,7 +280,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
                 exit(EXIT_FAILURE);
               }
 
-              if ((ir == v0_index))
+              if (ir == v0_index)
               {
                 //================= Processing boundary
                 int boundary_type =

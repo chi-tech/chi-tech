@@ -258,7 +258,7 @@ void chi_mesh::SurfaceMesherDelaunay::
   fprintf(of,"clear\n");
   fprintf(of,"clc\n");
 
-  fprintf(of,"verts=zeros(%d,2);\n",Pstar.size());
+  fprintf(of,"verts=zeros(%lu,2);\n",Pstar.size());
 
   for (int v=0; v<Pstar.size(); v++)
   {
@@ -268,7 +268,7 @@ void chi_mesh::SurfaceMesherDelaunay::
   }
 
   fprintf(of,"\n");
-  fprintf(of,"tris=zeros(%d,6);\n",triangles.size());
+  fprintf(of,"tris=zeros(%lu,6);\n",triangles.size());
 
   for (int f=0; f<triangles.size(); f++)
   {
@@ -528,6 +528,3 @@ FindCircumCircle(chi_mesh::Vertex a, chi_mesh::Vertex b, chi_mesh::Vertex c,
 
   radius = sqrt(    (center.x-b.x)*(center.x-b.x)  + (center.y-b.y)*(center.y-b.y)  );
 }
-
-
-

@@ -38,7 +38,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
     {
       int cell_glob_index = local_cell_glob_indices[c];
 
-      if (typeid(*cells[c]) == typeid(chi_mesh::CellPolyhedron))
+      if (dynamic_cast<chi_mesh::CellPolyhedron*>(cells[c]))
       {
         chi_mesh::CellPolyhedron* polyh_cell =
           ((chi_mesh::CellPolyhedron*)cells[c]);
@@ -153,7 +153,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
       {
         int cell_glob_index = local_cell_glob_indices[c];
 
-        if (typeid(*cells[c]) == typeid(chi_mesh::CellPolyhedron))
+        if (dynamic_cast<chi_mesh::CellPolyhedron*>(cells[c]))
         {
           chi_mesh::CellPolyhedron* polyh_cell =
             ((chi_mesh::CellPolyhedron*)cells[c]);
