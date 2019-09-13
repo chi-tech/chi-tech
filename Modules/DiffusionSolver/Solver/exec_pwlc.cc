@@ -56,18 +56,18 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
     chi_mesh::Cell* cell = grid->cells[glob_cell_index];
 
     //====================================== Process cells
-    if (cell->Type() == chi_mesh::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       if (!suppress_assembly)
         CFEM_Ab_Slab(glob_cell_index, cell, gi);
 
     }
-    else if (cell->Type() == chi_mesh::POLYGON_CELL)
+    else if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       if (!suppress_assembly)
         CFEM_Ab_Polygon(glob_cell_index, cell, gi);
     }
-    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
+    else if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       if (!suppress_assembly)
         CFEM_Ab_Polyhedron(glob_cell_index, cell, gi);

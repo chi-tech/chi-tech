@@ -6,7 +6,7 @@
 
 namespace chi_mesh
 {
-  enum CellTypes
+  enum class CellTypes
   {
     GHOST_CELL = 0,
     SLAB_CELL = 1,
@@ -55,7 +55,7 @@ public:
 
   virtual ~Cell()
   {
-    cell_type = GHOST_CELL;
+    cell_type = CellTypes::GHOST_CELL;
   }
 public:
   virtual void FindBoundary2D(chi_mesh::Region* region)

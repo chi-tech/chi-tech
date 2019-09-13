@@ -19,7 +19,7 @@ public:
 public:
   CellSlab()
   {
-    cell_type = SLAB_CELL;
+    cell_type = CellTypes::SLAB_CELL;
   }
 };
 

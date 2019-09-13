@@ -84,7 +84,7 @@ CreateSweepOrder(double polar, double azimuthal,
     chi_mesh::Cell* cell = vol_continuum->cells[cell_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -144,7 +144,7 @@ CreateSweepOrder(double polar, double azimuthal,
       }//for face
     }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::POLYGON_CELL)
+    else if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -203,7 +203,7 @@ CreateSweepOrder(double polar, double azimuthal,
       }//for edge
     } //If polygon
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
+    else if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 

@@ -50,7 +50,7 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     auto cell = vol_continuum->cells[cell_glob_index];
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       for (int v=0; v<2; v++)
@@ -60,7 +60,7 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::POLYGON_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       for (int v=0; v<poly_cell->v_indices.size(); v++)
@@ -70,7 +70,7 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       for (int v=0; v<polyh_cell->v_indices.size(); v++)
@@ -106,7 +106,7 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     auto cell = vol_continuum->cells[cell_glob_index];
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       for (int e=0; e<2; e++)
@@ -133,7 +133,7 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     }//if slab
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::POLYGON_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       for (int e=0; e<poly_cell->edges.size(); e++)
@@ -160,7 +160,7 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     }//if polygon
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       for (int f=0; f<polyh_cell->faces.size(); f++)

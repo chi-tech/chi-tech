@@ -15,7 +15,7 @@ public:
 public:
   CellPolyhedron()
   {
-    cell_type = POLYHEDRON_CELL;
+    cell_type = CellTypes::POLYHEDRON_CELL;
   }
 };
 

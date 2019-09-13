@@ -27,7 +27,7 @@ public:
 public:
   CellPolygon()
   {
-    cell_type = POLYGON_CELL;
+    cell_type = CellTypes::POLYGON_CELL;
   }
   //01
   void FindBoundary2D(chi_mesh::Region* region);

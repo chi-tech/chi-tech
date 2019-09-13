@@ -51,13 +51,13 @@ void chi_montecarlon::Solver::ComputeTallySqr()
     auto cell = grid->cells[cell_glob_index];
 
     double V = 1.0;
-    if (cell->Type() == chi_mesh::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto cell_fv_view =
         (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
       V = cell_fv_view->volume;
     }
-    else if (cell->Type() == chi_mesh::POLYGON_CELL)
+    else if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto cell_fv_view =
         (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);

@@ -433,7 +433,7 @@ void chi_mesh::VolumeMesher::
     chi_mesh::Cell* cell = vol_continuum->cells[c];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::POLYGON_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -449,7 +449,7 @@ void chi_mesh::VolumeMesher::
     }//if typeid
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
