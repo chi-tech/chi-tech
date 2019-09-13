@@ -23,6 +23,9 @@ public:
     v_indices[1] = -1;
     edges[0] = -1;
     edges[1] = -1;
+
+    face_normals[0] = chi_mesh::Vector();
+    face_normals[1] = chi_mesh::Vector();
   }
 };
 
