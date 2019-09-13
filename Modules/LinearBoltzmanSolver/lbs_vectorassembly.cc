@@ -24,7 +24,7 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
     auto cell        = grid->cells[cell_g_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       LBSCellViewFull* transport_view =
         (LBSCellViewFull*)cell_transport_views[c];
@@ -45,7 +45,7 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
     }//if slab
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -68,7 +68,7 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
     }//if polygon
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
@@ -114,7 +114,7 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
     auto cell        = grid->cells[cell_g_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       LBSCellViewFull* transport_view =
         (LBSCellViewFull*)cell_transport_views[c];
@@ -135,7 +135,7 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
     }//if slab
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -158,7 +158,7 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
     }//if polygon
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
@@ -204,7 +204,7 @@ DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
     auto cell        = grid->cells[cell_g_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       LBSCellViewFull* transport_view =
         (LBSCellViewFull*)cell_transport_views[c];
@@ -226,7 +226,7 @@ DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
     }//if slab
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -250,7 +250,7 @@ DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
     }//if polygon
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;

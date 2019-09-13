@@ -119,7 +119,7 @@ void chi_montecarlon::ResidualSource::
     }
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       chi_log.Log(LOG_0VERBOSE_1) << "Cell " << cell_glob_index;
       auto slab_cell = (chi_mesh::CellSlab*)cell;
@@ -291,7 +291,7 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
 
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+  if (cell->Type() == chi_mesh::SLAB_CELL)
   {
     auto slab_cell = (chi_mesh::CellSlab*)cell;
 

@@ -131,7 +131,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     auto cell = grid->cells[glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)(cell);
@@ -189,7 +189,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)(cell);
@@ -247,7 +247,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
       }//for vertices i
     }//if Polygon
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If polyhedral item_id
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)(cell);

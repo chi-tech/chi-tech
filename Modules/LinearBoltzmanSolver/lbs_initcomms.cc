@@ -25,7 +25,7 @@ void LinearBoltzmanSolver::InitializeCommunicators()
     auto cell           = grid->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)cell;
@@ -47,7 +47,7 @@ void LinearBoltzmanSolver::InitializeCommunicators()
       }//for f
     } //if slab
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -69,7 +69,7 @@ void LinearBoltzmanSolver::InitializeCommunicators()
     } //if polyhedron
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;

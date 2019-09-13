@@ -162,14 +162,14 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   int first_cell_g_index = grid->local_cell_glob_indices[0];
   auto first_cell = grid->cells[first_cell_g_index];
 
-  if (typeid(*first_cell) == typeid(chi_mesh::CellSlab))
+  if (first_cell->Type() == chi_mesh::SLAB_CELL)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
   }
 
-  if (typeid(*first_cell) == typeid(chi_mesh::CellPolyhedron))
+  if (first_cell->Type() == chi_mesh::POLYHEDRON_CELL)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
 

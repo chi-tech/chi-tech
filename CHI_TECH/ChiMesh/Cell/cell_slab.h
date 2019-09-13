@@ -15,6 +15,12 @@ public:
   int     v_indices[2];
   int     edges[2];
   Vector  face_normals[2];
+
+public:
+  CellSlab()
+  {
+    cell_type = SLAB_CELL;
+  }
 };
 
 #endif

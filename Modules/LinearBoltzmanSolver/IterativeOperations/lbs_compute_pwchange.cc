@@ -21,7 +21,7 @@ double LinearBoltzmanSolver::ComputePiecewiseChange(LBSGroupset* groupset)
     auto cell        = grid->cells[cell_g_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)cell;
@@ -57,7 +57,7 @@ double LinearBoltzmanSolver::ComputePiecewiseChange(LBSGroupset* groupset)
     }//if slab
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -93,7 +93,7 @@ double LinearBoltzmanSolver::ComputePiecewiseChange(LBSGroupset* groupset)
     }//if polyhedron
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;

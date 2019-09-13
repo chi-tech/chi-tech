@@ -87,19 +87,19 @@ InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
     auto cell         = grid->cells[cell_g_index];
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       TSlab* slab_cell = (TSlab*)cell;
       NLIncidentMapping(slab_cell,spds);
     }//if slab
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       TPolygon* poly_cell = (TPolygon*)cell;
       NLIncidentMapping(poly_cell,spds);
     }//if polyhedron
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       TPolyhedron* polyh_cell = (TPolyhedron*)cell;
       NLIncidentMapping(polyh_cell,spds);

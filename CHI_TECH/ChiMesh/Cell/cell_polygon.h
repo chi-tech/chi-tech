@@ -24,7 +24,11 @@ public:
   std::vector<int>  v_indices;
   std::vector<int*> edges; ///< Stores arrays of edge indices
   std::vector<chi_mesh::Vector> edgenormals;
-
+public:
+  CellPolygon()
+  {
+    cell_type = POLYGON_CELL;
+  }
   //01
   void FindBoundary2D(chi_mesh::Region* region);
   //02

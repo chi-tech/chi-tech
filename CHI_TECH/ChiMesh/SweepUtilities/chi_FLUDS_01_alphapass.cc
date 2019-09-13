@@ -50,19 +50,19 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
     std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       TSlab* slab_cell = (TSlab*)cell;
       SlotDynamics(slab_cell,spds,lock_box,location_boundary_dependency_set);
     }//if slab
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       TPolygon* poly_cell = (TPolygon*)cell;
       SlotDynamics(poly_cell,spds,lock_box,location_boundary_dependency_set);
     }//if polygon
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       TPolyhedron* polyh_cell = (TPolyhedron*)cell;
       SlotDynamics(polyh_cell,spds,lock_box,location_boundary_dependency_set);
@@ -102,19 +102,19 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
     auto cell         = grid->cells[cell_g_index];
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       TSlab* slab_cell = (TSlab*)cell;
       IncidentMapping(slab_cell,spds,local_so_cell_mapping);
     }//if slab
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       TPolygon* poly_cell = (TPolygon*)cell;
       IncidentMapping(poly_cell,spds,local_so_cell_mapping);
     }//if polyhedron
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
     {
       TPolyhedron* polyh_cell = (TPolyhedron*)cell;
       IncidentMapping(polyh_cell,spds,local_so_cell_mapping);

@@ -51,7 +51,7 @@ void chi_montecarlon::BoundarySource::
     auto cell = grid->cells[cell_glob_index];
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -88,7 +88,7 @@ void chi_montecarlon::BoundarySource::
       }//for faces
     }//if slab
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       auto cell_fv_view = (PolygonFVView*)fv_sdm->MapFeView(cell_glob_index);
@@ -206,10 +206,12 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
   chi_montecarlon::Particle new_particle;
 
+  chi_mesh::Cell* first_cell = grid->cells[0];
+
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   // Categorally slab surface sampling does not require
   // a cdf and therefore we have a specific routine for it.
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  if (first_cell->Type() == chi_mesh::SLAB_CELL)
   {
     //====================================== Sample ref face
     int num_ref_faces = ref_cell_faces.size();
@@ -241,7 +243,7 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     return new_particle;
   }//Slab cells
-  else if (typeid(*grid->cells[0]) == typeid(chi_mesh::CellPolygon))
+  else if (first_cell->Type() == chi_mesh::POLYGON_CELL)
   {
     int f = surface_sampler->Sample(rng->Rand());
 

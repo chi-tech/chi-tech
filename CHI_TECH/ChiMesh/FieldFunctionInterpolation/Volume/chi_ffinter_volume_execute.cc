@@ -69,7 +69,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
     if (inside_logvolume)
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+      if (cell->Type() == chi_mesh::SLAB_CELL)
       {
         chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
         SlabFEView* cell_fe_view =
@@ -102,7 +102,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
       }//if slab
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+      if (cell->Type() == chi_mesh::POLYGON_CELL)
       {
         chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
         PolygonFEView* cell_fe_view =
@@ -134,7 +134,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
       }//if polygon
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+      if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
       {
         chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
         PolyhedronFEView* cell_fe_view =
@@ -212,7 +212,7 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
     if (inside_logvolume)
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+      if (cell->Type() == chi_mesh::SLAB_CELL)
       {
         chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
         SlabFEView* cell_fe_view =
@@ -243,7 +243,7 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
         }//for dof
       }//if slab
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+      if (cell->Type() == chi_mesh::POLYGON_CELL)
       {
         chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
         PolygonFEView* cell_fe_view =
@@ -274,7 +274,7 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
         }//for dof
       }//if Polygon
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+      if (cell->Type() == chi_mesh::POLYHEDRON_CELL)
       {
         chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
         PolyhedronFEView* cell_fe_view =

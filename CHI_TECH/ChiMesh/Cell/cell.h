@@ -4,6 +4,25 @@
 #include"../chi_mesh.h"
 #include <tuple>
 
+namespace chi_mesh
+{
+  enum CellTypes
+  {
+    GHOST_CELL = 0,
+    SLAB_CELL = 1,
+    SPHERICAL_SHELL_CELL = 2,
+    CYLINDRICAL_ANNULUS_CELL = 3,
+    TRIANGLE_CELL = 4,
+    QUADRILATERAL_CELL = 5,
+    POLYGON_CELL = 6,
+    TETRAHEDRON_CELL = 7,
+    HEXAHEDRON_CELL = 8,
+    POLYHEDRON_CELL = 9
+  };
+}
+
+
+
 //######################################################### Class def
 /**Generic mesh cell object*/
 class chi_mesh::Cell
@@ -16,6 +35,9 @@ public:
   int partition_id;
   Vertex centroid;
   int material_id;
+
+protected:
+  CellTypes cell_type;
 public:
   Cell()
   {
@@ -32,12 +54,18 @@ public:
   }
 
   virtual ~Cell()
-  {}
+  {
+    cell_type = GHOST_CELL;
+  }
 public:
   virtual void FindBoundary2D(chi_mesh::Region* region)
   {}
   virtual bool CheckBoundary2D()
   {return true;}
+  CellTypes Type()
+  {
+    return cell_type;
+  }
 };
 
 
