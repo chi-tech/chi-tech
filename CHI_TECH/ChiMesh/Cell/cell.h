@@ -4,6 +4,7 @@
 #include"../chi_mesh.h"
 #include <tuple>
 
+//Appending cell types to namespace
 namespace chi_mesh
 {
   enum class CellTypes
