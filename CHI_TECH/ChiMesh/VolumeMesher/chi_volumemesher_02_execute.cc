@@ -26,7 +26,7 @@ int chi_mesh::VolumeMesher::MapNode(int iref)
   try{
     mapping = this->node_ordering.at(iref);
   }
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cerr << "ERROR: Cannot reference node mapping.";
     exit(EXIT_FAILURE);
   }

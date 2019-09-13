@@ -29,7 +29,7 @@ int chiSolverAddRegion(lua_State *L)
   try{
     solver = chi_physics_handler.solver_stack.at(solver_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cout << "Invalid solver handle" << std::endl;
     return 0;
@@ -40,7 +40,7 @@ int chiSolverAddRegion(lua_State *L)
   try{
     region = cur_hndlr->region_stack.at(region_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cout << "Invalid region handle" << std::endl;
     return 0;

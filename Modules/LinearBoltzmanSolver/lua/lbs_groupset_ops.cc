@@ -88,7 +88,7 @@ int chiLBSCreateGroupset(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
                    "in chiLBSCreateGroupset\n");
@@ -140,7 +140,7 @@ int chiLBSCreateGroup(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
                    "in chiLBSCreateGroup\n");
@@ -216,7 +216,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
                    "in chiLBSGroupsetAddGroups\n");
@@ -228,7 +228,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to groupset"
                    "in chiLBSGroupsetAddGroups\n");
@@ -253,7 +253,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     try {
       group = solver->groups.at(k);
     }
-    catch (std::out_of_range o)
+    catch (const std::out_of_range& o)
     {
       fprintf(stderr,"ERROR: Invalid group added to groupset"
                      "in chiLBSGroupsetAddGroups\n");
@@ -322,7 +322,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
                    "in chiLBSGroupsetSetQuadrature\n");
@@ -334,7 +334,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to groupset"
                    "in chiLBSGroupsetSetQuadrature\n");
@@ -346,7 +346,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   try{
     prodquad = chi_math_handler.product_quadratures.at(prquad_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to Product Quadrature"
                    "in chiLBSGroupsetSetQuadrature\n");
@@ -425,7 +425,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -438,7 +438,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -513,7 +513,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -526,7 +526,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -609,7 +609,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -622,7 +622,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -703,7 +703,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -716,7 +716,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -794,7 +794,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -807,7 +807,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -882,7 +882,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -895,7 +895,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -994,7 +994,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -1007,7 +1007,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "
@@ -1104,7 +1104,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to solver "
@@ -1117,7 +1117,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
   try{
     groupset = solver->group_sets.at(grpset_index);
   }
-  catch (std::out_of_range o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to groupset "

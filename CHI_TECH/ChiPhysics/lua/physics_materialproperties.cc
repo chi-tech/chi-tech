@@ -78,7 +78,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   try {
     cur_material = chi_physics_handler.material_stack.at(material_index);
   }
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     chi_log.Log(LOG_0ERROR) << "ERROR: Invalid material handle." << std::endl;
     exit(EXIT_FAILURE);
   }
@@ -337,7 +337,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   try {
     cur_material = chi_physics_handler.material_stack.at(material_index);
   }
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     chi_log.Log(LOG_ALLERROR) << "ERROR: Invalid material handle." << std::endl;
     exit(EXIT_FAILURE);
   }

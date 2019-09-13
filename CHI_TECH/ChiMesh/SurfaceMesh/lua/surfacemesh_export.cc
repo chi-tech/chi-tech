@@ -38,7 +38,7 @@ int chiSurfaceMeshExportToObj(lua_State* L)
     curItem->ExportToOBJFile(temp);
   }
 
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cerr << "ERROR: Invalid index to surface mesh.\n";
     exit(EXIT_FAILURE);
   }
@@ -75,7 +75,7 @@ int chiSurfaceMeshExportPolyFile(lua_State* L)
     curItem->ExportToPolyFile(temp);
   }
 
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cerr << "ERROR: Invalid index to surface mesh.\n";
     exit(EXIT_FAILURE);
   }

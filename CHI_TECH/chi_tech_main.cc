@@ -92,7 +92,7 @@ void ParseArguments(int argc, char** argv)
           int level = std::stoi(v_option);
           chi_log.SetVerbosity(level);
         }
-        catch (std::invalid_argument e)
+        catch (const std::invalid_argument& e)
         {
           std::cerr << "Invalid option used with command line argument "
                        "-v. Options are 0,1 or 2." << std::endl;

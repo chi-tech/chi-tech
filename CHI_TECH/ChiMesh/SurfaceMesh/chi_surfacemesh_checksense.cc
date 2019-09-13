@@ -15,7 +15,7 @@ bool chi_mesh::SurfaceMesh::CheckNegativeSense(double x, double y, double z)
     try{
       p = this->vertices.at(cur_face->v_index[0]);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       std::cout << "Invalid vertex handle" << std::endl;
     }
 
