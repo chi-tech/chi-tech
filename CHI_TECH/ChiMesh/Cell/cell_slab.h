@@ -17,7 +17,7 @@ public:
   Vector  face_normals[2];
 
 public:
-  CellSlab() : Cell(CellTypes::SLAB_CELL)
+  CellSlab() : Cell(CellType::SLAB)
   {
     v_indices[0] = -1;
     v_indices[1] = -1;

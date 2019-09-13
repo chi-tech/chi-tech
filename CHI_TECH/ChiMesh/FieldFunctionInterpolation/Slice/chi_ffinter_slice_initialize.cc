@@ -41,7 +41,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0)
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
@@ -49,13 +49,13 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       intersecting_cell_indices.push_back(cell_glob_index);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       bool intersects = false;
@@ -97,7 +97,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -155,7 +155,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 

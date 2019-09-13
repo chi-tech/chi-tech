@@ -50,7 +50,7 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
   chi_mesh::Vector pos_f_line = pos_i_copy + omega_i_copy*extention_distance;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -89,7 +89,7 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
 
   }//slab
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-  else if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+  else if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
     auto poly_cell = (chi_mesh::CellPolygon*)cell;
 

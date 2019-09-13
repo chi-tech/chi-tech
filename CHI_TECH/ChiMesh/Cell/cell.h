@@ -7,18 +7,18 @@
 //Appending cell types to namespace
 namespace chi_mesh
 {
-  enum class CellTypes
+  enum class CellType
   {
-    GHOST_CELL = 0,
-    SLAB_CELL = 1,
-    SPHERICAL_SHELL_CELL = 2,
-    CYLINDRICAL_ANNULUS_CELL = 3,
-    TRIANGLE_CELL = 4,
-    QUADRILATERAL_CELL = 5,
-    POLYGON_CELL = 6,
-    TETRAHEDRON_CELL = 7,
-    HEXAHEDRON_CELL = 8,
-    POLYHEDRON_CELL = 9
+    GHOST = 0,
+    SLAB = 1,
+    SPHERICAL_SHELL = 2,
+    CYLINDRICAL_ANNULUS = 3,
+    TRIANGLE = 4,
+    QUADRILATERAL = 5,
+    POLYGON = 6,
+    TETRAHEDRON = 7,
+    HEXAHEDRON = 8,
+    POLYHEDRON = 9
   };
 }
 
@@ -38,9 +38,9 @@ public:
   int material_id;
 
 private:
-  const CellTypes cell_type;
+  const CellType cell_type;
 public:
-  Cell(CellTypes in_cell_type) : cell_type(in_cell_type)
+  Cell(CellType in_cell_type) : cell_type(in_cell_type)
   {
     cell_global_id = -1;
     cell_local_id = -1;
@@ -60,7 +60,7 @@ public:
   virtual void FindBoundary2D(chi_mesh::Region* region) {}
   virtual bool CheckBoundary2D() {return true;}
 
-  const CellTypes Type() {return cell_type;}
+  const CellType Type() {return cell_type;}
 };
 
 
