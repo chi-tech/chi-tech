@@ -37,7 +37,7 @@ int chiSurfaceMeshExtractOpenEdgesToObj(lua_State *L)
     curItem->ExtractOpenEdgesToObj(file_name);
   }
 
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cerr << "ERROR: Invalid index to surface mesh.\n";
     exit(EXIT_FAILURE);
   }

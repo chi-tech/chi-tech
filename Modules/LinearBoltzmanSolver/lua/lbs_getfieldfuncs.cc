@@ -39,7 +39,7 @@ int chiLBSGetFieldFunctionList(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       <<"ERROR: Invalid handle to solver"
@@ -95,7 +95,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
                    "in chiLBSSetProperty\n");

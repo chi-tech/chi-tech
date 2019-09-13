@@ -323,7 +323,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
         try {
           sourceQ[i] = q_field->field_vector_local->at(mapping[i]);
         }
-        catch (std::out_of_range o)
+        catch (const std::out_of_range& o)
         {
           chi_log.Log(LOG_ALLERROR)
             << "Mapping error i=" << i
@@ -406,7 +406,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
         try {
           sourceQ[i] = q_field->field_vector_local->at(mapping[i]);
         }
-        catch (std::out_of_range o)
+        catch (const std::out_of_range& o)
         {
           chi_log.Log(LOG_ALLERROR)
             << "Mapping error i=" << i
@@ -489,7 +489,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
         try {
           sourceQ[i] = q_field->field_vector_local->at(mapping[i]);
         }
-        catch (std::out_of_range o)
+        catch (const std::out_of_range& o)
         {
           chi_log.Log(LOG_ALLERROR)
             << "Mapping error i=" << i

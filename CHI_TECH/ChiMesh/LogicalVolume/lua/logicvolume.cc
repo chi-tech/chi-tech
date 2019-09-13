@@ -138,7 +138,7 @@ int chiLogicalVolumeCreate(lua_State *L)
     try {
       surf_mesh = handler->surface_mesh_stack.at(surf_mesh_hndle);
     }
-    catch(std::out_of_range o)
+    catch(const std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid handle to surface mesh specified in call to "

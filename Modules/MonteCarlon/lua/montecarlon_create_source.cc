@@ -44,7 +44,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
   try{
     solver = (chi_montecarlon::Solver*)chi_physics_handler.solver_stack.at(solver_index);
   }
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cout << "Invalid solver handle" << std::endl;
     lua_pushinteger(L,-1);
   }
@@ -97,7 +97,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
       ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
     }
 
-    catch (std::out_of_range o)
+    catch (const std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid field function handle supplied in call to "
