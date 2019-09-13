@@ -39,7 +39,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
     if (inside_logvolume)
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Slab
-      if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+      if (cell->Type() == chi_mesh::CellType::SLAB)
       {
         chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -52,7 +52,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
       }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+      if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -65,7 +65,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
       }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
       {
         chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 

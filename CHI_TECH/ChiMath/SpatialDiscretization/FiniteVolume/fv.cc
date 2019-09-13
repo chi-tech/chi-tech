@@ -54,7 +54,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
     if (cell_fv_views_mapping[cell_index]<0)
     {
       //========================================= If slab item_id
-      if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+      if (cell->Type() == chi_mesh::CellType::SLAB)
       {
         SlabFVView* view =
           new SlabFVView((chi_mesh::CellSlab*)cell,vol_continuum);
@@ -74,7 +74,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 //      }
 
       //========================================= If polygon item_id
-      if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+      if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         PolygonFVView* view =
           new PolygonFVView((chi_mesh::CellPolygon*)(cell),vol_continuum);
@@ -84,7 +84,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       }
 
 //      //========================================= If polyhedron item_id
-//      if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+//      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
 //      {
 //        PolyhedronFEView* view =
 //          new PolyhedronFEView(

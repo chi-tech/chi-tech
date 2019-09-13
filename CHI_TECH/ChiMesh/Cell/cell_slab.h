@@ -17,12 +17,15 @@ public:
   Vector  face_normals[2];
 
 public:
-  CellSlab() : Cell(CellTypes::SLAB_CELL)
+  CellSlab() : Cell(CellType::SLAB)
   {
     v_indices[0] = -1;
     v_indices[1] = -1;
     edges[0] = -1;
     edges[1] = -1;
+
+    face_normals[0] = chi_mesh::Vector();
+    face_normals[1] = chi_mesh::Vector();
   }
 };
 

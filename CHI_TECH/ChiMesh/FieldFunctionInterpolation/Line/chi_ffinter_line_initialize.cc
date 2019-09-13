@@ -72,7 +72,7 @@ Initialize()
         auto cell = grid_view->cells[cell_glob_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
         {
           chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -110,7 +110,7 @@ Initialize()
         }//if slab
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        else if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+        else if (cell->Type() == chi_mesh::CellType::POLYGON)
         {
           chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -155,7 +155,7 @@ Initialize()
         }//if polygon cell
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
           chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
@@ -210,7 +210,7 @@ Initialize()
         auto cell = grid_view->cells[cell_glob_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
         {
           chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -224,7 +224,7 @@ Initialize()
         }//if poly
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+        if (cell->Type() == chi_mesh::CellType::POLYGON)
         {
           chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -238,7 +238,7 @@ Initialize()
         }//if poly
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
           chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 

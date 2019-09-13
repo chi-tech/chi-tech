@@ -99,7 +99,7 @@ CFEMInterpolate(Vec field,
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
       SlabFEView*      cell_fe_view =
@@ -127,7 +127,7 @@ CFEMInterpolate(Vec field,
     }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
+    else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
       PolygonFEView*      cell_fe_view =
@@ -155,7 +155,7 @@ CFEMInterpolate(Vec field,
     }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       PolyhedronFEView*       cell_fe_view =
@@ -211,7 +211,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
       SlabFEView*      cell_fe_view =
@@ -240,7 +240,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
 
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       PolyhedronFEView*       cell_fe_view =
