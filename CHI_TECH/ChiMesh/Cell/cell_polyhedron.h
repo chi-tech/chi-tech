@@ -13,10 +13,7 @@ public:
   std::vector<PolyFace*> faces;
 
 public:
-  CellPolyhedron()
-  {
-    cell_type = CellTypes::POLYHEDRON_CELL;
-  }
+  CellPolyhedron() : Cell(CellTypes::POLYHEDRON_CELL) {}
 };
 
 

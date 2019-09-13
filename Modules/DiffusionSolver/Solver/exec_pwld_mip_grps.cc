@@ -111,7 +111,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
       else
       {
         chi_log.Log(LOG_ALLERROR)
-          << "Invalid cell-type encountered in chi_diffusion::Solver::ExecuteS";
+          << "Invalid cell-type encountered in chi_diffusion::Solver::ExecutePWLD_MIP_GRPS";
       }
     }//for local cell
   }//for gr

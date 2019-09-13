@@ -36,10 +36,10 @@ public:
   Vertex centroid;
   int material_id;
 
-protected:
-  CellTypes cell_type;
+private:
+  const CellTypes cell_type;
 public:
-  Cell()
+  Cell(CellTypes in_cell_type) : cell_type(in_cell_type)
   {
     cell_global_id = -1;
     cell_local_id = -1;
@@ -53,19 +53,13 @@ public:
     material_id = -1;
   }
 
-  virtual ~Cell()
-  {
-    cell_type = CellTypes::GHOST_CELL;
-  }
+  virtual ~Cell() {}
+
 public:
-  virtual void FindBoundary2D(chi_mesh::Region* region)
-  {}
-  virtual bool CheckBoundary2D()
-  {return true;}
-  CellTypes Type()
-  {
-    return cell_type;
-  }
+  virtual void FindBoundary2D(chi_mesh::Region* region) {}
+  virtual bool CheckBoundary2D() {return true;}
+
+  const CellTypes Type() {return cell_type;}
 };
 
 

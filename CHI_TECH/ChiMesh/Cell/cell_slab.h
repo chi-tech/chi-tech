@@ -17,9 +17,12 @@ public:
   Vector  face_normals[2];
 
 public:
-  CellSlab()
+  CellSlab() : Cell(CellTypes::SLAB_CELL)
   {
-    cell_type = CellTypes::SLAB_CELL;
+    v_indices[0] = -1;
+    v_indices[1] = -1;
+    edges[0] = -1;
+    edges[1] = -1;
   }
 };
 
