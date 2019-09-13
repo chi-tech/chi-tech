@@ -49,20 +49,20 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
     auto cell = vol_continuum->cells[cell_glob_index];
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       pwld_local_dof_count += 2;
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       pwld_local_dof_count += poly_cell->v_indices.size();
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       pwld_local_dof_count += polyh_cell->v_indices.size();

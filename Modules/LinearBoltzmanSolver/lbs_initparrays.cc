@@ -121,7 +121,7 @@ int LinearBoltzmanSolver::InitializeParrays()
     auto cell = grid->cells[cell_g_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)cell;
@@ -179,7 +179,7 @@ int LinearBoltzmanSolver::InitializeParrays()
     }//slab
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -237,7 +237,7 @@ int LinearBoltzmanSolver::InitializeParrays()
     }//polygon
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;

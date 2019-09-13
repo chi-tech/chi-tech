@@ -363,7 +363,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
           if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
           {
-            printf("Z-Cut %d, %g\n",vol_mesher->zcuts.size(),
+            printf("Z-Cut %lu, %g\n",vol_mesher->zcuts.size(),
                    extruder->vertex_layers[layer_index]);
           }
         }
@@ -433,7 +433,7 @@ void chi_mesh::VolumeMesher::
     chi_mesh::Cell* cell = vol_continuum->cells[c];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -449,7 +449,7 @@ void chi_mesh::VolumeMesher::
     }//if typeid
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
@@ -464,7 +464,7 @@ void chi_mesh::VolumeMesher::
       }
     }//if typeid
   }//for local item_id
-  printf("Number of boundary item_id: %d\n",vol_continuum->boundary_cell_indices.size());
+  printf("Number of boundary item_id: %lu\n",vol_continuum->boundary_cell_indices.size());
 
   vol_continuum->ExportCellsToPython(
     "BoundaryCells.py",true,

@@ -46,7 +46,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
 
       //========================================= Create a template empty
       //                                          cell
-      chi_mesh::Cell *tcell = new chi_mesh::Cell;
+      chi_mesh::Cell *tcell = new chi_mesh::Cell(chi_mesh::CellTypes::GHOST_CELL);
       tcell->centroid = centroid_precompd;
 
       //========================================= Get the partition id
@@ -71,7 +71,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         //####################### LOCAL CELL ###############################
       else
       {
-        delete [] tcell;
+        delete tcell;
         //========================================= Create polyhedron
         chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
         cell->xyz_partition_indices = tcell->xyz_partition_indices;

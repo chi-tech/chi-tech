@@ -94,7 +94,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     auto cell = grid->cells[cell_glob_index];
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -136,7 +136,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -188,7 +188,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }//polygon
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
@@ -290,7 +290,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     border_cell_info.push_back(ip_view->cell_dof_start); //cell_dof_start
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       border_cell_info.push_back(0);                     //cell_type
@@ -309,7 +309,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       border_cell_info.push_back(1);                     //cell_type
@@ -329,7 +329,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       border_cell_info.push_back(2);                     //cell_type
@@ -466,7 +466,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     auto cell = grid->cells[cell_glob_index];
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -476,7 +476,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -503,7 +503,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }//polygon
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 

@@ -37,7 +37,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
              "import scipy as sp\n");
 
   //============================================= Parse nodes
-  fprintf(of,"xyz=np.zeros((%d,%d))\n",nodes.size(),3);
+  fprintf(of,"xyz=np.zeros((%lu,%d))\n",nodes.size(),3);
   for (int n=0; n<nodes.size(); n++)
   {
     fprintf(of,"xyz[%d][%d]=%f;  ",n,0,nodes[n]->x);
@@ -49,7 +49,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
   int num_faces=0;
   for (int c=0; c<cells.size(); c++)
   {
-    if (typeid(*cells[c]) == typeid(chi_mesh::CellPolyhedron))
+    if (dynamic_cast<chi_mesh::CellPolyhedron*>(cells[c]))
     {
       chi_mesh::CellPolyhedron* cell = ((chi_mesh::CellPolyhedron*)cells[c]);
       if (surface_only)
@@ -76,7 +76,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         num_faces+=cell->faces.size();
       }
     }
-    if (typeid(*cells[c]) == typeid(chi_mesh::CellPolygon))
+    if (dynamic_cast<chi_mesh::CellPolygon*>(cells[c]))
     {
       num_faces++;
     }
@@ -92,7 +92,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
   int f=-1;
   for (int c=0; c<cells.size(); c++)
   {
-    if (typeid(*cells[c]) == typeid(chi_mesh::CellPolyhedron))
+    if (dynamic_cast<chi_mesh::CellPolyhedron*>(cells[c]))
     {
       auto cell = ((chi_mesh::CellPolyhedron*)cells[c]);
       if (surface_only)
@@ -117,7 +117,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           if (export_face)
           {
             f++;
-            fprintf(of,"face_numverts[%d,0]=%d   \n",f,
+            fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
                     cell->faces[s]->v_indices.size());
 
             bool flagged = false;
@@ -151,7 +151,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         for (int s=0; s< cell->faces.size(); s++)
         {
           f++;
-          fprintf(of,"face_numverts[%d,0]=%d   \n",f,
+          fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
                   cell->faces[s]->v_indices.size());
 
           bool flagged = false;
@@ -180,10 +180,10 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
 
     }
-    if (typeid(*cells[c]) == typeid(chi_mesh::CellPolygon))
+    if (dynamic_cast<chi_mesh::CellPolygon*>(cells[c]))
     {
       auto cell = ((chi_mesh::CellPolygon*)cells[c]);
-      fprintf(of,"face_numverts[%d,0]=%d   \n",c,
+      fprintf(of,"face_numverts[%d,0]=%lu   \n",c,
               cell->v_indices.size());
 
       bool flagged = false;

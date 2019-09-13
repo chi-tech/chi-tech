@@ -82,7 +82,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
     int mat_id = cell->material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -130,7 +130,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -177,7 +177,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
@@ -335,7 +335,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
     int mat_id = cell->material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellTypes::SLAB_CELL)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -387,7 +387,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellTypes::POLYGON_CELL)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -437,7 +437,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellTypes::POLYHEDRON_CELL)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);

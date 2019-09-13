@@ -12,6 +12,8 @@ public:
   std::vector<int>       v_indices;
   std::vector<PolyFace*> faces;
 
+public:
+  CellPolyhedron() : Cell(CellTypes::POLYHEDRON_CELL) {}
 };
 
 
