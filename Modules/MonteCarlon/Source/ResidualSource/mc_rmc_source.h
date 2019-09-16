@@ -20,6 +20,9 @@ private:
   std::vector<double> cell_residual_cdf;
 
   double total_residual;
+  double total_Cresidual;
+  double total_Lresidual;
+  double total_Rresidual;
 
   chi_math::CDFSampler* residual_sampler;
 public:

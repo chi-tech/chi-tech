@@ -8,6 +8,12 @@
 chi_montecarlon::Source::Source()
 {
   type_index = MC_BASE_SRC;
+  particles_C = 0;
+  particles_L = 0;
+  particles_R = 0;
+
+  weights_L = 0.0;
+  weights_R = 0.0;
 }
 
 void chi_montecarlon::Source::Initialize(chi_mesh::MeshContinuum* ref_grid,

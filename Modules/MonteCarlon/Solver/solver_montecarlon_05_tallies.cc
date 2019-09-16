@@ -26,6 +26,21 @@ void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
 
   double tracklength = (pf - prtcl->pos).Norm();
 
+  double zmin = 0.0-1.0e-8;
+  double zmax = 5.0+1.0e-8;
+  if (pf.z < zmin or pf.z>zmax)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Error pf out of domain " << pf.PrintS();
+    exit(EXIT_FAILURE);
+  }
+  if (prtcl->pos.z < zmin or prtcl->pos.z>zmax)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Error pi out of domain " << pf.PrintS();
+    exit(EXIT_FAILURE);
+  }
+
   phi_tally_contrib[ir] += (tracklength*prtcl->w);
 
   if (isnan(tracklength))

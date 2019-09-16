@@ -44,7 +44,7 @@ chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 mmesh = chiMeshHandlerCreate()
 
 mesh={}
-N=20
+--N=20
 L=5.0
 xmin = 0.0
 dx = L/N
@@ -90,8 +90,8 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
 num_groups = 1
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.2)
-chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.2)
+chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.5)
+chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.5)
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 
@@ -165,13 +165,13 @@ chiSolverAddRegion(phys0,region0)
 --chiMonteCarlonCreateSource(phys0,MC_BNDRY_SRC,1);
 chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys0,MC_NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys0,MC_NUM_PARTICLES,10e6)
 chiMonteCarlonSetProperty(phys0,MC_TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys0,MC_TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys0,MC_SCATTERING_ORDER,0)
-chiMonteCarlonSetProperty(phys0,MC_MONOENERGETIC,false)
-chiMonteCarlonSetProperty(phys0,MC_FORCE_ISOTROPIC,false)
-chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.5)
+chiMonteCarlonSetProperty(phys0,MC_MONOENERGETIC,true)
+chiMonteCarlonSetProperty(phys0,MC_FORCE_ISOTROPIC,true)
+--chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.25)
 
 chiMonteCarlonInitialize(phys0)
 chiMonteCarlonExecute(phys0)
@@ -184,13 +184,13 @@ chiSolverAddRegion(phys2,region1)
 chiMonteCarlonCreateSource(phys2,MC_BNDRY_SRC,1);
 --chiMonteCarlonCreateSource(phys2,MC_RESID_SRC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys2,MC_NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys2,MC_NUM_PARTICLES,10e6)
 chiMonteCarlonSetProperty(phys2,MC_TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys2,MC_TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys2,MC_SCATTERING_ORDER,0)
-chiMonteCarlonSetProperty(phys2,MC_MONOENERGETIC,false)
-chiMonteCarlonSetProperty(phys2,MC_FORCE_ISOTROPIC,false)
-chiMonteCarlonSetProperty(phys2,MC_TALLY_MULTIPLICATION_FACTOR,0.5)
+chiMonteCarlonSetProperty(phys2,MC_MONOENERGETIC,true)
+chiMonteCarlonSetProperty(phys2,MC_FORCE_ISOTROPIC,true)
+chiMonteCarlonSetProperty(phys2,MC_TALLY_MULTIPLICATION_FACTOR,0.5/2)
 
 chiMonteCarlonInitialize(phys2)
 chiMonteCarlonExecute(phys2)

@@ -3,9 +3,13 @@
 #include <chi_log.h>
 #include <ChiTimer/chi_timer.h>
 
+#include "../Source/ResidualSource/mc_rmc_source.h"
+
 extern ChiLog chi_log;
 extern ChiTimer chi_program_timer;
 typedef unsigned long long TULL;
+
+#include<typeinfo>
 
 //#########################################################
 /**Executes the solver*/
@@ -36,6 +40,12 @@ void chi_montecarlon::Solver::Execute()
 //        << "Src particle " << prtcl.pos.PrintS()
 //        << " " << prtcl.dir << " " << prtcl.cur_cell_ind;
 //      usleep(100000);
+      if (isnan(prtcl.dir.x))
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "Particle dir corrupt.";
+        exit(EXIT_FAILURE);
+      }
 
       while (prtcl.alive)
       {
@@ -98,9 +108,17 @@ void chi_montecarlon::Solver::Execute()
     chi_log.Log(LOG_0)
       << "Cell " << lc
       << " phi=" << phi_global[lc*num_grps]
-      << " std=" << phi_local_relsigma[lc*num_grps+0];
+      << " std=" << phi_local_relsigma[lc*num_grps+0]
+      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps];
   }
 
+
+  chi_montecarlon::ResidualSource* rsrc = (chi_montecarlon::ResidualSource*)sources[0];
+  std::cout << "Particles sampled intr = " << rsrc->particles_C << std::endl;
+  std::cout << "Particles sampled left = " << rsrc->particles_L << std::endl;
+  std::cout << "Particles sampled rite = " << rsrc->particles_R << std::endl;
+  std::cout << "Weights sampled left = " << rsrc->weights_L << std::endl;
+  std::cout << "Weights sampled rite = " << rsrc->weights_R << std::endl;
 
   chi_log.Log(LOG_0) << "Done executing Montecarlo solver";
 }

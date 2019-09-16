@@ -43,6 +43,13 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   double d_to_intract = -1.0*log(1.0-rng0.Rand())/sigt;
   double d_to_surface = 1.0e15;
 
+  if (isnan(prtcl->dir.x))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Particle dir corrupt before raytrace.";
+    exit(EXIT_FAILURE);
+  }
+
   chi_mesh::Vector posf = prtcl->pos;
   chi_mesh::Vector dirf = prtcl->dir;
   int                ef = prtcl->egrp;
@@ -54,6 +61,13 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Posf corruption after surface tracking.";
+    exit(EXIT_FAILURE);
+  }
+
+  if (isnan(prtcl->dir.x))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Particle dir corrupt after raytrace.";
     exit(EXIT_FAILURE);
   }
 
@@ -79,6 +93,16 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   {
     posf = prtcl->pos + prtcl->dir*d_to_intract;
 
+    if (isnan(posf.x))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Posf corruption after interaction tracking. "
+        << prtcl->pos.PrintS() << " "
+        << prtcl->dir.PrintS() << " "
+        << d_to_intract;
+      exit(EXIT_FAILURE);
+    }
+
     if (rng0.Rand() < (sigs/sigt))
     {
 
@@ -86,6 +110,13 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
         ProcessScattering(prtcl,xs);
       ef   = e_dir.first;
       dirf = e_dir.second;
+
+      if (isnan(dirf.x))
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "Particle dir corrupt after scattering.";
+        exit(EXIT_FAILURE);
+      }
 
       if (mono_energy && (ef != prtcl->egrp))
         prtcl->alive = false;
@@ -98,6 +129,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   //======================================== Process surface
   else
   {
+    //posf set in call to RayTrace
     ContributeTally(prtcl,posf);
     if (auxinfo[2] < 0)
     {

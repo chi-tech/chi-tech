@@ -21,6 +21,13 @@ This source is an isotropic source at [0 0 0] with energy of 4 MeV.*/
 class chi_montecarlon::Source
 {
 public:
+  int particles_C;
+  int particles_L;
+  int particles_R;
+  double weights_L;
+  double weights_R;
+
+public:
   chi_mesh::MeshContinuum* grid;
   SpatialDiscretization_FV*   fv_sdm;
   int type_index;

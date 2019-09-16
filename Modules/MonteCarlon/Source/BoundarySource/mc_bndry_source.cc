@@ -225,7 +225,7 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     //====================================== Sample direction
     double costheta = rng->Rand();     //Sample half-range only
-    double theta    = acos(costheta);
+    double theta    = acos(sqrt(costheta));
     double varphi   = rng->Rand()*2.0*M_PI;
 
     chi_mesh::Vector ref_dir;
@@ -238,11 +238,12 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
     new_particle.dir = face_ref->RotMatrix*ref_dir;
 
     new_particle.egrp = 0;
-    new_particle.w = costheta;
+    new_particle.w = 1.0;
     new_particle.cur_cell_ind = face_ref->cell_glob_index;
 
     return new_particle;
   }//Slab cells
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
   else if (first_cell->Type() == chi_mesh::CellType::POLYGON)
   {
     int f = surface_sampler->Sample(rng->Rand());
@@ -258,7 +259,7 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     //====================================== Sample direction
     double costheta = rng->Rand();     //Sample half-range only
-    double theta    = acos(costheta);
+    double theta    = acos(sqrt(costheta));
     double varphi   = rng->Rand()*2.0*M_PI;
 
     chi_mesh::Vector ref_dir;
@@ -275,7 +276,7 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
     new_particle.dir = face_ref->RotMatrix*ref_dir;
 
     new_particle.egrp = 0;
-    new_particle.w = costheta;
+    new_particle.w = 1.0;
     new_particle.cur_cell_ind = face_ref->cell_glob_index;
 
     return new_particle;
