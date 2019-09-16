@@ -277,7 +277,7 @@ CreateSweepOrder(double polar, double azimuthal,
   try{
     boost::topological_sort(G,std::back_inserter(sorted_list));
   }
-  catch (boost::bad_graph exc)
+  catch (const boost::bad_graph& exc)
   {
     chi_log.Log(LOG_ALLERROR)
     << "Cyclic local sweep ordering detected.";
@@ -406,7 +406,7 @@ CreateSweepOrder(double polar, double azimuthal,
   try {
     boost::topological_sort(TDG, std::back_inserter(glob_sorted_list));
   }
-  catch (boost::bad_graph exc)
+  catch (const boost::bad_graph& exc)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Cyclic global sweep ordering detected.";

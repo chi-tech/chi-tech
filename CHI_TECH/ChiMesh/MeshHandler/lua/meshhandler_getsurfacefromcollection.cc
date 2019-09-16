@@ -39,7 +39,7 @@ int chiMeshHandlerGetSurfaceFromCollection(lua_State *L)
     std::cout << std::endl;
   }
 
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cerr << "ERROR: Invalid handle or index specified in "
                  "chiMeshHandlerGetSurfaceFromCollection.\n";
     exit(EXIT_FAILURE);

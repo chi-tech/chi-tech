@@ -115,7 +115,7 @@ int chiDiffusionSetProperty(lua_State *L)
   try{
     solver = (chi_diffusion::Solver*)chi_physics_handler.solver_stack.at(solver_index);
   }
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     chi_log.Log(LOG_0ERROR) << "ERROR: Invalid solver handle." << std::endl;
     exit(EXIT_FAILURE);
   }

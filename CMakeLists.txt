@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+message(STATUS "Configuring ${CMAKE_BUILD_TYPE} build of ChiTech.")
+
 if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX_ENV)
 elseif(APPLE)
@@ -29,6 +30,7 @@ endif()
 #================================================ Set project targets
 SET(TARGET ChiTech)
 project(${TARGET} C CXX)
+
 
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/CHI_TECH")
@@ -62,10 +64,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
   set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-format -Wno-unused-but-set-variable")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-write-strings")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-strict-aliasing")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable -Wno-sign-compare")
+  set_source_files_properties(Modules/LinearBoltzmanSolver/lbs_main_initialize.cc PROPERTIES COMPILE_FLAGS "-Wno-format")
+  set_source_files_properties(CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/prop_transportxs_03_ecollapse.cc PROPERTIES COMPILE_FLAGS "-Wno-int-in-bool-context")
+  set_source_files_properties(CHI_TECH/ChiMesh/SurfaceMesher/Delaunay/delaunay_patch_00_utils.cc PROPERTIES COMPILE_FLAGS "-Wno-int-in-bool-context")
   set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -73,6 +76,9 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Force -O3 in release builds (some OS's might downgrade it)
+string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
@@ -101,8 +107,7 @@ find_package(VTK COMPONENTS
 	vtkIOXML vtkParallelCore
 	vtkIOParallelXML REQUIRED)
 if (NOT VTK_FOUND)
-	message("VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
-  return ()
+  message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()
 
 message (STATUS "VTK_VERSION: ${VTK_VERSION}")
@@ -144,10 +149,10 @@ add_subdirectory("${CHI_TECH_MOD}/MonteCarlon")
 add_subdirectory("${CHI_TECH_MOD}/DiffusionSolver")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
-
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET} ${LIBS} ${TRIANGLE})
 
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
         "clean:\n\t$(MAKE) -C chi_build clean\n")
+

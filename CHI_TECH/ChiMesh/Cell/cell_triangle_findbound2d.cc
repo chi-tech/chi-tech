@@ -43,7 +43,7 @@ void chi_mesh::CellTriangle::FindBoundary2D(chi_mesh::Region* region)
           v[0] = *ref_cont->nodes.at(this->e_index[e][0]);
           v[1] = *ref_cont->nodes.at(this->e_index[e][1]);
         }
-        catch (std::out_of_range o)
+        catch (const std::out_of_range& o)
         {
           std::cerr << "Program exception in FindBoundary2D!\n";
           exit(EXIT_FAILURE);
@@ -57,7 +57,7 @@ void chi_mesh::CellTriangle::FindBoundary2D(chi_mesh::Region* region)
             w[0] = (*bndry)->initial_mesh_continuum.line_mesh->vertices.front();
             w[1] = (*bndry)->initial_mesh_continuum.line_mesh->vertices.back();
           }
-          catch (std::out_of_range o)
+          catch (const std::out_of_range& o)
           {
             std::cerr << "Program exception in FindBoundary2D!\n";
             exit(EXIT_FAILURE);

@@ -37,7 +37,7 @@ int chiSurfaceMeshCheckCycles(lua_State *L)
     curItem->CheckCyclicDependencies(num_angles);
   }
 
-  catch(std::out_of_range o){
+  catch(const std::out_of_range& o){
     std::cerr << "ERROR: Invalid index to surface mesh.\n";
     exit(EXIT_FAILURE);
   }
