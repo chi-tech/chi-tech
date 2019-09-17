@@ -14,6 +14,8 @@
 #define    MC_ALL_BOUNDARIES -1
 #define MC_LOGICVOL_SRC 3
 #define MC_RESID_SRC    4
+#define MC_RESID_SRC_SU 5
+#define MC_RESID_MOC    6
 
 //######################################################### Class Def
 /**Parent Monte carlo source.

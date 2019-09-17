@@ -1,4 +1,4 @@
-#include "mc_rmc_source.h"
+#include "mc_moc_source.h"
 
 #include "../../RandomNumberGenerator/montecarlon_rng.h"
 
@@ -33,7 +33,7 @@ extern ChiPhysics chi_physics_handler;
 
 //###################################################################
 /**Constructor for residual source.*/
-chi_montecarlon::ResidualSource::ResidualSource(
+chi_montecarlon::ResidualMOCSource::ResidualMOCSource(
   chi_physics::FieldFunction *in_resid_ff, bool use_uniform_sampling) :
   sample_uniformly(use_uniform_sampling)
 {
@@ -55,9 +55,9 @@ chi_montecarlon::ResidualSource::ResidualSource(
  *
  * This process involves numerous steps. One of the first steps is
  * to */
-void chi_montecarlon::ResidualSource::
-  Initialize(chi_mesh::MeshContinuum *ref_grid,
-             SpatialDiscretization_FV *ref_fv_sdm)
+void chi_montecarlon::ResidualMOCSource::
+Initialize(chi_mesh::MeshContinuum *ref_grid,
+           SpatialDiscretization_FV *ref_fv_sdm)
 {
   chi_log.Log(LOG_0) << "Initializing RMC Source";
   grid = ref_grid;
@@ -137,7 +137,7 @@ void chi_montecarlon::ResidualSource::
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       auto cell_fe_view =
         static_cast<SlabFEView*>(
-        resid_sdm_pwl->MapFeView(cell_glob_index));
+          resid_sdm_pwl->MapFeView(cell_glob_index));
 
       //==================================== Creating current cell dof-mapping
       std::vector<int> dofs_to_map(cell_fe_view->dofs);
@@ -154,8 +154,8 @@ void chi_montecarlon::ResidualSource::
         *resid_ff->local_cell_dof_array_address,&cur_cell_mapping);
 
       chi_log.Log(LOG_0VERBOSE_1)
-       << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
-       << "dof 1 phi=" << field[cur_cell_mapping[1]];
+        << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
+        << "dof 1 phi=" << field[cur_cell_mapping[1]];
 
       //==================================== Creating adj cell dof-mapping
       chi_log.Log(LOG_0VERBOSE_1) << "Mapping adj cell dofs";
@@ -232,9 +232,9 @@ void chi_montecarlon::ResidualSource::
 //          phi_adj=0.0;
 
           chi_log.Log(LOG_0VERBOSE_1)
-          << "Face " << f << "\n"
-          << "phi=" << phi << " adj_phi="<<phi_adj
-          << " neigbor=" <<slab_cell->edges[f];
+            << "Face " << f << "\n"
+            << "phi=" << phi << " adj_phi="<<phi_adj
+            << " neigbor=" <<slab_cell->edges[f];
 
           if (f == 0)
             cell_surface_residualL[lc] =-0.25*(phi - phi_adj);
@@ -250,11 +250,11 @@ void chi_montecarlon::ResidualSource::
         std::fabs(cell_surface_residualR[lc]);
 
       chi_log.Log(LOG_0VERBOSE_1)
-      << "Cell residuals "
-      << cell_interior_residual[lc] << " "
-      << cell_surface_residualL[lc] << " "
-      << cell_surface_residualR[lc] << " "
-      << cell_residuals[lc];
+        << "Cell residuals "
+        << cell_interior_residual[lc] << " "
+        << cell_surface_residualL[lc] << " "
+        << cell_surface_residualR[lc] << " "
+        << cell_residuals[lc];
 
       total_Cresidual += std::fabs(cell_interior_residual[lc]);
       total_Lresidual += std::fabs(cell_surface_residualL[lc]);
@@ -304,8 +304,8 @@ void chi_montecarlon::ResidualSource::
 
 //###################################################################
 /**Executes a source sampling for the residual source.*/
-chi_montecarlon::Particle chi_montecarlon::ResidualSource::
-  CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
+chi_montecarlon::Particle chi_montecarlon::ResidualMOCSource::
+CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
 {
   int num_local_cells = grid->local_cell_glob_indices.size();
   int lc = 0;
@@ -372,7 +372,7 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
 
       new_particle.egrp = 0;
       new_particle.w = sampling_normalization*
-        ((cell_interior_residual[lc]<0.0) ? -1.0:1.0);
+                       ((cell_interior_residual[lc]<0.0) ? -1.0:1.0);
 //      new_particle.w = std::fabs(sampling_normalization);
       new_particle.cur_cell_ind = cell_glob_index;
 //      new_particle.alive = false;
@@ -402,7 +402,7 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
 
       new_particle.egrp = 0;
       new_particle.w = sampling_normalization*
-        ((cell_surface_residualL[lc]<0.0) ? -1.0:1.0);
+                       ((cell_surface_residualL[lc]<0.0) ? -1.0:1.0);
 //      new_particle.w = std::fabs(sampling_normalization);
       new_particle.cur_cell_ind = cell_glob_index;
 //      new_particle.alive = false;
@@ -411,7 +411,7 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
 
       return new_particle;
     }
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RIGHT
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RIGHT
     else
     {
       //====================================== Sample direction
@@ -432,7 +432,7 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
 
       new_particle.egrp = 0;
       new_particle.w = sampling_normalization*
-        ((cell_surface_residualR[lc]<0.0) ? -1.0:1.0);
+                       ((cell_surface_residualR[lc]<0.0) ? -1.0:1.0);
 //      new_particle.w = std::fabs(sampling_normalization);
       new_particle.cur_cell_ind = cell_glob_index;
 //      new_particle.alive = false;

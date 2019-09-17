@@ -37,41 +37,9 @@ chiVolumeMesherExecute();
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
-
-
-
---############################################### Setup Monte-carlo mesh
-mmesh = chiMeshHandlerCreate()
-
-mesh={}
---N=20
-L=5.0
-xmin = 0.0
-dx = L/N
-for i=1,(N+1) do
-    k=i-1
-    mesh[i] = xmin + k*dx
-end
-line_mesh = chiLineMeshCreateFromArray(mesh)
-
-
-region1 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
-
---############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
-
-chiVolumeMesherSetProperty(MESH_GLOBAL,true)
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
-chiVolumeMesherExecute();
-
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+vol1 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,2.5,1000)
+chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 
 
@@ -146,7 +114,7 @@ chiLBSSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
 --chiLBSSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
 chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
 chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
-chiLBSSetProperty(phys1,SWEEP_EAGER_LIMIT,62000)
+
 
 chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs0,5)
 chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs1,7)
@@ -171,13 +139,13 @@ chiMonteCarlonSetProperty(phys0,MC_TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys0,MC_SCATTERING_ORDER,0)
 chiMonteCarlonSetProperty(phys0,MC_MONOENERGETIC,true)
 chiMonteCarlonSetProperty(phys0,MC_FORCE_ISOTROPIC,true)
---chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.25)
+--chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,20.0)
 
 chiMonteCarlonInitialize(phys0)
 chiMonteCarlonExecute(phys0)
 
 --############################################### Setup ref Monte Carlo Physics
-chiMeshHandlerSetCurrent(mmesh)
+chiMeshHandlerSetCurrent(tmesh)
 phys2 = chiMonteCarlonCreateSolver()
 chiSolverAddRegion(phys2,region1)
 

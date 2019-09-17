@@ -254,8 +254,8 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     int* ref_edge = poly_cell->edges[face_ref->face_num];
 
-    chi_mesh::Vertex v0 = *grid->nodes[ref_edge[0]];
-    chi_mesh::Vertex v1 = *grid->nodes[ref_edge[1]];
+    chi_mesh::Vertex& v0 = *grid->nodes[ref_edge[0]];
+    chi_mesh::Vertex& v1 = *grid->nodes[ref_edge[1]];
 
     //====================================== Sample direction
     double costheta = rng->Rand();     //Sample half-range only
@@ -266,9 +266,6 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
     ref_dir.x = sin(theta)*cos(varphi);
     ref_dir.y = sin(theta)*sin(varphi);
     ref_dir.z = cos(theta);
-
-//    chi_log.Log(LOG_0) << v0.PrintS();
-//    chi_log.Log(LOG_0) << v1.PrintS();
 
     //====================================== Set quantities
     double w = rng->Rand();

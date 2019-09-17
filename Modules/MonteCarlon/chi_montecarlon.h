@@ -11,6 +11,7 @@ namespace chi_montecarlon
   class BoundarySource;
   class VolumetricSource;
   class ResidualSource;
+  class ResidualMOCSource;
 
 
   class Solver;

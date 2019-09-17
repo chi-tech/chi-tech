@@ -1,5 +1,5 @@
-#ifndef _mc_rmc_source_h
-#define _mc_rmc_source_h
+#ifndef _mc_moc_source_h
+#define _mc_moc_source_h
 
 #include "../mc_base_source.h"
 
@@ -9,7 +9,7 @@
 
 //###################################################################
 /**Residual source class.*/
-class chi_montecarlon::ResidualSource : public chi_montecarlon::Source
+class chi_montecarlon::ResidualMOCSource : public chi_montecarlon::Source
 {
 private:
   chi_physics::FieldFunction* resid_ff;
@@ -28,7 +28,7 @@ private:
 
   chi_math::CDFSampler* residual_sampler;
 public:
-  ResidualSource(
+  ResidualMOCSource(
     chi_physics::FieldFunction* in_resid_ff,
     bool use_uniform_sampling=false);
   void Initialize(chi_mesh::MeshContinuum* ref_grid,

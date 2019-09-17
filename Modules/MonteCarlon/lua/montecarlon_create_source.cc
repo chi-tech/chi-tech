@@ -6,6 +6,7 @@
 #include "../Source/mc_base_source.h"
 #include "../Source/BoundarySource/mc_bndry_source.h"
 #include "../Source/ResidualSource/mc_rmc_source.h"
+#include "../Source/ResidualSource/mc_moc_source.h"
 
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
@@ -29,7 +30,11 @@ MC_BNDRY_SRC\n
 
 MC_RESID_SRC\n
  Uses a residual source from a field function. Expects to be followed by a
- field function handle.
+ field function handle. This will sample the residual.
+
+MC_RESID_SRC_SU\n
+ Same as above but will sample the domain uniformly and adjust the weights of
+ each individual particle.
 
 \return Handle int Handle to the created source.
 \ingroup LuaMonteCarlon
@@ -107,6 +112,76 @@ int chiMonteCarlonCreateSource(lua_State *L)
 
     chi_montecarlon::ResidualSource* new_source = new
       chi_montecarlon::ResidualSource(ff);
+
+    solver->sources.push_back(new_source);
+    lua_pushnumber(L,solver->sources.size()-1);
+
+    chi_log.Log(LOG_0) << "MonteCarlo-created residual source.";
+
+  }
+  //============================================= Residual source
+  //                                              sampled uniformly
+  else if (source_type == MC_RESID_SRC_SU)
+  {
+    if (num_args < 3)
+      LuaPostArgAmountError("chiMonteCarlonCreateSource-"
+                            "MC_RESID_SRC_SU",
+                            3,num_args);
+
+    int ff_handle = lua_tonumber(L,3);
+    size_t ff_stack_size = chi_physics_handler.fieldfunc_stack.size();
+
+
+    chi_physics::FieldFunction* ff;
+    try {
+      ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
+    }
+
+    catch (std::out_of_range o)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Invalid field function handle supplied in call to "
+           "chiMonteCarlonCreateSource-MC_RESID_SRC_SU";
+      exit(EXIT_FAILURE);
+    }
+
+    chi_montecarlon::ResidualSource* new_source = new
+      chi_montecarlon::ResidualSource(ff,true);
+
+    solver->sources.push_back(new_source);
+    lua_pushnumber(L,solver->sources.size()-1);
+
+    chi_log.Log(LOG_0) << "MonteCarlo-created residual source.";
+
+  }
+  //============================================= Residual source
+  //                                              MOC
+  else if (source_type == MC_RESID_MOC)
+  {
+    if (num_args < 3)
+      LuaPostArgAmountError("chiMonteCarlonCreateSource-"
+                            "MC_RESID_SRC_SU",
+                            3,num_args);
+
+    int ff_handle = lua_tonumber(L,3);
+    size_t ff_stack_size = chi_physics_handler.fieldfunc_stack.size();
+
+
+    chi_physics::FieldFunction* ff;
+    try {
+      ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
+    }
+
+    catch (std::out_of_range o)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Invalid field function handle supplied in call to "
+           "chiMonteCarlonCreateSource-MC_RESID_SRC_SU";
+      exit(EXIT_FAILURE);
+    }
+
+    chi_montecarlon::ResidualMOCSource* new_source = new
+      chi_montecarlon::ResidualMOCSource(ff,true);
 
     solver->sources.push_back(new_source);
     lua_pushnumber(L,solver->sources.size()-1);

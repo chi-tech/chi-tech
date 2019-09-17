@@ -164,6 +164,8 @@ RegisterFunction(chiMonteCarlonExecute)
     RegisterConstant(MC_ALL_BOUNDARIES,         -1);
   RegisterConstant(MC_LOGICVOL_SRC,          3);
   RegisterConstant(MC_RESID_SRC,             4);
+  RegisterConstant(MC_RESID_SRC_SU,          5);
+  RegisterConstant(MC_RESID_MOC,             6);
 RegisterFunction(chiMonteCarlonSetProperty)
   RegisterConstant(MC_NUM_PARTICLES,             1);
   RegisterConstant(MC_TFC_UPDATE_INTVL,          2);
