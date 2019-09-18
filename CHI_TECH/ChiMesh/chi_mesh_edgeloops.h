@@ -19,7 +19,7 @@ struct chi_mesh::Edge
     f_index[3] = -1;
   }
 
-  void operator=(const Edge& that)
+  Edge& operator=(const Edge& that)
   {
     this->v_index[0] = that.v_index[0];
     this->v_index[1] = that.v_index[1];
@@ -31,6 +31,8 @@ struct chi_mesh::Edge
 
     this->vertices[0] = that.vertices[0];
     this->vertices[1] = that.vertices[1];
+
+    return *this;
   }
 };
 
