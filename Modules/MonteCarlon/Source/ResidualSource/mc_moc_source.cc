@@ -24,6 +24,7 @@
 #include <ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h>
 
 #include <ChiMath/Statistics/cdfsampler.h>
+#include <ChiMath/Quadratures/quadrature_gausslegendre.h>
 
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
@@ -43,11 +44,6 @@ chi_montecarlon::ResidualMOCSource::ResidualMOCSource(
 
   weights_L = 0.0;
   weights_R = 0.0;
-
-  total_residual = 0.0;
-  total_Cresidual = 0.0;
-  total_Lresidual = 0.0;
-  total_Rresidual = 0.0;
 }
 
 //###################################################################
@@ -106,10 +102,10 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
   chi_log.Log(LOG_0) << "Computing cell residuals";
   int num_local_cells = grid->local_cell_glob_indices.size();
   std::vector<double> cell_averages(num_local_cells,0.0);
-  cell_residuals.resize(num_local_cells,0.0);
-  cell_interior_residual.resize(num_local_cells,0.0);
-  cell_surface_residualL.resize(num_local_cells,0.0);
-  cell_surface_residualR.resize(num_local_cells,0.0);
+  cell_dof_phi.resize(num_local_cells);
+  cell_sigma_s.resize(num_local_cells);
+  cell_sigma_t.resize(num_local_cells);
+
   for (int lc=0; lc<num_local_cells; lc++)
   {
     int cell_glob_index = grid->local_cell_glob_indices[lc];
@@ -130,6 +126,9 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
         source = (TrQ*)cell_mat->properties[p];
     }
 
+    cell_sigma_s[lc] = xs->sigma_tg[0] - xs->sigma_rg[0];
+    cell_sigma_t[lc] = xs->sigma_tg[0];
+
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
@@ -143,22 +142,21 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
       std::vector<int> dofs_to_map(cell_fe_view->dofs);
       std::vector<int> cells_to_map;
       std::vector<int> cur_cell_mapping;
+      cells_to_map.resize(cell_fe_view->dofs);
       for (int i=0; i<cell_fe_view->dofs; i++)
+      {
         dofs_to_map[i] = i;
-      cells_to_map.resize(cell_fe_view->dofs,cell_glob_index);
+        cells_to_map[i] = cell_glob_index;
+      }
 
-      chi_log.Log(LOG_0VERBOSE_1) << "Mapping cell dofs ";
       ff_interp.CreatePWLDMapping(
-        resid_ff->num_grps,resid_ff->num_moms,0,0,
-        dofs_to_map,cells_to_map,
-        *resid_ff->local_cell_dof_array_address,&cur_cell_mapping);
+        resid_ff,dofs_to_map,cells_to_map,&cur_cell_mapping);
 
       chi_log.Log(LOG_0VERBOSE_1)
         << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
         << "dof 1 phi=" << field[cur_cell_mapping[1]];
 
       //==================================== Creating adj cell dof-mapping
-      chi_log.Log(LOG_0VERBOSE_1) << "Mapping adj cell dofs";
       std::vector<std::vector<int>> adj_cell_mapping_f;
 
       int num_faces = 2;
@@ -170,8 +168,6 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
 
         if (adj_cell_index >= 0)
         {
-          auto adj_cell = (chi_mesh::CellSlab*)grid->cells[adj_cell_index];
-
           int adj_num_dofs = 2;
           for (int i=0; i<adj_num_dofs; i++)
           {
@@ -180,9 +176,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
           }
 
           ff_interp.CreatePWLDMapping(
-            resid_ff->num_grps,resid_ff->num_moms,0,0,
-            dofs_to_map,cells_to_map,
-            *resid_ff->local_cell_dof_array_address,&adj_mapping);
+            resid_ff,dofs_to_map,cells_to_map,&adj_mapping);
 
           chi_log.Log(LOG_0VERBOSE_1)
             << "adj_cell " << adj_cell_index << "\n"
@@ -196,69 +190,32 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
       double phi     = 0.5*field[cur_cell_mapping[0]] +
                        0.5*field[cur_cell_mapping[1]];
 
-//      phi=0.0;
-
       double q = source->source_value_g[0];
 
-      //==================================== Computing interior residual
-      chi_log.Log(LOG_0VERBOSE_1) << "Computing cell interior residual";
-      for (int i=0; i<cell_fe_view->dofs; i++)
-      {
-        cell_interior_residual[lc] += q*
-                                      cell_fe_view->IntV_shapeI[i];
-        cell_interior_residual[lc] -= xs->sigma_rg[0]*
-                                      cell_fe_view->IntV_shapeI[i]*phi;
-        chi_log.Log(LOG_0VERBOSE_1) << "Vol_i[" << i << "]=" << cell_fe_view->IntV_shapeI[i];
-      }
-      chi_log.Log(LOG_0VERBOSE_1) << "Sigma a=" << xs->sigma_rg[0];
-
-      //==================================== Computing surface residuals
+      //==================================== Computing average dof flux
       cell_averages[lc] = phi;
-      chi_log.Log(LOG_0VERBOSE_1) << "Computing cell surface residual";
+      cell_dof_phi[lc].resize(2,0.0);
       for (int f=0; f<num_faces; f++)
       {
         int num_face_verts = 1;
         for (int fi=0; fi<num_face_verts; fi++)
         {
-          double phi_adj = 0.0;
           if (slab_cell->edges[f] >= 0)
-            phi_adj = 0.5*field[adj_cell_mapping_f[f][0]] +
-                      0.5*field[adj_cell_mapping_f[f][1]];
-          if (slab_cell->edges[f] == -1)
-            phi_adj = 1.0;
-//          else
-//            phi_adj = 0.0;
-
-//          phi_adj=0.0;
-
-          chi_log.Log(LOG_0VERBOSE_1)
-            << "Face " << f << "\n"
-            << "phi=" << phi << " adj_phi="<<phi_adj
-            << " neigbor=" <<slab_cell->edges[f];
-
-          if (f == 0)
-            cell_surface_residualL[lc] =-0.25*(phi - phi_adj);
+          {
+            cell_dof_phi[lc][f] =
+              0.5*field[cur_cell_mapping[f]] +
+              0.5*field[adj_cell_mapping_f[f][abs(f-1)]];
+          }
           else
-            cell_surface_residualR[lc] =-0.25*(phi - phi_adj);
+          {
+            double phi_adj = 0.0;
+            if (f == 0) phi_adj = 1.0;
 
+            cell_dof_phi[lc][f] = 0.5*field[cur_cell_mapping[f]] +
+                                  0.5*phi_adj;
+          }
         }//for face verts
       }//for face
-
-      cell_residuals[lc] =
-        std::fabs(cell_interior_residual[lc]) +
-        std::fabs(cell_surface_residualL[lc]) +
-        std::fabs(cell_surface_residualR[lc]);
-
-      chi_log.Log(LOG_0VERBOSE_1)
-        << "Cell residuals "
-        << cell_interior_residual[lc] << " "
-        << cell_surface_residualL[lc] << " "
-        << cell_surface_residualR[lc] << " "
-        << cell_residuals[lc];
-
-      total_Cresidual += std::fabs(cell_interior_residual[lc]);
-      total_Lresidual += std::fabs(cell_surface_residualL[lc]);
-      total_Rresidual += std::fabs(cell_surface_residualR[lc]);
     }//slab
     else
     {
@@ -269,37 +226,170 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     }
   }//for local cells
 
-  chi_log.Log(LOG_0) << "Computing total residual";
-  double total_resid = 0.0;
-  for (int lc=0; lc<num_local_cells; lc++)
-    total_resid += cell_residuals[lc];
-
-  total_residual = total_resid;
-
-  chi_log.Log(LOG_0) << "Total residual = " << total_residual;
-  chi_log.Log(LOG_0) << "Total cint residual = " << total_Cresidual;
-  chi_log.Log(LOG_0) << "Total left residual = " << total_Lresidual;
-  chi_log.Log(LOG_0) << "Total rite residual = " << total_Rresidual;
-
-
-  cell_residual_cdf.resize(num_local_cells,0.0);
-  double intgl = 0.0;
-  for (int lc=0; lc<num_local_cells; lc++)
-  {
-    intgl += cell_residuals[lc];
-    cell_residual_cdf[lc] = intgl/total_resid;
-  }
-
-  residual_sampler = new chi_math::CDFSampler(cell_residual_cdf);
 
   for (int lc=0; lc<num_local_cells; lc++)
   {
     chi_log.Log(LOG_0VERBOSE_1)
-      << "Cell total residual "
+      << "Cell nodal values "
       << std::setw(3) << lc
-      << std::setw(12) << cell_residuals[lc]
+      << std::setw(12) << cell_dof_phi[lc][0]
+      << std::setw(12) << cell_dof_phi[lc][1]
       << " phi_avg=" << cell_averages[lc];
   }
+
+  //================================================== Raytrace subdivisions
+  num_subdivs = 10;
+  size_t num_angles = 16;
+  quadrature.Initialize(num_angles);
+
+  cell_phi_star.resize(
+    num_local_cells,
+    std::vector<double>(num_subdivs+1,0.0));
+  cell_z_i_star.resize(
+    num_local_cells,
+    std::vector<double>(num_subdivs+1,0.0));
+
+  for (size_t n=0; n<quadrature.abscissae.size(); n++)
+  {
+    double mu = quadrature.abscissae[n];
+    double q_weight = quadrature.weights[n];
+    if (mu>0.0)
+    {
+      double psi_z_i = 0.5;
+
+      for (int lc=0; lc<num_local_cells; lc++)
+      {
+        auto cell = grid->cells[lc];
+
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
+        if (cell->Type() == chi_mesh::CellType::SLAB)
+        {
+          auto slab_cell = (chi_mesh::CellSlab*)cell;
+
+          int v0i = slab_cell->v_indices[0];
+          int v1i = slab_cell->v_indices[1];
+
+          chi_mesh::Vertex& v0 = *grid->nodes[v0i];
+          chi_mesh::Vertex& v1 = *grid->nodes[v1i];
+
+          double dz = (v1-v0).Norm();
+          double dzstar = dz/num_subdivs;
+          double z_i = v0.z;
+          double s_t = cell_sigma_t[lc]/mu;
+
+          for (int i=0; i<(num_subdivs+1); i++)
+          {
+            double zistar = z_i + dzstar*i;
+
+            if (i>0)
+            {
+              psi_z_i = psi_z_i*exp(-s_t*dzstar);
+
+//              double w = (cell_z_i_star[lc][i]-0.5*dzstar)/dz;
+//              double phi_avg_sub =
+//                w*cell_dof_phi[lc][0] +
+//                (1.0-w)*cell_dof_phi[lc][1];
+//              double q = (cell_sigma_s[lc]-cell_sigma_t[lc])*phi_avg_sub;
+//
+//
+//
+//              psi_z_i += q*(1.0-exp(-s_t*dzstar))/std::fabs(mu);
+            }
+
+            cell_phi_star[lc][i] += q_weight*psi_z_i;
+            cell_z_i_star[lc][i]  = zistar;
+          }
+        }//slab
+      }//for local cell
+    }//if mu>0.0
+    else
+    {
+      double psi_z_i = 0.0;
+
+      for (int lc=(num_local_cells-1); lc>=0; lc--)
+      {
+        auto cell = grid->cells[lc];
+
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
+        if (cell->Type() == chi_mesh::CellType::SLAB)
+        {
+          auto slab_cell = (chi_mesh::CellSlab*)cell;
+
+          int v0i = slab_cell->v_indices[0];
+          int v1i = slab_cell->v_indices[1];
+
+          chi_mesh::Vertex& v0 = *grid->nodes[v0i];
+          chi_mesh::Vertex& v1 = *grid->nodes[v1i];
+
+          double dz = (v1-v0).Norm();
+          double dzstar = dz/num_subdivs;
+          double z_i = v0.z;
+          double s_t = cell_sigma_t[lc]/std::fabs(mu);
+
+          for (int i=0; i<(num_subdivs+1); i++)
+          {
+            double zistar = z_i + dzstar*i;
+
+            if (i>0)
+            {
+              psi_z_i = psi_z_i*exp(-s_t*dzstar);
+
+            }
+
+
+            int irev = num_subdivs - i; //reverse i
+            cell_phi_star[lc][irev] += q_weight*psi_z_i;
+            cell_z_i_star[lc][irev]  = zistar;
+          }
+        }//slab
+      }//for local cell
+    }//if mu<0.0
+  }//for mu
+
+  //============================================= Constructing cell totals
+  total_uncollided_flux = 0.0;
+  cell_total_subfluxes.resize(num_local_cells,0.0);
+  cell_subfluxes.resize(num_local_cells);
+  for (int lc=0; lc<num_local_cells; lc++)
+  {
+    cell_subfluxes[lc].resize(num_subdivs,0.0);
+    for (int i=0; i<(num_subdivs+1); i++)
+    {
+      chi_log.Log(LOG_0VERBOSE_1)
+        << cell_z_i_star[lc][i] << " "
+        << cell_phi_star[lc][i];
+
+      if (i<num_subdivs)
+      {
+        double phi_avg =
+          0.5*cell_phi_star[lc][i] +
+          0.5*cell_phi_star[lc][i+1];
+
+        cell_total_subfluxes[lc] += phi_avg;
+        cell_subfluxes[lc][i] = phi_avg;
+      }
+    }//for subdivs
+    total_uncollided_flux += cell_total_subfluxes[lc];
+  }//for local cell
+
+  chi_log.Log(LOG_0VERBOSE_1)
+   << "\nTotal uncollided flux = " << total_uncollided_flux;
+
+  //============================================= Constructing cdf
+  cell_cdf.resize(num_local_cells);
+  double cumulator = 0.0;
+  for (int lc=0; lc<num_local_cells; lc++)
+  {
+    cumulator += std::fabs(cell_total_subfluxes[lc]);
+    cell_cdf[lc] = cumulator/total_uncollided_flux;
+    chi_log.Log(LOG_0VERBOSE_1)
+      << "Cell avg uncollided flux "
+      << lc << " "
+      << cell_total_subfluxes[lc]/num_subdivs;
+  }
+
+  cell_sampler = new chi_math::CDFSampler(cell_cdf);
+
 }
 
 //###################################################################
@@ -307,23 +397,29 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
 chi_montecarlon::Particle chi_montecarlon::ResidualMOCSource::
 CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
 {
+  chi_montecarlon::Particle new_particle;
+
   int num_local_cells = grid->local_cell_glob_indices.size();
   int lc = 0;
-  double sampling_normalization;
-  if (sample_uniformly) {
-    lc = std::floor( rng->Rand()*(num_local_cells) );
-    sampling_normalization = (cell_residuals[lc]/total_residual)*
-                             num_local_cells*total_residual;
-  }
-  else {
-    lc = residual_sampler->Sample(rng->Rand());
-    sampling_normalization = total_residual;
-  }
+//  lc = std::floor( rng->Rand()*(num_local_cells) );
+  lc = cell_sampler->Sample(rng->Rand());
+
 
   int cell_glob_index = grid->local_cell_glob_indices[lc];
   auto cell = grid->cells[cell_glob_index];
 
-  chi_montecarlon::Particle new_particle;
+
+  //====================================== Sample direction
+  double costheta = 2.0*rng->Rand() - 1.0;
+  double theta    = acos(costheta);
+  double varphi   = rng->Rand()*2.0*M_PI;
+
+  chi_mesh::Vector ref_dir;
+  ref_dir.x = sin(theta)*cos(varphi);
+  ref_dir.y = sin(theta)*sin(varphi);
+  ref_dir.z = cos(theta);
+
+  new_particle.dir = ref_dir;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
@@ -336,114 +432,38 @@ CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
     chi_mesh::Vertex v0 = *grid->nodes[v0i];
     chi_mesh::Vertex v1 = *grid->nodes[v1i];
 
-    double rn = rng->Rand();
+    //====================================== Sample position
+    double dz = (v1-v0).Norm();
+    double dzstar = (v1-v0).Norm()/num_subdivs;
+    double s = rng->Rand();
+    double w = rng->Rand();
 
-    double center_res = std::fabs(cell_interior_residual[lc]);
-    double surfL_res  = std::fabs(cell_surface_residualL[lc]);
-    double surfR_res  = std::fabs(cell_surface_residualR[lc]);
-
-    double cell_R = center_res + surfL_res + surfR_res;
-
-    if (cell_R < 1.0e-16) {
-      new_particle.alive = false;
-      return new_particle;
-    }
-
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CENTER
-    if (rn < (center_res/cell_R))
+    double sampling_normalization = 1.0;
+    double z=0.0;
+    double cumulator = 0.0;
+    for (int i=0; i<10; i++)
     {
-      //====================================== Sample direction
-      double costheta = 2.0*rng->Rand() - 1.0;
-      double theta    = acos(costheta);
-      double varphi   = rng->Rand()*2.0*M_PI;
-
-      chi_mesh::Vector ref_dir;
-      ref_dir.x = sin(theta)*cos(varphi);
-      ref_dir.y = sin(theta)*sin(varphi);
-      ref_dir.z = cos(theta);
-
-      //====================================== Sample position
-      double w = rng->Rand();
-      new_particle.pos = v0*w + v1*(1.0-w);
-
-      //====================================== Set quantities
-      new_particle.dir = ref_dir;
-
-      new_particle.egrp = 0;
-      new_particle.w = sampling_normalization*
-                       ((cell_interior_residual[lc]<0.0) ? -1.0:1.0);
-//      new_particle.w = std::fabs(sampling_normalization);
-      new_particle.cur_cell_ind = cell_glob_index;
-//      new_particle.alive = false;
-      particles_C++;
-
-      return new_particle;
-    }
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LEFT
-    else if (rn < ((center_res + surfL_res)/cell_R))
-//    if (rn < (0.5))
-    {
-      //====================================== Sample direction
-      double costheta = rng->Rand();
-      double theta    = acos(sqrt(costheta));
-      double varphi   = rng->Rand()*2.0*M_PI;
-
-      chi_mesh::Vector ref_dir;
-      ref_dir.x = sin(theta)*cos(varphi);
-      ref_dir.y = sin(theta)*sin(varphi);
-      ref_dir.z = cos(theta);
-
-      //====================================== Set position
-      new_particle.pos = v0+chi_mesh::Vector(0,0,1.0e-8);
-
-      //====================================== Set quantities
-      new_particle.dir = ref_dir;
-
-      new_particle.egrp = 0;
-      new_particle.w = sampling_normalization*
-                       ((cell_surface_residualL[lc]<0.0) ? -1.0:1.0);
-//      new_particle.w = std::fabs(sampling_normalization);
-      new_particle.cur_cell_ind = cell_glob_index;
-//      new_particle.alive = false;
-      particles_L++;
-      weights_L += new_particle.w;
-
-      return new_particle;
-    }
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RIGHT
-    else
-    {
-      //====================================== Sample direction
-      double costheta = rng->Rand();
-      double theta    = acos(-sqrt(costheta));
-      double varphi   = rng->Rand()*2.0*M_PI;
-
-      chi_mesh::Vector ref_dir;
-      ref_dir.x = sin(theta)*cos(varphi);
-      ref_dir.y = sin(theta)*sin(varphi);
-      ref_dir.z = cos(theta);
-
-      //====================================== Set position
-      new_particle.pos = v1-chi_mesh::Vector(0,0,1.0e-8);
-
-      //====================================== Set quantities
-      new_particle.dir = ref_dir;
-
-      new_particle.egrp = 0;
-      new_particle.w = sampling_normalization*
-                       ((cell_surface_residualR[lc]<0.0) ? -1.0:1.0);
-//      new_particle.w = std::fabs(sampling_normalization);
-      new_particle.cur_cell_ind = cell_glob_index;
-//      new_particle.alive = false;
-      particles_R++;
-      weights_R += new_particle.w;
-
-      return new_particle;
+      cumulator += std::fabs(cell_subfluxes[lc][i]);
+      if (s < (cumulator/std::fabs(cell_total_subfluxes[lc])))
+      {
+        z = cell_z_i_star[lc][i] + w*dzstar;
+        sampling_normalization *= cell_sigma_s[lc]*dz*
+          ((cell_subfluxes[lc][i]<0.0) ? -1.0:1.0);
+        break;
+      }
     }
 
+    new_particle.pos = chi_mesh::Vector(0.0,0.0,z);
+    new_particle.egrp = 0;
+    new_particle.w = sampling_normalization;
+
+    new_particle.cur_cell_ind = cell_glob_index;
 
   }
+
+
+
+//  new_particle.alive = false;
 
   return new_particle;
 }

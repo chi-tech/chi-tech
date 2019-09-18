@@ -3,6 +3,8 @@
 
 #include "../mc_base_source.h"
 
+#include <ChiMath/Quadratures/quadrature_gausslegendre.h>
+
 #include <ChiPhysics/chi_physics.h>
 
 #include <ChiMath/chi_math.h>
@@ -13,20 +15,24 @@ class chi_montecarlon::ResidualMOCSource : public chi_montecarlon::Source
 {
 private:
   chi_physics::FieldFunction* resid_ff;
-  std::vector<double> cell_residuals;
-  std::vector<double> cell_interior_residual;
-  std::vector<double> cell_surface_residualL;
-  std::vector<double> cell_surface_residualR;
-  std::vector<double> cell_residual_cdf;
 
-  double total_residual;
-  double total_Cresidual;
-  double total_Lresidual;
-  double total_Rresidual;
+  std::vector<std::vector<double>> cell_dof_phi;
+  chi_math::QuadratureGaussLegendre quadrature;
+
+  std::vector<std::vector<double>> cell_z_i_star;
+  std::vector<std::vector<double>> cell_phi_star;
+
+  double                           total_uncollided_flux;
+  std::vector<double>              cell_total_subfluxes;
+  std::vector<std::vector<double>> cell_subfluxes;
+  std::vector<double>              cell_cdf;
+  std::vector<double>              cell_sigma_s;
+  std::vector<double>              cell_sigma_t;
 
   const bool sample_uniformly;
+  size_t num_subdivs;
 
-  chi_math::CDFSampler* residual_sampler;
+  chi_math::CDFSampler* cell_sampler;
 public:
   ResidualMOCSource(
     chi_physics::FieldFunction* in_resid_ff,

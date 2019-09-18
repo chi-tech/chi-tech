@@ -30,11 +30,15 @@ MC_BNDRY_SRC\n
 
 MC_RESID_SRC\n
  Uses a residual source from a field function. Expects to be followed by a
- field function handle. This will sample the residual.
+ field function handle. This will sample the residual.\n\n
 
 MC_RESID_SRC_SU\n
  Same as above but will sample the domain uniformly and adjust the weights of
- each individual particle.
+ each individual particle.\n\n
+
+MC_RESID_MOC\n
+ Uses a field-function for computing a residual but uses the Method of
+ Characteristics to trace the uncollided portions.\n\n
 
 \return Handle int Handle to the created source.
 \ingroup LuaMonteCarlon
@@ -181,7 +185,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
     }
 
     chi_montecarlon::ResidualMOCSource* new_source = new
-      chi_montecarlon::ResidualMOCSource(ff,true);
+      chi_montecarlon::ResidualMOCSource(ff);
 
     solver->sources.push_back(new_source);
     lua_pushnumber(L,solver->sources.size()-1);
