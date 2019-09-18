@@ -117,7 +117,7 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
     auto cell        = grid->cells[cell_g_index];
 
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       LBSCellViewFull* transport_view =
         (LBSCellViewFull*)cell_transport_views[c];
@@ -143,7 +143,7 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
       }//for dof
     }//slab
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYGON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -171,7 +171,7 @@ void LinearBoltzmanSolver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
       }//for dof
     }//polygon
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
@@ -228,7 +228,7 @@ void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
     auto cell        = grid->cells[cell_g_index];
 
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       LBSCellViewFull* transport_view =
         (LBSCellViewFull*)cell_transport_views[c];
@@ -247,7 +247,7 @@ void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
       }//for dof
     }//slab
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYGON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
@@ -268,7 +268,7 @@ void LinearBoltzmanSolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
       }//for dof
     }//polygon
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-    else if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;

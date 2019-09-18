@@ -46,7 +46,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
 
       //========================================= Create a template empty
       //                                          cell
-      chi_mesh::Cell *tcell = new chi_mesh::Cell;
+      chi_mesh::Cell *tcell = new chi_mesh::Cell(chi_mesh::CellType::GHOST);
       tcell->centroid = centroid_precompd;
 
       //========================================= Get the partition id

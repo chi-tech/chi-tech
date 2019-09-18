@@ -584,7 +584,7 @@ int chiLBSSetProperty(lua_State *L)
     int limit = lua_tonumber(L,3);
     if (limit<=64000)
     {
-      solver->options.sweep_eager_limit;
+      solver->options.sweep_eager_limit = limit;
     }
   }
   else

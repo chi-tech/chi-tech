@@ -126,7 +126,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
     auto cell = grid->cells[cell_glob_index];
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
 
@@ -168,7 +168,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
@@ -221,7 +221,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
     }//polygon
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
@@ -321,7 +321,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
     border_cell_info.push_back(ip_view->cell_dof_start); //cell_dof_start
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (typeid(*cell) == typeid(chi_mesh::CellSlab))
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       border_cell_info.push_back(0);                     //cell_type
@@ -340,7 +340,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       border_cell_info.push_back(1);                     //cell_type
@@ -360,7 +360,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
     }
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolyhedron))
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       border_cell_info.push_back(2);                     //cell_type
