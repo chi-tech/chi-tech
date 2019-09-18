@@ -42,7 +42,7 @@ struct CSTMemory
     memory_gbytes = 0.0;
   }
 
-  CSTMemory(double in_mem)
+  explicit CSTMemory(double in_mem)
   {
     memory_bytes  = in_mem;
     memory_kbytes = in_mem/1024.0;
