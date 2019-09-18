@@ -1,5 +1,5 @@
 #include "delaunay_mesher.h"
-#include "../../../../CHI_RESOURCES/Dependencies/Eigen/Dense"
+#include "Eigen/Dense"
 
 //###################################################################
 /**Determine the orientation of point c relative to point a and b.
