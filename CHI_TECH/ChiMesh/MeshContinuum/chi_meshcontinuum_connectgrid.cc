@@ -138,7 +138,7 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
 
   chi_mesh::Cell* cell = cells[adj_cell_g_index];
 
-  if (typeid(*cell) != typeid(chi_mesh::CellPolyhedron))
+  if (cell->Type() != chi_mesh::CellType::POLYHEDRON)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell type encountered in "
@@ -251,7 +251,7 @@ int chi_mesh::MeshContinuum::FindAssociatedEdge(int* edgeinfo,
 
   chi_mesh::Cell* cell = cells[adj_cell_g_index];
 
-  if (typeid(*cell) != typeid(chi_mesh::CellPolygon))
+  if (cell->Type() != chi_mesh::CellType::POLYGON)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell type encountered in "
@@ -348,7 +348,7 @@ void chi_mesh::MeshContinuum::
 
   chi_mesh::Cell* cell = cells[adj_cell_g_index];
 
-  if (typeid(*cell) != typeid(chi_mesh::CellPolyhedron))
+  if (cell->Type() != chi_mesh::CellType::POLYHEDRON)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell type encountered in "

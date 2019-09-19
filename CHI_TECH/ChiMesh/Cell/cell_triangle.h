@@ -14,7 +14,7 @@ public:
   int e_index[3][4];
 
 public:
-  CellTriangle():Cell()
+  CellTriangle():Cell(CellType::TRIANGLE)
   {
     for (int k=0;k<3;k++)
     {

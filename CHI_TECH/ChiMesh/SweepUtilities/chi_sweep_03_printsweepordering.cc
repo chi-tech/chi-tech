@@ -45,7 +45,7 @@ void chi_mesh::SweepManagement::
     int cell_index = sweep_order->spls->item_id[ci];
     chi_mesh::Cell* cell =  vol_continuum->cells[cell_index];
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (typeid(*cell) == typeid(chi_mesh::CellPolygon))
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
