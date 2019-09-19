@@ -5,9 +5,8 @@
 #   ./configure.sh [clean] [Debug|Release|RelWithDebInfo|MinSizeRel] [...]
 #
 # DESCRIPTION:
-#   This script checks the dependencies and installs the required libraries if 
-#   they are missing. After that, it generates the CMake build scripts; the 
-#   precise behavior of this stage depends on the arguments passed:
+#   This script generates the CMake build scripts. The precise behavior of this
+#   script depends on the arguments passed:
 #   
 #   1. If called without arguments, CMake scripts for a release (optimized) build
 #      of ChiTech will be generated in the directory chi_build. Additional
@@ -49,57 +48,6 @@ is_cmake_build_type() {
   done
   return 1
 }
-
-#----- Check if dependencies have been compiled -----
-if [ ! -d "CHI_RESOURCES/Dependencies/ncurses" ]; then
-  cd "CHI_RESOURCES/Dependencies"
-  tar -zxf readline.tar.gz
-  tar -zxf ncurses.tar.gz
-  tar -zxf lua-5.3.5.tar.gz
-  cd readline
-  ./configure --prefix=$PWD/build
-  make 
-  make install
-  cd ../ncurses
-  ./configure --prefix=$PWD/build
-  make 
-  make install
-  cd ../
-  export LIBRARY_PATH=$LIBRARY_PATH:"$PWD/readline/build/lib"
-  export LIBRARY_PATH=$LIBRARY_PATH:"$PWD/ncurses/build/lib"
-  export CPATH=$CPATH:"$PWD/readline/build/include"
-
-  cd lua-5.3.5
-  if [ "$(uname)" = "Darwin" ]; then
-      make macosx MYLIBS=-lncurses      
-  elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
-      make linux MYLIBS=-lncurses
-  elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
-      make mingw MYLIBS=-lncurses
-  elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
-      make mingw MYLIBS=-lncurses
-  fi
-  
-  make local
-
-  cd ../
-  if [ ! -d "triangle" ]; then
-    if [ "$(uname)" = "Darwin" ]; then
-        tar -zxf trianglemac.tar.gz  triangle/  
-    elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
-        tar -zxf triangle.tar.gz
-    elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
-        tar -zxf triangle.tar.gz
-    elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW64_NT" ]; then
-        tar -zxf triangle.tar.gz
-    fi
-  fi
-  cd triangle
-  echo "Building Triangle"
-  make triangle
-  make trilibrary
-  cd ../../../
-fi
 
 CMAKE_ARGS=                 # additional CMake arguments
 DO_CLEAN="No"               # if yes, remove the chi_build directory before generating CMake
