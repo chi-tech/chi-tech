@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+message(STATUS "Configuring ${CMAKE_BUILD_TYPE} build of ChiTech.")
+
 if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX_ENV)
 elseif(APPLE)
@@ -53,7 +54,6 @@ else()
     message(STATUS "RANDOM123_ROOT set to ${RANDOM123_ROOT}")
 endif()
 
-
 #================================================ Set project targets
 SET(TARGET ChiTech)
 project(${TARGET} C CXX)
@@ -98,6 +98,9 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Force -O3 in release builds (some OS's might downgrade it)
+string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
 include_directories("${EIGEN_ROOT}")
@@ -127,8 +130,7 @@ find_package(VTK COMPONENTS
 	vtkIOXML vtkParallelCore
 	vtkIOParallelXML REQUIRED)
 if (NOT VTK_FOUND)
-	message("VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
-  return ()
+  message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()
 
 message (STATUS "VTK_VERSION: ${VTK_VERSION}")
@@ -170,10 +172,10 @@ add_subdirectory("${CHI_TECH_MOD}/MonteCarlon")
 add_subdirectory("${CHI_TECH_MOD}/DiffusionSolver")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
-
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET} ${LIBS} ${TRIANGLE})
 
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
         "clean:\n\t$(MAKE) -C chi_build clean\n")
+
