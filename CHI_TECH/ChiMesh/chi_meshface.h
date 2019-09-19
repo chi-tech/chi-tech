@@ -42,7 +42,7 @@ struct chi_mesh::Face
     e_index[2][0] = c; e_index[2][1] = a;
   }
 
-  void operator=(const Face& that)
+  Face& operator=(const Face& that)
   {
     for (int k=0;k<3;k++)
     {
@@ -57,6 +57,7 @@ struct chi_mesh::Face
     geometric_normal = that.geometric_normal;
     assigned_normal  = that.assigned_normal;
     invalidated = that.invalidated;
+    return *this;
   }
 
 };
