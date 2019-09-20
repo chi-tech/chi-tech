@@ -1,6 +1,6 @@
 #include "../property10_transportxsections.h"
 
-#include <ChiMath/../../CHI_RESOURCES/Dependencies/Eigen/Dense>
+#include <Eigen/Dense>
 
 #include <chi_log.h>
 

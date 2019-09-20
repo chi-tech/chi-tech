@@ -1,7 +1,7 @@
 #ifndef _lbs_structs_h
 #define _lbs_structs_h
 
-#include "../../CHI_RESOURCES/Dependencies/Eigen/Dense"
+#include "Eigen/Dense"
 
 
 #define PARTITION_METHOD_SERIAL        1

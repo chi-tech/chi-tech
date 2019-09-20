@@ -26,20 +26,41 @@ else()
     message(STATUS "PETSC_ROOT set to ${PETSC_ROOT}")
 endif()
 
+if (NOT (DEFINED ENV{EIGEN_ROOT}))
+    message(FATAL_ERROR "***** EIGEN_ROOT is not set *****")
+else()
+    set(EIGEN_ROOT    "$ENV{EIGEN_ROOT}")
+    message(STATUS "EIGEN_ROOT set to ${EIGEN_ROOT}")
+endif()
+
+if (NOT (DEFINED ENV{LUA_ROOT}))
+    message(FATAL_ERROR "***** LUA_ROOT is not set *****")
+else()
+    set(LUA_ROOT    "$ENV{LUA_ROOT}")
+    message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
+endif()
+
+if (NOT (DEFINED ENV{TRIANGLE_ROOT}))
+    message(FATAL_ERROR "***** TRIANGLE_ROOT is not set *****")
+else()
+    set(TRIANGLE_ROOT    "$ENV{TRIANGLE_ROOT}")
+    message(STATUS "TRIANGLE_ROOT set to ${TRIANGLE_ROOT}")
+endif()
+
+if (NOT (DEFINED ENV{RANDOM123_ROOT}))
+    message(FATAL_ERROR "***** RANDOM123_ROOT is not set *****")
+else()
+    set(RANDOM123_ROOT    "$ENV{RANDOM123_ROOT}")
+    message(STATUS "RANDOM123_ROOT set to ${RANDOM123_ROOT}")
+endif()
 
 #================================================ Set project targets
 SET(TARGET ChiTech)
 project(${TARGET} C CXX)
 
-
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/CHI_TECH")
 set(CHI_TECH_MOD "Modules")
-set(CHI_TECH_DEP "${PROJECT_SOURCE_DIR}/CHI_RESOURCES/Dependencies")
-
-set(TRIANGLE_ROOT "${CHI_TECH_DEP}/triangle")
-set(LUA_ROOT      "${CHI_TECH_DEP}/lua-5.3.5/install")
-
 
 #================================================ Set cmake variables
 find_package(MPI)
@@ -82,13 +103,15 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
+include_directories("${EIGEN_ROOT}")
 include_directories("${CHI_TECH_DEP}/Random123/include")
 include_directories("${TRIANGLE_ROOT}")
+include_directories("${PETSC_ROOT}/include")
+include_directories("${BOOST_ROOT}/include")
+include_directories("${RANDOM123_ROOT}/include")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-include_directories("${PETSC_ROOT}/include")
-include_directories(SYSTEM "${BOOST_ROOT}/include")
 
 
 #================================================ Library directories

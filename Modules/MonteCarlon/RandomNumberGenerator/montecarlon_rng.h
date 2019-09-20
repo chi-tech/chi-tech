@@ -4,7 +4,7 @@
 #include "../chi_montecarlon.h"
 #define R123_UNIFORM_FLOAT_STORE 1
 #include<Random123/threefry.h>
-#include<R123Uniform.hpp>
+#include<Random123/uniform.hpp>
 
 //#########################################################
 /**Random number generator based on threefry.*/
