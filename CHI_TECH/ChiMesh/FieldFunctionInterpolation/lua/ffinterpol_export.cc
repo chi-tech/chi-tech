@@ -30,7 +30,7 @@ int chiFFInterpolationExportPython(lua_State* L)
   try {
     cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid ffi handle in chiFFInterpolationSetProperty.";

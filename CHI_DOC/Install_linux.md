@@ -1,13 +1,14 @@
 # Compiling on Personal Linux Machines
 
-The following instructions were tested on Ubuntu 18.04 LTS; other Linux distributions might require some minor tweaking.
+The following instructions were tested on Ubuntu 18.04 LTS; other Linux
+distributions might require some minor tweaking.
 
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
-GCC is used to build and install ChiTech. 
-GFortran and Python is used during the installation of PETSc 
-(which ChiTech uses as a linear algebra backend) and 
-OpenGL is required by VTK (used by ChiTech for visualization). 
+GCC is used to build and install ChiTech.
+GFortran and Python is used during the installation of PETSc
+(which ChiTech uses as a linear algebra backend) and
+OpenGL is required by VTK (used by ChiTech for visualization).
 These packages will therefore also need to be installed.
 
 Check to see if gcc is installed
@@ -41,7 +42,7 @@ sudo apt-get install cmake python git zlib1g-dev libx11-dev
 sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 ```
 
-<u>NOTE</u>: *The recommended version of PETSc requires Python 2.6+; Python 3.x, typically 
+<u>NOTE</u>: *The recommended version of PETSc requires Python 2.6+; Python 3.x, typically
 pre-installed on modern Linux systems, will not work (Step 4 below provides more
 details if you need to use `python3`) .*
 
@@ -54,7 +55,7 @@ are probably already set to go. **MPICH** is recommended for better performance.
 sudo apt-get install mpich
 ```
 
-To check if this is working properly, simply do the mpi version of checking for 
+To check if this is working properly, simply do the mpi version of checking for
 a C++ compiler:
 
 ```bash
@@ -71,14 +72,14 @@ Which should display the same message the gcc call did, i.e.
 
 ### Step 3 - Boost 1.63+
 
-Download and unpack boost. Eventually ChiTech needs the location where the 
-"include" directory is so just follow online instructions for this. 
+Download and unpack boost. Eventually ChiTech needs the location where the
+"include" directory is so just follow online instructions for this.
 
 Alternatively, just make a *projects* directory and download boost there,
 like the following:
 
 ```bash
-mkdir projects 
+mkdir projects
 cd projects
 mkdir boost
 cd boost
@@ -107,11 +108,11 @@ the line to the file `.profile` in your home directory.
 
 ### Step 4 - PETSc
 
-The best performance thus far tested is with 
+The best performance thus far tested is with
 [petsc version 3.9.4](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz) .
 It is recommended to use this version.
 
-Return to your *projects* folder (or whatever you chose to place stuff). Run 
+Return to your *projects* folder (or whatever you chose to place stuff). Run
 the following
 
 ```bash
@@ -148,12 +149,12 @@ F77FLAGS='-fPIC -fopenmp' \
 COPTFLAGS='-O3 -march=native -mtune=native' \
 CXXOPTFLAGS='-O3 -march=native -mtune=native' \
 FOPTFLAGS='-O3 -march=native -mtune=native' \
-PETSC_DIR=$PWD 
+PETSC_DIR=$PWD
 ```
 
 If the configuration fails then consult PETSc's user documentation.
 
-<u>NOTE:</u> *The recommended version of PETSc requires Python 2.6+ for its configuration. 
+<u>NOTE:</u> *The recommended version of PETSc requires Python 2.6+ for its configuration.
 If you need to use Python 3.4+ (which is typically pre-installed on modern Linux systems as
 `python3`), you will need to download PETSc 3.11 (current most recent version is 3.11.3)
 and run the above configure script as `python3 ./configure ...`*
@@ -170,7 +171,7 @@ To test whether the system has been installed correctly execute:
 make test
 ```
 
-The final step is to generate the environment variable for the install 
+The final step is to generate the environment variable for the install
 directory of PETSc:
 
 ```bash
@@ -190,7 +191,7 @@ wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
 tar -zxf VTK-8.2.0.tar.gz
 cd VTK-8.2.0
 mkdir build
-cd build     
+cd build
 cmake -DCMAKE_INSTALL_PREFIX=$PWD/install \
 -DBUILD_SHARED_LIBS:BOOL=ON \
 -DVTK_Group_MPI:BOOL=ON \
@@ -212,49 +213,97 @@ export VTK_DIR=$PWD/install
 
 Again, this is also something you'd like to add to your bash profile.
 
-### Step 6 - Build ChiTech
+### Step 6 - Install Eigen
 
-#### Configure
+Download and extract **Eigen** from https://eigen.tuxfamily.org.  **Eigen** v3.3.7+
+is recommended.  **Eigen** is a header only library, and no further installation is
+required.
 
-Clone the repository. Go the folder where you want to keep ChiTech relevant stuff:
-
+Set the EIGEN_ROOT environment variable to the **Eigen** install location:
 ```bash
-git clone https://github.com/chi-tech/chi-tech
+    $ export EIGEN_ROOT=/Path/to/Eigen
 ```
 
-Go to the chi-tech folder and type
+Add the export command to your bash profile.
 
+### Step 7 - Install Random123
+
+Download and extract **Random123** from https://www.deshawresearch.com/resources_random123.html.
+**Radom123** v1.13.2+ is recommended.  **Random123** is a header only library,
+and no further installation is required.
+
+Set the RANDOM123_ROOT environment variable to the **Random123** install location:
 ```bash
-cd chi-tech
-./configure.sh
+    $ export RANDOM123_ROOT=/Path/to/Random123
 ```
 
-If all goes well it will automatically install 4 things
- - The readline library,
- - The ncurses library,
- - Lua 5.3.5, and
- - Triangle 1.6
+Add the export command to your bash profile.
 
-If problems are encountered here please see 
-[troubleshooting installation](TroubleShootingInstall.md)
+### Step 8 - Install Triangle
 
-#### Build
+Download and extract **Triangle** from https://www.cs.cmu.edu/~quake/triangle.html.
+**Triangle** v1.6 is recommended.
 
-In the main directory (i.e. *chi-tech/*), execute
-
-```bash
-make -j4
+Install **Triangle** as follows:
+```bach
+    $ make
+    $ make trilibrary
 ```
 
-You can also use -j8 even if you don't have 8 processors, the make command 
+Set the TRIANGLE_ROOT environment variable to the **Triangle** install location:
+```bash
+    $ export TRIANGLE_ROOT=/Path/to/Triangle
+```
+
+Add the export command to your bash profile.
+
+### Step 9 - Install Lua
+
+Download and extract **Lua** from https://www.lua.org.  v5.3.5+ is recommended.
+Before installing **Lua** edit the Makefile and set INSTALL_TOP to your desired
+install location.  Install **Lua** as follows:
+```bash
+    $ make linux
+    $ make install
+```
+If the install complains about missing **readline** includes or libraries, it may
+be necessary to install **readline** first.
+
+Set the LUA_ROOT environment variable to the **Lua** install location:
+```bash
+    $export LUA_ROOT=/Path/to/Lua
+```
+
+Add the export command to your bash profile.
+
+### Step 10 - Build ChiTech
+
+Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech relevant stuff:
+```bash
+    $ git clone https://github.com/chi-tech/chi-tech
+```
+
+Go to the chi-tech folder and type:
+```bash
+    $ cd chi-tech
+    $ ./configure.sh
+```
+The configure script will generate the CMake build scripts.
+
+In the main directory (i.e. *chi-tech/*), execute:
+```bash
+    $ make -j4
+```
+
+You can also use -j8 even if you don't have 8 processors, the make command
 will use threading where possible.
 
-### Step 7 - ChiTech documentation
+### Step 11 - ChiTech documentation
 
-You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally. 
+You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
-To generate the documentation from your local working copy, first make sure 
-Doxygen and LaTeX is installed:
+To generate the documentation from your local working copy, first make sure
+Doxygen and LaTeX are installed:
 
 ```bash
 sudo apt-get install doxygen texlive
@@ -265,7 +314,7 @@ using a script provided in that folder:
 
 ```bash
 cd CHI_DOC/
-./YReGenerateDocumentation.sh 
+./YReGenerateDocumentation.sh
 ```
 
 Once finished, you can view the generated documentation by opening

@@ -42,11 +42,13 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  void operator=(const Vector& that)
+  Vector& operator=(const Vector& that)
   {
     this->x = that.x;
     this->y = that.y;
     this->z = that.z;
+
+    return *this;
   }
 
   Vector operator*(double value)

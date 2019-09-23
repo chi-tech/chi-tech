@@ -40,7 +40,7 @@ public:
 private:
   const CellType cell_type;
 public:
-  Cell(CellType in_cell_type) : cell_type(in_cell_type)
+  explicit Cell(CellType in_cell_type) : cell_type(in_cell_type)
   {
     cell_global_id = -1;
     cell_local_id = -1;

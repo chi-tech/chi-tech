@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+message(STATUS "Configuring ${CMAKE_BUILD_TYPE} build of ChiTech.")
+
 if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX_ENV)
 elseif(APPLE)
@@ -25,6 +26,33 @@ else()
     message(STATUS "PETSC_ROOT set to ${PETSC_ROOT}")
 endif()
 
+if (NOT (DEFINED ENV{EIGEN_ROOT}))
+    message(FATAL_ERROR "***** EIGEN_ROOT is not set *****")
+else()
+    set(EIGEN_ROOT    "$ENV{EIGEN_ROOT}")
+    message(STATUS "EIGEN_ROOT set to ${EIGEN_ROOT}")
+endif()
+
+if (NOT (DEFINED ENV{LUA_ROOT}))
+    message(FATAL_ERROR "***** LUA_ROOT is not set *****")
+else()
+    set(LUA_ROOT    "$ENV{LUA_ROOT}")
+    message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
+endif()
+
+if (NOT (DEFINED ENV{TRIANGLE_ROOT}))
+    message(FATAL_ERROR "***** TRIANGLE_ROOT is not set *****")
+else()
+    set(TRIANGLE_ROOT    "$ENV{TRIANGLE_ROOT}")
+    message(STATUS "TRIANGLE_ROOT set to ${TRIANGLE_ROOT}")
+endif()
+
+if (NOT (DEFINED ENV{RANDOM123_ROOT}))
+    message(FATAL_ERROR "***** RANDOM123_ROOT is not set *****")
+else()
+    set(RANDOM123_ROOT    "$ENV{RANDOM123_ROOT}")
+    message(STATUS "RANDOM123_ROOT set to ${RANDOM123_ROOT}")
+endif()
 
 #================================================ Set project targets
 SET(TARGET ChiTech)
@@ -33,11 +61,6 @@ project(${TARGET} C CXX)
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/CHI_TECH")
 set(CHI_TECH_MOD "Modules")
-set(CHI_TECH_DEP "${PROJECT_SOURCE_DIR}/CHI_RESOURCES/Dependencies")
-
-set(TRIANGLE_ROOT "${CHI_TECH_DEP}/triangle")
-set(LUA_ROOT      "${CHI_TECH_DEP}/lua-5.3.5/install")
-
 
 #================================================ Set cmake variables
 find_package(MPI)
@@ -62,10 +85,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
   set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-int-in-bool-context")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-format -Wno-unused-but-set-variable")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-variable -Wno-write-strings")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-strict-aliasing")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable -Wno-sign-compare")
+  set_source_files_properties(Modules/LinearBoltzmanSolver/lbs_main_initialize.cc PROPERTIES COMPILE_FLAGS "-Wno-format")
+  set_source_files_properties(CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/prop_transportxs_03_ecollapse.cc PROPERTIES COMPILE_FLAGS "-Wno-int-in-bool-context")
+  set_source_files_properties(CHI_TECH/ChiMesh/SurfaceMesher/Delaunay/delaunay_patch_00_utils.cc PROPERTIES COMPILE_FLAGS "-Wno-int-in-bool-context")
   set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -74,15 +98,20 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Force -O3 in release builds (some OS's might downgrade it)
+string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
+include_directories("${EIGEN_ROOT}")
 include_directories("${CHI_TECH_DEP}/Random123/include")
 include_directories("${TRIANGLE_ROOT}")
+include_directories("${PETSC_ROOT}/include")
+include_directories("${BOOST_ROOT}/include")
+include_directories("${RANDOM123_ROOT}/include")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-include_directories("${PETSC_ROOT}/include")
-include_directories(SYSTEM "${BOOST_ROOT}/include")
 
 
 #================================================ Library directories
@@ -101,8 +130,7 @@ find_package(VTK COMPONENTS
 	vtkIOXML vtkParallelCore
 	vtkIOParallelXML REQUIRED)
 if (NOT VTK_FOUND)
-	message("VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
-  return ()
+  message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()
 
 message (STATUS "VTK_VERSION: ${VTK_VERSION}")
@@ -144,10 +172,10 @@ add_subdirectory("${CHI_TECH_MOD}/MonteCarlon")
 add_subdirectory("${CHI_TECH_MOD}/DiffusionSolver")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
-
 add_executable(${TARGET} ${SOURCES})
 target_link_libraries(${TARGET} ${LIBS} ${TRIANGLE})
 
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
         "clean:\n\t$(MAKE) -C chi_build clean\n")
+

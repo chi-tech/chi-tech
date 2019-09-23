@@ -60,7 +60,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
   try {
     cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid ffi handle in chiFFInterpolationSetProperty.";
@@ -111,7 +111,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     try {
       cur_ff = chi_physics_handler.fieldfunc_stack.at(ffhandle);
     }
-    catch(std::out_of_range o)
+    catch(const std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid field function handle in chiFFInterpolationSetProperty.";
@@ -256,7 +256,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     try {
       logvol = cur_hndlr->logicvolume_stack.at(logvol_hndle);
     }
-    catch(std::out_of_range o)
+    catch(const std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid logical volume handle in chiFFInterpolationSetProperty.";

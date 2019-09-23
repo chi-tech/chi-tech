@@ -34,7 +34,7 @@ chi_mesh::EdgeLoopCollection* chi_mesh::SurfaceMesh::GetEdgeLoopsPoly()
 
           unused_edge_list.push_back(new_edge);
         }
-        catch(std::out_of_range o)
+        catch(const std::out_of_range& o)
         {
           std::cerr << "EXCEPTION: Invalid vertex index\n";
           exit(EXIT_FAILURE);

@@ -280,7 +280,7 @@ if (x && !y)
   ...
 \endcode
 
-\subsection devman1_sec3_4 Templates and Casts
+\subsection devman1_sec3_4 Templates
 
 \code
 // No spaces inside the angle brackets (< and >), before
@@ -292,8 +292,30 @@ y = static_cast<char*>(x);
 std::vector<char *> x;
 \endcode
 
+\subsection devman1_sec3_5 Casting
 
+In general there are three variants of casting; C-style casting, `static_cast`
+and `dynamic_cast`.
 
+\code
+double aa = 10.5;
 
+float a = (float)aa;               // C-style (Use only for numerics)
+float b = static_cast<float>(aa);  // static_cast
+float c = dynamic_cast<float>(aa); // dynamic_cast
+\endcode
+
+The difference between the 3 are as follows: C-style casting is a brute-force
+way of casting one type into another. In most, if not all cases, the compiler
+will not provide any protection against casts that will be illegal. The better
+alternative is to use `static_cast` which will allow the compiler to determine
+whether the cast would be legal in a broad scope sense (i.e. casting parent
+pointer to child pointer). If the user needs to check for a valid cast, it is
+often better to use `dynamic_cast` which will return null if the cast is
+illegal, however, be aware that this uses RTTI and therefore has some cost.
+The following conventions therefore apply:
+
+- Use C-style casting only for numerical values
+- Objects and structures should use either `static_cast` or `dynamic_cast`
 
  */

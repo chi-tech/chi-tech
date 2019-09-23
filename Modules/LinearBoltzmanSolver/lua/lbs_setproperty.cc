@@ -175,7 +175,7 @@ int chiLBSSetProperty(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     fprintf(stderr,"ERROR: Invalid handle to solver"
                    "in chiLBSSetProperty\n");
@@ -318,7 +318,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD.";
@@ -355,7 +355,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_TOLERANCE.";
@@ -375,7 +375,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_MAXITERATIONS.";
@@ -395,7 +395,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_GMRESRESTART_INTVL.";
@@ -415,7 +415,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_SUBSETS.";
@@ -435,7 +435,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_WGDSA.";
@@ -463,7 +463,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_TGDSA.";
@@ -491,7 +491,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_WGDSA_MAXITERATIONS.";
@@ -511,7 +511,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_TGDSA_MAXITERATIONS.";
@@ -531,7 +531,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_WGDSA_TOLERANCE.";
@@ -551,7 +551,7 @@ int chiLBSSetProperty(lua_State *L)
     try {
       groupset = solver->group_sets.at(groupset_num);
     }
-    catch(std::out_of_range o){
+    catch(const std::out_of_range& o){
       chi_log.Log(LOG_0ERROR)
         << "Invalid Groupset handle supplied in call to "
         << "chiLBSSetProperty:GROUPSET_TGDSA_TOLERANCE.";

@@ -15,7 +15,7 @@ chi_mesh::MeshHandler* chi_mesh::GetCurrentHandler()
   try{
     cur_handler = chi_meshhandler_stack.at(chi_current_mesh_handler);
   }
-  catch(std::out_of_range err){
+  catch(const std::out_of_range& err){
     std::cerr << "ERROR: Invalid index to mesh handler.";
     std::cerr << " Call chiMeshHandlerCreate() to create handler scope.\n";
     exit(EXIT_FAILURE);

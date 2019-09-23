@@ -29,7 +29,7 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
   try{
     cur_region = cur_hndlr->region_stack.at(region_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cerr << "ERROR: Invalid index to region.\n";
     exit(EXIT_FAILURE);
@@ -38,7 +38,7 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
   try{
     cur_surfacemesh = cur_hndlr->surface_mesh_stack.at(surface_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cerr << "ERROR: Invalid index to surface mesh.\n";
     exit(EXIT_FAILURE);
@@ -76,7 +76,7 @@ int chiRegionAddLineBoundary(lua_State *L)
   try{
     cur_region = cur_hndlr->region_stack.at(region_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cerr << "ERROR: Invalid index to region.\n";
     exit(EXIT_FAILURE);
@@ -85,7 +85,7 @@ int chiRegionAddLineBoundary(lua_State *L)
   try{
     cur_linemesh = cur_hndlr->linemesh_stack.at(line_index);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     std::cerr << "ERROR: Invalid index to line mesh.\n";
     exit(EXIT_FAILURE);

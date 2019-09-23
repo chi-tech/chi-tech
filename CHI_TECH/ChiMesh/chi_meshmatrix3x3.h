@@ -18,10 +18,11 @@ struct chi_mesh::Matrix3x3
   }
 
   /**Copy constructor*/
-  void operator=(const Matrix3x3& inM)
+  Matrix3x3& operator=(const Matrix3x3& inM)
   {
     for (int k=0;k<9;k++)
       this->vals[k] = inM.vals[k];
+    return *this;
   }
 
   /**Matrix addition operator.*/

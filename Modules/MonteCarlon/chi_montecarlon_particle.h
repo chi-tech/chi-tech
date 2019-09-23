@@ -33,7 +33,7 @@ struct chi_montecarlon::Particle
   }
 
   //=================================== Copy operator
-  void operator=(const Particle& that)
+  Particle& operator=(const Particle& that)
   {
     this->pos.x = that.pos.x;  this->dir.x = that.dir.x;
     this->pos.y = that.pos.y;  this->dir.y = that.dir.y;
@@ -44,6 +44,8 @@ struct chi_montecarlon::Particle
     this->cur_cell_ind = that.cur_cell_ind;
 
     this->alive = that.alive;
+
+    return *this;
   }
 };
 

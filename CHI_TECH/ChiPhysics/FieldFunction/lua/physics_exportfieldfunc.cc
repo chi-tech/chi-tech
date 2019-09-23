@@ -34,7 +34,7 @@ int chiExportFieldFunctionToVTK(lua_State *L)
   try{
     ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
@@ -71,7 +71,7 @@ int chiExportFieldFunctionToVTKG(lua_State *L)
   try{
     ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
@@ -112,7 +112,7 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
   try{
     ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
@@ -123,7 +123,7 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
   try{
     ff_slave = chi_physics_handler.fieldfunc_stack.at(ff_handle_slave);
   }
-  catch(std::out_of_range o)
+  catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
