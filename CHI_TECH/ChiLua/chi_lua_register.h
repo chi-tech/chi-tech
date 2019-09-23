@@ -218,6 +218,7 @@ RegisterConstant(BOUNDARY_CONDITION,   3);
 RegisterConstant(GROUPSET_ITERATIVEMETHOD,   101);
   RegisterConstant(NPT_CLASSICRICHARDSON,   1);
   RegisterConstant(NPT_GMRES,               3);
+  RegisterConstant(NPT_GMRES_CYCLES,           4);
 RegisterConstant(GROUPSET_TOLERANCE,   102);
 RegisterConstant(GROUPSET_MAXITERATIONS,   103);
 RegisterConstant(GROUPSET_GMRESRESTART_INTVL,   104);

@@ -17,6 +17,8 @@ struct chi_mesh::SweepManagement::SPDS
   std::vector<STDG*>       global_sweep_planes;  ///< Processor sweep planes
   std::vector<int>         location_dependencies;
   std::vector<int>         location_successors;
+  std::vector<int>         delayed_location_dependencies;
+  std::vector<int>         delayed_location_successors;
 
 
   //======================================== Default constructor
@@ -43,10 +45,17 @@ struct chi_mesh::SweepManagement::SPDS
       }
     }
 
+    for (int i=0; i<delayed_location_dependencies.size(); i++)
+    {
+      if (delayed_location_dependencies[i] == locJ)
+      {
+        return -(i+1);
+      }
+    }
+
     chi_log.Log(LOG_ALLERROR)
       << "SPDS Invalid mapping encountered in MapLocJToPrelocI.";
     exit(EXIT_FAILURE);
-    return -1;
   }
 
   int MapLocJToDeplocI(int locJ)

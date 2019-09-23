@@ -100,20 +100,45 @@ double*  chi_mesh::SweepManagement::FLUDS::
   int prelocI =
     nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].first;
 
-  int nonlocal_psi_Gn_blockstride = prelocI_face_dof_count[prelocI];
-  int slot =
-    nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].second.first;
+  if (prelocI>=0)
+  {
+    int nonlocal_psi_Gn_blockstride = prelocI_face_dof_count[prelocI];
+    int slot =
+        nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].second.first;
 
-  int mapped_dof =
-    nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].
-    second.second[face_dof];
+    int mapped_dof =
+        nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].
+            second.second[face_dof];
 
-  int index =
-    nonlocal_psi_Gn_blockstride*G*n +
-    slot*G +
-    mapped_dof*G + g;
+    int index =
+        nonlocal_psi_Gn_blockstride*G*n +
+            slot*G +
+            mapped_dof*G + g;
 
-  return &ref_prelocI_outgoing_psi->operator[](prelocI)[index];
+    return &ref_prelocI_outgoing_psi->operator[](prelocI)[index];
+  }
+  else
+  {
+    prelocI =
+        delayed_nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].first;
+
+    int nonlocal_psi_Gn_blockstride = delayed_prelocI_face_dof_count[prelocI];
+    int slot =
+        delayed_nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].second.first;
+
+    int mapped_dof =
+        delayed_nonlocal_inc_face_prelocI_slot_dof[nonl_inc_face_counter].
+            second.second[face_dof];
+
+    int index =
+        nonlocal_psi_Gn_blockstride*G*n +
+            slot*G +
+            mapped_dof*G + g;
+
+    return &ref_delayed_prelocI_outgoing_psi->operator[](prelocI)[index];
+  }
+
+
 }
 
 //###################################################################

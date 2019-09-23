@@ -1,7 +1,7 @@
 #include "chi_FLUDS.h"
 #include "chi_SPDS.h"
 
-#include "../../ChiMesh/Cell/cell_polyhedron.h"
+#include <ChiMesh/Cell/cell_polyhedron.h>
 
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
@@ -17,7 +17,7 @@ void chi_mesh::SweepManagement::FLUDS::
   chi_mesh::Vector jhat(0.0,1.0,0.0);
   chi_mesh::Vector khat(0.0,0.0,1.0);
 
-  short        outgoing_face_count=0;
+//  short        outgoing_face_count=0;
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
@@ -104,8 +104,7 @@ void chi_mesh::SweepManagement::FLUDS::
       if (poly_face->edges.size()>largest_face)
         largest_face = poly_face->edges.size();
 
-      outgoing_face_count++;
-
+      //========================================== Find a open slot
       bool slot_found = false;
       for (int k=0; k<lock_box.size(); k++)
       {
@@ -118,6 +117,8 @@ void chi_mesh::SweepManagement::FLUDS::
           break;
         }
       }
+      //========================================= If an open slot was not found
+      //                                          push a new one
       if (!slot_found)
       {
         outb_face_slot_indices.push_back(lock_box.size());

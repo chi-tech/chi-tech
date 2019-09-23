@@ -33,6 +33,10 @@ class chi_mesh::SweepManagement::AngleAggregation
 {
 public:
   std::vector<AngleSetGroup*> angle_set_groups;
+
+  double GetDelayedPsiNorm();
+  void ResetDelayedPsi();
+
 };
 
 

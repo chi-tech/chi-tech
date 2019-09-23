@@ -4,3 +4,4 @@
 
 
 int NPTMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax);
+int NPTMatrixAction_Ax_Cycles(Mat matrix, Vec krylov_vector, Vec Ax);

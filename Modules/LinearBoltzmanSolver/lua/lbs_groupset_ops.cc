@@ -569,6 +569,10 @@ Standard source iteration.\n\n
 NPT_GMRES\n
 Generalized Minimal Residual formulation for iterations.\n\n
 
+NPT_GMRES_CYCLES\n
+Generalized Minimal Residual formulation for iterations with cyclic dependency
+convergence.\n\n
+
 Example:
 \code
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
@@ -637,6 +641,11 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   else if (iter_method == NPT_GMRES)
   {
     groupset->iterative_method = NPT_GMRES;
+  }
+  else if (iter_method == NPT_GMRES_CYCLES)
+  {
+    groupset->allow_cycles = true;
+    groupset->iterative_method = NPT_GMRES_CYCLES;
   }
   else
   {

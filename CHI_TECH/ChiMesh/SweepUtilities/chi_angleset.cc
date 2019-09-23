@@ -6,8 +6,25 @@
 
 extern ChiMPI chi_mpi;
 
-#include "../../ChiTimer/chi_timer.h"
+//###################################################################
+/**Initializes delayed upstream data.*/
+void chi_mesh::SweepManagement::AngleSet::
+InitializeDelayedUpstreamData()
+{
+  delayed_prelocI_outgoing_psi.resize(
+      spds->delayed_location_dependencies.size(),
+      std::vector<double>());
+  for (int prelocI=0;
+       prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  {
+    int num_dofs = fluds->delayed_prelocI_face_dof_count[prelocI];
+    int num_grps   = GetNumGrps();
+    int num_angles = angles.size();
+    u_ll_int buff_size = num_dofs*num_grps*num_angles;
 
+    delayed_prelocI_outgoing_psi[prelocI].resize(buff_size,0.0);
+  }
+}
 
 //###################################################################
 /**This function advances the work stages of an angleset.*/

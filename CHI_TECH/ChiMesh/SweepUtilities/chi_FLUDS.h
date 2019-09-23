@@ -42,6 +42,8 @@ private:
   std::vector<std::vector<double>>*  ref_prelocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_boundryI_incoming_psi;
 
+  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi;
+
   //======================================== Alpha elements
 
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
@@ -87,6 +89,8 @@ public:
   // face dofs for each predecessor location.
   std::vector<int>    prelocI_face_dof_count;
 
+  std::vector<int>    delayed_prelocI_face_dof_count;
+
 private:
   // This is a vector [predecessor_location][unordered_cell_index]
   // that holds an AlphaPair. AlphaPair-first is the cell's global_id
@@ -97,6 +101,9 @@ private:
   std::vector<std::vector<CompactCellView>>
     prelocI_cell_views;
 
+  std::vector<std::vector<CompactCellView>>
+      delayed_prelocI_cell_views;
+
   // This is a vector [nonlocal_inc_face_counter] containing
   // AlphaPairs. AlphaPair-first is the prelocI index and
   // AlphaPair-second is a BetaPair. The BetaPair-first is the slot where
@@ -104,6 +111,8 @@ private:
   std::vector<std::pair<int,std::pair<int,std::vector<int>>>>
     nonlocal_inc_face_prelocI_slot_dof;
 
+  std::vector<std::pair<int,std::pair<int,std::vector<int>>>>
+      delayed_nonlocal_inc_face_prelocI_slot_dof;
 
 public:
   FLUDS(int in_G)
@@ -117,12 +126,14 @@ public:
   void SetReferencePsi(std::vector<double>*               local_psi,
                        std::vector<std::vector<double>>*  deplocI_outgoing_psi,
                        std::vector<std::vector<double>>*  prelocI_outgoing_psi,
-                       std::vector<std::vector<double>>*  boundryI_incoming_psi)
+                       std::vector<std::vector<double>>*  boundryI_incoming_psi,
+                       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi)
   {
     ref_local_psi = local_psi;
     ref_deplocI_outgoing_psi = deplocI_outgoing_psi;
     ref_prelocI_outgoing_psi = prelocI_outgoing_psi;
     ref_boundryI_incoming_psi = boundryI_incoming_psi;
+    ref_delayed_prelocI_outgoing_psi = delayed_prelocI_outgoing_psi;
   }
 
 public:

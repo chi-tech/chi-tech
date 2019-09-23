@@ -29,7 +29,8 @@ namespace SweepManagement
   //01
   SPDS* CreateSweepOrder(double polar, double azimuthal,
                          chi_mesh::MeshContinuum *vol_continuum,
-                         int number_of_groups);
+                         int number_of_groups,
+                         bool allow_cycles=false);
 
   //02
 //  void Sweep(SPDS* spds,

@@ -34,7 +34,8 @@ extern ChiTimer   chi_program_timer;
  * cells.*/
 chi_mesh::SweepManagement::SPDS* chi_mesh::SweepManagement::
 CreateSweepOrder(double polar, double azimuthal,
-                 chi_mesh::MeshContinuum *vol_continuum,int number_of_groups)
+                 chi_mesh::MeshContinuum *vol_continuum,int number_of_groups,
+                 bool allow_cycles)
 {
   chi_mesh::SweepManagement::SPDS* sweep_order =
     new chi_mesh::SweepManagement::SPDS;
@@ -319,27 +320,16 @@ CreateSweepOrder(double polar, double azimuthal,
 
   G.clearing_graph();
 
-  //======================================================= Determine sweep plane
-  //                                                        maximum width
-  double time,hours,minutes,seconds;
-  char buf[20];
-  time    = chi_program_timer.GetTime()/1000.0;
-  hours   = floor(time/3600);
-  minutes = floor((time - hours*60)/60);
-  seconds = time - hours*3600 - minutes*60;
-
-  sprintf(buf,"%02d:%02d:%02d",int(hours),int(minutes),int(seconds));
-
   chi_log.Log(LOG_0VERBOSE_1)
-  << std::string(buf)
-  << "Communicating sweep dependencies.";
+  << chi_program_timer.GetTimeString()
+  << " Communicating sweep dependencies.";
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Create Task Dependency Graphs
-  //All non-home locations will send their dependencies
-  //to the home location
+  //All locations will send their dependencies
+  //to the other locations
   int P = chi_mpi.process_count;
   std::vector<int> dependency_count_per_location(P,0);
-  std::vector<std::vector<int>> dependencies_per_location2(P,std::vector<int>());
+  std::vector<std::vector<int>> global_dependencies(P, std::vector<int>());
 
   dependency_count_per_location[chi_mpi.location_id] =
     sweep_order->location_dependencies.size();
@@ -361,19 +351,57 @@ CreateSweepOrder(double polar, double azimuthal,
     {
       std::copy(sweep_order->location_dependencies.begin(),
                 sweep_order->location_dependencies.end(),
-                std::back_inserter(dependencies_per_location2[locI]));
+                std::back_inserter(global_dependencies[locI]));
     } else
     {
-      dependencies_per_location2[locI].
+      global_dependencies[locI].
         resize(dependency_count_per_location[locI],-1);
     }
 
-    MPI_Bcast(dependencies_per_location2[locI].data(), //Buffer
+    MPI_Bcast(global_dependencies[locI].data(), //Buffer
               dependency_count_per_location[locI],     //Count
               MPI_INT,                                 //Type
               locI,                                    //Sending location
               MPI_COMM_WORLD);                         //Communicator
   }
+
+  //====================================== Filter dependencies for cycles
+  if (true)
+  {
+    for (int locI=0; locI<P; locI++)
+    {
+      for (int c=0; c<global_dependencies[locI].size(); c++)
+      {
+        int rlocI = global_dependencies[locI][c];
+        if (rlocI<0)
+          continue;
+        for (int d=0; d<global_dependencies[rlocI].size(); d++)
+        {
+          if (global_dependencies[rlocI][d] == locI)
+          {
+            global_dependencies[locI][c]  = -1;
+//            global_dependencies[rlocI][d] = -1;
+
+            if (locI == chi_mpi.location_id)
+            {
+              std::vector<int>::iterator dependent_location =
+                  std::find(sweep_order->location_dependencies.begin(),
+                            sweep_order->location_dependencies.end(),
+                            rlocI);
+              sweep_order->location_dependencies.erase(dependent_location);
+              sweep_order->delayed_location_dependencies.push_back(rlocI);
+            }
+
+            if (rlocI == chi_mpi.location_id)
+            {
+              sweep_order->delayed_location_successors.push_back(locI);
+            }
+          }//if cyclic dependency
+        }//for rlocI dependency d
+      }//for locI dependency c
+    }//for locI
+  }//if cycles allowed
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //====================================== Build task dependency graph
   CHI_D_GRAPH TDG;
@@ -392,9 +420,10 @@ CreateSweepOrder(double polar, double azimuthal,
   //================================= Add dependencies
   for (int loc=0; loc<chi_mpi.process_count; loc++)
   {
-    for (int dep=0; dep<dependencies_per_location2[loc].size(); dep++)
+    for (int dep=0; dep<global_dependencies[loc].size(); dep++)
     {
-      boost::add_edge(dependencies_per_location2[loc][dep],loc,TDG);
+      if (global_dependencies[loc][dep]>=0)
+        boost::add_edge(global_dependencies[loc][dep], loc, TDG);
     }
   }
 
@@ -446,16 +475,16 @@ CreateSweepOrder(double polar, double azimuthal,
   for (int k=0; k<num_ord; k++)
   {
     int loc = glob_linear_sweep_order[k];
-    if (dependencies_per_location2[loc].size() == 0)
+    if (global_dependencies[loc].size() == 0)
     {
       glob_sweep_order_rank[k] = 0;
     }
     else
     {
       int max_rank = -1;
-      for (int dep=0; dep<dependencies_per_location2[loc].size(); dep++)
+      for (int dep=0; dep<global_dependencies[loc].size(); dep++)
       {
-        int dep_loc = dependencies_per_location2[loc][dep];
+        int dep_loc = global_dependencies[loc][dep];
         int dep_mapped_index = glob_order_mapping[dep_loc];
 
         if (glob_sweep_order_rank[dep_mapped_index] > max_rank)

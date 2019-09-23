@@ -94,6 +94,48 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
     prelocI_message_available.push_back(std::vector<bool>(message_count,false));
   }
 
+  //============================================= Delayed Predecessor locations
+  for (int prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  {
+    angleset->delayed_prelocI_norm.push_back(0.0);
+
+    u_ll_int num_unknowns =
+        fluds->delayed_prelocI_face_dof_count[prelocI]*num_grps*num_angles;
+
+    u_ll_int message_size  = num_unknowns;
+    int      message_count = 1;
+    if ((num_unknowns*8)<=EAGER_LIMIT)
+    {
+      message_count = num_angles;
+      message_size  = ceil((double)num_unknowns/(double)message_count);
+    }
+    else
+    {
+      message_count = ceil((double)num_unknowns*8/(double)(double)EAGER_LIMIT);
+      message_size  = ceil((double)num_unknowns/(double)message_count);
+    }
+
+    delayed_prelocI_message_count.push_back(message_count);
+    delayed_prelocI_message_size.push_back(std::vector<u_ll_int>());
+    delayed_prelocI_message_blockpos.push_back(std::vector<u_ll_int>());
+
+    u_ll_int pre_block_pos = 0;
+    for (int m=0; m<(message_count-1); m++)
+    {
+      delayed_prelocI_message_size[prelocI].push_back(message_size);
+      delayed_prelocI_message_blockpos[prelocI].push_back(pre_block_pos);
+      num_unknowns -= message_size;
+      pre_block_pos += message_size;
+    }
+    if (num_unknowns>0)
+    {
+      delayed_prelocI_message_blockpos[prelocI].push_back(pre_block_pos);
+      delayed_prelocI_message_size[prelocI].push_back(num_unknowns);
+    }
+
+    delayed_prelocI_message_available.push_back(std::vector<bool>(message_count,false));
+  }
+
 
   //============================================= Successor locations
   for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
@@ -145,7 +187,8 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
   angleset->fluds->SetReferencePsi(&angleset->local_psi,
                                    &angleset->deplocI_outgoing_psi,
                                    &angleset->prelocI_outgoing_psi,
-                                   &angleset->boundryI_incoming_psi);
+                                   &angleset->boundryI_incoming_psi,
+                                   &angleset->delayed_prelocI_outgoing_psi);
 
   initialized = true;
 }
@@ -247,6 +290,84 @@ void chi_mesh::SweepManagement::SweepBuffer::
     }
 
   }
+
+
+}
+
+void chi_mesh::SweepManagement::SweepBuffer::
+ReceiveDelayedData(int angle_set_num)
+{
+  chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
+
+  //======================================== Receive delayed data
+  for (int prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  {
+    int locJ = spds->delayed_location_dependencies[prelocI];
+
+    int num_mess = delayed_prelocI_message_count[prelocI];
+    for (int m=0; m<num_mess; m++)
+    {
+
+      if (!delayed_prelocI_message_available[prelocI][m])
+      {
+        int msg_avail = 1;
+
+        int comm_index = comm_set->MapIonJ(locJ,chi_mpi.location_id);
+
+
+//        MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
+//                   300 + angle_set_num*num_mess + m, //tag
+//                   comm_set->communicators[chi_mpi.location_id],
+//                   &msg_avail,MPI_STATUS_IGNORE);
+
+//        if (msg_avail != 1)
+//        {
+////          ready_to_execute = false;
+//          chi_log.Log(LOG_ALL)
+//            << "SweepBuffer: Delayed Data message was not available";
+//          break;
+//        }//if message is not available
+//          //============================ Receive upstream data
+//        else
+        {
+//          delayed_prelocI_message_available[prelocI][m] = true;
+
+          u_ll_int block_addr   = delayed_prelocI_message_blockpos[prelocI][m];
+          u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];
+
+          std::vector<double> psi_old(angleset->delayed_prelocI_outgoing_psi[prelocI].size(),0.0);
+
+          for (int k=0; k<psi_old.size(); k++)
+            psi_old[k] = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
+
+          MPI_Recv(&angleset->delayed_prelocI_outgoing_psi[prelocI].data()[block_addr],
+                   message_size,
+                   MPI_DOUBLE,
+                   comm_set->MapIonJ(locJ,chi_mpi.location_id),
+                   300 + angle_set_num*num_mess + m, //tag
+                   comm_set->communicators[chi_mpi.location_id],
+                   MPI_STATUS_IGNORE);
+
+          double rel_change = 0.0;
+          for (int k=0; k<psi_old.size(); k++)
+          {
+            double psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
+//            if (std::fabs(psi_new) >= std::numeric_limits<double>::min())
+//            {
+//              double rel_chng = std::fabs(psi_new - psi_old[k]);
+//              max_change = std::max(max_change,rel_chng);
+//            }
+//            angleset->delayed_prelocI_outgoing_psi[prelocI][k] = 0.5*(psi_new-psi_old[k]);
+//            psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
+            rel_change += std::fabs(psi_new);
+
+          }
+
+          angleset->delayed_prelocI_norm[prelocI] = rel_change;
+        }
+      }//if not message already received
+    }//for message
+  }//for delayed predecessor
 }
 
 //###################################################################

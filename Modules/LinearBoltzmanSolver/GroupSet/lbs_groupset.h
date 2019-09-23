@@ -55,6 +55,8 @@ public:
   std::string                                  wgdsa_string;
   std::string                                  tgdsa_string;
 
+  bool                                         allow_cycles;
+
 
   chi_physics::Solver*                         wgdsa_solver;
   chi_physics::Solver*                         tgdsa_solver;
@@ -70,7 +72,7 @@ public:
     master_num_grp_subsets = 1;
     master_num_ang_subsets = 1;
     residual_tolerance = 1.0e-6;
-    max_iterations = 1000;
+    max_iterations = 200;
     gmres_restart_intvl = 30;
     apply_wgdsa = false;
     apply_tgdsa = false;
@@ -86,6 +88,8 @@ public:
 
     wgdsa_verbose = false;
     tgdsa_verbose = false;
+
+    allow_cycles = false;
   }
 
   //npt_groupset.cc

@@ -27,15 +27,20 @@ private:
 
   std::vector<int> prelocI_message_count;
   std::vector<int> deplocI_message_count;
+  std::vector<int> delayed_prelocI_message_count;
 
   std::vector<std::vector<u_ll_int>> prelocI_message_size;
   std::vector<std::vector<u_ll_int>> deplocI_message_size;
+  std::vector<std::vector<u_ll_int>> delayed_prelocI_message_size;
 
   std::vector<std::vector<u_ll_int>> prelocI_message_blockpos;
   std::vector<std::vector<u_ll_int>> deplocI_message_blockpos;
+  std::vector<std::vector<u_ll_int>> delayed_prelocI_message_blockpos;
 
   std::vector<std::vector<bool>> prelocI_message_available;
   std::vector<std::vector<bool>> deplocI_message_sent; //Might be redundant
+
+  std::vector<std::vector<bool>> delayed_prelocI_message_available;
 
 
   std::vector<std::vector<MPI_Request>> deplocI_message_request;
@@ -50,6 +55,7 @@ public:
   void CheckInitialized();
   void InitializeBuffers();
   void SendDownstreamPsi(int angle_set_num);
+  void ReceiveDelayedData(int angle_set_num);
   void CheckDownstreamBuffersClear();
   bool CheckUpstreamPsiAvailable(int angle_set_num);
   void ClearReceiveBuffers();

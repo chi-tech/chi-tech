@@ -184,6 +184,13 @@ void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoDOG()
   {
     angle_agg->angle_set_groups[q]->ResetSweep();
   }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  for (int as=0; as<rule_values.size(); as++)
+  {
+    TAngleSet *angleset = rule_values[as].angle_set;
+    angleset->ReceiveDelayedData(rule_values[as].set_index);
+  }
 //  chi_log.Log(LOG_ALL) << "Done with Sweep";
 //  exit(0);
   chi_global_timings[16] += t16_sweeptime.GetTime()/1000.0;

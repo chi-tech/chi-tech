@@ -139,6 +139,10 @@ Classic richardson iteration or otherwise known as source iteration.\n
 \n
 NPT_GMRES\n
 Generalized Minimized Residual. Very robust method for converging solutions.\n
+\n
+NPT_GMRES_CYCLES\n
+Generalized Minimized Residual with cyclic dependency convergence.
+Very robust method for converging solutions.\n
 
 ###Note on the Eager limit
 The eager limit is the message size limit before which non-blocking MPI send
@@ -334,6 +338,11 @@ int chiLBSSetProperty(lua_State *L)
     else if (iter_method == NPT_GMRES)
     {
       groupset->iterative_method = NPT_GMRES;
+    }
+    else if (iter_method == NPT_GMRES_CYCLES)
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = NPT_GMRES_CYCLES;
     }
     else
     {

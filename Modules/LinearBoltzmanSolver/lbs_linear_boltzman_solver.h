@@ -61,7 +61,7 @@ public:
   Vec phi_new, phi_old, q_fixed;
   std::vector<double> q_fixed_local;
   std::vector<double> q_moments_local;
-  std::vector<double> phi_new_local, phi_old_local;
+  std::vector<double> phi_new_local, phi_old_local, phi_oldcycle_local;
   std::vector<double> delta_phi_local;
 
   std::vector<int> local_indices;
@@ -123,6 +123,7 @@ public:
   SweepChunk* SetSweepChunk(int group_set_num);
   void        ClassicRichardson(int group_set_num);
   void        GMRES(int group_set_num);
+  void        GMRES_Cycles(int group_set_num);
   void        AssembleVectors(LBSGroupset *groupset);
   void        AssembleVector(LBSGroupset *groupset, Vec x, double *y);
   void        DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);

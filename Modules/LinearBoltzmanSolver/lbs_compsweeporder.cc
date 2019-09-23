@@ -53,7 +53,8 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
       CreateSweepOrder(groupset->quadrature->polar_ang[0],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size());
+                       groupset->groups.size(),
+                       groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
 
     new_swp_order =
@@ -61,7 +62,8 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
       CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size());
+                       groupset->groups.size(),
+                       groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D MESHES
@@ -85,7 +87,8 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
         CreateSweepOrder(groupset->quadrature->polar_ang[0],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
-                         groupset->groups.size());
+                         groupset->groups.size(),
+                         groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
   }
@@ -122,7 +125,8 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
                   CreateSweepOrder(groupset->quadrature->polar_ang[0],
                                    groupset->quadrature->azimu_ang[i],
                                    this->grid,
-                                   groupset->groups.size());
+                                   groupset->groups.size(),
+                                   groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
     //=========================================== BOTTOM HEMISPHERE
@@ -134,7 +138,8 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
         CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
-                         groupset->groups.size());
+                         groupset->groups.size(),
+                         groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
 
