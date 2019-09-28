@@ -22,9 +22,10 @@ private:
   std::vector<std::vector<double>> cell_z_i_star;
   std::vector<std::vector<double>> cell_phi_star;
 
-  double                           total_uncollided_flux;
-  std::vector<double>              cell_total_subfluxes;
-  std::vector<std::vector<double>> cell_subfluxes;
+  double                           total_abs_source;
+  std::vector<double>              cell_abs_total_source;
+  std::vector<double>              cell_total_source;
+  std::vector<std::vector<double>> cell_subintvl_source;
   std::vector<double>              cell_cdf;
   std::vector<double>              cell_sigma_s;
   std::vector<double>              cell_sigma_t;

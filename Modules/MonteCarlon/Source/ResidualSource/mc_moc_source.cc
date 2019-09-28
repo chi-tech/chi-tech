@@ -205,14 +205,22 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
             cell_dof_phi[lc][f] =
               0.5*field[cur_cell_mapping[f]] +
               0.5*field[adj_cell_mapping_f[f][abs(f-1)]];
+            cell_dof_phi[lc][f] = 0.0; //TODO: remove if RMC
           }
           else
           {
             double phi_adj = 0.0;
-            if (f == 0) phi_adj = 1.0;
+//            if (f==0)
+//              phi_adj = 1.0;
+//            else
+              phi_adj = field[cur_cell_mapping[f]];
 
             cell_dof_phi[lc][f] = 0.5*field[cur_cell_mapping[f]] +
                                   0.5*phi_adj;
+
+            cell_dof_phi[lc][f] = 0.0; //TODO: remove before flight
+
+
           }
         }//for face verts
       }//for face
@@ -234,12 +242,12 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
       << std::setw(3) << lc
       << std::setw(12) << cell_dof_phi[lc][0]
       << std::setw(12) << cell_dof_phi[lc][1]
-      << " phi_avg=" << cell_averages[lc];
+      << " phi_avg=" << cell_dof_phi[lc][0]*0.5+cell_dof_phi[lc][1]*0.5;
   }
 
   //================================================== Raytrace subdivisions
-  num_subdivs = 10;
-  size_t num_angles = 16;
+  num_subdivs = 80;
+  size_t num_angles = 32;
   quadrature.Initialize(num_angles);
 
   cell_phi_star.resize(
@@ -255,7 +263,8 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     double q_weight = quadrature.weights[n];
     if (mu>0.0)
     {
-      double psi_z_i = 0.5;
+      double psi_z_i = -0.5*(cell_dof_phi[0][0]-1.0);
+
 
       for (int lc=0; lc<num_local_cells; lc++)
       {
@@ -285,15 +294,17 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
             {
               psi_z_i = psi_z_i*exp(-s_t*dzstar);
 
-//              double w = (cell_z_i_star[lc][i]-0.5*dzstar)/dz;
-//              double phi_avg_sub =
-//                w*cell_dof_phi[lc][0] +
-//                (1.0-w)*cell_dof_phi[lc][1];
-//              double q = (cell_sigma_s[lc]-cell_sigma_t[lc])*phi_avg_sub;
-//
-//
-//
-//              psi_z_i += q*(1.0-exp(-s_t*dzstar))/std::fabs(mu);
+              double w = (dzstar*i-0.5*dzstar)/dz;
+              double phi_zstar =
+                  (1.0-w)*cell_dof_phi[lc][0] +
+                      (w-0.0)*cell_dof_phi[lc][1];
+              double q = 0.5*(cell_sigma_s[lc] - cell_sigma_t[lc])*phi_zstar;
+
+              double nabla_phi = 0.5*(cell_dof_phi[lc][1]-cell_dof_phi[lc][0])/dz;
+
+              q -= mu*nabla_phi;
+
+              psi_z_i += q*(1.0-exp(-s_t*dzstar))/cell_sigma_t[lc];
             }
 
             cell_phi_star[lc][i] += q_weight*psi_z_i;
@@ -304,7 +315,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     }//if mu>0.0
     else
     {
-      double psi_z_i = 0.0;
+      double psi_z_i = 0.5*(cell_dof_phi[num_local_cells-1][1]-0.0);
 
       for (int lc=(num_local_cells-1); lc>=0; lc--)
       {
@@ -334,6 +345,17 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
             {
               psi_z_i = psi_z_i*exp(-s_t*dzstar);
 
+              double w = (dzstar*i-0.5*dzstar)/dz;
+              double phi_zstar =
+                  (w-0.0)*cell_dof_phi[lc][0] +
+                      (1.0-w)*cell_dof_phi[lc][1];
+              double q = 0.5*(cell_sigma_s[lc] - cell_sigma_t[lc])*phi_zstar;
+
+              double nabla_phi = 0.5*(cell_dof_phi[lc][1]-cell_dof_phi[lc][0])/dz;
+
+              q -= mu*nabla_phi;
+
+              psi_z_i += q*(1.0-exp(-s_t*dzstar))/cell_sigma_t[lc];
             }
 
 
@@ -347,12 +369,14 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
   }//for mu
 
   //============================================= Constructing cell totals
-  total_uncollided_flux = 0.0;
-  cell_total_subfluxes.resize(num_local_cells,0.0);
-  cell_subfluxes.resize(num_local_cells);
+  total_abs_source = 0.0;
+  cell_abs_total_source.resize(num_local_cells, 0.0);
+  cell_total_source.resize(num_local_cells, 0.0);
+  cell_subintvl_source.resize(num_local_cells);
+  double dz = 5.0/num_local_cells;
   for (int lc=0; lc<num_local_cells; lc++)
   {
-    cell_subfluxes[lc].resize(num_subdivs,0.0);
+    cell_subintvl_source[lc].resize(num_subdivs, 0.0);
     for (int i=0; i<(num_subdivs+1); i++)
     {
       chi_log.Log(LOG_0VERBOSE_1)
@@ -365,31 +389,36 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
           0.5*cell_phi_star[lc][i] +
           0.5*cell_phi_star[lc][i+1];
 
-        cell_total_subfluxes[lc] += phi_avg;
-        cell_subfluxes[lc][i] = phi_avg;
+        cell_abs_total_source[lc] += std::fabs(phi_avg)*cell_sigma_s[lc]/num_subdivs;
+        cell_total_source[lc] += phi_avg;
+        cell_subintvl_source[lc][i] = phi_avg*cell_sigma_s[lc]/num_subdivs;
       }
     }//for subdivs
-    total_uncollided_flux += cell_total_subfluxes[lc];
+    total_abs_source += cell_abs_total_source[lc];
   }//for local cell
 
   chi_log.Log(LOG_0VERBOSE_1)
-   << "\nTotal uncollided flux = " << total_uncollided_flux;
+      << "\nTotal absolute source = " << total_abs_source;
 
   //============================================= Constructing cdf
   cell_cdf.resize(num_local_cells);
   double cumulator = 0.0;
-  for (int lc=0; lc<num_local_cells; lc++)
+  for (int lc=0; lc<(num_local_cells); lc++)
   {
-    cumulator += std::fabs(cell_total_subfluxes[lc]);
-    cell_cdf[lc] = cumulator/total_uncollided_flux;
-    chi_log.Log(LOG_0VERBOSE_1)
-      << "Cell avg uncollided flux "
-      << lc << " "
-      << cell_total_subfluxes[lc]/num_subdivs;
+    cumulator +=cell_abs_total_source[lc];
+    cell_cdf[lc] = cumulator/total_abs_source;
   }
 
   cell_sampler = new chi_math::CDFSampler(cell_cdf);
 
+  //============================================= Print cell averages
+  for (int lc=0; lc<num_local_cells; lc++)
+  {
+    chi_log.Log(LOG_0VERBOSE_1)
+        << "Cell avg uncollided flux "
+        << lc << " "
+        << cell_total_source[lc]/num_subdivs;
+  }
 }
 
 //###################################################################
@@ -403,7 +432,6 @@ CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
   int lc = 0;
 //  lc = std::floor( rng->Rand()*(num_local_cells) );
   lc = cell_sampler->Sample(rng->Rand());
-
 
   int cell_glob_index = grid->local_cell_glob_indices[lc];
   auto cell = grid->cells[cell_glob_index];
@@ -438,17 +466,17 @@ CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
     double s = rng->Rand();
     double w = rng->Rand();
 
-    double sampling_normalization = 1.0;
+    double sampling_normalization = total_abs_source;
     double z=0.0;
     double cumulator = 0.0;
-    for (int i=0; i<10; i++)
+    for (int i=0; i<num_subdivs; i++)
     {
-      cumulator += std::fabs(cell_subfluxes[lc][i]);
-      if (s < (cumulator/std::fabs(cell_total_subfluxes[lc])))
+      cumulator += std::fabs(cell_subintvl_source[lc][i]);
+      if (s < (cumulator/std::fabs(cell_abs_total_source[lc])))
       {
         z = cell_z_i_star[lc][i] + w*dzstar;
-        sampling_normalization *= cell_sigma_s[lc]*dz*
-          ((cell_subfluxes[lc][i]<0.0) ? -1.0:1.0);
+        sampling_normalization *= dz*
+          ((cell_subintvl_source[lc][i]<0.0) ? -1.0 : 1.0);
         break;
       }
     }

@@ -35,3 +35,5 @@ CHI_RESOURCES/\.DS_Store
 \.DS_Store
 *.pyc
 *.pmesh
+
+*-private.sh

@@ -130,7 +130,7 @@ chiMeshHandlerSetCurrent(tmesh)
 phys0 = chiMonteCarlonCreateSolver()
 chiSolverAddRegion(phys0,region0)
 
---chiMonteCarlonCreateSource(phys0,MC_BNDRY_SRC,1);
+chiMonteCarlonCreateSource(phys0,MC_BNDRY_SRC,1);
 --chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
 chiMonteCarlonCreateSource(phys0,MC_RESID_MOC,fflist1[1]);
 
@@ -140,7 +140,7 @@ chiMonteCarlonSetProperty(phys0,MC_TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys0,MC_SCATTERING_ORDER,0)
 chiMonteCarlonSetProperty(phys0,MC_MONOENERGETIC,true)
 chiMonteCarlonSetProperty(phys0,MC_FORCE_ISOTROPIC,true)
---chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,20.0)
+--chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.25)
 
 chiMonteCarlonInitialize(phys0)
 chiMonteCarlonExecute(phys0)
