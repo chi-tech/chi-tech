@@ -315,7 +315,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     }//if mu>0.0
     else
     {
-      double psi_z_i = 0.5*(cell_dof_phi[num_local_cells-1][1]-0.0);
+      double psi_z_i = -0.5*(cell_dof_phi[num_local_cells-1][1]-0.0);
 
       for (int lc=(num_local_cells-1); lc>=0; lc--)
       {
