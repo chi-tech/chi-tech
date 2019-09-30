@@ -366,7 +366,7 @@ CreateSweepOrder(double polar, double azimuthal,
   }
 
   //====================================== Filter dependencies for cycles
-  if (true)
+  if (allow_cycles)
   {
     for (int locI=0; locI<P; locI++)
     {

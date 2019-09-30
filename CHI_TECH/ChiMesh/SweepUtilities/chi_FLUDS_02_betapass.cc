@@ -23,6 +23,13 @@ InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
 
 //  chi_log.Log(LOG_0) << "Initializing FLUDS Beta elements";
 
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+  // The first two major steps here are: Send delayed successor information
+  // and Receive delayed predecessor information. The send portion is done
+  // first because the delayed information does not follow the
+  // Task Dependency Graph and hence when a location receives its delayed
+  // information, the information might not have been sent yet.
+
   //=============================================== Send delayed successor information
   std::vector<MPI_Request>  send_requests;
   send_requests.resize(spds->location_successors.size(),MPI_Request());
@@ -56,6 +63,37 @@ InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
     deplocI_cell_views[deplocI].shrink_to_fit();
   }
 
+  //=============================================== Receive delayed predecessor
+  //                                                information
+  delayed_prelocI_cell_views.resize(spds->delayed_location_dependencies.size(),
+                                    std::vector<CompactCellView>());
+  delayed_prelocI_face_dof_count.resize(spds->delayed_location_dependencies.size(),0);
+  for (int prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  {
+    int locJ = spds->delayed_location_dependencies[prelocI];
+
+    MPI_Status probe_status;
+    MPI_Probe(locJ,101+tag_index,MPI_COMM_WORLD,&probe_status);
+
+    int amount_to_receive=0;
+    MPI_Get_count(&probe_status, MPI_INT, &amount_to_receive );
+
+    std::vector<int> face_indices;
+    face_indices.resize(amount_to_receive,0);
+
+    MPI_Recv(face_indices.data(),amount_to_receive,MPI_INT,
+             locJ,101+tag_index,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+
+    DeSerializeCellInfo(delayed_prelocI_cell_views[prelocI], &face_indices,
+                        delayed_prelocI_face_dof_count[prelocI]);
+  }
+
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+  // The next two operations is to receive predecessor information followed
+  // by the sending of successor information. The receives are blocking but
+  // will cause a dead lock because the successor/predecessor combination
+  // follows the TDG.
+
   //=============================================== Receive predecessor
   //                                                information
   prelocI_cell_views.resize(spds->location_dependencies.size(),
@@ -81,38 +119,7 @@ InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
                         prelocI_face_dof_count[prelocI]);
   }
 
-  //=============================================== Receive predecessor
-  //                                                information
-  /////////
-  delayed_prelocI_cell_views.resize(spds->delayed_location_dependencies.size(),
-                            std::vector<CompactCellView>());
-  delayed_prelocI_face_dof_count.resize(spds->delayed_location_dependencies.size(),0);
-  for (int prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
-  {
-    int locJ = spds->delayed_location_dependencies[prelocI];
-
-    MPI_Status probe_status;
-    MPI_Probe(locJ,101+tag_index,MPI_COMM_WORLD,&probe_status);
-
-    int amount_to_receive=0;
-    MPI_Get_count(&probe_status, MPI_INT, &amount_to_receive );
-
-    std::vector<int> face_indices;
-    face_indices.resize(amount_to_receive,0);
-
-    MPI_Recv(face_indices.data(),amount_to_receive,MPI_INT,
-             locJ,101+tag_index,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-
-    DeSerializeCellInfo(delayed_prelocI_cell_views[prelocI], &face_indices,
-                        delayed_prelocI_face_dof_count[prelocI]);
-  }
-  /////////
-
   //=============================================== Send successor information
-//  std::vector<MPI_Request>  send_requests;
-//  send_requests.resize(spds->location_successors.size(),MPI_Request());
-//  std::vector<std::vector<int>>
-//    multi_face_indices(spds->location_successors.size(),std::vector<int>());
   for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
   {
     int locJ = spds->location_successors[deplocI];
@@ -142,13 +149,16 @@ InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
   }
 
   //================================================== Verify sends completed
-  //TODO: This might be redundent since we use Isend
-//  chi_log.Log(LOG_ALL) << "Verify sends";
   for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
     MPI_Wait(&send_requests[deplocI],MPI_STATUS_IGNORE);
   multi_face_indices.clear();
   multi_face_indices.shrink_to_fit();
-//  chi_log.Log(LOG_ALL) << "Done Verify sends";
+
+
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+  // In the next process we loop over cells in the sweep order and perform
+  // the non-local face mappings. This is dependent on having the compact
+  // cellviews on the partition interfaces.
 
 
   //================================================== Loop over cells in sorder

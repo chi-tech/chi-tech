@@ -284,9 +284,20 @@ void chi_mesh::SweepManagement::SweepBuffer::
                   message_size,
                   MPI_DOUBLE,
                   comm_set->MapIonJ(locJ,locJ),
-                  300 + angle_set_num*num_mess + m,   //tag
+                  10000*angle_set_num + 100*num_mess + m,   //tag
                   comm_set->communicators[locJ],
                   &deplocI_message_request[deplocI][m]);
+
+        if (  ((10000*angle_set_num + 100*num_mess + m) == 84000) &&
+              (chi_mpi.location_id == 1))
+        {
+          chi_log.Log(LOG_ALL)
+          << "Tag: " << 10000*angle_set_num + 100*num_mess + m
+          << " angle_set_num=" << angle_set_num
+          << " num_mess=" << num_mess
+          << " message=" << m
+          << " message size=" << message_size;
+        }
     }
 
   }
@@ -298,11 +309,16 @@ void chi_mesh::SweepManagement::SweepBuffer::
 ReceiveDelayedData(int angle_set_num)
 {
   chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
-
+  MPI_Barrier(MPI_COMM_WORLD);
   //======================================== Receive delayed data
   for (int prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
   {
     int locJ = spds->delayed_location_dependencies[prelocI];
+
+    std::vector<double> psi_old(angleset->delayed_prelocI_outgoing_psi[prelocI].size(),0.0);
+
+    for (int k=0; k<psi_old.size(); k++)
+      psi_old[k] = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
 
     int num_mess = delayed_prelocI_message_count[prelocI];
     for (int m=0; m<num_mess; m++)
@@ -314,59 +330,70 @@ ReceiveDelayedData(int angle_set_num)
 
         int comm_index = comm_set->MapIonJ(locJ,chi_mpi.location_id);
 
-
-//        MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
-//                   300 + angle_set_num*num_mess + m, //tag
-//                   comm_set->communicators[chi_mpi.location_id],
-//                   &msg_avail,MPI_STATUS_IGNORE);
-
-//        if (msg_avail != 1)
-//        {
-////          ready_to_execute = false;
-//          chi_log.Log(LOG_ALL)
-//            << "SweepBuffer: Delayed Data message was not available";
-//          break;
-//        }//if message is not available
-//          //============================ Receive upstream data
-//        else
-        {
-//          delayed_prelocI_message_available[prelocI][m] = true;
-
-          u_ll_int block_addr   = delayed_prelocI_message_blockpos[prelocI][m];
-          u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];
-
-          std::vector<double> psi_old(angleset->delayed_prelocI_outgoing_psi[prelocI].size(),0.0);
-
-          for (int k=0; k<psi_old.size(); k++)
-            psi_old[k] = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
-
-          MPI_Recv(&angleset->delayed_prelocI_outgoing_psi[prelocI].data()[block_addr],
-                   message_size,
-                   MPI_DOUBLE,
-                   comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   300 + angle_set_num*num_mess + m, //tag
+        MPI_Status status0;
+        MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
+                   10000*angle_set_num + 100*num_mess + m, //tag
                    comm_set->communicators[chi_mpi.location_id],
-                   MPI_STATUS_IGNORE);
+                   &msg_avail,&status0);
 
-          double rel_change = 0.0;
-          for (int k=0; k<psi_old.size(); k++)
-          {
-            double psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
-//            if (std::fabs(psi_new) >= std::numeric_limits<double>::min())
-//            {
-//              double rel_chng = std::fabs(psi_new - psi_old[k]);
-//              max_change = std::max(max_change,rel_chng);
-//            }
-//            angleset->delayed_prelocI_outgoing_psi[prelocI][k] = 0.5*(psi_new-psi_old[k]);
-//            psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
-            rel_change += std::fabs(psi_new);
+        if (msg_avail != 1)
+        {
+//          ready_to_execute = false;
+          chi_log.Log(LOG_ALL)
+            << "SweepBuffer: Delayed Data message was not available";
+//          break;
+        }//if message is not available
 
-          }
+        //============================ Receive upstream data
+        u_ll_int block_addr   = delayed_prelocI_message_blockpos[prelocI][m];
+        u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];
 
-          angleset->delayed_prelocI_norm[prelocI] = rel_change;
+        MPI_Status status;
+        int error_code = MPI_Recv(&angleset->delayed_prelocI_outgoing_psi[prelocI].data()[block_addr],
+                 message_size,
+                 MPI_DOUBLE,
+                 comm_set->MapIonJ(locJ,chi_mpi.location_id),
+                 10000*angle_set_num + 100*num_mess + m, //tag
+                 comm_set->communicators[chi_mpi.location_id],
+                 &status);
+
+        int num = MPI_Get_count(&status,MPI_DOUBLE,&num);
+
+        if (error_code != MPI_SUCCESS)
+        {
+          std::stringstream err_stream;
+          err_stream << "################# Delayed receive error."
+                     << " message size=" << message_size
+                     << " as_num=" << angle_set_num
+                     << " num_mess=" << num_mess
+                     << " m=" << m
+                     << " error=" << status.MPI_ERROR
+                     << " size=" << num << "\n";
+          char error_string[BUFSIZ];
+          int length_of_error_string, error_class;
+          MPI_Error_class(error_code, &error_class);
+          MPI_Error_string(error_class, error_string, &length_of_error_string);
+          err_stream << error_string << "\n";
+          MPI_Error_string(error_code, error_string, &length_of_error_string);
+          err_stream << error_string << "\n";
+          chi_log.Log(LOG_ALLWARNING) << err_stream.str();
         }
+
       }//if not message already received
     }//for message
+
+    double rel_change = 0.0;
+    for (int k=0; k<psi_old.size(); k++)
+    {
+      double psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI][k];
+      if (std::fabs(psi_new) >= std::numeric_limits<double>::min())
+      {
+        double max_change =
+            std::fabs(psi_new - psi_old[k])/std::fabs(psi_new);
+        rel_change = std::max(max_change,rel_change);
+      }
+    }
+    angleset->delayed_prelocI_norm[prelocI] = rel_change;
   }//for delayed predecessor
 }
 
@@ -445,7 +472,7 @@ CheckUpstreamPsiAvailable(int angle_set_num)
         int msg_avail = 1;
 
         MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   300 + angle_set_num*num_mess + m, //tag
+                   10000*angle_set_num + 100*num_mess + m, //tag
                    comm_set->communicators[chi_mpi.location_id],
                    &msg_avail,MPI_STATUS_IGNORE);
 
@@ -462,13 +489,33 @@ CheckUpstreamPsiAvailable(int angle_set_num)
           u_ll_int block_addr   = prelocI_message_blockpos[prelocI][m];
           u_ll_int message_size = prelocI_message_size[prelocI][m];
 
-          MPI_Recv(&angleset->prelocI_outgoing_psi[prelocI].data()[block_addr],
+          int error_code = MPI_Recv(&angleset->prelocI_outgoing_psi[prelocI].data()[block_addr],
                    message_size,
                    MPI_DOUBLE,
                    comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   300 + angle_set_num*num_mess + m, //tag
+                   10000*angle_set_num + 100*num_mess + m, //tag
                    comm_set->communicators[chi_mpi.location_id],
                    MPI_STATUS_IGNORE);
+
+          if (error_code != MPI_SUCCESS)
+          {
+            std::stringstream err_stream;
+            err_stream << "################# Delayed receive error."
+                       << " message size=" << message_size
+                       << " as_num=" << angle_set_num
+                       << " num_mess=" << num_mess
+                       << " m=" << m
+                       << " error="
+                       << " size=\n";
+            char error_string[BUFSIZ];
+            int length_of_error_string, error_class;
+            MPI_Error_class(error_code, &error_class);
+            MPI_Error_string(error_class, error_string, &length_of_error_string);
+            err_stream << error_string << "\n";
+            MPI_Error_string(error_code, error_string, &length_of_error_string);
+            err_stream << error_string << "\n";
+            chi_log.Log(LOG_ALLWARNING) << err_stream.str();
+          }
         }
       }//if not message already received
     }//for message

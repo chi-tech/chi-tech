@@ -37,16 +37,19 @@ int NPTMatrixAction_Ax_Cycles(Mat matrix, Vec krylov_vector, Vec Ax)
   double new_norm = 0.0;
   double prev_norm = 1.0;
   bool cycles_converged = false;
+  bool sweep_once_more = false;
   for (int k=0; k<15; k++)
   {
     solver->phi_new_local.assign(solver->phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler->Sweep(sweep_chunk);
     new_norm = groupset->angle_agg->GetDelayedPsiNorm();
 
-    double rel_change = std::fabs(1.0-new_norm/prev_norm);
+    double rel_change = 0.0;
+    if (prev_norm > 1.0e-10)
+      rel_change = std::fabs(1.0-new_norm/prev_norm);
     prev_norm = new_norm;
-//    if (rel_change<std::max(1.0e-2,1.0e-10))
-//      cycles_converged = true;
+    if (new_norm<std::max(1.0e-8,1.0e-10))
+      cycles_converged = true;
 
     std::string offset;
     if (groupset->apply_wgdsa || groupset->apply_tgdsa)
@@ -64,7 +67,9 @@ int NPTMatrixAction_Ax_Cycles(Mat matrix, Vec krylov_vector, Vec Ax)
 
     chi_log.Log(LOG_0) << iter_info.str();
 
-    if (cycles_converged)
+    if (cycles_converged and (!sweep_once_more))
+      sweep_once_more = true;
+    else if (cycles_converged)
       break;
   }
 

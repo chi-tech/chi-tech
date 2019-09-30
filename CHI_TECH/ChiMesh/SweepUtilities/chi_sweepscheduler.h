@@ -43,15 +43,7 @@ public:
 //      InitializeAlgoDOG();
 //  }
 
-  void Sweep(SweepChunk* in_sweep_chunk=NULL)
-  {
-    sweep_chunk = in_sweep_chunk;
-
-    if (scheduler_type == FIFO)
-      ScheduleAlgoFIFO();
-    else if (scheduler_type == DEPTH_OF_GRAPH)
-      ScheduleAlgoDOG();
-  }
+  void Sweep(SweepChunk* in_sweep_chunk=NULL);
 
 private:
   void ScheduleAlgoFIFO();

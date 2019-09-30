@@ -11,7 +11,7 @@ chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic.obj",true)
+        "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic2.obj",true)
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()
@@ -21,10 +21,20 @@ chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
 
+
+
 chiSurfaceMesherSetProperty(PARTITION_X,2)
 chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+if (support_cycles == nil) then
+    chiSurfaceMesherSetProperty(CUT_X,0.5)
+    chiSurfaceMesherSetProperty(CUT_Y,0.5)
+    print("NON_CYCLES")
+else
+    chiSurfaceMesherSetProperty(CUT_X,0.0)
+    chiSurfaceMesherSetProperty(CUT_Y,0.0)
+    print("WITH_CYCLES")
+end
+
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
@@ -115,7 +125,9 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
 --========== Solvers
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
-chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_GMRES_CYCLES)
+if (support_cycles ~= nil) then
+    chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_GMRES_CYCLES)
+end
 --chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_CLASSICRICHARDSON)
 --chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,LBS_CLASSICRICHARDSON)
 chiLBSSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
@@ -181,3 +193,13 @@ if (master_export == nil) then
     chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 end
 
+line = chiFFInterpolationCreate(LINE)
+chiFFInterpolationSetProperty(line,LINE_FIRSTPOINT,0.0,-1.0,0.5)
+chiFFInterpolationSetProperty(line,LINE_SECONDPOINT,0.0, 1.0,0.5)
+chiFFInterpolationSetProperty(line,LINE_NUMBEROFPOINTS,1000)
+chiFFInterpolationSetProperty(line,ADD_FIELDFUNCTION,fflist[2])
+
+chiFFInterpolationInitialize(line)
+chiFFInterpolationExecute(line)
+
+chiFFInterpolationExportPython(line,"Line")

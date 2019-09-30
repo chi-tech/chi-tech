@@ -47,12 +47,13 @@ private:
   //======================================== Alpha elements
 
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
-  // which holds the slot in the local multi-level psi vector
+  // which holds the slot address in the local psi vector where the first
+  // face dof will store its data
   std::vector<std::vector<int>>
     so_cell_outb_face_slot_indices;
 
   // This is a vector [cell_sweep_order_index][incoming_face_count]
-  // that will holds a pair. Pair-first holds the slot where this
+  // that will hold a pair. Pair-first holds the slot address where this
   // face's upwind data is stored. Pair-second is a mapping of
   // each of this face's dofs to the upwinded face's dofs
   std::vector<std::vector<std::pair<int,std::vector<int>> >>

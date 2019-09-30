@@ -173,7 +173,7 @@ void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoDOG()
       if (angleset_status == FLAG_NOT_FINISHED)
       {
         completion_status = FLAG_NOT_FINISHED;
-        //break;
+//        break;
       }
 
     }
