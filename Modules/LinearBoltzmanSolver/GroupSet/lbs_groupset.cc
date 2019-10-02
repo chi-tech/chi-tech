@@ -5,6 +5,37 @@
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
+//##############################################
+/**Groupset constructor.*/
+LBSGroupset::LBSGroupset()
+{
+  quadrature = nullptr;
+  iterative_method = NPT_GMRES;
+  angleagg_method  = NPT_ANGAGG_POLAR;
+  angle_agg = new AngleAgg;
+  master_num_grp_subsets = 1;
+  master_num_ang_subsets = 1;
+  residual_tolerance = 1.0e-6;
+  max_iterations = 200;
+  gmres_restart_intvl = 30;
+  apply_wgdsa = false;
+  apply_tgdsa = false;
+
+  wgdsa_solver = nullptr;
+  tgdsa_solver = nullptr;
+
+  wgdsa_max_iters = 30;
+  tgdsa_max_iters = 30;
+
+  wgdsa_tol = 1.0e-4;
+  tgdsa_tol = 1.0e-4;
+
+  wgdsa_verbose = false;
+  tgdsa_verbose = false;
+
+  allow_cycles = false;
+}
+
 //###################################################################
 /**Computes the discrete to moment operator.*/
 void LBSGroupset::BuildDiscMomOperator(int scatt_order)
