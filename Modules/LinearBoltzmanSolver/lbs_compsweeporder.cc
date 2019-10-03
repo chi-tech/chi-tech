@@ -22,7 +22,7 @@ extern ChiConsole chi_console;
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/
-void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
+void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 {
   chi_log.Log(LOG_0) << "Computing Sweep ordering.\n";
 

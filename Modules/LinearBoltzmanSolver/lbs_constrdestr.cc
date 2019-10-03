@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Constructor for NPT*/
-LinearBoltzmanSolver::LinearBoltzmanSolver()
+LinearBoltzman::Solver::Solver()
 {
   //============================================= Default options
   options.scattering_order  = 1;

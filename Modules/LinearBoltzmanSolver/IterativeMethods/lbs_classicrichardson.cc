@@ -20,7 +20,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
+void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
 {
   chi_log.Log(LOG_0)
     << "\n\n";
@@ -59,7 +59,7 @@ void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
   bool converged = false;
   for (int k=0; k<groupset->max_iterations; k++)
   {
-    SetSource(group_set_num,USE_MATERIAL_SOURCE);
+    SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE);
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
 
     sweepScheduler.Sweep(sweep_chunk);

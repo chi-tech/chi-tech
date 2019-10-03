@@ -30,7 +30,7 @@ extern double chi_global_timings[20];
  * \param suppress_phi_old Flag indicating whether to suppress phi_old.
  *
  * */
-void LinearBoltzmanSolver::SetSource(int group_set_num,
+void LinearBoltzman::Solver::SetSource(int group_set_num,
                                 bool apply_mat_src,
                                 bool suppress_phi_old)
 {
@@ -64,8 +64,8 @@ void LinearBoltzmanSolver::SetSource(int group_set_num,
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
-    LBSCellViewFull* full_cell_view =
-      (LBSCellViewFull*)cell_transport_views[cell->cell_local_id];
+    LinearBoltzman::CellViewFull* full_cell_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell->cell_local_id];
 
     //=========================================== Obtain cross-section and src
     int cell_matid = cell->material_id;

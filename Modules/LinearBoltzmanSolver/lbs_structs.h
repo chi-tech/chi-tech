@@ -7,14 +7,19 @@
 #define PARTITION_METHOD_SERIAL        1
 #define PARTITION_METHOD_FROM_SURFACE  2
 
+namespace LinearBoltzman
+{
+
+
+
 /**Struct for storing NPT options.*/
-struct LBSOptions
+struct Options
 {
   int scattering_order;
   int partition_method;
   int sweep_eager_limit;
 
-  LBSOptions()
+  Options()
   {
     scattering_order = 0;
     partition_method = PARTITION_METHOD_SERIAL;
@@ -22,7 +27,7 @@ struct LBSOptions
   }
 };
 
-class LBSCellViewBase
+class CellViewBase
 {
 public:
   std::vector<int> node_dof_mapping;
@@ -31,7 +36,7 @@ public:
 
 
 /**Transport view of a cell*/
-class LBSCellViewFull : public LBSCellViewBase
+class CellViewFull : public CellViewBase
 {
 public:
   std::vector<bool>  face_f_upwind_flag;
@@ -47,7 +52,7 @@ private:
   int num_moms;
 
 public:
-  LBSCellViewFull(int in_dofs,int num_G, int num_m)
+  CellViewFull(int in_dofs, int num_G, int num_m)
   {
     dof_phi_map_start = -1;
     dofs = in_dofs;
@@ -61,6 +66,6 @@ public:
   }
 };
 
-
+}
 
 #endif

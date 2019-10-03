@@ -19,13 +19,13 @@ extern ChiConsole chi_console;
 
 //###################################################################
 /** Initialize the solver.*/
-void LinearBoltzmanSolver::Initialize()
+void LinearBoltzman::Solver::Initialize()
 {
   //============================================= Input checks
   if (discretization == nullptr)
   {
     chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzmanSolver: No discretization method set.";
+      << "LinearBoltzman::Solver: No discretization method set.";
     exit(EXIT_FAILURE);
   }
 
@@ -158,8 +158,8 @@ void LinearBoltzmanSolver::Initialize()
     //here is that it holds the means to know where a given cell's
     //transport quantities are located in the unknown vectors (i.e. phi)
     CellFEView* cell_fe_view = pwl_discretization->MapFeView(cell_g_index);
-    LBSCellViewFull* full_cell_view =
-      new LBSCellViewFull(cell_fe_view->dofs, groups.size(), num_moments);
+    LinearBoltzman::CellViewFull* full_cell_view =
+      new LinearBoltzman::CellViewFull(cell_fe_view->dofs, groups.size(), num_moments);
     cell_transport_views.push_back(full_cell_view);
 
     //For PWLD, for a given cell, within a given sweep chunk,

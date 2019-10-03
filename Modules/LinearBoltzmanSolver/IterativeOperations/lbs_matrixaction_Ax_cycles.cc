@@ -16,7 +16,7 @@ int NPTMatrixAction_Ax_Cycles(Mat matrix, Vec krylov_vector, Vec Ax)
   KSPDataContext* context;
   MatShellGetContext(matrix,&context);
 
-  LinearBoltzmanSolver* solver = context->solver;
+  LinearBoltzman::Solver* solver = context->solver;
   SweepChunk* sweep_chunk = context->sweep_chunk;
   LBSGroupset* groupset  = context->groupset;
   MainSweepScheduler* sweepScheduler = context->sweepScheduler;
@@ -28,7 +28,8 @@ int NPTMatrixAction_Ax_Cycles(Mat matrix, Vec krylov_vector, Vec Ax)
 
   //============================================= Setting the source using
   //                                             updated phi_old
-  solver->SetSource(context->group_set_num,USE_DLINV_SOURCE);
+  solver->SetSource(context->group_set_num,
+                    LinearBoltzman::SourceFlags::USE_DLINV_SOURCE);
 
   //============================================= Sweeping the new source
 //  solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);

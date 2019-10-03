@@ -5,7 +5,7 @@
  * objects needed in matrix free operations.*/
 struct KSPDataContext
 {
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   SweepChunk*      sweep_chunk;
   int              group_set_num;
   LBSGroupset*    groupset;

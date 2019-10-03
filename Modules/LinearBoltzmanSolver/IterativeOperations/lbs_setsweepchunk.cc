@@ -13,7 +13,7 @@ typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
 
 //###################################################################
 /**Sets up the sweek chunk for the given discretization method.*/
-SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
+SweepChunk* LinearBoltzman::Solver::SetSweepChunk(int group_set_num)
 {
   //================================================== Obtain groupset
   LBSGroupset* groupset = group_sets[group_set_num];
@@ -67,7 +67,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
   else
   {
     chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzmanSolver::SetSweepChunk, failed. Could not establish "
+      << "LinearBoltzman::Solver::SetSweepChunk, failed. Could not establish "
       << "which sweep chunk to use.";
     exit(EXIT_FAILURE);
   }

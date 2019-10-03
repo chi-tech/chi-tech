@@ -22,7 +22,7 @@ typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
-void LinearBoltzmanSolver::GMRES_Cycles(int group_set_num)
+void LinearBoltzman::Solver::GMRES_Cycles(int group_set_num)
 {
   chi_log.Log(LOG_0)
     << "\n\n";
@@ -110,7 +110,7 @@ void LinearBoltzmanSolver::GMRES_Cycles(int group_set_num)
 
   //================================================== Compute b
   chi_log.Log(LOG_0) << "Computing b";
-  SetSource(group_set_num,USE_MATERIAL_SOURCE,SUPPRESS_PHI_OLD);
+  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
   double new_norm = 0.0;

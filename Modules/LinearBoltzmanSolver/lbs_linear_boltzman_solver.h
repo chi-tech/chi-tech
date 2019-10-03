@@ -18,69 +18,78 @@ typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
 #define VACUUM             301
 #define INCIDENT_ISOTROPIC 302
 
-#define USE_MATERIAL_SOURCE true
-#define USE_DLINV_SOURCE false
-#define SUPPRESS_PHI_OLD true
+//#define USE_MATERIAL_SOURCE true
+//#define USE_DLINV_SOURCE false
+//#define SUPPRESS_PHI_OLD true
+
+namespace LinearBoltzman
+{
+//  struct BoundaryTypes
+//  {
+//    static const int VACUUM = 1;
+//    static const int INCIDENT_ISOTROPIC = 2;
+//  };
+  struct SourceFlags
+  {
+    static const bool USE_MATERIAL_SOURCE = true;
+    static const bool USE_DLINV_SOURCE = false;
+    static const bool SUPPRESS_PHI_OLD = true;
+  };
+}
+
+namespace LinearBoltzman {
 
 //################################################################### Class def
 /**A neutral particle transport solver.*/
-class LinearBoltzmanSolver : public chi_physics::Solver
-{
-public:
-  LBSOptions options;    //In chi_npt_structs.h
+class Solver : public chi_physics::Solver {
+ public:
+  LinearBoltzman::Options options;    //In chi_npt_structs.h
 
   int num_moments;
 
-  std::vector<LBSGroup*>                            groups;
-  std::vector<LBSGroupset*>                         group_sets;
-  std::vector<chi_physics::TransportCrossSections*>  material_xs;
-  std::vector<chi_physics::IsotropicMultiGrpSource*> material_srcs;
-  std::vector<int>                                   matid_to_xs_map;
-  std::vector<int>                                   matid_to_src_map;
+  std::vector<LBSGroup *> groups;
+  std::vector<LBSGroupset *> group_sets;
+  std::vector<chi_physics::TransportCrossSections *> material_xs;
+  std::vector<chi_physics::IsotropicMultiGrpSource *> material_srcs;
+  std::vector<int> matid_to_xs_map;
+  std::vector<int> matid_to_src_map;
 
+  SpatialDiscretization *discretization;
+  chi_mesh::MeshContinuum *grid;
+  std::vector<LinearBoltzman::CellViewBase *> cell_transport_views;
 
-  SpatialDiscretization*                                discretization;
-  chi_mesh::MeshContinuum*                           grid;
-  std::vector<LBSCellViewBase*>                         cell_transport_views;
-
-  std::vector<int>                                   local_cell_indices;
+  std::vector<int> local_cell_indices;
 
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeBuffers
   //A default 0.0 incident boundary is loaded at the back of
   //the stack to use as default. This is loaded during initparrays
-  std::vector<std::pair<int,int>>                    boundary_types;
-  std::vector<std::vector<double>>                   incident_P0_mg_boundaries;
-  std::vector<chi_mesh::SweepManagement::SPDS*>      sweep_orderings;
+  std::vector<std::pair<int, int>> boundary_types;
+  std::vector<std::vector<double>> incident_P0_mg_boundaries;
+  std::vector<chi_mesh::SweepManagement::SPDS *> sweep_orderings;
 
-  ChiMPICommunicatorSet                           comm_set;
+  ChiMPICommunicatorSet comm_set;
 
   int max_cell_dof_count;
   unsigned long long local_dof_count;
   unsigned long long glob_dof_count;
 
   Vec phi_new, phi_old, q_fixed;
-  std::vector<double> q_fixed_local;
   std::vector<double> q_moments_local;
   std::vector<double> phi_new_local, phi_old_local, phi_oldcycle_local;
   std::vector<double> delta_phi_local;
 
-  std::vector<int> local_indices;
-  std::vector<int> global_indices;
-
   std::vector<int> local_cell_phi_dof_array_address;
   std::vector<int> local_cell_dof_array_address;
 
-  ISLocalToGlobalMapping ltog;
-
-public:
+ public:
   //00
-       LinearBoltzmanSolver();
+  Solver();
   //01
   void Initialize();
   //01a
   void ComputeNumberOfMoments();
   //01b
-  void InitMaterials(std::set<int>& material_ids);
+  void InitMaterials(std::set<int> &material_ids);
   //01c
   int InitializeParrays();
   //01d
@@ -103,31 +112,30 @@ public:
   void DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
                                       double *ref_phi_new);
   //04d
-  void InitTGDSA(LBSGroupset* groupset);
+  void InitTGDSA(LBSGroupset *groupset);
   void AssembleTGDSADeltaPhiVector(LBSGroupset *groupset, double *ref_phi_old,
                                    double *ref_phi_new);
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                       double *ref_phi_new);
 
-
   //04c
   void ResetSweepOrderings(LBSGroupset *groupset);
 
-
-
   //IterativeMethods
-  void        SetSource(int group_set_num,
-                        bool apply_mat_src=false,
-                        bool suppress_phi_old=false);
-  double      ComputePiecewiseChange(LBSGroupset* groupset);
-  SweepChunk* SetSweepChunk(int group_set_num);
-  void        ClassicRichardson(int group_set_num);
-  void        GMRES(int group_set_num);
-  void        GMRES_Cycles(int group_set_num);
-  void        AssembleVectors(LBSGroupset *groupset);
-  void        AssembleVector(LBSGroupset *groupset, Vec x, double *y);
-  void        DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);
-  void        DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y);
+  void SetSource(int group_set_num,
+                 bool apply_mat_src = false,
+                 bool suppress_phi_old = false);
+  double ComputePiecewiseChange(LBSGroupset *groupset);
+  SweepChunk *SetSweepChunk(int group_set_num);
+  void ClassicRichardson(int group_set_num);
+  void GMRES(int group_set_num);
+  void GMRES_Cycles(int group_set_num);
+  void AssembleVectors(LBSGroupset *groupset);
+  void AssembleVector(LBSGroupset *groupset, Vec x, double *y);
+  void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);
+  void DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double *x_src, double *y);
 };
+
+}
 
 #endif

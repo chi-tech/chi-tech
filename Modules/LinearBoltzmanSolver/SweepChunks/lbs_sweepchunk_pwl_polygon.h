@@ -36,7 +36,7 @@ class LBSSweepChunkPWLPolygon : public chi_mesh::SweepManagement::SweepChunk
 private:
   chi_mesh::MeshContinuum*    grid_view;
   SpatialDiscretization_PWL*     grid_fe_view;
-  std::vector<LBSCellViewBase*>* grid_transport_view;
+  std::vector<LinearBoltzman::CellViewBase*>* grid_transport_view;
 //std::vector<double>*        x;                   BASE CLASS
   std::vector<double>*        q_moments;
   LBSGroupset*               groupset;
@@ -72,7 +72,7 @@ public:
   //################################################## Constructor
   LBSSweepChunkPWLPolygon(chi_mesh::MeshContinuum* vol_continuum,
                              SpatialDiscretization_PWL* discretization,
-                             std::vector<LBSCellViewBase*>* cell_transport_views,
+                             std::vector<LinearBoltzman::CellViewBase*>* cell_transport_views,
                              std::vector<double>* destination_phi,
                              std::vector<double>* source_moments,
                              LBSGroupset* in_groupset,
@@ -154,8 +154,8 @@ public:
         (chi_mesh::CellPolygon*)cell;
       PolygonFEView* cell_fe_view =
         (PolygonFEView*)grid_fe_view->MapFeView(cell_g_index);
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)(*grid_transport_view)[poly_cell->cell_local_id];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)(*grid_transport_view)[poly_cell->cell_local_id];
 
       int     cell_dofs    = cell_fe_view->dofs;
       int     xs_id        = transport_view->xs_id;

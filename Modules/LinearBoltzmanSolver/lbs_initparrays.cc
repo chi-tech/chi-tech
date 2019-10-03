@@ -48,16 +48,13 @@ A long int only supports up to 4.29e9. This obviously requires
 unsigned long long int which can hold up to 2x2e63.\n
 \n
 Another interesting aspect is what it will take to get to exascale. For a
-discrete ordinates this will undoubtly be evident in the amount of angular flux
+discrete ordinates code this will undoubtly be evident in the amount of angular flux
 unknowns. 1 billion cells, 24 vertices, 200 groups, 48 azimuthal angles per
 octant, 8 polar angles per octant (3072) angles. 1.47456e16. Just a factor 68
 away from exascale.
    */
-int LinearBoltzmanSolver::InitializeParrays()
+int LinearBoltzman::Solver::InitializeParrays()
 {
-//  PetscErrorCode ierr;
-//  PetscMPIInt    size;
-
   SpatialDiscretization_PWL* pwl_discretization =
     (SpatialDiscretization_PWL*)discretization;
 
@@ -67,9 +64,7 @@ int LinearBoltzmanSolver::InitializeParrays()
   {
     size_t num_cell_views = pwl_discretization->cell_fe_views.size();
     for (int c=0; c<num_cell_views; c++)
-    {
       local_dof_count += pwl_discretization->cell_fe_views[c]->dofs;
-    }
   }
   chi_log.Log(LOG_ALLVERBOSE_2) << "Local DOF count = " << local_dof_count;
 
@@ -84,23 +79,15 @@ int LinearBoltzmanSolver::InitializeParrays()
   unsigned long long local_unknown_count = local_dof_count*G*M;
   unsigned long long glob_unknown_count  = glob_dof_count*G*M;
 
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Local Unknown count = "
-                                      << local_unknown_count;
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Globl Unknown count = "
-                                      << glob_unknown_count;
+  chi_log.Log(LOG_ALLVERBOSE_2)
+    << "Local Unknown count = " << local_unknown_count;
+  chi_log.Log(LOG_ALLVERBOSE_2)
+    << "Globl Unknown count = " << glob_unknown_count;
 
-  //================================================== Size fixed source
-//  q_fixed_local.resize(local_unknown_count,0.0);
+  //================================================== Size local vectors
   q_moments_local.resize(local_unknown_count,0.0);
   phi_old_local.resize(local_unknown_count,0.0);
   phi_new_local.resize(local_unknown_count,0.0);
-
-//  //================================================== Initialize local indices
-//  for (int i=0; i<local_unknown_count; i++)
-//    local_indices.push_back(i);
-
-  //================================================== Set local to global mapping
-  //This has been deferred to solvers
 
   //================================================== Initialize default
   //                                                   incident boundary
@@ -127,8 +114,8 @@ int LinearBoltzmanSolver::InitializeParrays()
         (chi_mesh::CellSlab*)cell;
       SlabFEView* slab_fe_view =
         (SlabFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBSCellViewFull* full_cell_view =
-        (LBSCellViewFull*)cell_transport_views[slab_cell->cell_local_id];
+      LinearBoltzman::CellViewFull* full_cell_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[slab_cell->cell_local_id];
 
       int mat_id = cell->material_id;
 
@@ -185,8 +172,8 @@ int LinearBoltzmanSolver::InitializeParrays()
         (chi_mesh::CellPolygon*)cell;
       PolygonFEView* poly_fe_view =
         (PolygonFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBSCellViewFull* full_cell_view =
-        (LBSCellViewFull*)cell_transport_views[poly_cell->cell_local_id];
+      LinearBoltzman::CellViewFull* full_cell_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[poly_cell->cell_local_id];
 
       int mat_id = cell->material_id;
 
@@ -243,8 +230,8 @@ int LinearBoltzmanSolver::InitializeParrays()
         (chi_mesh::CellPolyhedron*)cell;
       PolyhedronFEView* polyh_fe_view =
         (PolyhedronFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBSCellViewFull* full_cell_view =
-        (LBSCellViewFull*)cell_transport_views[polyh_cell->cell_local_id];
+      LinearBoltzman::CellViewFull* full_cell_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[polyh_cell->cell_local_id];
 
       int mat_id = cell->material_id;
 

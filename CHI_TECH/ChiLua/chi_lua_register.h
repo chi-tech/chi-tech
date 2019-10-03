@@ -1,5 +1,6 @@
 #define RegisterFunction(x) int x(lua_State *L); lua_register(this->consoleState, #x          , x );
 #define RegisterConstant(x,y) lua_pushnumber(this->consoleState,y); lua_setglobal(this->consoleState, #x);
+#define RegisterNamespace(x) lua_newtable(this->consoleState); lua_setglobal(this->consoleState, #x);
 
 
 
@@ -254,4 +255,9 @@ RegisterFunction(chiLBSGroupsetSetTGDSA)
 
 //module:Test scripts
 RegisterFunction(chiLuaTest)
+RegisterNamespace(LuaNamespace)
+lua_getglobal(this->consoleState,"LuaNamespace");
+lua_pushstring(this->consoleState,"Name");
+lua_pushstring(this->consoleState,"Jan");
+lua_settable(this->consoleState,-3);
 

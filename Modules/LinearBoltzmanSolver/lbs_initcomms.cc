@@ -11,7 +11,7 @@ extern ChiLog chi_log;
 
 //###################################################################
 /**Initializes communicators*/
-void LinearBoltzmanSolver::InitializeCommunicators()
+void LinearBoltzman::Solver::InitializeCommunicators()
 {
   std::set<int>    local_graph_edges;
   std::vector<int> local_connections;
