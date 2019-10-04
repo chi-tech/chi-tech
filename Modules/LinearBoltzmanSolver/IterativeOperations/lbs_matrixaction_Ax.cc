@@ -28,8 +28,12 @@ int NPTMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
                     LinearBoltzman::SourceFlags::USE_DLINV_SOURCE);
 
   //============================================= Sweeping the new source
+  groupset->angle_agg->ResetDelayedPsi();
+
   solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
   sweepScheduler->Sweep(sweep_chunk);
+
+  solver->ConvergeCycles(*sweepScheduler,sweep_chunk,groupset);
 
   //=================================================== Apply WGDSA
   if (groupset->apply_wgdsa)

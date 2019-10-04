@@ -954,27 +954,6 @@ PARTITION_METHOD\n
  Multi-processor partitioning method.\n\n
 BOUNDARY_CONDITION\n
  Boundary condition type. See BoundaryIdentify.\n\n
-GROUPSET_ITERATIVEMETHOD\n
- Iterative method to be used by a given groupset. Expects to be followed
- by the groupset handle and IterativeMethod.\n\n
-GROUPSET_TOLERANCE\n
- Either Residual or pointwise tolerance to use for iterative method. Expects
- to be followed by the groupset handle and a float. Default is 1.0e-6\n\n
-GROUPSET_MAXITERATIONS\n
- Maximum iterations for groupset solve. Exepects to be followed by the groupset
- handle and an integer. Default is 1000.\n\n
-GROUPSET_GMRESRESTART_INTVL\n
- Number of GMRES iterations to accumulate Krylov vectors before restarting
- the accumulation. Default 10.\n\n
-GROUPSET_SUBSETS\n
- Number of subsets to use for groupset. Default 1. Expects to be followed by
- groupset handle and integer amount of subsets.\n\n
-GROUPSET_WGDSA\n
- Expects to be followed by a boolean flag. If true then Within-Group
- Diffusion Synthetic Acceleration will be applied. Default false.\n\n
-GROUPSET_TGDSA\n
- Expects to be followed by a boolean flag. If true then Two-Grid
- Diffusion Synthetic Acceleration will be applied. Default false.\n\n
 SCATTERING_ORDER\n
  Defines the level of harmonic expansion for the scattering source.Default 1.
  Expects to be followed by an integer.\n\n
@@ -1003,20 +982,14 @@ Specifies the type of boundary. Depending on the type this argument needs
 to be followed by one or more values. Note: By default all boundaries are
 type VACUUM.\n
 \n
-VACUUM\n
+LBSBoundaryTypes.VACUUM\n
 Specifies a vaccuum boundary condition. It is not followed by any value.\n
 \n
 \n
-INCIDENT_ISOTROPIC\n
+LBSBoundaryTypes.INCIDENT_ISOTROPIC\n
 Incident isotropic flux. This argument needs to be followed by a lua table
 index 1 to G where G is the amount of energy groups. Note internally this
 is mapped as 0 to G-1.
-###IterativeMethod
-NPT_CLASSICRICHARDSON\n
-Classic richardson iteration or otherwise known as source iteration.\n
-\n
-NPT_GMRES\n
-Generalized Minimized Residual. Very robust method for converging solutions.\n
 ###Note on the Eager limit
 The eager limit is the message size limit before which non-blocking MPI send
 calls will execute without waiting for a matching receive call. The limit is
@@ -1176,6 +1149,9 @@ NPT_CLASSICRICHARDSON\n
 Standard source iteration.\n\n
 NPT_GMRES\n
 Generalized Minimal Residual formulation for iterations.\n\n
+NPT_GMRES_CYCLES\n
+Generalized Minimal Residual formulation for iterations with cyclic dependency
+convergence.\n\n
 Example:
 \code
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)

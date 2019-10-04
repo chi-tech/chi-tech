@@ -173,26 +173,26 @@ void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoDOG()
       if (angleset_status == FLAG_NOT_FINISHED)
       {
         completion_status = FLAG_NOT_FINISHED;
-//        break;
+        // The following break statement
+        // essentially inhibits FIFO
+        break;
       }
 
     }
   }
 
   //================================================== Reset all
-  for (int q=0; q<angle_agg->angle_set_groups.size(); q++)
-  {
-    angle_agg->angle_set_groups[q]->ResetSweep();
-  }
+  for (auto angset_group : angle_agg->angle_set_groups)
+    angset_group->ResetSweep();
 
+  //================================================== Receive delayed data
   MPI_Barrier(MPI_COMM_WORLD);
   for (int as=0; as<rule_values.size(); as++)
   {
     TAngleSet *angleset = rule_values[as].angle_set;
     angleset->ReceiveDelayedData(rule_values[as].set_index);
   }
-//  chi_log.Log(LOG_ALL) << "Done with Sweep";
-//  exit(0);
+
   chi_global_timings[16] += t16_sweeptime.GetTime()/1000.0;
   chi_global_timings[17] += 1.0;
 

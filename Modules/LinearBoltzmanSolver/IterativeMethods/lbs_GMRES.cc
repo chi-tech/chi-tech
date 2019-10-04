@@ -71,8 +71,6 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   MatShellSetOperation(A, MATOP_MULT,(void (*)(void)) NPTMatrixAction_Ax);
 
   //================================================== Initial vector assembly
-  phi_new_local.assign(phi_new_local.size(),0.0);
-
   VecCreate(PETSC_COMM_WORLD,&phi_new);
   VecCreate(PETSC_COMM_WORLD,&phi_old);
   VecCreate(PETSC_COMM_WORLD,&q_fixed);
@@ -111,7 +109,10 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
+  phi_new_local.assign(phi_new_local.size(),0.0);
   sweepScheduler.Sweep(sweep_chunk);
+
+  ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
 
   //=================================================== Apply WGDSA
   if (groupset->apply_wgdsa)

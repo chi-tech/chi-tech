@@ -1,6 +1,20 @@
-#define RegisterFunction(x) int x(lua_State *L); lua_register(this->consoleState, #x          , x );
-#define RegisterConstant(x,y) lua_pushnumber(this->consoleState,y); lua_setglobal(this->consoleState, #x);
-#define RegisterNamespace(x) lua_newtable(this->consoleState); lua_setglobal(this->consoleState, #x);
+#define RegisterFunction(x) \
+        int x(lua_State *L); \
+        lua_register(this->consoleState, #x, x);
+
+#define RegisterConstant(x,y) \
+        lua_pushnumber(this->consoleState,y); \
+        lua_setglobal(this->consoleState, #x);
+
+#define RegisterNamespace(x) \
+        lua_newtable(this->consoleState); \
+        lua_setglobal(this->consoleState, #x);
+
+#define AddNamedConstantToNamespace(const_name,const_value,namespace_name) \
+        lua_getglobal(this->consoleState,#namespace_name); \
+        lua_pushstring(this->consoleState,#const_name); \
+        lua_pushnumber(this->consoleState,const_value); \
+        lua_settable(this->consoleState,-3);
 
 
 
@@ -213,8 +227,14 @@ RegisterConstant(BOUNDARY_CONDITION,   3);
   RegisterConstant(YMIN,   34);
   RegisterConstant(ZMAX,   35);
   RegisterConstant(ZMIN,   36);
-    RegisterConstant(VACUUM,               301);
-    RegisterConstant(INCIDENT_ISOTROPIC,   302);
+
+
+  RegisterNamespace(LBSBoundaryTypes);
+  AddNamedConstantToNamespace(VACUUM            ,1,LBSBoundaryTypes)
+  AddNamedConstantToNamespace(INCIDENT_ISOTROPIC,2,LBSBoundaryTypes)
+//
+//    RegisterConstant(VACUUM,               301);
+//    RegisterConstant(INCIDENT_ISOTROPIC,   302);
 
 RegisterConstant(GROUPSET_ITERATIVEMETHOD,   101);
   RegisterConstant(NPT_CLASSICRICHARDSON,   1);
@@ -255,9 +275,8 @@ RegisterFunction(chiLBSGroupsetSetTGDSA)
 
 //module:Test scripts
 RegisterFunction(chiLuaTest)
+
+
 RegisterNamespace(LuaNamespace)
-lua_getglobal(this->consoleState,"LuaNamespace");
-lua_pushstring(this->consoleState,"Name");
-lua_pushstring(this->consoleState,"Jan");
-lua_settable(this->consoleState,-3);
+AddNamedConstantToNamespace(Name,1,LuaNamespace)
 

@@ -14,30 +14,24 @@
 #include <petscksp.h>
 
 typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
-
-#define VACUUM             301
-#define INCIDENT_ISOTROPIC 302
-
-//#define USE_MATERIAL_SOURCE true
-//#define USE_DLINV_SOURCE false
-//#define SUPPRESS_PHI_OLD true
+typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
 
 namespace LinearBoltzman
 {
-//  struct BoundaryTypes
-//  {
-//    static const int VACUUM = 1;
-//    static const int INCIDENT_ISOTROPIC = 2;
-//  };
-  struct SourceFlags
-  {
-    static const bool USE_MATERIAL_SOURCE = true;
-    static const bool USE_DLINV_SOURCE = false;
-    static const bool SUPPRESS_PHI_OLD = true;
-  };
-}
+struct BoundaryTypes
+{
+  static const int VACUUM = 1;
+  static const int INCIDENT_ISOTROPIC = 2;
+};
+struct SourceFlags
+{
+  static const bool USE_MATERIAL_SOURCE = true;
+  static const bool USE_DLINV_SOURCE = false;
+  static const bool SUPPRESS_PHI_OLD = true;
+};
 
-namespace LinearBoltzman {
+
+
 
 //################################################################### Class def
 /**A neutral particle transport solver.*/
@@ -47,7 +41,7 @@ class Solver : public chi_physics::Solver {
 
   int num_moments;
 
-  std::vector<LBSGroup *> groups;
+  std::vector<LBSGroup*> groups;
   std::vector<LBSGroupset *> group_sets;
   std::vector<chi_physics::TransportCrossSections *> material_xs;
   std::vector<chi_physics::IsotropicMultiGrpSource *> material_srcs;
@@ -134,6 +128,9 @@ class Solver : public chi_physics::Solver {
   void AssembleVector(LBSGroupset *groupset, Vec x, double *y);
   void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);
   void DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double *x_src, double *y);
+  void ConvergeCycles(MainSweepScheduler& sweepScheduler,
+                      SweepChunk* sweep_chunk,
+                      LBSGroupset *groupset);
 };
 
 }

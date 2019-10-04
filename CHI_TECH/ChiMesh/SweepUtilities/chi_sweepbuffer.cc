@@ -12,9 +12,6 @@ extern ChiLog     chi_log;
 extern ChiMPI     chi_mpi;
 extern ChiConsole chi_console;
 
-#define VACUUM             301
-#define INCIDENT_ISOTROPIC 302
-
 extern double chi_global_timings[20];
 
 //###################################################################
@@ -226,7 +223,7 @@ void chi_mesh::SweepManagement::SweepBuffer::
     for (int refb=0; refb<fluds->boundary_dependencies.size(); refb++)
     {
       int b = fluds->boundary_dependencies[refb];
-      if (bndry_types[b].first == INCIDENT_ISOTROPIC)
+      if (bndry_types[b].first == BoundaryTypes::INCIDENT_ISOTROPIC)
       {
         int index_incid_iso = bndry_types[b].second;
 

@@ -366,6 +366,9 @@ CreateSweepOrder(double polar, double azimuthal,
   }
 
   //====================================== Filter dependencies for cycles
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Removing cycles.";
   if (allow_cycles)
   {
     for (int locI=0; locI<P; locI++)
@@ -404,6 +407,9 @@ CreateSweepOrder(double polar, double azimuthal,
   MPI_Barrier(MPI_COMM_WORLD);
 
   //====================================== Build task dependency graph
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Building Task Dependency Graphs.";
   CHI_D_GRAPH TDG;
   std::vector<int> glob_linear_sweep_order;
   std::vector<int> glob_sweep_order_rank;
@@ -471,9 +477,13 @@ CreateSweepOrder(double polar, double azimuthal,
   }
 
   //================================= Determine sweep order ranks
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Determining sweep order ranks.";
   int abs_max_rank = 0;
   for (int k=0; k<num_ord; k++)
   {
+    chi_log.Log(LOG_0VERBOSE_1) << k;
     int loc = glob_linear_sweep_order[k];
     if (global_dependencies[loc].size() == 0)
     {
@@ -485,6 +495,8 @@ CreateSweepOrder(double polar, double azimuthal,
       for (int dep=0; dep<global_dependencies[loc].size(); dep++)
       {
         int dep_loc = global_dependencies[loc][dep];
+        if (dep_loc <0)
+          continue;
         int dep_mapped_index = glob_order_mapping[dep_loc];
 
         if (glob_sweep_order_rank[dep_mapped_index] > max_rank)
@@ -501,6 +513,9 @@ CreateSweepOrder(double polar, double azimuthal,
   }
 
   //================================= Generate TDG structure
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)
   {
     chi_mesh::SweepManagement::STDG* new_stdg =
@@ -525,7 +540,9 @@ CreateSweepOrder(double polar, double azimuthal,
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Done computing sweep ordering.";
 
 
 

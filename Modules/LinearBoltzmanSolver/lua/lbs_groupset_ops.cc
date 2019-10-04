@@ -645,7 +645,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   else if (iter_method == NPT_GMRES_CYCLES)
   {
     groupset->allow_cycles = true;
-    groupset->iterative_method = NPT_GMRES_CYCLES;
+    groupset->iterative_method = NPT_GMRES;
   }
   else
   {

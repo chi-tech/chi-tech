@@ -32,6 +32,8 @@ if (support_cycles == nil) then
 else
     chiSurfaceMesherSetProperty(CUT_X,0.0)
     chiSurfaceMesherSetProperty(CUT_Y,0.0)
+    --chiSurfaceMesherSetProperty(CUT_X,0.5)
+    --chiSurfaceMesherSetProperty(CUT_Y,0.5)
     print("WITH_CYCLES")
 end
 
@@ -107,8 +109,19 @@ pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,6, 6)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
-chiLBSGroupsetAddGroups(phys1,gs0,0,20)
-chiLBSGroupsetSetQuadrature(phys1,gs0,pquad2)
+cur_gs = gs0
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,20)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad2)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+if (support_cycles ~= nil) then
+    chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES_CYCLES)
+end
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
+--chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+--chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 --
 --gs1 = chiLBSCreateGroupset(phys1)
 --chiLBSGroupsetAddGroups(phys1,gs1,63,167)
@@ -120,23 +133,11 @@ for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/4.0/math.pi;
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
-if (support_cycles ~= nil) then
-    chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_GMRES_CYCLES)
-end
---chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,NPT_CLASSICRICHARDSON)
---chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,LBS_CLASSICRICHARDSON)
-chiLBSSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
---chiLBSSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
-chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
---chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
-
-chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs0,3)
---chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs1,5)
 
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)

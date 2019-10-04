@@ -11,10 +11,20 @@
 
 typedef unsigned long long int u_ll_int;
 
+namespace chi_mesh::SweepManagement
+{
+
+struct BoundaryTypes
+{
+  static const int VACUUM = 1;
+  static const int INCIDENT_ISOTROPIC = 2;
+};
+
+
 //###################################################################
 /**Handles the swift communication of interprocess communication
  * related to sweeping.*/
-class chi_mesh::SweepManagement::SweepBuffer
+class SweepBuffer
 {
 private:
   chi_mesh::SweepManagement::AngleSet* angleset;
@@ -76,5 +86,5 @@ public:
   }
 
 };
-
+}
 #endif

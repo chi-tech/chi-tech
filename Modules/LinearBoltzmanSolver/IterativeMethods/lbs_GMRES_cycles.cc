@@ -72,9 +72,6 @@ void LinearBoltzman::Solver::GMRES_Cycles(int group_set_num)
   MatShellSetOperation(A, MATOP_MULT,(void (*)(void)) NPTMatrixAction_Ax_Cycles);
 
   //================================================== Initial vector assembly
-  phi_new_local.assign(phi_new_local.size(),0.0);
-  phi_oldcycle_local.resize(phi_new_local.size(),0.0);
-
   VecCreate(PETSC_COMM_WORLD,&phi_new);
   VecCreate(PETSC_COMM_WORLD,&phi_old);
   VecCreate(PETSC_COMM_WORLD,&q_fixed);
@@ -113,44 +110,10 @@ void LinearBoltzman::Solver::GMRES_Cycles(int group_set_num)
   SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
-  double new_norm = 0.0;
-  double prev_norm = 1.0;
-  bool cycles_converged = false;
-  bool sweep_once_more = false;
-  for (int k=0; k<20; k++)
-  {
-    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
-    sweepScheduler.Sweep(sweep_chunk);
-    new_norm = groupset->angle_agg->GetDelayedPsiNorm();
+  phi_new_local.assign(phi_new_local.size(),0.0);
+  sweepScheduler.Sweep(sweep_chunk);
 
-    double rel_change = 0.0;
-    if (prev_norm > 1.0e-10)
-      rel_change = std::fabs(1.0-new_norm/prev_norm);
-    prev_norm = new_norm;
-    if (new_norm<std::max(1.0e-8,1.0e-10))
-      cycles_converged = true;
-
-    std::string offset;
-    if (groupset->apply_wgdsa || groupset->apply_tgdsa)
-      offset = std::string("    ");
-
-    std::stringstream iter_info;
-    iter_info
-        << chi_program_timer.GetTimeString() << " "
-        << offset
-        << "Cyclic iteration " << std::setw(5) << k
-        << " Point-wise change " << std::setw(14) << rel_change << " " << new_norm;
-
-    if (cycles_converged)
-      iter_info << " CONVERGED\n";
-
-    chi_log.Log(LOG_0) << iter_info.str();
-
-    if (cycles_converged and (!sweep_once_more))
-      sweep_once_more = true;
-    else if (cycles_converged)
-      break;
-  }
+  ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
 
 
 

@@ -32,47 +32,12 @@ int NPTMatrixAction_Ax_Cycles(Mat matrix, Vec krylov_vector, Vec Ax)
                     LinearBoltzman::SourceFlags::USE_DLINV_SOURCE);
 
   //============================================= Sweeping the new source
-//  solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
-//  sweepScheduler->Sweep(sweep_chunk);
   groupset->angle_agg->ResetDelayedPsi();
-  double new_norm = 0.0;
-  double prev_norm = 1.0;
-  bool cycles_converged = false;
-  bool sweep_once_more = false;
-  for (int k=0; k<15; k++)
-  {
-    solver->phi_new_local.assign(solver->phi_new_local.size(),0.0); //Ensure phi_new=0.0
-    sweepScheduler->Sweep(sweep_chunk);
-    new_norm = groupset->angle_agg->GetDelayedPsiNorm();
 
-    double rel_change = 0.0;
-    if (prev_norm > 1.0e-10)
-      rel_change = std::fabs(1.0-new_norm/prev_norm);
-    prev_norm = new_norm;
-    if (new_norm<std::max(1.0e-8,1.0e-10))
-      cycles_converged = true;
+  solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
+  sweepScheduler->Sweep(sweep_chunk);
 
-    std::string offset;
-    if (groupset->apply_wgdsa || groupset->apply_tgdsa)
-      offset = std::string("    ");
-
-    std::stringstream iter_info;
-    iter_info
-        << chi_program_timer.GetTimeString() << " "
-        << offset
-        << "Cyclic iteration " << std::setw(5) << k
-        << " Point-wise change " << std::setw(14) << rel_change << " " << new_norm;
-
-    if (cycles_converged)
-      iter_info << " CONVERGED\n";
-
-    chi_log.Log(LOG_0) << iter_info.str();
-
-    if (cycles_converged and (!sweep_once_more))
-      sweep_once_more = true;
-    else if (cycles_converged)
-      break;
-  }
+  solver->ConvergeCycles(*sweepScheduler,sweep_chunk,groupset);
 
 
 

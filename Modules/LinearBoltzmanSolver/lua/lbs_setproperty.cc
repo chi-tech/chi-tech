@@ -15,8 +15,6 @@ extern ChiMath    chi_math_handler;
   #define PWLD3D 6
 
 #define PARTITION_METHOD 2
-  #define SERIAL 1
-  #define FROM_SURFACE 2
 
 #define BOUNDARY_CONDITION 3
   #define XMAX 31
@@ -25,19 +23,6 @@ extern ChiMath    chi_math_handler;
   #define YMIN 34
   #define ZMAX 35
   #define ZMIN 36
-//Already defined in chi_nptransport.h but just here for convenience
-//    #define VACUUM             301
-//    #define INCIDENT_ISOTROPIC 302
-#define GROUPSET_TOLERANCE     102
-#define GROUPSET_MAXITERATIONS 103
-#define GROUPSET_GMRESRESTART_INTVL 104
-#define GROUPSET_SUBSETS 105
-#define GROUPSET_WGDSA   106
-#define GROUPSET_TGDSA   107
-#define GROUPSET_WGDSA_MAXITERATIONS 108
-#define GROUPSET_TGDSA_MAXITERATIONS 109
-#define GROUPSET_WGDSA_TOLERANCE 110
-#define GROUPSET_TGDSA_TOLERANCE 111
 
 #define SCATTERING_ORDER 4
 
@@ -63,34 +48,6 @@ PARTITION_METHOD\n
 
 BOUNDARY_CONDITION\n
  Boundary condition type. See BoundaryIdentify.\n\n
-
-GROUPSET_ITERATIVEMETHOD\n
- Iterative method to be used by a given groupset. Expects to be followed
- by the groupset handle and IterativeMethod.\n\n
-
-GROUPSET_TOLERANCE\n
- Either Residual or pointwise tolerance to use for iterative method. Expects
- to be followed by the groupset handle and a float. Default is 1.0e-6\n\n
-
-GROUPSET_MAXITERATIONS\n
- Maximum iterations for groupset solve. Exepects to be followed by the groupset
- handle and an integer. Default is 1000.\n\n
-
-GROUPSET_GMRESRESTART_INTVL\n
- Number of GMRES iterations to accumulate Krylov vectors before restarting
- the accumulation. Default 10.\n\n
-
-GROUPSET_SUBSETS\n
- Number of subsets to use for groupset. Default 1. Expects to be followed by
- groupset handle and integer amount of subsets.\n\n
-
-GROUPSET_WGDSA\n
- Expects to be followed by a boolean flag. If true then Within-Group
- Diffusion Synthetic Acceleration will be applied. Default false.\n\n
-
-GROUPSET_TGDSA\n
- Expects to be followed by a boolean flag. If true then Two-Grid
- Diffusion Synthetic Acceleration will be applied. Default false.\n\n
 
 SCATTERING_ORDER\n
  Defines the level of harmonic expansion for the scattering source.Default 1.
@@ -126,25 +83,16 @@ Specifies the type of boundary. Depending on the type this argument needs
 to be followed by one or more values. Note: By default all boundaries are
 type VACUUM.\n
 \n
-VACUUM\n
+LBSBoundaryTypes.VACUUM\n
 Specifies a vaccuum boundary condition. It is not followed by any value.\n
 \n
 \n
-INCIDENT_ISOTROPIC\n
+LBSBoundaryTypes.INCIDENT_ISOTROPIC\n
 Incident isotropic flux. This argument needs to be followed by a lua table
 index 1 to G where G is the amount of energy groups. Note internally this
 is mapped as 0 to G-1.
 
-###IterativeMethod
-NPT_CLASSICRICHARDSON\n
-Classic richardson iteration or otherwise known as source iteration.\n
-\n
-NPT_GMRES\n
-Generalized Minimized Residual. Very robust method for converging solutions.\n
-\n
-NPT_GMRES_CYCLES\n
-Generalized Minimized Residual with cyclic dependency convergence.
-Very robust method for converging solutions.\n
+
 
 ###Note on the Eager limit
 The eager limit is the message size limit before which non-blocking MPI send
@@ -241,11 +189,12 @@ int chiLBSSetProperty(lua_State *L)
 
     int bid = bident - 31;
 
-    if (btype == VACUUM)
+    if (btype == LinearBoltzman::BoundaryTypes::VACUUM)
     {
-      solver->boundary_types[bid].first = VACUUM;
+      solver->boundary_types[bid].first = LinearBoltzman::BoundaryTypes::VACUUM;
+      chi_log.Log(LOG_0) << "Boundary set to Vacuum.";
     }
-    else if (btype == INCIDENT_ISOTROPIC)
+    else if (btype == LinearBoltzman::BoundaryTypes::INCIDENT_ISOTROPIC)
     {
       if (numArgs!=5)
         LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
@@ -297,7 +246,8 @@ int chiLBSSetProperty(lua_State *L)
 
       //bid = XMIN or XMAX or YMIN ... etc
       //index is where it is on the incident_P0_mg_boundaries stack
-      solver->boundary_types[bid].first = INCIDENT_ISOTROPIC;
+      solver->boundary_types[bid].first =
+        LinearBoltzman::BoundaryTypes::INCIDENT_ISOTROPIC;
       solver->boundary_types[bid].second= index;
 
       chi_log.Log(LOG_0)
@@ -308,268 +258,10 @@ int chiLBSSetProperty(lua_State *L)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Unsupported boundary type encountered "
-           "in call to chiLBSSetProperty";
+           "in call to " << LuaSourceInfo(L,"chiLBSSetProperty");
       exit(EXIT_FAILURE);
     }
 
-  }
-  else if (property == GROUPSET_ITERATIVEMETHOD)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD.";
-      exit(EXIT_FAILURE);
-    }
-
-    int iter_method = lua_tonumber(L,4);
-
-    if (iter_method == NPT_CLASSICRICHARDSON)
-    {
-      groupset->iterative_method = NPT_CLASSICRICHARDSON;
-    }
-    else if (iter_method == NPT_GMRES)
-    {
-      groupset->iterative_method = NPT_GMRES;
-    }
-    else if (iter_method == NPT_GMRES_CYCLES)
-    {
-      groupset->allow_cycles = true;
-      groupset->iterative_method = NPT_GMRES_CYCLES;
-    }
-    else
-    {
-      chi_log.Log(LOG_0ERROR)
-        << "Unsupported iterative method specified in call to "
-        << "chiLBSSetProperty:GROUPSET_ITERATIVEMETHOD.";
-      exit(EXIT_FAILURE);
-    }
-
-  }
-  else if (property == GROUPSET_TOLERANCE)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TOLERANCE",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_TOLERANCE.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->residual_tolerance = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_MAXITERATIONS)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_MAXITERATIONS",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_MAXITERATIONS.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->max_iterations = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_GMRESRESTART_INTVL)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_GMRESRESTART_INTVL",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_GMRESRESTART_INTVL.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->gmres_restart_intvl = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_SUBSETS)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_SUBSETS",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_SUBSETS.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->master_num_grp_subsets = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_WGDSA)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_WGDSA",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_WGDSA.";
-      exit(EXIT_FAILURE);
-    }
-
-    if (!lua_isboolean(L,4))
-    {
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid datatype supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_WGDSA. Boolean expected.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->apply_wgdsa = lua_toboolean(L,4);
-  }
-  else if (property == GROUPSET_TGDSA)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TGDSA",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_TGDSA.";
-      exit(EXIT_FAILURE);
-    }
-
-    if (!lua_isboolean(L,4))
-    {
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid datatype supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_TGDSA. Boolean expected.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->apply_tgdsa = lua_toboolean(L,4);
-  }
-  else if (property == GROUPSET_WGDSA_MAXITERATIONS)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_WGDSA_MAXITERATIONS",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_WGDSA_MAXITERATIONS.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->wgdsa_max_iters = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_TGDSA_MAXITERATIONS)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TGDSA_MAXITERATIONS",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_TGDSA_MAXITERATIONS.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->tgdsa_max_iters = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_WGDSA_TOLERANCE)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_WGDSA_TOLERANCE",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_WGDSA_TOLERANCE.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->wgdsa_tol = lua_tonumber(L,4);
-  }
-  else if (property == GROUPSET_TGDSA_TOLERANCE)
-  {
-    if (numArgs!=4)
-      LuaPostArgAmountError("chiLBSSetProperty:GROUPSET_TGDSA_TOLERANCE",
-                            4,numArgs);
-
-    int groupset_num = lua_tonumber(L,3);
-    LBSGroupset* groupset;
-    try {
-      groupset = solver->group_sets.at(groupset_num);
-    }
-    catch(const std::out_of_range& o){
-      chi_log.Log(LOG_0ERROR)
-        << "Invalid Groupset handle supplied in call to "
-        << "chiLBSSetProperty:GROUPSET_TGDSA_TOLERANCE.";
-      exit(EXIT_FAILURE);
-    }
-
-    groupset->tgdsa_tol = lua_tonumber(L,4);
   }
   else if (property == SCATTERING_ORDER)
   {
