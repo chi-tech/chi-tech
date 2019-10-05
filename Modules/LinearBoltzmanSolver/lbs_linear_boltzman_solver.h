@@ -123,7 +123,6 @@ class Solver : public chi_physics::Solver {
   SweepChunk *SetSweepChunk(int group_set_num);
   void ClassicRichardson(int group_set_num);
   void GMRES(int group_set_num);
-  void GMRES_Cycles(int group_set_num);
   void AssembleVectors(LBSGroupset *groupset);
   void AssembleVector(LBSGroupset *groupset, Vec x, double *y);
   void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);

@@ -55,10 +55,7 @@ void LinearBoltzman::Solver::SolveGroupset(int group_set_num)
   {
     GMRES(group_set_num);
   }
-  else if (group_set->iterative_method == NPT_GMRES_CYCLES)
-  {
-    GMRES_Cycles(group_set_num);
-  }
+
 
   chi_log.Log(LOG_0)
     << "Groupset solve complete.                  Process memory = "

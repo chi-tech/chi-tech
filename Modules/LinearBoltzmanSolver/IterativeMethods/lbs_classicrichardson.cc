@@ -60,9 +60,13 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
   for (int k=0; k<groupset->max_iterations; k++)
   {
     SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE);
-    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
 
+    groupset->angle_agg->ResetDelayedPsi();
+
+    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
+
+    ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
 
     if (groupset->apply_wgdsa)
     {
@@ -86,7 +90,7 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     pw_change_prev = pw_change;
 
     if (k==0) rho = 0.0;
-    if (pw_change<std::max(groupset->residual_tolerance,1.0e-10))
+    if (pw_change<std::max(groupset->residual_tolerance*rho,1.0e-10))
       converged = true;
 
     //======================================== Print iteration information

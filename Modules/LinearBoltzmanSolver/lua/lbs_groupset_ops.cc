@@ -566,6 +566,9 @@ is to be created.
 NPT_CLASSICRICHARDSON\n
 Standard source iteration.\n\n
 
+NPT_CLASSICRICHARDSON_CYCLES\n
+Standard source iteration with cyclic dependency convergence.\n\n
+
 NPT_GMRES\n
 Generalized Minimal Residual formulation for iterations.\n\n
 
@@ -636,6 +639,11 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 
   if (iter_method == NPT_CLASSICRICHARDSON)
   {
+    groupset->iterative_method = NPT_CLASSICRICHARDSON;
+  }
+  else if (iter_method == NPT_CLASSICRICHARDSON_CYCLES)
+  {
+    groupset->allow_cycles = true;
     groupset->iterative_method = NPT_CLASSICRICHARDSON;
   }
   else if (iter_method == NPT_GMRES)
