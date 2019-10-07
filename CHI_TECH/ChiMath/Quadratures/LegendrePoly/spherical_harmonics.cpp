@@ -1,7 +1,5 @@
 #include "legendrepoly.h"
-#include <math.h>
-
-#define PI 3.14159265359
+#include <cmath>
 
 double fac(int x)
 {
