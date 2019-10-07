@@ -4,7 +4,7 @@
 
 extern ChiLog chi_log;
 
-#include <math.h>
+#include <cmath>
 
 /**Master callable function that will return a reference to the abscissae and
  * weights of the discrete angles.*/
@@ -172,7 +172,7 @@ void GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_beta)
       }
 
       double xnew = xold-(a/(b-a*c));
-      if (isnan(xnew))
+      if (std::isnan(xnew))
       {
         chi_log.Log(LOG_0VERBOSE_2) << "xnew " << i << " " << xnew << " y=" << a << std::endl;
         exit(EXIT_FAILURE);

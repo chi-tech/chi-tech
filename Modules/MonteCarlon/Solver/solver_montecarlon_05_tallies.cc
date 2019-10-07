@@ -28,7 +28,7 @@ void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
 
   phi_tally_contrib[ir] += (tracklength*prtcl->w);
 
-  if (isnan(tracklength))
+  if (std::isnan(tracklength))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Tracklength corruption."
@@ -123,7 +123,7 @@ void chi_montecarlon::Solver::ComputeRelativeStdDev()
 
       double stddev = sqrt((x2_avg - x_avg*x_avg)/nps_global);
 
-      if (!isinf(stddev/x_avg))
+      if (!std::isinf(stddev/x_avg))
       {
         phi_local_relsigma[ir] = stddev/x_avg;
 
@@ -140,7 +140,7 @@ void chi_montecarlon::Solver::ComputeRelativeStdDev()
       }
 
 
-      if (isinf(phi_local_relsigma[ir]))
+      if (std::isinf(phi_local_relsigma[ir]))
       {
         printf("Infinite lc=%d g=%d\n", lc,g);
         chi_log.Log(LOG_ALL) << "stddev=" << stddev << "\n";

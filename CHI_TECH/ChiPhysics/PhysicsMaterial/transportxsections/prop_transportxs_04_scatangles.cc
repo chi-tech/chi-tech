@@ -180,7 +180,7 @@ double chi_physics::TransportCrossSections::
     }
   }
 
-  if (isnan(mu))
+  if (std::isnan(mu))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Mu corruption in GolubFischer sample mu.\n"
