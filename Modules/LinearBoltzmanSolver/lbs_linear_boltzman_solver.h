@@ -52,8 +52,6 @@ class Solver : public chi_physics::Solver {
   chi_mesh::MeshContinuum *grid;
   std::vector<LinearBoltzman::CellViewBase *> cell_transport_views;
 
-  std::vector<int> local_cell_indices;
-
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeBuffers
   //A default 0.0 incident boundary is loaded at the back of
   //the stack to use as default. This is loaded during initparrays
@@ -69,7 +67,7 @@ class Solver : public chi_physics::Solver {
 
   Vec phi_new, phi_old, q_fixed;
   std::vector<double> q_moments_local;
-  std::vector<double> phi_new_local, phi_old_local, phi_oldcycle_local;
+  std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
 
   std::vector<int> local_cell_phi_dof_array_address;
@@ -123,7 +121,6 @@ class Solver : public chi_physics::Solver {
   SweepChunk *SetSweepChunk(int group_set_num);
   void ClassicRichardson(int group_set_num);
   void GMRES(int group_set_num);
-  void AssembleVectors(LBSGroupset *groupset);
   void AssembleVector(LBSGroupset *groupset, Vec x, double *y);
   void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);
   void DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double *x_src, double *y);
