@@ -40,6 +40,10 @@ MC_RESID_MOC\n
  Uses a field-function for computing a residual but uses the Method of
  Characteristics to trace the uncollided portions.\n\n
 
+MC_RESID_MOC_SU\n
+ Same as above but will sample the domain uniformly and adjust the weights of
+ each individual particle.\n\n
+
 \return Handle int Handle to the created source.
 \ingroup LuaMonteCarlon
 \author Jan*/
@@ -164,7 +168,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
   {
     if (num_args < 3)
       LuaPostArgAmountError("chiMonteCarlonCreateSource-"
-                            "MC_RESID_SRC_SU",
+                            "MC_RESID_MOC",
                             3,num_args);
 
     int ff_handle = lua_tonumber(L,3);
@@ -186,6 +190,41 @@ int chiMonteCarlonCreateSource(lua_State *L)
 
     chi_montecarlon::ResidualMOCSource* new_source = new
       chi_montecarlon::ResidualMOCSource(ff);
+
+    solver->sources.push_back(new_source);
+    lua_pushnumber(L,solver->sources.size()-1);
+
+    chi_log.Log(LOG_0) << "MonteCarlo-created residual source.";
+
+  }
+    //============================================= Residual source
+    //                                              MOC Uniform sampling
+  else if (source_type == MC_RESID_MOC_SU)
+  {
+    if (num_args < 3)
+      LuaPostArgAmountError("chiMonteCarlonCreateSource-"
+                            "MC_RESID_MOC_SU",
+                            3,num_args);
+
+    int ff_handle = lua_tonumber(L,3);
+    size_t ff_stack_size = chi_physics_handler.fieldfunc_stack.size();
+
+
+    chi_physics::FieldFunction* ff;
+    try {
+      ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
+    }
+
+    catch (std::out_of_range o)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Invalid field function handle supplied in call to "
+           "chiMonteCarlonCreateSource-MC_RESID_MOC_SU";
+      exit(EXIT_FAILURE);
+    }
+
+    chi_montecarlon::ResidualMOCSource* new_source = new
+      chi_montecarlon::ResidualMOCSource(ff,true);
 
     solver->sources.push_back(new_source);
     lua_pushnumber(L,solver->sources.size()-1);

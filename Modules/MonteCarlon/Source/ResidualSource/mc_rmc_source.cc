@@ -305,7 +305,21 @@ void chi_montecarlon::ResidualSource::
 //###################################################################
 /**Executes a source sampling for the residual source.*/
 chi_montecarlon::Particle chi_montecarlon::ResidualSource::
-  CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
+CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
+{
+  chi_montecarlon::Particle new_particle;
+  if (sample_uniformly)
+    new_particle = UniformSampling(rng);
+  else
+    new_particle = DirectSampling(rng);
+
+  return new_particle;
+}
+
+//###################################################################
+/**Executes a source sampling for the residual source.*/
+chi_montecarlon::Particle chi_montecarlon::ResidualSource::
+  DirectSampling(chi_montecarlon::RandomNumberGenerator* rng)
 {
   int num_local_cells = grid->local_cell_glob_indices.size();
   int lc = 0;
@@ -448,3 +462,154 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
   return new_particle;
 }
 
+
+//###################################################################
+/**Executes a source sampling for the residual source.*/
+chi_montecarlon::Particle chi_montecarlon::ResidualSource::
+UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
+{
+  int num_local_cells = grid->local_cell_glob_indices.size();
+  int lc = 0;
+  double sampling_normalization;
+
+  if (true) {
+    lc = std::floor( rng->Rand()*(num_local_cells) );
+    sampling_normalization = num_local_cells*total_residual;
+  }
+  else {
+    lc = residual_sampler->Sample(rng->Rand());
+    sampling_normalization = total_residual;
+  }
+
+  int cell_glob_index = grid->local_cell_glob_indices[lc];
+  auto cell = grid->cells[cell_glob_index];
+
+  chi_montecarlon::Particle new_particle;
+
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
+  if (cell->Type() == chi_mesh::CellType::SLAB)
+  {
+    auto slab_cell = (chi_mesh::CellSlab*)cell;
+
+    int v0i = slab_cell->v_indices[0];
+    int v1i = slab_cell->v_indices[1];
+
+    chi_mesh::Vertex v0 = *grid->nodes[v0i];
+    chi_mesh::Vertex v1 = *grid->nodes[v1i];
+
+    double rn = rng->Rand();
+
+    double center_res = std::fabs(cell_interior_residual[lc]);
+    double surfL_res  = std::fabs(cell_surface_residualL[lc]);
+    double surfR_res  = std::fabs(cell_surface_residualR[lc]);
+
+    double cell_R = center_res + surfL_res + surfR_res;
+
+
+
+    if (cell_R < 1.0e-16) {
+      new_particle.alive = false;
+      return new_particle;
+    }
+
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CENTER
+    if (rn < 0.3333333)
+    {
+      //====================================== Sample direction
+      double costheta = 2.0*rng->Rand() - 1.0;
+      double theta    = acos(costheta);
+      double varphi   = rng->Rand()*2.0*M_PI;
+
+      chi_mesh::Vector ref_dir;
+      ref_dir.x = sin(theta)*cos(varphi);
+      ref_dir.y = sin(theta)*sin(varphi);
+      ref_dir.z = cos(theta);
+
+      //====================================== Sample position
+      double w = rng->Rand();
+      new_particle.pos = v0*w + v1*(1.0-w);
+
+      //====================================== Set quantities
+      new_particle.dir = ref_dir;
+
+      new_particle.egrp = 0;
+      new_particle.w = sampling_normalization*
+                       ((cell_interior_residual[lc]<0.0) ? -1.0:1.0)*
+                       (cell_R/total_residual)*(3.0*center_res/cell_R);
+//      new_particle.w = std::fabs(sampling_normalization);
+      new_particle.cur_cell_ind = cell_glob_index;
+//      new_particle.alive = false;
+      particles_C++;
+
+      return new_particle;
+    }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LEFT
+    else if (rn < 0.666666666)
+//    if (rn < (0.5))
+    {
+      //====================================== Sample direction
+      double costheta = rng->Rand();
+      double theta    = acos(sqrt(costheta));
+      double varphi   = rng->Rand()*2.0*M_PI;
+
+      chi_mesh::Vector ref_dir;
+      ref_dir.x = sin(theta)*cos(varphi);
+      ref_dir.y = sin(theta)*sin(varphi);
+      ref_dir.z = cos(theta);
+
+      //====================================== Set position
+      new_particle.pos = v0+chi_mesh::Vector(0,0,1.0e-8);
+
+      //====================================== Set quantities
+      new_particle.dir = ref_dir;
+
+      new_particle.egrp = 0;
+      new_particle.w = sampling_normalization*
+                       ((cell_surface_residualL[lc]<0.0) ? -1.0:1.0)*
+                       (cell_R/total_residual)*(3.0*surfL_res/cell_R);
+//      new_particle.w = std::fabs(sampling_normalization);
+      new_particle.cur_cell_ind = cell_glob_index;
+//      new_particle.alive = false;
+      particles_L++;
+      weights_L += new_particle.w;
+
+      return new_particle;
+    }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RIGHT
+    else
+    {
+      //====================================== Sample direction
+      double costheta = rng->Rand();
+      double theta    = acos(-sqrt(costheta));
+      double varphi   = rng->Rand()*2.0*M_PI;
+
+      chi_mesh::Vector ref_dir;
+      ref_dir.x = sin(theta)*cos(varphi);
+      ref_dir.y = sin(theta)*sin(varphi);
+      ref_dir.z = cos(theta);
+
+      //====================================== Set position
+      new_particle.pos = v1-chi_mesh::Vector(0,0,1.0e-8);
+
+      //====================================== Set quantities
+      new_particle.dir = ref_dir;
+
+      new_particle.egrp = 0;
+      new_particle.w = sampling_normalization*
+                       ((cell_surface_residualR[lc]<0.0) ? -1.0:1.0)*
+                       (cell_R/total_residual)*(3.0*surfR_res/cell_R);
+//      new_particle.w = std::fabs(sampling_normalization);
+      new_particle.cur_cell_ind = cell_glob_index;
+//      new_particle.alive = false;
+      particles_R++;
+      weights_R += new_particle.w;
+
+      return new_particle;
+    }
+
+
+  }
+
+  return new_particle;
+}

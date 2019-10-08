@@ -35,6 +35,12 @@ public:
                   SpatialDiscretization_FV*   ref_fv_sdm);
   chi_montecarlon::Particle
   CreateParticle(chi_montecarlon::RandomNumberGenerator* rng);
+
+  chi_montecarlon::Particle
+  UniformSampling(chi_montecarlon::RandomNumberGenerator* rng);
+
+  chi_montecarlon::Particle
+  DirectSampling(chi_montecarlon::RandomNumberGenerator* rng);
 };
 
 

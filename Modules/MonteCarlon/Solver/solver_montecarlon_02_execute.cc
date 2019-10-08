@@ -40,7 +40,7 @@ void chi_montecarlon::Solver::Execute()
 //        << "Src particle " << prtcl.pos.PrintS()
 //        << " " << prtcl.dir << " " << prtcl.cur_cell_ind;
 //      usleep(100000);
-      if (isnan(prtcl.dir.x))
+      if (std::isnan(prtcl.dir.x))
       {
         chi_log.Log(LOG_ALLERROR)
           << "Particle dir corrupt.";

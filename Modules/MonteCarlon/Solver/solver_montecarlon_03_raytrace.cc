@@ -43,7 +43,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   double d_to_intract = -1.0*log(1.0-rng0.Rand())/sigt;
   double d_to_surface = 1.0e15;
 
-  if (isnan(prtcl->dir.x))
+  if (std::isnan(prtcl->dir.x))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Particle dir corrupt before raytrace.";
@@ -64,14 +64,14 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
     exit(EXIT_FAILURE);
   }
 
-  if (isnan(prtcl->dir.x))
+  if (std::isnan(prtcl->dir.x))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Particle dir corrupt after raytrace.";
     exit(EXIT_FAILURE);
   }
 
-  if (isnan(d_to_intract))
+  if (std::isnan(d_to_intract))
   {
     chi_log.Log(LOG_ALLERROR)
       << "d_to_interact corrupt.";
@@ -93,7 +93,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   {
     posf = prtcl->pos + prtcl->dir*d_to_intract;
 
-    if (isnan(posf.x))
+    if (std::isnan(posf.x))
     {
       chi_log.Log(LOG_ALLERROR)
         << "Posf corruption after interaction tracking. "
@@ -111,7 +111,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
       ef   = e_dir.first;
       dirf = e_dir.second;
 
-      if (isnan(dirf.x))
+      if (std::isnan(dirf.x))
       {
         chi_log.Log(LOG_ALLERROR)
           << "Particle dir corrupt after scattering.";

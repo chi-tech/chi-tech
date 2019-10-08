@@ -16,6 +16,7 @@
 #define MC_RESID_SRC    4
 #define MC_RESID_SRC_SU 5
 #define MC_RESID_MOC    6
+#define MC_RESID_MOC_SU 7
 
 //######################################################### Class Def
 /**Parent Monte carlo source.

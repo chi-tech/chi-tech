@@ -205,7 +205,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
             cell_dof_phi[lc][f] =
               0.5*field[cur_cell_mapping[f]] +
               0.5*field[adj_cell_mapping_f[f][abs(f-1)]];
-            cell_dof_phi[lc][f] = 0.0; //TODO: remove if RMC
+//            cell_dof_phi[lc][f] = 0.0; //TODO: remove if RMC
           }
           else
           {
@@ -218,7 +218,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
             cell_dof_phi[lc][f] = 0.5*field[cur_cell_mapping[f]] +
                                   0.5*phi_adj;
 
-            cell_dof_phi[lc][f] = 0.0; //TODO: remove before flight
+//            cell_dof_phi[lc][f] = 0.0; //TODO: remove before flight
 
 
           }
@@ -427,6 +427,20 @@ chi_montecarlon::Particle chi_montecarlon::ResidualMOCSource::
 CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
 {
   chi_montecarlon::Particle new_particle;
+  if (sample_uniformly)
+    new_particle = UniformSampling(rng);
+  else
+    new_particle = DirectSampling(rng);
+
+  return new_particle;
+}
+
+//###################################################################
+/**Executes a source sampling for the residual source.*/
+chi_montecarlon::Particle chi_montecarlon::ResidualMOCSource::
+DirectSampling(chi_montecarlon::RandomNumberGenerator* rng)
+{
+  chi_montecarlon::Particle new_particle;
 
   int num_local_cells = grid->local_cell_glob_indices.size();
   int lc = 0;
@@ -489,10 +503,68 @@ CreateParticle(chi_montecarlon::RandomNumberGenerator* rng)
 
   }
 
-
-
-//  new_particle.alive = false;
-
   return new_particle;
 }
 
+
+//###################################################################
+/**Executes a source sampling for the residual source.*/
+chi_montecarlon::Particle chi_montecarlon::ResidualMOCSource::
+UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
+{
+  chi_montecarlon::Particle new_particle;
+
+  int num_local_cells = grid->local_cell_glob_indices.size();
+  int lc = 0;
+  lc = std::floor( rng->Rand()*(num_local_cells) );
+//  lc = cell_sampler->Sample(rng->Rand());
+
+  int cell_glob_index = grid->local_cell_glob_indices[lc];
+  auto cell = grid->cells[cell_glob_index];
+
+
+  //====================================== Sample direction
+  double costheta = 2.0*rng->Rand() - 1.0;
+  double theta    = acos(costheta);
+  double varphi   = rng->Rand()*2.0*M_PI;
+
+  chi_mesh::Vector ref_dir;
+  ref_dir.x = sin(theta)*cos(varphi);
+  ref_dir.y = sin(theta)*sin(varphi);
+  ref_dir.z = cos(theta);
+
+  new_particle.dir = ref_dir;
+
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
+  if (cell->Type() == chi_mesh::CellType::SLAB)
+  {
+    auto slab_cell = (chi_mesh::CellSlab*)cell;
+
+    int v0i = slab_cell->v_indices[0];
+    int v1i = slab_cell->v_indices[1];
+
+    chi_mesh::Vertex v0 = *grid->nodes[v0i];
+    chi_mesh::Vertex v1 = *grid->nodes[v1i];
+
+    //====================================== Sample position
+    double dz = (v1-v0).Norm();
+    double dzstar = (v1-v0).Norm()/num_subdivs;
+    double w = rng->Rand();
+
+    double sampling_normalization = total_abs_source*num_local_cells;
+    double z=0.0;
+    int i = std::floor(rng->Rand()*num_subdivs);
+    z = cell_z_i_star[lc][i] + w*dzstar;
+    sampling_normalization *= dz*
+                              cell_subintvl_source[lc][i]*num_subdivs/
+                              total_abs_source;
+
+    new_particle.pos = chi_mesh::Vector(0.0,0.0,z);
+    new_particle.egrp = 0;
+    new_particle.w = sampling_normalization;
+
+    new_particle.cur_cell_ind = cell_glob_index;
+  }
+
+  return new_particle;
+}
