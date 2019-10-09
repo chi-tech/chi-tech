@@ -217,34 +217,6 @@ void chi_mesh::SweepManagement::SweepBuffer::
         fluds->deplocI_face_dof_count[deplocI]*num_grps*num_angles,0.0);
     }
 
-    //============================ Set incident boundaries size
-    std::vector<std::pair<int,int>>& bndry_types = *angleset->ref_boundary_types;
-    angleset->boundryI_incoming_psi.resize(6,std::vector<double>(1,0.0));
-    for (int refb=0; refb<fluds->boundary_dependencies.size(); refb++)
-    {
-      int b = fluds->boundary_dependencies[refb];
-      if (bndry_types[b].first == BoundaryTypes::INCIDENT_ISOTROPIC)
-      {
-        int index_incid_iso = bndry_types[b].second;
-
-        angleset->boundryI_incoming_psi[b].clear();
-
-        std::copy(
-          (*angleset->ref_incident_P0_mg_boundaries)[index_incid_iso].begin(),
-          (*angleset->ref_incident_P0_mg_boundaries)[index_incid_iso].end(),
-          std::back_inserter(angleset->boundryI_incoming_psi[b]));
-      }
-      else
-      {
-        angleset->boundryI_incoming_psi[b].clear();
-
-        std::copy(
-          (*angleset->ref_incident_P0_mg_boundaries).back().begin(),
-          (*angleset->ref_incident_P0_mg_boundaries).back().end(),
-          std::back_inserter(angleset->boundryI_incoming_psi[b]));
-      }
-    }
-
     //================================================ Make a memory query
     double memory_mb = chi_console.GetMemoryUsageInMB();
 

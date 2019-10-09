@@ -3,8 +3,12 @@
 
 #include "../chi_mesh.h"
 #include "chi_sweepbuffer.h"
+#include "chi_sweep_boundaries.h"
+#include <ChiMesh/SweepUtilities/chi_FLUDS.h>
 
 #include <chi_mpi.h>
+
+typedef chi_mesh::SweepManagement::BoundaryBase SweepBndry;
 
 //###################################################################
 /**Manages the workstages of a single angle set.*/
@@ -20,8 +24,7 @@ private:
 public:
   FLUDS*                                 fluds;
   std::vector<int>                       angles;
-  std::vector<std::pair<int,int>>*       ref_boundary_types;
-  std::vector<std::vector<double>>*      ref_incident_P0_mg_boundaries;
+  std::vector<SweepBndry*>&              ref_boundaries;
   int                                    ref_subset;
 
   //FLUDS
@@ -36,18 +39,24 @@ public:
   AngleSet(int in_numgrps,
            int in_ref_subset,
            SPDS* in_spds,
-           std::vector<std::pair<int,int>>* sim_boundary_types,
-           std::vector<std::vector<double>>* incident_P0_mg_boundaries,
+           std::vector<int>& angle_indices,
+           std::vector<SweepBndry*>& sim_boundaries,
            int sweep_eager_limit,
            ChiMPICommunicatorSet* in_comm_set):
-           sweep_buffer(this,sweep_eager_limit,in_comm_set)
+           sweep_buffer(this,sweep_eager_limit,in_comm_set),
+           ref_boundaries(sim_boundaries)
   {
     num_grps = in_numgrps;
     spds     = in_spds;
-    ref_boundary_types = sim_boundary_types;
-    ref_incident_P0_mg_boundaries = incident_P0_mg_boundaries;
     executed = false;
     ref_subset = in_ref_subset;
+    std::copy(angle_indices.begin(),
+              angle_indices.end(),
+              std::back_inserter(angles));
+
+    fluds = new chi_mesh::SweepManagement::FLUDS(num_grps);
+    fluds->InitializeAlphaElements(spds);
+    fluds->InitializeBetaElements(spds);
   };
 
   void InitializeDelayedUpstreamData();
@@ -80,7 +89,7 @@ public:
   double* PsiBndry(int bndry_face_count, int bndry_map,
                       int face_dof, int g,int angle_num)
   {
-    double* Psi = &boundryI_incoming_psi[bndry_map].data()[g];
+    double* Psi = &ref_boundaries[bndry_map]->boundary_flux.data()[g];
     return Psi;
   }
 

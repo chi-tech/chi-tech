@@ -189,12 +189,12 @@ int chiLBSSetProperty(lua_State *L)
 
     int bid = bident - 31;
 
-    if (btype == LinearBoltzman::BoundaryTypes::VACUUM)
+    if (btype == (int)LinearBoltzman::BoundaryType::VACUUM)
     {
-      solver->boundary_types[bid].first = LinearBoltzman::BoundaryTypes::VACUUM;
+      solver->boundary_types[bid].first = LinearBoltzman::BoundaryType::VACUUM;
       chi_log.Log(LOG_0) << "Boundary set to Vacuum.";
     }
-    else if (btype == LinearBoltzman::BoundaryTypes::INCIDENT_ISOTROPIC)
+    else if (btype == (int)LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
     {
       if (numArgs!=5)
         LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
@@ -247,7 +247,7 @@ int chiLBSSetProperty(lua_State *L)
       //bid = XMIN or XMAX or YMIN ... etc
       //index is where it is on the incident_P0_mg_boundaries stack
       solver->boundary_types[bid].first =
-        LinearBoltzman::BoundaryTypes::INCIDENT_ISOTROPIC;
+        LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC;
       solver->boundary_types[bid].second= index;
 
       chi_log.Log(LOG_0)

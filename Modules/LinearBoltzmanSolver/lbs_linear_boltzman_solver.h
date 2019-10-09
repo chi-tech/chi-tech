@@ -9,6 +9,7 @@
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
 #include "ChiMesh/SweepUtilities/chi_sweep.h"
+#include "ChiMesh/SweepUtilities/chi_sweep_boundaries.h"
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 
 #include <petscksp.h>
@@ -18,10 +19,10 @@ typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
 
 namespace LinearBoltzman
 {
-struct BoundaryTypes
+enum class BoundaryType
 {
-  static const int VACUUM = 1;
-  static const int INCIDENT_ISOTROPIC = 2;
+  VACUUM = 1,
+  INCIDENT_ISOTROPIC = 2
 };
 struct SourceFlags
 {
@@ -55,9 +56,10 @@ class Solver : public chi_physics::Solver {
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeBuffers
   //A default 0.0 incident boundary is loaded at the back of
   //the stack to use as default. This is loaded during initparrays
-  std::vector<std::pair<int, int>> boundary_types;
-  std::vector<std::vector<double>> incident_P0_mg_boundaries;
-  std::vector<chi_mesh::SweepManagement::SPDS *> sweep_orderings;
+  std::vector<std::pair<BoundaryType, int>>     boundary_types;
+  std::vector<std::vector<double>>              incident_P0_mg_boundaries;
+  std::vector<chi_mesh::SweepManagement::SPDS*> sweep_orderings;
+  std::vector<SweepBndry*>                      sweep_boundaries;
 
   ChiMPICommunicatorSet comm_set;
 

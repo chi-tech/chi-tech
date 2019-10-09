@@ -91,8 +91,24 @@ int LinearBoltzman::Solver::InitializeParrays()
 
   //================================================== Initialize default
   //                                                   incident boundary
+  typedef chi_mesh::SweepManagement::BoundaryVacuum SweepVacuumBndry;
+  typedef chi_mesh::SweepManagement::BoundaryIncidentHomogenous SweepIncHomoBndry;
+  std::vector<std::vector<double>>& flux_vec = incident_P0_mg_boundaries;
+
+  // Defining default Vacuum boundary
   std::vector<double> zero_boundary(G,0.0);
-  incident_P0_mg_boundaries.push_back(zero_boundary);
+  flux_vec.push_back(zero_boundary);
+
+  // For boundaries
+  for (auto bndry_type : boundary_types)
+  {
+    int vec_index = bndry_type.second;
+
+    if (bndry_type.first == LinearBoltzman::BoundaryType::VACUUM)
+      sweep_boundaries.push_back(new SweepVacuumBndry(flux_vec.back()));
+    else if (bndry_type.first == LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
+      sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
+  }
 
   //================================================== Initialize transport views
   int num_grps = groups.size();

@@ -50,23 +50,26 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
       {
         for (int an_ss=0; an_ss<groupset->ang_subsets_top.size(); an_ss++)
         {
+          std::vector<int> angle_indices;
+
           //============================================= Each quadrant gets 1/4 of azi angles
           int a = azi+q*d_azi;   //azimuthal angle index
+          AngSubSet angle_subset = groupset->ang_subsets_top[an_ss];
+          for (int p=angle_subset.first; p<=angle_subset.second; p++)
+          {
+            int angle_num = groupset->quadrature->GetAngleNum(p,a);
+            angle_indices.push_back(angle_num);
+          }//for pr
+
+
           TAngleSet* angleSet =
             new TAngleSet(groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
                           sweep_orderings[a],
-                          &boundary_types,
-                          &incident_P0_mg_boundaries,
+                          angle_indices,
+                          sweep_boundaries,
                           options.sweep_eager_limit,
                           &comm_set);
-
-          AngSubSet angle_set = groupset->ang_subsets_top[an_ss];
-          for (int p=angle_set.first; p<=angle_set.second; p++)
-          {
-            int angle_num = groupset->quadrature->GetAngleNum(p,a);
-            angleSet->angles.push_back(angle_num);
-          }//for pr
 
           angle_set_group->angle_sets.push_back(angleSet);
         }//for an_ss
@@ -84,23 +87,24 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
       {
         for (int an_ss=0; an_ss<groupset->ang_subsets_bot.size(); an_ss++)
         {
+          std::vector<int> angle_indices;
+
           //============================================= Each quadrant gets 1/4 of azi angles
           int a = azi+q*d_azi;   //azimuthal angle index
+          AngSubSet angle_subset = groupset->ang_subsets_bot[an_ss];
+          for (int p=angle_subset.first; p<=angle_subset.second; p++)
+          {
+            int angle_num = groupset->quadrature->GetAngleNum(p,a);
+            angle_indices.push_back(angle_num);
+          }//for pr
           TAngleSet* angleSet =
             new TAngleSet(groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
                           sweep_orderings[a+num_azi],
-                          &boundary_types,
-                          &incident_P0_mg_boundaries,
+                          angle_indices,
+                          sweep_boundaries,
                           options.sweep_eager_limit,
                           &comm_set);
-
-          AngSubSet angle_set = groupset->ang_subsets_bot[an_ss];
-          for (int p=angle_set.first; p<=angle_set.second; p++)
-          {
-            int angle_num = groupset->quadrature->GetAngleNum(p,a);
-            angleSet->angles.push_back(angle_num);
-          }//for pr
 
           angle_set_group->angle_sets.push_back(angleSet);
         }//for an_ss
@@ -139,20 +143,21 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
       {
         for (int gs_ss=0; gs_ss<groupset->grp_subsets.size(); gs_ss++)
         {
+          std::vector<int> angle_indices;
+
           //============================================= Each quadrant gets 1/4 of azi angles
           int a = azi+q*d_azi;   //azimuthal angle index
-          TAngleSet* angleSet =
-            new TAngleSet(groupset->groups.size(),
-                          gs_ss,
-                          sweep_orderings[a],
-                          &boundary_types,
-                          &incident_P0_mg_boundaries,
-                          options.sweep_eager_limit,
-                          &comm_set);
-
           int p = pa - pr - 1;
           int angle_num = groupset->quadrature->GetAngleNum(p,a);
-          angleSet->angles.push_back(angle_num);
+          angle_indices.push_back(angle_num);
+          TAngleSet* angleSet =
+            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+                          gs_ss,
+                          sweep_orderings[a],
+                          angle_indices,
+                          sweep_boundaries,
+                          options.sweep_eager_limit,
+                          &comm_set);
 
           angle_set_group->angle_sets.push_back(angleSet);
         }
@@ -175,20 +180,21 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
       {
         for (int gs_ss=0; gs_ss<groupset->grp_subsets.size(); gs_ss++)
         {
+          std::vector<int> angle_indices;
+
           //============================================= Each quadrant gets 1/4 of azi angles
           int a = azi+q*d_azi;   //azimuthal angle index
-          TAngleSet* angleSet =
-            new TAngleSet(groupset->groups.size(),
-                          gs_ss,
-                          sweep_orderings[a+num_azi],
-                          &boundary_types,
-                          &incident_P0_mg_boundaries,
-                          options.sweep_eager_limit,
-                          &comm_set);
-
           int p = pa + pr;
           int angle_num = groupset->quadrature->GetAngleNum(p,a);
-          angleSet->angles.push_back(angle_num);
+          angle_indices.push_back(angle_num);
+          TAngleSet* angleSet =
+            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+                          gs_ss,
+                          sweep_orderings[a+num_azi],
+                          angle_indices,
+                          sweep_boundaries,
+                          options.sweep_eager_limit,
+                          &comm_set);
 
           angle_set_group->angle_sets.push_back(angleSet);
         }

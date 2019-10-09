@@ -12,8 +12,17 @@
 
 typedef chi_mesh::SweepManagement::AngleAggregation AngleAgg;
 
-#define NPT_ANGAGG_SINGLE 1
-#define NPT_ANGAGG_POLAR 2
+//#define NPT_ANGAGG_SINGLE 1
+//#define NPT_ANGAGG_POLAR 2
+
+namespace LinearBoltzman
+{
+  enum class AngleAggregationType
+  {
+    SINGLE = 1,
+    POLAR = 2
+  };
+}
 
 typedef std::pair<int,int> GsSubSet;
 typedef std::pair<int,int> AngSubSet;
@@ -40,7 +49,7 @@ public:
   std::vector<int>                             ang_subset_sizes_bot;
 
   int                                          iterative_method;
-  int                                          angleagg_method;
+  LinearBoltzman::AngleAggregationType         angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;
   int                                          gmres_restart_intvl;

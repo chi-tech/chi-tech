@@ -11,7 +11,7 @@ LBSGroupset::LBSGroupset()
 {
   quadrature = nullptr;
   iterative_method = NPT_GMRES;
-  angleagg_method  = NPT_ANGAGG_POLAR;
+  angleagg_method  = LinearBoltzman::AngleAggregationType::POLAR;
   angle_agg = new AngleAgg;
   master_num_grp_subsets = 1;
   master_num_ang_subsets = 1;
@@ -295,9 +295,10 @@ void LBSGroupset::BuildSubsets()
     ang_subsets_top.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
     ang_subset_sizes_top.push_back(subset_size);
 
-    chi_log.Log(LOG_0)
-      << "Top-hemi Angle subset " << ss << " "
-      << subset_ranki << "->" << subset_ranki+subset_size-1;
+    if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
+      chi_log.Log(LOG_0)
+        << "Top-hemi Angle subset " << ss << " "
+        << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
 
   //==================== Bottom hemisphere
@@ -312,8 +313,9 @@ void LBSGroupset::BuildSubsets()
     ang_subsets_bot.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
     ang_subset_sizes_bot.push_back(subset_size);
 
-    chi_log.Log(LOG_0)
-      << "Bot-hemi Angle subset " << ss << " "
-      << subset_ranki << "->" << subset_ranki+subset_size-1;
+    if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
+      chi_log.Log(LOG_0)
+        << "Bot-hemi Angle subset " << ss << " "
+        << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
 }

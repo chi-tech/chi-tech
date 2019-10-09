@@ -15,5 +15,5 @@ LinearBoltzman::Solver::Solver()
   discretization = nullptr;
 
   boundary_types.resize(6,
-    std::pair<int,int>(LinearBoltzman::BoundaryTypes::VACUUM,-1));
+    std::pair<BoundaryType,int>(LinearBoltzman::BoundaryType::VACUUM,-1));
 }

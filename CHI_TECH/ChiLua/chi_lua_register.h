@@ -261,10 +261,14 @@ RegisterFunction(chiLBSGetScalarFieldFunctionList)
 
 //module:Linear Boltzman Solver - Groupset manipulation
 //\ref LuaLBSGroupsets Main page
+RegisterNamespace(LBSGroupset)
 RegisterFunction(chiLBSCreateGroup)
 RegisterFunction(chiLBSCreateGroupset)
 RegisterFunction(chiLBSGroupsetAddGroups)
 RegisterFunction(chiLBSGroupsetSetQuadrature)
+RegisterFunction(chiLBSGroupsetSetAngleAggregationType)
+  AddNamedConstantToNamespace(ANGLE_AGG_SINGLE,1,LBSGroupset)
+  AddNamedConstantToNamespace(ANGLE_AGG_POLAR ,2,LBSGroupset)
 RegisterFunction(chiLBSGroupsetSetAngleAggDiv)
 RegisterFunction(chiLBSGroupsetSetGroupSubsets)
 RegisterFunction(chiLBSGroupsetSetIterativeMethod)

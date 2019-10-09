@@ -368,6 +368,106 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
 }
 
 //###################################################################
+/**Sets the the type of angle aggregation to use for this groupset.
+\param SolverIndex int Handle to the solver for which the group
+is to be created.
+
+\param GroupsetIndex int Index to the groupset to which this function should
+                         apply
+\param AggregationType int See AggregationType.
+
+##_
+
+###AggregationType
+LBSGroupset.ANGLE_AGG_POLAR\n
+ Use Polar angle aggregation. This is the default.\n\n
+
+LBSGroupset.ANGLE_AGG_SINGLE\n
+ Use Single angle aggregation.\n\n
+
+Example:
+\code
+chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_POLAR)
+\endcode
+
+\ingroup LuaLBSGroupsets
+*/
+int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
+{
+  //============================================= Get arguments
+  int num_args = lua_gettop(L);
+  if (num_args != 3)
+    LuaPostArgAmountError("chiLBSGroupsetSetAngleAggregationType",3,num_args);
+
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,3);
+  int solver_index = lua_tonumber(L,1);
+  int grpset_index = lua_tonumber(L,2);
+  int agg_type = lua_tonumber(L,3);
+
+  //============================================= Get pointer to solver
+  chi_physics::Solver* psolver;
+  LinearBoltzman::Solver* solver;
+  try{
+    psolver = chi_physics_handler.solver_stack.at(solver_index);
+
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
+    {
+      solver = (LinearBoltzman::Solver*)(psolver);
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Incorrect solver-type "
+        << "in call to chiLBSGroupsetSetAngleAggregationType";
+      exit(EXIT_FAILURE);
+    }
+  }
+  catch(const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid handle to solver "
+      << "in call to chiLBSGroupsetSetAngleAggregationType";
+    exit(EXIT_FAILURE);
+  }
+
+  //============================================= Obtain pointer to groupset
+  LBSGroupset* groupset;
+  try{
+    groupset = solver->group_sets.at(grpset_index);
+  }
+  catch (const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid handle to groupset "
+      << "in call to chiLBSGroupsetSetAngleAggregationType";
+    exit(EXIT_FAILURE);
+  }
+
+  //============================================= Setting aggregation type
+  if      (agg_type == (int)LinearBoltzman::AngleAggregationType::SINGLE)
+    groupset->angleagg_method = LinearBoltzman::AngleAggregationType::SINGLE;
+  else if (agg_type == (int)LinearBoltzman::AngleAggregationType::POLAR)
+    groupset->angleagg_method = LinearBoltzman::AngleAggregationType::POLAR;
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid aggregation type to groupset " << grpset_index
+      << " in call to chiLBSGroupsetSetAngleAggregationType";
+    exit(EXIT_FAILURE);
+  }
+
+  chi_log.Log(LOG_0)
+    << "Groupset " << grpset_index
+    << " Angle aggregation set to "
+    << agg_type;
+
+
+  return 0;
+}
+
+//###################################################################
 /**Sets the angle aggregation divisions
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
