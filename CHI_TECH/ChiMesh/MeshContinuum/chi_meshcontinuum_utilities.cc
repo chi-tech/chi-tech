@@ -1,4 +1,5 @@
 #include "chi_meshcontinuum.h"
+#include "../Cell/cell_slab.h"
 #include "../Cell/cell_polygon.h"
 #include "../Cell/cell_polyhedron.h"
 
@@ -13,71 +14,130 @@ extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
 //###################################################################
-/**Connects the nodes of the mesh to each other.*/
-void chi_mesh::MeshContinuum::ConnectGrid()
+/**Populates a face histogram.
+ *
+ * \param master_tolerance Multiple histograms will only be attempted
+ * if the ratio of the maximum dofs-per-face to the average dofs-per-face
+ * is greater than this value. Default 1.2.
+ *
+ * \param slave_tolerance While traversing a sorted list of dofs-per-face,
+ * a new bin will only be generated when the ratio of the listed dofs-per-face
+ * to a running bin average exceeds this value. Defualt 1.1.
+ *
+ * The function populates face_categories which is a structure containing
+ * pairs. Pair.first is the max dofs-per-face for the category and Pair.second
+ * is the number of faces in this category.
+ *
+ * */
+void chi_mesh::MeshContinuum::
+  BuildFaceHistogramInfo(double master_tolerance, double slave_tolerance)
 {
-  //================================================== Loop over all item_id
-//  for (int c=0; c<this->cells.size(); c++)
-//  {
-//    auto cell = (chi_mesh::CellPolyhedron*)this->grid_graph[c].cell_ptr;
-//
-//    for (int f=0; f<cell->faces.size(); f++)
-//    {
-//      if (cell->faces[f]->face_indices[0]>=0)
-//      {
-//        int cd = cell->faces[f]->face_indices[0];
-//        boost::add_edge(c,cd,this->grid_graph);
-//      }
-//    }
-//  }
-/*
-  //================================================== Iterate
-  typedef boost::graph_traits<UndirectedGraph>::vertex_descriptor Vertex;
-  typedef boost::graph_traits<UndirectedGraph>::vertices_size_type size_type;
+  if (face_histogram_available) return;
 
+  //================================================== Fill histogram
+  std::vector<size_t> face_size_histogram;
+  for (auto c : local_cell_glob_indices)
+  {
+    auto cell = cells[c];
 
-  boost::graph_traits<UndirectedGraph>::vertex_iterator  ui, ui_end;
+    if (cell->Type() == chi_mesh::CellType::SLAB)
+    {
+      CellSlab* slab_cell = static_cast<CellSlab*>(cell);
 
-  boost::property_map<UndirectedGraph,boost::vertex_degree_t>::type deg =
-    get(boost::vertex_degree,grid_graph);
+      size_t num_faces = 2;
+      for (int f=0; f<num_faces; f++)
+        face_size_histogram.push_back(1);
 
-  for (boost::tie(ui, ui_end) = vertices(grid_graph); ui != ui_end; ++ui)
-    deg[*ui] = degree(*ui, grid_graph);
+    }//if slab
+    else if (cell->Type() == chi_mesh::CellType::POLYGON)
+    {
+      CellPolygon* poly_cell = static_cast<CellPolygon*>(cell);
 
+      for (auto face : poly_cell->edges)
+        face_size_histogram.push_back(2);
+    }//if polygon
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    {
+      CellPolyhedron* polyh_cell = static_cast<CellPolyhedron*>(cell);
 
-  boost::property_map<UndirectedGraph, boost::vertex_index_t>::type
-    index_map = get(boost::vertex_index, grid_graph);
+      for (auto face : polyh_cell->faces)
+        face_size_histogram.push_back(face->v_indices.size());
+    }//if polyhedron
+  }
+  std::stable_sort(face_size_histogram.begin(), face_size_histogram.end());
 
-  std::cout << "original bandwidth: " <<
-  boost::bandwidth(grid_graph) << std::endl;
+  //================================================== Determine total face dofs
+  size_t total_face_dofs_count = 0;
+  for (auto face_size : face_size_histogram)
+    total_face_dofs_count += face_size;
 
+  //================================================== Compute average and ratio
+  size_t smallest_face = face_size_histogram.front();
+  size_t largest_face = face_size_histogram.back();
+  size_t total_num_faces = face_size_histogram.size();
+  double average_dofs_per_face = (double)total_face_dofs_count/total_num_faces;
 
+  std::stringstream outstr;
+  outstr << "\nSmallest face = " << smallest_face;
+  outstr << "\nLargest face = " << largest_face;
+  outstr << "\nTotal face dofs = " << total_face_dofs_count;
+  outstr << "\nTotal faces = " << face_size_histogram.size();
+  outstr << "\nAverage dofs/face = " << average_dofs_per_face;
+  outstr << "\nMax to avg ratio = " << largest_face/average_dofs_per_face;
+  chi_log.Log(LOG_ALLVERBOSE_1) << outstr.str();
 
-  std::vector<Vertex> inv_perm(num_vertices(grid_graph));
-  std::vector<size_type> perm(num_vertices(grid_graph));
+  //================================================== Determine number of bins
+  size_t last_bin_num_faces = total_num_faces;
+  if ((largest_face/average_dofs_per_face) > master_tolerance)
+  {
+    chi_log.Log(LOG_ALLVERBOSE_1)
+    << "The ratio of max face dofs to average face dofs "
+    << "is larger than " << master_tolerance
+    << ", therefore a binned histogram "
+    << "will be constructed.";
 
-  //reverse cuthill_mckee_ordering
-  Vertex s = vertex(6, grid_graph);
-  boost::cuthill_mckee_ordering(grid_graph, s, inv_perm.rbegin(),
-    get(boost::vertex_color, grid_graph),
-                         get(boost::vertex_degree, grid_graph));
-  std::cout << "Reverse Cuthill-McKee ordering starting at: " << s <<
-  std::endl;
-  std::cout << "  ";
+    //====================================== Build categories
+    size_t running_total_face_dofs = 0;
+    size_t running_face_count = 0;
+    size_t running_face_size = face_size_histogram[0];
 
-  for (std::vector<Vertex>::const_iterator i = inv_perm.begin();
-       i != inv_perm.end(); ++i)
-    std::cout << index_map[*i] << " ";
-  std::cout << std::endl;
+    double running_average = face_size_histogram[0];
 
-  for (size_type c = 0; c != inv_perm.size(); ++c)
-    perm[index_map[inv_perm[c]]] = c;
-  std::cout << "  bandwidth: "
-            << bandwidth(grid_graph, make_iterator_property_map(&perm[0], index_map, perm[0]))
-            << std::endl;
+    for (size_t f=0; f<total_num_faces; ++f)
+    {
+      if ((face_size_histogram[f]/running_average) > slave_tolerance)
+      {
+        face_categories.emplace_back(running_face_size,running_face_count);
+        running_total_face_dofs = 0;
+        running_face_count = 0;
+      }
 
-  write_graphviz(std::cout, grid_graph);
-  */
+      running_face_size = face_size_histogram[f];
+      running_total_face_dofs += face_size_histogram[f];
+      running_face_count++;
+      running_average = (double)running_total_face_dofs/running_face_count;
+      last_bin_num_faces = running_face_count;
+    }
+  }
+  face_categories.emplace_back(largest_face,last_bin_num_faces);
+
+  //================================================== Verbose print bins
+  outstr.str(std::string());
+  outstr
+  << "A total of " << face_categories.size()
+  << " bins were created:\n";
+
+  size_t bin_counter = -1;
+  for (auto bins : face_categories)
+  {
+    outstr
+    << "Bin " << ++bin_counter << ": "
+    << bins.second << " faces with max face dofs " << bins.first << "\n";
+  }
+
+  chi_log.Log(LOG_ALLVERBOSE_1) << outstr.str();
+
+  face_histogram_available = true;
 }
 
 
@@ -103,6 +163,32 @@ bool chi_mesh::MeshContinuum::IsCellLocal(int cell_global_index)
   return false;
 }
 
+//###################################################################
+/**Gets the number of face-histogram categories.*/
+size_t chi_mesh::MeshContinuum::NumberOfFaceHistogramCategories()
+{
+  if (!face_histogram_available) BuildFaceHistogramInfo();
+
+  return face_categories.size();
+}
+
+//###################################################################
+/**Maps the face-histogram category number for a given face size.*/
+size_t chi_mesh::MeshContinuum::MapFaceHistogramCategory(size_t num_face_dofs)
+{
+  if (!face_histogram_available) BuildFaceHistogramInfo();
+
+  size_t category_counter = -1;
+  for (auto category : face_categories)
+  {
+    if (num_face_dofs <= category.first)
+      return category_counter;
+  }
+
+  return 0;
+}
+
+//###################################################################
 /**Check whether a cell is a boundary*/
 bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
 {

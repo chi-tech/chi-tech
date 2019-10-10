@@ -11,6 +11,8 @@
 
 extern ChiLog     chi_log;
 
+
+
 //###################################################################
 /**Populates a flux data structure.*/
 void chi_mesh::SweepManagement::FLUDS::
@@ -18,6 +20,8 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
   chi_mesh::SweepManagement::SPLS* spls = spds->spls;
+
+  size_t num_face_categories = grid->NumberOfFaceHistogramCategories();
 
   //================================================== Initialize dependent
   //                                                   locations
@@ -88,12 +92,12 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
       TSlab* slab_cell = static_cast<TSlab*>(cell);
       IncidentMapping(slab_cell,spds,local_so_cell_mapping);
     }//if slab
-    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
+    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       TPolygon* poly_cell = static_cast<TPolygon*>(cell);
       IncidentMapping(poly_cell,spds,local_so_cell_mapping);
-    }//if polyhedron
+    }//if polygon
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
@@ -117,5 +121,13 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
   so_cell_inco_face_dof_indices.shrink_to_fit();
 
   nonlocal_outb_face_deplocI_slot.shrink_to_fit();
+
+}
+
+//###################################################################
+/**Process local interfaces.*/
+void chi_mesh::SweepManagement::FLUDS::
+ ProcessLocalInterfaces(chi_mesh::SweepManagement::SPDS *spds)
+{
 
 }

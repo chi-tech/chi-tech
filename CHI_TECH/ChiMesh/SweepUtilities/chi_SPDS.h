@@ -20,6 +20,7 @@ struct chi_mesh::SweepManagement::SPDS
   std::vector<int>         delayed_location_dependencies;
   std::vector<int>         delayed_location_successors;
 
+  std::vector<std::pair<int,int>> local_cyclic_dependencies;
 
   //======================================== Default constructor
   SPDS()

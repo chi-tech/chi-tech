@@ -37,8 +37,12 @@ CreateSweepOrder(double polar, double azimuthal,
                  chi_mesh::MeshContinuum *vol_continuum,int number_of_groups,
                  bool allow_cycles)
 {
-  chi_mesh::SweepManagement::SPDS* sweep_order =
-    new chi_mesh::SweepManagement::SPDS;
+  auto sweep_order  = new chi_mesh::SweepManagement::SPDS;
+  sweep_order->grid = vol_continuum;
+
+  size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
+
+  //============================================= Compute direction vector
   sweep_order->polar     = polar;
   sweep_order->azimuthal = azimuthal;
 
@@ -46,18 +50,7 @@ CreateSweepOrder(double polar, double azimuthal,
   sweep_order->omega.y = sin(polar)*sin(azimuthal);
   sweep_order->omega.z = cos(polar);
 
-  sweep_order->grid    = vol_continuum;
-
-  chi_mesh::MeshHandler* cur_handler = GetCurrentHandler();
-  chi_mesh::VolumeMesher* mesher     = cur_handler->volume_mesher;
-
-  double tolerance = 1.0e-8;
-
-  //============================================= Compute direction vector
-  chi_mesh::Vector omega;
-  omega.x = sin(polar)*cos(azimuthal);
-  omega.y = sin(polar)*sin(azimuthal);
-  omega.z = cos(polar);
+  chi_mesh::Vector omega = sweep_order->omega; //shorter name
   if (chi_mpi.location_id == 0)
   {
     char buff[100];
@@ -70,200 +63,41 @@ CreateSweepOrder(double polar, double azimuthal,
   // The cell added to the graph vertex will have
   // the same index as the cell's local index
   CHI_D_GRAPH G;
-  size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
-  for (int c=0; c<num_loc_cells; c++)
-  {
+  for (auto c : vol_continuum->local_cell_glob_indices)
     boost::add_vertex(G);
-  }
 
-
+  std::vector<std::set<int>> cell_dependencies(num_loc_cells);
+  std::vector<std::set<int>> cell_successors(num_loc_cells);
 
   //============================================= Make directed connections
+  PopulateCellRelationships(vol_continuum,
+                            sweep_order,
+                            cell_dependencies,
+                            cell_successors);
+
+  //================================================== Add connectivity to
+  //                                                   Graph and filter Strongly
+  //                                                   Connected Components
   for (int c=0; c<num_loc_cells; c++)
   {
-    size_t cell_index = vol_continuum->local_cell_glob_indices[c];
-    chi_mesh::Cell* cell = vol_continuum->cells[cell_index];
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    for (auto successor : cell_successors[c])
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-
-      int num_faces = 2;
-      for (int f=0; f<num_faces; f++)
+      if (!allow_cycles)
+        boost::add_edge(c,successor,G);
+      else
       {
-        //======================================= Determine if the face
-        //                                        is incident
-        bool is_outgoing = false;
-        double dot_normal = omega.Dot(slab_cell->face_normals[f]);
-        if (dot_normal>(0.0+tolerance)) {is_outgoing = true;}
+        bool strongly_connected = false;
 
-        //======================================= If outgoing determine if
-        //                                        it is to a local cell
-        if (is_outgoing)
-        {
-          int adj_cell_glob_index = slab_cell->edges[f];
+        for (auto dependency : cell_dependencies[c])
+          if (dependency == successor)
+            strongly_connected = true;
 
-          //================================if it is a cell and not bndry
-          if (adj_cell_glob_index>=0)
-          {
-            auto adj_cell = vol_continuum->cells[adj_cell_glob_index];
-
-            //========================= If it is not the current location
-            if (adj_cell->partition_id == chi_mpi.location_id)
-            {
-              int adj_cell_local_index =
-                vol_continuum->glob_cell_local_indices[adj_cell_glob_index];
-              boost::add_edge(c,adj_cell_local_index,G);
-              //dependencies_per_cell[adj_cell_glob_index]->push_back(cell_index);
-            }else
-            {
-              sweep_order->AddLocalSuccessor(adj_cell->partition_id);
-            }
-
-          }
-        }
-          //======================================= If not outgoing determine
-          //                                        what it is dependent on
+        if (!strongly_connected) boost::add_edge(c,successor,G);
         else
-        {
-          int adj_cell_glob_index = slab_cell->edges[f];
-
-          //================================if it is a cell and not bndry
-          if (adj_cell_glob_index>=0)
-          {
-            auto adj_cell = vol_continuum->cells[adj_cell_glob_index];
-
-            //========================= If it is not the current location
-            if (adj_cell->partition_id != chi_mpi.location_id)
-            {
-              sweep_order->AddLocalDependecy(adj_cell->partition_id);
-            }
-          }
-        }
-
-      }//for face
-    }
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-
-      for (int e=0; e<poly_cell->edges.size(); e++)
-      {
-        //======================================= Determine if the face
-        //                                        is incident
-        bool is_outgoing = false;
-        double dot_normal = omega.Dot(poly_cell->edgenormals[e]);
-        if (dot_normal>(0.0+tolerance)) {is_outgoing = true;}
-
-        //======================================= If outgoing determine if
-        //                                        it is to a local cell
-        if (is_outgoing)
-        {
-          int adj_cell_glob_index = poly_cell->edges[e][2];
-
-          //================================if it is a cell and not bndry
-          if (adj_cell_glob_index>=0)
-          {
-            auto adj_cell = vol_continuum->cells[adj_cell_glob_index];
-
-            //========================= If it is not the current location
-            if (adj_cell->partition_id == chi_mpi.location_id)
-            {
-              int adj_cell_local_index =
-                vol_continuum->glob_cell_local_indices[adj_cell_glob_index];
-              boost::add_edge(c,adj_cell_local_index,G);
-              //dependencies_per_cell[adj_cell_glob_index]->push_back(cell_index);
-            }else
-            {
-              sweep_order->AddLocalSuccessor(adj_cell->partition_id);
-            }
-
-          }
-        }
-        //======================================= If not outgoing determine
-        //                                        what it is dependent on
-        else
-        {
-          int adj_cell_glob_index = poly_cell->edges[e][2];
-
-          //================================if it is a cell and not bndry
-          if (adj_cell_glob_index>=0)
-          {
-            auto adj_cell = vol_continuum->cells[adj_cell_glob_index];
-
-            //========================= If it is not the current location
-            if (adj_cell->partition_id != chi_mpi.location_id)
-            {
-              sweep_order->AddLocalDependecy(adj_cell->partition_id);
-            }
-          }
-        }
-
-      }//for edge
-    } //If polygon
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-
-      for (int f=0; f<polyh_cell->faces.size(); f++)
-      {
-        //======================================= Determine if the face
-        //                                        is incident
-        bool is_outgoing = false;
-        double dot_normal = omega.Dot(polyh_cell->faces[f]->geometric_normal);
-        if (dot_normal>(0.0+tolerance)) {is_outgoing = true;}
-
-        //======================================= If outgoing determine if
-        //                                        it is to a local cell
-        if (is_outgoing)
-        {
-          int adj_cell_glob_index = polyh_cell->faces[f]->face_indices[0];
-
-          //================================if it is a cell and not bndry
-          if (adj_cell_glob_index>=0)
-          {
-            auto adj_cell = vol_continuum->cells[adj_cell_glob_index];
-
-            //========================= If it is in the current location
-            if (adj_cell->partition_id == chi_mpi.location_id)
-            {
-              int adj_cell_local_index =
-                vol_continuum->glob_cell_local_indices[adj_cell_glob_index];
-              boost::add_edge(c,adj_cell_local_index,G);
-              //dependencies_per_cell[adj_cell_glob_index]->push_back(cell_index);
-            } else
-            {
-              sweep_order->AddLocalSuccessor(adj_cell->partition_id);
-            }
-          }
-
-        }
-          //======================================= If not outgoing determine
-          //                                        what it is dependent on
-        else
-        {
-          int adj_cell_glob_index = polyh_cell->faces[f]->face_indices[0];
-
-          //================================if it is a cell and not bndry
-          if (adj_cell_glob_index>=0)
-          {
-            auto adj_cell = vol_continuum->cells[adj_cell_glob_index];
-
-            //========================= If it is not the current location
-            if (adj_cell->partition_id != chi_mpi.location_id)
-            {
-              sweep_order->AddLocalDependecy(adj_cell->partition_id);
-            }
-          }
-        }
-
-      }//for edge
-    }
-
-  }//for cell
+          sweep_order->local_cyclic_dependencies.emplace_back(c,successor);
+      }
+    }//for successors
+  }//for local cell
 
 
 
@@ -368,7 +202,7 @@ CreateSweepOrder(double polar, double azimuthal,
   //====================================== Filter dependencies for cycles
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
-    << " Removing cycles.";
+    << " Removing intra-cellset cycles.";
   if (allow_cycles)
   {
     for (int locI=0; locI<P; locI++)
@@ -531,21 +365,13 @@ CreateSweepOrder(double polar, double azimuthal,
     }
   }
 
-
   TDG.clear();
-
-
-
-
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
     << " Done computing sweep ordering.";
-
-
-
 
   return sweep_order;
 }

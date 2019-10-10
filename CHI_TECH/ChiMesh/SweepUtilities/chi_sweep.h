@@ -3,6 +3,8 @@
 
 #include "../chi_mesh.h"
 
+#include <set>
+
 #include <chi_log.h>
 
 extern ChiLog chi_log;
@@ -33,6 +35,11 @@ namespace SweepManagement
                          bool allow_cycles=false);
 
   //02
+  void PopulateCellRelationships(
+    chi_mesh::MeshContinuum *grid,
+    chi_mesh::SweepManagement::SPDS* sweep_order,
+    std::vector<std::set<int>>& cell_dependencies,
+    std::vector<std::set<int>>& cell_successors);
 //  void Sweep(SPDS* spds,
 //             SweepChunk* sweep_chunk=NULL,
 //             bool communicate=true);

@@ -83,6 +83,7 @@ private:
     deplocI_cell_views;
 
 
+  std::vector<int> face_lockbox_category;
 
   //======================================== Beta elements
 public:
@@ -140,6 +141,7 @@ public:
 public:
   //01
   void InitializeAlphaElements(chi_mesh::SweepManagement::SPDS *spds);
+  void ProcessLocalInterfaces(chi_mesh::SweepManagement::SPDS *spds);
   //02
   void InitializeBetaElements(chi_mesh::SweepManagement::SPDS *spds,
                               int tag_index=0);

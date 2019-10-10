@@ -17,8 +17,6 @@ void chi_mesh::SweepManagement::FLUDS::
   chi_mesh::Vector jhat(0.0,1.0,0.0);
   chi_mesh::Vector khat(0.0,0.0,1.0);
 
-//  short        outgoing_face_count=0;
-
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
@@ -64,6 +62,7 @@ void chi_mesh::SweepManagement::FLUDS::
         }
 
       }//if local
+      //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
       else if (grid->IsCellBndry(neighbor))
       {
         chi_mesh::Vector& face_norm = polyh_cell->faces[f]->geometric_normal;
