@@ -25,19 +25,24 @@ typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;
 class chi_mesh::SweepManagement::FLUDS
 {
 public:
-  int local_psi_stride;
-  int local_psi_max_elements;
-
+  std::vector<size_t> local_psi_stride;
+  std::vector<size_t> local_psi_max_elements;
+  size_t              delayed_local_psi_stride;
+  size_t              delayed_local_psi_max_elements;
+  size_t              num_face_categories;
 
 
 private:
   int largest_face;
   int G;
-  int local_psi_Gn_block_stride;
-  int local_psi_Gn_block_strideG;
+  std::vector<size_t> local_psi_Gn_block_stride;
+  std::vector<size_t> local_psi_Gn_block_strideG;
+  size_t delayed_local_psi_Gn_block_stride;
+  size_t delayed_local_psi_Gn_block_strideG;
 
   //======================================== References to psi vectors
-  std::vector<double>*               ref_local_psi;
+  std::vector<std::vector<double>>*  ref_local_psi;
+  std::vector<double>*               ref_delayed_local_psi;
   std::vector<std::vector<double>>*  ref_deplocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_prelocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_boundryI_incoming_psi;
@@ -52,12 +57,24 @@ private:
   std::vector<std::vector<int>>
     so_cell_outb_face_slot_indices;
 
+  // This is a vector [cell_sweep_order_index][outgoing_face_count]
+  // which holds the face categorization for the face. i.e. the local
+  // psi vector that hold faces of the same category.
+  std::vector<std::vector<int>>
+    so_cell_outb_face_face_category;
+
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // that will hold a pair. Pair-first holds the slot address where this
   // face's upwind data is stored. Pair-second is a mapping of
   // each of this face's dofs to the upwinded face's dofs
   std::vector<std::vector<std::pair<int,std::vector<int>> >>
     so_cell_inco_face_dof_indices;
+
+  // This is a vector [cell_sweep_order_index][incoming_face_count]
+  // which holds the face categorization for the face. i.e. the local
+  // psi vector that hold faces of the same category.
+  std::vector<std::vector<int>>
+    so_cell_inco_face_face_category;
 
 public:
   // This is a small vector [deplocI] that holds the number of
@@ -119,19 +136,21 @@ private:
 public:
   FLUDS(int in_G)
   {
-    local_psi_stride=0;
-    local_psi_max_elements=0;
+//    local_psi_stride=0;
+//    local_psi_max_elements=0;
     G=in_G;
   }
 
 
-  void SetReferencePsi(std::vector<double>*               local_psi,
+  void SetReferencePsi(std::vector<std::vector<double>>*  local_psi,
+                       std::vector<double>*               delayed_local_psi,
                        std::vector<std::vector<double>>*  deplocI_outgoing_psi,
                        std::vector<std::vector<double>>*  prelocI_outgoing_psi,
                        std::vector<std::vector<double>>*  boundryI_incoming_psi,
                        std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi)
   {
     ref_local_psi = local_psi;
+    ref_delayed_local_psi = delayed_local_psi;
     ref_deplocI_outgoing_psi = deplocI_outgoing_psi;
     ref_prelocI_outgoing_psi = prelocI_outgoing_psi;
     ref_boundryI_incoming_psi = boundryI_incoming_psi;
@@ -176,7 +195,8 @@ public:
   //01a
   void SlotDynamics(TSlab *slab_cell,
                     chi_mesh::SweepManagement::SPDS* spds,
-                    std::vector<std::pair<int,short>>& lock_box,
+                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
+                    std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
   void IncidentMapping(TSlab *slab_cell,
                        chi_mesh::SweepManagement::SPDS* spds,
@@ -185,7 +205,8 @@ public:
   //01b
   void SlotDynamics(TPolygon *poly_cell,
                     chi_mesh::SweepManagement::SPDS* spds,
-                    std::vector<std::pair<int,short>>& lock_box,
+                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
+                    std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
   void IncidentMapping(TPolygon *poly_cell,
                        chi_mesh::SweepManagement::SPDS* spds,
@@ -194,7 +215,8 @@ public:
   //01c polyhedron
   void SlotDynamics(TPolyhedron *polyh_cell,
                     chi_mesh::SweepManagement::SPDS* spds,
-                    std::vector<std::pair<int,short>>& lock_box,
+                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
+                    std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
   void IncidentMapping(TPolyhedron *polyh_cell,
                        chi_mesh::SweepManagement::SPDS* spds,

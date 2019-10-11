@@ -23,4 +23,8 @@ void chi_mesh::SweepManagement::AngleAggregation::ResetDelayedPsi()
     for (auto angset : angsetgrp->angle_sets)
       for (auto& delayed_data : angset->delayed_prelocI_outgoing_psi)
         delayed_data.assign(delayed_data.size(),0.0);
+
+  for (auto angsetgrp : angle_set_groups)
+    for (auto angset : angsetgrp->angle_sets)
+      angset->delayed_local_psi.assign(angset->delayed_local_psi.size(),0.0);
 }

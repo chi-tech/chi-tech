@@ -181,11 +181,33 @@ size_t chi_mesh::MeshContinuum::MapFaceHistogramCategory(size_t num_face_dofs)
   size_t category_counter = -1;
   for (auto category : face_categories)
   {
+    category_counter++;
     if (num_face_dofs <= category.first)
       return category_counter;
   }
 
   return 0;
+}
+
+//###################################################################
+/**Maps the face-histogram category number for a given face size.*/
+size_t chi_mesh::MeshContinuum::GetFaceHistogramCategoryDOFSize(size_t category)
+{
+  if (!face_histogram_available) BuildFaceHistogramInfo();
+
+  size_t face_dof_size = 0;
+
+  try {
+    face_dof_size = face_categories.at(category).first;
+  }
+  catch (std::out_of_range o){
+    chi_log.Log(LOG_ALLWARNING)
+    << "Fault detected in chi_mesh::MeshContinuum::"
+    << "GetFaceHistogramCategoryDOFSize.";
+    return 0;
+  }
+
+  return face_dof_size;
 }
 
 //###################################################################

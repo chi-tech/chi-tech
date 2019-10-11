@@ -182,6 +182,7 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
   }
 
   angleset->fluds->SetReferencePsi(&angleset->local_psi,
+                                   &angleset->delayed_local_psi,
                                    &angleset->deplocI_outgoing_psi,
                                    &angleset->prelocI_outgoing_psi,
                                    &angleset->boundryI_incoming_psi,
@@ -204,9 +205,17 @@ void chi_mesh::SweepManagement::SweepBuffer::
     int num_angles = angleset->angles.size();
 
     //============================ Resize FLUDS local outgoing Data
-    angleset->local_psi.resize(fluds->local_psi_stride*
-                               fluds->local_psi_max_elements*
-                               num_grps*num_angles,0.0);
+    angleset->local_psi.resize(fluds->num_face_categories);
+    // fc = face category
+    for (size_t fc = 0; fc<fluds->num_face_categories; fc++)
+    {
+      angleset->local_psi[fc].resize(fluds->local_psi_stride[fc]*
+                                     fluds->local_psi_max_elements[fc]*
+                                     num_grps*num_angles,0.0);
+    }
+//    angleset->delayed_local_psi.resize(fluds->delayed_local_psi_stride*
+//                                       fluds->delayed_local_psi_max_elements*
+//                                       num_grps*num_angles,0.0);
 
     //============================ Resize FLUDS non-local outgoing Data
     angleset->deplocI_outgoing_psi.resize(

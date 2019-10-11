@@ -28,7 +28,7 @@ public:
   int                                    ref_subset;
 
   //FLUDS
-  std::vector<double>               local_psi;
+  std::vector<std::vector<double>>  local_psi;
   std::vector<double>               delayed_local_psi;
   std::vector<std::vector<double>>  deplocI_outgoing_psi;
   std::vector<std::vector<double>>  prelocI_outgoing_psi;

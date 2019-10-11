@@ -11,7 +11,7 @@
 
 extern ChiLog     chi_log;
 
-
+typedef std::vector<std::pair<int,short>> LockBox;
 
 //###################################################################
 /**Populates a flux data structure.*/
@@ -21,7 +21,12 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
   chi_mesh::MeshContinuum*         grid = spds->grid;
   chi_mesh::SweepManagement::SPLS* spls = spds->spls;
 
-  size_t num_face_categories = grid->NumberOfFaceHistogramCategories();
+  num_face_categories = grid->NumberOfFaceHistogramCategories();
+  local_psi_stride.resize(num_face_categories,0);
+  local_psi_max_elements.resize(num_face_categories,0);
+  local_psi_Gn_block_stride.resize(num_face_categories,0);
+  local_psi_Gn_block_strideG.resize(num_face_categories,0);
+
 
   //================================================== Initialize dependent
   //                                                   locations
@@ -38,7 +43,8 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
   local_so_cell_mapping.resize(grid->local_cell_glob_indices.size(),0);
 
   largest_face = 0; // Will contain the max dofs per face
-  std::vector<std::pair<int,short>> lock_box; //cell,face index pairs
+  std::vector<LockBox> lock_boxes(num_face_categories); //cell,face index pairs
+  LockBox              delayed_lock_box;
   std::set<int> location_boundary_dependency_set;
 
   // csoi = cell sweep order index
@@ -51,17 +57,17 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       TSlab* slab_cell = static_cast<TSlab*>(cell);
-      SlotDynamics(slab_cell,spds,lock_box,location_boundary_dependency_set);
+      SlotDynamics(slab_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if slab
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       TPolygon* poly_cell = static_cast<TPolygon*>(cell);
-      SlotDynamics(poly_cell,spds,lock_box,location_boundary_dependency_set);
+      SlotDynamics(poly_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if polygon
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       TPolyhedron* polyh_cell = static_cast<TPolyhedron*>(cell);
-      SlotDynamics(polyh_cell,spds,lock_box,location_boundary_dependency_set);
+      SlotDynamics(polyh_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if polyhedron
     else
     {
@@ -72,6 +78,7 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
     }
 
   }//for csoi
+
 
   //================================================== Populate boundary
   //                                                   dependencies
@@ -107,10 +114,18 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
 
   }//for csoi
 
-  this->local_psi_stride       = largest_face;
-  this->local_psi_max_elements = lock_box.size();
-  this->local_psi_Gn_block_stride = largest_face*lock_box.size();
-  this->local_psi_Gn_block_strideG = local_psi_Gn_block_stride*G;
+  for (size_t fc=0; fc<num_face_categories; ++fc)
+  {
+    local_psi_stride[fc] = grid->GetFaceHistogramCategoryDOFSize(fc);
+    local_psi_max_elements[fc]     = lock_boxes[fc].size();
+    local_psi_Gn_block_stride[fc]  = local_psi_stride[fc]*lock_boxes[fc].size();
+    local_psi_Gn_block_strideG[fc] = local_psi_Gn_block_stride[fc]*G;
+  }
+  delayed_local_psi_stride           = largest_face;
+  delayed_local_psi_max_elements     = delayed_lock_box.size();
+  delayed_local_psi_Gn_block_stride  = largest_face*delayed_lock_box.size();
+  delayed_local_psi_Gn_block_strideG = delayed_local_psi_Gn_block_stride*G;
+
 
   //================================================== Clean up
   this->so_cell_outb_face_slot_indices.shrink_to_fit();

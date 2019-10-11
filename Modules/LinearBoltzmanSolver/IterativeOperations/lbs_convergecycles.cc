@@ -21,7 +21,7 @@ void LinearBoltzman::Solver::ConvergeCycles(
     return;
 
   bool cycles_converged = false;
-  for (int k=0; k<20; k++)
+  for (int k=0; k<50; k++)
   {
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);

@@ -11,6 +11,8 @@ extern ChiMPI chi_mpi;
 void chi_mesh::SweepManagement::AngleSet::
 InitializeDelayedUpstreamData()
 {
+  int num_angles = angles.size();
+
   delayed_prelocI_outgoing_psi.resize(
       spds->delayed_location_dependencies.size(),
       std::vector<double>());
@@ -19,11 +21,15 @@ InitializeDelayedUpstreamData()
   {
     int num_dofs = fluds->delayed_prelocI_face_dof_count[prelocI];
     int num_grps   = GetNumGrps();
-    int num_angles = angles.size();
+
     u_ll_int buff_size = num_dofs*num_grps*num_angles;
 
     delayed_prelocI_outgoing_psi[prelocI].resize(buff_size,0.0);
   }
+
+  delayed_local_psi.resize(fluds->delayed_local_psi_stride*
+                           fluds->delayed_local_psi_max_elements*
+                           num_grps*num_angles,0.0);
 }
 
 //###################################################################

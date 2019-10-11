@@ -95,6 +95,7 @@ CreateSweepOrder(double polar, double azimuthal,
         if (!strongly_connected) boost::add_edge(c,successor,G);
         else
           sweep_order->local_cyclic_dependencies.emplace_back(c,successor);
+
       }
     }//for successors
   }//for local cell

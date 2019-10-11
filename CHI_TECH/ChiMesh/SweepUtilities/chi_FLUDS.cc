@@ -26,13 +26,30 @@ double*  chi_mesh::SweepManagement::FLUDS::
  OutgoingPsi(int cell_so_index, int outb_face_counter,
               int face_dof, int n)
 {
-  int index =
-    local_psi_Gn_block_stride*G*n +
-    so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter]*
-    local_psi_stride*G +
-    face_dof*G;
+  // Face category
+  int fc = so_cell_outb_face_face_category[cell_so_index][outb_face_counter];
 
-  return &ref_local_psi->operator[](index);
+  if (fc >= 0)
+  {
+    int index =
+      local_psi_Gn_block_stride[fc]*G*n +
+      so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter]*
+      local_psi_stride[fc]*G +
+      face_dof*G;
+
+    return &(ref_local_psi->operator[](fc))[index];
+  }
+  else
+  {
+    int index =
+      delayed_local_psi_Gn_block_stride*G*n +
+      so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter]*
+      delayed_local_psi_stride*G +
+      face_dof*G;
+
+    return &ref_delayed_local_psi->operator[](index);
+  }
+
 }
 
 //###################################################################
@@ -79,14 +96,32 @@ double*  chi_mesh::SweepManagement::FLUDS::
 UpwindPsi(int cell_so_index, int inc_face_counter,
              int face_dof,int g, int n)
 {
-  int index =
-    local_psi_Gn_block_stride*G*n +
-    so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].first*
-    local_psi_stride*G +
-    so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
-      second[face_dof]*G + g;
+  // Face category
+  int fc = so_cell_inco_face_face_category[cell_so_index][inc_face_counter];
 
-  return &ref_local_psi->operator[](index);
+  if (fc >= 0)
+  {
+    int index =
+      local_psi_Gn_block_stride[fc]*G*n +
+      so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].first*
+      local_psi_stride[fc]*G +
+      so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
+        second[face_dof]*G + g;
+
+    return &(ref_local_psi->operator[](fc))[index];
+  }
+  else
+  {
+    int index =
+      delayed_local_psi_Gn_block_stride*G*n +
+      so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].first*
+      delayed_local_psi_stride*G +
+      so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
+        second[face_dof]*G + g;
+
+    return &ref_delayed_local_psi->operator[](index);
+  }
+
 }
 
 //###################################################################

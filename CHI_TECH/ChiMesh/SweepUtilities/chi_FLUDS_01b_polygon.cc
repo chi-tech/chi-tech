@@ -4,12 +4,15 @@
 
 #include "../../ChiMesh/Cell/cell_polygon.h"
 
+typedef std::vector<std::pair<int,short>> LockBox;
+
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
 void chi_mesh::SweepManagement::FLUDS::
   SlotDynamics(TPolygon *poly_cell,
                chi_mesh::SweepManagement::SPDS* spds,
-               std::vector<std::pair<int,short>>& lock_box,
+               std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
+               std::vector<std::pair<int,short>>& delayed_lock_box,
                std::set<int>& location_boundary_dependency_set)
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
@@ -20,9 +23,12 @@ void chi_mesh::SweepManagement::FLUDS::
 
   short        outgoing_face_count=0;
 
+  LockBox& lock_box = lock_boxes.front();
+
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
+  std::vector<int> inco_face_face_category;
   int bndry_face_counter = 0;
   for (short f=0; f<poly_cell->edges.size(); f++)
   {
@@ -38,6 +44,8 @@ void chi_mesh::SweepManagement::FLUDS::
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
       if (grid->IsCellLocal(neighbor))
       {
+        inco_face_face_category.push_back(0);
+
         //======================================== Find associated face for
         //                                         dof mapping and lock box
         short ass_face = grid->FindAssociatedEdge(poly_cell->edges[f],neighbor);
@@ -85,10 +93,13 @@ void chi_mesh::SweepManagement::FLUDS::
 
   }//for f
 
+  so_cell_inco_face_face_category.push_back(inco_face_face_category);
+
   //=================================================== Loop over faces
   //                OUTGOING                            but process
   //                                                    only outgoing faces
   std::vector<int>                outb_face_slot_indices;
+  std::vector<int>                outb_face_face_category;
   for (short f=0; f<poly_cell->edges.size(); f++)
   {
     double     mu        = spds->omega.Dot(poly_cell->edgenormals[f]);
@@ -98,6 +109,8 @@ void chi_mesh::SweepManagement::FLUDS::
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=0.0)
     {
+      outb_face_face_category.push_back(0);
+
       //========================================== Check if this face is
       //                                           the max size
       largest_face = 2;
@@ -144,6 +157,7 @@ void chi_mesh::SweepManagement::FLUDS::
   }//for f
 
   so_cell_outb_face_slot_indices.push_back(outb_face_slot_indices);
+  so_cell_outb_face_face_category.push_back(outb_face_face_category);
 }
 
 

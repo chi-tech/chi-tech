@@ -3,12 +3,15 @@
 
 #include "../../ChiMesh/Cell/cell_slab.h"
 
+typedef std::vector<std::pair<int,short>> LockBox;
+
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
 void chi_mesh::SweepManagement::FLUDS::
 SlotDynamics(TSlab *slab_cell,
              chi_mesh::SweepManagement::SPDS* spds,
-             std::vector<std::pair<int,short>>& lock_box,
+             std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
+             std::vector<std::pair<int,short>>& delayed_lock_box,
              std::set<int>& location_boundary_dependency_set)
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
@@ -19,9 +22,12 @@ SlotDynamics(TSlab *slab_cell,
 
   short        outgoing_face_count=0;
 
+  LockBox& lock_box = lock_boxes.front();
+
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
+  std::vector<int> inco_face_face_category;
   int bndry_face_counter = 0;
   int num_faces = 2;
   for (short f=0; f<num_faces; f++)
@@ -38,6 +44,8 @@ SlotDynamics(TSlab *slab_cell,
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
       if (grid->IsCellLocal(neighbor))
       {
+        inco_face_face_category.push_back(0);
+
         //======================================== Find associated face for
         //                                         dof mapping and lock box
         short ass_face = 0;
@@ -91,10 +99,13 @@ SlotDynamics(TSlab *slab_cell,
 
   }//for f
 
+  so_cell_inco_face_face_category.push_back(inco_face_face_category);
+
   //=================================================== Loop over faces
   //                OUTGOING                            but process
   //                                                    only outgoing faces
   std::vector<int>                outb_face_slot_indices;
+  std::vector<int>                outb_face_face_category;
   for (short f=0; f<num_faces; f++)
   {
     double mu        = spds->omega.Dot(slab_cell->face_normals[f]);
@@ -104,6 +115,8 @@ SlotDynamics(TSlab *slab_cell,
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=0.0)
     {
+      outb_face_face_category.push_back(0);
+
       //========================================== Check if this face is
       //                                           the max size
       largest_face = 1;
@@ -150,6 +163,7 @@ SlotDynamics(TSlab *slab_cell,
   }//for f
 
   so_cell_outb_face_slot_indices.push_back(outb_face_slot_indices);
+  so_cell_outb_face_face_category.push_back(outb_face_face_category);
 }
 
 
