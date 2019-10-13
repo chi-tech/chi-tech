@@ -31,21 +31,19 @@ chi_mesh::SweepManagement::SweepBuffer::
 }
 
 //###################################################################
-/**Check if the buffer has been initialized. This method gets
- * executed before the workstage commences and before a sweep
- * is performed. It also only executes once and only once. Its main
- * purpose is to break-up the angular flux vectors into messages all
- * of which will fit into the specified eager limit.*/
-void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
+/**Builds message structure.
+ *
+ * Outgoing and incoming data needs to be sub-divided into messages
+ * each of which is smaller than the MPI eager-limit. There are
+ * three parts to this: predecessors, delayed-predecessors and successors.*/
+void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
 {
-  if (initialized) return;
-
-  //============================================= Check angleset is complete
+//============================================= Check angleset is complete
   if (angleset->angles.empty())
   {
     chi_log.Log(LOG_ALLERROR)
-    << "A call to SweepBuffer::Initialize() has been made without"
-       " an initialized angleset.";
+      << "A call to SweepBuffer::BuildMessageStructure() has been made without"
+         " an initialized angleset.";
     exit(EXIT_FAILURE);
   }
 
@@ -56,7 +54,14 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
   int num_angles = angleset->angles.size();
 
   //============================================= Predecessor locations
-  for (size_t prelocI=0; prelocI<spds->location_dependencies.size(); prelocI++)
+  size_t num_dependencies = spds->location_dependencies.size();
+
+  prelocI_message_count.resize(num_dependencies,0);
+  prelocI_message_size.resize(num_dependencies);
+  prelocI_message_blockpos.resize(num_dependencies);
+  prelocI_message_available.clear();
+
+  for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
   {
     u_ll_int num_unknowns =
       fluds->prelocI_face_dof_count[prelocI]*num_grps*num_angles;
@@ -74,9 +79,7 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
 
-    prelocI_message_count.push_back(message_count);
-    prelocI_message_size.push_back(std::vector<u_ll_int>());
-    prelocI_message_blockpos.push_back(std::vector<u_ll_int>());
+    prelocI_message_count[prelocI] = message_count;
 
     u_ll_int pre_block_pos = 0;
     for (int m=0; m<(message_count-1); m++)
@@ -92,16 +95,23 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
       prelocI_message_size[prelocI].push_back(num_unknowns);
     }
 
-    prelocI_message_available.push_back(std::vector<bool>(message_count,false));
+    prelocI_message_available.emplace_back(message_count,false);
   }
 
   //============================================= Delayed Predecessor locations
-  for (size_t prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  size_t num_delayed_dependencies = spds->delayed_location_dependencies.size();
+
+  delayed_prelocI_message_count.resize(num_delayed_dependencies,0);
+  delayed_prelocI_message_size.resize(num_delayed_dependencies);
+  delayed_prelocI_message_blockpos.resize(num_delayed_dependencies);
+  delayed_prelocI_message_available.clear();
+
+  for (size_t prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
   {
     angleset->delayed_prelocI_norm.push_back(0.0);
 
     u_ll_int num_unknowns =
-        fluds->delayed_prelocI_face_dof_count[prelocI]*num_grps*num_angles;
+      fluds->delayed_prelocI_face_dof_count[prelocI]*num_grps*num_angles;
 
     u_ll_int message_size  = num_unknowns;
     int      message_count = 1;
@@ -116,9 +126,7 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
 
-    delayed_prelocI_message_count.push_back(message_count);
-    delayed_prelocI_message_size.push_back(std::vector<u_ll_int>());
-    delayed_prelocI_message_blockpos.push_back(std::vector<u_ll_int>());
+    delayed_prelocI_message_count[prelocI] = message_count;
 
     u_ll_int pre_block_pos = 0;
     for (int m=0; m<(message_count-1); m++)
@@ -134,13 +142,21 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
       delayed_prelocI_message_size[prelocI].push_back(num_unknowns);
     }
 
-    delayed_prelocI_message_available.push_back(
-      std::vector<bool>(message_count,false));
+    delayed_prelocI_message_available.emplace_back(message_count,false);
   }
 
 
   //============================================= Successor locations
-  for (int deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+  size_t num_successors = spds->location_successors.size();
+
+  deplocI_message_count.resize(num_successors,0);
+  deplocI_message_size.resize(num_successors);
+  deplocI_message_blockpos.resize(num_successors);
+
+  deplocI_message_sent.clear();
+  deplocI_message_request.clear();
+
+  for (size_t deplocI=0; deplocI<num_successors; deplocI++)
   {
     u_ll_int num_unknowns =
       fluds->deplocI_face_dof_count[deplocI]*num_grps*num_angles;
@@ -163,9 +179,7 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
     chi_global_timings[14] += message_count;
     chi_global_timings[15] += 1.0;
 
-    deplocI_message_count.push_back(message_count);
-    deplocI_message_size.push_back(std::vector<u_ll_int>());
-    deplocI_message_blockpos.push_back(std::vector<u_ll_int>());
+    deplocI_message_count[deplocI] = message_count;
 
     u_ll_int dep_block_pos = 0;
     for (int m=0; m<(message_count-1); m++)
@@ -181,9 +195,8 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
       deplocI_message_size[deplocI].push_back(num_unknowns);
     }
 
-    deplocI_message_sent.push_back(std::vector<bool>(message_count,false));
-    deplocI_message_request.push_back(
-      std::vector<MPI_Request>(message_count,MPI_Request()));
+    deplocI_message_sent.emplace_back(message_count,false);
+    deplocI_message_request.emplace_back(message_count,MPI_Request());
   }
 
   angleset->fluds->SetReferencePsi(&angleset->local_psi,
@@ -193,8 +206,8 @@ void chi_mesh::SweepManagement::SweepBuffer::CheckInitialized()
                                    &angleset->boundryI_incoming_psi,
                                    &angleset->delayed_prelocI_outgoing_psi);
 
-  initialized = true;
 }
+
 
 //###################################################################
 /**Checks if data has been initialized and initializes it if not.*/

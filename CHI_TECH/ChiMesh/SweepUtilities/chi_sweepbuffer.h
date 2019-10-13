@@ -56,6 +56,7 @@ public:
   SweepBuffer(chi_mesh::SweepManagement::AngleSet* ref_angleset,
               int sweep_eager_limit,
               ChiMPICommunicatorSet* in_comm_set);
+  void BuildMessageStructure();
   void CheckInitialized();
   void InitializeBuffers();
   void SendDownstreamPsi(int angle_set_num);

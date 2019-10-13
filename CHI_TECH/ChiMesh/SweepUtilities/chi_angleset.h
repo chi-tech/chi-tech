@@ -61,6 +61,8 @@ public:
     fluds->InitializeAlphaElements(spds);
     fluds->InitializeBetaElements(spds);
 
+    sweep_buffer.BuildMessageStructure();
+
     delayed_local_norm = 0.0;
   };
 

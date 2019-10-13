@@ -42,9 +42,6 @@ AngleSetAdvance(chi_mesh::SweepManagement::SweepChunk *sweep_chunk,
   if (executed)
     return FLAG_FINISHED;
 
-  //================================================== Check sweep buffer
-  sweep_buffer.CheckInitialized();
-
   //================================================== Check all predecessor
   //                                                   locations sent data
   if (!sweep_buffer.CheckUpstreamPsiAvailable(angle_set_num))
