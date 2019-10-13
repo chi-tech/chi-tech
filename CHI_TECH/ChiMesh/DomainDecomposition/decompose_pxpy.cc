@@ -6,6 +6,10 @@ typedef std::pair<int,int>  IntPair;
 typedef std::vector<double> DblVec;
 typedef std::vector<int>    IntVec;
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //================================================== Define LBF-Calc funtion
 /**Makes a centroid based load balance factor calculation.
  *

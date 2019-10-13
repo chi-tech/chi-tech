@@ -2,10 +2,10 @@
 
 #include "chi_SPDS.h"
 
-#include "../../ChiMesh/Cell/cell.h"
-#include "../../ChiMesh/Cell/cell_slab.h"
-#include "../../ChiMesh/Cell/cell_polygon.h"
-#include "../../ChiMesh/Cell/cell_polyhedron.h"
+#include <ChiMesh/Cell/cell.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <chi_log.h>
 
@@ -30,7 +30,7 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
 
   //================================================== Initialize dependent
   //                                                   locations
-  int num_of_deplocs = spds->location_successors.size();
+  size_t num_of_deplocs = spds->location_successors.size();
   deplocI_face_dof_count.resize(num_of_deplocs,0);
   deplocI_cell_views.resize(num_of_deplocs,std::vector<CompactCellView>());
 
@@ -56,17 +56,17 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
 
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
-      TSlab* slab_cell = static_cast<TSlab*>(cell);
+      auto slab_cell = static_cast<TSlab*>(cell);
       SlotDynamics(slab_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if slab
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
-      TPolygon* poly_cell = static_cast<TPolygon*>(cell);
+      auto poly_cell = static_cast<TPolygon*>(cell);
       SlotDynamics(poly_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if polygon
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      TPolyhedron* polyh_cell = static_cast<TPolyhedron*>(cell);
+      auto polyh_cell = static_cast<TPolyhedron*>(cell);
       SlotDynamics(polyh_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if polyhedron
     else
@@ -96,19 +96,19 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
-      TSlab* slab_cell = static_cast<TSlab*>(cell);
+      auto slab_cell = static_cast<TSlab*>(cell);
       IncidentMapping(slab_cell,spds,local_so_cell_mapping);
     }//if slab
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
-      TPolygon* poly_cell = static_cast<TPolygon*>(cell);
+      auto poly_cell = static_cast<TPolygon*>(cell);
       IncidentMapping(poly_cell,spds,local_so_cell_mapping);
     }//if polygon
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      TPolyhedron* polyh_cell = static_cast<TPolyhedron*>(cell);
+      auto polyh_cell = static_cast<TPolyhedron*>(cell);
       IncidentMapping(polyh_cell,spds,local_so_cell_mapping);
     }//if polyhedron
 
@@ -136,13 +136,5 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
   so_cell_inco_face_dof_indices.shrink_to_fit();
 
   nonlocal_outb_face_deplocI_slot.shrink_to_fit();
-
-}
-
-//###################################################################
-/**Process local interfaces.*/
-void chi_mesh::SweepManagement::FLUDS::
- ProcessLocalInterfaces(chi_mesh::SweepManagement::SPDS *spds)
-{
 
 }

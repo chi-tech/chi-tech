@@ -28,7 +28,9 @@ extern ChiMath    chi_math_handler;
 
 #define SWEEP_EAGER_LIMIT 5
 
+#include <chi_log.h>
 
+extern ChiLog chi_log;
 
 
 //###################################################################

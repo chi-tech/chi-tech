@@ -5,6 +5,10 @@
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //##############################################
 /**Groupset constructor.*/
 LBSGroupset::LBSGroupset()

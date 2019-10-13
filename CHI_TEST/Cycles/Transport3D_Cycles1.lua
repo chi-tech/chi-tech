@@ -4,7 +4,6 @@ if (chi_location_id == 0) then
 end
 --dofile(CHI_LIBRARY)
 
-print(LuaNamespace.Name)
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()

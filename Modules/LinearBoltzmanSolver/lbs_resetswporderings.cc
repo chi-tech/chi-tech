@@ -8,6 +8,10 @@ extern ChiMPI chi_mpi;
 
 extern double chi_global_timings[20];
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for
  * another.*/

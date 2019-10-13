@@ -10,11 +10,6 @@
 
 #include <ChiPhysics/chi_physics_namespace.h>
 
-typedef chi_mesh::SweepManagement::AngleAggregation AngleAgg;
-
-//#define NPT_ANGAGG_SINGLE 1
-//#define NPT_ANGAGG_POLAR 2
-
 namespace LinearBoltzman
 {
   enum class AngleAggregationType
@@ -24,6 +19,7 @@ namespace LinearBoltzman
   };
 }
 
+typedef chi_mesh::SweepManagement::AngleAggregation AngleAgg;
 typedef std::pair<int,int> GsSubSet;
 typedef std::pair<int,int> AngSubSet;
 

@@ -134,12 +134,8 @@ private:
       delayed_nonlocal_inc_face_prelocI_slot_dof;
 
 public:
-  FLUDS(int in_G)
-  {
-//    local_psi_stride=0;
-//    local_psi_max_elements=0;
-    G=in_G;
-  }
+  FLUDS(int in_G) : G(in_G)
+  { }
 
 
   void SetReferencePsi(std::vector<std::vector<double>>*  local_psi,
@@ -160,37 +156,6 @@ public:
 public:
   //01
   void InitializeAlphaElements(chi_mesh::SweepManagement::SPDS *spds);
-  void ProcessLocalInterfaces(chi_mesh::SweepManagement::SPDS *spds);
-  //02
-  void InitializeBetaElements(chi_mesh::SweepManagement::SPDS *spds,
-                              int tag_index=0);
-
-  //chi_FLUDSv2.cc
-  double*  OutgoingPsi(int cell_so_index, int outb_face_counter,
-                       int face_dof, int n);
-  double*  UpwindPsi(int cell_so_index, int inc_face_counter,
-                     int face_dof,int g, int n);
-
-
-  double*  NLOutgoingPsi(int outb_face_count,int face_dof, int n);
-
-  double*  NLUpwindPsi(int nonl_inc_face_counter,
-                       int face_dof,int g, int n);
-
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, TVertexFace face_v_index);
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, TEdgeFace edge_v_indices);
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, TPolyFace* poly_face);
-
-
-  void SerializeCellInfo(std::vector<CompactCellView>* cell_views,
-                         std::vector<int>& face_indices,
-                         int num_face_dofs);
-  void DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
-                           std::vector<int>* face_indices,
-                           int& num_face_dofs);
 
   //01a
   void SlotDynamics(TSlab *slab_cell,
@@ -222,6 +187,10 @@ public:
                        chi_mesh::SweepManagement::SPDS* spds,
                        std::vector<int>&  local_so_cell_mapping);
 
+  //02
+  void InitializeBetaElements(chi_mesh::SweepManagement::SPDS *spds,
+                              int tag_index=0);
+
   //02a
   void NLIncidentMapping(TSlab *slab_cell,
                          chi_mesh::SweepManagement::SPDS* spds);
@@ -231,6 +200,34 @@ public:
   //02c
   void NLIncidentMapping(TPolyhedron *polyh_cell,
                          chi_mesh::SweepManagement::SPDS* spds);
+
+  //chi_FLUDS.cc
+  double*  OutgoingPsi(int cell_so_index, int outb_face_counter,
+                       int face_dof, int n);
+  double*  UpwindPsi(int cell_so_index, int inc_face_counter,
+                     int face_dof,int g, int n);
+
+
+  double*  NLOutgoingPsi(int outb_face_count,int face_dof, int n);
+
+  double*  NLUpwindPsi(int nonl_inc_face_counter,
+                       int face_dof,int g, int n);
+
+  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
+                            int face_slot, TVertexFace face_v_index);
+  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
+                            int face_slot, TEdgeFace edge_v_indices);
+  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
+                            int face_slot, TPolyFace* poly_face);
+
+
+  void SerializeCellInfo(std::vector<CompactCellView>* cell_views,
+                         std::vector<int>& face_indices,
+                         int num_face_dofs);
+  void DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
+                           std::vector<int>* face_indices,
+                           int& num_face_dofs);
+
 };
 
 #endif

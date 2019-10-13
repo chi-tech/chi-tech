@@ -2,6 +2,8 @@
 
 #include <chi_log.h>
 
+extern ChiLog chi_log;
+
 //###################################################################
 /** Adds a vertex to the graph.*/
 void chi_graph::DirectedGraph::AddVertex(void* context)

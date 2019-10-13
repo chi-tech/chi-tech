@@ -31,8 +31,8 @@ double*  chi_mesh::SweepManagement::FLUDS::
 
   if (fc >= 0)
   {
-    int index =
-      local_psi_Gn_block_stride[fc]*G*n +
+    size_t index =
+      local_psi_Gn_block_strideG[fc]*n +
       so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter]*
       local_psi_stride[fc]*G +
       face_dof*G;
@@ -41,8 +41,8 @@ double*  chi_mesh::SweepManagement::FLUDS::
   }
   else
   {
-    int index =
-      delayed_local_psi_Gn_block_stride*G*n +
+    size_t index =
+      delayed_local_psi_Gn_block_strideG*n +
       so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter]*
       delayed_local_psi_stride*G +
       face_dof*G;
@@ -101,8 +101,8 @@ UpwindPsi(int cell_so_index, int inc_face_counter,
 
   if (fc >= 0)
   {
-    int index =
-      local_psi_Gn_block_stride[fc]*G*n +
+    size_t index =
+      local_psi_Gn_block_strideG[fc]*n +
       so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].first*
       local_psi_stride[fc]*G +
       so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
@@ -112,8 +112,8 @@ UpwindPsi(int cell_so_index, int inc_face_counter,
   }
   else
   {
-    int index =
-      delayed_local_psi_Gn_block_stride*G*n +
+    size_t index =
+      delayed_local_psi_Gn_block_strideG*n +
       so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].first*
       delayed_local_psi_stride*G +
       so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
@@ -192,7 +192,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     {
       cell_already_there = true;
       deplocI_cell_views[deplocI][c].second.
-        push_back(  CompactFaceView(face_slot,std::vector<int>(1,face_v_index)));
+        emplace_back(face_slot,std::vector<int>(1,face_v_index));
       break;
     }
   }
@@ -203,7 +203,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     CompactCellView new_cell_view;
     new_cell_view.first = cell_g_index;
     new_cell_view.second.
-      push_back(  CompactFaceView(face_slot,std::vector<int>(1,face_v_index)));
+      emplace_back(face_slot,std::vector<int>(1,face_v_index));
 
     deplocI_cell_views[deplocI].push_back(new_cell_view);
   }
@@ -230,7 +230,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
 
 
       deplocI_cell_views[deplocI][c].second.
-        push_back(  CompactFaceView(face_slot,verts));
+        emplace_back(face_slot,verts);
       break;
     }
   }
@@ -245,7 +245,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     verts.push_back(edge_v_indices[1]);
 
     new_cell_view.second.
-      push_back(  CompactFaceView(face_slot,verts));
+      emplace_back(face_slot,verts);
 
     deplocI_cell_views[deplocI].push_back(new_cell_view);
   }
@@ -267,7 +267,7 @@ void  chi_mesh::SweepManagement::FLUDS::
     {
       cell_already_there = true;
       deplocI_cell_views[deplocI][c].second.
-        push_back(  CompactFaceView(face_slot,poly_face->v_indices)  );
+        emplace_back(face_slot,poly_face->v_indices);
       break;
     }
   }
@@ -278,7 +278,7 @@ void  chi_mesh::SweepManagement::FLUDS::
     CompactCellView new_cell_view;
     new_cell_view.first = cell_g_index;
     new_cell_view.second.
-      push_back(  CompactFaceView(face_slot,poly_face->v_indices)  );
+      emplace_back(face_slot,poly_face->v_indices);
 
     deplocI_cell_views[deplocI].push_back(new_cell_view);
   }
@@ -324,14 +324,14 @@ SerializeCellInfo(std::vector<CompactCellView>* cell_views,
     std::vector<CompactFaceView>* cell_face_views =
       &(*cell_views)[c].second;
 
-    int num_faces = cell_face_views->size();
-    for (int f=0; f<num_faces; f++)
+    size_t num_faces = cell_face_views->size();
+    for (size_t f=0; f<num_faces; f++)
     {
       face_indices.push_back(glob_index);
       face_indices.push_back((*cell_face_views)[f].first);
       std::vector<int>* face_vertices = &(*cell_face_views)[f].second;
 
-      int num_verts = face_vertices->size();
+      size_t num_verts = face_vertices->size();
       for (int fi=0; fi<num_verts; fi++)
       {
         face_indices.push_back((*face_vertices)[fi]);
@@ -351,7 +351,6 @@ DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
   int num_cells     = (*face_indices)[1];
 
   cell_views.resize(num_cells);
-  //chi_log.Log(LOG_ALL) << "Number of cells= " << num_cells;
 
   int k         =  2;
   int last_cell = -1;
@@ -385,16 +384,6 @@ DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
     else
     {
       cell_views[c].second[f].second.push_back(entry);
-
-
-//      chi_log.Log(LOG_ALL) << "Cell " << c
-//                                << "(" << cell_views[c].first << ")"
-//                                << " Face " << f
-//                                << " Store " << cell_views[c].second[f].first
-//                                << " Vert " << v
-//                                << " Val= " << entry;
-
-
       v++;
     }
     k++;

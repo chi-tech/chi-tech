@@ -30,12 +30,14 @@ public:
   //FLUDS
   std::vector<std::vector<double>>  local_psi;
   std::vector<double>               delayed_local_psi;
+  std::vector<double>               delayed_local_psi_old;
   std::vector<std::vector<double>>  deplocI_outgoing_psi;
   std::vector<std::vector<double>>  prelocI_outgoing_psi;
   std::vector<std::vector<double>>  boundryI_incoming_psi;
 
   std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi;
   std::vector<double>               delayed_prelocI_norm;
+  double                            delayed_local_norm;
 
   AngleSet(int in_numgrps,
            int in_ref_subset,
@@ -58,6 +60,8 @@ public:
     fluds = new chi_mesh::SweepManagement::FLUDS(num_grps);
     fluds->InitializeAlphaElements(spds);
     fluds->InitializeBetaElements(spds);
+
+    delayed_local_norm = 0.0;
   };
 
   void InitializeDelayedUpstreamData();

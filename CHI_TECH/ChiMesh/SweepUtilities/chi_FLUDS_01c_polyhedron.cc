@@ -5,6 +5,10 @@
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
 void chi_mesh::SweepManagement::FLUDS::
@@ -19,8 +23,6 @@ void chi_mesh::SweepManagement::FLUDS::
   chi_mesh::Vector ihat(1.0,0.0,0.0);
   chi_mesh::Vector jhat(0.0,1.0,0.0);
   chi_mesh::Vector khat(0.0,0.0,1.0);
-
-//  LockBox& lock_box = lock_boxes.front();
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process

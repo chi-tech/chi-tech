@@ -2,12 +2,8 @@
 #define _chi_sweep_h
 
 #include "../chi_mesh.h"
-
 #include <set>
 
-#include <chi_log.h>
-
-extern ChiLog chi_log;
 
 //###################################################################
 namespace chi_mesh
