@@ -51,6 +51,7 @@ private:
 
   ChiMPICommunicatorSet*   comm_set;
 
+  int max_num_mess;
 
 public:
   SweepBuffer(chi_mesh::SweepManagement::AngleSet* ref_angleset,

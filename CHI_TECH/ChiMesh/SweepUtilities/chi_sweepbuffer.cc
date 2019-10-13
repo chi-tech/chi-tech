@@ -28,6 +28,8 @@ chi_mesh::SweepManagement::SweepBuffer::
   upstream_data_initialized = false;
   EAGER_LIMIT = sweep_eager_limit;
   comm_set = in_comm_set;
+
+  max_num_mess = 0;
 }
 
 //###################################################################
@@ -206,6 +208,23 @@ void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
                                    &angleset->boundryI_incoming_psi,
                                    &angleset->delayed_prelocI_outgoing_psi);
 
+  int local_max_message_count = 0;
+  for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
+    local_max_message_count =
+      std::max(prelocI_message_count[prelocI], local_max_message_count);
+
+  for (size_t prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
+    local_max_message_count =
+      std::max(delayed_prelocI_message_count[prelocI], local_max_message_count);
+
+  for (size_t deplocI=0; deplocI<num_successors; deplocI++)
+    local_max_message_count =
+      std::max(deplocI_message_count[deplocI], local_max_message_count);
+
+  MPI_Allreduce(&local_max_message_count,
+                &max_num_mess,
+                1, MPI_INT,
+                MPI_MAX, MPI_COMM_WORLD);
 }
 
 
@@ -269,7 +288,7 @@ void chi_mesh::SweepManagement::SweepBuffer::
 
   for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
   {
-    int locJ              = spds->location_successors[deplocI];
+    int locJ = spds->location_successors[deplocI];
 
     int num_mess = deplocI_message_count[deplocI];
     for (int m=0; m<num_mess; m++)
@@ -281,7 +300,8 @@ void chi_mesh::SweepManagement::SweepBuffer::
                   message_size,
                   MPI_DOUBLE,
                   comm_set->MapIonJ(locJ,locJ),
-                  10000*angle_set_num + 100*num_mess + m,   //tag
+                  //10000*angle_set_num + 100*num_mess + m,   //tag
+                  max_num_mess*angle_set_num + m,
                   comm_set->communicators[locJ],
                   &deplocI_message_request[deplocI][m]);
     }//for message
@@ -315,7 +335,8 @@ ReceiveDelayedData(int angle_set_num)
 
         MPI_Status status0;
         MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   10000*angle_set_num + 100*num_mess + m, //tag
+                   //10000*angle_set_num + 100*num_mess + m,   //tag
+                   max_num_mess*angle_set_num + m,
                    comm_set->communicators[chi_mpi.location_id],
                    &msg_avail,&status0);
 
@@ -333,7 +354,8 @@ ReceiveDelayedData(int angle_set_num)
                  message_size,
                  MPI_DOUBLE,
                  comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                 10000*angle_set_num + 100*num_mess + m, //tag
+                 //10000*angle_set_num + 100*num_mess + m,   //tag
+                 max_num_mess*angle_set_num + m,
                  comm_set->communicators[chi_mpi.location_id],
                  &status);
 
@@ -467,7 +489,8 @@ CheckUpstreamPsiAvailable(int angle_set_num)
         int msg_avail = 1;
 
         MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   10000*angle_set_num + 100*num_mess + m, //tag
+                   //10000*angle_set_num + 100*num_mess + m,   //tag
+                   max_num_mess*angle_set_num + m,
                    comm_set->communicators[chi_mpi.location_id],
                    &msg_avail,MPI_STATUS_IGNORE);
 
@@ -488,7 +511,8 @@ CheckUpstreamPsiAvailable(int angle_set_num)
                    message_size,
                    MPI_DOUBLE,
                    comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   10000*angle_set_num + 100*num_mess + m, //tag
+                   //10000*angle_set_num + 100*num_mess + m,   //tag
+                   max_num_mess*angle_set_num + m,
                    comm_set->communicators[chi_mpi.location_id],
                    MPI_STATUS_IGNORE);
 
