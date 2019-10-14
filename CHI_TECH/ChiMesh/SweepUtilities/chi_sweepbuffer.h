@@ -51,9 +51,9 @@ private:
 
   ChiMPICommunicatorSet*   comm_set;
 
+public:
   int max_num_mess;
 
-public:
   SweepBuffer(chi_mesh::SweepManagement::AngleSet* ref_angleset,
               int sweep_eager_limit,
               ChiMPICommunicatorSet* in_comm_set);

@@ -73,6 +73,16 @@ public:
     return spds;
   }
 
+  int GetMaxBufferMessages()
+  {
+    return sweep_buffer.max_num_mess;
+  }
+
+  void SetMaxBufferMessages(int new_max)
+  {
+    sweep_buffer.max_num_mess = new_max;
+  }
+
   int GetNumGrps() {return num_grps;}
 
   void EnsureClearedBuffers() {

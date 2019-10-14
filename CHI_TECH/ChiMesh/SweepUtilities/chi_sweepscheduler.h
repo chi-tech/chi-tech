@@ -35,13 +35,6 @@ private:
 public:
   SweepScheduler(int in_scheduler_type,
                  AngleAggregation* in_angle_agg);
-//  {
-//    scheduler_type = in_scheduler_type;
-//    angle_agg      = in_angle_agg;
-//
-//    if (scheduler_type == DEPTH_OF_GRAPH)
-//      InitializeAlgoDOG();
-//  }
 
   void Sweep(SweepChunk* in_sweep_chunk=NULL);
 

@@ -210,23 +210,21 @@ void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
 
   //================================================== All reduce to get
   //                                                   maximum message count
-  int local_max_message_count = 0;
+  int angset_max_message_count = 0;
   for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
-    local_max_message_count =
-      std::max(prelocI_message_count[prelocI], local_max_message_count);
+    angset_max_message_count =
+      std::max(prelocI_message_count[prelocI], angset_max_message_count);
 
   for (size_t prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
-    local_max_message_count =
-      std::max(delayed_prelocI_message_count[prelocI], local_max_message_count);
+    angset_max_message_count =
+      std::max(delayed_prelocI_message_count[prelocI], angset_max_message_count);
 
   for (size_t deplocI=0; deplocI<num_successors; deplocI++)
-    local_max_message_count =
-      std::max(deplocI_message_count[deplocI], local_max_message_count);
+    angset_max_message_count =
+      std::max(deplocI_message_count[deplocI], angset_max_message_count);
 
-  MPI_Allreduce(&local_max_message_count,
-                &max_num_mess,
-                1, MPI_INT,
-                MPI_MAX, MPI_COMM_WORLD);
+  //Temporarily assign max_num_mess tot he local maximum
+  max_num_mess = angset_max_message_count;
 }
 
 
