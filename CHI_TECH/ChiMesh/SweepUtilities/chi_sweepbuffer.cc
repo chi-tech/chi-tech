@@ -208,6 +208,8 @@ void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
                                    &angleset->boundryI_incoming_psi,
                                    &angleset->delayed_prelocI_outgoing_psi);
 
+  //================================================== All reduce to get
+  //                                                   maximum message count
   int local_max_message_count = 0;
   for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
     local_max_message_count =
@@ -229,7 +231,11 @@ void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
 
 
 //###################################################################
-/**Checks if data has been initialized and initializes it if not.*/
+/** This is the final level of initialization before a sweep-chunk executes.
+ * Once all upstream dependencies are met and if the sweep scheduler places
+ * this angleset as "ready-to-execute", then the angle-set will call this
+ * method. It is also fairly important in terms of memory to only allocate
+ * these chunks of memory since they form the majority of memory requirements.*/
 void chi_mesh::SweepManagement::SweepBuffer::
   InitializeBuffers()
 {
@@ -280,7 +286,8 @@ void chi_mesh::SweepManagement::SweepBuffer::
 }
 
 //###################################################################
-/**Sends downstream psi.*/
+/**Sends downstream psi. This method gets called after a sweep chunk has
+ * executed */
 void chi_mesh::SweepManagement::SweepBuffer::
   SendDownstreamPsi(int angle_set_num)
 {
@@ -300,8 +307,7 @@ void chi_mesh::SweepManagement::SweepBuffer::
                   message_size,
                   MPI_DOUBLE,
                   comm_set->MapIonJ(locJ,locJ),
-                  //10000*angle_set_num + 100*num_mess + m,   //tag
-                  max_num_mess*angle_set_num + m,
+                  max_num_mess*angle_set_num + m, //tag
                   comm_set->communicators[locJ],
                   &deplocI_message_request[deplocI][m]);
     }//for message
@@ -335,8 +341,7 @@ ReceiveDelayedData(int angle_set_num)
 
         MPI_Status status0;
         MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   //10000*angle_set_num + 100*num_mess + m,   //tag
-                   max_num_mess*angle_set_num + m,
+                   max_num_mess*angle_set_num + m, //tag
                    comm_set->communicators[chi_mpi.location_id],
                    &msg_avail,&status0);
 
@@ -354,8 +359,7 @@ ReceiveDelayedData(int angle_set_num)
                  message_size,
                  MPI_DOUBLE,
                  comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                 //10000*angle_set_num + 100*num_mess + m,   //tag
-                 max_num_mess*angle_set_num + m,
+                 max_num_mess*angle_set_num + m, //tag
                  comm_set->communicators[chi_mpi.location_id],
                  &status);
 
@@ -489,8 +493,7 @@ CheckUpstreamPsiAvailable(int angle_set_num)
         int msg_avail = 1;
 
         MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   //10000*angle_set_num + 100*num_mess + m,   //tag
-                   max_num_mess*angle_set_num + m,
+                   max_num_mess*angle_set_num + m, //tag
                    comm_set->communicators[chi_mpi.location_id],
                    &msg_avail,MPI_STATUS_IGNORE);
 
@@ -511,8 +514,7 @@ CheckUpstreamPsiAvailable(int angle_set_num)
                    message_size,
                    MPI_DOUBLE,
                    comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                   //10000*angle_set_num + 100*num_mess + m,   //tag
-                   max_num_mess*angle_set_num + m,
+                   max_num_mess*angle_set_num + m, //tag
                    comm_set->communicators[chi_mpi.location_id],
                    MPI_STATUS_IGNORE);
 
