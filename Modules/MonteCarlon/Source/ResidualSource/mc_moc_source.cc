@@ -389,9 +389,9 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
           0.5*cell_phi_star[lc][i] +
           0.5*cell_phi_star[lc][i+1];
 
-        cell_abs_total_source[lc] += std::fabs(phi_avg)*cell_sigma_s[lc]/num_subdivs;
+        cell_abs_total_source[lc] += std::fabs(phi_avg)*cell_sigma_s[lc]*dz/num_subdivs;
         cell_total_source[lc] += phi_avg;
-        cell_subintvl_source[lc][i] = phi_avg*cell_sigma_s[lc]/num_subdivs;
+        cell_subintvl_source[lc][i] = phi_avg*cell_sigma_s[lc]*dz/num_subdivs;
       }
     }//for subdivs
     total_abs_source += cell_abs_total_source[lc];
@@ -489,7 +489,7 @@ DirectSampling(chi_montecarlon::RandomNumberGenerator* rng)
       if (s < (cumulator/std::fabs(cell_abs_total_source[lc])))
       {
         z = cell_z_i_star[lc][i] + w*dzstar;
-        sampling_normalization *= dz*
+        sampling_normalization *=
           ((cell_subintvl_source[lc][i]<0.0) ? -1.0 : 1.0);
         break;
       }
@@ -500,6 +500,8 @@ DirectSampling(chi_montecarlon::RandomNumberGenerator* rng)
     new_particle.w = sampling_normalization;
 
     new_particle.cur_cell_ind = cell_glob_index;
+
+    if (w<0.0) new_particle.alive = false;
 
   }
 
@@ -551,13 +553,11 @@ UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
     double dzstar = (v1-v0).Norm()/num_subdivs;
     double w = rng->Rand();
 
-    double sampling_normalization = total_abs_source*num_local_cells;
+    double sampling_normalization = num_local_cells;
     double z=0.0;
     int i = std::floor(rng->Rand()*num_subdivs);
     z = cell_z_i_star[lc][i] + w*dzstar;
-    sampling_normalization *= dz*
-                              cell_subintvl_source[lc][i]*num_subdivs/
-                              total_abs_source;
+    sampling_normalization *= cell_subintvl_source[lc][i]*num_subdivs;
 
     new_particle.pos = chi_mesh::Vector(0.0,0.0,z);
     new_particle.egrp = 0;
