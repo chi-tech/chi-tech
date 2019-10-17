@@ -19,7 +19,7 @@ namespace LinearBoltzman
   };
 }
 
-typedef chi_mesh::SweepManagement::AngleAggregation AngleAgg;
+typedef chi_mesh::sweep_management::AngleAggregation AngleAgg;
 typedef std::pair<int,int> GsSubSet;
 typedef std::pair<int,int> AngSubSet;
 
@@ -34,7 +34,7 @@ public:
   chi_math::ProductQuadrature*                 quadrature;
   std::vector<std::vector<double>>             d2m_op;
   std::vector<std::vector<double>>             m2d_op;
-  chi_mesh::SweepManagement::AngleAggregation* angle_agg;
+  chi_mesh::sweep_management::AngleAggregation* angle_agg;
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
   std::vector<GsSubSet>                        grp_subsets;
@@ -65,6 +65,8 @@ public:
   chi_physics::Solver*                         wgdsa_solver;
   chi_physics::Solver*                         tgdsa_solver;
   std::vector<int>                             wgdsa_cell_dof_array_address;
+
+  double                                       latest_convergence_metric;
 
   //npt_groupset.cc
        LBSGroupset();

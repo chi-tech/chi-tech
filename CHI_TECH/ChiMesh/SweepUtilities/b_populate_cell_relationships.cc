@@ -18,9 +18,9 @@ extern double chi_global_timings[20];
 
 //###################################################################
 /**Populates the local sub-grid connection information for sweep orderings.*/
-void chi_mesh::SweepManagement::PopulateCellRelationships(
+void chi_mesh::sweep_management::PopulateCellRelationships(
          chi_mesh::MeshContinuum *grid,
-         chi_mesh::SweepManagement::SPDS* sweep_order,
+         chi_mesh::sweep_management::SPDS* sweep_order,
          std::vector<std::set<int>>& cell_dependencies,
          std::vector<std::set<int>>& cell_successors)
 {

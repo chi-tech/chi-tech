@@ -15,11 +15,11 @@ extern ChiMPI     chi_mpi;
 
 //###################################################################
 /**Receives and send predecessor data.*/
-void chi_mesh::SweepManagement::FLUDS::
-InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
+void chi_mesh::sweep_management::FLUDS::
+InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
-  chi_mesh::SweepManagement::SPLS* spls = spds->spls;
+  chi_mesh::sweep_management::SPLS* spls = spds->spls;
 
 //  chi_log.Log(LOG_0) << "Initializing FLUDS Beta elements";
 
@@ -171,19 +171,19 @@ InitializeBetaElements(chi_mesh::SweepManagement::SPDS* spds,int tag_index)
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       TSlab* slab_cell = (TSlab*)cell;
-      NLIncidentMapping(slab_cell,spds);
+      NonLocalIncidentMapping(slab_cell, spds);
     }//if slab
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       TPolygon* poly_cell = (TPolygon*)cell;
-      NLIncidentMapping(poly_cell,spds);
+      NonLocalIncidentMapping(poly_cell, spds);
     }//if polyhedron
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       TPolyhedron* polyh_cell = (TPolyhedron*)cell;
-      NLIncidentMapping(polyh_cell,spds);
+      NonLocalIncidentMapping(polyh_cell, spds);
     }//if polyhedron
 
   }//for csoi

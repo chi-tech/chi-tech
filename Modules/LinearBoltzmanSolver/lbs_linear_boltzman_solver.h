@@ -14,8 +14,8 @@
 
 #include <petscksp.h>
 
-typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
-typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
+typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
+typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 
 namespace LinearBoltzman
 {
@@ -58,7 +58,7 @@ class Solver : public chi_physics::Solver {
   //the stack to use as default. This is loaded during initparrays
   std::vector<std::pair<BoundaryType, int>>     boundary_types;
   std::vector<std::vector<double>>              incident_P0_mg_boundaries;
-  std::vector<chi_mesh::SweepManagement::SPDS*> sweep_orderings;
+  std::vector<chi_mesh::sweep_management::SPDS*> sweep_orderings;
   std::vector<SweepBndry*>                      sweep_boundaries;
 
   ChiMPICommunicatorSet comm_set;
@@ -128,7 +128,9 @@ class Solver : public chi_physics::Solver {
   void DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double *x_src, double *y);
   void ConvergeCycles(MainSweepScheduler& sweepScheduler,
                       SweepChunk* sweep_chunk,
-                      LBSGroupset *groupset);
+                      LBSGroupset *groupset,
+                      double cyclic_tolerance = 1.0e-8,
+                      size_t cyclic_max_iter = 50);
 };
 
 }

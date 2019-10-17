@@ -9,7 +9,7 @@
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
-typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
+typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 //###################################################################
 /**Sets up the sweek chunk for the given discretization method.*/

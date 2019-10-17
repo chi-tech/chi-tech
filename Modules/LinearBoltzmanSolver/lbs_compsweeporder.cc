@@ -12,8 +12,8 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
-typedef chi_mesh::SweepManagement::AngleSet TAngleSet;
-typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;
+typedef chi_mesh::sweep_management::AngleSet TAngleSet;
+typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 #include <iomanip>
 #include "ChiConsole/chi_console.h"
@@ -48,8 +48,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       exit(EXIT_FAILURE);
     }
 
-    chi_mesh::SweepManagement::SPDS* new_swp_order =
-      chi_mesh::SweepManagement::
+    chi_mesh::sweep_management::SPDS* new_swp_order =
+      chi_mesh::sweep_management::
       CreateSweepOrder(groupset->quadrature->polar_ang[0],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
@@ -58,7 +58,7 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     this->sweep_orderings.push_back(new_swp_order);
 
     new_swp_order =
-      chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::
       CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
@@ -82,8 +82,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 
     for (int i=0; i<num_azi; i++)
     {
-      chi_mesh::SweepManagement::SPDS* new_swp_order =
-        chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
         CreateSweepOrder(groupset->quadrature->polar_ang[0],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
@@ -120,8 +120,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     //=========================================== TOP HEMISPHERE
     for (int i=0; i<num_azi; i++)
     {
-      chi_mesh::SweepManagement::SPDS* new_swp_order =
-        chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
                   CreateSweepOrder(groupset->quadrature->polar_ang[0],
                                    groupset->quadrature->azimu_ang[i],
                                    this->grid,
@@ -133,8 +133,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     int pa = num_pol/2;
     for (int i=0; i<num_azi; i++)
     {
-      chi_mesh::SweepManagement::SPDS* new_swp_order =
-        chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
         CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,

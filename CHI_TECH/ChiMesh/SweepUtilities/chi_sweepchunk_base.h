@@ -3,7 +3,7 @@
 
 //###################################################################
 /**Sweep work function*/
-class chi_mesh::SweepManagement::SweepChunk
+class chi_mesh::sweep_management::SweepChunk
 {
 public:
   int                         angle_num;

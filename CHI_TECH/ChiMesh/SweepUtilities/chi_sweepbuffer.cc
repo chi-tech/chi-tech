@@ -16,8 +16,8 @@ extern double chi_global_timings[20];
 
 //###################################################################
 /**Constructor.*/
-chi_mesh::SweepManagement::SweepBuffer::
-  SweepBuffer(chi_mesh::SweepManagement::AngleSet* ref_angleset,
+chi_mesh::sweep_management::SweepBuffer::
+  SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
               int sweep_eager_limit,
               ChiMPICommunicatorSet* in_comm_set)
 {
@@ -38,7 +38,7 @@ chi_mesh::SweepManagement::SweepBuffer::
  * Outgoing and incoming data needs to be sub-divided into messages
  * each of which is smaller than the MPI eager-limit. There are
  * three parts to this: predecessors, delayed-predecessors and successors.*/
-void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
+void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 {
 //============================================= Check angleset is complete
   if (angleset->angles.empty())
@@ -49,8 +49,8 @@ void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
-  chi_mesh::SweepManagement::FLUDS* fluds=  angleset->fluds;
+  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
+  chi_mesh::sweep_management::FLUDS* fluds=  angleset->fluds;
 
   int num_grps   = angleset->GetNumGrps();
   int num_angles = angleset->angles.size();
@@ -234,13 +234,13 @@ void chi_mesh::SweepManagement::SweepBuffer::BuildMessageStructure()
  * this angleset as "ready-to-execute", then the angle-set will call this
  * method. It is also fairly important in terms of memory to only allocate
  * these chunks of memory since they form the majority of memory requirements.*/
-void chi_mesh::SweepManagement::SweepBuffer::
+void chi_mesh::sweep_management::SweepBuffer::
   InitializeBuffers()
 {
   if (!data_initialized)
   {
-    chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
-    chi_mesh::SweepManagement::FLUDS* fluds=  angleset->fluds;
+    chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
+    chi_mesh::sweep_management::FLUDS* fluds=  angleset->fluds;
 
     int num_grps   = angleset->GetNumGrps();
     int num_angles = angleset->angles.size();
@@ -286,10 +286,10 @@ void chi_mesh::SweepManagement::SweepBuffer::
 //###################################################################
 /**Sends downstream psi. This method gets called after a sweep chunk has
  * executed */
-void chi_mesh::SweepManagement::SweepBuffer::
+void chi_mesh::sweep_management::SweepBuffer::
   SendDownstreamPsi(int angle_set_num)
 {
-  chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
+  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
 
   for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
   {
@@ -314,10 +314,10 @@ void chi_mesh::SweepManagement::SweepBuffer::
 
 //###################################################################
 /** Receives delayed data from successor locations. */
-void chi_mesh::SweepManagement::SweepBuffer::
+void chi_mesh::sweep_management::SweepBuffer::
 ReceiveDelayedData(int angle_set_num)
 {
-  chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
+  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
   MPI_Barrier(MPI_COMM_WORLD);
   //======================================== Receive delayed data
   for (size_t prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
@@ -418,12 +418,12 @@ ReceiveDelayedData(int angle_set_num)
 
 //###################################################################
 /**Sends downstream psi.*/
-void chi_mesh::SweepManagement::SweepBuffer::
+void chi_mesh::sweep_management::SweepBuffer::
  CheckDownstreamBuffersClear()
 {
   if (done_sending) return;
 
-  chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
+  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
 
   done_sending = true;
   for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
@@ -452,11 +452,11 @@ void chi_mesh::SweepManagement::SweepBuffer::
 
 //###################################################################
 /**Check if all upstream dependencies have been met.*/
-bool chi_mesh::SweepManagement::SweepBuffer::
+bool chi_mesh::sweep_management::SweepBuffer::
 CheckUpstreamPsiAvailable(int angle_set_num)
 {
-  chi_mesh::SweepManagement::SPDS*  spds =  angleset->GetSPDS();
-  chi_mesh::SweepManagement::FLUDS* fluds=  angleset->fluds;
+  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
+  chi_mesh::sweep_management::FLUDS* fluds=  angleset->fluds;
 
   int num_grps   = angleset->GetNumGrps();
   int num_angles = angleset->angles.size();
@@ -548,7 +548,7 @@ CheckUpstreamPsiAvailable(int angle_set_num)
 
 //###################################################################
 /**Receive all upstream Psi.*/
-void chi_mesh::SweepManagement::SweepBuffer::
+void chi_mesh::sweep_management::SweepBuffer::
   ClearReceiveBuffers()
 {
   angleset->local_psi.clear();

@@ -45,9 +45,9 @@ public:
 
   //02
   void BuildFaceHistogramInfo(double master_tolerance=1.2, double slave_tolerance=1.1);
-  size_t NumberOfFaceHistogramCategories();
-  size_t MapFaceHistogramCategory(size_t num_face_dofs);
-  size_t GetFaceHistogramCategoryDOFSize(size_t category);
+  size_t NumberOfFaceHistogramBins();
+  size_t MapFaceHistogramBins(size_t num_face_dofs);
+  size_t GetFaceHistogramBinDOFSize(size_t category);
   bool IsCellLocal(int cell_global_index=-1);
   bool IsCellBndry(int cell_global_index = 0);
 

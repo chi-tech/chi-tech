@@ -22,7 +22,7 @@ extern ChiMPI     chi_mpi;
  * the outgoing face dof, this function computes the location
  * of this position's upwind psi in the local upwind psi vector
  * and returns a reference to it.*/
-double*  chi_mesh::SweepManagement::FLUDS::
+double*  chi_mesh::sweep_management::FLUDS::
  OutgoingPsi(int cell_so_index, int outb_face_counter,
               int face_dof, int n)
 {
@@ -54,7 +54,7 @@ double*  chi_mesh::SweepManagement::FLUDS::
 
 //###################################################################
 /**Given a */
-double*  chi_mesh::SweepManagement::FLUDS::
+double*  chi_mesh::sweep_management::FLUDS::
 NLOutgoingPsi(int outb_face_counter,
                 int face_dof, int n)
 {
@@ -92,7 +92,7 @@ NLOutgoingPsi(int outb_face_counter,
  * the incoming face dof, this function computes the location
  * where to store this position's outgoing psi and returns a reference
  * to it.*/
-double*  chi_mesh::SweepManagement::FLUDS::
+double*  chi_mesh::sweep_management::FLUDS::
 UpwindPsi(int cell_so_index, int inc_face_counter,
              int face_dof,int g, int n)
 {
@@ -128,7 +128,7 @@ UpwindPsi(int cell_so_index, int inc_face_counter,
 /**Given a sweep ordering index, the incoming face counter,
  * the incoming face dof, this function computes the location
  * where to obtain the position's upwind psi.*/
-double*  chi_mesh::SweepManagement::FLUDS::
+double*  chi_mesh::sweep_management::FLUDS::
  NLUpwindPsi(int nonl_inc_face_counter,
           int face_dof,int g, int n)
 {
@@ -180,7 +180,7 @@ double*  chi_mesh::SweepManagement::FLUDS::
 /**Given a sweep ordering index, the outgoing face counter,
  * the outgoing face dof, this function computes the location
  * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::SweepManagement::FLUDS::
+void  chi_mesh::sweep_management::FLUDS::
 AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
                      TVertexFace face_v_index)
 {
@@ -213,7 +213,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
 /**Given a sweep ordering index, the outgoing face counter,
  * the outgoing face dof, this function computes the location
  * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::SweepManagement::FLUDS::
+void  chi_mesh::sweep_management::FLUDS::
 AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
                      TEdgeFace edge_v_indices)
 {
@@ -255,7 +255,7 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
 /**Given a sweep ordering index, the outgoing face counter,
  * the outgoing face dof, this function computes the location
  * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::SweepManagement::FLUDS::
+void  chi_mesh::sweep_management::FLUDS::
   AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
                        TPolyFace *poly_face)
 {
@@ -297,7 +297,7 @@ void  chi_mesh::SweepManagement::FLUDS::
 /**This cell takes a hierarchy of a cell compact view and
  * serializes it for MPI transmission. This is easy since all
  * the values are integers.*/
-void chi_mesh::SweepManagement::FLUDS::
+void chi_mesh::sweep_management::FLUDS::
 SerializeCellInfo(std::vector<CompactCellView>* cell_views,
                   std::vector<int>& face_indices,
                   int num_face_dofs)
@@ -342,7 +342,7 @@ SerializeCellInfo(std::vector<CompactCellView>* cell_views,
 
 //###################################################################
 /**Deserializes face indices.*/
-void chi_mesh::SweepManagement::FLUDS::
+void chi_mesh::sweep_management::FLUDS::
 DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
                     std::vector<int>* face_indices,
                     int& num_face_dofs)

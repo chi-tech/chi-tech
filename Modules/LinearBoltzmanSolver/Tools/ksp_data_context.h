@@ -11,5 +11,5 @@ struct KSPDataContext
   LBSGroupset*    groupset;
   KSP              krylov_solver;
   Vec              x_temp;
-  chi_mesh::SweepManagement::SweepScheduler* sweepScheduler;
+  chi_mesh::sweep_management::SweepScheduler* sweepScheduler;
 };

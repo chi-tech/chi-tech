@@ -8,7 +8,7 @@ extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Initializes delayed upstream data.*/
-void chi_mesh::SweepManagement::AngleSet::
+void chi_mesh::sweep_management::AngleSet::
 InitializeDelayedUpstreamData()
 {
   int num_angles = angles.size();
@@ -34,8 +34,8 @@ InitializeDelayedUpstreamData()
 
 //###################################################################
 /**This function advances the work stages of an angleset.*/
-bool chi_mesh::SweepManagement::AngleSet::
-AngleSetAdvance(chi_mesh::SweepManagement::SweepChunk *sweep_chunk,
+bool chi_mesh::sweep_management::AngleSet::
+AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
                 int angle_set_num)
 {
   //================================================== Prevent reexecution

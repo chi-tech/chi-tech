@@ -6,7 +6,7 @@ extern ChiLog chi_log;
 
 //###################################################################
 /** Given a location J index, maps to a predecessor location.*/
-int chi_mesh::SweepManagement::SPDS::MapLocJToPrelocI(int locJ)
+int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ)
 {
   for (int i=0; i<location_dependencies.size(); i++)
   {
@@ -31,7 +31,7 @@ int chi_mesh::SweepManagement::SPDS::MapLocJToPrelocI(int locJ)
 
 //###################################################################
 /** Given a location J index, maps to a dependent location.*/
-int chi_mesh::SweepManagement::SPDS::MapLocJToDeplocI(int locJ)
+int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
 {
   for (int i=0; i<location_successors.size(); i++)
   {
@@ -49,7 +49,7 @@ int chi_mesh::SweepManagement::SPDS::MapLocJToDeplocI(int locJ)
 
 //###################################################################
 /** Adds a location dependency for this location.*/
-void chi_mesh::SweepManagement::SPDS::AddLocalDependecy(int location_index)
+void chi_mesh::sweep_management::SPDS::AddLocalDependecy(int location_index)
 {
   if (location_index<0){return;}
 
@@ -71,7 +71,7 @@ void chi_mesh::SweepManagement::SPDS::AddLocalDependecy(int location_index)
 
 //###################################################################
 /** Adds a location successor for this location.*/
-void chi_mesh::SweepManagement::SPDS::AddLocalSuccessor(int location_index)
+void chi_mesh::sweep_management::SPDS::AddLocalSuccessor(int location_index)
 {
   if (location_index<0){return;}
 

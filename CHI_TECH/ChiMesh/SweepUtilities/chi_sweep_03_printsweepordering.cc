@@ -14,8 +14,8 @@
 
 //###################################################################
 /**Print a sweep ordering to file.*/
-void chi_mesh::SweepManagement::
-  PrintSweepOrdering(chi_mesh::SweepManagement::SPDS *sweep_order,
+void chi_mesh::sweep_management::
+  PrintSweepOrdering(chi_mesh::sweep_management::SPDS *sweep_order,
                      MeshContinuum* vol_continuum)
 {
   double polar = sweep_order->polar;

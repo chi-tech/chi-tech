@@ -32,7 +32,7 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 
 //###################################################################
 /**Sweep chunk to compute the fixed source.*/
-class LBSSweepChunkPWLSlab : public chi_mesh::SweepManagement::SweepChunk
+class LBSSweepChunkPWLSlab : public chi_mesh::sweep_management::SweepChunk
 {
 private:
   chi_mesh::MeshContinuum*    grid_view;
@@ -107,7 +107,7 @@ public:
 
 
   //############################################################ Actual chunk
-  void Sweep(chi_mesh::SweepManagement::AngleSet* angle_set)
+  void Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   {
     int outface_master_counter=0;
 
@@ -121,8 +121,8 @@ public:
       a_and_b_initialized = true;
     }
 
-    chi_mesh::SweepManagement::SPDS* spds = angle_set->GetSPDS();
-    chi_mesh::SweepManagement::FLUDS* fluds = angle_set->fluds;
+    chi_mesh::sweep_management::SPDS* spds = angle_set->GetSPDS();
+    chi_mesh::sweep_management::FLUDS* fluds = angle_set->fluds;
 
     GsSubSet& subset = groupset->grp_subsets[angle_set->ref_subset];
     int gs_ss_size  = groupset->grp_subset_sizes[angle_set->ref_subset];

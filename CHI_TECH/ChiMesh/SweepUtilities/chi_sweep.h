@@ -8,7 +8,7 @@
 //###################################################################
 namespace chi_mesh
 {
-namespace SweepManagement
+namespace sweep_management
 {
   struct STDG;   ///< Global Sweep Plane Ordering
   struct SPLS;   ///< Sweep Plane Local Subgrid
@@ -33,7 +33,7 @@ namespace SweepManagement
   //02
   void PopulateCellRelationships(
     chi_mesh::MeshContinuum *grid,
-    chi_mesh::SweepManagement::SPDS* sweep_order,
+    chi_mesh::sweep_management::SPDS* sweep_order,
     std::vector<std::set<int>>& cell_dependencies,
     std::vector<std::set<int>>& cell_successors);
 //  void Sweep(SPDS* spds,

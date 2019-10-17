@@ -38,6 +38,8 @@ LBSGroupset::LBSGroupset()
   tgdsa_verbose = false;
 
   allow_cycles = false;
+
+  latest_convergence_metric = 1.0;
 }
 
 //###################################################################

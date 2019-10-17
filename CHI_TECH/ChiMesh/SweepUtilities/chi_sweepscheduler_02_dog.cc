@@ -13,7 +13,7 @@ extern double chi_global_timings[20];
 
 //###################################################################
 /**Initializes the Depth-Of-Graph algorithm.*/
-void chi_mesh::SweepManagement::SweepScheduler::InitializeAlgoDOG()
+void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
 {
   //================================================== Load all anglesets
   //                                                   in preperation for
@@ -151,7 +151,7 @@ void chi_mesh::SweepManagement::SweepScheduler::InitializeAlgoDOG()
 
 //###################################################################
 /**Executes the Depth-Of-Graph algorithm.*/
-void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoDOG()
+void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
 {
   ChiTimer t16_sweeptime; t16_sweeptime.Reset();
 

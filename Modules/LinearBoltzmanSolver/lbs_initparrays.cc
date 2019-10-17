@@ -91,8 +91,8 @@ int LinearBoltzman::Solver::InitializeParrays()
 
   //================================================== Initialize default
   //                                                   incident boundary
-  typedef chi_mesh::SweepManagement::BoundaryVacuum SweepVacuumBndry;
-  typedef chi_mesh::SweepManagement::BoundaryIncidentHomogenous SweepIncHomoBndry;
+  typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
+  typedef chi_mesh::sweep_management::BoundaryIncidentHomogenous SweepIncHomoBndry;
   std::vector<std::vector<double>>& flux_vec = incident_P0_mg_boundaries;
 
   // Defining default Vacuum boundary

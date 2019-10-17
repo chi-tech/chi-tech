@@ -21,7 +21,7 @@ void LinearBoltzman::Solver::ResetSweepOrderings(LBSGroupset *groupset)
     << "Resetting SPDS and FLUDS";
   for (int so=0; so<sweep_orderings.size(); so++)
   {
-    chi_mesh::SweepManagement::SPDS* cur_so =
+    chi_mesh::sweep_management::SPDS* cur_so =
       sweep_orderings[so];
 
     //delete cur_so->spls->fluds;
@@ -31,16 +31,16 @@ void LinearBoltzman::Solver::ResetSweepOrderings(LBSGroupset *groupset)
 
   sweep_orderings.clear();
 
-  chi_mesh::SweepManagement::AngleAggregation* angle_agg = groupset->angle_agg;
+  chi_mesh::sweep_management::AngleAggregation* angle_agg = groupset->angle_agg;
 
   for (int asg=0; asg<angle_agg->angle_set_groups.size(); asg++)
   {
-    chi_mesh::SweepManagement::AngleSetGroup* angset_grp =
+    chi_mesh::sweep_management::AngleSetGroup* angset_grp =
       angle_agg->angle_set_groups[asg];
 
     for (int as=0; as<angset_grp->angle_sets.size(); as++)
     {
-      chi_mesh::SweepManagement::AngleSet* angset =
+      chi_mesh::sweep_management::AngleSet* angset =
         angset_grp->angle_sets[as];
 
       angset->local_psi.clear();

@@ -32,12 +32,12 @@ extern ChiTimer   chi_program_timer;
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
  * cells.*/
-chi_mesh::SweepManagement::SPDS* chi_mesh::SweepManagement::
+chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
 CreateSweepOrder(double polar, double azimuthal,
                  chi_mesh::MeshContinuum *vol_continuum,int number_of_groups,
                  bool allow_cycles)
 {
-  auto sweep_order  = new chi_mesh::SweepManagement::SPDS;
+  auto sweep_order  = new chi_mesh::sweep_management::SPDS;
   sweep_order->grid = vol_continuum;
 
   size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
@@ -130,14 +130,14 @@ CreateSweepOrder(double polar, double azimuthal,
   //but I can see no reason for this other than for
   //visualization.
   int i=0;
-  chi_mesh::SweepManagement::SPLS* new_swp;
+  chi_mesh::sweep_management::SPLS* new_swp;
   for (std::vector<gVertex>::reverse_iterator ii=sorted_list.rbegin();
        ii!=sorted_list.rend();
        ii++)
   {
     if (i==0)
     {
-      new_swp = new chi_mesh::SweepManagement::SPLS;
+      new_swp = new chi_mesh::sweep_management::SPLS;
       sweep_order->spls=new_swp;
     }
 
@@ -181,7 +181,7 @@ CreateSweepOrder(double polar, double azimuthal,
   //============================================= Broadcast dependencies
   for (int locI=0; locI<P; locI++)
   {
-    std::vector<int> locI_dependencies;
+//    std::vector<int> locI_dependencies;
     if (locI == chi_mpi.location_id)
     {
       std::copy(sweep_order->location_dependencies.begin(),
@@ -353,8 +353,8 @@ CreateSweepOrder(double polar, double azimuthal,
     << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)
   {
-    chi_mesh::SweepManagement::STDG* new_stdg =
-      new chi_mesh::SweepManagement::STDG;
+    chi_mesh::sweep_management::STDG* new_stdg =
+      new chi_mesh::sweep_management::STDG;
     sweep_order->global_sweep_planes.push_back(new_stdg);
 
     for (int k=0; k<num_ord; k++)

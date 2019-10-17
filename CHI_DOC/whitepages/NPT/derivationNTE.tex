@@ -1731,7 +1731,7 @@ When sweeping along a certain direction, cell dependencies are defined by the no
 \newline
 The \xmltag{boost::graph} library has this particular functionality with the restriction that the graph must be a Directed-Acyclic-Graph (DAG) which essentially means that cells cannot have cyclic dependencies. Fortunately by enforcing the use of strictly convex cells, acyclic dependencies are ensured. This also means that partitioning cuts need to cut through a cell instead of seperating along faces. We must also note that for a parallel implementation we will have a ``fine-view" of the sweep ordering as well as a ``course-view" which is the processor dependency for the given sweep ordering.
 \newpage
-Sweeping on meshes is handled by the \xmltag{SweepManagement} namespace. Given a grid and a direction ($\Omega$), the function call \xmltag{SweepManagement::CreateSweepOrdering} will firstly assemble a DAG of the local cells and create a single Sweep Plane Local Subgrid (\xmltag{SPLS}) that contains the indices of all the local cells, sorted topologically against the direction. This provides the ``fine-view" of sweep ordering. This is stored in the vector \xmltag{SPLS.item\_id} on each sweep ordering. Note that at the time of writing only a single sweep plane is assembled for the local sweep, this is because the local sweeping is inherently serial and there is no parallel benefit to using multiple sweep planes, however, future support for memory optimizing schemes are supported by allowing multiple sweep planes. During the  process of generating a local sweep plane, a set (\xmltag{std::set}) of location dependencies is also constructed which feeds into the subsequent step which is building the ``course view" of the SPDS. The dependencies are split into \xmltag{location\_predecessors} and \xmltag{location\_successors} for later use. The latter step will generate one or more Globals Sweep Plane Orderings (\xmltag{GSPO}s) from which the parallel nature arises, with each global sweep plane denoting the locations that are ``in-play". The purpose of the ``course view" sweep planes is hard to explain without further context, however, such a discussion will have to be deferred to later but for now it will be said that these planes are used in the Depth-Of-Graph sweep scheduling algorithm. The final piece of each SPDS is the Flux Data Structure (\xmltag{FLUDS}) which is the topic of the next subsection but required to be mentioned here to give context to Figure \ref{fig:sweepordering} below, which depicts the hierarchy of datastructures.
+Sweeping on meshes is handled by the \xmltag{sweep_management} namespace. Given a grid and a direction ($\Omega$), the function call \xmltag{sweep_management::CreateSweepOrdering} will firstly assemble a DAG of the local cells and create a single Sweep Plane Local Subgrid (\xmltag{SPLS}) that contains the indices of all the local cells, sorted topologically against the direction. This provides the ``fine-view" of sweep ordering. This is stored in the vector \xmltag{SPLS.item\_id} on each sweep ordering. Note that at the time of writing only a single sweep plane is assembled for the local sweep, this is because the local sweeping is inherently serial and there is no parallel benefit to using multiple sweep planes, however, future support for memory optimizing schemes are supported by allowing multiple sweep planes. During the  process of generating a local sweep plane, a set (\xmltag{std::set}) of location dependencies is also constructed which feeds into the subsequent step which is building the ``course view" of the SPDS. The dependencies are split into \xmltag{location\_predecessors} and \xmltag{location\_successors} for later use. The latter step will generate one or more Globals Sweep Plane Orderings (\xmltag{GSPO}s) from which the parallel nature arises, with each global sweep plane denoting the locations that are ``in-play". The purpose of the ``course view" sweep planes is hard to explain without further context, however, such a discussion will have to be deferred to later but for now it will be said that these planes are used in the Depth-Of-Graph sweep scheduling algorithm. The final piece of each SPDS is the Flux Data Structure (\xmltag{FLUDS}) which is the topic of the next subsection but required to be mentioned here to give context to Figure \ref{fig:sweepordering} below, which depicts the hierarchy of datastructures.
 \vspace{0.5cm}
 \begin{figure}[H]
 \centering
@@ -1813,7 +1813,7 @@ See next page
 
 \newpage
 \begin{lstlisting}[language=c++]
-double*  chi_mesh::SweepManagement::FLUDS::
+double*  chi_mesh::sweep_management::FLUDS::
  OutgoingPsi(int cell_so_index, int outb_face_counter,
               int face_dof, int n)
 {
@@ -1828,7 +1828,7 @@ double*  chi_mesh::SweepManagement::FLUDS::
 \end{lstlisting}
 
 \begin{lstlisting}[language=c++]
-double*  chi_mesh::SweepManagement::FLUDS::
+double*  chi_mesh::sweep_management::FLUDS::
 UpwindPsi(int cell_so_index, int inc_face_counter,
              int face_dof,int g, int n)
 {

@@ -11,9 +11,9 @@ extern ChiLog chi_log;
 
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
-void chi_mesh::SweepManagement::FLUDS::
+void chi_mesh::sweep_management::FLUDS::
   SlotDynamics(TPolyhedron *polyh_cell,
-               chi_mesh::SweepManagement::SPDS* spds,
+               chi_mesh::sweep_management::SPDS* spds,
                std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                std::vector<std::pair<int,short>>& delayed_lock_box,
                std::set<int>& location_boundary_dependency_set)
@@ -43,7 +43,7 @@ void chi_mesh::SweepManagement::FLUDS::
       if (grid->IsCellLocal(neighbor))
       {
         size_t num_face_dofs = poly_face->edges.size();
-        size_t face_categ = grid->MapFaceHistogramCategory(num_face_dofs);
+        size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
 
         inco_face_face_category.push_back(face_categ);
 
@@ -139,7 +139,7 @@ void chi_mesh::SweepManagement::FLUDS::
     if (mu>=0.0)
     {
       size_t num_face_dofs = poly_face->edges.size();
-      size_t face_categ = grid->MapFaceHistogramCategory(num_face_dofs);
+      size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
 
       outb_face_face_category.push_back(face_categ);
 
@@ -218,10 +218,10 @@ void chi_mesh::SweepManagement::FLUDS::
 
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/
-void chi_mesh::SweepManagement::FLUDS::
-  IncidentMapping(TPolyhedron *polyh_cell,
-                  chi_mesh::SweepManagement::SPDS* spds,
-                  std::vector<int>&  local_so_cell_mapping)
+void chi_mesh::sweep_management::FLUDS::
+  LocalIncidentMapping(TPolyhedron *polyh_cell,
+                       chi_mesh::sweep_management::SPDS* spds,
+                       std::vector<int>&  local_so_cell_mapping)
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
   std::vector<std::pair<int,std::vector<int>>> inco_face_dof_mapping;

@@ -15,13 +15,13 @@ typedef std::vector<std::pair<int,short>> LockBox;
 
 //###################################################################
 /**Populates a flux data structure.*/
-void chi_mesh::SweepManagement::FLUDS::
-InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
+void chi_mesh::sweep_management::FLUDS::
+InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
-  chi_mesh::SweepManagement::SPLS* spls = spds->spls;
+  chi_mesh::sweep_management::SPLS* spls = spds->spls;
 
-  num_face_categories = grid->NumberOfFaceHistogramCategories();
+  num_face_categories = grid->NumberOfFaceHistogramBins();
   local_psi_stride.resize(num_face_categories,0);
   local_psi_max_elements.resize(num_face_categories,0);
   local_psi_Gn_block_stride.resize(num_face_categories,0);
@@ -97,26 +97,26 @@ InitializeAlphaElements(chi_mesh::SweepManagement::SPDS* spds)
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto slab_cell = static_cast<TSlab*>(cell);
-      IncidentMapping(slab_cell,spds,local_so_cell_mapping);
+      LocalIncidentMapping(slab_cell, spds, local_so_cell_mapping);
     }//if slab
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = static_cast<TPolygon*>(cell);
-      IncidentMapping(poly_cell,spds,local_so_cell_mapping);
+      LocalIncidentMapping(poly_cell, spds, local_so_cell_mapping);
     }//if polygon
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = static_cast<TPolyhedron*>(cell);
-      IncidentMapping(polyh_cell,spds,local_so_cell_mapping);
+      LocalIncidentMapping(polyh_cell, spds, local_so_cell_mapping);
     }//if polyhedron
 
   }//for csoi
 
   for (size_t fc=0; fc<num_face_categories; ++fc)
   {
-    local_psi_stride[fc] = grid->GetFaceHistogramCategoryDOFSize(fc);
+    local_psi_stride[fc] = grid->GetFaceHistogramBinDOFSize(fc);
     local_psi_max_elements[fc]     = lock_boxes[fc].size();
     local_psi_Gn_block_stride[fc]  = local_psi_stride[fc]*lock_boxes[fc].size();
     local_psi_Gn_block_strideG[fc] = local_psi_Gn_block_stride[fc]*G;

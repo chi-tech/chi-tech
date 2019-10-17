@@ -2,7 +2,7 @@
 
 //###################################################################
 /**This is the entry point for sweeping.*/
-void chi_mesh::SweepManagement::SweepScheduler::
+void chi_mesh::sweep_management::SweepScheduler::
      Sweep(SweepChunk* in_sweep_chunk)
 {
   sweep_chunk = in_sweep_chunk;

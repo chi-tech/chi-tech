@@ -13,8 +13,8 @@ extern ChiLog chi_log;
 
 extern double chi_global_timings[20];
 
-typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
-typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
+typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
+typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 
 extern ChiTimer chi_program_timer;
 
@@ -66,6 +66,7 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
 
+    groupset->latest_convergence_metric = std::min(pw_change, 1.0);
     ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
 
     if (groupset->apply_wgdsa)

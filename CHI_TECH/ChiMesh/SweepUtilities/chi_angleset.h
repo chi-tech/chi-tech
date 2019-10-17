@@ -8,18 +8,18 @@
 
 #include <chi_mpi.h>
 
-typedef chi_mesh::SweepManagement::BoundaryBase SweepBndry;
+typedef chi_mesh::sweep_management::BoundaryBase SweepBndry;
 
 //###################################################################
 /**Manages the workstages of a single angle set.*/
-class chi_mesh::SweepManagement::AngleSet
+class chi_mesh::sweep_management::AngleSet
 {
 private:
   int              num_grps;
   SPDS*            spds;
   bool             executed;
 
-  chi_mesh::SweepManagement::SweepBuffer sweep_buffer;
+  chi_mesh::sweep_management::SweepBuffer sweep_buffer;
 
 public:
   FLUDS*                                 fluds;
@@ -57,7 +57,7 @@ public:
               angle_indices.end(),
               std::back_inserter(angles));
 
-    fluds = new chi_mesh::SweepManagement::FLUDS(num_grps);
+    fluds = new chi_mesh::sweep_management::FLUDS(num_grps);
     fluds->InitializeAlphaElements(spds);
     fluds->InitializeBetaElements(spds);
 
@@ -91,7 +91,7 @@ public:
 
 
 
-  bool AngleSetAdvance(chi_mesh::SweepManagement::SweepChunk *sweep_chunk,
+  bool AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
                        int angle_set_num);
   void ResetSweepBuffers()
   {

@@ -22,7 +22,7 @@ typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;
 
 //###################################################################
 /**Improved Flux Data Structure (FLUDS).*/
-class chi_mesh::SweepManagement::FLUDS
+class chi_mesh::sweep_management::FLUDS
 {
 public:
   std::vector<size_t> local_psi_stride;
@@ -155,51 +155,51 @@ public:
 
 public:
   //01
-  void InitializeAlphaElements(chi_mesh::SweepManagement::SPDS *spds);
+  void InitializeAlphaElements(chi_mesh::sweep_management::SPDS *spds);
 
   //01a
   void SlotDynamics(TSlab *slab_cell,
-                    chi_mesh::SweepManagement::SPDS* spds,
+                    chi_mesh::sweep_management::SPDS* spds,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
-  void IncidentMapping(TSlab *slab_cell,
-                       chi_mesh::SweepManagement::SPDS* spds,
-                       std::vector<int>&  local_so_cell_mapping);
+  void LocalIncidentMapping(TSlab *slab_cell,
+                            chi_mesh::sweep_management::SPDS* spds,
+                            std::vector<int>&  local_so_cell_mapping);
 
   //01b
   void SlotDynamics(TPolygon *poly_cell,
-                    chi_mesh::SweepManagement::SPDS* spds,
+                    chi_mesh::sweep_management::SPDS* spds,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
-  void IncidentMapping(TPolygon *poly_cell,
-                       chi_mesh::SweepManagement::SPDS* spds,
-                       std::vector<int>&  local_so_cell_mapping);
+  void LocalIncidentMapping(TPolygon *poly_cell,
+                            chi_mesh::sweep_management::SPDS* spds,
+                            std::vector<int>&  local_so_cell_mapping);
 
   //01c polyhedron
   void SlotDynamics(TPolyhedron *polyh_cell,
-                    chi_mesh::SweepManagement::SPDS* spds,
+                    chi_mesh::sweep_management::SPDS* spds,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
-  void IncidentMapping(TPolyhedron *polyh_cell,
-                       chi_mesh::SweepManagement::SPDS* spds,
-                       std::vector<int>&  local_so_cell_mapping);
+  void LocalIncidentMapping(TPolyhedron *polyh_cell,
+                            chi_mesh::sweep_management::SPDS* spds,
+                            std::vector<int>&  local_so_cell_mapping);
 
   //02
-  void InitializeBetaElements(chi_mesh::SweepManagement::SPDS *spds,
+  void InitializeBetaElements(chi_mesh::sweep_management::SPDS *spds,
                               int tag_index=0);
 
   //02a
-  void NLIncidentMapping(TSlab *slab_cell,
-                         chi_mesh::SweepManagement::SPDS* spds);
+  void NonLocalIncidentMapping(TSlab *slab_cell,
+                               chi_mesh::sweep_management::SPDS* spds);
   //02b
-  void NLIncidentMapping(TPolygon *poly_cell,
-                         chi_mesh::SweepManagement::SPDS* spds);
+  void NonLocalIncidentMapping(TPolygon *poly_cell,
+                               chi_mesh::sweep_management::SPDS* spds);
   //02c
-  void NLIncidentMapping(TPolyhedron *polyh_cell,
-                         chi_mesh::SweepManagement::SPDS* spds);
+  void NonLocalIncidentMapping(TPolyhedron *polyh_cell,
+                               chi_mesh::sweep_management::SPDS* spds);
 
   //chi_FLUDS.cc
   double*  OutgoingPsi(int cell_so_index, int outb_face_counter,

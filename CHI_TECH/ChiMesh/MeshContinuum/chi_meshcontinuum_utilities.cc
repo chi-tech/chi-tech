@@ -165,7 +165,7 @@ bool chi_mesh::MeshContinuum::IsCellLocal(int cell_global_index)
 
 //###################################################################
 /**Gets the number of face-histogram categories.*/
-size_t chi_mesh::MeshContinuum::NumberOfFaceHistogramCategories()
+size_t chi_mesh::MeshContinuum::NumberOfFaceHistogramBins()
 {
   if (!face_histogram_available) BuildFaceHistogramInfo();
 
@@ -174,7 +174,7 @@ size_t chi_mesh::MeshContinuum::NumberOfFaceHistogramCategories()
 
 //###################################################################
 /**Maps the face-histogram category number for a given face size.*/
-size_t chi_mesh::MeshContinuum::MapFaceHistogramCategory(size_t num_face_dofs)
+size_t chi_mesh::MeshContinuum::MapFaceHistogramBins(size_t num_face_dofs)
 {
   if (!face_histogram_available) BuildFaceHistogramInfo();
 
@@ -191,7 +191,7 @@ size_t chi_mesh::MeshContinuum::MapFaceHistogramCategory(size_t num_face_dofs)
 
 //###################################################################
 /**Maps the face-histogram category number for a given face size.*/
-size_t chi_mesh::MeshContinuum::GetFaceHistogramCategoryDOFSize(size_t category)
+size_t chi_mesh::MeshContinuum::GetFaceHistogramBinDOFSize(size_t category)
 {
   if (!face_histogram_available) BuildFaceHistogramInfo();
 
@@ -203,7 +203,7 @@ size_t chi_mesh::MeshContinuum::GetFaceHistogramCategoryDOFSize(size_t category)
   catch (std::out_of_range o){
     chi_log.Log(LOG_ALLWARNING)
     << "Fault detected in chi_mesh::MeshContinuum::"
-    << "GetFaceHistogramCategoryDOFSize.";
+    << "GetFaceHistogramBinDOFSize.";
     return 0;
   }
 

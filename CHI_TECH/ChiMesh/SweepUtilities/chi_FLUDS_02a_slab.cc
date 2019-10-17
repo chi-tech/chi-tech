@@ -10,12 +10,12 @@ extern ChiLog     chi_log;
 
 //###################################################################
 /**Performs non-local incident mapping for polyhedron cells.*/
-void chi_mesh::SweepManagement::FLUDS::
-  NLIncidentMapping(TSlab *slab_cell,
-                    chi_mesh::SweepManagement::SPDS* spds)
+void chi_mesh::sweep_management::FLUDS::
+  NonLocalIncidentMapping(TSlab *slab_cell,
+                          chi_mesh::sweep_management::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
-  chi_mesh::SweepManagement::SPLS* spls = spds->spls;
+  chi_mesh::sweep_management::SPLS* spls = spds->spls;
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process

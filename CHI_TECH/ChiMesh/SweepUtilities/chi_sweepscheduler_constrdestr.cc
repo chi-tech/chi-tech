@@ -2,9 +2,9 @@
 
 //###################################################################
 /**Sweep scheduler constructor*/
-chi_mesh::SweepManagement::SweepScheduler::SweepScheduler(
+chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
     int in_scheduler_type,
-    chi_mesh::SweepManagement::AngleAggregation *in_angle_agg)
+    chi_mesh::sweep_management::AngleAggregation *in_angle_agg)
 {
   scheduler_type = in_scheduler_type;
   angle_agg      = in_angle_agg;

@@ -1,7 +1,7 @@
 #ifndef _chi_sweep_bndry_base_h
 #define _chi_sweep_bndry_base_h
 
-namespace chi_mesh::SweepManagement
+namespace chi_mesh::sweep_management
 {
 
 enum class BoundaryType
@@ -17,7 +17,7 @@ enum class BoundaryType
 class BoundaryBase
 {
 public:
-  const chi_mesh::SweepManagement::BoundaryType type;
+  const chi_mesh::sweep_management::BoundaryType type;
   std::vector<double>& boundary_flux;
 
 public:

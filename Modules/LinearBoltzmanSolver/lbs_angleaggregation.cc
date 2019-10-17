@@ -12,8 +12,8 @@
 
 extern ChiLog chi_log;
 
-typedef chi_mesh::SweepManagement::AngleSet TAngleSet;
-typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;
+typedef chi_mesh::sweep_management::AngleSet TAngleSet;
+typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 
 

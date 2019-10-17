@@ -5,7 +5,7 @@
 
 //###################################################################
 /**Contains multiple levels*/
-struct chi_mesh::SweepManagement::SPDS
+struct chi_mesh::sweep_management::SPDS
 {
   double                   polar;
   double                   azimuthal;

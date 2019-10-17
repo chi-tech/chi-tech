@@ -11,9 +11,9 @@ extern ChiLog chi_log;
 
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
-void chi_mesh::SweepManagement::FLUDS::
+void chi_mesh::sweep_management::FLUDS::
 SlotDynamics(TSlab *slab_cell,
-             chi_mesh::SweepManagement::SPDS* spds,
+             chi_mesh::sweep_management::SPDS* spds,
              std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
              std::vector<std::pair<int,short>>& delayed_lock_box,
              std::set<int>& location_boundary_dependency_set)
@@ -173,10 +173,10 @@ SlotDynamics(TSlab *slab_cell,
 
 //###################################################################
 /**Performs Incident mapping for slab cell.*/
-void chi_mesh::SweepManagement::FLUDS::
-IncidentMapping(TSlab *slab_cell,
-                chi_mesh::SweepManagement::SPDS* spds,
-                std::vector<int>&  local_so_cell_mapping)
+void chi_mesh::sweep_management::FLUDS::
+LocalIncidentMapping(TSlab *slab_cell,
+                     chi_mesh::sweep_management::SPDS* spds,
+                     std::vector<int>&  local_so_cell_mapping)
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
   std::vector<std::pair<int,std::vector<int>>> inco_face_dof_mapping;

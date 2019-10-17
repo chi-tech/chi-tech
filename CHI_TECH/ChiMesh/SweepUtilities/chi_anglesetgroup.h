@@ -7,10 +7,10 @@
 
 //###################################################################
 /**Manages the workstages of a single angleset group.*/
-class chi_mesh::SweepManagement::AngleSetGroup
+class chi_mesh::sweep_management::AngleSetGroup
 {
 public:
-  std::vector<chi_mesh::SweepManagement::AngleSet*> angle_sets;
+  std::vector<chi_mesh::sweep_management::AngleSet*> angle_sets;
 
 private:
   int current_angle_set = 0;
@@ -19,7 +19,7 @@ private:
 public:
 
   //###################################################################
-  bool AngleSetGroupAdvance(chi_mesh::SweepManagement::SweepChunk *sweep_chunk,
+  bool AngleSetGroupAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
                             int anglesetgroup_number)
   {
     //====================================== Return finished if angle sets

@@ -11,7 +11,7 @@ extern double chi_global_timings[20];
 
 //###################################################################
 /**Applies a First-In-First-Out sweep scheduling.*/
-void chi_mesh::SweepManagement::SweepScheduler::ScheduleAlgoFIFO()
+void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
 {
   ChiTimer t16_sweeptime; t16_sweeptime.Reset();
   //================================================== Loop over AngleSetGroups

@@ -8,13 +8,13 @@
 #define FIFO           0
 #define DEPTH_OF_GRAPH 1
 
-typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;
-typedef chi_mesh::SweepManagement::AngleSet      TAngleSet;
-typedef chi_mesh::SweepManagement::STDG          TGSPO;
+typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
+typedef chi_mesh::sweep_management::AngleSet      TAngleSet;
+typedef chi_mesh::sweep_management::STDG          TGSPO;
 typedef std::vector<TGSPO*>                      TLEVELED_GRAPH;
 
 //###################################################################
-class chi_mesh::SweepManagement::SweepScheduler
+class chi_mesh::sweep_management::SweepScheduler
 {
 private:
   int                       scheduler_type;
