@@ -1,4 +1,4 @@
-#include "chi_sweep.h"
+#include "sweep_namespace.h"
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 #include <ChiMesh/Cell/cell_slab.h>

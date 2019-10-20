@@ -1,5 +1,5 @@
 #include "../chi_mesh.h"
-#include "chi_sweep.h"
+#include "sweep_namespace.h"
 
 #include "../MeshHandler/chi_meshhandler.h"
 #include "../Cell/cell_slab.h"

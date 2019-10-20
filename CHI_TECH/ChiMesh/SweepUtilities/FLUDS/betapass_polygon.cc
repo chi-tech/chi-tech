@@ -1,6 +1,6 @@
-#include "ChiMesh/SweepUtilities/chi_FLUDS.h"
+#include "FLUDS.h"
 
-#include "ChiMesh/SweepUtilities/chi_SPDS.h"
+#include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
 #include "ChiMesh/Cell/cell_polygon.h"
 

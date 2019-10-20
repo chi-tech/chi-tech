@@ -1,6 +1,6 @@
 #include "../chi_mesh.h"
 #include "../MeshContinuum/chi_meshcontinuum.h"
-#include "chi_sweep.h"
+#include "sweep_namespace.h"
 #include <fstream>
 
 #include "../MeshHandler/chi_meshhandler.h"
