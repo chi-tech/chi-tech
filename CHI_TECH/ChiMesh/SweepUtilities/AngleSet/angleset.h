@@ -45,72 +45,27 @@ public:
            std::vector<int>& angle_indices,
            std::vector<SweepBndry*>& sim_boundaries,
            int sweep_eager_limit,
-           ChiMPICommunicatorSet* in_comm_set):
-           sweep_buffer(this,sweep_eager_limit,in_comm_set),
-           ref_boundaries(sim_boundaries)
-  {
-    num_grps = in_numgrps;
-    spds     = in_spds;
-    executed = false;
-    ref_subset = in_ref_subset;
-    std::copy(angle_indices.begin(),
-              angle_indices.end(),
-              std::back_inserter(angles));
-
-    fluds = new chi_mesh::sweep_management::FLUDS(num_grps);
-    fluds->InitializeAlphaElements(spds);
-    fluds->InitializeBetaElements(spds);
-
-    sweep_buffer.BuildMessageStructure();
-
-    delayed_local_norm = 0.0;
-  };
+           ChiMPICommunicatorSet* in_comm_set);
 
   void InitializeDelayedUpstreamData();
 
-  SPDS* GetSPDS()
-  {
-    return spds;
-  }
+  SPDS* GetSPDS();
 
-  int GetMaxBufferMessages()
-  {
-    return sweep_buffer.max_num_mess;
-  }
+  int GetMaxBufferMessages();
 
-  void SetMaxBufferMessages(int new_max)
-  {
-    sweep_buffer.max_num_mess = new_max;
-  }
+  void SetMaxBufferMessages(int new_max);
 
-  int GetNumGrps() {return num_grps;}
-
-  void EnsureClearedBuffers() {
-    if (executed) sweep_buffer.ClearDownstreamBuffers();}
-
-
-
+  int GetNumGrps();
 
   AngleSetStatus AngleSetAdvance(
              SweepChunk *sweep_chunk,
              int angle_set_num,
              ExecutionPermission permission = ExecutionPermission::EXECUTE);
-  void ResetSweepBuffers()
-  {
-    sweep_buffer.Reset();
-    executed = false;
-  }
-  void ReceiveDelayedData(int angle_set_num)
-  {
-    sweep_buffer.ReceiveDelayedData(angle_set_num);
-  }
+  void ResetSweepBuffers();
+  void ReceiveDelayedData(int angle_set_num);
 
   double* PsiBndry(int bndry_face_count, int bndry_map,
-                      int face_dof, int g,int angle_num)
-  {
-    double* Psi = &ref_boundaries[bndry_map]->boundary_flux.data()[g];
-    return Psi;
-  }
+                      int face_dof, int g,int angle_num);
 
 };
 

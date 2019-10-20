@@ -20,11 +20,11 @@ namespace chi_mesh::sweep_management
  * related to sweeping.*/
 class SweepBuffer
 {
-public:
-  bool done_sending;
 private:
-  chi_mesh::sweep_management::AngleSet* angleset;
-  bool initialized;
+  chi_mesh::sweep_management::AngleSet* const angleset;
+  ChiMPICommunicatorSet* const                comm_set;
+
+  bool done_sending;
   bool data_initialized;
   bool upstream_data_initialized;
 
@@ -50,7 +50,7 @@ private:
 
   std::vector<std::vector<MPI_Request>> deplocI_message_request;
 
-  ChiMPICommunicatorSet*   comm_set;
+
 
 public:
   int max_num_mess;
@@ -58,28 +58,16 @@ public:
   SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
               int sweep_eager_limit,
               ChiMPICommunicatorSet* in_comm_set);
+  bool DoneSending();
   void BuildMessageStructure();
-  void InitializeBuffers();
+  void InitializeDelayedUpstreamData();
+  void InitializeLocalAndDownstreamBuffers();
   void SendDownstreamPsi(int angle_set_num);
   void ReceiveDelayedData(int angle_set_num);
   void ClearDownstreamBuffers();
   AngleSetStatus ReceiveUpstreamPsi(int angle_set_num);
   void ClearLocalAndReceiveBuffers();
-
-  void Reset()
-  {
-    done_sending = false;
-    data_initialized = false;
-    upstream_data_initialized = false;
-
-    for (int prelocI=0; prelocI<prelocI_message_available.size(); prelocI++)
-    {
-      for (int m=0; m<prelocI_message_available[prelocI].size(); m++)
-      {
-        prelocI_message_available[prelocI][m] = false;
-      }
-    }
-  }
+  void Reset();
 
 };
 }

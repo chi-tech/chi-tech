@@ -4,10 +4,6 @@
 #include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
-//Scheduler types
-//#define FIFO           0
-//#define DEPTH_OF_GRAPH 1
-
 namespace chi_mesh::sweep_management
 {
   enum class SchedulingAlgorithm {

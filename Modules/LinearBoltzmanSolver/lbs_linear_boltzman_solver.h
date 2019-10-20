@@ -53,7 +53,7 @@ class Solver : public chi_physics::Solver {
   chi_mesh::MeshContinuum *grid;
   std::vector<LinearBoltzman::CellViewBase *> cell_transport_views;
 
-  //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeBuffers
+  //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeLocalAndDownstreamBuffers
   //A default 0.0 incident boundary is loaded at the back of
   //the stack to use as default. This is loaded during initparrays
   std::vector<std::pair<BoundaryType, int>>     boundary_types;

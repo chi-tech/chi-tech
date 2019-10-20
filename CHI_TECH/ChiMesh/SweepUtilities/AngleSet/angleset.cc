@@ -7,32 +7,43 @@
 
 extern ChiMPI chi_mpi;
 
+//###################################################################
+/**AngleSet constructor.*/
+chi_mesh::sweep_management::AngleSet::
+AngleSet(int in_numgrps,
+         int in_ref_subset,
+         SPDS* in_spds,
+         std::vector<int>& angle_indices,
+         std::vector<SweepBndry*>& sim_boundaries,
+         int sweep_eager_limit,
+         ChiMPICommunicatorSet* in_comm_set):
+  sweep_buffer(this,sweep_eager_limit,in_comm_set),
+  ref_boundaries(sim_boundaries)
+{
+  num_grps = in_numgrps;
+  spds     = in_spds;
+  executed = false;
+  ref_subset = in_ref_subset;
+  std::copy(angle_indices.begin(),
+            angle_indices.end(),
+            std::back_inserter(angles));
 
+  fluds = new chi_mesh::sweep_management::FLUDS(num_grps);
+  fluds->InitializeAlphaElements(spds);
+  fluds->InitializeBetaElements(spds);
+
+  sweep_buffer.BuildMessageStructure();
+
+  delayed_local_norm = 0.0;
+};
 
 //###################################################################
-/**Initializes delayed upstream data.*/
+/**Initializes delayed upstream data. This method gets called
+ * when a sweep scheduler is constructed.*/
 void chi_mesh::sweep_management::AngleSet::
 InitializeDelayedUpstreamData()
 {
-  int num_angles = angles.size();
-
-  delayed_prelocI_outgoing_psi.resize(
-      spds->delayed_location_dependencies.size(),
-      std::vector<double>());
-  for (int prelocI=0;
-       prelocI<spds->delayed_location_dependencies.size(); prelocI++)
-  {
-    int num_dofs = fluds->delayed_prelocI_face_dof_count[prelocI];
-    int num_grps   = GetNumGrps();
-
-    u_ll_int buff_size = num_dofs*num_grps*num_angles;
-
-    delayed_prelocI_outgoing_psi[prelocI].resize(buff_size,0.0);
-  }
-
-  delayed_local_psi.resize(fluds->delayed_local_psi_stride*
-                           fluds->delayed_local_psi_max_elements*
-                           num_grps*num_angles,0.0);
+  sweep_buffer.InitializeDelayedUpstreamData();
 }
 
 //###################################################################
@@ -47,7 +58,7 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
 
   if (executed)
   {
-    if (!sweep_buffer.done_sending)
+    if (!sweep_buffer.DoneSending())
       sweep_buffer.ClearDownstreamBuffers();
     return AngleSetStatus::FINISHED;
   }
@@ -58,7 +69,7 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
   else if (status == Status::READY_TO_EXECUTE and
            permission == ExecutionPermission::EXECUTE)
   {
-    sweep_buffer.InitializeBuffers();
+    sweep_buffer.InitializeLocalAndDownstreamBuffers();
 
     sweep_chunk->Sweep(this); //Execute chunk
 
@@ -71,4 +82,58 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
   }
   else
     return AngleSetStatus::READY_TO_EXECUTE;
+}
+
+//###################################################################
+/**Returns a reference to the associated spds.*/
+chi_mesh::sweep_management::SPDS*
+  chi_mesh::sweep_management::AngleSet::GetSPDS()
+{
+  return spds;
+}
+
+//###################################################################
+/**Returns the maximum buffer size from the sweepbuffer.*/
+int chi_mesh::sweep_management::AngleSet::GetMaxBufferMessages()
+{
+  return sweep_buffer.max_num_mess;
+}
+
+//###################################################################
+/**Sets the maximum buffer size for the sweepbuffer.*/
+void chi_mesh::sweep_management::AngleSet::SetMaxBufferMessages(int new_max)
+{
+  sweep_buffer.max_num_mess = new_max;
+}
+
+//###################################################################
+/**Returns the number of groups associated with the angleset.*/
+int chi_mesh::sweep_management::AngleSet::GetNumGrps()
+{
+  return num_grps;
+}
+
+//###################################################################
+/**Resets the sweep buffer.*/
+void chi_mesh::sweep_management::AngleSet::ResetSweepBuffers()
+{
+  sweep_buffer.Reset();
+  executed = false;
+}
+
+//###################################################################
+/**Instructs the sweep buffer to receive delayed data.*/
+void chi_mesh::sweep_management::AngleSet::ReceiveDelayedData(int angle_set_num)
+{
+  sweep_buffer.ReceiveDelayedData(angle_set_num);
+}
+
+//###################################################################
+/**Returns a pointer to a boundary flux data.*/
+double* chi_mesh::sweep_management::AngleSet::
+PsiBndry(int bndry_face_count, int bndry_map,
+         int face_dof, int g,int angle_num)
+{
+  double* Psi = &ref_boundaries[bndry_map]->boundary_flux.data()[g];
+  return Psi;
 }

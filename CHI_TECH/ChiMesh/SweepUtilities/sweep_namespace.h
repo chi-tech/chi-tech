@@ -24,24 +24,17 @@ namespace sweep_management
 
   class SweepScheduler;
 
-  //01
   SPDS* CreateSweepOrder(double polar, double azimuthal,
                          chi_mesh::MeshContinuum *vol_continuum,
                          int number_of_groups,
                          bool allow_cycles=false);
 
-  //02
   void PopulateCellRelationships(
-    chi_mesh::MeshContinuum *grid,
-    chi_mesh::sweep_management::SPDS* sweep_order,
-    std::vector<std::set<int>>& cell_dependencies,
-    std::vector<std::set<int>>& cell_successors);
-//  void Sweep(SPDS* spds,
-//             SweepChunk* sweep_chunk=NULL,
-//             bool communicate=true);
-//  void Sweep(AngleAggregation* angle_agg,
-//             SweepChunk* sweep_chunk=NULL);
-  //03
+            chi_mesh::MeshContinuum *grid,
+            chi_mesh::sweep_management::SPDS* sweep_order,
+            std::vector<std::set<int>>& cell_dependencies,
+            std::vector<std::set<int>>& cell_successors);
+
   void PrintSweepOrdering(SPDS* sweep_order,
                           MeshContinuum* vol_continuum);
 
