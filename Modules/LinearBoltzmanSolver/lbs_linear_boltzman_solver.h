@@ -8,8 +8,8 @@
 #include <ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h>
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
-#include "ChiMesh/SweepUtilities/chi_sweep.h"
-#include "ChiMesh/SweepUtilities/chi_sweep_boundaries.h"
+#include "ChiMesh/SweepUtilities/sweep_namespace.h"
+#include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 
 #include <petscksp.h>
@@ -129,8 +129,8 @@ class Solver : public chi_physics::Solver {
   void ConvergeCycles(MainSweepScheduler& sweepScheduler,
                       SweepChunk* sweep_chunk,
                       LBSGroupset *groupset,
-                      double cyclic_tolerance = 1.0e-8,
-                      size_t cyclic_max_iter = 50);
+                      double cyclic_tolerance = 1.0e-12,
+                      size_t cyclic_max_iter = 500);
 };
 
 }

@@ -1,5 +1,5 @@
 #include "../lbs_linear_boltzman_solver.h"
-#include "ChiMesh/SweepUtilities/chi_sweepscheduler.h"
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include <ChiTimer/chi_timer.h>
 #include <ChiLog/chi_log.h>

@@ -135,7 +135,7 @@ namespace chi_mesh
 #include"chi_mesh_edgeloops.h"
 #include"chi_mesh_interface.h"
 
-#include "SweepUtilities/chi_sweep.h"
+#include "ChiMesh/SweepUtilities/sweep_namespace.h"
 
 
 

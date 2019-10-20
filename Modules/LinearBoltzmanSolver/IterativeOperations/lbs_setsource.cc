@@ -1,7 +1,7 @@
 #include "../lbs_linear_boltzman_solver.h"
 
 #include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
-#include "ChiMesh/SweepUtilities/chi_SPDS.h"
+#include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>

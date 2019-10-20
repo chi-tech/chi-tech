@@ -43,16 +43,6 @@ void LinearBoltzman::Solver::ResetSweepOrderings(LBSGroupset *groupset)
       chi_mesh::sweep_management::AngleSet* angset =
         angset_grp->angle_sets[as];
 
-      angset->local_psi.clear();
-      angset->local_psi.shrink_to_fit();
-
-      angset->deplocI_outgoing_psi.clear();
-      angset->deplocI_outgoing_psi.shrink_to_fit();
-
-      angset->prelocI_outgoing_psi.clear();
-      angset->prelocI_outgoing_psi.shrink_to_fit();
-
-
       delete angset->fluds;
       delete angset;
     }

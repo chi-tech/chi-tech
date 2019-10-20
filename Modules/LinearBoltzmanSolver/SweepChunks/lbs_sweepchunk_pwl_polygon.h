@@ -3,7 +3,7 @@
 
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
-#include <ChiMesh/SweepUtilities/chi_sweep.h>
+#include <ChiMesh/SweepUtilities/sweep_namespace.h>
 #include <ChiMath/SpatialDiscretization/spatial_discretization.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
@@ -15,8 +15,8 @@
 #include "../GroupSet/lbs_groupset.h"
 #include <ChiMath/Quadratures/product_quadrature.h>
 
-#include <ChiMesh/SweepUtilities/chi_SPDS.h>
-#include <ChiMesh/SweepUtilities/chi_angleaggregation.h>
+#include <ChiMesh/SweepUtilities/SPDS/SPDS.h>
+#include <ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h>
 
 #include <ChiTimer/chi_timer.h>
 

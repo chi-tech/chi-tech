@@ -1,7 +1,7 @@
 #include "lbs_linear_boltzman_solver.h"
 #include "ChiConsole/chi_console.h"
 
-#include <ChiMesh/SweepUtilities/chi_FLUDS.h>
+#include <ChiMesh/SweepUtilities/FLUDS/FLUDS.h>
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>

@@ -1,6 +1,6 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "ChiMesh/SweepUtilities/chi_sweepscheduler.h"
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 #include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
@@ -13,8 +13,10 @@ extern ChiLog chi_log;
 
 extern double chi_global_timings[20];
 
-typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
-typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
+namespace sweep_namespace = chi_mesh::sweep_management;
+typedef sweep_namespace::SweepChunk SweepChunk;
+typedef sweep_namespace::SweepScheduler MainSweepScheduler;
+typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 extern ChiTimer chi_program_timer;
 
@@ -46,7 +48,7 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
   SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
 
   //================================================== Set sweep scheduler
-  MainSweepScheduler sweepScheduler(DEPTH_OF_GRAPH,
+  MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                     groupset->angle_agg);
 
   //================================================== Tool the sweep chunk
