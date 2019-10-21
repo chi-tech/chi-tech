@@ -1,0 +1,18 @@
+\digraph[scale=1]{MyGraph}{
+node[shape=rectangle]
+rankdir=TB
+"Location 0"->Mesh[label="  Generate Mesh"]
+Mesh->"Cell Sets"
+{rank=same; Mesh "Cell Sets"}
+
+Mesh->"Location 1"[label="  Broadcast"]
+"Location 1"->"Cell Set 1"
+Mesh->"Location 2"[label="  Broadcast"]
+"Location 2"->"Cell Set 2"
+Mesh->"Location N"[label="  Broadcast"]
+
+"Location 0"->"Cell Set 0"
+{rank=same; "Cell Set 0" "Cell Set 1" "Cell Set 2"}
+
+"Cell Set 0"->"Localtion 0 $\phi$"
+}
