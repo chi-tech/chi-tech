@@ -50,20 +50,20 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   chi_mesh::RayTrace(grid, cell, prtcl->pos, prtcl->dir,
                      d_to_surface, posf, auxinfo);
 
-  if (isnan(posf.x))
+  if (std::isnan(posf.x))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Posf corruption after surface tracking.";
     exit(EXIT_FAILURE);
   }
 
-  if (isnan(d_to_intract))
+  if (std::isnan(d_to_intract))
   {
     chi_log.Log(LOG_ALLERROR)
       << "d_to_interact corrupt.";
     exit(EXIT_FAILURE);
   }
-  if (isnan(d_to_surface))
+  if (std::isnan(d_to_surface))
   {
     chi_log.Log(LOG_ALLERROR)
       << "d_to_surface corrupt.";
