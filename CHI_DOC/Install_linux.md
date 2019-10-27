@@ -38,7 +38,7 @@ assist you.
 Now, install the remaining packages needed to build ChiTech and its dependencies:
 
 ```bash
-sudo apt-get install cmake python git zlib1g-dev libx11-dev
+sudo apt-get install cmake python git zlib1g-dev libx11-dev unzip
 sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 ```
 
