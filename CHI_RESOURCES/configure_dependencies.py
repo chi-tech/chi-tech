@@ -65,7 +65,7 @@ def ExecSub(command,log,env_vars=None):
 def CheckForCCompilers():
   result = True
   print("Looking for c compiler...",end="")
-  success,err = ExecSub("gcxc --version",log_file)
+  success,err = ExecSub("gcc --version",log_file)
 
   if (success):
     print("Success")
@@ -175,14 +175,18 @@ def InstallTriangle():
     print("Configuring Triangle to \"" + os.getcwd() + "\"")
     success,err = ExecSub("unzip triangle.zip",log_file)
 
+    os_tag = "LINUX"
+    if ("Darwin" in os.uname() ):
+      os_tag = "APPLE"
+
     env_vars=os.environ.copy()
-    command = "gcc -O -DAPPLE -I/usr/X11R6/include" + \
+    command = "gcc -O -D" + os_tag + " -I/usr/X11R6/include" + \
               " -L/usr/X11R6/lib -o ./triangle " + \
               " ./triangle.c -lm"
     success,err = ExecSub(command,log_file,env_vars)
     print(command,err)
 
-    command = "gcc -O -DAPPLE -I/usr/X11R6/include " + \
+    command = "gcc -O -D" + os_tag + " -I/usr/X11R6/include " + \
               "-L/usr/X11R6/lib -DTRILIBRARY -c -o " + \
               "./triangle.o ./triangle.c"
     success,err = ExecSub(command,log_file,env_vars)
@@ -296,17 +300,12 @@ def InstallLua():
     os.chdir("lua-5.3.5")
     env_vars=os.environ.copy()
 
-    lib_path = ""
-    if ("LIBRARY_PATH" in env_vars):
-      lib_path = env_vars["LIBRARY_PATH"]
+    lib_path = env_vars.get("LIBRARY_PATH","")
     lib_path = lib_path + ":" + install_dir + "/READLINE/readline-8.0/build/lib"
-    lib_path = lib_path + ":" + install_dir + "/READLINE/ncurses-6.1/build/lib"
+    lib_path = lib_path + ":" + install_dir + "/NCURSES/ncurses-6.1/build/lib"
     env_vars["LIBRARY_PATH"] = lib_path
 
-    c_path = ""
-    if ("CPATH" in env_vars):
-      c_path = env_vars["CPATH"]
-    c_path = env_vars["CPATH"]
+    c_path =  env_vars.get('CPATH',"")
     c_path = c_path + ":" + install_dir + "/READLINE/readline-8.0/build/include"
     env_vars["CPATH"] = c_path
 
@@ -484,13 +483,14 @@ InstallVTK()
 
 roots_file.write('export BASE_PATH="' + install_dir + '"\n')
 roots_file.write('\n')
-roots_file.write('export EIGEN_ROOT="$BASE_PATH/EIGEN/Eigen-3.3.7"\n')
+roots_file.write('export EIGEN_ROOT="$BASE_PATH/EIGEN/eigen-3.3.7"\n')
 roots_file.write('export RANDOM123_ROOT="$BASE_PATH/RANDOM123/Random123-1.13.2"\n')
-roots_file.write('export TRIANGLE_ROOT="/$BASE_PATH/Triangle"\n')
+roots_file.write('export TRIANGLE_ROOT="/$BASE_PATH/TRIANGLE"\n')
 roots_file.write('export LUA_ROOT="$BASE_PATH/LUA/lua-5.3.5/install"\n')
 roots_file.write('export BOOST_ROOT="$BASE_PATH/BOOST/boost_1_71_0"\n')
 roots_file.write('export PETSC_ROOT="$BASE_PATH/PETSc/petsc-3.9.4/install"\n')
 roots_file.write('export VTK_DIR="$BASE_PATH/VTK/VTK-8.2.0/install"\n')
+roots_file.write('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$BASE_PATH/VTK/VTK-8.2.0/install/lib"\n')
 
 ExecSub("chmod u+x configure_deproots.sh",log_file)
 
