@@ -37,3 +37,6 @@ CHI_RESOURCES/\.DS_Store
 *.pmesh
 
 *-private.sh
+
+# Dependency directory
+chi-dependencies/

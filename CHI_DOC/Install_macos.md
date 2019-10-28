@@ -199,7 +199,16 @@ Once configure.sh has completed, build **ChiTech** with:
     $ make
 ```
 
-#### Step 11 - Generate the documentation
+### Step 11 - Run regression tests
+
+To check if the code compiled correctly execute the test scripts:
+
+```bash
+    $ python3 CHI_TEST/Z_Run_all.py
+```
+
+
+#### Step 12 - Generate the documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io),
 or generate it locally.
