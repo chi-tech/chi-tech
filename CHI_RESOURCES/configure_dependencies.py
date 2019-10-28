@@ -503,4 +503,4 @@ log_file.close()
 roots_file.close()
 
 print("########## Chi-Tech Dependency install complete ##########")
-print("     Now execute: \n\"     $. ./chi-dependencies/configure_deproots.sh\"")
+print("Now execute: \n     $. ./chi-dependencies/configure_deproots.sh\n")
