@@ -131,8 +131,8 @@ phys0 = chiMonteCarlonCreateSolver()
 chiSolverAddRegion(phys0,region0)
 
 --chiMonteCarlonCreateSource(phys0,MC_BNDRY_SRC,1);
-chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
---chiMonteCarlonCreateSource(phys0,MC_RESID_MOC,fflist1[1]);
+--chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
+chiMonteCarlonCreateSource(phys0,MC_RESID_MOC,fflist1[1]);
 
 chiMonteCarlonSetProperty(phys0,MC_NUM_PARTICLES,1e6)
 chiMonteCarlonSetProperty(phys0,MC_TFC_UPDATE_INTVL,10e3)

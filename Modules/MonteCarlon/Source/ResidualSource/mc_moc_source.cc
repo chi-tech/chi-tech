@@ -259,6 +259,8 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
 
   for (size_t n=0; n<quadrature.abscissae.size(); n++)
   {
+    chi_log.Log(LOG_0VERBOSE_0)
+    << "Angle " << n << " " << quadrature.abscissae[n];
     double mu = quadrature.abscissae[n];
     double q_weight = quadrature.weights[n];
     if (mu>0.0)
@@ -305,6 +307,12 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
               q -= mu*nabla_phi;
 
               psi_z_i += q*(1.0-exp(-s_t*dzstar))/cell_sigma_t[lc];
+
+              if (n==17)
+              {
+                chi_log.Log(LOG_0VERBOSE_1)
+                  << zistar << " " << q;
+              }
             }
 
             cell_phi_star[lc][i] += q_weight*psi_z_i;
@@ -379,9 +387,9 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     cell_subintvl_source[lc].resize(num_subdivs, 0.0);
     for (int i=0; i<(num_subdivs+1); i++)
     {
-      chi_log.Log(LOG_0VERBOSE_1)
-        << cell_z_i_star[lc][i] << " "
-        << cell_phi_star[lc][i];
+//      chi_log.Log(LOG_0VERBOSE_1)
+//        << cell_z_i_star[lc][i] << " "
+//        << cell_phi_star[lc][i];
 
       if (i<num_subdivs)
       {
