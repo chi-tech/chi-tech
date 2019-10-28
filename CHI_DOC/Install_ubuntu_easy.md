@@ -33,7 +33,9 @@ sudo apt-get install build-essential gfortran
 
 If you still do not get the appropriate version when running either ``gcc --version``
 or ``gfortran --version`` then there are many online resources which may be able to
-assist you.
+assist you. One issue commonly seen is that the repositories on your system is not
+updated in which case just run ```sudo apt update``` followed by 
+```sudo apt upgrade```.
 
 Now, install the remaining packages needed to build ChiTech and its dependencies:
 
