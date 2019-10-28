@@ -425,7 +425,7 @@ def InstallVTK():
 
 
   # Check if vtk is installed already
-  installed = os.path.exists(install_dir + "/VTK/VTK-8.2.0/install/lib")
+  installed = os.path.exists(install_dir + "/VTK/VTK-8.2.0/install/include")
   if (not installed):
     print("Configuring VTK 8.2.0 to \"" + os.getcwd() + "\"")
     success,err = ExecSub("tar -zxf VTK-8.2.0.tar.gz",log_file)
@@ -491,6 +491,11 @@ roots_file.write('export BOOST_ROOT="$BASE_PATH/BOOST/boost_1_71_0"\n')
 roots_file.write('export PETSC_ROOT="$BASE_PATH/PETSc/petsc-3.9.4/install"\n')
 roots_file.write('export VTK_DIR="$BASE_PATH/VTK/VTK-8.2.0/install"\n')
 roots_file.write('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$BASE_PATH/VTK/VTK-8.2.0/install/lib"\n')
+roots_file.write('echo "Enviroment set for compiling. If recompiling changed sources execute"\n')
+roots_file.write('echo "     ./configure clean"\n')
+roots_file.write('echo " "\n')
+roots_file.write('echo "Otherwise just execute:"\n')
+roots_file.write('echo "     ./configure"\n')
 
 ExecSub("chmod u+x configure_deproots.sh",log_file)
 
@@ -498,4 +503,4 @@ log_file.close()
 roots_file.close()
 
 print("########## Chi-Tech Dependency install complete ##########")
-print("     Now execute: \". ./chi-dependencies/configure_deproots.sh\"")
+print("Now execute: \n     $. ./chi-dependencies/configure_deproots.sh\n")
