@@ -119,8 +119,15 @@ you can run
     $ make -j4
 ```
 
+### Step 6 - Run regression tests
 
-### Step 6 - ChiTech documentation
+To check if the code compiled correctly execute the test scripts:
+
+```bash
+    $ python3 CHI_TEST/Z_Run_all.py
+```
+
+### Step 7 - ChiTech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
