@@ -17,7 +17,7 @@ public:
   //01
   void Initialize(int N, int maxiters=1000,
                   double tol=1.0e-10, bool verbose=false);
-
+  void FindRoots(int N, std::vector<double>& roots);
 };
 
 #endif
