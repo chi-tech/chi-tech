@@ -1,7 +1,7 @@
 #include "legendrepoly.h"
 #include <math.h>
 
-#include <iostream>
+#include <algorithm>
 //###################################################################
 /**Provides the function evaluation of the Legendre polynomial
  * P_N at value x.
@@ -64,8 +64,6 @@ double chi_math::d2Legendredx2(int N, double x)
 
   double dPdx_pos = dLegendredx(N,xpos);
   double dPdx_neg = dLegendredx(N,xneg);
-
-//  std::cout << dPdx_pos << " " << dPdx_neg << "\n";
 
   return (dPdx_pos - dPdx_neg)/dx;
 }

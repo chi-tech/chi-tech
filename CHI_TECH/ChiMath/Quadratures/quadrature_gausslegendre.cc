@@ -9,7 +9,6 @@ using namespace chi_math;
 extern ChiLog chi_log;
 
 #include <algorithm>
-#include <unistd.h>
 
 //###################################################################
 /**Initializes the Legendre quadrature.*/
