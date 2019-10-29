@@ -1,5 +1,7 @@
 #include "legendrepoly.h"
 #include <math.h>
+
+#include <iostream>
 //###################################################################
 /**Provides the function evaluation of the Legendre polynomial
  * P_N at value x.
@@ -38,8 +40,32 @@ double chi_math::dLegendredx(int N, double x)
 
   if (N==1) {return 1;}
 
-  double retval = (N*x/(pow(x,2.0)-1))*Legendre(N,x);
-         retval-= (N/(pow(x,2.0)-1))*Legendre(N-1,x);
+  double retval = (N*x/(x*x-1))*Legendre(N,x);
+         retval-= (N/(x*x-1))*Legendre(N-1,x);
 
   return retval;
+}
+
+//###################################################################
+/**Provides the function evaluation of the second derivative of Pn at value x
+
+ \param N int The Legendre polynomial.
+ \param x double The evaluation point.*/
+double chi_math::d2Legendredx2(int N, double x)
+{
+  double epsilon = 1.0e-8;
+  if (N==0) {return 0.0;}
+
+  if (N==1) {return 0.0;}
+
+  double xpos = std::min(x+epsilon, 1.0-1.0e-10);
+  double xneg = std::max(x-epsilon,-1.0+1.0e-10);
+  double dx = xpos - xneg;
+
+  double dPdx_pos = dLegendredx(N,xpos);
+  double dPdx_neg = dLegendredx(N,xneg);
+
+//  std::cout << dPdx_pos << " " << dPdx_neg << "\n";
+
+  return (dPdx_pos - dPdx_neg)/dx;
 }
