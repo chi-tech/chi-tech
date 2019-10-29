@@ -24,7 +24,8 @@ int chi_lua::chiCreateProductQuadrature(int QuadratureType, int Np, int Na)
  *
 \param QuadratureType int Quadrature identifier.
 \param NumberOfPoints int Number of quadrature points.
-Identifiers:\n
+##_
+###QuadratureType:\n
  GAUSS_LEGENDRE = Gauss-Legendre quadrature.
  GAUSS_CHEBYSHEV = Gauss-Chebyshev quadrature.
 \return Returns a unique handle to the created quadrature rule
