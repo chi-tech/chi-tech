@@ -16,8 +16,9 @@ class chi_math::QuadratureGaussLegendre : public chi_math::Quadrature
 public:
   //01
   void Initialize(int N, int maxiters=1000,
-                  double tol=1.0e-10, bool verbose=false);
-  void FindRoots(int N, std::vector<double>& roots);
+                  double tol=1.0e-12, bool verbose=false);
+  void FindRoots(int N, std::vector<double>& roots,
+                 size_t max_iters=1000, double tol=1.0e-12);
 };
 
 #endif
