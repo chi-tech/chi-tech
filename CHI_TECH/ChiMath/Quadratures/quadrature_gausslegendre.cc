@@ -1,6 +1,6 @@
 #include "quadrature_gausslegendre.h"
 #include "LegendrePoly/legendrepoly.h"
-#include <math.h>
+#include <cmath>
 
 using namespace chi_math;
 
