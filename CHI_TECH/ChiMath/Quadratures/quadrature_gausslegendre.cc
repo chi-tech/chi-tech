@@ -30,8 +30,8 @@ void chi_math::QuadratureGaussLegendre::
   {
     weights[k] =
       2.0 * (1.0 - abscissae[k] * abscissae[k]) /
-      ((N + 1) * (N + 1) *
-      Legendre(N+1, abscissae[k]) * Legendre(N+1, abscissae[k]));
+      ( (N + 1) * (N + 1) *
+        Legendre(N+1, abscissae[k]) * Legendre(N+1, abscissae[k]) );
 
     if (verbose)
       chi_log.Log(LOG_0)
