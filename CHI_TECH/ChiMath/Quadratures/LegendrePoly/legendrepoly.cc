@@ -32,7 +32,7 @@ double chi_math::Legendre(int N, double x)
 //###################################################################
 /**Provides the function evaluation of the derivative of Pn at value x
 
- \param N int The Legendre polynomial.
+ \param N int Order of the Legendre polynomial.
  \param x double The evaluation point.*/
 double chi_math::dLegendredx(int N, double x)
 {
@@ -49,7 +49,7 @@ double chi_math::dLegendredx(int N, double x)
 //###################################################################
 /**Provides the function evaluation of the second derivative of Pn at value x
 
- \param N int The Legendre polynomial.
+ \param N int Order of the Legendre polynomial.
  \param x double The evaluation point.*/
 double chi_math::d2Legendredx2(int N, double x)
 {
