@@ -22,7 +22,7 @@ void chi_math::QuadratureGaussLegendre::
   }
 
   //========================= Compute the roots
-  FindRoots(N, abscissae, maxiters, tol);
+  abscissae = FindRoots(N, maxiters, tol);
 
   //========================= Compute the weights
   weights.resize(N,1.0);
@@ -57,8 +57,8 @@ void chi_math::QuadratureGaussLegendre::
  *        Default: 1.0e-12.
  *
  * \author Jan*/
-void chi_math::QuadratureGaussLegendre::FindRoots(
-  int N, std::vector<double> &roots, size_t max_iters, double tol)
+std::vector<double> chi_math::QuadratureGaussLegendre::FindRoots(
+  int N, size_t max_iters, double tol)
 {
   //======================================== Populate init guess
   //This initial guess proved to be quite important
@@ -85,8 +85,7 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
   // For this code we simply check to see where the
   // polynomial changes sign.
   double delta = 2.0/num_search_intvls;
-  std::vector<double>& xk = roots;
-  xk.resize(N, 0.0);
+  std::vector<double> xk(N, 0.0);
   int counter = -1;
   for(size_t i=0; i<num_search_intvls; i++)
   {
@@ -139,4 +138,6 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
   }//for k
 
   std::stable_sort(xk.begin(), xk.end());
+
+  return xk;
 }
