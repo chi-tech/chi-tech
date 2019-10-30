@@ -6,7 +6,7 @@
 /**Provides the function evaluation of the Legendre polynomial
  * P_N at value x.
 
- \param N int The Legendre polynomial.
+ \param N int Order of the Legendre polynomial.
  \param x double The evaluation point.*/
 double chi_math::Legendre(int N, double x)
 {

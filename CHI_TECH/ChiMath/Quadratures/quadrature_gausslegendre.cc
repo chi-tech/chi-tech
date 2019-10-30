@@ -29,15 +29,15 @@ void chi_math::QuadratureGaussLegendre::
   for (size_t k=0; k < abscissae.size(); k++)
   {
     weights[k] =
-      2.0 * (1.0 - abscissae[k] * abscissae[k]) / (N + 1) / (N + 1) /
-      Legendre(N+1, abscissae[k]) /
-      Legendre(N+1, abscissae[k]);
+      2.0 * (1.0 - abscissae[k] * abscissae[k]) /
+      ((N + 1) * (N + 1) *
+      Legendre(N+1, abscissae[k]) * Legendre(N+1, abscissae[k]));
 
     if (verbose)
       chi_log.Log(LOG_0)
         << "root[" << k << "]=" << abscissae[k]
         << ", weight=" << weights[k];
-  }//for root
+  }//for abscissae
 }
 
 //###################################################################
@@ -79,14 +79,14 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
       << "chi_math::QuadratureGaussLegendre::FindRoots: "
       << "The order of the polynomial for which to find the roots is "
       << "greater than 2056. Accuracy of the root finder will be diminished "
-      << "along with a reduction in accuracy. At this point there are so many "
-      << "roots that it might just be prudent to not use a quadrature.";
+      << "along with a reduction in stability.";
   }
 
   // For this code we simply check to see where the
   // polynomial changes sign.
   double delta = 2.0/num_search_intvls;
-  std::vector<double> xn(N, 0.0);
+  std::vector<double>& xk = roots;
+  xk.resize(N, 0.0);
   int counter = -1;
   for(size_t i=0; i<num_search_intvls; i++)
   {
@@ -94,7 +94,7 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
     double x_ip1 = x_i + delta;
 
     if (Legendre(N,x_i)*Legendre(N,x_ip1) < 0.0)
-      xn[++counter] = (x_ip1 + x_i)/2.0;
+      xk[++counter] = (x_ip1 + x_i) / 2.0;
   }
 
   //======================================== Apply algorithm
@@ -108,7 +108,7 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
   {
     for (size_t iteration=0; iteration<max_iters; iteration++)
     {
-      double xold = xn[k];
+      double xold = xk[k];
       double f   = Legendre(N,xold);      //Function evaluation
       double fp  = dLegendredx(N,xold);   //First derivative
       double fpp = d2Legendredx2(N,xold); //Second derivative
@@ -116,7 +116,7 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
       //===================== Compute sum 1
       double S1 = 0.0;
       for (int i=0; i<=(k-1); i++)
-        S1 += 1.0/(xn[k]-xn[i]);
+        S1 += 1.0/(xk[k] - xk[i]);
 
       //===================== Compute B at x_k
       double B_xk = fp - f*S1;
@@ -124,21 +124,19 @@ void chi_math::QuadratureGaussLegendre::FindRoots(
       //===================== Compute sum 2
       double S2 = 0.0;
       for (int i=0; i<=(k-1); i++)
-        S2 += 1.0/(xn[k]-xn[i])/(xn[k]-xn[i]);
+        S2 += 1.0 / (xk[k] - xk[i]) / (xk[k] - xk[i]);
 
       //===================== Compute final formula
       double a    = fpp + f*S2;
       double b    = B_xk*B_xk + fp*fp - f*a;
       double c    = 2.0*f*B_xk/b;
 
-      xn[k] = xold - c;
+      xk[k] = xold - c;
 
-      if (std::fabs(xn[k]-xold) < tol)
+      if (std::fabs(xk[k] - xold) < tol)
         break;
-    }//while
+    }//for iteration
   }//for k
 
-  std::stable_sort(xn.begin(),xn.end());
-
-  roots = std::move(xn);
+  std::stable_sort(xk.begin(), xk.end());
 }
