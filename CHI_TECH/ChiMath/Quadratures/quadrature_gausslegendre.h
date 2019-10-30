@@ -18,7 +18,7 @@ public:
   void Initialize(int N, int maxiters=1000,
                   double tol=1.0e-12, bool verbose=false);
   std::vector<double> FindRoots(int N,
-                                size_t max_iters=1000,
+                                int max_iters=1000,
                                 double tol=1.0e-12);
 };
 

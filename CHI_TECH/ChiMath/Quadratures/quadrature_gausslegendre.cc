@@ -58,13 +58,13 @@ void chi_math::QuadratureGaussLegendre::
  *
  * \author Jan*/
 std::vector<double> chi_math::QuadratureGaussLegendre::FindRoots(
-  int N, size_t max_iters, double tol)
+  int N, int max_iters, double tol)
 {
   //======================================== Populate init guess
   //This initial guess proved to be quite important
   //at higher N since the roots start to get
   //squeezed to -1 and 1.
-  size_t num_search_intvls = 1000;
+  int num_search_intvls = 1000;
   if (N>64)
     num_search_intvls *= 10;
   if (N>256)
