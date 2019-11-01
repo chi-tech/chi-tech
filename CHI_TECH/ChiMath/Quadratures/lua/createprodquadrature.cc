@@ -28,6 +28,10 @@ GAUSS_LEGENDRE_CHEBYSHEV\n
  Gauss-Legendre quadrature for the polar angle but Gauss-Chebyshev
  for the azimuthal angle.\n\n
 
+###Verbose option:\n
+ An additional boolean argument at the end can be provided to
+ add verbose output.\n\n
+
 \return Returns a unique handle to the created product quadrature rule
 
 \ingroup LuaQuadrature
