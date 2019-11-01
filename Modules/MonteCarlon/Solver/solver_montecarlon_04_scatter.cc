@@ -40,7 +40,8 @@ ProcessScattering(chi_montecarlon::Particle *prtcl,
   chi_mesh::Vector khat(0.0,0.0,1.0);
   chi_mesh::Matrix3x3 R;
 
-  if (khat.Dot(prtcl->dir) < (1.0-1.0e-12))
+  if ((khat.Dot(prtcl->dir) < ( 1.0-1.0e-12)) and
+      (khat.Dot(prtcl->dir) > (-1.0+1.0e-12)))
   {
     chi_mesh::Vector tangent = prtcl->dir.Cross(khat);
     chi_mesh::Vector binorm = prtcl->dir.Cross(tangent);
