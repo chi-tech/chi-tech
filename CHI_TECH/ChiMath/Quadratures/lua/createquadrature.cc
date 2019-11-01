@@ -14,8 +14,11 @@ extern ChiMath    chi_math_handler;
  *
 \param QuadratureType int Quadrature identifier.
 \param NumberOfPoints int Number of quadrature points.
+\param VerboseFlag bool As the name implies. Default: false.
 
-Identifiers:\n
+##_
+
+###QuadratureType:\n
  GAUSS_LEGENDRE = Gauss-Legendre quadrature.
  GAUSS_CHEBYSHEV = Gauss-Chebyshev quadrature.
 
@@ -25,16 +28,26 @@ Identifiers:\n
 \author Jan*/
 int chiCreateQuadrature(lua_State *L)
 {
+  size_t num_args = lua_gettop(L);
+
+  if (not ((num_args == 2) or (num_args == 3)))
+    LuaPostArgAmountError("chiCreateQuadrature",2,num_args);
+
+  LuaCheckNilValue("chiCreateQuadrature",L,1);
+  LuaCheckNilValue("chiCreateQuadrature",L,2);
 
   //============================================= Parse argument
   int ident = lua_tonumber(L,1);
   int N = lua_tonumber(L,2);
+  bool verbose = false;
+  if (num_args == 3)
+    verbose = lua_toboolean(L,3);
 
   if (ident == 1) //GAUSS_LEGENDRE
   {
-    printf("Creating Gauss-Legendre Quadrature\n");
+    chi_log.Log(LOG_0) << "Creating Gauss-Legendre Quadrature\n";
     chi_math::QuadratureGaussLegendre* new_quad = new chi_math::QuadratureGaussLegendre;
-    new_quad->Initialize(N,1000,1.0e-10,true);
+    new_quad->Initialize(N,1000,1.0e-10,verbose);
     chi_math_handler.quadratures.push_back(new_quad);
     int index = chi_math_handler.quadratures.size()-1;
     lua_pushnumber(L,index);
@@ -42,9 +55,9 @@ int chiCreateQuadrature(lua_State *L)
   }
   else if (ident == 2) //GAUSS_CHEBYSHEV
   {
-    printf("Creating Gauss-Chebyshev Quadrature\n");
+    chi_log.Log(LOG_0) << "Creating Gauss-Chebyshev Quadrature\n";
     chi_math::QuadratureGaussChebyshev* new_quad = new chi_math::QuadratureGaussChebyshev;
-    new_quad->Initialize(N,true);
+    new_quad->Initialize(N,verbose);
     chi_math_handler.quadratures.push_back(new_quad);
     int index = chi_math_handler.quadratures.size()-1;
     lua_pushnumber(L,index);
