@@ -1,10 +1,10 @@
 #include "../property10_transportxsections.h"
 
+#include <Eigen/Dense>
+
 #include <chi_log.h>
 
 extern ChiLog chi_log;
-
-extern ChiMath chi_math_handler;
 
 //###################################################################
 /**Partial Jacobi energy collapse.*/
@@ -13,7 +13,6 @@ void chi_physics::TransportCrossSections::
                  double& D, double& sigma_a,
                  int collapse_type)
 {
-  ChiMath& math = chi_math_handler;
   //============================================= Make a Dense matrix from
   //                                              sparse transfer matrix
   std::vector<std::vector<double>> S;
@@ -31,42 +30,42 @@ void chi_physics::TransportCrossSections::
 
   //============================================= Compiling the A and B matrices
   //                                              for different methods
-  MatDbl A(G, VecDbl(G,0.0));
-  MatDbl B(G, VecDbl(G,0.0));
+  Eigen::MatrixXd A(G,G); A.setZero();
+  Eigen::MatrixXd B(G,G); B.setZero();
   for (int g=0; g<G; g++)
   {
     if      (collapse_type == E_COLLAPSE_JACOBI)
     {
-      A[g][g] = sigma_tg[g] - S[g][g];
+      A(g,g) = sigma_tg[g] - S[g][g];
       for (int gp=0; gp<g; gp++)
-        B[g][gp] = S[g][gp];
+        B(g,gp) = S[g][gp];
 
       for (int gp=g+1; gp<G; gp++)
-        B[g][gp] = S[g][gp];
+        B(g,gp) = S[g][gp];
     }
     else if (collapse_type == E_COLLAPSE_PARTIAL_JACOBI)
     {
-      A[g][g] = sigma_tg[g];
+      A(g,g) = sigma_tg[g];
       for (int gp=0; gp<G; gp++)
-        B[g][gp] = S[g][gp];
+        B(g,gp) = S[g][gp];
     }
     else if (collapse_type == E_COLLAPSE_GAUSS)
     {
-      A[g][g] = sigma_tg[g] - S[g][g];
+      A(g,g) = sigma_tg[g] - S[g][g];
       for (int gp=0; gp<g; gp++)
-        A[g][gp] = -S[g][gp];
+        A(g,gp) = -S[g][gp];
 
       for (int gp=g+1; gp<G; gp++)
-        B[g][gp] = S[g][gp];
+        B(g,gp) = S[g][gp];
     }
     else if (collapse_type == E_COLLAPSE_PARTIAL_GAUSS)
     {
-      A[g][g] = sigma_tg[g];
+      A(g,g) = sigma_tg[g];
       for (int gp=0; gp<g; gp++)
-        A[g][gp] = -S[g][gp];
+        A(g,gp) = -S[g][gp];
 
       for (int gp=g; gp<G; gp++)
-        B[g][gp] = S[g][gp];
+        B(g,gp) = S[g][gp];
     }
   }//for g
 
@@ -78,38 +77,37 @@ void chi_physics::TransportCrossSections::
   //initial guess of 1.0. Here we reset them
   for (int g=0; g<G; g++)
     if (sigma_tg[g] < 1.0e-16)
-      A[g][g] = 1.0;
+      A(g,g) = 1.0;
 
-  MatDbl Ainv = math.Inverse(A);
-  MatDbl C    = math.MatMul(Ainv,B);
-  VecDbl E(G,1.0);
-  VecDbl E_new(G,0.0);
-
+  Eigen::MatrixXd Ainv = A.inverse();
+  Eigen::MatrixXd C = Ainv*B;
+  Eigen::VectorXd E(G); E.setConstant(1.0);
+  Eigen::VectorXd E_new(G);
 
   //============================================= Perform power iteration
-  E_new = math.MatMul(C,E);
-  double rho = math.Dot(E_new,E);
+  E_new = C*E;
+  double rho = E_new.dot(E);
   double rho_old;
-  E = math.VecMul(E_new,1.0/math.Vec2Norm(E_new));
+  E = E_new/E_new.norm();
 
   if (rho<0.0)
-    E = math.VecMul(E,-1.0);
+    E = E*-1.0;
 
   for (int k=0; k<1000; k++)
   {
     rho_old = rho;
 
-    E_new = math.MatMul(C,E);
-    rho = math.Dot(E_new,E);
-    E = math.VecMul(E_new,1.0/math.Vec2Norm(E_new));
+    E_new = C*E;
+    rho = E_new.dot(E);
+    E = E_new/E_new.norm();
 
     if (rho<0.0)
-      E = math.VecMul(E,-1.0);
+      E = E*-1.0;
 
     if (std::fabs(rho-rho_old) < 1.0e-12)
       break;
   }
-  E = math.VecMul(E,1.0/rho);
+  E = E/rho;
 
   ref_xi.resize(G);
   double sum = 0.0;
@@ -132,12 +130,4 @@ void chi_physics::TransportCrossSections::
     for (int gp=0; gp<G; gp++)
       sigma_a -= S[g][gp]*ref_xi[gp];
   }
-
-  //======================================== Verbose output the spectrum
-  chi_log.Log(LOG_0VERBOSE_1) << "Fundamental eigen-value: " << rho;
-  std::stringstream outstr;
-  for (auto& xi : ref_xi)
-    outstr << xi << '\n';
-  chi_log.Log(LOG_0VERBOSE_1) << outstr.str();
-
 }

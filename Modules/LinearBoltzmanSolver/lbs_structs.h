@@ -1,6 +1,9 @@
 #ifndef _lbs_structs_h
 #define _lbs_structs_h
 
+#include "Eigen/Dense"
+
+
 #define PARTITION_METHOD_SERIAL        1
 #define PARTITION_METHOD_FROM_SURFACE  2
 
