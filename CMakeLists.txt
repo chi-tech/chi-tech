@@ -26,6 +26,13 @@ else()
     message(STATUS "PETSC_ROOT set to ${PETSC_ROOT}")
 endif()
 
+if (NOT (DEFINED ENV{EIGEN_ROOT}))
+    message(FATAL_ERROR "***** EIGEN_ROOT is not set *****")
+else()
+    set(EIGEN_ROOT    "$ENV{EIGEN_ROOT}")
+    message(STATUS "EIGEN_ROOT set to ${EIGEN_ROOT}")
+endif()
+
 if (NOT (DEFINED ENV{LUA_ROOT}))
     message(FATAL_ERROR "***** LUA_ROOT is not set *****")
 else()
@@ -96,6 +103,7 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
+include_directories("${EIGEN_ROOT}")
 include_directories("${CHI_TECH_DEP}/Random123/include")
 include_directories("${TRIANGLE_ROOT}")
 include_directories("${PETSC_ROOT}/include")
