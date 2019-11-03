@@ -7,6 +7,7 @@ namespace chi_math
 {
   double Legendre(int N, double x);
   double dLegendredx(int N, double x);
+  double d2Legendredx2(int N, double x);
 
   double AssocLegendre(int ell, int m, double x);
 

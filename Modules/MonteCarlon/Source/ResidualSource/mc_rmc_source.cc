@@ -517,8 +517,8 @@ UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
     if (rn < 0.3333333)
     {
       //====================================== Sample direction
-      double costheta = 2.0*rng->Rand() - 1.0;
-      double theta    = acos(costheta);
+      double costheta = rng->Rand();
+      double theta    = acos(-costheta);
       double varphi   = rng->Rand()*2.0*M_PI;
 
       chi_mesh::Vector ref_dir;
