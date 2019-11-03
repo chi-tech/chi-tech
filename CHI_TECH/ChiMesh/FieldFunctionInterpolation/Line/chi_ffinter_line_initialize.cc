@@ -99,7 +99,7 @@ Initialize()
               is_inside = false;
             }
 
-            if (is_inside)
+            if (is_inside and interpolation_points_ass_cell[p]<0)
             {
               interpolation_points_ass_cell[p] = cell_glob_index;
               chi_log.Log(LOG_ALLVERBOSE_2)

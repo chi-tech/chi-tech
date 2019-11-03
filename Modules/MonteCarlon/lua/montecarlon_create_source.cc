@@ -145,7 +145,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
       ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
     }
 
-    catch (std::out_of_range o)
+    catch (std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid field function handle supplied in call to "
@@ -180,7 +180,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
       ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
     }
 
-    catch (std::out_of_range o)
+    catch (std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid field function handle supplied in call to "
@@ -215,7 +215,7 @@ int chiMonteCarlonCreateSource(lua_State *L)
       ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
     }
 
-    catch (std::out_of_range o)
+    catch (std::out_of_range& o)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid field function handle supplied in call to "

@@ -6,6 +6,8 @@
 #include <FiniteVolume/CellViews/fv_slab.h>
 #include <FiniteVolume/CellViews/fv_polygon.h>
 
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+
 typedef unsigned long long TULL;
 
 #include <chi_log.h>
@@ -26,21 +28,6 @@ void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
 
   double tracklength = (pf - prtcl->pos).Norm();
 
-  double zmin = 0.0-1.0e-8;
-  double zmax = 5.0+1.0e-8;
-  if (pf.z < zmin or pf.z>zmax)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Error pf out of domain " << pf.PrintS();
-    exit(EXIT_FAILURE);
-  }
-  if (prtcl->pos.z < zmin or prtcl->pos.z>zmax)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Error pi out of domain " << pf.PrintS();
-    exit(EXIT_FAILURE);
-  }
-
   phi_tally_contrib[ir] += (tracklength*prtcl->w);
 
   if (std::isnan(tracklength))
@@ -51,6 +38,45 @@ void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
       << " posf " << pf.PrintS();
     exit(EXIT_FAILURE);
   }
+
+  ContributePWLTally(prtcl,pf);
+
+}
+
+//###################################################################
+/**Makes a contribution to pwl based tallies*/
+void chi_montecarlon::Solver::ContributePWLTally(
+  chi_montecarlon::Particle *prtcl, chi_mesh::Vector pf)
+{
+  auto cell = grid->cells[prtcl->cur_cell_ind];
+  auto cell_pwl_view = pwl_discretization->MapFeView(prtcl->cur_cell_ind);
+  int cell_local_ind = cell->cell_local_id;
+
+  if (cell->Type() == chi_mesh::CellType::SLAB)
+  {
+    auto slab_pwl_view = static_cast<SlabFEView*>(cell_pwl_view);
+    int map = local_cell_pwl_dof_array_address[cell_local_ind];
+
+    double tracklength = (pf - prtcl->pos).Norm();
+    auto p = prtcl->pos + prtcl->dir*(0.5*tracklength);
+
+    for (int dof=0; dof<cell_pwl_view->dofs; dof++)
+    {
+      double N = slab_pwl_view->Shape_x(dof,p);
+
+      int ir = map + dof*num_grps*num_moms + num_grps*0 + prtcl->egrp;
+      phi_pwl_tally_contrib[ir] += (tracklength*prtcl->w*N);
+    }
+
+    if (std::isnan(tracklength))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Tracklength corruption in pwl tally contribution."
+        << " pos  " << prtcl->pos.PrintS()
+        << " posf " << pf.PrintS();
+      exit(EXIT_FAILURE);
+    }
+  }//slab
 
 }
 
@@ -104,6 +130,129 @@ void chi_montecarlon::Solver::ComputeTallySqr()
   }
 }
 
+//###################################################################
+/**Compute tally square contributions.*/
+void chi_montecarlon::Solver::ComputePWLTallySqr()
+{
+  int num_cells = grid->local_cell_glob_indices.size();
+  for (int lc=0; lc<num_cells; lc++)
+  {
+    int cell_glob_index = grid->local_cell_glob_indices[lc];
+    auto cell = grid->cells[cell_glob_index];
+
+    double V = 1.0;
+    if (cell->Type() == chi_mesh::CellType::SLAB)
+    {
+      auto cell_pwl_view =
+        (SlabFEView*)pwl_discretization->MapFeView(cell->cell_global_id);
+
+      int map = local_cell_pwl_dof_array_address[lc];
+      for (int dof=0; dof<cell_pwl_view->dofs; dof++)
+      {
+        V = cell_pwl_view->IntV_shapeI[dof];
+
+        int hi = 0;
+        int lo = num_grps-1;
+        if (group_hi_bound >= 0)
+          hi = group_hi_bound;
+        if (group_lo_bound >=0 && group_lo_bound >= group_hi_bound)
+          lo = group_lo_bound;
+
+        for (int g=hi; g<=lo; g++)
+        {
+          int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
+
+          phi_pwl_tally[ir]     += phi_pwl_tally_contrib[ir]/V;
+          phi_pwl_tally_sqr[ir] += phi_pwl_tally_contrib[ir]*phi_pwl_tally_contrib[ir]/V/V;
+          phi_pwl_tally_contrib[ir] = 0.0;
+        }
+      }
+
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported cell type encountered in call to "
+        << "chi_montecarlon::Solver::ComputeTallySqr.";
+      exit(EXIT_FAILURE);
+    }
+
+
+  }
+}
+
+
+
+
+
+
+//###################################################################
+/**Merges tallies from multiple locations.*/
+void chi_montecarlon::Solver::RendesvouzTallies()
+{
+  TULL temp_nps_global = 0;
+  MPI_Allreduce(&nps,&temp_nps_global,1,MPI_UNSIGNED_LONG_LONG,MPI_SUM,MPI_COMM_WORLD);
+
+  nps_global += temp_nps_global;
+
+  //============================================= Merge phi_local
+  int num_values = phi_tally.size();
+  std::vector<double> temp_phi_global(num_values,0.0);
+
+  MPI_Allreduce(phi_tally.data(),
+                temp_phi_global.data(),
+                num_values,MPI_DOUBLE,
+                MPI_SUM,MPI_COMM_WORLD);
+
+  for (int i=0; i<num_values; i++)
+    phi_global[i] += temp_phi_global[i];
+
+  //============================================= Merge phi_tally local
+  phi_global_tally_sqr.assign(num_values,0.0);
+
+  MPI_Allreduce(phi_tally_sqr.data(),
+                phi_global_tally_sqr.data(),
+                num_values,MPI_DOUBLE,
+                MPI_SUM,MPI_COMM_WORLD);
+
+  //============================================= Reset tallies
+  phi_tally.assign(phi_tally.size(),0.0);
+  phi_tally_sqr.assign(phi_tally_sqr.size(),0.0);
+}
+
+//###################################################################
+/**Merges tallies from multiple locations.*/
+void chi_montecarlon::Solver::RendesvouzPWLTallies()
+{
+//  TULL temp_nps_global = 0;
+//  MPI_Allreduce(&nps,&temp_nps_global,1,MPI_UNSIGNED_LONG_LONG,MPI_SUM,MPI_COMM_WORLD);
+//
+//  nps_global += temp_nps_global;
+
+  //============================================= Merge phi_local
+  int num_values = phi_pwl_tally.size();
+  std::vector<double> temp_phi_pwl_global(num_values,0.0);
+
+  MPI_Allreduce(phi_pwl_tally.data(),
+                temp_phi_pwl_global.data(),
+                num_values,MPI_DOUBLE,
+                MPI_SUM,MPI_COMM_WORLD);
+
+  for (int i=0; i<num_values; i++)
+    phi_pwl_global[i] += temp_phi_pwl_global[i];
+
+  //============================================= Merge phi_pwl_tally local
+  phi_pwl_global_tally_sqr.assign(num_values,0.0);
+
+  MPI_Allreduce(phi_pwl_tally_sqr.data(),
+                phi_pwl_global_tally_sqr.data(),
+                num_values,MPI_DOUBLE,
+                MPI_SUM,MPI_COMM_WORLD);
+
+  //============================================= Reset tallies
+  phi_pwl_tally.assign(phi_pwl_tally.size(),0.0);
+  phi_pwl_tally_sqr.assign(phi_pwl_tally_sqr.size(),0.0);
+}
 
 
 //###################################################################
@@ -167,39 +316,4 @@ void chi_montecarlon::Solver::ComputeRelativeStdDev()
       }
     }//for g
   }//for local cell
-}
-
-
-//###################################################################
-/**Merges tallies from multiple locations.*/
-void chi_montecarlon::Solver::RendesvouzTallies()
-{
-  TULL temp_nps_global = 0;
-  MPI_Allreduce(&nps,&temp_nps_global,1,MPI_UNSIGNED_LONG_LONG,MPI_SUM,MPI_COMM_WORLD);
-
-  nps_global += temp_nps_global;
-
-  //============================================= Merge phi_local
-  int num_values = phi_tally.size();
-  std::vector<double> temp_phi_global(num_values,0.0);
-
-  MPI_Allreduce(phi_tally.data(),
-                temp_phi_global.data(),
-                num_values,MPI_DOUBLE,
-                MPI_SUM,MPI_COMM_WORLD);
-
-  for (int i=0; i<num_values; i++)
-    phi_global[i] += temp_phi_global[i];
-
-  //============================================= Merge phi_tally local
-  phi_global_tally_sqr.assign(num_values,0.0);
-
-  MPI_Allreduce(phi_tally_sqr.data(),
-                phi_global_tally_sqr.data(),
-                num_values,MPI_DOUBLE,
-                MPI_SUM,MPI_COMM_WORLD);
-
-  //============================================= Reset tallies
-  phi_tally.assign(phi_tally.size(),0.0);
-  phi_tally_sqr.assign(phi_tally_sqr.size(),0.0);
 }

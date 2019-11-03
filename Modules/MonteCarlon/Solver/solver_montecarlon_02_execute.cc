@@ -5,11 +5,15 @@
 
 #include "../Source/ResidualSource/mc_rmc_source.h"
 
+#include <PiecewiseLinear/CellViews/pwl_slab.h>
+
 extern ChiLog chi_log;
 extern ChiTimer chi_program_timer;
 typedef unsigned long long TULL;
 
 #include<typeinfo>
+
+extern ChiMath chi_math_handler;
 
 //#########################################################
 /**Executes the solver*/
@@ -58,12 +62,14 @@ void chi_montecarlon::Solver::Execute()
 
 
       ComputeTallySqr();
+      ComputePWLTallySqr();
     }//for pi in batch
 
 
 
 
     RendesvouzTallies();
+    RendesvouzPWLTallies();
     ComputeRelativeStdDev();
 
 
@@ -101,15 +107,57 @@ void chi_montecarlon::Solver::Execute()
     }
   }
 
+  for (auto& tally_value : phi_pwl_global)
+    tally_value *= tally_multipl_factor/nps_global;
+
+  //==================== Computing pwl transformations
+  for (int lc=0; lc<num_cells; lc++)
+  {
+    int cell_g_index = grid->local_cell_glob_indices[lc];
+    auto cell = grid->cells[cell_g_index];
+    int map = local_cell_pwl_dof_array_address[lc];
+
+    if (cell->Type() == chi_mesh::CellType::SLAB)
+    {
+      auto cell_pwl_view =
+        static_cast<SlabFEView*>(pwl_discretization->MapFeView(cell_g_index));
+
+      MatDbl A(cell_pwl_view->IntV_shapeI_shapeJ);
+      MatDbl Ainv = chi_math_handler.Inverse(A);
+      VecDbl b(2,0.0);
+
+      for (int g=0; g<num_grps; g++)
+      {
+        for (int dof=0; dof<2; dof++)
+        {
+          int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
+          b[dof] = phi_pwl_global[ir]*cell_pwl_view->IntV_shapeI[dof];
+        }
+        VecDbl x = chi_math_handler.MatMul(Ainv,b);
+        for (int dof=0; dof<2; dof++)
+        {
+          int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
+          phi_pwl_global[ir] = x[dof];
+        }
+      }
+
+
+    }
+  }
+
   //Print group 0
 
   for (int lc=0; lc<num_cells; lc++)
   {
+    int map0 = local_cell_pwl_dof_array_address[lc];
+    int map1 = map0 + 1*num_grps*num_moms + num_grps*0 + 0;;
     chi_log.Log(LOG_0)
       << "Cell " << lc
       << " phi=" << phi_global[lc*num_grps]
       << " std=" << phi_local_relsigma[lc*num_grps+0]
-      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps];
+      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps]
+      << " dof0g0m0=" << phi_pwl_global[map0]
+      << " dof1g0m0=" << phi_pwl_global[map1];
   }
 
 

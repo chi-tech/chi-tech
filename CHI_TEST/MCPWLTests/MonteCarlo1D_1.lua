@@ -10,7 +10,7 @@ end
 chiMeshHandlerCreate()
 
 mesh={}
-N=50
+N=20
 L=30.0
 xmin = 0.0
 dx = L/N
@@ -77,11 +77,11 @@ chiSolverAddRegion(phys1,region1)
 
 chiMonteCarlonCreateSource(phys1,MC_BNDRY_SRC,1);
 
-chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,2e6)
+chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,1e6)
 chiMonteCarlonSetProperty(phys1,MC_TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MERGE_INTVL,1e5)
 chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
-chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
+chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,true)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,0.5)
 
@@ -93,11 +93,12 @@ chiMonteCarlonExecute(phys1)
 cline = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
 chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,0.0, 30.0+xmin)
-chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 50)
+chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 503)
 
-for k=1,2 do
+for k=1,1 do
     chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,k-1)
 end
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
 
 
 chiFFInterpolationInitialize(cline)

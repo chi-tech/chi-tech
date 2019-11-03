@@ -9,6 +9,7 @@
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <FiniteVolume/fv.h>
+#include <PiecewiseLinear/pwl.h>
 #include <ChiMath/chi_math.h>
 
 #define MC_NUM_PARTICLES     1
@@ -26,7 +27,8 @@ class chi_montecarlon::Solver : public chi_physics::Solver
 {
 private:
   chi_mesh::MeshContinuum*              grid;
-  SpatialDiscretization_FV*                fv_discretization;
+  SpatialDiscretization_FV*             fv_discretization;
+  SpatialDiscretization_PWL*            pwl_discretization;
 
   std::vector<int>                      matid_xs_map;
 
@@ -35,6 +37,7 @@ private:
 
   int                                   num_grps;
 
+  //FV tallies
   std::vector<double>                   phi_tally_contrib;
   std::vector<double>                   phi_tally;
   std::vector<double>                   phi_tally_sqr;
@@ -43,6 +46,20 @@ private:
   std::vector<double>                   phi_global_tally_sqr;
 
   std::vector<double>                   phi_local_relsigma;
+
+  //PWL tallies
+  int                                   num_moms;
+  std::vector<double>                   phi_pwl_tally_contrib;
+  std::vector<double>                   phi_pwl_tally;
+  std::vector<double>                   phi_pwl_tally_sqr;
+
+  std::vector<double>                   phi_pwl_global;
+  std::vector<double>                   phi_pwl_global_tally_sqr;
+
+  std::vector<double>                   phi_pwl_local_relsigma;
+
+  std::vector<int>                      local_cell_pwl_dof_array_address;
+
 
   //runtime quantities
   int                                   current_batch;
@@ -97,9 +114,15 @@ private:
   //05
   void ContributeTally(chi_montecarlon::Particle* prtcl,
                        chi_mesh::Vector pf);
+  void ContributePWLTally(chi_montecarlon::Particle* prtcl,
+                          chi_mesh::Vector pf);
   void ComputeTallySqr();
-  void ComputeRelativeStdDev();
+  void ComputePWLTallySqr();
+
   void RendesvouzTallies();
+  void RendesvouzPWLTallies();
+
+  void ComputeRelativeStdDev();
 };
 
 #endif
