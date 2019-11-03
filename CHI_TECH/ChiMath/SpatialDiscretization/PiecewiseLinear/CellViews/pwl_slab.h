@@ -140,17 +140,17 @@ public:
 
     chi_mesh::Vector v01 = p1 - p0;
 
-    double xi   = v01.Dot(xyz_ref)/v01.Norm();
+    double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
 
     if ((xi>=-1.0e-12) and (xi<=1.0+1.0e-12))
     {
       if (i==0)
       {
-        return 1.0 - xi/h;
+        return 1.0 - xi;
       }
       else
       {
-        return xi/h;
+        return xi;
       }
     }
 
