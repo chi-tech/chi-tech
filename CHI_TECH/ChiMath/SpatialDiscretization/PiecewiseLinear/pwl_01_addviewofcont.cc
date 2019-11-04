@@ -57,7 +57,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       }
 
       //========================================= If triangle item_id
-      if (typeid(*(cell)) == typeid(chi_mesh::CellTriangle) )
+      else if (typeid(*(cell)) == typeid(chi_mesh::CellTriangle) )
       {
         TriangleFEView* view =
           new TriangleFEView((chi_mesh::CellTriangle*)(cell),vol_continuum);
@@ -67,7 +67,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       }
 
       //========================================= If polygon item_id
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
+      else if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         PolygonFEView* view =
           new PolygonFEView((chi_mesh::CellPolygon*)(cell),vol_continuum,this);
@@ -78,7 +78,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       }
 
       //========================================= If polyhedron item_id
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
       {
         PolyhedronFEView* view =
           new PolyhedronFEView(
@@ -90,6 +90,28 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         view->CleanUp();
         this->cell_fe_views.push_back(view);
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+      }
+      else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      {
+        auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
+        if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+        {
+          auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell_base);
+          PolyhedronFEView* view =
+            new PolyhedronFEView(polyh_cell, vol_continuum, this);
+
+          view->PreCompute();
+          view->CleanUp();
+          this->cell_fe_views.push_back(view);
+          cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+        }
+      }
+      else
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "SpatialDiscretization_PWL::AddViewOfLocalContinuum. "
+          << "Unsupported cell type encountered.";
+        exit(EXIT_FAILURE);
       }
     }//if mapping not yet assigned
   }//for num cells

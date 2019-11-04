@@ -5,6 +5,7 @@
 #include <vector>
 #include "../../../Quadratures/quadrature.h"
 #include "../../../../ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell_polyhedronv2.h"
 #include "../../../../ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #define ON_SURFACE true
@@ -120,6 +121,9 @@ private:
 
 public:
   PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
+                   chi_mesh::MeshContinuum* vol_continuum,
+                   SpatialDiscretization_PWL* discretization= nullptr);
+  PolyhedronFEView(chi_mesh::CellPolyhedronV2* polyh_cell,
                    chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization= nullptr);
 

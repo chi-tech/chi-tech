@@ -72,10 +72,16 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
       if (!suppress_assembly)
         CFEM_Ab_Polyhedron(glob_cell_index, cell, gi);
     }
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      if (!suppress_assembly)
+        CFEM_Assemble_A_and_b(glob_cell_index, cell, gi);
+    }
     else
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid cell-type encountered in chi_diffusion::Solver::ExecutePWLC";
+      exit(EXIT_FAILURE);
     }
   }
 
