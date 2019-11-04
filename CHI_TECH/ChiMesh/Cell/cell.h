@@ -18,7 +18,11 @@ namespace chi_mesh
     POLYGON = 6,
     TETRAHEDRON = 7,
     HEXAHEDRON = 8,
-    POLYHEDRON = 9
+    POLYHEDRON = 9,
+    CELL_NEWBASE = 10,
+    SLABV2 = 11,
+    POLYGONV2 = 12,
+    POLYHEDRONV2 = 13
   };
 }
 

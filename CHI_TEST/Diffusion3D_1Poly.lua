@@ -135,8 +135,8 @@ if (chi_location_id == 0 and master_export == nil) then
     chiFFInterpolationExportPython(slice1)
     chiFFInterpolationExportPython(slice2)
     chiFFInterpolationExportPython(line0)
-    local handle = io.popen("python ZPFFI00.py")
-    local handle = io.popen("python ZPFFI10.py")
+    local handle = io.popen("python3 ZPFFI00.py")
+    local handle = io.popen("python3 ZPFFI10.py")
     --local handle = io.popen("python ZLFFI20.py")
     print("Execution completed")
 end

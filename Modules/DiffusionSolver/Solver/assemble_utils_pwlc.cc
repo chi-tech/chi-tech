@@ -3,15 +3,16 @@
 #include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell.h"
+#include <ChiMesh/Cell/cell_newbase.h>
 #include "ChiMesh/Cell/cell_slab.h"
 #include "ChiMesh/Cell/cell_polygon.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 #include "ChiTimer/chi_timer.h"
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
+//#include <boost/mpi.hpp>
+//#include <boost/mpi/environment.hpp>
+//#include <boost/mpi/communicator.hpp>
 
 #include <chi_log.h>
 #include <chi_mpi.h>
@@ -76,6 +77,15 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
       for (int v=0; v<polyh_cell->v_indices.size(); v++)
       {
         exnonex_nodes_set.insert(polyh_cell->v_indices[v]);
+      }
+    }
+
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto polyh_cell = (chi_mesh::CellBase*)cell;
+      for (int v=0; v<polyh_cell->vertex_ids.size(); v++)
+      {
+        exnonex_nodes_set.insert(polyh_cell->vertex_ids[v]);
       }
     }
   }
@@ -179,6 +189,32 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
                                            std::find(std::begin(exnonex_nodes),
                                                      std::end(exnonex_nodes),
                                                      v_index));
+              ghost_flags[v_setind] = true;
+            }//for face verts
+          }//if neighbor not local
+        }//if neighbor is not a boundary
+      }//for cell face
+    }//if polyhedron
+
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto polyh_cell = (chi_mesh::CellBase*)cell;
+      for (int f=0; f<polyh_cell->faces.size(); f++)
+      {
+        if (polyh_cell->faces[f].neighbor >= 0)
+        {
+          int adj_cell_ind = polyh_cell->faces[f].neighbor;
+          auto adj_cell = vol_continuum->cells[adj_cell_ind];
+
+          if (adj_cell->partition_id != polyh_cell->partition_id)
+          {
+            for (int fv=0; fv<polyh_cell->faces[f].vertex_ids.size(); fv++)
+            {
+              int v_index = polyh_cell->faces[f].vertex_ids[fv];
+              int v_setind = (int)std::distance(exnonex_nodes.begin(),
+                                                std::find(std::begin(exnonex_nodes),
+                                                          std::end(exnonex_nodes),
+                                                          v_index));
               ghost_flags[v_setind] = true;
             }//for face verts
           }//if neighbor not local

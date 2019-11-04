@@ -188,6 +188,7 @@ public:
   void CFEM_Ab_Polygon(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
   //02b_c
   void CFEM_Ab_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
+  void CFEM_Assemble_A_and_b(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
 
 
 
