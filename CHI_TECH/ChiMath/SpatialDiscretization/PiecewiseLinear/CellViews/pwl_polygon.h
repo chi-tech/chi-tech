@@ -50,30 +50,17 @@ private:
 public:
   int      num_of_subtris;
   double   beta;
-//  std::vector<chi_mesh::Vector> v01,v02;
   chi_mesh::Vertex vc;
   std::vector<double> detJ;
   std::vector<int*> node_to_side_map;
   std::vector<std::vector<int>> edge_dof_mappings;
 
 
-//  std::vector<chi_math::QuadraturePointXY*> qpoints;
-//  std::vector<double> w;
-
 public:
-  std::vector<double*>                          IntV_gradShapeI_gradShapeJ;
-  std::vector<std::vector<chi_mesh::Vector>>    IntV_shapeI_gradshapeJ;
-  std::vector<std::vector<double>>              IntV_shapeI_shapeJ;
-  std::vector<double>                           IntV_shapeI;
-
   std::vector<chi_mesh::Vector>                 IntV_gradshapeI;
 private:
   std::vector<std::vector<std::vector<double>>>           IntSi_shapeI_shapeJ;
   std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntSi_shapeI_gradshapeJ;
-public:
-  std::vector<std::vector<std::vector<double>>> IntS_shapeI_shapeJ;
-  std::vector<double*>                          IntS_shapeI;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntS_shapeI_gradshapeJ;
 
 private:
   chi_mesh::MeshContinuum* grid;

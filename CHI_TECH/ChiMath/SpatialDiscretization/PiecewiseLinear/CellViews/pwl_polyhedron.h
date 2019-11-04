@@ -98,18 +98,9 @@ public:
   std::vector<FEnodeMap*>         node_maps;
   std::vector<FEFaceDOFMapping*>  face_dof_mappings;
 
-public:
-  std::vector<double*>                          IntV_gradShapeI_gradShapeJ;
-  std::vector<std::vector<chi_mesh::Vector>>    IntV_shapeI_gradshapeJ;
-  std::vector<std::vector<double>>              IntV_shapeI_shapeJ;
-  std::vector<double>                           IntV_shapeI;
 private:
   std::vector<std::vector<std::vector<double>>> IntSi_shapeI_shapeJ;
   std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntSi_shapeI_gradshapeJ;
-public:
-  std::vector<std::vector<std::vector<double>>> IntS_shapeI_shapeJ;
-  std::vector<double*>                          IntS_shapeI;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntS_shapeI_gradshapeJ;
 
 private:
   std::vector<chi_math::QuadratureTetrahedron*> quadratures;

@@ -14,13 +14,6 @@ private:
   int v0i;
   int v1i;
 public:
-  std::vector<double*>                          IntV_gradShapeI_gradShapeJ;
-  std::vector<std::vector<chi_mesh::Vector>>    IntV_shapeI_gradshapeJ;
-  std::vector<std::vector<double>>              IntV_shapeI_shapeJ;
-  std::vector<double>                           IntV_shapeI;
-  std::vector<double*>                          IntS_shapeI;
-  std::vector<std::vector<double*>>             IntS_shapeI_shapeJ;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntS_shapeI_gradshapeJ;
   double h;
 public:
 
@@ -41,16 +34,16 @@ public:
     IntV_shapeI.push_back(h/2);
     IntV_shapeI.push_back(h/2);
 
-    IntV_shapeI_shapeJ.push_back(std::vector<double>(2,0.0));
-    IntV_shapeI_shapeJ.push_back(std::vector<double>(2,0.0));
+    IntV_shapeI_shapeJ.emplace_back(2, 0.0);
+    IntV_shapeI_shapeJ.emplace_back(2, 0.0);
 
     IntV_shapeI_shapeJ[0][0] = h/3;
     IntV_shapeI_shapeJ[0][1] = h/6;
     IntV_shapeI_shapeJ[1][0] = h/6;
     IntV_shapeI_shapeJ[1][1] = h/3;
 
-    IntV_gradShapeI_gradShapeJ.push_back(new double[2]);
-    IntV_gradShapeI_gradShapeJ.push_back(new double[2]);
+    IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
+    IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
 
     IntV_gradShapeI_gradShapeJ[0][0] = 1/h;
     IntV_gradShapeI_gradShapeJ[0][1] = -1/h;
@@ -69,8 +62,8 @@ public:
     IntV_shapeI_gradshapeJ[1][0] = chi_mesh::Vector(0.0,0.0,-1/2.0);
     IntV_shapeI_gradshapeJ[1][1] = chi_mesh::Vector(0.0,0.0, 1/2.0);
 
-    IntS_shapeI.push_back(new double[2]);
-    IntS_shapeI.push_back(new double[2]);
+    IntS_shapeI.emplace_back(2, 0.0);
+    IntS_shapeI.emplace_back(2, 0.0);
 
     IntS_shapeI[0][0] = 1.0;
     IntS_shapeI[0][1] = 0.0;
@@ -80,16 +73,22 @@ public:
 
 
 
-    IntS_shapeI_shapeJ.resize(2,std::vector<double*>(2));
-    IntS_shapeI_shapeJ.resize(2,std::vector<double*>(2));
+//    IntS_shapeI_shapeJ.resize(2,std::vector<std::vector<double>>(2));
+//    IntS_shapeI_shapeJ.resize(2,std::vector<std::vector<double>>(2));
+    IntS_shapeI_shapeJ.resize(2,
+                              std::vector<std::vector<double>>(2,
+                              std::vector<double>(2, 0.0)));
+    IntS_shapeI_shapeJ.resize(2,
+                              std::vector<std::vector<double>>(2,
+                              std::vector<double>(2, 0.0)));
 
     //Left face
-    IntS_shapeI_shapeJ[0][0]= new double[2];
-    IntS_shapeI_shapeJ[0][1]= new double[2];
+//    IntS_shapeI_shapeJ[0][0].emplace_back(2, 0.0);
+//    IntS_shapeI_shapeJ[0][1].emplace_back(2, 0.0);
 
     //Right face
-    IntS_shapeI_shapeJ[1][0]= new double[2];
-    IntS_shapeI_shapeJ[1][1]= new double[2];
+//    IntS_shapeI_shapeJ[1][0].emplace_back(2, 0.0);
+//    IntS_shapeI_shapeJ[1][1].emplace_back(2, 0.0);
 
     //Left face
     IntS_shapeI_shapeJ[0][0][0] =  1.0;

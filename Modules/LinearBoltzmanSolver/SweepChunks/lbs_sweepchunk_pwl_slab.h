@@ -169,7 +169,7 @@ public:
       const std::vector<std::vector<double>>& M =
         cell_fe_view->IntV_shapeI_shapeJ;
 
-      const std::vector<std::vector<double *>>& N =
+      const std::vector<std::vector<std::vector<double>>>& N =
         cell_fe_view->IntS_shapeI_shapeJ;
 
       //=================================================== Loop over angles in set
