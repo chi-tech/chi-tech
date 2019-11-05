@@ -171,7 +171,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Extruding cells"
           << std::endl;
-        ExtrudeCells2(temp_continuum, vol_continuum);
+        ExtrudeCells(temp_continuum, vol_continuum);
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
           << vol_continuum->cells.size()

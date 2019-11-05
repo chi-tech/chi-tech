@@ -246,12 +246,12 @@ public:
             int num_face_indices = polyh_cell->faces[f]->v_indices.size();
             for (int fi=0; fi<num_face_indices; fi++)
             {
-              int i = cell_fe_view->face_dof_mappings[f]->cell_dof[fi];
+              int i = cell_fe_view->face_dof_mappings[f][fi];
 
               //=========== Loop over face unknowns
               for (int fj=0; fj<num_face_indices; fj++)
               {
-                int j = cell_fe_view->face_dof_mappings[f]->cell_dof[fj];
+                int j = cell_fe_view->face_dof_mappings[f][fj];
 
                 // %%%%% LOCAL CELL DEPENDENCY %%%%%
                 if (face_neighbor == LOCAL)
@@ -363,7 +363,7 @@ public:
           {
             for (int fi=0; fi<polyh_cell->faces[f]->v_indices.size(); fi++)
             {
-              int i = cell_fe_view->face_dof_mappings[f]->cell_dof[fi];
+              int i = cell_fe_view->face_dof_mappings[f][fi];
               psi = fluds->OutgoingPsi(cr_i,out_face_counter,fi,n);
 
               for (int gsg=0; gsg<gs_ss_size; gsg++)
@@ -378,7 +378,7 @@ public:
             deploc_face_counter++;
             for (int fi=0; fi<polyh_cell->faces[f]->v_indices.size(); fi++)
             {
-              int i = cell_fe_view->face_dof_mappings[f]->cell_dof[fi];
+              int i = cell_fe_view->face_dof_mappings[f][fi];
               psi = fluds->NLOutgoingPsi(deploc_face_counter,fi,n);
 
               for (int gsg=0; gsg<gs_ss_size; gsg++)

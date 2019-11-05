@@ -192,7 +192,7 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
   // surface integrals of the shape functions.
   for (int f=0; f<polyh_cell->faces.size(); f++)
   {
-    FEFaceDOFMapping* face_dof_mapping = new FEFaceDOFMapping;
+    std::vector<int> face_dof_mapping;
 
     for (int fi=0; fi<polyh_cell->faces[f]->v_indices.size(); fi++)
     {
@@ -212,7 +212,7 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
                                      "pwl_polyhedron.h";
         exit(EXIT_FAILURE);
       }
-      face_dof_mapping->cell_dof.push_back(mapping);
+      face_dof_mapping.push_back(mapping);
     }//for face i
 
     face_dof_mappings.push_back(face_dof_mapping);
@@ -414,7 +414,7 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
   // surface integrals of the shape functions.
   for (int f=0; f<polyh_cell->faces.size(); f++)
   {
-    FEFaceDOFMapping* face_dof_mapping = new FEFaceDOFMapping;
+    std::vector<int> face_dof_mapping;
 
     for (int fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
     {
@@ -434,7 +434,7 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
                                      "pwl_polyhedron.h";
         exit(EXIT_FAILURE);
       }
-      face_dof_mapping->cell_dof.push_back(mapping);
+      face_dof_mapping.push_back(mapping);
     }//for face i
 
     face_dof_mappings.push_back(face_dof_mapping);

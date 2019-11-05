@@ -110,10 +110,21 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
       else
         PWLD_b_Polyhedron(glob_cell_index,cell,cell_ip_view,gi);
     }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If CELL_NEWBASE
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      if (!suppress_assembly)
+        PWLD_Assemble_A_and_b(glob_cell_index,cell,cell_ip_view,gi);
+      else
+        PWLD_Assemble_b(glob_cell_index,cell,cell_ip_view,gi);
+    }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     else
     {
       chi_log.Log(LOG_ALLERROR)
         << "Invalid cell-type encountered in chi_diffusion::Solver::ExecutePWLD_MIP";
+      exit(EXIT_FAILURE);
     }
   }
 

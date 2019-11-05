@@ -1,6 +1,8 @@
 #ifndef _chi_diffusion_solver_h
 #define _chi_diffusion_solver_h
 
+#include <ChiMesh/Cell/cell_newbase.h>
+
 #define SOLVER_SYSTEM_EIGEN 1
 #define SOLVER_SYSTEM_PETSC 2
 #define PROPERTY_D_MAP 5
@@ -212,6 +214,12 @@ public:
   void PWLD_b_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell,
                           DiffusionIPCellView* cell_ip_view, int group=0);
 
+  //02c_c
+  void PWLD_Assemble_A_and_b(int cell_glob_index, chi_mesh::Cell *cell,
+                          DiffusionIPCellView* cell_ip_view, int group=0);
+  void PWLD_Assemble_b(int cell_glob_index, chi_mesh::Cell *cell,
+                         DiffusionIPCellView* cell_ip_view, int group=0);
+
   //02d
   int ExecutePWLD_MIP_GRPS(bool suppress_assembly = false,
                            bool suppress_solve = false);
@@ -253,6 +261,11 @@ public:
   int MapCellDof(chi_mesh::CellPolyhedron* polyh_cell, int ig);
   int MapCellFace(chi_mesh::CellPolyhedron* polyh_cell,
                   chi_mesh::CellPolyhedron* adjph_cell, int f);
+
+  double HPerpendicular(chi_mesh::CellBase* cell, CellFEView* fe_view, int f);
+  int MapCellDof(chi_mesh::CellBase* cell, int ig);
+  int MapCellFace(chi_mesh::CellBase* cur_cell,
+                  chi_mesh::CellBase* adj_cell, int f);
 
   DiffusionIPCellView* GetBorderIPView(int locI, int cell_glob_index);
   CellFEView* GetBorderFEView(int locI, int cell_glob_index);

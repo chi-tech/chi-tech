@@ -39,7 +39,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
     double rhsvalue =0.0;
 
     int ir_boundary_type;
-    if (!ApplyDirichletI(ir,&ir_boundary_type,ig))
+//    if (!ApplyDirichletI(ir,&ir_boundary_type,ig))
     {
       //====================== Develop matrix entry
       for (int j=0; j<fe_view->dofs; j++)
@@ -53,7 +53,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
           siga[j]*fe_view->IntV_shapeI_shapeJ[i][j];
 
         int jr_boundary_type;
-        if (!ApplyDirichletJ(jr,ir,jr_mat_entry,&jr_boundary_type,jg))
+//        if (!ApplyDirichletJ(jr,ir,jr_mat_entry,&jr_boundary_type,jg))
         {
           MatSetValue(Aref,ir,jr,jr_mat_entry,ADD_VALUES);
         }
@@ -148,7 +148,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
       double intS = 0.0;
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int i = fe_view->edge_dof_mappings[f][fi];
+        int i = fe_view->face_dof_mappings[f][fi];
         D_avg += D[i]*fe_view->IntS_shapeI[i][f];
         intS += fe_view->IntS_shapeI[i][f];
       }
@@ -159,7 +159,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
       double adj_intS = 0.0;
       for (int fi=0; fi<2; fi++)
       {
-        int i    = fe_view->edge_dof_mappings[f][fi];
+        int i    = fe_view->face_dof_mappings[f][fi];
         int imap = MapCellDof(adj_cell,poly_cell->v_indices[i]);
         adj_D_avg += adj_D[imap]*adj_fe_view->IntS_shapeI[imap][fmap];
         adj_intS += adj_fe_view->IntS_shapeI[imap][fmap];
@@ -171,7 +171,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
       //========================= Assembly penalty terms
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int i  = fe_view->edge_dof_mappings[f][fi];
+        int i  = fe_view->face_dof_mappings[f][fi];
         int ir = cell_ip_view->MapDof(i);
 
         //Mapping face index to adj-cell
@@ -180,7 +180,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
 
         for (int fj=0; fj<2; fj++)
         {
-          int j  = fe_view->edge_dof_mappings[f][fj];
+          int j  = fe_view->face_dof_mappings[f][fj];
           int jr = cell_ip_view->MapDof(j);
 
           double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
@@ -272,7 +272,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
         double intS = 0.0;
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i = fe_view->edge_dof_mappings[f][fi];
+          int i = fe_view->face_dof_mappings[f][fi];
           D_avg += D[i]*fe_view->IntS_shapeI[i][f];
           intS += fe_view->IntS_shapeI[i][f];
         }
@@ -283,12 +283,12 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
         //========================= Assembly penalty terms
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_view->edge_dof_mappings[f][fi];
+          int i  = fe_view->face_dof_mappings[f][fi];
           int ir = cell_ip_view->MapDof(i);
 
           for (int fj=0; fj<2; fj++)
           {
-            int j  = fe_view->edge_dof_mappings[f][fj];
+            int j  = fe_view->face_dof_mappings[f][fj];
             int jr = cell_ip_view->MapDof(j);
 
             double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
@@ -328,12 +328,12 @@ void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,
 
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_view->edge_dof_mappings[f][fi];
+          int i  = fe_view->face_dof_mappings[f][fi];
           int ir =  cell_ip_view->MapDof(i);
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_view->edge_dof_mappings[f][fj];
+            int j  = fe_view->face_dof_mappings[f][fj];
             int jr =  cell_ip_view->MapDof(j);
 
             double aij = robin_bndry->a*fe_view->IntS_shapeI_shapeJ[f][i][j];

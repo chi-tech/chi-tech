@@ -68,10 +68,10 @@ struct FEnodeMap
 
 
 /**FaceDOFmapping*/
-struct FEFaceDOFMapping
-{
-  std::vector<int> cell_dof;
-};
+//struct FEFaceDOFMapping
+//{
+//  std::vector<int> cell_dof;
+//};
 
 //###################################################################
 /**Object for handling piecewise linear
@@ -85,7 +85,7 @@ struct FEFaceDOFMapping
  * Some notes on indexing:\n
  *  - IntV_shapeI_gradshapeJ, given i and j results in a vector.
  *  - IntS_shapeI_shapeJ, requires f, then cell i, then cell j
- *  - face_dof_mappings, is as follows face_dof_mappings[f]->cell_dof[fi] and
+ *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  * */
 class PolyhedronFEView : public CellFEView
@@ -96,7 +96,6 @@ private:
   std::vector<double>              face_betaf;
 public:
   std::vector<FEnodeMap*>         node_maps;
-  std::vector<FEFaceDOFMapping*>  face_dof_mappings;
 
 private:
   std::vector<std::vector<std::vector<double>>> IntSi_shapeI_shapeJ;

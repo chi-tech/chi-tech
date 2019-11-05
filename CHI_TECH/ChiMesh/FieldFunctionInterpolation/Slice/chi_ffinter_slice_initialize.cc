@@ -1,6 +1,8 @@
 #include "chi_ffinter_slice.h"
 #include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
 #include <ChiMesh/Cell/cell_polyhedronv2.h>
+
 #include "../../Cell/cell_slab.h"
 #include "../../Cell/cell_polygon.h"
 #include "../../Cell/cell_polyhedron.h"
@@ -57,6 +59,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       intersecting_cell_indices.push_back(cell_glob_index);
     }
 
+
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
@@ -94,7 +97,11 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     {
       auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
 
-      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        intersecting_cell_indices.push_back(cell_glob_index);
+      }
+      else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
       {
         auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell_base);
         bool intersects = false;
@@ -125,6 +132,12 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           }//for e
           if (intersects) break;
         }//for f
+      }
+      else
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "Unsupported cell type in call to Slice Initialize.";
+        exit(EXIT_FAILURE);
       }
 
     }//if polyh
@@ -384,12 +397,67 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
     }//if polyhedron
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
     if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
 
-      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+
+        //========================================= Initialize cell intersection
+        //                                          data structure
+        FFICellIntersection* cell_isds = new FFICellIntersection;
+        cell_isds->cell_global_index = cell_glob_index;
+        cell_intersections.push_back(cell_isds);
+
+        //========================================= Loop over vertices
+        for (int v=0; v<poly_cell->vertex_ids.size(); v++)
+        {
+          FFIFaceEdgeIntersection* face_isds =
+            new FFIFaceEdgeIntersection;
+
+          int v0gi = poly_cell->vertex_ids[v];
+
+          face_isds->v0_g_index = v0gi;
+          face_isds->v1_g_index = v0gi;
+
+          face_isds->v0_dofindex_cell = v;
+          face_isds->v1_dofindex_cell = v;
+
+          face_isds->weights = std::pair<double,double>(0.5,0.5);
+          face_isds->point   = *grid_view->nodes[v0gi];
+
+          cell_isds->intersections.push_back(face_isds);
+        }
+
+        //========================================= Set intersection center
+        cell_isds->intersection_centre = poly_cell->centroid;
+
+        //========================================= Set straight 2D center
+        // This is normally transformed for the 3D case
+        cell_isds->intersection_2d_centre = cell_isds->intersection_centre;
+
+        //========================================= Same for 2D points
+        int num_points = cell_isds->intersections.size();
+        for (int p=0; p<num_points; p++)
+        {
+          chi_mesh::Vector vref = cell_isds->intersections[p]->point-this->point;
+
+          cell_isds->intersections[p]->point2d = vref;
+
+          cfem_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v0_g_index);
+          cfem_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v1_g_index);
+          pwld_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v0_dofindex_cell);
+          pwld_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v1_dofindex_cell);
+          pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+          pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+        }
+      }//polygon
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
+      else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
       {
         auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell_base);
 

@@ -70,25 +70,10 @@ public:
     IntS_shapeI[1][0] = 0.0;
     IntS_shapeI[1][1] = 1.0;
 
-
-
-
-//    IntS_shapeI_shapeJ.resize(2,std::vector<std::vector<double>>(2));
-//    IntS_shapeI_shapeJ.resize(2,std::vector<std::vector<double>>(2));
-    IntS_shapeI_shapeJ.resize(2,
-                              std::vector<std::vector<double>>(2,
-                              std::vector<double>(2, 0.0)));
-    IntS_shapeI_shapeJ.resize(2,
-                              std::vector<std::vector<double>>(2,
-                              std::vector<double>(2, 0.0)));
-
-    //Left face
-//    IntS_shapeI_shapeJ[0][0].emplace_back(2, 0.0);
-//    IntS_shapeI_shapeJ[0][1].emplace_back(2, 0.0);
-
-    //Right face
-//    IntS_shapeI_shapeJ[1][0].emplace_back(2, 0.0);
-//    IntS_shapeI_shapeJ[1][1].emplace_back(2, 0.0);
+    typedef std::vector<double> VecDbl;
+    typedef std::vector<VecDbl> VecVecDbl;
+    IntS_shapeI_shapeJ.resize(2, VecVecDbl(2, VecDbl(2, 0.0)));
+    IntS_shapeI_shapeJ.resize(2, VecVecDbl(2, VecDbl(2, 0.0)));
 
     //Left face
     IntS_shapeI_shapeJ[0][0][0] =  1.0;
@@ -127,6 +112,8 @@ public:
     IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector(0.0,0.0,-1.0/h);
     IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector(0.0,0.0, 1.0/h);
 
+    face_dof_mappings.emplace_back(1,0);
+    face_dof_mappings.emplace_back(1,1);
 
   }
 

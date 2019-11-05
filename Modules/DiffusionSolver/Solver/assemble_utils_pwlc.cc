@@ -82,10 +82,10 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
 
     if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto polyh_cell = (chi_mesh::CellBase*)cell;
-      for (int v=0; v<polyh_cell->vertex_ids.size(); v++)
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      for (int v=0; v < cell_base->vertex_ids.size(); v++)
       {
-        exnonex_nodes_set.insert(polyh_cell->vertex_ids[v]);
+        exnonex_nodes_set.insert(cell_base->vertex_ids[v]);
       }
     }
   }
@@ -198,19 +198,19 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
 
     if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto polyh_cell = (chi_mesh::CellBase*)cell;
-      for (int f=0; f<polyh_cell->faces.size(); f++)
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      for (int f=0; f < cell_base->faces.size(); f++)
       {
-        if (polyh_cell->faces[f].neighbor >= 0)
+        if (cell_base->faces[f].neighbor >= 0)
         {
-          int adj_cell_ind = polyh_cell->faces[f].neighbor;
+          int adj_cell_ind = cell_base->faces[f].neighbor;
           auto adj_cell = vol_continuum->cells[adj_cell_ind];
 
-          if (adj_cell->partition_id != polyh_cell->partition_id)
+          if (adj_cell->partition_id != cell_base->partition_id)
           {
-            for (int fv=0; fv<polyh_cell->faces[f].vertex_ids.size(); fv++)
+            for (int fv=0; fv < cell_base->faces[f].vertex_ids.size(); fv++)
             {
-              int v_index = polyh_cell->faces[f].vertex_ids[fv];
+              int v_index = cell_base->faces[f].vertex_ids[fv];
               int v_setind = (int)std::distance(exnonex_nodes.begin(),
                                                 std::find(std::begin(exnonex_nodes),
                                                           std::end(exnonex_nodes),
