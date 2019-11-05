@@ -173,6 +173,20 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   {
     auto cell_base = dynamic_cast<chi_mesh::CellBase*>(first_cell);
 
+    if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+    {
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+//
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+      PetscOptionsInsertString(NULL,"-options_left");
+    }
     if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
     {
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");

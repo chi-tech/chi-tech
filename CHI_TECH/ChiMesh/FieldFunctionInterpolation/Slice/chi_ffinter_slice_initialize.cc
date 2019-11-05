@@ -402,6 +402,14 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     {
       auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
 
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+      {
+        chi_log.Log(LOG_0)
+          << "FieldFunctionInterpolationSlice does not support 1D cells.";
+        exit(EXIT_FAILURE);
+      }
+
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
       if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
       {
