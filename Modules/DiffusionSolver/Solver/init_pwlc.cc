@@ -337,25 +337,25 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If polyhedral item_id
     else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto base_cell = static_cast<chi_mesh::CellBase*>(cell);
+      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
 
-      for (int i=0; i<base_cell->vertex_ids.size(); i++)
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
       {
-        int ir =  mesher->MapNode(base_cell->vertex_ids[i]);
+        int ir =  mesher->MapNode(cell_base->vertex_ids[i]);
 
         if (ir<0)
         {
           chi_log.Log(LOG_ALLERROR)
-            << "ir Mapping error node " << base_cell->vertex_ids[i];
+            << "ir Mapping error node " << cell_base->vertex_ids[i];
           exit(EXIT_FAILURE);
         }
 
         //================================== Check if i is on boundary
-        for (int f=0; f<base_cell->faces.size(); f++)
+        for (int f=0; f < cell_base->faces.size(); f++)
         {
-          if (base_cell->faces[f].neighbor < 0)
+          if (cell_base->faces[f].neighbor < 0)
           {
-            chi_mesh::CellFace& face = base_cell->faces[f];
+            chi_mesh::CellFace& face = cell_base->faces[f];
             size_t num_face_verts = face.vertex_ids.size();
             for (int fv=0; fv<num_face_verts; fv++)
             {
@@ -386,9 +386,9 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
         //======================================= Set nodal connections
         std::vector<int>* node_links = nodal_connections[ir];
-        for (int j=0; j<base_cell->vertex_ids.size(); j++)
+        for (int j=0; j < cell_base->vertex_ids.size(); j++)
         {
-          int jr = mesher->MapNode(base_cell->vertex_ids[j]);
+          int jr = mesher->MapNode(cell_base->vertex_ids[j]);
 
           //====================== Check for duplicates
           bool already_there = false;

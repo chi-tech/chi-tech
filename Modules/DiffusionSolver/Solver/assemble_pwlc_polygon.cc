@@ -75,12 +75,12 @@ void chi_diffusion::Solver::CFEM_Ab_Polygon(int cell_glob_index,
 
         for (int fi=0; fi<2; fi++)
         {
-          int i  = fe_view->edge_dof_mappings[f][fi];
+          int i  = fe_view->face_dof_mappings[f][fi];
           int ir = mesher->MapNode(poly_cell->v_indices[i]);
 
           for (int fj=0; fj<2; fj++)
           {
-            int j  = fe_view->edge_dof_mappings[f][fj];
+            int j  = fe_view->face_dof_mappings[f][fj];
             int jr = mesher->MapNode(poly_cell->v_indices[j]);
 
             double aij = robin_bndry->a*fe_view->IntS_shapeI_shapeJ[f][i][j];

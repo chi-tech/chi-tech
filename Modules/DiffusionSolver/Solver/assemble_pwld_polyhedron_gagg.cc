@@ -156,7 +156,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
         double intS = 0.0;
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i = fe_view->face_dof_mappings[f]->cell_dof[fi];
+          int i = fe_view->face_dof_mappings[f][fi];
           D_avg += D[i]*fe_view->IntS_shapeI[i][f];
           intS += fe_view->IntS_shapeI[i][f];
         }
@@ -167,7 +167,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
         double adj_intS = 0.0;
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i    = fe_view->face_dof_mappings[f]->cell_dof[fi];
+          int i    = fe_view->face_dof_mappings[f][fi];
           int imap = MapCellDof(adj_cell,polyh_cell->v_indices[i]);
           adj_D_avg += adj_D[imap]*adj_fe_view->IntS_shapeI[imap][fmap];
           adj_intS += adj_fe_view->IntS_shapeI[imap][fmap];
@@ -180,12 +180,12 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
         //========================= Assembly penalty terms
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_view->face_dof_mappings[f]->cell_dof[fi];
+          int i  = fe_view->face_dof_mappings[f][fi];
           int ir = cell_ip_view->MapDof(i);
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_view->face_dof_mappings[f]->cell_dof[fj];
+            int j  = fe_view->face_dof_mappings[f][fj];
             int jr = cell_ip_view->MapDof(j);
             int jmap  = MapCellDof(adj_cell,polyh_cell->faces[f]->v_indices[fj]);
             int jrmap = adj_ip_view->MapDof(jmap);
@@ -311,7 +311,7 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
           double intS = 0.0;
           for (int fi=0; fi<num_face_dofs; fi++)
           {
-            int i = fe_view->face_dof_mappings[f]->cell_dof[fi];
+            int i = fe_view->face_dof_mappings[f][fi];
             D_avg += D[i]*fe_view->IntS_shapeI[i][f];
             intS += fe_view->IntS_shapeI[i][f];
           }
@@ -322,12 +322,12 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
           //========================= Assembly penalty terms
           for (int fi=0; fi<num_face_dofs; fi++)
           {
-            int i  = fe_view->face_dof_mappings[f]->cell_dof[fi];
+            int i  = fe_view->face_dof_mappings[f][fi];
             int ir = cell_ip_view->MapDof(i);
 
             for (int fj=0; fj<num_face_dofs; fj++)
             {
-              int j  = fe_view->face_dof_mappings[f]->cell_dof[fj];
+              int j  = fe_view->face_dof_mappings[f][fj];
               int jr = cell_ip_view->MapDof(j);
 
               double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
@@ -363,12 +363,12 @@ void chi_diffusion::Solver::PWLD_Ab_Polyhedron_GAGG(
 
           for (int fi=0; fi<num_face_dofs; fi++)
           {
-            int i  = fe_view->face_dof_mappings[f]->cell_dof[fi];
+            int i  = fe_view->face_dof_mappings[f][fi];
             int ir =  cell_ip_view->MapDof(i);
 
             for (int fj=0; fj<num_face_dofs; fj++)
             {
-              int j  = fe_view->face_dof_mappings[f]->cell_dof[fj];
+              int j  = fe_view->face_dof_mappings[f][fj];
               int jr =  cell_ip_view->MapDof(j);
 
               double aij = robin_bndry->a*fe_view->IntS_shapeI_shapeJ[f][i][j];

@@ -88,13 +88,11 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         //================================== Create cell for each face
         if (this->options.force_polygons)
         {
-          this->CreatePolygonCells(ref_continuum->surface_mesh,
-                                   vol_continuum);
+          this->CreatePolygonCells2(ref_continuum->surface_mesh, vol_continuum);
         }
         else
         {
-          this->CreateTriangleCells(ref_continuum->surface_mesh,
-                                    vol_continuum);
+          this->CreateTriangleCells(ref_continuum->surface_mesh, vol_continuum);
         }
 
         //================================== Connect Boundaries

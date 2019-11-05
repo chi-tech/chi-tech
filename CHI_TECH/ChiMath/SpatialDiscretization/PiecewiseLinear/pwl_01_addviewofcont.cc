@@ -91,18 +91,31 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         this->cell_fe_views.push_back(view);
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
       }
+        //========================================= If new_base
       else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
         auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
-        if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
+        if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+        {
+          auto poly_cell = static_cast<chi_mesh::CellPolygonV2*>(cell_base);
+          auto cell_fe_view = new PolygonFEView(poly_cell, vol_continuum, this);
+
+          cell_fe_view->PreCompute();
+//          view->CleanUp();
+          this->cell_fe_views.push_back(cell_fe_view);
+          cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+        }
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
+        else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
         {
           auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell_base);
-          PolyhedronFEView* view =
-            new PolyhedronFEView(polyh_cell, vol_continuum, this);
+          auto cell_fe_view = new PolyhedronFEView(polyh_cell, vol_continuum, this);
 
-          view->PreCompute();
-          view->CleanUp();
-          this->cell_fe_views.push_back(view);
+          cell_fe_view->PreCompute();
+          cell_fe_view->CleanUp();
+          this->cell_fe_views.push_back(cell_fe_view);
           cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
         }
       }

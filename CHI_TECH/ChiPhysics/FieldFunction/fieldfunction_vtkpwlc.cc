@@ -240,7 +240,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
-          int v = cell_fe_view->face_dof_mappings[f]->cell_dof[fv];
+          int v = cell_fe_view->face_dof_mappings[f][fv];
           face[fv] = cell_info[v];
         }
 
@@ -506,7 +506,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
-          int v = cell_fe_view->face_dof_mappings[f]->cell_dof[fv];
+          int v = cell_fe_view->face_dof_mappings[f][fv];
           face[fv] = cell_info[v];
         }
 

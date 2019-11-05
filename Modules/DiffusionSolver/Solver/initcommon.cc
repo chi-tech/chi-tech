@@ -10,6 +10,7 @@
 #include <ChiMesh/Cell/cell_slab.h>
 #include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -93,48 +94,48 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     int cell_glob_index = grid->local_cell_glob_indices[lc];
     auto cell = grid->cells[cell_glob_index];
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-
-      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
-      ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
-      pwld_cell_dof_array_address.push_back(dof_count);
-      ip_cell_views.push_back(ip_view);
-
-      nodal_nnz_in_diag[dof_count]   = 4;
-      nodal_nnz_in_diag[dof_count+1] = 4;
-
-      if (slab_cell->edges[0]>=0)
-      {
-        if (grid->IsCellLocal(slab_cell->edges[0]))
-          nodal_nnz_in_diag[dof_count]  += 2;
-        else
-        {
-//          nodal_nnz_off_diag[dof_count] += 2;
-          local_border_cells.insert(lc);
-        }
-      }
-      else
-        nodal_boundary_numbers[slab_cell->v_indices[0]] = slab_cell->edges[0];
-
-      if (slab_cell->edges[1]>=0)
-      {
-        if (grid->IsCellLocal(slab_cell->edges[1]))
-          nodal_nnz_in_diag[dof_count+1]  += 2;
-        else
-        {
-//          nodal_nnz_off_diag[dof_count+1] += 2;
-          local_border_cells.insert(lc);
-        }
-      }
-      else
-        nodal_boundary_numbers[slab_cell->v_indices[1]] = slab_cell->edges[1];
-
-      dof_count += 2;
-    }
-
+//    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+//    if (cell->Type() == chi_mesh::CellType::SLAB)
+//    {
+//      auto slab_cell = (chi_mesh::CellSlab*)cell;
+//
+//      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
+//      ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
+//      pwld_cell_dof_array_address.push_back(dof_count);
+//      ip_cell_views.push_back(ip_view);
+//
+//      nodal_nnz_in_diag[dof_count]   = 4;
+//      nodal_nnz_in_diag[dof_count+1] = 4;
+//
+//      if (slab_cell->edges[0]>=0)
+//      {
+//        if (grid->IsCellLocal(slab_cell->edges[0]))
+//          nodal_nnz_in_diag[dof_count]  += 2;
+//        else
+//        {
+////          nodal_nnz_off_diag[dof_count] += 2;
+//          local_border_cells.insert(lc);
+//        }
+//      }
+//      else
+//        nodal_boundary_numbers[slab_cell->v_indices[0]] = slab_cell->edges[0];
+//
+//      if (slab_cell->edges[1]>=0)
+//      {
+//        if (grid->IsCellLocal(slab_cell->edges[1]))
+//          nodal_nnz_in_diag[dof_count+1]  += 2;
+//        else
+//        {
+////          nodal_nnz_off_diag[dof_count+1] += 2;
+//          local_border_cells.insert(lc);
+//        }
+//      }
+//      else
+//        nodal_boundary_numbers[slab_cell->v_indices[1]] = slab_cell->edges[1];
+//
+//      dof_count += 2;
+//    }
+//
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
@@ -187,41 +188,92 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
 
     }//polygon
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+//    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+//    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+//    {
+//      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+//
+//      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
+//      ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
+//      pwld_cell_dof_array_address.push_back(dof_count);
+//      ip_cell_views.push_back(ip_view);
+//
+//      for (int v=0; v<polyh_cell->v_indices.size(); v++)
+//      {
+//        nodal_nnz_in_diag[dof_count] = polyh_cell->v_indices.size();
+//
+//        for (int f=0; f<polyh_cell->faces.size(); f++)
+//        {
+//          if (polyh_cell->faces[f]->face_indices[NEIGHBOR]>=0) //Not bndry
+//          {
+//            bool is_local =
+//              grid->IsCellLocal(polyh_cell->faces[f]->face_indices[NEIGHBOR]);
+//
+//            if (is_local)
+//            {
+//              int adj_cell_glob_index =
+//                polyh_cell->faces[f]->face_indices[NEIGHBOR];
+//              auto adj_cell =
+//                (chi_mesh::CellPolyhedron*)grid->cells[adj_cell_glob_index];
+//              nodal_nnz_in_diag[dof_count] += adj_cell->v_indices.size();
+//            }
+//            else
+//            {
+//              //Since we have no information about the non-local cell,
+//              //we can make a good assumption that it has the same amount
+//              //of dofs than does the current cell.
+////              nodal_nnz_off_diag[dof_count] += polyh_cell->v_indices.size();
+//              local_border_cells.insert(lc);
+//            }
+//          }
+//        }
+//        dof_count++;
+//      }
+//
+//      //==================================== Boundary numbers
+//      for (int f=0; f<polyh_cell->faces.size(); f++)
+//      {
+//        if (polyh_cell->faces[f]->face_indices[NEIGHBOR]<0)
+//        {
+//          for (int fv=0; fv<polyh_cell->faces[f]->v_indices.size(); fv++)
+//          {
+//            int fvi = polyh_cell->faces[f]->v_indices[fv];
+//            nodal_boundary_numbers[fvi] =
+//              polyh_cell->faces[f]->face_indices[NEIGHBOR];
+//          }//for fv
+//        }//if bndry
+//      }//for face v's
+//    }//if polyhedron
+
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
       DiffusionIPCellView* ip_view = new DiffusionIPCellView;
       ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
       pwld_cell_dof_array_address.push_back(dof_count);
       ip_cell_views.push_back(ip_view);
 
-      for (int v=0; v<polyh_cell->v_indices.size(); v++)
+      for (int v=0; v<cell_base->vertex_ids.size(); v++)
       {
-        nodal_nnz_in_diag[dof_count] = polyh_cell->v_indices.size();
+        nodal_nnz_in_diag[dof_count] = cell_base->vertex_ids.size();
 
-        for (int f=0; f<polyh_cell->faces.size(); f++)
+        for (int f=0; f<cell_base->faces.size(); f++)
         {
-          if (polyh_cell->faces[f]->face_indices[NEIGHBOR]>=0) //Not bndry
+          if (cell_base->faces[f].neighbor >= 0) //Not bndry
           {
-            bool is_local =
-              grid->IsCellLocal(polyh_cell->faces[f]->face_indices[NEIGHBOR]);
+            bool is_local = grid->IsCellLocal(cell_base->faces[f].neighbor);
 
             if (is_local)
             {
-              int adj_cell_glob_index =
-                polyh_cell->faces[f]->face_indices[NEIGHBOR];
+              int adj_cell_glob_index = cell_base->faces[f].neighbor;
               auto adj_cell =
-                (chi_mesh::CellPolyhedron*)grid->cells[adj_cell_glob_index];
-              nodal_nnz_in_diag[dof_count] += adj_cell->v_indices.size();
+                (chi_mesh::CellBase*)grid->cells[adj_cell_glob_index];
+              nodal_nnz_in_diag[dof_count] += adj_cell->vertex_ids.size();
             }
             else
             {
-              //Since we have no information about the non-local cell,
-              //we can make a good assumption that it has the same amount
-              //of dofs than does the current cell.
-//              nodal_nnz_off_diag[dof_count] += polyh_cell->v_indices.size();
               local_border_cells.insert(lc);
             }
           }
@@ -230,15 +282,15 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       }
 
       //==================================== Boundary numbers
-      for (int f=0; f<polyh_cell->faces.size(); f++)
+      for (int f=0; f<cell_base->faces.size(); f++)
       {
-        if (polyh_cell->faces[f]->face_indices[NEIGHBOR]<0)
+        if (cell_base->faces[f].neighbor < 0)
         {
-          for (int fv=0; fv<polyh_cell->faces[f]->v_indices.size(); fv++)
+          for (int fv=0; fv<cell_base->faces[f].vertex_ids.size(); fv++)
           {
-            int fvi = polyh_cell->faces[f]->v_indices[fv];
+            int fvi = cell_base->faces[f].vertex_ids[fv];
             nodal_boundary_numbers[fvi] =
-              polyh_cell->faces[f]->face_indices[NEIGHBOR];
+              cell_base->faces[f].neighbor;
           }//for fv
         }//if bndry
       }//for face v's
@@ -249,10 +301,8 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
 
 
 
-  if (true)
-    chi_log.Log(LOG_0) << "Communicating border cell information.";
-  if (true)
-    chi_log.Log(LOG_0) << "Serializing border cell information.";
+  chi_log.Log(LOG_0) << "Communicating border cell information.";
+  chi_log.Log(LOG_0) << "Serializing border cell information.";
   //================================================== Serialize local cells
   // The vectorized values will be as follows
   // - cell_glob_index
@@ -289,25 +339,25 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     border_cell_info.push_back(cell_glob_index);         //cell_glob_index
     border_cell_info.push_back(ip_view->cell_dof_start); //cell_dof_start
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      border_cell_info.push_back(0);                     //cell_type
-      border_cell_info.push_back(slab_cell->material_id);//cell_mat_id
-      border_cell_info.push_back(2);                     //cell_dof_count
-      border_cell_info.push_back(2);                     //cell_face_count
-
-      for (int v=0; v<2; v++)
-        border_cell_info.push_back(slab_cell->v_indices[v]); //dof 0 to N
-
-      for (int f=0; f<2; f++)
-      {
-        border_cell_info.push_back(1);                   //face dof_count
-        border_cell_info.push_back(slab_cell->v_indices[f]); //face dof 0 to fN
-      }
-    }
-
+//    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+//    if (cell->Type() == chi_mesh::CellType::SLAB)
+//    {
+//      auto slab_cell = (chi_mesh::CellSlab*)cell;
+//      border_cell_info.push_back(0);                     //cell_type
+//      border_cell_info.push_back(slab_cell->material_id);//cell_mat_id
+//      border_cell_info.push_back(2);                     //cell_dof_count
+//      border_cell_info.push_back(2);                     //cell_face_count
+//
+//      for (int v=0; v<2; v++)
+//        border_cell_info.push_back(slab_cell->v_indices[v]); //dof 0 to N
+//
+//      for (int f=0; f<2; f++)
+//      {
+//        border_cell_info.push_back(1);                   //face dof_count
+//        border_cell_info.push_back(slab_cell->v_indices[f]); //face dof 0 to fN
+//      }
+//    }//slab
+//
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
@@ -326,32 +376,58 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
         border_cell_info.push_back(poly_cell->edges[f][0]); //face dof 0 to fN
         border_cell_info.push_back(poly_cell->edges[f][1]); //face dof 0 to fN
       }
-    }
+    }//polygon
+//
+//    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+//    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+//    {
+//      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+//      border_cell_info.push_back(2);                     //cell_type
+//      border_cell_info.push_back(polyh_cell->material_id);//cell_mat_id
+//      border_cell_info.push_back(polyh_cell->v_indices.size());//cell_dof_count
+//      border_cell_info.push_back(polyh_cell->faces.size());//cell_face_count
+//
+//      for (int v=0; v<polyh_cell->v_indices.size(); v++)
+//        border_cell_info.push_back(polyh_cell->v_indices[v]);//dof 0 to N
+//
+//      for (int f=0; f<polyh_cell->faces.size(); f++)
+//      {
+//        int face_dof_count = polyh_cell->faces[f]->v_indices.size();
+//        border_cell_info.push_back(face_dof_count);         //face dof_count
+//        for (int fv=0; fv<face_dof_count; fv++)
+//          border_cell_info.push_back(polyh_cell->faces[f]->v_indices[fv]);
+//        //face dof 0 to fN
+//      }
+//    }//polyhedron
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      border_cell_info.push_back(2);                     //cell_type
-      border_cell_info.push_back(polyh_cell->material_id);//cell_mat_id
-      border_cell_info.push_back(polyh_cell->v_indices.size());//cell_dof_count
-      border_cell_info.push_back(polyh_cell->faces.size());//cell_face_count
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+        border_cell_info.push_back(4);                         //cell_type
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+        border_cell_info.push_back(5);                         //cell_type
 
-      for (int v=0; v<polyh_cell->v_indices.size(); v++)
-        border_cell_info.push_back(polyh_cell->v_indices[v]);//dof 0 to N
+      border_cell_info.push_back(cell_base->material_id);      //cell_mat_id
+      border_cell_info.push_back(cell_base->vertex_ids.size());//cell_dof_count
+      border_cell_info.push_back(cell_base->faces.size());     //cell_face_count
 
-      for (int f=0; f<polyh_cell->faces.size(); f++)
+      for (int v=0; v<cell_base->vertex_ids.size(); v++)
+        border_cell_info.push_back(cell_base->vertex_ids[v]);//dof 0 to N
+
+      for (int f=0; f<cell_base->faces.size(); f++)
       {
-        int face_dof_count = polyh_cell->faces[f]->v_indices.size();
+        int face_dof_count = cell_base->faces[f].vertex_ids.size();
         border_cell_info.push_back(face_dof_count);         //face dof_count
         for (int fv=0; fv<face_dof_count; fv++)
-          border_cell_info.push_back(polyh_cell->faces[f]->v_indices[fv]);
+          border_cell_info.push_back(cell_base->faces[f].vertex_ids[fv]);
         //face dof 0 to fN
       }
-    }
+    }//new cell base
   }//for local cell
-  if (true)
-    chi_log.Log(LOG_0) << "Broadcasting border cell information.";
+
+  chi_log.Log(LOG_0) << "Broadcasting border cell information.";
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Distribute border info
@@ -440,7 +516,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       for (int f=0; f<face_count; f++)
       {
         int face_dof_count = locI_border_cell_info[locI][k]; k++;
-        border_cell->face_v_indices.push_back(std::vector<int>());
+        border_cell->face_v_indices.emplace_back();
         for (int fv=0; fv<face_dof_count; fv++)
         {
           int vgi = locI_border_cell_info[locI][k]; k++;
@@ -465,16 +541,16 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     int cell_glob_index = grid->local_cell_glob_indices[lc];
     auto cell = grid->cells[cell_glob_index];
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-
-      nodal_nnz_in_diag[dof_count]   += 2;
-      nodal_nnz_in_diag[dof_count+1] += 2;
-      dof_count += 2;
-    }
-
+//    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+//    if (cell->Type() == chi_mesh::CellType::SLAB)
+//    {
+//      auto slab_cell = (chi_mesh::CellSlab*)cell;
+//
+//      nodal_nnz_in_diag[dof_count]   += 2;
+//      nodal_nnz_in_diag[dof_count+1] += 2;
+//      dof_count += 2;
+//    }
+//
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
@@ -501,27 +577,53 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       }//for vi
 
     }//polygon
+//
+//    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+//    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+//    {
+//      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+//
+//      for (int v=0; v<polyh_cell->v_indices.size(); v++)
+//      {
+//        for (int f=0; f<polyh_cell->faces.size(); f++)
+//        {
+//          int neighbor = polyh_cell->faces[f]->face_indices[NEIGHBOR];
+//          bool is_bndry = grid->IsCellBndry(neighbor);
+//          bool is_local = grid->IsCellLocal(neighbor);
+//
+//          if ((not is_bndry) and (not is_local))
+//          {
+//            auto adj_cell = grid->cells[neighbor];
+//            auto adj_polyh_cell = (chi_mesh::CellPolyhedron*)
+//                                  GetBorderCell(adj_cell->partition_id,
+//                                                neighbor);
+//            nodal_nnz_off_diag[dof_count] += adj_polyh_cell->v_indices.size();
+//          }
+//        }//for face
+//        dof_count++;
+//      }
+//    }//if polyhedron
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      for (int v=0; v<polyh_cell->v_indices.size(); v++)
+      for (int v=0; v<cell_base->vertex_ids.size(); v++)
       {
-        for (int f=0; f<polyh_cell->faces.size(); f++)
+        for (int f=0; f<cell_base->faces.size(); f++)
         {
-          int neighbor = polyh_cell->faces[f]->face_indices[NEIGHBOR];
+          int neighbor = cell_base->faces[f].neighbor;
           bool is_bndry = grid->IsCellBndry(neighbor);
           bool is_local = grid->IsCellLocal(neighbor);
 
           if ((not is_bndry) and (not is_local))
           {
             auto adj_cell = grid->cells[neighbor];
-            auto adj_polyh_cell = (chi_mesh::CellPolyhedron*)
-                                  GetBorderCell(adj_cell->partition_id,
-                                                neighbor);
-            nodal_nnz_off_diag[dof_count] += adj_polyh_cell->v_indices.size();
+            auto adj_polyh_cell = (chi_mesh::CellBase*)
+              GetBorderCell(adj_cell->partition_id,
+                            neighbor);
+            nodal_nnz_off_diag[dof_count] += adj_polyh_cell->vertex_ids.size();
           }
         }//for face
         dof_count++;
