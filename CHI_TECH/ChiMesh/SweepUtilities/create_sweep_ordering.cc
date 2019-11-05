@@ -2,14 +2,6 @@
 #include "sweep_namespace.h"
 
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../Cell/cell_slab.h"
-#include "../Cell/cell_polyhedron.h"
-#include "../Cell/cell_polygon.h"
-
-#include "../MeshContinuum/chi_meshcontinuum.h"
-#include "../VolumeMesher/chi_volumemesher.h"
-
-#include "../../ChiGraph/chi_graph.h"
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 

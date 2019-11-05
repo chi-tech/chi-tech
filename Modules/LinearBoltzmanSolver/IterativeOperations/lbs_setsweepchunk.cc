@@ -2,6 +2,7 @@
 #include "../SweepChunks/lbs_sweepchunk_pwl_slab.h"
 #include "../SweepChunks/lbs_sweepchunk_pwl_polygon.h"
 #include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
+#include "../SweepChunks/lbs_sweepchunk_pwl.h"
 
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/chi_volumemesher.h>
@@ -25,10 +26,54 @@ SweepChunk* LinearBoltzman::Solver::SetSweepChunk(int group_set_num)
   //================================================== Setting up required
   //                                                   sweep chunks
   SweepChunk* sweep_chunk = nullptr;
-  if      (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
-  {
-    sweep_chunk =
-      new LBSSweepChunkPWLSlab(
+//  if      (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+//  {
+//    sweep_chunk =
+//      new LBSSweepChunkPWLSlab(
+//        grid,                                    //Spatial grid of cells
+//        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
+//        &cell_transport_views,                   //Cell transport views
+//        &phi_new_local,                          //Destination phi
+//        &q_moments_local,                        //Source moments
+//        groupset,                                //Reference groupset
+//        &material_xs,                            //Material cross-sections
+//        num_moments,max_cell_dof_count);
+//  }
+//  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
+//  {
+//    sweep_chunk =
+//      new LBSSweepChunkPWLPolygon(
+//        grid,                                    //Spatial grid of cells
+//        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
+//        &cell_transport_views,                   //Cell transport views
+//        &phi_new_local,                          //Destination phi
+//        &q_moments_local,                        //Source moments
+//        groupset,                                //Reference groupset
+//        &material_xs,                            //Material cross-sections
+//        num_moments,max_cell_dof_count);
+//  }
+//  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+//  {
+//    sweep_chunk =
+//      new LBSSweepChunkPWLPolyhedron(
+//        grid,                                    //Spatial grid of cells
+//        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
+//        &cell_transport_views,                   //Cell transport views
+//        &phi_new_local,                          //Destination phi
+//        &q_moments_local,                        //Source moments
+//        groupset,                                //Reference groupset
+//        &material_xs,                            //Material cross-sections
+//        num_moments,max_cell_dof_count);
+//  }
+//  else
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "LinearBoltzman::Solver::SetSweepChunk, failed. Could not establish "
+//      << "which sweep chunk to use.";
+//    exit(EXIT_FAILURE);
+//  }
+  sweep_chunk =
+      new LBSSweepChunkPWL(
         grid,                                    //Spatial grid of cells
         (SpatialDiscretization_PWL*)discretization, //Spatial discretization
         &cell_transport_views,                   //Cell transport views
@@ -37,41 +82,6 @@ SweepChunk* LinearBoltzman::Solver::SetSweepChunk(int group_set_num)
         groupset,                                //Reference groupset
         &material_xs,                            //Material cross-sections
         num_moments,max_cell_dof_count);
-  }
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
-  {
-    sweep_chunk =
-      new LBSSweepChunkPWLPolygon(
-        grid,                                    //Spatial grid of cells
-        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
-        &cell_transport_views,                   //Cell transport views
-        &phi_new_local,                          //Destination phi
-        &q_moments_local,                        //Source moments
-        groupset,                                //Reference groupset
-        &material_xs,                            //Material cross-sections
-        num_moments,max_cell_dof_count);
-  }
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
-  {
-    sweep_chunk =
-      new LBSSweepChunkPWLPolyhedron(
-        grid,                                    //Spatial grid of cells
-        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
-        &cell_transport_views,                   //Cell transport views
-        &phi_new_local,                          //Destination phi
-        &q_moments_local,                        //Source moments
-        groupset,                                //Reference groupset
-        &material_xs,                            //Material cross-sections
-        num_moments,max_cell_dof_count);
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzman::Solver::SetSweepChunk, failed. Could not establish "
-      << "which sweep chunk to use.";
-    exit(EXIT_FAILURE);
-  }
-
 
   return sweep_chunk;
 }

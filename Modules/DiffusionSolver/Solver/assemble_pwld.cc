@@ -7,6 +7,9 @@
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 #include "../Boundaries/chi_diffusion_bndry_robin.h"
 
+#include <chi_log.h>
+extern ChiLog chi_log;
+
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,

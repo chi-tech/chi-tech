@@ -3,6 +3,7 @@
 #include <ChiMesh/Cell/cell_slab.h>
 #include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 
 
 //###################################################################
@@ -76,6 +77,28 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
         (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      {
+        for (int m=0; m<num_moments; m++)
+        {
+          int mapping = transport_view->MapDOF(i,m,gsi);
+          double* source_mapped = &y[mapping];
+          for (int g=0; g<gss; g++)
+          {
+            index++;
+            x_ref[index] = source_mapped[g]; //On purpose
+          }//for g
+        }//for moment
+      }//for dof
+    }//if polyhedron
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      auto transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
       {
         for (int m=0; m<num_moments; m++)
         {
@@ -180,6 +203,28 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
       }//for dof
     }//if polyhedron
 
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      auto transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
+      {
+        for (int m=0; m<num_moments; m++)
+        {
+          int mapping = transport_view->MapDOF(i,m,gsi);
+          double* destination_mapped = &y[mapping];
+          for (int g=0; g<gss; g++)
+          {
+            index++;
+            destination_mapped[g] = x_ref[index];
+          }//for g
+        }//for moment
+      }//for dof
+    }//if polyhedron
+
   }//for cell
 
   VecRestoreArrayRead(x_src,&x_ref);
@@ -258,6 +303,29 @@ DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
         (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      {
+        for (int m=0; m<num_moments; m++)
+        {
+          int mapping = transport_view->MapDOF(i,m,gsi);
+          double* destination_mapped = &y[mapping];
+          const double* source_mapped      = &x_ref[mapping];
+          for (int g=0; g<gss; g++)
+          {
+            index++;
+            destination_mapped[g] = source_mapped[g];
+          }//for g
+        }//for moment
+      }//for dof
+    }//if polyhedron
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      auto transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
       {
         for (int m=0; m<num_moments; m++)
         {

@@ -2,6 +2,7 @@
 #include <ChiMesh/Cell/cell_slab.h>
 #include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -77,6 +78,26 @@ void LinearBoltzman::Solver::InitializeCommunicators()
       for (int f=0; f< polyh_cell->faces.size(); f++)
       {
         int neighbor = polyh_cell->faces[f]->face_indices[NEIGHBOR];
+
+        if (neighbor>=0)
+        {
+          auto adj_cell = grid->cells[neighbor];
+
+          if (adj_cell->partition_id != chi_mpi.location_id)
+          {
+            local_graph_edges.insert(adj_cell->partition_id);
+          }
+        }
+      }//for f
+    } //if polyhedron
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = (chi_mesh::CellBase*)cell;
+
+      for (int f=0; f < cell_base->faces.size(); f++)
+      {
+        int neighbor = cell_base->faces[f].neighbor;
 
         if (neighbor>=0)
         {

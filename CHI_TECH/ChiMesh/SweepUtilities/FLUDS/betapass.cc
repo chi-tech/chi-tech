@@ -185,6 +185,12 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
       TPolyhedron* polyh_cell = (TPolyhedron*)cell;
       NonLocalIncidentMapping(polyh_cell, spds);
     }//if polyhedron
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ CELL_NEWBASE
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      NonLocalIncidentMapping(cell_base, spds);
+    }//if polyhedron
 
   }//for csoi
 

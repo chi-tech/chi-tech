@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include <ChiMesh/Cell/cell_newbase.h>
 
 typedef chi_mesh::CellSlab       TSlab;
 typedef chi_mesh::CellPolygon    TPolygon;
@@ -183,6 +184,15 @@ public:
   void LocalIncidentMapping(TPolyhedron *polyh_cell,
                             chi_mesh::sweep_management::SPDS* spds,
                             std::vector<int>&  local_so_cell_mapping);
+  //01d
+  void SlotDynamics(chi_mesh::CellBase *cell_base,
+                    chi_mesh::sweep_management::SPDS* spds,
+                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
+                    std::vector<std::pair<int,short>>& delayed_lock_box,
+                    std::set<int>& location_boundary_dependency_set);
+  void LocalIncidentMapping(chi_mesh::CellBase *cell_base,
+                            chi_mesh::sweep_management::SPDS* spds,
+                            std::vector<int>&  local_so_cell_mapping);
 
   //02
   void InitializeBetaElements(chi_mesh::sweep_management::SPDS *spds,
@@ -196,6 +206,9 @@ public:
                                chi_mesh::sweep_management::SPDS* spds);
   //02c
   void NonLocalIncidentMapping(TPolyhedron *polyh_cell,
+                               chi_mesh::sweep_management::SPDS* spds);
+  //02d
+  void NonLocalIncidentMapping(chi_mesh::CellBase *cell_base,
                                chi_mesh::sweep_management::SPDS* spds);
 
   //chi_FLUDS.cc
@@ -216,6 +229,8 @@ public:
                             int face_slot, TEdgeFace edge_v_indices);
   void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
                             int face_slot, TPolyFace* poly_face);
+  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
+                            int face_slot, chi_mesh::CellFace& face);
 
 
   void SerializeCellInfo(std::vector<CompactCellView>* cell_views,

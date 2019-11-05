@@ -3,6 +3,7 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
 #include <ChiMesh/Cell/cell.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 #include <ChiMesh/Cell/cell_slab.h>
 #include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/Cell/cell_polyhedron.h>
@@ -69,6 +70,11 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
       auto polyh_cell = static_cast<TPolyhedron*>(cell);
       SlotDynamics(polyh_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
     }//if polyhedron
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
+      SlotDynamics(cell_base,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
+    }//if polyhedron
     else
     {
       chi_log.Log(LOG_ALLERROR)
@@ -110,6 +116,12 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     {
       auto polyh_cell = static_cast<TPolyhedron*>(cell);
       LocalIncidentMapping(polyh_cell, spds, local_so_cell_mapping);
+    }//if polyhedron
+    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ CELL_NEWBASE
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
+      LocalIncidentMapping(cell_base, spds, local_so_cell_mapping);
     }//if polyhedron
 
   }//for csoi
@@ -242,6 +254,41 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     new_cell_view.first = cell_g_index;
     new_cell_view.second.
       emplace_back(face_slot,poly_face->v_indices);
+
+    deplocI_cell_views[deplocI].push_back(new_cell_view);
+  }
+
+
+}
+
+//###################################################################
+/**Given a sweep ordering index, the outgoing face counter,
+ * the outgoing face dof, this function computes the location
+ * of this position's upwind psi in the local upwind psi vector.*/
+void  chi_mesh::sweep_management::FLUDS::
+AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
+                     chi_mesh::CellFace& face)
+{
+  //======================================== Check if cell is already there
+  bool cell_already_there = false;
+  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
+  {
+    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
+    {
+      cell_already_there = true;
+      deplocI_cell_views[deplocI][c].second.
+        emplace_back(face_slot, face.vertex_ids);
+      break;
+    }
+  }
+
+  //======================================== If the cell is not there yet
+  if (!cell_already_there)
+  {
+    CompactCellView new_cell_view;
+    new_cell_view.first = cell_g_index;
+    new_cell_view.second.
+      emplace_back(face_slot, face.vertex_ids);
 
     deplocI_cell_views[deplocI].push_back(new_cell_view);
   }

@@ -4,6 +4,7 @@
 #include <ChiMesh/Cell/cell_slab.h>
 #include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
@@ -153,7 +154,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
 
       }//for edge
     } //If polygon
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
@@ -196,6 +197,65 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
         else
         {
           int adj_cell_glob_index = polyh_cell->faces[f]->face_indices[0];
+
+          //================================if it is a cell and not bndry
+          if (adj_cell_glob_index>=0)
+          {
+            auto adj_cell = grid->cells[adj_cell_glob_index];
+
+            if (adj_cell->partition_id == chi_mpi.location_id)
+              cell_dependencies[c].insert(adj_cell->cell_local_id);
+            else
+              sweep_order->AddLocalDependecy(adj_cell->partition_id);
+
+          }
+        }
+
+      }//for edge
+    }
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = (chi_mesh::CellBase*)cell;
+
+      for (int f=0; f < cell_base->faces.size(); f++)
+      {
+        //======================================= Determine if the face
+        //                                        is incident
+        bool is_outgoing = false;
+        double dot_normal = sweep_order->omega.Dot(cell_base->faces[f].normal);
+        if (dot_normal>(0.0+tolerance)) {is_outgoing = true;}
+
+        //======================================= If outgoing determine if
+        //                                        it is to a local cell
+        if (is_outgoing)
+        {
+          int adj_cell_glob_index = cell_base->faces[f].neighbor;
+
+          //================================if it is a cell and not bndry
+          if (adj_cell_glob_index>=0)
+          {
+            auto adj_cell = grid->cells[adj_cell_glob_index];
+
+            //========================= If it is in the current location
+            if (adj_cell->partition_id == chi_mpi.location_id)
+            {
+              int adj_cell_local_index =
+                grid->glob_cell_local_indices[adj_cell_glob_index];
+//              boost::add_edge(c,adj_cell_local_index,G);
+
+              cell_successors[c].insert(adj_cell->cell_local_id);
+            }
+            else
+              sweep_order->AddLocalSuccessor(adj_cell->partition_id);
+          }
+
+        }
+          //======================================= If not outgoing determine
+          //                                        what it is dependent on
+        else
+        {
+          int adj_cell_glob_index = cell_base->faces[f].neighbor;
 
           //================================if it is a cell and not bndry
           if (adj_cell_glob_index>=0)
