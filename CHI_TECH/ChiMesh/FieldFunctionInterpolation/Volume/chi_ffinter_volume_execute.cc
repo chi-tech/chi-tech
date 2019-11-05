@@ -164,6 +164,37 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
           }
         }//for dof
       }//if Polyhedron
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      {
+        auto cell_base = (chi_mesh::CellBase*)cell;
+        auto cell_fe_view = (CellFEView*)discretization->MapFeView(cell_glob_index);
+
+        for (int i=0; i<cell_base->vertex_ids.size(); i++)
+        {
+          double value = 0.0;
+          int ir = -1;
+
+          counter++;
+          ir = mapping[counter];
+          VecGetValues(field,1,&ir,&value);
+
+          op_value += value*cell_fe_view->IntV_shapeI[i];
+          total_volume += cell_fe_view->IntV_shapeI[i];
+
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
+        }//for dof
+      }//if Polyhedron
     }//if inside logicalVol
 
   }//for local cell
@@ -281,6 +312,36 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
           (PolyhedronFEView*)discretization->MapFeView(cell_glob_index);
 
         for (int i=0; i<polyh_cell->v_indices.size(); i++)
+        {
+          double value = 0.0;
+          int ir = -1;
+
+          counter++;
+          ir = mapping[counter];
+          value = field[ir];
+
+          op_value += value*cell_fe_view->IntV_shapeI[i];
+          total_volume += cell_fe_view->IntV_shapeI[i];
+
+          if (!max_set)
+          {
+            max_value = value;
+            max_set = true;
+          }
+          else
+          {
+            if (value > max_value)
+              max_value = value;
+          }
+        }//for dof
+      }//if Polyhedron
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
+      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      {
+        auto cell_base = (chi_mesh::CellBase*)cell;
+        auto cell_fe_view = (CellFEView*)discretization->MapFeView(cell_glob_index);
+
+        for (int i=0; i < cell_base->vertex_ids.size(); i++)
         {
           double value = 0.0;
           int ir = -1;

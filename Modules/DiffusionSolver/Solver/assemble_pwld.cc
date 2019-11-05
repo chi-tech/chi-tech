@@ -139,6 +139,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
       //========================= Compute kappa
       double kappa = 1.0;
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+        kappa = fmax(2.0*(adj_D_avg/hp + D_avg/hm),0.25);
       if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
         kappa = fmax(2.0*(adj_D_avg/hp + D_avg/hm),0.25);
       if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
@@ -312,6 +314,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
         D_avg /= intS;
 
         double kappa = 1.0;
+        if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+          kappa = fmax(4.0*(D_avg/hm),0.25);
         if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
           kappa = fmax(4.0*(D_avg/hm),0.25);
         if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)

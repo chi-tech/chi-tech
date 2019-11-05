@@ -404,6 +404,8 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       auto cell_base = (chi_mesh::CellBase*)cell;
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+        border_cell_info.push_back(3);                         //cell_type
       if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
         border_cell_info.push_back(4);                         //cell_type
       if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)

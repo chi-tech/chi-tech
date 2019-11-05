@@ -334,7 +334,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
       }//for i
 
     } //if typeid
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If polyhedral item_id
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEWBASE item_id
     else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       auto cell_base = static_cast<chi_mesh::CellBase*>(cell);

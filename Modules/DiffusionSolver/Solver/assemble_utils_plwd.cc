@@ -13,10 +13,6 @@
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
-
 #include <chi_log.h>
 #include <chi_mpi.h>
 
@@ -201,8 +197,14 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::CellBase* cell,
   int Nf = cell->faces.size();
   int Nv = cell->vertex_ids.size();
 
-  //============================================= POLYGONV2
-  if (cell->Type2() == chi_mesh::CellType::POLYGONV2)
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLABV2
+  if (cell->Type2() == chi_mesh::CellType::SLABV2)
+  {
+    auto slab_fe_view = (SlabFEView*)fe_view;
+    hp = slab_fe_view->h/2.0;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
+  else if (cell->Type2() == chi_mesh::CellType::POLYGONV2)
   {
     Nv = 4;
     chi_mesh::CellFace& face = cell->faces[f];
@@ -234,7 +236,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::CellBase* cell,
       }
     }
   }
-  //============================================= POLYHEDRON
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
   else if (cell->Type2() == chi_mesh::CellType::POLYHEDRONV2)
   {
     double volume  = 0.0;
@@ -647,6 +649,35 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
   }//polyhedron
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLABV2
+  else if (cell_info->cell_type == 3)
+  {
+    auto cell = new chi_mesh::CellSlabV2;
+    cell->partition_id = locI;
+    cell->material_id = cell_info->cell_mat_id;
+
+    chi_mesh::Vector vc;
+    for (int v=0; v<cell_info->cell_dof_count; v++)
+    {
+      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      cell->vertex_ids.push_back(cell_info->v_indices[v]);
+    }
+    cell->centroid = vc/cell_info->cell_dof_count;
+
+    cell->faces.resize(cell_info->cell_face_count);
+    for (int f=0; f<cell_info->cell_face_count; f++)
+    {
+      for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
+        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
+    }
+
+    ip_locI_bordercells[locI][cell_border_index] = cell;
+
+    auto fe_view = new SlabFEView(cell, grid);
+
+    ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
+
+  }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
   else if (cell_info->cell_type == 4)
   {
