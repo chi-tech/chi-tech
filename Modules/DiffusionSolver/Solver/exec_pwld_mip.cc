@@ -83,37 +83,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
 
     DiffusionIPCellView* cell_ip_view = ip_cell_views[lc];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      if (!suppress_assembly)
-        PWLD_Ab_Slab(glob_cell_index,cell,cell_ip_view,gi);
-      else
-        PWLD_b_Slab(glob_cell_index,cell,cell_ip_view,gi);
-    }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      if (!suppress_assembly)
-        PWLD_Ab_Polygon(glob_cell_index,cell,cell_ip_view,gi);
-      else
-        PWLD_b_Polygon(glob_cell_index,cell,cell_ip_view,gi);
-    }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      if (!suppress_assembly)
-        PWLD_Ab_Polyhedron(glob_cell_index,cell,cell_ip_view,gi);
-      else
-        PWLD_b_Polyhedron(glob_cell_index,cell,cell_ip_view,gi);
-    }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% If CELL_NEWBASE
-    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       if (!suppress_assembly)
         PWLD_Assemble_A_and_b(glob_cell_index,cell,cell_ip_view,gi);

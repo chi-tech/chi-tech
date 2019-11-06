@@ -1,7 +1,7 @@
 #include "solver_montecarlon.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
 
 #include <FiniteVolume/CellViews/fv_slab.h>
 #include <FiniteVolume/CellViews/fv_polygon.h>
@@ -51,25 +51,32 @@ void chi_montecarlon::Solver::ComputeTallySqr()
     auto cell = grid->cells[cell_glob_index];
 
     double V = 1.0;
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto cell_fv_view =
-        (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
-      V = cell_fv_view->volume;
-    }
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto cell_fv_view =
-        (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);
-      V = cell_fv_view->volume;
-    }
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encountered in call to "
-        << "chi_montecarlon::Solver::ComputeTallySqr.";
-      exit(EXIT_FAILURE);
-    }
+      auto cell_base = (chi_mesh::CellBase*)cell;
+
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+      {
+        auto cell_fv_view =
+          (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+        V = cell_fv_view->volume;
+      }
+      else if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto cell_fv_view =
+          (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+        V = cell_fv_view->volume;
+      }
+      else
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "Unsupported cell type encountered in call to "
+          << "chi_montecarlon::Solver::ComputeTallySqr.";
+        exit(EXIT_FAILURE);
+      }
+    }//new cell base
+
 
     int hi = 0;
     int lo = num_grps-1;

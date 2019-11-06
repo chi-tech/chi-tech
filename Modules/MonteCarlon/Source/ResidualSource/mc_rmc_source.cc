@@ -6,9 +6,9 @@
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/chi_volumemesher.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include <FiniteVolume/fv.h>
 #include <FiniteVolume/CellViews/fv_slab.h>
@@ -118,136 +118,143 @@ void chi_montecarlon::ResidualSource::
         source = (TrQ*)cell_mat->properties[p];
     }
 
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_log.Log(LOG_0VERBOSE_1) << "Cell " << cell_glob_index;
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      auto cell_fe_view = (SlabFEView*)resid_sdm_pwl->MapFeView(cell_glob_index);
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      //==================================== Creating current cell dof-mapping
-      std::vector<int> dofs_to_map(cell_fe_view->dofs);
-      std::vector<int> cells_to_map;
-      std::vector<int> cur_cell_mapping;
-      for (int i=0; i<cell_fe_view->dofs; i++)
-        dofs_to_map[i] = i;
-      cells_to_map.resize(cell_fe_view->dofs,cell_glob_index);
-
-      chi_log.Log(LOG_0VERBOSE_1) << "Mapping cell dofs ";
-      ff_interp.CreatePWLDMapping(
-        resid_ff->num_grps,resid_ff->num_moms,0,0,
-        dofs_to_map,cells_to_map,
-        *resid_ff->local_cell_dof_array_address,&cur_cell_mapping);
-
-      chi_log.Log(LOG_0VERBOSE_1)
-       << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
-       << "dof 1 phi=" << field[cur_cell_mapping[1]];
-
-      //==================================== Creating adj cell dof-mapping
-      chi_log.Log(LOG_0VERBOSE_1) << "Mapping adj cell dofs";
-      std::vector<std::vector<int>> adj_cell_mapping_f;
-
-      int num_faces = 2;
-      for (int f=0; f<num_faces; f++)
+      //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        int adj_cell_index = slab_cell->edges[f];
+        chi_log.Log(LOG_0VERBOSE_1) << "Cell " << cell_glob_index;
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
+        auto cell_fe_view = (SlabFEView*)resid_sdm_pwl->MapFeView(cell_glob_index);
 
-        std::vector<int> adj_mapping;
+        //==================================== Creating current cell dof-mapping
+        std::vector<int> dofs_to_map(cell_fe_view->dofs);
+        std::vector<int> cells_to_map;
+        std::vector<int> cur_cell_mapping;
+        for (int i=0; i<cell_fe_view->dofs; i++)
+          dofs_to_map[i] = i;
+        cells_to_map.resize(cell_fe_view->dofs,cell_glob_index);
 
-        if (adj_cell_index >= 0)
+        chi_log.Log(LOG_0VERBOSE_1) << "Mapping cell dofs ";
+        ff_interp.CreatePWLDMapping(
+          resid_ff->num_grps,resid_ff->num_moms,0,0,
+          dofs_to_map,cells_to_map,
+          *resid_ff->local_cell_dof_array_address,&cur_cell_mapping);
+
+        chi_log.Log(LOG_0VERBOSE_1)
+          << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
+          << "dof 1 phi=" << field[cur_cell_mapping[1]];
+
+        //==================================== Creating adj cell dof-mapping
+        chi_log.Log(LOG_0VERBOSE_1) << "Mapping adj cell dofs";
+        std::vector<std::vector<int>> adj_cell_mapping_f;
+
+        int num_faces = 2;
+        for (int f=0; f<num_faces; f++)
         {
-          auto adj_cell = (chi_mesh::CellSlab*)grid->cells[adj_cell_index];
+          int adj_cell_index = slab_cell->faces[f].neighbor;
 
-          int adj_num_dofs = 2;
-          for (int i=0; i<adj_num_dofs; i++)
+          std::vector<int> adj_mapping;
+
+          if (adj_cell_index >= 0)
           {
-            dofs_to_map[i] = i;
-            cells_to_map[i] = adj_cell_index;
-          }
+            auto adj_cell = (chi_mesh::CellSlabV2*)grid->cells[adj_cell_index];
 
-          ff_interp.CreatePWLDMapping(
-            resid_ff->num_grps,resid_ff->num_moms,0,0,
-            dofs_to_map,cells_to_map,
-            *resid_ff->local_cell_dof_array_address,&adj_mapping);
+            int adj_num_dofs = 2;
+            for (int i=0; i<adj_num_dofs; i++)
+            {
+              dofs_to_map[i] = i;
+              cells_to_map[i] = adj_cell_index;
+            }
 
-          chi_log.Log(LOG_0VERBOSE_1)
-            << "adj_cell " << adj_cell_index << "\n"
-            << "dof 0 phi=" << field[adj_mapping[0]] << "\n"
-            << "dof 1 phi=" << field[adj_mapping[1]];
-        }//if not bndry
+            ff_interp.CreatePWLDMapping(
+              resid_ff->num_grps,resid_ff->num_moms,0,0,
+              dofs_to_map,cells_to_map,
+              *resid_ff->local_cell_dof_array_address,&adj_mapping);
 
-        adj_cell_mapping_f.push_back(adj_mapping);
-      }//for faces
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "adj_cell " << adj_cell_index << "\n"
+              << "dof 0 phi=" << field[adj_mapping[0]] << "\n"
+              << "dof 1 phi=" << field[adj_mapping[1]];
+          }//if not bndry
 
-      //==================================== Computing interior residual
-      chi_log.Log(LOG_0VERBOSE_1) << "Computing cell interior residual";
-      double resid = 0.0;
-      for (int i=0; i<cell_fe_view->dofs; i++)
-      {
-        double phi = field[cur_cell_mapping[i]];
-        cell_interior_residual[lc] += source->source_value_g[0]*
-                                      cell_fe_view->IntV_shapeI[i];
-        cell_interior_residual[lc] -= xs->sigma_rg[0]*
-                                      cell_fe_view->IntV_shapeI[i]*phi;
-      }
-      chi_log.Log(LOG_0VERBOSE_1) << "Sigma a=" << xs->sigma_rg[0];
+          adj_cell_mapping_f.push_back(adj_mapping);
+        }//for faces
 
-
-      //==================================== Computing surface residuals
-      chi_log.Log(LOG_0VERBOSE_1) << "Computing cell surface residual";
-      for (int f=0; f<num_faces; f++)
-      {
-        int fmap = 0;
-        if (f == 0)
-          fmap = 1;
-
-        int num_face_verts = 1;
-        for (int fi=0; fi<num_face_verts; fi++)
+        //==================================== Computing interior residual
+        chi_log.Log(LOG_0VERBOSE_1) << "Computing cell interior residual";
+        double resid = 0.0;
+        for (int i=0; i<cell_fe_view->dofs; i++)
         {
-          int i = f;
-          int imap = fmap;
+          double phi = field[cur_cell_mapping[i]];
+          cell_interior_residual[lc] += source->source_value_g[0]*
+                                        cell_fe_view->IntV_shapeI[i];
+          cell_interior_residual[lc] -= xs->sigma_rg[0]*
+                                        cell_fe_view->IntV_shapeI[i]*phi;
+        }
+        chi_log.Log(LOG_0VERBOSE_1) << "Sigma a=" << xs->sigma_rg[0];
 
-          double phi     = 0.5*field[cur_cell_mapping[0]] +
-                           0.5*field[cur_cell_mapping[1]];
-          double phi_adj = 0.0;
-          if (slab_cell->edges[f] >= 0)
-            phi_adj = 0.5*field[adj_cell_mapping_f[f][0]] +
-                      0.5*field[adj_cell_mapping_f[f][1]];
-          if (slab_cell->edges[f] == -1)
-            phi_adj = 0.5;
 
-          chi_log.Log(LOG_0VERBOSE_1)
-          << "Face " << f << "\n"
-          << "phi=" << phi << " adj_phi="<<phi_adj;
-
+        //==================================== Computing surface residuals
+        chi_log.Log(LOG_0VERBOSE_1) << "Computing cell surface residual";
+        for (int f=0; f<num_faces; f++)
+        {
+          int fmap = 0;
           if (f == 0)
-            cell_surface_residualL[lc] -= (phi - phi_adj);
-          else
-            cell_surface_residualR[lc] -= (phi_adj - phi);
+            fmap = 1;
 
-        }//for face verts
-      }//for face
+          int num_face_verts = 1;
+          for (int fi=0; fi<num_face_verts; fi++)
+          {
+            int i = f;
+            int imap = fmap;
 
-      chi_log.Log(LOG_0VERBOSE_1)
-      << "Cell residuals "
-      << cell_interior_residual[lc] << " "
-      << cell_surface_residualL[lc] << " "
-      << cell_surface_residualR[lc];
+            double phi     = 0.5*field[cur_cell_mapping[0]] +
+                             0.5*field[cur_cell_mapping[1]];
+            double phi_adj = 0.0;
+            if (slab_cell->faces[f].neighbor >= 0)
+              phi_adj = 0.5*field[adj_cell_mapping_f[f][0]] +
+                        0.5*field[adj_cell_mapping_f[f][1]];
+            if (slab_cell->faces[f].neighbor == -1)
+              phi_adj = 0.5;
 
-      cell_residuals[lc] =
-        std::fabs(cell_interior_residual[lc]) +
-        std::fabs(cell_surface_residualL[lc]);
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Face " << f << "\n"
+              << "phi=" << phi << " adj_phi="<<phi_adj;
 
-      if (lc == (grid->local_cell_glob_indices.size()-1))
-        cell_residuals[lc] += std::fabs(cell_surface_residualR[lc]);
-    }//slab
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "chi_montecarlon: Unsupported cell type encountered in "
-        << "call to ResidualSource::Initialize.";
-      exit(EXIT_FAILURE);
-    }
+            if (f == 0)
+              cell_surface_residualL[lc] -= (phi - phi_adj);
+            else
+              cell_surface_residualR[lc] -= (phi_adj - phi);
+
+          }//for face verts
+        }//for face
+
+        chi_log.Log(LOG_0VERBOSE_1)
+          << "Cell residuals "
+          << cell_interior_residual[lc] << " "
+          << cell_surface_residualL[lc] << " "
+          << cell_surface_residualR[lc];
+
+        cell_residuals[lc] =
+          std::fabs(cell_interior_residual[lc]) +
+          std::fabs(cell_surface_residualL[lc]);
+
+        if (lc == (grid->local_cell_glob_indices.size()-1))
+          cell_residuals[lc] += std::fabs(cell_surface_residualR[lc]);
+      }//slab
+      else
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "chi_montecarlon: Unsupported cell type encountered in "
+          << "call to ResidualSource::Initialize.";
+        exit(EXIT_FAILURE);
+      }
+    }//new cell base
+
+
   }//for local cells
 
   chi_log.Log(LOG_0) << "Computing total residual";
@@ -289,60 +296,97 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
     lc--;
   }
 
-
-  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto cell_base = (chi_mesh::CellBase*)cell;
 
-    int v0i = slab_cell->v_indices[0];
-    int v1i = slab_cell->v_indices[1];
-
-    chi_mesh::Vertex v0 = *grid->nodes[v0i];
-    chi_mesh::Vertex v1 = *grid->nodes[v1i];
-
-    double rn = rng->Rand();
-
-    double center_res = std::fabs(cell_interior_residual[lc]);
-    double surfL_res  = std::fabs(cell_surface_residualL[lc]);
-    double surfR_res  = std::fabs(cell_surface_residualR[lc]);
-
-
-    if (!sample_rite)
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
+    if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
     {
-      double cell_R = center_res + surfL_res;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CENTER
-      if (rn < center_res/cell_R)
+      int v0i = slab_cell->vertex_ids[0];
+      int v1i = slab_cell->vertex_ids[1];
+
+      chi_mesh::Vertex v0 = *grid->nodes[v0i];
+      chi_mesh::Vertex v1 = *grid->nodes[v1i];
+
+      double rn = rng->Rand();
+
+      double center_res = std::fabs(cell_interior_residual[lc]);
+      double surfL_res  = std::fabs(cell_surface_residualL[lc]);
+      double surfR_res  = std::fabs(cell_surface_residualR[lc]);
+
+
+      if (!sample_rite)
       {
-        //====================================== Sample direction
-        double costheta = 2.0*rng->Rand() - 1.0;
-        double theta    = acos(costheta);
-        double varphi   = rng->Rand()*2.0*M_PI;
+        double cell_R = center_res + surfL_res;
 
-        chi_mesh::Vector ref_dir;
-        ref_dir.x = sin(theta)*cos(varphi);
-        ref_dir.y = sin(theta)*sin(varphi);
-        ref_dir.z = cos(theta);
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CENTER
+        if (rn < center_res/cell_R)
+        {
+          //====================================== Sample direction
+          double costheta = 2.0*rng->Rand() - 1.0;
+          double theta    = acos(costheta);
+          double varphi   = rng->Rand()*2.0*M_PI;
 
-        //====================================== Sample position
-        double w = rng->Rand();
-        new_particle.pos = v0*w + v1*(1.0-w);
+          chi_mesh::Vector ref_dir;
+          ref_dir.x = sin(theta)*cos(varphi);
+          ref_dir.y = sin(theta)*sin(varphi);
+          ref_dir.z = cos(theta);
 
-        //====================================== Set quantities
-        new_particle.dir = ref_dir;
+          //====================================== Sample position
+          double w = rng->Rand();
+          new_particle.pos = v0*w + v1*(1.0-w);
 
-        new_particle.egrp = 0;
-        new_particle.w = (cell_R/total_residual)*
-                         cell_interior_residual[lc]/
-                         std::fabs(cell_interior_residual[lc]);
-        new_particle.cur_cell_ind = cell_glob_index;
+          //====================================== Set quantities
+          new_particle.dir = ref_dir;
 
-        return new_particle;
+          new_particle.egrp = 0;
+          new_particle.w = (cell_R/total_residual)*
+                           cell_interior_residual[lc]/
+                           std::fabs(cell_interior_residual[lc]);
+          new_particle.cur_cell_ind = cell_glob_index;
+
+          return new_particle;
+        }
+          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LEFT
+        else
+        {
+          //====================================== Sample direction
+          double costheta = 2.0*rng->Rand() - 1.0;
+          double theta    = acos(costheta);
+          double varphi   = rng->Rand()*2.0*M_PI;
+
+          chi_mesh::Vector ref_dir;
+          ref_dir.x = sin(theta)*cos(varphi);
+          ref_dir.y = sin(theta)*sin(varphi);
+          ref_dir.z = cos(theta);
+
+          //====================================== Set position
+          if (costheta >= 0.0)
+            new_particle.pos = v0;
+          else
+            new_particle.pos = v0-ref_dir*1.0e-6;
+
+          //====================================== Set quantities
+          new_particle.dir = ref_dir;
+
+          new_particle.egrp = 0;
+          new_particle.w = (cell_R/total_residual)*
+                           cell_surface_residualL[lc]/
+                           std::fabs(cell_surface_residualL[lc])*
+                           (costheta);
+          new_particle.cur_cell_ind = cell_glob_index;
+
+          return new_particle;
+        }
       }
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LEFT
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RIGHT
       else
       {
+        double cell_R = surfR_res;
+
         //====================================== Sample direction
         double costheta = 2.0*rng->Rand() - 1.0;
         double theta    = acos(costheta);
@@ -355,58 +399,27 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
 
         //====================================== Set position
         if (costheta >= 0.0)
-          new_particle.pos = v0;
+          new_particle.pos = v1 - ref_dir*1.0e-6;
         else
-          new_particle.pos = v0-ref_dir*1.0e-6;
+          new_particle.pos = v1;
 
         //====================================== Set quantities
         new_particle.dir = ref_dir;
 
         new_particle.egrp = 0;
         new_particle.w = (cell_R/total_residual)*
-                         cell_surface_residualL[lc]/
-                         std::fabs(cell_surface_residualL[lc])*
-                          (costheta);
+                         cell_surface_residualR[lc]/
+                         std::fabs(cell_surface_residualR[lc])*
+                         (costheta);
         new_particle.cur_cell_ind = cell_glob_index;
 
         return new_particle;
       }
+
     }
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RIGHT
-    else
-    {
-      double cell_R = surfR_res;
+  }//new cell base
 
-      //====================================== Sample direction
-      double costheta = 2.0*rng->Rand() - 1.0;
-      double theta    = acos(costheta);
-      double varphi   = rng->Rand()*2.0*M_PI;
 
-      chi_mesh::Vector ref_dir;
-      ref_dir.x = sin(theta)*cos(varphi);
-      ref_dir.y = sin(theta)*sin(varphi);
-      ref_dir.z = cos(theta);
-
-      //====================================== Set position
-      if (costheta >= 0.0)
-        new_particle.pos = v1 - ref_dir*1.0e-6;
-      else
-        new_particle.pos = v1;
-
-      //====================================== Set quantities
-      new_particle.dir = ref_dir;
-
-      new_particle.egrp = 0;
-      new_particle.w = (cell_R/total_residual)*
-                       cell_surface_residualR[lc]/
-                       std::fabs(cell_surface_residualR[lc])*
-                        (costheta);
-      new_particle.cur_cell_ind = cell_glob_index;
-
-      return new_particle;
-    }
-
-  }
 
   return new_particle;
 }

@@ -1,7 +1,4 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
 #include <ChiMesh/Cell/cell_newbase.h>
 
 #include <chi_mpi.h>
@@ -25,73 +22,7 @@ void LinearBoltzman::Solver::InitializeCommunicators()
     int cell_glob_index = grid->local_cell_glob_indices[c];
     auto cell           = grid->cells[cell_glob_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-
-      int num_faces = 2;
-      for (int f=0; f<num_faces; f++)
-      {
-        int neighbor = slab_cell->edges[f];
-
-        if (neighbor>=0)
-        {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
-        }
-      }//for f
-    } //if slab
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-
-      for (int f=0; f< poly_cell->edges.size(); f++)
-      {
-        int neighbor = poly_cell->edges[f][EDGE_NEIGHBOR];
-
-        if (neighbor>=0)
-        {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
-        }
-      }//for f
-    } //if polyhedron
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-
-      for (int f=0; f< polyh_cell->faces.size(); f++)
-      {
-        int neighbor = polyh_cell->faces[f]->face_indices[NEIGHBOR];
-
-        if (neighbor>=0)
-        {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
-        }
-      }//for f
-    } //if polyhedron
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
-    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       auto cell_base = (chi_mesh::CellBase*)cell;
 

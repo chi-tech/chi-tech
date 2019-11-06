@@ -4,8 +4,7 @@
 #include <fstream>
 
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../Cell/cell_polyhedron.h"
-#include "../Cell/cell_polygon.h"
+#include "../Cell/cell_newbase.h"
 
 #include "../MeshContinuum/chi_meshcontinuum.h"
 #include "../VolumeMesher/chi_volumemesher.h"
@@ -45,23 +44,23 @@ void chi_mesh::sweep_management::
     int cell_index = sweep_order->spls->item_id[ci];
     chi_mesh::Cell* cell =  vol_continuum->cells[cell_index];
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      for (int e=0; e<poly_cell->edges.size(); e++)
+      for (int e=0; e < cell_base->faces.size(); e++)
       {
         //======================================= Determine if the face
         //                                        is incident
         bool is_incoming = false;
-        double dot_normal = omega.Dot(poly_cell->edgenormals[e]);
+        double dot_normal = omega.Dot(cell_base->faces[e].normal);
         if (dot_normal<0.0) {is_incoming = true;}
 
         //======================================= If incoming determine if
         //                                        it is locally dependent
         if (is_incoming)
         {
-          int adj_index = poly_cell->edges[e][2];
+          int adj_index = cell_base->faces[e].neighbor;
 
           for (int lc=0;
                lc<vol_continuum->local_cell_glob_indices.size(); lc++)

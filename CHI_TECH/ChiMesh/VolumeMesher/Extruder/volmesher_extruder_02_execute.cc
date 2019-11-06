@@ -1,11 +1,10 @@
 #include "volmesher_extruder.h"
 #include <iostream>
 #include <vector>
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../SurfaceMesher/surfacemesher.h"
-#include "../../Region/chi_region.h"
-#include "../../Cell/cell_triangle.h"
-#include "../../Boundary/chi_boundary.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/SurfaceMesher/surfacemesher.h"
+#include "ChiMesh/Region/chi_region.h"
+#include "ChiMesh/Boundary/chi_boundary.h"
 #include <ChiMPI/chi_mpi.h>
 
 #include <chi_log.h>
@@ -54,8 +53,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
     //=========================================== Create new continuum
     //chi_mesh::MeshContinuum* remeshed_surfcont = region->mesh_continua.back();
-    chi_mesh::MeshContinuum* vol_continuum = new chi_mesh::MeshContinuum;
-    chi_mesh::MeshContinuum* temp_continuum = new chi_mesh::MeshContinuum;
+    auto vol_continuum = new chi_mesh::MeshContinuum;
+    auto temp_continuum = new chi_mesh::MeshContinuum;
     region->volume_mesh_continua.push_back(temp_continuum);
     region->volume_mesh_continua.push_back(vol_continuum);
 

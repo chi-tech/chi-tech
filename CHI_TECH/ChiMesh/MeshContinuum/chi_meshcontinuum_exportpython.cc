@@ -1,7 +1,7 @@
 #include "chi_meshcontinuum.h"
 #include <fstream>
-#include "../Cell/cell_polyhedron.h"
-#include "../Cell/cell_polygon.h"
+#include "../Cell/cell_polyhedronv2.h"
+#include "../Cell/cell_polygonv2.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -47,39 +47,49 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
   //============================================= Find amount of faces
   int num_faces=0;
-  for (int c=0; c<cells.size(); c++)
+  for (int lc=0; lc<local_cell_glob_indices.size(); lc++)
   {
-    if (dynamic_cast<chi_mesh::CellPolyhedron*>(cells[c]))
+    int cell_g_index = local_cell_glob_indices[lc];
+    auto cell = cells[cell_g_index];
+
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_mesh::CellPolyhedron* cell = ((chi_mesh::CellPolyhedron*)cells[c]);
-      if (surface_only)
+      auto cell_base = (chi_mesh::CellBase*)cell;
+
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
       {
-        for (int f=0; f<cell->faces.size(); f++)
+        num_faces++;
+      }
+
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+        if (surface_only)
         {
-          int* face_indices = cell->faces[f]->face_indices;
-          if (face_indices[0]<0)
+          for (int f=0; f<polyh_cell->faces.size(); f++)
           {
-            num_faces++;
-          }
-          else
-          {
-            auto adj_cell = cells[face_indices[0]];
-            if (adj_cell->partition_id != chi_mpi.location_id)
+            if (polyh_cell->faces[f].neighbor < 0)
             {
               num_faces++;
             }
+            else
+            {
+              auto adj_cell = cells[polyh_cell->faces[f].neighbor];
+              if (adj_cell->partition_id != chi_mpi.location_id)
+              {
+                num_faces++;
+              }
+            }
           }
         }
+        else
+        {
+          num_faces+=polyh_cell->faces.size();
+        }
       }
-      else
-      {
-        num_faces+=cell->faces.size();
-      }
-    }
-    if (dynamic_cast<chi_mesh::CellPolygon*>(cells[c]))
-    {
-      num_faces++;
-    }
+    }//new cell base
+
+
   }
 
   chi_log.Log(LOG_ALL) << "Number of faces to be exported = "
@@ -90,42 +100,112 @@ ExportCellsToPython(const char* fileName, bool surface_only,
   fprintf(of,"face_vertindi=np.zeros((%d,10))\n",num_faces);
 
   int f=-1;
-  for (int c=0; c<cells.size(); c++)
+  for (int lc=0; lc<local_cell_glob_indices.size(); lc++)
   {
-    if (dynamic_cast<chi_mesh::CellPolyhedron*>(cells[c]))
+    int cell_g_index = local_cell_glob_indices[lc];
+    auto cell = cells[cell_g_index];
+
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto cell = ((chi_mesh::CellPolyhedron*)cells[c]);
-      if (surface_only)
+      auto cell_base = (chi_mesh::CellBase*)cell;
+
+      //################################################### POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
       {
-        for (int s=0; s< cell->faces.size(); s++)
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
+        fprintf(of,"face_numverts[%d,0]=%lu   \n",cell_g_index,
+                poly_cell->vertex_ids.size());
+
+        bool flagged = false;
+        if (cell_flags != nullptr)
         {
-          int* face_indices = cell->faces[s]->face_indices;
-          bool export_face = false;
-          if (face_indices[0]<0)
+          for (int i=0; i<cell_flags->size(); i++)
           {
-            export_face = true;
+            if (cell_g_index==(*cell_flags)[i])
+            {flagged = true;}
+
+            if (!poly_cell->CheckBoundary2D())
+            {flagged = true;}
           }
-          else
+          if (flagged)
           {
-            auto adj_cell = cells[face_indices[0]];
-            if (adj_cell->partition_id != chi_mpi.location_id)
+            fprintf(of,"face_numverts[%d,1]=%d   \n",cell_g_index,1);
+          }
+        }
+
+        for (int v=0; v<poly_cell->vertex_ids.size(); v++)
+        {
+          fprintf(of,"face_vertindi[%d][%d]=%d\n",cell_g_index,v,poly_cell->vertex_ids[v]);
+        }
+      }//polygon
+
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+        if (surface_only)
+        {
+          for (int s=0; s< polyh_cell->faces.size(); s++)
+          {
+            bool export_face = false;
+            if (polyh_cell->faces[s].neighbor < 0)
             {
               export_face = true;
             }
-          }
+            else
+            {
+              auto adj_cell = cells[polyh_cell->faces[s].neighbor];
+              if (adj_cell->partition_id != chi_mpi.location_id)
+              {
+                export_face = true;
+              }
+            }
 
-          if (export_face)
+            if (export_face)
+            {
+              f++;
+              fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
+                      polyh_cell->faces[s].vertex_ids.size());
+
+              bool flagged = false;
+              if (cell_flags != nullptr)
+              {
+                for (int i=0; i<cell_flags->size(); i++)
+                {
+                  if (cell_g_index==(*cell_flags)[i])
+                  {flagged = true;}
+                }
+                if (flagged)
+                {
+                  fprintf(of,"face_numverts[%d,1]=%d   \n",f,1);
+                }
+              }
+
+
+              chi_mesh::CellFace& face = polyh_cell->faces[s];
+
+              for (int v=0; v<face.vertex_ids.size(); v++)
+              {
+                fprintf(of,"face_vertindi[%d][%d]=%d\n",f,v,face.vertex_ids[v]);
+              }
+            }
+
+
+          }
+        }
+        else
+        {
+          for (int s=0; s< polyh_cell->faces.size(); s++)
           {
             f++;
             fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
-                    cell->faces[s]->v_indices.size());
+                    polyh_cell->faces[s].vertex_ids.size());
 
             bool flagged = false;
             if (cell_flags != nullptr)
             {
               for (int i=0; i<cell_flags->size(); i++)
               {
-                if (c==(*cell_flags)[i])
+                if (cell_g_index==(*cell_flags)[i])
                 {flagged = true;}
               }
               if (flagged)
@@ -134,80 +214,22 @@ ExportCellsToPython(const char* fileName, bool surface_only,
               }
             }
 
+            chi_mesh::CellFace& face = polyh_cell->faces[s];
 
-            chi_mesh::PolyFace* face = cell->faces[s];
-
-            for (int v=0; v<face->v_indices.size(); v++)
+            for (int v=0; v<face.vertex_ids.size(); v++)
             {
-              fprintf(of,"face_vertindi[%d][%d]=%d\n",f,v,face->v_indices[v]);
+              fprintf(of,"face_vertindi[%d][%d]=%d\n",f,v,face.vertex_ids[v]);
             }
+
           }
-
-
         }
-      }
-      else
-      {
-        for (int s=0; s< cell->faces.size(); s++)
-        {
-          f++;
-          fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
-                  cell->faces[s]->v_indices.size());
 
-          bool flagged = false;
-          if (cell_flags != nullptr)
-          {
-            for (int i=0; i<cell_flags->size(); i++)
-            {
-              if (c==(*cell_flags)[i])
-              {flagged = true;}
-            }
-            if (flagged)
-            {
-              fprintf(of,"face_numverts[%d,1]=%d   \n",f,1);
-            }
-          }
 
-          chi_mesh::PolyFace* face = cell->faces[s];
-
-          for (int v=0; v<face->v_indices.size(); v++)
-          {
-            fprintf(of,"face_vertindi[%d][%d]=%d\n",f,v,face->v_indices[v]);
-          }
-
-        }
       }
 
+    }//new cell base
 
-    }
-    if (dynamic_cast<chi_mesh::CellPolygon*>(cells[c]))
-    {
-      auto cell = ((chi_mesh::CellPolygon*)cells[c]);
-      fprintf(of,"face_numverts[%d,0]=%lu   \n",c,
-              cell->v_indices.size());
 
-      bool flagged = false;
-      if (cell_flags != nullptr)
-      {
-        for (int i=0; i<cell_flags->size(); i++)
-        {
-          if (c==(*cell_flags)[i])
-          {flagged = true;}
-
-          if (!cell->CheckBoundary2D())
-          {flagged = true;}
-        }
-        if (flagged)
-        {
-          fprintf(of,"face_numverts[%d,1]=%d   \n",c,1);
-        }
-      }
-
-      for (int v=0; v<cell->v_indices.size(); v++)
-      {
-        fprintf(of,"face_vertindi[%d][%d]=%d\n",c,v,cell->v_indices[v]);
-      }
-    }
   }
 
   //============================================= Initialize plot

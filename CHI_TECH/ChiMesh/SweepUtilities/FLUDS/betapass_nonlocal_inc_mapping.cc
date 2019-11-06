@@ -2,8 +2,6 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include "ChiMesh/Cell/cell_polyhedron.h"
-
 #include <chi_log.h>
 
 extern ChiLog     chi_log;

@@ -7,10 +7,6 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include <ChiMesh/Cell/cell_newbase.h>
 
-typedef chi_mesh::CellSlab       TSlab;
-typedef chi_mesh::CellPolygon    TPolygon;
-typedef chi_mesh::CellPolyhedron TPolyhedron;
-
 typedef int                      TVertexFace;
 typedef int*                     TEdgeFace;
 typedef chi_mesh::PolyFace       TPolyFace;
@@ -155,35 +151,6 @@ public:
   //01
   void InitializeAlphaElements(chi_mesh::sweep_management::SPDS *spds);
 
-  //01a
-  void SlotDynamics(TSlab *slab_cell,
-                    chi_mesh::sweep_management::SPDS* spds,
-                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
-                    std::vector<std::pair<int,short>>& delayed_lock_box,
-                    std::set<int>& location_boundary_dependency_set);
-  void LocalIncidentMapping(TSlab *slab_cell,
-                            chi_mesh::sweep_management::SPDS* spds,
-                            std::vector<int>&  local_so_cell_mapping);
-
-  //01b
-  void SlotDynamics(TPolygon *poly_cell,
-                    chi_mesh::sweep_management::SPDS* spds,
-                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
-                    std::vector<std::pair<int,short>>& delayed_lock_box,
-                    std::set<int>& location_boundary_dependency_set);
-  void LocalIncidentMapping(TPolygon *poly_cell,
-                            chi_mesh::sweep_management::SPDS* spds,
-                            std::vector<int>&  local_so_cell_mapping);
-
-  //01c polyhedron
-  void SlotDynamics(TPolyhedron *polyh_cell,
-                    chi_mesh::sweep_management::SPDS* spds,
-                    std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
-                    std::vector<std::pair<int,short>>& delayed_lock_box,
-                    std::set<int>& location_boundary_dependency_set);
-  void LocalIncidentMapping(TPolyhedron *polyh_cell,
-                            chi_mesh::sweep_management::SPDS* spds,
-                            std::vector<int>&  local_so_cell_mapping);
   //01d
   void SlotDynamics(chi_mesh::CellBase *cell_base,
                     chi_mesh::sweep_management::SPDS* spds,
@@ -197,16 +164,6 @@ public:
   //02
   void InitializeBetaElements(chi_mesh::sweep_management::SPDS *spds,
                               int tag_index=0);
-
-  //02a
-  void NonLocalIncidentMapping(TSlab *slab_cell,
-                               chi_mesh::sweep_management::SPDS* spds);
-  //02b
-  void NonLocalIncidentMapping(TPolygon *poly_cell,
-                               chi_mesh::sweep_management::SPDS* spds);
-  //02c
-  void NonLocalIncidentMapping(TPolyhedron *polyh_cell,
-                               chi_mesh::sweep_management::SPDS* spds);
   //02d
   void NonLocalIncidentMapping(chi_mesh::CellBase *cell_base,
                                chi_mesh::sweep_management::SPDS* spds);

@@ -34,8 +34,6 @@ public:
   //05
   void ExtrudeCells(chi_mesh::MeshContinuum* template_continuum,
                     chi_mesh::MeshContinuum* vol_continuum);
-  void ExtrudeCells2(chi_mesh::MeshContinuum* template_continuum,
-                     chi_mesh::MeshContinuum* vol_continuum);
 
 };
 

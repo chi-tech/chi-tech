@@ -1,9 +1,6 @@
 #include "lbs_linear_boltzman_solver.h"
 
-#include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
@@ -116,98 +113,16 @@ void LinearBoltzman::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      auto transport_view =
         (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
 
-      for (int i=0; i<2; i++)
-      {
-        index++;
-        int m = 0;
-        int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
-
-        double* phi_old_mapped = &ref_phi_old[mapping];
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-        {
-          double R_g = 0.0;
-          int num_transfers = S.inds_rowI[gsi+g].size();
-          for (int j=0; j<num_transfers; j++)
-          {
-            int gp = S.inds_rowI[gsi+g][j];
-
-            if (not (gp >= (gsi+g+1)))
-              continue;
-
-            double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
-
-            R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
-          }
-          delta_phi_local[index] += R_g;
-        }//for g
-
-      }//for dof
-    }//slab
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
-
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
-      {
-        index++;
-        int m = 0;
-        int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
-
-        double* phi_old_mapped = &ref_phi_old[mapping];
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-        {
-          double R_g = 0.0;
-          int num_transfers = S.inds_rowI[gsi+g].size();
-          for (int j=0; j<num_transfers; j++)
-          {
-            int gp = S.inds_rowI[gsi+g][j];
-
-            if (not (gp >= (gsi+g+1)))
-              continue;
-
-            double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
-
-            R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
-          }
-          delta_phi_local[index] += R_g;
-        }//for g
-
-      }//for dof
-    }//polygon
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
-
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
       {
         index++;
         int m = 0;
@@ -258,69 +173,17 @@ void LinearBoltzman::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupse
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      auto transport_view =
         (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
 
 
-      for (int i=0; i<2; i++)
-      {
-        index++;
-        int m=0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
-
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-          phi_new_mapped[g] += tgdsa_solver->pwld_phi_local[index]*xi_g[gsi+g];
-
-      }//for dof
-    }//slab
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
-
-
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
-      {
-        index++;
-        int m=0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
-
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-          phi_new_mapped[g] += tgdsa_solver->pwld_phi_local[index]*xi_g[gsi+g];
-
-      }//for dof
-    }//polygon
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
-
-
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
       {
         index++;
         int m=0;

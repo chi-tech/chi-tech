@@ -4,9 +4,6 @@
 
 #include <ChiMesh/Cell/cell.h>
 #include <ChiMesh/Cell/cell_newbase.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <chi_log.h>
 
@@ -55,22 +52,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     auto cell         = grid->cells[cell_g_index];
     local_so_cell_mapping[cell->cell_local_id] = csoi; //Set mapping
 
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = static_cast<TSlab*>(cell);
-      SlotDynamics(slab_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if slab
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = static_cast<TPolygon*>(cell);
-      SlotDynamics(poly_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if polygon
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = static_cast<TPolyhedron*>(cell);
-      SlotDynamics(polyh_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if polyhedron
-    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
       SlotDynamics(cell_base,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
@@ -99,26 +81,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     int  cell_g_index = spls->item_id[csoi];
     auto cell         = grid->cells[cell_g_index];
 
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = static_cast<TSlab*>(cell);
-      LocalIncidentMapping(slab_cell, spds, local_so_cell_mapping);
-    }//if slab
-    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = static_cast<TPolygon*>(cell);
-      LocalIncidentMapping(poly_cell, spds, local_so_cell_mapping);
-    }//if polygon
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = static_cast<TPolyhedron*>(cell);
-      LocalIncidentMapping(polyh_cell, spds, local_so_cell_mapping);
-    }//if polyhedron
-    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ CELL_NEWBASE
-    else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
       auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
       LocalIncidentMapping(cell_base, spds, local_so_cell_mapping);

@@ -1,7 +1,6 @@
 #include "diffusion_solver.h"
 
 #include <PiecewiseLinear/CellViews/pwl_cellbase.h>
-#include <ChiMesh/Cell/cell_newbase.h>
 
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"

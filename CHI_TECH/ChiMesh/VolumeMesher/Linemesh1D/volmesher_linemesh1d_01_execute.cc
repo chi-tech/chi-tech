@@ -3,7 +3,6 @@
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "../../Region/chi_region.h"
 #include "../../Boundary/chi_boundary.h"
-#include "../../Cell/cell_slab.h"
 #include <ChiMesh/Cell/cell_slabv2.h>
 #include "../../SurfaceMesher/surfacemesher.h"
 
@@ -76,48 +75,6 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         num_slab_cells = line_mesh->vertices.size()-1;
 
         //================================== Create cells from line mesh
-//        int cell_count = -1;
-//        for (int v=0; v<(line_mesh->vertices.size()-1); v++)
-//        {
-//          cell_count++;
-//          chi_mesh::CellSlab* slab = new chi_mesh::CellSlab;
-//          slab->cell_global_id = vol_continuum->cells.size();
-//
-//          //====================== Populate basic data
-//          slab->v_indices[0] = v;
-//          slab->v_indices[1] = v+1;
-//
-//          slab->edges[0] = cell_count-1;
-//          slab->edges[1] = cell_count+1;
-//
-//          if (v == (line_mesh->vertices.size()-2))
-//            slab->edges[1] = -2;
-//
-//          //====================== Compute centroid
-//          chi_mesh::Vertex v0 = line_mesh->vertices[v];
-//          chi_mesh::Vertex v1 = line_mesh->vertices[v+1];
-//
-//          slab->centroid = (v0+v1)/2.0;
-//
-//          //====================== Compute normals
-//          chi_mesh::Vector n = (v1-v0)/(v1-v0).Norm();
-//          slab->face_normals[0] = chi_mesh::Vector(0.0,0.0,-1.0);
-//          slab->face_normals[1] = chi_mesh::Vector(0.0,0.0, 1.0);
-//
-//          slab->xyz_partition_indices = GetCellXYZPartitionID(slab);
-//
-//          int xi,yi,zi;
-//          xi = std::get<0>(slab->xyz_partition_indices);
-//          yi = std::get<1>(slab->xyz_partition_indices);
-//          zi = std::get<2>(slab->xyz_partition_indices);
-//          int px,py;
-//          px = surf_mesher->partitioning_x;
-//          py = surf_mesher->partitioning_y;
-//          slab->partition_id = zi*px*py + yi*px + xi;
-//
-//          vol_continuum->cells.push_back(slab);
-//
-//        }//for interval
         int cell_count = -1;
         for (int v=0; v<(line_mesh->vertices.size()-1); v++)
         {

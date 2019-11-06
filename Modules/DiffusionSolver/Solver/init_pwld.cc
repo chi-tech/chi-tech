@@ -1,9 +1,5 @@
 #include "diffusion_solver.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
-
 #include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
@@ -13,9 +9,6 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
-
-#include<fstream>
-#include <unistd.h>
 
 PetscErrorCode
 DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
@@ -162,13 +155,6 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   int first_cell_g_index = grid->local_cell_glob_indices[0];
   auto first_cell = grid->cells[first_cell_g_index];
 
-  if (first_cell->Type() == chi_mesh::CellType::SLAB)
-  {
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-  }
-
   if (first_cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
   {
     auto cell_base = dynamic_cast<chi_mesh::CellBase*>(first_cell);
@@ -178,7 +164,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-//
+
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
@@ -191,9 +177,9 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
     {
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
 
-//      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+      //PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
-//
+
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
       PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");

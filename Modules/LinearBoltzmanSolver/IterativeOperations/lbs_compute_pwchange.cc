@@ -1,8 +1,5 @@
 #include "../lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_newbase.h>
 
 //###################################################################
 /**Computes the point wise change between phi_new and phi_old.*/
@@ -20,15 +17,13 @@ double LinearBoltzman::Solver::ComputePiecewiseChange(LBSGroupset* groupset)
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
+      auto cell_base = (chi_mesh::CellBase*)cell;
+      auto transport_view =
         (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
-      for (int i=0; i<2; i++)
+      for (int i=0; i < cell_base->vertex_ids.size(); i++)
       {
         for (int m=0; m<num_moments; m++)
         {
@@ -54,79 +49,7 @@ double LinearBoltzman::Solver::ComputePiecewiseChange(LBSGroupset* groupset)
           }//for g
         }//for m
       }//for i
-    }//if slab
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
-
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
-      {
-        for (int m=0; m<num_moments; m++)
-        {
-          int mapping = transport_view->MapDOF(i,m,gsi);
-          double* phi_new_m = &phi_new_local.data()[mapping];
-          double* phi_old_m = &phi_old_local.data()[mapping];
-
-          for (int g=0; g<deltag; g++)
-          {
-            int map0 = transport_view->MapDOF(i,0,gsi+g);
-
-            double abs_phi_m0     = fabs(phi_new_local[map0]);
-            double abs_phi_old_m0 = fabs(phi_old_local[map0]);
-            double max_phi = std::max(abs_phi_m0,abs_phi_old_m0);
-
-            double delta_phi = std::fabs(phi_new_m[g] - phi_old_m[g]);
-
-            if (max_phi >= std::numeric_limits<double>::min())
-              pw_change = std::max(delta_phi/max_phi,pw_change);
-            else
-              pw_change = std::max(delta_phi,pw_change);
-
-          }//for g
-        }//for m
-      }//for i
-    }//if polyhedron
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-      LinearBoltzman::CellViewFull* transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
-
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
-      {
-        for (int m=0; m<num_moments; m++)
-        {
-          int mapping = transport_view->MapDOF(i,m,gsi);
-          double* phi_new_m = &phi_new_local.data()[mapping];
-          double* phi_old_m = &phi_old_local.data()[mapping];
-
-          for (int g=0; g<deltag; g++)
-          {
-            int map0 = transport_view->MapDOF(i,0,gsi+g);
-
-            double abs_phi_m0     = fabs(phi_new_local[map0]);
-            double abs_phi_old_m0 = fabs(phi_old_local[map0]);
-            double max_phi = std::max(abs_phi_m0,abs_phi_old_m0);
-
-            double delta_phi = std::fabs(phi_new_m[g] - phi_old_m[g]);
-
-            if (max_phi >= std::numeric_limits<double>::min())
-              pw_change = std::max(delta_phi/max_phi,pw_change);
-            else
-              pw_change = std::max(delta_phi,pw_change);
-
-          }//for g
-        }//for m
-      }//for i
-    }//if polyhedron
+    }//if cell new base
 
   }//for c
 
