@@ -1,6 +1,6 @@
 #include "diffusion_solver.h"
 
-#include "../../LinearBoltzmanSolver/Tools/kspmonitor_npt.h"
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
@@ -10,11 +10,6 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
-
-#include<fstream>
-#include <unistd.h>
-
-extern ChiTimer chi_program_timer;
 
 PetscErrorCode
 DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
@@ -30,17 +25,21 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
   chi_mesh::Region*     aregion = this->regions.back();
   grid = aregion->volume_mesh_continua.back();
 
+  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
+  mesher = mesh_handler->volume_mesher;
+
+  int num_nodes = grid->nodes.size();
 
   //================================================== Reorder nodes
-  chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
+  if (verbose)
+    chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  this->ReorderNodesPWLD();
+  ReorderNodesPWLD();
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Time taken during nodal reordering "
-                     << t_reorder.GetTime()/1000.0;
-
-
+  if (verbose)
+    chi_log.Log(LOG_0) << "Time taken during nodal reordering "
+                       << t_reorder.GetTime()/1000.0;
 
 
   //================================================== Initialize field function
@@ -87,256 +86,28 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
   }
 
   //================================================== Setup timer
-  chi_log.Log(LOG_0) << "Determining nodal connections";
+  if (verbose)
+    chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
   double t0 = 0.0;
 
 
   //================================================== Initialize nodal DOF
   //                                                   and connection info
-  for (int i=0; i<pwld_local_dof_count; i++)
-  {
-    std::vector<int>* new_node_links = new std::vector<int>;
-    nodal_connections.push_back(new_node_links);
-    new_node_links = new std::vector<int>;
-    nodal_cell_connections.push_back(new_node_links);
-
-    nodal_nnz_in_diag.push_back(0);
-    nodal_nnz_off_diag.push_back(1);
-  }
-
+  nodal_nnz_in_diag.resize(pwld_local_dof_count,0);
+  nodal_nnz_off_diag.resize(pwld_local_dof_count,0);
   nodal_boundary_numbers.resize(grid->nodes.size(),0);
   int total_nnz = 0;
 
 
 
+
+
+
+
   //================================================== First pass store pwld view
-  int num_loc_cells = grid->local_cell_glob_indices.size();
-  int dof_count = 0;
-  std::set<int> local_border_cells;
-  for (int lc=0; lc<num_loc_cells; lc++)
-  {
-    int cell_glob_index = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_glob_index];
-
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-
-      DiffusionIPCellView* ip_view = new DiffusionIPCellView;
-      ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
-      pwld_cell_dof_array_address.push_back(dof_count);
-      ip_cell_views.push_back(ip_view);
-
-      for (int v=0; v<cell_base->vertex_ids.size(); v++)
-      {
-        nodal_nnz_in_diag[dof_count] = cell_base->vertex_ids.size();
-
-        for (int f=0; f<cell_base->faces.size(); f++)
-        {
-          if (cell_base->faces[f].neighbor >= 0) //Not bndry
-          {
-            bool is_local =
-              grid->IsCellLocal(cell_base->faces[f].neighbor);
-
-            if (is_local)
-            {
-              int adj_cell_glob_index =
-                cell_base->faces[f].neighbor;
-              auto adj_cell =
-                (chi_mesh::CellBase*)grid->cells[adj_cell_glob_index];
-              nodal_nnz_in_diag[dof_count] += adj_cell->vertex_ids.size();
-            }
-            else
-            {
-              //Since we have no information about the non-local cell,
-              //we can make a good assumption that it has the same amount
-              //of dofs than does the current cell.
-              nodal_nnz_off_diag[dof_count] += cell_base->vertex_ids.size();
-              local_border_cells.insert(lc);
-            }
-          }
-        }
-        dof_count++;
-      }
-
-      //==================================== Boundary numbers
-      for (int f=0; f<cell_base->faces.size(); f++)
-      {
-        if (cell_base->faces[f].neighbor < 0)
-        {
-          for (int fv=0; fv<cell_base->faces[f].vertex_ids.size(); fv++)
-          {
-            int fvi = cell_base->faces[f].vertex_ids[fv];
-            nodal_boundary_numbers[fvi] = cell_base->faces[f].neighbor;
-          }//for fv
-        }//if bndry
-      }//for face v's
-    }//new cell base
-
-  }//for local cell
-  chi_log.Log(LOG_0) << "Time taken during nodal connection "
-                     << t_connect.GetTime()/1000.0;
-  MPI_Barrier(MPI_COMM_WORLD);
-
-
-  chi_log.Log(LOG_0) << "Communicating border cell information.";
-  //================================================== Serialize local cells
-  // The vectorized values will be as follows
-  // - cell_glob_index
-  // - cell_dof_start
-  // - cell_type
-  // - cell_mat_id
-  // - cell_dof_count
-  // - cell_face_count
-  //
-  // - dof 0 glob_index
-  //     to
-  // - dof N glob_index
-  //
-  // - face_0 dof_count
-  // - face_0 dof 0 glob_index
-  //     to
-  // - face_0 dof fN glob_index
-  //
-  // - repeat all face info
-  std::vector<int> border_cell_info;
-
-  //============================================= Loop over set
-  std::set<int>::iterator local_cell;
-  for (local_cell  = local_border_cells.begin();
-       local_cell != local_border_cells.end();
-       local_cell++)
-  {
-    int local_cell_index = *local_cell;
-    int cell_glob_index = grid->local_cell_glob_indices[local_cell_index];
-
-    auto cell = grid->cells[cell_glob_index];
-    DiffusionIPCellView* ip_view = ip_cell_views[local_cell_index];
-
-    border_cell_info.push_back(cell_glob_index);         //cell_glob_index
-    border_cell_info.push_back(ip_view->cell_dof_start); //cell_dof_start
-
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      border_cell_info.push_back(2);                     //cell_type
-      border_cell_info.push_back(cell_base->material_id);//cell_mat_id
-      border_cell_info.push_back(cell_base->vertex_ids.size());//cell_dof_count
-      border_cell_info.push_back(cell_base->faces.size());//cell_face_count
-
-      for (int v=0; v < cell_base->vertex_ids.size(); v++)
-        border_cell_info.push_back(cell_base->vertex_ids[v]);//dof 0 to N
-
-      for (int f=0; f < cell_base->faces.size(); f++)
-      {
-        int face_dof_count = cell_base->faces[f].vertex_ids.size();
-        border_cell_info.push_back(face_dof_count);         //face dof_count
-        for (int fv=0; fv<face_dof_count; fv++)
-          border_cell_info.push_back(cell_base->faces[f].vertex_ids[fv]);
-        //face dof 0 to fN
-      }
-    }
-  }//for local cell
-
-  //================================================== Distribute border info
-  std::vector<int> locI_info_size;
-  std::vector<std::vector<int>> locI_border_cell_info;
-
-  locI_info_size.resize(chi_mpi.process_count);
-  locI_border_cell_info.resize(chi_mpi.process_count);
-
-  //======================================== Collect sizes
-  for (int locI=0; locI<chi_mpi.process_count; locI++)
-  {
-    if (locI == chi_mpi.location_id)
-    {
-      locI_info_size[locI] = border_cell_info.size();
-    }
-    MPI_Bcast(&locI_info_size[locI],1,MPI_INT,locI,MPI_COMM_WORLD);
-  }
-
-  //======================================== Collect info
-  for (int locI=0; locI<chi_mpi.process_count; locI++)
-  {
-    if (locI == chi_mpi.location_id)
-    {
-      std::copy(border_cell_info.begin(),
-                border_cell_info.end(),
-                std::back_inserter(locI_border_cell_info[locI]));
-    }
-    else
-      locI_border_cell_info[locI].resize(locI_info_size[locI]);
-
-    MPI_Bcast(locI_border_cell_info[locI].data(),
-              locI_info_size[locI],MPI_INT,locI,MPI_COMM_WORLD);
-  }
-
-  //================================================== Deserialize border info
-  // The vectorized values will be as follows
-  // - cell_glob_index
-  // - cell_dof_start
-  // - cell_type
-  // - cell_mat_id
-  // - cell_dof_count
-  // - cell_face_count
-  //
-  // - dof 0 glob_index
-  //     to
-  // - dof N glob_index
-  //
-  // - face_0 dof_count
-  // - face_0 dof 0 glob_index
-  //     to
-  // - face_0 dof fN glob_index
-  //
-  // - repeat all face info
-  ip_locI_bordercell_info.resize(chi_mpi.process_count);
-  ip_locI_bordercells.resize(chi_mpi.process_count);
-  ip_locI_borderfeviews.resize(chi_mpi.process_count);
-  ip_locI_borderipviews.resize(chi_mpi.process_count);
-  for (int locI=0; locI<chi_mpi.process_count; locI++)
-  {
-    int k=0;
-    while (k<locI_info_size[locI])
-    {
-      DiffusionIPBorderCell* border_cell = new DiffusionIPBorderCell;
-      border_cell->cell_glob_index = locI_border_cell_info[locI][k]; k++;
-      border_cell->cell_dof_start  = locI_border_cell_info[locI][k]; k++;
-      border_cell->cell_type       = locI_border_cell_info[locI][k]; k++;
-      border_cell->cell_mat_id     = locI_border_cell_info[locI][k]; k++;
-      border_cell->cell_dof_count  = locI_border_cell_info[locI][k]; k++;
-      border_cell->cell_face_count = locI_border_cell_info[locI][k]; k++;
-
-      int dof_count = border_cell->cell_dof_count;
-
-      for (int v=0; v<dof_count; v++)
-      {
-        border_cell->v_indices.push_back(locI_border_cell_info[locI][k]);
-        k++;
-      }
-
-      int face_count = border_cell->cell_face_count;
-
-      for (int f=0; f<face_count; f++)
-      {
-        int face_dof_count = locI_border_cell_info[locI][k]; k++;
-        border_cell->face_v_indices.push_back(std::vector<int>());
-        for (int fv=0; fv<face_dof_count; fv++)
-        {
-          int vgi = locI_border_cell_info[locI][k]; k++;
-          border_cell->face_v_indices[f].push_back(vgi);
-        }
-      }
-
-      ip_locI_bordercell_info[locI].push_back(border_cell);
-    }//while less than buffersize
-
-    int locI_num_bordercells  = ip_locI_bordercell_info[locI].size();
-    ip_locI_bordercells[locI].resize(locI_num_bordercells,nullptr);
-    ip_locI_borderfeviews[locI].resize(locI_num_bordercells,nullptr);
-    ip_locI_borderipviews[locI].resize(locI_num_bordercells,nullptr);
-  }
+  chi_log.Log(LOG_0) << "Building sparsity pattern.";
+  PWLDBuildSparsityPattern();
 
 
   //################################################## Initialize groupwise
@@ -385,15 +156,65 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
 
     PCHYPRESetType(pcg[gr],"boomeramg");
 
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
+    //================================================== Setting Hypre parameters
+    //The default HYPRE parameters used for polyhedra
+    //seemed to have caused a lot of trouble for Slab
+    //geometries. This section makes some custom options
+    //per cell type
+    int first_cell_g_index = grid->local_cell_glob_indices[0];
+    auto first_cell = grid->cells[first_cell_g_index];
 
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+    if (first_cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    {
+      auto cell_base = dynamic_cast<chi_mesh::CellBase*>(first_cell);
 
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+      {
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+        PetscOptionsInsertString(NULL,"-options_left");
+      }
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
+
+        //PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+        PetscOptionsInsertString(NULL,"-options_left");
+      }
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
+
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+        PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+        PetscOptionsInsertString(NULL,"-options_left");
+      }
 
 
+    }
     PetscOptionsInsertString(NULL,options_string.c_str());
     PCSetFromOptions(pcg[gr]);
 

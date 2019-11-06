@@ -1,5 +1,6 @@
 #include "diffusion_solver.h"
 
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
@@ -9,9 +10,6 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
-
-#include<fstream>
-#include <unistd.h>
 
 PetscErrorCode
 DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
@@ -27,19 +25,21 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   chi_mesh::Region*     aregion = this->regions.back();
   grid = aregion->volume_mesh_continua.back();
 
+  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
+  mesher = mesh_handler->volume_mesher;
+
+  int num_nodes = grid->nodes.size();
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  this->ReorderNodesPWLD();
+  ReorderNodesPWLD();
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
-  {
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
-  }
 
 
   //================================================== Initialize field function
@@ -86,6 +86,8 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   }
 
   //================================================== Setup timers
+  if (verbose)
+    chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
   double t0 = 0.0;
 
@@ -97,9 +99,16 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   nodal_boundary_numbers.resize(grid->nodes.size(),0);
   int total_nnz = 0;
 
+
+
+
+
+
+
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
   PWLDBuildSparsityPattern();
+
 
   //================================================== Reshuffling nnz
   std::vector<int> G_nodal_nnz_in_diag(pwld_local_dof_count*G);
