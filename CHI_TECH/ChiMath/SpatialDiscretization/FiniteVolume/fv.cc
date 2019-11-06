@@ -1,9 +1,9 @@
 #include "fv.h"
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include "CellViews/fv_slab.h"
 #include "CellViews/fv_polygon.h"
@@ -53,35 +53,34 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 
     if (cell_fv_views_mapping[cell_index]<0)
     {
-      //========================================= If slab item_id
-      if (cell->Type() == chi_mesh::CellType::SLAB)
+
+      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
-        SlabFVView* view =
-          new SlabFVView((chi_mesh::CellSlab*)cell,vol_continuum);
-
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-      }
-
-//      //========================================= If triangle item_id
-//      if (typeid(*(cell)) == typeid(chi_mesh::CellTriangle) )
-//      {
-//        TriangleFEView* view =
-//          new TriangleFEView((chi_mesh::CellTriangle*)(cell),vol_continuum);
-//
-//        this->cell_fe_views.push_back(view);
-//        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-//      }
-
-      //========================================= If polygon item_id
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
+        auto cell_base = (chi_mesh::CellBase*)cell;
+      }//new cell base
+      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
-        PolygonFVView* view =
-          new PolygonFVView((chi_mesh::CellPolygon*)(cell),vol_continuum);
+        auto cell_base = (chi_mesh::CellBase*)cell;
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-      }
+        //========================================= If slab item_id
+        if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+        {
+          auto view =
+            new SlabFVView((chi_mesh::CellSlabV2*)cell_base,vol_continuum);
+
+          this->cell_fv_views.push_back(view);
+          cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        }
+
+        //========================================= If polygon item_id
+        if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+        {
+          auto view =
+            new PolygonFVView((chi_mesh::CellPolygonV2*)(cell_base),vol_continuum);
+
+          this->cell_fv_views.push_back(view);
+          cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        }
 
 //      //========================================= If polyhedron item_id
 //      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
@@ -97,6 +96,8 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 //        this->cell_fe_views.push_back(view);
 //        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
 //      }
+      }//new cell base
+
     }//if mapping not yet assigned
   }//for num cells
 

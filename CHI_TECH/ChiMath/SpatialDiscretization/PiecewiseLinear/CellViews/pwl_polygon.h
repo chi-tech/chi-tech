@@ -3,8 +3,7 @@
 
 #include "../pwl.h"
 #include <vector>
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polygonv2.h"
+#include <ChiMesh/Cell/cell_polygonv2.h>
 
 /**For a given side(triangle), this structure holds the values of
  * shape functions at each quadrature point.*/
@@ -70,10 +69,6 @@ private:
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonFEView(chi_mesh::CellPolygon* poly_cell,
-                chi_mesh::MeshContinuum* vol_continuum,
-                SpatialDiscretization_PWL *discretization);
-
   PolygonFEView(chi_mesh::CellPolygonV2* poly_cell,
                 chi_mesh::MeshContinuum* vol_continuum,
                 SpatialDiscretization_PWL *discretization);

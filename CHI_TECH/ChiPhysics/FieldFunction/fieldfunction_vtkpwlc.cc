@@ -1,8 +1,8 @@
 #include "fieldfunction.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 #include <ChiPhysics/chi_physics.h>
 
 #include <PiecewiseLinear/pwl.h>
@@ -84,35 +84,42 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      int num_verts = 2;
-      for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(slab_cell->v_indices[v]);
-    }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+      {
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+        int num_verts = 2;
+        for (int v=0; v<num_verts; v++)
+          cfem_nodes.push_back(slab_cell->vertex_ids[v]);
+      }
 
-      int num_verts = poly_cell->v_indices.size();
-      for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(poly_cell->v_indices[v]);
-    }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+        int num_verts = poly_cell->vertex_ids.size();
+        for (int v=0; v<num_verts; v++)
+          cfem_nodes.push_back(poly_cell->vertex_ids[v]);
+      }
 
-      int num_verts = polyh_cell->v_indices.size();
-      for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(polyh_cell->v_indices[v]);
-    }//polyhedron
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+
+        int num_verts = polyh_cell->vertex_ids.size();
+        for (int v=0; v<num_verts; v++)
+          cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
+      }//polyhedron
+    }//new cell base
+
+
   }//for local cells
 
   std::vector<int> mapping;
@@ -131,142 +138,148 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      int num_verts = 2;
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        int vgi = slab_cell->v_indices[v];
-        std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
-      }
-
-      ugrid->
-        InsertNextCell(VTK_LINE,2,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
-      {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
-      }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-
-      int num_verts = poly_cell->v_indices.size();
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
-      {
-        int vgi = poly_cell->v_indices[v];
-        std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
-      }
-
-      ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
-      {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
-      }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
-
-      int num_verts = polyh_cell->v_indices.size();
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
-      {
-        int vgi = polyh_cell->v_indices[v];
-        std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
-      }
-
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
-
-      int num_faces = polyh_cell->faces.size();
-      for (int f=0; f<num_faces; f++)
-      {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
-        std::vector<vtkIdType> face(num_fverts);
-        for (int fv=0; fv<num_fverts; fv++)
+        int num_verts = 2;
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
         {
-          int v = cell_fe_view->face_dof_mappings[f][fv];
-          face[fv] = cell_info[v];
+          int vgi = slab_cell->vertex_ids[v];
+          std::vector<double> d_node(3);
+          d_node[0] = grid->nodes[vgi]->x;
+          d_node[1] = grid->nodes[vgi]->y;
+          d_node[2] = grid->nodes[vgi]->z;
+
+
+          points->InsertPoint(nc,d_node.data());
+          cell_info[v] = nc; nc++;
         }
 
+        ugrid->
+          InsertNextCell(VTK_LINE,2,
+                         cell_info.data());
 
-        faces->InsertNextCell(num_fverts,face.data());
-      }//for f
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
 
-      ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
-      {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray->InsertNextValue(dof_value);
+        }
+        phiavgarray->InsertNextValue(cell_avg_value/num_verts);
       }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
-    }//polyhedron
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
+
+        int num_verts = poly_cell->vertex_ids.size();
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
+        {
+          int vgi = poly_cell->vertex_ids[v];
+          std::vector<double> d_node(3);
+          d_node[0] = grid->nodes[vgi]->x;
+          d_node[1] = grid->nodes[vgi]->y;
+          d_node[2] = grid->nodes[vgi]->z;
+
+          points->InsertPoint(nc,d_node.data());
+          cell_info[v] = nc; nc++;
+        }
+
+        ugrid->
+          InsertNextCell(VTK_POLYGON,num_verts,
+                         cell_info.data());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray->InsertNextValue(dof_value);
+        }
+        phiavgarray->InsertNextValue(cell_avg_value/num_verts);
+      }
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+        auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
+
+        int num_verts = polyh_cell->vertex_ids.size();
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
+        {
+          int vgi = polyh_cell->vertex_ids[v];
+          std::vector<double> d_node(3);
+          d_node[0] = grid->nodes[vgi]->x;
+          d_node[1] = grid->nodes[vgi]->y;
+          d_node[2] = grid->nodes[vgi]->z;
+
+          points->InsertPoint(nc,d_node.data());
+          cell_info[v] = nc; nc++;
+        }
+
+        vtkSmartPointer<vtkCellArray> faces =
+          vtkSmartPointer<vtkCellArray>::New();
+
+        int num_faces = polyh_cell->faces.size();
+        for (int f=0; f<num_faces; f++)
+        {
+          int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+          std::vector<vtkIdType> face(num_fverts);
+          for (int fv=0; fv<num_fverts; fv++)
+          {
+            int v = cell_fe_view->face_dof_mappings[f][fv];
+            face[fv] = cell_info[v];
+          }
+
+
+          faces->InsertNextCell(num_fverts,face.data());
+        }//for f
+
+        ugrid->
+          InsertNextCell(VTK_POLYHEDRON,num_verts,
+                         cell_info.data(),num_faces,faces->GetPointer());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray->InsertNextValue(dof_value);
+        }
+        phiavgarray->InsertNextValue(cell_avg_value/num_verts);
+      }//polyhedron
+    }//new cell base
+
   }//for local cells
 
   ugrid->SetPoints(points);
@@ -347,38 +360,43 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      int num_verts = 2;
-      for (int v=0; v<num_verts; v++)
-        for (int g=0; g<num_grps; g++)
-          cfem_nodes.push_back(slab_cell->v_indices[v]);
-    }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+      {
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+        int num_verts = 2;
+        for (int v=0; v<num_verts; v++)
+          for (int g=0; g<num_grps; g++)
+            cfem_nodes.push_back(slab_cell->vertex_ids[v]);
+      }
 
-      int num_verts = poly_cell->v_indices.size();
-      for (int v=0; v<num_verts; v++)
-        for (int g=0; g<num_grps; g++)
-          cfem_nodes.push_back(poly_cell->v_indices[v]);
-    }
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+        int num_verts = poly_cell->vertex_ids.size();
+        for (int v=0; v<num_verts; v++)
+          for (int g=0; g<num_grps; g++)
+            cfem_nodes.push_back(poly_cell->vertex_ids[v]);
+      }
 
-      int num_verts = polyh_cell->v_indices.size();
-      for (int v=0; v<num_verts; v++)
-        for (int g=0; g<num_grps; g++)
-          cfem_nodes.push_back(polyh_cell->v_indices[v]);
-    }//polyhedron
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+
+        int num_verts = polyh_cell->vertex_ids.size();
+        for (int v=0; v<num_verts; v++)
+          for (int g=0; g<num_grps; g++)
+            cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
+      }//polyhedron
+    }//new cell base
   }//for local cells
 
   std::vector<int> mapping;
@@ -397,142 +415,149 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      int num_verts = 2;
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        int vgi = slab_cell->v_indices[v];
-        std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
-      }
-
-      ugrid->
-        InsertNextCell(VTK_LINE,2,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
-      {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
-      }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-
-      int num_verts = poly_cell->v_indices.size();
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
-      {
-        int vgi = poly_cell->v_indices[v];
-        std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
-      }
-
-      ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
-      {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
-      }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
-
-      int num_verts = polyh_cell->v_indices.size();
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
-      {
-        int vgi = polyh_cell->v_indices[v];
-        std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
-      }
-
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
-
-      int num_faces = polyh_cell->faces.size();
-      for (int f=0; f<num_faces; f++)
-      {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
-        std::vector<vtkIdType> face(num_fverts);
-        for (int fv=0; fv<num_fverts; fv++)
+        int num_verts = 2;
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
         {
-          int v = cell_fe_view->face_dof_mappings[f][fv];
-          face[fv] = cell_info[v];
+          int vgi = slab_cell->vertex_ids[v];
+          std::vector<double> d_node(3);
+          d_node[0] = grid->nodes[vgi]->x;
+          d_node[1] = grid->nodes[vgi]->y;
+          d_node[2] = grid->nodes[vgi]->z;
+
+
+          points->InsertPoint(nc,d_node.data());
+          cell_info[v] = nc; nc++;
         }
 
+        ugrid->
+          InsertNextCell(VTK_LINE,2,
+                         cell_info.data());
 
-        faces->InsertNextCell(num_fverts,face.data());
-      }//for f
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
 
-      ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
-      {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray->InsertNextValue(dof_value);
+        }
+        phiavgarray->InsertNextValue(cell_avg_value/num_verts);
       }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
-    }//polyhedron
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
+
+        int num_verts = poly_cell->vertex_ids.size();
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
+        {
+          int vgi = poly_cell->vertex_ids[v];
+          std::vector<double> d_node(3);
+          d_node[0] = grid->nodes[vgi]->x;
+          d_node[1] = grid->nodes[vgi]->y;
+          d_node[2] = grid->nodes[vgi]->z;
+
+          points->InsertPoint(nc,d_node.data());
+          cell_info[v] = nc; nc++;
+        }
+
+        ugrid->
+          InsertNextCell(VTK_POLYGON,num_verts,
+                         cell_info.data());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray->InsertNextValue(dof_value);
+        }
+        phiavgarray->InsertNextValue(cell_avg_value/num_verts);
+      }
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+        auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
+
+        int num_verts = polyh_cell->vertex_ids.size();
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
+        {
+          int vgi = polyh_cell->vertex_ids[v];
+          std::vector<double> d_node(3);
+          d_node[0] = grid->nodes[vgi]->x;
+          d_node[1] = grid->nodes[vgi]->y;
+          d_node[2] = grid->nodes[vgi]->z;
+
+          points->InsertPoint(nc,d_node.data());
+          cell_info[v] = nc; nc++;
+        }
+
+        vtkSmartPointer<vtkCellArray> faces =
+          vtkSmartPointer<vtkCellArray>::New();
+
+        int num_faces = polyh_cell->faces.size();
+        for (int f=0; f<num_faces; f++)
+        {
+          int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+          std::vector<vtkIdType> face(num_fverts);
+          for (int fv=0; fv<num_fverts; fv++)
+          {
+            int v = cell_fe_view->face_dof_mappings[f][fv];
+            face[fv] = cell_info[v];
+          }
+
+
+          faces->InsertNextCell(num_fverts,face.data());
+        }//for f
+
+        ugrid->
+          InsertNextCell(VTK_POLYHEDRON,num_verts,
+                         cell_info.data(),num_faces,faces->GetPointer());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray->InsertNextValue(dof_value);
+        }
+        phiavgarray->InsertNextValue(cell_avg_value/num_verts);
+      }//polyhedron
+    }//new cell base
+
+
   }//for local cells
 
   ugrid->SetPoints(points);

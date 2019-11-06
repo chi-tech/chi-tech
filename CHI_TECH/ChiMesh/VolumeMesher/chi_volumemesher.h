@@ -60,7 +60,7 @@ public:
                            chi_mesh::MeshContinuum* vol_continuum);
   void                CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
                                          chi_mesh::MeshContinuum* vol_continuum);
-  void                CreatePolygonCells2(chi_mesh::SurfaceMesh* surface_mesh,
+  void                CreatePolygonCellsOld(chi_mesh::SurfaceMesh* surface_mesh,
                                           chi_mesh::MeshContinuum* vol_continuum);
   std::pair<int,int>  GetCellXYPartitionID(chi_mesh::Cell *cell);
   std::tuple<int,int,int>

@@ -2,12 +2,16 @@
 #include "../../MeshContinuum/chi_meshcontinuum.h"
 #include "../../Cell/cell_polyhedron.h"
 #include "../../Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polygonv2.h"
 #include "ChiMesh/Cell/cell_polyhedronv2.h"
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "../../SurfaceMesher/surfacemesher.h"
-#include "../../../ChiMPI/chi_mpi.h"
 
+#include <chi_mpi.h>
 extern ChiMPI chi_mpi;
+
+#include <chi_log.h>
+extern ChiLog chi_log;
 
 //###################################################################
 /**Extrude template cells into polygons.*/
@@ -26,24 +30,31 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
     for (int tc=0; tc<template_continuum->cells.size(); tc++)
     {
       //========================================= Get template cell
-      chi_mesh::CellPolygon* template_cell =
-        (chi_mesh::CellPolygon*)template_continuum->cells[tc];
+      auto template_cell =
+        dynamic_cast<chi_mesh::CellPolygonV2*>(template_continuum->cells[tc]);
+//      chi_mesh::CellPolygon* template_cell =
+//        (chi_mesh::CellPolygon*)template_continuum->cells[tc];
+      if (template_cell == nullptr)
+      {
+        chi_log.Log(LOG_ALLERROR) << "Extruder: Template cell error.";
+        exit(EXIT_FAILURE);
+      }
 
       //========================================= Precompute centroid
       chi_mesh::Vector centroid_precompd;
-      for (int tv=0; tv<template_cell->v_indices.size(); tv++)
+      for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
       {
-        int v_index = (template_cell->v_indices[tv]
+        int v_index = (template_cell->vertex_ids[tv]
                        + iz*node_z_index_incr);
         centroid_precompd = centroid_precompd + *vol_continuum->nodes[v_index];
       }
-      for (int tv=0; tv<template_cell->v_indices.size(); tv++)
+      for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
       {
-        int v_index = (template_cell->v_indices[tv]
+        int v_index = (template_cell->vertex_ids[tv]
                        + (iz+1)*node_z_index_incr);
         centroid_precompd = centroid_precompd + *vol_continuum->nodes[(v_index)];
       }
-      centroid_precompd = centroid_precompd/(2*template_cell->v_indices.size());
+      centroid_precompd = centroid_precompd/(2*template_cell->vertex_ids.size());
 
       //========================================= Create a template empty
       //                                          cell
@@ -80,15 +91,15 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
 
         //========================================= Compute centroid
         //                                          and set vindices
-        for (int tv=0; tv<template_cell->v_indices.size(); tv++)
+        for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
         {
-          int v_index = (template_cell->v_indices[tv]
+          int v_index = (template_cell->vertex_ids[tv]
                          + iz*node_z_index_incr);
           cell->vertex_ids.push_back(v_index);
         }
-        for (int tv=0; tv<template_cell->v_indices.size(); tv++)
+        for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
         {
-          int v_index = (template_cell->v_indices[tv]
+          int v_index = (template_cell->vertex_ids[tv]
                          + (iz+1)*node_z_index_incr);
           cell->vertex_ids.push_back(v_index);
         }
@@ -96,21 +107,17 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         cell->vertex_ids.shrink_to_fit();
 
         //========================================= Create side faces
-        for (int e=0; e<template_cell->edges.size(); e++)
+        for (int e=0; e<template_cell->faces.size(); e++)
         {
-          int* template_edge_indices = template_cell->edges[e];
+          chi_mesh::CellFace& face = template_cell->faces[e];
 
           chi_mesh::CellFace newFace;
 
           newFace.vertex_ids.resize(4,-1);
-          newFace.vertex_ids[0] = template_edge_indices[0] +
-                                  iz*node_z_index_incr;
-          newFace.vertex_ids[1] = template_edge_indices[1] +
-                                  iz*node_z_index_incr;
-          newFace.vertex_ids[2] = template_edge_indices[1] +
-                                  (iz+1)*node_z_index_incr;
-          newFace.vertex_ids[3] = template_edge_indices[0] +
-                                  (iz+1)*node_z_index_incr;
+          newFace.vertex_ids[0] = face.vertex_ids[0] + iz*node_z_index_incr;
+          newFace.vertex_ids[1] = face.vertex_ids[1] + iz*node_z_index_incr;
+          newFace.vertex_ids[2] = face.vertex_ids[1] + (iz+1)*node_z_index_incr;
+          newFace.vertex_ids[3] = face.vertex_ids[0] + (iz+1)*node_z_index_incr;
 
           //Compute centroid
           chi_mesh::Vertex v0 = *vol_continuum->nodes[newFace.vertex_ids[0]];
@@ -132,11 +139,11 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
           //Set neighbor
           //The side connections have the same connections as the
           //template cell + the iz specifiers of the layer.
-          if (template_edge_indices[2] >= 0)
-            newFace.neighbor = template_edge_indices[2] +
+          if (face.neighbor >= 0)
+            newFace.neighbor = face.neighbor +
                                iz*((int)template_continuum->cells.size());
           else
-            newFace.neighbor = template_edge_indices[2];
+            newFace.neighbor = face.neighbor;
 
           cell->faces.push_back(newFace);
         } //for side faces
@@ -153,17 +160,17 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         newFace = chi_mesh::CellFace();
         //Vertices
         vfc = chi_mesh::Vertex(0.0,0.0,0.0);
-        newFace.vertex_ids.reserve(template_cell->v_indices.size());
-        for (int tv=((int)(template_cell->v_indices.size())-1); tv>=0; tv--)
+        newFace.vertex_ids.reserve(template_cell->vertex_ids.size());
+        for (int tv=((int)(template_cell->vertex_ids.size())-1); tv>=0; tv--)
         {
-          newFace.vertex_ids.push_back(template_cell->v_indices[tv]
+          newFace.vertex_ids.push_back(template_cell->vertex_ids[tv]
                                        + iz*node_z_index_incr);
           chi_mesh::Vertex v = *vol_continuum->nodes[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }
 
         //Compute centroid
-        vfc = vfc/template_cell->v_indices.size();
+        vfc = vfc/template_cell->vertex_ids.size();
         newFace.centroid = vfc;
 
         //Compute normal
@@ -185,17 +192,17 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         newFace = chi_mesh::CellFace();
         //Vertices
         vfc = chi_mesh::Vertex(0.0,0.0,0.0);
-        newFace.vertex_ids.reserve(template_cell->v_indices.size());
-        for (int tv=0; tv<template_cell->v_indices.size(); tv++)
+        newFace.vertex_ids.reserve(template_cell->vertex_ids.size());
+        for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
         {
-          newFace.vertex_ids.push_back(template_cell->v_indices[tv]
+          newFace.vertex_ids.push_back(template_cell->vertex_ids[tv]
                                        + (iz+1)*node_z_index_incr);
           chi_mesh::Vertex v = *vol_continuum->nodes[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }
 
         //Compute centroid
-        vfc = vfc/template_cell->v_indices.size();
+        vfc = vfc/template_cell->vertex_ids.size();
         newFace.centroid = vfc;
 
         //Compute normal

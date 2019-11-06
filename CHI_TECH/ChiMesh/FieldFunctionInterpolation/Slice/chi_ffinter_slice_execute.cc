@@ -1,8 +1,8 @@
 #include "chi_ffinter_slice.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
-
-#include "../../VolumeMesher/chi_volumemesher.h"
+//#include "ChiMesh/Cell/cell_polygonv2.h"
+//#include "ChiMesh/Cell/cell_polyhedronv2.h"
+//
+//#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
 //###################################################################
 /**Executes the slice interpolation.*/

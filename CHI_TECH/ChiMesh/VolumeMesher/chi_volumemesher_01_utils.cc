@@ -53,134 +53,10 @@ CreateTriangleCells(chi_mesh::SurfaceMesh *surface_mesh,
 
 }
 
-
-
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
 CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                   chi_mesh::MeshContinuum *vol_continuum)
-{
-  //============================================= Get current mesh handler
-  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
-
-  //============================================= Copy nodes
-  std::vector<chi_mesh::Vertex>::iterator vertex;
-  for (vertex = surface_mesh->vertices.begin();
-       vertex != surface_mesh->vertices.end();
-       vertex++)
-  {
-    chi_mesh::Node* node = new chi_mesh::Node;
-    *node = (*vertex.base());
-
-    vol_continuum->nodes.push_back(node);
-  }
-
-  //============================================= Process faces
-  std::vector<chi_mesh::Face>::iterator face;
-  for (face = surface_mesh->faces.begin();
-       face != surface_mesh->faces.end();
-       face++)
-  {
-    chi_mesh::CellPolygon* cell = new chi_mesh::CellPolygon;
-
-    for (int k=0;k<3;k++)
-    {
-      cell->v_indices.push_back(face->v_index[k]);
-
-      int* edge_indices = new int[5];
-
-      edge_indices[0]=face->e_index[k][0];
-      edge_indices[1]=face->e_index[k][1];
-      edge_indices[2]=face->e_index[k][2];
-      edge_indices[3]=face->e_index[k][3];
-
-      //auto adj_cell = vol_continuum->item_id[edge_indices[2]];
-      //edge_indices[4] = GetCellXYPartitionID(adj_cell);
-      //printf("Miff\n");
-      //chi_mesh::Vertex v0 = *vol_continuum->nodes[edge_indices[0]];
-      //chi_mesh::Vertex v1 = *vol_continuum->nodes[edge_indices[1]];
-      chi_mesh::Vertex v0 = surface_mesh->vertices[edge_indices[0]];
-      chi_mesh::Vertex v1 = surface_mesh->vertices[edge_indices[1]];
-      chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
-
-      chi_mesh::Vector va = v1-v0;
-      chi_mesh::Vector vn = va.Cross(vk);
-      vn = vn/vn.Norm();
-      cell->edgenormals.push_back(vn);
-
-      cell->edges.push_back(edge_indices);
-
-
-      cell->centroid = cell->centroid +
-                       surface_mesh->vertices[face->v_index[k]];
-    }
-    cell->centroid = cell->centroid/3;
-
-    //====================================== Compute xy partition id
-    cell->xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = cell->xy_partition_indices.second*
-                            handler->surface_mesher->partitioning_x +
-                            cell->xy_partition_indices.first;
-
-    cell->cell_global_id = vol_continuum->cells.size();
-
-    vol_continuum->cells.push_back(cell);
-  }
-  for (int f=0; f<surface_mesh->poly_faces.size(); f++)
-  {
-    chi_mesh::PolyFace* face = surface_mesh->poly_faces[f];
-
-    chi_mesh::CellPolygon* cell = new chi_mesh::CellPolygon;
-
-    //====================================== Copy vertices
-    for (int v=0; v<face->v_indices.size();v++)
-    {
-      cell->v_indices.push_back(face->v_indices[v]);
-      cell->centroid = cell->centroid +
-                      surface_mesh->vertices[face->v_indices[v]];
-    }
-    cell->centroid = cell->centroid/cell->v_indices.size();
-
-    //====================================== Compute partition id
-    cell->xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = cell->xy_partition_indices.second*
-                            handler->surface_mesher->partitioning_x +
-                            cell->xy_partition_indices.first;
-
-    //====================================== Copy edges
-    for (int e=0; e<face->edges.size(); e++)
-    {
-      int* src_side = face->edges[e];
-      int* des_side = new int[5];
-
-      for (int k=0;k<4;k++)
-      {
-        des_side[k] = src_side[k];
-      }
-
-      chi_mesh::Vertex v0 = surface_mesh->vertices[des_side[0]];
-      chi_mesh::Vertex v1 = surface_mesh->vertices[des_side[1]];
-      chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
-
-      chi_mesh::Vector va = v1-v0;
-      chi_mesh::Vector vn = va.Cross(vk);
-      vn = vn/vn.Norm();
-      cell->edgenormals.push_back(vn);
-
-      cell->edges.push_back(des_side);
-    }
-
-    cell->cell_global_id = vol_continuum->cells.size();
-
-    vol_continuum->cells.push_back(cell);
-  }
-}
-
-//###################################################################
-/**Creates 2D polygon cells for each face of a surface mesh.*/
-void chi_mesh::VolumeMesher::
-CreatePolygonCells2(chi_mesh::SurfaceMesh *surface_mesh,
                    chi_mesh::MeshContinuum *vol_continuum)
 {
   //============================================= Get current mesh handler
@@ -288,6 +164,128 @@ CreatePolygonCells2(chi_mesh::SurfaceMesh *surface_mesh,
       new_face.neighbor = src_side[2];
 
       cell->faces.push_back(new_face);
+    }
+
+    cell->cell_global_id = vol_continuum->cells.size();
+
+    vol_continuum->cells.push_back(cell);
+  }
+}
+
+//###################################################################
+/**Creates 2D polygon cells for each face of a surface mesh.*/
+void chi_mesh::VolumeMesher::
+CreatePolygonCellsOld(chi_mesh::SurfaceMesh *surface_mesh,
+                      chi_mesh::MeshContinuum *vol_continuum)
+{
+  //============================================= Get current mesh handler
+  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+
+  //============================================= Copy nodes
+  std::vector<chi_mesh::Vertex>::iterator vertex;
+  for (vertex = surface_mesh->vertices.begin();
+       vertex != surface_mesh->vertices.end();
+       vertex++)
+  {
+    chi_mesh::Node* node = new chi_mesh::Node;
+    *node = (*vertex.base());
+
+    vol_continuum->nodes.push_back(node);
+  }
+
+  //============================================= Process faces
+  std::vector<chi_mesh::Face>::iterator face;
+  for (face = surface_mesh->faces.begin();
+       face != surface_mesh->faces.end();
+       face++)
+  {
+    chi_mesh::CellPolygon* cell = new chi_mesh::CellPolygon;
+
+    for (int k=0;k<3;k++)
+    {
+      cell->v_indices.push_back(face->v_index[k]);
+
+      int* edge_indices = new int[5];
+
+      edge_indices[0]=face->e_index[k][0];
+      edge_indices[1]=face->e_index[k][1];
+      edge_indices[2]=face->e_index[k][2];
+      edge_indices[3]=face->e_index[k][3];
+
+      //auto adj_cell = vol_continuum->item_id[edge_indices[2]];
+      //edge_indices[4] = GetCellXYPartitionID(adj_cell);
+      //printf("Miff\n");
+      //chi_mesh::Vertex v0 = *vol_continuum->nodes[edge_indices[0]];
+      //chi_mesh::Vertex v1 = *vol_continuum->nodes[edge_indices[1]];
+      chi_mesh::Vertex v0 = surface_mesh->vertices[edge_indices[0]];
+      chi_mesh::Vertex v1 = surface_mesh->vertices[edge_indices[1]];
+      chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
+
+      chi_mesh::Vector va = v1-v0;
+      chi_mesh::Vector vn = va.Cross(vk);
+      vn = vn/vn.Norm();
+      cell->edgenormals.push_back(vn);
+
+      cell->edges.push_back(edge_indices);
+
+
+      cell->centroid = cell->centroid +
+                       surface_mesh->vertices[face->v_index[k]];
+    }
+    cell->centroid = cell->centroid/3;
+
+    //====================================== Compute xy partition id
+    cell->xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = cell->xy_partition_indices.second*
+                         handler->surface_mesher->partitioning_x +
+                         cell->xy_partition_indices.first;
+
+    cell->cell_global_id = vol_continuum->cells.size();
+
+    vol_continuum->cells.push_back(cell);
+  }
+  for (int f=0; f<surface_mesh->poly_faces.size(); f++)
+  {
+    chi_mesh::PolyFace* face = surface_mesh->poly_faces[f];
+
+    chi_mesh::CellPolygon* cell = new chi_mesh::CellPolygon;
+
+    //====================================== Copy vertices
+    for (int v=0; v<face->v_indices.size();v++)
+    {
+      cell->v_indices.push_back(face->v_indices[v]);
+      cell->centroid = cell->centroid +
+                       surface_mesh->vertices[face->v_indices[v]];
+    }
+    cell->centroid = cell->centroid/cell->v_indices.size();
+
+    //====================================== Compute partition id
+    cell->xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = cell->xy_partition_indices.second*
+                         handler->surface_mesher->partitioning_x +
+                         cell->xy_partition_indices.first;
+
+    //====================================== Copy edges
+    for (int e=0; e<face->edges.size(); e++)
+    {
+      int* src_side = face->edges[e];
+      int* des_side = new int[5];
+
+      for (int k=0;k<4;k++)
+      {
+        des_side[k] = src_side[k];
+      }
+
+      chi_mesh::Vertex v0 = surface_mesh->vertices[des_side[0]];
+      chi_mesh::Vertex v1 = surface_mesh->vertices[des_side[1]];
+      chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
+
+      chi_mesh::Vector va = v1-v0;
+      chi_mesh::Vector vn = va.Cross(vk);
+      vn = vn/vn.Norm();
+      cell->edgenormals.push_back(vn);
+
+      cell->edges.push_back(des_side);
     }
 
     cell->cell_global_id = vol_continuum->cells.size();

@@ -3,10 +3,9 @@
 
 #include "../pwl.h"
 #include <vector>
-#include "../../../Quadratures/quadrature.h"
-#include "../../../../ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMath/Quadratures/quadrature.h"
 #include "ChiMesh/Cell/cell_polyhedronv2.h"
-#include "../../../../ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #define ON_SURFACE true
 
@@ -66,13 +65,6 @@ struct FEnodeMap
 // side s
 // node_maps[n]->face_map[f]->side_map[s]
 
-
-/**FaceDOFmapping*/
-//struct FEFaceDOFMapping
-//{
-//  std::vector<int> cell_dof;
-//};
-
 //###################################################################
 /**Object for handling piecewise linear
  * shape functions on polyhedron shaped 3D cells.
@@ -110,9 +102,6 @@ private:
 
 
 public:
-  PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
-                   chi_mesh::MeshContinuum* vol_continuum,
-                   SpatialDiscretization_PWL* discretization= nullptr);
   PolyhedronFEView(chi_mesh::CellPolyhedronV2* polyh_cell,
                    chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization= nullptr);

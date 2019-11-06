@@ -1,8 +1,8 @@
 #include "chi_ffinter_line.h"
 
-#include "../../Cell/cell_slab.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell_slabv2.h"
+#include "ChiMesh/Cell/cell_polygonv2.h"
+#include "ChiMesh/Cell/cell_polyhedronv2.h"
 
 #include <chi_log.h>
 
@@ -71,110 +71,70 @@ Initialize()
         int cell_glob_index = grid_view->local_cell_glob_indices[ic];
         auto cell = grid_view->cells[cell_glob_index];
 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
         {
-          chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
+          auto cell_base = (chi_mesh::CellBase*)cell;
 
-
-
-          for (int p=0; p<number_of_points; p++)
+          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+          if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
           {
-            //Assume each point is inside the cell, now try to disprove it
-            bool is_inside = true;
-            int v0_i = slab_cell->v_indices[0];
-            int v1_i = slab_cell->v_indices[1];
+            auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-            chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-            chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
-
-            chi_mesh::Vector v01 = v1 - v0;
-            chi_mesh::Vector v0p = interpolation_points[p]-v0;
-
-            double norm = v0p.Norm();
-            double projection = v01.Dot(v0p)/v01.Norm();
-
-            if ((v0p.Dot(v01)<0.0) or (projection>v01.Norm()))
+            for (int p=0; p<number_of_points; p++)
             {
-              is_inside = false;
-            }
-
-            if (is_inside)
-            {
-              interpolation_points_ass_cell[p] = cell_glob_index;
-              chi_log.Log(LOG_ALLVERBOSE_2)
-                << "Cell inter section found  " << p;
-            }
-
-          }//for each point
-        }//if slab
-
-          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        else if (cell->Type() == chi_mesh::CellType::POLYGON)
-        {
-          chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
-
-          size_t num_edges = poly_cell->edges.size();
-
-          for (int p=0; p<number_of_points; p++)
-          {
-            //Assume each point is inside the cell, now try to disprove it
-            bool is_inside = true;
-            //Form a plane for each edge
-            for (int e=0; e<num_edges; e++)
-            {
-              chi_mesh::Vector nref(0.0,0.0,1.0);
-              int v0_i = poly_cell->edges[e][0];
-              int v1_i = poly_cell->edges[e][1];
+              //Assume each point is inside the cell, now try to disprove it
+              bool is_inside = true;
+              int v0_i = slab_cell->vertex_ids[0];
+              int v1_i = slab_cell->vertex_ids[1];
 
               chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
               chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
 
               chi_mesh::Vector v01 = v1 - v0;
-              chi_mesh::Vector   n = v01.Cross(nref);
-              n = n/n.Norm();
-
               chi_mesh::Vector v0p = interpolation_points[p]-v0;
-              v0p=v0p/v0p.Norm();
 
-              if (n.Dot(v0p)>0.0)
+              double norm = v0p.Norm();
+              double projection = v01.Dot(v0p)/v01.Norm();
+
+              if ((v0p.Dot(v01)<0.0) or (projection>v01.Norm()))
               {
                 is_inside = false;
-                break;
               }
-            }//for edge
 
-            if (is_inside)
-            {
-              interpolation_points_ass_cell[p] = cell_glob_index;
-              chi_log.Log(LOG_ALLVERBOSE_2)
-                << "Cell inter section found  " << p;
-            }
+              if (is_inside)
+              {
+                interpolation_points_ass_cell[p] = cell_glob_index;
+                chi_log.Log(LOG_ALLVERBOSE_2)
+                  << "Cell inter section found  " << p;
+              }
 
-          }//for each point
-        }//if polygon cell
+            }//for each point
+          }//if slab
 
-          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-        {
-          chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-
-          size_t num_faces = polyh_cell->faces.size();
-
-          for (int p=0; p<number_of_points; p++)
+          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+          else if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
           {
-            //Assume each point is inside the cell, now try to disprove it
-            bool is_inside = true;
-            for (int f=0; f<num_faces; f++)
+            auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
+
+            size_t num_edges = poly_cell->faces.size();
+
+            for (int p=0; p<number_of_points; p++)
             {
-              size_t num_edges = polyh_cell->faces[f]->edges.size();
-              //Form a plane for each side
+              //Assume each point is inside the cell, now try to disprove it
+              bool is_inside = true;
+              //Form a plane for each edge
               for (int e=0; e<num_edges; e++)
               {
-                int v0_i = polyh_cell->faces[f]->edges[e][0];
+                chi_mesh::Vector nref(0.0,0.0,1.0);
+                int v0_i = poly_cell->faces[e].vertex_ids[0];
+                int v1_i = poly_cell->faces[e].vertex_ids[1];
 
                 chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-                chi_mesh::Vector n  = polyh_cell->faces[f]->geometric_normal;
+                chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
+
+                chi_mesh::Vector v01 = v1 - v0;
+                chi_mesh::Vector   n = v01.Cross(nref);
+                n = n/n.Norm();
 
                 chi_mesh::Vector v0p = interpolation_points[p]-v0;
                 v0p=v0p/v0p.Norm();
@@ -184,20 +144,66 @@ Initialize()
                   is_inside = false;
                   break;
                 }
-              }//for e
-              if (!is_inside) break;
-            }//for f
+              }//for edge
 
-            if (is_inside)
+              if (is_inside)
+              {
+                interpolation_points_ass_cell[p] = cell_glob_index;
+                chi_log.Log(LOG_ALLVERBOSE_2)
+                  << "Cell inter section found  " << p;
+              }
+
+            }//for each point
+          }//if polygon cell
+
+          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+          else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+          {
+            auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+
+            size_t num_faces = polyh_cell->faces.size();
+
+            for (int p=0; p<number_of_points; p++)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
-              chi_log.Log(LOG_ALLVERBOSE_2)
-                << "Cell inter section found  " << p;
-            }
+              //Assume each point is inside the cell, now try to disprove it
+              bool is_inside = true;
+              for (int f=0; f<num_faces; f++)
+              {
+                std::vector<std::vector<int>> edges = polyh_cell->GetFaceEdges(f);
+                size_t num_edges = edges.size();
+                //Form a plane for each side
+                for (int e=0; e<num_edges; e++)
+                {
+                  int v0_i = edges[e][0];
 
-          }//for each point
+                  chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
+                  chi_mesh::Vector n  = polyh_cell->faces[f].normal;
 
-        }//if polyh
+                  chi_mesh::Vector v0p = interpolation_points[p]-v0;
+                  v0p=v0p/v0p.Norm();
+
+                  if (n.Dot(v0p)>0.0)
+                  {
+                    is_inside = false;
+                    break;
+                  }
+                }//for e
+                if (!is_inside) break;
+              }//for f
+
+              if (is_inside)
+              {
+                interpolation_points_ass_cell[p] = cell_glob_index;
+                chi_log.Log(LOG_ALLVERBOSE_2)
+                  << "Cell inter section found  " << p;
+              }
+
+            }//for each point
+
+          }//if polyhedron
+        }//new cell base
+
+
       }//for local cell
 
       //================================================== Upload node indices that
@@ -209,47 +215,54 @@ Initialize()
         int cell_glob_index = interpolation_points_ass_cell[c];
         auto cell = grid_view->cells[cell_glob_index];
 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
         {
-          chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
+          auto cell_base = (chi_mesh::CellBase*)cell;
 
-          for (int i=0; i<2; i++)
+          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+          if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
           {
-            cfem_local_nodes_needed_unmapped.push_back(slab_cell->v_indices[i]);
-            pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-          }
+            auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-        }//if poly
+            for (int i=0; i<2; i++)
+            {
+              cfem_local_nodes_needed_unmapped.push_back(slab_cell->vertex_ids[i]);
+              pwld_local_nodes_needed_unmapped.push_back(i);
+              pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            }
 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        if (cell->Type() == chi_mesh::CellType::POLYGON)
-        {
-          chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
+          }//if poly
 
-          for (int i=0; i<poly_cell->v_indices.size(); i++)
+          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+          if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
           {
-            cfem_local_nodes_needed_unmapped.push_back(poly_cell->v_indices[i]);
-            pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-          }
+            auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
 
-        }//if poly
+            for (int i=0; i<poly_cell->vertex_ids.size(); i++)
+            {
+              cfem_local_nodes_needed_unmapped.push_back(poly_cell->vertex_ids[i]);
+              pwld_local_nodes_needed_unmapped.push_back(i);
+              pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            }
 
-          //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-        {
-          chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+          }//if poly
 
-          for (int i=0; i<polyh_cell->v_indices.size(); i++)
+            //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+          else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
           {
-            cfem_local_nodes_needed_unmapped.push_back(polyh_cell->v_indices[i]);
-            pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-          }
+            auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
 
-        }//if polyh
+            for (int i=0; i<polyh_cell->vertex_ids.size(); i++)
+            {
+              cfem_local_nodes_needed_unmapped.push_back(polyh_cell->vertex_ids[i]);
+              pwld_local_nodes_needed_unmapped.push_back(i);
+              pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            }
+
+          }//if polyh
+        }//new cell base
+
+
       }//for associated cells
     }//if unique grid
 

@@ -128,8 +128,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Creating template cells"
           << std::endl;
-        this->CreatePolygonCells(ref_continuum->surface_mesh,
-                                 temp_continuum);
+        CreatePolygonCells(ref_continuum->surface_mesh, temp_continuum);
 
 
         //================================== Connect template Boundaries
@@ -169,9 +168,10 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         }
         //================================== Create extruded item_id
         chi_log.Log(LOG_0)
-          << "VolumeMesherExtruder: Extruding cells"
-          << std::endl;
+          << "VolumeMesherExtruder: Extruding cells" << std::endl;
+
         ExtrudeCells(temp_continuum, vol_continuum);
+
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
           << vol_continuum->cells.size()

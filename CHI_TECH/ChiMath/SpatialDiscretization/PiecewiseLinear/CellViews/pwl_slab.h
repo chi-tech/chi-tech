@@ -3,7 +3,6 @@
 
 #include "../pwl.h"
 #include <vector>
-#include <ChiMesh/Cell/cell_slab.h>
 #include <ChiMesh/Cell/cell_slabv2.h>
 
 //###################################################################
@@ -19,105 +18,6 @@ public:
 public:
 
   /**Constructor for a slab view.*/
-  SlabFEView(chi_mesh::CellSlab *slab_cell,
-                         chi_mesh::MeshContinuum *vol_continuum) :
-                         CellFEView(2)
-  {
-    grid = vol_continuum;
-    v0i = slab_cell->v_indices[0];
-    v1i = slab_cell->v_indices[1];
-    chi_mesh::Vertex v0 = *grid->nodes[v0i];
-    chi_mesh::Vertex v1 = *grid->nodes[v1i];
-
-    chi_mesh::Vector v01 = v1-v0;
-    h = v01.Norm();
-
-    IntV_shapeI.push_back(h/2);
-    IntV_shapeI.push_back(h/2);
-
-    IntV_shapeI_shapeJ.emplace_back(2, 0.0);
-    IntV_shapeI_shapeJ.emplace_back(2, 0.0);
-
-    IntV_shapeI_shapeJ[0][0] = h/3;
-    IntV_shapeI_shapeJ[0][1] = h/6;
-    IntV_shapeI_shapeJ[1][0] = h/6;
-    IntV_shapeI_shapeJ[1][1] = h/3;
-
-    IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
-    IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
-
-    IntV_gradShapeI_gradShapeJ[0][0] = 1/h;
-    IntV_gradShapeI_gradShapeJ[0][1] = -1/h;
-    IntV_gradShapeI_gradShapeJ[1][0] = -1/h;
-    IntV_gradShapeI_gradShapeJ[1][1] = 1/h;
-
-//    IntV_shapeI_gradshapeJ.push_back(new double[2]);
-//    IntV_shapeI_gradshapeJ.push_back(new double[2]);
-
-    IntV_shapeI_gradshapeJ.resize(2);
-    IntV_shapeI_gradshapeJ[0].resize(2);
-    IntV_shapeI_gradshapeJ[1].resize(2);
-
-    IntV_shapeI_gradshapeJ[0][0] = chi_mesh::Vector(0.0,0.0,-1/2.0);
-    IntV_shapeI_gradshapeJ[0][1] = chi_mesh::Vector(0.0,0.0, 1/2.0);
-    IntV_shapeI_gradshapeJ[1][0] = chi_mesh::Vector(0.0,0.0,-1/2.0);
-    IntV_shapeI_gradshapeJ[1][1] = chi_mesh::Vector(0.0,0.0, 1/2.0);
-
-    IntS_shapeI.emplace_back(2, 0.0);
-    IntS_shapeI.emplace_back(2, 0.0);
-
-    IntS_shapeI[0][0] = 1.0;
-    IntS_shapeI[0][1] = 0.0;
-    IntS_shapeI[1][0] = 0.0;
-    IntS_shapeI[1][1] = 1.0;
-
-    typedef std::vector<double> VecDbl;
-    typedef std::vector<VecDbl> VecVecDbl;
-    IntS_shapeI_shapeJ.resize(2, VecVecDbl(2, VecDbl(2, 0.0)));
-    IntS_shapeI_shapeJ.resize(2, VecVecDbl(2, VecDbl(2, 0.0)));
-
-    //Left face
-    IntS_shapeI_shapeJ[0][0][0] =  1.0;
-    IntS_shapeI_shapeJ[0][0][1] =  0.0;
-    IntS_shapeI_shapeJ[0][1][0] =  0.0;
-    IntS_shapeI_shapeJ[0][1][1] =  1.0;
-
-    //Right face
-    IntS_shapeI_shapeJ[1][0][0] =  1.0;
-    IntS_shapeI_shapeJ[1][0][1] =  0.0;
-    IntS_shapeI_shapeJ[1][1][0] =  0.0;
-    IntS_shapeI_shapeJ[1][1][1] =  1.0;
-
-
-    IntS_shapeI_gradshapeJ.resize(2);
-    IntS_shapeI_gradshapeJ[0].resize(2);
-    IntS_shapeI_gradshapeJ[1].resize(2);
-
-    //Left face
-    IntS_shapeI_gradshapeJ[0][0].resize(2);
-    IntS_shapeI_gradshapeJ[0][1].resize(2);
-
-    //Right face
-    IntS_shapeI_gradshapeJ[1][0].resize(2);
-    IntS_shapeI_gradshapeJ[1][1].resize(2);
-
-    //Left face
-    IntS_shapeI_gradshapeJ[0][0][0] = chi_mesh::Vector(0.0,0.0,-1.0/h);
-    IntS_shapeI_gradshapeJ[0][0][1] = chi_mesh::Vector(0.0,0.0, 1.0/h);
-    IntS_shapeI_gradshapeJ[0][1][0] = chi_mesh::Vector(0.0,0.0, 0.0  );
-    IntS_shapeI_gradshapeJ[0][1][1] = chi_mesh::Vector(0.0,0.0, 0.0  );
-
-    //Right face
-    IntS_shapeI_gradshapeJ[1][0][0] = chi_mesh::Vector(0.0,0.0, 0.0  );
-    IntS_shapeI_gradshapeJ[1][0][1] = chi_mesh::Vector(0.0,0.0, 0.0  );
-    IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector(0.0,0.0,-1.0/h);
-    IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector(0.0,0.0, 1.0/h);
-
-    face_dof_mappings.emplace_back(1,0);
-    face_dof_mappings.emplace_back(1,1);
-
-  }
-
   SlabFEView(chi_mesh::CellSlabV2 *slab_cell,
              chi_mesh::MeshContinuum *vol_continuum) :
     CellFEView(2)

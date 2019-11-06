@@ -1,11 +1,5 @@
 #include "chi_ffinter_volume.h"
-#include "../../Cell/cell_slab.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
-#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
-#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
 
 #include <chi_mpi.h>
 
@@ -68,103 +62,6 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
 
     if (inside_logvolume)
     {
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (cell->Type() == chi_mesh::CellType::SLAB)
-      {
-        chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-        SlabFEView* cell_fe_view =
-          (SlabFEView*)discretization->MapFeView(cell_glob_index);
-
-        for (int i=0; i<2; i++)
-        {
-          double value = 0.0;
-          int ir = -1;
-
-          counter++;
-          ir = mapping[counter];
-          VecGetValues(field,1,&ir,&value);
-
-          op_value += value*cell_fe_view->IntV_shapeI[i];
-          total_volume += cell_fe_view->IntV_shapeI[i];
-
-          if (!max_set)
-          {
-            max_value = value;
-            max_set = true;
-          }
-          else
-          {
-            if (value > max_value)
-              max_value = value;
-          }
-
-        }//for dof
-      }//if slab
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
-      {
-        chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
-        PolygonFEView* cell_fe_view =
-          (PolygonFEView*)discretization->MapFeView(cell_glob_index);
-
-        for (int i=0; i<poly_cell->v_indices.size(); i++)
-        {
-          double value = 0.0;
-          int ir = -1;
-
-          counter++;
-          ir = mapping[counter];
-          VecGetValues(field,1,&ir,&value);
-
-          op_value += value*cell_fe_view->IntV_shapeI[i];
-          total_volume += cell_fe_view->IntV_shapeI[i];
-
-          if (!max_set)
-          {
-            max_value = value;
-            max_set = true;
-          }
-          else
-          {
-            if (value > max_value)
-              max_value = value;
-          }
-        }//for dof
-      }//if polygon
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-      {
-        chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-        PolyhedronFEView* cell_fe_view =
-          (PolyhedronFEView*)discretization->MapFeView(cell_glob_index);
-
-        for (int i=0; i<polyh_cell->v_indices.size(); i++)
-        {
-          double value = 0.0;
-          int ir = -1;
-
-          counter++;
-          ir = mapping[counter];
-          VecGetValues(field,1,&ir,&value);
-
-          op_value += value*cell_fe_view->IntV_shapeI[i];
-          total_volume += cell_fe_view->IntV_shapeI[i];
-
-          if (!max_set)
-          {
-            max_value = value;
-            max_set = true;
-          }
-          else
-          {
-            if (value > max_value)
-              max_value = value;
-          }
-        }//for dof
-      }//if Polyhedron
-
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
       if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
@@ -194,7 +91,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
               max_value = value;
           }
         }//for dof
-      }//if Polyhedron
+      }//new cell base
     }//if inside logicalVol
 
   }//for local cell
@@ -242,100 +139,6 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 
     if (inside_logvolume)
     {
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (cell->Type() == chi_mesh::CellType::SLAB)
-      {
-        chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-        SlabFEView* cell_fe_view =
-          (SlabFEView*)discretization->MapFeView(cell_glob_index);
-
-        for (int i=0; i<2; i++)
-        {
-          double value = 0.0;
-          int ir = -1;
-
-          counter++;
-          ir = mapping[counter];
-          value = field[ir];
-
-          op_value += value*cell_fe_view->IntV_shapeI[i];
-          total_volume += cell_fe_view->IntV_shapeI[i];
-
-          if (!max_set)
-          {
-            max_value = value;
-            max_set = true;
-          }
-          else
-          {
-            if (value > max_value)
-              max_value = value;
-          }
-        }//for dof
-      }//if slab
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
-      {
-        chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
-        PolygonFEView* cell_fe_view =
-          (PolygonFEView*)discretization->MapFeView(cell_glob_index);
-
-        for (int i=0; i<poly_cell->v_indices.size(); i++)
-        {
-          double value = 0.0;
-          int ir = -1;
-
-          counter++;
-          ir = mapping[counter];
-          value = field[ir];
-
-          op_value += value*cell_fe_view->IntV_shapeI[i];
-          total_volume += cell_fe_view->IntV_shapeI[i];
-
-          if (!max_set)
-          {
-            max_value = value;
-            max_set = true;
-          }
-          else
-          {
-            if (value > max_value)
-              max_value = value;
-          }
-        }//for dof
-      }//if Polygon
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-      {
-        chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-        PolyhedronFEView* cell_fe_view =
-          (PolyhedronFEView*)discretization->MapFeView(cell_glob_index);
-
-        for (int i=0; i<polyh_cell->v_indices.size(); i++)
-        {
-          double value = 0.0;
-          int ir = -1;
-
-          counter++;
-          ir = mapping[counter];
-          value = field[ir];
-
-          op_value += value*cell_fe_view->IntV_shapeI[i];
-          total_volume += cell_fe_view->IntV_shapeI[i];
-
-          if (!max_set)
-          {
-            max_value = value;
-            max_set = true;
-          }
-          else
-          {
-            if (value > max_value)
-              max_value = value;
-          }
-        }//for dof
-      }//if Polyhedron
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CELL_NEWBASE
       if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
         auto cell_base = (chi_mesh::CellBase*)cell;
@@ -364,7 +167,7 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
               max_value = value;
           }
         }//for dof
-      }//if Polyhedron
+      }//new cell base
     }//if inside logicalVol
 
   }//for local cell

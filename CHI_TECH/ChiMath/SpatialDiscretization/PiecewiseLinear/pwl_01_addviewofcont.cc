@@ -1,8 +1,6 @@
 #include "pwl.h"
 
-#include "../../../ChiMesh/Cell/cell_triangle.h"
 #include "CellViews/pwl_slab.h"
-#include "CellViews/pwl_triangle.h"
 #include "CellViews/pwl_polygon.h"
 #include "CellViews/pwl_polyhedron.h"
 #include<typeinfo>
@@ -46,53 +44,9 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
 
     if (cell_fe_views_mapping[cell_index]<0)
     {
-      //========================================= If slab item_id
-      if (cell->Type() == chi_mesh::CellType::SLAB)
-      {
-        SlabFEView* view =
-          new SlabFEView((chi_mesh::CellSlab*)cell,vol_continuum);
 
-        this->cell_fe_views.push_back(view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-      }
-
-      //========================================= If triangle item_id
-      else if (typeid(*(cell)) == typeid(chi_mesh::CellTriangle) )
-      {
-        TriangleFEView* view =
-          new TriangleFEView((chi_mesh::CellTriangle*)(cell),vol_continuum);
-
-        this->cell_fe_views.push_back(view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-      }
-
-      //========================================= If polygon item_id
-      else if (cell->Type() == chi_mesh::CellType::POLYGON)
-      {
-        PolygonFEView* view =
-          new PolygonFEView((chi_mesh::CellPolygon*)(cell),vol_continuum,this);
-
-        view->PreCompute();
-        this->cell_fe_views.push_back(view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-      }
-
-      //========================================= If polyhedron item_id
-      else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-      {
-        PolyhedronFEView* view =
-          new PolyhedronFEView(
-            (chi_mesh::CellPolyhedron*)(cell),
-            vol_continuum,
-            this);
-
-        view->PreCompute();
-        view->CleanUp();
-        this->cell_fe_views.push_back(view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-      }
-        //========================================= If new_base
-      else if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      //========================================= If new_base
+      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
         auto cell_base = dynamic_cast<chi_mesh::CellBase*>(cell);
 

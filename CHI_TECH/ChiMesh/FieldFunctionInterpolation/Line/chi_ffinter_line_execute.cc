@@ -1,7 +1,7 @@
 #include "chi_ffinter_line.h"
-#include "../../Cell/cell_slab.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell_slabv2.h"
+#include "ChiMesh/Cell/cell_polygonv2.h"
+#include "ChiMesh/Cell/cell_polyhedronv2.h"
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
@@ -98,90 +98,96 @@ CFEMInterpolate(Vec field,
     int cell_glob_index = ff_ctx->interpolation_points_ass_cell[c];
     auto cell = grid_view->cells[cell_glob_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-      SlabFEView*      cell_fe_view =
-        (SlabFEView*)spatial_dm->MapFeView(cell_glob_index);
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      double weighted_value = 0.0;
-      for (int i=0; i<2; i++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        double node_value=0.0;
-        counter++;
-        int ir = mapping[counter];
-        VecGetValues(field,1,&ir,&node_value);
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
+        SlabFEView*      cell_fe_view =
+          (SlabFEView*)spatial_dm->MapFeView(cell_glob_index);
 
-        double weight=0.0;
-        //Here I use c in interpolation_points because the vector should
-        //be one-to-one with it.
-        weight = cell_fe_view->Shape_x(i, interpolation_points[c]);
+        double weighted_value = 0.0;
+        for (int i=0; i<2; i++)
+        {
+          double node_value=0.0;
+          counter++;
+          int ir = mapping[counter];
+          VecGetValues(field,1,&ir,&node_value);
 
-        node_value *= weight;
+          double weight=0.0;
+          //Here I use c in interpolation_points because the vector should
+          //be one-to-one with it.
+          weight = cell_fe_view->Shape_x(i, interpolation_points[c]);
 
-        weighted_value += node_value;
+          node_value *= weight;
+
+          weighted_value += node_value;
+        }
+
+        ff_ctx->interpolation_points_values[c] = weighted_value;
       }
-
-      ff_ctx->interpolation_points_values[c] = weighted_value;
-    }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
-      PolygonFEView*      cell_fe_view =
-        (PolygonFEView*)spatial_dm->MapFeView(cell_glob_index);
-
-      double weighted_value = 0.0;
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
+      else if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
       {
-        double node_value=0.0;
-        counter++;
-        int ir = mapping[counter];
-        VecGetValues(field,1,&ir,&node_value);
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
+        PolygonFEView*      cell_fe_view =
+          (PolygonFEView*)spatial_dm->MapFeView(cell_glob_index);
 
-        double weight=0.0;
-        //Here I use c in interpolation_points because the vector should
-        //be one-to-one with it.
-        weight = cell_fe_view->Shape_xy(i, interpolation_points[c]);
+        double weighted_value = 0.0;
+        for (int i=0; i<poly_cell->vertex_ids.size(); i++)
+        {
+          double node_value=0.0;
+          counter++;
+          int ir = mapping[counter];
+          VecGetValues(field,1,&ir,&node_value);
 
-        node_value *= weight;
+          double weight=0.0;
+          //Here I use c in interpolation_points because the vector should
+          //be one-to-one with it.
+          weight = cell_fe_view->Shape_xy(i, interpolation_points[c]);
 
-        weighted_value += node_value;
+          node_value *= weight;
+
+          weighted_value += node_value;
+        }
+
+        ff_ctx->interpolation_points_values[c] = weighted_value;
       }
 
-      ff_ctx->interpolation_points_values[c] = weighted_value;
-    }
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      PolyhedronFEView*       cell_fe_view =
-        (PolyhedronFEView*)spatial_dm->MapFeView(cell_glob_index);
-
-      double weighted_value = 0.0;
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
       {
-        double node_value=0.0;
-        counter++;
-        int ir = mapping[counter];
-        VecGetValues(field,1,&ir,&node_value);
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+        PolyhedronFEView*       cell_fe_view =
+          (PolyhedronFEView*)spatial_dm->MapFeView(cell_glob_index);
 
-        double weight=0.0;
-        //Here I use c in interpolation_points because the vector should
-        //be one-to-one with it.
-        weight = cell_fe_view->Shape_xyz(i, interpolation_points[c]);
+        double weighted_value = 0.0;
+        for (int i=0; i<polyh_cell->vertex_ids.size(); i++)
+        {
+          double node_value=0.0;
+          counter++;
+          int ir = mapping[counter];
+          VecGetValues(field,1,&ir,&node_value);
 
-        node_value *= weight;
+          double weight=0.0;
+          //Here I use c in interpolation_points because the vector should
+          //be one-to-one with it.
+          weight = cell_fe_view->Shape_xyz(i, interpolation_points[c]);
 
-        weighted_value += node_value;
-      }
+          node_value *= weight;
 
-      ff_ctx->interpolation_points_values[c] = weighted_value;
+          weighted_value += node_value;
+        }
 
-    }//if polyh
+        ff_ctx->interpolation_points_values[c] = weighted_value;
+
+      }//if polyhedron
+    }//new cell base
+
   }//for ass cell
 
 }
@@ -210,63 +216,68 @@ void chi_mesh::FieldFunctionInterpolationLine::
     int cell_glob_index = ff_ctx->interpolation_points_ass_cell[c];
     auto cell = grid_view->cells[cell_glob_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-      SlabFEView*      cell_fe_view =
-        (SlabFEView*)spatial_dm->MapFeView(cell_glob_index);
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      double weighted_value = 0.0;
-      for (int i=0; i<2; i++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        double node_value=0.0;
-        counter++;
-        int ir = mapping[counter];
-        node_value = field[ir];
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
+        SlabFEView*      cell_fe_view =
+          (SlabFEView*)spatial_dm->MapFeView(cell_glob_index);
 
-        double weight=0.0;
-        //Here I use c in interpolation_points because the vector should
-        //be one-to-one with it.
-        weight = cell_fe_view->Shape_x(i, interpolation_points[c]);
+        double weighted_value = 0.0;
+        for (int i=0; i<2; i++)
+        {
+          double node_value=0.0;
+          counter++;
+          int ir = mapping[counter];
+          node_value = field[ir];
 
-        node_value *= weight;
+          double weight=0.0;
+          //Here I use c in interpolation_points because the vector should
+          //be one-to-one with it.
+          weight = cell_fe_view->Shape_x(i, interpolation_points[c]);
 
-        weighted_value += node_value;
+          node_value *= weight;
+
+          weighted_value += node_value;
+        }
+
+        ff_ctx->interpolation_points_values[c] = weighted_value;
       }
 
-      ff_ctx->interpolation_points_values[c] = weighted_value;
-    }
 
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      PolyhedronFEView*       cell_fe_view =
-        (PolyhedronFEView*)spatial_dm->MapFeView(cell_glob_index);
-
-      double weighted_value = 0.0;
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
       {
-        double node_value=0.0;
-        counter++;
-        int ir = mapping[counter];
-        node_value = field[ir];
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+        PolyhedronFEView*       cell_fe_view =
+          (PolyhedronFEView*)spatial_dm->MapFeView(cell_glob_index);
 
-        double weight=0.0;
-        //Here I use c in interpolation_points because the vector should
-        //be one-to-one with it.
-        weight = cell_fe_view->Shape_xyz(i, interpolation_points[c]);
+        double weighted_value = 0.0;
+        for (int i=0; i<polyh_cell->vertex_ids.size(); i++)
+        {
+          double node_value=0.0;
+          counter++;
+          int ir = mapping[counter];
+          node_value = field[ir];
 
-        node_value *= weight;
+          double weight=0.0;
+          //Here I use c in interpolation_points because the vector should
+          //be one-to-one with it.
+          weight = cell_fe_view->Shape_xyz(i, interpolation_points[c]);
 
-        weighted_value += node_value;
-      }
+          node_value *= weight;
 
-      ff_ctx->interpolation_points_values[c] = weighted_value;
+          weighted_value += node_value;
+        }
 
-    }//if polyh
+        ff_ctx->interpolation_points_values[c] = weighted_value;
+
+      }//if polyh
+    }//new cell base
   }//for ass cell
 
 }

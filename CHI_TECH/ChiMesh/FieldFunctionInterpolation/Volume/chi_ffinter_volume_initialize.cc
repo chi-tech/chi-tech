@@ -1,8 +1,5 @@
 #include "chi_ffinter_volume.h"
-#include "../../Cell/cell_slab.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
-#include "../../Cell/cell_newbase.h"
+#include "ChiMesh/Cell/cell_newbase.h"
 
 
 #include <chi_log.h>
@@ -39,46 +36,6 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
 
     if (inside_logvolume)
     {
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Slab
-      if (cell->Type() == chi_mesh::CellType::SLAB)
-      {
-        chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-
-        for (int i=0; i<2; i++)
-        {
-          cfem_local_nodes_needed_unmapped.push_back(slab_cell->v_indices[i]);
-          pwld_local_nodes_needed_unmapped.push_back(i);
-          pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-        }//for dof
-      }
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
-      {
-        chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
-
-        for (int i=0; i<poly_cell->v_indices.size(); i++)
-        {
-          cfem_local_nodes_needed_unmapped.push_back(poly_cell->v_indices[i]);
-          pwld_local_nodes_needed_unmapped.push_back(i);
-          pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-        }//for dof
-      }
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-      {
-        chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-
-        for (int i=0; i<polyh_cell->v_indices.size(); i++)
-        {
-          cfem_local_nodes_needed_unmapped.push_back(polyh_cell->v_indices[i]);
-          pwld_local_nodes_needed_unmapped.push_back(i);
-          pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-        }//for dof
-      }//if Polyhedron
-
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEWBASE
       if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
       {
         auto cell_base = (chi_mesh::CellBase*)cell;

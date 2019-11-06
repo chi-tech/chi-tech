@@ -88,7 +88,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         //================================== Create cell for each face
         if (this->options.force_polygons)
         {
-          this->CreatePolygonCells2(ref_continuum->surface_mesh, vol_continuum);
+          this->CreatePolygonCells(ref_continuum->surface_mesh, vol_continuum);
         }
         else
         {

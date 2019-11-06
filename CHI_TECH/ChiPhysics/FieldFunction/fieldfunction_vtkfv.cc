@@ -1,8 +1,8 @@
 #include "fieldfunction.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 #include <ChiPhysics/chi_physics.h>
 
 #include <PiecewiseLinear/pwl.h>
@@ -69,7 +69,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
   phiavgarray = vtkDoubleArray::New();
   phiavgarray->SetName((field_name + std::string("-Avg")).c_str());
 
-  //========================================= Populate dones
+  //========================================= Populate nodes
   for (int v=0; v<grid->nodes.size(); v++)
   {
     std::vector<double> d_node;
@@ -99,82 +99,89 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->v_indices[0]);
-      cell_info.push_back(slab_cell->v_indices[1]);
-
-      ugrid->
-        InsertNextCell(VTK_LINE,2,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double phi_value = field_vector_local->operator[](mapping[lc]);
-      phiavgarray->InsertNextValue(phi_value);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-
-      std::vector<vtkIdType> cell_info;
-
-      int num_verts = poly_cell->v_indices.size();
-      for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->v_indices[v]);
-
-      ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      double phi_value = field_vector_local->operator[](mapping[lc]);
-      phiavgarray->InsertNextValue(phi_value);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-
-      int num_verts = polyh_cell->v_indices.size();
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->v_indices[v];
-
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
-
-      int num_faces = polyh_cell->faces.size();
-      for (int f=0; f<num_faces; f++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
-        std::vector<vtkIdType> face(num_fverts);
-        for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f]->v_indices[fv];
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-        faces->InsertNextCell(num_fverts,face.data());
-      }//for f
+        std::vector<vtkIdType> cell_info;
+        cell_info.push_back(slab_cell->vertex_ids[0]);
+        cell_info.push_back(slab_cell->vertex_ids[1]);
 
-      ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
+        ugrid->
+          InsertNextCell(VTK_LINE,2,
+                         cell_info.data());
 
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
 
-      double phi_value = field_vector_local->operator[](mapping[lc]);
-      phiavgarray->InsertNextValue(phi_value);
-    }//polyhedron
+        double phi_value = field_vector_local->operator[](mapping[lc]);
+        phiavgarray->InsertNextValue(phi_value);
+      }
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      {
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
+
+        std::vector<vtkIdType> cell_info;
+
+        int num_verts = poly_cell->vertex_ids.size();
+        for (int v=0; v<num_verts; v++)
+          cell_info.push_back(poly_cell->vertex_ids[v]);
+
+        ugrid->
+          InsertNextCell(VTK_POLYGON,num_verts,
+                         cell_info.data());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        double phi_value = field_vector_local->operator[](mapping[lc]);
+        phiavgarray->InsertNextValue(phi_value);
+      }
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+
+        int num_verts = polyh_cell->vertex_ids.size();
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
+          cell_info[v] = polyh_cell->vertex_ids[v];
+
+        vtkSmartPointer<vtkCellArray> faces =
+          vtkSmartPointer<vtkCellArray>::New();
+
+        int num_faces = polyh_cell->faces.size();
+        for (int f=0; f<num_faces; f++)
+        {
+          int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+          std::vector<vtkIdType> face(num_fverts);
+          for (int fv=0; fv<num_fverts; fv++)
+            face[fv] = polyh_cell->faces[f].vertex_ids[fv];
+
+          faces->InsertNextCell(num_fverts,face.data());
+        }//for f
+
+        ugrid->
+          InsertNextCell(VTK_POLYHEDRON,num_verts,
+                         cell_info.data(),num_faces,faces->GetPointer());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        double phi_value = field_vector_local->operator[](mapping[lc]);
+        phiavgarray->InsertNextValue(phi_value);
+      }//polyhedron
+    }
+
+
   }//for local cells
 
   ugrid->SetPoints(points);
@@ -276,92 +283,99 @@ void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto cell_base = (chi_mesh::CellBase*)cell;
 
-      std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->v_indices[0]);
-      cell_info.push_back(slab_cell->v_indices[1]);
-
-      ugrid->
-        InsertNextCell(VTK_LINE,2,
-                       cell_info.data());
-
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      for (int g=0; g<num_grps; g++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
       {
-        double phi_value = field_vector_local->operator[](mapping[lc]+g);
-        phiavgarray[g]->InsertNextValue(phi_value);
-      }//for g
+        auto slab_cell = (chi_mesh::CellSlabV2*)cell_base;
 
-    }
+        std::vector<vtkIdType> cell_info;
+        cell_info.push_back(slab_cell->vertex_ids[0]);
+        cell_info.push_back(slab_cell->vertex_ids[1]);
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+        ugrid->
+          InsertNextCell(VTK_LINE,2,
+                         cell_info.data());
 
-      std::vector<vtkIdType> cell_info;
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
 
-      int num_verts = poly_cell->v_indices.size();
-      for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->v_indices[v]);
+        for (int g=0; g<num_grps; g++)
+        {
+          double phi_value = field_vector_local->operator[](mapping[lc]+g);
+          phiavgarray[g]->InsertNextValue(phi_value);
+        }//for g
 
-      ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
-                       cell_info.data());
+      }
 
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
-
-      for (int g=0; g<num_grps; g++)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
       {
-        double phi_value = field_vector_local->operator[](mapping[lc]+g);
-        phiavgarray[g]->InsertNextValue(phi_value);
-      }//for g
-    }
+        auto poly_cell = (chi_mesh::CellPolygonV2*)cell_base;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+        std::vector<vtkIdType> cell_info;
 
-      int num_verts = polyh_cell->v_indices.size();
-      std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->v_indices[v];
+        int num_verts = poly_cell->vertex_ids.size();
+        for (int v=0; v<num_verts; v++)
+          cell_info.push_back(poly_cell->vertex_ids[v]);
 
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
+        ugrid->
+          InsertNextCell(VTK_POLYGON,num_verts,
+                         cell_info.data());
 
-      int num_faces = polyh_cell->faces.size();
-      for (int f=0; f<num_faces; f++)
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        for (int g=0; g<num_grps; g++)
+        {
+          double phi_value = field_vector_local->operator[](mapping[lc]+g);
+          phiavgarray[g]->InsertNextValue(phi_value);
+        }//for g
+      }
+
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
       {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
-        std::vector<vtkIdType> face(num_fverts);
-        for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f]->v_indices[fv];
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
 
-        faces->InsertNextCell(num_fverts,face.data());
-      }//for f
+        int num_verts = polyh_cell->vertex_ids.size();
+        std::vector<vtkIdType> cell_info(num_verts);
+        for (int v=0; v<num_verts; v++)
+          cell_info[v] = polyh_cell->vertex_ids[v];
 
-      ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
+        vtkSmartPointer<vtkCellArray> faces =
+          vtkSmartPointer<vtkCellArray>::New();
 
-      matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+        int num_faces = polyh_cell->faces.size();
+        for (int f=0; f<num_faces; f++)
+        {
+          int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+          std::vector<vtkIdType> face(num_fverts);
+          for (int fv=0; fv<num_fverts; fv++)
+            face[fv] = polyh_cell->faces[f].vertex_ids[fv];
 
-      for (int g=0; g<num_grps; g++)
-      {
-        double phi_value = field_vector_local->operator[](mapping[lc]+g);
-        phiavgarray[g]->InsertNextValue(phi_value);
-      }//for g
-    }//polyhedron
+          faces->InsertNextCell(num_fverts,face.data());
+        }//for f
+
+        ugrid->
+          InsertNextCell(VTK_POLYHEDRON,num_verts,
+                         cell_info.data(),num_faces,faces->GetPointer());
+
+        matarray->InsertNextValue(mat_id);
+        pararray->InsertNextValue(cell->partition_id);
+
+        for (int g=0; g<num_grps; g++)
+        {
+          double phi_value = field_vector_local->operator[](mapping[lc]+g);
+          phiavgarray[g]->InsertNextValue(phi_value);
+        }//for g
+      }//polyhedron
+    }//new cell base
+
+
   }//for local cells
 
   ugrid->SetPoints(points);
