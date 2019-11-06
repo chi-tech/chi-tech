@@ -1,5 +1,6 @@
 #include "diffusion_solver.h"
 
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
@@ -24,19 +25,21 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   chi_mesh::Region*     aregion = this->regions.back();
   grid = aregion->volume_mesh_continua.back();
 
+  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
+  mesher = mesh_handler->volume_mesher;
+
+  int num_nodes = grid->nodes.size();
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  this->ReorderNodesPWLD();
+  ReorderNodesPWLD();
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
-  {
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
-  }
 
 
   //================================================== Initialize field function
@@ -98,6 +101,10 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 
 
 
+
+
+
+
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
   PWLDBuildSparsityPattern();
@@ -106,8 +113,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   //================================================== Initialize x and b
   ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
   ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-  ierr = VecSetSizes(x,pwld_local_dof_count,
-                     pwld_global_dof_count);CHKERRQ(ierr);
+  ierr = VecSetSizes(x,pwld_local_dof_count, pwld_global_dof_count);CHKERRQ(ierr);
   ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
   ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
 
@@ -121,21 +127,13 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
                      pwld_global_dof_count,pwld_global_dof_count);CHKERRQ(ierr);
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
-
   //================================================== Allocate matrix memory
-  if (verbose)
-  {
-    chi_log.Log(LOG_0)
-      << "Setting matrix preallocation. Total non-zeros: " << total_nnz;
-  }
-
-
+  chi_log.Log(LOG_0) << "Setting matrix preallocation.";
   MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
                               0,nodal_nnz_off_diag.data());
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-  MatSetOption(A,MAT_IGNORE_ZERO_ENTRIES,PETSC_TRUE);
+  MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
   MatSetUp(A);
-
 
   //================================================== Set up solver
   ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);

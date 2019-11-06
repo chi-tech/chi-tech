@@ -254,7 +254,7 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
       return new_particle;
     }//Slab cells
-    else if (cell_base->Type() == chi_mesh::CellType::POLYGONV2)
+    else if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
     {
       int f = surface_sampler->Sample(rng->Rand());
 

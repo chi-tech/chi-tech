@@ -7,7 +7,7 @@ extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
 
 //###################################################################
-/**Distributes border cell information.*/
+/** Builds the sparsity pattern for PWLC spatial discretization.*/
 void chi_diffusion::Solver::PWLDBuildSparsityPattern()
 {
   int num_loc_cells = grid->local_cell_glob_indices.size();

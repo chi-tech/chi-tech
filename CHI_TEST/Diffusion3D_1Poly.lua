@@ -97,6 +97,7 @@ chiFFInterpolationSetProperty(slice1,SLICE_TANGENT,0.0,-1.0,0.0)
 chiFFInterpolationSetProperty(slice1,SLICE_NORMAL,1.0,0.0,0.0)
 chiFFInterpolationSetProperty(slice1,ADD_FIELDFUNCTION,fftemp)
 
+
 slice2 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
 chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp)

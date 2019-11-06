@@ -1,9 +1,6 @@
 #include "diffusion_solver.h"
 
-#include <ChiMesh/Cell/cell_newbase.h>
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
-
 #include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
@@ -13,9 +10,6 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
-
-#include<fstream>
-#include <unistd.h>
 
 PetscErrorCode
 DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
@@ -32,31 +26,20 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   grid = aregion->volume_mesh_continua.back();
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
+  mesher = mesh_handler->volume_mesher;
 
-  int n = grid->nodes.size();
+  int num_nodes = grid->nodes.size();
 
-  //==================================================
-  chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
+  //================================================== Reorder nodes
+  if (verbose)
+    chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
   ChiTimer t_reorder; t_reorder.Reset();
-  this->ReorderNodesPWLC();
-
+  ReorderNodesPWLC();
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Time taken during nodal reordering "
-                     << t_reorder.GetTime()/1000.0;
-
-
-  //================================================== Initialize x and b
-  ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
-  ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-  ierr = VecSetSizes(x,local_rows_to - local_rows_from+1,n);CHKERRQ(ierr);
-  ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
-  ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
-
-  VecSet(x,0.0);
-  VecSet(b,0.0);
-
+  if (verbose)
+    chi_log.Log(LOG_0) << "Time taken during nodal reordering "
+                       << t_reorder.GetTime()/1000.0;
 
 
   //================================================== Initialize field function
@@ -70,7 +53,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     initial_field_function->spatial_discretization = discretization;
     initial_field_function->id = chi_physics_handler.fieldfunc_stack.size();
 
-    initial_field_function->field_vector = x;
+    initial_field_function->field_vector = &x;
 
     field_functions.push_back(initial_field_function);
     chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
@@ -83,138 +66,73 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
       chi_physics::FieldFunction* cur_ff = field_functions[ff];
       cur_ff->grid                   = grid;
       cur_ff->spatial_discretization = discretization;
-      cur_ff->field_vector           = x;
+      cur_ff->field_vector           = &x;
     }
   }
 
 
 
-  //################################################## Create matrix
-  ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRQ(ierr);
-  ierr = MatSetSizes(A,local_rows_to - local_rows_from+1,
-                     local_rows_to - local_rows_from+1,
-                     n,n);CHKERRQ(ierr);
-  ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
-  ierr = MatSetUp(A);CHKERRQ(ierr);
+
+
+
+
+
+
+
+
+
+
+
+
 
   //================================================== Setup timer
-  chi_log.Log(LOG_0) << "Determining nodal connections";
+  if (verbose)
+    chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
   double t0 = 0.0;
 
 
   //================================================== Initialize nodal DOF
   //                                                   and connection info
+  nodal_nnz_in_diag.resize(grid->nodes.size(),0);
+  nodal_nnz_off_diag.resize(grid->nodes.size(),0);
+  nodal_boundary_numbers.resize(grid->nodes.size(),0);
   for (int i=0; i<grid->nodes.size(); i++)
   {
     std::vector<int>* new_node_links = new std::vector<int>;
     nodal_connections.push_back(new_node_links);
     new_node_links = new std::vector<int>;
     nodal_cell_connections.push_back(new_node_links);
-
-    nodal_boundary_numbers.push_back(0);
-    nodal_nnz_in_diag.push_back(0);
-    nodal_nnz_off_diag.push_back(0);
   }
-
-
 
   //================================================== Determine nodal DOF
-  size_t num_local_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc < num_local_cells; lc++)
-  {
-    int glob_index = grid->local_cell_glob_indices[lc];
+  chi_log.Log(LOG_0) << "Building sparsity pattern.";
+  PWLCBuildSparsityPattern();
 
-    auto cell = grid->cells[glob_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
+  //================================================== Initialize x and b
+  ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
+  ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
+  ierr = VecSetSizes(x,local_rows_to - local_rows_from+1, num_nodes);CHKERRQ(ierr);
+  ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
+  ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
 
-      for (int i=0; i < cell_base->vertex_ids.size(); i++)
-      {
-        int ir =  mesher->MapNode(cell_base->vertex_ids[i]);
+  VecSet(x,0.0);
+  VecSet(b,0.0);
 
-        if (ir<0)
-        {
-          chi_log.Log(LOG_ALLERROR)
-            << "ir Mapping error node " << cell_base->vertex_ids[i];
-          exit(EXIT_FAILURE);
-        }
-
-        //================================== Check if i is on boundary
-        for (int f=0; f < cell_base->faces.size(); f++)
-        {
-          if (cell_base->faces[f].neighbor < 0)
-          {
-            chi_mesh::CellFace& face = cell_base->faces[f];
-            size_t num_face_verts = face.vertex_ids.size();
-            for (int fv=0; fv<num_face_verts; fv++)
-            {
-              int v0_index =
-                mesher->MapNode(face.vertex_ids[fv]);
-
-              if (v0_index<0)
-              {
-                chi_log.Log(LOG_ALLERROR)
-                  << "v0 Mapping error node " << face.vertex_ids[fv];
-                exit(EXIT_FAILURE);
-              }
-
-              if (ir == v0_index)
-              {
-                //================= Processing boundary
-                int boundary_type =
-                  boundaries[abs(face.neighbor)-1]->type;
-                if (boundary_type == DIFFUSION_DIRICHLET)
-                {
-                  nodal_boundary_numbers[ir]= face.neighbor;
-                }
-                break;
-              } //if ir part of face
-            }
-          }
-        }//for f
-
-        //======================================= Set nodal connections
-        std::vector<int>* node_links = nodal_connections[ir];
-        for (int j=0; j < cell_base->vertex_ids.size(); j++)
-        {
-          int jr = mesher->MapNode(cell_base->vertex_ids[j]);
-
-          //====================== Check for duplicates
-          bool already_there = false;
-          for (int k=0; k<node_links->size(); k++)
-          {
-            if ((*node_links)[k] == jr)
-            {already_there = true; break;}
-          }
-          if (!already_there)
-          {
-            (*node_links).push_back(jr);
-            if ((jr>=local_rows_from) && (jr<=local_rows_to))
-            {
-              nodal_nnz_in_diag[ir]+=1;
-            } else
-            {
-              nodal_nnz_off_diag[ir]+=1;
-            }
-          }
-        }//for j
-      }//for i
-
-    } //if typeid
-
-  }
-  chi_log.Log(LOG_0) << "Time taken during nodal connection "
-                     << t_connect.GetTime()/1000.0;
+  //################################################## Create matrix
+  ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRQ(ierr);
+  ierr = MatSetSizes(A,local_rows_to - local_rows_from+1,
+                     local_rows_to - local_rows_from+1,
+                     num_nodes, num_nodes);CHKERRQ(ierr);
+  ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
   chi_log.Log(LOG_0) << "Setting matrix preallocation.";
   MatMPIAIJSetPreallocation(A,0,&nodal_nnz_in_diag[local_rows_from],
                             0,&nodal_nnz_off_diag[local_rows_from]);
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-  MatSetOption(A,MAT_IGNORE_ZERO_ENTRIES,PETSC_TRUE);
+  MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
   MatSetUp(A);
 
   //================================================== Set up solver
@@ -223,9 +141,71 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   ierr = KSPSetType(ksp,KSPCG);
 
   ierr = KSPGetPC(ksp,&pc);
-  ierr = PCSetType(pc,PCGAMG);
+  PCSetType(pc,PCHYPRE);
 
+  PCHYPRESetType(pc,"boomeramg");
+
+  //================================================== Setting Hypre parameters
+  //The default HYPRE parameters used for polyhedra
+  //seemed to have caused a lot of trouble for Slab
+  //geometries. This section makes some custom options
+  //per cell type
+  int first_cell_g_index = grid->local_cell_glob_indices[0];
+  auto first_cell = grid->cells[first_cell_g_index];
+
+  if (first_cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+  {
+    auto cell_base = dynamic_cast<chi_mesh::CellBase*>(first_cell);
+
+    if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+    {
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+      PetscOptionsInsertString(NULL,"-options_left");
+    }
+    if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+    {
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
+
+      //PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+      PetscOptionsInsertString(NULL,"-options_left");
+    }
+    if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+    {
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
+
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+      PetscOptionsInsertString(NULL,"-options_left");
+    }
+
+
+  }
   PetscOptionsInsertString(NULL,options_string.c_str());
+  PCSetFromOptions(pc);
 
   //=================================== Set up monitor
   if (verbose)

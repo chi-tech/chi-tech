@@ -125,7 +125,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
   std::vector<int> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_grps,num_moms,grp,mom,
-                                field_vector,phi_vec,cfem_nodes,&mapping);
+                                *field_vector,phi_vec,cfem_nodes,&mapping);
 
 
   //======================================== Populate cell information
@@ -402,7 +402,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
   std::vector<int> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_grps,num_moms,grp,mom,
-                                field_vector,phi_vec,cfem_nodes,&mapping);
+                                *field_vector,phi_vec,cfem_nodes,&mapping);
 
 
   //======================================== Populate cell information

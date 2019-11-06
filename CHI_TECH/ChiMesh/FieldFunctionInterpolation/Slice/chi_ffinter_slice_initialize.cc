@@ -142,8 +142,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         //========================================= Loop over vertices
         for (int v=0; v<poly_cell->vertex_ids.size(); v++)
         {
-          FFIFaceEdgeIntersection* face_isds =
-            new FFIFaceEdgeIntersection;
+          auto face_isds = new FFIFaceEdgeIntersection;
 
           int v0gi = poly_cell->vertex_ids[v];
 
@@ -185,11 +184,11 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
       else if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
       {
-        auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell_base);
+        auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedronV2*>(cell_base);
 
         //========================================= Initialize cell intersection
         //                                          data structure
-        FFICellIntersection* cell_isds = new FFICellIntersection;
+        auto cell_isds = new FFICellIntersection;
         cell_isds->cell_global_index = cell_glob_index;
         cell_intersections.push_back(cell_isds);
 
@@ -235,8 +234,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
               //==================== No duplicate
               if (!duplicate_found)
               {
-                FFIFaceEdgeIntersection* face_isds =
-                  new FFIFaceEdgeIntersection;
+                auto face_isds = new FFIFaceEdgeIntersection;
 
                 //Find vertex 0 dof index
                 face_isds->v0_g_index = v0gi;

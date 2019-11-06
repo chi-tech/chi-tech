@@ -21,7 +21,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
     {
       Vec x_mapped;
       std::vector<int> mapping;
-      Vec x = field_functions[ff]->field_vector;
+      Vec x = *field_functions[ff]->field_vector;
       CreateCFEMMapping(field_functions[ff]->num_grps,
                         field_functions[ff]->num_moms,
                         field_functions[ff]->grp,

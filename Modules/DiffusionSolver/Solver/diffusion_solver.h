@@ -164,6 +164,7 @@ public:
   //01a
   void InitializeCommonItems();
   void PWLDBuildSparsityPattern();
+  void PWLCBuildSparsityPattern();
   //01b
   int Initialize(bool verbose=true);
   //01c
