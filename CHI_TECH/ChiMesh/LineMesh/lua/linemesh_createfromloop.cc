@@ -51,7 +51,7 @@ int chiLineMeshCreateFromLoop(lua_State *L)
   }
 
   //============================================= Check valid loop
-  if (cur_loop->edges.size()==0)
+  if (cur_loop->edges.empty())
   {
     std::cerr << "ERROR: Empty loop accessed." << std::endl;
     exit(EXIT_FAILURE);

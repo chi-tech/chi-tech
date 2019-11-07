@@ -2,7 +2,7 @@
 #define _fv_polygon_h
 
 #include "fv_cellbase.h"
-#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 //################################################################### Class def
@@ -21,20 +21,20 @@ public:
   std::vector<double>                        face_area; ///< Actually length unity h
   std::vector<std::vector<chi_mesh::Vector>> side_s_v;
 
-  PolygonFVView(chi_mesh::CellPolygon* poly_cell,
+  PolygonFVView(chi_mesh::CellPolygonV2* poly_cell,
                 chi_mesh::MeshContinuum *vol_continuum) :
-                CellFVView(poly_cell->v_indices.size())
+                CellFVView(poly_cell->vertex_ids.size())
   {
     grid = vol_continuum;
 
     volume = 0.0;
 
-    int num_faces = poly_cell->edges.size();
+    int num_faces = poly_cell->faces.size();
     side_s_v.resize(num_faces);
     for (int f=0; f<num_faces; f++)
     {
-      int v0i = poly_cell->edges[f][0];
-      int v1i = poly_cell->edges[f][1];
+      int v0i = poly_cell->faces[f].vertex_ids[0];
+      int v1i = poly_cell->faces[f].vertex_ids[1];
 
       chi_mesh::Vector v0 = *grid->nodes[v0i];
       chi_mesh::Vector v1 = *grid->nodes[v1i];

@@ -1,26 +1,28 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "ChiMesh/SweepUtilities/chi_sweepscheduler.h"
-#include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
 #include <ChiTimer/chi_timer.h>
 
 
 #include <chi_log.h>
-
+#include <chi_mpi.h>
 extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 
 extern double chi_global_timings[20];
 
-typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
-typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
+namespace sweep_namespace = chi_mesh::sweep_management;
+typedef sweep_namespace::SweepChunk SweepChunk;
+typedef sweep_namespace::SweepScheduler MainSweepScheduler;
+typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
+void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
 {
   chi_log.Log(LOG_0)
     << "\n\n";
@@ -46,7 +48,7 @@ void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
   SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
 
   //================================================== Set sweep scheduler
-  MainSweepScheduler sweepScheduler(DEPTH_OF_GRAPH,
+  MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                     groupset->angle_agg);
 
   //================================================== Tool the sweep chunk
@@ -59,10 +61,15 @@ void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
   bool converged = false;
   for (int k=0; k<groupset->max_iterations; k++)
   {
-    SetSource(group_set_num,USE_MATERIAL_SOURCE);
-    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
+    SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE);
 
+    groupset->angle_agg->ResetDelayedPsi();
+
+    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
+
+    groupset->latest_convergence_metric = std::min(pw_change, 1.0);
+    ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
 
     if (groupset->apply_wgdsa)
     {
@@ -86,7 +93,7 @@ void LinearBoltzmanSolver::ClassicRichardson(int group_set_num)
     pw_change_prev = pw_change;
 
     if (k==0) rho = 0.0;
-    if (pw_change<std::max(groupset->residual_tolerance,1.0e-10))
+    if (pw_change<std::max(groupset->residual_tolerance*rho,1.0e-10))
       converged = true;
 
     //======================================== Print iteration information

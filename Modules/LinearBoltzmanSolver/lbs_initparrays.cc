@@ -1,11 +1,6 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell.h>
 #include <PiecewiseLinear/pwl.h>
-#include <PiecewiseLinear/CellViews/pwl_slab.h>
-#include <PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
@@ -48,16 +43,13 @@ A long int only supports up to 4.29e9. This obviously requires
 unsigned long long int which can hold up to 2x2e63.\n
 \n
 Another interesting aspect is what it will take to get to exascale. For a
-discrete ordinates this will undoubtly be evident in the amount of angular flux
+discrete ordinates code this will undoubtly be evident in the amount of angular flux
 unknowns. 1 billion cells, 24 vertices, 200 groups, 48 azimuthal angles per
 octant, 8 polar angles per octant (3072) angles. 1.47456e16. Just a factor 68
 away from exascale.
    */
-int LinearBoltzmanSolver::InitializeParrays()
+int LinearBoltzman::Solver::InitializeParrays()
 {
-//  PetscErrorCode ierr;
-//  PetscMPIInt    size;
-
   SpatialDiscretization_PWL* pwl_discretization =
     (SpatialDiscretization_PWL*)discretization;
 
@@ -67,9 +59,7 @@ int LinearBoltzmanSolver::InitializeParrays()
   {
     size_t num_cell_views = pwl_discretization->cell_fe_views.size();
     for (int c=0; c<num_cell_views; c++)
-    {
       local_dof_count += pwl_discretization->cell_fe_views[c]->dofs;
-    }
   }
   chi_log.Log(LOG_ALLVERBOSE_2) << "Local DOF count = " << local_dof_count;
 
@@ -84,28 +74,36 @@ int LinearBoltzmanSolver::InitializeParrays()
   unsigned long long local_unknown_count = local_dof_count*G*M;
   unsigned long long glob_unknown_count  = glob_dof_count*G*M;
 
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Local Unknown count = "
-                                      << local_unknown_count;
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Globl Unknown count = "
-                                      << glob_unknown_count;
+  chi_log.Log(LOG_ALLVERBOSE_2)
+    << "Local Unknown count = " << local_unknown_count;
+  chi_log.Log(LOG_ALLVERBOSE_2)
+    << "Globl Unknown count = " << glob_unknown_count;
 
-  //================================================== Size fixed source
-//  q_fixed_local.resize(local_unknown_count,0.0);
+  //================================================== Size local vectors
   q_moments_local.resize(local_unknown_count,0.0);
   phi_old_local.resize(local_unknown_count,0.0);
   phi_new_local.resize(local_unknown_count,0.0);
 
-//  //================================================== Initialize local indices
-//  for (int i=0; i<local_unknown_count; i++)
-//    local_indices.push_back(i);
-
-  //================================================== Set local to global mapping
-  //This has been deferred to solvers
-
   //================================================== Initialize default
   //                                                   incident boundary
+  typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
+  typedef chi_mesh::sweep_management::BoundaryIncidentHomogenous SweepIncHomoBndry;
+  std::vector<std::vector<double>>& flux_vec = incident_P0_mg_boundaries;
+
+  // Defining default Vacuum boundary
   std::vector<double> zero_boundary(G,0.0);
-  incident_P0_mg_boundaries.push_back(zero_boundary);
+  flux_vec.push_back(zero_boundary);
+
+  // For boundaries
+  for (auto bndry_type : boundary_types)
+  {
+    int vec_index = bndry_type.second;
+
+    if (bndry_type.first == LinearBoltzman::BoundaryType::VACUUM)
+      sweep_boundaries.push_back(new SweepVacuumBndry(flux_vec.back()));
+    else if (bndry_type.first == LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
+      sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
+  }
 
   //================================================== Initialize transport views
   int num_grps = groups.size();
@@ -120,179 +118,57 @@ int LinearBoltzmanSolver::InitializeParrays()
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    auto cell_fe_view =
+      (CellFEView*)pwl_discretization->MapFeView(cell_g_index);
+    auto full_cell_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell->cell_local_id];
+
+    int mat_id = cell->material_id;
+
+    full_cell_view->xs_id = matid_to_xs_map[mat_id];
+
+    full_cell_view->dof_phi_map_start = block_MG_counter;
+    block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
+
+    //Init face upwind flags and adj_partition_id
+    int num_faces = cell->faces.size();
+    full_cell_view->face_f_upwind_flag.resize(num_faces,false);
+    for (int f=0; f<num_faces; f++)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-      SlabFEView* slab_fe_view =
-        (SlabFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBSCellViewFull* full_cell_view =
-        (LBSCellViewFull*)cell_transport_views[slab_cell->cell_local_id];
-
-      int mat_id = cell->material_id;
-
-      full_cell_view->xs_id = matid_to_xs_map[mat_id];
-
-      full_cell_view->dof_phi_map_start = block_MG_counter;
-      block_MG_counter += slab_fe_view->dofs*num_grps*num_moments;
-
-      //Init face upwind flags and adj_partition_id
-      int num_faces = 2;
-      full_cell_view->face_f_upwind_flag.resize(num_faces,false);
-      for (int f=0; f<num_faces; f++)
+      if (cell->faces[f].neighbor >= 0)
       {
-        if (slab_cell->edges[f] >= 0)
-        {
-          int adj_g_index = slab_cell->edges[f];
-          auto adj_cell = grid->cells[adj_g_index];
+        int adj_g_index = cell->faces[f].neighbor;
+        auto adj_cell = grid->cells[adj_g_index];
 
-          full_cell_view->face_f_adj_part_id.push_back(
-            adj_cell->partition_id);
-        }//if not bndry
-        else
-        {
-          full_cell_view->face_f_adj_part_id.push_back(
-            slab_cell->edges[f]);
-
-          chi_mesh::Vector& face_norm = slab_cell->face_normals[f];
-
-          if      (face_norm.Dot(ihat)>0.999)
-            full_cell_view->face_boundary_id.push_back(0);
-          else if (face_norm.Dot(ihat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(1);
-          else if (face_norm.Dot(jhat)>0.999)
-            full_cell_view->face_boundary_id.push_back(2);
-          else if (face_norm.Dot(jhat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(3);
-          else if (face_norm.Dot(khat)>0.999)
-            full_cell_view->face_boundary_id.push_back(4);
-          else if (face_norm.Dot(khat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(5);
-        }//if bndry
-      }//for f
-
-      //Add address
-      local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
-      local_cell_dof_array_address.push_back(block_counter);
-      block_counter += slab_fe_view->dofs;
-    }//slab
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-      PolygonFEView* poly_fe_view =
-        (PolygonFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBSCellViewFull* full_cell_view =
-        (LBSCellViewFull*)cell_transport_views[poly_cell->cell_local_id];
-
-      int mat_id = cell->material_id;
-
-      full_cell_view->xs_id = matid_to_xs_map[mat_id];
-
-      full_cell_view->dof_phi_map_start = block_MG_counter;
-      block_MG_counter += poly_fe_view->dofs*num_grps*num_moments;
-
-      //Init face upwind flags and adj_partition_id
-      int num_faces = poly_cell->edges.size();
-      full_cell_view->face_f_upwind_flag.resize(num_faces,false);
-      for (int f=0; f<num_faces; f++)
+        full_cell_view->face_f_adj_part_id.push_back(
+          adj_cell->partition_id);
+      }//if not bndry
+      else
       {
-        if (poly_cell->edges[f][EDGE_NEIGHBOR] >= 0)
-        {
-          int adj_g_index = poly_cell->edges[f][EDGE_NEIGHBOR];
-          auto adj_cell = grid->cells[adj_g_index];
+        full_cell_view->face_f_adj_part_id.push_back(
+          cell->faces[f].neighbor);
 
-          full_cell_view->face_f_adj_part_id.push_back(
-            adj_cell->partition_id);
-        }//if not bndry
-        else
-        {
-          full_cell_view->face_f_adj_part_id.push_back(
-            poly_cell->edges[f][EDGE_NEIGHBOR]);
+        chi_mesh::Vector& face_norm = cell->faces[f].normal;
 
-          chi_mesh::Vector& face_norm = poly_cell->edgenormals[f];
+        if      (face_norm.Dot(ihat)>0.999)
+          full_cell_view->face_boundary_id.push_back(0);
+        else if (face_norm.Dot(ihat)<-0.999)
+          full_cell_view->face_boundary_id.push_back(1);
+        else if (face_norm.Dot(jhat)>0.999)
+          full_cell_view->face_boundary_id.push_back(2);
+        else if (face_norm.Dot(jhat)<-0.999)
+          full_cell_view->face_boundary_id.push_back(3);
+        else if (face_norm.Dot(khat)>0.999)
+          full_cell_view->face_boundary_id.push_back(4);
+        else if (face_norm.Dot(khat)<-0.999)
+          full_cell_view->face_boundary_id.push_back(5);
+      }//if bndry
+    }//for f
 
-          if      (face_norm.Dot(ihat)>0.999)
-            full_cell_view->face_boundary_id.push_back(0);
-          else if (face_norm.Dot(ihat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(1);
-          else if (face_norm.Dot(jhat)>0.999)
-            full_cell_view->face_boundary_id.push_back(2);
-          else if (face_norm.Dot(jhat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(3);
-          else if (face_norm.Dot(khat)>0.999)
-            full_cell_view->face_boundary_id.push_back(4);
-          else if (face_norm.Dot(khat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(5);
-        }//if bndry
-      }//for f
-
-      //Add address
-      local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
-      local_cell_dof_array_address.push_back(block_counter);
-      block_counter += poly_fe_view->dofs;
-    }//polygon
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-      PolyhedronFEView* polyh_fe_view =
-        (PolyhedronFEView*)pwl_discretization->MapFeView(cell_g_index);
-      LBSCellViewFull* full_cell_view =
-        (LBSCellViewFull*)cell_transport_views[polyh_cell->cell_local_id];
-
-      int mat_id = cell->material_id;
-
-      full_cell_view->xs_id = matid_to_xs_map[mat_id];
-
-      full_cell_view->dof_phi_map_start = block_MG_counter;
-      block_MG_counter += polyh_fe_view->dofs*num_grps*num_moments;
-
-      //Init face upwind flags and adj_partition_id
-      int num_faces = polyh_cell->faces.size();
-      full_cell_view->face_f_upwind_flag.resize(num_faces,false);
-      for (int f=0; f<num_faces; f++)
-      {
-        if (polyh_cell->faces[f]->face_indices[0] >= 0)
-        {
-          int adj_g_index = polyh_cell->faces[f]->face_indices[0];
-          auto adj_cell = grid->cells[adj_g_index];
-
-          full_cell_view->face_f_adj_part_id.push_back(
-            adj_cell->partition_id);
-        }//if not bndry
-        else
-        {
-          full_cell_view->face_f_adj_part_id.push_back(
-            polyh_cell->faces[f]->face_indices[0]);
-
-          chi_mesh::Vector& face_norm = polyh_cell->faces[f]->geometric_normal;
-
-          if      (face_norm.Dot(ihat)>0.999)
-            full_cell_view->face_boundary_id.push_back(0);
-          else if (face_norm.Dot(ihat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(1);
-          else if (face_norm.Dot(jhat)>0.999)
-            full_cell_view->face_boundary_id.push_back(2);
-          else if (face_norm.Dot(jhat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(3);
-          else if (face_norm.Dot(khat)>0.999)
-            full_cell_view->face_boundary_id.push_back(4);
-          else if (face_norm.Dot(khat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(5);
-        }//if bndry
-      }//for f
-
-      //Add address
-      local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
-      local_cell_dof_array_address.push_back(block_counter);
-      block_counter += polyh_fe_view->dofs;
-    }//polyhedron
+    //Add address
+    local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
+    local_cell_dof_array_address.push_back(block_counter);
+    block_counter += cell_fe_view->dofs;
   }//for local cell
 
   //================================================== Initialize Field Functions

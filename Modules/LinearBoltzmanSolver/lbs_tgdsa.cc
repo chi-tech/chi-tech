@@ -1,9 +1,6 @@
 #include "lbs_linear_boltzman_solver.h"
 
 #include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
@@ -15,7 +12,7 @@ extern ChiPhysics chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void LinearBoltzmanSolver::InitTGDSA(LBSGroupset *groupset)
+void LinearBoltzman::Solver::InitTGDSA(LBSGroupset *groupset)
 {
   if (groupset->apply_tgdsa)
   {
@@ -101,7 +98,7 @@ void LinearBoltzmanSolver::InitTGDSA(LBSGroupset *groupset)
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzman::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                                   double *ref_phi_old,
                                                   double *ref_phi_new)
 {
@@ -116,134 +113,47 @@ void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    auto transport_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+    int xs_id = matid_to_xs_map[cell->material_id];
+    chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
+
+    for (int i=0; i < cell->vertex_ids.size(); i++)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      index++;
+      int m = 0;
+      int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
 
-      int xs_id = matid_to_xs_map[cell->material_id];
-      chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
+      double* phi_old_mapped = &ref_phi_old[mapping];
+      double* phi_new_mapped = &ref_phi_new[mapping];
 
-      for (int i=0; i<2; i++)
+      for (int g=0; g<gss; g++)
       {
-        index++;
-        int m = 0;
-        int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
-
-        double* phi_old_mapped = &ref_phi_old[mapping];
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
+        double R_g = 0.0;
+        int num_transfers = S.inds_rowI[gsi+g].size();
+        for (int j=0; j<num_transfers; j++)
         {
-          double R_g = 0.0;
-          int num_transfers = S.inds_rowI[gsi+g].size();
-          for (int j=0; j<num_transfers; j++)
-          {
-            int gp = S.inds_rowI[gsi+g][j];
+          int gp = S.inds_rowI[gsi+g][j];
 
-            if (not (gp >= (gsi+g+1)))
-              continue;
+          if (not (gp >= (gsi+g+1)))
+            continue;
 
-            double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
+          double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
 
-            R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
-          }
-          delta_phi_local[index] += R_g;
-        }//for g
+          R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
+        }
+        delta_phi_local[index] += R_g;
+      }//for g
 
-      }//for dof
-    }//slab
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
-
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
-      {
-        index++;
-        int m = 0;
-        int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
-
-        double* phi_old_mapped = &ref_phi_old[mapping];
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-        {
-          double R_g = 0.0;
-          int num_transfers = S.inds_rowI[gsi+g].size();
-          for (int j=0; j<num_transfers; j++)
-          {
-            int gp = S.inds_rowI[gsi+g][j];
-
-            if (not (gp >= (gsi+g+1)))
-              continue;
-
-            double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
-
-            R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
-          }
-          delta_phi_local[index] += R_g;
-        }//for g
-
-      }//for dof
-    }//polygon
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
-
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
-      {
-        index++;
-        int m = 0;
-        int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
-
-        double* phi_old_mapped = &ref_phi_old[mapping];
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-        {
-          double R_g = 0.0;
-          int num_transfers = S.inds_rowI[gsi+g].size();
-          for (int j=0; j<num_transfers; j++)
-          {
-            int gp = S.inds_rowI[gsi+g][j];
-
-            if (not (gp >= (gsi+g+1)))
-              continue;
-
-            double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
-
-            R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
-          }
-          delta_phi_local[index] += R_g;
-        }//for g
-
-      }//for dof
-    }//polyhedron
-
+    }//for dof
   }//for cell
 
 }
 
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void LinearBoltzmanSolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzman::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                                      double *ref_phi_new)
 {
   int gsi = groupset->groups[0]->id;
@@ -258,83 +168,24 @@ void LinearBoltzmanSolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    auto transport_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+    int xs_id = matid_to_xs_map[cell->material_id];
+    std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
+
+    for (int i=0; i < cell->vertex_ids.size(); i++)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      index++;
+      int m=0;
+      int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
 
-      int xs_id = matid_to_xs_map[cell->material_id];
-      std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
+      double* phi_new_mapped = &ref_phi_new[mapping];
 
+      for (int g=0; g<gss; g++)
+        phi_new_mapped[g] += tgdsa_solver->pwld_phi_local[index]*xi_g[gsi+g];
 
-      for (int i=0; i<2; i++)
-      {
-        index++;
-        int m=0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
-
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-          phi_new_mapped[g] += tgdsa_solver->pwld_phi_local[index]*xi_g[gsi+g];
-
-      }//for dof
-    }//slab
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
-
-
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
-      {
-        index++;
-        int m=0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
-
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-          phi_new_mapped[g] += tgdsa_solver->pwld_phi_local[index]*xi_g[gsi+g];
-
-      }//for dof
-    }//polygon
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
-
-      int xs_id = matid_to_xs_map[cell->material_id];
-      std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
-
-
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
-      {
-        index++;
-        int m=0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
-
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-          phi_new_mapped[g] += tgdsa_solver->pwld_phi_local[index]*xi_g[gsi+g];
-
-      }//for dof
-    }//polyhedron
-
-
+    }//for dof
   }//for cell
 
   delta_phi_local.resize(0);

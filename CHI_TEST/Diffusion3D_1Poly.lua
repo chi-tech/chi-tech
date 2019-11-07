@@ -97,6 +97,7 @@ chiFFInterpolationSetProperty(slice1,SLICE_TANGENT,0.0,-1.0,0.0)
 chiFFInterpolationSetProperty(slice1,SLICE_NORMAL,1.0,0.0,0.0)
 chiFFInterpolationSetProperty(slice1,ADD_FIELDFUNCTION,fftemp)
 
+
 slice2 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
 chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp)
@@ -135,8 +136,8 @@ if (chi_location_id == 0 and master_export == nil) then
     chiFFInterpolationExportPython(slice1)
     chiFFInterpolationExportPython(slice2)
     chiFFInterpolationExportPython(line0)
-    local handle = io.popen("python ZPFFI00.py")
-    local handle = io.popen("python ZPFFI10.py")
+    local handle = io.popen("python3 ZPFFI00.py")
+    local handle = io.popen("python3 ZPFFI10.py")
     --local handle = io.popen("python ZLFFI20.py")
     print("Execution completed")
 end

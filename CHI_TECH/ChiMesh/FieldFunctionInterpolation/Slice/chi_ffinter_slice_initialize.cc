@@ -1,7 +1,7 @@
 #include "chi_ffinter_slice.h"
-#include "../../Cell/cell_slab.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include <chi_log.h>
 
@@ -19,9 +19,10 @@ extern ChiLog chi_log;
 void chi_mesh::FieldFunctionInterpolationSlice::
   Initialize()
 {
+  typedef std::vector<std::vector<int>> VecVecInt;
   chi_log.Log(LOG_0VERBOSE_1) << "Initializing slice interpolator.";
   //================================================== Check grid available
-  if (field_functions.size() == 0)
+  if (field_functions.empty())
   {
     chi_log.Log(LOG_ALLERROR)
     << "Unassigned field function in slice field function interpolator.";
@@ -41,39 +42,38 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
       chi_log.Log(LOG_0)
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
       exit(EXIT_FAILURE);
     }
-
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
       intersecting_cell_indices.push_back(cell_glob_index);
     }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell);
       bool intersects = false;
 
       size_t num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        size_t num_edges = polyh_cell->faces[f]->edges.size();
+        VecVecInt edges = polyh_cell->GetFaceEdges(f);
+        size_t num_edges = edges.size();
         for (int e=0; e<num_edges; e++)
         {
-          int v0_i = polyh_cell->faces[f]->edges[e][0];
-          int v1_i = polyh_cell->faces[f]->edges[e][1];
+          int v0_i = edges[e][0];
+          int v1_i = edges[e][1];
 
           std::vector<chi_mesh::Vector*> tet_points;
 
           tet_points.push_back(grid_view->nodes[v0_i]);
           tet_points.push_back(grid_view->nodes[v1_i]);
-          tet_points.push_back(&polyh_cell->faces[f]->face_centroid);
+          tet_points.push_back(&polyh_cell->faces[f].centroid);
           tet_points.push_back(&polyh_cell->centroid);
 
           if (CheckPlaneTetIntersect(this->normal,this->point,&tet_points))
@@ -85,7 +85,13 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         }//for e
         if (intersects) break;
       }//for f
-    }//if polyh
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported cell type in call to Slice Initialize.";
+      exit(EXIT_FAILURE);
+    }
   }//for local cell
 
   //================================================== Computing cell intersections
@@ -96,24 +102,31 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
     auto cell = grid_view->cells[cell_glob_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
+      chi_log.Log(LOG_0)
+        << "FieldFunctionInterpolationSlice does not support 1D cells.";
+      exit(EXIT_FAILURE);
+    }
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    {
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
       //========================================= Initialize cell intersection
       //                                          data structure
-      FFICellIntersection* cell_isds = new FFICellIntersection;
+      auto cell_isds = new FFICellIntersection;
       cell_isds->cell_global_index = cell_glob_index;
       cell_intersections.push_back(cell_isds);
 
       //========================================= Loop over vertices
-      for (int v=0; v<poly_cell->v_indices.size(); v++)
+      for (int v=0; v<poly_cell->vertex_ids.size(); v++)
       {
-        FFIFaceEdgeIntersection* face_isds =
-          new FFIFaceEdgeIntersection;
+        auto face_isds = new FFIFaceEdgeIntersection;
 
-        int v0gi = poly_cell->v_indices[v];
+        int v0gi = poly_cell->vertex_ids[v];
 
         face_isds->v0_g_index = v0gi;
         face_isds->v1_g_index = v0gi;
@@ -149,19 +162,15 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
         pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
       }
-    }
-
-
-
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    }//polygon
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedronV2*>(cell);
 
       //========================================= Initialize cell intersection
       //                                          data structure
-      FFICellIntersection* cell_isds = new FFICellIntersection;
+      auto cell_isds = new FFICellIntersection;
       cell_isds->cell_global_index = cell_glob_index;
       cell_intersections.push_back(cell_isds);
 
@@ -170,11 +179,12 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       for (int f=0; f<num_faces; f++)
       {
         //================================== Loop over edges
-        size_t num_edges = polyh_cell->faces[f]->edges.size();
+        VecVecInt edges = polyh_cell->GetFaceEdges(f);
+        size_t num_edges = edges.size();
         for (int e=0; e<num_edges; e++)
         {
-          int v0gi = polyh_cell->faces[f]->edges[e][0]; //global index v0
-          int v1gi = polyh_cell->faces[f]->edges[e][1]; //global index v1
+          int v0gi = edges[e][0]; //global index v0
+          int v1gi = edges[e][1]; //global index v1
 
           chi_mesh::Vertex v0 = (*grid_view->nodes[v0gi]);
           chi_mesh::Vertex v1 = (*grid_view->nodes[v1gi]);
@@ -206,15 +216,14 @@ void chi_mesh::FieldFunctionInterpolationSlice::
             //==================== No duplicate
             if (!duplicate_found)
             {
-              FFIFaceEdgeIntersection* face_isds =
-                new FFIFaceEdgeIntersection;
+              auto face_isds = new FFIFaceEdgeIntersection;
 
               //Find vertex 0 dof index
               face_isds->v0_g_index = v0gi;
-              size_t num_dofs = polyh_cell->v_indices.size();
+              size_t num_dofs = polyh_cell->vertex_ids.size();
               for (int dof=0; dof<num_dofs; dof++)
               {
-                if (polyh_cell->v_indices[dof] == v0gi)
+                if (polyh_cell->vertex_ids[dof] == v0gi)
                 {
                   face_isds->v0_dofindex_cell = dof; break;
                 }
@@ -224,7 +233,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
               face_isds->v1_g_index = v1gi;
               for (int dof=0; dof<num_dofs; dof++)
               {
-                if (polyh_cell->v_indices[dof] == v1gi)
+                if (polyh_cell->vertex_ids[dof] == v1gi)
                 {
                   face_isds->v1_dofindex_cell = dof; break;
                 }
@@ -332,8 +341,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
         }//for p
       }
-
-    }//if polyhedron
+    }//polyhedron
   }//for intersected cell
 
   //chi_log.Log(LOG_0) << "Finished initializing interpolator.";

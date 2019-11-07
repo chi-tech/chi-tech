@@ -6,7 +6,7 @@
 void chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::ExportAsObj(
   const char *fileName)
 {
-  if (this->triangles.size()==0)
+  if (this->triangles.empty())
   {
     std::cout << "Cannot export empty DelaunayPatch\n";
     return;

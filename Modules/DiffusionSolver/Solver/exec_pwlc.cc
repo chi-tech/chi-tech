@@ -35,7 +35,7 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 
   std::vector<int> boundary_nodes,boundary_numbers;
 
-  if (chi_physics_handler.material_stack.size()==0)
+  if (chi_physics_handler.material_stack.empty())
   {
     chi_log.Log(LOG_0ERROR)
       << "No materials added to simulation. Add materials.";
@@ -55,28 +55,8 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
     int glob_cell_index = grid->local_cell_glob_indices[lc];
     chi_mesh::Cell* cell = grid->cells[glob_cell_index];
 
-    //====================================== Process cells
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      if (!suppress_assembly)
-        CFEM_Ab_Slab(glob_cell_index, cell, gi);
-
-    }
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      if (!suppress_assembly)
-        CFEM_Ab_Polygon(glob_cell_index, cell, gi);
-    }
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      if (!suppress_assembly)
-        CFEM_Ab_Polyhedron(glob_cell_index, cell, gi);
-    }
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Invalid cell-type encountered in chi_diffusion::Solver::ExecutePWLC";
-    }
+    if (!suppress_assembly)
+      CFEM_Assemble_A_and_b(glob_cell_index, cell, gi);
   }
 
   //=================================== Call matrix assembly

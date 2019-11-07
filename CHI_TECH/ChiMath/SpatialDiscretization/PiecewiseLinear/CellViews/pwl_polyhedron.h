@@ -3,9 +3,9 @@
 
 #include "../pwl.h"
 #include <vector>
-#include "../../../Quadratures/quadrature.h"
-#include "../../../../ChiMesh/Cell/cell_polyhedron.h"
-#include "../../../../ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMath/Quadratures/quadrature.h"
+#include "ChiMesh/Cell/cell_polyhedronv2.h"
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #define ON_SURFACE true
 
@@ -65,13 +65,6 @@ struct FEnodeMap
 // side s
 // node_maps[n]->face_map[f]->side_map[s]
 
-
-/**FaceDOFmapping*/
-struct FEFaceDOFMapping
-{
-  std::vector<int> cell_dof;
-};
-
 //###################################################################
 /**Object for handling piecewise linear
  * shape functions on polyhedron shaped 3D cells.
@@ -84,7 +77,7 @@ struct FEFaceDOFMapping
  * Some notes on indexing:\n
  *  - IntV_shapeI_gradshapeJ, given i and j results in a vector.
  *  - IntS_shapeI_shapeJ, requires f, then cell i, then cell j
- *  - face_dof_mappings, is as follows face_dof_mappings[f]->cell_dof[fi] and
+ *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  * */
 class PolyhedronFEView : public CellFEView
@@ -95,20 +88,10 @@ private:
   std::vector<double>              face_betaf;
 public:
   std::vector<FEnodeMap*>         node_maps;
-  std::vector<FEFaceDOFMapping*>  face_dof_mappings;
 
-public:
-  std::vector<double*>                          IntV_gradShapeI_gradShapeJ;
-  std::vector<std::vector<chi_mesh::Vector>>    IntV_shapeI_gradshapeJ;
-  std::vector<std::vector<double>>              IntV_shapeI_shapeJ;
-  std::vector<double>                           IntV_shapeI;
 private:
   std::vector<std::vector<std::vector<double>>> IntSi_shapeI_shapeJ;
   std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntSi_shapeI_gradshapeJ;
-public:
-  std::vector<std::vector<std::vector<double>>> IntS_shapeI_shapeJ;
-  std::vector<double*>                          IntS_shapeI;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntS_shapeI_gradshapeJ;
 
 private:
   std::vector<chi_math::QuadratureTetrahedron*> quadratures;
@@ -119,7 +102,7 @@ private:
 
 
 public:
-  PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
+  PolyhedronFEView(chi_mesh::CellPolyhedronV2* polyh_cell,
                    chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization= nullptr);
 

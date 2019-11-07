@@ -1,7 +1,5 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -11,7 +9,7 @@ extern ChiLog chi_log;
 
 //###################################################################
 /**Initializes communicators*/
-void LinearBoltzmanSolver::InitializeCommunicators()
+void LinearBoltzman::Solver::InitializeCommunicators()
 {
   std::set<int>    local_graph_edges;
   std::vector<int> local_connections;
@@ -24,78 +22,20 @@ void LinearBoltzmanSolver::InitializeCommunicators()
     int cell_glob_index = grid->local_cell_glob_indices[c];
     auto cell           = grid->cells[cell_glob_index];
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    for (int f=0; f < cell->faces.size(); f++)
     {
-      chi_mesh::CellSlab* slab_cell =
-        (chi_mesh::CellSlab*)cell;
+      int neighbor = cell->faces[f].neighbor;
 
-      int num_faces = 2;
-      for (int f=0; f<num_faces; f++)
+      if (neighbor>=0)
       {
-        int neighbor = slab_cell->edges[f];
+        auto adj_cell = grid->cells[neighbor];
 
-        if (neighbor>=0)
+        if (adj_cell->partition_id != chi_mpi.location_id)
         {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
+          local_graph_edges.insert(adj_cell->partition_id);
         }
-      }//for f
-    } //if slab
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      chi_mesh::CellPolygon* poly_cell =
-        (chi_mesh::CellPolygon*)cell;
-
-      for (int f=0; f< poly_cell->edges.size(); f++)
-      {
-        int neighbor = poly_cell->edges[f][EDGE_NEIGHBOR];
-
-        if (neighbor>=0)
-        {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
-        }
-      }//for f
-    } //if polyhedron
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      chi_mesh::CellPolyhedron* polyh_cell =
-        (chi_mesh::CellPolyhedron*)cell;
-
-      for (int f=0; f< polyh_cell->faces.size(); f++)
-      {
-        int neighbor = polyh_cell->faces[f]->face_indices[NEIGHBOR];
-
-        if (neighbor>=0)
-        {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
-        }
-      }//for f
-    } //if polyhedron
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encountered in call to "
-           "InitializeCommunicators.";
-      exit(EXIT_FAILURE);
-    }
+      }
+    }//for f
   }//for local cells
 
   //============================================= Convert set to vector

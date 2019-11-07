@@ -6,9 +6,9 @@
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/chi_volumemesher.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include <FiniteVolume/fv.h>
 #include <FiniteVolume/CellViews/fv_slab.h>
@@ -131,8 +131,11 @@ void chi_montecarlon::ResidualSource::
     }
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
+      chi_log.Log(LOG_0VERBOSE_1) << "Cell " << cell_glob_index;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+      auto cell_fe_view = (SlabFEView*)resid_sdm_pwl->MapFeView(cell_glob_index);
       chi_log.Log(LOG_0VERBOSE_1) << "**************** Cell " << cell_glob_index;
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       auto cell_fe_view =
@@ -154,8 +157,8 @@ void chi_montecarlon::ResidualSource::
         *resid_ff->local_cell_dof_array_address,&cur_cell_mapping);
 
       chi_log.Log(LOG_0VERBOSE_1)
-       << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
-       << "dof 1 phi=" << field[cur_cell_mapping[1]];
+        << "dof 0 phi=" << field[cur_cell_mapping[0]] << "\n"
+        << "dof 1 phi=" << field[cur_cell_mapping[1]];
 
       //==================================== Creating adj cell dof-mapping
       chi_log.Log(LOG_0VERBOSE_1) << "Mapping adj cell dofs";
@@ -164,13 +167,13 @@ void chi_montecarlon::ResidualSource::
       int num_faces = 2;
       for (int f=0; f<num_faces; f++)
       {
-        int adj_cell_index = slab_cell->edges[f];
+        int adj_cell_index = slab_cell->faces[f].neighbor;
 
         std::vector<int> adj_mapping;
 
         if (adj_cell_index >= 0)
         {
-          auto adj_cell = (chi_mesh::CellSlab*)grid->cells[adj_cell_index];
+          auto adj_cell = (chi_mesh::CellSlabV2*)grid->cells[adj_cell_index];
 
           int adj_num_dofs = 2;
           for (int i=0; i<adj_num_dofs; i++)
@@ -221,7 +224,7 @@ void chi_montecarlon::ResidualSource::
         for (int fi=0; fi<num_face_verts; fi++)
         {
           double phi_adj = 0.0;
-          if (slab_cell->edges[f] >= 0)
+          if (slab_cell->faces[f].neighbor >= 0)
             phi_adj = 0.5*field[adj_cell_mapping_f[f][0]] +
                       0.5*field[adj_cell_mapping_f[f][1]];
           if (slab_cell->edges[f] == -1)
@@ -267,6 +270,7 @@ void chi_montecarlon::ResidualSource::
         << "call to ResidualSource::Initialize.";
       exit(EXIT_FAILURE);
     }
+
   }//for local cells
 
   chi_log.Log(LOG_0) << "Computing total residual";
@@ -487,12 +491,12 @@ UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
   chi_montecarlon::Particle new_particle;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (cell->Type() == chi_mesh::CellType::SLABV2)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
-    int v0i = slab_cell->v_indices[0];
-    int v1i = slab_cell->v_indices[1];
+    int v0i = slab_cell->vertex_ids[0];
+    int v1i = slab_cell->vertex_ids[1];
 
     chi_mesh::Vertex v0 = *grid->nodes[v0i];
     chi_mesh::Vertex v1 = *grid->nodes[v1i];

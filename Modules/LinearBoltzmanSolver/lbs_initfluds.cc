@@ -1,7 +1,7 @@
 #include "lbs_linear_boltzman_solver.h"
 #include "ChiConsole/chi_console.h"
 
-#include <ChiMesh/SweepUtilities/chi_FLUDS.h>
+#include <ChiMesh/SweepUtilities/FLUDS/FLUDS.h>
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
@@ -19,7 +19,7 @@ extern ChiMPI     chi_mpi;
 
 //###################################################################
 /**Initializes fluds data structures.*/
-void LinearBoltzmanSolver::InitFluxDataStructures(LBSGroupset *groupset)
+void LinearBoltzman::Solver::InitFluxDataStructures(LBSGroupset *groupset)
 {
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* mesher = handler->volume_mesher;
@@ -28,11 +28,11 @@ void LinearBoltzmanSolver::InitFluxDataStructures(LBSGroupset *groupset)
       (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
   {
     //================================================== Angle Aggregation
-    if      (groupset->angleagg_method == NPT_ANGAGG_SINGLE)
+    if      (groupset->angleagg_method == AngleAggregationType::SINGLE)
     {
       InitAngleAggSingle(groupset);
     }
-    else if (groupset->angleagg_method == NPT_ANGAGG_POLAR)
+    else if (groupset->angleagg_method == AngleAggregationType::POLAR)
     {
       InitAngleAggPolar(groupset);
     }
@@ -42,64 +42,11 @@ void LinearBoltzmanSolver::InitFluxDataStructures(LBSGroupset *groupset)
     InitAngleAggSingle(groupset);
   }
 
-
-
-
-
-
-  //                   FIRST PASS                   //
-  //================================================== Loop over angle set groups
-  for (int ag=0; ag<groupset->angle_agg->angle_set_groups.size(); ag++)
-  {
-    int num_angle_sets = groupset->angle_agg->
-                         angle_set_groups[ag]->angle_sets.size();
-
-    //====================================== Loop over anglesets
-    for (int as=0; as<num_angle_sets; as++)
-    {
-      chi_mesh::SweepManagement::AngleSet* angle_set =
-        groupset->angle_agg->angle_set_groups[ag]->angle_sets[as];
-
-      angle_set->fluds =
-        new chi_mesh::SweepManagement::FLUDS(angle_set->GetNumGrps());
-
-      angle_set->fluds->InitializeAlphaElements(angle_set->GetSPDS());
-    }
-  }//for ag
-
   chi_log.Log(LOG_0)
-    << "Initialized FLUDS Alpha Elements. ";
-
-
-
-
-  //                  SECOND PASS                   //
-  //================================================== Loop over angle set groups
-  int anglset_counter=-1;
-  for (int ag=0; ag<groupset->angle_agg->angle_set_groups.size(); ag++)
-  {
-    int num_angle_sets = groupset->angle_agg->
-                         angle_set_groups[ag]->angle_sets.size();
-
-    //====================================== Loop over anglesets
-    for (int as=0; as<num_angle_sets; as++)
-    {
-      chi_mesh::SweepManagement::AngleSet* angle_set =
-        groupset->angle_agg->angle_set_groups[ag]->angle_sets[as];
-
-      anglset_counter++;
-      angle_set->fluds->InitializeBetaElements(angle_set->GetSPDS());
-    }
-  }//for ag
-
-  chi_log.Log(LOG_0)
-    << "Initialized FLUDS Beta Elements. "
+    << "Initialized Angle Aggregation.   "
     << "         Process memory = "
     << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
     << " MB.";
-
-
-
 
 
   MPI_Barrier(MPI_COMM_WORLD);

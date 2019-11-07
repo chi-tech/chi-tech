@@ -6,9 +6,9 @@
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/chi_volumemesher.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include <FiniteVolume/fv.h>
 #include <FiniteVolume/CellViews/fv_slab.h>
@@ -51,14 +51,14 @@ void chi_montecarlon::BoundarySource::
     auto cell = grid->cells[cell_glob_index];
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       int num_faces = 2;
       for (int f=0; f<num_faces; f++)
       {
-        int neighbor = slab_cell->edges[f];
+        int neighbor = slab_cell->faces[f].neighbor;
 
         //================================== If all boundaries
         if ((neighbor < 0) and (ref_bndry == MC_ALL_BOUNDARIES))
@@ -68,11 +68,11 @@ void chi_montecarlon::BoundarySource::
 
           R.SetRowIVec(0,chi_mesh::Vector(1.0,0.0,0.0));
           R.SetRowIVec(1,chi_mesh::Vector(0.0,1.0,0.0));
-          R.SetRowIVec(2,slab_cell->face_normals[f]*-1.0);
+          R.SetRowIVec(2,slab_cell->faces[f].normal*-1.0);
 
           ref_cell_faces.push_back(new_face_ref);
         }
-        //================================== If specific bndries
+          //================================== If specific bndries
         else if ((neighbor < 0) and (ref_bndry == abs(neighbor)))
         {
           FACE_REF* new_face_ref = new FACE_REF(cell_glob_index,f);
@@ -80,23 +80,23 @@ void chi_montecarlon::BoundarySource::
 
           R.SetRowIVec(0,chi_mesh::Vector(1.0,0.0,0.0));
           R.SetRowIVec(1,chi_mesh::Vector(0.0,1.0,0.0));
-          R.SetRowIVec(2,slab_cell->face_normals[f]*-1.0);
+          R.SetRowIVec(2,slab_cell->faces[f].normal*-1.0);
 
           ref_cell_faces.push_back(new_face_ref);
         }
 
       }//for faces
     }//if slab
-    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
+      // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
+    else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
       auto cell_fv_view = (PolygonFVView*)fv_sdm->MapFeView(cell_glob_index);
 
-      int num_faces = poly_cell->edges.size();
+      int num_faces = poly_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int neighbor = poly_cell->edges[f][EDGE_NEIGHBOR];
+        int neighbor = poly_cell->faces[f].neighbor;
 
         //================================== If all boundaries
         if ((neighbor < 0) and (ref_bndry == MC_ALL_BOUNDARIES))
@@ -104,7 +104,7 @@ void chi_montecarlon::BoundarySource::
           FACE_REF* new_face_ref = new FACE_REF(cell_glob_index,f);
           chi_mesh::Matrix3x3& R = new_face_ref->RotMatrix;
 
-          chi_mesh::Vector n = poly_cell->edgenormals[f]*-1.0;
+          chi_mesh::Vector n = poly_cell->faces[f].normal*-1.0;
           chi_mesh::Vector khat(0.0,0.0,1.0);
 
           if (n.Dot(khat) > 0.9999)
@@ -132,11 +132,11 @@ void chi_montecarlon::BoundarySource::
           FACE_REF* new_face_ref = new FACE_REF(cell_glob_index,f);
           chi_mesh::Matrix3x3& R = new_face_ref->RotMatrix;
 
-          chi_mesh::Vector n = poly_cell->edgenormals[f]*-1.0;
+          chi_mesh::Vector n = poly_cell->faces[f].normal*-1.0;
           chi_mesh::Vector khat(0.0,0.0,1.0);
 
-          int v0i = poly_cell->edges[f][0];
-          int v1i = poly_cell->edges[f][1];
+          int v0i = poly_cell->faces[f].vertex_ids[0];
+          int v1i = poly_cell->faces[f].vertex_ids[1];
 
           chi_mesh::Node v0 = *grid->nodes[v0i];
           chi_mesh::Node v1 = *grid->nodes[v1i];
@@ -211,16 +211,16 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   // Categorally slab surface sampling does not require
   // a cdf and therefore we have a specific routine for it.
-  if (first_cell->Type() == chi_mesh::CellType::SLAB)
+  if (first_cell->Type() == chi_mesh::CellType::SLABV2)
   {
     //====================================== Sample ref face
     int num_ref_faces = ref_cell_faces.size();
     int f = std::round(rng->Rand()*(num_ref_faces-1));
     FACE_REF* face_ref = ref_cell_faces[f];
 
-    chi_mesh::CellSlab* slab_cell =
-      (chi_mesh::CellSlab*)grid->cells[face_ref->cell_glob_index];
-    int ref_vert_index = slab_cell->v_indices[face_ref->face_num];
+    auto slab_cell =
+      (chi_mesh::CellSlabV2*)grid->cells[face_ref->cell_glob_index];
+    int ref_vert_index = slab_cell->vertex_ids[face_ref->face_num];
     chi_mesh::Vertex* ref_vert = grid->nodes[ref_vert_index];
 
     //====================================== Sample direction
@@ -243,19 +243,18 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     return new_particle;
   }//Slab cells
-  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-  else if (first_cell->Type() == chi_mesh::CellType::POLYGON)
+  else if (first_cell->Type() == chi_mesh::CellType::POLYGONV2)
   {
     int f = surface_sampler->Sample(rng->Rand());
 
     FACE_REF* face_ref = ref_cell_faces[f];
     auto poly_cell =
-      (chi_mesh::CellPolygon*)grid->cells[face_ref->cell_glob_index];
+      (chi_mesh::CellPolygonV2*)grid->cells[face_ref->cell_glob_index];
 
-    int* ref_edge = poly_cell->edges[face_ref->face_num];
+    chi_mesh::CellFace& ref_face = poly_cell->faces[face_ref->face_num];
 
-    chi_mesh::Vertex& v0 = *grid->nodes[ref_edge[0]];
-    chi_mesh::Vertex& v1 = *grid->nodes[ref_edge[1]];
+    chi_mesh::Vertex v0 = *grid->nodes[ref_face.vertex_ids[0]];
+    chi_mesh::Vertex v1 = *grid->nodes[ref_face.vertex_ids[1]];
 
     //====================================== Sample direction
     double costheta = rng->Rand();     //Sample half-range only
@@ -285,8 +284,6 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
       << "call to BoundarySource::CreateParticle.";
     exit(EXIT_FAILURE);
   }
-
-
 
   return new_particle;
 }

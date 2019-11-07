@@ -751,7 +751,7 @@ ierr = KSPSetTolerances(ksp,1.e-50,residual_tolerance,1.0e50,100);
 //=================================== Set up monitor
 ierr = KSPMonitorSet(ksp,&chi_diffusion::KSPMonitorAChiTech,NULL,NULL);
 
-//=================================== Setup verbose viewer
+//=================================== Setup verbose_info viewer
 if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
 	KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
 
@@ -988,7 +988,7 @@ only.
 //========================= Assemble penalty terms
 for (int fi=0; fi<num_face_dofs; fi++)
 {
-	int i  = fe_view->edge_dof_mappings[f][fi];
+	int i  = fe_view->face_dof_mappings[f][fi];
 	int ir = cell_ip_view->MapDof(i);
 
 	//Mapping face index to adj-cell
@@ -997,7 +997,7 @@ for (int fi=0; fi<num_face_dofs; fi++)
 
 	for (int fj=0; fj<2; fj++)
 	{
-		int j  = fe_view->edge_dof_mappings[f][fj];
+		int j  = fe_view->face_dof_mappings[f][fj];
 		int jr = cell_ip_view->MapDof(j);
 
 		double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];

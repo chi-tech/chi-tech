@@ -6,7 +6,7 @@ distributions might require some minor tweaking.
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
 GCC is used to build and install ChiTech.
-GFortran and Python is used during the installation of PETSc
+GFortran and Python are used during the installation of PETSc
 (which ChiTech uses as a linear algebra backend) and
 OpenGL is required by VTK (used by ChiTech for visualization).
 These packages will therefore also need to be installed.
@@ -33,7 +33,7 @@ sudo apt-get install build-essential gfortran
 
 If you still do not get the appropriate version when running either ``gcc --version``
 or ``gfortran --version`` then there are many online resources which may be able to
-assist you. One issue commonly seen is that the repositories on your system is not
+assist you. One issue commonly seen is that the repositories on your system are not
 updated in which case just run ```sudo apt update``` followed by 
 ```sudo apt upgrade```.
 

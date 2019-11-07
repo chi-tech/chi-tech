@@ -1,9 +1,9 @@
 #include "../chi_mesh.h"
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include <chi_log.h>
 
@@ -50,9 +50,9 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
   chi_mesh::Vector pos_f_line = pos_i_copy + omega_i_copy*extention_distance;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (cell->Type() == chi_mesh::CellType::SLABV2)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
     chi_mesh::Vector intersection_point;
     std::pair<double,double> weights;
@@ -60,11 +60,11 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
     int num_faces = 2;
     for (int f=0; f<num_faces; f++)
     {
-      int fpi = slab_cell->v_indices[f]; //face point index
+      int fpi = slab_cell->vertex_ids[f]; //face point index
       chi_mesh::Vertex face_point = *grid->nodes[fpi];
 
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
-        slab_cell->face_normals[f], face_point,
+        slab_cell->faces[f].normal, face_point,
         pos_i, pos_f_line,
         intersection_point, weights);
 
@@ -80,7 +80,7 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
           if (aux_info[0] >= 2)
             aux_info[1] = f;
           if (aux_info[0] >= 3)
-            aux_info[2] = slab_cell->edges[f];
+            aux_info[2] = slab_cell->faces[f].neighbor;
         }
         break;
       }
@@ -88,24 +88,24 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
 
 
   }//slab
-  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-  else if (cell->Type() == chi_mesh::CellType::POLYGON)
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
+  else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
   {
-    auto poly_cell = (chi_mesh::CellPolygon*)cell;
+    auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
     chi_mesh::Vector intersection_point;
     std::pair<double,double> weights;
 
-    int num_faces = poly_cell->edges.size();
+    int num_faces = poly_cell->faces.size();
     for (int f=0; f<num_faces; f++)
     {
-      int fpi = poly_cell->edges[f][0]; //face point index 0
-      int fpf = poly_cell->edges[f][1]; //face point index 1
+      int fpi = poly_cell->faces[f].vertex_ids[0]; //face point index 0
+      int fpf = poly_cell->faces[f].vertex_ids[1]; //face point index 1
       chi_mesh::Vertex face_point_i = *grid->nodes[fpi];
       chi_mesh::Vertex face_point_f = *grid->nodes[fpf];
 
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
-        poly_cell->edgenormals[f], face_point_i,
+        poly_cell->faces[f].normal, face_point_i,
         pos_i, pos_f_line,
         intersection_point, weights);
 
@@ -131,7 +131,7 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
             if (aux_info[0] >= 2)
               aux_info[1] = f;
             if (aux_info[0] >= 3)
-              aux_info[2] = poly_cell->edges[f][EDGE_NEIGHBOR];
+              aux_info[2] = poly_cell->faces[f].neighbor;
           }
           break;
         }
@@ -145,5 +145,7 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
       << "chi_mesh::RayTrace.";
     exit(EXIT_FAILURE);
   }
+
+
 
 }

@@ -1,8 +1,8 @@
 #include "fieldfunction.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 #include <ChiPhysics/chi_physics.h>
 
 #include <PiecewiseLinear/pwl.h>
@@ -85,40 +85,40 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
     int mat_id = cell->material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       int num_verts = 2;
       for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(slab_cell->v_indices[v]);
+        cfem_nodes.push_back(slab_cell->vertex_ids[v]);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-      int num_verts = poly_cell->v_indices.size();
+      int num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(poly_cell->v_indices[v]);
+        cfem_nodes.push_back(poly_cell->vertex_ids[v]);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-      int num_verts = polyh_cell->v_indices.size();
+      int num_verts = polyh_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(polyh_cell->v_indices[v]);
+        cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
     }//polyhedron
   }//for local cells
 
   std::vector<int> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_grps,num_moms,grp,mom,
-                                field_vector,phi_vec,cfem_nodes,&mapping);
+                                *field_vector,phi_vec,cfem_nodes,&mapping);
 
 
   //======================================== Populate cell information
@@ -131,16 +131,16 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       int num_verts = 2;
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = slab_cell->v_indices[v];
+        int vgi = slab_cell->vertex_ids[v];
         std::vector<double> d_node(3);
         d_node[0] = grid->nodes[vgi]->x;
         d_node[1] = grid->nodes[vgi]->y;
@@ -172,15 +172,15 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-      int num_verts = poly_cell->v_indices.size();
+      int num_verts = poly_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = poly_cell->v_indices[v];
+        int vgi = poly_cell->vertex_ids[v];
         std::vector<double> d_node(3);
         d_node[0] = grid->nodes[vgi]->x;
         d_node[1] = grid->nodes[vgi]->y;
@@ -211,16 +211,16 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
       auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
 
-      int num_verts = polyh_cell->v_indices.size();
+      int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = polyh_cell->v_indices[v];
+        int vgi = polyh_cell->vertex_ids[v];
         std::vector<double> d_node(3);
         d_node[0] = grid->nodes[vgi]->x;
         d_node[1] = grid->nodes[vgi]->y;
@@ -236,11 +236,11 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
       int num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
+        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
-          int v = cell_fe_view->face_dof_mappings[f]->cell_dof[fv];
+          int v = cell_fe_view->face_dof_mappings[f][fv];
           face[fv] = cell_info[v];
         }
 
@@ -347,44 +347,44 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       int num_verts = 2;
       for (int v=0; v<num_verts; v++)
         for (int g=0; g<num_grps; g++)
-          cfem_nodes.push_back(slab_cell->v_indices[v]);
+          cfem_nodes.push_back(slab_cell->vertex_ids[v]);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-      int num_verts = poly_cell->v_indices.size();
+      int num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
         for (int g=0; g<num_grps; g++)
-          cfem_nodes.push_back(poly_cell->v_indices[v]);
+          cfem_nodes.push_back(poly_cell->vertex_ids[v]);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-      int num_verts = polyh_cell->v_indices.size();
+      int num_verts = polyh_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
         for (int g=0; g<num_grps; g++)
-          cfem_nodes.push_back(polyh_cell->v_indices[v]);
+          cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
     }//polyhedron
   }//for local cells
 
   std::vector<int> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_grps,num_moms,grp,mom,
-                                field_vector,phi_vec,cfem_nodes,&mapping);
+                                *field_vector,phi_vec,cfem_nodes,&mapping);
 
 
   //======================================== Populate cell information
@@ -397,16 +397,16 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       int num_verts = 2;
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = slab_cell->v_indices[v];
+        int vgi = slab_cell->vertex_ids[v];
         std::vector<double> d_node(3);
         d_node[0] = grid->nodes[vgi]->x;
         d_node[1] = grid->nodes[vgi]->y;
@@ -438,15 +438,15 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-      int num_verts = poly_cell->v_indices.size();
+      int num_verts = poly_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = poly_cell->v_indices[v];
+        int vgi = poly_cell->vertex_ids[v];
         std::vector<double> d_node(3);
         d_node[0] = grid->nodes[vgi]->x;
         d_node[1] = grid->nodes[vgi]->y;
@@ -477,16 +477,16 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
       auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
 
-      int num_verts = polyh_cell->v_indices.size();
+      int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = polyh_cell->v_indices[v];
+        int vgi = polyh_cell->vertex_ids[v];
         std::vector<double> d_node(3);
         d_node[0] = grid->nodes[vgi]->x;
         d_node[1] = grid->nodes[vgi]->y;
@@ -502,11 +502,11 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
       int num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
+        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
-          int v = cell_fe_view->face_dof_mappings[f]->cell_dof[fv];
+          int v = cell_fe_view->face_dof_mappings[f][fv];
           face[fv] = cell_info[v];
         }
 

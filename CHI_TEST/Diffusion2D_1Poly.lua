@@ -107,8 +107,8 @@ chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 if (master_export == nil) then
     chiFFInterpolationExportPython(slice2)
     chiFFInterpolationExportPython(line0)
-    local handle = io.popen("python ZPFFI00.py")
-    local handle = io.popen("python ZLFFI10.py")
+    local handle = io.popen("python3 ZPFFI00.py")
+    local handle = io.popen("python3 ZLFFI10.py")
 
     chiExportFieldFunctionToVTK(fftemp,"ZPhi")
 end

@@ -1,8 +1,8 @@
 #include "fieldfunction.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 #include <ChiPhysics/chi_physics.h>
 
 #include <PiecewiseLinear/pwl.h>
@@ -69,7 +69,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
   phiavgarray = vtkDoubleArray::New();
   phiavgarray->SetName((field_name + std::string("-Avg")).c_str());
 
-  //========================================= Populate dones
+  //========================================= Populate nodes
   for (int v=0; v<grid->nodes.size(); v++)
   {
     std::vector<double> d_node;
@@ -99,14 +99,14 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->v_indices[0]);
-      cell_info.push_back(slab_cell->v_indices[1]);
+      cell_info.push_back(slab_cell->vertex_ids[0]);
+      cell_info.push_back(slab_cell->vertex_ids[1]);
 
       ugrid->
         InsertNextCell(VTK_LINE,2,
@@ -120,15 +120,15 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
       std::vector<vtkIdType> cell_info;
 
-      int num_verts = poly_cell->v_indices.size();
+      int num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->v_indices[v]);
+        cell_info.push_back(poly_cell->vertex_ids[v]);
 
       ugrid->
         InsertNextCell(VTK_POLYGON,num_verts,
@@ -142,14 +142,14 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-      int num_verts = polyh_cell->v_indices.size();
+      int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->v_indices[v];
+        cell_info[v] = polyh_cell->vertex_ids[v];
 
       vtkSmartPointer<vtkCellArray> faces =
         vtkSmartPointer<vtkCellArray>::New();
@@ -157,10 +157,10 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
       int num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
+        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f]->v_indices[fv];
+          face[fv] = polyh_cell->faces[f].vertex_ids[fv];
 
         faces->InsertNextCell(num_fverts,face.data());
       }//for f
@@ -276,14 +276,14 @@ void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
 
     int mat_id = cell->material_id;
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
       std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->v_indices[0]);
-      cell_info.push_back(slab_cell->v_indices[1]);
+      cell_info.push_back(slab_cell->vertex_ids[0]);
+      cell_info.push_back(slab_cell->vertex_ids[1]);
 
       ugrid->
         InsertNextCell(VTK_LINE,2,
@@ -301,15 +301,15 @@ void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
       std::vector<vtkIdType> cell_info;
 
-      int num_verts = poly_cell->v_indices.size();
+      int num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->v_indices[v]);
+        cell_info.push_back(poly_cell->vertex_ids[v]);
 
       ugrid->
         InsertNextCell(VTK_POLYGON,num_verts,
@@ -326,14 +326,14 @@ void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-      int num_verts = polyh_cell->v_indices.size();
+      int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->v_indices[v];
+        cell_info[v] = polyh_cell->vertex_ids[v];
 
       vtkSmartPointer<vtkCellArray> faces =
         vtkSmartPointer<vtkCellArray>::New();
@@ -341,10 +341,10 @@ void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
       int num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f]->v_indices.size();
+        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f]->v_indices[fv];
+          face[fv] = polyh_cell->faces[f].vertex_ids[fv];
 
         faces->InsertNextCell(num_fverts,face.data());
       }//for f

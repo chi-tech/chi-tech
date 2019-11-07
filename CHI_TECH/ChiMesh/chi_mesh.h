@@ -44,10 +44,10 @@ namespace chi_mesh
 
   //=================================== Cells
   class Cell;
-  class CellSlab;
-  class CellTriangle;
-  class CellPolygon;
-  class CellPolyhedron;
+//  class CellSlab;
+//  class CellTriangle;
+//  class CellPolygon;
+//  class CellPolyhedron;
 
   //=================================== Field function interpolation
   class FieldFunctionInterpolation;
@@ -135,7 +135,7 @@ namespace chi_mesh
 #include"chi_mesh_edgeloops.h"
 #include"chi_mesh_interface.h"
 
-#include "SweepUtilities/chi_sweep.h"
+#include "ChiMesh/SweepUtilities/sweep_namespace.h"
 
 
 

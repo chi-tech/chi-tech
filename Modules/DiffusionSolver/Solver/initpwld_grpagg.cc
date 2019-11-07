@@ -1,12 +1,6 @@
 #include "diffusion_solver.h"
 
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
-
-
-
-
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiTimer/chi_timer.h>
 
 #include <chi_mpi.h>
@@ -16,9 +10,6 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
-
-#include<fstream>
-#include <unistd.h>
 
 PetscErrorCode
 DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
@@ -34,19 +25,21 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   chi_mesh::Region*     aregion = this->regions.back();
   grid = aregion->volume_mesh_continua.back();
 
+  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
+  mesher = mesh_handler->volume_mesher;
+
+  int num_nodes = grid->nodes.size();
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  this->ReorderNodesPWLD();
+  ReorderNodesPWLD();
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
-  {
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
-  }
 
 
   //================================================== Initialize field function
@@ -93,6 +86,8 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   }
 
   //================================================== Setup timers
+  if (verbose)
+    chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
   double t0 = 0.0;
 
@@ -104,9 +99,16 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   nodal_boundary_numbers.resize(grid->nodes.size(),0);
   int total_nnz = 0;
 
+
+
+
+
+
+
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
   PWLDBuildSparsityPattern();
+
 
   //================================================== Reshuffling nnz
   std::vector<int> G_nodal_nnz_in_diag(pwld_local_dof_count*G);
@@ -174,14 +176,36 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   int first_cell_g_index = grid->local_cell_glob_indices[0];
   auto first_cell = grid->cells[first_cell_g_index];
 
-  if (first_cell->Type() == chi_mesh::CellType::SLAB)
+  if (first_cell->Type() == chi_mesh::CellType::SLABV2)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-  }
 
-  if (first_cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+    PetscOptionsInsertString(NULL,"-options_left");
+  }
+  if (first_cell->Type() == chi_mesh::CellType::POLYGONV2)
+  {
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
+
+    //PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+    PetscOptionsInsertString(NULL,"-options_left");
+  }
+  if (first_cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
 
@@ -193,6 +217,8 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+
+    PetscOptionsInsertString(NULL,"-options_left");
   }
   PetscOptionsInsertString(NULL,options_string.c_str());
   PCSetFromOptions(pc);
@@ -203,7 +229,7 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
 
   KSPSetConvergenceTest(ksp,&DiffusionConvergenceTestNPT,NULL,NULL);
 
-  //=================================== Setup verbose viewer
+  //=================================== Setup verbose_info viewer
   if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
     KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
 

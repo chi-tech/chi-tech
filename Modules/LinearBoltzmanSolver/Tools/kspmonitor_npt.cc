@@ -54,6 +54,8 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
   double relative_residual = rnorm/rhs_norm;
 
+  context->groupset->latest_convergence_metric = std::min(relative_residual, 1.0);
+
 
   //======================================== Print iteration information
   std::string offset;

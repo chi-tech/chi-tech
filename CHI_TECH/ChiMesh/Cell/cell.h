@@ -7,26 +7,47 @@
 //Appending cell types to namespace
 namespace chi_mesh
 {
-  enum class CellType
+enum class CellType
+{
+  GHOST = 0,
+//    SLAB = 1,
+  SPHERICAL_SHELL = 2,
+  CYLINDRICAL_ANNULUS = 3,
+  TRIANGLE = 4,
+  QUADRILATERAL = 5,
+//    POLYGON = 6,
+  TETRAHEDRON = 7,
+  HEXAHEDRON = 8,
+//    POLYHEDRON = 9,
+  SLABV2 = 11,
+  POLYGONV2 = 12,
+  POLYHEDRONV2 = 13
+};
+
+//######################################################### Class def
+/** In this paradigm a face is an object which largely
+ * is considered to be planar (meaning all the vertices
+ * lay in the same plane).*/
+class CellFace
+{
+public:
+  std::vector<int> vertex_ids;   /// A list of the vertices
+  Normal normal;                 /// The average/geometric normal
+  Vertex centroid;               /// The face centroid
+  int neighbor;                  /// Neigboring cell index (<0 indicates bndry)
+
+  CellFace()
   {
-    GHOST = 0,
-    SLAB = 1,
-    SPHERICAL_SHELL = 2,
-    CYLINDRICAL_ANNULUS = 3,
-    TRIANGLE = 4,
-    QUADRILATERAL = 5,
-    POLYGON = 6,
-    TETRAHEDRON = 7,
-    HEXAHEDRON = 8,
-    POLYHEDRON = 9
-  };
-}
+    neighbor = -1;
+  }
+};
+
 
 
 
 //######################################################### Class def
 /**Generic mesh cell object*/
-class chi_mesh::Cell
+class Cell
 {
 public:
   int cell_global_id;
@@ -36,6 +57,9 @@ public:
   int partition_id;
   Vertex centroid;
   int material_id;
+
+  std::vector<int> vertex_ids;
+  std::vector<CellFace> faces;
 
 private:
   const CellType cell_type;
@@ -63,5 +87,6 @@ public:
   const CellType Type() {return cell_type;}
 };
 
+}
 
 #endif

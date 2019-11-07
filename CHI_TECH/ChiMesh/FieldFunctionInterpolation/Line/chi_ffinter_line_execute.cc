@@ -1,7 +1,7 @@
 #include "chi_ffinter_line.h"
-#include "../../Cell/cell_slab.h"
-#include "../../Cell/cell_polygon.h"
-#include "../../Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell_slabv2.h"
+#include "ChiMesh/Cell/cell_polygonv2.h"
+#include "ChiMesh/Cell/cell_polyhedronv2.h"
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
@@ -21,7 +21,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
     {
       Vec x_mapped;
       std::vector<int> mapping;
-      Vec x = field_functions[ff]->field_vector;
+      Vec x = *field_functions[ff]->field_vector;
       CreateCFEMMapping(field_functions[ff]->num_grps,
                         field_functions[ff]->num_moms,
                         field_functions[ff]->grp,
@@ -99,10 +99,10 @@ CFEMInterpolate(Vec field,
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-      SlabFEView*      cell_fe_view =
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+      auto cell_fe_view =
         (SlabFEView*)spatial_dm->MapFeView(cell_glob_index);
 
       double weighted_value = 0.0;
@@ -127,14 +127,14 @@ CFEMInterpolate(Vec field,
     }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
+    else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
     {
-      chi_mesh::CellPolygon* poly_cell = (chi_mesh::CellPolygon*)cell;
-      PolygonFEView*      cell_fe_view =
+      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+      auto cell_fe_view =
         (PolygonFEView*)spatial_dm->MapFeView(cell_glob_index);
 
       double weighted_value = 0.0;
-      for (int i=0; i<poly_cell->v_indices.size(); i++)
+      for (int i=0; i<poly_cell->vertex_ids.size(); i++)
       {
         double node_value=0.0;
         counter++;
@@ -155,14 +155,14 @@ CFEMInterpolate(Vec field,
     }
 
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      PolyhedronFEView*       cell_fe_view =
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+      auto cell_fe_view =
         (PolyhedronFEView*)spatial_dm->MapFeView(cell_glob_index);
 
       double weighted_value = 0.0;
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      for (int i=0; i<polyh_cell->vertex_ids.size(); i++)
       {
         double node_value=0.0;
         counter++;
@@ -181,7 +181,7 @@ CFEMInterpolate(Vec field,
 
       ff_ctx->interpolation_points_values[c] = weighted_value;
 
-    }//if polyh
+    }//if polyhedron
   }//for ass cell
 
 }
@@ -211,10 +211,10 @@ void chi_mesh::FieldFunctionInterpolationLine::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
-      chi_mesh::CellSlab* slab_cell = (chi_mesh::CellSlab*)cell;
-      SlabFEView*      cell_fe_view =
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+      auto cell_fe_view =
         (SlabFEView*)spatial_dm->MapFeView(cell_glob_index);
 
       double weighted_value = 0.0;
@@ -240,14 +240,14 @@ void chi_mesh::FieldFunctionInterpolationLine::
 
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
     {
-      chi_mesh::CellPolyhedron* polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      PolyhedronFEView*       cell_fe_view =
+      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+      auto cell_fe_view =
         (PolyhedronFEView*)spatial_dm->MapFeView(cell_glob_index);
 
       double weighted_value = 0.0;
-      for (int i=0; i<polyh_cell->v_indices.size(); i++)
+      for (int i=0; i<polyh_cell->vertex_ids.size(); i++)
       {
         double node_value=0.0;
         counter++;

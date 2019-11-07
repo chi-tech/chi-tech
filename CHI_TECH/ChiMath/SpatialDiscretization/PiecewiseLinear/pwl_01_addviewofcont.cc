@@ -1,14 +1,10 @@
 #include "pwl.h"
 
-#include "../../../ChiMesh/Cell/cell_triangle.h"
 #include "CellViews/pwl_slab.h"
-#include "CellViews/pwl_triangle.h"
 #include "CellViews/pwl_polygon.h"
 #include "CellViews/pwl_polyhedron.h"
-#include<typeinfo>
 
 #include <chi_log.h>
-#include <chi_mpi.h>
 
 extern ChiLog chi_log;
 
@@ -46,50 +42,45 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
 
     if (cell_fe_views_mapping[cell_index]<0)
     {
-      //========================================= If slab item_id
-      if (cell->Type() == chi_mesh::CellType::SLAB)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+      if (cell->Type() == chi_mesh::CellType::SLABV2)
       {
-        SlabFEView* view =
-          new SlabFEView((chi_mesh::CellSlab*)cell,vol_continuum);
+        auto slab_cell = dynamic_cast<chi_mesh::CellSlabV2*>(cell);
+        auto cell_fe_view = new SlabFEView(slab_cell, vol_continuum);
 
-        this->cell_fe_views.push_back(view);
+        //cell_fe_view->PreCompute();
+
+        this->cell_fe_views.push_back(cell_fe_view);
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
       }
-
-      //========================================= If triangle item_id
-      if (typeid(*(cell)) == typeid(chi_mesh::CellTriangle) )
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+      else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
       {
-        TriangleFEView* view =
-          new TriangleFEView((chi_mesh::CellTriangle*)(cell),vol_continuum);
+        auto poly_cell = dynamic_cast<chi_mesh::CellPolygonV2*>(cell);
+        auto cell_fe_view = new PolygonFEView(poly_cell, vol_continuum, this);
 
-        this->cell_fe_views.push_back(view);
+        cell_fe_view->PreCompute();
+
+        this->cell_fe_views.push_back(cell_fe_view);
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
       }
-
-      //========================================= If polygon item_id
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+      else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
       {
-        PolygonFEView* view =
-          new PolygonFEView((chi_mesh::CellPolygon*)(cell),vol_continuum,this);
+        auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedronV2*>(cell);
+        auto cell_fe_view = new PolyhedronFEView(polyh_cell, vol_continuum, this);
 
-        view->PreCompute();
-        this->cell_fe_views.push_back(view);
+        cell_fe_view->PreCompute();
+        cell_fe_view->CleanUp();
+        this->cell_fe_views.push_back(cell_fe_view);
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
       }
-
-      //========================================= If polyhedron item_id
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      else
       {
-        PolyhedronFEView* view =
-          new PolyhedronFEView(
-            (chi_mesh::CellPolyhedron*)(cell),
-            vol_continuum,
-            this);
-
-        view->PreCompute();
-        view->CleanUp();
-        this->cell_fe_views.push_back(view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+        chi_log.Log(LOG_ALLERROR)
+          << "SpatialDiscretization_PWL::AddViewOfLocalContinuum. "
+          << "Unsupported cell type encountered.";
+        exit(EXIT_FAILURE);
       }
     }//if mapping not yet assigned
   }//for num cells

@@ -1,6 +1,8 @@
 #ifndef _chi_diffusion_solver_h
 #define _chi_diffusion_solver_h
 
+#include <ChiMesh/Cell/cell.h>
+
 #define SOLVER_SYSTEM_EIGEN 1
 #define SOLVER_SYSTEM_PETSC 2
 #define PROPERTY_D_MAP 5
@@ -73,7 +75,7 @@ private:
   ChiTimer t_solve;
 
   double time_assembly, time_solve;
-  bool verbose;
+  bool verbose_info;
 public:
   std::string                              solver_name;
   std::vector<chi_diffusion::Boundary*>    boundaries;
@@ -113,8 +115,8 @@ public:
   PetscErrorCode ierr;
   PetscInt       local_rows_from, local_rows_to;
 
-  std::vector<std::vector<int>*> nodal_connections;
-  std::vector<std::vector<int>*> nodal_cell_connections;
+  std::vector<std::vector<int>>  nodal_connections;
+  std::vector<std::vector<int>>  nodal_cell_connections;
   std::vector<int>               nodal_boundary_numbers;
   std::vector<int>               nodal_nnz_in_diag;
   std::vector<int>               nodal_nnz_off_diag;
@@ -162,6 +164,7 @@ public:
   //01a
   void InitializeCommonItems();
   void PWLDBuildSparsityPattern();
+  void PWLCBuildSparsityPattern();
   //01b
   int Initialize(bool verbose=true);
   //01c
@@ -182,12 +185,7 @@ public:
   //02b
   int  ExecutePWLC(bool suppress_assembly = false,
                    bool suppress_solve = false);
-  //02b_a
-  void CFEM_Ab_Slab(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
-  //02b_b
-  void CFEM_Ab_Polygon(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
-  //02b_c
-  void CFEM_Ab_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
+  void CFEM_Assemble_A_and_b(int cell_glob_index, chi_mesh::Cell *cell, int group=0);
 
 
 
@@ -195,44 +193,24 @@ public:
   //02c
   int ExecutePWLD_MIP(bool suppress_assembly = false,
                       bool suppress_solve = false);
-  //02c_a
-  void PWLD_Ab_Slab(int cell_glob_index, chi_mesh::Cell *cell,
-                    DiffusionIPCellView* cell_ip_view, int group=0);
-  void PWLD_b_Slab(int cell_glob_index, chi_mesh::Cell *cell,
-                    DiffusionIPCellView* cell_ip_view, int group=0);
-  //02c_b
-  void PWLD_Ab_Polygon(int cell_glob_index, chi_mesh::Cell *cell,
-                       DiffusionIPCellView* cell_ip_view, int group=0);
-  void PWLD_b_Polygon(int cell_glob_index, chi_mesh::Cell *cell,
-                       DiffusionIPCellView* cell_ip_view, int group=0);
   //02c_c
-  void PWLD_Ab_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell,
+  void PWLD_Assemble_A_and_b(int cell_glob_index, chi_mesh::Cell *cell,
                           DiffusionIPCellView* cell_ip_view, int group=0);
-  void PWLD_b_Polyhedron(int cell_glob_index, chi_mesh::Cell *cell,
-                          DiffusionIPCellView* cell_ip_view, int group=0);
+  void PWLD_Assemble_b(int cell_glob_index, chi_mesh::Cell *cell,
+                         DiffusionIPCellView* cell_ip_view, int group=0);
 
   //02d
   int ExecutePWLD_MIP_GRPS(bool suppress_assembly = false,
                            bool suppress_solve = false);
 
-
   //02e
   int ExecutePWLD_MIP_GAGG(bool suppress_assembly = false,
                            bool suppress_solve = false);
-  //02e_a
-  void PWLD_Ab_Slab_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                         DiffusionIPCellView* cell_ip_view);
-  void PWLD_b_Slab_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                         DiffusionIPCellView* cell_ip_view);
-  //02e_b
-  void PWLD_Ab_Polygon_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                            DiffusionIPCellView* cell_ip_view);
-  void PWLD_b_Polygon_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
-                            DiffusionIPCellView* cell_ip_view);
+
   //02e_c
-  void PWLD_Ab_Polyhedron_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
+  void PWLD_Assemble_A_and_b_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
                                DiffusionIPCellView* cell_ip_view);
-  void PWLD_b_Polyhedron_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
+  void PWLD_Assemble_b_GAGG(int cell_glob_index, chi_mesh::Cell *cell,
                               DiffusionIPCellView* cell_ip_view);
 
 
@@ -245,13 +223,12 @@ public:
   void ReorderNodesPWLD();
   int  MapBorderCell(int locI, int neighbor, int vglob_i);
   void SpawnBorderCell(int locI, int cell_border_index);
-  double HPerpendicularPoly(int Nv, double area, double perimeter);
-  double HPerpendicularPolyH(int Nf, int Nv, double volume, double area);
-  int MapCellDof(chi_mesh::CellSlab* slab_cell, int ig);
-  int MapCellDof(chi_mesh::CellPolygon* poly_cell, int ig);
-  int MapCellDof(chi_mesh::CellPolyhedron* polyh_cell, int ig);
-  int MapCellFace(chi_mesh::CellPolyhedron* polyh_cell,
-                  chi_mesh::CellPolyhedron* adjph_cell, int f);
+
+
+  double HPerpendicular(chi_mesh::Cell* cell, CellFEView* fe_view, int f);
+  int MapCellDof(chi_mesh::Cell* cell, int ig);
+  int MapCellFace(chi_mesh::Cell* cur_cell,
+                  chi_mesh::Cell* adj_cell, int f);
 
   DiffusionIPCellView* GetBorderIPView(int locI, int cell_glob_index);
   CellFEView* GetBorderFEView(int locI, int cell_glob_index);
