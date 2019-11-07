@@ -38,7 +38,7 @@ assist you.
 Now, install the remaining packages needed to build ChiTech and its dependencies:
 
 ```bash
-sudo apt-get install cmake python git zlib1g-dev libx11-dev
+sudo apt-get install cmake python git zlib1g-dev libx11-dev unzip
 sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 ```
 
@@ -298,7 +298,16 @@ In the main directory (i.e. *chi-tech/*), execute:
 You can also use -j8 even if you don't have 8 processors, the make command
 will use threading where possible.
 
-### Step 11 - ChiTech documentation
+### Step 11 - Run regression tests
+
+To check if the code compiled correctly execute the test scripts:
+
+```bash
+    $ python3 CHI_TEST/Z_Run_all.py
+```
+
+
+### Step 12 - ChiTech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
