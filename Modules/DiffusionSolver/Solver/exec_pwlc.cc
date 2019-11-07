@@ -35,7 +35,7 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 
   std::vector<int> boundary_nodes,boundary_numbers;
 
-  if (chi_physics_handler.material_stack.size()==0)
+  if (chi_physics_handler.material_stack.empty())
   {
     chi_log.Log(LOG_0ERROR)
       << "No materials added to simulation. Add materials.";

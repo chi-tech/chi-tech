@@ -297,7 +297,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
     auto extruder = (chi_mesh::VolumeMesherExtruder*)vol_mesher;
 
     //====================================== Create virtual cuts
-    if (vol_mesher->zcuts.size()==0)
+    if (vol_mesher->zcuts.empty())
     {
       int num_sub_layers = extruder->vertex_layers.size()-1;
 

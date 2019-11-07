@@ -48,7 +48,7 @@ std::vector<int> chi_graph::DirectedGraph::GenerateTopologicalSort()
   int num_verts = vertices.size();
   for (int v=0; v<num_verts; v++)
   {
-    if (vertices[v]->us_edge.size() == 0)
+    if (vertices[v]->us_edge.empty())
     {
       verts_rank_r[0].push_back(vertices[v]);
       vertices[v]->rank = 0;

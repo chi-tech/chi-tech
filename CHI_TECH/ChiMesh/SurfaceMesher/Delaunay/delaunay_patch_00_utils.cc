@@ -249,7 +249,7 @@ void chi_mesh::SurfaceMesherDelaunay::
 void chi_mesh::SurfaceMesherDelaunay::
   DelaunayPatch::DumpToScilab(const char *file_name, bool verbose)
 {
-  if (this->triangles.size()==0)
+  if (this->triangles.empty())
   {
     std::cout << "Cannot export empty SurfaceMesh to scilab format\n";
     return;

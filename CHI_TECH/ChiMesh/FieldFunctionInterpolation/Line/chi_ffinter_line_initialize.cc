@@ -26,7 +26,7 @@ Initialize()
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Initializing line interpolator2.";
   //================================================== Check grid available
-  if (field_functions.size() == 0)
+  if (field_functions.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "Unassigned field function in line field function interpolator.";
@@ -47,7 +47,8 @@ Initialize()
   }
 
   //====================================================== Loop over contexts
-  for (int ff=0; ff<field_functions.size(); ff++)
+  size_t num_ff = field_functions.size();
+  for (size_t ff=0; ff<num_ff; ff++)
   {
     auto ff_context = new FieldFunctionContext;
     ff_contexts.push_back(ff_context);
@@ -66,7 +67,7 @@ Initialize()
       //================================================== Find a home for each
       //                                                   point
       size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-      for (int ic=0; ic<num_local_cells; ic++)
+      for (size_t ic=0; ic<num_local_cells; ic++)
       {
         int cell_glob_index = grid_view->local_cell_glob_indices[ic];
         auto cell = grid_view->cells[cell_glob_index];
@@ -89,10 +90,10 @@ Initialize()
             chi_mesh::Vector v01 = v1 - v0;
             chi_mesh::Vector v0p = interpolation_points[p]-v0;
 
-            double norm = v0p.Norm();
-            double projection = v01.Dot(v0p)/v01.Norm();
+            double v01_norm = v01.Norm();
+            double projection = v01.Dot(v0p)/v01_norm;
 
-            if ((v0p.Dot(v01)<0.0) or (projection>v01.Norm()))
+            if ((v0p.Dot(v01)<0.0) or (projection>v01_norm))
             {
               is_inside = false;
             }
@@ -119,7 +120,7 @@ Initialize()
             //Assume each point is inside the cell, now try to disprove it
             bool is_inside = true;
             //Form a plane for each edge
-            for (int e=0; e<num_edges; e++)
+            for (size_t e=0; e<num_edges; e++)
             {
               chi_mesh::Vector nref(0.0,0.0,1.0);
               int v0_i = poly_cell->faces[e].vertex_ids[0];
@@ -163,12 +164,12 @@ Initialize()
           {
             //Assume each point is inside the cell, now try to disprove it
             bool is_inside = true;
-            for (int f=0; f<num_faces; f++)
+            for (size_t f=0; f<num_faces; f++)
             {
               std::vector<std::vector<int>> edges = polyh_cell->GetFaceEdges(f);
               size_t num_edges = edges.size();
               //Form a plane for each side
-              for (int e=0; e<num_edges; e++)
+              for (size_t e=0; e<num_edges; e++)
               {
                 int v0_i = edges[e][0];
 
@@ -201,7 +202,8 @@ Initialize()
 
       //================================================== Upload node indices that
       //                                                   need mapping
-      for (int c=0; c<interpolation_points_ass_cell.size(); c++)
+      size_t num_interp_points = interpolation_points_ass_cell.size();
+      for (size_t c=0; c<num_interp_points; c++)
       {
         if (interpolation_points_ass_cell[c] < 0) continue;
 
@@ -227,7 +229,8 @@ Initialize()
         {
           auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-          for (int i=0; i<poly_cell->vertex_ids.size(); i++)
+          size_t num_verts = poly_cell->vertex_ids.size();
+          for (size_t i=0; i<num_verts; i++)
           {
             cfem_local_nodes_needed_unmapped.push_back(poly_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
@@ -241,7 +244,8 @@ Initialize()
         {
           auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-          for (int i=0; i<polyh_cell->vertex_ids.size(); i++)
+          size_t num_verts = polyh_cell->vertex_ids.size();
+          for (size_t i=0; i<num_verts; i++)
           {
             cfem_local_nodes_needed_unmapped.push_back(polyh_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);

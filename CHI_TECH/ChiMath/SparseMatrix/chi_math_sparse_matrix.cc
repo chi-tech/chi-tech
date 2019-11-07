@@ -264,7 +264,7 @@ std::string chi_math::SparseMatrix::PrintS()
 /**Constructor with number of rows constructor.*/
 void chi_math::SparseMatrix::CheckInitialized()
 {
-  if (rowI_colJ.size()==0)
+  if (rowI_colJ.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "Illegal call to unitialized SparseMatrix matrix.";

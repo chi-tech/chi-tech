@@ -12,7 +12,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Initializing volume interpolator.";
   //================================================== Check grid available
-  if (field_functions.size() == 0)
+  if (field_functions.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "Unassigned field function in volume field function interpolator.";

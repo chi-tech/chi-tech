@@ -159,7 +159,7 @@ double chi_physics::TransportCrossSections::
 {
   double mu = 0.0;
 
-  if (isotropic or scat_angles_gprime_g[gp][g].size()==0)
+  if (isotropic or scat_angles_gprime_g[gp][g].empty())
     mu = 2.0*rn-1.0;
   else
   {

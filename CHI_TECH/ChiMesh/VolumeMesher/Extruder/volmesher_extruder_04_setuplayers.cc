@@ -9,7 +9,7 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
 {
   //================================================== Create default layers if no
   //                                                   input layers are provided
-  if (input_layers.size()==0)
+  if (input_layers.empty())
   {
     chi_log.Log(LOG_0WARNING)
       << "VolumeMesherExtruder: No extrusion layers have been specified. "

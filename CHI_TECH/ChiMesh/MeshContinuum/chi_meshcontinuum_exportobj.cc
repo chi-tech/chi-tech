@@ -124,7 +124,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
     std::string file_base_name =
       str_file_name.substr(0,str_file_name.find("."));
 
-    if (chi_physics_handler.material_stack.size() == 0)
+    if (chi_physics_handler.material_stack.empty())
     {
       chi_log.Log(LOG_0WARNING)
         << "ExportCellsToObj: No mesh will be exported because there "
