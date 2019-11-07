@@ -1,5 +1,5 @@
 #include "chi_ffinter_volume.h"
-#include "ChiMesh/Cell/cell_newbase.h"
+#include "ChiMesh/Cell/cell.h"
 
 
 #include <chi_log.h>
@@ -36,17 +36,12 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
 
     if (inside_logvolume)
     {
-      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      for (int i=0; i < cell->vertex_ids.size(); i++)
       {
-        auto cell_base = (chi_mesh::CellBase*)cell;
-
-        for (int i=0; i < cell_base->vertex_ids.size(); i++)
-        {
-          cfem_local_nodes_needed_unmapped.push_back(cell_base->vertex_ids[i]);
-          pwld_local_nodes_needed_unmapped.push_back(i);
-          pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-        }//for dof
-      }//if Polyhedron
+        cfem_local_nodes_needed_unmapped.push_back(cell->vertex_ids[i]);
+        pwld_local_nodes_needed_unmapped.push_back(i);
+        pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+      }//for dof
     }//if inside logicalVol
 
   }//for local cell

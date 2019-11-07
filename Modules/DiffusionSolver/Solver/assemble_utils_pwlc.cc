@@ -2,7 +2,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 #include "ChiTimer/chi_timer.h"
@@ -44,13 +44,9 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
     auto cell = vol_continuum->cells[cell_glob_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    for (int v=0; v < cell->vertex_ids.size(); v++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      for (int v=0; v < cell_base->vertex_ids.size(); v++)
-      {
-        exnonex_nodes_set.insert(cell_base->vertex_ids[v]);
-      }
+      exnonex_nodes_set.insert(cell->vertex_ids[v]);
     }
   }
 
@@ -79,31 +75,27 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
     auto cell = vol_continuum->cells[cell_glob_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    for (int f=0; f < cell->faces.size(); f++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      for (int f=0; f < cell_base->faces.size(); f++)
+      if (cell->faces[f].neighbor >= 0)
       {
-        if (cell_base->faces[f].neighbor >= 0)
-        {
-          int adj_cell_ind = cell_base->faces[f].neighbor;
-          auto adj_cell = vol_continuum->cells[adj_cell_ind];
+        int adj_cell_ind = cell->faces[f].neighbor;
+        auto adj_cell = vol_continuum->cells[adj_cell_ind];
 
-          if (adj_cell->partition_id != cell_base->partition_id)
+        if (adj_cell->partition_id != cell->partition_id)
+        {
+          for (int fv=0; fv < cell->faces[f].vertex_ids.size(); fv++)
           {
-            for (int fv=0; fv < cell_base->faces[f].vertex_ids.size(); fv++)
-            {
-              int v_index = cell_base->faces[f].vertex_ids[fv];
-              int v_setind = (int)std::distance(exnonex_nodes.begin(),
-                                                std::find(std::begin(exnonex_nodes),
-                                                          std::end(exnonex_nodes),
-                                                          v_index));
-              ghost_flags[v_setind] = true;
-            }//for face verts
-          }//if neighbor not local
-        }//if neighbor is not a boundary
-      }//for cell face
-    }//if polyhedron
+            int v_index = cell->faces[f].vertex_ids[fv];
+            int v_setind = (int)std::distance(exnonex_nodes.begin(),
+                                              std::find(std::begin(exnonex_nodes),
+                                                        std::end(exnonex_nodes),
+                                                        v_index));
+            ghost_flags[v_setind] = true;
+          }//for face verts
+        }//if neighbor not local
+      }//if neighbor is not a boundary
+    }//for cell face
   }
   chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 1 time: "
                             << t_stage[1].GetTime()/1000.0;

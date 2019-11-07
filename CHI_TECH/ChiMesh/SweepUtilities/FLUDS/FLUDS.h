@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 typedef int                      TVertexFace;
 typedef int*                     TEdgeFace;
@@ -152,12 +152,12 @@ public:
   void InitializeAlphaElements(chi_mesh::sweep_management::SPDS *spds);
 
   //01d
-  void SlotDynamics(chi_mesh::CellBase *cell_base,
+  void SlotDynamics(chi_mesh::Cell *cell,
                     chi_mesh::sweep_management::SPDS* spds,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
-  void LocalIncidentMapping(chi_mesh::CellBase *cell_base,
+  void LocalIncidentMapping(chi_mesh::Cell *cell,
                             chi_mesh::sweep_management::SPDS* spds,
                             std::vector<int>&  local_so_cell_mapping);
 
@@ -165,7 +165,7 @@ public:
   void InitializeBetaElements(chi_mesh::sweep_management::SPDS *spds,
                               int tag_index=0);
   //02d
-  void NonLocalIncidentMapping(chi_mesh::CellBase *cell_base,
+  void NonLocalIncidentMapping(chi_mesh::Cell *cell,
                                chi_mesh::sweep_management::SPDS* spds);
 
   //chi_FLUDS.cc

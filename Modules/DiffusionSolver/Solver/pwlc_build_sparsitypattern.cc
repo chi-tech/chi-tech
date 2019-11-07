@@ -17,84 +17,77 @@ void chi_diffusion::Solver::PWLCBuildSparsityPattern()
 
     auto cell = grid->cells[glob_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    for (int i=0; i < cell->vertex_ids.size(); i++)
     {
-      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
+      int ir =  mesher->MapNode(cell->vertex_ids[i]);
 
-      for (int i=0; i < cell_base->vertex_ids.size(); i++)
+      if (ir<0)
       {
-        int ir =  mesher->MapNode(cell_base->vertex_ids[i]);
+        chi_log.Log(LOG_ALLERROR)
+          << "ir Mapping error node " << cell->vertex_ids[i];
+        exit(EXIT_FAILURE);
+      }
 
-        if (ir<0)
+      //================================== Check if i is on boundary
+      for (int f=0; f < cell->faces.size(); f++)
+      {
+        if (cell->faces[f].neighbor < 0)
         {
-          chi_log.Log(LOG_ALLERROR)
-            << "ir Mapping error node " << cell_base->vertex_ids[i];
-          exit(EXIT_FAILURE);
-        }
-
-        //================================== Check if i is on boundary
-        for (int f=0; f < cell_base->faces.size(); f++)
-        {
-          if (cell_base->faces[f].neighbor < 0)
+          chi_mesh::CellFace& face = cell->faces[f];
+          size_t num_face_verts = face.vertex_ids.size();
+          for (int fv=0; fv<num_face_verts; fv++)
           {
-            chi_mesh::CellFace& face = cell_base->faces[f];
-            size_t num_face_verts = face.vertex_ids.size();
-            for (int fv=0; fv<num_face_verts; fv++)
-            {
-              int v0_index =
-                mesher->MapNode(face.vertex_ids[fv]);
+            int v0_index =
+              mesher->MapNode(face.vertex_ids[fv]);
 
-              if (v0_index<0)
+            if (v0_index<0)
+            {
+              chi_log.Log(LOG_ALLERROR)
+                << "v0 Mapping error node " << face.vertex_ids[fv];
+              exit(EXIT_FAILURE);
+            }
+
+            if (ir == v0_index)
+            {
+              //================= Processing boundary
+              int boundary_type =
+                boundaries[abs(face.neighbor)-1]->type;
+              if (boundary_type == DIFFUSION_DIRICHLET)
               {
-                chi_log.Log(LOG_ALLERROR)
-                  << "v0 Mapping error node " << face.vertex_ids[fv];
-                exit(EXIT_FAILURE);
+                nodal_boundary_numbers[ir]= face.neighbor;
               }
-
-              if (ir == v0_index)
-              {
-                //================= Processing boundary
-                int boundary_type =
-                  boundaries[abs(face.neighbor)-1]->type;
-                if (boundary_type == DIFFUSION_DIRICHLET)
-                {
-                  nodal_boundary_numbers[ir]= face.neighbor;
-                }
-                break;
-              } //if ir part of face
-            }
+              break;
+            } //if ir part of face
           }
-        }//for f
+        }
+      }//for f
 
-        //======================================= Set nodal connections
-        std::vector<int>* node_links = nodal_connections[ir];
-        for (int j=0; j < cell_base->vertex_ids.size(); j++)
+      //======================================= Set nodal connections
+      std::vector<int>& node_links = nodal_connections[ir];
+      for (int j=0; j < cell->vertex_ids.size(); j++)
+      {
+        int jr = mesher->MapNode(cell->vertex_ids[j]);
+
+        //====================== Check for duplicates
+        bool already_there = false;
+        for (int k=0; k<node_links.size(); k++)
         {
-          int jr = mesher->MapNode(cell_base->vertex_ids[j]);
-
-          //====================== Check for duplicates
-          bool already_there = false;
-          for (int k=0; k<node_links->size(); k++)
+          if (node_links[k] == jr)
+          {already_there = true; break;}
+        }
+        if (!already_there)
+        {
+          node_links.push_back(jr);
+          if ((jr>=local_rows_from) && (jr<=local_rows_to))
           {
-            if ((*node_links)[k] == jr)
-            {already_there = true; break;}
-          }
-          if (!already_there)
+            nodal_nnz_in_diag[ir]+=1;
+          } else
           {
-            (*node_links).push_back(jr);
-            if ((jr>=local_rows_from) && (jr<=local_rows_to))
-            {
-              nodal_nnz_in_diag[ir]+=1;
-            } else
-            {
-              nodal_nnz_off_diag[ir]+=1;
-            }
+            nodal_nnz_off_diag[ir]+=1;
           }
-        }//for j
-      }//for i
-
-    } //if typeid
-
+        }
+      }//for j
+    }//for i
   }
 
   MPI_Barrier(MPI_COMM_WORLD);

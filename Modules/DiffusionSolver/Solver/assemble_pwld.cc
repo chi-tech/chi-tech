@@ -16,8 +16,6 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
                                                   DiffusionIPCellView* cell_ip_view,
                                                   int group)
 {
-
-  auto cell_base = (chi_mesh::CellBase*)(cell);
   auto fe_view = (CellFEView*)pwl_discr->MapFeView(cell_glob_index);
 
   //====================================== Process material id
@@ -57,20 +55,20 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
 
   //========================================= Loop over faces
-  int num_faces = cell_base->faces.size();
+  int num_faces = cell->faces.size();
   for (int f=0; f<num_faces; f++)
   {
-    int neighbor = cell_base->faces[f].neighbor;
+    int neighbor = cell->faces[f].neighbor;
 
     //================================== Get face normal
-    chi_mesh::Vector n  = cell_base->faces[f].normal;
+    chi_mesh::Vector n  = cell->faces[f].normal;
 
-    int num_face_dofs = cell_base->faces[f].vertex_ids.size();
+    int num_face_dofs = cell->faces[f].vertex_ids.size();
 
     if (neighbor >=0)
     {
       try{
-      chi_mesh::CellBase*       adj_cell    = nullptr;
+      chi_mesh::Cell*           adj_cell    = nullptr;
       CellFEView*               adj_fe_view = nullptr;
       DiffusionIPCellView*      adj_ip_view = nullptr;
       int                              fmap = -1;
@@ -80,14 +78,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       {
         int adj_cell_local_index = grid->glob_cell_local_indices[neighbor];
         adj_ip_view   = ip_cell_views[adj_cell_local_index];
-        adj_cell      = (chi_mesh::CellBase*)grid->cells[neighbor];
+        adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
         adj_fe_view   = (CellFEView*)pwl_discr->MapFeView(neighbor);
       }//local
       else //Non-local
       {
         int locI = grid->cells[neighbor]->partition_id;
         adj_ip_view = GetBorderIPView(locI,neighbor);
-        adj_cell    = (chi_mesh::CellBase*)GetBorderCell(locI,neighbor);
+        adj_cell    = (chi_mesh::Cell*)GetBorderCell(locI,neighbor);
         adj_fe_view = (CellFEView*)GetBorderFEView(locI,neighbor);
       }//non-local
       //========================= Check valid information
@@ -100,11 +98,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       }
 
       //========================= Get the current map to the adj cell's face
-      fmap = MapCellFace(cell_base,adj_cell,f);
+      fmap = MapCellFace(cell,adj_cell,f);
 
       //========================= Compute penalty coefficient
       double hp = HPerpendicular(adj_cell, adj_fe_view, fmap);
-      double hm = HPerpendicular(cell_base, fe_view, f);
+      double hm = HPerpendicular(cell, fe_view, f);
 
       std::vector<double> adj_D,adj_Q,adj_sigma;
 
@@ -133,7 +131,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       for (int fi=0; fi<num_face_dofs; fi++)
       {
         int i    = fe_view->face_dof_mappings[f][fi];
-        int imap = MapCellDof(adj_cell,cell_base->vertex_ids[i]);
+        int imap = MapCellDof(adj_cell,cell->vertex_ids[i]);
         adj_D_avg += adj_D[imap]*adj_fe_view->IntS_shapeI[imap][fmap];
         adj_intS += adj_fe_view->IntS_shapeI[imap][fmap];
       }
@@ -141,11 +139,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
       //========================= Compute kappa
       double kappa = 1.0;
-      if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+      if (cell->Type() == chi_mesh::CellType::SLABV2)
         kappa = fmax(2.0*(adj_D_avg/hp + D_avg/hm),0.25);
-      if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+      if (cell->Type() == chi_mesh::CellType::POLYGONV2)
         kappa = fmax(2.0*(adj_D_avg/hp + D_avg/hm),0.25);
-      if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+      if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
         kappa = fmax(4.0*(adj_D_avg/hp + D_avg/hm),0.25);
 
       //========================= Assembly penalty terms
@@ -158,7 +156,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
         {
           int j     = fe_view->face_dof_mappings[f][fj];
           int jr    = cell_ip_view->MapDof(j);
-          int jmap  = MapCellDof(adj_cell,cell_base->faces[f].vertex_ids[fj]);
+          int jmap  = MapCellDof(adj_cell,cell->faces[f].vertex_ids[fj]);
           int jrmap = adj_ip_view->MapDof(jmap);
 
           double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
@@ -216,8 +214,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       //+ Di^- bj^+
       for (int fj=0; fj<num_face_dofs; fj++)
       {
-        int j     = MapCellDof(cell_base,cell_base->faces[f].vertex_ids[fj]);
-        int jmap  = MapCellDof(adj_cell,cell_base->faces[f].vertex_ids[fj]);
+        int j     = MapCellDof(cell,cell->faces[f].vertex_ids[fj]);
+        int jmap  = MapCellDof(adj_cell,cell->faces[f].vertex_ids[fj]);
         int jrmap = adj_ip_view->MapDof(jmap);
 
         for (int i=0; i<fe_view->dofs; i++)
@@ -237,8 +235,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       // - Dj^+ bi^-
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int imap  = MapCellDof(adj_cell,cell_base->faces[f].vertex_ids[fi]);
-        int i     = MapCellDof(cell_base,cell_base->faces[f].vertex_ids[fi]);
+        int imap  = MapCellDof(adj_cell,cell->faces[f].vertex_ids[fi]);
+        int i     = MapCellDof(cell,cell->faces[f].vertex_ids[fi]);
         int ir    = cell_ip_view->MapDof(i);
 
         for (int jmap=0; jmap<adj_fe_view->dofs; jmap++)
@@ -293,7 +291,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
     }//if not bndry
     else
     {
-      int ir_boundary_index = abs(cell_base->faces[f].neighbor)-1;
+      int ir_boundary_index = abs(cell->faces[f].neighbor)-1;
       int ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
       if (ir_boundary_type == DIFFUSION_DIRICHLET)
@@ -302,7 +300,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
           (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
 
         //========================= Compute penalty coefficient
-        double hm = HPerpendicular(cell_base, fe_view, f);
+        double hm = HPerpendicular(cell, fe_view, f);
 
         //========================= Compute surface average D
         double D_avg = 0.0;
@@ -316,11 +314,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
         D_avg /= intS;
 
         double kappa = 1.0;
-        if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
+        if (cell->Type() == chi_mesh::CellType::SLABV2)
           kappa = fmax(4.0*(D_avg/hm),0.25);
-        if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
+        if (cell->Type() == chi_mesh::CellType::POLYGONV2)
           kappa = fmax(4.0*(D_avg/hm),0.25);
-        if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+        if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
           kappa = fmax(8.0*(D_avg/hm),0.25);
 
         //========================= Assembly penalty terms
@@ -402,7 +400,6 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
                                             DiffusionIPCellView* cell_ip_view,
                                             int group)
 {
-  auto cell_base = (chi_mesh::CellBase*)(cell);
   auto fe_view = (CellFEView*)pwl_discr->MapFeView(cell_glob_index);
 
   //====================================== Process material id
@@ -418,7 +415,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
   for (int i=0; i<fe_view->dofs; i++)
   {
     int ir = cell_ip_view->MapDof(i);
-    int ig = cell_base->vertex_ids[i];
+    int ig = cell->vertex_ids[i];
     double rhsvalue =0.0;
 
     int ir_boundary_type;

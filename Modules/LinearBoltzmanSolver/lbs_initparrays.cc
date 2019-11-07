@@ -1,5 +1,5 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 #include <PiecewiseLinear/pwl.h>
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
@@ -118,61 +118,57 @@ int LinearBoltzman::Solver::InitializeParrays()
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    auto cell_fe_view =
+      (CellFEView*)pwl_discretization->MapFeView(cell_g_index);
+    auto full_cell_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell->cell_local_id];
+
+    int mat_id = cell->material_id;
+
+    full_cell_view->xs_id = matid_to_xs_map[mat_id];
+
+    full_cell_view->dof_phi_map_start = block_MG_counter;
+    block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
+
+    //Init face upwind flags and adj_partition_id
+    int num_faces = cell->faces.size();
+    full_cell_view->face_f_upwind_flag.resize(num_faces,false);
+    for (int f=0; f<num_faces; f++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      auto cell_fe_view =
-        (CellFEView*)pwl_discretization->MapFeView(cell_g_index);
-      auto full_cell_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[cell_base->cell_local_id];
-
-      int mat_id = cell->material_id;
-
-      full_cell_view->xs_id = matid_to_xs_map[mat_id];
-
-      full_cell_view->dof_phi_map_start = block_MG_counter;
-      block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
-
-      //Init face upwind flags and adj_partition_id
-      int num_faces = cell_base->faces.size();
-      full_cell_view->face_f_upwind_flag.resize(num_faces,false);
-      for (int f=0; f<num_faces; f++)
+      if (cell->faces[f].neighbor >= 0)
       {
-        if (cell_base->faces[f].neighbor >= 0)
-        {
-          int adj_g_index = cell_base->faces[f].neighbor;
-          auto adj_cell = grid->cells[adj_g_index];
+        int adj_g_index = cell->faces[f].neighbor;
+        auto adj_cell = grid->cells[adj_g_index];
 
-          full_cell_view->face_f_adj_part_id.push_back(
-            adj_cell->partition_id);
-        }//if not bndry
-        else
-        {
-          full_cell_view->face_f_adj_part_id.push_back(
-            cell_base->faces[f].neighbor);
+        full_cell_view->face_f_adj_part_id.push_back(
+          adj_cell->partition_id);
+      }//if not bndry
+      else
+      {
+        full_cell_view->face_f_adj_part_id.push_back(
+          cell->faces[f].neighbor);
 
-          chi_mesh::Vector& face_norm = cell_base->faces[f].normal;
+        chi_mesh::Vector& face_norm = cell->faces[f].normal;
 
-          if      (face_norm.Dot(ihat)>0.999)
-            full_cell_view->face_boundary_id.push_back(0);
-          else if (face_norm.Dot(ihat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(1);
-          else if (face_norm.Dot(jhat)>0.999)
-            full_cell_view->face_boundary_id.push_back(2);
-          else if (face_norm.Dot(jhat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(3);
-          else if (face_norm.Dot(khat)>0.999)
-            full_cell_view->face_boundary_id.push_back(4);
-          else if (face_norm.Dot(khat)<-0.999)
-            full_cell_view->face_boundary_id.push_back(5);
-        }//if bndry
-      }//for f
+        if      (face_norm.Dot(ihat)>0.999)
+          full_cell_view->face_boundary_id.push_back(0);
+        else if (face_norm.Dot(ihat)<-0.999)
+          full_cell_view->face_boundary_id.push_back(1);
+        else if (face_norm.Dot(jhat)>0.999)
+          full_cell_view->face_boundary_id.push_back(2);
+        else if (face_norm.Dot(jhat)<-0.999)
+          full_cell_view->face_boundary_id.push_back(3);
+        else if (face_norm.Dot(khat)>0.999)
+          full_cell_view->face_boundary_id.push_back(4);
+        else if (face_norm.Dot(khat)<-0.999)
+          full_cell_view->face_boundary_id.push_back(5);
+      }//if bndry
+    }//for f
 
-      //Add address
-      local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
-      local_cell_dof_array_address.push_back(block_counter);
-      block_counter += cell_fe_view->dofs;
-    }//polyhedron
+    //Add address
+    local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
+    local_cell_dof_array_address.push_back(block_counter);
+    block_counter += cell_fe_view->dofs;
   }//for local cell
 
   //================================================== Initialize Field Functions

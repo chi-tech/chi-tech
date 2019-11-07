@@ -1,6 +1,6 @@
 #include "lbs_linear_boltzman_solver.h"
 
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
@@ -113,40 +113,28 @@ void LinearBoltzman::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    auto transport_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+    int xs_id = matid_to_xs_map[cell->material_id];
+    std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
+
+    for (int i=0; i < cell->vertex_ids.size(); i++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      auto transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      index++;
+      int m = 0;
+      int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
 
-      int xs_id = matid_to_xs_map[cell->material_id];
-      std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
+      double* phi_old_mapped = &ref_phi_old[mapping];
+      double* phi_new_mapped = &ref_phi_new[mapping];
 
-      for (int i=0; i < cell_base->vertex_ids.size(); i++)
+      for (int g=0; g<gss; g++)
       {
-        index++;
-        int m = 0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
-
-        double* phi_old_mapped = &ref_phi_old[mapping];
-        double* phi_new_mapped = &ref_phi_new[mapping];
-
-        for (int g=0; g<gss; g++)
-        {
-          delta_phi_local[index*gss+g] =
-            phi_new_mapped[g] - phi_old_mapped[g];
-          delta_phi_local[index*gss+g] *= sigma_s[gsi+g];
-        }//for g
-      }//for dof
-    }//polyhedron
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encounted in call to "
-           "AssembleWGDSADeltaPhiVector.";
-      exit(EXIT_FAILURE);
-    }
-
+        delta_phi_local[index*gss+g] =
+          phi_new_mapped[g] - phi_old_mapped[g];
+        delta_phi_local[index*gss+g] *= sigma_s[gsi+g];
+      }//for g
+    }//for dof
   }//for cell
 
 }
@@ -168,33 +156,21 @@ void LinearBoltzman::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupse
     int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell        = grid->cells[cell_g_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    auto transport_view =
+      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+
+    for (int i=0; i < cell->vertex_ids.size(); i++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      auto transport_view =
-        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      index++;
+      int m=0;
+      int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
 
-      for (int i=0; i < cell_base->vertex_ids.size(); i++)
-      {
-        index++;
-        int m=0;
-        int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
+      double* phi_new_mapped = &ref_phi_new[mapping];
 
-        double* phi_new_mapped = &ref_phi_new[mapping];
+      for (int g=0; g<gss; g++)
+        phi_new_mapped[g] += wgdsa_solver->pwld_phi_local[index*gss+g];
 
-        for (int g=0; g<gss; g++)
-          phi_new_mapped[g] += wgdsa_solver->pwld_phi_local[index*gss+g];
-
-      }//for dof
-    }//polyhedron
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encounted in call to "
-           "DisAssembleWGDSADeltaPhiVector.";
-      exit(EXIT_FAILURE);
-    }
-
+    }//for dof
   }//for cell
 
   delta_phi_local.resize(0);

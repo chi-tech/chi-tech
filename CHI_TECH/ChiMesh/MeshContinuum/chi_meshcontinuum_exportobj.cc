@@ -41,30 +41,23 @@ ExportCellsToObj(const char* fileName, bool per_material,
       int cell_glob_index = local_cell_glob_indices[c];
       auto cell = cells[cell_glob_index];
 
-      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
       {
-        auto cell_base = (chi_mesh::CellBase*)cell;
+        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-        if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+        for (int f=0; f<polyh_cell->faces.size(); f++)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
-
-          for (int f=0; f<polyh_cell->faces.size(); f++)
+          if (polyh_cell->faces[f].neighbor < 0)
           {
-            if (polyh_cell->faces[f].neighbor < 0)
+            faces_to_export.push_back(polyh_cell->faces[f]);
+
+            for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
             {
-              faces_to_export.push_back(polyh_cell->faces[f]);
-
-              for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
-              {
-                nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
-              }
-            }//if boundary
-          }//for face
-        }//if polyhedron
-      }//new cell base
-
-
+              nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
+            }
+          }//if boundary
+        }//for face
+      }//if polyhedron
     }//for local cell
 
     //====================================== Write header
@@ -163,21 +156,30 @@ ExportCellsToObj(const char* fileName, bool per_material,
         int cell_glob_index = local_cell_glob_indices[c];
         auto cell = cells[cell_glob_index];
 
-        if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+        if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
         {
-          auto cell_base = (chi_mesh::CellBase*)cell;
+          auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-          if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+          if (polyh_cell->material_id != mat) continue;
+
+          for (int f=0; f<polyh_cell->faces.size(); f++)
           {
-            auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell_base;
+            int adjcell_glob_index = polyh_cell->faces[f].neighbor;
 
-            if (polyh_cell->material_id != mat) continue;
-
-            for (int f=0; f<polyh_cell->faces.size(); f++)
+            if (adjcell_glob_index<0)
             {
-              int adjcell_glob_index = polyh_cell->faces[f].neighbor;
+              faces_to_export.push_back(polyh_cell->faces[f]);
 
-              if (adjcell_glob_index<0)
+              for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
+              {
+                nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
+              }
+            }//if boundary
+            else
+            {
+              auto adj_cell = cells[adjcell_glob_index];
+
+              if (adj_cell->material_id != mat)
               {
                 faces_to_export.push_back(polyh_cell->faces[f]);
 
@@ -185,26 +187,10 @@ ExportCellsToObj(const char* fileName, bool per_material,
                 {
                   nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
                 }
-              }//if boundary
-              else
-              {
-                auto adj_cell = cells[adjcell_glob_index];
-
-                if (adj_cell->material_id != mat)
-                {
-                  faces_to_export.push_back(polyh_cell->faces[f]);
-
-                  for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
-                  {
-                    nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
-                  }
-                }//if material missmatch
-              }//if neigbor cell
-            }//for face
-          }//if polyhedron
-        }//new cell base
-
-
+              }//if material missmatch
+            }//if neigbor cell
+          }//for face
+        }//if polyhedron
       }//for local cell
 
       //====================================== Write header

@@ -751,7 +751,7 @@ ierr = KSPSetTolerances(ksp,1.e-50,residual_tolerance,1.0e50,100);
 //=================================== Set up monitor
 ierr = KSPMonitorSet(ksp,&chi_diffusion::KSPMonitorAChiTech,NULL,NULL);
 
-//=================================== Setup verbose viewer
+//=================================== Setup verbose_info viewer
 if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
 	KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
 

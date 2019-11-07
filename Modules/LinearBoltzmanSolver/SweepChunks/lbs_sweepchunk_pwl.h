@@ -8,7 +8,7 @@
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
-#include "ChiMesh/Cell/cell_newbase.h"
+#include "ChiMesh/Cell/cell.h"
 #include <ChiPhysics/chi_physics.h>
 
 #include "ChiMath/chi_math.h"
@@ -149,11 +149,9 @@ public:
       int    cell_g_index = spds->spls->item_id[cr_i];
       auto   cell         = grid_view->cells[cell_g_index];
 
-
-      auto polyh_cell     = (chi_mesh::CellBase*)cell;
       auto cell_fe_view   = (CellFEView*)grid_fe_view->MapFeView(cell_g_index);
       auto transport_view =
-        (LinearBoltzman::CellViewFull*)(*grid_transport_view)[polyh_cell->cell_local_id];
+        (LinearBoltzman::CellViewFull*)(*grid_transport_view)[cell->cell_local_id];
 
       int     cell_dofs    = cell_fe_view->dofs;
       int     xs_id        = transport_view->xs_id;
@@ -198,13 +196,13 @@ public:
 
 
         //============================================ Surface integrals
-        int num_faces = polyh_cell->faces.size();
+        int num_faces = cell->faces.size();
         int in_face_counter=-1;
         int internal_face_bndry_counter = -1;
         for (int f=0; f<num_faces; f++)
         {
 
-          double mu       = omega.Dot(polyh_cell->faces[f].normal);
+          double mu       = omega.Dot(cell->faces[f].normal);
           int    face_neighbor = transport_view->face_f_adj_part_id[f];
 
           //============================= Set flags
@@ -241,7 +239,7 @@ public:
 
 
             //============================== Loop over face vertices
-            int num_face_indices = polyh_cell->faces[f].vertex_ids.size();
+            int num_face_indices = cell->faces[f].vertex_ids.size();
             for (int fi=0; fi<num_face_indices; fi++)
             {
               int i = cell_fe_view->face_dof_mappings[f][fi];
@@ -346,7 +344,7 @@ public:
 
         //============================================= Outgoing fluxes
         int out_face_counter=-1;
-        for (int f=0; f<polyh_cell->faces.size(); f++)
+        for (int f=0; f<cell->faces.size(); f++)
         {
           int     face_neighbor = transport_view->face_f_adj_part_id[f];
           bool    face_incident = transport_view->face_f_upwind_flag[f];
@@ -359,7 +357,7 @@ public:
           //============================= Store outgoing Psi Locally
           if ((face_neighbor == LOCAL) && (!face_incident))
           {
-            for (int fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
+            for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
             {
               int i = cell_fe_view->face_dof_mappings[f][fi];
               psi = fluds->OutgoingPsi(cr_i,out_face_counter,fi,n);
@@ -374,7 +372,7 @@ public:
                    (!face_incident))
           {
             deploc_face_counter++;
-            for (int fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
+            for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
             {
               int i = cell_fe_view->face_dof_mappings[f][fi];
               psi = fluds->NLOutgoingPsi(deploc_face_counter,fi,n);

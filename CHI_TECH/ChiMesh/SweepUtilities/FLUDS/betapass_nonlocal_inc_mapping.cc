@@ -9,7 +9,7 @@ extern ChiLog     chi_log;
 //###################################################################
 /**Performs non-local incident mapping for polyhedron cells.*/
 void chi_mesh::sweep_management::FLUDS::
-  NonLocalIncidentMapping(chi_mesh::CellBase *cell_base,
+  NonLocalIncidentMapping(chi_mesh::Cell *cell,
                           chi_mesh::sweep_management::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
@@ -18,9 +18,9 @@ void chi_mesh::sweep_management::FLUDS::
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
-  for (short f=0; f<cell_base->faces.size(); f++)
+  for (short f=0; f < cell->faces.size(); f++)
   {
-    CellFace&  face = cell_base->faces[f];
+    CellFace&  face = cell->faces[f];
     double     mu   = face.normal.Dot(spds->omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face

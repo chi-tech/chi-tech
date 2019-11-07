@@ -2,7 +2,7 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 #include <chi_log.h>
 #include <chi_mpi.h>
@@ -164,12 +164,7 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
     int  cell_g_index = spls->item_id[csoi];
     auto cell         = grid->cells[cell_g_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      NonLocalIncidentMapping(cell_base, spds);
-    }//if polyhedron
-
+    NonLocalIncidentMapping(cell, spds);
   }//for csoi
 
   //================================================== Clear unneccesary data

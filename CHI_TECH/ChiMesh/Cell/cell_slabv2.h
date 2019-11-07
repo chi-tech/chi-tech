@@ -1,17 +1,17 @@
 #ifndef _chi_mesh_cell_slab_h
 #define _chi_mesh_cell_slab_h
 
-#include "cell_newbase.h"
+#include "cell.h"
 
 namespace chi_mesh
 {
 
 //######################################################### Class def
 /** Slab cell definition.*/
-class CellSlabV2 : public CellBase
+class CellSlabV2 : public Cell
 {
 public:
-  CellSlabV2() : CellBase(CellType::SLABV2) {}
+  CellSlabV2() : Cell(CellType::SLABV2) {}
 
 
 };

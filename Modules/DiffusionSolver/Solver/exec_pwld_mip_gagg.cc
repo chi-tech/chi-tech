@@ -40,7 +40,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
   }
 
   //################################################## Assemble Amatrix
-  if (verbose || chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
+  if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
   {
     chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString() << " "
@@ -82,22 +82,14 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
 
     DiffusionIPCellView* cell_ip_view = ip_cell_views[lc];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      if (!suppress_assembly)
-        PWLD_Assemble_A_and_b_GAGG(glob_cell_index, cell, cell_ip_view);
-      else
-        PWLD_Assemble_b_GAGG(glob_cell_index, cell, cell_ip_view);
-    }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if (!suppress_assembly)
+      PWLD_Assemble_A_and_b_GAGG(glob_cell_index, cell, cell_ip_view);
     else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Invalid cell-type encountered in chi_diffusion::Solver::ExecutePWLD_MIP_GAGG";
-    }
+      PWLD_Assemble_b_GAGG(glob_cell_index, cell, cell_ip_view);
   }
 
   //=================================== Call matrix assembly
-  if (verbose || chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
+  if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
     chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString() << " "
     << solver_name << ": Communicating matrix assembly";
@@ -127,7 +119,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
       chi_log.Log(LOG_ALLERROR) << chi_program_timer.GetTimeString() << " "
                                 << solver_name << ": Missing diagonal detected";
   }
-  if (verbose || chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
+  if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
                        << solver_name << ": Assembling x and b";
   VecAssemblyBegin(x);
@@ -149,7 +141,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
   }
   else
   {
-    if (verbose || chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
+    if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
       chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
                          << solver_name << ": Solving system\n";
     t_solve.Reset();
@@ -171,7 +163,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
     //=================================== Get convergence reason
     KSPConvergedReason reason;
     KSPGetConvergedReason(ksp,&reason);
-    if (verbose || reason != KSP_CONVERGED_RTOL)
+    if (verbose_info || reason != KSP_CONVERGED_RTOL)
       chi_log.Log(LOG_0) << "Convergence reason: " << reason;
 
 
@@ -186,7 +178,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
         << "[g=" << gi << "-" << gi+G-1
         << "]: Number of iterations =" << its;
 
-      if (verbose || chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
+      if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
       {
         chi_log.Log(LOG_0) << "Timing:";
         chi_log.Log(LOG_0) << "Assembling the matrix: " << time_assembly;
@@ -194,7 +186,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
       }
     }
 
-    if (verbose || chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
+    if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
       chi_log.Log(LOG_0) << "Diffusion Solver execution completed!\n";
   }//if not suppressed solve
 

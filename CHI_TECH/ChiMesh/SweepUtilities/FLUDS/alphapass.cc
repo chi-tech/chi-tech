@@ -3,7 +3,6 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
 #include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_newbase.h>
 
 #include <chi_log.h>
 
@@ -52,18 +51,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     auto cell         = grid->cells[cell_g_index];
     local_so_cell_mapping[cell->cell_local_id] = csoi; //Set mapping
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
-      SlotDynamics(cell_base,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if polyhedron
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "InitializeAlphaElements: Unsupported cell type during "
-           "first pass of function.";
-      exit(EXIT_FAILURE);
-    }
+    SlotDynamics(cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
 
   }//for csoi
 
@@ -81,11 +69,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     int  cell_g_index = spls->item_id[csoi];
     auto cell         = grid->cells[cell_g_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = static_cast<chi_mesh::CellBase*>(cell);
-      LocalIncidentMapping(cell_base, spds, local_so_cell_mapping);
-    }//if polyhedron
+    LocalIncidentMapping(cell, spds, local_so_cell_mapping);
 
   }//for csoi
 

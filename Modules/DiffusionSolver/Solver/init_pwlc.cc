@@ -44,10 +44,9 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //================================================== Initialize field function
   //                                                   if empty
-  if (field_functions.size() == 0)
+  if (field_functions.empty())
   {
-    chi_physics::FieldFunction* initial_field_function =
-      new chi_physics::FieldFunction;
+    auto initial_field_function = new chi_physics::FieldFunction;
     initial_field_function->text_name = std::string("phi");
     initial_field_function->grid = grid;
     initial_field_function->spatial_discretization = discretization;
@@ -61,7 +60,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   else
   {
     size_t num_ff = field_functions.size();
-    for (int ff=0; ff<num_ff; ff++)
+    for (size_t ff=0; ff<num_ff; ff++)
     {
       chi_physics::FieldFunction* cur_ff = field_functions[ff];
       cur_ff->grid                   = grid;
@@ -89,7 +88,6 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
-  double t0 = 0.0;
 
 
   //================================================== Initialize nodal DOF
@@ -97,13 +95,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   nodal_nnz_in_diag.resize(grid->nodes.size(),0);
   nodal_nnz_off_diag.resize(grid->nodes.size(),0);
   nodal_boundary_numbers.resize(grid->nodes.size(),0);
-  for (int i=0; i<grid->nodes.size(); i++)
-  {
-    std::vector<int>* new_node_links = new std::vector<int>;
-    nodal_connections.push_back(new_node_links);
-    new_node_links = new std::vector<int>;
-    nodal_cell_connections.push_back(new_node_links);
-  }
+  nodal_connections.resize(grid->nodes.size(),std::vector<int>());
 
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
@@ -153,56 +145,49 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   int first_cell_g_index = grid->local_cell_glob_indices[0];
   auto first_cell = grid->cells[first_cell_g_index];
 
-  if (first_cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+  if (first_cell->Type() == chi_mesh::CellType::SLABV2)
   {
-    auto cell_base = dynamic_cast<chi_mesh::CellBase*>(first_cell);
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
 
-    if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
-    {
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
 
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+    PetscOptionsInsertString(NULL,"-options_left");
+  }
+  if (first_cell->Type() == chi_mesh::CellType::POLYGONV2)
+  {
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
 
-      PetscOptionsInsertString(NULL,"-options_left");
-    }
-    if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
-    {
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
+    //PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
 
-      //PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
 
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
+    PetscOptionsInsertString(NULL,"-options_left");
+  }
+  if (first_cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+  {
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
 
-      PetscOptionsInsertString(NULL,"-options_left");
-    }
-    if (cell_base->Type2() == chi_mesh::CellType::POLYHEDRONV2)
-    {
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
 
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
+    PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
 
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_grid_sweeps_coarse 1");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_max_levels 25");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
-      PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
-
-      PetscOptionsInsertString(NULL,"-options_left");
-    }
-
-
+    PetscOptionsInsertString(NULL,"-options_left");
   }
   PetscOptionsInsertString(NULL,options_string.c_str());
   PCSetFromOptions(pc);
@@ -213,7 +198,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   KSPSetConvergenceTest(ksp,&DiffusionConvergenceTestNPT,NULL,NULL);
 
-  //=================================== Setup verbose viewer
+  //=================================== Setup verbose_info viewer
   if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
     KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
 

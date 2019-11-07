@@ -53,36 +53,27 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 
     if (cell_fv_views_mapping[cell_index]<0)
     {
-
-      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+      //######################################### SLAB
+      if (cell->Type() == chi_mesh::CellType::SLABV2)
       {
-        auto cell_base = (chi_mesh::CellBase*)cell;
-      }//new cell base
-      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+        auto view =
+          new SlabFVView((chi_mesh::CellSlabV2*)cell,vol_continuum);
+
+        this->cell_fv_views.push_back(view);
+        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+      }
+
+      //######################################### POLYGON
+      if (cell->Type() == chi_mesh::CellType::POLYGONV2)
       {
-        auto cell_base = (chi_mesh::CellBase*)cell;
+        auto view =
+          new PolygonFVView((chi_mesh::CellPolygonV2*)(cell),vol_continuum);
 
-        //========================================= If slab item_id
-        if (cell_base->Type2() == chi_mesh::CellType::SLABV2)
-        {
-          auto view =
-            new SlabFVView((chi_mesh::CellSlabV2*)cell_base,vol_continuum);
+        this->cell_fv_views.push_back(view);
+        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+      }
 
-          this->cell_fv_views.push_back(view);
-          cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-        }
-
-        //========================================= If polygon item_id
-        if (cell_base->Type2() == chi_mesh::CellType::POLYGONV2)
-        {
-          auto view =
-            new PolygonFVView((chi_mesh::CellPolygonV2*)(cell_base),vol_continuum);
-
-          this->cell_fv_views.push_back(view);
-          cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-        }
-
-//      //========================================= If polyhedron item_id
+//      //######################################### POLYHEDRON
 //      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
 //      {
 //        PolyhedronFEView* view =
@@ -96,8 +87,6 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 //        this->cell_fe_views.push_back(view);
 //        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
 //      }
-      }//new cell base
-
     }//if mapping not yet assigned
   }//for num cells
 

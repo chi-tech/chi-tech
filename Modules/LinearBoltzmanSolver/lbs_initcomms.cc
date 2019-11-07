@@ -1,5 +1,5 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -22,32 +22,20 @@ void LinearBoltzman::Solver::InitializeCommunicators()
     int cell_glob_index = grid->local_cell_glob_indices[c];
     auto cell           = grid->cells[cell_glob_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    for (int f=0; f < cell->faces.size(); f++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
+      int neighbor = cell->faces[f].neighbor;
 
-      for (int f=0; f < cell_base->faces.size(); f++)
+      if (neighbor>=0)
       {
-        int neighbor = cell_base->faces[f].neighbor;
+        auto adj_cell = grid->cells[neighbor];
 
-        if (neighbor>=0)
+        if (adj_cell->partition_id != chi_mpi.location_id)
         {
-          auto adj_cell = grid->cells[neighbor];
-
-          if (adj_cell->partition_id != chi_mpi.location_id)
-          {
-            local_graph_edges.insert(adj_cell->partition_id);
-          }
+          local_graph_edges.insert(adj_cell->partition_id);
         }
-      }//for f
-    } //if polyhedron
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encountered in call to "
-           "InitializeCommunicators.";
-      exit(EXIT_FAILURE);
-    }
+      }
+    }//for f
   }//for local cells
 
   //============================================= Convert set to vector

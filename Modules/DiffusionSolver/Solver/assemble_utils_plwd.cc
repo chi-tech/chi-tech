@@ -42,11 +42,7 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
     int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
     auto cell = vol_continuum->cells[cell_glob_index];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-      pwld_local_dof_count += cell_base->vertex_ids.size();
-    }
+    pwld_local_dof_count += cell->vertex_ids.size();
   }
 
   //================================================== Get global DOF count
@@ -133,7 +129,7 @@ int chi_diffusion::Solver::MapBorderCell(int locI, int neighbor, int vglob_i)
  * \n
  * Nv = Number of vertices. If Nv <= 4 then the perimeter parameter
  * should be replaced by edge length.*/
-double chi_diffusion::Solver::HPerpendicular(chi_mesh::CellBase* cell,
+double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
                                              CellFEView* fe_view,
                                              int f)
 {
@@ -143,13 +139,13 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::CellBase* cell,
   int Nv = cell->vertex_ids.size();
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLABV2
-  if (cell->Type2() == chi_mesh::CellType::SLABV2)
+  if (cell->Type() == chi_mesh::CellType::SLABV2)
   {
     auto slab_fe_view = (SlabFEView*)fe_view;
     hp = slab_fe_view->h/2.0;
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
-  else if (cell->Type2() == chi_mesh::CellType::POLYGONV2)
+  else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
   {
     Nv = 4;
     chi_mesh::CellFace& face = cell->faces[f];
@@ -182,7 +178,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::CellBase* cell,
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-  else if (cell->Type2() == chi_mesh::CellType::POLYHEDRONV2)
+  else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
   {
     double volume  = 0.0;
     for (int i=0; i<fe_view->dofs; i++)
@@ -215,7 +211,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::CellBase* cell,
 
 /**Given a global node index, returns the dof its associated on the
  * referenced cell. Polyhedron overload.*/
-int chi_diffusion::Solver::MapCellDof(chi_mesh::CellBase* cell, int ig)
+int chi_diffusion::Solver::MapCellDof(chi_mesh::Cell* cell, int ig)
 {
   int imap = -1;
   for (int ai=0; ai < cell->vertex_ids.size(); ai++)
@@ -233,8 +229,8 @@ int chi_diffusion::Solver::MapCellDof(chi_mesh::CellBase* cell, int ig)
 
 /**Given the face index on the current cell, finds the
  * corresponding face index on the adjacent cell.*/
-int chi_diffusion::Solver::MapCellFace(chi_mesh::CellBase* cur_cell,
-                                       chi_mesh::CellBase* adj_cell,
+int chi_diffusion::Solver::MapCellFace(chi_mesh::Cell* cur_cell,
+                                       chi_mesh::Cell* adj_cell,
                                        int f)
 {
   int num_face_dofs = cur_cell->faces[f].vertex_ids.size();

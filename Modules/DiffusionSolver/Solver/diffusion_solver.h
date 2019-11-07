@@ -1,7 +1,7 @@
 #ifndef _chi_diffusion_solver_h
 #define _chi_diffusion_solver_h
 
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 #define SOLVER_SYSTEM_EIGEN 1
 #define SOLVER_SYSTEM_PETSC 2
@@ -75,7 +75,7 @@ private:
   ChiTimer t_solve;
 
   double time_assembly, time_solve;
-  bool verbose;
+  bool verbose_info;
 public:
   std::string                              solver_name;
   std::vector<chi_diffusion::Boundary*>    boundaries;
@@ -115,8 +115,8 @@ public:
   PetscErrorCode ierr;
   PetscInt       local_rows_from, local_rows_to;
 
-  std::vector<std::vector<int>*> nodal_connections;
-  std::vector<std::vector<int>*> nodal_cell_connections;
+  std::vector<std::vector<int>>  nodal_connections;
+  std::vector<std::vector<int>>  nodal_cell_connections;
   std::vector<int>               nodal_boundary_numbers;
   std::vector<int>               nodal_nnz_in_diag;
   std::vector<int>               nodal_nnz_off_diag;
@@ -225,10 +225,10 @@ public:
   void SpawnBorderCell(int locI, int cell_border_index);
 
 
-  double HPerpendicular(chi_mesh::CellBase* cell, CellFEView* fe_view, int f);
-  int MapCellDof(chi_mesh::CellBase* cell, int ig);
-  int MapCellFace(chi_mesh::CellBase* cur_cell,
-                  chi_mesh::CellBase* adj_cell, int f);
+  double HPerpendicular(chi_mesh::Cell* cell, CellFEView* fe_view, int f);
+  int MapCellDof(chi_mesh::Cell* cell, int ig);
+  int MapCellFace(chi_mesh::Cell* cur_cell,
+                  chi_mesh::Cell* adj_cell, int f);
 
   DiffusionIPCellView* GetBorderIPView(int locI, int cell_glob_index);
   CellFEView* GetBorderFEView(int locI, int cell_glob_index);

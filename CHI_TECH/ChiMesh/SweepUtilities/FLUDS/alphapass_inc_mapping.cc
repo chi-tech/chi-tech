@@ -1,7 +1,7 @@
 #include "FLUDS.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <ChiMesh/Cell/cell_newbase.h>
+#include <ChiMesh/Cell/cell.h>
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
@@ -12,7 +12,7 @@ extern ChiLog chi_log;
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/
 void chi_mesh::sweep_management::FLUDS::
-LocalIncidentMapping(chi_mesh::CellBase *cell_base,
+LocalIncidentMapping(chi_mesh::Cell *cell,
                      chi_mesh::sweep_management::SPDS* spds,
                      std::vector<int>&  local_so_cell_mapping)
 {
@@ -24,9 +24,9 @@ LocalIncidentMapping(chi_mesh::CellBase *cell_base,
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
-  for (short f=0; f < cell_base->faces.size(); f++)
+  for (short f=0; f < cell->faces.size(); f++)
   {
-    CellFace& face = cell_base->faces[f];
+    CellFace& face = cell->faces[f];
     double     mu  = face.normal.Dot(spds->omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
@@ -53,11 +53,10 @@ LocalIncidentMapping(chi_mesh::CellBase *cell_base,
         int  adj_so_index = local_so_cell_mapping[adj_cell->cell_local_id];
         int  ass_f_counter=-1;
 
-        auto adj_cell_base = (chi_mesh::CellBase*)adj_cell;
         int out_f = -1;
-        for (short af=0; af < adj_cell_base->faces.size(); af++)
+        for (short af=0; af < adj_cell->faces.size(); af++)
         {
-          double mur = adj_cell_base->faces[af].normal.Dot(spds->omega);
+          double mur = adj_cell->faces[af].normal.Dot(spds->omega);
 
           if (mur>=0.0) {out_f++;}
           if (af == ass_face)

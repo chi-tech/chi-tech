@@ -17,7 +17,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   chi_log.Log(LOG_0) << "\n"
                      << chi_program_timer.GetTimeString() << " "
                      << solver_name << ": Initializing Diffusion solver PETSc";
-  this->verbose = verbose;
+  this->verbose_info = verbose;
 
   if (not common_items_initialized)
     InitializeCommonItems();

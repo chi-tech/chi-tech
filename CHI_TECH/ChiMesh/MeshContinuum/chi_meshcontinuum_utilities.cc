@@ -40,13 +40,8 @@ void chi_mesh::MeshContinuum::
   {
     auto cell = cells[c];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-    {
-      auto cell_base = static_cast<CellBase*>(cell);
-
-      for (auto face : cell_base->faces)
-        face_size_histogram.push_back(face.vertex_ids.size());
-    }//if polyhedron
+    for (auto face : cell->faces)
+      face_size_histogram.push_back(face.vertex_ids.size());
   }
   std::stable_sort(face_size_histogram.begin(), face_size_histogram.end());
 
@@ -207,7 +202,7 @@ bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
 ////###################################################################
 ///**Polyhedron find associated cell face*/
 //int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
-//                                                int adj_cell_g_index,bool verbose)
+//                                                int adj_cell_g_index,bool verbose_info)
 //{
 //  //======================================== Check index validity
 //  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
@@ -287,7 +282,7 @@ bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
 //  }
 //
 //  //======================================== Verbose output
-//  if (verbose)
+//  if (verbose_info)
 //  {
 //    std::stringstream out_string;
 //
@@ -341,35 +336,23 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::Cell* cell = cells[adj_cell_g_index];
-
-  if (cell->Type() != chi_mesh::CellType::CELL_NEWBASE)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell type encountered in "
-      << "MeshContinuum::FindAssociatedFace. Adjacent cell is expected to"
-         "be polyhedron but is found not to be. Index given "
-      << adj_cell_g_index << " " << cur_face.centroid.PrintS();
-    exit(EXIT_FAILURE);
-  }
-
-  auto adj_cell_base = (chi_mesh::CellBase*)cell;
+  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
 
   int associated_face = -1;
 
   //======================================== Loop over adj cell faces
-  for (int af=0; af < adj_cell_base->faces.size(); af++)
+  for (int af=0; af < adj_cell->faces.size(); af++)
   {
     //Assume face matches
     bool face_matches = true; //Now disprove it
     //================================= Loop over adj cell face verts
-    for (int afv=0; afv < adj_cell_base->faces[af].vertex_ids.size(); afv++)
+    for (int afv=0; afv < adj_cell->faces[af].vertex_ids.size(); afv++)
     {
       //========================== Try and find them in the reference face
       bool found = false;
       for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
       {
-        if (cur_face.vertex_ids[cfv] == adj_cell_base->faces[af].vertex_ids[afv])
+        if (cur_face.vertex_ids[cfv] == adj_cell->faces[af].vertex_ids[afv])
         {
           found = true;
           break;
@@ -390,11 +373,11 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
       << "Could not find associated face in call to "
       << "MeshContinuum::FindAssociatedFace. Reference face with centroid at \n"
       << cur_face.centroid.PrintS();
-    for (int af=0; af < adj_cell_base->faces.size(); af++)
+    for (int af=0; af < adj_cell->faces.size(); af++)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Adjacent cell face " << af << " centroid "
-        << adj_cell_base->faces[af].centroid.PrintS();
+        << adj_cell->faces[af].centroid.PrintS();
     }
     exit(EXIT_FAILURE);
   }
@@ -407,16 +390,16 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
     out_string
       << "Adj cell " << adj_cell_g_index << ":\n"
       << "face " << associated_face << "\n";
-    for (int v=0; v < adj_cell_base->faces[associated_face].vertex_ids.size(); v++)
+    for (int v=0; v < adj_cell->faces[associated_face].vertex_ids.size(); v++)
     {
       out_string
         << "vertex " << v << " "
-        << adj_cell_base->faces[associated_face].vertex_ids[v]
+        << adj_cell->faces[associated_face].vertex_ids[v]
         << "\n";
     }
     out_string
       << "Cur cell "
-      << adj_cell_base->faces[associated_face].neighbor << ":\n";
+      << adj_cell->faces[associated_face].neighbor << ":\n";
     for (int v=0; v<cur_face.vertex_ids.size(); v++)
     {
       out_string
@@ -433,7 +416,7 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
 ////###################################################################
 ///**Polyhedron find associated cell face*/
 //int chi_mesh::MeshContinuum::FindAssociatedEdge(int* edgeinfo,
-//                                                int adj_cell_g_index,bool verbose)
+//                                                int adj_cell_g_index,bool verbose_info)
 //{
 //  //======================================== Check index validity
 //  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
@@ -621,29 +604,17 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::Cell* cell = cells[adj_cell_g_index];
-
-  if (cell->Type() != chi_mesh::CellType::CELL_NEWBASE)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell type encountered in "
-      << "MeshContinuum::FindAssociatedVertices. Adjacent cell is expected to"
-         "be polyhedron but is found not to be. Index given "
-      << adj_cell_g_index << " " << cur_face.centroid.PrintS();
-    exit(EXIT_FAILURE);
-  }
-
-  auto adj_cell_base = (chi_mesh::CellBase*)cell;
+  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
 
 
   for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
   {
     bool found = false;
     for (int afv=0;
-         afv < adj_cell_base->faces[associated_face].vertex_ids.size(); afv++)
+         afv < adj_cell->faces[associated_face].vertex_ids.size(); afv++)
     {
       if (cur_face.vertex_ids[cfv] ==
-          adj_cell_base->faces[associated_face].vertex_ids[afv])
+        adj_cell->faces[associated_face].vertex_ids[afv])
       {
         dof_mapping.push_back(afv);
         found = true;

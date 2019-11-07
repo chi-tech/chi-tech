@@ -76,18 +76,10 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
 
       DiffusionIPCellView* cell_ip_view = ip_cell_views[lc];
 
-      if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
-      {
-        if (!suppress_assembly)
-          PWLD_Assemble_A_and_b(glob_cell_index, cell, cell_ip_view, gi+gr);
-        else
-          PWLD_Assemble_b(glob_cell_index, cell, cell_ip_view, gi+gr);
-      }//if typeid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      if (!suppress_assembly)
+        PWLD_Assemble_A_and_b(glob_cell_index, cell, cell_ip_view, gi+gr);
       else
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "Invalid cell-type encountered in chi_diffusion::Solver::ExecutePWLD_MIP_GRPS";
-      }
+        PWLD_Assemble_b(glob_cell_index, cell, cell_ip_view, gi+gr);
     }//for local cell
   }//for gr
 

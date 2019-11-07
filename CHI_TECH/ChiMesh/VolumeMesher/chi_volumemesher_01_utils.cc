@@ -394,19 +394,14 @@ void chi_mesh::VolumeMesher::
     int c = vol_continuum->local_cell_glob_indices[lc];
     chi_mesh::Cell* cell = vol_continuum->cells[c];
 
-    if (cell->Type() == chi_mesh::CellType::CELL_NEWBASE)
+    for (int f=0; f<cell->faces.size(); f++)
     {
-      auto cell_base = (chi_mesh::CellBase*)cell;
-
-      for (int e=0; e<cell_base->faces.size(); e++)
+      if (cell->faces[f].neighbor < 0)
       {
-        if (cell_base->faces[e].neighbor < 0)
-        {
-          vol_continuum->boundary_cell_indices.push_back(c);
-          break;
-        }
+        vol_continuum->boundary_cell_indices.push_back(c);
+        break;
       }
-    }//if typeid
+    }
   }//for local item_id
   printf("Number of boundary item_id: %lu\n",vol_continuum->boundary_cell_indices.size());
 
