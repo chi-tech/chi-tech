@@ -38,7 +38,20 @@ end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
+chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
+
+chiSurfaceMesherSetProperty(PARTITION_X,1)
+chiSurfaceMesherSetProperty(PARTITION_Y,1)
+chiSurfaceMesherSetProperty(CUT_X,0.0)
+chiSurfaceMesherSetProperty(CUT_Y,0.0)
+
+NZ=2
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
+
+chiVolumeMesherSetProperty(PARTITION_Z,1);
 
 chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
 chiVolumeMesherSetProperty(MESH_GLOBAL,true)
@@ -96,7 +109,7 @@ chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
 chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,1.0)
-chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,true)
+chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,false)
 
 chiMonteCarlonInitialize(phys1)
 chiMonteCarlonExecute(phys1)
@@ -104,14 +117,14 @@ chiMonteCarlonExecute(phys1)
 
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0, 0.0)
-chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,1.0, 0.0)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0, 0.999)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,1.0, 0.999)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 500)
 
 for k=1,2 do
     chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,k-1)
 end
-chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
+--chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
 
 
 chiFFInterpolationInitialize(cline)
@@ -126,4 +139,4 @@ if (chi_location_id == 0) then
     local handle = io.popen("python ZLFFI00.py")
 end
 
-chiExportFieldFunctionToVTKG(168,"ZPhiMC")
+chiExportFieldFunctionToVTKG(0,"ZPhiMC")

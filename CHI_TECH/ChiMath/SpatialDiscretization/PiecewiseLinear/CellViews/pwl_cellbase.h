@@ -1,6 +1,8 @@
 #ifndef _pwl_cellbase_h
 #define _pwl_cellbase_h
 
+#include <ChiMesh/chi_mesh.h>
+
 //###################################################################
 /** Base class for all cell FE views.*/
 class CellFEView
@@ -22,6 +24,12 @@ public:
   CellFEView(int num_dofs)
   {
     dofs=num_dofs;
+  }
+
+  /** Virtual function evaluation of the shape function. */
+  virtual double ShapeValue(int i, chi_mesh::Vector& xyz)
+  {
+    return 0.0;
   }
 
 };

@@ -5,8 +5,6 @@
 
 #include "../Source/ResidualSource/mc_rmc_source.h"
 
-#include <PiecewiseLinear/CellViews/pwl_slab.h>
-
 extern ChiLog chi_log;
 extern ChiTimer chi_program_timer;
 typedef unsigned long long TULL;
@@ -27,7 +25,6 @@ void chi_montecarlon::Solver::Execute()
   TULL nps_last = 0;
   double start_time = chi_program_timer.GetTime()/1000.0;
   double time = 0.0;
-  double last_time = 0.0;
   double particle_rate = 0.0;
   for (int b=0; b<batch_sizes_per_loc.size(); b++)
   {
@@ -40,36 +37,24 @@ void chi_montecarlon::Solver::Execute()
       nps_last++;
       chi_montecarlon::Particle prtcl = src->CreateParticle(&rng0);
 
-//      chi_log.Log(LOG_0)
-//        << "Src particle " << prtcl.pos.PrintS()
-//        << " " << prtcl.dir << " " << prtcl.cur_cell_ind;
-//      usleep(100000);
       if (std::isnan(prtcl.dir.x))
       {
         chi_log.Log(LOG_ALLERROR)
           << "Particle dir corrupt.";
         exit(EXIT_FAILURE);
       }
-
+//      chi_log.Log(LOG_0) << pi;
       while (prtcl.alive)
-      {
         Raytrace(&prtcl);
-//        chi_log.Log(LOG_0)
-//          << "Ray particle " << prtcl.pos.PrintS()
-//          << " " << prtcl.dir << " " << prtcl.cur_cell_ind;
-//        usleep(100000);
-      }
 
-
-      ComputeTallySqr();
-      ComputePWLTallySqr();
     }//for pi in batch
 
 
 
-
+    chi_log.Log(LOG_0) << "Rendesvous-ing";
     RendesvouzTallies();
-    RendesvouzPWLTallies();
+    if (make_pwld)
+      RendesvouzPWLTallies();
     ComputeRelativeStdDev();
 
 
@@ -97,71 +82,70 @@ void chi_montecarlon::Solver::Execute()
   }
 
   //Normalize tallies
-  int num_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_cells; lc++)
-  {
-    for (int g=0; g<num_grps; g++)
-    {
-      int ir = lc*num_grps + g;
-      phi_global[ir] = phi_global[ir]*tally_multipl_factor/nps_global;
-    }
-  }
-
-  for (auto& tally_value : phi_pwl_global)
-    tally_value *= tally_multipl_factor/nps_global;
+  NormalizeTallies();
+  if (make_pwld)
+    NormalizePWLTallies();
 
   //==================== Computing pwl transformations
-  for (int lc=0; lc<num_cells; lc++)
+  size_t num_cells = grid->local_cell_glob_indices.size();
+  if (make_pwld)
   {
-    int cell_g_index = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_g_index];
-    int map = local_cell_pwl_dof_array_address[lc];
-
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    for (size_t lc=0; lc<num_cells; lc++)
     {
-      auto cell_pwl_view =
-        static_cast<SlabFEView*>(pwl_discretization->MapFeView(cell_g_index));
+      int cell_g_index = grid->local_cell_glob_indices[lc];
+      int map = local_cell_pwl_dof_array_address[lc];
+
+      auto cell_pwl_view = pwl_discretization->MapFeView(cell_g_index);
 
       MatDbl A(cell_pwl_view->IntV_shapeI_shapeJ);
       MatDbl Ainv = chi_math_handler.Inverse(A);
-      VecDbl b(2,0.0);
+      VecDbl b(cell_pwl_view->dofs,0.0);
 
       for (int g=0; g<num_grps; g++)
       {
-        for (int dof=0; dof<2; dof++)
+        for (int dof=0; dof<cell_pwl_view->dofs; dof++)
         {
           int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
           b[dof] = phi_pwl_global[ir]*cell_pwl_view->IntV_shapeI[dof];
         }
         VecDbl x = chi_math_handler.MatMul(Ainv,b);
-        for (int dof=0; dof<2; dof++)
+        for (int dof=0; dof<cell_pwl_view->dofs; dof++)
         {
           int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
           phi_pwl_global[ir] = x[dof];
         }
       }
+    }//for local cell lc
+  }//if make_pwld
 
-
-    }
-  }
 
   //Print group 0
 
   for (int lc=0; lc<num_cells; lc++)
   {
-    int map0 = local_cell_pwl_dof_array_address[lc];
-    int map1 = map0 + 1*num_grps*num_moms + num_grps*0 + 0;;
-    chi_log.Log(LOG_0)
+    std::stringstream outstr;
+    outstr
       << "Cell " << lc
       << " phi=" << phi_global[lc*num_grps]
       << " std=" << phi_local_relsigma[lc*num_grps+0]
-      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps]
-      << " dof0g0m0=" << phi_pwl_global[map0]
-      << " dof1g0m0=" << phi_pwl_global[map1];
+      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps];
+
+    if (make_pwld)
+    {
+      int map0 = local_cell_pwl_dof_array_address[lc];
+      int map1 = map0 + 1*num_grps*num_moms + num_grps*0 + 0;
+
+      outstr
+        << " dof0g0m0=" << phi_pwl_global[map0]
+        << " dof1g0m0=" << phi_pwl_global[map1];
+    }
+
+
+    chi_log.Log(LOG_0) << outstr.str();
   }
 
 
-  chi_montecarlon::ResidualSource* rsrc = (chi_montecarlon::ResidualSource*)sources[0];
+  auto rsrc = (chi_montecarlon::ResidualSource*)sources[0];
   std::cout << "Particles sampled intr = " << rsrc->particles_C << std::endl;
   std::cout << "Particles sampled left = " << rsrc->particles_L << std::endl;
   std::cout << "Particles sampled rite = " << rsrc->particles_R << std::endl;

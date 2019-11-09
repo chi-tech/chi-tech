@@ -5,8 +5,11 @@
 
 #include <FiniteVolume/CellViews/fv_slab.h>
 #include <FiniteVolume/CellViews/fv_polygon.h>
+#include <FiniteVolume/CellViews/fv_polyhedron.h>
 
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
+
+#include <ChiMesh/Raytrace/raytracing.h>
 
 typedef unsigned long long TULL;
 
@@ -18,8 +21,9 @@ extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Makes a contribution to tallies*/
-void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
-                                              chi_mesh::Vector pf)
+void chi_montecarlon::Solver::ContributeTally(
+  chi_montecarlon::Particle *prtcl,
+  chi_mesh::Vector pf)
 {
   auto cell = grid->cells[prtcl->cur_cell_ind];
   int cell_local_ind = cell->cell_local_id;
@@ -28,7 +32,10 @@ void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
 
   double tracklength = (pf - prtcl->pos).Norm();
 
-  phi_tally_contrib[ir] += (tracklength*prtcl->w);
+  double tally_contrib = (tracklength*prtcl->w);
+
+  phi_tally[ir]     += tally_contrib;
+  phi_tally_sqr[ir] += tally_contrib*tally_contrib;
 
   if (std::isnan(tracklength))
   {
@@ -39,154 +46,53 @@ void chi_montecarlon::Solver::ContributeTally(chi_montecarlon::Particle *prtcl,
     exit(EXIT_FAILURE);
   }
 
-  ContributePWLTally(prtcl,pf);
-
-}
-
-//###################################################################
-/**Makes a contribution to pwl based tallies*/
-void chi_montecarlon::Solver::ContributePWLTally(
-  chi_montecarlon::Particle *prtcl, chi_mesh::Vector pf)
-{
-  auto cell = grid->cells[prtcl->cur_cell_ind];
-  auto cell_pwl_view = pwl_discretization->MapFeView(prtcl->cur_cell_ind);
-  int cell_local_ind = cell->cell_local_id;
-
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (make_pwld)
   {
-    auto slab_pwl_view = static_cast<SlabFEView*>(cell_pwl_view);
-    int map = local_cell_pwl_dof_array_address[cell_local_ind];
+    std::vector<double> segment_lengths;
+    chi_mesh::PopulateRaySegmentLengths(
+      grid, cell, segment_lengths,
+      prtcl->pos, pf);
 
-    double tracklength = (pf - prtcl->pos).Norm();
-    auto p = prtcl->pos + prtcl->dir*(0.5*tracklength);
+    auto cell_pwl_view = pwl_discretization->MapFeView(prtcl->cur_cell_ind);
+    int map            = local_cell_pwl_dof_array_address[cell_local_ind];
 
-    for (int dof=0; dof<cell_pwl_view->dofs; dof++)
+    double last_segment_length = 0.0;
+
+//    std::cout << "Tracklength " << tracklength << "\n";
+
+    for (auto segment_length : segment_lengths)
     {
-      double N = slab_pwl_view->Shape_x(dof,p);
+//      std::cout << segment_length << " ";
+      double d = last_segment_length + 0.5*segment_length;
+      last_segment_length += segment_length;
+      auto p = prtcl->pos + prtcl->dir*d;
 
-      int ir = map + dof*num_grps*num_moms + num_grps*0 + prtcl->egrp;
-      phi_pwl_tally_contrib[ir] += (tracklength*prtcl->w*N);
-    }
-
-    if (std::isnan(tracklength))
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Tracklength corruption in pwl tally contribution."
-        << " pos  " << prtcl->pos.PrintS()
-        << " posf " << pf.PrintS();
-      exit(EXIT_FAILURE);
-    }
-  }//slab
-
-}
-
-
-//###################################################################
-/**Compute tally square contributions.*/
-void chi_montecarlon::Solver::ComputeTallySqr()
-{
-  int num_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_cells; lc++)
-  {
-    int cell_glob_index = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_glob_index];
-
-    double V = 1.0;
-
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
-    {
-      auto cell_fv_view =
-        (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
-      V = cell_fv_view->volume;
-    }
-    else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
-    {
-      auto cell_fv_view =
-        (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);
-      V = cell_fv_view->volume;
-    }
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encountered in call to "
-        << "chi_montecarlon::Solver::ComputeTallySqr.";
-      exit(EXIT_FAILURE);
-    }
-
-
-    int hi = 0;
-    int lo = num_grps-1;
-    if (group_hi_bound >= 0)
-      hi = group_hi_bound;
-    if (group_lo_bound >=0 && group_lo_bound >= group_hi_bound)
-      lo = group_lo_bound;
-
-    for (int g=hi; g<=lo; g++)
-    {
-      int ir = lc*num_grps + g;
-
-      phi_tally[ir]     += phi_tally_contrib[ir]/V;
-      phi_tally_sqr[ir] += phi_tally_contrib[ir]*phi_tally_contrib[ir]/V/V;
-      phi_tally_contrib[ir] = 0.0;
-    }
-  }
-}
-
-//###################################################################
-/**Compute tally square contributions.*/
-void chi_montecarlon::Solver::ComputePWLTallySqr()
-{
-  int num_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_cells; lc++)
-  {
-    int cell_glob_index = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_glob_index];
-
-    double V = 1.0;
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto cell_pwl_view =
-        (SlabFEView*)pwl_discretization->MapFeView(cell->cell_global_id);
-
-      int map = local_cell_pwl_dof_array_address[lc];
       for (int dof=0; dof<cell_pwl_view->dofs; dof++)
       {
-        V = cell_pwl_view->IntV_shapeI[dof];
+        double N = cell_pwl_view->ShapeValue(dof,p);
 
-        int hi = 0;
-        int lo = num_grps-1;
-        if (group_hi_bound >= 0)
-          hi = group_hi_bound;
-        if (group_lo_bound >=0 && group_lo_bound >= group_hi_bound)
-          lo = group_lo_bound;
+        ir = map + dof*num_grps*num_moms + num_grps*0 + prtcl->egrp;
+        double pwl_tally_contrib = (segment_length*prtcl->w*N);
 
-        for (int g=hi; g<=lo; g++)
-        {
-          int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
-
-          phi_pwl_tally[ir]     += phi_pwl_tally_contrib[ir]/V;
-          phi_pwl_tally_sqr[ir] += phi_pwl_tally_contrib[ir]*phi_pwl_tally_contrib[ir]/V/V;
-          phi_pwl_tally_contrib[ir] = 0.0;
-        }
+        phi_pwl_tally[ir]     += pwl_tally_contrib;
+        phi_pwl_tally_sqr[ir] += pwl_tally_contrib*pwl_tally_contrib;
       }
 
+      if (std::isnan(tracklength))
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "Tracklength corruption in pwl tally contribution."
+          << " pos  " << prtcl->pos.PrintS()
+          << " posf " << pf.PrintS();
+        exit(EXIT_FAILURE);
+      }
     }
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Unsupported cell type encountered in call to "
-        << "chi_montecarlon::Solver::ComputeTallySqr.";
-      exit(EXIT_FAILURE);
-    }
+//    std::cout << "\n";
+//    usleep(100000);
 
+  }//if make pwld
 
-  }
 }
-
-
-
-
-
 
 //###################################################################
 /**Merges tallies from multiple locations.*/
@@ -226,11 +132,6 @@ void chi_montecarlon::Solver::RendesvouzTallies()
 /**Merges tallies from multiple locations.*/
 void chi_montecarlon::Solver::RendesvouzPWLTallies()
 {
-//  TULL temp_nps_global = 0;
-//  MPI_Allreduce(&nps,&temp_nps_global,1,MPI_UNSIGNED_LONG_LONG,MPI_SUM,MPI_COMM_WORLD);
-//
-//  nps_global += temp_nps_global;
-
   //============================================= Merge phi_local
   int num_values = phi_pwl_tally.size();
   std::vector<double> temp_phi_pwl_global(num_values,0.0);
@@ -265,12 +166,6 @@ void chi_montecarlon::Solver::ComputeRelativeStdDev()
   int num_cells = grid->local_cell_glob_indices.size();
   for (int lc=0; lc<num_cells; lc++)
   {
-    //=======
-    // PROCESS CELL VOLUME HERE
-    //=======
-
-
-
     int hi = 0;
     int lo = num_grps-1;
     if (group_hi_bound >= 0)
@@ -316,6 +211,93 @@ void chi_montecarlon::Solver::ComputeRelativeStdDev()
         chi_log.Log(LOG_ALL) << "batch=" << n << "\n";
         chi_log.Log(LOG_ALL) << "nps=" << nps_global << "\n";
       }
+    }//for g
+  }//for local cell
+}
+
+
+//###################################################################
+/**Compute tally square contributions.*/
+void chi_montecarlon::Solver::NormalizeTallies()
+{
+  int num_cells = grid->local_cell_glob_indices.size();
+  for (int lc=0; lc<num_cells; lc++)
+  {
+    int cell_glob_index = grid->local_cell_glob_indices[lc];
+    auto cell = grid->cells[cell_glob_index];
+
+    double V = 1.0;
+
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    {
+      auto cell_fv_view =
+        (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+      V = cell_fv_view->volume;
+    }
+    else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    {
+      auto cell_fv_view =
+        (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+      V = cell_fv_view->volume;
+    }
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    {
+      auto cell_fv_view =
+        (PolyhedronFVView*)fv_discretization->MapFeView(cell->cell_global_id);
+      V = cell_fv_view->volume;
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported cell type encountered in call to "
+        << "chi_montecarlon::Solver::ComputeTallySqr.";
+      exit(EXIT_FAILURE);
+    }
+
+
+    int hi = 0;
+    int lo = num_grps-1;
+    if (group_hi_bound >= 0)
+      hi = group_hi_bound;
+    if (group_lo_bound >=0 && group_lo_bound >= group_hi_bound)
+      lo = group_lo_bound;
+
+    for (int g=hi; g<=lo; g++)
+    {
+      int ir = lc*num_grps + g;
+
+      phi_global[ir] *= tally_multipl_factor/nps_global/V;
+    }//for g
+  }//for local cell
+}
+
+//###################################################################
+/**Compute tally square contributions.*/
+void chi_montecarlon::Solver::NormalizePWLTallies()
+{
+  int num_cells = grid->local_cell_glob_indices.size();
+  for (int lc=0; lc<num_cells; lc++)
+  {
+    int cell_glob_index = grid->local_cell_glob_indices[lc];
+    auto cell_pwl_view   = pwl_discretization->MapFeView(cell_glob_index);
+    int map             = local_cell_pwl_dof_array_address[lc];
+
+    int hi = 0;
+    int lo = num_grps-1;
+    if (group_hi_bound >= 0)
+      hi = group_hi_bound;
+    if (group_lo_bound >=0 && group_lo_bound >= group_hi_bound)
+      lo = group_lo_bound;
+
+    for (int g=hi; g<=lo; g++)
+    {
+      for (int dof=0; dof<cell_pwl_view->dofs; dof++)
+      {
+        int ir = map + dof*num_grps*num_moms + num_grps*0 + g;
+        double V = cell_pwl_view->IntV_shapeI[dof];
+
+        phi_pwl_global[ir] *= tally_multipl_factor/nps_global/V;
+      }//for dof
     }//for g
   }//for local cell
 }

@@ -152,8 +152,13 @@ private:
 
   //############################################### Actual shape functions
 public:
-  double           Shape_xyz(int i, chi_mesh::Vector xyz);
+  double           Shape_xyz(int i, chi_mesh::Vector& xyz);
   chi_mesh::Vector GradShape_xyz(int i, chi_mesh::Vector xyz);
+
+  double ShapeValue(int i, chi_mesh::Vector& xyz) override
+  {
+    return Shape_xyz(i, xyz);
+  }
 
   //############################################### Precomputation cell matrices
 private:

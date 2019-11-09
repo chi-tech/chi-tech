@@ -6,9 +6,9 @@
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/chi_volumemesher.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 
 #include <FiniteVolume/fv.h>
 #include <FiniteVolume/CellViews/fv_slab.h>
@@ -130,10 +130,10 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     cell_sigma_t[lc] = xs->sigma_tg[0];
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell->Type() == chi_mesh::CellType::SLABV2)
     {
       chi_log.Log(LOG_0VERBOSE_1) << "**************** Cell " << cell_glob_index;
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
       auto cell_fe_view =
         static_cast<SlabFEView*>(
           resid_sdm_pwl->MapFeView(cell_glob_index));
@@ -162,7 +162,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
       int num_faces = 2;
       for (int f=0; f<num_faces; f++)
       {
-        int adj_cell_index = slab_cell->edges[f];
+        int adj_cell_index = slab_cell->faces[f].neighbor;
 
         std::vector<int> adj_mapping;
 
@@ -200,7 +200,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
         int num_face_verts = 1;
         for (int fi=0; fi<num_face_verts; fi++)
         {
-          if (slab_cell->edges[f] >= 0)
+          if (slab_cell->faces[f].neighbor >= 0)
           {
             cell_dof_phi[lc][f] =
               0.5*field[cur_cell_mapping[f]] +
@@ -273,12 +273,12 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
         auto cell = grid->cells[lc];
 
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell->Type() == chi_mesh::CellType::SLABV2)
         {
-          auto slab_cell = (chi_mesh::CellSlab*)cell;
+          auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
-          int v0i = slab_cell->v_indices[0];
-          int v1i = slab_cell->v_indices[1];
+          int v0i = slab_cell->vertex_ids[0];
+          int v1i = slab_cell->vertex_ids[1];
 
           chi_mesh::Vertex& v0 = *grid->nodes[v0i];
           chi_mesh::Vertex& v1 = *grid->nodes[v1i];
@@ -330,12 +330,12 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
         auto cell = grid->cells[lc];
 
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell->Type() == chi_mesh::CellType::SLABV2)
         {
-          auto slab_cell = (chi_mesh::CellSlab*)cell;
+          auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
-          int v0i = slab_cell->v_indices[0];
-          int v1i = slab_cell->v_indices[1];
+          int v0i = slab_cell->vertex_ids[0];
+          int v1i = slab_cell->vertex_ids[1];
 
           chi_mesh::Vertex& v0 = *grid->nodes[v0i];
           chi_mesh::Vertex& v1 = *grid->nodes[v1i];
@@ -472,12 +472,12 @@ DirectSampling(chi_montecarlon::RandomNumberGenerator* rng)
   new_particle.dir = ref_dir;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (cell->Type() == chi_mesh::CellType::SLABV2)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
-    int v0i = slab_cell->v_indices[0];
-    int v1i = slab_cell->v_indices[1];
+    int v0i = slab_cell->vertex_ids[0];
+    int v1i = slab_cell->vertex_ids[1];
 
     chi_mesh::Vertex v0 = *grid->nodes[v0i];
     chi_mesh::Vertex v1 = *grid->nodes[v1i];
@@ -546,12 +546,12 @@ UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
   new_particle.dir = ref_dir;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (cell->Type() == chi_mesh::CellType::SLABV2)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
-    int v0i = slab_cell->v_indices[0];
-    int v1i = slab_cell->v_indices[1];
+    int v0i = slab_cell->vertex_ids[0];
+    int v1i = slab_cell->vertex_ids[1];
 
     chi_mesh::Vertex v0 = *grid->nodes[v0i];
     chi_mesh::Vertex v1 = *grid->nodes[v1i];

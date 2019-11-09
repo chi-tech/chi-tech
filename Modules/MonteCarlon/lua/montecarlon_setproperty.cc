@@ -49,6 +49,10 @@ MC_TALLY_MULTIPLICATION_FACTOR\n
  Classical global tally multiplication factor to be applied after normalization
  per source particle. Expects to be followed by a float. Default 1.0.\n\n
 
+MC_MAKE_PWLD_SOLUTION\n
+ Classical global tally multiplication factor to be applied after normalization
+ per source particle. Expects to be followed by a float. Default 1.0.\n\n
+
 \ingroup LuaMonteCarlon
 \author Jan*/
 int chiMonteCarlonSetProperty(lua_State *L)
@@ -82,55 +86,61 @@ int chiMonteCarlonSetProperty(lua_State *L)
 
   //============================================= Process property index
   int property_index = lua_tonumber(L,2);
-  if (property_index == MC_NUM_PARTICLES)
+  if (property_index == chi_montecarlon::Property::NUM_PARTICLES)
   {
     unsigned long long num_part = lua_tonumber(L,3);
 
     mcsolver->num_particles = num_part;
   }
-  else if (property_index == MC_TFC_UPDATE_INTVL)
+  else if (property_index == chi_montecarlon::Property::TFC_UPDATE_INTVL)
   {
     int tfc_updt_intvl = lua_tonumber(L,3);
 
     mcsolver->tfc_update_interval = tfc_updt_intvl;
   }
-  else if (property_index == MC_SCATTERING_ORDER)
+  else if (property_index == chi_montecarlon::Property::SCATTERING_ORDER)
   {
     int scatorder = lua_tonumber(L,3);
 
     mcsolver->scattering_order = scatorder;
   }
-  else if (property_index == MC_MONOENERGETIC)
+  else if (property_index == chi_montecarlon::Property::MONOENERGETIC)
   {
     bool mono = lua_toboolean(L,3);
 
     mcsolver->mono_energy = mono;
   }
-  else if (property_index == MC_FORCE_ISOTROPIC)
+  else if (property_index == chi_montecarlon::Property::FORCE_ISOTROPIC)
   {
     bool iso = lua_toboolean(L,3);
 
     mcsolver->force_isotropic = iso;
   }
-  else if (property_index == MC_GROUP_BOUNDS)
+  else if (property_index == chi_montecarlon::Property::GROUP_BOUNDS)
   {
     int hi = lua_tonumber(L,3);
-    int lo = lua_tonumber(L,3);
+    int lo = lua_tonumber(L,4);
 
     mcsolver->group_hi_bound = hi;
     mcsolver->group_lo_bound = lo;
   }
-  else if (property_index == MC_TALLY_MERGE_INTVL)
+  else if (property_index == chi_montecarlon::Property::TALLY_MERGE_INTVL)
   {
     unsigned long long tal_merg_invtl = lua_tonumber(L,3);
 
     mcsolver->tally_rendezvous_intvl = tal_merg_invtl;
   }
-  else if (property_index == MC_TALLY_MULTIPLICATION_FACTOR)
+  else if (property_index == chi_montecarlon::Property::TALLY_MULTIPLICATION_FACTOR)
   {
     double tmf = lua_tonumber(L,3);
 
     mcsolver->tally_multipl_factor = tmf;
+  }
+  else if (property_index == chi_montecarlon::Property::MAKE_PWLD_SOLUTION)
+  {
+    bool make_pwld = lua_toboolean(L,3);
+
+    mcsolver->make_pwld = make_pwld;
   }
   else
   {

@@ -84,6 +84,7 @@ chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
 chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,0.5)
+chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,true)
 
 chiMonteCarlonInitialize(phys1)
 chiMonteCarlonExecute(phys1)
@@ -93,11 +94,13 @@ chiMonteCarlonExecute(phys1)
 cline = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
 chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,0.0, 30.0+xmin)
-chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 50)
+chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 500)
 
 for k=1,2 do
     chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,k-1)
 end
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,169)
 
 
 chiFFInterpolationInitialize(cline)

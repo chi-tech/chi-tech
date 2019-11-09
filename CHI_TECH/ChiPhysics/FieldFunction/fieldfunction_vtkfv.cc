@@ -387,7 +387,7 @@ void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
 
   /*It seems that cluster systems throw an error when the pvtu file
    * also tries to write to the serial file.*/
-  if (chi_mpi.location_id != 0)
+//  if (chi_mpi.location_id != 0)
     grid_writer->Write();
 
   //============================================= Parallel summary file

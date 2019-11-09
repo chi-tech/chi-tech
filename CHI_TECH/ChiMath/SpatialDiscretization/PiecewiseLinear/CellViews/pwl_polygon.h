@@ -73,8 +73,14 @@ public:
                 chi_mesh::MeshContinuum* vol_continuum,
                 SpatialDiscretization_PWL *discretization);
 
-  double Shape_xy(int i, chi_mesh::Vector xyz);
+  double Shape_xy(int i, chi_mesh::Vector& xyz);
   chi_mesh::Vector GradShape_xy(int i, chi_mesh::Vector xyz);
+
+  double ShapeValue(int i, chi_mesh::Vector& xyz) override
+  {
+    return Shape_xy(i, xyz);
+  }
+
 
   //############################################### Precomputation cell matrices
   double PreShape(int s, int i, int qpoint_index, bool on_surface = false);

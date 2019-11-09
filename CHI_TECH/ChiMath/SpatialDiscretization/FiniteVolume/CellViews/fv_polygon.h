@@ -19,7 +19,7 @@ private:
 public:
   double                                     volume; ///< Actually area times unity h
   std::vector<double>                        face_area; ///< Actually length unity h
-  std::vector<std::vector<chi_mesh::Vector>> side_s_v;
+  std::vector<std::vector<chi_mesh::Vector>> side_legs;
 
   PolygonFVView(chi_mesh::CellPolygonV2* poly_cell,
                 chi_mesh::MeshContinuum *vol_continuum) :
@@ -30,7 +30,7 @@ public:
     volume = 0.0;
 
     int num_faces = poly_cell->faces.size();
-    side_s_v.resize(num_faces);
+    side_legs.resize(num_faces);
     for (int f=0; f<num_faces; f++)
     {
       int v0i = poly_cell->faces[f].vertex_ids[0];
@@ -45,8 +45,8 @@ public:
       chi_mesh::Vector sidev01 = v1-v0;
       chi_mesh::Vector sidev02 = v2-v0;
 
-      side_s_v[f].push_back(sidev01);
-      side_s_v[f].push_back(sidev02);
+      side_legs[f].push_back(sidev01);
+      side_legs[f].push_back(sidev02);
 
       double sidedetJ = ((sidev01.x)*(sidev02.y) - (sidev02.x)*(sidev01.y));
 

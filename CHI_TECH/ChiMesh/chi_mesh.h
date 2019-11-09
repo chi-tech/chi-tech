@@ -108,25 +108,6 @@ namespace chi_mesh
                                 Vertex* line_point_0,
                                 Vertex* line_point_1,
                                 double tolerance);
-
-
-
-
-  //=================================== Raytracing
-  void RayTrace(chi_mesh::MeshContinuum* grid,
-                Cell* cell,
-                const Vector& pos_i,
-                const Vector& omega_i,
-                double& d_to_surface,
-                Vector& pos_f,
-                int* aux_info = nullptr);
-  bool
-  CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                          chi_mesh::Vector plane_point,
-                          chi_mesh::Vector line_point_0,
-                          chi_mesh::Vector line_point_1,
-                          chi_mesh::Vector& intersection_point,
-                          std::pair<double,double>& weights);
 }
 
 #include"chi_meshvector.h"

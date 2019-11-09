@@ -136,11 +136,9 @@ void chi_montecarlon::ResidualSource::
       chi_log.Log(LOG_0VERBOSE_1) << "Cell " << cell_glob_index;
       auto slab_cell = (chi_mesh::CellSlabV2*)cell;
       auto cell_fe_view = (SlabFEView*)resid_sdm_pwl->MapFeView(cell_glob_index);
+
       chi_log.Log(LOG_0VERBOSE_1) << "**************** Cell " << cell_glob_index;
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      auto cell_fe_view =
-        static_cast<SlabFEView*>(
-        resid_sdm_pwl->MapFeView(cell_glob_index));
+
 
       //==================================== Creating current cell dof-mapping
       std::vector<int> dofs_to_map(cell_fe_view->dofs);
@@ -227,7 +225,7 @@ void chi_montecarlon::ResidualSource::
           if (slab_cell->faces[f].neighbor >= 0)
             phi_adj = 0.5*field[adj_cell_mapping_f[f][0]] +
                       0.5*field[adj_cell_mapping_f[f][1]];
-          if (slab_cell->edges[f] == -1)
+          if (slab_cell->faces[f].neighbor == -1)
             phi_adj = 1.0;
 //          else
 //            phi_adj = 0.0;
@@ -237,7 +235,7 @@ void chi_montecarlon::ResidualSource::
           chi_log.Log(LOG_0VERBOSE_1)
           << "Face " << f << "\n"
           << "phi=" << phi << " adj_phi="<<phi_adj
-          << " neigbor=" <<slab_cell->edges[f];
+          << " neigbor=" <<slab_cell->faces[f].neighbor;
 
           if (f == 0)
             cell_surface_residualL[lc] =-0.25*(phi - phi_adj);
@@ -344,12 +342,12 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
   chi_montecarlon::Particle new_particle;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLAB)
+  if (cell->Type() == chi_mesh::CellType::SLABV2)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
-    int v0i = slab_cell->v_indices[0];
-    int v1i = slab_cell->v_indices[1];
+    int v0i = slab_cell->vertex_ids[0];
+    int v1i = slab_cell->vertex_ids[1];
 
     chi_mesh::Vertex v0 = *grid->nodes[v0i];
     chi_mesh::Vertex v1 = *grid->nodes[v1i];

@@ -1,6 +1,7 @@
 #include "solver_montecarlon.h"
 
 #include <ChiMesh/Cell/cell.h>
+#include <ChiMesh/Raytrace/raytracing.h>
 #include <ChiPhysics/chi_physics.h>
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
@@ -25,8 +26,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
 
   chi_physics::Material* mat = chi_physics_handler.material_stack[mat_id];
 
-  chi_physics::TransportCrossSections* xs =
-    (chi_physics::TransportCrossSections*)mat->properties[xs_id];
+  auto xs = (chi_physics::TransportCrossSections*)mat->properties[xs_id];
 
   double sigt = xs->sigma_tg[prtcl->egrp];
   double sigs = sigt - xs->sigma_ag[prtcl->egrp];
@@ -53,9 +53,9 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   chi_mesh::Vector posf = prtcl->pos;
   chi_mesh::Vector dirf = prtcl->dir;
   int                ef = prtcl->egrp;
-  int         auxinfo[] = {3,-1,-1};
-  chi_mesh::RayTrace(grid, cell, prtcl->pos, prtcl->dir,
-                     d_to_surface, posf, auxinfo);
+  chi_mesh::RayDestinationInfo ray_dest_info =
+    chi_mesh::RayTrace(grid, cell, prtcl->pos, prtcl->dir,
+                       d_to_surface, posf);
 
   if (std::isnan(posf.x))
   {
@@ -131,7 +131,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   {
     //posf set in call to RayTrace
     ContributeTally(prtcl,posf);
-    if (auxinfo[2] < 0)
+    if (ray_dest_info.destination_face_neighbor < 0)
     {
       bool reflecting = false;
       if (!reflecting)
@@ -142,7 +142,7 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
       }
     }//if bndry
     else
-      prtcl->cur_cell_ind = auxinfo[2];
+      prtcl->cur_cell_ind = ray_dest_info.destination_face_neighbor;
   }
 
   prtcl->pos = posf;

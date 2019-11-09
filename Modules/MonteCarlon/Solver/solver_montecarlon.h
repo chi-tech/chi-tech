@@ -12,14 +12,20 @@
 #include <PiecewiseLinear/pwl.h>
 #include <ChiMath/chi_math.h>
 
-#define MC_NUM_PARTICLES     1
-#define MC_TFC_UPDATE_INTVL  2
-#define MC_MONOENERGETIC     3
-#define MC_SCATTERING_ORDER  4
-#define MC_FORCE_ISOTROPIC   5
-#define MC_GROUP_BOUNDS      6
-#define MC_TALLY_MERGE_INTVL 7
-#define MC_TALLY_MULTIPLICATION_FACTOR 8
+namespace chi_montecarlon
+{
+  enum Property{
+    NUM_PARTICLES     = 1,
+    TFC_UPDATE_INTVL  = 2,
+    MONOENERGETIC     = 3,
+    SCATTERING_ORDER  = 4,
+    FORCE_ISOTROPIC   = 5,
+    GROUP_BOUNDS      = 6,
+    TALLY_MERGE_INTVL = 7,
+    TALLY_MULTIPLICATION_FACTOR = 8,
+    MAKE_PWLD_SOLUTION = 9
+  };
+}
 
 //######################################################### Class def
 /**Monte Carlo neutron particle solver.*/
@@ -86,6 +92,7 @@ public:
   int                                   group_lo_bound;
   unsigned long long                    tally_rendezvous_intvl;
   double                                tally_multipl_factor;
+  bool                                  make_pwld;
 
 
   //derived from options-set during init
@@ -114,15 +121,17 @@ private:
   //05
   void ContributeTally(chi_montecarlon::Particle* prtcl,
                        chi_mesh::Vector pf);
-  void ContributePWLTally(chi_montecarlon::Particle* prtcl,
-                          chi_mesh::Vector pf);
-  void ComputeTallySqr();
-  void ComputePWLTallySqr();
-
   void RendesvouzTallies();
   void RendesvouzPWLTallies();
 
   void ComputeRelativeStdDev();
+
+  void NormalizeTallies();
+  void NormalizePWLTallies();
+
+
+
+
 };
 
 #endif

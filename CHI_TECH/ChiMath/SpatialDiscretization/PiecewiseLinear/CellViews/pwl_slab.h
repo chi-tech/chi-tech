@@ -118,10 +118,10 @@ public:
   }
 
   /**Shape function for the slab function.*/
-  double Shape_x(int i, chi_mesh::Vector xyz)
+  double Shape_x(int i, chi_mesh::Vector& xyz)
   {
-    chi_mesh::Vector p0 = *grid->nodes[v0i];
-    chi_mesh::Vector p1 = *grid->nodes[v1i];
+    chi_mesh::Vector& p0 = *grid->nodes[v0i];
+    chi_mesh::Vector& p1 = *grid->nodes[v1i];
     chi_mesh::Vector xyz_ref = xyz - p0;
 
     chi_mesh::Vector v01 = p1 - p0;
@@ -141,6 +141,11 @@ public:
     }
 
     return 0.0;
+  }
+
+  double ShapeValue(int i, chi_mesh::Vector& xyz) override
+  {
+    return Shape_x(i, xyz);
   }
 };
 #endif

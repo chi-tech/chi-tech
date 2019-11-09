@@ -7,6 +7,7 @@
 
 #include "CellViews/fv_slab.h"
 #include "CellViews/fv_polygon.h"
+#include "CellViews/fv_polyhedron.h"
 
 #include <chi_log.h>
 
@@ -73,20 +74,17 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
       }
 
-//      //######################################### POLYHEDRON
-//      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-//      {
-//        PolyhedronFEView* view =
-//          new PolyhedronFEView(
-//            (chi_mesh::CellPolyhedron*)(cell),
-//            vol_continuum,
-//            this);
-//
-//        view->PreCompute();
-//        view->CleanUp();
-//        this->cell_fe_views.push_back(view);
-//        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-//      }
+      //######################################### POLYHEDRON
+      if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+      {
+        PolyhedronFVView* view =
+          new PolyhedronFVView(
+            (chi_mesh::CellPolyhedronV2*)(cell),
+            vol_continuum);
+
+        this->cell_fv_views.push_back(view);
+        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+      }
     }//if mapping not yet assigned
   }//for num cells
 

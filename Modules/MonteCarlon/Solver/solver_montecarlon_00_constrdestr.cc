@@ -18,6 +18,7 @@ chi_montecarlon::Solver::Solver()
   group_lo_bound = -1;
   tally_rendezvous_intvl = 100000;
   tally_multipl_factor = 1.0;
+  make_pwld = false;
 
   max_relative_error = 0.0;
 

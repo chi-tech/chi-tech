@@ -23,7 +23,7 @@ bool chi_montecarlon::Solver::Initialize()
   chi_log.Log(LOG_0) << "Initializing MonteCarlo solver.";
 
   //=================================== Initialize Materials
-  if (chi_physics_handler.material_stack.size() == 0)
+  if (chi_physics_handler.material_stack.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "chi_montecarlon::Solver::Initialize : No materials found.";
@@ -36,11 +36,12 @@ bool chi_montecarlon::Solver::Initialize()
     chi_physics::Material* cur_mat = chi_physics_handler.material_stack[m];
 
     //======================= Only first xs will be used
-    for (int p=0; p<cur_mat->properties.size(); p++)
+    size_t num_props = cur_mat->properties.size();
+    for (size_t p=0; p<num_props; p++)
     {
       if (cur_mat->properties[p]->type_index == TRANSPORT_XSECTIONS)
       {
-        chi_physics::TransportCrossSections* transp_xs =
+        auto transp_xs =
           (chi_physics::TransportCrossSections*)cur_mat->properties[p];
 
         transp_xs->ComputeDiffusionParameters();
@@ -84,7 +85,8 @@ bool chi_montecarlon::Solver::Initialize()
 
 
   //=================================== Initialize tallies
-  size_t tally_size = num_grps*grid->local_cell_glob_indices.size();
+  size_t num_local_cells = grid->local_cell_glob_indices.size();
+  size_t tally_size = num_grps*num_local_cells;
   phi_tally_contrib.resize(tally_size,0.0);
   phi_tally.resize(tally_size,0.0);
   phi_tally_sqr.resize(tally_size,0.0);
@@ -99,41 +101,48 @@ bool chi_montecarlon::Solver::Initialize()
 
   fv_discretization->
     AddViewOfLocalContinuum(grid,
-                            grid->local_cell_glob_indices.size(),
+                            num_local_cells,
                             grid->local_cell_glob_indices.data());
 
-  //=================================== Initialize pwl discretization
-  pwl_discretization = new SpatialDiscretization_PWL;
-
-  pwl_discretization->
-    AddViewOfLocalContinuum(grid,
-                            grid->local_cell_glob_indices.size(),
-                            grid->local_cell_glob_indices.data());
-
-  num_moms = 1;
-  size_t num_local_cells = grid->local_cell_glob_indices.size();
-  local_cell_pwl_dof_array_address.resize(num_local_cells,0);
-  int block_MG_counter = 0;
-  for (size_t lc=0; lc<num_local_cells; lc++)
+  if (make_pwld)
   {
-    local_cell_pwl_dof_array_address[lc] = block_MG_counter;
-    int cell_g_index = grid->local_cell_glob_indices[lc];
-    auto cell_pwl_view = pwl_discretization->MapFeView(cell_g_index);
+    //=================================== Initialize pwl discretization
+    pwl_discretization = new SpatialDiscretization_PWL;
 
-    block_MG_counter += cell_pwl_view->dofs*num_grps*num_moms;
+    pwl_discretization->
+      AddViewOfLocalContinuum(grid,
+                              num_local_cells,
+                              grid->local_cell_glob_indices.data());
+
+    //=================================== Generate moment wise addresses
+    num_moms = 1;
+    local_cell_pwl_dof_array_address.resize(num_local_cells,0);
+    int block_MG_counter = 0;
+    for (size_t lc=0; lc<num_local_cells; lc++)
+    {
+      local_cell_pwl_dof_array_address[lc] = block_MG_counter;
+      int cell_g_index = grid->local_cell_glob_indices[lc];
+      auto cell_pwl_view = pwl_discretization->MapFeView(cell_g_index);
+
+      block_MG_counter += cell_pwl_view->dofs*num_grps*num_moms;
+    }
+
+    //=================================== Initialize PWLD tallies
+    tally_size = block_MG_counter-1;
+    phi_pwl_tally_contrib.resize(tally_size,0.0);
+    phi_pwl_tally.resize(tally_size,0.0);
+    phi_pwl_tally_sqr.resize(tally_size,0.0);
+
+    phi_pwl_global.resize(tally_size,0.0);
+    phi_pwl_global_tally_sqr.resize(tally_size,0.0);
+
+    phi_pwl_local_relsigma.resize(tally_size,0.0);
   }
-  tally_size = block_MG_counter-1;
-  phi_pwl_tally_contrib.resize(tally_size,0.0);
-  phi_pwl_tally.resize(tally_size,0.0);
-  phi_pwl_tally_sqr.resize(tally_size,0.0);
 
-  phi_pwl_global.resize(tally_size,0.0);
-  phi_pwl_global_tally_sqr.resize(tally_size,0.0);
-
-  phi_pwl_local_relsigma.resize(tally_size,0.0);
 
 
   //=================================== Initialize Sources
+  chi_log.Log(LOG_0) << "Initializing sources";
   for (int s=0; s<sources.size(); s++)
   {
     sources[s]->Initialize(grid,fv_discretization);
@@ -162,31 +171,35 @@ bool chi_montecarlon::Solver::Initialize()
     field_functions.push_back(group_ff);
   }
 
-  for (int g=0; g<num_grps; g++)
+  if (make_pwld)
   {
-    for (int m=0; m<num_moms; m++)
+    for (int g=0; g<num_grps; g++)
     {
-      chi_physics::FieldFunction* group_ff =
-        new chi_physics::FieldFunction;
-      group_ff->text_name = std::string("Flux_g") +
-                            std::to_string(g) +
-                            std::string("_m") + std::to_string(m);
-      group_ff->grid = grid;
-      group_ff->spatial_discretization = pwl_discretization;
-      group_ff->id = chi_physics_handler.fieldfunc_stack.size();
+      for (int m=0; m<num_moms; m++)
+      {
+        chi_physics::FieldFunction* group_ff =
+          new chi_physics::FieldFunction;
+        group_ff->text_name = std::string("Flux_g") +
+                              std::to_string(g) +
+                              std::string("_m") + std::to_string(m);
+        group_ff->grid = grid;
+        group_ff->spatial_discretization = pwl_discretization;
+        group_ff->id = chi_physics_handler.fieldfunc_stack.size();
 
-      group_ff->type = FF_SDM_PWLD;
-      group_ff->num_grps = num_grps;
-      group_ff->num_moms = num_moms;
-      group_ff->grp = g;
-      group_ff->mom = m;
-      group_ff->field_vector_local = &phi_pwl_global;
-      group_ff->local_cell_dof_array_address = &local_cell_pwl_dof_array_address;
+        group_ff->type = FF_SDM_PWLD;
+        group_ff->num_grps = num_grps;
+        group_ff->num_moms = num_moms;
+        group_ff->grp = g;
+        group_ff->mom = m;
+        group_ff->field_vector_local = &phi_pwl_global;
+        group_ff->local_cell_dof_array_address = &local_cell_pwl_dof_array_address;
 
-      chi_physics_handler.fieldfunc_stack.push_back(group_ff);
-      field_functions.push_back(group_ff);
-    }//for m
-  }//for g
+        chi_physics_handler.fieldfunc_stack.push_back(group_ff);
+        field_functions.push_back(group_ff);
+      }//for m
+    }//for g
+  }//if make_pwld
+
 
 
 
