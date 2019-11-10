@@ -68,15 +68,13 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         break;
       }
     }//for faces
-
-
   }//slab
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
   else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
   {
     auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-    chi_mesh::Vector intersection_point;
+    chi_mesh::Vector ip; //intersetion point
 
     int num_faces = poly_cell->faces.size();
     for (int f=0; f<num_faces; f++)
@@ -87,26 +85,20 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       chi_mesh::Vertex face_point_f = *grid->nodes[fpf];
 
       bool intersects = chi_mesh::CheckLineIntersectStrip(
-        face_point_i,
-        face_point_f,
-        poly_cell->faces[f].normal,
-        pos_i, pos_f_line,
-        intersection_point);
+        face_point_i, face_point_f, poly_cell->faces[f].normal,
+        pos_i, pos_f_line, ip);
 
-      if (intersects)
+      double D = (ip - pos_i).Norm();
+
+      if (intersects and (D > 1.0e-10))
       {
-        double D = (intersection_point - pos_i).Norm();
+        d_to_surface = D;
+        pos_f = ip;
 
-        if (D > 1.0e-10)
-        {
-          d_to_surface = D;
-          pos_f = intersection_point;
-
-          dest_info.destination_face_index = f;
-          dest_info.destination_face_neighbor = poly_cell->faces[f].neighbor;
-          intersection_found = true;
-          break;
-        }
+        dest_info.destination_face_index = f;
+        dest_info.destination_face_neighbor = poly_cell->faces[f].neighbor;
+        intersection_found = true;
+        break;
       }//if intersects
     }//for faces
   }//polygon
@@ -115,7 +107,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   {
     auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
-    chi_mesh::Vector intersection_point;
+    chi_mesh::Vector ip = pos_i; //Intersection point
 
     int num_faces = polyh_cell->faces.size();
     for (int f=0; f<num_faces; f++)
@@ -125,67 +117,32 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       size_t num_sides = edges.size();
       for (size_t s=0; s<num_sides; s++)
       {
-        int v0i = edges[s][0]; //face point index 0
-        int v1i = edges[s][1]; //face point index 1
-        chi_mesh::Vertex& v0 = *grid->nodes[v0i];
-        chi_mesh::Vertex& v1 = *grid->nodes[v1i];
+        chi_mesh::Vertex& v0 = *grid->nodes[edges[s][0]];
+        chi_mesh::Vertex& v1 = *grid->nodes[edges[s][1]];
         chi_mesh::Vertex& v2 = polyh_cell->faces[f].centroid;
 
-        auto v01 = v1 - v0;
-        auto v12 = v2 - v1;
+//        bool intersects =
+//          chi_mesh::CheckLineIntersectTriangle(v0,v1,v2,polyh_cell->faces[f].normal,pos_i,pos_f_line,ip);
 
-        auto n = v01.Cross(v12);
-        n = n/n.Norm();
-
-        std::pair<double,double> weights;
-
-        bool intersects = chi_mesh::CheckPlaneLineIntersect(
-          n, v0, pos_i, pos_f_line,
-          intersection_point, weights);
+        bool intersects =
+          chi_mesh::CheckLineIntersectTriangle2(v0,v1,v2,pos_i,omega_i,ip);
 
 
+        double D = (ip - pos_i).Norm();
 
-        if (intersects)
+        if (intersects and (D > 1.0e-10))
         {
-//          chi_log.Log(LOG_0) << intersection_point.PrintS();
-//          chi_log.Log(LOG_0) << "    v0: " << v0.PrintS();
-//          chi_log.Log(LOG_0) << "    v1: " << v1.PrintS();
-//          chi_log.Log(LOG_0) << "    v2: " << v2.PrintS();
+          d_to_surface = D;
+          pos_f = ip;
 
-          intersects = chi_mesh::CheckPointInTriangle(
-            v0,v1,v2,n,intersection_point);
-        }
+          dest_info.destination_face_index = f;
+          dest_info.destination_face_neighbor = polyh_cell->faces[f].neighbor;
 
-
-        if (intersects)
-        {
-          double D = (intersection_point - pos_i).Norm();
-
-          if (D > 1.0e-10)
-          {
-            d_to_surface = D;
-            pos_f = intersection_point;
-
-            dest_info.destination_face_index = f;
-            dest_info.destination_face_neighbor = polyh_cell->faces[f].neighbor;
-
-//            chi_log.Log(LOG_0)
-//              << "Distance to surface"
-//            usleep(100000);
-            intersection_found = true;
-            break;
-          }
+          intersection_found = true;
+          break;
         }//if intersects
-      }
-
-
+      }//for side
     }//for faces
-    if (!intersection_found)
-    {
-      chi_log.Log(LOG_0) << "Cell: ";
-      for (auto vi : polyh_cell->vertex_ids)
-        chi_log.Log(LOG_0) << grid->nodes[vi]->PrintS();
-    }
   }//polyhedron
   else
   {
@@ -197,12 +154,18 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
 
   if (!intersection_found)
   {
-    chi_log.Log(LOG_ALLERROR)
-      << "Intersection not found. "
-      << pos_i.PrintS() << " "
-      << omega_i.PrintS();
-    exit(EXIT_FAILURE);
-    usleep(1000000);
+    std::stringstream outstr;
+
+    outstr
+      << "Intersection not found. For particle xyz="
+      << pos_i.PrintS() << " uvw="
+      << omega_i.PrintS() << " in cell " << cell->cell_global_id
+      << " with vertices: \n";
+
+    for (auto vi : cell->vertex_ids)
+      outstr << grid->nodes[vi]->PrintS() << "\n";
+
+    chi_log.Log(LOG_ALLERROR) << outstr.str();
   }
 
   return dest_info;

@@ -35,7 +35,8 @@ CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,
                         chi_mesh::Vector& intersection_point,
                         std::pair<double,double>& weights);
 
-bool CheckLineIntersectStrip(
+bool
+CheckLineIntersectStrip(
   const chi_mesh::Vector& strip_point0,
   const chi_mesh::Vector& strip_point1,
   const chi_mesh::Vector& strip_normal,
@@ -43,12 +44,32 @@ bool CheckLineIntersectStrip(
   const chi_mesh::Vector& line_point1,
   chi_mesh::Vector& intersection_point);
 
+bool
+CheckLineIntersectTriangle(
+  const chi_mesh::Vector& tri_point0,
+  const chi_mesh::Vector& tri_point1,
+  const chi_mesh::Vector& tri_point2,
+  const chi_mesh::Normal& tri_normal,
+  const chi_mesh::Vector& line_point0,
+  const chi_mesh::Vector& line_point1,
+  chi_mesh::Vector& intersection_point);
+
+bool
+CheckLineIntersectTriangle2(
+  const chi_mesh::Vector& tri_point0,
+  const chi_mesh::Vector& tri_point1,
+  const chi_mesh::Vector& tri_point2,
+  const chi_mesh::Vector& ray_posi,
+  const chi_mesh::Vector& ray_dir,
+  chi_mesh::Vector& intersection_point);
+
 void PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum* grid,
-  const Cell* cell,
+  Cell* cell,
   std::vector<double> &segment_lengths,
-  const chi_mesh::Vector line_point0,
-  const chi_mesh::Vector line_point1);
+  const chi_mesh::Vector& line_point0,
+  const chi_mesh::Vector& line_point1,
+  const chi_mesh::Vector& omega);
 
 bool
 CheckPointInTriangle(const chi_mesh::Vector& v0,

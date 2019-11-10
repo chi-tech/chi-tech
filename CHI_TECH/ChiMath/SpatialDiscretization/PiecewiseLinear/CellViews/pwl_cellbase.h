@@ -27,9 +27,16 @@ public:
   }
 
   /** Virtual function evaluation of the shape function. */
-  virtual double ShapeValue(int i, chi_mesh::Vector& xyz)
+  virtual double ShapeValue(int i, const chi_mesh::Vector& xyz)
   {
     return 0.0;
+  }
+
+  /** Virtual function returning the all the shape function evaluations
+   * at the point.*/
+   virtual std::vector<double> ShapeValues(const chi_mesh::Vector& xyz)
+  {
+     return std::vector<double>(dofs,0.0);
   }
 
 };

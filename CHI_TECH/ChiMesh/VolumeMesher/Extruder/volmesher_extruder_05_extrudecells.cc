@@ -72,7 +72,8 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
       //printf("xi,yi,zi=%d,%d,%d\n", xi,yi,zi);
 
       //###################### NOT A LOCAL CELL ############################
-      if (tcell->partition_id != chi_mpi.location_id)
+      if ((tcell->partition_id != chi_mpi.location_id) and
+          (!options.mesh_global))
       {
         tcell->cell_global_id = vol_continuum->cells.size();
         vol_continuum->cells.push_back(tcell);

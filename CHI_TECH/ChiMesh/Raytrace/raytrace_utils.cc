@@ -1,5 +1,7 @@
 #include "raytracing.h"
 #include <ChiMesh/Cell/cell.h>
+#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polyhedronv2.h>
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 #include <algorithm>
@@ -110,6 +112,102 @@ bool chi_mesh::CheckLineIntersectStrip(
 }
 
 //###################################################################
+/**Given a triangle defined by three points, computes whether a line
+ * intersects this triangle.
+ *
+ * */
+bool chi_mesh::CheckLineIntersectTriangle(
+  const chi_mesh::Vector& tri_point0,
+  const chi_mesh::Vector& tri_point1,
+  const chi_mesh::Vector& tri_point2,
+  const chi_mesh::Normal& tri_normal,
+  const chi_mesh::Vector& line_point0,
+  const chi_mesh::Vector& line_point1,
+  chi_mesh::Vector& intersection_point)
+{
+  chi_mesh::Vector plane_pi; //plane point of intersection
+  std::pair<double,double> weights;
+
+  bool intersects_plane =
+    chi_mesh::CheckPlaneLineIntersect(
+      tri_normal, tri_point0,
+      line_point0, line_point1,
+      plane_pi, weights);
+
+  if (!intersects_plane) return false;
+  else
+  {
+    bool in_triangle =
+      chi_mesh::CheckPointInTriangle(
+        tri_point0, tri_point1, tri_point2, tri_normal, plane_pi);
+
+    if (in_triangle)
+    {
+      intersection_point = plane_pi;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool
+chi_mesh::CheckLineIntersectTriangle2(
+  const chi_mesh::Vector& tri_point0,
+  const chi_mesh::Vector& tri_point1,
+  const chi_mesh::Vector& tri_point2,
+  const chi_mesh::Vector& ray_posi,
+  const chi_mesh::Vector& ray_dir,
+  chi_mesh::Vector& intersection_point)
+{
+  double epsilon = 1.0e-12;
+  chi_mesh::Vector edge1 = tri_point1 - tri_point0;
+  chi_mesh::Vector edge2 = tri_point2 - tri_point0;
+
+  chi_mesh::Vector s = ray_posi - tri_point0;
+
+  // Compute characteristic vector for incident angle
+  // This vector becomes zero in length when the ray
+  // gets close to parallel to the triangle.
+  chi_mesh::Vector h = ray_dir.Cross(edge2);
+
+  chi_mesh::Vector q = s.Cross(edge1);
+
+  // Instead of computing the length of h we rather just
+  // find the project length of v02 onto it.
+  double a = edge1.Dot(h);
+  if (a > -epsilon and a < epsilon)
+    return false;
+
+  double f = 1.0/a;
+
+  // If, s projected onto h, is greater than,
+  // v01 projected onto h, or negative, there is now way
+  // the ray can intersect
+  double u = f*(s.Dot(h));
+  if (u<0.0 or u>1.0)
+    return false;
+
+  // If, q projected onto omega, is greater than,
+  // v01 projected onto h, or negative, there is now way
+  // the ray can intersect
+  double v = f*ray_dir.Dot(q);
+  if (v<0.0 or (u+v)>1.0)
+    return false;
+
+  double t = f*edge2.Dot(q);
+  if (t > epsilon and t<(1.0/epsilon))
+  {
+    intersection_point = ray_posi + ray_dir*t;
+    return true;
+  } else
+  {
+    return false;
+  }
+
+}
+
+//###################################################################
 /** Check whether a point lies in a triangle.*/
 bool
 chi_mesh::CheckPointInTriangle(
@@ -146,22 +244,20 @@ chi_mesh::CheckPointInTriangle(
 /** Populates segment lengths along a ray.*/
 void chi_mesh::PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum* grid,
-  const Cell* cell,
+  Cell* cell,
   std::vector<double> &segment_lengths,
-  const chi_mesh::Vector line_point0,
-  const chi_mesh::Vector line_point1)
+  const chi_mesh::Vector& line_point0,
+  const chi_mesh::Vector& line_point1,
+  const chi_mesh::Vector& omega)
 {
-  double ray_length = (line_point1-line_point0).Norm();
-  std::vector<double> distance_to_segments;
+  if (segment_lengths.empty())
+    segment_lengths.push_back((line_point1-line_point0).Norm());
 
   //======================================== Determine intersection points
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   // Since there are no segments within a slab we will only have
-  // a single segment length.
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
-  {
-    distance_to_segments.emplace_back(ray_length);
-  }
+  // a single segment length. It is already pushed
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
   // A polygon can be decomposed into "sides" by means of its
   // edges. Each side comprises a triangle formed by: the two
@@ -169,21 +265,18 @@ void chi_mesh::PopulateRaySegmentLengths(
   // centroid vc.
   // Since the triangles all share an edge we only determine
   // segment lengths from the strip defined by v0 to vc.
-  else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+  if (cell->Type() == chi_mesh::CellType::POLYGONV2)
   {
-    distance_to_segments.emplace_back(ray_length);
+    auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-    for (auto face : cell->faces) //edges
+    int f=-1;
+    for (auto& face : cell->faces) //edges
     {
-      chi_mesh::Vertex v0 = *grid->nodes[face.vertex_ids[0]];
-      chi_mesh::Vertex vc = cell->centroid;
+      f++;
+      chi_mesh::Vertex& v0 = *grid->nodes[face.vertex_ids[0]];
+      chi_mesh::Vertex& vc = cell->centroid;
 
-      chi_mesh::Vector khat(0.0,0.0,1.0);
-      chi_mesh::Vector vc0 = vc - v0;
-
-      chi_mesh::Vector n0 = ((vc0)/vc0.Norm()).Cross(khat);
-
-      n0 = n0/n0.Norm();
+      auto& n0 = poly_cell->GetSegmentNormals(grid)[f];
 
       chi_mesh::Vertex intersection_point;
       bool intersects = chi_mesh::CheckLineIntersectStrip(
@@ -194,30 +287,65 @@ void chi_mesh::PopulateRaySegmentLengths(
       if (intersects)
       {
         double d = (intersection_point - line_point0).Norm();
-        distance_to_segments.push_back(d);
+        segment_lengths.push_back(d);
       }
 
     }//for face
   }
   else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
   {
-    distance_to_segments.emplace_back(ray_length);
+    auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+
+    auto& vcc = polyh_cell->centroid;
+
+    auto& face_side_normals =  polyh_cell->GetSegmentNormals(grid);
+
+    int f=-1;
+    for (auto& face : cell->faces)
+    {
+      f++;
+      auto edges = polyh_cell->GetFaceEdges(f);
+      auto& vfc  = face.centroid;
+
+      int s=-1;
+      for (auto& edge : edges)
+      {
+        s++;
+        auto& vert = *grid->nodes[edge[0]];
+
+        chi_mesh::Vertex intersection_point;
+//        bool intersects = chi_mesh::CheckLineIntersectTriangle(
+//          vert,vfc,vcc,
+//          face_side_normals[f][s],
+//          line_point0,line_point1,intersection_point);
+
+        bool intersects = chi_mesh::CheckLineIntersectTriangle2(
+          vert,vfc,vcc,line_point0,omega,intersection_point);
+
+        if (intersects)
+        {
+          double d = (intersection_point - line_point0).Norm();
+          segment_lengths.push_back(d);
+        }
+      }//for edge
+    }//for face
   }
 
   //======================================== Sort distances
-  std::stable_sort(distance_to_segments.begin(),
-                   distance_to_segments.end());
+  std::sort(segment_lengths.begin(),
+            segment_lengths.end());
 
   //======================================== Populate segment lengths
   //if there are N segments intersected then there will always be
   //N+1 distances.
-  size_t num_distances = distance_to_segments.size();
-  segment_lengths.resize(num_distances);
-  segment_lengths[0] = distance_to_segments[0];
+  size_t num_distances = segment_lengths.size();
+  double last_distance = segment_lengths[0];
   for (size_t di=1; di < num_distances; di++)
   {
-    segment_lengths[di] =
-      distance_to_segments[di] - distance_to_segments[di-1];
+    double new_seg_length =
+      segment_lengths[di] - last_distance;
+    last_distance = segment_lengths[di];
+    segment_lengths[di] = new_seg_length;
   }
 
 }

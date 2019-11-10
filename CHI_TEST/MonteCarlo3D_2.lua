@@ -11,7 +11,7 @@ chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
+        "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 
 --############################################### Extract edges from surface mesh
 loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
@@ -46,10 +46,10 @@ chiSurfaceMesherSetProperty(CUT_X,0.0)
 chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 NZ=2
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ*20,NZ,"Charlie");--0.4
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ*20,NZ,"Charlie");--0.8
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ*20,NZ,"Charlie");--1.2
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ*20,NZ,"Charlie");--1.6
 
 chiVolumeMesherSetProperty(PARTITION_Z,1);
 
@@ -117,8 +117,8 @@ chiMonteCarlonExecute(phys1)
 
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0, 0.999)
-chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,1.0, 0.999)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-20.0, 20.999)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,20.0, 20.999)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 500)
 
 for k=1,2 do

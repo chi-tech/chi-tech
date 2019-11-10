@@ -55,6 +55,7 @@ bool chi_montecarlon::Solver::Initialize()
       }
     }//for prop
   }//for mat
+  MPI_Barrier(MPI_COMM_WORLD);
 
   chi_mesh::Region*  aregion = this->regions.back();
   this->grid                 = aregion->volume_mesh_continua.back();
@@ -81,8 +82,8 @@ bool chi_montecarlon::Solver::Initialize()
                                chi_mpi.location_id*loc_num_part;
     }
   }
-
-
+  chi_log.Log(LOG_0) << "Batches seperated among processes.";
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //=================================== Initialize tallies
   size_t num_local_cells = grid->local_cell_glob_indices.size();
@@ -97,15 +98,17 @@ bool chi_montecarlon::Solver::Initialize()
   phi_local_relsigma.resize(tally_size,0.0);
 
   //=================================== Initialize default discretization
+  chi_log.Log(LOG_0) << "Adding finite volume views.";
   fv_discretization = new SpatialDiscretization_FV;
 
   fv_discretization->
     AddViewOfLocalContinuum(grid,
                             num_local_cells,
                             grid->local_cell_glob_indices.data());
-
+  MPI_Barrier(MPI_COMM_WORLD);
   if (make_pwld)
   {
+    chi_log.Log(LOG_0) << "Adding PWL finite element views.";
     //=================================== Initialize pwl discretization
     pwl_discretization = new SpatialDiscretization_PWL;
 
@@ -138,7 +141,7 @@ bool chi_montecarlon::Solver::Initialize()
 
     phi_pwl_local_relsigma.resize(tally_size,0.0);
   }
-
+  MPI_Barrier(MPI_COMM_WORLD);
 
 
   //=================================== Initialize Sources

@@ -118,7 +118,7 @@ public:
   }
 
   /**Shape function for the slab function.*/
-  double Shape_x(int i, chi_mesh::Vector& xyz)
+  double Shape_x(int i, const chi_mesh::Vector& xyz)
   {
     chi_mesh::Vector& p0 = *grid->nodes[v0i];
     chi_mesh::Vector& p1 = *grid->nodes[v1i];
@@ -143,9 +143,19 @@ public:
     return 0.0;
   }
 
-  double ShapeValue(int i, chi_mesh::Vector& xyz) override
+  double ShapeValue(int i, const chi_mesh::Vector& xyz) override
   {
     return Shape_x(i, xyz);
+  }
+
+  std::vector<double> ShapeValues(const chi_mesh::Vector& xyz) override
+  {
+    std::vector<double> ret_values(dofs,0.0);
+
+    for (int i=0; i<dofs; i++)
+      ret_values[i] = Shape_x(i, xyz);
+
+    return ret_values;
   }
 };
 #endif

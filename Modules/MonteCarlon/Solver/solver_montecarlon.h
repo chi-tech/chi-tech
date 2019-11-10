@@ -66,7 +66,7 @@ private:
 
   std::vector<int>                      local_cell_pwl_dof_array_address;
 
-
+  std::vector<double> segment_lengths;
   //runtime quantities
   int                                   current_batch;
   unsigned long long                    nps;

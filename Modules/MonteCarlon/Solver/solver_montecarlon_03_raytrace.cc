@@ -12,8 +12,7 @@ extern ChiPhysics chi_physics_handler;
 extern ChiLog chi_log;
 
 #include<iostream>
-#include<math.h>
-#include<typeinfo>
+#include<cmath>
 
 //###################################################################
 /**The default raytracing algorithm.*/
@@ -31,24 +30,9 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   double sigt = xs->sigma_tg[prtcl->egrp];
   double sigs = sigt - xs->sigma_ag[prtcl->egrp];
 
-  if (sigs>sigt)
-  {
-    chi_log.Log(LOG_ALLERROR)
-    << "Error in ray trace material";
-    exit(EXIT_FAILURE);
-  }
-
-
   //======================================== Distance to event
   double d_to_intract = -1.0*log(1.0-rng0.Rand())/sigt;
   double d_to_surface = 1.0e15;
-
-  if (std::isnan(prtcl->dir.x))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Particle dir corrupt before raytrace.";
-    exit(EXIT_FAILURE);
-  }
 
   chi_mesh::Vector posf = prtcl->pos;
   chi_mesh::Vector dirf = prtcl->dir;
@@ -57,66 +41,19 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
     chi_mesh::RayTrace(grid, cell, prtcl->pos, prtcl->dir,
                        d_to_surface, posf);
 
-  if (std::isnan(posf.x))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Posf corruption after surface tracking.";
-    exit(EXIT_FAILURE);
-  }
-
-  if (std::isnan(prtcl->dir.x))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Particle dir corrupt after raytrace.";
-    exit(EXIT_FAILURE);
-  }
-
-  if (std::isnan(d_to_intract))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "d_to_interact corrupt.";
-    exit(EXIT_FAILURE);
-  }
-  if (std::isnan(d_to_surface))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "d_to_surface corrupt.";
-    exit(EXIT_FAILURE);
-  }
-
-//  chi_log.Log(LOG_0)
-//  << "d2s=" << d_to_surface << " "
-//  << "d2i=" << d_to_intract;
 
   //======================================== Process interaction
   if (d_to_intract < d_to_surface)
   {
     posf = prtcl->pos + prtcl->dir*d_to_intract;
 
-    if (std::isnan(posf.x))
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Posf corruption after interaction tracking. "
-        << prtcl->pos.PrintS() << " "
-        << prtcl->dir.PrintS() << " "
-        << d_to_intract;
-      exit(EXIT_FAILURE);
-    }
-
     if (rng0.Rand() < (sigs/sigt))
     {
 
-      std::pair<int,chi_mesh::Vector> e_dir =
-        ProcessScattering(prtcl,xs);
-      ef   = e_dir.first;
-      dirf = e_dir.second;
-
-      if (std::isnan(dirf.x))
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "Particle dir corrupt after scattering.";
-        exit(EXIT_FAILURE);
-      }
+      auto energy_dir = ProcessScattering(prtcl,xs);
+      ef   = energy_dir.first;
+      dirf = energy_dir.second;
+//      prtcl->alive = false;  // TODO: Remove before flight
 
       if (mono_energy && (ef != prtcl->egrp))
         prtcl->alive = false;

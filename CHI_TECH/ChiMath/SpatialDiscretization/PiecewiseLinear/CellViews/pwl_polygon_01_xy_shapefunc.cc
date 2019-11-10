@@ -3,7 +3,7 @@
 //###################################################################
 /**Returns the value of the shape function given cartesian
  * coordinates.*/
-double PolygonFEView::Shape_xy(int i, chi_mesh::Vector& xyz)
+double PolygonFEView::Shape_xy(int i, const chi_mesh::Vector& xyz)
 {
   for (int s=0; s<num_of_subtris; s++)
   {

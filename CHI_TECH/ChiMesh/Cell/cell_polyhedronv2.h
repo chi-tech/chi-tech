@@ -2,6 +2,7 @@
 #define _chi_mesh_cell_polyhedron_h
 
 #include "cell.h"
+#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 namespace chi_mesh
 {
@@ -13,7 +14,11 @@ class CellPolyhedronV2 : public Cell
 {
 private:
   std::vector<std::vector<std::vector<int>>> face_edges;
-  bool edges_developed  = false;
+  bool edges_developed = false;
+
+private:
+  std::vector<std::vector<chi_mesh::Vector>> face_segment_normals;
+  bool segment_normals_developed = false;
 
 public:
   CellPolyhedronV2() : Cell(CellType::POLYHEDRONV2) {}
@@ -44,6 +49,33 @@ private:
     edges_developed = true;
   }
 
+  void DevelopSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  {
+    auto& vcc = centroid;
+
+    face_segment_normals.resize(faces.size());
+    int f=-1;
+    for (auto& face : faces)
+    {
+      f++;
+      auto& vfc = face.centroid;
+      face_segment_normals[f].reserve(face.vertex_ids.size());
+      for (auto vi : face.vertex_ids)
+      {
+        auto& vert = *grid->nodes[vi];
+
+        auto v01 = vfc - vert;
+        auto v12 = vcc - vfc;
+
+        auto n = v01.Cross(v12);
+        n = n/n.Norm();
+
+        face_segment_normals[f].push_back(n);
+      }
+    }
+    segment_normals_developed = true;
+  }
+
 public:
   std::vector<std::vector<int>>& GetFaceEdges(size_t f)
   {
@@ -51,6 +83,16 @@ public:
       DevelopEdges();
     return face_edges[f];
   }
+
+  std::vector<std::vector<chi_mesh::Vector>>&
+    GetSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  {
+    if (!segment_normals_developed)
+      DevelopSegmentNormals(grid);
+
+    return face_segment_normals;
+  }
+
 };
 
 }

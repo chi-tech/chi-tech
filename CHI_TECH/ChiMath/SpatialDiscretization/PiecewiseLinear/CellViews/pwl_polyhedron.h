@@ -152,12 +152,22 @@ private:
 
   //############################################### Actual shape functions
 public:
-  double           Shape_xyz(int i, chi_mesh::Vector& xyz);
+  double           Shape_xyz(int i, const chi_mesh::Vector& xyz);
   chi_mesh::Vector GradShape_xyz(int i, chi_mesh::Vector xyz);
 
-  double ShapeValue(int i, chi_mesh::Vector& xyz) override
+  double ShapeValue(int i, const chi_mesh::Vector& xyz) override
   {
     return Shape_xyz(i, xyz);
+  }
+
+  std::vector<double> ShapeValues(const chi_mesh::Vector& xyz) override
+  {
+    std::vector<double> ret_values(dofs,0.0);
+
+    for (int i=0; i<dofs; i++)
+      ret_values[i] = Shape_xyz(i, xyz);
+
+    return ret_values;
   }
 
   //############################################### Precomputation cell matrices

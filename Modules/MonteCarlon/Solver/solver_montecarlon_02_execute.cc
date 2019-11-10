@@ -50,7 +50,7 @@ void chi_montecarlon::Solver::Execute()
     }//for pi in batch
 
 
-
+    MPI_Barrier(MPI_COMM_WORLD);
     chi_log.Log(LOG_0) << "Rendesvous-ing";
     RendesvouzTallies();
     if (make_pwld)
@@ -121,28 +121,28 @@ void chi_montecarlon::Solver::Execute()
 
   //Print group 0
 
-  for (int lc=0; lc<num_cells; lc++)
-  {
-    std::stringstream outstr;
-    outstr
-      << "Cell " << lc
-      << " phi=" << phi_global[lc*num_grps]
-      << " std=" << phi_local_relsigma[lc*num_grps+0]
-      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps];
-
-    if (make_pwld)
-    {
-      int map0 = local_cell_pwl_dof_array_address[lc];
-      int map1 = map0 + 1*num_grps*num_moms + num_grps*0 + 0;
-
-      outstr
-        << " dof0g0m0=" << phi_pwl_global[map0]
-        << " dof1g0m0=" << phi_pwl_global[map1];
-    }
-
-
-    chi_log.Log(LOG_0) << outstr.str();
-  }
+//  for (int lc=0; lc<num_cells; lc++)
+//  {
+//    std::stringstream outstr;
+//    outstr
+//      << "Cell " << lc
+//      << " phi=" << phi_global[lc*num_grps]
+//      << " std=" << phi_local_relsigma[lc*num_grps+0]
+//      << " abs=" << phi_local_relsigma[lc*num_grps+0]*phi_global[lc*num_grps];
+//
+//    if (make_pwld)
+//    {
+//      int map0 = local_cell_pwl_dof_array_address[lc];
+//      int map1 = map0 + 1*num_grps*num_moms + num_grps*0 + 0;
+//
+//      outstr
+//        << " dof0g0m0=" << phi_pwl_global[map0]
+//        << " dof1g0m0=" << phi_pwl_global[map1];
+//    }
+//
+//
+//    chi_log.Log(LOG_0) << outstr.str();
+//  }
 
 
   auto rsrc = (chi_montecarlon::ResidualSource*)sources[0];

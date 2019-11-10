@@ -32,7 +32,7 @@ void chi_montecarlon::Solver::ContributeTally(
 
   double tracklength = (pf - prtcl->pos).Norm();
 
-  double tally_contrib = (tracklength*prtcl->w);
+  double tally_contrib = tracklength*prtcl->w;
 
   phi_tally[ir]     += tally_contrib;
   phi_tally_sqr[ir] += tally_contrib*tally_contrib;
@@ -48,48 +48,36 @@ void chi_montecarlon::Solver::ContributeTally(
 
   if (make_pwld)
   {
-    std::vector<double> segment_lengths;
-    chi_mesh::PopulateRaySegmentLengths(
-      grid, cell, segment_lengths,
-      prtcl->pos, pf);
+    segment_lengths.clear();
+    segment_lengths.push_back(tracklength);
+    chi_mesh::PopulateRaySegmentLengths(grid, cell,
+                                        segment_lengths,
+                                        prtcl->pos, pf,prtcl->dir);
 
     auto cell_pwl_view = pwl_discretization->MapFeView(prtcl->cur_cell_ind);
     int map            = local_cell_pwl_dof_array_address[cell_local_ind];
 
     double last_segment_length = 0.0;
 
-//    std::cout << "Tracklength " << tracklength << "\n";
-
     for (auto segment_length : segment_lengths)
     {
-//      std::cout << segment_length << " ";
       double d = last_segment_length + 0.5*segment_length;
       last_segment_length += segment_length;
       auto p = prtcl->pos + prtcl->dir*d;
+
+//      std::vector<double> N = cell_pwl_view->ShapeValues(p);
 
       for (int dof=0; dof<cell_pwl_view->dofs; dof++)
       {
         double N = cell_pwl_view->ShapeValue(dof,p);
 
         ir = map + dof*num_grps*num_moms + num_grps*0 + prtcl->egrp;
-        double pwl_tally_contrib = (segment_length*prtcl->w*N);
+        double pwl_tally_contrib = segment_length*prtcl->w*N;
 
         phi_pwl_tally[ir]     += pwl_tally_contrib;
         phi_pwl_tally_sqr[ir] += pwl_tally_contrib*pwl_tally_contrib;
-      }
-
-      if (std::isnan(tracklength))
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "Tracklength corruption in pwl tally contribution."
-          << " pos  " << prtcl->pos.PrintS()
-          << " posf " << pf.PrintS();
-        exit(EXIT_FAILURE);
-      }
-    }
-//    std::cout << "\n";
-//    usleep(100000);
-
+      }//for dof
+    }//for segment_length
   }//if make pwld
 
 }
