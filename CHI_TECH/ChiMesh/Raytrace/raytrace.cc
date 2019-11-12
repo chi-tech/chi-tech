@@ -81,8 +81,8 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     {
       int fpi = poly_cell->faces[f].vertex_ids[0]; //face point index 0
       int fpf = poly_cell->faces[f].vertex_ids[1]; //face point index 1
-      chi_mesh::Vertex face_point_i = *grid->nodes[fpi];
-      chi_mesh::Vertex face_point_f = *grid->nodes[fpf];
+      chi_mesh::Vertex& face_point_i = *grid->nodes[fpi];
+      chi_mesh::Vertex& face_point_f = *grid->nodes[fpf];
 
       bool intersects = chi_mesh::CheckLineIntersectStrip(
         face_point_i, face_point_f, poly_cell->faces[f].normal,
@@ -121,18 +121,12 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         chi_mesh::Vertex& v1 = *grid->nodes[edges[s][1]];
         chi_mesh::Vertex& v2 = polyh_cell->faces[f].centroid;
 
-//        bool intersects =
-//          chi_mesh::CheckLineIntersectTriangle(v0,v1,v2,polyh_cell->faces[f].normal,pos_i,pos_f_line,ip);
-
         bool intersects =
           chi_mesh::CheckLineIntersectTriangle2(v0,v1,v2,pos_i,omega_i,ip);
 
-
-        double D = (ip - pos_i).Norm();
-
-        if (intersects and (D > 1.0e-10))
+        if (intersects)
         {
-          d_to_surface = D;
+          d_to_surface = (ip - pos_i).Norm();
           pos_f = ip;
 
           dest_info.destination_face_index = f;
@@ -142,6 +136,8 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
           break;
         }//if intersects
       }//for side
+
+      if (intersection_found) break;
     }//for faces
   }//polyhedron
   else

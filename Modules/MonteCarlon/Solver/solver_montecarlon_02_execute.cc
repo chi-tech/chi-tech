@@ -43,12 +43,11 @@ void chi_montecarlon::Solver::Execute()
           << "Particle dir corrupt.";
         exit(EXIT_FAILURE);
       }
-//      chi_log.Log(LOG_0) << pi;
+
       while (prtcl.alive)
         Raytrace(&prtcl);
 
     }//for pi in batch
-
 
     MPI_Barrier(MPI_COMM_WORLD);
     chi_log.Log(LOG_0) << "Rendesvous-ing";
@@ -60,7 +59,7 @@ void chi_montecarlon::Solver::Execute()
 
 
     time = chi_program_timer.GetTime()/1000.0;
-    particle_rate = (nps_global)*60.0e-6/(time-start_time);
+    particle_rate = (nps_global)*3600.0e-6/(time-start_time);
     chi_log.Log(LOG_0)
       << chi_program_timer.GetTimeString()
       << " TFC-rendesvouz: # of particles ="
@@ -68,7 +67,7 @@ void chi_montecarlon::Solver::Execute()
       << nps_global
       << " avg-rate = "
       << std::setw(6) << std::setprecision(4)
-      << particle_rate << " M/min"
+      << particle_rate << " M/hr"
       << " Max Rel.Sigma = "
       << std::setw(6) << std::setprecision(4) << std::scientific
       << max_relative_error

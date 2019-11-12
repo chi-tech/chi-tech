@@ -63,19 +63,11 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   //============================================= copy cdf
   //This will make the CDF from 0.0 to 1.0
   cdf_gprime_g.resize(G,std::vector<double>(G,0.0));
-  double intgl = 0.0;
   for (int gp=0; gp<G; gp++)
     for (int g=0; g<G; g++)
-    {
       cdf_gprime_g[g][gp] = prob_gprime_g_normed[g][gp];
-//      if (g<62 and gp<62)
-//      {
-//        chi_log.Log(LOG_0)
-//        << "gp=" << gp << " g=" << g << " cp=" << cdf_gprime_g[g][gp];
-//      }
-    }
 
-
+   cdf_gprime_g = chi_math_handler.Transpose(cdf_gprime_g);
 
   //============================================= Collect scattering moments
   //For a given scattering gprime->g we need all
@@ -104,7 +96,6 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   for (int gp=0; gp<G; gp++)
   {
     scat_angles_gprime_g[gp].resize(G);
-//    if (sigma_tg[gp]<1.0e-16) continue;
 
     for (int g=0; g<G; g++)
     {
@@ -139,13 +130,11 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
  * energy.*/
 int chi_physics::TransportCrossSections::Sample_gprime(int gp, double rn)
 {
+//  int gto = cdf_sampler_gprime_g[gp].Sample(rn);
   int gto = 0;
   for (int g=0; g<G; g++)
   {
-    if ((rn < cdf_gprime_g[g][gp]) and (gp == 0))
-    {gto = g; break;}
-
-    if ((rn < cdf_gprime_g[g][gp]) and (rn >= cdf_gprime_g[g-1][gp]))
+    if (rn < cdf_gprime_g[gp][g])
     {gto = g; break;}
   }
 

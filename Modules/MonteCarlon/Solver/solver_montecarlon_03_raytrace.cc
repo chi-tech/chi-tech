@@ -3,7 +3,7 @@
 #include <ChiMesh/Cell/cell.h>
 #include <ChiMesh/Raytrace/raytracing.h>
 #include <ChiPhysics/chi_physics.h>
-#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
+
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 
 #include <chi_log.h>
@@ -38,7 +38,8 @@ void chi_montecarlon::Solver::Raytrace(chi_montecarlon::Particle* prtcl)
   chi_mesh::Vector dirf = prtcl->dir;
   int                ef = prtcl->egrp;
   chi_mesh::RayDestinationInfo ray_dest_info =
-    chi_mesh::RayTrace(grid, cell, prtcl->pos, prtcl->dir,
+    chi_mesh::RayTrace(grid, cell,
+                       prtcl->pos, prtcl->dir,
                        d_to_surface, posf);
 
 

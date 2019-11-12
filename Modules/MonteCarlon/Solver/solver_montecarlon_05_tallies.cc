@@ -65,8 +65,6 @@ void chi_montecarlon::Solver::ContributeTally(
       last_segment_length += segment_length;
       auto p = prtcl->pos + prtcl->dir*d;
 
-//      std::vector<double> N = cell_pwl_view->ShapeValues(p);
-
       for (int dof=0; dof<cell_pwl_view->dofs; dof++)
       {
         double N = cell_pwl_view->ShapeValue(dof,p);

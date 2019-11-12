@@ -164,20 +164,19 @@ chi_mesh::CheckLineIntersectTriangle2(
   chi_mesh::Vector edge1 = tri_point1 - tri_point0;
   chi_mesh::Vector edge2 = tri_point2 - tri_point0;
 
-  chi_mesh::Vector s = ray_posi - tri_point0;
-
   // Compute characteristic vector for incident angle
-  // This vector becomes zero in length when the ray
-  // gets close to parallel to the triangle.
+  // This vector becomes perpendicular to the plane
+  // when the ray is parallel to triangle
   chi_mesh::Vector h = ray_dir.Cross(edge2);
 
-  chi_mesh::Vector q = s.Cross(edge1);
-
-  // Instead of computing the length of h we rather just
-  // find the project length of v02 onto it.
+  // If h is indeed perpendicular to the plane,
+  // the dot product of the other leg with this h will be close
+  // to zero.
   double a = edge1.Dot(h);
-  if (a > -epsilon and a < epsilon)
+  if (std::fabs(a) < epsilon)
     return false;
+
+  chi_mesh::Vector s = ray_posi - tri_point0;
 
   double f = 1.0/a;
 
@@ -187,6 +186,8 @@ chi_mesh::CheckLineIntersectTriangle2(
   double u = f*(s.Dot(h));
   if (u<0.0 or u>1.0)
     return false;
+
+  chi_mesh::Vector q = s.Cross(edge1);
 
   // If, q projected onto omega, is greater than,
   // v01 projected onto h, or negative, there is now way
@@ -298,8 +299,6 @@ void chi_mesh::PopulateRaySegmentLengths(
 
     auto& vcc = polyh_cell->centroid;
 
-    auto& face_side_normals =  polyh_cell->GetSegmentNormals(grid);
-
     int f=-1;
     for (auto& face : cell->faces)
     {
@@ -314,10 +313,6 @@ void chi_mesh::PopulateRaySegmentLengths(
         auto& vert = *grid->nodes[edge[0]];
 
         chi_mesh::Vertex intersection_point;
-//        bool intersects = chi_mesh::CheckLineIntersectTriangle(
-//          vert,vfc,vcc,
-//          face_side_normals[f][s],
-//          line_point0,line_point1,intersection_point);
 
         bool intersects = chi_mesh::CheckLineIntersectTriangle2(
           vert,vfc,vcc,line_point0,omega,intersection_point);
