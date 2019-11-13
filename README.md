@@ -10,8 +10,8 @@ with Ubuntu 18.04)
 
 Easy scripts - [Easy Linux instructions](CHI_DOC/Install_ubuntu_easy.md)
 
-If the automated installation of dependencies fail, or if you don't have a system
-supporting it, then rather follow any of the below instructions: 
+If the automated installation of dependencies fails, or if you don't have a system
+supporting it, then follow the instructions below: 
 
 For Linux machines - [Linux installation instructions](CHI_DOC/Install_linux.md)  
 For MacOS machines - [MacOS installation instructions](CHI_DOC/Install_macos.md)
