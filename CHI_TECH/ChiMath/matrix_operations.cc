@@ -3,7 +3,7 @@
 
 //######################################################### Print
 /** Prints the contents of a matrix.*/
-void ChiMath::PrintMatrix(const MatDbl &A)
+void chi_math::PrintMatrix(const MatDbl &A)
 {
   size_t AR = A.size();
   size_t AC = 0;
@@ -24,7 +24,7 @@ void ChiMath::PrintMatrix(const MatDbl &A)
 
 //######################################################### Scale
 /** Scales the matrix by a constant value.*/
-void ChiMath::Scale(MatDbl &A, const double &val)
+void chi_math::Scale(MatDbl &A, const double &val)
 {
   for (std::vector<double>& Ai : A)
     for (double& Aij : Ai)
@@ -33,7 +33,7 @@ void ChiMath::Scale(MatDbl &A, const double &val)
 
 //######################################################### Transpose
 /** Returns the transpose of a matrix.*/
-MatDbl ChiMath::Transpose(const MatDbl &A)
+MatDbl chi_math::Transpose(const MatDbl &A)
 {
   assert(A.size());
   assert(A[0].size());
@@ -51,7 +51,7 @@ MatDbl ChiMath::Transpose(const MatDbl &A)
 
 //######################################################### Swap Row
 /** Swaps two rows of a matrix.*/
-void ChiMath::SwapRow(size_t r1, size_t r2, MatDbl &A)
+void chi_math::SwapRow(size_t r1, size_t r2, MatDbl &A)
 {
   assert(A.size());
   assert(A[0].size());
@@ -69,7 +69,7 @@ void ChiMath::SwapRow(size_t r1, size_t r2, MatDbl &A)
 
 //######################################################### Swap Columns
 /** Swaps two columns of a matrix.*/
-void ChiMath::SwapColumn(size_t c1, size_t c2, MatDbl &A)
+void chi_math::SwapColumn(size_t c1, size_t c2, MatDbl &A)
 {
   assert(A.size());
   assert(A[0].size());
@@ -84,7 +84,7 @@ void ChiMath::SwapColumn(size_t c1, size_t c2, MatDbl &A)
 
 //######################################################### Matrix-multiply
 /** Multiply matrix with a constant and return result.*/
-MatDbl ChiMath::MatMul(const MatDbl &A, const double c)
+MatDbl chi_math::MatMul(const MatDbl &A, const double c)
 {
   size_t R = A.size();
   size_t C = 0;
@@ -101,7 +101,7 @@ MatDbl ChiMath::MatMul(const MatDbl &A, const double c)
 }
 
 /** Multiply matrix with a vector and return resulting vector*/
-VecDbl ChiMath::MatMul(const MatDbl &A, const VecDbl &x)
+VecDbl chi_math::MatMul(const MatDbl &A, const VecDbl &x)
 {
   size_t R = A.size();
   size_t C = x.size();
@@ -121,7 +121,7 @@ VecDbl ChiMath::MatMul(const MatDbl &A, const VecDbl &x)
 }
 
 /** Mutliply two matrices and return result.*/
-MatDbl ChiMath::MatMul(const MatDbl &A, const MatDbl &B)
+MatDbl chi_math::MatMul(const MatDbl &A, const MatDbl &B)
 {
   size_t AR = A.size();
 
@@ -148,7 +148,7 @@ MatDbl ChiMath::MatMul(const MatDbl &A, const MatDbl &B)
 
 //######################################################### Addition
 /** Adds two matrices and returns the result.*/
-MatDbl ChiMath::MatAdd(const MatDbl &A, const MatDbl &B)
+MatDbl chi_math::MatAdd(const MatDbl &A, const MatDbl &B)
 {
   size_t AR = A.size();
   size_t BR = A.size();
@@ -173,7 +173,7 @@ MatDbl ChiMath::MatAdd(const MatDbl &A, const MatDbl &B)
 
 //######################################################### Addition
 /** Subtracts matrix A from B and returns the result.*/
-MatDbl ChiMath::MatSubtract(const MatDbl &A, const MatDbl &B)
+MatDbl chi_math::MatSubtract(const MatDbl &A, const MatDbl &B)
 {
   size_t AR = A.size();
   size_t BR = A.size();
@@ -199,7 +199,7 @@ MatDbl ChiMath::MatSubtract(const MatDbl &A, const MatDbl &B)
 
 //######################################################### Determinant
 /** Computes the determinant of a matrix.*/
-double ChiMath::Determinant(const MatDbl &A)
+double chi_math::Determinant(const MatDbl &A)
 {
   size_t R = A.size();
 
@@ -242,7 +242,7 @@ double ChiMath::Determinant(const MatDbl &A)
 
 //######################################################### Submatrix
 /** Returns a sub-matrix.*/
-MatDbl ChiMath::SubMatrix(const size_t r,
+MatDbl chi_math::SubMatrix(const size_t r,
                           const size_t c,
                           const MatDbl &A)
 {
@@ -274,7 +274,7 @@ MatDbl ChiMath::SubMatrix(const size_t r,
 
 //######################################################### Gauss Elimination
 /** Gauss Elimination without pivoting.*/
-void ChiMath::GaussElimination(std::vector<std::vector<double> > &A,
+void chi_math::GaussElimination(std::vector<std::vector<double> > &A,
 	                              std::vector<double> &b, int n)
 {
 	// Forward elimination
@@ -306,7 +306,7 @@ void ChiMath::GaussElimination(std::vector<std::vector<double> > &A,
 
 //#########################################################
 /** Computes the inverse of a matrix using Gauss-Elimination with pivoting.*/
-MatDbl ChiMath::InverseGEPivoting(const MatDbl &A)
+MatDbl chi_math::InverseGEPivoting(const MatDbl &A)
 {
   assert(A.size());
   assert(A.size() == A[0].size());
@@ -365,7 +365,7 @@ MatDbl ChiMath::InverseGEPivoting(const MatDbl &A)
 //######################################################### Matrix inverse
 /** Computes the inverse of a matrix.*/
 std::vector<std::vector<double>>
-ChiMath::Inverse(const std::vector<std::vector<double> > &A)
+chi_math::Inverse(const std::vector<std::vector<double> > &A)
 {
   size_t R = A.size();
   std::vector<std::vector<double>> M(R,std::vector<double>(R,0.));
@@ -440,7 +440,7 @@ ChiMath::Inverse(const std::vector<std::vector<double> > &A)
 /** Performs power iteration to obtain the fundamental eigen mode. The
  * eigen-value of the fundamental mode is return whilst the eigen-vector
  * is return via reference.*/
-double ChiMath::PowerIteration(
+double chi_math::PowerIteration(
   const MatDbl &A, VecDbl &e_vec, int max_it, double tol)
 {
   // Local Variables

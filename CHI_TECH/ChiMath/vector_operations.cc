@@ -3,7 +3,7 @@
 
 //######################################################### Print Vector
 /** Prints the Vector.*/
-void ChiMath::PrintVector(const VecDbl &x)
+void chi_math::PrintVector(const VecDbl &x)
 {
   for (auto& xi : x)
     std::cout << xi << ' ';
@@ -12,7 +12,7 @@ void ChiMath::PrintVector(const VecDbl &x)
 
 //#########################################################  Scale
 /** Scales a vector in place by constant.*/
-void ChiMath::Scale(VecDbl &x, const double &val)
+void chi_math::Scale(VecDbl &x, const double &val)
 {
   for (double& xi : x)
     xi *= val;
@@ -25,7 +25,7 @@ void ChiMath::Scale(VecDbl &x, const double &val)
  * \mathrm{a} \cdot \mathrm{b}=\sum_{i=1}^{n} a_{i} b_{i}
  * \f]
  * */
-double ChiMath::Dot(const VecDbl &x, const VecDbl &y)
+double chi_math::Dot(const VecDbl &x, const VecDbl &y)
 {
   // Error Checks
   assert(x.size() > 0);
@@ -43,7 +43,7 @@ double ChiMath::Dot(const VecDbl &x, const VecDbl &y)
 
 //######################################################### Multiply with const
 /** Multiplies the vector with a constant and returns result.*/
-VecDbl ChiMath::VecMul(const VecDbl &x, const double &val)
+VecDbl chi_math::VecMul(const VecDbl &x, const double &val)
 {
   size_t n = x.size();
   VecDbl y(n);
@@ -62,7 +62,7 @@ VecDbl ChiMath::VecMul(const VecDbl &x, const double &val)
  * \f]
  *
  * */
- double ChiMath::Vec1Norm(const VecDbl &x)
+ double chi_math::Vec1Norm(const VecDbl &x)
  {
    // Local Variables
    size_t n = x.size();
@@ -82,7 +82,7 @@ VecDbl ChiMath::VecMul(const VecDbl &x, const double &val)
  * \f]
  *
  * */
-double ChiMath::Vec2Norm(const VecDbl &x)
+double chi_math::Vec2Norm(const VecDbl &x)
 {
   // Local Variables
   size_t n = x.size();
@@ -101,7 +101,7 @@ double ChiMath::Vec2Norm(const VecDbl &x)
  * \f]
  *
  * */
-double ChiMath::VecInfinityNorm(const VecDbl &x)
+double chi_math::VecInfinityNorm(const VecDbl &x)
 {
   // Local Variables
   size_t n = x.size();
@@ -120,7 +120,7 @@ double ChiMath::VecInfinityNorm(const VecDbl &x)
  * \f]
  *
  * */
-double ChiMath::VecPNorm(const VecDbl &x, const double& p)
+double chi_math::VecPNorm(const VecDbl &x, const double& p)
 {
   // Local Variables
   size_t n = x.size();

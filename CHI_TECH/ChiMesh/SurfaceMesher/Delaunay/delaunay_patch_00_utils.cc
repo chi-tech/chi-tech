@@ -52,7 +52,6 @@ and
 bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::CheckCrossSimplices(
   chi_mesh::Vertex v0, chi_mesh::Vertex v1)
 {
-  ChiMath& math = chi_math_handler;
   Vector v01 = v1 - v0;
   Vector n_v = v01;
 
@@ -91,7 +90,7 @@ bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::CheckCrossSimplices(
         A[0][0] = n_v.x; A[0][1] = -n_w.x;
         A[1][0] = n_v.y; A[1][1] = -n_w.y;
 
-        math.GaussElimination(A,rhs,2);
+        chi_math::GaussElimination(A,rhs,2);
         VecDbl t = rhs;
 
 //        printf("Simplex from (%+.2f,%+.2f)  ",w0.x,w0.y);
@@ -124,7 +123,7 @@ double chi_mesh::SurfaceMesherDelaunay::
   m[2][0] = c.x; m[2][1] = c.y; m[2][2] = c.x*c.x + c.y*c.y; m[2][3] = 1.0;
   m[3][0] = d.x; m[3][1] = d.y; m[3][2] = d.x*d.x + d.y*d.y; m[3][3] = 1.0;
 
-  return chi_math_handler.Determinant(m);
+  return chi_math::Determinant(m);
 }
 
 

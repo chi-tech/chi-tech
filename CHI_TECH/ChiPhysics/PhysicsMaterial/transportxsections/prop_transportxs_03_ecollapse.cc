@@ -4,7 +4,6 @@
 
 extern ChiLog chi_log;
 
-extern ChiMath chi_math_handler;
 
 //###################################################################
 /**Partial Jacobi energy collapse.*/
@@ -13,7 +12,6 @@ void chi_physics::TransportCrossSections::
                  double& D, double& sigma_a,
                  int collapse_type)
 {
-  ChiMath& math = chi_math_handler;
   //============================================= Make a Dense matrix from
   //                                              sparse transfer matrix
   std::vector<std::vector<double>> S;
@@ -80,12 +78,12 @@ void chi_physics::TransportCrossSections::
     if (sigma_tg[g] < 1.0e-16)
       A[g][g] = 1.0;
 
-  MatDbl Ainv = math.Inverse(A);
-  MatDbl C    = math.MatMul(Ainv,B);
+  MatDbl Ainv = chi_math::Inverse(A);
+  MatDbl C    = chi_math::MatMul(Ainv,B);
   VecDbl E(G,1.0);
 
   //============================================= Perform power iteration
-  double rho = math.PowerIteration(C, E, 1000, 1.0e-12);
+  double rho = chi_math::PowerIteration(C, E, 1000, 1.0e-12);
 
   ref_xi.resize(G);
   double sum = 0.0;
