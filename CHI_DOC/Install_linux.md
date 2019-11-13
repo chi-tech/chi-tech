@@ -304,7 +304,7 @@ will use threading where possible.
 
 ### Step 11 - Run regression tests
 
-To check if the code compiled correctly execute the test scripts:
+To check if the code compiled correctly, execute the test scripts:
 
 ```bash
     $ python3 CHI_TEST/Z_Run_all.py

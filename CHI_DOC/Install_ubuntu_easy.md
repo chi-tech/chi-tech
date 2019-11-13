@@ -68,7 +68,7 @@ a C++ compiler:
 mpicc --version
 ```
 
-Which should display the same message the gcc call did, i.e.
+Which should display the same message the gcc call did, i.e.,
 
     $ mpicc --version
     gcc (Ubuntu 7.3.0-30ubuntu1~18.04.york0) 7.3.0
@@ -117,7 +117,7 @@ In the main directory (i.e. *chi-tech/*), execute:
 You can also use -j8 even if you don't have 8 processors, the make command
 will use threading where possible.
 
-Whenever you need to recompile and the configuration might have changed
+Whenever recompilation is needed or the configuration has changed,
 you can run
 ```bash
     $ ./configure.sh clean
