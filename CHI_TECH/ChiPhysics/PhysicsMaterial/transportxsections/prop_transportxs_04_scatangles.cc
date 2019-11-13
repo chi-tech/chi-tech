@@ -6,6 +6,9 @@
 #include <chi_log.h>
 
 extern ChiLog chi_log;
+extern ChiMath chi_math_handler;
+
+#include <algorithm>
 
 //###################################################################
 /**Computes the discrete scattering tables.*/
@@ -130,13 +133,11 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
  * energy.*/
 int chi_physics::TransportCrossSections::Sample_gprime(int gp, double rn)
 {
-//  int gto = cdf_sampler_gprime_g[gp].Sample(rn);
   int gto = 0;
-  for (int g=0; g<G; g++)
-  {
-    if (rn < cdf_gprime_g[gp][g])
-    {gto = g; break;}
-  }
+
+  gto = std::lower_bound(cdf_gprime_g[gp].begin(),
+                         cdf_gprime_g[gp].end(),
+                         rn) - cdf_gprime_g[gp].begin();
 
   return gto;
 }
@@ -148,25 +149,21 @@ double chi_physics::TransportCrossSections::
 {
   double mu = 0.0;
 
+  struct
+  {
+    bool operator()(const std::pair<double,double>& left, double val)
+    {return left.second <= val;}
+  }compare;
+
   if (isotropic or scat_angles_gprime_g[gp][g].empty())
     mu = 2.0*rn-1.0;
   else
   {
-    int num_angles = scat_angles_gprime_g[gp][g].size();
-    for (int a=0; a<num_angles; a++)
-    {
-      double prob = scat_angles_gprime_g[gp][g][a].second;
-      if ((rn < prob) and (a == 0))
-      {
-        mu =  scat_angles_gprime_g[gp][g][a].first;
-        break;
-      }
-      if ((rn < prob) and (rn >= scat_angles_gprime_g[gp][g][a-1].second))
-      {
-        mu =  scat_angles_gprime_g[gp][g][a].first;
-        break;
-      }
-    }
+    int angle_num = std::lower_bound(scat_angles_gprime_g[gp][g].begin(),
+                                     scat_angles_gprime_g[gp][g].end(),rn,
+                                     compare) -
+                                     scat_angles_gprime_g[gp][g].begin();
+    mu = scat_angles_gprime_g[gp][g][angle_num].first;
   }
 
   if (std::isnan(mu))

@@ -109,7 +109,7 @@ chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
 chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,1.0)
-chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,true)
+chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,false)
 
 chiMonteCarlonInitialize(phys1)
 chiMonteCarlonExecute(phys1)
@@ -124,7 +124,7 @@ chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 500)
 for k=1,2 do
     chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,k-1)
 end
-chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
+--chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
 
 
 chiFFInterpolationInitialize(cline)
@@ -140,4 +140,4 @@ if (chi_location_id == 0) then
 end
 
 --chiExportFieldFunctionToVTKG(0,"ZPhiMC")
-chiExportFieldFunctionToVTKG(168,"ZPhiMC")
+--chiExportFieldFunctionToVTKG(168,"ZPhiMC")
