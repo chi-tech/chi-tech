@@ -138,14 +138,14 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
   int Nf = cell->faces.size();
   int Nv = cell->vertex_ids.size();
 
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLABV2
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_fe_view = (SlabFEView*)fe_view;
     hp = slab_fe_view->h/2.0;
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
-  else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+  else if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
     Nv = 4;
     chi_mesh::CellFace& face = cell->faces[f];
@@ -178,7 +178,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-  else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+  else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
     double volume  = 0.0;
     for (int i=0; i<fe_view->dofs; i++)
@@ -381,7 +381,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
   ip_locI_borderipviews[locI][cell_border_index] = ip_view;
 
 
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLABV2
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell_info->cell_type == 3)
   {
     auto cell = new chi_mesh::CellSlabV2;
@@ -410,7 +410,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
   else if (cell_info->cell_type == 4)
   {
     auto cell = new chi_mesh::CellPolygonV2;
@@ -442,7 +442,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
   else if (cell_info->cell_type == 5)
   {
     chi_mesh::CellPolyhedronV2* cell = new chi_mesh::CellPolyhedronV2;

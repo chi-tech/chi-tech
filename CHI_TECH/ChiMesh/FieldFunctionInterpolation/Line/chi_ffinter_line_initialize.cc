@@ -73,7 +73,7 @@ Initialize()
         auto cell = grid_view->cells[cell_glob_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLABV2)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
         {
           auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
@@ -109,7 +109,7 @@ Initialize()
         }//if slab
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+        else if (cell->Type() == chi_mesh::CellType::POLYGON)
         {
           auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
@@ -154,7 +154,7 @@ Initialize()
         }//if polygon cell
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
           auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 
@@ -211,7 +211,7 @@ Initialize()
         auto cell = grid_view->cells[cell_glob_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLABV2)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
         {
           auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
@@ -225,7 +225,7 @@ Initialize()
         }//if poly
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+        if (cell->Type() == chi_mesh::CellType::POLYGON)
         {
           auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
@@ -240,7 +240,7 @@ Initialize()
         }//if poly
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
           auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 

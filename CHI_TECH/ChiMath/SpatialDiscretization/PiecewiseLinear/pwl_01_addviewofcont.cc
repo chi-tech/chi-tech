@@ -43,7 +43,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
     if (cell_fe_views_mapping[cell_index]<0)
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (cell->Type() == chi_mesh::CellType::SLABV2)
+      if (cell->Type() == chi_mesh::CellType::SLAB)
       {
         auto slab_cell = dynamic_cast<chi_mesh::CellSlabV2*>(cell);
         auto cell_fe_view = new SlabFEView(slab_cell, vol_continuum);
@@ -54,7 +54,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+      else if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         auto poly_cell = dynamic_cast<chi_mesh::CellPolygonV2*>(cell);
         auto cell_fe_view = new PolygonFEView(poly_cell, vol_continuum, this);
@@ -65,7 +65,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+      else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
       {
         auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedronV2*>(cell);
         auto cell_fe_view = new PolyhedronFEView(polyh_cell, vol_continuum, this);

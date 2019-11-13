@@ -52,12 +52,12 @@ ExportCellsToPython(const char* fileName, bool surface_only,
     int cell_g_index = local_cell_glob_indices[lc];
     auto cell = cells[cell_g_index];
 
-    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       num_faces++;
     }
 
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
       if (surface_only)
@@ -99,7 +99,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
     auto cell = cells[cell_g_index];
 
     //################################################### POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
       fprintf(of,"face_numverts[%d,0]=%lu   \n",cell_g_index,
@@ -128,7 +128,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
       }
     }//polygon
 
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
       if (surface_only)

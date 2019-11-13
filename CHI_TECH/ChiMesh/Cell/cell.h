@@ -10,18 +10,15 @@ namespace chi_mesh
 enum class CellType
 {
   GHOST = 0,
-//    SLAB = 1,
+  SLAB = 1,
   SPHERICAL_SHELL = 2,
   CYLINDRICAL_ANNULUS = 3,
   TRIANGLE = 4,
   QUADRILATERAL = 5,
-//    POLYGON = 6,
+  POLYGON = 6,
   TETRAHEDRON = 7,
   HEXAHEDRON = 8,
-//    POLYHEDRON = 9,
-  SLABV2 = 11,
-  POLYGONV2 = 12,
-  POLYHEDRONV2 = 13
+  POLYHEDRON = 9,
 };
 
 //######################################################### Class def

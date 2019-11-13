@@ -74,7 +74,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     int mat_id = cell->material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
@@ -91,7 +91,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
@@ -110,7 +110,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 

@@ -21,7 +21,7 @@ private:
   bool segment_normals_developed = false;
 
 public:
-  CellPolyhedronV2() : Cell(CellType::POLYHEDRONV2) {}
+  CellPolyhedronV2() : Cell(CellType::POLYHEDRON) {}
 
 private:
   void DevelopEdges()

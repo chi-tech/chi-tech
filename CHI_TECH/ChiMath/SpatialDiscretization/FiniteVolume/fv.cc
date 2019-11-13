@@ -55,7 +55,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
     if (cell_fv_views_mapping[cell_index]<0)
     {
       //######################################### SLAB
-      if (cell->Type() == chi_mesh::CellType::SLABV2)
+      if (cell->Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
           new SlabFVView((chi_mesh::CellSlabV2*)cell,vol_continuum);
@@ -65,7 +65,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       }
 
       //######################################### POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+      if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
           new PolygonFVView((chi_mesh::CellPolygonV2*)(cell),vol_continuum);

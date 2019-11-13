@@ -145,7 +145,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   int first_cell_g_index = grid->local_cell_glob_indices[0];
   auto first_cell = grid->cells[first_cell_g_index];
 
-  if (first_cell->Type() == chi_mesh::CellType::SLABV2)
+  if (first_cell->Type() == chi_mesh::CellType::SLAB)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_agg_nl 1");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_P_max 4");
@@ -159,7 +159,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
     PetscOptionsInsertString(NULL,"-options_left");
   }
-  if (first_cell->Type() == chi_mesh::CellType::POLYGONV2)
+  if (first_cell->Type() == chi_mesh::CellType::POLYGON)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.6");
 
@@ -174,7 +174,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
     PetscOptionsInsertString(NULL,"-options_left");
   }
-  if (first_cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+  if (first_cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_strong_threshold 0.8");
 

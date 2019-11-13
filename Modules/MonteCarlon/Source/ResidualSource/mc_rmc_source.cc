@@ -131,7 +131,7 @@ void chi_montecarlon::ResidualSource::
     }
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0VERBOSE_1) << "Cell " << cell_glob_index;
       auto slab_cell = (chi_mesh::CellSlabV2*)cell;
@@ -489,7 +489,7 @@ UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
   chi_montecarlon::Particle new_particle;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 

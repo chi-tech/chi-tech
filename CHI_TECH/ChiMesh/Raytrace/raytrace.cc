@@ -37,7 +37,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   bool intersection_found = false;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 

@@ -42,19 +42,19 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0)
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
       exit(EXIT_FAILURE);
     }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       intersecting_cell_indices.push_back(cell_glob_index);
     }
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell);
       bool intersects = false;
@@ -103,15 +103,15 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     auto cell = grid_view->cells[cell_glob_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0)
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
       exit(EXIT_FAILURE);
     }
 
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGONV2
-    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
@@ -163,8 +163,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
       }
     }//polygon
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRONV2
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedronV2*>(cell);
 

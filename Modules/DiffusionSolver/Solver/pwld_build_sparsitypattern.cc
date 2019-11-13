@@ -105,11 +105,11 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     border_cell_info.push_back(cell_glob_index);         //cell_glob_index
     border_cell_info.push_back(ip_view->cell_dof_start); //cell_dof_start
 
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
       border_cell_info.push_back(3);                         //cell_type
-    if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYGON)
       border_cell_info.push_back(4);                         //cell_type
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
       border_cell_info.push_back(5);                         //cell_type
 
     border_cell_info.push_back(cell->material_id);      //cell_mat_id

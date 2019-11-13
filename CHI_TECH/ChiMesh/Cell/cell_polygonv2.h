@@ -15,7 +15,7 @@ private:
   std::vector<chi_mesh::Vector> segment_normals;
   bool segment_normals_developed = false;
 public:
-  CellPolygonV2() : Cell(CellType::POLYGONV2) {}
+  CellPolygonV2() : Cell(CellType::POLYGON) {}
 
 private:
   void DevelopSegmentNormals(const chi_mesh::MeshContinuum* grid)

@@ -11,7 +11,7 @@ namespace chi_mesh
 class CellSlabV2 : public Cell
 {
 public:
-  CellSlabV2() : Cell(CellType::SLABV2) {}
+  CellSlabV2() : Cell(CellType::SLAB) {}
 
 
 };

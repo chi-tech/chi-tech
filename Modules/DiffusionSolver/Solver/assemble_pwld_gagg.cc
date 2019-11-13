@@ -153,11 +153,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
 
         //========================= Compute kappa
         double kappa = 1.0;
-        if (cell->Type() == chi_mesh::CellType::SLABV2)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
           kappa = fmax(2.0*(adj_D_avg/hp + D_avg/hm),0.25);
-        if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+        if (cell->Type() == chi_mesh::CellType::POLYGON)
           kappa = fmax(2.0*(adj_D_avg/hp + D_avg/hm),0.25);
-        if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+        if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
           kappa = fmax(4.0*(adj_D_avg/hp + D_avg/hm),0.25);
 
         //========================= Assembly penalty terms
@@ -289,11 +289,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
           D_avg /= intS;
 
           double kappa = 1.0;
-          if (cell->Type() == chi_mesh::CellType::SLABV2)
+          if (cell->Type() == chi_mesh::CellType::SLAB)
             kappa = fmax(4.0*(D_avg/hm),0.25);
-          if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+          if (cell->Type() == chi_mesh::CellType::POLYGON)
             kappa = fmax(4.0*(D_avg/hm),0.25);
-          if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+          if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
             kappa = fmax(8.0*(D_avg/hm),0.25);
 
           //========================= Assembly penalty terms
