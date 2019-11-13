@@ -3,6 +3,10 @@
 The following instructions were tested on Ubuntu 18.04 LTS; other Linux
 distributions might require some minor tweaking.
 
+Some portions of this document indicate the use of `sudo`. If you do not have 
+administrative privileges then have you system administrator assist you in 
+these steps.
+
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
 GCC is used to build and install ChiTech.
