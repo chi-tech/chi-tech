@@ -62,15 +62,9 @@ void ChiMath::SwapRow(unsigned int r1, unsigned int r2, MatDbl &A)
 
   assert(r1 >= 0 && r1 < AR && r2 >= 0 && r2 < AR);
 
-  auto SwapVal = [](double& a, double& b)
-  {
-    double temp = a;
-    a = b;
-    b = temp;
-  };
-
   for (unsigned int j = 0; j < AC; j++)
-    SwapVal(A[r1][j], A[r2][j]);
+    std::swap(A[r1][j], A[r2][j]);
+
 }
 
 //######################################################### Swap Columns
@@ -84,15 +78,8 @@ void ChiMath::SwapColumn(unsigned int c1, unsigned int c2, MatDbl &A)
   if (A.size())
     assert(c1 >= 0 && c1 < A[0].size() && c2 >= 0 && c2 < A[0].size());
 
-  auto SwapVal = [](double& a, double& b)
-  {
-    double temp = a;
-    a = b;
-    b = temp;
-  };
-
   for (unsigned int i = 0; i < AR; i++)
-    SwapVal(A[i][c1], A[i][c2]);
+    std::swap(A[i][c1], A[i][c2]);
 }
 
 //######################################################### Matrix-multiply
@@ -453,7 +440,7 @@ ChiMath::Inverse(const std::vector<std::vector<double> > &A)
 /** Performs power iteration to obtain the fundamental eigen mode. The
  * eigen-value of the fundamental mode is return whilst the eigen-vector
  * is return via reference.*/
-double ChiMath::Fundamental_EigValVec_PowerIteration(
+double ChiMath::PowerIteration(
   const MatDbl &A, VecDbl &e_vec, int max_it, double tol)
 {
   // Local Variables
@@ -474,19 +461,21 @@ double ChiMath::Fundamental_EigValVec_PowerIteration(
   while(!converged && it_counter < max_it)
   {
     // Update old eigenvalue
-    lambda0 = lambda;
+    lambda0 = std::fabs(lambda);
     // Calculate new eigenvalue/eigenvector
     Ay = MatMul(A, y);
     lambda = Dot( y, Ay );
     y = VecMul( Ay, 1./Vec2Norm(Ay) );
-    if (lambda < 0.)
-      Scale(y, -1.0);
+
     // Check if converged or not
-    if (std::fabs(lambda - lambda0) <= tol)
+    if (std::fabs(std::fabs(lambda) - lambda0) <= tol)
       converged = true;
     // Update counter
     ++it_counter;
   }
+
+  if (lambda < 0.)
+    Scale(y, -1.0);
 
   // Renormalize eigenvector for the last time
   y = VecMul(Ay, 1./lambda);

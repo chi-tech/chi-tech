@@ -83,33 +83,9 @@ void chi_physics::TransportCrossSections::
   MatDbl Ainv = math.Inverse(A);
   MatDbl C    = math.MatMul(Ainv,B);
   VecDbl E(G,1.0);
-  VecDbl E_new(G,0.0);
-
 
   //============================================= Perform power iteration
-  E_new = math.MatMul(C,E);
-  double rho = math.Dot(E_new,E);
-  double rho_old;
-  E = math.VecMul(E_new,1.0/math.Vec2Norm(E_new));
-
-  if (rho<0.0)
-    E = math.VecMul(E,-1.0);
-
-  for (int k=0; k<1000; k++)
-  {
-    rho_old = rho;
-
-    E_new = math.MatMul(C,E);
-    rho = math.Dot(E_new,E);
-    E = math.VecMul(E_new,1.0/math.Vec2Norm(E_new));
-
-    if (rho<0.0)
-      E = math.VecMul(E,-1.0);
-
-    if (std::fabs(rho-rho_old) < 1.0e-12)
-      break;
-  }
-  E = math.VecMul(E,1.0/rho);
+  double rho = math.PowerIteration(C, E, 1000, 1.0e-12);
 
   ref_xi.resize(G);
   double sum = 0.0;
