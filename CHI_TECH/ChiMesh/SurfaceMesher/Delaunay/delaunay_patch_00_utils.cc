@@ -1,5 +1,5 @@
 #include "delaunay_mesher.h"
-#include <ChiMath/chi_math.h>
+#include "ChiMath/chi_math.h"
 
 extern ChiMath chi_math_handler;
 

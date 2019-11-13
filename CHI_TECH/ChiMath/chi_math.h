@@ -43,16 +43,16 @@ public:
   void   PrintMatrix(const MatDbl& A);
 	void   Scale(MatDbl& A, const double& val);
   MatDbl Transpose(const MatDbl& A);
-	void   SwapRow(unsigned int r1, unsigned int r2, MatDbl& A);
-  void   SwapColumn(unsigned int c1, unsigned int c2, MatDbl& A);
+	void   SwapRow(size_t r1, size_t r2, MatDbl& A);
+  void   SwapColumn(size_t c1, size_t c2, MatDbl& A);
   MatDbl MatMul(const MatDbl& A, const double c);
   VecDbl MatMul(const MatDbl& A, const VecDbl& x);
   MatDbl MatMul(const MatDbl& A, const MatDbl& B);
   MatDbl MatAdd(const MatDbl& A, const MatDbl& B);
   MatDbl MatSubtract(const MatDbl& A, const MatDbl& B);
 	double Determinant(const MatDbl& A);
-  MatDbl SubMatrix( const unsigned int r,
-                    const unsigned int c,
+  MatDbl SubMatrix( const size_t r,
+                    const size_t c,
                     const MatDbl& A );
 	void   GaussElimination(MatDbl& A, VecDbl& b, int n);
 	MatDbl InverseGEPivoting(const MatDbl& A);

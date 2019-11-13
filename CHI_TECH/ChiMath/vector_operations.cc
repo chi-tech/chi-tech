@@ -32,10 +32,10 @@ double ChiMath::Dot(const VecDbl &x, const VecDbl &y)
   assert(y.size() > 0);
   assert(x.size() == y.size());
   // Local Variables
-  unsigned int n = x.size();
+  size_t n = x.size();
   double val = 0.0;
 
-  for(unsigned int i = 0; i != n; i++)
+  for(size_t i = 0; i != n; i++)
     val += x[i] * y[i];
 
   return val;
@@ -45,10 +45,10 @@ double ChiMath::Dot(const VecDbl &x, const VecDbl &y)
 /** Multiplies the vector with a constant and returns result.*/
 VecDbl ChiMath::VecMul(const VecDbl &x, const double &val)
 {
-  unsigned int n = x.size();
+  size_t n = x.size();
   VecDbl y(n);
 
-  for (unsigned int i = 0; i != n; ++i)
+  for (size_t i = 0; i != n; ++i)
     y[i] = val * x[i];
 
   return y;
@@ -65,10 +65,10 @@ VecDbl ChiMath::VecMul(const VecDbl &x, const double &val)
  double ChiMath::Vec1Norm(const VecDbl &x)
  {
    // Local Variables
-   unsigned int n = x.size();
+   size_t n = x.size();
    double val = 0.;
 
-   for(unsigned int i = 0; i != n; i++)
+   for(size_t i = 0; i != n; i++)
      val += std::fabs(x[i]);
 
    return val;
@@ -85,10 +85,10 @@ VecDbl ChiMath::VecMul(const VecDbl &x, const double &val)
 double ChiMath::Vec2Norm(const VecDbl &x)
 {
   // Local Variables
-  unsigned int n = x.size();
+  size_t n = x.size();
   double val = 0.;
 
-  for(unsigned int i = 0; i != n; i++)
+  for(size_t i = 0; i != n; i++)
     val += x[i]*x[i];
 
   return std::sqrt(val);
@@ -104,10 +104,10 @@ double ChiMath::Vec2Norm(const VecDbl &x)
 double ChiMath::VecInfinityNorm(const VecDbl &x)
 {
   // Local Variables
-  unsigned int n = x.size();
+  size_t n = x.size();
   double val = 0.0;
 
-  for(unsigned int i = 0; i != n; i++)
+  for(size_t i = 0; i != n; i++)
     val += std::max(std::fabs(x[i]), val);
 
   return val;
@@ -123,10 +123,10 @@ double ChiMath::VecInfinityNorm(const VecDbl &x)
 double ChiMath::VecPNorm(const VecDbl &x, const double& p)
 {
   // Local Variables
-  unsigned int n = x.size();
+  size_t n = x.size();
   double val = 0.;
 
-  for(unsigned int i = 0; i != n; i++)
+  for(size_t i = 0; i != n; i++)
     val += std::pow(std::fabs(x[i]), p);
 
   return std::pow(val, 1./p);

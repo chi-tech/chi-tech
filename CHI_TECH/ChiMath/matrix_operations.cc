@@ -5,16 +5,16 @@
 /** Prints the contents of a matrix.*/
 void ChiMath::PrintMatrix(const MatDbl &A)
 {
-  unsigned int AR = A.size();
-  unsigned int AC = 0;
+  size_t AR = A.size();
+  size_t AC = 0;
   if (AR)
     AC = A[0].size();
   else
     std::cout << "A has no rows" << std::endl;
 
-  for(unsigned int i = 0; i < AR; i++)
+  for(size_t i = 0; i < AR; i++)
   {
-    for(unsigned int j = 0; j < AC; j++)
+    for(size_t j = 0; j < AC; j++)
     {
       std::cout << A[i][j] << ' ';
     }
@@ -37,48 +37,48 @@ MatDbl ChiMath::Transpose(const MatDbl &A)
 {
   assert(A.size());
   assert(A[0].size());
-  unsigned int AR = A.size();
-  unsigned int AC = 0;
+  size_t AR = A.size();
+  size_t AC = 0;
   if (AR)
     AC = A[0].size();
 
   MatDbl T(AC, VecDbl(AR));
-  for (unsigned int i = 0; i < AR; i++)
-    for (unsigned int j = 0; j < AC; j++)
+  for (size_t i = 0; i < AR; i++)
+    for (size_t j = 0; j < AC; j++)
       T[j][i] = A[i][j];
   return T;
 }
 
 //######################################################### Swap Row
 /** Swaps two rows of a matrix.*/
-void ChiMath::SwapRow(unsigned int r1, unsigned int r2, MatDbl &A)
+void ChiMath::SwapRow(size_t r1, size_t r2, MatDbl &A)
 {
   assert(A.size());
   assert(A[0].size());
-  unsigned int AR = A.size();
-  unsigned int AC = 0;
+  size_t AR = A.size();
+  size_t AC = 0;
   if (AR)
     AC = A[0].size();
 
   assert(r1 >= 0 && r1 < AR && r2 >= 0 && r2 < AR);
 
-  for (unsigned int j = 0; j < AC; j++)
+  for (size_t j = 0; j < AC; j++)
     std::swap(A[r1][j], A[r2][j]);
 
 }
 
 //######################################################### Swap Columns
 /** Swaps two columns of a matrix.*/
-void ChiMath::SwapColumn(unsigned int c1, unsigned int c2, MatDbl &A)
+void ChiMath::SwapColumn(size_t c1, size_t c2, MatDbl &A)
 {
   assert(A.size());
   assert(A[0].size());
-  unsigned int AR = A.size();
+  size_t AR = A.size();
 
   if (A.size())
     assert(c1 >= 0 && c1 < A[0].size() && c2 >= 0 && c2 < A[0].size());
 
-  for (unsigned int i = 0; i < AR; i++)
+  for (size_t i = 0; i < AR; i++)
     std::swap(A[i][c1], A[i][c2]);
 }
 
@@ -86,15 +86,15 @@ void ChiMath::SwapColumn(unsigned int c1, unsigned int c2, MatDbl &A)
 /** Multiply matrix with a constant and return result.*/
 MatDbl ChiMath::MatMul(const MatDbl &A, const double c)
 {
-  unsigned int R = A.size();
-  unsigned int C = 0;
+  size_t R = A.size();
+  size_t C = 0;
   if(R)
     C = A[0].size();
 
   MatDbl B(R, VecDbl(C,0.));
 
-  for(unsigned int i = 0; i < R; i++)
-    for(unsigned int j = 0; j < C; j++)
+  for(size_t i = 0; i < R; i++)
+    for(size_t j = 0; j < C; j++)
       B[i][j] = A[i][j] * c;
 
   return B;
@@ -103,17 +103,17 @@ MatDbl ChiMath::MatMul(const MatDbl &A, const double c)
 /** Multiply matrix with a vector and return resulting vector*/
 VecDbl ChiMath::MatMul(const MatDbl &A, const VecDbl &x)
 {
-  unsigned int R = A.size();
-  unsigned int C = x.size();
+  size_t R = A.size();
+  size_t C = x.size();
 
   assert(R>0);
   assert(C == A[0].size());
 
   VecDbl b(R,0.);
 
-  for(unsigned int i = 0; i < R; i++)
+  for(size_t i = 0; i < R; i++)
   {
-    for(unsigned int j = 0; j < C; j++)
+    for(size_t j = 0; j < C; j++)
       b[i] += A[i][j] * x[j];
   }
 
@@ -123,24 +123,24 @@ VecDbl ChiMath::MatMul(const MatDbl &A, const VecDbl &x)
 /** Mutliply two matrices and return result.*/
 MatDbl ChiMath::MatMul(const MatDbl &A, const MatDbl &B)
 {
-  unsigned int AR = A.size();
+  size_t AR = A.size();
 
   assert(AR != 0 && B.size() != 0);
 
-  unsigned int AC = A[0].size();
-  unsigned int BC = B[0].size();
+  size_t AC = A[0].size();
+  size_t BC = B[0].size();
 
   assert(AC != 0 && BC != 0 && AC == B.size());
 
-  unsigned int CR = AR;
-  unsigned int CC = BC;
-  unsigned int Cs = AC;
+  size_t CR = AR;
+  size_t CC = BC;
+  size_t Cs = AC;
 
   MatDbl C(CR, VecDbl(CC,0.));
 
-  for(unsigned int i = 0; i < CR; i++)
-    for(unsigned int j = 0; j < CC; j++)
-      for(unsigned int k = 0; k < Cs; k++)
+  for(size_t i = 0; i < CR; i++)
+    for(size_t j = 0; j < CC; j++)
+      for(size_t k = 0; k < Cs; k++)
         C[i][j] += A[i][k] * B[k][j];
 
   return C;
@@ -164,8 +164,8 @@ MatDbl ChiMath::MatAdd(const MatDbl &A, const MatDbl &B)
 
   MatDbl C(AR, VecDbl(AC,0.0));
 
-  for(unsigned int i = 0; i < AR; i++)
-    for(unsigned int j = 0; j < AC; j++)
+  for(size_t i = 0; i < AR; i++)
+    for(size_t j = 0; j < AC; j++)
       C[i][j] = A[i][j] + B[i][j];
 
   return C;
@@ -189,8 +189,8 @@ MatDbl ChiMath::MatSubtract(const MatDbl &A, const MatDbl &B)
 
   MatDbl C(AR, VecDbl(AC,0.0));
 
-  for(unsigned int i = 0; i < AR; i++)
-    for(unsigned int j = 0; j < AC; j++)
+  for(size_t i = 0; i < AR; i++)
+    for(size_t j = 0; j < AC; j++)
       C[i][j] = B[i][j] - A[i][j];
 
   return C;
@@ -201,7 +201,7 @@ MatDbl ChiMath::MatSubtract(const MatDbl &A, const MatDbl &B)
 /** Computes the determinant of a matrix.*/
 double ChiMath::Determinant(const MatDbl &A)
 {
-  unsigned int R = A.size();
+  size_t R = A.size();
 
   if ( R == 1 )
     return A[0][0];
@@ -230,7 +230,7 @@ double ChiMath::Determinant(const MatDbl &A)
   else
   {
     double det = 0;
-    for (unsigned int n = 0; n < R; n++)
+    for (size_t n = 0; n < R; n++)
     {
       std::vector<std::vector<double> > M = SubMatrix(0, n, A);
       double pm = ((n+1)%2)*2. - 1.;
@@ -242,23 +242,23 @@ double ChiMath::Determinant(const MatDbl &A)
 
 //######################################################### Submatrix
 /** Returns a sub-matrix.*/
-MatDbl ChiMath::SubMatrix(const unsigned int r,
-                          const unsigned int c,
+MatDbl ChiMath::SubMatrix(const size_t r,
+                          const size_t c,
                           const MatDbl &A)
 {
-  unsigned int R = A.size();
-  unsigned int C = 0;
+  size_t R = A.size();
+  size_t C = 0;
   if (R)
     C = A[0].size();
 
   assert( (r >= 0) && (r < R) && (c >= 0) && (c < C) );
 
   MatDbl B(R-1,VecDbl(C-1));
-  for (unsigned int i = 0, ii = 0; i < R; ++i)
+  for (size_t i = 0, ii = 0; i < R; ++i)
   {
     if ( i != r )
     {
-      for (unsigned int j = 0, jj = 0; j < C; ++j)
+      for (size_t j = 0, jj = 0; j < C; ++j)
       {
         if ( j != c )
         {
