@@ -1,7 +1,7 @@
 #include "chi_meshcontinuum.h"
 #include <fstream>
-#include "../Cell/cell_polyhedronv2.h"
-#include "../Cell/cell_polygonv2.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell_polygon.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>

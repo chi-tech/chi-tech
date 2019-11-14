@@ -2,7 +2,7 @@
 #define _fv_polygon_h
 
 #include "fv_cellbase.h"
-#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polygon.h>
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 //################################################################### Class def

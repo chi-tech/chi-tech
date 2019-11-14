@@ -1,4 +1,4 @@
-#include "cell_polygonv2.h"
+#include "cell_polygon.h"
 #include <iostream>
 
 //###################################################################

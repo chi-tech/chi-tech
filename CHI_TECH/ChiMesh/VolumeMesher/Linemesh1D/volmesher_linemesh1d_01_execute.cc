@@ -3,7 +3,7 @@
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "../../Region/chi_region.h"
 #include "../../Boundary/chi_boundary.h"
-#include <ChiMesh/Cell/cell_slabv2.h>
+#include <ChiMesh/Cell/cell_slab.h>
 #include "../../SurfaceMesher/surfacemesher.h"
 
 #include <chi_mpi.h>

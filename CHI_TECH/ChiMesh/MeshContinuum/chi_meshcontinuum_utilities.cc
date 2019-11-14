@@ -1,7 +1,7 @@
 #include "chi_meshcontinuum.h"
-#include "../Cell/cell_slabv2.h"
-#include "../Cell/cell_polygonv2.h"
-#include "../Cell/cell_polyhedronv2.h"
+#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
 
 #include <boost/graph/bandwidth.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>

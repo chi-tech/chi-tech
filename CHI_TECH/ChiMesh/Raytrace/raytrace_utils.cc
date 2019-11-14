@@ -1,7 +1,7 @@
 #include "raytracing.h"
 #include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_polygonv2.h>
-#include <ChiMesh/Cell/cell_polyhedronv2.h>
+#include <ChiMesh/Cell/cell_polygon.h>
+#include <ChiMesh/Cell/cell_polyhedron.h>
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 #include <algorithm>

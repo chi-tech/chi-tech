@@ -1,7 +1,7 @@
 #include "volmesher_extruder.h"
 #include "../../MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Cell/cell_polygonv2.h"
-#include "ChiMesh/Cell/cell_polyhedronv2.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "../../SurfaceMesher/surfacemesher.h"
 

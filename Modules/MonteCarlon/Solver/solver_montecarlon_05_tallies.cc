@@ -1,7 +1,7 @@
 #include "solver_montecarlon.h"
 
-#include <ChiMesh/Cell/cell_slabv2.h>
-#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_slab.h>
+#include <ChiMesh/Cell/cell_polygon.h>
 
 #include <FiniteVolume/CellViews/fv_slab.h>
 #include <FiniteVolume/CellViews/fv_polygon.h>

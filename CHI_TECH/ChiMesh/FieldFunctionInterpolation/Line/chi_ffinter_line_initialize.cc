@@ -1,8 +1,8 @@
 #include "chi_ffinter_line.h"
 
-#include "ChiMesh/Cell/cell_slabv2.h"
-#include "ChiMesh/Cell/cell_polygonv2.h"
-#include "ChiMesh/Cell/cell_polyhedronv2.h"
+#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
 
 #include <chi_log.h>
 

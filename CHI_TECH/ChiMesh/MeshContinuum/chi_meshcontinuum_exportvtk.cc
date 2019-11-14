@@ -1,8 +1,8 @@
 #include "chi_meshcontinuum.h"
 
-#include "../Cell/cell_slabv2.h"
-#include "../Cell/cell_polygonv2.h"
-#include "../Cell/cell_polyhedronv2.h"
+#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
 #include <ChiPhysics/chi_physics.h>
 
 #include <chi_log.h>

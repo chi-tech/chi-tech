@@ -7,7 +7,7 @@
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include "Linemesh1D/volmesher_linemesh1d.h"
 
-#include <ChiMesh/Cell/cell_polygonv2.h>
+#include <ChiMesh/Cell/cell_polygon.h>
 #include "../MeshHandler/chi_meshhandler.h"
 #include "../../ChiMPI/chi_mpi.h"
 #include "../LogicalVolume/chi_mesh_logicalvolume.h"
