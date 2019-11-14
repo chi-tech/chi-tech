@@ -1,5 +1,7 @@
 #include "delaunay_mesher.h"
-#include "Eigen/Dense"
+#include "ChiMath/chi_math.h"
+
+extern ChiMath chi_math_handler;
 
 //###################################################################
 /**Determine the orientation of point c relative to point a and b.
@@ -80,20 +82,23 @@ bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::CheckCrossSimplices(
 
       if (fabs((w01.Cross(v01)).z)>tolerance)
       {
-        Eigen::Vector2d rhs(w0.x-v0.x,w0.y-v0.y);
-        Eigen::Matrix<double,2,2> A;
+        VecDbl rhs(2);
+        rhs[0] = w0.x-v0.x;
+        rhs[1] = w0.y-v0.y;
 
-        A(0,0) = n_v.x; A(0,1) = -n_w.x;
-        A(1,0) = n_v.y; A(1,1) = -n_w.y;
+        MatDbl A(2,VecDbl(2,0.0));
+        A[0][0] = n_v.x; A[0][1] = -n_w.x;
+        A[1][0] = n_v.y; A[1][1] = -n_w.y;
 
-        Eigen::Vector2d t = A.colPivHouseholderQr().solve(rhs);
+        chi_math::GaussElimination(A,rhs,2);
+        VecDbl t = rhs;
 
 //        printf("Simplex from (%+.2f,%+.2f)  ",w0.x,w0.y);
 //        printf("to (%+.2f,%+.2f)  t(%+.4f,%+.4f\n",w1.x,w1.y,t(0),t(1));
 
 
-        if (   (t(0)>(0.0+1.0e-4)) && (t(0)<(1.0-1.0e-4)) &&
-               (t(1)>(0.0+1.0e-4)) && (t(1)<(1.0-1.0e-4)) )
+        if (   (t[0]>(0.0+1.0e-4)) && (t[0]<(1.0-1.0e-4)) &&
+               (t[1]>(0.0+1.0e-4)) && (t[1]<(1.0-1.0e-4)) )
         {
           return true;
         }
@@ -112,13 +117,13 @@ double chi_mesh::SurfaceMesherDelaunay::
                           chi_mesh::Vertex c,
                           chi_mesh::Vertex d)
 {
-  Eigen::Matrix4d m;
-  m(0,0) = a.x; m(0,1) = a.y; m(0,2) = a.x*a.x + a.y*a.y; m(0,3) = 1.0;
-  m(1,0) = b.x; m(1,1) = b.y; m(1,2) = b.x*b.x + b.y*b.y; m(1,3) = 1.0;
-  m(2,0) = c.x; m(2,1) = c.y; m(2,2) = c.x*c.x + c.y*c.y; m(2,3) = 1.0;
-  m(3,0) = d.x; m(3,1) = d.y; m(3,2) = d.x*d.x + d.y*d.y; m(3,3) = 1.0;
+  MatDbl m(4,VecDbl(4,0.0));
+  m[0][0] = a.x; m[0][1] = a.y; m[0][2] = a.x*a.x + a.y*a.y; m[0][3] = 1.0;
+  m[1][0] = b.x; m[1][1] = b.y; m[1][2] = b.x*b.x + b.y*b.y; m[1][3] = 1.0;
+  m[2][0] = c.x; m[2][1] = c.y; m[2][2] = c.x*c.x + c.y*c.y; m[2][3] = 1.0;
+  m[3][0] = d.x; m[3][1] = d.y; m[3][2] = d.x*d.x + d.y*d.y; m[3][3] = 1.0;
 
-  return m.determinant();
+  return chi_math::Determinant(m);
 }
 
 

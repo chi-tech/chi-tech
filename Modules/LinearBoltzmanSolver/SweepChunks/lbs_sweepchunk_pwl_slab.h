@@ -323,7 +323,7 @@ public:
 
 
           //============================= Solve system
-          chi_math_handler.GaussElimination(Atemp,b[gsg],cell_fe_view->dofs);
+          chi_math::GaussElimination(Atemp,b[gsg],cell_fe_view->dofs);
 
 
         }//for g
