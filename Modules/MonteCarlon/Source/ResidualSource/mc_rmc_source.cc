@@ -342,7 +342,7 @@ chi_montecarlon::Particle chi_montecarlon::ResidualSource::
   chi_montecarlon::Particle new_particle;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 

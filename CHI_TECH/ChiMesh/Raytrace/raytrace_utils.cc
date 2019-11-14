@@ -266,7 +266,7 @@ void chi_mesh::PopulateRaySegmentLengths(
   // centroid vc.
   // Since the triangles all share an edge we only determine
   // segment lengths from the strip defined by v0 to vc.
-  if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+  if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
     auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
@@ -293,7 +293,7 @@ void chi_mesh::PopulateRaySegmentLengths(
 
     }//for face
   }
-  else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+  else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
     auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 

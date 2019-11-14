@@ -214,19 +214,19 @@ void chi_montecarlon::Solver::NormalizeTallies()
 
     double V = 1.0;
 
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto cell_fv_view =
         (SlabFVView*)fv_discretization->MapFeView(cell->cell_global_id);
       V = cell_fv_view->volume;
     }
-    else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+    else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto cell_fv_view =
         (PolygonFVView*)fv_discretization->MapFeView(cell->cell_global_id);
       V = cell_fv_view->volume;
     }
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto cell_fv_view =
         (PolyhedronFVView*)fv_discretization->MapFeView(cell->cell_global_id);

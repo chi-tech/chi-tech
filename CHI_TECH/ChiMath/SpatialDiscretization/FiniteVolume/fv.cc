@@ -75,9 +75,9 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       }
 
       //######################################### POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        PolyhedronFVView* view =
+        auto view =
           new PolyhedronFVView(
             (chi_mesh::CellPolyhedronV2*)(cell),
             vol_continuum);

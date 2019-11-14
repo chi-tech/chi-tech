@@ -70,7 +70,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     }//for faces
   }//slab
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-  else if (cell->Type() == chi_mesh::CellType::POLYGONV2)
+  else if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
     auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
@@ -103,7 +103,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     }//for faces
   }//polygon
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-  else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+  else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
     auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
 

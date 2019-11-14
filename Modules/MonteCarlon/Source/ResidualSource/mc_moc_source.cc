@@ -130,7 +130,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
     cell_sigma_t[lc] = xs->sigma_tg[0];
 
     //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLABV2)
+    if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0VERBOSE_1) << "**************** Cell " << cell_glob_index;
       auto slab_cell = (chi_mesh::CellSlabV2*)cell;
@@ -273,7 +273,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
         auto cell = grid->cells[lc];
 
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-        if (cell->Type() == chi_mesh::CellType::SLABV2)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
         {
           auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
@@ -330,7 +330,7 @@ Initialize(chi_mesh::MeshContinuum *ref_grid,
         auto cell = grid->cells[lc];
 
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-        if (cell->Type() == chi_mesh::CellType::SLABV2)
+        if (cell->Type() == chi_mesh::CellType::SLAB)
         {
           auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
@@ -472,7 +472,7 @@ DirectSampling(chi_montecarlon::RandomNumberGenerator* rng)
   new_particle.dir = ref_dir;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
@@ -546,7 +546,7 @@ UniformSampling(chi_montecarlon::RandomNumberGenerator* rng)
   new_particle.dir = ref_dir;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-  if (cell->Type() == chi_mesh::CellType::SLABV2)
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
     auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 

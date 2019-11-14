@@ -161,7 +161,7 @@ void chi_montecarlon::BoundarySource::
       }
     }//for polygon
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
       auto cell_fv_view = (PolyhedronFVView*)fv_sdm->MapFeView(cell_glob_index);
@@ -332,7 +332,7 @@ chi_montecarlon::Particle chi_montecarlon::BoundarySource::
 
     return new_particle;
   }//polygon
-  else if (first_cell->Type() == chi_mesh::CellType::POLYHEDRONV2)
+  else if (first_cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
     int fref = surface_sampler->Sample(rng->Rand());
 
