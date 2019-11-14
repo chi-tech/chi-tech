@@ -5,6 +5,14 @@ as part of a research study.
 
 ## Installation instructions
 
+We have a set of easy instructions for users running Ubuntu 18.04+ (including WSL
+with Ubuntu 18.04)
+
+Easy scripts - [Easy Linux instructions](CHI_DOC/Install_ubuntu_easy.md)
+
+If the automated installation of dependencies fails, or if you don't have a system
+supporting it, then follow the instructions below: 
+
 For Linux machines - [Linux installation instructions](CHI_DOC/Install_linux.md)  
 For MacOS machines - [MacOS installation instructions](CHI_DOC/Install_macos.md)
 
