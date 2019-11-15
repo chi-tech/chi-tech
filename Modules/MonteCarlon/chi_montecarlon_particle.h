@@ -10,27 +10,14 @@ struct chi_montecarlon::Particle
   chi_mesh::Vector pos;
 
   //Dir
-  chi_mesh::Vector dir;
+  chi_mesh::Vector dir = chi_mesh::Vector(0.0,0.0,1.0);
 
-  double w; //Weight
-  int egrp; //Energy group
-  int cur_cell_ind;
+  double w = 1.0; //Weight
+  int egrp = 0; //Energy group
+  int cur_cell_ind = -1;
 
-  bool alive;
-
-  //=================================== Constructor
-  Particle()
-  {
-    pos.x=0.0;   dir.x=0.0;
-    pos.y=0.0;   dir.y=0.0;
-    pos.z=0.0;   dir.z=1.0;
-
-    w=1.0;
-    egrp = 0;
-    cur_cell_ind = -1;
-
-    alive = true;
-  }
+  bool alive = true;
+  bool banked = false;
 
   //=================================== Copy operator
   Particle& operator=(const Particle& that)

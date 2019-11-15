@@ -9,7 +9,6 @@ extern ChiLog chi_log;
 extern ChiTimer chi_program_timer;
 typedef unsigned long long TULL;
 
-#include<typeinfo>
 
 extern ChiMath chi_math_handler;
 
@@ -18,6 +17,26 @@ extern ChiMath chi_math_handler;
 void chi_montecarlon::Solver::Execute()
 {
   chi_log.Log(LOG_0) << "Executing Montecarlo solver";
+
+  int block_lengths[] = {3,3,1,2,2};
+  MPI_Aint block_disp[] = {
+    offsetof(Particle,pos),
+    offsetof(Particle,dir),
+    offsetof(Particle,w),
+    offsetof(Particle,egrp),
+    offsetof(Particle,alive)};
+
+  MPI_Datatype types[] = {
+    MPI_DOUBLE,
+    MPI_DOUBLE,
+    MPI_DOUBLE,
+    MPI_INT,
+    MPIU_BOOL
+  };
+
+  MPI_Datatype prtcl_data_type;
+
+  MPI_Type_create_struct(5,block_lengths,block_disp,types,&prtcl_data_type);
 
   chi_montecarlon::Source* src = sources.back();
 
@@ -37,20 +56,15 @@ void chi_montecarlon::Solver::Execute()
       nps_last++;
       chi_montecarlon::Particle prtcl = src->CreateParticle(&rng0);
 
-      if (std::isnan(prtcl.dir.x))
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "Particle dir corrupt.";
-        exit(EXIT_FAILURE);
-      }
-
-      while (prtcl.alive)
+      while (prtcl.alive and !prtcl.banked)
         Raytrace(&prtcl);
 
     }//for pi in batch
 
     MPI_Barrier(MPI_COMM_WORLD);
-    chi_log.Log(LOG_0) << "Rendesvous-ing";
+
+
+
     RendesvouzTallies();
     if (make_pwld)
       RendesvouzPWLTallies();

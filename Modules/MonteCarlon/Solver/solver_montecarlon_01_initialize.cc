@@ -57,9 +57,6 @@ bool chi_montecarlon::Solver::Initialize()
   }//for mat
   MPI_Barrier(MPI_COMM_WORLD);
 
-  chi_mesh::Region*  aregion = this->regions.back();
-  this->grid                 = aregion->volume_mesh_continua.back();
-
 
 
   //=================================== Process rendesvous intervals
@@ -86,6 +83,9 @@ bool chi_montecarlon::Solver::Initialize()
   MPI_Barrier(MPI_COMM_WORLD);
 
   //=================================== Initialize tallies
+  chi_mesh::Region*  aregion = this->regions.back();
+  this->grid                 = aregion->volume_mesh_continua.back();
+
   size_t num_local_cells = grid->local_cell_glob_indices.size();
   size_t tally_size = num_grps*num_local_cells;
   phi_tally_contrib.resize(tally_size,0.0);
@@ -154,8 +154,7 @@ bool chi_montecarlon::Solver::Initialize()
   //=================================== Initialize field functions
   for (int g=0; g<num_grps; g++)
   {
-    chi_physics::FieldFunction* group_ff =
-      new chi_physics::FieldFunction;
+    auto group_ff = new chi_physics::FieldFunction;
     group_ff->text_name = std::string("Flux_g") +
                           std::to_string(g);
 
@@ -180,8 +179,7 @@ bool chi_montecarlon::Solver::Initialize()
     {
       for (int m=0; m<num_moms; m++)
       {
-        chi_physics::FieldFunction* group_ff =
-          new chi_physics::FieldFunction;
+        auto group_ff = new chi_physics::FieldFunction;
         group_ff->text_name = std::string("Flux_g") +
                               std::to_string(g) +
                               std::string("_m") + std::to_string(m);
