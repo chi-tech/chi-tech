@@ -1,11 +1,10 @@
 #include "volmesher_extruder.h"
 #include <iostream>
 #include <vector>
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../SurfaceMesher/surfacemesher.h"
-#include "../../Region/chi_region.h"
-#include "../../Cell/cell_triangle.h"
-#include "../../Boundary/chi_boundary.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/SurfaceMesher/surfacemesher.h"
+#include "ChiMesh/Region/chi_region.h"
+#include "ChiMesh/Boundary/chi_boundary.h"
 #include <ChiMPI/chi_mpi.h>
 
 #include <chi_log.h>
@@ -54,8 +53,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
     //=========================================== Create new continuum
     //chi_mesh::MeshContinuum* remeshed_surfcont = region->mesh_continua.back();
-    chi_mesh::MeshContinuum* vol_continuum = new chi_mesh::MeshContinuum;
-    chi_mesh::MeshContinuum* temp_continuum = new chi_mesh::MeshContinuum;
+    auto vol_continuum = new chi_mesh::MeshContinuum;
+    auto temp_continuum = new chi_mesh::MeshContinuum;
     region->volume_mesh_continua.push_back(temp_continuum);
     region->volume_mesh_continua.push_back(vol_continuum);
 
@@ -128,8 +127,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Creating template cells"
           << std::endl;
-        this->CreatePolygonCells(ref_continuum->surface_mesh,
-                                 temp_continuum);
+        CreatePolygonCells(ref_continuum->surface_mesh, temp_continuum);
 
 
         //================================== Connect template Boundaries
@@ -169,9 +167,10 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         }
         //================================== Create extruded item_id
         chi_log.Log(LOG_0)
-          << "VolumeMesherExtruder: Extruding cells"
-          << std::endl;
+          << "VolumeMesherExtruder: Extruding cells" << std::endl;
+
         ExtrudeCells(temp_continuum, vol_continuum);
+
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
           << vol_continuum->cells.size()
@@ -179,33 +178,37 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
 
         //================================== Checking partitioning parameters
-        int p_tot = mesh_handler->surface_mesher->partitioning_x*
-                    mesh_handler->surface_mesher->partitioning_y*
-                    options.partition_z;
-        chi_log.Log(LOG_ALLVERBOSE_2)
-          << "Processes called for " << p_tot
-          << ". Processes supplied " << chi_mpi.process_count;
-
-        if ((chi_mpi.process_count != p_tot) /*&& (p_tot != 0)*/)
+        if (!options.mesh_global)
         {
-          chi_log.Log(LOG_ALLERROR) <<
-                         "ERROR: Number of processors available ("
-                         << chi_mpi.process_count <<
-                         ") does not match amount of processors "
-                         "required by surface"
-                         " mesher partitioning parameters ("
-                         << p_tot <<
-                         ").";
-          exit(EXIT_FAILURE);
+          int p_tot = mesh_handler->surface_mesher->partitioning_x*
+                      mesh_handler->surface_mesher->partitioning_y*
+                      options.partition_z;
+          chi_log.Log(LOG_ALLVERBOSE_2)
+            << "Processes called for " << p_tot
+            << ". Processes supplied " << chi_mpi.process_count;
+
+          if ((chi_mpi.process_count != p_tot) /*&& (p_tot != 0)*/)
+          {
+            chi_log.Log(LOG_ALLERROR) <<
+                                      "ERROR: Number of processors available ("
+                                      << chi_mpi.process_count <<
+                                      ") does not match amount of processors "
+                                      "required by surface"
+                                      " mesher partitioning parameters ("
+                                      << p_tot <<
+                                      ").";
+            exit(EXIT_FAILURE);
+          }
         }
+
 
         //================================== Initialize local cell indices
         int num_glob_cells=vol_continuum->cells.size();
         for (int c=0; c<num_glob_cells; c++)
         {
           vol_continuum->glob_cell_local_indices.push_back(-1);
-          if (vol_continuum->cells[c]->partition_id ==
-              chi_mpi.location_id)
+          if ((vol_continuum->cells[c]->partition_id == chi_mpi.location_id) ||
+              (options.mesh_global))
           {
             vol_continuum->local_cell_glob_indices.push_back(c);
             int local_cell_index =

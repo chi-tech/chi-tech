@@ -193,6 +193,38 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
 //###################################################################
 /**Computes interpolated field function values.*/
 void chi_mesh::FieldFunctionInterpolation::
+CreatePWLDMapping(chi_physics::FieldFunction* field_function,
+                  std::vector<int> &pwld_nodes,
+                  std::vector<int> &pwld_cells,
+                  std::vector<int> *mapping,
+                  int m,
+                  int g)
+{
+  int num_grps = field_function->num_grps;
+  int num_moms = field_function->num_moms;
+
+  size_t num_nodes_to_map = pwld_nodes.size();
+  for (int n=0; n< num_nodes_to_map; n++)
+  {
+    int dof = pwld_nodes[n];
+    int cell_g_index = pwld_cells[n];
+
+    auto cell = grid_view->cells[cell_g_index];
+
+    int c = cell->cell_local_id;
+
+    int dof_map_start = (*field_function->local_cell_dof_array_address)[c];
+
+    int address = dof_map_start + dof*num_grps*num_moms + num_grps*m + g;
+
+    mapping->push_back(address);
+  }
+
+}
+
+//###################################################################
+/**Computes interpolated field function values.*/
+void chi_mesh::FieldFunctionInterpolation::
   CreateFVMapping(int num_grps, int num_moms, int g, int m,
                   std::vector<int> &cells, std::vector<int> *mapping)
 {

@@ -124,7 +124,7 @@ void PolygonFEView::PreCompute()
   // ==================================================== Volume integrals
   for (int i=0; i<dofs; i++)
   {
-    double* gradijvalue_i             = new double[dofs];
+    std::vector<double> gradijvalue_i(dofs, 0.0);
     std::vector<chi_mesh::Vector> varphi_i_gradj(dofs,chi_mesh::Vector());
     std::vector<double>           varphi_i_varphi_j(dofs,0);
 
@@ -199,7 +199,7 @@ void PolygonFEView::PreCompute()
     // Varphi_i on each face
     std::vector<std::vector<double>> varphi_i_varphi_j_surf;
     std::vector<std::vector<chi_mesh::Vector>> varphi_i_gradvarphi_j_surf;
-    double* varphi_i_surf = new double[num_of_subtris];
+    std::vector<double> varphi_i_surf(num_of_subtris, 0.0);
 
     for (int f=0; f< num_of_subtris; f++)
     {

@@ -15,7 +15,7 @@ int chi_mesh::VolumeMesher::MapNode(int iref)
 {
   //============================================= Check if reordering has
   //                                              been done
-  if (this->node_ordering.size()==0)
+  if (this->node_ordering.empty())
   {
     return iref;
   }
@@ -42,7 +42,7 @@ int chi_mesh::VolumeMesher::ReverseMapNode(int i)
 {
   //============================================= Check if reordering has
   //                                              been done
-  if (this->reverse_node_ordering.size()==0)
+  if (this->reverse_node_ordering.empty())
   {
     return i;
   }

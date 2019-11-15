@@ -2,16 +2,11 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Cell/cell.h"
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include <ChiMesh/Cell/cell.h>
+
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 #include "ChiTimer/chi_timer.h"
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
 
 #include <chi_log.h>
 #include <chi_mpi.h>
@@ -49,34 +44,9 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
     auto cell = vol_continuum->cells[cell_glob_index];
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    for (int v=0; v < cell->vertex_ids.size(); v++)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      for (int v=0; v<2; v++)
-      {
-        exnonex_nodes_set.insert(slab_cell->v_indices[v]);
-      }
-    }
-
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-      for (int v=0; v<poly_cell->v_indices.size(); v++)
-      {
-        exnonex_nodes_set.insert(poly_cell->v_indices[v]);
-      }
-    }
-
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      for (int v=0; v<polyh_cell->v_indices.size(); v++)
-      {
-        exnonex_nodes_set.insert(polyh_cell->v_indices[v]);
-      }
+      exnonex_nodes_set.insert(cell->vertex_ids[v]);
     }
   }
 
@@ -105,86 +75,27 @@ void chi_diffusion::Solver::ReorderNodesPWLC()
     int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
     auto cell = vol_continuum->cells[cell_glob_index];
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    for (int f=0; f < cell->faces.size(); f++)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      for (int e=0; e<2; e++)
+      if (cell->faces[f].neighbor >= 0)
       {
-        if (slab_cell->edges[e]>=0)
+        int adj_cell_ind = cell->faces[f].neighbor;
+        auto adj_cell = vol_continuum->cells[adj_cell_ind];
+
+        if (adj_cell->partition_id != cell->partition_id)
         {
-          int adj_cell_ind = slab_cell->edges[e];
-          auto adj_cell = vol_continuum->cells[adj_cell_ind];
-
-          if (adj_cell->partition_id != slab_cell->partition_id)
+          for (int fv=0; fv < cell->faces[f].vertex_ids.size(); fv++)
           {
-            for (int ev=0; ev<2; ev++)
-            {
-              int v_index = slab_cell->edges[ev];
-              int v_setind = (int)std::distance(exnonex_nodes.begin(),
-                                                std::find(std::begin(exnonex_nodes),
-                                                          std::end(exnonex_nodes),
-                                                          v_index));
-              ghost_flags[v_setind] = true;
-            }//for edge vertices
-          }//if neighbor not local
-        }//if neigbor not a boundary
-      }//for each edge
-    }//if slab
-
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-      for (int e=0; e<poly_cell->edges.size(); e++)
-      {
-        if (poly_cell->edges[e][2]>=0)
-        {
-          int adj_cell_ind = poly_cell->edges[e][2];
-          auto adj_cell = vol_continuum->cells[adj_cell_ind];
-
-          if (adj_cell->partition_id != poly_cell->partition_id)
-          {
-            for (int ev=0; ev<2; ev++)
-            {
-              int v_index = poly_cell->edges[e][ev];
-              int v_setind = (int)std::distance(exnonex_nodes.begin(),
-                                                std::find(std::begin(exnonex_nodes),
-                                                          std::end(exnonex_nodes),
-                                                          v_index));
-              ghost_flags[v_setind] = true;
-            }//for edge vertices
-          }//if neighbor not local
-        }//if neigbor not a boundary
-      }//for each edge
-    }//if polygon
-
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      for (int f=0; f<polyh_cell->faces.size(); f++)
-      {
-        if (polyh_cell->faces[f]->face_indices[NEIGHBOR]>=0)
-        {
-          int adj_cell_ind = polyh_cell->faces[f]->face_indices[0];
-          auto adj_cell = vol_continuum->cells[adj_cell_ind];
-
-          if (adj_cell->partition_id != polyh_cell->partition_id)
-          {
-            for (int fv=0; fv<polyh_cell->faces[f]->v_indices.size(); fv++)
-            {
-              int v_index = polyh_cell->faces[f]->v_indices[fv];
-              int v_setind = (int)std::distance(exnonex_nodes.begin(),
-                                           std::find(std::begin(exnonex_nodes),
-                                                     std::end(exnonex_nodes),
-                                                     v_index));
-              ghost_flags[v_setind] = true;
-            }//for face verts
-          }//if neighbor not local
-        }//if neighbor is not a boundary
-      }//for cell face
-    }//if polyhedron
+            int v_index = cell->faces[f].vertex_ids[fv];
+            int v_setind = (int)std::distance(exnonex_nodes.begin(),
+                                              std::find(std::begin(exnonex_nodes),
+                                                        std::end(exnonex_nodes),
+                                                        v_index));
+            ghost_flags[v_setind] = true;
+          }//for face verts
+        }//if neighbor not local
+      }//if neighbor is not a boundary
+    }//for cell face
   }
   chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 1 time: "
                             << t_stage[1].GetTime()/1000.0;

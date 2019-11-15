@@ -1,7 +1,7 @@
 #include "FLUDS.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include <ChiMesh/Cell/cell.h>
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
@@ -12,7 +12,7 @@ extern ChiLog chi_log;
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
 void chi_mesh::sweep_management::FLUDS::
-  SlotDynamics(TPolyhedron *polyh_cell,
+  SlotDynamics(chi_mesh::Cell *cell,
                chi_mesh::sweep_management::SPDS* spds,
                std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                std::vector<std::pair<int,short>>& delayed_lock_box,
@@ -29,20 +29,20 @@ void chi_mesh::sweep_management::FLUDS::
   //                                                    only incident faces
   std::vector<int> inco_face_face_category;
   int bndry_face_counter = 0;
-  for (short f=0; f<polyh_cell->faces.size(); f++)
+  for (short f=0; f < cell->faces.size(); f++)
   {
-    TPolyFace* poly_face = polyh_cell->faces[f];
-    double     mu        = spds->omega.Dot(poly_face->geometric_normal);
+    CellFace&  face = cell->faces[f];
+    double     mu   = spds->omega.Dot(face.normal);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<0.0)
     {
-      int neighbor = poly_face->face_indices[NEIGHBOR];
+      int neighbor = face.neighbor;
 
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
       if (grid->IsCellLocal(neighbor))
       {
-        size_t num_face_dofs = poly_face->edges.size();
+        size_t num_face_dofs = face.vertex_ids.size();
         size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
 
         inco_face_face_category.push_back(face_categ);
@@ -55,8 +55,8 @@ void chi_mesh::sweep_management::FLUDS::
         bool is_cyclic = false;
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ( (cyclic_dependency.first == polyh_cell->cell_local_id) &&
-               (cyclic_dependency.second == adj_cell->cell_local_id) )
+          if ((cyclic_dependency.first == cell->cell_local_id) &&
+              (cyclic_dependency.second == adj_cell->cell_local_id) )
           {
             is_cyclic = true;
             inco_face_face_category.back() *= -1;
@@ -67,7 +67,7 @@ void chi_mesh::sweep_management::FLUDS::
 
         //======================================== Find associated face for
         //                                         dof mapping and lock box
-        short ass_face = grid->FindAssociatedFace(poly_face,neighbor);
+        short ass_face = grid->FindAssociatedFace(face, neighbor);
 
         //Now find the cell (index,face) pair in the lock box and empty slot
         bool found = false;
@@ -87,7 +87,7 @@ void chi_mesh::sweep_management::FLUDS::
           chi_log.Log(LOG_ALLERROR)
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
-            << polyh_cell->cell_local_id
+            << cell->cell_local_id
             << " face " << f
             << " looking for cell "
             << adj_cell->cell_local_id
@@ -102,7 +102,7 @@ void chi_mesh::sweep_management::FLUDS::
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
       else if (grid->IsCellBndry(neighbor))
       {
-        chi_mesh::Vector& face_norm = polyh_cell->faces[f]->geometric_normal;
+        chi_mesh::Vector& face_norm = cell->faces[f].normal;
 
         if (face_norm.Dot(ihat)>0.999)
           location_boundary_dependency_set.insert(0);
@@ -128,17 +128,17 @@ void chi_mesh::sweep_management::FLUDS::
   //                                                    only outgoing faces
   std::vector<int>                outb_face_slot_indices;
   std::vector<int>                outb_face_face_category;
-  for (short f=0; f<polyh_cell->faces.size(); f++)
+  for (short f=0; f < cell->faces.size(); f++)
   {
-    TPolyFace* poly_face = polyh_cell->faces[f];
-    double     mu        = spds->omega.Dot(poly_face->geometric_normal);
-    int        neighbor  = poly_face->face_indices[NEIGHBOR];
-    int        cell_g_index = polyh_cell->cell_global_id;
+    CellFace&  face         = cell->faces[f];
+    double     mu           = spds->omega.Dot(face.normal);
+    int        neighbor     = face.neighbor;
+    int        cell_g_index = cell->cell_global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=0.0)
     {
-      size_t num_face_dofs = poly_face->edges.size();
+      size_t num_face_dofs = face.vertex_ids.size();
       size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
 
       outb_face_face_category.push_back(face_categ);
@@ -152,8 +152,8 @@ void chi_mesh::sweep_management::FLUDS::
         auto adj_cell = grid->cells[neighbor];
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ( (cyclic_dependency.first == polyh_cell->cell_local_id) &&
-               (cyclic_dependency.second == adj_cell->cell_local_id) )
+          if ((cyclic_dependency.first == cell->cell_local_id) &&
+              (cyclic_dependency.second == adj_cell->cell_local_id) )
           {
             temp_lock_box = &delayed_lock_box;
             outb_face_face_category.back() *= -1;
@@ -198,13 +198,12 @@ void chi_mesh::sweep_management::FLUDS::
         int  deplocI      = spds->MapLocJToDeplocI(locJ);
         int  face_slot    = deplocI_face_dof_count[deplocI];
 
-        deplocI_face_dof_count[deplocI]+= poly_face->v_indices.size();
+        deplocI_face_dof_count[deplocI]+= face.vertex_ids.size();
 
-        nonlocal_outb_face_deplocI_slot.
-          push_back(std::pair<int,int>(deplocI,face_slot));
+        nonlocal_outb_face_deplocI_slot.emplace_back(deplocI,face_slot);
 
-        AddFaceViewToDepLocI(deplocI,cell_g_index,
-                             face_slot,poly_face);
+        AddFaceViewToDepLocI(deplocI, cell_g_index,
+                             face_slot, face);
 
       }//non-local neighbor
     }//if outgoing
@@ -216,81 +215,3 @@ void chi_mesh::sweep_management::FLUDS::
 }
 
 
-//###################################################################
-/**Performs Incident mapping for Polyhedron cell.*/
-void chi_mesh::sweep_management::FLUDS::
-  LocalIncidentMapping(TPolyhedron *polyh_cell,
-                       chi_mesh::sweep_management::SPDS* spds,
-                       std::vector<int>&  local_so_cell_mapping)
-{
-  chi_mesh::MeshContinuum* grid = spds->grid;
-  std::vector<std::pair<int,std::vector<int>>> inco_face_dof_mapping;
-
-  short        incoming_face_count=-1;
-
-  //=================================================== Loop over faces
-  //           INCIDENT                                 but process
-  //                                                    only incident faces
-  for (short f=0; f<polyh_cell->faces.size(); f++)
-  {
-    TPolyFace* poly_face = polyh_cell->faces[f];
-    double     mu        = poly_face->geometric_normal.Dot(spds->omega);
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<0.0)
-    {
-      int neighbor = poly_face->face_indices[NEIGHBOR];
-
-      if (grid->IsCellLocal(neighbor))
-      {
-        incoming_face_count++;
-        //======================================== Find associated face for
-        //                                         dof mapping
-        int ass_face = grid->FindAssociatedFace(poly_face,neighbor);
-
-        std::pair<int,std::vector<int>> dof_mapping;
-        grid->FindAssociatedVertices(poly_face,
-                                     neighbor,
-                                     ass_face,
-                                     dof_mapping.second);
-
-        //======================================== Find associated face
-        //                                         counter for slot lookup
-        auto adj_cell     = grid->cells[neighbor];
-        int  adj_so_index = local_so_cell_mapping[adj_cell->cell_local_id];
-        int  ass_f_counter=-1;
-
-        auto adj_polyh_cell = (chi_mesh::CellPolyhedron*)adj_cell;
-        int out_f = -1;
-        for (short af=0; af<adj_polyh_cell->faces.size(); af++)
-        {
-          double mur = adj_polyh_cell->faces[af]->
-            geometric_normal.Dot(spds->omega);
-
-          if (mur>=0.0) {out_f++;}
-          if (af == ass_face)
-          {
-            ass_f_counter = out_f;
-            break;
-          }
-        }
-        if (ass_f_counter<0)
-        {
-          chi_log.Log(LOG_ALLERROR)
-            << "Associated face counter not found"
-            << ass_face << " " << neighbor;
-          grid->FindAssociatedFace(poly_face,neighbor,true);
-          exit(EXIT_FAILURE);
-        }
-
-        dof_mapping.first = /*local_psi_stride*G**/
-          so_cell_outb_face_slot_indices[adj_so_index][ass_f_counter];
-
-        dof_mapping.second.shrink_to_fit();
-        inco_face_dof_mapping.push_back(dof_mapping);
-      }//if local
-    }//if incident
-  }//for incindent f
-
-  so_cell_inco_face_dof_indices.push_back(inco_face_dof_mapping);
-}

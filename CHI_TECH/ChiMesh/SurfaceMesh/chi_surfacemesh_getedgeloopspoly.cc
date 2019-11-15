@@ -44,7 +44,7 @@ chi_mesh::EdgeLoopCollection* chi_mesh::SurfaceMesh::GetEdgeLoopsPoly()
   }
 
   //================================================== Check if open edges
-//  if (unused_edge_list.size()==0)
+//  if (unused_edge_list.empty())
 //  {
 //    std::cerr << "ERROR: No open edges found in function GetEdgeLoops.\n";
 //    exit(EXIT_FAILURE);

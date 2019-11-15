@@ -3,7 +3,7 @@
 chi_diffusion::Solver::Solver()
 {
   solver_name = std::string("Diffusion Solver");
-  verbose = true;
+  verbose_info = true;
   common_items_initialized = false;
   max_iters = 500;
   residual_tolerance = 1.0e-8;

@@ -30,7 +30,7 @@
 #
 #   ./configure.sh -DCMAKE_VERBOSE_MAKEFILE=1
 #      generate the CMake scripts for a Release build of ChiTech (using CMake
-#      cache if available); the 'make' command will be verbose (showing, e.g.,
+#      cache if available); the 'make' command will be verbose_info (showing, e.g.,
 #      what compiler flags are being used)
 #
 #   ./configure.sh Debug -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/bin/Debug
