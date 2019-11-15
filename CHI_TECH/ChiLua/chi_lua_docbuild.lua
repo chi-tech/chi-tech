@@ -192,8 +192,12 @@ function scanDirectory()
 	local fFile;
 
 	--os.execute("dir /B/S *.cpp > LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-	os.execute("find . -name \"*.cpp\" > LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
+	print("Generating filelist");
+	os.execute("mkdir LUA_DOCUMENTATION")
+	os.execute(">LUA_DOCUMENTATION/Z_GeneratedFileList.txt")
 	os.execute("find . -name \"*.cc\" >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
+	os.execute("find . -name \"*.cpp\">> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
+
 
     
     if (moduleFolders.itemCount>0) then
@@ -237,9 +241,10 @@ This function reads the lua register and creates a formatted table
 containing all the function names.
 ]]--
 function generateFunctionList()
+	print("Generating function list for main page")
 	newFile = io.open("../../CHI_DOC/PAGES/MainPage.h","w");
 	headFile = io.open("../../CHI_DOC/PAGES/mp_header.txt","r")
-	reg = io.open("chi_lua_register.h","r");
+	reg = io.open("../../CHI_DOC/LUA_DOCUMENTATION/lua_register.txt","r");
 
 	--=============================== Write header
 	line = headFile:read("L")
@@ -352,10 +357,57 @@ function generateFunctionList()
 	headFile:close()
 	reg:close();
 	newFile:close();
+
+	print("Done generating function list for main page")
 end
 
---newFile = io.open("LUA_DOCUMENTATION/lua_functions.c","w");
---newFile2 = io.open("LUA_DOCUMENTATION/lua_namespace.hpp","w");
+-- ============================================== Recursive includes
+--[[
+This function can be called recursively to find #include statements
+and put them into the master file.
+]]--
+function IncludeIntoMaster(master_file,slave_file_name)
+	local in_file = io.open(slave_file_name)
+	line = in_file:read("L")
+	while (line ~= nil) do
+
+		incl_statement = string.find(line,"#include",0,true)
+		if (incl_statement ~= nil) then
+
+			name_start  = string.find(line,"\"",0,true)
+			name_end  = string.find(line,"\"",name_start+1,true)
+
+			new_slave_name = string.sub(line,name_start+1,name_end-1)
+			master_file:write("\n\n// Consolidating "..new_slave_name)
+			master_file:write("\n")
+
+			IncludeIntoMaster(master_file,new_slave_name)
+		else
+			master_file:write(line)
+		end
+
+		line = in_file:read("L")
+	end
+	in_file:close()
+end
+
+-- ============================================== Consolidate registers
+--[[
+This function consolidates all registers into a single one. This is
+mostly because registers are c macro-fied files that link together with
+#include statements
+]]--
+function ConsolidateRegisters()
+	print("Consolidating lua register")
+	consolidated_file_name = "../../CHI_DOC/LUA_DOCUMENTATION/lua_register.txt"
+	consolidated_file = io.open(consolidated_file_name,"w+");
+
+	IncludeIntoMaster(consolidated_file,"chi_lua_register.h")
+
+	consolidated_file:close()
+	print("Done consolidating lua register")
+end
+
 newFile = io.open("../../CHI_DOC/LUA_DOCUMENTATION/lua_functions.c","w");
 newFile2 = io.open("../../CHI_DOC/LUA_DOCUMENTATION/lua_namespace.hpp","w");
 newFile2:write("namespace chi_lua \n {\n");
@@ -364,5 +416,6 @@ newFile2:write("}\n");
 newFile2:close();
 newFile:close();
 
+ConsolidateRegisters()
 generateFunctionList()
 
