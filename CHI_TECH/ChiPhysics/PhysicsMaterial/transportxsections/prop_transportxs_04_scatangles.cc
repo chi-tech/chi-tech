@@ -6,7 +6,6 @@
 #include <chi_log.h>
 
 extern ChiLog chi_log;
-extern ChiMath chi_math_handler;
 
 #include <algorithm>
 
@@ -70,7 +69,7 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
     for (int g=0; g<G; g++)
       cdf_gprime_g[g][gp] = prob_gprime_g_normed[g][gp];
 
-   cdf_gprime_g = chi_math_handler.Transpose(cdf_gprime_g);
+   cdf_gprime_g = chi_math::Transpose(cdf_gprime_g);
 
   //============================================= Collect scattering moments
   //For a given scattering gprime->g we need all

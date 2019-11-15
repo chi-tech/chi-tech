@@ -41,3 +41,9 @@ CHI_RESOURCES/\.DS_Store
 
 # Dependency directory
 chi-dependencies/
+
+#Documentation
+CHI_DOC/LUA_DOCUMENTATION/lua_functions.c
+CHI_DOC/LUA_DOCUMENTATION/lua_namespace.hpp
+CHI_DOC/PAGES/MainPage.h
+CHI_TECH/ChiLua/LUA_DOCUMENTATION/Z_GeneratedFileList.txt
