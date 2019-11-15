@@ -6,15 +6,15 @@
  * applied to it.
 
  * */
-bool chi_mesh::CellPolygon::CheckBoundary2D()
+bool chi_mesh::CellPolygonV2::CheckBoundary2D()
 {
-  for (int e=0;e<edges.size();e++)
-  {
-    if ((this->edges[e][2]<0) && (this->edges[e][3]<0))
-    {
-      return false;
-    }
-  }
+//  for (int e=0;e<edges.size();e++)
+//  {
+//    if ((this->edges[e][2]<0) && (this->edges[e][3]<0))
+//    {
+//      return false;
+//    }
+//  }
 
   return true;
 }

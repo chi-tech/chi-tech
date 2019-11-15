@@ -18,13 +18,13 @@ private:
 public:
   double volume; ///< Actually length times unity dx*dy
 
-  SlabFVView(chi_mesh::CellSlab *slab_cell,
+  SlabFVView(chi_mesh::CellSlabV2 *slab_cell,
              chi_mesh::MeshContinuum *vol_continuum) :
              CellFVView(2)
   {
     grid = vol_continuum;
-    v0i = slab_cell->v_indices[0];
-    v1i = slab_cell->v_indices[1];
+    v0i = slab_cell->vertex_ids[0];
+    v1i = slab_cell->vertex_ids[1];
     chi_mesh::Vertex v0 = *grid->nodes[v0i];
     chi_mesh::Vertex v1 = *grid->nodes[v1i];
 

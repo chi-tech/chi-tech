@@ -1,25 +1,19 @@
 #include "diffusion_solver.h"
 
-#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
+#include <ChiMesh/Cell/cell.h>
+#include <PiecewiseLinear/CellViews/pwl_cellbase.h>
 
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 #include "../Boundaries/chi_diffusion_bndry_robin.h"
 
-#include <chi_log.h>
-
-extern ChiLog chi_log;
-
 //###################################################################
-/**Assembles PWLC matrix for polygon cells.*/
-void chi_diffusion::Solver::CFEM_Ab_Polyhedron(int cell_glob_index,
-                                               chi_mesh::Cell *cell,
-                                               int group)
+/**Assembles PWLC matrix for general cells.*/
+void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
+                                                  chi_mesh::Cell *cell,
+                                                  int group)
 {
-  chi_mesh::CellPolyhedron* polyh_cell =
-    (chi_mesh::CellPolyhedron*)(cell);
-  PolyhedronFEView* fe_view =
-    (PolyhedronFEView*)pwl_discr->MapFeView(cell_glob_index);
+  auto fe_view   = dynamic_cast<CellFEView*>(pwl_discr->MapFeView(cell_glob_index));
 
   //====================================== Process material id
   int mat_id = cell->material_id;
@@ -33,7 +27,7 @@ void chi_diffusion::Solver::CFEM_Ab_Polyhedron(int cell_glob_index,
   //========================================= Loop over DOFs
   for (int i=0; i<fe_view->dofs; i++)
   {
-    int ir = mesher->MapNode(polyh_cell->v_indices[i]);
+    int ir = mesher->MapNode(cell->vertex_ids[i]);
 
     int ir_boundary_type;
     if (!ApplyDirichletI(ir,&ir_boundary_type))
@@ -41,7 +35,7 @@ void chi_diffusion::Solver::CFEM_Ab_Polyhedron(int cell_glob_index,
       //====================== Develop matrix entry
       for (int j=0; j<fe_view->dofs; j++)
       {
-        int jr =  mesher->MapNode(polyh_cell->v_indices[j]);
+        int jr =  mesher->MapNode(cell->vertex_ids[j]);
         double jr_mat_entry =
           D[j]*fe_view->IntV_gradShapeI_gradShapeJ[i][j];
 
@@ -65,13 +59,13 @@ void chi_diffusion::Solver::CFEM_Ab_Polyhedron(int cell_glob_index,
 
   //======================================== Apply Vacuum, Neumann and Robin
   //                                         BCs
-  for (int f=0; f<polyh_cell->faces.size(); f++)
+  for (int f=0; f<cell->faces.size(); f++)
   {
-    int num_face_dofs = polyh_cell->faces[f]->v_indices.size();
-    if (polyh_cell->faces[f]->face_indices[NEIGHBOR] < 0)
+    int num_face_dofs = cell->faces[f].vertex_ids.size();
+    if (cell->faces[f].neighbor < 0)
     {
       int ir_boundary_index =
-        abs(polyh_cell->faces[f]->face_indices[NEIGHBOR])-1;
+        abs(cell->faces[f].neighbor)-1;
       int ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
       if (ir_boundary_type == DIFFUSION_ROBIN)
@@ -81,13 +75,13 @@ void chi_diffusion::Solver::CFEM_Ab_Polyhedron(int cell_glob_index,
 
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_view->face_dof_mappings[f]->cell_dof[fi];
-          int ir = mesher->MapNode(polyh_cell->v_indices[i]);
+          int i  = fe_view->face_dof_mappings[f][fi];
+          int ir = mesher->MapNode(cell->vertex_ids[i]);
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_view->face_dof_mappings[f]->cell_dof[fj];
-            int jr = mesher->MapNode(polyh_cell->v_indices[j]);
+            int j  = fe_view->face_dof_mappings[f][fj];
+            int jr = mesher->MapNode(cell->vertex_ids[j]);
 
             double aij = robin_bndry->a*fe_view->IntS_shapeI_shapeJ[f][i][j];
             aij /= robin_bndry->b;

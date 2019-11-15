@@ -2,6 +2,7 @@
 #include <iostream>
 #include"../LineMesh/chi_linemesh.h"
 #include "../Boundary/chi_boundary.h"
+#include <ChiMesh/Region/chi_region.h>
 
 //###################################################################
 /**This function operates on cells with an open edge and finds
@@ -9,13 +10,13 @@
  * it only tries to match to the line-mesh associated with the
  * boundary. If a boundary was found then the edge index is set to >=0,
  * i.e. e_index[e][3]=0*/
-void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
+void chi_mesh::CellPolygonV2::FindBoundary2D(chi_mesh::Region* region)
 {
   //================================================== Check if has boundary
   bool has_boundary=false;
-  for (int e=0;e<edges.size();e++)
+  for (int e=0;e<faces.size();e++)
   {
-    if (this->edges[e][2]<0)
+    if (this->faces[e].neighbor < 0)
     {
       has_boundary = true;
       break;
@@ -27,9 +28,9 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
   chi_mesh::MeshContinuum* ref_cont = region->volume_mesh_continua.back();
 
   //================================================== Loop over edges
-  for (int e=0;e<edges.size();e++)
+  for (int e=0;e<faces.size();e++)
   {
-    if (this->edges[e][2]<0)
+    if (this->faces[e].neighbor < 0)
     {
       //================================================ Loop over boundaries
       std::vector<chi_mesh::Boundary*>::iterator bndry;
@@ -40,8 +41,8 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
         chi_mesh::Vertex v[2];
 
         try{
-          v[0] = *ref_cont->nodes.at(this->edges[e][0]);
-          v[1] = *ref_cont->nodes.at(this->edges[e][1]);
+          v[0] = *ref_cont->nodes.at(faces[e].vertex_ids[0]);
+          v[1] = *ref_cont->nodes.at(faces[e].vertex_ids[1]);
         }
         catch (const std::out_of_range& o)
         {
@@ -107,9 +108,9 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
           //======================================= If both conditions met
           if (slopes_equal && colinear)
           {
-            this->edges[e][2] =
+            this->faces[e].neighbor =
               -1*std::distance(region->boundaries.begin(),bndry);
-            this->edges[e][3] = 0;
+//            this->edges[e][3] = 0;
             //printf("Boundary assigned %d\n",this->e_index[e][2]);
           }
 

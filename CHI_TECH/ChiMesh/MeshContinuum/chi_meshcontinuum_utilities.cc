@@ -1,7 +1,7 @@
 #include "chi_meshcontinuum.h"
-#include "../Cell/cell_slab.h"
-#include "../Cell/cell_polygon.h"
-#include "../Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
 
 #include <boost/graph/bandwidth.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>
@@ -40,29 +40,8 @@ void chi_mesh::MeshContinuum::
   {
     auto cell = cells[c];
 
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      CellSlab* slab_cell = static_cast<CellSlab*>(cell);
-
-      size_t num_faces = 2;
-      for (int f=0; f<num_faces; f++)
-        face_size_histogram.push_back(1);
-
-    }//if slab
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      CellPolygon* poly_cell = static_cast<CellPolygon*>(cell);
-
-      for (auto face : poly_cell->edges)
-        face_size_histogram.push_back(2);
-    }//if polygon
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      CellPolyhedron* polyh_cell = static_cast<CellPolyhedron*>(cell);
-
-      for (auto face : polyh_cell->faces)
-        face_size_histogram.push_back(face->v_indices.size());
-    }//if polyhedron
+    for (auto face : cell->faces)
+      face_size_histogram.push_back(face.vertex_ids.size());
   }
   std::stable_sort(face_size_histogram.begin(), face_size_histogram.end());
 
@@ -200,7 +179,7 @@ size_t chi_mesh::MeshContinuum::GetFaceHistogramBinDOFSize(size_t category)
   try {
     face_dof_size = face_categories.at(category).first;
   }
-  catch (std::out_of_range o){
+  catch (std::out_of_range& o){
     chi_log.Log(LOG_ALLWARNING)
     << "Fault detected in chi_mesh::MeshContinuum::"
     << "GetFaceHistogramBinDOFSize.";
@@ -220,9 +199,122 @@ bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
   return false;
 }
 
+////###################################################################
+///**Polyhedron find associated cell face*/
+//int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
+//                                                int adj_cell_g_index,bool verbose_info)
+//{
+//  //======================================== Check index validity
+//  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedFace. Index points to either a boundary"
+//      << "or a non-local cell.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  //======================================== Check cell validity by index
+//  if (adj_cell_g_index >= cells.size())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedFace. Index is out of cell index bounds.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  chi_mesh::Cell* cell = cells[adj_cell_g_index];
+//
+//  if (cell->Type() != chi_mesh::CellType::POLYHEDRON)
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell type encountered in "
+//      << "MeshContinuum::FindAssociatedFace. Adjacent cell is expected to"
+//         "be polyhedron but is found not to be. Index given "
+//      << adj_cell_g_index << " " << cur_face->face_centroid.PrintS();
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  chi_mesh::CellPolyhedron* adj_polyhcell = (chi_mesh::CellPolyhedron*)cell;
+//
+//  int associated_face = -1;
+//
+//  //======================================== Loop over adj cell faces
+//  for (int af=0; af<adj_polyhcell->faces.size(); af++)
+//  {
+//    //Assume face matches
+//    bool face_matches = true; //Now disprove it
+//    //================================= Loop over adj cell face verts
+//    for (int afv=0; afv<adj_polyhcell->faces[af]->v_indices.size(); afv++)
+//    {
+//      //========================== Try and find them in the reference face
+//      bool found = false;
+//      for (int cfv=0; cfv<cur_face->v_indices.size(); cfv++)
+//      {
+//        if (cur_face->v_indices[cfv] == adj_polyhcell->faces[af]->v_indices[afv])
+//        {
+//          found = true;
+//          break;
+//        }
+//      }//for cfv
+//
+//      if (!found) {face_matches = false; break;}
+//    }//for afv
+//
+//    if (face_matches) {associated_face = af; break;}
+//  }
+//
+//
+//  //======================================== Check associated face validity
+//  if (associated_face<0)
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Could not find associated face in call to "
+//      << "MeshContinuum::FindAssociatedFace. Reference face with centroid at \n"
+//      << cur_face->face_centroid.PrintS();
+//    for (int af=0; af<adj_polyhcell->faces.size(); af++)
+//    {
+//      chi_log.Log(LOG_ALLERROR)
+//        << "Adjacent cell face " << af << " centroid "
+//        << adj_polyhcell->faces[af]->face_centroid.PrintS();
+//    }
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  //======================================== Verbose output
+//  if (verbose_info)
+//  {
+//    std::stringstream out_string;
+//
+//    out_string
+//    << "Adj cell " << adj_cell_g_index << ":\n"
+//    << "face " << associated_face << "\n";
+//    for (int v=0; v<adj_polyhcell->faces[associated_face]->v_indices.size(); v++)
+//    {
+//      out_string
+//      << "vertex " << v << " "
+//      << adj_polyhcell->faces[associated_face]->v_indices[v]
+//      << "\n";
+//    }
+//    out_string
+//      << "Cur cell "
+//      << adj_polyhcell->faces[associated_face]->face_indices[NEIGHBOR] << ":\n";
+//    for (int v=0; v<cur_face->v_indices.size(); v++)
+//    {
+//      out_string
+//      << "vertex " << v << " "
+//      << cur_face->v_indices[v]
+//      << "\n";
+//    }
+//    chi_log.Log(LOG_ALL) << out_string.str();
+//  }
+//
+//  return associated_face;
+//}
+
 //###################################################################
-/**Polyhedron find associated cell face*/
-int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
+/**Generalized find associated cell face*/
+int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
                                                 int adj_cell_g_index,bool verbose)
 {
   //======================================== Check index validity
@@ -244,35 +336,23 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::Cell* cell = cells[adj_cell_g_index];
-
-  if (cell->Type() != chi_mesh::CellType::POLYHEDRON)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell type encountered in "
-      << "MeshContinuum::FindAssociatedFace. Adjacent cell is expected to"
-         "be polyhedron but is found not to be. Index given "
-      << adj_cell_g_index << " " << cur_face->face_centroid.PrintS();
-    exit(EXIT_FAILURE);
-  }
-
-  chi_mesh::CellPolyhedron* adj_polyhcell = (chi_mesh::CellPolyhedron*)cell;
+  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
 
   int associated_face = -1;
 
   //======================================== Loop over adj cell faces
-  for (int af=0; af<adj_polyhcell->faces.size(); af++)
+  for (int af=0; af < adj_cell->faces.size(); af++)
   {
     //Assume face matches
     bool face_matches = true; //Now disprove it
     //================================= Loop over adj cell face verts
-    for (int afv=0; afv<adj_polyhcell->faces[af]->v_indices.size(); afv++)
+    for (int afv=0; afv < adj_cell->faces[af].vertex_ids.size(); afv++)
     {
       //========================== Try and find them in the reference face
       bool found = false;
-      for (int cfv=0; cfv<cur_face->v_indices.size(); cfv++)
+      for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
       {
-        if (cur_face->v_indices[cfv] == adj_polyhcell->faces[af]->v_indices[afv])
+        if (cur_face.vertex_ids[cfv] == adj_cell->faces[af].vertex_ids[afv])
         {
           found = true;
           break;
@@ -292,12 +372,12 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
     chi_log.Log(LOG_ALLERROR)
       << "Could not find associated face in call to "
       << "MeshContinuum::FindAssociatedFace. Reference face with centroid at \n"
-      << cur_face->face_centroid.PrintS();
-    for (int af=0; af<adj_polyhcell->faces.size(); af++)
+      << cur_face.centroid.PrintS();
+    for (int af=0; af < adj_cell->faces.size(); af++)
     {
       chi_log.Log(LOG_ALLERROR)
         << "Adjacent cell face " << af << " centroid "
-        << adj_polyhcell->faces[af]->face_centroid.PrintS();
+        << adj_cell->faces[af].centroid.PrintS();
     }
     exit(EXIT_FAILURE);
   }
@@ -308,24 +388,24 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
     std::stringstream out_string;
 
     out_string
-    << "Adj cell " << adj_cell_g_index << ":\n"
-    << "face " << associated_face << "\n";
-    for (int v=0; v<adj_polyhcell->faces[associated_face]->v_indices.size(); v++)
+      << "Adj cell " << adj_cell_g_index << ":\n"
+      << "face " << associated_face << "\n";
+    for (int v=0; v < adj_cell->faces[associated_face].vertex_ids.size(); v++)
     {
       out_string
-      << "vertex " << v << " "
-      << adj_polyhcell->faces[associated_face]->v_indices[v]
-      << "\n";
+        << "vertex " << v << " "
+        << adj_cell->faces[associated_face].vertex_ids[v]
+        << "\n";
     }
     out_string
       << "Cur cell "
-      << adj_polyhcell->faces[associated_face]->face_indices[NEIGHBOR] << ":\n";
-    for (int v=0; v<cur_face->v_indices.size(); v++)
+      << adj_cell->faces[associated_face].neighbor << ":\n";
+    for (int v=0; v<cur_face.vertex_ids.size(); v++)
     {
       out_string
-      << "vertex " << v << " "
-      << cur_face->v_indices[v]
-      << "\n";
+        << "vertex " << v << " "
+        << cur_face.vertex_ids[v]
+        << "\n";
     }
     chi_log.Log(LOG_ALL) << out_string.str();
   }
@@ -333,107 +413,177 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::PolyFace *cur_face,
   return associated_face;
 }
 
-//###################################################################
-/**Polyhedron find associated cell face*/
-int chi_mesh::MeshContinuum::FindAssociatedEdge(int* edgeinfo,
-                                                int adj_cell_g_index,bool verbose)
-{
-  //======================================== Check index validity
-  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedEdge. Index points to either a boundary"
-      << "or a non-local cell.";
-    exit(EXIT_FAILURE);
-  }
-
-  //======================================== Check cell validity by index
-  if (adj_cell_g_index >= cells.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedEdge. Index is out of cell index bounds.";
-    exit(EXIT_FAILURE);
-  }
-
-  chi_mesh::Cell* cell = cells[adj_cell_g_index];
-
-  if (cell->Type() != chi_mesh::CellType::POLYGON)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell type encountered in "
-      << "MeshContinuum::FindAssociatedEdge. Adjacent cell is expected to"
-         "be polygon but is found not to be. Index given "
-      << adj_cell_g_index << " " << edgeinfo[EDGE_NEIGHBOR];
-    exit(EXIT_FAILURE);
-  }
-
-  chi_mesh::CellPolygon* adj_polycell = (chi_mesh::CellPolygon*)cell;
-
-  int associated_face = -1;
-
-  //======================================== Loop over adj cell faces
-  for (int af=0; af<adj_polycell->edges.size(); af++)
-  {
-    //Assume face matches
-    bool face_matches = false; //Now disprove it
-    if ((adj_polycell->edges[af][0] == edgeinfo[1]) and
-        (adj_polycell->edges[af][1] == edgeinfo[0]))
-    {
-      face_matches = true;
-    }
-
-    if (face_matches) {associated_face = af; break;}
-  }
-
-
-  //======================================== Check associated face validity
-  if (associated_face<0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Could not find associated face in call to "
-      << "MeshContinuum::FindAssociatedEdge.";
-    exit(EXIT_FAILURE);
-  }
-
-  //======================================== Verbose output
-//  if (verbose)
+////###################################################################
+///**Polyhedron find associated cell face*/
+//int chi_mesh::MeshContinuum::FindAssociatedEdge(int* edgeinfo,
+//                                                int adj_cell_g_index,bool verbose_info)
+//{
+//  //======================================== Check index validity
+//  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
 //  {
-//    std::stringstream out_string;
-//
-//    out_string
-//      << "Adj cell " << adj_cell_g_index << ":\n"
-//      << "face " << associated_face << "\n";
-//    for (int v=0; v<adj_polyhcell->faces[associated_face]->v_indices.size(); v++)
-//    {
-//      out_string
-//        << "vertex " << v << " "
-//        << adj_polyhcell->faces[associated_face]->v_indices[v]
-//        << "\n";
-//    }
-//    out_string
-//      << "Cur cell "
-//      << adj_polyhcell->faces[associated_face]->face_indices[NEIGHBOR] << ":\n";
-//    for (int v=0; v<cur_face->v_indices.size(); v++)
-//    {
-//      out_string
-//        << "vertex " << v << " "
-//        << cur_face->v_indices[v]
-//        << "\n";
-//    }
-//    chi_log.Log(LOG_ALL) << out_string.str();
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedEdge. Index points to either a boundary"
+//      << "or a non-local cell.";
+//    exit(EXIT_FAILURE);
 //  }
+//
+//  //======================================== Check cell validity by index
+//  if (adj_cell_g_index >= cells.size())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedEdge. Index is out of cell index bounds.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  chi_mesh::Cell* cell = cells[adj_cell_g_index];
+//
+//  if (cell->Type() != chi_mesh::CellType::POLYGON)
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell type encountered in "
+//      << "MeshContinuum::FindAssociatedEdge. Adjacent cell is expected to"
+//         "be polygon but is found not to be. Index given "
+//      << adj_cell_g_index << " " << edgeinfo[EDGE_NEIGHBOR];
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  chi_mesh::CellPolygon* adj_polycell = (chi_mesh::CellPolygon*)cell;
+//
+//  int associated_face = -1;
+//
+//  //======================================== Loop over adj cell faces
+//  for (int af=0; af<adj_polycell->edges.size(); af++)
+//  {
+//    //Assume face matches
+//    bool face_matches = false; //Now disprove it
+//    if ((adj_polycell->edges[af][0] == edgeinfo[1]) and
+//        (adj_polycell->edges[af][1] == edgeinfo[0]))
+//    {
+//      face_matches = true;
+//    }
+//
+//    if (face_matches) {associated_face = af; break;}
+//  }
+//
+//
+//  //======================================== Check associated face validity
+//  if (associated_face<0)
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Could not find associated face in call to "
+//      << "MeshContinuum::FindAssociatedEdge.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  //======================================== Verbose output
+////  if (verbose)
+////  {
+////    std::stringstream out_string;
+////
+////    out_string
+////      << "Adj cell " << adj_cell_g_index << ":\n"
+////      << "face " << associated_face << "\n";
+////    for (int v=0; v<adj_polyhcell->faces[associated_face]->v_indices.size(); v++)
+////    {
+////      out_string
+////        << "vertex " << v << " "
+////        << adj_polyhcell->faces[associated_face]->v_indices[v]
+////        << "\n";
+////    }
+////    out_string
+////      << "Cur cell "
+////      << adj_polyhcell->faces[associated_face]->face_indices[NEIGHBOR] << ":\n";
+////    for (int v=0; v<cur_face->v_indices.size(); v++)
+////    {
+////      out_string
+////        << "vertex " << v << " "
+////        << cur_face->v_indices[v]
+////        << "\n";
+////    }
+////    chi_log.Log(LOG_ALL) << out_string.str();
+////  }
+//
+//  return associated_face;
+//}
 
-  return associated_face;
-}
+////###################################################################
+///**Polyhedron map vertices*/
+//void chi_mesh::MeshContinuum::
+//       FindAssociatedVertices(chi_mesh::PolyFace* cur_face,
+//                              int adj_cell_g_index, int associated_face,
+//                              std::vector<int>& dof_mapping)
+//{
+//  //======================================== Check index validity
+//  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedVertices. Index points to either a boundary"
+//      << "or a non-local cell.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  //======================================== Check cell validity by index
+//  if (adj_cell_g_index >= cells.size())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedVertices. Index is out of cell index bounds.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  chi_mesh::Cell* cell = cells[adj_cell_g_index];
+//
+//  if (cell->Type() != chi_mesh::CellType::POLYHEDRON)
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell type encountered in "
+//      << "MeshContinuum::FindAssociatedVertices. Adjacent cell is expected to"
+//         "be polyhedron but is found not to be. Index given "
+//      << adj_cell_g_index << " " << cur_face->face_centroid.PrintS();
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  chi_mesh::CellPolyhedron* adj_polyhcell = (chi_mesh::CellPolyhedron*)cell;
+//
+//
+//  for (int cfv=0; cfv<cur_face->v_indices.size(); cfv++)
+//  {
+//    bool found = false;
+//    for (int afv=0;
+//         afv<adj_polyhcell->faces[associated_face]->v_indices.size(); afv++)
+//    {
+//      if (cur_face->v_indices[cfv] ==
+//          adj_polyhcell->faces[associated_face]->v_indices[afv])
+//      {
+//        dof_mapping.push_back(afv);
+//        found = true;
+//        break;
+//      }
+//    }
+//
+//    if (!found)
+//    {
+//      chi_log.Log(LOG_ALLERROR)
+//        << "Face DOF mapping failed in call to "
+//        << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
+//           "node."
+//        << adj_cell_g_index << " " << cur_face->face_centroid.PrintS();
+//      exit(EXIT_FAILURE);
+//    }
+//
+//  }//for cfv
+//
+//}
 
 //###################################################################
-/**Polyhedron map vertices*/
+/**General map vertices*/
 void chi_mesh::MeshContinuum::
-       FindAssociatedVertices(chi_mesh::PolyFace* cur_face,
-                              int adj_cell_g_index, int associated_face,
-                              std::vector<int>& dof_mapping)
+FindAssociatedVertices(chi_mesh::CellFace& cur_face,
+                       int adj_cell_g_index, int associated_face,
+                       std::vector<int>& dof_mapping)
 {
   //======================================== Check index validity
   if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
@@ -454,29 +604,17 @@ void chi_mesh::MeshContinuum::
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::Cell* cell = cells[adj_cell_g_index];
-
-  if (cell->Type() != chi_mesh::CellType::POLYHEDRON)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell type encountered in "
-      << "MeshContinuum::FindAssociatedVertices. Adjacent cell is expected to"
-         "be polyhedron but is found not to be. Index given "
-      << adj_cell_g_index << " " << cur_face->face_centroid.PrintS();
-    exit(EXIT_FAILURE);
-  }
-
-  chi_mesh::CellPolyhedron* adj_polyhcell = (chi_mesh::CellPolyhedron*)cell;
+  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
 
 
-  for (int cfv=0; cfv<cur_face->v_indices.size(); cfv++)
+  for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
   {
     bool found = false;
     for (int afv=0;
-         afv<adj_polyhcell->faces[associated_face]->v_indices.size(); afv++)
+         afv < adj_cell->faces[associated_face].vertex_ids.size(); afv++)
     {
-      if (cur_face->v_indices[cfv] ==
-          adj_polyhcell->faces[associated_face]->v_indices[afv])
+      if (cur_face.vertex_ids[cfv] ==
+        adj_cell->faces[associated_face].vertex_ids[afv])
       {
         dof_mapping.push_back(afv);
         found = true;
@@ -490,7 +628,7 @@ void chi_mesh::MeshContinuum::
         << "Face DOF mapping failed in call to "
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
-        << adj_cell_g_index << " " << cur_face->face_centroid.PrintS();
+        << adj_cell_g_index << " " << cur_face.centroid.PrintS();
       exit(EXIT_FAILURE);
     }
 

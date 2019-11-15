@@ -63,6 +63,18 @@ public:
                        std::vector<int>& cells,
                        std::vector<int>* mapping);
 
+//  void CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
+//                         Vec& x, Vec& x_cell,
+//                         std::vector<int>& cfem_nodes,
+//                         std::vector<int>* mapping);
+  void CreatePWLDMapping(chi_physics::FieldFunction* field_function,
+                         std::vector<int>& pwld_nodes,
+                         std::vector<int>& pwld_cells,
+                         std::vector<int>* mapping,int m=0,int g=0);
+//  void CreateFVMapping(int num_grps, int num_moms, int g, int m,
+//                       std::vector<int>& cells,
+//                       std::vector<int>* mapping);
+
   virtual void Initialize(){};
   virtual void Execute(){};
 };

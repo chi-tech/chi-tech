@@ -1,4 +1,4 @@
-#include "../chi_mesh.h"
+#include "raytracing.h"
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 #include <ChiMesh/Cell/cell_slab.h>
@@ -10,49 +10,36 @@
 extern ChiLog chi_log;
 
 //###################################################################
-/**Performs raytracing on chi_mesh type cells. With the exception
- * of slab-type cells this algorithm essentially looks for
- * intersection with triangles. The first step involves check
- * the intersection with a plane formed by a given triangle's
- * normal and a reference point.
+/**Performs raytracing on chi_mesh type cells. This algorithm essentially
+ * looks for intersections with planes, strips or triangles.
  *
- * The pointer to aux_info must be a data structure with the first
- * element being an integer.
- *
- * \param Reference to the grid on which the specific cell resides.
- * \param A pointer to the cell base.
- * \param The initial position of the ray.
- * \param The direction of the ray.
- * \param A reference to a variable that will receive the distance to the
+ * \param grid          Reference to the grid on which the specific cell resides.
+ * \param cell          A pointer to the cell base.
+ * \param pos_i         The initial position of the ray.
+ * \param omega_i       The direction of the ray.
+ * \param d_to_surface  A reference to a variable that will receive the distance to the
  *        surface.
- * \param A reference to the vector to receive the final position.
- * \param (Optional) A pointer to an integer array of minimum size 1. The
- *        first integer in this array indicates how many elements there are in
- *        the array. If the array size is 2, the seconds element (i.e. element[1]
- *        will receive the associated face of the surface of the cell. If
- *        the array size is 3 then the third element will be the cell/bndry
- *        on the either side of the face.*/
-void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
-                        chi_mesh::Cell *cell,
-                        const chi_mesh::Vector &pos_i,
-                        const chi_mesh::Vector &omega_i,
-                        double& d_to_surface,
-                        chi_mesh::Vector &pos_f,
-                        int *aux_info)
+ * \param pos_f         A reference to the vector to receive the final position.
+ * \param get_segments  (Optional) A flag indicating .*/
+chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
+  chi_mesh::MeshContinuum* grid,
+  chi_mesh::Cell *cell,
+  const chi_mesh::Vector &pos_i,
+  const chi_mesh::Vector &omega_i,
+  double& d_to_surface,
+  chi_mesh::Vector &pos_f)
 {
-
-  //We make these copies so we can do arithmetic on them
-  chi_mesh::Vector pos_i_copy = pos_i;
-  chi_mesh::Vector omega_i_copy = omega_i;
+  chi_mesh::RayDestinationInfo dest_info;
 
   double extention_distance = 1.0e15;
+  chi_mesh::Vector pos_f_line = pos_i + omega_i*extention_distance;
 
-  chi_mesh::Vector pos_f_line = pos_i_copy + omega_i_copy*extention_distance;
+  bool intersection_found = false;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    auto slab_cell = (chi_mesh::CellSlab*)cell;
+    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
 
     chi_mesh::Vector intersection_point;
     std::pair<double,double> weights;
@@ -60,84 +47,99 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
     int num_faces = 2;
     for (int f=0; f<num_faces; f++)
     {
-      int fpi = slab_cell->v_indices[f]; //face point index
+      int fpi = slab_cell->vertex_ids[f]; //face point index
       chi_mesh::Vertex face_point = *grid->nodes[fpi];
 
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
-        slab_cell->face_normals[f], face_point,
+        slab_cell->faces[f].normal, face_point,
         pos_i, pos_f_line,
         intersection_point, weights);
 
       double D = weights.first*extention_distance;
 
-      if ( ((D) > 1.0e-10) and (intersects) )
+      if ( (D > 1.0e-10) and intersects )
       {
         d_to_surface = D;
         pos_f = intersection_point;
 
-        if (aux_info != nullptr)
-        {
-          if (aux_info[0] >= 2)
-            aux_info[1] = f;
-          if (aux_info[0] >= 3)
-            aux_info[2] = slab_cell->edges[f];
-        }
+        dest_info.destination_face_index = f;
+        dest_info.destination_face_neighbor = slab_cell->faces[f].neighbor;
+        intersection_found = true;
         break;
       }
     }//for faces
-
-
   }//slab
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
   else if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
-    auto poly_cell = (chi_mesh::CellPolygon*)cell;
+    auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
 
-    chi_mesh::Vector intersection_point;
-    std::pair<double,double> weights;
+    chi_mesh::Vector ip; //intersetion point
 
-    int num_faces = poly_cell->edges.size();
+    int num_faces = poly_cell->faces.size();
     for (int f=0; f<num_faces; f++)
     {
-      int fpi = poly_cell->edges[f][0]; //face point index 0
-      int fpf = poly_cell->edges[f][1]; //face point index 1
-      chi_mesh::Vertex face_point_i = *grid->nodes[fpi];
-      chi_mesh::Vertex face_point_f = *grid->nodes[fpf];
+      int fpi = poly_cell->faces[f].vertex_ids[0]; //face point index 0
+      int fpf = poly_cell->faces[f].vertex_ids[1]; //face point index 1
+      chi_mesh::Vertex& face_point_i = *grid->nodes[fpi];
+      chi_mesh::Vertex& face_point_f = *grid->nodes[fpf];
 
-      bool intersects = chi_mesh::CheckPlaneLineIntersect(
-        poly_cell->edgenormals[f], face_point_i,
-        pos_i, pos_f_line,
-        intersection_point, weights);
+      bool intersects = chi_mesh::CheckLineIntersectStrip(
+        face_point_i, face_point_f, poly_cell->faces[f].normal,
+        pos_i, pos_f_line, ip);
 
-      double D = weights.first*extention_distance;
+      double D = (ip - pos_i).Norm();
 
-      if ( ((D) > 1.0e-10) and (intersects) )
+      if (intersects and (D > 1.0e-10))
       {
         d_to_surface = D;
+        pos_f = ip;
 
-        chi_mesh::Vector edge_vec = face_point_f - face_point_i;
-        chi_mesh::Vector ints_vec1 = intersection_point - face_point_i;
-        chi_mesh::Vector ints_vec2 = intersection_point - face_point_f;
-
-        bool sense1 = edge_vec.Dot(ints_vec1)>=0;
-        bool sense2 = edge_vec.Dot(ints_vec2)>=0;
-
-        if (sense1 != sense2)
-        {
-          pos_f = intersection_point;
-
-          if (aux_info != nullptr)
-          {
-            if (aux_info[0] >= 2)
-              aux_info[1] = f;
-            if (aux_info[0] >= 3)
-              aux_info[2] = poly_cell->edges[f][EDGE_NEIGHBOR];
-          }
-          break;
-        }
-      }
+        dest_info.destination_face_index = f;
+        dest_info.destination_face_neighbor = poly_cell->faces[f].neighbor;
+        intersection_found = true;
+        break;
+      }//if intersects
     }//for faces
-  }
+  }//polygon
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
+  else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+  {
+    auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+
+    chi_mesh::Vector ip = pos_i; //Intersection point
+
+    int num_faces = polyh_cell->faces.size();
+    for (int f=0; f<num_faces; f++)
+    {
+      auto& edges = polyh_cell->GetFaceEdges(f);
+
+      size_t num_sides = edges.size();
+      for (size_t s=0; s<num_sides; s++)
+      {
+        chi_mesh::Vertex& v0 = *grid->nodes[edges[s][0]];
+        chi_mesh::Vertex& v1 = *grid->nodes[edges[s][1]];
+        chi_mesh::Vertex& v2 = polyh_cell->faces[f].centroid;
+
+        bool intersects =
+          chi_mesh::CheckLineIntersectTriangle2(v0,v1,v2,pos_i,omega_i,ip);
+
+        if (intersects)
+        {
+          d_to_surface = (ip - pos_i).Norm();
+          pos_f = ip;
+
+          dest_info.destination_face_index = f;
+          dest_info.destination_face_neighbor = polyh_cell->faces[f].neighbor;
+
+          intersection_found = true;
+          break;
+        }//if intersects
+      }//for side
+
+      if (intersection_found) break;
+    }//for faces
+  }//polyhedron
   else
   {
     chi_log.Log(LOG_ALLERROR)
@@ -146,4 +148,21 @@ void chi_mesh::RayTrace(chi_mesh::MeshContinuum* grid,
     exit(EXIT_FAILURE);
   }
 
+  if (!intersection_found)
+  {
+    std::stringstream outstr;
+
+    outstr
+      << "Intersection not found. For particle xyz="
+      << pos_i.PrintS() << " uvw="
+      << omega_i.PrintS() << " in cell " << cell->cell_global_id
+      << " with vertices: \n";
+
+    for (auto vi : cell->vertex_ids)
+      outstr << grid->nodes[vi]->PrintS() << "\n";
+
+    chi_log.Log(LOG_ALLERROR) << outstr.str();
+  }
+
+  return dest_info;
 }

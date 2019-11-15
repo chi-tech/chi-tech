@@ -4,8 +4,7 @@
 #include <fstream>
 
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../Cell/cell_polyhedron.h"
-#include "../Cell/cell_polygon.h"
+#include "../Cell/cell.h"
 
 #include "../MeshContinuum/chi_meshcontinuum.h"
 #include "../VolumeMesher/chi_volumemesher.h"
@@ -44,46 +43,41 @@ void chi_mesh::sweep_management::
   {
     int cell_index = sweep_order->spls->item_id[ci];
     chi_mesh::Cell* cell =  vol_continuum->cells[cell_index];
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+
+    for (int e=0; e < cell->faces.size(); e++)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      //======================================= Determine if the face
+      //                                        is incident
+      bool is_incoming = false;
+      double dot_normal = omega.Dot(cell->faces[e].normal);
+      if (dot_normal<0.0) {is_incoming = true;}
 
-      for (int e=0; e<poly_cell->edges.size(); e++)
+      //======================================= If incoming determine if
+      //                                        it is locally dependent
+      if (is_incoming)
       {
-        //======================================= Determine if the face
-        //                                        is incident
-        bool is_incoming = false;
-        double dot_normal = omega.Dot(poly_cell->edgenormals[e]);
-        if (dot_normal<0.0) {is_incoming = true;}
+        int adj_index = cell->faces[e].neighbor;
 
-        //======================================= If incoming determine if
-        //                                        it is locally dependent
-        if (is_incoming)
+        for (int lc=0;
+             lc<vol_continuum->local_cell_glob_indices.size(); lc++)
         {
-          int adj_index = poly_cell->edges[e][2];
-
-          for (int lc=0;
-               lc<vol_continuum->local_cell_glob_indices.size(); lc++)
+          if (adj_index == vol_continuum->local_cell_glob_indices[lc])
           {
-            if (adj_index == vol_continuum->local_cell_glob_indices[lc])
+            if (rank_of_cell[cell_index]==0)
             {
-              if (rank_of_cell[cell_index]==0)
+              rank_of_cell[cell_index] = rank_of_cell[adj_index]+1;
+              printf("Sweep cell %d, rank %d\n",ci,rank_of_cell[cell_index]);
+              if (max_rank<rank_of_cell[cell_index])
               {
-                rank_of_cell[cell_index] = rank_of_cell[adj_index]+1;
-                printf("Sweep cell %d, rank %d\n",ci,rank_of_cell[cell_index]);
-                if (max_rank<rank_of_cell[cell_index])
-                {
-                  max_rank = rank_of_cell[cell_index];
-                }
+                max_rank = rank_of_cell[cell_index];
               }
-              break;
             }
+            break;
           }
         }
+      }
 
-      }//for face
-    }
+    }//for face
   }
 
   printf("Max rank=%d\n",max_rank);

@@ -1,15 +1,15 @@
 #include "../lbs_linear_boltzman_solver.h"
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
-#include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
 #include <ChiTimer/chi_timer.h>
 
 
 #include <chi_log.h>
-
+#include <chi_mpi.h>
 extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 
 extern double chi_global_timings[20];
 

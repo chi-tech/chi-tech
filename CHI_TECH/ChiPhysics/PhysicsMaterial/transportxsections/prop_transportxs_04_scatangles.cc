@@ -6,6 +6,9 @@
 #include <chi_log.h>
 
 extern ChiLog chi_log;
+extern ChiMath chi_math_handler;
+
+#include <algorithm>
 
 //###################################################################
 /**Computes the discrete scattering tables.*/
@@ -63,19 +66,11 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   //============================================= copy cdf
   //This will make the CDF from 0.0 to 1.0
   cdf_gprime_g.resize(G,std::vector<double>(G,0.0));
-  double intgl = 0.0;
   for (int gp=0; gp<G; gp++)
     for (int g=0; g<G; g++)
-    {
       cdf_gprime_g[g][gp] = prob_gprime_g_normed[g][gp];
-//      if (g<62 and gp<62)
-//      {
-//        chi_log.Log(LOG_0)
-//        << "gp=" << gp << " g=" << g << " cp=" << cdf_gprime_g[g][gp];
-//      }
-    }
 
-
+   cdf_gprime_g = chi_math_handler.Transpose(cdf_gprime_g);
 
   //============================================= Collect scattering moments
   //For a given scattering gprime->g we need all
@@ -104,7 +99,6 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   for (int gp=0; gp<G; gp++)
   {
     scat_angles_gprime_g[gp].resize(G);
-//    if (sigma_tg[gp]<1.0e-16) continue;
 
     for (int g=0; g<G; g++)
     {
@@ -140,14 +134,10 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
 int chi_physics::TransportCrossSections::Sample_gprime(int gp, double rn)
 {
   int gto = 0;
-  for (int g=0; g<G; g++)
-  {
-    if ((rn < cdf_gprime_g[g][gp]) and (gp == 0))
-    {gto = g; break;}
 
-    if ((rn < cdf_gprime_g[g][gp]) and (rn >= cdf_gprime_g[g-1][gp]))
-    {gto = g; break;}
-  }
+  gto = std::lower_bound(cdf_gprime_g[gp].begin(),
+                         cdf_gprime_g[gp].end(),
+                         rn) - cdf_gprime_g[gp].begin();
 
   return gto;
 }
@@ -159,25 +149,21 @@ double chi_physics::TransportCrossSections::
 {
   double mu = 0.0;
 
-  if (isotropic or scat_angles_gprime_g[gp][g].size()==0)
+  struct
+  {
+    bool operator()(const std::pair<double,double>& left, double val)
+    {return left.second <= val;}
+  }compare;
+
+  if (isotropic or scat_angles_gprime_g[gp][g].empty())
     mu = 2.0*rn-1.0;
   else
   {
-    int num_angles = scat_angles_gprime_g[gp][g].size();
-    for (int a=0; a<num_angles; a++)
-    {
-      double prob = scat_angles_gprime_g[gp][g][a].second;
-      if ((rn < prob) and (a == 0))
-      {
-        mu =  scat_angles_gprime_g[gp][g][a].first;
-        break;
-      }
-      if ((rn < prob) and (rn >= scat_angles_gprime_g[gp][g][a-1].second))
-      {
-        mu =  scat_angles_gprime_g[gp][g][a].first;
-        break;
-      }
-    }
+    int angle_num = std::lower_bound(scat_angles_gprime_g[gp][g].begin(),
+                                     scat_angles_gprime_g[gp][g].end(),rn,
+                                     compare) -
+                                     scat_angles_gprime_g[gp][g].begin();
+    mu = scat_angles_gprime_g[gp][g][angle_num].first;
   }
 
   if (std::isnan(mu))

@@ -121,7 +121,7 @@ chiMonteCarlonSetProperty(phys0,MC_TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys0,MC_SCATTERING_ORDER,10)
 chiMonteCarlonSetProperty(phys0,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys0,MC_FORCE_ISOTROPIC,false)
-chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.5)
+chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.25)
 
 chiMonteCarlonInitialize(phys0)
 chiMonteCarlonExecute(phys0)

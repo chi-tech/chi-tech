@@ -3,7 +3,7 @@
 #include "../../MeshHandler/chi_meshhandler.h"
 #include "../../Region/chi_region.h"
 #include "../../Boundary/chi_boundary.h"
-#include "../../Cell/cell_slab.h"
+#include <ChiMesh/Cell/cell_slab.h>
 #include "../../SurfaceMesher/surfacemesher.h"
 
 #include <chi_mpi.h>
@@ -79,29 +79,36 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         for (int v=0; v<(line_mesh->vertices.size()-1); v++)
         {
           cell_count++;
-          chi_mesh::CellSlab* slab = new chi_mesh::CellSlab;
+          auto slab = new chi_mesh::CellSlabV2;
           slab->cell_global_id = vol_continuum->cells.size();
 
           //====================== Populate basic data
-          slab->v_indices[0] = v;
-          slab->v_indices[1] = v+1;
+          slab->vertex_ids.resize(2,-1);
+          slab->vertex_ids[0] = v;
+          slab->vertex_ids[1] = v+1;
 
-          slab->edges[0] = cell_count-1;
-          slab->edges[1] = cell_count+1;
+          slab->faces.resize(2,chi_mesh::CellFace());
+          slab->faces[0].vertex_ids.push_back(v);
+          slab->faces[1].vertex_ids.push_back(v+1);
+
+          slab->faces[0].neighbor = cell_count-1;
+          slab->faces[1].neighbor = cell_count+1;
 
           if (v == (line_mesh->vertices.size()-2))
-            slab->edges[1] = -2;
+            slab->faces[1].neighbor = -2;
 
           //====================== Compute centroid
           chi_mesh::Vertex v0 = line_mesh->vertices[v];
           chi_mesh::Vertex v1 = line_mesh->vertices[v+1];
 
+          slab->faces[0].centroid = v0;
+          slab->faces[1].centroid = v1;
           slab->centroid = (v0+v1)/2.0;
 
           //====================== Compute normals
           chi_mesh::Vector n = (v1-v0)/(v1-v0).Norm();
-          slab->face_normals[0] = chi_mesh::Vector(0.0,0.0,-1.0);
-          slab->face_normals[1] = chi_mesh::Vector(0.0,0.0, 1.0);
+          slab->faces[0].normal = chi_mesh::Vector(0.0,0.0,-1.0);
+          slab->faces[1].normal = chi_mesh::Vector(0.0,0.0, 1.0);
 
           slab->xyz_partition_indices = GetCellXYZPartitionID(slab);
 

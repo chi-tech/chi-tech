@@ -3,11 +3,6 @@
 #include "ChiConsole/chi_console.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include "ChiMesh/Cell/cell.h"
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
-
 #include <chi_log.h>
 #include <chi_mpi.h>
 

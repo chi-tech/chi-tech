@@ -126,7 +126,7 @@ InsertVertex(chi_mesh::Vertex vc_pstar, unsigned seed_search_triangle_index)
     }
   }
 
-  //================================================== Write verbose output
+  //================================================== Write verbose_info output
   printf("Inserting projected vertex %lu at [%.2f,%.2f]\n", Pstar.size(),vc_pstar.x,vc_pstar.y);
 
   //================================================== Inserted projected vertex

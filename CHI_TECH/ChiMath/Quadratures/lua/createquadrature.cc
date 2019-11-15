@@ -5,6 +5,10 @@
 
 extern ChiMath    chi_math_handler;
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 
 /**\defgroup LuaQuadrature Quadrature rules
  * \ingroup LuaMath*/
