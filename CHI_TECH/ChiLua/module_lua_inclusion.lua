@@ -27,8 +27,10 @@ Add_Folder("../ChiLog/lua")
 
 Add_Folder("../ChiPhysics/lua")
 
-Add_Folder("../../Modules/MonteCarlon/lua")
-Add_Folder("../../Modules/DiffusionSolver/lua")
-Add_Folder("../../Modules/LinearBoltzmanSolver/lua")
+
+-- ==================================== Include modules
+MODULE_FOLDER = "../../Modules"
+
+dofile(MODULE_FOLDER.."/module_lua_inclusion.lua")
 
 Add_Folder("../LuaTest")

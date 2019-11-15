@@ -1,6 +1,6 @@
 cd ../
 
-LUA="$PWD/CHI_RESOURCES/Dependencies/lua-5.3.5/install/bin/lua"
+LUA="lua"
 
 #============================== Making lua documentation
 cd CHI_TECH/ChiLua

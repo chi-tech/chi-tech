@@ -274,8 +274,8 @@ MatDbl chi_math::SubMatrix(const size_t r,
 
 //######################################################### Gauss Elimination
 /** Gauss Elimination without pivoting.*/
-void chi_math::GaussElimination(std::vector<std::vector<double> > &A,
-	                              std::vector<double> &b, int n)
+void chi_math::GaussElimination(MatDbl &A,
+                                VecDbl &b, int n)
 {
 	// Forward elimination
 	for(int i = 0;i < n-1;++i)
@@ -364,8 +364,8 @@ MatDbl chi_math::InverseGEPivoting(const MatDbl &A)
 
 //######################################################### Matrix inverse
 /** Computes the inverse of a matrix.*/
-std::vector<std::vector<double>>
-chi_math::Inverse(const std::vector<std::vector<double> > &A)
+MatDbl
+chi_math::Inverse(const MatDbl &A)
 {
   size_t R = A.size();
   std::vector<std::vector<double>> M(R,std::vector<double>(R,0.));
