@@ -18,13 +18,19 @@ public:
   std::vector<int>               glob_cell_local_indices;
   std::vector<int>               boundary_cell_indices;
 
-  //CHI_UD_GRAPH                   grid_graph;
+private:
+  bool                           face_histogram_available;
 
+  //Pair.first is the max dofs-per-face for the category and Pair.second
+  //is the number of faces in this category
+  std::vector<std::pair<size_t,size_t>> face_categories;
+
+public:
   MeshContinuum()
   {
     this->surface_mesh = nullptr;
     this->line_mesh    = nullptr;
-
+    face_histogram_available = false;
   }
 
   //01
@@ -38,7 +44,10 @@ public:
   void ExportCellsToVTK(const char* baseName);
 
   //02
-  void ConnectGrid();
+  void BuildFaceHistogramInfo(double master_tolerance=1.2, double slave_tolerance=1.1);
+  size_t NumberOfFaceHistogramBins();
+  size_t MapFaceHistogramBins(size_t num_face_dofs);
+  size_t GetFaceHistogramBinDOFSize(size_t category);
   bool IsCellLocal(int cell_global_index=-1);
   bool IsCellBndry(int cell_global_index = 0);
 

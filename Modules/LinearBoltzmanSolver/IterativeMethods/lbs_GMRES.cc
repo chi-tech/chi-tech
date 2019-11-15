@@ -1,6 +1,6 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "ChiMesh/SweepUtilities/chi_sweepscheduler.h"
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 #include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 
 #include "ChiTimer/chi_timer.h"
@@ -16,12 +16,14 @@ extern ChiLog chi_log;
 
 extern double chi_global_timings[20];
 
-typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
-typedef chi_mesh::SweepManagement::SweepScheduler MainSweepScheduler;
+namespace sweep_namespace = chi_mesh::sweep_management;
+typedef sweep_namespace::SweepChunk SweepChunk;
+typedef sweep_namespace::SweepScheduler MainSweepScheduler;
+typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
-void LinearBoltzmanSolver::GMRES(int group_set_num)
+void LinearBoltzman::Solver::GMRES(int group_set_num)
 {
   chi_log.Log(LOG_0)
     << "\n\n";
@@ -43,7 +45,7 @@ void LinearBoltzmanSolver::GMRES(int group_set_num)
   //================================================== Setting up required
   //                                                   sweep chunks
   SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
-  MainSweepScheduler sweepScheduler(DEPTH_OF_GRAPH,
+  MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                     groupset->angle_agg);
 
   //=================================================== Create Data context
@@ -71,8 +73,6 @@ void LinearBoltzmanSolver::GMRES(int group_set_num)
   MatShellSetOperation(A, MATOP_MULT,(void (*)(void)) NPTMatrixAction_Ax);
 
   //================================================== Initial vector assembly
-  phi_new_local.assign(phi_new_local.size(),0.0);
-
   VecCreate(PETSC_COMM_WORLD,&phi_new);
   VecCreate(PETSC_COMM_WORLD,&phi_old);
   VecCreate(PETSC_COMM_WORLD,&q_fixed);
@@ -108,12 +108,16 @@ void LinearBoltzmanSolver::GMRES(int group_set_num)
 
   //================================================== Compute b
   chi_log.Log(LOG_0) << "Computing b";
-  SetSource(group_set_num,USE_MATERIAL_SOURCE,SUPPRESS_PHI_OLD);
+  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
+  phi_new_local.assign(phi_new_local.size(),0.0);
   sweepScheduler.Sweep(sweep_chunk);
 
-  //=================================================== Apply WGDSA
+  groupset->latest_convergence_metric = groupset->residual_tolerance;
+  ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
+
+  //=================================================== Apply DSA
   if (groupset->apply_wgdsa)
   {
     AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());

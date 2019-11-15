@@ -1,5 +1,9 @@
 #include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
 
+#include <ChiLog/chi_log.h>
+
+extern ChiLog chi_log;
+
 void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 {
   if (diffusion_initialized)

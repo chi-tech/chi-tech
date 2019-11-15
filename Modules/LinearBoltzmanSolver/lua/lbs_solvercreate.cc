@@ -36,7 +36,7 @@ int chiLBSCreateSolver(lua_State *L)
 {
   chi_log.Log(LOG_ALLVERBOSE_1)
   << "Creating Linear Boltzman solver";
-  LinearBoltzmanSolver* new_solver = new LinearBoltzmanSolver;
+  LinearBoltzman::Solver* new_solver = new LinearBoltzman::Solver;
 
   chi_physics_handler.solver_stack.push_back(new_solver);
 

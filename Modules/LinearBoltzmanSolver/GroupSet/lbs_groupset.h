@@ -6,15 +6,20 @@
 
 #include <ChiMath/Quadratures/LegendrePoly/legendrepoly.h>
 #include <ChiMath/Quadratures/product_quadrature.h>
-#include <ChiMesh/SweepUtilities/chi_angleaggregation.h>
+#include <ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h>
 
 #include <ChiPhysics/chi_physics_namespace.h>
 
-typedef chi_mesh::SweepManagement::AngleAggregation AngleAgg;
+namespace LinearBoltzman
+{
+  enum class AngleAggregationType
+  {
+    SINGLE = 1,
+    POLAR = 2
+  };
+}
 
-#define NPT_ANGAGG_SINGLE 1
-#define NPT_ANGAGG_POLAR 2
-
+typedef chi_mesh::sweep_management::AngleAggregation AngleAgg;
 typedef std::pair<int,int> GsSubSet;
 typedef std::pair<int,int> AngSubSet;
 
@@ -25,13 +30,11 @@ typedef std::pair<int,int> AngSubSet;
 class LBSGroupset
 {
 public:
-  std::vector<LBSGroup*>                      groups;
-  chi_math::ProductQuadrature*                      quadrature;
-  int                                          iterative_method;
-  int                                          angleagg_method;
+  std::vector<LBSGroup*>                       groups;
+  chi_math::ProductQuadrature*                 quadrature;
   std::vector<std::vector<double>>             d2m_op;
   std::vector<std::vector<double>>             m2d_op;
-  chi_mesh::SweepManagement::AngleAggregation* angle_agg;
+  chi_mesh::sweep_management::AngleAggregation* angle_agg;
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
   std::vector<GsSubSet>                        grp_subsets;
@@ -41,6 +44,8 @@ public:
   std::vector<AngSubSet>                       ang_subsets_bot;
   std::vector<int>                             ang_subset_sizes_bot;
 
+  int                                          iterative_method;
+  LinearBoltzman::AngleAggregationType         angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;
   int                                          gmres_restart_intvl;
@@ -55,40 +60,16 @@ public:
   std::string                                  wgdsa_string;
   std::string                                  tgdsa_string;
 
+  bool                                         allow_cycles;
 
   chi_physics::Solver*                         wgdsa_solver;
   chi_physics::Solver*                         tgdsa_solver;
   std::vector<int>                             wgdsa_cell_dof_array_address;
 
-
-  LBSGroupset()
-  {
-    quadrature = nullptr;
-    iterative_method = NPT_GMRES;
-    angleagg_method  = NPT_ANGAGG_POLAR;
-    angle_agg = new AngleAgg;
-    master_num_grp_subsets = 1;
-    master_num_ang_subsets = 1;
-    residual_tolerance = 1.0e-6;
-    max_iterations = 1000;
-    gmres_restart_intvl = 30;
-    apply_wgdsa = false;
-    apply_tgdsa = false;
-
-    wgdsa_solver = nullptr;
-    tgdsa_solver = nullptr;
-
-    wgdsa_max_iters = 30;
-    tgdsa_max_iters = 30;
-
-    wgdsa_tol = 1.0e-4;
-    tgdsa_tol = 1.0e-4;
-
-    wgdsa_verbose = false;
-    tgdsa_verbose = false;
-  }
+  double                                       latest_convergence_metric;
 
   //npt_groupset.cc
+       LBSGroupset();
   void BuildDiscMomOperator(int scatt_order);
   void BuildMomDiscOperator(int scatt_order);
   void BuildSubsets();

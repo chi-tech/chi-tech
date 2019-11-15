@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Constructor for NPT*/
-LinearBoltzmanSolver::LinearBoltzmanSolver()
+LinearBoltzman::Solver::Solver()
 {
   //============================================= Default options
   options.scattering_order  = 1;
@@ -14,5 +14,6 @@ LinearBoltzmanSolver::LinearBoltzmanSolver()
 
   discretization = nullptr;
 
-  boundary_types.resize(6,std::pair<int,int>(VACUUM,-1));
+  boundary_types.resize(6,
+    std::pair<BoundaryType,int>(LinearBoltzman::BoundaryType::VACUUM,-1));
 }

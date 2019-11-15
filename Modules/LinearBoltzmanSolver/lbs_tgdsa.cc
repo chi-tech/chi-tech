@@ -15,7 +15,7 @@ extern ChiPhysics chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void LinearBoltzmanSolver::InitTGDSA(LBSGroupset *groupset)
+void LinearBoltzman::Solver::InitTGDSA(LBSGroupset *groupset)
 {
   if (groupset->apply_tgdsa)
   {
@@ -101,7 +101,7 @@ void LinearBoltzmanSolver::InitTGDSA(LBSGroupset *groupset)
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzman::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                                   double *ref_phi_old,
                                                   double *ref_phi_new)
 {
@@ -121,8 +121,8 @@ void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
@@ -161,8 +161,8 @@ void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
@@ -201,8 +201,8 @@ void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
@@ -243,7 +243,7 @@ void LinearBoltzmanSolver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
 
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void LinearBoltzmanSolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzman::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                                      double *ref_phi_new)
 {
   int gsi = groupset->groups[0]->id;
@@ -263,8 +263,8 @@ void LinearBoltzmanSolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       chi_mesh::CellSlab* slab_cell =
         (chi_mesh::CellSlab*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
@@ -288,8 +288,8 @@ void LinearBoltzmanSolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       chi_mesh::CellPolygon* poly_cell =
         (chi_mesh::CellPolygon*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
@@ -313,8 +313,8 @@ void LinearBoltzmanSolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       chi_mesh::CellPolyhedron* polyh_cell =
         (chi_mesh::CellPolyhedron*)cell;
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)cell_transport_views[c];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)cell_transport_views[c];
 
       int xs_id = matid_to_xs_map[cell->material_id];
       std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;

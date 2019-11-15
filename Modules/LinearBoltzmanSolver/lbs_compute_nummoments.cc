@@ -12,7 +12,7 @@ extern ChiLog chi_log;
 
 //###################################################################
 /** Computes the number of moments for the given mesher types*/
-void LinearBoltzmanSolver::ComputeNumberOfMoments()
+void LinearBoltzman::Solver::ComputeNumberOfMoments()
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;

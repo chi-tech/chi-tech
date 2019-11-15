@@ -33,6 +33,7 @@ CHI_RESOURCES/Dependencies/\.DS_Store
 CHI_RESOURCES/\.DS_Store
 
 \.DS_Store
+._.DS_Store
 *.pyc
 *.pmesh
 

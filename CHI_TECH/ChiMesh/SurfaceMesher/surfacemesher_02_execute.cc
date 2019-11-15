@@ -5,6 +5,7 @@
 #include<iostream>
 
 #include <chi_log.h>
+extern ChiLog chi_log;
 
 //###################################################################
 /**Virtual execute function. Meant to be overwritten.*/

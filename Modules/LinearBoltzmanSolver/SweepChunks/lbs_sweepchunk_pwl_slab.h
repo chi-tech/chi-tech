@@ -3,7 +3,7 @@
 
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
-#include <ChiMesh/SweepUtilities/chi_sweep.h>
+#include <ChiMesh/SweepUtilities/sweep_namespace.h>
 #include <spatial_discretization.h>
 #include <PiecewiseLinear/pwl.h>
 #include <PiecewiseLinear/CellViews/pwl_slab.h>
@@ -16,8 +16,8 @@
 #include "../GroupSet/lbs_groupset.h"
 #include <ChiMath/Quadratures/product_quadrature.h>
 
-#include <ChiMesh/SweepUtilities/chi_SPDS.h>
-#include <ChiMesh/SweepUtilities/chi_angleaggregation.h>
+#include <ChiMesh/SweepUtilities/SPDS/SPDS.h>
+#include <ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h>
 
 #include <ChiTimer/chi_timer.h>
 
@@ -32,12 +32,12 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 
 //###################################################################
 /**Sweep chunk to compute the fixed source.*/
-class LBSSweepChunkPWLSlab : public chi_mesh::SweepManagement::SweepChunk
+class LBSSweepChunkPWLSlab : public chi_mesh::sweep_management::SweepChunk
 {
 private:
   chi_mesh::MeshContinuum*    grid_view;
   SpatialDiscretization_PWL*     grid_fe_view;
-  std::vector<LBSCellViewBase*>* grid_transport_view;
+  std::vector<LinearBoltzman::CellViewBase*>* grid_transport_view;
 //std::vector<double>*        x;                   BASE CLASS
   std::vector<double>*        q_moments;
   LBSGroupset*               groupset;
@@ -73,7 +73,7 @@ public:
   //################################################## Constructor
   LBSSweepChunkPWLSlab(chi_mesh::MeshContinuum* vol_continuum,
                              SpatialDiscretization_PWL* discretization,
-                             std::vector<LBSCellViewBase*>* cell_transport_views,
+                             std::vector<LinearBoltzman::CellViewBase*>* cell_transport_views,
                              std::vector<double>* destination_phi,
                              std::vector<double>* source_moments,
                              LBSGroupset* in_groupset,
@@ -107,7 +107,7 @@ public:
 
 
   //############################################################ Actual chunk
-  void Sweep(chi_mesh::SweepManagement::AngleSet* angle_set)
+  void Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   {
     int outface_master_counter=0;
 
@@ -121,8 +121,8 @@ public:
       a_and_b_initialized = true;
     }
 
-    chi_mesh::SweepManagement::SPDS* spds = angle_set->GetSPDS();
-    chi_mesh::SweepManagement::FLUDS* fluds = angle_set->fluds;
+    chi_mesh::sweep_management::SPDS* spds = angle_set->GetSPDS();
+    chi_mesh::sweep_management::FLUDS* fluds = angle_set->fluds;
 
     GsSubSet& subset = groupset->grp_subsets[angle_set->ref_subset];
     int gs_ss_size  = groupset->grp_subset_sizes[angle_set->ref_subset];
@@ -154,8 +154,8 @@ public:
         (chi_mesh::CellSlab*)cell;
       SlabFEView* cell_fe_view =
         (SlabFEView*)grid_fe_view->MapFeView(cell_g_index);
-      LBSCellViewFull* transport_view =
-        (LBSCellViewFull*)(*grid_transport_view)[slab_cell->cell_local_id];
+      LinearBoltzman::CellViewFull* transport_view =
+        (LinearBoltzman::CellViewFull*)(*grid_transport_view)[slab_cell->cell_local_id];
 
       int     cell_dofs    = cell_fe_view->dofs;
       int     xs_id        = transport_view->xs_id;

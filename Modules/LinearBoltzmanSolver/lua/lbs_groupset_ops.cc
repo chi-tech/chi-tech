@@ -73,13 +73,13 @@ int chiLBSCreateGroupset(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -125,13 +125,13 @@ int chiLBSCreateGroup(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -201,13 +201,13 @@ int chiLBSGroupsetAddGroups(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -307,13 +307,13 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -368,6 +368,106 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
 }
 
 //###################################################################
+/**Sets the the type of angle aggregation to use for this groupset.
+\param SolverIndex int Handle to the solver for which the group
+is to be created.
+
+\param GroupsetIndex int Index to the groupset to which this function should
+                         apply
+\param AggregationType int See AggregationType.
+
+##_
+
+###AggregationType
+LBSGroupset.ANGLE_AGG_POLAR\n
+ Use Polar angle aggregation. This is the default.\n\n
+
+LBSGroupset.ANGLE_AGG_SINGLE\n
+ Use Single angle aggregation.\n\n
+
+Example:
+\code
+chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_POLAR)
+\endcode
+
+\ingroup LuaLBSGroupsets
+*/
+int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
+{
+  //============================================= Get arguments
+  int num_args = lua_gettop(L);
+  if (num_args != 3)
+    LuaPostArgAmountError("chiLBSGroupsetSetAngleAggregationType",3,num_args);
+
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,3);
+  int solver_index = lua_tonumber(L,1);
+  int grpset_index = lua_tonumber(L,2);
+  int agg_type = lua_tonumber(L,3);
+
+  //============================================= Get pointer to solver
+  chi_physics::Solver* psolver;
+  LinearBoltzman::Solver* solver;
+  try{
+    psolver = chi_physics_handler.solver_stack.at(solver_index);
+
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
+    {
+      solver = (LinearBoltzman::Solver*)(psolver);
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Incorrect solver-type "
+        << "in call to chiLBSGroupsetSetAngleAggregationType";
+      exit(EXIT_FAILURE);
+    }
+  }
+  catch(const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid handle to solver "
+      << "in call to chiLBSGroupsetSetAngleAggregationType";
+    exit(EXIT_FAILURE);
+  }
+
+  //============================================= Obtain pointer to groupset
+  LBSGroupset* groupset;
+  try{
+    groupset = solver->group_sets.at(grpset_index);
+  }
+  catch (const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid handle to groupset "
+      << "in call to chiLBSGroupsetSetAngleAggregationType";
+    exit(EXIT_FAILURE);
+  }
+
+  //============================================= Setting aggregation type
+  if      (agg_type == (int)LinearBoltzman::AngleAggregationType::SINGLE)
+    groupset->angleagg_method = LinearBoltzman::AngleAggregationType::SINGLE;
+  else if (agg_type == (int)LinearBoltzman::AngleAggregationType::POLAR)
+    groupset->angleagg_method = LinearBoltzman::AngleAggregationType::POLAR;
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid aggregation type to groupset " << grpset_index
+      << " in call to chiLBSGroupsetSetAngleAggregationType";
+    exit(EXIT_FAILURE);
+  }
+
+  chi_log.Log(LOG_0)
+    << "Groupset " << grpset_index
+    << " Angle aggregation set to "
+    << agg_type;
+
+
+  return 0;
+}
+
+//###################################################################
 /**Sets the angle aggregation divisions
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
@@ -409,13 +509,13 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -497,13 +597,13 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -566,8 +666,15 @@ is to be created.
 NPT_CLASSICRICHARDSON\n
 Standard source iteration.\n\n
 
+NPT_CLASSICRICHARDSON_CYCLES\n
+Standard source iteration with cyclic dependency convergence.\n\n
+
 NPT_GMRES\n
 Generalized Minimal Residual formulation for iterations.\n\n
+
+NPT_GMRES_CYCLES\n
+Generalized Minimal Residual formulation for iterations with cyclic dependency
+convergence.\n\n
 
 Example:
 \code
@@ -593,13 +700,13 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -634,8 +741,18 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   {
     groupset->iterative_method = NPT_CLASSICRICHARDSON;
   }
+  else if (iter_method == NPT_CLASSICRICHARDSON_CYCLES)
+  {
+    groupset->allow_cycles = true;
+    groupset->iterative_method = NPT_CLASSICRICHARDSON;
+  }
   else if (iter_method == NPT_GMRES)
   {
+    groupset->iterative_method = NPT_GMRES;
+  }
+  else if (iter_method == NPT_GMRES_CYCLES)
+  {
+    groupset->allow_cycles = true;
     groupset->iterative_method = NPT_GMRES;
   }
   else
@@ -687,13 +804,13 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -778,13 +895,13 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -866,13 +983,13 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -978,13 +1095,13 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {
@@ -1088,13 +1205,13 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {

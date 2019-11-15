@@ -11,6 +11,10 @@ extern ChiPhysics chi_physics_handler;
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //###################################################################
 /***/
 void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
