@@ -160,7 +160,6 @@ add_subdirectory("${CHI_TECH_DIR}/ChiMesh")
 add_subdirectory("${CHI_TECH_DIR}/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/ChiLog")
 
-add_subdirectory("${CHI_TECH_MOD}/MonteCarlon")
 add_subdirectory("${CHI_TECH_MOD}/DiffusionSolver")
 add_subdirectory("${CHI_TECH_MOD}/LinearBoltzmanSolver")
 
