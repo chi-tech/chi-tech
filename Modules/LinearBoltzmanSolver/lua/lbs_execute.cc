@@ -15,13 +15,13 @@ int chiLBSExecute(lua_State *L)
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmanSolver* solver;
+  LinearBoltzman::Solver* solver;
   try{
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    if (typeid(*psolver) == typeid(LinearBoltzmanSolver))
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
     {
-      solver = (LinearBoltzmanSolver*)(psolver);
+      solver = (LinearBoltzman::Solver*)(psolver);
     }
     else
     {

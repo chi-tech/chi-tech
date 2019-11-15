@@ -9,11 +9,11 @@
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
-typedef chi_mesh::SweepManagement::SweepChunk SweepChunk;
+typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 //###################################################################
 /**Sets up the sweek chunk for the given discretization method.*/
-SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
+SweepChunk* LinearBoltzman::Solver::SetSweepChunk(int group_set_num)
 {
   //================================================== Obtain groupset
   LBSGroupset* groupset = group_sets[group_set_num];
@@ -67,7 +67,7 @@ SweepChunk* LinearBoltzmanSolver::SetSweepChunk(int group_set_num)
   else
   {
     chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzmanSolver::SetSweepChunk, failed. Could not establish "
+      << "LinearBoltzman::Solver::SetSweepChunk, failed. Could not establish "
       << "which sweep chunk to use.";
     exit(EXIT_FAILURE);
   }

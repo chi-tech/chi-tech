@@ -6,6 +6,10 @@
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 #include "../Boundaries/chi_diffusion_bndry_robin.h"
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
 void chi_diffusion::Solver::CFEM_Ab_Slab(int cell_glob_index,

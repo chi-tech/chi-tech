@@ -19,18 +19,16 @@ extern ChiConsole chi_console;
 
 //###################################################################
 /** Initialize the solver.*/
-void LinearBoltzmanSolver::Initialize()
+void LinearBoltzman::Solver::Initialize()
 {
   //============================================= Input checks
   if (discretization == nullptr)
   {
     chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzmanSolver: No discretization method set.";
+      << "LinearBoltzman::Solver: No discretization method set.";
     exit(EXIT_FAILURE);
   }
 
-//  int L = options.scattering_order;
-//  this->num_moments = L*(L+2) + 1;
   ComputeNumberOfMoments();
 
   if (chi_mpi.location_id == 0)
@@ -44,8 +42,6 @@ void LinearBoltzmanSolver::Initialize()
                        << group_sets.size() << std::endl;
     chi_log.Log(LOG_0) << "Number of Moments   : "
                        << num_moments << std::endl;
-
-
 
     //================================================== Output Groupsets
     for (int gs=0; gs<group_sets.size(); gs++)
@@ -113,19 +109,16 @@ void LinearBoltzmanSolver::Initialize()
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
-  //================================================== Determine partitioning
-  //SetPartitioning();
-
-
   //================================================== Compute cell matrices
   chi_log.Log(LOG_0) << "Computing cell matrices.\n";
   chi_mesh::Region*  aregion = this->regions.back();
   this->grid                 = aregion->volume_mesh_continua.back();
 
-
-  discretization->AddViewOfLocalContinuum(grid,
-                                          grid->local_cell_glob_indices.size(),
-                                          grid->local_cell_glob_indices.data());
+  discretization->AddViewOfLocalContinuum(
+    grid,
+    grid->local_cell_glob_indices.size(),
+    grid->local_cell_glob_indices.data());
+  auto pwl_discretization = (SpatialDiscretization_PWL*)discretization;
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
@@ -133,11 +126,8 @@ void LinearBoltzmanSolver::Initialize()
     << std::setprecision(3)
     << chi_console.GetMemoryUsageInMB() << " MB";
 
-
-  //================================================== Add transport views
-  SpatialDiscretization_PWL* pwl_discretization =
-    (SpatialDiscretization_PWL*)discretization;
-
+  //================================================== Add transport views and
+  //                                                   unique material ids
   std::set<int> unique_material_ids;
   int invalid_mat_cell_count = 0;
   for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
@@ -158,8 +148,8 @@ void LinearBoltzmanSolver::Initialize()
     //here is that it holds the means to know where a given cell's
     //transport quantities are located in the unknown vectors (i.e. phi)
     CellFEView* cell_fe_view = pwl_discretization->MapFeView(cell_g_index);
-    LBSCellViewFull* full_cell_view =
-      new LBSCellViewFull(cell_fe_view->dofs, groups.size(), num_moments);
+    LinearBoltzman::CellViewFull* full_cell_view =
+      new LinearBoltzman::CellViewFull(cell_fe_view->dofs, groups.size(), num_moments);
     cell_transport_views.push_back(full_cell_view);
 
     //For PWLD, for a given cell, within a given sweep chunk,
@@ -177,11 +167,8 @@ void LinearBoltzmanSolver::Initialize()
       << "Number of invalid material cells: " << invalid_mat_cell_count;
   }
 
-
-
   //================================================== Initialize materials
   InitMaterials(unique_material_ids);
-
 
   //================================================== Initialize parrays
   MPI_Barrier(MPI_COMM_WORLD);
@@ -189,7 +176,6 @@ void LinearBoltzmanSolver::Initialize()
     << "Initializing parallel arrays. " << std::endl;
 
   InitializeParrays();
-
 
   chi_log.Log(LOG_0)
     << "Done with parallel arrays.                Process memory = "

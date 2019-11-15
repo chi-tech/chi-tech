@@ -12,8 +12,8 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
-typedef chi_mesh::SweepManagement::AngleSet TAngleSet;
-typedef chi_mesh::SweepManagement::AngleSetGroup TAngleSetGroup;
+typedef chi_mesh::sweep_management::AngleSet TAngleSet;
+typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 #include <iomanip>
 #include "ChiConsole/chi_console.h"
@@ -22,7 +22,7 @@ extern ChiConsole chi_console;
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/
-void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
+void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 {
   chi_log.Log(LOG_0) << "Computing Sweep ordering.\n";
 
@@ -48,20 +48,22 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
       exit(EXIT_FAILURE);
     }
 
-    chi_mesh::SweepManagement::SPDS* new_swp_order =
-      chi_mesh::SweepManagement::
+    chi_mesh::sweep_management::SPDS* new_swp_order =
+      chi_mesh::sweep_management::
       CreateSweepOrder(groupset->quadrature->polar_ang[0],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size());
+                       groupset->groups.size(),
+                       groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
 
     new_swp_order =
-      chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::
       CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size());
+                       groupset->groups.size(),
+                       groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D MESHES
@@ -80,12 +82,13 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
 
     for (int i=0; i<num_azi; i++)
     {
-      chi_mesh::SweepManagement::SPDS* new_swp_order =
-        chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
         CreateSweepOrder(groupset->quadrature->polar_ang[0],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
-                         groupset->groups.size());
+                         groupset->groups.size(),
+                         groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
   }
@@ -117,24 +120,26 @@ void LinearBoltzmanSolver::ComputeSweepOrderings(LBSGroupset *groupset)
     //=========================================== TOP HEMISPHERE
     for (int i=0; i<num_azi; i++)
     {
-      chi_mesh::SweepManagement::SPDS* new_swp_order =
-        chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
                   CreateSweepOrder(groupset->quadrature->polar_ang[0],
                                    groupset->quadrature->azimu_ang[i],
                                    this->grid,
-                                   groupset->groups.size());
+                                   groupset->groups.size(),
+                                   groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
     //=========================================== BOTTOM HEMISPHERE
     int pa = num_pol/2;
     for (int i=0; i<num_azi; i++)
     {
-      chi_mesh::SweepManagement::SPDS* new_swp_order =
-        chi_mesh::SweepManagement::
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
         CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
-                         groupset->groups.size());
+                         groupset->groups.size(),
+                         groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
 

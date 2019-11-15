@@ -5,6 +5,43 @@
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
+//##############################################
+/**Groupset constructor.*/
+LBSGroupset::LBSGroupset()
+{
+  quadrature = nullptr;
+  iterative_method = NPT_GMRES;
+  angleagg_method  = LinearBoltzman::AngleAggregationType::POLAR;
+  angle_agg = new AngleAgg;
+  master_num_grp_subsets = 1;
+  master_num_ang_subsets = 1;
+  residual_tolerance = 1.0e-6;
+  max_iterations = 200;
+  gmres_restart_intvl = 30;
+  apply_wgdsa = false;
+  apply_tgdsa = false;
+
+  wgdsa_solver = nullptr;
+  tgdsa_solver = nullptr;
+
+  wgdsa_max_iters = 30;
+  tgdsa_max_iters = 30;
+
+  wgdsa_tol = 1.0e-4;
+  tgdsa_tol = 1.0e-4;
+
+  wgdsa_verbose = false;
+  tgdsa_verbose = false;
+
+  allow_cycles = false;
+
+  latest_convergence_metric = 1.0;
+}
+
 //###################################################################
 /**Computes the discrete to moment operator.*/
 void LBSGroupset::BuildDiscMomOperator(int scatt_order)
@@ -264,9 +301,10 @@ void LBSGroupset::BuildSubsets()
     ang_subsets_top.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
     ang_subset_sizes_top.push_back(subset_size);
 
-    chi_log.Log(LOG_0)
-      << "Top-hemi Angle subset " << ss << " "
-      << subset_ranki << "->" << subset_ranki+subset_size-1;
+    if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
+      chi_log.Log(LOG_0)
+        << "Top-hemi Angle subset " << ss << " "
+        << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
 
   //==================== Bottom hemisphere
@@ -281,8 +319,9 @@ void LBSGroupset::BuildSubsets()
     ang_subsets_bot.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
     ang_subset_sizes_bot.push_back(subset_size);
 
-    chi_log.Log(LOG_0)
-      << "Bot-hemi Angle subset " << ss << " "
-      << subset_ranki << "->" << subset_ranki+subset_size-1;
+    if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
+      chi_log.Log(LOG_0)
+        << "Bot-hemi Angle subset " << ss << " "
+        << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
 }

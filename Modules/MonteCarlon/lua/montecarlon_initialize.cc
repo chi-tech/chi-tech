@@ -8,6 +8,8 @@ extern ChiPhysics chi_physics_handler;
 
 #include <chi_log.h>
 
+extern ChiLog chi_log;
+
 //#############################################################################
 /** Creates a MonteCarlon solver.
 

@@ -14,7 +14,7 @@ extern ChiMPI chi_mpi;
 
 //###################################################################
 /**Initializes default materials and physics materials.*/
-void LinearBoltzmanSolver::InitMaterials(std::set<int>& material_ids)
+void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "Initializing Materials";

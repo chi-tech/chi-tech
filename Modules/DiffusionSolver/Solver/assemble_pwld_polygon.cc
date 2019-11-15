@@ -6,6 +6,10 @@
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 #include "../Boundaries/chi_diffusion_bndry_robin.h"
 
+#include <chi_log.h>
+
+extern ChiLog chi_log;
+
 //###################################################################
 /**Assembles A and b PWLD for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Ab_Polygon(int cell_glob_index,

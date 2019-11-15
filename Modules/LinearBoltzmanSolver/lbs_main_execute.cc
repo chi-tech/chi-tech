@@ -11,7 +11,7 @@ extern ChiConsole chi_console;
 
 //###################################################################
 /**Execute the solver.*/
-void LinearBoltzmanSolver::Execute()
+void LinearBoltzman::Solver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
   for (int gs=0; gs<group_sets.size(); gs++)
@@ -44,7 +44,7 @@ void LinearBoltzmanSolver::Execute()
 
 //###################################################################
 /**Solves a single groupset.*/
-void LinearBoltzmanSolver::SolveGroupset(int group_set_num)
+void LinearBoltzman::Solver::SolveGroupset(int group_set_num)
 {
   LBSGroupset* group_set = group_sets[group_set_num];
   if (group_set->iterative_method == NPT_CLASSICRICHARDSON)
@@ -55,6 +55,7 @@ void LinearBoltzmanSolver::SolveGroupset(int group_set_num)
   {
     GMRES(group_set_num);
   }
+
 
   chi_log.Log(LOG_0)
     << "Groupset solve complete.                  Process memory = "
