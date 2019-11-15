@@ -3,9 +3,6 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
 #include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <chi_log.h>
 
@@ -54,28 +51,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     auto cell         = grid->cells[cell_g_index];
     local_so_cell_mapping[cell->cell_local_id] = csoi; //Set mapping
 
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = static_cast<TSlab*>(cell);
-      SlotDynamics(slab_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if slab
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = static_cast<TPolygon*>(cell);
-      SlotDynamics(poly_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if polygon
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = static_cast<TPolyhedron*>(cell);
-      SlotDynamics(polyh_cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
-    }//if polyhedron
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "InitializeAlphaElements: Unsupported cell type during "
-           "first pass of function.";
-      exit(EXIT_FAILURE);
-    }
+    SlotDynamics(cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
 
   }//for csoi
 
@@ -93,24 +69,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     int  cell_g_index = spls->item_id[csoi];
     auto cell         = grid->cells[cell_g_index];
 
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = static_cast<TSlab*>(cell);
-      LocalIncidentMapping(slab_cell, spds, local_so_cell_mapping);
-    }//if slab
-    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = static_cast<TPolygon*>(cell);
-      LocalIncidentMapping(poly_cell, spds, local_so_cell_mapping);
-    }//if polygon
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = static_cast<TPolyhedron*>(cell);
-      LocalIncidentMapping(polyh_cell, spds, local_so_cell_mapping);
-    }//if polyhedron
+    LocalIncidentMapping(cell, spds, local_so_cell_mapping);
 
   }//for csoi
 
@@ -242,6 +201,41 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
     new_cell_view.first = cell_g_index;
     new_cell_view.second.
       emplace_back(face_slot,poly_face->v_indices);
+
+    deplocI_cell_views[deplocI].push_back(new_cell_view);
+  }
+
+
+}
+
+//###################################################################
+/**Given a sweep ordering index, the outgoing face counter,
+ * the outgoing face dof, this function computes the location
+ * of this position's upwind psi in the local upwind psi vector.*/
+void  chi_mesh::sweep_management::FLUDS::
+AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
+                     chi_mesh::CellFace& face)
+{
+  //======================================== Check if cell is already there
+  bool cell_already_there = false;
+  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
+  {
+    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
+    {
+      cell_already_there = true;
+      deplocI_cell_views[deplocI][c].second.
+        emplace_back(face_slot, face.vertex_ids);
+      break;
+    }
+  }
+
+  //======================================== If the cell is not there yet
+  if (!cell_already_there)
+  {
+    CompactCellView new_cell_view;
+    new_cell_view.first = cell_g_index;
+    new_cell_view.second.
+      emplace_back(face_slot, face.vertex_ids);
 
     deplocI_cell_views[deplocI].push_back(new_cell_view);
   }

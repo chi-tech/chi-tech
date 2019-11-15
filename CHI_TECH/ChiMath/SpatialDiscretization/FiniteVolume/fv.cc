@@ -7,6 +7,7 @@
 
 #include "CellViews/fv_slab.h"
 #include "CellViews/fv_polygon.h"
+#include "CellViews/fv_polyhedron.h"
 
 #include <chi_log.h>
 
@@ -53,50 +54,37 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 
     if (cell_fv_views_mapping[cell_index]<0)
     {
-      //========================================= If slab item_id
+      //######################################### SLAB
       if (cell->Type() == chi_mesh::CellType::SLAB)
       {
-        SlabFVView* view =
-          new SlabFVView((chi_mesh::CellSlab*)cell,vol_continuum);
+        auto view =
+          new SlabFVView((chi_mesh::CellSlabV2*)cell,vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
       }
 
-//      //========================================= If triangle item_id
-//      if (typeid(*(cell)) == typeid(chi_mesh::CellTriangle) )
-//      {
-//        TriangleFEView* view =
-//          new TriangleFEView((chi_mesh::CellTriangle*)(cell),vol_continuum);
-//
-//        this->cell_fe_views.push_back(view);
-//        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-//      }
-
-      //========================================= If polygon item_id
+      //######################################### POLYGON
       if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
-        PolygonFVView* view =
-          new PolygonFVView((chi_mesh::CellPolygon*)(cell),vol_continuum);
+        auto view =
+          new PolygonFVView((chi_mesh::CellPolygonV2*)(cell),vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
       }
 
-//      //========================================= If polyhedron item_id
-//      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-//      {
-//        PolyhedronFEView* view =
-//          new PolyhedronFEView(
-//            (chi_mesh::CellPolyhedron*)(cell),
-//            vol_continuum,
-//            this);
-//
-//        view->PreCompute();
-//        view->CleanUp();
-//        this->cell_fe_views.push_back(view);
-//        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
-//      }
+      //######################################### POLYHEDRON
+      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      {
+        auto view =
+          new PolyhedronFVView(
+            (chi_mesh::CellPolyhedronV2*)(cell),
+            vol_continuum);
+
+        this->cell_fv_views.push_back(view);
+        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+      }
     }//if mapping not yet assigned
   }//for num cells
 

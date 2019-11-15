@@ -22,7 +22,7 @@ struct chi_mesh::Vector
     x=a; y=b; z=c;
   }
 
-  Vector operator+(const Vector& that)
+  Vector operator+(const Vector& that) const
   {
     Vector newVector;
     newVector.x = this->x + that.x;
@@ -32,7 +32,7 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector operator-(const Vector& that)
+  Vector operator-(const Vector& that) const
   {
     Vector newVector;
     newVector.x = this->x - that.x;
@@ -51,7 +51,7 @@ struct chi_mesh::Vector
     return *this;
   }
 
-  Vector operator*(double value)
+  Vector operator*(double value) const
   {
     Vector newVector;
     newVector.x = this->x*value;
@@ -61,7 +61,7 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector operator/(double value)
+  Vector operator/(double value) const
   {
     Vector newVector;
     newVector.x = this->x/value;
@@ -71,7 +71,7 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector Cross(const Vector& that)
+  Vector Cross(const Vector& that) const
   {
     Vector newVector;
     newVector.x = this->y*that.z - this->z*that.y;
@@ -81,7 +81,7 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  double Dot(const Vector& that)
+  double Dot(const Vector& that) const
   {
     double value = 0.0;
     value += this->x*that.x;
@@ -127,7 +127,7 @@ struct chi_mesh::Vector
     return out;
   }
 
-  std::string PrintS()
+  std::string PrintS() const
   {
     std::stringstream out;
     out << "[" << x << " " << y << " " << z << "]";

@@ -56,10 +56,8 @@ public:
   std::vector<int>                     reverse_node_ordering;
 public:
   //01 Utils
-  void                CreateTriangleCells(chi_mesh::SurfaceMesh* surface_mesh,
-                           chi_mesh::MeshContinuum* vol_continuum);
   void                CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
-                          chi_mesh::MeshContinuum* vol_continuum);
+                                         chi_mesh::MeshContinuum* vol_continuum);
   std::pair<int,int>  GetCellXYPartitionID(chi_mesh::Cell *cell);
   std::tuple<int,int,int>
                       GetCellXYZPartitionID(chi_mesh::Cell *cell);
@@ -70,18 +68,7 @@ public:
   virtual void Execute();
   int          MapNode(int iref);
   int          ReverseMapNode(int i);
-
-  //03
-  void         ReOrderDOF(chi_mesh::MeshContinuum* vol_continuum);
-  void         ReOrderDOF_CuthillMckee(chi_mesh::MeshContinuum* vol_continuum);
-  bool         IsInList(std::vector<chi_mesh::NodeIndexMap*>* list, int index);
-
-  int          MapLevel(std::vector<chi_mesh::NodeIndexMap*>* used_list,
-                        std::vector<chi_mesh::NodeIndexMap*>* unused_cells,
-                        chi_mesh::MeshContinuum* vol_continuum,
-                        int seeded_index,
-                        int level);
-
+  
 
 };
 

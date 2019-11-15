@@ -3,9 +3,6 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
 #include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <chi_log.h>
 #include <chi_mpi.h>
@@ -167,25 +164,7 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
     int  cell_g_index = spls->item_id[csoi];
     auto cell         = grid->cells[cell_g_index];
 
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      TSlab* slab_cell = (TSlab*)cell;
-      NonLocalIncidentMapping(slab_cell, spds);
-    }//if slab
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      TPolygon* poly_cell = (TPolygon*)cell;
-      NonLocalIncidentMapping(poly_cell, spds);
-    }//if polyhedron
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      TPolyhedron* polyh_cell = (TPolyhedron*)cell;
-      NonLocalIncidentMapping(polyh_cell, spds);
-    }//if polyhedron
-
+    NonLocalIncidentMapping(cell, spds);
   }//for csoi
 
   //================================================== Clear unneccesary data

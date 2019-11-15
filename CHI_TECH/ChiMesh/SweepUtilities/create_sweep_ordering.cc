@@ -2,14 +2,6 @@
 #include "sweep_namespace.h"
 
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../Cell/cell_slab.h"
-#include "../Cell/cell_polyhedron.h"
-#include "../Cell/cell_polygon.h"
-
-#include "../MeshContinuum/chi_meshcontinuum.h"
-#include "../VolumeMesher/chi_volumemesher.h"
-
-#include "../../ChiGraph/chi_graph.h"
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
@@ -293,7 +285,7 @@ CreateSweepOrder(double polar, double azimuthal,
     int location_index = glob_index_map[*ii];
     glob_linear_sweep_order.push_back(location_index);
   }
-  if (glob_linear_sweep_order.size() == 0)
+  if (glob_linear_sweep_order.empty())
   {
     chi_log.Log(LOG_0ERROR) << "Empty linear sweep ordering.";
     exit(EXIT_FAILURE);
@@ -320,7 +312,7 @@ CreateSweepOrder(double polar, double azimuthal,
   {
     chi_log.Log(LOG_0VERBOSE_1) << k;
     int loc = glob_linear_sweep_order[k];
-    if (global_dependencies[loc].size() == 0)
+    if (global_dependencies[loc].empty())
     {
       glob_sweep_order_rank[k] = 0;
     }

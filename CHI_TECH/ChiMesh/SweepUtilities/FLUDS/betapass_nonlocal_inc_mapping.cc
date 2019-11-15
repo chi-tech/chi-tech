@@ -2,8 +2,6 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include "ChiMesh/Cell/cell_polyhedron.h"
-
 #include <chi_log.h>
 
 extern ChiLog     chi_log;
@@ -11,7 +9,7 @@ extern ChiLog     chi_log;
 //###################################################################
 /**Performs non-local incident mapping for polyhedron cells.*/
 void chi_mesh::sweep_management::FLUDS::
-  NonLocalIncidentMapping(TPolyhedron *polyh_cell,
+  NonLocalIncidentMapping(chi_mesh::Cell *cell,
                           chi_mesh::sweep_management::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
@@ -20,15 +18,15 @@ void chi_mesh::sweep_management::FLUDS::
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
   //                                                    only incident faces
-  for (short f=0; f<polyh_cell->faces.size(); f++)
+  for (short f=0; f < cell->faces.size(); f++)
   {
-    TPolyFace* poly_face = polyh_cell->faces[f];
-    double     mu        = poly_face->geometric_normal.Dot(spds->omega);
+    CellFace&  face = cell->faces[f];
+    double     mu   = face.normal.Dot(spds->omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<0.0)
     {
-      int neighbor = poly_face->face_indices[NEIGHBOR];
+      int neighbor = face.neighbor;
 
       if ((!grid->IsCellLocal(neighbor)) && (!grid->IsCellBndry(neighbor)))
       {
@@ -69,10 +67,10 @@ void chi_mesh::sweep_management::FLUDS::
             for (int afv=0; afv<adj_cell_view->second[af].second.size(); afv++)
             {
               bool match_found = false;
-              for (int fv=0; fv<poly_face->v_indices.size(); fv++)
+              for (int fv=0; fv < face.vertex_ids.size(); fv++)
               {
                 if (adj_cell_view->second[af].second[afv] ==
-                    poly_face->v_indices[fv])
+                    face.vertex_ids[fv])
                 {
                   match_found = true;
                   break;
@@ -96,12 +94,12 @@ void chi_mesh::sweep_management::FLUDS::
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<int>* ass_face_verts =
               &adj_cell_view->second[ass_face].second;
-          for (int fv=0; fv<poly_face->v_indices.size(); fv++)
+          for (int fv=0; fv < face.vertex_ids.size(); fv++)
           {
             bool match_found = false;
             for (int afv=0; afv<ass_face_verts->size(); afv++)
             {
-              if (poly_face->v_indices[fv] ==
+              if (face.vertex_ids[fv] ==
                   ass_face_verts->operator[](afv))
               {
                 match_found = true;
@@ -164,10 +162,10 @@ void chi_mesh::sweep_management::FLUDS::
             for (int afv=0; afv<adj_cell_view->second[af].second.size(); afv++)
             {
               bool match_found = false;
-              for (int fv=0; fv<poly_face->v_indices.size(); fv++)
+              for (int fv=0; fv < face.vertex_ids.size(); fv++)
               {
                 if (adj_cell_view->second[af].second[afv] ==
-                    poly_face->v_indices[fv])
+                    face.vertex_ids[fv])
                 {
                   match_found = true;
                   break;
@@ -191,12 +189,12 @@ void chi_mesh::sweep_management::FLUDS::
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<int>* ass_face_verts =
               &adj_cell_view->second[ass_face].second;
-          for (int fv=0; fv<poly_face->v_indices.size(); fv++)
+          for (int fv=0; fv < face.vertex_ids.size(); fv++)
           {
             bool match_found = false;
             for (int afv=0; afv<ass_face_verts->size(); afv++)
             {
-              if (poly_face->v_indices[fv] ==
+              if (face.vertex_ids[fv] ==
                   ass_face_verts->operator[](afv))
               {
                 match_found = true;

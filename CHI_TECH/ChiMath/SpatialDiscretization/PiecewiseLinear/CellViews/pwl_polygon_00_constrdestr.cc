@@ -1,13 +1,15 @@
 #include "pwl_polygon.h"
 
-PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
+//###################################################################
+/** Constructor.*/
+PolygonFEView::PolygonFEView(chi_mesh::CellPolygonV2* poly_cell,
                              chi_mesh::MeshContinuum* vol_continuum,
                              SpatialDiscretization_PWL *discretization) :
-                             CellFEView(poly_cell->v_indices.size())
+  CellFEView(poly_cell->vertex_ids.size())
 {
   precomputed = false;
   grid = vol_continuum;
-  num_of_subtris = poly_cell->edges.size();
+  num_of_subtris = poly_cell->faces.size();
   beta = 1.0/num_of_subtris;
 
   //=========================================== Create the single quad point
@@ -23,10 +25,10 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
   //=========================================== Calculate legs and determinants
   for (int side=0;side<num_of_subtris;side++)
   {
-    int* side_indices = poly_cell->edges[side];
+    chi_mesh::CellFace& face = poly_cell->faces[side];
 
-    chi_mesh::Vertex v0 = *vol_continuum->nodes[side_indices[0]];
-    chi_mesh::Vertex v1 = *vol_continuum->nodes[side_indices[1]];
+    chi_mesh::Vertex v0 = *vol_continuum->nodes[face.vertex_ids[0]];
+    chi_mesh::Vertex v1 = *vol_continuum->nodes[face.vertex_ids[1]];
     chi_mesh::Vertex v2 = vc;
 //
 //    std::cout<< v0.PrintS() << "\n";
@@ -45,8 +47,8 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
     triangle_data->detJ_surf = sidev01.Norm();
     triangle_data->v_index = new int[2];
 
-    triangle_data->v_index[0] = side_indices[0];
-    triangle_data->v_index[1] = side_indices[1];
+    triangle_data->v_index[0] = face.vertex_ids[0];
+    triangle_data->v_index[1] = face.vertex_ids[1];
 
     //Set Jacobian
     triangle_data->J.SetIJ(0,0,sidev01.x);
@@ -75,20 +77,20 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
   }
 
   //=========================================== Compute node to side mapping
-  for (int v=0; v<poly_cell->v_indices.size(); v++)
+  for (int v=0; v<poly_cell->vertex_ids.size(); v++)
   {
-    int vindex = poly_cell->v_indices[v];
+    int vindex = poly_cell->vertex_ids[v];
     int* side_mapping = new int[num_of_subtris];
     for (int side=0;side<num_of_subtris;side++)
     {
       side_mapping[side] = -1;
 
-      int* side_indices = poly_cell->edges[side];
-      if (side_indices[0] == vindex)
+      chi_mesh::CellFace& face = poly_cell->faces[side];
+      if (face.vertex_ids[0] == vindex)
       {
         side_mapping[side] = 0;
       }
-      if (side_indices[1] == vindex)
+      if (face.vertex_ids[1] == vindex)
       {
         side_mapping[side] = 1;
       }
@@ -97,17 +99,17 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
   }
 
   //============================================= Compute edge dof mappings
-  edge_dof_mappings.resize(poly_cell->edges.size());
-  for (int e=0; e<poly_cell->edges.size(); e++)
+  face_dof_mappings.resize(poly_cell->faces.size());
+  for (int e=0; e<poly_cell->faces.size(); e++)
   {
-    edge_dof_mappings[e].resize(2);
+    face_dof_mappings[e].resize(2);
     for (int fv=0; fv<2; fv++)
     {
-      for (int v=0; v<poly_cell->v_indices.size(); v++)
+      for (int v=0; v<poly_cell->vertex_ids.size(); v++)
       {
-        if (poly_cell->edges[e][fv] == poly_cell->v_indices[v])
+        if (poly_cell->faces[e].vertex_ids[fv] == poly_cell->vertex_ids[v])
         {
-          edge_dof_mappings[e][fv] = v;
+          face_dof_mappings[e][fv] = v;
           break;
         }
       }

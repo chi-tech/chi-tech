@@ -22,7 +22,7 @@ public:
 
   chi_mesh::MeshContinuum* grid;
   SpatialDiscretization*      spatial_discretization;
-  Vec                      field_vector;
+  Vec*                     field_vector;
   std::vector<double>*     field_vector_local;
 
   std::vector<int>*        local_cell_dof_array_address;

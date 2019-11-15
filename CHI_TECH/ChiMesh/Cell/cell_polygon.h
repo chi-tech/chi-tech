@@ -1,36 +1,54 @@
-#ifndef _cell_polygon_h
-#define _cell_polygon_h
+#ifndef _chi_mesh_cell_polygon_h
+#define _chi_mesh_cell_polygon_h
 
 #include "cell.h"
-#include"../Region/chi_region.h"
+#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
-#define EDGE_NEIGHBOR 2
-//######################################################### Class def
-/**Object to handle generic polygon cells.
- *
- * edges\n
- An array of 4 integers.\n
- [0] = Vertex index of edge start.\n
- [1] = Vertex index of edge end.\n
- [2] = Index of the cell adjoining this edge (not the current cell).
-       -1 if not connected to anything,-1*boundary_index if connected
-       to a boundary.\n
- [3] = Edge number of adjoining face. -1 if not connected
-       to anything. 0 if a boundary.\n
-   \n*/
-class chi_mesh::CellPolygon : public chi_mesh::Cell
+namespace chi_mesh
 {
-public:
-  std::vector<int>  v_indices;
-  std::vector<int*> edges; ///< Stores arrays of edge indices
-  std::vector<chi_mesh::Vector> edgenormals;
-public:
-  CellPolygon() : Cell(CellType::POLYGON) {}
 
-  //01
+//######################################################### Class def
+/** Polygon cell definition.*/
+class CellPolygonV2 : public Cell
+{
+private:
+  std::vector<chi_mesh::Vector> segment_normals;
+  bool segment_normals_developed = false;
+public:
+  CellPolygonV2() : Cell(CellType::POLYGON) {}
+
+private:
+  void DevelopSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  {
+    segment_normals.reserve(faces.size());
+    for (auto& face : faces) //edges
+    {
+      chi_mesh::Vertex &v0 = *grid->nodes[face.vertex_ids[0]];
+      const chi_mesh::Vertex &vc = centroid;
+
+      chi_mesh::Vector khat(0.0, 0.0, 1.0);
+      auto vc0 = vc - v0;
+      auto n0 = ((vc0) / vc0.Norm()).Cross(khat);
+      n0 = n0 / n0.Norm();
+
+      segment_normals.push_back(n0);
+    }
+    segment_normals_developed = true;
+  }
+public:
+  std::vector<chi_mesh::Vector>& GetSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  {
+    if (!segment_normals_developed)
+      DevelopSegmentNormals(grid);
+
+    return segment_normals;
+  }
+
   void FindBoundary2D(chi_mesh::Region* region);
   //02
   bool CheckBoundary2D();
 };
+
+}
 
 #endif

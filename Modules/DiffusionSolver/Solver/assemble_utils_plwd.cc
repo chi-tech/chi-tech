@@ -13,10 +13,6 @@
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h>
 #include <ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
-#include <boost/mpi.hpp>
-#include <boost/mpi/environment.hpp>
-#include <boost/mpi/communicator.hpp>
-
 #include <chi_log.h>
 #include <chi_mpi.h>
 
@@ -38,8 +34,6 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
   auto region  = handler->region_stack.back();
   auto vol_continuum = region->volume_mesh_continua.back();
 
-  auto mesher = handler->volume_mesher;
-
   //================================================== Get local DOF count
   pwld_local_dof_count=0;
   size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
@@ -48,25 +42,7 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
     int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
     auto cell = vol_continuum->cells[cell_glob_index];
 
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      pwld_local_dof_count += 2;
-    }
-
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-      pwld_local_dof_count += poly_cell->v_indices.size();
-    }
-
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      pwld_local_dof_count += polyh_cell->v_indices.size();
-    }
+    pwld_local_dof_count += cell->vertex_ids.size();
   }
 
   //================================================== Get global DOF count
@@ -143,90 +119,104 @@ int chi_diffusion::Solver::MapBorderCell(int locI, int neighbor, int vglob_i)
 }
 
 
-/**Defined from paper  \n
+/**Still searching for a reference for this.
+ *
+ * For Polygons:
+ * Defined from paper  \n
  * Turcksin B, Ragusa J, "Discontinuous diffusion synthetic acceleration
  * for S_n transport on 2D arbitrary polygonal meshes", Journal of
  * Computational Physics 274, pg 356-369, 2014.\n
  * \n
  * Nv = Number of vertices. If Nv <= 4 then the perimeter parameter
  * should be replaced by edge length.*/
-double chi_diffusion::Solver::HPerpendicularPoly(int Nv, double area, double perimeter)
+double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
+                                             CellFEView* fe_view,
+                                             int f)
 {
-  double hp = 0.0;
+  double hp = 1.0;
 
-  if (Nv == 3)
-    hp = 2*area/perimeter;
-  else if (Nv == 4)
-    hp = area/perimeter;
-  else //Nv > 4
+  int Nf = cell->faces.size();
+  int Nv = cell->vertex_ids.size();
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+  if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    if (Nv%2 == 0)
-      hp = 4*area/perimeter;
-    else
-    {
+    auto slab_fe_view = (SlabFEView*)fe_view;
+    hp = slab_fe_view->h/2.0;
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+  else if (cell->Type() == chi_mesh::CellType::POLYGON)
+  {
+    Nv = 4;
+    chi_mesh::CellFace& face = cell->faces[f];
+
+    int v0i = face.vertex_ids[0];
+    int v1i = face.vertex_ids[1];
+
+    chi_mesh::Vertex& v0 = *grid->nodes[v0i];
+    chi_mesh::Vertex& v1 = *grid->nodes[v1i];
+
+    double perimeter = (v1 - v0).Norm();
+
+    double area  = 0.0;
+    for (int i=0; i<fe_view->dofs; i++)
+      area += fe_view->IntV_shapeI[i];
+
+    if (Nv == 3)
       hp = 2*area/perimeter;
-      hp += sqrt(2*area / Nv*sin(2*M_PI/Nv));
+    else if (Nv == 4)
+      hp = area/perimeter;
+    else //Nv > 4
+    {
+      if (Nv%2 == 0)
+        hp = 4*area/perimeter;
+      else
+      {
+        hp = 2*area/perimeter;
+        hp += sqrt(2*area / Nv*sin(2*M_PI/Nv));
+      }
     }
   }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+  else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+  {
+    double volume  = 0.0;
+    for (int i=0; i<fe_view->dofs; i++)
+      volume += fe_view->IntV_shapeI[i];
+
+    double area = 0.0;
+    for (int fr=0; fr<Nf; fr++)
+      for (int i=0; i<Nv; i++)
+        area += fe_view->IntS_shapeI[i][fr];
+
+    if (Nf == 4)                  //Tet
+      hp = 3*volume/area;
+    else if (Nf == 6 && Nv == 8)  //Hex
+      hp = volume/area;
+    else                          //Polyhedron
+      hp = 6*volume/area;
+  }//Polyhedron
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Unsupported cell type in call to HPerpendicular";
+    exit(EXIT_FAILURE);
+  }
+
 
   return hp;
 }
 
-/**Still searching for a reference for this.*/
-double chi_diffusion::Solver::HPerpendicularPolyH(int Nf, int Nv, double volume, double area)
-{
-  double hp = 0.0;
 
-  if (Nf == 4)                  //Tet
-    hp = 3*volume/area;
-  else if (Nf == 6 && Nv == 8)  //Hex
-    hp = volume/area;
-  else                          //Polyhedron
-    hp = 6*volume/area;
-
-  return hp;
-}
-
-/**Given a global node index, returns the dof its associated on the
- * referenced cell. Slab overload.*/
-int chi_diffusion::Solver::MapCellDof(chi_mesh::CellSlab* slab_cell, int ig)
-{
-  int imap = -1;
-  for (int ai=0; ai<2; ai++)
-  {
-    if (ig == slab_cell->v_indices[ai])
-    {
-      imap = ai;
-      break;
-    }
-  }
-  return imap;
-}
-
-/**Given a global node index, returns the dof its associated on the
- * referenced cell. Polygon overload.*/
-int chi_diffusion::Solver::MapCellDof(chi_mesh::CellPolygon* poly_cell, int ig)
-{
-  int imap = -1;
-  for (int ai=0; ai<poly_cell->v_indices.size(); ai++)
-  {
-    if (ig == poly_cell->v_indices[ai])
-    {
-      imap = ai;
-      break;
-    }
-  }
-  return imap;
-}
 
 /**Given a global node index, returns the dof its associated on the
  * referenced cell. Polyhedron overload.*/
-int chi_diffusion::Solver::MapCellDof(chi_mesh::CellPolyhedron* polyh_cell, int ig)
+int chi_diffusion::Solver::MapCellDof(chi_mesh::Cell* cell, int ig)
 {
   int imap = -1;
-  for (int ai=0; ai<polyh_cell->v_indices.size(); ai++)
+  for (int ai=0; ai < cell->vertex_ids.size(); ai++)
   {
-    if (ig == polyh_cell->v_indices[ai])
+    if (ig == cell->vertex_ids[ai])
     {
       imap = ai;
       break;
@@ -235,15 +225,17 @@ int chi_diffusion::Solver::MapCellDof(chi_mesh::CellPolyhedron* polyh_cell, int 
   return imap;
 }
 
+
+
 /**Given the face index on the current cell, finds the
  * corresponding face index on the adjacent cell.*/
-int chi_diffusion::Solver::MapCellFace(chi_mesh::CellPolyhedron* polyh_cell,
-                                       chi_mesh::CellPolyhedron* adjph_cell,
+int chi_diffusion::Solver::MapCellFace(chi_mesh::Cell* cur_cell,
+                                       chi_mesh::Cell* adj_cell,
                                        int f)
 {
-  int num_face_dofs = polyh_cell->faces[f]->v_indices.size();
+  int num_face_dofs = cur_cell->faces[f].vertex_ids.size();
   int fmap = -1;
-  for (int af=0; af<adjph_cell->faces.size(); af++)
+  for (int af=0; af < adj_cell->faces.size(); af++)
   {
     bool is_match = true;
 
@@ -251,10 +243,10 @@ int chi_diffusion::Solver::MapCellFace(chi_mesh::CellPolyhedron* polyh_cell,
     {
       bool found = false;
 
-      for (int afi=0; afi<adjph_cell->faces[af]->v_indices.size(); afi++)
+      for (int afi=0; afi < adj_cell->faces[af].vertex_ids.size(); afi++)
       {
-        if (polyh_cell->faces[f]->v_indices[fi] ==
-          adjph_cell->faces[af]->v_indices[afi])
+        if (cur_cell->faces[f].vertex_ids[fi] ==
+            adj_cell->faces[af].vertex_ids[afi])
         {
           found = true;
           break;
@@ -388,10 +380,11 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
   ip_view->cell_dof_start = cell_info->cell_dof_start;
   ip_locI_borderipviews[locI][cell_border_index] = ip_view;
 
-  //============================================= Create cell
-  if (cell_info->cell_type == 0)
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+  if (cell_info->cell_type == 3)
   {
-    chi_mesh::CellSlab* cell = new chi_mesh::CellSlab;
+    auto cell = new chi_mesh::CellSlabV2;
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
@@ -399,42 +392,49 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
       vc = vc + *grid->nodes[cell_info->v_indices[v]];
-      cell->v_indices[v] = cell_info->v_indices[v];
+      cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
 
-    ip_locI_bordercells[locI][cell_border_index] = cell;
-
-    SlabFEView* fe_view = new SlabFEView(cell, grid);
-
-    ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
-  }
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-  else if (cell_info->cell_type == 1)
-  {
-    chi_mesh::CellPolygon* cell = new chi_mesh::CellPolygon;
-    cell->partition_id = locI;
-    cell->material_id = cell_info->cell_mat_id;
-
-    chi_mesh::Vector vc;
-    for (int v=0; v<cell_info->cell_dof_count; v++)
-    {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
-      cell->v_indices.push_back(cell_info->v_indices[v]);
-    }
-    cell->centroid = vc/cell_info->cell_dof_count;
-
-    cell->edges.resize(cell_info->cell_face_count);
+    cell->faces.resize(cell_info->cell_face_count);
     for (int f=0; f<cell_info->cell_face_count; f++)
     {
-      cell->edges[f] = new int[2];
       for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
-        cell->edges[f][fv] = cell_info->face_v_indices[f][fv];
+        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
     }
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
-    PolygonFEView* fe_view =
+    auto fe_view = new SlabFEView(cell, grid);
+
+    ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
+
+  }
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+  else if (cell_info->cell_type == 4)
+  {
+    auto cell = new chi_mesh::CellPolygonV2;
+    cell->partition_id = locI;
+    cell->material_id = cell_info->cell_mat_id;
+
+    chi_mesh::Vector vc;
+    for (int v=0; v<cell_info->cell_dof_count; v++)
+    {
+      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      cell->vertex_ids.push_back(cell_info->v_indices[v]);
+    }
+    cell->centroid = vc/cell_info->cell_dof_count;
+
+    cell->faces.resize(cell_info->cell_face_count);
+    for (int f=0; f<cell_info->cell_face_count; f++)
+    {
+      for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
+        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
+    }
+
+    ip_locI_bordercells[locI][cell_border_index] = cell;
+
+    auto fe_view =
       new PolygonFEView(cell, grid, (SpatialDiscretization_PWL*)discretization);
 
     fe_view->PreCompute();
@@ -443,9 +443,9 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-  else if (cell_info->cell_type == 2)
+  else if (cell_info->cell_type == 5)
   {
-    chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
+    chi_mesh::CellPolyhedronV2* cell = new chi_mesh::CellPolyhedronV2;
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
@@ -453,46 +453,28 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
       vc = vc + *grid->nodes[cell_info->v_indices[v]];
-      cell->v_indices.push_back(cell_info->v_indices[v]);
+      cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
 
     cell->faces.resize(cell_info->cell_face_count);
     for (int f=0; f<cell_info->cell_face_count; f++)
     {
-      cell->faces[f] = new chi_mesh::PolyFace;
       chi_mesh::Vertex vfc;
       for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
       {
-        cell->faces[f]->v_indices.push_back(cell_info->face_v_indices[f][fv]);
+        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
         vfc = vfc + *grid->nodes[cell_info->face_v_indices[f][fv]];
       }
       vfc = vfc/cell_info->face_v_indices[f].size();
-      cell->faces[f]->face_centroid = vfc;
+      cell->faces[f].centroid = vfc;
 
       chi_mesh::Vector v0fc = vfc - *grid->nodes[cell_info->face_v_indices[f][0]];
       chi_mesh::Vector v01 = *grid->nodes[cell_info->face_v_indices[f][1]] -
                              *grid->nodes[cell_info->face_v_indices[f][0]];
 
       chi_mesh::Vector n = v01.Cross(v0fc);
-      cell->faces[f]->geometric_normal = n/n.Norm();
-
-      //Populate edges
-      int edge_count = cell->faces[f]->v_indices.size();
-      cell->faces[f]->edges.resize(edge_count);
-      for (int e=0; e<edge_count; e++)
-      {
-        cell->faces[f]->edges[e] = new int[4];
-        if (e != (edge_count-1))
-        {
-          cell->faces[f]->edges[e][0] = cell->faces[f]->v_indices[e];
-          cell->faces[f]->edges[e][1] = cell->faces[f]->v_indices[e+1];
-        } else
-        {
-          cell->faces[f]->edges[e][0] = cell->faces[f]->v_indices[e];
-          cell->faces[f]->edges[e][1] = cell->faces[f]->v_indices[0];
-        }
-      }
+      cell->faces[f].normal = n/n.Norm();
 
     }//for f
 
@@ -506,7 +488,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
-  }
+  }//polyhedron
   else
   {
     chi_log.Log(LOG_ALLERROR)

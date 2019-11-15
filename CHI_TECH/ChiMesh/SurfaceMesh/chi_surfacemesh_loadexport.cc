@@ -630,7 +630,7 @@ void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
 void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
 {
 
-//  if (this->faces.size()==0)
+//  if (this->faces.empty())
 //  {
 //    std::cout << "Cannot export empty SurfaceMesh\n";
 //    return;

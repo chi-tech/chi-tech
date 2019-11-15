@@ -1,12 +1,11 @@
 #include "volmesher_predefined2d.h"
 #include <iostream>
 #include <vector>
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../Region/chi_region.h"
-#include "../../Cell/cell_triangle.h"
-#include "../../Boundary/chi_boundary.h"
-#include "../../SurfaceMesher/surfacemesher.h"
-#include "../../../ChiMPI/chi_mpi.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/Region/chi_region.h"
+#include "ChiMesh/Boundary/chi_boundary.h"
+#include "ChiMesh/SurfaceMesher/surfacemesher.h"
+#include <chi_mpi.h>
 #include <chi_log.h>
 
 extern ChiMPI chi_mpi;
@@ -36,7 +35,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
 
     //=========================================== Create new continuum
     //chi_mesh::MeshContinuum* remeshed_surfcont = region->mesh_continua.back();
-    chi_mesh::MeshContinuum* vol_continuum = new chi_mesh::MeshContinuum;
+    auto vol_continuum = new chi_mesh::MeshContinuum;
     region->volume_mesh_continua.push_back(vol_continuum);
 
     std::vector<chi_mesh::Boundary*>::iterator bndry;
@@ -86,16 +85,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
 //        }
 
         //================================== Create cell for each face
-        if (this->options.force_polygons)
-        {
-          this->CreatePolygonCells(ref_continuum->surface_mesh,
-                                   vol_continuum);
-        }
-        else
-        {
-          this->CreateTriangleCells(ref_continuum->surface_mesh,
-                                    vol_continuum);
-        }
+        this->CreatePolygonCells(ref_continuum->surface_mesh, vol_continuum);
 
         //================================== Connect Boundaries
         std::vector<chi_mesh::Cell*>::iterator cell;

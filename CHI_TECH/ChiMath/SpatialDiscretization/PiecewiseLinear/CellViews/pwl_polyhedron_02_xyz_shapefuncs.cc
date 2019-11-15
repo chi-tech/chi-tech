@@ -1,6 +1,6 @@
 #include "pwl_polyhedron.h"
 
-double PolyhedronFEView::Shape_xyz(int i, chi_mesh::Vector xyz)
+double PolyhedronFEView::Shape_xyz(int i, const chi_mesh::Vector& xyz)
 {
   for (int f=0; f<faces.size(); f++)
   {

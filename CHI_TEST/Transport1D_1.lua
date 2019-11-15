@@ -169,8 +169,10 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
+if (master_export == nil) then
+    chiFFInterpolationExportPython(cline)
+end
 
 if (chi_location_id == 0 and master_export == nil) then
-    chiFFInterpolationExportPython(cline)
-    local handle = io.popen("python ZLFFI00.py")
+    local handle = io.popen("python3 ZLFFI00.py")
 end

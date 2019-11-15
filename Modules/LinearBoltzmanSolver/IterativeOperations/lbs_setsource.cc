@@ -1,6 +1,5 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "../SweepChunks/lbs_sweepchunk_pwl_polyhedron.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 

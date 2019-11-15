@@ -1,11 +1,6 @@
 #include "diffusion_solver.h"
 
-#include"ChiMesh/Cell/cell_slab.h"
-#include"ChiMesh/Cell/cell_triangle.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+
 
 #include <ChiTimer/chi_timer.h>
 #include <chi_mpi.h>
@@ -15,9 +10,6 @@ extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiTimer chi_program_timer;
 
-#include<fstream>
-#include <unistd.h>
-
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
 int chi_diffusion::Solver::Initialize(bool verbose)
@@ -25,7 +17,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   chi_log.Log(LOG_0) << "\n"
                      << chi_program_timer.GetTimeString() << " "
                      << solver_name << ": Initializing Diffusion solver PETSc";
-  this->verbose = verbose;
+  this->verbose_info = verbose;
 
   if (not common_items_initialized)
     InitializeCommonItems();
