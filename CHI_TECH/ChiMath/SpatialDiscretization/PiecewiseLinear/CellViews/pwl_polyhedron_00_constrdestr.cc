@@ -10,7 +10,6 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
                                    SpatialDiscretization_PWL *discretization):
   CellFEView(polyh_cell->vertex_ids.size())
 {
-  precomputed = false;
   grid = vol_continuum;
   //=========================================== Create quadrature points
   if (discretization != nullptr)
@@ -27,43 +26,42 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
 
 
   //=========================================== Assign cell centre
-  vcc = polyh_cell->centroid;
+  chi_mesh::Vertex& vcc = polyh_cell->centroid;
   alphac = 1.0/polyh_cell->vertex_ids.size();
 
   //=========================================== For each face
-  faces.reserve(polyh_cell->faces.size());
-  for (int f=0; f<polyh_cell->faces.size(); f++)
+  face_data.reserve(polyh_cell->faces.size());
+  for (size_t f=0; f<polyh_cell->faces.size(); f++)
   {
     chi_mesh::CellFace& face = polyh_cell->faces[f];
-    FEface_data* face_data = new FEface_data;
+    FEface_data face_f_data;
     face_betaf.push_back(1.0/face.vertex_ids.size());
 
-    chi_mesh::Vertex vfc = face.centroid;
-
-    face_data->vfc = vfc;
+    chi_mesh::Vertex& vfc = face.centroid;
 
     //==================================== Build edges
     std::vector<std::vector<int>> edges = polyh_cell->GetFaceEdges(f);
 
     //==================================== For each edge
-    face_data->sides.reserve(edges.size());
-    for (int e=0; e<edges.size(); e++)
+    face_f_data.sides.reserve(edges.size());
+//    for (size_t e=0; e<edges.size(); e++)
+    for (auto edge : edges)
     {
-      FEside_data3d* side_data = new FEside_data3d;
+      FEside_data3d side_data;
 
       //============================= Assign vertices of tetrahedron
-      int v0index = edges[e][0];
-      int v1index = edges[e][1];
-      side_data->v_index = new int[2];
-      side_data->v_index[0] = v0index;
-      side_data->v_index[1] = v1index;
+      int v0index = edge[0];
+      int v1index = edge[1];
+      side_data.v_index.resize(2,-1);
+      side_data.v_index[0] = v0index;
+      side_data.v_index[1] = v1index;
 
-      chi_mesh::Vertex v0 = *vol_continuum->nodes[v0index];
-      chi_mesh::Vertex v1 = vfc;
-      chi_mesh::Vertex v2 = *vol_continuum->nodes[v1index];
-      chi_mesh::Vertex v3 = vcc;
+      const chi_mesh::Vertex& v0 = *vol_continuum->nodes[v0index];
+      const chi_mesh::Vertex& v1 = vfc;
+      const chi_mesh::Vertex& v2 = *vol_continuum->nodes[v1index];
+      const chi_mesh::Vertex& v3 = vcc;
 
-      side_data->sc = (v0+v1+v2+v3)/4.0;
+      side_data.side_centroid = (v0 + v1 + v2 + v3) / 4.0;
 
       //============================= Compute vectors
       chi_mesh::Vector v01 = v1 - v0;
@@ -98,7 +96,7 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
 //        {
 //          printf("ERROR! v01\n");
 //        }
-      side_data->detJ_surf = v01N.x*v02N.y - v01N.y*v02N.x;
+      side_data.detJ_surf = v01N.x*v02N.y - v01N.y*v02N.x;
 
       //============================= Compute Jacobian
       chi_mesh::Matrix3x3 J;
@@ -106,25 +104,25 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
       J.SetColJVec(1,v02);
       J.SetColJVec(2,v03);
 
-      side_data->J = J;
+      side_data.J = J;
 
 
       //============================= Compute determinant of jacobian
-      side_data->detJ = J.Det();
+      side_data.detJ = J.Det();
 
       //============================= Compute inverse Jacobian elements
       chi_mesh::Matrix3x3 JT   = J.Transpose();
       chi_mesh::Matrix3x3 Jinv = J.Inverse();
       chi_mesh::Matrix3x3 JTinv= JT.Inverse();
 
-      side_data->Jinv  = Jinv;
-      side_data->JTinv = JTinv;
+      side_data.Jinv  = Jinv;
+      side_data.JTinv = JTinv;
 
-      side_data->qp_data.reserve(dofs);
-      face_data->sides.push_back(side_data);
+      side_data.qp_data.reserve(dofs);
+      face_f_data.sides.push_back(side_data);
     }//for each edge
 
-    faces.push_back(face_data);
+    face_data.push_back(face_f_data);
   }//for each face
 
 
@@ -142,45 +140,45 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
   // so no mapping is needed.
   for (int i=0; i<dofs; i++)
   {
-    FEnodeMap* newNodeMap = new FEnodeMap;
-    for (int f=0; f<faces.size(); f++)
+    FEnodeMap newNodeMap;
+    for (size_t f=0; f < face_data.size(); f++)
     {
-      FEnodeFaceMap* newFaceMap = new FEnodeFaceMap;
-      for (int s=0; s<faces[f]->sides.size(); s++)
+      FEnodeFaceMap newFaceMap;
+      for (size_t s=0; s < face_data[f].sides.size(); s++)
       {
-        FEnodeSideMap* newSideMap = new FEnodeSideMap;
-        newSideMap->part_of_face = false;
-        int s0 = faces[f]->sides[s]->v_index[0];
-        int s1 = faces[f]->sides[s]->v_index[1];
+        FEnodeSideMap newSideMap;
+        newSideMap.part_of_face = false;
+        int s0 = face_data[f].sides[s].v_index[0];
+        int s1 = face_data[f].sides[s].v_index[1];
         if      (polyh_cell->vertex_ids[i] == s0)
         {
-          newSideMap->index = 0;
-          newSideMap->part_of_face = true;
+          newSideMap.index = 0;
+          newSideMap.part_of_face = true;
         }
         else if (polyh_cell->vertex_ids[i] == s1)
         {
-          newSideMap->index = 2;
-          newSideMap->part_of_face = true;
+          newSideMap.index = 2;
+          newSideMap.part_of_face = true;
         }
         else
         {
-          newSideMap->index = -1;
-          for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
+          newSideMap.index = -1;
+          for (size_t v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
           {
             if (polyh_cell->vertex_ids[i] ==
                 polyh_cell->faces[f].vertex_ids[v])
             {
-              newSideMap->part_of_face = true;
+              newSideMap.part_of_face = true;
               break;
             }
           }
 
         }
-        newFaceMap->side_map.push_back(newSideMap);
+        newFaceMap.side_map.push_back(newSideMap);
       }//for s
-      newNodeMap->face_map.push_back(newFaceMap);
+      newNodeMap.face_map.push_back(newFaceMap);
     }//for f
-    node_maps.push_back(newNodeMap);
+    node_side_maps.push_back(newNodeMap);
   }//for i
 
   //================================================ Compute Face DOF mapping
@@ -193,14 +191,14 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
   // This mapping is not used by any of the methods in
   // this class but is used by methods requiring the
   // surface integrals of the shape functions.
-  for (int f=0; f<polyh_cell->faces.size(); f++)
+  for (size_t f=0; f<polyh_cell->faces.size(); f++)
   {
     std::vector<int> face_dof_mapping;
 
-    for (int fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
+    for (size_t fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
     {
       int mapping = -1;
-      for (int ci=0; ci<polyh_cell->vertex_ids.size(); ci++)
+      for (size_t ci=0; ci<polyh_cell->vertex_ids.size(); ci++)
       {
         if (polyh_cell->faces[f].vertex_ids[fi] ==
             polyh_cell->vertex_ids[ci])

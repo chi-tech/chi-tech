@@ -121,28 +121,32 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         }
 
         //================================== Checking partitioning parameters
-        int p_tot = mesh_handler->surface_mesher->partitioning_x*
-                    mesh_handler->surface_mesher->partitioning_y;
-        if (chi_mpi.process_count != p_tot)
+        if (!options.mesh_global)
         {
-          chi_log.Log(LOG_ALLERROR) <<
-                                  "ERROR: Number of processors available ("
-                                  << chi_mpi.process_count <<
-                                  ") does not match amount of processors "
-                                  "required by surface"
-                                  " mesher partitioning parameters ("
-                                  << p_tot <<
-                                  ").";
-          exit(EXIT_FAILURE);
+          int p_tot = mesh_handler->surface_mesher->partitioning_x*
+                      mesh_handler->surface_mesher->partitioning_y;
+          if (chi_mpi.process_count != p_tot)
+          {
+            chi_log.Log(LOG_ALLERROR) <<
+                                      "ERROR: Number of processors available ("
+                                      << chi_mpi.process_count <<
+                                      ") does not match amount of processors "
+                                      "required by surface"
+                                      " mesher partitioning parameters ("
+                                      << p_tot <<
+                                      ").";
+            exit(EXIT_FAILURE);
+          }
         }
+
 
         //================================== InitializeAlphaElements local cell indices
         int num_glob_cells=vol_continuum->cells.size();
         for (int c=0; c<num_glob_cells; c++)
         {
           vol_continuum->glob_cell_local_indices.push_back(-1);
-          if (vol_continuum->cells[c]->partition_id ==
-              chi_mpi.location_id)
+          if ((vol_continuum->cells[c]->partition_id == chi_mpi.location_id) ||
+              (options.mesh_global))
           {
             vol_continuum->local_cell_glob_indices.push_back(c);
             int local_cell_index = vol_continuum->local_cell_glob_indices.size()-1;

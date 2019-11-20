@@ -20,7 +20,7 @@ double PolyhedronFEView::TetShape(int index,
   return value;
 }
 
-double PolyhedronFEView::TetGradShape_x(int index, int qpoint_index)
+double PolyhedronFEView::TetGradShape_x(const int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -31,7 +31,7 @@ double PolyhedronFEView::TetGradShape_x(int index, int qpoint_index)
   return value;
 }
 
-double PolyhedronFEView::TetGradShape_y(int index, int qpoint_index)
+double PolyhedronFEView::TetGradShape_y(const int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -42,7 +42,7 @@ double PolyhedronFEView::TetGradShape_y(int index, int qpoint_index)
   return value;
 }
 
-double PolyhedronFEView::TetGradShape_z(int index, int qpoint_index)
+double PolyhedronFEView::TetGradShape_z(const int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
