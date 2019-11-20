@@ -89,7 +89,7 @@ chiSolverAddRegion(phys1,region1)
 
 chiMonteCarlonCreateSource(phys1,MC_BNDRY_SRC,1);
 
-chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,10e6)
 chiMonteCarlonSetProperty(phys1,MC_TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MERGE_INTVL,1e5)
 chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
@@ -97,6 +97,7 @@ chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,1.0)
 chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,true)
+chiMonteCarlonSetProperty(phys1,MC_UNCOLLIDED_ONLY,true)
 
 chiMonteCarlonInitialize(phys1)
 chiMonteCarlonExecute(phys1)

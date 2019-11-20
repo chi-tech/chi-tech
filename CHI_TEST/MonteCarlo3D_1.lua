@@ -40,8 +40,8 @@ end
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
 
-chiSurfaceMesherSetProperty(PARTITION_X,1)
-chiSurfaceMesherSetProperty(PARTITION_Y,1)
+--chiSurfaceMesherSetProperty(PARTITION_X,2)
+--chiSurfaceMesherSetProperty(PARTITION_Y,2)
 chiSurfaceMesherSetProperty(CUT_X,0.0)
 chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
@@ -102,14 +102,15 @@ chiSolverAddRegion(phys1,region1)
 
 chiMonteCarlonCreateSource(phys1,MC_BNDRY_SRC,1);
 
-chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,100e6)
+chiMonteCarlonSetProperty(phys1,MC_NUM_PARTICLES,10e6)
 chiMonteCarlonSetProperty(phys1,MC_TFC_UPDATE_INTVL,10e3)
-chiMonteCarlonSetProperty(phys1,MC_TALLY_MERGE_INTVL,2e6)
+chiMonteCarlonSetProperty(phys1,MC_TALLY_MERGE_INTVL,1e6)
 chiMonteCarlonSetProperty(phys1,MC_SCATTERING_ORDER,10)
 chiMonteCarlonSetProperty(phys1,MC_MONOENERGETIC,false)
 chiMonteCarlonSetProperty(phys1,MC_FORCE_ISOTROPIC,false)
 chiMonteCarlonSetProperty(phys1,MC_TALLY_MULTIPLICATION_FACTOR,1.0)
-chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,false)
+chiMonteCarlonSetProperty(phys1,MC_MAKE_PWLD_SOLUTION,true)
+chiMonteCarlonSetProperty(phys1,MC_UNCOLLIDED_ONLY,true)
 
 chiMonteCarlonInitialize(phys1)
 chiMonteCarlonExecute(phys1)
@@ -117,11 +118,11 @@ chiMonteCarlonExecute(phys1)
 
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0, 0.999)
-chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,1.0, 0.999)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.01,-1.0, 0.799)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.01,1.0, 0.799)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 500)
 
-for k=2,2 do
+for k=1,2 do
     chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,k-1)
 end
 --chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,168)
@@ -139,5 +140,5 @@ if (chi_location_id == 0) then
     local handle = io.popen("python ZLFFI00.py")
 end
 
---chiExportFieldFunctionToVTKG(0,"ZPhiMC")
+chiExportFieldFunctionToVTKG(0,"ZPhiMC")
 --chiExportFieldFunctionToVTKG(168,"ZPhiMC")
