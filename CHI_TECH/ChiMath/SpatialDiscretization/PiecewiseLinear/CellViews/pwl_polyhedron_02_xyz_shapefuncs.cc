@@ -1,16 +1,18 @@
 #include "pwl_polyhedron.h"
 
-double PolyhedronFEView::Shape_xyz(int i, const chi_mesh::Vector& xyz)
+//###################################################################
+/**Returns the evaluation of shape function i at the supplied point.*/
+double PolyhedronFEView::ShapeValue(const int i, const chi_mesh::Vector& xyz)
 {
-  for (int f=0; f<faces.size(); f++)
+  for (size_t f=0; f < face_data.size(); f++)
   {
-    for (int s=0; s<faces[f]->sides.size(); s++)
+    for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector p0 = *grid->nodes[faces[f]->sides[s]->v_index[0]];
+      chi_mesh::Vector& p0 = *grid->nodes[face_data[f].sides[s].v_index[0]];
       chi_mesh::Vector xyz_ref = xyz - p0;
 
-      chi_mesh::Vector xi_eta_zeta   = faces[f]->sides[s]->Jinv*xyz_ref;
+      chi_mesh::Vector xi_eta_zeta   = face_data[f].sides[s].Jinv * xyz_ref;
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -25,13 +27,13 @@ double PolyhedronFEView::Shape_xyz(int i, const chi_mesh::Vector& xyz)
         double Nf = 0.0;
         double Nc = alphac*zeta;
 
-        if (node_maps[i]->face_map[f]->side_map[s]->part_of_face)
+        if (node_side_maps[i].face_map[f].side_map[s].part_of_face)
         {
-          if (node_maps[i]->face_map[f]->side_map[s]->index == 0)
+          if (node_side_maps[i].face_map[f].side_map[s].index == 0)
           {
             Ni = 1-xi-eta-zeta;
           }
-          if (node_maps[i]->face_map[f]->side_map[s]->index == 2)
+          if (node_side_maps[i].face_map[f].side_map[s].index == 2)
           {
             Ni = eta;
           }
@@ -46,18 +48,70 @@ double PolyhedronFEView::Shape_xyz(int i, const chi_mesh::Vector& xyz)
   return 0.0;
 }
 
-chi_mesh::Vector PolyhedronFEView::GradShape_xyz(int i, chi_mesh::Vector xyz)
+//###################################################################
+/**Populates shape_values with the value of each shape function's
+ * value evaluate at the supplied point.*/
+void PolyhedronFEView::ShapeValues(const chi_mesh::Vector& xyz,
+                                   std::vector<double>& shape_values)
+{
+  shape_values.resize(dofs,0.0);
+  for (size_t f=0; f < face_data.size(); f++)
+  {
+    for (size_t s=0; s < face_data[f].sides.size(); s++)
+    {
+      auto& side_fe_info = face_data[f].sides[s];
+      //Map xyz to xi_eta_zeta
+      chi_mesh::Vector& p0 = *grid->nodes[side_fe_info.v_index[0]];
+      chi_mesh::Vector xi_eta_zeta   = side_fe_info.Jinv*(xyz - p0);
+
+      double xi  = xi_eta_zeta.x;
+      double eta = xi_eta_zeta.y;
+      double zeta= xi_eta_zeta.z;
+
+
+      //Determine if inside tet
+      if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and (zeta>=-1.0e-12) and
+          ((xi + eta + zeta)<=(1.0+1.0e-12)))
+      {
+        for (int i=0; i<dofs; i++)
+        {
+          auto side_map = node_side_maps[i].face_map[f].side_map[s];
+
+          double Ni = 0.0;
+          double Nf = 0.0;
+          double Nc = alphac*zeta;
+
+          if (side_map.part_of_face)
+          {
+            if      (side_map.index == 0) Ni = 1-xi-eta-zeta;
+            else if (side_map.index == 2) Ni = eta;
+
+            Nf = face_betaf[f]*xi;
+          }
+
+          shape_values[i] = Ni + Nf + Nc;
+        }//for dof
+        return;
+      }//if in tet
+    }//for side
+  }//for face
+}
+
+//###################################################################
+/**Returns the evaluation of grad-shape function i at the supplied point.*/
+chi_mesh::Vector PolyhedronFEView::GradShapeValue(const int i,
+                                                  const chi_mesh::Vector& xyz)
 {
   chi_mesh::Vector grad,gradr;
-  for (int f=0; f<faces.size(); f++)
+  for (size_t f=0; f < face_data.size(); f++)
   {
-    for (int s=0; s<faces[f]->sides.size(); s++)
+    for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector p0 = *grid->nodes[faces[f]->sides[s]->v_index[0]];
+      chi_mesh::Vector p0 = *grid->nodes[face_data[f].sides[s].v_index[0]];
       chi_mesh::Vector xyz_ref = xyz - p0;
 
-      chi_mesh::Vector xi_eta_zeta = faces[f]->sides[s]->Jinv*xyz_ref;
+      chi_mesh::Vector xi_eta_zeta = face_data[f].sides[s].Jinv * xyz_ref;
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -71,15 +125,15 @@ chi_mesh::Vector PolyhedronFEView::GradShape_xyz(int i, chi_mesh::Vector xyz)
         chi_mesh::Vector grad_f;
         chi_mesh::Vector grad_c;
 
-        if (node_maps[i]->face_map[f]->side_map[s]->part_of_face)
+        if (node_side_maps[i].face_map[f].side_map[s].part_of_face)
         {
-          if (node_maps[i]->face_map[f]->side_map[s]->index == 0)
+          if (node_side_maps[i].face_map[f].side_map[s].index == 0)
           {
             grad_i.x =-1.0;
             grad_i.y =-1.0;
             grad_i.z =-1.0;
           }
-          if (node_maps[i]->face_map[f]->side_map[s]->index == 2)
+          if (node_side_maps[i].face_map[f].side_map[s].index == 2)
           {
             grad_i.x = 0.0;
             grad_i.y = 1.0;
@@ -96,7 +150,7 @@ chi_mesh::Vector PolyhedronFEView::GradShape_xyz(int i, chi_mesh::Vector xyz)
         grad_c.z = alphac*1.0;
 
         grad = (grad_i+grad_f+grad_c);
-        grad = faces[f]->sides[s]->JTinv*grad;
+        grad = face_data[f].sides[s].JTinv * grad;
 
 
         return grad;
