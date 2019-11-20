@@ -295,22 +295,19 @@ void chi_mesh::PopulateRaySegmentLengths(
   }
   else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
-
-    auto& vcc = polyh_cell->centroid;
+    auto& vcc = cell->centroid;
 
     int f=-1;
     for (auto& face : cell->faces)
     {
       f++;
-      auto edges = polyh_cell->GetFaceEdges(f);
       auto& vfc  = face.centroid;
 
       int s=-1;
-      for (auto& edge : edges)
+      for (auto vi : face.vertex_ids)
       {
         s++;
-        auto& vert = *grid->nodes[edge[0]];
+        auto& vert = *grid->nodes[vi];
 
         chi_mesh::Vertex intersection_point;
 

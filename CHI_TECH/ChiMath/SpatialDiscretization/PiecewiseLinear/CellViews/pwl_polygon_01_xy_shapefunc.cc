@@ -3,7 +3,7 @@
 //###################################################################
 /**Returns the value of the shape function given cartesian
  * coordinates.*/
-double PolygonFEView::Shape_xy(int i, const chi_mesh::Vector& xyz)
+double PolygonFEView::ShapeValue(const int i, const chi_mesh::Vector& xyz)
 {
   for (int s=0; s<num_of_subtris; s++)
   {
@@ -41,8 +41,51 @@ double PolygonFEView::Shape_xy(int i, const chi_mesh::Vector& xyz)
 }
 
 //###################################################################
-/**Returns the value of the gradient of the shape function.*/
-chi_mesh::Vector PolygonFEView::GradShape_xy(int i, chi_mesh::Vector xyz)
+/**Populates shape_values with the value of each shape function's
+ * value evaluate at the supplied point.*/
+void PolygonFEView::ShapeValues(const chi_mesh::Vector &xyz,
+                                std::vector<double> &shape_values)
+{
+  shape_values.resize(dofs,0.0);
+  for (int s=0; s<num_of_subtris; s++)
+  {
+    chi_mesh::Vector p0 = *grid->nodes[sides[s]->v_index[0]];
+    chi_mesh::Vector xi_eta_zeta   = sides[s]->Jinv*(xyz - p0);
+
+    double xi  = xi_eta_zeta.x;
+    double eta = xi_eta_zeta.y;
+
+    //Determine if inside tet
+    if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and
+        ((xi + eta)<=(1.0+1.0e-12)))
+    {
+      for (int i=0; i<dofs; i++)
+      {
+        int index = node_to_side_map[i][s];
+        double value = 0.0;
+
+        if (index==0)
+        {
+          value = 1.0 - xi - eta;
+        }
+        if (index==1)
+        {
+          value = xi;
+        }
+
+        value += beta*eta;
+
+        shape_values[i] = value;
+      }
+      return;
+    }//if in triangle
+  }//for side
+}
+
+//###################################################################
+/**Returns the evaluation of grad-shape function i at the supplied point.*/
+chi_mesh::Vector PolygonFEView::GradShapeValue(const int i,
+                                               const chi_mesh::Vector& xyz)
 {
   chi_mesh::Vector grad_r;
   chi_mesh::Vector grad;
@@ -56,7 +99,6 @@ chi_mesh::Vector PolygonFEView::GradShape_xy(int i, chi_mesh::Vector xyz)
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
-    double zeta= xi_eta_zeta.z;
 
     if ((xi>=-1.0e-12) and (eta>=-1.0e-12)  and
         ((xi + eta)<=(1.0+1.0e-12)))

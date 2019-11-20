@@ -117,8 +117,34 @@ public:
 
   }
 
-  /**Shape function for the slab function.*/
-  double Shape_x(int i, const chi_mesh::Vector& xyz)
+//  /**Shape function for the slab function.*/
+//  double Shape_x(int i, const chi_mesh::Vector& xyz)
+//  {
+//    chi_mesh::Vector& p0 = *grid->nodes[v0i];
+//    chi_mesh::Vector& p1 = *grid->nodes[v1i];
+//    chi_mesh::Vector xyz_ref = xyz - p0;
+//
+//    chi_mesh::Vector v01 = p1 - p0;
+//
+//    double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
+//
+//    if ((xi>=-1.0e-12) and (xi<=1.0+1.0e-12))
+//    {
+//      if (i==0)
+//      {
+//        return 1.0 - xi;
+//      }
+//      else
+//      {
+//        return xi;
+//      }
+//    }
+//
+//    return 0.0;
+//  }
+
+  /**Shape function i evaluated at given point for the slab.*/
+  double ShapeValue(const int i, const chi_mesh::Vector& xyz) override
   {
     chi_mesh::Vector& p0 = *grid->nodes[v0i];
     chi_mesh::Vector& p1 = *grid->nodes[v1i];
@@ -143,19 +169,48 @@ public:
     return 0.0;
   }
 
-  double ShapeValue(int i, const chi_mesh::Vector& xyz) override
+  //#################################################################
+  /**Populates shape_values with the value of each shape function's
+   * value evaluate at the supplied point.*/
+  void ShapeValues(const chi_mesh::Vector& xyz,
+                   std::vector<double>& shape_values) override
   {
-    return Shape_x(i, xyz);
+    shape_values.resize(dofs,0.0);
+    chi_mesh::Vector& p0 = *grid->nodes[v0i];
+    chi_mesh::Vector& p1 = *grid->nodes[v1i];
+    chi_mesh::Vector xyz_ref = xyz - p0;
+
+    chi_mesh::Vector v01 = p1 - p0;
+
+    double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
+
+    if ((xi>=-1.0e-12) and (xi<=1.0+1.0e-12))
+    {
+      for (int i=0; i<dofs; i++)
+      {
+        if (i==0)
+        {
+          shape_values[i] = 1.0 - xi;
+        }
+        else
+        {
+          shape_values[i] = xi;
+        }
+      }//for dof
+
+      return;
+    }//if in cell
+
   }
 
-  std::vector<double> ShapeValues(const chi_mesh::Vector& xyz) override
+  //###################################################################
+  /**Returns the evaluation of grad-shape function i at the supplied point.*/
+  chi_mesh::Vector GradShapeValue(const int i, const chi_mesh::Vector& xyz) override
   {
-    std::vector<double> ret_values(dofs,0.0);
-
-    for (int i=0; i<dofs; i++)
-      ret_values[i] = Shape_x(i, xyz);
-
-    return ret_values;
+    if (i==0)
+      return chi_mesh::Vector(0.0,0.0,-1.0/h);
+    else
+      return chi_mesh::Vector(0.0,0.0, 1.0/h);
   }
 };
 #endif
