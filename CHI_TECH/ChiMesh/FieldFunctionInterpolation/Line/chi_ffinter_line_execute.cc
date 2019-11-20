@@ -68,6 +68,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
 
   for (size_t c=0; c<ff_ctx->interpolation_points_ass_cell.size(); c++)
   {
+    if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
+
     ff_ctx->interpolation_points_values[c] =
       ff_ctx->ref_ff->field_vector_local->operator[](mapping[c]);
   }
