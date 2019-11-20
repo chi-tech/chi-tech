@@ -23,7 +23,7 @@ CheckPlaneTetIntersect(chi_mesh::Normal plane_normal,
   bool current_sense = false;
 
   size_t num_points = tet_points->size();
-  for (int i=0; i<num_points; i++)
+  for (size_t i=0; i<num_points; i++)
   {
     chi_mesh::Vector v = (*(*tet_points)[i]) - plane_point;
     double dotp = plane_normal.Dot(v);
@@ -133,7 +133,7 @@ CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
 
   size_t num_nodes_to_map = cfem_nodes.size();
   std::vector<int> mapped_nodes;
-  for (int n=0; n< num_nodes_to_map; n++)
+  for (size_t n=0; n< num_nodes_to_map; n++)
   {
     int ir = mesher->MapNode(
       cfem_nodes[n])*num_grps + g;
@@ -173,7 +173,7 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
                   std::vector<int> *mapping)
 {
   size_t num_nodes_to_map = pwld_nodes.size();
-  for (int n=0; n< num_nodes_to_map; n++)
+  for (size_t n=0; n< num_nodes_to_map; n++)
   {
     int dof = pwld_nodes[n];
     int cell_g_index = pwld_cells[n];
@@ -204,7 +204,7 @@ CreatePWLDMapping(chi_physics::FieldFunction* field_function,
   int num_moms = field_function->num_moms;
 
   size_t num_nodes_to_map = pwld_nodes.size();
-  for (int n=0; n< num_nodes_to_map; n++)
+  for (size_t n=0; n< num_nodes_to_map; n++)
   {
     int dof = pwld_nodes[n];
     int cell_g_index = pwld_cells[n];
@@ -228,10 +228,17 @@ void chi_mesh::FieldFunctionInterpolation::
   CreateFVMapping(int num_grps, int num_moms, int g, int m,
                   std::vector<int> &cells, std::vector<int> *mapping)
 {
-  for (int c=0; c<cells.size(); c++)
+  for (auto& cell_glob_index : cells)
   {
-    int cell_glob_index = cells[c];
-    int address = cell_glob_index*num_grps*num_moms + num_grps*m + g;
+    if (cell_glob_index<0)
+    {
+      mapping->push_back(-1);
+      continue;
+    }
+
+    auto cell = grid_view->cells[cell_glob_index];
+    int cell_local_index = cell->cell_local_id;
+    int address = cell_local_index*num_grps*num_moms + num_grps*m + g;
 
     mapping->push_back(address);
   }
