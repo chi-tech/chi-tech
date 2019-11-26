@@ -1,5 +1,8 @@
 #include "fieldfunction.h"
 
+#include <ChiMesh/MeshHandler/chi_meshhandler.h>
+#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
+
 #include <chi_log.h>
 #include <chi_mpi.h>
 //#include <iostream>
@@ -120,14 +123,19 @@ void chi_physics::FieldFunction::WritePVTU(std::string base_filename,
     ofile << "      <PDataArray type=\"Float32\" NumberOfComponents=\"3\"/>" << std::endl;
     ofile << "    </PPoints>" << std::endl;
 
+    bool is_global_mesh =
+      chi_mesh::GetCurrentHandler()->volume_mesher->options.mesh_global;
+
     for (int p=0; p<chi_mpi.process_count; p++)
     {
-        ofile << "      <Piece Source=\""
-              << base_filename +
-                 std::string("_") +
-                 std::to_string(p) +
-                 std::string(".vtu")
-              << "\"/>" << std::endl;
+      if (is_global_mesh and p!=0) continue;
+
+      ofile << "      <Piece Source=\""
+            << base_filename +
+               std::string("_") +
+               std::to_string(p) +
+               std::string(".vtu")
+            << "\"/>" << std::endl;
     }
 
     ofile << "  </PUnstructuredGrid>" << std::endl;

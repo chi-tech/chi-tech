@@ -27,16 +27,24 @@ public:
   }
 
   /** Virtual function evaluation of the shape function. */
-  virtual double ShapeValue(int i, const chi_mesh::Vector& xyz)
+  virtual double ShapeValue(const int i, const chi_mesh::Vector& xyz)
   {
     return 0.0;
   }
 
   /** Virtual function returning the all the shape function evaluations
    * at the point.*/
-   virtual std::vector<double> ShapeValues(const chi_mesh::Vector& xyz)
+  virtual void ShapeValues(const chi_mesh::Vector& xyz,
+                           std::vector<double>& shape_values)
   {
-     return std::vector<double>(dofs,0.0);
+    shape_values.resize(dofs,0.0);
+  }
+
+  /** Virtual function evaluation of the grad-shape function. */
+  virtual chi_mesh::Vector GradShapeValue(const int i,
+                                          const chi_mesh::Vector& xyz)
+  {
+    return chi_mesh::Vector(0.0,0.0,0.0);
   }
 
 };

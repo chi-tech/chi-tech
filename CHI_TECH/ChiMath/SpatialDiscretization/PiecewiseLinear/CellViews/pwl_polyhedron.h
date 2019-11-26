@@ -13,51 +13,50 @@
  * shape functions at each quadrature point.*/
 struct FEqp_data3d
 {
-  std::vector<float> shape_qp;
-  std::vector<float> shape_qp_surf;
-  std::vector<float> gradshapex_qp;
-  std::vector<float> gradshapey_qp;
-  std::vector<float> gradshapez_qp;
+  std::vector<double> shape_qp;
+  std::vector<double> shape_qp_surf;
+  std::vector<double> gradshapex_qp;
+  std::vector<double> gradshapey_qp;
+  std::vector<double> gradshapez_qp;
 };
 //Goes into
 /**Stores the data for each side's tetrahedron. */
 struct FEside_data3d
 {
-  float detJ;
-  float detJ_surf;
-  int*    v_index;
-  chi_mesh::Vector sc;
-  chi_mesh::Matrix3x3 J;
-  chi_mesh::Matrix3x3 Jinv;
-  chi_mesh::Matrix3x3 JTinv;
-  std::vector<FEqp_data3d*> qp_data;
+  double                    detJ = 0.0;
+  double                    detJ_surf = 0.0;
+  std::vector<int>          v_index;
+  chi_mesh::Vector          side_centroid;
+  chi_mesh::Matrix3x3       J;
+  chi_mesh::Matrix3x3       Jinv;
+  chi_mesh::Matrix3x3       JTinv;
+  std::vector<FEqp_data3d>  qp_data;
 };
 //Goes into
 /**Stores data for each face.*/
 struct FEface_data
 {
-  std::vector<FEside_data3d*> sides;
-  chi_mesh::Vector vfc;
+  std::vector<FEside_data3d> sides;
 };
 
 
 /**Lowest level of mapping dof i.*/
 struct FEnodeSideMap
 {
-  int index;
-  bool part_of_face;
+  int index = -1;
+  bool part_of_face = false;
 };
 //Goes into
 /**Intermediate level of mapping.*/
 struct FEnodeFaceMap
 {
-  std::vector<FEnodeSideMap*> side_map;
+  std::vector<FEnodeSideMap> side_map;
 };
 //Goes into
 /**Node map per face.*/
 struct FEnodeMap
 {
-  std::vector<FEnodeFaceMap*> face_map;
+  std::vector<FEnodeFaceMap> face_map;
 };
 //Goes into node_maps
 // node n
@@ -83,22 +82,17 @@ struct FEnodeMap
 class PolyhedronFEView : public CellFEView
 {
 private:
-  chi_mesh::Vertex                vcc;                   ///< Cell centroid
-  std::vector<FEface_data*>       faces;
-  std::vector<double>              face_betaf;
+  std::vector<FEface_data>       face_data;      ///< Holds determinants and data tet-by-tet.
+  std::vector<double>            face_betaf;     ///< Face Beta-factor.
+  double                         alphac;         ///< Cell alpha-factor.
 public:
-  std::vector<FEnodeMap*>         node_maps;
+  std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
-  std::vector<std::vector<std::vector<double>>> IntSi_shapeI_shapeJ;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntSi_shapeI_gradshapeJ;
+  std::vector<chi_math::QuadratureTetrahedron*> quadratures; ///< Quadratures used by this method.
+  chi_mesh::MeshContinuum*       grid;                       ///< Pointer to the reference grid.
 
-private:
-  std::vector<chi_math::QuadratureTetrahedron*> quadratures;
-  chi_mesh::MeshContinuum* grid;
-
-  double alphac;
-  bool precomputed;
+  bool                   precomputed = false;   ///< Are the integrals computed.
 
 
 public:
@@ -112,9 +106,9 @@ public:
   //                                                   functions
 private:
   double TetShape(int index, int qpoint_index, bool on_surface = false);
-  double TetGradShape_x(int index, int qpoint_index);
-  double TetGradShape_y(int index, int qpoint_index);
-  double TetGradShape_z(int index, int qpoint_index);
+  static double TetGradShape_x(int index);
+  static double TetGradShape_y(int index);
+  static double TetGradShape_z(int index);
 
   //################################################## Shape functions per side
 private:
@@ -123,52 +117,42 @@ private:
               int qpoint_index, bool on_surface=false)
   {
     if (on_surface)
-      return (faces[face_index]->sides[side_index]->detJ_surf);
+      return (face_data[face_index].sides[side_index].detJ_surf);
     else
-      return (faces[face_index]->sides[side_index]->detJ);
+      return (face_data[face_index].sides[side_index].detJ);
   }
+  /**Shape function evaluation on a tet at a quadrature point*/
   double GetShape(int face, int side, int i, int qp, bool surface = false)
   {
     if (surface)
-      return faces[face]->sides[side]->qp_data[i]->shape_qp_surf[qp];
+      return face_data[face].sides[side].qp_data[i].shape_qp_surf[qp];
     else
-      return faces[face]->sides[side]->qp_data[i]->shape_qp[qp];
+      return face_data[face].sides[side].qp_data[i].shape_qp[qp];
   }
-
+  /**GradeShape-x function evaluation on a tet at a quadrature point*/
   double GetGradShape_x(int face, int side, int i, int qp)
   {
-    return faces[face]->sides[side]->qp_data[i]->gradshapex_qp[qp];
+    return face_data[face].sides[side].qp_data[i].gradshapex_qp[qp];
   }
-
+  /**GradeShape-y function evaluation on a tet at a quadrature point*/
   double GetGradShape_y(int face, int side, int i, int qp)
   {
-    return faces[face]->sides[side]->qp_data[i]->gradshapey_qp[qp];
+    return face_data[face].sides[side].qp_data[i].gradshapey_qp[qp];
   }
-
+  /**GradeShape-z function evaluation on a tet at a quadrature point*/
   double GetGradShape_z(int face, int side, int i, int qp)
   {
-    return faces[face]->sides[side]->qp_data[i]->gradshapez_qp[qp];
+    return face_data[face].sides[side].qp_data[i].gradshapez_qp[qp];
   }
 
   //############################################### Actual shape functions
 public:
-  double           Shape_xyz(int i, const chi_mesh::Vector& xyz);
-  chi_mesh::Vector GradShape_xyz(int i, chi_mesh::Vector xyz);
+  double ShapeValue(int i, const chi_mesh::Vector& xyz) override;
+  chi_mesh::Vector GradShapeValue(int i, const chi_mesh::Vector& xyz) override;
 
-  double ShapeValue(int i, const chi_mesh::Vector& xyz) override
-  {
-    return Shape_xyz(i, xyz);
-  }
 
-  std::vector<double> ShapeValues(const chi_mesh::Vector& xyz) override
-  {
-    std::vector<double> ret_values(dofs,0.0);
-
-    for (int i=0; i<dofs; i++)
-      ret_values[i] = Shape_xyz(i, xyz);
-
-    return ret_values;
-  }
+  void ShapeValues(const chi_mesh::Vector& xyz,
+                   std::vector<double>& shape_values) override;
 
   //############################################### Precomputation cell matrices
 private:
@@ -176,13 +160,13 @@ private:
                   int i, int qpoint_index, bool on_surface = false);
 
   double PreGradShape_x(int face_index, int side_index,
-                        int i, int qpoint_index);
+                        int i);
 
   double PreGradShape_y(int face_index, int side_index,
-                        int i, int qpoint_index);
+                        int i);
 
   double PreGradShape_z(int face_index, int side_index,
-                        int i, int qpoint_index);
+                        int i);
 
 public:
   //####################################################### Precomputing
@@ -191,57 +175,9 @@ public:
 public:
   void CleanUp()
   {
-//    face_betaf.clear(); face_betaf.shrink_to_fit();
-//    for (int f=(faces.size()-1); f>=0; f--)
-//    {
-//      for (int s=(faces[f]->sides.size()-1); s>=0; s--)
-//      {
-//        //delete [] faces[f]->sides[s]->m;
-//        delete [] faces[f]->sides[s]->v_index;
-//
-//        for (int qp=(faces[f]->sides[s]->qp_data.size()-1); qp>=0; qp--)
-//        {
-//          FEqp_data* cur_qp = faces[f]->sides[s]->qp_data[qp];
-//          cur_qp->varphi_qp.clear();
-//          cur_qp->gradvarphix_qp.clear();
-//          cur_qp->gradvarphiy_qp.clear();
-//          cur_qp->gradvarphiz_qp.clear();
-//
-//          cur_qp->varphi_qp.shrink_to_fit();
-//          cur_qp->gradvarphix_qp.shrink_to_fit();
-//          cur_qp->gradvarphiy_qp.shrink_to_fit();
-//          cur_qp->gradvarphiz_qp.shrink_to_fit();
-//
-//          faces[f]->sides[s]->qp_data.erase(
-//            faces[f]->sides[s]->qp_data.begin()+qp);
-//          delete cur_qp;
-//        }
-//        FEside_data* cur_side = faces[f]->sides[s];
-//        delete cur_side;
-//      }
-//      FEface_data* cur_face = faces[f];
-//      delete cur_face;
-//    }
-//    faces.clear();
-//    faces.shrink_to_fit();
-//
-//    for (int n=0; n<node_maps.size(); n++)
-//    {
-//      FEnodeMap* cur_node = node_maps[n];
-//      for (int f=0; f<cur_node->face_map.size(); f++)
-//      {
-//        FEnodeFaceMap* cur_face = cur_node->face_map[f];
-//        for (int s=0; s<node_maps[n]->face_map[f]->side_map.size(); s++)
-//        {
-//          FEnodeSideMap* cur_side = cur_face->side_map[s];
-//          delete [] cur_side;
-//        }
-//        delete cur_face;
-//      }
-//      delete cur_node;
-//    }
-//    node_maps.clear();
-//    node_maps.shrink_to_fit();
+    for (auto& face : face_data)
+      for (auto& side : face.sides)
+        side.qp_data = std::move(std::vector<FEqp_data3d>(0));
   }
 
 };

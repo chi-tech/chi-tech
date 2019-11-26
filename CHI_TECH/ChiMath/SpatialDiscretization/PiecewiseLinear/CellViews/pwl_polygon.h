@@ -73,23 +73,12 @@ public:
                 chi_mesh::MeshContinuum* vol_continuum,
                 SpatialDiscretization_PWL *discretization);
 
-  double Shape_xy(int i, const chi_mesh::Vector& xyz);
-  chi_mesh::Vector GradShape_xy(int i, chi_mesh::Vector xyz);
+  double ShapeValue(const int i, const chi_mesh::Vector& xyz) override;
+  chi_mesh::Vector GradShapeValue(const int i, const chi_mesh::Vector& xyz) override;
 
-  double ShapeValue(int i, const chi_mesh::Vector& xyz) override
-  {
-    return Shape_xy(i, xyz);
-  }
 
-  std::vector<double> ShapeValues(const chi_mesh::Vector& xyz) override
-  {
-    std::vector<double> ret_values(dofs,0.0);
-
-    for (int i=0; i<dofs; i++)
-      ret_values[i] = Shape_xy(i, xyz);
-
-    return ret_values;
-  }
+  void ShapeValues(const chi_mesh::Vector& xyz,
+                   std::vector<double>& shape_values) override;
 
 
   //############################################### Precomputation cell matrices
