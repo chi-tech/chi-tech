@@ -3,7 +3,7 @@
 
 //############################################################################# Default constr
 /** Default constructor.*/
-ChiTimer::ChiTimer()
+ChiTimer::ChiTimer() noexcept
 {
     #ifdef UNIX_ENV
       clock_gettime(CLOCK_MONOTONIC,&this->startTime);

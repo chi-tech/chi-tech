@@ -22,7 +22,7 @@ public:
 	timespec  	startTime;
 public:
 	//00
-				ChiTimer();
+				ChiTimer() noexcept;
 	//01
 	void   		Reset();
 	double 		GetTime();

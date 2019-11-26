@@ -3,7 +3,7 @@
 
 //############################################################################# Default constructor
 /** Default constructor.*/
-ChiPhysics::ChiPhysics()
+ChiPhysics::ChiPhysics() noexcept
 {
 	this->physicsTimestep=16.66667;
 	//this->physicsTimestep=1000;

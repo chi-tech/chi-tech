@@ -1,15 +1,53 @@
 #include<iostream>
-#include<mpi.h>
 
-#include"chi_tech_main.h"
+#include "ChiConsole/chi_console.h"
+#include "ChiMath/chi_math.h"
+#include "ChiPhysics/chi_physics.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+
+#include <chi_mpi.h>
+#include <chi_log.h>
+#include "ChiTimer/chi_timer.h"
+
+ChiConsole  chi_console;
+ChiMath     chi_math_handler;
+ChiPhysics  chi_physics_handler;
+
+std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
+int chi_current_mesh_handler=-1;
+
+ChiMPI      chi_mpi;
+ChiLog      chi_log;
+ChiTimer    chi_program_timer;
 
 void ParseArguments(int argc, char** argv);
-#ifdef CHI_USEGRAPHICS
 void RunInteractive(int argc, char** argv);
-#endif
 void RunBatch(int argc, char** argv);
 
 /// @file
+
+//=============================================== Global variables
+bool            chi_termination_posted = false;
+std::string     input_file_name;
+bool            sim_option_interactive = true;
+
+/** GLOBAL TIMING
+   This array serves as a place holder for many things
+   [ 0]      Unused
+       ...
+   [09]      Maximum memory
+   [10]      Memory events
+   [11]      Memory event counter
+   [12],[13] [12]*8/[13] gives the avg sweep buffer
+             communication requirement in bytes
+   [14],[15] [14]/[15] average sweep predecessor
+             message count per angleset
+   [16]      Cumulative sweep time
+   [17]      Number of sweeps counter
+   [18]      Cumulative set-source time
+   [19]      Number of set source counts
+*/
+double          chi_global_timings[20];
 
 
 //######################################################### Program entry point
@@ -25,30 +63,13 @@ int main(int argc, char** argv)
     chi_global_timings[k] = 0.0;
 
   ParseArguments(argc,argv);
-#ifdef CHI_USEGRAPHICS
-  if (sim_option_withgraphics)
-  {
+
+  if (sim_option_interactive)
     RunInteractive(argc,argv);
-  } else
-  {
+  else
     RunBatch(argc,argv);
-  }
-#else
-  RunBatch(argc,argv);
-#endif
+
   return 0;
-}
-
-//############################################### Small utility for parsing
-/**Checks if all the characters in a
- * string is a number.*/
-bool IsNumber(std::string s)
-{
-  for (int i = 0; i < s.length(); i++)
-    if (isdigit(s[i]) == false)
-      return false;
-
-  return true;
 }
 
 //############################################### Argument parser
@@ -58,24 +79,23 @@ void ParseArguments(int argc, char** argv)
   bool input_file_found = false;
   for (int i=1; i<argc; i++)
   {
-    //std::cout << i;
     std::string argument(argv[i]);
 
     if ((argument.find('=') == std::string::npos) && (!input_file_found) )
     {
-      //std::cout << "Input File: " << argument << std::endl;
       input_file_name = argument;
       input_file_found = true;
-    }
+      sim_option_interactive = false;
+    }//no =
     else if (argument.find('=') != std::string::npos)
     {
       luaL_dostring(chi_console.consoleState, argument.c_str());
-    }
+    }//=
     //================================================ No-graphics option
     if ((argument.find("-b")!=std::string::npos)  )
     {
-      sim_option_withgraphics = false;
-    }
+      sim_option_interactive = false;
+    }//-b
     //================================================ Verbosity
     if (argument.find("-v") != std::string::npos)
     {
@@ -100,86 +120,33 @@ void ParseArguments(int argc, char** argv)
         }
       }
 
-    }
-  }
+    }//-v
+  }//for argument
 }
 
-#ifdef CHI_USEGRAPHICS
-//========================================================= Interactive interface
-/**Runs the interactive chitech engine*/
-void RunInteractive(int argc, char** argv)
-{
-  printf("Running interactive ChiTech\n");
-  chi_program_timer.Reset();
-  chiwindowManager.CreateCHIWindow("ChiTech Window", false);
-
-  if (input_file_name.size()>0)
-    chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
-
-  printf("Starting threads\n");
-    omp_set_dynamic(0);
-#pragma omp parallel num_threads(4)
-    {
-#pragma omp master
-        {
-            chiwindowManager.RunEventLoop();
-        }
-#pragma omp single nowait
-        {
-            chigraphics.RunGraphicsLoop(); // Graphics loop
-        }
-#pragma omp single nowait
-        {
-            chi_console.RunConsoleLoop();
-        }
-#pragma omp single nowait
-        {
-            chi_physics_handler.RunPhysicsLoop();
-        }
-
-    }
-}
-#endif
-
-//############################################### Batch interface
-/**Runs ChiTech in pure batch mode. Start then finish.*/
-void RunBatch(int argc, char** argv)
+//############################################### Initialize ChiTech
+/**Initializes all necessary items for ChiTech.*/
+void ChiTechInitialize(int argc, char** argv)
 {
   int location_id, number_processes;
 
-  MPI_Init (&argc, &argv);                            /* starts MPI */
+  MPI_Init (&argc, &argv);                           /* starts MPI */
   MPI_Comm_rank (MPI_COMM_WORLD, &location_id);      /* get current process id */
   MPI_Comm_size (MPI_COMM_WORLD, &number_processes); /* get number of processes */
 
   chi_mpi.location_id = location_id;
   chi_mpi.process_count = number_processes;
 
-  chi_log.Log(LOG_0)
-    << "ChiTech number of arguments supplied: "
-    << argc - 1;
-
-  chi_log.Log(LOG_0)
-    << "Running ChiTech in batch mode with "
-    << number_processes << " processes.";
-
-  if (argc<=1)
-    chi_log.Log(LOG_0)
-      << "\nUsage: exe inputfile [options values]\n"
-      << "\n"
-      << "     -v    Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
-      << "     a=b   Executes argument as a lua string.\n\n\n";
-
-
-
   chi_console.PostMPIInfo(location_id, number_processes);
   chi_mpi.Initialize();
 
   chi_physics_handler.InitPetSc(argc,argv);
+}
 
-  if ((input_file_name.size()>0) )
-  {
-    chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
-  }
+//############################################### Finalize ChiTech
+/**Finalizes ChiTech.*/
+void ChiTechFinalize()
+{
   PetscFinalize();
   MPI_Finalize();
 }
@@ -188,30 +155,49 @@ void RunBatch(int argc, char** argv)
 /**Runs the interactive chitech engine*/
 void RunInteractive(int argc, char** argv)
 {
-  int location_id, number_processes;
-
-  MPI_Init (&argc, &argv);                            /* starts MPI */
-  MPI_Comm_rank (MPI_COMM_WORLD, &location_id);      /* get current process id */
-  MPI_Comm_size (MPI_COMM_WORLD, &number_processes); /* get number of processes */
-
-  chi_mpi.location_id = location_id;
-  chi_mpi.process_count = number_processes;
+  ChiTechInitialize(argc,argv);
 
   chi_log.Log(LOG_0)
-    << "ChiTech interactive mode with " << number_processes << " processes.";
+    << "ChiTech number of arguments supplied: "
+    << argc - 1;
 
-  chi_console.PostMPIInfo(location_id, number_processes);
-  chi_mpi.Initialize();
+  chi_log.Log(LOG_0)
+    << "Running ChiTech in interactive-mode with "
+    << chi_mpi.process_count << " processes.";
 
-  chi_physics_handler.InitPetSc(argc,argv);
-
-  if ((input_file_name.size()>0) )
-  {
+  if ( not input_file_name.empty() )
     chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
-  }
 
+  chi_console.RunConsoleLoop();
 
-
-  PetscFinalize();
-  MPI_Finalize();
+  ChiTechFinalize();
 }
+
+//############################################### Batch interface
+/**Runs ChiTech in pure batch mode. Start then finish.*/
+void RunBatch(int argc, char** argv)
+{
+  ChiTechInitialize(argc,argv);
+
+  chi_log.Log(LOG_0)
+    << "ChiTech number of arguments supplied: "
+    << argc - 1;
+
+  chi_log.Log(LOG_0)
+    << "Running ChiTech in batch-mode with "
+    << chi_mpi.process_count << " processes.";
+
+  if (argc<=1)
+    chi_log.Log(LOG_0)
+      << "\nUsage: exe inputfile [options values]\n"
+      << "\n"
+      << "     -v    Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
+      << "     a=b   Executes argument as a lua string.\n\n\n";
+
+  if ( not input_file_name.empty() )
+    chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
+
+  ChiTechFinalize();
+}
+
+
