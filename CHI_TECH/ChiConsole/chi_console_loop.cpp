@@ -1,19 +1,10 @@
-#include <cstdio>
-
 #include "chi_console.h"
 #include <iostream>
 
-//#include "../CHI_LIB/chi_lib.h"
-
-#ifdef CHI_INTERACTIVE
-#include "../CHI_WINDOWMANAGER/chi_windowmanager.h"
-
-extern CHI_VECTOR<char>          chiconsoleInputBuffer;
-extern CHI_WINDOWMANAGER       chiwindowManager;
-#endif
-//#define CHI_INTERACTIVE
-
 extern bool chi_termination_posted;
+
+#include <chi_log.h>
+extern ChiLog chi_log;
 
 
 //############################################################################# Run Console loop
@@ -21,24 +12,28 @@ extern bool chi_termination_posted;
 void ChiConsole::RunConsoleLoop(char* fileName)
 {
 
-    printf("Console loop started.\n");
-	exitLoop = false;
+  chi_log.Log(LOG_0) << "Console loop started.";
+  exit_loop = false;
 
-  while ((!exitLoop) || (!chi_termination_posted))
+  while ((!exit_loop) and (!chi_termination_posted))
   {
-//    char* newConsoleInput = new char[200];
-//    fgets (newConsoleInput, 200, stdin);
     std::string console_input;
 
     std::cin >> console_input;
 
-    if (console_input == "exit")
-      exitLoop=true;
+    if (console_input == std::string("exit"))
+    {
+      exit_loop=true;
+      break;
+    }
 
-    //chiconsoleInputBuffer.PushItem((char*)console_input.data());
-
+    if (luaL_dostring(consoleState,console_input.c_str()))
+    {
+      chi_log.Log(LOG_ALL) << lua_tostring(consoleState,-1);
+      lua_pop(consoleState,1);
+    }
   }
   chi_termination_posted = true;
 
-    printf("Console loop stopped successfully\n");
+  chi_log.Log(LOG_0) << "Console loop stopped successfully.";
 }

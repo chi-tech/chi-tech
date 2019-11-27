@@ -38,7 +38,7 @@ public:
   MPI_Datatype LOC_SWP_DEP_C;
 
 public:
-  ChiMPI()
+  ChiMPI() noexcept
   {
     location_id = 0;
     process_count = 1;

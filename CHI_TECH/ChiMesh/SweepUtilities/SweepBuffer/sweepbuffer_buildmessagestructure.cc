@@ -12,8 +12,6 @@ extern ChiLog     chi_log;
 extern ChiMPI     chi_mpi;
 extern ChiConsole chi_console;
 
-extern double chi_global_timings[20];
-
 //###################################################################
 /**Builds message structure.
  *
@@ -161,10 +159,10 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
 
-    chi_global_timings[12] += num_unknowns;
-    chi_global_timings[13] += 1.0;
-    chi_global_timings[14] += message_count;
-    chi_global_timings[15] += 1.0;
+//    chi_global_timings[12] += num_unknowns;
+//    chi_global_timings[13] += 1.0;
+//    chi_global_timings[14] += message_count;
+//    chi_global_timings[15] += 1.0;
 
     deplocI_message_count[deplocI] = message_count;
 

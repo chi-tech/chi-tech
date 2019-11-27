@@ -2,12 +2,9 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
-#include <ChiTimer/chi_timer.h>
 
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
-
-extern double chi_global_timings[20];
 
 
 
@@ -121,7 +118,8 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
 {
   typedef ExecutionPermission ExePerm;
   typedef AngleSetStatus Status;
-  ChiTimer t16_sweeptime; t16_sweeptime.Reset();
+
+  chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
   //==================================================== Loop till done
   bool finished = false;
@@ -172,7 +170,5 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
     angleset->ReceiveDelayedData(sorted_angleset.set_index);
   }
 
-  chi_global_timings[16] += t16_sweeptime.GetTime()/1000.0;
-  chi_global_timings[17] += 1.0;
-
+  chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_END);
 }

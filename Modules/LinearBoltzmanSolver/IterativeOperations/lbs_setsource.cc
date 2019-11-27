@@ -1,12 +1,7 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
-
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
-#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
 #include "ChiTimer/chi_timer.h"
 
@@ -37,13 +32,11 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
   bool OneD_Slab = false;
-  bool TwoD      = false;
 
   if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
     OneD_Slab = true;
 
-
-  ChiTimer t18_setsrctime; t18_setsrctime.Reset();
+  chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
   //================================================== Get reference to groupset
   LBSGroupset* groupset = group_sets[group_set_num];
@@ -58,12 +51,13 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
 
 
   //================================================== Loop over local cells
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+//  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (auto& cell_g_index : grid->local_cell_glob_indices)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
+//    int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
-    LinearBoltzman::CellViewFull* full_cell_view =
+    auto full_cell_view =
       (LinearBoltzman::CellViewFull*)cell_transport_views[cell->cell_local_id];
 
     //=========================================== Obtain cross-section and src
@@ -94,7 +88,7 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
     double inscat_g = 0.0;
     double sigma_sm = 0.0;
     double* q_mom;
-    double* phi_old;
+    double* phi_oldp;
     int num_dofs = full_cell_view->dofs;
     int gprime;
     for (int i=0; i<num_dofs; i++)
@@ -112,8 +106,8 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
         {
           m++;
           int ir = full_cell_view->MapDOF(i,m,0);
-          q_mom   = &q_moments_local.data()[ir];
-          phi_old = &phi_old_local.data()[ir];
+          q_mom    = &q_moments_local[ir];
+          phi_oldp = &phi_old_local[ir];
 
           //============================= Loop over groupset groups
           for (int g=gs_i; g<=gs_f; g++)
@@ -133,7 +127,7 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
                 if ((gprime < gs_i) || (gprime > gs_f))
                 {
                   sigma_sm  = xs->transfer_matrix[ell].rowI_colJ[g][t];
-                  inscat_g += sigma_sm*phi_old[gprime];
+                  inscat_g += sigma_sm * phi_oldp[gprime];
                 }
               }
             }//if moment avail
@@ -148,7 +142,7 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
                 if ((gprime >= gs_i) && (gprime<=gs_f))
                 {
                   sigma_sm  = xs->transfer_matrix[ell].rowI_colJ[g][t];
-                  inscat_g += sigma_sm*phi_old[gprime];
+                  inscat_g += sigma_sm * phi_oldp[gprime];
                 }
               }
             }//if moment avail
@@ -161,6 +155,5 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
 
   }//for cell
 
-  chi_global_timings[18] += t18_setsrctime.GetTime();
-  chi_global_timings[19] += 1.0;
+  chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_END);
 }
