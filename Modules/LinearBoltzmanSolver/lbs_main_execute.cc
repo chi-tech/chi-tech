@@ -46,6 +46,7 @@ void LinearBoltzman::Solver::Execute()
 /**Solves a single groupset.*/
 void LinearBoltzman::Solver::SolveGroupset(int group_set_num)
 {
+  source_event_tag = chi_log.GetRepeatingEventTag("Set Source");
   LBSGroupset* group_set = group_sets[group_set_num];
   if (group_set->iterative_method == NPT_CLASSICRICHARDSON)
   {
@@ -55,7 +56,6 @@ void LinearBoltzman::Solver::SolveGroupset(int group_set_num)
   {
     GMRES(group_set_num);
   }
-
 
   chi_log.Log(LOG_0)
     << "Groupset solve complete.                  Process memory = "

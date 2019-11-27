@@ -31,24 +31,6 @@ bool            chi_termination_posted = false;
 std::string     input_file_name;
 bool            sim_option_interactive = true;
 
-/** GLOBAL TIMING
-   This array serves as a place holder for many things
-   [ 0]      Unused
-       ...
-   [09]      Maximum memory
-   [10]      Memory events
-   [11]      Memory event counter
-   [12],[13] [12]*8/[13] gives the avg sweep buffer
-             communication requirement in bytes
-   [14],[15] [14]/[15] average sweep predecessor
-             message count per angleset
-   [16]      Cumulative sweep time
-   [17]      Number of sweeps counter
-   [18]      Cumulative set-source time
-   [19]      Number of set source counts
-*/
-double          chi_global_timings[20];
-
 
 //######################################################### Program entry point
 /** Program entry point.
@@ -59,9 +41,6 @@ double          chi_global_timings[20];
 */
 int main(int argc, char** argv)
 {
-  for (int k=0; k<20; k++)
-    chi_global_timings[k] = 0.0;
-
   ParseArguments(argc,argv);
 
   if (sim_option_interactive)

@@ -6,7 +6,6 @@
 extern ChiConsole chi_console;
 extern ChiMPI chi_mpi;
 
-extern double chi_global_timings[20];
 
 #include <chi_log.h>
 
@@ -59,21 +58,21 @@ void LinearBoltzman::Solver::ResetSweepOrderings(LBSGroupset *groupset)
     << std::setprecision(3)
     << chi_console.GetMemoryUsageInMB() << " MB";
 
+  double local_app_memory =
+    chi_log.ProcessEvent(ChiLog::StdTags::MAX_MEMORY_USAGE,
+                         ChiLog::EventOperation::MAX_VALUE);
   double total_app_memory=0.0;
-  MPI_Allreduce(&chi_global_timings[9],&total_app_memory,
+  MPI_Allreduce(&local_app_memory,&total_app_memory,
                 1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
   double max_proc_memory=0.0;
-  MPI_Allreduce(&chi_global_timings[9],&max_proc_memory,
+  MPI_Allreduce(&local_app_memory,&max_proc_memory,
                 1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
-  double local_avg_memory= chi_global_timings[10]/chi_global_timings[11];
-  double avg_proc_memory=0.0;
-  MPI_Allreduce(&local_avg_memory,&avg_proc_memory,
-                1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-  avg_proc_memory/=chi_mpi.process_count;
+
   chi_log.Log(LOG_0)
     << "\n" << std::setprecision(3)
-    << "           Total application memory (max): " << total_app_memory/1000.0 << " GB\n"
-    << "           Maximum process memory        : " << max_proc_memory/1000.0 << " GB\n"
-    << "           Average process memory        : " << avg_proc_memory/1000.0 << " GB\n\n";
+    << "           Total application memory (max): "
+    << total_app_memory/1000.0 << " GB\n"
+    << "           Maximum process memory        : "
+    << max_proc_memory/1000.0 << " GB\n\n";
 
 }

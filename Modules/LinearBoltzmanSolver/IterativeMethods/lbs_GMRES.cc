@@ -163,8 +163,10 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
 
 
 
-  double sweep_time = chi_global_timings[16]/chi_global_timings[17];
-  double source_time= chi_global_timings[18]/chi_global_timings[19];
+  double sweep_time = sweepScheduler.GetAverageSweepTime();
+  double source_time=
+    chi_log.ProcessEvent(source_event_tag,
+                         ChiLog::EventOperation::AVERAGE_DURATION);
   size_t num_angles = groupset->quadrature->abscissae.size();
   long int num_unknowns = (long int)glob_dof_count*
                           (long int)num_angles*
@@ -172,8 +174,11 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   chi_log.Log(LOG_0)
     << "\n\n";
   chi_log.Log(LOG_0)
-    << "        Set Src Time/sweep (s):    "
-    << source_time*1.0e-3;
+    << "        Set Src Time/sweep (s):        "
+    << source_time;
+  chi_log.Log(LOG_0)
+    << "        Average sweep time (s):        "
+    << sweep_time;
   chi_log.Log(LOG_0)
     << "        Sweep Time/Unknown (ns):       "
     << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
