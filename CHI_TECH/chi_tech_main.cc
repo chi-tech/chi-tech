@@ -23,6 +23,8 @@ ChiTimer    chi_program_timer;
 void ParseArguments(int argc, char** argv);
 void RunInteractive(int argc, char** argv);
 void RunBatch(int argc, char** argv);
+void ChiTechInitialize(int argc, char** argv);
+void ChiTechFinalize();
 
 /// @file
 
@@ -41,12 +43,14 @@ bool            sim_option_interactive = true;
 */
 int main(int argc, char** argv)
 {
-  ParseArguments(argc,argv);
+  ChiTechInitialize(argc,argv);
 
   if (sim_option_interactive)
     RunInteractive(argc,argv);
   else
     RunBatch(argc,argv);
+
+  ChiTechFinalize();
 
   return 0;
 }
@@ -107,6 +111,8 @@ void ParseArguments(int argc, char** argv)
 /**Initializes all necessary items for ChiTech.*/
 void ChiTechInitialize(int argc, char** argv)
 {
+  ParseArguments(argc,argv);
+  
   int location_id, number_processes;
 
   MPI_Init (&argc, &argv);                           /* starts MPI */
@@ -134,8 +140,6 @@ void ChiTechFinalize()
 /**Runs the interactive chitech engine*/
 void RunInteractive(int argc, char** argv)
 {
-  ChiTechInitialize(argc,argv);
-
   chi_log.Log(LOG_0)
     << "ChiTech number of arguments supplied: "
     << argc - 1;
@@ -148,16 +152,12 @@ void RunInteractive(int argc, char** argv)
     chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
 
   chi_console.RunConsoleLoop();
-
-  ChiTechFinalize();
 }
 
 //############################################### Batch interface
 /**Runs ChiTech in pure batch mode. Start then finish.*/
 void RunBatch(int argc, char** argv)
 {
-  ChiTechInitialize(argc,argv);
-
   chi_log.Log(LOG_0)
     << "ChiTech number of arguments supplied: "
     << argc - 1;
@@ -176,7 +176,6 @@ void RunBatch(int argc, char** argv)
   if ( not input_file_name.empty() )
     chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
 
-  ChiTechFinalize();
 }
 
 
