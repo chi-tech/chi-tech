@@ -6,32 +6,20 @@
 /** Resets the timer to zero.*/
 void ChiTimer::Reset()
 {
-    #ifdef UNIX_ENV
-	     clock_gettime(CLOCK_MONOTONIC,&this->startTime);
-    #else
-	     QueryPerformanceCounter(&this->LargeInt);
-	     CounterStart = this->LargeInt.QuadPart;
-    #endif
+  startTime = std::chrono::steady_clock::now();
 }
 
 //################################################################### Get time
 /** Gets the current timer value in milliseconds.*/
 double ChiTimer::GetTime()
 {
-    #ifdef UNIX_ENV
-	     timespec  newTime;
-	     clock_gettime(CLOCK_MONOTONIC,&newTime);
-	     timespec diff=this->GetDifference(this->startTime,newTime);
-	     double diffTime=diff.tv_sec*1000.0+diff.tv_nsec/1000000.0;
-    #else
-	     QueryPerformanceFrequency(&this->LargeInt);
-		   this->PCFreq = double(this->LargeInt.QuadPart)/1000.0;
-       QueryPerformanceCounter(&this->LargeInt);
-	     this->counterTime = double(this->LargeInt.QuadPart - this->CounterStart)/this->PCFreq;
-       double diffTime=this->counterTime;
-    #endif
+  using namespace std::chrono;
 
-	return diffTime;
+  steady_clock::time_point newTime = std::chrono::steady_clock::now();
+  duration<double> time_span =
+    duration_cast<duration<double>>(newTime - startTime);
+
+	return time_span.count()*1000.0;
 }
 
 //################################################################### Get string
@@ -45,7 +33,7 @@ std::string ChiTimer::GetTimeString()
   double time_sec = this->GetTime()/1000.0;
   int    hours    = std::floor(time_sec/60/60);
   int    minutes  = std::floor((time_sec-60*60*hours)/60);
-  int    seconds  = time_sec - 3600*hours - 60*minutes;
+  int    seconds  = (int)time_sec - 3600*hours - 60*minutes;
 
   char buff[100];
   sprintf(buff,"%02d:%02d:%02d",hours,minutes,seconds);
@@ -54,24 +42,3 @@ std::string ChiTimer::GetTimeString()
 }
 
 
-#ifdef UNIX_ENV
-//################################################################### Get Difference
-/** Determines the difference between two time calls.*/
-timespec ChiTimer::GetDifference(timespec start, timespec end)
-{
-
-	timespec temp;
-	if ((end.tv_nsec-start.tv_nsec)<0) {
-		temp.tv_sec = end.tv_sec-start.tv_sec-1;
-		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-	} else {
-		temp.tv_sec = end.tv_sec-start.tv_sec;
-		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-	}
-	return temp;
-
-    //return 0.0;
-
-}
-
-#endif

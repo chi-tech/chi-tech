@@ -24,6 +24,7 @@ private:
   SchedulingAlgorithm       scheduler_type;
   AngleAggregation*         angle_agg;
   SweepChunk*               sweep_chunk;
+  const size_t              sweep_event_tag;
 
   struct RULE_VALUES
   {
@@ -51,6 +52,7 @@ public:
                  AngleAggregation* in_angle_agg);
 
   void Sweep(SweepChunk* in_sweep_chunk=NULL);
+  double GetAverageSweepTime();
 
 private:
   void ScheduleAlgoFIFO();

@@ -36,8 +36,11 @@ struct SourceFlags
 
 //################################################################### Class def
 /**A neutral particle transport solver.*/
-class Solver : public chi_physics::Solver {
- public:
+class Solver : public chi_physics::Solver
+{
+private:
+  size_t source_event_tag=0;
+public:
   LinearBoltzman::Options options;    //In chi_npt_structs.h
 
   int num_moments;
