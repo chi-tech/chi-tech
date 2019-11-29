@@ -2,6 +2,8 @@
 #include "../../Quadratures/quadrature_triangle.h"
 #include "../../Quadratures/quadrature_tetrahedron.h"
 
+//###################################################################
+/**Constructor.*/
 SpatialDiscretization_PWL::SpatialDiscretization_PWL(int dim)
   : SpatialDiscretization(dim)
 {
@@ -25,4 +27,14 @@ SpatialDiscretization_PWL::SpatialDiscretization_PWL(int dim)
   this->tet_quad_deg3_surface = new_quad;
 
   mapping_initialized = false;
+}
+
+//###################################################################
+/**Maps a vertex id according to a developed node ordering.*/
+int SpatialDiscretization_PWL::MapNode(int vertex_id)
+{
+  if (node_mapping.empty())
+    return vertex_id;
+
+  return node_mapping[vertex_id];
 }
