@@ -15,6 +15,10 @@ public:
   int dim;
 
 public:
+  std::vector<int> node_mapping;
+  std::vector<int> reverse_node_mapping;
+
+public:
   //00
   SpatialDiscretization(int dim);
 
@@ -23,6 +27,8 @@ public:
     chi_mesh::MeshContinuum* vol_continuum,
     int num_cells,
     int* cell_indices);
+
+  virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* vol_continuum);
 
 };
 

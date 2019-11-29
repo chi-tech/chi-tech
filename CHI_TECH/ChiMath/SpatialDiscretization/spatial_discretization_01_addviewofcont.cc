@@ -7,3 +7,9 @@ void SpatialDiscretization::AddViewOfLocalContinuum(
 {
   //This function is meant to be overwritten
 }
+
+void SpatialDiscretization::AddViewOfLocalContinuum(
+  chi_mesh::MeshContinuum* vol_continuum)
+{
+  //This function is meant to be overwritten
+}

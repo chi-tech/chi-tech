@@ -36,7 +36,18 @@ public:
     chi_mesh::MeshContinuum* vol_continuum,
     int num_cells,
     int* cell_indices);
+  void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* vol_continuum) override;
+  //02
+  std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuum* grid);
   CellFEView* MapFeView(int cell_glob_index);
+  int         MapNode(int vertex_id);
+
+  //03
+  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuum* grid,
+                                std::vector<int>& nodal_bndry_ids,
+                                std::vector<int>& nodal_nnz_in_diag,
+                                std::vector<int>& nodal_nnz_off_diag,
+                                const std::pair<int,int>& domain_ownership);
 };
 
 #endif

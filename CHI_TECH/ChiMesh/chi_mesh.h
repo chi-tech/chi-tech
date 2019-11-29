@@ -97,6 +97,8 @@ namespace chi_mesh
 
   Boundary*              AssignSurfaceToBoundary(chi_mesh::SurfaceMesh* surface);
   MeshHandler*           GetCurrentHandler();
+  size_t                 PushNewHandler();
+  MeshHandler*           GetNewHandler();
   EdgeLoopCollection*    SplitEdgeLoopByAngle(EdgeLoop* input,double angle=1);
 
   //=================================== Domain decompositions
@@ -108,6 +110,9 @@ namespace chi_mesh
                                 Vertex* line_point_0,
                                 Vertex* line_point_1,
                                 double tolerance);
+
+  //=================================== Utilities
+  void Create1DSlabMesh(std::vector<chi_mesh::Vertex> vertices);
 }
 
 #include"chi_meshvector.h"

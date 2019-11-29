@@ -14,6 +14,10 @@ struct chi_mesh::Vector
     x=0.0; y=0.0; z=0.0;
   }
 
+  Vector(double a){
+    x=0.0; y=0.0; z=a;
+  }
+
   Vector(double a, double b){
     x=a; y=b; z=0.0;
   }
