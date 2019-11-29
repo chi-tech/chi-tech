@@ -18,7 +18,7 @@ class ChiConsole
 {
     public:
 	lua_State*							consoleState;             	///< Pointer to lua console state
-	bool                    exitLoop;
+	bool                    exit_loop;
 	bool                    runDeveloper;
 	long                    currentSize;
 	long                    previousSize;
@@ -27,9 +27,9 @@ class ChiConsole
 	int                     xSize;
     public:
 	//00
-						  ChiConsole();
+						  ChiConsole() noexcept;
   //01 Loop
-  void        RunConsoleLoop(char* fileName=NULL);
+  void        RunConsoleLoop(char* fileName=nullptr);
   //02 Utilities
   void        InitializeLuaEvent(const char* eventTitle);
   void        ExecuteFile(const char* fileName,int argc, char** argv);

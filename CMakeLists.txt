@@ -138,7 +138,7 @@ else ()
     )
 endif()
 
-set(LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
+set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ${TRIANGLE})
 
 
 #================================================ Default include directories
@@ -148,7 +148,7 @@ include_directories("${CHI_TECH_DIR}/ChiLog")
 include_directories("${PROJECT_SOURCE_DIR}/Modules")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/chi_tech_main.cc" "${CHI_TECH_DIR}/LuaTest/lua_test.cc")
+set(SOURCES "${CHI_TECH_DIR}/chi_runtime.cc" "${CHI_TECH_DIR}/LuaTest/lua_test.cc")
 add_subdirectory("${CHI_TECH_DIR}/ChiConsole")
 add_subdirectory("${CHI_TECH_DIR}/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/ChiMath")
@@ -162,8 +162,10 @@ add_subdirectory("${CHI_TECH_DIR}/ChiLog")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
-add_executable(${TARGET} ${SOURCES})
-target_link_libraries(${TARGET} ${LIBS} ${TRIANGLE})
+add_library(ChiLib STATIC ${SOURCES})
+add_executable(${TARGET} "${CHI_TECH_DIR}/chi_tech_main.cc")
+target_link_libraries(${TARGET} ChiLib)
+target_link_libraries(ChiLib ${CHI_LIBS})
 
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"

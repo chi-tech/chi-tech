@@ -24,7 +24,7 @@ class ChiPhysics
 
 	public:
 	//00
-			ChiPhysics();
+			ChiPhysics() noexcept;
 	int  InitPetSc(int argc, char** argv);
 	//01
 	void	RunPhysicsLoop();

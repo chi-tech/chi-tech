@@ -26,7 +26,7 @@ public:
 	std::vector<chi_math::ProductQuadrature*> product_quadratures;
 public:
 	//00 Constructor
-	ChiMath();
+	ChiMath() noexcept;
 	//01 Utility
 
 };

@@ -4,7 +4,7 @@
 
 //############################################################################# Default constructor
 /** Default constructor for the console*/
-ChiConsole::ChiConsole()
+ChiConsole::ChiConsole() noexcept
 {
 
 	this->currentSize=0;

@@ -24,6 +24,7 @@ public:
     chi_mesh::MeshContinuum* vol_continuum,
     int num_cells,
     int* cell_indices);
+  void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* vol_continuum) override;
 
   CellFVView* MapFeView(int cell_glob_index);
 };
