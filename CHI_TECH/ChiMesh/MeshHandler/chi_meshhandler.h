@@ -28,6 +28,9 @@ public:
   std::vector<chi_mesh::Cell*> pCells;
 
   std::vector<chi_mesh::CELL_SET*> cell_sets;
+
+public:
+  chi_mesh::MeshContinuum* GetGrid();
 };
 
 #endif
