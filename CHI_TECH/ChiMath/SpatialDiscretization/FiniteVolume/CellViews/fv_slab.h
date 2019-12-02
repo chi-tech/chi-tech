@@ -16,7 +16,6 @@ private:
   int v1i;
 
 public:
-  double volume; ///< Actually length times unity dx*dy
 
   SlabFVView(chi_mesh::CellSlabV2 *slab_cell,
              chi_mesh::MeshContinuum *vol_continuum) :
@@ -30,6 +29,8 @@ public:
 
     chi_mesh::Vector v01 = v1-v0;
     volume = v01.Norm();
+    face_area.push_back(1.0);
+    face_area.push_back(1.0);
   }
 };
 

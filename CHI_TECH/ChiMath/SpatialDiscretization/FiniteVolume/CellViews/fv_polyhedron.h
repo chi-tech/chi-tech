@@ -17,8 +17,6 @@ private:
   chi_mesh::MeshContinuum* grid;
 
 public:
-  double                                     volume; ///< Actually area times unity h
-  std::vector<double>                        face_area; ///< Actually length unity h
   std::vector<std::vector<double>>           face_side_area;
   std::vector<std::vector<double>>           face_side_volume;
   std::vector<std::vector<std::vector<chi_mesh::Vector>>> face_side_vectors;

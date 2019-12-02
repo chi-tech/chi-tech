@@ -1,3 +1,5 @@
 [submodule "CHI_DOC/whitepages"]
 	path = CHI_DOC/whitepages
 	url = https://github.com/chi-tech/whitepapers
+[submodule "Modules/MCParTra"]
+	url = https://github.com/Naktakala/mcpartra

@@ -134,7 +134,7 @@ chiSolverAddRegion(phys0,region0)
 --chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
 chiMonteCarlonCreateSource(phys0,MCSrcTypes.RESID_MOC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys0,MCProperties.NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys0,MCProperties.NUM_PARTICLES,10e6)
 chiMonteCarlonSetProperty(phys0,MCProperties.TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys0,MCProperties.TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys0,MCProperties.SCATTERING_ORDER,0)
@@ -150,10 +150,10 @@ chiMeshHandlerSetCurrent(tmesh)
 phys2 = chiMonteCarlonCreateSolver()
 chiSolverAddRegion(phys2,region1)
 
-chiMonteCarlonCreateSource(phys2,MCSrcTypes.RESIDUAL,1);
+chiMonteCarlonCreateSource(phys2,MCSrcTypes.BNDRY_SRC,1);
 --chiMonteCarlonCreateSource(phys2,MC_RESID_SRC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys2,MCProperties.NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys2,MCProperties.NUM_PARTICLES,10e6)
 chiMonteCarlonSetProperty(phys2,MCProperties.TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys2,MCProperties.TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys2,MCProperties.SCATTERING_ORDER,0)

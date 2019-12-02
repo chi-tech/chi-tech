@@ -17,8 +17,6 @@ private:
   chi_mesh::MeshContinuum* grid;
 
 public:
-  double                                     volume; ///< Actually area times unity h
-  std::vector<double>                        face_area; ///< Actually length unity h
   std::vector<std::vector<chi_mesh::Vector>> side_legs;
 
   PolygonFVView(chi_mesh::CellPolygonV2* poly_cell,

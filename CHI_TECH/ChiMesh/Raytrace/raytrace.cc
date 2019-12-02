@@ -162,6 +162,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       outstr << grid->nodes[vi]->PrintS() << "\n";
 
     chi_log.Log(LOG_ALLERROR) << outstr.str();
+    exit(EXIT_FAILURE);
   }
 
   return dest_info;
