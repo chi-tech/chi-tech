@@ -5,41 +5,49 @@ end
 --dofile(CHI_LIBRARY)
 
 --############################################### Setup Transport mesh
-tmesh = chiMeshHandlerCreate()
+function Create1DMesh(N)
+    tmesh_handle = chiMeshHandlerCreate()
 
-mesh={}
-N=20
-L=5.0
-xmin = 0.0
-dx = L/N
-for i=1,(N+1) do
-    k=i-1
-    mesh[i] = xmin + k*dx
+    mesh={}
+    --N=20
+    L=5.0
+    xmin = 0.0
+    dx = L/N
+    for i=1,(N+1) do
+        k=i-1
+        mesh[i] = xmin + k*dx
+    end
+    line_mesh = chiLineMeshCreateFromArray(mesh)
+
+
+    region0 = chiRegionCreate()
+    chiRegionAddLineBoundary(region1,line_mesh);
+
+
+    --############################################### Create meshers
+    chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
+    chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
+
+    --chiVolumeMesherSetProperty(PARTITION_Z,4)
+    --chiVolumeMesherSetProperty(MESH_GLOBAL,true)
+
+    --############################################### Execute meshing
+    chiSurfaceMesherExecute();
+    chiVolumeMesherExecute();
+
+    --############################################### Set Material IDs
+    vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+    chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+
+    --############################################### Set Material IDs
+    vol1 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,2.5,1000)
+    chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
+
+    return tmesh_handle
 end
-line_mesh = chiLineMeshCreateFromArray(mesh)
 
-
-region0 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
-
---############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
-
---chiVolumeMesherSetProperty(PARTITION_Z,6)
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
-chiVolumeMesherExecute();
-
---############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
-
---############################################### Set Material IDs
-vol1 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,2.5,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
+tmesh = Create1DMesh(20)
+tmesh2= Create1DMesh(120)
 
 
 
@@ -58,8 +66,8 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
 num_groups = 1
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.5)
-chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.5)
+chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.9)
+chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS1,1,1.0,0.9)
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 
@@ -132,52 +140,65 @@ chiSolverAddRegion(phys0,region0)
 
 --chiMonteCarlonCreateSource(phys0,MC_BNDRY_SRC,1);
 --chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
-chiMonteCarlonCreateSource(phys0,MCSrcTypes.RESID_MOC,fflist1[1]);
+chiMonteCarlonCreateSource(phys0,MCSrcTypes.RESIDUAL,1,0);
 
-chiMonteCarlonSetProperty(phys0,MCProperties.NUM_PARTICLES,10e6)
+chiMonteCarlonSetProperty(phys0,MCProperties.NUM_PARTICLES,5e6)
 chiMonteCarlonSetProperty(phys0,MCProperties.TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys0,MCProperties.TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys0,MCProperties.SCATTERING_ORDER,0)
 chiMonteCarlonSetProperty(phys0,MCProperties.MONOENERGETIC,true)
 chiMonteCarlonSetProperty(phys0,MCProperties.FORCE_ISOTROPIC,true)
---chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.25)
+chiMonteCarlonSetProperty(phys0,MCProperties.MAKE_PWLD_SOLUTION,true)
+chiMonteCarlonSetProperty(phys0,MCProperties.TALLY_MULTIPLICATION_FACTOR,0.5)
 
 chiMonteCarlonInitialize(phys0)
 chiMonteCarlonExecute(phys0)
 
 --############################################### Setup ref Monte Carlo Physics
-chiMeshHandlerSetCurrent(tmesh)
+chiMeshHandlerSetCurrent(tmesh2)
 phys2 = chiMonteCarlonCreateSolver()
 chiSolverAddRegion(phys2,region1)
 
 chiMonteCarlonCreateSource(phys2,MCSrcTypes.BNDRY_SRC,1);
 --chiMonteCarlonCreateSource(phys2,MC_RESID_SRC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys2,MCProperties.NUM_PARTICLES,10e6)
+chiMonteCarlonSetProperty(phys2,MCProperties.NUM_PARTICLES,100e6)
 chiMonteCarlonSetProperty(phys2,MCProperties.TFC_UPDATE_INTVL,10e3)
 chiMonteCarlonSetProperty(phys2,MCProperties.TALLY_MERGE_INTVL,100e3)
 chiMonteCarlonSetProperty(phys2,MCProperties.SCATTERING_ORDER,0)
 chiMonteCarlonSetProperty(phys2,MCProperties.MONOENERGETIC,true)
 chiMonteCarlonSetProperty(phys2,MCProperties.FORCE_ISOTROPIC,true)
+
+chiMonteCarlonSetProperty(phys2,MCProperties.MAKE_PWLD_SOLUTION,true)
+
 chiMonteCarlonSetProperty(phys2,MCProperties.TALLY_MULTIPLICATION_FACTOR,0.5/2)
 
 chiMonteCarlonInitialize(phys2)
 chiMonteCarlonExecute(phys2)
 
 
-fflist0,count = chiGetFieldFunctionList(phys0)
-fflist1,count = chiLBSGetScalarFieldFunctionList(phys1)
-fflist2,count = chiGetFieldFunctionList(phys2) --Fine mesh MC
+--############################################### Post processing
+fflist0,count0 = chiGetFieldFunctionList(phys0)
+fflist1,count1 = chiLBSGetScalarFieldFunctionList(phys1)
+fflist2,count2 = chiGetFieldFunctionList(phys2) --Fine mesh MC
+
+print(fflist0[1],count0)
+print(fflist1[1],count1)
+print(fflist2[1],count2)
 
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
-chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,0.0, 5.0+xmin)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0001+xmin)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,0.0, 4.9999+xmin)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 500)
 
-chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist0[1])
-chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist1[1])
-chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist2[1])
+--chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist0[1])
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,1)
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,2)
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,0)
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,4)
+--chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist1[1])
+--chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist2[1])
 
 chiFFInterpolationInitialize(cline)
 chiFFInterpolationExecute(cline)
@@ -188,5 +209,5 @@ chiFFInterpolationExportPython(cline)
 
 
 if (chi_location_id == 0) then
-    local handle = io.popen("python3 ZLFFI00.py")
+    local handle = io.popen("python3 CHI_TEST/RMC/Compare3.py")
 end
