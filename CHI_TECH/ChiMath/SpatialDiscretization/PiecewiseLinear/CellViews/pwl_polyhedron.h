@@ -154,6 +154,9 @@ public:
   void ShapeValues(const chi_mesh::Vector& xyz,
                    std::vector<double>& shape_values) override;
 
+  void GradShapeValues(const chi_mesh::Vector& xyz,
+                       std::vector<chi_mesh::Vector>& gradshape_values) override;
+
   //############################################### Precomputation cell matrices
 private:
   double PreShape(int face_index, int side_index,

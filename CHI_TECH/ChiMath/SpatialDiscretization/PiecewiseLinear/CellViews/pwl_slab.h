@@ -117,32 +117,6 @@ public:
 
   }
 
-//  /**Shape function for the slab function.*/
-//  double Shape_x(int i, const chi_mesh::Vector& xyz)
-//  {
-//    chi_mesh::Vector& p0 = *grid->nodes[v0i];
-//    chi_mesh::Vector& p1 = *grid->nodes[v1i];
-//    chi_mesh::Vector xyz_ref = xyz - p0;
-//
-//    chi_mesh::Vector v01 = p1 - p0;
-//
-//    double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
-//
-//    if ((xi>=-1.0e-12) and (xi<=1.0+1.0e-12))
-//    {
-//      if (i==0)
-//      {
-//        return 1.0 - xi;
-//      }
-//      else
-//      {
-//        return xi;
-//      }
-//    }
-//
-//    return 0.0;
-//  }
-
   /**Shape function i evaluated at given point for the slab.*/
   double ShapeValue(const int i, const chi_mesh::Vector& xyz) override
   {
@@ -154,7 +128,7 @@ public:
 
     double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
 
-    if ((xi>=-1.0e-12) and (xi<=1.0+1.0e-12))
+    if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
     {
       if (i==0)
       {
@@ -184,7 +158,7 @@ public:
 
     double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
 
-    if ((xi>=-1.0e-12) and (xi<=1.0+1.0e-12))
+    if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
     {
       for (int i=0; i<dofs; i++)
       {
@@ -211,6 +185,17 @@ public:
       return chi_mesh::Vector(0.0,0.0,-1.0/h);
     else
       return chi_mesh::Vector(0.0,0.0, 1.0/h);
+  }
+
+  //###################################################################
+  /**Populates shape_values with the value of each shape function's
+   * value evaluate at the supplied point.*/
+  void GradShapeValues(const chi_mesh::Vector& xyz,
+                       std::vector<chi_mesh::Vector>& gradshape_values) override
+  {
+    gradshape_values.clear();
+    gradshape_values.emplace_back(GradShapeValue(0,xyz));
+    gradshape_values.emplace_back(GradShapeValue(1,xyz));
   }
 };
 #endif

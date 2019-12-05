@@ -80,6 +80,9 @@ public:
   void ShapeValues(const chi_mesh::Vector& xyz,
                    std::vector<double>& shape_values) override;
 
+  void GradShapeValues(const chi_mesh::Vector& xyz,
+                       std::vector<chi_mesh::Vector>& gradshape_values) override;
+
 
   //############################################### Precomputation cell matrices
   double PreShape(int s, int i, int qpoint_index, bool on_surface = false);
@@ -113,6 +116,8 @@ private:
   {
     return sides[side]->qp_data[i]->gradshapey_qp[qp];
   }
+
+
 
 public:
   void PreCompute();

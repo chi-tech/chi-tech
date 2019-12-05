@@ -159,3 +159,15 @@ chi_mesh::Vector PolyhedronFEView::GradShapeValue(const int i,
   }
   return gradr;
 }
+
+//###################################################################
+/**Populates gradshape_values with the value of each shape function's
+ * gradient evaluated at the supplied point.*/
+void PolyhedronFEView::GradShapeValues(
+  const chi_mesh::Vector &xyz,
+  std::vector<chi_mesh::Vector> &gradshape_values)
+{
+  gradshape_values.clear();
+  for (int i=0; i<dofs; ++i)
+    gradshape_values.emplace_back(GradShapeValue(i,xyz));
+}
