@@ -239,7 +239,8 @@ std::string ChiLog::PrintEventHistory(size_t ev_tag)
         break;
     }
 
-    outstr << event.ev_info->GetString();
+    if (event.ev_info != nullptr)
+      outstr << event.ev_info->GetString();
     outstr << std::endl;
   }
 
