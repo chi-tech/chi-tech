@@ -1037,6 +1037,87 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   return 0;
 }
 
+
+//###################################################################
+/**Enables or disables the printing of a sweep log.
+\param SolverIndex int Handle to the solver for which the group
+is to be created.
+
+\param GroupsetIndex int Index to the groupset to which this function should
+                         apply
+\param flag bool Flag indicating whether to print sweep log. Default false.
+
+##_
+
+Example:
+\code
+chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
+\endcode
+
+\ingroup LuaLBSGroupsets
+*/
+int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
+{
+  //============================================= Get arguments
+  int num_args = lua_gettop(L);
+  if (num_args != 3)
+    LuaPostArgAmountError("chiLBSGroupsetSetEnableSweepLog",3,num_args);
+
+  LuaCheckNilValue("chiLBSGroupsetSetEnableSweepLog",L,1);
+  LuaCheckNilValue("chiLBSGroupsetSetEnableSweepLog",L,2);
+  LuaCheckNilValue("chiLBSGroupsetSetEnableSweepLog",L,3);
+  int solver_index = lua_tonumber(L,1);
+  int grpset_index = lua_tonumber(L,2);
+  bool log_flag = lua_toboolean(L,3);
+
+  //============================================= Get pointer to solver
+  chi_physics::Solver* psolver;
+  LinearBoltzman::Solver* solver;
+  try{
+    psolver = chi_physics_handler.solver_stack.at(solver_index);
+
+    if (typeid(*psolver) == typeid(LinearBoltzman::Solver))
+    {
+      solver = (LinearBoltzman::Solver*)(psolver);
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Incorrect solver-type "
+        << "in call to chiLBSGroupsetSetEnableSweepLog";
+      exit(EXIT_FAILURE);
+    }
+  }
+  catch(const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid handle to solver "
+      << "in call to chiLBSGroupsetSetEnableSweepLog";
+    exit(EXIT_FAILURE);
+  }
+
+  //============================================= Obtain pointer to groupset
+  LBSGroupset* groupset;
+  try{
+    groupset = solver->group_sets.at(grpset_index);
+  }
+  catch (const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Invalid handle to groupset "
+      << "in call to chiLBSGroupsetSetEnableSweepLog";
+    exit(EXIT_FAILURE);
+  }
+
+  groupset->log_sweep_events = log_flag;
+
+  chi_log.Log(LOG_0)
+    << "Groupset " << grpset_index << " flag for writing sweep log "
+    << "set to " << log_flag;
+
+  return 0;
+}
+
 //###################################################################
 /**Sets the Within-Group Diffusion Synthetic Acceleration parameters
  * for this groupset. If this call is being made then it is assumed

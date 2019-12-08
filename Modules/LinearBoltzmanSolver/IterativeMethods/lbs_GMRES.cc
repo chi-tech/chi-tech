@@ -186,6 +186,12 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
     << "        Number of unknowns per sweep:  " << num_unknowns;
   chi_log.Log(LOG_0)
     << "\n\n";
+
+  std::string sweep_log_file_name =
+    std::string("GS_") + std::to_string(group_set_num) +
+    std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+    std::string(".log");
+  groupset->PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
 }
 
 

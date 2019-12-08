@@ -13,6 +13,12 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
 {
   chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
+  auto ev_info_i =
+    std::make_shared<ChiLog::EventInfo>(std::string("Sweep initiated"));
+
+  chi_log.LogEvent(sweep_event_tag,
+                   ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_i);
+
   //================================================== Loop over AngleSetGroups
   // For 3D geometry this will be 8, one for each octant.
   // For 2D geometry this will be 4, one for each quadrant.

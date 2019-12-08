@@ -6,8 +6,12 @@
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 
 #include <chi_log.h>
+#include <chi_mpi.h>
 
 extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
+
+#include <fstream>
 
 //##############################################
 /**Groupset constructor.*/
@@ -38,6 +42,8 @@ LBSGroupset::LBSGroupset()
   tgdsa_verbose = false;
 
   allow_cycles = false;
+
+  log_sweep_events = false;
 
   latest_convergence_metric = 1.0;
 }
@@ -324,4 +330,50 @@ void LBSGroupset::BuildSubsets()
         << "Bot-hemi Angle subset " << ss << " "
         << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
+}
+
+//###################################################################
+/**Constructs the groupset subsets.*/
+void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, std::string file_name)
+{
+  if (not log_sweep_events) return;
+
+  std::ofstream ofile;
+  ofile.open(file_name,std::ofstream::out);
+
+  ofile
+    << "Groupset Sweep information "
+    << "location " << chi_mpi.location_id << "\n";
+
+
+  //======================================== Print all anglesets
+  for (int q=0; q<angle_agg->angle_set_groups.size(); ++q)
+  {
+    ofile << "Angle-set group " << q << ":\n";
+    auto ang_set_grp = angle_agg->angle_set_groups[q];
+    size_t num_ang_sets_per_grp = ang_set_grp->angle_sets.size();
+    for (int as=0; as<num_ang_sets_per_grp; ++as)
+    {
+      auto ang_set = ang_set_grp->angle_sets[as];
+
+      int ang_set_num = as + q*num_ang_sets_per_grp;
+
+      ofile << "  Angle-set " << ang_set_num << " angles [# varphi theta]:\n";
+
+      for (auto& ang_num : ang_set->angles)
+      {
+        auto angle = quadrature->abscissae[ang_num];
+
+        ofile
+          << "    " << ang_num
+          << " " << angle->phi
+          << " " << angle->theta << "\n";
+      }
+    }
+  }
+
+  //======================================== Print event history
+  ofile << chi_log.PrintEventHistory(ev_tag);
+
+  ofile.close();
 }
