@@ -19,7 +19,18 @@ public:
   int G;
   int L;
 
-  std::vector<double> sigma_tg;
+  std::vector<double> sigma_tg;     ///< MT 1    Total cross-section
+  std::vector<double> sigma_fg;     ///< MT 18   Sigmaf cross-section
+  std::vector<double> sigma_captg;  ///< MT 27   Capture cross-section
+  std::vector<double> chi_g;        ///< MT 2018 Fission spectrum
+  std::vector<double> nu_sigma_fg;  ///< MT 2452 Nubar-Sigmaf cross-section
+
+  /**The MT number for this transfer varies:
+   * MT 2500 is total,
+   * MT 2501 is scattering only
+   * MT 2519 is scattering and fission
+   * MT 2502 is elastic scattering only
+   * MT 2504 is inelastic scattering only*/
   std::vector<chi_math::SparseMatrix> transfer_matrix;
 
 public:
@@ -30,6 +41,7 @@ public:
   std::vector<double> sigma_rg;
   std::vector<double> sigma_ag;
   std::vector<double> sigma_s_gtog;
+
 
   std::vector<double> xi_Jfull_g;
   std::vector<double> xi_Jpart_g;

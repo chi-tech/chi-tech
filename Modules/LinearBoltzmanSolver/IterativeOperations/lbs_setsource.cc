@@ -44,6 +44,9 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
   int gs_i = groupset->groups[0]->id;
   int gs_f = groupset->groups.back()->id;
 
+  int first_grp = groups.front()->id;
+  int last_grp = groups.back()->id;
+
   std::vector<double> default_zero_src(groups.size(),0.0);
 
   //================================================== Reset source moments
@@ -51,10 +54,8 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
 
 
   //================================================== Loop over local cells
-//  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
   for (auto& cell_g_index : grid->local_cell_glob_indices)
   {
-//    int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
     auto full_cell_view =
@@ -146,7 +147,36 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
                 }
               }
             }//if moment avail
+
             q_mom[g] += inscat_g;
+
+            //====================== Apply accross-groupset fission
+            if ((ell == 0) and (apply_mat_src))
+            {
+              for (gprime=first_grp; gprime<=last_grp; ++gprime)
+              {
+                if ((gprime < gs_i) || (gprime > gs_f))
+                {
+                  q_mom[g] += xs->chi_g[g]*
+                              xs->nu_sigma_fg[gprime]*
+                              phi_oldp[gprime];
+                }
+              }//for gprime
+            }//if zeroth moment
+
+            //====================== Apply within-groupset fission
+            if ((ell == 0) and (!suppress_phi_old))
+            {
+              for (gprime=first_grp; gprime<=last_grp; ++gprime)
+              {
+                if ((gprime >= gs_i) && (gprime<=gs_f))
+                {
+                  q_mom[g] += xs->chi_g[g]*
+                              xs->nu_sigma_fg[gprime]*
+                              phi_oldp[gprime];
+                }
+              }//for gprime
+            }//if zeroth moment
           }//for g
         }
 
