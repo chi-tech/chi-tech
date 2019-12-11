@@ -160,6 +160,13 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
     cur_material->properties.push_back(prop);
     chi_log.Log(LOG_0VERBOSE_1) << "Transport cross-sections added to material"
                                  " at index " << material_index;
+
+    chi_physics_handler.trnsprt_xs_stack.push_back(prop);
+
+    int index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+
+    lua_pushnumber(L,index);
+    return 1;
   }
   else if (property_index == ISOTROPIC_MG_SOURCE)
   {
@@ -257,6 +264,11 @@ to be followed by a filepath specifying the xs-file. By default this routine
 will attempt to build a transfer matrix from reaction type MT2501, however,
 an additional text field can be supplied specifying the transfer matrix to
  use.
+
+####_
+
+EXISTING\n
+Supply handle to an existing cross-section and simply swap them out.
 
 \code
 chiPhysicsMaterialSetProperty(materials[1],
@@ -554,6 +566,29 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         prop->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
       }
+      else if (operation_index == EXISTING)
+      {
+        if (numArgs != 4)
+          LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
+
+        int handle = lua_tonumber(L,4);
+
+        chi_physics::TransportCrossSections* xs;
+        try {
+          xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+        }
+        catch(const std::out_of_range& o){
+          chi_log.Log(LOG_ALLERROR)
+            << "ERROR: Invalid cross-section handle"
+            << " in call to chiPhysicsMaterialSetProperty."
+            << std::endl;
+          exit(EXIT_FAILURE);
+        }
+        auto old_prop = prop;
+        prop = xs;
+
+//        delete old_prop; //Still debating if this should be deleted
+      }
       else
       {
         chi_log.Log(LOG_ALLERROR) << "Unsupported operation for "
@@ -673,5 +708,148 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   }
 
 
+  return 0;
+}
+
+//###################################################################
+/**Creates a stand-alone transport cross-section.
+ *
+ * \return Returns a handle to the cross-section.
+ *
+ * */
+int chiPhysicsTransportXSCreate(lua_State* L)
+{
+  auto xs = new chi_physics::TransportCrossSections;
+
+  chi_physics_handler.trnsprt_xs_stack.push_back(xs);
+
+  int index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+
+  lua_pushnumber(L,index);
+  return 1;
+}
+
+//###################################################################
+/**Sets the properties of a transport cross-section.
+ *
+ * \param XS_handle int Handle to the cross-section to be modified.
+ * \param OperationIndex int Method used for setting the xs property.
+ * \param Information varying Varying information depending on the operation.
+ *
+ * ##_
+ *
+###OperationIndex\n
+SINGLE_VALUE\n
+Sets the property based on a single value. Requires a single value as additional
+information. As a simple example consider the case where the user would like
+to set a single constant thermal conductivity. This can be achieved with \n
+FROM_ARRAY\n
+Sets a property based on a Lua array indexed from 1 to N. Internally
+will be converted to 0 to N-1. This method can be used to set mutligroup
+cross-sections or sources.
+\n
+SIMPLEXS0\n
+Makes a simple material with no transfer matrix just \f$\sigma_t \f$. Expects two
+values: \n
+ - int number of groups \f$G \f$,
+ - float \f$\sigma_t \f$.
+
+####_
+
+SIMPLEXS1\n
+Makes a simple material with isotropic transfer matrix (L=0)
+and mostly down scattering but with a few of the last groups
+subject to up-scattering. Expects three values
+values: \n
+ - int number of groups (\f$G \f$),
+ - float \f$\sigma_t \f$,
+ - float scattering to total ratio (\f$c \f$)
+
+####_
+
+PDT_XSFILE\n
+Loads transport cross-sections from PDT type cross-section files. Expects
+to be followed by a filepath specifying the xs-file. By default this routine
+will attempt to build a transfer matrix from reaction type MT 2501, however,
+an additional text field can be supplied specifying the transfer matrix to
+ use.
+
+\code
+graphite = chiPhysicsTransportXSCreate()
+chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
+\endcode
+ *
+ * \return */
+int chiPhysicsTransportXSSet(lua_State* L)
+{
+  int num_args = lua_gettop(L);
+
+  if (num_args < 3)
+  {
+    LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
+    exit(EXIT_FAILURE);
+  }
+
+  LuaCheckNilValue("chiPhysicsTransportXSSet",L,1);
+  LuaCheckNilValue("chiPhysicsTransportXSSet",L,2);
+
+  int handle = lua_tonumber(L,1);
+  int operation_index = lua_tonumber(L,1);
+
+  chi_physics::TransportCrossSections* xs;
+  try {
+    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+  }
+  catch(const std::out_of_range& o){
+    chi_log.Log(LOG_ALLERROR)
+      << "ERROR: Invalid cross-section handle"
+      << " in call to chiPhysicsTransportXSSet."
+      << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  //========================== Process operation
+  if (operation_index == SIMPLEXS0)
+  {
+    if (num_args!=4)
+      LuaPostArgAmountError("chiPhysicsTransportXSSet",4,num_args);
+
+    int    G       = lua_tonumber(L,3);
+    double sigma_t = lua_tonumber(L,4);
+
+    xs->MakeSimple0(G,sigma_t);
+  }
+  else if (operation_index == SIMPLEXS1)
+  {
+    if (num_args!=5)
+      LuaPostArgAmountError("chiPhysicsTransportXSSet",5,num_args);
+
+    int    G       = lua_tonumber(L,3);
+    double sigma_t = lua_tonumber(L,4);
+    double c       = lua_tonumber(L,5);
+
+    xs->MakeSimple1(G,sigma_t,c);
+  }
+  else if (operation_index == PDT_XSFILE)
+  {
+    if (!((num_args>=3) && (num_args<=4)))
+      LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
+
+    const char* file_name_c = lua_tostring(L,3);
+    std::string MT_TRANSFER("2501");
+
+    if (num_args == 4)
+      MT_TRANSFER = std::string(lua_tostring(L,4));
+
+    xs->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
+  }
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Unsupported operation in "
+      << "chiPhysicsTransportXSSet."
+      << std::endl;
+    exit(EXIT_FAILURE);
+  }
   return 0;
 }

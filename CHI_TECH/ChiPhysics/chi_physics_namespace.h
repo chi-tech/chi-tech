@@ -10,6 +10,7 @@
 #define SIMPLEXS0                 20
 #define SIMPLEXS1                 21
 #define PDT_XSFILE                22
+#define EXISTING                  23
 
 
 namespace chi_physics

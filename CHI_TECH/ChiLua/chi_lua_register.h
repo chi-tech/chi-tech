@@ -167,6 +167,7 @@ RegisterConstant(FROM_ARRAY,              1);
 RegisterConstant(SIMPLEXS0,              20);
 RegisterConstant(SIMPLEXS1,              21);
 RegisterConstant(PDT_XSFILE,             22);
+RegisterConstant(EXISTING,               23);
 
 
 #include "../../Modules/module_lua_register.h"
