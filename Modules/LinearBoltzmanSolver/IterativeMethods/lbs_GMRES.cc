@@ -164,6 +164,7 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
 
 
   double sweep_time = sweepScheduler.GetAverageSweepTime();
+  double chunk_overhead_ratio = 1.0-sweepScheduler.GetAngleSetTimings()[2];
   double source_time=
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
@@ -179,6 +180,9 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   chi_log.Log(LOG_0)
     << "        Average sweep time (s):        "
     << sweep_time;
+  chi_log.Log(LOG_0)
+    << "        Chunk-Overhead-Ratio  :        "
+    << chunk_overhead_ratio;
   chi_log.Log(LOG_0)
     << "        Sweep Time/Unknown (ns):       "
     << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;

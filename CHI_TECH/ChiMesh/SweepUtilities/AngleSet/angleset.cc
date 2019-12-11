@@ -1,11 +1,12 @@
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "angleset.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
-#include "ChiMesh/SweepUtilities/SweepBuffer/sweepbuffer.h"
 
 #include <chi_mpi.h>
-
 extern ChiMPI chi_mpi;
+
+#include <chi_log.h>
+extern ChiLog chi_log;
 
 //###################################################################
 /**AngleSet constructor.*/
@@ -52,6 +53,7 @@ chi_mesh::sweep_management::AngleSetStatus
 chi_mesh::sweep_management::AngleSet::
 AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
                 int angle_set_num,
+                const std::vector<size_t>& timing_tags,
                 chi_mesh::sweep_management::ExecutionPermission permission)
 {
   typedef AngleSetStatus Status;
@@ -71,7 +73,9 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
   {
     sweep_buffer.InitializeLocalAndDownstreamBuffers();
 
+    chi_log.LogEvent(timing_tags[0],ChiLog::EventType::EVENT_BEGIN);
     sweep_chunk->Sweep(this); //Execute chunk
+    chi_log.LogEvent(timing_tags[0],ChiLog::EventType::EVENT_END);
 
     //Send outgoing psi and clear local and receive buffers
     sweep_buffer.SendDownstreamPsi(angle_set_num);

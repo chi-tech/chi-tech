@@ -147,7 +147,10 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
       //  - FINISHED.
       //      Meaning the angleset has executed its sweep chunk
       Status status = angleset->
-        AngleSetAdvance(sweep_chunk, angset_number, ExePerm::NO_EXEC_IF_READY);
+        AngleSetAdvance(sweep_chunk,
+                        angset_number,
+                        sweep_timing_events_tag,
+                        ExePerm::NO_EXEC_IF_READY);
 
       //=============================== Execute if ready and allowed
       // If this angleset is the one scheduled to run
@@ -193,7 +196,10 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
                          ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_i);
 
         status = angleset->
-          AngleSetAdvance(sweep_chunk, angset_number, ExePerm::EXECUTE);
+          AngleSetAdvance(sweep_chunk,
+                          angset_number,
+                          sweep_timing_events_tag,
+                          ExePerm::EXECUTE);
 
         std::stringstream message_f;
         message_f

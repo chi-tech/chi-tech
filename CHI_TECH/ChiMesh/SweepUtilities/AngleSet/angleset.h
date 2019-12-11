@@ -60,6 +60,7 @@ public:
   AngleSetStatus AngleSetAdvance(
              SweepChunk *sweep_chunk,
              int angle_set_num,
+             const std::vector<size_t>& timing_tags,
              ExecutionPermission permission = ExecutionPermission::EXECUTE);
   void ResetSweepBuffers();
   void ReceiveDelayedData(int angle_set_num);

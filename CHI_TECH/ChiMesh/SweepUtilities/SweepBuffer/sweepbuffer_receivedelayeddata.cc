@@ -15,7 +15,7 @@ void chi_mesh::sweep_management::SweepBuffer::
 ReceiveDelayedData(int angle_set_num)
 {
   chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
-  MPI_Barrier(MPI_COMM_WORLD);
+
   //======================================== Receive delayed data
   for (size_t prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
   {

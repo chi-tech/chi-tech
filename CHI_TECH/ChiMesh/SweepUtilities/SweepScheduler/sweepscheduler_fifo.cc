@@ -30,7 +30,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
     for (int q=0; q<angle_agg->angle_set_groups.size(); q++)
     {
       completion_status = angle_agg->angle_set_groups[q]->
-        AngleSetGroupAdvance(sweep_chunk, q);
+        AngleSetGroupAdvance(sweep_chunk, q, sweep_timing_events_tag);
     }
   }
 
