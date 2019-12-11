@@ -47,9 +47,10 @@ private:
 
   std::vector<std::vector<bool>> delayed_prelocI_message_available;
 
+
   std::vector<std::vector<MPI_Request>> deplocI_message_request;
 
-  bool messages_received = false;
+
 
 public:
   int max_num_mess;
