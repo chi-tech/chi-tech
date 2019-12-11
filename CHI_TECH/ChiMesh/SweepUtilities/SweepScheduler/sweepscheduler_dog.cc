@@ -155,35 +155,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
       //=============================== Execute if ready and allowed
       // If this angleset is the one scheduled to run
       // and it is ready then it will be given permission
-//      if (status == Status::READY_TO_EXECUTE and as == scheduled_angleset)
-//      {
-//        std::stringstream message_i;
-//        message_i
-//          << "Angleset " << angset_number
-//          << " executed on location " << chi_mpi.location_id;
-//
-//        auto ev_info_i = std::make_shared<ChiLog::EventInfo>(message_i.str());
-//
-//        chi_log.LogEvent(sweep_event_tag,
-//                         ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_i);
-//
-//        status = angleset->
-//          AngleSetAdvance(sweep_chunk, angset_number, ExePerm::EXECUTE);
-//
-//        std::stringstream message_f;
-//        message_f
-//          << "Angleset " << angset_number
-//          << " finished on location " << chi_mpi.location_id;
-//
-//        auto ev_info_f = std::make_shared<ChiLog::EventInfo>(message_f.str());
-//
-//        chi_log.LogEvent(sweep_event_tag,
-//                         ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_f);
-//
-//        scheduled_angleset++; //Schedule the next angleset
-//      }
-
-      if (status == Status::READY_TO_EXECUTE)
+      if (status == Status::READY_TO_EXECUTE and as == scheduled_angleset)
       {
         std::stringstream message_i;
         message_i
@@ -210,6 +182,8 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
 
         chi_log.LogEvent(sweep_event_tag,
                          ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_f);
+
+        scheduled_angleset++; //Schedule the next angleset
       }
 
       if (status != Status::FINISHED)
