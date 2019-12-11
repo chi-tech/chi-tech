@@ -62,46 +62,63 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
           break;
         }//if message is not available
           //============================ Receive upstream data
-        else
-        {
-          prelocI_message_available[prelocI][m] = true;
-
-          u_ll_int block_addr   = prelocI_message_blockpos[prelocI][m];
-          u_ll_int message_size = prelocI_message_size[prelocI][m];
-
-          int error_code = MPI_Recv(&angleset->prelocI_outgoing_psi[prelocI].data()[block_addr],
-                                    message_size,
-                                    MPI_DOUBLE,
-                                    comm_set->MapIonJ(locJ,chi_mpi.location_id),
-                                    max_num_mess*angle_set_num + m, //tag
-                                    comm_set->communicators[chi_mpi.location_id],
-                                    MPI_STATUS_IGNORE);
-
-          if (error_code != MPI_SUCCESS)
-          {
-            std::stringstream err_stream;
-            err_stream << "################# Delayed receive error."
-                       << " message size=" << message_size
-                       << " as_num=" << angle_set_num
-                       << " num_mess=" << num_mess
-                       << " m=" << m
-                       << " error="
-                       << " size=\n";
-            char error_string[BUFSIZ];
-            int length_of_error_string, error_class;
-            MPI_Error_class(error_code, &error_class);
-            MPI_Error_string(error_class, error_string, &length_of_error_string);
-            err_stream << error_string << "\n";
-            MPI_Error_string(error_code, error_string, &length_of_error_string);
-            err_stream << error_string << "\n";
-            chi_log.Log(LOG_ALLWARNING) << err_stream.str();
-          }
-        }
+//        else
+//        {
+//          prelocI_message_available[prelocI][m] = true;
+//        }
       }//if not message already received
     }//for message
 
     if (!ready_to_execute) break;
   }//for predecessor
+
+  if (ready_to_execute)
+  {
+    for (size_t prelocI=0; prelocI<spds->location_dependencies.size(); prelocI++)
+    {
+      int locJ = spds->location_dependencies[prelocI];
+
+      size_t num_mess = prelocI_message_count[prelocI];
+      for (size_t m=0; m<num_mess; m++)
+      {
+        if (prelocI_message_available[prelocI][m]) continue;
+        prelocI_message_available[prelocI][m] = true;
+
+        u_ll_int block_addr   = prelocI_message_blockpos[prelocI][m];
+        u_ll_int message_size = prelocI_message_size[prelocI][m];
+
+        int error_code = MPI_Recv(&angleset->prelocI_outgoing_psi[prelocI].data()[block_addr],
+                                  message_size,
+                                  MPI_DOUBLE,
+                                  comm_set->MapIonJ(locJ,chi_mpi.location_id),
+                                  max_num_mess*angle_set_num + m, //tag
+                                  comm_set->communicators[chi_mpi.location_id],
+                                  MPI_STATUS_IGNORE);
+
+        if (error_code != MPI_SUCCESS)
+        {
+          std::stringstream err_stream;
+          err_stream << "################# Delayed receive error."
+                     << " message size=" << message_size
+                     << " as_num=" << angle_set_num
+                     << " num_mess=" << num_mess
+                     << " m=" << m
+                     << " error="
+                     << " size=\n";
+          char error_string[BUFSIZ];
+          int length_of_error_string, error_class;
+          MPI_Error_class(error_code, &error_class);
+          MPI_Error_string(error_class, error_string, &length_of_error_string);
+          err_stream << error_string << "\n";
+          MPI_Error_string(error_code, error_string, &length_of_error_string);
+          err_stream << error_string << "\n";
+          chi_log.Log(LOG_ALLWARNING) << err_stream.str();
+        }
+      }//for message
+
+    }//for predecessor
+  }
+
 
   if (!ready_to_execute)
     return AngleSetStatus::RECEIVING;
