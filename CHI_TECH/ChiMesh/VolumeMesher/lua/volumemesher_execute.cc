@@ -43,7 +43,7 @@ int chiVolumeMesherExecute(lua_State *L)
 
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
-    << "chiVolumeMesherExecute: Volume meshing completed."
+    << " chiVolumeMesherExecute: Volume meshing completed."
     << mem_string.str()
     << std::endl;
 

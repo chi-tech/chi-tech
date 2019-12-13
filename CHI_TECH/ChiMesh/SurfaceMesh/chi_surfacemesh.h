@@ -30,9 +30,12 @@ public:
   //loadexport.cc
   int   ImportFromOBJFile(const char* fileName,bool as_poly);
   int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
-  void  UpdateInternalConnectivity();
   void  ExportToOBJFile(const char* fileName);
   void  ExportToPolyFile(const char* fileName);
+
+  //internalconn.cc
+  void  UpdateInternalConnectivityOld();
+  void  UpdateInternalConnectivity();
 
   //checksense.cc
   bool  CheckNegativeSense(double x, double y, double z);

@@ -17,7 +17,8 @@
 extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
 
-
+#include <ChiTimer/chi_timer.h>
+extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
@@ -418,6 +419,9 @@ void chi_mesh::VolumeMesher::
 void chi_mesh::VolumeMesher::
   SetMatIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int mat_id)
 {
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
 
@@ -436,4 +440,8 @@ void chi_mesh::VolumeMesher::
       cell->material_id = mat_id;
     }
   }
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Done setting material id from logical volume.";
 }
