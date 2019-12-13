@@ -122,17 +122,25 @@ void ChiTechFinalize()
 void ChiTechRunInteractive(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
-    << "ChiTech number of arguments supplied: "
-    << argc - 1;
+    << chi_program_timer.GetLocalDateTimeString()
+    << " Running ChiTech in interactive-mode with "
+    << chi_mpi.process_count << " processes.";
 
   chi_log.Log(LOG_0)
-    << "Running ChiTech in interactive-mode with "
-    << chi_mpi.process_count << " processes.";
+    << "ChiTech number of arguments supplied: "
+    << argc - 1;
 
   if ( not input_file_name.empty() )
     chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
 
   chi_console.RunConsoleLoop();
+
+  chi_log.Log(LOG_0)
+    << "Final program time " << chi_program_timer.GetTimeString();
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetLocalDateTimeString()
+    << " ChiTech finished execution.";
 }
 
 //############################################### Batch interface
@@ -140,12 +148,13 @@ void ChiTechRunInteractive(int argc, char** argv)
 void ChiTechRunBatch(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
-    << "ChiTech number of arguments supplied: "
-    << argc - 1;
+    << chi_program_timer.GetLocalDateTimeString()
+    << " Running ChiTech in batch-mode with "
+    << chi_mpi.process_count << " processes.";
 
   chi_log.Log(LOG_0)
-    << "Running ChiTech in batch-mode with "
-    << chi_mpi.process_count << " processes.";
+    << "ChiTech number of arguments supplied: "
+    << argc - 1;
 
   if (argc<=1)
     chi_log.Log(LOG_0)
@@ -157,6 +166,12 @@ void ChiTechRunBatch(int argc, char** argv)
   if ( not input_file_name.empty() )
     chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
 
+  chi_log.Log(LOG_0)
+    << "Final program time " << chi_program_timer.GetTimeString();
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetLocalDateTimeString()
+    << " ChiTech finished execution of " << input_file_name;
 }
 
 
