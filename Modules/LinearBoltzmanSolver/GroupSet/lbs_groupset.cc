@@ -270,7 +270,8 @@ void LBSGroupset::BuildSubsets()
   if (master_num_grp_subsets < groups.size())
     num_gs_subsets = master_num_grp_subsets;
 
-  int gs_subset_size = ceil(groups.size()/num_gs_subsets);
+  int gs_subset_size = floor(groups.size()/num_gs_subsets);
+
   for (int ss=0; ss<num_gs_subsets; ss++)
   {
     int subset_ranki = ss*gs_subset_size;
@@ -293,7 +294,7 @@ void LBSGroupset::BuildSubsets()
   if (master_num_ang_subsets < num_pol_angls_hemi)
     num_an_subsets = master_num_ang_subsets;
 
-  int an_subset_size = ceil(num_pol_angls_hemi/num_an_subsets);
+  int an_subset_size = floor(num_pol_angls_hemi/num_an_subsets);
 
   //==================== Top hemishpere
   for (int ss=0; ss<num_an_subsets; ss++)
