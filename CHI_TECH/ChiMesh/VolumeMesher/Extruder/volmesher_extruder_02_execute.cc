@@ -134,22 +134,22 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Connecting boundaries"
           << std::endl;
-        std::vector<chi_mesh::Cell*>::iterator cell;
-        for (cell = temp_continuum->cells.begin();
-             cell != temp_continuum->cells.end();
-             cell++)
+        std::vector<chi_mesh::Cell*>::iterator cell_iter;
+        for (cell_iter = temp_continuum->cells.begin();
+             cell_iter != temp_continuum->cells.end();
+             cell_iter++)
         {
-          (*cell)->FindBoundary2D(region);
+          (*cell_iter)->FindBoundary2D(region);
         }
 
         //================================== Check all open item_id of template
         //                                   have boundaries
         int no_boundary_cells=0;
-        for (cell = temp_continuum->cells.begin();
-             cell != temp_continuum->cells.end();
-             cell++)
+        for (cell_iter = temp_continuum->cells.begin();
+             cell_iter != temp_continuum->cells.end();
+             cell_iter++)
         {
-          if (!(*cell)->CheckBoundary2D())
+          if (!(*cell_iter)->CheckBoundary2D())
           {
             no_boundary_cells++;
           }
@@ -218,6 +218,29 @@ void chi_mesh::VolumeMesherExtruder::Execute()
             vol_continuum->cells[c]->cell_local_id = local_cell_index;
           }
         }
+
+        //================================== Delete non-border ghosts
+        std::vector<bool> border_flags(num_glob_cells,false);
+        for (auto cell_glob_index : vol_continuum->local_cell_glob_indices)
+        {
+          auto cell = vol_continuum->cells[cell_glob_index];
+
+          for (auto& face : cell->faces)
+            if (face.neighbor >=0) border_flags[face.neighbor] = true;
+        }
+
+        for (size_t cgi=0; cgi<num_glob_cells; ++cgi)
+        {
+          auto cell = vol_continuum->cells[cgi];
+
+          if ( (cell->Type() == chi_mesh::CellType::GHOST) and
+               (border_flags[cgi] == false) )
+          {
+            delete cell;
+          }
+
+        }
+
         chi_log.Log(LOG_ALLVERBOSE_1)
           << "### LOCATION[" << chi_mpi.location_id
           << "] amount of local cells="
