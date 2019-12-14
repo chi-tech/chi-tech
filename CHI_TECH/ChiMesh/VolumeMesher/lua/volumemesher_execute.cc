@@ -13,7 +13,7 @@ extern ChiTimer chi_program_timer;
 extern ChiConsole       chi_console;
 
 #include <iomanip>
-
+#include <unistd.h>
 
 //#############################################################################
 /** Executes the volume meshing pipeline.
@@ -24,6 +24,7 @@ int chiVolumeMesherExecute(lua_State *L)
 {
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
 
+  usleep(10000000);
   //Get memory before
   CSTMemory mem_before = chi_console.GetMemoryUsage();
 

@@ -102,6 +102,11 @@ struct chi_mesh::PolyFace
     invalidated = false;
   }
 
+  ~PolyFace()
+  {
+    for (auto edge : edges) delete [] edge;
+  }
+
 };
 
 

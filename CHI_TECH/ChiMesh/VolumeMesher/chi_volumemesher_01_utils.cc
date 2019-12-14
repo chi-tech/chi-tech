@@ -35,7 +35,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
        vertex != surface_mesh->vertices.end();
        vertex++)
   {
-    chi_mesh::Node* node = new chi_mesh::Node;
+    auto node = new chi_mesh::Node;
     *node = (*vertex.base());
 
     vol_continuum->nodes.push_back(node);

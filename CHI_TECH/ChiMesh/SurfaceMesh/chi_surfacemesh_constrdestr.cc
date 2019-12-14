@@ -8,6 +8,19 @@ chi_mesh::SurfaceMesh::SurfaceMesh()
 }
 
 //#########################################################
+/**Default destructor.*/
+chi_mesh::SurfaceMesh::~SurfaceMesh()
+{
+  for (auto poly_face : poly_faces)
+  {
+    delete poly_face;
+  }
+
+  poly_faces.clear();
+  std::cout << "Surface mesh destructor\n";
+}
+
+//#########################################################
 std::ostream& operator<<(std::ostream& os,
    chi_mesh::SurfaceMesh& that)
 {

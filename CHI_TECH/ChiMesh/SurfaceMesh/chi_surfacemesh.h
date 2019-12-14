@@ -26,6 +26,7 @@ public:
 public:
   //constrdestr.cc
         SurfaceMesh();
+       ~SurfaceMesh();
   friend std::ostream& operator<<(std::ostream& os,  SurfaceMesh& dt);
   //loadexport.cc
   int   ImportFromOBJFile(const char* fileName,bool as_poly);
