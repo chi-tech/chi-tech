@@ -155,7 +155,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
       //=============================== Execute if ready and allowed
       // If this angleset is the one scheduled to run
       // and it is ready then it will be given permission
-      if (status == Status::READY_TO_EXECUTE and as == scheduled_angleset)
+      if (status == Status::READY_TO_EXECUTE /*and as == scheduled_angleset*/)
       {
         std::stringstream message_i;
         message_i
