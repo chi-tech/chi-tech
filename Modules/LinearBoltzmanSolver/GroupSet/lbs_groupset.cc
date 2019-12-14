@@ -267,7 +267,7 @@ void LBSGroupset::BuildSubsets()
 {
   //=================================== Groupset subsets
   int num_gs_subsets = 1;
-  if (master_num_grp_subsets < groups.size())
+  if (master_num_grp_subsets <= groups.size())
     num_gs_subsets = master_num_grp_subsets;
 
   int gs_subset_size = floor(groups.size()/num_gs_subsets);
@@ -291,7 +291,7 @@ void LBSGroupset::BuildSubsets()
   //=================================== Angle subsets
   int num_pol_angls_hemi = quadrature->polar_ang.size()/2;
   int num_an_subsets = 1;
-  if (master_num_ang_subsets < num_pol_angls_hemi)
+  if (master_num_ang_subsets <= num_pol_angls_hemi)
     num_an_subsets = master_num_ang_subsets;
 
   int an_subset_size = floor(num_pol_angls_hemi/num_an_subsets);
