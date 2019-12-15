@@ -17,7 +17,6 @@ chi_mesh::SurfaceMesh::~SurfaceMesh()
   }
 
   poly_faces.clear();
-  std::cout << "Surface mesh destructor\n";
 }
 
 //#########################################################

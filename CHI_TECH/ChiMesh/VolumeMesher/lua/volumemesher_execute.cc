@@ -24,7 +24,6 @@ int chiVolumeMesherExecute(lua_State *L)
 {
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
 
-  usleep(10000000);
   //Get memory before
   CSTMemory mem_before = chi_console.GetMemoryUsage();
 

@@ -12,7 +12,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 
 //###################################################################
 /**Populates a flux data structure.*/
-void chi_mesh::sweep_management::FLUDS::
+void chi_mesh::sweep_management::PRIMARY_FLUDS::
 InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
@@ -102,117 +102,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 /**Given a sweep ordering index, the outgoing face counter,
  * the outgoing face dof, this function computes the location
  * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::sweep_management::FLUDS::
-AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
-                     TVertexFace face_v_index)
-{
-  //======================================== Check if cell is already there
-  bool cell_already_there = false;
-  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
-  {
-    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
-    {
-      cell_already_there = true;
-      deplocI_cell_views[deplocI][c].second.
-        emplace_back(face_slot,std::vector<int>(1,face_v_index));
-      break;
-    }
-  }
-
-  //======================================== If the cell is not there yet
-  if (!cell_already_there)
-  {
-    CompactCellView new_cell_view;
-    new_cell_view.first = cell_g_index;
-    new_cell_view.second.
-      emplace_back(face_slot,std::vector<int>(1,face_v_index));
-
-    deplocI_cell_views[deplocI].push_back(new_cell_view);
-  }
-}
-
-//###################################################################
-/**Given a sweep ordering index, the outgoing face counter,
- * the outgoing face dof, this function computes the location
- * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::sweep_management::FLUDS::
-AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
-                     TEdgeFace edge_v_indices)
-{
-  //======================================== Check if cell is already there
-  bool cell_already_there = false;
-  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
-  {
-    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
-    {
-      cell_already_there = true;
-      std::vector<int> verts;
-      verts.push_back(edge_v_indices[0]);
-      verts.push_back(edge_v_indices[1]);
-
-
-      deplocI_cell_views[deplocI][c].second.
-        emplace_back(face_slot,verts);
-      break;
-    }
-  }
-
-  //======================================== If the cell is not there yet
-  if (!cell_already_there)
-  {
-    CompactCellView new_cell_view;
-    new_cell_view.first = cell_g_index;
-    std::vector<int> verts;
-    verts.push_back(edge_v_indices[0]);
-    verts.push_back(edge_v_indices[1]);
-
-    new_cell_view.second.
-      emplace_back(face_slot,verts);
-
-    deplocI_cell_views[deplocI].push_back(new_cell_view);
-  }
-}
-
-//###################################################################
-/**Given a sweep ordering index, the outgoing face counter,
- * the outgoing face dof, this function computes the location
- * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::sweep_management::FLUDS::
-AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
-                     TPolyFace *poly_face)
-{
-  //======================================== Check if cell is already there
-  bool cell_already_there = false;
-  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
-  {
-    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
-    {
-      cell_already_there = true;
-      deplocI_cell_views[deplocI][c].second.
-        emplace_back(face_slot,poly_face->v_indices);
-      break;
-    }
-  }
-
-  //======================================== If the cell is not there yet
-  if (!cell_already_there)
-  {
-    CompactCellView new_cell_view;
-    new_cell_view.first = cell_g_index;
-    new_cell_view.second.
-      emplace_back(face_slot,poly_face->v_indices);
-
-    deplocI_cell_views[deplocI].push_back(new_cell_view);
-  }
-
-
-}
-
-//###################################################################
-/**Given a sweep ordering index, the outgoing face counter,
- * the outgoing face dof, this function computes the location
- * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::sweep_management::FLUDS::
+void  chi_mesh::sweep_management::PRIMARY_FLUDS::
 AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
                      chi_mesh::CellFace& face)
 {
