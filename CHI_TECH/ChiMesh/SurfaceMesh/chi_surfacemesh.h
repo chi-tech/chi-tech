@@ -35,7 +35,6 @@ public:
   void  ExportToPolyFile(const char* fileName);
 
   //internalconn.cc
-  void  UpdateInternalConnectivityOld();
   void  UpdateInternalConnectivity();
 
   //checksense.cc
