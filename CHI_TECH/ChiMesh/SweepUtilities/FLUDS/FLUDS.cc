@@ -1,16 +1,7 @@
 #include "FLUDS.h"
 
-#include "ChiConsole/chi_console.h"
-#include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
-
 #include <chi_log.h>
-#include <chi_mpi.h>
-
-#include <iomanip>
-
-extern ChiConsole chi_console;
 extern ChiLog     chi_log;
-extern ChiMPI     chi_mpi;
 
 //###################################################################
 /**Given a sweep ordering index, the outgoing face counter,

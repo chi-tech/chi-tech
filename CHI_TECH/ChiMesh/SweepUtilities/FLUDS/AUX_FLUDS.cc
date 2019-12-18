@@ -5,54 +5,50 @@ extern ChiLog     chi_log;
 
 
 //######################################################### Constr
-/**Only constructor grabbing the parent.*/
+/**This constructor initializes an auxiliary FLUDS based
+ * on a primary FLUDS. The restriction here is that the
+ * auxiliary FLUDS has the exact same sweep ordering as the
+ * primary FLUDS.*/
 chi_mesh::sweep_management::AUX_FLUDS::
-  AUX_FLUDS(chi_mesh::sweep_management::PRIMARY_FLUDS &primary,
-            int in_G) :
-  largest_face(primary.largest_face),
-  G(in_G),
+  AUX_FLUDS(chi_mesh::sweep_management::PRIMARY_FLUDS &primary, int in_G) :
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Initializing references
+  largest_face( primary.largest_face ),
+  G( in_G ),
 
-  local_psi_Gn_block_stride(
-    primary.local_psi_Gn_block_stride),
+  local_psi_Gn_block_stride( primary.local_psi_Gn_block_stride ),
 
-  delayed_local_psi_Gn_block_stride(
-    primary.delayed_local_psi_Gn_block_stride),
+  delayed_local_psi_Gn_block_stride( primary.delayed_local_psi_Gn_block_stride ),
   //================ Alpha Elements
-  so_cell_outb_face_slot_indices(primary.so_cell_outb_face_slot_indices),
-  so_cell_outb_face_face_category(primary.so_cell_outb_face_face_category),
+  so_cell_outb_face_slot_indices( primary.so_cell_outb_face_slot_indices ),
+  so_cell_outb_face_face_category( primary.so_cell_outb_face_face_category ),
 
-  so_cell_inco_face_dof_indices(primary.so_cell_inco_face_dof_indices),
-  so_cell_inco_face_face_category(primary.so_cell_inco_face_face_category),
+  so_cell_inco_face_dof_indices( primary.so_cell_inco_face_dof_indices ),
+  so_cell_inco_face_face_category( primary.so_cell_inco_face_face_category ),
 
-//  //================
-//  deplocI_face_dof_count(primary.deplocI_face_dof_count),
-//  boundary_dependencies(primary.boundary_dependencies),
+  //================ Beta Elements
+  nonlocal_outb_face_deplocI_slot( primary.nonlocal_outb_face_deplocI_slot ),
 
-  //================
-  nonlocal_outb_face_deplocI_slot(primary.nonlocal_outb_face_deplocI_slot),
-
-//  //================
-//  prelocI_face_dof_count(primary.prelocI_face_dof_count),
-//  delayed_prelocI_face_dof_count(primary.delayed_prelocI_face_dof_count),
-
-  //================
-  nonlocal_inc_face_prelocI_slot_dof(
-    primary.nonlocal_inc_face_prelocI_slot_dof),
+  nonlocal_inc_face_prelocI_slot_dof( primary.nonlocal_inc_face_prelocI_slot_dof ),
   delayed_nonlocal_inc_face_prelocI_slot_dof(
-    primary.delayed_nonlocal_inc_face_prelocI_slot_dof)
+    primary.delayed_nonlocal_inc_face_prelocI_slot_dof )
+
+  //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Actual constructor
 {
-  local_psi_stride = primary.local_psi_stride;
-  local_psi_max_elements = primary.local_psi_max_elements;
-  delayed_local_psi_stride = primary.delayed_local_psi_stride;
+  //============================== Small copied items
+  //                               defined on base class
+  local_psi_stride               = primary.local_psi_stride;
+  local_psi_max_elements         = primary.local_psi_max_elements;
+  delayed_local_psi_stride       = primary.delayed_local_psi_stride;
   delayed_local_psi_max_elements = primary.delayed_local_psi_max_elements;
-  num_face_categories = primary.num_face_categories;
+  num_face_categories            = primary.num_face_categories;
 
-  deplocI_face_dof_count = primary.deplocI_face_dof_count;
-  boundary_dependencies = primary.boundary_dependencies;
+  deplocI_face_dof_count         = primary.deplocI_face_dof_count;
+  boundary_dependencies          = primary.boundary_dependencies;
 
-  prelocI_face_dof_count = primary.prelocI_face_dof_count;
+  prelocI_face_dof_count         = primary.prelocI_face_dof_count;
   delayed_prelocI_face_dof_count = primary.delayed_prelocI_face_dof_count;
 
+  //============================== Adjusting for different group aggregate
   for (auto& val : local_psi_Gn_block_stride)
     local_psi_Gn_block_strideG.push_back(val*G);
 
@@ -98,7 +94,8 @@ OutgoingPsi(int cell_so_index, int outb_face_counter,
 }
 
 //###################################################################
-/**Given a */
+/**Given a outbound face counter this method returns a pointer
+ * to the location*/
 double*  chi_mesh::sweep_management::AUX_FLUDS::
 NLOutgoingPsi(int outb_face_counter,
               int face_dof, int n)

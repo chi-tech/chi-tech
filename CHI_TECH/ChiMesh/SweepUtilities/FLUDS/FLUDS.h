@@ -73,6 +73,8 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
   public chi_mesh::sweep_management::FLUDS
 {
   friend chi_mesh::sweep_management::AUX_FLUDS;
+
+  //Inherited from base FLUDS
 //public:
 //  std::vector<size_t> local_psi_stride;               //face category face size
 //  std::vector<size_t> local_psi_max_elements;         //number of face in each cat
@@ -137,6 +139,7 @@ private:
   std::vector<std::vector<int>>
     so_cell_inco_face_face_category;
 
+  //Inherited from base FLUDS
 //public:
 //  // This is a small vector [deplocI] that holds the number of
 //  // face dofs for each dependent location.
@@ -162,6 +165,7 @@ private:
     deplocI_cell_views;
 
   //======================================== Beta elements
+  //Inherited from base FLUDS
 //public:
 //  // This is a small vector [prelocI] that holds the number of
 //  // face dofs for each predecessor location.
@@ -198,6 +202,8 @@ public:
   { }
 
 public:
+  /**Passes pointers from sweep buffers to FLUDS so
+   * that chunk utilities function as required. */
   void SetReferencePsi(
     std::vector<std::vector<double>>*  local_psi,
     std::vector<double>*               delayed_local_psi,

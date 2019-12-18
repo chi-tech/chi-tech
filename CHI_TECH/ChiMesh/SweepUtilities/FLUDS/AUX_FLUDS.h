@@ -9,10 +9,10 @@ class chi_mesh::sweep_management::AUX_FLUDS :
   public chi_mesh::sweep_management::FLUDS
 {
 public:
-  AUX_FLUDS(PRIMARY_FLUDS& set_primary,
-            int in_G);
+  AUX_FLUDS(PRIMARY_FLUDS& set_primary, int in_G);
 
-public:
+  //Inherited from base FLUDS
+//public:
 //  std::vector<size_t>& local_psi_stride;               //face category face size
 //  std::vector<size_t>& local_psi_max_elements;         //number of face in each cat
 //  const size_t         delayed_local_psi_stride;       //face category face size
@@ -54,14 +54,12 @@ private:
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
   // which holds the slot address in the local psi vector where the first
   // face dof will store its data
-  std::vector<std::vector<int>>&
-    so_cell_outb_face_slot_indices;
+  std::vector<std::vector<int>>& so_cell_outb_face_slot_indices;
 
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
   // which holds the face categorization for the face. i.e. the local
   // psi vector that hold faces of the same category.
-  std::vector<std::vector<int>>&
-    so_cell_outb_face_face_category;
+  std::vector<std::vector<int>>& so_cell_outb_face_face_category;
 
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // that will hold a pair. Pair-first holds the slot address where this
@@ -73,9 +71,9 @@ private:
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // which holds the face categorization for the face. i.e. the local
   // psi vector that hold faces of the same category.
-  std::vector<std::vector<int>>&
-    so_cell_inco_face_face_category;
+  std::vector<std::vector<int>>& so_cell_inco_face_face_category;
 
+  //Inherited from base FLUDS
 //public:
 //  // This is a small vector [deplocI] that holds the number of
 //  // face dofs for each dependent location.
@@ -87,10 +85,10 @@ private:
 private:
   // This is a vector [non_local_outgoing_face_count]
   // that maps a face to a dependent location and associated slot index
-  std::vector<std::pair<int,int>>&
-    nonlocal_outb_face_deplocI_slot;
+  std::vector<std::pair<int,int>>& nonlocal_outb_face_deplocI_slot;
 
   //======================================== Beta elements
+  //Inherited from base FLUDS
 //public:
 //  // This is a small vector [prelocI] that holds the number of
 //  // face dofs for each predecessor location.
@@ -111,6 +109,8 @@ private:
     delayed_nonlocal_inc_face_prelocI_slot_dof;
 
 public:
+  /**Passes pointers from sweep buffers to FLUDS so
+   * that chunk utilities function as required. */
   void SetReferencePsi(
     std::vector<std::vector<double>>*  local_psi,
     std::vector<double>*               delayed_local_psi,
