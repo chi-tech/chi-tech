@@ -168,3 +168,93 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
   chi_log.Log(LOG_0) << output.str();
 
 }
+
+
+//###################################################################
+/**Computes load balancing parameters from a set of predictive cuts.
+ * Does not actually perform these cuts.*/
+void chi_mesh::SurfaceMesh::ComputeLoadBalancing(
+  std::vector<double> &x_cuts,
+  std::vector<double> &y_cuts)
+{
+  chi_log.Log(LOG_0) << "X-cuts to be logged: " << x_cuts.size();
+//  for (auto& val : x_cuts)
+//    chi_log.Log(LOG_0) << val;
+//
+  chi_log.Log(LOG_0) << "Y-cuts to be logged: " << y_cuts.size();
+//  for (auto& val : y_cuts)
+//    chi_log.Log(LOG_0) << val;
+
+  //======================================== Sort faces into bins
+  size_t I = x_cuts.size();
+  size_t J = y_cuts.size();
+
+  std::vector<std::vector<int>> IJ_bins(I+1,std::vector<int>(J+1,0));
+
+  for (auto& poly_face : poly_faces)
+  {
+    int ref_i = 0;
+    int ref_j = 0;
+    for (size_t i=0; i<I; ++i)
+    {
+      if (poly_face->face_centroid.x >= x_cuts[i])
+        ref_i = i+1;
+    }//for i
+    for (size_t j=0; j<J; ++j)
+    {
+      if (poly_face->face_centroid.y >= y_cuts[j])
+        ref_j = j+1;
+    }//for j
+
+    IJ_bins[ref_i][ref_j] += 1;
+  }//for face
+
+  //======================================== Determine average and max
+  int max_bin_size = 0;
+  int tot_bin_size = 0;
+  int i_max = 0, j_max = 0;
+
+  for (int i=0; i<(I+1); ++i)
+  {
+    for (int j=0; j<(J+1); ++j)
+    {
+      if (IJ_bins[i][j] > max_bin_size)
+      {
+        max_bin_size = IJ_bins[i][j];
+        i_max = i;
+        j_max = j;
+      }
+      tot_bin_size += IJ_bins[i][j];
+    }
+  }
+
+  double average = tot_bin_size/((double)(I+1)*(J+1));
+
+  chi_log.Log(LOG_0) << "Average faces per set: " << average;
+  chi_log.Log(LOG_0)
+    << "Maximum faces per set: " << max_bin_size
+    << " at (i,j)= ( " << i_max << " , " << j_max << " )";
+
+  if      (i_max == I)
+    chi_log.Log(LOG_0)  << "X greater than " << x_cuts[i_max-1];
+  else if (i_max == 0)
+    chi_log.Log(LOG_0)  << "X less than " << x_cuts[0];
+  else
+    chi_log.Log(LOG_0)
+      << "X greater than " << x_cuts[i_max-1]
+      << " and less than " << x_cuts[i_max];
+
+  if      (j_max == J)
+    chi_log.Log(LOG_0)  << "Y greater than " << y_cuts[j_max-1];
+  else if (j_max == 0)
+    chi_log.Log(LOG_0)  << "Y less than " << y_cuts[0];
+  else
+    chi_log.Log(LOG_0)
+      << "Y greater than " << y_cuts[j_max-1]
+      << " and less than " << y_cuts[j_max];
+
+                        chi_log.Log(LOG_0)
+    << "Max-to-average ratio: " << max_bin_size/average;
+
+
+}

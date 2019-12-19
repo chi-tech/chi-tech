@@ -55,6 +55,8 @@ public:
   //meshstats.cc
   void  CheckCyclicDependencies(int num_angles);
   void  GetMeshStats();
+  void  ComputeLoadBalancing(std::vector<double>& x_cuts,
+                             std::vector<double>& y_cuts);
 
 };
 

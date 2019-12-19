@@ -70,6 +70,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiSurfaceMeshSplitByPatch)
     RegisterFunction(chiSurfaceMeshExtractOpenEdgesToObj)
     RegisterFunction(chiSurfaceMeshCheckCycles)
+    RegisterFunction(chiComputeLoadBalancing)
 //  SurfaceMesher
     RegisterFunction(chiSurfaceMesherCreate)
       RegisterConstant(SURFACEMESHER_PREDEFINED,   1);
