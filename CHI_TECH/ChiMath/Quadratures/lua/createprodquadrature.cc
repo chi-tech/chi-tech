@@ -1,6 +1,5 @@
 #include "../../../ChiLua/chi_lua.h"
 #include "../../chi_math.h"
-#include "../product_quadrature.h"
 
 #include <chi_log.h>
 
@@ -45,7 +44,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
 
 
-  if (ident == GAUSS_LEGENDRE) //GAUSS_LEGENDRE_LEGENDRE
+  if (ident == GAUSS_LEGENDRE) //GAUSS_LEGENDRE
   {
     if (num_args<2)
       LuaPostArgAmountError("chiCreateProductQuadrature",2,num_args);
