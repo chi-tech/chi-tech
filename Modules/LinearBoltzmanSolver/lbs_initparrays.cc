@@ -50,8 +50,7 @@ away from exascale.
    */
 int LinearBoltzman::Solver::InitializeParrays()
 {
-  SpatialDiscretization_PWL* pwl_discretization =
-    (SpatialDiscretization_PWL*)discretization;
+  auto pwl_discretization = (SpatialDiscretization_PWL*)discretization;
 
   //================================================== Compute local # of dof
   local_dof_count=0;
@@ -88,13 +87,18 @@ int LinearBoltzman::Solver::InitializeParrays()
   //                                                   incident boundary
   typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
   typedef chi_mesh::sweep_management::BoundaryIncidentHomogenous SweepIncHomoBndry;
+  typedef chi_mesh::sweep_management::BoundaryReflecting SweepReflectingBndry;
   std::vector<std::vector<double>>& flux_vec = incident_P0_mg_boundaries;
 
   // Defining default Vacuum boundary
   std::vector<double> zero_boundary(G,0.0);
   flux_vec.push_back(zero_boundary);
 
-  // For boundaries
+  // ================================================= Populate boundaries
+  chi_mesh::Vector ihat(1.0,0.0,0.0);
+  chi_mesh::Vector jhat(0.0,1.0,0.0);
+  chi_mesh::Vector khat(0.0,0.0,1.0);
+  int bndry_id=0;
   for (auto bndry_type : boundary_types)
   {
     int vec_index = bndry_type.second;
@@ -103,6 +107,21 @@ int LinearBoltzman::Solver::InitializeParrays()
       sweep_boundaries.push_back(new SweepVacuumBndry(flux_vec.back()));
     else if (bndry_type.first == LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
       sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
+    else if (bndry_type.first == LinearBoltzman::BoundaryType::REFLECTING)
+    {
+      chi_mesh::Normal normal;
+      if (bndry_id == 0) normal = ihat;
+      if (bndry_id == 1) normal = ihat*-1.0;
+      if (bndry_id == 2) normal = jhat;
+      if (bndry_id == 3) normal = jhat*-1.0;
+      if (bndry_id == 4) normal = khat;
+      if (bndry_id == 5) normal = khat*-1.0;
+
+      sweep_boundaries.push_back(new SweepReflectingBndry(flux_vec.back(),
+                                 normal));
+    }
+
+    ++bndry_id;
   }
 
   //================================================== Initialize transport views
@@ -110,12 +129,8 @@ int LinearBoltzman::Solver::InitializeParrays()
   int block_MG_counter = 0;       //Counts the strides of moment and group
   int block_counter = 0;          //Counts the base stride
 
-  chi_mesh::Vector ihat(1.0,0.0,0.0);
-  chi_mesh::Vector jhat(0.0,1.0,0.0);
-  chi_mesh::Vector khat(0.0,0.0,1.0);
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (auto cell_g_index : grid->local_cell_glob_indices)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
     auto cell_fe_view =
@@ -176,8 +191,7 @@ int LinearBoltzman::Solver::InitializeParrays()
   {
     for (int m=0; m<num_moments; m++)
     {
-      chi_physics::FieldFunction* group_ff =
-        new chi_physics::FieldFunction;
+      auto group_ff = new chi_physics::FieldFunction;
       group_ff->text_name = std::string("Flux_g") +
                             std::to_string(g) +
                             std::string("_m") + std::to_string(m);

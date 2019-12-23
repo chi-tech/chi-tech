@@ -8,9 +8,11 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
+#include "ChiTimer/chi_timer.h"
 
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
+extern ChiTimer chi_program_timer;
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
@@ -24,7 +26,9 @@ extern ChiConsole chi_console;
 /**Initializes the sweep ordering for the given groupset.*/
 void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 {
-  chi_log.Log(LOG_0) << "Computing Sweep ordering.\n";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Computing Sweep ordering.\n";
 
   //============================================= Clear sweep ordering
   sweep_orderings.clear();
@@ -153,7 +157,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 
 
   chi_log.Log(LOG_0)
-    << "Done computing sweep orderings.           Process memory = "
+    << chi_program_timer.GetTimeString()
+    << " Done computing sweep orderings.           Process memory = "
     << std::setprecision(3)
     << chi_console.GetMemoryUsageInMB() << " MB";
 

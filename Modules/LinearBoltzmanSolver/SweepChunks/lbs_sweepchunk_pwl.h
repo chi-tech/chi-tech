@@ -108,6 +108,7 @@ public:
   //############################################################ Actual chunk
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   {
+    typedef chi_mesh::sweep_management::BoundaryType BndryType;
     int outface_master_counter=0;
 
     if (!a_and_b_initialized)
@@ -222,7 +223,8 @@ public:
           {
             internal_face_bndry_counter++;
             bndry_map = transport_view->
-              face_boundary_id[internal_face_bndry_counter];}
+              face_boundary_id[internal_face_bndry_counter];
+          }
 
           if (mu < 0.0) //UPWIND
           {
@@ -256,13 +258,15 @@ public:
                 else if (face_neighbor >= 0)
                 {psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,n);}
                   // %%%%% BOUNDARY CELL DEPENDENCY %%%%%
-                else if (!suppress_surface_src)
-                {psi = angle_set->PsiBndry(bndry_face_counter,
-                                            bndry_map,fj,gs_gi,n);
+                else
+                {psi = angle_set->PsiBndry(bndry_map,
+                                           angle_num,
+                                           cell->cell_local_id,
+                                           f,fj,gs_gi,gs_ss_begin,
+                                           suppress_surface_src);
                 //if (gs_gi>9) psi = zero_mg_src.data();
                 }
-                else
-                {psi = zero_mg_src.data();}
+
 
                 double mu_Nij = -mu*N[f][i][j];
 
@@ -344,18 +348,27 @@ public:
 
         //============================================= Outgoing fluxes
         int out_face_counter=-1;
+        internal_face_bndry_counter = -1;
         for (int f=0; f<cell->faces.size(); f++)
         {
           int     face_neighbor = transport_view->face_f_adj_part_id[f];
           bool    face_incident = transport_view->face_f_upwind_flag[f];
           double* psi = zero_mg_src.data();
 
+          int bndry_map = -1;
+          if (face_neighbor<0)
+          {
+            internal_face_bndry_counter++;
+            bndry_map = transport_view->
+              face_boundary_id[internal_face_bndry_counter];
+          }
+
           //============================= Set flags and counters
           if (face_incident) continue;
           else out_face_counter++;
 
           //============================= Store outgoing Psi Locally
-          if ((face_neighbor == LOCAL) && (!face_incident))
+          if (face_neighbor == LOCAL)
           {
             for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
             {
@@ -368,8 +381,7 @@ public:
           }//
           //============================= Store outgoing Psi Non-Locally
           else if ((face_neighbor != LOCAL) &&
-                   (face_neighbor >= 0) &&
-                   (!face_incident))
+                   (face_neighbor >= 0))
           {
             deploc_face_counter++;
             for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
@@ -381,6 +393,23 @@ public:
                 psi[gsg] = b[gsg][i];
             }//for fdof
           }//if non-local
+          //============================= Store outgoing reflecting Psi
+          else if ((face_neighbor != LOCAL) &&
+                   (face_neighbor < 0) &&
+                   (angle_set->ref_boundaries[bndry_map]->Type() ==
+                                     BndryType::REFLECTING))
+          {
+            for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
+            {
+              int i = cell_fe_view->face_dof_mappings[f][fi];
+              psi = angle_set->ReflectingPsiOutBoundBndry(bndry_map, angle_num,
+                                                          cell->cell_local_id,f,
+                                                          fi,gs_ss_begin);
+
+              for (int gsg=0; gsg<gs_ss_size; gsg++)
+                psi[gsg] = b[gsg][i];
+            }//for fdof
+          }//reflecting
         }//for f
 
 

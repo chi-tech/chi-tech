@@ -17,6 +17,8 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   scheduler_type = in_scheduler_type;
   angle_agg      = in_angle_agg;
 
+  angle_agg->InitializeReflectingBCs();
+
   if (scheduler_type == SchedulingAlgorithm::DEPTH_OF_GRAPH)
     InitializeAlgoDOG();
 

@@ -21,6 +21,7 @@ RegisterConstant(ZMIN,   36);
 RegisterNamespace(LBSBoundaryTypes);
 AddNamedConstantToNamespace(VACUUM            ,1,LBSBoundaryTypes)
 AddNamedConstantToNamespace(INCIDENT_ISOTROPIC,2,LBSBoundaryTypes)
+AddNamedConstantToNamespace(REFLECTING        ,3,LBSBoundaryTypes)
 //
 //    RegisterConstant(VACUUM,               301);
 //    RegisterConstant(INCIDENT_ISOTROPIC,   302);

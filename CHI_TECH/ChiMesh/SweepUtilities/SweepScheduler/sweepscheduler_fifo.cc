@@ -38,6 +38,15 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
   for (auto angsetgroup : angle_agg->angle_set_groups)
     angsetgroup->ResetSweep();
 
+  for (auto bndry : angle_agg->sim_boundaries)
+  {
+    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
+    {
+      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      rbndry->ResetAnglesReadyStatus();
+    }
+  }
+
   //================================================== Receive delayed data
   MPI_Barrier(MPI_COMM_WORLD);
   for (auto sorted_angleset : rule_values)

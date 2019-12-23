@@ -194,7 +194,7 @@ int chiLBSSetProperty(lua_State *L)
     if (btype == (int)LinearBoltzman::BoundaryType::VACUUM)
     {
       solver->boundary_types[bid].first = LinearBoltzman::BoundaryType::VACUUM;
-      chi_log.Log(LOG_0) << "Boundary set to Vacuum.";
+      chi_log.Log(LOG_0) << "Boundary " << bid << " set to Vacuum.";
     }
     else if (btype == (int)LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
     {
@@ -255,6 +255,11 @@ int chiLBSSetProperty(lua_State *L)
       chi_log.Log(LOG_0)
         << "Isotropic boundary condition for boundary " << bid
         << " loaded with " << table_len << " groups.";
+    }
+    else if (btype == (int)LinearBoltzman::BoundaryType::REFLECTING)
+    {
+      solver->boundary_types[bid].first = LinearBoltzman::BoundaryType::REFLECTING;
+      chi_log.Log(LOG_0) << "Boundary " << bid << " set to Reflecting.";
     }
     else
     {

@@ -36,82 +36,13 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
   if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
     num_angset_grps = 1;
 
-
-
-
-//  //=========================================== Set angle aggregation
-//  for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
-//  {
-//    TAngleSetGroup* angle_set_group = new TAngleSetGroup;
-//    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
-//
-//    for (int azi=0; azi<num_azi/num_angset_grps; azi++)
-//    {
-//      for (int gs_ss=0; gs_ss<groupset->grp_subsets.size(); gs_ss++)
-//      {
-//        for (int an_ss=0; an_ss<groupset->ang_subsets_top.size(); an_ss++)
-//        {
-//          std::vector<int> angle_indices;
-//
-//          //============================================= Each quadrant gets 1/4 of azi angles
-//          int a = azi+q*d_azi;   //azimuthal angle index
-//          AngSubSet angle_subset = groupset->ang_subsets_top[an_ss];
-//          for (int p=angle_subset.first; p<=angle_subset.second; p++)
-//          {
-//            int angle_num = groupset->quadrature->GetAngleNum(p,a);
-//            angle_indices.push_back(angle_num);
-//          }//for pr
-//
-//
-//          TAngleSet* angleSet =
-//            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
-//                          gs_ss,
-//                          sweep_orderings[a],
-//                          angle_indices,
-//                          sweep_boundaries,
-//                          options.sweep_eager_limit,
-//                          &comm_set);
-//
-//          angle_set_group->angle_sets.push_back(angleSet);
-//        }//for an_ss
-//      }//for gs_ss
-//    } //azi
-//  }//for q top
-//  for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
-//  {
-//    TAngleSetGroup* angle_set_group = new TAngleSetGroup;
-//    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
-//
-//    for (int azi=0; azi<num_azi/num_angset_grps; azi++)
-//    {
-//      for (int gs_ss=0; gs_ss<groupset->grp_subsets.size(); gs_ss++)
-//      {
-//        for (int an_ss=0; an_ss<groupset->ang_subsets_bot.size(); an_ss++)
-//        {
-//          std::vector<int> angle_indices;
-//
-//          //============================================= Each quadrant gets 1/4 of azi angles
-//          int a = azi+q*d_azi;   //azimuthal angle index
-//          AngSubSet angle_subset = groupset->ang_subsets_bot[an_ss];
-//          for (int p=angle_subset.first; p<=angle_subset.second; p++)
-//          {
-//            int angle_num = groupset->quadrature->GetAngleNum(p,a);
-//            angle_indices.push_back(angle_num);
-//          }//for pr
-//          TAngleSet* angleSet =
-//            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
-//                          gs_ss,
-//                          sweep_orderings[a+num_azi],
-//                          angle_indices,
-//                          sweep_boundaries,
-//                          options.sweep_eager_limit,
-//                          &comm_set);
-//
-//          angle_set_group->angle_sets.push_back(angleSet);
-//        }//for an_ss
-//      }//for gs_ss
-//    } //azi
-//  }//for q bot
+  //=========================================== Passing the sweep boundaries
+  //                                            to the angle aggregation
+  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
+  groupset->angle_agg->number_of_groups        = groupset->groups.size();
+  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
+  groupset->angle_agg->quadrature              = groupset->quadrature;
+  groupset->angle_agg->grid                    = grid;
 
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -247,6 +178,13 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
   int num_angset_grps = 4; //Default Extruded and 2D
   if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
     num_angset_grps = 1;
+
+  //=========================================== Passing the sweep boundaries
+  //                                            to the angle aggregation
+  groupset->angle_agg->sim_boundaries = sweep_boundaries;
+  groupset->angle_agg->number_of_groups = groupset->groups.size();
+  groupset->angle_agg->quadrature = groupset->quadrature;
+  groupset->angle_agg->grid = grid;
 
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant

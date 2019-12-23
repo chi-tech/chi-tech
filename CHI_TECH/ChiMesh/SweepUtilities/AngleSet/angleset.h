@@ -15,17 +15,17 @@ typedef chi_mesh::sweep_management::BoundaryBase SweepBndry;
 class chi_mesh::sweep_management::AngleSet
 {
 private:
-  int              num_grps;
-  SPDS*            spds;
-  bool             executed;
+  int                               num_grps;
+  SPDS*                             spds;
+  bool                              executed;
 
   chi_mesh::sweep_management::SweepBuffer sweep_buffer;
 
 public:
-  FLUDS*                                 fluds;
-  std::vector<int>                       angles;
-  std::vector<SweepBndry*>&              ref_boundaries;
-  int                                    ref_subset;
+  FLUDS*                            fluds;
+  std::vector<int>                  angles;
+  std::vector<SweepBndry*>&         ref_boundaries;
+  int                               ref_subset;
 
   //FLUDS
   std::vector<std::vector<double>>  local_psi;
@@ -74,9 +74,20 @@ public:
   void ResetSweepBuffers();
   void ReceiveDelayedData(int angle_set_num);
 
-  double* PsiBndry(int bndry_face_count, int bndry_map,
-                      int face_dof, int g,int angle_num);
-
+  double* PsiBndry(int bndry_map,
+                   int angle_num,
+                   int cell_local_id,
+                   int face_num,
+                   int fi,
+                   int g,
+                   int gs_ss_begin,
+                   bool suppress_surface_src);
+  double* ReflectingPsiOutBoundBndry(int bndry_map,
+                                     int angle_num,
+                                     int cell_local_id,
+                                     int face_num,
+                                     int fi,
+                                     int g);
 };
 
 #endif

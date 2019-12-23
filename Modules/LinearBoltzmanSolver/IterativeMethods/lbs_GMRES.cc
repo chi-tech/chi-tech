@@ -13,6 +13,7 @@
 #include <chi_mpi.h>
 extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
+extern ChiTimer chi_program_timer;
 
 extern double chi_global_timings[20];
 
@@ -107,8 +108,9 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   KSPSetUp(ksp);
 
   //================================================== Compute b
-  chi_log.Log(LOG_0) << "Computing b";
-  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,SourceFlags::SUPPRESS_PHI_OLD);
+  chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
+  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,
+                          SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
   phi_new_local.assign(phi_new_local.size(),0.0);
@@ -142,7 +144,8 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   VecCopy(phi_old,phi_new);
 
   //**************** CALL GMRES SOLVE ******************
-  chi_log.Log(LOG_0) << "Starting iterations";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString() << " Starting iterations";
   KSPSolve(ksp,q_fixed,phi_new);
   //****************************************************
 
@@ -160,6 +163,8 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   VecDestroy(&phi_new);
   VecDestroy(&phi_old);
   VecDestroy(&q_fixed);
+  VecDestroy(&data_context.x_temp);
+  MatDestroy(&A);
 
 
 
