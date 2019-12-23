@@ -44,6 +44,7 @@ void chi_mesh::sweep_management::AngleAggregation::ResetDelayedPsi()
 /** Initializes reflecting boundary conditions. */
 void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 {
+  const double epsilon = 1.0e-8;
   chi_log.Log(LOG_0) << "Initializing Reflecting boundary conditions.";
   int total_reflect_cells = 0;
   int total_reflect_faces = 0;
@@ -60,30 +61,32 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       rbndry->angle_readyflags.resize(tot_num_angles,
                         std::vector<bool>(number_of_group_subsets,false));
 
+      //========================================= Determine reflected angle
+      for (int n=0; n<tot_num_angles; ++n)
+      {
+        auto omega_reflected = (*quadrature->omegas[n]) -
+                               rbndry->normal*
+                               quadrature->omegas[n]->Dot(rbndry->normal)*2.0;
+        for (int nstar=0; nstar<tot_num_angles; ++nstar)
+          if (omega_reflected.Dot(*quadrature->omegas[nstar])> (1.0-epsilon))
+            {rbndry->reflected_anglenum[n] = nstar;break;}
+
+        if (rbndry->reflected_anglenum[n]<0)
+        {
+          chi_log.Log(LOG_ALLERROR)
+            << "Reflected angle not found for angle " << n
+            << " with direction " << quadrature->omegas[n]->PrintS();
+          exit(EXIT_FAILURE);
+        }
+      }
+
       //========================================= For angles
       rbndry->hetero_boundary_flux.resize(tot_num_angles);
       for (int n=0; n<tot_num_angles; ++n)
       {
-        //================================== Determine reflected angles
         //Only continue if omega is outgoing
-        if ( quadrature->omegas[n]->Dot(rbndry->normal)> 0.0 )
-        {
-          auto omega_reflected = (*quadrature->omegas[n]) -
-                                 rbndry->normal*
-                                 quadrature->omegas[n]->Dot(rbndry->normal)*2.0;
-          for (int nstar=0; nstar<tot_num_angles; ++nstar)
-            if (omega_reflected.Dot(*quadrature->omegas[nstar])> 0.999999){
-              rbndry->reflected_anglenum[n] = nstar;break;}
-        } else
-        {
-          auto omega_reflected = (*quadrature->omegas[n]) -
-                                 rbndry->normal*
-                                 quadrature->omegas[n]->Dot(rbndry->normal)*2.0;
-          for (int nstar=0; nstar<tot_num_angles; ++nstar)
-            if (omega_reflected.Dot(*quadrature->omegas[nstar])> 0.999999){
-              rbndry->reflected_anglenum[n] = nstar;break;}
+        if ( quadrature->omegas[n]->Dot(rbndry->normal)< 0.0 )
           continue;
-        }
 
         //================================== For cells
         auto& cell_vec = rbndry->hetero_boundary_flux[n];
@@ -113,6 +116,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
             if ( (face.neighbor < 0) and
                  (face.normal.Dot(rbndry->normal) > 0.999999) )
             {
+              cell_vec[c][f].clear();
               cell_vec[c][f].resize(face.vertex_ids.size(),
                                     std::vector<double>(number_of_groups,0.0));
               total_reflect_faces += 1;
