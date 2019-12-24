@@ -87,7 +87,7 @@ public:
                                      int cell_local_id,
                                      int face_num,
                                      int fi,
-                                     int g);
+                                     int gs_ss_begin);
 };
 
 #endif

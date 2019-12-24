@@ -117,7 +117,7 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   sweepScheduler.Sweep(sweep_chunk);
 
   groupset->latest_convergence_metric = groupset->residual_tolerance;
-  ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
+  ConvergeCycles(sweepScheduler,sweep_chunk,groupset,true);
 
   //=================================================== Apply DSA
   if (groupset->apply_wgdsa)

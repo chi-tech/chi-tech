@@ -96,20 +96,13 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
     return AngleSetStatus::FINISHED;
   }
 
+  //Check upstream data available
   Status status = sweep_buffer.ReceiveUpstreamPsi(angle_set_num);
 
-  bool boundaries_ready = true;
+  //Also check boundaries
   for (auto bndry : ref_boundaries)
-  {
-    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
-    {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
-
-      if (not rbndry->CheckAnglesReadyStatus(angles,ref_subset))
-      {boundaries_ready = false; break;}
-    }
-  }
-  if (not boundaries_ready) status = Status::RECEIVING;
+    if (not bndry->CheckAnglesReadyStatus(angles,ref_subset))
+      {status = Status::RECEIVING; break;}
 
   if      (status == Status::RECEIVING) return status;
   else if (status == Status::READY_TO_EXECUTE and
@@ -125,14 +118,9 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
     sweep_buffer.SendDownstreamPsi(angle_set_num);
     sweep_buffer.ClearLocalAndReceiveBuffers();
 
+    //Update boundary readiness
     for (auto bndry : ref_boundaries)
-    {
-      if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
-      {
-        auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
-        rbndry->UpdateAnglesReadyStatus(angles,ref_subset);
-      }
-    }
+      bndry->UpdateAnglesReadyStatus(angles,ref_subset);
 
     executed = true;
     return AngleSetStatus::FINISHED;
@@ -202,21 +190,12 @@ PsiBndry(int bndry_map,
   if (suppress_surface_src)
     Psi = &ref_boundaries[bndry_map]->zero_boundary_flux[g];
 
-  if (ref_boundaries[bndry_map]->Type() ==
-      chi_mesh::sweep_management::BoundaryType::REFLECTING)
+  if (ref_boundaries[bndry_map]->IsReflecting())
   {
-    auto rbndry =
-      (chi_mesh::sweep_management::BoundaryReflecting*)ref_boundaries[bndry_map];
-    int reflected_angle_num = rbndry->reflected_anglenum[angle_num];
+    Psi = ref_boundaries[bndry_map]->HeterogenousPsiIncoming(
+      angle_num, cell_local_id, face_num, fi, gs_ss_begin);
 
-    Psi = &rbndry->hetero_boundary_flux[reflected_angle_num]
-                                       [cell_local_id]
-                                       [face_num]
-                                       [fi][gs_ss_begin];
   }
-
-//  if (suppress_surface_src)
-//    Psi = &ref_boundaries[bndry_map]->zero_boundary_flux[g];
 
   return Psi;
 }
@@ -229,13 +208,11 @@ ReflectingPsiOutBoundBndry(int bndry_map,
                            int cell_local_id,
                            int face_num,
                            int fi,
-                           int g)
+                           int gs_ss_begin)
 {
-  auto rbndry =
-    (chi_mesh::sweep_management::BoundaryReflecting*)ref_boundaries[bndry_map];
-  double* Psi = &rbndry->hetero_boundary_flux[angle_num]
-                                             [cell_local_id]
-                                             [face_num]
-                                             [fi][g];
-  return Psi;
+  return ref_boundaries[bndry_map]->HeterogenousPsiOutgoing(angle_num,
+                                                            cell_local_id,
+                                                            face_num,
+                                                            fi,
+                                                            gs_ss_begin);
 }

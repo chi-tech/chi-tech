@@ -108,7 +108,6 @@ public:
   //############################################################ Actual chunk
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   {
-    typedef chi_mesh::sweep_management::BoundaryType BndryType;
     int outface_master_counter=0;
 
     if (!a_and_b_initialized)
@@ -264,7 +263,6 @@ public:
                                            cell->cell_local_id,
                                            f,fj,gs_gi,gs_ss_begin,
                                            suppress_surface_src);
-                //if (gs_gi>9) psi = zero_mg_src.data();
                 }
 
 
@@ -396,8 +394,7 @@ public:
           //============================= Store outgoing reflecting Psi
           else if ((face_neighbor != LOCAL) &&
                    (face_neighbor < 0) &&
-                   (angle_set->ref_boundaries[bndry_map]->Type() ==
-                                     BndryType::REFLECTING))
+                   (angle_set->ref_boundaries[bndry_map]->IsReflecting()))
           {
             for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
             {

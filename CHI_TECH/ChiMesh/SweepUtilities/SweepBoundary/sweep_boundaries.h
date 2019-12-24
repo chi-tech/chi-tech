@@ -1,6 +1,11 @@
 #ifndef _chi_sweep_bndry_base_h
 #define _chi_sweep_bndry_base_h
 
+#include "ChiMesh/chi_mesh.h"
+
+#include <vector>
+#include <limits>
+
 namespace chi_mesh::sweep_management
 {
 
@@ -32,6 +37,25 @@ public:
 
   virtual ~BoundaryBase() {}
   const    BoundaryType Type() {return type;}
+  bool     IsReflecting();
+
+
+  virtual double* HeterogenousPsiIncoming(
+                                  int angle_num,
+                                  int cell_local_id,
+                                  int face_num,
+                                  int fi,
+                                  int gs_ss_begin);
+  virtual double* HeterogenousPsiOutgoing(
+                                  int angle_num,
+                                  int cell_local_id,
+                                  int face_num,
+                                  int fi,
+                                  int gs_ss_begin);
+  virtual void UpdateAnglesReadyStatus(std::vector<int> angles, int gs_ss){}
+  virtual bool CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss)
+  {return true;}
+
 };
 
 //###################################################################
@@ -70,6 +94,7 @@ class BoundaryReflecting : public BoundaryBase
 {
 public:
   const chi_mesh::Normal normal;
+  bool  opposing_reflected = false;
 
   typedef std::vector<double> DOFVec;   //Groups per DOF
   typedef std::vector<DOFVec> FaceVec;  //DOFs per face
@@ -79,6 +104,9 @@ public:
   //angle,cell,face,dof,group
   //Populated by angle aggregation
   std::vector<AngVec>              hetero_boundary_flux;
+  std::vector<AngVec>              hetero_boundary_flux_old;
+  double                           pw_change=0.0;
+
   std::vector<int>                 reflected_anglenum;
   std::vector<std::vector<bool>>   angle_readyflags;
 
@@ -89,33 +117,24 @@ public:
   normal(in_normal)
   {}
 
-  /**Sets flags indicating reflected angles are ready to execute.*/
-  void UpdateAnglesReadyStatus(std::vector<int> angles, int gs_ss)
-  {
-    for (auto& n : angles)
-      angle_readyflags[reflected_anglenum[n]][gs_ss] = true;
-  }
+  double* HeterogenousPsiIncoming(
+                          int angle_num,
+                          int cell_local_id,
+                          int face_num,
+                          int fi,
+                          int gs_ss_begin) override;
+  double* HeterogenousPsiOutgoing(
+                          int angle_num,
+                          int cell_local_id,
+                          int face_num,
+                          int fi,
+                          int gs_ss_begin) override;
 
-  /**Checks to see if angles are ready to execute.*/
-  bool CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss)
-  {
-    bool ready_flag = true;
-    for (auto& n : angles)
-      if (hetero_boundary_flux[reflected_anglenum[n]].size()>0)
-        if (not angle_readyflags[n][gs_ss]) return false;
-
-    return ready_flag;
-  }
-
-  /**Resets angle ready flags to false.*/
-  void ResetAnglesReadyStatus()
-  {
-    for (auto& flags : angle_readyflags)
-      for (int gs_ss=0; gs_ss<flags.size(); ++gs_ss)
-        flags[gs_ss] = false;
-  }
+  void UpdateAnglesReadyStatus(std::vector<int> angles, int gs_ss) override;
+  bool CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss) override;
+  void ResetAnglesReadyStatus();
 };
 
-}
+}//namespace chi_mesh::sweep_management
 
 #endif

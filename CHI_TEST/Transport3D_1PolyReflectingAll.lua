@@ -7,27 +7,13 @@ end
 if (reflecting == nil) then
     reflecting=false
 end
-if (reflectingXY == nil) then
-    reflecting=false
-    reflectingXY = false
-else
-    reflecting = false
-end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
-if (reflecting) then
-    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsHalfY.obj",true)
-elseif (reflectingXY) then
-    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-                "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsHalfYHalfX.obj",true)
-else
-    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
+chiSurfaceMeshImportFromOBJFile(newSurfMesh,
             "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
-end
 
 --############################################### Extract edges from surface mesh
 loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
@@ -59,16 +45,8 @@ chiSurfaceMesherSetProperty(MAX_AREA,1/20/20)
 chiSurfaceMesherSetProperty(PARTITION_X,2)
 chiSurfaceMesherSetProperty(PARTITION_Y,2)
 
-if (reflecting) then
-    chiSurfaceMesherSetProperty(CUT_X,0.0)
-    chiSurfaceMesherSetProperty(CUT_Y,-0.5)
-elseif (reflectingXY) then
-    chiSurfaceMesherSetProperty(CUT_X,-0.5)
-    chiSurfaceMesherSetProperty(CUT_Y,-0.5)
-else
-    chiSurfaceMesherSetProperty(CUT_X,0.0)
-    chiSurfaceMesherSetProperty(CUT_Y,0.0)
-end
+chiSurfaceMesherSetProperty(CUT_X,0.0)
+chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
@@ -92,7 +70,7 @@ chiVolumeMesherExecute();
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
-vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
+vol1 = chiLogicalVolumeCreate(RPP,-0.0625,0.0625,-0.0625,0.0625,0.6,1.0)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 
@@ -104,11 +82,11 @@ materials[2] = chiPhysicsAddMaterial("Test Material2");
 chiPhysicsMaterialAddProperty(materials[1],TRANSPORT_XSECTIONS)
 chiPhysicsMaterialAddProperty(materials[2],TRANSPORT_XSECTIONS)
 
-chiPhysicsMaterialAddProperty(materials[1],ISOTROPIC_MG_SOURCE)
+-- chiPhysicsMaterialAddProperty(materials[1],ISOTROPIC_MG_SOURCE)
 chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
-num_groups = 168
+num_groups = 10
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
         PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
@@ -118,8 +96,8 @@ src={}
 for g=1,num_groups do
     src[g] = 0.0
 end
-
-chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
+src[1] = 1.0
+-- chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
@@ -136,13 +114,13 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
 pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,5, 5)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,9)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
 --chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
@@ -150,33 +128,33 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
 -- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,5)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
-gs1 = chiLBSCreateGroupset(phys1)
-cur_gs = gs1
-chiLBSGroupsetAddGroups(phys1,cur_gs,63,num_groups-1)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
---chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
--- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+-- gs1 = chiLBSCreateGroupset(phys1)
+-- cur_gs = gs1
+-- chiLBSGroupsetAddGroups(phys1,cur_gs,63,num_groups-1)
+-- chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+-- --chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
+-- chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+-- chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
+-- -- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON)
+-- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+-- chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+-- chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+-- chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --========== Boundary conditions
-bsrc={}
-for g=1,num_groups do
-    bsrc[g] = 0.0
-end
-bsrc[1] = 1.0/4.0/math.pi;
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+-- bsrc={}
+-- for g=1,num_groups do
+--     bsrc[g] = 0.0
+-- end
+-- bsrc[1] = 1.0/4.0/math.pi;
+-- chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 if (reflecting) then
-    chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMAX,LBSBoundaryTypes.REFLECTING);
-elseif (reflectingXY) then
+    chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
     chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMAX,LBSBoundaryTypes.REFLECTING);
+    chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
     chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMAX,LBSBoundaryTypes.REFLECTING);
 end
 
@@ -220,17 +198,40 @@ ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
 chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
-chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[20])
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[9])
 
 chiFFInterpolationInitialize(curffi)
 chiFFInterpolationExecute(curffi)
 maxval = chiFFInterpolationGetValue(curffi)
 
+cline = chiFFInterpolationCreate(LINE)
+curffi = cline
+chiFFInterpolationSetProperty(curffi,LINE_FIRSTPOINT,-1.0,0.01,0.801)
+chiFFInterpolationSetProperty(curffi,LINE_SECONDPOINT,1.0,0.01,0.801)
+chiFFInterpolationSetProperty(curffi,LINE_NUMBEROFPOINTS, 500)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[9])
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+
+cline2 = chiFFInterpolationCreate(LINE)
+curffi = cline2
+chiFFInterpolationSetProperty(curffi,LINE_FIRSTPOINT,0.01,-1.0,0.801)
+chiFFInterpolationSetProperty(curffi,LINE_SECONDPOINT,0.01,1.0,0.801)
+chiFFInterpolationSetProperty(curffi,LINE_NUMBEROFPOINTS, 500)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[9])
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+
+
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
+
+chiFFInterpolationExportPython(cline)
+chiFFInterpolationExportPython(cline2)
 
 if (chi_location_id == 0 and master_export == nil) then
 
-    --os.execute("python ZPFFI00.py")
+    os.execute("python ZLFFI20.py")
+    os.execute("python ZLFFI30.py")
     ----os.execute("python ZPFFI11.py")
     --local handle = io.popen("python ZPFFI00.py")
     print("Execution completed")

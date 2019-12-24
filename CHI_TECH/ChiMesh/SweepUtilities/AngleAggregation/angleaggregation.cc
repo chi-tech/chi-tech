@@ -45,13 +45,17 @@ void chi_mesh::sweep_management::AngleAggregation::ResetDelayedPsi()
 void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 {
   const double epsilon = 1.0e-8;
-  chi_log.Log(LOG_0) << "Initializing Reflecting boundary conditions.";
+
   int total_reflect_cells = 0;
   int total_reflect_faces = 0;
   int total_reflect_size = 0;
+
+  bool reflecting_bcs_initialized=false;
+
+  int bndry_id=0;
   for (auto bndry : sim_boundaries)
   {
-    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
+    if (bndry->IsReflecting())
     {
       size_t tot_num_angles = quadrature->abscissae.size();
       size_t num_local_cells = grid->local_cell_glob_indices.size();
@@ -126,12 +130,28 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           }
         }//for cells
       }//for angles
+
+      //========================================= Determine if boundary is
+      //                                          opposing reflecting
+      if ((bndry_id == 1) and (sim_boundaries[0]->IsReflecting()))
+        rbndry->opposing_reflected = true;
+      if ((bndry_id == 3) and (sim_boundaries[2]->IsReflecting()))
+        rbndry->opposing_reflected = true;
+      if ((bndry_id == 5) and (sim_boundaries[4]->IsReflecting()))
+        rbndry->opposing_reflected = true;
+
+      if (rbndry->opposing_reflected)
+        rbndry->hetero_boundary_flux_old = rbndry->hetero_boundary_flux;
+
+      reflecting_bcs_initialized = true;
     }//if reflecting
+
+    ++bndry_id;
   }//for bndry
 
-  chi_log.Log(LOG_0) << "Total reflecting cells = " << total_reflect_cells;
-  chi_log.Log(LOG_0) << "Total reflecting faces = " << total_reflect_faces;
-  chi_log.Log(LOG_0) << "Total reflecting variables = " << total_reflect_size;
+  if (reflecting_bcs_initialized)
+    chi_log.Log(LOG_0) << "Reflecting boundary conditions initialized.";
+
 }
 
 //###################################################################
@@ -140,7 +160,7 @@ void chi_mesh::sweep_management::AngleAggregation::ResetReflectingBCs()
 {
   for (auto bndry : sim_boundaries)
   {
-    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
+    if (bndry->IsReflecting())
     {
       auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
 
@@ -150,6 +170,9 @@ void chi_mesh::sweep_management::AngleAggregation::ResetReflectingBCs()
             for (auto& dofvec : facevec)
               for (auto& val : dofvec)
                 val = 0.0;
+
+      if (rbndry->opposing_reflected)
+        rbndry->hetero_boundary_flux_old = rbndry->hetero_boundary_flux;
     }//if reflecting
   }//for bndry
 }

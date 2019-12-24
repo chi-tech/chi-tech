@@ -133,6 +133,8 @@ public:
   void ConvergeCycles(MainSweepScheduler& sweepScheduler,
                       SweepChunk* sweep_chunk,
                       LBSGroupset *groupset,
+                      bool convergence_opp_refl_bndries=false,
+                      bool apply_latest_convergence_metric=true,
                       double cyclic_tolerance = 1.0e-12,
                       size_t cyclic_max_iter = 500);
 };
