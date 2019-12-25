@@ -158,7 +158,6 @@ RegisterFunction(chiExportMultiFieldFunctionToVTKG)
 
 
 //Property indices
-RegisterConstant(THERMAL_CONDUCTIVITY,   0);
 RegisterConstant(SCALAR_VALUE,           1);
 RegisterConstant(TRANSPORT_XSECTIONS,    10);
 RegisterConstant(ISOTROPIC_MG_SOURCE,    11);

@@ -2,7 +2,6 @@
 #include<iostream>
 #include "../chi_physics.h"
 #include "../PhysicsMaterial/chi_physicsmaterial.h"
-#include "ChiPhysics/PhysicsMaterial/property00_thermconductivity.h"
 #include "ChiPhysics/PhysicsMaterial/property01_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
 #include "ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h"
@@ -23,8 +22,6 @@ extern ChiLog chi_log;
 ##_
 
 ###PropertyIndex\n
-THERMAL_CONDUCTIVITY\n
- Basic material thermal property.\n\n
 
 SCALAR_VALUE\n
  Simple scalar value property.\n\n
@@ -84,42 +81,13 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   }
 
   //============================================= Process property
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% THERMAL_CONDUCTIVITY
-  if (property_index == THERMAL_CONDUCTIVITY)
-  {
-    //================================= Check for duplicate
-    for (int p=0; p<cur_material->properties.size(); p++)
-    {
-      if (cur_material->properties[p]->type_index == THERMAL_CONDUCTIVITY)
-      {
-        chi_log.Log(LOG_0ERROR) << "Material " << material_index << " \""
-                                << cur_material->name << "\""
-                                << " already has property THERMAL_CONDUCTIVITY"
-                                << std::endl;
-        exit(EXIT_FAILURE);
-      }
-    }
-
-    chi_physics::ThermalConductivity* prop = new
-      chi_physics::ThermalConductivity;
-
-    prop->property_name = std::string("Property ") +
-                          std::to_string(cur_material->properties.size());
-
-    if (numArgs == 3)
-      prop->property_name = std::string(provided_name);
-
-    cur_material->properties.push_back(prop);
-    chi_log.Log(LOG_0VERBOSE_1) << "Thermal Conductivity added to material"
-                                 " at index " << material_index;
-  }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% THERMAL_CONDUCTIVITY
-  else if (property_index == SCALAR_VALUE)
+  using MatProperty = chi_physics::PropertyType;
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SCALAR_VALUE
+  if (property_index == static_cast<int>(MatProperty::SCALAR_VALUE))
   {
     //Duplicates are allowed
 
-    chi_physics::ScalarValue* prop = new
-      chi_physics::ScalarValue;
+    auto prop = new chi_physics::ScalarValue;
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties.size());
@@ -132,12 +100,13 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
                                  " at index " << material_index;
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSPORT_XSECTIONS
-  else if (property_index == TRANSPORT_XSECTIONS)
+  else if (property_index == static_cast<int>(MatProperty::TRANSPORT_XSECTIONS))
   {
     //================================= Check for duplicate
     for (int p=0; p<cur_material->properties.size(); p++)
     {
-      if (cur_material->properties[p]->type_index == TRANSPORT_XSECTIONS)
+      if (cur_material->properties[p]->Type() ==
+            MatProperty::TRANSPORT_XSECTIONS)
       {
         chi_log.Log(LOG_0ERROR)    << "Material " << material_index << " \""
                                    << cur_material->name << "\""
@@ -148,8 +117,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
       }
     }
 
-    chi_physics::TransportCrossSections* prop = new
-      chi_physics::TransportCrossSections;
+    auto prop = new chi_physics::TransportCrossSections;
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties.size());
@@ -163,32 +131,30 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
 
     chi_physics_handler.trnsprt_xs_stack.push_back(prop);
 
-    int index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+    size_t index = chi_physics_handler.trnsprt_xs_stack.size()-1;
 
     lua_pushnumber(L,index);
     return 1;
   }
-  else if (property_index == ISOTROPIC_MG_SOURCE)
+  else if (property_index == static_cast<int>(MatProperty::ISOTROPIC_MG_SOURCE))
   {
     //================================= Check for duplicate
     for (int p=0; p<cur_material->properties.size(); p++)
     {
-      if (cur_material->properties[p]->type_index == ISOTROPIC_MG_SOURCE)
+      if (cur_material->properties[p]->Type() ==
+            MatProperty::ISOTROPIC_MG_SOURCE)
       {
         chi_log.Log(LOG_0ERROR)    << "Material " << material_index << " \""
                                    << cur_material->name << "\""
                                    << " already has property "
                                       "ISOTROPIC_MG_SOURCE "
-                                   << property_index << " "
-                                   << THERMAL_CONDUCTIVITY << " "
-                                   << TRANSPORT_XSECTIONS
+                                   << property_index
                                    << std::endl;
         exit(EXIT_FAILURE);
       }
     }
 
-    chi_physics::IsotropicMultiGrpSource* prop = new
-      chi_physics::IsotropicMultiGrpSource;
+    auto prop = new chi_physics::IsotropicMultiGrpSource;
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties.size());
@@ -223,7 +189,6 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
 ##_
 
 ###PropertyIndex\n
-THERMAL_CONDUCTIVITY =  Basic material thermal property.\n
 SCALAR_VALUE         =  Basic Scalar value property.\n
 TRANSPORT_XSECTIONS   =  Multi-group transport cross-section supporting numerous
                         features.\n
@@ -333,7 +298,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
   int material_index = lua_tonumber(L,1);
   int property_index = -1;
-  std::string property_index_name("");
+  std::string property_index_name;
   if (lua_isnumber(L,2))
     property_index = lua_tonumber(L,2);
   else
@@ -358,124 +323,41 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   //                                              find property index
   if (!lua_isnumber(L,2))
   {
-    for (int p=0; p<cur_material->properties.size(); p++)
-    {
-      if (cur_material->properties[p]->property_name == property_index_name)
-      {
-        chi_physics::MaterialProperty* property = cur_material->properties[p];
-
-        if (typeid(*property) == typeid(chi_physics::ThermalConductivity))
-          property_index = THERMAL_CONDUCTIVITY;
-        else if (typeid(*property) == typeid(chi_physics::ScalarValue))
-          property_index = SCALAR_VALUE;
-        else if (typeid(*property) == typeid(chi_physics::TransportCrossSections))
-          property_index = TRANSPORT_XSECTIONS;
-        else if (typeid(*property) == typeid(chi_physics::IsotropicMultiGrpSource))
-          property_index = ISOTROPIC_MG_SOURCE;
-        else if (typeid(*property) == typeid(chi_physics::MaterialProperty))
-        {
-          property_index = -1;
-          printf("Defaulted\n");
-        }
-
-      }
-    }
+    for (auto property : cur_material->properties)
+      if (property->property_name == property_index_name)
+        property_index = static_cast<int>(property->Type());
   }
 
   //============================================= Process property
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% THERMAL_CONDUCTIVITY
-  if (property_index == THERMAL_CONDUCTIVITY)
+  using MatProperty = chi_physics::PropertyType;
+  using OpType = chi_physics::OperationType;
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SCALAR_VALUE
+  if (property_index == static_cast<int>(MatProperty::SCALAR_VALUE))
   {
     int location_of_prop = -1;
     //================================= Check if the material has this property
     if (lua_isnumber(L,2))
     {
       for (int p=0; p<cur_material->properties.size(); p++)
-      {
-        if (cur_material->properties[p]->type_index == THERMAL_CONDUCTIVITY)
-        {
+        if (cur_material->properties[p]->Type() == MatProperty::SCALAR_VALUE)
           location_of_prop = p;
-        }
-      }
     }
     else
     {
       for (int p=0; p<cur_material->properties.size(); p++)
-      {
         if (cur_material->properties[p]->property_name == property_index_name)
-        {
           location_of_prop = p;
-        }
-      }
     }
 
 
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      chi_physics::ThermalConductivity* prop =
-        (chi_physics::ThermalConductivity*)
-        cur_material->properties[location_of_prop];
+      auto prop =
+        (chi_physics::ScalarValue*)cur_material->properties[location_of_prop];
 
       //========================== Process operation
-      if (operation_index == SINGLE_VALUE)
-      {
-        double k_cond = lua_tonumber(L,4);
-        prop->k = k_cond;
-        chi_log.Log(LOG_0VERBOSE_1) << "Thermal Conductivity for material"
-                                     " at index " << material_index
-                                  << " set to " << k_cond;
-      }
-      else
-      {
-        chi_log.Log(LOG_0ERROR) << "ERROR: Unsupported operation for "
-                                   "THERMAL_CONDUCTIVITY." << std::endl;
-        exit(EXIT_FAILURE);
-      }
-
-    }
-    else
-    {
-      chi_log.Log(LOG_0ERROR) << "ERROR: Material has no property "
-                                 "THERMAL_CONDUCTIVITY." << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }//if thermal conductivity
-  else if (property_index == SCALAR_VALUE)
-  {
-    int location_of_prop = -1;
-    //================================= Check if the material has this property
-    if (lua_isnumber(L,2))
-    {
-      for (int p=0; p<cur_material->properties.size(); p++)
-      {
-        if (cur_material->properties[p]->type_index == SCALAR_VALUE)
-        {
-          location_of_prop = p;
-        }
-      }
-    }
-    else
-    {
-      for (int p=0; p<cur_material->properties.size(); p++)
-      {
-        if (cur_material->properties[p]->property_name == property_index_name)
-        {
-          location_of_prop = p;
-        }
-      }
-    }
-
-
-    //================================= If the property is valid
-    if (location_of_prop>=0)
-    {
-      chi_physics::ScalarValue* prop =
-        (chi_physics::ScalarValue*)
-          cur_material->properties[location_of_prop];
-
-      //========================== Process operation
-      if (operation_index == SINGLE_VALUE)
+      if (operation_index == static_cast<int>(OpType::SINGLE_VALUE))
       {
         double value = lua_tonumber(L,4);
         prop->value = value;
@@ -499,7 +381,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     }
   }//if scalar value
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSPORT_XSECTIONS
-  else if (property_index == TRANSPORT_XSECTIONS)
+  else if (property_index == static_cast<int>(MatProperty::TRANSPORT_XSECTIONS))
   {
     int location_of_prop = -1;
     //================================= Check if the material has this property
@@ -507,7 +389,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     {
       for (int p=0; p<cur_material->properties.size(); p++)
       {
-        if (cur_material->properties[p]->type_index == TRANSPORT_XSECTIONS)
+        if (cur_material->properties[p]->Type() ==
+              MatProperty::TRANSPORT_XSECTIONS)
         {
           location_of_prop = p;
         }
@@ -527,12 +410,11 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      chi_physics::TransportCrossSections* prop =
-        (chi_physics::TransportCrossSections*)
-          cur_material->properties[location_of_prop];
+      auto prop = (chi_physics::TransportCrossSections*)
+                  cur_material->properties[location_of_prop];
 
       //========================== Process operation
-      if (operation_index == SIMPLEXS0)
+      if (operation_index == static_cast<int>(OpType::SIMPLEXS0))
       {
         if (numArgs!=5)
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",5,numArgs);
@@ -542,7 +424,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         prop->MakeSimple0(G,sigma_t);
       }
-      else if (operation_index == SIMPLEXS1)
+      else if (operation_index == static_cast<int>(OpType::SIMPLEXS1))
       {
         if (numArgs!=6)
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",6,numArgs);
@@ -553,7 +435,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         prop->MakeSimple1(G,sigma_t,c);
       }
-      else if (operation_index == PDT_XSFILE)
+      else if (operation_index == static_cast<int>(OpType::PDT_XSFILE))
       {
         if (!((numArgs>=4) && (numArgs<=5)))
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
@@ -566,7 +448,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         prop->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
       }
-      else if (operation_index == EXISTING)
+      else if (operation_index == static_cast<int>(OpType::EXISTING))
       {
         if (numArgs != 4)
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
@@ -584,7 +466,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
             << std::endl;
           exit(EXIT_FAILURE);
         }
-        auto old_prop = prop;
+//        auto old_prop = prop;
         prop = xs;
 
 //        delete old_prop; //Still debating if this should be deleted
@@ -605,7 +487,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     }
   }//if thermal conductivity
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ISOTROPIC_MG_SOURCE
-  else if (property_index == ISOTROPIC_MG_SOURCE)
+  else if (property_index == static_cast<int>(MatProperty::ISOTROPIC_MG_SOURCE))
   {
     int location_of_prop = -1;
     //================================= Check if the material has this property
@@ -613,7 +495,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     {
       for (int p=0; p<cur_material->properties.size(); p++)
       {
-        if (cur_material->properties[p]->type_index == ISOTROPIC_MG_SOURCE)
+        if (cur_material->properties[p]->Type() ==
+              MatProperty::ISOTROPIC_MG_SOURCE)
         {
           location_of_prop = p;
         }
@@ -633,12 +516,12 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      chi_physics::IsotropicMultiGrpSource* prop =
+      auto prop =
         (chi_physics::IsotropicMultiGrpSource*)
           cur_material->properties[location_of_prop];
 
 
-      if (operation_index == SINGLE_VALUE)
+      if (operation_index == static_cast<int>(OpType::SINGLE_VALUE))
       {
         if (numArgs!=4)
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
@@ -651,7 +534,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
                                      " at index " << material_index
                                   << " set to " << value;
       }
-      else if (operation_index == FROM_ARRAY)
+      else if (operation_index == static_cast<int>(OpType::FROM_ARRAY))
       {
         if (numArgs!=4)
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
@@ -723,7 +606,7 @@ int chiPhysicsTransportXSCreate(lua_State* L)
 
   chi_physics_handler.trnsprt_xs_stack.push_back(xs);
 
-  int index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+  size_t index = chi_physics_handler.trnsprt_xs_stack.size()-1;
 
   lua_pushnumber(L,index);
   return 1;
@@ -809,7 +692,8 @@ int chiPhysicsTransportXSSet(lua_State* L)
   }
 
   //========================== Process operation
-  if (operation_index == SIMPLEXS0)
+  using OpType = chi_physics::OperationType;
+  if (operation_index == static_cast<int>(OpType::SIMPLEXS0))
   {
     if (num_args!=4)
       LuaPostArgAmountError("chiPhysicsTransportXSSet",4,num_args);
@@ -819,7 +703,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     xs->MakeSimple0(G,sigma_t);
   }
-  else if (operation_index == SIMPLEXS1)
+  else if (operation_index == static_cast<int>(OpType::SIMPLEXS1))
   {
     if (num_args!=5)
       LuaPostArgAmountError("chiPhysicsTransportXSSet",5,num_args);
@@ -830,7 +714,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     xs->MakeSimple1(G,sigma_t,c);
   }
-  else if (operation_index == PDT_XSFILE)
+  else if (operation_index == static_cast<int>(OpType::PDT_XSFILE))
   {
     if (!((num_args>=3) && (num_args<=4)))
       LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);

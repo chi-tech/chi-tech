@@ -10,14 +10,9 @@ class chi_physics::IsotropicMultiGrpSource : public chi_physics::MaterialPropert
 public:
   std::vector<double> source_value_g;
 
-  IsotropicMultiGrpSource()
-  {
-    type_index = ISOTROPIC_MG_SOURCE;
-  }
-  double GetScalarValue()
-  {
-    return 0.0;
-  }
+  IsotropicMultiGrpSource() :
+    MaterialProperty(PropertyType::ISOTROPIC_MG_SOURCE) {}
+
 };
 
 #endif
