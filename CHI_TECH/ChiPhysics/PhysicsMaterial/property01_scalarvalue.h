@@ -8,18 +8,11 @@
 class chi_physics::ScalarValue : public chi_physics::MaterialProperty
 {
 public:
-  double value;
+  double value=1.0;
 
-  ScalarValue()
-  {
-    type_index = SCALAR_VALUE;
-    value = 1.0;
-  }
+  ScalarValue() : MaterialProperty(PropertyType::SCALAR_VALUE) {}
 
-  double GetScalarValue()
-  {
-    return value;
-  }
+  double GetScalarValue() {return value;}
 };
 
 #endif

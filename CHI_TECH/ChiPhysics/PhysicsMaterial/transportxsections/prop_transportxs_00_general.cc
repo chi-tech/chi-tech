@@ -2,9 +2,9 @@
 
 //###################################################################
 /**Default constructor.*/
-chi_physics::TransportCrossSections::TransportCrossSections()
+chi_physics::TransportCrossSections::TransportCrossSections() :
+  chi_physics::MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
 {
-  type_index = TRANSPORT_XSECTIONS;
   G = 0;
   L = 0;
 

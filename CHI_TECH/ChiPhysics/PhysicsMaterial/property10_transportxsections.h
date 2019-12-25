@@ -16,8 +16,8 @@ typedef std::vector<std::pair<double,double>> Tvecdbl_vecdbl;
 class chi_physics::TransportCrossSections : public chi_physics::MaterialProperty
 {
 public:
-  int G;
-  int L;
+  int G=0;
+  int L=0;
 
   std::vector<double> sigma_tg;     ///< MT 1    Total cross-section
   std::vector<double> sigma_fg;     ///< MT 18   Sigmaf cross-section
@@ -34,8 +34,8 @@ public:
   std::vector<chi_math::SparseMatrix> transfer_matrix;
 
 public:
-  bool diffusion_initialized;
-  bool scattering_initialized;
+  bool diffusion_initialized = false;
+  bool scattering_initialized = false;
 public:
   std::vector<double> diffg;
   std::vector<double> sigma_rg;
@@ -46,11 +46,11 @@ public:
   std::vector<double> xi_Jfull_g;
   std::vector<double> xi_Jpart_g;
 
-  double D_jfull;
-  double D_jpart;
+  double D_jfull = 0.0;
+  double D_jpart = 0.0;
 
-  double sigma_a_jfull;
-  double sigma_a_jpart;
+  double sigma_a_jfull = 0.0;
+  double sigma_a_jpart = 0.0;
 
 private:
   std::vector<std::vector<double>>         cdf_gprime_g;

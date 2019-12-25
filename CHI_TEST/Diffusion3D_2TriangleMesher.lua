@@ -71,12 +71,12 @@ materials = {}
 materials[0] = chiPhysicsAddMaterial("Test Material");
 materials[1] = chiPhysicsAddMaterial("Test Material2");
 
-chiPhysicsMaterialAddProperty(materials[0],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialSetProperty(materials[0],THERMAL_CONDUCTIVITY,SINGLE_VALUE,1.0)
+chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
+chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
 
-chiPhysicsMaterialAddProperty(materials[1],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialSetProperty(materials[1],THERMAL_CONDUCTIVITY,SINGLE_VALUE,10000)
+chiPhysicsMaterialAddProperty(materials[1],SCALAR_VALUE)
+chiPhysicsMaterialSetProperty(materials[1],SCALAR_VALUE,SINGLE_VALUE,10000)
 
 
 --############################################### Setup Physics

@@ -76,8 +76,8 @@ materials = {}
 materials[1] = chiPhysicsAddMaterial("Test Material");
 materials[2] = chiPhysicsAddMaterial("Test Material2");
 
-chiPhysicsMaterialAddProperty(materials[1],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialAddProperty(materials[2],THERMAL_CONDUCTIVITY)
+chiPhysicsMaterialAddProperty(materials[1],SCALAR_VALUE)
+chiPhysicsMaterialAddProperty(materials[2],SCALAR_VALUE)
 
 chiPhysicsMaterialAddProperty(materials[1],TRANSPORT_XSECTIONS)
 chiPhysicsMaterialAddProperty(materials[2],TRANSPORT_XSECTIONS)
@@ -86,8 +86,8 @@ chiPhysicsMaterialAddProperty(materials[2],TRANSPORT_XSECTIONS)
 --chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
-chiPhysicsMaterialSetProperty(materials[1],THERMAL_CONDUCTIVITY,SINGLE_VALUE,13.7)
-chiPhysicsMaterialSetProperty(materials[2],THERMAL_CONDUCTIVITY,SINGLE_VALUE,0.5)
+chiPhysicsMaterialSetProperty(materials[1],SCALAR_VALUE,SINGLE_VALUE,13.7)
+chiPhysicsMaterialSetProperty(materials[2],SCALAR_VALUE,SINGLE_VALUE,0.5)
 
 num_groups = 168
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.01)
