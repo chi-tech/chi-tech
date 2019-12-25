@@ -10,7 +10,7 @@ extern ChiLog     chi_log;
  * auxiliary FLUDS has the exact same sweep ordering as the
  * primary FLUDS.*/
 chi_mesh::sweep_management::AUX_FLUDS::
-  AUX_FLUDS(chi_mesh::sweep_management::PRIMARY_FLUDS &primary, int in_G) :
+  AUX_FLUDS(PRIMARY_FLUDS &primary, int in_G) :
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Initializing references
   largest_face( primary.largest_face ),
   G( in_G ),

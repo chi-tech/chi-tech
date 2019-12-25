@@ -170,9 +170,10 @@ RegisterConstant(SIMPLEXS1,              21);
 RegisterConstant(PDT_XSFILE,             22);
 RegisterConstant(EXISTING,               23);
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "../../Modules/module_lua_register.h"
 
+#endif
 //module:Test scripts
 RegisterFunction(chiLuaTest)
 

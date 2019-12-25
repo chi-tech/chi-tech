@@ -171,8 +171,8 @@ size_t ChiLog::GetRepeatingEventTag(std::string event_name)
 //###################################################################
 /**Logs an event with the supplied event information.*/
 void ChiLog::LogEvent(size_t ev_tag,
-                      ChiLog::EventType ev_type,
-                      std::shared_ptr<ChiLog::EventInfo> ev_info)
+                      EventType ev_type,
+                      std::shared_ptr<EventInfo> ev_info)
 {
   if (ev_tag >= repeating_events.size())
     return;
@@ -188,7 +188,7 @@ void ChiLog::LogEvent(size_t ev_tag,
 //###################################################################
 /**Logs an event without any event information.*/
 void ChiLog::LogEvent(size_t ev_tag,
-                      ChiLog::EventType ev_type)
+                      EventType ev_type)
 {
   if (ev_tag >= repeating_events.size())
     return;

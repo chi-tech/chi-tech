@@ -72,6 +72,7 @@ namespace chi_mesh::sweep_management
 class chi_mesh::sweep_management::PRIMARY_FLUDS :
   public chi_mesh::sweep_management::FLUDS
 {
+  /**\relates chi_mesh::sweep_management::AUX_FLUDS*/
   friend chi_mesh::sweep_management::AUX_FLUDS;
 
   //Inherited from base FLUDS
