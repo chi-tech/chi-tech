@@ -10,29 +10,9 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
 
---############################################### Extract edges from surface mesh
--- loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
---
--- line_mesh = {};
--- line_mesh_count = 0;
---
--- for k=1,loop_count do
---     split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
---     for m=1,split_count do
---         line_mesh_count = line_mesh_count + 1;
---         line_mesh[line_mesh_count] =
---         chiLineMeshCreateFromLoop(split_loops,m-1);
---     end
---
--- end
-
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
--- chiRegionAddEmptyBoundary(region1);
--- for k=1,line_mesh_count do
---     chiRegionAddLineBoundary(region1,line_mesh[k]);
--- end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
@@ -75,7 +55,10 @@ materials[0] = chiPhysicsAddMaterial("Test Material");
 chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
 chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
-
+prop = chiPhysicsMaterialGetProperty(materials[0],SCALAR_VALUE)
+if ((prop.is_empty ~=nil) and (not prop.is_empty)) then
+    print("Property table populated, value="..tostring(prop.value))
+end
 
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
@@ -113,6 +96,22 @@ chiFFInterpolationExecute(curffi)
 maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
+
+--==========================================
+xwing=2.0
+function IntegrateMaterialVolume(ff_value,mat_id)
+    return xwing
+end
+ffi2 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi2
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_SUM_LUA,"IntegrateMaterialVolume")
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+print(chiFFInterpolationGetValue(curffi))
+--==========================================
 
 if (master_export == nil) then
     chiFFInterpolationExportPython(slice2)

@@ -240,3 +240,30 @@ if (master_export == nil) then
     chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 end
 
+mat0_xs = chiPhysicsMaterialGetProperty(materials[1],TRANSPORT_XSECTIONS)
+
+
+
+edits_vals={}
+for g=1,num_groups do
+
+    function F(ff_value,mat_id)
+        return ff_value*mat0_xs.sigma_tg[g]
+    end
+
+    curffi = chiFFInterpolationCreate(VOLUME)
+    chiFFInterpolationSetProperty(curffi,OPERATION,OP_SUM_LUA,"F")
+    chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+    chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[g])
+
+    chiFFInterpolationInitialize(curffi)
+    chiFFInterpolationExecute(curffi)
+    edits_vals[g] = chiFFInterpolationGetValue(curffi)
+end
+
+if (chi_location_id == 0 and master_export == nil) then
+    print("Sigma-t:")
+    for g=1,num_groups do
+        print(string.format("%3d %.5e",g,edits_vals[g]))
+    end
+end

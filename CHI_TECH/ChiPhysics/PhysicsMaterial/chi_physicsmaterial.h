@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "ChiLua/chi_lua.h"
+
 namespace chi_physics
 {
   enum class PropertyType
@@ -31,6 +33,7 @@ public:
   PropertyType Type() {return type;}
 
   virtual double GetScalarValue() { return 0.0; }
+  virtual void PushLuaTable(lua_State* L);
 };
 
 //###################################################################

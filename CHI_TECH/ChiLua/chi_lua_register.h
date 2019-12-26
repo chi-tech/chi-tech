@@ -117,6 +117,9 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
         RegisterConstant(OP_SUM,   10);
         RegisterConstant(OP_AVG,   11);
         RegisterConstant(OP_MAX,   12);
+        RegisterConstant(OP_SUM_LUA,   13);
+        RegisterConstant(OP_AVG_LUA,   14);
+        RegisterConstant(OP_MAX_LUA,   15);
     RegisterConstant(LOGICAL_VOLUME,   8);
     RegisterConstant(LINE_FIRSTPOINT,   11);
     RegisterConstant(LINE_SECONDPOINT,   12);
@@ -152,6 +155,7 @@ RegisterFunction(chiSolverExecute)
 RegisterFunction(chiPhysicsAddMaterial)
 RegisterFunction(chiPhysicsMaterialAddProperty)
 RegisterFunction(chiPhysicsMaterialSetProperty)
+RegisterFunction(chiPhysicsMaterialGetProperty)
 RegisterFunction(chiSolverAddFieldFunction)
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)

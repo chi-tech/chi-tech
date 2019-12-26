@@ -182,7 +182,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
 /** Sets a material property for a given material.
  *
 \param MaterialHandle int Index to the reference material.
-\param PropertyIndex int Property index.
+\param PropertyIndex int Property index. Or name of property.
 \param OperationIndex int Method used for setting the material property.
 \param Information varying Varying information depending on the operation.
 
@@ -592,6 +592,75 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
 
   return 0;
+}
+
+//###################################################################
+/** Returns a rich lua data-structure of the required property.
+ *
+\param MaterialHandle int Index to the reference material.
+\param PropertyIndex int Property index. Or name of property.
+
+\return Lua table of the desired property.
+
+*/
+int chiPhysicsMaterialGetProperty(lua_State* L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 2)
+    LuaPostArgAmountError("chiPhysicsMaterialGetProperty",2,num_args);
+
+  int material_index = lua_tonumber(L,1);
+  int property_index = -1;
+  std::string property_index_name;
+  if (lua_isnumber(L,2))
+    property_index = lua_tonumber(L,2);
+  else
+  {
+    const char* temp_name = lua_tostring(L,2);
+    property_index_name = std::string(temp_name);
+  }
+
+  //============================================= Get reference to material
+  chi_physics::Material* cur_material;
+  try {
+    cur_material = chi_physics_handler.material_stack.at(material_index);
+  }
+  catch(const std::out_of_range& o){
+    chi_log.Log(LOG_ALLERROR) << "ERROR: Invalid material handle." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  //============================================= If user supplied name then
+  //                                              find property index
+  if (!lua_isnumber(L,2))
+  {
+    for (auto property : cur_material->properties)
+      if (property->property_name == property_index_name)
+        property_index = static_cast<int>(property->Type());
+  }
+
+  //============================================= Process property
+  bool property_polulated = false;
+  for (auto property : cur_material->properties)
+  {
+    if (static_cast<int>(property->Type()) == property_index)
+    {
+      property->PushLuaTable(L);
+      property_polulated = true;
+    }
+  }
+
+
+  if (not property_polulated)
+  {
+    chi_log.Log(LOG_ALLERROR) << "Invalid material property specified in "
+                                 "call to chiPhysicsMaterialGetProperty."
+                              << property_index
+                              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  return 1;
 }
 
 //###################################################################

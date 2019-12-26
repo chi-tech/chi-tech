@@ -24,6 +24,7 @@ class chi_mesh::FieldFunctionInterpolationVolume :
 public:
   chi_mesh::LogicalVolume* logical_volume;
   int op_type;
+  std::string op_lua_func;
   double op_value;
 
 private:
@@ -52,6 +53,8 @@ public:
   {
 
   }
+
+  double CallLuaFunction(double ff_value, int mat_id);
 
 };
 
