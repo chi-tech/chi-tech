@@ -22,9 +22,9 @@ double chi_math::Ylm(int ell, int m, double varphi, double theta)
 
   if (em<0)
   {
-    return sqrt( ( 2.0 ) * fac(el-abs(em))/fac(el+abs(em)) )*
-           AssocLegendre(el,abs(em),cos(theta))*
-           sin(fabs(em)*varphi);
+    return sqrt( ( 2.0 ) * fac(el-std::fabs(em))/fac(el+std::fabs(em)) )*
+           AssocLegendre(el,std::fabs(em),cos(theta))*
+           sin(std::fabs(em)*varphi);
   }
   else if(em==0)
   {
@@ -36,4 +36,6 @@ double chi_math::Ylm(int ell, int m, double varphi, double theta)
             AssocLegendre(el,em,cos(theta))*
             cos(em*varphi);
   }
+
+  return 0.0;
 }
