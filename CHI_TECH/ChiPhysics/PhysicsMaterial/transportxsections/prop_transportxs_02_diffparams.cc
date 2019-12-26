@@ -56,7 +56,7 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     }
 
     //====================================== Determine removal cross-section
-    sigma_rg[g] = sigma_tg[g] - sigma_s_gtog[g];
+    sigma_rg[g] = std::max(0.0,sigma_tg[g] - sigma_s_gtog[g]);
 
 
 
@@ -79,6 +79,8 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
         }
       }//for j
     }//for gp
+
+    sigma_ag[g] = std::max(0.0,sigma_ag[g]);
   }
 
 
