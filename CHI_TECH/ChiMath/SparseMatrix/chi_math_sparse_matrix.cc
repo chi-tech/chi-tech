@@ -117,8 +117,37 @@ void chi_math::SparseMatrix::Insert(int i, int j, double value)
     inds_rowI[i].push_back(j);
     j_jr_maps[i][j] = inds_rowI[i].size()-1;
   }
+}
 
+//###################################################################
+/**Inserts-Adds a value into the matrix with duplicate check.*/
+void chi_math::SparseMatrix::InsertAdd(int i, int j, double value)
+{
+  CheckInitialized();
 
+  if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SparseMatrix::Insert encountered out of bounds,"
+      << " i=" << i << " j=" << j
+      << " bounds(" << row_size << "," << col_size << ")";
+    exit(EXIT_FAILURE);
+  }
+
+  bool already_there = false;
+  if (j_jr_maps[i][j]>=0)
+  {
+    already_there = true;
+    int jr = j_jr_maps[i][j];
+    rowI_colJ[i][jr] += value;
+  }
+
+  if (!already_there)
+  {
+    rowI_colJ[i].push_back(value);
+    inds_rowI[i].push_back(j);
+    j_jr_maps[i][j] = inds_rowI[i].size()-1;
+  }
 }
 
 //###################################################################

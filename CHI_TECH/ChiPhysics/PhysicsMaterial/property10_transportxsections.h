@@ -63,6 +63,7 @@ public:
 
   void MakeSimple0(int in_G, double in_sigmat);
   void MakeSimple1(int in_G, double in_sigmat, double c);
+  void MakeCombined(std::vector<std::pair<int,double>>& combinations);
 
   //01
   void MakeFromPDTxsFile(const std::string &file_name,std::string MT_TRANSFER);
@@ -82,6 +83,8 @@ public:
 
   //05
   void PushLuaTable(lua_State* L) override;
+
+
 };
 
 

@@ -469,6 +469,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 //        auto old_prop = prop;
         prop = xs;
 
+        cur_material->properties[location_of_prop] = prop;
+
 //        delete old_prop; //Still debating if this should be deleted
       }
       else
@@ -600,6 +602,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 \param MaterialHandle int Index to the reference material.
 \param PropertyIndex int Property index. Or name of property.
 
+
+\ingroup LuaPhysicsMaterials
 \return Lua table of the desired property.
 
 */
@@ -666,6 +670,8 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
 //###################################################################
 /**Creates a stand-alone transport cross-section.
  *
+ *
+\ingroup LuaPhysicsMaterials
  * \return Returns a handle to the cross-section.
  *
  * */
@@ -731,6 +737,8 @@ graphite = chiPhysicsTransportXSCreate()
 chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
 \endcode
  *
+ *
+\ingroup LuaPhysicsMaterials
  * \return */
 int chiPhysicsTransportXSSet(lua_State* L)
 {
@@ -746,7 +754,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   LuaCheckNilValue("chiPhysicsTransportXSSet",L,2);
 
   int handle = lua_tonumber(L,1);
-  int operation_index = lua_tonumber(L,1);
+  int operation_index = lua_tonumber(L,2);
 
   chi_physics::TransportCrossSections* xs;
   try {
@@ -800,9 +808,111 @@ int chiPhysicsTransportXSSet(lua_State* L)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Unsupported operation in "
-      << "chiPhysicsTransportXSSet."
+      << "chiPhysicsTransportXSSet. " << operation_index
       << std::endl;
     exit(EXIT_FAILURE);
   }
   return 0;
+}
+
+//###################################################################
+/**Makes a combined cross-section from multiple other cross-sections.
+ *
+ * \param Combinations table A lua-table with each element another table
+ *                           containing a handle to an existing xs and a
+ *                           scalar multiplier.
+ *
+ * ## _
+ *
+ * Example:\n
+\code
+xs_1 = chiPhysicsTransportXSCreate()
+xs_2 = chiPhysicsTransportXSCreate()
+xs_3 = chiPhysicsTransportXSCreate()
+
+chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
+chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
+chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
+
+combo ={{xs_1, 0.5},
+        {xs_2, 0.4},
+        {xs_3, 0.1}}
+aerated_graphite = chiPhysicsTransportXSMakeCombined(combo)
+
+
+chiPhysicsMaterialSetProperty(materials[1],
+                              TRANSPORT_XSECTIONS,
+                              EXISTING,aerated_graphite)
+\endcode
+ *
+ * \return Returns a handle to another cross-section object that contains the
+ *         desired combination.
+ *
+ * \ingroup LuaPhysicsMaterials
+ * */
+int chiPhysicsTransportXSMakeCombined(lua_State* L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError("chiPhysicsMakeCombinedTransportXS",1,num_args);
+
+  if (!lua_istable(L,1))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "In call to chiPhysicsMakeCombinedTransportXS: "
+      << "Argument must be a lua table.";
+    exit(EXIT_FAILURE);
+  }
+
+  int table_len = lua_rawlen(L,1);
+
+  std::vector<std::pair<int,double>> combinations;
+  combinations.reserve(table_len);
+
+  //======================================== Process table
+  for (int v=0; v<table_len; ++v)
+  {
+    lua_pushnumber(L,v+1);
+    lua_gettable(L,1);
+
+    if (!lua_istable(L,-1))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "In call to chiPhysicsMakeCombinedTransportXS: "
+        << "The elements of the supplied table must themselves also"
+           "be lua tables of the xs handle and its scalar multiplier.";
+      exit(EXIT_FAILURE);
+    }
+
+    lua_pushinteger(L,1);
+    lua_gettable(L,-2);
+    LuaCheckNilValue("chiPhysicsMakeCombinedTransportXS:A1:E1",L,-1);
+
+    int handle = lua_tonumber(L,-1); lua_pop(L,1);
+
+    lua_pushinteger(L,2);
+    lua_gettable(L,-2);
+    LuaCheckNilValue("chiPhysicsMakeCombinedTransportXS:A1:E2",L,-1);
+
+    double scalar = lua_tonumber(L,-1); lua_pop(L,1);
+
+    combinations.emplace_back(handle,scalar);
+    lua_pop(L,1); //pop off table
+  }
+
+  //======================================== Print out table
+  chi_log.Log(LOG_0) << "Generating XS with following combination:";
+  for (auto& elem : combinations)
+    chi_log.Log(LOG_0) << "  Element handle: " << elem.first
+                       << " scalar value: " << elem.second;
+
+  //======================================== Make the new cross-section
+  auto new_xs = new chi_physics::TransportCrossSections;
+
+  new_xs->MakeCombined(combinations);
+
+  chi_physics_handler.trnsprt_xs_stack.push_back(new_xs);
+  lua_pushnumber(L,chi_physics_handler.trnsprt_xs_stack.size()-1);
+
+  return 1;
 }

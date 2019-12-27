@@ -12,7 +12,7 @@ void LuaPostArgAmountError(const char* func_name,int expected, int given)
   chi_log.Log(LOG_ALLERROR)
   << "Incorrect amount of arguments supplied in "
   << std::string(func_name)
-  << "expected " << expected << " arguments "
+  << " expected " << expected << " arguments "
   << " but " << given << " provided";
   exit(EXIT_FAILURE);
 }

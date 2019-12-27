@@ -38,8 +38,10 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     {
       sigs_g_1 = 0.0;
       chi_log.Log(LOG_0WARNING)
-        << "Transport corrected diffusion coefficient failed in call to "
-        << "chi_physics::TransportCrossSections::ComputeDiffusionParameters.";
+        << "Transport corrected diffusion coefficient failed for group "
+        << g << " in call to "
+        << "chi_physics::TransportCrossSections::ComputeDiffusionParameters."
+        << " sigma_t=" << sigma_tg[g] << " sigs_g_(m=1)=" << sigs_g_1;
     }
     diffg[g] = (fmin(1.0e12,1.0/3.0/(sigma_tg[g]-sigs_g_1)));
     //diffg[g] = 1.0/3.0/(sigma_tg[g]-sigs_g_1);

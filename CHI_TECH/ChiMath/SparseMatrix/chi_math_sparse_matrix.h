@@ -45,6 +45,7 @@ public:
   void SetSize(int num_rows, int num_cols);
   void UnsafeInsert(int i, int j, double value);
   void Insert(int i, int j, double value);
+  void InsertAdd(int i, int j, double value);
 //  void SafeInsert(int i,int j, double value);
   void SetDiagonal(const std::vector<double>& diag);
 
