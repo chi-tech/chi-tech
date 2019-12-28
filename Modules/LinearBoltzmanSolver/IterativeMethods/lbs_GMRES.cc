@@ -141,7 +141,11 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   sweep_chunk->SetDestinationPhi(&phi_new_local);
   sweep_chunk->suppress_surface_src = true; //Action of Ax specific
 
-  VecCopy(phi_old,phi_new);
+  double phi_old_norm=0.0;
+  VecNorm(phi_old,NORM_2,&phi_old_norm);
+
+  if (phi_old_norm > 1.0e-10)
+    VecCopy(phi_old,phi_new);
 
   //**************** CALL GMRES SOLVE ******************
   chi_log.Log(LOG_0)
