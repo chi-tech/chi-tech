@@ -85,6 +85,8 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       }
 
       //========================================= For angles
+      rbndry->hetero_boundary_flux.clear();
+      rbndry->hetero_boundary_flux_old.clear();
       rbndry->hetero_boundary_flux.resize(tot_num_angles);
       for (int n=0; n<tot_num_angles; ++n)
       {
