@@ -24,7 +24,12 @@ void chi_physics::TransportCrossSections::
   MakeSimple0(int in_G, double in_sigmat)
 {
   G = in_G;
+  sigma_tg.clear();
   sigma_tg.resize(in_G,in_sigmat);
+  sigma_fg.resize(in_G,0.0);
+  sigma_captg.resize(in_G,0.0);
+  chi_g.resize(in_G,0.0);
+  nu_sigma_fg.resize(in_G,0.0);
 
   transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
 }
@@ -39,6 +44,12 @@ void chi_physics::TransportCrossSections::
   G = in_G;
 
   sigma_tg.resize(in_G,in_sigmat);
+  sigma_tg.clear();
+  sigma_tg.resize(in_G,in_sigmat);
+  sigma_fg.resize(in_G,0.0);
+  sigma_captg.resize(in_G,0.0);
+  chi_g.resize(in_G,0.0);
+  nu_sigma_fg.resize(in_G,0.0);
 
   transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
 
