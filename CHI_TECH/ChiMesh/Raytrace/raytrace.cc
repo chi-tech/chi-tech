@@ -154,12 +154,12 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   {
     if (func_depth < 5)
     {
-      chi_log.Log(LOG_ALLERROR) << "Particle nudged";
+      //chi_log.Log(LOG_ALLERROR) << "Particle nudged";
       //Vector from position to cell-centroid
       chi_mesh::Vector v_p_i_cc = (cell->centroid - pos_i).Normalized();
       chi_mesh::Vector pos_i_nudged = pos_i + v_p_i_cc*epsilon;
 
-      printf("%.12f %.12f %.12f\n",pos_i_nudged.x,pos_i_nudged.y,pos_i_nudged.z);
+      //printf("%.12f %.12f %.12f\n",pos_i_nudged.x,pos_i_nudged.y,pos_i_nudged.z);
 
       dest_info =
         RayTrace(grid,cell,pos_i_nudged,omega_i,d_to_surface,pos_f,func_depth+1);
