@@ -317,7 +317,7 @@ test_passed = True
 if (test_str_start >= 0):
     #convert value to number
     test_val = float(out[test_str_end:test_str_line_end])
-    if (not abs(test_val-0.50337) < 1.0e-4):
+    if (not abs(test_val-0.50758) < 1.0e-4):
         test_passed = False
 else:
     test_passed = False
@@ -335,7 +335,7 @@ test_str_line_end = out.find("\n",test_str_start)
 if (test_str_start >= 0):
     #convert value to number
     test_val = float(out[test_str_end:test_str_line_end])
-    if (not abs(test_val-5.00978e-05) < 1.0e-4):
+    if (not abs(test_val-2.52527e-04) < 1.0e-4):
         test_passed = False
 else:
     test_passed = False
