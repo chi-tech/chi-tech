@@ -70,34 +70,9 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                        groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D MESHES
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
-  {
-    int num_azi = groupset->quadrature->azimu_ang.size();
-    int num_pol = groupset->quadrature->polar_ang.size();
-
-    if (num_pol != 1)
-    {
-      chi_log.Log(LOG_0)
-        << "Incompatible number of polar angles in quadrature set "
-        << "for a 2D simulation.";
-      exit(EXIT_FAILURE);
-    }
-
-    for (int i=0; i<num_azi; i++)
-    {
-      chi_mesh::sweep_management::SPDS* new_swp_order =
-        chi_mesh::sweep_management::
-        CreateSweepOrder(groupset->quadrature->polar_ang[0],
-                         groupset->quadrature->azimu_ang[i],
-                         this->grid,
-                         groupset->groups.size(),
-                         groupset->allow_cycles);
-      this->sweep_orderings.push_back(new_swp_order);
-    }
-  }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EXTRUDED MESHES
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D 3D MESHES
+  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) )
   {
     int num_azi = groupset->quadrature->azimu_ang.size();
     int num_pol = groupset->quadrature->polar_ang.size();
@@ -106,14 +81,14 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     {
       chi_log.Log(LOG_0)
         << "Incompatible number of azimuthal angles in quadrature set "
-        << "for a 3D simulation.";
+        << "for a 2D or 3D simulation.";
       exit(EXIT_FAILURE);
     }
     if (num_pol < 2)
     {
       chi_log.Log(LOG_0)
         << "Incompatible number of polar angles in quadrature set "
-        << "for a 3D simulation.";
+        << "for a 2D or 3D simulation.";
       exit(EXIT_FAILURE);
     }
 

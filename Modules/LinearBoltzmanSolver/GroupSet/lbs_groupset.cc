@@ -73,8 +73,8 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
         {
           chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
-                                                       cur_angle->phi,
-                                                       cur_angle->theta);
+                                       cur_angle->phi,
+                                       cur_angle->theta);
           double w = quadrature->weights[n];
           cur_mom.push_back(value*w);
         }
@@ -83,8 +83,9 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
       }//for m
     }//for ell
   }//line mesh
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
+  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) )
   {
     int mc=-1; //moment count
     for (int ell=0; ell<=scatt_order; ell++)
@@ -98,33 +99,8 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
         {
           chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
-                                                       cur_angle->phi,
-                                                       cur_angle->theta);
-          double w = quadrature->weights[n];
-          cur_mom.push_back(value*w);
-        }
-
-        d2m_op.push_back(cur_mom);
-      }//for m
-    }//for ell
-  }//2d meshers
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3D
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
-  {
-    int mc=-1; //moment count
-    for (int ell=0; ell<=scatt_order; ell++)
-    {
-      for (int m=-ell; m<=ell; m++)
-      {
-        std::vector<double> cur_mom; mc++;
-        num_moms++;
-
-        for (int n=0; n<num_angles; n++)
-        {
-          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
-          double value = chi_math::Ylm(ell,m,
-                                                       cur_angle->phi,
-                                                       cur_angle->theta);
+                                       cur_angle->phi,
+                                       cur_angle->theta);
           double w = quadrature->weights[n];
           cur_mom.push_back(value*w);
         }
@@ -133,6 +109,12 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
       }//for m
     }//for ell
   }//extruder
+  else
+  {
+    chi_log.Log(LOG_ALLERROR) << "Unsupported mesh type encountered in call to"
+                                 "LBSGroupset::BuildDiscMomOperator.";
+    exit(EXIT_FAILURE);
+  }
 
 
   std::stringstream outs;
@@ -188,35 +170,9 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
       }//for m
     }//for ell
   }//line mesh
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
-  {
-    int mc=-1;
-    for (int ell=0; ell<=scatt_order; ell++)
-    {
-      for (int m=-ell; m<=ell; m++)
-      {
-        std::vector<double> cur_mom; mc++;
-        num_moms++;
-
-        for (int n=0; n<num_angles; n++)
-        {
-          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
-          double value = ((2.0*ell+1.0)/2.0/M_PI)*
-                         chi_math::Ylm(ell,m,
-                                                       cur_angle->phi,
-                                                       cur_angle->theta);
-          cur_mom.push_back(value);
-        }
-
-        m2d_op.push_back(cur_mom);
-      }//for m
-    }//for ell
-  }//extruder
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3D
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
+  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) )
   {
     int mc=-1;
     for (int ell=0; ell<=scatt_order; ell++)
@@ -240,6 +196,12 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
       }//for m
     }//for ell
   }//extruder
+  else
+  {
+    chi_log.Log(LOG_ALLERROR) << "Unsupported mesh type encountered in call to"
+                                 "LBSGroupset::BuildMomDiscOperator.";
+    exit(EXIT_FAILURE);
+  }
 
   std::stringstream outs;
 
