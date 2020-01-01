@@ -83,6 +83,12 @@ int LinearBoltzman::Solver::InitializeParrays()
   phi_old_local.resize(local_unknown_count,0.0);
   phi_new_local.resize(local_unknown_count,0.0);
 
+  //================================================== Read Restart data
+  if (options.read_restart_data)
+    ReadRestartData(options.read_restart_folder_name,
+                    options.read_restart_file_base);
+  MPI_Barrier(MPI_COMM_WORLD);
+
   //================================================== Initialize default
   //                                                   incident boundary
   typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;

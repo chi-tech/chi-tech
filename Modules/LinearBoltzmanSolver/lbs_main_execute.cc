@@ -57,6 +57,10 @@ void LinearBoltzman::Solver::SolveGroupset(int group_set_num)
     GMRES(group_set_num);
   }
 
+  if (options.write_restart_data)
+    WriteRestartData(options.write_restart_folder_name,
+                     options.write_restart_file_base);
+
   chi_log.Log(LOG_0)
     << "Groupset solve complete.                  Process memory = "
     << std::setprecision(3)

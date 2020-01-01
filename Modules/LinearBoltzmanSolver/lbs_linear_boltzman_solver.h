@@ -42,6 +42,7 @@ class Solver : public chi_physics::Solver
 private:
   size_t source_event_tag=0;
 public:
+  double last_restart_write=0.0;
   LinearBoltzman::Options options;    //In chi_npt_structs.h
 
   int num_moments;
@@ -118,6 +119,10 @@ public:
 
   //04c
   void ResetSweepOrderings(LBSGroupset *groupset);
+
+  //05
+  void WriteRestartData(std::string folder_name, std::string file_base);
+  void ReadRestartData(std::string folder_name, std::string file_base);
 
   //IterativeMethods
   void SetSource(int group_set_num,

@@ -119,6 +119,17 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     chi_log.Log(LOG_0) << iter_info.str();
 
     if (converged) break;
+
+    if (options.write_restart_data)
+    {
+      if ((chi_program_timer.GetTime()/60000.0) >
+          last_restart_write+options.write_restart_interval)
+      {
+        last_restart_write = chi_program_timer.GetTime()/60000.0;
+        WriteRestartData(options.write_restart_folder_name,
+                         options.write_restart_file_base);
+      }
+    }
   }
 
 
