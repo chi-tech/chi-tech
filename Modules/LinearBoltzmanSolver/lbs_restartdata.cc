@@ -74,15 +74,32 @@ void LinearBoltzman::Solver::WriteRestartData(std::string folder_name,
                 MPI_LAND,              //Operation - Logical and
                 MPI_COMM_WORLD);       //Communicator
 
-  chi_log.Log(LOG_0) << "Successfully wrote restart data: " << file_name;
+  //======================================== Write status message
+  if (global_succeeded)
+    chi_log.Log(LOG_0)
+      << "Successfully wrote restart data: "
+      << folder_name + std::string("/") +
+         file_base + std::string("X.r");
+  else
+    chi_log.Log(LOG_0ERROR)
+      << "Failed to write restart data: "
+      << folder_name + std::string("/") +
+         file_base + std::string("X.r");
 }
 
 //###################################################################
-/**Writes phi_old to restart file.*/
+/**Read phi_old from restart file.*/
 void LinearBoltzman::Solver::ReadRestartData(std::string folder_name,
                                               std::string file_base)
 {
   MPI_Barrier(MPI_COMM_WORLD);
+
+  //======================================== Open files
+  //This step might fail for specific locations and
+  //can create quite a messy output if we print it all.
+  //We also need to consolidate the error to determine if
+  //the process as whole succeeded.
+  bool location_succeeded = true;
   char location_cstr[20];
   sprintf(location_cstr,"%d.r",chi_mpi.location_id);
 
@@ -94,47 +111,59 @@ void LinearBoltzman::Solver::ReadRestartData(std::string folder_name,
 
   if (not ifile.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
-      << "Failed to read restart file: " << file_name;
     ifile.close();
-    return;
+    location_succeeded = false;
+  }
+  else
+  {
+    size_t number_of_unknowns;
+    ifile.read((char*)&number_of_unknowns, sizeof(size_t));
+
+    if (number_of_unknowns != phi_old_local.size())
+    {
+      location_succeeded = false;
+      ifile.close();
+    }
+    else
+    {
+      std::vector<double> temp_phi_old(phi_old_local.size(),0.0);
+
+      size_t v=0;
+      while (not ifile.eof())
+      {
+        ifile.read((char*)&temp_phi_old[v], sizeof(double));
+        ++v;
+      }
+
+      if (v != (number_of_unknowns+1))
+      {
+        location_succeeded = false;
+        ifile.close();
+      }
+      else
+        phi_old_local = std::move(temp_phi_old);
+
+      ifile.close();
+    }
   }
 
-  size_t number_of_unknowns;
-  ifile.read((char*)&number_of_unknowns, sizeof(size_t));
+  //======================================== Wait for all processes
+  //                                         then check success status
+  MPI_Barrier(MPI_COMM_WORLD);
+  bool global_succeeded = true;
+  MPI_Allreduce(&location_succeeded,   //Send buffer
+                &global_succeeded,     //Recv buffer
+                1,                     //count
+                MPI_CXX_BOOL,          //Data type
+                MPI_LAND,              //Operation - Logical and
+                MPI_COMM_WORLD);       //Communicator
 
-  if (number_of_unknowns != phi_old_local.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Failed to read restart file: " << file_name
-      << " number of unknowns not equal. Expected "
-      << phi_old_local.size() << ". Available: " << number_of_unknowns;
-    ifile.close();
-    return;
-  }
-
-  std::vector<double> temp_phi_old(phi_old_local.size(),0.0);
-
-  size_t v=0;
-  while (not ifile.eof())
-  {
-    ifile.read((char*)&temp_phi_old[v], sizeof(double));
-    ++v;
-  }
-
-  if (v != (number_of_unknowns+1))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Failed to read restart file: " << file_name
-      << " number unknowns read " << v
-      << " not equal to desired amount " << number_of_unknowns;
-    ifile.close();
-    return;
-  } else
-  {
-    phi_old_local = std::move(temp_phi_old);
-  }
-
-  ifile.close();
-  chi_log.Log(LOG_0) << "Successfully read restart data.";
+  //======================================== Write status message
+  if (global_succeeded)
+    chi_log.Log(LOG_0) << "Successfully read restart data";
+  else
+    chi_log.Log(LOG_0ERROR)
+      << "Failed to read restart data: "
+      << folder_name + std::string("/") +
+         file_base + std::string("X.r");
 }
