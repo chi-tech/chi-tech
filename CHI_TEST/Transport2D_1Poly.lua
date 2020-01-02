@@ -80,7 +80,7 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_CHEBYSHEV,2)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
@@ -112,8 +112,9 @@ bsrc={}
 for g=1,num_groups do
     bsrc[g] = 0.0
 end
-bsrc[1] = 1.0/2.0/math.pi
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+bsrc[1] = 1.0/4.0/math.pi
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
+                        LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)

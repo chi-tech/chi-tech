@@ -122,13 +122,15 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   //=================================================== Apply DSA
   if (groupset->apply_wgdsa)
   {
-    AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
+    std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
+    AssembleWGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
     ((chi_diffusion::Solver*)groupset->wgdsa_solver)->ExecuteS(true,false);
     DisAssembleWGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
   if (groupset->apply_tgdsa)
   {
-    AssembleTGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
+    std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
+    AssembleTGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
     ((chi_diffusion::Solver*)groupset->tgdsa_solver)->ExecuteS(true,false);
     DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
@@ -145,7 +147,11 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   VecNorm(phi_old,NORM_2,&phi_old_norm);
 
   if (phi_old_norm > 1.0e-10)
+  {
     VecCopy(phi_old,phi_new);
+    chi_log.Log(LOG_0) << "Using phi_old as initial guess.";
+  }
+
 
   //**************** CALL GMRES SOLVE ******************
   chi_log.Log(LOG_0)

@@ -42,6 +42,7 @@ class Solver : public chi_physics::Solver
 private:
   size_t source_event_tag=0;
 public:
+  double last_restart_write=0.0;
   LinearBoltzman::Options options;    //In chi_npt_structs.h
 
   int num_moments;
@@ -109,15 +110,21 @@ public:
                                    double *ref_phi_new);
   void DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
                                       double *ref_phi_new);
+  void CleanUpWGDSA(LBSGroupset *groupset);
   //04d
   void InitTGDSA(LBSGroupset *groupset);
   void AssembleTGDSADeltaPhiVector(LBSGroupset *groupset, double *ref_phi_old,
                                    double *ref_phi_new);
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                       double *ref_phi_new);
+  void CleanUpTGDSA(LBSGroupset *groupset);
 
   //04c
   void ResetSweepOrderings(LBSGroupset *groupset);
+
+  //05
+  void WriteRestartData(std::string folder_name, std::string file_base);
+  void ReadRestartData(std::string folder_name, std::string file_base);
 
   //IterativeMethods
   void SetSource(int group_set_num,

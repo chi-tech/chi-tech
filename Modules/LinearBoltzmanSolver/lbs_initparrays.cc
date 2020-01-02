@@ -83,6 +83,12 @@ int LinearBoltzman::Solver::InitializeParrays()
   phi_old_local.resize(local_unknown_count,0.0);
   phi_new_local.resize(local_unknown_count,0.0);
 
+  //================================================== Read Restart data
+  if (options.read_restart_data)
+    ReadRestartData(options.read_restart_folder_name,
+                    options.read_restart_file_base);
+  MPI_Barrier(MPI_COMM_WORLD);
+
   //================================================== Initialize default
   //                                                   incident boundary
   typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
@@ -177,6 +183,8 @@ int LinearBoltzman::Solver::InitializeParrays()
           full_cell_view->face_boundary_id.push_back(4);
         else if (face_norm.Dot(khat)<-0.999)
           full_cell_view->face_boundary_id.push_back(5);
+
+        cell->faces[f].neighbor = -(full_cell_view->face_boundary_id.back() + 1);
       }//if bndry
     }//for f
 

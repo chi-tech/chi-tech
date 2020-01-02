@@ -71,33 +71,6 @@ int chiCreateProductQuadrature(lua_State *L)
 
     return 1;
   }
-  else if (ident == GAUSS_CHEBYSHEV) //GAUSS_CHEBYSHEV
-  {
-    if (num_args<2)
-      LuaPostArgAmountError("chiCreateProductQuadrature",2,num_args);
-
-    int Na = lua_tonumber(L,2);
-    if (num_args == 3)
-      verbose = lua_toboolean(L,3);
-
-    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
-    new_quad->InitializeWithGC(Na,verbose);
-    chi_math_handler.product_quadratures.push_back(new_quad);
-    int index = chi_math_handler.product_quadratures.size()-1;
-    lua_pushnumber(L,index);
-
-    if (verbose)
-    {
-      chi_log.Log(LOG_0)
-        << "Created Gauss-Chebyshev Quadrature with "
-        << new_quad->azimu_ang.size()
-        << " azimuthal angles and "
-        << new_quad->polar_ang.size()
-        << " polar angles.";
-    }
-
-    return 1;
-  }
   else if (ident == GAUSS_LEGENDRE_LEGENDRE) //GAUSS_LEGENDRE_LEGENDRE
   {
     if (num_args<3)

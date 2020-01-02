@@ -2,10 +2,10 @@
 #include"quadrature_gausslegendre.h"
 #include"quadrature_gausschebyshev.h"
 
-#include <math.h>
+#include <cmath>
+#include <sstream>
 
 #include <ChiLog/chi_log.h>
-
 extern ChiLog chi_log;
 
 //#########################################################
@@ -30,6 +30,7 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
   }
 
   //================================================== Create angle pairs
+  std::stringstream ostr;
   for (unsigned i=0; i<(1); i++)
   {
     for (unsigned j=0; j<(Np*2); j++)
@@ -48,10 +49,12 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
 
       if (verbose)
       {
-        fprintf(stdout,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
+        char buf[200];
+        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
                 new_pair->phi*180.0/M_PI,
                 new_pair->theta*180.0/M_PI,
                 weight);
+        ostr << buf;
       }
     }
   }
@@ -73,73 +76,12 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
     omegas.push_back(new_omega);
   }
 
-  if (verbose) {fprintf(stdout,"Weight sum=%f\n",weight_sum);}
-
-}
-
-//###################################################################
-/**Initializes the quadrature with Gauss-Legendre for the polar
- * angles and Gauss-Chebyshev for the azimuthal.*/
-void chi_math::ProductQuadrature::InitializeWithGC(int Na, bool verbose)
-{
-  auto gl_azimu = new chi_math::QuadratureGaussChebyshev;
-
-  gl_azimu->Initialize(Na*4);
-
-  double weight     = 0.0;
-  double weight_sum = 0.0;
-
-  //================================================= Create azimuthal angles
-  for (unsigned i=0; i<(Na*4); i++)
+  if (verbose)
   {
-    azimu_ang.push_back(M_PI*(2*(i+1)-1)/(Na*4));
+    chi_log.Log(LOG_0)
+      << ostr.str() << "\n"
+      << "Weight sum=" << weight_sum;
   }
-
-  //================================================== Create polar angles
-  polar_ang.push_back(0.5*M_PI);
-
-  //================================================== Create angle pairs
-  for (unsigned i=0; i<(Na*4); i++)
-  {
-    for (unsigned j=0; j<(1); j++)
-    {
-      auto new_pair = new chi_math::QuadraturePointPhiTheta;
-
-      new_pair->phi   = M_PI*(2*(i+1)-1)/(Na*4);
-      new_pair->theta = 0.5*M_PI;
-
-      abscissae.push_back(new_pair);
-
-      weight = 2*gl_azimu->weights[i];
-
-      weights.push_back(weight);
-      weight_sum += weight;
-
-      if (verbose)
-      {
-        fprintf(stdout,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair->phi*180.0/M_PI,
-                new_pair->theta*180.0/M_PI,
-                weight);
-      }
-
-    }
-  }
-
-  //================================================== Create omega list
-  for (size_t n=0; n<abscissae.size(); n++)
-  {
-    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
-
-    auto new_omega = new chi_mesh::Vector;
-    new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
-    new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
-    new_omega->z = cos(qpoint->theta);
-
-    omegas.push_back(new_omega);
-  }
-
-  if (verbose) {fprintf(stdout,"Weight sum=%f\n",weight_sum);}
 
 }
 
@@ -170,6 +112,7 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   }
 
   //================================================== Create angle pairs
+  std::stringstream ostr;
   for (unsigned i=0; i<(Na*4); i++)
   {
     for (unsigned j=0; j<(Np*2); j++)
@@ -188,10 +131,12 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
 
       if (verbose)
       {
-        fprintf(stdout,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
+        char buf[200];
+        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
                 new_pair->phi*180.0/M_PI,
                 new_pair->theta*180.0/M_PI,
                 weight);
+        ostr << buf;
       }
     }
   }
@@ -209,7 +154,12 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
     omegas.push_back(new_omega);
   }
 
-  if (verbose) {fprintf(stdout,"Weight sum=%f\n",weight_sum);}
+  if (verbose)
+  {
+    chi_log.Log(LOG_0)
+      << ostr.str() << "\n"
+      << "Weight sum=" << weight_sum;
+  }
 
 }
 
@@ -241,6 +191,7 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
   }
 
   //================================================== Create angle pairs
+  std::stringstream ostr;
   for (unsigned i=0; i<(Na*4); i++)
   {
     for (unsigned j=0; j<(Np*2); j++)
@@ -259,12 +210,13 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
 
       if (verbose)
       {
-        fprintf(stdout,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
+        char buf[200];
+        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
                 new_pair->phi*180.0/M_PI,
                 new_pair->theta*180.0/M_PI,
                 weight);
+        ostr << buf;
       }
-
     }
   }
 
@@ -281,6 +233,11 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
     omegas.push_back(new_omega);
   }
 
-  if (verbose) {fprintf(stdout,"Weight sum=%f\n",weight_sum);}
+  if (verbose)
+  {
+    chi_log.Log(LOG_0)
+      << ostr.str() << "\n"
+      << "Weight sum=" << weight_sum;
+  }
 
 }
