@@ -4,6 +4,7 @@
 
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
@@ -68,15 +69,15 @@ void LinearBoltzman::Solver::InitTGDSA(LBSGroupset *groupset)
     if (not dsolver->common_items_initialized)
       dsolver->InitializeCommonItems();
 
-    for (int b=0; b<dsolver->boundaries.size(); b++)
+    typedef chi_mesh::sweep_management::BoundaryType SwpBndryType;
+    dsolver->boundaries.clear();
+    for (auto lbs_bndry : sweep_boundaries)
     {
-//      chi_diffusion::BoundaryRobin* bound =
-//        new chi_diffusion::BoundaryRobin(0.25,0.5,0.0);
-      chi_diffusion::BoundaryDirichlet* bound =
-        new chi_diffusion::BoundaryDirichlet();
-
-      dsolver->boundaries[b] = bound;
-    }//for bndry
+      if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
+        dsolver->boundaries.push_back(new chi_diffusion::BoundaryReflecting());
+      else
+        dsolver->boundaries.push_back(new chi_diffusion::BoundaryDirichlet());
+    }
 
     //================================= Redirect material lookup to use
     //                                  transport cross-sections
@@ -94,6 +95,14 @@ void LinearBoltzman::Solver::InitTGDSA(LBSGroupset *groupset)
     delta_phi_local.resize(0);
     delta_phi_local.shrink_to_fit();
   }//if wgdsa
+}
+
+//###################################################################
+/**Cleans up memory consuming items. */
+void LinearBoltzman::Solver::CleanUpTGDSA(LBSGroupset *groupset)
+{
+  if (groupset->apply_tgdsa)
+    delete groupset->tgdsa_solver;
 }
 
 //###################################################################

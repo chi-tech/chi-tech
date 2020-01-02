@@ -143,6 +143,7 @@ public:
   //00
   Solver();
   Solver(std::string in_solver_name);
+  ~Solver();
   //01 General
   void GetMaterialProperties(int mat_id, double& diffCoeff,
                                          double& sourceQ,

@@ -183,6 +183,8 @@ int LinearBoltzman::Solver::InitializeParrays()
           full_cell_view->face_boundary_id.push_back(4);
         else if (face_norm.Dot(khat)<-0.999)
           full_cell_view->face_boundary_id.push_back(5);
+
+        cell->faces[f].neighbor = -(full_cell_view->face_boundary_id.back() + 1);
       }//if bndry
     }//for f
 

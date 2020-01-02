@@ -110,12 +110,14 @@ public:
                                    double *ref_phi_new);
   void DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
                                       double *ref_phi_new);
+  void CleanUpWGDSA(LBSGroupset *groupset);
   //04d
   void InitTGDSA(LBSGroupset *groupset);
   void AssembleTGDSADeltaPhiVector(LBSGroupset *groupset, double *ref_phi_old,
                                    double *ref_phi_new);
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
                                       double *ref_phi_new);
+  void CleanUpTGDSA(LBSGroupset *groupset);
 
   //04c
   void ResetSweepOrderings(LBSGroupset *groupset);

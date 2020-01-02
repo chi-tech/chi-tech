@@ -31,6 +31,9 @@ void LinearBoltzman::Solver::Execute()
 
     SolveGroupset(gs);
 
+    CleanUpWGDSA(group_sets[gs]);
+    CleanUpTGDSA(group_sets[gs]);
+
     ResetSweepOrderings(group_sets[gs]);
 
     MPI_Barrier(MPI_COMM_WORLD);

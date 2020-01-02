@@ -18,6 +18,7 @@ public:
   std::vector<chi_physics::FieldFunction*> field_functions;
 
 public:
+  virtual ~Solver() {};
   //01
   void AddRegion(chi_mesh::Region* region);
 
