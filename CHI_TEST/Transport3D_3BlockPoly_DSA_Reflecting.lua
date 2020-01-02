@@ -20,27 +20,9 @@ else
             "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 end
 
---############################################### Extract edges from surface mesh
-loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
-
-line_mesh = {};
-line_mesh_count = 0;
-
-for k=1,loop_count do
-    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
-    for m=1,split_count do
-        line_mesh_count = line_mesh_count + 1;
-        line_mesh[line_mesh_count] = chiLineMeshCreateFromLoop(split_loops,m-1);
-    end
-
-end
-
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-for k=1,line_mesh_count do
-    chiRegionAddLineBoundary(region1,line_mesh[k]);
-end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
@@ -118,8 +100,8 @@ chiSolverAddRegion(phys1,region1)
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
-chiLBSSetProperty(phys1,READ_RESTART_DATA,"YRestart1")
-chiLBSSetProperty(phys1,WRITE_RESTART_DATA,"YRestart1","restart",0.5)
+--chiLBSSetProperty(phys1,READ_RESTART_DATA,"YRestart1")
+--chiLBSSetProperty(phys1,WRITE_RESTART_DATA,"YRestart1","restart",0.5)
 
 --========== Groups
 grp = {}
