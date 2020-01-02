@@ -26,6 +26,8 @@ public:
     dofs=num_dofs;
   }
 
+  virtual ~CellFEView() {};
+
   /** Virtual function evaluation of the shape function. */
   virtual double ShapeValue(const int i, const chi_mesh::Vector& xyz)
   {
