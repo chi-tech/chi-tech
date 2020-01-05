@@ -15,8 +15,6 @@ extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
 extern ChiTimer chi_program_timer;
 
-extern double chi_global_timings[20];
-
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;
@@ -62,8 +60,11 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
 
   //=================================================== Create the matrix
   Mat A;
-  int local_size = local_dof_count*num_moments*groupset_numgrps;
-  int globl_size = glob_dof_count*num_moments*groupset_numgrps;
+  auto num_ang_unknowns = groupset->angle_agg->GetNumberOfAngularUnknowns();
+  int local_size = local_dof_count*num_moments*groupset_numgrps +
+                   num_ang_unknowns.first;
+  int globl_size = glob_dof_count*num_moments*groupset_numgrps +
+                   num_ang_unknowns.second;
   MatCreateShell(PETSC_COMM_WORLD,local_size,
                                   local_size,
                                   globl_size,
@@ -115,9 +116,6 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
 
   phi_new_local.assign(phi_new_local.size(),0.0);
   sweepScheduler.Sweep(sweep_chunk);
-
-  groupset->latest_convergence_metric = groupset->residual_tolerance;
-  ConvergeCycles(sweepScheduler,sweep_chunk,groupset,true);
 
   //=================================================== Apply DSA
   if (groupset->apply_wgdsa)

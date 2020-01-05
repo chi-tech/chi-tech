@@ -46,10 +46,12 @@ namespace chi_mesh::sweep_management
     void SetReferencePsi(
       std::vector<std::vector<double>>*  local_psi,
        std::vector<double>*               delayed_local_psi,
+       std::vector<double>*               delayed_local_psi_old,
        std::vector<std::vector<double>>*  deplocI_outgoing_psi,
        std::vector<std::vector<double>>*  prelocI_outgoing_psi,
        std::vector<std::vector<double>>*  boundryI_incoming_psi,
-       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi)=0;
+       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi,
+       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi_old)=0;
 
     virtual
     double*  OutgoingPsi(int cell_so_index, int outb_face_counter,
@@ -107,11 +109,13 @@ private:
   //  location I has its own interface vector
   std::vector<std::vector<double>>*  ref_local_psi;
   std::vector<double>*               ref_delayed_local_psi;
+  std::vector<double>*               ref_delayed_local_psi_old;
   std::vector<std::vector<double>>*  ref_deplocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_prelocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_boundryI_incoming_psi;
 
   std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi;
+  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi_old;
 private:
   //======================================== Alpha elements
 
@@ -208,18 +212,22 @@ public:
   void SetReferencePsi(
     std::vector<std::vector<double>>*  local_psi,
     std::vector<double>*               delayed_local_psi,
+    std::vector<double>*               delayed_local_psi_old,
     std::vector<std::vector<double>>*  deplocI_outgoing_psi,
     std::vector<std::vector<double>>*  prelocI_outgoing_psi,
     std::vector<std::vector<double>>*  boundryI_incoming_psi,
-    std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi)
+    std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi,
+    std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi_old)
     override
   {
     ref_local_psi = local_psi;
     ref_delayed_local_psi = delayed_local_psi;
+    ref_delayed_local_psi_old = delayed_local_psi_old;
     ref_deplocI_outgoing_psi = deplocI_outgoing_psi;
     ref_prelocI_outgoing_psi = prelocI_outgoing_psi;
     ref_boundryI_incoming_psi = boundryI_incoming_psi;
     ref_delayed_prelocI_outgoing_psi = delayed_prelocI_outgoing_psi;
+    ref_delayed_prelocI_outgoing_psi_old = delayed_prelocI_outgoing_psi_old;
   }
 
 public:

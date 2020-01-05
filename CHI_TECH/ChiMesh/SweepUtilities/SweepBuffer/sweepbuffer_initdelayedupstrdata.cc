@@ -16,9 +16,14 @@ InitializeDelayedUpstreamData()
   int num_grps   = angleset->GetNumGrps();
   int num_angles = angleset->angles.size();
 
+  angleset->delayed_prelocI_outgoing_psi.clear();
   angleset->delayed_prelocI_outgoing_psi.resize(
-    spds->delayed_location_dependencies.size(),
-    std::vector<double>());
+    spds->delayed_location_dependencies.size());
+
+  angleset->delayed_prelocI_outgoing_psi_old.clear();
+  angleset->delayed_prelocI_outgoing_psi_old.resize(
+    spds->delayed_location_dependencies.size());
+
   for (int prelocI=0;
        prelocI<spds->delayed_location_dependencies.size(); prelocI++)
   {
@@ -27,9 +32,14 @@ InitializeDelayedUpstreamData()
     u_ll_int buff_size = num_dofs*num_grps*num_angles;
 
     angleset->delayed_prelocI_outgoing_psi[prelocI].resize(buff_size,0.0);
+    angleset->delayed_prelocI_outgoing_psi_old[prelocI].resize(buff_size,0.0);
   }
 
   angleset->delayed_local_psi.resize(fluds->delayed_local_psi_stride*
                            fluds->delayed_local_psi_max_elements*
                            num_grps*num_angles,0.0);
+
+  angleset->delayed_local_psi_old.resize(fluds->delayed_local_psi_stride*
+                                         fluds->delayed_local_psi_max_elements*
+                                         num_grps*num_angles,0.0);
 }
