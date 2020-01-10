@@ -47,7 +47,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
        face != surface_mesh->faces.end();
        face++)
   {
-    auto cell = new chi_mesh::CellPolygonV2;
+    auto cell = new chi_mesh::CellPolygon;
 
     for (int k=0;k<3;k++)
     {
@@ -92,7 +92,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
   {
     chi_mesh::PolyFace* face = surface_mesh->poly_faces[f];
 
-    auto cell = new chi_mesh::CellPolygonV2;
+    auto cell = new chi_mesh::CellPolygon;
 
     //====================================== Copy vertices
     for (int v=0; v<face->v_indices.size();v++)

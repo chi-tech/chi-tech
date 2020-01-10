@@ -5,7 +5,7 @@
  * view.
  *
  * */
-PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedronV2 *polyh_cell,
+PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
                                    chi_mesh::MeshContinuum *vol_continuum,
                                    SpatialDiscretization_PWL *discretization):
   CellFEView(polyh_cell->vertex_ids.size())

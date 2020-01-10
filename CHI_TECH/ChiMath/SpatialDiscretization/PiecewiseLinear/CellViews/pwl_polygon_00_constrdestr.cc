@@ -2,7 +2,7 @@
 
 //###################################################################
 /** Constructor.*/
-PolygonFEView::PolygonFEView(chi_mesh::CellPolygonV2* poly_cell,
+PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
                              chi_mesh::MeshContinuum* vol_continuum,
                              SpatialDiscretization_PWL *discretization) :
   CellFEView(poly_cell->vertex_ids.size())

@@ -31,6 +31,7 @@ class ChiPhysics
 	void	RunPhysicsLoop();
 	//02
 	void    PrintPerformanceData(char* fileName);
+
 };
 
 

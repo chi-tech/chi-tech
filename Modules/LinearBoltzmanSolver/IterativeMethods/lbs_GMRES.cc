@@ -9,6 +9,8 @@
 
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
+#include "ChiPhysics/chi_physics.h"
+
 #include <chi_log.h>
 #include <chi_mpi.h>
 extern ChiLog chi_log;
@@ -159,8 +161,10 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
 
   KSPConvergedReason reason;
   KSPGetConvergedReason(ksp,&reason);
-  if (reason<0)
-    chi_log.Log(LOG_0WARNING) << "GMRES solver failed.";
+  if (reason != KSP_CONVERGED_RTOL)
+    chi_log.Log(LOG_0WARNING)
+      << "GMRES solver failed. "
+      << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
 
   DisAssembleVector(groupset, phi_new, phi_new_local.data());

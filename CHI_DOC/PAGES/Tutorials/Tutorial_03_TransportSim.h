@@ -83,31 +83,32 @@ The general material property TRANSPORT_XSECTIONS is used for
 ## Step 4 - Add Transport physics
 
 \code
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
-chiNPTCreateGroup(phys1)
+chiLBSCreateGroup(phys1)
 
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE,32)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,32)
 
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
-chiNPTGroupsetAddGroups(phys1,gs0,0,0)
-chiNPTGroupsetSetQuadrature(phys1,gs0,pquad)
+gs0 = chiLBSCreateGroupset(phys1)
+chiLBSGroupsetAddGroups(phys1,gs0,0,0)
+chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 
 --========== Boundary conditions
 bsrc = {0.5}
-chiNPTSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,
+                  ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD1D)
-chiNPTSetProperty(phys1,SCATTERING_ORDER,0)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD1D)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 \endcode
 
- A transport solver is invoked by using a call to chiNPTransportCreateSolver().
+ A transport solver is invoked by using a call to chiLBSCreateSolver().
  This creates a derived physics solver so the mesh region gets added to the
  solver using the generic call chiSolverAddRegion(). Past this point we need
- to create the single required group with chiNPTCreateGroup() and then a
+ to create the single required group with chiLBSCreateGroup() and then a
  quadrature rule for integration of the angular fluxes. Since we are dealing
  with a 1D simulation we will be integration over theta translating to a
  cosine from -1 to 1 and therefore the appropriate quadrature rule would be a
@@ -118,17 +119,17 @@ chiNPTSetProperty(phys1,SCATTERING_ORDER,0)
  The next step in the process is to assign a group-set. Group-sets are very
  useful aggregation features in higher dimension simulations but here we
  only have a single groupset. The group-set is created with a call to
- chiNPTCreateGroupset(). Next we add groups to the group-set using a range,
+ chiLBSCreateGroupset(). Next we add groups to the group-set using a range,
  however, since we only have one group here the range will be 0 to 0. The
  final piece of a groupset is to add a quadrature which is achieved with a
- call to chiNPTGroupsetSetQuadrature().
+ call to chiLBSGroupsetSetQuadrature().
 
 
 ## Step 5 - Initialize and Execute
 
 \code
-chiNPTInitialize(phys1)
-chiNPTExecute(phys1)
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
 \endcode
 
 This should be intuitive.
@@ -136,7 +137,7 @@ This should be intuitive.
 ## Step 6 - Add output
 
 \code
-fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 cline = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)

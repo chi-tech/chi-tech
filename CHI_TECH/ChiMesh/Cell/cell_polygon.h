@@ -9,13 +9,13 @@ namespace chi_mesh
 
 //######################################################### Class def
 /** Polygon cell definition.*/
-class CellPolygonV2 : public Cell
+class CellPolygon : public Cell
 {
 private:
   std::vector<chi_mesh::Vector> segment_normals;
   bool segment_normals_developed = false;
 public:
-  CellPolygonV2() : Cell(CellType::POLYGON) {}
+  CellPolygon() : Cell(CellType::POLYGON) {}
 
 private:
   void DevelopSegmentNormals(const chi_mesh::MeshContinuum* grid)

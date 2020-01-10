@@ -41,31 +41,32 @@ chiPhysicsMaterialSetProperty(material0,
                               1.0)   --Scattering ratio
 
 --############################################### Setup Physics
-phys1 = chiNPTransportCreateSolver()
+phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
-chiNPTCreateGroup(phys1)
+chiLBSCreateGroup(phys1)
 
-pqaud = chiCreateProductQuadrature(GAUSS_LEGENDRE,32)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,32)
 
 --========== Groupset def
-gs0 = chiNPTCreateGroupset(phys1)
-chiNPTGroupsetAddGroups(phys1,gs0,0,0)
-chiNPTGroupsetSetQuadrature(phys1,gs0,pquad)
+gs0 = chiLBSCreateGroupset(phys1)
+chiLBSGroupsetAddGroups(phys1,gs0,0,0)
+chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 
 --========== Boundary conditions
 bsrc = {0.5}
-chiNPTSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,
+                  ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
-chiNPTSetProperty(phys1,DISCRETIZATION_METHOD,PWLD1D)
-chiNPTSetProperty(phys1,SCATTERING_ORDER,0)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD1D)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 
-chiNPTInitialize(phys1)
-chiNPTExecute(phys1)
+chiLBSInitialize(phys1)
+chiLBSExecute(phys1)
 
 --############################################### Setup Output
-fflist,count = chiNPTGetScalarFieldFunctionList(phys1)
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 cline = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)

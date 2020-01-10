@@ -41,7 +41,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+    auto slab_cell = (chi_mesh::CellSlab*)cell;
 
     chi_mesh::Vector intersection_point;
     std::pair<double,double> weights;
@@ -74,7 +74,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
   else if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
-    auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+    auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
     chi_mesh::Vector ip; //intersetion point
 
@@ -107,7 +107,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
   else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+    auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
     chi_mesh::Vector ip = pos_i; //Intersection point
 

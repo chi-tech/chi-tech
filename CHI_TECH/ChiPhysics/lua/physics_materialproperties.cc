@@ -48,6 +48,14 @@ Checklist for adding a new material property:
  - Add another else-if for your property. Just have a look at how the others
    were done, it should be intuitive enough.
 
+##_
+
+### Example\n
+Example lua code:
+\code
+chiPhysicsMaterialAddProperty(materials[i],TRANSPORT_XSECTIONS)
+\endcode
+
 \ingroup LuaPhysicsMaterials
 \author Jan*/
 int chiPhysicsMaterialAddProperty(lua_State *L)
@@ -672,6 +680,16 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
  *
  *
 \ingroup LuaPhysicsMaterials
+
+\code
+xs_grph_clean = chiPhysicsTransportXSCreate()
+chiPhysicsTransportXSSet(xs_grph_clean,PDT_XSFILE,"xs_graphite_pure_116.data")
+
+chiPhysicsMaterialSetProperty(materials[2],
+                                    TRANSPORT_XSECTIONS,
+                                    EXISTING,
+                                    xs_grph_clean)
+\endcode
  * \return Returns a handle to the cross-section.
  *
  * */
@@ -732,6 +750,9 @@ will attempt to build a transfer matrix from reaction type MT 2501, however,
 an additional text field can be supplied specifying the transfer matrix to
  use.
 
+##_
+### Example\n
+Example lua code:
 \code
 graphite = chiPhysicsTransportXSCreate()
 chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
@@ -824,7 +845,8 @@ int chiPhysicsTransportXSSet(lua_State* L)
  *
  * ## _
  *
- * Example:\n
+###Example:\n
+Example lua code:
 \code
 xs_1 = chiPhysicsTransportXSCreate()
 xs_2 = chiPhysicsTransportXSCreate()

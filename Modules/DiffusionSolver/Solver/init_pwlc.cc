@@ -70,20 +70,6 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   //================================================== Setup timer
   if (verbose)
     chi_log.Log(LOG_0) << "Determining nodal connections";
@@ -156,8 +142,6 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
-
-    PetscOptionsInsertString(NULL,"-options_left");
   }
   if (first_cell->Type() == chi_mesh::CellType::POLYGON)
   {
@@ -171,8 +155,6 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
-
-    PetscOptionsInsertString(NULL,"-options_left");
   }
   if (first_cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
@@ -186,8 +168,6 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
-
-    PetscOptionsInsertString(NULL,"-options_left");
   }
   PetscOptionsInsertString(NULL,options_string.c_str());
   PCSetFromOptions(pc);

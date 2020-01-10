@@ -119,7 +119,12 @@ Specifies a vaccuum boundary condition. It is not followed by any value.\n
 LBSBoundaryTypes.INCIDENT_ISOTROPIC\n
 Incident isotropic flux. This argument needs to be followed by a lua table
 index 1 to G where G is the amount of energy groups. Note internally this
-is mapped as 0 to G-1.
+is mapped as 0 to G-1.\n
+\n
+LBSBoundaryTypes.REFLECTING\n
+Reflecting boundary condition. Beware, when opposing reflecting boundary
+conditions are used this enduces a cyclic dependency which will increase the
+iteration convergence behavior.
 
 
 

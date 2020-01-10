@@ -10,7 +10,7 @@
  * it only tries to match to the line-mesh associated with the
  * boundary. If a boundary was found then the edge index is set to >=0,
  * i.e. e_index[e][3]=0*/
-void chi_mesh::CellPolygonV2::FindBoundary2D(chi_mesh::Region* region)
+void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
 {
   //================================================== Check if has boundary
   bool has_boundary=false;

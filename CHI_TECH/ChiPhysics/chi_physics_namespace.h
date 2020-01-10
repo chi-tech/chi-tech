@@ -2,6 +2,8 @@
 #define _chi_physics_namespace_h
 /**\defgroup LuaPhysics C Physics*/
 
+#include <petscksp.h>
+
 namespace chi_physics
 {
   enum class OperationType
@@ -19,10 +21,12 @@ namespace chi_physics
   class Material;
   class MaterialProperty;
 
-  class ThermalConductivity;
   class ScalarValue;
   class TransportCrossSections;
   class IsotropicMultiGrpSource;
+
+  //03 Utils
+  std::string GetPETScConvergedReasonstring(KSPConvergedReason reason);
 }
 
 

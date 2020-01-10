@@ -76,7 +76,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
-      auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+      auto slab_cell = (chi_mesh::CellSlab*)cell;
 
       std::vector<vtkIdType> cell_info;
       cell_info.push_back(slab_cell->vertex_ids[0]);
@@ -93,7 +93,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
-      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+      auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
       std::vector<vtkIdType> cell_info;
 
@@ -112,7 +112,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);

@@ -96,7 +96,7 @@ private:
 
 
 public:
-  PolyhedronFEView(chi_mesh::CellPolyhedronV2* polyh_cell,
+  PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
                    chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization= nullptr);
 
