@@ -20,6 +20,7 @@ class ChiPhysics
 
   std::vector<chi_physics::Solver*>        solver_stack;
   std::vector<chi_physics::Material*>      material_stack;
+  std::vector<chi_physics::TransportCrossSections*> trnsprt_xs_stack;
   std::vector<chi_physics::FieldFunction*> fieldfunc_stack;
 
 	public:
@@ -30,6 +31,7 @@ class ChiPhysics
 	void	RunPhysicsLoop();
 	//02
 	void    PrintPerformanceData(char* fileName);
+
 };
 
 

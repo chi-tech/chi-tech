@@ -76,10 +76,10 @@ materials = {}
 materials[1] = chiPhysicsAddMaterial("Test Material");
 materials[2] = chiPhysicsAddMaterial("Test Material2");
 
-chiPhysicsMaterialAddProperty(materials[1],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialSetProperty(materials[1],THERMAL_CONDUCTIVITY,SINGLE_VALUE,1.0)
-chiPhysicsMaterialAddProperty(materials[2],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialSetProperty(materials[2],THERMAL_CONDUCTIVITY,SINGLE_VALUE,1.0)
+chiPhysicsMaterialAddProperty(materials[1],SCALAR_VALUE)
+chiPhysicsMaterialSetProperty(materials[1],SCALAR_VALUE,SINGLE_VALUE,1.0)
+chiPhysicsMaterialAddProperty(materials[2],SCALAR_VALUE)
+chiPhysicsMaterialSetProperty(materials[2],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
 chiPhysicsMaterialAddProperty(materials[1],SCALAR_VALUE)
 chiPhysicsMaterialSetProperty(materials[1],SCALAR_VALUE,SINGLE_VALUE,1.0)
@@ -93,15 +93,24 @@ chiPhysicsMaterialAddProperty(materials[1],ISOTROPIC_MG_SOURCE)
 chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
+xs_1 = chiPhysicsTransportXSCreate()
+xs_2 = chiPhysicsTransportXSCreate()
+xs_3 = chiPhysicsTransportXSCreate()
 
+chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
+chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
+chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
 
+combo ={{xs_1, 0.5},
+        {xs_2, 0.4},
+        {xs_3, 0.1}}
+comb = chiPhysicsTransportXSMakeCombined(combo)
 
-
-num_groups = 21
+num_groups = 168
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
+                                           EXISTING,comb)
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
+                                           EXISTING,comb)
 
 src={}
 for g=1,num_groups do
@@ -131,7 +140,7 @@ pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,20)
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,3)
@@ -139,6 +148,19 @@ chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+
+gs1 = chiLBSCreateGroupset(phys1)
+cur_gs = gs1
+chiLBSGroupsetAddGroups(phys1,cur_gs,63,num_groups-1)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,200)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 --========== Boundary conditions
 bsrc={}

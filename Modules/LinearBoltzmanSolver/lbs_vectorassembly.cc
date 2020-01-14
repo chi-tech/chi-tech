@@ -38,6 +38,9 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
     }//for dof
   }//for cell
 
+
+  groupset->angle_agg->AssembleAngularUnknowns(index,x_ref);
+
   VecRestoreArray(x,&x_ref);
 }
 
@@ -76,6 +79,8 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
       }//for moment
     }//for dof
   }//for cell
+
+  groupset->angle_agg->DisassembleAngularUnknowns(index,x_ref);
 
   VecRestoreArrayRead(x_src,&x_ref);
 }

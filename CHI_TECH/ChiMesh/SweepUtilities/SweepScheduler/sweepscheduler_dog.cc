@@ -6,7 +6,7 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
-
+#include <sstream>
 
 //###################################################################
 /**Initializes the Depth-Of-Graph algorithm.*/
@@ -121,6 +121,12 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
 
   chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
+  auto ev_info =
+    std::make_shared<ChiLog::EventInfo>(std::string("Sweep initiated"));
+
+  chi_log.LogEvent(sweep_event_tag,
+                   ChiLog::EventType::SINGLE_OCCURRENCE,ev_info);
+
   //==================================================== Loop till done
   bool finished = false;
   size_t scheduled_angleset = 0;
@@ -141,15 +147,42 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
       //  - FINISHED.
       //      Meaning the angleset has executed its sweep chunk
       Status status = angleset->
-        AngleSetAdvance(sweep_chunk, angset_number, ExePerm::NO_EXEC_IF_READY);
+        AngleSetAdvance(sweep_chunk,
+                        angset_number,
+                        sweep_timing_events_tag,
+                        ExePerm::NO_EXEC_IF_READY);
 
       //=============================== Execute if ready and allowed
       // If this angleset is the one scheduled to run
       // and it is ready then it will be given permission
-      if (status == Status::READY_TO_EXECUTE and as == scheduled_angleset)
+      if (status == Status::READY_TO_EXECUTE /*and as == scheduled_angleset*/)
       {
+        std::stringstream message_i;
+        message_i
+          << "Angleset " << angset_number
+          << " executed on location " << chi_mpi.location_id;
+
+        auto ev_info_i = std::make_shared<ChiLog::EventInfo>(message_i.str());
+
+        chi_log.LogEvent(sweep_event_tag,
+                         ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_i);
+
         status = angleset->
-          AngleSetAdvance(sweep_chunk, angset_number, ExePerm::EXECUTE);
+          AngleSetAdvance(sweep_chunk,
+                          angset_number,
+                          sweep_timing_events_tag,
+                          ExePerm::EXECUTE);
+
+        std::stringstream message_f;
+        message_f
+          << "Angleset " << angset_number
+          << " finished on location " << chi_mpi.location_id;
+
+        auto ev_info_f = std::make_shared<ChiLog::EventInfo>(message_f.str());
+
+        chi_log.LogEvent(sweep_event_tag,
+                         ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_f);
+
         scheduled_angleset++; //Schedule the next angleset
       }
 
@@ -161,6 +194,15 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
   //================================================== Reset all
   for (auto angset_group : angle_agg->angle_set_groups)
     angset_group->ResetSweep();
+
+  for (auto bndry : angle_agg->sim_boundaries)
+  {
+    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
+    {
+      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      rbndry->ResetAnglesReadyStatus();
+    }
+  }
 
   //================================================== Receive delayed data
   MPI_Barrier(MPI_COMM_WORLD);

@@ -12,7 +12,7 @@ extern ChiMPI     chi_mpi;
 
 //###################################################################
 /**Receives and send predecessor data.*/
-void chi_mesh::sweep_management::FLUDS::
+void chi_mesh::sweep_management::PRIMARY_FLUDS::
 InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
@@ -182,7 +182,7 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 /**This cell takes a hierarchy of a cell compact view and
  * serializes it for MPI transmission. This is easy since all
  * the values are integers.*/
-void chi_mesh::sweep_management::FLUDS::
+void chi_mesh::sweep_management::PRIMARY_FLUDS::
 SerializeCellInfo(std::vector<CompactCellView>* cell_views,
                   std::vector<int>& face_indices,
                   int num_face_dofs)
@@ -227,7 +227,7 @@ SerializeCellInfo(std::vector<CompactCellView>* cell_views,
 
 //###################################################################
 /**Deserializes face indices.*/
-void chi_mesh::sweep_management::FLUDS::
+void chi_mesh::sweep_management::PRIMARY_FLUDS::
 DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
                     std::vector<int>* face_indices,
                     int& num_face_dofs)

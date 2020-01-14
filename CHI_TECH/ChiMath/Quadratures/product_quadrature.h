@@ -35,7 +35,6 @@ public:
 public:
   //product_quadrature.cc
   void InitializeWithGL(int Np, bool verbose=false);
-  void InitializeWithGC(int Na, bool verbose=false);
   void InitializeWithGLL(int Na, int Np, bool verbose=false);
   void InitializeWithGLC(int Na, int Np, bool verbose=false);
   int  GetAngleNum(int polar_angle_index, int azimu_ang_index)

@@ -33,11 +33,11 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   //============================================= Extract the dense version
   for (int g=0; g<G; g++)
   {
-    int num_transfer = transfer_matrix[0].inds_rowI[g].size();
+    int num_transfer = transfer_matrix[0].rowI_indices[g].size();
     for (int j=0; j<num_transfer; j++)
     {
-      int gp = transfer_matrix[0].inds_rowI[g][j];
-      prob_gprime_g[g][gp] = transfer_matrix[0].rowI_colJ[g][j];
+      int gp = transfer_matrix[0].rowI_indices[g][j];
+      prob_gprime_g[g][gp] = transfer_matrix[0].rowI_values[g][j];
     }//for j
   }//for g
 

@@ -4,8 +4,10 @@
 #include <algorithm>
 
 #include <chi_log.h>
-
 extern ChiLog chi_log;
+
+#include <ChiTimer/chi_timer.h>
+extern ChiTimer    chi_program_timer;
 
 //#########################################################
 /** Loads a surface mesh from a wavefront .obj file.*/
@@ -548,79 +550,6 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
   return 0;
 }
 
-
-
-//#########################################################
-/** Runs over the faces of the surfacemesh and determines
- * neighbors. */
-void chi_mesh::SurfaceMesh::UpdateInternalConnectivity()
-{
-  std::vector<chi_mesh::Face>::iterator curFace;
-  for (curFace = this->faces.begin(); curFace!=this->faces.end(); curFace++)
-  {
-    int outer_index = std::distance(this->faces.begin(),curFace);
-
-    //Reset face connections
-    for (int e=0;e<3;e++) //Loop over current face's edges
-    {
-      curFace->e_index[e][2] = -1; //tri index
-      curFace->e_index[e][3] = -1;
-    }
-    //printf("Outer index %d\n",outer_index);
-    //=========================================== Determine face connectivity
-    //If the head v_index of the current triangle is equal to the tail
-    //of the other triangle and vice versa on the tail of the current
-    //triangle, then they are connected.
-    std::vector<chi_mesh::Face>::iterator other_face;
-    for (other_face = faces.begin(); other_face!=faces.end(); other_face++)
-    {
-      int inner_index = std::distance(this->faces.begin(),other_face);
-      //if (outer_index!=inner_index)
-      {
-        for (int e=0;e<3;e++) //Loop over current face's edges
-        {
-
-          for (int e2=0;e2<3;e2++)  //Loop over other face's edges
-          {
-            if ( (curFace->e_index[e][0]==other_face->e_index[e2][1]) &&
-                 (curFace->e_index[e][1]==other_face->e_index[e2][0]) )
-            {
-              curFace->e_index[e][2] = inner_index; //tri index
-              curFace->e_index[e][3] = e2;                       //edge index
-            }
-          }
-        }
-      }
-
-    }
-  }
-
-  for (int f=0; f<this->poly_faces.size(); f++)
-  {
-    chi_mesh::PolyFace* curFace = this->poly_faces[f];
-
-    for (int f2=0; f2<this->poly_faces.size(); f2++)
-    {
-      if (f!=f2)
-      {
-        chi_mesh::PolyFace* other_face = this->poly_faces[f2];
-        for (int e=0;e<curFace->edges.size();e++) //Loop over current face's edges
-        {
-
-          for (int e2=0;e2<other_face->edges.size();e2++)  //Loop over other face's edges
-          {
-            if ( (curFace->edges[e][0]==other_face->edges[e2][1]) &&
-                 (curFace->edges[e][1]==other_face->edges[e2][0]) )
-            {
-              curFace->edges[e][2] = f2; //tri index
-              curFace->edges[e][3] = e2;                       //edge index
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 
 

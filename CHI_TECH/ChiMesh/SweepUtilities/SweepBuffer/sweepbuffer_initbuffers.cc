@@ -58,10 +58,4 @@ InitializeLocalAndDownstreamBuffers()
 
     data_initialized = true;
   }
-
-  //================================================== Copy delayed Psi to Psi_old
-  angleset->delayed_local_psi_old.clear();
-  std::copy(angleset->delayed_local_psi.begin(),
-            angleset->delayed_local_psi.end(),
-            std::back_inserter(angleset->delayed_local_psi_old));
 }

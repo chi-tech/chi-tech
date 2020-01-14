@@ -36,6 +36,7 @@ int chiLogSetVerbosity(lua_State *L)
 /**Logs a message depending on the log type specified.
 
 \param LogType int Can be any of the log types specified below.
+\param LogMsg char Message or value to be output to the log.
 
 ##_
 

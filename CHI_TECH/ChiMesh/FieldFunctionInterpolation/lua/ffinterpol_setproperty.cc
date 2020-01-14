@@ -36,6 +36,17 @@ LOGICAL_VOLUME = To be followed by a handle to a logical volume to be
                  used by the interpolator.\n
 
 ###OpTypes
+Basic operations are volume sum, volume average or volume max. The volume
+sum is computed from
+\f[
+Sum = \sum_k \sum_i u_i \int_V N_i .dV.
+\f]
+The volume average is computed from
+\f[
+Avg = \frac{\sum_k \sum_i u_i \int_V N_i .dV}{\sum_k \sum_i \int_V N_i .dV}
+\f]
+The volume max is simply \f$ max_{k,i}(u_i) \f$.\n\n
+
 OP_SUM\n
 For volume interpolations, computes the volume integral.\n
 \n
@@ -43,7 +54,41 @@ OP_AVG\n
 For volume interpolations, computes the volume average.\n
 OP_MAX\n
 For volume interpolations, computes the volume max.\n
+\n
+A modified version of these operations are also available. Instead of OP_SUM,
+OP_AVG and OP_MAX, the user may supply OP_SUM_LUA, OP_AVG_LUA and OP_MAX_LUA
+which then needs to be followed by a string value `LuaFunctionName` of a lua
+function of the following form:
 
+\code
+function LuaFunctionName(ff_value, mat_id)
+ ret_val = 0.0;   --Or some computation
+ return ret_val
+end
+\endcode
+
+This code will be called to return a value \f$ f(u_i) \f$ to be used instead of
+the field function \f$ u_i \f$.\n
+
+Example:
+\code
+xwing=2.0
+function IntegrateMaterialVolume(ff_value,mat_id)
+    return xwing
+end
+ffi2 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi2
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_SUM_LUA,"IntegrateMaterialVolume")
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+print(chiFFInterpolationGetValue(curffi))
+\endcode
+
+The code above will return 2.0 times the volume of cells included in the logical
+volume `vol0`.
 
 
 \return Handle int Handle to the created interpolation.
@@ -217,7 +262,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
   }
   else if (property == FFI_PROP_OPERATION)
   {
-    if (numArgs!=3)
+    if (numArgs!=3 and numArgs!=4)
       LuaPostArgAmountError("chiFFInterpolationSetProperty",3,numArgs);
 
     if (typeid(*cur_ffi) != typeid(chi_mesh::FieldFunctionInterpolationVolume))
@@ -234,7 +279,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     int op_type = lua_tonumber(L,3);
 
-    if (!((op_type>=OP_SUM) && (op_type<=OP_MAX)))
+    if (!((op_type>=OP_SUM) && (op_type<=OP_MAX_LUA)))
     {
       chi_log.Log(LOG_ALLERROR)
         << "Volume property FFI_PROP_OPERATION"
@@ -242,6 +287,16 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << " Supported types are OP_AVG and OP_SUM. " << op_type;
       exit(EXIT_FAILURE);
     }
+
+    if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
+    {
+      if (numArgs != 4)
+        LuaPostArgAmountError("chiFFInterpolationSetProperty",4,numArgs);
+
+      const char* func_name = lua_tostring(L,4);
+      cur_ffi_volume->op_lua_func = std::string(func_name);
+    }
+
     cur_ffi_volume->op_type = op_type;
   }
   else if (property == FFI_PROP_LOGICAL_VOLUME)

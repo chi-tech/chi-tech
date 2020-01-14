@@ -93,8 +93,17 @@ pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,1)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
+cur_gs = gs0
 chiLBSGroupsetAddGroups(phys1,gs0,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+--chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+--chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 --========== Boundary conditions
 bsrc={}
@@ -102,22 +111,13 @@ for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/2
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,
+        ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
---chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs0,LBS_CLASSICRICHARDSON)
---chiLBSSetProperty(phys1,GROUPSET_ITERATIVEMETHOD,gs1,NPT_CLASSICRICHARDSON)
-chiLBSSetProperty(phys1,GROUPSET_TOLERANCE,gs0,1.0e-6)
---chiLBSSetProperty(phys1,GROUPSET_MAXITERATIONS,gs0,3)
-chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs0,100)
-chiLBSSetProperty(phys1,GROUPSET_GMRESRESTART_INTVL,gs1,100)
-
-
-chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs0,5)
-chiLBSSetProperty(phys1,GROUPSET_SUBSETS,gs1,7)
 
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
@@ -132,14 +132,14 @@ chiSolverAddRegion(phys0,region0)
 
 --chiMonteCarlonCreateSource(phys0,MC_BNDRY_SRC,1);
 --chiMonteCarlonCreateSource(phys0,MC_RESID_SRC,fflist1[1]);
-chiMonteCarlonCreateSource(phys0,MC_RESID_MOC,fflist1[1]);
+chiMonteCarlonCreateSource(phys0,MCSrcTypes.RESID_MOC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys0,MC_NUM_PARTICLES,10e6)
-chiMonteCarlonSetProperty(phys0,MC_TFC_UPDATE_INTVL,10e3)
-chiMonteCarlonSetProperty(phys0,MC_TALLY_MERGE_INTVL,100e3)
-chiMonteCarlonSetProperty(phys0,MC_SCATTERING_ORDER,0)
-chiMonteCarlonSetProperty(phys0,MC_MONOENERGETIC,true)
-chiMonteCarlonSetProperty(phys0,MC_FORCE_ISOTROPIC,true)
+chiMonteCarlonSetProperty(phys0,MCProperties.NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys0,MCProperties.TFC_UPDATE_INTVL,10e3)
+chiMonteCarlonSetProperty(phys0,MCProperties.TALLY_MERGE_INTVL,100e3)
+chiMonteCarlonSetProperty(phys0,MCProperties.SCATTERING_ORDER,0)
+chiMonteCarlonSetProperty(phys0,MCProperties.MONOENERGETIC,true)
+chiMonteCarlonSetProperty(phys0,MCProperties.FORCE_ISOTROPIC,true)
 --chiMonteCarlonSetProperty(phys0,MC_TALLY_MULTIPLICATION_FACTOR,0.25)
 
 chiMonteCarlonInitialize(phys0)
@@ -150,16 +150,16 @@ chiMeshHandlerSetCurrent(tmesh)
 phys2 = chiMonteCarlonCreateSolver()
 chiSolverAddRegion(phys2,region1)
 
-chiMonteCarlonCreateSource(phys2,MC_BNDRY_SRC,1);
+chiMonteCarlonCreateSource(phys2,MCSrcTypes.RESIDUAL,1);
 --chiMonteCarlonCreateSource(phys2,MC_RESID_SRC,fflist1[1]);
 
-chiMonteCarlonSetProperty(phys2,MC_NUM_PARTICLES,1e6)
-chiMonteCarlonSetProperty(phys2,MC_TFC_UPDATE_INTVL,10e3)
-chiMonteCarlonSetProperty(phys2,MC_TALLY_MERGE_INTVL,100e3)
-chiMonteCarlonSetProperty(phys2,MC_SCATTERING_ORDER,0)
-chiMonteCarlonSetProperty(phys2,MC_MONOENERGETIC,true)
-chiMonteCarlonSetProperty(phys2,MC_FORCE_ISOTROPIC,true)
-chiMonteCarlonSetProperty(phys2,MC_TALLY_MULTIPLICATION_FACTOR,0.5/2)
+chiMonteCarlonSetProperty(phys2,MCProperties.NUM_PARTICLES,1e6)
+chiMonteCarlonSetProperty(phys2,MCProperties.TFC_UPDATE_INTVL,10e3)
+chiMonteCarlonSetProperty(phys2,MCProperties.TALLY_MERGE_INTVL,100e3)
+chiMonteCarlonSetProperty(phys2,MCProperties.SCATTERING_ORDER,0)
+chiMonteCarlonSetProperty(phys2,MCProperties.MONOENERGETIC,true)
+chiMonteCarlonSetProperty(phys2,MCProperties.FORCE_ISOTROPIC,true)
+chiMonteCarlonSetProperty(phys2,MCProperties.TALLY_MULTIPLICATION_FACTOR,0.5/2)
 
 chiMonteCarlonInitialize(phys2)
 chiMonteCarlonExecute(phys2)
@@ -188,5 +188,5 @@ chiFFInterpolationExportPython(cline)
 
 
 if (chi_location_id == 0) then
-    --local handle = io.popen("python ZLFFI00.py")
+    local handle = io.popen("python3 ZLFFI00.py")
 end

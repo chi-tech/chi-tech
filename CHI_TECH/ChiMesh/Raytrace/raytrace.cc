@@ -27,10 +27,12 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   const chi_mesh::Vector &pos_i,
   const chi_mesh::Vector &omega_i,
   double& d_to_surface,
-  chi_mesh::Vector &pos_f)
+  chi_mesh::Vector &pos_f,
+  int func_depth)
 {
   chi_mesh::RayDestinationInfo dest_info;
 
+  double epsilon = 1.0e-8;
   double extention_distance = 1.0e15;
   chi_mesh::Vector pos_f_line = pos_i + omega_i*extention_distance;
 
@@ -39,7 +41,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+    auto slab_cell = (chi_mesh::CellSlab*)cell;
 
     chi_mesh::Vector intersection_point;
     std::pair<double,double> weights;
@@ -72,7 +74,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
   else if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
-    auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+    auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
     chi_mesh::Vector ip; //intersetion point
 
@@ -105,7 +107,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
   else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+    auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
     chi_mesh::Vector ip = pos_i; //Intersection point
 
@@ -150,6 +152,22 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
 
   if (!intersection_found)
   {
+    if (func_depth < 5)
+    {
+      //chi_log.Log(LOG_ALLERROR) << "Particle nudged";
+      //Vector from position to cell-centroid
+      chi_mesh::Vector v_p_i_cc = (cell->centroid - pos_i).Normalized();
+      chi_mesh::Vector pos_i_nudged = pos_i + v_p_i_cc*epsilon;
+
+      //printf("%.12f %.12f %.12f\n",pos_i_nudged.x,pos_i_nudged.y,pos_i_nudged.z);
+
+      dest_info =
+        RayTrace(grid,cell,pos_i_nudged,omega_i,d_to_surface,pos_f,func_depth+1);
+
+      return dest_info;
+    }
+
+
     std::stringstream outstr;
 
     outstr
@@ -162,6 +180,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       outstr << grid->nodes[vi]->PrintS() << "\n";
 
     chi_log.Log(LOG_ALLERROR) << outstr.str();
+    exit(EXIT_FAILURE);
   }
 
   return dest_info;

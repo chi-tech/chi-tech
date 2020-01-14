@@ -11,8 +11,6 @@ struct RayDestinationInfo
   int destination_face_neighbor;
   int destination_face_index;
 
-  std::vector<double> segment_lengths;
-
   RayDestinationInfo() :
   destination_face_neighbor(-1),
   destination_face_index(-1)
@@ -25,7 +23,8 @@ RayDestinationInfo RayTrace(chi_mesh::MeshContinuum* grid,
                             const Vector& pos_i,
                             const Vector& omega_i,
                             double& d_to_surface,
-                            Vector& pos_f);
+                            Vector& pos_f,
+                            int func_depth=0);
 
 bool
 CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,

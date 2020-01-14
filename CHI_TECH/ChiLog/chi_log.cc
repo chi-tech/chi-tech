@@ -1,10 +1,12 @@
 #include "chi_log.h"
 #include <chi_mpi.h>
 #include <ChiTimer/chi_timer.h>
-#include <sstream>
 
 extern ChiMPI    chi_mpi;
 extern ChiTimer  chi_program_timer;
+
+#include <sstream>
+#include <iomanip>
 
 //###################################################################
 /** Default constructor*/
@@ -151,7 +153,7 @@ int ChiLog::GetVerbosity()
 }
 
 //###################################################################
-/** */
+/** Returns a unique tag to a newly created repeating event.*/
 size_t ChiLog::GetRepeatingEventTag(std::string event_name)
 {
   repeating_events.emplace_back(event_name);
@@ -167,10 +169,10 @@ size_t ChiLog::GetRepeatingEventTag(std::string event_name)
 }
 
 //###################################################################
-/** */
+/**Logs an event with the supplied event information.*/
 void ChiLog::LogEvent(size_t ev_tag,
-                      ChiLog::EventType ev_type,
-                      std::shared_ptr<ChiLog::EventInfo>& ev_info)
+                      EventType ev_type,
+                      std::shared_ptr<EventInfo> ev_info)
 {
   if (ev_tag >= repeating_events.size())
     return;
@@ -184,9 +186,9 @@ void ChiLog::LogEvent(size_t ev_tag,
 }
 
 //###################################################################
-/** */
+/**Logs an event without any event information.*/
 void ChiLog::LogEvent(size_t ev_tag,
-                      ChiLog::EventType ev_type)
+                      EventType ev_type)
 {
   if (ev_tag >= repeating_events.size())
     return;
@@ -200,19 +202,26 @@ void ChiLog::LogEvent(size_t ev_tag,
 }
 
 //###################################################################
-/** */
-void ChiLog::PrintEventHistory(size_t ev_tag, std::ostream& outstream)
+/**Returns a string representation of the event history associated with
+ * the tag. Each event entry will be prepended by the location id and
+ * the program timestamp in seconds. This method uses the
+ * ChiLog::EventInfo::GetString method to append information. This allows
+ * derived classes to implement more sophisticated outputs.*/
+std::string ChiLog::PrintEventHistory(size_t ev_tag)
 {
+  std::stringstream outstr;
   if (ev_tag >= repeating_events.size())
-    return;
+    return outstr.str();
 
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
-  std::stringstream outstr;
   for (auto& event : ref_rep_event.events)
   {
     outstr << "[" << chi_mpi.location_id << "] ";
-    outstr << event.ev_time << " ";
+
+    char buf[100];
+    sprintf(buf,"%16.9f",event.ev_time/1000.0);
+    outstr << buf << " ";
 
     switch (event.ev_type)
     {
@@ -230,15 +239,17 @@ void ChiLog::PrintEventHistory(size_t ev_tag, std::ostream& outstream)
         break;
     }
 
-    outstr << event.ev_info->GetString();
+    if (event.ev_info != nullptr)
+      outstr << event.ev_info->GetString();
     outstr << std::endl;
   }
 
-  outstream << outstr.str();
+  return outstr.str();
 }
 
 //###################################################################
-/** */
+/**Processes an event given an event operation. See ChiLog for further
+ * reference.*/
 double ChiLog::ProcessEvent(size_t ev_tag,
                             ChiLog::EventOperation ev_operation)
 {
@@ -305,6 +316,27 @@ double ChiLog::ProcessEvent(size_t ev_tag,
             ret_val = std::max(event.ev_info->arb_value,ret_val);
         }
       }//for events
+      break;
+    }
+    case EventOperation::AVERAGE_VALUE:
+    {
+      ret_val = 0.0;
+      int count = 0;
+      for (auto& event : ref_rep_event.events)
+      {
+        if ((event.ev_type == EventType::SINGLE_OCCURRENCE) or
+            (event.ev_type == EventType::EVENT_BEGIN) or
+            (event.ev_type == EventType::EVENT_END))
+        {
+          if (event.ev_info != nullptr)
+          {
+            ret_val += event.ev_info->arb_value;
+            ++count;
+          }
+        }
+      }//for events
+      if (count == 0) count = 1;
+      ret_val /= count;
       break;
     }
   }//switch

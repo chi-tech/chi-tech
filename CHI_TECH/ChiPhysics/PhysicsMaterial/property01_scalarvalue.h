@@ -8,18 +8,23 @@
 class chi_physics::ScalarValue : public chi_physics::MaterialProperty
 {
 public:
-  double value;
+  double value=1.0;
 
-  ScalarValue()
+  ScalarValue() : MaterialProperty(PropertyType::SCALAR_VALUE) {}
+
+  double GetScalarValue() {return value;}
+  void PushLuaTable(lua_State* L) override
   {
-    type_index = SCALAR_VALUE;
-    value = 1.0;
+    lua_newtable(L);
+    lua_pushstring(L,"is_empty");
+    lua_pushboolean(L,false);
+    lua_settable(L,-3);
+
+    lua_pushstring(L,"value");
+    lua_pushnumber(L,value);
+    lua_settable(L,-3);
   }
 
-  double GetScalarValue()
-  {
-    return value;
-  }
 };
 
 #endif

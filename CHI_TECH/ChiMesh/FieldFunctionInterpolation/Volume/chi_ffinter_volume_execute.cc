@@ -74,6 +74,9 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
         ir = mapping[counter];
         VecGetValues(field,1,&ir,&value);
 
+        if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
+          value = CallLuaFunction(value,cell->material_id);
+
         op_value += value*cell_fe_view->IntV_shapeI[i];
         total_volume += cell_fe_view->IntV_shapeI[i];
 
@@ -145,6 +148,9 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
         counter++;
         ir = mapping[counter];
         value = field[ir];
+
+        if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
+          value = CallLuaFunction(value,cell->material_id);
 
         op_value += value*cell_fe_view->IntV_shapeI[i];
         total_volume += cell_fe_view->IntV_shapeI[i];

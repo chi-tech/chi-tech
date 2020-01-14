@@ -11,8 +11,6 @@
 extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
 
-extern double chi_global_timings[20];
-
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;
@@ -68,9 +66,6 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
 
-    groupset->latest_convergence_metric = std::min(pw_change, 1.0);
-    ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
-
     if (groupset->apply_wgdsa)
     {
       AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
@@ -119,6 +114,17 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     chi_log.Log(LOG_0) << iter_info.str();
 
     if (converged) break;
+
+    if (options.write_restart_data)
+    {
+      if ((chi_program_timer.GetTime()/60000.0) >
+          last_restart_write+options.write_restart_interval)
+      {
+        last_restart_write = chi_program_timer.GetTime()/60000.0;
+        WriteRestartData(options.write_restart_folder_name,
+                         options.write_restart_file_base);
+      }
+    }
   }
 
 
@@ -145,4 +151,10 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     << "        Number of unknowns per sweep:  " << num_unknowns;
   chi_log.Log(LOG_0)
     << "\n\n";
+
+  std::string sweep_log_file_name =
+    std::string("GS_") + std::to_string(group_set_num) +
+    std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+    std::string(".log");
+  groupset->PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
 }

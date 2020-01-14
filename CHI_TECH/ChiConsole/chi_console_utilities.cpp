@@ -56,7 +56,7 @@ void ChiConsole::InitializeLuaEvent(const char* eventTitle)
 //############################################################################# Execute file
 /** Executes the given file in the Lua engine.
 \author Jan*/
-void ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv)
+int ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv)
 {
 	lua_State* L = this->consoleState;
 	if (fileName!=NULL)
@@ -77,9 +77,11 @@ void ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv)
 		if (error > 0)
 		{
 			printf("%s\n", lua_tostring(this->consoleState, -1));
+			return EXIT_FAILURE;
 		}
 		//std::cout<<lua_tostring(this->consoleState,-1)<<"\n";
 	}
+	return EXIT_SUCCESS;
 }
 
 

@@ -115,6 +115,7 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 if (support_cycles ~= nil) then
     chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES_CYCLES)
+    --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON_CYCLES)
 else
     chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 end

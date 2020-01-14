@@ -10,28 +10,9 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
 
---############################################### Extract edges from surface mesh
-loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
-
-line_mesh = {};
-line_mesh_count = 0;
-
-for k=1,loop_count do
-    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
-    for m=1,split_count do
-        line_mesh_count = line_mesh_count + 1;
-        line_mesh[line_mesh_count] =
-        chiLineMeshCreateFromLoop(split_loops,m-1);
-    end
-
-end
-
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-for k=1,line_mesh_count do
-    chiRegionAddLineBoundary(region1,line_mesh[k]);
-end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
@@ -52,15 +33,32 @@ chiVolumeMesherExecute();
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
+e_vol = chiLogicalVolumeCreate(RPP,0.99999,1000,-1000,1000,-1000,1000)
+w_vol = chiLogicalVolumeCreate(RPP,-1000,-0.99999,-1000,1000,-1000,1000)
+n_vol = chiLogicalVolumeCreate(RPP,-1000,1000,0.99999,1000,-1000,1000)
+s_vol = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,-0.99999,-1000,1000)
+
+e_bndry = chiRegionAddEmptyBoundary(region1);
+w_bndry = chiRegionAddEmptyBoundary(region1);
+n_bndry = chiRegionAddEmptyBoundary(region1);
+s_bndry = chiRegionAddEmptyBoundary(region1);
+
+chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,e_vol,e_bndry)
+chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,w_vol,w_bndry)
+chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
+chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
 --############################################### Add materials
 materials = {}
 materials[0] = chiPhysicsAddMaterial("Test Material");
 
-chiPhysicsMaterialAddProperty(materials[0],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialSetProperty(materials[0],THERMAL_CONDUCTIVITY,SINGLE_VALUE,1.0)
+chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
+chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
-
+prop = chiPhysicsMaterialGetProperty(materials[0],SCALAR_VALUE)
+if ((prop.is_empty ~=nil) and (not prop.is_empty)) then
+    print("Property table populated, value="..tostring(prop.value))
+end
 
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
@@ -70,10 +68,10 @@ chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLD_MIP);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-8)
 
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_REFLECTING)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_VACUUM)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,2,DIFFUSION_REFLECTING)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,3,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,e_bndry,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,w_bndry,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,n_bndry,DIFFUSION_REFLECTING)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,s_bndry,DIFFUSION_REFLECTING)
 
 --############################################### Initialize Solver
 chiDiffusionInitialize(phys1)
@@ -99,10 +97,29 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 
-if (chi_location_id == 0 and master_export == nil) then
+--==========================================
+xwing=2.0
+function IntegrateMaterialVolume(ff_value,mat_id)
+    return xwing
+end
+ffi2 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi2
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_SUM_LUA,"IntegrateMaterialVolume")
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+print(chiFFInterpolationGetValue(curffi))
+--==========================================
+
+if (master_export == nil) then
     chiFFInterpolationExportPython(slice2)
-    local handle = io.popen("python ZPFFI00.py")
     chiExportFieldFunctionToVTK(fftemp,"ZPhi")
+end
+
+if (chi_location_id == 0 and master_export == nil) then
+    local handle = io.popen("python ZPFFI00.py")
 end
 
 

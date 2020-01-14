@@ -21,6 +21,7 @@ RegisterConstant(ZMIN,   36);
 RegisterNamespace(LBSBoundaryTypes);
 AddNamedConstantToNamespace(VACUUM            ,1,LBSBoundaryTypes)
 AddNamedConstantToNamespace(INCIDENT_ISOTROPIC,2,LBSBoundaryTypes)
+AddNamedConstantToNamespace(REFLECTING        ,3,LBSBoundaryTypes)
 //
 //    RegisterConstant(VACUUM,               301);
 //    RegisterConstant(INCIDENT_ISOTROPIC,   302);
@@ -43,6 +44,8 @@ RegisterConstant(GROUPSET_TGDSA_TOLERANCE,111);
 
 RegisterConstant(SCATTERING_ORDER,   4);
 RegisterConstant(SWEEP_EAGER_LIMIT,   5);
+RegisterConstant(READ_RESTART_DATA,   6);
+RegisterConstant(WRITE_RESTART_DATA,  7);
 RegisterFunction(chiLBSInitialize)
 RegisterFunction(chiLBSExecute)
 RegisterFunction(chiLBSGetFieldFunctionList)
@@ -64,5 +67,6 @@ RegisterFunction(chiLBSGroupsetSetIterativeMethod)
 RegisterFunction(chiLBSGroupsetSetResidualTolerance)
 RegisterFunction(chiLBSGroupsetSetMaxIterations)
 RegisterFunction(chiLBSGroupsetSetGMRESRestartIntvl)
+RegisterFunction(chiLBSGroupsetSetEnableSweepLog)
 RegisterFunction(chiLBSGroupsetSetWGDSA)
 RegisterFunction(chiLBSGroupsetSetTGDSA)
