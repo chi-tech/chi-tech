@@ -18,6 +18,7 @@ public:
 	void   		  Reset();
 	double 		  GetTime();
 	std::string GetTimeString();
+	std::string GetLocalDateTimeString();
 };
 
 #endif

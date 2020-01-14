@@ -11,7 +11,7 @@ extern ChiLog chi_log;
 
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/
-void chi_mesh::sweep_management::FLUDS::
+void chi_mesh::sweep_management::PRIMARY_FLUDS::
 LocalIncidentMapping(chi_mesh::Cell *cell,
                      chi_mesh::sweep_management::SPDS* spds,
                      std::vector<int>&  local_so_cell_mapping)

@@ -17,13 +17,11 @@ private:
   chi_mesh::MeshContinuum* grid;
 
 public:
-  double                                     volume; ///< Actually area times unity h
-  std::vector<double>                        face_area; ///< Actually length unity h
   std::vector<std::vector<double>>           face_side_area;
   std::vector<std::vector<double>>           face_side_volume;
   std::vector<std::vector<std::vector<chi_mesh::Vector>>> face_side_vectors;
 
-  PolyhedronFVView(chi_mesh::CellPolyhedronV2* polyh_cell,
+  PolyhedronFVView(chi_mesh::CellPolyhedron* polyh_cell,
                 chi_mesh::MeshContinuum *vol_continuum) :
                 CellFVView(polyh_cell->vertex_ids.size())
   {

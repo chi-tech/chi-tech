@@ -64,6 +64,8 @@ public:
   void                GetBoundaryCells(chi_mesh::MeshContinuum* vol_continuum);
   void                SetMatIDFromLogical(chi_mesh::LogicalVolume* log_vol,
                                           bool sense, int mat_id);
+  void                SetBndryIDFromLogical(chi_mesh::LogicalVolume* log_vol,
+                                          bool sense, int bndry_id);
   //02
   virtual void Execute();
   int          MapNode(int iref);

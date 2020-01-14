@@ -4,6 +4,7 @@
 
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
 
@@ -20,8 +21,7 @@ void LinearBoltzman::Solver::InitWGDSA(LBSGroupset *groupset)
     delta_phi_local.resize(local_dof_count*groupset->groups.size(),0.0);
     int g = 0;
     int m = 0;
-    chi_physics::FieldFunction* deltaphi_ff =
-      new chi_physics::FieldFunction;
+    auto deltaphi_ff = new chi_physics::FieldFunction;
     deltaphi_ff->text_name = std::string("Sigma_s_DeltaPhi_g") +
                           std::to_string(g) +
                           std::string("_m") + std::to_string(m);
@@ -52,7 +52,7 @@ void LinearBoltzman::Solver::InitWGDSA(LBSGroupset *groupset)
 
     //================================= Set diffusion solver
     std::string solver_name = std::string("WGDSA");
-    chi_diffusion::Solver* dsolver = new chi_diffusion::Solver(solver_name);
+    auto dsolver = new chi_diffusion::Solver(solver_name);
     groupset->wgdsa_solver = dsolver;
 
     dsolver->regions.push_back(this->regions.back());
@@ -68,15 +68,15 @@ void LinearBoltzman::Solver::InitWGDSA(LBSGroupset *groupset)
     if (not dsolver->common_items_initialized)
       dsolver->InitializeCommonItems();
 
-    for (int b=0; b<dsolver->boundaries.size(); b++)
+    typedef chi_mesh::sweep_management::BoundaryType SwpBndryType;
+    dsolver->boundaries.clear();
+    for (auto lbs_bndry : sweep_boundaries)
     {
-//      chi_diffusion::BoundaryRobin* bound =
-//        new chi_diffusion::BoundaryRobin(0.25,0.5,0.0);
-      chi_diffusion::BoundaryDirichlet* bound =
-        new chi_diffusion::BoundaryDirichlet();
-
-      dsolver->boundaries[b] = bound;
-    }//for bndry
+      if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
+        dsolver->boundaries.push_back(new chi_diffusion::BoundaryReflecting());
+      else
+        dsolver->boundaries.push_back(new chi_diffusion::BoundaryDirichlet());
+    }
 
     //================================= Redirect material lookup to use
     //                                  transport cross-sections
@@ -94,6 +94,14 @@ void LinearBoltzman::Solver::InitWGDSA(LBSGroupset *groupset)
     delta_phi_local.resize(0);
     delta_phi_local.shrink_to_fit();
   }//if wgdsa
+}
+
+//###################################################################
+/**Cleans up memory consuming items. */
+void LinearBoltzman::Solver::CleanUpWGDSA(LBSGroupset *groupset)
+{
+  if (groupset->apply_wgdsa)
+    delete groupset->wgdsa_solver;
 }
 
 //###################################################################

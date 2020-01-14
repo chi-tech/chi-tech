@@ -75,7 +75,7 @@ public:
     material_id = -1;
   }
 
-  virtual ~Cell() {}
+  virtual ~Cell() = default;
 
 public:
   virtual void FindBoundary2D(chi_mesh::Region* region) {}

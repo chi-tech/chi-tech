@@ -26,13 +26,16 @@ public:
 public:
   //constrdestr.cc
         SurfaceMesh();
+       ~SurfaceMesh();
   friend std::ostream& operator<<(std::ostream& os,  SurfaceMesh& dt);
   //loadexport.cc
   int   ImportFromOBJFile(const char* fileName,bool as_poly);
   int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
-  void  UpdateInternalConnectivity();
   void  ExportToOBJFile(const char* fileName);
   void  ExportToPolyFile(const char* fileName);
+
+  //internalconn.cc
+  void  UpdateInternalConnectivity();
 
   //checksense.cc
   bool  CheckNegativeSense(double x, double y, double z);
@@ -52,6 +55,8 @@ public:
   //meshstats.cc
   void  CheckCyclicDependencies(int num_angles);
   void  GetMeshStats();
+  void  ComputeLoadBalancing(std::vector<double>& x_cuts,
+                             std::vector<double>& y_cuts);
 
 };
 

@@ -179,6 +179,7 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(chi_mesh::SurfaceMesh* smesh,
       min_lbf = lbf;
       min_bin = x;
     }
+    chi_log.Log(LOG_0) << "Load balance factor: " << lbf;
   }//for x
 
   //================================================== Write y-cuts

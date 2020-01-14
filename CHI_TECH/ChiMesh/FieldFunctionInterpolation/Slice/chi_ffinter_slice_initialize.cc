@@ -56,7 +56,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = static_cast<chi_mesh::CellPolyhedronV2*>(cell);
+      auto polyh_cell = static_cast<chi_mesh::CellPolyhedron*>(cell);
       bool intersects = false;
 
       size_t num_faces = polyh_cell->faces.size();
@@ -113,7 +113,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
-      auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+      auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
       //========================================= Initialize cell intersection
       //                                          data structure
@@ -166,7 +166,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedronV2*>(cell);
+      auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedron*>(cell);
 
       //========================================= Initialize cell intersection
       //                                          data structure

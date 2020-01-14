@@ -29,7 +29,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
     {
       //========================================= Get template cell
       auto template_cell =
-        dynamic_cast<chi_mesh::CellPolygonV2*>(template_continuum->cells[tc]);
+        dynamic_cast<chi_mesh::CellPolygon*>(template_continuum->cells[tc]);
 //      chi_mesh::CellPolygon* template_cell =
 //        (chi_mesh::CellPolygon*)template_continuum->cells[tc];
       if (template_cell == nullptr)
@@ -84,7 +84,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
       {
         delete tcell;
         //========================================= Create polyhedron
-        chi_mesh::CellPolyhedronV2* cell = new chi_mesh::CellPolyhedronV2;
+        chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
         cell->xyz_partition_indices = tcell->xyz_partition_indices;
         cell->partition_id = tcell->partition_id;
 

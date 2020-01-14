@@ -1,6 +1,6 @@
 #include "chi_runtime.h"
 
-extern bool sim_option_interactive;
+extern bool chi_sim_option_interactive;
 
 //######################################################### Program entry point
 /** Program entry point.
@@ -13,12 +13,13 @@ int main(int argc, char** argv)
 {
   ChiTechInitialize(argc,argv);
 
-  if (sim_option_interactive)
-    ChiTechRunInteractive(argc, argv);
+  int error_code = 0;
+  if (chi_sim_option_interactive)
+    error_code = ChiTechRunInteractive(argc, argv);
   else
-    ChiTechRunBatch(argc, argv);
+    error_code = ChiTechRunBatch(argc, argv);
 
   ChiTechFinalize();
 
-  return 0;
+  return error_code;
 }

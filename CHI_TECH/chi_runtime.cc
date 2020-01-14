@@ -21,17 +21,17 @@ ChiLog      chi_log;
 ChiTimer    chi_program_timer;
 
 void ChiTechParseArguments(int argc, char** argv);
-void ChiTechRunInteractive(int argc, char** argv);
-void ChiTechRunBatch(int argc, char** argv);
-void ChiTechInitialize(int argc, char** argv);
+int  ChiTechRunInteractive(int argc, char** argv);
+int  ChiTechRunBatch(int argc, char** argv);
+int  ChiTechInitialize(int argc, char** argv);
 void ChiTechFinalize();
 
 /// @file
 
 //=============================================== Global variables
 bool            chi_termination_posted = false;
-std::string     input_file_name;
-bool            sim_option_interactive = true;
+std::string     chi_input_file_name;
+bool            chi_sim_option_interactive = true;
 
 
 
@@ -47,9 +47,9 @@ void ChiTechParseArguments(int argc, char** argv)
 
     if ((argument.find('=') == std::string::npos) && (!input_file_found) )
     {
-      input_file_name = argument;
+      chi_input_file_name = argument;
       input_file_found = true;
-      sim_option_interactive = false;
+      chi_sim_option_interactive = false;
     }//no =
     else if (argument.find('=') != std::string::npos)
     {
@@ -58,7 +58,7 @@ void ChiTechParseArguments(int argc, char** argv)
     //================================================ No-graphics option
     if ((argument.find("-b")!=std::string::npos)  )
     {
-      sim_option_interactive = false;
+      chi_sim_option_interactive = false;
     }//-b
     //================================================ Verbosity
     if (argument.find("-v") != std::string::npos)
@@ -90,7 +90,7 @@ void ChiTechParseArguments(int argc, char** argv)
 
 //############################################### Initialize ChiTech
 /**Initializes all necessary items for ChiTech.*/
-void ChiTechInitialize(int argc, char** argv)
+int ChiTechInitialize(int argc, char** argv)
 {
   ChiTechParseArguments(argc, argv);
   
@@ -107,6 +107,8 @@ void ChiTechInitialize(int argc, char** argv)
   chi_mpi.Initialize();
 
   chi_physics_handler.InitPetSc(argc,argv);
+
+  return 0;
 }
 
 //############################################### Finalize ChiTech
@@ -119,33 +121,44 @@ void ChiTechFinalize()
 
 //############################################### Interactive interface
 /**Runs the interactive chitech engine*/
-void ChiTechRunInteractive(int argc, char** argv)
+int ChiTechRunInteractive(int argc, char** argv)
 {
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetLocalDateTimeString()
+    << " Running ChiTech in interactive-mode with "
+    << chi_mpi.process_count << " processes.";
+
   chi_log.Log(LOG_0)
     << "ChiTech number of arguments supplied: "
     << argc - 1;
 
-  chi_log.Log(LOG_0)
-    << "Running ChiTech in interactive-mode with "
-    << chi_mpi.process_count << " processes.";
-
-  if ( not input_file_name.empty() )
-    chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
+  if ( not chi_input_file_name.empty() )
+    chi_console.ExecuteFile(chi_input_file_name.c_str(), argc, argv);
 
   chi_console.RunConsoleLoop();
+
+  chi_log.Log(LOG_0)
+    << "Final program time " << chi_program_timer.GetTimeString();
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetLocalDateTimeString()
+    << " ChiTech finished execution.";
+
+  return 0;
 }
 
 //############################################### Batch interface
 /**Runs ChiTech in pure batch mode. Start then finish.*/
-void ChiTechRunBatch(int argc, char** argv)
+int ChiTechRunBatch(int argc, char** argv)
 {
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetLocalDateTimeString()
+    << " Running ChiTech in batch-mode with "
+    << chi_mpi.process_count << " processes.";
+
   chi_log.Log(LOG_0)
     << "ChiTech number of arguments supplied: "
     << argc - 1;
-
-  chi_log.Log(LOG_0)
-    << "Running ChiTech in batch-mode with "
-    << chi_mpi.process_count << " processes.";
 
   if (argc<=1)
     chi_log.Log(LOG_0)
@@ -154,9 +167,18 @@ void ChiTechRunBatch(int argc, char** argv)
       << "     -v    Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
       << "     a=b   Executes argument as a lua string.\n\n\n";
 
-  if ( not input_file_name.empty() )
-    chi_console.ExecuteFile(input_file_name.c_str(),argc,argv);
+  int error_code = 0;
+  if ( not chi_input_file_name.empty() )
+    error_code = chi_console.ExecuteFile(chi_input_file_name.c_str(), argc, argv);
 
+  chi_log.Log(LOG_0)
+    << "Final program time " << chi_program_timer.GetTimeString();
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetLocalDateTimeString()
+    << " ChiTech finished execution of " << chi_input_file_name;
+
+  return error_code;
 }
 
 

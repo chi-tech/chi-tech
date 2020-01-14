@@ -59,22 +59,23 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     }
 
     //====================================== Extract properties
+    using MatProperty = chi_physics::PropertyType;
     chi_physics::Material* cur_mat = chi_physics_handler.material_stack[id];
     int num_props = cur_mat->properties.size();
     bool found_transport_xs = false;
     for (int p=0; p<num_props; p++)
     {
-      if (cur_mat->properties[p]->type_index == TRANSPORT_XSECTIONS)
+      if (cur_mat->properties[p]->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
-        chi_physics::TransportCrossSections* transp_xs =
+        auto transp_xs =
           (chi_physics::TransportCrossSections*)cur_mat->properties[p];
         material_xs.push_back(transp_xs);
         matid_to_xs_map[id] = material_xs.size()-1;
         found_transport_xs = true;
       }
-      if (cur_mat->properties[p]->type_index == ISOTROPIC_MG_SOURCE)
+      if (cur_mat->properties[p]->Type() == MatProperty::ISOTROPIC_MG_SOURCE)
       {
-        chi_physics::IsotropicMultiGrpSource* mg_source =
+        auto mg_source =
           (chi_physics::IsotropicMultiGrpSource*)cur_mat->properties[p];
 
         if (mg_source->source_value_g.size() < groups.size())
@@ -142,7 +143,14 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     chi_log.Log(LOG_0) << "Computing diffusion parameters.";
 
     for (int xs=0; xs<material_xs.size(); xs++)
+    {
       material_xs[xs]->ComputeDiffusionParameters();
+      auto rel_location = std::find(matid_to_xs_map.begin(),
+                                    matid_to_xs_map.end(), xs);
+      size_t mat_id = rel_location - matid_to_xs_map.begin();
+      if (rel_location != matid_to_xs_map.end())
+        chi_log.Log(LOG_0VERBOSE_1) << "Material " << mat_id;
+    }
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Do more stuff

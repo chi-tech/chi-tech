@@ -32,7 +32,7 @@ class ChiConsole
   void        RunConsoleLoop(char* fileName=nullptr);
   //02 Utilities
   void        InitializeLuaEvent(const char* eventTitle);
-  void        ExecuteFile(const char* fileName,int argc, char** argv);
+  int         ExecuteFile(const char* fileName,int argc, char** argv);
   void				PostEventToConsole(CSTEvent* inputEvent);
   void        PostMPIInfo(int location_id, int number_of_processes);
   //03

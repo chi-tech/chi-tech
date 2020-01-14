@@ -56,7 +56,6 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
   context->groupset->latest_convergence_metric = std::min(relative_residual, 1.0);
 
-
   //======================================== Print iteration information
   std::string offset;
   if (context->groupset->apply_wgdsa || context->groupset->apply_tgdsa)
@@ -82,6 +81,33 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
 
   chi_log.Log(LOG_0) << iter_info.str() << std::endl;
+
+  if (context->groupset->iterative_method == NPT_GMRES)
+  {
+    if (context->last_iteration == n)
+    {
+      if (context->solver->options.write_restart_data)
+      {
+        if ((chi_program_timer.GetTime()/60000.0) >
+          context->solver->last_restart_write +
+          context->solver->options.write_restart_interval)
+        {
+          Vec phi_new;
+          KSPBuildSolution(ksp,NULL,&phi_new);
+
+          context->solver->
+          DisAssembleVector(context->groupset, phi_new,
+                            context->solver->phi_old_local.data());
+
+          context->solver->last_restart_write = chi_program_timer.GetTime()/60000.0;
+          context->solver->WriteRestartData(
+            context->solver->options.write_restart_folder_name,
+            context->solver->options.write_restart_file_base);
+        }
+      }
+    }
+  }
+  context->last_iteration = n;
 
   return KSP_CONVERGED_ITERATING;
 }

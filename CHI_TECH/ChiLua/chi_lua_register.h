@@ -25,13 +25,13 @@ RegisterFunction(chiLegendre)
 RegisterFunction(chiLegendreDerivative)
 RegisterFunction(chiYlm)
 RegisterFunction(chiCreateQuadrature)
-    RegisterConstant(GAUSS_LEGENDRE,   1);
-    RegisterConstant(GAUSS_CHEBYSHEV,   2);
 RegisterFunction(chiCreateProductQuadrature)
     RegisterConstant(GAUSS_LEGENDRE,             1);
     RegisterConstant(GAUSS_CHEBYSHEV,            2);
     RegisterConstant(GAUSS_LEGENDRE_LEGENDRE,    3);
     RegisterConstant(GAUSS_LEGENDRE_CHEBYSHEV,   4);
+RegisterFunction(chiGetProductQuadrature)
+
 
 
 //module:Mesh Utilities
@@ -55,6 +55,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiRegionCreate)
     RegisterFunction(chiRegionAddSurfaceBoundary)
     RegisterFunction(chiRegionAddLineBoundary)
+    RegisterFunction(chiRegionAddEmptyBoundary)
     RegisterFunction(chiRegionGetBoundarySurfaceMesh)
     RegisterFunction(chiRegionExportMeshToPython)
     RegisterFunction(chiRegionExportMeshToObj)
@@ -70,6 +71,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiSurfaceMeshSplitByPatch)
     RegisterFunction(chiSurfaceMeshExtractOpenEdgesToObj)
     RegisterFunction(chiSurfaceMeshCheckCycles)
+    RegisterFunction(chiComputeLoadBalancing)
 //  SurfaceMesher
     RegisterFunction(chiSurfaceMesherCreate)
       RegisterConstant(SURFACEMESHER_PREDEFINED,   1);
@@ -95,6 +97,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(PARTITION_Z,   3);
       RegisterConstant(EXTRUSION_LAYER,   10);
       RegisterConstant(MATID_FROMLOGICAL,   11);
+      RegisterConstant(BNDRYID_FROMLOGICAL, 12);
 //  Domain Decomposition
     RegisterFunction(chiDomDecompose2D)
     RegisterFunction(chiDecomposeSurfaceMeshPxPy)
@@ -113,6 +116,9 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
         RegisterConstant(OP_SUM,   10);
         RegisterConstant(OP_AVG,   11);
         RegisterConstant(OP_MAX,   12);
+        RegisterConstant(OP_SUM_LUA,   13);
+        RegisterConstant(OP_AVG_LUA,   14);
+        RegisterConstant(OP_MAX_LUA,   15);
     RegisterConstant(LOGICAL_VOLUME,   8);
     RegisterConstant(LINE_FIRSTPOINT,   11);
     RegisterConstant(LINE_SECONDPOINT,   12);
@@ -148,6 +154,10 @@ RegisterFunction(chiSolverExecute)
 RegisterFunction(chiPhysicsAddMaterial)
 RegisterFunction(chiPhysicsMaterialAddProperty)
 RegisterFunction(chiPhysicsMaterialSetProperty)
+RegisterFunction(chiPhysicsMaterialGetProperty)
+RegisterFunction(chiPhysicsTransportXSCreate)
+RegisterFunction(chiPhysicsTransportXSSet)
+RegisterFunction(chiPhysicsTransportXSMakeCombined)
 RegisterFunction(chiSolverAddFieldFunction)
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)
@@ -156,7 +166,6 @@ RegisterFunction(chiExportMultiFieldFunctionToVTKG)
 
 
 //Property indices
-RegisterConstant(THERMAL_CONDUCTIVITY,   0);
 RegisterConstant(SCALAR_VALUE,           1);
 RegisterConstant(TRANSPORT_XSECTIONS,    10);
 RegisterConstant(ISOTROPIC_MG_SOURCE,    11);
@@ -167,10 +176,12 @@ RegisterConstant(FROM_ARRAY,              1);
 RegisterConstant(SIMPLEXS0,              20);
 RegisterConstant(SIMPLEXS1,              21);
 RegisterConstant(PDT_XSFILE,             22);
+RegisterConstant(EXISTING,               23);
 
-
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "../../Modules/module_lua_register.h"
 
+#endif
 //module:Test scripts
 RegisterFunction(chiLuaTest)
 

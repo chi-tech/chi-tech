@@ -8,9 +8,11 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
+#include "ChiTimer/chi_timer.h"
 
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
+extern ChiTimer chi_program_timer;
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
@@ -24,7 +26,9 @@ extern ChiConsole chi_console;
 /**Initializes the sweep ordering for the given groupset.*/
 void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 {
-  chi_log.Log(LOG_0) << "Computing Sweep ordering.\n";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Computing Sweep ordering.\n";
 
   //============================================= Clear sweep ordering
   sweep_orderings.clear();
@@ -66,34 +70,9 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                        groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D MESHES
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
-  {
-    int num_azi = groupset->quadrature->azimu_ang.size();
-    int num_pol = groupset->quadrature->polar_ang.size();
-
-    if (num_pol != 1)
-    {
-      chi_log.Log(LOG_0)
-        << "Incompatible number of polar angles in quadrature set "
-        << "for a 2D simulation.";
-      exit(EXIT_FAILURE);
-    }
-
-    for (int i=0; i<num_azi; i++)
-    {
-      chi_mesh::sweep_management::SPDS* new_swp_order =
-        chi_mesh::sweep_management::
-        CreateSweepOrder(groupset->quadrature->polar_ang[0],
-                         groupset->quadrature->azimu_ang[i],
-                         this->grid,
-                         groupset->groups.size(),
-                         groupset->allow_cycles);
-      this->sweep_orderings.push_back(new_swp_order);
-    }
-  }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EXTRUDED MESHES
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D 3D MESHES
+  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) )
   {
     int num_azi = groupset->quadrature->azimu_ang.size();
     int num_pol = groupset->quadrature->polar_ang.size();
@@ -102,14 +81,14 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     {
       chi_log.Log(LOG_0)
         << "Incompatible number of azimuthal angles in quadrature set "
-        << "for a 3D simulation.";
+        << "for a 2D or 3D simulation.";
       exit(EXIT_FAILURE);
     }
     if (num_pol < 2)
     {
       chi_log.Log(LOG_0)
         << "Incompatible number of polar angles in quadrature set "
-        << "for a 3D simulation.";
+        << "for a 2D or 3D simulation.";
       exit(EXIT_FAILURE);
     }
 
@@ -153,7 +132,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
 
 
   chi_log.Log(LOG_0)
-    << "Done computing sweep orderings.           Process memory = "
+    << chi_program_timer.GetTimeString()
+    << " Done computing sweep orderings.           Process memory = "
     << std::setprecision(3)
     << chi_console.GetMemoryUsageInMB() << " MB";
 

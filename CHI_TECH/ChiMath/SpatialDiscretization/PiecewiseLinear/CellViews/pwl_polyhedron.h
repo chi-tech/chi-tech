@@ -96,7 +96,7 @@ private:
 
 
 public:
-  PolyhedronFEView(chi_mesh::CellPolyhedronV2* polyh_cell,
+  PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
                    chi_mesh::MeshContinuum* vol_continuum,
                    SpatialDiscretization_PWL* discretization= nullptr);
 
@@ -153,6 +153,9 @@ public:
 
   void ShapeValues(const chi_mesh::Vector& xyz,
                    std::vector<double>& shape_values) override;
+
+  void GradShapeValues(const chi_mesh::Vector& xyz,
+                       std::vector<chi_mesh::Vector>& gradshape_values) override;
 
   //############################################### Precomputation cell matrices
 private:

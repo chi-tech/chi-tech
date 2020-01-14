@@ -23,8 +23,8 @@ extern ChiLog chi_log;
 
 ##_
 
-###Example\n
-Simple example of adding a material
+### Example\n
+Example lua code:
 \code
 materials = {}
 materials[0] = chiPhysicsAddMaterial("Test Material");
