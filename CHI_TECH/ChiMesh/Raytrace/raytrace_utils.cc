@@ -268,7 +268,7 @@ void chi_mesh::PopulateRaySegmentLengths(
   // segment lengths from the strip defined by v0 to vc.
   if (cell->Type() == chi_mesh::CellType::POLYGON)
   {
-    auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+    auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
     int f=-1;
     for (auto& face : cell->faces) //edges

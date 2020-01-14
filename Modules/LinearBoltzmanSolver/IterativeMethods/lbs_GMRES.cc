@@ -9,12 +9,13 @@
 
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
+#include "ChiPhysics/chi_physics.h"
+
 #include <chi_log.h>
 #include <chi_mpi.h>
 extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
-
-extern double chi_global_timings[20];
+extern ChiTimer chi_program_timer;
 
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
@@ -61,8 +62,11 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
 
   //=================================================== Create the matrix
   Mat A;
-  int local_size = local_dof_count*num_moments*groupset_numgrps;
-  int globl_size = glob_dof_count*num_moments*groupset_numgrps;
+  auto num_ang_unknowns = groupset->angle_agg->GetNumberOfAngularUnknowns();
+  int local_size = local_dof_count*num_moments*groupset_numgrps +
+                   num_ang_unknowns.first;
+  int globl_size = glob_dof_count*num_moments*groupset_numgrps +
+                   num_ang_unknowns.second;
   MatCreateShell(PETSC_COMM_WORLD,local_size,
                                   local_size,
                                   globl_size,
@@ -107,26 +111,26 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   KSPSetUp(ksp);
 
   //================================================== Compute b
-  chi_log.Log(LOG_0) << "Computing b";
-  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,SourceFlags::SUPPRESS_PHI_OLD);
+  chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
+  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,
+                          SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
   phi_new_local.assign(phi_new_local.size(),0.0);
   sweepScheduler.Sweep(sweep_chunk);
 
-  groupset->latest_convergence_metric = groupset->residual_tolerance;
-  ConvergeCycles(sweepScheduler,sweep_chunk,groupset);
-
   //=================================================== Apply DSA
   if (groupset->apply_wgdsa)
   {
-    AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
+    std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
+    AssembleWGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
     ((chi_diffusion::Solver*)groupset->wgdsa_solver)->ExecuteS(true,false);
     DisAssembleWGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
   if (groupset->apply_tgdsa)
   {
-    AssembleTGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
+    std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
+    AssembleTGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
     ((chi_diffusion::Solver*)groupset->tgdsa_solver)->ExecuteS(true,false);
     DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
@@ -139,17 +143,28 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   sweep_chunk->SetDestinationPhi(&phi_new_local);
   sweep_chunk->suppress_surface_src = true; //Action of Ax specific
 
-  VecCopy(phi_old,phi_new);
+  double phi_old_norm=0.0;
+  VecNorm(phi_old,NORM_2,&phi_old_norm);
+
+  if (phi_old_norm > 1.0e-10)
+  {
+    VecCopy(phi_old,phi_new);
+    chi_log.Log(LOG_0) << "Using phi_old as initial guess.";
+  }
+
 
   //**************** CALL GMRES SOLVE ******************
-  chi_log.Log(LOG_0) << "Starting iterations";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString() << " Starting iterations";
   KSPSolve(ksp,q_fixed,phi_new);
   //****************************************************
 
   KSPConvergedReason reason;
   KSPGetConvergedReason(ksp,&reason);
-  if (reason<0)
-    chi_log.Log(LOG_0WARNING) << "GMRES solver failed.";
+  if (reason != KSP_CONVERGED_RTOL)
+    chi_log.Log(LOG_0WARNING)
+      << "GMRES solver failed. "
+      << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
 
   DisAssembleVector(groupset, phi_new, phi_new_local.data());
@@ -160,10 +175,13 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   VecDestroy(&phi_new);
   VecDestroy(&phi_old);
   VecDestroy(&q_fixed);
+  VecDestroy(&data_context.x_temp);
+  MatDestroy(&A);
 
 
 
   double sweep_time = sweepScheduler.GetAverageSweepTime();
+  double chunk_overhead_ratio = 1.0-sweepScheduler.GetAngleSetTimings()[2];
   double source_time=
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
@@ -180,12 +198,21 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
     << "        Average sweep time (s):        "
     << sweep_time;
   chi_log.Log(LOG_0)
+    << "        Chunk-Overhead-Ratio  :        "
+    << chunk_overhead_ratio;
+  chi_log.Log(LOG_0)
     << "        Sweep Time/Unknown (ns):       "
     << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
   chi_log.Log(LOG_0)
     << "        Number of unknowns per sweep:  " << num_unknowns;
   chi_log.Log(LOG_0)
     << "\n\n";
+
+  std::string sweep_log_file_name =
+    std::string("GS_") + std::to_string(group_set_num) +
+    std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+    std::string(".log");
+  groupset->PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
 }
 
 

@@ -60,9 +60,6 @@ chiVolumeMesherSetProperty(MESH_GLOBAL,false);
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
-chiRegionExportMeshToPython(region1,
-        "YMesh"..string.format("%d",chi_location_id)..".py",false)
-
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
@@ -111,7 +108,7 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 4)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,1, 8)
 pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,16, 16)
 
 --========== Groupset def
@@ -119,8 +116,8 @@ gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
 chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
---chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,3)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,8)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,31)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,200)

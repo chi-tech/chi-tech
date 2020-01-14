@@ -7,45 +7,116 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include <ChiMesh/Cell/cell.h>
 
-typedef int                      TVertexFace;
-typedef int*                     TEdgeFace;
-typedef chi_mesh::PolyFace       TPolyFace;
-
 //face_slot index, vertex ids
 typedef std::pair<int,std::vector<int>>             CompactFaceView;
 
 //cell_global_id, faces
 typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;
 
+namespace chi_mesh::sweep_management
+{
+  class FLUDS
+  {
+  public:
+    std::vector<size_t> local_psi_stride;               //face category face size
+    std::vector<size_t> local_psi_max_elements;         //number of face in each cat
+    size_t              delayed_local_psi_stride;       //face category face size
+    size_t              delayed_local_psi_max_elements; //number of face in each cat
+    size_t              num_face_categories;
+
+  public:
+    // This is a small vector [deplocI] that holds the number of
+    // face dofs for each dependent location.
+    std::vector<int>    deplocI_face_dof_count;
+
+    // Very small vector listing the boundaries this location depends on
+    std::vector<int> boundary_dependencies;
+
+  public:
+    // This is a small vector [prelocI] that holds the number of
+    // face dofs for each predecessor location.
+    std::vector<int>    prelocI_face_dof_count;
+
+    std::vector<int>    delayed_prelocI_face_dof_count;
+
+
+  public:
+    virtual ~FLUDS() {};
+    virtual
+    void SetReferencePsi(
+      std::vector<std::vector<double>>*  local_psi,
+       std::vector<double>*               delayed_local_psi,
+       std::vector<double>*               delayed_local_psi_old,
+       std::vector<std::vector<double>>*  deplocI_outgoing_psi,
+       std::vector<std::vector<double>>*  prelocI_outgoing_psi,
+       std::vector<std::vector<double>>*  boundryI_incoming_psi,
+       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi,
+       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi_old)=0;
+
+    virtual
+    double*  OutgoingPsi(int cell_so_index, int outb_face_counter,
+                         int face_dof, int n) = 0;
+    virtual
+    double*  UpwindPsi(int cell_so_index, int inc_face_counter,
+                       int face_dof,int g, int n) = 0;
+
+    virtual
+    double*  NLOutgoingPsi(int outb_face_count,int face_dof, int n) = 0;
+
+    virtual
+    double*  NLUpwindPsi(int nonl_inc_face_counter,
+                         int face_dof,int g, int n) = 0;
+  };
+}
+
 //###################################################################
 /**Improved Flux Data Structure (FLUDS).*/
-class chi_mesh::sweep_management::FLUDS
+class chi_mesh::sweep_management::PRIMARY_FLUDS :
+  public chi_mesh::sweep_management::FLUDS
 {
-public:
-  std::vector<size_t> local_psi_stride;
-  std::vector<size_t> local_psi_max_elements;
-  size_t              delayed_local_psi_stride;
-  size_t              delayed_local_psi_max_elements;
-  size_t              num_face_categories;
+  /**\relates chi_mesh::sweep_management::AUX_FLUDS*/
+  friend chi_mesh::sweep_management::AUX_FLUDS;
+
+  //Inherited from base FLUDS
+//public:
+//  std::vector<size_t> local_psi_stride;               //face category face size
+//  std::vector<size_t> local_psi_max_elements;         //number of face in each cat
+//  size_t              delayed_local_psi_stride;       //face category face size
+//  size_t              delayed_local_psi_max_elements; //number of face in each cat
+//  size_t              num_face_categories;
 
 
 private:
   int largest_face;
   int G;
+
+  //local_psi_Gn_block_stride[fc]. Given face category fc, the value is
+  //total number of faces that store information in this categorie's buffer
   std::vector<size_t> local_psi_Gn_block_stride;
   std::vector<size_t> local_psi_Gn_block_strideG;
   size_t delayed_local_psi_Gn_block_stride;
   size_t delayed_local_psi_Gn_block_strideG;
 
   //======================================== References to psi vectors
+  //ref_local_psi[fc]. Each category fc has its own
+  //  local psi interface vector storing all aggregated angles and groups.
+  //ref_delayed_local_psi. All delayed information is in this vector.
+  //ref_deplocI_outgoing_psi[deplocI]. Each dependent location I has
+  //  its own interface vector
+  //ref_prelocI_outgoing_psi[prelocI]. Each predecessor location I has
+  //  its own interface vector
+  //ref_delayed_prelocI_outgoing_psi[prelocI]. Each delayed predecessor
+  //  location I has its own interface vector
   std::vector<std::vector<double>>*  ref_local_psi;
   std::vector<double>*               ref_delayed_local_psi;
+  std::vector<double>*               ref_delayed_local_psi_old;
   std::vector<std::vector<double>>*  ref_deplocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_prelocI_outgoing_psi;
   std::vector<std::vector<double>>*  ref_boundryI_incoming_psi;
 
   std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi;
-
+  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi_old;
+private:
   //======================================== Alpha elements
 
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
@@ -73,13 +144,14 @@ private:
   std::vector<std::vector<int>>
     so_cell_inco_face_face_category;
 
-public:
-  // This is a small vector [deplocI] that holds the number of
-  // face dofs for each dependent location.
-  std::vector<int>    deplocI_face_dof_count;
-
-  // Very small vector listing the boundaries this location depends on
-  std::vector<int> boundary_dependencies;
+  //Inherited from base FLUDS
+//public:
+//  // This is a small vector [deplocI] that holds the number of
+//  // face dofs for each dependent location.
+//  std::vector<int>    deplocI_face_dof_count;
+//
+//  // Very small vector listing the boundaries this location depends on
+//  std::vector<int> boundary_dependencies;
 
 private:
   // This is a vector [non_local_outgoing_face_count]
@@ -87,6 +159,7 @@ private:
   std::vector<std::pair<int,int>>
     nonlocal_outb_face_deplocI_slot;
 
+private:
   // This is a vector [dependent_location][unordered_cell_index]
   // that holds an AlphaPair. AlphaPair-first is the cell's global_id
   // and AlphaPair-second holds a number of BetaPairs. Each BetaPair
@@ -97,12 +170,13 @@ private:
     deplocI_cell_views;
 
   //======================================== Beta elements
-public:
-  // This is a small vector [prelocI] that holds the number of
-  // face dofs for each predecessor location.
-  std::vector<int>    prelocI_face_dof_count;
-
-  std::vector<int>    delayed_prelocI_face_dof_count;
+  //Inherited from base FLUDS
+//public:
+//  // This is a small vector [prelocI] that holds the number of
+//  // face dofs for each predecessor location.
+//  std::vector<int>    prelocI_face_dof_count;
+//
+//  std::vector<int>    delayed_prelocI_face_dof_count;
 
 private:
   // This is a vector [predecessor_location][unordered_cell_index]
@@ -117,6 +191,7 @@ private:
   std::vector<std::vector<CompactCellView>>
       delayed_prelocI_cell_views;
 
+private:
   // This is a vector [nonlocal_inc_face_counter] containing
   // AlphaPairs. AlphaPair-first is the prelocI index and
   // AlphaPair-second is a BetaPair. The BetaPair-first is the slot where
@@ -128,67 +203,54 @@ private:
       delayed_nonlocal_inc_face_prelocI_slot_dof;
 
 public:
-  FLUDS(int in_G) : G(in_G)
+  PRIMARY_FLUDS(int in_G): G(in_G)
   { }
 
-
-  void SetReferencePsi(std::vector<std::vector<double>>*  local_psi,
-                       std::vector<double>*               delayed_local_psi,
-                       std::vector<std::vector<double>>*  deplocI_outgoing_psi,
-                       std::vector<std::vector<double>>*  prelocI_outgoing_psi,
-                       std::vector<std::vector<double>>*  boundryI_incoming_psi,
-                       std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi)
+public:
+  /**Passes pointers from sweep buffers to FLUDS so
+   * that chunk utilities function as required. */
+  void SetReferencePsi(
+    std::vector<std::vector<double>>*  local_psi,
+    std::vector<double>*               delayed_local_psi,
+    std::vector<double>*               delayed_local_psi_old,
+    std::vector<std::vector<double>>*  deplocI_outgoing_psi,
+    std::vector<std::vector<double>>*  prelocI_outgoing_psi,
+    std::vector<std::vector<double>>*  boundryI_incoming_psi,
+    std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi,
+    std::vector<std::vector<double>>*  delayed_prelocI_outgoing_psi_old)
+    override
   {
     ref_local_psi = local_psi;
     ref_delayed_local_psi = delayed_local_psi;
+    ref_delayed_local_psi_old = delayed_local_psi_old;
     ref_deplocI_outgoing_psi = deplocI_outgoing_psi;
     ref_prelocI_outgoing_psi = prelocI_outgoing_psi;
     ref_boundryI_incoming_psi = boundryI_incoming_psi;
     ref_delayed_prelocI_outgoing_psi = delayed_prelocI_outgoing_psi;
+    ref_delayed_prelocI_outgoing_psi_old = delayed_prelocI_outgoing_psi_old;
   }
 
 public:
-  //01
+  //alphapass.cc
   void InitializeAlphaElements(chi_mesh::sweep_management::SPDS *spds);
 
-  //01d
+  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
+                            int face_slot, chi_mesh::CellFace& face);
+
+  //alphapass_slotdynamics.cc
   void SlotDynamics(chi_mesh::Cell *cell,
                     chi_mesh::sweep_management::SPDS* spds,
                     std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                     std::vector<std::pair<int,short>>& delayed_lock_box,
                     std::set<int>& location_boundary_dependency_set);
+  //alphapass_inc_mapping.cc
   void LocalIncidentMapping(chi_mesh::Cell *cell,
                             chi_mesh::sweep_management::SPDS* spds,
                             std::vector<int>&  local_so_cell_mapping);
 
-  //02
+  //betapass.cc
   void InitializeBetaElements(chi_mesh::sweep_management::SPDS *spds,
                               int tag_index=0);
-  //02d
-  void NonLocalIncidentMapping(chi_mesh::Cell *cell,
-                               chi_mesh::sweep_management::SPDS* spds);
-
-  //chi_FLUDS.cc
-  double*  OutgoingPsi(int cell_so_index, int outb_face_counter,
-                       int face_dof, int n);
-  double*  UpwindPsi(int cell_so_index, int inc_face_counter,
-                     int face_dof,int g, int n);
-
-
-  double*  NLOutgoingPsi(int outb_face_count,int face_dof, int n);
-
-  double*  NLUpwindPsi(int nonl_inc_face_counter,
-                       int face_dof,int g, int n);
-
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, TVertexFace face_v_index);
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, TEdgeFace edge_v_indices);
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, TPolyFace* poly_face);
-  void AddFaceViewToDepLocI(int deplocI, int cell_g_index,
-                            int face_slot, chi_mesh::CellFace& face);
-
 
   void SerializeCellInfo(std::vector<CompactCellView>* cell_views,
                          std::vector<int>& face_indices,
@@ -196,6 +258,22 @@ public:
   void DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
                            std::vector<int>* face_indices,
                            int& num_face_dofs);
+
+  //betapass_nonlocal_inc_mapping.cc
+  void NonLocalIncidentMapping(chi_mesh::Cell *cell,
+                               chi_mesh::sweep_management::SPDS* spds);
+
+  //FLUDS_chunk_utilities.cc
+  double*  OutgoingPsi(int cell_so_index, int outb_face_counter,
+                       int face_dof, int n) override;
+  double*  UpwindPsi(int cell_so_index, int inc_face_counter,
+                     int face_dof,int g, int n) override;
+
+
+  double*  NLOutgoingPsi(int outb_face_count,int face_dof, int n) override;
+
+  double*  NLUpwindPsi(int nonl_inc_face_counter,
+                       int face_dof,int g, int n) override;
 
 };
 

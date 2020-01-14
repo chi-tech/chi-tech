@@ -12,4 +12,5 @@ struct KSPDataContext
   KSP              krylov_solver;
   Vec              x_temp;
   chi_mesh::sweep_management::SweepScheduler* sweepScheduler;
+  int last_iteration = -1;
 };

@@ -15,11 +15,26 @@ void LinearBoltzman::Solver::ConvergeCycles(
   MainSweepScheduler& sweepScheduler,
   SweepChunk* sweep_chunk,
   LBSGroupset *groupset,
+  bool convergence_opp_refl_bndries,
+  bool apply_latest_convergence_metric,
   double cyclic_tolerance,
   size_t cyclic_max_iter)
 {
+  auto REFLECTING_BNDRY = chi_mesh::sweep_management::BoundaryType::REFLECTING;
+  typedef chi_mesh::sweep_management::BoundaryReflecting TBndryReflecting;
+
+  double convergence_metric = cyclic_tolerance;
+  if (apply_latest_convergence_metric)
+    convergence_metric =
+      std::max(cyclic_tolerance,0.8*groupset->latest_convergence_metric);
+
   double max_pw_change = groupset->angle_agg->GetDelayedPsiNorm();
-  if (max_pw_change<std::max(cyclic_tolerance,0.8*groupset->latest_convergence_metric))
+  if (convergence_opp_refl_bndries)
+    for (auto bndry : sweep_boundaries)
+      if (bndry->Type() == REFLECTING_BNDRY)
+        max_pw_change += ((TBndryReflecting*)bndry)->pw_change;
+
+  if (max_pw_change<convergence_metric)
     return;
 
   std::vector<double> temp_phi_old(phi_old_local.size(),0.0);
@@ -31,12 +46,22 @@ void LinearBoltzman::Solver::ConvergeCycles(
   {
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
-//    max_pw_change = groupset->angle_agg->GetDelayedPsiNorm();
+
     max_pw_change = ComputePiecewiseChange(groupset)*
                     groupset->angle_agg->GetDelayedPsiNorm();
+
+    if (convergence_opp_refl_bndries)
+      for (auto bndry : sweep_boundaries)
+        if (bndry->Type() == REFLECTING_BNDRY)
+          max_pw_change += ((TBndryReflecting*)bndry)->pw_change;
+
     DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(), phi_old_local.data());
 
-    if (max_pw_change<std::max(cyclic_tolerance,0.8*groupset->latest_convergence_metric))
+    if (apply_latest_convergence_metric)
+      convergence_metric =
+        std::max(cyclic_tolerance,0.8*groupset->latest_convergence_metric);
+
+    if (max_pw_change<convergence_metric)
       cycles_converged = true;
 
     std::stringstream iter_info;
@@ -55,4 +80,6 @@ void LinearBoltzman::Solver::ConvergeCycles(
   }
 
   DisAssembleVectorLocalToLocal(groupset,temp_phi_old.data(), phi_old_local.data());
+
+  groupset->angle_agg->ResetReflectingBCs();
 }

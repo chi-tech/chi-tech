@@ -19,11 +19,11 @@ void chi_physics::TransportCrossSections::
   for (int g=0; g<G; g++)
   {
     S[g][g] = 1.0;
-    int num_transfer = transfer_matrix[0].inds_rowI[g].size();
+    int num_transfer = transfer_matrix[0].rowI_indices[g].size();
     for (int j=0; j<num_transfer; j++)
     {
-      int gprime   = transfer_matrix[0].inds_rowI[g][j];
-      S[g][gprime] = transfer_matrix[0].rowI_colJ[g][j];
+      int gprime   = transfer_matrix[0].rowI_indices[g][j];
+      S[g][gprime] = transfer_matrix[0].rowI_values[g][j];
     }//for j
   }//for g
 
@@ -85,13 +85,13 @@ void chi_physics::TransportCrossSections::
   //============================================= Perform power iteration
   double rho = chi_math::PowerIteration(C, E, 1000, 1.0e-12);
 
-  ref_xi.resize(G);
+  ref_xi.resize(G,0.0);
   double sum = 0.0;
   for (int g=0; g<G; g++)
-    sum += E[g];
+    sum += std::fabs(E[g]);
 
   for (int g=0; g<G; g++)
-    ref_xi[g] = E[g]/sum;
+    ref_xi[g] = std::fabs(E[g])/sum;
 
 
   //======================================== Compute two-grid diffusion quantities

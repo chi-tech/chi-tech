@@ -4,6 +4,7 @@
 #include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
+
 namespace chi_mesh::sweep_management
 {
   enum class SchedulingAlgorithm {
@@ -24,7 +25,7 @@ private:
   SchedulingAlgorithm       scheduler_type;
   AngleAggregation*         angle_agg;
   SweepChunk*               sweep_chunk;
-  const size_t              sweep_event_tag;
+
 
   struct RULE_VALUES
   {
@@ -46,13 +47,16 @@ private:
     }
   };
   std::vector<RULE_VALUES> rule_values;
-
+public:
+  const size_t sweep_event_tag;
+  const std::vector<size_t> sweep_timing_events_tag;
 public:
   SweepScheduler(SchedulingAlgorithm in_scheduler_type,
                  AngleAggregation* in_angle_agg);
 
   void Sweep(SweepChunk* in_sweep_chunk=NULL);
   double GetAverageSweepTime();
+  std::vector<double> GetAngleSetTimings();
 
 private:
   void ScheduleAlgoFIFO();

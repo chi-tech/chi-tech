@@ -20,7 +20,8 @@ public:
 
   //###################################################################
   AngleSetStatus AngleSetGroupAdvance(SweepChunk *sweep_chunk,
-                                      int anglesetgroup_number)
+                                      int anglesetgroup_number,
+                                      const std::vector<size_t>& timing_tags)
   {
     //====================================== Return finished if angle sets
     //                                       depleted
@@ -28,9 +29,13 @@ public:
       return AngleSetStatus::FINISHED;
 
     //====================================== Execute current angleset
-    AngleSetStatus completion_status = angle_sets[current_angle_set]->
-      AngleSetAdvance(sweep_chunk, current_angle_set +
-      anglesetgroup_number * angle_sets.size());
+    int angset_number = current_angle_set +
+                        anglesetgroup_number * angle_sets.size();
+    auto completion_status = angle_sets[current_angle_set]->
+      AngleSetAdvance(sweep_chunk,
+                      angset_number,
+                      timing_tags,
+                      ExecutionPermission::EXECUTE);
 
     //====================================== Check if angle set finished
     if (completion_status ==  AngleSetStatus::FINISHED)

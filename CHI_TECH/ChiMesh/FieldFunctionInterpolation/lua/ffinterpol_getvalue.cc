@@ -12,7 +12,8 @@ extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
 
 //#############################################################################
-/** Gets the value(s) associated with an interpolation.
+/** Gets the value(s) associated with an interpolation provided the
+ * interpolation type has an associated value.
  *
 \param FFIHandle int Handle to the field function interpolation.
 
@@ -25,10 +26,12 @@ int chiFFInterpolationGetValue(lua_State *L)
 {
   double value = 0.0;
 
-  int numArgs = lua_gettop(L);
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError("chiFFInterpolationGetValue",1,num_args);
 
   //================================================== Get handle to field function
+  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
   int ffihandle = lua_tonumber(L,1);
   chi_mesh::FieldFunctionInterpolation* cur_ffi;
   try {
@@ -37,26 +40,21 @@ int chiFFInterpolationGetValue(lua_State *L)
   catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-      << "Invalid ffi handle in chiFFInterpolationSetProperty.";
+      << "Invalid ffi handle in chiFFInterpolationGetValue.";
     exit(EXIT_FAILURE);
   }
 
   if (typeid(*cur_ffi) != typeid(chi_mesh::FieldFunctionInterpolationVolume))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi_log.Log(LOG_0WARNING)
       << "chiFFInterpolationGetValue is currently only supported for "
       << " VOLUME interpolator types.";
-    exit(EXIT_FAILURE);
   }
-
-  chi_mesh::FieldFunctionInterpolationVolume* cur_ffi_volume =
-    (chi_mesh::FieldFunctionInterpolationVolume*)cur_ffi;
-
-  value = cur_ffi_volume->op_value;
-
-//  double glob_value = 0.0;
-//
-//  MPI_Allreduce(&value,&glob_value,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+  else
+  {
+    auto cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume*)cur_ffi;
+    value = cur_ffi_volume->op_value;
+  }
 
   lua_pushnumber(L,value);
   return 1;

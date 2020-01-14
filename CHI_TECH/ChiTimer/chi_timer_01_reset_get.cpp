@@ -1,6 +1,7 @@
 #include"chi_timer.h"
 
 #include <cmath>
+#include <ctime>
 
 //################################################################### Reset
 /** Resets the timer to zero.*/
@@ -23,9 +24,7 @@ double ChiTimer::GetTime()
 }
 
 //################################################################### Get string
-/**Obtains a stringstream in the format of hh:mm::ss.
- *
- * \param time_milli Time in milliseconds.
+/**Obtains a string in the format of hh:mm::ss.
  *
  * */
 std::string ChiTimer::GetTimeString()
@@ -41,4 +40,19 @@ std::string ChiTimer::GetTimeString()
   return std::string(buff);
 }
 
+//################################################################### Get date
+/**Obtains a string in the format YYYY-MM-DD hh:mm:ss
+ *
+ * */
+std::string ChiTimer::GetLocalDateTimeString()
+{
+  using namespace std::chrono;
+  std::time_t now = system_clock::to_time_t(system_clock::now());
+
+  char s[30];
+  int end = std::strftime(s, 30, "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+  s[29] = '\0';
+  if (end < 30)  s[end]='\0';
+  return s;
+}
 

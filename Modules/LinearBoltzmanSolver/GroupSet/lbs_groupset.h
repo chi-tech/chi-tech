@@ -66,6 +66,8 @@ public:
   chi_physics::Solver*                         tgdsa_solver;
   std::vector<int>                             wgdsa_cell_dof_array_address;
 
+  bool                                         log_sweep_events;
+
   double                                       latest_convergence_metric;
 
   //npt_groupset.cc
@@ -73,8 +75,8 @@ public:
   void BuildDiscMomOperator(int scatt_order);
   void BuildMomDiscOperator(int scatt_order);
   void BuildSubsets();
-
-
+public:
+  void PrintSweepInfoFile(size_t ev_tag,std::string file_name);
 };
 
 #endif

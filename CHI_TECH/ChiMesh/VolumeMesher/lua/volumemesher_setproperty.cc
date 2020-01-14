@@ -32,7 +32,12 @@ extern ChiLog chi_log;
  MATID_FROMLOGICAL = <B>LogicalVolumeHandle:[int],Mat_id:[int],
                      Sense:[bool](Optional, default:true)</B> Sets the material
                      id of cells that meet the sense requirement for the given
-                     logical volume.
+                     logical volume.\n
+ BNDRYID_FROMLOGICAL = <B>LogicalVolumeHandle:[int],Bndry_id:[int],
+                     Sense:[bool](Optional, default:true)</B> Sets the cell
+                     boundary id to the specified value for cells
+                     that meet the sense requirement for the given
+                     logical volume.\n
 
 
 \ingroup LuaVolumeMesher
@@ -53,13 +58,13 @@ int chiVolumeMesherSetProperty(lua_State *L)
     cur_hndlr->volume_mesher->options.force_polygons = force_condition;
   }
 
-  if (property_index == 2) //MESH_GLOBAL
+  else if (property_index == 2) //MESH_GLOBAL
   {
     bool mesh_global = lua_toboolean(L,2);
     cur_hndlr->volume_mesher->options.mesh_global = mesh_global;
   }
 
-  if (property_index == 3) //PARTITION_Z
+  else if (property_index == 3) //PARTITION_Z
   {
     int pz = lua_tonumber(L,2);
     cur_hndlr->volume_mesher->options.partition_z = pz;
@@ -68,12 +73,11 @@ int chiVolumeMesherSetProperty(lua_State *L)
   }
 
 
-  if (property_index == 10) //EXTRUSION_LAYER
+  else if (property_index == 10) //EXTRUSION_LAYER
   {
     if (typeid(*cur_hndlr->volume_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
     {
-      chi_mesh::VolumeMesherExtruder* mesher =
-        (chi_mesh::VolumeMesherExtruder*)cur_hndlr->volume_mesher;
+      auto mesher = (chi_mesh::VolumeMesherExtruder*)cur_hndlr->volume_mesher;
 
       double layer_height = lua_tonumber(L,2);
       int    subdivisions = 1;
@@ -82,7 +86,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         subdivisions = lua_tonumber(L,3);
       }
-      MeshLayer* new_layer = new MeshLayer;
+      auto new_layer = new MeshLayer;
       new_layer->height = layer_height;
       new_layer->sub_divisions = subdivisions;
 
@@ -100,11 +104,11 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
   }
 
-  if (property_index == 11) //MATID_FROMLOGICAL
+  else if (property_index == 11) //MATID_FROMLOGICAL
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi_log.Log(LOG_0ERROR) << "Invalid amount of arguments used for "
+      chi_log.Log(LOG_ALLERROR) << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "MATID_FROMLOGICAL...";
       exit(EXIT_FAILURE);
@@ -116,7 +120,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
     if (volume_hndl >= cur_hndlr->logicvolume_stack.size())
     {
-      chi_log.Log(LOG_0ERROR) << "Invalid logical volume specified in "
+      chi_log.Log(LOG_ALLERROR) << "Invalid logical volume specified in "
                                  "chiVolumeMesherSetProperty("
                                  "MATID_FROMLOGICAL...";
       exit(EXIT_FAILURE);
@@ -125,6 +129,39 @@ int chiVolumeMesherSetProperty(lua_State *L)
     chi_mesh::LogicalVolume* volume_ptr =
       cur_hndlr->logicvolume_stack[volume_hndl];
     cur_hndlr->volume_mesher->SetMatIDFromLogical(volume_ptr,sense,mat_id);
+  }
+
+  else if (property_index == 12) //BNDRYID_FROMLOGICAL
+  {
+    if (!((num_args == 3) || (num_args == 4)))
+    {
+      chi_log.Log(LOG_ALLERROR) << "Invalid amount of arguments used for "
+                                 "chiVolumeMesherSetProperty("
+                                 "BNDRYID_FROMLOGICAL...";
+      exit(EXIT_FAILURE);
+    }
+    int volume_hndl = lua_tonumber(L,2);
+    int bndry_id = lua_tonumber(L,3);
+    int sense = true;
+    if (num_args==4) sense = lua_toboolean(L,4);
+
+    if (volume_hndl >= cur_hndlr->logicvolume_stack.size())
+    {
+      chi_log.Log(LOG_ALLERROR) << "Invalid logical volume specified in "
+                                 "chiVolumeMesherSetProperty("
+                                 "BNDRYID_FROMLOGICAL...";
+      exit(EXIT_FAILURE);
+    }
+
+    chi_mesh::LogicalVolume* volume_ptr =
+      cur_hndlr->logicvolume_stack[volume_hndl];
+    cur_hndlr->volume_mesher->SetBndryIDFromLogical(volume_ptr,sense,bndry_id);
+  }
+  else
+  {
+    chi_log.Log(LOG_ALLERROR) << "Invalid property specified in call to "
+                               "chiVolumeMesherSetProperty().";
+    exit(EXIT_FAILURE);
   }
 
   return 0;

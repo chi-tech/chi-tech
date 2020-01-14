@@ -21,12 +21,12 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     {
       for (int gp=0; gp<G; gp++)
       {
-        int num_cols = transfer_matrix[1].inds_rowI[gp].size();
+        int num_cols = transfer_matrix[1].rowI_indices[gp].size();
         for (int j=0; j<num_cols; j++)
         {
-          if (transfer_matrix[1].inds_rowI[gp][j] == g)
+          if (transfer_matrix[1].rowI_indices[gp][j] == g)
           {
-            sigs_g_1 += transfer_matrix[1].rowI_colJ[gp][j];
+            sigs_g_1 += transfer_matrix[1].rowI_values[gp][j];
             break;
           }
         }//for j
@@ -38,25 +38,27 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     {
       sigs_g_1 = 0.0;
       chi_log.Log(LOG_0WARNING)
-        << "Transport corrected diffusion coefficient failed in call to "
-        << "chi_physics::TransportCrossSections::ComputeDiffusionParameters.";
+        << "Transport corrected diffusion coefficient failed for group "
+        << g << " in call to "
+        << "chi_physics::TransportCrossSections::ComputeDiffusionParameters."
+        << " sigma_t=" << sigma_tg[g] << " sigs_g_(m=1)=" << sigs_g_1;
     }
     diffg[g] = (fmin(1.0e12,1.0/3.0/(sigma_tg[g]-sigs_g_1)));
     //diffg[g] = 1.0/3.0/(sigma_tg[g]-sigs_g_1);
 
     //====================================== Determine in group scattering
-    int num_cols = transfer_matrix[0].inds_rowI[g].size();
+    int num_cols = transfer_matrix[0].rowI_indices[g].size();
     for (int j=0; j<num_cols; j++)
     {
-      if (transfer_matrix[0].inds_rowI[g][j] == g)
+      if (transfer_matrix[0].rowI_indices[g][j] == g)
       {
-        sigma_s_gtog[g] = transfer_matrix[0].rowI_colJ[g][j];
+        sigma_s_gtog[g] = transfer_matrix[0].rowI_values[g][j];
         break;
       }
     }
 
     //====================================== Determine removal cross-section
-    sigma_rg[g] = sigma_tg[g] - sigma_s_gtog[g];
+    sigma_rg[g] = std::max(0.0,sigma_tg[g] - sigma_s_gtog[g]);
 
 
 
@@ -69,16 +71,18 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 
     for (int g2=0; g2<G; g2++)
     {
-      int num_cols = transfer_matrix[0].inds_rowI[g2].size();
+      int num_cols = transfer_matrix[0].rowI_indices[g2].size();
       for (int j=0; j<num_cols; j++)
       {
-        if (transfer_matrix[0].inds_rowI[g2][j] == g)
+        if (transfer_matrix[0].rowI_indices[g2][j] == g)
         {
-          sigma_ag[g] -= transfer_matrix[0].rowI_colJ[g2][j];
+          sigma_ag[g] -= transfer_matrix[0].rowI_values[g2][j];
           break;
         }
       }//for j
     }//for gp
+
+    sigma_ag[g] = std::max(0.0,sigma_ag[g]);
   }
 
 

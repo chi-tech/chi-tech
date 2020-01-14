@@ -40,8 +40,8 @@ chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 materials = {}
 materials[0] = chiPhysicsAddMaterial("Test Material");
 
-chiPhysicsMaterialAddProperty(materials[0],THERMAL_CONDUCTIVITY)
-chiPhysicsMaterialSetProperty(materials[0],THERMAL_CONDUCTIVITY,SINGLE_VALUE,1.0)
+chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
+chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
 
 

@@ -9,10 +9,15 @@ extern ChiLog chi_log;
 chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
     SchedulingAlgorithm in_scheduler_type,
     chi_mesh::sweep_management::AngleAggregation *in_angle_agg) :
-  sweep_event_tag(chi_log.GetRepeatingEventTag(std::string("Sweep Timing")))
+  sweep_event_tag(chi_log.GetRepeatingEventTag("Sweep Timing")),
+  sweep_timing_events_tag({
+    chi_log.GetRepeatingEventTag("Sweep Chunk Only Timing")
+  })
 {
   scheduler_type = in_scheduler_type;
   angle_agg      = in_angle_agg;
+
+  angle_agg->InitializeReflectingBCs();
 
   if (scheduler_type == SchedulingAlgorithm::DEPTH_OF_GRAPH)
     InitializeAlgoDOG();

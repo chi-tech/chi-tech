@@ -10,10 +10,11 @@ namespace chi_mesh
 {
 namespace sweep_management
 {
-  struct STDG;   ///< Global Sweep Plane Ordering
-  struct SPLS;   ///< Sweep Plane Local Subgrid
-  class  FLUDS;  ///< Flux Data Structure
-  struct SPDS;   ///< Sweep Plane Data Structure
+  struct STDG;           ///< Global Sweep Plane Ordering
+  struct SPLS;           ///< Sweep Plane Local Subgrid
+  class  PRIMARY_FLUDS;  ///< Primary Flux Data Structure
+  class  AUX_FLUDS;      ///< Auxiliary Flux Data Structure
+  struct SPDS;           ///< Sweep Plane Data Structure
 
   class  SweepBuffer;
   class AngleSet;

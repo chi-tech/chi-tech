@@ -43,7 +43,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
 
       if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+        auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
         for (int f=0; f<polyh_cell->faces.size(); f++)
         {
@@ -158,7 +158,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
 
         if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
           if (polyh_cell->material_id != mat) continue;
 

@@ -69,7 +69,7 @@ private:
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonFEView(chi_mesh::CellPolygonV2* poly_cell,
+  PolygonFEView(chi_mesh::CellPolygon* poly_cell,
                 chi_mesh::MeshContinuum* vol_continuum,
                 SpatialDiscretization_PWL *discretization);
 
@@ -79,6 +79,9 @@ public:
 
   void ShapeValues(const chi_mesh::Vector& xyz,
                    std::vector<double>& shape_values) override;
+
+  void GradShapeValues(const chi_mesh::Vector& xyz,
+                       std::vector<chi_mesh::Vector>& gradshape_values) override;
 
 
   //############################################### Precomputation cell matrices
@@ -113,6 +116,8 @@ private:
   {
     return sides[side]->qp_data[i]->gradshapey_qp[qp];
   }
+
+
 
 public:
   void PreCompute();

@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import importlib
+import os
 
-execfile('../../ZLFFI00.py')
+script_dir = os.path.dirname(os.path.realpath(__file__))
+# execfile('../../ZLFFI00.py')
+exec(open(script_dir + '/../../ZLFFI00.py').read())
 
 snavg = np.array([
 0.504805,
@@ -26,14 +29,11 @@ snavg = np.array([
 0.00189601,
 0.0013091])
 
-
-
-
 dz=20
 data_avg1 = np.zeros((2,dz))
 data_avg2 = np.zeros((2,dz))
 err_avg12 = np.zeros((2,dz))
-di = 500/dz
+di = int(500/dz)
 for i in range(0,dz):
     data_avg1[0,i] = np.average(data1[(i*di):((i+1)*di),3])
     data_avg1[1,i] = np.average(data1[(i*di):((i+1)*di),4])
@@ -68,4 +68,4 @@ plt.legend()
 plt.grid(which='major')
 plt.show()
 
-print(err_avg12[1,:])
+# print(err_avg12[1,:])

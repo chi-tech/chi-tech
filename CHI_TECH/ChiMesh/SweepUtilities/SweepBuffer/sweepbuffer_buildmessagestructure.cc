@@ -186,10 +186,12 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 
   angleset->fluds->SetReferencePsi(&angleset->local_psi,
                                    &angleset->delayed_local_psi,
+                                   &angleset->delayed_local_psi_old,
                                    &angleset->deplocI_outgoing_psi,
                                    &angleset->prelocI_outgoing_psi,
                                    &angleset->boundryI_incoming_psi,
-                                   &angleset->delayed_prelocI_outgoing_psi);
+                                   &angleset->delayed_prelocI_outgoing_psi,
+                                   &angleset->delayed_prelocI_outgoing_psi_old);
 
   //================================================== All reduce to get
   //                                                   maximum message count

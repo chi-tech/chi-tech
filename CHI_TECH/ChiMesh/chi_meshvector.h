@@ -95,7 +95,28 @@ struct chi_mesh::Vector
     return value;
   }
 
-  double Norm()
+  void Normalize()
+  {
+    double norm = this->Norm();
+
+    x /= norm;
+    y /= norm;
+    z /= norm;
+  }
+
+  Vector Normalized() const
+  {
+    double norm = this->Norm();
+
+    Vector newVector;
+    newVector.x = this->x/norm;
+    newVector.y = this->y/norm;
+    newVector.z = this->z/norm;
+
+    return newVector;
+  }
+
+  double Norm() const
   {
     double value = 0.0;
     value += this->x*this->x;

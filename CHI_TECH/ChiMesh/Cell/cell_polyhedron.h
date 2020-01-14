@@ -10,7 +10,7 @@ namespace chi_mesh
 
 //######################################################### Class def
 /** Polyhedron cell definition.*/
-class CellPolyhedronV2 : public Cell
+class CellPolyhedron : public Cell
 {
 private:
   std::vector<std::vector<std::vector<int>>> face_edges;
@@ -21,7 +21,7 @@ private:
   bool segment_normals_developed = false;
 
 public:
-  CellPolyhedronV2() : Cell(CellType::POLYHEDRON) {}
+  CellPolyhedron() : Cell(CellType::POLYHEDRON) {}
 
 private:
   void DevelopEdges()

@@ -28,6 +28,10 @@ extern ChiMath    chi_math_handler;
 
 #define SWEEP_EAGER_LIMIT 5
 
+#define READ_RESTART_DATA 6
+
+#define WRITE_RESTART_DATA 7
+
 #include <chi_log.h>
 
 extern ChiLog chi_log;
@@ -60,6 +64,29 @@ SWEEP_EAGER_LIMIT\n
  This expects to be followed by a size in bytes (Max 64,0000).Default 32,000.
  See note below.\n\n
 
+READ_RESTART_DATA\n
+ Indicates the reading of restart data from restart file.
+ The value can be followed by two
+ optional strings. The first is the folder name which can be relative or
+ absolute, and the second is the file base name. These are defaulted to
+ "YRestart" and "restart" respectively.\n\n
+
+\code
+chiLBSSetProperty(phys1,READ_RESTART_DATA,"YRestart1")
+\endcode
+
+WRITE_RESTART_DATA\n
+ Indicates the writing of restart data to restart files.
+ The value can be followed by two optional strings and a number
+ optional strings. The first string is the folder name which can be relative or
+ absolute, and the second string is the file base name. The number is the time
+ interval (in minutes) for a restart write to be triggered (apart from GMRES
+ restarts and the conclusion of groupset completions) .These are defaulted to
+ "YRestart", "restart" and 30 minutes respectively.\n\n
+
+\code
+chiLBSSetProperty(phys1,WRITE_RESTART_DATA,"YRestart1","restart",1)
+\endcode
 
 ###Discretization methods
  PWLD2D = Piecewise Linear Finite Element 2D.\n
@@ -92,7 +119,12 @@ Specifies a vaccuum boundary condition. It is not followed by any value.\n
 LBSBoundaryTypes.INCIDENT_ISOTROPIC\n
 Incident isotropic flux. This argument needs to be followed by a lua table
 index 1 to G where G is the amount of energy groups. Note internally this
-is mapped as 0 to G-1.
+is mapped as 0 to G-1.\n
+\n
+LBSBoundaryTypes.REFLECTING\n
+Reflecting boundary condition. Beware, when opposing reflecting boundary
+conditions are used this enduces a cyclic dependency which will increase the
+iteration convergence behavior.
 
 
 
@@ -194,7 +226,7 @@ int chiLBSSetProperty(lua_State *L)
     if (btype == (int)LinearBoltzman::BoundaryType::VACUUM)
     {
       solver->boundary_types[bid].first = LinearBoltzman::BoundaryType::VACUUM;
-      chi_log.Log(LOG_0) << "Boundary set to Vacuum.";
+      chi_log.Log(LOG_0) << "Boundary " << bid << " set to Vacuum.";
     }
     else if (btype == (int)LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
     {
@@ -256,6 +288,11 @@ int chiLBSSetProperty(lua_State *L)
         << "Isotropic boundary condition for boundary " << bid
         << " loaded with " << table_len << " groups.";
     }
+    else if (btype == (int)LinearBoltzman::BoundaryType::REFLECTING)
+    {
+      solver->boundary_types[bid].first = LinearBoltzman::BoundaryType::REFLECTING;
+      chi_log.Log(LOG_0) << "Boundary " << bid << " set to Reflecting.";
+    }
     else
     {
       chi_log.Log(LOG_ALLERROR)
@@ -291,6 +328,43 @@ int chiLBSSetProperty(lua_State *L)
     {
       solver->options.sweep_eager_limit = limit;
     }
+  }
+  else if (property == READ_RESTART_DATA)
+  {
+    if (numArgs >= 3)
+    {
+      const char* folder = lua_tostring(L,3);
+      solver->options.read_restart_folder_name = std::string(folder);
+      chi_log.Log(LOG_0) << "Restart input folder set to " << folder;
+    }
+    if (numArgs >= 4)
+    {
+      const char* filebase = lua_tostring(L,4);
+      solver->options.read_restart_file_base = std::string(filebase);
+      chi_log.Log(LOG_0) << "Restart input filebase set to " << filebase;
+    }
+    solver->options.read_restart_data = true;
+  }
+  else if (property == WRITE_RESTART_DATA)
+  {
+    if (numArgs >= 3)
+    {
+      const char* folder = lua_tostring(L,3);
+      solver->options.write_restart_folder_name = std::string(folder);
+      chi_log.Log(LOG_0) << "Restart output folder set to " << folder;
+    }
+    if (numArgs >= 4)
+    {
+      const char* filebase = lua_tostring(L,4);
+      solver->options.write_restart_file_base = std::string(filebase);
+      chi_log.Log(LOG_0) << "Restart output filebase set to " << filebase;
+    }
+    if (numArgs == 5)
+    {
+      double interval = lua_tonumber(L,5);
+      solver->options.write_restart_interval = interval;
+    }
+    solver->options.write_restart_data = true;
   }
   else
   {

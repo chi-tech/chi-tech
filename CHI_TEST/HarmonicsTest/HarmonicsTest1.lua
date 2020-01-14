@@ -1,4 +1,4 @@
-print("############### Test of orthogonality")
+HarmonicsTest1.luaprint("############### Test of orthogonality")
 
 N = 1000
 Nt = N

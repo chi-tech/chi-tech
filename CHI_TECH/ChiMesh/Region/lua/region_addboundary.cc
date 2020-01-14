@@ -19,6 +19,10 @@
 \author Jan*/
 int chiRegionAddSurfaceBoundary(lua_State *L)
 {
+  int num_args = lua_gettop(L);
+  if (num_args != 2)
+    LuaPostArgAmountError("chiRegionAddSurfaceBoundary",2,num_args);
+
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int region_index = lua_tonumber(L,1);
@@ -66,6 +70,10 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
 \author Jan*/
 int chiRegionAddLineBoundary(lua_State *L)
 {
+  int num_args = lua_gettop(L);
+  if (num_args != 2)
+    LuaPostArgAmountError("chiRegionAddLineBoundary",2,num_args);
+
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int region_index = lua_tonumber(L,1);
@@ -93,6 +101,44 @@ int chiRegionAddLineBoundary(lua_State *L)
 
   chi_mesh::Boundary* new_boundary = new chi_mesh::Boundary;
   new_boundary->initial_mesh_continuum.line_mesh = cur_linemesh;
+
+  cur_region->boundaries.push_back(new_boundary);
+
+  lua_pushnumber(L,cur_region->boundaries.size()-1);
+
+  return 1;
+}
+
+//#############################################################################
+/** Adds an unspecified boundary to the region
+
+\param RegionHandle int Handle to the region for which boundary is to be added.
+
+\return BoundaryNumber int. Number of the boundary added to the region.
+
+\ingroup LuaRegion
+\author Jan*/
+int chiRegionAddEmptyBoundary(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError("chiRegionAddEmptyBoundary",1,num_args);
+
+  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+
+  int region_index = lua_tonumber(L,1);
+
+  chi_mesh::Region* cur_region;
+  try{
+    cur_region = cur_hndlr->region_stack.at(region_index);
+  }
+  catch(const std::out_of_range& o)
+  {
+    std::cerr << "ERROR: Invalid index to region.\n";
+    exit(EXIT_FAILURE);
+  }
+
+  auto new_boundary = new chi_mesh::Boundary;
 
   cur_region->boundaries.push_back(new_boundary);
 

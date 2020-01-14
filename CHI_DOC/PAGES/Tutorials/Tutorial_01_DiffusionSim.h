@@ -303,42 +303,48 @@ ChiTech Tutorial01.lua
 The output produced will look as follows:
 
 \verbatim
-[0]  ChiTech batch mode with 1 processes.
-[0]  VolumeMesherExtruder executed
+[0]  2020-01-08 13:30:30 Running ChiTech in batch-mode with 1 processes.
+[0]  ChiTech number of arguments supplied: 1
+[0]  Surface mesh loaded with 0 triangle faces and 1024 polygon faces.
+[0]  00:00:00 VolumeMesherExtruder executed. Memory in use = 12.3516 MB
+[0]  VolumeMesherExtruder: Total number of cell layers is 3
 [0]  VolumeMesherExtruder: Extruding cells
 [0]  VolumeMesherExtruder: Cells extruded = 3072
 [0]  VolumeMesherExtruder: Number of cells in region = 3072
 [0]  VolumeMesherExtruder: Number of nodes in region = 4356
-[0]  chiVolumeMesherExecute: Volume meshing completed. Memory used = 5.82 MB
-[0]  Total process memory used after meshing 14.3 MB
+[0]  00:00:00 chiVolumeMesherExecute: Volume meshing completed. Memory used = 3.49 MB
+[0]  Total process memory used after meshing 15.8 MB
+[0]  00:00:00 Setting material id from logical volume.
+[0]  00:00:00 Done setting material id from logical volume. Number of cells modified = 3072.
 [0]  Exported Material Volume mesh to Tutorial01Mesh_m0.obj
-[0]  Initializing Diffusion solver PETSc
-[0]  Dirichlet boundary added (index 0).
-[0]  Reflecting boundary added (index 1).
-[0]  Reflecting boundary added (index 2).
+[0]
+[0]  00:00:00 Diffusion Solver: Initializing Diffusion solver PETSc
 [0]  Computing nodal reorderings for CFEM
-[0]  Time taken during nodal reordering 0.003423
+[0]  Time taken during nodal reordering 0.00318
 [0]  Determining nodal connections
-[0]  Time taken during nodal connection 0.008049
-[0]  Computing cell matrices
+[0]  Building sparsity pattern.
 [0]  Setting matrix preallocation.
-[0]  Solver initialization time 0.69799
+[0]  Computing cell matrices
+[0]  00:00:01 Diffusion Solver: Diffusion Solver initialization time 1.47667
 [0]  Diffusion Solver: Assembling A and b
 [0]  Diffusion Solver: Local matrix instructions
 [0]  Diffusion Solver: Communicating matrix assembly
 [0]  Diffusion Solver: Solving system
-[0]  Diffusion iteration    0 - Residual 9.1664344
-[0]  Diffusion iteration    1 - Residual 0.1777589
-[0]  Diffusion iteration    2 - Residual 9.589e-03
-[0]  Diffusion iteration    3 - Residual 4.001e-03
-[0]  Diffusion iteration    4 - Residual 7.263e-04
-[0]  Diffusion iteration    5 - Residual 7.460e-05
-[0]  Convergence reason: 3
-[0]  Diffusion Solver: Number of iterations =5
+[0]  Diffusion iteration    0 - Residual 34.8524639
+[0]  Diffusion iteration    1 - Residual 2.6205789
+[0]  Diffusion iteration    2 - Residual 0.2875545
+[0]  Diffusion iteration    3 - Residual 0.0372920
+[0]  Diffusion iteration    4 - Residual 3.783e-03
+[0]  Diffusion iteration    5 - Residual 3.774e-04
+[0]  Diffusion iteration    6 - Residual 4.446e-05
+[0]  Convergence reason: 2
+[0]  Diffusion Solver: Number of iterations =6
 [0]  Timing:
-[0]  Assembling the matrix: 0.012567
-[0]  Solving the system   : 0.052297
-Diffusion Solver execution completed!
+[0]  Assembling the matrix: 0.017682
+[0]  Solving the system   : 0.01209
+[0]  Diffusion Solver execution completed!
+[0]  Final program time 00:00:01
+[0]  2020-01-08 13:30:31 ChiTech finished execution of Tutorials/Tutorial01.lua
 \endverbatim
 
 

@@ -1,7 +1,6 @@
 #include "diffusion_solver.h"
 
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
-#include <ChiPhysics/PhysicsMaterial/property00_thermconductivity.h>
 #include <ChiPhysics/PhysicsMaterial/property01_scalarvalue.h>
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h>
@@ -57,8 +56,6 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
 
   //For now we can only support scalar values so lets check that
   if (dynamic_cast<chi_physics::ScalarValue*>
-      (material->properties[property_map_D]) ||
-      dynamic_cast<chi_physics::ThermalConductivity*>
       (material->properties[property_map_D]))
   {
     diffCoeff = material->properties[property_map_D]->GetScalarValue();
@@ -164,8 +161,6 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
 
     //For now we can only support scalar values so lets check that
     if (dynamic_cast<chi_physics::ScalarValue*>
-        (material->properties[property_map_D]) ||
-        dynamic_cast<chi_physics::ThermalConductivity*>
         (material->properties[property_map_D]))
     {
       diffCoeff.assign(cell_dofs,

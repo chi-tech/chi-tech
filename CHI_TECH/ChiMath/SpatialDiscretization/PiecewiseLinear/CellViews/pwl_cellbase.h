@@ -26,6 +26,8 @@ public:
     dofs=num_dofs;
   }
 
+  virtual ~CellFEView() {};
+
   /** Virtual function evaluation of the shape function. */
   virtual double ShapeValue(const int i, const chi_mesh::Vector& xyz)
   {
@@ -45,6 +47,13 @@ public:
                                           const chi_mesh::Vector& xyz)
   {
     return chi_mesh::Vector(0.0,0.0,0.0);
+  }
+
+  /** Virtual function evaluation of the grad-shape function. */
+  virtual void GradShapeValues(const chi_mesh::Vector& xyz,
+                               std::vector<chi_mesh::Vector>& gradshape_values)
+  {
+    gradshape_values.resize(dofs,chi_mesh::Vector());
   }
 
 };

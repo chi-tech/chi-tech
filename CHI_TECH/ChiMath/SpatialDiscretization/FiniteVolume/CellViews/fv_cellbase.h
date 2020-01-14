@@ -7,6 +7,8 @@ class CellFVView
 {
 public:
   int dofs;
+  double                volume;
+  std::vector<double>   face_area; ///< Actually length unity h
 
   CellFVView(int num_dofs)
   {

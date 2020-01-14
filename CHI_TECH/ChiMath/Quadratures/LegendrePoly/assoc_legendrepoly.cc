@@ -28,10 +28,6 @@ double chi_math::AssocLegendre(int ell, int m, double x)
   //===== ell=1, m=1
   double Pnpos = -sqrt(1.0 - x*x);
 
-//  //===== m=-1, ell=1
-//  double Pnneg = -0.5*Pnpos;
-
-
   if (ell==1)
   {
     if (m== 0) return Pn;

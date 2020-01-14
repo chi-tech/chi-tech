@@ -17,7 +17,8 @@
 extern ChiLog chi_log;
 extern ChiMPI chi_mpi;
 
-
+#include <ChiTimer/chi_timer.h>
+extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
@@ -34,7 +35,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
        vertex != surface_mesh->vertices.end();
        vertex++)
   {
-    chi_mesh::Node* node = new chi_mesh::Node;
+    auto node = new chi_mesh::Node;
     *node = (*vertex.base());
 
     vol_continuum->nodes.push_back(node);
@@ -46,7 +47,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
        face != surface_mesh->faces.end();
        face++)
   {
-    auto cell = new chi_mesh::CellPolygonV2;
+    auto cell = new chi_mesh::CellPolygon;
 
     for (int k=0;k<3;k++)
     {
@@ -91,7 +92,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
   {
     chi_mesh::PolyFace* face = surface_mesh->poly_faces[f];
 
-    auto cell = new chi_mesh::CellPolygonV2;
+    auto cell = new chi_mesh::CellPolygon;
 
     //====================================== Copy vertices
     for (int v=0; v<face->v_indices.size();v++)
@@ -418,6 +419,9 @@ void chi_mesh::VolumeMesher::
 void chi_mesh::VolumeMesher::
   SetMatIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int mat_id)
 {
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
 
@@ -425,15 +429,50 @@ void chi_mesh::VolumeMesher::
   chi_mesh::Region* cur_region = handler->region_stack.back();
   chi_mesh::MeshContinuum* vol_cont = cur_region->volume_mesh_continua.back();
 
-  int num_loc_cells = vol_cont->local_cell_glob_indices.size();
-  for (int c=0;c<num_loc_cells; c++)
+  int num_cells_modified = 0;
+  for (auto glob_index : vol_cont->local_cell_glob_indices)
   {
-    int glob_index = vol_cont->local_cell_glob_indices[c];
-    chi_mesh::Cell* cell = vol_cont->cells[glob_index];
-
-    if (log_vol->Inside(cell->centroid) && sense)
-    {
+    auto cell = vol_cont->cells[glob_index];
+    if (log_vol->Inside(cell->centroid) && sense){
       cell->material_id = mat_id;
+      ++num_cells_modified;
     }
   }
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Done setting material id from logical volume. "
+    << "Number of cells modified = " << num_cells_modified << ".";
+}
+
+//###################################################################
+/**Sets material id's using a logical volume.*/
+void chi_mesh::VolumeMesher::
+SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
+{
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Setting boundary id from logical volume.";
+  //============================================= Get current mesh handler
+  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+
+  //============================================= Get back mesh
+  chi_mesh::Region* cur_region = handler->region_stack.back();
+  chi_mesh::MeshContinuum* vol_cont = cur_region->volume_mesh_continua.back();
+
+  int num_faces_modified = 0;
+  for (auto glob_index : vol_cont->local_cell_glob_indices)
+  {
+    auto cell = vol_cont->cells[glob_index];
+    for (auto& face : cell->faces)
+      if (log_vol->Inside(face.centroid) && sense){
+        face.neighbor = -1*(abs(bndry_id)+1);
+        ++num_faces_modified;
+      }
+  }
+
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Done setting boundary id from logical volume. "
+    << "Number of faces modified = " << num_faces_modified << ".";
 }
