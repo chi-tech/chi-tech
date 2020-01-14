@@ -19,11 +19,11 @@ void chi_physics::TransportCrossSections::
   for (int g=0; g<G; g++)
   {
     S[g][g] = 1.0;
-    int num_transfer = transfer_matrix[0].inds_rowI[g].size();
+    int num_transfer = transfer_matrix[0].rowI_indices[g].size();
     for (int j=0; j<num_transfer; j++)
     {
-      int gprime   = transfer_matrix[0].inds_rowI[g][j];
-      S[g][gprime] = transfer_matrix[0].rowI_colJ[g][j];
+      int gprime   = transfer_matrix[0].rowI_indices[g][j];
+      S[g][gprime] = transfer_matrix[0].rowI_values[g][j];
     }//for j
   }//for g
 
