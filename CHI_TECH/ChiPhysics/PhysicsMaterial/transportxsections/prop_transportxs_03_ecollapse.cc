@@ -85,13 +85,13 @@ void chi_physics::TransportCrossSections::
   //============================================= Perform power iteration
   double rho = chi_math::PowerIteration(C, E, 1000, 1.0e-12);
 
-  ref_xi.resize(G);
+  ref_xi.resize(G,0.0);
   double sum = 0.0;
   for (int g=0; g<G; g++)
-    sum += E[g];
+    sum += std::fabs(E[g]);
 
   for (int g=0; g<G; g++)
-    ref_xi[g] = E[g]/sum;
+    ref_xi[g] = std::fabs(E[g])/sum;
 
 
   //======================================== Compute two-grid diffusion quantities
