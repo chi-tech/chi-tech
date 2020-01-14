@@ -68,4 +68,6 @@ std::string chi_physics::GetPETScConvergedReasonstring(KSPConvergedReason reason
     default:
       ostr << "Unknown convergence reason.";
   }
+
+  return ostr.str();
 }
