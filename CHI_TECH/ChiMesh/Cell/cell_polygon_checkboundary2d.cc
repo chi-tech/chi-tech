@@ -6,7 +6,7 @@
  * applied to it.
 
  * */
-bool chi_mesh::CellPolygonV2::CheckBoundary2D()
+bool chi_mesh::CellPolygon::CheckBoundary2D()
 {
 //  for (int e=0;e<edges.size();e++)
 //  {

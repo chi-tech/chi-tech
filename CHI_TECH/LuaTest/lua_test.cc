@@ -1,6 +1,9 @@
 #include <ChiLua/chi_lua.h>
 
+#include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
+
 #include <chi_log.h>
+
 extern ChiLog chi_log;
 
 //###################################################################
@@ -10,34 +13,33 @@ extern ChiLog chi_log;
  */
 int chiLuaTest(lua_State* L)
 {
-  //============================== Optional argument protection
-  int num_args = lua_gettop(L);
-  if (num_args<1)
-    LuaPostArgAmountError("chiLuaTest",1,num_args);
+  chi_math::SparseMatrix A(5,5);
 
-  //============================== Obtain first argument from stack
-  const char* argument_1 = lua_tostring(L,1);
+  std::cout << A.PrintS();
 
-  //============================== Print to screen
-  chi_log.Log(LOG_ALL) << "LuaTest: " << argument_1 << std::endl;
+  A.Insert(0,4,20.0);
+  A.Insert(0,0,2.0);
+  A.Insert(0,1,-1.0);
+  A.InsertAdd(0,1,-1.0);
 
-  size_t tag = chi_log.GetRepeatingEventTag(std::string());
+  A.Compress();
 
+  std::cout << std::endl;
 
-  chi_log.LogEvent(tag,
-                   ChiLog::EventType::SINGLE_OCCURRENCE,
-                   std::make_shared<ChiLog::EventInfo>(std::string("A"),2.0));
-  chi_log.LogEvent(tag,
-                   ChiLog::EventType::SINGLE_OCCURRENCE,
-                   std::make_shared<ChiLog::EventInfo>(std::string("B")));
-  chi_log.LogEvent(tag,
-                   ChiLog::EventType::SINGLE_OCCURRENCE,
-                   std::make_shared<ChiLog::EventInfo>(std::string("C"),2.0));
+  std::cout << A.PrintS();
 
-  chi_log.Log(LOG_ALL)
-    << chi_log.ProcessEvent(tag, ChiLog::EventOperation::AVERAGE_VALUE);
-  std::cout << chi_log.PrintEventHistory(tag);
+  std::cout << std::endl;
 
+  auto& indicesJ_rowI = A.rowI_indices[0];
+  auto& valuesJ_rowI  = A.rowI_values[0];
+
+  auto j = indicesJ_rowI.begin();
+  auto v = valuesJ_rowI.begin();
+  for (; j!= indicesJ_rowI.end(); ++j,++v)
+  {
+    std::cout << *j << " " << *v << "\n";
+  }
+  std::cout << std::endl;
 
   return 0;
 }

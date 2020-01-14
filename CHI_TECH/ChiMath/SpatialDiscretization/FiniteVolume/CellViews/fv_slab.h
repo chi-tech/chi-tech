@@ -17,7 +17,7 @@ private:
 
 public:
 
-  SlabFVView(chi_mesh::CellSlabV2 *slab_cell,
+  SlabFVView(chi_mesh::CellSlab *slab_cell,
              chi_mesh::MeshContinuum *vol_continuum) :
              CellFVView(2)
   {

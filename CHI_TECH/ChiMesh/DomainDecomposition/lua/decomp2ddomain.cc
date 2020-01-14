@@ -13,6 +13,7 @@
 //#############################################################################
 /** Decomposes a region domain and stores a collection of lists that indicates
  * which cells go to which process.
+ * \image html "InProgressImage.png" width=200px
  *
 \param Px int Number of divisions in x.
 \param Py int Number of divisions in y.
@@ -70,6 +71,7 @@ int chiDomDecompose2D(lua_State *L)
 
 //#############################################################################
 /** Decomposes a surface mesh into block px py elements.
+ * \image html "InProgressImage.png" width=200px
  *
 \param Surface mesh handler
 \param Px int Number of divisions in x.

@@ -384,7 +384,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell_info->cell_type == 3)
   {
-    auto cell = new chi_mesh::CellSlabV2;
+    auto cell = new chi_mesh::CellSlab;
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
@@ -413,7 +413,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
   else if (cell_info->cell_type == 4)
   {
-    auto cell = new chi_mesh::CellPolygonV2;
+    auto cell = new chi_mesh::CellPolygon;
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
@@ -445,7 +445,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
   else if (cell_info->cell_type == 5)
   {
-    chi_mesh::CellPolyhedronV2* cell = new chi_mesh::CellPolyhedronV2;
+    chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 

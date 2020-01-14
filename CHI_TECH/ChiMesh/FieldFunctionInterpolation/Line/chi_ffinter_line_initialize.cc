@@ -75,7 +75,7 @@ Initialize()
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell->Type() == chi_mesh::CellType::SLAB)
         {
-          auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+          auto slab_cell = (chi_mesh::CellSlab*)cell;
 
           for (int p=0; p<number_of_points; p++)
           {
@@ -111,7 +111,7 @@ Initialize()
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
         else if (cell->Type() == chi_mesh::CellType::POLYGON)
         {
-          auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+          auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
           size_t num_edges = poly_cell->faces.size();
 
@@ -156,7 +156,7 @@ Initialize()
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
         else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
           size_t num_faces = polyh_cell->faces.size();
 
@@ -213,7 +213,7 @@ Initialize()
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell->Type() == chi_mesh::CellType::SLAB)
         {
-          auto slab_cell = (chi_mesh::CellSlabV2*)cell;
+          auto slab_cell = (chi_mesh::CellSlab*)cell;
 
           for (int i=0; i<2; i++)
           {
@@ -227,7 +227,7 @@ Initialize()
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
         if (cell->Type() == chi_mesh::CellType::POLYGON)
         {
-          auto poly_cell = (chi_mesh::CellPolygonV2*)cell;
+          auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
           size_t num_verts = poly_cell->vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
@@ -242,7 +242,7 @@ Initialize()
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
         else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedronV2*)cell;
+          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
           size_t num_verts = polyh_cell->vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)

@@ -36,6 +36,7 @@ public:
   std::vector<std::vector<double>>  boundryI_incoming_psi;
 
   std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi;
+  std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi_old;
   std::vector<double>               delayed_prelocI_norm;
   double                            delayed_local_norm;
 

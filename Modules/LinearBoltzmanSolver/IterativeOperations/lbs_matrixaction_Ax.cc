@@ -33,15 +33,6 @@ int NPTMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
   sweepScheduler->Sweep(sweep_chunk);
 
-  int max_iters = 50;
-  if (context->groupset->latest_convergence_metric > 1.0e2 * 1.0e-6)
-    max_iters = 10;
-  solver->ConvergeCycles(*sweepScheduler,sweep_chunk,groupset,
-                         true,       //converge opp_refl_bndries
-                         true,       //apply latest conv metric
-                         1.0e-8,     //tolerance
-                         max_iters); //max iters
-
   //=================================================== Apply WGDSA
   if (groupset->apply_wgdsa)
   {

@@ -62,20 +62,38 @@ CreateSweepOrder(double polar, double azimuthal,
   std::vector<std::set<int>> cell_successors(num_loc_cells);
 
   //============================================= Make directed connections
+  chi_log.Log(LOG_0VERBOSE_1) << "Populating cell relationships";
   PopulateCellRelationships(vol_continuum,
                             sweep_order,
                             cell_dependencies,
                             cell_successors);
 
+
   //================================================== Add connectivity to
   //                                                   Graph and filter Strongly
   //                                                   Connected Components
+  chi_log.Log(LOG_0VERBOSE_1) << "Adding connectivity";
   for (int c=0; c<num_loc_cells; c++)
   {
     for (auto successor : cell_successors[c])
     {
       if (!allow_cycles)
+      {
         boost::add_edge(c,successor,G);
+
+        bool strongly_connected = false;
+
+        for (auto dependency : cell_dependencies[c])
+          if (dependency == successor)
+            strongly_connected = true;
+
+        if (strongly_connected)
+        {
+          chi_log.Log(LOG_ALLERROR)
+            << "Cyclic local sweep ordering detected.";
+          exit(EXIT_FAILURE);
+        }
+      }
       else
       {
         bool strongly_connected = false;
@@ -96,6 +114,7 @@ CreateSweepOrder(double polar, double azimuthal,
 
   //================================================== Generic topological
   //                                                   sorting
+  chi_log.Log(LOG_0VERBOSE_1) << "Generating topological sorting";
   typedef boost::graph_traits<CHI_D_GRAPH>::vertex_descriptor gVertex;
 
   boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
@@ -114,6 +133,7 @@ CreateSweepOrder(double polar, double azimuthal,
 
 
   //================================================== Generating sweep planes
+  chi_log.Log(LOG_0VERBOSE_1) << "Generating sweep planes";
   //The functionality of a sweep order allows for creating
   //multiple sweep planes but since this is a local sweep
   //we do not require to sort the sweep planes by the

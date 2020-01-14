@@ -161,7 +161,7 @@ UpwindPsi(int cell_so_index, int inc_face_counter,
       so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
         second[face_dof]*G + g;
 
-    return &ref_delayed_local_psi->operator[](index);
+    return &ref_delayed_local_psi_old->operator[](index);
   }
 
 }
@@ -212,7 +212,7 @@ NLUpwindPsi(int nonl_inc_face_counter,
       slot*G +
       mapped_dof*G + g;
 
-    return &ref_delayed_prelocI_outgoing_psi->operator[](prelocI)[index];
+    return &ref_delayed_prelocI_outgoing_psi_old->operator[](prelocI)[index];
   }
 
 

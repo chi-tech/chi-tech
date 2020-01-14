@@ -143,7 +143,14 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     chi_log.Log(LOG_0) << "Computing diffusion parameters.";
 
     for (int xs=0; xs<material_xs.size(); xs++)
+    {
       material_xs[xs]->ComputeDiffusionParameters();
+      auto rel_location = std::find(matid_to_xs_map.begin(),
+                                    matid_to_xs_map.end(), xs);
+      size_t mat_id = rel_location - matid_to_xs_map.begin();
+      if (rel_location != matid_to_xs_map.end())
+        chi_log.Log(LOG_0VERBOSE_1) << "Material " << mat_id;
+    }
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Do more stuff

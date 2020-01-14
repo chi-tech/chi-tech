@@ -140,17 +140,17 @@ void LinearBoltzman::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
       for (int g=0; g<gss; g++)
       {
         double R_g = 0.0;
-        int num_transfers = S.inds_rowI[gsi+g].size();
+        int num_transfers = S.rowI_indices[gsi + g].size();
         for (int j=0; j<num_transfers; j++)
         {
-          int gp = S.inds_rowI[gsi+g][j];
+          int gp = S.rowI_indices[gsi + g][j];
 
           if (not (gp >= (gsi+g+1)))
             continue;
 
           double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];
 
-          R_g += S.rowI_colJ[gsi+g][j]*delta_phi;
+          R_g += S.rowI_values[gsi + g][j] * delta_phi;
         }
         delta_phi_local[index] += R_g;
       }//for g

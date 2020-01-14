@@ -53,17 +53,19 @@ void chi_physics::TransportCrossSections::
 
   transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
 
+  auto ref_matrix = transfer_matrix.back();
+
   if (G == 1)
-    transfer_matrix[0].SetDiagonal(std::vector<double>(in_G,in_sigmat*c));
+    ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c));
   else
-    transfer_matrix[0].SetDiagonal(std::vector<double>(in_G,in_sigmat*c*2.0/4.0));
+    ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c*2.0/4.0));
 
   for (int g=0; g<in_G; g++)
   {
     //Downscattering
     if (g>0)
     {
-      transfer_matrix[0][g][g-1] = in_sigmat*c*2.0/4.0;
+      ref_matrix.Insert(g,g-1,in_sigmat*c*2.0/4.0);
     }
 
 
@@ -72,12 +74,12 @@ void chi_physics::TransportCrossSections::
     {
       if (g<(in_G-1))
       {
-        transfer_matrix[0][g][g-1] = in_sigmat*c*1.0/4.0;
-        transfer_matrix[0][g][g+1] = in_sigmat*c*1.0/4.0;
+        ref_matrix.Insert(g,g-1,in_sigmat*c*1.0/4.0);
+        ref_matrix.Insert(g,g+1,in_sigmat*c*1.0/4.0);
       }
       else
       {
-        transfer_matrix[0][g][g-1] = in_sigmat*c*2.0/4.0;
+        ref_matrix.Insert(g,g-1,in_sigmat*c*2.0/4.0);
       }
     }
 
@@ -164,7 +166,7 @@ void chi_physics::TransportCrossSections::
       auto& xs_tm = cross_secs[x]->transfer_matrix[m];
       for (int i=0; i<G; ++i)
       {
-        for (auto j : xs_tm.inds_rowI[i])
+        for (auto j : xs_tm.rowI_indices[i])
         {
           double value = xs_tm.ValueIJ(i,j)*combinations[x].second;
           transfer_matrix[m].InsertAdd(i,j,value);

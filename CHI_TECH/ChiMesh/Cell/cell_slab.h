@@ -8,10 +8,10 @@ namespace chi_mesh
 
 //######################################################### Class def
 /** Slab cell definition.*/
-class CellSlabV2 : public Cell
+class CellSlab : public Cell
 {
 public:
-  CellSlabV2() : Cell(CellType::SLAB) {}
+  CellSlab() : Cell(CellType::SLAB) {}
 
 
 };

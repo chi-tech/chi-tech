@@ -58,7 +58,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       if (cell->Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
-          new SlabFVView((chi_mesh::CellSlabV2*)cell,vol_continuum);
+          new SlabFVView((chi_mesh::CellSlab*)cell, vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
@@ -68,7 +68,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
-          new PolygonFVView((chi_mesh::CellPolygonV2*)(cell),vol_continuum);
+          new PolygonFVView((chi_mesh::CellPolygon*)(cell), vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
@@ -79,7 +79,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       {
         auto view =
           new PolyhedronFVView(
-            (chi_mesh::CellPolyhedronV2*)(cell),
+            (chi_mesh::CellPolyhedron*)(cell),
             vol_continuum);
 
         this->cell_fv_views.push_back(view);
@@ -125,7 +125,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       if (cell->Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
-          new SlabFVView((chi_mesh::CellSlabV2*)cell,vol_continuum);
+          new SlabFVView((chi_mesh::CellSlab*)cell, vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
@@ -135,7 +135,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       if (cell->Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
-          new PolygonFVView((chi_mesh::CellPolygonV2*)(cell),vol_continuum);
+          new PolygonFVView((chi_mesh::CellPolygon*)(cell), vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
@@ -146,7 +146,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       {
         auto view =
           new PolyhedronFVView(
-            (chi_mesh::CellPolyhedronV2*)(cell),
+            (chi_mesh::CellPolyhedron*)(cell),
             vol_continuum);
 
         this->cell_fv_views.push_back(view);

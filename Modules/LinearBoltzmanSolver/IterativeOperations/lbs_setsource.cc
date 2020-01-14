@@ -121,13 +121,13 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
             //====================== Apply across-groupset scattering
             if ((ell < xs->transfer_matrix.size()) && (apply_mat_src) )
             {
-              int num_transfers = xs->transfer_matrix[ell].inds_rowI[g].size();
+              int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
               for (int t=0; t<num_transfers; t++)
               {
-                gprime    = xs->transfer_matrix[ell].inds_rowI[g][t];
+                gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
                 if ((gprime < gs_i) || (gprime > gs_f))
                 {
-                  sigma_sm  = xs->transfer_matrix[ell].rowI_colJ[g][t];
+                  sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
                   inscat_g += sigma_sm * phi_oldp[gprime];
                 }
               }
@@ -136,13 +136,13 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
             //====================== Apply within-groupset scattering
             if ((ell < xs->transfer_matrix.size()) && (!suppress_phi_old) )
             {
-              int num_transfers = xs->transfer_matrix[ell].inds_rowI[g].size();
+              int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
               for (int t=0; t<num_transfers; t++)
               {
-                gprime    = xs->transfer_matrix[ell].inds_rowI[g][t];
+                gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
                 if ((gprime >= gs_i) && (gprime<=gs_f))
                 {
-                  sigma_sm  = xs->transfer_matrix[ell].rowI_colJ[g][t];
+                  sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
                   inscat_g += sigma_sm * phi_oldp[gprime];
                 }
               }

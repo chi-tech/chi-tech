@@ -32,6 +32,10 @@ public:
   int                          number_of_group_subsets=0;
   chi_math::ProductQuadrature* quadrature=nullptr;
 
+private:
+  std::pair<int,int> number_angular_unknowns;
+  bool num_ang_unknowns_avail = false;
+
 public:
   chi_mesh::MeshContinuum* grid;
 
@@ -41,6 +45,10 @@ public:
 
   void InitializeReflectingBCs();
   void ResetReflectingBCs();
+
+  std::pair<int,int> GetNumberOfAngularUnknowns();
+  void AssembleAngularUnknowns(int& index, double* x_ref);
+  void DisassembleAngularUnknowns(int& index, const double* x_ref);
 
 };
 

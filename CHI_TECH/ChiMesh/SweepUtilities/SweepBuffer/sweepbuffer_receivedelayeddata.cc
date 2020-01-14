@@ -111,4 +111,18 @@ ReceiveDelayedData(int angle_set_num)
     }
   }
   angleset->delayed_local_norm = rel_change;
+
+  //================================================== Copy non-local delayed Psi
+  //                                                   to Psi_old
+  for (size_t prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)
+  {
+    auto& psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI];
+    auto& psi_old = angleset->delayed_prelocI_outgoing_psi_old[prelocI];
+    psi_old = psi_new;
+  }
+
+  //================================================== Copy local delayed Psi
+  //                                                   to Psi_old
+  angleset->delayed_local_psi_old = angleset->delayed_local_psi;
+
 }
