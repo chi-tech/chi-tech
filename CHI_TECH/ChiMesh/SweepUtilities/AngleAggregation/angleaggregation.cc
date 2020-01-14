@@ -222,7 +222,6 @@ std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
         local_ang_unknowns += loc_vector.size();
 
-  chi_log.Log(LOG_ALL) << "Number of angular unknowns: " << local_ang_unknowns;
 
 
   int global_ang_unknowns = 0;
@@ -232,6 +231,8 @@ std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
                 MPI_INT,
                 MPI_SUM,
                 MPI_COMM_WORLD);
+
+  chi_log.Log(LOG_0) << "Number of angular unknowns: " << global_ang_unknowns;
 
   number_angular_unknowns = {local_ang_unknowns,global_ang_unknowns};
 
