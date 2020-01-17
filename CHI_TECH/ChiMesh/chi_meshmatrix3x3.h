@@ -17,6 +17,32 @@ struct chi_mesh::Matrix3x3
     vals[6] = 0.0; vals[7] = 0.0; vals[8] = 0.0;
   }
 
+  static Matrix3x3 MakeRotationMatrixFromVector(const Vector& vec)
+  {
+    chi_mesh::Matrix3x3 R;
+
+    chi_mesh::Vector n = vec;
+    chi_mesh::Vector khat(0.0,0.0,1.0);
+
+    if      (n.Dot(khat) >  0.9999999)
+      R.SetDiagonalVec(1.0,1.0,1.0);
+    else if (n.Dot(khat) < -0.9999999)
+      R.SetDiagonalVec(1.0,1.0,-1.0);
+    else
+    {
+      chi_mesh::Vector binorm = khat.Cross(n);
+      binorm = binorm/binorm.Norm();
+
+      chi_mesh::Vector tangent = binorm.Cross(n);
+      tangent = tangent/tangent.Norm();
+
+      R.SetColJVec(0,tangent);
+      R.SetColJVec(1,binorm);
+      R.SetColJVec(2,n);
+    }
+    return R;
+  }
+
   /**Copy constructor*/
   Matrix3x3& operator=(const Matrix3x3& inM)
   {
