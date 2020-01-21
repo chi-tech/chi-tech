@@ -21,20 +21,10 @@ void LinearBoltzman::Solver::InitWGDSA(LBSGroupset *groupset)
     delta_phi_local.resize(local_dof_count*groupset->groups.size(),0.0);
     int g = 0;
     int m = 0;
-    auto deltaphi_ff = new chi_physics::FieldFunction;
-    deltaphi_ff->text_name = std::string("Sigma_s_DeltaPhi_g") +
-                          std::to_string(g) +
-                          std::string("_m") + std::to_string(m);
-    deltaphi_ff->grid = grid;
-    deltaphi_ff->spatial_discretization = discretization;
-    deltaphi_ff->id = chi_physics_handler.fieldfunc_stack.size();
 
-    deltaphi_ff->type = FF_SDM_PWLD;
-    deltaphi_ff->num_grps = groupset->groups.size();
-    deltaphi_ff->num_moms = 1;
-    deltaphi_ff->grp = g;
-    deltaphi_ff->mom = m;
-    deltaphi_ff->field_vector_local = &delta_phi_local;
+    std::string text_name = std::string("Sigma_s_DeltaPhi_g") +
+                            std::to_string(g) +
+                            std::string("_m") + std::to_string(m);
 
     groupset->wgdsa_cell_dof_array_address.resize(
       local_cell_dof_array_address.size(),0);
@@ -44,8 +34,18 @@ void LinearBoltzman::Solver::InitWGDSA(LBSGroupset *groupset)
         local_cell_dof_array_address[c]*groupset->groups.size();
     }
 
-    deltaphi_ff->local_cell_dof_array_address =
-      &groupset->wgdsa_cell_dof_array_address;
+    auto deltaphi_ff = new chi_physics::FieldFunction(
+      text_name,                                    //Text name
+      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
+      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
+      grid,                                         //Grid
+      discretization,                               //Spatial Discretization
+      groupset->groups.size(),                      //Number of components
+      1,                                            //Number of sets
+      g,m,                                          //Ref component, ref set
+      &groupset->wgdsa_cell_dof_array_address,      //Dof block address
+      &delta_phi_local);                            //Data vector
+
 
     chi_physics_handler.fieldfunc_stack.push_back(deltaphi_ff);
     field_functions.push_back(deltaphi_ff);

@@ -46,27 +46,20 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   //                                                   if empty
   if (field_functions.empty())
   {
-    auto initial_field_function = new chi_physics::FieldFunction;
-    initial_field_function->text_name = std::string("phi");
-    initial_field_function->grid = grid;
-    initial_field_function->spatial_discretization = discretization;
-    initial_field_function->id = chi_physics_handler.fieldfunc_stack.size();
-
-    initial_field_function->field_vector = &x;
+    auto initial_field_function = new chi_physics::FieldFunction(
+      std::string("phi"),                           //Text name
+      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
+      chi_physics::FieldFunctionType::CFEM_PWL,     //Type
+      grid,                                         //Grid
+      discretization,                               //Spatial Discretization
+      1,                                            //Number of components
+      1,                                            //Number of sets
+      0,0,                                          //Ref component, ref set
+      nullptr,                                      //Dof block address
+      &x);                                          //Data vector
 
     field_functions.push_back(initial_field_function);
     chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
-  }
-  else
-  {
-    size_t num_ff = field_functions.size();
-    for (size_t ff=0; ff<num_ff; ff++)
-    {
-      chi_physics::FieldFunction* cur_ff = field_functions[ff];
-      cur_ff->grid                   = grid;
-      cur_ff->spatial_discretization = discretization;
-      cur_ff->field_vector           = &x;
-    }
   }
 
 
