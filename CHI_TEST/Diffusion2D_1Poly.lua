@@ -60,7 +60,6 @@ chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
-fftemp = chiSolverAddFieldFunction(phys1,"Temperature")
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
 
@@ -72,11 +71,12 @@ chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
 
 --############################################### Initialize Solver
 chiDiffusionInitialize(phys1)
+fftemp,count = chiGetFieldFunctionList(phys1)
 chiDiffusionExecute(phys1)
 
 slice2 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
-chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp)
+chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp[1])
 
 chiFFInterpolationInitialize(slice2)
 chiFFInterpolationExecute(slice2)
@@ -86,7 +86,7 @@ line0 = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(line0,LINE_FIRSTPOINT,-1.0,0.1,0.0)
 chiFFInterpolationSetProperty(line0,LINE_SECONDPOINT, 1.0,0.1,0.0)
 chiFFInterpolationSetProperty(line0,LINE_NUMBEROFPOINTS, 100)
-chiFFInterpolationSetProperty(line0,ADD_FIELDFUNCTION,fftemp)
+chiFFInterpolationSetProperty(line0,ADD_FIELDFUNCTION,fftemp[1])
 
 chiFFInterpolationInitialize(line0)
 chiFFInterpolationExecute(line0)
@@ -96,7 +96,7 @@ ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
 chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
-chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp[1])
 
 chiFFInterpolationInitialize(curffi)
 chiFFInterpolationExecute(curffi)
