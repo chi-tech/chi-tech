@@ -339,7 +339,8 @@ chiFFInterpolationExportPython(cline)
 
 
 --
-
+chiExportFieldFunctionToVTKG(fflist0[1],"ZPhi","Phi")
+chiExportFieldFunctionToVTKG(fflist1[1]+count1/2,"ZErr","Err")
 
 if (chi_location_id == 0) then
     local handle = io.popen("python3 Compare3.py")
