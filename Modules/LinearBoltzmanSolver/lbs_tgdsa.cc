@@ -21,21 +21,20 @@ void LinearBoltzman::Solver::InitTGDSA(LBSGroupset *groupset)
     delta_phi_local.resize(local_dof_count,0.0);
     int g = 0;
     int m = 0;
-    chi_physics::FieldFunction* deltaphi_ff =
-      new chi_physics::FieldFunction;
-    deltaphi_ff->text_name = std::string("Sum_Sigma_s_DeltaPhi_g") +
-                             std::to_string(g) +
-                             std::string("_m") + std::to_string(m);
-    deltaphi_ff->grid = grid;
-    deltaphi_ff->spatial_discretization = discretization;
-    deltaphi_ff->id = chi_physics_handler.fieldfunc_stack.size();
-
-    deltaphi_ff->type = FF_SDM_PWLD;
-    deltaphi_ff->num_grps = 1;
-    deltaphi_ff->num_moms = 1;
-    deltaphi_ff->grp = g;
-    deltaphi_ff->mom = m;
-    deltaphi_ff->field_vector_local = &delta_phi_local;
+    std::string text_name = std::string("Sum_Sigma_s_DeltaPhi_g") +
+                            std::to_string(g) +
+                            std::string("_m") + std::to_string(m);
+    auto deltaphi_ff = new chi_physics::FieldFunction(
+      text_name,                                    //Text name
+      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
+      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
+      grid,                                         //Grid
+      discretization,                               //Spatial Discretization
+      1,                                            //Number of components
+      1,                                            //Number of sets
+      g,m,                                          //Ref component, ref set
+      &local_cell_dof_array_address,                //Dof block address
+      &delta_phi_local);                            //Data vector
 
     deltaphi_ff->local_cell_dof_array_address =
       &local_cell_dof_array_address;
@@ -50,7 +49,7 @@ void LinearBoltzman::Solver::InitTGDSA(LBSGroupset *groupset)
                  + std::string("-")
                  + std::to_string(groupset->groups.back()->id)
                  + std::string("]");
-    chi_diffusion::Solver* dsolver = new chi_diffusion::Solver(solver_name);
+    auto dsolver = new chi_diffusion::Solver(solver_name);
     groupset->tgdsa_solver = dsolver;
 
     dsolver->regions.push_back(this->regions.back());
@@ -145,7 +144,7 @@ void LinearBoltzman::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
         {
           int gp = S.rowI_indices[gsi + g][j];
 
-          if (not (gp >= (gsi+g+1)))
+          if (gp < gsi + g + 1)
             continue;
 
           double delta_phi = phi_new_mapped[gp] - phi_old_mapped[gp];

@@ -115,9 +115,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
-      ff_interpol.CreatePWLDMapping(num_grps,num_moms,grp,mom,
-                                    dofs_to_map,cell_to_map,
-                                    *local_cell_dof_array_address,&mapping);
+      ff_interpol.CreatePWLDMapping(num_components, num_sets, ref_component, ref_set,
+                                    dofs_to_map, cell_to_map,
+                                    *local_cell_dof_array_address, &mapping);
 
       double cell_avg_value = 0.0;
       for (int v=0; v<num_verts; v++)
@@ -162,9 +162,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
-      ff_interpol.CreatePWLDMapping(num_grps,num_moms,grp,mom,
-                                    dofs_to_map,cell_to_map,
-                                    *local_cell_dof_array_address,&mapping);
+      ff_interpol.CreatePWLDMapping(num_components, num_sets, ref_component, ref_set,
+                                    dofs_to_map, cell_to_map,
+                                    *local_cell_dof_array_address, &mapping);
 
       double cell_avg_value = 0.0;
       for (int v=0; v<num_verts; v++)
@@ -228,9 +228,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
-      ff_interpol.CreatePWLDMapping(num_grps,num_moms,grp,mom,
-                                    dofs_to_map,cell_to_map,
-                                    *local_cell_dof_array_address,&mapping);
+      ff_interpol.CreatePWLDMapping(num_components, num_sets, ref_component, ref_set,
+                                    dofs_to_map, cell_to_map,
+                                    *local_cell_dof_array_address, &mapping);
 
       double cell_avg_value = 0.0;
       for (int v=0; v<num_verts; v++)
@@ -298,8 +298,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
   vtkUnstructuredGrid* ugrid;
   vtkIntArray*      matarray;
   vtkIntArray*      pararray;
-  std::vector<vtkDoubleArray*>   phiarray(num_grps);
-  std::vector<vtkDoubleArray*>   phiavgarray(num_grps);
+  std::vector<vtkDoubleArray*>   phiarray(num_components);
+  std::vector<vtkDoubleArray*>   phiavgarray(num_components);
 
   ugrid    = vtkUnstructuredGrid::New();
   matarray = vtkIntArray::New();
@@ -307,7 +307,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
   pararray = vtkIntArray::New();
   pararray->SetName("Partition");
 
-  for (int g=0; g<num_grps; g++)
+  for (int g=0; g < num_components; g++)
   {
     char group_text[100];
     sprintf(group_text,"%03d",g);
@@ -368,11 +368,11 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
-      ff_interpol.CreatePWLDMapping(num_grps,num_moms,grp,mom,
-                                    dofs_to_map,cell_to_map,
-                                    *local_cell_dof_array_address,&mapping);
+      ff_interpol.CreatePWLDMapping(num_components, num_sets, ref_component, ref_set,
+                                    dofs_to_map, cell_to_map,
+                                    *local_cell_dof_array_address, &mapping);
 
-      for (int g=0; g<num_grps; g++)
+      for (int g=0; g < num_components; g++)
       {
         double cell_avg_value = 0.0;
         for (int v=0; v<num_verts; v++)
@@ -419,11 +419,11 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
-      ff_interpol.CreatePWLDMapping(num_grps,num_moms,grp,mom,
-                                    dofs_to_map,cell_to_map,
-                                    *local_cell_dof_array_address,&mapping);
+      ff_interpol.CreatePWLDMapping(num_components, num_sets, ref_component, ref_set,
+                                    dofs_to_map, cell_to_map,
+                                    *local_cell_dof_array_address, &mapping);
 
-      for (int g=0; g<num_grps; g++)
+      for (int g=0; g < num_components; g++)
       {
         double cell_avg_value = 0.0;
         for (int v=0; v<num_verts; v++)
@@ -488,11 +488,11 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
-      ff_interpol.CreatePWLDMapping(num_grps,num_moms,grp,mom,
-                                    dofs_to_map,cell_to_map,
-                                    *local_cell_dof_array_address,&mapping);
+      ff_interpol.CreatePWLDMapping(num_components, num_sets, ref_component, ref_set,
+                                    dofs_to_map, cell_to_map,
+                                    *local_cell_dof_array_address, &mapping);
 
-      for (int g=0; g<num_grps; g++)
+      for (int g=0; g < num_components; g++)
       {
         double cell_avg_value = 0.0;
         for (int v=0; v<num_verts; v++)
@@ -523,7 +523,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
   ugrid->GetCellData()->AddArray(matarray);
   ugrid->GetCellData()->AddArray(pararray);
 
-  for (int g=0; g<num_grps; g++)
+  for (int g=0; g < num_components; g++)
   {
     ugrid->GetPointData()->AddArray(phiarray[g]);
     ugrid->GetCellData()->AddArray(phiavgarray[g]);
@@ -543,6 +543,6 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
   //============================================= Parallel summary file
   if (chi_mpi.location_id == 0)
   {
-      WritePVTU(base_filename, field_name, num_grps);
+      WritePVTU(base_filename, field_name, num_components);
   }
 }
