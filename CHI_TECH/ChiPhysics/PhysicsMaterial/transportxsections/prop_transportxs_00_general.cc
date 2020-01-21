@@ -53,7 +53,7 @@ void chi_physics::TransportCrossSections::
 
   transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
 
-  auto ref_matrix = transfer_matrix.back();
+  auto& ref_matrix = transfer_matrix.back();
 
   if (G == 1)
     ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c));
@@ -85,6 +85,7 @@ void chi_physics::TransportCrossSections::
 
   }
 
+//  chi_log.Log(LOG_0WARNING) << c << " " << in_sigmat;
 //  chi_log.Log(LOG_0WARNING) << transfer_matrix[0].PrintS();
 }
 

@@ -47,42 +47,20 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
   pwld_phi_local.resize(pwld_local_dof_count*G);
   if (field_functions.size() == 0)
   {
-    chi_physics::FieldFunction* initial_field_function =
-      new chi_physics::FieldFunction;
-    initial_field_function->text_name = std::string("phi0");
-    initial_field_function->grid = grid;
-    initial_field_function->spatial_discretization = discretization;
-    initial_field_function->id = chi_physics_handler.fieldfunc_stack.size();
-
-    initial_field_function->type = FF_SDM_PWLD;
-    initial_field_function->num_grps = 1;
-    initial_field_function->num_moms = 1;
-    initial_field_function->grp = 0;
-    initial_field_function->mom = 0;
-    initial_field_function->field_vector_local = &pwld_phi_local;
-    initial_field_function->local_cell_dof_array_address =
-      &pwld_cell_dof_array_address;
+    auto initial_field_function = new chi_physics::FieldFunction(
+      std::string("phi0"),                          //Text name
+      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
+      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
+      grid,                                         //Grid
+      discretization,                               //Spatial Discretization
+      1,                                            //Number of components
+      1,                                            //Number of sets
+      0,0,                                          //Ref component, ref set
+      &pwld_cell_dof_array_address,                 //Dof block address
+      &pwld_phi_local);                             //Data vector
 
     field_functions.push_back(initial_field_function);
     chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
-  }
-  else
-  {
-    size_t num_ff = field_functions.size();
-    for (int ff=0; ff<num_ff; ff++)
-    {
-      chi_physics::FieldFunction* cur_ff = field_functions[ff];
-      cur_ff->grid                   = grid;
-      cur_ff->spatial_discretization = discretization;
-
-      cur_ff->type = FF_SDM_PWLD;
-      cur_ff->num_grps = 1;
-      cur_ff->num_moms = 1;
-      cur_ff->grp = 0;
-      cur_ff->mom = 0;
-      cur_ff->field_vector_local = &pwld_phi_local;
-      cur_ff->local_cell_dof_array_address = &pwld_cell_dof_array_address;
-    }
   }
 
   //================================================== Setup timer

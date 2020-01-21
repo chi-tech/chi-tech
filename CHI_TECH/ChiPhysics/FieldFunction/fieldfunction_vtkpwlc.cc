@@ -117,8 +117,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
 
   std::vector<int> mapping;
   Vec phi_vec;
-  ff_interpol.CreateCFEMMapping(num_grps,num_moms,grp,mom,
-                                *field_vector,phi_vec,cfem_nodes,&mapping);
+  ff_interpol.CreateCFEMMapping(num_components, num_sets, ref_component, ref_set,
+                                *field_vector, phi_vec, cfem_nodes, &mapping);
 
 
   //======================================== Populate cell information
@@ -354,7 +354,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
       int num_verts = 2;
       for (int v=0; v<num_verts; v++)
-        for (int g=0; g<num_grps; g++)
+        for (int g=0; g < num_components; g++)
           cfem_nodes.push_back(slab_cell->vertex_ids[v]);
     }
 
@@ -365,7 +365,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
       int num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        for (int g=0; g<num_grps; g++)
+        for (int g=0; g < num_components; g++)
           cfem_nodes.push_back(poly_cell->vertex_ids[v]);
     }
 
@@ -376,15 +376,15 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
 
       int num_verts = polyh_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        for (int g=0; g<num_grps; g++)
+        for (int g=0; g < num_components; g++)
           cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
     }//polyhedron
   }//for local cells
 
   std::vector<int> mapping;
   Vec phi_vec;
-  ff_interpol.CreateCFEMMapping(num_grps,num_moms,grp,mom,
-                                *field_vector,phi_vec,cfem_nodes,&mapping);
+  ff_interpol.CreateCFEMMapping(num_components, num_sets, ref_component, ref_set,
+                                *field_vector, phi_vec, cfem_nodes, &mapping);
 
 
   //======================================== Populate cell information
@@ -564,6 +564,6 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
   //============================================= Parallel summary file
   if (chi_mpi.location_id == 0)
   {
-      WritePVTU(base_filename, field_name, num_grps);
+      WritePVTU(base_filename, field_name, num_components);
   }
 }

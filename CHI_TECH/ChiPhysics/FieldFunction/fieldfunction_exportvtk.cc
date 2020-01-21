@@ -23,11 +23,11 @@ void chi_physics::FieldFunction::ExportToVTK(std::string base_name,
     << " to files with base name " << base_name;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PWLD NODES
-  if (type == FF_SDM_FV)
+  if (type == chi_physics::FieldFunctionType::FV)
     ExportToVTKFV(base_name,field_name);
-  if (type == FF_SDM_CFEM)
+  if (type == chi_physics::FieldFunctionType::CFEM_PWL)
     ExportToVTKPWLC(base_name,field_name);
-  if (type == FF_SDM_PWLD)
+  if (type == chi_physics::FieldFunctionType::DFEM_PWL)
     ExportToVTKPWLD(base_name,field_name);
 
 }
@@ -45,11 +45,11 @@ void chi_physics::FieldFunction::ExportToVTKG(std::string base_name,
     << " to files with base name " << base_name;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PWLD NODES
-  if (type == FF_SDM_FV)
+  if (type == chi_physics::FieldFunctionType::FV)
     ExportToVTKFVG(base_name,field_name);
-  if (type == FF_SDM_CFEM)
+  if (type == chi_physics::FieldFunctionType::CFEM_PWL)
     ExportToVTKPWLCG(base_name,field_name);
-  if (type == FF_SDM_PWLD)
+  if (type == chi_physics::FieldFunctionType::DFEM_PWL)
     ExportToVTKPWLDG(base_name,field_name);
 
 }

@@ -199,21 +199,22 @@ int LinearBoltzman::Solver::InitializeParrays()
   {
     for (int m=0; m<num_moments; m++)
     {
-      auto group_ff = new chi_physics::FieldFunction;
-      group_ff->text_name = std::string("Flux_g") +
+
+      std::string text_name = std::string("Flux_g") +
                             std::to_string(g) +
                             std::string("_m") + std::to_string(m);
-      group_ff->grid = grid;
-      group_ff->spatial_discretization = discretization;
-      group_ff->id = chi_physics_handler.fieldfunc_stack.size();
 
-      group_ff->type = FF_SDM_PWLD;
-      group_ff->num_grps = groups.size();
-      group_ff->num_moms = num_moments;
-      group_ff->grp = g;
-      group_ff->mom = m;
-      group_ff->field_vector_local = &phi_old_local;
-      group_ff->local_cell_dof_array_address = &local_cell_phi_dof_array_address;
+      auto group_ff = new chi_physics::FieldFunction(
+          text_name,                                    //Text name
+          chi_physics_handler.fieldfunc_stack.size(),   //FF-id
+          chi_physics::FieldFunctionType::DFEM_PWL,     //Type
+          grid,                                         //Grid
+          discretization,                               //Spatial Discretization
+          groups.size(),                                //Number of components
+          num_moments,                                  //Number of sets
+          g,m,                                          //Ref component, ref set
+          &local_cell_phi_dof_array_address,            //Dof block address
+          &phi_old_local);                              //Data vector
 
       chi_physics_handler.fieldfunc_stack.push_back(group_ff);
       field_functions.push_back(group_ff);

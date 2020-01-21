@@ -251,8 +251,9 @@ void chi_mesh::PopulateRaySegmentLengths(
   const chi_mesh::Vector& line_point1,
   const chi_mesh::Vector& omega)
 {
+  double track_length = (line_point1-line_point0).Norm();
   if (segment_lengths.empty())
-    segment_lengths.push_back((line_point1-line_point0).Norm());
+    segment_lengths.push_back(track_length);
 
   //======================================== Determine intersection points
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
@@ -317,7 +318,8 @@ void chi_mesh::PopulateRaySegmentLengths(
         if (intersects)
         {
           double d = (intersection_point - line_point0).Norm();
-          segment_lengths.push_back(d);
+          if (d < track_length)
+            segment_lengths.push_back(d);
         }
       }//for edge
     }//for face

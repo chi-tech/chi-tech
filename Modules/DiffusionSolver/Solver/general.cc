@@ -309,8 +309,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
       ffinterp.grid_view = grid;
-      ffinterp.CreatePWLDMapping(q_field->num_grps,
-                                 q_field->num_moms,
+      ffinterp.CreatePWLDMapping(q_field->num_components,
+                                 q_field->num_sets,
                                  group-gi,moment,
                                  pwld_nodes,pwld_cells,
                                  *q_field->local_cell_dof_array_address,
@@ -392,8 +392,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
       ffinterp.grid_view = grid;
-      ffinterp.CreatePWLDMapping(q_field->num_grps,
-                                 q_field->num_moms,
+      ffinterp.CreatePWLDMapping(q_field->num_components,
+                                 q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
                                  *q_field->local_cell_dof_array_address,
@@ -475,8 +475,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
       ffinterp.grid_view = grid;
-      ffinterp.CreatePWLDMapping(q_field->num_grps,
-                                 q_field->num_moms,
+      ffinterp.CreatePWLDMapping(q_field->num_components,
+                                 q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
                                  *q_field->local_cell_dof_array_address,

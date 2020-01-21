@@ -14,15 +14,15 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
     grid_view = field_functions[ff]->grid;
     FieldFunctionContext* ff_ctx = ff_contexts[ff];
 
-    if (field_functions[ff]->type == FF_SDM_CFEM)
+    if (field_functions[ff]->type == chi_physics::FieldFunctionType::CFEM_PWL)
     {
       Vec x_mapped;
       std::vector<int> mapping;
       Vec x = *field_functions[ff]->field_vector;
-      CreateCFEMMapping(field_functions[ff]->num_grps,
-                        field_functions[ff]->num_moms,
-                        field_functions[ff]->grp,
-                        field_functions[ff]->mom,
+      CreateCFEMMapping(field_functions[ff]->num_components,
+                        field_functions[ff]->num_sets,
+                        field_functions[ff]->ref_component,
+                        field_functions[ff]->ref_set,
                         x,x_mapped,
                         ff_ctx->cfem_local_nodes_needed_unmapped,
                         &mapping);
@@ -30,26 +30,26 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
       CFEMInterpolate(x_mapped,mapping,ff_ctx);
 
     }
-    else if (field_functions[ff]->type == FF_SDM_PWLD)
+    else if (field_functions[ff]->type == chi_physics::FieldFunctionType::DFEM_PWL)
     {
       std::vector<int> mapping;
-      CreatePWLDMapping(field_functions[ff]->num_grps,
-                        field_functions[ff]->num_moms,
-                        field_functions[ff]->grp,
-                        field_functions[ff]->mom,
+      CreatePWLDMapping(field_functions[ff]->num_components,
+                        field_functions[ff]->num_sets,
+                        field_functions[ff]->ref_component,
+                        field_functions[ff]->ref_set,
                         ff_ctx->pwld_local_nodes_needed_unmapped,
                         ff_ctx->pwld_local_cells_needed_unmapped,
                         *field_functions[ff]->local_cell_dof_array_address,
                         &mapping);
       PWLDInterpolate(mapping,ff_ctx);
     }
-    else if (field_functions[ff]->type == FF_SDM_FV)
+    else if (field_functions[ff]->type == chi_physics::FieldFunctionType::FV)
     {
       std::vector<int> mapping;
-      CreateFVMapping(field_functions[ff]->num_grps,
-                      field_functions[ff]->num_moms,
-                      field_functions[ff]->grp,
-                      field_functions[ff]->mom,
+      CreateFVMapping(field_functions[ff]->num_components,
+                      field_functions[ff]->num_sets,
+                      field_functions[ff]->ref_component,
+                      field_functions[ff]->ref_set,
                       ff_ctx->interpolation_points_ass_cell,
                       &mapping);
       FVInterpolate(mapping,ff_ctx);

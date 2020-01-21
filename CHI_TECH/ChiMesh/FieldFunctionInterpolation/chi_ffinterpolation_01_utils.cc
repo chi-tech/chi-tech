@@ -121,7 +121,8 @@ bool chi_mesh::FieldFunctionInterpolation::
 }
 
 
-
+//###################################################################
+/** Creates a mapping from a global vector */
 void chi_mesh::FieldFunctionInterpolation::
 CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                   Vec& x, Vec& x_cell,
@@ -200,8 +201,8 @@ CreatePWLDMapping(chi_physics::FieldFunction* field_function,
                   int m,
                   int g)
 {
-  int num_grps = field_function->num_grps;
-  int num_moms = field_function->num_moms;
+  int num_grps = field_function->num_components;
+  int num_moms = field_function->num_sets;
 
   size_t num_nodes_to_map = pwld_nodes.size();
   for (size_t n=0; n< num_nodes_to_map; n++)

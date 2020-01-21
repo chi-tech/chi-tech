@@ -8,27 +8,27 @@
 /**Executes the volume interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 {
-  if (field_functions[0]->type == FF_SDM_CFEM)
+  if (field_functions[0]->type == chi_physics::FieldFunctionType::CFEM_PWL)
   {
     Vec x_mapped;
     std::vector<int> mapping;
     Vec x = *field_functions[0]->field_vector;
-    CreateCFEMMapping(field_functions[0]->num_grps,
-                      field_functions[0]->num_moms,
-                      field_functions[0]->grp,
-                      field_functions[0]->mom,
+    CreateCFEMMapping(field_functions[0]->num_components,
+                      field_functions[0]->num_sets,
+                      field_functions[0]->ref_component,
+                      field_functions[0]->ref_set,
                       x,x_mapped,cfem_local_nodes_needed_unmapped,&mapping);
 
     CFEMInterpolate(x_mapped,mapping);
 
   }
-  else if (field_functions[0]->type == FF_SDM_PWLD)
+  else if (field_functions[0]->type == chi_physics::FieldFunctionType::DFEM_PWL)
   {
     std::vector<int> mapping;
-    CreatePWLDMapping(field_functions[0]->num_grps,
-                      field_functions[0]->num_moms,
-                      field_functions[0]->grp,
-                      field_functions[0]->mom,
+    CreatePWLDMapping(field_functions[0]->num_components,
+                      field_functions[0]->num_sets,
+                      field_functions[0]->ref_component,
+                      field_functions[0]->ref_set,
                       pwld_local_nodes_needed_unmapped,
                       pwld_local_cells_needed_unmapped,
                       *field_functions[0]->local_cell_dof_array_address,
