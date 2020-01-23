@@ -30,11 +30,19 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   int num_nodes = grid->nodes.size();
 
+  //================================================== Add pwl fem views
+  if (verbose)
+    chi_log.Log(LOG_0) << "Computing cell matrices";
+  pwl_sdm = ((SpatialDiscretization_PWL*)(this->discretization));
+  pwl_sdm->AddViewOfLocalContinuum(grid);
+  MPI_Barrier(MPI_COMM_WORLD);
+
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
   ChiTimer t_reorder; t_reorder.Reset();
   ReorderNodesPWLC();
+  auto domain_ownership = pwl_sdm->OrderNodesCFEM(grid);
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
@@ -79,6 +87,14 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
   PWLCBuildSparsityPattern();
+  std::vector<int> nodal_bid_copy = nodal_boundary_numbers;
+  pwl_sdm->BuildCFEMSparsityPattern(grid,
+                                    nodal_boundary_numbers,
+                                    nodal_nnz_in_diag,
+                                    nodal_nnz_off_diag,
+                                    domain_ownership);
+
+  nodal_boundary_numbers = nodal_bid_copy;
 
 
   //================================================== Initialize x and b

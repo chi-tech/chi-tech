@@ -7,17 +7,76 @@
 #include "../Cell/cell.h"
 
 
+
 //######################################################### Class Definition
+/**Stores the relevant information for completely defining a computational
+ * domain. */
 class chi_mesh::MeshContinuum
 {
 public:
+  //################################################## LocalCells Class Definition
+  /**Stores references to global cells to enable an iterator.*/
+  class LocalCells
+  {
+  public:
+    std::vector<int>& local_cell_ind;
+    std::vector<chi_mesh::Cell*>& cell_references;
+
+    LocalCells(std::vector<int>& in_local_cell_ind,
+               std::vector<chi_mesh::Cell*>& in_cell_references) :
+      local_cell_ind(in_local_cell_ind),
+      cell_references(in_cell_references) {}
+
+    //##################################### iterator Class Definition
+    /**Internal iterator class.*/
+    class iterator
+    {
+    public:
+      LocalCells& ref_block;
+      size_t      ref_element;
+
+      iterator(LocalCells& in_block, size_t i) :
+        ref_block(in_block),
+        ref_element(i) {}
+
+      iterator operator++(        ) {iterator i = *this; ref_element++; return i;}
+      iterator operator++(int junk) {ref_element++; return *this;}
+      chi_mesh::Cell& operator*()
+      {
+        return *(ref_block.cell_references[
+                   ref_block.local_cell_ind[ref_element]]);
+      }
+      chi_mesh::Cell* operator->()
+      {
+        return ref_block.cell_references[
+                 ref_block.local_cell_ind[ref_element]];}
+      bool operator==(const iterator& rhs)
+      {
+        return ref_element == rhs.ref_element;
+      }
+      bool operator!=(const iterator& rhs)
+      {
+        return ref_element != rhs.ref_element;
+      }
+    };
+
+    iterator begin() {return iterator(*this,0);}
+
+    iterator end(){return iterator(*this,local_cell_ind.size());}
+  };
+  //--------------------------------------------------
+
   std::vector<chi_mesh::Node*>   nodes;
   std::vector<chi_mesh::Cell*>   cells;
+  LocalCells                     local_cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
   chi_mesh::LineMesh*            line_mesh;
   std::vector<int>               local_cell_glob_indices;
   std::vector<int>               glob_cell_local_indices;
   std::vector<int>               boundary_cell_indices;
+
+
+
 
 private:
   bool                           face_histogram_available;
@@ -27,7 +86,7 @@ private:
   std::vector<std::pair<size_t,size_t>> face_categories;
 
 public:
-  MeshContinuum()
+  MeshContinuum() : local_cells(local_cell_glob_indices,cells)
   {
     this->surface_mesh = nullptr;
     this->line_mesh    = nullptr;
@@ -60,6 +119,8 @@ public:
 
 
 };
+
+
 
 
 #endif

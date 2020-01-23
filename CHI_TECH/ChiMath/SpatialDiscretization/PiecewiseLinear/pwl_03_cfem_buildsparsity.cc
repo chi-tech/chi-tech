@@ -17,6 +17,10 @@ void SpatialDiscretization_PWL::
 {
   std::vector<std::vector<int>> nodal_connections(grid->nodes.size());
 
+  nodal_bndry_ids.clear();
+  nodal_nnz_in_diag.clear();
+  nodal_nnz_off_diag.clear();
+
   nodal_bndry_ids   .resize(grid->nodes.size(),0);
   nodal_nnz_in_diag .resize(grid->nodes.size(),0);
   nodal_nnz_off_diag.resize(grid->nodes.size(),0);

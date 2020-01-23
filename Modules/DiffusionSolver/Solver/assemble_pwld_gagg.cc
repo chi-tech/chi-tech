@@ -18,7 +18,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
-  auto fe_view = (CellFEView*)pwl_discr->MapFeView(cell_glob_index);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeView(cell_glob_index);
 
   for (int gr=0; gr<G; gr++)
   {
@@ -92,7 +92,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
           int adj_cell_local_index = grid->glob_cell_local_indices[neighbor];
           adj_ip_view   = ip_cell_views[adj_cell_local_index];
           adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
-          adj_fe_view   = (CellFEView*)pwl_discr->MapFeView(neighbor);
+          adj_fe_view   = (CellFEView*)pwl_sdm->MapFeView(neighbor);
         }//local
         else //Non-local
         {
@@ -372,7 +372,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
-  auto fe_view = (CellFEView*)pwl_discr->MapFeView(cell_glob_index);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeView(cell_glob_index);
 
   for (int gr=0; gr<G; gr++)
   {

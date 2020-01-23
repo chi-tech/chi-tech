@@ -30,6 +30,13 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 
   int num_nodes = grid->nodes.size();
 
+  //================================================== Add pwl fem views
+  if (verbose)
+    chi_log.Log(LOG_0) << "Computing cell matrices";
+  pwl_sdm = ((SpatialDiscretization_PWL*)(this->discretization));
+  pwl_sdm->AddViewOfLocalContinuum(grid);
+  MPI_Barrier(MPI_COMM_WORLD);
+
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";

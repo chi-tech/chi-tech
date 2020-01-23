@@ -13,7 +13,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
                                                   chi_mesh::Cell *cell,
                                                   int group)
 {
-  auto fe_view   = dynamic_cast<CellFEView*>(pwl_discr->MapFeView(cell_glob_index));
+  auto fe_view   = dynamic_cast<CellFEView*>(pwl_sdm->MapFeView(cell_glob_index));
 
   //====================================== Process material id
   int mat_id = cell->material_id;

@@ -81,7 +81,7 @@ public:
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuum*                 grid;
   SpatialDiscretization*                      discretization;
-  SpatialDiscretization_PWL*                  pwl_discr;
+  SpatialDiscretization_PWL*                  pwl_sdm;
   chi_mesh::VolumeMesher*                  mesher;
   int fem_method;
 

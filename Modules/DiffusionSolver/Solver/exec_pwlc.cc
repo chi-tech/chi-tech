@@ -26,7 +26,7 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher    = mesh_handler->volume_mesher;
-  pwl_discr = ((SpatialDiscretization_PWL*)(this->discretization));
+
 
   //################################################## Assemble Amatrix
   chi_log.Log(LOG_0) << "Diffusion Solver: Assembling A and b";
@@ -49,14 +49,10 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 
   //================================================== Loop over locally owned
   //                                                   cells
-  size_t num_local_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
+  for (auto& cell : grid->local_cells)
   {
-    int glob_cell_index = grid->local_cell_glob_indices[lc];
-    chi_mesh::Cell* cell = grid->cells[glob_cell_index];
-
     if (!suppress_assembly)
-      CFEM_Assemble_A_and_b(glob_cell_index, cell, gi);
+      CFEM_Assemble_A_and_b(cell.cell_global_id, &cell, gi);
   }
 
   //=================================== Call matrix assembly
