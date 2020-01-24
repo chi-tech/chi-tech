@@ -35,7 +35,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     double     mu   = spds->omega.Dot(face.normal);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<0.0)
+    if (mu<(0.0-1.0e-16))
     {
       int neighbor = face.neighbor;
 
@@ -136,7 +136,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     int        cell_g_index = cell->cell_global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
-    if (mu>=0.0)
+    if (mu>=(0.0+1.0e-16))
     {
       size_t num_face_dofs = face.vertex_ids.size();
       size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
