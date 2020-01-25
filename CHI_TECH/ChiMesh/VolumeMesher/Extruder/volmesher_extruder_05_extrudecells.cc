@@ -1,5 +1,4 @@
 #include "volmesher_extruder.h"
-#include "../../MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell_polygon.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include "../../MeshHandler/chi_meshhandler.h"
@@ -10,6 +9,128 @@ extern ChiMPI chi_mpi;
 
 #include <chi_log.h>
 extern ChiLog chi_log;
+
+//###################################################################
+/**Computes the partition id of a template cell's projection onto 3D.*/
+chi_mesh::Vector
+chi_mesh::VolumeMesherExtruder::ComputeTemplateCell3DCentroid(
+  chi_mesh::CellPolygon *n_template_cell,
+  chi_mesh::MeshContinuum *vol_continuum,
+  int z_level_begin,int z_level_end)
+{
+  chi_mesh::Vector n_centroid_precompd;
+  size_t tc_num_verts = n_template_cell->vertex_ids.size();
+
+  for (auto tc_vid : n_template_cell->vertex_ids)
+  {
+    int v_index = (tc_vid + z_level_begin*node_z_index_incr);
+    n_centroid_precompd = n_centroid_precompd + *vol_continuum->nodes[v_index];
+  }
+
+  for (auto tc_vid : n_template_cell->vertex_ids)
+  {
+    int v_index = (tc_vid + (z_level_end)*node_z_index_incr);
+    n_centroid_precompd = n_centroid_precompd + *vol_continuum->nodes[(v_index)];
+  }
+  n_centroid_precompd = n_centroid_precompd/(2*tc_num_verts);
+
+  return n_centroid_precompd;
+}
+
+//###################################################################
+/**Computes a cell's partition id based on a centroid.*/
+int chi_mesh::VolumeMesherExtruder::
+  GetCellPartitionIDFromCentroid(chi_mesh::Vector& centroid,
+                                 chi_mesh::SurfaceMesher* surf_mesher)
+{
+  int px = surf_mesher->partitioning_x;
+  int py = surf_mesher->partitioning_y;
+
+  chi_mesh::Cell n_gcell(chi_mesh::CellType::GHOST);
+  n_gcell.centroid = centroid;
+
+  n_gcell.xyz_partition_indices = GetCellXYZPartitionID(&n_gcell);
+
+  int nxi = std::get<0>(n_gcell.xyz_partition_indices);
+  int nyi = std::get<1>(n_gcell.xyz_partition_indices);
+  int nzi = std::get<2>(n_gcell.xyz_partition_indices);
+
+  return nzi*px*py + nyi*px + nxi;
+}
+
+//###################################################################
+/**Determines if a template cell is neighbor to the current partition.*/
+bool chi_mesh::VolumeMesherExtruder::
+  IsTemplateCellNeighborToThisPartition(
+    chi_mesh::CellPolygon *template_cell,
+    chi_mesh::MeshContinuum *template_continuum,
+    chi_mesh::MeshContinuum *vol_continuum,
+    chi_mesh::SurfaceMesher *surf_mesher,
+    int z_level,int tc_index)
+{
+  int iz = z_level;
+  int tc = tc_index;
+
+  //========================= Loop over template cell neighbors
+  //                          for side neighbors
+  bool is_neighbor_to_partition = false;
+  for (auto& tc_face : template_cell->faces)
+  {
+    if (tc_face.neighbor >= 0)
+    {
+      auto n_template_cell = (chi_mesh::CellPolygon*)
+        template_continuum->cells[tc_face.neighbor];
+
+      auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
+        n_template_cell, vol_continuum, iz, iz+1);
+
+      int n_gcell_partition_id =
+        GetCellPartitionIDFromCentroid(n_centroid_precompd,surf_mesher);
+
+      if (n_gcell_partition_id == chi_mpi.location_id)
+      {
+        is_neighbor_to_partition = true;
+        break;
+      }
+    }//if neighbor not border
+  }//for neighbors
+
+  //========================= Now look at bottom neighbor
+  //Bottom face
+  if (iz != 0)
+  {
+    auto n_template_cell = (chi_mesh::CellPolygon*)
+      template_continuum->cells[tc];
+
+    auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
+      n_template_cell, vol_continuum, iz-1, iz);
+
+    int n_gcell_partition_id =
+      GetCellPartitionIDFromCentroid(n_centroid_precompd,surf_mesher);
+
+    if (n_gcell_partition_id == chi_mpi.location_id)
+      is_neighbor_to_partition = true;
+  }//if neighbor not border
+
+  //========================= Now look at top neighbor
+  //Top Face
+  if (iz != (vertex_layers.size()-2))
+  {
+    auto n_template_cell = (chi_mesh::CellPolygon*)
+      template_continuum->cells[tc];
+
+    auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
+      n_template_cell, vol_continuum, iz+1, iz+2);
+
+    int n_gcell_partition_id =
+      GetCellPartitionIDFromCentroid(n_centroid_precompd,surf_mesher);
+
+    if (n_gcell_partition_id == chi_mpi.location_id)
+      is_neighbor_to_partition = true;
+  }//if neighbor not border
+
+  return is_neighbor_to_partition;
+}
 
 //###################################################################
 /**Extrude template cells into polygons.*/
@@ -28,48 +149,27 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
     for (int tc=0; tc<template_continuum->cells.size(); tc++)
     {
       //========================================= Get template cell
-      auto template_cell =
-        dynamic_cast<chi_mesh::CellPolygon*>(template_continuum->cells[tc]);
-//      chi_mesh::CellPolygon* template_cell =
-//        (chi_mesh::CellPolygon*)template_continuum->cells[tc];
-      if (template_cell == nullptr)
+      if (template_continuum->cells[tc]->Type() !=
+          chi_mesh::CellType::POLYGON)
       {
         chi_log.Log(LOG_ALLERROR) << "Extruder: Template cell error.";
         exit(EXIT_FAILURE);
       }
+      auto template_cell = (chi_mesh::CellPolygon*)template_continuum->cells[tc];
+
 
       //========================================= Precompute centroid
-      chi_mesh::Vector centroid_precompd;
-      for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
-      {
-        int v_index = (template_cell->vertex_ids[tv]
-                       + iz*node_z_index_incr);
-        centroid_precompd = centroid_precompd + *vol_continuum->nodes[v_index];
-      }
-      for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
-      {
-        int v_index = (template_cell->vertex_ids[tv]
-                       + (iz+1)*node_z_index_incr);
-        centroid_precompd = centroid_precompd + *vol_continuum->nodes[(v_index)];
-      }
-      centroid_precompd = centroid_precompd/(2*template_cell->vertex_ids.size());
+      auto centroid_precompd = ComputeTemplateCell3DCentroid(
+        template_cell, vol_continuum, iz, iz+1);
 
       //========================================= Create a template empty
       //                                          cell
-      chi_mesh::Cell *tcell = new chi_mesh::Cell(chi_mesh::CellType::GHOST);
+      auto tcell = new chi_mesh::Cell(chi_mesh::CellType::GHOST);
       tcell->centroid = centroid_precompd;
 
       //========================================= Get the partition id
-      tcell->xyz_partition_indices = GetCellXYZPartitionID(tcell);
-      int xi,yi,zi;
-      xi = std::get<0>(tcell->xyz_partition_indices);
-      yi = std::get<1>(tcell->xyz_partition_indices);
-      zi = std::get<2>(tcell->xyz_partition_indices);
-      int px,py;
-      px = surf_mesher->partitioning_x;
-      py = surf_mesher->partitioning_y;
-      tcell->partition_id = zi*px*py + yi*px + xi;
-      //printf("xi,yi,zi=%d,%d,%d\n", xi,yi,zi);
+      tcell->partition_id =
+        GetCellPartitionIDFromCentroid(tcell->centroid, surf_mesher);
 
       //###################### NOT A LOCAL CELL ############################
       if ((tcell->partition_id != chi_mpi.location_id) and
@@ -78,38 +178,37 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         tcell->cell_global_id = vol_continuum->cells.size();
         vol_continuum->cells.push_back(tcell);
 
+        bool is_neighbor_to_partition = IsTemplateCellNeighborToThisPartition(
+          template_cell, template_continuum, vol_continuum, surf_mesher, iz, tc);
+
+        if (not is_neighbor_to_partition)
+        {
+          vol_continuum->cells[tcell->cell_global_id] = nullptr;
+          delete tcell;
+        }
       }
         //####################### LOCAL CELL ###############################
       else
       {
-        delete tcell;
         //========================================= Create polyhedron
-        chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
+        auto cell = new chi_mesh::CellPolyhedron;
         cell->xyz_partition_indices = tcell->xyz_partition_indices;
         cell->partition_id = tcell->partition_id;
+        delete tcell;
 
-        //========================================= Compute centroid
-        //                                          and set vindices
-        for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
-        {
-          int v_index = (template_cell->vertex_ids[tv]
-                         + iz*node_z_index_incr);
-          cell->vertex_ids.push_back(v_index);
-        }
-        for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
-        {
-          int v_index = (template_cell->vertex_ids[tv]
-                         + (iz+1)*node_z_index_incr);
-          cell->vertex_ids.push_back(v_index);
-        }
+        //========================================= Populate cell v-indices
+        for (auto tc_vid : template_cell->vertex_ids)
+          cell->vertex_ids.push_back(tc_vid + iz*node_z_index_incr);
+
+        for (auto tc_vid : template_cell->vertex_ids)
+          cell->vertex_ids.push_back(tc_vid + (iz+1)*node_z_index_incr);
+
         cell->centroid = centroid_precompd;
         cell->vertex_ids.shrink_to_fit();
 
         //========================================= Create side faces
-        for (int e=0; e<template_cell->faces.size(); e++)
+        for (auto& face : template_cell->faces)
         {
-          chi_mesh::CellFace& face = template_cell->faces[e];
-
           chi_mesh::CellFace newFace;
 
           newFace.vertex_ids.resize(4,-1);
@@ -119,10 +218,10 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
           newFace.vertex_ids[3] = face.vertex_ids[0] + (iz+1)*node_z_index_incr;
 
           //Compute centroid
-          chi_mesh::Vertex v0 = *vol_continuum->nodes[newFace.vertex_ids[0]];
-          chi_mesh::Vertex v1 = *vol_continuum->nodes[newFace.vertex_ids[1]];
-          chi_mesh::Vertex v2 = *vol_continuum->nodes[newFace.vertex_ids[2]];
-          chi_mesh::Vertex v3 = *vol_continuum->nodes[newFace.vertex_ids[3]];
+          chi_mesh::Vertex& v0 = *vol_continuum->nodes[newFace.vertex_ids[0]];
+          chi_mesh::Vertex& v1 = *vol_continuum->nodes[newFace.vertex_ids[1]];
+          chi_mesh::Vertex& v2 = *vol_continuum->nodes[newFace.vertex_ids[2]];
+          chi_mesh::Vertex& v3 = *vol_continuum->nodes[newFace.vertex_ids[3]];
 
           chi_mesh::Vertex vfc = (v0+v1+v2+v3)/4.0;
           newFace.centroid = vfc;
@@ -192,10 +291,9 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         //Vertices
         vfc = chi_mesh::Vertex(0.0,0.0,0.0);
         newFace.vertex_ids.reserve(template_cell->vertex_ids.size());
-        for (int tv=0; tv<template_cell->vertex_ids.size(); tv++)
+        for (auto tc_vid : template_cell->vertex_ids)
         {
-          newFace.vertex_ids.push_back(template_cell->vertex_ids[tv]
-                                       + (iz+1)*node_z_index_incr);
+          newFace.vertex_ids.push_back(tc_vid + (iz+1)*node_z_index_incr);
           chi_mesh::Vertex v = *vol_continuum->nodes[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }

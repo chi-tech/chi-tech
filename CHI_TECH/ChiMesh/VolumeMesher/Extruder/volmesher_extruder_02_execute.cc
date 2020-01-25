@@ -187,11 +187,17 @@ void chi_mesh::VolumeMesherExtruder::Execute()
           }
         }//if mesh-global
 
+        chi_log.Log(LOG_ALLVERBOSE_1) << "Building local cell indices";
+
         //================================== Initialize local cell indices
         int num_glob_cells=grid->cells.size();
         for (int c=0; c<num_glob_cells; c++)
         {
           grid->glob_cell_local_indices.push_back(-1);
+
+          if (grid->cells[c] == nullptr)
+            continue;
+
           if ((grid->cells[c]->partition_id == chi_mpi.location_id) ||
               (options.mesh_global))
           {
@@ -200,28 +206,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
             grid->glob_cell_local_indices[c]=local_cell_index;
 
             grid->cells[c]->cell_local_id = local_cell_index;
-          }
-        }
-
-        //================================== Delete non-neighbor ghosts
-        std::vector<bool> neighbor_to_partition(num_glob_cells, false);
-        for (auto cell_glob_index : grid->local_cell_glob_indices)
-        {
-          auto cell = grid->cells[cell_glob_index];
-
-          for (auto& face : cell->faces)
-            if (face.neighbor >=0) neighbor_to_partition[face.neighbor] = true;
-        }
-
-        for (size_t cgi=0; cgi<num_glob_cells; ++cgi)
-        {
-          auto cell = grid->cells[cgi];
-
-          if ( (cell->Type() == chi_mesh::CellType::GHOST) and
-               (neighbor_to_partition[cgi] == false) )
-          {
-            grid->cells[cgi] = nullptr;
-            delete cell;
           }
         }
 
