@@ -99,18 +99,17 @@ void chi_mesh::VolumeMesherExtruder::Execute()
           << "VolumeMesherExtruder: Creating nodes"
           << std::endl;
 
-        node_z_index_incr = 0;
-        for (int iz=0; iz<vertex_layers.size(); iz++)
-        {
-          for (auto& vertex : ref_continuum->surface_mesh->vertices)
-          {
-            auto node = new chi_mesh::Node(vertex);
-            node->z = vertex_layers[iz];
-
-            grid->nodes.push_back(node);
-          }
-          if (iz==0) node_z_index_incr = grid->nodes.size();
-        }
+        node_z_index_incr = ref_continuum->surface_mesh->vertices.size();
+//        for (int iz=0; iz<vertex_layers.size(); iz++)
+//        {
+//          for (auto& vertex : ref_continuum->surface_mesh->vertices)
+//          {
+//            auto node = new chi_mesh::Node(vertex);
+//            node->z = vertex_layers[iz];
+//
+//            grid->nodes.push_back(node);
+//          }
+//        }
 
         //================================== Create baseline polygons in template
         //                                   continuum
@@ -121,42 +120,55 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
         delete ref_continuum->surface_mesh;
 
-        //================================== Connect template Boundaries
+        MPI_Barrier(MPI_COMM_WORLD);
         chi_log.Log(LOG_0VERBOSE_1)
-          << "VolumeMesherExtruder: Connecting boundaries"
+          << "VolumeMesherExtruder: Creating local nodes"
+          << std::endl;
+        CreateLocalAndBoundaryNodes(temp_grid,grid);
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        chi_log.Log(LOG_0VERBOSE_1)
+          << "VolumeMesherExtruder: Done creating local nodes"
           << std::endl;
 
-        for (auto template_cell : temp_grid->cells)
-          template_cell->FindBoundary2D(region);
+//        //================================== Connect template Boundaries
+//        chi_log.Log(LOG_0VERBOSE_1)
+//          << "VolumeMesherExtruder: Connecting boundaries"
+//          << std::endl;
+
+//        for (auto template_cell : temp_grid->cells)
+//          template_cell->FindBoundary2D(region);
 
         //================================== Check all open item_id of template
         //                                   have boundaries
-        int no_boundary_cells=0;
-
-        for (auto template_cell : temp_grid->cells)
-          if (!template_cell->CheckBoundary2D())
-            no_boundary_cells++;
-
-        if (no_boundary_cells>0)
-        {
-          chi_log.Log(LOG_ALLVERBOSE_1)
-            << "A total of "
-            << no_boundary_cells
-            << " out of "
-            << temp_grid->cells.size()
-            << " item_id found with no boundary connection.\n";
-          //temp_continuum->ExportCellsToPython("Zerror.py");
-        }
+//        int no_boundary_cells=0;
+//
+//        for (auto template_cell : temp_grid->cells)
+//          if (!template_cell->CheckBoundary2D())
+//            no_boundary_cells++;
+//
+//        if (no_boundary_cells>0)
+//        {
+//          chi_log.Log(LOG_ALLVERBOSE_1)
+//            << "A total of "
+//            << no_boundary_cells
+//            << " out of "
+//            << temp_grid->cells.size()
+//            << " item_id found with no boundary connection.\n";
+//          //temp_continuum->ExportCellsToPython("Zerror.py");
+//        }
         //================================== Create extruded item_id
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Extruding cells" << std::endl;
-
+        MPI_Barrier(MPI_COMM_WORLD);
         ExtrudeCells(temp_grid, grid);
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
           << grid->cells.size()
           << std::endl;
+
+
 
         //================================== Clean-up temporary continuum
         for (auto vert : temp_grid->nodes) delete vert;

@@ -32,10 +32,13 @@ public:
   //ReorderDOFs
   //04
   void SetupLayers(int default_layer_count=1);
+
+  void CreateLocalAndBoundaryNodes(chi_mesh::MeshContinuum* template_continuum,
+                                   chi_mesh::MeshContinuum* vol_continuum);
   //05
   chi_mesh::Vector ComputeTemplateCell3DCentroid(
                       chi_mesh::CellPolygon* n_template_cell,
-                      chi_mesh::MeshContinuum* vol_continuum,
+                      chi_mesh::MeshContinuum* template_continuum,
                       int z_level_begin,int z_level_end);
 
   int GetCellPartitionIDFromCentroid(chi_mesh::Vector& centroid,
@@ -44,7 +47,6 @@ public:
   bool IsTemplateCellNeighborToThisPartition(
     chi_mesh::CellPolygon* template_cell,
     chi_mesh::MeshContinuum* template_continuum,
-    chi_mesh::MeshContinuum* vol_continuum,
     chi_mesh::SurfaceMesher* surf_mesher,
     int z_level, int tc_index);
 
