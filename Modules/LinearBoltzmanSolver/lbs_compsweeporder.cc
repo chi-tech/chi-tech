@@ -95,13 +95,14 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     //============================================= Create sweep ordering
     //                                              per azimuthal angle
     //                                              per hemisphere
+    int pa = num_pol/2;
 
     //=========================================== TOP HEMISPHERE
     for (int i=0; i<num_azi; i++)
     {
       chi_mesh::sweep_management::SPDS* new_swp_order =
         chi_mesh::sweep_management::
-                  CreateSweepOrder(groupset->quadrature->polar_ang[0],
+                  CreateSweepOrder(groupset->quadrature->polar_ang[pa-1],
                                    groupset->quadrature->azimu_ang[i],
                                    this->grid,
                                    groupset->groups.size(),
@@ -109,7 +110,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       this->sweep_orderings.push_back(new_swp_order);
     }
     //=========================================== BOTTOM HEMISPHERE
-    int pa = num_pol/2;
     for (int i=0; i<num_azi; i++)
     {
       chi_mesh::sweep_management::SPDS* new_swp_order =
