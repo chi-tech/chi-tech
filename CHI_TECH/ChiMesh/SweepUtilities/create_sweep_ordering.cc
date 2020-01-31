@@ -22,6 +22,108 @@ extern ChiTimer   chi_program_timer;
 #include <ChiGraph/chi_directed_graph.h>
 
 //###################################################################
+/** This method searches ref_glob_dep[ref_locI] for a dependency on
+ * master_locI and if found will set found=true.
+ * Its search is registered in search_history to prevent
+ * cyclic search patterns. Optionally the routine can also be allowed to
+ * search recursively.*/
+void
+chi_mesh::sweep_management::RecursivelyFindLocIDependency(
+                                   std::vector<std::vector<int>>& ref_glob_dep,
+                                   std::vector<int>& search_history,
+                                   int master_locI,
+                                   int ref_locI,
+                                   bool& found,
+                                   bool allow_recursive_search)
+{
+  if (found) return;
+  if (ref_locI < 0) return;
+
+  auto already_searched = (
+    std::find(search_history.begin(),search_history.end(),ref_locI) !=
+      search_history.end() );
+
+  if (already_searched) return;
+  search_history.push_back(ref_locI);
+
+
+  for (auto dependency : ref_glob_dep[ref_locI])
+  {
+    if (dependency == master_locI)
+    {
+      found = true;
+      break;
+    }
+    if (allow_recursive_search)
+      RecursivelyFindLocIDependency(ref_glob_dep,
+                                    search_history,
+                                    master_locI,
+                                    dependency,
+                                    found,
+                                    allow_recursive_search);
+  }
+};
+
+//###################################################################
+/** This method firstly loops over each location and then each location's
+ * dependencies. It can optionally also go deeper and recursively loop.
+ *
+ * The main purpose is to find whether dependencies reference back to this
+ * location, thereby identifying a cyclic dependency. When a cyclic
+ * dependency is found it will be removed and the appropriate registers
+ * will be set.*/
+void
+  chi_mesh::sweep_management::RemoveGlobalCyclicDependencies(
+    chi_mesh::sweep_management::SPDS *sweep_order,
+    std::vector<std::vector<int>> &global_dependencies,
+    bool allow_recursive_search)
+{
+  std::vector<int> search_history;
+  search_history.reserve(chi_mpi.location_id);
+  for (int locI=0; locI<chi_mpi.process_count; locI++)
+  {
+
+    int c=-1;
+    for (auto rlocI : global_dependencies[locI])
+    {
+      ++c;
+      if (rlocI<0) continue;
+
+      bool depends_on_locI = false;
+      search_history.clear();
+      search_history.reserve(chi_mpi.location_id);
+      RecursivelyFindLocIDependency(global_dependencies,
+                                    search_history,
+                                    locI,
+                                    rlocI,
+                                    depends_on_locI,
+                                    allow_recursive_search);
+
+      if (depends_on_locI)
+      {
+        global_dependencies[locI][c]  = -1;
+        if (locI == chi_mpi.location_id)
+        {
+          auto dependent_location =
+            std::find(sweep_order->location_dependencies.begin(),
+                      sweep_order->location_dependencies.end(),
+                      rlocI);
+          sweep_order->location_dependencies.erase(dependent_location);
+          sweep_order->delayed_location_dependencies.push_back(rlocI);
+        }
+
+        if (rlocI == chi_mpi.location_id)
+        {
+          sweep_order->delayed_location_successors.push_back(locI);
+        }
+      }
+
+
+    }//for locI dependency c
+  }//for locI
+}
+
+//###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
  * cells.*/
 chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
@@ -216,40 +318,14 @@ CreateSweepOrder(double polar, double azimuthal,
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
     << " Removing intra-cellset cycles.";
+
+  const bool ALLOW_RECURSIVE_SEARCH = true;
+
   if (allow_cycles)
   {
-    for (int locI=0; locI<P; locI++)
-    {
-      for (int c=0; c<global_dependencies[locI].size(); c++)
-      {
-        int rlocI = global_dependencies[locI][c];
-        if (rlocI<0)
-          continue;
-        for (int d=0; d<global_dependencies[rlocI].size(); d++)
-        {
-          if (global_dependencies[rlocI][d] == locI)
-          {
-            global_dependencies[locI][c]  = -1;
-//            global_dependencies[rlocI][d] = -1;
-
-            if (locI == chi_mpi.location_id)
-            {
-              std::vector<int>::iterator dependent_location =
-                  std::find(sweep_order->location_dependencies.begin(),
-                            sweep_order->location_dependencies.end(),
-                            rlocI);
-              sweep_order->location_dependencies.erase(dependent_location);
-              sweep_order->delayed_location_dependencies.push_back(rlocI);
-            }
-
-            if (rlocI == chi_mpi.location_id)
-            {
-              sweep_order->delayed_location_successors.push_back(locI);
-            }
-          }//if cyclic dependency
-        }//for rlocI dependency d
-      }//for locI dependency c
-    }//for locI
+    RemoveGlobalCyclicDependencies(sweep_order,global_dependencies);
+    RemoveGlobalCyclicDependencies(sweep_order,global_dependencies,
+                                   ALLOW_RECURSIVE_SEARCH);
   }//if cycles allowed
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -270,17 +346,29 @@ CreateSweepOrder(double polar, double azimuthal,
     glob_order_mapping.push_back(loc);
   }
 
+  chi_log.Log(LOG_ALLVERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << "   - Adding dependencies.";
   //================================= Add dependencies
   for (int loc=0; loc<chi_mpi.process_count; loc++)
   {
+    chi_log.Log(LOG_0VERBOSE_1) << "Location " << loc;
     for (int dep=0; dep<global_dependencies[loc].size(); dep++)
     {
       if (global_dependencies[loc][dep]>=0)
+      {
         boost::add_edge(global_dependencies[loc][dep], loc, TDG);
+
+        chi_log.Log(LOG_0VERBOSE_1) << " depends loc " << global_dependencies[loc][dep];
+      }
+
     }
   }
 
   //================================= Generate topological sort
+  chi_log.Log(LOG_ALLVERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << "   - Generating topological sort.";
   boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
     glob_index_map = get(boost::vertex_index, TDG);
 
@@ -298,6 +386,9 @@ CreateSweepOrder(double polar, double azimuthal,
   //================================= Generate linear ordering
   // This step just puts the topological
   // sorting into a std::vector.
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Generating global ordering.";
   for (std::vector<gVertex>::reverse_iterator ii=glob_sorted_list.rbegin();
        ii!=glob_sorted_list.rend();
        ii++)

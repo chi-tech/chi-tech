@@ -8,6 +8,7 @@
 #define GAUSS_CHEBYSHEV          2
 #define GAUSS_LEGENDRE_LEGENDRE  3
 #define GAUSS_LEGENDRE_CHEBYSHEV 4
+#define CUSTOM_QUADRATURE        5
 
 namespace chi_math
 {
@@ -37,6 +38,10 @@ public:
   void InitializeWithGL(int Np, bool verbose=false);
   void InitializeWithGLL(int Na, int Np, bool verbose=false);
   void InitializeWithGLC(int Na, int Np, bool verbose=false);
+  void InitializeWithCustom(std::vector<double>& azimuthal,
+                            std::vector<double>& polar,
+                            std::vector<double>& in_weights,
+                            bool verbose=false);
   int  GetAngleNum(int polar_angle_index, int azimu_ang_index)
   {
     return azimu_ang_index*polar_ang.size() +

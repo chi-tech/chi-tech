@@ -25,10 +25,22 @@ namespace sweep_management
 
   class SweepScheduler;
 
+  void RecursivelyFindLocIDependency(std::vector<std::vector<int>>& ref_glob_dep,
+                                     std::vector<int>& search_history,
+                                     int master_locI,
+                                     int ref_locI,
+                                     bool& found,
+                                     bool allow_recursive_search= false);
+
   SPDS* CreateSweepOrder(double polar, double azimuthal,
                          chi_mesh::MeshContinuum *vol_continuum,
                          int number_of_groups,
                          bool allow_cycles=false);
+
+  void RemoveGlobalCyclicDependencies(
+    chi_mesh::sweep_management::SPDS* sweep_order,
+    std::vector<std::vector<int>>& global_dependencies,
+    bool allow_recursive_search=false);
 
   void PopulateCellRelationships(
             chi_mesh::MeshContinuum *grid,
