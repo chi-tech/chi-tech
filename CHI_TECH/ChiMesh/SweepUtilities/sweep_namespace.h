@@ -33,7 +33,7 @@ namespace sweep_management
                                      bool allow_recursive_search= false);
 
   SPDS* CreateSweepOrder(double polar, double azimuthal,
-                         chi_mesh::MeshContinuum *vol_continuum,
+                         chi_mesh::MeshContinuum *grid,
                          int number_of_groups,
                          bool allow_cycles=false);
 
