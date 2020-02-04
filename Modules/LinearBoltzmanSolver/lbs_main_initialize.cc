@@ -114,10 +114,7 @@ void LinearBoltzman::Solver::Initialize()
   chi_mesh::Region*  aregion = this->regions.back();
   this->grid                 = aregion->volume_mesh_continua.back();
 
-  discretization->AddViewOfLocalContinuum(
-    grid,
-    grid->local_cell_glob_indices.size(),
-    grid->local_cell_glob_indices.data());
+  discretization->AddViewOfLocalContinuum(grid);
   auto pwl_discretization = (SpatialDiscretization_PWL*)discretization;
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -130,9 +127,8 @@ void LinearBoltzman::Solver::Initialize()
   //                                                   unique material ids
   std::set<int> unique_material_ids;
   int invalid_mat_cell_count = 0;
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (auto cell_g_index : grid->local_cell_glob_indices)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
     auto cell = grid->cells[cell_g_index];
 
     //Transport simulations can sometimes have very complex material
@@ -148,8 +144,10 @@ void LinearBoltzman::Solver::Initialize()
     //here is that it holds the means to know where a given cell's
     //transport quantities are located in the unknown vectors (i.e. phi)
     CellFEView* cell_fe_view = pwl_discretization->MapFeView(cell_g_index);
-    LinearBoltzman::CellViewFull* full_cell_view =
-      new LinearBoltzman::CellViewFull(cell_fe_view->dofs, groups.size(), num_moments);
+    auto full_cell_view =
+      new LinearBoltzman::CellViewFull(cell_fe_view->dofs,
+                                       groups.size(),
+                                       num_moments);
     cell_transport_views.push_back(full_cell_view);
 
     //For PWLD, for a given cell, within a given sweep chunk,

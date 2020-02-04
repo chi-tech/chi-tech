@@ -24,43 +24,37 @@ extern ChiTimer chi_program_timer;
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
 CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                   chi_mesh::MeshContinuum *vol_continuum)
+                   chi_mesh::MeshContinuum *vol_continuum,
+                   bool delete_surface_mesh_elements)
 {
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Copy nodes
-  std::vector<chi_mesh::Vertex>::iterator vertex;
-  for (vertex = surface_mesh->vertices.begin();
-       vertex != surface_mesh->vertices.end();
-       vertex++)
-  {
-    auto node = new chi_mesh::Node;
-    *node = (*vertex.base());
+  for (auto& vertex : surface_mesh->vertices)
+    vol_continuum->nodes.push_back(new chi_mesh::Node(vertex));
 
-    vol_continuum->nodes.push_back(node);
-  }
+  //============================================= Delete nodes
+  if (delete_surface_mesh_elements)
+    surface_mesh->vertices = std::move(std::vector<chi_mesh::Vertex>(0));
 
   //============================================= Process faces
-  std::vector<chi_mesh::Face>::iterator face;
-  for (face = surface_mesh->faces.begin();
-       face != surface_mesh->faces.end();
-       face++)
+  for (auto& face : surface_mesh->faces)
   {
     auto cell = new chi_mesh::CellPolygon;
 
     for (int k=0;k<3;k++)
     {
-      cell->vertex_ids.push_back(face->v_index[k]);
+      cell->vertex_ids.push_back(face.v_index[k]);
 
       chi_mesh::CellFace new_face;
 
-      new_face.vertex_ids.push_back(face->e_index[k][0]);
-      new_face.vertex_ids.push_back(face->e_index[k][1]);
+      new_face.vertex_ids.push_back(face.e_index[k][0]);
+      new_face.vertex_ids.push_back(face.e_index[k][1]);
 
 
-      chi_mesh::Vertex v0 = surface_mesh->vertices[face->e_index[k][0]];
-      chi_mesh::Vertex v1 = surface_mesh->vertices[face->e_index[k][1]];
+      chi_mesh::Vertex& v0 = *vol_continuum->nodes[face.e_index[k][0]];
+      chi_mesh::Vertex& v1 = *vol_continuum->nodes[face.e_index[k][1]];
       new_face.centroid = v0*0.5 + v1*0.5;
 
       chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
@@ -70,11 +64,11 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
-      new_face.neighbor = face->e_index[k][2];
+      new_face.neighbor = face.e_index[k][2];
 
       cell->faces.push_back(new_face);
 
-      cell->centroid = cell->centroid + surface_mesh->vertices[face->v_index[k]];
+      cell->centroid = cell->centroid + surface_mesh->vertices[face.v_index[k]];
     }
     cell->centroid = cell->centroid/3;
 
@@ -88,17 +82,17 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 
     vol_continuum->cells.push_back(cell);
   }
-  for (int f=0; f<surface_mesh->poly_faces.size(); f++)
-  {
-    chi_mesh::PolyFace* face = surface_mesh->poly_faces[f];
 
+  for (auto face : surface_mesh->poly_faces)
+  {
     auto cell = new chi_mesh::CellPolygon;
 
     //====================================== Copy vertices
-    for (int v=0; v<face->v_indices.size();v++)
+    for (auto vid : face->v_indices)
     {
-      cell->vertex_ids.push_back(face->v_indices[v]);
-      cell->centroid = cell->centroid + surface_mesh->vertices[face->v_indices[v]];
+      cell->vertex_ids.push_back(vid);
+      cell->centroid = cell->centroid +
+                       *vol_continuum->nodes[vid];
     }
     cell->centroid = cell->centroid/cell->vertex_ids.size();
 
@@ -118,8 +112,8 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       new_face.vertex_ids.push_back(src_side[0]);
       new_face.vertex_ids.push_back(src_side[1]);
 
-      chi_mesh::Vertex v0 = surface_mesh->vertices[src_side[0]];
-      chi_mesh::Vertex v1 = surface_mesh->vertices[src_side[1]];
+      chi_mesh::Vertex& v0 = *vol_continuum->nodes[src_side[0]];
+      chi_mesh::Vertex& v1 = *vol_continuum->nodes[src_side[1]];
       new_face.centroid = v0*0.5 + v1*0.5;
       chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
 
@@ -136,7 +130,14 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     cell->cell_global_id = vol_continuum->cells.size();
 
     vol_continuum->cells.push_back(cell);
+
+    if (delete_surface_mesh_elements)
+      delete face;
   }
+
+  if (delete_surface_mesh_elements)
+    surface_mesh->poly_faces.clear();
+
 }
 
 
