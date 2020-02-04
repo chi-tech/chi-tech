@@ -10,26 +10,35 @@ extern ChiLog     chi_log;
 /** Creates a Product-quadrature.
  *
 \param QuadratureType int Quadrature identifier.
-\param Np int Number of polar angles per octant.
-\param Na int Number of Azimuthal angles per octant.
+\param values varying Varying options based on the quadrature type.
 
 ##_
 
 ###QuadratureType:\n
 GAUSS_LEGENDRE\n
  Gauss-Legendre quadrature for the polar angles and no quadrature rule
- for the azimuthal angle. Suitable only for 1D simulations. \n\n
+ for the azimuthal angle. Suitable only for 1D simulations. Expects
+ to be followed by the number of angles Np. Optionally a verbosity flag
+ can be added.\n\n
 
 GAUSS_LEGENDRE_LEGENDRE\n
- Gauss-Legendre quadrature for both the polar and azimuthal dimension.\n\n
+ Gauss-Legendre quadrature for both the polar and azimuthal dimension.
+ Expects to be followed by number of Azimuthal and Polar angles.
+ Optionally a verbosity flag can be added.\n\n
 
 GAUSS_LEGENDRE_CHEBYSHEV\n
  Gauss-Legendre quadrature for the polar angle but Gauss-Chebyshev
- for the azimuthal angle.\n\n
+ for the azimuthal angle.
+ Expects to be followed by number of Azimuthal and Polar angles.
+ Optionally a verbosity flag can be added.\n\n
 
-###Verbose option:\n
- An additional boolean argument at the end can be provided to
- add verbose output.\n\n
+CUSTOM_QUADRATURE\n
+ Expects to be followed by three lua tables. The first table is an array,
+ of length Na, of the azimuthal angles (radians). The second table is an array,
+ of length Np, of the polar angles (radians). The third table is an array, of
+ length Na*Np, and contains the weight associated with each angle pair.
+ Optionally a verbosity flag can be added.\n\n
+
 
 \return Returns a unique handle to the created product quadrature rule
 
@@ -123,6 +132,85 @@ int chiCreateProductQuadrature(lua_State *L)
       << " azimuthal angles and "
       << new_quad->polar_ang.size()
       << " polar angles.";
+    }
+
+    return 1;
+  }
+  else if (ident == CUSTOM_QUADRATURE) //CUSTOM_QUADRATURE
+  {
+    if (num_args<4)
+      LuaPostArgAmountError("chiCreateProductQuadrature:CUSTOM_QUADRATURE",3,num_args);
+
+    if (not lua_istable(L,2))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chiCreateProductQuadrature:CUSTOM_QUADRATURE, second argument must "
+        << "be a lua table.";
+      exit(EXIT_FAILURE);
+    }
+    if (not lua_istable(L,3))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chiCreateProductQuadrature:CUSTOM_QUADRATURE, third argument must "
+        << "be a lua table.";
+      exit(EXIT_FAILURE);
+    }
+    if (not lua_istable(L,4))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chiCreateProductQuadrature:CUSTOM_QUADRATURE, fourth argument must "
+        << "be a lua table.";
+      exit(EXIT_FAILURE);
+    }
+    if (num_args == 5)
+      verbose = lua_toboolean(L,4);
+
+    int Na = lua_rawlen(L,2);
+    int Np = lua_rawlen(L,3);
+    int Nw = lua_rawlen(L,4);
+
+    std::vector<double> azimuthal(Na,0.0);
+    std::vector<double> polar(Np,0.0);
+    std::vector<double> weights(Nw,0.0);
+
+    for (int n=1; n<=Na; ++n)
+    {
+      lua_pushnumber(L,n);
+      lua_gettable(L,2);
+      azimuthal[n-1] = lua_tonumber(L,-1);
+      lua_pop(L,1);
+    }
+    for (int n=1; n<=Np; ++n)
+    {
+      lua_pushnumber(L,n);
+      lua_gettable(L,3);
+      polar[n-1] = lua_tonumber(L,-1);
+      lua_pop(L,1);
+    }
+    for (int n=1; n<=Nw; ++n)
+    {
+      lua_pushnumber(L,n);
+      lua_gettable(L,4);
+      weights[n-1] = lua_tonumber(L,-1);
+      lua_pop(L,1);
+    }
+
+    chi_log.Log(LOG_0) << Na << " " << Np << " " << Nw;
+
+    auto new_quad = new chi_math::ProductQuadrature;
+    new_quad->InitializeWithCustom(azimuthal,polar,weights,verbose);
+    chi_math_handler.product_quadratures.push_back(new_quad);
+    int index = chi_math_handler.product_quadratures.size()-1;
+    lua_pushnumber(L,index);
+
+    if (verbose)
+    {
+      chi_log.Log(LOG_0)
+        << "Created Custom Quadrature with "
+        << new_quad->azimu_ang.size()
+        << " azimuthal angles and "
+        << new_quad->polar_ang.size()
+        << " polar angles.";
     }
 
     return 1;
