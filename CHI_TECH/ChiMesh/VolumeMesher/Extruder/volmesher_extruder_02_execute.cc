@@ -60,7 +60,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     region->volume_mesh_continua.push_back(temp_grid);
     region->volume_mesh_continua.push_back(grid);
 
-    std::vector<chi_mesh::Boundary*>::iterator bndry;
     //=========================================== Perform the operation
     bool single_surfacemesh_processed = false;
 
@@ -85,7 +84,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
         //================================== Assign reference continuum
         chi_mesh::MeshContinuum* ref_continuum = &bndry->initial_mesh_continuum;
-        if (bndry->mesh_continua.size()>0)
+        if (not bndry->mesh_continua.empty())
           ref_continuum = bndry->mesh_continua.back();
 
         //We now have the surface we want to extrude
@@ -94,69 +93,40 @@ void chi_mesh::VolumeMesherExtruder::Execute()
           << std::endl;
         SetupLayers();
 
-        //================================== Create nodes
-        chi_log.Log(LOG_0VERBOSE_1)
-          << "VolumeMesherExtruder: Creating nodes"
-          << std::endl;
-
-        node_z_index_incr = 0;
-        for (int iz=0; iz<vertex_layers.size(); iz++)
-        {
-          for (auto& vertex : ref_continuum->surface_mesh->vertices)
-          {
-            auto node = new chi_mesh::Node(vertex);
-            node->z = vertex_layers[iz];
-
-            grid->nodes.push_back(node);
-          }
-          if (iz==0) node_z_index_incr = grid->nodes.size();
-        }
+        //================================== Get node_z_incr
+        node_z_index_incr = ref_continuum->surface_mesh->vertices.size();
 
         //================================== Create baseline polygons in template
         //                                   continuum
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Creating template cells"
           << std::endl;
-        CreatePolygonCells(ref_continuum->surface_mesh, temp_grid);
-
+        bool delete_surface_mesh_elements = true;
+        CreatePolygonCells(ref_continuum->surface_mesh, temp_grid,
+                           delete_surface_mesh_elements);
         delete ref_continuum->surface_mesh;
 
-        //================================== Connect template Boundaries
         chi_log.Log(LOG_0VERBOSE_1)
-          << "VolumeMesherExtruder: Connecting boundaries"
+          << "VolumeMesherExtruder: Creating local nodes"
+          << std::endl;
+        CreateLocalAndBoundaryNodes(temp_grid,grid);
+
+        chi_log.Log(LOG_0VERBOSE_1)
+          << "VolumeMesherExtruder: Done creating local nodes"
           << std::endl;
 
-        for (auto template_cell : temp_grid->cells)
-          template_cell->FindBoundary2D(region);
-
-        //================================== Check all open item_id of template
-        //                                   have boundaries
-        int no_boundary_cells=0;
-
-        for (auto template_cell : temp_grid->cells)
-          if (!template_cell->CheckBoundary2D())
-            no_boundary_cells++;
-
-        if (no_boundary_cells>0)
-        {
-          chi_log.Log(LOG_ALLVERBOSE_1)
-            << "A total of "
-            << no_boundary_cells
-            << " out of "
-            << temp_grid->cells.size()
-            << " item_id found with no boundary connection.\n";
-          //temp_continuum->ExportCellsToPython("Zerror.py");
-        }
         //================================== Create extruded item_id
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Extruding cells" << std::endl;
-
+        MPI_Barrier(MPI_COMM_WORLD);
         ExtrudeCells(temp_grid, grid);
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
           << grid->cells.size()
           << std::endl;
+
+
 
         //================================== Clean-up temporary continuum
         for (auto vert : temp_grid->nodes) delete vert;
@@ -187,11 +157,17 @@ void chi_mesh::VolumeMesherExtruder::Execute()
           }
         }//if mesh-global
 
+        chi_log.Log(LOG_ALLVERBOSE_1) << "Building local cell indices";
+
         //================================== Initialize local cell indices
         int num_glob_cells=grid->cells.size();
         for (int c=0; c<num_glob_cells; c++)
         {
           grid->glob_cell_local_indices.push_back(-1);
+
+          if (grid->cells[c] == nullptr)
+            continue;
+
           if ((grid->cells[c]->partition_id == chi_mpi.location_id) ||
               (options.mesh_global))
           {
@@ -200,28 +176,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
             grid->glob_cell_local_indices[c]=local_cell_index;
 
             grid->cells[c]->cell_local_id = local_cell_index;
-          }
-        }
-
-        //================================== Delete non-neighbor ghosts
-        std::vector<bool> neighbor_to_partition(num_glob_cells, false);
-        for (auto cell_glob_index : grid->local_cell_glob_indices)
-        {
-          auto cell = grid->cells[cell_glob_index];
-
-          for (auto& face : cell->faces)
-            if (face.neighbor >=0) neighbor_to_partition[face.neighbor] = true;
-        }
-
-        for (size_t cgi=0; cgi<num_glob_cells; ++cgi)
-        {
-          auto cell = grid->cells[cgi];
-
-          if ( (cell->Type() == chi_mesh::CellType::GHOST) and
-               (neighbor_to_partition[cgi] == false) )
-          {
-            grid->cells[cgi] = nullptr;
-            delete cell;
           }
         }
 

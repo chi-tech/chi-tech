@@ -7,16 +7,12 @@
 
 #include <chi_mpi.h>
 #include <chi_log.h>
+#include "../../ChiConsole/chi_console.h"
+#include <ChiTimer/chi_timer.h>
 
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
-
-#include "../../ChiConsole/chi_console.h"
-
 extern ChiConsole chi_console;
-
-#include <ChiTimer/chi_timer.h>
-
 extern ChiTimer   chi_program_timer;
 
 #include <ChiGraph/chi_directed_graph.h>
@@ -26,13 +22,13 @@ extern ChiTimer   chi_program_timer;
  * cells.*/
 chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
 CreateSweepOrder(double polar, double azimuthal,
-                 chi_mesh::MeshContinuum *vol_continuum,int number_of_groups,
+                 chi_mesh::MeshContinuum *grid,
                  bool allow_cycles)
 {
   auto sweep_order  = new chi_mesh::sweep_management::SPDS;
-  sweep_order->grid = vol_continuum;
+  sweep_order->grid = grid;
 
-  size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
+  size_t num_loc_cells = grid->local_cell_glob_indices.size();
 
   //============================================= Compute direction vector
   sweep_order->polar     = polar;
@@ -55,7 +51,7 @@ CreateSweepOrder(double polar, double azimuthal,
   // The cell added to the graph vertex will have
   // the same index as the cell's local index
   CHI_D_GRAPH G;
-  for (auto c : vol_continuum->local_cell_glob_indices)
+  for (auto c : grid->local_cell_glob_indices)
     boost::add_vertex(G);
 
   std::vector<std::set<int>> cell_dependencies(num_loc_cells);
@@ -63,7 +59,7 @@ CreateSweepOrder(double polar, double azimuthal,
 
   //============================================= Make directed connections
   chi_log.Log(LOG_0VERBOSE_1) << "Populating cell relationships";
-  PopulateCellRelationships(vol_continuum,
+  PopulateCellRelationships(grid,
                             sweep_order,
                             cell_dependencies,
                             cell_successors);
@@ -142,28 +138,15 @@ CreateSweepOrder(double polar, double azimuthal,
   //but I can see no reason for this other than for
   //visualization.
   int i=0;
-  chi_mesh::sweep_management::SPLS* new_swp;
-  for (std::vector<gVertex>::reverse_iterator ii=sorted_list.rbegin();
-       ii!=sorted_list.rend();
-       ii++)
+  for (auto ii=sorted_list.rbegin(); ii!=sorted_list.rend(); ++ii)
   {
-    if (i==0)
-    {
-      new_swp = new chi_mesh::sweep_management::SPLS;
-      sweep_order->spls=new_swp;
-    }
+    if (i==0) sweep_order->spls = new chi_mesh::sweep_management::SPLS;
 
-    int cell_local_index = index_map[*ii];
-    int cell_global_index =
-      vol_continuum->local_cell_glob_indices[cell_local_index];
-    new_swp->item_id.push_back(cell_global_index);
-    i++;
-
-    //if (i==1000) {i=0;}
-
+    int cell_local_id = index_map[*ii];
+    int cell_global_index = grid->local_cell_glob_indices[cell_local_id];
+    sweep_order->spls->item_id.push_back(cell_global_index);
+    ++i;
   }
-
-
 
   G.clearing_graph();
 
@@ -193,7 +176,6 @@ CreateSweepOrder(double polar, double azimuthal,
   //============================================= Broadcast dependencies
   for (int locI=0; locI<P; locI++)
   {
-//    std::vector<int> locI_dependencies;
     if (locI == chi_mpi.location_id)
     {
       std::copy(sweep_order->location_dependencies.begin(),
@@ -216,40 +198,14 @@ CreateSweepOrder(double polar, double azimuthal,
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
     << " Removing intra-cellset cycles.";
+
+  const bool ALLOW_RECURSIVE_SEARCH = true;
+
   if (allow_cycles)
   {
-    for (int locI=0; locI<P; locI++)
-    {
-      for (int c=0; c<global_dependencies[locI].size(); c++)
-      {
-        int rlocI = global_dependencies[locI][c];
-        if (rlocI<0)
-          continue;
-        for (int d=0; d<global_dependencies[rlocI].size(); d++)
-        {
-          if (global_dependencies[rlocI][d] == locI)
-          {
-            global_dependencies[locI][c]  = -1;
-//            global_dependencies[rlocI][d] = -1;
-
-            if (locI == chi_mpi.location_id)
-            {
-              std::vector<int>::iterator dependent_location =
-                  std::find(sweep_order->location_dependencies.begin(),
-                            sweep_order->location_dependencies.end(),
-                            rlocI);
-              sweep_order->location_dependencies.erase(dependent_location);
-              sweep_order->delayed_location_dependencies.push_back(rlocI);
-            }
-
-            if (rlocI == chi_mpi.location_id)
-            {
-              sweep_order->delayed_location_successors.push_back(locI);
-            }
-          }//if cyclic dependency
-        }//for rlocI dependency d
-      }//for locI dependency c
-    }//for locI
+    RemoveGlobalCyclicDependencies(sweep_order,global_dependencies);
+    RemoveGlobalCyclicDependencies(sweep_order,global_dependencies,
+                                   ALLOW_RECURSIVE_SEARCH);
   }//if cycles allowed
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -270,17 +226,29 @@ CreateSweepOrder(double polar, double azimuthal,
     glob_order_mapping.push_back(loc);
   }
 
+  chi_log.Log(LOG_ALLVERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << "   - Adding dependencies.";
   //================================= Add dependencies
   for (int loc=0; loc<chi_mpi.process_count; loc++)
   {
+    chi_log.Log(LOG_0VERBOSE_1) << "Location " << loc;
     for (int dep=0; dep<global_dependencies[loc].size(); dep++)
     {
       if (global_dependencies[loc][dep]>=0)
+      {
         boost::add_edge(global_dependencies[loc][dep], loc, TDG);
+
+        chi_log.Log(LOG_0VERBOSE_1) << " depends loc " << global_dependencies[loc][dep];
+      }
+
     }
   }
 
   //================================= Generate topological sort
+  chi_log.Log(LOG_ALLVERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << "   - Generating topological sort.";
   boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
     glob_index_map = get(boost::vertex_index, TDG);
 
@@ -298,6 +266,9 @@ CreateSweepOrder(double polar, double azimuthal,
   //================================= Generate linear ordering
   // This step just puts the topological
   // sorting into a std::vector.
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Generating global ordering.";
   for (std::vector<gVertex>::reverse_iterator ii=glob_sorted_list.rbegin();
        ii!=glob_sorted_list.rend();
        ii++)
@@ -365,8 +336,7 @@ CreateSweepOrder(double polar, double azimuthal,
     << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)
   {
-    chi_mesh::sweep_management::STDG* new_stdg =
-      new chi_mesh::sweep_management::STDG;
+    auto new_stdg = new chi_mesh::sweep_management::STDG;
     sweep_order->global_sweep_planes.push_back(new_stdg);
 
     for (int k=0; k<num_ord; k++)
