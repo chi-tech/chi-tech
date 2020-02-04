@@ -30,7 +30,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
     double     mu  = face.normal.Dot(spds->omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<0.0)
+    if (mu<(0.0-1.0e-16))
     {
       int neighbor = face.neighbor;
 
@@ -58,7 +58,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         {
           double mur = adj_cell->faces[af].normal.Dot(spds->omega);
 
-          if (mur>=0.0) {out_f++;}
+          if (mur>=(0.0+1.0e-16)) {out_f++;}
           if (af == ass_face)
           {
             ass_f_counter = out_f;

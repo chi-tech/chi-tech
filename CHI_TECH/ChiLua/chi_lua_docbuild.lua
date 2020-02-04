@@ -367,7 +367,14 @@ This function can be called recursively to find #include statements
 and put them into the master file.
 ]]--
 function IncludeIntoMaster(master_file,slave_file_name)
+	print("Opening Slave file: "..slave_file_name)
 	local in_file = io.open(slave_file_name)
+
+	if (in_file == nil) then
+		print("ERROR (non-fatal): Could not open file \""..slave_file_name.."\"")
+		return 0;
+	end
+
 	line = in_file:read("L")
 	while (line ~= nil) do
 

@@ -5,42 +5,45 @@ end
 --dofile(CHI_LIBRARY)
 
 
+
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
-if (support_cycles ~= nil) then
-    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic3.obj",true)
-else
-    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic.obj",true)
+chiSurfaceMeshImportFromOBJFile(newSurfMesh,
+        "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
+
+--############################################### Extract edges from surface mesh
+loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
+
+line_mesh = {};
+line_mesh_count = 0;
+
+for k=1,loop_count do
+    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
+    for m=1,split_count do
+        line_mesh_count = line_mesh_count + 1;
+        line_mesh[line_mesh_count] = chiLineMeshCreateFromLoop(split_loops,m-1);
+    end
+
 end
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
+for k=1,line_mesh_count do
+    chiRegionAddLineBoundary(region1,line_mesh[k]);
+end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
 
-
-
+chiSurfaceMesherSetProperty(MAX_AREA,1/20/20)
 chiSurfaceMesherSetProperty(PARTITION_X,2)
 chiSurfaceMesherSetProperty(PARTITION_Y,2)
-if (support_cycles == nil) then
-    chiSurfaceMesherSetProperty(CUT_X,0.5)
-    chiSurfaceMesherSetProperty(CUT_Y,0.0)
-    print("NON_CYCLES")
-else
-    chiSurfaceMesherSetProperty(CUT_X,0.0)
-    chiSurfaceMesherSetProperty(CUT_Y,0.0)
-    --chiSurfaceMesherSetProperty(CUT_X,0.5)
-    --chiSurfaceMesherSetProperty(CUT_Y,0.5)
-    print("WITH_CYCLES")
-end
-
+chiSurfaceMesherSetProperty(CUT_X,0.0)
+chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
@@ -108,31 +111,43 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
-pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,6, 6)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4, 2)
+azimuthal = {0.196349540849362,0.589048622548086,0.98174770424681,1.37444678594553,1.76714586764426,
+             2.15984494934298,2.55254403104171,2.94524311274043,3.33794219443915,3.73064127613788,
+             4.1233403578366,4.51603943953533,4.90873852123405,5.30143760293278,5.6941366846315,
+             6.08683576633023}
+polar = {0.533296293171529,1.22389963281593,1.91769302077387,2.60829636041826}
+weights = {0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431,0.13660233906431,
+           0.256096742634414,0.256096742634414,0.13660233906431,0.13660233906431,0.256096742634414,
+           0.256096742634414,0.13660233906431,0.13660233906431,0.256096742634414,0.256096742634414,
+           0.13660233906431,0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431,
+           0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431,0.13660233906431,
+           0.256096742634414,0.256096742634414,0.13660233906431,0.13660233906431,0.256096742634414,
+           0.256096742634414,0.13660233906431,0.13660233906431,0.256096742634414,0.256096742634414,
+           0.13660233906431,0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431,
+           0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431,0.13660233906431,
+           0.256096742634414,0.256096742634414,0.13660233906431,0.13660233906431,0.256096742634414,
+           0.256096742634414,0.13660233906431,0.13660233906431,0.256096742634414,0.256096742634414,
+           0.13660233906431,0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431,
+           0.13660233906431,0.256096742634414,0.256096742634414,0.13660233906431}
+--pquad = chiCreateProductQuadrature(CUSTOM_QUADRATURE,azimuthal, polar, weights)
+pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,5, 5)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
 chiLBSGroupsetAddGroups(phys1,cur_gs,0,20)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad2)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+--chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
-if (support_cycles ~= nil) then
-    chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES_CYCLES)
-    --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON_CYCLES)
-else
-    chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-end
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+if (master_export == nil) then
+    chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
+end
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
---
---gs1 = chiLBSCreateGroupset(phys1)
---chiLBSGroupsetAddGroups(phys1,gs1,63,167)
---chiLBSGroupsetSetQuadrature(phys1,gs1,pquad)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --========== Boundary conditions
 bsrc={}
@@ -140,9 +155,7 @@ for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/4.0/math.pi;
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
---chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
---chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMAX,LBSBoundaryTypes.REFLECTING);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
@@ -203,13 +216,3 @@ if (master_export == nil) then
     chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 end
 
-line = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(line,LINE_FIRSTPOINT,0.0,-1.0,0.5)
-chiFFInterpolationSetProperty(line,LINE_SECONDPOINT,0.0, 1.0,0.5)
-chiFFInterpolationSetProperty(line,LINE_NUMBEROFPOINTS,1000)
-chiFFInterpolationSetProperty(line,ADD_FIELDFUNCTION,fflist[2])
-
-chiFFInterpolationInitialize(line)
-chiFFInterpolationExecute(line)
-
-chiFFInterpolationExportPython(line,"Line")

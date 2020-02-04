@@ -24,7 +24,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
 {
   size_t num_loc_cells = grid->local_cell_glob_indices.size();
 
-  double tolerance = 1.0e-8;
+  double tolerance = 1.0e-16;
 
   //============================================= Make directed connections
   for (size_t c=0; c<num_loc_cells; c++)

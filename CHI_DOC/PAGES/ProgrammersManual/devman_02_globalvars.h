@@ -11,6 +11,32 @@ They are:
  - ChiMPI chi_mpi A handler for parallel related items.
  - ChiLog chi_log A handler for parallel logging events and verbosity.
 
+There are also a number fo secondary global variables that assist developers
+with coding. They are:
+ - ChiTimer chi_program_timer Holds a timer which initiates at program
+   start.
+   \code
+   double time_in_ms = chi_program_timer.GetTime();
+   \endcode
+ - std::string chi_input_file_name Holds the input file name if supplied.
+ - bool chi_termination_posted A flag used during interactive mode.
+ - bool chi_sim_option_interactive A flag indicating whether the code is
+   run in interactive mode.
+ - std::vector<chi_mesh::MeshHandler*> chi_meshhandler_stack and
+   int chi_current_mesh_handler. Holds various mesh handlers. When not using
+   the lua code to create a chi_mesh::MeshHandler be sure to set it to current
+   in order to ensure that the method chi_mesh::GetCurrentHandler() works:
+   \code
+   chi_meshhandler_stack.push_back(new chi_mesh::MeshHandler);
+   int index = chi_meshhandler_stack.size()-1;
+
+   chi_current_mesh_handler = index;
+   \endcode
+   And using it:
+   \code
+   auto& handler = *chi_mesh::GetCurrentHandler();
+   \endcode
+
 
 
 

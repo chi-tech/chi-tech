@@ -4,6 +4,7 @@
  *\subpage DevManCodeConventions \n
  *\subpage DevManGlobalVars \n
  *\subpage DevManAddingLua \n
+ *\subpage DevManMeshes \n
  *
 \section devman_sec0 Development  Cycle
 
