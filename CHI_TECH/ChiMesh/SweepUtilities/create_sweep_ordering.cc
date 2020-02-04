@@ -23,7 +23,6 @@ extern ChiTimer   chi_program_timer;
 chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
 CreateSweepOrder(double polar, double azimuthal,
                  chi_mesh::MeshContinuum *grid,
-                 int number_of_groups,
                  bool allow_cycles)
 {
   auto sweep_order  = new chi_mesh::sweep_management::SPDS;

@@ -57,7 +57,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       CreateSweepOrder(groupset->quadrature->polar_ang[0],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size(),
                        groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
 
@@ -66,7 +65,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size(),
                        groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
   }
@@ -105,7 +103,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                   CreateSweepOrder(groupset->quadrature->polar_ang[pa-1],
                                    groupset->quadrature->azimu_ang[i],
                                    this->grid,
-                                   groupset->groups.size(),
                                    groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
@@ -117,7 +114,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
         CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
-                         groupset->groups.size(),
                          groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
