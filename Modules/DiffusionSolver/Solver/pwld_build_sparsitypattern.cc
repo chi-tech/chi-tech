@@ -266,6 +266,6 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
   MPI_Barrier(MPI_COMM_WORLD);
 
 
-
+  chi_log.Log(LOG_0) << "Done creating DFEM sparsity pattern";
 
 }

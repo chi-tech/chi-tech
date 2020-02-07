@@ -42,14 +42,13 @@ extern ChiPhysics chi_physics_handler;
 /**Handles the PWLD version of a field function export to VTK.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
-                                                 std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
+                                                 const std::string& field_name)
 {
   SpatialDiscretization_PWL* pwl_sdm =
     (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
-  ff_interpol.grid_view = grid;
 
   std::vector<std::vector<double>>    d_nodes;
 
@@ -118,7 +117,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
   std::vector<int> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_components, num_sets, ref_component, ref_set,
-                                *field_vector, phi_vec, cfem_nodes, &mapping);
+                                *field_vector, phi_vec, cfem_nodes, &mapping,
+                                spatial_discretization);
 
 
   //======================================== Populate cell information
@@ -305,14 +305,13 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(std::string base_name,
 /**Handles the PWLD version of a field function export to VTK.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
-                                                 std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
+                                                  const std::string& field_name)
 {
   SpatialDiscretization_PWL* pwl_sdm =
     (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
-  ff_interpol.grid_view = grid;
 
   std::vector<std::vector<double>>    d_nodes;
 
@@ -384,7 +383,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(std::string base_name,
   std::vector<int> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_components, num_sets, ref_component, ref_set,
-                                *field_vector, phi_vec, cfem_nodes, &mapping);
+                                *field_vector, phi_vec, cfem_nodes, &mapping,
+                                spatial_discretization);
 
 
   //======================================== Populate cell information

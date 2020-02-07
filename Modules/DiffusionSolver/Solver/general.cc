@@ -329,7 +329,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }
@@ -412,7 +412,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }
@@ -495,7 +495,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }

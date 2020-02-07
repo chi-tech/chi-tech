@@ -4,6 +4,7 @@
 #include "../MeshContinuum/chi_meshcontinuum.h"
 #include "../chi_mesh.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 #define FFI_SLICE 1
 #define FFI_LINE 2
@@ -56,7 +57,8 @@ public:
   void CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                          Vec& x, Vec& x_cell,
                          std::vector<int>& cfem_nodes,
-                         std::vector<int>* mapping);
+                         std::vector<int>* mapping,
+                         SpatialDiscretization* sdm);
   void CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
                          std::vector<int>& pwld_nodes,
                          std::vector<int>& pwld_cells,

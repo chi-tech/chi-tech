@@ -147,7 +147,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
     VecGetArrayRead(x,&x_ref);
     double max =0.0;
 
-    for (int i=0; i<pwld_local_dof_count; i++)
+    for (int i=0; i < local_dof_count; i++)
     {
       pwld_phi_local[i] = x_ref[i];
       if (x_ref[i]> max)

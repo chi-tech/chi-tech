@@ -13,6 +13,23 @@
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
+chi_mesh::Cell& chi_mesh::MeshContinuum::LocalCells::
+  operator[](int cell_local_index)
+{
+  if ((cell_local_index < 0) or
+      (cell_local_index >= local_cell_ind.size()))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "LocalCells attempted to access local cell "
+      << cell_local_index
+      << " but index out of range [0, "
+      << local_cell_ind.size()-1 << "].";
+    exit(EXIT_FAILURE);
+  }
+  int cell_global_index = local_cell_ind[cell_local_index];
+  return *cell_references[cell_global_index];
+}
+
 //###################################################################
 /**Populates a face histogram.
  *
@@ -360,4 +377,22 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 
   }//for cfv
 
+}
+
+
+//###################################################################
+/**Computes the centroid from nodes specified by the given list.*/
+chi_mesh::Vector chi_mesh::MeshContinuum::
+  ComputeCentroidFromListOfNodes(const std::vector<int> &list)
+{
+  if (list.empty())
+  {
+    chi_log.Log(LOG_ALLERROR) << "ComputeCentroidFromListOfNodes, empty list";
+    exit(EXIT_FAILURE);
+  }
+  chi_mesh::Vector centroid;
+  for (auto node_id : list)
+    centroid = centroid + *nodes[node_id];
+
+  return centroid/list.size();
 }

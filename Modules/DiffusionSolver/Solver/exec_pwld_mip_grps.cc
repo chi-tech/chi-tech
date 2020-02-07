@@ -139,7 +139,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
       const double* x_ref;
       VecGetArrayRead(xg[gr],&x_ref);
 
-      for (int i=0; i<pwld_local_dof_count; i++)
+      for (int i=0; i < local_dof_count; i++)
       {
         int ir = i*G + gr;
         pwld_phi_local[ir] = x_ref[i];

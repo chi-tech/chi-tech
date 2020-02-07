@@ -7,14 +7,13 @@
 #include "../Cell/cell.h"
 
 
-
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
 class chi_mesh::MeshContinuum
 {
 public:
-  //################################################## LocalCells Class Definition
+  //##################################################
   /**Stores references to global cells to enable an iterator.*/
   class LocalCells
   {
@@ -26,6 +25,9 @@ public:
                std::vector<chi_mesh::Cell*>& in_cell_references) :
       local_cell_ind(in_local_cell_ind),
       cell_references(in_cell_references) {}
+
+    chi_mesh::Cell& operator[](int cell_local_index);
+
 
     //##################################### iterator Class Definition
     /**Internal iterator class.*/
@@ -115,7 +117,11 @@ public:
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
                               int adj_cell_g_index, int associated_face,
                               std::vector<int>& dof_mapping);
-  void PopulateUniqueBoundaries(std::set<int>& bndries);
+
+  chi_mesh::Vector ComputeCentroidFromListOfNodes(const std::vector<int>& list);
+
+  void CommunicatePartitionNeighborCells(
+    std::vector<chi_mesh::Cell*>& neighbor_cells);
 
 
 };

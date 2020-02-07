@@ -45,6 +45,11 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 
+chiSurfaceMesherSetProperty(PARTITION_X,2)
+chiSurfaceMesherSetProperty(PARTITION_Y,2)
+chiSurfaceMesherSetProperty(CUT_X,0.0)
+chiSurfaceMesherSetProperty(CUT_Y,0.0)
+
 --############################################### Execute meshing
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
@@ -131,13 +136,16 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 
-if (chi_location_id == 0 and master_export == nil) then
+if (master_export == nil) then
     chiFFInterpolationExportPython(slice1)
     chiFFInterpolationExportPython(slice2)
     chiFFInterpolationExportPython(line0)
+end
+
+if (chi_location_id == 0 and master_export == nil) then
     local handle = io.popen("python3 ZPFFI00.py")
     local handle = io.popen("python3 ZPFFI10.py")
-    --local handle = io.popen("python ZLFFI20.py")
+    local handle = io.popen("python3 ZLFFI20.py")
     print("Execution completed")
 end
 

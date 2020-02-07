@@ -60,8 +60,8 @@ chiVolumeMesherSetProperty(MESH_GLOBAL,false);
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
-chiRegionExportMeshToPython(region1,
-        "YMesh"..string.format("%d",chi_location_id)..".py",false)
+--chiRegionExportMeshToPython(region1,
+--        "YMesh"..string.format("%d",chi_location_id)..".py",false)
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)

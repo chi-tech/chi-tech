@@ -40,8 +40,8 @@ extern ChiPhysics chi_physics_handler;
 /**Handles the PWLD version of a field function export to VTK.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
-                                                 std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
+                                                 const std::string& field_name)
 {
   SpatialDiscretization_PWL* pwl_sdm =
     (SpatialDiscretization_PWL*)spatial_discretization;
@@ -280,8 +280,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(std::string base_name,
 /**Handles the PWLD version of a field function export to VTK with all groups.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKPWLDG(std::string base_name,
-                                                 std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
+                                                  const std::string& field_name)
 {
   SpatialDiscretization_PWL* pwl_sdm =
     (SpatialDiscretization_PWL*)spatial_discretization;

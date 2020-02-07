@@ -31,7 +31,7 @@ SpatialDiscretization_PWL::SpatialDiscretization_PWL(int dim)
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int SpatialDiscretization_PWL::MapNode(int vertex_id)
+int SpatialDiscretization_PWL::MapCFEMDOF(int vertex_id)
 {
   if (node_mapping.empty())
     return vertex_id;

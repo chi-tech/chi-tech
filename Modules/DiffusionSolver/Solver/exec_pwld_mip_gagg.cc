@@ -149,7 +149,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GAGG(bool suppress_assembly,
     const double* x_ref;
     VecGetArrayRead(x,&x_ref);
 
-    for (int i=0; i<pwld_local_dof_count*G; i++)
+    for (int i=0; i < local_dof_count * G; i++)
     {
       pwld_phi_local[i] = x_ref[i];
     }

@@ -2,6 +2,8 @@
 #include "../MeshHandler/chi_meshhandler.h"
 #include "../VolumeMesher/chi_volumemesher.h"
 
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+
 #include <chi_log.h>
 
 extern ChiLog chi_log;
@@ -127,16 +129,19 @@ void chi_mesh::FieldFunctionInterpolation::
 CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                   Vec& x, Vec& x_cell,
                   std::vector<int> &cfem_nodes,
-                  std::vector<int> *mapping)
+                  std::vector<int> *mapping,
+                  SpatialDiscretization* sdm)
 {
   chi_mesh::MeshHandler* cur_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* mesher = cur_handler->volume_mesher;
+
+  auto pwl_sdm = (SpatialDiscretization_PWL*)sdm;
 
   size_t num_nodes_to_map = cfem_nodes.size();
   std::vector<int> mapped_nodes;
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
-    int ir = mesher->MapNode(
+    int ir = pwl_sdm->MapCFEMDOF(
       cfem_nodes[n])*num_grps + g;
 
     mapped_nodes.push_back(ir);

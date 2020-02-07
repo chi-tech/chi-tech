@@ -25,7 +25,8 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
                         field_functions[ff]->ref_set,
                         x,x_mapped,
                         ff_ctx->cfem_local_nodes_needed_unmapped,
-                        &mapping);
+                        &mapping,
+                        field_functions[ff]->spatial_discretization);
 
       CFEMInterpolate(x_mapped,mapping,ff_ctx);
 

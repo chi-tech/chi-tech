@@ -28,7 +28,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher = mesh_handler->volume_mesher;
 
-  int num_nodes = grid->nodes.size();
+//  int num_nodes = grid->nodes.size();
 
   //================================================== Add pwl fem views
   if (verbose)
@@ -41,8 +41,10 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
   ChiTimer t_reorder; t_reorder.Reset();
-  ReorderNodesPWLC();
+
   auto domain_ownership = pwl_sdm->OrderNodesCFEM(grid);
+  local_dof_count = domain_ownership.first;
+  global_dof_count   = domain_ownership.second;
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
@@ -79,28 +81,23 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //================================================== Initialize nodal DOF
   //                                                   and connection info
-  nodal_nnz_in_diag.resize(grid->nodes.size(),0);
-  nodal_nnz_off_diag.resize(grid->nodes.size(),0);
-  nodal_boundary_numbers.resize(grid->nodes.size(),0);
-  nodal_connections.resize(grid->nodes.size(),std::vector<int>());
+  nodal_nnz_in_diag.resize(local_dof_count,0);
+  nodal_nnz_off_diag.resize(local_dof_count,0);
+  nodal_boundary_numbers.resize(local_dof_count,0);
+  nodal_connections.resize(local_dof_count,std::vector<int>());
 
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  PWLCBuildSparsityPattern();
-  std::vector<int> nodal_bid_copy = nodal_boundary_numbers;
   pwl_sdm->BuildCFEMSparsityPattern(grid,
-                                    nodal_boundary_numbers,
                                     nodal_nnz_in_diag,
                                     nodal_nnz_off_diag,
                                     domain_ownership);
-
-  nodal_boundary_numbers = nodal_bid_copy;
 
 
   //================================================== Initialize x and b
   ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
   ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-  ierr = VecSetSizes(x,local_rows_to - local_rows_from+1, num_nodes);CHKERRQ(ierr);
+  ierr = VecSetSizes(x,local_dof_count, global_dof_count);CHKERRQ(ierr);
   ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
   ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
 
@@ -109,15 +106,15 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //################################################## Create matrix
   ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRQ(ierr);
-  ierr = MatSetSizes(A,local_rows_to - local_rows_from+1,
-                     local_rows_to - local_rows_from+1,
-                     num_nodes, num_nodes);CHKERRQ(ierr);
+  ierr = MatSetSizes(A,local_dof_count,
+                       local_dof_count,
+                       global_dof_count, global_dof_count);CHKERRQ(ierr);
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
   chi_log.Log(LOG_0) << "Setting matrix preallocation.";
-  MatMPIAIJSetPreallocation(A,0,&nodal_nnz_in_diag[local_rows_from],
-                            0,&nodal_nnz_off_diag[local_rows_from]);
+  MatMPIAIJSetPreallocation(A,0,&nodal_nnz_in_diag[0],
+                            0,&nodal_nnz_off_diag[0]);
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
   MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
   MatSetUp(A);

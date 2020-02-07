@@ -42,8 +42,8 @@ extern ChiPhysics chi_physics_handler;
 /**Handles the PWLD version of a field function export to VTK.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
-                                               std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
+                                               const std::string& field_name)
 {
   chi_mesh::FieldFunctionInterpolation ff_interpol;
   ff_interpol.grid_view = grid;
@@ -212,11 +212,10 @@ void chi_physics::FieldFunction::ExportToVTKFV(std::string base_name,
 /**Handles the PWLD version of a field function export to VTK.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKFVG(std::string base_name,
-                                               std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
+                                                const std::string& field_name)
 {
   chi_mesh::FieldFunctionInterpolation ff_interpol;
-  ff_interpol.grid_view = grid;
 
   std::vector<std::vector<double>>    d_nodes;
 
