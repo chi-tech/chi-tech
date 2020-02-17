@@ -251,8 +251,8 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
         {
           auto k_hat = chi_mesh::Normal(0.0,0.0, 1.0);
 
-          auto& v0 = *nodes[cell->faces[f].vertex_ids[0]];
-          auto& v1 = *nodes[cell->faces[f].vertex_ids[1]];
+          auto& v0 = *vertices[cell->faces[f].vertex_ids[0]];
+          auto& v1 = *vertices[cell->faces[f].vertex_ids[1]];
 
           auto v01 = v1 - v0;
 
@@ -260,8 +260,8 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
         }
         else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto& v0 = *nodes[cell->faces[f].vertex_ids[0]];
-          auto& v1 = *nodes[cell->faces[f].vertex_ids[1]];
+          auto& v0 = *vertices[cell->faces[f].vertex_ids[0]];
+          auto& v1 = *vertices[cell->faces[f].vertex_ids[1]];
           auto& v2 = cell->faces[f].centroid;
 
           auto v01 = v1 - v0;
