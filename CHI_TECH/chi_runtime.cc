@@ -1,4 +1,6 @@
-#include<iostream>
+/** @file Runtime file*/
+#include "chi_runtime.h"
+#include <iostream>
 
 #include "ChiConsole/chi_console.h"
 #include "ChiMath/chi_math.h"
@@ -20,14 +22,6 @@ ChiMPI      chi_mpi;
 ChiLog      chi_log;
 ChiTimer    chi_program_timer;
 
-void ChiTechParseArguments(int argc, char** argv);
-int  ChiTechRunInteractive(int argc, char** argv);
-int  ChiTechRunBatch(int argc, char** argv);
-int  ChiTechInitialize(int argc, char** argv);
-void ChiTechFinalize();
-
-/// @file
-
 //=============================================== Global variables
 bool            chi_termination_posted = false;
 std::string     chi_input_file_name;
@@ -37,8 +31,11 @@ bool            chi_sim_option_interactive = true;
 
 
 //############################################### Argument parser
-/**Parses input arguments.*/
-void ChiTechParseArguments(int argc, char** argv)
+/**Parses input arguments.
+\param argc int    Number of arguments supplied.
+\param argv char** Array of strings representing each argument.
+ */
+void ChiTech::ParseArguments(int argc, char** argv)
 {
   bool input_file_found = false;
   for (int i=1; i<argc; i++)
@@ -89,10 +86,13 @@ void ChiTechParseArguments(int argc, char** argv)
 }
 
 //############################################### Initialize ChiTech
-/**Initializes all necessary items for ChiTech.*/
-int ChiTechInitialize(int argc, char** argv)
+/**Initializes all necessary items for ChiTech.
+\param argc int    Number of arguments supplied.
+\param argv char** Array of strings representing each argument.
+ */
+int ChiTech::Initialize(int argc, char** argv)
 {
-  ChiTechParseArguments(argc, argv);
+  ParseArguments(argc, argv);
   
   int location_id, number_processes;
 
@@ -112,8 +112,9 @@ int ChiTechInitialize(int argc, char** argv)
 }
 
 //############################################### Finalize ChiTech
-/**Finalizes ChiTech.*/
-void ChiTechFinalize()
+/**Finalizes ChiTech.
+ * */
+void ChiTech::Finalize()
 {
   PetscFinalize();
   MPI_Finalize();
@@ -121,7 +122,7 @@ void ChiTechFinalize()
 
 //############################################### Interactive interface
 /**Runs the interactive chitech engine*/
-int ChiTechRunInteractive(int argc, char** argv)
+int ChiTech::RunInteractive(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetLocalDateTimeString()
@@ -149,7 +150,7 @@ int ChiTechRunInteractive(int argc, char** argv)
 
 //############################################### Batch interface
 /**Runs ChiTech in pure batch mode. Start then finish.*/
-int ChiTechRunBatch(int argc, char** argv)
+int ChiTech::RunBatch(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetLocalDateTimeString()

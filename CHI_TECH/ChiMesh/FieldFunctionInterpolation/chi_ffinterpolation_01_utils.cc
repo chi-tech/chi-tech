@@ -19,15 +19,15 @@ extern ChiLog chi_log;
  * intersecting.*/
 bool chi_mesh::FieldFunctionInterpolation::
 CheckPlaneTetIntersect(chi_mesh::Normal plane_normal,
-                       chi_mesh::Vector plane_point,
-                       std::vector<chi_mesh::Vector *>* tet_points)
+                       chi_mesh::Vector3 plane_point,
+                       std::vector<chi_mesh::Vector3 *>* tet_points)
 {
   bool current_sense = false;
 
   size_t num_points = tet_points->size();
   for (size_t i=0; i<num_points; i++)
   {
-    chi_mesh::Vector v = (*(*tet_points)[i]) - plane_point;
+    chi_mesh::Vector3 v = (*(*tet_points)[i]) - plane_point;
     double dotp = plane_normal.Dot(v);
 
     bool new_sense = (dotp >= 0.0);
@@ -44,14 +44,14 @@ CheckPlaneTetIntersect(chi_mesh::Normal plane_normal,
 //###################################################################
 bool chi_mesh::FieldFunctionInterpolation::
 CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                        chi_mesh::Vector plane_point,
-                        chi_mesh::Vector line_point_0,
-                        chi_mesh::Vector line_point_1,
-                        chi_mesh::Vector& intersection_point,
+                        chi_mesh::Vector3 plane_point,
+                        chi_mesh::Vector3 line_point_0,
+                        chi_mesh::Vector3 line_point_1,
+                        chi_mesh::Vector3& intersection_point,
                         std::pair<double,double>& weights)
 {
-  chi_mesh::Vector v0 = line_point_0 - plane_point;
-  chi_mesh::Vector v1 = line_point_1 - plane_point;
+  chi_mesh::Vector3 v0 = line_point_0 - plane_point;
+  chi_mesh::Vector3 v1 = line_point_1 - plane_point;
 
   double dotp_0 = plane_normal.Dot(v0);
   double dotp_1 = plane_normal.Dot(v1);
@@ -84,17 +84,17 @@ Equation of a line:     <x,y,z> = <x0,y0,z0> + d<x1,y1,z1>
 
 */
 bool chi_mesh::FieldFunctionInterpolation::
-     CheckLineTriangleIntersect(std::vector<chi_mesh::Vector>& triangle_points,
-                                chi_mesh::Vector line_point_i,
-                                chi_mesh::Vector line_point_f)
+     CheckLineTriangleIntersect(std::vector<chi_mesh::Vector3>& triangle_points,
+                                chi_mesh::Vector3 line_point_i,
+                                chi_mesh::Vector3 line_point_f)
 {
   //======================================== First find plane intersection
   //Compute normal
-  chi_mesh::Vector p01 = triangle_points[1]-triangle_points[0];
-  chi_mesh::Vector p12 = triangle_points[2]-triangle_points[1];
-  chi_mesh::Vector p20 = triangle_points[0]-triangle_points[2];
-  chi_mesh::Vector pintersection;
-  chi_mesh::Vector n   = p01.Cross(p12); n=n/n.Norm();
+  chi_mesh::Vector3 p01 = triangle_points[1] - triangle_points[0];
+  chi_mesh::Vector3 p12 = triangle_points[2] - triangle_points[1];
+  chi_mesh::Vector3 p20 = triangle_points[0] - triangle_points[2];
+  chi_mesh::Vector3 pintersection;
+  chi_mesh::Vector3 n   = p01.Cross(p12); n= n / n.Norm();
 
   std::pair<double,double> weights;
   if (CheckPlaneLineIntersect(n,triangle_points[0],
@@ -104,13 +104,13 @@ bool chi_mesh::FieldFunctionInterpolation::
   {
     //======================================== Now determine if it is inside
     //                                         the triangle
-    chi_mesh::Vector p0_pint = pintersection - triangle_points[0];
-    chi_mesh::Vector p1_pint = pintersection - triangle_points[1];
-    chi_mesh::Vector p2_pint = pintersection - triangle_points[2];
+    chi_mesh::Vector3 p0_pint = pintersection - triangle_points[0];
+    chi_mesh::Vector3 p1_pint = pintersection - triangle_points[1];
+    chi_mesh::Vector3 p2_pint = pintersection - triangle_points[2];
 
-    chi_mesh::Vector cross0 = p01.Cross(p0_pint); cross0=cross0/cross0.Norm();
-    chi_mesh::Vector cross1 = p12.Cross(p1_pint); cross1=cross1/cross1.Norm();
-    chi_mesh::Vector cross2 = p20.Cross(p2_pint); cross2=cross2/cross2.Norm();
+    chi_mesh::Vector3 cross0 = p01.Cross(p0_pint); cross0= cross0 / cross0.Norm();
+    chi_mesh::Vector3 cross1 = p12.Cross(p1_pint); cross1= cross1 / cross1.Norm();
+    chi_mesh::Vector3 cross2 = p20.Cross(p2_pint); cross2= cross2 / cross2.Norm();
 
     if (cross0.Dot(n)<(0.0)) return false;
     if (cross1.Dot(n)<(0.0)) return false;
@@ -189,7 +189,7 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
     int c = cell->cell_local_id;
     int dof_map_start = local_cell_dof_array_address[c];
 
-    int address = dof_map_start + dof*num_grps*num_moms + num_grps*m + g;
+    int address = (dof_map_start + dof)*num_grps*num_moms + num_grps*m + g;
 
     mapping->push_back(address);
   }

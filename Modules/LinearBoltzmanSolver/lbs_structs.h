@@ -54,10 +54,6 @@ public:
 class CellViewFull : public CellViewBase
 {
 public:
-  std::vector<bool>  face_f_upwind_flag;
-  std::vector<int>   face_f_adj_part_id;
-  std::vector<int>   face_boundary_id;
-
   int dof_phi_map_start;
   int dofs;
   int xs_id;

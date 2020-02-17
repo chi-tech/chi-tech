@@ -43,17 +43,17 @@ public:
 
   //01 utils
   bool CheckPlaneTetIntersect(chi_mesh::Normal plane_normal,
-                              chi_mesh::Vector plane_point,
-                              std::vector<chi_mesh::Vector*>* tet_points);
+                              chi_mesh::Vector3 plane_point,
+                              std::vector<chi_mesh::Vector3*>* tet_points);
   bool CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                               chi_mesh::Vector plane_point,
-                               chi_mesh::Vector line_point_0,
-                               chi_mesh::Vector line_point_1,
-                               chi_mesh::Vector& intersection_point,
+                               chi_mesh::Vector3 plane_point,
+                               chi_mesh::Vector3 line_point_0,
+                               chi_mesh::Vector3 line_point_1,
+                               chi_mesh::Vector3& intersection_point,
                                std::pair<double,double>& weights);
-  bool CheckLineTriangleIntersect(std::vector<chi_mesh::Vector>& triangle_points,
-                                  chi_mesh::Vector line_point_i,
-                                  chi_mesh::Vector line_point_f);
+  bool CheckLineTriangleIntersect(std::vector<chi_mesh::Vector3>& triangle_points,
+                                  chi_mesh::Vector3 line_point_i,
+                                  chi_mesh::Vector3 line_point_f);
   void CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                          Vec& x, Vec& x_cell,
                          std::vector<int>& cfem_nodes,

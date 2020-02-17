@@ -2,17 +2,17 @@
 
 //###################################################################
 /**Returns the evaluation of shape function i at the supplied point.*/
-double PolyhedronFEView::ShapeValue(const int i, const chi_mesh::Vector& xyz)
+double PolyhedronFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 {
   for (size_t f=0; f < face_data.size(); f++)
   {
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector& p0 = *grid->nodes[face_data[f].sides[s].v_index[0]];
-      chi_mesh::Vector xyz_ref = xyz - p0;
+      chi_mesh::Vector3& p0 = *grid->vertices[face_data[f].sides[s].v_index[0]];
+      chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-      chi_mesh::Vector xi_eta_zeta   = face_data[f].sides[s].Jinv * xyz_ref;
+      chi_mesh::Vector3 xi_eta_zeta   = face_data[f].sides[s].Jinv * xyz_ref;
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -51,7 +51,7 @@ double PolyhedronFEView::ShapeValue(const int i, const chi_mesh::Vector& xyz)
 //###################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void PolyhedronFEView::ShapeValues(const chi_mesh::Vector& xyz,
+void PolyhedronFEView::ShapeValues(const chi_mesh::Vector3& xyz,
                                    std::vector<double>& shape_values)
 {
   shape_values.resize(dofs,0.0);
@@ -61,8 +61,8 @@ void PolyhedronFEView::ShapeValues(const chi_mesh::Vector& xyz,
     {
       auto& side_fe_info = face_data[f].sides[s];
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector& p0 = *grid->nodes[side_fe_info.v_index[0]];
-      chi_mesh::Vector xi_eta_zeta   = side_fe_info.Jinv*(xyz - p0);
+      chi_mesh::Vector3& p0 = *grid->vertices[side_fe_info.v_index[0]];
+      chi_mesh::Vector3 xi_eta_zeta   = side_fe_info.Jinv * (xyz - p0);
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -99,19 +99,19 @@ void PolyhedronFEView::ShapeValues(const chi_mesh::Vector& xyz,
 
 //###################################################################
 /**Returns the evaluation of grad-shape function i at the supplied point.*/
-chi_mesh::Vector PolyhedronFEView::GradShapeValue(const int i,
-                                                  const chi_mesh::Vector& xyz)
+chi_mesh::Vector3 PolyhedronFEView::GradShapeValue(const int i,
+                                                   const chi_mesh::Vector3& xyz)
 {
-  chi_mesh::Vector grad,gradr;
+  chi_mesh::Vector3 grad,gradr;
   for (size_t f=0; f < face_data.size(); f++)
   {
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector p0 = *grid->nodes[face_data[f].sides[s].v_index[0]];
-      chi_mesh::Vector xyz_ref = xyz - p0;
+      chi_mesh::Vector3 p0 = *grid->vertices[face_data[f].sides[s].v_index[0]];
+      chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-      chi_mesh::Vector xi_eta_zeta = face_data[f].sides[s].Jinv * xyz_ref;
+      chi_mesh::Vector3 xi_eta_zeta = face_data[f].sides[s].Jinv * xyz_ref;
 
       double xi  = xi_eta_zeta.x;
       double eta = xi_eta_zeta.y;
@@ -121,9 +121,9 @@ chi_mesh::Vector PolyhedronFEView::GradShapeValue(const int i,
       if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and (zeta>=-1.0e-12) and
           ((xi + eta + zeta)<=(1.0+1.0e-12)))
       {
-        chi_mesh::Vector grad_i;
-        chi_mesh::Vector grad_f;
-        chi_mesh::Vector grad_c;
+        chi_mesh::Vector3 grad_i;
+        chi_mesh::Vector3 grad_f;
+        chi_mesh::Vector3 grad_c;
 
         if (node_side_maps[i].face_map[f].side_map[s].part_of_face)
         {
@@ -164,8 +164,8 @@ chi_mesh::Vector PolyhedronFEView::GradShapeValue(const int i,
 /**Populates gradshape_values with the value of each shape function's
  * gradient evaluated at the supplied point.*/
 void PolyhedronFEView::GradShapeValues(
-  const chi_mesh::Vector &xyz,
-  std::vector<chi_mesh::Vector> &gradshape_values)
+  const chi_mesh::Vector3 &xyz,
+  std::vector<chi_mesh::Vector3> &gradshape_values)
 {
   gradshape_values.clear();
   for (int i=0; i<dofs; ++i)

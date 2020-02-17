@@ -45,10 +45,10 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+--chiSurfaceMesherSetProperty(PARTITION_X,2)
+--chiSurfaceMesherSetProperty(PARTITION_Y,2)
+--chiSurfaceMesherSetProperty(CUT_X,0.0)
+--chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 --############################################### Execute meshing
 chiSurfaceMesherExecute();

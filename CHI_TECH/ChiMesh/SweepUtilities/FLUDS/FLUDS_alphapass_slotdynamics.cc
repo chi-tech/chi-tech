@@ -20,9 +20,9 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
 
-  chi_mesh::Vector ihat(1.0,0.0,0.0);
-  chi_mesh::Vector jhat(0.0,1.0,0.0);
-  chi_mesh::Vector khat(0.0,0.0,1.0);
+  chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
+  chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
+  chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process
@@ -102,7 +102,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
       else if (grid->IsCellBndry(neighbor))
       {
-        chi_mesh::Vector& face_norm = cell->faces[f].normal;
+        chi_mesh::Vector3& face_norm = cell->faces[f].normal;
 
         if (face_norm.Dot(ihat)>0.999)
           location_boundary_dependency_set.insert(0);

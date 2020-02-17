@@ -25,10 +25,10 @@ public:
     grid = vol_continuum;
     v0i = slab_cell->vertex_ids[0];
     v1i = slab_cell->vertex_ids[1];
-    chi_mesh::Vertex v0 = *grid->nodes[v0i];
-    chi_mesh::Vertex v1 = *grid->nodes[v1i];
+    chi_mesh::Vertex v0 = *grid->vertices[v0i];
+    chi_mesh::Vertex v1 = *grid->vertices[v1i];
 
-    chi_mesh::Vector v01 = v1-v0;
+    chi_mesh::Vector3 v01 = v1 - v0;
     h = v01.Norm();
 
     IntV_shapeI.push_back(h/2);
@@ -57,10 +57,10 @@ public:
     IntV_shapeI_gradshapeJ[0].resize(2);
     IntV_shapeI_gradshapeJ[1].resize(2);
 
-    IntV_shapeI_gradshapeJ[0][0] = chi_mesh::Vector(0.0,0.0,-1/2.0);
-    IntV_shapeI_gradshapeJ[0][1] = chi_mesh::Vector(0.0,0.0, 1/2.0);
-    IntV_shapeI_gradshapeJ[1][0] = chi_mesh::Vector(0.0,0.0,-1/2.0);
-    IntV_shapeI_gradshapeJ[1][1] = chi_mesh::Vector(0.0,0.0, 1/2.0);
+    IntV_shapeI_gradshapeJ[0][0] = chi_mesh::Vector3(0.0, 0.0, -1 / 2.0);
+    IntV_shapeI_gradshapeJ[0][1] = chi_mesh::Vector3(0.0, 0.0, 1 / 2.0);
+    IntV_shapeI_gradshapeJ[1][0] = chi_mesh::Vector3(0.0, 0.0, -1 / 2.0);
+    IntV_shapeI_gradshapeJ[1][1] = chi_mesh::Vector3(0.0, 0.0, 1 / 2.0);
 
     IntS_shapeI.emplace_back(2, 0.0);
     IntS_shapeI.emplace_back(2, 0.0);
@@ -101,16 +101,16 @@ public:
     IntS_shapeI_gradshapeJ[1][1].resize(2);
 
     //Left face
-    IntS_shapeI_gradshapeJ[0][0][0] = chi_mesh::Vector(0.0,0.0,-1.0/h);
-    IntS_shapeI_gradshapeJ[0][0][1] = chi_mesh::Vector(0.0,0.0, 1.0/h);
-    IntS_shapeI_gradshapeJ[0][1][0] = chi_mesh::Vector(0.0,0.0, 0.0  );
-    IntS_shapeI_gradshapeJ[0][1][1] = chi_mesh::Vector(0.0,0.0, 0.0  );
+    IntS_shapeI_gradshapeJ[0][0][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
+    IntS_shapeI_gradshapeJ[0][0][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
+    IntS_shapeI_gradshapeJ[0][1][0] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
+    IntS_shapeI_gradshapeJ[0][1][1] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
 
     //Right face
-    IntS_shapeI_gradshapeJ[1][0][0] = chi_mesh::Vector(0.0,0.0, 0.0  );
-    IntS_shapeI_gradshapeJ[1][0][1] = chi_mesh::Vector(0.0,0.0, 0.0  );
-    IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector(0.0,0.0,-1.0/h);
-    IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector(0.0,0.0, 1.0/h);
+    IntS_shapeI_gradshapeJ[1][0][0] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
+    IntS_shapeI_gradshapeJ[1][0][1] = chi_mesh::Vector3(0.0, 0.0, 0.0  );
+    IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
+    IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
 
     face_dof_mappings.emplace_back(1,0);
     face_dof_mappings.emplace_back(1,1);
@@ -118,13 +118,13 @@ public:
   }
 
   /**Shape function i evaluated at given point for the slab.*/
-  double ShapeValue(const int i, const chi_mesh::Vector& xyz) override
+  double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override
   {
-    chi_mesh::Vector& p0 = *grid->nodes[v0i];
-    chi_mesh::Vector& p1 = *grid->nodes[v1i];
-    chi_mesh::Vector xyz_ref = xyz - p0;
+    chi_mesh::Vector3& p0 = *grid->vertices[v0i];
+    chi_mesh::Vector3& p1 = *grid->vertices[v1i];
+    chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-    chi_mesh::Vector v01 = p1 - p0;
+    chi_mesh::Vector3 v01 = p1 - p0;
 
     double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
 
@@ -146,15 +146,15 @@ public:
   //#################################################################
   /**Populates shape_values with the value of each shape function's
    * value evaluate at the supplied point.*/
-  void ShapeValues(const chi_mesh::Vector& xyz,
+  void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) override
   {
     shape_values.resize(dofs,0.0);
-    chi_mesh::Vector& p0 = *grid->nodes[v0i];
-    chi_mesh::Vector& p1 = *grid->nodes[v1i];
-    chi_mesh::Vector xyz_ref = xyz - p0;
+    chi_mesh::Vector3& p0 = *grid->vertices[v0i];
+    chi_mesh::Vector3& p1 = *grid->vertices[v1i];
+    chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-    chi_mesh::Vector v01 = p1 - p0;
+    chi_mesh::Vector3 v01 = p1 - p0;
 
     double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
 
@@ -179,19 +179,19 @@ public:
 
   //###################################################################
   /**Returns the evaluation of grad-shape function i at the supplied point.*/
-  chi_mesh::Vector GradShapeValue(const int i, const chi_mesh::Vector& xyz) override
+  chi_mesh::Vector3 GradShapeValue(const int i, const chi_mesh::Vector3& xyz) override
   {
     if (i==0)
-      return chi_mesh::Vector(0.0,0.0,-1.0/h);
+      return chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
     else
-      return chi_mesh::Vector(0.0,0.0, 1.0/h);
+      return chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
   }
 
   //###################################################################
   /**Populates shape_values with the value of each shape function's
    * value evaluate at the supplied point.*/
-  void GradShapeValues(const chi_mesh::Vector& xyz,
-                       std::vector<chi_mesh::Vector>& gradshape_values) override
+  void GradShapeValues(const chi_mesh::Vector3& xyz,
+                       std::vector<chi_mesh::Vector3>& gradshape_values) override
   {
     gradshape_values.clear();
     gradshape_values.emplace_back(GradShapeValue(0,xyz));

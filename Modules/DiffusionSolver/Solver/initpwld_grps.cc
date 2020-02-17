@@ -28,7 +28,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher = mesh_handler->volume_mesher;
 
-  int num_nodes = grid->nodes.size();
+  int num_nodes = grid->vertices.size();
 
   //================================================== Add pwl fem views
   if (verbose)
@@ -81,7 +81,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
   //                                                   and connection info
   nodal_nnz_in_diag.resize(local_dof_count, 0);
   nodal_nnz_off_diag.resize(local_dof_count, 0);
-  nodal_boundary_numbers.resize(grid->nodes.size(),0);
+  nodal_boundary_numbers.resize(grid->vertices.size(), 0);
   int total_nnz = 0;
 
 

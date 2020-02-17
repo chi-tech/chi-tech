@@ -75,7 +75,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
       int neighbor = cell->faces[f].neighbor;
 
       //================================== Get face normal
-      chi_mesh::Vector n  = cell->faces[f].normal;
+      chi_mesh::Vector3 n  = cell->faces[f].normal;
 
       int num_face_dofs = cell->faces[f].vertex_ids.size();
 

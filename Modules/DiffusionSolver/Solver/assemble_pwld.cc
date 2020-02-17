@@ -62,7 +62,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
     int neighbor = cell->faces[f].neighbor;
 
     //================================== Get face normal
-    chi_mesh::Vector n  = cell->faces[f].normal;
+    chi_mesh::Vector3 n  = cell->faces[f].normal;
 
     int num_face_dofs = cell->faces[f].vertex_ids.size();
 
@@ -71,26 +71,26 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       try{
       chi_mesh::Cell*           adj_cell    = nullptr;
       CellFEView*               adj_fe_view = nullptr;
-      DiffusionIPCellView*      adj_ip_view = nullptr;
+//      DiffusionIPCellView*      adj_ip_view = nullptr;
       int                              fmap = -1;
 
       //========================= Get adj cell information
       if (grid->IsCellLocal(neighbor))  //Local
       {
         adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
-        adj_ip_view   = ip_cell_views[adj_cell->cell_local_id];
+//        adj_ip_view   = ip_cell_views[adj_cell->cell_local_id];
         adj_fe_view   = (CellFEView*)pwl_sdm->MapFeView(neighbor);
       }//local
       else //Non-local
       {
         int locI = grid->cells[neighbor]->partition_id;
-        adj_ip_view = GetBorderIPView(locI,neighbor);
+//        adj_ip_view = GetBorderIPView(locI,neighbor);
         adj_cell    = pwl_sdm->MapNeighborCell(neighbor);
         adj_fe_view = pwl_sdm->MapNeighborCellFeView(neighbor);
       }//non-local
       //========================= Check valid information
-      if (adj_cell == nullptr || adj_fe_view == nullptr ||
-          adj_ip_view == nullptr)
+      if (adj_cell == nullptr || adj_fe_view == nullptr /*||
+          adj_ip_view == nullptr*/)
       {
         chi_log.Log(LOG_ALL)
           << "Error in MIP cell information.";

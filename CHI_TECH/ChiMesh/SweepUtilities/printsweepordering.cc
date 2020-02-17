@@ -30,7 +30,7 @@ void chi_mesh::sweep_management::
     rank_of_cell.push_back(0);
   }
 
-  chi_mesh::Vector omega;
+  chi_mesh::Vector3 omega;
   omega.x = sin(polar)*cos(azimuthal);
   omega.y = sin(polar)*sin(azimuthal);
   omega.z = cos(polar);

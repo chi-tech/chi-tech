@@ -70,12 +70,12 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
   phiavgarray->SetName((field_name + std::string("-Avg")).c_str());
 
   //========================================= Populate nodes
-  for (int v=0; v<grid->nodes.size(); v++)
+  for (int v=0; v<grid->vertices.size(); v++)
   {
     std::vector<double> d_node;
-    d_node.push_back(grid->nodes[v]->x);
-    d_node.push_back(grid->nodes[v]->y);
-    d_node.push_back(grid->nodes[v]->z);
+    d_node.push_back(grid->vertices[v]->x);
+    d_node.push_back(grid->vertices[v]->y);
+    d_node.push_back(grid->vertices[v]->z);
 
     d_nodes.push_back(d_node);
 
@@ -246,12 +246,12 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
 
   //========================================= Populate dones
-  for (int v=0; v<grid->nodes.size(); v++)
+  for (int v=0; v<grid->vertices.size(); v++)
   {
     std::vector<double> d_node;
-    d_node.push_back(grid->nodes[v]->x);
-    d_node.push_back(grid->nodes[v]->y);
-    d_node.push_back(grid->nodes[v]->z);
+    d_node.push_back(grid->vertices[v]->x);
+    d_node.push_back(grid->vertices[v]->y);
+    d_node.push_back(grid->vertices[v]->z);
 
     d_nodes.push_back(d_node);
 

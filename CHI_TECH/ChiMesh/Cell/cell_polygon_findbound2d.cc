@@ -41,8 +41,8 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
         chi_mesh::Vertex v[2];
 
         try{
-          v[0] = *ref_cont->nodes.at(faces[e].vertex_ids[0]);
-          v[1] = *ref_cont->nodes.at(faces[e].vertex_ids[1]);
+          v[0] = *ref_cont->vertices.at(faces[e].vertex_ids[0]);
+          v[1] = *ref_cont->vertices.at(faces[e].vertex_ids[1]);
         }
         catch (const std::out_of_range& o)
         {
@@ -66,8 +66,8 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
 
           //======================================= Check slope
           bool slopes_equal = false;
-          chi_mesh::Vector v01 = v[1]-v[0];
-          chi_mesh::Vector w01 = w[1]-w[0];
+          chi_mesh::Vector3 v01 = v[1] - v[0];
+          chi_mesh::Vector3 w01 = w[1] - w[0];
 
           v01 = v01/v01.Norm();
           w01 = w01/w01.Norm();
@@ -84,7 +84,7 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
           bool colinear = false;
           if (slopes_equal)
           {
-            chi_mesh::Vector vw0 = w[0]-v[0];
+            chi_mesh::Vector3 vw0 = w[0] - v[0];
 
             if (vw0.Norm()<0.0000001)
             {

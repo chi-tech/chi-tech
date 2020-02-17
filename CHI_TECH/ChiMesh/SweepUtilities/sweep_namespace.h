@@ -34,12 +34,13 @@ namespace sweep_management
 
   SPDS* CreateSweepOrder(double polar, double azimuthal,
                          chi_mesh::MeshContinuum *grid,
-                         bool allow_cycles=false);
+                         bool cycle_allowance_flag=false);
 
   void RemoveGlobalCyclicDependencies(
     chi_mesh::sweep_management::SPDS* sweep_order,
     std::vector<std::vector<int>>& global_dependencies,
-    bool allow_recursive_search=false);
+    bool allow_recursive_search=false,
+    bool allow_cycles=false);
 
   void PopulateCellRelationships(
             chi_mesh::MeshContinuum *grid,

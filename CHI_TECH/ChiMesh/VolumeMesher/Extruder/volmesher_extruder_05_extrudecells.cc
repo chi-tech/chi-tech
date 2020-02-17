@@ -12,25 +12,25 @@ extern ChiLog chi_log;
 
 //###################################################################
 /**Computes the partition id of a template cell's projection onto 3D.*/
-chi_mesh::Vector
+chi_mesh::Vector3
 chi_mesh::VolumeMesherExtruder::ComputeTemplateCell3DCentroid(
   chi_mesh::CellPolygon *n_template_cell,
   chi_mesh::MeshContinuum *template_continuum,
   int z_level_begin,int z_level_end)
 {
-  chi_mesh::Vector n_centroid_precompd;
+  chi_mesh::Vector3 n_centroid_precompd;
   size_t tc_num_verts = n_template_cell->vertex_ids.size();
 
    for (auto tc_vid : n_template_cell->vertex_ids)
   {
-    auto temp_vert = *template_continuum->nodes[tc_vid];
+    auto temp_vert = *template_continuum->vertices[tc_vid];
     temp_vert.z = vertex_layers[z_level_begin];
     n_centroid_precompd = n_centroid_precompd + temp_vert;
   }
 
   for (auto tc_vid : n_template_cell->vertex_ids)
   {
-    auto temp_vert = *template_continuum->nodes[tc_vid];
+    auto temp_vert = *template_continuum->vertices[tc_vid];
     temp_vert.z = vertex_layers[z_level_end];
     n_centroid_precompd = n_centroid_precompd + temp_vert;
   }
@@ -42,7 +42,7 @@ chi_mesh::VolumeMesherExtruder::ComputeTemplateCell3DCentroid(
 //###################################################################
 /**Computes a cell's partition id based on a centroid.*/
 int chi_mesh::VolumeMesherExtruder::
-  GetCellPartitionIDFromCentroid(chi_mesh::Vector& centroid,
+  GetCellPartitionIDFromCentroid(chi_mesh::Vector3& centroid,
                                  chi_mesh::SurfaceMesher* surf_mesher)
 {
   int px = surf_mesher->partitioning_x;
@@ -219,19 +219,19 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
           newFace.vertex_ids[3] = face.vertex_ids[0] + (iz+1)*node_z_index_incr;
 
           //Compute centroid
-          chi_mesh::Vertex& v0 = *vol_continuum->nodes[newFace.vertex_ids[0]];
-          chi_mesh::Vertex& v1 = *vol_continuum->nodes[newFace.vertex_ids[1]];
-          chi_mesh::Vertex& v2 = *vol_continuum->nodes[newFace.vertex_ids[2]];
-          chi_mesh::Vertex& v3 = *vol_continuum->nodes[newFace.vertex_ids[3]];
+          chi_mesh::Vertex& v0 = *vol_continuum->vertices[newFace.vertex_ids[0]];
+          chi_mesh::Vertex& v1 = *vol_continuum->vertices[newFace.vertex_ids[1]];
+          chi_mesh::Vertex& v2 = *vol_continuum->vertices[newFace.vertex_ids[2]];
+          chi_mesh::Vertex& v3 = *vol_continuum->vertices[newFace.vertex_ids[3]];
 
           chi_mesh::Vertex vfc = (v0+v1+v2+v3)/4.0;
           newFace.centroid = vfc;
 
           //Compute normal
-          chi_mesh::Vector va = v0 - vfc;
-          chi_mesh::Vector vb = v1 - vfc;
+          chi_mesh::Vector3 va = v0 - vfc;
+          chi_mesh::Vector3 vb = v1 - vfc;
 
-          chi_mesh::Vector vn = va.Cross(vb);
+          chi_mesh::Vector3 vn = va.Cross(vb);
 
           newFace.normal = (vn/vn.Norm());
 
@@ -264,7 +264,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         {
           newFace.vertex_ids.push_back(template_cell->vertex_ids[tv]
                                        + iz*node_z_index_incr);
-          chi_mesh::Vertex v = *vol_continuum->nodes[newFace.vertex_ids.back()];
+          chi_mesh::Vertex v = *vol_continuum->vertices[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }
 
@@ -273,8 +273,8 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         newFace.centroid = vfc;
 
         //Compute normal
-        va = *vol_continuum->nodes[newFace.vertex_ids[0]] - vfc;
-        vb = *vol_continuum->nodes[newFace.vertex_ids[1]] - vfc;
+        va = *vol_continuum->vertices[newFace.vertex_ids[0]] - vfc;
+        vb = *vol_continuum->vertices[newFace.vertex_ids[1]] - vfc;
 
         vn = va.Cross(vb);
         newFace.normal = vn/vn.Norm();
@@ -295,7 +295,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         for (auto tc_vid : template_cell->vertex_ids)
         {
           newFace.vertex_ids.push_back(tc_vid + (iz+1)*node_z_index_incr);
-          chi_mesh::Vertex v = *vol_continuum->nodes[newFace.vertex_ids.back()];
+          chi_mesh::Vertex v = *vol_continuum->vertices[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }
 
@@ -304,8 +304,8 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         newFace.centroid = vfc;
 
         //Compute normal
-        va = *vol_continuum->nodes[newFace.vertex_ids[0]] - vfc;
-        vb = *vol_continuum->nodes[newFace.vertex_ids[1]] - vfc;
+        va = *vol_continuum->vertices[newFace.vertex_ids[0]] - vfc;
+        vb = *vol_continuum->vertices[newFace.vertex_ids[1]] - vfc;
 
         vn = va.Cross(vb);
         newFace.normal = vn/vn.Norm();

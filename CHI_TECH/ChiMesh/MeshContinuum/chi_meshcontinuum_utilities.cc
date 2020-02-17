@@ -1,34 +1,13 @@
 #include "chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
 
 #include <boost/graph/bandwidth.hpp>
-#include <boost/graph/cuthill_mckee_ordering.hpp>
-#include <boost/graph/graphviz.hpp>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
 
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
-
-chi_mesh::Cell& chi_mesh::MeshContinuum::LocalCells::
-  operator[](int cell_local_index)
-{
-  if ((cell_local_index < 0) or
-      (cell_local_index >= local_cell_ind.size()))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "LocalCells attempted to access local cell "
-      << cell_local_index
-      << " but index out of range [0, "
-      << local_cell_ind.size()-1 << "].";
-    exit(EXIT_FAILURE);
-  }
-  int cell_global_index = local_cell_ind[cell_local_index];
-  return *cell_references[cell_global_index];
-}
 
 //###################################################################
 /**Populates a face histogram.
@@ -136,7 +115,7 @@ void chi_mesh::MeshContinuum::
   face_histogram_available = true;
 }
 
-
+//###################################################################
 /**Check whether a cell is local*/
 bool chi_mesh::MeshContinuum::IsCellLocal(int cell_global_index)
 {
@@ -382,7 +361,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 
 //###################################################################
 /**Computes the centroid from nodes specified by the given list.*/
-chi_mesh::Vector chi_mesh::MeshContinuum::
+chi_mesh::Vector3 chi_mesh::MeshContinuum::
   ComputeCentroidFromListOfNodes(const std::vector<int> &list)
 {
   if (list.empty())
@@ -390,9 +369,9 @@ chi_mesh::Vector chi_mesh::MeshContinuum::
     chi_log.Log(LOG_ALLERROR) << "ComputeCentroidFromListOfNodes, empty list";
     exit(EXIT_FAILURE);
   }
-  chi_mesh::Vector centroid;
+  chi_mesh::Vector3 centroid;
   for (auto node_id : list)
-    centroid = centroid + *nodes[node_id];
+    centroid = centroid + *vertices[node_id];
 
   return centroid/list.size();
 }

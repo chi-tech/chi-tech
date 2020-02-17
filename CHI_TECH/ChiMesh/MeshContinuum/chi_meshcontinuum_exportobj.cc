@@ -68,7 +68,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
     fprintf(of,"o %s\n",file_base_name.c_str());
 
     //====================================== Develop node mapping and write them
-    std::vector<int> node_mapping(nodes.size(),-1);
+    std::vector<int> node_mapping(vertices.size(), -1);
     std::set<int>::iterator node;
     int node_counter=0;
     for (node =  nodes_set.begin();
@@ -79,7 +79,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
       int node_g_index = *node;
       node_mapping[node_g_index] = node_counter;
 
-      chi_mesh::Vertex* cur_v = nodes[node_g_index];
+      chi_mesh::Vertex* cur_v = vertices[node_g_index];
 
       fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v->x,cur_v->y,cur_v->z);
     }
@@ -198,7 +198,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
       fprintf(of,"o %s\n",mat_base_name.c_str());
 
       //====================================== Develop node mapping and write them
-      std::vector<int> node_mapping(nodes.size(),-1);
+      std::vector<int> node_mapping(vertices.size(), -1);
       std::set<int>::iterator node;
       int node_counter=0;
       for (node =  nodes_set.begin();
@@ -209,7 +209,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
         int node_g_index = *node;
         node_mapping[node_g_index] = node_counter;
 
-        chi_mesh::Vertex* cur_v = nodes[node_g_index];
+        chi_mesh::Vertex* cur_v = vertices[node_g_index];
 
         fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v->x,cur_v->y,cur_v->z);
       }

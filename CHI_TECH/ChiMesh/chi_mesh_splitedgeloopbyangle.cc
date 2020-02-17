@@ -54,10 +54,10 @@ chi_mesh::EdgeLoopCollection* chi_mesh::SplitEdgeLoopByAngle(EdgeLoop *input,
                 ref_edge != (*cur_loop)->edges.end();
                 ref_edge++)
         {
-          chi_mesh::Vector vu = rcur_edge->vertices[1] -
-                                rcur_edge->vertices[0];
-          chi_mesh::Vector vr = ref_edge->vertices[1] -
-                                ref_edge->vertices[0];
+          chi_mesh::Vector3 vu = rcur_edge->vertices[1] -
+                                 rcur_edge->vertices[0];
+          chi_mesh::Vector3 vr = ref_edge->vertices[1] -
+                                 ref_edge->vertices[0];
           vu = vu/vu.Norm();
           vr = vr/vr.Norm();
 

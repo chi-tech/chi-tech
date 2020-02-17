@@ -124,7 +124,7 @@ int chiLogicalVolumeCreate(lua_State *L)
     handler->logicvolume_stack.push_back(log_vol);
     lua_pushnumber(L,handler->logicvolume_stack.size()-1);
 
-    chi_mesh::Vector point(-0.5,0.0,0.1);
+    chi_mesh::Vector3 point(-0.5, 0.0, 0.1);
     printf("MATRIX %d\n", log_vol->Inside(point));
   }
   else if (type_index == SURFACE)

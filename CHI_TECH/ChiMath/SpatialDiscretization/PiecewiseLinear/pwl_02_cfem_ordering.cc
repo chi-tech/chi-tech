@@ -350,7 +350,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //                                                   ordering
   //Initially this is just pass through
   std::vector<int> node_ordering;
-  int num_nodes = grid->nodes.size();
+  int num_nodes = grid->vertices.size();
   node_ordering.resize(num_nodes,-1);
 
 
@@ -397,5 +397,5 @@ std::pair<int,int> SpatialDiscretization_PWL::
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
-  return {local_to - local_from + 1,grid->nodes.size()};
+  return {local_to - local_from + 1,grid->vertices.size()};
 }

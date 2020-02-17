@@ -33,10 +33,8 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
   if (!mapping_initialized)
   {
     this->cell_fv_views_mapping.reserve(vol_continuum->cells.size());
-    std::vector<chi_mesh::Cell*>::iterator cellit;
-    for (cellit = vol_continuum->cells.begin();
-         cellit != vol_continuum->cells.end();
-         cellit++)
+//    std::vector<chi_mesh::Cell*>::iterator cellit;
+    for (size_t cellit = 0; cellit < vol_continuum->cells.size(); ++cellit)
     {
       this->cell_fv_views_mapping.push_back(-1);
     }
@@ -102,10 +100,8 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
   if (!mapping_initialized)
   {
     this->cell_fv_views_mapping.reserve(vol_continuum->cells.size());
-    std::vector<chi_mesh::Cell*>::iterator cellit;
-    for (cellit = vol_continuum->cells.begin();
-         cellit != vol_continuum->cells.end();
-         cellit++)
+    //    std::vector<chi_mesh::Cell*>::iterator cellit;
+    for (size_t cellit = 0; cellit < vol_continuum->cells.size(); ++cellit)
     {
       this->cell_fv_views_mapping.push_back(-1);
     }

@@ -6,6 +6,7 @@
 #include "../../ChiGraph/chi_graph.h"
 #include "../Cell/cell.h"
 
+#include <chi_mpi.h>
 
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
@@ -20,6 +21,7 @@ public:
   public:
     std::vector<int>& local_cell_ind;
     std::vector<chi_mesh::Cell*>& cell_references;
+
 
     LocalCells(std::vector<int>& in_local_cell_ind,
                std::vector<chi_mesh::Cell*>& in_cell_references) :
@@ -68,9 +70,39 @@ public:
   };
   //--------------------------------------------------
 
-  std::vector<chi_mesh::Node*>   nodes;
-  std::vector<chi_mesh::Cell*>   cells;
+  //##################################################
+  /**Handles all global index queries.*/
+  class GlobalCellHandler
+  {
+  private:
+    LocalCells& local_cells;
+  public:
+    explicit GlobalCellHandler(LocalCells& local_cell_object_ref) :
+     local_cells(local_cell_object_ref)
+    {}
+
+    void push_back(chi_mesh::Cell* new_cell)
+    {
+      local_cells.cell_references.push_back(new_cell);
+    }
+
+    chi_mesh::Cell* &operator[](int cell_global_index)
+    {
+      return local_cells.cell_references[cell_global_index];
+    }
+
+    size_t size()
+    {
+      return local_cells.cell_references.size();
+    }
+
+
+  };
+
+  std::vector<chi_mesh::Node*>   vertices;
+  std::vector<chi_mesh::Cell*>   cells_storage;
   LocalCells                     local_cells;
+  GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
   chi_mesh::LineMesh*            line_mesh;
   std::vector<int>               local_cell_glob_indices;
@@ -81,18 +113,22 @@ public:
 
 
 private:
-  bool                           face_histogram_available;
+  bool                           face_histogram_available = false;
+  bool                           communicators_available  = false;
 
   //Pair.first is the max dofs-per-face for the category and Pair.second
   //is the number of faces in this category
   std::vector<std::pair<size_t,size_t>> face_categories;
 
+  ChiMPICommunicatorSet commicator_set;
+
 public:
-  MeshContinuum() : local_cells(local_cell_glob_indices,cells)
+  MeshContinuum() :
+    local_cells(local_cell_glob_indices,cells_storage),
+    cells(local_cells)
   {
-    this->surface_mesh = nullptr;
-    this->line_mesh    = nullptr;
-    face_histogram_available = false;
+    surface_mesh = nullptr;
+    line_mesh    = nullptr;
   }
 
   //01
@@ -118,12 +154,12 @@ public:
                               int adj_cell_g_index, int associated_face,
                               std::vector<int>& dof_mapping);
 
-  chi_mesh::Vector ComputeCentroidFromListOfNodes(const std::vector<int>& list);
+  chi_mesh::Vector3 ComputeCentroidFromListOfNodes(const std::vector<int>& list);
 
   void CommunicatePartitionNeighborCells(
     std::vector<chi_mesh::Cell*>& neighbor_cells);
 
-
+  ChiMPICommunicatorSet& GetCommunicator();
 };
 
 

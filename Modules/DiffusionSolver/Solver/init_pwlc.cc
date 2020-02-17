@@ -113,8 +113,8 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //================================================== Allocate matrix memory
   chi_log.Log(LOG_0) << "Setting matrix preallocation.";
-  MatMPIAIJSetPreallocation(A,0,&nodal_nnz_in_diag[0],
-                            0,&nodal_nnz_off_diag[0]);
+  MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
+                              0,nodal_nnz_off_diag.data());
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
   MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
   MatSetUp(A);

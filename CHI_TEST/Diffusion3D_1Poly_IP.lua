@@ -105,6 +105,7 @@ slice2 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.024)
 chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fflist[1])
 
+chiMPIBarrier();
 line0 = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(line0,LINE_FIRSTPOINT,-1.0,0.0,0.025)
 chiFFInterpolationSetProperty(line0,LINE_SECONDPOINT, 1.0,0.0,0.025)
@@ -114,11 +115,12 @@ chiFFInterpolationSetProperty(line0,ADD_FIELDFUNCTION,fflist[1])
 chiFFInterpolationInitialize(slice1)
 chiFFInterpolationExecute(slice1)
 
-
 chiFFInterpolationInitialize(slice2)
 chiFFInterpolationExecute(slice2)
 
 
+print("Yip2")
+chiMPIBarrier();
 chiFFInterpolationInitialize(line0)
 chiFFInterpolationExecute(line0)
 
@@ -129,12 +131,15 @@ chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
 chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
 chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[1])
 
+print("Yip3")
 chiFFInterpolationInitialize(curffi)
 chiFFInterpolationExecute(curffi)
 maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 
+print("Yip3")
+chiMPIBarrier();
 if (master_export == nil) then
     chiFFInterpolationExportPython(slice1)
     chiFFInterpolationExportPython(slice2)
@@ -143,7 +148,8 @@ end
 
 chiMPIBarrier()
 
-
+print("Yip4")
+chiMPIBarrier();
 if (chi_location_id == 0 and master_export == nil) then
     local handle = io.popen("python ZPFFI10.py")
     local handle = io.popen("python ZLFFI20.py")

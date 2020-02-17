@@ -313,7 +313,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  group-gi,moment,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -396,7 +397,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -479,7 +481,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)

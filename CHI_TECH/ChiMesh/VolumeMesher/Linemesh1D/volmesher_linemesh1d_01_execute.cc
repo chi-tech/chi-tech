@@ -70,7 +70,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         //================================== Populate nodes
         for (int v=0; v<line_mesh->vertices.size(); v++)
         {
-          vol_continuum->nodes.push_back(&line_mesh->vertices[v]);
+          vol_continuum->vertices.push_back(&line_mesh->vertices[v]);
         }
         num_slab_cells = line_mesh->vertices.size()-1;
 
@@ -106,9 +106,9 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           slab->centroid = (v0+v1)/2.0;
 
           //====================== Compute normals
-          chi_mesh::Vector n = (v1-v0)/(v1-v0).Norm();
-          slab->faces[0].normal = chi_mesh::Vector(0.0,0.0,-1.0);
-          slab->faces[1].normal = chi_mesh::Vector(0.0,0.0, 1.0);
+          chi_mesh::Vector3 n = (v1 - v0) / (v1 - v0).Norm();
+          slab->faces[0].normal = chi_mesh::Vector3(0.0, 0.0, -1.0);
+          slab->faces[1].normal = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
           slab->xyz_partition_indices = GetCellXYZPartitionID(slab);
 
@@ -180,9 +180,9 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
 
         chi_log.Log(LOG_0)
           << "VolumeMesherLinemesh1D: Number of nodes in region = "
-          << vol_continuum->nodes.size()
+          << vol_continuum->vertices.size()
           << std::endl;
-        vol_continuum->nodes.shrink_to_fit();
+        vol_continuum->vertices.shrink_to_fit();
 
       }//if linemesh
     }//for bndry

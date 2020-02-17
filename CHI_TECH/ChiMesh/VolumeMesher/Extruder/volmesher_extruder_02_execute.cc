@@ -129,7 +129,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
 
         //================================== Clean-up temporary continuum
-        for (auto vert : temp_grid->nodes) delete vert;
+        for (auto vert : temp_grid->vertices) delete vert;
         for (auto pcell : temp_grid->cells) delete pcell;
         delete temp_grid;
 
@@ -193,9 +193,9 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Number of nodes in region = "
-          << grid->nodes.size()
+          << grid->vertices.size()
           << std::endl;
-        grid->nodes.shrink_to_fit();
+        grid->vertices.shrink_to_fit();
 
 
       }//if surface mesh

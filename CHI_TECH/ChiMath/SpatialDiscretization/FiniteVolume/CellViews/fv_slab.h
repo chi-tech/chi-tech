@@ -24,10 +24,10 @@ public:
     grid = vol_continuum;
     v0i = slab_cell->vertex_ids[0];
     v1i = slab_cell->vertex_ids[1];
-    chi_mesh::Vertex v0 = *grid->nodes[v0i];
-    chi_mesh::Vertex v1 = *grid->nodes[v1i];
+    chi_mesh::Vertex v0 = *grid->vertices[v0i];
+    chi_mesh::Vertex v1 = *grid->vertices[v1i];
 
-    chi_mesh::Vector v01 = v1-v0;
+    chi_mesh::Vector3 v01 = v1 - v0;
     volume = v01.Norm();
     face_area.push_back(1.0);
     face_area.push_back(1.0);

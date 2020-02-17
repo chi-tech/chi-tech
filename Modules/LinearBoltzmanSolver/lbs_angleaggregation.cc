@@ -91,7 +91,7 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
-                          &comm_set);
+                          &grid->GetCommunicator());
 
           angle_set_group->angle_sets.push_back(angleSet);
         }//for an_ss
@@ -148,7 +148,7 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
-                          &comm_set);
+                          &grid->GetCommunicator());
 
           angle_set_group->angle_sets.push_back(angleSet);
         }//for an_ss
@@ -231,7 +231,7 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
-                          &comm_set);
+                          &grid->GetCommunicator());
 
           angle_set_group->angle_sets.push_back(angleSet);
         }
@@ -287,7 +287,7 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
-                          &comm_set);
+                          &grid->GetCommunicator());
 
           angle_set_group->angle_sets.push_back(angleSet);
         }

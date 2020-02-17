@@ -3,7 +3,7 @@
 
 bool chi_mesh::SurfaceMesh::CheckNegativeSense(double x, double y, double z)
 {
-  chi_mesh::Vector xyz = chi_mesh::Vector(x,y,z);
+  chi_mesh::Vector3 xyz = chi_mesh::Vector3(x, y, z);
 
   //======================================================= Loop through each face
   std::vector<chi_mesh::Face>::iterator cur_face;
@@ -20,7 +20,7 @@ bool chi_mesh::SurfaceMesh::CheckNegativeSense(double x, double y, double z)
     }
 
     //=========================================== Calculate dot product
-    chi_mesh::Vector p_xyz = xyz - p;
+    chi_mesh::Vector3 p_xyz = xyz - p;
     double dprod = cur_face->assigned_normal.Dot(p_xyz);
 
     if (dprod<0.0)

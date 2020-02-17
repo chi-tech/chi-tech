@@ -17,7 +17,7 @@ private:
   bool edges_developed = false;
 
 private:
-  std::vector<std::vector<chi_mesh::Vector>> face_segment_normals;
+  std::vector<std::vector<chi_mesh::Vector3>> face_segment_normals;
   bool segment_normals_developed = false;
 
 public:
@@ -62,7 +62,7 @@ private:
       face_segment_normals[f].reserve(face.vertex_ids.size());
       for (auto vi : face.vertex_ids)
       {
-        auto& vert = *grid->nodes[vi];
+        auto& vert = *grid->vertices[vi];
 
         auto v01 = vfc - vert;
         auto v12 = vcc - vfc;
@@ -84,7 +84,7 @@ public:
     return face_edges[f];
   }
 
-  std::vector<std::vector<chi_mesh::Vector>>&
+  std::vector<std::vector<chi_mesh::Vector3>>&
     GetSegmentNormals(const chi_mesh::MeshContinuum* grid)
   {
     if (!segment_normals_developed)

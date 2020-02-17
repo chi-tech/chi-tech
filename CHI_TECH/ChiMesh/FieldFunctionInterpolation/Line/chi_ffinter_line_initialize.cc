@@ -35,7 +35,7 @@ Initialize()
   grid_view = nullptr;
 
   //================================================== Create points;
-  chi_mesh::Vector vif = pf-pi;
+  chi_mesh::Vector3 vif = pf - pi;
   delta_d = vif.Norm()/(number_of_points-1);
 
   vif = vif/vif.Norm();
@@ -84,11 +84,11 @@ Initialize()
             int v0_i = slab_cell->vertex_ids[0];
             int v1_i = slab_cell->vertex_ids[1];
 
-            chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-            chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
+            chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+            chi_mesh::Vector3 v1 = *grid_view->vertices[v1_i];
 
-            chi_mesh::Vector v01 = v1 - v0;
-            chi_mesh::Vector v0p = interpolation_points[p]-v0;
+            chi_mesh::Vector3 v01 = v1 - v0;
+            chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
 
             double v01_norm = v01.Norm();
             double projection = v01.Dot(v0p)/v01_norm;
@@ -122,18 +122,18 @@ Initialize()
             //Form a plane for each edge
             for (size_t e=0; e<num_edges; e++)
             {
-              chi_mesh::Vector nref(0.0,0.0,1.0);
+              chi_mesh::Vector3 nref(0.0, 0.0, 1.0);
               int v0_i = poly_cell->faces[e].vertex_ids[0];
               int v1_i = poly_cell->faces[e].vertex_ids[1];
 
-              chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-              chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
+              chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+              chi_mesh::Vector3 v1 = *grid_view->vertices[v1_i];
 
-              chi_mesh::Vector v01 = v1 - v0;
-              chi_mesh::Vector   n = v01.Cross(nref);
+              chi_mesh::Vector3 v01 = v1 - v0;
+              chi_mesh::Vector3   n = v01.Cross(nref);
               n = n/n.Norm();
 
-              chi_mesh::Vector v0p = interpolation_points[p]-v0;
+              chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
               v0p=v0p/v0p.Norm();
 
               if (n.Dot(v0p)>0.0)
@@ -173,10 +173,10 @@ Initialize()
               {
                 int v0_i = edges[e][0];
 
-                chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-                chi_mesh::Vector n  = polyh_cell->faces[f].normal;
+                chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+                chi_mesh::Vector3 n  = polyh_cell->faces[f].normal;
 
-                chi_mesh::Vector v0p = interpolation_points[p]-v0;
+                chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
                 v0p=v0p/v0p.Norm();
 
                 if (n.Dot(v0p)>0.0)

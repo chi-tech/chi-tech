@@ -69,10 +69,10 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           int v0_i = edges[e][0];
           int v1_i = edges[e][1];
 
-          std::vector<chi_mesh::Vector*> tet_points;
+          std::vector<chi_mesh::Vector3*> tet_points;
 
-          tet_points.push_back(grid_view->nodes[v0_i]);
-          tet_points.push_back(grid_view->nodes[v1_i]);
+          tet_points.push_back(grid_view->vertices[v0_i]);
+          tet_points.push_back(grid_view->vertices[v1_i]);
           tet_points.push_back(&polyh_cell->faces[f].centroid);
           tet_points.push_back(&polyh_cell->centroid);
 
@@ -135,7 +135,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         face_isds->v1_dofindex_cell = v;
 
         face_isds->weights = std::pair<double,double>(0.5,0.5);
-        face_isds->point   = *grid_view->nodes[v0gi];
+        face_isds->point   = *grid_view->vertices[v0gi];
 
         cell_isds->intersections.push_back(face_isds);
       }
@@ -151,7 +151,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       int num_points = cell_isds->intersections.size();
       for (int p=0; p<num_points; p++)
       {
-        chi_mesh::Vector vref = cell_isds->intersections[p]->point-this->point;
+        chi_mesh::Vector3 vref = cell_isds->intersections[p]->point - this->point;
 
         cell_isds->intersections[p]->point2d = vref;
 
@@ -186,8 +186,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           int v0gi = edges[e][0]; //global index v0
           int v1gi = edges[e][1]; //global index v1
 
-          chi_mesh::Vertex v0 = (*grid_view->nodes[v0gi]);
-          chi_mesh::Vertex v1 = (*grid_view->nodes[v1gi]);
+          chi_mesh::Vertex v0 = (*grid_view->vertices[v0gi]);
+          chi_mesh::Vertex v1 = (*grid_view->vertices[v1gi]);
 
           chi_mesh::Vertex interstion_point;            //Placeholder
           std::pair<double,double> weights;
@@ -270,7 +270,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       }
 
       //==================================== Computing 2D transforms
-      chi_mesh::Vector vref = cell_isds->intersection_centre - this->point;
+      chi_mesh::Vector3 vref = cell_isds->intersection_centre - this->point;
 
       cell_isds->intersection_2d_centre.x = vref.Dot(tangent);
       cell_isds->intersection_2d_centre.y = vref.Dot(binorm);
@@ -280,7 +280,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       std::vector<FFIFaceEdgeIntersection*> unsorted_points;
       for (int p=0; p<num_points; p++)
       {
-        chi_mesh::Vector vref = cell_isds->intersections[p]->point-this->point;
+        chi_mesh::Vector3 vref = cell_isds->intersections[p]->point - this->point;
 
         cell_isds->intersections[p]->point2d.x = vref.Dot(tangent);
         cell_isds->intersections[p]->point2d.y = vref.Dot(binorm);
@@ -307,16 +307,16 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       {
         for (int p=0; p<unsorted_points.size(); p++)
         {
-          chi_mesh::Vector v1 = unsorted_points[p]->point2d -
-                                cell_isds->intersections.back()->point2d;
+          chi_mesh::Vector3 v1 = unsorted_points[p]->point2d -
+                                 cell_isds->intersections.back()->point2d;
 
           bool illegal_value = false;
           for (int pr=0; pr<unsorted_points.size(); pr++)
           {
             if (pr!=p)
             {
-              chi_mesh::Vector vr = unsorted_points[pr]->point2d -
-                                    unsorted_points[p]->point2d;
+              chi_mesh::Vector3 vr = unsorted_points[pr]->point2d -
+                                     unsorted_points[p]->point2d;
 
               if (vr.Cross(v1).z < 0.0)
               {

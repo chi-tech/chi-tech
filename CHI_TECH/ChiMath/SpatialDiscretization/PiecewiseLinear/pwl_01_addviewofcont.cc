@@ -127,7 +127,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
   }//for num cells
 
 
-  chi_log.Log(LOG_ALL)
+  chi_log.Log(LOG_ALLVERBOSE_1)
     << "Number of neighbor cells added: "
     << neighbor_cell_fe_views.size();
 

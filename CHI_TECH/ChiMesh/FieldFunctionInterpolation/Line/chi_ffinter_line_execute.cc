@@ -40,7 +40,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
                         field_functions[ff]->ref_set,
                         ff_ctx->pwld_local_nodes_needed_unmapped,
                         ff_ctx->pwld_local_cells_needed_unmapped,
-                        *field_functions[ff]->local_cell_dof_array_address,
+                        field_functions[ff]->spatial_discretization->cell_dfem_block_address,
                         &mapping);
       PWLDInterpolate(mapping,ff_ctx);
     }

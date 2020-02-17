@@ -35,7 +35,7 @@ chi_mesh::SurfaceMeshLogicalVolume::
 
 //###################################################################
 /**Logical operation for surface mesh.*/
-bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector point)
+bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
 {
   double tolerance = 1.0e-5;
 
@@ -59,8 +59,8 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector point)
   bool cheap_pass = true; // now try to disprove
   for (int f=0; f<surf_mesh->faces.size(); f++)
   {
-    chi_mesh::Vector fc      = surf_mesh->faces[f].face_centroid;
-    chi_mesh::Vector p_to_fc = fc - point;
+    chi_mesh::Vector3 fc      = surf_mesh->faces[f].face_centroid;
+    chi_mesh::Vector3 p_to_fc = fc - point;
 
     p_to_fc = p_to_fc/p_to_fc.Norm();
 
@@ -81,8 +81,8 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector point)
   // a negative and now we need to do more work.
   for (int f=0; f<surf_mesh->faces.size(); f++)
   {
-    chi_mesh::Vector fc      = surf_mesh->faces[f].face_centroid;
-    chi_mesh::Vector p_to_fc = fc - point;
+    chi_mesh::Vector3 fc      = surf_mesh->faces[f].face_centroid;
+    chi_mesh::Vector3 p_to_fc = fc - point;
     double distance_to_face = p_to_fc.Norm();
     double closest_distance = 1.0e16;
     bool   closest_sense_pos= false;
@@ -123,27 +123,27 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector point)
         bool intersects_triangle = true;
 
         //Compute the legs
-        chi_mesh::Vector v01 = v1 - v0;
-        chi_mesh::Vector v12 = v2 - v1;
-        chi_mesh::Vector v20 = v0 - v2;
+        chi_mesh::Vector3 v01 = v1 - v0;
+        chi_mesh::Vector3 v12 = v2 - v1;
+        chi_mesh::Vector3 v20 = v0 - v2;
 
         //Compute the vertices to the point
-        chi_mesh::Vector v0p = intp - v0;
-        chi_mesh::Vector v1p = intp - v1;
-        chi_mesh::Vector v2p = intp - v2;
+        chi_mesh::Vector3 v0p = intp - v0;
+        chi_mesh::Vector3 v1p = intp - v1;
+        chi_mesh::Vector3 v2p = intp - v2;
 
         //Compute the cross products
-        chi_mesh::Vector x0p = v01.Cross(v0p);
-        chi_mesh::Vector x1p = v12.Cross(v1p);
-        chi_mesh::Vector x2p = v20.Cross(v2p);
+        chi_mesh::Vector3 x0p = v01.Cross(v0p);
+        chi_mesh::Vector3 x1p = v12.Cross(v1p);
+        chi_mesh::Vector3 x2p = v20.Cross(v2p);
 
         //Normalize them
         x0p = x0p/x0p.Norm();
         x1p = x1p/x1p.Norm();
         x2p = x2p/x2p.Norm();
 
-        chi_mesh::Vector face_norm = surf_mesh->faces[fi].geometric_normal/
-                                     surf_mesh->faces[fi].geometric_normal.Norm();
+        chi_mesh::Vector3 face_norm = surf_mesh->faces[fi].geometric_normal /
+                                      surf_mesh->faces[fi].geometric_normal.Norm();
 
         if (x0p.Dot(face_norm)<0.0) intersects_triangle = false;
         if (x1p.Dot(face_norm)<0.0) intersects_triangle = false;
@@ -189,14 +189,14 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector point)
  * probably needs to find a home in math somewhere (or mesh).*/
 bool chi_mesh::SurfaceMeshLogicalVolume::
 CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                        chi_mesh::Vector plane_point,
-                        chi_mesh::Vector line_point_0,
-                        chi_mesh::Vector line_point_1,
-                        chi_mesh::Vector& intersection_point,
+                        chi_mesh::Vector3 plane_point,
+                        chi_mesh::Vector3 line_point_0,
+                        chi_mesh::Vector3 line_point_1,
+                        chi_mesh::Vector3& intersection_point,
                         std::pair<double,double>& weights)
 {
-  chi_mesh::Vector v0 = line_point_0 - plane_point;
-  chi_mesh::Vector v1 = line_point_1 - plane_point;
+  chi_mesh::Vector3 v0 = line_point_0 - plane_point;
+  chi_mesh::Vector3 v1 = line_point_1 - plane_point;
 
   double dotp_0 = plane_normal.Dot(v0);
   double dotp_1 = plane_normal.Dot(v1);

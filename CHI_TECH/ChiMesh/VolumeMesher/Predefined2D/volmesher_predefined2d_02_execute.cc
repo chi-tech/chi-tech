@@ -171,7 +171,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
           << "VolumeMesherPredefined2D["
           << chi_mpi.location_id
           << "]: Number of nodes in region = "
-          << vol_continuum->nodes.size()
+          << vol_continuum->vertices.size()
           << std::endl;
 
 

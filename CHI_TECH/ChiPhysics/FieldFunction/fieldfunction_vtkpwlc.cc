@@ -142,9 +142,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
       {
         int vgi = slab_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
 
 
         points->InsertPoint(nc,d_node.data());
@@ -182,9 +182,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
       {
         int vgi = poly_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;
@@ -222,9 +222,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
       {
         int vgi = polyh_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;
@@ -408,9 +408,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
       {
         int vgi = slab_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
 
 
         points->InsertPoint(nc,d_node.data());
@@ -448,9 +448,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
       {
         int vgi = poly_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;
@@ -488,9 +488,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
       {
         int vgi = polyh_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->nodes[vgi]->x;
-        d_node[1] = grid->nodes[vgi]->y;
-        d_node[2] = grid->nodes[vgi]->z;
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;

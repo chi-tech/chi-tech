@@ -5,13 +5,18 @@
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_robin.h"
 
+#include <sstream>
+#include "chi_log.h"
+
+extern ChiLog chi_log;
+
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/
 void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
                                                   chi_mesh::Cell *cell,
                                                   int group)
 {
-  auto fe_view   = dynamic_cast<CellFEView*>(pwl_sdm->MapFeView(cell_glob_index));
+  auto fe_view   = pwl_sdm->MapFeView(cell_glob_index);
 
   //======================================== Process material id
   int mat_id = cell->material_id;
@@ -77,8 +82,6 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
           int i  = fe_view->face_dof_mappings[f][fi];
           dirichlet_count[i] += 1;
           dirichlet_value[i] += dirichlet_bndry->boundary_value;
-
-          dof_global_col_ind[i] = -1;
         }
       }
 
@@ -122,8 +125,12 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
   {
     if (dirichlet_count[i] > 0)
     {
+      cell_matrix[i].clear();
       cell_matrix[i] = std::vector<double>(fe_view->dofs,0.0);
       cell_matrix[i][i] = 1.0;
+      int ir = dof_global_col_ind[i];
+      MatSetValue(Aref,ir,ir,1.0,ADD_VALUES);
+      dof_global_col_ind[i] = -1;
       cell_rhs[i] = dirichlet_value[i];
     }
     else
@@ -131,17 +138,20 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
       for (int j=0; j<fe_view->dofs; ++j)
       {
         if (dirichlet_count[j] > 0)
+        {
           cell_rhs[i] -= cell_matrix[i][j]*dirichlet_value[j];
+          cell_matrix[i][j] = 0.0;
+        }
       }
     }
   }
 
   //======================================== Make contiguous copy of matrix
   std::vector<double> cell_matrix_cont(fe_view->dofs*fe_view->dofs,0.0);
-  int N = fe_view->dofs;
+  int n = 0;
   for (int i=0; i<fe_view->dofs; ++i)
     for (int j=0; j<fe_view->dofs; ++j)
-      cell_matrix_cont[i*N + j] = cell_matrix[i][j];
+      cell_matrix_cont[n++] = cell_matrix[i][j];
 
   //======================================== Add to global
   MatSetValues(Aref,
@@ -157,6 +167,5 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
                fe_view->dofs,
                dof_global_row_ind.data(),
                dirichlet_value.data(),INSERT_VALUES);
-
 
 }

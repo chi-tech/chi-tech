@@ -31,7 +31,7 @@ public:
   std::vector<double>           polar_ang;
   std::vector<double>           azimu_ang;
   std::vector<double>           weights;
-  std::vector<chi_mesh::Vector*>          omegas;
+  std::vector<chi_mesh::Vector3*>          omegas;
 
 public:
   //product_quadrature.cc

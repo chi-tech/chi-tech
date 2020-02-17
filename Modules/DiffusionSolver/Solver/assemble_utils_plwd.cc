@@ -153,8 +153,8 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
     int v0i = face.vertex_ids[0];
     int v1i = face.vertex_ids[1];
 
-    chi_mesh::Vertex& v0 = *grid->nodes[v0i];
-    chi_mesh::Vertex& v1 = *grid->nodes[v1i];
+    chi_mesh::Vertex& v0 = *grid->vertices[v0i];
+    chi_mesh::Vertex& v1 = *grid->vertices[v1i];
 
     double perimeter = (v1 - v0).Norm();
 
@@ -388,10 +388,10 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
-    chi_mesh::Vector vc;
+    chi_mesh::Vector3 vc;
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      vc = vc + *grid->vertices[cell_info->v_indices[v]];
       cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
@@ -417,10 +417,10 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
-    chi_mesh::Vector vc;
+    chi_mesh::Vector3 vc;
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      vc = vc + *grid->vertices[cell_info->v_indices[v]];
       cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
@@ -449,10 +449,10 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
-    chi_mesh::Vector vc;
+    chi_mesh::Vector3 vc;
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      vc = vc + *grid->vertices[cell_info->v_indices[v]];
       cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
@@ -464,16 +464,16 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
       for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
       {
         cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
-        vfc = vfc + *grid->nodes[cell_info->face_v_indices[f][fv]];
+        vfc = vfc + *grid->vertices[cell_info->face_v_indices[f][fv]];
       }
       vfc = vfc/cell_info->face_v_indices[f].size();
       cell->faces[f].centroid = vfc;
 
-      chi_mesh::Vector v0fc = vfc - *grid->nodes[cell_info->face_v_indices[f][0]];
-      chi_mesh::Vector v01 = *grid->nodes[cell_info->face_v_indices[f][1]] -
-                             *grid->nodes[cell_info->face_v_indices[f][0]];
+      chi_mesh::Vector3 v0fc = vfc - *grid->vertices[cell_info->face_v_indices[f][0]];
+      chi_mesh::Vector3 v01 = *grid->vertices[cell_info->face_v_indices[f][1]] -
+                              *grid->vertices[cell_info->face_v_indices[f][0]];
 
-      chi_mesh::Vector n = v01.Cross(v0fc);
+      chi_mesh::Vector3 n = v01.Cross(v0fc);
       cell->faces[f].normal = n/n.Norm();
 
     }//for f

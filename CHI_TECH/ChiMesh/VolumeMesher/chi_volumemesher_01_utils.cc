@@ -32,7 +32,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 
   //============================================= Copy nodes
   for (auto& vertex : surface_mesh->vertices)
-    vol_continuum->nodes.push_back(new chi_mesh::Node(vertex));
+    vol_continuum->vertices.push_back(new chi_mesh::Node(vertex));
 
   //============================================= Delete nodes
   if (delete_surface_mesh_elements)
@@ -53,14 +53,14 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       new_face.vertex_ids.push_back(face.e_index[k][1]);
 
 
-      chi_mesh::Vertex& v0 = *vol_continuum->nodes[face.e_index[k][0]];
-      chi_mesh::Vertex& v1 = *vol_continuum->nodes[face.e_index[k][1]];
+      chi_mesh::Vertex& v0 = *vol_continuum->vertices[face.e_index[k][0]];
+      chi_mesh::Vertex& v1 = *vol_continuum->vertices[face.e_index[k][1]];
       new_face.centroid = v0*0.5 + v1*0.5;
 
-      chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
+      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
-      chi_mesh::Vector va = v1-v0;
-      chi_mesh::Vector vn = va.Cross(vk);
+      chi_mesh::Vector3 va = v1 - v0;
+      chi_mesh::Vector3 vn = va.Cross(vk);
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
@@ -92,7 +92,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     {
       cell->vertex_ids.push_back(vid);
       cell->centroid = cell->centroid +
-                       *vol_continuum->nodes[vid];
+                       *vol_continuum->vertices[vid];
     }
     cell->centroid = cell->centroid/cell->vertex_ids.size();
 
@@ -112,13 +112,13 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       new_face.vertex_ids.push_back(src_side[0]);
       new_face.vertex_ids.push_back(src_side[1]);
 
-      chi_mesh::Vertex& v0 = *vol_continuum->nodes[src_side[0]];
-      chi_mesh::Vertex& v1 = *vol_continuum->nodes[src_side[1]];
+      chi_mesh::Vertex& v0 = *vol_continuum->vertices[src_side[0]];
+      chi_mesh::Vertex& v1 = *vol_continuum->vertices[src_side[1]];
       new_face.centroid = v0*0.5 + v1*0.5;
-      chi_mesh::Vector vk = chi_mesh::Vector(0.0,0.0,1.0);
+      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
-      chi_mesh::Vector va = v1-v0;
-      chi_mesh::Vector vn = va.Cross(vk);
+      chi_mesh::Vector3 va = v1 - v0;
+      chi_mesh::Vector3 vn = va.Cross(vk);
       vn = vn/vn.Norm();
       new_face.normal = vn;
 

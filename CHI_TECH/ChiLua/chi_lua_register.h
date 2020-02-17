@@ -63,6 +63,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiRegionExportMeshToVTK)
 //  SurfaceMesh
     RegisterFunction(chiSurfaceMeshCreate)
+    RegisterFunction(chiSurfaceMeshCreateFromArrays)
     RegisterFunction(chiSurfaceMeshImportFromOBJFile)
     RegisterFunction(chiSurfaceMeshImportFromTriangleFiles)
     RegisterFunction(chiSurfaceMeshExportToObj)

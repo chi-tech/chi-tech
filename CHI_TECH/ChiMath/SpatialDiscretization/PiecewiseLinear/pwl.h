@@ -54,6 +54,9 @@ public:
   int MapDFEMDOF(chi_mesh::Cell* cell, int dof,
                  int component=0,
                  int component_block_offset=1);
+  int MapDFEMDOFLocal(chi_mesh::Cell* cell, int dof,
+                      int component=0,
+                      int component_block_offset=1);
 
   //05
   void BuildDFEMSparsityPattern(chi_mesh::MeshContinuum* grid,

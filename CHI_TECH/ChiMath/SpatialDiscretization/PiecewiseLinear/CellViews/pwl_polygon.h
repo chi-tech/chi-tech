@@ -57,10 +57,10 @@ public:
 
 
 public:
-  std::vector<chi_mesh::Vector>                 IntV_gradshapeI;
+  std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
 private:
   std::vector<std::vector<std::vector<double>>>           IntSi_shapeI_shapeJ;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> IntSi_shapeI_gradshapeJ;
+  std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntSi_shapeI_gradshapeJ;
 
 private:
   chi_mesh::MeshContinuum* grid;
@@ -73,15 +73,15 @@ public:
                 chi_mesh::MeshContinuum* vol_continuum,
                 SpatialDiscretization_PWL *discretization);
 
-  double ShapeValue(const int i, const chi_mesh::Vector& xyz) override;
-  chi_mesh::Vector GradShapeValue(const int i, const chi_mesh::Vector& xyz) override;
+  double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
+  chi_mesh::Vector3 GradShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
 
 
-  void ShapeValues(const chi_mesh::Vector& xyz,
+  void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) override;
 
-  void GradShapeValues(const chi_mesh::Vector& xyz,
-                       std::vector<chi_mesh::Vector>& gradshape_values) override;
+  void GradShapeValues(const chi_mesh::Vector3& xyz,
+                       std::vector<chi_mesh::Vector3>& gradshape_values) override;
 
 
   //############################################### Precomputation cell matrices

@@ -125,7 +125,7 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 if (master_export == nil) then
-    chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
+    --chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 end
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)

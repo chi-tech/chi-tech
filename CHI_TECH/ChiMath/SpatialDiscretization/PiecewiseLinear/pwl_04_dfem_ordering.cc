@@ -79,7 +79,6 @@ int SpatialDiscretization_PWL::MapDFEMDOF(chi_mesh::Cell *cell,
                 dfem_local_block_address +
                 dof;
     return address*component_block_offset + component;
-//    return address;
   }
   else
   {
@@ -99,10 +98,32 @@ int SpatialDiscretization_PWL::MapDFEMDOF(chi_mesh::Cell *cell,
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell->cell_global_id << " and partition-ID "
         << cell->partition_id;
+      exit(EXIT_FAILURE);
     }
 
     int address = neighbor_cell_block_address[index].second + dof;
     return address*component_block_offset + component;
-//    return address;
+  }
+}
+
+//###################################################################
+/**Provides a local mapping of cell's DOF from a DFEM perspective.*/
+int SpatialDiscretization_PWL::MapDFEMDOFLocal(chi_mesh::Cell *cell,
+                                               int dof,
+                                               int component,
+                                               int component_block_offset)
+{
+  if (cell->partition_id == chi_mpi.location_id)
+  {
+    int address = cell_dfem_block_address[cell->cell_local_id] + dof;
+    return address*component_block_offset + component;
+  }
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
+      << "with global index " << cell->cell_global_id << " and partition-ID "
+      << cell->partition_id;
+    exit(EXIT_FAILURE);
   }
 }

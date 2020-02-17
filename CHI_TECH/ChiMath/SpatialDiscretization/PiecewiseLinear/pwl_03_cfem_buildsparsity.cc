@@ -14,13 +14,13 @@ void SpatialDiscretization_PWL::
                            std::vector<int> &nodal_nnz_off_diag,
                            const std::pair<int,int>& domain_ownership)
 {
-  std::vector<std::vector<int>> nodal_connections(grid->nodes.size());
+  std::vector<std::vector<int>> nodal_connections(grid->vertices.size());
 
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
-  nodal_nnz_in_diag .resize(grid->nodes.size(),0);
-  nodal_nnz_off_diag.resize(grid->nodes.size(),0);
+  nodal_nnz_in_diag .resize(grid->vertices.size(), 0);
+  nodal_nnz_off_diag.resize(grid->vertices.size(), 0);
 
   for (auto& glob_index : grid->local_cell_glob_indices)
   {

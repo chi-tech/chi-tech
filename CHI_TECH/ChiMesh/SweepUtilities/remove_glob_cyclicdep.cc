@@ -2,8 +2,10 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
+#include <chi_log.h>
 #include <chi_mpi.h>
 extern ChiMPI chi_mpi;
+extern ChiLog chi_log;
 
 #include <algorithm>
 
@@ -62,7 +64,8 @@ void
 chi_mesh::sweep_management::RemoveGlobalCyclicDependencies(
   chi_mesh::sweep_management::SPDS *sweep_order,
   std::vector<std::vector<int>> &global_dependencies,
-  bool allow_recursive_search)
+  bool allow_recursive_search,
+  bool allow_cycles)
 {
   std::vector<int> search_history;
   search_history.reserve(chi_mpi.location_id);
@@ -85,7 +88,7 @@ chi_mesh::sweep_management::RemoveGlobalCyclicDependencies(
                                     depends_on_locI,
                                     allow_recursive_search);
 
-      if (depends_on_locI)
+      if (depends_on_locI and allow_cycles)
       {
         global_dependencies[locI][c]  = -1;
         if (locI == chi_mpi.location_id)
@@ -103,6 +106,14 @@ chi_mesh::sweep_management::RemoveGlobalCyclicDependencies(
           sweep_order->delayed_location_successors.push_back(locI);
         }
       }
+      else if (depends_on_locI and (not allow_cycles))
+      {
+        chi_log.Log(LOG_ALLERROR)
+          << "Global cyclic dependency detected. This must be allowed"
+             " by client applications.";
+        exit(EXIT_FAILURE);
+      }
+
 
 
     }//for locI dependency c

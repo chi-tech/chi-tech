@@ -54,7 +54,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   //================================================== Initialize field function
   //                                                   if empty
   pwld_phi_local.resize(local_dof_count);
-  if (field_functions.size() == 0)
+  if (field_functions.empty())
   {
     auto initial_field_function = new chi_physics::FieldFunction(
       std::string("phi"),                           //Text name
@@ -82,12 +82,12 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   //                                                   and connection info
   nodal_nnz_in_diag.resize(local_dof_count, 0);
   nodal_nnz_off_diag.resize(local_dof_count, 0);
-  nodal_boundary_numbers.resize(grid->nodes.size(),0);
+  nodal_boundary_numbers.resize(grid->vertices.size(), 0);
 
 
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  PWLDBuildSparsityPattern();
+//  PWLDBuildSparsityPattern();
   pwl_sdm->BuildDFEMSparsityPattern(grid,
                                     nodal_nnz_in_diag,
                                     nodal_nnz_off_diag,
