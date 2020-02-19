@@ -190,7 +190,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
+      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeViewL(cell.cell_local_id);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
@@ -466,7 +466,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
+      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeViewL(cell.cell_local_id);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);

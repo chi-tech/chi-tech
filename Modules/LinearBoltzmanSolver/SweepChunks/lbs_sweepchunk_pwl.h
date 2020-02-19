@@ -154,7 +154,7 @@ public:
       auto cell          = &grid_view->local_cells[cell_local_id];
       int  cell_g_index  = cell->cell_global_id;
 
-      auto cell_fe_view   = (CellFEView*)grid_fe_view->MapFeView(cell_g_index);
+      auto cell_fe_view   = (CellFEView*)grid_fe_view->MapFeViewL(cell->cell_local_id);
       auto transport_view =
         (LinearBoltzman::CellViewFull*)(*grid_transport_view)[cell->cell_local_id];
 

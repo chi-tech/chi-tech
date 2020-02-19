@@ -65,7 +65,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
 
     if (inside_logvolume)
     {
-      auto cell_fe_view = (CellFEView*)discretization->MapFeView(cell_glob_index);
+      auto cell_fe_view = (CellFEView*)discretization->MapFeViewL(cell->cell_local_id);
 
       for (int i=0; i<cell->vertex_ids.size(); i++)
       {
@@ -140,7 +140,7 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 
     if (inside_logvolume)
     {
-      auto cell_fe_view = (CellFEView*)discretization->MapFeView(cell_glob_index);
+      auto cell_fe_view = (CellFEView*)discretization->MapFeViewL(cell->cell_local_id);
 
       for (int i=0; i < cell->vertex_ids.size(); i++)
       {

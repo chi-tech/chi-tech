@@ -92,7 +92,7 @@ void LinearBoltzman::Solver::InitializeParrays()
 
   for (auto& cell : grid->local_cells)
   {
-    auto cell_fe_view   = pwl_discretization->MapFeView(cell.cell_global_id);
+    auto cell_fe_view   = pwl_discretization->MapFeViewL(cell.cell_local_id);
     auto full_cell_view = new CellViewFull(cell_fe_view->dofs, num_grps, M);
 
     int mat_id = cell.material_id;

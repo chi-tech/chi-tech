@@ -11,18 +11,18 @@ class SpatialDiscretization_FV : public SpatialDiscretization
 {
 private:
   std::vector<CellFVView*> cell_fv_views;
-  std::vector<int>         cell_fv_views_mapping;
 
 private:
-  bool mapping_initialized;
+  bool               mapping_initialized;
+  std::vector<bool>  cell_view_added_flags;
 
 
 public:
   SpatialDiscretization_FV(int dim=0);
 
-  void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* vol_continuum) override;
+  void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
 
-  CellFVView* MapFeView(int cell_glob_index);
+  CellFVView* MapFeView(int cell_local_index);
 };
 
 

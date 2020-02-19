@@ -24,48 +24,41 @@ SpatialDiscretization_FV::SpatialDiscretization_FV(int dim)
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* vol_continuum)
+  chi_mesh::MeshContinuum* grid)
 {
   //================================================== Create empty view
   //                                                 for each cell
   if (!mapping_initialized)
   {
-    this->cell_fv_views_mapping.reserve(vol_continuum->cells.size());
-    //    std::vector<chi_mesh::Cell*>::iterator cellit;
-    for (size_t cellit = 0; cellit < vol_continuum->cells.size(); ++cellit)
-    {
-      this->cell_fv_views_mapping.push_back(-1);
-    }
+    cell_view_added_flags.resize(grid->local_cells.size(),false);
     mapping_initialized = true;
   }
 
 
   //================================================== Swap views for
   //                                                   specified item_id
-  for (const auto& cell : vol_continuum->local_cells)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_index = cell.cell_global_id;
-
-    if (cell_fv_views_mapping[cell_index]<0)
+    if (not cell_view_added_flags[cell.cell_local_id])
     {
       //######################################### SLAB
       if (cell.Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
-          new SlabFVView((chi_mesh::CellSlab*)(&cell), vol_continuum);
+          new SlabFVView((chi_mesh::CellSlab*)(&cell), grid);
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        cell_fv_views.push_back(view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
 
       //######################################### POLYGON
       if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
-          new PolygonFVView((chi_mesh::CellPolygon*)(&cell), vol_continuum);
+          new PolygonFVView((chi_mesh::CellPolygon*)(&cell), grid);
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        cell_fv_views.push_back(view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
 
       //######################################### POLYHEDRON
@@ -74,10 +67,10 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
         auto view =
           new PolyhedronFVView(
             (chi_mesh::CellPolyhedron*)(&cell),
-            vol_continuum);
+            grid);
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        cell_fv_views.push_back(view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
     }//if mapping not yet assigned
   }//for num cells
@@ -89,8 +82,18 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVView* SpatialDiscretization_FV::MapFeView(int cell_glob_index)
+CellFVView* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 {
-  CellFVView* value = cell_fv_views.at(cell_fv_views_mapping[cell_glob_index]);
+  CellFVView* value;
+  try { value = cell_fv_views.at(cell_local_index); }
+  catch (const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SpatialDiscretization_FV::MapFeView "
+         "Failure to map Finite Volume View. The view is either not"
+         "available or the supplied local index is invalid.";
+    exit(EXIT_FAILURE);
+  }
+
   return value;
 }

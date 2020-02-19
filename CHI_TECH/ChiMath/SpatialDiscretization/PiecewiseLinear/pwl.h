@@ -20,8 +20,11 @@ class SpatialDiscretization_PWL : public SpatialDiscretization
 {
 public:
   std::vector<CellFEView*> cell_fe_views;
-  std::vector<int>         cell_fe_views_mapping;
+
+private:
+  std::vector<bool>        cell_view_added_flags;
   bool mapping_initialized;
+public:
   chi_math::QuadratureTriangle*    tri_quad_deg5;
   chi_math::QuadratureTriangle*    tri_quad_deg3_surf;
   chi_math::QuadratureTetrahedron* tet_quad_deg1;
@@ -40,7 +43,7 @@ public:
   void AddViewOfNeighborContinuums(chi_mesh::MeshContinuum* grid);
   //02
   std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuum* grid);
-  CellFEView* MapFeView(int cell_glob_index);
+  CellFEView* MapFeViewL(int cell_local_index);
   int         MapCFEMDOF(int vertex_id);
 
   //03

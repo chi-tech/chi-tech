@@ -17,51 +17,49 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
   //                                                 for each cell
   if (!mapping_initialized)
   {
-    cell_fe_views_mapping.resize(grid->cells.size(), -1);
+    cell_view_added_flags.resize(grid->local_cells.size(),false);
     mapping_initialized = true;
   }
 
 
   //================================================== Swap views for
   //                                                   specified item_id
-  for (auto& cell_index : grid->local_cell_glob_indices)
+  for (const auto& cell : grid->local_cells)
   {
-    chi_mesh::Cell* cell = grid->cells[cell_index];
-
-    if (cell_fe_views_mapping[cell_index]<0)
+    if (not cell_view_added_flags[cell.cell_local_id])
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (cell->Type() == chi_mesh::CellType::SLAB)
+      if (cell.Type() == chi_mesh::CellType::SLAB)
       {
-        auto slab_cell = dynamic_cast<chi_mesh::CellSlab*>(cell);
+        auto slab_cell = (chi_mesh::CellSlab*)(&cell);
         auto cell_fe_view = new SlabFEView(slab_cell, grid);
 
         //cell_fe_view->PreCompute();
-
-        this->cell_fe_views.push_back(cell_fe_view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+        //cell_fe_view->CleanUp();
+        cell_fe_views.push_back(cell_fe_view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      else if (cell->Type() == chi_mesh::CellType::POLYGON)
+      else if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
-        auto poly_cell = dynamic_cast<chi_mesh::CellPolygon*>(cell);
+        auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
         auto cell_fe_view = new PolygonFEView(poly_cell, grid, this);
 
         cell_fe_view->PreCompute();
 
-        this->cell_fe_views.push_back(cell_fe_view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+        cell_fe_views.push_back(cell_fe_view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedron*>(cell);
+        auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
         auto cell_fe_view = new PolyhedronFEView(polyh_cell, grid, this);
 
         cell_fe_view->PreCompute();
         cell_fe_view->CleanUp();
-        this->cell_fe_views.push_back(cell_fe_view);
-        cell_fe_views_mapping[cell_index] = this->cell_fe_views.size()-1;
+        cell_fe_views.push_back(cell_fe_view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
       else
       {
@@ -134,14 +132,20 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
 }//AddViewOfNeighborContinuums
 
 
-
-
-
-
 //###################################################################
-/**Maps the cell index to a position stored locally.*/
-CellFEView* SpatialDiscretization_PWL::MapFeView(int cell_glob_index)
+/**Returns a locally stored finite element view.*/
+CellFEView* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
 {
-  CellFEView* value = cell_fe_views.at(cell_fe_views_mapping[cell_glob_index]);
+  CellFEView* value;
+  try { value = cell_fe_views.at(cell_local_index); }
+  catch (const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SpatialDiscretization_PWL::MapFeView "
+         "Failure to map Finite Element View. The view is either not"
+         "available or the supplied local index is invalid.";
+    exit(EXIT_FAILURE);
+  }
+
   return value;
 }

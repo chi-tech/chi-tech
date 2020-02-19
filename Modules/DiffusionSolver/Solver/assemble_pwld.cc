@@ -17,7 +17,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
                                                   int component,
                                                   int component_block_offset)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeView(cell_glob_index);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->cell_local_id);
 
   //====================================== Process material id
   int mat_id = cell->material_id;
@@ -79,7 +79,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       {
         adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
 //        adj_ip_view   = ip_cell_views[adj_cell->cell_local_id];
-        adj_fe_view   = (CellFEView*)pwl_sdm->MapFeView(neighbor);
+        adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell->cell_local_id);
       }//local
       else //Non-local
       {
@@ -399,7 +399,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
                                             int component,
                                             int component_block_offset)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeView(cell_glob_index);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->cell_local_id);
 
   //====================================== Process material id
   int mat_id = cell->material_id;

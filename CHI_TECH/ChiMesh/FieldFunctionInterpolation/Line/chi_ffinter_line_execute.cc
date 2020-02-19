@@ -96,7 +96,8 @@ CFEMInterpolate(Vec field,
     if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
 
     int cell_glob_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm->MapFeView(cell_glob_index);
+    auto cell = grid_view->cells[cell_glob_index];
+    auto cell_fe_view = spatial_dm->MapFeViewL(cell->cell_local_id);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->dofs; i++)
@@ -143,7 +144,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
 
     int cell_glob_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm->MapFeView(cell_glob_index);
+    auto cell = grid_view->cells[cell_glob_index];
+    auto cell_fe_view = spatial_dm->MapFeViewL(cell->cell_local_id);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->dofs; i++)
