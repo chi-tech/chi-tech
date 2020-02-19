@@ -57,6 +57,7 @@ public:
   int dof_phi_map_start;
   int dofs;
   int xs_id;
+  std::vector<bool> face_local;
 
 private:
   int num_grps;

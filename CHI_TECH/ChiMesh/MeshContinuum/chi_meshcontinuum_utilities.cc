@@ -213,13 +213,13 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
   }
 
   //======================================== Check cell validity by index
-  if (adj_cell_g_index >= cells.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedFace. Index is out of cell index bounds.";
-    exit(EXIT_FAILURE);
-  }
+//  if (adj_cell_g_index >= cells.size())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedFace. Index is out of cell index bounds.";
+//    exit(EXIT_FAILURE);
+//  }
 
   chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
 
@@ -318,13 +318,13 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
   }
 
   //======================================== Check cell validity by index
-  if (adj_cell_g_index >= cells.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedVertices. Index is out of cell index bounds.";
-    exit(EXIT_FAILURE);
-  }
+//  if (adj_cell_g_index >= cells.size())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Invalid cell index encountered in call to "
+//      << "MeshContinuum::FindAssociatedVertices. Index is out of cell index bounds.";
+//    exit(EXIT_FAILURE);
+//  }
 
   chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
 

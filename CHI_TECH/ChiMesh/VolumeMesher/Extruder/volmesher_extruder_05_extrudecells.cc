@@ -144,10 +144,11 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
   chi_mesh::SurfaceMesher* surf_mesher = handler->surface_mesher;
 
   //================================================== Start extrusion
+  int num_global_cells = 0;
   for (int iz=0; iz<(vertex_layers.size()-1); iz++)
   {
 
-    for (int tc=0; tc<template_continuum->cells.size(); tc++)
+    for (int tc=0; tc<template_continuum->local_cells.size(); tc++)
     {
       //========================================= Get template cell
       if (template_continuum->cells[tc]->Type() !=
@@ -176,8 +177,8 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
       if ((tcell->partition_id != chi_mpi.location_id) and
           (!options.mesh_global))
       {
-        tcell->cell_global_id = vol_continuum->cells.size();
-        vol_continuum->cells.push_back(tcell);
+        tcell->cell_global_id = num_global_cells;
+        vol_continuum->cells.push_back(tcell); ++num_global_cells;
 
         bool is_neighbor_to_partition = IsTemplateCellNeighborToThisPartition(
           template_cell, template_continuum, surf_mesher, iz, tc);
@@ -240,7 +241,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
           //template cell + the iz specifiers of the layer.
           if (face.neighbor >= 0)
             newFace.neighbor = face.neighbor +
-                               iz*((int)template_continuum->cells.size());
+                               iz*((int)template_continuum->local_cells.size());
           else
             newFace.neighbor = face.neighbor;
 
@@ -283,7 +284,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         if (iz==0)
           newFace.neighbor = -1*(bot_boundary_index+1);
         else
-          newFace.neighbor = tc + (iz-1)*(int)(template_continuum->cells.size());
+          newFace.neighbor = tc + (iz-1)*(int)(template_continuum->local_cells.size());
 
         cell->faces.push_back(newFace);
 
@@ -314,12 +315,12 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
         if (iz==(vertex_layers.size()-2))
           newFace.neighbor = -1*(top_boundary_index+1);
         else
-          newFace.neighbor = tc + (iz+1)*(int)(template_continuum->cells.size());
+          newFace.neighbor = tc + (iz+1)*(int)(template_continuum->local_cells.size());
 
         cell->faces.push_back(newFace);
 
-        cell->cell_global_id = vol_continuum->cells.size();
-        vol_continuum->cells.push_back(cell);
+        cell->cell_global_id = num_global_cells;
+        vol_continuum->cells.push_back(cell); ++num_global_cells;
 
       } //if cell is local
       //################### END OF LOCAL CELL ##############################

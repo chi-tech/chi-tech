@@ -151,21 +151,6 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
 
 
         //================================== Initialize local cell indices
-        int num_glob_cells=vol_continuum->cells.size();
-        for (int c=0; c<num_glob_cells; c++)
-        {
-          vol_continuum->glob_cell_local_indices.push_back(-1);
-          if ((vol_continuum->cells[c]->partition_id == chi_mpi.location_id) ||
-              (options.mesh_global))
-          {
-            vol_continuum->local_cell_glob_indices.push_back(c);
-            int local_cell_index =
-              vol_continuum->local_cell_glob_indices.size()-1;
-            vol_continuum->glob_cell_local_indices[c]=local_cell_index;
-
-            vol_continuum->cells[c]->cell_local_id = local_cell_index;
-          }
-        }
         chi_log.Log(LOG_ALLVERBOSE_1)
           << "### LOCATION[" << chi_mpi.location_id
           << "] amount of local cells="
@@ -176,7 +161,6 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           << "VolumeMesherLinemesh1D: Number of cells in region = "
           << vol_continuum->cells.size()
           << std::endl;
-        vol_continuum->cells.shrink_to_fit();
 
         chi_log.Log(LOG_0)
           << "VolumeMesherLinemesh1D: Number of nodes in region = "

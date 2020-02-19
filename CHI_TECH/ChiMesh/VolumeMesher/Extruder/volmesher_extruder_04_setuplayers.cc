@@ -62,7 +62,7 @@ void chi_mesh::VolumeMesherExtruder::
   std::set<int> local_vert_ids;
   for (int iz=0; iz<(vertex_layers.size()-1); iz++)
   {
-    for (int tc=0; tc<template_continuum->cells.size(); tc++)
+    for (int tc=0; tc<template_continuum->local_cells.size(); tc++)
     {
       //========================================= Get template cell
       if (template_continuum->cells[tc]->Type() !=

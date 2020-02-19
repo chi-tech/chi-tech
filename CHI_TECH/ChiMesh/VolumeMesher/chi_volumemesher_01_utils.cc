@@ -25,7 +25,8 @@ extern ChiTimer chi_program_timer;
 void chi_mesh::VolumeMesher::
 CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
                    chi_mesh::MeshContinuum *vol_continuum,
-                   bool delete_surface_mesh_elements)
+                   bool delete_surface_mesh_elements,
+                   bool force_local)
 {
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
@@ -39,6 +40,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     surface_mesh->vertices = std::move(std::vector<chi_mesh::Vertex>(0));
 
   //============================================= Process faces
+  unsigned int num_cells = 0;
   for (auto& face : surface_mesh->faces)
   {
     auto cell = new chi_mesh::CellPolygon;
@@ -78,9 +80,12 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
                          handler->surface_mesher->partitioning_x +
                          cell->xy_partition_indices.first;
 
-    cell->cell_global_id = vol_continuum->cells.size();
+    if (force_local)
+      cell->partition_id = chi_mpi.location_id;
 
-    vol_continuum->cells.push_back(cell);
+    cell->cell_global_id = num_cells;
+
+    vol_continuum->cells.push_back(cell); ++num_cells;
   }
 
   for (auto face : surface_mesh->poly_faces)
@@ -96,17 +101,9 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     }
     cell->centroid = cell->centroid/cell->vertex_ids.size();
 
-    //====================================== Compute partition id
-    cell->xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = cell->xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
-                         cell->xy_partition_indices.first;
-
     //====================================== Copy edges
-    for (int e=0; e<face->edges.size(); e++)
+    for (auto src_side : face->edges)
     {
-      int* src_side = face->edges[e];
-
       chi_mesh::CellFace new_face;
 
       new_face.vertex_ids.push_back(src_side[0]);
@@ -127,9 +124,18 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       cell->faces.push_back(new_face);
     }
 
-    cell->cell_global_id = vol_continuum->cells.size();
+    //====================================== Compute partition id
+    cell->xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = cell->xy_partition_indices.second*
+                         handler->surface_mesher->partitioning_x +
+                         cell->xy_partition_indices.first;
 
-    vol_continuum->cells.push_back(cell);
+    if (force_local)
+      cell->partition_id = chi_mpi.location_id;
+
+    cell->cell_global_id = num_cells;
+
+    vol_continuum->cells.push_back(cell); ++num_cells;
 
     if (delete_surface_mesh_elements)
       delete face;

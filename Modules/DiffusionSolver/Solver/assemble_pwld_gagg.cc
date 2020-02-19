@@ -89,9 +89,10 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
         //========================= Get adj cell information
         if (grid->IsCellLocal(neighbor))  //Local
         {
-          int adj_cell_local_index = grid->glob_cell_local_indices[neighbor];
-          adj_ip_view   = ip_cell_views[adj_cell_local_index];
+//          int adj_cell_local_index = grid->glob_cell_local_indices[neighbor];
+//          adj_ip_view   = ip_cell_views[adj_cell_local_index];
           adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
+          adj_ip_view   = ip_cell_views[adj_cell->cell_local_id];
           adj_fe_view   = (CellFEView*)pwl_sdm->MapFeView(neighbor);
         }//local
         else //Non-local

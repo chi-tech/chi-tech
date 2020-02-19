@@ -33,6 +33,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Loop over all regions
+  int total_global_cells = 0;
   std::vector<chi_mesh::Region*>::iterator region_iter;
   for (region_iter = mesh_handler->region_stack.begin();
        region_iter != mesh_handler->region_stack.end();
@@ -101,9 +102,12 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Creating template cells"
           << std::endl;
-        bool delete_surface_mesh_elements = true;
-        CreatePolygonCells(ref_continuum->surface_mesh, temp_grid,
-                           delete_surface_mesh_elements);
+        const bool DELETE_SURFACE_MESH_ELEMENTS = true;
+        const bool FORCE_LOCAL = true;
+        CreatePolygonCells(ref_continuum->surface_mesh,
+                           temp_grid,
+                           DELETE_SURFACE_MESH_ELEMENTS,
+                           FORCE_LOCAL);
         delete ref_continuum->surface_mesh;
 
         chi_log.Log(LOG_0VERBOSE_1)
@@ -121,16 +125,25 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         MPI_Barrier(MPI_COMM_WORLD);
         ExtrudeCells(temp_grid, grid);
 
+        int total_local_cells = grid->local_cells.size();
+
+        MPI_Allreduce(&total_local_cells,
+                      &total_global_cells,
+                      1,
+                      MPI_INT,
+                      MPI_SUM,
+                      MPI_COMM_WORLD);
+
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
-          << grid->cells.size()
+          << total_global_cells
           << std::endl;
 
 
 
         //================================== Clean-up temporary continuum
         for (auto vert : temp_grid->vertices) delete vert;
-        for (auto pcell : temp_grid->cells) delete pcell;
+        for (auto pcell : temp_grid->cells_storage) delete pcell;
         delete temp_grid;
 
         //================================== Checking partitioning parameters
@@ -160,25 +173,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_ALLVERBOSE_1) << "Building local cell indices";
 
         //================================== Initialize local cell indices
-        int num_glob_cells=grid->cells.size();
-        for (int c=0; c<num_glob_cells; c++)
-        {
-          grid->glob_cell_local_indices.push_back(-1);
-
-          if (grid->cells[c] == nullptr)
-            continue;
-
-          if ((grid->cells[c]->partition_id == chi_mpi.location_id) ||
-              (options.mesh_global))
-          {
-            grid->local_cell_glob_indices.push_back(c);
-            int local_cell_index = grid->local_cell_glob_indices.size() - 1;
-            grid->glob_cell_local_indices[c]=local_cell_index;
-
-            grid->cells[c]->cell_local_id = local_cell_index;
-          }
-        }
-
         chi_log.Log(LOG_ALLVERBOSE_1)
           << "### LOCATION[" << chi_mpi.location_id
           << "] amount of local cells="
@@ -187,9 +181,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Number of cells in region = "
-          << grid->cells.size()
+          << total_global_cells
           << std::endl;
-        grid->cells.shrink_to_fit();
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Number of nodes in region = "

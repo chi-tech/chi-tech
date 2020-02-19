@@ -22,7 +22,10 @@ public:
     std::vector<int>& local_cell_ind;
     std::vector<chi_mesh::Cell*>& cell_references;
 
+    std::vector<chi_mesh::Cell*> native_cells;
+    std::vector<chi_mesh::Cell*> foreign_cells;
 
+    /**Constructor.*/
     LocalCells(std::vector<int>& in_local_cell_ind,
                std::vector<chi_mesh::Cell*>& in_cell_references) :
       local_cell_ind(in_local_cell_ind),
@@ -64,9 +67,11 @@ public:
       }
     };
 
-    iterator begin() {return iterator(*this,0);}
+    iterator begin() {return {*this,0};}
 
-    iterator end(){return iterator(*this,local_cell_ind.size());}
+    iterator end(){return {*this,local_cell_ind.size()};}
+
+    size_t size() {return local_cell_ind.size();}
   };
   //--------------------------------------------------
 
@@ -76,25 +81,18 @@ public:
   {
   private:
     LocalCells& local_cells;
+    std::set<std::pair<int,int>> global_cell_native_index_set;
+    std::set<std::pair<int,int>> global_cell_foreign_index_set;
+
+
   public:
     explicit GlobalCellHandler(LocalCells& local_cell_object_ref) :
      local_cells(local_cell_object_ref)
     {}
 
-    void push_back(chi_mesh::Cell* new_cell)
-    {
-      local_cells.cell_references.push_back(new_cell);
-    }
-
-    chi_mesh::Cell* &operator[](int cell_global_index)
-    {
-      return local_cells.cell_references[cell_global_index];
-    }
-
-    size_t size()
-    {
-      return local_cells.cell_references.size();
-    }
+    void push_back(chi_mesh::Cell* new_cell);
+    chi_mesh::Cell* &operator[](int cell_global_index);
+    size_t size();
 
 
   };
@@ -106,7 +104,6 @@ public:
   chi_mesh::SurfaceMesh*         surface_mesh;
   chi_mesh::LineMesh*            line_mesh;
   std::vector<int>               local_cell_glob_indices;
-  std::vector<int>               glob_cell_local_indices;
   std::vector<int>               boundary_cell_indices;
 
 

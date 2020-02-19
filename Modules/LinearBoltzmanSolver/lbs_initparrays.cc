@@ -3,8 +3,10 @@
 #include <PiecewiseLinear/pwl.h>
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
+#include <chi_mpi.h>
 
 extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 extern ChiPhysics chi_physics_handler;
 
 //###################################################################
@@ -103,6 +105,8 @@ void LinearBoltzman::Solver::InitializeParrays()
     block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
 
     //Init face upwind flags and adj_partition_id
+    full_cell_view->face_local.resize(cell->faces.size(),true);
+    int f=0;
     for (auto& face : cell->faces)
     {
       if (grid->IsCellBndry(face.neighbor))
@@ -119,6 +123,10 @@ void LinearBoltzman::Solver::InitializeParrays()
 
         if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
       }//if bndry
+      if (not grid->IsCellLocal(face.neighbor))
+        full_cell_view->face_local[f] = false;
+
+      ++f;
     }//for f
 
     //Add address

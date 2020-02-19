@@ -89,21 +89,23 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
 
         //================================== Connect Boundaries
         std::vector<chi_mesh::Cell*>::iterator cell;
-        for (cell = vol_continuum->cells.begin();
-             cell != vol_continuum->cells.end();
-             cell++)
+//        for (cell = vol_continuum->cells.begin();
+//             cell != vol_continuum->cells.end();
+//             cell++)
+        for (auto cell : vol_continuum->cells_storage)
         {
-          (*cell)->FindBoundary2D(region);
+          cell->FindBoundary2D(region);
         }
 
         //================================== Check all open item_id have
         //                                   boundaries
         int no_boundary_cells=0;
-        for (cell = vol_continuum->cells.begin();
-             cell != vol_continuum->cells.end();
-             cell++)
+//        for (cell = vol_continuum->cells.begin();
+//             cell != vol_continuum->cells.end();
+//             cell++)
+        for (auto cell : vol_continuum->cells_storage)
         {
-          if (!(*cell)->CheckBoundary2D())
+          if (!cell->CheckBoundary2D())
           {
             no_boundary_cells++;
           }
@@ -141,19 +143,6 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
 
 
         //================================== InitializeAlphaElements local cell indices
-        int num_glob_cells=vol_continuum->cells.size();
-        for (int c=0; c<num_glob_cells; c++)
-        {
-          vol_continuum->glob_cell_local_indices.push_back(-1);
-          if ((vol_continuum->cells[c]->partition_id == chi_mpi.location_id) ||
-              (options.mesh_global))
-          {
-            vol_continuum->local_cell_glob_indices.push_back(c);
-            int local_cell_index = vol_continuum->local_cell_glob_indices.size()-1;
-            vol_continuum->glob_cell_local_indices[c]=local_cell_index;
-            vol_continuum->cells[c]->cell_local_id = local_cell_index;
-          }
-        }
         chi_log.Log(LOG_ALLVERBOSE_1)
         << "### LOCATION[" << chi_mpi.location_id
         << "] amount of local cells="
@@ -174,11 +163,6 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
           << vol_continuum->vertices.size()
           << std::endl;
 
-
-//        if (chi_mpi.location_id == 0)
-//        {
-//          vol_continuum->ExportCellsToPython("SurfaceMesh.py");
-//        }
       } //if surface mesh
     } //for boundaries
   } //for regions

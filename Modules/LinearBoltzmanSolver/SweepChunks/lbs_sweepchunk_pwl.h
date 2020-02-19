@@ -208,11 +208,10 @@ public:
         for (int f=0; f<num_faces; f++)
         {
 
-          double mu       = omega.Dot(cell->faces[f].normal);
-//          int    face_neighbor = transport_view->face_f_adj_part_id[f];
-          auto& face = cell->faces[f];
+          double mu              = omega.Dot(cell->faces[f].normal);
+          auto& face             = cell->faces[f];
           bool  face_on_boundary = grid_view->IsCellBndry(face.neighbor);
-          bool  neighbor_is_local = grid_view->IsCellLocal(face.neighbor);
+          bool neighbor_is_local = (transport_view->face_local[f]);
 
           //============================= Set flags
           if (mu>=0.0) face_incident_flags[f] = false;
@@ -228,32 +227,20 @@ public:
           if (face.neighbor<0)
           {
             internal_face_bndry_counter++;
-//            bndry_map = transport_view->
-//              face_boundary_id[internal_face_bndry_counter];
             bndry_map = -(face.neighbor+1);
           }
 
           if (mu < 0.0) //UPWIND
           {
             //============================== Increment face counters
-
-//            if (face_neighbor == LOCAL)
-//            {in_face_counter++;}
-//
-//            if ((face_neighbor != LOCAL) && (face_neighbor>=0))
-//            {preloc_face_counter++;}
-//
-//            if (face_neighbor<0)
-//            {bndry_face_counter++;}
-
             if (neighbor_is_local)
-            {in_face_counter++;}
+              in_face_counter++;
 
             if ((not neighbor_is_local) && (not face_on_boundary))
-            {preloc_face_counter++;}
+              preloc_face_counter++;
 
             if (face_on_boundary)
-            {bndry_face_counter++;}
+              bndry_face_counter++;
 
 
             //============================== Loop over face vertices
