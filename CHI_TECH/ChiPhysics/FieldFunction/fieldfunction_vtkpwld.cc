@@ -73,18 +73,16 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
 
   //======================================== Populate cell information
   int nc=0;
-  int num_loc_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_loc_cells; lc++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_g_ind];
+    int cell_g_ind = cell.cell_global_id;
 
-    int mat_id = cell->material_id;
+    int mat_id = cell.material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
       int num_verts = 2;
       std::vector<vtkIdType> cell_info(num_verts);
@@ -106,7 +104,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
       std::vector<int> mapping;
@@ -136,9 +134,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
       int num_verts = poly_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
@@ -159,7 +157,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
       std::vector<int> mapping;
@@ -189,9 +187,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
       auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
 
       int num_verts = polyh_cell->vertex_ids.size();
@@ -231,7 +229,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                        cell_info.data(),num_faces,faces->GetPointer());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
       std::vector<int> mapping;
@@ -344,18 +342,16 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
 
   //======================================== Populate cell information
   int nc=0;
-  int num_loc_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_loc_cells; lc++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_g_ind];
+    int cell_g_ind = cell.cell_global_id;
 
-    int mat_id = cell->material_id;
+    int mat_id = cell.material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
       int num_verts = 2;
       std::vector<vtkIdType> cell_info(num_verts);
@@ -377,7 +373,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
       std::vector<int> mapping;
@@ -411,9 +407,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+      auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
       int num_verts = poly_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
@@ -434,7 +430,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
       std::vector<int> mapping;
@@ -467,9 +463,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
       auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeView(cell_g_ind);
 
       int num_verts = polyh_cell->vertex_ids.size();
@@ -509,7 +505,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
                        cell_info.data(),num_faces,faces->GetPointer());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
       std::vector<int> mapping;

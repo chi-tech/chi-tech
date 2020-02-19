@@ -66,16 +66,14 @@ Initialize()
 
       //================================================== Find a home for each
       //                                                   point
-      size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-      for (size_t ic=0; ic<num_local_cells; ic++)
+      for (const auto& cell : grid_view->local_cells)
       {
-        int cell_glob_index = grid_view->local_cell_glob_indices[ic];
-        auto cell = grid_view->cells[cell_glob_index];
+        int cell_glob_index = cell.cell_global_id;
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell.Type() == chi_mesh::CellType::SLAB)
         {
-          auto slab_cell = (chi_mesh::CellSlab*)cell;
+          auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
           for (int p=0; p<number_of_points; p++)
           {
@@ -109,9 +107,9 @@ Initialize()
         }//if slab
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        else if (cell->Type() == chi_mesh::CellType::POLYGON)
+        else if (cell.Type() == chi_mesh::CellType::POLYGON)
         {
-          auto poly_cell = (chi_mesh::CellPolygon*)cell;
+          auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
           size_t num_edges = poly_cell->faces.size();
 
@@ -154,9 +152,9 @@ Initialize()
         }//if polygon cell
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+        else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+          auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
 
           size_t num_faces = polyh_cell->faces.size();
 

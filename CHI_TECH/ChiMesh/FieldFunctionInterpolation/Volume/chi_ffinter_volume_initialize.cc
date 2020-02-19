@@ -23,22 +23,20 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
   }
 
   //================================================== Find cell inside volume
-  size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
+  for (const auto& cell : grid_view->local_cells)
   {
-    int cell_glob_index = grid_view->local_cell_glob_indices[lc];
-    auto cell = grid_view->cells[cell_glob_index];
+    int cell_glob_index = cell.cell_global_id;
 
     bool inside_logvolume=true;
 
     if (logical_volume != nullptr)
-      inside_logvolume = logical_volume->Inside(cell->centroid);
+      inside_logvolume = logical_volume->Inside(cell.centroid);
 
     if (inside_logvolume)
     {
-      for (int i=0; i < cell->vertex_ids.size(); i++)
+      for (int i=0; i < cell.vertex_ids.size(); i++)
       {
-        cfem_local_nodes_needed_unmapped.push_back(cell->vertex_ids[i]);
+        cfem_local_nodes_needed_unmapped.push_back(cell.vertex_ids[i]);
         pwld_local_nodes_needed_unmapped.push_back(i);
         pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
       }//for dof

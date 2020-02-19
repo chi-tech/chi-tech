@@ -32,13 +32,10 @@ void chi_mesh::MeshContinuum::
 
   //================================================== Fill histogram
   std::vector<size_t> face_size_histogram;
-  for (auto c : local_cell_glob_indices)
-  {
-    auto cell = cells[c];
-
-    for (auto face : cell->faces)
+  for (const auto& cell : local_cells)
+    for (const auto& face : cell.faces)
       face_size_histogram.push_back(face.vertex_ids.size());
-  }
+
   std::stable_sort(face_size_histogram.begin(), face_size_histogram.end());
 
   //================================================== Determine total face dofs
@@ -47,8 +44,8 @@ void chi_mesh::MeshContinuum::
     total_face_dofs_count += face_size;
 
   //================================================== Compute average and ratio
-  size_t smallest_face = face_size_histogram.front();
-  size_t largest_face = face_size_histogram.back();
+  size_t smallest_face   = face_size_histogram.front();
+  size_t largest_face    = face_size_histogram.back();
   size_t total_num_faces = face_size_histogram.size();
   double average_dofs_per_face = (double)total_face_dofs_count/total_num_faces;
 

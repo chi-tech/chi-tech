@@ -35,28 +35,26 @@ void chi_mesh::FieldFunctionInterpolationSlice::
   //================================================== Find cells intersecting plane
   intersecting_cell_indices.clear();
 
-  size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
+  for (const auto& cell : grid_view->local_cells)
   {
-    int cell_glob_index = grid_view->local_cell_glob_indices[lc];
-    auto cell = grid_view->cells[cell_glob_index];
+    int cell_glob_index = cell.cell_global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell.Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0)
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
       exit(EXIT_FAILURE);
     }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
       intersecting_cell_indices.push_back(cell_glob_index);
     }
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = static_cast<chi_mesh::CellPolyhedron*>(cell);
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
       bool intersects = false;
 
       size_t num_faces = polyh_cell->faces.size();

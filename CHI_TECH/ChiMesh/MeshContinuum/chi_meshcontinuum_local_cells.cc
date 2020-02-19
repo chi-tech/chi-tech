@@ -60,13 +60,16 @@ void chi_mesh::MeshContinuum::GlobalCellHandler::
 
 }
 
-
+//###################################################################
+/**Returns a pointer to a cell given its global cell index.*/
 chi_mesh::Cell* &chi_mesh::MeshContinuum::GlobalCellHandler::
   operator[](int cell_global_index)
 {
   return local_cells.cell_references[cell_global_index];
 }
 
+//###################################################################
+/**Returns the total number of cells.*/
 size_t chi_mesh::MeshContinuum::GlobalCellHandler::size()
 {
   return local_cells.cell_references.size();

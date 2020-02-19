@@ -42,38 +42,38 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 
   //================================================== Swap views for
   //                                                   specified item_id
-  for (auto& cell_index : vol_continuum->local_cell_glob_indices)
+  for (const auto& cell : vol_continuum->local_cells)
   {
-    chi_mesh::Cell* cell = vol_continuum->cells[cell_index];
+    int cell_index = cell.cell_global_id;
 
     if (cell_fv_views_mapping[cell_index]<0)
     {
       //######################################### SLAB
-      if (cell->Type() == chi_mesh::CellType::SLAB)
+      if (cell.Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
-          new SlabFVView((chi_mesh::CellSlab*)cell, vol_continuum);
+          new SlabFVView((chi_mesh::CellSlab*)(&cell), vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
       }
 
       //######################################### POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
+      if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
-          new PolygonFVView((chi_mesh::CellPolygon*)(cell), vol_continuum);
+          new PolygonFVView((chi_mesh::CellPolygon*)(&cell), vol_continuum);
 
         this->cell_fv_views.push_back(view);
         cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
       }
 
       //######################################### POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
         auto view =
           new PolyhedronFVView(
-            (chi_mesh::CellPolyhedron*)(cell),
+            (chi_mesh::CellPolyhedron*)(&cell),
             vol_continuum);
 
         this->cell_fv_views.push_back(view);

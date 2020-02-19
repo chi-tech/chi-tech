@@ -396,17 +396,14 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 void chi_mesh::VolumeMesher::
  GetBoundaryCells(chi_mesh::MeshContinuum* vol_continuum)
 {
-  for (int lc=0;
-       lc<vol_continuum->local_cell_glob_indices.size(); lc++)
+  for (const auto& cell : vol_continuum->local_cells)
   {
-    int c = vol_continuum->local_cell_glob_indices[lc];
-    chi_mesh::Cell* cell = vol_continuum->cells[c];
 
-    for (int f=0; f<cell->faces.size(); f++)
+    for (int f=0; f<cell.faces.size(); f++)
     {
-      if (cell->faces[f].neighbor < 0)
+      if (cell.faces[f].neighbor < 0)
       {
-        vol_continuum->boundary_cell_indices.push_back(c);
+        vol_continuum->boundary_cell_indices.push_back(cell.cell_global_id);
         break;
       }
     }
@@ -437,11 +434,10 @@ void chi_mesh::VolumeMesher::
   chi_mesh::MeshContinuum* vol_cont = cur_region->volume_mesh_continua.back();
 
   int num_cells_modified = 0;
-  for (auto glob_index : vol_cont->local_cell_glob_indices)
+  for (auto& cell : vol_cont->local_cells)
   {
-    auto cell = vol_cont->cells[glob_index];
-    if (log_vol->Inside(cell->centroid) && sense){
-      cell->material_id = mat_id;
+    if (log_vol->Inside(cell.centroid) && sense){
+      cell.material_id = mat_id;
       ++num_cells_modified;
     }
   }
@@ -468,10 +464,9 @@ SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
   chi_mesh::MeshContinuum* vol_cont = cur_region->volume_mesh_continua.back();
 
   int num_faces_modified = 0;
-  for (auto glob_index : vol_cont->local_cell_glob_indices)
+  for (auto& cell : vol_cont->local_cells)
   {
-    auto cell = vol_cont->cells[glob_index];
-    for (auto& face : cell->faces)
+    for (auto& face : cell.faces)
       if (log_vol->Inside(face.centroid) && sense){
         face.neighbor = -1*(abs(bndry_id)+1);
         ++num_faces_modified;

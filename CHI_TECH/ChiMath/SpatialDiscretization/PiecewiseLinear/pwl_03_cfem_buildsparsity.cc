@@ -22,24 +22,22 @@ void SpatialDiscretization_PWL::
   nodal_nnz_in_diag .resize(grid->vertices.size(), 0);
   nodal_nnz_off_diag.resize(grid->vertices.size(), 0);
 
-  for (auto& glob_index : grid->local_cell_glob_indices)
+  for (auto& cell : grid->local_cells)
   {
-    auto cell = grid->cells[glob_index];
-
-    for (size_t i=0; i < cell->vertex_ids.size(); i++)
+    for (size_t i=0; i < cell.vertex_ids.size(); i++)
     {
-      int ir = MapCFEMDOF(cell->vertex_ids[i]);
+      int ir = MapCFEMDOF(cell.vertex_ids[i]);
 
       if (ir<0)
       {
         chi_log.Log(LOG_ALLERROR)
-          << "ir Mapping error node " << cell->vertex_ids[i];
+          << "ir Mapping error node " << cell.vertex_ids[i];
         exit(EXIT_FAILURE);
       }
 
       //======================================= Set nodal connections
       std::vector<int>& node_links = nodal_connections[ir];
-      for (auto& jvid : cell->vertex_ids)
+      for (auto& jvid : cell.vertex_ids)
       {
         int jr = MapCFEMDOF(jvid);
 
@@ -64,7 +62,7 @@ void SpatialDiscretization_PWL::
         }
       }//for j
     }//for i
-  }
+  }//for cell
 
   MPI_Barrier(MPI_COMM_WORLD);
 }
