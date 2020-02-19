@@ -161,8 +161,8 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
   //================================================== Loop over cells in sorder
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
-    int  cell_g_index = spls->item_id[csoi];
-    auto cell         = grid->cells[cell_g_index];
+    int cell_local_index = spls->item_id[csoi];
+    auto cell = &grid->local_cells[cell_local_index];
 
     NonLocalIncidentMapping(cell, spds);
   }//for csoi
@@ -250,17 +250,17 @@ DeSerializeCellInfo(std::vector<CompactCellView>& cell_views,
     {
       if (-entry != last_cell)
       {
-        cell_views.push_back(CompactCellView()); c++;
+        cell_views.emplace_back(); c++;
         cell_views[c].first = -entry-1;
 
-        cell_views[c].second.push_back(CompactFaceView());f=0;
+        cell_views[c].second.emplace_back();f=0;
 
         v=0; last_cell = -entry;
 
         cell_views[c].second[f].first = (*face_indices)[k+1]; k++;
       } else
       {
-        cell_views[c].second.push_back(CompactFaceView()); f++; v=0;
+        cell_views[c].second.emplace_back(); f++; v=0;
 
         cell_views[c].second[f].first = (*face_indices)[k+1]; k++;
       }

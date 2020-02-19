@@ -36,14 +36,8 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
 
   //================================================== Get local DOF count
   local_dof_count=0;
-  size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_loc_cells; lc++)
-  {
-    int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
-    auto cell = vol_continuum->cells[cell_glob_index];
-
-    local_dof_count += cell->vertex_ids.size();
-  }
+  for (const auto& cell : vol_continuum->local_cells)
+    local_dof_count += cell.vertex_ids.size();
 
   //================================================== Get global DOF count
   global_dof_count=0;

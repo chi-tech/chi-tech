@@ -150,8 +150,9 @@ public:
     size_t num_loc_cells = spds->spls->item_id.size();
     for (int cr_i=0; cr_i<num_loc_cells; cr_i++)
     {
-      int    cell_g_index = spds->spls->item_id[cr_i];
-      auto   cell         = grid_view->cells[cell_g_index];
+      int  cell_local_id = spds->spls->item_id[cr_i];
+      auto cell          = &grid_view->local_cells[cell_local_id];
+      int  cell_g_index  = cell->cell_global_id;
 
       auto cell_fe_view   = (CellFEView*)grid_fe_view->MapFeView(cell_g_index);
       auto transport_view =

@@ -27,15 +27,12 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
   int gss = gsf-gsi+1;
 
   int index = -1;
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
-    auto cell        = grid->cells[cell_g_index];
-
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
 
-    for (int i=0; i < cell->vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       for (int m=0; m<num_moments; m++)
       {
@@ -69,15 +66,12 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
   int gss = gsf-gsi+1;
 
   int index = -1;
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
-    auto cell        = grid->cells[cell_g_index];
-
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
 
-    for (int i=0; i < cell->vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       for (int m=0; m<num_moments; m++)
       {
@@ -110,15 +104,12 @@ DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
   int gss = groupset->groups.size();
 
   int index = -1;
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
-    auto cell        = grid->cells[cell_g_index];
-
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
 
-    for (int i=0; i < cell->vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       for (int m=0; m<num_moments; m++)
       {

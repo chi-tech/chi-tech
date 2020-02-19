@@ -142,9 +142,10 @@ CreateSweepOrder(double polar, double azimuthal,
   {
     if (i==0) sweep_order->spls = new chi_mesh::sweep_management::SPLS;
 
-    int cell_local_id = index_map[*ii];
-    int cell_global_index = grid->local_cell_glob_indices[cell_local_id];
-    sweep_order->spls->item_id.push_back(cell_global_index);
+//    int cell_local_id = index_map[*ii];
+//    int cell_global_index = grid->local_cell_glob_indices[cell_local_id];
+//    sweep_order->spls->item_id.push_back(cell_global_index);
+    sweep_order->spls->item_id.push_back(index_map[*ii]);
     ++i;
   }
 

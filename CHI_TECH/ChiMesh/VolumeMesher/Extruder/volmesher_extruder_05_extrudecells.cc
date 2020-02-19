@@ -79,8 +79,8 @@ bool chi_mesh::VolumeMesherExtruder::
   {
     if (tc_face.neighbor >= 0)
     {
-      auto n_template_cell = (chi_mesh::CellPolygon*)
-        template_continuum->cells[tc_face.neighbor];
+      auto n_template_cell = (chi_mesh::CellPolygon*)(
+        &template_continuum->local_cells[tc_face.neighbor]);
 
       auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
         n_template_cell, template_continuum, iz, iz+1);
@@ -101,7 +101,7 @@ bool chi_mesh::VolumeMesherExtruder::
   if (iz != 0)
   {
     auto n_template_cell = (chi_mesh::CellPolygon*)
-      template_continuum->cells[tc];
+      (&template_continuum->local_cells[tc]);
 
     auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
       n_template_cell, template_continuum, iz-1, iz);
@@ -118,7 +118,7 @@ bool chi_mesh::VolumeMesherExtruder::
   if (iz != (vertex_layers.size()-2))
   {
     auto n_template_cell = (chi_mesh::CellPolygon*)
-      template_continuum->cells[tc];
+      (&template_continuum->local_cells[tc]);
 
     auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
       n_template_cell, template_continuum, iz+1, iz+2);
@@ -151,13 +151,13 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
     for (int tc=0; tc<template_continuum->local_cells.size(); tc++)
     {
       //========================================= Get template cell
-      if (template_continuum->cells[tc]->Type() !=
+      if (template_continuum->local_cells[tc].Type() !=
           chi_mesh::CellType::POLYGON)
       {
         chi_log.Log(LOG_ALLERROR) << "Extruder: Template cell error.";
         exit(EXIT_FAILURE);
       }
-      auto template_cell = (chi_mesh::CellPolygon*)template_continuum->cells[tc];
+      auto template_cell = (chi_mesh::CellPolygon*)(&template_continuum->local_cells[tc]);
 
 
       //========================================= Precompute centroid

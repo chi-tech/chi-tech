@@ -159,8 +159,7 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   //seemed to have caused a lot of trouble for Slab
   //geometries. This section makes some custom options
   //per cell type
-  int first_cell_g_index = grid->local_cell_glob_indices[0];
-  auto first_cell = grid->cells[first_cell_g_index];
+  auto first_cell = &grid->local_cells[0];
 
   if (first_cell->Type() == chi_mesh::CellType::SLAB)
   {

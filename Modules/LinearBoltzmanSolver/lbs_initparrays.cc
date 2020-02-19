@@ -90,14 +90,12 @@ void LinearBoltzman::Solver::InitializeParrays()
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
-  for (auto cell_g_index : grid->local_cell_glob_indices)
+  for (auto& cell : grid->local_cells)
   {
-    auto cell = grid->cells[cell_g_index];
-
-    auto cell_fe_view   = pwl_discretization->MapFeView(cell_g_index);
+    auto cell_fe_view   = pwl_discretization->MapFeView(cell.cell_global_id);
     auto full_cell_view = new CellViewFull(cell_fe_view->dofs, num_grps, M);
 
-    int mat_id = cell->material_id;
+    int mat_id = cell.material_id;
 
     full_cell_view->xs_id = matid_to_xs_map[mat_id];
 
@@ -105,9 +103,9 @@ void LinearBoltzman::Solver::InitializeParrays()
     block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
 
     //Init face upwind flags and adj_partition_id
-    full_cell_view->face_local.resize(cell->faces.size(),true);
+    full_cell_view->face_local.resize(cell.faces.size(),true);
     int f=0;
-    for (auto& face : cell->faces)
+    for (auto& face : cell.faces)
     {
       if (grid->IsCellBndry(face.neighbor))
       {

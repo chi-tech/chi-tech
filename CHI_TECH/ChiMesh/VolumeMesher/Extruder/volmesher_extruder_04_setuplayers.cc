@@ -65,14 +65,14 @@ void chi_mesh::VolumeMesherExtruder::
     for (int tc=0; tc<template_continuum->local_cells.size(); tc++)
     {
       //========================================= Get template cell
-      if (template_continuum->cells[tc]->Type() !=
+      if (template_continuum->local_cells[tc].Type() !=
           chi_mesh::CellType::POLYGON)
       {
         chi_log.Log(LOG_ALLERROR)
           << "Extruder::CreateLocalAndBoundaryNodes: Template cell error.";
         exit(EXIT_FAILURE);
       }
-      auto template_cell = (chi_mesh::CellPolygon*)template_continuum->cells[tc];
+      auto template_cell = (chi_mesh::CellPolygon*)(&template_continuum->local_cells[tc]);
 
       //========================================= Precompute centroid
       auto centroid_precompd = ComputeTemplateCell3DCentroid(
