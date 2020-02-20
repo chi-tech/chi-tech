@@ -13,7 +13,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
   int num_loc_cells = grid->local_cell_glob_indices.size();
   int dof_count = 0;
   std::set<int> local_border_cells;
-  for (const auto& cell : grid->local_cells)
+  for (auto& cell : grid->local_cells)
   {
     auto ip_view = new DiffusionIPCellView;
     ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
@@ -28,13 +28,13 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       {
         if (cell.faces[f].neighbor >= 0) //Not bndry
         {
-          bool is_local = grid->IsCellLocal(cell.faces[f].neighbor);
+          bool is_local = cell.faces[f].IsNeighborLocal(grid);
 
           if (is_local)
           {
-            int adj_cell_glob_index = cell.faces[f].neighbor;
-            auto adj_cell = grid->cells[adj_cell_glob_index];
-            nodal_nnz_in_diag[dof_count] += adj_cell->vertex_ids.size();
+            int neighbor_local_id = cell.faces[f].GetNeighborLocalID(grid);
+            auto adj_cell = grid->local_cells[neighbor_local_id];
+            nodal_nnz_in_diag[dof_count] += adj_cell.vertex_ids.size();
           }
           else
           {
@@ -234,7 +234,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
   //================================================== Building off-diagonal
   //                                                   sparsity pattern
   dof_count = 0;
-  for (const auto& cell : grid->local_cells)
+  for (auto& cell : grid->local_cells)
   {
     for (int v=0; v<cell.vertex_ids.size(); v++)
     {
@@ -242,14 +242,13 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       {
         int neighbor = cell.faces[f].neighbor;
         bool is_bndry = grid->IsCellBndry(neighbor);
-        bool is_local = grid->IsCellLocal(neighbor);
+        bool is_local = cell.faces[f].IsNeighborLocal(grid);
 
         if ((not is_bndry) and (not is_local))
         {
-          auto adj_cell = grid->cells[neighbor];
+          int adj_cell_partition_id = cell.faces[f].GetNeighborPartitionID(grid);
           auto adj_polyh_cell = (chi_mesh::Cell*)
-            GetBorderCell(adj_cell->partition_id,
-                          neighbor);
+            GetBorderCell(adj_cell_partition_id, neighbor);
           nodal_nnz_off_diag[dof_count] += adj_polyh_cell->vertex_ids.size();
         }
       }//for face

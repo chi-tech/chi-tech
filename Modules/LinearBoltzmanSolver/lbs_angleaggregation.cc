@@ -12,13 +12,17 @@ extern ChiLog chi_log;
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
+#include "ChiTimer/chi_timer.h"
 
+extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
 void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 {
-  chi_log.Log(LOG_0) << "Initializing angle aggregation: Polar";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Initializing angle aggregation: Polar";
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
@@ -161,7 +165,8 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 /**Initializes angle aggregation for a groupset.*/
 void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 {
-  chi_log.Log(LOG_0) << "Initializing angle aggregation: Single";
+  chi_log.Log(LOG_0) << chi_program_timer.GetTimeString()
+                     << " Initializing angle aggregation: Single";
 
   int d_azi   = std::max((int)(groupset->quadrature->azimu_ang.size()/4),1);
   int num_azi = groupset->quadrature->azimu_ang.size();

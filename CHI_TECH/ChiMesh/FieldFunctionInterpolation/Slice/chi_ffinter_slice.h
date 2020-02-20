@@ -30,7 +30,7 @@ struct FFIFaceEdgeIntersection
 
 struct FFICellIntersection
 {
-  int cell_global_index;
+  int cell_local_index;
   std::vector<FFIFaceEdgeIntersection*> intersections;
   chi_mesh::Vector3 intersection_centre;
   chi_mesh::Vector3 intersection_2d_centre;

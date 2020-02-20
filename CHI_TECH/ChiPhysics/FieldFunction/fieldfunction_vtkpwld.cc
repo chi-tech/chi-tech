@@ -43,8 +43,7 @@ extern ChiPhysics chi_physics_handler;
 void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                                                  const std::string& field_name)
 {
-  SpatialDiscretization_PWL* pwl_sdm =
-    (SpatialDiscretization_PWL*)spatial_discretization;
+  auto pwl_sdm = (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
   ff_interpol.grid_view = grid;
@@ -75,7 +74,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
   int nc=0;
   for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = cell.cell_global_id;
+    int cell_local_id = cell.cell_local_id;
 
     int mat_id = cell.material_id;
 
@@ -109,7 +108,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
       //============= Create dof mapping
       std::vector<int> mapping;
       std::vector<int> dofs_to_map(num_verts);
-      std::vector<int> cell_to_map(num_verts,cell_g_ind);
+      std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
@@ -162,7 +161,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
       //============= Create dof mapping
       std::vector<int> mapping;
       std::vector<int> dofs_to_map(num_verts);
-      std::vector<int> cell_to_map(num_verts,cell_g_ind);
+      std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
@@ -234,7 +233,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
       //============= Create dof mapping
       std::vector<int> mapping;
       std::vector<int> dofs_to_map(num_verts);
-      std::vector<int> cell_to_map(num_verts,cell_g_ind);
+      std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
@@ -344,7 +343,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
   int nc=0;
   for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = cell.cell_global_id;
+    int cell_local_id = cell.cell_local_id;
 
     int mat_id = cell.material_id;
 
@@ -378,7 +377,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
       //============= Create dof mapping
       std::vector<int> mapping;
       std::vector<int> dofs_to_map(num_verts);
-      std::vector<int> cell_to_map(num_verts,cell_g_ind);
+      std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
@@ -435,7 +434,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
       //============= Create dof mapping
       std::vector<int> mapping;
       std::vector<int> dofs_to_map(num_verts);
-      std::vector<int> cell_to_map(num_verts,cell_g_ind);
+      std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 
@@ -510,7 +509,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
       //============= Create dof mapping
       std::vector<int> mapping;
       std::vector<int> dofs_to_map(num_verts);
-      std::vector<int> cell_to_map(num_verts,cell_g_ind);
+      std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
         dofs_to_map[v] = v;
 

@@ -372,7 +372,7 @@ public:
 
 
           //============================= Store outgoing Psi Locally
-          if (grid_view->IsCellLocal(face.neighbor))
+          if (transport_view->face_local[f])
           {
             for (int fi=0; fi<cell->faces[f].vertex_ids.size(); fi++)
             {

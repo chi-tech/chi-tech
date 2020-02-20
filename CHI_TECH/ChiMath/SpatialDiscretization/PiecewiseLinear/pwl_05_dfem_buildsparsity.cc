@@ -14,8 +14,6 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
                          std::vector<int> &nodal_nnz_off_diag,
                          const std::pair<int, int> &domain_ownership)
 {
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Local connectivity";
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
   int local_dof_count = domain_ownership.first;
 
@@ -26,7 +24,7 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
   nodal_nnz_off_diag.resize(local_dof_count,0);
 
   int lc=0;
-  for (const auto& cell : grid->local_cells)
+  for (auto& cell : grid->local_cells)
   {
     auto cell_fe_view = cell_fe_views[lc];
 
@@ -38,12 +36,12 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
     }
 
     //==================================== Local adjacent cell connections
-    for (const auto& face : cell.faces)
+    for (auto& face : cell.faces)
     {
-      if (grid->IsCellLocal(face.neighbor))
+      if (face.IsNeighborLocal(grid))
       {
-        auto adj_cell = grid->cells[face.neighbor];
-        auto adj_cell_fe_view = cell_fe_views[adj_cell->cell_local_id];
+        int  adj_cell_local_id = face.GetNeighborLocalID(grid);
+        auto adj_cell_fe_view = cell_fe_views[adj_cell_local_id];
 
         for (int i=0; i<cell_fe_view->dofs; ++i)
         {
@@ -54,21 +52,19 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
     }
     ++lc;
   }//for local cell
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Done Local connectivity";
 
 
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEIGHBORING CONNECTIVITY
   lc=0;
-  for (const auto& cell : grid->local_cells)
+  for (auto& cell : grid->local_cells)
   {
     auto cell_fe_view = cell_fe_views[lc];
 
     //==================================== Local adjacent cell connections
-    for (const auto& face : cell.faces)
+    for (auto& face : cell.faces)
     {
-      if ((not grid->IsCellLocal(face.neighbor)) and
+      if ((not face.IsNeighborLocal(grid)) and
           (not grid->IsCellBndry(face.neighbor)))
       {
         auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor);
@@ -99,11 +95,11 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
   {
     for (auto& face : cell.faces)
     {
-      if ((not grid->IsCellLocal(face.neighbor)) and
+      if ((not face.IsNeighborLocal(grid)) and
           (not grid->IsCellBndry(face.neighbor)))
       {
         local_neighboring_cell_indices.insert(cell.cell_local_id);
-        neighboring_partitions.insert(grid->cells[face.neighbor]->partition_id);
+        neighboring_partitions.insert(face.GetNeighborPartitionID(grid));
       }
     }
   }
@@ -130,10 +126,10 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
 
       for (auto& face : cell.faces)
       {
-        if ((not grid->IsCellLocal(face.neighbor)) and
+        if ((not face.IsNeighborLocal(grid)) and
             (not grid->IsCellBndry(face.neighbor)))
         {
-          if (grid->cells[face.neighbor]->partition_id == adj_part)
+          if (face.GetNeighborPartitionID(grid) == adj_part)
             new_list.second.push_back(local_cell_index);
         }
       }//for faces
@@ -195,9 +191,6 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
       global_serialized_data.push_back(val);
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "About to do counts";
-
   //============================================= Communicate counts
   std::vector<int> recv_counts(chi_mpi.process_count,0);
 
@@ -215,9 +208,6 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
     ++c;
   }
 
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Done counts";
-
   //============================================= Receive serialized data
   std::vector<int> global_receive_data(total_receive_size,0);
   MPI_Alltoallv(global_serialized_data.data(),
@@ -231,7 +221,6 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
                 MPI_COMM_WORLD);
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Done all to all";
 
   //============================================= Deserialize
   {

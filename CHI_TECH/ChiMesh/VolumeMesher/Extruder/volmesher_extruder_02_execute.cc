@@ -33,14 +33,10 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Loop over all regions
+  bool single_surfacemesh_processed = false;
   int total_global_cells = 0;
-  std::vector<chi_mesh::Region*>::iterator region_iter;
-  for (region_iter = mesh_handler->region_stack.begin();
-       region_iter != mesh_handler->region_stack.end();
-       region_iter++)
+  for (auto region : mesh_handler->region_stack)
   {
-    chi_mesh::Region* region = *region_iter;
-
     chi_log.Log(LOG_0VERBOSE_1)
       << "VolumeMesherExtruder: Processing Region"
       << std::endl;
@@ -60,9 +56,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     auto temp_grid = new chi_mesh::MeshContinuum;
     region->volume_mesh_continua.push_back(temp_grid);
     region->volume_mesh_continua.push_back(grid);
-
-    //=========================================== Perform the operation
-    bool single_surfacemesh_processed = false;
 
     //=========================================== Look over boundaries
     for (auto bndry : region->boundaries)
@@ -194,6 +187,14 @@ void chi_mesh::VolumeMesherExtruder::Execute()
       }//if surface mesh
     }//for bndry
   }//for regions
+
+  if (not single_surfacemesh_processed)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "VolumeMesherExtruder: No surface mesh was processed for any region."
+         " Use \"chiRegionAddSurfaceBoundary\" to add a surface to the region.";
+    exit(EXIT_FAILURE);
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

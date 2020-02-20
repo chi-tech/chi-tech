@@ -200,7 +200,7 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
                                                 int adj_cell_g_index,bool verbose)
 {
   //======================================== Check index validity
-  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
+  if (IsCellBndry(adj_cell_g_index) || (not cur_face.IsNeighborLocal(this)))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell index encountered in call to "
@@ -218,7 +218,8 @@ int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
 //    exit(EXIT_FAILURE);
 //  }
 
-  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
+//  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
+  chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(this)];
 
   int associated_face = -1;
 
@@ -305,7 +306,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
                        std::vector<int>& dof_mapping)
 {
   //======================================== Check index validity
-  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
+  if (IsCellBndry(adj_cell_g_index) || (not cur_face.IsNeighborLocal(this)))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell index encountered in call to "
@@ -323,8 +324,8 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 //    exit(EXIT_FAILURE);
 //  }
 
-  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
-
+//  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
+  chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(this)];
 
   for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
   {

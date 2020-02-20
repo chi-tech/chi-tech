@@ -50,13 +50,16 @@ public:
       iterator operator++(int junk) {ref_element++; return *this;}
       chi_mesh::Cell& operator*()
       {
-        return *(ref_block.cell_references[
-                   ref_block.local_cell_ind[ref_element]]);
+//        return *(ref_block.cell_references[
+//                   ref_block.local_cell_ind[ref_element]]);
+        return *(ref_block.native_cells[ref_element]);
       }
       chi_mesh::Cell* operator->()
       {
-        return ref_block.cell_references[
-                 ref_block.local_cell_ind[ref_element]];}
+//        return ref_block.cell_references[
+//                 ref_block.local_cell_ind[ref_element]];
+        return ref_block.native_cells[ref_element];
+      }
       bool operator==(const iterator& rhs)
       {
         return ref_element == rhs.ref_element;

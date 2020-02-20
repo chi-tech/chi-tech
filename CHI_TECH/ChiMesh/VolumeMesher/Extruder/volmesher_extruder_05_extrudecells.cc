@@ -178,15 +178,20 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
           (!options.mesh_global))
       {
         tcell->cell_global_id = num_global_cells;
-        vol_continuum->cells.push_back(tcell); ++num_global_cells;
+//        vol_continuum->cells.push_back(tcell); ++num_global_cells;
+        ++num_global_cells;
 
         bool is_neighbor_to_partition = IsTemplateCellNeighborToThisPartition(
           template_cell, template_continuum, surf_mesher, iz, tc);
 
         if (not is_neighbor_to_partition)
         {
-          vol_continuum->cells[tcell->cell_global_id] = nullptr;
+//          vol_continuum->cells[tcell->cell_global_id] = nullptr;
           delete tcell;
+        }
+        else
+        {
+          vol_continuum->cells.push_back(tcell);
         }
       }
         //####################### LOCAL CELL ###############################

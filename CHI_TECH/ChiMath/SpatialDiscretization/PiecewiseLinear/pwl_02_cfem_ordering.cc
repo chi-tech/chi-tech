@@ -47,14 +47,12 @@ std::pair<int,int> SpatialDiscretization_PWL::
   {
     for (size_t f=0; f < cell.faces.size(); f++)
     {
-      if (cell.faces[f].neighbor >= 0)
+      auto& face = cell.faces[f];
+      if (face.neighbor >= 0)
       {
-        int adj_cell_ind = cell.faces[f].neighbor;
-        auto adj_cell = grid->cells[adj_cell_ind];
-
-        if (adj_cell->partition_id != cell.partition_id)
+        if (face.GetNeighborPartitionID(grid) != cell.partition_id)
         {
-          for (auto v_index : cell.faces[f].vertex_ids)
+          for (auto v_index : face.vertex_ids)
           {
             int v_setind =
               (int)std::distance(exnonex_nodes.begin(),

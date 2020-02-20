@@ -59,12 +59,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
   int num_faces = cell->faces.size();
   for (int f=0; f<num_faces; f++)
   {
-    int neighbor = cell->faces[f].neighbor;
+    auto& face = cell->faces[f];
+    int neighbor = face.neighbor;
 
     //================================== Get face normal
-    chi_mesh::Vector3 n  = cell->faces[f].normal;
+    chi_mesh::Vector3 n  = face.normal;
 
-    int num_face_dofs = cell->faces[f].vertex_ids.size();
+    int num_face_dofs = face.vertex_ids.size();
 
     if (neighbor >=0)
     {
@@ -75,16 +76,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       int                              fmap = -1;
 
       //========================= Get adj cell information
-      if (grid->IsCellLocal(neighbor))  //Local
+      if (cell->faces[f].IsNeighborLocal(grid))  //Local
       {
-        adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
-//        adj_ip_view   = ip_cell_views[adj_cell->cell_local_id];
+        adj_cell      = &grid->local_cells[face.GetNeighborLocalID(grid)];
         adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell->cell_local_id);
       }//local
       else //Non-local
       {
-        int locI = grid->cells[neighbor]->partition_id;
-//        adj_ip_view = GetBorderIPView(locI,neighbor);
         adj_cell    = pwl_sdm->MapNeighborCell(neighbor);
         adj_fe_view = pwl_sdm->MapNeighborCellFeView(neighbor);
       }//non-local

@@ -45,7 +45,7 @@ extern ChiPhysics chi_physics_handler;
 void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
                                                  const std::string& field_name)
 {
-  SpatialDiscretization_PWL* pwl_sdm =
+  auto pwl_sdm =
     (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
@@ -76,41 +76,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   std::vector<int> cfem_nodes;
 
   for (const auto& cell : grid->local_cells)
-  {
-    int cell_g_ind = cell.cell_global_id;
-
-    int mat_id = cell.material_id;
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell.Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = (chi_mesh::CellSlab*)(&cell);
-
-      int num_verts = 2;
-      for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(slab_cell->vertex_ids[v]);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell.Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-
-      int num_verts = poly_cell->vertex_ids.size();
-      for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(poly_cell->vertex_ids[v]);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-
-      int num_verts = polyh_cell->vertex_ids.size();
-      for (int v=0; v<num_verts; v++)
-        cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
-    }//polyhedron
-  }//for local cells
+    for (auto vid : cell.vertex_ids)
+      cfem_nodes.push_back(vid);
 
   std::vector<int> mapping;
   Vec phi_vec;
@@ -124,8 +91,6 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   int counter=-1;
   for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = cell.cell_global_id;
-
     int mat_id = cell.material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
@@ -305,7 +270,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
 void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
                                                   const std::string& field_name)
 {
-  SpatialDiscretization_PWL* pwl_sdm =
+  auto pwl_sdm =
     (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
@@ -336,44 +301,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
   std::vector<int> cfem_nodes;
 
   for (const auto& cell : grid->local_cells)
-  {
-    int cell_g_ind = cell.cell_global_id;
-
-    int mat_id = cell.material_id;
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell.Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = (chi_mesh::CellSlab*)(&cell);
-
-      int num_verts = 2;
-      for (int v=0; v<num_verts; v++)
-        for (int g=0; g < num_components; g++)
-          cfem_nodes.push_back(slab_cell->vertex_ids[v]);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell.Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-
-      int num_verts = poly_cell->vertex_ids.size();
-      for (int v=0; v<num_verts; v++)
-        for (int g=0; g < num_components; g++)
-          cfem_nodes.push_back(poly_cell->vertex_ids[v]);
-    }
-
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-
-      int num_verts = polyh_cell->vertex_ids.size();
-      for (int v=0; v<num_verts; v++)
-        for (int g=0; g < num_components; g++)
-          cfem_nodes.push_back(polyh_cell->vertex_ids[v]);
-    }//polyhedron
-  }//for local cells
+    for (auto vid : cell.vertex_ids)
+      for (int g=0; g < num_components; g++)
+        cfem_nodes.push_back(vid);
 
   std::vector<int> mapping;
   Vec phi_vec;
@@ -387,8 +317,6 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
   int counter=-1;
   for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = cell.cell_global_id;
-
     int mat_id = cell.material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB

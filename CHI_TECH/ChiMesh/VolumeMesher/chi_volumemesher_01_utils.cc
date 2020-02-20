@@ -441,7 +441,7 @@ void chi_mesh::VolumeMesher::
       ++num_cells_modified;
     }
   }
-
+  MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
     << " Done setting material id from logical volume. "
@@ -451,7 +451,7 @@ void chi_mesh::VolumeMesher::
 //###################################################################
 /**Sets material id's using a logical volume.*/
 void chi_mesh::VolumeMesher::
-SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
+ SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()

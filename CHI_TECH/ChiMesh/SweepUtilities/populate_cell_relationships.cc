@@ -25,7 +25,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
   {
     int c = cell.cell_local_id;
 
-    for (const auto& face : cell.faces)
+    for (auto& face : cell.faces)
     {
       //======================================= Determine if the face
       //                                        is incident
@@ -42,13 +42,13 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
         //================================if it is a cell and not bndry
         if (adj_cell_glob_index>=0)
         {
-          auto adj_cell = grid->cells[adj_cell_glob_index];
-
           //========================= If it is in the current location
-          if (adj_cell->partition_id == chi_mpi.location_id)
-            cell_successors[c].insert(adj_cell->cell_local_id);
+          if (face.IsNeighborLocal(grid))
+          {
+            cell_successors[c].insert(face.GetNeighborLocalID(grid));
+          }
           else
-            sweep_order->AddLocalSuccessor(adj_cell->partition_id);
+            sweep_order->AddLocalSuccessor(face.GetNeighborPartitionID(grid));
         }
 
       }
@@ -61,12 +61,10 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
         //================================if it is a cell and not bndry
         if (adj_cell_glob_index>=0)
         {
-          auto adj_cell = grid->cells[adj_cell_glob_index];
-
-          if (adj_cell->partition_id == chi_mpi.location_id)
-            cell_dependencies[c].insert(adj_cell->cell_local_id);
+          if (face.IsNeighborLocal(grid))
+            cell_dependencies[c].insert(face.GetNeighborLocalID(grid));
           else
-            sweep_order->AddLocalDependecy(adj_cell->partition_id);
+            sweep_order->AddLocalDependecy(face.GetNeighborPartitionID(grid));
 
         }
       }

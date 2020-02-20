@@ -42,9 +42,7 @@ Initialize()
 
   interpolation_points.push_back(pi);
   for (int k=1; k<(number_of_points); k++)
-  {
     interpolation_points.push_back(pi + vif*delta_d*k);
-  }
 
   //====================================================== Loop over contexts
   size_t num_ff = field_functions.size();
@@ -68,7 +66,7 @@ Initialize()
       //                                                   point
       for (const auto& cell : grid_view->local_cells)
       {
-        int cell_glob_index = cell.cell_global_id;
+        int cell_local_index = cell.cell_local_id;
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell.Type() == chi_mesh::CellType::SLAB)
@@ -98,7 +96,7 @@ Initialize()
 
             if (is_inside and interpolation_points_ass_cell[p]<0)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
+              interpolation_points_ass_cell[p] = cell_local_index;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -143,7 +141,7 @@ Initialize()
 
             if (is_inside)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
+              interpolation_points_ass_cell[p] = cell_local_index;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -188,7 +186,7 @@ Initialize()
 
             if (is_inside)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
+              interpolation_points_ass_cell[p] = cell_local_index;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -205,8 +203,8 @@ Initialize()
       {
         if (interpolation_points_ass_cell[c] < 0) continue;
 
-        int cell_glob_index = interpolation_points_ass_cell[c];
-        auto cell = grid_view->cells[cell_glob_index];
+        int cell_local_index = interpolation_points_ass_cell[c];
+        auto cell = &grid_view->local_cells[cell_local_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell->Type() == chi_mesh::CellType::SLAB)
@@ -217,7 +215,7 @@ Initialize()
           {
             cfem_local_nodes_needed_unmapped.push_back(slab_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
 
         }//if poly
@@ -232,7 +230,7 @@ Initialize()
           {
             cfem_local_nodes_needed_unmapped.push_back(poly_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
 
         }//if poly
@@ -247,7 +245,7 @@ Initialize()
           {
             cfem_local_nodes_needed_unmapped.push_back(polyh_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
 
         }//if polyh

@@ -123,6 +123,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                                   int group,
                                                   int moment)
 {
+  int cell_local_id = grid->cells[cell_glob_index]->cell_local_id;
   if (mat_id<0)
   {
     chi_log.Log(LOG_0ERROR)
@@ -304,7 +305,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -388,7 +389,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -472,7 +473,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;

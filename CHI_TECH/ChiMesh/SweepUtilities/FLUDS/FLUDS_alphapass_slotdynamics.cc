@@ -40,7 +40,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       int neighbor = face.neighbor;
 
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
-      if (grid->IsCellLocal(neighbor))
+      if (face.IsNeighborLocal(grid))
       {
         size_t num_face_dofs = face.vertex_ids.size();
         size_t face_categ = grid->MapFaceHistogramBins(num_face_dofs);
@@ -51,12 +51,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         //========================================== Check if part of cyclic
         //                                           dependency
-        auto adj_cell = grid->cells[neighbor];
         bool is_cyclic = false;
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
           if ((cyclic_dependency.first == cell->cell_local_id) &&
-              (cyclic_dependency.second == adj_cell->cell_local_id) )
+              (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
           {
             is_cyclic = true;
             inco_face_face_category.back() *= -1;
@@ -90,7 +89,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             << cell->cell_local_id
             << " face " << f
             << " looking for cell "
-            << adj_cell->cell_local_id
+            << face.GetNeighborLocalID(grid)
             << " face " << ass_face
             << " cat: " << face_categ
             << " omg=" << spds->omega.PrintS()
@@ -147,13 +146,12 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
       //========================================== Check if part of cyclic
       //                                           dependency
-      if (grid->IsCellLocal(neighbor))
+      if (face.IsNeighborLocal(grid))
       {
-        auto adj_cell = grid->cells[neighbor];
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
           if ((cyclic_dependency.first == cell->cell_local_id) &&
-              (cyclic_dependency.second == adj_cell->cell_local_id) )
+              (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
           {
             temp_lock_box = &delayed_lock_box;
             outb_face_face_category.back() *= -1;
@@ -191,12 +189,11 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       }
 
       //========================================== Non-local outgoing
-      if ((!grid->IsCellLocal(neighbor)) && (!grid->IsCellBndry(neighbor)))
+      if ((!face.IsNeighborLocal(grid)) && (!grid->IsCellBndry(neighbor)))
       {
-        auto adj_cell     = grid->cells[neighbor];
-        int  locJ         = adj_cell->partition_id;
-        int  deplocI      = spds->MapLocJToDeplocI(locJ);
-        int  face_slot    = deplocI_face_dof_count[deplocI];
+        int locJ         = face.GetNeighborPartitionID(grid);
+        int deplocI      = spds->MapLocJToDeplocI(locJ);
+        int face_slot    = deplocI_face_dof_count[deplocI];
 
         deplocI_face_dof_count[deplocI]+= face.vertex_ids.size();
 

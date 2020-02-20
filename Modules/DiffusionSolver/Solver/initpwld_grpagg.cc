@@ -202,8 +202,6 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
-
-    PetscOptionsInsertString(NULL,"-options_left");
   }
   PetscOptionsInsertString(NULL,options_string.c_str());
   PCSetFromOptions(pc);

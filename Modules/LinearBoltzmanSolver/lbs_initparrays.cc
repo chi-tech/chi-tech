@@ -121,7 +121,8 @@ void LinearBoltzman::Solver::InitializeParrays()
 
         if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
       }//if bndry
-      if (not grid->IsCellLocal(face.neighbor))
+
+      if (not face.IsNeighborLocal(grid))
         full_cell_view->face_local[f] = false;
 
       ++f;
