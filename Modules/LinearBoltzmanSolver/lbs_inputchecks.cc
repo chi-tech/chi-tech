@@ -44,15 +44,8 @@ void LinearBoltzman::Solver::PerformInputChecks()
       << "LinearBoltzman::Solver: No regions added to solver.";
     exit(EXIT_FAILURE);
   }
-  if (regions.back()->volume_mesh_continua.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzman::Solver: Domain region has no mesh to operate"
-         "on. Make sure meshing operations completed correctly.";
-    exit(EXIT_FAILURE);
-  }
   chi_mesh::Region*  aregion = regions.back();
-  grid                       = aregion->volume_mesh_continua.back();
+  grid                       = aregion->GetGrid();
 
 
 }

@@ -32,11 +32,11 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
   //================================================== Get reference to continuum
   auto handler = chi_mesh::GetCurrentHandler();
   auto region  = handler->region_stack.back();
-  auto vol_continuum = region->volume_mesh_continua.back();
+  auto grid = region->GetGrid();
 
   //================================================== Get local DOF count
   local_dof_count=0;
-  for (const auto& cell : vol_continuum->local_cells)
+  for (const auto& cell : grid->local_cells)
     local_dof_count += cell.vertex_ids.size();
 
   //================================================== Get global DOF count

@@ -54,8 +54,9 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     //=========================================== Create new continuum
     auto grid = new chi_mesh::MeshContinuum;
     auto temp_grid = new chi_mesh::MeshContinuum;
-    region->volume_mesh_continua.push_back(temp_grid);
-    region->volume_mesh_continua.push_back(grid);
+//    region->volume_mesh_continua.push_back(temp_grid);
+//    region->volume_mesh_continua.push_back(grid);
+    AddContinuumToRegion(grid, *region);
 
     //=========================================== Look over boundaries
     for (auto bndry : region->boundaries)

@@ -22,8 +22,8 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 {
   //Right now I am only doing one region at a time.
   //Later I want to support multiple regions with interfaces.
-  chi_mesh::Region*     aregion = this->regions.back();
-  grid = aregion->volume_mesh_continua.back();
+//  chi_mesh::Region*     aregion = this->regions.back();
+//  grid = aregion->volume_mesh_continua.back();
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher = mesh_handler->volume_mesher;

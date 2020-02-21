@@ -23,6 +23,14 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
+  AddContinuumToRegion(chi_mesh::MeshContinuum *grid, chi_mesh::Region& region)
+{
+  region.volume_mesh_continua.push_back(grid);
+}
+
+//###################################################################
+/**Creates 2D polygon cells for each face of a surface mesh.*/
+void chi_mesh::VolumeMesher::
 CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
                    chi_mesh::MeshContinuum *vol_continuum,
                    bool delete_surface_mesh_elements,
@@ -431,7 +439,7 @@ void chi_mesh::VolumeMesher::
 
   //============================================= Get back mesh
   chi_mesh::Region* cur_region = handler->region_stack.back();
-  chi_mesh::MeshContinuum* vol_cont = cur_region->volume_mesh_continua.back();
+  chi_mesh::MeshContinuum* vol_cont = cur_region->GetGrid();
 
   int num_cells_modified = 0;
   for (auto& cell : vol_cont->local_cells)
@@ -461,7 +469,7 @@ void chi_mesh::VolumeMesher::
 
   //============================================= Get back mesh
   chi_mesh::Region* cur_region = handler->region_stack.back();
-  chi_mesh::MeshContinuum* vol_cont = cur_region->volume_mesh_continua.back();
+  chi_mesh::MeshContinuum* vol_cont = cur_region->GetGrid();
 
   int num_faces_modified = 0;
   for (auto& cell : vol_cont->local_cells)

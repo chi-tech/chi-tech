@@ -19,6 +19,18 @@ int chi_diffusion::Solver::Initialize(bool verbose)
                      << solver_name << ": Initializing Diffusion solver PETSc";
   this->verbose_info = verbose;
 
+  if (regions.empty())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "chi_diffusion::Solver::Initialize: No region added to solver.";
+    exit(EXIT_FAILURE);
+  }
+
+  chi_mesh::Region* region = regions.back();
+  grid = region->GetGrid();
+
+
+
   if (not common_items_initialized)
     InitializeCommonItems(); //Mostly boundaries
 

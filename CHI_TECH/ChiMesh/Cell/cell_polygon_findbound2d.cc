@@ -25,7 +25,7 @@ void chi_mesh::CellPolygon::FindBoundary2D(chi_mesh::Region* region)
   if (!has_boundary) { return; }
 
   //================================================== Use init mesh continuum
-  chi_mesh::MeshContinuum* ref_cont = region->volume_mesh_continua.back();
+  chi_mesh::MeshContinuum* ref_cont = region->GetGrid();
 
   //================================================== Loop over edges
   for (int e=0;e<faces.size();e++)

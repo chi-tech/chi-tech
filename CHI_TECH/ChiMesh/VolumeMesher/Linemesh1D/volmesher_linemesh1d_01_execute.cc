@@ -29,20 +29,15 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
   chi_mesh::SurfaceMesher* surf_mesher = mesh_handler->surface_mesher;
 
   //================================================== Loop over all regions
-  std::vector<chi_mesh::Region*>::iterator region_iter;
-  for (region_iter = mesh_handler->region_stack.begin();
-       region_iter != mesh_handler->region_stack.end();
-       region_iter++)
+  for (auto region : mesh_handler->region_stack)
   {
-    chi_mesh::Region* region = *region_iter;
-
     chi_log.Log(LOG_0VERBOSE_1)
       << "VolumeMesherLinemesh1D: Processing Region"
       << std::endl;
 
     //=========================================== Create new continuum
-    chi_mesh::MeshContinuum* vol_continuum = new chi_mesh::MeshContinuum;
-    region->volume_mesh_continua.push_back(vol_continuum);
+    auto grid = new chi_mesh::MeshContinuum;
+    AddContinuumToRegion(grid, *region);
 
     std::vector<chi_mesh::Boundary*>::iterator bndry;
     //=========================================== Perform the operation
@@ -70,7 +65,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         //================================== Populate nodes
         for (int v=0; v<line_mesh->vertices.size(); v++)
         {
-          vol_continuum->vertices.push_back(&line_mesh->vertices[v]);
+          grid->vertices.push_back(&line_mesh->vertices[v]);
         }
         num_slab_cells = line_mesh->vertices.size()-1;
 
@@ -80,7 +75,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         {
           cell_count++;
           auto slab = new chi_mesh::CellSlab;
-          slab->cell_global_id = vol_continuum->cells.size();
+          slab->cell_global_id = grid->cells.size();
 
           //====================== Populate basic data
           slab->vertex_ids.resize(2,-1);
@@ -121,7 +116,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           py = surf_mesher->partitioning_y;
           slab->partition_id = zi*px*py + yi*px + xi;
 
-          vol_continuum->cells.push_back(slab);
+          grid->cells.push_back(slab);
 
         }//for interval
 
@@ -154,19 +149,19 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         chi_log.Log(LOG_ALLVERBOSE_1)
           << "### LOCATION[" << chi_mpi.location_id
           << "] amount of local cells="
-          << vol_continuum->local_cell_glob_indices.size();
+          << grid->local_cell_glob_indices.size();
 
 
         chi_log.Log(LOG_0)
           << "VolumeMesherLinemesh1D: Number of cells in region = "
-          << vol_continuum->cells.size()
+          << grid->cells.size()
           << std::endl;
 
         chi_log.Log(LOG_0)
           << "VolumeMesherLinemesh1D: Number of nodes in region = "
-          << vol_continuum->vertices.size()
+          << grid->vertices.size()
           << std::endl;
-        vol_continuum->vertices.shrink_to_fit();
+        grid->vertices.shrink_to_fit();
 
       }//if linemesh
     }//for bndry

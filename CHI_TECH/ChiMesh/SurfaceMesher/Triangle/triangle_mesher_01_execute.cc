@@ -21,6 +21,14 @@ void chi_mesh::SurfaceMesherTriangle::Execute()
   //================================================== Get the current handler
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
 
+  //================================================== Check empty region list
+  if (mesh_handler->region_stack.empty())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SurfaceMesherPredefined: No region added.";
+    exit(EXIT_FAILURE);
+  }
+
   //================================================== Loop over all regions
   std::vector<chi_mesh::Region*>::iterator region_iter;
   for (region_iter = mesh_handler->region_stack.begin();

@@ -25,18 +25,11 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Loop over all regions
-  std::vector<chi_mesh::Region*>::iterator region_iter;
-  for (region_iter = mesh_handler->region_stack.begin();
-       region_iter != mesh_handler->region_stack.end();
-       region_iter++)
+  for (auto region : mesh_handler->region_stack)
   {
-    chi_mesh::Region* region = *region_iter;
-    //=========================================== Check for interfaces
-
     //=========================================== Create new continuum
-    //chi_mesh::MeshContinuum* remeshed_surfcont = region->mesh_continua.back();
-    auto vol_continuum = new chi_mesh::MeshContinuum;
-    region->volume_mesh_continua.push_back(vol_continuum);
+    auto grid = new chi_mesh::MeshContinuum;
+    AddContinuumToRegion(grid, *region);
 
     std::vector<chi_mesh::Boundary*>::iterator bndry;
     //=========================================== Find the first boundary that
@@ -72,27 +65,11 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
           ref_continuum = (*bndry)->mesh_continua.back();
         }
 
-        //================================== Create node for each vertex
-//        std::vector<chi_mesh::Vertex>::iterator vertex;
-//        for (vertex = ref_continuum->surface_mesh->vertices.begin();
-//             vertex != ref_continuum->surface_mesh->vertices.end();
-//             vertex++)
-//        {
-//          chi_mesh::Node* node = new chi_mesh::Node;
-//          *node = (*vertex.base());
-//
-//          vol_continuum->nodes.push_back(node);
-//        }
-
         //================================== Create cell for each face
-        this->CreatePolygonCells(ref_continuum->surface_mesh, vol_continuum);
+        this->CreatePolygonCells(ref_continuum->surface_mesh, grid);
 
         //================================== Connect Boundaries
-        std::vector<chi_mesh::Cell*>::iterator cell;
-//        for (cell = vol_continuum->cells.begin();
-//             cell != vol_continuum->cells.end();
-//             cell++)
-        for (auto cell : vol_continuum->cells_storage)
+        for (auto cell : grid->cells_storage)
         {
           cell->FindBoundary2D(region);
         }
@@ -100,24 +77,17 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         //================================== Check all open item_id have
         //                                   boundaries
         int no_boundary_cells=0;
-//        for (cell = vol_continuum->cells.begin();
-//             cell != vol_continuum->cells.end();
-//             cell++)
-        for (auto cell : vol_continuum->cells_storage)
-        {
+        for (auto cell : grid->cells_storage)
           if (!cell->CheckBoundary2D())
-          {
             no_boundary_cells++;
-          }
 
-        }
         if (no_boundary_cells>0)
         {
           chi_log.Log(LOG_ALLVERBOSE_1)
             << "A total of "
             << no_boundary_cells
             << " out of "
-            << vol_continuum->cells.size()
+            << grid->cells.size()
             << " item_id found with no boundary connection.\n";
           //temp_continuum->ExportCellsToPython("Zerror.py");
         }
@@ -144,23 +114,23 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
 
         //================================== InitializeAlphaElements local cell indices
         chi_log.Log(LOG_ALLVERBOSE_1)
-        << "### LOCATION[" << chi_mpi.location_id
-        << "] amount of local cells="
-        << vol_continuum->local_cell_glob_indices.size();
+          << "### LOCATION[" << chi_mpi.location_id
+          << "] amount of local cells="
+          << grid->local_cell_glob_indices.size();
 
 
         chi_log.Log(LOG_0)
           << "VolumeMesherPredefined2D["
           << chi_mpi.location_id
           << "]: Number of cells in region = "
-          << vol_continuum->cells.size()
+          << grid->cells.size()
           << std::endl;
 
         chi_log.Log(LOG_0)
           << "VolumeMesherPredefined2D["
           << chi_mpi.location_id
           << "]: Number of nodes in region = "
-          << vol_continuum->vertices.size()
+          << grid->vertices.size()
           << std::endl;
 
       } //if surface mesh

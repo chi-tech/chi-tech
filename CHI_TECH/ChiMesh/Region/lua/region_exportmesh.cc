@@ -120,23 +120,8 @@ int chiRegionExportMeshToObj(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  //============================================= Get back continuum
-  if (cur_region->volume_mesh_continua.size()>0)
-  {
-    int num_cont = cur_region->volume_mesh_continua.size();
-
-    chi_mesh::MeshContinuum* vol_cont;
-    vol_cont= cur_region->volume_mesh_continua.back();
-
-    vol_cont->ExportCellsToObj((char*)file_name,per_material);
-
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLWARNING) << "No volume continuum to export in "
-                                   "call to chiRegionExportMeshToObj.";
-  }
-
+  auto vol_cont= cur_region->GetGrid();
+  vol_cont->ExportCellsToObj((char*)file_name,per_material);
 
 
   return 0;
@@ -177,23 +162,9 @@ int chiRegionExportMeshToVTK(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  //============================================= Get back continuum
-  if (cur_region->volume_mesh_continua.size()>0)
-  {
-    int num_cont = cur_region->volume_mesh_continua.size();
+  auto vol_cont = cur_region->GetGrid();
 
-    chi_mesh::MeshContinuum* vol_cont;
-    vol_cont= cur_region->volume_mesh_continua.back();
-
-    vol_cont->ExportCellsToVTK(base_name);
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLWARNING) << "No volume continuum to export in "
-                                   "call to chiRegionExportMeshToObj.";
-  }
-
-
+  vol_cont->ExportCellsToVTK(base_name);
 
   return 0;
 }

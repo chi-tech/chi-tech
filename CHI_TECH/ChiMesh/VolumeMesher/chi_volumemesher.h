@@ -56,6 +56,7 @@ public:
   std::vector<int>                     reverse_node_ordering;
 public:
   //01 Utils
+  void AddContinuumToRegion(MeshContinuum* grid, Region& region);
   void                CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
                                          chi_mesh::MeshContinuum* vol_continuum,
                                          bool delete_surface_mesh_elements=false,
