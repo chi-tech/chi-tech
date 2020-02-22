@@ -16,13 +16,5 @@ chi_mesh::MeshContinuum* chi_mesh::MeshHandler::GetGrid()
     exit(EXIT_FAILURE);
   }
 
-  if (region_stack.back()->volume_mesh_continua.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chi_mesh::MeshHandler::GetGrid. Region found but no grids "
-         "added to the region.";
-    exit(EXIT_FAILURE);
-  }
-
-  return region_stack.back()->volume_mesh_continua.back();
+  return region_stack.back()->GetGrid();
 }

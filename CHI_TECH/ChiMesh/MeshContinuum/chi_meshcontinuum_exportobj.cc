@@ -1,7 +1,5 @@
 #include "chi_meshcontinuum.h"
 #include <fstream>
-#include "ChiMesh/Cell/cell_polyhedron.h"
-#include "ChiMesh/Cell/cell_polygon.h"
 #include <ChiPhysics/chi_physics.h>
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 
@@ -19,14 +17,13 @@ extern ChiLog chi_log;
  *
  * \todo Export Cells to OBJ needs polygon support. */
 void chi_mesh::MeshContinuum::
-ExportCellsToObj(const char* fileName, bool per_material,
-                    int options)
+ ExportCellsToObj(const char* fileName, bool per_material, int options)
 {
   if (!per_material)
   {
     FILE* of = fopen(fileName,"w");
 
-    if (of==NULL)
+    if (of == nullptr)
     {
       chi_log.Log(LOG_ALLERROR) << "Could not open file: "
                                   << std::string(fileName);
@@ -36,25 +33,18 @@ ExportCellsToObj(const char* fileName, bool per_material,
     //====================================== Develop list of faces and nodes
     std::set<int> nodes_set;
     std::vector<chi_mesh::CellFace> faces_to_export;
-    for (int c=0; c<local_cell_glob_indices.size(); c++)
+    for (auto& cell : local_cells)
     {
-      int cell_glob_index = local_cell_glob_indices[c];
-      auto cell = cells[cell_glob_index];
-
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-
-        for (int f=0; f<polyh_cell->faces.size(); f++)
+        for (auto& face : cell.faces)
         {
-          if (polyh_cell->faces[f].neighbor < 0)
+          if (face.neighbor < 0)
           {
-            faces_to_export.push_back(polyh_cell->faces[f]);
+            faces_to_export.push_back(face);
 
-            for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
-            {
-              nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
-            }
+            for (int vid : face.vertex_ids)
+              nodes_set.insert(vid);
           }//if boundary
         }//for face
       }//if polyhedron
@@ -64,48 +54,43 @@ ExportCellsToObj(const char* fileName, bool per_material,
     fprintf(of,"# Exported mesh file from Extrusion script\n");
     std::string str_file_name(fileName);
     std::string file_base_name =
-      str_file_name.substr(0,str_file_name.find("."));
+      str_file_name.substr(0,str_file_name.find('.'));
     fprintf(of,"o %s\n",file_base_name.c_str());
 
     //====================================== Develop node mapping and write them
-    std::vector<int> node_mapping(nodes.size(),-1);
-    std::set<int>::iterator node;
+    std::vector<int> node_mapping(vertices.size(), -1);
+
     int node_counter=0;
-    for (node =  nodes_set.begin();
-         node != nodes_set.end();
-         node++)
+    for (auto node : nodes_set)
     {
       node_counter++;
-      int node_g_index = *node;
+      int node_g_index = node;
       node_mapping[node_g_index] = node_counter;
 
-      chi_mesh::Vertex* cur_v = nodes[node_g_index];
+      chi_mesh::Vertex* cur_v = vertices[node_g_index];
 
       fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v->x,cur_v->y,cur_v->z);
     }
 
     //====================================== Write face normals
-    for (int f=0; f<faces_to_export.size(); f++)
+    for (const auto& face : faces_to_export)
     {
       fprintf(of,"vn %.4f %.4f %.4f\n",
-              faces_to_export[f].normal.x,
-              faces_to_export[f].normal.y,
-              faces_to_export[f].normal.z);
+              face.normal.x,
+              face.normal.y,
+              face.normal.z);
     }
 
     //====================================== Write faces
     int normal_counter=0;
-    for (int f=0; f<faces_to_export.size(); f++)
+    for (const auto& face : faces_to_export)
     {
       normal_counter++;
       fprintf(of,"f");
-      for (int v=0; v<faces_to_export[f].vertex_ids.size(); v++)
-      {
-        int v_g_index = faces_to_export[f].vertex_ids[v];
-        int v_mapped  = node_mapping[v_g_index];
 
-        fprintf(of," %d//%d",v_mapped,normal_counter);
-      }
+      for (auto v_g_index : face.vertex_ids)
+        fprintf(of," %d//%d",node_mapping[v_g_index],normal_counter);
+
       fprintf(of,"\n");
     }
 
@@ -122,7 +107,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
     //========================================= Get base name
     std::string str_file_name(fileName);
     std::string file_base_name =
-      str_file_name.substr(0,str_file_name.find("."));
+      str_file_name.substr(0,str_file_name.find('.'));
 
     if (chi_physics_handler.material_stack.empty())
     {
@@ -141,7 +126,7 @@ ExportCellsToObj(const char* fileName, bool per_material,
                                   std::string(".obj");
       FILE* of = fopen(mat_file_name.c_str(),"w");
 
-      if (of==NULL)
+      if (of == nullptr)
       {
         chi_log.Log(LOG_ALLERROR) << "Could not open file: "
                                   << mat_file_name;
@@ -151,29 +136,22 @@ ExportCellsToObj(const char* fileName, bool per_material,
       //====================================== Develop list of faces and nodes
       std::set<int> nodes_set;
       std::vector<chi_mesh::CellFace> faces_to_export;
-      for (int c=0; c<local_cell_glob_indices.size(); c++)
+      for (const auto& cell : local_cells)
       {
-        int cell_glob_index = local_cell_glob_indices[c];
-        auto cell = cells[cell_glob_index];
-
-        if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+        if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+          if (cell.material_id != mat) continue;
 
-          if (polyh_cell->material_id != mat) continue;
-
-          for (int f=0; f<polyh_cell->faces.size(); f++)
+          for (const auto& face : cell.faces)
           {
-            int adjcell_glob_index = polyh_cell->faces[f].neighbor;
+            int adjcell_glob_index = face.neighbor;
 
             if (adjcell_glob_index<0)
             {
-              faces_to_export.push_back(polyh_cell->faces[f]);
+              faces_to_export.push_back(face);
 
-              for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
-              {
-                nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
-              }
+              for (auto vid : face.vertex_ids)
+                nodes_set.insert(vid);
             }//if boundary
             else
             {
@@ -181,12 +159,10 @@ ExportCellsToObj(const char* fileName, bool per_material,
 
               if (adj_cell->material_id != mat)
               {
-                faces_to_export.push_back(polyh_cell->faces[f]);
+                faces_to_export.push_back(face);
 
-                for (int v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
-                {
-                  nodes_set.insert(polyh_cell->faces[f].vertex_ids[v]);
-                }
+                for (auto vid : face.vertex_ids)
+                  nodes_set.insert(vid);
               }//if material missmatch
             }//if neigbor cell
           }//for face
@@ -198,44 +174,39 @@ ExportCellsToObj(const char* fileName, bool per_material,
       fprintf(of,"o %s\n",mat_base_name.c_str());
 
       //====================================== Develop node mapping and write them
-      std::vector<int> node_mapping(nodes.size(),-1);
-      std::set<int>::iterator node;
+      std::vector<int> node_mapping(vertices.size(), -1);
+
       int node_counter=0;
-      for (node =  nodes_set.begin();
-           node != nodes_set.end();
-           node++)
+      for (auto node : nodes_set)
       {
         node_counter++;
-        int node_g_index = *node;
+        int node_g_index = node;
         node_mapping[node_g_index] = node_counter;
 
-        chi_mesh::Vertex* cur_v = nodes[node_g_index];
+        chi_mesh::Vertex* cur_v = vertices[node_g_index];
 
         fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v->x,cur_v->y,cur_v->z);
       }
 
       //====================================== Write face normals
-      for (int f=0; f<faces_to_export.size(); f++)
+      for (const auto& face : faces_to_export)
       {
         fprintf(of,"vn %.4f %.4f %.4f\n",
-                faces_to_export[f].normal.x,
-                faces_to_export[f].normal.y,
-                faces_to_export[f].normal.z);
+                face.normal.x,
+                face.normal.y,
+                face.normal.z);
       }
 
       //====================================== Write faces
       int normal_counter=0;
-      for (int f=0; f<faces_to_export.size(); f++)
+      for (const auto& face : faces_to_export)
       {
         normal_counter++;
         fprintf(of,"f");
-        for (int v=0; v<faces_to_export[f].vertex_ids.size(); v++)
-        {
-          int v_g_index = faces_to_export[f].vertex_ids[v];
-          int v_mapped  = node_mapping[v_g_index];
 
-          fprintf(of," %d//%d",v_mapped,normal_counter);
-        }
+        for (auto v_g_index : face.vertex_ids)
+          fprintf(of," %d//%d",node_mapping[v_g_index],normal_counter);
+
         fprintf(of,"\n");
       }
 

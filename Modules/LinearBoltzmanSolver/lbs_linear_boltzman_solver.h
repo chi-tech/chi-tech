@@ -66,8 +66,6 @@ public:
   std::vector<chi_mesh::sweep_management::SPDS*> sweep_orderings;
   std::vector<SweepBndry*>                      sweep_boundaries;
 
-  ChiMPICommunicatorSet comm_set;
-
   int max_cell_dof_count;
   unsigned long long local_dof_count;
   unsigned long long glob_dof_count;
@@ -86,13 +84,15 @@ public:
   //01
   void Initialize();
   //01a
+  void PerformInputChecks();
   void ComputeNumberOfMoments();
+  void PrintSimHeader();
   //01b
   void InitMaterials(std::set<int> &material_ids);
   //01c
-  int InitializeParrays();
+  void InitializeBoundaries();
   //01d
-  void InitializeCommunicators();
+  void InitializeParrays();
   //02
   void Execute();
   void SolveGroupset(int group_set_num);
@@ -134,6 +134,9 @@ public:
   SweepChunk *SetSweepChunk(int group_set_num);
   void ClassicRichardson(int group_set_num);
   void GMRES(int group_set_num);
+
+  //Vector assembly
+  int  MapDOF(chi_mesh::Cell* cell, int dof, int mom, int g);
   void AssembleVector(LBSGroupset *groupset, Vec x, double *y);
   void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);
   void DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double *x_src, double *y);

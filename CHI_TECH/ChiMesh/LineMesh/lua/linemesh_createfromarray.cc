@@ -18,9 +18,7 @@ extern ChiLog chi_log;
 
 ## Example
 \code
-mesh={}
-mesh[1] = {0.1,0.001}
-mesh[2] = {0.2,0.001,0.003}
+mesh = {0.0,0.1,0.2,0.3,0.5}
 line_mesh = chiLineMeshCreateFromArray(mesh)
 \endcode
 
@@ -37,7 +35,7 @@ int chiLineMeshCreateFromArray(lua_State *L)
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Create LineMesh
-  chi_mesh::LineMesh* new_line = new chi_mesh::LineMesh;
+  auto new_line = new chi_mesh::LineMesh;
 
   if (!lua_istable(L,1))
   {
@@ -103,9 +101,7 @@ int chiLineMeshCreateFromArray(lua_State *L)
       lua_pop(L,1); //Pop the vector off
     }
 
-    new_line->vertices.push_back(chi_mesh::Vector(values_x[g],
-                                                  values_y[g],
-                                                  values_z[g]));
+    new_line->vertices.emplace_back(values_x[g], values_y[g], values_z[g]);
   }
 
   //============================================= Add to handler

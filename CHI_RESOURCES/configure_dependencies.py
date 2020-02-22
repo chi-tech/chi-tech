@@ -17,7 +17,7 @@ else:
   if (os.path.isdir(cwd)):
     os.chdir(cwd)
     cwd = os.getcwd()
-    install_dir = cwd + "/chi-dependencies"
+    install_dir = cwd + "/"
     print("Install directory set to \"" + install_dir + "\"")
   else:
     print("!!******!! Error !!*****!!: ", end="")
@@ -25,7 +25,7 @@ else:
     print(" does not exist")
     sys.exit(1)
 if (not os.path.exists(install_dir)):
-  os.mkdir("chi-dependencies")
+  os.mkdir(install_dir)
 
 log_file = open(install_dir + "/log.txt","w+")
 roots_file = open(install_dir + "/configure_deproots.sh","w+")
@@ -503,4 +503,4 @@ log_file.close()
 roots_file.close()
 
 print("########## Chi-Tech Dependency install complete ##########")
-print("Now execute: \n     $. ./chi-dependencies/configure_deproots.sh\n")
+print("Now execute: \n     $. " + install_dir + "/configure_deproots.sh\n")

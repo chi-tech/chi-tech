@@ -22,19 +22,29 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 {
   //Right now I am only doing one region at a time.
   //Later I want to support multiple regions with interfaces.
-  chi_mesh::Region*              aregion = this->regions.back();
-  grid = aregion->volume_mesh_continua.back();
+//  chi_mesh::Region*              aregion = this->regions.back();
+//  grid = aregion->volume_mesh_continua.back();
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher = mesh_handler->volume_mesher;
 
-  int num_nodes = grid->nodes.size();
+//  int num_nodes = grid->nodes.size();
+
+  //================================================== Add pwl fem views
+  if (verbose)
+    chi_log.Log(LOG_0) << "Computing cell matrices";
+  pwl_sdm = ((SpatialDiscretization_PWL*)(this->discretization));
+  pwl_sdm->AddViewOfLocalContinuum(grid);
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
   ChiTimer t_reorder; t_reorder.Reset();
-  ReorderNodesPWLC();
+
+  auto domain_ownership = pwl_sdm->OrderNodesCFEM(grid);
+  local_dof_count = domain_ownership.first;
+  global_dof_count   = domain_ownership.second;
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
@@ -71,20 +81,23 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //================================================== Initialize nodal DOF
   //                                                   and connection info
-  nodal_nnz_in_diag.resize(grid->nodes.size(),0);
-  nodal_nnz_off_diag.resize(grid->nodes.size(),0);
-  nodal_boundary_numbers.resize(grid->nodes.size(),0);
-  nodal_connections.resize(grid->nodes.size(),std::vector<int>());
+  nodal_nnz_in_diag.resize(local_dof_count,0);
+  nodal_nnz_off_diag.resize(local_dof_count,0);
+  nodal_boundary_numbers.resize(local_dof_count,0);
+  nodal_connections.resize(local_dof_count,std::vector<int>());
 
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  PWLCBuildSparsityPattern();
+  pwl_sdm->BuildCFEMSparsityPattern(grid,
+                                    nodal_nnz_in_diag,
+                                    nodal_nnz_off_diag,
+                                    domain_ownership);
 
 
   //================================================== Initialize x and b
   ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
   ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-  ierr = VecSetSizes(x,local_rows_to - local_rows_from+1, num_nodes);CHKERRQ(ierr);
+  ierr = VecSetSizes(x,local_dof_count, global_dof_count);CHKERRQ(ierr);
   ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
   ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
 
@@ -93,15 +106,15 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //################################################## Create matrix
   ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRQ(ierr);
-  ierr = MatSetSizes(A,local_rows_to - local_rows_from+1,
-                     local_rows_to - local_rows_from+1,
-                     num_nodes, num_nodes);CHKERRQ(ierr);
+  ierr = MatSetSizes(A,local_dof_count,
+                       local_dof_count,
+                       global_dof_count, global_dof_count);CHKERRQ(ierr);
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
   chi_log.Log(LOG_0) << "Setting matrix preallocation.";
-  MatMPIAIJSetPreallocation(A,0,&nodal_nnz_in_diag[local_rows_from],
-                            0,&nodal_nnz_off_diag[local_rows_from]);
+  MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
+                              0,nodal_nnz_off_diag.data());
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
   MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
   MatSetUp(A);
@@ -121,8 +134,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   //seemed to have caused a lot of trouble for Slab
   //geometries. This section makes some custom options
   //per cell type
-  int first_cell_g_index = grid->local_cell_glob_indices[0];
-  auto first_cell = grid->cells[first_cell_g_index];
+  auto first_cell = &grid->local_cells[0];
 
   if (first_cell->Type() == chi_mesh::CellType::SLAB)
   {

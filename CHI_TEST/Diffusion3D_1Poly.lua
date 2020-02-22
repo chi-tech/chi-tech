@@ -12,28 +12,9 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
 
---############################################### Extract edges from surface mesh
-loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
-
-line_mesh = {};
-line_mesh_count = 0;
-
-for k=1,loop_count do
-    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
-    for m=1,split_count do
-        line_mesh_count = line_mesh_count + 1;
-        line_mesh[line_mesh_count] =
-        chiLineMeshCreateFromLoop(split_loops,m-1);
-    end
-
-end
-
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-for k=1,line_mesh_count do
-    chiRegionAddLineBoundary(region1,line_mesh[k]);
-end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
@@ -44,6 +25,11 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
+
+--chiSurfaceMesherSetProperty(PARTITION_X,2)
+--chiSurfaceMesherSetProperty(PARTITION_Y,2)
+--chiSurfaceMesherSetProperty(CUT_X,0.0)
+--chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 --############################################### Execute meshing
 chiSurfaceMesherExecute();
@@ -131,13 +117,16 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 
-if (chi_location_id == 0 and master_export == nil) then
+if (master_export == nil) then
     chiFFInterpolationExportPython(slice1)
     chiFFInterpolationExportPython(slice2)
     chiFFInterpolationExportPython(line0)
+end
+
+if (chi_location_id == 0 and master_export == nil) then
     local handle = io.popen("python3 ZPFFI00.py")
     local handle = io.popen("python3 ZPFFI10.py")
-    --local handle = io.popen("python ZLFFI20.py")
+    local handle = io.popen("python3 ZLFFI20.py")
     print("Execution completed")
 end
 

@@ -14,7 +14,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::Execute()
                       field_functions[0]->num_sets,
                       field_functions[0]->ref_component,
                       field_functions[0]->ref_set,
-                      x,x_mapped,cfem_local_nodes_needed_unmapped,&mapping);
+                      x,x_mapped,cfem_local_nodes_needed_unmapped,&mapping,
+                      field_functions[0]->spatial_discretization);
 
     CFEMInterpolate(x_mapped,mapping);
 
@@ -28,7 +29,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::Execute()
                       field_functions[0]->ref_set,
                       pwld_local_nodes_needed_unmapped,
                       pwld_local_cells_needed_unmapped,
-                      *field_functions[0]->local_cell_dof_array_address,
+                      field_functions[0]->spatial_discretization->cell_dfem_block_address,
                       &mapping);
     PWLDInterpolate(*field_functions[0]->field_vector_local,mapping);
   }

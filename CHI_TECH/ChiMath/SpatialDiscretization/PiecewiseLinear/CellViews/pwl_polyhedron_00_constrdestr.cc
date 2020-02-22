@@ -56,26 +56,26 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;
 
-      const chi_mesh::Vertex& v0 = *vol_continuum->nodes[v0index];
+      const chi_mesh::Vertex& v0 = *vol_continuum->vertices[v0index];
       const chi_mesh::Vertex& v1 = vfc;
-      const chi_mesh::Vertex& v2 = *vol_continuum->nodes[v1index];
+      const chi_mesh::Vertex& v2 = *vol_continuum->vertices[v1index];
       const chi_mesh::Vertex& v3 = vcc;
 
       side_data.side_centroid = (v0 + v1 + v2 + v3) / 4.0;
 
       //============================= Compute vectors
-      chi_mesh::Vector v01 = v1 - v0;
-      chi_mesh::Vector v02 = v2 - v0;
-      chi_mesh::Vector v03 = v3 - v0;
+      chi_mesh::Vector3 v01 = v1 - v0;
+      chi_mesh::Vector3 v02 = v2 - v0;
+      chi_mesh::Vector3 v03 = v3 - v0;
 
       //============================= Compute determinant of surface jacobian
       // First we compute the rotation matrix which will rotate
       // any vector in natural coordinates to the same reference
       // frame as the current face.
-      chi_mesh::Vector normal  = face.normal*-1.0;
-      chi_mesh::Vector tangent = v02.Cross(normal);
+      chi_mesh::Vector3 normal  = face.normal * -1.0;
+      chi_mesh::Vector3 tangent = v02.Cross(normal);
       tangent = tangent/tangent.Norm();
-      chi_mesh::Vector binorm  = v02/v02.Norm();
+      chi_mesh::Vector3 binorm  = v02 / v02.Norm();
 
       chi_mesh::Matrix3x3 R;
       R.SetColJVec(0,tangent);
@@ -90,8 +90,8 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
       // Compute v01 and v02 rotated to natural coordinates
       // A test to see if this is done correctly would be to
       // check if fabs(v01N.z) < epsilon and fabs(v02N.z) < epsilon
-      chi_mesh::Vector v01N = Rinv*v01;
-      chi_mesh::Vector v02N = Rinv*v02;
+      chi_mesh::Vector3 v01N = Rinv * v01;
+      chi_mesh::Vector3 v02N = Rinv * v02;
 //        if ( (std::fabs(v01N.z) > 1.0e-5) || (std::fabs(v01N.z) > 1.0e-5) )
 //        {
 //          printf("ERROR! v01\n");

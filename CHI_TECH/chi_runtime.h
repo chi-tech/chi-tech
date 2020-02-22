@@ -1,9 +1,17 @@
 #ifndef chi_runtime_h
 #define chi_runtime_h
 
-int  ChiTechRunInteractive(int argc, char** argv);
-int  ChiTechRunBatch(int argc, char** argv);
-int  ChiTechInitialize(int argc, char** argv);
-void ChiTechFinalize();
+/**General utilities in ChiTech*/
+class ChiTech
+{
+private:
+  static void ParseArguments(int argc, char** argv);
+
+public:
+  static int  RunInteractive(int argc, char** argv);
+  static int  RunBatch(int argc, char** argv);
+  static int  Initialize(int argc, char** argv);
+  static void Finalize();
+};
 
 #endif

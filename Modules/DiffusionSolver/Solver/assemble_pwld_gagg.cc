@@ -10,7 +10,6 @@
 
 extern ChiLog chi_log;
 
-
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
@@ -18,7 +17,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
-  auto fe_view = (CellFEView*)pwl_discr->MapFeView(cell_glob_index);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->cell_local_id);
 
   for (int gr=0; gr<G; gr++)
   {
@@ -72,12 +71,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
     int num_faces = cell->faces.size();
     for (int f=0; f<num_faces; f++)
     {
-      int neighbor = cell->faces[f].neighbor;
+      auto& face = cell->faces[f];
+      int neighbor = face.neighbor;
 
       //================================== Get face normal
-      chi_mesh::Vector n  = cell->faces[f].normal;
+      chi_mesh::Vector3 n  = face.normal;
 
-      int num_face_dofs = cell->faces[f].vertex_ids.size();
+      int num_face_dofs = face.vertex_ids.size();
 
       if (neighbor >=0)
       {
@@ -87,16 +87,16 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
         int                              fmap = -1;
 
         //========================= Get adj cell information
-        if (grid->IsCellLocal(neighbor))  //Local
+        if (cell->faces[f].IsNeighborLocal(grid))  //Local
         {
-          int adj_cell_local_index = grid->glob_cell_local_indices[neighbor];
+          int adj_cell_local_index = face.GetNeighborLocalID(grid);
+          adj_cell      = &grid->local_cells[adj_cell_local_index];
           adj_ip_view   = ip_cell_views[adj_cell_local_index];
-          adj_cell      = (chi_mesh::Cell*)grid->cells[neighbor];
-          adj_fe_view   = (CellFEView*)pwl_discr->MapFeView(neighbor);
+          adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell_local_index);
         }//local
         else //Non-local
         {
-          int locI = grid->cells[neighbor]->partition_id;
+          int locI = face.GetNeighborPartitionID(grid);
           adj_ip_view = GetBorderIPView(locI,neighbor);
           adj_cell    = (chi_mesh::Cell*)GetBorderCell(locI,neighbor);
           adj_fe_view = (CellFEView*)GetBorderFEView(locI,neighbor);
@@ -372,7 +372,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
-  auto fe_view = (CellFEView*)pwl_discr->MapFeView(cell_glob_index);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->cell_local_id);
 
   for (int gr=0; gr<G; gr++)
   {

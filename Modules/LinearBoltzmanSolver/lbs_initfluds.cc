@@ -16,6 +16,10 @@ extern ChiConsole chi_console;
 extern ChiLog     chi_log;
 extern ChiMPI     chi_mpi;
 
+#include "ChiTimer/chi_timer.h"
+
+extern ChiTimer chi_program_timer;
+
 
 //###################################################################
 /**Initializes fluds data structures.*/
@@ -43,7 +47,8 @@ void LinearBoltzman::Solver::InitFluxDataStructures(LBSGroupset *groupset)
   }
 
   chi_log.Log(LOG_0)
-    << "Initialized Angle Aggregation.   "
+    << chi_program_timer.GetTimeString()
+    << " Initialized Angle Aggregation.   "
     << "         Process memory = "
     << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
     << " MB.";

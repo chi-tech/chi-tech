@@ -14,7 +14,7 @@ extern ChiLog chi_log;
 /**Makes a centroid based load balance factor calculation.
  *
  * \author Jan*/
-double chi_mesh::ComputeLBF(std::vector<Vector>& points,
+double chi_mesh::ComputeLBF(std::vector<Vector3>& points,
                             std::vector<double>& x_cuts,
                             std::vector<double>& y_cuts)
 {
@@ -76,7 +76,7 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(chi_mesh::SurfaceMesh* smesh,
 {
   //================================================== Collect centroids
   int num_pfaces = smesh->poly_faces.size();
-  std::vector<chi_mesh::Vector> centroids(num_pfaces);
+  std::vector<chi_mesh::Vector3> centroids(num_pfaces);
   for (int pf=0; pf<num_pfaces; pf++)
     centroids[pf] = smesh->poly_faces[pf]->face_centroid;
 
@@ -84,7 +84,7 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(chi_mesh::SurfaceMesh* smesh,
   //================================================== Define sort operators
   struct
   {
-    bool operator()(chi_mesh::Vector a, chi_mesh::Vector b)
+    bool operator()(chi_mesh::Vector3 a, chi_mesh::Vector3 b)
     {
       if (a.x < b.x)
       {return true;}
@@ -95,7 +95,7 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(chi_mesh::SurfaceMesh* smesh,
 
   struct
   {
-    bool operator()(chi_mesh::Vector a, chi_mesh::Vector b)
+    bool operator()(chi_mesh::Vector3 a, chi_mesh::Vector3 b)
     {
       if (a.y < b.y)
       {return true;}
@@ -107,8 +107,8 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(chi_mesh::SurfaceMesh* smesh,
 
 
   //================================================== Create sorts
-  std::vector<chi_mesh::Vector> centroids_sortedx;
-  std::vector<chi_mesh::Vector> centroids_sortedy;
+  std::vector<chi_mesh::Vector3> centroids_sortedx;
+  std::vector<chi_mesh::Vector3> centroids_sortedy;
   std::copy(centroids.begin(), centroids.end(),
             std::back_inserter(centroids_sortedx));
 

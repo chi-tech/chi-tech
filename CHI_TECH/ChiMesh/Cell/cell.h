@@ -31,12 +31,19 @@ public:
   std::vector<int> vertex_ids;   /// A list of the vertices
   Normal normal;                 /// The average/geometric normal
   Vertex centroid;               /// The face centroid
-  int neighbor;                  /// Neigboring cell index (<0 indicates bndry)
+  int neighbor=-1;               /// Neigboring cell global id (<0 indicates bndry)
 
-  CellFace()
-  {
-    neighbor = -1;
-  }
+
+private:
+  int  neighbor_partition_id=-1;  /// Neighboring cell's partition id
+  bool neighbor_partition_id_updated=false;
+  int  neighbor_local_id=-1;  /// Neighboring cell's local id
+  bool neighbor_local_id_updated=false;
+
+public:
+  bool IsNeighborLocal(chi_mesh::MeshContinuum* grid);
+  int GetNeighborPartitionID(chi_mesh::MeshContinuum* grid);
+  int GetNeighborLocalID(chi_mesh::MeshContinuum* grid);
 };
 
 
@@ -60,6 +67,8 @@ public:
 
 private:
   const CellType cell_type;
+  bool  neighbor_partition_populated = false;
+
 public:
   explicit Cell(CellType in_cell_type) : cell_type(in_cell_type)
   {

@@ -13,36 +13,32 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
   int num_loc_cells = grid->local_cell_glob_indices.size();
   int dof_count = 0;
   std::set<int> local_border_cells;
-  for (int lc=0; lc<num_loc_cells; lc++)
+  for (auto& cell : grid->local_cells)
   {
-    int cell_glob_index = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_glob_index];
-
     auto ip_view = new DiffusionIPCellView;
     ip_view->cell_dof_start = dof_count + pwld_local_dof_start;
     pwld_cell_dof_array_address.push_back(dof_count);
     ip_cell_views.push_back(ip_view);
 
-    for (size_t v=0; v<cell->vertex_ids.size(); v++)
+    for (size_t v=0; v<cell.vertex_ids.size(); v++)
     {
-      nodal_nnz_in_diag[dof_count] = cell->vertex_ids.size();
+      nodal_nnz_in_diag[dof_count] = cell.vertex_ids.size();
 
-      for (size_t f=0; f<cell->faces.size(); f++)
+      for (size_t f=0; f<cell.faces.size(); f++)
       {
-        if (cell->faces[f].neighbor >= 0) //Not bndry
+        if (cell.faces[f].neighbor >= 0) //Not bndry
         {
-          bool is_local = grid->IsCellLocal(cell->faces[f].neighbor);
+          bool is_local = cell.faces[f].IsNeighborLocal(grid);
 
           if (is_local)
           {
-            int adj_cell_glob_index = cell->faces[f].neighbor;
-            auto adj_cell =
-              (chi_mesh::Cell*)grid->cells[adj_cell_glob_index];
-            nodal_nnz_in_diag[dof_count] += adj_cell->vertex_ids.size();
+            int neighbor_local_id = cell.faces[f].GetNeighborLocalID(grid);
+            auto adj_cell = grid->local_cells[neighbor_local_id];
+            nodal_nnz_in_diag[dof_count] += adj_cell.vertex_ids.size();
           }
           else
           {
-            local_border_cells.insert(lc);
+            local_border_cells.insert(cell.cell_local_id);
           }
         }
       }
@@ -50,15 +46,15 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     }
 
     //==================================== Boundary numbers
-    for (size_t f=0; f<cell->faces.size(); f++)
+    for (size_t f=0; f<cell.faces.size(); f++)
     {
-      if (cell->faces[f].neighbor < 0)
+      if (cell.faces[f].neighbor < 0)
       {
-        for (size_t fv=0; fv<cell->faces[f].vertex_ids.size(); fv++)
+        for (size_t fv=0; fv<cell.faces[f].vertex_ids.size(); fv++)
         {
-          int fvi = cell->faces[f].vertex_ids[fv];
+          int fvi = cell.faces[f].vertex_ids[fv];
           nodal_boundary_numbers[fvi] =
-            cell->faces[f].neighbor;
+            cell.faces[f].neighbor;
         }//for fv
       }//if bndry
     }//for face v's
@@ -99,7 +95,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     int local_cell_index = *local_cell;
     int cell_glob_index = grid->local_cell_glob_indices[local_cell_index];
 
-    auto cell = grid->cells[cell_glob_index];
+    auto cell = &grid->local_cells[local_cell_index];
     DiffusionIPCellView* ip_view = ip_cell_views[local_cell_index];
 
     border_cell_info.push_back(cell_glob_index);         //cell_glob_index
@@ -238,25 +234,21 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
   //================================================== Building off-diagonal
   //                                                   sparsity pattern
   dof_count = 0;
-  for (int lc=0; lc<num_loc_cells; lc++)
+  for (auto& cell : grid->local_cells)
   {
-    int cell_glob_index = grid->local_cell_glob_indices[lc];
-    auto cell = grid->cells[cell_glob_index];
-
-    for (int v=0; v<cell->vertex_ids.size(); v++)
+    for (int v=0; v<cell.vertex_ids.size(); v++)
     {
-      for (int f=0; f<cell->faces.size(); f++)
+      for (int f=0; f<cell.faces.size(); f++)
       {
-        int neighbor = cell->faces[f].neighbor;
+        int neighbor = cell.faces[f].neighbor;
         bool is_bndry = grid->IsCellBndry(neighbor);
-        bool is_local = grid->IsCellLocal(neighbor);
+        bool is_local = cell.faces[f].IsNeighborLocal(grid);
 
         if ((not is_bndry) and (not is_local))
         {
-          auto adj_cell = grid->cells[neighbor];
+          int adj_cell_partition_id = cell.faces[f].GetNeighborPartitionID(grid);
           auto adj_polyh_cell = (chi_mesh::Cell*)
-            GetBorderCell(adj_cell->partition_id,
-                          neighbor);
+            GetBorderCell(adj_cell_partition_id, neighbor);
           nodal_nnz_off_diag[dof_count] += adj_polyh_cell->vertex_ids.size();
         }
       }//for face
@@ -266,6 +258,6 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
   MPI_Barrier(MPI_COMM_WORLD);
 
 
-
+  chi_log.Log(LOG_0) << "Done creating DFEM sparsity pattern";
 
 }

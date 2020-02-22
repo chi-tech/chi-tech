@@ -20,56 +20,58 @@ extern ChiLog chi_log;
 \author Jan*/
 int chiRegionExportMeshToPython(lua_State *L)
 {
-  //============================================= Check arguments
-  int num_args = lua_gettop(L);
-  if (!((num_args == 2) || (num_args == 3)))
-  {
-    chi_log.Log(LOG_0ERROR) << "Incorrect amount of arguments used in "
-                               "chiRegionExportMeshToPython";
-    exit(EXIT_FAILURE);
-  }
-
-  int region_index = lua_tonumber(L,1);
-  const char* file_name = lua_tostring(L,2);
-  bool export_template = false;
-
-  if (num_args == 3) export_template = lua_toboolean(L,3);
-
-  //============================================= Get current handler
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
-
-  //============================================= Attempt to obtain region
-  chi_mesh::Region* cur_region;
-  try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
-  }
-  catch(const std::invalid_argument& ia)
-  {
-    chi_log.Log(LOG_0ERROR) << "ERROR: Invalid index to region in "
-                               "chiRegionExportMeshToPython.";
-    exit(EXIT_FAILURE);
-  }
-
-  //============================================= Get back continuum
-  if (cur_region->volume_mesh_continua.size()>0)
-  {
-    int num_cont = cur_region->volume_mesh_continua.size();
-
-    chi_mesh::MeshContinuum* vol_cont;
-    if ((export_template) && (num_cont >= 2))
-      vol_cont = cur_region->volume_mesh_continua[num_cont-2];
-    else
-      vol_cont= cur_region->volume_mesh_continua.back();
-
-    vol_cont->ExportCellsToPython((char*)file_name);
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLWARNING) << "No volume continuum to export in "
-                                   "call to chiRegionExportMeshToPython.";
-  }
-
-
+//  //============================================= Check arguments
+//  int num_args = lua_gettop(L);
+//  if (!((num_args == 2) || (num_args == 3)))
+//  {
+//    chi_log.Log(LOG_0ERROR) << "Incorrect amount of arguments used in "
+//                               "chiRegionExportMeshToPython";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  int region_index = lua_tonumber(L,1);
+//  const char* file_name = lua_tostring(L,2);
+//  bool export_template = false;
+//
+//  if (num_args == 3) export_template = lua_toboolean(L,3);
+//
+//  //============================================= Get current handler
+//  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+//
+//  //============================================= Attempt to obtain region
+//  chi_mesh::Region* cur_region;
+//  try{
+//    cur_region = cur_hndlr->region_stack.at(region_index);
+//  }
+//  catch(const std::invalid_argument& ia)
+//  {
+//    chi_log.Log(LOG_0ERROR) << "ERROR: Invalid index to region in "
+//                               "chiRegionExportMeshToPython.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  //============================================= Get back continuum
+//  if (cur_region->volume_mesh_continua.size()>0)
+//  {
+//    int num_cont = cur_region->volume_mesh_continua.size();
+//
+//    chi_mesh::MeshContinuum* vol_cont;
+//    if ((export_template) && (num_cont >= 2))
+//      vol_cont = cur_region->volume_mesh_continua[num_cont-2];
+//    else
+//      vol_cont= cur_region->volume_mesh_continua.back();
+//
+//    vol_cont->ExportCellsToPython((char*)file_name);
+//  }
+//  else
+//  {
+//    chi_log.Log(LOG_ALLWARNING) << "No volume continuum to export in "
+//                                   "call to chiRegionExportMeshToPython.";
+//  }
+//
+  chi_log.Log(LOG_0WARNING)
+    << "chiRegionExportMeshToPython is deprecated. "
+       "Use chiRegionExportMeshToVTK instead.";
 
   return 0;
 }
@@ -118,23 +120,8 @@ int chiRegionExportMeshToObj(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  //============================================= Get back continuum
-  if (cur_region->volume_mesh_continua.size()>0)
-  {
-    int num_cont = cur_region->volume_mesh_continua.size();
-
-    chi_mesh::MeshContinuum* vol_cont;
-    vol_cont= cur_region->volume_mesh_continua.back();
-
-    vol_cont->ExportCellsToObj((char*)file_name,per_material);
-
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLWARNING) << "No volume continuum to export in "
-                                   "call to chiRegionExportMeshToObj.";
-  }
-
+  auto vol_cont= cur_region->GetGrid();
+  vol_cont->ExportCellsToObj((char*)file_name,per_material);
 
 
   return 0;
@@ -175,23 +162,9 @@ int chiRegionExportMeshToVTK(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  //============================================= Get back continuum
-  if (cur_region->volume_mesh_continua.size()>0)
-  {
-    int num_cont = cur_region->volume_mesh_continua.size();
+  auto vol_cont = cur_region->GetGrid();
 
-    chi_mesh::MeshContinuum* vol_cont;
-    vol_cont= cur_region->volume_mesh_continua.back();
-
-    vol_cont->ExportCellsToVTK(base_name);
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLWARNING) << "No volume continuum to export in "
-                                   "call to chiRegionExportMeshToObj.";
-  }
-
-
+  vol_cont->ExportCellsToVTK(base_name);
 
   return 0;
 }

@@ -116,18 +116,15 @@ void LinearBoltzman::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
   delta_phi_local.resize(local_dof_count*gss,0.0);
 
   int index = -1;
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
-    auto cell        = grid->cells[cell_g_index];
-
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
 
-    int xs_id = matid_to_xs_map[cell->material_id];
+    int xs_id = matid_to_xs_map[cell.material_id];
     std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
 
-    for (int i=0; i < cell->vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       index++;
       int m = 0;
@@ -155,19 +152,16 @@ void LinearBoltzman::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupse
   int gsi = groupset->groups[0]->id;
   int gss = groupset->groups.size();
 
-  chi_diffusion::Solver* wgdsa_solver =
-    (chi_diffusion::Solver*)groupset->wgdsa_solver;
+  auto wgdsa_solver = (chi_diffusion::Solver*)groupset->wgdsa_solver;
 
   int index = -1;
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
-    auto cell        = grid->cells[cell_g_index];
 
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
 
-    for (int i=0; i < cell->vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       index++;
       int m=0;

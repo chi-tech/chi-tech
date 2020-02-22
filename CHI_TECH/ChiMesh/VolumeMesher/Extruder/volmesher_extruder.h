@@ -36,12 +36,12 @@ public:
   void CreateLocalAndBoundaryNodes(chi_mesh::MeshContinuum* template_continuum,
                                    chi_mesh::MeshContinuum* vol_continuum);
   //05
-  chi_mesh::Vector ComputeTemplateCell3DCentroid(
+  chi_mesh::Vector3 ComputeTemplateCell3DCentroid(
                       chi_mesh::CellPolygon* n_template_cell,
                       chi_mesh::MeshContinuum* template_continuum,
                       int z_level_begin,int z_level_end);
 
-  int GetCellPartitionIDFromCentroid(chi_mesh::Vector& centroid,
+  int GetCellPartitionIDFromCentroid(chi_mesh::Vector3& centroid,
                                      chi_mesh::SurfaceMesher* surf_mesher);
 
   bool IsTemplateCellNeighborToThisPartition(

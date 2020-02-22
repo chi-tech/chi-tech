@@ -33,6 +33,9 @@ public:
   int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
   void  ExportToOBJFile(const char* fileName);
   void  ExportToPolyFile(const char* fileName);
+  static SurfaceMesh*
+  CreateFromDivisions(std::vector<double>& vertices_1d_x,
+                      std::vector<double>& vertices_1d_y);
 
   //internalconn.cc
   void  UpdateInternalConnectivity();

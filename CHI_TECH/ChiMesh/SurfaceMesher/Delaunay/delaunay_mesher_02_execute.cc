@@ -5,6 +5,9 @@
 #include "../../Boundary/chi_boundary.h"
 #include "../../MeshContinuum/chi_meshcontinuum.h"
 
+#include "chi_log.h"
+
+extern ChiLog chi_log;
 
 /**Executes a Delaunay surface remeshing operation on all
  * regions.
@@ -34,6 +37,14 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
 
   //================================================== Get the current handler
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
+
+  //================================================== Check empty region list
+  if (mesh_handler->region_stack.empty())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SurfaceMesherPredefined: No region added.";
+    exit(EXIT_FAILURE);
+  }
 
   //================================================== Loop over all regions
   std::vector<chi_mesh::Region*>::iterator region_iter;

@@ -33,13 +33,10 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Loop over all regions
-  std::vector<chi_mesh::Region*>::iterator region_iter;
-  for (region_iter = mesh_handler->region_stack.begin();
-       region_iter != mesh_handler->region_stack.end();
-       region_iter++)
+  bool single_surfacemesh_processed = false;
+  int total_global_cells = 0;
+  for (auto region : mesh_handler->region_stack)
   {
-    chi_mesh::Region* region = *region_iter;
-
     chi_log.Log(LOG_0VERBOSE_1)
       << "VolumeMesherExtruder: Processing Region"
       << std::endl;
@@ -57,11 +54,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     //=========================================== Create new continuum
     auto grid = new chi_mesh::MeshContinuum;
     auto temp_grid = new chi_mesh::MeshContinuum;
-    region->volume_mesh_continua.push_back(temp_grid);
-    region->volume_mesh_continua.push_back(grid);
-
-    //=========================================== Perform the operation
-    bool single_surfacemesh_processed = false;
+    AddContinuumToRegion(grid, *region);
 
     //=========================================== Look over boundaries
     for (auto bndry : region->boundaries)
@@ -101,9 +94,12 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Creating template cells"
           << std::endl;
-        bool delete_surface_mesh_elements = true;
-        CreatePolygonCells(ref_continuum->surface_mesh, temp_grid,
-                           delete_surface_mesh_elements);
+        const bool DELETE_SURFACE_MESH_ELEMENTS = true;
+        const bool FORCE_LOCAL = true;
+        CreatePolygonCells(ref_continuum->surface_mesh,
+                           temp_grid,
+                           DELETE_SURFACE_MESH_ELEMENTS,
+                           FORCE_LOCAL);
         delete ref_continuum->surface_mesh;
 
         chi_log.Log(LOG_0VERBOSE_1)
@@ -121,16 +117,24 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         MPI_Barrier(MPI_COMM_WORLD);
         ExtrudeCells(temp_grid, grid);
 
+        int total_local_cells = grid->local_cells.size();
+
+        MPI_Allreduce(&total_local_cells,
+                      &total_global_cells,
+                      1,
+                      MPI_INT,
+                      MPI_SUM,
+                      MPI_COMM_WORLD);
+
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Cells extruded = "
-          << grid->cells.size()
+          << total_global_cells
           << std::endl;
 
 
 
         //================================== Clean-up temporary continuum
-        for (auto vert : temp_grid->nodes) delete vert;
-        for (auto pcell : temp_grid->cells) delete pcell;
+        for (auto vert : temp_grid->vertices) delete vert;
         delete temp_grid;
 
         //================================== Checking partitioning parameters
@@ -160,25 +164,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         chi_log.Log(LOG_ALLVERBOSE_1) << "Building local cell indices";
 
         //================================== Initialize local cell indices
-        int num_glob_cells=grid->cells.size();
-        for (int c=0; c<num_glob_cells; c++)
-        {
-          grid->glob_cell_local_indices.push_back(-1);
-
-          if (grid->cells[c] == nullptr)
-            continue;
-
-          if ((grid->cells[c]->partition_id == chi_mpi.location_id) ||
-              (options.mesh_global))
-          {
-            grid->local_cell_glob_indices.push_back(c);
-            int local_cell_index = grid->local_cell_glob_indices.size() - 1;
-            grid->glob_cell_local_indices[c]=local_cell_index;
-
-            grid->cells[c]->cell_local_id = local_cell_index;
-          }
-        }
-
         chi_log.Log(LOG_ALLVERBOSE_1)
           << "### LOCATION[" << chi_mpi.location_id
           << "] amount of local cells="
@@ -187,20 +172,27 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Number of cells in region = "
-          << grid->cells.size()
+          << total_global_cells
           << std::endl;
-        grid->cells.shrink_to_fit();
 
         chi_log.Log(LOG_0)
           << "VolumeMesherExtruder: Number of nodes in region = "
-          << grid->nodes.size()
+          << grid->vertices.size()
           << std::endl;
-        grid->nodes.shrink_to_fit();
+        grid->vertices.shrink_to_fit();
 
 
       }//if surface mesh
     }//for bndry
   }//for regions
+
+  if (not single_surfacemesh_processed)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "VolumeMesherExtruder: No surface mesh was processed for any region."
+         " Use \"chiRegionAddSurfaceBoundary\" to add a surface to the region.";
+    exit(EXIT_FAILURE);
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

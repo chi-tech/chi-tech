@@ -19,7 +19,7 @@ private:
 public:
   std::vector<std::vector<double>>           face_side_area;
   std::vector<std::vector<double>>           face_side_volume;
-  std::vector<std::vector<std::vector<chi_mesh::Vector>>> face_side_vectors;
+  std::vector<std::vector<std::vector<chi_mesh::Vector3>>> face_side_vectors;
 
   PolyhedronFVView(chi_mesh::CellPolyhedron* polyh_cell,
                 chi_mesh::MeshContinuum *vol_continuum) :
@@ -28,7 +28,7 @@ public:
     grid = vol_continuum;
 
     volume = 0.0;
-    chi_mesh::Vector& vcc = polyh_cell->centroid;
+    chi_mesh::Vector3& vcc = polyh_cell->centroid;
 
     int num_faces = polyh_cell->faces.size();
     face_side_vectors.resize(num_faces);
@@ -44,12 +44,12 @@ public:
         int v0i = edge[0];
         int v1i = edge[1];
 
-        chi_mesh::Vector& v0 = *grid->nodes[v0i];
-        chi_mesh::Vector& v1 = polyh_cell->faces[f].centroid;
-        chi_mesh::Vector& v2 = *grid->nodes[v1i];
-        chi_mesh::Vector& v3 = vcc;
+        chi_mesh::Vector3& v0 = *grid->vertices[v0i];
+        chi_mesh::Vector3& v1 = polyh_cell->faces[f].centroid;
+        chi_mesh::Vector3& v2 = *grid->vertices[v1i];
+        chi_mesh::Vector3& v3 = vcc;
 
-        std::vector<chi_mesh::Vector> side_legs(3);
+        std::vector<chi_mesh::Vector3> side_legs(3);
         side_legs[0] = v1-v0;
         side_legs[1] = v2-v0;
         side_legs[2] = v3-v0;
@@ -62,8 +62,8 @@ public:
         J.SetColJVec(1,side_legs[1]);
         J.SetColJVec(2,side_legs[2]);
 
-        chi_mesh::Vector& sidev01 = side_legs[0];
-        chi_mesh::Vector& sidev02 = side_legs[1];
+        chi_mesh::Vector3& sidev01 = side_legs[0];
+        chi_mesh::Vector3& sidev02 = side_legs[1];
 
         double side_area = (sidev01.Cross(sidev02)).Norm()/2.0;
         face_side_area[f].emplace_back(side_area);
