@@ -20,16 +20,20 @@ public:
   {
   public:
     std::vector<int>& local_cell_ind;
-    std::vector<chi_mesh::Cell*>& cell_references;
 
     std::vector<chi_mesh::Cell*> native_cells;
     std::vector<chi_mesh::Cell*> foreign_cells;
 
     /**Constructor.*/
-    LocalCells(std::vector<int>& in_local_cell_ind,
-               std::vector<chi_mesh::Cell*>& in_cell_references) :
-      local_cell_ind(in_local_cell_ind),
-      cell_references(in_cell_references) {}
+    LocalCells(std::vector<int>& in_local_cell_ind) :
+      local_cell_ind(in_local_cell_ind)
+      {}
+
+    ~LocalCells()
+    {
+      for (auto cell : native_cells) delete cell;
+      for (auto cell : foreign_cells) delete cell;
+    }
 
     chi_mesh::Cell& operator[](int cell_local_index);
 
@@ -49,25 +53,13 @@ public:
       iterator operator++(        ) {iterator i = *this; ref_element++; return i;}
       iterator operator++(int junk) {ref_element++; return *this;}
       chi_mesh::Cell& operator*()
-      {
-//        return *(ref_block.cell_references[
-//                   ref_block.local_cell_ind[ref_element]]);
-        return *(ref_block.native_cells[ref_element]);
-      }
+      { return *(ref_block.native_cells[ref_element]); }
       chi_mesh::Cell* operator->()
-      {
-//        return ref_block.cell_references[
-//                 ref_block.local_cell_ind[ref_element]];
-        return ref_block.native_cells[ref_element];
-      }
+      { return ref_block.native_cells[ref_element]; }
       bool operator==(const iterator& rhs)
-      {
-        return ref_element == rhs.ref_element;
-      }
+      { return ref_element == rhs.ref_element; }
       bool operator!=(const iterator& rhs)
-      {
-        return ref_element != rhs.ref_element;
-      }
+      { return ref_element != rhs.ref_element; }
     };
 
     iterator begin() {return {*this,0};}
@@ -95,13 +87,11 @@ public:
 
     void push_back(chi_mesh::Cell* new_cell);
     chi_mesh::Cell* &operator[](int cell_global_index);
-    size_t size();
 
 
   };
 
   std::vector<chi_mesh::Node*>   vertices;
-  std::vector<chi_mesh::Cell*>   cells_storage;
   LocalCells                     local_cells;
   GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
@@ -124,7 +114,7 @@ private:
 
 public:
   MeshContinuum() :
-    local_cells(local_cell_glob_indices,cells_storage),
+    local_cells(local_cell_glob_indices),
     cells(local_cells)
   {
     surface_mesh = nullptr;

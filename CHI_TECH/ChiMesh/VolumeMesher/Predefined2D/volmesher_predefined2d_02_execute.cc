@@ -25,6 +25,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
   chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Loop over all regions
+  int total_global_cells = 0;
   for (auto region : mesh_handler->region_stack)
   {
     //=========================================== Create new continuum
@@ -69,17 +70,25 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         this->CreatePolygonCells(ref_continuum->surface_mesh, grid);
 
         //================================== Connect Boundaries
-        for (auto cell : grid->cells_storage)
-        {
-          cell->FindBoundary2D(region);
-        }
+        for (auto& cell : grid->local_cells)
+          cell.FindBoundary2D(region);
 
         //================================== Check all open item_id have
         //                                   boundaries
         int no_boundary_cells=0;
-        for (auto cell : grid->cells_storage)
-          if (!cell->CheckBoundary2D())
+        for (auto cell : grid->local_cells)
+          if (!cell.CheckBoundary2D())
             no_boundary_cells++;
+
+        int total_local_cells = grid->local_cells.size();
+
+        MPI_Allreduce(&total_local_cells,
+                      &total_global_cells,
+                      1,
+                      MPI_INT,
+                      MPI_SUM,
+                      MPI_COMM_WORLD);
+
 
         if (no_boundary_cells>0)
         {
@@ -87,7 +96,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
             << "A total of "
             << no_boundary_cells
             << " out of "
-            << grid->cells.size()
+            << total_global_cells
             << " item_id found with no boundary connection.\n";
           //temp_continuum->ExportCellsToPython("Zerror.py");
         }
@@ -123,7 +132,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
           << "VolumeMesherPredefined2D["
           << chi_mpi.location_id
           << "]: Number of cells in region = "
-          << grid->cells.size()
+          << total_global_cells
           << std::endl;
 
         chi_log.Log(LOG_0)

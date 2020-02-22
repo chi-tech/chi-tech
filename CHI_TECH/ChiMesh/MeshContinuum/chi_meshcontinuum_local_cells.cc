@@ -31,7 +31,7 @@ operator[](int cell_local_index)
 void chi_mesh::MeshContinuum::GlobalCellHandler::
   push_back(chi_mesh::Cell *new_cell)
 {
-  local_cells.cell_references.push_back(new_cell);
+//  local_cells.cell_references.push_back(new_cell);
 
   if (new_cell->partition_id == chi_mpi.location_id)
   {
@@ -114,7 +114,7 @@ chi_mesh::Cell* &chi_mesh::MeshContinuum::GlobalCellHandler::
 
 //###################################################################
 /**Returns the total number of cells.*/
-size_t chi_mesh::MeshContinuum::GlobalCellHandler::size()
-{
-  return local_cells.cell_references.size();
-}
+//size_t chi_mesh::MeshContinuum::GlobalCellHandler::size()
+//{
+//  return local_cells.cell_references.size();
+//}

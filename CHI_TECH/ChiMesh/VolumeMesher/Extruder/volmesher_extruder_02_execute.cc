@@ -54,8 +54,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     //=========================================== Create new continuum
     auto grid = new chi_mesh::MeshContinuum;
     auto temp_grid = new chi_mesh::MeshContinuum;
-//    region->volume_mesh_continua.push_back(temp_grid);
-//    region->volume_mesh_continua.push_back(grid);
     AddContinuumToRegion(grid, *region);
 
     //=========================================== Look over boundaries
@@ -137,7 +135,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
         //================================== Clean-up temporary continuum
         for (auto vert : temp_grid->vertices) delete vert;
-        for (auto pcell : temp_grid->cells_storage) delete pcell;
         delete temp_grid;
 
         //================================== Checking partitioning parameters

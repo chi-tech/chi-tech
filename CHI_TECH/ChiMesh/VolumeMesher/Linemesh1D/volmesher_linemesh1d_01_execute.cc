@@ -29,6 +29,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
   chi_mesh::SurfaceMesher* surf_mesher = mesh_handler->surface_mesher;
 
   //================================================== Loop over all regions
+  int cell_count = 0;
   for (auto region : mesh_handler->region_stack)
   {
     chi_log.Log(LOG_0VERBOSE_1)
@@ -75,7 +76,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         {
           cell_count++;
           auto slab = new chi_mesh::CellSlab;
-          slab->cell_global_id = grid->cells.size();
+          slab->cell_global_id = cell_count;
 
           //====================== Populate basic data
           slab->vertex_ids.resize(2,-1);
@@ -151,10 +152,19 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           << "] amount of local cells="
           << grid->local_cell_glob_indices.size();
 
+        int total_local_cells = grid->local_cells.size();
+        int total_global_cells=0;
+
+        MPI_Allreduce(&total_local_cells,
+                      &total_global_cells,
+                      1,
+                      MPI_INT,
+                      MPI_SUM,
+                      MPI_COMM_WORLD);
 
         chi_log.Log(LOG_0)
           << "VolumeMesherLinemesh1D: Number of cells in region = "
-          << grid->cells.size()
+          << total_global_cells
           << std::endl;
 
         chi_log.Log(LOG_0)

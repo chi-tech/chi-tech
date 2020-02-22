@@ -177,7 +177,7 @@ int chiMeshCreate2DOrthoMesh(lua_State* L)
 \param y_nodes array_float An Array of floating point numbers denoting
                            1D nodes along y-axis.
 \param z_nodes array_float An Array of floating point numbers denoting
-                           1D nodes along y-axis.
+                           1D nodes along z-axis.
 
 \return Two handles: surface-mesh, region
 
