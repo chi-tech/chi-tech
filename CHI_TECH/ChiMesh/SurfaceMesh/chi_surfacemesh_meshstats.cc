@@ -14,7 +14,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
 {
   double tolerance = 1.0e-8;
   double dvarphi = 2.0*M_PI/num_angles;
-  chi_mesh::Vector khat(0.0,0.0,1.0);
+  chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
 
   //================================================== Loop over angles
@@ -22,7 +22,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
   {
     double varphi = 0.5*dvarphi + a*dvarphi;
 
-    chi_mesh::Vector omega;
+    chi_mesh::Vector3 omega;
     omega.x = cos(varphi);
     omega.y = sin(varphi);
     omega.z = 0.0;
@@ -44,8 +44,8 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
         int v0i = face->edges[e][0];
         int v1i = face->edges[e][1];
 
-        chi_mesh::Vector v01 = vertices[v1i] - vertices[v0i];
-        chi_mesh::Vector n = v01.Cross(khat); n=n/n.Norm();
+        chi_mesh::Vector3 v01 = vertices[v1i] - vertices[v0i];
+        chi_mesh::Vector3 n = v01.Cross(khat); n= n / n.Norm();
 
         double mu = omega.Dot(n);
         int neighbor = face->edges[e][2];
@@ -113,8 +113,8 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
       int v0i = face->edges[e][0];
       int v1i = face->edges[e][1];
 
-      chi_mesh::Vector v01 = vertices[v1i] - vertices[v0i];
-      chi_mesh::Vector v02 = face->face_centroid - vertices[v0i];
+      chi_mesh::Vector3 v01 = vertices[v1i] - vertices[v0i];
+      chi_mesh::Vector3 v02 = face->face_centroid - vertices[v0i];
 
       //This is essentially the combine of the triangle for each side
 

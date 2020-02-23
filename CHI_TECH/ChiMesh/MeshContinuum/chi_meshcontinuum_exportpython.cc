@@ -37,12 +37,12 @@ ExportCellsToPython(const char* fileName, bool surface_only,
              "import scipy as sp\n");
 
   //============================================= Parse nodes
-  fprintf(of,"xyz=np.zeros((%lu,%d))\n",nodes.size(),3);
-  for (int n=0; n<nodes.size(); n++)
+  fprintf(of, "xyz=np.zeros((%lu,%d))\n", vertices.size(), 3);
+  for (int n=0; n < vertices.size(); n++)
   {
-    fprintf(of,"xyz[%d][%d]=%f;  ",n,0,nodes[n]->x);
-    fprintf(of,"xyz[%d][%d]=%f;  ",n,1,nodes[n]->y);
-    fprintf(of,"xyz[%d][%d]=%f;\n",n,2,nodes[n]->z);
+    fprintf(of, "xyz[%d][%d]=%f;  ", n, 0, vertices[n]->x);
+    fprintf(of, "xyz[%d][%d]=%f;  ", n, 1, vertices[n]->y);
+    fprintf(of, "xyz[%d][%d]=%f;\n", n, 2, vertices[n]->z);
   }
 
   //============================================= Find amount of faces

@@ -100,13 +100,13 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
         //================================== For cells
         auto& cell_vec = rbndry->hetero_boundary_flux[n];
         cell_vec.resize(num_local_cells);
-        for (size_t c=0; c<num_local_cells; ++c)
+        for (const auto& cell : grid->local_cells)
         {
-          auto cell = grid->cells[grid->local_cell_glob_indices[c]];
+          int c = cell.cell_local_id;
 
           //=========================== Check cell on ref bndry
           bool on_ref_bndry = false;
-          for (auto& face : cell->faces){
+          for (const auto& face : cell.faces){
             if ( (face.neighbor < 0) and
                  (face.normal.Dot(rbndry->normal) > 0.999999) )
             {
@@ -118,9 +118,9 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           total_reflect_cells += 1;
 
           //=========================== If cell on ref bndry
-          cell_vec[c].resize(cell->faces.size());
+          cell_vec[c].resize(cell.faces.size());
           int f=0;
-          for (auto& face : cell->faces)
+          for (const auto& face : cell.faces)
           {
             if ( (face.neighbor < 0) and
                  (face.normal.Dot(rbndry->normal) > 0.999999) )

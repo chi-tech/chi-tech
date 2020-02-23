@@ -35,28 +35,26 @@ void chi_mesh::FieldFunctionInterpolationSlice::
   //================================================== Find cells intersecting plane
   intersecting_cell_indices.clear();
 
-  size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
+  for (const auto& cell : grid_view->local_cells)
   {
-    int cell_glob_index = grid_view->local_cell_glob_indices[lc];
-    auto cell = grid_view->cells[cell_glob_index];
+    int cell_local_index = cell.cell_local_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell.Type() == chi_mesh::CellType::SLAB)
     {
       chi_log.Log(LOG_0)
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
       exit(EXIT_FAILURE);
     }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      intersecting_cell_indices.push_back(cell_glob_index);
+      intersecting_cell_indices.push_back(cell_local_index);
     }
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = static_cast<chi_mesh::CellPolyhedron*>(cell);
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
       bool intersects = false;
 
       size_t num_faces = polyh_cell->faces.size();
@@ -69,16 +67,16 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           int v0_i = edges[e][0];
           int v1_i = edges[e][1];
 
-          std::vector<chi_mesh::Vector*> tet_points;
+          std::vector<chi_mesh::Vector3*> tet_points;
 
-          tet_points.push_back(grid_view->nodes[v0_i]);
-          tet_points.push_back(grid_view->nodes[v1_i]);
+          tet_points.push_back(grid_view->vertices[v0_i]);
+          tet_points.push_back(grid_view->vertices[v1_i]);
           tet_points.push_back(&polyh_cell->faces[f].centroid);
           tet_points.push_back(&polyh_cell->centroid);
 
           if (CheckPlaneTetIntersect(this->normal,this->point,&tet_points))
           {
-            intersecting_cell_indices.push_back(cell_glob_index);
+            intersecting_cell_indices.push_back(cell_local_index);
             intersects = true;
             break;
           }
@@ -98,9 +96,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::
   size_t num_cut_cells = intersecting_cell_indices.size();
   for (int cc=0; cc<num_cut_cells; cc++)
   {
-    int cell_glob_index = intersecting_cell_indices[cc];
+    int cell_local_index = intersecting_cell_indices[cc];
 
-    auto cell = grid_view->cells[cell_glob_index];
+    auto cell = &grid_view->local_cells[cell_local_index];
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell->Type() == chi_mesh::CellType::SLAB)
@@ -118,7 +116,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       //========================================= Initialize cell intersection
       //                                          data structure
       auto cell_isds = new FFICellIntersection;
-      cell_isds->cell_global_index = cell_glob_index;
+      cell_isds->cell_local_index = cell_local_index;
       cell_intersections.push_back(cell_isds);
 
       //========================================= Loop over vertices
@@ -135,7 +133,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         face_isds->v1_dofindex_cell = v;
 
         face_isds->weights = std::pair<double,double>(0.5,0.5);
-        face_isds->point   = *grid_view->nodes[v0gi];
+        face_isds->point   = *grid_view->vertices[v0gi];
 
         cell_isds->intersections.push_back(face_isds);
       }
@@ -151,7 +149,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       int num_points = cell_isds->intersections.size();
       for (int p=0; p<num_points; p++)
       {
-        chi_mesh::Vector vref = cell_isds->intersections[p]->point-this->point;
+        chi_mesh::Vector3 vref = cell_isds->intersections[p]->point - this->point;
 
         cell_isds->intersections[p]->point2d = vref;
 
@@ -159,19 +157,19 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         cfem_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v1_g_index);
         pwld_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v0_dofindex_cell);
         pwld_local_nodes_needed_unmapped.push_back(cell_isds->intersections[p]->v1_dofindex_cell);
-        pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-        pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+        pwld_local_cells_needed_unmapped.push_back(cell_local_index);
+        pwld_local_cells_needed_unmapped.push_back(cell_local_index);
       }
     }//polygon
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = dynamic_cast<chi_mesh::CellPolyhedron*>(cell);
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)(cell);
 
       //========================================= Initialize cell intersection
       //                                          data structure
       auto cell_isds = new FFICellIntersection;
-      cell_isds->cell_global_index = cell_glob_index;
+      cell_isds->cell_local_index = cell_local_index;
       cell_intersections.push_back(cell_isds);
 
       //========================================= Loop over faces
@@ -186,8 +184,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           int v0gi = edges[e][0]; //global index v0
           int v1gi = edges[e][1]; //global index v1
 
-          chi_mesh::Vertex v0 = (*grid_view->nodes[v0gi]);
-          chi_mesh::Vertex v1 = (*grid_view->nodes[v1gi]);
+          chi_mesh::Vertex v0 = (*grid_view->vertices[v0gi]);
+          chi_mesh::Vertex v1 = (*grid_view->vertices[v1gi]);
 
           chi_mesh::Vertex interstion_point;            //Placeholder
           std::pair<double,double> weights;
@@ -270,7 +268,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       }
 
       //==================================== Computing 2D transforms
-      chi_mesh::Vector vref = cell_isds->intersection_centre - this->point;
+      chi_mesh::Vector3 vref = cell_isds->intersection_centre - this->point;
 
       cell_isds->intersection_2d_centre.x = vref.Dot(tangent);
       cell_isds->intersection_2d_centre.y = vref.Dot(binorm);
@@ -280,7 +278,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       std::vector<FFIFaceEdgeIntersection*> unsorted_points;
       for (int p=0; p<num_points; p++)
       {
-        chi_mesh::Vector vref = cell_isds->intersections[p]->point-this->point;
+        chi_mesh::Vector3 vref = cell_isds->intersections[p]->point - this->point;
 
         cell_isds->intersections[p]->point2d.x = vref.Dot(tangent);
         cell_isds->intersections[p]->point2d.y = vref.Dot(binorm);
@@ -299,24 +297,24 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       cfem_local_nodes_needed_unmapped.push_back(unsorted_points[0]->v1_g_index);
       pwld_local_nodes_needed_unmapped.push_back(unsorted_points[0]->v0_dofindex_cell);
       pwld_local_nodes_needed_unmapped.push_back(unsorted_points[0]->v1_dofindex_cell);
-      pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-      pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+      pwld_local_cells_needed_unmapped.push_back(cell_local_index);
+      pwld_local_cells_needed_unmapped.push_back(cell_local_index);
       unsorted_points.erase(unsorted_points.begin());
 
       while (unsorted_points.size()>0)
       {
         for (int p=0; p<unsorted_points.size(); p++)
         {
-          chi_mesh::Vector v1 = unsorted_points[p]->point2d -
-                                cell_isds->intersections.back()->point2d;
+          chi_mesh::Vector3 v1 = unsorted_points[p]->point2d -
+                                 cell_isds->intersections.back()->point2d;
 
           bool illegal_value = false;
           for (int pr=0; pr<unsorted_points.size(); pr++)
           {
             if (pr!=p)
             {
-              chi_mesh::Vector vr = unsorted_points[pr]->point2d -
-                                    unsorted_points[p]->point2d;
+              chi_mesh::Vector3 vr = unsorted_points[pr]->point2d -
+                                     unsorted_points[p]->point2d;
 
               if (vr.Cross(v1).z < 0.0)
               {
@@ -333,8 +331,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
             cfem_local_nodes_needed_unmapped.push_back(unsorted_points[p]->v1_g_index);
             pwld_local_nodes_needed_unmapped.push_back(unsorted_points[p]->v0_dofindex_cell);
             pwld_local_nodes_needed_unmapped.push_back(unsorted_points[p]->v1_dofindex_cell);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
             unsorted_points.erase(unsorted_points.begin()+p);
             break;
           }

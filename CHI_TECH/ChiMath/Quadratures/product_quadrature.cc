@@ -64,7 +64,7 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
   {
     chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
-    auto new_omega = new chi_mesh::Vector;
+    auto new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);
@@ -146,7 +146,7 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   {
     chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
-    auto new_omega = new chi_mesh::Vector;
+    auto new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);
@@ -225,7 +225,7 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
   {
     chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
-    chi_mesh::Vector* new_omega = new chi_mesh::Vector;
+    chi_mesh::Vector3* new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);
@@ -301,7 +301,7 @@ void chi_math::ProductQuadrature::
   //================================================== Create omega list
   for (auto qpoint : abscissae)
   {
-    auto new_omega = new chi_mesh::Vector;
+    auto new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);

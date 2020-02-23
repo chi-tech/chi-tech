@@ -62,17 +62,17 @@ void chi_mesh::VolumeMesherExtruder::
   std::set<int> local_vert_ids;
   for (int iz=0; iz<(vertex_layers.size()-1); iz++)
   {
-    for (int tc=0; tc<template_continuum->cells.size(); tc++)
+    for (int tc=0; tc<template_continuum->local_cells.size(); tc++)
     {
       //========================================= Get template cell
-      if (template_continuum->cells[tc]->Type() !=
+      if (template_continuum->local_cells[tc].Type() !=
           chi_mesh::CellType::POLYGON)
       {
         chi_log.Log(LOG_ALLERROR)
           << "Extruder::CreateLocalAndBoundaryNodes: Template cell error.";
         exit(EXIT_FAILURE);
       }
-      auto template_cell = (chi_mesh::CellPolygon*)template_continuum->cells[tc];
+      auto template_cell = (chi_mesh::CellPolygon*)(&template_continuum->local_cells[tc]);
 
       //========================================= Precompute centroid
       auto centroid_precompd = ComputeTemplateCell3DCentroid(
@@ -111,14 +111,14 @@ void chi_mesh::VolumeMesherExtruder::
 
   //============================================= Now add all nodes
   //                                              that are local or neighboring
-  for (auto vert : vol_continuum->nodes) delete vert;
-  vol_continuum->nodes.clear();
+  for (auto vert : vol_continuum->vertices) delete vert;
+  vol_continuum->vertices.clear();
 //  for (int iz=0; iz<vertex_layers.size(); iz++)
   for (auto layer_z_level : vertex_layers)
   {
-    for (auto vertex : template_continuum->nodes)
+    for (auto vertex : template_continuum->vertices)
     {
-      int new_vert_index = vol_continuum->nodes.size();
+      int new_vert_index = vol_continuum->vertices.size();
 
       auto local_index = local_vert_ids.find(new_vert_index);
 
@@ -127,10 +127,10 @@ void chi_mesh::VolumeMesherExtruder::
         auto node = new chi_mesh::Node(*vertex);
         node->z = layer_z_level;
 
-        vol_continuum->nodes.push_back(node);
+        vol_continuum->vertices.push_back(node);
       }
       else
-        vol_continuum->nodes.push_back(nullptr);
+        vol_continuum->vertices.push_back(nullptr);
 
 
     }

@@ -20,7 +20,7 @@ RefineEdges()
           Vertex v0 = Pstar[v0_i];
           Vertex v1 = Pstar[v1_i];
 
-          Vector v01 = v1 - v0;
+          Vector3 v01 = v1 - v0;
           double v01_ell = v01.Norm();
 
           if (v01_ell>(2.0*absoluteMinumumSize))

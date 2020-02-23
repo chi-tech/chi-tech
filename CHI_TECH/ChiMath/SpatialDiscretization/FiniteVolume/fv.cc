@@ -24,133 +24,53 @@ SpatialDiscretization_FV::SpatialDiscretization_FV(int dim)
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* vol_continuum,
-  int num_cells,
-  int* cell_indices)
+  chi_mesh::MeshContinuum* grid)
 {
   //================================================== Create empty view
   //                                                 for each cell
   if (!mapping_initialized)
   {
-    this->cell_fv_views_mapping.reserve(vol_continuum->cells.size());
-    std::vector<chi_mesh::Cell*>::iterator cellit;
-    for (cellit = vol_continuum->cells.begin();
-         cellit != vol_continuum->cells.end();
-         cellit++)
-    {
-      this->cell_fv_views_mapping.push_back(-1);
-    }
+    cell_view_added_flags.resize(grid->local_cells.size(),false);
     mapping_initialized = true;
   }
 
 
   //================================================== Swap views for
   //                                                   specified item_id
-  int cell_index = -1;
-  for (int c=0; c<num_cells; c++)
+  for (const auto& cell : grid->local_cells)
   {
-    cell_index = cell_indices[c];
-    chi_mesh::Cell* cell = vol_continuum->cells[cell_index];
-
-    if (cell_fv_views_mapping[cell_index]<0)
+    if (not cell_view_added_flags[cell.cell_local_id])
     {
       //######################################### SLAB
-      if (cell->Type() == chi_mesh::CellType::SLAB)
+      if (cell.Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
-          new SlabFVView((chi_mesh::CellSlab*)cell, vol_continuum);
+          new SlabFVView((chi_mesh::CellSlab*)(&cell), grid);
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        cell_fv_views.push_back(view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
 
       //######################################### POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
+      if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
-          new PolygonFVView((chi_mesh::CellPolygon*)(cell), vol_continuum);
+          new PolygonFVView((chi_mesh::CellPolygon*)(&cell), grid);
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        cell_fv_views.push_back(view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
 
       //######################################### POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+      if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
         auto view =
           new PolyhedronFVView(
-            (chi_mesh::CellPolyhedron*)(cell),
-            vol_continuum);
+            (chi_mesh::CellPolyhedron*)(&cell),
+            grid);
 
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-      }
-    }//if mapping not yet assigned
-  }//for num cells
-
-
-
-}//AddViewOfLocalContinuum
-
-//###################################################################
-/**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_FV::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* vol_continuum)
-{
-  //================================================== Create empty view
-  //                                                 for each cell
-  if (!mapping_initialized)
-  {
-    this->cell_fv_views_mapping.reserve(vol_continuum->cells.size());
-    std::vector<chi_mesh::Cell*>::iterator cellit;
-    for (cellit = vol_continuum->cells.begin();
-         cellit != vol_continuum->cells.end();
-         cellit++)
-    {
-      this->cell_fv_views_mapping.push_back(-1);
-    }
-    mapping_initialized = true;
-  }
-
-
-  //================================================== Swap views for
-  //                                                   specified item_id
-  for (auto& cell_index : vol_continuum->local_cell_glob_indices)
-  {
-    chi_mesh::Cell* cell = vol_continuum->cells[cell_index];
-
-    if (cell_fv_views_mapping[cell_index]<0)
-    {
-      //######################################### SLAB
-      if (cell->Type() == chi_mesh::CellType::SLAB)
-      {
-        auto view =
-          new SlabFVView((chi_mesh::CellSlab*)cell, vol_continuum);
-
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-      }
-
-      //######################################### POLYGON
-      if (cell->Type() == chi_mesh::CellType::POLYGON)
-      {
-        auto view =
-          new PolygonFVView((chi_mesh::CellPolygon*)(cell), vol_continuum);
-
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
-      }
-
-      //######################################### POLYHEDRON
-      if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-      {
-        auto view =
-          new PolyhedronFVView(
-            (chi_mesh::CellPolyhedron*)(cell),
-            vol_continuum);
-
-        this->cell_fv_views.push_back(view);
-        cell_fv_views_mapping[cell_index] = this->cell_fv_views.size()-1;
+        cell_fv_views.push_back(view);
+        cell_view_added_flags[cell.cell_local_id] = true;
       }
     }//if mapping not yet assigned
   }//for num cells
@@ -162,8 +82,18 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVView* SpatialDiscretization_FV::MapFeView(int cell_glob_index)
+CellFVView* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 {
-  CellFVView* value = cell_fv_views.at(cell_fv_views_mapping[cell_glob_index]);
+  CellFVView* value;
+  try { value = cell_fv_views.at(cell_local_index); }
+  catch (const std::out_of_range& o)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SpatialDiscretization_FV::MapFeView "
+         "Failure to map Finite Volume View. The view is either not"
+         "available or the supplied local index is invalid.";
+    exit(EXIT_FAILURE);
+  }
+
   return value;
 }

@@ -20,9 +20,9 @@ RemoveBadQualityTriangles()
       Vertex v2 = Pstar[v2_index];
 
       //========================================= Find smallest edge
-      Vector v01 = v1 - v0;
-      Vector v12 = v2 - v1;
-      Vector v20 = v0 - v2;
+      Vector3 v01 = v1 - v0;
+      Vector3 v12 = v2 - v1;
+      Vector3 v20 = v0 - v2;
 
       double d01 = v01.Norm();
       double d12 = v12.Norm();

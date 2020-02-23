@@ -125,7 +125,7 @@ void PolygonFEView::PreCompute()
   for (int i=0; i<dofs; i++)
   {
     std::vector<double> gradijvalue_i(dofs, 0.0);
-    std::vector<chi_mesh::Vector> varphi_i_gradj(dofs,chi_mesh::Vector());
+    std::vector<chi_mesh::Vector3> varphi_i_gradj(dofs, chi_mesh::Vector3());
     std::vector<double>           varphi_i_varphi_j(dofs,0);
 
     // Computing
@@ -171,7 +171,7 @@ void PolygonFEView::PreCompute()
 
     //Computing Varphi_i
     double  valuei_i = 0.0;
-    chi_mesh::Vector gradvalue_i(0,0,0);
+    chi_mesh::Vector3 gradvalue_i(0, 0, 0);
     for (int s = 0; s < sides.size(); s++)
     {
       for (int qp=0; qp<vol_quadrature->qpoints.size();qp++)
@@ -198,14 +198,14 @@ void PolygonFEView::PreCompute()
     // Varphi_i*Varphi_j on each face and
     // Varphi_i on each face
     std::vector<std::vector<double>> varphi_i_varphi_j_surf;
-    std::vector<std::vector<chi_mesh::Vector>> varphi_i_gradvarphi_j_surf;
+    std::vector<std::vector<chi_mesh::Vector3>> varphi_i_gradvarphi_j_surf;
     std::vector<double> varphi_i_surf(num_of_subtris, 0.0);
 
     for (int f=0; f< num_of_subtris; f++)
     {
       std::vector<double>           f_varphi_i_varphi_j_surf(dofs,0);
-      std::vector<chi_mesh::Vector> f_varphi_i_grad_j_surf;
-      f_varphi_i_grad_j_surf.resize(dofs,chi_mesh::Vector());
+      std::vector<chi_mesh::Vector3> f_varphi_i_grad_j_surf;
+      f_varphi_i_grad_j_surf.resize(dofs,chi_mesh::Vector3());
 
       for (int j=0; j<dofs; j++)
       {

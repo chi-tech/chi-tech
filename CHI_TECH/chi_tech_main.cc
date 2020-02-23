@@ -11,15 +11,15 @@ extern bool chi_sim_option_interactive;
 */
 int main(int argc, char** argv)
 {
-  ChiTechInitialize(argc,argv);
+  ChiTech::Initialize(argc, argv);
 
   int error_code = 0;
   if (chi_sim_option_interactive)
-    error_code = ChiTechRunInteractive(argc, argv);
+    error_code = ChiTech::RunInteractive(argc, argv);
   else
-    error_code = ChiTechRunBatch(argc, argv);
+    error_code = ChiTech::RunBatch(argc, argv);
 
-  ChiTechFinalize();
+  ChiTech::Finalize();
 
   return error_code;
 }

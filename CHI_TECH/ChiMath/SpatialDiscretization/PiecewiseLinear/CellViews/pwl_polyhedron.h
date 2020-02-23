@@ -26,7 +26,7 @@ struct FEside_data3d
   double                    detJ = 0.0;
   double                    detJ_surf = 0.0;
   std::vector<int>          v_index;
-  chi_mesh::Vector          side_centroid;
+  chi_mesh::Vector3          side_centroid;
   chi_mesh::Matrix3x3       J;
   chi_mesh::Matrix3x3       Jinv;
   chi_mesh::Matrix3x3       JTinv;
@@ -147,15 +147,15 @@ private:
 
   //############################################### Actual shape functions
 public:
-  double ShapeValue(int i, const chi_mesh::Vector& xyz) override;
-  chi_mesh::Vector GradShapeValue(int i, const chi_mesh::Vector& xyz) override;
+  double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
+  chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
 
 
-  void ShapeValues(const chi_mesh::Vector& xyz,
+  void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) override;
 
-  void GradShapeValues(const chi_mesh::Vector& xyz,
-                       std::vector<chi_mesh::Vector>& gradshape_values) override;
+  void GradShapeValues(const chi_mesh::Vector3& xyz,
+                       std::vector<chi_mesh::Vector3>& gradshape_values) override;
 
   //############################################### Precomputation cell matrices
 private:

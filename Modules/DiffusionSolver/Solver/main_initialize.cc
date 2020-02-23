@@ -19,8 +19,20 @@ int chi_diffusion::Solver::Initialize(bool verbose)
                      << solver_name << ": Initializing Diffusion solver PETSc";
   this->verbose_info = verbose;
 
+  if (regions.empty())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "chi_diffusion::Solver::Initialize: No region added to solver.";
+    exit(EXIT_FAILURE);
+  }
+
+  chi_mesh::Region* region = regions.back();
+  grid = region->GetGrid();
+
+
+
   if (not common_items_initialized)
-    InitializeCommonItems();
+    InitializeCommonItems(); //Mostly boundaries
 
   ChiTimer t_init; t_init.Reset();
 
@@ -42,22 +54,6 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     exit(EXIT_FAILURE);
   }
   MPI_Barrier(MPI_COMM_WORLD);
-
-  //================================================== Compute cell matrices
-  chi_mesh::Region*              aregion = this->regions.back();
-  chi_mesh::MeshContinuum* vol_continuum =
-    aregion->volume_mesh_continua.back();
-
-  if (verbose)
-    chi_log.Log(LOG_0) << "Computing cell matrices";
-  this->discretization->AddViewOfLocalContinuum(
-    vol_continuum,
-    vol_continuum->local_cell_glob_indices.size(),
-    vol_continuum->local_cell_glob_indices.data());
-  MPI_Barrier(MPI_COMM_WORLD);
-
-
-
 
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString() << " "

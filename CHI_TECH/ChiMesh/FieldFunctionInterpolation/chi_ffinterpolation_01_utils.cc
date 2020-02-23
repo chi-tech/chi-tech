@@ -2,6 +2,8 @@
 #include "../MeshHandler/chi_meshhandler.h"
 #include "../VolumeMesher/chi_volumemesher.h"
 
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+
 #include <chi_log.h>
 
 extern ChiLog chi_log;
@@ -17,15 +19,15 @@ extern ChiLog chi_log;
  * intersecting.*/
 bool chi_mesh::FieldFunctionInterpolation::
 CheckPlaneTetIntersect(chi_mesh::Normal plane_normal,
-                       chi_mesh::Vector plane_point,
-                       std::vector<chi_mesh::Vector *>* tet_points)
+                       chi_mesh::Vector3 plane_point,
+                       std::vector<chi_mesh::Vector3 *>* tet_points)
 {
   bool current_sense = false;
 
   size_t num_points = tet_points->size();
   for (size_t i=0; i<num_points; i++)
   {
-    chi_mesh::Vector v = (*(*tet_points)[i]) - plane_point;
+    chi_mesh::Vector3 v = (*(*tet_points)[i]) - plane_point;
     double dotp = plane_normal.Dot(v);
 
     bool new_sense = (dotp >= 0.0);
@@ -42,14 +44,14 @@ CheckPlaneTetIntersect(chi_mesh::Normal plane_normal,
 //###################################################################
 bool chi_mesh::FieldFunctionInterpolation::
 CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                        chi_mesh::Vector plane_point,
-                        chi_mesh::Vector line_point_0,
-                        chi_mesh::Vector line_point_1,
-                        chi_mesh::Vector& intersection_point,
+                        chi_mesh::Vector3 plane_point,
+                        chi_mesh::Vector3 line_point_0,
+                        chi_mesh::Vector3 line_point_1,
+                        chi_mesh::Vector3& intersection_point,
                         std::pair<double,double>& weights)
 {
-  chi_mesh::Vector v0 = line_point_0 - plane_point;
-  chi_mesh::Vector v1 = line_point_1 - plane_point;
+  chi_mesh::Vector3 v0 = line_point_0 - plane_point;
+  chi_mesh::Vector3 v1 = line_point_1 - plane_point;
 
   double dotp_0 = plane_normal.Dot(v0);
   double dotp_1 = plane_normal.Dot(v1);
@@ -82,17 +84,17 @@ Equation of a line:     <x,y,z> = <x0,y0,z0> + d<x1,y1,z1>
 
 */
 bool chi_mesh::FieldFunctionInterpolation::
-     CheckLineTriangleIntersect(std::vector<chi_mesh::Vector>& triangle_points,
-                                chi_mesh::Vector line_point_i,
-                                chi_mesh::Vector line_point_f)
+     CheckLineTriangleIntersect(std::vector<chi_mesh::Vector3>& triangle_points,
+                                chi_mesh::Vector3 line_point_i,
+                                chi_mesh::Vector3 line_point_f)
 {
   //======================================== First find plane intersection
   //Compute normal
-  chi_mesh::Vector p01 = triangle_points[1]-triangle_points[0];
-  chi_mesh::Vector p12 = triangle_points[2]-triangle_points[1];
-  chi_mesh::Vector p20 = triangle_points[0]-triangle_points[2];
-  chi_mesh::Vector pintersection;
-  chi_mesh::Vector n   = p01.Cross(p12); n=n/n.Norm();
+  chi_mesh::Vector3 p01 = triangle_points[1] - triangle_points[0];
+  chi_mesh::Vector3 p12 = triangle_points[2] - triangle_points[1];
+  chi_mesh::Vector3 p20 = triangle_points[0] - triangle_points[2];
+  chi_mesh::Vector3 pintersection;
+  chi_mesh::Vector3 n   = p01.Cross(p12); n= n / n.Norm();
 
   std::pair<double,double> weights;
   if (CheckPlaneLineIntersect(n,triangle_points[0],
@@ -102,13 +104,13 @@ bool chi_mesh::FieldFunctionInterpolation::
   {
     //======================================== Now determine if it is inside
     //                                         the triangle
-    chi_mesh::Vector p0_pint = pintersection - triangle_points[0];
-    chi_mesh::Vector p1_pint = pintersection - triangle_points[1];
-    chi_mesh::Vector p2_pint = pintersection - triangle_points[2];
+    chi_mesh::Vector3 p0_pint = pintersection - triangle_points[0];
+    chi_mesh::Vector3 p1_pint = pintersection - triangle_points[1];
+    chi_mesh::Vector3 p2_pint = pintersection - triangle_points[2];
 
-    chi_mesh::Vector cross0 = p01.Cross(p0_pint); cross0=cross0/cross0.Norm();
-    chi_mesh::Vector cross1 = p12.Cross(p1_pint); cross1=cross1/cross1.Norm();
-    chi_mesh::Vector cross2 = p20.Cross(p2_pint); cross2=cross2/cross2.Norm();
+    chi_mesh::Vector3 cross0 = p01.Cross(p0_pint); cross0= cross0 / cross0.Norm();
+    chi_mesh::Vector3 cross1 = p12.Cross(p1_pint); cross1= cross1 / cross1.Norm();
+    chi_mesh::Vector3 cross2 = p20.Cross(p2_pint); cross2= cross2 / cross2.Norm();
 
     if (cross0.Dot(n)<(0.0)) return false;
     if (cross1.Dot(n)<(0.0)) return false;
@@ -127,16 +129,19 @@ void chi_mesh::FieldFunctionInterpolation::
 CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                   Vec& x, Vec& x_cell,
                   std::vector<int> &cfem_nodes,
-                  std::vector<int> *mapping)
+                  std::vector<int> *mapping,
+                  SpatialDiscretization* sdm)
 {
   chi_mesh::MeshHandler* cur_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* mesher = cur_handler->volume_mesher;
+
+  auto pwl_sdm = (SpatialDiscretization_PWL*)sdm;
 
   size_t num_nodes_to_map = cfem_nodes.size();
   std::vector<int> mapped_nodes;
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
-    int ir = mesher->MapNode(
+    int ir = pwl_sdm->MapCFEMDOF(
       cfem_nodes[n])*num_grps + g;
 
     mapped_nodes.push_back(ir);
@@ -177,51 +182,50 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
     int dof = pwld_nodes[n];
-    int cell_g_index = pwld_cells[n];
+    int c = pwld_cells[n];
 
-    auto cell = grid_view->cells[cell_g_index];
+    auto cell = grid_view->local_cells[c];
 
-    int c = cell->cell_local_id;
     int dof_map_start = local_cell_dof_array_address[c];
 
-    int address = dof_map_start + dof*num_grps*num_moms + num_grps*m + g;
+    int address = (dof_map_start + dof)*num_grps*num_moms + num_grps*m + g;
 
     mapping->push_back(address);
   }
 
 }
 
-//###################################################################
-/**Computes interpolated field function values.*/
-void chi_mesh::FieldFunctionInterpolation::
-CreatePWLDMapping(chi_physics::FieldFunction* field_function,
-                  std::vector<int> &pwld_nodes,
-                  std::vector<int> &pwld_cells,
-                  std::vector<int> *mapping,
-                  int m,
-                  int g)
-{
-  int num_grps = field_function->num_components;
-  int num_moms = field_function->num_sets;
-
-  size_t num_nodes_to_map = pwld_nodes.size();
-  for (size_t n=0; n< num_nodes_to_map; n++)
-  {
-    int dof = pwld_nodes[n];
-    int cell_g_index = pwld_cells[n];
-
-    auto cell = grid_view->cells[cell_g_index];
-
-    int c = cell->cell_local_id;
-
-    int dof_map_start = (*field_function->local_cell_dof_array_address)[c];
-
-    int address = dof_map_start + dof*num_grps*num_moms + num_grps*m + g;
-
-    mapping->push_back(address);
-  }
-
-}
+////###################################################################
+///**Computes interpolated field function values.*/
+//void chi_mesh::FieldFunctionInterpolation::
+//CreatePWLDMapping(chi_physics::FieldFunction* field_function,
+//                  std::vector<int> &pwld_nodes,
+//                  std::vector<int> &pwld_cells,
+//                  std::vector<int> *mapping,
+//                  int m,
+//                  int g)
+//{
+//  int num_grps = field_function->num_components;
+//  int num_moms = field_function->num_sets;
+//
+//  size_t num_nodes_to_map = pwld_nodes.size();
+//  for (size_t n=0; n< num_nodes_to_map; n++)
+//  {
+//    int dof = pwld_nodes[n];
+//    int cell_g_index = pwld_cells[n];
+//
+//    auto cell = grid_view->cells[cell_g_index];
+//
+//    int c = cell->cell_local_id;
+//
+//    int dof_map_start = (*field_function->local_cell_dof_array_address)[c];
+//
+//    int address = dof_map_start + dof*num_grps*num_moms + num_grps*m + g;
+//
+//    mapping->push_back(address);
+//  }
+//
+//}
 
 //###################################################################
 /**Computes interpolated field function values.*/
@@ -229,16 +233,14 @@ void chi_mesh::FieldFunctionInterpolation::
   CreateFVMapping(int num_grps, int num_moms, int g, int m,
                   std::vector<int> &cells, std::vector<int> *mapping)
 {
-  for (auto& cell_glob_index : cells)
+  for (auto& cell_local_index : cells)
   {
-    if (cell_glob_index<0)
+    if (cell_local_index < 0)
     {
       mapping->push_back(-1);
       continue;
     }
 
-    auto cell = grid_view->cells[cell_glob_index];
-    int cell_local_index = cell->cell_local_id;
     int address = cell_local_index*num_grps*num_moms + num_grps*m + g;
 
     mapping->push_back(address);

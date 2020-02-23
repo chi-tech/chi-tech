@@ -23,7 +23,7 @@ extern ChiTimer   chi_program_timer;
 chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
 CreateSweepOrder(double polar, double azimuthal,
                  chi_mesh::MeshContinuum *grid,
-                 bool allow_cycles)
+                 bool cycle_allowance_flag)
 {
   auto sweep_order  = new chi_mesh::sweep_management::SPDS;
   sweep_order->grid = grid;
@@ -38,7 +38,7 @@ CreateSweepOrder(double polar, double azimuthal,
   sweep_order->omega.y = sin(polar)*sin(azimuthal);
   sweep_order->omega.z = cos(polar);
 
-  chi_mesh::Vector omega = sweep_order->omega; //shorter name
+  chi_mesh::Vector3 omega = sweep_order->omega; //shorter name
   if (chi_mpi.location_id == 0)
   {
     char buff[100];
@@ -73,7 +73,7 @@ CreateSweepOrder(double polar, double azimuthal,
   {
     for (auto successor : cell_successors[c])
     {
-      if (!allow_cycles)
+      if (!cycle_allowance_flag)
       {
         boost::add_edge(c,successor,G);
 
@@ -142,9 +142,10 @@ CreateSweepOrder(double polar, double azimuthal,
   {
     if (i==0) sweep_order->spls = new chi_mesh::sweep_management::SPLS;
 
-    int cell_local_id = index_map[*ii];
-    int cell_global_index = grid->local_cell_glob_indices[cell_local_id];
-    sweep_order->spls->item_id.push_back(cell_global_index);
+//    int cell_local_id = index_map[*ii];
+//    int cell_global_index = grid->local_cell_glob_indices[cell_local_id];
+//    sweep_order->spls->item_id.push_back(cell_global_index);
+    sweep_order->spls->item_id.push_back(index_map[*ii]);
     ++i;
   }
 
@@ -200,13 +201,12 @@ CreateSweepOrder(double polar, double azimuthal,
     << " Removing intra-cellset cycles.";
 
   const bool ALLOW_RECURSIVE_SEARCH = true;
+  const bool DONT_ALLOW_RECURSIVE_SEARCH = false;
 
-  if (allow_cycles)
-  {
-    RemoveGlobalCyclicDependencies(sweep_order,global_dependencies);
-    RemoveGlobalCyclicDependencies(sweep_order,global_dependencies,
-                                   ALLOW_RECURSIVE_SEARCH);
-  }//if cycles allowed
+  RemoveGlobalCyclicDependencies(sweep_order, global_dependencies,
+                                 DONT_ALLOW_RECURSIVE_SEARCH, cycle_allowance_flag);
+  RemoveGlobalCyclicDependencies(sweep_order, global_dependencies,
+                                 ALLOW_RECURSIVE_SEARCH, cycle_allowance_flag);
   MPI_Barrier(MPI_COMM_WORLD);
 
   //====================================== Build task dependency graph
@@ -256,7 +256,8 @@ CreateSweepOrder(double polar, double azimuthal,
   try {
     boost::topological_sort(TDG, std::back_inserter(glob_sorted_list));
   }
-  catch (const boost::bad_graph& exc)
+//  catch (const boost::bad_graph& exc)
+  catch(...)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Cyclic global sweep ordering detected.";

@@ -123,6 +123,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                                   int group,
                                                   int moment)
 {
+  int cell_local_id = grid->cells[cell_glob_index]->cell_local_id;
   if (mat_id<0)
   {
     chi_log.Log(LOG_0ERROR)
@@ -304,7 +305,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -313,7 +314,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  group-gi,moment,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -329,7 +331,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }
@@ -387,7 +389,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -396,7 +398,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -412,7 +415,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }
@@ -470,7 +473,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -479,7 +482,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -495,7 +499,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }

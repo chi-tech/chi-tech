@@ -27,14 +27,14 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
   {
     chi_mesh::CellFace& face = poly_cell->faces[side];
 
-    chi_mesh::Vertex v0 = *vol_continuum->nodes[face.vertex_ids[0]];
-    chi_mesh::Vertex v1 = *vol_continuum->nodes[face.vertex_ids[1]];
+    chi_mesh::Vertex v0 = *vol_continuum->vertices[face.vertex_ids[0]];
+    chi_mesh::Vertex v1 = *vol_continuum->vertices[face.vertex_ids[1]];
     chi_mesh::Vertex v2 = vc;
 //
 //    std::cout<< v0.PrintS() << "\n";
 
-    chi_mesh::Vector sidev01 = v1-v0;
-    chi_mesh::Vector sidev02 = v2-v0;
+    chi_mesh::Vector3 sidev01 = v1 - v0;
+    chi_mesh::Vector3 sidev02 = v2 - v0;
 
 //    v01.push_back(sidev01);
 //    v02.push_back(sidev02);

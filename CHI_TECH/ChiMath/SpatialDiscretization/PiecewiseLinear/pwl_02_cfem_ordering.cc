@@ -22,18 +22,15 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //                                                   exclusive + non-exclusive
   //                                                   nodes
   std::set<int> exnonex_nodes_set;
-  for (auto& cell_glob_index : grid->local_cell_glob_indices)
-  {
-    auto cell = grid->cells[cell_glob_index];
-
-    for (auto& vid : cell->vertex_ids)
+  for (auto& cell : grid->local_cells)
+    for (auto& vid : cell.vertex_ids)
       exnonex_nodes_set.insert(vid);
-  }
 
   //================================================== Copy set into vector
   std::vector<int> exnonex_nodes;
   for (auto& vid : exnonex_nodes_set)
     exnonex_nodes.push_back(vid);
+
   chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 0 time: "
                               << t_stage[0].GetTime()/1000.0;
 
@@ -46,20 +43,16 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //================================================== Determine ghost flags
   //Run through each cell and for each local nodes deterime
   //if the nodes are ghosts to another location
-  for (auto& cell_glob_index : grid->local_cell_glob_indices)
+  for (auto& cell : grid->local_cells)
   {
-    auto cell = grid->cells[cell_glob_index];
-
-    for (size_t f=0; f < cell->faces.size(); f++)
+    for (size_t f=0; f < cell.faces.size(); f++)
     {
-      if (cell->faces[f].neighbor >= 0)
+      auto& face = cell.faces[f];
+      if (face.neighbor >= 0)
       {
-        int adj_cell_ind = cell->faces[f].neighbor;
-        auto adj_cell = grid->cells[adj_cell_ind];
-
-        if (adj_cell->partition_id != cell->partition_id)
+        if (face.GetNeighborPartitionID(grid) != cell.partition_id)
         {
-          for (auto v_index : cell->faces[f].vertex_ids)
+          for (auto v_index : face.vertex_ids)
           {
             int v_setind =
               (int)std::distance(exnonex_nodes.begin(),
@@ -355,7 +348,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //                                                   ordering
   //Initially this is just pass through
   std::vector<int> node_ordering;
-  int num_nodes = grid->nodes.size();
+  int num_nodes = grid->vertices.size();
   node_ordering.resize(num_nodes,-1);
 
 
@@ -402,5 +395,5 @@ std::pair<int,int> SpatialDiscretization_PWL::
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
-  return {local_from,local_to};
+  return {local_to - local_from + 1,grid->vertices.size()};
 }

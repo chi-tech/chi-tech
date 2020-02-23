@@ -1,34 +1,32 @@
-#include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell.h>
+#include "chi_meshcontinuum.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "chi_log.h"
 
 extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 
 //###################################################################
-/**Initializes communicators*/
-void LinearBoltzman::Solver::InitializeCommunicators()
+/***/
+ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 {
+  //================================================== Check if already avail
+  if (communicators_available)
+    return commicator_set;
+
+  //================================================== Build the communicator
   std::set<int>    local_graph_edges;
   std::vector<int> local_connections;
 
   //================================================== Loop over local cells
   //Populate local_graph_edges
   local_graph_edges.insert(chi_mpi.location_id); //add current location
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (auto& cell : local_cells)
   {
-    int cell_glob_index = grid->local_cell_glob_indices[c];
-    auto cell           = grid->cells[cell_glob_index];
-
-    for (int f=0; f < cell->faces.size(); f++)
+    for (auto& face : cell.faces)
     {
-      int neighbor = cell->faces[f].neighbor;
-
-      if (neighbor>=0)
+      if (face.neighbor>=0)
       {
-        auto adj_cell = grid->cells[neighbor];
+        auto adj_cell = cells[face.neighbor];
 
         if (adj_cell->partition_id != chi_mpi.location_id)
         {
@@ -49,7 +47,7 @@ void LinearBoltzman::Solver::InitializeCommunicators()
   }
 
   //============================================= Broadcast local connection size
-  chi_log.Log(LOG_0)
+  chi_log.Log(LOG_0VERBOSE_1)
     << "Communicating local connections.";
 
   std::vector<std::vector<int>> global_graph(chi_mpi.process_count,
@@ -86,42 +84,44 @@ void LinearBoltzman::Solver::InitializeCommunicators()
               MPI_INT,locI,MPI_COMM_WORLD);
   }
 
-  chi_log.Log(LOG_0)
+  chi_log.Log(LOG_0VERBOSE_1)
     << "Done communicating local connections.";
 
 
   //============================================= Build groups
-  MPI_Comm_group(MPI_COMM_WORLD,&comm_set.world_group);
-  comm_set.location_groups.resize(chi_mpi.process_count,MPI_Group());
+  MPI_Comm_group(MPI_COMM_WORLD,&commicator_set.world_group);
+  commicator_set.location_groups.resize(chi_mpi.process_count,MPI_Group());
 
   for (int locI=0;locI<chi_mpi.process_count; locI++)
   {
-    MPI_Group_incl(comm_set.world_group,
+    MPI_Group_incl(commicator_set.world_group,
                    global_graph[locI].size(),
                    global_graph[locI].data(),
-                   &comm_set.location_groups[locI]);
+                   &commicator_set.location_groups[locI]);
   }
 
   //============================================= Build communicators
-  chi_log.Log(LOG_0)
+  chi_log.Log(LOG_0VERBOSE_1)
     << "Building communicators.";
-  comm_set.communicators.resize(chi_mpi.process_count,MPI_Comm());
+  commicator_set.communicators.resize(chi_mpi.process_count,MPI_Comm());
 
   for (int locI=0;locI<chi_mpi.process_count; locI++)
   {
     int err = MPI_Comm_create_group(MPI_COMM_WORLD,
-                                    comm_set.location_groups[locI],
+                                    commicator_set.location_groups[locI],
                                     0, //tag
-                                    &comm_set.communicators[locI]);
+                                    &commicator_set.communicators[locI]);
 
-    if (!(err == MPI_SUCCESS))
+    if (err != MPI_SUCCESS)
     {
-      chi_log.Log(LOG_ALL)
+      chi_log.Log(LOG_0VERBOSE_1)
         << "Communicator creation failed.";
     }
   }
 
-  chi_log.Log(LOG_0)
+  chi_log.Log(LOG_0VERBOSE_1)
     << "Done building communicators.";
 
+  communicators_available = true;
+  return commicator_set;
 }

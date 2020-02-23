@@ -32,23 +32,17 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
   //================================================== Get reference to continuum
   auto handler = chi_mesh::GetCurrentHandler();
   auto region  = handler->region_stack.back();
-  auto vol_continuum = region->volume_mesh_continua.back();
+  auto grid = region->GetGrid();
 
   //================================================== Get local DOF count
-  pwld_local_dof_count=0;
-  size_t num_loc_cells = vol_continuum->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_loc_cells; lc++)
-  {
-    int cell_glob_index = vol_continuum->local_cell_glob_indices[lc];
-    auto cell = vol_continuum->cells[cell_glob_index];
-
-    pwld_local_dof_count += cell->vertex_ids.size();
-  }
+  local_dof_count=0;
+  for (const auto& cell : grid->local_cells)
+    local_dof_count += cell.vertex_ids.size();
 
   //================================================== Get global DOF count
-  pwld_global_dof_count=0;
-  MPI_Allreduce(&pwld_local_dof_count,    //Send buffer
-                &pwld_global_dof_count,   //Recv buffer
+  global_dof_count=0;
+  MPI_Allreduce(&local_dof_count,    //Send buffer
+                &global_dof_count,   //Recv buffer
                 1,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
 
   //================================================== Ring communicate DOF start
@@ -64,7 +58,7 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
 
   if (chi_mpi.location_id != (chi_mpi.process_count-1))
   {
-    int next_loc_start = pwld_local_dof_start+pwld_local_dof_count;
+    int next_loc_start = pwld_local_dof_start + local_dof_count;
     MPI_Send(&next_loc_start,
              1,MPI_INT,
              chi_mpi.location_id+1,
@@ -73,10 +67,10 @@ void chi_diffusion::Solver::ReorderNodesPWLD()
   }
 
   chi_log.Log(LOG_ALLVERBOSE_2)
-   << "Local dof count, start, total "
-   << pwld_local_dof_count << " "
-   << pwld_local_dof_start << " "
-   << pwld_global_dof_count;
+    << "Local dof count, start, total "
+    << local_dof_count << " "
+    << pwld_local_dof_start << " "
+    << global_dof_count;
 
 }
 
@@ -153,8 +147,8 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
     int v0i = face.vertex_ids[0];
     int v1i = face.vertex_ids[1];
 
-    chi_mesh::Vertex& v0 = *grid->nodes[v0i];
-    chi_mesh::Vertex& v1 = *grid->nodes[v1i];
+    chi_mesh::Vertex& v0 = *grid->vertices[v0i];
+    chi_mesh::Vertex& v1 = *grid->vertices[v1i];
 
     double perimeter = (v1 - v0).Norm();
 
@@ -388,10 +382,10 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
-    chi_mesh::Vector vc;
+    chi_mesh::Vector3 vc;
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      vc = vc + *grid->vertices[cell_info->v_indices[v]];
       cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
@@ -417,10 +411,10 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
-    chi_mesh::Vector vc;
+    chi_mesh::Vector3 vc;
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      vc = vc + *grid->vertices[cell_info->v_indices[v]];
       cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
@@ -449,10 +443,10 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
-    chi_mesh::Vector vc;
+    chi_mesh::Vector3 vc;
     for (int v=0; v<cell_info->cell_dof_count; v++)
     {
-      vc = vc + *grid->nodes[cell_info->v_indices[v]];
+      vc = vc + *grid->vertices[cell_info->v_indices[v]];
       cell->vertex_ids.push_back(cell_info->v_indices[v]);
     }
     cell->centroid = vc/cell_info->cell_dof_count;
@@ -464,16 +458,16 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
       for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
       {
         cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
-        vfc = vfc + *grid->nodes[cell_info->face_v_indices[f][fv]];
+        vfc = vfc + *grid->vertices[cell_info->face_v_indices[f][fv]];
       }
       vfc = vfc/cell_info->face_v_indices[f].size();
       cell->faces[f].centroid = vfc;
 
-      chi_mesh::Vector v0fc = vfc - *grid->nodes[cell_info->face_v_indices[f][0]];
-      chi_mesh::Vector v01 = *grid->nodes[cell_info->face_v_indices[f][1]] -
-                             *grid->nodes[cell_info->face_v_indices[f][0]];
+      chi_mesh::Vector3 v0fc = vfc - *grid->vertices[cell_info->face_v_indices[f][0]];
+      chi_mesh::Vector3 v01 = *grid->vertices[cell_info->face_v_indices[f][1]] -
+                              *grid->vertices[cell_info->face_v_indices[f][0]];
 
-      chi_mesh::Vector n = v01.Cross(v0fc);
+      chi_mesh::Vector3 n = v01.Cross(v0fc);
       cell->faces[f].normal = n/n.Norm();
 
     }//for f

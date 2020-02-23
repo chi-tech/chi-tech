@@ -17,12 +17,12 @@ struct chi_mesh::Matrix3x3
     vals[6] = 0.0; vals[7] = 0.0; vals[8] = 0.0;
   }
 
-  static Matrix3x3 MakeRotationMatrixFromVector(const Vector& vec)
+  static Matrix3x3 MakeRotationMatrixFromVector(const Vector3& vec)
   {
     chi_mesh::Matrix3x3 R;
 
-    chi_mesh::Vector n = vec;
-    chi_mesh::Vector khat(0.0,0.0,1.0);
+    chi_mesh::Vector3 n = vec;
+    chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
     if      (n.Dot(khat) >  0.9999999)
       R.SetDiagonalVec(1.0,1.0,1.0);
@@ -30,10 +30,10 @@ struct chi_mesh::Matrix3x3
       R.SetDiagonalVec(1.0,1.0,-1.0);
     else
     {
-      chi_mesh::Vector binorm = khat.Cross(n);
+      chi_mesh::Vector3 binorm = khat.Cross(n);
       binorm = binorm/binorm.Norm();
 
-      chi_mesh::Vector tangent = binorm.Cross(n);
+      chi_mesh::Vector3 tangent = binorm.Cross(n);
       tangent = tangent/tangent.Norm();
 
       R.SetColJVec(0,tangent);
@@ -81,7 +81,7 @@ struct chi_mesh::Matrix3x3
   }
 
   /**Matrix multiply with vector.*/
-  Vector operator*(const Vector& vec)
+  Vector3 operator*(const Vector3& vec)
   {
     double i_vec[] = {vec.x,vec.y,vec.z};
     double o_vec[] = {0.0,0.0,0.0};
@@ -93,7 +93,7 @@ struct chi_mesh::Matrix3x3
         o_vec[i] += this->GetIJ(i,j)*i_vec[j];
       }
     }
-    Vector oV(o_vec[0],o_vec[1],o_vec[2]);
+    Vector3 oV(o_vec[0], o_vec[1], o_vec[2]);
     return oV;
   }
 
@@ -119,7 +119,7 @@ struct chi_mesh::Matrix3x3
   }
 
   /**Set row i using a vector.*/
-  void SetRowIVec(int i, Vector vec)
+  void SetRowIVec(int i, Vector3 vec)
   {
     vals[0 + 3*i] = vec.x;
     vals[1 + 3*i] = vec.y;
@@ -127,7 +127,7 @@ struct chi_mesh::Matrix3x3
   }
 
   /**Set column j using a vector.*/
-  void SetColJVec(int j, Vector vec)
+  void SetColJVec(int j, Vector3 vec)
   {
     vals[j + 3*0] = vec.x;
     vals[j + 3*1] = vec.y;

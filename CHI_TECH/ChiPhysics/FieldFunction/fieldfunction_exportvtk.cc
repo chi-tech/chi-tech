@@ -15,8 +15,8 @@ extern ChiMPI chi_mpi;
 /**Exports a field function to VTK format.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTK(std::string base_name,
-                                             std::string field_name)
+void chi_physics::FieldFunction::ExportToVTK(const std::string& base_name,
+                                             const std::string& field_name)
 {
   chi_log.Log(LOG_0)
     << "Exporting field function " << text_name
@@ -37,8 +37,8 @@ void chi_physics::FieldFunction::ExportToVTK(std::string base_name,
  * available groups.
  *
  * */
-void chi_physics::FieldFunction::ExportToVTKG(std::string base_name,
-                                             std::string field_name)
+void chi_physics::FieldFunction::ExportToVTKG(const std::string& base_name,
+                                              const std::string& field_name)
 {
   chi_log.Log(LOG_0)
     << "Exporting field function " << text_name

@@ -33,6 +33,10 @@ RegisterFunction(chiCreateProductQuadrature)
     RegisterConstant(CUSTOM_QUADRATURE,          5);
 RegisterFunction(chiGetProductQuadrature)
 
+//module:Mesh Macros
+RegisterFunction(chiMeshCreate1DSlabMesh)
+RegisterFunction(chiMeshCreate2DOrthoMesh)
+RegisterFunction(chiMeshCreate3DOrthoMesh)
 
 
 //module:Mesh Utilities
@@ -63,6 +67,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiRegionExportMeshToVTK)
 //  SurfaceMesh
     RegisterFunction(chiSurfaceMeshCreate)
+    RegisterFunction(chiSurfaceMeshCreateFromArrays)
     RegisterFunction(chiSurfaceMeshImportFromOBJFile)
     RegisterFunction(chiSurfaceMeshImportFromTriangleFiles)
     RegisterFunction(chiSurfaceMeshExportToObj)

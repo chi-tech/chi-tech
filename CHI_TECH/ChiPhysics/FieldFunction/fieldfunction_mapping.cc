@@ -17,8 +17,8 @@ std::vector<double>& chi_physics::FieldFunction::
   }
   else
   {
-    auto cell = grid->cells[grid->local_cell_glob_indices[cell_local_id]];
-    int num_dofs = cell->vertex_ids.size();
+    auto cell = grid->local_cells[cell_local_id];
+    int num_dofs = cell.vertex_ids.size();
 
     temp_cell_dof_values.resize(num_dofs,0.0);
 

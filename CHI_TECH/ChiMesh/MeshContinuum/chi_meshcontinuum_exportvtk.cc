@@ -39,12 +39,12 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
   vtkSmartPointer<vtkPoints> points =
     vtkSmartPointer<vtkPoints>::New();
 
-  for (int v=0; v<nodes.size(); v++)
+  for (int v=0; v < vertices.size(); v++)
   {
     std::vector<double> d_node;
-    d_node.push_back(nodes[v]->x);
-    d_node.push_back(nodes[v]->y);
-    d_node.push_back(nodes[v]->z);
+    d_node.push_back(vertices[v]->x);
+    d_node.push_back(vertices[v]->y);
+    d_node.push_back(vertices[v]->z);
 
     d_nodes.push_back(d_node);
 

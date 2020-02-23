@@ -25,7 +25,7 @@ public:
     type_index = 0;
   }
 
-  virtual bool Inside(chi_mesh::Vector point)
+  virtual bool Inside(chi_mesh::Vector3 point)
   {
     return false;
   }
@@ -60,7 +60,7 @@ public:
     z0 = in_z;
   }
 
-  bool Inside(chi_mesh::Vector point)
+  bool Inside(chi_mesh::Vector3 point)
   {
     double dx = point.x - x0;
     double dy = point.y - y0;
@@ -102,7 +102,7 @@ public:
     zmin = z0; zmax = z1;
   }
 
-  bool Inside(chi_mesh::Vector point)
+  bool Inside(chi_mesh::Vector3 point)
   {
     if ((point.x <= xmax) && (point.x >= xmin) &&
         (point.y <= ymax) && (point.y >= ymin) &&
@@ -145,21 +145,21 @@ public:
     r = ir;
   }
 
-  bool Inside(chi_mesh::Vector p1)
+  bool Inside(chi_mesh::Vector3 p1)
   {
-    chi_mesh::Vector p0(x0,y0,z0);
-    chi_mesh::Vector vd(vx,vy,vz);
-    chi_mesh::Vector k(0.0,0.0,1.0);
+    chi_mesh::Vector3 p0(x0, y0, z0);
+    chi_mesh::Vector3 vd(vx, vy, vz);
+    chi_mesh::Vector3 k(0.0, 0.0, 1.0);
 
-    chi_mesh::Vector p01 = p1-p0;
+    chi_mesh::Vector3 p01 = p1 - p0;
 
     //====================================== Building rotation matrix
-    chi_mesh::Vector binorm;
-    chi_mesh::Vector tangent;
+    chi_mesh::Vector3 binorm;
+    chi_mesh::Vector3 tangent;
     if (abs(vd.Dot(k)/vd.Norm())>(1.0-1.0e-12))
     {
-      binorm = chi_mesh::Vector(0.0,1.0,0.0);
-      tangent = chi_mesh::Vector(1.0,0.0,0.0);
+      binorm = chi_mesh::Vector3(0.0, 1.0, 0.0);
+      tangent = chi_mesh::Vector3(1.0, 0.0, 0.0);
     }
     else
     {
@@ -177,7 +177,7 @@ public:
 
     //====================================== Rotate point to ref coords
     chi_mesh::Matrix3x3 Rinv = R.Inverse();
-    chi_mesh::Vector p01T = Rinv*p01;
+    chi_mesh::Vector3 p01T = Rinv * p01;
 
     chi_log.Log(LOG_0) << "Inverted p: \n" << p01T.PrintS();
 
@@ -212,13 +212,13 @@ public:
 
   SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh* in_surf_mesh);
 
-  bool Inside(chi_mesh::Vector point);
+  bool Inside(chi_mesh::Vector3 point);
 private:
   bool CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                               chi_mesh::Vector plane_point,
-                               chi_mesh::Vector line_point_0,
-                               chi_mesh::Vector line_point_1,
-                               chi_mesh::Vector& intersection_point,
+                               chi_mesh::Vector3 plane_point,
+                               chi_mesh::Vector3 line_point_0,
+                               chi_mesh::Vector3 line_point_1,
+                               chi_mesh::Vector3& intersection_point,
                                std::pair<double,double>& weights);
 };
 
@@ -230,7 +230,7 @@ class chi_mesh::BooleanLogicalVolume : public LogicalVolume
 public:
   std::vector<std::pair<bool,LogicalVolume*>> parts;
 
-  bool Inside(chi_mesh::Vector point)
+  bool Inside(chi_mesh::Vector3 point)
   {
     for (int p=0;p<parts.size();p++)
     {

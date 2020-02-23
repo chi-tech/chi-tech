@@ -1,15 +1,7 @@
 #include"spatial_discretization.h"
 
 void SpatialDiscretization::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* vol_continuum,
-  int num_cells,
-  int* cell_indices)
-{
-  //This function is meant to be overwritten
-}
-
-void SpatialDiscretization::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* vol_continuum)
+  chi_mesh::MeshContinuum* grid)
 {
   //This function is meant to be overwritten
 }
