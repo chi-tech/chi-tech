@@ -5,6 +5,8 @@
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include <ChiPhysics/chi_physics.h>
 
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+
 #include <chi_log.h>
 #include <chi_mpi.h>
 
@@ -33,23 +35,10 @@ extern ChiPhysics chi_physics_handler;
 /**On hold*/
 void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 {
-  //============================================= Assemble nodes
   std::vector<std::vector<double>>    d_nodes;
 
   vtkSmartPointer<vtkPoints> points =
     vtkSmartPointer<vtkPoints>::New();
-
-  for (int v=0; v < vertices.size(); v++)
-  {
-    std::vector<double> d_node;
-    d_node.push_back(vertices[v]->x);
-    d_node.push_back(vertices[v]->y);
-    d_node.push_back(vertices[v]->z);
-
-    d_nodes.push_back(d_node);
-
-    points->InsertPoint(v,d_node.data());
-  }
 
   //============================================= Init grid and material name
   vtkUnstructuredGrid* ugrid;
@@ -62,62 +51,96 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
   pararray = vtkIntArray::New();
   pararray->SetName("Partition");
 
-  ugrid->SetPoints(points);
+  //======================================== Precreate nodes to map
+  std::vector<int> cfem_nodes;
+
+  auto grid = this;
+
+  for (const auto& cell : grid->local_cells)
+    for (auto vid : cell.vertex_ids)
+      cfem_nodes.push_back(vid);
 
   //======================================== Populate cell information
-  int num_loc_cells = local_cell_glob_indices.size();
-  for (int lc=0; lc<num_loc_cells; lc++)
+  int nc=0;
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_ind = local_cell_glob_indices[lc];
-    auto cell = cells[cell_g_ind];
-
-    int mat_id = cell->material_id;
+    int mat_id = cell.material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
+    if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
+      auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
-      std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->vertex_ids[0]);
-      cell_info.push_back(slab_cell->vertex_ids[1]);
+      int num_verts = 2;
+      std::vector<vtkIdType> cell_info(num_verts);
+      for (int v=0; v<num_verts; v++)
+      {
+        int vgi = slab_cell->vertex_ids[v];
+        std::vector<double> d_node(3);
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
+
+
+        points->InsertPoint(nc,d_node.data());
+        cell_info[v] = nc; nc++;
+      }
 
       ugrid->
         InsertNextCell(VTK_LINE,2,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
+
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    if (cell->Type() == chi_mesh::CellType::POLYGON)
+    if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-
-      std::vector<vtkIdType> cell_info;
+      auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
       int num_verts = poly_cell->vertex_ids.size();
+      std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->vertex_ids[v]);
+      {
+        int vgi = poly_cell->vertex_ids[v];
+        std::vector<double> d_node(3);
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
+
+        points->InsertPoint(nc,d_node.data());
+        cell_info[v] = nc; nc++;
+      }
 
       ugrid->
         InsertNextCell(VTK_POLYGON,num_verts,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
+
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+    if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->vertex_ids[v];
+      {
+        int vgi = polyh_cell->vertex_ids[v];
+        std::vector<double> d_node(3);
+        d_node[0] = grid->vertices[vgi]->x;
+        d_node[1] = grid->vertices[vgi]->y;
+        d_node[2] = grid->vertices[vgi]->z;
+
+        points->InsertPoint(nc,d_node.data());
+        cell_info[v] = nc; nc++;
+      }
 
       vtkSmartPointer<vtkCellArray> faces =
         vtkSmartPointer<vtkCellArray>::New();
@@ -128,7 +151,17 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
         int num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f].vertex_ids[fv];
+        {
+          int v = -1;
+          for (int vr=0; vr<cell.vertex_ids.size(); ++vr)
+            if (polyh_cell->faces[f].vertex_ids[fv] ==
+                cell.vertex_ids[vr])
+            {
+              v = vr; break;
+            }
+          face[fv] = cell_info[v];
+        }
+
 
         faces->InsertNextCell(num_fverts,face.data());
       }//for f
@@ -138,9 +171,11 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
                        cell_info.data(),num_faces,faces->GetPointer());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell->partition_id);
+      pararray->InsertNextValue(cell.partition_id);
     }//polyhedron
   }//for local cells
+
+  ugrid->SetPoints(points);
 
   //============================================= Construct file name
   std::string base_filename     = std::string(baseName);
@@ -165,59 +200,44 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
   if (chi_mpi.location_id == 0)
   {
     std::string summary_file_name = base_filename + std::string(".pvtu");
-    vtkXMLPUnstructuredGridWriter* pgrid_writer =
-      vtkXMLPUnstructuredGridWriter::New();
-
-    pgrid_writer->SetInputData(ugrid);
-    pgrid_writer->SetFileName(summary_file_name.c_str());
-
-    pgrid_writer->SetNumberOfPieces(chi_mpi.process_count);
-    pgrid_writer->SetStartPiece(0);
-    pgrid_writer->SetEndPiece(0);
-
-    pgrid_writer->Write();
-
-    //=========================================== Modify summary file
-    std::vector<std::string> file_lines;
-
-    std::ifstream summary_file;
-    summary_file.open(summary_file_name);
-    char rawline[250];
-
-    while (!summary_file.eof())
-    {
-      summary_file.getline(rawline,250);
-      std::string file_line(rawline);
-      file_lines.push_back(file_line);
-
-      size_t piece_tag = file_line.find("Piece");
-
-      if (piece_tag != std::string::npos)
-      {
-        for (int p=1; p<chi_mpi.process_count; p++)
-        {
-          std::string piece =
-            file_line.substr(0,piece_tag) +
-            std::string("Piece Source=\"") +
-            base_filename +
-            std::string("_") +
-            std::to_string(p) +
-            std::string(".vtu\"/>");
-          file_lines.push_back(piece);
-        }
-      }
-
-    }
-
-    summary_file.close();
-
     std::ofstream ofile;
     ofile.open(summary_file_name);
 
-    for (int l=0; l<file_lines.size(); l++)
+    ofile << "<?xml version=\"1.0\"?>" << std::endl;
+    ofile << "<!--" << std::endl;
+    ofile << "#Unstructured Mesh" << std::endl;
+    ofile << "-->" << std::endl;
+    ofile << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" "
+          << "byte_order=\"LittleEndian\">" << std::endl;
+    ofile << "  <PUnstructuredGrid GhostLevel=\"0\">" << std::endl;
+    ofile << "    <PCellData Scalars=\"scalars\">" << std::endl;
+    ofile << "      <PDataArray type=\"Int32\" Name=\"Material\" "
+          << " format=\"ascii\"/>" << std::endl;
+    ofile << "      <PDataArray type=\"Int32\" Name=\"Partition\""
+          << " format=\"ascii\"/>" << std::endl;
+
+    ofile << "    </PCellData>" << std::endl;
+    ofile << "    <PPoints>" << std::endl;
+    ofile << "      <PDataArray type=\"Float32\" NumberOfComponents=\"3\"/>" << std::endl;
+    ofile << "    </PPoints>" << std::endl;
+
+    bool is_global_mesh =
+      chi_mesh::GetCurrentHandler()->volume_mesher->options.mesh_global;
+
+    for (int p=0; p<chi_mpi.process_count; p++)
     {
-      ofile << file_lines[l] << "\n";
+      if (is_global_mesh and p!=0) continue;
+
+      ofile << "      <Piece Source=\""
+            << base_filename +
+               std::string("_") +
+               std::to_string(p) +
+               std::string(".vtu")
+            << "\"/>" << std::endl;
     }
+
+    ofile << "  </PUnstructuredGrid>" << std::endl;
+    ofile << "</VTKFile>" << std::endl;
 
     ofile.close();
   }

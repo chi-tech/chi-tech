@@ -25,7 +25,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
   std::vector<double> q(fe_view->dofs,1.0);
   std::vector<double> siga(fe_view->dofs,0.0);
 
-  GetMaterialProperties(mat_id,cell_glob_index,fe_view->dofs,D,q,siga,group);
+  GetMaterialProperties(mat_id,cell,fe_view->dofs,D,q,siga,group);
 
   //======================================== Init cell matrix info
   typedef std::vector<double> Row;
@@ -59,9 +59,9 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
   }//for i
   dof_global_col_ind = dof_global_row_ind;
 
-  //======================================== Apply Dirichlet,Vacuum, Neumann and
-  //                                         Robin BCs
-  // Dirichlets are just collected
+//  //======================================== Apply Dirichlet,Vacuum, Neumann and
+//  //                                         Robin BCs
+//  // Dirichlets are just collected
   std::vector<int>    dirichlet_count(fe_view->dofs,0);
   std::vector<double> dirichlet_value(fe_view->dofs,0.0);
   for (int f=0; f<cell->faces.size(); f++)

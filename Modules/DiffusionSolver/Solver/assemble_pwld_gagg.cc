@@ -28,7 +28,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
     std::vector<double> q(fe_view->dofs,1.0);
     std::vector<double> siga(fe_view->dofs,1.0);
 
-    GetMaterialProperties(mat_id,cell_glob_index,fe_view->dofs,D,q,siga,gi+gr);
+    GetMaterialProperties(mat_id,cell,fe_view->dofs,D,q,siga,gi+gr);
 
     //========================================= Loop over DOFs
     for (int i=0; i<fe_view->dofs; i++)
@@ -121,7 +121,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
         std::vector<double> adj_D,adj_Q,adj_sigma;
 
         GetMaterialProperties(adj_cell->material_id,
-                              neighbor,
+                              adj_cell,
                               adj_fe_view->dofs,
                               adj_D,
                               adj_Q,
@@ -383,7 +383,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(
     std::vector<double> q(fe_view->dofs,1.0);
     std::vector<double> siga(fe_view->dofs,1.0);
 
-    GetMaterialProperties(mat_id,cell_glob_index,fe_view->dofs,D,q,siga,gi+gr);
+    GetMaterialProperties(mat_id,cell,fe_view->dofs,D,q,siga,gi+gr);
 
     //========================================= Loop over DOFs
     for (int i=0; i<fe_view->dofs; i++)

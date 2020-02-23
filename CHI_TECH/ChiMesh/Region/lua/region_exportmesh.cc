@@ -157,7 +157,7 @@ int chiRegionExportMeshToVTK(lua_State *L)
   }
   catch(const std::invalid_argument& ia)
   {
-    chi_log.Log(LOG_0ERROR) << "ERROR: Invalid index to region in "
+    chi_log.Log(LOG_ALLERROR) << "ERROR: Invalid index to region in "
                                "chiRegionExportMeshToObj.";
     exit(EXIT_FAILURE);
   }

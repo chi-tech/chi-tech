@@ -13,6 +13,7 @@ bool chi_mesh::CellFace::
   IsNeighborLocal(chi_mesh::MeshContinuum *grid)
 {
   if (neighbor < 0) return false;
+  if (chi_mpi.process_count == 1) return true;
 
   if (not neighbor_partition_id_updated)
   {
@@ -30,6 +31,7 @@ int chi_mesh::CellFace::
   GetNeighborPartitionID(chi_mesh::MeshContinuum *grid)
 {
   if (neighbor < 0) return -1;
+  if (chi_mpi.process_count == 1) return 0;
 
   if (not neighbor_partition_id_updated)
   {
@@ -47,6 +49,7 @@ int chi_mesh::CellFace::
 GetNeighborLocalID(chi_mesh::MeshContinuum *grid)
 {
   if (neighbor < 0) return -1;
+  if (chi_mpi.process_count == 1) return neighbor;
 
   if (not neighbor_local_id_updated)
   {

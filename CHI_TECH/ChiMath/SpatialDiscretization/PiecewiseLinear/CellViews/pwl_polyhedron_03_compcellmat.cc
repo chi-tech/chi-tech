@@ -187,6 +187,15 @@ void PolyhedronFEView::PreCompute()
   } //for face
 
   // ==================================================== Volume integrals
+  IntV_gradShapeI_gradShapeJ.reserve(dofs);
+  IntV_shapeI_gradshapeJ.reserve(dofs);
+  IntV_shapeI_shapeJ.reserve(dofs);
+  IntV_shapeI.reserve(dofs);
+
+//  IntV_gradShapeI_gradShapeJ.push_back(gradijvalue_i);
+//  IntV_shapeI_gradshapeJ.push_back(varphi_i_gradj);
+//  IntV_shapeI_shapeJ.push_back(varphi_i_varphi_j);
+//  IntV_shapeI.push_back(valuei_i);
   for (int i=0; i<dofs; i++)
   {
     std::vector<double> gradijvalue_i(dofs, 0.0);
@@ -251,10 +260,10 @@ void PolyhedronFEView::PreCompute()
         }// for gp
       } // for s
     }// for f
-    IntV_gradShapeI_gradShapeJ.push_back(gradijvalue_i);
-    IntV_shapeI_gradshapeJ.push_back(varphi_i_gradj);
-    IntV_shapeI_shapeJ.push_back(varphi_i_varphi_j);
-    IntV_shapeI.push_back(valuei_i);
+    IntV_gradShapeI_gradShapeJ.push_back(std::move(gradijvalue_i));
+    IntV_shapeI_gradshapeJ.push_back(std::move(varphi_i_gradj));
+    IntV_shapeI_shapeJ.push_back(std::move(varphi_i_varphi_j));
+    IntV_shapeI.push_back(std::move(valuei_i));
 
     //=================================================== Surface integrals
     // Computing
@@ -328,9 +337,9 @@ void PolyhedronFEView::PreCompute()
       }
       varphi_i_surf[f] = f_varphi_i_surf;
     }// for f
-    IntSi_shapeI_shapeJ.push_back(varphi_i_varphi_j_surf);
-    IntSi_shapeI_gradshapeJ.push_back(varphi_i_gradvarphi_j_surf);
-    IntS_shapeI.push_back(varphi_i_surf);
+    IntSi_shapeI_shapeJ.push_back(std::move(varphi_i_varphi_j_surf));
+    IntSi_shapeI_gradshapeJ.push_back(std::move(varphi_i_gradvarphi_j_surf));
+    IntS_shapeI.push_back(std::move(varphi_i_surf));
   }// for i
 
   //====================================== Reindexing surface integrals

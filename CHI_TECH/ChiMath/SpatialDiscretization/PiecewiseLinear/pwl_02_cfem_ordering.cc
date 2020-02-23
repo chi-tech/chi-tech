@@ -395,5 +395,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
+  cfem_local_block_address = local_from;
+
   return {local_to - local_from + 1,grid->vertices.size()};
 }
