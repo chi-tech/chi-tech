@@ -1,14 +1,14 @@
-/** \page Tutorial01 Tutorial 1: Basic Diffusion Simulation (No output)
+/** \page Tutorial01 Tutorial 1: Basic Diffusion Simulation
 
  Let us tackle the basic diffusion equation as applied to steady state heat
- transfer.\n
+ transfer on a 3D orthogonal mesh.\n
  \f[
  \nabla k \nabla T = q
  \f]
 
  The purpose of this tutorial is to understand the basics of the
  input paradigm which is completely different from the traditional
- input-card based paradigm.
+ input-card based method.
  ChiTech uses an imbedded Lua console. For a history of Lua please see its
  wikipedia page
  <a href="https://en.wikipedia.org/wiki/Lua_(programming_language)">here</a>.
@@ -38,106 +38,60 @@ centered on operating on a specific chi_mesh::MeshHandler object. Physics/math
  objects can then freely operate on meshes by simply specifying which handler
  to use.
 
-## Step 3 - Load a 2D surface mesh as template for extrusion
+## Step 3 - Create a 3D mesh
 
- The extrusion mesh generator requires a 2D mesh to generate the actual
- extrusion and this is how to load such a surface. For now we will use
- a test object included in ChiTech, which is an orthogonal grid of 32x32 cells
- (1024 total).
+ For this we will create a simple orthogonal grid of 32x32x32 cells
+ (32,768 total) as shown in Figure 1.
 
 
- \image html "Meshing/SquareMesh2x2Quads.png"  "Figure 1 - Mesh spanning from [-1,-1] to [1,1]" width=350px
+ \image html "Meshing/CubeMeshTut1.png"  "Figure 1 - Mesh spanning from [-1,-1,-1] to [1,1,1]" width=350px
 
+The first step of this process is to define an array of nodes starting from -1.0
+with a distance \f$ ds \f$ between each of them. In lua we can create this array
+programatically:
 \code
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj")
+nodes={}
+N=32
+ds=2.0/N
+for i=0,N do
+    nodes[i+1] = i*ds
+end
 \endcode
 
-The first function call, CHI_LUA::chiSurfaceMeshCreate, returns a handle to an
- unpopulated surface mesh. This handle is essentially a stack index on the
- current mesh handler.
-The second function call, CHI_LUA::chiSurfaceMeshImportFromOBJFile, receives
- as arguments the handle to the empty surface mesh and a filename pointing to
- a
- <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">wavefront</a>
- ".obj" file.
-
-<B>NOTE:</B> File names and paths are relative to where the executable is
- executed. i.e. If you are in your desktop folder then the path will be relative
- to it. Absolute paths can also be specified.
-
-## Step 3 - Create a region and add the surface mesh as a boundary
-
-A region is a weak concept for now but will later be used for transformation
- of meshes and boundaries. Boundaries get added to regions. A surface mesh
- boundary does not have a physical sense when using an extrusion.
- i.e It doesn't define the boundary on that surface. It gets assimilated
- during meshing process.
+Note here that lua arrays cannot use \f$ nodes[0] \f$ since arrays in lua are not
+zero based. The next step is call chiMeshCreate3DOrthoMesh with the node
+arrangement along the X-direction, Y-direction and Z-direction, which in our
+ case is the same,
 
 \code
-region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
+surf_mesh, region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
 \endcode
 
-The first function call, CHI_LUA::chiRegionCreate, returns a handle to an
- empty Region similar to what we used with the surface mesh.
- The second function call, CHI_LUA::chiRegionAddSurfaceBoundary, receives
- as arguments a region handle and a surface mesh handle.
+Some work has been encapsulated behind the scenes here. Firstly, a 2D surface
+mesh was created and assigned to a region.
+Secondly a surface-mesher (chi_mesh::SurfaceMesher)
+ and a volume mesher (chi_mesh::VolumeMesher) has been
+assigned to the mesh handler. The volume mesher is not executed because the
+macro allows the user to first assign parallel partitioning.
 
-## Step 4 - Creating the meshers
-
-Generating meshes in ChiTech follows the same paradigm as Star-CCM+. We first
- execute a surface meshing routing then a volume meshing routine. This is true
- whether you are doing a 1D, 2D or 3D simulation.
-
-\code
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
-\endcode
-
-A surface mesher is created using CHI_LUA::chiSurfaceMesherCreate and for our
-purpose we are using a SURFACEMESHER_PREDEFINED which means we will be using
- predefined 2D cells and therefore will not be creating/modifying the surface
- mesh. The extruder is created with the call to CHI_LUA::chiVolumeMesherCreate
- with a type VOLUMEMESHER_EXTRUDER.
-
-## Step 5 - Setup extrusion layers
-
-Extrusion layers are needed by the extruder to define the 3D meshes. By default
-a single layer of height 1.0 will be used provided that the user does not
- provide layer information.
+## Step 4 -  Executing the mesher
+The underlying mesher for a 3D mesh is an extruded mesh from 2D. This mesh
+ has some partitioning properties that can be set to allow parallel simulations,
+ however, we will just focus on serial simulations for now.
+ The next step to complete meshing is to execute the volume mesher. Since we
+ are not going to set any partitioning parameters we will just execute it now.
 
 \code
-subdivisions=3
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,3.0,subdivisions,"My Layer");
-\endcode
-
-Extrusion layers are handled as a property of the extruder mesh and hence they
- are specified with a call to CHI_LUA::chiVolumeMesherSetProperty. It requires
- as arguments firstly the property index, which for this case is,
- EXTRUSION_LAYER, followed by the height of this layer (3.0), the number
- of sub-divisions, and a name for the layer.
- At this moment the name is of no
- physical meaning other than to help the user organize.
-
-## Step 6 - Execute the meshers
-
-By executing the meshers we create the geometry of the mesh. All material id's
- will be empty (-1) but the mesh can be visualized for error checking.
-
-\code
-chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 \endcode
 
-
-## Step 7 - Assign material ID's
+## Step 5 - Assign material ID's
 
 Materials ID's can conveniently be specified using logical volumes. There are
 many options for logical volumes ranging from primitive parametric surfaces
- to non-convex user generated surfaces using surface meshes. For this tutorial
- we will use a rectangular paralellipiped (brick) as follows.
+ to non-convex user generated surfaces using surface meshes
+ (see chiLogicalVolumeCreate). For this tutorial
+ we will use a rectangular paralellipiped (RPP or brick) as follows.
 
 \code
 material = chiPhysicsAddMaterial("Test Material");
@@ -169,9 +123,7 @@ The user can even export the mesh for visualization using the function
  chiRegionExportMeshToObj(). The extruded mesh is shown below:
 
 
-\image html "Meshing/SquareMeshExtruded.png"  "Figure 2 - Extruded mesh" width=350px
-
-## Step 8 - Adding material properties
+## Step 5 - Adding material properties
 
 Now that the cells have been assigned a material id we need to add
  properties to the material conducive to a diffusion simulation. For a heat
@@ -201,7 +153,7 @@ Material property values are set using the function
  future the user can specify, as an example, temperature dependent values which
  will support the operation FROM_TABLE, but that is a topic for a different time.
 
-## Step 9 - Setup the diffusion physics
+## Step 6 - Setup the diffusion physics
 
 The following sequence of function calls completely define the diffusion solver.
 
@@ -222,7 +174,7 @@ We first create the diffusion solver with a call to
 Next we can set numerous diffusion solver properties which can comprehensively
  viewed in its specific documentation (CHI_LUA::chiDiffusionSetProperty).
 
-## Step 10 - Initialize and Solve
+## Step 7 - Initialize and Solve
 
 The final step of this process is to initialize and execute the diffusion solver.
 
@@ -230,6 +182,20 @@ The final step of this process is to initialize and execute the diffusion solver
 chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
 \endcode
+
+## Step 8 - Post-processing
+The execution of a Chi-Tech physics module culminates in the creation of one or
+ more field functions. These field functions should all be populated for use
+ during the initialization phase of the solver. Users can get handles to all
+ the field functions by using the chiGetFieldFunctionList call. Thereafter, the
+ field function can be exported to VTK-format which can be read by Paraview.
+
+\code
+fflist,count = chiGetFieldFunctionList(phys1)
+chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")
+\endcode
+
+
 
 ## Complete input file
 
@@ -291,7 +257,7 @@ chiDiffusionExecute(phys1)
 \endcode
 
 
-## Step 11 - Execute the code
+## Step 9 - Execute the code
 Assuming you added the executable to your PATH environment variable, the code
 can be executed by typing the executable name followed by the input file path
  (relative or absolute).
@@ -303,49 +269,56 @@ ChiTech Tutorial01.lua
 The output produced will look as follows:
 
 \verbatim
-[0]  2020-01-08 13:30:30 Running ChiTech in batch-mode with 1 processes.
+[0]  2020-02-23 16:53:20 Running ChiTech in batch-mode with 1 processes.
 [0]  ChiTech number of arguments supplied: 1
-[0]  Surface mesh loaded with 0 triangle faces and 1024 polygon faces.
-[0]  00:00:00 VolumeMesherExtruder executed. Memory in use = 12.3516 MB
-[0]  VolumeMesherExtruder: Total number of cell layers is 3
+[0]  00:00:00 VolumeMesherExtruder executed. Memory in use = 12.3594 MB
+[0]  VolumeMesherExtruder: Total number of cell layers is 32
 [0]  VolumeMesherExtruder: Extruding cells
-[0]  VolumeMesherExtruder: Cells extruded = 3072
-[0]  VolumeMesherExtruder: Number of cells in region = 3072
-[0]  VolumeMesherExtruder: Number of nodes in region = 4356
-[0]  00:00:00 chiVolumeMesherExecute: Volume meshing completed. Memory used = 3.49 MB
-[0]  Total process memory used after meshing 15.8 MB
+[0]  VolumeMesherExtruder: Cells extruded = 32768
+[0]  VolumeMesherExtruder: Number of cells in region = 32768
+[0]  VolumeMesherExtruder: Number of nodes in region = 35937
+[0]  00:00:00 chiVolumeMesherExecute: Volume meshing completed. Memory used = 40.4 MB
+[0]  Total process memory used after meshing 52.7 MB
 [0]  00:00:00 Setting material id from logical volume.
-[0]  00:00:00 Done setting material id from logical volume. Number of cells modified = 3072.
-[0]  Exported Material Volume mesh to Tutorial01Mesh_m0.obj
+[0]  00:00:00 Done setting material id from logical volume. Number of cells modified = 32768.
 [0]
 [0]  00:00:00 Diffusion Solver: Initializing Diffusion solver PETSc
+[0]  Computing cell matrices
 [0]  Computing nodal reorderings for CFEM
-[0]  Time taken during nodal reordering 0.00318
+[0]  Time taken during nodal reordering 0.021969
+[0]  Domain ownership: 35937 35937
 [0]  Determining nodal connections
 [0]  Building sparsity pattern.
 [0]  Setting matrix preallocation.
-[0]  Computing cell matrices
-[0]  00:00:01 Diffusion Solver: Diffusion Solver initialization time 1.47667
+[0]  00:00:16 Diffusion Solver: Diffusion Solver initialization time 15.254
 [0]  Diffusion Solver: Assembling A and b
-[0]  Diffusion Solver: Local matrix instructions
-[0]  Diffusion Solver: Communicating matrix assembly
+[0]  00:00:16 Diffusion Solver: Local matrix instructions
+[0]  00:00:16 Diffusion Solver: Communicating matrix assembly
 [0]  Diffusion Solver: Solving system
-[0]  Diffusion iteration    0 - Residual 34.8524639
-[0]  Diffusion iteration    1 - Residual 2.6205789
-[0]  Diffusion iteration    2 - Residual 0.2875545
-[0]  Diffusion iteration    3 - Residual 0.0372920
-[0]  Diffusion iteration    4 - Residual 3.783e-03
-[0]  Diffusion iteration    5 - Residual 3.774e-04
-[0]  Diffusion iteration    6 - Residual 4.446e-05
+[0]  Diffusion iteration    0 - Residual 418.5914509
+[0]  Diffusion iteration    1 - Residual 41.4175004
+[0]  Diffusion iteration    2 - Residual 5.3813804
+[0]  Diffusion iteration    3 - Residual 0.7898487
+[0]  Diffusion iteration    4 - Residual 0.1424018
+[0]  Diffusion iteration    5 - Residual 0.0280161
+[0]  Diffusion iteration    6 - Residual 3.749e-03
+[0]  Diffusion iteration    7 - Residual 5.062e-04
+[0]  Diffusion iteration    8 - Residual 9.615e-05
+[0]  Diffusion iteration    9 - Residual 9.141e-06
+[0]  Diffusion iteration   10 - Residual 1.880e-06
+[0]  Diffusion iteration   11 - Residual 2.131e-07
 [0]  Convergence reason: 2
-[0]  Diffusion Solver: Number of iterations =6
+[0]  Diffusion Solver: Number of iterations =11
 [0]  Timing:
-[0]  Assembling the matrix: 0.017682
-[0]  Solving the system   : 0.01209
+[0]  Assembling the matrix: 0.161813
+[0]  Solving the system   : 0.148049
 [0]  Diffusion Solver execution completed!
-[0]  Final program time 00:00:01
-[0]  2020-01-08 13:30:31 ChiTech finished execution of Tutorials/Tutorial01.lua
+[0]  Exporting field function phi to files with base name Tutorial1Output
+[0]  Final program time 00:00:17
+[0]  2020-02-23 16:53:37 ChiTech finished execution of Tutorial01.lua
 \endverbatim
+
+\image html "Meshing/CubeSolutionTut1.png"  "Figure 2 - Solution viewed in Paraview" width=700px
 
 
  */
