@@ -31,6 +31,7 @@ public:
   //loadexport.cc
   int   ImportFromOBJFile(const char* fileName,bool as_poly);
   int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
+  int   ImportFromMshFiles(const char* fileName, bool as_poly);
   void  ExportToOBJFile(const char* fileName);
   void  ExportToPolyFile(const char* fileName);
   static SurfaceMesh*
