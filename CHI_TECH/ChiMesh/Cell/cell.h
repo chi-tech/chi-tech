@@ -32,13 +32,13 @@ public:
   Normal normal;                 /// The average/geometric normal
   Vertex centroid;               /// The face centroid
   int neighbor=-1;               /// Neigboring cell global id (<0 indicates bndry)
+  int neighbor_ass_face=-1;      /// Neighbor associated face
 
 
 private:
   int  neighbor_partition_id=-1;  /// Neighboring cell's partition id
-  bool neighbor_partition_id_updated=false;
   int  neighbor_local_id=-1;  /// Neighboring cell's local id
-  bool neighbor_local_id_updated=false;
+  bool neighbor_parallel_info_updated=false;
 
 public:
   bool IsNeighborLocal(chi_mesh::MeshContinuum* grid);
@@ -67,7 +67,6 @@ public:
 
 private:
   const CellType cell_type;
-  bool  neighbor_partition_populated = false;
 
 public:
   explicit Cell(CellType in_cell_type) : cell_type(in_cell_type)

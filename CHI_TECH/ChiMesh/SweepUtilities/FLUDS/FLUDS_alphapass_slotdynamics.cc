@@ -66,17 +66,28 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         //======================================== Find associated face for
         //                                         dof mapping and lock box
-        short ass_face = grid->FindAssociatedFace(face, neighbor);
+        short ass_face = grid->FindAssociatedFace(face);
 
         //Now find the cell (index,face) pair in the lock box and empty slot
         bool found = false;
-        for (int k=0; k<lock_box.size(); k++)
+//        for (int k=0; k<lock_box.size(); k++)
+//        {
+//          if ((lock_box[k].first == neighbor) &&
+//              (lock_box[k].second== ass_face))
+//          {
+//            lock_box[k].first = -1;
+//            lock_box[k].second= -1;
+//            found = true;
+//            break;
+//          }
+//        }
+        for (auto& lock_box_slot : lock_box)
         {
-          if ((lock_box[k].first == neighbor) &&
-              (lock_box[k].second== ass_face))
+          if ((lock_box_slot.first == neighbor) &&
+              (lock_box_slot.second== ass_face))
           {
-            lock_box[k].first = -1;
-            lock_box[k].second= -1;
+            lock_box_slot.first = -1;
+            lock_box_slot.second= -1;
             found = true;
             break;
           }
@@ -180,6 +191,8 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           break;
         }
       }
+
+
       //========================================= If an open slot was not found
       //                                          push a new one
       if (!slot_found)

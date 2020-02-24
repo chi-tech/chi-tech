@@ -56,11 +56,11 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 
   }//for csoi
 
-
   //================================================== Populate boundary
   //                                                   dependencies
   for (auto bndry : location_boundary_dependency_set)
     boundary_dependencies.push_back(bndry);
+
 
   //                      PERFORM INCIDENT MAPPING
   //================================================== Loop over cells in

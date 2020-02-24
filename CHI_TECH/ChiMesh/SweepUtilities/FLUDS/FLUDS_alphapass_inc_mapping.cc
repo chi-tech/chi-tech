@@ -39,7 +39,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         incoming_face_count++;
         //======================================== Find associated face for
         //                                         dof mapping
-        int ass_face = grid->FindAssociatedFace(face, neighbor);
+        int ass_face = grid->FindAssociatedFace(face);
 
         std::pair<int,std::vector<int>> dof_mapping;
         grid->FindAssociatedVertices(face,
@@ -70,7 +70,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
           chi_log.Log(LOG_ALLERROR)
             << "Associated face counter not found"
             << ass_face << " " << neighbor;
-          grid->FindAssociatedFace(face, neighbor, true);
+          grid->FindAssociatedFace(face, true);
           exit(EXIT_FAILURE);
         }
 

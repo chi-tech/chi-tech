@@ -14,6 +14,7 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
     return commicator_set;
 
   //================================================== Build the communicator
+  chi_log.Log(LOG_0VERBOSE_1) << "Building communicator.";
   std::set<int>    local_graph_edges;
   std::vector<int> local_connections;
 
@@ -25,14 +26,8 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
     for (auto& face : cell.faces)
     {
       if (face.neighbor>=0)
-      {
-        auto adj_cell = cells[face.neighbor];
-
-        if (adj_cell->partition_id != chi_mpi.location_id)
-        {
-          local_graph_edges.insert(adj_cell->partition_id);
-        }
-      }
+        if (not face.IsNeighborLocal(this))
+          local_graph_edges.insert(face.GetNeighborPartitionID(this));
     }//for f
   }//for local cells
 

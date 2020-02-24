@@ -39,7 +39,6 @@ namespace chi_mesh::sweep_management
 
     std::vector<int>    delayed_prelocI_face_dof_count;
 
-
   public:
     virtual ~FLUDS() {};
     virtual

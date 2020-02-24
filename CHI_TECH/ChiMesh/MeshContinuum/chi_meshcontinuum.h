@@ -139,7 +139,7 @@ public:
   bool IsCellLocal(int cell_global_index=-1);
   bool IsCellBndry(int cell_global_index = 0);
 
-  int  FindAssociatedFace(chi_mesh::CellFace& cur_face,int adj_cell_g_index,bool verbose=false);
+  int  FindAssociatedFace(chi_mesh::CellFace& cur_face, bool verbose=false);
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
                               int adj_cell_g_index, int associated_face,
                               std::vector<int>& dof_mapping);
