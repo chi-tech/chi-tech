@@ -25,7 +25,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
   //================================================== Find cell inside volume
   for (const auto& cell : grid_view->local_cells)
   {
-    int cell_local_index = cell.cell_local_id;
+    int cell_local_index = cell.local_id;
 
     bool inside_logvolume=true;
 

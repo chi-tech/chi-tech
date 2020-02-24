@@ -195,116 +195,14 @@ bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
 
 
 //###################################################################
-/**Generalized find associated cell face*/
-int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
-                                                bool verbose)
-{
-  //======================================== Check index validity
-  if (IsCellBndry(cur_face.neighbor) || (not cur_face.IsNeighborLocal(this)))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedFace. Index points to either a boundary"
-      << "or a non-local cell.";
-    exit(EXIT_FAILURE);
-  }
-
-  chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(this)];
-
-  int associated_face = -1;
-  if (cur_face.neighbor_ass_face < 0)
-  {
-    //======================================== Loop over adj cell faces
-    for (int af=0; af < adj_cell->faces.size(); af++)
-    {
-      //Assume face matches
-      bool face_matches = true; //Now disprove it
-      //================================= Loop over adj cell face verts
-      for (int afv=0; afv < adj_cell->faces[af].vertex_ids.size(); afv++)
-      {
-        //========================== Try and find them in the reference face
-        bool found = false;
-        for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
-        {
-          if (cur_face.vertex_ids[cfv] == adj_cell->faces[af].vertex_ids[afv])
-          {
-            found = true;
-            break;
-          }
-        }//for cfv
-
-        if (!found) {face_matches = false; break;}
-      }//for afv
-
-      if (face_matches) {associated_face = af; break;}
-    }
-  }
-  else
-    associated_face = cur_face.neighbor_ass_face;
-
-
-
-
-
-  //======================================== Check associated face validity
-  if (associated_face<0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Could not find associated face in call to "
-      << "MeshContinuum::FindAssociatedFace. Reference face with centroid at \n"
-      << cur_face.centroid.PrintS();
-    for (int af=0; af < adj_cell->faces.size(); af++)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Adjacent cell face " << af << " centroid "
-        << adj_cell->faces[af].centroid.PrintS();
-    }
-    exit(EXIT_FAILURE);
-  }
-
-  //======================================== Verbose output
-  if (verbose)
-  {
-    std::stringstream out_string;
-
-    out_string
-      << "Adj cell " << cur_face.neighbor << ":\n"
-      << "face " << associated_face << "\n";
-    for (int v=0; v < adj_cell->faces[associated_face].vertex_ids.size(); v++)
-    {
-      out_string
-        << "vertex " << v << " "
-        << adj_cell->faces[associated_face].vertex_ids[v]
-        << "\n";
-    }
-    out_string
-      << "Cur cell "
-      << adj_cell->faces[associated_face].neighbor << ":\n";
-    for (int v=0; v<cur_face.vertex_ids.size(); v++)
-    {
-      out_string
-        << "vertex " << v << " "
-        << cur_face.vertex_ids[v]
-        << "\n";
-    }
-    chi_log.Log(LOG_ALL) << out_string.str();
-  }
-
-  cur_face.neighbor_ass_face = associated_face;
-  return associated_face;
-}
-
-
-
-//###################################################################
 /**General map vertices*/
 void chi_mesh::MeshContinuum::
 FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                       int adj_cell_g_index, int associated_face,
                        std::vector<int>& dof_mapping)
 {
+  int associated_face = cur_face.GetNeighborAssociatedFace(this);
   //======================================== Check index validity
-  if (IsCellBndry(adj_cell_g_index) || (not cur_face.IsNeighborLocal(this)))
+  if (IsCellBndry(cur_face.neighbor) || (not cur_face.IsNeighborLocal(this)))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell index encountered in call to "
@@ -337,7 +235,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
         << "Face DOF mapping failed in call to "
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
-        << adj_cell_g_index << " " << cur_face.centroid.PrintS();
+        << cur_face.neighbor << " " << cur_face.centroid.PrintS();
       exit(EXIT_FAILURE);
     }
 

@@ -26,7 +26,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
   //                                                   specified item_id
   for (const auto& cell : grid->local_cells)
   {
-    if (not cell_view_added_flags[cell.cell_local_id])
+    if (not cell_view_added_flags[cell.local_id])
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
       if (cell.Type() == chi_mesh::CellType::SLAB)
@@ -37,7 +37,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         //cell_fe_view->PreCompute();
         //cell_fe_view->CleanUp();
         cell_fe_views.push_back(cell_fe_view);
-        cell_view_added_flags[cell.cell_local_id] = true;
+        cell_view_added_flags[cell.local_id] = true;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
       else if (cell.Type() == chi_mesh::CellType::POLYGON)
@@ -48,7 +48,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         cell_fe_view->PreCompute();
 
         cell_fe_views.push_back(cell_fe_view);
-        cell_view_added_flags[cell.cell_local_id] = true;
+        cell_view_added_flags[cell.local_id] = true;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
       else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
@@ -59,7 +59,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
         cell_fe_view->PreCompute();
         cell_fe_view->CleanUp();
         cell_fe_views.push_back(cell_fe_view);
-        cell_view_added_flags[cell.cell_local_id] = true;
+        cell_view_added_flags[cell.local_id] = true;
       }
       else
       {

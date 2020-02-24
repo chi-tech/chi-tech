@@ -58,7 +58,7 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
   for (const auto& cell : grid->local_cells)
   {
     auto full_cell_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     //=========================================== Obtain cross-section and src
     int cell_matid = cell.material_id;

@@ -15,7 +15,7 @@ double LinearBoltzman::Solver::ComputePiecewiseChange(LBSGroupset* groupset)
   for (const auto& cell : grid->local_cells)
   {
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {

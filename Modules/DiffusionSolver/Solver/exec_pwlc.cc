@@ -56,7 +56,7 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
   for (auto& cell : grid->local_cells)
   {
     if (!suppress_assembly)
-      CFEM_Assemble_A_and_b(cell.cell_global_id, &cell, gi);
+      CFEM_Assemble_A_and_b(cell.global_id, &cell, gi);
   }
 
   //=================================== Call matrix assembly

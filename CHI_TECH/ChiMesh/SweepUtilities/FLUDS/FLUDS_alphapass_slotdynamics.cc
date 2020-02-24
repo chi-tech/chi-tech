@@ -54,7 +54,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         bool is_cyclic = false;
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ((cyclic_dependency.first == cell->cell_local_id) &&
+          if ((cyclic_dependency.first == cell->local_id) &&
               (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
           {
             is_cyclic = true;
@@ -66,7 +66,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         //======================================== Find associated face for
         //                                         dof mapping and lock box
-        short ass_face = grid->FindAssociatedFace(face);
+        short ass_face = face.GetNeighborAssociatedFace(grid);
 
         //Now find the cell (index,face) pair in the lock box and empty slot
         bool found = false;
@@ -97,7 +97,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           chi_log.Log(LOG_ALLERROR)
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
-            << cell->cell_local_id
+            << cell->local_id
             << " face " << f
             << " looking for cell "
             << face.GetNeighborLocalID(grid)
@@ -143,7 +143,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     CellFace&  face         = cell->faces[f];
     double     mu           = spds->omega.Dot(face.normal);
     int        neighbor     = face.neighbor;
-    int        cell_g_index = cell->cell_global_id;
+    int        cell_g_index = cell->global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=(0.0+1.0e-16))
@@ -161,7 +161,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       {
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ((cyclic_dependency.first == cell->cell_local_id) &&
+          if ((cyclic_dependency.first == cell->local_id) &&
               (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
           {
             temp_lock_box = &delayed_lock_box;

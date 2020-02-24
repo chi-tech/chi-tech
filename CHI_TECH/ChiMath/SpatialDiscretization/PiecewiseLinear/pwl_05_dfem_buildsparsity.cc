@@ -98,7 +98,7 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
       if ((not face.IsNeighborLocal(grid)) and
           (not grid->IsCellBndry(face.neighbor)))
       {
-        local_neighboring_cell_indices.insert(cell.cell_local_id);
+        local_neighboring_cell_indices.insert(cell.local_id);
         neighboring_partitions.insert(face.GetNeighborPartitionID(grid));
       }
     }
@@ -164,7 +164,7 @@ BuildDFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
         cell_dfem_block_address[local_cell_index] +
         dfem_local_block_address;
 
-      border_cell_info.push_back(cell.cell_global_id);         //cell_glob_index
+      border_cell_info.push_back(cell.global_id);         //cell_glob_index
       border_cell_info.push_back(cell_global_block_address);   //block address
     }
     total_serial_size += new_serial_data.second.size();
@@ -248,7 +248,7 @@ MapNeighborCell(int cell_glob_index)
   int index=0;
   for (auto cell : neighbor_cells)
   {
-    if (cell->cell_global_id == cell_glob_index) break;
+    if (cell->global_id == cell_glob_index) break;
     ++index;
   }
 
@@ -271,7 +271,7 @@ CellFEView* SpatialDiscretization_PWL::
   int index=0;
   for (auto cell : neighbor_cells)
   {
-    if (cell->cell_global_id == cell_glob_index) break;
+    if (cell->global_id == cell_glob_index) break;
     ++index;
   }
 

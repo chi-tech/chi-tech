@@ -119,7 +119,7 @@ void LinearBoltzman::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
   for (const auto& cell : grid->local_cells)
   {
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     int xs_id = matid_to_xs_map[cell.material_id];
     std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
@@ -159,7 +159,7 @@ void LinearBoltzman::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupse
   {
 
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {

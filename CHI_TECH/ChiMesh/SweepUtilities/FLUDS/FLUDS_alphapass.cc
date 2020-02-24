@@ -50,7 +50,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
     int cell_local_id = spls->item_id[csoi];
     auto cell = &grid->local_cells[cell_local_id];
 
-    local_so_cell_mapping[cell->cell_local_id] = csoi; //Set mapping
+    local_so_cell_mapping[cell->local_id] = csoi; //Set mapping
 
     SlotDynamics(cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
 

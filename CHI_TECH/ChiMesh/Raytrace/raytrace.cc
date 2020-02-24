@@ -173,7 +173,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     outstr
       << "Intersection not found. For particle xyz="
       << pos_i.PrintS() << " uvw="
-      << omega_i.PrintS() << " in cell " << cell->cell_global_id
+      << omega_i.PrintS() << " in cell " << cell->global_id
       << " with vertices: \n";
 
     for (auto vi : cell->vertex_ids)

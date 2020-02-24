@@ -29,9 +29,9 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                                   int group,
                                                   int moment)
 {
-  int cell_glob_index = cell->cell_global_id;
+  int cell_glob_index = cell->global_id;
   bool cell_is_local = (cell->partition_id == chi_mpi.location_id);
-  int cell_local_id = cell->cell_local_id;
+  int cell_local_id = cell->local_id;
   if (mat_id<0)
   {
     chi_log.Log(LOG_0ERROR)

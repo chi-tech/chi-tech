@@ -23,7 +23,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
   //============================================= Make directed connections
   for (auto& cell : grid->local_cells)
   {
-    int c = cell.cell_local_id;
+    int c = cell.local_id;
 
     for (auto& face : cell.faces)
     {

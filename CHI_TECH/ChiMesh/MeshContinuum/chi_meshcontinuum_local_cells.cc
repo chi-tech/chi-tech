@@ -35,15 +35,15 @@ void chi_mesh::MeshContinuum::GlobalCellHandler::
 
   if (new_cell->partition_id == chi_mpi.location_id)
   {
-    local_cells.local_cell_ind.push_back(new_cell->cell_global_id);
+    local_cells.local_cell_ind.push_back(new_cell->global_id);
     int local_cell_index = local_cells.local_cell_ind.size()-1;
-    new_cell->cell_local_id = local_cell_index;
+    new_cell->local_id = local_cell_index;
 
 
     local_cells.native_cells.push_back(new_cell);
 
     std::pair<int,int> new_info = std::make_pair(
-      new_cell->cell_global_id,
+      new_cell->global_id,
       local_cells.native_cells.size()-1);
 
     global_cell_native_index_set.insert(new_info);
@@ -53,7 +53,7 @@ void chi_mesh::MeshContinuum::GlobalCellHandler::
     local_cells.foreign_cells.push_back(new_cell);
 
     std::pair<int,int> new_info = std::make_pair(
-      new_cell->cell_global_id,
+      new_cell->global_id,
       local_cells.foreign_cells.size() - 1);
 
     global_cell_foreign_index_set.insert(new_info);

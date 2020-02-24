@@ -118,7 +118,7 @@ void LinearBoltzman::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
   int index = -1;
   for (const auto& cell : grid->local_cells)
   {
-    int c = cell.cell_local_id;
+    int c = cell.local_id;
 
     auto transport_view =
       (LinearBoltzman::CellViewFull*)cell_transport_views[c];
@@ -171,7 +171,7 @@ void LinearBoltzman::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupse
   int index = -1;
   for (const auto& cell : grid->local_cells)
   {
-    int c = cell.cell_local_id;
+    int c = cell.local_id;
 
     auto transport_view =
       (LinearBoltzman::CellViewFull*)cell_transport_views[c];

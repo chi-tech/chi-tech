@@ -39,18 +39,15 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         incoming_face_count++;
         //======================================== Find associated face for
         //                                         dof mapping
-        int ass_face = grid->FindAssociatedFace(face);
+        int ass_face = face.GetNeighborAssociatedFace(grid);
 
         std::pair<int,std::vector<int>> dof_mapping;
-        grid->FindAssociatedVertices(face,
-                                     neighbor,
-                                     ass_face,
-                                     dof_mapping.second);
+        grid->FindAssociatedVertices(face, dof_mapping.second);
 
         //======================================== Find associated face
         //                                         counter for slot lookup
         auto adj_cell     = &grid->local_cells[face.GetNeighborLocalID(grid)];
-        int  adj_so_index = local_so_cell_mapping[adj_cell->cell_local_id];
+        int  adj_so_index = local_so_cell_mapping[adj_cell->local_id];
         int  ass_f_counter=-1;
 
         int out_f = -1;
@@ -70,7 +67,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
           chi_log.Log(LOG_ALLERROR)
             << "Associated face counter not found"
             << ass_face << " " << neighbor;
-          grid->FindAssociatedFace(face, true);
+          face.GetNeighborAssociatedFace(grid);
           exit(EXIT_FAILURE);
         }
 
