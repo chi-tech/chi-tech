@@ -668,8 +668,200 @@ chi_mesh::SurfaceMesh* chi_mesh::SurfaceMesh::
   return surf_mesh;
 }
 
+//#########################################################
+/** Loads a surface mesh from gmsh's file format.*/
+int chi_mesh::SurfaceMesh::
+ImportFromMshFiles(const char* fileName, bool as_poly=false)
+{
+  const std::string node_section_name="$Nodes";
+  const std::string elements_section_name = "$Elements";
+
+  std::istringstream iss;
+  std::string line;
+
+  std::ifstream file;
+  file.open(std::string(fileName));
+
+  if (!file.is_open())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Failed to open file: "<< fileName <<" in call "
+      << "to ImportFromMshFiles \n";
+    exit(EXIT_FAILURE);
+  }
+
+  //=================================================== Find section with node information
+  //                                                    and then read information
+  while (std::getline(file, line))
+  {
+    if ( node_section_name.compare(line)==0 )
+      break;
+  }
+
+  std::getline(file, line);
+  iss = std::istringstream(line);
+  int num_nodes;
+  if ( !(iss >> num_nodes) )
+  {
+    chi_log.Log(LOG_ALLERROR)<<"Failed while trying to read the number of nodes.\n";
+    exit(EXIT_FAILURE);
+  }
+
+  vertices.resize(num_nodes);
+
+  for (int n=0; n<num_nodes; n++)
+  {
+    std::getline(file, line);
+    iss = std::istringstream(line);
+
+    chi_mesh::Vertex vertex;
+    int vert_index;
+    if ( !(iss >> vert_index) )
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed to read vertex index.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    if (!(iss >> vertex.x >> vertex.y >> vertex.z))
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed while reading the vertex coordinates.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    vertices[vert_index-1] = vertex;
+  }
 
 
+  //=================================================== Find the element listing section
+  //                                                    and first read the boundary data
+  file.seekg(0);
+  while (std::getline(file, line))
+  {
+    if ( elements_section_name.compare(line)==0 )
+      break;
+  }
+
+  std::getline(file, line);
+  iss = std::istringstream(line);
+  int num_elems;
+  if (!(iss >> num_elems))
+  {
+    chi_log.Log(LOG_ALLERROR)<<"Failed to read number of elements.\n";
+    exit(EXIT_FAILURE);
+  }
+
+  for (int n=0; n<num_elems; n++)
+  {
+    int elem_type, num_tags, tag, element_index;
+    chi_mesh::PolyFace* newFace = new chi_mesh::PolyFace;
+    std::getline(file, line);
+    iss = std::istringstream(line);
+
+    if ( !(iss >> element_index >> elem_type >> num_tags) )
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed while reading element index, element type, and number of tags.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    for (int i=0; i<num_tags; i++)
+      if( !(iss >> tag) )
+      {
+        chi_log.Log(LOG_ALLERROR)<<"Failed when reading tags.\n";
+        exit(EXIT_FAILURE);
+      }
+
+    if (elem_type == 2)
+    {
+      const int num_nodes = 3;
+
+      int nodes[num_nodes];
+      for (int i=0; i<num_nodes; i++)
+        if ( !(iss >> nodes[i]) )
+        {
+          chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
+          exit(EXIT_FAILURE);
+        }
+
+      newFace->v_indices.resize(num_nodes);
+      for (int i=0; i<num_nodes; i++)
+        newFace->v_indices[i] = nodes[i]-1;
+
+    } else if (elem_type == 3)
+    {
+      const int num_nodes = 4;
+
+      int nodes[num_nodes];
+      for (int i=0; i<num_nodes; i++)
+        if ( !(iss >> nodes[i]) )
+        {
+          chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
+          exit(EXIT_FAILURE);
+        }
+
+      newFace->v_indices.resize(num_nodes);
+      for (int i=0; i<num_nodes; i++)
+        newFace->v_indices[i] = nodes[i]-1;
+
+    } else
+    {
+
+      continue;
+    }
+
+    const int total_nodes = newFace->v_indices.size();
+
+    for (int e=0; e<total_nodes; e++)
+    {
+      int* side_indices = new int[total_nodes];
+      side_indices[0] = newFace->v_indices[e];
+
+      if (e<total_nodes-1)
+        side_indices[1] = newFace->v_indices[e+1];
+      else
+        side_indices[1] = newFace->v_indices[0];
+
+      side_indices[2] = -1;
+      side_indices[3] = -1;
+
+      newFace->edges.push_back(side_indices);
+    }
+
+    poly_faces.push_back(newFace);
+
+  }
+
+  file.close();
+
+  //======================================================= Calculate face properties
+  std::vector<chi_mesh::Face>::iterator curFace;
+  std::vector<chi_mesh::PolyFace*>::iterator curPFace;
+  for (curPFace = this->poly_faces.begin();
+       curPFace!=this->poly_faces.end();
+       curPFace++)
+  {
+    chi_mesh::Vector3 centroid;
+    int num_verts = (*curPFace)->v_indices.size();
+
+    for (int v=0; v<num_verts; v++)
+      centroid = centroid + vertices[(*curPFace)->v_indices[v]];
+
+    centroid = centroid/num_verts;
+
+    (*curPFace)->face_centroid = centroid;
+
+    chi_mesh::Vector3 n = (vertices[(*curPFace)->v_indices[1]] -
+                          vertices[(*curPFace)->v_indices[0]]).Cross(
+                          centroid - vertices[(*curPFace)->v_indices[1]]);
+
+    n = n/n.Norm();
+
+    (*curPFace)->geometric_normal = n;
+  }
+
+  UpdateInternalConnectivity();
+
+  return 0;
+}
 
 //#########################################################
 /**Exports the triangular faces of a surface mesh to
@@ -742,7 +934,6 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
       fprintf(outputFile,"\n");
     }
   }
-
 
   fclose(outputFile);
   printf("Exported mesh to %s\n",fileName);

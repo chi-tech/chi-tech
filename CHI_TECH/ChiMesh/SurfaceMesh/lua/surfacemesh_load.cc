@@ -102,3 +102,38 @@ int chiSurfaceMeshImportFromTriangleFiles(lua_State *L)
 
   return 1;
 }
+
+int chiSurfaceMeshImportFromMshFiles(lua_State *L)
+{
+  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+
+  //============================================= Get arguments
+  int num_args = lua_gettop(L);
+  int handle = lua_tonumber(L,1);
+
+  size_t length = 0;
+  const char* temp = lua_tolstring(L, 2, &length);
+
+  bool as_poly = true;
+  if (num_args==3)
+  {
+    as_poly = lua_toboolean(L,3);
+  }
+
+  try{
+    chi_mesh::SurfaceMesh* curItem = cur_hndlr->surface_mesh_stack.at(handle);
+    std::stringstream outtext;
+    outtext << "chiSurfaceMeshImportFromMshFiles: "
+               "Loading a gmsh ascii file: ";
+    outtext << temp << std::endl;
+    chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
+    curItem->ImportFromMshFiles(temp,as_poly);
+  }
+
+  catch(const std::out_of_range& o){
+    std::cerr << "ERROR: Invalid index to surface mesh.\n";
+    exit(EXIT_FAILURE);
+  }
+
+  return 1;
+}
