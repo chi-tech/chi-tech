@@ -68,12 +68,12 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
     //                                                   cells
     for (auto& cell : grid->local_cells)
     {
-      auto cell_ip_view = ip_cell_views[cell.cell_local_id];
+      auto cell_ip_view = ip_cell_views[cell.local_id];
 
       if (!suppress_assembly)
-        PWLD_Assemble_A_and_b(cell.cell_global_id,&cell,cell_ip_view,gi+gr);
+        PWLD_Assemble_A_and_b(cell.global_id, &cell, cell_ip_view, gi + gr);
       else
-        PWLD_Assemble_b(cell.cell_global_id,&cell,cell_ip_view,gi+gr);
+        PWLD_Assemble_b(cell.global_id, &cell, cell_ip_view, gi + gr);
     }
   }//for gr
 

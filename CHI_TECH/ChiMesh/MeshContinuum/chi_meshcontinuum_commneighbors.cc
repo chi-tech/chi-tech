@@ -33,7 +33,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
     {
       if ((not face.IsNeighborLocal(this)) and (not IsCellBndry(face.neighbor)))
       {
-        local_neighboring_cell_indices.insert(cell.cell_local_id);
+        local_neighboring_cell_indices.insert(cell.local_id);
         neighboring_partitions.insert(cells[face.neighbor]->partition_id);
       }
     }
@@ -118,7 +118,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
       else
         border_cell_info.push_back(-1);                        //cell_type
 
-      border_cell_info.push_back(cell.cell_global_id);         //cell_glob_index
+      border_cell_info.push_back(cell.global_id);         //cell_glob_index
       border_cell_info.push_back(cell.material_id);            //cell_mat_id
       border_cell_info.push_back(cell.partition_id);           //cell_par_id
       border_cell_info.push_back(cell.vertex_ids.size());      //cell_dof_count
@@ -212,7 +212,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
         exit(EXIT_FAILURE);
       }
 
-      cell->cell_global_id = global_receive_data[k]; k++;
+      cell->global_id = global_receive_data[k]; k++;
       cell->material_id    = global_receive_data[k]; k++;
       cell->partition_id   = global_receive_data[k]; k++;
       int cell_dof_count  = global_receive_data[k]; k++;

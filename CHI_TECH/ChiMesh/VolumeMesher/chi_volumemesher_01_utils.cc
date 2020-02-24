@@ -91,7 +91,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     if (force_local)
       cell->partition_id = chi_mpi.location_id;
 
-    cell->cell_global_id = num_cells;
+    cell->global_id = num_cells;
 
     vol_continuum->cells.push_back(cell); ++num_cells;
   }
@@ -141,7 +141,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     if (force_local)
       cell->partition_id = chi_mpi.location_id;
 
-    cell->cell_global_id = num_cells;
+    cell->global_id = num_cells;
 
     vol_continuum->cells.push_back(cell); ++num_cells;
 
@@ -295,7 +295,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
     int cur_loc = 0;
     for (int k=0; k<chi_mpi.process_count; k++)
     {
-      if (cell->cell_global_id < ((k+1)*cells_per_loc))
+      if (cell->global_id < ((k + 1) * cells_per_loc))
       {
         cur_loc = k;
         found_partition = true;
@@ -411,7 +411,7 @@ void chi_mesh::VolumeMesher::
     {
       if (cell.faces[f].neighbor < 0)
       {
-        vol_continuum->boundary_cell_indices.push_back(cell.cell_global_id);
+        vol_continuum->boundary_cell_indices.push_back(cell.global_id);
         break;
       }
     }

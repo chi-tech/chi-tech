@@ -54,7 +54,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         bool is_cyclic = false;
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ((cyclic_dependency.first == cell->cell_local_id) &&
+          if ((cyclic_dependency.first == cell->local_id) &&
               (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
           {
             is_cyclic = true;
@@ -66,17 +66,28 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         //======================================== Find associated face for
         //                                         dof mapping and lock box
-        short ass_face = grid->FindAssociatedFace(face, neighbor);
+        short ass_face = face.GetNeighborAssociatedFace(grid);
 
         //Now find the cell (index,face) pair in the lock box and empty slot
         bool found = false;
-        for (int k=0; k<lock_box.size(); k++)
+//        for (int k=0; k<lock_box.size(); k++)
+//        {
+//          if ((lock_box[k].first == neighbor) &&
+//              (lock_box[k].second== ass_face))
+//          {
+//            lock_box[k].first = -1;
+//            lock_box[k].second= -1;
+//            found = true;
+//            break;
+//          }
+//        }
+        for (auto& lock_box_slot : lock_box)
         {
-          if ((lock_box[k].first == neighbor) &&
-              (lock_box[k].second== ass_face))
+          if ((lock_box_slot.first == neighbor) &&
+              (lock_box_slot.second== ass_face))
           {
-            lock_box[k].first = -1;
-            lock_box[k].second= -1;
+            lock_box_slot.first = -1;
+            lock_box_slot.second= -1;
             found = true;
             break;
           }
@@ -86,7 +97,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           chi_log.Log(LOG_ALLERROR)
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
-            << cell->cell_local_id
+            << cell->local_id
             << " face " << f
             << " looking for cell "
             << face.GetNeighborLocalID(grid)
@@ -132,7 +143,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     CellFace&  face         = cell->faces[f];
     double     mu           = spds->omega.Dot(face.normal);
     int        neighbor     = face.neighbor;
-    int        cell_g_index = cell->cell_global_id;
+    int        cell_g_index = cell->global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
     if (mu>=(0.0+1.0e-16))
@@ -150,7 +161,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       {
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ((cyclic_dependency.first == cell->cell_local_id) &&
+          if ((cyclic_dependency.first == cell->local_id) &&
               (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
           {
             temp_lock_box = &delayed_lock_box;
@@ -180,6 +191,8 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           break;
         }
       }
+
+
       //========================================= If an open slot was not found
       //                                          push a new one
       if (!slot_found)

@@ -50,7 +50,10 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
-
+  chi_log.Log(LOG_0)
+    << "Domain ownership: "
+    << domain_ownership.first << " "
+    << domain_ownership.second;
 
   //================================================== Initialize field function
   //                                                   if empty

@@ -177,7 +177,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
       if ((tcell->partition_id != chi_mpi.location_id) and
           (!options.mesh_global))
       {
-        tcell->cell_global_id = num_global_cells;
+        tcell->global_id = num_global_cells;
 //        vol_continuum->cells.push_back(tcell); ++num_global_cells;
         ++num_global_cells;
 
@@ -324,7 +324,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
 
         cell->faces.push_back(newFace);
 
-        cell->cell_global_id = num_global_cells;
+        cell->global_id = num_global_cells;
         vol_continuum->cells.push_back(cell); ++num_global_cells;
 
       } //if cell is local

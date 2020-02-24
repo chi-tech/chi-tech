@@ -18,6 +18,8 @@ extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
 
+extern ChiTimer chi_program_timer;
+
 
 //###################################################################
 /**Builds the matrix using the PWLC discretization method.*/
@@ -30,7 +32,9 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 
   //################################################## Assemble Amatrix
   chi_log.Log(LOG_0) << "Diffusion Solver: Assembling A and b";
-  chi_log.Log(LOG_0) << "Diffusion Solver: Local matrix instructions";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString() << " "
+    << "Diffusion Solver: Local matrix instructions";
   t_assembly.Reset();
 
   std::vector<int> boundary_nodes,boundary_numbers;
@@ -52,11 +56,13 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
   for (auto& cell : grid->local_cells)
   {
     if (!suppress_assembly)
-      CFEM_Assemble_A_and_b(cell.cell_global_id, &cell, gi);
+      CFEM_Assemble_A_and_b(cell.global_id, &cell, gi);
   }
 
   //=================================== Call matrix assembly
-  chi_log.Log(LOG_0) << "Diffusion Solver: Communicating matrix assembly";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString() << " "
+    << "Diffusion Solver: Communicating matrix assembly";
 
   if (!suppress_assembly)
   {

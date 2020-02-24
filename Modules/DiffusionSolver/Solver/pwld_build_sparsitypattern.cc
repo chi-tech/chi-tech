@@ -38,7 +38,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
           }
           else
           {
-            local_border_cells.insert(cell.cell_local_id);
+            local_border_cells.insert(cell.local_id);
           }
         }
       }

@@ -66,7 +66,7 @@ Initialize()
       //                                                   point
       for (const auto& cell : grid_view->local_cells)
       {
-        int cell_local_index = cell.cell_local_id;
+        int cell_local_index = cell.local_id;
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell.Type() == chi_mesh::CellType::SLAB)

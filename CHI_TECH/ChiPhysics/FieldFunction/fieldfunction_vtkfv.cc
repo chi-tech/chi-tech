@@ -94,7 +94,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
   //======================================== Populate cell information
   for (const auto& cell : grid->local_cells)
   {
-    int lc = cell.cell_local_id;
+    int lc = cell.local_id;
 
     int mat_id = cell.material_id;
 
@@ -269,7 +269,7 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
   //======================================== Populate cell information
   for (const auto& cell : grid->local_cells)
   {
-    int lc = cell.cell_local_id;
+    int lc = cell.local_id;
 
     int mat_id = cell.material_id;
 

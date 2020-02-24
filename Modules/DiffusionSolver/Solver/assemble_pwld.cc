@@ -17,7 +17,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
                                                   int component,
                                                   int component_block_offset)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->cell_local_id);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->local_id);
 
   //====================================== Process material id
   int mat_id = cell->material_id;
@@ -26,7 +26,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
   std::vector<double> q(fe_view->dofs,1.0);
   std::vector<double> siga(fe_view->dofs,0.0);
 
-  GetMaterialProperties(mat_id, cell_glob_index, fe_view->dofs, D, q, siga, component);
+  GetMaterialProperties(mat_id, cell, fe_view->dofs, D, q, siga, component);
 
   //========================================= Loop over DOFs
   for (int i=0; i<fe_view->dofs; i++)
@@ -69,17 +69,15 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
     if (neighbor >=0)
     {
-      try{
       chi_mesh::Cell*           adj_cell    = nullptr;
       CellFEView*               adj_fe_view = nullptr;
-//      DiffusionIPCellView*      adj_ip_view = nullptr;
       int                              fmap = -1;
 
       //========================= Get adj cell information
       if (cell->faces[f].IsNeighborLocal(grid))  //Local
       {
         adj_cell      = &grid->local_cells[face.GetNeighborLocalID(grid)];
-        adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell->cell_local_id);
+        adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell->local_id);
       }//local
       else //Non-local
       {
@@ -87,8 +85,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
         adj_fe_view = pwl_sdm->MapNeighborCellFeView(neighbor);
       }//non-local
       //========================= Check valid information
-      if (adj_cell == nullptr || adj_fe_view == nullptr /*||
-          adj_ip_view == nullptr*/)
+      if (adj_cell == nullptr || adj_fe_view == nullptr)
       {
         chi_log.Log(LOG_ALL)
           << "Error in MIP cell information.";
@@ -105,7 +102,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       std::vector<double> adj_D,adj_Q,adj_sigma;
 
       GetMaterialProperties(adj_cell->material_id,
-                            neighbor,
+                            adj_cell,
                             adj_fe_view->dofs,
                             adj_D,
                             adj_Q,
@@ -285,7 +282,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 //        }
 //      }
 
-      }catch (std::out_of_range& o) {chi_log.Log(LOG_ALLERROR) << "OOR error.";exit(EXIT_FAILURE);}
+
     }//if not bndry
     else
     {
@@ -294,7 +291,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
       if (ir_boundary_type == DIFFUSION_DIRICHLET)
       {
-        chi_diffusion::BoundaryDirichlet* dc_boundary =
+        auto dc_boundary =
           (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
 
         //========================= Compute penalty coefficient
@@ -397,7 +394,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
                                             int component,
                                             int component_block_offset)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->cell_local_id);
+  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->local_id);
 
   //====================================== Process material id
   int mat_id = cell->material_id;
@@ -406,7 +403,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
   std::vector<double> q(fe_view->dofs,1.0);
   std::vector<double> siga(fe_view->dofs,1.0);
 
-  GetMaterialProperties(mat_id, cell_glob_index, fe_view->dofs, D, q, siga, component);
+  GetMaterialProperties(mat_id, cell, fe_view->dofs, D, q, siga, component);
 
   //========================================= Loop over DOFs
   for (int i=0; i<fe_view->dofs; i++)

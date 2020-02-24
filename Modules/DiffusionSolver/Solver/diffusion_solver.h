@@ -149,7 +149,7 @@ public:
                                          double& sourceQ,
                                          double& sigmaa);
   void GetMaterialProperties(int mat_id,
-                             int cell_glob_index,
+                             chi_mesh::Cell* cell,
                              int cell_dofs,
                              std::vector<double>& diffCoeff,
                              std::vector<double>& sourceQ,

@@ -39,7 +39,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
   //                                                   specified item_id
   for (const auto& cell : grid->local_cells)
   {
-    if (not cell_view_added_flags[cell.cell_local_id])
+    if (not cell_view_added_flags[cell.local_id])
     {
       //######################################### SLAB
       if (cell.Type() == chi_mesh::CellType::SLAB)
@@ -48,7 +48,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
           new SlabFVView((chi_mesh::CellSlab*)(&cell), grid);
 
         cell_fv_views.push_back(view);
-        cell_view_added_flags[cell.cell_local_id] = true;
+        cell_view_added_flags[cell.local_id] = true;
       }
 
       //######################################### POLYGON
@@ -58,7 +58,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
           new PolygonFVView((chi_mesh::CellPolygon*)(&cell), grid);
 
         cell_fv_views.push_back(view);
-        cell_view_added_flags[cell.cell_local_id] = true;
+        cell_view_added_flags[cell.local_id] = true;
       }
 
       //######################################### POLYHEDRON
@@ -70,7 +70,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
             grid);
 
         cell_fv_views.push_back(view);
-        cell_view_added_flags[cell.cell_local_id] = true;
+        cell_view_added_flags[cell.local_id] = true;
       }
     }//if mapping not yet assigned
   }//for num cells

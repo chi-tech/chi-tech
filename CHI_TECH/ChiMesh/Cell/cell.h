@@ -33,17 +33,20 @@ public:
   Vertex centroid;               /// The face centroid
   int neighbor=-1;               /// Neigboring cell global id (<0 indicates bndry)
 
-
 private:
   int  neighbor_partition_id=-1;  /// Neighboring cell's partition id
-  bool neighbor_partition_id_updated=false;
-  int  neighbor_local_id=-1;  /// Neighboring cell's local id
-  bool neighbor_local_id_updated=false;
+  int  neighbor_local_id=-1;      /// Neighboring cell's local id
+  int neighbor_ass_face=-1;       /// Neighbor associated face
+  bool neighbor_parallel_info_initialized=false;
 
 public:
   bool IsNeighborLocal(chi_mesh::MeshContinuum* grid);
   int GetNeighborPartitionID(chi_mesh::MeshContinuum* grid);
   int GetNeighborLocalID(chi_mesh::MeshContinuum* grid);
+  int GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid);
+
+private:
+  void InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid);
 };
 
 
@@ -54,8 +57,8 @@ public:
 class Cell
 {
 public:
-  int cell_global_id;
-  int cell_local_id;
+  int global_id;
+  int local_id;
   std::pair<int,int> xy_partition_indices;
   std::tuple<int,int,int> xyz_partition_indices;
   int partition_id;
@@ -67,13 +70,12 @@ public:
 
 private:
   const CellType cell_type;
-  bool  neighbor_partition_populated = false;
 
 public:
   explicit Cell(CellType in_cell_type) : cell_type(in_cell_type)
   {
-    cell_global_id = -1;
-    cell_local_id = -1;
+    global_id = -1;
+    local_id = -1;
     xy_partition_indices.first  = 0;
     xy_partition_indices.second = 0;
     partition_id = -1;

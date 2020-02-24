@@ -51,8 +51,8 @@ void SpatialDiscretization_PWL::
         if (!already_there)
         {
           node_links.push_back(jr);
-          if ((jr>=domain_ownership.first) and
-              (jr<=domain_ownership.second))
+          if ((jr>=cfem_local_block_address) and
+              (jr<=(cfem_local_block_address+domain_ownership.first)))
           {
             nodal_nnz_in_diag[ir]+=1;
           } else

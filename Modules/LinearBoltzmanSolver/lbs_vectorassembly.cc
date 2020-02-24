@@ -8,7 +8,7 @@ int LinearBoltzman::Solver::
 MapDOF(chi_mesh::Cell *cell, int dof, int mom, int g)
 {
   int G = groups.size();
-  int address = local_cell_dof_array_address[cell->cell_local_id];
+  int address = local_cell_dof_array_address[cell->local_id];
 //  int block_address = (address+dof)*num_moments*groups.size();
 
   return (address+dof)*num_moments*G + G*mom + g;
@@ -30,7 +30,7 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
   for (const auto& cell : grid->local_cells)
   {
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {
@@ -69,7 +69,7 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
   for (const auto& cell : grid->local_cells)
   {
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {
@@ -107,7 +107,7 @@ DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
   for (const auto& cell : grid->local_cells)
   {
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {

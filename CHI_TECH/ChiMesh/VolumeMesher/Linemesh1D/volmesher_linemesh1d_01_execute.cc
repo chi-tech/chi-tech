@@ -76,7 +76,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         {
           cell_count++;
           auto slab = new chi_mesh::CellSlab;
-          slab->cell_global_id = cell_count;
+          slab->global_id = cell_count;
 
           //====================== Populate basic data
           slab->vertex_ids.resize(2,-1);

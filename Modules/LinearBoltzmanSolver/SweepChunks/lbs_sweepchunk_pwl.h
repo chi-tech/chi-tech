@@ -152,11 +152,11 @@ public:
     {
       int  cell_local_id = spds->spls->item_id[cr_i];
       auto cell          = &grid_view->local_cells[cell_local_id];
-      int  cell_g_index  = cell->cell_global_id;
+      int  cell_g_index  = cell->global_id;
 
-      auto cell_fe_view   = (CellFEView*)grid_fe_view->MapFeViewL(cell->cell_local_id);
+      auto cell_fe_view   = (CellFEView*)grid_fe_view->MapFeViewL(cell->local_id);
       auto transport_view =
-        (LinearBoltzman::CellViewFull*)(*grid_transport_view)[cell->cell_local_id];
+        (LinearBoltzman::CellViewFull*)(*grid_transport_view)[cell->local_id];
 
       int     cell_dofs    = cell_fe_view->dofs;
       int     xs_id        = transport_view->xs_id;
@@ -265,7 +265,7 @@ public:
                 else
                 {psi = angle_set->PsiBndry(bndry_map,
                                            angle_num,
-                                           cell->cell_local_id,
+                                           cell->local_id,
                                            f,fj,gs_gi,gs_ss_begin,
                                            suppress_surface_src);
                 }
@@ -403,7 +403,7 @@ public:
             {
               int i = cell_fe_view->face_dof_mappings[f][fi];
               psi = angle_set->ReflectingPsiOutBoundBndry(bndry_index, angle_num,
-                                                          cell->cell_local_id, f,
+                                                          cell->local_id, f,
                                                           fi, gs_ss_begin);
 
               for (int gsg=0; gsg<gs_ss_size; gsg++)

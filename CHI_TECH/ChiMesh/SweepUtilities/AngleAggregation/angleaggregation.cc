@@ -102,7 +102,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
         cell_vec.resize(num_local_cells);
         for (const auto& cell : grid->local_cells)
         {
-          int c = cell.cell_local_id;
+          int c = cell.local_id;
 
           //=========================== Check cell on ref bndry
           bool on_ref_bndry = false;
