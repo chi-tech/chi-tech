@@ -1,6 +1,6 @@
 /** \page Tutorial03 Tutorial 3: Basic transport simulation
 
-Let us tackle a basic transport simulation and perform a 1D simulation\n
+Let us tackle a basic transport simulation on a 1D mesh\n
 
 \f[
  \hat{\Omega} \nabla \Psi(\hat{\Omega}) + \sigma_t \Psi (\hat{\Omega}) =

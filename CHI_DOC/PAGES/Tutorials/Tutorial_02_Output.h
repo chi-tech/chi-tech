@@ -1,4 +1,4 @@
-/** \page Tutorial02 Tutorial 2: Adding basic output
+/** \page Tutorial02 Tutorial 2: Other forms of output
  *
  * Solver modules in ChiTech connect their solution information to a concept
  * called a <B>Field Function</B>. A field function is considered fully defined
@@ -16,7 +16,7 @@ We will be adding some items to this input file.
  fflist,count = chiGetFieldFunctionList(phys1)
  \endcode
 
- The funcation call chiGetFieldFunctionList() provides us with two items. A
+ The function call chiGetFieldFunctionList() provides us with two items. A
  lua-table and a count of how many items there are in the table. The items
  in "fflist" are the text names of the field functions. Each solver has its
  own defaults.
@@ -80,24 +80,20 @@ The output procuded is shown below:
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj")
+nodes={}
+N=32
+ds=2.0/N
+for i=0,N do
+    nodes[i+1] = -1.0 + i*ds
+end
+surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
+--surf_mesh,region1 = chiMeshCreate2DOrthoMesh(nodes,nodes)
 
--- Setup Region
-region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
+--chiSurfaceMesherSetProperty(PARTITION_X,2)
+--chiSurfaceMesherSetProperty(PARTITION_Y,2)
+--chiSurfaceMesherSetProperty(CUT_X,0.0)
+--chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
--- Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
-
--- Setup extrusion layers
-subdivisions=3
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,3.0,subdivisions,"My Layer");
-
---  Execute meshing
-chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
 material = chiPhysicsAddMaterial("Test Material");
@@ -106,9 +102,7 @@ material = chiPhysicsAddMaterial("Test Material");
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,material)
 
--- Export visualization
-chiRegionExportMeshToObj(region1,"Tutorial01Mesh.obj",true)
-
+chiRegionExportMeshToVTK(region1,"Mesh")
 --############################################### Add material properties
 
 
@@ -124,15 +118,17 @@ chiPhysicsMaterialSetProperty(material,"q",SINGLE_VALUE,1.0)
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
-
--- Initialize and Execute Solver
+chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
+--
+----############################################### Initialize and
+----                                                Execute Solver
 chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
-
-
---############################################### Setup FF interpolator
+--
+----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
+chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")
+
 slice1 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,1.5)
 chiFFInterpolationSetProperty(slice1,ADD_FIELDFUNCTION,fflist[1])
