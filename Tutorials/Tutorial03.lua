@@ -41,7 +41,6 @@ for k=1,num_groups do
     chiLBSCreateGroup(phys1)
 end
 
---pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,32)
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2,2)
 
 --========== Groupset def
@@ -79,6 +78,8 @@ chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist[1])
 chiFFInterpolationInitialize(cline)
 chiFFInterpolationExecute(cline)
 chiFFInterpolationExportPython(cline)
+
+chiExportFieldFunctionToVTK(fflist[1],"Tutorial3Output","Phi")
 
 if (chi_location_id == 0) then
     local handle = io.popen("python ZLFFI00.py")

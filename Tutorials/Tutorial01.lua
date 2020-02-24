@@ -9,11 +9,11 @@ for i=0,N do
 end
 surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
 --surf_mesh,region1 = chiMeshCreate2DOrthoMesh(nodes,nodes)
-
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+--
+--chiSurfaceMesherSetProperty(PARTITION_X,2)
+--chiSurfaceMesherSetProperty(PARTITION_Y,2)
+--chiSurfaceMesherSetProperty(CUT_X,0.0)
+--chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 chiVolumeMesherExecute();
 

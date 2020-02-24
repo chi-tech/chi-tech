@@ -205,24 +205,14 @@ Here is the complete input file with comments
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj")
+nodes={}
+N=32
+ds=2.0/N
+for i=0,N do
+    nodes[i+1] = -1.0 + i*ds
+end
+surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
 
--- Setup Region
-region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-
--- Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
-
--- Setup extrusion layers
-subdivisions=3
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,3.0,subdivisions,"My Layer");
-
---  Execute meshing
-chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
 material = chiPhysicsAddMaterial("Test Material");
@@ -231,9 +221,7 @@ material = chiPhysicsAddMaterial("Test Material");
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,material)
 
--- Export visualization
-chiRegionExportMeshToObj(region1,"Tutorial01Mesh.obj",true)
-
+chiRegionExportMeshToVTK(region1,"Mesh")
 --############################################### Add material properties
 
 
@@ -249,11 +237,16 @@ chiPhysicsMaterialSetProperty(material,"q",SINGLE_VALUE,1.0)
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
+chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
 
--- Initialize and Execute Solver
+--############################################### Initialize and
+--                                                Execute Solver
 chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
+
+----############################################### Visualize the field function
+fflist,count = chiGetFieldFunctionList(phys1)
+chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")
 \endcode
 
 

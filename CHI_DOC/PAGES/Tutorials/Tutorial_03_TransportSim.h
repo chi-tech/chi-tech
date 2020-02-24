@@ -1,6 +1,6 @@
 /** \page Tutorial03 Tutorial 3: Basic transport simulation
 
-Let us tackle a basic transport simulation on a 1D mesh\n
+Let us tackle a basic transport simulation on a 3D mesh\n
 
 \f[
  \hat{\Omega} \nabla \Psi(\hat{\Omega}) + \sigma_t \Psi (\hat{\Omega}) =
@@ -15,47 +15,29 @@ Let us tackle a basic transport simulation on a 1D mesh\n
 
 ## Step 2 - Create a mesh
 
-A 1D simulation is created from a Line-mesh. The line mesh expects to be
- populated by a number of points supplied by a lua table.
+As was done in Tutorials 1 and 2 we create the 3D mesh as follows:
 
 \code
-mesh={}
-N=5000
-L=30.0
-xmin = 0.0
-dx = L/N
-for i=1,(N+1) do
-    k=i-1
-    mesh[i] = xmin + k*dx
+chiMeshHandlerCreate()
+
+nodes={}
+N=32
+ds=2.0/N
+for i=0,N do
+    nodes[i+1] = -1.0 + i*ds
 end
-line_mesh = chiLineMeshCreateFromArray(mesh)
+surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
+
+chiVolumeMesherExecute();
 \endcode
 
-As soon as we have a line mesh we can now proceed as before.
+Next we set the material IDs:
 
 \code
-region1 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
--- Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
-
--- Execute meshing
-chiSurfaceMesherExecute();
-chiVolumeMesherExecute();
-
 -- Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 \endcode
-
-Some notably new items is the different volume mesher (VOLUMEMESHER_LINEMESH1D).
- Note also that even though there is no notion of a surfacemesher we still
- need to use a pass-through SurfaceMesher. This helps to keep the coding
- pipeline simple.
-
-We also set the material id's the same we we do any mesh format.
 
 ## Step 3 - Add a material with a transport cross-section
 
@@ -66,13 +48,13 @@ Similar to the diffusion tutorial we have to create a material, then add a
 material0 = chiPhysicsAddMaterial("Test Material");
 
 chiPhysicsMaterialAddProperty(material0,TRANSPORT_XSECTIONS)
-
+num_groups = 1
 chiPhysicsMaterialSetProperty(material0,
                               TRANSPORT_XSECTIONS,
                               SIMPLEXS1,
-                              1,     --Num grps
-                              1.0,   --Sigma_t
-                              1.0)   --Scattering ratio
+                              num_groups,     --Num grps
+                              1.0,            --Sigma_t
+                              0.2)            --Scattering ratio
 \endcode
 
 The general material property TRANSPORT_XSECTIONS is used for
@@ -83,22 +65,29 @@ The general material property TRANSPORT_XSECTIONS is used for
 ## Step 4 - Add Transport physics
 
 \code
+--############################################### Setup Physics
 phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
-chiLBSCreateGroup(phys1)
+for k=1,num_groups do
+    chiLBSCreateGroup(phys1)
+end
 
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,32)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2,2)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
-chiLBSGroupsetAddGroups(phys1,gs0,0,0)
+chiLBSGroupsetAddGroups(phys1,gs0,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
 
 --========== Boundary conditions
-bsrc = {0.5}
+bsrc = {}
+for k=1,num_groups do
+    bsrc[k] = 0.0
+end
+bsrc[1] = 0.5
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,
-                  ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+                  YMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD1D)
@@ -106,15 +95,18 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 \endcode
 
  A transport solver is invoked by using a call to chiLBSCreateSolver().
- This creates a derived physics solver so the mesh region gets added to the
+ This creates a derived object based on a base physics solver so the
+ mesh region gets added to the
  solver using the generic call chiSolverAddRegion(). Past this point we need
- to create the single required group with chiLBSCreateGroup() and then a
+ to create the single required group with chiLBSCreateGroup(), although we put
+ this in a loop for in-case we want to increase the number of groups, and then a
  quadrature rule for integration of the angular fluxes. Since we are dealing
- with a 1D simulation we will be integration over theta translating to a
- cosine from -1 to 1 and therefore the appropriate quadrature rule would be a
- Gauss-Legendre quadrature rule. For this we use a call to
- chiCreateProductQuadrature() and specifying GAUSS_LEGENDRE as the rule and
- 32 number of discrete angles.
+ with a 3D simulation we will be integrating over \f$ \theta \f$, the polar
+ angle, and \f$ \varphi \f$, the azimuthal angle. A quadrature with favorable
+ parallel properties is the Gauss-Legendre-Chebyshev quadrature. We create this
+ quadrature with a call to
+ chiCreateProductQuadrature() and specifying GAUSS_LEGENDRE_CHEBYSHEV as the rule
+ and we then specify 2 azimuthal angles per octant and 2 polar angles per octant.
 
  The next step in the process is to assign a group-set. Group-sets are very
  useful aggregation features in higher dimension simulations but here we
@@ -140,8 +132,8 @@ This should be intuitive.
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
-chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0,0.0, L+xmin)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0,1.0)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0, 1.0,1.0)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 50)
 
 chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist[1])

@@ -40,12 +40,12 @@ phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
---
-----############################################### Initialize and
-----                                                Execute Solver
+
+--############################################### Initialize and
+--                                                Execute Solver
 chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
---
+
 ----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
 chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")
