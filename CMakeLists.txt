@@ -116,11 +116,12 @@ set(TRIANGLE "${TRIANGLE_ROOT}/triangle.o")
 
 # --------------------------- VTK
 find_package(VTK COMPONENTS
-  vtkCommonCore
-  vtkCommonDataModel
-	vtkIOLegacy vtkIOCore 
-	vtkIOXML vtkParallelCore
-	vtkIOParallelXML REQUIRED)
+             vtkCommonCore vtkCommonDataModel
+	         vtkIOLegacy vtkIOCore
+	         vtkIOXML vtkParallelCore vtkIOParallelXML
+             vtkFiltersCore
+             vtkIOEnSight
+             REQUIRED)
 if (NOT VTK_FOUND)
   message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()

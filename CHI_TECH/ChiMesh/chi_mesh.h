@@ -58,6 +58,7 @@ namespace chi_mesh
   //=================================== Meshes
   class LineMesh;
   class SurfaceMesh;
+  class UnpartitionedMesh;
   class MeshContinuum;
 
   //=================================== Logical Volumes

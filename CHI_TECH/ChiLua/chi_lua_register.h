@@ -37,6 +37,8 @@ RegisterFunction(chiGetProductQuadrature)
 RegisterFunction(chiMeshCreate1DSlabMesh)
 RegisterFunction(chiMeshCreate2DOrthoMesh)
 RegisterFunction(chiMeshCreate3DOrthoMesh)
+RegisterFunction(chiUnpartitionedMeshFromVTU)
+RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
 
 
 //module:Mesh Utilities
