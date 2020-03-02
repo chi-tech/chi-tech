@@ -4,6 +4,7 @@
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
 
 
 #include <chi_mpi.h>
@@ -70,7 +71,8 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D 3D MESHES
   else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) )
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)))
   {
     int num_azi = groupset->quadrature->azimu_ang.size();
     int num_pol = groupset->quadrature->polar_ang.size();

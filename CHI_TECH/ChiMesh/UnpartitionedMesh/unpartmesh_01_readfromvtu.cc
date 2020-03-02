@@ -44,7 +44,7 @@ void chi_mesh::UnpartitionedMesh::
   reader->Update();
 
   chi_log.Log(LOG_0)
-    << "Done reading Ensight-Gold file: \""
+    << "Done reading VTU file: \""
     << options.file_name << "\".";
 
   //======================================== Remove duplicate vertices
@@ -79,7 +79,14 @@ void chi_mesh::UnpartitionedMesh::
   {
     auto point = ugrid->GetPoint(p);
     vertices.push_back(new chi_mesh::Vertex(point[0],point[1],point[2]));
-  }
 
+    if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
+    if (point[0] > bound_box.xmax) bound_box.xmax = point[0];
+    if (point[1] < bound_box.ymin) bound_box.ymin = point[1];
+    if (point[1] > bound_box.ymax) bound_box.ymax = point[1];
+    if (point[2] < bound_box.zmin) bound_box.zmin = point[2];
+    if (point[2] > bound_box.zmax) bound_box.zmax = point[2];
+
+  }
 
 }

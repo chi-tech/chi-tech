@@ -140,6 +140,15 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.push_back(CreateCellFromVTKHexahedron(vtk_cell));
     else if (vtk_celltype == VTK_TETRA)
       raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
+
+    int mat_id=-1;
+    for (auto block_lim : block_mat_id)
+    {
+      ++mat_id;
+      if (c>=block_lim) break;
+    }
+
+    raw_cells.back()->material_id = mat_id;
   }//for c
 
   //======================================== Push points
@@ -147,6 +156,13 @@ void chi_mesh::UnpartitionedMesh::
   {
     auto point = ugrid->GetPoint(p);
     vertices.push_back(new chi_mesh::Vertex(point[0],point[1],point[2]));
+
+    if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
+    if (point[0] > bound_box.xmax) bound_box.xmax = point[0];
+    if (point[1] < bound_box.ymin) bound_box.ymin = point[1];
+    if (point[1] > bound_box.ymax) bound_box.ymax = point[1];
+    if (point[2] < bound_box.zmin) bound_box.zmin = point[2];
+    if (point[2] > bound_box.zmax) bound_box.zmax = point[2];
   }
 
 }

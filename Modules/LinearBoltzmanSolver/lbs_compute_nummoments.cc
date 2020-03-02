@@ -3,6 +3,7 @@
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
 #include <ChiMesh/SurfaceMesher/Triangle/triangle_mesher.h>
 #include <ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h>
 
@@ -23,7 +24,8 @@ void LinearBoltzman::Solver::ComputeNumberOfMoments()
     this->num_moments = L+1;
   }
   if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder) or
-      typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
+      typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D) or
+      typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D))
   {
     int L = options.scattering_order;
     this->num_moments = L*(L+2) + 1;

@@ -4,7 +4,9 @@
 #include <ChiMesh/SurfaceMesh/chi_surfacemesh.h>
 #include <ChiMesh/SurfaceMesher/Triangle/triangle_mesher.h>
 #include <ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h>
+#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
+#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
 #include "Linemesh1D/volmesher_linemesh1d.h"
 
 #include <ChiMesh/Cell/cell_polygon.h>
@@ -260,7 +262,7 @@ std::pair<int,int> chi_mesh::VolumeMesher::
  * Cell xy_partition ids are obtained from
  * the surface mesher. z id is obtained from the volume mesher.*/
 std::tuple<int,int,int> chi_mesh::VolumeMesher::
-GetCellXYZPartitionID(chi_mesh::Cell *cell)
+  GetCellXYZPartitionID(chi_mesh::Cell *cell)
 {
   std::tuple<int,int,int> ijk_id(0,0,0);
   bool found_partition = false;
@@ -376,7 +378,46 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
       zmin = zmax;
     }
   }//if typeid
-  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
+  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefined3D))
+  {
+    if (vol_mesher->zcuts.empty())
+    {
+      std::get<0>(ijk_id) = ij_id.first;
+      std::get<1>(ijk_id) = ij_id.second;
+      std::get<2>(ijk_id) = 0;
+      found_partition = true;
+    }
+
+    //====================================== Scan cuts for location
+    double zmin = -1.0e16;
+    double zmax =  1.0e16;
+    vol_mesher->zcuts.push_back(zmax);
+    for (int k=0; k<(vol_mesher->zcuts.size()); k++)
+    {
+      zmax =  vol_mesher->zcuts[k];
+
+      double z = cell->centroid.z;
+
+      if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
+      {
+        printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
+      }
+
+
+      if ((z > zmin) && (z < zmax))
+      {
+        std::get<0>(ijk_id) = ij_id.first;
+        std::get<1>(ijk_id) = ij_id.second;
+        std::get<2>(ijk_id) = k;
+
+        found_partition = true;
+        break;
+      }
+      zmin = zmax;
+    }
+  }//if typeid
+  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
   {
     found_partition = true;
     std::get<0>(ijk_id) = ij_id.first;
@@ -387,7 +428,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
   //================================================== Report unallocated item_id
   if (!found_partition)
   {
-    chi_log.Log(LOG_0ERROR)
+    chi_log.Log(LOG_ALLERROR)
     << "A cell was encountered for which "
        "no zpartition id was found";
     exit(EXIT_FAILURE);

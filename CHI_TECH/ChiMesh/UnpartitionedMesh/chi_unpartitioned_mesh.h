@@ -10,7 +10,8 @@
  * partitioning.*/
 class chi_mesh::UnpartitionedMesh
 {
-public:
+  friend class VolumeMesherPredefined3D;
+private:
   struct LightWeightFace
   {
     int neighbor=-1;
@@ -19,6 +20,7 @@ public:
   struct LightWeightCell
   {
     chi_mesh::Vertex centroid;
+    int material_id=-1;
     std::vector<int> vertex_ids;
     std::vector<LightWeightFace> faces;
   };
@@ -37,6 +39,13 @@ public:
     std::string file_name;
     ParallelMethod parallel_method = ParallelMethod::ALL_FROM_HOME;
   }mesh_options;
+
+  struct BoundBox
+  {
+    double xmin=0.0, xmax=0.0,
+           ymin=0.0, ymax=0.0,
+           zmin=0.0, zmax=0.0;
+  } bound_box;
 
   LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
   LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);

@@ -54,8 +54,19 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         bool is_cyclic = false;
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ((cyclic_dependency.first == cell->local_id) &&
-              (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
+          int a = cyclic_dependency.first;
+          int b = cyclic_dependency.second;
+          int c = cell->local_id;
+          int d = face.GetNeighborLocalID(grid);
+
+          if ((a == c) && (b == d) )
+          {
+            is_cyclic = true;
+            inco_face_face_category.back() *= -1;
+            inco_face_face_category.back() -= 1;
+          }
+
+          if ((a == d) && (b == c) )
           {
             is_cyclic = true;
             inco_face_face_category.back() *= -1;
@@ -161,8 +172,19 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       {
         for (auto cyclic_dependency : spds->local_cyclic_dependencies)
         {
-          if ((cyclic_dependency.first == cell->local_id) &&
-              (cyclic_dependency.second == face.GetNeighborLocalID(grid)) )
+          int a = cyclic_dependency.first;
+          int b = cyclic_dependency.second;
+          int c = cell->local_id;
+          int d = face.GetNeighborLocalID(grid);
+
+          if ((a == c) && (b == d) )
+          {
+            temp_lock_box = &delayed_lock_box;
+            outb_face_face_category.back() *= -1;
+            outb_face_face_category.back() -= 1;
+          }
+
+          if ((a == d) && (b == c) )
           {
             temp_lock_box = &delayed_lock_box;
             outb_face_face_category.back() *= -1;

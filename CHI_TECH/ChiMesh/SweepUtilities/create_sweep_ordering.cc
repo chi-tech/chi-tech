@@ -21,9 +21,9 @@ extern ChiTimer   chi_program_timer;
 /**Develops a sweep ordering for a given angle for locally owned
  * cells.*/
 chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
-CreateSweepOrder(double polar, double azimuthal,
-                 chi_mesh::MeshContinuum *grid,
-                 bool cycle_allowance_flag)
+  CreateSweepOrder(double polar, double azimuthal,
+                   chi_mesh::MeshContinuum *grid,
+                   bool cycle_allowance_flag)
 {
   auto sweep_order  = new chi_mesh::sweep_management::SPDS;
   sweep_order->grid = grid;
@@ -47,117 +47,89 @@ CreateSweepOrder(double polar, double azimuthal,
     chi_log.Log(LOG_0VERBOSE_1) << buff;
   }
 
-  //============================================= Add all local item_id to graph
-  // The cell added to the graph vertex will have
-  // the same index as the cell's local index
-  CHI_D_GRAPH G;
-  for (auto c : grid->local_cell_glob_indices)
-    boost::add_vertex(G);
-
-  std::vector<std::set<int>> cell_dependencies(num_loc_cells);
-  std::vector<std::set<int>> cell_successors(num_loc_cells);
-
   //============================================= Make directed connections
   chi_log.Log(LOG_0VERBOSE_1) << "Populating cell relationships";
+  std::vector<std::set<int>> cell_dependencies(num_loc_cells);
+  std::vector<std::set<int>> cell_successors(num_loc_cells);
   PopulateCellRelationships(grid,
                             sweep_order,
                             cell_dependencies,
                             cell_successors);
 
+  //============================================= Build graph
+  chi_graph::DirectedGraph test_DG;
 
-  //================================================== Add connectivity to
-  //                                                   Graph and filter Strongly
-  //                                                   Connected Components
-  chi_log.Log(LOG_0VERBOSE_1) << "Adding connectivity";
+  for (int c=0; c<num_loc_cells; ++c)
+    test_DG.AddVertex();
+
   for (int c=0; c<num_loc_cells; c++)
-  {
     for (auto successor : cell_successors[c])
+      test_DG.AddEdge(c,successor);
+
+  //============================================= Find initial SCCs
+  auto SCCs = test_DG.FindStronglyConnectedConnectionns();
+
+  //============================================= Rinse remove edges
+  std::vector<std::pair<int,int>> edges_to_remove;
+  int iter=0;
+  while (not SCCs.empty())
+  {
+    chi_log.Log(LOG_0VERBOSE_1)
+      << "Local cyclic dependency removal. Iteration " << ++iter;
+    //=================================== Loop over sub-graphs
+    edges_to_remove.clear();
+    for (auto& subDG : SCCs)
     {
-      if (!cycle_allowance_flag)
+      //Identify edges to remove
+      bool found_edge_to_remove = false;
+      for (int v : subDG)
       {
-        boost::add_edge(c,successor,G);
+        for (int w : test_DG.vertices[v].ds_edge)
+          if (std::find(subDG.begin(), subDG.end(), w) != subDG.end())
+          {
+            found_edge_to_remove = true;
+            edges_to_remove.emplace_back(v,w);
+            break;
+          }
 
-        bool strongly_connected = false;
+        if (found_edge_to_remove) break;
+      }//for v in subDG
+    }//for subDG
 
-        for (auto dependency : cell_dependencies[c])
-          if (dependency == successor)
-            strongly_connected = true;
+    //Remove the edges
+    for (auto& edge_to_remove : edges_to_remove)
+    {
+      test_DG.RemoveEdge(edge_to_remove.first,edge_to_remove.second);
+      sweep_order->local_cyclic_dependencies.emplace_back(
+                                               edge_to_remove.first,
+                                               edge_to_remove.second);
+    }
 
-        if (strongly_connected)
-        {
-          chi_log.Log(LOG_ALLERROR)
-            << "Cyclic local sweep ordering detected.";
-          exit(EXIT_FAILURE);
-        }
-      }
-      else
-      {
-        bool strongly_connected = false;
-
-        for (auto dependency : cell_dependencies[c])
-          if (dependency == successor)
-            strongly_connected = true;
-
-        if (!strongly_connected) boost::add_edge(c,successor,G);
-        else
-          sweep_order->local_cyclic_dependencies.emplace_back(c,successor);
-
-      }
-    }//for successors
-  }//for local cell
-
-
-
-  //================================================== Generic topological
-  //                                                   sorting
-  chi_log.Log(LOG_0VERBOSE_1) << "Generating topological sorting";
-  typedef boost::graph_traits<CHI_D_GRAPH>::vertex_descriptor gVertex;
-
-  boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
-    index_map = get(boost::vertex_index, G);
-
-  std::vector<gVertex> sorted_list;
-  try{
-    boost::topological_sort(G,std::back_inserter(sorted_list));
+    // Refind SCCs
+    SCCs = test_DG.FindStronglyConnectedConnectionns();
   }
-  catch (const boost::bad_graph& exc)
+
+  //============================================= Generate topological sorting
+  chi_log.Log(LOG_0VERBOSE_1) << "Generating topological sorting";
+  sweep_order->spls = new chi_mesh::sweep_management::SPLS;
+  sweep_order->spls->item_id = test_DG.GenerateTopologicalSort();
+
+  if (sweep_order->spls->item_id.empty())
   {
     chi_log.Log(LOG_ALLERROR)
-    << "Cyclic local sweep ordering detected.";
+      << "Topological sorting for local sweep-ordering failed. "
+      << "Cyclic dependencies detected.";
     exit(EXIT_FAILURE);
   }
-
-
-  //================================================== Generating sweep planes
-  chi_log.Log(LOG_0VERBOSE_1) << "Generating sweep planes";
-  //The functionality of a sweep order allows for creating
-  //multiple sweep planes but since this is a local sweep
-  //we do not require to sort the sweep planes by the
-  //their degrees and we can just use a single sweep plane.
-  //Alternatively this code can be modified to allows this
-  //but I can see no reason for this other than for
-  //visualization.
-  int i=0;
-  for (auto ii=sorted_list.rbegin(); ii!=sorted_list.rend(); ++ii)
-  {
-    if (i==0) sweep_order->spls = new chi_mesh::sweep_management::SPLS;
-
-//    int cell_local_id = index_map[*ii];
-//    int cell_global_index = grid->local_cell_glob_indices[cell_local_id];
-//    sweep_order->spls->item_id.push_back(cell_global_index);
-    sweep_order->spls->item_id.push_back(index_map[*ii]);
-    ++i;
-  }
-
-  G.clearing_graph();
-
-  chi_log.Log(LOG_0VERBOSE_1)
-  << chi_program_timer.GetTimeString()
-  << " Communicating sweep dependencies.";
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Create Task Dependency Graphs
   //All locations will send their dependencies
   //to the other locations
+
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Communicating sweep dependencies.";
+
   int P = chi_mpi.process_count;
   std::vector<int> dependency_count_per_location(P,0);
   std::vector<std::vector<int>> global_dependencies(P, std::vector<int>());
@@ -167,12 +139,10 @@ CreateSweepOrder(double polar, double azimuthal,
 
   //============================================= Broadcast location dep counts
   for (int locI=0; locI<P; locI++)
-  {
     MPI_Bcast(&dependency_count_per_location[locI], //Buffer
               1, MPI_INT,                           //Count and type
               locI,                                 //Sending location
               MPI_COMM_WORLD);                      //Communicator
-  }
 
   //============================================= Broadcast dependencies
   for (int locI=0; locI<P; locI++)
@@ -182,13 +152,14 @@ CreateSweepOrder(double polar, double azimuthal,
       std::copy(sweep_order->location_dependencies.begin(),
                 sweep_order->location_dependencies.end(),
                 std::back_inserter(global_dependencies[locI]));
-    } else
+    }
+    else
     {
       global_dependencies[locI].
         resize(dependency_count_per_location[locI],-1);
     }
 
-    MPI_Bcast(global_dependencies[locI].data(), //Buffer
+    MPI_Bcast(global_dependencies[locI].data(),        //Buffer
               dependency_count_per_location[locI],     //Count
               MPI_INT,                                 //Type
               locI,                                    //Sending location
@@ -249,6 +220,8 @@ CreateSweepOrder(double polar, double azimuthal,
   chi_log.Log(LOG_ALLVERBOSE_1)
     << chi_program_timer.GetTimeString()
     << "   - Generating topological sort.";
+  typedef boost::graph_traits<CHI_D_GRAPH>::vertex_descriptor gVertex;
+
   boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
     glob_index_map = get(boost::vertex_index, TDG);
 
@@ -256,8 +229,8 @@ CreateSweepOrder(double polar, double azimuthal,
   try {
     boost::topological_sort(TDG, std::back_inserter(glob_sorted_list));
   }
-//  catch (const boost::bad_graph& exc)
-  catch(...)
+  catch (const boost::bad_graph& exc)
+//  catch(...)
   {
     chi_log.Log(LOG_ALLERROR)
       << "Cyclic global sweep ordering detected.";
