@@ -38,8 +38,22 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Single angle aggr.
+  if (groupset->angleagg_method == LinearBoltzman::AngleAggregationType::SINGLE)
+  {
+    for (auto angle : groupset->quadrature->abscissae)
+    {
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
+        CreateSweepOrder(angle->theta,
+                         angle->phi,
+                         this->grid,
+                         groupset->allow_cycles);
+      this->sweep_orderings.push_back(new_swp_order);
+    }
+  }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D MESHES
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
   {
     int num_azi = groupset->quadrature->azimu_ang.size();
     int num_pol = groupset->quadrature->polar_ang.size();

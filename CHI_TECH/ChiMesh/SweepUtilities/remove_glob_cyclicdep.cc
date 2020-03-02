@@ -1,6 +1,7 @@
 #include "../chi_mesh.h"
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
+#include "ChiGraph/chi_directed_graph.h"
 
 #include <chi_log.h>
 #include <chi_mpi.h>
@@ -10,112 +11,116 @@ extern ChiLog chi_log;
 #include <algorithm>
 
 //###################################################################
-/** This method searches ref_glob_dep[ref_locI] for a dependency on
- * master_locI and if found will set found=true.
- * Its search is registered in search_history to prevent
- * cyclic search patterns. Optionally the routine can also be allowed to
- * search recursively.*/
-void
-chi_mesh::sweep_management::RecursivelyFindLocIDependency(
-  std::vector<std::vector<int>>& ref_glob_dep,
-  std::vector<int>& search_history,
-  int master_locI,
-  int ref_locI,
-  bool& found,
-  bool allow_recursive_search)
+/**Removes local cyclic dependencies.*/
+void chi_mesh::sweep_management::
+  RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
+                                chi_graph::DirectedGraph &local_DG)
 {
-  if (found) return;
-  if (ref_locI < 0) return;
+  //============================================= Find initial SCCs
+  auto SCCs = local_DG.FindStronglyConnectedConnectionns();
 
-  auto already_searched = (
-    std::find(search_history.begin(),search_history.end(),ref_locI) !=
-    search_history.end() );
-
-  if (already_searched) return;
-  search_history.push_back(ref_locI);
-
-
-  for (auto dependency : ref_glob_dep[ref_locI])
+  //============================================= Rinse remove edges
+  std::vector<std::pair<int,int>> edges_to_remove;
+  int iter=0;
+  while (not SCCs.empty())
   {
-    if (dependency == master_locI)
+    chi_log.Log(LOG_0VERBOSE_1)
+      << "Inter cell cyclic dependency removal. Iteration " << ++iter;
+    //=================================== Loop over sub-graphs
+    edges_to_remove.clear();
+    for (auto& subDG : SCCs)
     {
-      found = true;
-      break;
+      //Identify edges to remove
+      bool found_edge_to_remove = false;
+      for (int v : subDG)
+      {
+        for (int w : local_DG.vertices[v].ds_edge)
+          if (std::find(subDG.begin(), subDG.end(), w) != subDG.end())
+          {
+            found_edge_to_remove = true;
+            edges_to_remove.emplace_back(v,w);
+            break;
+          }
+
+        if (found_edge_to_remove) break;
+      }//for v in subDG
+    }//for subDG
+
+    //Remove the edges
+    for (auto& edge_to_remove : edges_to_remove)
+    {
+      local_DG.RemoveEdge(edge_to_remove.first, edge_to_remove.second);
+      sweep_order->local_cyclic_dependencies.emplace_back(
+        edge_to_remove.first,
+        edge_to_remove.second);
     }
-    if (allow_recursive_search)
-      RecursivelyFindLocIDependency(ref_glob_dep,
-                                    search_history,
-                                    master_locI,
-                                    dependency,
-                                    found,
-                                    allow_recursive_search);
+
+    // Refind SCCs
+    SCCs = local_DG.FindStronglyConnectedConnectionns();
   }
 }
 
 //###################################################################
-/** This method firstly loops over each location and then each location's
- * dependencies. It can optionally also go deeper and recursively loop.
- *
- * The main purpose is to find whether dependencies reference back to this
- * location, thereby identifying a cyclic dependency. When a cyclic
- * dependency is found it will be removed and the appropriate registers
- * will be set.*/
-void
-chi_mesh::sweep_management::RemoveGlobalCyclicDependencies(
-  chi_mesh::sweep_management::SPDS *sweep_order,
-  std::vector<std::vector<int>> &global_dependencies,
-  bool allow_recursive_search,
-  bool allow_cycles)
+/**Removes global cyclic dependencies.*/
+void chi_mesh::sweep_management::
+  RemoveGlobalCyclicDependencies(
+    chi_mesh::sweep_management::SPDS* sweep_order,
+    chi_graph::DirectedGraph& TDG)
 {
-  std::vector<int> search_history;
-  search_history.reserve(chi_mpi.location_id);
-  for (int locI=0; locI<chi_mpi.process_count; locI++)
+  //============================================= Find initial SCCs
+  auto SCCs = TDG.FindStronglyConnectedConnectionns();
+
+  //============================================= Rinse remove edges
+  std::vector<std::pair<int,int>> edges_to_remove;
+  int iter=0;
+  while (not SCCs.empty())
   {
-
-    int c=-1;
-    for (auto rlocI : global_dependencies[locI])
+    chi_log.Log(LOG_0VERBOSE_1)
+      << "Inter cell-set cyclic dependency removal. Iteration " << ++iter;
+    //=================================== Loop over sub-graphs
+    edges_to_remove.clear();
+    for (auto& subDG : SCCs)
     {
-      ++c;
-      if (rlocI<0) continue;
-
-      bool depends_on_locI = false;
-      search_history.clear();
-      search_history.reserve(chi_mpi.location_id);
-      RecursivelyFindLocIDependency(global_dependencies,
-                                    search_history,
-                                    locI,
-                                    rlocI,
-                                    depends_on_locI,
-                                    allow_recursive_search);
-
-      if (depends_on_locI and allow_cycles)
+      //Identify edges to remove
+      bool found_edge_to_remove = false;
+      for (int v : subDG)
       {
-        global_dependencies[locI][c]  = -1;
-        if (locI == chi_mpi.location_id)
-        {
-          auto dependent_location =
-            std::find(sweep_order->location_dependencies.begin(),
-                      sweep_order->location_dependencies.end(),
-                      rlocI);
-          sweep_order->location_dependencies.erase(dependent_location);
-          sweep_order->delayed_location_dependencies.push_back(rlocI);
-        }
+        for (int w : TDG.vertices[v].ds_edge)
+          if (std::find(subDG.begin(), subDG.end(), w) != subDG.end())
+          {
+            found_edge_to_remove = true;
+            edges_to_remove.emplace_back(v,w);
+            break;
+          }
 
-        if (rlocI == chi_mpi.location_id)
-        {
-          sweep_order->delayed_location_successors.push_back(locI);
-        }
-      }
-      else if (depends_on_locI and (not allow_cycles))
+        if (found_edge_to_remove) break;
+      }//for v in subDG
+    }//for subDG
+
+    //Remove the edges
+    for (auto& edge_to_remove : edges_to_remove)
+    {
+      int rlocI  = edge_to_remove.first;
+      int locI = edge_to_remove.second;
+      TDG.RemoveEdge(rlocI, locI);
+
+      if (locI == chi_mpi.location_id)
       {
-        chi_log.Log(LOG_ALLERROR)
-          << "Global cyclic dependency detected. This must be allowed"
-             " by client applications.";
-        exit(EXIT_FAILURE);
+        auto dependent_location =
+          std::find(sweep_order->location_dependencies.begin(),
+                    sweep_order->location_dependencies.end(),
+                    rlocI);
+        sweep_order->location_dependencies.erase(dependent_location);
+        sweep_order->delayed_location_dependencies.push_back(rlocI);
       }
 
+      if (rlocI == chi_mpi.location_id)
+      {
+        sweep_order->delayed_location_successors.push_back(locI);
+      }
+    }
 
-
-    }//for locI dependency c
-  }//for locI
+    // Refind SCCs
+    SCCs = TDG.FindStronglyConnectedConnectionns();
+  }
 }

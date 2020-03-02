@@ -33,16 +33,6 @@ bool chi_graph::DirectedGraph::AddEdge(int from, int to, bool allow_cycle)
     exit(EXIT_FAILURE);
   }
 
-  //=================================== Check "from" is not in
-  //                                    ds_edge set of "to"
-//  if (vertices[to].ds_edge.find(from) != vertices[to].ds_edge.end())
-//    return false;
-
-  //=================================== Check "to" is not in
-  //                                    us_edge set of "from"
-//  if (vertices[from].us_edge.find(to) != vertices[from].us_edge.end())
-//    return false;
-
   vertices[from].ds_edge.insert(to);
   vertices[to].us_edge.insert(from);
 

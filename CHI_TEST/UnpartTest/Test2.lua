@@ -63,15 +63,15 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,1, 1)
-pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,5, 1)
+pquad  = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,1, 1)
+pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 8)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
 chiLBSGroupsetAddGroups(phys1,cur_gs,0,20)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad2)
---chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
+chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES_CYCLES)
