@@ -34,7 +34,7 @@ chiPhysicsMaterialAddProperty(materials[1],ISOTROPIC_MG_SOURCE)
 chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
-num_groups = 21
+num_groups = 62
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
         PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
@@ -69,8 +69,8 @@ pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 8)
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,20)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad2)
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
 chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
@@ -79,7 +79,7 @@ chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 if (master_export == nil) then
     --chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 end
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,10)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --========== Boundary conditions
@@ -91,7 +91,7 @@ bsrc[1] = 1.0/4.0/math.pi;
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
-chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 
 chiLBSInitialize(phys1)
