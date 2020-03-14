@@ -29,6 +29,7 @@ void LinearBoltzman::Solver::InitFluxDataStructures(LBSGroupset *groupset)
   chi_mesh::VolumeMesher* mesher = handler->volume_mesher;
 
   if ((typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D)) or
+      (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
       (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
   {
     //================================================== Angle Aggregation

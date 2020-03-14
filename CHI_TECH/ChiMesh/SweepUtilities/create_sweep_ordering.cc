@@ -185,7 +185,6 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
     exit(EXIT_FAILURE);
   }
 
-
   //============================================= Compute reorder mapping
   // This mapping allows us to punch in
   // the location id and find what its
