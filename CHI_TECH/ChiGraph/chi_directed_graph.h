@@ -1,77 +1,7 @@
 #ifndef _chi_directed_graph_h
 #define _chi_directed_graph_h
 
-#include "chi_graph.h"
-
-//###################################################################
-/**General implementation of a directed-graph vertex.*/
-struct chi_graph::GraphVertex
-{
-  int id;
-  void* context;
-
-  std::set<int> us_edge;
-  std::set<int> ds_edge;
-
-  GraphVertex(int in_id, void* in_context) :
-    id(in_id),
-    context(in_context)
-  {}
-
-  GraphVertex(int in_id) :
-    id(in_id),
-    context(nullptr)
-  {}
-
-  GraphVertex(const GraphVertex& in_v)
-  {
-    this->id = in_v.id;
-    this->context = in_v.context;
-
-    us_edge = in_v.us_edge;
-    ds_edge = in_v.ds_edge;
-  }
-
-  GraphVertex(GraphVertex&& in_v)
-  {
-    this->id = in_v.id;
-    this->context = in_v.context;
-
-    us_edge = in_v.us_edge;
-    ds_edge = in_v.ds_edge;
-
-    in_v.context = nullptr;
-  }
-
-  GraphVertex& operator=(const GraphVertex& in_v)
-  {
-    this->id = in_v.id;
-    this->context = in_v.context;
-
-    us_edge = in_v.us_edge;
-    ds_edge = in_v.ds_edge;
-
-    return *this;
-  }
-
-  GraphVertex& operator=(GraphVertex&& in_v)
-  {
-    this->id = in_v.id;
-    this->context = in_v.context;
-
-    us_edge = in_v.us_edge;
-    ds_edge = in_v.ds_edge;
-
-    in_v.context = nullptr;
-
-    return *this;
-  }
-
-  bool operator==(const GraphVertex& other)
-  {
-    return other.id == this->id;
-  }
-};
+#include "chi_directed_graph_vertex.h"
 
 //###################################################################
 /**Simple implementation of a directed graph. This implementation was
@@ -80,8 +10,10 @@ struct chi_graph::GraphVertex
 class chi_graph::DirectedGraph
 {
 public:
-//  std::vector<GraphVertex> vertices;
 
+  //============================================= Vertex accessor definition
+  /**Allows semi-sane access to vertices even if
+   * they are removed from the graph.*/
   class VertexAccessor
   {
   private:
@@ -93,8 +25,8 @@ public:
 
     GraphVertex& operator[](int v);
 
-    //##################################### iterator Class Definition
-    /**Internal iterator class.*/
+    //############################ iterator Class Definition
+    /**Internal iterator class for vertex accessor.*/
     class iterator
     {
     public:
@@ -131,6 +63,7 @@ public:
       bool operator!=(const iterator& rhs)
       { return ref_element != rhs.ref_element; }
     };
+    //############################ End of iterator Class Definition
 
     iterator begin()
     {
@@ -156,12 +89,13 @@ public:
 
     void clear() {vertices.clear(); vertex_valid_flags.clear();}
   };
+  //============================================= End of Vertex accessor def
 
   VertexAccessor vertices;
 
   void AddVertex(void* context = nullptr, int id=-1);
   void RemoveVertex(int v);
-  bool AddEdge(int from, int to);
+  bool AddEdge(int from, int to, double weight=1.0);
   void RemoveEdge(int from, int to);
 
   int GetNumSinks()
@@ -197,7 +131,7 @@ private:
 public:
   std::vector<int> DepthFirstSearch(int vertex_id);
   std::vector<std::vector<int>>
-    FindStronglyConnectedConnections();
+    FindStronglyConnectedComponents();
 
   std::vector<int> GenerateTopologicalSort();
 

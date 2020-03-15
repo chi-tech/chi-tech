@@ -93,10 +93,13 @@ void chi_graph::DirectedGraph::
 //###################################################################
 /** Adds an edge to the graph. Range checks are supplied by the
  * vertex accessor.*/
-bool chi_graph::DirectedGraph::AddEdge(int from, int to)
+bool chi_graph::DirectedGraph::AddEdge(int from, int to, double weight)
 {
   vertices[from].ds_edge.insert(to);
   vertices[to].us_edge.insert(from);
+
+  vertices[from].ds_weights[to] = weight;
+  vertices[to].us_weights[from] = weight;
 
   return true;
 }
@@ -130,7 +133,8 @@ void chi_graph::DirectedGraph::
 
 //###################################################################
 /** Depth-First-Search or traversal from specified vertex. Returns
- * the order in which vertices will be traversed in a depth first sense.*/
+ * the order in which vertices will be traversed in a depth first sense.
+ * This algorithm will return the sequence of DFS traversal.*/
 std::vector<int> chi_graph::DirectedGraph::DepthFirstSearch(int vertex_id)
 {
   std::vector<int>  traversal;
@@ -199,7 +203,7 @@ void chi_graph::DirectedGraph::SCCAlgorithm(
  * It returns collections of vertices that form strongly connected
  * components excluding singletons.*/
 std::vector<std::vector<int>> chi_graph::DirectedGraph::
-  FindStronglyConnectedConnections()
+  FindStronglyConnectedComponents()
 {
   size_t V = vertices.size();
 
@@ -299,7 +303,19 @@ std::vector<int> chi_graph::DirectedGraph::
   FindApproxMinimumFAS()
 {
   auto GetVertexDelta = [](chi_graph::GraphVertex& vertex)
-  { return vertex.ds_edge.size() - vertex.us_edge.size(); };
+  {
+//    double delta = vertex.ds_edge.size() - vertex.us_edge.size();
+//    return delta;
+
+    double delta = 0.0;
+    for (int ds : vertex.ds_edge)
+      delta += 1.0*vertex.ds_weights[ds];
+
+    for (int us : vertex.us_edge)
+      delta -= 1.0*vertex.us_weights[us];
+
+    return delta;
+  };
 
   auto& TG = *this;
 
@@ -332,10 +348,10 @@ std::vector<int> chi_graph::DirectedGraph::
     }//G contains sinks
 
     //======================== Get max delta
-    std::pair<int,int> max_delta(-1,-100);
+    std::pair<int,double> max_delta(-1,-100.0);
     for (auto& u : TG.vertices)
     {
-      int delta = GetVertexDelta(u);
+      double delta = GetVertexDelta(u);
       if (delta > max_delta.second)
         max_delta = std::make_pair(u.id,delta);
     }
