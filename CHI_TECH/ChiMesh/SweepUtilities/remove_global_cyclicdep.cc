@@ -18,7 +18,7 @@ void chi_mesh::sweep_management::
     chi_graph::DirectedGraph& TDG)
 {
   //============================================= Find initial SCCs
-  auto SCCs = TDG.FindStronglyConnectedConnections();
+  auto SCCs = TDG.FindStronglyConnectedComponents();
 
   //============================================= Rinse remove edges
   std::vector<std::pair<int,int>> edges_to_remove;
@@ -71,6 +71,6 @@ void chi_mesh::sweep_management::
     }
 
     // Refind SCCs
-    SCCs = TDG.FindStronglyConnectedConnections();
+    SCCs = TDG.FindStronglyConnectedComponents();
   }
 }

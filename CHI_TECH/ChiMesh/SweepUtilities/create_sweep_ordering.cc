@@ -50,7 +50,7 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
   //============================================= Make directed connections
   chi_log.Log(LOG_0VERBOSE_1) << "Populating cell relationships";
   std::vector<std::set<int>> cell_dependencies(num_loc_cells);
-  std::vector<std::set<int>> cell_successors(num_loc_cells);
+  std::vector<std::set<std::pair<int,double>>> cell_successors(num_loc_cells);
   PopulateCellRelationships(grid,
                             sweep_order,
                             cell_dependencies,
@@ -63,8 +63,8 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
     local_DG.AddVertex();
 
   for (int c=0; c<num_loc_cells; c++)
-    for (auto successor : cell_successors[c])
-      local_DG.AddEdge(c, successor);
+    for (auto& successor : cell_successors[c])
+      local_DG.AddEdge(c, successor.first, successor.second);
 
   //============================================= Remove local cycles if allowed
   if (cycle_allowance_flag)

@@ -33,7 +33,7 @@ namespace sweep_management
     chi_mesh::MeshContinuum *grid,
     chi_mesh::sweep_management::SPDS* sweep_order,
     std::vector<std::set<int>>& cell_dependencies,
-    std::vector<std::set<int>>& cell_successors);
+    std::vector<std::set<std::pair<int,double>>>& cell_successors);
 
   void RemoveGlobalCyclicDependencies(
     chi_mesh::sweep_management::SPDS* sweep_order,

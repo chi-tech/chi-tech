@@ -13,8 +13,8 @@ extern ChiLog chi_log;
 //###################################################################
 /**Removes local cyclic dependencies.*/
 void chi_mesh::sweep_management::
-RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
-                              chi_graph::DirectedGraph &local_DG)
+  RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
+                                chi_graph::DirectedGraph &local_DG)
 {
   //============================================= Utility lambdas
   auto IsInList = [](std::vector<int>& list, int val)
@@ -23,11 +23,9 @@ RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
   };
 
   //============================================= Find initial SCCs
-  auto SCCs = local_DG.FindStronglyConnectedConnections();
+  auto SCCs = local_DG.FindStronglyConnectedComponents();
 
-
-
-  //============================================= Remove bi-connected and
+  //============================================= Remove bi-connected then
   //                                              tri-connected SCCs then
   //                                              n-connected
   for (auto& subDG : SCCs)
@@ -38,10 +36,11 @@ RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
       sweep_order->local_cyclic_dependencies.emplace_back(
         subDG.front(),
         subDG.back());
-      chi_log.Log(LOG_0VERBOSE_1)
-        << "Bi-connected component removed: "
-        << subDG.front() << "->"
-        << subDG.back();
+      if (chi_log.GetVerbosity() >= LOG_0VERBOSE_2)
+        chi_log.Log(LOG_ALL)
+          << "Bi-connected component removed: "
+          << subDG.front() << "->"
+          << subDG.back();
     }//bi-connected
     else if (subDG.size()==3)
     {
@@ -54,9 +53,10 @@ RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
             found=true;
             local_DG.RemoveEdge(u, v);
             sweep_order->local_cyclic_dependencies.emplace_back(u, v);
-            chi_log.Log(LOG_0VERBOSE_1)
-              << "Tri-connected component removed: "
-              << u << "->" << v;
+            if (chi_log.GetVerbosity() >= LOG_0VERBOSE_2)
+              chi_log.Log(LOG_ALL)
+                << "Tri-connected component removed: "
+                << u << "->" << v;
             break;
           }
         if (found) break;
@@ -79,7 +79,7 @@ RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
           if (mapv != subDG.end())
           {
             int mapping_v = mapv - subDG.begin();
-            TG.AddEdge(mapping_u,mapping_v);
+            TG.AddEdge(mapping_u,mapping_v,local_DG.vertices[u].ds_weights[v]);
           }
         }//for v
 
@@ -126,22 +126,31 @@ RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
         int v = subDG[edge.second];
         local_DG.RemoveEdge(u, v);
         sweep_order->local_cyclic_dependencies.emplace_back(u, v);
-        chi_log.Log(LOG_0VERBOSE_1) << "Removing edge " << u << " " << v;
+        if (chi_log.GetVerbosity() >= LOG_0VERBOSE_2)
+          chi_log.Log(LOG_ALL)
+            << "Removing edge " << u << " " << v;
       }
 
     }//n-connected
   }//for sub-DG
 
 
-  SCCs = local_DG.FindStronglyConnectedConnections();
+  //============================================= Find SSCs again
+  // This step is like an insurance policy for if
+  // something came through. There should be no SSCs
+  // after the minFAS process, however, we just look
+  // again in-case.
+  SCCs = local_DG.FindStronglyConnectedComponents();
 
   //============================================= Rinse remove edges
   std::vector<std::pair<int,int>> edges_to_remove;
   int iter=0;
   while (not SCCs.empty())
   {
-    chi_log.Log(LOG_0VERBOSE_1)
-      << "Inter cell cyclic dependency removal. Iteration " << ++iter;
+    if (chi_log.GetVerbosity() >= LOG_0VERBOSE_2)
+      chi_log.Log(LOG_ALL)
+        << "Inter cell cyclic dependency removal. Iteration " << ++iter;
+
     //=================================== Loop over sub-graphs
     edges_to_remove.clear();
     for (auto& subDG : SCCs)
@@ -172,6 +181,6 @@ RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
     }
 
     // Refind SCCs
-    SCCs = local_DG.FindStronglyConnectedConnections();
+    SCCs = local_DG.FindStronglyConnectedComponents();
   }
 }
