@@ -782,6 +782,60 @@ else:
   num_failed += 1
 
 
+#=========================================== Test
+test_number += 1
+test_name = "3D LinearBSolver Test - PWLD Full Unstructured Cycles 4 MPI Processes"
+print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
+process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
+                            "CHI_TEST/Transport3D_5Cycles2.lua", "master_export=false"],
+                           cwd=kchi_src_pth,
+                           stdout=subprocess.PIPE,
+                           universal_newlines=True)
+process.wait()
+out,err = process.communicate()
+
+#string to find in output
+find_str          = "[0]  Max-value1="
+#start of the string (<0 if not found)
+test_str_start    = out.find(find_str)
+#end of the string to find
+test_str_end      = test_str_start + len(find_str)
+#end of the line at which string was found
+test_str_line_end = out.find("\n",test_str_start)
+
+test_passed = True
+if (test_str_start >= 0):
+  #convert value to number
+  test_val = float(out[test_str_end:test_str_line_end])
+  if (not abs(test_val-6.55396) < 1.0e-4):
+    test_passed = False
+else:
+  test_passed = False
+
+#string to find in output
+find_str          = "[0]  Max-value2="
+#start of the string (<0 if not found)
+test_str_start    = out.find(find_str)
+#end of the string to find
+test_str_end      = test_str_start + len(find_str)
+#end of the line at which string was found
+test_str_line_end = out.find("\n",test_str_start)
+
+# test_passed = True
+if (test_str_start >= 0):
+  #convert value to number
+  test_val = float(out[test_str_end:test_str_line_end])
+  if (not abs(test_val-1.02943) < 1.0e-4):
+    test_passed = False
+else:
+  test_passed = False
+
+if (test_passed):
+  print(" - Passed")
+else:
+  print(" - FAILED!")
+  num_failed += 1
+
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
 print("")
