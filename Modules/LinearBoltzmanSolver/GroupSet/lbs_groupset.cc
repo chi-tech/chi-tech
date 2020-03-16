@@ -4,6 +4,7 @@
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
 
 #include <chi_log.h>
 #include <chi_mpi.h>
@@ -85,7 +86,8 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
   }//line mesh
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
   else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) )
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)) )
   {
     int mc=-1; //moment count
     for (int ell=0; ell<=scatt_order; ell++)
@@ -172,7 +174,8 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
   }//line mesh
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
   else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) )
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)) )
   {
     int mc=-1;
     for (int ell=0; ell<=scatt_order; ell++)

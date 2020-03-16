@@ -16,7 +16,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
          chi_mesh::MeshContinuum *grid,
          chi_mesh::sweep_management::SPDS* sweep_order,
          std::vector<std::set<int>>& cell_dependencies,
-         std::vector<std::set<int>>& cell_successors)
+         std::vector<std::set<std::pair<int,double>>>& cell_successors)
 {
   double tolerance = 1.0e-16;
 
@@ -45,7 +45,9 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
           //========================= If it is in the current location
           if (face.IsNeighborLocal(grid))
           {
-            cell_successors[c].insert(face.GetNeighborLocalID(grid));
+            double weight = dot_normal*face.ComputeFaceArea(grid);
+            cell_successors[c].insert(
+              std::make_pair(face.GetNeighborLocalID(grid),weight));
           }
           else
             sweep_order->AddLocalSuccessor(face.GetNeighborPartitionID(grid));

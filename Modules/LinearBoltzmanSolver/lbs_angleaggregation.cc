@@ -165,16 +165,17 @@ void LinearBoltzman::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 /**Initializes angle aggregation for a groupset.*/
 void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 {
-  chi_log.Log(LOG_0) << chi_program_timer.GetTimeString()
-                     << " Initializing angle aggregation: Single";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Initializing angle aggregation: Single";
+
+  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
+  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
   int d_azi   = std::max((int)(groupset->quadrature->azimu_ang.size()/4),1);
   int num_azi = groupset->quadrature->azimu_ang.size();
   int num_pol = groupset->quadrature->polar_ang.size();
   int pa = std::max(1,num_pol/2);
-
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
   int num_angset_grps = 4; //Default Extruded and 2D
   if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
@@ -214,24 +215,19 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
           chi_mesh::sweep_management::FLUDS* fluds;
           if (make_primary)
           {
-            make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
             PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-            primary_fluds->InitializeAlphaElements(sweep_orderings[a]);
-            primary_fluds->InitializeBetaElements(sweep_orderings[a]);
+            primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
+            primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
 
             fluds = primary_fluds;
-          } else
-          {
-            fluds = new chi_mesh::sweep_management::
-            AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
           auto angleSet =
             new TAngleSet(groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
-                          sweep_orderings[a],
+                          sweep_orderings[angle_num],
                           fluds,
                           angle_indices,
                           sweep_boundaries,
@@ -270,24 +266,19 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
           chi_mesh::sweep_management::FLUDS* fluds;
           if (make_primary)
           {
-            make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
             PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-            primary_fluds->InitializeAlphaElements(sweep_orderings[a+num_azi]);
-            primary_fluds->InitializeBetaElements(sweep_orderings[a+num_azi]);
+            primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
+            primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
 
             fluds = primary_fluds;
-          } else
-          {
-            fluds = new chi_mesh::sweep_management::
-            AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
           auto angleSet =
             new TAngleSet(groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
-                          sweep_orderings[a+num_azi],
+                          sweep_orderings[angle_num],
                           fluds,
                           angle_indices,
                           sweep_boundaries,
