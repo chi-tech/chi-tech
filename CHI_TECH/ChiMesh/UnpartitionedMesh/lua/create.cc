@@ -10,6 +10,8 @@
 //###################################################################
 /**Creates an unpartitioned mesh from VTK Unstructured mesh files.
  *
+ * \image html "InProgressImage.png" width=200px
+ *
  * \param file_name char Filename of the .vtu file.
  *
  * \ingroup LuaUnpartitionedMesh
