@@ -60,11 +60,15 @@ int chiSurfaceMesherSetProperty(lua_State *L)
   {
     int num = lua_tonumber(L,2);
     surf_mesher->partitioning_x = num;
+
+    chi_log.Log(LOG_0) << "Surface mesher partitioning x set to: " << num;
   }
   if (property_num == 3)   //PARTITION_Y
   {
     int num = lua_tonumber(L,2);
     surf_mesher->partitioning_y = num;
+
+    chi_log.Log(LOG_0) << "Surface mesher partitioning y set to: " << num;
   }
   if (property_num == 4)   //CUT_X
   {

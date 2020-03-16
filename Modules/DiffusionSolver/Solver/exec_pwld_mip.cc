@@ -120,6 +120,17 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
 
+  MatInfo info;
+  ierr = MatGetInfo(A,MAT_GLOBAL_SUM,&info);
+
+  chi_log.Log(LOG_0) << "Number of mallocs used = " << info.mallocs
+                     << "\nNumber of non-zeros allocated = "
+                     << info.nz_allocated
+                     << "\nNumber of non-zeros used = "
+                     << info.nz_used
+                     << "\nNumber of unneeded non-zeros = "
+                     << info.nz_unneeded;
+
   time_assembly = t_assembly.GetTime()/1000.0;
 
   //=================================== Execute solve

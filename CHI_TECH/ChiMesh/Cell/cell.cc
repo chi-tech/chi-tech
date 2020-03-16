@@ -134,3 +134,45 @@ void chi_mesh::CellFace::
   if (neighbor_partition_id == chi_mpi.location_id)
     neighbor_local_id = adj_cell->local_id;
 }
+
+//###################################################################
+/**Computes the face area.*/
+double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum *grid)
+{
+  if (vertex_ids.size() <= 1)
+    return 1.0;
+  else if (vertex_ids.size() == 2)
+  {
+    auto& v0 = *grid->vertices[vertex_ids[0]];
+    auto& v1 = *grid->vertices[vertex_ids[1]];
+
+    return (v1 - v0).Norm();
+  }
+  else
+  {
+    double area = 0.0;
+    auto& v2 = centroid;
+    const auto num_verts = vertex_ids.size();
+    for (int v=0; v<num_verts; ++v)
+    {
+      int vid0 = vertex_ids[v];
+      int vid1 = (v < (num_verts-1))? vertex_ids[v+1] : vertex_ids[0];
+
+      auto& v0 = *grid->vertices[vid0];
+      auto& v1 = *grid->vertices[vid1];
+
+      auto v01 = v1-v0;
+      auto v02 = v2-v0;
+
+      chi_mesh::Matrix3x3 J;
+      J.SetColJVec(0,v01);
+      J.SetColJVec(1,v02);
+      J.SetColJVec(2,chi_mesh::Vector3(1.0,1.0,1.0));
+
+      area += 0.5*std::fabs(J.Det());
+    }
+
+    return area;
+  }
+
+}

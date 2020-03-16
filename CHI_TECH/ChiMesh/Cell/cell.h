@@ -45,6 +45,9 @@ public:
   int GetNeighborLocalID(chi_mesh::MeshContinuum* grid);
   int GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid);
 
+public:
+  double ComputeFaceArea(chi_mesh::MeshContinuum *grid);
+
 private:
   void InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid);
 };
