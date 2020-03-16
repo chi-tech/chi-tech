@@ -40,7 +40,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  ReorderNodesPWLD();
+//  ReorderNodesPWLD();
   auto domain_ownership = pwl_sdm->OrderNodesDFEM(grid);
   local_dof_count = domain_ownership.first;
   global_dof_count   = domain_ownership.second;

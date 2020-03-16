@@ -4,9 +4,35 @@
 #include "../chi_mesh.h"
 #include "../Cell/cell.h"
 
-#define VOLUMEMESHER_LINEMESH1D 1
-#define VOLUMEMESHER_PREDEFINED2D 3
-#define VOLUMEMESHER_EXTRUDER 4
+//#define VOLUMEMESHER_LINEMESH1D 1
+//#define VOLUMEMESHER_PREDEFINED2D 3
+//#define VOLUMEMESHER_EXTRUDER 4
+
+namespace chi_mesh
+{
+  enum VolumeMesherType
+  {
+    LINEMESH1D   = 1,
+    PREDEFINED2D = 3,
+    EXTRUDER     = 4,
+    PREDEFINED3D = 5
+  };
+  enum VolumeMesherProperty
+  {
+    FORCE_POLYGONS      = 1,
+    MESH_GLOBAL         = 2,
+    PARTITION_Z         = 3,
+    PARTITION_Y         = 4,
+    PARTITION_X         = 5,
+    CUTS_Z              = 6,
+    CUTS_Y              = 7,
+    CUTS_X              = 8,
+    PARTITION_TYPE      = 9,
+    EXTRUSION_LAYER     = 10,
+    MATID_FROMLOGICAL   = 11,
+    BNDRYID_FROMLOGICAL = 12
+  };
+};
 
 struct chi_mesh::CellIndexMap
 {
@@ -32,22 +58,22 @@ struct chi_mesh::CellIndexMap
 /**Parent volume mesher class.*/
 class chi_mesh::VolumeMesher
 {
-private:
+public:
   std::vector<double> zcuts;
 
 public:
+  enum PartitionType
+  {
+    KBA_STYLE_XY  = 1,
+    KBA_STYLE_XYZ = 2,
+    PARMETIS      = 3
+  };
   struct VOLUME_MESHER_OPTIONS
   {
-    bool force_polygons;
-    bool mesh_global;
-    int  partition_z;
-
-    VOLUME_MESHER_OPTIONS()
-    {
-      force_polygons = true;
-      mesh_global = false;
-      partition_z = 1;
-    }
+    bool         force_polygons = true;
+    bool         mesh_global    = false;
+    int          partition_z    = 1;
+    PartitionType partition_type = KBA_STYLE_XYZ;
   };
   VOLUME_MESHER_OPTIONS options;
 public:

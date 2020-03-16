@@ -19,6 +19,7 @@ public:
   std::vector<chi_mesh::LineMesh*>                   linemesh_stack;
   std::vector<chi_mesh::LogicalVolume*>              logicvolume_stack;
   std::vector<chi_mesh::FieldFunctionInterpolation*> ffinterpolation_stack;
+  std::vector<chi_mesh::UnpartitionedMesh*>          unpartitionedmesh_stack;
 
   std::vector<chi_mesh::EdgeLoopCollection*>         edge_loop_collections;
 

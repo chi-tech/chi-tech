@@ -73,16 +73,27 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
     VecAssemblyEnd(x);
 
     //================================= Matrix symmetry check
-    PetscBool is_symmetric;
-    ierr = MatIsSymmetric(A,1.0e-4,&is_symmetric);
-    if (!is_symmetric)
-    {
-      chi_log.Log(LOG_0WARNING)
-        << "Assembled matrix is not symmetric";
-    }
+//    PetscBool is_symmetric;
+//    ierr = MatIsSymmetric(A,1.0e-4,&is_symmetric);
+//    if (!is_symmetric)
+//    {
+//      chi_log.Log(LOG_0WARNING)
+//        << "Assembled matrix is not symmetric";
+//    }
   }
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
+
+  MatInfo info;
+  ierr = MatGetInfo(A,MAT_GLOBAL_SUM,&info);
+
+  chi_log.Log(LOG_0) << "Number of mallocs used = " << info.mallocs
+                     << "\nNumber of non-zeros allocated = "
+                     << info.nz_allocated
+                     << "\nNumber of non-zeros used = "
+                     << info.nz_used
+                     << "\nNumber of unneeded non-zeros = "
+                     << info.nz_unneeded;
 
   time_assembly = t_assembly.GetTime()/1000.0;
 
