@@ -4,6 +4,10 @@
 #include "../chi_mesh.h"
 #include <set>
 
+namespace chi_graph
+{
+  class DirectedGraph;
+}
 
 //###################################################################
 namespace chi_mesh
@@ -25,16 +29,23 @@ namespace sweep_management
 
   class SweepScheduler;
 
-  SPDS* CreateSweepOrder(double polar, double azimuthal,
-                         chi_mesh::MeshContinuum *vol_continuum,
-                         int number_of_groups,
-                         bool allow_cycles=false);
-
   void PopulateCellRelationships(
-            chi_mesh::MeshContinuum *grid,
-            chi_mesh::sweep_management::SPDS* sweep_order,
-            std::vector<std::set<int>>& cell_dependencies,
-            std::vector<std::set<int>>& cell_successors);
+    chi_mesh::MeshContinuum *grid,
+    chi_mesh::sweep_management::SPDS* sweep_order,
+    std::vector<std::set<int>>& cell_dependencies,
+    std::vector<std::set<std::pair<int,double>>>& cell_successors);
+
+  void RemoveGlobalCyclicDependencies(
+    chi_mesh::sweep_management::SPDS* sweep_order,
+    chi_graph::DirectedGraph& TDG);
+
+  void RemoveLocalCyclicDependencies(
+    chi_mesh::sweep_management::SPDS* sweep_order,
+    chi_graph::DirectedGraph& local_DG);
+
+  SPDS* CreateSweepOrder(double polar, double azimuthal,
+                         chi_mesh::MeshContinuum *grid,
+                         bool cycle_allowance_flag=false);
 
   void PrintSweepOrdering(SPDS* sweep_order,
                           MeshContinuum* vol_continuum);

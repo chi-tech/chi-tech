@@ -23,8 +23,6 @@ extern ChiTimer chi_program_timer;
 int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
                                                 bool suppress_solve)
 {
-  pwl_discr = ((SpatialDiscretization_PWL*)(this->discretization));
-
   //=================================== Verbose print solver info
   if (chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
   {
@@ -68,19 +66,15 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
 
     //================================================== Loop over locally owned
     //                                                   cells
-    size_t num_local_cells = grid->local_cell_glob_indices.size();
-    for (int lc=0; lc<num_local_cells; lc++)
+    for (auto& cell : grid->local_cells)
     {
-      int glob_cell_index = grid->local_cell_glob_indices[lc];
-      chi_mesh::Cell* cell = grid->cells[glob_cell_index];
-
-      DiffusionIPCellView* cell_ip_view = ip_cell_views[lc];
+      auto cell_ip_view = ip_cell_views[cell.local_id];
 
       if (!suppress_assembly)
-        PWLD_Assemble_A_and_b(glob_cell_index, cell, cell_ip_view, gi+gr);
+        PWLD_Assemble_A_and_b(cell.global_id, &cell, cell_ip_view, gi + gr);
       else
-        PWLD_Assemble_b(glob_cell_index, cell, cell_ip_view, gi+gr);
-    }//for local cell
+        PWLD_Assemble_b(cell.global_id, &cell, cell_ip_view, gi + gr);
+    }
   }//for gr
 
 
@@ -145,7 +139,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP_GRPS(bool suppress_assembly,
       const double* x_ref;
       VecGetArrayRead(xg[gr],&x_ref);
 
-      for (int i=0; i<pwld_local_dof_count; i++)
+      for (int i=0; i < local_dof_count; i++)
       {
         int ir = i*G + gr;
         pwld_phi_local[ir] = x_ref[i];

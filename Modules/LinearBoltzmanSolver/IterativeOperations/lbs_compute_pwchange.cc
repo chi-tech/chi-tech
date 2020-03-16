@@ -12,15 +12,12 @@ double LinearBoltzman::Solver::ComputePiecewiseChange(LBSGroupset* groupset)
   int gsf = groupset->groups.back()->id;
   int deltag = groupset->groups.size();
 
-  for (int c=0; c<grid->local_cell_glob_indices.size(); c++)
+  for (const auto& cell : grid->local_cells)
   {
-    int cell_g_index = grid->local_cell_glob_indices[c];
-    auto cell        = grid->cells[cell_g_index];
-
     auto transport_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[c];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
-    for (int i=0; i < cell->vertex_ids.size(); i++)
+    for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       for (int m=0; m<num_moments; m++)
       {

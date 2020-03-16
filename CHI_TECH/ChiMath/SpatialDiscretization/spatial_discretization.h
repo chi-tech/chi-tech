@@ -17,18 +17,17 @@ public:
 public:
   std::vector<int> node_mapping;
   std::vector<int> reverse_node_mapping;
+  int              cfem_local_block_address = 0;
+  int              dfem_local_block_address = 0;
+  std::vector<int> cell_dfem_block_address;
+  std::vector<std::pair<int,int>> neighbor_cell_block_address;
 
 public:
   //00
   SpatialDiscretization(int dim);
 
   //01
-  virtual void AddViewOfLocalContinuum(
-    chi_mesh::MeshContinuum* vol_continuum,
-    int num_cells,
-    int* cell_indices);
-
-  virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* vol_continuum);
+  virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid);
 
 };
 

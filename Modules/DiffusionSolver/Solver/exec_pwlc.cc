@@ -18,6 +18,8 @@ extern ChiMPI chi_mpi;
 extern ChiLog chi_log;
 extern ChiPhysics chi_physics_handler;
 
+extern ChiTimer chi_program_timer;
+
 
 //###################################################################
 /**Builds the matrix using the PWLC discretization method.*/
@@ -26,11 +28,13 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher    = mesh_handler->volume_mesher;
-  pwl_discr = ((SpatialDiscretization_PWL*)(this->discretization));
+
 
   //################################################## Assemble Amatrix
   chi_log.Log(LOG_0) << "Diffusion Solver: Assembling A and b";
-  chi_log.Log(LOG_0) << "Diffusion Solver: Local matrix instructions";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString() << " "
+    << "Diffusion Solver: Local matrix instructions";
   t_assembly.Reset();
 
   std::vector<int> boundary_nodes,boundary_numbers;
@@ -49,18 +53,16 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
 
   //================================================== Loop over locally owned
   //                                                   cells
-  size_t num_local_cells = grid->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
+  for (auto& cell : grid->local_cells)
   {
-    int glob_cell_index = grid->local_cell_glob_indices[lc];
-    chi_mesh::Cell* cell = grid->cells[glob_cell_index];
-
     if (!suppress_assembly)
-      CFEM_Assemble_A_and_b(glob_cell_index, cell, gi);
+      CFEM_Assemble_A_and_b(cell.global_id, &cell, gi);
   }
 
   //=================================== Call matrix assembly
-  chi_log.Log(LOG_0) << "Diffusion Solver: Communicating matrix assembly";
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString() << " "
+    << "Diffusion Solver: Communicating matrix assembly";
 
   if (!suppress_assembly)
   {
@@ -71,16 +73,27 @@ int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
     VecAssemblyEnd(x);
 
     //================================= Matrix symmetry check
-    PetscBool is_symmetric;
-    ierr = MatIsSymmetric(A,1.0e-4,&is_symmetric);
-    if (!is_symmetric)
-    {
-      chi_log.Log(LOG_0WARNING)
-        << "Assembled matrix is not symmetric";
-    }
+//    PetscBool is_symmetric;
+//    ierr = MatIsSymmetric(A,1.0e-4,&is_symmetric);
+//    if (!is_symmetric)
+//    {
+//      chi_log.Log(LOG_0WARNING)
+//        << "Assembled matrix is not symmetric";
+//    }
   }
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
+
+  MatInfo info;
+  ierr = MatGetInfo(A,MAT_GLOBAL_SUM,&info);
+
+  chi_log.Log(LOG_0) << "Number of mallocs used = " << info.mallocs
+                     << "\nNumber of non-zeros allocated = "
+                     << info.nz_allocated
+                     << "\nNumber of non-zeros used = "
+                     << info.nz_used
+                     << "\nNumber of unneeded non-zeros = "
+                     << info.nz_unneeded;
 
   time_assembly = t_assembly.GetTime()/1000.0;
 

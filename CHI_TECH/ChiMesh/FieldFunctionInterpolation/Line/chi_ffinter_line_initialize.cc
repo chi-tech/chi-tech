@@ -35,16 +35,14 @@ Initialize()
   grid_view = nullptr;
 
   //================================================== Create points;
-  chi_mesh::Vector vif = pf-pi;
+  chi_mesh::Vector3 vif = pf - pi;
   delta_d = vif.Norm()/(number_of_points-1);
 
   vif = vif/vif.Norm();
 
   interpolation_points.push_back(pi);
   for (int k=1; k<(number_of_points); k++)
-  {
     interpolation_points.push_back(pi + vif*delta_d*k);
-  }
 
   //====================================================== Loop over contexts
   size_t num_ff = field_functions.size();
@@ -66,16 +64,14 @@ Initialize()
 
       //================================================== Find a home for each
       //                                                   point
-      size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-      for (size_t ic=0; ic<num_local_cells; ic++)
+      for (const auto& cell : grid_view->local_cells)
       {
-        int cell_glob_index = grid_view->local_cell_glob_indices[ic];
-        auto cell = grid_view->cells[cell_glob_index];
+        int cell_local_index = cell.local_id;
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell.Type() == chi_mesh::CellType::SLAB)
         {
-          auto slab_cell = (chi_mesh::CellSlab*)cell;
+          auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
           for (int p=0; p<number_of_points; p++)
           {
@@ -84,11 +80,11 @@ Initialize()
             int v0_i = slab_cell->vertex_ids[0];
             int v1_i = slab_cell->vertex_ids[1];
 
-            chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-            chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
+            chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+            chi_mesh::Vector3 v1 = *grid_view->vertices[v1_i];
 
-            chi_mesh::Vector v01 = v1 - v0;
-            chi_mesh::Vector v0p = interpolation_points[p]-v0;
+            chi_mesh::Vector3 v01 = v1 - v0;
+            chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
 
             double v01_norm = v01.Norm();
             double projection = v01.Dot(v0p)/v01_norm;
@@ -100,7 +96,7 @@ Initialize()
 
             if (is_inside and interpolation_points_ass_cell[p]<0)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
+              interpolation_points_ass_cell[p] = cell_local_index;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -109,9 +105,9 @@ Initialize()
         }//if slab
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        else if (cell->Type() == chi_mesh::CellType::POLYGON)
+        else if (cell.Type() == chi_mesh::CellType::POLYGON)
         {
-          auto poly_cell = (chi_mesh::CellPolygon*)cell;
+          auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
           size_t num_edges = poly_cell->faces.size();
 
@@ -122,18 +118,18 @@ Initialize()
             //Form a plane for each edge
             for (size_t e=0; e<num_edges; e++)
             {
-              chi_mesh::Vector nref(0.0,0.0,1.0);
+              chi_mesh::Vector3 nref(0.0, 0.0, 1.0);
               int v0_i = poly_cell->faces[e].vertex_ids[0];
               int v1_i = poly_cell->faces[e].vertex_ids[1];
 
-              chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-              chi_mesh::Vector v1 = *grid_view->nodes[v1_i];
+              chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+              chi_mesh::Vector3 v1 = *grid_view->vertices[v1_i];
 
-              chi_mesh::Vector v01 = v1 - v0;
-              chi_mesh::Vector   n = v01.Cross(nref);
+              chi_mesh::Vector3 v01 = v1 - v0;
+              chi_mesh::Vector3   n = v01.Cross(nref);
               n = n/n.Norm();
 
-              chi_mesh::Vector v0p = interpolation_points[p]-v0;
+              chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
               v0p=v0p/v0p.Norm();
 
               if (n.Dot(v0p)>0.0)
@@ -145,7 +141,7 @@ Initialize()
 
             if (is_inside)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
+              interpolation_points_ass_cell[p] = cell_local_index;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -154,9 +150,9 @@ Initialize()
         }//if polygon cell
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+        else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+          auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
 
           size_t num_faces = polyh_cell->faces.size();
 
@@ -173,10 +169,10 @@ Initialize()
               {
                 int v0_i = edges[e][0];
 
-                chi_mesh::Vector v0 = *grid_view->nodes[v0_i];
-                chi_mesh::Vector n  = polyh_cell->faces[f].normal;
+                chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+                chi_mesh::Vector3 n  = polyh_cell->faces[f].normal;
 
-                chi_mesh::Vector v0p = interpolation_points[p]-v0;
+                chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
                 v0p=v0p/v0p.Norm();
 
                 if (n.Dot(v0p)>0.0)
@@ -190,7 +186,7 @@ Initialize()
 
             if (is_inside)
             {
-              interpolation_points_ass_cell[p] = cell_glob_index;
+              interpolation_points_ass_cell[p] = cell_local_index;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -207,8 +203,8 @@ Initialize()
       {
         if (interpolation_points_ass_cell[c] < 0) continue;
 
-        int cell_glob_index = interpolation_points_ass_cell[c];
-        auto cell = grid_view->cells[cell_glob_index];
+        int cell_local_index = interpolation_points_ass_cell[c];
+        auto cell = &grid_view->local_cells[cell_local_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell->Type() == chi_mesh::CellType::SLAB)
@@ -219,7 +215,7 @@ Initialize()
           {
             cfem_local_nodes_needed_unmapped.push_back(slab_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
 
         }//if poly
@@ -234,7 +230,7 @@ Initialize()
           {
             cfem_local_nodes_needed_unmapped.push_back(poly_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
 
         }//if poly
@@ -249,7 +245,7 @@ Initialize()
           {
             cfem_local_nodes_needed_unmapped.push_back(polyh_cell->vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
-            pwld_local_cells_needed_unmapped.push_back(cell_glob_index);
+            pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
 
         }//if polyh

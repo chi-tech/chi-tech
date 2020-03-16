@@ -30,27 +30,24 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
     double     mu  = face.normal.Dot(spds->omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<0.0)
+    if (mu<(0.0-1.0e-16))
     {
       int neighbor = face.neighbor;
 
-      if (grid->IsCellLocal(neighbor))
+      if (face.IsNeighborLocal(grid))
       {
         incoming_face_count++;
         //======================================== Find associated face for
         //                                         dof mapping
-        int ass_face = grid->FindAssociatedFace(face, neighbor);
+        int ass_face = face.GetNeighborAssociatedFace(grid);
 
         std::pair<int,std::vector<int>> dof_mapping;
-        grid->FindAssociatedVertices(face,
-                                     neighbor,
-                                     ass_face,
-                                     dof_mapping.second);
+        grid->FindAssociatedVertices(face, dof_mapping.second);
 
         //======================================== Find associated face
         //                                         counter for slot lookup
-        auto adj_cell     = grid->cells[neighbor];
-        int  adj_so_index = local_so_cell_mapping[adj_cell->cell_local_id];
+        auto adj_cell     = &grid->local_cells[face.GetNeighborLocalID(grid)];
+        int  adj_so_index = local_so_cell_mapping[adj_cell->local_id];
         int  ass_f_counter=-1;
 
         int out_f = -1;
@@ -58,7 +55,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         {
           double mur = adj_cell->faces[af].normal.Dot(spds->omega);
 
-          if (mur>=0.0) {out_f++;}
+          if (mur>=(0.0+1.0e-16)) {out_f++;}
           if (af == ass_face)
           {
             ass_f_counter = out_f;
@@ -70,7 +67,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
           chi_log.Log(LOG_ALLERROR)
             << "Associated face counter not found"
             << ass_face << " " << neighbor;
-          grid->FindAssociatedFace(face, neighbor, true);
+          face.GetNeighborAssociatedFace(grid);
           exit(EXIT_FAILURE);
         }
 

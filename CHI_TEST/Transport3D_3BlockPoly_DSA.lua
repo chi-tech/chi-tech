@@ -39,13 +39,12 @@ end
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
 
-chiSurfaceMesherSetProperty(MAX_AREA,1/20/20)
 chiSurfaceMesherSetProperty(PARTITION_X,2)
 chiSurfaceMesherSetProperty(PARTITION_Y,2)
 chiSurfaceMesherSetProperty(CUT_X,0.0)
 chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
-NZ=2
+NZ=1
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,10.0,NZ,"Charlie");--10.0
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,10.0,NZ,"Charlie");--20.0
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,10.0,NZ,"Charlie");--30.0
@@ -60,8 +59,8 @@ chiVolumeMesherSetProperty(MESH_GLOBAL,false);
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
-chiRegionExportMeshToPython(region1,
-        "YMesh"..string.format("%d",chi_location_id)..".py",false)
+--chiRegionExportMeshToPython(region1,
+--        "YMesh"..string.format("%d",chi_location_id)..".py",false)
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
@@ -129,7 +128,7 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
 chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4)
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
@@ -144,7 +143,7 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
 chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
@@ -169,4 +168,7 @@ chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
-chiExportFieldFunctionToVTKG(fflist[1],"ZPhi","Phi")
+
+if (master_export == nil) then
+    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi","Phi")
+end

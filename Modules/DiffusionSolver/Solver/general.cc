@@ -11,111 +11,17 @@ extern ChiPhysics chi_physics_handler;
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
 
 #include <chi_log.h>
+#include "chi_mpi.h"
 
 extern ChiLog chi_log;
-
-//###################################################################
-/***/
-void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
-                                                  double& diffCoeff,
-                                                  double& sourceQ,
-                                                  double& sigmaa)
-{
-  if (mat_id<0)
-  {
-    chi_log.Log(LOG_0ERROR)
-      << "Cell encountered with no material id. ";
-    exit(EXIT_FAILURE);
-  }
-
-  if (mat_id>=chi_physics_handler.material_stack.size())
-  {
-    chi_log.Log(LOG_0ERROR)
-      << "Cell encountered with material id pointing to "
-         "non-existing material.";
-    exit(EXIT_FAILURE);
-  }
-
-  chi_physics::Material* material =
-    chi_physics_handler.material_stack[mat_id];
-
-  //====================================== Process material properties
-  diffCoeff = 1.0;
-  sourceQ   = 1.0;
-  sigmaa    = 0.0;
-
-  //We absolutely need the diffusion coefficient so process error
-  if ((property_map_D < 0) || (property_map_D >= material->properties.size()))
-  {
-    chi_log.Log(LOG_0ERROR)
-      << "Solver diffusion coefficient mapped to property index "
-      << property_map_D << " is not a valid index for material \""
-      << material->name <<"\" id " << mat_id;
-    exit(EXIT_FAILURE);
-  }
-
-  //For now we can only support scalar values so lets check that
-  if (dynamic_cast<chi_physics::ScalarValue*>
-      (material->properties[property_map_D]))
-  {
-    diffCoeff = material->properties[property_map_D]->GetScalarValue();
-  }
-  else
-  {
-    chi_log.Log(LOG_0ERROR)
-      << "Solver diffusion coefficient mapped to property index "
-      << property_map_D << " is not a valid property type"
-      << " for material \""
-      << material->name <<"\" id " << mat_id
-      << ". Currently SCALAR_VALUE and THERMAL_CONDUCTIVITY are the "
-      << "only supported types.";
-    exit(EXIT_FAILURE);
-  }
+extern ChiMPI chi_mpi;
 
 
-  if ((property_map_q < material->properties.size()) &&
-      (property_map_q >= 0))
-  {
-    if (dynamic_cast<chi_physics::ScalarValue*>
-        (material->properties[property_map_q]))
-    {
-      sourceQ = material->properties[property_map_q]->GetScalarValue();
-    }
-    else
-    {
-      chi_log.Log(LOG_0ERROR)
-        << "Source value mapped to property index "
-        << property_map_q << " is not a valid property type"
-        << " for material \""
-        << material->name <<"\" id " << mat_id
-        << ". Currently SCALAR_VALUE is the "
-        << "only supported type.";
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  if ((property_map_sigma < 0) ||
-      (property_map_sigma >= material->properties.size()))
-  {
-//    chi_log.Log(LOG_0WARNING)
-//      << "Solver absorbtion coefficient mapped to property index "
-//      << property_map_sigma << " is not a valid index for material \""
-//      << material->name <<"\" id " << mat_id
-//      << ". Property will be set to zero.";
-
-  }
-  else
-  {
-    sigmaa = material->properties[property_map_sigma]->GetScalarValue();
-  }
-
-
-}
 
 //###################################################################
 /**Gets material properties various sources.*/
 void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
-                                                  int cell_glob_index,
+                                                  chi_mesh::Cell* cell,
                                                   int cell_dofs,
                                                   std::vector<double>& diffCoeff,
                                                   std::vector<double>& sourceQ,
@@ -123,6 +29,9 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                                   int group,
                                                   int moment)
 {
+  int cell_glob_index = cell->global_id;
+  bool cell_is_local = (cell->partition_id == chi_mpi.location_id);
+  int cell_local_id = cell->local_id;
   if (mat_id<0)
   {
     chi_log.Log(LOG_0ERROR)
@@ -295,7 +204,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     }
 
     //====================================== Setting Q
-    if ((q_field != nullptr) and (grid->IsCellLocal(cell_glob_index)))
+    if ((q_field != nullptr) and (cell_is_local))
     {
       std::vector<int> mapping;
       std::vector<int> pwld_nodes;
@@ -304,7 +213,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -313,7 +222,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  group-gi,moment,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -329,7 +239,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }
@@ -378,7 +288,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     }
 
     //====================================== Setting Q
-    if ((q_field != nullptr) and (grid->IsCellLocal(cell_glob_index)))
+    if ((q_field != nullptr) and (cell_is_local))
     {
       std::vector<int> mapping;
       std::vector<int> pwld_nodes;
@@ -387,7 +297,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -396,7 +306,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -412,7 +323,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }
@@ -461,7 +372,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     }
 
     //====================================== Setting Q
-    if ((q_field != nullptr) and (grid->IsCellLocal(cell_glob_index)))
+    if ((q_field != nullptr) and (cell_is_local))
     {
       std::vector<int> mapping;
       std::vector<int> pwld_nodes;
@@ -470,7 +381,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
       for (int i=0; i<cell_dofs; i++)
       {
         pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_glob_index);
+        pwld_cells.push_back(cell_local_id);
       }
 
       chi_mesh::FieldFunctionInterpolation ffinterp;
@@ -479,7 +390,8 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  q_field->num_sets,
                                  0,0,
                                  pwld_nodes,pwld_cells,
-                                 *q_field->local_cell_dof_array_address,
+                                 pwl_sdm->cell_dfem_block_address,
+                                 //*q_field->local_cell_dof_array_address,
                                  &mapping);
 
       for (int i=0; i<cell_dofs; i++)
@@ -495,7 +407,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << pwld_local_dof_count
+            << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index]->partition_id;
           exit(EXIT_FAILURE);
         }

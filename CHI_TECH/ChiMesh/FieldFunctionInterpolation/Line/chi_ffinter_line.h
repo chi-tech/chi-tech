@@ -27,11 +27,11 @@ class chi_mesh::FieldFunctionInterpolationLine :
 {
 public:
   int               number_of_points;
-  chi_mesh::Vector  pi,pf;
+  chi_mesh::Vector3  pi,pf;
 
 private:
   double                         delta_d;
-  std::vector<chi_mesh::Vector>  interpolation_points;
+  std::vector<chi_mesh::Vector3>  interpolation_points;
   std::vector<double>            interpolation_points_values;
   std::vector<int>               cfem_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_nodes_needed_unmapped;

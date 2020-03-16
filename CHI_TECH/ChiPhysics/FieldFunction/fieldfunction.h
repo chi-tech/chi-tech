@@ -117,17 +117,25 @@ public:
                                         size_t set);
 
   //01
-  void ExportToVTK(std::string base_name, std::string field_name);
-  void ExportToVTKG(std::string base_name, std::string field_name);
+  void ExportToVTK(const std::string& base_name,
+                   const std::string& field_name);
+  void ExportToVTKG(const std::string& base_name,
+                    const std::string& field_name);
   //01a
-  void ExportToVTKFV(std::string base_name, std::string field_name);
-  void ExportToVTKFVG(std::string base_name, std::string field_name);
+  void ExportToVTKFV(const std::string& base_name,
+                     const std::string& field_name);
+  void ExportToVTKFVG(const std::string& base_name,
+                      const std::string& field_name);
   //01b
-  void ExportToVTKPWLC(std::string base_name, std::string field_name);
-  void ExportToVTKPWLCG(std::string base_name, std::string field_name);
+  void ExportToVTKPWLC(const std::string& base_name,
+                       const std::string& field_name);
+  void ExportToVTKPWLCG(const std::string& base_name,
+                        const std::string& field_name);
   //01c
-  void ExportToVTKPWLD(std::string base_name, std::string field_name);
-  void ExportToVTKPWLDG(std::string base_name, std::string field_name);
+  void ExportToVTKPWLD(const std::string& base_name,
+                       const std::string& field_name);
+  void ExportToVTKPWLDG(const std::string& base_name,
+                        const std::string& field_name);
 
   void WritePVTU(std::string base_filename, std::string field_name, int num_grps=0);
 };

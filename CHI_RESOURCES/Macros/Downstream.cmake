@@ -1,3 +1,5 @@
+set(CHI_TECH_DIR "${CMAKE_CURRENT_LIST_DIR}/../../")
+
 if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX_ENV)
 elseif(APPLE)
@@ -59,9 +61,9 @@ include_directories("${BOOST_ROOT}/include")
 include_directories("${RANDOM123_ROOT}/include")
 
 include_directories("${CHI_TECH_DIR}/CHI_TECH")
-include_directories("${CHI_TECH_DIR}/ChiLua")
-include_directories("${CHI_TECH_DIR}/ChiMPI")
-include_directories("${CHI_TECH_DIR}/ChiLog")
+include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiLua")
+include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiMPI")
+include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiLog")
 include_directories("${CHI_TECH_DIR}/Modules")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
 
@@ -100,4 +102,4 @@ else ()
     )
 endif()
 
-set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ${TRIANGLE})
+set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ${TRIANGLE} ChiLib)

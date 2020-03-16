@@ -92,8 +92,8 @@ public:
   std::vector<int*>   lexi_map;
   EdgeLoopCollection  simplices;
   chi_mesh::Normal    patch_normal;
-  chi_mesh::Vector    hat_i,hat_j,hat_k;
-  chi_mesh::Vector    centroid;
+  chi_mesh::Vector3    hat_i,hat_j,hat_k;
+  chi_mesh::Vector3    centroid;
   std::vector<chi_mesh::Vertex> Pstar;
   std::vector<int>    unused_vs;
 

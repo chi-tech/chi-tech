@@ -54,15 +54,14 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
 
 
   //================================================== Loop over local cells
-  for (auto& cell_g_index : grid->local_cell_glob_indices)
+//  for (auto& cell_g_index : grid->local_cell_glob_indices)
+  for (const auto& cell : grid->local_cells)
   {
-    auto cell = grid->cells[cell_g_index];
-
     auto full_cell_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell->cell_local_id];
+      (LinearBoltzman::CellViewFull*)cell_transport_views[cell.local_id];
 
     //=========================================== Obtain cross-section and src
-    int cell_matid = cell->material_id;
+    int cell_matid = cell.material_id;
 
     int xs_id = matid_to_xs_map[cell_matid];
     int src_id= matid_to_src_map[cell_matid];

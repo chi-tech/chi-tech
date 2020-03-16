@@ -343,8 +343,8 @@ int chi_mesh::SurfaceMesh::
     chi_mesh::Vertex vB = this->vertices.at(curFace->v_index[1]);
     chi_mesh::Vertex vC = this->vertices.at(curFace->v_index[2]);
 
-    chi_mesh::Vector vAB = vB-vA;
-    chi_mesh::Vector vBC = vC-vB;
+    chi_mesh::Vector3 vAB = vB - vA;
+    chi_mesh::Vector3 vBC = vC - vB;
 
     curFace->geometric_normal = vAB.Cross(vBC);
     curFace->geometric_normal = curFace->geometric_normal/curFace->geometric_normal.Norm();
@@ -354,7 +354,7 @@ int chi_mesh::SurfaceMesh::
     chi_mesh::Vertex nB = this->normals.at(curFace->n_index[1]);
     chi_mesh::Vertex nC = this->normals.at(curFace->n_index[2]);
 
-    chi_mesh::Vector nAvg = (nA+nB+nC)/3.0;
+    chi_mesh::Vector3 nAvg = (nA + nB + nC) / 3.0;
     nAvg = nAvg/nAvg.Norm();
 
     curFace->assigned_normal = nAvg;
@@ -367,7 +367,7 @@ int chi_mesh::SurfaceMesh::
        curPFace!=this->poly_faces.end();
        curPFace++)
   {
-    chi_mesh::Vector centroid;
+    chi_mesh::Vector3 centroid;
     int num_verts = (*curPFace)->v_indices.size();
     for (int v=0; v<num_verts; v++)
       centroid = centroid + vertices[(*curPFace)->v_indices[v]];
@@ -376,8 +376,8 @@ int chi_mesh::SurfaceMesh::
 
     (*curPFace)->face_centroid = centroid;
 
-    chi_mesh::Vector n = (vertices[(*curPFace)->v_indices[1]] -
-                          vertices[(*curPFace)->v_indices[0]]).Cross(
+    chi_mesh::Vector3 n = (vertices[(*curPFace)->v_indices[1]] -
+                           vertices[(*curPFace)->v_indices[0]]).Cross(
                           centroid - vertices[(*curPFace)->v_indices[1]]);
     n = n/n.Norm();
 
@@ -497,8 +497,8 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
     chi_mesh::Vertex vB = this->vertices.at(curFace->v_index[1]);
     chi_mesh::Vertex vC = this->vertices.at(curFace->v_index[2]);
 
-    chi_mesh::Vector vAB = vB-vA;
-    chi_mesh::Vector vBC = vC-vB;
+    chi_mesh::Vector3 vAB = vB - vA;
+    chi_mesh::Vector3 vBC = vC - vB;
 
     curFace->geometric_normal = vAB.Cross(vBC);
     curFace->geometric_normal = curFace->geometric_normal/curFace->geometric_normal.Norm();
@@ -508,7 +508,7 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
     chi_mesh::Vertex nB = this->normals.at(curFace->n_index[1]);
     chi_mesh::Vertex nC = this->normals.at(curFace->n_index[2]);
 
-    chi_mesh::Vector nAvg = (nA+nB+nC)/3.0;
+    chi_mesh::Vector3 nAvg = (nA + nB + nC) / 3.0;
     nAvg = nAvg/nAvg.Norm();
 
     curFace->assigned_normal = nAvg;
@@ -521,7 +521,7 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
        curPFace!=this->poly_faces.end();
        curPFace++)
   {
-    chi_mesh::Vector centroid;
+    chi_mesh::Vector3 centroid;
     int num_verts = (*curPFace)->v_indices.size();
     for (int v=0; v<num_verts; v++)
       centroid = centroid + vertices[(*curPFace)->v_indices[v]];
@@ -530,8 +530,8 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
 
     (*curPFace)->face_centroid = centroid;
 
-    chi_mesh::Vector n = (vertices[(*curPFace)->v_indices[1]] -
-                          vertices[(*curPFace)->v_indices[0]]).Cross(
+    chi_mesh::Vector3 n = (vertices[(*curPFace)->v_indices[1]] -
+                           vertices[(*curPFace)->v_indices[0]]).Cross(
       centroid - vertices[(*curPFace)->v_indices[1]]);
     n = n/n.Norm();
 
@@ -550,8 +550,318 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
   return 0;
 }
 
+//#########################################################
+/**Creates a 2D orthogonal mesh from a set of vertices in x and y.
+ * The vertices along a dimension merely represents the divisions. They
+ * are not the complete vertices defining a cell. For example:
+\code
+std::vector<chi_mesh::Vertex> vertices_x = {0.0,1.0,2.0};
+std::vector<chi_mesh::Vertex> vertices_y = {0.0,1.0,2.0};
+chi_mesh::SurfaceMesh::CreateFromDivisions(vertices_x,vertices_y);
+\endcode
+
+This code will create a 2x2 mesh with \f$ \vec{x} \in [0,2]^2 \f$.
+*/
+chi_mesh::SurfaceMesh* chi_mesh::SurfaceMesh::
+  CreateFromDivisions(std::vector<double>& vertices_1d_x,
+                      std::vector<double>& vertices_1d_y)
+{
+  //======================================== Checks if vertices are empty
+  if (vertices_1d_x.empty())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "chi_mesh::SurfaceMesh::CreateFromDivisions. Empty vertex_x list.";
+    exit(EXIT_FAILURE);
+  }
+  if (vertices_1d_y.empty())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "chi_mesh::SurfaceMesh::CreateFromDivisions. Empty vertex_y list.";
+    exit(EXIT_FAILURE);
+  }
+
+  //======================================== Populate 2D vertices
+  int Nvx = vertices_1d_x.size();
+  int Nvy = vertices_1d_y.size();
+
+  int Ncx = Nvx - 1;
+  int Ncy = Nvy - 1;
+
+  std::vector<chi_mesh::Vertex> vertices_x;
+  std::vector<chi_mesh::Vertex> vertices_y;
+
+  vertices_x.reserve(Nvx);
+  vertices_y.reserve(Nvy);
+
+  for (double v : vertices_1d_x)
+    vertices_x.emplace_back(v,0.0,0.0);
+
+  for (double v : vertices_1d_y)
+    vertices_y.emplace_back(0.0,v,0.0);
+
+  //======================================== Create surface mesh
+  auto surf_mesh = new chi_mesh::SurfaceMesh();
+
+  //============================== Populate vertices
+  std::vector<std::vector<int>> vert_ij_map(Nvx,std::vector<int>(Nvx,-1));
+  for (int i=0; i<Nvy; ++i)
+  {
+    for (int j=0; j<Nvx; ++j)
+    {
+      surf_mesh->vertices.push_back(vertices_x[j] + vertices_y[i]);
+      vert_ij_map[i][j] = surf_mesh->vertices.size() - 1;
+    }//for j
+  }//for i
+
+  //============================== Populate polyfaces
+  for (int i=0; i<Ncy; ++i)
+  {
+    for (int j=0; j<Ncx; ++j)
+    {
+      auto new_face = new chi_mesh::PolyFace();
+      new_face->v_indices.push_back(vert_ij_map[i  ][j  ]);
+      new_face->v_indices.push_back(vert_ij_map[i  ][j+1]);
+      new_face->v_indices.push_back(vert_ij_map[i+1][j+1]);
+      new_face->v_indices.push_back(vert_ij_map[i+1][j]);
+
+      for (int v=0;v<(new_face->v_indices.size());v++)
+      {
+        int* side_indices = new int[4];
+
+        side_indices[0] = new_face->v_indices[v];
+        side_indices[1] = new_face->v_indices[v+1];
+        side_indices[2] = -1;
+        side_indices[3] = -1;
+
+        if ((v+1)>=new_face->v_indices.size())
+          side_indices[1] = new_face->v_indices[0];
+
+        new_face->edges.push_back(side_indices);
+      }//for v
+
+      surf_mesh->poly_faces.push_back(new_face);
+    }//for j
+  }//for i
+
+  //============================== Compute normals
+  for (auto poly_face : surf_mesh->poly_faces)
+  {
+    chi_mesh::Vector3 centroid;
+    int num_verts = poly_face->v_indices.size();
+    for (int v=0; v<num_verts; v++)
+      centroid = centroid + surf_mesh->vertices[poly_face->v_indices[v]];
+
+    centroid = centroid/num_verts;
+
+    poly_face->face_centroid = centroid;
+
+    chi_mesh::Vector3 n = (surf_mesh->vertices[poly_face->v_indices[1]] -
+                           surf_mesh->vertices[poly_face->v_indices[0]]).Cross(
+      centroid - surf_mesh->vertices[poly_face->v_indices[1]]);
+    n = n/n.Norm();
+
+    poly_face->geometric_normal = n;
+  }
+
+  surf_mesh->UpdateInternalConnectivity();
+
+  return surf_mesh;
+}
+
+//#########################################################
+/** Loads a surface mesh from gmsh's file format.*/
+int chi_mesh::SurfaceMesh::
+ImportFromMshFiles(const char* fileName, bool as_poly=false)
+{
+  const std::string node_section_name="$Nodes";
+  const std::string elements_section_name = "$Elements";
+
+  std::istringstream iss;
+  std::string line;
+
+  std::ifstream file;
+  file.open(std::string(fileName));
+
+  if (!file.is_open())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Failed to open file: "<< fileName <<" in call "
+      << "to ImportFromMshFiles \n";
+    exit(EXIT_FAILURE);
+  }
+
+  //=================================================== Find section with node information
+  //                                                    and then read information
+  while (std::getline(file, line))
+  {
+    if ( node_section_name.compare(line)==0 )
+      break;
+  }
+
+  std::getline(file, line);
+  iss = std::istringstream(line);
+  int num_nodes;
+  if ( !(iss >> num_nodes) )
+  {
+    chi_log.Log(LOG_ALLERROR)<<"Failed while trying to read the number of nodes.\n";
+    exit(EXIT_FAILURE);
+  }
+
+  vertices.resize(num_nodes);
+
+  for (int n=0; n<num_nodes; n++)
+  {
+    std::getline(file, line);
+    iss = std::istringstream(line);
+
+    chi_mesh::Vertex vertex;
+    int vert_index;
+    if ( !(iss >> vert_index) )
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed to read vertex index.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    if (!(iss >> vertex.x >> vertex.y >> vertex.z))
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed while reading the vertex coordinates.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    vertices[vert_index-1] = vertex;
+  }
 
 
+  //=================================================== Find the element listing section
+  //                                                    and first read the boundary data
+  file.seekg(0);
+  while (std::getline(file, line))
+  {
+    if ( elements_section_name.compare(line)==0 )
+      break;
+  }
+
+  std::getline(file, line);
+  iss = std::istringstream(line);
+  int num_elems;
+  if (!(iss >> num_elems))
+  {
+    chi_log.Log(LOG_ALLERROR)<<"Failed to read number of elements.\n";
+    exit(EXIT_FAILURE);
+  }
+
+  for (int n=0; n<num_elems; n++)
+  {
+    int elem_type, num_tags, tag, element_index;
+    chi_mesh::PolyFace* newFace = new chi_mesh::PolyFace;
+    std::getline(file, line);
+    iss = std::istringstream(line);
+
+    if ( !(iss >> element_index >> elem_type >> num_tags) )
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed while reading element index, element type, and number of tags.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    for (int i=0; i<num_tags; i++)
+      if( !(iss >> tag) )
+      {
+        chi_log.Log(LOG_ALLERROR)<<"Failed when reading tags.\n";
+        exit(EXIT_FAILURE);
+      }
+
+    if (elem_type == 2)
+    {
+      const int num_nodes = 3;
+
+      int nodes[num_nodes];
+      for (int i=0; i<num_nodes; i++)
+        if ( !(iss >> nodes[i]) )
+        {
+          chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
+          exit(EXIT_FAILURE);
+        }
+
+      newFace->v_indices.resize(num_nodes);
+      for (int i=0; i<num_nodes; i++)
+        newFace->v_indices[i] = nodes[i]-1;
+
+    } else if (elem_type == 3)
+    {
+      const int num_nodes = 4;
+
+      int nodes[num_nodes];
+      for (int i=0; i<num_nodes; i++)
+        if ( !(iss >> nodes[i]) )
+        {
+          chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
+          exit(EXIT_FAILURE);
+        }
+
+      newFace->v_indices.resize(num_nodes);
+      for (int i=0; i<num_nodes; i++)
+        newFace->v_indices[i] = nodes[i]-1;
+
+    } else
+    {
+
+      continue;
+    }
+
+    const int total_nodes = newFace->v_indices.size();
+
+    for (int e=0; e<total_nodes; e++)
+    {
+      int* side_indices = new int[total_nodes];
+      side_indices[0] = newFace->v_indices[e];
+
+      if (e<total_nodes-1)
+        side_indices[1] = newFace->v_indices[e+1];
+      else
+        side_indices[1] = newFace->v_indices[0];
+
+      side_indices[2] = -1;
+      side_indices[3] = -1;
+
+      newFace->edges.push_back(side_indices);
+    }
+
+    poly_faces.push_back(newFace);
+
+  }
+
+  file.close();
+
+  //======================================================= Calculate face properties
+  std::vector<chi_mesh::Face>::iterator curFace;
+  std::vector<chi_mesh::PolyFace*>::iterator curPFace;
+  for (curPFace = this->poly_faces.begin();
+       curPFace!=this->poly_faces.end();
+       curPFace++)
+  {
+    chi_mesh::Vector3 centroid;
+    int num_verts = (*curPFace)->v_indices.size();
+
+    for (int v=0; v<num_verts; v++)
+      centroid = centroid + vertices[(*curPFace)->v_indices[v]];
+
+    centroid = centroid/num_verts;
+
+    (*curPFace)->face_centroid = centroid;
+
+    chi_mesh::Vector3 n = (vertices[(*curPFace)->v_indices[1]] -
+                          vertices[(*curPFace)->v_indices[0]]).Cross(
+                          centroid - vertices[(*curPFace)->v_indices[1]]);
+
+    n = n/n.Norm();
+
+    (*curPFace)->geometric_normal = n;
+  }
+
+  UpdateInternalConnectivity();
+
+  return 0;
+}
 
 //#########################################################
 /**Exports the triangular faces of a surface mesh to
@@ -624,7 +934,6 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
       fprintf(outputFile,"\n");
     }
   }
-
 
   fclose(outputFile);
   printf("Exported mesh to %s\n",fileName);

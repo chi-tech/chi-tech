@@ -22,13 +22,13 @@ but gives an indication of where $c$ lays relative to the line $ab$.
 double chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::Orient2D(
   chi_mesh::Vertex a, chi_mesh::Vertex b, chi_mesh::Vertex c)
 {
-  Vector ab = b-a;
-  Vector bc = c-b;
+  Vector3 ab = b - a;
+  Vector3 bc = c - b;
   ab = ab/ab.Norm();
   bc = bc/bc.Norm();
-  Vector khat(0.0,0.0,1.0);
+  Vector3 khat(0.0, 0.0, 1.0);
 
-  Vector ab_x_bc = ab.Cross(bc);
+  Vector3 ab_x_bc = ab.Cross(bc);
 
   return ab_x_bc.Dot(khat);
 }
@@ -52,8 +52,8 @@ and
 bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::CheckCrossSimplices(
   chi_mesh::Vertex v0, chi_mesh::Vertex v1)
 {
-  Vector v01 = v1 - v0;
-  Vector n_v = v01;
+  Vector3 v01 = v1 - v0;
+  Vector3 n_v = v01;
 
 //  printf("Line from (%+.2f,%+.2f)  ",v0.x,v0.y);
 //  printf("to (%+.2f,%+.2f)\n",v1.x,v1.y);
@@ -77,8 +77,8 @@ bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::CheckCrossSimplices(
       Vertex w0(w0_up.Dot(hat_i), w0_up.Dot(hat_j), 0.0);
       Vertex w1(w1_up.Dot(hat_i), w1_up.Dot(hat_j), 0.0);
 
-      Vector w01 = w1 - w0;
-      Vector n_w = w01;
+      Vector3 w01 = w1 - w0;
+      Vector3 n_w = w01;
 
       if (fabs((w01.Cross(v01)).z)>tolerance)
       {
@@ -381,7 +381,7 @@ bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::
   Vertex a = Pstar[i_vindex];
   Vertex b = Pstar[f_vindex];
 
-  Vector ab = b - a;
+  Vector3 ab = b - a;
 
   if ((ab.Norm()/2.0)>absoluteMinumumSize)
   {
@@ -410,8 +410,8 @@ bool chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::
 
   Vertex vc = v0*0.5 + v1*0.5;
 
-  Vector vc2i = vc - v0;
-  Vector vc2o = vc - v2;
+  Vector3 vc2i = vc - v0;
+  Vector3 vc2o = vc - v2;
 
   double r = vc2i.Norm();
   double d = vc2o.Norm();
@@ -437,8 +437,8 @@ CheckEdgeEncroached(unsigned i_vindex,
 
   Vertex vc = v0*0.5 + v1*0.5;
 
-  Vector vc2i = vc - v0;
-  Vector vc2o = vc - v2;
+  Vector3 vc2i = vc - v0;
+  Vector3 vc2o = vc - v2;
 
   double r = vc2i.Norm();
   double d = vc2o.Norm();

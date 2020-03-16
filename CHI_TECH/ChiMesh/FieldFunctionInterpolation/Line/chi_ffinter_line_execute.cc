@@ -25,7 +25,8 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
                         field_functions[ff]->ref_set,
                         x,x_mapped,
                         ff_ctx->cfem_local_nodes_needed_unmapped,
-                        &mapping);
+                        &mapping,
+                        field_functions[ff]->spatial_discretization);
 
       CFEMInterpolate(x_mapped,mapping,ff_ctx);
 
@@ -39,7 +40,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
                         field_functions[ff]->ref_set,
                         ff_ctx->pwld_local_nodes_needed_unmapped,
                         ff_ctx->pwld_local_cells_needed_unmapped,
-                        *field_functions[ff]->local_cell_dof_array_address,
+                        field_functions[ff]->spatial_discretization->cell_dfem_block_address,
                         &mapping);
       PWLDInterpolate(mapping,ff_ctx);
     }
@@ -94,8 +95,8 @@ CFEMInterpolate(Vec field,
   {
     if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
 
-    int cell_glob_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm->MapFeView(cell_glob_index);
+    int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
+    auto cell_fe_view = spatial_dm->MapFeViewL(cell_local_index);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->dofs; i++)
@@ -141,8 +142,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
   {
     if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
 
-    int cell_glob_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm->MapFeView(cell_glob_index);
+    int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
+    auto cell_fe_view = spatial_dm->MapFeViewL(cell_local_index);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->dofs; i++)

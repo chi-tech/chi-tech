@@ -33,8 +33,8 @@ void chi_mesh::SurfaceMesherDelaunay::DelaunayPatch::ProjectTo2D()
          curedge != (*curloop)->edges.end();
          curedge++)
     {
-      Vector v01 = curedge->vertices[1] - curedge->vertices[0];
-      double cheatx = fabs((v01/v01.Norm()).Dot(Vector(1,0,0))*1.0e-3);
+      Vector3 v01 = curedge->vertices[1] - curedge->vertices[0];
+      double cheatx = fabs((v01/v01.Norm()).Dot(Vector3(1, 0, 0)) * 1.0e-3);
       //printf("%f   %f (%f)",v01.Norm(),maxD,cheatx);
       //printf("%+.4f %+.4f\n", v01.x,v01.y);
       if ((v01.Norm()+cheatx)>=maxD)

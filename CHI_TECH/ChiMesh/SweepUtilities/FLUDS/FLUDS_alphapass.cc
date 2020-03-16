@@ -47,27 +47,28 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   // csoi = cell sweep order index
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
-    int  cell_g_index = spls->item_id[csoi];           // Global index
-    auto cell         = grid->cells[cell_g_index];
-    local_so_cell_mapping[cell->cell_local_id] = csoi; //Set mapping
+    int cell_local_id = spls->item_id[csoi];
+    auto cell = &grid->local_cells[cell_local_id];
+
+    local_so_cell_mapping[cell->local_id] = csoi; //Set mapping
 
     SlotDynamics(cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
 
   }//for csoi
-
 
   //================================================== Populate boundary
   //                                                   dependencies
   for (auto bndry : location_boundary_dependency_set)
     boundary_dependencies.push_back(bndry);
 
+
   //                      PERFORM INCIDENT MAPPING
   //================================================== Loop over cells in
   //                                                   sweep order
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
-    int  cell_g_index = spls->item_id[csoi];
-    auto cell         = grid->cells[cell_g_index];
+    int cell_local_id = spls->item_id[csoi];
+    auto cell = &grid->local_cells[cell_local_id];
 
     LocalIncidentMapping(cell, spds, local_so_cell_mapping);
 

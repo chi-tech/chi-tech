@@ -3,14 +3,11 @@
 #include <PiecewiseLinear/pwl.h>
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
+#include <chi_mpi.h>
 
 extern ChiLog chi_log;
+extern ChiMPI chi_mpi;
 extern ChiPhysics chi_physics_handler;
-
-#include <iomanip>
-#include "ChiConsole/chi_console.h"
-
-extern ChiConsole chi_console;
 
 //###################################################################
 /**Initializes p_arrays.\n
@@ -48,35 +45,22 @@ unknowns. 1 billion cells, 24 vertices, 200 groups, 48 azimuthal angles per
 octant, 8 polar angles per octant (3072) angles. 1.47456e16. Just a factor 68
 away from exascale.
    */
-int LinearBoltzman::Solver::InitializeParrays()
+void LinearBoltzman::Solver::InitializeParrays()
 {
   auto pwl_discretization = (SpatialDiscretization_PWL*)discretization;
 
   //================================================== Compute local # of dof
-  local_dof_count=0;
-  if (typeid(*discretization) == typeid(SpatialDiscretization_PWL))
-  {
-    size_t num_cell_views = pwl_discretization->cell_fe_views.size();
-    for (int c=0; c<num_cell_views; c++)
-      local_dof_count += pwl_discretization->cell_fe_views[c]->dofs;
-  }
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Local DOF count = " << local_dof_count;
+  auto domain_ownership = pwl_discretization->OrderNodesDFEM(grid);
 
-  //================================================== Compute global # of dof
-  MPI_Allreduce(&local_dof_count,&glob_dof_count,1,
-    MPI_UNSIGNED_LONG_LONG, MPI_SUM,MPI_COMM_WORLD);
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Global DOF count = " << glob_dof_count;
+  local_dof_count = domain_ownership.first;
+  glob_dof_count  = domain_ownership.second;
+
+  local_cell_dof_array_address = pwl_discretization->cell_dfem_block_address;
 
   //================================================== Compute num of unknowns
-  int G = groups.size();
+  int num_grps = groups.size();
   int M = num_moments;
-  unsigned long long local_unknown_count = local_dof_count*G*M;
-  unsigned long long glob_unknown_count  = glob_dof_count*G*M;
-
-  chi_log.Log(LOG_ALLVERBOSE_2)
-    << "Local Unknown count = " << local_unknown_count;
-  chi_log.Log(LOG_ALLVERBOSE_2)
-    << "Globl Unknown count = " << glob_unknown_count;
+  unsigned long long local_unknown_count = local_dof_count * num_grps * M;
 
   //================================================== Size local vectors
   q_moments_local.resize(local_unknown_count,0.0);
@@ -89,62 +73,29 @@ int LinearBoltzman::Solver::InitializeParrays()
                     options.read_restart_file_base);
   MPI_Barrier(MPI_COMM_WORLD);
 
-  //================================================== Initialize default
-  //                                                   incident boundary
-  typedef chi_mesh::sweep_management::BoundaryVacuum SweepVacuumBndry;
-  typedef chi_mesh::sweep_management::BoundaryIncidentHomogenous SweepIncHomoBndry;
-  typedef chi_mesh::sweep_management::BoundaryReflecting SweepReflectingBndry;
-  std::vector<std::vector<double>>& flux_vec = incident_P0_mg_boundaries;
-
-  // Defining default Vacuum boundary
-  std::vector<double> zero_boundary(G,0.0);
-  flux_vec.push_back(zero_boundary);
-
-  // ================================================= Populate boundaries
-  chi_mesh::Vector ihat(1.0,0.0,0.0);
-  chi_mesh::Vector jhat(0.0,1.0,0.0);
-  chi_mesh::Vector khat(0.0,0.0,1.0);
-  int bndry_id=0;
-  for (auto bndry_type : boundary_types)
-  {
-    int vec_index = bndry_type.second;
-
-    if (bndry_type.first == LinearBoltzman::BoundaryType::VACUUM)
-      sweep_boundaries.push_back(new SweepVacuumBndry(flux_vec.back()));
-    else if (bndry_type.first == LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
-      sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
-    else if (bndry_type.first == LinearBoltzman::BoundaryType::REFLECTING)
-    {
-      chi_mesh::Normal normal;
-      if (bndry_id == 0) normal = ihat;
-      if (bndry_id == 1) normal = ihat*-1.0;
-      if (bndry_id == 2) normal = jhat;
-      if (bndry_id == 3) normal = jhat*-1.0;
-      if (bndry_id == 4) normal = khat;
-      if (bndry_id == 5) normal = khat*-1.0;
-
-      sweep_boundaries.push_back(new SweepReflectingBndry(flux_vec.back(),
-                                 normal));
-    }
-
-    ++bndry_id;
-  }
-
   //================================================== Initialize transport views
-  int num_grps = groups.size();
+  // Transport views act as a data structure to store information
+  // related to the transport simulation. The most prominent function
+  // here is that it holds the means to know where a given cell's
+  // transport quantities are located in the unknown vectors (i.e. phi)
+  //
+  // Also, for a given cell, within a given sweep chunk,
+  // we need to solve a matrix which square size is the
+  // amount of dofs on the cell. max_cell_dof_count is
+  // initialized here.
+  //
   int block_MG_counter = 0;       //Counts the strides of moment and group
-  int block_counter = 0;          //Counts the base stride
 
-  for (auto cell_g_index : grid->local_cell_glob_indices)
+  chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
+  chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
+  chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
+
+  for (auto& cell : grid->local_cells)
   {
-    auto cell = grid->cells[cell_g_index];
+    auto cell_fe_view   = pwl_discretization->MapFeViewL(cell.local_id);
+    auto full_cell_view = new CellViewFull(cell_fe_view->dofs, num_grps, M);
 
-    auto cell_fe_view =
-      (CellFEView*)pwl_discretization->MapFeView(cell_g_index);
-    auto full_cell_view =
-      (LinearBoltzman::CellViewFull*)cell_transport_views[cell->cell_local_id];
-
-    int mat_id = cell->material_id;
+    int mat_id = cell.material_id;
 
     full_cell_view->xs_id = matid_to_xs_map[mat_id];
 
@@ -152,46 +103,38 @@ int LinearBoltzman::Solver::InitializeParrays()
     block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
 
     //Init face upwind flags and adj_partition_id
-    int num_faces = cell->faces.size();
-    full_cell_view->face_f_upwind_flag.resize(num_faces,false);
-    for (int f=0; f<num_faces; f++)
+    full_cell_view->face_local.resize(cell.faces.size(),true);
+    int f=0;
+    for (auto& face : cell.faces)
     {
-      if (cell->faces[f].neighbor >= 0)
+      if (grid->IsCellBndry(face.neighbor))
       {
-        int adj_g_index = cell->faces[f].neighbor;
-        auto adj_cell = grid->cells[adj_g_index];
+        chi_mesh::Vector3& n = face.normal;
 
-        full_cell_view->face_f_adj_part_id.push_back(
-          adj_cell->partition_id);
-      }//if not bndry
-      else
-      {
-        full_cell_view->face_f_adj_part_id.push_back(
-          cell->faces[f].neighbor);
+        int boundary_id = -1;
+        if      (n.Dot(ihat)>0.999)  boundary_id = 0;
+        else if (n.Dot(ihat)<-0.999) boundary_id = 1;
+        else if (n.Dot(jhat)> 0.999) boundary_id = 2;
+        else if (n.Dot(jhat)<-0.999) boundary_id = 3;
+        else if (n.Dot(khat)> 0.999) boundary_id = 4;
+        else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
-        chi_mesh::Vector& face_norm = cell->faces[f].normal;
-
-        if      (face_norm.Dot(ihat)>0.999)
-          full_cell_view->face_boundary_id.push_back(0);
-        else if (face_norm.Dot(ihat)<-0.999)
-          full_cell_view->face_boundary_id.push_back(1);
-        else if (face_norm.Dot(jhat)>0.999)
-          full_cell_view->face_boundary_id.push_back(2);
-        else if (face_norm.Dot(jhat)<-0.999)
-          full_cell_view->face_boundary_id.push_back(3);
-        else if (face_norm.Dot(khat)>0.999)
-          full_cell_view->face_boundary_id.push_back(4);
-        else if (face_norm.Dot(khat)<-0.999)
-          full_cell_view->face_boundary_id.push_back(5);
-
-        cell->faces[f].neighbor = -(full_cell_view->face_boundary_id.back() + 1);
+        if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
       }//if bndry
+
+      if (not face.IsNeighborLocal(grid))
+        full_cell_view->face_local[f] = false;
+
+      ++f;
     }//for f
 
     //Add address
     local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
-    local_cell_dof_array_address.push_back(block_counter);
-    block_counter += cell_fe_view->dofs;
+
+    if (cell_fe_view->dofs > max_cell_dof_count)
+      max_cell_dof_count = cell_fe_view->dofs;
+
+    cell_transport_views.push_back(full_cell_view);
   }//for local cell
 
   //================================================== Initialize Field Functions
@@ -220,9 +163,4 @@ int LinearBoltzman::Solver::InitializeParrays()
       field_functions.push_back(group_ff);
     }//for m
   }//for g
-
-
-
-
-  return 0;
 }

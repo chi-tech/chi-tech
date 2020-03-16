@@ -24,14 +24,14 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     double     mu   = face.normal.Dot(spds->omega);
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
-    if (mu<0.0)
+    if (mu<(0.0-1.0e-16))
     {
       int neighbor = face.neighbor;
 
-      if ((!grid->IsCellLocal(neighbor)) && (!grid->IsCellBndry(neighbor)))
+      if ((!face.IsNeighborLocal(grid)) && (!grid->IsCellBndry(neighbor)))
       {
         //============================== Find prelocI
-        int locJ = grid->cells[neighbor]->partition_id;
+        int locJ = face.GetNeighborPartitionID(grid);
         int prelocI = spds->MapLocJToPrelocI(locJ);
 
         //###########################################################

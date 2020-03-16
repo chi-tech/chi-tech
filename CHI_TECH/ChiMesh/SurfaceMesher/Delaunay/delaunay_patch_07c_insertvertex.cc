@@ -119,7 +119,7 @@ InsertVertex(chi_mesh::Vertex vc_pstar, unsigned seed_search_triangle_index)
   //================================================== Check if vertex already added
   for (unsigned k=0; k<Pstar.size(); k++)
   {
-    Vector v01 = vc_pstar - Pstar[k];
+    Vector3 v01 = vc_pstar - Pstar[k];
     if (v01.Norm()<0.000001)
     {
       return false;

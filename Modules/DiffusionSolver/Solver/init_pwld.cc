@@ -22,19 +22,28 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 {
   //Right now I am only doing one region at a time.
   //Later I want to support multiple regions with interfaces.
-  chi_mesh::Region*     aregion = this->regions.back();
-  grid = aregion->volume_mesh_continua.back();
+//  chi_mesh::Region*     aregion = this->regions.back();
+//  grid = aregion->volume_mesh_continua.back();
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   mesher = mesh_handler->volume_mesher;
 
-  int num_nodes = grid->nodes.size();
+  //================================================== Add pwl fem views
+  if (verbose)
+    chi_log.Log(LOG_0) << "Computing cell matrices";
+  pwl_sdm = ((SpatialDiscretization_PWL*)(this->discretization));
+  pwl_sdm->AddViewOfLocalContinuum(grid);
+  pwl_sdm->AddViewOfNeighborContinuums(grid);
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  ReorderNodesPWLD();
+//  ReorderNodesPWLD();
+  auto domain_ownership = pwl_sdm->OrderNodesDFEM(grid);
+  local_dof_count = domain_ownership.first;
+  global_dof_count   = domain_ownership.second;
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
@@ -44,8 +53,8 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 
   //================================================== Initialize field function
   //                                                   if empty
-  pwld_phi_local.resize(pwld_local_dof_count);
-  if (field_functions.size() == 0)
+  pwld_phi_local.resize(local_dof_count);
+  if (field_functions.empty())
   {
     auto initial_field_function = new chi_physics::FieldFunction(
       std::string("phi"),                           //Text name
@@ -67,31 +76,28 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
-  double t0 = 0.0;
 
 
   //================================================== Initialize nodal DOF
   //                                                   and connection info
-  nodal_nnz_in_diag.resize(pwld_local_dof_count,0);
-  nodal_nnz_off_diag.resize(pwld_local_dof_count,0);
-  nodal_boundary_numbers.resize(grid->nodes.size(),0);
-  int total_nnz = 0;
-
-
-
-
-
+  nodal_nnz_in_diag.resize(local_dof_count, 0);
+  nodal_nnz_off_diag.resize(local_dof_count, 0);
+  nodal_boundary_numbers.resize(grid->vertices.size(), 0);
 
 
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  PWLDBuildSparsityPattern();
+//  PWLDBuildSparsityPattern();
+  pwl_sdm->BuildDFEMSparsityPattern(grid,
+                                    nodal_nnz_in_diag,
+                                    nodal_nnz_off_diag,
+                                    domain_ownership);
 
 
   //================================================== Initialize x and b
   ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
   ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-  ierr = VecSetSizes(x,pwld_local_dof_count, pwld_global_dof_count);CHKERRQ(ierr);
+  ierr = VecSetSizes(x, local_dof_count, global_dof_count);CHKERRQ(ierr);
   ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
   ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
 
@@ -100,9 +106,8 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 
   //################################################## Create matrix
   ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRQ(ierr);
-  ierr = MatSetSizes(A,pwld_local_dof_count,
-                     pwld_local_dof_count,
-                     pwld_global_dof_count,pwld_global_dof_count);CHKERRQ(ierr);
+  ierr = MatSetSizes(A, local_dof_count , local_dof_count,
+                        global_dof_count, global_dof_count);CHKERRQ(ierr);
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
@@ -128,8 +133,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   //seemed to have caused a lot of trouble for Slab
   //geometries. This section makes some custom options
   //per cell type
-  int first_cell_g_index = grid->local_cell_glob_indices[0];
-  auto first_cell = grid->cells[first_cell_g_index];
+  auto first_cell = &grid->local_cells[0];
 
   if (first_cell->Type() == chi_mesh::CellType::SLAB)
   {
@@ -172,8 +176,6 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_relax_type_all symmetric-SOR/Jacobi");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_coarsen_type HMIS");
     PetscOptionsInsertString(NULL,"-pc_hypre_boomeramg_interp_type ext+i");
-
-    PetscOptionsInsertString(NULL,"-options_left");
   }
   PetscOptionsInsertString(NULL,options_string.c_str());
   PCSetFromOptions(pc);

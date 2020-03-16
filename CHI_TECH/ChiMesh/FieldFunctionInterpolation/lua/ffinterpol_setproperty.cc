@@ -174,7 +174,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice->point = chi_mesh::Vector(x,y,z);
+    cur_ffi_slice->point = chi_mesh::Vector3(x, y, z);
   }
   else if (property == FFI_PROP_SLICENORMAL)               //NORMAL
   {
@@ -185,7 +185,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice->normal = chi_mesh::Vector(x,y,z);
+    cur_ffi_slice->normal = chi_mesh::Vector3(x, y, z);
     cur_ffi_slice->normal = cur_ffi_slice->normal/
                             cur_ffi_slice->normal.Norm();
   }
@@ -198,7 +198,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice->tangent = chi_mesh::Vector(x,y,z);
+    cur_ffi_slice->tangent = chi_mesh::Vector3(x, y, z);
     cur_ffi_slice->tangent = cur_ffi_slice->tangent/
                             cur_ffi_slice->tangent.Norm();
   }
@@ -211,7 +211,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     double y = lua_tonumber(L,4);
     double z = lua_tonumber(L,5);
 
-    cur_ffi_slice->binorm = chi_mesh::Vector(x,y,z);
+    cur_ffi_slice->binorm = chi_mesh::Vector3(x, y, z);
     cur_ffi_slice->binorm = cur_ffi_slice->binorm/
                             cur_ffi_slice->binorm.Norm();
   }

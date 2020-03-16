@@ -55,11 +55,11 @@ void chi_mesh::SurfaceMesher::PrintLoadBalanceInfo()
           int vi1 = mesh->faces[f].v_index[1];
           int vi2 = mesh->faces[f].v_index[2];
 
-          chi_mesh::Vector v0 = mesh->vertices[vi0];
-          chi_mesh::Vector v1 = mesh->vertices[vi1];
-          chi_mesh::Vector v2 = mesh->vertices[vi2];
+          chi_mesh::Vector3 v0 = mesh->vertices[vi0];
+          chi_mesh::Vector3 v1 = mesh->vertices[vi1];
+          chi_mesh::Vector3 v2 = mesh->vertices[vi2];
 
-          chi_mesh::Vector c = (v0+v1+v2)/3.0;
+          chi_mesh::Vector3 c = (v0 + v1 + v2) / 3.0;
 
           //Compute partition
           int x=-1;
@@ -88,7 +88,7 @@ void chi_mesh::SurfaceMesher::PrintLoadBalanceInfo()
         for (int f=0; f<mesh->poly_faces.size(); f++)
         {
           //Compute centroid
-          chi_mesh::Vector c;
+          chi_mesh::Vector3 c;
           for (int v=0; v<mesh->poly_faces[f]->v_indices.size(); v++)
           {
             int vi = mesh->poly_faces[f]->v_indices[v];

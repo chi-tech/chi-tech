@@ -2,33 +2,34 @@
 #define _chi_meshvector_h
 #include<cmath>
 #include <sstream>
-//#include"../chi_mesh.h"
-//=============================================== Vertex structure
-struct chi_mesh::Vector
+
+//=============================================== General 3D vector structure
+/**General vertex structure*/
+struct chi_mesh::Vector3
 {
   double x;
   double y;
   double z;
 
-  Vector()  {
+  Vector3()  {
     x=0.0; y=0.0; z=0.0;
   }
 
-  Vector(double a){
+  Vector3(double a){
     x=0.0; y=0.0; z=a;
   }
 
-  Vector(double a, double b){
+  Vector3(double a, double b){
     x=a; y=b; z=0.0;
   }
 
-  Vector(double a, double b, double c){
+  Vector3(double a, double b, double c){
     x=a; y=b; z=c;
   }
 
-  Vector operator+(const Vector& that) const
+  Vector3 operator+(const Vector3& that) const
   {
-    Vector newVector;
+    Vector3 newVector;
     newVector.x = this->x + that.x;
     newVector.y = this->y + that.y;
     newVector.z = this->z + that.z;
@@ -36,9 +37,9 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector operator-(const Vector& that) const
+  Vector3 operator-(const Vector3& that) const
   {
-    Vector newVector;
+    Vector3 newVector;
     newVector.x = this->x - that.x;
     newVector.y = this->y - that.y;
     newVector.z = this->z - that.z;
@@ -46,7 +47,7 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector& operator=(const Vector& that)
+  Vector3& operator=(const Vector3& that)
   {
     this->x = that.x;
     this->y = that.y;
@@ -55,9 +56,9 @@ struct chi_mesh::Vector
     return *this;
   }
 
-  Vector operator*(double value) const
+  Vector3 operator*(double value) const
   {
-    Vector newVector;
+    Vector3 newVector;
     newVector.x = this->x*value;
     newVector.y = this->y*value;
     newVector.z = this->z*value;
@@ -65,9 +66,9 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector operator/(double value) const
+  Vector3 operator/(double value) const
   {
-    Vector newVector;
+    Vector3 newVector;
     newVector.x = this->x/value;
     newVector.y = this->y/value;
     newVector.z = this->z/value;
@@ -75,9 +76,9 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  Vector Cross(const Vector& that) const
+  Vector3 Cross(const Vector3& that) const
   {
-    Vector newVector;
+    Vector3 newVector;
     newVector.x = this->y*that.z - this->z*that.y;
     newVector.y = this->z*that.x - this->x*that.z;
     newVector.z = this->x*that.y - this->y*that.x;
@@ -85,7 +86,7 @@ struct chi_mesh::Vector
     return newVector;
   }
 
-  double Dot(const Vector& that) const
+  double Dot(const Vector3& that) const
   {
     double value = 0.0;
     value += this->x*that.x;
@@ -104,11 +105,11 @@ struct chi_mesh::Vector
     z /= norm;
   }
 
-  Vector Normalized() const
+  Vector3 Normalized() const
   {
     double norm = this->Norm();
 
-    Vector newVector;
+    Vector3 newVector;
     newVector.x = this->x/norm;
     newVector.y = this->y/norm;
     newVector.z = this->z/norm;
@@ -145,7 +146,7 @@ struct chi_mesh::Vector
     std::cout<<this->z;
   }
 
-  friend std::ostream & operator<< (std::ostream& out, Vector& v)
+  friend std::ostream & operator<< (std::ostream& out, Vector3& v)
   {
     out << "[" << v.x << " " << v.y << " " << v.z << "]";
 

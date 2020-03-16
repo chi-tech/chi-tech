@@ -13,27 +13,9 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
 
---############################################### Extract edges from surface mesh
-loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
-
-line_mesh = {};
-line_mesh_count = 0;
-
-for k=1,loop_count do
-    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
-    for m=1,split_count do
-        line_mesh_count = line_mesh_count + 1;
-        line_mesh[line_mesh_count] = chiLineMeshCreateFromLoop(split_loops,m-1);
-    end
-
-end
-
 --############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-for k=1,line_mesh_count do
-    chiRegionAddLineBoundary(region1,line_mesh[k]);
-end
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
@@ -47,9 +29,9 @@ chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
-chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Chuck");--0.8
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Bob");--1.2
+chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"SarahConner");--1.6
 
 chiVolumeMesherSetProperty(PARTITION_Z,1);
 
@@ -125,7 +107,7 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 if (master_export == nil) then
-    chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
+    --chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 end
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)

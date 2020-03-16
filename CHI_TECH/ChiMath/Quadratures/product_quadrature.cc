@@ -64,7 +64,7 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
   {
     chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
-    auto new_omega = new chi_mesh::Vector;
+    auto new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);
@@ -146,7 +146,7 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   {
     chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
-    auto new_omega = new chi_mesh::Vector;
+    auto new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);
@@ -225,7 +225,83 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
   {
     chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
 
-    chi_mesh::Vector* new_omega = new chi_mesh::Vector;
+    chi_mesh::Vector3* new_omega = new chi_mesh::Vector3;
+    new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
+    new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
+    new_omega->z = cos(qpoint->theta);
+
+    omegas.push_back(new_omega);
+  }
+
+  if (verbose)
+  {
+    chi_log.Log(LOG_0)
+      << ostr.str() << "\n"
+      << "Weight sum=" << weight_sum;
+  }
+
+}
+
+//###################################################################
+/**Initializes the quadrature with Gauss-Legendre for the polar
+ * angles and Gauss-Chebyshev for the azimuthal.*/
+void chi_math::ProductQuadrature::
+  InitializeWithCustom(std::vector<double>& azimuthal,
+                       std::vector<double>& polar,
+                       std::vector<double>& in_weights, bool verbose)
+{
+  size_t Na = azimuthal.size();
+  size_t Np = polar.size();
+  size_t Nw = in_weights.size();
+
+  if (Nw != Na*Np)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Product Quadrature, InitializeWithCustom: mismatch in the amount "
+         "angles and weights. Number of azimuthal angles times number "
+         "polar angles must equal the amount of weights.";
+    exit(EXIT_FAILURE);
+  }
+
+  azimu_ang = azimuthal;
+  polar_ang = polar;
+
+  //================================================== Create angle pairs
+  std::stringstream ostr;
+  double weight_sum = 0.0;
+  int nw = -1;
+  for (unsigned i=0; i<Na; i++)
+  {
+    for (unsigned j=0; j<Np; j++)
+    {
+      ++nw;
+      auto new_pair = new chi_math::QuadraturePointPhiTheta;
+
+      new_pair->phi   = azimuthal[i];
+      new_pair->theta = polar[j];
+
+      abscissae.push_back(new_pair);
+
+      double weight = in_weights[nw];
+      weights.push_back(weight);
+      weight_sum += weight;
+
+      if (verbose)
+      {
+        char buf[200];
+        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
+                new_pair->phi*180.0/M_PI,
+                new_pair->theta*180.0/M_PI,
+                weight);
+        ostr << buf;
+      }
+    }
+  }
+
+  //================================================== Create omega list
+  for (auto qpoint : abscissae)
+  {
+    auto new_omega = new chi_mesh::Vector3;
     new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
     new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
     new_omega->z = cos(qpoint->theta);

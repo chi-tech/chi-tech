@@ -9,8 +9,13 @@ end
 chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic3.obj",true)
+if (support_cycles ~= nil) then
+    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
+            "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic3.obj",true)
+else
+    chiSurfaceMeshImportFromOBJFile(newSurfMesh,
+            "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic.obj",true)
+end
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()
@@ -26,7 +31,7 @@ chiSurfaceMesherSetProperty(PARTITION_X,2)
 chiSurfaceMesherSetProperty(PARTITION_Y,2)
 if (support_cycles == nil) then
     chiSurfaceMesherSetProperty(CUT_X,0.5)
-    chiSurfaceMesherSetProperty(CUT_Y,0.5)
+    chiSurfaceMesherSetProperty(CUT_Y,0.0)
     print("NON_CYCLES")
 else
     chiSurfaceMesherSetProperty(CUT_X,0.0)
@@ -135,7 +140,9 @@ for g=1,num_groups do
     bsrc[g] = 0.0
 end
 bsrc[1] = 1.0/4.0/math.pi;
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMAX,LBSBoundaryTypes.REFLECTING);
 
 --========== Solvers
 chiLBSSetProperty(phys1,PARTITION_METHOD,FROM_SURFACE)

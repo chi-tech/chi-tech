@@ -15,10 +15,10 @@
 namespace chi_mesh
 {
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ FORWARD DECLARATIONS
-  struct Vector;
-  typedef Vector Normal;
-  typedef Vector Vertex;
-  typedef Vector Node;
+  struct Vector3;
+  typedef Vector3 Normal;
+  typedef Vector3 Vertex;
+  typedef Vector3 Node;
 
   struct Matrix3x3;
 
@@ -58,6 +58,7 @@ namespace chi_mesh
   //=================================== Meshes
   class LineMesh;
   class SurfaceMesh;
+  class UnpartitionedMesh;
   class MeshContinuum;
 
   //=================================== Logical Volumes
@@ -89,6 +90,7 @@ namespace chi_mesh
   class VolumeMesherLinemesh1D;
   class VolumeMesherPredefined2D;
   class VolumeMesherExtruder;
+  class VolumeMesherPredefined3D;
 
 
 
@@ -102,7 +104,7 @@ namespace chi_mesh
   EdgeLoopCollection*    SplitEdgeLoopByAngle(EdgeLoop* input,double angle=1);
 
   //=================================== Domain decompositions
-  double ComputeLBF(std::vector<Vector>& points,
+  double ComputeLBF(std::vector<Vector3>& points,
                     std::vector<double>& x_cuts,
                     std::vector<double>& y_cuts);
   void   DecomposeSurfaceMeshPxPy(SurfaceMesh* smesh, int Px, int Py);
@@ -112,7 +114,14 @@ namespace chi_mesh
                                 double tolerance);
 
   //=================================== Utilities
-  void Create1DSlabMesh(std::vector<chi_mesh::Vertex> vertices);
+  void Create1DSlabMesh(std::vector<double>& vertices_1d);
+
+  void Create2DOrthoMesh(std::vector<double>& vertices_1d_x,
+                         std::vector<double>& vertices_1d_y);
+
+  void Create3DOrthoMesh(std::vector<double>& vertices_1d_x,
+                         std::vector<double>& vertices_1d_y,
+                         std::vector<double>& vertices_1d_z);
 }
 
 #include"chi_meshvector.h"

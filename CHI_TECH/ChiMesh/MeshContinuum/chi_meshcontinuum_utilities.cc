@@ -1,11 +1,7 @@
 #include "chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
 
 #include <boost/graph/bandwidth.hpp>
-#include <boost/graph/cuthill_mckee_ordering.hpp>
-#include <boost/graph/graphviz.hpp>
 
 #include <chi_mpi.h>
 #include <chi_log.h>
@@ -36,13 +32,10 @@ void chi_mesh::MeshContinuum::
 
   //================================================== Fill histogram
   std::vector<size_t> face_size_histogram;
-  for (auto c : local_cell_glob_indices)
-  {
-    auto cell = cells[c];
-
-    for (auto face : cell->faces)
+  for (const auto& cell : local_cells)
+    for (const auto& face : cell.faces)
       face_size_histogram.push_back(face.vertex_ids.size());
-  }
+
   std::stable_sort(face_size_histogram.begin(), face_size_histogram.end());
 
   //================================================== Determine total face dofs
@@ -51,8 +44,8 @@ void chi_mesh::MeshContinuum::
     total_face_dofs_count += face_size;
 
   //================================================== Compute average and ratio
-  size_t smallest_face = face_size_histogram.front();
-  size_t largest_face = face_size_histogram.back();
+  size_t smallest_face   = face_size_histogram.front();
+  size_t largest_face    = face_size_histogram.back();
   size_t total_num_faces = face_size_histogram.size();
   double average_dofs_per_face = (double)total_face_dofs_count/total_num_faces;
 
@@ -119,7 +112,7 @@ void chi_mesh::MeshContinuum::
   face_histogram_available = true;
 }
 
-
+//###################################################################
 /**Check whether a cell is local*/
 bool chi_mesh::MeshContinuum::IsCellLocal(int cell_global_index)
 {
@@ -202,117 +195,14 @@ bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
 
 
 //###################################################################
-/**Generalized find associated cell face*/
-int chi_mesh::MeshContinuum::FindAssociatedFace(chi_mesh::CellFace& cur_face,
-                                                int adj_cell_g_index,bool verbose)
-{
-  //======================================== Check index validity
-  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedFace. Index points to either a boundary"
-      << "or a non-local cell.";
-    exit(EXIT_FAILURE);
-  }
-
-  //======================================== Check cell validity by index
-  if (adj_cell_g_index >= cells.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedFace. Index is out of cell index bounds.";
-    exit(EXIT_FAILURE);
-  }
-
-  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
-
-  int associated_face = -1;
-
-  //======================================== Loop over adj cell faces
-  for (int af=0; af < adj_cell->faces.size(); af++)
-  {
-    //Assume face matches
-    bool face_matches = true; //Now disprove it
-    //================================= Loop over adj cell face verts
-    for (int afv=0; afv < adj_cell->faces[af].vertex_ids.size(); afv++)
-    {
-      //========================== Try and find them in the reference face
-      bool found = false;
-      for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
-      {
-        if (cur_face.vertex_ids[cfv] == adj_cell->faces[af].vertex_ids[afv])
-        {
-          found = true;
-          break;
-        }
-      }//for cfv
-
-      if (!found) {face_matches = false; break;}
-    }//for afv
-
-    if (face_matches) {associated_face = af; break;}
-  }
-
-
-  //======================================== Check associated face validity
-  if (associated_face<0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Could not find associated face in call to "
-      << "MeshContinuum::FindAssociatedFace. Reference face with centroid at \n"
-      << cur_face.centroid.PrintS();
-    for (int af=0; af < adj_cell->faces.size(); af++)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Adjacent cell face " << af << " centroid "
-        << adj_cell->faces[af].centroid.PrintS();
-    }
-    exit(EXIT_FAILURE);
-  }
-
-  //======================================== Verbose output
-  if (verbose)
-  {
-    std::stringstream out_string;
-
-    out_string
-      << "Adj cell " << adj_cell_g_index << ":\n"
-      << "face " << associated_face << "\n";
-    for (int v=0; v < adj_cell->faces[associated_face].vertex_ids.size(); v++)
-    {
-      out_string
-        << "vertex " << v << " "
-        << adj_cell->faces[associated_face].vertex_ids[v]
-        << "\n";
-    }
-    out_string
-      << "Cur cell "
-      << adj_cell->faces[associated_face].neighbor << ":\n";
-    for (int v=0; v<cur_face.vertex_ids.size(); v++)
-    {
-      out_string
-        << "vertex " << v << " "
-        << cur_face.vertex_ids[v]
-        << "\n";
-    }
-    chi_log.Log(LOG_ALL) << out_string.str();
-  }
-
-  return associated_face;
-}
-
-
-
-//###################################################################
 /**General map vertices*/
 void chi_mesh::MeshContinuum::
 FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                       int adj_cell_g_index, int associated_face,
                        std::vector<int>& dof_mapping)
 {
+  int associated_face = cur_face.GetNeighborAssociatedFace(this);
   //======================================== Check index validity
-  if (IsCellBndry(adj_cell_g_index) || (!IsCellLocal(adj_cell_g_index)))
+  if (IsCellBndry(cur_face.neighbor) || (not cur_face.IsNeighborLocal(this)))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell index encountered in call to "
@@ -321,18 +211,9 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
     exit(EXIT_FAILURE);
   }
 
-  //======================================== Check cell validity by index
-  if (adj_cell_g_index >= cells.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid cell index encountered in call to "
-      << "MeshContinuum::FindAssociatedVertices. Index is out of cell index bounds.";
-    exit(EXIT_FAILURE);
-  }
+  chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(this)];
 
-  chi_mesh::Cell* adj_cell = cells[adj_cell_g_index];
-
-
+  dof_mapping.reserve(cur_face.vertex_ids.size());
   for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
   {
     bool found = false;
@@ -354,10 +235,28 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
         << "Face DOF mapping failed in call to "
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
-        << adj_cell_g_index << " " << cur_face.centroid.PrintS();
+        << cur_face.neighbor << " " << cur_face.centroid.PrintS();
       exit(EXIT_FAILURE);
     }
 
   }//for cfv
 
+}
+
+
+//###################################################################
+/**Computes the centroid from nodes specified by the given list.*/
+chi_mesh::Vector3 chi_mesh::MeshContinuum::
+  ComputeCentroidFromListOfNodes(const std::vector<int> &list)
+{
+  if (list.empty())
+  {
+    chi_log.Log(LOG_ALLERROR) << "ComputeCentroidFromListOfNodes, empty list";
+    exit(EXIT_FAILURE);
+  }
+  chi_mesh::Vector3 centroid;
+  for (auto node_id : list)
+    centroid = centroid + *vertices[node_id];
+
+  return centroid/list.size();
 }

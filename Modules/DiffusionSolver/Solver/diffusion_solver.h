@@ -81,7 +81,7 @@ public:
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuum*                 grid;
   SpatialDiscretization*                      discretization;
-  SpatialDiscretization_PWL*                  pwl_discr;
+  SpatialDiscretization_PWL*                  pwl_sdm;
   chi_mesh::VolumeMesher*                  mesher;
   int fem_method;
 
@@ -113,7 +113,7 @@ public:
 
   PetscReal      norm;         /* norm of solution error */
   PetscErrorCode ierr;
-  PetscInt       local_rows_from, local_rows_to;
+//  PetscInt       local_rows_from, local_rows_to;
 
   std::vector<std::vector<int>>  nodal_connections;
   std::vector<std::vector<int>>  nodal_cell_connections;
@@ -121,8 +121,8 @@ public:
   std::vector<int>               nodal_nnz_in_diag;
   std::vector<int>               nodal_nnz_off_diag;
 
-  int                            pwld_local_dof_count;
-  int                            pwld_global_dof_count;
+  int                            local_dof_count;
+  int                            global_dof_count;
   int                            pwld_local_dof_start;
   std::vector<DiffusionIPCellView*> ip_cell_views;
   IP_BORDERCELL_INFO             ip_locI_bordercell_info;
@@ -149,7 +149,7 @@ public:
                                          double& sourceQ,
                                          double& sigmaa);
   void GetMaterialProperties(int mat_id,
-                             int cell_glob_index,
+                             chi_mesh::Cell* cell,
                              int cell_dofs,
                              std::vector<double>& diffCoeff,
                              std::vector<double>& sourceQ,
@@ -195,10 +195,17 @@ public:
   int ExecutePWLD_MIP(bool suppress_assembly = false,
                       bool suppress_solve = false);
   //02c_c
-  void PWLD_Assemble_A_and_b(int cell_glob_index, chi_mesh::Cell *cell,
-                          DiffusionIPCellView* cell_ip_view, int group=0);
-  void PWLD_Assemble_b(int cell_glob_index, chi_mesh::Cell *cell,
-                         DiffusionIPCellView* cell_ip_view, int group=0);
+  void PWLD_Assemble_A_and_b(int cell_glob_index,
+                             chi_mesh::Cell *cell,
+                             DiffusionIPCellView* cell_ip_view,
+                             int component=0,
+                             int component_block_offset=1);
+  void PWLD_Assemble_b(int cell_glob_index,
+                       chi_mesh::Cell *cell,
+                       DiffusionIPCellView* cell_ip_view,
+                       int component=0,
+                       int component_block_offset=1);
+
 
   //02d
   int ExecutePWLD_MIP_GRPS(bool suppress_assembly = false,

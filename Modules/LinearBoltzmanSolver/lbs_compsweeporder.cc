@@ -4,6 +4,7 @@
 #include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
+#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
 
 
 #include <chi_mpi.h>
@@ -37,8 +38,22 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Single angle aggr.
+  if (groupset->angleagg_method == LinearBoltzman::AngleAggregationType::SINGLE)
+  {
+    for (auto angle : groupset->quadrature->abscissae)
+    {
+      chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::
+        CreateSweepOrder(angle->theta,
+                         angle->phi,
+                         this->grid,
+                         groupset->allow_cycles);
+      this->sweep_orderings.push_back(new_swp_order);
+    }
+  }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D MESHES
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
   {
     int num_azi = groupset->quadrature->azimu_ang.size();
     int num_pol = groupset->quadrature->polar_ang.size();
@@ -57,7 +72,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       CreateSweepOrder(groupset->quadrature->polar_ang[0],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size(),
                        groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
 
@@ -66,13 +80,13 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                        groupset->quadrature->azimu_ang[0],
                        this->grid,
-                       groupset->groups.size(),
                        groupset->allow_cycles);
     this->sweep_orderings.push_back(new_swp_order);
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D 3D MESHES
   else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) )
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)))
   {
     int num_azi = groupset->quadrature->azimu_ang.size();
     int num_pol = groupset->quadrature->polar_ang.size();
@@ -95,21 +109,20 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     //============================================= Create sweep ordering
     //                                              per azimuthal angle
     //                                              per hemisphere
+    int pa = num_pol/2;
 
     //=========================================== TOP HEMISPHERE
     for (int i=0; i<num_azi; i++)
     {
       chi_mesh::sweep_management::SPDS* new_swp_order =
         chi_mesh::sweep_management::
-                  CreateSweepOrder(groupset->quadrature->polar_ang[0],
+                  CreateSweepOrder(groupset->quadrature->polar_ang[pa-1],
                                    groupset->quadrature->azimu_ang[i],
                                    this->grid,
-                                   groupset->groups.size(),
                                    groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }
     //=========================================== BOTTOM HEMISPHERE
-    int pa = num_pol/2;
     for (int i=0; i<num_azi; i++)
     {
       chi_mesh::sweep_management::SPDS* new_swp_order =
@@ -117,7 +130,6 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
         CreateSweepOrder(groupset->quadrature->polar_ang[pa],
                          groupset->quadrature->azimu_ang[i],
                          this->grid,
-                         groupset->groups.size(),
                          groupset->allow_cycles);
       this->sweep_orderings.push_back(new_swp_order);
     }

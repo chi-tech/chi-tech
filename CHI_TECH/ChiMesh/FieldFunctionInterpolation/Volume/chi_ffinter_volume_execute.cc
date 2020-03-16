@@ -17,7 +17,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
                       field_functions[0]->num_sets,
                       field_functions[0]->ref_component,
                       field_functions[0]->ref_set,
-                      x,x_mapped,cfem_local_nodes_needed_unmapped,&mapping);
+                      x,x_mapped,cfem_local_nodes_needed_unmapped,&mapping,
+                      field_functions[0]->spatial_discretization);
 
     CFEMInterpolate(x_mapped,mapping);
 
@@ -31,7 +32,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
                       field_functions[0]->ref_set,
                       pwld_local_nodes_needed_unmapped,
                       pwld_local_cells_needed_unmapped,
-                      *field_functions[0]->local_cell_dof_array_address,
+                      field_functions[0]->spatial_discretization->cell_dfem_block_address,
+                      //*field_functions[0]->local_cell_dof_array_address,
                       &mapping);
     PWLDInterpolate(*field_functions[0]->field_vector_local,mapping);
   }
@@ -42,7 +44,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 void chi_mesh::FieldFunctionInterpolationVolume::
 CFEMInterpolate(Vec field, std::vector<int> &mapping)
 {
-  SpatialDiscretization_PWL* discretization =
+  auto discretization =
     (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
 
   int counter=-1;
@@ -50,22 +52,19 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
   op_value = 0.0;
   double max_value = 0.0;
   bool max_set = false;
-  size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
-  {
-    int cell_glob_index = grid_view->local_cell_glob_indices[lc];
-    auto cell = grid_view->cells[cell_glob_index];
 
+  for (auto& cell : grid_view->local_cells)
+  {
     bool inside_logvolume=true;
 
     if (logical_volume != nullptr)
-      inside_logvolume = logical_volume->Inside(cell->centroid);
+      inside_logvolume = logical_volume->Inside(cell.centroid);
 
     if (inside_logvolume)
     {
-      auto cell_fe_view = (CellFEView*)discretization->MapFeView(cell_glob_index);
+      auto cell_fe_view = discretization->MapFeViewL(cell.local_id);
 
-      for (int i=0; i<cell->vertex_ids.size(); i++)
+      for (int i=0; i<cell.vertex_ids.size(); i++)
       {
         double value = 0.0;
         int ir = -1;
@@ -75,7 +74,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
         VecGetValues(field,1,&ir,&value);
 
         if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
-          value = CallLuaFunction(value,cell->material_id);
+          value = CallLuaFunction(value,cell.material_id);
 
         op_value += value*cell_fe_view->IntV_shapeI[i];
         total_volume += cell_fe_view->IntV_shapeI[i];
@@ -117,7 +116,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
 void chi_mesh::FieldFunctionInterpolationVolume::
 PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
 {
-  SpatialDiscretization_PWL* discretization =
+  auto discretization =
     (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
 
   int counter=-1;
@@ -125,22 +124,20 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
   double max_value = 0.0;
   bool max_set = false;
   double total_volume = 0.0;
-  size_t num_local_cells = grid_view->local_cell_glob_indices.size();
-  for (int lc=0; lc<num_local_cells; lc++)
-  {
-    int cell_glob_index = grid_view->local_cell_glob_indices[lc];
-    auto cell = grid_view->cells[cell_glob_index];
 
+  for (auto& cell : grid_view->local_cells)
+  {
     bool inside_logvolume=true;
 
     if (logical_volume != nullptr)
-      inside_logvolume = logical_volume->Inside(cell->centroid);
+      inside_logvolume = logical_volume->Inside(cell.centroid);
 
     if (inside_logvolume)
     {
-      auto cell_fe_view = (CellFEView*)discretization->MapFeView(cell_glob_index);
+      auto cell_fe_view =
+        (CellFEView*)discretization->MapFeViewL(cell.local_id);
 
-      for (int i=0; i < cell->vertex_ids.size(); i++)
+      for (int i=0; i < cell.vertex_ids.size(); i++)
       {
         double value = 0.0;
         int ir = -1;
@@ -150,7 +147,7 @@ PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
         value = field[ir];
 
         if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
-          value = CallLuaFunction(value,cell->material_id);
+          value = CallLuaFunction(value,cell.material_id);
 
         op_value += value*cell_fe_view->IntV_shapeI[i];
         total_volume += cell_fe_view->IntV_shapeI[i];

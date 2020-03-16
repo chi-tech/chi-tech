@@ -24,17 +24,17 @@ extern ChiLog chi_log;
 chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   chi_mesh::MeshContinuum* grid,
   chi_mesh::Cell *cell,
-  const chi_mesh::Vector &pos_i,
-  const chi_mesh::Vector &omega_i,
+  const chi_mesh::Vector3 &pos_i,
+  const chi_mesh::Vector3 &omega_i,
   double& d_to_surface,
-  chi_mesh::Vector &pos_f,
+  chi_mesh::Vector3 &pos_f,
   int func_depth)
 {
   chi_mesh::RayDestinationInfo dest_info;
 
   double epsilon = 1.0e-8;
   double extention_distance = 1.0e15;
-  chi_mesh::Vector pos_f_line = pos_i + omega_i*extention_distance;
+  chi_mesh::Vector3 pos_f_line = pos_i + omega_i * extention_distance;
 
   bool intersection_found = false;
 
@@ -43,14 +43,14 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   {
     auto slab_cell = (chi_mesh::CellSlab*)cell;
 
-    chi_mesh::Vector intersection_point;
+    chi_mesh::Vector3 intersection_point;
     std::pair<double,double> weights;
 
     int num_faces = 2;
     for (int f=0; f<num_faces; f++)
     {
       int fpi = slab_cell->vertex_ids[f]; //face point index
-      chi_mesh::Vertex face_point = *grid->nodes[fpi];
+      chi_mesh::Vertex face_point = *grid->vertices[fpi];
 
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
         slab_cell->faces[f].normal, face_point,
@@ -76,15 +76,15 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   {
     auto poly_cell = (chi_mesh::CellPolygon*)cell;
 
-    chi_mesh::Vector ip; //intersetion point
+    chi_mesh::Vector3 ip; //intersetion point
 
     int num_faces = poly_cell->faces.size();
     for (int f=0; f<num_faces; f++)
     {
       int fpi = poly_cell->faces[f].vertex_ids[0]; //face point index 0
       int fpf = poly_cell->faces[f].vertex_ids[1]; //face point index 1
-      chi_mesh::Vertex& face_point_i = *grid->nodes[fpi];
-      chi_mesh::Vertex& face_point_f = *grid->nodes[fpf];
+      chi_mesh::Vertex& face_point_i = *grid->vertices[fpi];
+      chi_mesh::Vertex& face_point_f = *grid->vertices[fpf];
 
       bool intersects = chi_mesh::CheckLineIntersectStrip(
         face_point_i, face_point_f, poly_cell->faces[f].normal,
@@ -109,7 +109,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   {
     auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
 
-    chi_mesh::Vector ip = pos_i; //Intersection point
+    chi_mesh::Vector3 ip = pos_i; //Intersection point
 
     int num_faces = polyh_cell->faces.size();
     for (int f=0; f<num_faces; f++)
@@ -119,8 +119,8 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       size_t num_sides = edges.size();
       for (size_t s=0; s<num_sides; s++)
       {
-        chi_mesh::Vertex& v0 = *grid->nodes[edges[s][0]];
-        chi_mesh::Vertex& v1 = *grid->nodes[edges[s][1]];
+        chi_mesh::Vertex& v0 = *grid->vertices[edges[s][0]];
+        chi_mesh::Vertex& v1 = *grid->vertices[edges[s][1]];
         chi_mesh::Vertex& v2 = polyh_cell->faces[f].centroid;
 
         bool intersects =
@@ -156,8 +156,8 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     {
       //chi_log.Log(LOG_ALLERROR) << "Particle nudged";
       //Vector from position to cell-centroid
-      chi_mesh::Vector v_p_i_cc = (cell->centroid - pos_i).Normalized();
-      chi_mesh::Vector pos_i_nudged = pos_i + v_p_i_cc*epsilon;
+      chi_mesh::Vector3 v_p_i_cc = (cell->centroid - pos_i).Normalized();
+      chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon;
 
       //printf("%.12f %.12f %.12f\n",pos_i_nudged.x,pos_i_nudged.y,pos_i_nudged.z);
 
@@ -173,11 +173,11 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     outstr
       << "Intersection not found. For particle xyz="
       << pos_i.PrintS() << " uvw="
-      << omega_i.PrintS() << " in cell " << cell->cell_global_id
+      << omega_i.PrintS() << " in cell " << cell->global_id
       << " with vertices: \n";
 
     for (auto vi : cell->vertex_ids)
-      outstr << grid->nodes[vi]->PrintS() << "\n";
+      outstr << grid->vertices[vi]->PrintS() << "\n";
 
     chi_log.Log(LOG_ALLERROR) << outstr.str();
     exit(EXIT_FAILURE);

@@ -17,8 +17,8 @@ struct FFIFaceEdgeIntersection
 {
   int v0_g_index, v1_g_index;
   int v0_dofindex_cell, v1_dofindex_cell;
-  chi_mesh::Vector point;
-  chi_mesh::Vector point2d;
+  chi_mesh::Vector3 point;
+  chi_mesh::Vector3 point2d;
   std::pair<double,double> weights;
   double point_value;
 
@@ -30,10 +30,10 @@ struct FFIFaceEdgeIntersection
 
 struct FFICellIntersection
 {
-  int cell_global_index;
+  int cell_local_index;
   std::vector<FFIFaceEdgeIntersection*> intersections;
-  chi_mesh::Vector intersection_centre;
-  chi_mesh::Vector intersection_2d_centre;
+  chi_mesh::Vector3 intersection_centre;
+  chi_mesh::Vector3 intersection_2d_centre;
   double cell_avg_value;
 
   FFICellIntersection()
@@ -57,7 +57,7 @@ public:
   chi_mesh::Normal normal;
   chi_mesh::Normal binorm;
   chi_mesh::Normal tangent;
-  chi_mesh::Vector point;
+  chi_mesh::Vector3 point;
 
 private:
   std::vector<int>                    intersecting_cell_indices;
