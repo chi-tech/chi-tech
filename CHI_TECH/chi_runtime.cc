@@ -15,6 +15,7 @@ ChiConsole  chi_console;
 ChiMath     chi_math_handler;
 ChiPhysics  chi_physics_handler;
 
+/** Global stack of handlers */
 std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
 int chi_current_mesh_handler=-1;
 
