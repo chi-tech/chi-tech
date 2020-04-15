@@ -97,3 +97,36 @@ CellFVView* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 
   return value;
 }
+
+//###################################################################
+/**Builds finite volume based sparsity pattern.*/
+void SpatialDiscretization_FV::BuildSparsityPattern(
+  chi_mesh::MeshContinuum *grid,
+  std::vector<int> &nodal_nnz_in_diag,
+  std::vector<int> &nodal_nnz_off_diag)
+{
+  nodal_nnz_in_diag.clear();
+  nodal_nnz_off_diag.clear();
+
+  const size_t num_local_cells = grid->local_cells.size();
+
+  nodal_nnz_in_diag.resize(num_local_cells,0);
+  nodal_nnz_off_diag.resize(num_local_cells,0);
+
+  for (auto& cell : grid->local_cells)
+  {
+    int i=cell.local_id;
+
+    nodal_nnz_in_diag[i] += 1;
+
+    for (auto& face : cell.faces)
+    {
+      if (face.neighbor < 0) continue;
+
+      if (face.IsNeighborLocal(grid))
+        nodal_nnz_in_diag[i] += 1;
+      else
+        nodal_nnz_off_diag[i] += 1;
+    }
+  }
+}

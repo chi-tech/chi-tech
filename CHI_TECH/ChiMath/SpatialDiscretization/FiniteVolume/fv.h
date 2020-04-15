@@ -23,6 +23,10 @@ public:
   void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
 
   CellFVView* MapFeView(int cell_local_index);
+
+  void BuildSparsityPattern(chi_mesh::MeshContinuum* grid,
+                            std::vector<int>& nodal_nnz_in_diag,
+                            std::vector<int>& nodal_nnz_off_diag);
 };
 
 
