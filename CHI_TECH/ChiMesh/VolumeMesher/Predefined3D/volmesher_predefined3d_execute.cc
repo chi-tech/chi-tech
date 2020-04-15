@@ -296,12 +296,9 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
 
         polyh_cell->faces.push_back(newFace);
       }
-//      printf("[%d] Bla4\n",loc_id);
 
       grid->cells.push_back(polyh_cell);
     }//else
-
-//    printf("[%d] Blee\n",loc_id);
   }
 
   chi_log.Log(LOG_0) << "Cells loaded.";
