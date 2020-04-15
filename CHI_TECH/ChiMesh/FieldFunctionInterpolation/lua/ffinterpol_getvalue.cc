@@ -44,18 +44,45 @@ int chiFFInterpolationGetValue(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  if (typeid(*cur_ffi) != typeid(chi_mesh::FieldFunctionInterpolationVolume))
+  if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationVolume))
+  {
+    auto cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume*)cur_ffi;
+    value = cur_ffi_volume->op_value;
+
+    lua_pushnumber(L,value);
+    return 1;
+  }
+  else if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationLine))
+  {
+    auto cur_ffi_line = (chi_mesh::FieldFunctionInterpolationLine*)cur_ffi;
+
+    lua_newtable(L);
+
+    for (int ff=0; ff<cur_ffi_line->field_functions.size(); ff++)
+    {
+      lua_pushnumber(L,ff+1);
+
+      lua_newtable(L);
+      auto ff_ctx = cur_ffi_line->ff_contexts[ff];
+
+      for (int p=0; p<cur_ffi_line->interpolation_points.size(); p++)
+      {
+        lua_pushnumber(L,p+1);
+        lua_pushnumber(L,ff_ctx->interpolation_points_values[p]);
+        lua_settable(L,-3);
+      }
+
+      lua_settable(L,-3);
+    }
+
+    return 1;
+  }
+  else
   {
     chi_log.Log(LOG_0WARNING)
       << "chiFFInterpolationGetValue is currently only supported for "
       << " VOLUME interpolator types.";
   }
-  else
-  {
-    auto cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume*)cur_ffi;
-    value = cur_ffi_volume->op_value;
-  }
 
-  lua_pushnumber(L,value);
-  return 1;
+  return 0;
 }

@@ -31,6 +31,7 @@ LINE_FIRSTPOINT   = Line start point.\n
 LINE_SECONDPOINT  = Line end point.\n
 LINE_NUMBEROFPOINTS = Number of points to put in the line interpolator.
                           Minimum 2.\n
+LINE_CUSTOM_ARRAY = Adds custom array to line interpolator.\n
 OPERATION  =  Some interpolations support operation types. See OpTypes.\n
 LOGICAL_VOLUME = To be followed by a handle to a logical volume to be
                  used by the interpolator.\n
@@ -259,6 +260,36 @@ int chiFFInterpolationSetProperty(lua_State *L)
       exit(EXIT_FAILURE);
     }
     cur_ffi_line->number_of_points = num_points;
+  }
+  else if (property == FFI_LINE_CUSTOM_ARRAY)
+  {
+    if (numArgs!=3)
+      LuaPostArgAmountError("chiFFInterpolationSetProperty",3,numArgs);
+
+    chi_mesh::FieldFunctionInterpolationLine* cur_ffi_line =
+      (chi_mesh::FieldFunctionInterpolationLine*)cur_ffi;
+
+    if (not lua_istable(L, 3))
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Line property FFI_LINE_CUSTOM_ARRAY"
+        << " used in chiFFInterpolationSetProperty. Argument 3 is expected "
+           "to be an array.";
+      exit(EXIT_FAILURE);
+    }
+
+    int table_len = lua_rawlen(L,3);
+
+    std::vector<double> new_array(table_len,0.0);
+    for (int k=0; k<table_len; ++k)
+    {
+      lua_pushnumber(L,k+1);
+      lua_gettable(L,3);
+      new_array[k] = lua_tonumber(L,-1);
+      lua_pop(L,1);
+    }
+
+    cur_ffi_line->custom_arrays.push_back(new_array);
   }
   else if (property == FFI_PROP_OPERATION)
   {

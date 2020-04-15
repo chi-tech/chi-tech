@@ -45,6 +45,13 @@ ExportPython(std::string base_name)
         << "data" << ff<< "=np.zeros([" << interpolation_points.size()
         << ",5])\n";
     }
+    for (int ca=0; ca<custom_arrays.size(); ca++)
+    {
+      int ff = ca + field_functions.size();
+      ofile
+        << "data" << ff<< "=np.zeros([" << interpolation_points.size()
+        << ",5])\n";
+    }
 
     offset = std::string("");
   }
@@ -98,6 +105,7 @@ ExportPython(std::string base_name)
 
 
     }
+
     ofile << offset << "done=True\n";
     ofile << "\n\n";
     if ((chi_mpi.process_count>1) &&
@@ -110,6 +118,52 @@ ExportPython(std::string base_name)
 
   }
 
+  for (int ca=0; ca<custom_arrays.size(); ca++)
+  {
+    int ff = ca + field_functions.size();
+
+    if (chi_mpi.process_count>1 and chi_mpi.location_id!=0)
+    {
+      ofile
+        << "def AddData" << ff << "(data" << ff << "):\n";
+
+      offset = std::string("  ");
+    }
+
+    std::string op("= ");
+    if (chi_mpi.location_id != 0) op = std::string("+= ");
+
+    for (int p=0; p<interpolation_points.size(); p++)
+    {
+      ofile << offset << "data" << ff << "[" << p << ",0] = "
+            << interpolation_points[p].x << "\n";
+      ofile << offset << "data" << ff << "[" << p << ",1] = "
+            << interpolation_points[p].y << "\n";
+      ofile << offset << "data" << ff << "[" << p << ",2] = "
+            << interpolation_points[p].z << "\n";
+
+      double d = delta_d*p;
+      double value = 0.0;
+
+      if (p<custom_arrays[ca].size())
+        value = custom_arrays[ca][p];
+
+      ofile << offset << "data" << ff << "[" << p << ",3] = "
+            << d << "\n";
+      ofile << offset << "data" << ff << "[" << p << ",4] " << op
+            << value << "\n";
+    }
+    ofile << offset << "done=True\n";
+    ofile << "\n\n";
+    if ((chi_mpi.process_count>1) &&
+        (chi_mpi.location_id != (chi_mpi.process_count-1)))
+    {
+      ofile << offset << submod_name
+            << ".AddData" << ff << "(data" << ff << ")\n";
+    }
+  }
+
+
   if (chi_mpi.location_id == 0)
   {
     ofile << "plt.figure(1)\n";
@@ -119,6 +173,14 @@ ExportPython(std::string base_name)
       << ff << "[:,4]"
       << ",label=\"" << field_functions[ff]->text_name << "\""
       << ")\n";
+    }
+    for (int ca=0; ca<custom_arrays.size(); ca++)
+    {
+      int ff = ca + field_functions.size();
+      ofile << "plt.plot(data" << ff << "[:,3],data"
+            << ff << "[:,4]"
+            << ",label=\"CustomArray" << ca << "\""
+            << ")\n";
     }
     ofile << "plt.legend()\n"
              "plt.grid(which='major')\n";
