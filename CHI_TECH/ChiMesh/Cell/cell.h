@@ -36,20 +36,21 @@ public:
 private:
   int  neighbor_partition_id=-1;  /// Neighboring cell's partition id
   int  neighbor_local_id=-1;      /// Neighboring cell's local id
-  int neighbor_ass_face=-1;       /// Neighbor associated face
+  int  neighbor_ass_face=-1;      /// Neighbor associated face
   bool neighbor_parallel_info_initialized=false;
+
+private:
+  void InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid);
 
 public:
   bool IsNeighborLocal(chi_mesh::MeshContinuum* grid);
-  int GetNeighborPartitionID(chi_mesh::MeshContinuum* grid);
-  int GetNeighborLocalID(chi_mesh::MeshContinuum* grid);
-  int GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid);
+  int  GetNeighborPartitionID(chi_mesh::MeshContinuum* grid);
+  int  GetNeighborLocalID(chi_mesh::MeshContinuum* grid);
+  int  GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid);
 
 public:
   double ComputeFaceArea(chi_mesh::MeshContinuum *grid);
 
-private:
-  void InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid);
 };
 
 
@@ -60,13 +61,13 @@ private:
 class Cell
 {
 public:
-  int global_id;
-  int local_id;
-  std::pair<int,int> xy_partition_indices;
-  std::tuple<int,int,int> xyz_partition_indices;
-  int partition_id;
+  int    global_id = -1;
+  int    local_id  = -1;
+  std::pair<int,int> xy_partition_indices = {0,0};
+  std::tuple<int,int,int> xyz_partition_indices = std::make_tuple(0,0,0);
+  int    partition_id = -1;
   Vertex centroid;
-  int material_id;
+  int    material_id = -1;
 
   std::vector<int> vertex_ids;
   std::vector<CellFace> faces;
@@ -75,19 +76,7 @@ private:
   const CellType cell_type;
 
 public:
-  explicit Cell(CellType in_cell_type) : cell_type(in_cell_type)
-  {
-    global_id = -1;
-    local_id = -1;
-    xy_partition_indices.first  = 0;
-    xy_partition_indices.second = 0;
-    partition_id = -1;
-    std::get<0>(xyz_partition_indices) = 0;
-    std::get<1>(xyz_partition_indices) = 0;
-    std::get<2>(xyz_partition_indices) = 0;
-
-    material_id = -1;
-  }
+  explicit Cell(CellType in_cell_type) : cell_type(in_cell_type) {}
 
   virtual ~Cell() = default;
 
@@ -95,8 +84,7 @@ public:
   virtual void FindBoundary2D(chi_mesh::Region* region) {}
   virtual bool CheckBoundary2D() {return true;}
 
-  const CellType Type() const
-  {return cell_type;}
+  const CellType Type() const {return cell_type;}
 };
 
 }
