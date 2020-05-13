@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 extern ChiLog     chi_log;
 
 //###################################################################

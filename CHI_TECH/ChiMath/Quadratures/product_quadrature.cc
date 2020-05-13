@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include <ChiLog/chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //#########################################################
 /**Initializes the quadrature with Gauss-Legendre for

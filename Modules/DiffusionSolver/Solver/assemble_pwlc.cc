@@ -8,7 +8,7 @@
 #include <sstream>
 #include "chi_log.h"
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/

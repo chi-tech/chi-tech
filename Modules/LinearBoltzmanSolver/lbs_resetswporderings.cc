@@ -3,13 +3,13 @@
 #include <ChiConsole/chi_console.h>
 #include <chi_mpi.h>
 
-extern ChiConsole chi_console;
-extern ChiMPI chi_mpi;
+extern ChiConsole&  chi_console;
+extern ChiMPI& chi_mpi;
 
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for

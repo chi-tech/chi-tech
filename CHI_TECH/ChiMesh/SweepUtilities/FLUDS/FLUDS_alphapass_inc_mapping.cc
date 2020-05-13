@@ -7,7 +7,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/

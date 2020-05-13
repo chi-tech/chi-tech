@@ -12,14 +12,14 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
 
 #include <ChiTimer/chi_timer.h>
 extern ChiTimer chi_program_timer;
 
 #include <ChiConsole/chi_console.h>
-extern ChiConsole  chi_console;
+extern ChiConsole&   chi_console;
 
 //###################################################################
 /**Gets the partition ID from a centroid.*/

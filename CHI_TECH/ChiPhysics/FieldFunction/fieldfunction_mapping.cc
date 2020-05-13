@@ -1,7 +1,7 @@
 #include "fieldfunction.h"
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /***/

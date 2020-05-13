@@ -24,9 +24,9 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMath    chi_math_handler;
-extern ChiMPI     chi_mpi;
-extern ChiLog     chi_log;
+extern ChiMath&     chi_math_handler;
+extern ChiMPI&      chi_mpi;
+extern ChiLog&     chi_log;
 
 typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 

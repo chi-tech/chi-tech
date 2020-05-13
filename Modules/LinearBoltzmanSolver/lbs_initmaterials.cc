@@ -4,13 +4,13 @@
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Initializes default materials and physics materials.*/

@@ -1,7 +1,7 @@
 #include "diffusion_solver.h"
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Executes the diffusion solver using the PETSc library.*/

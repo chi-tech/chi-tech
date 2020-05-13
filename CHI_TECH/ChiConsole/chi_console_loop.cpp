@@ -4,7 +4,7 @@
 extern bool chi_termination_posted;
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 
 //############################################################################# Run Console loop

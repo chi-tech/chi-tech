@@ -1,5 +1,7 @@
 #include "pwl_polyhedron.h"
 
+extern ChiLog& chi_log;
+
 //###################################################################
 /**Constructor for the Piecewise Linear Polyhedron cell finite elment
  * view.

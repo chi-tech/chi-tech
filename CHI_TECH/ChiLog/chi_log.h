@@ -59,7 +59,7 @@ enum LOG_LVL {LOG_0=1,                ///< Used only for location 0
  *
  * \code
  * #include <chi_log.h>
- * extern ChiLog chi_log;
+ * extern ChiLog& chi_log;
  * \endcode
  *
  * A log is then written inside a piece of code as follows:
@@ -200,9 +200,16 @@ private:
   DummyStream dummy_stream;
   int verbosity;
 
+  static ChiLog instance;
+
 public:
+  static ChiLog& GetInstance()
+  { return instance;}
+private:
   //00
                   ChiLog() noexcept;
+
+public:
   //01
   LogStream       Log(LOG_LVL level);
   void            SetVerbosity(int int_level);

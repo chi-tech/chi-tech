@@ -9,9 +9,11 @@
 #include "CellViews/fv_polygon.h"
 #include "CellViews/fv_polyhedron.h"
 
+#include "ChiMath/UnknownManager/unknown_manager.h"
+
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Only constructor for this method.*/
@@ -74,10 +76,37 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
       }
     }//if mapping not yet assigned
   }//for num cells
-
-
-
 }//AddViewOfLocalContinuum
+
+//###################################################################
+/**Maps a finite volume degree of freedom.*/
+int SpatialDiscretization_FV::
+  MapDOF(chi_mesh::Cell* cell,
+         chi_math::UnknownManager* unknown_manager,
+         unsigned int unknown_id,
+         unsigned int component)
+{
+  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
+  size_t block_id = unknown_manager->MapUnknown(unknown_id,component);
+
+//  return block_size_per_unknown*block_id + cell->global_id;
+  return num_unknowns*cell->global_id + block_id;
+}
+
+//###################################################################
+/**Maps a finite volume degree of freedom.*/
+int SpatialDiscretization_FV::
+MapDOF(int cell_global_id,
+       chi_math::UnknownManager* unknown_manager,
+       unsigned int unknown_id,
+       unsigned int component)
+{
+  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
+  size_t block_id = unknown_manager->MapUnknown(unknown_id,component);
+
+//  return block_size_per_unknown*block_id + cell->global_id;
+  return num_unknowns*cell_global_id + block_id;
+}
 
 
 //###################################################################
@@ -103,30 +132,73 @@ CellFVView* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 void SpatialDiscretization_FV::BuildSparsityPattern(
   chi_mesh::MeshContinuum *grid,
   std::vector<int> &nodal_nnz_in_diag,
-  std::vector<int> &nodal_nnz_off_diag)
+  std::vector<int> &nodal_nnz_off_diag,
+  chi_math::UnknownManager* unknown_manager)
 {
+  unsigned int N = 1; //Number of components
+
+  if (unknown_manager != nullptr)
+    N = unknown_manager->GetTotalUnknownSize();
+
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
   const size_t num_local_cells = grid->local_cells.size();
+  block_size_per_unknown = num_local_cells;
 
-  nodal_nnz_in_diag.resize(num_local_cells,0);
-  nodal_nnz_off_diag.resize(num_local_cells,0);
+  nodal_nnz_in_diag.resize(num_local_cells*N,0.0);
+  nodal_nnz_off_diag.resize(num_local_cells*N,0.0);
 
-  for (auto& cell : grid->local_cells)
+  for (int block=0; block<N; ++block)
   {
-    int i=cell.local_id;
-
-    nodal_nnz_in_diag[i] += 1;
-
-    for (auto& face : cell.faces)
+    for (auto& cell : grid->local_cells)
     {
-      if (face.neighbor < 0) continue;
+      int i=cell.local_id + block*num_local_cells;
 
-      if (face.IsNeighborLocal(grid))
-        nodal_nnz_in_diag[i] += 1;
-      else
-        nodal_nnz_off_diag[i] += 1;
+      nodal_nnz_in_diag[i]   += 1;
+
+      for (auto& face : cell.faces)
+      {
+        if (face.neighbor < 0) continue;
+
+        if (face.IsNeighborLocal(grid))
+          nodal_nnz_in_diag[i] += 1;
+        else
+          nodal_nnz_off_diag[i] += 1;
+      }
     }
   }
+
+}
+
+//###################################################################
+/**Get the number of local degrees-of-freedom.*/
+unsigned int SpatialDiscretization_FV::
+  GetNumLocalDOFs(chi_mesh::MeshContinuum* grid,
+                  chi_math::UnknownManager* unknown_manager)
+{
+  unsigned int N = 1;
+
+  if (unknown_manager != nullptr)
+    N = unknown_manager->GetTotalUnknownSize();
+
+  const int num_local_cells = grid->local_cells.size();
+
+  return num_local_cells*N;
+}
+
+//###################################################################
+/**Get the number of local degrees-of-freedom.*/
+unsigned int SpatialDiscretization_FV::
+  GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
+                   chi_math::UnknownManager* unknown_manager)
+{
+  unsigned int N = 1;
+
+  if (unknown_manager != nullptr)
+    N = unknown_manager->GetTotalUnknownSize();
+
+  const int num_globl_cells = grid->GetGlobalNumberOfCells();
+
+  return num_globl_cells*N;
 }

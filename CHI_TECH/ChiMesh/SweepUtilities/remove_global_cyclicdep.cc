@@ -5,8 +5,8 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-extern ChiMPI chi_mpi;
-extern ChiLog chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
 
 #include <algorithm>
 

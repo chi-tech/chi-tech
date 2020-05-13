@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 #include <ChiTimer/chi_timer.h>
 extern ChiTimer    chi_program_timer;

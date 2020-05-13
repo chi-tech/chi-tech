@@ -16,7 +16,7 @@ extern "C"
 /** Class for handling the console and scripting.*/
 class ChiConsole
 {
-    public:
+public:
 	lua_State*							consoleState;             	///< Pointer to lua console state
 	bool                    exit_loop;
 	bool                    runDeveloper;
@@ -25,9 +25,15 @@ class ChiConsole
 	char                    buffer[2000];
 	int                     numberOfLines;
 	int                     xSize;
-    public:
+
+private:
+  static ChiConsole       instance;
 	//00
 						  ChiConsole() noexcept;
+public:
+	static ChiConsole& GetInstance()
+  {return instance;}
+
   //01 Loop
   void        RunConsoleLoop(char* fileName=nullptr);
   //02 Utilities

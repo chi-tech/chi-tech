@@ -3,7 +3,7 @@
 #include "ChiMesh/Region/chi_region.h"
 
 #include "chi_log.h"
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Obtains a pointer to the last created grid.*/

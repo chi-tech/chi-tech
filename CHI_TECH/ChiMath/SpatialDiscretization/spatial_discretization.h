@@ -23,6 +23,9 @@ public:
   std::vector<std::pair<int,int>> neighbor_cell_block_address;
 
 public:
+  int              block_size_per_unknown=0;
+
+public:
   //00
   SpatialDiscretization(int dim);
 

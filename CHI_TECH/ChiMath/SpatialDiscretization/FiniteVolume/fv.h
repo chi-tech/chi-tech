@@ -3,6 +3,7 @@
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "CellViews/fv_cellbase.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
 
 //###################################################################
 /**Spatial discretizations supporting Finite Volume representations.
@@ -22,11 +23,26 @@ public:
 
   void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
 
+  int MapDOF(chi_mesh::Cell* cell,
+             chi_math::UnknownManager* unknown_manager,
+             unsigned int unknown_id,
+             unsigned int component=0);
+  int MapDOF(int cell_global_id,
+             chi_math::UnknownManager* unknown_manager,
+             unsigned int unknown_id,
+             unsigned int component=0);
+
   CellFVView* MapFeView(int cell_local_index);
 
   void BuildSparsityPattern(chi_mesh::MeshContinuum* grid,
                             std::vector<int>& nodal_nnz_in_diag,
-                            std::vector<int>& nodal_nnz_off_diag);
+                            std::vector<int>& nodal_nnz_off_diag,
+                            chi_math::UnknownManager* unknown_manager=nullptr);
+
+  unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuum* grid,
+                               chi_math::UnknownManager* unknown_manager);
+  unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
+                                chi_math::UnknownManager* unknown_manager);
 };
 
 

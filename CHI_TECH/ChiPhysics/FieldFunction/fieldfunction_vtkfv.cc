@@ -15,9 +15,9 @@
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
-extern ChiPhysics chi_physics_handler;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiPhysics&  chi_physics_handler;
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>

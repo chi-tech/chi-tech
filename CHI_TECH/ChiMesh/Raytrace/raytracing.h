@@ -8,8 +8,8 @@ namespace chi_mesh
 
 struct RayDestinationInfo
 {
-  int destination_face_neighbor;
-  int destination_face_index;
+  int destination_face_neighbor; //Neighbor cell global-id
+  int destination_face_index;    //Neighbor cell face index (deprecated)
 
   RayDestinationInfo() :
   destination_face_neighbor(-1),

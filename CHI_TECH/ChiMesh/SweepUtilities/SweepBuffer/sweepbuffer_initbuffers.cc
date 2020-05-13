@@ -5,10 +5,10 @@
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
 #include <ChiConsole/chi_console.h>
-extern ChiConsole chi_console;
+extern ChiConsole&  chi_console;
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /** This is the final level of initialization before a sweep-chunk executes.

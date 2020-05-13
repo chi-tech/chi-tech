@@ -3,11 +3,11 @@
 #include "../quadrature_gausslegendre.h"
 #include "../quadrature_gausschebyshev.h"
 
-extern ChiMath    chi_math_handler;
+extern ChiMath&     chi_math_handler;
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 
 /**\defgroup LuaQuadrature Quadrature rules

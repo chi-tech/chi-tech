@@ -11,16 +11,22 @@
 #include <chi_log.h>
 #include "ChiTimer/chi_timer.h"
 
-ChiConsole  chi_console;
-ChiMath     chi_math_handler;
-ChiPhysics  chi_physics_handler;
+ChiConsole  ChiConsole::instance;
+ChiMath     ChiMath::instance;
+ChiMPI      ChiMPI::instance;
+ChiLog      ChiLog::instance;
+ChiPhysics ChiPhysics::instance;
+
+ChiConsole&  chi_console = ChiConsole::GetInstance();
+ChiMath&     chi_math_handler = ChiMath::GetInstance();
+ChiMPI&      chi_mpi = ChiMPI::GetInstance();
+ChiLog&      chi_log = ChiLog::GetInstance();
+ChiPhysics&  chi_physics_handler = ChiPhysics::GetInstance();
 
 /** Global stack of handlers */
 std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
 int chi_current_mesh_handler=-1;
 
-ChiMPI      chi_mpi;
-ChiLog      chi_log;
 ChiTimer    chi_program_timer;
 
 //=============================================== Global variables

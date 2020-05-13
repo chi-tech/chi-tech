@@ -1,3 +1,6 @@
+#ifndef _chi_math_petscutils_h
+#define _chi_math_petscutils_h
+
 #include <petscksp.h>
 
 #include <vector>
@@ -6,6 +9,7 @@ namespace chi_math
 {
   namespace PETScUtils
   {
+    /**Generalized solver structure.*/
     struct PETScSolverSetup
     {
       KSP ksp;
@@ -21,10 +25,12 @@ namespace chi_math
     };
 
     Mat CreateSquareMatrix(int local_size, int global_size);
+    void CreateSquareMatrix(Mat& A, int local_size, int global_size);
     void InitMatrixSparsity(Mat A,
                             std::vector<int>& nodal_nnz_in_diag,
                             std::vector<int>& nodal_nnz_off_diag);
     Vec CreateVector(int local_size, int global_size);
+    void CreateVector(Vec& x, int local_size, int global_size);
 
     PETScSolverSetup CreateCommonKrylovSolverSetup(
       Mat ref_matrix,
@@ -44,6 +50,13 @@ namespace chi_math
     GeneralKSPMonitor(KSP ksp, PetscInt n,
                       PetscReal rnorm, void *monitordestroy);
 
+    void CopyVecToSTLvector(Vec x, std::vector<double>& data, size_t N);
 
+    void CopyGlobalVecToSTLvector(
+      Vec x,
+      const std::vector<int>& global_indices,
+      std::vector<double>& data);
   }
 }
+
+#endif

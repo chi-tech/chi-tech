@@ -2,7 +2,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /** Given a location J index, maps to a predecessor location.*/

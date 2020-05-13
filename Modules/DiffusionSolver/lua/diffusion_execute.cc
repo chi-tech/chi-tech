@@ -2,7 +2,7 @@
 #include "../Solver/diffusion_solver.h"
 #include <ChiPhysics/chi_physics.h>
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 //#############################################################################
 /** Initialize the Diffusion solver.
