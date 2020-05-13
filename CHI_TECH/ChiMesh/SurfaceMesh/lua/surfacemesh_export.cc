@@ -6,7 +6,7 @@
 #include "../../MeshHandler/chi_meshhandler.h"
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //############################################################################# Create
 /** Exports mesh as a .obj format.

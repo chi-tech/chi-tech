@@ -9,7 +9,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog&  chi_log;
 
 //#############################################################################
 /** Creates a new line mesh from a loop.

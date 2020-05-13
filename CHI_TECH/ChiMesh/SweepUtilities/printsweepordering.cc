@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "../MeshHandler/chi_meshhandler.h"
-#include "../Cell/cell.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include "../MeshContinuum/chi_meshcontinuum.h"
 #include "../VolumeMesher/chi_volumemesher.h"

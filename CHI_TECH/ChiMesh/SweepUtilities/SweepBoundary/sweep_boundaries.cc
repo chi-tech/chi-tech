@@ -2,7 +2,7 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Returns a flag indicating whether this bndry is reflecting or not.*/

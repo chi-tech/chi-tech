@@ -4,6 +4,7 @@
 #include "../chi_physics_namespace.h"
 #include "../../ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
 
 #include <petscksp.h>
 
@@ -37,22 +38,23 @@ namespace chi_physics
 class chi_physics::FieldFunction
 {
 public:
-  std::string              text_name;
-  int                      id;
-  FieldFunctionType        type;
-  chi_mesh::MeshContinuum* grid;
-  SpatialDiscretization*   spatial_discretization;
-  int                      num_components, num_sets;
-  int                      ref_component, ref_set;
+  std::string               text_name;
+  int                       id;
+  FieldFunctionType         type;
+  chi_mesh::MeshContinuum*  grid;
+  SpatialDiscretization*    spatial_discretization;
+  chi_math::UnknownManager* unknown_manager;
+  int                       num_components, num_sets;
+  int                       ref_component, ref_set;
 
-  std::vector<int>*        local_cell_dof_array_address;
+  std::vector<int>*         local_cell_dof_array_address;
 
-  Vec*                     field_vector;
-  std::vector<double>*     field_vector_local;
-  bool                     using_petsc_field_vector;
+  Vec*                      field_vector;
+  std::vector<double>*      field_vector_local;
+  bool                      using_petsc_field_vector;
 
 private:
-  std::vector<double>      temp_cell_dof_values;
+  std::vector<double>       temp_cell_dof_values;
 
 public:
 

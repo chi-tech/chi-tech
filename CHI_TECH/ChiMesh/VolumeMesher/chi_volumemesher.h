@@ -2,7 +2,7 @@
 #define _chi_volumemesher_h
 
 #include "../chi_mesh.h"
-#include "../Cell/cell.h"
+#include "ChiMesh/Cell/cell.h"
 
 //#define VOLUMEMESHER_LINEMESH1D 1
 //#define VOLUMEMESHER_PREDEFINED2D 3

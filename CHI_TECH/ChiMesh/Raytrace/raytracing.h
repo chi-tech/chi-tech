@@ -8,8 +8,8 @@ namespace chi_mesh
 
 struct RayDestinationInfo
 {
-  int destination_face_neighbor;
-  int destination_face_index;
+  int destination_face_neighbor; //Neighbor cell global-id
+  int destination_face_index;    //Neighbor cell face index (deprecated)
 
   RayDestinationInfo() :
   destination_face_neighbor(-1),
@@ -41,17 +41,8 @@ CheckLineIntersectStrip(
   const chi_mesh::Vector3& strip_normal,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,
-  chi_mesh::Vector3& intersection_point);
-
-bool
-CheckLineIntersectTriangle(
-  const chi_mesh::Vector3& tri_point0,
-  const chi_mesh::Vector3& tri_point1,
-  const chi_mesh::Vector3& tri_point2,
-  const chi_mesh::Normal& tri_normal,
-  const chi_mesh::Vector3& line_point0,
-  const chi_mesh::Vector3& line_point1,
-  chi_mesh::Vector3& intersection_point);
+  chi_mesh::Vector3& intersection_point,
+  double* distance_to_intersection = nullptr);
 
 bool
 CheckLineIntersectTriangle2(
@@ -60,7 +51,8 @@ CheckLineIntersectTriangle2(
   const chi_mesh::Vector3& tri_point2,
   const chi_mesh::Vector3& ray_posi,
   const chi_mesh::Vector3& ray_dir,
-  chi_mesh::Vector3& intersection_point);
+  chi_mesh::Vector3& intersection_point,
+  double* distance_to_intersection = nullptr);
 
 void PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum* grid,

@@ -82,7 +82,8 @@ bool chi_mesh::CheckLineIntersectStrip(
   const chi_mesh::Vector3& strip_normal,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,
-  chi_mesh::Vector3& intersection_point)
+  chi_mesh::Vector3& intersection_point,
+  double* distance_to_intersection)
 {
   chi_mesh::Vector3 plane_intersection_point;
   std::pair<double,double> weights;
@@ -101,6 +102,10 @@ bool chi_mesh::CheckLineIntersectStrip(
   bool sense1 = edge_vec.Dot(ints_vec1)>=0.0;
   bool sense2 = edge_vec.Dot(ints_vec2)>=0.0;
 
+  if (distance_to_intersection != nullptr)
+    *distance_to_intersection =
+      (plane_intersection_point - line_point0).Norm();
+
   if (sense1 != sense2)
   {
     intersection_point = plane_intersection_point;
@@ -116,41 +121,6 @@ bool chi_mesh::CheckLineIntersectStrip(
  * intersects this triangle.
  *
  * */
-bool chi_mesh::CheckLineIntersectTriangle(
-  const chi_mesh::Vector3& tri_point0,
-  const chi_mesh::Vector3& tri_point1,
-  const chi_mesh::Vector3& tri_point2,
-  const chi_mesh::Normal& tri_normal,
-  const chi_mesh::Vector3& line_point0,
-  const chi_mesh::Vector3& line_point1,
-  chi_mesh::Vector3& intersection_point)
-{
-  chi_mesh::Vector3 plane_pi; //plane point of intersection
-  std::pair<double,double> weights;
-
-  bool intersects_plane =
-    chi_mesh::CheckPlaneLineIntersect(
-      tri_normal, tri_point0,
-      line_point0, line_point1,
-      plane_pi, weights);
-
-  if (!intersects_plane) return false;
-  else
-  {
-    bool in_triangle =
-      chi_mesh::CheckPointInTriangle(
-        tri_point0, tri_point1, tri_point2, tri_normal, plane_pi);
-
-    if (in_triangle)
-    {
-      intersection_point = plane_pi;
-      return true;
-    }
-  }
-
-  return false;
-}
-
 bool
 chi_mesh::CheckLineIntersectTriangle2(
   const chi_mesh::Vector3& tri_point0,
@@ -158,7 +128,8 @@ chi_mesh::CheckLineIntersectTriangle2(
   const chi_mesh::Vector3& tri_point2,
   const chi_mesh::Vector3& ray_posi,
   const chi_mesh::Vector3& ray_dir,
-  chi_mesh::Vector3& intersection_point)
+  chi_mesh::Vector3& intersection_point,
+  double* distance_to_intersection)
 {
   double epsilon = 1.0e-12;
   chi_mesh::Vector3 edge1 = tri_point1 - tri_point0;
@@ -197,6 +168,10 @@ chi_mesh::CheckLineIntersectTriangle2(
     return false;
 
   double t = f*edge2.Dot(q);
+
+  if (distance_to_intersection != nullptr)
+    *distance_to_intersection = t;
+
   if (t > epsilon and t<(1.0/epsilon))
   {
     intersection_point = ray_posi + ray_dir*t;
@@ -251,9 +226,17 @@ void chi_mesh::PopulateRaySegmentLengths(
   const chi_mesh::Vector3& line_point1,
   const chi_mesh::Vector3& omega)
 {
-  double track_length = (line_point1-line_point0).Norm();
+  std::set<double> distance_set;
+
+  double track_length = 0.0;
   if (segment_lengths.empty())
+  {
+    track_length = (line_point1-line_point0).Norm();
     segment_lengths.push_back(track_length);
+  }
+
+  track_length = segment_lengths.front();
+  distance_set.insert(track_length);
 
   //======================================== Determine intersection points
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
@@ -281,15 +264,16 @@ void chi_mesh::PopulateRaySegmentLengths(
       auto& n0 = poly_cell->GetSegmentNormals(grid)[f];
 
       chi_mesh::Vertex intersection_point;
+      double d = 0.0;
       bool intersects = chi_mesh::CheckLineIntersectStrip(
         v0, vc, n0,
         line_point0, line_point1,
-        intersection_point);
+        intersection_point, &d);
 
       if (intersects)
       {
-        double d = (intersection_point - line_point0).Norm();
-        segment_lengths.push_back(d);
+//        double d = (intersection_point - line_point0).Norm();
+        distance_set.insert(d);
       }
 
     }//for face
@@ -304,42 +288,61 @@ void chi_mesh::PopulateRaySegmentLengths(
       f++;
       auto& vfc  = face.centroid;
 
-      int s=-1;
+      //===================== Face center to vertex segments
       for (auto vi : face.vertex_ids)
       {
-        s++;
         auto& vert = *grid->vertices[vi];
 
         chi_mesh::Vertex intersection_point;
 
+        double d = 0.0;
         bool intersects = chi_mesh::CheckLineIntersectTriangle2(
-          vert,vfc,vcc,line_point0,omega,intersection_point);
+          vert,vfc,vcc,line_point0,omega,intersection_point,&d);
 
         if (intersects)
         {
-          double d = (intersection_point - line_point0).Norm();
           if (d < track_length)
-            segment_lengths.push_back(d);
+            distance_set.insert(d);
+        }
+      }//for edge
+
+      //===================== Face edge to cell center segments
+      for (int v=0; v<face.vertex_ids.size(); ++v)
+      {
+        int vid_0 = face.vertex_ids[v];
+        int vid_1 = (v<(face.vertex_ids.size()-1))?
+                    face.vertex_ids[v+1] :
+                    face.vertex_ids[0];
+
+        auto& v0 = *grid->vertices[vid_0];
+        auto& v1 = *grid->vertices[vid_1];
+        auto& v2 = vcc;
+
+        chi_mesh::Vertex intersection_point;
+
+        double d = 0.0;
+        bool intersects = chi_mesh::CheckLineIntersectTriangle2(
+          v0,v1,v2,line_point0,omega,intersection_point,&d);
+
+        if (intersects)
+        {
+          if (d < track_length)
+            distance_set.insert(d);
         }
       }//for edge
     }//for face
   }
 
-  //======================================== Sort distances
-  std::sort(segment_lengths.begin(),
-            segment_lengths.end());
-
   //======================================== Populate segment lengths
   //if there are N segments intersected then there will always be
   //N+1 distances.
-  size_t num_distances = segment_lengths.size();
-  double last_distance = segment_lengths[0];
-  for (size_t di=1; di < num_distances; di++)
+  segment_lengths.clear();
+  double last_distance = 0.0;
+  for (double dl : distance_set)
   {
-    double new_seg_length =
-      segment_lengths[di] - last_distance;
-    last_distance = segment_lengths[di];
-    segment_lengths[di] = new_seg_length;
+    double new_seg_length = dl - last_distance;
+    last_distance = dl;
+    segment_lengths.push_back(new_seg_length);
   }
 
 }

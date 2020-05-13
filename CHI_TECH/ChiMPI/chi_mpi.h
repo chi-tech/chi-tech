@@ -37,12 +37,17 @@ public:
 
   MPI_Datatype LOC_SWP_DEP_C;
 
-public:
+  static ChiMPI instance;
+
+private:
   ChiMPI() noexcept
   {
     location_id = 0;
     process_count = 1;
   }
+public:
+  static ChiMPI& GetInstance()
+    {return instance;}
   //01
   void Initialize();
 

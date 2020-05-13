@@ -13,7 +13,7 @@
 /** Object for controlling real-time physics.*/
 class ChiPhysics
 {
-	public:
+public:
 	double    					physicsTimestep;
 	double              performanceData[10000];     ///< Misc performance data;
 	double              physicsTimeCost;
@@ -23,9 +23,15 @@ class ChiPhysics
   std::vector<chi_physics::TransportCrossSections*> trnsprt_xs_stack;
   std::vector<chi_physics::FieldFunction*> fieldfunc_stack;
 
-	public:
+private:
+  static ChiPhysics instance;
+
+private:
 	//00
 			ChiPhysics() noexcept;
+public:
+  static ChiPhysics& GetInstance()
+  {return instance;}
 	int  InitPetSc(int argc, char** argv);
 	//01
 	void	RunPhysicsLoop();

@@ -2,7 +2,7 @@
 
 #include "../lbs_linear_boltzman_solver.h"
 #include "ChiPhysics/chi_physics.h"
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Executes the LBS solver.

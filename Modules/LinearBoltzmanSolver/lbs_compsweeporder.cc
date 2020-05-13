@@ -11,8 +11,8 @@
 #include <chi_log.h>
 #include "ChiTimer/chi_timer.h"
 
-extern ChiMPI chi_mpi;
-extern ChiLog chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
 extern ChiTimer chi_program_timer;
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
@@ -21,7 +21,7 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 #include <iomanip>
 #include "ChiConsole/chi_console.h"
 
-extern ChiConsole chi_console;
+extern ChiConsole&  chi_console;
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/

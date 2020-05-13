@@ -9,14 +9,14 @@
 
 #include <chi_log.h>
 
-extern ChiMPI chi_mpi;
-extern ChiLog chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
 
 #include <ChiTimer/chi_timer.h>
 extern ChiTimer chi_program_timer;
 
 #include <ChiConsole/chi_console.h>
-extern ChiConsole  chi_console;
+extern ChiConsole&   chi_console;
 
 
 //###################################################################

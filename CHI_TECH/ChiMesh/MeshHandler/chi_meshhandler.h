@@ -28,7 +28,7 @@ public:
 
 
 public:
-  chi_mesh::MeshContinuum* GetGrid();
+  chi_mesh::MeshContinuum* GetGrid(int region_index=-1);
 };
 
 #endif
