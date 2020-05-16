@@ -142,6 +142,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterConstant(LINE_FIRSTPOINT,   11);
     RegisterConstant(LINE_SECONDPOINT,   12);
     RegisterConstant(LINE_NUMBEROFPOINTS,   13);
+    RegisterConstant(LINE_CUSTOM_ARRAY,   14);
     RegisterFunction(chiFFInterpolationInitialize)
     RegisterFunction(chiFFInterpolationExecute)
     RegisterFunction(chiFFInterpolationExportPython)

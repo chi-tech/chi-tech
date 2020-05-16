@@ -117,6 +117,34 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
+  /**Returns a vector v^* where each element is inverted provided
+   * that it is greater than the given tolerance, otherwise it is zeroed.*/
+  Vector3 InverseZeroIfGreater(double tol) const
+  {
+    Vector3 newVector;
+    newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 0.0;
+    newVector.y = (std::fabs(this->y)>tol)? 1.0/this->y : 0.0;
+    newVector.z = (std::fabs(this->z)>tol)? 1.0/this->z : 0.0;
+
+    return newVector;
+  }
+
+  /**Returns a vector v^* where each element is inverted provided
+   * that the inversion is not infinite, otherwise it is zeroed.*/
+  Vector3 InverseZeroIfInf() const
+  {
+    Vector3 newVector;
+    double dx_inv = 1.0/this->x;
+    double dy_inv = 1.0/this->y;
+    double dz_inv = 1.0/this->z;
+
+    newVector.x = (std::isinf(dx_inv))? dx_inv : 0.0;
+    newVector.y = (std::isinf(dy_inv))? dy_inv : 0.0;
+    newVector.z = (std::isinf(dz_inv))? dz_inv : 0.0;
+
+    return newVector;
+  }
+
   double Norm() const
   {
     double value = 0.0;
@@ -161,5 +189,15 @@ struct chi_mesh::Vector3
     return out.str();
   }
 };
+
+chi_mesh::Vector3 operator*(double value,const chi_mesh::Vector3& a);
+//{
+//  chi_mesh::Vector3 newVector;
+//  newVector.x = a.x*value;
+//  newVector.y = a.y*value;
+//  newVector.z = a.z*value;
+//
+//  return newVector;
+//}
 
 #endif

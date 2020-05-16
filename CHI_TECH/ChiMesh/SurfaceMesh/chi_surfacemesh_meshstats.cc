@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Checks for cyclic dependencies in this mesh.

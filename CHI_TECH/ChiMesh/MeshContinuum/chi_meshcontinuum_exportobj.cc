@@ -4,13 +4,13 @@
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI chi_mpi;
-extern ChiLog chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Export cells to python.

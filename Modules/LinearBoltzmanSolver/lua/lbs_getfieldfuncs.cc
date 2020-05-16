@@ -3,10 +3,10 @@
 #include "../lbs_linear_boltzman_solver.h"
 
 #include "ChiPhysics/chi_physics.h"
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Obtains a list of field functions from the transport solver.

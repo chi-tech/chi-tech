@@ -1,7 +1,7 @@
 #include "FLUDS.h"
 
 #include <chi_log.h>
-extern ChiLog     chi_log;
+extern ChiLog&     chi_log;
 
 //###################################################################
 /**Given a sweep ordering index, the outgoing face counter,

@@ -24,9 +24,15 @@ class ChiMath
 public:
 	std::vector<chi_math::Quadrature*> quadratures;
 	std::vector<chi_math::ProductQuadrature*> product_quadratures;
-public:
+private:
+  static ChiMath instance;
+private:
 	//00 Constructor
 	ChiMath() noexcept;
+
+public:
+  static ChiMath& GetInstance()
+  {return instance;}
 	//01 Utility
 
 };
@@ -69,6 +75,9 @@ namespace chi_math
 
   double PowerIteration(const MatDbl& A,
                         VecDbl& e_vec, int max_it = 2000, double tol = 1.0e-13);
+
+  //04 Unknown Managers
+  class UnknownManager;
 }
 
 

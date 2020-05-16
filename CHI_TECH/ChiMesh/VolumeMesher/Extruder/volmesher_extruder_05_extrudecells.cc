@@ -5,10 +5,10 @@
 #include "../../SurfaceMesher/surfacemesher.h"
 
 #include <chi_mpi.h>
-extern ChiMPI chi_mpi;
+extern ChiMPI& chi_mpi;
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Computes the partition id of a template cell's projection onto 3D.*/

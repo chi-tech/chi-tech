@@ -1,7 +1,7 @@
 #include "chi_math_sparse_matrix.h"
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 #include <iomanip>
 #include <algorithm>

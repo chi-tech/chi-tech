@@ -7,7 +7,7 @@
 #include "../../VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //#############################################################################
 /** Sets a volume mesher property.

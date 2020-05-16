@@ -1,10 +1,10 @@
 #include "pwl.h"
 
 #include "chi_log.h"
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI chi_mpi;
+extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/

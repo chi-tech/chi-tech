@@ -7,7 +7,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Performs raytracing on chi_mesh type cells. This algorithm essentially

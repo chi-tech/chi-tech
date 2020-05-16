@@ -5,7 +5,7 @@
 #include <boost/graph/graphviz.hpp>
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**This method takes an undirected graph and performs

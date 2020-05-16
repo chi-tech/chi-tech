@@ -5,9 +5,9 @@
 #include <chi_log.h>
 #include <ChiConsole/chi_console.h>
 
-extern ChiMPI     chi_mpi;
-extern ChiLog     chi_log;
-extern ChiConsole chi_console;
+extern ChiMPI&      chi_mpi;
+extern ChiLog&     chi_log;
+extern ChiConsole&  chi_console;
 
 //###################################################################
 /**Execute the solver.*/

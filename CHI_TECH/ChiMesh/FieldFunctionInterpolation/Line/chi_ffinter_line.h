@@ -9,6 +9,7 @@
 #define FFI_LINE_FIRSTPOINT  11
 #define FFI_LINE_SECONDPOINT 12
 #define FFI_LINE_NUMBEROFPOINTS 13
+#define FFI_LINE_CUSTOM_ARRAY 14
 
 struct FieldFunctionContext
 {
@@ -29,16 +30,18 @@ public:
   int               number_of_points;
   chi_mesh::Vector3  pi,pf;
 
+  std::vector<std::vector<double>> custom_arrays;
+  std::vector<chi_mesh::Vector3>  interpolation_points;
+  std::vector<FieldFunctionContext*> ff_contexts;
+
 private:
   double                         delta_d;
-  std::vector<chi_mesh::Vector3>  interpolation_points;
   std::vector<double>            interpolation_points_values;
   std::vector<int>               cfem_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_cells_needed_unmapped;
   std::vector<int>               interpolation_points_ass_cell;
 
-  std::vector<FieldFunctionContext*> ff_contexts;
 public:
   FieldFunctionInterpolationLine()
   {

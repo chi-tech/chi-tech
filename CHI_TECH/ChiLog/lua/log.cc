@@ -2,7 +2,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 /** \defgroup LuaLogging D Output and Logging
  * \ingroup LuaUtilities*/

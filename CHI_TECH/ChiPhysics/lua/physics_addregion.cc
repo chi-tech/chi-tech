@@ -4,7 +4,7 @@
 #include "../../ChiMesh/Region/chi_region.h"
 #include "../../ChiMesh/MeshHandler/chi_meshhandler.h"
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/

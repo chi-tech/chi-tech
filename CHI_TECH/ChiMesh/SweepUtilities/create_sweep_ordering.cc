@@ -10,9 +10,9 @@
 #include "../../ChiConsole/chi_console.h"
 #include <ChiTimer/chi_timer.h>
 
-extern ChiMPI chi_mpi;
-extern ChiLog chi_log;
-extern ChiConsole chi_console;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
+extern ChiConsole&  chi_console;
 extern ChiTimer   chi_program_timer;
 
 #include <ChiGraph/chi_directed_graph.h>

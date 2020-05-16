@@ -6,11 +6,11 @@
 #include <chi_log.h>
 #include <ChiTimer/chi_timer.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 extern ChiTimer chi_program_timer;
 
 #include "../../../ChiConsole/chi_console.h"
-extern ChiConsole       chi_console;
+extern ChiConsole&        chi_console;
 
 #include <iomanip>
 #include <unistd.h>

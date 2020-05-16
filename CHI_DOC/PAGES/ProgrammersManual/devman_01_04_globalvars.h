@@ -2,7 +2,7 @@
 
 \section devman2_sec0 Global variables available
 
-The major global variables are defined in "chi_tech_main.h"
+The major global variables are defined in "chi_runtime.cc"
 
 They are:
  - ChiConsole chi_console The link to the lua scripting engine.
@@ -11,19 +11,25 @@ They are:
  - ChiMPI chi_mpi A handler for parallel related items.
  - ChiLog chi_log A handler for parallel logging events and verbosity.
 
-There are also a number fo secondary global variables that assist developers
+There are also a number of secondary global variables that assist developers
 with coding. They are:
  - ChiTimer chi_program_timer Holds a timer which initiates at program
-   start.
+   start. To access the timer from another piece of source code, include at the
+   top of the file the ```extern``` command:
+   \code
+   #include "ChiTimer/chi_timer.h"
+   extern ChiTimer chi_program_timer;
+   \endcode
+   Current program time can then be obtained using:
    \code
    double time_in_ms = chi_program_timer.GetTime();
    \endcode
- - std::string chi_input_file_name Holds the input file name if supplied.
- - bool chi_termination_posted A flag used during interactive mode.
- - bool chi_sim_option_interactive A flag indicating whether the code is
+ - ```std::string chi_input_file_name``` Holds the input file name if supplied.
+ - ```bool chi_termination_posted``` A flag used during interactive mode.
+ - ```bool chi_sim_option_interactive``` A flag indicating whether the code is
    run in interactive mode.
- - std::vector<chi_mesh::MeshHandler*> chi_meshhandler_stack and
-   int chi_current_mesh_handler. Holds various mesh handlers. When not using
+ - ```std::vector<chi_mesh::MeshHandler*> chi_meshhandler_stack``` and
+   ```int chi_current_mesh_handler```. Holds various mesh handlers. When not using
    the lua code to create a chi_mesh::MeshHandler be sure to set it to current
    in order to ensure that the method chi_mesh::GetCurrentHandler() works:
    \code
@@ -57,6 +63,15 @@ To access chi_physics_handler include the following code at the top of your
 extern ChiPhysics chi_physics_handler;
 \endcode
 
+ or obtain an instance to it via
+
+\code
+// Include this at the top of the file
+#include <ChiPhysics/chi_physics.h>
+
+// Include this in the body of your code
+ChiPhysics& chi_physics_handler = ChiPhysics::GetInstance();
+\endcode
 
 
 \subsection devman2_sec0_4 Connecting to MPI
@@ -78,6 +93,15 @@ if (chi_mpi.location_id == 1)
  printf("This is process 1, Dab!");
 \endcode
 
+ or obtain an instance to it via
+
+\code
+// Include this at the top of the file
+#include <chi_mpi.h>
+
+// Include this in the body of your code
+ChiMPI&      chi_mpi = ChiMPI::GetInstance();
+\endcode
 
 
 \subsection devman2_sec0_5 Connecting to the parallel logging utility
@@ -93,6 +117,16 @@ Connecting to chi_log is done as follows
 #include <chi_log.h>
 
 extern ChiLog chi_log;
+\endcode
+
+ or obtain an instance to it via
+
+\code
+// Include this at the top of the file
+#include <chi_log.h>
+
+// Include this in the body of your code
+ChiLog&      chi_log = ChiLog::GetInstance();
 \endcode
 
 The logger needs to be supplied with an enumeration (LOG_LVL) indicating

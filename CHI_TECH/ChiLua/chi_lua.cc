@@ -5,7 +5,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog&  chi_log;
 
 void LuaPostArgAmountError(const char* func_name,int expected, int given)
 {

@@ -12,9 +12,9 @@
 
 #include <iomanip>
 
-extern ChiConsole chi_console;
-extern ChiLog     chi_log;
-extern ChiMPI     chi_mpi;
+extern ChiConsole&  chi_console;
+extern ChiLog&     chi_log;
+extern ChiMPI&      chi_mpi;
 
 #include "ChiTimer/chi_timer.h"
 

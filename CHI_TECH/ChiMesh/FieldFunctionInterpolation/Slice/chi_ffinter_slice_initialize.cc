@@ -5,7 +5,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 /**Initializes the data structures necessary for interpolation. This is
  * independent of the physics and hence is a routine on its own.

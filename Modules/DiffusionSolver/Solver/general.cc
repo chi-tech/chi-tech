@@ -5,7 +5,7 @@
 #include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
 #include <ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h>
 #include <ChiPhysics/chi_physics.h>
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 #include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../Boundaries/chi_diffusion_bndry_reflecting.h"
@@ -13,8 +13,8 @@ extern ChiPhysics chi_physics_handler;
 #include <chi_log.h>
 #include "chi_mpi.h"
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
 
 
 

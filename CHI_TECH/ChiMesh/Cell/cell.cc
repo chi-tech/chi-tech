@@ -4,8 +4,24 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
+
+//###################################################################
+/**A private method that initializes a neighbor's parallel information.
+ * For now these are 2 items:
+ *  - neighbor_partition_id, and
+ *  - neighbor_parallel_info_initialized */
+void chi_mesh::CellFace::
+  InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
+{
+  auto adj_cell = grid->cells[neighbor];
+  neighbor_partition_id = adj_cell->partition_id;
+  neighbor_parallel_info_initialized = true;
+
+  if (neighbor_partition_id == chi_mpi.location_id)
+    neighbor_local_id = adj_cell->local_id;
+}
 
 //###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
@@ -17,7 +33,6 @@ bool chi_mesh::CellFace::
 
   if (not neighbor_parallel_info_initialized)
     InitializeNeighborParallelInfo(grid);
-
 
   return (neighbor_partition_id == chi_mpi.location_id);
 }
@@ -120,19 +135,6 @@ int chi_mesh::CellFace::
 
   cur_face.neighbor_ass_face = associated_face;
   return associated_face;
-}
-
-//###################################################################
-/**Initializes a neighbor's parallel information.*/
-void chi_mesh::CellFace::
-  InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
-{
-  auto adj_cell = grid->cells[neighbor];
-  neighbor_partition_id = adj_cell->partition_id;
-  neighbor_parallel_info_initialized = true;
-
-  if (neighbor_partition_id == chi_mpi.location_id)
-    neighbor_local_id = adj_cell->local_id;
 }
 
 //###################################################################

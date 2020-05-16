@@ -3,11 +3,11 @@
 #include "../chi_physics.h"
 #include "../PhysicsMaterial/chi_physicsmaterial.h"
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics&  chi_physics_handler;
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 /** \defgroup LuaPhysicsMaterials Materials
  * \ingroup LuaPhysics*/
