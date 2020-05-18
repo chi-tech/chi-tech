@@ -37,6 +37,7 @@ public:
   struct Options
   {
     std::string file_name;
+    double scale=1.0;
     ParallelMethod parallel_method = ParallelMethod::ALL_FROM_HOME;
   }mesh_options;
 

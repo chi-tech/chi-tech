@@ -91,7 +91,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 {
   auto polyh_cell  = new LightWeightCell;
 
-  auto vtk_tet     = vtkHexahedron::SafeDownCast(vtk_cell);
+  auto vtk_tet     = vtkTetra::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_tet->GetNumberOfPoints();
   auto num_cfaces  = vtk_tet->GetNumberOfFaces();
 

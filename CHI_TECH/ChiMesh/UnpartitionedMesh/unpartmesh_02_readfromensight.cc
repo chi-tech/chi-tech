@@ -142,10 +142,13 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
 
     int mat_id=-1;
+    int prev_block_lim = -1;
     for (auto block_lim : block_mat_id)
     {
       ++mat_id;
-      if (c>=block_lim) break;
+      if (c<block_lim and c>=prev_block_lim) break;
+
+      prev_block_lim=block_lim;
     }
 
     raw_cells.back()->material_id = mat_id;
@@ -155,14 +158,35 @@ void chi_mesh::UnpartitionedMesh::
   for (int p=0; p<total_point_count; ++p)
   {
     auto point = ugrid->GetPoint(p);
-    vertices.push_back(new chi_mesh::Vertex(point[0],point[1],point[2]));
+    vertices.push_back(new chi_mesh::Vertex(point[0]*options.scale,
+                                            point[1]*options.scale,
+                                            point[2]*options.scale));
 
-    if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
-    if (point[0] > bound_box.xmax) bound_box.xmax = point[0];
-    if (point[1] < bound_box.ymin) bound_box.ymin = point[1];
-    if (point[1] > bound_box.ymax) bound_box.ymax = point[1];
-    if (point[2] < bound_box.zmin) bound_box.zmin = point[2];
-    if (point[2] > bound_box.zmax) bound_box.zmax = point[2];
+    if (point[0]*options.scale < bound_box.xmin) bound_box.xmin = point[0]*options.scale;
+    if (point[0]*options.scale > bound_box.xmax) bound_box.xmax = point[0]*options.scale;
+    if (point[1]*options.scale < bound_box.ymin) bound_box.ymin = point[1]*options.scale;
+    if (point[1]*options.scale > bound_box.ymax) bound_box.ymax = point[1]*options.scale;
+    if (point[2]*options.scale < bound_box.zmin) bound_box.zmin = point[2]*options.scale;
+    if (point[2]*options.scale > bound_box.zmax) bound_box.zmax = point[2]*options.scale;
   }
+
+//  std::stringstream ostr;
+//
+//  ostr << "Cell 0 vids: ";
+//  auto first_cell = raw_cells[0];
+//  for (auto vid : first_cell->vertex_ids)
+//    ostr << vid << " " << vertices[vid]->PrintS();
+//  ostr << "\n";
+//  int f=-1;
+//  for (auto& face : first_cell->faces)
+//  {
+//    ++f;
+//    ostr << "Face " << f << ": ";
+//    for (auto vid : face.vertex_ids)
+//      ostr << vid << " ";
+//    ostr << "\n";
+//  }
+//
+//  chi_log.Log(LOG_0) << ostr.str();
 
 }

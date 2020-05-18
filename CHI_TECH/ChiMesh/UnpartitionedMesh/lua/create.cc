@@ -45,6 +45,7 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
  * Ensight Gold mesh files.
  *
  * \param file_name char Filename of the .case file.
+ * \param scale float Scale to apply to the mesh
  *
  * \ingroup LuaUnpartitionedMesh
  *
@@ -53,14 +54,17 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 {
   const char func_name[] = "chiUnpartitionedMeshFromEnsightGold";
   int num_args = lua_gettop(L);
-  if (num_args != 1)
+  if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
 
   const char* temp = lua_tostring(L,1);
+  double scale = 1.0;
+  if (num_args >= 2) scale = lua_tonumber(L,2);
   auto new_object = new chi_mesh::UnpartitionedMesh;
 
   chi_mesh::UnpartitionedMesh::Options options;
   options.file_name = std::string(temp);
+  options.scale = scale;
 
   new_object->ReadFromEnsightGold(options);
 
