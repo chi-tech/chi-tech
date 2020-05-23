@@ -114,16 +114,40 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
           if (adj_cell_id == c) continue;
           auto adj_cell = umesh->raw_cells[adj_cell_id];
 
-          //Assume it matches now disprove
-          bool adj_cell_matches = true;
-          for (auto cfvid : face.vertex_ids)
+          bool adj_cell_matches = false;
+          for (auto& aface : adj_cell->faces)
           {
-            bool vertex_found=false;
-            for (auto acvid : adj_cell->vertex_ids)
-              if (cfvid == acvid) {vertex_found = true; break;}
+            bool face_matches=true;
+            for (auto cfvid : face.vertex_ids)
+            {
+              bool vertex_found = false;
+              for (auto afvid : aface.vertex_ids)
+                if (cfvid == afvid) {vertex_found = true; break;}
 
-            if (not vertex_found) { adj_cell_matches = false; break;}
+              if (not vertex_found)
+              {
+                face_matches = false;
+                break;
+              }
+            }
+
+            if (face_matches)
+            {
+              adj_cell_matches = true;
+              break;
+            }
           }
+
+          //Assume it matches now disprove
+//          bool adj_cell_matches = true;
+//          for (auto cfvid : face.vertex_ids)
+//          {
+//            bool vertex_found=false;
+//            for (auto acvid : adj_cell->vertex_ids)
+//              if (cfvid == acvid) {vertex_found = true; break;}
+//
+//            if (not vertex_found) { adj_cell_matches = false; break;}
+//          }
 
           if (adj_cell_matches)
           {

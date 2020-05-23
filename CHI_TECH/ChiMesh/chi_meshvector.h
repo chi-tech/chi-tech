@@ -92,6 +92,17 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
+  /**Vector component-wise division.*/
+  Vector3 operator/(const Vector3& that) const
+  {
+    Vector3 newVector;
+    newVector.x = this->x/that.x;
+    newVector.y = this->y/that.y;
+    newVector.z = this->z/that.z;
+
+    return newVector;
+  }
+
   /**Returns a copy of the value at the given index.*/
   double operator[](int i) const
   {
