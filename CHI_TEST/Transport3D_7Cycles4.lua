@@ -1,6 +1,6 @@
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromEnsightGold("/Users/janv4/Desktop/GoogleDrive/Temp/DMDMeshes/Mesh3c.case",1.0)
+chiUnpartitionedMeshFromEnsightGold("/Users/janv4/Desktop/GoogleDrive/Temp/DMDMeshes/Mesh3c.case",2.0)
 
 region1 = chiRegionCreate()
 chiRegionAddEmptyBoundary(region1)

@@ -52,6 +52,10 @@ public:
   LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
   LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
 
+  LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
+  LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
+  LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
+
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);
 };

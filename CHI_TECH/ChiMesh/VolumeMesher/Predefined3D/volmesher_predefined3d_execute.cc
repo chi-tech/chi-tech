@@ -3,7 +3,6 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
-#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/Region//chi_region.h"
@@ -26,7 +25,7 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
-    << " VolumeMesherPredefined3D executed. Memory in use = "
+    << " VolumeMesherPredefined3D executing. Memory in use = "
     << chi_console.GetMemoryUsageInMB() << " MB"
     << std::endl;
 
@@ -160,7 +159,7 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
   MPI_Barrier(MPI_COMM_WORLD);
 
 
-  //======================================== Apply paritioning scheme
+  //======================================== Apply partitioning scheme
   auto grid = new chi_mesh::MeshContinuum;
 
   if (options.partition_type == PartitionType::KBA_STYLE_XY or

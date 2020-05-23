@@ -22,7 +22,7 @@ extern ChiMPI& chi_mpi;
 
 
 //###################################################################
-/**Reads a VTK unstructured mesh.*/
+/**Reads an Ensight-Gold unstructured mesh.*/
 void chi_mesh::UnpartitionedMesh::
   ReadFromEnsightGold(const chi_mesh::UnpartitionedMesh::Options &options)
 {
@@ -62,11 +62,31 @@ void chi_mesh::UnpartitionedMesh::
   std::vector<vtkSmartPointer<vtkUnstructuredGrid>> grid_blocks;
   grid_blocks.reserve(num_blocks);
   for (int b=0; b<num_blocks; ++b)
-    grid_blocks.push_back(
-      vtkSmartPointer<vtkUnstructuredGrid>(
+    grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(multiblock->GetBlock(b))
-        )
       );
+
+  //========================================= Determine mesh type
+  // This step goes through each grid block
+  // and tries to find 3D cells. If it does the
+  // overall mesh is classified as 3D.
+  bool mesh_is_3D = false;
+  for (auto ugrid : grid_blocks)
+  {
+    if (ugrid->GetNumberOfCells() == 0) continue;
+
+    auto cell = ugrid->GetCell(0); //Get first cell
+    auto ctype = cell->GetCellType();
+
+    if ((ctype == VTK_POLYHEDRON) or
+        (ctype == VTK_HEXAHEDRON) or
+        (ctype == VTK_TETRA) )
+    {
+      mesh_is_3D = true;
+      break;
+    }
+  }//for grid block
+
 
   //========================================= Process each block
   vtkSmartPointer<vtkAppendFilter> append =
@@ -80,29 +100,43 @@ void chi_mesh::UnpartitionedMesh::
     int num_cells  = ugrid->GetNumberOfCells();
     int num_points = ugrid->GetNumberOfPoints();
 
-
     std::stringstream outstr;
     outstr
       << "Block " << ug << " has "
       << num_cells << " cells and "
       << num_points << " points";
 
-    if (num_cells > 0)
-    {
-      auto cell = ugrid->GetCell(0);
-      auto ctype = cell->GetCellType();
+    if (num_cells == 0) continue;
 
+    auto cell = ugrid->GetCell(0);
+    auto ctype = cell->GetCellType();
+
+    if (mesh_is_3D)
+    {
       if (not ((ctype == VTK_POLYHEDRON) or
                (ctype == VTK_HEXAHEDRON) or
                (ctype == VTK_TETRA)) )
-           { outstr << " (Boundary Mesh)"; }
+      { outstr << " (Boundary Mesh)"; }
       else
       {
         append->AddInputData(ugrid);
         total_cells += num_cells;
         block_mat_id.push_back(total_cells);
       }
-    }
+    }//3D mesh
+    else
+    {
+      if (not ((ctype == VTK_POLYGON) or
+               (ctype == VTK_QUAD) or
+               (ctype == VTK_TRIANGLE)) )
+      { outstr << " (Boundary Mesh)"; }
+      else
+      {
+        append->AddInputData(ugrid);
+        total_cells += num_cells;
+        block_mat_id.push_back(total_cells);
+      }
+    }//2D mesh
 
    chi_log.Log(LOG_0VERBOSE_1) << outstr.str();
   }
@@ -140,6 +174,12 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.push_back(CreateCellFromVTKHexahedron(vtk_cell));
     else if (vtk_celltype == VTK_TETRA)
       raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
+    else if (vtk_celltype == VTK_POLYGON)
+      raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+    else if (vtk_celltype == VTK_QUAD)
+      raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
+    else if (vtk_celltype == VTK_TRIANGLE)
+      raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
 
     int mat_id=-1;
     int prev_block_lim = -1;
@@ -158,16 +198,20 @@ void chi_mesh::UnpartitionedMesh::
   for (int p=0; p<total_point_count; ++p)
   {
     auto point = ugrid->GetPoint(p);
-    vertices.push_back(new chi_mesh::Vertex(point[0]*options.scale,
-                                            point[1]*options.scale,
-                                            point[2]*options.scale));
 
-    if (point[0]*options.scale < bound_box.xmin) bound_box.xmin = point[0]*options.scale;
-    if (point[0]*options.scale > bound_box.xmax) bound_box.xmax = point[0]*options.scale;
-    if (point[1]*options.scale < bound_box.ymin) bound_box.ymin = point[1]*options.scale;
-    if (point[1]*options.scale > bound_box.ymax) bound_box.ymax = point[1]*options.scale;
-    if (point[2]*options.scale < bound_box.zmin) bound_box.zmin = point[2]*options.scale;
-    if (point[2]*options.scale > bound_box.zmax) bound_box.zmax = point[2]*options.scale;
+    point[0] = point[0]*options.scale;
+    point[1] = point[1]*options.scale;
+    point[2] = point[2]*options.scale;
+
+
+    vertices.push_back(new chi_mesh::Vertex(point[0],point[1],point[2]));
+
+    if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
+    if (point[0] > bound_box.xmax) bound_box.xmax = point[0];
+    if (point[1] < bound_box.ymin) bound_box.ymin = point[1];
+    if (point[1] > bound_box.ymax) bound_box.ymax = point[1];
+    if (point[2] < bound_box.zmin) bound_box.zmin = point[2];
+    if (point[2] > bound_box.zmax) bound_box.zmax = point[2];
   }
 
 //  std::stringstream ostr;

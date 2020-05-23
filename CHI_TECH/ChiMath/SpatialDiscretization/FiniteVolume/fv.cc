@@ -86,25 +86,33 @@ int SpatialDiscretization_FV::
          unsigned int unknown_id,
          unsigned int component)
 {
+  if (component < 0) return -1;
+
   size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
+
+  if (component >= num_unknowns) return -1;
+
   size_t block_id = unknown_manager->MapUnknown(unknown_id,component);
 
-//  return block_size_per_unknown*block_id + cell->global_id;
   return num_unknowns*cell->global_id + block_id;
 }
 
 //###################################################################
 /**Maps a finite volume degree of freedom.*/
 int SpatialDiscretization_FV::
-MapDOF(int cell_global_id,
+  MapDOF(int cell_global_id,
        chi_math::UnknownManager* unknown_manager,
        unsigned int unknown_id,
        unsigned int component)
 {
+  if (component < 0) return -1;
+
   size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
+
+  if (component >= num_unknowns) return -1;
+
   size_t block_id = unknown_manager->MapUnknown(unknown_id,component);
 
-//  return block_size_per_unknown*block_id + cell->global_id;
   return num_unknowns*cell_global_id + block_id;
 }
 
