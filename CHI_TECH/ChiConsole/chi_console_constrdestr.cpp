@@ -1,12 +1,9 @@
 #include "chi_console.h"
-//#include "../ChiLua/chi_lua.h"
-
 
 //############################################################################# Default constructor
 /** Default constructor for the console*/
 ChiConsole::ChiConsole() noexcept
 {
-
 	this->currentSize=0;
 	this->previousSize=0;
 	this->buffer[0]='\0';
@@ -15,11 +12,7 @@ ChiConsole::ChiConsole() noexcept
 	runDeveloper=false;
 	//========================================== Initializing console
 	this->consoleState = luaL_newstate();
-	//this->consoleState = lua_open();
 	luaL_openlibs(this->consoleState);
-
-	//luaL_dostring(this->consoleState, "print(\"CHI_TECH to lua interface established.\")");
-
 	
 	//========================================== Registering functions
 	#include"../ChiLua/chi_lua_register.h"
@@ -46,25 +39,18 @@ ChiConsole::ChiConsole() noexcept
 	this->InitializeLuaEvent("WM_SIZE");
 	this->InitializeLuaEvent("WM_CLOSE");
 
-
 	//========================================== Defining global variables
 	char global1[] = "chi_displayStatus=true;";
 	luaL_dostring(this->consoleState, global1);
 
-
 	char global3[] = "chi_programTime=0;";
 	luaL_dostring(this->consoleState, global3);
 
-
 	//========================================== Defining main function
-	char initialScript[] = "function main()\n   end";
+	char initialScript[] =
+	  "function main()\n print(\"Empty Main Function\")\nend";
 	luaL_dostring(this->consoleState, initialScript);
 
-#ifdef CHI_USEGRAPHICS
-	char library[] = "CHI_RESOURCES/Scripts/chil/Library.lua";
-	lua_pushstring(this->consoleState,library);
-	lua_setglobal(this->consoleState,"CHI_LIBRARY");
-#endif
 }
 
 

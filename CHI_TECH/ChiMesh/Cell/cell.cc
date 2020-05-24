@@ -4,8 +4,24 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
+
+//###################################################################
+/**A private method that initializes a neighbor's parallel information.
+ * For now these are 2 items:
+ *  - neighbor_partition_id, and
+ *  - neighbor_parallel_info_initialized */
+void chi_mesh::CellFace::
+  InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
+{
+  auto adj_cell = grid->cells[neighbor];
+  neighbor_partition_id = adj_cell->partition_id;
+  neighbor_parallel_info_initialized = true;
+
+  if (neighbor_partition_id == chi_mpi.location_id)
+    neighbor_local_id = adj_cell->local_id;
+}
 
 //###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
@@ -17,7 +33,6 @@ bool chi_mesh::CellFace::
 
   if (not neighbor_parallel_info_initialized)
     InitializeNeighborParallelInfo(grid);
-
 
   return (neighbor_partition_id == chi_mpi.location_id);
 }
@@ -72,31 +87,17 @@ int chi_mesh::CellFace::
   int associated_face = -1;
   if (cur_face.neighbor_ass_face < 0)
   {
+    std::set<int> cfvids(cur_face.vertex_ids.begin(),
+                         cur_face.vertex_ids.end());
     //======================================== Loop over adj cell faces
     int af=-1;
     for (auto& adj_face : adj_cell->faces)
     {
       ++af;
-      //Assume face matches
-      bool face_matches = true; //Now disprove it
-      //================================= Loop over adj cell face verts
-      for (auto afvi : adj_face.vertex_ids)
-      {
-        //========================== Try and find them in the reference face
-        bool found = false;
-        for (auto cfvi : cur_face.vertex_ids)
-        {
-          if (cfvi == afvi)
-          {
-            found = true;
-            break;
-          }
-        }//for cfv
+      std::set<int> afvids(adj_face.vertex_ids.begin(),
+                           adj_face.vertex_ids.end());
 
-        if (!found) {face_matches = false; break;}
-      }//for afv
-
-      if (face_matches) {associated_face = af; break;}
+      if (afvids == cfvids) {associated_face = af; break;}
     }
   }
   else
@@ -107,8 +108,10 @@ int chi_mesh::CellFace::
   {
     chi_log.Log(LOG_ALLERROR)
       << "Could not find associated face in call to "
-      << "CellFace::GetNeighborAssociatedFace. Reference face with centroid at \n"
-      << cur_face.centroid.PrintS();
+      << "CellFace::GetNeighborAssociatedFace.\n"
+      << "Reference face with centroid at: "
+      << cur_face.centroid.PrintS() << "\n"
+      << "Adjacent cell: " << adj_cell->global_id;
     for (int af=0; af < adj_cell->faces.size(); af++)
     {
       chi_log.Log(LOG_ALLERROR)
@@ -120,19 +123,6 @@ int chi_mesh::CellFace::
 
   cur_face.neighbor_ass_face = associated_face;
   return associated_face;
-}
-
-//###################################################################
-/**Initializes a neighbor's parallel information.*/
-void chi_mesh::CellFace::
-  InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
-{
-  auto adj_cell = grid->cells[neighbor];
-  neighbor_partition_id = adj_cell->partition_id;
-  neighbor_parallel_info_initialized = true;
-
-  if (neighbor_partition_id == chi_mpi.location_id)
-    neighbor_local_id = adj_cell->local_id;
 }
 
 //###################################################################

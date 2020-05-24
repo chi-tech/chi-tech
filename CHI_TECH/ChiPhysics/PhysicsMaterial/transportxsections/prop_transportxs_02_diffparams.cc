@@ -2,7 +2,7 @@
 
 #include <ChiLog/chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 {

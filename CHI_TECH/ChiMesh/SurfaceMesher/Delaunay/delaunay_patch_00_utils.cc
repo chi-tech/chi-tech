@@ -1,7 +1,7 @@
 #include "delaunay_mesher.h"
 #include "ChiMath/chi_math.h"
 
-extern ChiMath chi_math_handler;
+extern ChiMath& chi_math_handler;
 
 //###################################################################
 /**Determine the orientation of point c relative to point a and b.

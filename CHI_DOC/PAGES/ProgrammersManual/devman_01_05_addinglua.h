@@ -13,7 +13,7 @@ a `CMakeLists.txt` recursion then follow
 the instructions for \ref DevManAddingCode "adding a code to the system".
 \n\n
 <B>Restrictions:</B> The lua-wrapper `.cc` file must be in a folder that
-is not shared with `.cc` files than contain regular non-lua code. In the example
+is not shared with `.cc` files that contain regular non-lua code. In the example
 above it means we cannot add the wrapper `.cc` to the general `CHI_TECH` folder.
 <I>This is because we use a script to convert the doxygen comments to
  text used in the input manual.</I>

@@ -17,6 +17,7 @@ CHI_RESOURCES/Dependencies/readline/
 CHI_RESOURCES/Dependencies/triangle/
 CHI_RESOURCES/Dependencies/glew-2.1.0/
 
+# Latex compile files
 *.aux
 *.lof
 *.log
@@ -32,6 +33,7 @@ CHI_RESOURCES/Dependencies/\.DS_Store
 
 CHI_RESOURCES/\.DS_Store
 
+# python files
 \.DS_Store
 ._.DS_Store
 *.pyc

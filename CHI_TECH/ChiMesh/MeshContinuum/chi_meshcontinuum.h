@@ -4,7 +4,7 @@
 #include "../chi_mesh.h"
 #include <boost/graph/adjacency_list.hpp>
 #include "../../ChiGraph/chi_graph.h"
-#include "../Cell/cell.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include <chi_mpi.h>
 
@@ -148,6 +148,8 @@ public:
     std::vector<chi_mesh::Cell*>& neighbor_cells);
 
   ChiMPICommunicatorSet& GetCommunicator();
+
+  size_t GetGlobalNumberOfCells();
 };
 
 

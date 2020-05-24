@@ -4,8 +4,6 @@
 #include "../chi_mesh.h"
 #include <chi_log.h>
 
-extern ChiLog chi_log;
-
 #define SPHERE        1
 #define SPHERE_ORIGIN 2
 #define RPP           3
@@ -147,6 +145,7 @@ public:
 
   bool Inside(chi_mesh::Vector3 p1)
   {
+    auto& chi_log = ChiLog::GetInstance();
     chi_mesh::Vector3 p0(x0, y0, z0);
     chi_mesh::Vector3 vd(vx, vy, vz);
     chi_mesh::Vector3 k(0.0, 0.0, 1.0);

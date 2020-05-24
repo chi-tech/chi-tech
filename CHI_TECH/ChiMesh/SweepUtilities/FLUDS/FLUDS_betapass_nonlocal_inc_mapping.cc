@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog     chi_log;
+extern ChiLog&     chi_log;
 
 //###################################################################
 /**Performs non-local incident mapping for polyhedron cells.*/
@@ -58,27 +58,20 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           }
 
           //============================== Find associated face
+          std::set<int> cfvids(face.vertex_ids.begin(),
+                               face.vertex_ids.end());
           CompactCellView* adj_cell_view =
               &prelocI_cell_views[prelocI][ass_cell];
-          int ass_face = -1;
-          for (int af=0; af<adj_cell_view->second.size(); af++)
+          int ass_face = -1, af = -1;
+          for (auto& adj_face : adj_cell_view->second)
           {
+            ++af;
             bool face_matches = true;
-            for (int afv=0; afv<adj_cell_view->second[af].second.size(); afv++)
-            {
-              bool match_found = false;
-              for (int fv=0; fv < face.vertex_ids.size(); fv++)
-              {
-                if (adj_cell_view->second[af].second[afv] ==
-                    face.vertex_ids[fv])
-                {
-                  match_found = true;
-                  break;
-                }
-              }
 
-              if (!match_found){face_matches = false; break;}
-            }
+            std::set<int> afvids(adj_face.second.begin(),
+                                 adj_face.second.end());
+
+            if (cfvids != afvids) face_matches = false;
 
             if (face_matches){ass_face = af; break;}
           }

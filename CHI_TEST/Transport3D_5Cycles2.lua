@@ -44,9 +44,9 @@ for g=1,num_groups do
     src[g] = 0.0
 end
 
-chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
-src[1]=1.0
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
+src[1]=1.0
+chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 

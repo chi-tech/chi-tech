@@ -1,3 +1,5 @@
+message (STATUS "Loading Downstream.cmake")
+
 set(CHI_TECH_DIR "${CMAKE_CURRENT_LIST_DIR}/../../")
 
 if(UNIX AND NOT APPLE)
@@ -64,8 +66,10 @@ include_directories("${CHI_TECH_DIR}/CHI_TECH")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiLua")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiMPI")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiLog")
+include_directories("${CHI_TECH_DIR}/CHI_RESOURCES")
 include_directories("${CHI_TECH_DIR}/Modules")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
+
 
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
@@ -80,11 +84,12 @@ set(TRIANGLE "${TRIANGLE_ROOT}/triangle.o")
 
 # --------------------------- VTK
 find_package(VTK COMPONENTS
-  vtkCommonCore
-  vtkCommonDataModel
-	vtkIOLegacy vtkIOCore 
-	vtkIOXML vtkParallelCore
-	vtkIOParallelXML REQUIRED)
+        vtkCommonCore vtkCommonDataModel
+        vtkIOLegacy vtkIOCore
+        vtkIOXML vtkParallelCore vtkIOParallelXML
+        vtkFiltersCore
+        vtkIOEnSight
+        REQUIRED)
 if (NOT VTK_FOUND)
   message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()

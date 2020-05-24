@@ -3,8 +3,8 @@
 
 #include <chi_log.h>
 
-extern ChiMath    chi_math_handler;
-extern ChiLog     chi_log;
+extern ChiMath&     chi_math_handler;
+extern ChiLog&     chi_log;
 
 //########################################################## Get product quadrature
 /** Get the values of a product quadrature

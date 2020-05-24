@@ -6,7 +6,7 @@
 #include "../../Boundary/chi_boundary.h"
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //#############################################################################
 /** Exports the mesh to python.

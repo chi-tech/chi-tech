@@ -8,7 +8,7 @@
 #include <chi_mpi.h>
 
 extern ChiLog     chi_log;
-extern ChiMPI     chi_mpi;
+extern ChiMPI&      chi_mpi;
 
 //###################################################################
 /**Check if all upstream dependencies have been met and receives

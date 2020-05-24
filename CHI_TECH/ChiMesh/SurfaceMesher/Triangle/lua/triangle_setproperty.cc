@@ -5,7 +5,7 @@
 #include "../../../MeshHandler/chi_meshhandler.h"
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //#############################################################################
 /** Sets a property of a Triangle surface mesher.

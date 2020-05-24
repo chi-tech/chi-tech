@@ -6,7 +6,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/

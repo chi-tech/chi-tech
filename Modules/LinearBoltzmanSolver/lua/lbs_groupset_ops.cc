@@ -5,9 +5,9 @@
 #include "ChiMath/chi_math.h"
 #include <chi_log.h>
 
-extern ChiPhysics chi_physics_handler;
-extern ChiMath    chi_math_handler;
-extern ChiLog     chi_log;
+extern ChiPhysics&  chi_physics_handler;
+extern ChiMath&     chi_math_handler;
+extern ChiLog&     chi_log;
 
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 

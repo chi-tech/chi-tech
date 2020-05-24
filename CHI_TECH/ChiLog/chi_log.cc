@@ -2,7 +2,7 @@
 #include <chi_mpi.h>
 #include <ChiTimer/chi_timer.h>
 
-extern ChiMPI    chi_mpi;
+extern ChiMPI&     chi_mpi;
 extern ChiTimer  chi_program_timer;
 
 #include <sstream>

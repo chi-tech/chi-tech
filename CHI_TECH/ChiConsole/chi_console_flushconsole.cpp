@@ -4,7 +4,7 @@
 
 #include "../ChiPhysics/chi_physics.h"
 #include "../ChiTimer/chi_timer.h"
-extern ChiPhysics  		chi_physics_handler;
+extern ChiPhysics&   		chi_physics_handler;
 extern ChiTimer        chi_program_timer;
 
 //############################################################################# Flush console

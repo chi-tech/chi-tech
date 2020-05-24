@@ -5,8 +5,8 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
-extern ChiPhysics chi_physics_handler;
+extern ChiLog& chi_log;
+extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /** Initialize interpolator.

@@ -37,6 +37,7 @@ public:
   struct Options
   {
     std::string file_name;
+    double scale=1.0;
     ParallelMethod parallel_method = ParallelMethod::ALL_FROM_HOME;
   }mesh_options;
 
@@ -50,6 +51,10 @@ public:
   LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
   LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
   LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
+
+  LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
+  LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
+  LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
 
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);

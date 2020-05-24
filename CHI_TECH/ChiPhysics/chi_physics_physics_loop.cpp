@@ -5,7 +5,7 @@
 #include"../ChiTimer/chi_timer.h"
 #include"../ChiConsole/chi_console.h"
 
-extern ChiConsole chi_console;
+extern ChiConsole&  chi_console;
 
 extern bool    chi_termination_posted;
 

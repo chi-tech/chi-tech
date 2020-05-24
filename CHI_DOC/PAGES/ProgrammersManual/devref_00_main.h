@@ -37,4 +37,12 @@
         <td width="33%">chi_mesh::CellPolygon</td>
             <td width="33%">chi_mesh::CellPolyhedron</td></tr>
 </table>
+
+\subsection devrefmain_00c Math Utilities
+
+<table>
+<tr><td width="33%">chi_math::PETScUtils::CreateSquareMatrix</td>
+        <td width="33%">chi_math::PETScUtils::InitMatrixSparsity</td>
+            <td width="33%">chi_math::PETScUtils::CreateVector</td></tr>
+</table>
  * */

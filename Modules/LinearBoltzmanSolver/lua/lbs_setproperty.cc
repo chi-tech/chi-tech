@@ -6,8 +6,8 @@
 
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
-extern ChiPhysics chi_physics_handler;
-extern ChiMath    chi_math_handler;
+extern ChiPhysics&  chi_physics_handler;
+extern ChiMath&     chi_math_handler;
 
 #define DISCRETIZATION_METHOD 1
   #define PWLD1D 4
@@ -34,7 +34,7 @@ extern ChiMath    chi_math_handler;
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 
 //###################################################################

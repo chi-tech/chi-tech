@@ -14,9 +14,9 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 #include <ChiPhysics/chi_physics.h>
-extern ChiMPI chi_mpi;
-extern ChiLog chi_log;
-extern ChiPhysics chi_physics_handler;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
+extern ChiPhysics&  chi_physics_handler;
 
 extern ChiTimer chi_program_timer;
 

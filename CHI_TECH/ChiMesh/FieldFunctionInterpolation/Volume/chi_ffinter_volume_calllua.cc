@@ -1,10 +1,10 @@
 #include "chi_ffinter_volume.h"
 
 #include "ChiConsole/chi_console.h"
-extern ChiConsole chi_console;
+extern ChiConsole&  chi_console;
 
 #include <chi_log.h>
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Calls the designated lua function*/

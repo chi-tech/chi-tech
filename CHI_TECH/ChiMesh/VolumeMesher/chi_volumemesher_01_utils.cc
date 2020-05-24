@@ -16,8 +16,8 @@
 
 #include <chi_log.h>
 
-extern ChiLog chi_log;
-extern ChiMPI chi_mpi;
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
 
 #include <ChiTimer/chi_timer.h>
 extern ChiTimer chi_program_timer;
@@ -516,10 +516,13 @@ void chi_mesh::VolumeMesher::
   for (auto& cell : vol_cont->local_cells)
   {
     for (auto& face : cell.faces)
+    {
+      if (face.neighbor >= 0) continue;
       if (log_vol->Inside(face.centroid) && sense){
         face.neighbor = -1*(abs(bndry_id)+1);
         ++num_faces_modified;
       }
+    }
   }
 
   chi_log.Log(LOG_0)

@@ -4,7 +4,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "chi_log.h"
 
-extern ChiLog chi_log;
+extern ChiLog&  chi_log;
 
 /** \defgroup LuaMeshMacros Mesh Macros
  * These functions are considered "macros" because they encapsulate

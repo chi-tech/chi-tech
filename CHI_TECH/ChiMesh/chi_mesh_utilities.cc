@@ -11,7 +11,7 @@
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include "chi_log.h"
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Creates a 1D slab mesh from a set of vertices.*/
@@ -174,4 +174,16 @@ void chi_mesh::Create3DOrthoMesh(std::vector<double>& vertices_x,
   }
 
   handler->surface_mesher->Execute();
+}
+
+//###################################################################
+/**Returns a 3D vector multiplied by the given scalar from the left.*/
+chi_mesh::Vector3 operator*(double value,const chi_mesh::Vector3& a)
+{
+  chi_mesh::Vector3 newVector;
+  newVector.x = a.x*value;
+  newVector.y = a.y*value;
+  newVector.z = a.z*value;
+
+  return newVector;
 }

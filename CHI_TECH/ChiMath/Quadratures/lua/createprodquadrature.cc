@@ -3,8 +3,8 @@
 
 #include <chi_log.h>
 
-extern ChiMath    chi_math_handler;
-extern ChiLog     chi_log;
+extern ChiMath&     chi_math_handler;
+extern ChiLog&     chi_log;
 
 //########################################################## Create empty system
 /** Creates a Product-quadrature.
