@@ -106,6 +106,9 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
       for (auto cfvid : face.vertex_ids)
         cells_to_search.push_back(vertex_subs[cfvid]);
 
+      std::set<int> cfvids(face.vertex_ids.begin(),
+                           face.vertex_ids.end());
+
       bool stop_searching = false;
       for (auto& adj_cell_id_set : cells_to_search)
       {
@@ -117,37 +120,15 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
           bool adj_cell_matches = false;
           for (auto& aface : adj_cell->faces)
           {
-            bool face_matches=true;
-            for (auto cfvid : face.vertex_ids)
-            {
-              bool vertex_found = false;
-              for (auto afvid : aface.vertex_ids)
-                if (cfvid == afvid) {vertex_found = true; break;}
+            std::set<int> afvids(aface.vertex_ids.begin(),
+                                 aface.vertex_ids.end());
 
-              if (not vertex_found)
-              {
-                face_matches = false;
-                break;
-              }
-            }
-
-            if (face_matches)
+            if (afvids == cfvids)
             {
               adj_cell_matches = true;
               break;
             }
           }
-
-          //Assume it matches now disprove
-//          bool adj_cell_matches = true;
-//          for (auto cfvid : face.vertex_ids)
-//          {
-//            bool vertex_found=false;
-//            for (auto acvid : adj_cell->vertex_ids)
-//              if (cfvid == acvid) {vertex_found = true; break;}
-//
-//            if (not vertex_found) { adj_cell_matches = false; break;}
-//          }
 
           if (adj_cell_matches)
           {
