@@ -19,21 +19,32 @@ extern ChiLog& chi_log;
 
 ###PropertyIndex:
  FORCE_POLYGONS = <B>PropertyValue:[bool]</B> Forces the 2D Meshing to use
-                  polygon cells even if the
- underlying surface mesh is triangles. Expects a boolean value.\n
+                  polygon cells even if the underlying surface mesh is
+                  triangles. Expects a boolean value.\n
+ MESH_GLOBAL = <B>PropertyValue:[bool]</B> Generate/Read the full mesh at each
+               location. Expects a boolean value [Default=true].
+ PARTITION_TYPE = <B>PartitionType</B>. See below.
  EXTRUSION_LAYER = <B>PropertyValue:[double,(int),(char)]</B> Adds a layer to the
                    extruder volume mesher if it exists.
                    Expects 1 required parameter, the layer height, followed by 2 optional
                    parameters: number of subdivisions (defaults to 1), and layer id (char)(defaults
-                   to nothing).\n
- MESH_GLOBAL = <B>PropertyValue:[bool]</B> Generate/Read the full mesh at each
-               location. Expects a boolean value [Default=true].\n
- CUT_X = Adds a cut at the given x-value.\n
- CUT_Y = Adds a cut at the given y-value.\n
- CUT_Z = Adds a cut at the given z-value.\n
- PARTITION_X   = <B>PropertyValue:[int]</B> Number of partitions in X.\n
- PARTITION_Y   = <B>PropertyValue:[int]</B> Number of partitions in Y.\n
- PARTITION_Z   = <B>PropertyValue:[int]</B> Number of partitions in Z.\n
+                   to nothing). Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```. \n
+ CUT_X = Adds a cut at the given x-value. Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
+ CUT_Y = Adds a cut at the given y-value. Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
+ CUT_Z = Adds a cut at the given z-value. Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
+ PARTITION_X   = <B>PropertyValue:[int]</B> Number of partitions in X.
+                    Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
+ PARTITION_Y   = <B>PropertyValue:[int]</B> Number of partitions in Y.
+                    Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
+ PARTITION_Z   = <B>PropertyValue:[int]</B> Number of partitions in Z.
+                    Only supported if partition-type is
+                   ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
  MATID_FROMLOGICAL = <B>LogicalVolumeHandle:[int],Mat_id:[int],
                      Sense:[bool](Optional, default:true)</B> Sets the material
                      id of cells that meet the sense requirement for the given
@@ -44,6 +55,13 @@ extern ChiLog& chi_log;
                      that meet the sense requirement for the given
                      logical volume.\n
 
+## _
+
+### PartitionType
+Can be any of the following:
+ - KBA_STYLE_XY
+ - KBA_STYLE_XYZ
+ - PARMETIS
 
 \ingroup LuaVolumeMesher
 \author Jan*/

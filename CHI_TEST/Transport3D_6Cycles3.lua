@@ -8,10 +8,7 @@ chiRegionAddEmptyBoundary(region1)
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
 chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED3D)
 
-chiVolumeMesherSetProperty(VOLUMEPARTITION_X,2)
-chiVolumeMesherSetProperty(VOLUMEPARTITION_Y,2)
-chiVolumeMesherSetProperty(CUTS_X,0.0)
-chiVolumeMesherSetProperty(CUTS_Y,0.0)
+chiVolumeMesherSetProperty(PARTITION_TYPE,PARMETIS)
 
 
 
@@ -44,9 +41,9 @@ for g=1,num_groups do
     src[g] = 0.0
 end
 
-chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
-src[1]=1.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
+src[1]=1.0
+chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 
@@ -63,13 +60,13 @@ end
 
 --========== ProdQuad
 pquad  = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2)
-pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12, 8)
+pquad2 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
 chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad2)
 chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)

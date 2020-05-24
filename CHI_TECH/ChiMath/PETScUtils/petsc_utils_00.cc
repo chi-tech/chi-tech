@@ -92,6 +92,7 @@ Vec chi_math::PETScUtils::CreateVector(int local_size, int global_size)
   VecCreate(PETSC_COMM_WORLD,&x);
   VecSetType(x,VECMPI);
   VecSetSizes(x, local_size, global_size);
+  VecSetOption(x,VEC_IGNORE_NEGATIVE_INDICES,PETSC_TRUE);
 
   return x;
 }

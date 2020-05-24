@@ -177,7 +177,7 @@ void chi_mesh::Create3DOrthoMesh(std::vector<double>& vertices_x,
 }
 
 //###################################################################
-/**Returns a 3D vector multiplied by the given scalar.*/
+/**Returns a 3D vector multiplied by the given scalar from the left.*/
 chi_mesh::Vector3 operator*(double value,const chi_mesh::Vector3& a)
 {
   chi_mesh::Vector3 newVector;
