@@ -1,6 +1,8 @@
 #include <ChiLua/chi_lua.h>
 
-#include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
+#include "ChiMesh/chi_mesh.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include <chi_log.h>
 
@@ -13,33 +15,17 @@ extern ChiLog& chi_log;
  */
 int chiLuaTest(lua_State* L)
 {
-  chi_math::SparseMatrix A(5,5);
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  auto grid = mesh_handler->GetGrid();
 
-  std::cout << A.PrintS();
-
-  A.Insert(0,4,20.0);
-  A.Insert(0,0,2.0);
-  A.Insert(0,1,-1.0);
-  A.InsertAdd(0,1,-1.0);
-
-  A.Compress();
-
-  std::cout << std::endl;
-
-  std::cout << A.PrintS();
-
-  std::cout << std::endl;
-
-  auto& indicesJ_rowI = A.rowI_indices[0];
-  auto& valuesJ_rowI  = A.rowI_values[0];
-
-  auto j = indicesJ_rowI.begin();
-  auto v = valuesJ_rowI.begin();
-  for (; j!= indicesJ_rowI.end(); ++j,++v)
+  for (auto& cell : grid->local_cells)
   {
-    std::cout << *j << " " << *v << "\n";
+    for (auto& face : cell.faces)
+    {
+      if (face.neighbor >= 0)
+        face.GetNeighborAssociatedFace(grid);
+    }
   }
-  std::cout << std::endl;
 
   return 0;
 }

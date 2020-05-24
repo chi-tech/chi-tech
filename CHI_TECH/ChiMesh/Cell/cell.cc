@@ -87,31 +87,17 @@ int chi_mesh::CellFace::
   int associated_face = -1;
   if (cur_face.neighbor_ass_face < 0)
   {
+    std::set<int> cfvids(cur_face.vertex_ids.begin(),
+                         cur_face.vertex_ids.end());
     //======================================== Loop over adj cell faces
     int af=-1;
     for (auto& adj_face : adj_cell->faces)
     {
       ++af;
-      //Assume face matches
-      bool face_matches = true; //Now disprove it
-      //================================= Loop over adj cell face verts
-      for (auto afvi : adj_face.vertex_ids)
-      {
-        //========================== Try and find them in the reference face
-        bool found = false;
-        for (auto cfvi : cur_face.vertex_ids)
-        {
-          if (cfvi == afvi)
-          {
-            found = true;
-            break;
-          }
-        }//for cfv
+      std::set<int> afvids(adj_face.vertex_ids.begin(),
+                           adj_face.vertex_ids.end());
 
-        if (!found) {face_matches = false; break;}
-      }//for afv
-
-      if (face_matches) {associated_face = af; break;}
+      if (afvids == cfvids) {associated_face = af; break;}
     }
   }
   else
@@ -122,8 +108,10 @@ int chi_mesh::CellFace::
   {
     chi_log.Log(LOG_ALLERROR)
       << "Could not find associated face in call to "
-      << "CellFace::GetNeighborAssociatedFace. Reference face with centroid at \n"
-      << cur_face.centroid.PrintS();
+      << "CellFace::GetNeighborAssociatedFace.\n"
+      << "Reference face with centroid at: "
+      << cur_face.centroid.PrintS() << "\n"
+      << "Adjacent cell: " << adj_cell->global_id;
     for (int af=0; af < adj_cell->faces.size(); af++)
     {
       chi_log.Log(LOG_ALLERROR)
