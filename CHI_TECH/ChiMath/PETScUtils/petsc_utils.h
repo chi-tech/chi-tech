@@ -32,6 +32,10 @@ namespace chi_math
     Vec CreateVector(int local_size, int global_size);
     void CreateVector(Vec& x, int local_size, int global_size);
 
+    Vec CreateVectorWithGhosts(int local_size, int global_size,
+                               int nghosts,
+                               std::vector<int>& ghost_indices);
+
     PETScSolverSetup CreateCommonKrylovSolverSetup(
       Mat ref_matrix,
       std::string in_solver_name = "KSPSolver",

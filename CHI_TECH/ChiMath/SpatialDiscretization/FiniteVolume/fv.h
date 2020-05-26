@@ -32,6 +32,11 @@ public:
              unsigned int unknown_id,
              unsigned int component=0);
 
+  int MapDOFLocal(chi_mesh::Cell* cell,
+                  chi_math::UnknownManager* unknown_manager,
+                  unsigned int unknown_id,
+                  unsigned int component=0);
+
   CellFVView* MapFeView(int cell_local_index);
 
   void BuildSparsityPattern(chi_mesh::MeshContinuum* grid,
@@ -43,6 +48,12 @@ public:
                                chi_math::UnknownManager* unknown_manager);
   unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
                                 chi_math::UnknownManager* unknown_manager);
+  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuum* grid,
+                               chi_math::UnknownManager* unknown_manager);
+
+  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuum* grid,
+                                      chi_math::UnknownManager* unknown_manager,
+                                      unsigned int unknown_id=0);
 };
 
 
