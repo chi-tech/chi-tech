@@ -21,6 +21,7 @@ namespace chi_mesh
   typedef Vector3 Node;
 
   struct Matrix3x3;
+  struct TensorRank2Dim3;
 
   struct Face;     //Triangle
   struct Edge;
@@ -124,11 +125,12 @@ namespace chi_mesh
                          std::vector<double>& vertices_1d_z);
 }
 
-#include"chi_meshvector.h"
+#include "chi_meshvector.h"
 #include "chi_meshmatrix3x3.h"
-#include"chi_meshface.h"
-#include"chi_mesh_edgeloops.h"
-#include"chi_mesh_interface.h"
+#include "chi_meshtensor_rank2_dim3.h"
+#include "chi_meshface.h"
+#include "chi_mesh_edgeloops.h"
+#include "chi_mesh_interface.h"
 
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 

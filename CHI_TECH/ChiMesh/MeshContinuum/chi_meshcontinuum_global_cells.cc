@@ -11,14 +11,11 @@ extern ChiLog& chi_log;
 void chi_mesh::MeshContinuum::GlobalCellHandler::
 push_back(chi_mesh::Cell *new_cell)
 {
-//  local_cells.cell_references.push_back(new_cell);
-
   if (new_cell->partition_id == chi_mpi.location_id)
   {
     local_cells.local_cell_ind.push_back(new_cell->global_id);
     int local_cell_index = local_cells.local_cell_ind.size()-1;
     new_cell->local_id = local_cell_index;
-
 
     local_cells.native_cells.push_back(new_cell);
 
@@ -58,10 +55,6 @@ operator[](int cell_global_index)
   }functor(cell_global_index);
 
   //======================================== First look in native cells
-//  auto native_loc = std::find_if(global_cell_native_index_set.begin(),
-//                                 global_cell_native_index_set.end(),
-//                                 functor);
-
   auto low_bound = global_cell_native_index_set.upper_bound(
     std::make_pair(cell_global_index-1,0)
   );
@@ -75,13 +68,8 @@ operator[](int cell_global_index)
                                  functor);
 
   //======================================== Then look in foreign cells
-//  if (native_loc == global_cell_native_index_set.end())
   if (native_loc == upp_bound)
   {
-//    auto loc = std::find_if(global_cell_foreign_index_set.begin(),
-//                            global_cell_foreign_index_set.end(),
-//                            functor);
-
     auto low_bound = global_cell_foreign_index_set.upper_bound(
       std::make_pair(cell_global_index-1,0)
     );
@@ -94,28 +82,20 @@ operator[](int cell_global_index)
                             upp_bound,
                             functor);
 
-//    if (loc != global_cell_foreign_index_set.end())
     if (loc != upp_bound)
       return local_cells.foreign_cells[loc->second];
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chi_mesh::MeshContinuum::cells. Mapping error."
+        << "\n"
+        << cell_global_index;
+
+      exit(EXIT_FAILURE);
+    }
   }
   else
     return local_cells.native_cells[native_loc->second];
-
-
-  chi_log.Log(LOG_ALLERROR)
-    << "chi_mesh::MeshContinuum::cells. Mapping error."
-    << "\n"
-    << cell_global_index;
-
-//  if (chi_mpi.location_id == 0)
-//  {
-//    for (auto& pair : global_cell_native_index_set)
-//    {
-//      chi_log.Log(LOG_ALLERROR) << pair.first << " " << pair.second;
-//    }
-//  }
-
-  exit(EXIT_FAILURE);
 }
 
 //###################################################################
@@ -133,4 +113,78 @@ size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells()
                 MPI_COMM_WORLD);
 
   return num_globl_cells;
+}
+
+//###################################################################
+/**Get the number of ghost cells. These are cells that
+ * neighbors to this partition's cells but are on a different
+ * partition.*/
+int chi_mesh::MeshContinuum::GlobalCellHandler::
+  GetNumGhosts()
+{
+  return global_cell_foreign_index_set.size();
+}
+
+//###################################################################
+/**Returns the cell global ids of all ghost cells. These are cells that
+ * neighbors to this partition's cells but are on a different
+ * partition.*/
+std::vector<int> chi_mesh::MeshContinuum::GlobalCellHandler::
+  GetGhostGlobalIDs()
+{
+  std::vector<int> ids;
+  ids.reserve(GetNumGhosts());
+
+//  for (auto map : global_cell_foreign_index_set)
+//    ids.push_back(map.first);
+  for (auto cell : local_cells.foreign_cells)
+    ids.push_back(cell->global_id);
+
+  return ids;
+}
+
+//###################################################################
+/**Returns the local storage address of a ghost cell. If the
+ * ghost is not truly a ghost then -1 is returned, but is wasteful and
+ * therefore the user of this function should implement code
+ * to prevent it.*/
+int chi_mesh::MeshContinuum::GlobalCellHandler::
+  GetGhostLocalID(int cell_global_index)
+{
+  int local_id = -1;
+
+  //======================================== Define functor
+  struct Functor
+  {
+    int cell_g_id;
+
+    Functor(int in_cgi) : cell_g_id(in_cgi) {}
+
+    bool operator()(const std::pair<int,int>& eval)
+    { return eval.first == cell_g_id; }
+  }functor(cell_global_index);
+
+  //======================================== Search foreign cells
+  auto low_bound = global_cell_foreign_index_set.upper_bound(
+    std::make_pair(cell_global_index-1,0)
+  );
+
+  auto upp_bound = global_cell_foreign_index_set.upper_bound(
+    std::make_pair(cell_global_index+1,0)
+  );
+
+  auto loc = std::find_if(low_bound,
+                          upp_bound,
+                          functor);
+
+  if (loc != upp_bound)
+    local_id = loc->second;
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Grid GetGhostLocalID failed to find cell " << cell_global_index;
+    exit(EXIT_FAILURE);
+  }
+
+  return local_id;
 }
