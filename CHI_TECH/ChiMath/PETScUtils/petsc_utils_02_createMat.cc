@@ -1,0 +1,75 @@
+#include "petsc_utils.h"
+
+#include "chi_log.h"
+extern ChiLog& chi_log;
+
+//###################################################################
+/**Creates a general square matrix.
+ *
+ * This is a macro for:
+\code
+Mat A;
+MatCreate(PETSC_COMM_WORLD,&A);
+MatSetType(A,MATMPIAIJ);
+MatSetSizes(A,local_size, local_size,
+              global_size, global_size);
+
+ return A;
+\endcode
+
+*/
+Mat chi_math::PETScUtils::CreateSquareMatrix(int local_size, int global_size)
+{
+  Mat A;
+  MatCreate(PETSC_COMM_WORLD,&A);
+  MatSetType(A,MATMPIAIJ);
+  MatSetSizes(A,local_size, local_size,
+              global_size, global_size);
+
+  return A;
+}
+
+//###################################################################
+/**Creates a general square matrix.
+ *
+ * This is a macro for:
+\code
+MatCreate(PETSC_COMM_WORLD,&A);
+MatSetType(A,MATMPIAIJ);
+MatSetSizes(A,local_size, local_size,
+              global_size, global_size);
+\endcode
+
+*/
+void chi_math::PETScUtils::
+CreateSquareMatrix(Mat& A, int local_size, int global_size)
+{
+  MatCreate(PETSC_COMM_WORLD,&A);
+  MatSetType(A,MATMPIAIJ);
+  MatSetSizes(A,local_size, local_size,
+              global_size, global_size);
+}
+
+//###################################################################
+/**Initializes the sparsity pattern of a matrix.
+
+This is a macro for:
+\code
+MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
+                            0,nodal_nnz_off_diag.data());
+MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
+MatSetUp(A);
+\endcode
+*/
+void chi_math::PETScUtils::InitMatrixSparsity(
+  Mat A,
+  std::vector<int>& nodal_nnz_in_diag,
+  std::vector<int>& nodal_nnz_off_diag)
+{
+  MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
+                            0,nodal_nnz_off_diag.data());
+  MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+  MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
+  MatSetUp(A);
+}
