@@ -88,7 +88,11 @@ public:
     void push_back(chi_mesh::Cell* new_cell);
     chi_mesh::Cell* &operator[](int cell_global_index);
 
+    int GetNumGhosts();
 
+    std::vector<int> GetGhostGlobalIDs();
+
+    int GetGhostLocalID(int cell_global_index);
   };
 
   std::vector<chi_mesh::Node*>   vertices;

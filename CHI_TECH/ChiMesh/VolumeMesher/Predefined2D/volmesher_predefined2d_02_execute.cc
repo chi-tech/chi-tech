@@ -67,7 +67,9 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         }
 
         //================================== Create cell for each face
-        this->CreatePolygonCells(ref_continuum->surface_mesh, grid);
+        auto temp_grid = new chi_mesh::MeshContinuum;
+        this->CreatePolygonCells(ref_continuum->surface_mesh, temp_grid);
+        GridFilterGhosts(temp_grid,grid);
 
         //================================== Connect Boundaries
         for (auto& cell : grid->local_cells)

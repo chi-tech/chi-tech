@@ -13,6 +13,7 @@ extern ChiLog& chi_log;
 void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
   chi_mesh::MeshContinuum* grid)
 {
+  ref_grid = grid;
   //================================================== Create empty view
   //                                                 for each cell
   if (!mapping_initialized)
@@ -78,6 +79,8 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
 void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
   chi_mesh::MeshContinuum* grid)
 {
+  ref_grid = grid;
+
   grid->CommunicatePartitionNeighborCells(neighbor_cells);
 
 

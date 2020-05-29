@@ -14,9 +14,12 @@ class SpatialDiscretization
 public:
   int dim;
 
+  chi_mesh::MeshContinuum* ref_grid;
+
 public:
   std::vector<int> node_mapping;
   std::vector<int> reverse_node_mapping;
+  int              fv_local_block_address = 0;
   int              cfem_local_block_address = 0;
   int              dfem_local_block_address = 0;
   std::vector<int> cell_dfem_block_address;

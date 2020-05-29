@@ -79,6 +79,9 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   // The serialized values will be as follows
   // - cell_type
   // - cell_glob_index
+
+  // - cell_local_index
+
   // - cell_mat_id
   // - cell_dof_count
   // - cell_face_count
@@ -119,6 +122,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
         border_cell_info.push_back(-1);                        //cell_type
 
       border_cell_info.push_back(cell.global_id);         //cell_glob_index
+      border_cell_info.push_back(cell.local_id);         //cell_local_index
       border_cell_info.push_back(cell.material_id);            //cell_mat_id
       border_cell_info.push_back(cell.partition_id);           //cell_par_id
       border_cell_info.push_back(cell.vertex_ids.size());      //cell_dof_count
@@ -213,6 +217,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
       }
 
       cell->global_id = global_receive_data[k]; k++;
+      cell->local_id = global_receive_data[k]; k++;
       cell->material_id    = global_receive_data[k]; k++;
       cell->partition_id   = global_receive_data[k]; k++;
       int cell_dof_count  = global_receive_data[k]; k++;

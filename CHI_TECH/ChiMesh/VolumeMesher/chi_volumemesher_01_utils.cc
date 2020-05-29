@@ -156,6 +156,59 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 
 }
 
+//###################################################################
+/**Filters non-esential ghosts from the grid.*/
+void chi_mesh::VolumeMesher::
+  GridFilterGhosts(chi_mesh::MeshContinuum *in_grid,
+                   chi_mesh::MeshContinuum *out_grid)
+{
+  chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
+  //======================================== Copy vertices
+  for (auto vertex : in_grid->vertices)
+    out_grid->vertices.push_back(vertex);
+
+  //======================================== Copy local cells
+  for (auto& cell : in_grid->local_cells)
+    out_grid->cells.push_back(&cell);
+
+
+
+  //======================================== Copy ghost cells only
+  //                                         if neighbor to current partition
+  auto in_ghost_ids = in_grid->cells.GetGhostGlobalIDs();
+  std::vector<Cell*> cells_to_delete;
+  for (int ghost_id : in_ghost_ids)
+  {
+    auto ref_ghost_cell = in_grid->cells[ghost_id];
+
+    bool is_neighbor_to_this_loc = false;
+    for (auto& face : ref_ghost_cell->faces)
+    {
+      if (face.neighbor<0) continue;
+
+      auto adj_cell = in_grid->cells[face.neighbor];
+      if (adj_cell->partition_id == chi_mpi.location_id)
+      {
+        is_neighbor_to_this_loc = true;
+        break;
+      }
+    }//for face
+
+    if (is_neighbor_to_this_loc)
+      out_grid->cells.push_back(ref_ghost_cell);
+    else
+      cells_to_delete.push_back(ref_ghost_cell);
+  }//for cell
+
+
+  //======================================== Deleting non-essential ghosts
+  for (auto cell : cells_to_delete)
+    delete cell;
+
+
+  chi_log.Log(LOG_0VERBOSE_1) << "Done filtering ghosts.";
+}
+
 
 
 
