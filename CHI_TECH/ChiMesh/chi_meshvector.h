@@ -4,30 +4,54 @@
 #include <sstream>
 
 //=============================================== General 3D vector structure
-/**General vector structure. */
+/**General 3 element vector structure. */
 struct chi_mesh::Vector3
 {
-  double x;
-  double y;
-  double z;
+  double x; ///< Element-0
+  double y; ///< Element-1
+  double z; ///< Element-2
 
+  /**Default constructor. Initialized as all zeros.*/
   Vector3()  {
     x=0.0; y=0.0; z=0.0;
   }
 
-  Vector3(double a){
+  /**Constructor where single element is initialized \f$ x[z]=a \f$.*/
+  explicit Vector3(double a){
     x=0.0; y=0.0; z=a;
   }
 
-  Vector3(double a, double b){
+  /**Constructor where \f$ x=a\f$ and \f$ y=b \f$. */
+  explicit Vector3(double a, double b){
     x=a; y=b; z=0.0;
   }
 
-  Vector3(double a, double b, double c){
+  /**Constructor where \f$ \vec{x}=[a,b,c] \f$.*/
+  explicit Vector3(double a, double b, double c){
     x=a; y=b; z=c;
   }
 
-  /**Component-wise addition.*/
+  /**Copy constructor.*/
+  Vector3(const Vector3& that)
+  {
+    this->x = that.x;
+    this->y = that.y;
+    this->z = that.z;
+  }
+
+  /**Assignment operator.*/
+  Vector3& operator=(const Vector3& that)
+  {
+    this->x = that.x;
+    this->y = that.y;
+    this->z = that.z;
+
+    return *this;
+  }
+
+  //============================================= Addition
+  /**Component-wise addition of two vectors.
+   * \f$ \vec{w} = \vec{x} + \vec{y} \f$*/
   Vector3 operator+(const Vector3& that) const
   {
     Vector3 newVector;
@@ -38,7 +62,43 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Component-wise subtraction.*/
+  /**In-place component-wise addition of two vectors.
+   * \f$ \vec{x} = \vec{x} + \vec{y} \f$*/
+  Vector3& operator+=(const Vector3& that)
+  {
+    this->x += that.x;
+    this->y += that.y;
+    this->z += that.z;
+
+    return *this;
+  }
+
+  /**Component-wise shift by scalar-value.
+   * \f$ \vec{w} = \vec{x} + \alpha \f$*/
+  Vector3 Shifted(const double value) const
+  {
+    Vector3 newVector;
+    newVector.x = this->x + value;
+    newVector.y = this->y + value;
+    newVector.z = this->z + value;
+
+    return newVector;
+  }
+
+  /**In-place component-wise shift by scalar-value.
+   * \f$ \vec{x} = \vec{x} + \alpha \f$*/
+  Vector3& Shift(const double value)
+  {
+    this->x += value;
+    this->y += value;
+    this->z += value;
+
+    return *this;
+  }
+
+  //============================================= Subtraction
+  /**Component-wise subtraction.
+   * \f$ \vec{w} = \vec{x} - \vec{y} \f$*/
   Vector3 operator-(const Vector3& that) const
   {
     Vector3 newVector;
@@ -49,18 +109,21 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Component-wise copy.*/
-  Vector3& operator=(const Vector3& that)
+  /**In-place component-wise subtraction.
+   * \f$ \vec{x} = \vec{x} - \vec{y} \f$*/
+  Vector3& operator-=(const Vector3& that)
   {
-    this->x = that.x;
-    this->y = that.y;
-    this->z = that.z;
+    this->x -= that.x;
+    this->y -= that.y;
+    this->z -= that.z;
 
     return *this;
   }
 
-  /**Vector component-wise multiplication by scalar.*/
-  Vector3 operator*(double value) const
+  //============================================= Multiplication
+  /**Vector component-wise multiplication by scalar.
+   * \f$ \vec{w} = \vec{x} \alpha \f$*/
+  Vector3 operator*(const double value) const
   {
     Vector3 newVector;
     newVector.x = this->x*value;
@@ -70,7 +133,19 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Vector component-wise multiplication.*/
+  /**Vector in-place component-wise multiplication by scalar.
+   * \f$ \vec{x} = \vec{x} \alpha \f$*/
+  Vector3& operator*=(const double value)
+  {
+    this->x*=value;
+    this->y*=value;
+    this->z*=value;
+
+    return *this;
+  }
+
+  /**Vector component-wise multiplication.
+   * \f$ w_i = x_i y_i \f$*/
   Vector3 operator*(const Vector3& that) const
   {
     Vector3 newVector;
@@ -81,8 +156,21 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Vector component-wise division by scalar.*/
-  Vector3 operator/(double value) const
+  /**Vector in-place component-wise multiplication.
+   * \f$ x_i = x_i y_i \f$*/
+  Vector3& operator*=(const Vector3& that)
+  {
+    this->x*=that.x;
+    this->y*=that.y;
+    this->z*=that.z;
+
+    return *this;
+  }
+
+  //============================================= Division
+  /**Vector component-wise division by scalar.
+   * \f$ w_i = \frac{x_i}{\alpha} \f$*/
+  Vector3 operator/(const double value) const
   {
     Vector3 newVector;
     newVector.x = this->x/value;
@@ -92,7 +180,19 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Vector component-wise division.*/
+  /**Vector in-place component-wise division by scalar.
+   * \f$ x_i = \frac{x_i}{\alpha} \f$*/
+  Vector3& operator/=(const double value)
+  {
+    this->x/=value;
+    this->y/=value;
+    this->z/=value;
+
+    return *this;
+  }
+
+  /**Vector component-wise division.
+   * \f$ w_i = \frac{x_i}{y_i} \f$*/
   Vector3 operator/(const Vector3& that) const
   {
     Vector3 newVector;
@@ -103,8 +203,20 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
+  /**Vector in-place component-wise division.
+   * \f$ x_i = \frac{x_i}{y_i} \f$*/
+  Vector3& operator/=(const Vector3& that)
+  {
+    this->x/=that.x;
+    this->y/=that.y;
+    this->z/=that.z;
+
+    return *this;
+  }
+
+  //============================================= Element access
   /**Returns a copy of the value at the given index.*/
-  double operator[](int i) const
+  double operator[](const int i) const
   {
          if (i==0) return this->x;
     else if (i==1) return this->y;
@@ -114,7 +226,7 @@ struct chi_mesh::Vector3
   }
 
   /**Returns a reference of the value at the given index.*/
-  double& operator()(int i)
+  double& operator()(const int i)
   {
     if (i==0)      return this->x;
     else if (i==1) return this->y;
@@ -123,7 +235,17 @@ struct chi_mesh::Vector3
     return this->x;
   }
 
-  /**Vector cross-product.*/
+  //============================================= Tensor product
+  //Defined in chi_mesh_utilities.cc
+  chi_mesh::TensorRank2Dim3 OTimes(const Vector3& that) const;
+
+  //============================================= Tensor dot product
+  //Defined in chi_mesh_utilities.cc
+  Vector3 Dot(const chi_mesh::TensorRank2Dim3& that) const;
+
+  //============================================= Operations
+  /**Vector cross-product.
+   * \f$ \vec{w} = \vec{x} \times \vec{y} \f$*/
   Vector3 Cross(const Vector3& that) const
   {
     Vector3 newVector;
@@ -134,7 +256,8 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Vector dot-product.*/
+  /**Vector dot-product.
+   * \f$ \vec{w} = \vec{x} \bullet \vec{y} \f$ */
   double Dot(const Vector3& that) const
   {
     double value = 0.0;
@@ -145,7 +268,8 @@ struct chi_mesh::Vector3
     return value;
   }
 
-  /**Normalizes the vector in-place.*/
+  /**Normalizes the vector in-place.
+   * \f$ \vec{x} = \frac{\vec{x}}{||x||_2} \f$*/
   void Normalize()
   {
     double norm = this->Norm();
@@ -155,7 +279,8 @@ struct chi_mesh::Vector3
     z /= norm;
   }
 
-  /**Returns a normalized version of the vector.*/
+  /**Returns a normalized version of the vector.
+   * \f$ \vec{w} = \frac{\vec{x}}{||x||_2} \f$*/
   Vector3 Normalized() const
   {
     double norm = this->Norm();
@@ -170,8 +295,9 @@ struct chi_mesh::Vector3
 
   /**Returns a vector v^* where each element is inverted provided
    * that it is greater than the given tolerance, otherwise the offending entry
-   * is set to 0.0.*/
-  Vector3 InverseZeroIfSmaller(double tol) const
+   * is set to 0.0.
+   * \f$ w_i = \frac{1.0}{x_i} \f$*/
+  Vector3 InverseZeroIfSmaller(const double tol) const
   {
     Vector3 newVector;
     newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 0.0;
@@ -183,8 +309,9 @@ struct chi_mesh::Vector3
 
   /**Returns a vector v^* where each element is inverted provided
    * that it is greater than the given tolerance, otherwise the offending entry
-   * is set to 1.0.*/
-  Vector3 InverseOneIfSmaller(double tol) const
+   * is set to 1.0.
+   * \f$ w_i = \frac{1.0}{x_i} \f$*/
+  Vector3 InverseOneIfSmaller(const double tol) const
   {
     Vector3 newVector;
     newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 0.0;
@@ -194,18 +321,15 @@ struct chi_mesh::Vector3
     return newVector;
   }
 
-  /**Returns a vector v^* where each element is inverted provided
-   * that the inversion is not infinite, otherwise it is zeroed.*/
-  Vector3 InverseZeroIfInf() const
+  /**Returns a vector v^* where each element is inverted without any
+   * check for division by zero.
+   * \f$ w_i = \frac{1.0}{x_i} \f$*/
+  Vector3 Inverse() const
   {
     Vector3 newVector;
     double dx_inv = 1.0/this->x;
     double dy_inv = 1.0/this->y;
     double dz_inv = 1.0/this->z;
-
-    newVector.x = (std::isinf(dx_inv))? dx_inv : 0.0;
-    newVector.y = (std::isinf(dy_inv))? dy_inv : 0.0;
-    newVector.z = (std::isinf(dz_inv))? dz_inv : 0.0;
 
     return newVector;
   }
@@ -263,7 +387,7 @@ struct chi_mesh::Vector3
 };
 
 //The following functions are defined in chi_mesh_utilities.cc
-
-chi_mesh::Vector3 operator*(double value,const chi_mesh::Vector3& a);
+//Left multiplcation by scalar
+chi_mesh::Vector3 operator*(const double value,const chi_mesh::Vector3& that);
 
 #endif
