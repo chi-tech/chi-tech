@@ -13,7 +13,8 @@ namespace chi_physics
     SIMPLEXS0    = 20,
     SIMPLEXS1    = 21,
     PDT_XSFILE   = 22,
-    EXISTING     = 23
+    EXISTING     = 23,
+    CHI_XSFILE   = 24
   };
 
   class FieldFunction;
