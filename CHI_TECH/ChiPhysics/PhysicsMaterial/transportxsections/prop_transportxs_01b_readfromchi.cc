@@ -11,13 +11,13 @@ void chi_physics::TransportCrossSections::
   MakeFromCHIxsFile(const std::string &file_name)
 {
 
-  std::cout << "Reading PDT cross-section file \"" << file_name << "\"\n";
+  chi_log.Log(LOG_0) << "Reading PDT cross-section file \"" << file_name << "\"\n";
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
   {
-      std::cout<< "Failed to open PDT cross-section file \""
+      chi_log.Log(LOG_0)<< "Failed to open PDT cross-section file \""
           << file_name << "\" in call to "
           << "TransportCrossSections::MakeFromPDTxsFile\n";
       exit(EXIT_FAILURE);
@@ -42,7 +42,7 @@ void chi_physics::TransportCrossSections::
   
   //get rid of the first line of comments
   file.getline(line,250);
-  std::cout<<std::endl<< line <<std::endl;
+
   //group and moments
   file >> word >> G;
   file >> word >> M;
@@ -79,10 +79,10 @@ void chi_physics::TransportCrossSections::
         for(int i = 0;i<g;++i){
           double destination, value;
           file>>destination>>value;
-          std::cout<<destination<<" "<<value<<std::endl;
+
           transfer_matrix[m].Insert(gprime,g,value);
         }
-        std::cout<<std::endl;
+
       }
     }
   }
