@@ -6,20 +6,20 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**This method populates a transport cross-section from
- * a PDT cross-section file.*/
+ * a Chi cross-section file.*/
 void chi_physics::TransportCrossSections::
   MakeFromCHIxsFile(const std::string &file_name)
 {
 
-  chi_log.Log(LOG_0) << "Reading PDT cross-section file \"" << file_name << "\"\n";
+  chi_log.Log(LOG_0) << "Reading Chi cross-section file \"" << file_name << "\"\n";
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
   {
-      chi_log.Log(LOG_0)<< "Failed to open PDT cross-section file \""
+      chi_log.Log(LOG_ALLERROR)<< "Failed to open chi cross-section file \""
           << file_name << "\" in call to "
-          << "TransportCrossSections::MakeFromPDTxsFile\n";
+          << "TransportCrossSections::MakeFromChixsFile\n";
       exit(EXIT_FAILURE);
   }
 
@@ -32,10 +32,10 @@ void chi_physics::TransportCrossSections::
   //num moments
   int M = 3;
 
-  
+  //ensures the vectors are the correct size
   sigma_tg.resize(G,0.0);
   sigma_fg.resize(G,0.0);
-  //sigma_captg.resize(G,0.0); // this is used for SIGMA_S in 1D XS
+  sigma_captg.resize(G,0.0);
   chi_g.resize(G,0.0);
   nu_sigma_fg.resize(G,0.0);
   
@@ -47,6 +47,7 @@ void chi_physics::TransportCrossSections::
   file >> word >> G;
   file >> word >> M;
 
+  //function for reading in the 1d vectors
   auto Read1DXS = [](std::vector<double>& xs, std::ifstream& file, int G)
   {
       for (int g=0; g<G; g++)
@@ -57,13 +58,18 @@ void chi_physics::TransportCrossSections::
       }
   };
 
+  //reads each section of the 1d xs
   while(sectionChecker!="TRANSFER_MOMENTS_BEGIN")
   {
     file >> sectionChecker;
     if (sectionChecker=="SIGMA_T_BEGIN"){Read1DXS(sigma_tg,file,G);}
-    //if (sectionChecker=="SIGMA_S_BEGIN"){Read1DXS(sigma_captg,file,G);}
     if (sectionChecker=="SIGMA_F_BEGIN"){Read1DXS(sigma_fg,file,G);}
     if (sectionChecker=="NU_BEGIN"){Read1DXS(nu_sigma_fg,file,G);}
+  }
+
+  //changes nu_sigma_fg from nu to nu * sigma_fg
+  for (int i = 0; i<G;++i){
+    nu_sigma_fg[i] = nu_sigma_fg[i]*sigma_fg[i];
   }
 
   //initilize sparce matrix
@@ -86,20 +92,6 @@ void chi_physics::TransportCrossSections::
       }
     }
   }
-  
-
-//     //TRANSFER_MOMENT_BEGIN 0
-//     int m=0;
-     
-// // GPRIME_TO_G 2 2
-// // 1   0.00157223178365
-// // 2   0.365296247644
-//     int gprime = 2;
-//     //for read 2 lines
-//     int g = 1;
-//     double val = 0.00157223178365;
-
-//     transfer_matrix[m].Insert(gprime,g,val);
 
   file.close();
 }
