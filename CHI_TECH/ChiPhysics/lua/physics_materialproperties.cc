@@ -240,6 +240,12 @@ an additional text field can be supplied specifying the transfer matrix to
 
 ####_
 
+CHI_XSFILE\n
+Loads transport cross-sections from CHI type cross-section files. Expects
+to be followed by a filepath specifying the xs-file. 
+
+####_
+
 EXISTING\n
 Supply handle to an existing cross-section and simply swap them out.
 
@@ -455,6 +461,15 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
           MT_TRANSFER = std::string(lua_tostring(L,5));
 
         prop->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
+      }
+      else if (operation_index == static_cast<int>(OpType::CHI_XSFILE))
+      {
+        if (numArgs != 4)
+          LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
+
+        const char* file_name_c = lua_tostring(L,4);
+
+        prop->MakeFromCHIxsFile(std::string(file_name_c));
       }
       else if (operation_index == static_cast<int>(OpType::EXISTING))
       {
