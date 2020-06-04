@@ -4,7 +4,9 @@
 #include <sstream>
 
 //=============================================== General 3D vector structure
-/**General 3 element vector structure. */
+/**General 3 element vector structure. 
+ * \author Jan
+*/
 struct chi_mesh::Vector3
 {
   double x; ///< Element-0
@@ -314,9 +316,9 @@ struct chi_mesh::Vector3
   Vector3 InverseOneIfSmaller(const double tol) const
   {
     Vector3 newVector;
-    newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 0.0;
-    newVector.y = (std::fabs(this->y)>tol)? 1.0/this->y : 0.0;
-    newVector.z = (std::fabs(this->z)>tol)? 1.0/this->z : 0.0;
+    newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 1.0;
+    newVector.y = (std::fabs(this->y)>tol)? 1.0/this->y : 1.0;
+    newVector.z = (std::fabs(this->z)>tol)? 1.0/this->z : 1.0;
 
     return newVector;
   }
