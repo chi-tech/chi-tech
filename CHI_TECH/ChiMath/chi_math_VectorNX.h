@@ -1,6 +1,5 @@
 #ifndef chi_math_VectorNX_h
 #define chi_math_VectorNX_h
-
 #include <iostream>
 
 #include <vector>
@@ -10,10 +9,7 @@
 #include<type_traits>
 
 namespace chi_math{
-    /**  
-     * \author JerryW
-    */
-    template <int N>
+    template <int N, class NumberFormat>
     struct VectorNX{
         std::vector<NumberFormat> elements;
         //default constructor
@@ -47,7 +43,7 @@ namespace chi_math{
         /**Component-wise addition.*/
         VectorNX operator+(const VectorNX& rhs) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N;++i)
                 newVector.elements[i] = elements[i] + rhs.elements[i];
             return newVector;
@@ -56,12 +52,27 @@ namespace chi_math{
         /**Component-wise subtraction.*/
         VectorNX operator-(const VectorNX& rhs) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N;++i)
                 newVector.elements[i] = elements[i] - rhs.elements[i];
             return newVector;
         }
 
+        /* */
+        VectorNX& operator+=(const VectorNX& rhs) 
+        {
+            for (int i = 0; i<N;++i)
+                elements[i] += rhs.elements[i];
+            return *this;
+        }
+
+        VectorNX& operator-=(const VectorNX& rhs) 
+        {
+            for (int i = 0; i<N;++i)
+                elements[i] -= rhs.elements[i];
+            return *this;
+        }
+        
         /**Component-wise copy.*/
         VectorNX& operator=(const VectorNX& rhs) 
         {
@@ -72,7 +83,7 @@ namespace chi_math{
         /**Vector component-wise multiplication by scalar.*/
         VectorNX operator*(NumberFormat value) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0;i<N;++i)
                 newVector.elements[i] = elements[i] * value;
             return newVector;
@@ -81,7 +92,7 @@ namespace chi_math{
         /**Vector component-wise multiplication.*/
         VectorNX operator*(const VectorNX& rhs) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N ; ++i)
                 newVector.elements[i] = elements[i] * rhs.elements[i];
             return newVector;
@@ -90,7 +101,7 @@ namespace chi_math{
         /**Vector component-wise division by scalar.*/
         VectorNX operator/(NumberFormat value) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0;i<N;++i)
                 newVector.elements[i] = elements[i] / value;
             return newVector;
@@ -99,7 +110,7 @@ namespace chi_math{
         /**Vector component-wise division.*/
         VectorNX operator/(const VectorNX& rhs) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N ; ++i)
                 newVector.elements[i] = elements[i] / rhs.elements[i];
             return newVector;
@@ -150,7 +161,7 @@ namespace chi_math{
         VectorNX Normalized() const
         {
             NumberFormat norm = this->Norm();
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0;i<N;++i)
                 newVector.elements[i] = elements[i]/norm;
             return newVector;
@@ -161,7 +172,7 @@ namespace chi_math{
         * is set to 0.0.*/
         VectorNX InverseZeroIfSmaller(NumberFormat tol) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N;++i)
                 newVector.elements[i] = (std::fabs(elements[i])>tol) ? 1.0/elements[i] : 0.0;
             
@@ -173,7 +184,7 @@ namespace chi_math{
         * is set to 1.0.*/
         VectorNX InverseOneIfSmaller(NumberFormat tol) const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N;++i)
                 newVector.elements[i] = (std::fabs(elements[i])>tol) ? 1.0/elements[i] : 1.0;
             return newVector;
@@ -183,7 +194,7 @@ namespace chi_math{
         * that the inversion is not infinite, otherwise it is zeroed.*/
         VectorNX InverseZeroIfInf() const
         {
-            VectorNX<N> newVector;
+            VectorNX<N,NumberFormat> newVector;
             for (int i = 0; i<N; ++i){
                 NumberFormat dn_inv = 1.0/elements[i];
                 newVector.elements[i] = (std::isinf(dn_inv))? dn_inv : 0.0;
@@ -215,8 +226,21 @@ namespace chi_math{
             return out.str();
 
         }
-
     };
+    template<int N>
+    using VectorN=VectorNX<N,double>;
+
+    using Vector2=VectorN<2>;
+    using Vector3=VectorN<3>;
+}
+
+template<int N, class NumberFormat>
+chi_math::VectorNX<N,NumberFormat> operator*(const double value,const chi_math::VectorNX<N,NumberFormat>& that)
+{
+    chi_math::VectorNX<N,NumberFormat> newVector;
+    for (int i = 0; i<N;++i)
+        newVector.elements[i] = that.elements[i]*value;
+    return newVector;
 }
 
 #endif
