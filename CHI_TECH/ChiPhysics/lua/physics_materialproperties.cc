@@ -476,6 +476,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
         if (numArgs != 4)
           LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
 
+        LuaCheckNilValue("chiPhysicsMaterialSetProperty",L,4);
         int handle = lua_tonumber(L,4);
 
         chi_physics::TransportCrossSections* xs;
@@ -765,6 +766,13 @@ will attempt to build a transfer matrix from reaction type MT 2501, however,
 an additional text field can be supplied specifying the transfer matrix to
  use.
 
+####_
+
+CHI_XSFILE\n
+Loads transport cross-sections from CHI type cross-section files. Expects
+to be followed by a filepath specifying the xs-file.
+
+
 ##_
 ### Example\n
 Example lua code:
@@ -839,6 +847,15 @@ int chiPhysicsTransportXSSet(lua_State* L)
       MT_TRANSFER = std::string(lua_tostring(L,4));
 
     xs->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
+  }
+  else if (operation_index == static_cast<int>(OpType::CHI_XSFILE))
+  {
+    if (num_args != 3)
+      LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
+
+    const char* file_name_c = lua_tostring(L,3);
+
+    xs->MakeFromCHIxsFile(std::string(file_name_c));
   }
   else
   {

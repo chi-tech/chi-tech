@@ -28,16 +28,9 @@ void chi_physics::TransportCrossSections::
   std::string word;
   std::string sectionChecker;
   //num groups
-  int G = 15;
+//  int G = 0;
   //num moments
-  int M = 3;
-
-  //ensures the vectors are the correct size
-  sigma_tg.resize(G,0.0);
-  sigma_fg.resize(G,0.0);
-  sigma_captg.resize(G,0.0);
-  chi_g.resize(G,0.0);
-  nu_sigma_fg.resize(G,0.0);
+  int M = L;
   
   
   //get rid of the first line of comments
@@ -46,6 +39,16 @@ void chi_physics::TransportCrossSections::
   //group and moments
   file >> word >> G;
   file >> word >> M;
+  L = M-1;
+
+//  chi_log.Log(LOG_0) << G;
+
+  //ensures the vectors are the correct size
+  sigma_tg.resize(G,0.0);
+  sigma_fg.resize(G,0.0);
+  sigma_captg.resize(G,0.0);
+  chi_g.resize(G,0.0);
+  nu_sigma_fg.resize(G,0.0);
 
   //function for reading in the 1d vectors
   auto Read1DXS = [](std::vector<double>& xs, std::ifstream& file, int G)
@@ -78,15 +81,16 @@ void chi_physics::TransportCrossSections::
   while(sectionChecker!="TRANSFER_MOMENTS_END"){
     file>>sectionChecker;
     if(sectionChecker == "TRANSFER_MOMENT_BEGIN"){
-      int m,gprime,g;
+      int m,gprime,num_entries;
       file>>m;
       for (int j = 0;j<G;++j){
-        file>>word>>gprime>>g;
-        for(int i = 0;i<g;++i){
-          double destination, value;
-          file>>destination>>value;
+        file>>word>>gprime>>num_entries;
+        for(int i = 0;i<num_entries;++i){
+          int src,dest;
+          double value;
+          file >> src >> dest >> value;
 
-          transfer_matrix[m].Insert(gprime,g,value);
+          transfer_matrix[m].Insert(dest,src,value);
         }
 
       }
