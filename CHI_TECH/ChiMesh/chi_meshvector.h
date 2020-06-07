@@ -1,10 +1,13 @@
 #ifndef _chi_meshvector_h
 #define _chi_meshvector_h
+#include<iostream>
 #include<cmath>
 #include <sstream>
 
 //=============================================== General 3D vector structure
-/**General 3 element vector structure. */
+/**General 3 element vector structure. 
+ * \author Jan
+*/
 struct chi_mesh::Vector3
 {
   double x; ///< Element-0
@@ -268,6 +271,33 @@ struct chi_mesh::Vector3
     return value;
   }
 
+  /**Computes the L2-norm of the vector. Otherwise known as the length of
+   * a 3D vector.*/
+  double Norm() const
+  {
+    double value = 0.0;
+    value += this->x*this->x;
+    value += this->y*this->y;
+    value += this->z*this->z;
+
+    value = sqrt(value);
+
+    return value;
+  }
+
+  /**Computes the square of the L2-norm of the vector. This eliminates the
+   * usage of the square root and is therefore less expensive that a proper
+   * L2-norm. Useful if only comparing distances.*/
+  double NormSquare()
+  {
+    double value = 0.0;
+    value += this->x*this->x;
+    value += this->y*this->y;
+    value += this->z*this->z;
+
+    return value;
+  }
+
   /**Normalizes the vector in-place.
    * \f$ \vec{x} = \frac{\vec{x}}{||x||_2} \f$*/
   void Normalize()
@@ -314,9 +344,9 @@ struct chi_mesh::Vector3
   Vector3 InverseOneIfSmaller(const double tol) const
   {
     Vector3 newVector;
-    newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 0.0;
-    newVector.y = (std::fabs(this->y)>tol)? 1.0/this->y : 0.0;
-    newVector.z = (std::fabs(this->z)>tol)? 1.0/this->z : 0.0;
+    newVector.x = (std::fabs(this->x)>tol)? 1.0/this->x : 1.0;
+    newVector.y = (std::fabs(this->y)>tol)? 1.0/this->y : 1.0;
+    newVector.z = (std::fabs(this->z)>tol)? 1.0/this->z : 1.0;
 
     return newVector;
   }
@@ -332,33 +362,6 @@ struct chi_mesh::Vector3
     double dz_inv = 1.0/this->z;
 
     return newVector;
-  }
-
-  /**Computes the L2-norm of the vector. Otherwise known as the length of
-   * a 3D vector.*/
-  double Norm() const
-  {
-    double value = 0.0;
-    value += this->x*this->x;
-    value += this->y*this->y;
-    value += this->z*this->z;
-
-    value = sqrt(value);
-
-    return value;
-  }
-
-  /**Computes the square of the L2-norm of the vector. This eliminates the
-   * usage of the square root and is therefore less expensive that a proper
-   * L2-norm. Useful if only comparing distances.*/
-  double NormSquare()
-  {
-    double value = 0.0;
-    value += this->x*this->x;
-    value += this->y*this->y;
-    value += this->z*this->z;
-
-    return value;
   }
 
   /**Prints the vector to std::cout.*/

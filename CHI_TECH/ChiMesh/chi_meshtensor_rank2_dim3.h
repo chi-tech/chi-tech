@@ -169,6 +169,7 @@ struct chi_mesh::TensorRank2Dim3
     return val;
   }
 
+  //============================================= Printing
   /**Prints the vector to a string and then returns the string.*/
   std::string PrintS()
   {
