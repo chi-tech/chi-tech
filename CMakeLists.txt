@@ -161,6 +161,8 @@ add_subdirectory("${CHI_TECH_DIR}/ChiMesh")
 add_subdirectory("${CHI_TECH_DIR}/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/ChiLog")
 
+add_subdirectory("${CHI_TECH_DIR}/UnitTests")
+
 add_subdirectory("${CHI_TECH_MOD}")
 
 add_library(ChiLib STATIC ${SOURCES})

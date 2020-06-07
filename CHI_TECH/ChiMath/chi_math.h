@@ -3,7 +3,6 @@
 
 #include "chi_math_incdef.h"
 
-
 #include "Quadratures/quadrature.h"
 #include "Quadratures/product_quadrature.h"
 
