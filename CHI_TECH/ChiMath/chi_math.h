@@ -2,7 +2,6 @@
 #define CHI_MATH_H
 
 #include "chi_math_incdef.h"
-#include "chi_math_VectorN.h"
 
 #include "Quadratures/quadrature.h"
 #include "Quadratures/product_quadrature.h"

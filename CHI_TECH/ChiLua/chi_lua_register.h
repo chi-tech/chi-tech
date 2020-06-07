@@ -198,6 +198,9 @@ RegisterConstant(PDT_XSFILE,             22);
 RegisterConstant(EXISTING,               23);
 RegisterConstant(CHI_XSFILE,             24);
 
+//Unit tests
+RegisterFunction(chiExecuteUnitTests)
+
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "../../Modules/module_lua_register.h"
 
