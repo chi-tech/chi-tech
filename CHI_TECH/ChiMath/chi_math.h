@@ -4,7 +4,9 @@
 #include "chi_math_incdef.h"
 
 #include "Quadratures/quadrature.h"
-#include "Quadratures/product_quadrature.h"
+#include "Quadratures/angular_quadrature_base.h"
+
+#include <memory>
 
 
 /**\defgroup LuaMath B Math*/
@@ -22,7 +24,7 @@ class ChiMath
 {
 public:
 	std::vector<chi_math::Quadrature*> quadratures;
-	std::vector<chi_math::ProductQuadrature*> product_quadratures;
+	std::vector<std::shared_ptr<chi_math::AngularQuadrature>> angular_quadratures;
 private:
   static ChiMath instance;
 private:

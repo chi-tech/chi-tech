@@ -3,6 +3,9 @@
 #include "../lbs_linear_boltzman_solver.h"
 #include "ChiPhysics/chi_physics.h"
 #include "ChiMath/chi_math.h"
+#include "ChiMath/Quadratures/product_quadrature.h"
+
+
 #include <chi_log.h>
 
 extern ChiPhysics&  chi_physics_handler;
@@ -317,15 +320,15 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
     }
     else
     {
-      fprintf(stderr,"ERROR: Incorrect solver-type"
-                     "in chiLBSGroupsetSetQuadrature\n");
+      chi_log.Log(LOG_ALLERROR) << "Incorrect solver-type"
+                                   "in chiLBSGroupsetSetQuadrature.";
       exit(EXIT_FAILURE);
     }
   }
   catch(const std::out_of_range& o)
   {
-    fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiLBSGroupsetSetQuadrature\n");
+    chi_log.Log(LOG_ALLERROR) << "Invalid handle to solver"
+                                 "in chiLBSGroupsetSetQuadrature.";
     exit(EXIT_FAILURE);
   }
 
@@ -336,32 +339,51 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   }
   catch (const std::out_of_range& o)
   {
-    fprintf(stderr,"ERROR: Invalid handle to groupset"
-                   "in chiLBSGroupsetSetQuadrature\n");
+    chi_log.Log(LOG_ALLERROR) << "Invalid handle to groupset"
+                                 "in chiLBSGroupsetSetQuadrature.";
     exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to quadrature
-  chi_math::ProductQuadrature* prodquad;
+  std::shared_ptr<chi_math::AngularQuadrature> ang_quad;
   try{
-    prodquad = chi_math_handler.product_quadratures.at(prquad_index);
+    ang_quad = chi_math_handler.angular_quadratures.at(prquad_index);
   }
   catch (const std::out_of_range& o)
   {
-    fprintf(stderr,"ERROR: Invalid handle to Product Quadrature"
-                   "in chiLBSGroupsetSetQuadrature\n");
+    chi_log.Log(LOG_ALLERROR) << "Invalid handle to Product Quadrature"
+                   "in chiLBSGroupsetSetQuadrature. Handle provided: "
+                   << prquad_index;
     exit(EXIT_FAILURE);
   }
 
-  groupset->quadrature = prodquad;
+  groupset->quadrature = ang_quad;
 
-  chi_log.Log(LOG_0)
-    << "Groupset " << grpset_index
-    << " quadrature set to quadrature with "
-    << prodquad->azimu_ang.size()
-    << " azimuthal angles and "
-    << prodquad->polar_ang.size()
-    << " polar angles. ";
+  if (ang_quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
+  {
+    auto prodquad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
+
+    chi_log.Log(LOG_0)
+      << "Groupset " << grpset_index
+      << " quadrature set to quadrature with "
+      << prodquad->azimu_ang.size()
+      << " azimuthal angles and "
+      << prodquad->polar_ang.size()
+      << " polar angles. ";
+  }
+  else if (ang_quad->type == chi_math::AngularQuadratureType::Arbitrary)
+  {
+    chi_log.Log(LOG_0)
+      << "Groupset " << grpset_index
+      << " quadrature set to quadrature with "
+      << ang_quad->abscissae.size()
+      << " number of angles.";
+  }
+  else
+    chi_log.Log(LOG_0)
+      << "Groupset " << grpset_index
+      << " quadrature set unknown quadrature type";
+
 
 
   return 0;

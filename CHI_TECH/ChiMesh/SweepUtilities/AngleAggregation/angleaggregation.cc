@@ -71,18 +71,22 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       //========================================= Determine reflected angle
       for (int n=0; n<tot_num_angles; ++n)
       {
-        auto omega_reflected = (*quadrature->omegas[n]) -
+        auto omega_reflected = (quadrature->omegas[n]) -
                                rbndry->normal*
-                               quadrature->omegas[n]->Dot(rbndry->normal)*2.0;
+                               quadrature->omegas[n].Dot(rbndry->normal)*2.0;
         for (int nstar=0; nstar<tot_num_angles; ++nstar)
-          if (omega_reflected.Dot(*quadrature->omegas[nstar])> (1.0-epsilon))
+          if (omega_reflected.Dot(quadrature->omegas[nstar])> (1.0-epsilon))
             {rbndry->reflected_anglenum[n] = nstar;break;}
 
         if (rbndry->reflected_anglenum[n]<0)
         {
           chi_log.Log(LOG_ALLERROR)
             << "Reflected angle not found for angle " << n
-            << " with direction " << quadrature->omegas[n]->PrintS();
+            << " with direction " << quadrature->omegas[n].PrintS()
+            << ". This can happen for two reasons: i) A quadrature is used"
+               " that is not symmetric about the axis associated with the "
+               "reflected boundary, or ii) the reflecting boundary is not "
+               "aligned with any reflecting axis of the quadrature.";
           exit(EXIT_FAILURE);
         }
       }
@@ -94,7 +98,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       for (int n=0; n<tot_num_angles; ++n)
       {
         //Only continue if omega is outgoing
-        if ( quadrature->omegas[n]->Dot(rbndry->normal)< 0.0 )
+        if ( quadrature->omegas[n].Dot(rbndry->normal)< 0.0 )
           continue;
 
         //================================== For cells
