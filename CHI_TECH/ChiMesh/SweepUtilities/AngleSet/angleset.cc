@@ -130,6 +130,20 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
 }
 
 //###################################################################
+/***/
+chi_mesh::sweep_management::AngleSetStatus
+  chi_mesh::sweep_management::AngleSet::FlushSendBuffers()
+{
+  if (!sweep_buffer.DoneSending())
+    sweep_buffer.ClearDownstreamBuffers();
+
+  if (sweep_buffer.DoneSending())
+    return AngleSetStatus::MESSAGES_SENT;
+
+  return AngleSetStatus::MESSAGES_PENDING;
+}
+
+//###################################################################
 /**Returns a reference to the associated spds.*/
 chi_mesh::sweep_management::SPDS*
   chi_mesh::sweep_management::AngleSet::GetSPDS()
