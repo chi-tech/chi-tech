@@ -31,6 +31,7 @@ RegisterFunction(chiCreateProductQuadrature)
     RegisterConstant(GAUSS_LEGENDRE_LEGENDRE,    3);
     RegisterConstant(GAUSS_LEGENDRE_CHEBYSHEV,   4);
     RegisterConstant(CUSTOM_QUADRATURE,          5);
+RegisterFunction(chiCreateCustomAngularQuadrature)
 RegisterFunction(chiGetProductQuadrature)
 
 //module:Mesh Macros

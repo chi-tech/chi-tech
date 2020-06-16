@@ -191,6 +191,42 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
     }//for each angleset rule
   }//while not finished
 
+//  //================================================== Reset all
+//  for (auto angset_group : angle_agg->angle_set_groups)
+//    angset_group->ResetSweep();
+//
+//  for (auto bndry : angle_agg->sim_boundaries)
+//  {
+//    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
+//    {
+//      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+//      rbndry->ResetAnglesReadyStatus();
+//    }
+//  }
+
+  //================================================== Receive delayed data
+  MPI_Barrier(MPI_COMM_WORLD);
+  bool received_delayed_data = false;
+  while (not received_delayed_data)
+  {
+    received_delayed_data = true;
+    for (auto sorted_angleset : rule_values)
+    {
+      TAngleSet *angleset = sorted_angleset.angle_set;
+
+      if (angleset->FlushSendBuffers() == Status::MESSAGES_PENDING)
+        received_delayed_data = false;
+      angleset->ReceiveDelayedData(sorted_angleset.set_index);
+    }
+  }
+
+//  for (auto sorted_angleset : rule_values)
+//  {
+//    TAngleSet *angleset = sorted_angleset.angle_set;
+//    angleset->ReceiveDelayedData(sorted_angleset.set_index);
+//  }
+
+
   //================================================== Reset all
   for (auto angset_group : angle_agg->angle_set_groups)
     angset_group->ResetSweep();
@@ -202,14 +238,6 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
       auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
       rbndry->ResetAnglesReadyStatus();
     }
-  }
-
-  //================================================== Receive delayed data
-  MPI_Barrier(MPI_COMM_WORLD);
-  for (auto sorted_angleset : rule_values)
-  {
-    TAngleSet *angleset = sorted_angleset.angle_set;
-    angleset->ReceiveDelayedData(sorted_angleset.set_index);
   }
 
   chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_END);

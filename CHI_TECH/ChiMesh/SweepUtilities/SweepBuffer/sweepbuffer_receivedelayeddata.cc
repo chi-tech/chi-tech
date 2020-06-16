@@ -40,11 +40,18 @@ ReceiveDelayedData(int angle_set_num)
                    comm_set->communicators[chi_mpi.location_id],
                    &msg_avail,&status0);
 
+//        if (msg_avail != 1)
+//          chi_log.Log(LOG_ALL)
+//            << "SweepBuffer: Delayed Data message was not available";
+
         if (msg_avail != 1)
-          chi_log.Log(LOG_ALL)
-            << "SweepBuffer: Delayed Data message was not available";
+        {
+          break;
+        }//if message is not available
 
         //============================ Receive upstream data
+        delayed_prelocI_message_available[prelocI][m] = true;
+
         u_ll_int block_addr   = delayed_prelocI_message_blockpos[prelocI][m];
         u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];
 

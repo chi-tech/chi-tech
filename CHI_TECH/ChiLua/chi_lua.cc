@@ -29,6 +29,18 @@ void LuaCheckNilValue(const char* func_name, lua_State* L, int arg)
   }
 }
 
+void LuaCheckTableValue(const char* func_name, lua_State* L, int arg)
+{
+  if (not lua_istable(L,arg))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Non-table value supplied in "
+      << std::string(func_name)
+      << " argument " << arg;
+    exit(EXIT_FAILURE);
+  }
+}
+
 std::string LuaSourceInfo(lua_State* L, const char* func_name)
 {
   lua_Debug err_info;
