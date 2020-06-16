@@ -56,7 +56,9 @@ namespace sweep_management
     RECEIVING = 2,
     READY_TO_EXECUTE = 3,
     EXECUTE = 4,
-    NO_EXEC_IF_READY = 5
+    NO_EXEC_IF_READY = 5,
+    MESSAGES_SENT = 6,
+    MESSAGES_PENDING = 7
   };
   typedef AngleSetStatus ExecutionPermission;
 }

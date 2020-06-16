@@ -1,10 +1,14 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../../chi_math.h"
+#include "ChiLua/chi_lua.h"
+#include "ChiMath//chi_math.h"
+
+#include "ChiMath/Quadratures/product_quadrature.h"
 
 #include <chi_log.h>
 
 extern ChiMath&     chi_math_handler;
 extern ChiLog&     chi_log;
+
+#include <memory>
 
 //########################################################## Create empty system
 /** Creates a Product-quadrature.
@@ -62,10 +66,12 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 3)
       verbose = lua_toboolean(L,3);
 
-    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
+    chi_log.Log(LOG_0) << "Creating Gauss-Legendre Quadrature\n";
+
+    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithGL(Np,verbose);
-    chi_math_handler.product_quadratures.push_back(new_quad);
-    int index = chi_math_handler.product_quadratures.size()-1;
+    chi_math_handler.angular_quadratures.push_back(new_quad);
+    int index = chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
@@ -90,10 +96,12 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 4)
       verbose = lua_toboolean(L,4);
 
-    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
+    chi_log.Log(LOG_0) << "Creating Gauss-Legendre-Legendre Quadrature\n";
+
+    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithGLL(Np,Na,verbose);
-    chi_math_handler.product_quadratures.push_back(new_quad);
-    int index = chi_math_handler.product_quadratures.size()-1;
+    chi_math_handler.angular_quadratures.push_back(new_quad);
+    int index = chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
@@ -118,10 +126,12 @@ int chiCreateProductQuadrature(lua_State *L)
     if (num_args == 4)
       verbose = lua_toboolean(L,4);
 
-    chi_math::ProductQuadrature* new_quad = new chi_math::ProductQuadrature;
+    chi_log.Log(LOG_0) << "Creating Gauss-Legendre-ChebyShev Quadrature\n";
+
+    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithGLC(Np,Na,verbose);
-    chi_math_handler.product_quadratures.push_back(new_quad);
-    int index = chi_math_handler.product_quadratures.size()-1;
+    chi_math_handler.angular_quadratures.push_back(new_quad);
+    int index = chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
@@ -195,12 +205,14 @@ int chiCreateProductQuadrature(lua_State *L)
       lua_pop(L,1);
     }
 
+    chi_log.Log(LOG_0) << "Creating custom product quadrature Quadrature\n";
+
     chi_log.Log(LOG_0) << Na << " " << Np << " " << Nw;
 
-    auto new_quad = new chi_math::ProductQuadrature;
+    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithCustom(azimuthal,polar,weights,verbose);
-    chi_math_handler.product_quadratures.push_back(new_quad);
-    int index = chi_math_handler.product_quadratures.size()-1;
+    chi_math_handler.angular_quadratures.push_back(new_quad);
+    int index = chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)

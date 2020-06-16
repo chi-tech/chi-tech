@@ -5,7 +5,7 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/AngleSetGroup/anglesetgroup.h"
 
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_quadrature_base.h"
 
 //###################################################################
 /**Angle aggregation has to cater for running the 8 corners of a 3D
@@ -30,7 +30,7 @@ public:
   std::vector<SweepBndry*>     sim_boundaries;
   int                          number_of_groups=0;
   int                          number_of_group_subsets=0;
-  chi_math::ProductQuadrature* quadrature=nullptr;
+  std::shared_ptr<chi_math::AngularQuadrature> quadrature=nullptr;
 
 private:
   std::pair<int,int> number_angular_unknowns;

@@ -186,7 +186,7 @@ public:
         bndry_face_counter  = ni_bndry_face_counter;
 
         angle_num = angle_set->angles[n];
-        omega = *groupset->quadrature->omegas[angle_num];
+        omega = groupset->quadrature->omegas[angle_num];
         wn    = groupset->quadrature->weights[angle_num];
 
         //============================================ Gradient matrix
