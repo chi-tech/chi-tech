@@ -347,6 +347,8 @@ namespace chi_math{
             return invertedMatrix*(1/determiant);
         }
 
+        /** calculated the norm of a matrix
+         * \sqrt{\sum a_ij^2} */
         NumberFormat Norm()
         {
             NumberFormat adderupper = 0.0;
@@ -371,6 +373,7 @@ namespace chi_math{
             
         }
 
+        /**outputs matrix to stringstream*/
         std::string PrintS() const
         {
             std::stringstream out;
