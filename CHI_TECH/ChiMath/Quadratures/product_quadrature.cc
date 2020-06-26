@@ -24,9 +24,11 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
   azimu_ang.push_back(0.0);
 
   //================================================== Create polar angles
+  if (verbose) chi_log.Log(LOG_0) << "Polar angles:";
   for (unsigned j=0; j<(Np*2); j++)
   {
     polar_ang.push_back(M_PI-acos(gl_polar->abscissae[j]));
+    if (verbose) chi_log.Log(LOG_0) << polar_ang.back();
   }
 
   //================================================== Create angle pairs
@@ -35,10 +37,10 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
   {
     for (unsigned j=0; j<(Np*2); j++)
     {
-      auto new_pair = new chi_math::QuadraturePointPhiTheta;
+      chi_math::QuadraturePointPhiTheta new_pair;
 
-      new_pair->phi   = 0.0;
-      new_pair->theta = M_PI-acos(gl_polar->abscissae[j]);
+      new_pair.phi   = 0.0;
+      new_pair.theta = M_PI-acos(gl_polar->abscissae[j]);
 
       abscissae.push_back(new_pair);
 
@@ -51,8 +53,8 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
       {
         char buf[200];
         sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair->phi*180.0/M_PI,
-                new_pair->theta*180.0/M_PI,
+                new_pair.phi*180.0/M_PI,
+                new_pair.theta*180.0/M_PI,
                 weight);
         ostr << buf;
       }
@@ -62,16 +64,16 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
   //================================================== Create omega list
   for (size_t n=0; n<abscissae.size(); n++)
   {
-    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
+    const chi_math::QuadraturePointPhiTheta& qpoint = abscissae[n];
 
-    auto new_omega = new chi_mesh::Vector3;
-    new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
-    new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
-    new_omega->z = cos(qpoint->theta);
+    chi_mesh::Vector3 new_omega;
+    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
+    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
+    new_omega.z = cos(qpoint.theta);
 
     chi_log.Log(LOG_0VERBOSE_1)
     << "Quadrature angle " << n
-    << " " << new_omega->PrintS();
+    << " " << new_omega.PrintS();
 
     omegas.push_back(new_omega);
   }
@@ -100,15 +102,19 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   double weight_sum = 0.0;
 
   //================================================= Create azimuthal angles
+  if (verbose) chi_log.Log(LOG_0) << "Azimuthal angles:";
   for (unsigned i=0; i<(Na*4); i++)
   {
     azimu_ang.push_back(M_PI*gl_azimu->abscissae[i] + M_PI);
+    if (verbose) chi_log.Log(LOG_0) << azimu_ang.back();
   }
 
   //================================================== Create polar angles
+  if (verbose) chi_log.Log(LOG_0) << "Polar angles:";
   for (unsigned j=0; j<(Np*2); j++)
   {
     polar_ang.push_back(M_PI-acos(gl_polar->abscissae[j]));
+    if (verbose) chi_log.Log(LOG_0) << polar_ang.back();
   }
 
   //================================================== Create angle pairs
@@ -117,10 +123,10 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   {
     for (unsigned j=0; j<(Np*2); j++)
     {
-      auto new_pair = new chi_math::QuadraturePointPhiTheta;
+      chi_math::QuadraturePointPhiTheta new_pair;
 
-      new_pair->phi   = M_PI*gl_azimu->abscissae[i] + M_PI;
-      new_pair->theta = M_PI-acos(gl_polar->abscissae[j]);
+      new_pair.phi   = M_PI*gl_azimu->abscissae[i] + M_PI;
+      new_pair.theta = M_PI-acos(gl_polar->abscissae[j]);
 
       abscissae.push_back(new_pair);
 
@@ -133,8 +139,8 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
       {
         char buf[200];
         sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair->phi*180.0/M_PI,
-                new_pair->theta*180.0/M_PI,
+                new_pair.phi*180.0/M_PI,
+                new_pair.theta*180.0/M_PI,
                 weight);
         ostr << buf;
       }
@@ -144,12 +150,12 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   //================================================== Create omega list
   for (size_t n=0; n<abscissae.size(); n++)
   {
-    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
+    const chi_math::QuadraturePointPhiTheta& qpoint = abscissae[n];
 
-    auto new_omega = new chi_mesh::Vector3;
-    new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
-    new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
-    new_omega->z = cos(qpoint->theta);
+    chi_mesh::Vector3 new_omega;
+    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
+    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
+    new_omega.z = cos(qpoint.theta);
 
     omegas.push_back(new_omega);
   }
@@ -179,15 +185,19 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
   double weight_sum = 0.0;
 
   //================================================= Create azimuthal angles
+  if (verbose) chi_log.Log(LOG_0) << "Azimuthal angles:";
   for (unsigned i=0; i<(Na*4); i++)
   {
     azimu_ang.push_back(M_PI*(2*(i+1)-1)/(Na*4));
+    if (verbose) chi_log.Log(LOG_0) << azimu_ang.back();
   }
 
   //================================================== Create polar angles
+  if (verbose) chi_log.Log(LOG_0) << "Polar angles:";
   for (unsigned j=0; j<(Np*2); j++)
   {
     polar_ang.push_back(M_PI-acos(gl_polar->abscissae[j]));
+    if (verbose) chi_log.Log(LOG_0) << polar_ang.back();
   }
 
   //================================================== Create angle pairs
@@ -196,10 +206,10 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
   {
     for (unsigned j=0; j<(Np*2); j++)
     {
-      auto new_pair = new chi_math::QuadraturePointPhiTheta;
+      chi_math::QuadraturePointPhiTheta new_pair;
 
-      new_pair->phi   = M_PI*(2*(i+1)-1)/(Na*4);
-      new_pair->theta = M_PI-acos(gl_polar->abscissae[j]);
+      new_pair.phi   = M_PI*(2*(i+1)-1)/(Na*4);
+      new_pair.theta = M_PI-acos(gl_polar->abscissae[j]);
 
       abscissae.push_back(new_pair);
 
@@ -212,8 +222,8 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
       {
         char buf[200];
         sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair->phi*180.0/M_PI,
-                new_pair->theta*180.0/M_PI,
+                new_pair.phi*180.0/M_PI,
+                new_pair.theta*180.0/M_PI,
                 weight);
         ostr << buf;
       }
@@ -223,12 +233,12 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
   //================================================== Create omega list
   for (size_t n=0; n<abscissae.size(); n++)
   {
-    chi_math::QuadraturePointPhiTheta* qpoint = abscissae[n];
+    const chi_math::QuadraturePointPhiTheta& qpoint = abscissae[n];
 
-    chi_mesh::Vector3* new_omega = new chi_mesh::Vector3;
-    new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
-    new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
-    new_omega->z = cos(qpoint->theta);
+    chi_mesh::Vector3 new_omega;
+    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
+    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
+    new_omega.z = cos(qpoint.theta);
 
     omegas.push_back(new_omega);
   }
@@ -243,8 +253,7 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
 }
 
 //###################################################################
-/**Initializes the quadrature with Gauss-Legendre for the polar
- * angles and Gauss-Chebyshev for the azimuthal.*/
+/**Initializes the quadrature with custom angles and weights.*/
 void chi_math::ProductQuadrature::
   InitializeWithCustom(std::vector<double>& azimuthal,
                        std::vector<double>& polar,
@@ -275,10 +284,10 @@ void chi_math::ProductQuadrature::
     for (unsigned j=0; j<Np; j++)
     {
       ++nw;
-      auto new_pair = new chi_math::QuadraturePointPhiTheta;
+      chi_math::QuadraturePointPhiTheta new_pair;
 
-      new_pair->phi   = azimuthal[i];
-      new_pair->theta = polar[j];
+      new_pair.phi   = azimuthal[i];
+      new_pair.theta = polar[j];
 
       abscissae.push_back(new_pair);
 
@@ -290,8 +299,8 @@ void chi_math::ProductQuadrature::
       {
         char buf[200];
         sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair->phi*180.0/M_PI,
-                new_pair->theta*180.0/M_PI,
+                new_pair.phi*180.0/M_PI,
+                new_pair.theta*180.0/M_PI,
                 weight);
         ostr << buf;
       }
@@ -301,10 +310,10 @@ void chi_math::ProductQuadrature::
   //================================================== Create omega list
   for (auto qpoint : abscissae)
   {
-    auto new_omega = new chi_mesh::Vector3;
-    new_omega->x = sin(qpoint->theta)*cos(qpoint->phi);
-    new_omega->y = sin(qpoint->theta)*sin(qpoint->phi);
-    new_omega->z = cos(qpoint->theta);
+    chi_mesh::Vector3 new_omega;
+    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
+    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
+    new_omega.z = cos(qpoint.theta);
 
     omegas.push_back(new_omega);
   }
@@ -316,4 +325,14 @@ void chi_math::ProductQuadrature::
       << "Weight sum=" << weight_sum;
   }
 
+}
+
+//###################################################################
+/**Obtains the abscissae index given the indices of the
+ * polar angle index and the azimuthal angle index.*/
+int chi_math::ProductQuadrature::
+  GetAngleNum(int polar_angle_index, int azimu_ang_index)
+{
+  return azimu_ang_index*polar_ang.size() +
+         polar_angle_index;
 }

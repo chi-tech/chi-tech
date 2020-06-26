@@ -5,7 +5,7 @@
 #include "../IterativeMethods/lbs_iterativemethods.h"
 
 #include <ChiMath/Quadratures/LegendrePoly/legendrepoly.h>
-#include <ChiMath/Quadratures/product_quadrature.h>
+#include <ChiMath/Quadratures/angular_quadrature_base.h>
 #include <ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h>
 
 #include <ChiPhysics/chi_physics_namespace.h>
@@ -31,7 +31,7 @@ class LBSGroupset
 {
 public:
   std::vector<LBSGroup*>                       groups;
-  chi_math::ProductQuadrature*                 quadrature;
+  std::shared_ptr<chi_math::AngularQuadrature> quadrature;
   std::vector<std::vector<double>>             d2m_op;
   std::vector<std::vector<double>>             m2d_op;
   chi_mesh::sweep_management::AngleAggregation* angle_agg;

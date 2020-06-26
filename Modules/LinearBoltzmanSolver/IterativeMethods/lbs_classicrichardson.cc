@@ -34,10 +34,6 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
   chi_log.Log(LOG_0)
     << "Quadrature number of angles: "
     << groupset->quadrature->abscissae.size() << "\n"
-    << "Number of azimuthal angles : "
-    << groupset->quadrature->azimu_ang.size() << "\n"
-    << "Number of polar angles     : "
-    << groupset->quadrature->polar_ang.size() << "\n"
     << "Groups " << groupset->groups.front()->id << " "
     << groupset->groups.back()->id << "\n\n";
 

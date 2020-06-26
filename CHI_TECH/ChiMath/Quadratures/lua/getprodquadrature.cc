@@ -1,5 +1,7 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../../chi_math.h"
+#include "ChiLua/chi_lua.h"
+#include "ChiMath//chi_math.h"
+
+#include "ChiMath/Quadratures/product_quadrature.h"
 
 #include <chi_log.h>
 
@@ -24,9 +26,18 @@ int chiGetProductQuadrature(lua_State *L)
 
   int handle = lua_tonumber(L,1);
 
-  chi_math::ProductQuadrature* quad;
+  std::shared_ptr<chi_math::ProductQuadrature> quad;
   try{
-    quad = chi_math_handler.product_quadratures.at(handle);
+    auto ang_quad = chi_math_handler.angular_quadratures.at(handle);
+    if (ang_quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
+      quad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chiGetProductQuadrature: Provided quadrature handle points to "
+           "a quadrature that is not a product quadrature.";
+      exit(EXIT_FAILURE);
+    }
   }
   catch (const std::out_of_range& o){
     chi_log.Log(LOG_ALLERROR)
@@ -45,11 +56,11 @@ int chiGetProductQuadrature(lua_State *L)
     lua_settable(L,-3);
 
     lua_pushstring(L,"polar");
-    lua_pushnumber(L,quad->abscissae[n]->theta);
+    lua_pushnumber(L,quad->abscissae[n].theta);
     lua_settable(L,-3);
 
     lua_pushstring(L,"azimuthal");
-    lua_pushnumber(L,quad->abscissae[n]->phi);
+    lua_pushnumber(L,quad->abscissae[n].phi);
     lua_settable(L,-3);
 
     lua_settable(L,-3);

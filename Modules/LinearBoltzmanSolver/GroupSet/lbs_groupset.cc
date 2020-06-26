@@ -6,6 +6,8 @@
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 #include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
 
+#include "ChiMath/Quadratures/product_quadrature.h"
+
 #include <chi_log.h>
 #include <chi_mpi.h>
 
@@ -72,10 +74,10 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
+          const auto& cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
-                                       cur_angle->phi,
-                                       cur_angle->theta);
+                                       cur_angle.phi,
+                                       cur_angle.theta);
           double w = quadrature->weights[n];
           cur_mom.push_back(value*w);
         }
@@ -99,10 +101,10 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
+          const auto& cur_angle = quadrature->abscissae[n];
           double value = chi_math::Ylm(ell,m,
-                                       cur_angle->phi,
-                                       cur_angle->theta);
+                                       cur_angle.phi,
+                                       cur_angle.theta);
           double w = quadrature->weights[n];
           cur_mom.push_back(value*w);
         }
@@ -160,11 +162,11 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
+          const auto& cur_angle = quadrature->abscissae[n];
           double value = ((2.0*ell+1.0)/2.0)*
                          chi_math::Ylm(ell,m,
-                                                       cur_angle->phi,
-                                                       cur_angle->theta);
+                                       cur_angle.phi,
+                                       cur_angle.theta);
           cur_mom.push_back(value);
         }
 
@@ -187,11 +189,11 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
 
         for (int n=0; n<num_angles; n++)
         {
-          chi_math::QuadraturePointPhiTheta* cur_angle = quadrature->abscissae[n];
+          const auto& cur_angle = quadrature->abscissae[n];
           double value = ((2.0*ell+1.0)/4.0/M_PI)*
                          chi_math::Ylm(ell,m,
-                                                       cur_angle->phi,
-                                                       cur_angle->theta);
+                         cur_angle.phi,
+                         cur_angle.theta);
           cur_mom.push_back(value);
         }
 
@@ -254,48 +256,54 @@ void LBSGroupset::BuildSubsets()
   }//for ss
 
   //=================================== Angle subsets
-  int num_pol_angls_hemi = quadrature->polar_ang.size()/2;
-  int num_an_subsets = 1;
-  if (master_num_ang_subsets <= num_pol_angls_hemi)
-    num_an_subsets = master_num_ang_subsets;
-
-  int an_subset_size = floor(num_pol_angls_hemi/num_an_subsets);
-
-  //==================== Top hemishpere
-  for (int ss=0; ss<num_an_subsets; ss++)
+  if (quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
   {
-    int subset_ranki = ss*an_subset_size;
-    int subset_size  = an_subset_size;
+    auto prodquadrature =
+      std::static_pointer_cast<chi_math::ProductQuadrature>(quadrature);
+    int num_pol_angls_hemi = prodquadrature->polar_ang.size()/2;
+    int num_an_subsets = 1;
+    if (master_num_ang_subsets <= num_pol_angls_hemi)
+      num_an_subsets = master_num_ang_subsets;
 
-    if (ss == (num_an_subsets-1))
-      subset_size = num_pol_angls_hemi - ss*an_subset_size;
+    int an_subset_size = floor(num_pol_angls_hemi/num_an_subsets);
 
-    ang_subsets_top.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
-    ang_subset_sizes_top.push_back(subset_size);
+    //==================== Top hemishpere
+    for (int ss=0; ss<num_an_subsets; ss++)
+    {
+      int subset_ranki = ss*an_subset_size;
+      int subset_size  = an_subset_size;
 
-    if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
-      chi_log.Log(LOG_0)
-        << "Top-hemi Angle subset " << ss << " "
-        << subset_ranki << "->" << subset_ranki+subset_size-1;
-  }//for ss
+      if (ss == (num_an_subsets-1))
+        subset_size = num_pol_angls_hemi - ss*an_subset_size;
 
-  //==================== Bottom hemisphere
-  for (int ss=0; ss<num_an_subsets; ss++)
-  {
-    int subset_ranki = ss*an_subset_size + num_pol_angls_hemi;
-    int subset_size  = an_subset_size;
+      ang_subsets_top.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
+      ang_subset_sizes_top.push_back(subset_size);
 
-    if (ss == (num_an_subsets-1))
-      subset_size = num_pol_angls_hemi - ss*an_subset_size;
+      if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
+        chi_log.Log(LOG_0)
+          << "Top-hemi Angle subset " << ss << " "
+          << subset_ranki << "->" << subset_ranki+subset_size-1;
+    }//for ss
 
-    ang_subsets_bot.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
-    ang_subset_sizes_bot.push_back(subset_size);
+    //==================== Bottom hemisphere
+    for (int ss=0; ss<num_an_subsets; ss++)
+    {
+      int subset_ranki = ss*an_subset_size + num_pol_angls_hemi;
+      int subset_size  = an_subset_size;
 
-    if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
-      chi_log.Log(LOG_0)
-        << "Bot-hemi Angle subset " << ss << " "
-        << subset_ranki << "->" << subset_ranki+subset_size-1;
-  }//for ss
+      if (ss == (num_an_subsets-1))
+        subset_size = num_pol_angls_hemi - ss*an_subset_size;
+
+      ang_subsets_bot.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
+      ang_subset_sizes_bot.push_back(subset_size);
+
+      if (angleagg_method != LinearBoltzman::AngleAggregationType::SINGLE)
+        chi_log.Log(LOG_0)
+          << "Bot-hemi Angle subset " << ss << " "
+          << subset_ranki << "->" << subset_ranki+subset_size-1;
+    }//for ss
+  }
+
 }
 
 //###################################################################
@@ -328,12 +336,12 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, std::string file_name)
 
       for (auto& ang_num : ang_set->angles)
       {
-        auto angle = quadrature->abscissae[ang_num];
+        const auto& angle = quadrature->abscissae[ang_num];
 
         ofile
           << "    " << ang_num
-          << " " << angle->phi
-          << " " << angle->theta << "\n";
+          << " " << angle.phi
+          << " " << angle.theta << "\n";
       }
     }
   }

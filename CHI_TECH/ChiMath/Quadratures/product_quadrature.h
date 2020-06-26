@@ -10,43 +10,35 @@
 #define GAUSS_LEGENDRE_CHEBYSHEV 4
 #define CUSTOM_QUADRATURE        5
 
+#include "angular_quadrature_base.h"
+
 namespace chi_math
 {
-  struct QuadraturePointPhiTheta;
   class ProductQuadrature;
+
 }
 
-struct chi_math::QuadraturePointPhiTheta
-{
-  double phi;
-  double theta;
-};
-
 //######################################################### Class def
-/** Parent class for product quadratures*/
-class chi_math::ProductQuadrature
+/** Class for product quadratures*/
+class chi_math::ProductQuadrature : public chi_math::AngularQuadrature
 {
 public:
-  std::vector<chi_math::QuadraturePointPhiTheta*> abscissae;
   std::vector<double>           polar_ang;
   std::vector<double>           azimu_ang;
-  std::vector<double>           weights;
-  std::vector<chi_mesh::Vector3*>          omegas;
 
 public:
   //product_quadrature.cc
+       ProductQuadrature() :
+         AngularQuadrature(chi_math::AngularQuadratureType::ProductQuadrature)
+       {}
   void InitializeWithGL(int Np, bool verbose=false);
   void InitializeWithGLL(int Na, int Np, bool verbose=false);
   void InitializeWithGLC(int Na, int Np, bool verbose=false);
   void InitializeWithCustom(std::vector<double>& azimuthal,
                             std::vector<double>& polar,
                             std::vector<double>& in_weights,
-                            bool verbose=false);
-  int  GetAngleNum(int polar_angle_index, int azimu_ang_index)
-  {
-    return azimu_ang_index*polar_ang.size() +
-           polar_angle_index;
-  }
+                            bool verbose=false) override;
+  int  GetAngleNum(int polar_angle_index, int azimu_ang_index);
 
 };
 

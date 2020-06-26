@@ -82,10 +82,11 @@ void chi_mesh::sweep_management::SweepBuffer::Reset()
   upstream_data_initialized = false;
 
   for (int prelocI=0; prelocI<prelocI_message_available.size(); prelocI++)
-  {
     for (int m=0; m<prelocI_message_available[prelocI].size(); m++)
-    {
       prelocI_message_available[prelocI][m] = false;
-    }
-  }
+
+  for (int prelocI=0; prelocI<delayed_prelocI_message_available.size(); prelocI++)
+    for (int m=0; m<delayed_prelocI_message_available[prelocI].size(); m++)
+      delayed_prelocI_message_available[prelocI][m] = false;
+
 }
