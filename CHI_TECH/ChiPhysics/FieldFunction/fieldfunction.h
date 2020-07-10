@@ -114,6 +114,23 @@ public:
   {
   }
 
+  /***/
+  FieldFunction(std::string ff_tex_name,
+                FieldFunctionType ff_type,
+                SpatialDiscretization* ff_sdm,
+                chi_math::UnknownManager* ff_unknown_manager,
+                int ff_unknown_id,
+                std::vector<double>* ff_field_vector) :
+    text_name(ff_tex_name),
+    id(0),
+    type(ff_type),
+    grid(ff_sdm->ref_grid),
+    spatial_discretization(ff_sdm),
+    unknown_manager(ff_unknown_manager),
+    ref_set(ff_unknown_id),
+    field_vector_local(ff_field_vector)
+  {}
+
   std::vector<double>& GetCellDOFValues(size_t cell_local_id,
                                         size_t component,
                                         size_t set);
@@ -138,6 +155,10 @@ public:
                        const std::string& field_name);
   void ExportToVTKPWLDG(const std::string& base_name,
                         const std::string& field_name);
+
+  //fieldfunction_exportmultiple_fv.cc
+  static void ExportMultipleFFToVTK(const std::string& file_base_name,
+                                    std::vector<FieldFunction*> ff_list);
 
   void WritePVTU(std::string base_filename, std::string field_name, int num_grps=0);
 };
