@@ -27,7 +27,7 @@ unsigned int SpatialDiscretization_FV::
 }
 
 //###################################################################
-/**Get the number of local degrees-of-freedom.*/
+/**Get the number of global degrees-of-freedom.*/
 unsigned int SpatialDiscretization_FV::
   GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
                    chi_math::UnknownManager* unknown_manager)

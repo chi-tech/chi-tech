@@ -8,6 +8,8 @@
 #include <ChiMath/Quadratures/angular_quadrature_base.h>
 #include <ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h>
 
+#include "../lbs_structs.h"
+
 #include <ChiPhysics/chi_physics_namespace.h>
 
 namespace LinearBoltzman
@@ -72,8 +74,10 @@ public:
 
   //npt_groupset.cc
        LBSGroupset();
-  void BuildDiscMomOperator(int scatt_order);
-  void BuildMomDiscOperator(int scatt_order);
+  void BuildDiscMomOperator(int scatt_order,
+                            LinearBoltzman::GeometryType geometry_type);
+  void BuildMomDiscOperator(int scatt_order,
+                            LinearBoltzman::GeometryType geometry_type);
   void BuildSubsets();
 public:
   void PrintSweepInfoFile(size_t ev_tag,std::string file_name);

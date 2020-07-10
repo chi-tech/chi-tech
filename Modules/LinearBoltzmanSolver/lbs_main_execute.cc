@@ -19,8 +19,10 @@ void LinearBoltzman::Solver::Execute()
     chi_log.Log(LOG_0)
       << "\n********* Initializing Groupset " << gs << "\n" << std::endl;
 
-    group_sets[gs]->BuildDiscMomOperator(options.scattering_order);
-    group_sets[gs]->BuildMomDiscOperator(options.scattering_order);
+    group_sets[gs]->BuildDiscMomOperator(options.scattering_order,
+                                         options.geometry_type);
+    group_sets[gs]->BuildMomDiscOperator(options.scattering_order,
+                                         options.geometry_type);
     group_sets[gs]->BuildSubsets();
 
     ComputeSweepOrderings(group_sets[gs]);
