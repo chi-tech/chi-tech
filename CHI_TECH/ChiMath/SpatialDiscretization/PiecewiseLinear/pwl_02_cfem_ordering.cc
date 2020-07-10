@@ -397,5 +397,30 @@ std::pair<int,int> SpatialDiscretization_PWL::
 
   cfem_local_block_address = local_from;
 
+  local_base_block_size = local_to - local_from + 1;
+  globl_base_block_size = grid->vertices.size();
+
+  //======================================== Collect block addresses
+  locJ_block_address.clear();
+  locJ_block_address.resize(chi_mpi.process_count, 0);
+  MPI_Allgather(&cfem_local_block_address,    //send buf
+                1,                            //send count
+                MPI_INT,                      //send type
+                locJ_block_address.data(),    //recv buf
+                1,                            //recv count
+                MPI_INT,                      //recv type
+                MPI_COMM_WORLD);              //communicator
+
+  //======================================== Collect block sizes
+  locJ_block_size.clear();
+  locJ_block_size.resize(chi_mpi.process_count, 0);
+  MPI_Allgather(&local_base_block_size,       //send buf
+                1,                            //send count
+                MPI_INT,                      //send type
+                locJ_block_size.data(),       //recv buf
+                1,                            //recv count
+                MPI_INT,                      //recv type
+                MPI_COMM_WORLD);              //communicator
+
   return {local_to - local_from + 1,grid->vertices.size()};
 }

@@ -12,7 +12,7 @@ void SpatialDiscretization_PWL::
   BuildCFEMSparsityPattern(chi_mesh::MeshContinuum *grid,
                            std::vector<int> &nodal_nnz_in_diag,
                            std::vector<int> &nodal_nnz_off_diag,
-                           const std::pair<int,int>& domain_ownership)
+                           chi_math::UnknownManager* unknown_manager)
 {
   //======================================== Determine global domain ownership
   std::vector<int> locI_block_addr(chi_mpi.process_count, 0);
@@ -53,7 +53,7 @@ void SpatialDiscretization_PWL::
   //=================================== Set dof handler values
   dof_handler.local_block_start = cfem_local_block_address;
   dof_handler.local_block_end   = cfem_local_block_address +
-                                  domain_ownership.first;
+                                  local_base_block_size;
   dof_handler.locI_block_addr = locI_block_addr;
 
   // Writes a message on ir error
@@ -87,7 +87,7 @@ void SpatialDiscretization_PWL::
 
   //======================================== Build local sparsity pattern
   chi_log.Log(LOG_0VERBOSE_1) << "Building local sparsity pattern.";
-  int local_node_count = domain_ownership.first;
+  int local_node_count = local_base_block_size;
   std::vector<std::vector<int>> nodal_connections(local_node_count);
 
   nodal_nnz_in_diag.clear();
@@ -306,6 +306,49 @@ void SpatialDiscretization_PWL::
     }
   }
 
-
   MPI_Barrier(MPI_COMM_WORLD);
+
+  //======================================== Spacing according to unknown
+  //                                         manager
+  if (unknown_manager != nullptr)
+  {
+    auto backup_nnz_in_diag  = nodal_nnz_in_diag;
+    auto backup_nnz_off_diag = nodal_nnz_off_diag;
+
+    unsigned int N = unknown_manager->GetTotalUnknownSize();
+
+    nodal_nnz_in_diag.clear();
+    nodal_nnz_off_diag.clear();
+
+    nodal_nnz_in_diag.resize(local_base_block_size*N,0);
+    nodal_nnz_off_diag.resize(local_base_block_size*N,0);
+
+    if (unknown_manager->dof_storage_type == chi_math::DOFStorageType::NODAL)
+    {
+      int ir = -1;
+      for (int i=0; i<local_base_block_size; ++i)
+      {
+        for (int j=0; j<N; ++j)
+        {
+          ++ir;
+          nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];
+          nodal_nnz_off_diag[ir] = backup_nnz_off_diag[i];
+        }//for j
+      }//for i
+    }
+    else if (unknown_manager->dof_storage_type == chi_math::DOFStorageType::BLOCK)
+    {
+      int ir = -1;
+      for (int j=0; j<N; ++j)
+      {
+        for (int i=0; i<local_base_block_size; ++i)
+        {
+          ++ir;
+          nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];
+          nodal_nnz_off_diag[ir] = backup_nnz_off_diag[i];
+        }//for i
+      }//for j
+    }
+
+  }//if unknown manager supplied
 }
