@@ -20,7 +20,7 @@ public:
   double cut_tol;
 public:
   //00
-  SurfaceMesherTriangle()
+  SurfaceMesherTriangle() : SurfaceMesher(SurfaceMesherType::Delaunay)
   {
     get_auto_min = true;
     area_constraint = 1.0;

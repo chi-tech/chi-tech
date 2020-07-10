@@ -1,5 +1,5 @@
-#ifndef _surfmesher_predefined_h
-#define _surfmesher_predefined_h
+#ifndef _surfmesher_passthrough_h
+#define _surfmesher_passthrough_h
 
 #include "../surfacemesher.h"
 
@@ -7,10 +7,10 @@
 /**Surface mesher that will not modify the mesh.
 Meant for loading 2D meshes and just connecting boundaries
 to elements.*/
-class chi_mesh::SurfaceMesherPredefined : public chi_mesh::SurfaceMesher
+class chi_mesh::SurfaceMesherPassthrough : public chi_mesh::SurfaceMesher
 {
 public:
-  SurfaceMesherPredefined() : SurfaceMesher(SurfaceMesherType::Passthrough)
+  SurfaceMesherPassthrough() : SurfaceMesher(SurfaceMesherType::Passthrough)
   {
     partitioning_x = 1;
     partitioning_y = 1;
