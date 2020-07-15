@@ -381,7 +381,7 @@ def InstallPETSc():
     os.chdir("petsc-3.9.4/")
     exstring = "./configure " \
         "--prefix=" + install_dir + "/PETSc/petsc-3.9.4/install " \
-        "--download-hypre=1 " \
+        "--download-hypre=git://https://github.com/hypre-space/hypre.git " \
         "--with-ssl=0 " \
         "--with-debugging=0 " \
         "--with-pic=1 " \
