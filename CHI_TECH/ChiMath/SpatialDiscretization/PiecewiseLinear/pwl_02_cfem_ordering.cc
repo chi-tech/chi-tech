@@ -8,6 +8,8 @@
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
+#include <algorithm>
+
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
@@ -26,7 +28,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
     for (auto& vid : cell.vertex_ids)
       exnonex_nodes_set.insert(vid);
 
-  //================================================== Copy set into vector
+  // Copy set into vector
   std::vector<int> exnonex_nodes;
   for (auto& vid : exnonex_nodes_set)
     exnonex_nodes.push_back(vid);
@@ -35,7 +37,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
                               << t_stage[0].GetTime()/1000.0;
 
   t_stage[1].Reset();
-  //================================================== Initialize ghost flags
+  // Initialize ghost flags
   std::vector<bool> ghost_flags;
   ghost_flags.resize(exnonex_nodes.size(),false);
 
@@ -97,15 +99,14 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //nodes to find a single list of all the ghost nodes
   std::vector<int> global_ghost_nodes;
 
-  //=================================== Location 0 sends to location 1
+  // Location 0 sends to location 1
   if (chi_mpi.location_id==0)
   {
     MPI_Send(nonexclus_nodes.data(),
              nonexclus_nodes.size(),
              MPI_INT,1,123,MPI_COMM_WORLD);
   }
-  //=================================== Location n=1..(N-1) first receives
-  //                                    n-1
+  // Location n=1..(N-1) first receives n-1
   else
   {
     std::vector<int> upstream_nonex;
@@ -119,7 +120,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
              MPI_INT,chi_mpi.location_id-1,123,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
-    //============================ Run through location n non-exclusive nodes
+    // Run through location n non-exclusive nodes
     // if a non-exclusive node is not in the upstream list then
     // it gets added to the list
     //for (size_t i=0; i<nonexclus_nodes.size(); i++)
@@ -131,14 +132,14 @@ std::pair<int,int> SpatialDiscretization_PWL::
         upstream_nonex.push_back(node);
     }
 
-    //============================ If this location is not the last location
+    // If this location is not the last location
     // send the updated upstream_nonex to location n+1
     if (chi_mpi.location_id<(chi_mpi.process_count-1))
     {
       MPI_Send(upstream_nonex.data(),upstream_nonex.size(),
                MPI_INT,chi_mpi.location_id+1,123,MPI_COMM_WORLD);
     }
-    //============================ On the last location send the completed
+    // On the last location send the completed
     // upstream_nonex back to all other locations
     else
     {
@@ -157,7 +158,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
 
 
 
-  //================================================== Collect ghost nodes
+  //================================================== Last location broadcasts
   if (chi_mpi.location_id<(chi_mpi.process_count-1))
   {
     MPI_Status status;
@@ -180,6 +181,8 @@ std::pair<int,int> SpatialDiscretization_PWL::
                               << t_stage[3].GetTime()/1000.0;
 
   t_stage[3].Reset();
+
+
   //================================================== Seperate ghost nodes into
   //                                                   pieces
   // Imagine that each location is a cell in a 1D array.
@@ -238,7 +241,6 @@ std::pair<int,int> SpatialDiscretization_PWL::
   {
     local_from = 0;
     local_to = (int)exclusive_nodes.size() - 1 + num_g_loc;
-    //world.send(chi_mpi.location_id+1,125,local_to);
     MPI_Send(&local_to,1,
              MPI_INT,chi_mpi.location_id+1,125,MPI_COMM_WORLD);
   }

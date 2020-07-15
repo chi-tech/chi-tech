@@ -1,10 +1,12 @@
 #include "chi_surfacemesh.h"
 
-#include <ChiGraph/chi_graph.h>
+#include "ChiGraph/chi_directed_graph.h"
 
 #include <chi_log.h>
 
 extern ChiLog& chi_log;
+
+#include <algorithm>
 
 //###################################################################
 /**Checks for cyclic dependencies in this mesh.
@@ -28,10 +30,10 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
     omega.z = 0.0;
 
     //================================= Add all polyfaces to graph
-    CHI_D_GRAPH G;
+    chi_graph::DirectedGraph G;
     size_t num_loc_cells = poly_faces.size();
     for (size_t c=0; c<num_loc_cells; c++)
-      boost::add_vertex(G);
+      G.AddVertex();
 
     //================================= Now construct dependencies
     for (size_t c=0; c<num_loc_cells; c++)
@@ -51,23 +53,32 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
         int neighbor = face->edges[e][2];
         if ( (mu > (0.0 + tolerance)) and (neighbor >= 0))
         {
-          boost::add_edge(c,neighbor,G);
+//          boost::add_edge(c,neighbor,G);
+          G.AddEdge(c,neighbor);
         }//if outgoing
       }//for edge
     }//for cell
 
     //================================================== Generic topological
     //                                                   sorting
-    typedef boost::graph_traits<CHI_D_GRAPH>::vertex_descriptor gVertex;
+//    typedef boost::graph_traits<CHI_D_GRAPH>::vertex_descriptor gVertex;
+//
+//    boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
+//      index_map = get(boost::vertex_index, G);
+//
+//    std::vector<gVertex> sorted_list;
+//    try{
+//      boost::topological_sort(G,std::back_inserter(sorted_list));
+//    }
+//    catch (const boost::bad_graph& exc)
+//    {
+//      chi_log.Log(LOG_ALLERROR)
+//        << "Function CheckCyclicDependencies. Detected cyclic depency.";
+//      exit(EXIT_FAILURE);
+//    }
 
-    boost::property_map<CHI_D_GRAPH, boost::vertex_index_t>::type
-      index_map = get(boost::vertex_index, G);
-
-    std::vector<gVertex> sorted_list;
-    try{
-      boost::topological_sort(G,std::back_inserter(sorted_list));
-    }
-    catch (const boost::bad_graph& exc)
+    auto topological_order = G.GenerateTopologicalSort();
+    if (topological_order.empty())
     {
       chi_log.Log(LOG_ALLERROR)
         << "Function CheckCyclicDependencies. Detected cyclic depency.";
@@ -75,7 +86,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
     }
 
     //================================= Cleanup
-    G.clearing_graph();
+    G.Clear();
   }//for angles
 
   GetMeshStats();

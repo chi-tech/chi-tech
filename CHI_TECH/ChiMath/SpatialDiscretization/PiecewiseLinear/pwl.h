@@ -91,6 +91,10 @@ public:
                  chi_math::UnknownManager* unknown_manager,
                  unsigned int unknown_id,
                  unsigned int component=0);
+  int MapDFEMDOFLocal(chi_mesh::Cell* cell, int node,
+                      chi_math::UnknownManager* unknown_manager,
+                      unsigned int unknown_id,
+                      unsigned int component=0);
 
 
   //06b utils

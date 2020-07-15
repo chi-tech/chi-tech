@@ -7,6 +7,7 @@ extern ChiLog&  chi_log;
 extern ChiMPI& chi_mpi;
 
 #include <sstream>
+#include <algorithm>
 
 //###################################################################
 /** Adds a vertex to the graph.*/

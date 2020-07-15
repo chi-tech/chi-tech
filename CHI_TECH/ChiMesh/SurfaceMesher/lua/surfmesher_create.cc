@@ -3,7 +3,6 @@
 #include "../Predefined/surfmesher_predefined.h"
 #include "../PassThrough/surfmesher_passthrough.h"
 #include "../Delaunay/delaunay_mesher.h"
-#include "../Triangle/triangle_mesher.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
 

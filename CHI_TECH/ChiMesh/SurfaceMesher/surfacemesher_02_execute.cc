@@ -2,7 +2,8 @@
 #include "../MeshHandler/chi_meshhandler.h"
 #include "../Region/chi_region.h"
 #include "../Boundary/chi_boundary.h"
-#include<iostream>
+#include <iostream>
+#include <iomanip>
 
 #include <chi_log.h>
 extern ChiLog& chi_log;

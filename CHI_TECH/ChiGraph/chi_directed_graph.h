@@ -2,6 +2,7 @@
 #define _chi_directed_graph_h
 
 #include "chi_directed_graph_vertex.h"
+#include <stack>
 
 //###################################################################
 /**Simple implementation of a directed graph. This implementation was

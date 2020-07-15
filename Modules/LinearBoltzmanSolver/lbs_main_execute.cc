@@ -9,6 +9,8 @@ extern ChiMPI&      chi_mpi;
 extern ChiLog&     chi_log;
 extern ChiConsole&  chi_console;
 
+#include <iomanip>
+
 //###################################################################
 /**Execute the solver.*/
 void LinearBoltzman::Solver::Execute()

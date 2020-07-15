@@ -2,7 +2,6 @@
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 #include <ChiMesh/Region/chi_region.h>
 #include <ChiMesh/SurfaceMesh/chi_surfacemesh.h>
-#include <ChiMesh/SurfaceMesher/Triangle/triangle_mesher.h>
 #include <ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h>
 #include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
 #include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
@@ -228,8 +227,7 @@ std::pair<int,int> chi_mesh::VolumeMesher::
   chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::SurfaceMesher* surf_mesher = mesh_handler->surface_mesher;
 
-  if  ((typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherTriangle)) ||
-       (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined)))
+  if  (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined))
   {
     //====================================== Sanity check on partitioning
     int num_x_subsets = surf_mesher->xcuts.size()+1;

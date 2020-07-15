@@ -84,6 +84,10 @@ public:
     field_vector_local(ff_field_vector),
     using_petsc_field_vector(false)
   {
+    auto uk_man = new chi_math::UnknownManager;
+
+    for (int set=0; set<ff_num_sets; ++set)
+      uk_man->AddUnknown(chi_math::UnknownType::VECTOR_N,ff_num_components);
   }
 
   /**PETSc-vector based field function constructor.*/

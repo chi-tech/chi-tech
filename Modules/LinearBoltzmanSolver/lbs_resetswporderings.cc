@@ -11,6 +11,8 @@ extern ChiMPI& chi_mpi;
 
 extern ChiLog& chi_log;
 
+#include <iomanip>
+
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for
  * another.*/

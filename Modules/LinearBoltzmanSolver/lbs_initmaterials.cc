@@ -12,6 +12,8 @@ extern ChiPhysics&  chi_physics_handler;
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
+#include <algorithm>
+
 //###################################################################
 /**Initializes default materials and physics materials.*/
 void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
