@@ -2,7 +2,6 @@
 #define _chi_meshcontinuum_h
 
 #include "../chi_mesh.h"
-#include <boost/graph/adjacency_list.hpp>
 #include "../../ChiGraph/chi_graph.h"
 #include "ChiMesh/Cell/cell.h"
 

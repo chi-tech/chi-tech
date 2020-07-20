@@ -284,25 +284,37 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
   vtkUnstructuredGrid* ugrid;
   vtkIntArray*      matarray;
   vtkIntArray*      pararray;
-  vtkDoubleArray*   phiarray;
-  vtkDoubleArray*   phiavgarray;
+  std::vector<vtkDoubleArray*>   phiarray(num_components);
+  std::vector<vtkDoubleArray*>   phiavgarray(num_components);
 
   ugrid    = vtkUnstructuredGrid::New();
   matarray = vtkIntArray::New();
   matarray->SetName("Material");
   pararray = vtkIntArray::New();
   pararray->SetName("Partition");
-  phiarray = vtkDoubleArray::New();
-  phiarray->SetName(field_name.c_str());
-  phiavgarray = vtkDoubleArray::New();
-  phiavgarray->SetName((field_name + std::string("-Avg")).c_str());
+
+  for (int g=0; g < num_components; g++)
+  {
+    char group_text[100];
+    sprintf(group_text,"%03d",g);
+    phiarray[g]    = vtkDoubleArray::New();
+    phiavgarray[g] = vtkDoubleArray::New();
+
+    phiarray[g]   ->SetName((field_name +
+                             std::string("_g") +
+                             std::string(group_text)).c_str());
+    phiavgarray[g]->SetName((field_name +
+                             std::string("_g") +
+                             std::string(group_text) +
+                             std::string("_avg")).c_str());
+  }
 
   //======================================== Precreate nodes to map
   std::vector<int> cfem_nodes;
 
   for (const auto& cell : grid->local_cells)
     for (auto vid : cell.vertex_ids)
-      for (int g=0; g < num_components; g++)
+//      for (int g=0; g < num_components; g++)
         cfem_nodes.push_back(vid);
 
   std::vector<int> mapping;
@@ -346,17 +358,21 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
 
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
+      for (int g=0; g < num_components; g++)
       {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray[g]->InsertNextValue(dof_value);
+        }
+        phiavgarray[g]->InsertNextValue(cell_avg_value/num_verts);
       }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
+
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
@@ -385,17 +401,22 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
 
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
+      int old_counter=counter;
+      for (int g=0; g < num_components; g++)
       {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
+        counter = old_counter;
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter]+g;
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray[g]->InsertNextValue(dof_value);
+        }
+        phiavgarray[g]->InsertNextValue(cell_avg_value/num_verts);
       }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
@@ -443,17 +464,20 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
 
-      double cell_avg_value = 0.0;
-      for (int v=0; v<num_verts; v++)
+      for (int g=0; g < num_components; g++)
       {
-        counter++;
-        int ir = mapping[counter];
-        double dof_value = 0.0;
-        VecGetValues(phi_vec,1,&ir,&dof_value);;
-        cell_avg_value+= dof_value;
-        phiarray->InsertNextValue(dof_value);
+        double cell_avg_value = 0.0;
+        for (int v=0; v<num_verts; v++)
+        {
+          counter++;
+          int ir = mapping[counter];
+          double dof_value = 0.0;
+          VecGetValues(phi_vec,1,&ir,&dof_value);;
+          cell_avg_value+= dof_value;
+          phiarray[g]->InsertNextValue(dof_value);
+        }
+        phiavgarray[g]->InsertNextValue(cell_avg_value/num_verts);
       }
-      phiavgarray->InsertNextValue(cell_avg_value/num_verts);
     }//polyhedron
   }//for local cells
 
@@ -472,15 +496,19 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
 
   ugrid->GetCellData()->AddArray(matarray);
   ugrid->GetCellData()->AddArray(pararray);
-  ugrid->GetPointData()->AddArray(phiarray);
-  ugrid->GetCellData()->AddArray(phiavgarray);
+
+  for (int g=0; g < num_components; g++)
+  {
+    ugrid->GetPointData()->AddArray(phiarray[g]);
+    ugrid->GetCellData()->AddArray(phiavgarray[g]);
+  }
 
   grid_writer->SetInputData(ugrid);
   grid_writer->SetFileName(location_filename.c_str());
 
   /*It seems that cluster systems throw an error when the pvtu file
    * also tries to write to the serial file.*/
-  if (chi_mpi.location_id != 0)
+//  if (chi_mpi.location_id != 0)
     grid_writer->Write();
 
   //============================================= Parallel summary file

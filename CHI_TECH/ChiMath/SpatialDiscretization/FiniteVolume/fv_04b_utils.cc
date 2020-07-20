@@ -3,6 +3,7 @@
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 
 #include "ChiMath/UnknownManager/unknown_manager.h"
+#include "ChiMath/PETScUtils/petsc_utils.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
@@ -27,7 +28,7 @@ unsigned int SpatialDiscretization_FV::
 }
 
 //###################################################################
-/**Get the number of local degrees-of-freedom.*/
+/**Get the number of global degrees-of-freedom.*/
 unsigned int SpatialDiscretization_FV::
   GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
                    chi_math::UnknownManager* unknown_manager)
@@ -80,4 +81,18 @@ std::vector<int> SpatialDiscretization_FV::
     }
 
   return dof_ids;
+}
+
+//###################################################################
+/**Develops a localized view of a petsc vector.*/
+void SpatialDiscretization_FV::
+  LocalizePETScVector(Vec petsc_vector,
+                      std::vector<double>& local_vector,
+                      chi_math::UnknownManager* unknown_manager)
+{
+  size_t num_local_dofs = GetNumLocalDOFs(ref_grid,unknown_manager);
+
+  chi_math::PETScUtils::CopyVecToSTLvector(petsc_vector,
+                                           local_vector,
+                                           num_local_dofs);
 }

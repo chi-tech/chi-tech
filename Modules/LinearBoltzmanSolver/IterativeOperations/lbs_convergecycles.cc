@@ -4,9 +4,10 @@
 #include <ChiTimer/chi_timer.h>
 #include <ChiLog/chi_log.h>
 
-
 extern ChiLog& chi_log;
 extern ChiTimer chi_program_timer;
+
+#include <iomanip>
 
 //###################################################################
 /**Performs iterations without source updates to converge cyclic

@@ -6,6 +6,8 @@
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 
+#include <algorithm>
+
 //###################################################################
 /**Adds a new cell to grid registry.*/
 void chi_mesh::MeshContinuum::GlobalCellHandler::

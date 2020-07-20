@@ -16,12 +16,16 @@ You can get the current mesh-handler using:
     auto cur_handler = chi_mesh::GetCurrentHandler();
  \endcode
 
-The computational grid is contained in a chi_mesh::MeshContinuum object which
+If an existing MeshHandler is not available one can easily create one
+with a call to chi_mesh::GetNewHandler().
+ The computational grid is contained in a chi_mesh::MeshContinuum object which
 you can obtain with:
 
 \code
 auto grid = cur_handler->GetGrid();
 \endcode
+
+If there is no existing grid then one can be created as detailed in 
 
 ## _
 ## More detail on Mesh data structures

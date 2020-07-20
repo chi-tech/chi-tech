@@ -10,7 +10,7 @@ to elements.*/
 class chi_mesh::SurfaceMesherPredefined : public chi_mesh::SurfaceMesher
 {
 public:
-  SurfaceMesherPredefined()
+  SurfaceMesherPredefined() : SurfaceMesher(SurfaceMesherType::Passthrough)
   {
     partitioning_x = 1;
     partitioning_y = 1;

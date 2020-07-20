@@ -7,6 +7,8 @@
 
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
 
+#include <memory>
+
 //###################################################################
 /**Angle aggregation has to cater for running the 8 corners of a 3D
  * partitioning, the 4 corners of a 2D partitioning (the latter 2 both being

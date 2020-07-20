@@ -38,6 +38,11 @@ RegisterFunction(chiGetProductQuadrature)
 RegisterFunction(chiMeshCreate1DSlabMesh)
 RegisterFunction(chiMeshCreate2DOrthoMesh)
 RegisterFunction(chiMeshCreate3DOrthoMesh)
+
+RegisterFunction(chiMeshCreateUnpartitioned1DOrthoMesh)
+RegisterFunction(chiMeshCreateUnpartitioned2DOrthoMesh)
+RegisterFunction(chiMeshCreateUnpartitioned3DOrthoMesh)
+
 RegisterFunction(chiUnpartitionedMeshFromVTU)
 RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
 
@@ -86,7 +91,13 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiSurfaceMesherCreate)
       RegisterConstant(SURFACEMESHER_PREDEFINED,   1);
       RegisterConstant(SURFACEMESHER_DELAUNAY,   2);
-      RegisterConstant(SURFACEMESHER_TRIANGLE,   3);
+//      RegisterConstant(SURFACEMESHER_TRIANGLE,   3);
+
+    RegisterNamespace(SurfaceMesherType)
+    AddNamedConstantToNamespace(Passthrough,1,SurfaceMesherType)
+    AddNamedConstantToNamespace(Delaunay,2,SurfaceMesherType)
+
+
     RegisterFunction(chiSurfaceMesherExecute)
     RegisterFunction(chiSurfaceMesherSetProperty)
       RegisterConstant(MAX_AREA,   1);

@@ -37,31 +37,32 @@
 \code
 cmake_minimum_required(VERSION 3.2)
 
-SET(TARGET test)
+set(TARGET test)
 project(${TARGET} C CXX)
+set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")
+include("${CHI_TECH_DIR}/CHI_RESOURCES/Macros/Downstream.cmake")
 
-include(~/Desktop/ChiTech/chi-tech/CHI_RESOURCES/Macros/Downstream.cmake)
-
-set(SOURCES "test.cc" )
-
+file (GLOB_RECURSE SOURCES "*.cc")
 add_executable(${TARGET} "${SOURCES}")
 target_link_libraries(${TARGET} ${CHI_LIBS})
 \endcode
 
-The `SET(TARGET test)` line sets the name of the eventual executable
+The `set(TARGET test)` line sets the name of the eventual executable
 to be used. You can use any name other than `test`.
+The `set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")` line sets the directory
+of an installed chi-tech. Change this line to point to the appropriate
+directory.
 The `include` statement allows you to connect to all the resources connected
 to Chi-Tech, including lua, PETSc, etc.
 You will have to find the location where you compiled Chi-Tech in order to
 properly specify the location of `Downstream.cmake`. Once this is properly
 specified, the cmake-variable `CHI_LIBS` will be defined and the necessary
 include-files will be usable.
-The source-file names are specified via the line `set(SOURCES "test.cc")`.
-Additional source files can be specified using:
-
-\code
- set(SOURCES ${SOURCES} "another_file.cc")
-\endcode
+ The line `file (GLOB_RECURSE SOURCES "*.cc")` adds all `.cc` files,
+ in the current directory, to
+ the list of sources to compile. To specify specific
+ source-file names use `set(SOURCES "test.cc")`. Alternatively cmake
+ functionality can be googled to determine how to add sub-directories.
 
 ## _
 

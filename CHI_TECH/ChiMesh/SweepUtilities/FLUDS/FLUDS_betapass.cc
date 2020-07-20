@@ -2,13 +2,13 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <ChiMesh/Cell/cell.h>
-
 #include <chi_log.h>
 #include <chi_mpi.h>
 
 extern ChiLog&     chi_log;
 extern ChiMPI&      chi_mpi;
+
+#include <algorithm>
 
 //###################################################################
 /**Receives and send predecessor data.*/

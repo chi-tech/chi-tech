@@ -12,13 +12,6 @@ else()
 endif()
 
 #------------------------------------------------ DEPENDENCIES
-if (NOT (DEFINED ENV{BOOST_ROOT}))
-    message(FATAL_ERROR "***** BOOST_ROOT is not set *****")
-else()
-    set(BOOST_ROOT    "$ENV{BOOST_ROOT}")
-    message(STATUS "BOOST_ROOT set to ${BOOST_ROOT}")
-endif()
-
 if (NOT (DEFINED ENV{PETSC_ROOT}))
     message(FATAL_ERROR "***** PETSC_ROOT is not set *****")
 else()
@@ -31,20 +24,6 @@ if (NOT (DEFINED ENV{LUA_ROOT}))
 else()
     set(LUA_ROOT    "$ENV{LUA_ROOT}")
     message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
-endif()
-
-if (NOT (DEFINED ENV{TRIANGLE_ROOT}))
-    message(FATAL_ERROR "***** TRIANGLE_ROOT is not set *****")
-else()
-    set(TRIANGLE_ROOT    "$ENV{TRIANGLE_ROOT}")
-    message(STATUS "TRIANGLE_ROOT set to ${TRIANGLE_ROOT}")
-endif()
-
-if (NOT (DEFINED ENV{RANDOM123_ROOT}))
-    message(FATAL_ERROR "***** RANDOM123_ROOT is not set *****")
-else()
-    set(RANDOM123_ROOT    "$ENV{RANDOM123_ROOT}")
-    message(STATUS "RANDOM123_ROOT set to ${RANDOM123_ROOT}")
 endif()
 
 #================================================ Set project targets
@@ -80,9 +59,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable -Wno-sign-compare")
-  set_source_files_properties(Modules/LinearBoltzmanSolver/lbs_main_initialize.cc PROPERTIES COMPILE_FLAGS "-Wno-format")
-  set_source_files_properties(CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/prop_transportxs_03_ecollapse.cc PROPERTIES COMPILE_FLAGS "-Wno-int-in-bool-context")
-  set_source_files_properties(CHI_TECH/ChiMesh/SurfaceMesher/Delaunay/delaunay_patch_00_utils.cc PROPERTIES COMPILE_FLAGS "-Wno-int-in-bool-context")
   set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -96,11 +72,7 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
-include_directories("${CHI_TECH_DEP}/Random123/include")
-include_directories("${TRIANGLE_ROOT}")
 include_directories("${PETSC_ROOT}/include")
-include_directories("${BOOST_ROOT}/include")
-include_directories("${RANDOM123_ROOT}/include")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
@@ -108,12 +80,7 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
-link_directories("${TRIANGLE_ROOT}")
 link_directories("${PETSC_ROOT}/lib")
-#link_directories("${BOOST_ROOT}/lib")
-
-set(TRIANGLE "${TRIANGLE_ROOT}/triangle.o")
-
 # --------------------------- VTK
 find_package(VTK COMPONENTS
              vtkCommonCore vtkCommonDataModel
@@ -139,8 +106,7 @@ else ()
     )
 endif()
 
-set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ${TRIANGLE})
-
+set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 #================================================ Default include directories
 include_directories("${CHI_TECH_DIR}/ChiLua")

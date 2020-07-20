@@ -11,6 +11,8 @@
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
+#include <iomanip>
+
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;

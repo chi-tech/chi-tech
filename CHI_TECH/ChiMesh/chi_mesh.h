@@ -79,10 +79,10 @@ namespace chi_mesh
 
   //=================================== Surface Meshers
   class SurfaceMesher;
+  class SurfaceMesherPassthrough;
   class SurfaceMesherPredefined;
   class SurfaceMesherDelaunay;
   class SurfaceMesherTriangle;
-  //struct DelaunayMeshContext;
 
   struct Interface;
 
@@ -92,6 +92,7 @@ namespace chi_mesh
   class VolumeMesherPredefined2D;
   class VolumeMesherExtruder;
   class VolumeMesherPredefined3D;
+  class VolumeMesherPredefinedUnpartitioned;
 
 
 
@@ -114,7 +115,7 @@ namespace chi_mesh
                                 Vertex* line_point_1,
                                 double tolerance);
 
-  //=================================== Utilities
+  //=================================== OrthoMeshes
   void Create1DSlabMesh(std::vector<double>& vertices_1d);
 
   void Create2DOrthoMesh(std::vector<double>& vertices_1d_x,
@@ -123,6 +124,15 @@ namespace chi_mesh
   void Create3DOrthoMesh(std::vector<double>& vertices_1d_x,
                          std::vector<double>& vertices_1d_y,
                          std::vector<double>& vertices_1d_z);
+
+  void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices_1d);
+
+  void CreateUnpartitioned2DOrthoMesh(std::vector<double>& vertices_1d_x,
+                                      std::vector<double>& vertices_1d_y);
+
+  void CreateUnpartitioned3DOrthoMesh(std::vector<double>& vertices_1d_x,
+                                      std::vector<double>& vertices_1d_y,
+                                      std::vector<double>& vertices_1d_z);
 }
 
 #include "chi_meshvector.h"

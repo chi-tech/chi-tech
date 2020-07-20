@@ -53,16 +53,15 @@ LBSGroupset::LBSGroupset()
 
 //###################################################################
 /**Computes the discrete to moment operator.*/
-void LBSGroupset::BuildDiscMomOperator(int scatt_order)
+void LBSGroupset::BuildDiscMomOperator(
+  int scatt_order,
+  LinearBoltzman::GeometryType geometry_type)
 {
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
-
   int num_angles = quadrature->abscissae.size();
   int num_moms = 0;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D Slab
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  if (geometry_type == LinearBoltzman::GeometryType::ONED_SLAB)
   {
     int mc=-1; //moment count
     for (int ell=0; ell<=scatt_order; ell++)
@@ -87,9 +86,8 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
     }//for ell
   }//line mesh
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
-  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)) )
+  else if ( (geometry_type == LinearBoltzman::GeometryType::TWOD_CARTESIAN) or
+            (geometry_type == LinearBoltzman::GeometryType::THREED_CARTESIAN) )
   {
     int mc=-1; //moment count
     for (int ell=0; ell<=scatt_order; ell++)
@@ -115,8 +113,8 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
   }//extruder
   else
   {
-    chi_log.Log(LOG_ALLERROR) << "Unsupported mesh type encountered in call to"
-                                 "LBSGroupset::BuildDiscMomOperator.";
+    chi_log.Log(LOG_ALLERROR) << "Unsupported geometry type encountered in "
+                                 "call to LBSGroupset::BuildDiscMomOperator.";
     exit(EXIT_FAILURE);
   }
 
@@ -141,7 +139,9 @@ void LBSGroupset::BuildDiscMomOperator(int scatt_order)
 
 //###################################################################
 /**Computes the moment to discrete operator.*/
-void LBSGroupset::BuildMomDiscOperator(int scatt_order)
+void LBSGroupset::BuildMomDiscOperator(
+  int scatt_order,
+  LinearBoltzman::GeometryType geometry_type)
 {
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
@@ -150,7 +150,7 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
   int num_moms = 0;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D Slab
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  if (geometry_type == LinearBoltzman::GeometryType::ONED_SLAB)
   {
     int mc=-1;
     for (int ell=0; ell<=scatt_order; ell++)
@@ -175,9 +175,8 @@ void LBSGroupset::BuildMomDiscOperator(int scatt_order)
     }//for ell
   }//line mesh
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
-  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)) )
+  else if ( (geometry_type == LinearBoltzman::GeometryType::TWOD_CARTESIAN) or
+            (geometry_type == LinearBoltzman::GeometryType::THREED_CARTESIAN) )
   {
     int mc=-1;
     for (int ell=0; ell<=scatt_order; ell++)

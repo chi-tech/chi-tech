@@ -1,7 +1,8 @@
 #ifndef chi_mesh_unpartitionedmesh_h
 #define chi_mesh_unpartitionedmesh_h
 
-#include "../chi_mesh.h"
+#include "ChiMesh/chi_mesh.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include <vtkCell.h>
 
@@ -11,6 +12,13 @@
 class chi_mesh::UnpartitionedMesh
 {
   friend class VolumeMesherPredefined3D;
+  friend class VolumeMesherPredefinedUnpartitioned;
+  friend void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices);
+  friend void CreateUnpartitioned2DOrthoMesh(std::vector<double>& vertices_1d_x,
+                                             std::vector<double>& vertices_1d_y);
+  friend void CreateUnpartitioned3DOrthoMesh(std::vector<double>& vertices_1d_x,
+                                             std::vector<double>& vertices_1d_y,
+                                             std::vector<double>& vertices_1d_z);
 private:
   struct LightWeightFace
   {
@@ -19,10 +27,13 @@ private:
   };
   struct LightWeightCell
   {
+    const chi_mesh::CellType type;
     chi_mesh::Vertex centroid;
     int material_id=-1;
     std::vector<int> vertex_ids;
     std::vector<LightWeightFace> faces;
+
+    LightWeightCell(chi_mesh::CellType in_type) : type(in_type) {}
   };
 private:
   std::vector<chi_mesh::Vertex*>  vertices;

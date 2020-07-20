@@ -7,11 +7,20 @@
 namespace LinearBoltzman
 {
 
-
+enum class GeometryType
+{
+  NO_GEOMETRY_SET  = 0,
+  ONED_SLAB        = 1,
+  ONED_SPHERICAL   = 2,
+  TWOD_CARTESIAN   = 3,
+  TWOD_CYLINDRICAL = 4,
+  THREED_CARTESIAN = 5
+};
 
 /**Struct for storing NPT options.*/
 struct Options
 {
+  GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
   int  scattering_order;
   int  partition_method;
   int  sweep_eager_limit;

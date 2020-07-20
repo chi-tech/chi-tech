@@ -7,6 +7,7 @@ extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 
 #include <sstream>
+#include <algorithm>
 
 //###################################################################
 /**Initializes the Depth-Of-Graph algorithm.*/

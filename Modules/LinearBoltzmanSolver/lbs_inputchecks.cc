@@ -47,5 +47,17 @@ void LinearBoltzman::Solver::PerformInputChecks()
   chi_mesh::Region*  aregion = regions.back();
   grid                       = aregion->GetGrid();
 
-
+  //======================================== Determine geometry type
+  if (grid->local_cells[0].Type() == chi_mesh::CellType::SLAB)
+  {
+    options.geometry_type = GeometryType::ONED_SLAB;
+  }
+  else if (grid->local_cells[0].Type() == chi_mesh::CellType::POLYGON)
+  {
+    options.geometry_type = GeometryType::TWOD_CARTESIAN;
+  }
+  else if (grid->local_cells[0].Type() == chi_mesh::CellType::POLYHEDRON)
+  {
+    options.geometry_type = GeometryType::THREED_CARTESIAN;
+  }
 }

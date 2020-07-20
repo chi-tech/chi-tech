@@ -6,6 +6,8 @@ extern ChiLog& chi_log;
 #include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
+#include <algorithm>
+
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/
 void SpatialDiscretization_PWL::
@@ -22,7 +24,7 @@ void SpatialDiscretization_PWL::
 
   if (chi_mpi.location_id == 0)
     for (auto locI : locI_block_addr)
-      printf("Block address = %d\n", locI);
+      chi_log.Log(LOG_ALLVERBOSE_1) << "Block address = " << locI;
   MPI_Barrier(MPI_COMM_WORLD);
 
   //**************************************** DEFINE UTILITIES
@@ -207,7 +209,9 @@ void SpatialDiscretization_PWL::
     sendcount[locI] = locI_data.size();
 
     if (chi_mpi.location_id == 0)
-      printf("To send to %d = %d\n", locI, sendcount[locI]);
+      chi_log.Log(LOG_ALLVERBOSE_1)
+        << "To send to " << locI
+        << " = " << sendcount[locI];
 
     ++locI;
   }
