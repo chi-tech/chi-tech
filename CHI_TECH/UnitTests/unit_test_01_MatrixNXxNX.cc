@@ -57,21 +57,6 @@ bool UnitTest_MatrixNXxNX()
       log.Log(LOG_0) << "finding transpose"<<"\n"<<a.Transpose().PrintS();
       log.Log(LOG_0) << "finding inverse"<<"\n"<<a.Inverse().PrintS();
       log.Log(LOG_0) << "norm of a: "<<a.Norm();
-      //log.Log(LOG_0) << "a*Vec1"<<"\n"<<(a*vec1).PrintS();
-
-      //Matrix A arithmetic 
-      // - "+,-"
-      // - A*scalar, scalar*A
-      // - A*vec
-      // - A.Transpose()
-      // - A.Inverse()
-      // - A.Determinant()
-      // - A.Norm()
-
-      //L1-norm: \sum |a_ij|
-      //L2-norm: Frobenius-norm, Vector-size, \sqrt{\sum a_ij^2}
-      //Lp-norm: Dont implement
-      //Linf-norm:  max(|a_ij|)
   }
   return true;
 }

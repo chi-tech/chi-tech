@@ -14,7 +14,7 @@
 
 namespace chi_math{
   //#################################################################
-  /**Generalized Matrix notion.
+  /**Generalized fixed size square matrix using chi_math::VectorNX for rows.
    * \author Jerry, Jan.*/
 
     template <int N, class NumberFormat>
@@ -22,195 +22,178 @@ namespace chi_math{
     {
         std::array<chi_math::VectorNX<N,NumberFormat>,N> elements;
 
-        /**Constructor for a matrix filled with 0s*/
+        /**Constructor for a matrix filled with 0s.*/
         MatrixNXxNX()
         {
             chi_math::VectorNX<N,NumberFormat> newVector;
-            for(int i = 0; i<N;++i){
+            for(int i = 0; i<N;++i)
                 elements[i] = newVector;
-            }
         }
         
-        /**Constructor for a matrix filled with value*/
+        /**Constructor for a matrix filled with value.*/
         MatrixNXxNX(NumberFormat value)
         {
             chi_math::VectorNX<N,NumberFormat> newVector(value);
-            for(int i = 0; i<N;++i){
+            for(int i = 0; i<N;++i)
                 elements[i] = newVector;
-            }
         }
 
-        /**Component-wise copy*/
+        /**Component-wise copy.*/
         MatrixNXxNX& operator=(const MatrixNXxNX& rhs)
         {
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     elements[i](j) = rhs.elements[i][j];
-                }
-            }
+            
             return *this;
         }
         
         //============================================ Addition
-        /** Component-wise addition by a scalar*/
+        /** Component-wise addition by a scalar.*/
         MatrixNXxNX& Shift( const NumberFormat value )
         {
-            for(int i = 0;i<N;++i){
-                for(int j = 0;  j<N; ++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;  j<N; ++j)
                     elements[i](j) += value;
-                }
-            }
+
             return *this;
         }
 
-        /** Component-wise addition of two matrices*/
+        /** Component-wise addition of two matrices.*/
         MatrixNXxNX operator+(const MatrixNXxNX& rhs) const
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     newMatrix.elements[i](j) = elements[i][j] + rhs.elements[i][j];
-                }
-            }
+            
             return newMatrix;
         }
         
-        /** In-place componet wise addition of two matrices*/
+        /** In-place componet wise addition of two matrices.*/
         MatrixNXxNX& operator +=(const MatrixNXxNX& rhs)
         {
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     elements[i](j) += rhs.elements[i][j];
-                }
-            }
+            
             return *this;
         }
         //============================================ Subtraction
-        /** Component-wise subtraction by a scalar*/
-        
-        /** Component-wise subtraction of two matrices*/
+        /** Component-wise subtraction of two matrices.*/
         MatrixNXxNX operator-(const MatrixNXxNX& rhs)
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     newMatrix.elements[i](j) = elements[i][j]- rhs.elements[i][j];
-                }
-            }
+            
 
             return newMatrix;
         }
-        /** In-place componet wise subtraction of two matrices*/
+        /** In-place componet wise subtraction of two matrices.*/
         MatrixNXxNX& operator -=(const MatrixNXxNX& rhs)
         {
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     elements[i](j) -= rhs.elements[i][j];
-                }
-            }
+            
             return *this;
         }
         //============================================ Multiplication
-        /** Component-wise multiplication by a scalar*/
+        /** Component-wise multiplication by a scalar.*/
         MatrixNXxNX operator*(NumberFormat value) const
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
 
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     newMatrix.elements[i](j) = elements[i][j] * value;
-                }
-            }
+            
             return newMatrix;
         }
 
         
-        /** pure multiplication of two matricies*/
+        /** Pure multiplication of two matricies.*/
         MatrixNXxNX operator*(const MatrixNXxNX& rhs) const
         {
             MatrixNXxNX<N,NumberFormat> result;
-            for(int i = 0; i < elements.size(); ++i){
-                for(int j = 0; j < N; ++j){
+            for(int i = 0; i < elements.size(); ++i)
+                for(int j = 0; j < N; ++j)
                     for(int k = 0; k < N; ++k)
-                    {
                         result.elements[i](j) += elements[i][k] * rhs.elements[k][j];
-                    }
-                }
-            }
+
             return result;
         }
 
-        /** multiplication of matrix and vector*/
+        /** Multiplication of matrix and vector.*/
         MatrixNXxNX operator*(const chi_math::VectorNX<N,NumberFormat>& rhs) const
         {
             MatrixNXxNX<N,NumberFormat> result;
-            for (int i=0; i<N;++i){
-                for(int j=0;j<N;++j){
+            for (int i=0; i<N;++i)
+                for(int j=0;j<N;++j)
                     result.elements[i](j) = elements[i][j]*rhs.elements[j];
-                }
-            }
+
             return result;
         }
         
-        /** Component-wise multiplication of two matrices*/
+        /** Component-wise multiplication of two matrices.*/
         MatrixNXxNX MultComponentWise(const MatrixNXxNX& rhs) const
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
 
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     newMatrix.elements[i](j) = elements[i][j] * rhs.elements[i][j];
-                }
-            }
+
             return newMatrix;
         }
 
         //=============================================Division
-        /** Component-wise division by a scalar*/
+        /** Component-wise division by a scalar.*/
         MatrixNXxNX operator/(NumberFormat value) const
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
 
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     newMatrix.elements[i](j) = elements[i][j] / value;
-                }
-            }
+
             return newMatrix;
         }
         
-        /** Component-wise division of two matrices*/
+        /** Component-wise division of two matrices.*/
         MatrixNXxNX DivComponentWise(const MatrixNXxNX& rhs) const
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
 
-            for(int i = 0;i<N;++i){
-                for(int j = 0;j<N;++j){
+            for(int i = 0;i<N;++i)
+                for(int j = 0;j<N;++j)
                     newMatrix.elements[i](j) = elements[i][j] / rhs.elements[i][j];
-                }
-            }
+
             return newMatrix;
         }
         
-        
-        /**returns the value stored at (i,j)*/
+        //=============================================Element access
+        /**Returns the value stored at (i,j).*/
         NumberFormat GetIJ(int i, int j)
         {
             return elements[i][j];
         }
         
-        /**Sets the position (i,j) equal to value*/
+        /**Sets the position (i,j) equal to value.*/
         void SetIJ(int i, int j, NumberFormat value)
         {
             elements[i](j) = value;
         }
         
-        /**adds value to the exisiting value at (i,j)*/
+        /**Adds value to the exisiting value at (i,j).*/
         void AddIJ(int i, int j, NumberFormat value)
         {
             elements[i](j) += value;
         }
         
+        //=============================================Utilities
         /**Sets the diagonal of the matrix.*/
         void SetDiagonalVec(std::vector<NumberFormat> vec)
         {   
@@ -219,34 +202,30 @@ namespace chi_math{
                 log.Log(LOG_ALLERROR)<<"MatrixNXxNX::SetDiagonalVec, incompatible vector size";
                 exit(EXIT_FAILURE);
             }
-            for(int i = 0;i<N;++i){
+            for(int i = 0;i<N;++i)
                 elements[i](i) = vec[i];
-            }
         }
-        /**Set row i using a vector*/
+        /**Set row i using a vector.*/
         void SetRowIVec(int i, std::vector<NumberFormat> vec){
             if (N!=vec.size()){
                 auto& log = ChiLog::GetInstance();
                 log.Log(LOG_ALLERROR)<<"error"<<std::endl;
-                //change this before commit;
             }
 
-            for (int j =0; j<N;++j){
+            for (int j =0; j<N;++j)
                 elements[i](j) = vec[j];
-            }
 
         }
         
-        /** sets column j using a vector*/
+        /** Sets column j using a vector.*/
         void SetColJVec(int j, std::vector<NumberFormat> vec){
             if (N!=vec.size()){
                 auto& log = ChiLog::GetInstance();
                 log.Log(LOG_ALLERROR)<<"error"<<std::endl;
             }
 
-            for (int i =0; i<N;++i){
+            for (int i =0; i<N;++i)
                 elements[i](j) = vec[i];
-            }
 
         }
 
@@ -276,9 +255,8 @@ namespace chi_math{
                         newMatrix.SetIJ(i,j,newMatrix.GetIJ(i,j)*sign);
                     }
                 }
-                for(int j = 0; j<N; ++j){
+                for(int j = 0; j<N; ++j)
                     determinant = determinant + newMatrix.elements[0][j]*MinorIJ(0,j);
-                }
             }
 
             return determinant;
@@ -286,7 +264,7 @@ namespace chi_math{
         }
         
         /**Gets the minor value associated with row ir and column jr
-        this is being used Recursively to find the determiant*/
+        this is being used Recursively to find the determiant.*/
         NumberFormat MinorIJ(int ir, int jr) const
         {
             MatrixNXxNX<N-1,NumberFormat> minor;
@@ -306,27 +284,25 @@ namespace chi_math{
             return minor.Det();
         }
         
-        /**Compute the matrix transpose*/
+        /**Compute the matrix transpose.*/
         MatrixNXxNX Transpose() const
         {
             MatrixNXxNX<N,NumberFormat> newMatrix;
             for (int i = 0; i < N; ++i)
-                for (int j = 0; j < N; ++j) {
+                for (int j = 0; j < N; ++j)
                     newMatrix.elements[j](i) = elements[i][j];
-                }
             
             return newMatrix;
         }
-        /**computes the matrix inverse*/
+        /**Computes the matrix inverse.*/
         MatrixNXxNX Inverse()
         {
             MatrixNXxNX<N,NumberFormat> invertedMatrix;
             // ======================= compute the matrix of minors
-            for (int i = 0; i<N; ++i){
-                for (int j = 0; j<N; ++j){
+            for (int i = 0; i<N; ++i)
+                for (int j = 0; j<N; ++j)
                     invertedMatrix.SetIJ(i,j,MinorIJ(i,j));
-                }
-            }
+
             // ======================= compute the matrix of cofactors
             int sign = -1;
             for (int i=0; i<N; i++)
@@ -347,25 +323,22 @@ namespace chi_math{
             return invertedMatrix*(1/determiant);
         }
 
-        /** calculated the norm of a matrix
+        /** Computes the L2-norm of the matrix.
          * \sqrt{\sum a_ij^2} */
         NumberFormat Norm()
         {
             NumberFormat adderupper = 0.0;
-            for (int i = 0; i<N; ++i){
-                for (int j = 0; j<N;++j){
+            for (int i = 0; i<N; ++i)
+                for (int j = 0; j<N;++j)
                     adderupper += (elements[i][j]*elements[i][j]);
-                }
-            }
             return sqrt(adderupper);
         }
 
         void Print() const
         {
             for(int i = 0;i<N;++i){
-                for(int j = 0;j<N-1;++j){
+                for(int j = 0;j<N-1;++j)
                     std::cout<<elements[i][j]<<" ";
-                }
                 
                 std::cout<<elements[i][N-1]<<std::endl;
             }
@@ -373,7 +346,7 @@ namespace chi_math{
             
         }
 
-        /**outputs matrix to stringstream*/
+        /**Outputs matrix to stringstream.*/
         std::string PrintS() const
         {
             std::stringstream out;
@@ -401,7 +374,7 @@ namespace chi_math{
 
     };
 
-    /** this prevents the det() from creating a matrix of size -1*/
+    /** This prevents the det() from creating a matrix of size -1.*/
     template <class NumberFormat>
     struct MatrixNXxNX<0,NumberFormat>
     {
@@ -419,7 +392,7 @@ namespace chi_math{
     };
 }
 
-/**multiplication by a scalar from the left.*/
+/**Multiplication by a scalar from the left.*/
 template<int N,class NumberFormat>
 chi_math::MatrixNXxNX<N,NumberFormat>
 operator*(const double value, const chi_math::MatrixNXxNX<N,NumberFormat>& rhs)
