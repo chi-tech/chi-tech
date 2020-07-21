@@ -4,8 +4,10 @@
 
 //###################################################################
 /**Constructor.*/
-SpatialDiscretization_PWL::SpatialDiscretization_PWL(int dim)
-  : SpatialDiscretization(dim)
+SpatialDiscretization_PWL::
+  SpatialDiscretization_PWL(int dim,
+                            chi_math::SpatialDiscretizationType sd_method)
+  : SpatialDiscretization(dim, sd_method)
 {
   chi_math::QuadratureTriangle* new_triquad;
 
@@ -29,12 +31,3 @@ SpatialDiscretization_PWL::SpatialDiscretization_PWL(int dim)
   mapping_initialized = false;
 }
 
-//###################################################################
-/**Maps a vertex id according to a developed node ordering.*/
-int SpatialDiscretization_PWL::MapCFEMDOF(int vertex_id)
-{
-  if (node_mapping.empty())
-    return vertex_id;
-
-  return node_mapping[vertex_id];
-}

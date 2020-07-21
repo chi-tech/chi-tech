@@ -63,7 +63,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
   }
   else
   {
-    for (int b=0; b<region->boundaries.size(); b++)
+    for (int b=0; b<std::max(1,(int)region->boundaries.size()); b++)
     {
       chi_diffusion::Boundary* new_bndry =
         new chi_diffusion::BoundaryDirichlet;

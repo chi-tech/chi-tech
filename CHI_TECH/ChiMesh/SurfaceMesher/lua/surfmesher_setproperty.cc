@@ -1,7 +1,6 @@
 #include "../../../ChiLua/chi_lua.h"
 #include <iostream>
 #include "../surfacemesher.h"
-#include "../Triangle/triangle_mesher.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
 #include <chi_log.h>
@@ -35,25 +34,9 @@ int chiSurfaceMesherSetProperty(lua_State *L)
   //================================================== Area constraint
   if (property_num == 1)   //MAX_AREA
   {
-    if (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherTriangle))
-    {
-      chi_mesh::SurfaceMesherTriangle* tri_mesher =
-        (chi_mesh::SurfaceMesherTriangle*)(cur_hndlr->surface_mesher);
-
-      double constraint = lua_tonumber(L,2);
-      tri_mesher->area_constraint = constraint;
-      tri_mesher->get_auto_min = false;
-      chi_log.Log(LOG_0VERBOSE_2) << "SurfaceMesherTriangle: "
-                                   "Area constraint set to "
-                                << constraint;
-    }
-    else
-    {
-      chi_log.Log(LOG_0WARNING) << "Current surface mesher is not "
-                                   "of type SURFACEMESHER_TRIANGLE. Therefor "
-                                   "propery MAX_AREA will be ignored in call"
-                                   " to chiSurfaceMesherSetProperty";
-    }
+    chi_log.Log(LOG_0WARNING) << "Deprecated and removed feature"
+                                 "property MAX_AREA in call"
+                                 " to chiSurfaceMesherSetProperty";
   }
   //================================================== Partitioning
   if (property_num == 2)   //PARTITION_X

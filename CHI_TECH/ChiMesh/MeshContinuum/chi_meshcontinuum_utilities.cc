@@ -1,13 +1,13 @@
 #include "chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell_slab.h"
 
-#include <boost/graph/bandwidth.hpp>
-
 #include <chi_mpi.h>
 #include <chi_log.h>
 
 extern ChiMPI& chi_mpi;
 extern ChiLog&  chi_log;
+
+#include <algorithm>
 
 //###################################################################
 /**Populates a face histogram.

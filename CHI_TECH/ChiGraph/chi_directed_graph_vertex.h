@@ -3,6 +3,8 @@
 
 #include "chi_graph.h"
 
+#include <map>
+
 //###################################################################
 /**General implementation of a directed-graph vertex.*/
 struct chi_graph::GraphVertex

@@ -2,7 +2,6 @@
 #include<iostream>
 #include "../chi_domdecomp.h"
 #include "../../MeshHandler/chi_meshhandler.h"
-#include "../../SurfaceMesher/Triangle/triangle_mesher.h"
 
 #include <typeinfo>
 

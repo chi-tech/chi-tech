@@ -2,6 +2,7 @@
 #define _chi_math_unknown_manager_h
 
 #include <vector>
+#include <string>
 
 namespace chi_math
 {
@@ -17,6 +18,12 @@ namespace chi_math
     TENSOR   = 5
   };
 
+  enum class DOFStorageType
+  {
+    NODAL = 1,
+    BLOCK = 2
+  };
+
 //###################################################################
 /**General object for the management of unknowns in mesh-based
  * mathematical model.*/
@@ -29,10 +36,19 @@ private:
   {
   public:
     const UnknownType type;
+    const unsigned int num_components;
+    std::string text_name;
+    std::vector<std::string> component_text_names;
+    std::vector<int> num_off_block_connections;
 
   public:
-    explicit Unknown(UnknownType in_type) : type(in_type)
-    {}
+    explicit Unknown(UnknownType in_type, int num_comps) :
+      type(in_type),
+      num_components(num_comps)
+    {
+      component_text_names.resize(num_comps);
+      num_off_block_connections.resize(num_comps,0);
+    }
 
     virtual ~Unknown() = default;
 
@@ -48,7 +64,7 @@ private:
     const unsigned int map;
   public:
     explicit ScalarUnknown(unsigned int map_begin) :
-      Unknown(UnknownType::SCALAR),
+      Unknown(UnknownType::SCALAR,1),
       map(map_begin)
     { }
 
@@ -65,12 +81,10 @@ private:
   {
   private:
     const unsigned int map_begin;
-    const unsigned int num_components;
   public:
     Vector2Unknown(unsigned int in_map_begin) :
-      Unknown(UnknownType::VECTOR_2),
-      map_begin(in_map_begin),
-      num_components(2)
+      Unknown(UnknownType::VECTOR_2,2),
+      map_begin(in_map_begin)
     {}
 
     unsigned int GetMap(unsigned int component_0) override
@@ -86,12 +100,10 @@ private:
   {
   private:
     const unsigned int map_begin;
-    const unsigned int num_components;
   public:
     Vector3Unknown(unsigned int in_map_begin) :
-      Unknown(UnknownType::VECTOR_3),
-      map_begin(in_map_begin),
-      num_components(3)
+      Unknown(UnknownType::VECTOR_3,3),
+      map_begin(in_map_begin)
     {}
 
     unsigned int GetMap(unsigned int component_0) override
@@ -107,12 +119,10 @@ private:
   {
   private:
     const unsigned int map_begin;
-    const unsigned int num_components;
   public:
     VectorNUnknown(unsigned int in_map_begin, unsigned int dimension) :
-      Unknown(UnknownType::VECTOR_N),
-      map_begin(in_map_begin),
-      num_components(dimension)
+      Unknown(UnknownType::VECTOR_N,dimension),
+      map_begin(in_map_begin)
     {}
 
     unsigned int GetMap(unsigned int component_0) override
@@ -125,12 +135,28 @@ private:
 
 public:
   std::vector<Unknown*> unknowns;
+  const DOFStorageType dof_storage_type;
+
+  explicit UnknownManager(DOFStorageType in_storage_type=DOFStorageType::NODAL) :
+    dof_storage_type(in_storage_type)
+  {}
 
   unsigned int AddUnknown(UnknownType unk_type, unsigned int dimension=0);
 
   unsigned int MapUnknown(unsigned int unknown_id, unsigned int component = 0);
 
   unsigned int GetTotalUnknownSize();
+
+  void SetUnknownNumOffBlockConnections(unsigned int unknown_id,
+                                        int num_conn);
+  void SetComponentNumOffBlockConnections(unsigned int unknown_id,
+                                          unsigned int component,
+                                          int num_conn);
+  void SetUnknownTextName(unsigned int unknown_id,
+                          const std::string& in_text_name);
+  void SetUnknownComponentTextName(unsigned int unknown_id,
+                                   unsigned int component,
+                                   const std::string& in_text_name);
 
   ~UnknownManager()
   {

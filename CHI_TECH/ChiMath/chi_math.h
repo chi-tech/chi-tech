@@ -15,7 +15,7 @@ typedef std::vector<double> VecDbl;
 typedef std::vector<VecDbl> MatDbl;
 
 //######################################################### Class definition
-/** This object handles the flow of data for math.
+/** This object handles the storage of math entities.
 
 More information of solvers can be obtained from:
 [HERE](http://www.maa.org/press/periodicals/loci/joma/iterative-methods-for-solving-iaxi-ibi-the-sor-method)
@@ -40,6 +40,15 @@ public:
 
 namespace chi_math
 {
+  enum class SpatialDiscretizationType
+  {
+    UNDEFINED                      = 0,
+    FINITE_VOLUME                  = 1,
+    PIECEWISE_LINEAR_CONTINUOUS    = 2,
+    PIECEWISE_LINEAR_DISCONTINUOUS = 3,
+    LAGRANGE_CONTINUOUS            = 4,
+    LAGRANGE_DISCONTINUOUS         = 5
+  };
   class SparseMatrix;
 
   class CDFSampler;

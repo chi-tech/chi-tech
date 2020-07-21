@@ -381,7 +381,7 @@ def InstallPETSc():
     os.chdir("petsc-3.9.4/")
     exstring = "./configure " \
         "--prefix=" + install_dir + "/PETSc/petsc-3.9.4/install " \
-        "--download-hypre=1 " \
+        "--download-hypre=git://https://github.com/hypre-space/hypre.git " \
         "--with-ssl=0 " \
         "--with-debugging=0 " \
         "--with-pic=1 " \
@@ -475,7 +475,7 @@ InstallReadline()
 Install_ncurses()
 InstallLua()
 
-InstallBoost()
+# InstallBoost()
 InstallPETSc()
 InstallVTK()
 
@@ -484,10 +484,10 @@ InstallVTK()
 roots_file.write('export BASE_PATH="' + install_dir + '"\n')
 roots_file.write('\n')
 roots_file.write('export EIGEN_ROOT="$BASE_PATH/EIGEN/eigen-3.3.7"\n')
-roots_file.write('export RANDOM123_ROOT="$BASE_PATH/RANDOM123/Random123-1.13.2"\n')
-roots_file.write('export TRIANGLE_ROOT="/$BASE_PATH/TRIANGLE"\n')
+# roots_file.write('export RANDOM123_ROOT="$BASE_PATH/RANDOM123/Random123-1.13.2"\n')
+# roots_file.write('export TRIANGLE_ROOT="/$BASE_PATH/TRIANGLE"\n')
 roots_file.write('export LUA_ROOT="$BASE_PATH/LUA/lua-5.3.5/install"\n')
-roots_file.write('export BOOST_ROOT="$BASE_PATH/BOOST/boost_1_71_0"\n')
+# roots_file.write('export BOOST_ROOT="$BASE_PATH/BOOST/boost_1_71_0"\n')
 roots_file.write('export PETSC_ROOT="$BASE_PATH/PETSc/petsc-3.9.4/install"\n')
 roots_file.write('export VTK_DIR="$BASE_PATH/VTK/VTK-8.2.0/install"\n')
 roots_file.write('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$BASE_PATH/VTK/VTK-8.2.0/install/lib"\n')

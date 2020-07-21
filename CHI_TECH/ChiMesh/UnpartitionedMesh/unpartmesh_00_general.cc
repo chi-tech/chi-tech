@@ -15,7 +15,7 @@
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKPolyhedron(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell;
+  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYHEDRON);
 
   auto vtk_polyh   = vtkPolyhedron::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_polyh->GetNumberOfPoints();
@@ -54,7 +54,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKHexahedron(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell;
+  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYHEDRON);
 
   auto vtk_hex     = vtkHexahedron::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_hex->GetNumberOfPoints();
@@ -93,7 +93,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKTetrahedron(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell;
+  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYHEDRON);
 
   auto vtk_tet     = vtkTetra::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_tet->GetNumberOfPoints();
@@ -132,7 +132,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKPolygon(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell;
+  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
   auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_polygon->GetNumberOfPoints();
@@ -171,7 +171,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKQuad(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell;
+  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
   auto vtk_quad    = vtkQuad::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_quad->GetNumberOfPoints();
@@ -210,7 +210,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKTriangle(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell;
+  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
   auto vtk_triangle = vtkTriangle::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_triangle->GetNumberOfPoints();

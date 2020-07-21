@@ -22,8 +22,8 @@ extern ChiLog& chi_log;
                   polygon cells even if the underlying surface mesh is
                   triangles. Expects a boolean value.\n
  MESH_GLOBAL = <B>PropertyValue:[bool]</B> Generate/Read the full mesh at each
-               location. Expects a boolean value [Default=true].
- PARTITION_TYPE = <B>PartitionType</B>. See below.
+               location. Expects a boolean value [Default=true].\n
+ PARTITION_TYPE = <B>PartitionType</B>. See below.\n
  EXTRUSION_LAYER = <B>PropertyValue:[double,(int),(char)]</B> Adds a layer to the
                    extruder volume mesher if it exists.
                    Expects 1 required parameter, the layer height, followed by 2 optional

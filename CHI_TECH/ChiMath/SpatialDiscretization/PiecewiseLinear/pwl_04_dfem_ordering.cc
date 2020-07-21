@@ -63,67 +63,31 @@ std::pair<int,int> SpatialDiscretization_PWL::
     << dfem_local_block_address << " "
     << global_dof_count;
 
+  local_base_block_size = local_dof_count;
+  globl_base_block_size = global_dof_count;
+
+  //======================================== Collect block addresses
+  locJ_block_address.clear();
+  locJ_block_address.resize(chi_mpi.process_count, 0);
+  MPI_Allgather(&dfem_local_block_address,    //send buf
+                1,                            //send count
+                MPI_INT,                      //send type
+                locJ_block_address.data(),    //recv buf
+                1,                            //recv count
+                MPI_INT,                      //recv type
+                MPI_COMM_WORLD);              //communicator
+
+  //======================================== Collect block sizes
+  locJ_block_size.clear();
+  locJ_block_size.resize(chi_mpi.process_count, 0);
+  MPI_Allgather(&local_base_block_size,       //send buf
+                1,                            //send count
+                MPI_INT,                      //send type
+                locJ_block_size.data(),       //recv buf
+                1,                            //recv count
+                MPI_INT,                      //recv type
+                MPI_COMM_WORLD);              //communicator
+
   return {local_dof_count, global_dof_count};
 }
 
-//###################################################################
-/**Provides a mapping of cell's DOF from a DFEM perspective.*/
-int SpatialDiscretization_PWL::MapDFEMDOF(chi_mesh::Cell *cell,
-                                          int dof,
-                                          int component,
-                                          int component_block_offset)
-{
-  if (cell->partition_id == chi_mpi.location_id)
-  {
-    int address = cell_dfem_block_address[cell->local_id] +
-                  dfem_local_block_address +
-                  dof;
-    return address*component_block_offset + component;
-  }
-  else
-  {
-    int index = 0;
-    bool found = false;
-    for (auto neighbor_info : neighbor_cell_block_address)
-    {
-      if (neighbor_info.first == cell->global_id) {
-        found = true; break;
-      }
-      ++index;
-    }
-
-    if (!found)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
-        << "with global index " << cell->global_id << " and partition-ID "
-        << cell->partition_id;
-      exit(EXIT_FAILURE);
-    }
-
-    int address = neighbor_cell_block_address[index].second + dof;
-    return address*component_block_offset + component;
-  }
-}
-
-//###################################################################
-/**Provides a local mapping of cell's DOF from a DFEM perspective.*/
-int SpatialDiscretization_PWL::MapDFEMDOFLocal(chi_mesh::Cell *cell,
-                                               int dof,
-                                               int component,
-                                               int component_block_offset)
-{
-  if (cell->partition_id == chi_mpi.location_id)
-  {
-    int address = cell_dfem_block_address[cell->local_id] + dof;
-    return address*component_block_offset + component;
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
-      << "with global index " << cell->global_id << " and partition-ID "
-      << cell->partition_id;
-    exit(EXIT_FAILURE);
-  }
-}

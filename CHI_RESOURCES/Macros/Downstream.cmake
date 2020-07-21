@@ -12,13 +12,6 @@ else()
 endif()
 
 #------------------------------------------------ DEPENDENCIES
-if (NOT (DEFINED ENV{BOOST_ROOT}))
-    message(FATAL_ERROR "***** BOOST_ROOT is not set *****")
-else()
-    set(BOOST_ROOT    "$ENV{BOOST_ROOT}")
-    message(STATUS "BOOST_ROOT set to ${BOOST_ROOT}")
-endif()
-
 if (NOT (DEFINED ENV{PETSC_ROOT}))
     message(FATAL_ERROR "***** PETSC_ROOT is not set *****")
 else()
@@ -33,34 +26,17 @@ else()
     message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
 endif()
 
-if (NOT (DEFINED ENV{TRIANGLE_ROOT}))
-    message(FATAL_ERROR "***** TRIANGLE_ROOT is not set *****")
-else()
-    set(TRIANGLE_ROOT    "$ENV{TRIANGLE_ROOT}")
-    message(STATUS "TRIANGLE_ROOT set to ${TRIANGLE_ROOT}")
-endif()
-
-if (NOT (DEFINED ENV{RANDOM123_ROOT}))
-    message(FATAL_ERROR "***** RANDOM123_ROOT is not set *****")
-else()
-    set(RANDOM123_ROOT    "$ENV{RANDOM123_ROOT}")
-    message(STATUS "RANDOM123_ROOT set to ${RANDOM123_ROOT}")
-endif()
-
 find_package(MPI)
 
 include(GNUInstallDirs)
+include(${CHI_TECH_DIR}/CHI_RESOURCES/Macros/Filter.cmake)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
-include_directories("${CHI_TECH_DEP}/Random123/include")
-include_directories("${TRIANGLE_ROOT}")
 include_directories("${PETSC_ROOT}/include")
-include_directories("${BOOST_ROOT}/include")
-include_directories("${RANDOM123_ROOT}/include")
 
 include_directories("${CHI_TECH_DIR}/CHI_TECH")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiLua")
@@ -76,11 +52,9 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
-link_directories("${TRIANGLE_ROOT}")
 link_directories("${PETSC_ROOT}/lib")
 link_directories("${CHI_TECH_DIR}/chi_build")
 
-set(TRIANGLE "${TRIANGLE_ROOT}/triangle.o")
 
 # --------------------------- VTK
 find_package(VTK COMPONENTS
@@ -107,4 +81,4 @@ else ()
     )
 endif()
 
-set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ${TRIANGLE} ChiLib)
+set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ChiLib)

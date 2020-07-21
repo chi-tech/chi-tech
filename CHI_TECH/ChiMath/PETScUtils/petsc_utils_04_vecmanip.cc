@@ -45,9 +45,9 @@ void chi_math::PETScUtils::CopyGlobalVecToSTLvector(
   //=================================== Create and transfer index sets
   IS global_set;
   IS local_set;
-  ISCreateGeneral(PETSC_COMM_WORLD, N, global_indices.data(),
+  ISCreateGeneral(PETSC_COMM_SELF, N, global_indices.data(),
                   PETSC_COPY_VALUES,&global_set);
-  ISCreateGeneral(PETSC_COMM_WORLD, N, local_indices.data(),
+  ISCreateGeneral(PETSC_COMM_SELF, N, local_indices.data(),
                   PETSC_COPY_VALUES,&local_set);
   VecScatter scat;
   VecScatterCreate(x,global_set,local_vec,local_set,&scat);
@@ -58,7 +58,7 @@ void chi_math::PETScUtils::CopyGlobalVecToSTLvector(
   data.clear();
   data.resize(N,0.0);
   const double* x_ref;
-  VecGetArrayRead(x,&x_ref);
+  VecGetArrayRead(local_vec,&x_ref);
 
   for (size_t i=0; i<N; ++i)
     data[i] = x_ref[i];
