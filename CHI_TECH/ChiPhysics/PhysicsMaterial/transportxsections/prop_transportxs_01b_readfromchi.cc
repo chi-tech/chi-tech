@@ -68,6 +68,7 @@ void chi_physics::TransportCrossSections::
     if (sectionChecker=="SIGMA_T_BEGIN"){Read1DXS(sigma_tg,file,G);}
     if (sectionChecker=="SIGMA_F_BEGIN"){Read1DXS(sigma_fg,file,G);}
     if (sectionChecker=="NU_BEGIN"){Read1DXS(nu_sigma_fg,file,G);}
+    if (sectionChecker=="CHI_BEGIN"){Read1DXS(chi_g,file,G);}
   }
 
   //changes nu_sigma_fg from nu to nu * sigma_fg
