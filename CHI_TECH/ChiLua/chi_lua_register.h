@@ -33,6 +33,7 @@ RegisterFunction(chiCreateProductQuadrature)
     RegisterConstant(CUSTOM_QUADRATURE,          5);
 RegisterFunction(chiCreateCustomAngularQuadrature)
 RegisterFunction(chiGetProductQuadrature)
+RegisterFunction(chiCreateSLDFESQAngularQuadrature)
 
 //module:Mesh Macros
 RegisterFunction(chiMeshCreate1DSlabMesh)
