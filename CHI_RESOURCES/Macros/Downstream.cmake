@@ -81,4 +81,4 @@ else ()
     )
 endif()
 
-set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES} ChiLib)
+set(CHI_LIBS ChiLib lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
