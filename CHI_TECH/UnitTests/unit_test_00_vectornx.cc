@@ -1,13 +1,10 @@
 #include "ChiMath/chi_math_vectorNX.h"
 #include "ChiMath/chi_math_tensorRNX.h"
 
-#include "chi_log.h"
+#include <iostream>
 
-bool UnitTest_VectorNX()
+int main()
 {
-  auto& log = ChiLog::GetInstance();
-
-
   {
     chi_math::Vector2 a(1.0);
     chi_math::Vector2 b(2.0);
@@ -23,38 +20,33 @@ bool UnitTest_VectorNX()
 
     auto f=a.Cross(b);
 
-//    chi_math::VectorN<4> a4(1.0);
-//    chi_math::VectorN<4> b4(2.0);
-//
-//    auto g = a4.Cross(b4);
-
     chi_math::Vector3 ihat(std::vector<double>{1.0,0.0});
     chi_math::Vector3 jhat(std::vector<double>{0.0,1.0,0.0,1.0});
     chi_math::Vector3 khat(std::vector<double>{0.0,0.0,1.0});
 
     auto g = ihat.Cross(jhat);
 
-    log.Log(LOG_0) << "Vector a: " << a.PrintS();
-    log.Log(LOG_0) << "Vector b: " << b.PrintS();
-    log.Log(LOG_0) << "Scalar s: " << s;
+    std::cout << "Vector a: " << a.PrintS() << "\n";
+    std::cout << "Vector b: " << b.PrintS() << "\n";
+    std::cout << "Scalar s: " << s << "\n";
 
-    log.Log(LOG_0) << "a+b: " << (a+b).PrintS();
-    log.Log(LOG_0) << "a-b: " << (a-b).PrintS();
-    log.Log(LOG_0) << "a*b: " << (a*b).PrintS();
-    log.Log(LOG_0) << "a/b: " << (a/b).PrintS();
-    log.Log(LOG_0) << "a*=b: " << c.PrintS();
-    log.Log(LOG_0) << "a/=b: " << d.PrintS();
-    log.Log(LOG_0) << "s*a: " << (s*a).PrintS();
-    log.Log(LOG_0) << "a*s: " << (a*s).PrintS();
-    log.Log(LOG_0) << "b.Norm(): " << b.Norm();
-    log.Log(LOG_0) << "b.NormSquare(): " << b.NormSquare();
-    log.Log(LOG_0) << "b.Normalized(): " << b.Normalized().PrintS();
-    log.Log(LOG_0) << "b.Normalize(): " << e.PrintS();
-    log.Log(LOG_0) << "a.Cross(b): " << f.PrintS();
-    log.Log(LOG_0) << "ihat: " << ihat.PrintS();
-    log.Log(LOG_0) << "jhat: " << jhat.PrintS();
-    log.Log(LOG_0) << "khat: " << khat.PrintS();
-    log.Log(LOG_0) << "ihat.Cross(jhat): " << g.PrintS();
+    std::cout << "a+b: " << (a+b).PrintS() << "\n";
+    std::cout << "a-b: " << (a-b).PrintS() << "\n";
+    std::cout << "a*b: " << (a*b).PrintS() << "\n";
+    std::cout << "a/b: " << (a/b).PrintS() << "\n";
+    std::cout << "a*=b: " << c.PrintS() << "\n";
+    std::cout << "a/=b: " << d.PrintS() << "\n";
+    std::cout << "s*a: " << (s*a).PrintS() << "\n";
+    std::cout << "a*s: " << (a*s).PrintS() << "\n";
+    std::cout << "b.Norm(): " << b.Norm() << "\n";
+    std::cout << "b.NormSquare(): " << b.NormSquare() << "\n";
+    std::cout << "b.Normalized(): " << b.Normalized().PrintS() << "\n";
+    std::cout << "b.Normalize(): " << e.PrintS() << "\n";
+    std::cout << "a.Cross(b): " << f.PrintS() << "\n";
+    std::cout << "ihat: " << ihat.PrintS() << "\n";
+    std::cout << "jhat: " << jhat.PrintS() << "\n";
+    std::cout << "khat: " << khat.PrintS() << "\n";
+    std::cout << "ihat.Cross(jhat): " << g.PrintS() << "\n";
   }
 
   {
@@ -68,15 +60,13 @@ bool UnitTest_VectorNX()
     auto c = a.Dot(t1);
     auto d = t1.Dot(a);
 
-    log.Log(LOG_0) << "Vector a: " << a.PrintS();
-    log.Log(LOG_0) << "Vector b: " << b.PrintS();
+    std::cout << "Vector a: " << a.PrintS() << "\n";
+    std::cout << "Vector b: " << b.PrintS() << "\n";
 
-    log.Log(LOG_0) << "Tensor t0: \n" << t0.PrintS();
-    log.Log(LOG_0) << "t1=a.OTimes(): \n" << t1.PrintS();
-    log.Log(LOG_0) << "c=a.Dot(t1): \n" << c.PrintS();
-    log.Log(LOG_0) << "d=t1.Dot(a): \n" << d.PrintS();
+    std::cout << "Tensor t0: \n" << t0.PrintS() << "\n";
+    std::cout << "t1=a.OTimes(): \n" << t1.PrintS() << "\n";
+    std::cout << "c=a.Dot(t1): \n" << c.PrintS() << "\n";
+    std::cout << "d=t1.Dot(a): \n" << d.PrintS() << "\n";
   }
-
-
-  return true;
+  return 0;
 }
