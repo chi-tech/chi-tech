@@ -91,6 +91,7 @@ public:
 
   //============================================= Element access
   NumberFormat& operator[](size_t i) {return elements[i];}
+  const NumberFormat& operator[](size_t i) const {return elements[i];}
 
   NumberFormat& at(size_t i) {return elements.at(i);}
 

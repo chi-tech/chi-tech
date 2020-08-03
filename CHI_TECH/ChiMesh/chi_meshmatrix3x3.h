@@ -17,6 +17,21 @@ struct chi_mesh::Matrix3x3
     vals[6] = 0.0; vals[7] = 0.0; vals[8] = 0.0;
   }
 
+  /**Produces a rotation matrix with a reference vector rotated from the
+   * cartesian basis vectors \f$\hat{i}\f$, \f$\hat{j}\f$ and \f$\hat{k}\f$.
+   *
+   * By default a rotation matrix that creates no rotation is
+   * the identity matrix. Such a matrix can be defined from basis vectors
+   * following the notion that the "up-vector" is \f$\hat{k}\f$,
+   * this is also called the normal vector \f$\hat{n}\f$.
+   * The tangent vector is \f$\hat{i}\f$, denoted with \f$\hat{t}\f$.
+   * And the bi-norm vector is \f$\hat{j}\f$, denoted with \f$\hat{b}\f$.
+   *
+   * By specifying only the normal vector we can compute a simple pitch based
+   * rotation matrix. The supplied vector is therefore the new normal-vector,
+   * the tangent vector is computed as \f$ \hat{t} = \hat{n} \times \hat{k} \f$,
+   * and the bi-norm vector is computed as
+   * \f$ \hat{b} = \hat{n} \times \hat{t} \f$*/
   static Matrix3x3 MakeRotationMatrixFromVector(const Vector3& vec)
   {
     chi_mesh::Matrix3x3 R;
@@ -30,11 +45,8 @@ struct chi_mesh::Matrix3x3
       R.SetDiagonalVec(1.0,1.0,-1.0);
     else
     {
-      chi_mesh::Vector3 binorm = khat.Cross(n);
-      binorm = binorm/binorm.Norm();
-
-      chi_mesh::Vector3 tangent = binorm.Cross(n);
-      tangent = tangent/tangent.Norm();
+      auto tangent = n.Cross(khat   ).Normalized();
+      auto binorm  = n.Cross(tangent).Normalized();
 
       R.SetColJVec(0,tangent);
       R.SetColJVec(1,binorm);
@@ -81,7 +93,7 @@ struct chi_mesh::Matrix3x3
   }
 
   /**Matrix multiply with vector.*/
-  Vector3 operator*(const Vector3& vec)
+  Vector3 operator*(const Vector3& vec) const
   {
     double i_vec[] = {vec.x,vec.y,vec.z};
     double o_vec[] = {0.0,0.0,0.0};
@@ -112,7 +124,7 @@ struct chi_mesh::Matrix3x3
   }
 
   /**Obtain a copy of the value at row i and column j.*/
-  double GetIJ(int i, int j)
+  double GetIJ(int i, int j) const
   {
     int k = j + 3*i;
     return vals[k];
