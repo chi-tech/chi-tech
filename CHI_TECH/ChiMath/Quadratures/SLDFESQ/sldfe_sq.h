@@ -76,7 +76,7 @@ private:
 public:
   friend struct FUNCTION_WEIGHT_FROM_RHO;
   Quadrature() :
-    AngularQuadrature(chi_math::AngularQuadratureType::Arbitrary)
+    AngularQuadrature(chi_math::AngularQuadratureType::SLDFESQ)
   {}
 
 
@@ -144,7 +144,8 @@ public:
   //04
 public:
   void LocallyRefine(const chi_mesh::Vector3& ref_dir,
-                     const double cone_size);
+                     const double cone_size,
+                     const bool dir_as_plane_normal=false);
 
 private:
   std::array<SphericalQuadrilateral,4>

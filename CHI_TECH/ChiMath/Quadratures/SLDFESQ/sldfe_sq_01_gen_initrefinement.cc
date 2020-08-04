@@ -84,6 +84,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
   CopyToAllOctants();
 
   //======================================== Populate quadriture points
+  PopulateQuadratureAbscissae();
 
   chi_log.Log(LOG_0VERBOSE_1) << "Time taken           : " << time;
 }

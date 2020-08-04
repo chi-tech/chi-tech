@@ -12,7 +12,8 @@ namespace chi_math
   enum class AngularQuadratureType
   {
     Arbitrary         = 1,
-    ProductQuadrature = 2
+    ProductQuadrature = 2,
+    SLDFESQ           = 3
   };
   class AngularQuadrature;
 }

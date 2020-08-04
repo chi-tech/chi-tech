@@ -314,8 +314,8 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
       } //azi
     }//for q bot
   }//Product Quadrature
-  else if (groupset->quadrature->type ==
-           chi_math::AngularQuadratureType::Arbitrary)
+  else if (groupset->quadrature->type !=
+           chi_math::AngularQuadratureType::ProductQuadrature)
   {
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation

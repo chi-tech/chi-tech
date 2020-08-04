@@ -1,6 +1,8 @@
 #include "sldfe_sq.h"
 
 #include <map>
+#include "chi_log.h"
+extern ChiLog& chi_log;
 
 //###################################################################
 /**Split a SQ.*/
@@ -80,8 +82,10 @@ std::array<chi_math::SimplifiedLDFESQ::SphericalQuadrilateral,4>
 /**Locally refines the cells.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::
   LocallyRefine(const chi_mesh::Vector3 &ref_dir,
-                const double cone_size)
+                const double cone_size,
+                const bool dir_as_plane_normal)
 {
+  auto ref_dir_n = ref_dir.Normalized();
   double mu_cone = cos(cone_size);
   std::vector<SphericalQuadrilateral> new_deployment;
   new_deployment.reserve(deployed_SQs.size());
@@ -89,19 +93,33 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   chi_math::QuadratureGaussLegendre legendre;
   legendre.Initialize(32);
 
+  int num_refined = 0;
   for (auto& sq : deployed_SQs)
   {
-    if (sq.centroid_xyz.Dot(ref_dir)<mu_cone)
+    bool sq_to_be_split = false;
+
+    if (not dir_as_plane_normal)
+      sq_to_be_split = sq.centroid_xyz.Dot(ref_dir_n)>mu_cone;
+    else
+      sq_to_be_split = std::fabs(sq.centroid_xyz.Dot(ref_dir_n)) <
+                       (sin(cone_size));
+
+    if (not sq_to_be_split)
       new_deployment.push_back(sq);
     else
     {
       auto new_sqs = SplitSQ(sq,legendre);
       for (auto& nsq : new_sqs)
         new_deployment.push_back(nsq);
+      ++num_refined;
     }
   }
 
   deployed_SQs.clear();
   deployed_SQs = new_deployment;
   deployed_SQs_history.push_back(new_deployment);
+
+  PopulateQuadratureAbscissae();
+
+  chi_log.Log(LOG_0) << "SLDFESQ refined " << num_refined << " SQs.";
 }

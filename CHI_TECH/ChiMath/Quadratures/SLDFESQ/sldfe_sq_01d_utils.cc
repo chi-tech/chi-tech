@@ -244,6 +244,31 @@ void chi_math::SimplifiedLDFESQ::Quadrature::CopyToAllOctants()
 /**Populates the quadrature abscissaes, weights and direction vectors.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::PopulateQuadratureAbscissae()
 {
-  
+  abscissae.clear();
+  weights.clear();
+  omegas.clear();
+
+  for (auto& sq : deployed_SQs)
+  {
+    for (int i=0;i<4;++i)
+    {
+      auto& omega = sq.sub_sqr_points[i];
+      double weight = sq.sub_sqr_weights[i];
+
+      double theta = acos(omega.z);
+      double phi = acos(omega.x/sin(theta));
+
+      if (omega.y/sin(theta)<0.0)
+        phi = 2.0*M_PI - phi;
+
+      chi_math::QuadraturePointPhiTheta qp;
+      qp.phi = phi;
+      qp.theta = theta;
+
+      abscissae.push_back(qp);
+      weights.push_back(weight);
+      omegas.push_back(omega);
+    }
+  }
 }
 
