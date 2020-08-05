@@ -10,6 +10,7 @@ end
 
 Add_Folder("../ChiMath/Quadratures/lua")
 Add_Folder("../ChiMath/Quadratures/LegendrePoly/lua")
+Add_Folder("../ChiMath/Quadratures/SLDFESQ/lua")
 
 Add_Folder("../ChiMesh/lua")
 Add_Folder("../ChiMesh/SurfaceMesh/lua")
