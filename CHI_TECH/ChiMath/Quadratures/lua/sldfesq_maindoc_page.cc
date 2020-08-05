@@ -17,6 +17,7 @@
  * - A cube of side length \f$a=\frac{1}{\sqrt{3}}\f$ is inscribed within
  *   the unit sphere and the origin planes. This cube has three faces
  *   that project onto the unit sphere in the first octant.
+ *   \image html "SLDFESQFig2.png" "The inscribed cube with one of the faces subdivided" width=800px
  * - Each face of the cube can be described by a local coordinate system,
  *   \f$\tilde{x}\f$, \f$ \tilde{y}\f$. In this reference frame each face
  *   is identically subdivided into an orthogonal grid. The generated
@@ -29,6 +30,7 @@
  *   Spherical Quadrilaterals (SQs) on the unit sphere, a space which we
  *   shall refer to as the \f$xyz\f$ reference frame. Or in the paper
  *   mu-eta-xi.
+ *   \image html "SLDFESQFig3.png" width=400px
  * - Once the SQs are generated we have numerous choices on where to
  *   define quadrature points and associated shape functions. In the LDFE
  *   formulation we need 4 quadrature points and, for simplicity, we restrict
@@ -61,6 +63,13 @@
  * points we found that placing the points on the 4 Gauss-Legendre points
  * for a quadrilateral (\f$[\pm \frac{1}{\sqrt{3}},\pm \frac{1}{\sqrt{3}} ]\f$)still produced 4th order convergence and added a
  * lot of speed to the algorithm.
+ *
+ * ## Integration of basis functions
+ * The determinant of the Jacobian can be hard to derive. It can be done
+ * in the two ways:
+ * [using a cross-product](../../HTMLimages/SLDFESQ_JacobianA.jpg)
+ * or in [angle-space](../../HTMLimages/SLDFESQ_JacobianB.jpg).
+ *
  *
  * ## Local refinement
  * The data structures employed allows the SQs to easily be refined in certain
