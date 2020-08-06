@@ -17,9 +17,19 @@ std::pair<int,int> SpatialDiscretization_PWL::
   ChiTimer t_stage[6];
 
   t_stage[0].Reset();
-  //================================================== Get local DOF count
+  //================================================== Check cell views avail
   size_t num_loc_cells = grid->local_cell_glob_indices.size();
+  if (num_loc_cells != cell_fe_views.size())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "SpatialDiscretization_PWL::OrderNodesDFEM. Number of cell_fe_views ("
+      << cell_fe_views.size() << ") does not correspond to the number of cells ("
+      << num_loc_cells << "). Was a call to AddViewOfLocalContinuum made?";
+    exit(EXIT_FAILURE);
+  }
 
+
+  //================================================== Get local DOF count
   cell_dfem_block_address.resize(num_loc_cells,0);
 
   int local_dof_count=0;
