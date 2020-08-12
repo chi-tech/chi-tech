@@ -12,6 +12,8 @@
 
 #include <ChiPhysics/chi_physics_namespace.h>
 
+#include <functional>
+
 namespace LinearBoltzman
 {
   enum class AngleAggregationType
@@ -71,6 +73,17 @@ public:
   bool                                         log_sweep_events;
 
   double                                       latest_convergence_metric;
+
+  /**Convenient typdef for the moment call back function. See moment_callbacks*/
+  typedef std::function<void(int, int, int, double)> MomentCallbackF;
+  /**
+   * Functions of type MomentCallbackF can be added to the moment_callbacks
+   * vector and these can be called from within functions taking a
+   * LBSGroupset instance. The intention is that this function can
+   * be used as a general interface to calculate specific types of
+   * moments beyond the simple scalar flux moments already accounted for
+   */
+  std::vector<MomentCallbackF> moment_callbacks;
 
   //npt_groupset.cc
        LBSGroupset();
