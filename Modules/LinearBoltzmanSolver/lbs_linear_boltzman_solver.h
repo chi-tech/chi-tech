@@ -11,11 +11,14 @@
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include <petscksp.h>
 
-typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
-typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
+namespace sweep_namespace = chi_mesh::sweep_management;
+typedef sweep_namespace::SweepChunk SweepChunk;
+typedef sweep_namespace::SweepScheduler MainSweepScheduler;
+typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 namespace LinearBoltzman
 {
@@ -40,7 +43,7 @@ struct SourceFlags
 /**A neutral particle transport solver.*/
 class Solver : public chi_physics::Solver
 {
-private:
+protected:
   size_t source_event_tag=0;
 public:
   double last_restart_write=0.0;
@@ -82,8 +85,9 @@ public:
  public:
   //00
   Solver();
+  virtual ~Solver(){};
   //01
-  void Initialize();
+  virtual void Initialize();
   //01a
   void PerformInputChecks();
   void ComputeNumberOfMoments();
@@ -93,9 +97,9 @@ public:
   //01c
   void InitializeBoundaries();
   //01d
-  void InitializeParrays();
+  virtual void InitializeParrays();
   //02
-  void Execute();
+  virtual void Execute();
   void SolveGroupset(int group_set_num);
 
   //03a
@@ -128,13 +132,13 @@ public:
   void ReadRestartData(std::string folder_name, std::string file_base);
 
   //IterativeMethods
-  void SetSource(int group_set_num,
+  virtual void SetSource(int group_set_num,
                  bool apply_mat_src = false,
                  bool suppress_phi_old = false);
   double ComputePiecewiseChange(LBSGroupset *groupset);
   SweepChunk *SetSweepChunk(int group_set_num);
-  void ClassicRichardson(int group_set_num);
-  void GMRES(int group_set_num);
+  void ClassicRichardson(int group_set_num, SweepChunk* sweep_chunk, MainSweepScheduler & sweepScheduler, bool log_info = true);
+  void GMRES(int group_set_num, SweepChunk* sweep_chunk, MainSweepScheduler & sweepScheduler, bool log_info = true);
 
   //Vector assembly
   int  MapDOF(chi_mesh::Cell* cell, int dof, int mom, int g);

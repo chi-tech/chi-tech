@@ -1,7 +1,5 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
-
 #include "ChiTimer/chi_timer.h"
 #include "../Tools/kspmonitor_npt.h"
 #include "../Tools/ksp_data_context.h"
@@ -17,35 +15,30 @@ extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 extern ChiTimer chi_program_timer;
 
-namespace sweep_namespace = chi_mesh::sweep_management;
-typedef sweep_namespace::SweepChunk SweepChunk;
-typedef sweep_namespace::SweepScheduler MainSweepScheduler;
-typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
-
 //###################################################################
 /**Solves a groupset using GMRES.*/
-void LinearBoltzman::Solver::GMRES(int group_set_num)
+void LinearBoltzman::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
+    MainSweepScheduler & sweepScheduler, bool log_info /* = true*/)
 {
-  chi_log.Log(LOG_0)
-    << "\n\n";
-  chi_log.Log(LOG_0)
-    << "********** Solving groupset " << group_set_num
-    << " with GMRES.\n\n";
+  if (log_info)
+  {
+    chi_log.Log(LOG_0)
+      << "\n\n";
+    chi_log.Log(LOG_0)
+      << "********** Solving groupset " << group_set_num
+      << " with GMRES.\n\n";
+  }
 
   //================================================== Obtain groupset
   LBSGroupset* groupset = group_sets[group_set_num];
   int groupset_numgrps = groupset->groups.size();
-  chi_log.Log(LOG_0)
-    << "Quadrature number of angles: "
-    << groupset->quadrature->abscissae.size() << "\n"
-    << "Groups " << groupset->groups.front()->id << " "
-    << groupset->groups.back()->id << "\n\n";
 
-  //================================================== Setting up required
-  //                                                   sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
-  MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    groupset->angle_agg);
+  if (log_info)
+    chi_log.Log(LOG_0)
+      << "Quadrature number of angles: "
+      << groupset->quadrature->abscissae.size() << "\n"
+      << "Groups " << groupset->groups.front()->id << " "
+      << groupset->groups.back()->id << "\n\n";
 
   //=================================================== Create Data context
   //                                                    available inside
@@ -109,7 +102,9 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   KSPSetUp(ksp);
 
   //================================================== Compute b
-  chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
+  if (log_info)
+    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
+
   SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,
                           SourceFlags::SUPPRESS_PHI_OLD);
   sweep_chunk->SetDestinationPhi(&phi_new_local);
@@ -147,13 +142,15 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   if (phi_old_norm > 1.0e-10)
   {
     VecCopy(phi_old,phi_new);
-    chi_log.Log(LOG_0) << "Using phi_old as initial guess.";
+    if (log_info)
+      chi_log.Log(LOG_0) << "Using phi_old as initial guess.";
   }
 
 
   //**************** CALL GMRES SOLVE ******************
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString() << " Starting iterations";
+  if (log_info)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString() << " Starting iterations";
   KSPSolve(ksp,q_fixed,phi_new);
   //****************************************************
 
@@ -187,24 +184,28 @@ void LinearBoltzman::Solver::GMRES(int group_set_num)
   long int num_unknowns = (long int)glob_dof_count*
                           (long int)num_angles*
                           (long int)groupset->groups.size();
-  chi_log.Log(LOG_0)
-    << "\n\n";
-  chi_log.Log(LOG_0)
-    << "        Set Src Time/sweep (s):        "
-    << source_time;
-  chi_log.Log(LOG_0)
-    << "        Average sweep time (s):        "
-    << sweep_time;
-  chi_log.Log(LOG_0)
-    << "        Chunk-Overhead-Ratio  :        "
-    << chunk_overhead_ratio;
-  chi_log.Log(LOG_0)
-    << "        Sweep Time/Unknown (ns):       "
-    << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
-  chi_log.Log(LOG_0)
-    << "        Number of unknowns per sweep:  " << num_unknowns;
-  chi_log.Log(LOG_0)
-    << "\n\n";
+
+  if (log_info)
+  {
+    chi_log.Log(LOG_0)
+      << "\n\n";
+    chi_log.Log(LOG_0)
+      << "        Set Src Time/sweep (s):        "
+      << source_time;
+    chi_log.Log(LOG_0)
+      << "        Average sweep time (s):        "
+      << sweep_time;
+    chi_log.Log(LOG_0)
+      << "        Chunk-Overhead-Ratio  :        "
+      << chunk_overhead_ratio;
+    chi_log.Log(LOG_0)
+      << "        Sweep Time/Unknown (ns):       "
+      << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+    chi_log.Log(LOG_0)
+      << "        Number of unknowns per sweep:  " << num_unknowns;
+    chi_log.Log(LOG_0)
+      << "\n\n";
+  }
 
   std::string sweep_log_file_name =
     std::string("GS_") + std::to_string(group_set_num) +
