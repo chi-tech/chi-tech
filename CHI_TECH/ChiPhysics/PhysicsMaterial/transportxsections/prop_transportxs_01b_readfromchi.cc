@@ -49,6 +49,7 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(G,0.0);
   chi_g.resize(G,0.0);
   nu_sigma_fg.resize(G,0.0);
+  ddt_coeff.resize(G, 0.0);
 
   //function for reading in the 1d vectors
   auto Read1DXS = [](std::vector<double>& xs, std::ifstream& file, int G)
@@ -69,6 +70,7 @@ void chi_physics::TransportCrossSections::
     if (sectionChecker=="SIGMA_F_BEGIN"){Read1DXS(sigma_fg,file,G);}
     if (sectionChecker=="NU_BEGIN"){Read1DXS(nu_sigma_fg,file,G);}
     if (sectionChecker=="CHI_BEGIN"){Read1DXS(chi_g,file,G);}
+    if (sectionChecker=="DDT_COEFF_BEGIN"){Read1DXS(ddt_coeff,file,G);}
   }
 
   //changes nu_sigma_fg from nu to nu * sigma_fg

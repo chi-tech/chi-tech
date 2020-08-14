@@ -81,6 +81,7 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(num_grps_G,0.0);
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
+  ddt_coeff.resize(num_grps_G, 0.0);
 
   transfer_matrix.clear();
   transfer_matrix.resize(scat_order+1,
