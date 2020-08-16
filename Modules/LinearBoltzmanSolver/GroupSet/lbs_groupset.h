@@ -74,8 +74,15 @@ public:
 
   double                                       latest_convergence_metric;
 
-  /**Convenient typdef for the moment call back function. See moment_callbacks*/
-  typedef std::function<void(int, int, int, double)> MomentCallbackF;
+  /**
+   * Convenient typdef for the moment call back function. See moment_callbacks.
+   *  Arguments are:
+   *  int dof_mapping Local DOF-address with moment and group folded in.
+   *  int moment The moment number.
+   *  int angle_num The reference angle number in the angular quadrature
+   *  double psi Angular flux for the given dof and angle_num.
+   */
+  typedef std::function<void(int dof, int moment, int angle_num, double psi)> MomentCallbackF;
   /**
    * Functions of type MomentCallbackF can be added to the moment_callbacks
    * vector and these can be called from within functions taking a
