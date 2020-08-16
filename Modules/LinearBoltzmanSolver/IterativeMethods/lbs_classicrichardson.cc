@@ -1,6 +1,6 @@
 #include "../lbs_linear_boltzman_solver.h"
 
-#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
+
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
 
 #include <ChiTimer/chi_timer.h>
@@ -13,39 +13,32 @@ extern ChiMPI& chi_mpi;
 
 #include <iomanip>
 
-namespace sweep_namespace = chi_mesh::sweep_management;
-typedef sweep_namespace::SweepChunk SweepChunk;
-typedef sweep_namespace::SweepScheduler MainSweepScheduler;
-typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
-
 extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
+void LinearBoltzman::Solver::ClassicRichardson(int group_set_num, SweepChunk* sweep_chunk,
+    MainSweepScheduler & sweepScheduler, bool log_info /* = true*/)
 {
-  chi_log.Log(LOG_0)
-    << "\n\n";
-  chi_log.Log(LOG_0)
-    << "********** Solving groupset " << group_set_num
-    << " with Classic-Richardson.\n\n";
+  if (log_info)
+  {
+    chi_log.Log(LOG_0)
+      << "\n\n";
+    chi_log.Log(LOG_0)
+      << "********** Solving groupset " << group_set_num
+      << " with Classic-Richardson.\n\n";
+  }
 
   //================================================== Obtain groupset
   LBSGroupset* groupset = group_sets[group_set_num];
   int groupset_numgrps = groupset->groups.size();
-  chi_log.Log(LOG_0)
-    << "Quadrature number of angles: "
-    << groupset->quadrature->abscissae.size() << "\n"
-    << "Groups " << groupset->groups.front()->id << " "
-    << groupset->groups.back()->id << "\n\n";
 
-  //================================================== Setting up required
-  //                                                   sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
-
-  //================================================== Set sweep scheduler
-  MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    groupset->angle_agg);
+  if (log_info)
+    chi_log.Log(LOG_0)
+      << "Quadrature number of angles: "
+      << groupset->quadrature->abscissae.size() << "\n"
+      << "Groups " << groupset->groups.front()->id << " "
+      << groupset->groups.back()->id << "\n\n";
 
   //================================================== Tool the sweep chunk
   sweep_chunk->SetDestinationPhi(&phi_new_local);
@@ -109,7 +102,8 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
     if (converged)
       iter_info << " CONVERGED\n";
 
-    chi_log.Log(LOG_0) << iter_info.str();
+    if (log_info)
+      chi_log.Log(LOG_0) << iter_info.str();
 
     if (converged) break;
 
@@ -134,21 +128,25 @@ void LinearBoltzman::Solver::ClassicRichardson(int group_set_num)
   long int num_unknowns = (long int)glob_dof_count*
                           (long int)num_angles*
                           (long int)groupset->groups.size();
-  chi_log.Log(LOG_0)
-    << "\n\n";
-  chi_log.Log(LOG_0)
-    << "        Set Src Time/sweep (s):        "
-    << source_time;
-  chi_log.Log(LOG_0)
-    << "        Average sweep time (s):        "
-    << sweep_time;
-  chi_log.Log(LOG_0)
-    << "        Sweep Time/Unknown (ns):       "
-    << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
-  chi_log.Log(LOG_0)
-    << "        Number of unknowns per sweep:  " << num_unknowns;
-  chi_log.Log(LOG_0)
-    << "\n\n";
+
+  if (log_info)
+  {
+    chi_log.Log(LOG_0)
+      << "\n\n";
+    chi_log.Log(LOG_0)
+      << "        Set Src Time/sweep (s):        "
+      << source_time;
+    chi_log.Log(LOG_0)
+      << "        Average sweep time (s):        "
+      << sweep_time;
+    chi_log.Log(LOG_0)
+      << "        Sweep Time/Unknown (ns):       "
+      << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+    chi_log.Log(LOG_0)
+      << "        Number of unknowns per sweep:  " << num_unknowns;
+    chi_log.Log(LOG_0)
+      << "\n\n";
+  }
 
   std::string sweep_log_file_name =
     std::string("GS_") + std::to_string(group_set_num) +

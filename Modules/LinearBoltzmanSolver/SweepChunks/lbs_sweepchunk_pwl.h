@@ -34,7 +34,7 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 /**Sweep chunk to compute the fixed source.*/
 class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
-private:
+protected:
   chi_mesh::MeshContinuum*    grid_view;
   SpatialDiscretization_PWL*     grid_fe_view;
   std::vector<LinearBoltzman::CellViewBase*>* grid_transport_view;
@@ -66,10 +66,6 @@ private:
   std::vector<double> test_mg_src;
   std::vector<double> zero_mg_src;
 
-
-
-
-
 public:
   //################################################## Constructor
   LBSSweepChunkPWL(chi_mesh::MeshContinuum* vol_continuum,
@@ -94,7 +90,6 @@ public:
     num_moms            = in_num_moms;
     max_cell_dofs       = in_max_cell_dofs;
 
-
     G                   = in_groupset->groups.size();
 
     a_and_b_initialized = false;
@@ -110,7 +105,7 @@ public:
 
 
   //############################################################ Actual chunk
-  void Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
+  virtual void Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
   {
     int outface_master_counter=0;
 
@@ -346,8 +341,17 @@ public:
 
             for (int gsg=0; gsg<gs_ss_size; gsg++)
               phi[ir+gsg] += wn_d2m*b[gsg][i];
+
+            for (auto callback : groupset->moment_callbacks)
+              if(callback)
+                for (int gsg=0; gsg<gs_ss_size; gsg++)
+                  callback(ir+gsg, m, angle_num, b[gsg][i]);
           }
         }
+
+
+
+
 
         //============================================= Outgoing fluxes
         int out_face_counter=-1;
