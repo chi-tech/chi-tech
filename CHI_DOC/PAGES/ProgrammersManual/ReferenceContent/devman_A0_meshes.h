@@ -1,10 +1,32 @@
 /**\page DevManMeshes The structure of meshes
-
+ *
 \section devman4_sec0 General structure of meshes
+
+Mesh generation can be classified into 4 basic levels difficulty.
+-# Orthogonal. The simplest mesh generation is undoubtedly the generation of orthogonal
+meshes.
+-# Reading meshes. Minimal repackaging of pre-generated meshes.
+-# Semi-generated meshes. Extruded meshes and other similar operations.
+-# Internally generated meshes. Pipe dream for now, but having the ability
+   to generate tetrahedral meshes would open a lot of doors. From there
+   I would like to have polyhedral meshes generation then hexahedral mesh
+   generation.
+
+\subsection devman_meshes_sec0_0 What is the grid?
+
+The grid is an instance of the chi_mesh::MeshContinuum class. It has 3
+members of primary interest namely:
+- chi_mesh::MeshContinuum::vertices containing pointers to all the nodes of type
+  chi_mesh::Node. The container is an indexed map using vertex global ids.
+- chi_mesh::MeshContinuum::local_cells containing local cells of type
+  chi_mesh::Cell. The container has an iterator available and is indexed by
+  cell local index.
+- chi_mesh::MeshContinuum::cells handles indexing by global cell ids. This
+  also facilitates the addition of cells to the local_cell storage.
 
 ## _
 
-## Easily access an existing grid
+\subsection devman_meshes_sec0_1 Easily access an existing grid
 
 We will explain the different elements of a mesh in more detail in sections
 below but as a quick primer we can say that mesh entities are loaded into
@@ -16,9 +38,7 @@ You can get the current mesh-handler using:
     auto cur_handler = chi_mesh::GetCurrentHandler();
  \endcode
 
-If an existing MeshHandler is not available one can easily create one
-with a call to chi_mesh::GetNewHandler().
- The computational grid is contained in a chi_mesh::MeshContinuum object which
+The computational grid is contained in a chi_mesh::MeshContinuum object which
 you can obtain with:
 
 \code
@@ -28,9 +48,9 @@ auto grid = cur_handler->GetGrid();
 If there is no existing grid then one can be created as detailed in 
 
 ## _
-## More detail on Mesh data structures
+\section devman_meshes_sec_1 More detail on Mesh data structures
 
-### chi_mesh::MeshHandler
+\subsection devman_meshes_sec1_0 chi_mesh::MeshHandler
 Meshes and mesh operations are all handled under the umbrella of a
 chi_mesh::MeshHandler. Mesh handlers are loaded onto the global variable
 `chi_meshhandler_stack` and the "current" handler is tracked by
@@ -41,7 +61,8 @@ a generalized architecture.
 
 \image html MeshOverview.png "Figure 1: Overview of the mesh hierarchy." width=700px
 
-The "current" handler can always be obtained with:
+Even though we already showed how to obtain the handler, the "current"
+ handler can always be obtained with:
 
  \code
     auto cur_handler = chi_mesh::GetCurrentHandler();
@@ -49,7 +70,7 @@ The "current" handler can always be obtained with:
 
 ## _
 
-### chi_mesh::Region
+\subsection devman_meshes_sec1_1 chi_mesh::Region
 
 When loading mesh related entities, all mesh operations are pushed onto stacks
 contained in the current handler. This is used free-form and the user can
@@ -67,7 +88,7 @@ cur_handler->region_stack.push_back(cur_region);
 
 ## _
 
-### chi_mesh::SurfaceMesher and chi_mesh::VolumeMesher
+\subsection devman_meshes_sec1_2 chi_mesh::SurfaceMesher and chi_mesh::VolumeMesher
 
 Each mesh-handler is outfitted with one surface mesher and one volume
 mesher, both initially undefined. The surface meshing step can be thought of
@@ -90,6 +111,9 @@ Similarly there are also various types of volume meshers:
    3D triangular prisms, hexahedrals or polyhedrons.
  - chi_mesh::VolumeMesherPredefined3D. Converts loaded 3D meshes to
    3D tetrahedrals, hexahedrals or polyhedrons.
+ - chi_mesh::VolumeMesherPredefinedUnpartitioned. Converts a ligthweight
+   unpartitioned mesh to a proper full detail partitioned mesh. This mesher
+   allows much flexibility for reading meshes from external sources.
 
 Surface meshers and volume meshers are assigned to a handler as:
 
@@ -107,7 +131,7 @@ cur_handler->volume_mesher->Execute();
 
 ## _
 
-### chi_mesh::MeshContinuum (or if you like ... THE GRID!)
+\subsection devman_meshes_sec1_3 chi_mesh::MeshContinuum (or if you like ... THE GRID!)
 
 A chi_mesh::MeshContinuum object is the business-end of meshes. The execution
 of a volume mesher ultimately results in the creation of a grid. To obtain
@@ -122,7 +146,7 @@ current mesh handler.
 
 ## _
 
-### chi_mesh::Cell
+\subsection devman_meshes_sec1_4 chi_mesh::Cell
 
 Cells in Chi-Tech are the basic building blocks for mesh-based scientific
 computing. Some of the mesh types are shown in Figure 2 below and are defined
@@ -141,7 +165,7 @@ supported right now are:
 
 ## _
 
-### Accessing cells (the pain of parallel programs)
+\subsection devman_meshes_sec1_5 Accessing cells (the pain of parallel programs)
 
 Cells live in the `local_cells` member of a grid, which is of object type
 chi_mesh::MeshContinuum::LocalCells, under the auspices of either

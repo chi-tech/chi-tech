@@ -3,6 +3,8 @@
 A large-scale scientific simulation engine being developed at Texas A&M University 
 as part of a research study.
 
+Chat with us on <a href="https://discord.gg/AJHHeAA">Discord<img src="CHI_DOC/HTMLimages/DiscordLogo.png" width="24" title="Chi-Tech on Discord" align="center"></a>
+
 ## Installation instructions
 
 We have a set of easy instructions for users running Ubuntu 18.04+ (including WSL

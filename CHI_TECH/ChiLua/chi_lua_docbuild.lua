@@ -235,6 +235,30 @@ function tableSize(tTable)
 	return counter;
 end
 
+--[[
+This functions writes a table in HTML format
+--]]
+function WriteTableHTML(newFile, table_name, table_ref, table_vals)
+	if (rawlen(table_vals) > 0) then
+		newFile:write("### "..table_name.."\n")
+		newFile:write(table_ref.."\n")
+		newFile:write("<table>\n")
+		colcnt = 0
+		for k=1,(rawlen(table_vals)) do
+			if (colcnt == 0) then
+				newFile:write("<tr>")
+			end
+			colcnt = colcnt + 1
+			newFile:write("<td width=\"33%\">"..table_vals[k].."()".."</td>")
+
+			if ((colcnt == 3) or (k == rawlen(table_vals))) then
+				colcnt = 0
+				newFile:write("</tr>\n")
+			end
+		end
+		newFile:write("</table>\n")
+	end
+end
 
 --[[
 This function reads the lua register and creates a formatted table
@@ -261,6 +285,8 @@ function generateFunctionList()
 	table_vals = {}
 	table_name = " "
 	table_ref = " "
+	strword = nil
+	strline = nil
 	while (line ~= nil) do
 
 		ifdef = string.find(line,"#ifdef",0,true)
@@ -273,34 +299,19 @@ function generateFunctionList()
 			block = false
 		end
 
-		--======================================== WRITES A TABLE
+		--======================================== "module:" keyword
 		modulestr = string.find(line,"module:", 0,true)
 		if (modulestr ~= nil) then
 			if (rawlen(table_vals) > 0) then
-				newFile:write("### "..table_name.."\n")
-				newFile:write(table_ref.."\n")
-				newFile:write("<table>\n")
-				colcnt = 0
-				for k=1,(rawlen(table_vals)) do
-					if (colcnt == 0) then
-						newFile:write("<tr>")
-					end
-					colcnt = colcnt + 1
-					newFile:write("<td width=\"33%\">"..table_vals[k].."()".."</td>")
-
-					if ((colcnt == 3) or (k == rawlen(table_vals))) then
-						colcnt = 0
-						newFile:write("</tr>\n")
-					end
-				end
-				newFile:write("</table>\n")
+				WriteTableHTML(newFile, table_name, table_ref, table_vals)
 			end
 			table_name = string.sub(line,modulestr+7,-1)
 			table_vals = {}
+			table_ref = " "
 		end
-		--========================================= END OF WRITES A TABLE
 
 		if (block ~= true) then
+			--=================================== "RegisterFunction" keyword
 			open_paren = string.find(line,"RegisterFunction(",0,true)
 
 			if (open_paren ~= nil) then
@@ -309,16 +320,20 @@ function generateFunctionList()
 				if ((clos_paren ~= nil) and (linecount>5)) then
 					k = rawlen(table_vals)+1
 					table_vals[k] = string.sub(line,open_paren+17,clos_paren-1)
-					--newFile:write(string.sub(line,open_paren+17,clos_paren-1))
-					--newFile:write("()")
-					--newFile:write("\n")
 				end
 			end
 
+			--=================================== "\ref " keyword
 			ref_start = string.find(line,"//\\ref",0,true)
 
 			if (ref_start ~= nil) then
 				table_ref = string.sub(line,ref_start+2)
+			end
+
+			--=================================== "string:" keyword
+			strword = string.find(line,"string:",0,true)
+			if (strword ~= nil) then
+				strline = line
 			end
 		end
 
@@ -330,27 +345,15 @@ function generateFunctionList()
 		linecount = linecount + 1
 	end
 
-	--======================================== WRITES A TABLE
+	--======================================== Last table in buffer
 	if (rawlen(table_vals) > 0) then
-		newFile:write("### "..table_name.."\n")
-		newFile:write(table_ref.."\n")
-		newFile:write("<table>\n")
-		colcnt = 0
-		for k=1,(rawlen(table_vals)) do
-			if (colcnt == 0) then
-				newFile:write("<tr>")
-			end
-			colcnt = colcnt + 1
-			newFile:write("<td width=\"33%\">"..table_vals[k].."()".."</td>")
-
-			if ((colcnt == 3) or (k == rawlen(table_vals))) then
-				colcnt = 0
-				newFile:write("</tr>\n")
-			end
-		end
-		newFile:write("</table>\n")
+		WriteTableHTML(newFile, table_name, table_ref, table_vals)
 	end
 	--======================================== END OF WRITES A TABLE
+
+	if (strword ~= nil) then
+		newFile:write(string.sub(strline,10).."\n")
+	end
 
 	newFile:write("\n\n*/\n")
 
