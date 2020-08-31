@@ -18,7 +18,7 @@ with coding. They are:
    top of the file the ```extern``` command:
    \code
    #include "ChiTimer/chi_timer.h"
-   extern ChiTimer chi_program_timer;
+   extern ChiTimer& chi_program_timer;
    \endcode
    Current program time can then be obtained using:
    \code
@@ -60,7 +60,7 @@ To access chi_physics_handler include the following code at the top of your
 \code
 #include <ChiPhysics/chi_physics.h>
 
-extern ChiPhysics chi_physics_handler;
+extern ChiPhysics& chi_physics_handler;
 \endcode
 
  or obtain an instance to it via
@@ -87,7 +87,7 @@ Additionally, by including the headers for chi_mpi, developers have access to
 \code
 #include <chi_mpi.h>
 
-extern ChiMPI chi_mpi;
+extern ChiMPI& chi_mpi;
 
 if (chi_mpi.location_id == 1)
  printf("This is process 1, Dab!");
@@ -116,7 +116,7 @@ Connecting to chi_log is done as follows
 \code
 #include <chi_log.h>
 
-extern ChiLog chi_log;
+extern ChiLog& chi_log;
 \endcode
 
  or obtain an instance to it via

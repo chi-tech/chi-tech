@@ -190,14 +190,16 @@ RegisterFunction(chiPhysicsAddMaterial)
 RegisterFunction(chiPhysicsMaterialAddProperty)
 RegisterFunction(chiPhysicsMaterialSetProperty)
 RegisterFunction(chiPhysicsMaterialGetProperty)
-RegisterFunction(chiPhysicsTransportXSCreate)
-RegisterFunction(chiPhysicsTransportXSSet)
-RegisterFunction(chiPhysicsTransportXSMakeCombined)
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)
 RegisterFunction(chiExportFieldFunctionToVTKG)
 RegisterFunction(chiExportMultiFieldFunctionToVTKG)
 
+//module:Transport interaction cross-sections
+//\ref ChiXSFile Chi-Tech native cross-section file format
+RegisterFunction(chiPhysicsTransportXSCreate)
+RegisterFunction(chiPhysicsTransportXSSet)
+RegisterFunction(chiPhysicsTransportXSMakeCombined)
 
 //Property indices
 RegisterConstant(SCALAR_VALUE,           1);
@@ -224,3 +226,4 @@ RegisterFunction(chiLuaTest)
 RegisterNamespace(LuaNamespace)
 AddNamedConstantToNamespace(Name,1,LuaNamespace)
 
+//string: This file was generated using the script: CHI_TECH/ChiLua/chi_lua_docbuild.lua

@@ -60,6 +60,8 @@ void LBSGroupset::BuildDiscMomOperator(
   int num_angles = quadrature->abscissae.size();
   int num_moms = 0;
 
+  d2m_op.clear();
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D Slab
   if (geometry_type == LinearBoltzman::GeometryType::ONED_SLAB)
   {
@@ -149,6 +151,8 @@ void LBSGroupset::BuildMomDiscOperator(
   int num_angles = quadrature->abscissae.size();
   int num_moms = 0;
 
+  m2d_op.clear();
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D Slab
   if (geometry_type == LinearBoltzman::GeometryType::ONED_SLAB)
   {
@@ -231,6 +235,9 @@ void LBSGroupset::BuildMomDiscOperator(
 /**Constructs the groupset subsets.*/
 void LBSGroupset::BuildSubsets()
 {
+  grp_subsets.clear();
+  grp_subset_sizes.clear();
+
   //=================================== Groupset subsets
   int num_gs_subsets = 1;
   if (master_num_grp_subsets <= groups.size())
@@ -255,6 +262,10 @@ void LBSGroupset::BuildSubsets()
   }//for ss
 
   //=================================== Angle subsets
+  ang_subsets_top.clear();
+  ang_subsets_bot.clear();
+  ang_subset_sizes_top.clear();
+  ang_subset_sizes_bot.clear();
   if (quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
   {
     auto prodquadrature =

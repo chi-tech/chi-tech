@@ -39,6 +39,17 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
+  //============================================= Check possibility of cycles
+  if (mesher->options.partition_type ==
+      chi_mesh::VolumeMesher::PartitionType::PARMETIS and
+      not groupset->allow_cycles)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "When using PARMETIS type partitioning then groupset iterative method"
+         " must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES";
+    exit(EXIT_FAILURE);
+  }
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Single angle aggr.
   if (groupset->angleagg_method == LinearBoltzman::AngleAggregationType::SINGLE)
   {
@@ -151,8 +162,9 @@ void LinearBoltzman::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   }
   else
   {
-    fprintf(stderr,"ERROR: Cannot create sweep ordering"
-                   " for given mesh type.\n");
+    chi_log.Log(LOG_ALLERROR)
+      << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
+         "and therefore only certain mesh types are supported.";
     exit(EXIT_FAILURE);
   }
 

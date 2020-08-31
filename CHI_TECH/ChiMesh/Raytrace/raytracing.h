@@ -24,6 +24,9 @@ RayDestinationInfo RayTrace(chi_mesh::MeshContinuum* grid,
                             const Vector3& omega_i,
                             double& d_to_surface,
                             Vector3& pos_f,
+                            double epsilon_nudge=1.0e-8,
+                            double backward_tolerance=1.0e-10,
+                            double extension_distance=1.0e5,
                             int func_depth=0);
 
 bool

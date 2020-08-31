@@ -24,6 +24,7 @@ public:
   std::vector<double> sigma_captg;  ///< MT 27   Capture cross-section
   std::vector<double> chi_g;        ///< MT 2018 Fission spectrum
   std::vector<double> nu_sigma_fg;  ///< MT 2452 Nubar-Sigmaf cross-section
+  std::vector<double> ddt_coeff;    ///< Time derivative coefficient
 
   /**The MT number for this transfer varies:
    * MT 2500 is total,

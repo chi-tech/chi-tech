@@ -115,87 +115,6 @@ def CheckDependencyDir():
   else:
     os.chdir(install_dir)
 
-####################################### Install Eigen
-eigen_url = "http://bitbucket.org/eigen/eigen/get/3.3.7.tar.gz"
-def InstallEigen():
-  if (not os.path.exists(install_dir + "/EIGEN")):
-    os.mkdir("EIGEN")
-  os.chdir("EIGEN")
-
-  if (not os.path.exists(install_dir + "/EIGEN/3.3.7.tar.gz")):
-    print("Downloading Eigen 3.3.7 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("wget " + eigen_url,log_file)
-
-  #Check if eigen is installed already
-  installed = os.path.exists(install_dir + "/EIGEN/eigen-3.3.7/Eigen")
-  if (not installed):
-    print("Configuring Eigen 3.3.7 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("tar -zxf 3.3.7.tar.gz",log_file)
-    success,err = ExecSub("mv eigen-* eigen-3.3.7",log_file)
-  else:
-    print("EIGEN already installed")
-
-  os.chdir(install_dir)
-
-####################################### Install Random-123
-r123_url = "https://www.deshawresearch.com/downloads/download_random123.cgi/Random123-1.13.2.tar.gz"
-def InstallRandom123():
-  if (not os.path.exists(install_dir + "/RANDOM123")):
-    os.mkdir("RANDOM123")
-  os.chdir("RANDOM123")
-
-  if (not os.path.exists(install_dir + "/RANDOM123/Random123-1.13.2.tar.gz")):
-    print("Downloading Random123-1.13.2 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("wget " + r123_url,log_file)
-
-  #Check if it is installed already
-  installed = os.path.exists(install_dir + "/RANDOM123/Random123-1.13.2/include")
-  if (not installed):
-    print("Configuring Random123-1.13.2 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("tar -zxf Random123-1.13.2.tar.gz",log_file)
-  else:
-    print("RANDOM123 already installed")
-
-  os.chdir(install_dir)
-
-####################################### Install triangle
-tri_url = "http://www.netlib.org/voronoi/triangle.zip"
-def InstallTriangle():
-  if (not os.path.exists(install_dir + "/TRIANGLE")):
-    os.mkdir("TRIANGLE")
-  os.chdir("TRIANGLE")
-
-  if (not os.path.exists(install_dir + "/TRIANGLE/triangle.zip")):
-    print("Downloading Triangle to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("wget " + tri_url,log_file)
-
-  #Check if it is installed already
-  installed = os.path.exists(install_dir + "/TRIANGLE/triangle.o")
-  if (not installed):
-    print("Configuring Triangle to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("unzip triangle.zip",log_file)
-
-    os_tag = "LINUX"
-    if ("Darwin" in os.uname() ):
-      os_tag = "APPLE"
-
-    env_vars=os.environ.copy()
-    command = "gcc -O -D" + os_tag + " -I/usr/X11R6/include" + \
-              " -L/usr/X11R6/lib -o ./triangle " + \
-              " ./triangle.c -lm"
-    success,err = ExecSub(command,log_file,env_vars)
-    print(command,err)
-
-    command = "gcc -O -D" + os_tag + " -I/usr/X11R6/include " + \
-              "-L/usr/X11R6/lib -DTRILIBRARY -c -o " + \
-              "./triangle.o ./triangle.c"
-    success,err = ExecSub(command,log_file,env_vars)
-    print(command,err)
-  else:
-    print("Triangle already installed")
-
-  os.chdir(install_dir)
-
 ####################################### Install readline
 readline_url = "ftp://ftp.gnu.org/gnu/readline/readline-8.0.tar.gz"
 def InstallReadline():
@@ -329,59 +248,31 @@ def InstallLua():
   os.chdir(install_dir)
 
 
-####################################### Install boost
-boost_url = "https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz"
-def InstallBoost():
-  if (not os.path.exists(install_dir + "/BOOST")):
-    os.mkdir("BOOST")
-  os.chdir("BOOST")
-
-  if (not os.path.exists(install_dir + "/BOOST/boost_1_71_0.tar.gz")):
-    print("Downloading Boost 1.71_0 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("wget " + boost_url,log_file)
-    sprint_esc("[1A")
-    sprint_esc("[2K")
-
-  #Check if boost is installed already
-  installed = os.path.exists(install_dir + "/BOOST/boost_1_71_0/include")
-  if (not installed):
-    print("Configuring Boost 1.71_0 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("tar -zxf boost_1_71_0.tar.gz",log_file)
-    os.chdir("boost_1_71_0/")
-    success,err = ExecSub("./bootstrap.sh --with-toolset=gcc",log_file)
-    success,err = ExecSub("./b2 headers",log_file)
-    os.mkdir("include")
-    success,err = ExecSub("cp -r boost include/",log_file)
-  else:
-    print("BOOST already installed")
-
-  os.chdir(install_dir)
-
 ####################################### Install PETSc
-petsc_url = "http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz"
+petsc_url = "http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz"
 def InstallPETSc():
   if (not os.path.exists(install_dir + "/PETSc")):
     os.mkdir("PETSc")
   os.chdir("PETSc")
 
-  if (not os.path.exists(install_dir + "/PETSc/petsc-3.9.4.tar.gz")):
-    print("Downloading PETSc 3.9.4 to \"" + os.getcwd() + "\"")
+  if (not os.path.exists(install_dir + "/PETSc/petsc-3.12.5.tar.gz")):
+    print("Downloading PETSc 3.12.5 to \"" + os.getcwd() + "\"")
     success,err = ExecSub("wget " + petsc_url,log_file)
 
 
   env_vars=os.environ.copy()
-  env_vars["PETSC_DIR"] = install_dir + "/PETSc/petsc-3.9.4"
+  env_vars["PETSC_DIR"] = install_dir + "/PETSc/petsc-3.12.5"
 
   #Check if petsc is installed already
   installed = os.path.exists(install_dir + \
-                             "/PETSc/petsc-3.9.4/install/include/petsc")
+                             "/PETSc/petsc-3.12.5/install/include/petsc")
   if (not installed):
     print("Configuring PETSc 3.9.4 to \"" + os.getcwd() + "\"")
-    success,err = ExecSub("tar -zxf petsc-3.9.4.tar.gz",log_file)
-    os.chdir("petsc-3.9.4/")
+    success,err = ExecSub("tar -zxf petsc-3.12.5.tar.gz",log_file)
+    os.chdir("petsc-3.12.5/")
     exstring = "./configure " \
-        "--prefix=" + install_dir + "/PETSc/petsc-3.9.4/install " \
-        "--download-hypre=git://https://github.com/hypre-space/hypre.git " \
+        "--prefix=" + install_dir + "/PETSc/petsc-3.12.5/install " \
+        "--download-hypre=1 " \
         "--with-ssl=0 " \
         "--with-debugging=0 " \
         "--with-pic=1 " \
@@ -400,7 +291,7 @@ def InstallPETSc():
         "COPTFLAGS='-O3 -march=native -mtune=native' " \
         "CXXOPTFLAGS='-O3 -march=native -mtune=native' " \
         "FOPTFLAGS='-O3 -march=native -mtune=native' " \
-        "PETSC_DIR=" + install_dir + "/PETSc/petsc-3.9.4/"
+        "PETSC_DIR=" + install_dir + "/PETSc/petsc-3.12.5/"
 
     print(exstring)
     success,err = ExecSub(exstring,log_file,env_vars)
@@ -468,9 +359,6 @@ if (not success):
 
 
 CheckDependencyDir()
-InstallEigen()
-InstallRandom123()
-InstallTriangle()
 InstallReadline()
 Install_ncurses()
 InstallLua()
@@ -483,12 +371,8 @@ InstallVTK()
 
 roots_file.write('export BASE_PATH="' + install_dir + '"\n')
 roots_file.write('\n')
-roots_file.write('export EIGEN_ROOT="$BASE_PATH/EIGEN/eigen-3.3.7"\n')
-# roots_file.write('export RANDOM123_ROOT="$BASE_PATH/RANDOM123/Random123-1.13.2"\n')
-# roots_file.write('export TRIANGLE_ROOT="/$BASE_PATH/TRIANGLE"\n')
 roots_file.write('export LUA_ROOT="$BASE_PATH/LUA/lua-5.3.5/install"\n')
-# roots_file.write('export BOOST_ROOT="$BASE_PATH/BOOST/boost_1_71_0"\n')
-roots_file.write('export PETSC_ROOT="$BASE_PATH/PETSc/petsc-3.9.4/install"\n')
+roots_file.write('export PETSC_ROOT="$BASE_PATH/PETSc/petsc-3.12.5/install"\n')
 roots_file.write('export VTK_DIR="$BASE_PATH/VTK/VTK-8.2.0/install"\n')
 roots_file.write('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$BASE_PATH/VTK/VTK-8.2.0/install/lib"\n')
 roots_file.write('echo "Enviroment set for compiling. If recompiling changed sources execute"\n')

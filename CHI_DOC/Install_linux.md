@@ -50,6 +50,8 @@ sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 pre-installed on modern Linux systems, will not work (Step 4 below provides more
 details if you need to use `python3`) .*
 
+<u>NOTE</u>: *The second line is to install OpenGL for VTK.*
+
 ### Step 2 - An MPI flavor
 
 Install either OpenMPI or MPICH. If you have MOOSE or deal.ii installed then you
@@ -74,85 +76,46 @@ Which should display the same message the gcc call did, i.e.
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-### Step 3 - Boost 1.63+
+### Step 3 - PETSc
 
-Download and unpack boost. Eventually ChiTech needs the location where the
-"include" directory is so just follow online instructions for this.
+The current supported version is
+[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz) .
 
-Alternatively, just make a *projects* directory and download boost there,
-like the following:
-
-```bash
-mkdir projects
-cd projects
-mkdir boost
-cd boost
-wget https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.tar.gz
-tar -zxf boost_1_71_0.tar.gz
-cd boost_1_71_0
-./bootstrap.sh
-./b2 headers
-mkdir include
-cp -r boost include/
-rm boost_1_71_0.tar.gz
-```
-
-(you can find the latest version of boost [here](https://www.boost.org/users/download/)).
-
-The current directory will now be your *BOOST_ROOT* folder.
-
-```bash
-export BOOST_ROOT=$PWD
-```
-
-You probably want to permanently add this to your bash profile file (using the
-actual path obtained from `$PWD`), so that you don't have to execute the above
-command every time you open a new terminal. This is typically done by adding
-the line to the file `.profile` in your home directory.
-
-### Step 4 - PETSc
-
-The best performance thus far tested is with
-[petsc version 3.9.4](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz) .
-It is recommended to use this version.
 
 Return to your *projects* folder (or whatever you chose to place stuff). Run
 the following
 
 ```bash
-wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.9.4.tar.gz
-tar -zxf petsc-3.9.4.tar.gz
-cd petsc-3.9.4
+wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz
+tar -zxf petsc-3.12.5.tar.gz
+cd petsc-3.12.5
 ```
 
 Download and extract the archive file to a folder of your choice then navigate
 into the directory containing the "configure" script and execute the following:
 
 ```bash
-./configure --prefix=$PWD/install \
---download-hypre=1 \
---with-ssl=0 \
---with-debugging=0 \
---with-pic=1 \
---with-shared-libraries=1 \
---with-cc=mpicc \
---with-cxx=mpicxx \
---with-fc=mpif90 \
---download-fblaslapack=1 \
---download-metis=1 \
---download-parmetis=1 \
---download-superlu_dist=1 \
---with-cxx-dialect=C++11 \
-CC=mpicc CXX=mpicxx FC=mpif90 F77=mpif77 F90=mpif90 \
-CFLAGS='-fPIC -fopenmp' \
-CXXFLAGS='-fPIC -fopenmp' \
-FFLAGS='-fPIC -fopenmp' \
-FCFLAGS='-fPIC -fopenmp' \
-F90FLAGS='-fPIC -fopenmp' \
-F77FLAGS='-fPIC -fopenmp' \
-COPTFLAGS='-O3 -march=native -mtune=native' \
-CXXOPTFLAGS='-O3 -march=native -mtune=native' \
-FOPTFLAGS='-O3 -march=native -mtune=native' \
+./configure  \
+--prefix=$PWD/install  \
+--download-hypre=1  \
+--with-ssl=0  \
+--with-debugging=0  \
+--with-pic=1  \
+--with-shared-libraries=1  \
+--download-fblaslapack=1  \
+--download-metis=1  \
+--download-parmetis=1  \
+--download-superlu_dist=1  \
+--with-cxx-dialect=C++11  \
+CFLAGS='-fPIC -fopenmp'  \
+CXXFLAGS='-fPIC -fopenmp'  \
+FFLAGS='-fPIC -fopenmp'  \
+FCFLAGS='-fPIC -fopenmp'  \
+F90FLAGS='-fPIC -fopenmp'  \
+F77FLAGS='-fPIC -fopenmp'  \
+COPTFLAGS='-O3 -march=native -mtune=native'  \
+CXXOPTFLAGS='-O3 -march=native -mtune=native'  \
+FOPTFLAGS='-O3 -march=native -mtune=native'  \
 PETSC_DIR=$PWD
 ```
 
@@ -184,7 +147,7 @@ export PETSC_ROOT=$PWD/install
 
 Again, this is also something you'd like to add to your bash profile.
 
-### Step 5 - Install the Visualization Tool Kit
+### Step 4 - Install the Visualization Tool Kit
 
 In your projects folder install VTK using the following commands:
 
@@ -196,10 +159,17 @@ tar -zxf VTK-8.2.0.tar.gz
 cd VTK-8.2.0
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=$PWD/install \
--DBUILD_SHARED_LIBS:BOOL=ON \
--DVTK_Group_MPI:BOOL=ON \
--DCMAKE_BUILD_TYPE=Release \
+cmake -DCMAKE_INSTALL_PREFIX=$PWD/../install  + \
+-DBUILD_SHARED_LIBS:BOOL=ON  + \
+-DVTK_Group_MPI:BOOL=ON  + \
+-DVTK_GROUP_ENABLE_Qt=NO  + \
+-DVTK_GROUP_ENABLE_Rendering=NO  + \
+-DVTK_GROUP_ENABLE_Imaging=NO  + \
+-DVTK_GROUP_ENABLE_StandAlone=WANT  + \
+-DVTK_GROUP_ENABLE_Web=NO  + \
+-DVTK_BUILD_TESTING:BOOL=OFF  + \
+-DCMAKE_BUILD_TYPE=Release  + \
+-DCMAKE_CXX_FLAGS=-std=c++11  + \
  ../
 ```
 
@@ -217,51 +187,7 @@ export VTK_DIR=$PWD/install
 
 Again, this is also something you'd like to add to your bash profile.
 
-### Step 6 - Install Eigen
-
-Download and extract **Eigen** from https://eigen.tuxfamily.org.  **Eigen** v3.3.7+
-is recommended.  **Eigen** is a header only library, and no further installation is
-required.
-
-Set the EIGEN_ROOT environment variable to the **Eigen** install location:
-```bash
-    $ export EIGEN_ROOT=/Path/to/Eigen
-```
-
-Add the export command to your bash profile.
-
-### Step 7 - Install Random123
-
-Download and extract **Random123** from https://www.deshawresearch.com/resources_random123.html.
-**Radom123** v1.13.2+ is recommended.  **Random123** is a header only library,
-and no further installation is required.
-
-Set the RANDOM123_ROOT environment variable to the **Random123** install location:
-```bash
-    $ export RANDOM123_ROOT=/Path/to/Random123
-```
-
-Add the export command to your bash profile.
-
-### Step 8 - Install Triangle
-
-Download and extract **Triangle** from https://www.cs.cmu.edu/~quake/triangle.html.
-**Triangle** v1.6 is recommended.
-
-Install **Triangle** as follows:
-```bach
-    $ make
-    $ make trilibrary
-```
-
-Set the TRIANGLE_ROOT environment variable to the **Triangle** install location:
-```bash
-    $ export TRIANGLE_ROOT=/Path/to/Triangle
-```
-
-Add the export command to your bash profile.
-
-### Step 9 - Install Lua
+### Step 5 - Install Lua
 
 Download and extract **Lua** from https://www.lua.org.  v5.3.5+ is recommended.
 Before installing **Lua** edit the Makefile and set INSTALL_TOP to your desired
@@ -280,7 +206,7 @@ Set the LUA_ROOT environment variable to the **Lua** install location:
 
 Add the export command to your bash profile.
 
-### Step 10 - Build ChiTech
+### Step 6 - Build ChiTech
 
 Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech relevant stuff:
 ```bash
@@ -302,7 +228,7 @@ In the main directory (i.e. *chi-tech/*), execute:
 You can also use -j8 even if you don't have 8 processors, the make command
 will use threading where possible.
 
-### Step 11 - Run regression tests
+### Step 7 - Run regression tests
 
 To check if the code compiled correctly, execute the test scripts:
 
@@ -311,7 +237,7 @@ To check if the code compiled correctly, execute the test scripts:
 ```
 
 
-### Step 12 - ChiTech documentation
+### Step 8 - ChiTech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
