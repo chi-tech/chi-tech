@@ -200,8 +200,8 @@ void LinearBoltzman::Solver::InitAngleAggSingle(LBSGroupset *groupset)
     int pa = std::max(1,num_pol/2);
 
     int num_angset_grps = 4; //Default Extruded and 2D
-    if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
-      num_angset_grps = 1;
+    if (options.geometry_type == GeometryType::ONED_SLAB)
+        num_angset_grps = 1;
 
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation

@@ -68,14 +68,15 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
         {
           j_indices.push_back(face.neighbor);
           ++icount;
+          chi_log.Log(LOG_0VERBOSE_1) << i << " " << face.neighbor;
         }
     }
-    i_indices[i+1] = icount+1;
+    i_indices[i+1] = icount;
     chi_log.Log(LOG_0VERBOSE_1) << "Done building indices.";
 
     //======================================== Copy to raw arrays
-    int* i_indices_raw; // = new int[i_indices.size()];
-    int* j_indices_raw; // = new int[j_indices.size()];
+    int* i_indices_raw;
+    int* j_indices_raw;
     PetscMalloc(i_indices.size()*sizeof(int),&i_indices_raw);
     PetscMalloc(j_indices.size()*sizeof(int),&j_indices_raw);
 
@@ -93,14 +94,13 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
                     (int)umesh->raw_cells.size(),
                     (int)umesh->raw_cells.size(),
                     i_indices_raw,j_indices_raw,NULL,&Adj);
-    MatSetOption(Adj,MAT_STRUCTURALLY_SYMMETRIC,PETSC_TRUE);
 
     chi_log.Log(LOG_0VERBOSE_1) << "Done creating adjacency matrix.";
 
     //========================================= Create partitioning
     MatPartitioning part;
     IS is,isg;
-    MatPartitioningCreate(PETSC_COMM_SELF,&part);
+    MatPartitioningCreate(MPI_COMM_SELF,&part);
     MatPartitioningSetAdjacency(part,Adj);
     MatPartitioningSetType(part,"parmetis");
     MatPartitioningSetNParts(part,chi_mpi.process_count);
