@@ -49,13 +49,13 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     if (id<0)
     {
       chi_log.Log(LOG_ALLERROR)
-        << "NPT Cells encountered with no assigned material.";
+        << "LBS-InitMaterials: Cells encountered with no assigned material.";
       exit(EXIT_FAILURE);
     }
     if (id>=num_physics_mats)
     {
       chi_log.Log(LOG_ALLERROR)
-        << "NPT Cells encountered with material id that matches no"
+        << "LBS-InitMaterials: Cells encountered with material id that matches no"
            "material in physics material library.";
       exit(EXIT_FAILURE);
     }
@@ -83,9 +83,9 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
         if (mg_source->source_value_g.size() < groups.size())
         {
           chi_log.Log(LOG_ALLWARNING)
-            << "NPT Isotropic Multigroup source specified in material \""
-            << cur_mat->name << "\" has fewer energy groups than "
-            << "called for in the simulation. Source will be ignored";
+            << "LBS-InitMaterials: Isotropic Multigroup source specified in "
+            << "material \"" << cur_mat->name << "\" has fewer energy groups than "
+            << "called for in the simulation. Source will be ignored.";
           //exit(EXIT_FAILURE);
         }
         else
@@ -100,8 +100,8 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     if (!found_transport_xs)
     {
       chi_log.Log(LOG_ALLERROR)
-        << "NPT Found no transport cross-section property for "
-        << "material \"" << cur_mat->name << "\"";
+        << "LBS-InitMaterials: Found no transport cross-section property for "
+        << "material \"" << cur_mat->name << "\".";
       exit(EXIT_FAILURE);
     }
 
@@ -109,7 +109,7 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     if (material_xs[matid_to_xs_map[id]]->G < groups.size())
     {
       chi_log.Log(LOG_ALLERROR)
-        << "NPT Found material \"" << cur_mat->name << "\" has "
+        << "LBS-InitMaterials: Found material \"" << cur_mat->name << "\" has "
         << material_xs[matid_to_xs_map[id]]->G << " groups and"
         << " the simulation has " << groups.size() << " groups."
         << " The material must have a greater or equal amount of groups.";
@@ -120,12 +120,12 @@ void LinearBoltzman::Solver::InitMaterials(std::set<int>& material_ids)
     if (material_xs[matid_to_xs_map[id]]->L < options.scattering_order)
     {
       chi_log.Log(LOG_0WARNING)
-        << "NPT Found material \"" << cur_mat->name << "\" has "
+        << "LBS-InitMaterials: Found material \"" << cur_mat->name << "\" has "
         << "a scattering order of "
         << material_xs[matid_to_xs_map[id]]->L << " and"
         << " the simulation has a scattering order of "
         << options.scattering_order << "."
-        << " The higher moments will therefore be assumed zero.";
+        << " The higher moments will therefore not be used.";
     }
 
     materials_list

@@ -1,7 +1,6 @@
 #include "../lbs_linear_boltzman_solver.h"
 
 #include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
 
 #include "ChiTimer/chi_timer.h"
 
@@ -33,7 +32,7 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
 
   bool OneD_Slab = false;
 
-  if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  if (options.geometry_type == GeometryType::ONED_SLAB)
     OneD_Slab = true;
 
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
@@ -54,7 +53,6 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
 
 
   //================================================== Loop over local cells
-//  for (auto& cell_g_index : grid->local_cell_glob_indices)
   for (const auto& cell : grid->local_cells)
   {
     auto full_cell_view =
@@ -79,9 +77,7 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
     //=========================================== Obtain material source
     double* src = default_zero_src.data();
     if ( (src_id >= 0) && (apply_mat_src) )
-    {
       src = material_srcs[src_id]->source_value_g.data();
-    }
 
 
     //=========================================== Loop over dofs
@@ -97,10 +93,8 @@ void LinearBoltzman::Solver::SetSource(int group_set_num,
       int m=-1;
       for (int ell=0; ell<=options.scattering_order; ell++)
       {
-        int ellmin = -ell;
-        int ellmax =  ell;
-        if (OneD_Slab)
-          {ellmin = 0;ellmax = 0;}
+        int ellmin = OneD_Slab? 0 : -ell;
+        int ellmax = OneD_Slab? 0 :  ell;
 
         for (int em=ellmin; em<=ellmax; em++)
         {

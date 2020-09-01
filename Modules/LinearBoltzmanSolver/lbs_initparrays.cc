@@ -62,6 +62,9 @@ void LinearBoltzman::Solver::InitializeParrays()
   int M = num_moments;
   unsigned long long local_unknown_count = local_dof_count * num_grps * M;
 
+  chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
+                                << local_unknown_count;
+
   //================================================== Size local vectors
   q_moments_local.resize(local_unknown_count,0.0);
   phi_old_local.resize(local_unknown_count,0.0);
@@ -120,6 +123,7 @@ void LinearBoltzman::Solver::InitializeParrays()
         else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
         if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
+        chi_log.Log(LOG_ALL) << cell.global_id << n.PrintS() << face.neighbor;
       }//if bndry
 
       if (not face.IsNeighborLocal(grid))
