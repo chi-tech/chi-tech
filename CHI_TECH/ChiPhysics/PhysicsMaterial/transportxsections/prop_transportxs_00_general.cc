@@ -142,12 +142,17 @@ void chi_physics::TransportCrossSections::
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
+    // If the combiation factor is supposed to be an atomic density, chi 
+    // should not be multiplied by combinations[x]. To run a problem with 
+    // multiple fissile isotopes present, a fission transfer matrix should 
+    // be generated. This matrix is given by:
+    //      F[g][gp] += chi_g[g] * nu_sigma_fg[gprime] * combinations[x]
     for (int g=0; g<G; g++)
     {
       sigma_tg   [g] += cross_secs[x]->sigma_tg   [g]*combinations[x].second;
       sigma_fg   [g] += cross_secs[x]->sigma_fg   [g]*combinations[x].second;
       sigma_captg[g] += cross_secs[x]->sigma_captg[g]*combinations[x].second;
-      chi_g      [g] += cross_secs[x]->chi_g      [g]*combinations[x].second;
+      chi_g      [g] += cross_secs[x]->chi_g      [g];//*combinations[x].second;
       nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g]*combinations[x].second;
     }
   }
