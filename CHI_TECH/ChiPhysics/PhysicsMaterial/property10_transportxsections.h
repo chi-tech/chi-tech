@@ -33,10 +33,12 @@ public:
    * MT 2502 is elastic scattering only
    * MT 2504 is inelastic scattering only*/
   std::vector<chi_math::SparseMatrix> transfer_matrix;
+  std::vector<std::vector<double>>    fission_matrix;
 
 public:
   bool diffusion_initialized = false;
   bool scattering_initialized = false;
+  bool fission_initialized = false;
 public:
   std::vector<double> diffg;
   std::vector<double> sigma_rg;

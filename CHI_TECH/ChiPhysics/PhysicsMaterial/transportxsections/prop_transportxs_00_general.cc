@@ -16,6 +16,7 @@ chi_physics::TransportCrossSections::TransportCrossSections() :
 
   diffusion_initialized = false;
   scattering_initialized = false;
+  fission_initialized = false;
 }
 
 //###################################################################
@@ -30,6 +31,9 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
+  fission_matrix.resize(in_G);
+  for (int g=0; g<in_G; ++g)
+    fission_matrix[g].resize(in_G,0.0);
 
   transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
 }
@@ -50,6 +54,9 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
+  fission_matrix.resize(in_G);
+  for (int g=0; g<in_G; ++g)
+    fission_matrix[g].resize(in_G,0.0);
 
   transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
 
@@ -139,6 +146,9 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(num_grps_G,0.0);
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
+  fission_matrix.resize(num_grps_G);
+  for (int g=0; g<G; ++g)
+    fission_matrix[g].resize(num_grps_G,0.0);
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
@@ -179,6 +189,10 @@ void chi_physics::TransportCrossSections::
         }
       }//for i
     }//for m
-  }//for xs
 
+    //======================================== Combine fission matrices
+    for (int g=0; g<G; ++g)
+      for (int gprime=0; gprime<G; ++gprime)
+        fission_matrix[g][gprime] += chi_g[g] * nu_sigma_fg[gprime];
+  }//for xs
 }
