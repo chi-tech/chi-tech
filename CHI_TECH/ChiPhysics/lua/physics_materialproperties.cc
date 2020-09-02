@@ -888,9 +888,9 @@ chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
 chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
 chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
 
-combo ={{xs_1, 0.5},
-        {xs_2, 0.4},
-        {xs_3, 0.1}}
+combo ={{xs_1, 0.5e5},
+        {xs_2, 0.4e3},
+        {xs_3, 0.3e2}}
 aerated_graphite = chiPhysicsTransportXSMakeCombined(combo)
 
 
