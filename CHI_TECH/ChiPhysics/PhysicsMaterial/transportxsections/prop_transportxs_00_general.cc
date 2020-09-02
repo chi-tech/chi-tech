@@ -16,7 +16,6 @@ chi_physics::TransportCrossSections::TransportCrossSections() :
 
   diffusion_initialized = false;
   scattering_initialized = false;
-  fission_initialized = false;
 }
 
 //###################################################################

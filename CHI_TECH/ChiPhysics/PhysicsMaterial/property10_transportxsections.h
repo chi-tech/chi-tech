@@ -38,7 +38,6 @@ public:
 public:
   bool diffusion_initialized = false;
   bool scattering_initialized = false;
-  bool fission_initialized = false;
 public:
   std::vector<double> diffg;
   std::vector<double> sigma_rg;
