@@ -123,7 +123,6 @@ void LinearBoltzman::Solver::InitializeParrays()
         else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
         if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
-        chi_log.Log(LOG_ALL) << cell.global_id << n.PrintS() << face.neighbor;
       }//if bndry
 
       if (not face.IsNeighborLocal(grid))
