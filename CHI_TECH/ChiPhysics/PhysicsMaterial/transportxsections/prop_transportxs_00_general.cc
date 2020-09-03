@@ -126,6 +126,11 @@ void chi_physics::TransportCrossSections::
     ++count;
   }
 
+  // For chi and ddt_coeff weighting
+  double combinations_total = 0.0;
+  for (const auto& combination : combinations)
+    combinations_total += combination.second;
+
   //======================================== Combine 1D cross-sections
   this->G = num_grps_G;
   sigma_tg.clear();
@@ -133,27 +138,25 @@ void chi_physics::TransportCrossSections::
   sigma_captg.clear();
   chi_g.clear();
   nu_sigma_fg.clear();
+  ddt_coeff.clear();
 
   sigma_tg.resize(num_grps_G,0.0);
   sigma_fg.resize(num_grps_G,0.0);
   sigma_captg.resize(num_grps_G,0.0);
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
+  ddt_coeff.resize(num_grps_G,0.0);
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
-    // If the combiation factor is supposed to be an atomic density, chi 
-    // should not be multiplied by combinations[x]. To run a problem with 
-    // multiple fissile isotopes present, a fission transfer matrix should 
-    // be generated. This matrix is given by:
-    //      F[g][gp] += chi_g[g] * nu_sigma_fg[gprime] * combinations[x]
     for (int g=0; g<G; g++)
     {
       sigma_tg   [g] += cross_secs[x]->sigma_tg   [g]*combinations[x].second;
       sigma_fg   [g] += cross_secs[x]->sigma_fg   [g]*combinations[x].second;
       sigma_captg[g] += cross_secs[x]->sigma_captg[g]*combinations[x].second;
-      chi_g      [g] += cross_secs[x]->chi_g      [g];//*combinations[x].second;
+      chi_g      [g] += cross_secs[x]->chi_g      [g]*combinations[x].second/combinations_total;
       nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g]*combinations[x].second;
+      ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g]*combinations[x].second/combinations_total;
     }
   }
 
