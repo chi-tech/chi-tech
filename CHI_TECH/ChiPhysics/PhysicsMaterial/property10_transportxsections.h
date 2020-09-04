@@ -18,13 +18,17 @@ class chi_physics::TransportCrossSections : public chi_physics::MaterialProperty
 public:
   int G=0;
   int L=0;
+  int J=0;
 
-  std::vector<double> sigma_tg;     ///< MT 1    Total cross-section
-  std::vector<double> sigma_fg;     ///< MT 18   Sigmaf cross-section
-  std::vector<double> sigma_captg;  ///< MT 27   Capture cross-section
-  std::vector<double> chi_g;        ///< MT 2018 Fission spectrum
-  std::vector<double> nu_sigma_fg;  ///< MT 2452 Nubar-Sigmaf cross-section
-  std::vector<double> ddt_coeff;    ///< Time derivative coefficient
+  std::vector<double> sigma_tg;           ///< MT 1    Total cross-section
+  std::vector<double> sigma_fg;           ///< MT 18   Sigmaf cross-section
+  std::vector<double> sigma_captg;        ///< MT 27   Capture cross-section
+  std::vector<double> chi_g;              ///< MT 2018 Fission spectrum
+  std::vector<double> nu_sigma_fg;        ///< MT 2452 Nubar-Sigmaf cross-section
+  std::vector<double> ddt_coeff;          ///< MT 259  Time derivative coefficient
+  std::vector<std::vector<double>> chi_d; ///< MT 455  Delayed neutron fission spectrum
+  std::vector<double> lambda;             ///<         Delayed neutron decay constants
+  std::vector<double> gamma;              ///<         Delayed neutron yields
 
   /**The MT number for this transfer varies:
    * MT 2500 is total,
