@@ -98,6 +98,7 @@ void chi_physics::TransportCrossSections::
   std::vector<chi_physics::TransportCrossSections*> cross_secs;
   cross_secs.reserve(combinations.size());
   int num_grps_G=0;
+  int num_precursors_J=0;
   int count=0;
   for (auto& combo : combinations)
   {
@@ -117,12 +118,17 @@ void chi_physics::TransportCrossSections::
 
     //============================ Check number of groups
     if (cross_secs.size() == 1)
+    {
       num_grps_G = xs->G;
+      num_precursors_J = xs->J;
+    }
     else
+    {
       if (cross_secs[count-1]->G != num_grps_G)
         chi_log.Log(LOG_ALLERROR)
           << "In call to TransportCrossSections::MakeCombined: "
           << "all cross-sections must have the same number of groups.";
+    }
     ++count;
   }
 
@@ -133,12 +139,16 @@ void chi_physics::TransportCrossSections::
 
   //======================================== Combine 1D cross-sections
   this->G = num_grps_G;
+  this->J = num_precursors_J;
   sigma_tg.clear();
   sigma_fg.clear();
   sigma_captg.clear();
   chi_g.clear();
   nu_sigma_fg.clear();
   ddt_coeff.clear();
+  lambda.clear();
+  gamma.clear();
+  chi_d.clear();
 
   sigma_tg.resize(num_grps_G,0.0);
   sigma_fg.resize(num_grps_G,0.0);
@@ -146,6 +156,11 @@ void chi_physics::TransportCrossSections::
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
   ddt_coeff.resize(num_grps_G,0.0);
+  lambda.resize(J,0.0);
+  gamma.resize(J,0.0);
+  chi_d.resize(G);
+  for (int g=0; g<G; g++)
+    chi_d[g].resize(J,0.0);
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
@@ -157,6 +172,14 @@ void chi_physics::TransportCrossSections::
       chi_g      [g] += cross_secs[x]->chi_g      [g]*combinations[x].second/combinations_total;
       nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g]*combinations[x].second;
       ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g]*combinations[x].second/combinations_total;
+    }
+    // Delayed neutron data
+    for (int j=0; j<J; j++)
+    {
+      lambda[j] += cross_secs[x]->lambda[j];
+      gamma [j] += cross_secs[x]->gamma [j];
+      for (int g=0; g<G; g++)
+        chi_d[g][j] += cross_secs[x]->chi_d[g][j];
     }
   }
 

@@ -279,9 +279,11 @@ void chi_physics::TransportCrossSections::
     }
     if (first_word == "NUM_PRECURSORS")
     {
+
       line_stream >> J;
       lambda.resize(J,0.0);
       gamma = lambda;
+      
       if (grabbed_G)
       {
         chi_d.resize(G);
@@ -309,7 +311,7 @@ void chi_physics::TransportCrossSections::
         ReadTransferMatrix("TRANSFER_MOMENTS",transfer_matrix,f,G,ln,ls);
 
       if (fw == "CHI_DELAYED_BEGIN")
-        ReadDelayedChi("CHI_DELAYED",chi_d,f,G,ln,ls);
+        ReadDelayedChi("CHI_DELAYED",chi_d,f,G,ln,ls);    
     }
 
     catch (const std::runtime_error& err)
@@ -336,6 +338,5 @@ void chi_physics::TransportCrossSections::
   for (int i = 0; i<G;++i){
     nu_sigma_fg[i] = nu_sigma_fg[i]*sigma_fg[i];
   }
-
   file.close();
 }
