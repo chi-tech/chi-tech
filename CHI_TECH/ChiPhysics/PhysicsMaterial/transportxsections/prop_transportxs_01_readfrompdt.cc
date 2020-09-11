@@ -10,12 +10,15 @@ extern ChiLog& chi_log;
 void chi_physics::TransportCrossSections::
   MakeFromPDTxsFile(const std::string &file_name,std::string MT_TRANSFER)
 {
+  //======================================== Clear any previous data
+  Reset();
+
+  //======================================== Opening the file
   chi_log.Log(LOG_0)
     << "Reading PDT cross-section file \"" << file_name << "\"";
 
   std::string MT_SEARCH_VAL = MT_TRANSFER + std::string(",");
 
-  //======================================== Opening the file
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
