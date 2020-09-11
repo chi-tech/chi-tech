@@ -17,16 +17,17 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-void LinearBoltzman::Solver::ClassicRichardson(int group_set_num, SweepChunk* sweep_chunk,
-    MainSweepScheduler & sweepScheduler, bool log_info /* = true*/)
+void LinearBoltzman::Solver::
+  ClassicRichardson(int group_set_num,
+                    SweepChunk* sweep_chunk,
+                    MainSweepScheduler & sweepScheduler,
+                    bool log_info /* = true*/)
 {
   if (log_info)
   {
-    chi_log.Log(LOG_0)
-      << "\n\n";
-    chi_log.Log(LOG_0)
-      << "********** Solving groupset " << group_set_num
-      << " with Classic-Richardson.\n\n";
+    chi_log.Log(LOG_0) << "\n\n";
+    chi_log.Log(LOG_0) << "********** Solving groupset " << group_set_num
+                       << " with Classic-Richardson.\n\n";
   }
 
   //================================================== Obtain groupset

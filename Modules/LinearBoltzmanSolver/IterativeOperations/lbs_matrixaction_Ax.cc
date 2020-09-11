@@ -7,7 +7,7 @@
 typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 //###################################################################
 /**Computes the action of the transport matrix on a vector.*/
-int NPTMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
+int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 {
   KSPDataContext* context;
   MatShellGetContext(matrix,&context);

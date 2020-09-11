@@ -3,4 +3,4 @@
 
 
 
-int NPTMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax);
+int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax);

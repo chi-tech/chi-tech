@@ -12,36 +12,39 @@ void LinearBoltzman::Solver::InitializeBoundaries()
   std::vector<std::vector<double>>& flux_vec = incident_P0_mg_boundaries;
 
   // Defining default Vacuum boundary
-  std::vector<double> zero_boundary(groups.size(),0.0);
-  flux_vec.push_back(zero_boundary);
+  zero_boundary.resize(groups.size(),0.0);
 
   // ================================================= Populate boundaries
-  chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
-  chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
-  chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
-  int bndry_id=0;
-  for (auto bndry_type : boundary_types)
+  if (sweep_boundaries.empty())
   {
-    int vec_index = bndry_type.second;
-
-    if (bndry_type.first == LinearBoltzman::BoundaryType::VACUUM)
-      sweep_boundaries.push_back(new SweepVacuumBndry(flux_vec.back()));
-    else if (bndry_type.first == LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
-      sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
-    else if (bndry_type.first == LinearBoltzman::BoundaryType::REFLECTING)
+    chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
+    chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
+    chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
+    int bndry_id=0;
+    for (auto bndry_type : boundary_types)
     {
-      chi_mesh::Normal normal;
-      if (bndry_id == 0) normal = ihat;
-      if (bndry_id == 1) normal = ihat*-1.0;
-      if (bndry_id == 2) normal = jhat;
-      if (bndry_id == 3) normal = jhat*-1.0;
-      if (bndry_id == 4) normal = khat;
-      if (bndry_id == 5) normal = khat*-1.0;
+      int vec_index = bndry_type.second;
 
-      sweep_boundaries.push_back(
-        new SweepReflectingBndry(flux_vec.back(), normal));
+      if (bndry_type.first == LinearBoltzman::BoundaryType::VACUUM)
+        sweep_boundaries.push_back(new SweepVacuumBndry(zero_boundary));
+      else if (bndry_type.first == LinearBoltzman::BoundaryType::INCIDENT_ISOTROPIC)
+        sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
+      else if (bndry_type.first == LinearBoltzman::BoundaryType::REFLECTING)
+      {
+        chi_mesh::Normal normal;
+        if (bndry_id == 0) normal = ihat;
+        if (bndry_id == 1) normal = ihat*-1.0;
+        if (bndry_id == 2) normal = jhat;
+        if (bndry_id == 3) normal = jhat*-1.0;
+        if (bndry_id == 4) normal = khat;
+        if (bndry_id == 5) normal = khat*-1.0;
+
+        sweep_boundaries.push_back(
+          new SweepReflectingBndry(zero_boundary, normal));
+      }
+
+      ++bndry_id;
     }
+  }//if empty
 
-    ++bndry_id;
-  }
 }

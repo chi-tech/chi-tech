@@ -65,7 +65,7 @@ void LinearBoltzman::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
                                   &data_context,&A);
 
   //================================================== Set the action-operator
-  MatShellSetOperation(A, MATOP_MULT,(void (*)(void)) NPTMatrixAction_Ax);
+  MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) LBSMatrixAction_Ax);
 
   //================================================== Initial vector assembly
   VecCreate(PETSC_COMM_WORLD,&phi_new);

@@ -1,5 +1,5 @@
 #include "lbs_linear_boltzman_solver.h"
-#include <ChiMesh/Cell/cell.h>
+
 #include <PiecewiseLinear/pwl.h>
 #include <ChiPhysics/chi_physics.h>
 #include <chi_log.h>
@@ -66,9 +66,9 @@ void LinearBoltzman::Solver::InitializeParrays()
                                 << local_unknown_count;
 
   //================================================== Size local vectors
-  q_moments_local.resize(local_unknown_count,0.0);
-  phi_old_local.resize(local_unknown_count,0.0);
-  phi_new_local.resize(local_unknown_count,0.0);
+  q_moments_local.assign(local_unknown_count,0.0);
+  phi_old_local.assign(local_unknown_count,0.0);
+  phi_new_local.assign(local_unknown_count,0.0);
 
   //================================================== Read Restart data
   if (options.read_restart_data)
@@ -93,64 +93,69 @@ void LinearBoltzman::Solver::InitializeParrays()
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
-  for (auto& cell : grid->local_cells)
+  if (cell_transport_views.empty())
   {
-    auto cell_fe_view   = pwl_discretization->MapFeViewL(cell.local_id);
-    auto full_cell_view = new CellViewFull(cell_fe_view->dofs, num_grps, M);
-
-    int mat_id = cell.material_id;
-
-    full_cell_view->xs_id = matid_to_xs_map[mat_id];
-
-    full_cell_view->dof_phi_map_start = block_MG_counter;
-    block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
-
-    //Init face upwind flags and adj_partition_id
-    full_cell_view->face_local.resize(cell.faces.size(),true);
-    int f=0;
-    for (auto& face : cell.faces)
+    for (auto& cell : grid->local_cells)
     {
-      if (grid->IsCellBndry(face.neighbor))
+      auto cell_fe_view   = pwl_discretization->MapFeViewL(cell.local_id);
+      auto full_cell_view = new CellViewFull(cell_fe_view->dofs, num_grps, M);
+
+      int mat_id = cell.material_id;
+
+      full_cell_view->xs_id = matid_to_xs_map[mat_id];
+
+      full_cell_view->dof_phi_map_start = block_MG_counter;
+      block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
+
+      //Init face upwind flags and adj_partition_id
+      full_cell_view->face_local.resize(cell.faces.size(),true);
+      int f=0;
+      for (auto& face : cell.faces)
       {
-        chi_mesh::Vector3& n = face.normal;
+        if (grid->IsCellBndry(face.neighbor))
+        {
+          chi_mesh::Vector3& n = face.normal;
 
-        int boundary_id = -1;
-        if      (n.Dot(ihat)>0.999)  boundary_id = 0;
-        else if (n.Dot(ihat)<-0.999) boundary_id = 1;
-        else if (n.Dot(jhat)> 0.999) boundary_id = 2;
-        else if (n.Dot(jhat)<-0.999) boundary_id = 3;
-        else if (n.Dot(khat)> 0.999) boundary_id = 4;
-        else if (n.Dot(khat)<-0.999) boundary_id = 5;
+          int boundary_id = -1;
+          if      (n.Dot(ihat)>0.999)  boundary_id = 0;
+          else if (n.Dot(ihat)<-0.999) boundary_id = 1;
+          else if (n.Dot(jhat)> 0.999) boundary_id = 2;
+          else if (n.Dot(jhat)<-0.999) boundary_id = 3;
+          else if (n.Dot(khat)> 0.999) boundary_id = 4;
+          else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
-        if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
-      }//if bndry
+          if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
+        }//if bndry
 
-      if (not face.IsNeighborLocal(grid))
-        full_cell_view->face_local[f] = false;
+        if (not face.IsNeighborLocal(grid))
+          full_cell_view->face_local[f] = false;
 
-      ++f;
-    }//for f
+        ++f;
+      }//for f
 
-    //Add address
-    local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
+      //Add address
+      local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
 
-    if (cell_fe_view->dofs > max_cell_dof_count)
-      max_cell_dof_count = cell_fe_view->dofs;
+      if (cell_fe_view->dofs > max_cell_dof_count)
+        max_cell_dof_count = cell_fe_view->dofs;
 
-    cell_transport_views.push_back(full_cell_view);
-  }//for local cell
+      cell_transport_views.push_back(full_cell_view);
+    }//for local cell
+  }//if empty
+
 
   //================================================== Initialize Field Functions
-  for (int g=0; g<groups.size(); g++)
+  if (field_functions.empty())
   {
-    for (int m=0; m<num_moments; m++)
+    for (int g=0; g<groups.size(); g++)
     {
+      for (int m=0; m<num_moments; m++)
+      {
+        std::string text_name = std::string("Flux_g") +
+                                std::to_string(g) +
+                                std::string("_m") + std::to_string(m);
 
-      std::string text_name = std::string("Flux_g") +
-                            std::to_string(g) +
-                            std::string("_m") + std::to_string(m);
-
-      auto group_ff = new chi_physics::FieldFunction(
+        auto group_ff = new chi_physics::FieldFunction(
           text_name,                                    //Text name
           chi_physics_handler.fieldfunc_stack.size(),   //FF-id
           chi_physics::FieldFunctionType::DFEM_PWL,     //Type
@@ -162,8 +167,10 @@ void LinearBoltzman::Solver::InitializeParrays()
           &local_cell_phi_dof_array_address,            //Dof block address
           &phi_old_local);                              //Data vector
 
-      chi_physics_handler.fieldfunc_stack.push_back(group_ff);
-      field_functions.push_back(group_ff);
-    }//for m
-  }//for g
+        chi_physics_handler.fieldfunc_stack.push_back(group_ff);
+        field_functions.push_back(group_ff);
+      }//for m
+    }//for g
+  }//if empty
+
 }

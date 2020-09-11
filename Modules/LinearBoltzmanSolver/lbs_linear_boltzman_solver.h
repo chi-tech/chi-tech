@@ -67,6 +67,7 @@ public:
   //the stack to use as default. This is loaded during initparrays
   std::vector<std::pair<BoundaryType, int>>     boundary_types;
   std::vector<std::vector<double>>              incident_P0_mg_boundaries;
+  std::vector<double>                           zero_boundary;
   std::vector<chi_mesh::sweep_management::SPDS*> sweep_orderings;
   std::vector<SweepBndry*>                      sweep_boundaries;
 

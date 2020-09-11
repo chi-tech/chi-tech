@@ -23,7 +23,6 @@ LBSGroupset::LBSGroupset()
   quadrature = nullptr;
   iterative_method = NPT_GMRES;
   angleagg_method  = LinearBoltzman::AngleAggregationType::POLAR;
-  angle_agg = new AngleAgg;
   master_num_grp_subsets = 1;
   master_num_ang_subsets = 1;
   residual_tolerance = 1.0e-6;
