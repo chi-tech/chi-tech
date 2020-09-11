@@ -68,7 +68,6 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
         {
           j_indices.push_back(face.neighbor);
           ++icount;
-          chi_log.Log(LOG_0VERBOSE_1) << i << " " << face.neighbor;
         }
     }
     i_indices[i+1] = icount;
