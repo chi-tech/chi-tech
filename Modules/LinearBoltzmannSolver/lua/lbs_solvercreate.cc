@@ -6,7 +6,7 @@
 extern ChiPhysics&  chi_physics_handler;
 extern ChiLog& chi_log;
 
-/** \defgroup LuaNPT Linear Boltzman Solver
+/** \defgroup LuaNPT Linear Boltzmann Solver
  * \ingroup LuaModules*/
 
 //###################################################################

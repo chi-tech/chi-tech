@@ -17,7 +17,7 @@ enum class GeometryType
   THREED_CARTESIAN = 5
 };
 
-/**Struct for storing NPT options.*/
+/**Struct for storing LBS options.*/
 struct Options
 {
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;

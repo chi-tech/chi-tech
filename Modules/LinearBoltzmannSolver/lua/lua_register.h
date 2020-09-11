@@ -1,4 +1,4 @@
-//module:Linear Boltzman Solver
+//module:Linear Boltzmann Solver
 RegisterFunction(chiLBSCreateSolver)
 
 RegisterFunction(chiLBSSetProperty)
@@ -51,7 +51,7 @@ RegisterFunction(chiLBSExecute)
 RegisterFunction(chiLBSGetFieldFunctionList)
 RegisterFunction(chiLBSGetScalarFieldFunctionList)
 
-//module:Linear Boltzman Solver - Groupset manipulation
+//module:Linear Boltzmann Solver - Groupset manipulation
 //\ref LuaLBSGroupsets Main page
 RegisterNamespace(LBSGroupset)
 RegisterFunction(chiLBSCreateGroup)

@@ -3,7 +3,7 @@
 
 
 //###################################################################
-/**Constructor for NPT*/
+/**Constructor for LBS*/
 LinearBoltzmann::Solver::Solver()
 {
   //============================================= Default options
