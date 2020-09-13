@@ -193,7 +193,11 @@ std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
 {
   //======================================== Check if this is already develeped
   if (num_ang_unknowns_avail)
+  {
+    chi_log.Log(LOG_0) << "Number of angular unknowns: "
+                       << number_angular_unknowns.second;
     return number_angular_unknowns;
+  }
 
   //======================================== If not developed
   int local_ang_unknowns = 0;

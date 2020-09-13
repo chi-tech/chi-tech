@@ -143,8 +143,8 @@ public:
 
   //Vector assembly
   int  MapDOF(chi_mesh::Cell* cell, int dof, int mom, int g);
-  void AssembleVector(LBSGroupset *groupset, Vec x, double *y);
-  void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y);
+  void AssembleVector(LBSGroupset *groupset, Vec x, double *y,bool with_delayed_psi=false);
+  void DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y,bool with_delayed_psi=false);
   void DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double *x_src, double *y);
   void ConvergeCycles(MainSweepScheduler& sweepScheduler,
                       SweepChunk* sweep_chunk,

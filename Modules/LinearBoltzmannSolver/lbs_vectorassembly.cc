@@ -17,7 +17,8 @@ MapDOF(chi_mesh::Cell *cell, int dof, int mom, int g)
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-AssembleVector(LBSGroupset *groupset, Vec x, double *y)
+AssembleVector(LBSGroupset *groupset, Vec x, double *y,
+               bool with_delayed_psi/*=false*/)
 {
   double* x_ref;
   VecGetArray(x,&x_ref);
@@ -47,8 +48,8 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
     }//for dof
   }//for cell
 
-
-  groupset->angle_agg->AssembleAngularUnknowns(index,x_ref);
+  if (with_delayed_psi)
+    groupset->angle_agg->AssembleAngularUnknowns(index,x_ref);
 
   VecRestoreArray(x,&x_ref);
 }
@@ -56,7 +57,8 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y)
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
+DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y,
+                  bool with_delayed_psi/*=false*/)
 {
   const double* x_ref;
   VecGetArrayRead(x_src,&x_ref);
@@ -86,7 +88,8 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y)
     }//for dof
   }//for cell
 
-  groupset->angle_agg->DisassembleAngularUnknowns(index,x_ref);
+  if (with_delayed_psi)
+    groupset->angle_agg->DisassembleAngularUnknowns(index,x_ref);
 
   VecRestoreArrayRead(x_src,&x_ref);
 }
