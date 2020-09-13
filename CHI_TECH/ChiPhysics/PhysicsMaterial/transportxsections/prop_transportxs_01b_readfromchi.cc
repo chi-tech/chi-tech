@@ -83,7 +83,10 @@ TRANSFER_MOMENTS_END
 void chi_physics::TransportCrossSections::
   MakeFromCHIxsFile(const std::string &file_name)
 {
+  //======================================== Clear any previous data
+  Reset();
 
+  //======================================== Read file
   chi_log.Log(LOG_0) << "Reading Chi cross-section file \"" << file_name << "\"\n";
   //opens and checks if open
   std::ifstream file;
