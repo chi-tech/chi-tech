@@ -282,11 +282,10 @@ void chi_physics::TransportCrossSections::
     }
     if (first_word == "NUM_PRECURSORS")
     {
-
       line_stream >> J;
       lambda.resize(J,0.0);
       gamma = lambda;
-      
+    
       if (grabbed_G)
       {
         chi_d.resize(G);
@@ -307,14 +306,17 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_BEGIN")                  Read1DXS("NU",nu_sigma_fg,f,G,ln,ls);
       if (fw == "CHI_PROMPT_BEGIN")          Read1DXS("CHI_PROMPT",chi_g,f,G,ln,ls);
       if (fw == "DDT_COEFF_BEGIN")           Read1DXS("DDT_COEFF",ddt_coeff,f,G,ln,ls);
-      if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA",lambda,f,J,ln,ls);
-      if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA",gamma,f,J,ln,ls);
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",transfer_matrix,f,G,ln,ls);
 
-      if (fw == "CHI_DELAYED_BEGIN")
-        ReadDelayedChi("CHI_DELAYED",chi_d,f,G,ln,ls);    
+      
+      if (J>0) {
+        if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA",lambda,f,J,ln,ls);
+        if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA",gamma,f,J,ln,ls);
+        if (fw == "CHI_DELAYED_BEGIN")
+          ReadDelayedChi("CHI_DELAYED",chi_d,f,G,ln,ls);   
+      } 
     }
 
     catch (const std::runtime_error& err)

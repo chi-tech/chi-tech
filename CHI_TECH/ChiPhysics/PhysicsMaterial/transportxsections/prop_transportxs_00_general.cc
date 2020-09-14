@@ -106,7 +106,7 @@ void chi_physics::TransportCrossSections::
   int num_precursors_J=0;
   int count=0;
   double combinations_total = 0.0;
-  for (auto& combo : combinations)
+  for (auto combo : combinations)
   {
     combinations_total += combo.second;
     chi_physics::TransportCrossSections* xs;
@@ -131,6 +131,7 @@ void chi_physics::TransportCrossSections::
     }
     else
     {
+      num_precursors_J += xs->J;
       if (cross_secs[count-1]->G != num_grps_G)
       {
         chi_log.Log(LOG_ALLERROR)
@@ -138,15 +139,14 @@ void chi_physics::TransportCrossSections::
           << "all cross-sections must have the same number of groups.";
         exit(EXIT_FAILURE);
       }
+    }
     ++count;
   }
 
-  // For chi and ddt_coeff weighting
-  double combinations_total = 0.0;
-  for (const auto& combination : combinations)
-    combinations_total += combination.second;
+  
 
   //======================================== Combine 1D cross-sections
+  int j_start(0), j_end(0);
   this->G = num_grps_G;
   this->J = num_precursors_J;
   sigma_tg.clear();
@@ -165,8 +165,8 @@ void chi_physics::TransportCrossSections::
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
   ddt_coeff.resize(num_grps_G,0.0);
-  lambda.resize(J,0.0);
-  gamma.resize(J,0.0);
+  lambda.resize(num_precursors_J,0.0);
+  gamma.resize(num_precursors_J,0.0);
   chi_d.resize(G);
   for (int g=0; g<G; g++)
     chi_d[g].resize(J,0.0);
@@ -183,13 +183,15 @@ void chi_physics::TransportCrossSections::
       ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g]*combinations[x].second/combinations_total;
     }
     // Delayed neutron data
-    for (int j=0; j<J; j++)
+    j_end += cross_secs[x]->J;
+    for (int j=j_start; j<j_end; j++)
     {
       lambda[j] += cross_secs[x]->lambda[j];
       gamma [j] += cross_secs[x]->gamma [j];
       for (int g=0; g<G; g++)
         chi_d[g][j] += cross_secs[x]->chi_d[g][j];
     }
+    j_start += cross_secs[x]->J;
   }
 
   //======================================== Combine transfer matrices

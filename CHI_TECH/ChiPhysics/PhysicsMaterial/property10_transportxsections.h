@@ -66,10 +66,14 @@ private:
   {
     int G=0;
     int L=0;
+    int J=0;
 
     sigma_tg.clear();
     sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
     transfer_matrix.clear();
+    lambda.clear();
+    gamma.clear();
+    chi_d.clear();
 
     diffusion_initialized = false;
     scattering_initialized = false;
