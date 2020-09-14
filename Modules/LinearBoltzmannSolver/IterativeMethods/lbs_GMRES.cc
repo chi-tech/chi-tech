@@ -64,6 +64,7 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
                                   globl_size,
                                   globl_size,
                                   &data_context,&A);
+  groupset->angle_agg->ZeroIncomingDelayedPsi();
 
   //================================================== Set the action-operator
   MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) LBSMatrixAction_Ax);

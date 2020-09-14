@@ -29,7 +29,7 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
                     LinearBoltzmann::SourceFlags::USE_DLINV_SOURCE);
 
   //============================================= Sweeping the new source
-  groupset->angle_agg->ResetDelayedPsi();
+  groupset->angle_agg->ZeroOutgoingDelayedPsi();
 
   solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
   sweepScheduler->Sweep(sweep_chunk);

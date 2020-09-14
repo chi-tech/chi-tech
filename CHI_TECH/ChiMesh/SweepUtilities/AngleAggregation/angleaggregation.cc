@@ -30,8 +30,9 @@ double chi_mesh::sweep_management::AngleAggregation::GetDelayedPsiNorm()
 }
 
 //###################################################################
-/** Resets all the intra-location and inter-location cyclic interfaces.*/
-void chi_mesh::sweep_management::AngleAggregation::ResetDelayedPsi()
+/** Resets all the outgoing intra-location and inter-location
+ * cyclic interfaces.*/
+void chi_mesh::sweep_management::AngleAggregation::ZeroOutgoingDelayedPsi()
 {
   for (auto angsetgrp : angle_set_groups)
     for (auto angset : angsetgrp->angle_sets)
@@ -41,6 +42,43 @@ void chi_mesh::sweep_management::AngleAggregation::ResetDelayedPsi()
   for (auto angsetgrp : angle_set_groups)
     for (auto angset : angsetgrp->angle_sets)
       angset->delayed_local_psi.assign(angset->delayed_local_psi.size(),0.0);
+}
+
+//###################################################################
+/** Resets all the incoming intra-location and inter-location
+ * cyclic interfaces.*/
+void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
+{
+  //======================================== Opposing reflecting bndries
+  for (auto bndry : sim_boundaries)
+  {
+    if (bndry->IsReflecting())
+    {
+      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+
+      if (rbndry->opposing_reflected)
+        for (auto& angle : rbndry->hetero_boundary_flux_old)
+          for (auto& cellvec : angle)
+            for (auto& facevec : cellvec)
+              for (auto& dofvec : facevec)
+                for (auto& val : dofvec)
+                  val = 0.0;
+
+    }//if reflecting
+  }//for bndry
+
+  //======================================== Intra-cell cycles
+  for (auto as_group : angle_set_groups)
+    for (auto angle_set : as_group->angle_sets)
+      for (auto& val : angle_set->delayed_local_psi_old)
+        val = 0.0;
+
+  //======================================== Inter location cycles
+  for (auto as_group : angle_set_groups)
+    for (auto angle_set : as_group->angle_sets)
+      for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
+        for (auto& val : loc_vector)
+          val = 0.0;
 }
 
 //###################################################################
