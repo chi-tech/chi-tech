@@ -23,15 +23,21 @@ chi_physics::TransportCrossSections::TransportCrossSections() :
 void chi_physics::TransportCrossSections::
   MakeSimple0(int in_G, double in_sigmat)
 {
+  //======================================== Clear any previous data
+  Reset();
+
   G = in_G;
+  L = 0;
+
   sigma_tg.clear();
   sigma_tg.resize(in_G,in_sigmat);
   sigma_fg.resize(in_G,0.0);
   sigma_captg.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
+  ddt_coeff.resize(in_G,0.0);
 
-  transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
+  transfer_matrix.emplace_back(in_G,in_G);
 }
 
 //###################################################################
@@ -41,7 +47,11 @@ void chi_physics::TransportCrossSections::
 void chi_physics::TransportCrossSections::
   MakeSimple1(int in_G, double in_sigmat, double c)
 {
+  //======================================== Clear any previous data
+  Reset();
+
   G = in_G;
+  L = 0;
 
   sigma_tg.resize(in_G,in_sigmat);
   sigma_tg.clear();
@@ -50,8 +60,9 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
+  ddt_coeff.resize(in_G,0.0);
 
-  transfer_matrix.push_back(chi_math::SparseMatrix(in_G,in_G));
+  transfer_matrix.emplace_back(in_G,in_G);
 
   auto& ref_matrix = transfer_matrix.back();
 
@@ -64,10 +75,7 @@ void chi_physics::TransportCrossSections::
   {
     //Downscattering
     if (g>0)
-    {
       ref_matrix.Insert(g,g-1,in_sigmat*c*2.0/4.0);
-    }
-
 
     //Upscattering
     if (g>(in_G/2))
@@ -78,15 +86,9 @@ void chi_physics::TransportCrossSections::
         ref_matrix.Insert(g,g+1,in_sigmat*c*1.0/4.0);
       }
       else
-      {
         ref_matrix.Insert(g,g-1,in_sigmat*c*2.0/4.0);
-      }
     }
-
-  }
-
-//  chi_log.Log(LOG_0WARNING) << c << " " << in_sigmat;
-//  chi_log.Log(LOG_0WARNING) << transfer_matrix[0].PrintS();
+  }//for g
 }
 
 //###################################################################
@@ -94,14 +96,19 @@ void chi_physics::TransportCrossSections::
 void chi_physics::TransportCrossSections::
   MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
+  //======================================== Clear any previous data
+  Reset();
+
   //======================================== Pickup all xs and make sure valid
   std::vector<chi_physics::TransportCrossSections*> cross_secs;
   cross_secs.reserve(combinations.size());
   int num_grps_G=0;
   int num_precursors_J=0;
   int count=0;
+  double combinations_total = 0.0;
   for (auto& combo : combinations)
   {
+    combinations_total += combo.second;
     chi_physics::TransportCrossSections* xs;
     try {
       xs = chi_physics_handler.trnsprt_xs_stack.at(combo.first);
@@ -125,10 +132,12 @@ void chi_physics::TransportCrossSections::
     else
     {
       if (cross_secs[count-1]->G != num_grps_G)
+      {
         chi_log.Log(LOG_ALLERROR)
           << "In call to TransportCrossSections::MakeCombined: "
           << "all cross-sections must have the same number of groups.";
-    }
+        exit(EXIT_FAILURE);
+      }
     ++count;
   }
 
