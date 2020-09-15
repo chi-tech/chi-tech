@@ -106,9 +106,9 @@ void chi_physics::TransportCrossSections::
   int num_precursors_J=0;
   int count=0;
   double combinations_total = 0.0;
+  double fissile_total = 0.0;
   for (auto combo : combinations)
   {
-    combinations_total += combo.second;
     chi_physics::TransportCrossSections* xs;
     try {
       xs = chi_physics_handler.trnsprt_xs_stack.at(combo.first);
@@ -121,32 +121,49 @@ void chi_physics::TransportCrossSections::
       exit(EXIT_FAILURE);
     }
 
+    combinations_total += combo.second;
+    if (xs->is_fissile) 
+      fissile_total += combo.second;
+
     cross_secs.push_back(xs);
 
     //============================ Check number of groups
     if (cross_secs.size() == 1)
     {
       num_grps_G = xs->G;
-      num_precursors_J = xs->J;
+      if (xs->is_fissile)
+        num_precursors_J = xs->J;
     }
     else
     {
-      num_precursors_J += xs->J;
-      if (cross_secs[count-1]->G != num_grps_G)
+      if (xs->G != num_grps_G)
       {
         chi_log.Log(LOG_ALLERROR)
           << "In call to TransportCrossSections::MakeCombined: "
           << "all cross-sections must have the same number of groups.";
         exit(EXIT_FAILURE);
       }
+      if (xs->is_fissile)
+      {
+        if (num_precursors_J == 0) 
+          num_precursors_J = xs->J;
+        else
+        {
+          if (xs->J != num_precursors_J)
+          {
+            chi_log.Log(LOG_ALLERROR)
+              << "In call to TransportCrossSections::MakeCombined: "
+              << "all fissile cross-sections must have the same number "
+              << "of precursors.";
+            exit(EXIT_FAILURE);
+          }
+        }
+      }
     }
     ++count;
   }
 
-  
-
   //======================================== Combine 1D cross-sections
-  int j_start(0), j_end(0);
   this->G = num_grps_G;
   this->J = num_precursors_J;
   sigma_tg.clear();
@@ -168,30 +185,45 @@ void chi_physics::TransportCrossSections::
   lambda.resize(num_precursors_J,0.0);
   gamma.resize(num_precursors_J,0.0);
   chi_d.resize(G);
-  for (int g=0; g<G; g++)
+  for (int g=0; g<G; ++g)
     chi_d[g].resize(J,0.0);
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
-    for (int g=0; g<G; g++)
+    for (int g=0; g<G; ++g)
     {
+      // Normal homogenization process. Multiply a microscopic cross section
+      // by the associated atomic density of the isotope.
       sigma_tg   [g] += cross_secs[x]->sigma_tg   [g]*combinations[x].second;
       sigma_fg   [g] += cross_secs[x]->sigma_fg   [g]*combinations[x].second;
       sigma_captg[g] += cross_secs[x]->sigma_captg[g]*combinations[x].second;
-      chi_g      [g] += cross_secs[x]->chi_g      [g]*combinations[x].second/combinations_total;
       nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g]*combinations[x].second;
-      ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g]*combinations[x].second/combinations_total;
+
+      // Chi is a spectrum and therefore homogenization is a bit different.
+      // Use a weighted average of chi for each fissile isotpoe to produce
+      // an effective chi accross several fissile isotopes.
+      if (cross_secs[x]->is_fissile)
+        chi_g[g] += cross_secs[x]->chi_g[g]*combinations[x].second/fissile_total;
+
+      // The ddt coefficient should be identical for all materials by nature
+      // of the requirement of the same group structures to be used.
+      // Take a simple weighted average. The result is identical to simply
+      // taking the first materials ddt_coeff
+      ddt_coeff[g] += cross_secs[x]->ddt_coeff[g]*combinations[x].second/combinations_total;
     }
-    // Delayed neutron data
-    j_end += cross_secs[x]->J;
-    for (int j=j_start; j<j_end; j++)
+
+    // Delayed neutron data. Only use if this material has precursors and is fissile.
+    if (cross_secs[x]->is_fissile)
     {
-      lambda[j] += cross_secs[x]->lambda[j];
-      gamma [j] += cross_secs[x]->gamma [j];
-      for (int g=0; g<G; g++)
-        chi_d[g][j] += cross_secs[x]->chi_d[g][j];
+      for (int j=0; j<J; j++)
+      {
+        // Use the same method used chi_g for each of these.
+        lambda[j] = cross_secs[x]->lambda[j]*combinations[x].second/fissile_total;
+        gamma [j] = cross_secs[x]->gamma [j]*combinations[x].second/fissile_total;
+        for (int g=0; g<G; g++)
+          chi_d[g][j] = cross_secs[x]->chi_d[g][j]*combinations[x].second/fissile_total;
+      }
     }
-    j_start += cross_secs[x]->J;
   }
 
   //======================================== Combine transfer matrices

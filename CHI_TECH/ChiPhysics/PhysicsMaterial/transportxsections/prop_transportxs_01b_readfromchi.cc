@@ -310,8 +310,14 @@ void chi_physics::TransportCrossSections::
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",transfer_matrix,f,G,ln,ls);
 
-      
-      if (J>0) {
+      for (auto& sig_f : sigma_fg) {
+        if (sig_f > 0.0) {
+          is_fissile = true;
+          break;
+        }
+      }
+
+      if ((J>0) and (is_fissile)) {
         if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA",lambda,f,J,ln,ls);
         if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA",gamma,f,J,ln,ls);
         if (fw == "CHI_DELAYED_BEGIN")
@@ -343,5 +349,6 @@ void chi_physics::TransportCrossSections::
   for (int i = 0; i<G;++i){
     nu_sigma_fg[i] = nu_sigma_fg[i]*sigma_fg[i];
   }
+
   file.close();
 }
