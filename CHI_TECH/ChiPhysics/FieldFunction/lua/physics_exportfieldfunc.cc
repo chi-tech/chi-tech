@@ -135,3 +135,52 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
 //  ff->ExportMultiToVTKG(ff_slave,base_name,field_name);
   return 0;
 }
+
+//#############################################################################
+/** Exports all the field functions in a list to VTK format.
+ *  *
+\param listFFHandles table Global handles to the field functions
+\param BaseName char Base name for the exported file.
+
+\ingroup LuaFieldFunc
+\author Jan*/
+int chiExportMultiFieldFunctionToVTK(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 2)
+    LuaPostArgAmountError(__FUNCTION__, 2, num_args);
+
+  int list = lua_tonumber(L,1);
+  const char* base_name = lua_tostring(L,2);
+
+  LuaCheckTableValue(__FUNCTION__,L,1);
+
+  int table_size = lua_rawlen(L,1);
+  std::vector<chi_physics::FieldFunction*> ffs;
+  ffs.reserve(table_size);
+  for (int i=0; i<table_size; ++i)
+  {
+    lua_pushnumber(L,i+1);
+    lua_gettable(L,1);
+
+    int ff_handle = lua_tonumber(L,-1);
+    lua_pop(L,1);
+
+    //======================================================= Getting solver
+    chi_physics::FieldFunction* ff;
+    try{
+      ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
+      ffs.push_back(ff);
+    }
+    catch(const std::out_of_range& o)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  chi_physics::FieldFunction::ExportMultipleFFToVTK(base_name,ffs);
+
+  return 0;
+}
