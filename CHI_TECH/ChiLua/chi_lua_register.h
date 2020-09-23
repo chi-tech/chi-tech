@@ -194,6 +194,7 @@ RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)
 RegisterFunction(chiExportFieldFunctionToVTKG)
 RegisterFunction(chiExportMultiFieldFunctionToVTKG)
+RegisterFunction(chiExportMultiFieldFunctionToVTK)
 
 //module:Transport interaction cross-sections
 //\ref ChiXSFile Chi-Tech native cross-section file format

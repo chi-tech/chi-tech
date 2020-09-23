@@ -20,6 +20,7 @@ extern ChiTimer chi_program_timer;
 void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
                                     MainSweepScheduler & sweepScheduler, bool log_info /* = true*/)
 {
+  constexpr bool WITH_DELAYED_PSI = true;
   if (log_info)
   {
     chi_log.Log(LOG_0)
@@ -63,6 +64,7 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
                                   globl_size,
                                   globl_size,
                                   &data_context,&A);
+  groupset->angle_agg->ZeroIncomingDelayedPsi();
 
   //================================================== Set the action-operator
   MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) LBSMatrixAction_Ax);
@@ -129,8 +131,8 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
   }
 
   //=================================================== Assemble vectors
-  AssembleVector(groupset,q_fixed,phi_new_local.data());
-  AssembleVector(groupset,phi_old,phi_old_local.data());
+  AssembleVector(groupset,q_fixed,phi_new_local.data(),WITH_DELAYED_PSI);
+  AssembleVector(groupset,phi_old,phi_old_local.data(),WITH_DELAYED_PSI);
 
   //=================================================== Retool for GMRES
   sweep_chunk->SetDestinationPhi(&phi_new_local);
@@ -162,8 +164,8 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
 
-  DisAssembleVector(groupset, phi_new, phi_new_local.data());
-  DisAssembleVector(groupset, phi_new, phi_old_local.data());
+  DisAssembleVector(groupset, phi_new, phi_new_local.data(),WITH_DELAYED_PSI);
+  DisAssembleVector(groupset, phi_new, phi_old_local.data(),WITH_DELAYED_PSI);
 
   //==================================================== Clean up
   KSPDestroy(&ksp);

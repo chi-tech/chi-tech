@@ -9,6 +9,7 @@ typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 /**Computes the action of the transport matrix on a vector.*/
 int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 {
+  constexpr bool WITH_DELAYED_PSI = true;
   KSPDataContext* context;
   MatShellGetContext(matrix,&context);
 
@@ -20,7 +21,7 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   //============================================= Copy krylov vector into local
   solver->DisAssembleVector(groupset,
                             krylov_vector,
-                            solver->phi_old_local.data());
+                            solver->phi_old_local.data(),WITH_DELAYED_PSI);
 
   //============================================= Setting the source using
   //                                             updated phi_old
@@ -28,7 +29,7 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
                     LinearBoltzmann::SourceFlags::USE_DLINV_SOURCE);
 
   //============================================= Sweeping the new source
-  groupset->angle_agg->ResetDelayedPsi();
+  groupset->angle_agg->ZeroOutgoingDelayedPsi();
 
   solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
   sweepScheduler->Sweep(sweep_chunk);
@@ -56,7 +57,7 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 
   solver->AssembleVector(groupset,
                          context->x_temp,
-                         solver->phi_new_local.data());
+                         solver->phi_new_local.data(),WITH_DELAYED_PSI);
 
 
   //============================================= Computing action
