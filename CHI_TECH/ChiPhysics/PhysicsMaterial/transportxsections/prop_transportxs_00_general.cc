@@ -206,14 +206,14 @@ void chi_physics::TransportCrossSections::
       nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g] * N_i;
       ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g] * f_i;
     }
-    if ((cross_secs[x]->is_fissile) and (cross_secs[x]->J > 0)
+    if ((cross_secs[x]->is_fissile) and (cross_secs[x]->J > 0))
     {
       for (int j=0; j<J; ++j)
       {
         lambda[j] += cross_secs[x]->lambda[j] * ff_i;
         gamma [j] += cross_secs[x]->gamma [j] * ff_i;
         for (int g=0; g<G; g++)
-          chi_d[g][j] = cross_secs[x]->chi_d[g][j] * ff_i;
+          chi_d[g][j] += cross_secs[x]->chi_d[g][j] * ff_i;
       }
     }
   }
