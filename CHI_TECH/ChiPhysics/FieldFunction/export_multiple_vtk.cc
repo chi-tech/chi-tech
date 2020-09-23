@@ -192,12 +192,14 @@ void chi_physics::FieldFunction::
   if (ff_type == FieldFunctionType::CFEM_PWL or
       ff_type == FieldFunctionType::DFEM_PWL)
   {
+    int unk_number = -1;
     for (auto ff : ff_list)
     {
       if (ff->unknown_manager== nullptr) continue;
 
       int ref_unknown = ff->ref_set;
       auto unknown = ff->unknown_manager->unknowns[ref_unknown];
+      unk_number++;
 
       int N = ff->unknown_manager->GetTotalUnknownSize();
 
@@ -206,7 +208,11 @@ void chi_physics::FieldFunction::
         int component = ff->unknown_manager->MapUnknown(ref_unknown,0);
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        unk_arr->SetName(unknown->text_name.c_str());
+        if (unknown->text_name == "")
+          unk_arr->SetName((std::string("Unknown_")+
+                            std::to_string(unk_number)).c_str());
+        else
+          unk_arr->SetName(unknown->text_name.c_str());
 
         int c=-1;
         for (auto& cell : grid->local_cells)
@@ -231,7 +237,11 @@ void chi_physics::FieldFunction::
           int component = ff->unknown_manager->MapUnknown(ref_unknown,comp);
 
           auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-          unk_arr->SetName(unknown->component_text_names[comp].c_str());
+          if (unknown->component_text_names[comp]=="")
+            unk_arr->SetName((std::string("Component_")+
+                              std::to_string(comp)).c_str());
+          else
+            unk_arr->SetName(unknown->component_text_names[comp].c_str());
 
           int c=-1;
           for (auto& cell : grid->local_cells)

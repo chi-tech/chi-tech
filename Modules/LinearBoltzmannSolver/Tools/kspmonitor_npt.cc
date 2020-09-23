@@ -35,6 +35,7 @@ PetscErrorCode
 KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
                       KSPConvergedReason* convergedReason, void *monitordestroy)
 {
+  constexpr bool WITH_DELAYED_PSI = true;
   //======================================== Get data context
   KSPDataContext* context;
   KSPGetApplicationContext(ksp,&context);
@@ -97,7 +98,8 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
           context->solver->
           DisAssembleVector(context->groupset, phi_new,
-                            context->solver->phi_old_local.data());
+                            context->solver->phi_old_local.data(),
+                            WITH_DELAYED_PSI);
 
           context->solver->last_restart_write = chi_program_timer.GetTime()/60000.0;
           context->solver->WriteRestartData(

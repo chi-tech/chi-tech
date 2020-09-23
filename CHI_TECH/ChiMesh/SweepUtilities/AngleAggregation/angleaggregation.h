@@ -43,7 +43,8 @@ public:
 
 public:
   double GetDelayedPsiNorm();
-  void   ResetDelayedPsi();
+  void   ZeroOutgoingDelayedPsi();
+  void   ZeroIncomingDelayedPsi();
 
   void InitializeReflectingBCs();
   void ResetReflectingBCs();
