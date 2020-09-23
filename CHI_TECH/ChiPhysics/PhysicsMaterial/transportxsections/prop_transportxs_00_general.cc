@@ -105,8 +105,8 @@ void chi_physics::TransportCrossSections::
   int num_grps_G=0;
   int num_precursors_J=0;
   int count=0;
-  double combinations_total = 0.0;
-  double fissile_total = 0.0;
+  double N_total = 0.0;
+  double Nf_total = 0.0;
   for (auto combo : combinations)
   {
     chi_physics::TransportCrossSections* xs;
@@ -120,12 +120,13 @@ void chi_physics::TransportCrossSections::
         << std::endl;
       exit(EXIT_FAILURE);
     }
-
-    combinations_total += combo.second;
-    if (xs->is_fissile) 
-      fissile_total += combo.second;
-
+    
     cross_secs.push_back(xs);
+
+    // Increment combo factor totals
+    N_total += combo.second;
+    if (xs->is_fissile) 
+      Nf_total += combo.second;
 
     //============================ Check number of groups
     if (cross_secs.size() == 1)
@@ -187,41 +188,32 @@ void chi_physics::TransportCrossSections::
   chi_d.resize(G);
   for (int g=0; g<G; ++g)
     chi_d[g].resize(J,0.0);
+
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
-    for (int g=0; g<G; ++g)
+
+    double N_i = combinations[x].second;
+    double f_i = N_i/N_total;
+    double ff_i = N_i/Nf_total;
+
+    for (int g=0; g<G; g++)
     {
-      // Normal homogenization process. Multiply a microscopic cross section
-      // by the associated atomic density of the isotope.
-      sigma_tg   [g] += cross_secs[x]->sigma_tg   [g]*combinations[x].second;
-      sigma_fg   [g] += cross_secs[x]->sigma_fg   [g]*combinations[x].second;
-      sigma_captg[g] += cross_secs[x]->sigma_captg[g]*combinations[x].second;
-      nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g]*combinations[x].second;
-
-      // Chi is a spectrum and therefore homogenization is a bit different.
-      // Use a weighted average of chi for each fissile isotpoe to produce
-      // an effective chi accross several fissile isotopes.
-      if (cross_secs[x]->is_fissile)
-        chi_g[g] += cross_secs[x]->chi_g[g]*combinations[x].second/fissile_total;
-
-      // The ddt coefficient should be identical for all materials by nature
-      // of the requirement of the same group structures to be used.
-      // Take a simple weighted average. The result is identical to simply
-      // taking the first materials ddt_coeff
-      ddt_coeff[g] += cross_secs[x]->ddt_coeff[g]*combinations[x].second/combinations_total;
+      sigma_tg   [g] += cross_secs[x]->sigma_tg   [g] * N_i;
+      sigma_fg   [g] += cross_secs[x]->sigma_fg   [g] * N_i;
+      sigma_captg[g] += cross_secs[x]->sigma_captg[g] * N_i;
+      chi_g      [g] += cross_secs[x]->chi_g      [g] * ff_i;
+      nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g] * N_i;
+      ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g] * f_i;
     }
-
-    // Delayed neutron data. Only use if this material has precursors and is fissile.
-    if (cross_secs[x]->is_fissile)
+    if ((cross_secs[x]->is_fissile) and (cross_secs[x]->J > 0)
     {
-      for (int j=0; j<J; j++)
+      for (int j=0; j<J; ++j)
       {
-        // Use the same method used chi_g for each of these.
-        lambda[j] = cross_secs[x]->lambda[j]*combinations[x].second/fissile_total;
-        gamma [j] = cross_secs[x]->gamma [j]*combinations[x].second/fissile_total;
+        lambda[j] += cross_secs[x]->lambda[j] * ff_i;
+        gamma [j] += cross_secs[x]->gamma [j] * ff_i;
         for (int g=0; g<G; g++)
-          chi_d[g][j] = cross_secs[x]->chi_d[g][j]*combinations[x].second/fissile_total;
+          chi_d[g][j] = cross_secs[x]->chi_d[g][j] * ff_i;
       }
     }
   }
