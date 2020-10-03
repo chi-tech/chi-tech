@@ -268,13 +268,8 @@ public:
               (*x)[ir + gsg] += wn_d2m*b[gsg][i];
 
             for (auto callback : groupset->moment_callbacks)
-            {
-              if(callback)
-              {
-                for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                  callback(ir + gsg, m, angle_num, b[gsg][i]);
-              }
-            }
+              for (int gsg=0; gsg<gs_ss_size; gsg++)
+                callback(cell->local_id, ir+gsg, i, gsg, m, angle_num, b[gsg][i]);
           }
         }
 

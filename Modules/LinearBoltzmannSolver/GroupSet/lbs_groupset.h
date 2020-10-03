@@ -78,18 +78,19 @@ public:
   /**
    * Convenient typdef for the moment call back function. See moment_callbacks.
    *  Arguments are:
-   *  int dof_mapping Local DOF-address with moment and group folded in.
-   *  int moment The moment number.
-   *  int angle_num The reference angle number in the angular quadrature
-   *  double psi Angular flux for the given dof and angle_num.
+   *  int cell_id, the value cell->local_id for the current cell
+   *  int dof_mapping, local DOF-address with moment and group folded in.
+   *  int dof_index, dof for the solution psi from ((CellFEView*)grid_fe_view->MapFeViewL(cell->local_id))->dofs
+   *  int moment, the moment number.
+   *  int angle_num, the reference angle number in the angular quadrature
+   *  double psi, angular flux for the given dof and angle_num.
    */
-  typedef std::function<void(int dof, int moment, int angle_num, double psi)> MomentCallbackF;
+  typedef std::function<void(int cell_id, int dof_mapping, int dof_index, int group, int moment, int angle_num, double psi)> MomentCallbackF;
   /**
    * Functions of type MomentCallbackF can be added to the moment_callbacks
    * vector and these can be called from within functions taking a
    * LBSGroupset instance. The intention is that this function can
-   * be used as a general interface to calculate specific types of
-   * moments beyond the simple scalar flux moments already accounted for
+   * be used as a general interface to retrieve angular flux values
    */
   std::vector<MomentCallbackF> moment_callbacks;
 
