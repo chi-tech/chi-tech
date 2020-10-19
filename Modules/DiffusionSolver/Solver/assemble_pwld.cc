@@ -1,10 +1,10 @@
 #include "diffusion_solver.h"
 
-#include <PiecewiseLinear/CellViews/pwl_cellbase.h>
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_cellbase.h"
 
-#include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "../Boundaries/chi_diffusion_bndry_reflecting.h"
-#include "../Boundaries/chi_diffusion_bndry_robin.h"
+#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
+#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
 
 #include <chi_log.h>
 extern ChiLog& chi_log;

@@ -1,9 +1,9 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <PiecewiseLinear/pwl.h>
-#include <ChiPhysics/chi_physics.h>
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiPhysics/chi_physics.h"
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
