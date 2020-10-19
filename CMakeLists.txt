@@ -77,8 +77,8 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 #================================================ Include directories
 include_directories("${LUA_ROOT}/include")
 include_directories("${PETSC_ROOT}/include")
+include_directories("${PROJECT_SOURCE_DIR}/")
 include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
-include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH/ChiMath/SpatialDiscretization")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 

@@ -1,19 +1,19 @@
 #include "diffusion_solver.h"
 
-#include <PiecewiseLinear/CellViews/pwl_slab.h>
-#include <PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
-#include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
-#include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "../Boundaries/chi_diffusion_bndry_reflecting.h"
+#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
 
-#include <ChiTimer/chi_timer.h>
+#include "ChiTimer/chi_timer.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-#include <ChiPhysics/chi_physics.h>
+#include "chi_mpi.h"
+#include "chi_log.h"
+#include "ChiPhysics/chi_physics.h"
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 extern ChiPhysics&  chi_physics_handler;

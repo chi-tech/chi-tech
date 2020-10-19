@@ -1,14 +1,14 @@
 #include "diffusion_solver.h"
 
-#include <PiecewiseLinear/CellViews/pwl_slab.h>
-#include <PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <PiecewiseLinear/CellViews/pwl_polyhedron.h>
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
-#include <ChiTimer/chi_timer.h>
+#include "ChiTimer/chi_timer.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-#include <ChiPhysics/chi_physics.h>
+#include "chi_mpi.h"
+#include "chi_log.h"
+#include "ChiPhysics/chi_physics.h"
 
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;

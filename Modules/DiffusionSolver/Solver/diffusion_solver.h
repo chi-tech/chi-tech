@@ -1,24 +1,24 @@
 #ifndef _chi_diffusion_solver_h
 #define _chi_diffusion_solver_h
 
-#include <ChiMesh/Cell/cell.h>
+#include "ChiMesh/Cell/cell.h"
 
 #define SOLVER_SYSTEM_EIGEN 1
 #define SOLVER_SYSTEM_PETSC 2
 #define PROPERTY_D_MAP 5
 #define PROPERTY_Q_MAP 6
 
-#include "../Boundaries/chi_diffusion_bndry.h"
+#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
 
-#include "../chi_diffusion.h"
-#include <ChiPhysics/SolverBase/chi_solver.h>
-#include <spatial_discretization.h>
-#include <PiecewiseLinear/pwl.h>
+#include "Modules/DiffusionSolver/chi_diffusion.h"
+#include "ChiPhysics/SolverBase/chi_solver.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
 
-#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
+#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
-#include <ChiPhysics/FieldFunction/fieldfunction.h>
-#include <ChiTimer/chi_timer.h>
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiTimer/chi_timer.h"
 
 #include <petscksp.h>
 
