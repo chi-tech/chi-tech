@@ -24,6 +24,7 @@ public:
   std::vector<double> sigma_captg;  ///< MT 27   Capture cross-section
   std::vector<double> chi_g;        ///< MT 2018 Fission spectrum
   std::vector<double> nu_sigma_fg;  ///< MT 2452 Nubar-Sigmaf cross-section
+  std::vector<double> ddt_coeff;    ///< Time derivative coefficient
 
   /**The MT number for this transfer varies:
    * MT 2500 is total,
@@ -56,10 +57,29 @@ private:
   std::vector<std::vector<double>>         cdf_gprime_g;
   std::vector<std::vector<Tvecdbl_vecdbl>> scat_angles_gprime_g;
 
+private:
+  void Reset()
+  {
+    int G=0;
+    int L=0;
+
+    sigma_tg.clear();
+    sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
+    transfer_matrix.clear();
+
+    diffusion_initialized = false;
+    scattering_initialized = false;
+
+    diffg = sigma_rg = sigma_ag = sigma_s_gtog = xi_Jfull_g = xi_Jpart_g = sigma_tg;
+
+    D_jfull = D_jpart = sigma_a_jfull = sigma_a_jpart = 0.0;
+
+    cdf_gprime_g.clear();
+    scat_angles_gprime_g.clear();
+  }
 public:
   //00
   TransportCrossSections();
-
 
   void MakeSimple0(int in_G, double in_sigmat);
   void MakeSimple1(int in_G, double in_sigmat, double c);

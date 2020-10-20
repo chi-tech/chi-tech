@@ -52,6 +52,8 @@ sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 pre-installed on modern Linux systems, will not work (Step 4 below provides more
 details if you need to use `python3`) .*
 
+<u>NOTE</u>: *The second line is to install OpenGL for VTK.*
+
 ### Step 2 - An MPI flavor
 
 Install either OpenMPI or MPICH. If you have MOOSE or deal.ii installed then you

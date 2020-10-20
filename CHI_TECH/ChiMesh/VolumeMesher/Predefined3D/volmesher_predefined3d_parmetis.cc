@@ -71,7 +71,7 @@ void chi_mesh::VolumeMesherPredefined3D::
           ++icount;
         }
     }
-    i_indices[i+1] = icount+1;
+    i_indices[i+1] = icount;
     chi_log.Log(LOG_0VERBOSE_1) << "Done building indices.";
 
     //======================================== Copy to raw arrays
@@ -108,7 +108,6 @@ void chi_mesh::VolumeMesherPredefined3D::
     MatPartitioningDestroy(&part);
     MatDestroy(&Adj);
     ISPartitioningToNumbering(is,&isg);
-
     chi_log.Log(LOG_0VERBOSE_1) << "Done building paritioned index set.";
 
     //========================================= Get cell global indices

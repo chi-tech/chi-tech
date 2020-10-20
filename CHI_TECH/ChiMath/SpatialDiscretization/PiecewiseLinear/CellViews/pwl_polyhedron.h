@@ -26,7 +26,7 @@ struct FEside_data3d
   double                    detJ = 0.0;
   double                    detJ_surf = 0.0;
   std::vector<int>          v_index;
-  chi_mesh::Vector3          side_centroid;
+  chi_mesh::Vector3         side_centroid;
   chi_mesh::Matrix3x3       J;
   chi_mesh::Matrix3x3       Jinv;
   chi_mesh::Matrix3x3       JTinv;
@@ -82,10 +82,10 @@ struct FEnodeMap
 class PolyhedronFEView : public CellFEView
 {
 private:
-  std::vector<FEface_data>       face_data;      ///< Holds determinants and data tet-by-tet.
   std::vector<double>            face_betaf;     ///< Face Beta-factor.
   double                         alphac;         ///< Cell alpha-factor.
 public:
+  std::vector<FEface_data>       face_data;      ///< Holds determinants and data tet-by-tet.
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:

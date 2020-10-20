@@ -126,8 +126,13 @@ void chi_physics::FieldFunction::
         int num_fverts = face.vertex_ids.size();
         std::vector<vtkIdType> fvertex_ids;
         fvertex_ids.reserve(num_fverts);
-        for (int vid : face.vertex_ids)
-          fvertex_ids.push_back(vid);
+
+        for (int fv=0; fv<num_fverts; fv++)
+          for (int v=0; v<cell.vertex_ids.size(); ++v)
+            if (face.vertex_ids[fv] == cell.vertex_ids[v])
+              fvertex_ids.push_back(vertex_ids[v]);
+//        for (int vid : face.vertex_ids)
+//          fvertex_ids.push_back(vid);
 
         faces->InsertNextCell(num_fverts,fvertex_ids.data());
       }//for faces
@@ -187,12 +192,14 @@ void chi_physics::FieldFunction::
   if (ff_type == FieldFunctionType::CFEM_PWL or
       ff_type == FieldFunctionType::DFEM_PWL)
   {
+    int unk_number = -1;
     for (auto ff : ff_list)
     {
       if (ff->unknown_manager== nullptr) continue;
 
       int ref_unknown = ff->ref_set;
       auto unknown = ff->unknown_manager->unknowns[ref_unknown];
+      unk_number++;
 
       int N = ff->unknown_manager->GetTotalUnknownSize();
 
@@ -201,7 +208,11 @@ void chi_physics::FieldFunction::
         int component = ff->unknown_manager->MapUnknown(ref_unknown,0);
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        unk_arr->SetName(unknown->text_name.c_str());
+        if (unknown->text_name == "")
+          unk_arr->SetName((std::string("Unknown_")+
+                            std::to_string(unk_number)).c_str());
+        else
+          unk_arr->SetName(unknown->text_name.c_str());
 
         int c=-1;
         for (auto& cell : grid->local_cells)
@@ -218,6 +229,36 @@ void chi_physics::FieldFunction::
         }//for cell
 
         ugrid->GetPointData()->AddArray(unk_arr);
+      }//scalar
+      if (unknown->type == chi_math::UnknownType::VECTOR_N)
+      {
+        for (int comp=0; comp<unknown->num_components; ++comp)
+        {
+          int component = ff->unknown_manager->MapUnknown(ref_unknown,comp);
+
+          auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
+          if (unknown->component_text_names[comp]=="")
+            unk_arr->SetName((std::string("Component_")+
+                              std::to_string(comp)).c_str());
+          else
+            unk_arr->SetName(unknown->component_text_names[comp].c_str());
+
+          int c=-1;
+          for (auto& cell : grid->local_cells)
+          {
+            for (int vid : cell.vertex_ids)
+            {
+              ++c;
+              int local_mapping = c*N + component;
+
+              double value = (*ff->field_vector_local)[local_mapping];
+
+              unk_arr->InsertNextValue(value);
+            }//for vid
+          }//for cell
+
+          ugrid->GetPointData()->AddArray(unk_arr);
+        }//for c
       }//scalar
     }
   }

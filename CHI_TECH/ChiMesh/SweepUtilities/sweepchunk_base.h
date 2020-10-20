@@ -17,6 +17,8 @@ public:
     x = destination_phi;
   }
 
+  virtual ~SweepChunk(){};
+
 public:
   /**Sweep chunks should override this.*/
   virtual void Sweep(AngleSet* angle_set)
