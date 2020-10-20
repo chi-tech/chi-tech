@@ -211,7 +211,7 @@ private:
 
 public:
   //01
-  LogStream       Log(LOG_LVL level);
+  LogStream       Log(LOG_LVL level=LOG_0);
   void            SetVerbosity(int int_level);
   int             GetVerbosity();
 
