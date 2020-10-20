@@ -67,7 +67,7 @@ find_package(VTK COMPONENTS
         vtkIOXML vtkParallelCore vtkIOParallelXML
         vtkFiltersCore
         vtkIOEnSight
-        REQUIRED)
+        REQUIRED PATHS $ENV{VTK_DIR})
 if (NOT VTK_FOUND)
   message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()
