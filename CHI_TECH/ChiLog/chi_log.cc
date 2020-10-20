@@ -26,7 +26,7 @@ ChiLog::ChiLog() noexcept
 
 //###################################################################
 /** Makes a log entry.*/
-LogStream ChiLog::Log(LOG_LVL level)
+LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 {
   switch (level)
   {

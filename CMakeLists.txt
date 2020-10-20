@@ -12,19 +12,23 @@ else()
 endif()
 
 #------------------------------------------------ DEPENDENCIES
-if (NOT (DEFINED ENV{PETSC_ROOT}))
-    message(FATAL_ERROR "***** PETSC_ROOT is not set *****")
-else()
-    set(PETSC_ROOT    "$ENV{PETSC_ROOT}")
-    message(STATUS "PETSC_ROOT set to ${PETSC_ROOT}")
+if (NOT DEFINED PETSC_ROOT)
+    if (NOT (DEFINED ENV{PETSC_ROOT}))
+        message(FATAL_ERROR "***** PETSC_ROOT is not set *****")
+    else()
+        set(PETSC_ROOT    "$ENV{PETSC_ROOT}")
+    endif()
 endif()
+message(STATUS "PETSC_ROOT set to ${PETSC_ROOT}")
 
-if (NOT (DEFINED ENV{LUA_ROOT}))
-    message(FATAL_ERROR "***** LUA_ROOT is not set *****")
-else()
-    set(LUA_ROOT    "$ENV{LUA_ROOT}")
-    message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
+if (NOT DEFINED LUA_ROOT)
+    if (NOT (DEFINED ENV{LUA_ROOT}))
+        message(FATAL_ERROR "***** LUA_ROOT is not set *****")
+    else()
+        set(LUA_ROOT    "$ENV{LUA_ROOT}")
+    endif()
 endif()
+message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
 
 #================================================ Set project targets
 SET(TARGET ChiTech)
@@ -88,7 +92,7 @@ find_package(VTK COMPONENTS
 	         vtkIOXML vtkParallelCore vtkIOParallelXML
              vtkFiltersCore
              vtkIOEnSight
-             REQUIRED)
+             REQUIRED PATHS $ENV{VTK_DIR})
 if (NOT VTK_FOUND)
   message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()

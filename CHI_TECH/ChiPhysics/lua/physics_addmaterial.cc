@@ -27,7 +27,7 @@ extern ChiLog& chi_log;
 Example lua code:
 \code
 materials = {}
-materials[0] = chiPhysicsAddMaterial("Test Material");
+materials[1] = chiPhysicsAddMaterial("Test Material");
 \endcode
 
 
