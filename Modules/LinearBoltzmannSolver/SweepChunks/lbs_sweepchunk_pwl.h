@@ -101,7 +101,7 @@ public:
 
     // ========================================================== Loop over each cell
     size_t num_loc_cells = spds->spls->item_id.size();
-    for (int cr_i=0; cr_i < num_loc_cells; ++cr_i)
+    for (int cr_i = 0; cr_i < num_loc_cells; ++cr_i)
     {
       int cell_local_id = spds->spls->item_id[cr_i];
       auto cell = &grid_view->local_cells[cell_local_id];
@@ -126,7 +126,7 @@ public:
       // =================================================== Loop over angles in set
       int ni_deploc_face_counter = deploc_face_counter;
       int ni_preloc_face_counter = preloc_face_counter;
-      for (int n=0; n<angle_set->angles.size(); n++)
+      for (int n = 0; n < angle_set->angles.size(); ++n)
       {
         deploc_face_counter = ni_deploc_face_counter;
         preloc_face_counter = ni_preloc_face_counter;
@@ -142,7 +142,7 @@ public:
           b[gsg].assign(num_dofs, 0.0);
 
         // ============================================ Surface integrals
-        int in_face_counter=-1;
+        int in_face_counter = -1;
         for (int f = 0; f < num_faces; ++f)
         {
           auto& face = cell->faces[f];
@@ -255,7 +255,7 @@ public:
         }
 
         // ============================= Accumulate flux
-        for (int m=0; m<num_moms; m++)
+        for (int m = 0; m < num_moms; ++m)
         {
           double wn_d2m = groupset->d2m_op[m][angle_num];
           for (int i = 0; i < num_dofs; ++i)
