@@ -79,7 +79,6 @@ int ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv)
 			printf("%s\n", lua_tostring(this->consoleState, -1));
 			return EXIT_FAILURE;
 		}
-		//std::cout<<lua_tostring(this->consoleState,-1)<<"\n";
 	}
 	return EXIT_SUCCESS;
 }

@@ -201,6 +201,7 @@ RegisterFunction(chiExportMultiFieldFunctionToVTK)
 RegisterFunction(chiPhysicsTransportXSCreate)
 RegisterFunction(chiPhysicsTransportXSSet)
 RegisterFunction(chiPhysicsTransportXSMakeCombined)
+RegisterFunction(chiPhysicsTransportXSGet)
 
 //Property indices
 RegisterConstant(SCALAR_VALUE,           1);

@@ -145,19 +145,27 @@ void chi_physics::TransportCrossSections::
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
   ddt_coeff.resize(num_grps_G,0.0);
+
+  double N_total = 0.0;
+  for (size_t x=0; x<cross_secs.size(); ++x)
+    N_total += combinations[x].second;
+
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     this->L = std::max(this->L,cross_secs[x]->L);
+
+    double N_i = combinations[x].second;
+
+    double f_i = N_i/N_total;
+
     for (int g=0; g<G; g++)
     {
-      sigma_tg   [g] += cross_secs[x]->sigma_tg   [g]*combinations[x].second;
-      sigma_fg   [g] += cross_secs[x]->sigma_fg   [g]*combinations[x].second;
-      sigma_captg[g] += cross_secs[x]->sigma_captg[g]*combinations[x].second;
-      chi_g      [g] += cross_secs[x]->chi_g      [g] * combinations[x].second /
-                        combinations_total;
-      nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g]*combinations[x].second;
-      ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g] * combinations[x].second /
-                        combinations_total;
+      sigma_tg   [g] += cross_secs[x]->sigma_tg   [g] * N_i;
+      sigma_fg   [g] += cross_secs[x]->sigma_fg   [g] * N_i;
+      sigma_captg[g] += cross_secs[x]->sigma_captg[g] * N_i;
+      chi_g      [g] += cross_secs[x]->chi_g      [g] * f_i;
+      nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g] * N_i;
+      ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g] * f_i;
     }
   }
 
