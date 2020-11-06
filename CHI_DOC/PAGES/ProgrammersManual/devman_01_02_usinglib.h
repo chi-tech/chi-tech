@@ -37,7 +37,7 @@
 \code
 cmake_minimum_required(VERSION 3.2)
 
-set(TARGET test)
+set(TARGET test_app)
 project(${TARGET} C CXX)
 set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")
 include("${CHI_TECH_DIR}/CHI_RESOURCES/Macros/Downstream.cmake")
@@ -47,7 +47,7 @@ add_executable(${TARGET} "${SOURCES}")
 target_link_libraries(${TARGET} ${CHI_LIBS})
 \endcode
 
-The `set(TARGET test)` line sets the name of the eventual executable
+The `set(TARGET test_app)` line sets the name of the eventual executable
 to be used. You can use any name other than `test`.
 The `set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")` line sets the directory
 of an installed chi-tech. Change this line to point to the appropriate
@@ -66,14 +66,20 @@ include-files will be usable.
 
 ## _
 
-\subsection devman01_02_04 Step 4 - Add the basic code to `test.cc`
+\subsection devman01_02_04 Step 4 - Add the basic code to test.cc
 
 \code
 #include "chi_runtime.h"
+#include "chi_log.h"
 
 int main(int argc, char* argv[])
 {
     ChiTech::Initialize(argc,argv);
+    ChiTech::RunBatch(argc, argv);
+
+    ChiLog& chi_log = ChiLog::GetInstance();
+
+    chi_log.Log() << "Hello World!";
 
     //We will add code here
 
