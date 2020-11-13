@@ -135,7 +135,7 @@ public:
   void ExportCellsToVTK(const char* baseName);
 
   //02
-  void BuildFaceHistogramInfo(double master_tolerance=1.2, double slave_tolerance=1.1);
+  void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
   size_t NumberOfFaceHistogramBins();
   size_t MapFaceHistogramBins(size_t num_face_dofs);
   size_t GetFaceHistogramBinDOFSize(size_t category);

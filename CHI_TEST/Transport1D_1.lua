@@ -30,6 +30,7 @@ chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
 
 chiVolumeMesherSetProperty(PARTITION_Z,3)
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XY)
 
 --############################################### Execute meshing
 chiSurfaceMesherExecute();

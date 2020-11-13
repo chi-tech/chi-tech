@@ -18,8 +18,6 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
   chi_mesh::MeshContinuum*         grid = spds->grid;
   chi_mesh::sweep_management::SPLS* spls = spds->spls;
 
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing FLUDS Beta elements";
-
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   // The first two major steps here are: Send delayed successor information
   // and Receive delayed predecessor information. The send portion is done
@@ -176,8 +174,6 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 
   empty_vector = std::vector<std::vector<CompactCellView>>(0);
   delayed_prelocI_cell_views.swap(empty_vector);
-
-  chi_log.Log(LOG_0VERBOSE_1) << "Done initializing FLUDS Beta elements";
 }
 
 //###################################################################

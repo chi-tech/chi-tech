@@ -22,14 +22,18 @@ struct chi_mesh::sweep_management::SPDS
 
   std::vector<std::pair<int,int>> local_cyclic_dependencies;
 
+  std::vector<std::vector<int>> global_dependencies;
+
   //======================================== Default constructor
   SPDS()
   {  }
 
   int MapLocJToPrelocI(int locJ);
   int MapLocJToDeplocI(int locJ);
-  void AddLocalDependecy(int location_index);
-  void AddLocalSuccessor(int location_index);
+//  void AddLocalDependecy(int location_index);
+//  void AddLocalSuccessor(int location_index);
+
+  void BuildTaskDependencyGraph(bool cycle_allowance_flag);
 };
 
 #endif

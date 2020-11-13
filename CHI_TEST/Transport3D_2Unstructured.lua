@@ -36,6 +36,7 @@ chiVolumeMesherSetProperty(PARTITION_Z,1);
 
 chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
 chiVolumeMesherSetProperty(MESH_GLOBAL,false);
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
 
 --############################################### Execute meshing
 chiSurfaceMesherExecute();

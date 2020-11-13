@@ -94,6 +94,10 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
             primary_fluds = new chi_mesh::sweep_management::
                   PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Initializing FLUDS for omega="
+              << sweep_orderings[a]->omega.PrintS();
+
             primary_fluds->InitializeAlphaElements(sweep_orderings[a]);
             primary_fluds->InitializeBetaElements(sweep_orderings[a]);
 
@@ -150,6 +154,10 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
             make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
             PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Initializing FLUDS for omega="
+              << sweep_orderings[a+num_azi]->omega.PrintS();
 
             primary_fluds->InitializeAlphaElements(sweep_orderings[a+num_azi]);
             primary_fluds->InitializeBetaElements(sweep_orderings[a+num_azi]);
@@ -243,6 +251,10 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               primary_fluds = new chi_mesh::sweep_management::
                 PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
+              chi_log.Log(LOG_0VERBOSE_1)
+                << "Initializing FLUDS for omega="
+                << sweep_orderings[angle_num]->omega.PrintS();
+
               primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
               primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
 
@@ -299,6 +311,10 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               make_primary = false;
               primary_fluds = new chi_mesh::sweep_management::
               PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+
+              chi_log.Log(LOG_0VERBOSE_1)
+                << "Initializing FLUDS for omega="
+                << sweep_orderings[angle_num]->omega.PrintS();
 
               primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
               primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
@@ -363,6 +379,10 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
             make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
               PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Initializing FLUDS for omega="
+              << sweep_orderings[n]->omega.PrintS();
 
             primary_fluds->InitializeAlphaElements(sweep_orderings[n]);
             primary_fluds->InitializeBetaElements(sweep_orderings[n]);

@@ -24,11 +24,13 @@ num_failed  = 0
 def format3(number):
   return "{:3d}".format(number)
 
+def FormatFileName(filename):
+  return "{:35s}".format(filename)
 
 
 #=========================================== Test
 test_number += 1
-test_name = "1D Diffusion Test - CFEM 1 MPI Process"
+test_name = FormatFileName("Diffusion1D") + " 1D Diffusion Test - CFEM 1 MPI Process"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen([kpath_to_exe,
                             "CHI_TEST/Diffusion1D.lua", "master_export=false"],
@@ -64,7 +66,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "1D Diffusion Test - DFEM 2 MPI Processes"
+test_name = FormatFileName("Diffusion1D_IP") + " 1D Diffusion Test - DFEM 2 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","2",kpath_to_exe,
                             "CHI_TEST/Diffusion1D_IP.lua", "master_export=false"],
@@ -100,7 +102,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "2D Diffusion Test - CFEM 1 MPI Processes"
+test_name = FormatFileName("Diffusion2D_1Poly") + " 2D Diffusion Test - CFEM 1 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","1",kpath_to_exe,
                             "CHI_TEST/Diffusion2D_1Poly.lua", "master_export=false"],
@@ -136,7 +138,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "2D Diffusion Test - DFEM 4 MPI Processes"
+test_name = FormatFileName("Diffusion2D_1Poly_IP") + " 2D Diffusion Test - DFEM 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Diffusion2D_1Poly_IP.lua", "master_export=false"],
@@ -172,7 +174,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "2D Diffusion Test - CFEM Unstr.Mesh 4 MPI Processes"
+test_name = FormatFileName("Diffusion2D_2Unstructured") + " 2D Diffusion Test - CFEM Unstr.Mesh 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Diffusion2D_2Unstructured.lua", "master_export=false"],
@@ -208,7 +210,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "2D Diffusion Test - DFEM Unstr.Mesh 4 MPI Processes"
+test_name = FormatFileName("Diffusion2D_2Unstructured_IP") + " 2D Diffusion Test - DFEM Unstr.Mesh 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Diffusion2D_2Unstructured_IP.lua", "master_export=false"],
@@ -244,7 +246,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D Diffusion Test - CFEM 1 MPI Processes"
+test_name = FormatFileName("Diffusion3D_1Poly") + " 3D Diffusion Test - CFEM 1 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","1",kpath_to_exe,
                             "CHI_TEST/Diffusion3D_1Poly.lua", "master_export=false"],
@@ -280,7 +282,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D Diffusion Test - DFEM 4 MPI Processes"
+test_name = FormatFileName("Diffusion3D_1Poly_IP") + " 3D Diffusion Test - DFEM 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Diffusion3D_1Poly_IP.lua", "master_export=false"],
@@ -316,7 +318,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D Diffusion Test - CFEM OrthoMesh 4 MPI Processes"
+test_name = FormatFileName("Diffusion3D_2Ortho") + " 3D Diffusion Test - CFEM OrthoMesh 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","1",kpath_to_exe,
                             "CHI_TEST/Diffusion3D_2Ortho.lua", "master_export=false"],
@@ -352,7 +354,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D Diffusion Test - CFEM Unstr.Mesh 4 MPI Processes"
+test_name = FormatFileName("Diffusion3D_3Unstructured") + " 3D Diffusion Test - CFEM Unstr.Mesh 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Diffusion3D_3Unstructured.lua", "master_export=false"],
@@ -388,7 +390,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D Diffusion Test - DFEM Unstr.Mesh 4 MPI Processes"
+test_name = FormatFileName("Diffusion3D_3Unstructured_IP") + " 3D Diffusion Test - DFEM Unstr.Mesh 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Diffusion3D_3Unstructured_IP.lua", "master_export=false"],
@@ -424,7 +426,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "1D LinearBSolver Test - PWLD 3 MPI Processes"
+test_name = FormatFileName("Transport1D_1") + " 1D LinearBSolver Test - PWLD 3 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","3",kpath_to_exe,
                             "CHI_TEST/Transport1D_1.lua", "master_export=false"],
@@ -478,7 +480,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "2D LinearBSolver Test - PWLD 4 MPI Processes"
+test_name = FormatFileName("Transport2D_1Poly") + " 2D LinearBSolver Test - PWLD 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport2D_1Poly.lua", "master_export=false"],
@@ -532,7 +534,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "2D LinearBSolver Test - PWLD Unstructured 4 MPI Processes"
+test_name = FormatFileName("Transport2D_2Unstructured") + " 2D LinearBSolver Test - PWLD Unstructured 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport2D_2Unstructured.lua", "master_export=false"],
@@ -586,7 +588,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D LinearBSolver Test - PWLD 4 MPI Processes"
+test_name = FormatFileName("Transport3D_1Poly") + " 3D LinearBSolver Test - PWLD 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport3D_1Poly.lua", "master_export=false"],
@@ -640,7 +642,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D LinearBSolver Test - PWLD Unstructured 4 MPI Processes"
+test_name = FormatFileName("Transport3D_2Unstructured") + " 3D LinearBSolver Test - PWLD Unstructured 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport3D_2Unstructured.lua", "master_export=false"],
@@ -694,7 +696,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D LinearBSolver Test - PWLD DSA 4 MPI Processes"
+test_name = FormatFileName("Transport3D_3BlockPoly_DSA") + " 3D LinearBSolver Test - PWLD DSA 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport3D_3BlockPoly_DSA.lua", "master_export=false"],
@@ -729,7 +731,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D LinearBSolver Test - PWLD Cycles 4 MPI Processes"
+test_name = FormatFileName("Transport3D_4Cycles1") + " 3D LinearBSolver Test - PWLD Cycles 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport3D_4Cycles1.lua", "master_export=false"],
@@ -784,7 +786,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = "3D LinearBSolver Test - PWLD Full Unstructured Cycles 4 MPI Processes"
+test_name = FormatFileName("Transport3D_5Cycles2") + " 3D LinearBSolver Test - PWLD Full Unstructured Cycles 4 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
                             "CHI_TEST/Transport3D_5Cycles2.lua", "master_export=false"],
