@@ -384,8 +384,22 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               << "Initializing FLUDS for omega="
               << sweep_orderings[n]->omega.PrintS();
 
-            primary_fluds->InitializeAlphaElements(sweep_orderings[n]);
-            primary_fluds->InitializeBetaElements(sweep_orderings[n]);
+            try{primary_fluds->InitializeAlphaElements(sweep_orderings[n]);}
+            catch (const std::exception& exc)
+            {
+              chi_log.Log(LOG_ALLERROR)
+                << "Unknown error in PRIMARY_FLUDS::\n"
+                   "InitializeAlphaElements. " << exc.what();
+              exit(EXIT_FAILURE);
+            }
+            try{primary_fluds->InitializeBetaElements(sweep_orderings[n]);}
+            catch (const std::exception& exc)
+            {
+              chi_log.Log(LOG_ALLERROR)
+                << "Unknown error in PRIMARY_FLUDS::\n"
+                   "InitializeBetaElements. " << exc.what();
+              exit(EXIT_FAILURE);
+            }
 
             fluds = primary_fluds;
           }
