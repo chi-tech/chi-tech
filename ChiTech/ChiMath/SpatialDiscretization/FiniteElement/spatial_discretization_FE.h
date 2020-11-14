@@ -27,11 +27,13 @@ protected:
 protected:
   SpatialDiscretization_FE(int dim,
                            chi_mesh::MeshContinuumPtr& in_grid,
+                           chi_math::CoordinateSystemType in_cs_type =
+                           chi_math::CoordinateSystemType::CARTESIAN,
                            SDMType in_type =
                            SDMType::UNDEFINED,
                            chi_math::finite_element::SetupFlags in_setup_flags=
                            chi_math::finite_element::SetupFlags::NO_FLAGS_SET) :
-    SpatialDiscretization(dim,in_grid,in_type),
+    SpatialDiscretization(dim, in_grid, in_cs_type, in_type),
     setup_flags(in_setup_flags)
   {}
 
