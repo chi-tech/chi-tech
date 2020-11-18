@@ -143,7 +143,7 @@ public:
   bool IsCellBndry(int cell_global_index = 0);
 
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                              std::vector<int>& dof_mapping);
+                              std::vector<short>& dof_mapping);
 
   chi_mesh::Vector3 ComputeCentroidFromListOfNodes(const std::vector<int>& list);
 

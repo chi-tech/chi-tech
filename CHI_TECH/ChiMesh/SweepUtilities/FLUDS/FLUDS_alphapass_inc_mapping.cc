@@ -17,7 +17,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
                      std::vector<int>&  local_so_cell_mapping)
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
-  std::vector<std::pair<int,std::vector<int>>> inco_face_dof_mapping;
+  std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 
   short        incoming_face_count=-1;
 
@@ -41,7 +41,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         //                                         dof mapping
         int ass_face = face.GetNeighborAssociatedFace(grid);
 
-        std::pair<int,std::vector<int>> dof_mapping;
+        std::pair<int,std::vector<short>> dof_mapping;
         grid->FindAssociatedVertices(face, dof_mapping.second);
 
         //======================================== Find associated face

@@ -198,7 +198,7 @@ bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
 /**General map vertices*/
 void chi_mesh::MeshContinuum::
 FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                       std::vector<int>& dof_mapping)
+                       std::vector<short>& dof_mapping)
 {
   int associated_face = cur_face.GetNeighborAssociatedFace(this);
   //======================================== Check index validity
@@ -214,10 +214,10 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
   chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(this)];
 
   dof_mapping.reserve(cur_face.vertex_ids.size());
-  for (int cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
+  for (short cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
   {
     bool found = false;
-    for (int afv=0;
+    for (short afv=0;
          afv < adj_cell->faces[associated_face].vertex_ids.size(); afv++)
     {
       if (cur_face.vertex_ids[cfv] ==

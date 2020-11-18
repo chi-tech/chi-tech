@@ -67,7 +67,7 @@ private:
   // that will hold a pair. Pair-first holds the slot address where this
   // face's upwind data is stored. Pair-second is a mapping of
   // each of this face's dofs to the upwinded face's dofs
-  std::vector<std::vector<std::pair<int,std::vector<int>> >>&
+  std::vector<std::vector<std::pair<int,std::vector<short>> >>&
     so_cell_inco_face_dof_indices;
 
   // This is a vector [cell_sweep_order_index][incoming_face_count]
