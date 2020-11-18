@@ -61,7 +61,7 @@ private:
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
   // which holds the face categorization for the face. i.e. the local
   // psi vector that hold faces of the same category.
-  std::vector<std::vector<int>>& so_cell_outb_face_face_category;
+  std::vector<std::vector<short>>& so_cell_outb_face_face_category;
 
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // that will hold a pair. Pair-first holds the slot address where this
@@ -73,7 +73,7 @@ private:
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // which holds the face categorization for the face. i.e. the local
   // psi vector that hold faces of the same category.
-  std::vector<std::vector<int>>& so_cell_inco_face_face_category;
+  std::vector<std::vector<short>>& so_cell_inco_face_face_category;
 
   //Inherited from base FLUDS
 //public:
