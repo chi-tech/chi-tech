@@ -28,6 +28,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //           INCIDENT                                 but process
   //                                                    only incident faces
   std::vector<short> inco_face_face_category;
+  inco_face_face_category.reserve(cell->faces.size());
   int bndry_face_counter = 0;
   for (short f=0; f < cell->faces.size(); f++)
   {
@@ -149,6 +150,8 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //                                                    only outgoing faces
   std::vector<int>                outb_face_slot_indices;
   std::vector<short>              outb_face_face_category;
+  outb_face_slot_indices.reserve(cell->faces.size());
+  outb_face_face_category.reserve(cell->faces.size());
   for (short f=0; f < cell->faces.size(); f++)
   {
     CellFace&  face         = cell->faces[f];

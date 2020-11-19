@@ -18,6 +18,12 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 extern ChiTimer chi_program_timer;
 
+#include "ChiConsole/chi_console.h"
+
+extern ChiConsole& chi_console;
+
+#include "iomanip"
+
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
 void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
@@ -96,7 +102,10 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 
             chi_log.Log(LOG_0VERBOSE_1)
               << "Initializing FLUDS for omega="
-              << sweep_orderings[a]->omega.PrintS();
+              << sweep_orderings[a]->omega.PrintS()
+              << "         Process memory = "
+              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << " MB.";
 
             primary_fluds->InitializeAlphaElements(sweep_orderings[a]);
             primary_fluds->InitializeBetaElements(sweep_orderings[a]);
@@ -157,7 +166,10 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 
             chi_log.Log(LOG_0VERBOSE_1)
               << "Initializing FLUDS for omega="
-              << sweep_orderings[a+num_azi]->omega.PrintS();
+              << sweep_orderings[a+num_azi]->omega.PrintS()
+              << "         Process memory = "
+              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << " MB.";
 
             primary_fluds->InitializeAlphaElements(sweep_orderings[a+num_azi]);
             primary_fluds->InitializeBetaElements(sweep_orderings[a+num_azi]);
@@ -253,7 +265,10 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
               chi_log.Log(LOG_0VERBOSE_1)
                 << "Initializing FLUDS for omega="
-                << sweep_orderings[angle_num]->omega.PrintS();
+                << sweep_orderings[angle_num]->omega.PrintS()
+                << "         Process memory = "
+                << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+                << " MB.";
 
               primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
               primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
@@ -314,7 +329,10 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
               chi_log.Log(LOG_0VERBOSE_1)
                 << "Initializing FLUDS for omega="
-                << sweep_orderings[angle_num]->omega.PrintS();
+                << sweep_orderings[angle_num]->omega.PrintS()
+                << "         Process memory = "
+                << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+                << " MB.";
 
               primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
               primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
@@ -382,7 +400,10 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
             chi_log.Log(LOG_0VERBOSE_1)
               << "Initializing FLUDS for omega="
-              << sweep_orderings[n]->omega.PrintS();
+              << sweep_orderings[n]->omega.PrintS()
+              << "         Process memory = "
+              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << " MB.";
 
             try{primary_fluds->InitializeAlphaElements(sweep_orderings[n]);}
             catch (const std::exception& exc)

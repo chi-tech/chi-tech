@@ -45,6 +45,9 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   std::set<int> location_boundary_dependency_set;
 
   // csoi = cell sweep order index
+  so_cell_inco_face_face_category.reserve(spls->item_id.size());
+  so_cell_outb_face_slot_indices.reserve(spls->item_id.size());
+  so_cell_outb_face_face_category.reserve(spls->item_id.size());
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
     int cell_local_id = spls->item_id[csoi];
@@ -65,6 +68,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   //                      PERFORM INCIDENT MAPPING
   //================================================== Loop over cells in
   //                                                   sweep order
+  so_cell_inco_face_dof_indices.reserve(spls->item_id.size());
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
     int cell_local_id = spls->item_id[csoi];
