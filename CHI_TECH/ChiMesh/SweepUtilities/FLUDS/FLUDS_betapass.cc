@@ -107,8 +107,12 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
     std::vector<int> face_indices;
     face_indices.resize(amount_to_receive,0);
 
-    MPI_Recv(face_indices.data(),amount_to_receive,MPI_INT,
-             locJ,101+tag_index,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    MPI_Recv(face_indices.data(),
+             amount_to_receive,
+             MPI_INT,
+             locJ,101+tag_index,
+             MPI_COMM_WORLD,
+             MPI_STATUS_IGNORE);
 
     DeSerializeCellInfo(prelocI_cell_views[prelocI], &face_indices,
                         prelocI_face_dof_count[prelocI]);
@@ -119,10 +123,9 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
   {
     int locJ = spds->location_successors[deplocI];
 
-    std::vector<int>::iterator delayed_successor =
-    std::find(spds->delayed_location_successors.begin(),
-              spds->delayed_location_successors.end(),
-              locJ);
+    auto delayed_successor = std::find(spds->delayed_location_successors.begin(),
+                                       spds->delayed_location_successors.end(),
+                                       locJ);
     if ((delayed_successor != spds->delayed_location_successors.end()))
       continue;
 
@@ -164,6 +167,15 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 
     NonLocalIncidentMapping(cell, spds);
   }//for csoi
+
+  deplocI_cell_views.clear();
+  deplocI_cell_views.shrink_to_fit();
+
+  prelocI_cell_views.clear();
+  prelocI_cell_views.shrink_to_fit();
+
+  delayed_prelocI_cell_views.clear();
+  delayed_prelocI_cell_views.shrink_to_fit();
 
   //================================================== Clear unneccesary data
   auto empty_vector = std::vector<std::vector<CompactCellView>>(0);

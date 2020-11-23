@@ -48,6 +48,10 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   so_cell_inco_face_face_category.reserve(spls->item_id.size());
   so_cell_outb_face_slot_indices.reserve(spls->item_id.size());
   so_cell_outb_face_face_category.reserve(spls->item_id.size());
+
+  so_cell_inco_face_face_category2.reserve(spls->item_id.size());
+  so_cell_outb_face_slot_indices2.reserve(spls->item_id.size());
+  so_cell_outb_face_face_category2.reserve(spls->item_id.size());
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
     int cell_local_id = spls->item_id[csoi];
@@ -59,6 +63,8 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 
   }//for csoi
 
+
+
   //================================================== Populate boundary
   //                                                   dependencies
   for (auto bndry : location_boundary_dependency_set)
@@ -69,6 +75,7 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   //================================================== Loop over cells in
   //                                                   sweep order
   so_cell_inco_face_dof_indices.reserve(spls->item_id.size());
+  so_cell_inco_face_dof_indices2.reserve(spls->item_id.size());
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
     int cell_local_id = spls->item_id[csoi];
@@ -92,48 +99,17 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 
 
   //================================================== Clean up
-  this->so_cell_outb_face_slot_indices.shrink_to_fit();
+  so_cell_outb_face_slot_indices.shrink_to_fit();
+  so_cell_outb_face_slot_indices2.shrink_to_fit();
 
   local_so_cell_mapping.clear();
   local_so_cell_mapping.shrink_to_fit();
 
   so_cell_inco_face_dof_indices.shrink_to_fit();
+  so_cell_inco_face_dof_indices2.shrink_to_fit();
 
   nonlocal_outb_face_deplocI_slot.shrink_to_fit();
 
 }
 
-//###################################################################
-/**Given a sweep ordering index, the outgoing face counter,
- * the outgoing face dof, this function computes the location
- * of this position's upwind psi in the local upwind psi vector.*/
-void  chi_mesh::sweep_management::PRIMARY_FLUDS::
-AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
-                     chi_mesh::CellFace& face)
-{
-  //======================================== Check if cell is already there
-  bool cell_already_there = false;
-  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
-  {
-    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
-    {
-      cell_already_there = true;
-      deplocI_cell_views[deplocI][c].second.
-        emplace_back(face_slot, face.vertex_ids);
-      break;
-    }
-  }
 
-  //======================================== If the cell is not there yet
-  if (!cell_already_there)
-  {
-    CompactCellView new_cell_view;
-    new_cell_view.first = cell_g_index;
-    new_cell_view.second.
-      emplace_back(face_slot, face.vertex_ids);
-
-    deplocI_cell_views[deplocI].push_back(new_cell_view);
-  }
-
-
-}

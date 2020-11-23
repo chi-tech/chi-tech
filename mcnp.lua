@@ -8,7 +8,7 @@ chiMeshCreateUnpartitioned3DOrthoMesh(nodesx,nodesy,nodesz)
 chiVolumeMesherSetProperty(PARTITION_TYPE,PARMETIS)
 chiVolumeMesherExecute();
 
-chiRegionExportMeshToVTK(0, "../../Output/MCNP/local_angle/mesh")
+--chiRegionExportMeshToVTK(0, "../../Output/MCNP/local_angle/mesh")
 
 --############################################### Setup materials
 --############################################### Set Material IDs
@@ -79,7 +79,7 @@ chiSolverAddRegion(phys1,0)
 --pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8,16)
 
 --========== Refined angular quadrature
-pquad = chiCreateSLDFESQAngularQuadrature(2)
+pquad = chiCreateSLDFESQAngularQuadrature(0)
 --chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 45.0*math.pi/180, false)
 --chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 22.5*math.pi/180, false)
 --chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 15.0*math.pi/180, false)
@@ -126,6 +126,6 @@ chiLBSExecute(phys1)
 --############################################### Grab FF
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
-chiExportFieldFunctionToASCII(fflist[1], "../../Output/MCNP/local_angle/phi")
+--chiExportFieldFunctionToASCII(fflist[1], "../../Output/MCNP/local_angle/phi")
 
 chiExportMultiFieldFunctionToVTK({fflist[1]}, "../../Output/MCNP/local_angle/phi")

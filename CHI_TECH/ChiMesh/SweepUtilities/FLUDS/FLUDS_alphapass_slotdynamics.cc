@@ -29,7 +29,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //                                                    only incident faces
   std::vector<short> inco_face_face_category;
   inco_face_face_category.reserve(cell->faces.size());
-  int bndry_face_counter = 0;
+//  int bndry_face_counter = 0;
   for (short f=0; f < cell->faces.size(); f++)
   {
     CellFace&  face = cell->faces[f];
@@ -82,17 +82,6 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         //Now find the cell (index,face) pair in the lock box and empty slot
         bool found = false;
-//        for (int k=0; k<lock_box.size(); k++)
-//        {
-//          if ((lock_box[k].first == neighbor) &&
-//              (lock_box[k].second== ass_face))
-//          {
-//            lock_box[k].first = -1;
-//            lock_box[k].second= -1;
-//            found = true;
-//            break;
-//          }
-//        }
         for (auto& lock_box_slot : lock_box)
         {
           if ((lock_box_slot.first == neighbor) &&
@@ -143,7 +132,15 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
   }//for f
 
-  so_cell_inco_face_face_category.push_back(inco_face_face_category);
+//  inco_face_face_category.shrink_to_fit();
+//  so_cell_inco_face_face_category.push_back(inco_face_face_category);
+
+  short* raw_inco_face_face_category = new short[inco_face_face_category.size()];
+  std::copy(inco_face_face_category.begin(),
+            inco_face_face_category.end(),
+            raw_inco_face_face_category);
+
+  so_cell_inco_face_face_category2.push_back(raw_inco_face_face_category);
 
   //=================================================== Loop over faces
   //                OUTGOING                            but process
@@ -245,8 +242,58 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
   }//for f
 
-  so_cell_outb_face_slot_indices.push_back(outb_face_slot_indices);
-  so_cell_outb_face_face_category.push_back(outb_face_face_category);
+//  outb_face_slot_indices.shrink_to_fit();
+//  outb_face_face_category.shrink_to_fit();
+//  so_cell_outb_face_slot_indices.push_back(outb_face_slot_indices);
+//  so_cell_outb_face_face_category.push_back(outb_face_face_category);
+
+  auto raw_outb_face_slot_indices = new int[outb_face_slot_indices.size()];
+  std::copy(outb_face_slot_indices.begin(),
+            outb_face_slot_indices.end(),
+            raw_outb_face_slot_indices);
+
+  so_cell_outb_face_slot_indices2.push_back(raw_outb_face_slot_indices);
+
+
+  auto raw_outb_face_face_category = new short[outb_face_face_category.size()];
+  std::copy(outb_face_face_category.begin(),
+            outb_face_face_category.end(),
+            raw_outb_face_face_category);
+
+  so_cell_outb_face_face_category2.push_back(raw_outb_face_face_category);
 }
 
+//###################################################################
+/**Given a sweep ordering index, the outgoing face counter,
+ * the outgoing face dof, this function computes the location
+ * of this position's upwind psi in the local upwind psi vector.*/
+void  chi_mesh::sweep_management::PRIMARY_FLUDS::
+AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
+                     chi_mesh::CellFace& face)
+{
+  //======================================== Check if cell is already there
+  bool cell_already_there = false;
+  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
+  {
+    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
+    {
+      cell_already_there = true;
+      deplocI_cell_views[deplocI][c].second.
+        emplace_back(face_slot, face.vertex_ids);
+      break;
+    }
+  }
 
+  //======================================== If the cell is not there yet
+  if (!cell_already_there)
+  {
+    CompactCellView new_cell_view;
+    new_cell_view.first = cell_g_index;
+    new_cell_view.second.
+      emplace_back(face_slot, face.vertex_ids);
+
+    deplocI_cell_views[deplocI].push_back(new_cell_view);
+  }
+
+
+}
