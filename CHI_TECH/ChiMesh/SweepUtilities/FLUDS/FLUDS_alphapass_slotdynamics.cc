@@ -29,7 +29,6 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //                                                    only incident faces
   std::vector<short> inco_face_face_category;
   inco_face_face_category.reserve(cell->faces.size());
-//  int bndry_face_counter = 0;
   for (short f=0; f < cell->faces.size(); f++)
   {
     CellFace&  face = cell->faces[f];
@@ -113,7 +112,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
       else if (grid->IsCellBndry(neighbor))
       {
-        chi_mesh::Vector3& face_norm = cell->faces[f].normal;
+        chi_mesh::Vector3& face_norm = face.normal;
 
         if (face_norm.Dot(ihat)>0.999)
           location_boundary_dependency_set.insert(0);
@@ -135,7 +134,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 //  inco_face_face_category.shrink_to_fit();
 //  so_cell_inco_face_face_category.push_back(inco_face_face_category);
 
-  short* raw_inco_face_face_category = new short[inco_face_face_category.size()];
+  auto raw_inco_face_face_category = new short[inco_face_face_category.size()];
   std::copy(inco_face_face_category.begin(),
             inco_face_face_category.end(),
             raw_inco_face_face_category);

@@ -79,10 +79,10 @@ chiSolverAddRegion(phys1,0)
 --pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8,16)
 
 --========== Refined angular quadrature
-pquad = chiCreateSLDFESQAngularQuadrature(0)
---chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 45.0*math.pi/180, false)
---chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 22.5*math.pi/180, false)
---chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 15.0*math.pi/180, false)
+pquad = chiCreateSLDFESQAngularQuadrature(2)
+chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 90.0*math.pi/180, false)
+chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 45.0*math.pi/180, false)
+chiLocallyRefineSLDFESQAngularQuadrature(pquad, {1, 0, 0}, 30.0*math.pi/180, false)
 --chiPrintToPythonSLDFESQAngularQuadrature(pquad, "../../Output/MCNP/local_angle/YQuad_")
 --os.exit()
 

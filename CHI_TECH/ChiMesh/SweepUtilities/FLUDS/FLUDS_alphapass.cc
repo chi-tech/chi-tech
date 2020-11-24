@@ -63,6 +63,9 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 
   }//for csoi
 
+  chi_log.Log(LOG_0VERBOSE_2) << "Done with Slot Dynamics.";
+  MPI_Barrier(MPI_COMM_WORLD);
+
 
 
   //================================================== Populate boundary
@@ -97,6 +100,8 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   delayed_local_psi_Gn_block_stride  = largest_face*delayed_lock_box.size();
   delayed_local_psi_Gn_block_strideG = delayed_local_psi_Gn_block_stride*G;
 
+  chi_log.Log(LOG_0VERBOSE_2) << "Done with Local Incidence mapping.";
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Clean up
   so_cell_outb_face_slot_indices.shrink_to_fit();

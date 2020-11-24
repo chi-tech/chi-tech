@@ -19,14 +19,14 @@ chi_mesh::sweep_management::AUX_FLUDS::
 
   delayed_local_psi_Gn_block_stride( primary.delayed_local_psi_Gn_block_stride ),
   //================ Alpha Elements
-  so_cell_outb_face_slot_indices( primary.so_cell_outb_face_slot_indices ),
+//  so_cell_outb_face_slot_indices( primary.so_cell_outb_face_slot_indices ),
   so_cell_outb_face_slot_indices2( primary.so_cell_outb_face_slot_indices2 ),
-  so_cell_outb_face_face_category( primary.so_cell_outb_face_face_category ),
+//  so_cell_outb_face_face_category( primary.so_cell_outb_face_face_category ),
   so_cell_outb_face_face_category2( primary.so_cell_outb_face_face_category2 ),
 
-  so_cell_inco_face_dof_indices( primary.so_cell_inco_face_dof_indices ),
+//  so_cell_inco_face_dof_indices( primary.so_cell_inco_face_dof_indices ),
   so_cell_inco_face_dof_indices2( primary.so_cell_inco_face_dof_indices2 ),
-  so_cell_inco_face_face_category( primary.so_cell_inco_face_face_category ),
+//  so_cell_inco_face_face_category( primary.so_cell_inco_face_face_category ),
   so_cell_inco_face_face_category2( primary.so_cell_inco_face_face_category2 ),
 
   //================ Beta Elements
