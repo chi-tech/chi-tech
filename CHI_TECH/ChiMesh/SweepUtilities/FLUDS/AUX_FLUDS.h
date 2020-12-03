@@ -13,23 +13,38 @@ public:
 
   //Inherited from base FLUDS
 //public:
-//  std::vector<size_t>& local_psi_stride;               //face category face size
-//  std::vector<size_t>& local_psi_max_elements;         //number of face in each cat
-//  const size_t         delayed_local_psi_stride;       //face category face size
-//  const size_t         delayed_local_psi_max_elements; //number of face in each cat
-//  const size_t         num_face_categories;
-
+//  size_t              num_face_categories=0;            //Number of face categories
+//  std::vector<size_t> local_psi_stride;                 //Group-angle-faceDOF stride per cat
+//  std::vector<size_t> local_psi_max_elements;           //Number of faces in each cat
+//  size_t              delayed_local_psi_stride=0;       //Group-angle-faceDOF stride delayed cat
+//  size_t              delayed_local_psi_max_elements=0; //Number of faces in delayed cat
+//
+//public:
+//  // This is a small vector [deplocI] that holds the number of
+//  // face dofs for each dependent location.
+//  std::vector<int>    deplocI_face_dof_count;
+//
+//  // Very small vector listing the boundaries this location depends on
+//  std::vector<int> boundary_dependencies;
+//
+//public:
+//  // This is a small vector [prelocI] that holds the number of
+//  // face dofs for each predecessor location.
+//  std::vector<int>    prelocI_face_dof_count;
+//
+//  std::vector<int>    delayed_prelocI_face_dof_count;
 
 private:
   const int largest_face;
   const int G;
 
-  //local_psi_Gn_block_stride[fc]. Given face category fc, the value is
-  //total number of faces that store information in this categorie's buffer
+  //local_psi_n_block_stride[fc]. Given face category fc, the value is
+  //total number of faces that store information in this category's buffer
+  //per angle
   std::vector<size_t>& local_psi_Gn_block_stride;
-  std::vector<size_t>  local_psi_Gn_block_strideG;
+  std::vector<size_t>  local_psi_Gn_block_strideG; //Custom G
   const size_t delayed_local_psi_Gn_block_stride;
-  size_t delayed_local_psi_Gn_block_strideG;
+  size_t delayed_local_psi_Gn_block_strideG;       //Custom G
 
   //======================================== References to psi vectors
   //ref_local_psi[fc]. Each category fc has its own
@@ -56,61 +71,36 @@ private:
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
   // which holds the slot address in the local psi vector where the first
   // face dof will store its data
-//  std::vector<std::vector<int>>& so_cell_outb_face_slot_indices;
-
   std::vector<int*>&
-    so_cell_outb_face_slot_indices2;
+    so_cell_outb_face_slot_indices;
 
   // This is a vector [cell_sweep_order_index][outgoing_face_count]
   // which holds the face categorization for the face. i.e. the local
   // psi vector that hold faces of the same category.
-//  std::vector<std::vector<short>>& so_cell_outb_face_face_category;
-
   std::vector<short*>&
-    so_cell_outb_face_face_category2;
+    so_cell_outb_face_face_category;
 
   // This is a vector [cell_sweep_order_index][incoming_face_count]
-  // that will hold a pair. Pair-first holds the slot address where this
-  // face's upwind data is stored. Pair-second is a mapping of
-  // each of this face's dofs to the upwinded face's dofs
-//  std::vector<std::vector<std::pair<int,std::vector<short>> >>&
-//    so_cell_inco_face_dof_indices;
-
-  std::vector<PRIMARY_FLUDS::INCOMING_FACE_INFO*>&
-    so_cell_inco_face_dof_indices2;
+  // that will hold a structure. struct.slot_address holds the slot address
+  // where this face's upwind data is stored. struct.upwind_dof_mapping is
+  // a mapping of each of this face's dofs to the upwinded face's dofs
+private:
+  std::vector<INCOMING_FACE_INFO*>&
+    so_cell_inco_face_dof_indices;
 
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // which holds the face categorization for the face. i.e. the local
   // psi vector that hold faces of the same category.
-//  std::vector<std::vector<short>>& so_cell_inco_face_face_category;
-
   std::vector<short*>&
-    so_cell_inco_face_face_category2;
-
-  //Inherited from base FLUDS
-//public:
-//  // This is a small vector [deplocI] that holds the number of
-//  // face dofs for each dependent location.
-//  std::vector<int>&    deplocI_face_dof_count;
-//
-//  // Very small vector listing the boundaries this location depends on
-//  std::vector<int>& boundary_dependencies;
+    so_cell_inco_face_face_category;
 
 private:
   // This is a vector [non_local_outgoing_face_count]
   // that maps a face to a dependent location and associated slot index
-  std::vector<std::pair<int,int>>& nonlocal_outb_face_deplocI_slot;
+  std::vector<std::pair<int,int>>&
+    nonlocal_outb_face_deplocI_slot;
 
   //======================================== Beta elements
-  //Inherited from base FLUDS
-//public:
-//  // This is a small vector [prelocI] that holds the number of
-//  // face dofs for each predecessor location.
-//  std::vector<int>&    prelocI_face_dof_count;
-//
-//  std::vector<int>&    delayed_prelocI_face_dof_count;
-
-
 private:
   // This is a vector [nonlocal_inc_face_counter] containing
   // AlphaPairs. AlphaPair-first is the prelocI index and

@@ -15,19 +15,14 @@ chi_mesh::sweep_management::AUX_FLUDS::
   largest_face( primary.largest_face ),
   G( in_G ),
 
-  local_psi_Gn_block_stride( primary.local_psi_Gn_block_stride ),
+  local_psi_Gn_block_stride( primary.local_psi_n_block_stride ),
 
   delayed_local_psi_Gn_block_stride( primary.delayed_local_psi_Gn_block_stride ),
   //================ Alpha Elements
-//  so_cell_outb_face_slot_indices( primary.so_cell_outb_face_slot_indices ),
-  so_cell_outb_face_slot_indices2( primary.so_cell_outb_face_slot_indices2 ),
-//  so_cell_outb_face_face_category( primary.so_cell_outb_face_face_category ),
-  so_cell_outb_face_face_category2( primary.so_cell_outb_face_face_category2 ),
-
-//  so_cell_inco_face_dof_indices( primary.so_cell_inco_face_dof_indices ),
-  so_cell_inco_face_dof_indices2( primary.so_cell_inco_face_dof_indices2 ),
-//  so_cell_inco_face_face_category( primary.so_cell_inco_face_face_category ),
-  so_cell_inco_face_face_category2( primary.so_cell_inco_face_face_category2 ),
+  so_cell_outb_face_slot_indices(primary.so_cell_outb_face_slot_indices ),
+  so_cell_outb_face_face_category(primary.so_cell_outb_face_face_category ),
+  so_cell_inco_face_dof_indices(primary.so_cell_inco_face_dof_indices ),
+  so_cell_inco_face_face_category(primary.so_cell_inco_face_face_category ),
 
   //================ Beta Elements
   nonlocal_outb_face_deplocI_slot( primary.nonlocal_outb_face_deplocI_slot ),
@@ -72,14 +67,14 @@ OutgoingPsi(int cell_so_index, int outb_face_counter,
             int face_dof, int n)
 {
   // Face category
-  int fc = so_cell_outb_face_face_category2[cell_so_index][outb_face_counter];
+  int fc = so_cell_outb_face_face_category[cell_so_index][outb_face_counter];
 
   if (fc >= 0)
   {
     size_t index =
       local_psi_Gn_block_strideG[fc]*n +
-      so_cell_outb_face_slot_indices2[cell_so_index][outb_face_counter]*
-      local_psi_stride[fc]*G +
+        so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter] *
+        local_psi_stride[fc] *G +
       face_dof*G;
 
     return &(ref_local_psi->operator[](fc))[index];
@@ -88,8 +83,8 @@ OutgoingPsi(int cell_so_index, int outb_face_counter,
   {
     size_t index =
       delayed_local_psi_Gn_block_strideG*n +
-      so_cell_outb_face_slot_indices2[cell_so_index][outb_face_counter]*
-      delayed_local_psi_stride*G +
+        so_cell_outb_face_slot_indices[cell_so_index][outb_face_counter] *
+        delayed_local_psi_stride *G +
       face_dof*G;
 
     return &ref_delayed_local_psi->operator[](index);
@@ -143,16 +138,16 @@ UpwindPsi(int cell_so_index, int inc_face_counter,
           int face_dof,int g, int n)
 {
   // Face category
-  int fc = so_cell_inco_face_face_category2[cell_so_index][inc_face_counter];
+  int fc = so_cell_inco_face_face_category[cell_so_index][inc_face_counter];
 
   if (fc >= 0)
   {
     size_t index =
       local_psi_Gn_block_strideG[fc]*n +
-      so_cell_inco_face_dof_indices2[cell_so_index][inc_face_counter].slot_address*
-      local_psi_stride[fc]*G +
-      so_cell_inco_face_dof_indices2[cell_so_index][inc_face_counter].
-        upwind_dof_mapping[face_dof]*G + g;
+        so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].slot_address *
+        local_psi_stride[fc] *G +
+        so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
+        upwind_dof_mapping[face_dof] *G + g;
 
     return &(ref_local_psi->operator[](fc))[index];
   }
@@ -160,10 +155,10 @@ UpwindPsi(int cell_so_index, int inc_face_counter,
   {
     size_t index =
       delayed_local_psi_Gn_block_strideG*n +
-      so_cell_inco_face_dof_indices2[cell_so_index][inc_face_counter].slot_address*
-      delayed_local_psi_stride*G +
-      so_cell_inco_face_dof_indices2[cell_so_index][inc_face_counter].
-        upwind_dof_mapping[face_dof]*G + g;
+        so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].slot_address *
+        delayed_local_psi_stride *G +
+        so_cell_inco_face_dof_indices[cell_so_index][inc_face_counter].
+        upwind_dof_mapping[face_dof] *G + g;
 
     return &ref_delayed_local_psi_old->operator[](index);
   }

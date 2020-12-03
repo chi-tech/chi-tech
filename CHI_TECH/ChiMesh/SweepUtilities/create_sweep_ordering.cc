@@ -5,17 +5,17 @@
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-#include "../../ChiConsole/chi_console.h"
-#include <ChiTimer/chi_timer.h>
+#include "chi_mpi.h"
+#include "chi_log.h"
+#include "ChiConsole/chi_console.h"
+#include "ChiTimer/chi_timer.h"
 
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 extern ChiConsole&  chi_console;
 extern ChiTimer   chi_program_timer;
 
-#include <ChiGraph/chi_directed_graph.h>
+#include "ChiGraph/chi_directed_graph.h"
 
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
@@ -38,17 +38,12 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
   sweep_order->omega.y = sin(polar)*sin(azimuthal);
   sweep_order->omega.z = cos(polar);
 
-  chi_mesh::Vector3 omega = sweep_order->omega; //shorter name
-  if (chi_mpi.location_id == 0)
-  {
-    char buff[100];
-    snprintf(buff, sizeof(buff), "Omega = %f,%f,%f\n",omega.x,omega.y,omega.z);
+  chi_mesh::Vector3& omega = sweep_order->omega; //shorter name
 
-    chi_log.Log(LOG_0VERBOSE_1)
-      << chi_program_timer.GetTimeString()
-      << " Building sweep ordering for "
-      << buff;
-  }
+  chi_log.Log(LOG_0VERBOSE_1)
+    << chi_program_timer.GetTimeString()
+    << " Building sweep ordering for Omega = "
+    << omega.PrintS();
 
   //============================================= Populate Cell Relationships
   chi_log.Log(LOG_0VERBOSE_1) << "Populating cell relationships";

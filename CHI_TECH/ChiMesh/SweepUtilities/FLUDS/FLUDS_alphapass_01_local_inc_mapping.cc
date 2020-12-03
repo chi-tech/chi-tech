@@ -74,7 +74,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
 //        dof_mapping.first = /*local_psi_stride*G**/
 //          so_cell_outb_face_slot_indices[adj_so_index][ass_f_counter];
         dof_mapping.first = /*local_psi_stride*G**/
-          so_cell_outb_face_slot_indices2[adj_so_index][ass_f_counter];
+          so_cell_outb_face_slot_indices[adj_so_index][ass_f_counter];
 
         dof_mapping.second.shrink_to_fit();
         inco_face_dof_mapping.push_back(dof_mapping);
@@ -89,7 +89,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
   for (int i=0; i<inco_face_dof_mapping.size(); ++i)
     inco_face_info_array[i].Setup(inco_face_dof_mapping[i]);
 
-  so_cell_inco_face_dof_indices2.push_back(inco_face_info_array);
+  so_cell_inco_face_dof_indices.push_back(inco_face_info_array);
 
 
 }

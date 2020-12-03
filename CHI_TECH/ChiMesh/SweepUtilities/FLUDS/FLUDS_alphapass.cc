@@ -18,23 +18,25 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   chi_mesh::MeshContinuum*         grid = spds->grid;
   chi_mesh::sweep_management::SPLS* spls = spds->spls;
 
+  //================================================== Initialize face
+  //                                                   categorization
   num_face_categories = grid->NumberOfFaceHistogramBins();
   local_psi_stride.resize(num_face_categories,0);
   local_psi_max_elements.resize(num_face_categories,0);
-  local_psi_Gn_block_stride.resize(num_face_categories,0);
+  local_psi_n_block_stride.resize(num_face_categories, 0);
   local_psi_Gn_block_strideG.resize(num_face_categories,0);
-
 
   //================================================== Initialize dependent
   //                                                   locations
   size_t num_of_deplocs = spds->location_successors.size();
   deplocI_face_dof_count.resize(num_of_deplocs,0);
-  deplocI_cell_views.resize(num_of_deplocs,std::vector<CompactCellView>());
+  deplocI_cell_views.resize(num_of_deplocs);
 
 
   //                      PERFORM SLOT DYNAMICS
   //================================================== Loop over cells in
   //                                                   sweep order
+
   // Given a local cell index, gives the so index
   std::vector<int>  local_so_cell_mapping;
   local_so_cell_mapping.resize(grid->local_cell_glob_indices.size(),0);
@@ -48,10 +50,6 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   so_cell_inco_face_face_category.reserve(spls->item_id.size());
   so_cell_outb_face_slot_indices.reserve(spls->item_id.size());
   so_cell_outb_face_face_category.reserve(spls->item_id.size());
-
-  so_cell_inco_face_face_category2.reserve(spls->item_id.size());
-  so_cell_outb_face_slot_indices2.reserve(spls->item_id.size());
-  so_cell_outb_face_face_category2.reserve(spls->item_id.size());
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
     int cell_local_id = spls->item_id[csoi];
@@ -59,7 +57,11 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 
     local_so_cell_mapping[cell->local_id] = csoi; //Set mapping
 
-    SlotDynamics(cell,spds,lock_boxes,delayed_lock_box,location_boundary_dependency_set);
+    SlotDynamics(cell,
+                 spds,
+                 lock_boxes,
+                 delayed_lock_box,
+                 location_boundary_dependency_set);
 
   }//for csoi
 
@@ -78,7 +80,6 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   //================================================== Loop over cells in
   //                                                   sweep order
   so_cell_inco_face_dof_indices.reserve(spls->item_id.size());
-  so_cell_inco_face_dof_indices2.reserve(spls->item_id.size());
   for (int csoi=0; csoi<spls->item_id.size(); csoi++)
   {
     int cell_local_id = spls->item_id[csoi];
@@ -92,8 +93,8 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
   {
     local_psi_stride[fc] = grid->GetFaceHistogramBinDOFSize(fc);
     local_psi_max_elements[fc]     = lock_boxes[fc].size();
-    local_psi_Gn_block_stride[fc]  = local_psi_stride[fc]*lock_boxes[fc].size();
-    local_psi_Gn_block_strideG[fc] = local_psi_Gn_block_stride[fc]*G;
+    local_psi_n_block_stride[fc]  = local_psi_stride[fc] * lock_boxes[fc].size();
+    local_psi_Gn_block_strideG[fc] = local_psi_n_block_stride[fc] * G;
   }
   delayed_local_psi_stride           = largest_face;
   delayed_local_psi_max_elements     = delayed_lock_box.size();
@@ -105,13 +106,11 @@ InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
 
   //================================================== Clean up
   so_cell_outb_face_slot_indices.shrink_to_fit();
-  so_cell_outb_face_slot_indices2.shrink_to_fit();
 
   local_so_cell_mapping.clear();
   local_so_cell_mapping.shrink_to_fit();
 
   so_cell_inco_face_dof_indices.shrink_to_fit();
-  so_cell_inco_face_dof_indices2.shrink_to_fit();
 
   nonlocal_outb_face_deplocI_slot.shrink_to_fit();
 

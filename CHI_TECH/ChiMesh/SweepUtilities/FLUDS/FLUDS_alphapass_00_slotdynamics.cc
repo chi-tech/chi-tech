@@ -29,7 +29,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   //                                                    only incident faces
   std::vector<short> inco_face_face_category;
   inco_face_face_category.reserve(cell->faces.size());
-  for (short f=0; f < cell->faces.size(); f++)
+  for (int f=0; f < cell->faces.size(); f++)
   {
     CellFace&  face = cell->faces[f];
     double     mu   = spds->omega.Dot(face.normal);
@@ -131,15 +131,12 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
   }//for f
 
-//  inco_face_face_category.shrink_to_fit();
-//  so_cell_inco_face_face_category.push_back(inco_face_face_category);
-
   auto raw_inco_face_face_category = new short[inco_face_face_category.size()];
   std::copy(inco_face_face_category.begin(),
             inco_face_face_category.end(),
             raw_inco_face_face_category);
 
-  so_cell_inco_face_face_category2.push_back(raw_inco_face_face_category);
+  so_cell_inco_face_face_category.push_back(raw_inco_face_face_category);
 
   //=================================================== Loop over faces
   //                OUTGOING                            but process
@@ -148,7 +145,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   std::vector<short>              outb_face_face_category;
   outb_face_slot_indices.reserve(cell->faces.size());
   outb_face_face_category.reserve(cell->faces.size());
-  for (short f=0; f < cell->faces.size(); f++)
+  for (int f=0; f < cell->faces.size(); f++)
   {
     CellFace&  face         = cell->faces[f];
     double     mu           = spds->omega.Dot(face.normal);
@@ -233,6 +230,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         nonlocal_outb_face_deplocI_slot.emplace_back(deplocI,face_slot);
 
+        //The following function is defined below
         AddFaceViewToDepLocI(deplocI, cell_g_index,
                              face_slot, face);
 
@@ -241,17 +239,12 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
   }//for f
 
-//  outb_face_slot_indices.shrink_to_fit();
-//  outb_face_face_category.shrink_to_fit();
-//  so_cell_outb_face_slot_indices.push_back(outb_face_slot_indices);
-//  so_cell_outb_face_face_category.push_back(outb_face_face_category);
-
   auto raw_outb_face_slot_indices = new int[outb_face_slot_indices.size()];
   std::copy(outb_face_slot_indices.begin(),
             outb_face_slot_indices.end(),
             raw_outb_face_slot_indices);
 
-  so_cell_outb_face_slot_indices2.push_back(raw_outb_face_slot_indices);
+  so_cell_outb_face_slot_indices.push_back(raw_outb_face_slot_indices);
 
 
   auto raw_outb_face_face_category = new short[outb_face_face_category.size()];
@@ -259,7 +252,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             outb_face_face_category.end(),
             raw_outb_face_face_category);
 
-  so_cell_outb_face_face_category2.push_back(raw_outb_face_face_category);
+  so_cell_outb_face_face_category.push_back(raw_outb_face_face_category);
 }
 
 //###################################################################
