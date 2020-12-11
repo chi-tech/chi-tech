@@ -392,6 +392,9 @@ LBSGroupset.ANGLE_AGG_POLAR\n
 LBSGroupset.ANGLE_AGG_SINGLE\n
  Use Single angle aggregation.\n\n
 
+LBSGroupset.ANGLE_AGG_AZIMUTHAL\n
+ Use Azimuthal angle aggregation.\n\n
+
 Example:
 \code
 chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_POLAR)
@@ -454,6 +457,8 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
     groupset->angleagg_method = LinearBoltzmann::AngleAggregationType::SINGLE;
   else if (agg_type == (int)LinearBoltzmann::AngleAggregationType::POLAR)
     groupset->angleagg_method = LinearBoltzmann::AngleAggregationType::POLAR;
+  else if (agg_type == (int)LinearBoltzmann::AngleAggregationType::AZIMUTHAL)
+    groupset->angleagg_method = LinearBoltzmann::AngleAggregationType::AZIMUTHAL;
   else
   {
     chi_log.Log(LOG_ALLERROR)

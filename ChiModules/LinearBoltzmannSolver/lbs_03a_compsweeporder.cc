@@ -59,6 +59,8 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
       ComputeSweepOrderingsAngleAggSingle(groupset); break;
     case AngleAggregationType::POLAR:
       ComputeSweepOrderingsAngleAggPolar(groupset); break;
+    case AngleAggregationType::AZIMUTHAL:
+      ComputeSweepOrderingsAngleAggAzimuthal(groupset); break;
     default:
       throw std::logic_error(std::string(__FUNCTION__) +
                              " Invalid angle aggregation type.");
@@ -185,6 +187,51 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& gr
          "and therefore only certain geometry types are supported. i.e., "
          "GeometryType::ONED_SLAB, GeometryType::TWOD_CARTESIAN, "
          "GeometryType::THREED_CARTESIAN.";
+    std::exit(EXIT_FAILURE);
+  }
+}
+
+
+void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const
+{
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Computing Sweep ordering - Angle aggregation: Azimuthal";
+
+  if (options.geometry_type == GeometryType::ONED_SPHERICAL ||
+      options.geometry_type == GeometryType::TWOD_CYLINDRICAL)
+  {
+    if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
+    {
+      const auto product_quadrature =
+        std::static_pointer_cast<chi_math::ProductQuadrature>(groupset.quadrature);
+
+      for (const auto& dir_set : product_quadrature->GetDirectionMap())
+        for (const auto& dir_idx : {dir_set.second.front(), dir_set.second.back()})
+        {
+          const auto new_swp_order =
+            chi_mesh::sweep_management::
+            CreateSweepOrder(product_quadrature->omegas[dir_idx],
+                             this->grid,
+                             groupset.allow_cycles);
+          groupset.sweep_orderings.emplace_back(new_swp_order);
+        }
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
+           "and therefore only certain angular quadrature types are supported. "
+           "i.e., for now just AngularQuadratureType::ProductQuadrature.";
+      std::exit(EXIT_FAILURE);
+    }
+  }
+  else
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
+         "and therefore only certain geometry types are supported. i.e., "
+         "GeometryType::ONED_SPHERICAL, GeometryType::TWOD_CYLINDRICAL.";
     std::exit(EXIT_FAILURE);
   }
 }

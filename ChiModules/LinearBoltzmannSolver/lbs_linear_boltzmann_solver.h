@@ -113,11 +113,13 @@ public:
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
   void ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const;
   void ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const;
+  void ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const;
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
   //03c
   void InitAngleAggPolar(LBSGroupset& groupset);
   void InitAngleAggSingle(LBSGroupset& groupset);
+  void InitAngleAggAzimuthal(LBSGroupset& groupset);
   //03d
   void InitWGDSA(LBSGroupset& groupset);
   void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset, double *ref_phi_old,

@@ -18,8 +18,10 @@ namespace LinearBoltzmann
 {
   enum class AngleAggregationType
   {
+    UNDEFINED = 0,
     SINGLE = 1,
-    POLAR = 2
+    POLAR = 2,
+    AZIMUTHAL = 3,
   };
 }
 

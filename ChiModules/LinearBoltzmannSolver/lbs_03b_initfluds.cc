@@ -1,7 +1,6 @@
 #include "lbs_linear_boltzmann_solver.h"
 #include "ChiConsole/chi_console.h"
 
-#include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
@@ -36,6 +35,20 @@ void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
         InitAngleAggSingle(groupset); break;
       case AngleAggregationType::POLAR:
         InitAngleAggPolar(groupset); break;
+      default:
+        throw std::logic_error(std::string(__FUNCTION__) +
+                               " Invalid angle aggregation type.");
+    }//switch on method
+  }//if aggregatable
+  else if (options.geometry_type == GeometryType::ONED_SPHERICAL ||
+           options.geometry_type == GeometryType::TWOD_CYLINDRICAL)
+  {
+    switch (groupset.angleagg_method)
+    {
+      case AngleAggregationType::SINGLE:
+        InitAngleAggSingle(groupset); break;
+      case AngleAggregationType::AZIMUTHAL:
+        InitAngleAggAzimuthal(groupset); break;
       default:
         throw std::logic_error(std::string(__FUNCTION__) +
                                " Invalid angle aggregation type.");
