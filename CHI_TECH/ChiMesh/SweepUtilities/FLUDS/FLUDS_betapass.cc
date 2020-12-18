@@ -16,7 +16,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
-  chi_mesh::sweep_management::SPLS* spls = spds->spls;
+  chi_mesh::sweep_management::SPLS& spls = spds->spls;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   // The first two major steps here are: Send delayed successor information
@@ -160,9 +160,9 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 
 
   //================================================== Loop over cells in sorder
-  for (int csoi=0; csoi<spls->item_id.size(); csoi++)
+  for (int csoi=0; csoi<spls.item_id.size(); csoi++)
   {
-    int cell_local_index = spls->item_id[csoi];
+    int cell_local_index = spls.item_id[csoi];
     auto cell = &grid->local_cells[cell_local_index];
 
     NonLocalIncidentMapping(cell, spds);

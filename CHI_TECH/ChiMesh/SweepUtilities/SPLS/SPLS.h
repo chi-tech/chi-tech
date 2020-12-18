@@ -8,7 +8,6 @@
 struct chi_mesh::sweep_management::SPLS
 {
   std::vector<int> item_id;
-  //chi_mesh::sweep_management::FLUDS* fluds;
 };
 
 //###################################################################
@@ -17,7 +16,6 @@ struct chi_mesh::sweep_management::SPLS
 struct chi_mesh::sweep_management::STDG
 {
   std::vector<int> item_id;
-
 };
 
 

@@ -384,13 +384,13 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
     << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)
   {
-    auto new_stdg = new chi_mesh::sweep_management::STDG;
-    global_sweep_planes.push_back(new_stdg);
+    chi_mesh::sweep_management::STDG new_stdg;
 
     for (int k=0; k<chi_mpi.process_count; k++)
     {
       if (glob_sweep_order_rank[k] == r)
-        new_stdg->item_id.push_back(glob_linear_sweep_order[k]);
+        new_stdg.item_id.push_back(glob_linear_sweep_order[k]);
     }
+    global_sweep_planes.push_back(new_stdg);
   }
 }

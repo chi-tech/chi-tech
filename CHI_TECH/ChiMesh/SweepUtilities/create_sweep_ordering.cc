@@ -91,10 +91,9 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
     << " Generating topological sorting for local sweep ordering";
-  sweep_order->spls = new chi_mesh::sweep_management::SPLS;
-  sweep_order->spls->item_id = local_DG.GenerateTopologicalSort();
+  sweep_order->spls.item_id = local_DG.GenerateTopologicalSort();
 
-  if (sweep_order->spls->item_id.empty())
+  if (sweep_order->spls.item_id.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "Topological sorting for local sweep-ordering failed. "

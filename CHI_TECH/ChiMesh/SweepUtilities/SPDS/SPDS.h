@@ -9,12 +9,12 @@ struct chi_mesh::sweep_management::SPDS
 {
   double                   polar;
   double                   azimuthal;
-  chi_mesh::Vector3         omega;
+  chi_mesh::Vector3        omega;
 
   chi_mesh::MeshContinuum* grid;
 
-  SPLS*                    spls;
-  std::vector<STDG*>       global_sweep_planes;  ///< Processor sweep planes
+  SPLS                     spls;
+  std::vector<STDG>        global_sweep_planes;  ///< Processor sweep planes
   std::vector<int>         location_dependencies;
   std::vector<int>         location_successors;
   std::vector<int>         delayed_location_dependencies;
@@ -30,8 +30,6 @@ struct chi_mesh::sweep_management::SPDS
 
   int MapLocJToPrelocI(int locJ);
   int MapLocJToDeplocI(int locJ);
-//  void AddLocalDependecy(int location_index);
-//  void AddLocalSuccessor(int location_index);
 
   void BuildTaskDependencyGraph(bool cycle_allowance_flag);
 };

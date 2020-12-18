@@ -13,7 +13,6 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                           chi_mesh::sweep_management::SPDS* spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
-  chi_mesh::sweep_management::SPLS* spls = spds->spls;
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process

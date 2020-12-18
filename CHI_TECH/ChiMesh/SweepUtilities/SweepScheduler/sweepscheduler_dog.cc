@@ -33,9 +33,9 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       size_t loc_depth = -1;
       for (size_t level=0; level<leveled_graph.size(); level++)
       {
-        for (size_t index=0; index<leveled_graph[level]->item_id.size(); index++)
+        for (size_t index=0; index<leveled_graph[level].item_id.size(); index++)
         {
-          if (leveled_graph[level]->item_id[index] == chi_mpi.location_id)
+          if (leveled_graph[level].item_id[index] == chi_mpi.location_id)
           {
             loc_depth = leveled_graph.size()-level;
             break;

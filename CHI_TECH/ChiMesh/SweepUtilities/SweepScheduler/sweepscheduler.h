@@ -16,7 +16,7 @@ namespace chi_mesh::sweep_management
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 typedef chi_mesh::sweep_management::AngleSet      TAngleSet;
 typedef chi_mesh::sweep_management::STDG          TGSPO;
-typedef std::vector<TGSPO*>                      TLEVELED_GRAPH;
+typedef std::vector<TGSPO>                        TLEVELED_GRAPH;
 
 //###################################################################
 class chi_mesh::sweep_management::SweepScheduler
