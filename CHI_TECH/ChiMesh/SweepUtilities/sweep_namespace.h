@@ -48,7 +48,7 @@ namespace sweep_management
     chi_mesh::sweep_management::SPDS* sweep_order,
     chi_graph::DirectedGraph& local_DG);
 
-  SPDS* CreateSweepOrder(double polar, double azimuthal,
+  SPDS CreateSweepOrder(double polar, double azimuthal,
                          chi_mesh::MeshContinuum *grid,
                          bool cycle_allowance_flag=false);
 

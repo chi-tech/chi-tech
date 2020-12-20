@@ -55,7 +55,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   {
     for (auto& angle : groupset->quadrature->abscissae)
     {
-      chi_mesh::sweep_management::SPDS* new_swp_order =
+      chi_mesh::sweep_management::SPDS new_swp_order =
         chi_mesh::sweep_management::
         CreateSweepOrder(angle.theta,
                          angle.phi,
@@ -84,7 +84,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
         exit(EXIT_FAILURE);
       }
 
-      chi_mesh::sweep_management::SPDS* new_swp_order =
+      chi_mesh::sweep_management::SPDS new_swp_order =
         chi_mesh::sweep_management::
         CreateSweepOrder(product_quadrature->polar_ang[0],
                          product_quadrature->azimu_ang[0],
@@ -139,7 +139,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       //=========================================== TOP HEMISPHERE
       for (int i=0; i<num_azi; i++)
       {
-        chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::SPDS new_swp_order =
           chi_mesh::sweep_management::
           CreateSweepOrder(product_quadrature->polar_ang[pa-1],
                            product_quadrature->azimu_ang[i],
@@ -150,7 +150,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
       //=========================================== BOTTOM HEMISPHERE
       for (int i=0; i<num_azi; i++)
       {
-        chi_mesh::sweep_management::SPDS* new_swp_order =
+        chi_mesh::sweep_management::SPDS new_swp_order =
           chi_mesh::sweep_management::
           CreateSweepOrder(product_quadrature->polar_ang[pa],
                            product_quadrature->azimu_ang[i],

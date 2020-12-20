@@ -18,13 +18,6 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset *groupset)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "Resetting SPDS and FLUDS";
-  for (int so=0; so<sweep_orderings.size(); so++)
-  {
-    chi_mesh::sweep_management::SPDS* cur_so =
-      sweep_orderings[so];
-
-    delete cur_so;
-  }
 
   sweep_orderings.clear();
 

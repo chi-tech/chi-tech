@@ -20,25 +20,26 @@ extern ChiTimer   chi_program_timer;
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
  * cells.*/
-chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
+chi_mesh::sweep_management::SPDS chi_mesh::sweep_management::
   CreateSweepOrder(double polar, double azimuthal,
                    chi_mesh::MeshContinuum *grid,
                    bool cycle_allowance_flag)
 {
-  auto sweep_order  = new chi_mesh::sweep_management::SPDS;
-  sweep_order->grid = grid;
+//  auto sweep_order  = new chi_mesh::sweep_management::SPDS
+  chi_mesh::sweep_management::SPDS sweep_order;
+  sweep_order.grid = grid;
 
   size_t num_loc_cells = grid->local_cell_glob_indices.size();
 
   //============================================= Compute direction vector
-  sweep_order->polar     = polar;
-  sweep_order->azimuthal = azimuthal;
+  sweep_order.polar     = polar;
+  sweep_order.azimuthal = azimuthal;
 
-  sweep_order->omega.x = sin(polar)*cos(azimuthal);
-  sweep_order->omega.y = sin(polar)*sin(azimuthal);
-  sweep_order->omega.z = cos(polar);
+  sweep_order.omega.x = sin(polar)*cos(azimuthal);
+  sweep_order.omega.y = sin(polar)*sin(azimuthal);
+  sweep_order.omega.z = cos(polar);
 
-  chi_mesh::Vector3& omega = sweep_order->omega; //shorter name
+  chi_mesh::Vector3& omega = sweep_order.omega; //shorter name
 
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
@@ -57,14 +58,14 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
                             location_successors,
                             cell_successors);
 
-  sweep_order->location_successors.reserve(location_successors.size());
-  sweep_order->location_dependencies.reserve(location_dependencies.size());
+  sweep_order.location_successors.reserve(location_successors.size());
+  sweep_order.location_dependencies.reserve(location_dependencies.size());
 
   for (auto v : location_successors)
-    sweep_order->location_successors.push_back(v);
+    sweep_order.location_successors.push_back(v);
 
   for (auto v : location_dependencies)
-    sweep_order->location_dependencies.push_back(v);
+    sweep_order.location_dependencies.push_back(v);
 
   //============================================= Build graph
   chi_graph::DirectedGraph local_DG;
@@ -84,16 +85,16 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
     chi_log.Log(LOG_0VERBOSE_1)
       << chi_program_timer.GetTimeString()
       << " Removing inter-cell cycles.";
-    RemoveLocalCyclicDependencies(sweep_order,local_DG);
+    RemoveLocalCyclicDependencies(&sweep_order,local_DG);
   }
 
   //============================================= Generate topological sorting
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()
     << " Generating topological sorting for local sweep ordering";
-  sweep_order->spls.item_id = local_DG.GenerateTopologicalSort();
+  sweep_order.spls.item_id = local_DG.GenerateTopologicalSort();
 
-  if (sweep_order->spls.item_id.empty())
+  if (sweep_order.spls.item_id.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "Topological sorting for local sweep-ordering failed. "
@@ -112,15 +113,15 @@ chi_mesh::sweep_management::SPDS* chi_mesh::sweep_management::
     << chi_program_timer.GetTimeString()
     << " Communicating sweep dependencies.";
 
-  auto& global_dependencies = sweep_order->global_dependencies;
+  auto& global_dependencies = sweep_order.global_dependencies;
   global_dependencies.resize(chi_mpi.process_count);
 
-  CommunicateLocationDependencies(sweep_order->location_dependencies,
+  CommunicateLocationDependencies(sweep_order.location_dependencies,
                                   global_dependencies);
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Build task
   //                                                        dependency graph
-  sweep_order->BuildTaskDependencyGraph(cycle_allowance_flag);
+  sweep_order.BuildTaskDependencyGraph(cycle_allowance_flag);
 
   MPI_Barrier(MPI_COMM_WORLD);
 
