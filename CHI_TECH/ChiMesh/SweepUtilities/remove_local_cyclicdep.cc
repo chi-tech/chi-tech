@@ -1,19 +1,19 @@
 #include "../chi_mesh.h"
 
+#include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiGraph/chi_directed_graph.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-extern ChiMPI& chi_mpi;
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
-#include <algorithm>
+#include "chi_mpi.h"
+extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Removes local cyclic dependencies.*/
 void chi_mesh::sweep_management::
-  RemoveLocalCyclicDependencies(chi_mesh::sweep_management::SPDS *sweep_order,
+  RemoveLocalCyclicDependencies(std::shared_ptr<SPDS> sweep_order,
                                 chi_graph::DirectedGraph &local_DG)
 {
   auto edges_to_remove = local_DG.RemoveCyclicDependencies();

@@ -47,7 +47,7 @@ ClearDownstreamBuffers()
 {
   if (done_sending) return;
 
-  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
+  auto spds =  angleset->GetSPDS();
 
   done_sending = true;
   for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)

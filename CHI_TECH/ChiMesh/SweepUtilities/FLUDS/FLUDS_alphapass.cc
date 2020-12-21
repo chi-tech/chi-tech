@@ -13,7 +13,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 //###################################################################
 /**Populates a flux data structure.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-InitializeAlphaElements(chi_mesh::sweep_management::SPDS* spds)
+InitializeAlphaElements(SPDS_ptr spds)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
   chi_mesh::sweep_management::SPLS& spls = spds->spls;

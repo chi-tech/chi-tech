@@ -21,8 +21,8 @@ InitializeLocalAndDownstreamBuffers()
 {
   if (!data_initialized)
   {
-    chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
-    chi_mesh::sweep_management::FLUDS* fluds=  angleset->fluds;
+    auto spds =  angleset->GetSPDS();
+    auto fluds=  angleset->fluds;
 
     int num_grps   = angleset->GetNumGrps();
     int num_angles = angleset->angles.size();

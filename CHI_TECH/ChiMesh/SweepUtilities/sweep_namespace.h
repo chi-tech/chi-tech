@@ -4,6 +4,8 @@
 #include "../chi_mesh.h"
 #include <set>
 
+#include <memory>
+
 namespace chi_graph
 {
   class DirectedGraph;
@@ -45,12 +47,12 @@ namespace sweep_management
     chi_graph::DirectedGraph& TDG);
 
   void RemoveLocalCyclicDependencies(
-    chi_mesh::sweep_management::SPDS* sweep_order,
+    std::shared_ptr<SPDS> sweep_order,
     chi_graph::DirectedGraph& local_DG);
 
-  SPDS CreateSweepOrder(double polar, double azimuthal,
-                         chi_mesh::MeshContinuum *grid,
-                         bool cycle_allowance_flag=false);
+  std::shared_ptr<SPDS> CreateSweepOrder(double polar, double azimuthal,
+                            chi_mesh::MeshContinuum *grid,
+                            bool cycle_allowance_flag=false);
 
   void PrintSweepOrdering(SPDS* sweep_order,
                           MeshContinuum* vol_continuum);

@@ -9,7 +9,7 @@
 void chi_mesh::sweep_management::SweepBuffer::
 SendDownstreamPsi(int angle_set_num)
 {
-  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
+  auto spds =  angleset->GetSPDS();
 
   for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
   {

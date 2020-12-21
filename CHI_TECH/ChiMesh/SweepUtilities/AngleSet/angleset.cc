@@ -8,54 +8,54 @@ extern ChiMPI& chi_mpi;
 #include <chi_log.h>
 extern ChiLog& chi_log;
 
+////###################################################################
+///**AngleSet constructor.*/
+//chi_mesh::sweep_management::AngleSet::
+//AngleSet(int in_numgrps,
+//         int in_ref_subset,
+//         SPDS* in_spds,
+//         std::vector<int>& angle_indices,
+//         std::vector<SweepBndry*>& sim_boundaries,
+//         int sweep_eager_limit,
+//         ChiMPICommunicatorSet* in_comm_set):
+//  sweep_buffer(this,sweep_eager_limit,in_comm_set),
+//  ref_boundaries(sim_boundaries)
+//{
+//  num_grps = in_numgrps;
+//  spds     = in_spds;
+//  executed = false;
+//  ref_subset = in_ref_subset;
+//  std::copy(angle_indices.begin(),
+//            angle_indices.end(),
+//            std::back_inserter(angles));
+//
+//  auto primary_fluds = new chi_mesh::sweep_management::PRIMARY_FLUDS(num_grps);
+//  primary_fluds->InitializeAlphaElements(spds);
+//  primary_fluds->InitializeBetaElements(spds);
+//
+//  fluds = primary_fluds;
+//
+//  sweep_buffer.BuildMessageStructure();
+//
+//  delayed_local_norm = 0.0;
+//};
+
 //###################################################################
 /**AngleSet constructor.*/
 chi_mesh::sweep_management::AngleSet::
 AngleSet(int in_numgrps,
          int in_ref_subset,
-         SPDS* in_spds,
-         std::vector<int>& angle_indices,
-         std::vector<SweepBndry*>& sim_boundaries,
-         int sweep_eager_limit,
-         ChiMPICommunicatorSet* in_comm_set):
-  sweep_buffer(this,sweep_eager_limit,in_comm_set),
-  ref_boundaries(sim_boundaries)
-{
-  num_grps = in_numgrps;
-  spds     = in_spds;
-  executed = false;
-  ref_subset = in_ref_subset;
-  std::copy(angle_indices.begin(),
-            angle_indices.end(),
-            std::back_inserter(angles));
-
-  auto primary_fluds = new chi_mesh::sweep_management::PRIMARY_FLUDS(num_grps);
-  primary_fluds->InitializeAlphaElements(spds);
-  primary_fluds->InitializeBetaElements(spds);
-
-  fluds = primary_fluds;
-
-  sweep_buffer.BuildMessageStructure();
-
-  delayed_local_norm = 0.0;
-};
-
-//###################################################################
-/**AngleSet constructor.*/
-chi_mesh::sweep_management::AngleSet::
-AngleSet(int in_numgrps,
-         int in_ref_subset,
-         SPDS* in_spds,
+         std::shared_ptr<SPDS> in_spds,
          FLUDS* in_fluds,
          std::vector<int>& angle_indices,
          std::vector<SweepBndry*>& sim_boundaries,
          int sweep_eager_limit,
          ChiMPICommunicatorSet* in_comm_set):
+  spds(in_spds),
   sweep_buffer(this,sweep_eager_limit,in_comm_set),
   ref_boundaries(sim_boundaries)
 {
   num_grps = in_numgrps;
-  spds     = in_spds;
   executed = false;
   ref_subset = in_ref_subset;
   std::copy(angle_indices.begin(),
@@ -145,7 +145,7 @@ chi_mesh::sweep_management::AngleSetStatus
 
 //###################################################################
 /**Returns a reference to the associated spds.*/
-chi_mesh::sweep_management::SPDS*
+std::shared_ptr<chi_mesh::sweep_management::SPDS>
   chi_mesh::sweep_management::AngleSet::GetSPDS()
 {
   return spds;

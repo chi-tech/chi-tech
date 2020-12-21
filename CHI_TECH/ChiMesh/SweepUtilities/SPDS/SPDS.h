@@ -3,6 +3,14 @@
 
 #include "ChiMesh/SweepUtilities/SPLS/SPLS.h"
 
+#include <memory>
+
+namespace chi_mesh::sweep_management
+{
+  struct SPDS;
+//  typedef std::shared_ptr<SPDS> SPDS_ptr;
+}
+
 //###################################################################
 /**Contains multiple levels*/
 struct chi_mesh::sweep_management::SPDS

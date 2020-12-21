@@ -13,7 +13,7 @@ extern ChiLog& chi_log;
 /**Performs slot dynamics for Polyhedron cell.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
   SlotDynamics(chi_mesh::Cell *cell,
-               chi_mesh::sweep_management::SPDS* spds,
+               SPDS_ptr spds,
                std::vector<std::vector<std::pair<int,short>>>& lock_boxes,
                std::vector<std::pair<int,short>>& delayed_lock_box,
                std::set<int>& location_boundary_dependency_set)

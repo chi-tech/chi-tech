@@ -13,7 +13,7 @@ extern ChiMPI&      chi_mpi;
 //###################################################################
 /**Receives and send predecessor data.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
+InitializeBetaElements(SPDS_ptr spds, int tag_index)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
   chi_mesh::sweep_management::SPLS& spls = spds->spls;

@@ -119,8 +119,8 @@ public:
       a_and_b_initialized = true;
     }
 
-    chi_mesh::sweep_management::SPDS* spds = angle_set->GetSPDS();
-    chi_mesh::sweep_management::FLUDS* fluds = angle_set->fluds;
+    auto spds = angle_set->GetSPDS();
+    auto fluds = angle_set->fluds;
 
     GsSubSet& subset = groupset->grp_subsets[angle_set->ref_subset];
     int gs_ss_size  = groupset->grp_subset_sizes[angle_set->ref_subset];
