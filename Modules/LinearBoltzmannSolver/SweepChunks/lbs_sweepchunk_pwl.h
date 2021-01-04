@@ -140,6 +140,9 @@ public:
     double* psi        = zero_mg_src.data();
     double* q_mom      = q_moments->data();
 
+    const auto& d2m_op = groupset->quadrature->GetDiscreteToMomentOperator();
+    const auto& m2d_op = groupset->quadrature->GetMomentToDiscreteOperator();
+
 
     //========================================================== Loop over each cell
     size_t num_loc_cells = spds->spls.item_id.size();
@@ -298,7 +301,7 @@ public:
             temp_src = 0.0;
             for (int m=0; m<num_moms; m++)
             {
-              m2d = groupset->m2d_op[m][angle_num];
+              m2d = m2d_op[m][angle_num];
 
               int ir = transport_view->MapDOF(i,m,g);
               temp_src += m2d*q_mom[ir];
@@ -334,7 +337,7 @@ public:
         double wn_d2m = 0.0;
         for (int m=0; m<num_moms; m++)
         {
-          wn_d2m = groupset->d2m_op[m][angle_num];
+          wn_d2m = d2m_op[m][angle_num];
           for (int i=0; i<cell_fe_view->dofs; i++)
           {
             int ir = transport_view->MapDOF(i,m,gs_gi);

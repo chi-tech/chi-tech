@@ -35,11 +35,18 @@ public:
   std::shared_ptr<chi_math::AngularQuadrature> quadrature=nullptr;
 
 private:
+  bool is_setup=false;
   std::pair<int,int> number_angular_unknowns;
   bool num_ang_unknowns_avail = false;
 
 public:
-  chi_mesh::MeshContinuum* grid;
+  chi_mesh::MeshContinuum* grid = nullptr;
+
+  void Setup(const std::vector<SweepBndry*>& in_sim_boundaries,
+             int in_number_of_groups,
+             int in_number_of_group_subsets,
+             std::shared_ptr<chi_math::AngularQuadrature>& in_quadrature,
+             chi_mesh::MeshContinuum* in_grid);
 
 public:
   double GetDelayedPsiNorm();

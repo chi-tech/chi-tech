@@ -61,11 +61,16 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
   groupset->angle_agg = new AngleAgg;
-  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-  groupset->angle_agg->number_of_groups        = groupset->groups.size();
-  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-  groupset->angle_agg->quadrature              = groupset->quadrature;
-  groupset->angle_agg->grid                    = grid;
+  groupset->angle_agg->Setup(sweep_boundaries,
+                             groupset->groups.size(),
+                             groupset->grp_subsets.size(),
+                             groupset->quadrature,
+                             grid);
+//  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
+//  groupset->angle_agg->number_of_groups        = groupset->groups.size();
+//  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
+//  groupset->angle_agg->quadrature              = groupset->quadrature;
+//  groupset->angle_agg->grid                    = grid;
 
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -227,11 +232,16 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation
     groupset->angle_agg = new AngleAgg;
-    groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-    groupset->angle_agg->number_of_groups        = groupset->groups.size();
-    groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-    groupset->angle_agg->quadrature              = groupset->quadrature;
-    groupset->angle_agg->grid                    = grid;
+    groupset->angle_agg->Setup(sweep_boundaries,
+                               groupset->groups.size(),
+                               groupset->grp_subsets.size(),
+                               groupset->quadrature,
+                               grid);
+//  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
+//  groupset->angle_agg->number_of_groups        = groupset->groups.size();
+//  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
+//  groupset->angle_agg->quadrature              = groupset->quadrature;
+//  groupset->angle_agg->grid                    = grid;
 
     //=========================================== Set angle aggregation
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -368,11 +378,16 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation
     groupset->angle_agg = new AngleAgg;
-    groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-    groupset->angle_agg->number_of_groups        = groupset->groups.size();
-    groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-    groupset->angle_agg->quadrature              = groupset->quadrature;
-    groupset->angle_agg->grid                    = grid;
+    groupset->angle_agg->Setup(sweep_boundaries,
+                               groupset->groups.size(),
+                               groupset->grp_subsets.size(),
+                               groupset->quadrature,
+                               grid);
+//  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
+//  groupset->angle_agg->number_of_groups        = groupset->groups.size();
+//  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
+//  groupset->angle_agg->quadrature              = groupset->quadrature;
+//  groupset->angle_agg->grid                    = grid;
 
     //=========================================== Set angle aggregation
     for (int q=0; q<1; q++)  //%%%%%%%%% Just a single group

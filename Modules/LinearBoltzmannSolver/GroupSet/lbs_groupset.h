@@ -36,9 +36,7 @@ class LBSGroupset
 public:
   std::vector<LBSGroup*>                       groups;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
-  std::vector<std::vector<double>>             d2m_op;
-  std::vector<std::vector<double>>             m2d_op;
-  chi_mesh::sweep_management::AngleAggregation* angle_agg;
+  chi_mesh::sweep_management::AngleAggregation* angle_agg = nullptr;
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
   std::vector<GsSubSet>                        grp_subsets;
@@ -49,7 +47,7 @@ public:
   std::vector<int>                             ang_subset_sizes_bot;
 
   int                                          iterative_method;
-  LinearBoltzmann::AngleAggregationType         angleagg_method;
+  LinearBoltzmann::AngleAggregationType        angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;
   int                                          gmres_restart_intvl;
@@ -100,7 +98,7 @@ public:
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildSubsets();
 public:
-  void PrintSweepInfoFile(size_t ev_tag,std::string file_name);
+  void PrintSweepInfoFile(size_t ev_tag,const std::string& file_name);
 };
 
 #endif

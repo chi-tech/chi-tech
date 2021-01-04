@@ -7,6 +7,24 @@ extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
 //###################################################################
+/** Sets up the angle-aggregation object. */
+void chi_mesh::sweep_management::AngleAggregation::
+  Setup(const std::vector<SweepBndry *> &in_sim_boundaries,
+        int in_number_of_groups,
+        int in_number_of_group_subsets,
+        std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
+        chi_mesh::MeshContinuum *in_grid)
+{
+  sim_boundaries = in_sim_boundaries;
+  number_of_groups = in_number_of_groups;
+  number_of_group_subsets = in_number_of_group_subsets;
+  quadrature = in_quadrature;
+  grid = in_grid;
+
+  is_setup = true;
+}
+
+//###################################################################
 /** Gets the L^infinity norm of the relative change of the
  * delayed Psi values across either
  * intra-location or inter-location cyclic interfaces. */
