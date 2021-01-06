@@ -71,13 +71,18 @@ namespace chi_mesh::sweep_management
   struct INCOMING_FACE_INFO
   {
     int slot_address=0;
-    short* upwind_dof_mapping;
+    short* upwind_dof_mapping = nullptr;
 
     void Setup(const std::pair<int,std::vector<short>>& input)
     {
       slot_address = input.first;
       upwind_dof_mapping = new short[input.second.size()];
       std::copy(input.second.begin(),input.second.end(),upwind_dof_mapping);
+    }
+
+    ~INCOMING_FACE_INFO()
+    {
+      delete [] upwind_dof_mapping;
     }
   };
 }
@@ -289,6 +294,15 @@ public:
 
   double*  NLUpwindPsi(int nonl_inc_face_counter,
                        int face_dof,int g, int n) override;
+
+  ~PRIMARY_FLUDS()
+  {
+    for (auto& val : so_cell_outb_face_slot_indices) delete [] val;
+    for (auto& val : so_cell_outb_face_face_category) delete [] val;
+    for (auto& val : so_cell_inco_face_dof_indices) delete [] val;
+    for (auto& val : so_cell_inco_face_face_category) delete [] val;
+
+  }
 
 };
 

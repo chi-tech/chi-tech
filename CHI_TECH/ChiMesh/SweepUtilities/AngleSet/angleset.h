@@ -42,14 +42,6 @@ public:
   std::vector<double>               delayed_prelocI_norm;
   double                            delayed_local_norm;
 
-//  AngleSet(int in_numgrps,
-//           int in_ref_subset,
-//           SPDS* in_spds,
-//           std::vector<int>& angle_indices,
-//           std::vector<SweepBndry*>& sim_boundaries,
-//           int sweep_eager_limit,
-//           ChiMPICommunicatorSet* in_comm_set);
-
   AngleSet(int in_numgrps,
            int in_ref_subset,
            std::shared_ptr<SPDS> in_spds,

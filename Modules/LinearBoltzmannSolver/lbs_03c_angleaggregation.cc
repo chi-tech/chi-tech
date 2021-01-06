@@ -66,11 +66,6 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
                              groupset->grp_subsets.size(),
                              groupset->quadrature,
                              grid);
-//  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-//  groupset->angle_agg->number_of_groups        = groupset->groups.size();
-//  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-//  groupset->angle_agg->quadrature              = groupset->quadrature;
-//  groupset->angle_agg->grid                    = grid;
 
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -211,9 +206,6 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
     << chi_program_timer.GetTimeString()
     << " Initializing angle aggregation: Single";
 
-//  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-//  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
-
   if (groupset->quadrature->type ==
       chi_math::AngularQuadratureType::ProductQuadrature)
   {
@@ -237,11 +229,6 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                                groupset->grp_subsets.size(),
                                groupset->quadrature,
                                grid);
-//  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-//  groupset->angle_agg->number_of_groups        = groupset->groups.size();
-//  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-//  groupset->angle_agg->quadrature              = groupset->quadrature;
-//  groupset->angle_agg->grid                    = grid;
 
     //=========================================== Set angle aggregation
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -383,11 +370,6 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                                groupset->grp_subsets.size(),
                                groupset->quadrature,
                                grid);
-//  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-//  groupset->angle_agg->number_of_groups        = groupset->groups.size();
-//  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-//  groupset->angle_agg->quadrature              = groupset->quadrature;
-//  groupset->angle_agg->grid                    = grid;
 
     //=========================================== Set angle aggregation
     for (int q=0; q<1; q++)  //%%%%%%%%% Just a single group
