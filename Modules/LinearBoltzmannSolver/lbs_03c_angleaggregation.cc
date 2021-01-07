@@ -70,8 +70,7 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
   {
-    auto angle_set_group = new TAngleSetGroup;
-    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+    TAngleSetGroup angle_set_group;
 
     for (int azi=0; azi<num_azi/num_angset_grps; azi++)
     {
@@ -127,15 +126,16 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
                           options.sweep_eager_limit,
                           &grid->GetCommunicator());
 
-          angle_set_group->angle_sets.push_back(angleSet);
+          angle_set_group.angle_sets.push_back(angleSet);
         }//for an_ss
       }//for gs_ss
     } //azi
+
+    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
   }//for q top
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
   {
-    auto angle_set_group = new TAngleSetGroup;
-    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+    TAngleSetGroup angle_set_group;
 
     for (int azi=0; azi<num_azi/num_angset_grps; azi++)
     {
@@ -191,10 +191,12 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
                           options.sweep_eager_limit,
                           &grid->GetCommunicator());
 
-          angle_set_group->angle_sets.push_back(angleSet);
+          angle_set_group.angle_sets.push_back(angleSet);
         }//for an_ss
       }//for gs_ss
     } //azi
+
+    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
   }//for q bot
 }
 
@@ -233,8 +235,7 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
     //=========================================== Set angle aggregation
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
     {
-      auto angle_set_group = new TAngleSetGroup;
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      TAngleSetGroup angle_set_group;
 
       for (int azi=0; azi<num_azi/num_angset_grps; azi++)
       {
@@ -288,17 +289,18 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                             options.sweep_eager_limit,
                             &grid->GetCommunicator());
 
-            angle_set_group->angle_sets.push_back(angleSet);
+            angle_set_group.angle_sets.push_back(angleSet);
           }
         }//for pr
 
       } //azi
+
+      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
     }//for q top
 
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
     {
-      auto angle_set_group = new TAngleSetGroup;
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      TAngleSetGroup angle_set_group;
 
       for (int azi=0; azi<num_azi/num_angset_grps; azi++)
       {
@@ -352,11 +354,13 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                             options.sweep_eager_limit,
                             &grid->GetCommunicator());
 
-            angle_set_group->angle_sets.push_back(angleSet);
+            angle_set_group.angle_sets.push_back(angleSet);
           }
         }//for pr
 
       } //azi
+
+      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
     }//for q bot
   }//Product Quadrature
   else if (groupset->quadrature->type !=
@@ -374,8 +378,7 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
     //=========================================== Set angle aggregation
     for (int q=0; q<1; q++)  //%%%%%%%%% Just a single group
     {
-      auto angle_set_group = new TAngleSetGroup;
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      TAngleSetGroup angle_set_group;
 
       for (int n=0; n<groupset->quadrature->abscissae.size(); ++n)
       {
@@ -437,10 +440,12 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
                           options.sweep_eager_limit,
                           &grid->GetCommunicator());
 
-          angle_set_group->angle_sets.push_back(angleSet);
+          angle_set_group.angle_sets.push_back(angleSet);
         }
 
       } //angle
+
+      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
     }//for q top
   }
   else

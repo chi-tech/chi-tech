@@ -189,11 +189,11 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
   for (int q=0; q<angle_agg->angle_set_groups.size(); ++q)
   {
     ofile << "Angle-set group " << q << ":\n";
-    auto ang_set_grp = angle_agg->angle_set_groups[q];
-    int num_ang_sets_per_grp = (int)ang_set_grp->angle_sets.size();
+    auto& ang_set_grp = angle_agg->angle_set_groups[q];
+    int num_ang_sets_per_grp = (int)ang_set_grp.angle_sets.size();
     for (int as=0; as<num_ang_sets_per_grp; ++as)
     {
-      auto ang_set = ang_set_grp->angle_sets[as];
+      auto ang_set = ang_set_grp.angle_sets[as];
 
       int ang_set_num = as + q*num_ang_sets_per_grp;
 

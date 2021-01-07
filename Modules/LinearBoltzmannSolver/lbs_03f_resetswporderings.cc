@@ -23,19 +23,14 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset *groupset)
 
   auto& angle_agg = groupset->angle_agg;
 
-  for (int asg=0; asg<angle_agg->angle_set_groups.size(); asg++)
+  for (auto& angset_grp : angle_agg->angle_set_groups)
   {
-    auto& angset_grp = angle_agg->angle_set_groups[asg];
-
-    for (int as=0; as<angset_grp->angle_sets.size(); as++)
+    for (auto& angset : angset_grp.angle_sets)
     {
-      auto& angset = angset_grp->angle_sets[as];
-
       delete angset->fluds;
       delete angset;
     }
-    angset_grp->angle_sets.clear();
-    delete angset_grp;
+    angset_grp.angle_sets.clear();
   }
   angle_agg->angle_set_groups.clear();
   delete angle_agg;

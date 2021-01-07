@@ -32,13 +32,13 @@ double chi_mesh::sweep_management::AngleAggregation::GetDelayedPsiNorm()
 {
   double loc_ret_val = 0.0;
 
-  for (auto angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp->angle_sets)
+  for (auto& angsetgrp : angle_set_groups)
+    for (auto angset : angsetgrp.angle_sets)
       for (auto prelocI_norm : angset->delayed_prelocI_norm)
         loc_ret_val = std::max(prelocI_norm,loc_ret_val);
 
-  for (auto angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp->angle_sets)
+  for (auto& angsetgrp : angle_set_groups)
+    for (auto angset : angsetgrp.angle_sets)
       loc_ret_val = std::max(angset->delayed_local_norm,loc_ret_val);
 
   double ret_val = 0.0;
@@ -52,13 +52,13 @@ double chi_mesh::sweep_management::AngleAggregation::GetDelayedPsiNorm()
  * cyclic interfaces.*/
 void chi_mesh::sweep_management::AngleAggregation::ZeroOutgoingDelayedPsi()
 {
-  for (auto angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp->angle_sets)
+  for (auto& angsetgrp : angle_set_groups)
+    for (auto angset : angsetgrp.angle_sets)
       for (auto& delayed_data : angset->delayed_prelocI_outgoing_psi)
         delayed_data.assign(delayed_data.size(),0.0);
 
-  for (auto angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp->angle_sets)
+  for (auto& angsetgrp : angle_set_groups)
+    for (auto angset : angsetgrp.angle_sets)
       angset->delayed_local_psi.assign(angset->delayed_local_psi.size(),0.0);
 }
 
@@ -86,14 +86,14 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
   }//for bndry
 
   //======================================== Intra-cell cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto& val : angle_set->delayed_local_psi_old)
         val = 0.0;
 
   //======================================== Inter location cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
         for (auto& val : loc_vector)
           val = 0.0;
@@ -276,13 +276,13 @@ std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
   }//for bndry
 
   //======================================== Intra-cell cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       local_ang_unknowns += angle_set->delayed_local_psi.size();
 
   //======================================== Inter location cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
         local_ang_unknowns += loc_vector.size();
 
@@ -328,14 +328,14 @@ void chi_mesh::sweep_management::AngleAggregation::
   }//for bndry
 
   //======================================== Intra-cell cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto val : angle_set->delayed_local_psi)
       {index++; x_ref[index] = val;}
 
   //======================================== Inter location cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
         for (auto val : loc_vector)
         {index++; x_ref[index] = val;}
@@ -365,14 +365,14 @@ DisassembleAngularUnknowns(int &index, const double* x_ref)
   }//for bndry
 
   //======================================== Intra-cell cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto& val : angle_set->delayed_local_psi_old)
       {index++; val = x_ref[index];}
 
   //======================================== Inter location cycles
-  for (auto as_group : angle_set_groups)
-    for (auto angle_set : as_group->angle_sets)
+  for (auto& as_group : angle_set_groups)
+    for (auto angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
         for (auto& val : loc_vector)
         {index++; val = x_ref[index];}

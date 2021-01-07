@@ -28,7 +28,7 @@
 class chi_mesh::sweep_management::AngleAggregation
 {
 public:
-  std::vector<AngleSetGroup*>  angle_set_groups;
+  std::vector<AngleSetGroup>   angle_set_groups;
   std::vector<SweepBndry*>     sim_boundaries;
   int                          number_of_groups=0;
   int                          number_of_group_subsets=0;
