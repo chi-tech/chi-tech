@@ -23,17 +23,15 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset *groupset)
 
   auto& angle_agg = groupset->angle_agg;
 
-  for (auto& angset_grp : angle_agg->angle_set_groups)
+  for (auto& angset_grp : angle_agg.angle_set_groups)
   {
     for (auto& angset : angset_grp.angle_sets)
     {
       delete angset->fluds;
-      delete angset;
     }
     angset_grp.angle_sets.clear();
   }
-  angle_agg->angle_set_groups.clear();
-  delete angle_agg;
+  angle_agg.angle_set_groups.clear();
 
   MPI_Barrier(MPI_COMM_WORLD);
 

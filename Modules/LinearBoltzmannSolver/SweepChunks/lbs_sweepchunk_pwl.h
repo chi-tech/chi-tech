@@ -140,8 +140,8 @@ public:
     double* psi        = zero_mg_src.data();
     double* q_mom      = q_moments->data();
 
-    const auto& d2m_op = groupset->quadrature->GetDiscreteToMomentOperator();
-    const auto& m2d_op = groupset->quadrature->GetMomentToDiscreteOperator();
+    auto const& d2m_op = groupset->quadrature->GetDiscreteToMomentOperator();
+    auto const& m2d_op = groupset->quadrature->GetMomentToDiscreteOperator();
 
 
     //========================================================== Loop over each cell

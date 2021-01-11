@@ -36,7 +36,7 @@ class LBSGroupset
 public:
   std::vector<LBSGroup*>                       groups;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
-  chi_mesh::sweep_management::AngleAggregation* angle_agg = nullptr;
+  chi_mesh::sweep_management::AngleAggregation angle_agg;
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
   std::vector<GsSubSet>                        grp_subsets;

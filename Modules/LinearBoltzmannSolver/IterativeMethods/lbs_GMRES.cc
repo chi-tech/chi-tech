@@ -54,7 +54,7 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
 
   //=================================================== Create the matrix
   Mat A;
-  auto num_ang_unknowns = groupset->angle_agg->GetNumberOfAngularUnknowns();
+  auto num_ang_unknowns = groupset->angle_agg.GetNumberOfAngularUnknowns();
   int local_size = local_dof_count*num_moments*groupset_numgrps +
                    num_ang_unknowns.first;
   int globl_size = glob_dof_count*num_moments*groupset_numgrps +
@@ -64,7 +64,7 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
                                   globl_size,
                                   globl_size,
                                   &data_context,&A);
-  groupset->angle_agg->ZeroIncomingDelayedPsi();
+  groupset->angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Set the action-operator
   MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) LBSMatrixAction_Ax);

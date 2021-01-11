@@ -51,7 +51,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
   MPI_Barrier(MPI_COMM_WORLD);
   for (auto sorted_angleset : rule_values)
   {
-    TAngleSet *angleset = sorted_angleset.angle_set;
+    auto angleset = sorted_angleset.angle_set;
     angleset->ReceiveDelayedData(sorted_angleset.set_index);
   }
 

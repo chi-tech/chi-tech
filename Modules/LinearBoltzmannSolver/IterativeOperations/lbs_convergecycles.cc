@@ -29,7 +29,7 @@ void LinearBoltzmann::Solver::ConvergeCycles(
     convergence_metric =
       std::max(cyclic_tolerance,0.8*groupset->latest_convergence_metric);
 
-  double max_pw_change = groupset->angle_agg->GetDelayedPsiNorm();
+  double max_pw_change = groupset->angle_agg.GetDelayedPsiNorm();
   if (convergence_opp_refl_bndries)
     for (auto bndry : sweep_boundaries)
       if (bndry->Type() == REFLECTING_BNDRY)
@@ -49,7 +49,7 @@ void LinearBoltzmann::Solver::ConvergeCycles(
     sweepScheduler.Sweep(sweep_chunk);
 
     max_pw_change = ComputePiecewiseChange(groupset)*
-                    groupset->angle_agg->GetDelayedPsiNorm();
+                    groupset->angle_agg.GetDelayedPsiNorm();
 
     if (convergence_opp_refl_bndries)
       for (auto bndry : sweep_boundaries)
@@ -82,5 +82,5 @@ void LinearBoltzmann::Solver::ConvergeCycles(
 
   DisAssembleVectorLocalToLocal(groupset,temp_phi_old.data(), phi_old_local.data());
 
-  groupset->angle_agg->ResetReflectingBCs();
+  groupset->angle_agg.ResetReflectingBCs();
 }

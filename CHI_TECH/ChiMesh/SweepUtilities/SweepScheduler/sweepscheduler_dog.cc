@@ -25,7 +25,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
     size_t num_anglesets = angleset_group.angle_sets.size();
     for (size_t as=0; as<num_anglesets; as++)
     {
-      TAngleSet* angleset           = angleset_group.angle_sets[as];
+      auto angleset                 = angleset_group.angle_sets[as];
       auto       spds               = angleset->GetSPDS();
       TLEVELED_GRAPH& leveled_graph = spds->global_sweep_planes;
 
@@ -136,7 +136,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
     finished = true;
     for (size_t as=0; as<rule_values.size(); as++)
     {
-      TAngleSet* angleset = rule_values[as].angle_set;
+      auto angleset = rule_values[as].angle_set;
       int angset_number = rule_values[as].set_index;
 
       //=============================== Query angleset status
@@ -213,7 +213,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
     received_delayed_data = true;
     for (auto sorted_angleset : rule_values)
     {
-      TAngleSet *angleset = sorted_angleset.angle_set;
+      auto angleset = sorted_angleset.angle_set;
 
       if (angleset->FlushSendBuffers() == Status::MESSAGES_PENDING)
         received_delayed_data = false;

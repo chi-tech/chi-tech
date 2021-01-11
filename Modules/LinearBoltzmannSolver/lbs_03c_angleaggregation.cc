@@ -60,12 +60,11 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
-  groupset->angle_agg = new AngleAgg;
-  groupset->angle_agg->Setup(sweep_boundaries,
-                             groupset->groups.size(),
-                             groupset->grp_subsets.size(),
-                             groupset->quadrature,
-                             grid);
+  groupset->angle_agg.Setup(sweep_boundaries,
+                            groupset->groups.size(),
+                            groupset->grp_subsets.size(),
+                            groupset->quadrature,
+                            grid);
 
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -116,8 +115,8 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
               AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
-          auto angleSet =
-            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+          auto angleSet = std::make_shared<TAngleSet>(
+                          groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
                           sweep_orderings[a],
                           fluds,
@@ -131,7 +130,7 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
       }//for gs_ss
     } //azi
 
-    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+    groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
   }//for q top
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
   {
@@ -181,8 +180,8 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
             AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
-          auto angleSet =
-            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+          auto angleSet = std::make_shared<TAngleSet>(
+                          groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
                           sweep_orderings[a+num_azi],
                           fluds,
@@ -196,7 +195,7 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
       }//for gs_ss
     } //azi
 
-    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+    groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
   }//for q bot
 }
 
@@ -225,12 +224,11 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation
-    groupset->angle_agg = new AngleAgg;
-    groupset->angle_agg->Setup(sweep_boundaries,
-                               groupset->groups.size(),
-                               groupset->grp_subsets.size(),
-                               groupset->quadrature,
-                               grid);
+    groupset->angle_agg.Setup(sweep_boundaries,
+                              groupset->groups.size(),
+                              groupset->grp_subsets.size(),
+                              groupset->quadrature,
+                              grid);
 
     //=========================================== Set angle aggregation
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
@@ -279,8 +277,8 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
             }
 
-            auto angleSet =
-              new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+            auto angleSet = std::make_shared<TAngleSet>(
+                            groupset->grp_subset_sizes[gs_ss],
                             gs_ss,
                             sweep_orderings[angle_num],
                             fluds,
@@ -295,7 +293,7 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
       } //azi
 
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
     }//for q top
 
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
@@ -344,8 +342,8 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
             }
 
-            auto angleSet =
-              new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+            auto angleSet = std::make_shared<TAngleSet>(
+                            groupset->grp_subset_sizes[gs_ss],
                             gs_ss,
                             sweep_orderings[angle_num],
                             fluds,
@@ -360,7 +358,7 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
       } //azi
 
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
     }//for q bot
   }//Product Quadrature
   else if (groupset->quadrature->type !=
@@ -368,12 +366,11 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
   {
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation
-    groupset->angle_agg = new AngleAgg;
-    groupset->angle_agg->Setup(sweep_boundaries,
-                               groupset->groups.size(),
-                               groupset->grp_subsets.size(),
-                               groupset->quadrature,
-                               grid);
+    groupset->angle_agg.Setup(sweep_boundaries,
+                              groupset->groups.size(),
+                              groupset->grp_subsets.size(),
+                              groupset->quadrature,
+                              grid);
 
     //=========================================== Set angle aggregation
     for (int q=0; q<1; q++)  //%%%%%%%%% Just a single group
@@ -430,8 +427,8 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
             AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
-          auto angleSet =
-            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+          auto angleSet = std::make_shared<TAngleSet>(
+                          groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
                           sweep_orderings[n],
                           fluds,
@@ -445,7 +442,7 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
       } //angle
 
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
     }//for q top
   }
   else
