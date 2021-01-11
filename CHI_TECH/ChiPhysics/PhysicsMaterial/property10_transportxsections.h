@@ -16,43 +16,45 @@ typedef std::vector<std::pair<double,double>> Tvecdbl_vecdbl;
 class chi_physics::TransportCrossSections : public chi_physics::MaterialProperty
 {
 public:
-  int G=0;
-  int L=0;
+  int G=0;                 ///< Total number of Groups
+  int L=0;                 ///< Legendre scattering order
+  int J=0;                 ///< Number of precursors
+  bool is_fissile = false; ///< Fissile or not
 
-  std::vector<double> sigma_tg;     ///< MT 1    Total cross-section
-  std::vector<double> sigma_fg;     ///< MT 18   Sigmaf cross-section
-  std::vector<double> sigma_captg;  ///< MT 27   Capture cross-section
-  std::vector<double> chi_g;        ///< MT 2018 Fission spectrum
-  std::vector<double> nu_sigma_fg;  ///< MT 2452 Nubar-Sigmaf cross-section
-  std::vector<double> ddt_coeff;    ///< Time derivative coefficient
+  std::vector<double> sigma_tg;           ///< Total cross-section
+  std::vector<double> sigma_fg;           ///< Sigmaf cross-section
+  std::vector<double> sigma_captg;        ///< Capture cross-section
+  std::vector<double> chi_g;              ///< Fission spectrum
+  std::vector<double> nu_sigma_fg;        ///< Nubar-Sigmaf cross-section
+  std::vector<double> ddt_coeff;          ///< Time derivative coefficient
+  std::vector<std::vector<double>> chi_d; ///< Delayed neutron fission spectrum
+  std::vector<double> lambda;             ///< Delayed neutron decay constants
+  std::vector<double> gamma;              ///< Delayed neutron yields
 
-  /**The MT number for this transfer varies:
-   * MT 2500 is total,
-   * MT 2501 is scattering only
-   * MT 2519 is scattering and fission
-   * MT 2502 is elastic scattering only
-   * MT 2504 is inelastic scattering only*/
   std::vector<chi_math::SparseMatrix> transfer_matrix;
 
+  //Diffusion quantities
 public:
   bool diffusion_initialized = false;
-  bool scattering_initialized = false;
 public:
-  std::vector<double> diffg;
-  std::vector<double> sigma_rg;
-  std::vector<double> sigma_ag;
-  std::vector<double> sigma_s_gtog;
+  std::vector<double> diffg;        ///< Transport corrected Diffusion coeff
+  std::vector<double> sigma_rg;     ///< Removal cross-section
+  std::vector<double> sigma_ag;     ///< Pure absorption
+  std::vector<double> sigma_s_gtog; ///< Within-group scattering xs
 
+  //Two-grid acceleration quantities
+  std::vector<double> xi_Jfull_g;   ///< Infinite medium spectrum Jfull
+  std::vector<double> xi_Jpart_g;   ///< Infinite medium spectrum Jpartial
 
-  std::vector<double> xi_Jfull_g;
-  std::vector<double> xi_Jpart_g;
+  double D_jfull = 0.0;             ///< Collapsed Diffusion coefficient Jfull
+  double D_jpart = 0.0;             ///< Collapsed Diffusion coefficient Jpart
 
-  double D_jfull = 0.0;
-  double D_jpart = 0.0;
+  double sigma_a_jfull = 0.0;       ///< Collapsed absorption Jfull
+  double sigma_a_jpart = 0.0;       ///< Collapsed absorption Jpart
 
-  double sigma_a_jfull = 0.0;
-  double sigma_a_jpart = 0.0;
-
+  //Monte-Carlo quantities
+public:
+  bool scattering_initialized = false;
 private:
   std::vector<std::vector<double>>         cdf_gprime_g;
   std::vector<std::vector<Tvecdbl_vecdbl>> scat_angles_gprime_g;
@@ -62,10 +64,14 @@ private:
   {
     int G=0;
     int L=0;
+    int J=0;
 
     sigma_tg.clear();
     sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
     transfer_matrix.clear();
+    lambda.clear();
+    gamma.clear();
+    chi_d.clear();
 
     diffusion_initialized = false;
     scattering_initialized = false;

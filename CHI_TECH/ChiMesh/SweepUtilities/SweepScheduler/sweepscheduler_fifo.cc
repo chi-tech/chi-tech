@@ -29,14 +29,14 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
     completion_status = AngleSetStatus::FINISHED;
     for (int q=0; q<angle_agg->angle_set_groups.size(); q++)
     {
-      completion_status = angle_agg->angle_set_groups[q]->
+      completion_status = angle_agg->angle_set_groups[q].
         AngleSetGroupAdvance(sweep_chunk, q, sweep_timing_events_tag);
     }
   }
 
   //================================================== Reset all
-  for (auto angsetgroup : angle_agg->angle_set_groups)
-    angsetgroup->ResetSweep();
+  for (auto& angsetgroup : angle_agg->angle_set_groups)
+    angsetgroup.ResetSweep();
 
   for (auto bndry : angle_agg->sim_boundaries)
   {
@@ -51,7 +51,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
   MPI_Barrier(MPI_COMM_WORLD);
   for (auto sorted_angleset : rule_values)
   {
-    TAngleSet *angleset = sorted_angleset.angle_set;
+    auto angleset = sorted_angleset.angle_set;
     angleset->ReceiveDelayedData(sorted_angleset.set_index);
   }
 

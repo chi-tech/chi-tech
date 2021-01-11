@@ -23,16 +23,16 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
     InitializeAlgoDOG();
 
   //=================================== Initialize delayed upstream data
-  for (auto angsetgrp : in_angle_agg->angle_set_groups)
-    for (auto angset : angsetgrp->angle_sets)
+  for (auto& angsetgrp : in_angle_agg->angle_set_groups)
+    for (auto angset : angsetgrp.angle_sets)
       angset->InitializeDelayedUpstreamData();
 
   //=================================== Get local max num messages accross
   //                                    anglesets
   int local_max_num_messages = 0;
-  for (auto angsetgrp : in_angle_agg->angle_set_groups)
+  for (auto& angsetgrp : in_angle_agg->angle_set_groups)
   {
-    for (auto angset : angsetgrp->angle_sets)
+    for (auto angset : angsetgrp.angle_sets)
     {
       local_max_num_messages = std::max(
         angset->GetMaxBufferMessages(),
@@ -48,7 +48,7 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
                 MPI_MAX, MPI_COMM_WORLD);
 
   //=================================== Propogate items back to sweep buffers
-  for (auto angsetgrp : in_angle_agg->angle_set_groups)
-    for (auto angset : angsetgrp->angle_sets)
+  for (auto& angsetgrp : in_angle_agg->angle_set_groups)
+    for (auto angset : angsetgrp.angle_sets)
       angset->SetMaxBufferMessages(global_max_num_messages);
 }

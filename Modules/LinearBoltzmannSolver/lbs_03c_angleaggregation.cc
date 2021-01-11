@@ -18,6 +18,12 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 extern ChiTimer chi_program_timer;
 
+#include "ChiConsole/chi_console.h"
+
+extern ChiConsole& chi_console;
+
+#include "iomanip"
+
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
 void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
@@ -54,18 +60,16 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
 
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
-  groupset->angle_agg = new AngleAgg;
-  groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-  groupset->angle_agg->number_of_groups        = groupset->groups.size();
-  groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-  groupset->angle_agg->quadrature              = groupset->quadrature;
-  groupset->angle_agg->grid                    = grid;
+  groupset->angle_agg.Setup(sweep_boundaries,
+                            groupset->groups.size(),
+                            groupset->grp_subsets.size(),
+                            groupset->quadrature,
+                            grid);
 
   //=========================================== Set angle aggregation
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
   {
-    auto angle_set_group = new TAngleSetGroup;
-    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+    TAngleSetGroup angle_set_group;
 
     for (int azi=0; azi<num_azi/num_angset_grps; azi++)
     {
@@ -94,8 +98,15 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
             primary_fluds = new chi_mesh::sweep_management::
                   PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-            primary_fluds->InitializeAlphaElements(sweep_orderings[a]);
-            primary_fluds->InitializeBetaElements(sweep_orderings[a]);
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Initializing FLUDS for omega="
+              << groupset->sweep_orderings[a]->omega.PrintS()
+              << "         Process memory = "
+              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << " MB.";
+
+            primary_fluds->InitializeAlphaElements(groupset->sweep_orderings[a]);
+            primary_fluds->InitializeBetaElements(groupset->sweep_orderings[a]);
 
             fluds = primary_fluds;
           } else
@@ -104,25 +115,26 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
               AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
-          auto angleSet =
-            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+          auto angleSet = std::make_shared<TAngleSet>(
+                          groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
-                          sweep_orderings[a],
+                          groupset->sweep_orderings[a],
                           fluds,
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
                           &grid->GetCommunicator());
 
-          angle_set_group->angle_sets.push_back(angleSet);
+          angle_set_group.angle_sets.push_back(angleSet);
         }//for an_ss
       }//for gs_ss
     } //azi
+
+    groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
   }//for q top
   for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
   {
-    auto angle_set_group = new TAngleSetGroup;
-    groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+    TAngleSetGroup angle_set_group;
 
     for (int azi=0; azi<num_azi/num_angset_grps; azi++)
     {
@@ -151,8 +163,15 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
             primary_fluds = new chi_mesh::sweep_management::
             PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-            primary_fluds->InitializeAlphaElements(sweep_orderings[a+num_azi]);
-            primary_fluds->InitializeBetaElements(sweep_orderings[a+num_azi]);
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Initializing FLUDS for omega="
+              << groupset->sweep_orderings[a+num_azi]->omega.PrintS()
+              << "         Process memory = "
+              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << " MB.";
+
+            primary_fluds->InitializeAlphaElements(groupset->sweep_orderings[a+num_azi]);
+            primary_fluds->InitializeBetaElements(groupset->sweep_orderings[a+num_azi]);
 
             fluds = primary_fluds;
           } else
@@ -161,20 +180,22 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
             AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
-          auto angleSet =
-            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+          auto angleSet = std::make_shared<TAngleSet>(
+                          groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
-                          sweep_orderings[a+num_azi],
+                          groupset->sweep_orderings[a+num_azi],
                           fluds,
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
                           &grid->GetCommunicator());
 
-          angle_set_group->angle_sets.push_back(angleSet);
+          angle_set_group.angle_sets.push_back(angleSet);
         }//for an_ss
       }//for gs_ss
     } //azi
+
+    groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
   }//for q bot
 }
 
@@ -185,9 +206,6 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
     << " Initializing angle aggregation: Single";
-
-//  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-//  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
 
   if (groupset->quadrature->type ==
       chi_math::AngularQuadratureType::ProductQuadrature)
@@ -206,18 +224,16 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
 
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation
-    groupset->angle_agg = new AngleAgg;
-    groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-    groupset->angle_agg->number_of_groups        = groupset->groups.size();
-    groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-    groupset->angle_agg->quadrature              = groupset->quadrature;
-    groupset->angle_agg->grid                    = grid;
+    groupset->angle_agg.Setup(sweep_boundaries,
+                              groupset->groups.size(),
+                              groupset->grp_subsets.size(),
+                              groupset->quadrature,
+                              grid);
 
     //=========================================== Set angle aggregation
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each top hemisphere quadrant
     {
-      auto angle_set_group = new TAngleSetGroup;
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      TAngleSetGroup angle_set_group;
 
       for (int azi=0; azi<num_azi/num_angset_grps; azi++)
       {
@@ -243,8 +259,15 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               primary_fluds = new chi_mesh::sweep_management::
                 PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-              primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
-              primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
+              chi_log.Log(LOG_0VERBOSE_1)
+                << "Initializing FLUDS for omega="
+                << groupset->sweep_orderings[angle_num]->omega.PrintS()
+                << "         Process memory = "
+                << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+                << " MB.";
+
+              primary_fluds->InitializeAlphaElements(groupset->sweep_orderings[angle_num]);
+              primary_fluds->InitializeBetaElements(groupset->sweep_orderings[angle_num]);
 
               fluds = primary_fluds;
             }
@@ -254,27 +277,28 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
             }
 
-            auto angleSet =
-              new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+            auto angleSet = std::make_shared<TAngleSet>(
+                            groupset->grp_subset_sizes[gs_ss],
                             gs_ss,
-                            sweep_orderings[angle_num],
+                            groupset->sweep_orderings[angle_num],
                             fluds,
                             angle_indices,
                             sweep_boundaries,
                             options.sweep_eager_limit,
                             &grid->GetCommunicator());
 
-            angle_set_group->angle_sets.push_back(angleSet);
+            angle_set_group.angle_sets.push_back(angleSet);
           }
         }//for pr
 
       } //azi
+
+      groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
     }//for q top
 
     for (int q=0; q<num_angset_grps; q++)  //%%%%%%%%% for each bot hemisphere quadrant
     {
-      auto angle_set_group = new TAngleSetGroup;
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      TAngleSetGroup angle_set_group;
 
       for (int azi=0; azi<num_azi/num_angset_grps; azi++)
       {
@@ -300,8 +324,15 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               primary_fluds = new chi_mesh::sweep_management::
               PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-              primary_fluds->InitializeAlphaElements(sweep_orderings[angle_num]);
-              primary_fluds->InitializeBetaElements(sweep_orderings[angle_num]);
+              chi_log.Log(LOG_0VERBOSE_1)
+                << "Initializing FLUDS for omega="
+                << groupset->sweep_orderings[angle_num]->omega.PrintS()
+                << "         Process memory = "
+                << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+                << " MB.";
+
+              primary_fluds->InitializeAlphaElements(groupset->sweep_orderings[angle_num]);
+              primary_fluds->InitializeBetaElements(groupset->sweep_orderings[angle_num]);
 
               fluds = primary_fluds;
             }
@@ -311,21 +342,23 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
               AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
             }
 
-            auto angleSet =
-              new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+            auto angleSet = std::make_shared<TAngleSet>(
+                            groupset->grp_subset_sizes[gs_ss],
                             gs_ss,
-                            sweep_orderings[angle_num],
+                            groupset->sweep_orderings[angle_num],
                             fluds,
                             angle_indices,
                             sweep_boundaries,
                             options.sweep_eager_limit,
                             &grid->GetCommunicator());
 
-            angle_set_group->angle_sets.push_back(angleSet);
+            angle_set_group.angle_sets.push_back(angleSet);
           }
         }//for pr
 
       } //azi
+
+      groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
     }//for q bot
   }//Product Quadrature
   else if (groupset->quadrature->type !=
@@ -333,18 +366,16 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
   {
     //=========================================== Passing the sweep boundaries
     //                                            to the angle aggregation
-    groupset->angle_agg = new AngleAgg;
-    groupset->angle_agg->sim_boundaries          = sweep_boundaries;
-    groupset->angle_agg->number_of_groups        = groupset->groups.size();
-    groupset->angle_agg->number_of_group_subsets = groupset->grp_subsets.size();
-    groupset->angle_agg->quadrature              = groupset->quadrature;
-    groupset->angle_agg->grid                    = grid;
+    groupset->angle_agg.Setup(sweep_boundaries,
+                              groupset->groups.size(),
+                              groupset->grp_subsets.size(),
+                              groupset->quadrature,
+                              grid);
 
     //=========================================== Set angle aggregation
     for (int q=0; q<1; q++)  //%%%%%%%%% Just a single group
     {
-      auto angle_set_group = new TAngleSetGroup;
-      groupset->angle_agg->angle_set_groups.push_back(angle_set_group);
+      TAngleSetGroup angle_set_group;
 
       for (int n=0; n<groupset->quadrature->abscissae.size(); ++n)
       {
@@ -364,8 +395,29 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
             primary_fluds = new chi_mesh::sweep_management::
               PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
 
-            primary_fluds->InitializeAlphaElements(sweep_orderings[n]);
-            primary_fluds->InitializeBetaElements(sweep_orderings[n]);
+            chi_log.Log(LOG_0VERBOSE_1)
+              << "Initializing FLUDS for omega="
+              << groupset->sweep_orderings[n]->omega.PrintS()
+              << "         Process memory = "
+              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << " MB.";
+
+            try{primary_fluds->InitializeAlphaElements(groupset->sweep_orderings[n]);}
+            catch (const std::exception& exc)
+            {
+              chi_log.Log(LOG_ALLERROR)
+                << "Unknown error in PRIMARY_FLUDS::\n"
+                   "InitializeAlphaElements. " << exc.what();
+              exit(EXIT_FAILURE);
+            }
+            try{primary_fluds->InitializeBetaElements(groupset->sweep_orderings[n]);}
+            catch (const std::exception& exc)
+            {
+              chi_log.Log(LOG_ALLERROR)
+                << "Unknown error in PRIMARY_FLUDS::\n"
+                   "InitializeBetaElements. " << exc.what();
+              exit(EXIT_FAILURE);
+            }
 
             fluds = primary_fluds;
           }
@@ -375,20 +427,22 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
             AUX_FLUDS(*primary_fluds,groupset->grp_subset_sizes[gs_ss]);
           }
 
-          auto angleSet =
-            new TAngleSet(groupset->grp_subset_sizes[gs_ss],
+          auto angleSet = std::make_shared<TAngleSet>(
+                          groupset->grp_subset_sizes[gs_ss],
                           gs_ss,
-                          sweep_orderings[n],
+                          groupset->sweep_orderings[n],
                           fluds,
                           angle_indices,
                           sweep_boundaries,
                           options.sweep_eager_limit,
                           &grid->GetCommunicator());
 
-          angle_set_group->angle_sets.push_back(angleSet);
+          angle_set_group.angle_sets.push_back(angleSet);
         }
 
       } //angle
+
+      groupset->angle_agg.angle_set_groups.push_back(angle_set_group);
     }//for q top
   }
   else

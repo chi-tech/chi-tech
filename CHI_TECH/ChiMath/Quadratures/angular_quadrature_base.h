@@ -36,6 +36,13 @@ public:
   std::vector<double>             weights;
   std::vector<chi_mesh::Vector3> omegas;
 
+protected:
+  std::vector<std::vector<double>> d2m_op;
+  std::vector<std::vector<double>> m2d_op;
+  bool                             d2m_op_built = false;
+  bool                             m2d_op_built = false;
+
+public:
   AngularQuadrature() :
   type(chi_math::AngularQuadratureType::Arbitrary)
   {  }
@@ -48,6 +55,21 @@ public:
   InitializeWithCustom(std::vector<double>& azimuthal,
                        std::vector<double>& polar,
                        std::vector<double>& in_weights, bool verbose=false);
+
+  virtual void BuildDiscreteToMomentOperator(int scatt_order, bool oneD);
+  virtual void BuildMomentToDiscreteOperator(int scatt_order, bool oneD);
+
+  std::vector<std::vector<double>>&
+  GetDiscreteToMomentOperator() {return d2m_op;}
+  std::vector<std::vector<double>> const&
+  GetDiscreteToMomentOperator() const {return d2m_op;}
+
+  std::vector<std::vector<double>>&
+  GetMomentToDiscreteOperator() {return m2d_op;}
+  std::vector<std::vector<double>> const&
+  GetMomentToDiscreteOperator() const {return m2d_op;}
+
+
 };
 
 #endif

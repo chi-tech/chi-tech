@@ -53,7 +53,7 @@ void LinearBoltzmann::Solver::
   {
     SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE);
 
-    groupset->angle_agg->ZeroOutgoingDelayedPsi();
+    groupset->angle_agg.ZeroOutgoingDelayedPsi();
 
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);

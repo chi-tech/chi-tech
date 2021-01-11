@@ -4,11 +4,13 @@
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/SweepUtilities/SweepBuffer/sweepbuffer.h"
 #include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
-#include <ChiMesh/SweepUtilities/FLUDS/FLUDS.h>
+#include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
 #include <chi_mpi.h>
 
 typedef chi_mesh::sweep_management::BoundaryBase SweepBndry;
+
+#include <memory>
 
 //###################################################################
 /**Manages the workstages of a single angle set.*/
@@ -16,7 +18,7 @@ class chi_mesh::sweep_management::AngleSet
 {
 private:
   int                               num_grps;
-  SPDS*                             spds;
+  std::shared_ptr<SPDS>             spds;
   bool                              executed;
 
   chi_mesh::sweep_management::SweepBuffer sweep_buffer;
@@ -42,15 +44,7 @@ public:
 
   AngleSet(int in_numgrps,
            int in_ref_subset,
-           SPDS* in_spds,
-           std::vector<int>& angle_indices,
-           std::vector<SweepBndry*>& sim_boundaries,
-           int sweep_eager_limit,
-           ChiMPICommunicatorSet* in_comm_set);
-
-  AngleSet(int in_numgrps,
-           int in_ref_subset,
-           SPDS* in_spds,
+           std::shared_ptr<SPDS> in_spds,
            FLUDS* in_fluds,
            std::vector<int>& angle_indices,
            std::vector<SweepBndry*>& sim_boundaries,
@@ -59,7 +53,7 @@ public:
 
   void InitializeDelayedUpstreamData();
 
-  SPDS* GetSPDS();
+  std::shared_ptr<chi_mesh::sweep_management::SPDS> GetSPDS();
 
   int GetMaxBufferMessages();
 

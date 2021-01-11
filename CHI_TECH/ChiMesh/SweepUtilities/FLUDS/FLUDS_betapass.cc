@@ -13,12 +13,10 @@ extern ChiMPI&      chi_mpi;
 //###################################################################
 /**Receives and send predecessor data.*/
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
-InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
+InitializeBetaElements(SPDS_ptr spds, int tag_index)
 {
   chi_mesh::MeshContinuum*         grid = spds->grid;
-  chi_mesh::sweep_management::SPLS* spls = spds->spls;
-
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing FLUDS Beta elements";
+  chi_mesh::sweep_management::SPLS& spls = spds->spls;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   // The first two major steps here are: Send delayed successor information
@@ -109,8 +107,12 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
     std::vector<int> face_indices;
     face_indices.resize(amount_to_receive,0);
 
-    MPI_Recv(face_indices.data(),amount_to_receive,MPI_INT,
-             locJ,101+tag_index,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    MPI_Recv(face_indices.data(),
+             amount_to_receive,
+             MPI_INT,
+             locJ,101+tag_index,
+             MPI_COMM_WORLD,
+             MPI_STATUS_IGNORE);
 
     DeSerializeCellInfo(prelocI_cell_views[prelocI], &face_indices,
                         prelocI_face_dof_count[prelocI]);
@@ -121,10 +123,9 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
   {
     int locJ = spds->location_successors[deplocI];
 
-    std::vector<int>::iterator delayed_successor =
-    std::find(spds->delayed_location_successors.begin(),
-              spds->delayed_location_successors.end(),
-              locJ);
+    auto delayed_successor = std::find(spds->delayed_location_successors.begin(),
+                                       spds->delayed_location_successors.end(),
+                                       locJ);
     if ((delayed_successor != spds->delayed_location_successors.end()))
       continue;
 
@@ -159,13 +160,22 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 
 
   //================================================== Loop over cells in sorder
-  for (int csoi=0; csoi<spls->item_id.size(); csoi++)
+  for (int csoi=0; csoi<spls.item_id.size(); csoi++)
   {
-    int cell_local_index = spls->item_id[csoi];
+    int cell_local_index = spls.item_id[csoi];
     auto cell = &grid->local_cells[cell_local_index];
 
     NonLocalIncidentMapping(cell, spds);
   }//for csoi
+
+  deplocI_cell_views.clear();
+  deplocI_cell_views.shrink_to_fit();
+
+  prelocI_cell_views.clear();
+  prelocI_cell_views.shrink_to_fit();
+
+  delayed_prelocI_cell_views.clear();
+  delayed_prelocI_cell_views.shrink_to_fit();
 
   //================================================== Clear unneccesary data
   auto empty_vector = std::vector<std::vector<CompactCellView>>(0);
@@ -176,8 +186,6 @@ InitializeBetaElements(chi_mesh::sweep_management::SPDS* spds, int tag_index)
 
   empty_vector = std::vector<std::vector<CompactCellView>>(0);
   delayed_prelocI_cell_views.swap(empty_vector);
-
-  chi_log.Log(LOG_0VERBOSE_1) << "Done initializing FLUDS Beta elements";
 }
 
 //###################################################################

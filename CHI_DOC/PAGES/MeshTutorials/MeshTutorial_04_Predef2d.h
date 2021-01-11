@@ -1,9 +1,4 @@
-/** \page MeshTutorials Meshing Tutorials
- *
- * \subpage MeshTutorial_01 \n
- */
-
-/** \page MeshTutorial_01 Mesh Tutorial 1: Predefined 2D Mesh Setup
+/** \page MeshTutorial_04 Mesh Tutorial 4: Predefined 2D Mesh Setup
 
 Consider an example of using a predeveloped mesh as shown in Figure 1 below.
 

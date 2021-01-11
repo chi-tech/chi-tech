@@ -172,6 +172,47 @@ void chi_physics::TransportCrossSections::
   };
 
   //#############################################
+  /**Lambda reading the delayed chi matrix.*/
+  auto ReadDelayedChi = [StrToD,StrToI]
+    (std::string keyword,std::vector<std::vector<double>>& chi,
+     std::ifstream& file, int Gtot, int& line_number,
+     std::istringstream& line_stream)
+  {
+    char first_word[250];
+    char line[250];
+    char value_str0[250],value_str1[250],value_str2[250];
+
+    file.getline(line,250); ++line_number;
+    line_stream = std::istringstream(line);
+    line_stream >> first_word;
+
+    while (std::string(first_word) != (keyword + "_END"))
+    {
+      if (std::string(first_word) == "G_PRECURSORJ_VAL")
+      {
+        value_str0[0] = '\0';
+        value_str1[0] = '\0';
+        value_str2[0] = '\0';
+        line_stream >> value_str0 >> value_str1 >> value_str2;
+
+        if (value_str0[0]==0 or value_str1[0]==0 or value_str2[0]==0)
+          throw std::runtime_error("Invalid amount of arguments. "
+                                   "Requires 4 numbers.");
+
+        int group     = StrToI(value_str0);
+        int precursor = StrToI(value_str1);
+        double value  = StrToD(value_str2);
+
+        chi[group][precursor] = value;
+      }
+
+      file.getline(line,250); ++line_number;
+      line_stream = std::istringstream(line);
+      line_stream >> first_word;
+    }
+  };
+
+  //#############################################
   /**Lambda reading a transfer matrix.*/
   auto ReadTransferMatrix = [StrToD,StrToI]
     (std::string keyword,std::vector<chi_math::SparseMatrix>& matrix,
@@ -218,6 +259,7 @@ void chi_physics::TransportCrossSections::
 
   //================================================== Read file line by line
   bool grabbed_G = false;
+  bool grabbed_J = false;
   int line_number=0;
   bool not_eof = bool(std::getline(file,line)); ++line_number;
   while (not_eof)
@@ -238,6 +280,19 @@ void chi_physics::TransportCrossSections::
         transfer_matrix.resize(M,chi_math::SparseMatrix(G,G));
       }
     }
+    if (first_word == "NUM_PRECURSORS")
+    {
+      line_stream >> J;
+      lambda.resize(J,0.0);
+      gamma = lambda;
+    
+      if (grabbed_G)
+      {
+        chi_d.resize(G);
+        for (int g=0; g<G; ++g)
+          chi_d[g].resize(J);
+      }
+    }
 
     try
     {
@@ -246,15 +301,28 @@ void chi_physics::TransportCrossSections::
       auto& f = file;
       auto& fw = first_word;
 
-      if (fw == "SIGMA_T_BEGIN")   Read1DXS ("SIGMA_T",sigma_tg,f,G,ln,ls);
-      if (fw == "SIGMA_F_BEGIN")   Read1DXS("SIGMA_F",sigma_fg,f,G,ln,ls);
-      if (fw == "NU_BEGIN")        Read1DXS("NU",nu_sigma_fg,f,G,ln,ls);
-      if (fw == "CHI_BEGIN")       Read1DXS("CHI",chi_g,f,G,ln,ls);
-      if (fw == "DDT_COEFF_BEGIN") Read1DXS("DDT_COEFF",ddt_coeff,f,G,ln,ls);
+      if (fw == "SIGMA_T_BEGIN")             Read1DXS ("SIGMA_T",sigma_tg,f,G,ln,ls);
+      if (fw == "SIGMA_F_BEGIN")             Read1DXS("SIGMA_F",sigma_fg,f,G,ln,ls);
+      if (fw == "NU_BEGIN")                  Read1DXS("NU",nu_sigma_fg,f,G,ln,ls);
+      if (fw == "CHI_PROMPT_BEGIN")          Read1DXS("CHI_PROMPT",chi_g,f,G,ln,ls);
+      if (fw == "DDT_COEFF_BEGIN")           Read1DXS("DDT_COEFF",ddt_coeff,f,G,ln,ls);
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",transfer_matrix,f,G,ln,ls);
 
+      for (auto& sig_f : sigma_fg) {
+        if (sig_f > 0.0) {
+          is_fissile = true;
+          break;
+        }
+      }
+
+      if ((J>0) and (is_fissile)) {
+        if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA",lambda,f,J,ln,ls);
+        if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA",gamma,f,J,ln,ls);
+        if (fw == "CHI_DELAYED_BEGIN")
+          ReadDelayedChi("CHI_DELAYED",chi_d,f,G,ln,ls);   
+      } 
     }
 
     catch (const std::runtime_error& err)

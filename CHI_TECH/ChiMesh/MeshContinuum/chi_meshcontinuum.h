@@ -135,7 +135,7 @@ public:
   void ExportCellsToVTK(const char* baseName);
 
   //02
-  void BuildFaceHistogramInfo(double master_tolerance=1.2, double slave_tolerance=1.1);
+  void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
   size_t NumberOfFaceHistogramBins();
   size_t MapFaceHistogramBins(size_t num_face_dofs);
   size_t GetFaceHistogramBinDOFSize(size_t category);
@@ -143,7 +143,7 @@ public:
   bool IsCellBndry(int cell_global_index = 0);
 
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                              std::vector<int>& dof_mapping);
+                              std::vector<short>& dof_mapping);
 
   chi_mesh::Vector3 ComputeCentroidFromListOfNodes(const std::vector<int>& list);
 

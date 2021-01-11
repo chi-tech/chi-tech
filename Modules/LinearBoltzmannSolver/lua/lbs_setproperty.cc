@@ -154,7 +154,7 @@ int chiLBSSetProperty(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSSetProperty: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";

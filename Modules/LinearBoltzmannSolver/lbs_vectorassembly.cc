@@ -49,7 +49,7 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y,
   }//for cell
 
   if (with_delayed_psi)
-    groupset->angle_agg->AssembleAngularUnknowns(index,x_ref);
+    groupset->angle_agg.AssembleAngularUnknowns(index,x_ref);
 
   VecRestoreArray(x,&x_ref);
 }
@@ -89,7 +89,7 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y,
   }//for cell
 
   if (with_delayed_psi)
-    groupset->angle_agg->DisassembleAngularUnknowns(index,x_ref);
+    groupset->angle_agg.DisassembleAngularUnknowns(index,x_ref);
 
   VecRestoreArrayRead(x_src,&x_ref);
 }

@@ -1,4 +1,4 @@
-#include "../../ChiLua/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 #include<iostream>
 #include "ChiPhysics/chi_physics.h"
 #include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"

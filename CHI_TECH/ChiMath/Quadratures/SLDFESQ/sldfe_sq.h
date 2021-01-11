@@ -71,7 +71,9 @@ private:
   int initial_level = 0;
   std::vector<chi_mesh::Vector3>      diagonal_vertices;
   std::vector<SphericalQuadrilateral> initial_octant_SQs;
+public:
   std::vector<SphericalQuadrilateral> deployed_SQs;
+private:
   std::vector<std::vector<SphericalQuadrilateral>> deployed_SQs_history;
 public:
   friend struct FUNCTION_WEIGHT_FROM_RHO;
