@@ -103,10 +103,10 @@ public:
     auto const& m2d_op = groupset->quadrature->GetMomentToDiscreteOperator();
 
     // ========================================================== Loop over each cell
-    size_t num_loc_cells = spds->spls->item_id.size();
+    size_t num_loc_cells = spds->spls.item_id.size();
     for (int cr_i = 0; cr_i < num_loc_cells; ++cr_i)
     {
-      int cell_local_id = spds->spls->item_id[cr_i];
+      int cell_local_id = spds->spls.item_id[cr_i];
       auto cell = &grid_view->local_cells[cell_local_id];
       auto cell_fe_view = grid_fe_view->MapFeViewL(cell->local_id);
       int num_faces = cell->faces.size();
@@ -234,7 +234,7 @@ public:
             for (int m = 0; m < num_moms; ++m)
             {
               int ir = transport_view->MapDOF(i, m, g);
-              temp_src += groupset->m2d_op[m][angle_num]*(*q_moments)[ir];
+              temp_src += m2d_op[m][angle_num]*(*q_moments)[ir];
             }
             source[i] = temp_src;
           }
@@ -260,7 +260,7 @@ public:
         // ============================= Accumulate flux
         for (int m = 0; m < num_moms; ++m)
         {
-          double wn_d2m = groupset->d2m_op[m][angle_num];
+          double wn_d2m = d2m_op[m][angle_num];
           for (int i = 0; i < num_dofs; ++i)
           {
             int ir = transport_view->MapDOF(i, m, gs_gi);
