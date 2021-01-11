@@ -6,25 +6,25 @@
 class chi_mesh::sweep_management::SweepChunk
 {
 public:
-  int                         angle_num;
   std::vector<double>*        x;
   bool                        suppress_surface_src;
 
-public:
+  SweepChunk(std::vector<double>* destination_phi, bool suppress_src)
+    : x(destination_phi), suppress_surface_src(suppress_src)
+  {}
+
   /**Sets the location where flux moments are to be written.*/
   void SetDestinationPhi(std::vector<double>* destination_phi)
   {
     x = destination_phi;
   }
 
-  virtual ~SweepChunk(){};
+  virtual ~SweepChunk()
+  {};
 
-public:
   /**Sweep chunks should override this.*/
   virtual void Sweep(AngleSet* angle_set)
-  {
-
-  }
+  {}
 };
 
 #endif
