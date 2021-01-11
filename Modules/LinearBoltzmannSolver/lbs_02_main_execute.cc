@@ -63,7 +63,7 @@ void LinearBoltzmann::Solver::SolveGroupset(int group_set_num)
   //                                                   sweep chunks
   SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
   MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    group_set->angle_agg);
+                                    &group_set->angle_agg);
 
   if (group_set->iterative_method == NPT_CLASSICRICHARDSON)
   {

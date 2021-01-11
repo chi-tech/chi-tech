@@ -4,6 +4,8 @@
 #include "../chi_mesh.h"
 #include <set>
 
+#include <memory>
+
 namespace chi_graph
 {
   class DirectedGraph;
@@ -31,21 +33,26 @@ namespace sweep_management
 
   void PopulateCellRelationships(
     chi_mesh::MeshContinuum *grid,
-    chi_mesh::sweep_management::SPDS* sweep_order,
-    std::vector<std::set<int>>& cell_dependencies,
+    const chi_mesh::Vector3& omega,
+    std::set<int>& location_dependencies,
+    std::set<int>& location_successors,
     std::vector<std::set<std::pair<int,double>>>& cell_successors);
+
+  void CommunicateLocationDependencies(
+    const std::vector<int>& location_dependencies,
+    std::vector<std::vector<int>>& global_dependencies);
 
   void RemoveGlobalCyclicDependencies(
     chi_mesh::sweep_management::SPDS* sweep_order,
     chi_graph::DirectedGraph& TDG);
 
   void RemoveLocalCyclicDependencies(
-    chi_mesh::sweep_management::SPDS* sweep_order,
+    std::shared_ptr<SPDS> sweep_order,
     chi_graph::DirectedGraph& local_DG);
 
-  SPDS* CreateSweepOrder(double polar, double azimuthal,
-                         chi_mesh::MeshContinuum *grid,
-                         bool cycle_allowance_flag=false);
+  std::shared_ptr<SPDS> CreateSweepOrder(double polar, double azimuthal,
+                            chi_mesh::MeshContinuum *grid,
+                            bool cycle_allowance_flag=false);
 
   void PrintSweepOrdering(SPDS* sweep_order,
                           MeshContinuum* vol_continuum);

@@ -13,9 +13,10 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Populates the local sub-grid connection information for sweep orderings.*/
 void chi_mesh::sweep_management::PopulateCellRelationships(
-         chi_mesh::MeshContinuum *grid,
-         chi_mesh::sweep_management::SPDS* sweep_order,
-         std::vector<std::set<int>>& cell_dependencies,
+         chi_mesh::MeshContinuum* grid,
+         const chi_mesh::Vector3& omega,
+         std::set<int>& location_dependencies,
+         std::set<int>& location_successors,
          std::vector<std::set<std::pair<int,double>>>& cell_successors)
 {
   double tolerance = 1.0e-16;
@@ -30,7 +31,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       //======================================= Determine if the face
       //                                        is incident
       bool is_outgoing = false;
-      double dot_normal = sweep_order->omega.Dot(face.normal);
+      double dot_normal = omega.Dot(face.normal);
       if (dot_normal>(0.0+tolerance)) {is_outgoing = true;}
 
       //======================================= If outgoing determine if
@@ -39,7 +40,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       {
         int adj_cell_glob_index = face.neighbor;
 
-        //================================if it is a cell and not bndry
+        //================================ If it is a cell and not bndry
         if (adj_cell_glob_index>=0)
         {
           //========================= If it is in the current location
@@ -50,25 +51,17 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
               std::make_pair(face.GetNeighborLocalID(grid),weight));
           }
           else
-            sweep_order->AddLocalSuccessor(face.GetNeighborPartitionID(grid));
+            location_successors.insert(face.GetNeighborPartitionID(grid));
         }
 
       }
-        //======================================= If not outgoing determine
-        //                                        what it is dependent on
+      //======================================= If not outgoing determine
+      //                                        what it is dependent on
       else
       {
-        int adj_cell_glob_index = face.neighbor;
-
         //================================if it is a cell and not bndry
-        if (adj_cell_glob_index>=0)
-        {
-          if (face.IsNeighborLocal(grid))
-            cell_dependencies[c].insert(face.GetNeighborLocalID(grid));
-          else
-            sweep_order->AddLocalDependecy(face.GetNeighborPartitionID(grid));
-
-        }
+        if (face.neighbor >= 0 and not face.IsNeighborLocal(grid))
+          location_dependencies.insert(face.GetNeighborPartitionID(grid));
       }
 
     }//for edge

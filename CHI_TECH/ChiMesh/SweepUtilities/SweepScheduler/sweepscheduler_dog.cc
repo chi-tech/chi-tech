@@ -19,13 +19,13 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
   //======================================== Loop over angleset groups
   for (size_t q=0; q<angle_agg->angle_set_groups.size(); q++)
   {
-    TAngleSetGroup* angleset_group = angle_agg->angle_set_groups[q];
+    TAngleSetGroup& angleset_group = angle_agg->angle_set_groups[q];
 
     //================================= Loop over anglesets in group
-    size_t num_anglesets = angleset_group->angle_sets.size();
+    size_t num_anglesets = angleset_group.angle_sets.size();
     for (size_t as=0; as<num_anglesets; as++)
     {
-      TAngleSet* angleset           = angleset_group->angle_sets[as];
+      auto angleset                 = angleset_group.angle_sets[as];
       auto       spds               = angleset->GetSPDS();
       TLEVELED_GRAPH& leveled_graph = spds->global_sweep_planes;
 
@@ -33,9 +33,9 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       size_t loc_depth = -1;
       for (size_t level=0; level<leveled_graph.size(); level++)
       {
-        for (size_t index=0; index<leveled_graph[level]->item_id.size(); index++)
+        for (size_t index=0; index<leveled_graph[level].item_id.size(); index++)
         {
-          if (leveled_graph[level]->item_id[index] == chi_mpi.location_id)
+          if (leveled_graph[level].item_id[index] == chi_mpi.location_id)
           {
             loc_depth = leveled_graph.size()-level;
             break;
@@ -136,7 +136,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
     finished = true;
     for (size_t as=0; as<rule_values.size(); as++)
     {
-      TAngleSet* angleset = rule_values[as].angle_set;
+      auto angleset = rule_values[as].angle_set;
       int angset_number = rule_values[as].set_index;
 
       //=============================== Query angleset status
@@ -213,7 +213,7 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
     received_delayed_data = true;
     for (auto sorted_angleset : rule_values)
     {
-      TAngleSet *angleset = sorted_angleset.angle_set;
+      auto angleset = sorted_angleset.angle_set;
 
       if (angleset->FlushSendBuffers() == Status::MESSAGES_PENDING)
         received_delayed_data = false;
@@ -229,8 +229,8 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
 
 
   //================================================== Reset all
-  for (auto angset_group : angle_agg->angle_set_groups)
-    angset_group->ResetSweep();
+  for (auto& angset_group : angle_agg->angle_set_groups)
+    angset_group.ResetSweep();
 
   for (auto bndry : angle_agg->sim_boundaries)
   {

@@ -86,7 +86,7 @@ int chiMeshCreate1DSlabMesh(lua_State* L)
 \param x_nodes array_float An Array of floating point numbers denoting
                            1D nodes along x-axis.
 
-\return Two handles: line-mesh, region
+\return Two handles: unpartitioned-mesh, region
 
 \ingroup LuaMeshMacros
 
@@ -244,7 +244,7 @@ int chiMeshCreate2DOrthoMesh(lua_State* L)
 \param y_nodes array_float An Array of floating point numbers denoting
                            1D nodes along y-axis.
 
-\return Two handles: surface-mesh, region
+\return Two handles: unpartitioned-mesh, region
 
 \ingroup LuaMeshMacros
 
@@ -446,7 +446,7 @@ int chiMeshCreate3DOrthoMesh(lua_State* L)
 \param z_nodes array_float An Array of floating point numbers denoting
                            1D nodes along z-axis.
 
-\return Two handles: surface-mesh, region
+\return Two handles: unpartitioned-mesh, region
 
 \ingroup LuaMeshMacros
 

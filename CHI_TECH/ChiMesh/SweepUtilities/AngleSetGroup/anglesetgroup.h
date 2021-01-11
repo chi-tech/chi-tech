@@ -10,7 +10,7 @@
 class chi_mesh::sweep_management::AngleSetGroup
 {
 public:
-  std::vector<chi_mesh::sweep_management::AngleSet*> angle_sets;
+  std::vector<std::shared_ptr<AngleSet>> angle_sets;
 
 private:
   int current_angle_set = 0;

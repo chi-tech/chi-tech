@@ -73,7 +73,7 @@ public:
     bool         force_polygons = true;
     bool         mesh_global    = false;
     int          partition_z    = 1;
-    PartitionType partition_type = KBA_STYLE_XYZ;
+    PartitionType partition_type = PARMETIS;
   };
   VOLUME_MESHER_OPTIONS options;
 public:

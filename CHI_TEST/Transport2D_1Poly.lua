@@ -27,6 +27,7 @@ chiSurfaceMesherSetProperty(CUT_X,0.0)
 chiSurfaceMesherSetProperty(CUT_Y,0.0)
 
 chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XY)
 
 --############################################### Execute meshing
 chiSurfaceMesherExecute();

@@ -143,6 +143,8 @@ public:
   void PrintSubGraphviz(const std::vector<int>& verts_to_print,
                         int location_mask=0);
 
+  std::vector<std::pair<int,int>> RemoveCyclicDependencies();
+
   void Clear();
 
   ~DirectedGraph();

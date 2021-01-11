@@ -14,7 +14,7 @@ extern ChiMPI&      chi_mpi;
 void chi_mesh::sweep_management::SweepBuffer::
 ReceiveDelayedData(int angle_set_num)
 {
-  chi_mesh::sweep_management::SPDS*  spds =  angleset->GetSPDS();
+  auto spds =  angleset->GetSPDS();
 
   //======================================== Receive delayed data
   for (size_t prelocI=0; prelocI<spds->delayed_location_dependencies.size(); prelocI++)

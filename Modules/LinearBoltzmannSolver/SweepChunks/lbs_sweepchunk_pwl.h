@@ -119,8 +119,8 @@ public:
       a_and_b_initialized = true;
     }
 
-    chi_mesh::sweep_management::SPDS* spds = angle_set->GetSPDS();
-    chi_mesh::sweep_management::FLUDS* fluds = angle_set->fluds;
+    auto spds = angle_set->GetSPDS();
+    auto fluds = angle_set->fluds;
 
     GsSubSet& subset = groupset->grp_subsets[angle_set->ref_subset];
     int gs_ss_size  = groupset->grp_subset_sizes[angle_set->ref_subset];
@@ -140,12 +140,15 @@ public:
     double* psi        = zero_mg_src.data();
     double* q_mom      = q_moments->data();
 
+    auto const& d2m_op = groupset->quadrature->GetDiscreteToMomentOperator();
+    auto const& m2d_op = groupset->quadrature->GetMomentToDiscreteOperator();
+
 
     //========================================================== Loop over each cell
-    size_t num_loc_cells = spds->spls->item_id.size();
+    size_t num_loc_cells = spds->spls.item_id.size();
     for (int cr_i=0; cr_i<num_loc_cells; cr_i++)
     {
-      int  cell_local_id = spds->spls->item_id[cr_i];
+      int  cell_local_id = spds->spls.item_id[cr_i];
       auto cell          = &grid_view->local_cells[cell_local_id];
       int  cell_g_index  = cell->global_id;
 
@@ -298,7 +301,7 @@ public:
             temp_src = 0.0;
             for (int m=0; m<num_moms; m++)
             {
-              m2d = groupset->m2d_op[m][angle_num];
+              m2d = m2d_op[m][angle_num];
 
               int ir = transport_view->MapDOF(i,m,g);
               temp_src += m2d*q_mom[ir];
@@ -334,7 +337,7 @@ public:
         double wn_d2m = 0.0;
         for (int m=0; m<num_moms; m++)
         {
-          wn_d2m = groupset->d2m_op[m][angle_num];
+          wn_d2m = d2m_op[m][angle_num];
           for (int i=0; i<cell_fe_view->dofs; i++)
           {
             int ir = transport_view->MapDOF(i,m,gs_gi);

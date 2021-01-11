@@ -16,7 +16,7 @@ namespace chi_mesh::sweep_management
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 typedef chi_mesh::sweep_management::AngleSet      TAngleSet;
 typedef chi_mesh::sweep_management::STDG          TGSPO;
-typedef std::vector<TGSPO*>                      TLEVELED_GRAPH;
+typedef std::vector<TGSPO>                        TLEVELED_GRAPH;
 
 //###################################################################
 class chi_mesh::sweep_management::SweepScheduler
@@ -29,14 +29,14 @@ private:
 
   struct RULE_VALUES
   {
-    TAngleSet* angle_set;
+    std::shared_ptr<TAngleSet> angle_set;
     int        depth_of_graph;
     int        sign_of_omegax;
     int        sign_of_omegay;
     int        sign_of_omegaz;
     size_t     set_index;
 
-    explicit RULE_VALUES(TAngleSet* ref_as) :
+    explicit RULE_VALUES(std::shared_ptr<TAngleSet> ref_as) :
       angle_set(ref_as)
     {
       depth_of_graph = 0;

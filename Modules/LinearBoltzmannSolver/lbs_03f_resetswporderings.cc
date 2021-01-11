@@ -1,15 +1,13 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include <ChiConsole/chi_console.h>
-#include <chi_mpi.h>
-
 extern ChiConsole&  chi_console;
-extern ChiMPI& chi_mpi;
-
 
 #include <chi_log.h>
-
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
+extern ChiMPI& chi_mpi;
 
 #include <iomanip>
 
@@ -20,38 +18,20 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset *groupset)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "Resetting SPDS and FLUDS";
-  for (int so=0; so<sweep_orderings.size(); so++)
+
+  groupset->sweep_orderings.clear();
+
+  auto& angle_agg = groupset->angle_agg;
+
+  for (auto& angset_grp : angle_agg.angle_set_groups)
   {
-    chi_mesh::sweep_management::SPDS* cur_so =
-      sweep_orderings[so];
-
-    //delete cur_so->spls->fluds;
-    delete cur_so->spls;
-    delete cur_so;
-  }
-
-  sweep_orderings.clear();
-
-  chi_mesh::sweep_management::AngleAggregation* angle_agg = groupset->angle_agg;
-
-  for (int asg=0; asg<angle_agg->angle_set_groups.size(); asg++)
-  {
-    chi_mesh::sweep_management::AngleSetGroup* angset_grp =
-      angle_agg->angle_set_groups[asg];
-
-    for (int as=0; as<angset_grp->angle_sets.size(); as++)
+    for (auto& angset : angset_grp.angle_sets)
     {
-      chi_mesh::sweep_management::AngleSet* angset =
-        angset_grp->angle_sets[as];
-
       delete angset->fluds;
-      delete angset;
     }
-    angset_grp->angle_sets.clear();
-    delete angset_grp;
+    angset_grp.angle_sets.clear();
   }
-  angle_agg->angle_set_groups.clear();
-  delete angle_agg;
+  angle_agg.angle_set_groups.clear();
 
   MPI_Barrier(MPI_COMM_WORLD);
 

@@ -438,6 +438,139 @@ void chi_graph::DirectedGraph::
 }
 
 //###################################################################
+std::vector<std::pair<int,int>>
+chi_graph::DirectedGraph::RemoveCyclicDependencies()
+{
+  std::vector<std::pair<int,int>> edges_to_remove;
+
+  //============================================= Utility lambdas
+  auto IsInList = [](std::vector<int>& list, int val)
+  {
+    return std::find(list.begin(),list.end(),val) != list.end();
+  };
+
+
+  //============================================= Find initial SCCs
+  auto SCCs = FindStronglyConnectedComponents();
+
+  int iter=0;
+  while (not SCCs.empty())
+  {
+    if (chi_log.GetVerbosity() >= LOG_0VERBOSE_2)
+      chi_log.Log(LOG_ALL)
+        << "Inter cell cyclic dependency removal. Iteration " << ++iter;
+
+    //============================================= Remove bi-connected then
+    //                                              tri-connected SCCs then
+    //                                              n-connected
+    for (auto& subDG : SCCs)
+    {
+      //====================================== If bi-connected
+      if (subDG.size()==2)
+      {
+        RemoveEdge(subDG.front(), subDG.back());
+        edges_to_remove.emplace_back(subDG.front(), subDG.back());
+      }//bi-connected
+        //====================================== If tri-connected
+      else if (subDG.size()==3)
+      {
+        bool found=false;
+        for (int u : subDG)
+        {
+          for (int v : vertices[u].ds_edge)
+            if (IsInList(subDG,v))
+            {
+              found=true;
+              RemoveEdge(u, v);
+              edges_to_remove.emplace_back(u, v);
+              break;
+            }
+          if (found) break;
+        }//for u
+      }//tri-connected
+        //====================================== If n-connected
+      else
+      {
+        //=============================== Add vertices to temporary graph
+        chi_graph::DirectedGraph TG; //Temp Graph
+        for (auto u : subDG)
+          TG.AddVertex();
+
+        //=============================== Add local connectivity
+        int mapping_u = 0;
+        for (auto u : subDG)
+        {
+          for (auto v : vertices[u].ds_edge)
+          {
+            auto mapv = std::find(subDG.begin(),subDG.end(),v);
+            if (mapv != subDG.end())
+            {
+              int mapping_v = mapv - subDG.begin();
+              TG.AddEdge(mapping_u,mapping_v,vertices[u].ds_weights[v]);
+            }
+          }//for v
+
+          ++mapping_u;
+        }//for u
+
+        //=============================== Make a copy of the graph verts
+        std::vector<chi_graph::GraphVertex> verts_copy;
+        verts_copy.reserve(TG.vertices.size());
+        for (auto& v : TG.vertices)
+          verts_copy.push_back(v);
+
+        //=============================== Solve the minimum Feedback
+        //                                     Arc Set (FAS) problem
+        auto s = TG.FindApproxMinimumFAS();
+
+        //========================== Build a sequence map
+        // This maps original sequence
+        // to minFAS sequence. i.e. originally
+        // we had v=0,1,2,3... and afterwards we
+        // something like s=7,3,1,5,0,....
+        // smap[v] then gives the position of v in s
+        std::vector<int> smap(s.size(),-1);
+        int count=0;
+        for (int u: s)
+          smap[u] = count++;
+
+        //========================== Build edges to remove
+        std::vector<std::pair<int,int>> edges_to_rem;
+        for (auto& u : verts_copy)
+        {
+          int cur_map = smap[u.id];
+          for (int v : u.ds_edge)
+          {
+            int adj_map = smap[v];
+            if (adj_map < cur_map)
+              edges_to_rem.emplace_back(u.id,v);
+          }
+        }
+
+        for (auto& edge : edges_to_rem)
+        {
+          int u = subDG[edge.first];
+          int v = subDG[edge.second];
+          RemoveEdge(u, v);
+          edges_to_remove.emplace_back(u, v);
+        }
+
+      }//n-connected
+    }//for sub-DG
+
+
+    //============================================= Find SSCs again
+    // This step is like an insurance policy for if
+    // something came through. There should be no SSCs
+    // after the minFAS process, however, we just look
+    // again in-case.
+    SCCs = FindStronglyConnectedComponents();
+  }
+
+  return edges_to_remove;
+}
+
+//###################################################################
 /**Clears all the data structures associated with the graph.*/
 void chi_graph::DirectedGraph::Clear()
 {

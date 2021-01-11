@@ -267,7 +267,7 @@ def InstallPETSc():
   installed = os.path.exists(install_dir + \
                              "/PETSc/petsc-3.12.5/install/include/petsc")
   if (not installed):
-    print("Configuring PETSc 3.9.4 to \"" + os.getcwd() + "\"")
+    print("Configuring PETSc 3.12.5 to \"" + os.getcwd() + "\"")
     success,err = ExecSub("tar -zxf petsc-3.12.5.tar.gz",log_file)
     os.chdir("petsc-3.12.5/")
     exstring = "./configure " \

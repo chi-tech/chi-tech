@@ -49,7 +49,7 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
       auto sldfesq = std::dynamic_pointer_cast<
         chi_math::SimplifiedLDFESQ::Quadrature>(ref_quadrature);
 
-      if (chi_mpi.location_id)
+      if (chi_mpi.location_id == 0)
       {
         sldfesq->output_filename_prefix = file_name;
         sldfesq->PrintQuadratureToFile();
