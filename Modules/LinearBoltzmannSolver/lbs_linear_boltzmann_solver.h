@@ -44,9 +44,8 @@ struct SourceFlags
 class Solver : public chi_physics::Solver
 {
 protected:
-  typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
-
   size_t source_event_tag=0;
+
 public:
   double last_restart_write=0.0;
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
@@ -70,7 +69,6 @@ public:
   std::vector<std::pair<BoundaryType, int>>         boundary_types;
   std::vector<std::vector<double>>                  incident_P0_mg_boundaries;
   std::vector<double>                               zero_boundary;
-  std::vector<SPDS_ptr>                             sweep_orderings;
   std::vector<SweepBndry*>                          sweep_boundaries;
 
   int max_cell_dof_count;

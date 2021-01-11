@@ -33,10 +33,13 @@ typedef std::pair<int,int> AngSubSet;
 /**Group set functioning as a collection of groups*/
 class LBSGroupset
 {
+protected:
+  typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
 public:
   std::vector<LBSGroup*>                       groups;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
+  std::vector<SPDS_ptr>                        sweep_orderings;
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
   std::vector<GsSubSet>                        grp_subsets;

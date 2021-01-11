@@ -19,7 +19,7 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset *groupset)
   chi_log.Log(LOG_0VERBOSE_1)
     << "Resetting SPDS and FLUDS";
 
-  sweep_orderings.clear();
+  groupset->sweep_orderings.clear();
 
   auto& angle_agg = groupset->angle_agg;
 

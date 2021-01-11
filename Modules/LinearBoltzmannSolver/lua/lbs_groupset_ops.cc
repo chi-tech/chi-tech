@@ -82,7 +82,7 @@ int chiLBSCreateGroupset(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSCreateGroupset: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -132,7 +132,7 @@ int chiLBSCreateGroup(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSCreateGroup: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -201,7 +201,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetAddGroups: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -305,7 +305,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetQuadrature: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -423,7 +423,7 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetAngleAggregationType: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -521,7 +521,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetAngleAggDiv: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -606,7 +606,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetGroupSubsets: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -706,7 +706,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetIterativeMethod: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -807,7 +807,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetResidualTolerance: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -895,7 +895,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetMaxIterations: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -980,7 +980,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetGMRESRestartIntvl: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -1066,7 +1066,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetEnableSweepLog: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -1167,7 +1167,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetWGDSA: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -1274,7 +1274,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetTGDSA: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";

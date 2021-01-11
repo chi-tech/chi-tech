@@ -33,8 +33,8 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
     << " Computing Sweep ordering.\n";
 
   //============================================= Clear sweep ordering
-  sweep_orderings.clear();
-  sweep_orderings.shrink_to_fit();
+  groupset->sweep_orderings.clear();
+  groupset->sweep_orderings.shrink_to_fit();
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
@@ -61,7 +61,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                          angle.phi,
                          this->grid,
                          groupset->allow_cycles);
-      this->sweep_orderings.push_back(new_swp_order);
+      groupset->sweep_orderings.push_back(new_swp_order);
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D MESHES
@@ -90,7 +90,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                          product_quadrature->azimu_ang[0],
                          this->grid,
                          groupset->allow_cycles);
-      this->sweep_orderings.push_back(new_swp_order);
+      groupset->sweep_orderings.push_back(new_swp_order);
 
       new_swp_order =
         chi_mesh::sweep_management::
@@ -98,7 +98,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                          product_quadrature->azimu_ang[0],
                          this->grid,
                          groupset->allow_cycles);
-      this->sweep_orderings.push_back(new_swp_order);
+      groupset->sweep_orderings.push_back(new_swp_order);
     }
 
   }
@@ -145,7 +145,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                            product_quadrature->azimu_ang[i],
                            this->grid,
                            groupset->allow_cycles);
-        this->sweep_orderings.push_back(new_swp_order);
+        groupset->sweep_orderings.push_back(new_swp_order);
       }
       //=========================================== BOTTOM HEMISPHERE
       for (int i=0; i<num_azi; i++)
@@ -156,7 +156,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
                            product_quadrature->azimu_ang[i],
                            this->grid,
                            groupset->allow_cycles);
-        this->sweep_orderings.push_back(new_swp_order);
+        groupset->sweep_orderings.push_back(new_swp_order);
       }
     }//if product quadrature
   }
