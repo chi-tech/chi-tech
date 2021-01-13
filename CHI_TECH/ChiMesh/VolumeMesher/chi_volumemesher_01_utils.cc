@@ -46,7 +46,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 
   //============================================= Delete nodes
   if (delete_surface_mesh_elements)
-    surface_mesh->vertices = std::move(std::vector<chi_mesh::Vertex>(0));
+    surface_mesh->vertices = std::vector<chi_mesh::Vertex>(0);
 
   //============================================= Process faces
   unsigned int num_cells = 0;

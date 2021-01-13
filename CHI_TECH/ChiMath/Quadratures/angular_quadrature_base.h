@@ -45,11 +45,14 @@ protected:
 public:
   AngularQuadrature() :
   type(chi_math::AngularQuadratureType::Arbitrary)
-  {  }
+  {}
 
   AngularQuadrature(chi_math::AngularQuadratureType in_type) :
     type(in_type)
-  {  }
+  {}
+
+  virtual ~AngularQuadrature()
+  {} 
 
   virtual void
   InitializeWithCustom(std::vector<double>& azimuthal,

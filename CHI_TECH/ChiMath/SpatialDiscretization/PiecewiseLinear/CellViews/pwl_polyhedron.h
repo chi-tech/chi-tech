@@ -180,7 +180,7 @@ public:
   {
     for (auto& face : face_data)
       for (auto& side : face.sides)
-        side.qp_data = std::move(std::vector<FEqp_data3d>(0));
+        side.qp_data = std::vector<FEqp_data3d>(0);
   }
 
 };
