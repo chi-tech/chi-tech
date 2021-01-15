@@ -27,10 +27,13 @@ public:
   std::vector<double>           azimu_ang;
 
 public:
-  //product_quadrature.cc
-       ProductQuadrature() :
-         AngularQuadrature(chi_math::AngularQuadratureType::ProductQuadrature)
-       {}
+  ProductQuadrature() :
+    AngularQuadrature(chi_math::AngularQuadratureType::ProductQuadrature)
+  {}
+
+  virtual ~ProductQuadrature()
+  {} 
+ 
   void InitializeWithGL(int Np, bool verbose=false);
   void InitializeWithGLL(int Na, int Np, bool verbose=false);
   void InitializeWithGLC(int Na, int Np, bool verbose=false);

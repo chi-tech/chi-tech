@@ -81,7 +81,8 @@ public:
     AngularQuadrature(chi_math::AngularQuadratureType::SLDFESQ)
   {}
 
-
+  virtual ~Quadrature()
+  {}
 
   //01
   void GenerateInitialRefinement(int level);
