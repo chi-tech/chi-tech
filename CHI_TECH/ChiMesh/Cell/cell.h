@@ -79,10 +79,7 @@ public:
   virtual ~Cell() = default;
 
 public:
-  virtual void FindBoundary2D(chi_mesh::Region* region) {}
-  virtual bool CheckBoundary2D() {return true;}
-
-  const CellType Type() const {return cell_type;}
+  CellType Type() const {return cell_type;}
 };
 
 }

@@ -113,8 +113,8 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           if (cell_g_index==(*cell_flags)[i])
           {flagged = true;}
 
-          if (!poly_cell->CheckBoundary2D())
-          {flagged = true;}
+//          if (!poly_cell->CheckBoundary2D())
+//          {flagged = true;}
         }
         if (flagged)
         {

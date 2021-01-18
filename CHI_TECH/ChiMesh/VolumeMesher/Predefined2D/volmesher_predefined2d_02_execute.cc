@@ -71,16 +71,16 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         this->CreatePolygonCells(ref_continuum->surface_mesh, temp_grid);
         GridFilterGhosts(temp_grid,grid);
 
-        //================================== Connect Boundaries
-        for (auto& cell : grid->local_cells)
-          cell.FindBoundary2D(region);
+//        //================================== Connect Boundaries
+//        for (auto& cell : grid->local_cells)
+//          cell.FindBoundary2D(region);
 
-        //================================== Check all open item_id have
-        //                                   boundaries
-        int no_boundary_cells=0;
-        for (auto cell : grid->local_cells)
-          if (!cell.CheckBoundary2D())
-            no_boundary_cells++;
+//        //================================== Check all open item_id have
+//        //                                   boundaries
+//        int no_boundary_cells=0;
+//        for (auto cell : grid->local_cells)
+//          if (!cell.CheckBoundary2D())
+//            no_boundary_cells++;
 
         int total_local_cells = grid->local_cells.size();
 
@@ -92,16 +92,16 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
                       MPI_COMM_WORLD);
 
 
-        if (no_boundary_cells>0)
-        {
-          chi_log.Log(LOG_ALLVERBOSE_1)
-            << "A total of "
-            << no_boundary_cells
-            << " out of "
-            << total_global_cells
-            << " item_id found with no boundary connection.\n";
-          //temp_continuum->ExportCellsToPython("Zerror.py");
-        }
+//        if (no_boundary_cells>0)
+//        {
+//          chi_log.Log(LOG_ALLVERBOSE_1)
+//            << "A total of "
+//            << no_boundary_cells
+//            << " out of "
+//            << total_global_cells
+//            << " item_id found with no boundary connection.\n";
+//          //temp_continuum->ExportCellsToPython("Zerror.py");
+//        }
 
         //================================== Checking partitioning parameters
         if (!options.mesh_global)

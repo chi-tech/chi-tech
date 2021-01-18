@@ -43,10 +43,6 @@ public:
 
     return segment_normals;
   }
-
-  void FindBoundary2D(chi_mesh::Region* region);
-  //02
-  bool CheckBoundary2D();
 };
 
 }
