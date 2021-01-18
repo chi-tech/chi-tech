@@ -247,7 +247,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 //###################################################################
 /**Computes the centroid from nodes specified by the given list.*/
 chi_mesh::Vector3 chi_mesh::MeshContinuum::
-  ComputeCentroidFromListOfNodes(const std::vector<int> &list)
+  ComputeCentroidFromListOfNodes(const std::vector<uint64_t> &list)
 {
   if (list.empty())
   {

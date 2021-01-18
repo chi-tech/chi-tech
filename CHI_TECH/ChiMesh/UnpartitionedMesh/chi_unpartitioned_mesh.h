@@ -23,14 +23,14 @@ private:
   struct LightWeightFace
   {
     int neighbor=-1;
-    std::vector<int> vertex_ids;
+    std::vector<uint64_t> vertex_ids;
   };
   struct LightWeightCell
   {
     const chi_mesh::CellType type;
     chi_mesh::Vertex centroid;
     int material_id=-1;
-    std::vector<int> vertex_ids;
+    std::vector<uint64_t> vertex_ids;
     std::vector<LightWeightFace> faces;
 
     LightWeightCell(chi_mesh::CellType in_type) : type(in_type) {}

@@ -77,7 +77,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
         //======================================== Find associated face for
         //                                         dof mapping and lock box
-        short ass_face = face.GetNeighborAssociatedFace(grid);
+        auto ass_face = (short)face.GetNeighborAssociatedFace(grid);
 
         //Now find the cell (index,face) pair in the lock box and empty slot
         bool found = false;
@@ -265,13 +265,12 @@ AddFaceViewToDepLocI(int deplocI, int cell_g_index, int face_slot,
 {
   //======================================== Check if cell is already there
   bool cell_already_there = false;
-  for (int c=0; c<deplocI_cell_views[deplocI].size(); c++)
+  for (auto& cell_view : deplocI_cell_views[deplocI])
   {
-    if (deplocI_cell_views[deplocI][c].first == cell_g_index)
+    if (cell_view.first == cell_g_index)
     {
       cell_already_there = true;
-      deplocI_cell_views[deplocI][c].second.
-        emplace_back(face_slot, face.vertex_ids);
+      cell_view.second.emplace_back(face_slot, face.vertex_ids);
       break;
     }
   }

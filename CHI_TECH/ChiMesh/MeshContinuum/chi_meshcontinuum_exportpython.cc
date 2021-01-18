@@ -122,9 +122,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         }
       }
 
-      for (int v=0; v<poly_cell->vertex_ids.size(); v++)
+      for (uint64_t v=0; v<poly_cell->vertex_ids.size(); v++)
       {
-        fprintf(of,"face_vertindi[%d][%d]=%d\n",cell_g_index,v,poly_cell->vertex_ids[v]);
+        fprintf(of,"face_vertindi[%d][%llu]=%llu\n",cell_g_index,v,poly_cell->vertex_ids[v]);
       }
     }//polygon
 
@@ -172,9 +172,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
             chi_mesh::CellFace& face = polyh_cell->faces[s];
 
-            for (int v=0; v<face.vertex_ids.size(); v++)
+            for (uint64_t v=0; v<face.vertex_ids.size(); v++)
             {
-              fprintf(of,"face_vertindi[%d][%d]=%d\n",f,v,face.vertex_ids[v]);
+              fprintf(of,"face_vertindi[%d][%llu]=%llu\n",f,v,face.vertex_ids[v]);
             }
           }
 
@@ -205,9 +205,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
           chi_mesh::CellFace& face = polyh_cell->faces[s];
 
-          for (int v=0; v<face.vertex_ids.size(); v++)
+          for (uint64_t v=0; v<face.vertex_ids.size(); v++)
           {
-            fprintf(of,"face_vertindi[%d][%d]=%d\n",f,v,face.vertex_ids[v]);
+            fprintf(of,"face_vertindi[%d][%llu]=%llu\n",f,v,face.vertex_ids[v]);
           }
 
         }

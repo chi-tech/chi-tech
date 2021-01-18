@@ -8,7 +8,7 @@
 #include <ChiMesh/Cell/cell.h>
 
 //face_slot index, vertex ids
-typedef std::pair<int,std::vector<int>>             CompactFaceView;
+typedef std::pair<int,std::vector<uint64_t>>             CompactFaceView;
 
 //cell_global_id, faces
 typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;

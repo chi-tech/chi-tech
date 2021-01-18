@@ -28,10 +28,10 @@ enum class CellType
 class CellFace
 {
 public:
-  std::vector<int> vertex_ids;   /// A list of the vertices
+  std::vector<uint64_t> vertex_ids;   /// A list of the vertices
   Normal normal;                 /// The average/geometric normal
   Vertex centroid;               /// The face centroid
-  int neighbor=-1;               /// Neigboring cell global id (<0 indicates bndry)
+  int neighbor=-1;                /// Neigboring cell global id (<0 indicates bndry)
 
 private:
   int  neighbor_partition_id=-1;  /// Neighboring cell's partition id
@@ -63,13 +63,11 @@ class Cell
 public:
   int    global_id = -1;
   int    local_id  = -1;
-  std::pair<int,int> xy_partition_indices = {0,0};
-  std::tuple<int,int,int> xyz_partition_indices = std::make_tuple(0,0,0);
   int    partition_id = -1;
   Vertex centroid;
   int    material_id = -1;
 
-  std::vector<int> vertex_ids;
+  std::vector<uint64_t> vertex_ids;
   std::vector<CellFace> faces;
 
 private:

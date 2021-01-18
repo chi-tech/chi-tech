@@ -84,10 +84,10 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     cell->centroid = cell->centroid/3;
 
     //====================================== Compute xy partition id
-    cell->xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = cell->xy_partition_indices.second*
+    auto xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = xy_partition_indices.second*
                          handler->surface_mesher->partitioning_x +
-                         cell->xy_partition_indices.first;
+                         xy_partition_indices.first;
 
     if (force_local)
       cell->partition_id = chi_mpi.location_id;
@@ -134,10 +134,10 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     }
 
     //====================================== Compute partition id
-    cell->xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = cell->xy_partition_indices.second*
+    auto xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = xy_partition_indices.second*
                          handler->surface_mesher->partitioning_x +
-                         cell->xy_partition_indices.first;
+                         xy_partition_indices.first;
 
     if (force_local)
       cell->partition_id = chi_mpi.location_id;

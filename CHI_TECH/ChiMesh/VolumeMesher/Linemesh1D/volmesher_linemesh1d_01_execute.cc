@@ -64,10 +64,12 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           (*bndry)->initial_mesh_continuum.line_mesh;
 
         //================================== Populate nodes
-        for (int v=0; v<line_mesh->vertices.size(); v++)
+        for (size_t v=0; v<line_mesh->vertices.size(); v++)
         {
           grid->vertices.push_back(&line_mesh->vertices[v]);
         }
+//        for (auto& vertex : line_mesh->vertices)
+//          grid->vertices.push_back(&vertex);
         num_slab_cells = line_mesh->vertices.size()-1;
 
         //================================== Create cells from line mesh
@@ -106,12 +108,12 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           slab->faces[0].normal = chi_mesh::Vector3(0.0, 0.0, -1.0);
           slab->faces[1].normal = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
-          slab->xyz_partition_indices = GetCellXYZPartitionID(slab);
+          auto xyz_partition_indices = GetCellXYZPartitionID(slab);
 
           int xi,yi,zi;
-          xi = std::get<0>(slab->xyz_partition_indices);
-          yi = std::get<1>(slab->xyz_partition_indices);
-          zi = std::get<2>(slab->xyz_partition_indices);
+          xi = std::get<0>(xyz_partition_indices);
+          yi = std::get<1>(xyz_partition_indices);
+          zi = std::get<2>(xyz_partition_indices);
           int px,py;
           px = surf_mesher->partitioning_x;
           py = surf_mesher->partitioning_y;

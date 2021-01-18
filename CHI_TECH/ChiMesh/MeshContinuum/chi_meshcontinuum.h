@@ -145,7 +145,7 @@ public:
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping);
 
-  chi_mesh::Vector3 ComputeCentroidFromListOfNodes(const std::vector<int>& list);
+  chi_mesh::Vector3 ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list);
 
   void CommunicatePartitionNeighborCells(
     std::vector<chi_mesh::Cell*>& neighbor_cells);

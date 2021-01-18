@@ -87,15 +87,15 @@ int chi_mesh::CellFace::
   int associated_face = -1;
   if (cur_face.neighbor_ass_face < 0)
   {
-    std::set<int> cfvids(cur_face.vertex_ids.begin(),
-                         cur_face.vertex_ids.end());
+    std::set<uint64_t> cfvids(cur_face.vertex_ids.begin(),
+                              cur_face.vertex_ids.end());
     //======================================== Loop over adj cell faces
     int af=-1;
     for (auto& adj_face : adj_cell->faces)
     {
       ++af;
-      std::set<int> afvids(adj_face.vertex_ids.begin(),
-                           adj_face.vertex_ids.end());
+      std::set<uint64_t> afvids(adj_face.vertex_ids.begin(),
+                                adj_face.vertex_ids.end());
 
       if (afvids == cfvids) {associated_face = af; break;}
     }

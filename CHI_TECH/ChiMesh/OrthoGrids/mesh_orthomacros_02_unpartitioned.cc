@@ -53,7 +53,7 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
     umesh->vertices.push_back(new chi_mesh::Vertex(vertex));
 
   //======================================== Create cells
-  for (int c=0; c<(zverts.size()-1); ++c)
+  for (size_t c=0; c<(zverts.size()-1); ++c)
   {
     auto cell = new UnpartitionedMesh::LightWeightCell(chi_mesh::CellType::SLAB);
 
@@ -120,7 +120,7 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
 
-  std::vector<std::vector<int>> vertex_ij_to_i_map(Ny,std::vector<int>(Nx));
+  std::vector<std::vector<uint64_t>> vertex_ij_to_i_map(Ny,std::vector<uint64_t>(Nx));
   umesh->vertices.reserve(Nx*Ny);
   int k=-1;
   for (int i=0; i<Ny; ++i)
@@ -214,7 +214,7 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
   size_t Ny = vertices_1d_y.size();
   size_t Nz = vertices_1d_z.size();
 
-  typedef std::vector<int>    VecInt;
+  typedef std::vector<uint64_t>    VecInt;
   typedef std::vector<VecInt> VecVecInt;
   std::vector<VecVecInt> vertex_ijk_to_i_map(Ny);
   for (auto& vec : vertex_ijk_to_i_map)

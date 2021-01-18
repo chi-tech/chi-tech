@@ -51,11 +51,11 @@ int chi_mesh::VolumeMesherExtruder::
   chi_mesh::Cell n_gcell(chi_mesh::CellType::GHOST);
   n_gcell.centroid = centroid;
 
-  n_gcell.xyz_partition_indices = GetCellXYZPartitionID(&n_gcell);
+  auto xyz_partition_indices = GetCellXYZPartitionID(&n_gcell);
 
-  int nxi = std::get<0>(n_gcell.xyz_partition_indices);
-  int nyi = std::get<1>(n_gcell.xyz_partition_indices);
-  int nzi = std::get<2>(n_gcell.xyz_partition_indices);
+  int nxi = std::get<0>(xyz_partition_indices);
+  int nyi = std::get<1>(xyz_partition_indices);
+  int nzi = std::get<2>(xyz_partition_indices);
 
   return nzi*px*py + nyi*px + nxi;
 }
@@ -199,7 +199,7 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
       {
         //========================================= Create polyhedron
         auto cell = new chi_mesh::CellPolyhedron;
-        cell->xyz_partition_indices = tcell->xyz_partition_indices;
+//        cell->xyz_partition_indices = tcell->xyz_partition_indices;
         cell->partition_id = tcell->partition_id;
         delete tcell;
 

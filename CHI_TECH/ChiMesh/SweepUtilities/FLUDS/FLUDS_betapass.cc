@@ -224,7 +224,7 @@ SerializeCellInfo(std::vector<CompactCellView>* cell_views,
     {
       face_indices.push_back(glob_index);
       face_indices.push_back((*cell_face_views)[f].first);
-      std::vector<int>* face_vertices = &(*cell_face_views)[f].second;
+      std::vector<uint64_t>* face_vertices = &(*cell_face_views)[f].second;
 
       size_t num_verts = face_vertices->size();
       for (int fi=0; fi<num_verts; fi++)
