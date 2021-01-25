@@ -178,15 +178,15 @@ void chi_mesh::VolumeMesher::
   std::vector<Cell*> cells_to_delete;
   for (int ghost_id : in_ghost_ids)
   {
-    auto ref_ghost_cell = in_grid->cells[ghost_id];
+    auto& ref_ghost_cell = in_grid->cells[ghost_id];
 
     bool is_neighbor_to_this_loc = false;
-    for (auto& face : ref_ghost_cell->faces)
+    for (auto& face : ref_ghost_cell.faces)
     {
       if (face.neighbor<0) continue;
 
       auto adj_cell = in_grid->cells[face.neighbor];
-      if (adj_cell->partition_id == chi_mpi.location_id)
+      if (adj_cell.partition_id == chi_mpi.location_id)
       {
         is_neighbor_to_this_loc = true;
         break;
@@ -194,9 +194,9 @@ void chi_mesh::VolumeMesher::
     }//for face
 
     if (is_neighbor_to_this_loc)
-      out_grid->cells.push_back(ref_ghost_cell);
+      out_grid->cells.push_back(&ref_ghost_cell);
     else
-      cells_to_delete.push_back(ref_ghost_cell);
+      cells_to_delete.push_back(&ref_ghost_cell);
   }//for cell
 
 

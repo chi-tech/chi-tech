@@ -65,7 +65,7 @@ std::vector<int> SpatialDiscretization_FV::
                      unsigned int unknown_id)
 {
   std::vector<int> dof_ids;
-  std::vector<int> ghost_cell_ids = grid->cells.GetGhostGlobalIDs();
+  std::vector<uint64_t> ghost_cell_ids = grid->cells.GetGhostGlobalIDs();
 
   unsigned int N = 1;
 
@@ -77,7 +77,7 @@ std::vector<int> SpatialDiscretization_FV::
     for (int comp=0; comp<N; ++comp)
     {
       dof_ids.push_back(
-        MapDOF(grid->cells[cell_id],unknown_manager,unknown_id,comp) );
+        MapDOF(&grid->cells[cell_id],unknown_manager,unknown_id,comp) );
     }
 
   return dof_ids;

@@ -32,6 +32,8 @@ public:
   Normal normal;                 /// The average/geometric normal
   Vertex centroid;               /// The face centroid
   int neighbor=-1;                /// Neigboring cell global id (<0 indicates bndry)
+//  bool has_neighbor=false;      ///< Flag indicating whether face has a neighbor
+//  uint64_t neighbor_id=0;       ///< If face has neighbor, contains the global id. 0 otherwise.
 
 private:
   int  neighbor_partition_id=-1;  /// Neighboring cell's partition id
@@ -61,11 +63,11 @@ public:
 class Cell
 {
 public:
-  int    global_id = -1;
-  int    local_id  = -1;
-  int    partition_id = -1;
+  uint64_t global_id = 0;
+  uint64_t local_id  = 0;
+  uint64_t partition_id = 0;
   Vertex centroid;
-  int    material_id = -1;
+  int material_id = -1;
 
   std::vector<uint64_t> vertex_ids;
   std::vector<CellFace> faces;

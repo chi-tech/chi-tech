@@ -113,29 +113,6 @@ void chi_mesh::MeshContinuum::
 }
 
 //###################################################################
-/**Check whether a cell is local*/
-bool chi_mesh::MeshContinuum::IsCellLocal(int cell_global_index)
-{
-  if (cell_global_index<0)
-  {
-    return false;
-  }
-  else
-  {
-    auto cell = cells[cell_global_index];
-    if (cell->partition_id == chi_mpi.location_id)
-    {
-      return true;
-    } else
-    {
-      return false;
-    }
-
-  }
-  return false;
-}
-
-//###################################################################
 /**Gets the number of face-histogram categories.*/
 size_t chi_mesh::MeshContinuum::NumberOfFaceHistogramBins()
 {
@@ -183,10 +160,31 @@ size_t chi_mesh::MeshContinuum::GetFaceHistogramBinDOFSize(size_t category)
 }
 
 //###################################################################
-/**Check whether a cell is a boundary*/
-bool chi_mesh::MeshContinuum::IsCellBndry(int cell_global_index)
+/**Check whether a cell is local by attempting to find the key in
+ * the native index map.*/
+bool chi_mesh::MeshContinuum::IsCellLocal(uint64_t cell_global_index)
 {
-  if (cell_global_index<0)
+  auto native_index = global_cell_id_to_native_id_map.find(cell_global_index);
+
+  if (native_index != global_cell_id_to_native_id_map.end())
+    return true;
+
+  return false;
+}
+
+
+//###################################################################
+/**Check whether a cell is a boundary by checking if the key is
+ * found in the native or foreign cell maps.*/
+bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index)
+{
+  auto native_index = global_cell_id_to_native_id_map.find(cell_global_index);
+  auto foreign_index = global_cell_id_to_foreign_id_map.find(cell_global_index);
+
+  auto no_native = global_cell_id_to_native_id_map.end();
+  auto no_foreign = global_cell_id_to_foreign_id_map.end();
+
+  if ( (native_index == no_native) and (foreign_index == no_foreign))
     return true;
 
   return false;
@@ -214,19 +212,48 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
   chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(this)];
 
   dof_mapping.reserve(cur_face.vertex_ids.size());
-  for (short cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
+//  for (short cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
+//  {
+//    bool found = false;
+//    for (short afv=0;
+//         afv < adj_cell->faces[associated_face].vertex_ids.size(); afv++)
+//    {
+//      if (cur_face.vertex_ids[cfv] ==
+//        adj_cell->faces[associated_face].vertex_ids[afv])
+//      {
+//        dof_mapping.push_back(afv);
+//        found = true;
+//        break;
+//      }
+//    }
+//
+//    if (!found)
+//    {
+//      chi_log.Log(LOG_ALLERROR)
+//        << "Face DOF mapping failed in call to "
+//        << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
+//           "node."
+//        << cur_face.neighbor << " " << cur_face.centroid.PrintS();
+//      exit(EXIT_FAILURE);
+//    }
+//
+//  }//for cfv
+
+  const auto& adj_face = adj_cell->faces[associated_face];
+
+  for (auto cfvid : cur_face.vertex_ids)
   {
     bool found = false;
-    for (short afv=0;
-         afv < adj_cell->faces[associated_face].vertex_ids.size(); afv++)
+    short afv = 0;
+    for (auto afvid : adj_face.vertex_ids)
     {
-      if (cur_face.vertex_ids[cfv] ==
-        adj_cell->faces[associated_face].vertex_ids[afv])
+      if (cfvid == afvid)
       {
-        dof_mapping.push_back(afv);
+        dof_mapping.push_back((short)afv);
         found = true;
         break;
       }
+      afv++;
     }
 
     if (!found)
@@ -238,8 +265,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
         << cur_face.neighbor << " " << cur_face.centroid.PrintS();
       exit(EXIT_FAILURE);
     }
-
-  }//for cfv
+  }
 
 }
 

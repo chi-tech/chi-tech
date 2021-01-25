@@ -173,10 +173,10 @@ CellFVView* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 /**Maps the cell index to a position stored locally.*/
 CellFVView* SpatialDiscretization_FV::MapNeighborFeView(int cell_global_index)
 {
-  auto cell = ref_grid->cells[cell_global_index];
+  auto& cell = ref_grid->cells[cell_global_index];
 
-  if (cell->partition_id == chi_mpi.location_id)
-    return MapFeView(cell->local_id);
+  if (cell.partition_id == chi_mpi.location_id)
+    return MapFeView(cell.local_id);
   else
   {
     int index=0;

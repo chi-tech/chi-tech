@@ -15,12 +15,12 @@ extern ChiMPI& chi_mpi;
 void chi_mesh::CellFace::
   InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
 {
-  auto adj_cell = grid->cells[neighbor];
-  neighbor_partition_id = adj_cell->partition_id;
+  auto& adj_cell = grid->cells[neighbor];
+  neighbor_partition_id = adj_cell.partition_id;
   neighbor_parallel_info_initialized = true;
 
   if (neighbor_partition_id == chi_mpi.location_id)
-    neighbor_local_id = adj_cell->local_id;
+    neighbor_local_id = adj_cell.local_id;
 }
 
 //###################################################################

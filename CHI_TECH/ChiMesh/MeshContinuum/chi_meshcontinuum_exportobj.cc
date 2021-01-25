@@ -155,9 +155,9 @@ void chi_mesh::MeshContinuum::
             }//if boundary
             else
             {
-              auto adj_cell = cells[adjcell_glob_index];
+              auto& adj_cell = cells[adjcell_glob_index];
 
-              if (adj_cell->material_id != mat)
+              if (adj_cell.material_id != mat)
               {
                 faces_to_export.push_back(face);
 

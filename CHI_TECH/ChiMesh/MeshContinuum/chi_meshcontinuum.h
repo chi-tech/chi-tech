@@ -1,109 +1,36 @@
-#ifndef _chi_meshcontinuum_h
-#define _chi_meshcontinuum_h
+#ifndef CHI_MESHCONTINUUM_H_
+#define CHI_MESHCONTINUUM_H_
 
 #include "../chi_mesh.h"
-#include "../../ChiGraph/chi_graph.h"
-#include "ChiMesh/Cell/cell.h"
+#include "chi_meshcontinuum_localcellhandler.h"
+#include "chi_meshcontinuum_globalcellhandler.h"
 
-#include <chi_mpi.h>
+#include "chi_mpi.h"
+
+
+
 
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
 class chi_mesh::MeshContinuum
 {
+private:
+  std::vector<chi_mesh::Cell*> native_cells;  ///< Actual native cells
+  std::vector<chi_mesh::Cell*> foreign_cells; ///< Locally stored ghosts
+
+  std::map<uint64_t,uint64_t> global_cell_id_to_native_id_map;
+  std::map<uint64_t,uint64_t> global_cell_id_to_foreign_id_map;
+
+
 public:
-  //##################################################
-  /**Stores references to global cells to enable an iterator.*/
-  class LocalCells
-  {
-  public:
-    std::vector<int>& local_cell_ind;
-
-    std::vector<chi_mesh::Cell*> native_cells;
-    std::vector<chi_mesh::Cell*> foreign_cells;
-
-    /**Constructor.*/
-    LocalCells(std::vector<int>& in_local_cell_ind) :
-      local_cell_ind(in_local_cell_ind)
-      {}
-
-    ~LocalCells()
-    {
-      for (auto cell : native_cells) delete cell;
-      for (auto cell : foreign_cells) delete cell;
-    }
-
-    chi_mesh::Cell& operator[](int cell_local_index);
-
-
-    //##################################### iterator Class Definition
-    /**Internal iterator class.*/
-    class iterator
-    {
-    public:
-      LocalCells& ref_block;
-      size_t      ref_element;
-
-      iterator(LocalCells& in_block, size_t i) :
-        ref_block(in_block),
-        ref_element(i) {}
-
-      iterator operator++(        ) {iterator i = *this; ref_element++; return i;}
-      iterator operator++(int junk) {ref_element++; return *this;}
-      chi_mesh::Cell& operator*()
-      { return *(ref_block.native_cells[ref_element]); }
-      chi_mesh::Cell* operator->()
-      { return ref_block.native_cells[ref_element]; }
-      bool operator==(const iterator& rhs)
-      { return ref_element == rhs.ref_element; }
-      bool operator!=(const iterator& rhs)
-      { return ref_element != rhs.ref_element; }
-    };
-
-    iterator begin() {return {*this,0};}
-
-    iterator end(){return {*this,local_cell_ind.size()};}
-
-    size_t size() {return local_cell_ind.size();}
-  };
-  //--------------------------------------------------
-
-  //##################################################
-  /**Handles all global index queries.*/
-  class GlobalCellHandler
-  {
-  private:
-    LocalCells& local_cells;
-    std::set<std::pair<int,int>> global_cell_native_index_set;
-    std::set<std::pair<int,int>> global_cell_foreign_index_set;
-
-
-  public:
-    explicit GlobalCellHandler(LocalCells& local_cell_object_ref) :
-     local_cells(local_cell_object_ref)
-    {}
-
-    void push_back(chi_mesh::Cell* new_cell);
-    chi_mesh::Cell* &operator[](int cell_global_index);
-
-    int GetNumGhosts();
-
-    std::vector<int> GetGhostGlobalIDs();
-
-    int GetGhostLocalID(int cell_global_index);
-  };
-
   std::vector<chi_mesh::Node*>   vertices;
-  LocalCells                     local_cells;
+  LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
   chi_mesh::LineMesh*            line_mesh;
-  std::vector<int>               local_cell_glob_indices;
+  std::vector<uint64_t>          local_cell_glob_indices;
   std::vector<int>               boundary_cell_indices;
-
-
-
 
 private:
   bool                           face_histogram_available = false;
@@ -117,8 +44,12 @@ private:
 
 public:
   MeshContinuum() :
-    local_cells(local_cell_glob_indices),
-    cells(local_cells)
+    local_cells(native_cells, foreign_cells),
+    cells(local_cell_glob_indices,
+          native_cells,
+          foreign_cells,
+          global_cell_id_to_native_id_map,
+          global_cell_id_to_foreign_id_map)
   {
     surface_mesh = nullptr;
     line_mesh    = nullptr;
@@ -139,8 +70,8 @@ public:
   size_t NumberOfFaceHistogramBins();
   size_t MapFaceHistogramBins(size_t num_face_dofs);
   size_t GetFaceHistogramBinDOFSize(size_t category);
-  bool IsCellLocal(int cell_global_index=-1);
-  bool IsCellBndry(int cell_global_index = 0);
+  bool IsCellLocal(uint64_t cell_global_index);
+  bool IsCellBndry(uint64_t cell_global_index);
 
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping);
@@ -155,7 +86,4 @@ public:
   size_t GetGlobalNumberOfCells();
 };
 
-
-
-
-#endif
+#endif //CHI_MESHCONTINUUM_H_
