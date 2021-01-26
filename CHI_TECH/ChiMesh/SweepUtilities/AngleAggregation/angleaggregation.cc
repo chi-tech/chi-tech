@@ -244,10 +244,10 @@ void chi_mesh::sweep_management::AngleAggregation::ResetReflectingBCs()
 
 //###################################################################
 /** Get number of angular unknowns. */
-std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
+std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
   GetNumberOfAngularUnknowns()
 {
-  //======================================== Check if this is already develeped
+  //======================================== Check if this is already developed
   if (num_ang_unknowns_avail)
   {
     chi_log.Log(LOG_0) << "Number of angular unknowns: "
@@ -256,7 +256,7 @@ std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
   }
 
   //======================================== If not developed
-  int local_ang_unknowns = 0;
+  size_t local_ang_unknowns = 0;
 
   //======================================== Opposing reflecting bndries
   for (auto bndry : sim_boundaries)
@@ -277,22 +277,22 @@ std::pair<int,int> chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       local_ang_unknowns += angle_set->delayed_local_psi.size();
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
         local_ang_unknowns += loc_vector.size();
 
 
 
-  int global_ang_unknowns = 0;
+  size_t global_ang_unknowns = 0;
   MPI_Allreduce(&local_ang_unknowns,
                 &global_ang_unknowns,
                 1,
-                MPI_INT,
+                MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
                 MPI_COMM_WORLD);
 

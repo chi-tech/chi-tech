@@ -120,7 +120,11 @@ void chi_mesh::VolumeMesherPredefined3D::
       {
         chi_mesh::CellFace newFace;
 
-        newFace.neighbor_id = raw_face.neighbor;
+        if (raw_face.neighbor >= 0)
+        {
+          newFace.neighbor_id = raw_face.neighbor;
+          newFace.has_neighbor = true;
+        }
 
         newFace.vertex_ids = raw_face.vertex_ids;
         auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);

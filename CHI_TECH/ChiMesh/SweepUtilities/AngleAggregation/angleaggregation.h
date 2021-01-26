@@ -36,7 +36,7 @@ public:
 
 private:
   bool is_setup=false;
-  std::pair<int,int> number_angular_unknowns;
+  std::pair<size_t ,size_t> number_angular_unknowns;
   bool num_ang_unknowns_avail = false;
 
 public:
@@ -56,7 +56,7 @@ public:
   void InitializeReflectingBCs();
   void ResetReflectingBCs();
 
-  std::pair<int,int> GetNumberOfAngularUnknowns();
+  std::pair<size_t,size_t> GetNumberOfAngularUnknowns();
   void AssembleAngularUnknowns(int& index, double* x_ref);
   void DisassembleAngularUnknowns(int& index, const double* x_ref);
 
