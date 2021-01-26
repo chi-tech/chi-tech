@@ -15,7 +15,7 @@ extern ChiMPI& chi_mpi;
 void chi_mesh::CellFace::
   InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
 {
-  auto& adj_cell = grid->cells[neighbor];
+  auto& adj_cell = grid->cells[neighbor_id];
   neighbor_partition_id = adj_cell.partition_id;
   neighbor_parallel_info_initialized = true;
 
@@ -28,7 +28,7 @@ void chi_mesh::CellFace::
 bool chi_mesh::CellFace::
   IsNeighborLocal(chi_mesh::MeshContinuum *grid)
 {
-  if (neighbor < 0) return false;
+  if (not has_neighbor) return false;
   if (chi_mpi.process_count == 1) return true;
 
   if (not neighbor_parallel_info_initialized)
@@ -42,7 +42,7 @@ bool chi_mesh::CellFace::
 int chi_mesh::CellFace::
   GetNeighborPartitionID(chi_mesh::MeshContinuum *grid)
 {
-  if (neighbor < 0) return -1;
+  if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return 0;
 
   if (not neighbor_parallel_info_initialized)
@@ -56,8 +56,8 @@ int chi_mesh::CellFace::
 int chi_mesh::CellFace::
   GetNeighborLocalID(chi_mesh::MeshContinuum *grid)
 {
-  if (neighbor < 0) return -1;
-  if (chi_mpi.process_count == 1) return neighbor;
+  if (not has_neighbor) return -1;
+  if (chi_mpi.process_count == 1) return neighbor_id;
 
   if (not neighbor_parallel_info_initialized)
     InitializeNeighborParallelInfo(grid);
@@ -72,7 +72,7 @@ int chi_mesh::CellFace::
 {
   auto& cur_face = *this;
   //======================================== Check index validity
-  if ((cur_face.neighbor<0) || (not cur_face.IsNeighborLocal(grid)))
+  if ((not cur_face.has_neighbor) || (not cur_face.IsNeighborLocal(grid)))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell index encountered in call to "

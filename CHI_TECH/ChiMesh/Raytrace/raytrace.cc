@@ -69,7 +69,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         pos_f = intersection_point;
 
         dest_info.destination_face_index = f;
-        dest_info.destination_face_neighbor = slab_cell->faces[f].neighbor;
+        dest_info.destination_face_neighbor = slab_cell->faces[f].neighbor_id;
         intersection_found = true;
         break;
       }
@@ -104,7 +104,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         pos_f = ip;
 
         dest_info.destination_face_index = f;
-        dest_info.destination_face_neighbor = poly_cell->faces[f].neighbor;
+        dest_info.destination_face_neighbor = poly_cell->faces[f].neighbor_id;
         intersection_found = true;
         break;
       }//if intersects
@@ -140,7 +140,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
           pos_f = ip;
 
           dest_info.destination_face_index = f;
-          dest_info.destination_face_neighbor = polyh_cell->faces[f].neighbor;
+          dest_info.destination_face_neighbor = polyh_cell->faces[f].neighbor_id;
 
           intersection_found = true;
           break;

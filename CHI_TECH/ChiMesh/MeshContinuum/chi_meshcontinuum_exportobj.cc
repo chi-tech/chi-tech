@@ -39,7 +39,7 @@ void chi_mesh::MeshContinuum::
       {
         for (auto& face : cell.faces)
         {
-          if (face.neighbor < 0)
+          if (not face.has_neighbor)
           {
             faces_to_export.push_back(face);
 
@@ -144,7 +144,7 @@ void chi_mesh::MeshContinuum::
 
           for (const auto& face : cell.faces)
           {
-            int adjcell_glob_index = face.neighbor;
+            int adjcell_glob_index = face.neighbor_id;
 
             if (adjcell_glob_index<0)
             {

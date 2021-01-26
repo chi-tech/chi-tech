@@ -32,8 +32,6 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
     {
-      int neighbor = face.neighbor;
-
       if (face.IsNeighborLocal(grid))
       {
         incoming_face_count++;
@@ -66,7 +64,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         {
           chi_log.Log(LOG_ALLERROR)
             << "Associated face counter not found"
-            << ass_face << " " << neighbor;
+            << ass_face << " " << face.neighbor_id;
           face.GetNeighborAssociatedFace(grid);
           exit(EXIT_FAILURE);
         }

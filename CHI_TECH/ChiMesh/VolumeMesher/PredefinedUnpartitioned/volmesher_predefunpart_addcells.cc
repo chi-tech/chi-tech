@@ -25,7 +25,11 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     ++fc;
     chi_mesh::CellFace newFace;
 
-    newFace.neighbor = raw_face.neighbor;
+    if (raw_face.neighbor>=0)
+    {
+      newFace.neighbor_id = raw_face.neighbor;
+      newFace.has_neighbor = true;
+    }
 
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
@@ -67,7 +71,11 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   {
     chi_mesh::CellFace newFace;
 
-    newFace.neighbor = raw_face.neighbor;
+    if (raw_face.neighbor>=0)
+    {
+      newFace.neighbor_id = raw_face.neighbor;
+      newFace.has_neighbor = true;
+    }
 
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
@@ -111,7 +119,11 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   {
     chi_mesh::CellFace newFace;
 
-    newFace.neighbor = raw_face.neighbor;
+    if (raw_face.neighbor>=0)
+    {
+      newFace.neighbor_id = raw_face.neighbor;
+      newFace.has_neighbor = true;
+    }
 
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);

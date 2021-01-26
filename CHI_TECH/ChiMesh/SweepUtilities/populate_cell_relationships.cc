@@ -38,10 +38,8 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       //                                        it is to a local cell
       if (is_outgoing)
       {
-        int adj_cell_glob_index = face.neighbor;
-
         //================================ If it is a cell and not bndry
-        if (adj_cell_glob_index>=0)
+        if (face.has_neighbor)
         {
           //========================= If it is in the current location
           if (face.IsNeighborLocal(grid))
@@ -60,7 +58,7 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       else
       {
         //================================if it is a cell and not bndry
-        if (face.neighbor >= 0 and not face.IsNeighborLocal(grid))
+        if (face.has_neighbor and not face.IsNeighborLocal(grid))
           location_dependencies.insert(face.GetNeighborPartitionID(grid));
       }
 

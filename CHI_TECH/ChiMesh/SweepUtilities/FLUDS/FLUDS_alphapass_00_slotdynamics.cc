@@ -37,7 +37,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
     {
-      int neighbor = face.neighbor;
+//      int neighbor = face.neighbor_id;
 
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ LOCAL CELL DEPENDENCE
       if (face.IsNeighborLocal(grid))
@@ -83,7 +83,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         bool found = false;
         for (auto& lock_box_slot : lock_box)
         {
-          if ((lock_box_slot.first == neighbor) &&
+          if ((lock_box_slot.first == face.neighbor_id) &&
               (lock_box_slot.second== ass_face))
           {
             lock_box_slot.first = -1;
@@ -110,7 +110,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
 
       }//if local
       //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ BOUNDARY DEPENDENCE
-      else if (grid->IsCellBndry(neighbor))
+      else if (not face.has_neighbor)
       {
         chi_mesh::Vector3& face_norm = face.normal;
 
@@ -149,7 +149,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   {
     CellFace&  face         = cell->faces[f];
     double     mu           = spds->omega.Dot(face.normal);
-    int        neighbor     = face.neighbor;
+//    int        neighbor     = face.neighbor_id;
     int        cell_g_index = cell->global_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Outgoing face
@@ -220,7 +220,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
       }
 
       //========================================== Non-local outgoing
-      if ((!face.IsNeighborLocal(grid)) && (!grid->IsCellBndry(neighbor)))
+      if (face.has_neighbor and (not face.IsNeighborLocal(grid)))
       {
         int locJ         = face.GetNeighborPartitionID(grid);
         int deplocI      = spds->MapLocJToDeplocI(locJ);

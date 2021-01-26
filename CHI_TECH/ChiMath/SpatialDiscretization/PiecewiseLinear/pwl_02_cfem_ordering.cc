@@ -50,7 +50,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
     for (size_t f=0; f < cell.faces.size(); f++)
     {
       auto& face = cell.faces[f];
-      if (face.neighbor >= 0)
+      if (face.has_neighbor)
       {
         if (face.GetNeighborPartitionID(grid) != cell.partition_id)
         {

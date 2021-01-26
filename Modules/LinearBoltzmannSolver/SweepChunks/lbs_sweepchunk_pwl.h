@@ -155,7 +155,7 @@ public:
           {
             face_incident_flags[f] = true;
             bool local = transport_view->face_local[f];
-            bool boundary = grid_view->IsCellBndry(face.neighbor);
+            bool boundary = not face.has_neighbor;
             int num_face_indices = face.vertex_ids.size();
 
             if (local)
@@ -200,7 +200,7 @@ public:
               // independent of angle. Accessing things like reflective boundary
               // angular fluxes (and complex boundary conditions), requires the
               // more general bndry_face_counter.
-              int bndry_index = -(face.neighbor + 1);
+              int bndry_index = face.neighbor_id;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
                 int i = cell_fe_view->face_dof_mappings[f][fi];
@@ -282,7 +282,7 @@ public:
           out_face_counter++;
           auto& face = cell->faces[f];
           bool local = transport_view->face_local[f];
-          bool boundary = grid_view->IsCellBndry(face.neighbor);
+          bool boundary = not face.has_neighbor;
           int num_face_indices = face.vertex_ids.size();
 
           if (local)
@@ -308,7 +308,7 @@ public:
           }
           else // Store outgoing reflecting Psi
           {
-            int bndry_index = -(face.neighbor + 1);
+            int bndry_index = face.neighbor_id;
             if (angle_set->ref_boundaries[bndry_index]->IsReflecting())
             {
               for (int fi = 0; fi < num_face_indices; ++fi)

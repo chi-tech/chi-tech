@@ -77,10 +77,10 @@ bool chi_mesh::VolumeMesherExtruder::
   bool is_neighbor_to_partition = false;
   for (auto& tc_face : template_cell->faces)
   {
-    if (tc_face.neighbor >= 0)
+    if (tc_face.has_neighbor)
     {
       auto n_template_cell = (chi_mesh::CellPolygon*)(
-        &template_continuum->local_cells[tc_face.neighbor]);
+        &template_continuum->local_cells[tc_face.neighbor_id]);
 
       auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
         n_template_cell, template_continuum, iz, iz+1);
@@ -244,11 +244,14 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
           //Set neighbor
           //The side connections have the same connections as the
           //template cell + the iz specifiers of the layer.
-          if (face.neighbor >= 0)
-            newFace.neighbor = face.neighbor +
-                               iz*((int)template_continuum->local_cells.size());
+          if (face.has_neighbor)
+          {
+            newFace.neighbor_id = face.neighbor_id +
+                                  iz*((int)template_continuum->local_cells.size());
+            newFace.has_neighbor = true;
+          }
           else
-            newFace.neighbor = face.neighbor;
+            newFace.neighbor_id = face.neighbor_id;
 
           cell->faces.push_back(newFace);
         } //for side faces
@@ -287,9 +290,12 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
 
         //Set neighbor
         if (iz==0)
-          newFace.neighbor = -1*(bot_boundary_index+1);
+          newFace.neighbor_id = bot_boundary_index;
         else
-          newFace.neighbor = tc + (iz-1)*(int)(template_continuum->local_cells.size());
+        {
+          newFace.neighbor_id = tc + (iz-1)*(int)(template_continuum->local_cells.size());
+          newFace.has_neighbor = true;
+        }
 
         cell->faces.push_back(newFace);
 
@@ -318,9 +324,12 @@ ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
 
         //Set neighbor
         if (iz==(vertex_layers.size()-2))
-          newFace.neighbor = -1*(top_boundary_index+1);
+          newFace.neighbor_id = top_boundary_index;
         else
-          newFace.neighbor = tc + (iz+1)*(int)(template_continuum->local_cells.size());
+        {
+          newFace.neighbor_id = tc + (iz+1)*(int)(template_continuum->local_cells.size());
+          newFace.has_neighbor = true;
+        }
 
         cell->faces.push_back(newFace);
 

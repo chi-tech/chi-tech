@@ -72,14 +72,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
     for (int f=0; f<num_faces; f++)
     {
       auto& face = cell->faces[f];
-      int neighbor = face.neighbor;
 
       //================================== Get face normal
       chi_mesh::Vector3 n  = face.normal;
 
       int num_face_dofs = face.vertex_ids.size();
 
-      if (neighbor >=0)
+      if (face.has_neighbor)
       {
         chi_mesh::Cell*           adj_cell    = nullptr;
         CellFEView*               adj_fe_view = nullptr;
@@ -97,9 +96,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
         else //Non-local
         {
           int locI = face.GetNeighborPartitionID(grid);
-          adj_ip_view = GetBorderIPView(locI,neighbor);
-          adj_cell    = (chi_mesh::Cell*)GetBorderCell(locI,neighbor);
-          adj_fe_view = (CellFEView*)GetBorderFEView(locI,neighbor);
+          adj_ip_view = GetBorderIPView(locI,face.neighbor_id);
+          adj_cell    = (chi_mesh::Cell*)GetBorderCell(locI,face.neighbor_id);
+          adj_fe_view = (CellFEView*)GetBorderFEView(locI,face.neighbor_id);
         }//non-local
 
         //========================= Check valid information
@@ -268,8 +267,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
       }//if not bndry
       else
       {
-        int ir_boundary_index =
-          abs(cell->faces[f].neighbor) - 1;
+        int ir_boundary_index = cell->faces[f].neighbor_id;
         int ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
         if (ir_boundary_type == DIFFUSION_DIRICHLET)

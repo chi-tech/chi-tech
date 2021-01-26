@@ -112,7 +112,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
       int f=0;
       for (auto& face : cell.faces)
       {
-        if (grid->IsCellBndry(face.neighbor))
+        if (not face.has_neighbor)
         {
           chi_mesh::Vector3& n = face.normal;
 
@@ -124,7 +124,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
           else if (n.Dot(khat)> 0.999) boundary_id = 4;
           else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
-          if (boundary_id >= 0) face.neighbor = -(boundary_id + 1);
+          if (boundary_id >= 0) face.neighbor_id = boundary_id;
         }//if bndry
 
         if (not face.IsNeighborLocal(grid))

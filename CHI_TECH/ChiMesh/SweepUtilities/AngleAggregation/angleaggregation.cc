@@ -167,7 +167,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           //=========================== Check cell on ref bndry
           bool on_ref_bndry = false;
           for (const auto& face : cell.faces){
-            if ( (face.neighbor < 0) and
+            if ( (not face.has_neighbor) and
                  (face.normal.Dot(rbndry->normal) > 0.999999) )
             {
               on_ref_bndry = true;
@@ -182,7 +182,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           int f=0;
           for (const auto& face : cell.faces)
           {
-            if ( (face.neighbor < 0) and
+            if ( (not face.has_neighbor) and
                  (face.normal.Dot(rbndry->normal) > 0.999999) )
             {
               cell_vec[c][f].clear();

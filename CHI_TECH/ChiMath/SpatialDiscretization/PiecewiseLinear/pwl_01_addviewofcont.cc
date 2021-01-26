@@ -79,9 +79,17 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
 void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
   chi_mesh::MeshContinuum* grid)
 {
+  chi_log.Log(LOG_0)
+    << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums.";
+  MPI_Barrier(MPI_COMM_WORLD);
+
   ref_grid = grid;
 
   grid->CommunicatePartitionNeighborCells(neighbor_cells);
+
+  chi_log.Log(LOG_0)
+    << "Done communicating neighbor cells.";
+  MPI_Barrier(MPI_COMM_WORLD);
 
 
   //================================================== Populate cell fe views

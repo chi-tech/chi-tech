@@ -89,11 +89,23 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
           slab->faces[0].vertex_ids.push_back(v);
           slab->faces[1].vertex_ids.push_back(v+1);
 
-          slab->faces[0].neighbor = cell_count-1;
-          slab->faces[1].neighbor = cell_count+1;
+          slab->faces[0].neighbor_id = cell_count-1;
+          slab->faces[1].neighbor_id = cell_count+1;
+
+          slab->faces[0].has_neighbor = true;
+          slab->faces[1].has_neighbor = true;
+
+          if (cell_count == 0)
+          {
+            slab->faces[0].neighbor_id = 0;
+            slab->faces[0].has_neighbor = false;
+          }
 
           if (v == (line_mesh->vertices.size()-2))
-            slab->faces[1].neighbor = -2;
+          {
+            slab->faces[1].neighbor_id = 1;
+            slab->faces[1].has_neighbor = false;
+          }
 
           //====================== Compute centroid
           chi_mesh::Vertex v0 = line_mesh->vertices[v];

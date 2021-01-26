@@ -75,7 +75,11 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
-      new_face.neighbor = face.e_index[k][2];
+      if (face.e_index[k][2]>=0)
+      {
+        new_face.neighbor_id = face.e_index[k][2];
+        new_face.has_neighbor = true;
+      }
 
       cell->faces.push_back(new_face);
 
@@ -128,7 +132,13 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
-      new_face.neighbor = src_side[2];
+      if (src_side[2] >= 0)
+      {
+        new_face.neighbor_id = src_side[2];
+        new_face.has_neighbor = true;
+      }
+      else
+        new_face.neighbor_id = 0;
 
       cell->faces.push_back(new_face);
     }
@@ -183,9 +193,9 @@ void chi_mesh::VolumeMesher::
     bool is_neighbor_to_this_loc = false;
     for (auto& face : ref_ghost_cell.faces)
     {
-      if (face.neighbor<0) continue;
+      if (not face.has_neighbor) continue;
 
-      auto adj_cell = in_grid->cells[face.neighbor];
+      auto adj_cell = in_grid->cells[face.neighbor_id];
       if (adj_cell.partition_id == chi_mpi.location_id)
       {
         is_neighbor_to_this_loc = true;
@@ -501,7 +511,7 @@ void chi_mesh::VolumeMesher::
 
     for (int f=0; f<cell.faces.size(); f++)
     {
-      if (cell.faces[f].neighbor < 0)
+      if (not cell.faces[f].has_neighbor)
       {
         vol_continuum->boundary_cell_indices.push_back(cell.global_id);
         break;
@@ -568,9 +578,9 @@ void chi_mesh::VolumeMesher::
   {
     for (auto& face : cell.faces)
     {
-      if (face.neighbor >= 0) continue;
+      if (face.has_neighbor) continue;
       if (log_vol->Inside(face.centroid) && sense){
-        face.neighbor = -1*(abs(bndry_id)+1);
+        face.neighbor_id = abs(bndry_id);
         ++num_faces_modified;
       }
     }

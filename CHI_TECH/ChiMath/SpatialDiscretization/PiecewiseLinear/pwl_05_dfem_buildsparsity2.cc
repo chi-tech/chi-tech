@@ -64,10 +64,9 @@ void SpatialDiscretization_PWL::
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if ((not face.IsNeighborLocal(grid)) and
-          (not grid->IsCellBndry(face.neighbor)))
+      if ((face.has_neighbor) and (not face.IsNeighborLocal(grid)) )
       {
-        auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor);
+        auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor_id);
 
         for (int i=0; i<cell_fe_view->dofs; ++i)
         {
@@ -95,8 +94,7 @@ void SpatialDiscretization_PWL::
   {
     for (auto& face : cell.faces)
     {
-      if ((not face.IsNeighborLocal(grid)) and
-          (not grid->IsCellBndry(face.neighbor)))
+      if ((face.has_neighbor) and (not face.IsNeighborLocal(grid)) )
       {
         local_neighboring_cell_indices.insert(cell.local_id);
         neighboring_partitions.insert(face.GetNeighborPartitionID(grid));
@@ -126,8 +124,7 @@ void SpatialDiscretization_PWL::
 
       for (auto& face : cell.faces)
       {
-        if ((not face.IsNeighborLocal(grid)) and
-            (not grid->IsCellBndry(face.neighbor)))
+        if ((face.has_neighbor) and (not face.IsNeighborLocal(grid)) )
         {
           if (face.GetNeighborPartitionID(grid) == adj_part)
             new_list.second.push_back(local_cell_index);

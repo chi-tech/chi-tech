@@ -64,13 +64,13 @@ ExportCellsToPython(const char* fileName, bool surface_only,
       {
         for (int f=0; f<polyh_cell.faces.size(); f++)
         {
-          if (polyh_cell.faces[f].neighbor < 0)
+          if (not polyh_cell.faces[f].has_neighbor)
           {
             num_faces++;
           }
           else
           {
-            auto& adj_cell = cells[polyh_cell.faces[f].neighbor];
+            auto& adj_cell = cells[polyh_cell.faces[f].neighbor_id];
             if (adj_cell.partition_id != chi_mpi.location_id)
             {
               num_faces++;
@@ -135,13 +135,13 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         for (int s=0; s< polyh_cell.faces.size(); s++)
         {
           bool export_face = false;
-          if (polyh_cell.faces[s].neighbor < 0)
+          if (not polyh_cell.faces[s].has_neighbor)
           {
             export_face = true;
           }
           else
           {
-            auto& adj_cell = cells[polyh_cell.faces[s].neighbor];
+            auto& adj_cell = cells[polyh_cell.faces[s].neighbor_id];
             if (adj_cell.partition_id != chi_mpi.location_id)
             {
               export_face = true;

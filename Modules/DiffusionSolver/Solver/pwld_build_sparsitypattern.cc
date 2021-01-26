@@ -26,7 +26,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
 
       for (size_t f=0; f<cell.faces.size(); f++)
       {
-        if (cell.faces[f].neighbor >= 0) //Not bndry
+        if (cell.faces[f].has_neighbor) //Not bndry
         {
           bool is_local = cell.faces[f].IsNeighborLocal(grid);
 
@@ -48,13 +48,13 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     //==================================== Boundary numbers
     for (size_t f=0; f<cell.faces.size(); f++)
     {
-      if (cell.faces[f].neighbor < 0)
+      if (not cell.faces[f].has_neighbor)
       {
         for (size_t fv=0; fv<cell.faces[f].vertex_ids.size(); fv++)
         {
           int fvi = cell.faces[f].vertex_ids[fv];
           nodal_boundary_numbers[fvi] =
-            cell.faces[f].neighbor;
+            cell.faces[f].neighbor_id;
         }//for fv
       }//if bndry
     }//for face v's
@@ -193,7 +193,7 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     int k=0;
     while (k<locI_info_size[locI])
     {
-      DiffusionIPBorderCell* border_cell = new DiffusionIPBorderCell;
+      auto border_cell = new DiffusionIPBorderCell;
       border_cell->cell_glob_index = locI_border_cell_info[locI][k]; k++;
       border_cell->cell_dof_start  = locI_border_cell_info[locI][k]; k++;
       border_cell->cell_type       = locI_border_cell_info[locI][k]; k++;
@@ -240,8 +240,8 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
     {
       for (int f=0; f<cell.faces.size(); f++)
       {
-        int neighbor = cell.faces[f].neighbor;
-        bool is_bndry = grid->IsCellBndry(neighbor);
+        auto neighbor = cell.faces[f].neighbor_id;
+        bool is_bndry = not cell.faces[f].has_neighbor;
         bool is_local = cell.faces[f].IsNeighborLocal(grid);
 
         if ((not is_bndry) and (not is_local))

@@ -66,9 +66,9 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
   std::vector<double> dirichlet_value(fe_view->dofs,0.0);
   for (int f=0; f<cell->faces.size(); f++)
   {
-    if (cell->faces[f].neighbor < 0)
+    if (not cell->faces[f].has_neighbor)
     {
-      int ir_boundary_index = abs(cell->faces[f].neighbor)-1;
+      int ir_boundary_index = cell->faces[f].neighbor_id;
       int ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
       if (ir_boundary_type == DIFFUSION_DIRICHLET)

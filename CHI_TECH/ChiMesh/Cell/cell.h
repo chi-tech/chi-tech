@@ -31,9 +31,9 @@ public:
   std::vector<uint64_t> vertex_ids;   /// A list of the vertices
   Normal normal;                 /// The average/geometric normal
   Vertex centroid;               /// The face centroid
-  int neighbor=-1;                /// Neigboring cell global id (<0 indicates bndry)
-//  bool has_neighbor=false;      ///< Flag indicating whether face has a neighbor
-//  uint64_t neighbor_id=0;       ///< If face has neighbor, contains the global id. 0 otherwise.
+//  int neighbor=-1;                /// Neigboring cell global id (<0 indicates bndry)
+  bool has_neighbor=false;      ///< Flag indicating whether face has a neighbor
+  uint64_t neighbor_id=0;       ///< If face has neighbor, contains the global id. 0 otherwise.
 
 private:
   int  neighbor_partition_id=-1;  /// Neighboring cell's partition id

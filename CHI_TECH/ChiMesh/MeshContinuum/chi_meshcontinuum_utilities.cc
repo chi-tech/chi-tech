@@ -200,7 +200,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 {
   int associated_face = cur_face.GetNeighborAssociatedFace(this);
   //======================================== Check index validity
-  if (IsCellBndry(cur_face.neighbor) || (not cur_face.IsNeighborLocal(this)))
+  if ((not cur_face.has_neighbor) || (not cur_face.IsNeighborLocal(this)))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid cell index encountered in call to "
@@ -262,7 +262,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
         << "Face DOF mapping failed in call to "
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
-        << cur_face.neighbor << " " << cur_face.centroid.PrintS();
+        << cur_face.neighbor_id << " " << cur_face.centroid.PrintS();
       exit(EXIT_FAILURE);
     }
   }

@@ -53,7 +53,7 @@ int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
   }
 
   chi_log.Log(LOG_ALLERROR)
-    << "SPDS Invalid mapping encountered in MapLocJToPrelocI.";
+    << "SPDS Invalid mapping encountered in MapLocJToDeplocI.";
   exit(EXIT_FAILURE);
   return -1;
 }

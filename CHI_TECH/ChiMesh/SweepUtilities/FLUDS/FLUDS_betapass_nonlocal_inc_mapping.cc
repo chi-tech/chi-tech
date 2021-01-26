@@ -25,9 +25,9 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
     {
-      int neighbor = face.neighbor;
+//      int neighbor = face.neighbor_id;
 
-      if ((!face.IsNeighborLocal(grid)) && (!grid->IsCellBndry(neighbor)))
+      if ((face.has_neighbor) and (!face.IsNeighborLocal(grid)) )
       {
         //============================== Find prelocI
         int locJ = face.GetNeighborPartitionID(grid);
@@ -40,7 +40,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           int ass_cell = -1;
           for (int c=0; c<prelocI_cell_views[prelocI].size(); c++)
           {
-            if (prelocI_cell_views[prelocI][c].first == neighbor)
+            if (prelocI_cell_views[prelocI][c].first == face.neighbor_id)
             {
               ass_cell = c;
               break;
@@ -52,7 +52,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                 << "Required predecessor cell not located in call to"
                 << " InitializeBetaElements. locJ=" << locJ
                 << " prelocI=" << prelocI
-                << " cell=" << neighbor;
+                << " cell=" << face.neighbor_id;
             exit(EXIT_FAILURE);
           }
 
@@ -128,7 +128,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           int ass_cell = -1;
           for (int c=0; c<delayed_prelocI_cell_views[delayed_preLocI].size(); c++)
           {
-            if (delayed_prelocI_cell_views[delayed_preLocI][c].first == neighbor)
+            if (delayed_prelocI_cell_views[delayed_preLocI][c].first == face.neighbor_id)
             {
               ass_cell = c;
               break;
@@ -140,7 +140,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                 << "Required predecessor cell not located in call to"
                 << " InitializeBetaElements. locJ=" << locJ
                 << " delayed prelocI=" << delayed_preLocI
-                << " cell=" << neighbor;
+                << " cell=" << face.neighbor_id;
             exit(EXIT_FAILURE);
           }
 

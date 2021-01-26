@@ -17,6 +17,10 @@ extern ChiMPI& chi_mpi;
 void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   std::vector<chi_mesh::Cell*>& neighbor_cells)
 {
+  chi_log.Log(LOG_0)
+    << "Communicating partition neighbors.";
+  MPI_Barrier(MPI_COMM_WORLD);
+
   std::set<int> local_neighboring_cell_indices;
   std::set<int> neighboring_partitions;
 
@@ -31,10 +35,10 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   {
     for (auto& face : cell.faces)
     {
-      if ((not face.IsNeighborLocal(this)) and (not IsCellBndry(face.neighbor)))
+      if (face.has_neighbor and (not face.IsNeighborLocal(this)))
       {
         local_neighboring_cell_indices.insert(cell.local_id);
-        neighboring_partitions.insert(cells[face.neighbor].partition_id);
+        neighboring_partitions.insert(cells[face.neighbor_id].partition_id);
       }
     }
   }
@@ -61,10 +65,9 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
 
       for (auto& face : cell.faces)
       {
-        if ((not face.IsNeighborLocal(this)) and
-            (not IsCellBndry(face.neighbor)))
+        if ((face.has_neighbor) and (not face.IsNeighborLocal(this)) )
         {
-          if (cells[face.neighbor].partition_id == adj_part)
+          if (cells[face.neighbor_id].partition_id == adj_part)
             new_list.second.push_back(local_cell_index);
         }
       }//for faces
@@ -128,7 +131,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
       border_cell_info.push_back(cell.vertex_ids.size());      //cell_dof_count
       border_cell_info.push_back(cell.faces.size());           //cell_face_count
 
-      for (int vid : cell.vertex_ids) //vid = vertex-id
+      for (auto vid : cell.vertex_ids) //vid = vertex-id
         border_cell_info.push_back(vid);//dof 0 to N
 
       for (auto& face : cell.faces)
