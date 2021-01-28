@@ -8,61 +8,45 @@ extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
 //###################################################################
-/**A private method that initializes a neighbor's parallel information.
- * For now these are 2 items:
- *  - neighbor_partition_id, and
- *  - neighbor_parallel_info_initialized */
-void chi_mesh::CellFace::
-  InitializeNeighborParallelInfo(chi_mesh::MeshContinuum *grid)
-{
-  auto& adj_cell = grid->cells[neighbor_id];
-  neighbor_partition_id = adj_cell.partition_id;
-  neighbor_parallel_info_initialized = true;
-
-  if (neighbor_partition_id == chi_mpi.location_id)
-    neighbor_local_id = adj_cell.local_id;
-}
-
-//###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
 bool chi_mesh::CellFace::
-  IsNeighborLocal(chi_mesh::MeshContinuum *grid)
+  IsNeighborLocal(chi_mesh::MeshContinuum *grid) const
 {
   if (not has_neighbor) return false;
   if (chi_mpi.process_count == 1) return true;
 
-  if (not neighbor_parallel_info_initialized)
-    InitializeNeighborParallelInfo(grid);
+  auto& adj_cell = grid->cells[neighbor_id];
 
-  return (neighbor_partition_id == chi_mpi.location_id);
+  return (adj_cell.partition_id == chi_mpi.location_id);
 }
 
 //###################################################################
 /**Determines the neighbor's partition.*/
 int chi_mesh::CellFace::
-  GetNeighborPartitionID(chi_mesh::MeshContinuum *grid)
+  GetNeighborPartitionID(chi_mesh::MeshContinuum *grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return 0;
 
-  if (not neighbor_parallel_info_initialized)
-    InitializeNeighborParallelInfo(grid);
+  auto& adj_cell = grid->cells[neighbor_id];
 
-  return neighbor_partition_id;
+  return adj_cell.partition_id;
 }
 
 //###################################################################
 /**Determines the neighbor's local id.*/
 int chi_mesh::CellFace::
-  GetNeighborLocalID(chi_mesh::MeshContinuum *grid)
+  GetNeighborLocalID(chi_mesh::MeshContinuum *grid) const
 {
   if (not has_neighbor) return -1;
-  if (chi_mpi.process_count == 1) return neighbor_id;
+  if (chi_mpi.process_count == 1) return neighbor_id; //cause global_ids=local_ids
 
-  if (not neighbor_parallel_info_initialized)
-    InitializeNeighborParallelInfo(grid);
+  auto& adj_cell = grid->cells[neighbor_id];
 
-  return neighbor_local_id;
+  if (adj_cell.partition_id != chi_mpi.location_id)
+    throw std::logic_error("Cell local ID requested from a non-local cell.");
+
+  return adj_cell.local_id;
 }
 
 //###################################################################
@@ -70,7 +54,7 @@ int chi_mesh::CellFace::
 int chi_mesh::CellFace::
   GetNeighborAssociatedFace(chi_mesh::MeshContinuum *grid)
 {
-  auto& cur_face = *this;
+  auto& cur_face = *this; //just for readability
   //======================================== Check index validity
   if ((not cur_face.has_neighbor) || (not cur_face.IsNeighborLocal(grid)))
   {
@@ -88,14 +72,14 @@ int chi_mesh::CellFace::
   if (cur_face.neighbor_ass_face < 0)
   {
     std::set<uint64_t> cfvids(cur_face.vertex_ids.begin(),
-                              cur_face.vertex_ids.end());
+                              cur_face.vertex_ids.end()); //cur_face vertex ids
     //======================================== Loop over adj cell faces
     int af=-1;
     for (auto& adj_face : adj_cell->faces)
     {
       ++af;
       std::set<uint64_t> afvids(adj_face.vertex_ids.begin(),
-                                adj_face.vertex_ids.end());
+                                adj_face.vertex_ids.end()); //adj_face vertex ids
 
       if (afvids == cfvids) {associated_face = af; break;}
     }
