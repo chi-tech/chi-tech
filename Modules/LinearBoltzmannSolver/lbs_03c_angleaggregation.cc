@@ -96,7 +96,8 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
           {
             make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
-                  PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+                  PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss],
+                                grid_nodal_mappings);
 
             chi_log.Log(LOG_0VERBOSE_1)
               << "Initializing FLUDS for omega="
@@ -161,7 +162,8 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset *groupset)
           {
             make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
-            PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+            PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss],
+                          grid_nodal_mappings);
 
             chi_log.Log(LOG_0VERBOSE_1)
               << "Initializing FLUDS for omega="
@@ -257,7 +259,8 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
             {
               make_primary = false;
               primary_fluds = new chi_mesh::sweep_management::
-                PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+                PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss],
+                              grid_nodal_mappings);
 
               chi_log.Log(LOG_0VERBOSE_1)
                 << "Initializing FLUDS for omega="
@@ -322,7 +325,8 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
             {
               make_primary = false;
               primary_fluds = new chi_mesh::sweep_management::
-              PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+              PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss],
+                            grid_nodal_mappings);
 
               chi_log.Log(LOG_0VERBOSE_1)
                 << "Initializing FLUDS for omega="
@@ -393,7 +397,8 @@ void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset *groupset)
           {
             make_primary = false;
             primary_fluds = new chi_mesh::sweep_management::
-              PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss]);
+              PRIMARY_FLUDS(groupset->grp_subset_sizes[gs_ss],
+                            grid_nodal_mappings);
 
             chi_log.Log(LOG_0VERBOSE_1)
               << "Initializing FLUDS for omega="

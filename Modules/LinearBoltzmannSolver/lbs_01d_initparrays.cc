@@ -93,6 +93,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
+  grid_nodal_mappings.reserve(grid->local_cells.size());
   if (cell_transport_views.empty())
   {
     for (auto& cell : grid->local_cells)
@@ -106,6 +107,9 @@ void LinearBoltzmann::Solver::InitializeParrays()
 
       full_cell_view->dof_phi_map_start = block_MG_counter;
       block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
+
+      chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
+      cell_nodal_mapping.reserve(cell.faces.size());
 
       //Init face upwind flags and adj_partition_id
       full_cell_view->face_local.resize(cell.faces.size(),true);
@@ -130,6 +134,18 @@ void LinearBoltzmann::Solver::InitializeParrays()
         if (not face.IsNeighborLocal(grid))
           full_cell_view->face_local[f] = false;
 
+        //Local nodal mappings
+        std::vector<short> face_nodal_mapping;
+        int ass_face = -1;
+
+        if (face.has_neighbor and face.IsNeighborLocal(grid))
+        {
+          grid->FindAssociatedVertices(face,face_nodal_mapping);
+          ass_face = face.GetNeighborAssociatedFace(grid);
+        }
+
+        cell_nodal_mapping.emplace_back(ass_face,face_nodal_mapping);
+
         ++f;
       }//for f
 
@@ -140,6 +156,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
         max_cell_dof_count = cell_fe_view->dofs;
 
       cell_transport_views.push_back(full_cell_view);
+      grid_nodal_mappings.push_back(cell_nodal_mapping);
     }//for local cell
   }//if empty
 

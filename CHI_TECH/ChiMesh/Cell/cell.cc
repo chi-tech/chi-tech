@@ -52,66 +52,63 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's associated face.*/
 int chi_mesh::CellFace::
-  GetNeighborAssociatedFace(chi_mesh::MeshContinuum *grid)
+  GetNeighborAssociatedFace(chi_mesh::MeshContinuum *grid) const
 {
-  auto& cur_face = *this; //just for readability
+  const auto& cur_face = *this; //just for readability
   //======================================== Check index validity
   if ((not cur_face.has_neighbor) || (not cur_face.IsNeighborLocal(grid)))
   {
-    chi_log.Log(LOG_ALLERROR)
+    std::stringstream outstr;
+    outstr
       << "Invalid cell index encountered in call to "
       << "CellFace::GetNeighborAssociatedFace. Index points "
       << "to either a boundary"
       << "or a non-local cell.";
-    exit(EXIT_FAILURE);
+    throw std::logic_error(outstr.str());
   }
 
-  auto adj_cell = &grid->local_cells[cur_face.GetNeighborLocalID(grid)];
+  const auto& adj_cell = grid->local_cells[cur_face.GetNeighborLocalID(grid)];
 
   int associated_face = -1;
-  if (cur_face.neighbor_ass_face < 0)
-  {
-    std::set<uint64_t> cfvids(cur_face.vertex_ids.begin(),
-                              cur_face.vertex_ids.end()); //cur_face vertex ids
-    //======================================== Loop over adj cell faces
-    int af=-1;
-    for (auto& adj_face : adj_cell->faces)
-    {
-      ++af;
-      std::set<uint64_t> afvids(adj_face.vertex_ids.begin(),
-                                adj_face.vertex_ids.end()); //adj_face vertex ids
+  std::set<uint64_t> cfvids(cur_face.vertex_ids.begin(),
+                            cur_face.vertex_ids.end()); //cur_face vertex ids
 
-      if (afvids == cfvids) {associated_face = af; break;}
-    }
+  //======================================== Loop over adj cell faces
+  int af=-1;
+  for (const auto& adj_face : adj_cell.faces)
+  {
+    ++af;
+    std::set<uint64_t> afvids(adj_face.vertex_ids.begin(),
+                              adj_face.vertex_ids.end()); //adj_face vertex ids
+
+    if (afvids == cfvids) {associated_face = af; break;}
   }
-  else
-    associated_face = cur_face.neighbor_ass_face;
 
   //======================================== Check associated face validity
   if (associated_face<0)
   {
-    chi_log.Log(LOG_ALLERROR)
+    std::stringstream outstr;
+    outstr
       << "Could not find associated face in call to "
       << "CellFace::GetNeighborAssociatedFace.\n"
       << "Reference face with centroid at: "
       << cur_face.centroid.PrintS() << "\n"
-      << "Adjacent cell: " << adj_cell->global_id;
-    for (int af=0; af < adj_cell->faces.size(); af++)
+      << "Adjacent cell: " << adj_cell.global_id << "\n";
+    for (int afi=0; afi < adj_cell.faces.size(); afi++)
     {
-      chi_log.Log(LOG_ALLERROR)
-        << "Adjacent cell face " << af << " centroid "
-        << adj_cell->faces[af].centroid.PrintS();
+      outstr
+        << "Adjacent cell face " << afi << " centroid "
+        << adj_cell.faces[afi].centroid.PrintS();
     }
-    exit(EXIT_FAILURE);
+    throw std::runtime_error(outstr.str());
   }
 
-  cur_face.neighbor_ass_face = associated_face;
   return associated_face;
 }
 
 //###################################################################
 /**Computes the face area.*/
-double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum *grid)
+double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum *grid) const
 {
   if (vertex_ids.size() <= 1)
     return 1.0;

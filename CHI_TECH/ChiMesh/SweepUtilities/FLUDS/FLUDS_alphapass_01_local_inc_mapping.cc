@@ -17,6 +17,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
                      std::vector<int>&  local_so_cell_mapping)
 {
   chi_mesh::MeshContinuum* grid = spds->grid;
+  auto& cell_nodal_mapping = grid_nodal_mappings[cell->local_id];
   std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 
   short        incoming_face_count=-1;
@@ -37,10 +38,10 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         incoming_face_count++;
         //======================================== Find associated face for
         //                                         dof mapping
-        int ass_face = face.GetNeighborAssociatedFace(grid);
+        int ass_face = cell_nodal_mapping[f].associated_face;
 
         std::pair<int,std::vector<short>> dof_mapping;
-        grid->FindAssociatedVertices(face, dof_mapping.second);
+        dof_mapping.second = cell_nodal_mapping[f].node_mapping;
 
         //======================================== Find associated face
         //                                         counter for slot lookup
@@ -69,8 +70,6 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
           exit(EXIT_FAILURE);
         }
 
-//        dof_mapping.first = /*local_psi_stride*G**/
-//          so_cell_outb_face_slot_indices[adj_so_index][ass_f_counter];
         dof_mapping.first = /*local_psi_stride*G**/
           so_cell_outb_face_slot_indices[adj_so_index][ass_f_counter];
 
@@ -80,10 +79,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
     }//if incident
   }//for incindent f
 
-//  so_cell_inco_face_dof_indices.push_back(inco_face_dof_mapping);
-
-  INCOMING_FACE_INFO* inco_face_info_array =
-    new INCOMING_FACE_INFO[inco_face_dof_mapping.size()];
+  auto inco_face_info_array = new INCOMING_FACE_INFO[inco_face_dof_mapping.size()];
   for (int i=0; i<inco_face_dof_mapping.size(); ++i)
     inco_face_info_array[i].Setup(inco_face_dof_mapping[i]);
 

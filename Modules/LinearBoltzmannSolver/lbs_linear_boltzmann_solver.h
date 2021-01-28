@@ -43,6 +43,7 @@ struct SourceFlags
 /**A neutral particle transport solver.*/
 class Solver : public chi_physics::Solver
 {
+  typedef chi_mesh::sweep_management::CellFaceNodalMapping CellFaceNodalMapping;
 protected:
   size_t source_event_tag=0;
 
@@ -61,6 +62,7 @@ public:
 
   SpatialDiscretization *discretization;
   chi_mesh::MeshContinuum *grid;
+  std::vector<CellFaceNodalMapping> grid_nodal_mappings;
   std::vector<LinearBoltzmann::CellViewBase *> cell_transport_views;
 
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeLocalAndDownstreamBuffers

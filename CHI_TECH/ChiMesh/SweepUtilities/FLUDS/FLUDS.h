@@ -15,6 +15,18 @@ typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;
 
 namespace chi_mesh::sweep_management
 {
+  struct FaceNodalMapping
+  {
+    const int associated_face;
+    const std::vector<short> node_mapping;
+
+    FaceNodalMapping(int in_ass_face,
+                     std::vector<short>& in_node_mapping) :
+                     associated_face(in_ass_face),
+                     node_mapping(in_node_mapping) {}
+  };
+  typedef std::vector<FaceNodalMapping> CellFaceNodalMapping;
+
   class FLUDS
   {
   public:
@@ -221,8 +233,13 @@ private:
   std::vector<std::vector<CompactCellView>> prelocI_cell_views;
   std::vector<std::vector<CompactCellView>> delayed_prelocI_cell_views;
 
+  std::vector<CellFaceNodalMapping>& grid_nodal_mappings;
+
 public:
-  PRIMARY_FLUDS(int in_G): G(in_G)
+  PRIMARY_FLUDS(int in_G,
+                std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings) :
+                G(in_G),
+                grid_nodal_mappings(in_grid_nodal_mappings)
   { }
 
 public:
