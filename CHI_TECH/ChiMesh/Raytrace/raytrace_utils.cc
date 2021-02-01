@@ -219,8 +219,8 @@ chi_mesh::CheckPointInTriangle(
 //###################################################################
 /** Populates segment lengths along a ray.*/
 void chi_mesh::PopulateRaySegmentLengths(
-  const chi_mesh::MeshContinuum* grid,
-  Cell* cell,
+  const chi_mesh::MeshContinuum& grid,
+  Cell& cell,
   std::vector<double> &segment_lengths,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,
@@ -228,7 +228,7 @@ void chi_mesh::PopulateRaySegmentLengths(
 {
   std::set<double> distance_set;
 
-  double track_length = 0.0;
+  double track_length;
   if (segment_lengths.empty())
   {
     track_length = (line_point1-line_point0).Norm();
@@ -250,18 +250,18 @@ void chi_mesh::PopulateRaySegmentLengths(
   // centroid vc.
   // Since the triangles all share an edge we only determine
   // segment lengths from the strip defined by v0 to vc.
-  if (cell->Type() == chi_mesh::CellType::POLYGON)
+  if (cell.Type() == chi_mesh::CellType::POLYGON)
   {
-    auto poly_cell = (chi_mesh::CellPolygon*)cell;
+    auto& poly_cell = (chi_mesh::CellPolygon&)cell;
 
     int f=-1;
-    for (auto& face : cell->faces) //edges
+    for (auto& face : cell.faces) //edges
     {
       f++;
-      chi_mesh::Vertex& v0 = *grid->vertices[face.vertex_ids[0]];
-      chi_mesh::Vertex& vc = cell->centroid;
+      chi_mesh::Vertex& v0 = *grid.vertices[face.vertex_ids[0]];
+      chi_mesh::Vertex& vc = cell.centroid;
 
-      auto& n0 = poly_cell->GetSegmentNormals(grid)[f];
+      auto& n0 = poly_cell.GetSegmentNormals(&grid)[f];
 
       chi_mesh::Vertex intersection_point;
       double d = 0.0;
@@ -278,12 +278,12 @@ void chi_mesh::PopulateRaySegmentLengths(
 
     }//for face
   }
-  else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+  else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    auto& vcc = cell->centroid;
+    auto& vcc = cell.centroid;
 
     int f=-1;
-    for (auto& face : cell->faces)
+    for (auto& face : cell.faces)
     {
       f++;
       auto& vfc  = face.centroid;
@@ -291,7 +291,7 @@ void chi_mesh::PopulateRaySegmentLengths(
       //===================== Face center to vertex segments
       for (auto vi : face.vertex_ids)
       {
-        auto& vert = *grid->vertices[vi];
+        auto& vert = *grid.vertices[vi];
 
         chi_mesh::Vertex intersection_point;
 
@@ -314,8 +314,8 @@ void chi_mesh::PopulateRaySegmentLengths(
                     face.vertex_ids[v+1] :
                     face.vertex_ids[0];
 
-        auto& v0 = *grid->vertices[vid_0];
-        auto& v1 = *grid->vertices[vid_1];
+        auto& v0 = *grid.vertices[vid_0];
+        auto& v1 = *grid.vertices[vid_1];
         auto& v2 = vcc;
 
         chi_mesh::Vertex intersection_point;

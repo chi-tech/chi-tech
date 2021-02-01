@@ -1,5 +1,5 @@
-#ifndef _chi_ffinter_volume_h
-#define _chi_ffinter_volume_h
+#ifndef CHI_FFINTER_VOLUME_H
+#define CHI_FFINTER_VOLUME_H
 
 #include "../chi_ffinterpolation.h"
 #include <ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h>
@@ -46,8 +46,8 @@ public:
   //02
   void Execute();
 
-  void CFEMInterpolate(Vec field, std::vector<int> &mapping);
-  void PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping);
+  void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
+  void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping);
 
   void ExportPython(std::string base_name)
   {

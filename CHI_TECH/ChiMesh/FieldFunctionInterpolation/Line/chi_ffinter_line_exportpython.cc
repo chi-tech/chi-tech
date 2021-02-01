@@ -83,7 +83,7 @@ ExportPython(std::string base_name)
     }
     for (int p=0; p<interpolation_points.size(); p++)
     {
-      if ((ff_ctx->interpolation_points_ass_cell[p]<0)  &&
+      if ((not ff_ctx->interpolation_points_has_ass_cell[p])  &&
           (chi_mpi.location_id != 0))
       {
         continue;

@@ -85,7 +85,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
     ofile
     << offset << "new_cell_data = CellData()\n";
 
-    size_t num_points = cell_intersections[c]->intersections.size();
+    size_t num_points = cell_intersections[c].intersections.size();
     ofile
     << offset << "new_cell_data.xy = np.zeros(("
               << std::to_string(num_points) << ",2))\n"
@@ -93,9 +93,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
               << std::to_string(num_points) << ")\n";
     for (int p=0; p<num_points; p++)
     {
-      x = cell_intersections[c]->intersections[p]->point2d.x;
-      y = cell_intersections[c]->intersections[p]->point2d.y;
-      v = cell_intersections[c]->intersections[p]->point_value;
+      x = cell_intersections[c].intersections[p].point2d.x;
+      y = cell_intersections[c].intersections[p].point2d.y;
+      v = cell_intersections[c].intersections[p].point_value;
 
       ofile
         << offset
@@ -108,7 +108,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
         << "new_cell_data.c[" << std::to_string(p)
         << "] = " << std::to_string(v) << "\n";
     }
-    v = cell_intersections[c]->cell_avg_value;
+    v = cell_intersections[c].cell_avg_value;
     ofile
       << offset
       << "new_cell_data.avg = " << std::to_string(v) << "\n";

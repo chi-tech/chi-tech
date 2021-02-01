@@ -106,7 +106,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
       pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> dofs_to_map(num_verts);
       std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
@@ -120,7 +120,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
         dofs_to_map,
         cell_to_map,
         spatial_discretization->cell_dfem_block_address,
-        &mapping);
+        mapping);
 
       double cell_avg_value = 0.0;
       for (int v=0; v<num_verts; v++)
@@ -159,7 +159,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
       pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> dofs_to_map(num_verts);
       std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
@@ -173,7 +173,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
         dofs_to_map,
         cell_to_map,
         spatial_discretization->cell_dfem_block_address,
-        &mapping);
+        mapping);
 
       double cell_avg_value = 0.0;
       for (int v=0; v<num_verts; v++)
@@ -231,7 +231,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
       pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> dofs_to_map(num_verts);
       std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
@@ -245,7 +245,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
         dofs_to_map,
         cell_to_map,
         spatial_discretization->cell_dfem_block_address,
-        &mapping);
+        mapping);
 
       double cell_avg_value = 0.0;
       for (int v=0; v<num_verts; v++)
@@ -298,8 +298,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
 void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
                                                   const std::string& field_name)
 {
-  SpatialDiscretization_PWL* pwl_sdm =
-    (SpatialDiscretization_PWL*)spatial_discretization;
+  auto pwl_sdm = (SpatialDiscretization_PWL*)spatial_discretization;
 
   chi_mesh::FieldFunctionInterpolation ff_interpol;
   ff_interpol.grid_view = grid;
@@ -375,7 +374,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
       pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> dofs_to_map(num_verts);
       std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
@@ -389,7 +388,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
         dofs_to_map,
         cell_to_map,
         spatial_discretization->cell_dfem_block_address,
-        &mapping);
+        mapping);
 
       for (int g=0; g < num_components; g++)
       {
@@ -432,7 +431,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
       pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> dofs_to_map(num_verts);
       std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
@@ -446,7 +445,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
         dofs_to_map,
         cell_to_map,
         spatial_discretization->cell_dfem_block_address,
-        &mapping);
+        mapping);
 
       for (int g=0; g < num_components; g++)
       {
@@ -507,7 +506,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
       pararray->InsertNextValue(cell.partition_id);
 
       //============= Create dof mapping
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> dofs_to_map(num_verts);
       std::vector<int> cell_to_map(num_verts, cell_local_id);
       for (int v=0; v<num_verts; v++)
@@ -521,7 +520,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
         dofs_to_map,
         cell_to_map,
         spatial_discretization->cell_dfem_block_address,
-        &mapping);
+        mapping);
 
       for (int g=0; g < num_components; g++)
       {

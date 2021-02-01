@@ -79,10 +79,10 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
     for (auto vid : cell.vertex_ids)
       cfem_nodes.push_back(vid);
 
-  std::vector<int> mapping;
+  std::vector<uint64_t> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_components, num_sets, ref_component, ref_set,
-                                *field_vector, phi_vec, cfem_nodes, &mapping,
+                                *field_vector, phi_vec, cfem_nodes, mapping,
                                 spatial_discretization);
 
 
@@ -317,10 +317,10 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
 //      for (int g=0; g < num_components; g++)
         cfem_nodes.push_back(vid);
 
-  std::vector<int> mapping;
+  std::vector<uint64_t> mapping;
   Vec phi_vec;
   ff_interpol.CreateCFEMMapping(num_components, num_sets, ref_component, ref_set,
-                                *field_vector, phi_vec, cfem_nodes, &mapping,
+                                *field_vector, phi_vec, cfem_nodes, mapping,
                                 spatial_discretization);
 
 

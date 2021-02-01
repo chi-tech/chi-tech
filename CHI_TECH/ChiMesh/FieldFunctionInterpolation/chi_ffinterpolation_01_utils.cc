@@ -122,6 +122,26 @@ bool chi_mesh::FieldFunctionInterpolation::
   return false;
 }
 
+//###################################################################
+/**Computes interpolated field function values.*/
+void chi_mesh::FieldFunctionInterpolation::
+CreateFVMapping(int num_grps, int num_moms, int g, int m,
+                std::vector<uint64_t> &cells, std::vector<uint64_t>& mapping)
+{
+  for (auto& cell_local_index : cells)
+  {
+    if (cell_local_index < 0)
+    {
+      mapping.push_back(-1);
+      continue;
+    }
+
+    int address = cell_local_index*num_grps*num_moms + num_grps*m + g;
+
+    mapping.push_back(address);
+  }
+}
+
 
 //###################################################################
 /** Creates a mapping from a global vector */
@@ -129,7 +149,7 @@ void chi_mesh::FieldFunctionInterpolation::
 CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                   Vec& x, Vec& x_cell,
                   std::vector<int> &cfem_nodes,
-                  std::vector<int> *mapping,
+                  std::vector<uint64_t>& mapping,
                   SpatialDiscretization* sdm)
 {
   chi_mesh::MeshHandler* cur_handler = chi_mesh::GetCurrentHandler();
@@ -145,19 +165,25 @@ CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
       cfem_nodes[n])*num_grps + g;
 
     mapped_nodes.push_back(ir);
-    mapping->push_back(n);
+    mapping.push_back(n);
   }
 
 
   VecCreateSeq(PETSC_COMM_SELF,mapped_nodes.size()+1,&x_cell);
   VecSet(x_cell,0.0);
 
+  std::vector<int> int_mapping;
+
+  std::copy(mapping.begin(),
+            mapping.end(),
+            std::back_inserter(int_mapping));
+
 
   IS global_set;
   IS local_set;
   ISCreateGeneral(PETSC_COMM_WORLD, num_nodes_to_map, mapped_nodes.data(),
                   PETSC_COPY_VALUES,&global_set);
-  ISCreateGeneral(PETSC_COMM_WORLD, num_nodes_to_map, mapping->data(),
+  ISCreateGeneral(PETSC_COMM_WORLD, num_nodes_to_map, int_mapping.data(),
                   PETSC_COPY_VALUES,&local_set);
   VecScatter scat;
   VecScatterCreate(x,global_set,x_cell,local_set,&scat);
@@ -176,7 +202,7 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
                   std::vector<int> &pwld_nodes,
                   std::vector<int> &pwld_cells,
                   std::vector<int> &local_cell_dof_array_address,
-                  std::vector<int> *mapping)
+                  std::vector<uint64_t>& mapping)
 {
   size_t num_nodes_to_map = pwld_nodes.size();
   for (size_t n=0; n< num_nodes_to_map; n++)
@@ -190,7 +216,7 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
 
     int address = (dof_map_start + dof)*num_grps*num_moms + num_grps*m + g;
 
-    mapping->push_back(address);
+    mapping.push_back(address);
   }
 
 }
@@ -227,22 +253,3 @@ CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
 //
 //}
 
-//###################################################################
-/**Computes interpolated field function values.*/
-void chi_mesh::FieldFunctionInterpolation::
-  CreateFVMapping(int num_grps, int num_moms, int g, int m,
-                  std::vector<int> &cells, std::vector<int> *mapping)
-{
-  for (auto& cell_local_index : cells)
-  {
-    if (cell_local_index < 0)
-    {
-      mapping->push_back(-1);
-      continue;
-    }
-
-    int address = cell_local_index*num_grps*num_moms + num_grps*m + g;
-
-    mapping->push_back(address);
-  }
-}

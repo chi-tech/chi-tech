@@ -1,5 +1,5 @@
-#ifndef _chi_mesh_raytracing_h
-#define _chi_mesh_raytracing_h
+#ifndef CHI_MESH_RAYTRACING_H
+#define CHI_MESH_RAYTRACING_H
 
 #include "../chi_mesh.h"
 
@@ -8,18 +8,18 @@ namespace chi_mesh
 
 struct RayDestinationInfo
 {
-  int destination_face_neighbor; //Neighbor cell global-id
-  int destination_face_index;    //Neighbor cell face index (deprecated)
+  uint64_t     destination_face_neighbor; //Neighbor cell global-id
+  unsigned int destination_face_index;    //Neighbor cell face index (deprecated)
 
   RayDestinationInfo() :
-  destination_face_neighbor(-1),
-  destination_face_index(-1)
+  destination_face_neighbor(0),
+  destination_face_index(0)
   {}
 };
 
 //=================================== Raytracing
-RayDestinationInfo RayTrace(chi_mesh::MeshContinuum* grid,
-                            Cell* cell,
+RayDestinationInfo RayTrace(const chi_mesh::MeshContinuum& grid,
+                            const Cell& cell,
                             const Vector3& pos_i,
                             const Vector3& omega_i,
                             double& d_to_surface,
@@ -58,8 +58,8 @@ CheckLineIntersectTriangle2(
   double* distance_to_intersection = nullptr);
 
 void PopulateRaySegmentLengths(
-  const chi_mesh::MeshContinuum* grid,
-  Cell* cell,
+  const chi_mesh::MeshContinuum& grid,
+  Cell& cell,
   std::vector<double> &segment_lengths,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,

@@ -24,7 +24,7 @@ extern ChiLog& chi_log;
 void chi_mesh::FieldFunctionInterpolationLine::
 Initialize()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing line interpolator2.";
+  chi_log.Log(LOG_0VERBOSE_1) << "Initializing line interpolator.";
   //================================================== Check grid available
   if (field_functions.empty())
   {
@@ -44,6 +44,13 @@ Initialize()
   for (int k=1; k<(number_of_points); k++)
     interpolation_points.push_back(pi + vif*delta_d*k);
 
+  //====================================================== Initialize scratch data
+  std::vector<int>               cfem_local_nodes_needed_unmapped;
+  std::vector<int>               pwld_local_nodes_needed_unmapped;
+  std::vector<int>               pwld_local_cells_needed_unmapped;
+  std::vector<uint64_t>          interpolation_points_ass_cell;
+  std::vector<bool>              interpolation_points_has_ass_cell;
+
   //====================================================== Loop over contexts
   size_t num_ff = field_functions.size();
   for (size_t ff=0; ff<num_ff; ff++)
@@ -56,8 +63,12 @@ Initialize()
     if (grid_view != field_functions[ff]->grid)
     {
       grid_view = field_functions[ff]->grid;
-      interpolation_points_ass_cell.resize(number_of_points,-1);
-      interpolation_points_ass_cell.assign(number_of_points,-1);
+      interpolation_points_ass_cell.resize(number_of_points,0);
+      interpolation_points_ass_cell.assign(number_of_points,0);
+
+      interpolation_points_has_ass_cell.resize(number_of_points,false);
+      interpolation_points_has_ass_cell.assign(number_of_points,false);
+
       cfem_local_nodes_needed_unmapped.clear();
       pwld_local_nodes_needed_unmapped.clear();
       pwld_local_cells_needed_unmapped.clear();
@@ -94,9 +105,10 @@ Initialize()
               is_inside = false;
             }
 
-            if (is_inside and interpolation_points_ass_cell[p]<0)
+            if (is_inside)
             {
               interpolation_points_ass_cell[p] = cell_local_index;
+              interpolation_points_has_ass_cell[p] = true;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -142,6 +154,7 @@ Initialize()
             if (is_inside)
             {
               interpolation_points_ass_cell[p] = cell_local_index;
+              interpolation_points_has_ass_cell[p] = true;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -187,6 +200,7 @@ Initialize()
             if (is_inside)
             {
               interpolation_points_ass_cell[p] = cell_local_index;
+              interpolation_points_has_ass_cell[p] = true;
               chi_log.Log(LOG_ALLVERBOSE_2)
                 << "Cell inter section found  " << p;
             }
@@ -201,19 +215,19 @@ Initialize()
       size_t num_interp_points = interpolation_points_ass_cell.size();
       for (size_t c=0; c<num_interp_points; c++)
       {
-        if (interpolation_points_ass_cell[c] < 0) continue;
+        if (not interpolation_points_has_ass_cell[c]) continue;
 
         int cell_local_index = interpolation_points_ass_cell[c];
-        auto cell = &grid_view->local_cells[cell_local_index];
+        const auto& cell = grid_view->local_cells[cell_local_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-        if (cell->Type() == chi_mesh::CellType::SLAB)
+        if (cell.Type() == chi_mesh::CellType::SLAB)
         {
-          auto slab_cell = (chi_mesh::CellSlab*)cell;
+          const auto& slab_cell = (chi_mesh::CellSlab&)cell;
 
           for (int i=0; i<2; i++)
           {
-            cfem_local_nodes_needed_unmapped.push_back(slab_cell->vertex_ids[i]);
+            cfem_local_nodes_needed_unmapped.push_back(slab_cell.vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
@@ -221,14 +235,14 @@ Initialize()
         }//if poly
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-        if (cell->Type() == chi_mesh::CellType::POLYGON)
+        if (cell.Type() == chi_mesh::CellType::POLYGON)
         {
-          auto poly_cell = (chi_mesh::CellPolygon*)cell;
+          const auto& poly_cell = (chi_mesh::CellPolygon&)cell;
 
-          size_t num_verts = poly_cell->vertex_ids.size();
+          size_t num_verts = poly_cell.vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
           {
-            cfem_local_nodes_needed_unmapped.push_back(poly_cell->vertex_ids[i]);
+            cfem_local_nodes_needed_unmapped.push_back(poly_cell.vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
@@ -236,14 +250,14 @@ Initialize()
         }//if poly
 
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+        else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+          const auto& polyh_cell = (chi_mesh::CellPolyhedron&)cell;
 
-          size_t num_verts = polyh_cell->vertex_ids.size();
+          size_t num_verts = polyh_cell.vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
           {
-            cfem_local_nodes_needed_unmapped.push_back(polyh_cell->vertex_ids[i]);
+            cfem_local_nodes_needed_unmapped.push_back(polyh_cell.vertex_ids[i]);
             pwld_local_nodes_needed_unmapped.push_back(i);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
@@ -255,22 +269,11 @@ Initialize()
 
     //Copies the latest developed references to the specific
     //field function context
-    std::copy(cfem_local_nodes_needed_unmapped.begin(),
-              cfem_local_nodes_needed_unmapped.end(),
-              std::back_inserter(
-              ff_context->cfem_local_nodes_needed_unmapped));
-    std::copy(pwld_local_nodes_needed_unmapped.begin(),
-              pwld_local_nodes_needed_unmapped.end(),
-              std::back_inserter(
-                ff_context->pwld_local_nodes_needed_unmapped));
-    std::copy(pwld_local_cells_needed_unmapped.begin(),
-              pwld_local_cells_needed_unmapped.end(),
-              std::back_inserter(
-                ff_context->pwld_local_cells_needed_unmapped));
-    std::copy(interpolation_points_ass_cell.begin(),
-              interpolation_points_ass_cell.end(),
-              std::back_inserter(
-                ff_context->interpolation_points_ass_cell));
+    ff_context->cfem_local_nodes_needed_unmapped  = cfem_local_nodes_needed_unmapped;
+    ff_context->pwld_local_nodes_needed_unmapped  = pwld_local_nodes_needed_unmapped;
+    ff_context->pwld_local_cells_needed_unmapped  = pwld_local_cells_needed_unmapped;
+    ff_context->interpolation_points_ass_cell     = interpolation_points_ass_cell;
+    ff_context->interpolation_points_has_ass_cell = interpolation_points_has_ass_cell;
   }//for ff
 
 

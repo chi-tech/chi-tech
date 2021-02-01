@@ -206,7 +206,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     //====================================== Setting Q
     if ((q_field != nullptr) and (cell_is_local))
     {
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> pwld_nodes;
       std::vector<int> pwld_cells;
 
@@ -223,15 +223,11 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  group-gi,moment,
                                  pwld_nodes,pwld_cells,
                                  pwl_sdm->cell_dfem_block_address,
-                                 //*q_field->local_cell_dof_array_address,
-                                 &mapping);
+                                 mapping);
 
       for (int i=0; i<cell_dofs; i++)
       {
-//        sourceQ[i] = q_field->field_vector_local->operator[](mapping[i]);
-        try {
-          sourceQ[i] = q_field->field_vector_local->at(mapping[i]);
-        }
+        try { sourceQ[i] = q_field->field_vector_local->at(mapping[i]); }
         catch (const std::out_of_range& o)
         {
           chi_log.Log(LOG_ALLERROR)
@@ -290,7 +286,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     //====================================== Setting Q
     if ((q_field != nullptr) and (cell_is_local))
     {
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> pwld_nodes;
       std::vector<int> pwld_cells;
 
@@ -307,8 +303,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  0,0,
                                  pwld_nodes,pwld_cells,
                                  pwl_sdm->cell_dfem_block_address,
-                                 //*q_field->local_cell_dof_array_address,
-                                 &mapping);
+                                 mapping);
 
       for (int i=0; i<cell_dofs; i++)
       {
@@ -374,7 +369,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     //====================================== Setting Q
     if ((q_field != nullptr) and (cell_is_local))
     {
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       std::vector<int> pwld_nodes;
       std::vector<int> pwld_cells;
 
@@ -391,8 +386,7 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                  0,0,
                                  pwld_nodes,pwld_cells,
                                  pwl_sdm->cell_dfem_block_address,
-                                 //*q_field->local_cell_dof_array_address,
-                                 &mapping);
+                                 mapping);
 
       for (int i=0; i<cell_dofs; i++)
       {

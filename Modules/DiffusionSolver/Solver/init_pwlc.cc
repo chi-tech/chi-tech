@@ -187,8 +187,8 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   KSPSetConvergenceTest(ksp,&DiffusionConvergenceTestNPT,NULL,NULL);
 
   //=================================== Setup verbose_info viewer
-  if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
-    KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
+//  if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
+//    KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
 
   ierr = KSPSetTolerances(ksp,1.e-50,residual_tolerance,1.0e50,max_iters);
   ierr = KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);

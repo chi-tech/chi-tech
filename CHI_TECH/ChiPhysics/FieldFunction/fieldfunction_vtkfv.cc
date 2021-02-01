@@ -87,9 +87,9 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
   //======================================== populate cell mapping
   int num_loc_cells = grid->local_cells.size();
-  std::vector<int> cells_to_map(num_loc_cells);
-  std::vector<int> mapping;
-  for (int lc=0; lc<num_loc_cells; lc++)
+  std::vector<uint64_t> cells_to_map(num_loc_cells);
+  std::vector<uint64_t> mapping;
+  for (uint64_t lc=0; lc<num_loc_cells; lc++)
     cells_to_map[lc] = lc;
 
   ff_interpol.CreateFVMapping(num_components,
@@ -97,7 +97,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
                               ref_component,
                               ref_set,
                               cells_to_map,
-                              &mapping);
+                              mapping);
 
   //======================================== Populate cell information
   for (const auto& cell : grid->local_cells)
@@ -270,12 +270,17 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
   //======================================== populate cell mapping
   int num_loc_cells = grid->local_cells.size();
-  std::vector<int> cells_to_map(num_loc_cells);
-  std::vector<int> mapping;
-  for (int lc=0; lc<num_loc_cells; lc++)
+  std::vector<uint64_t> cells_to_map(num_loc_cells);
+  std::vector<uint64_t> mapping;
+  for (uint64_t lc=0; lc<num_loc_cells; lc++)
     cells_to_map[lc] = lc;
 
-  ff_interpol.CreateFVMapping(num_components, num_sets, ref_component, ref_set, cells_to_map, &mapping);
+  ff_interpol.CreateFVMapping(num_components,
+                              num_sets,
+                              ref_component,
+                              ref_set,
+                              cells_to_map,
+                              mapping);
 
   //======================================== Populate cell information
   for (const auto& cell : grid->local_cells)

@@ -11,13 +11,13 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
   if (field_functions[0]->type == chi_physics::FieldFunctionType::CFEM_PWL)
   {
     Vec x_mapped;
-    std::vector<int> mapping;
+    std::vector<uint64_t> mapping;
     Vec x = *field_functions[0]->field_vector;
     CreateCFEMMapping(field_functions[0]->num_components,
                       field_functions[0]->num_sets,
                       field_functions[0]->ref_component,
                       field_functions[0]->ref_set,
-                      x,x_mapped,cfem_local_nodes_needed_unmapped,&mapping,
+                      x,x_mapped,cfem_local_nodes_needed_unmapped,mapping,
                       field_functions[0]->spatial_discretization);
 
     CFEMInterpolate(x_mapped,mapping);
@@ -25,7 +25,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
   }
   else if (field_functions[0]->type == chi_physics::FieldFunctionType::DFEM_PWL)
   {
-    std::vector<int> mapping;
+    std::vector<uint64_t> mapping;
     CreatePWLDMapping(field_functions[0]->num_components,
                       field_functions[0]->num_sets,
                       field_functions[0]->ref_component,
@@ -33,8 +33,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
                       pwld_local_nodes_needed_unmapped,
                       pwld_local_cells_needed_unmapped,
                       field_functions[0]->spatial_discretization->cell_dfem_block_address,
-                      //*field_functions[0]->local_cell_dof_array_address,
-                      &mapping);
+                      mapping);
     PWLDInterpolate(*field_functions[0]->field_vector_local,mapping);
   }
 }
@@ -42,7 +41,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 //###################################################################
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationVolume::
-CFEMInterpolate(Vec field, std::vector<int> &mapping)
+  CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping)
 {
   auto discretization =
     (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
@@ -114,7 +113,7 @@ CFEMInterpolate(Vec field, std::vector<int> &mapping)
 //###################################################################
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationVolume::
-PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping)
+  PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping)
 {
   auto discretization =
     (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;

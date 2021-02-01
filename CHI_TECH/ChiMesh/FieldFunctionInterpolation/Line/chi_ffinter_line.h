@@ -1,5 +1,5 @@
-#ifndef _chi_ffinter_line_h
-#define _chi_ffinter_line_h
+#ifndef CHI_FFINTER_LINE_H
+#define CHI_FFINTER_LINE_H
 
 #include "../chi_ffinterpolation.h"
 #include "../../chi_mesh.h"
@@ -18,7 +18,8 @@ struct FieldFunctionContext
   std::vector<int>               cfem_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_cells_needed_unmapped;
-  std::vector<int>               interpolation_points_ass_cell;
+  std::vector<uint64_t>          interpolation_points_ass_cell;
+  std::vector<bool>              interpolation_points_has_ass_cell;
 };
 
 //###################################################################
@@ -36,11 +37,12 @@ public:
 
 private:
   double                         delta_d;
-  std::vector<double>            interpolation_points_values;
-  std::vector<int>               cfem_local_nodes_needed_unmapped;
-  std::vector<int>               pwld_local_nodes_needed_unmapped;
-  std::vector<int>               pwld_local_cells_needed_unmapped;
-  std::vector<int>               interpolation_points_ass_cell;
+//  std::vector<double>            interpolation_points_values;
+//  std::vector<int>               cfem_local_nodes_needed_unmapped;
+//  std::vector<int>               pwld_local_nodes_needed_unmapped;
+//  std::vector<int>               pwld_local_cells_needed_unmapped;
+//  std::vector<uint64_t>          interpolation_points_ass_cell;
+//  std::vector<bool>              interpolation_points_has_ass_cell;
 
 public:
   FieldFunctionInterpolationLine()
@@ -54,15 +56,15 @@ public:
   //02
   void Execute();
 private:
-  void CFEMInterpolate(Vec field, std::vector<int> &mapping);
-  void PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping);
+  void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
+  void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping);
 
   void CFEMInterpolate(Vec field,
-                       std::vector<int> &mapping,
+                       std::vector<uint64_t>& mapping,
                        FieldFunctionContext* ff_ctx);
-  void PWLDInterpolate(std::vector<int> &mapping,
+  void PWLDInterpolate(std::vector<uint64_t>& mapping,
                        FieldFunctionContext* ff_ctx);
-  void FVInterpolate(std::vector<int> &mapping,
+  void FVInterpolate(std::vector<uint64_t>& mapping,
                      FieldFunctionContext* ff_ctx);
 public:
   void ExportPython(std::string base_name);

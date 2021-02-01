@@ -1,5 +1,5 @@
-#ifndef _chi_ffinterpolation_h
-#define _chi_ffinterpolation_h
+#ifndef CHI_FFINTERPOLATION_H
+#define CHI_FFINTERPOLATION_H
 
 #include "../MeshContinuum/chi_meshcontinuum.h"
 #include "../chi_mesh.h"
@@ -54,24 +54,24 @@ public:
   bool CheckLineTriangleIntersect(std::vector<chi_mesh::Vector3>& triangle_points,
                                   chi_mesh::Vector3 line_point_i,
                                   chi_mesh::Vector3 line_point_f);
+  void CreateFVMapping(int num_grps, int num_moms, int g, int m,
+                       std::vector<uint64_t>& cells,
+                       std::vector<uint64_t>& mapping);
   void CreateCFEMMapping(int num_grps, int num_moms, int g, int m,
                          Vec& x, Vec& x_cell,
                          std::vector<int>& cfem_nodes,
-                         std::vector<int>* mapping,
+                         std::vector<uint64_t>& mapping,
                          SpatialDiscretization* sdm);
   void CreatePWLDMapping(int num_grps, int num_moms, int g, int m,
                          std::vector<int>& pwld_nodes,
                          std::vector<int>& pwld_cells,
                          std::vector<int>& local_cell_dof_array_address,
-                         std::vector<int>* mapping);
-  void CreateFVMapping(int num_grps, int num_moms, int g, int m,
-                       std::vector<int>& cells,
-                       std::vector<int>* mapping);
+                         std::vector<uint64_t>& mapping);
 
-  void CreatePWLDMapping(chi_physics::FieldFunction* field_function,
-                         std::vector<int>& pwld_nodes,
-                         std::vector<int>& pwld_cells,
-                         std::vector<int>* mapping,int m=0,int g=0);
+//  void CreatePWLDMapping(chi_physics::FieldFunction* field_function,
+//                         std::vector<int>& pwld_nodes,
+//                         std::vector<int>& pwld_cells,
+//                         std::vector<int>* mapping,int m=0,int g=0);
 
   virtual void Initialize(){};
   virtual void Execute(){};

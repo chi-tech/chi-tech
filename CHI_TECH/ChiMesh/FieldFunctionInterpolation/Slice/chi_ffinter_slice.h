@@ -1,5 +1,5 @@
-#ifndef _chi_ffinter_slice_h
-#define _chi_ffinter_slice_h
+#ifndef CHI_FFINTER_SLICE_H
+#define CHI_FFINTER_SLICE_H
 
 #include "../chi_ffinterpolation.h"
 #include "../../chi_mesh.h"
@@ -15,12 +15,12 @@
 
 struct FFIFaceEdgeIntersection
 {
-  int v0_g_index, v1_g_index;
-  int v0_dofindex_cell, v1_dofindex_cell;
+  int v0_g_index=0, v1_g_index=0;
+  int v0_dofindex_cell=0, v1_dofindex_cell=0;
   chi_mesh::Vector3 point;
   chi_mesh::Vector3 point2d;
   std::pair<double,double> weights;
-  double point_value;
+  double point_value=0.0;
 
   FFIFaceEdgeIntersection()
   {
@@ -30,11 +30,11 @@ struct FFIFaceEdgeIntersection
 
 struct FFICellIntersection
 {
-  int cell_local_index;
-  std::vector<FFIFaceEdgeIntersection*> intersections;
+  int cell_local_index=0;
+  std::vector<FFIFaceEdgeIntersection> intersections;
   chi_mesh::Vector3 intersection_centre;
   chi_mesh::Vector3 intersection_2d_centre;
-  double cell_avg_value;
+  double cell_avg_value=0.0;
 
   FFICellIntersection()
   {
@@ -60,8 +60,8 @@ public:
   chi_mesh::Vector3 point;
 
 private:
-  std::vector<int>                    intersecting_cell_indices;
-  std::vector<FFICellIntersection*> cell_intersections;
+  std::vector<uint64_t>               intersecting_cell_indices;
+  std::vector<FFICellIntersection>    cell_intersections;
   std::vector<int>                    cfem_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_cells_needed_unmapped;
@@ -79,8 +79,8 @@ public:
   //02
   void Execute();
 private:
-  void CFEMInterpolate(Vec field, std::vector<int> &mapping);
-  void PWLDInterpolate(std::vector<double>& field, std::vector<int> &mapping);
+  void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
+  void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t>& mapping);
 public:
   //03
   void ExportPython(std::string base_name);

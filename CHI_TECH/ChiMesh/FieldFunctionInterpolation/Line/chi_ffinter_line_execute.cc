@@ -8,7 +8,7 @@ extern ChiLog&  chi_log;
 /**Executes the interpolation.*/
 void chi_mesh::FieldFunctionInterpolationLine::Execute()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Executing line interpolator2.";
+  chi_log.Log(LOG_0VERBOSE_1) << "Executing line interpolator.";
   for (int ff=0; ff<field_functions.size(); ff++)
   {
     grid_view = field_functions[ff]->grid;
@@ -17,7 +17,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
     if (field_functions[ff]->type == chi_physics::FieldFunctionType::CFEM_PWL)
     {
       Vec x_mapped;
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       Vec x = *field_functions[ff]->field_vector;
       CreateCFEMMapping(field_functions[ff]->num_components,
                         field_functions[ff]->num_sets,
@@ -25,7 +25,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
                         field_functions[ff]->ref_set,
                         x,x_mapped,
                         ff_ctx->cfem_local_nodes_needed_unmapped,
-                        &mapping,
+                        mapping,
                         field_functions[ff]->spatial_discretization);
 
       CFEMInterpolate(x_mapped,mapping,ff_ctx);
@@ -33,7 +33,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
     }
     else if (field_functions[ff]->type == chi_physics::FieldFunctionType::DFEM_PWL)
     {
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       CreatePWLDMapping(field_functions[ff]->num_components,
                         field_functions[ff]->num_sets,
                         field_functions[ff]->ref_component,
@@ -41,18 +41,18 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
                         ff_ctx->pwld_local_nodes_needed_unmapped,
                         ff_ctx->pwld_local_cells_needed_unmapped,
                         field_functions[ff]->spatial_discretization->cell_dfem_block_address,
-                        &mapping);
+                        mapping);
       PWLDInterpolate(mapping,ff_ctx);
     }
     else if (field_functions[ff]->type == chi_physics::FieldFunctionType::FV)
     {
-      std::vector<int> mapping;
+      std::vector<uint64_t> mapping;
       CreateFVMapping(field_functions[ff]->num_components,
                       field_functions[ff]->num_sets,
                       field_functions[ff]->ref_component,
                       field_functions[ff]->ref_set,
                       ff_ctx->interpolation_points_ass_cell,
-                      &mapping);
+                      mapping);
       FVInterpolate(mapping,ff_ctx);
     }
   }
@@ -62,14 +62,14 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
 //###################################################################
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationLine::
-  FVInterpolate(std::vector<int> &mapping,
+  FVInterpolate(std::vector<uint64_t>& mapping,
                 FieldFunctionContext *ff_ctx)
 {
   ff_ctx->interpolation_points_values.resize(interpolation_points.size(),0.0);
 
   for (size_t c=0; c<ff_ctx->interpolation_points_ass_cell.size(); c++)
   {
-    if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
+    if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     ff_ctx->interpolation_points_values[c] =
       ff_ctx->ref_ff->field_vector_local->operator[](mapping[c]);
@@ -79,9 +79,9 @@ void chi_mesh::FieldFunctionInterpolationLine::
 //###################################################################
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationLine::
-CFEMInterpolate(Vec field,
-                std::vector<int> &mapping,
-                FieldFunctionContext* ff_ctx)
+  CFEMInterpolate(Vec field,
+                  std::vector<uint64_t>& mapping,
+                  FieldFunctionContext* ff_ctx)
 {
   auto spatial_dm   =
     (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;
@@ -93,7 +93,7 @@ CFEMInterpolate(Vec field,
   int counter = -1;
   for (int c=0; c<ff_ctx->interpolation_points_ass_cell.size(); c++)
   {
-    if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
+    if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
     auto cell_fe_view = spatial_dm->MapFeViewL(cell_local_index);
@@ -125,7 +125,7 @@ CFEMInterpolate(Vec field,
 //###################################################################
 /**Computes the cell average of each cell that was cut.*/
 void chi_mesh::FieldFunctionInterpolationLine::
-  PWLDInterpolate(std::vector<int> &mapping,
+  PWLDInterpolate(std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
   auto spatial_dm   =
@@ -140,7 +140,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
   int counter = -1;
   for (int c=0; c<ff_ctx->interpolation_points_ass_cell.size(); c++)
   {
-    if (ff_ctx->interpolation_points_ass_cell[c] < 0) continue;
+    if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
     auto cell_fe_view = spatial_dm->MapFeViewL(cell_local_index);
