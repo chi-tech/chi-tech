@@ -1,5 +1,5 @@
-#ifndef _chi_field_function_h
-#define _chi_field_function_h
+#ifndef CHI_FIELD_FUNCTION_H
+#define CHI_FIELD_FUNCTION_H
 
 #include "../chi_physics_namespace.h"
 #include "../../ChiMesh/MeshContinuum/chi_meshcontinuum.h"
@@ -136,9 +136,9 @@ public:
     field_vector_local(ff_field_vector)
   {}
 
-  std::vector<double>& GetCellDOFValues(size_t cell_local_id,
-                                        size_t component,
-                                        size_t set);
+//  std::vector<double>& GetCellDOFValues(size_t cell_local_id,
+//                                        size_t component,
+//                                        size_t set);
 
   //01
   void ExportToVTK(const std::string& base_name,

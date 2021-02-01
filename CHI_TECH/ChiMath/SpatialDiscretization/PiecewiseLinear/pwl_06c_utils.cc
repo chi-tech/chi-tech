@@ -47,10 +47,10 @@ void SpatialDiscretization_PWL::
       for (int vid : cell.vertex_ids)
       {
         int uk=-1;
-        for (auto unknown : unknown_manager->unknowns)
+        for (const auto& unknown : unknown_manager->unknowns)
         {
           ++uk;
-          for (int c=0; c<unknown->num_components; ++c)
+          for (int c=0; c<unknown.num_components; ++c)
           {
             int ir = MapCFEMDOF(vid,unknown_manager,uk,c);
 
@@ -72,10 +72,10 @@ void SpatialDiscretization_PWL::
       for (int i=0; i<cell.vertex_ids.size(); ++i)
       {
         int uk=-1;
-        for (auto unknown : unknown_manager->unknowns)
+        for (const auto& unknown : unknown_manager->unknowns)
         {
           ++uk;
-          for (int c=0; c<unknown->num_components; ++c)
+          for (int c=0; c<unknown.num_components; ++c)
           {
             int ir = MapDFEMDOF(&cell,i,unknown_manager,uk,c);
 

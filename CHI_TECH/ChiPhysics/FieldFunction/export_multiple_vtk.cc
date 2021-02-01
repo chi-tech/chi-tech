@@ -166,12 +166,12 @@ void chi_physics::FieldFunction::
       if (ff->unknown_manager== nullptr) continue;
 
       int ref_unknown = ff->ref_set;
-      auto unknown = ff->unknown_manager->unknowns[ref_unknown];
+      const auto& unknown = ff->unknown_manager->unknowns[ref_unknown];
 
-      if (unknown->type == chi_math::UnknownType::SCALAR)
+      if (unknown.type == chi_math::UnknownType::SCALAR)
       {
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        unk_arr->SetName(unknown->text_name.c_str());
+        unk_arr->SetName(unknown.text_name.c_str());
 
         for (auto& cell : grid->local_cells)
         {
@@ -198,21 +198,21 @@ void chi_physics::FieldFunction::
       if (ff->unknown_manager== nullptr) continue;
 
       int ref_unknown = ff->ref_set;
-      auto unknown = ff->unknown_manager->unknowns[ref_unknown];
+      const auto& unknown = ff->unknown_manager->unknowns[ref_unknown];
       unk_number++;
 
       int N = ff->unknown_manager->GetTotalUnknownSize();
 
-      if (unknown->type == chi_math::UnknownType::SCALAR)
+      if (unknown.type == chi_math::UnknownType::SCALAR)
       {
         int component = ff->unknown_manager->MapUnknown(ref_unknown,0);
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        if (unknown->text_name == "")
+        if (unknown.text_name == "")
           unk_arr->SetName((std::string("Unknown_")+
                             std::to_string(unk_number)).c_str());
         else
-          unk_arr->SetName(unknown->text_name.c_str());
+          unk_arr->SetName(unknown.text_name.c_str());
 
         int c=-1;
         for (auto& cell : grid->local_cells)
@@ -230,18 +230,18 @@ void chi_physics::FieldFunction::
 
         ugrid->GetPointData()->AddArray(unk_arr);
       }//scalar
-      if (unknown->type == chi_math::UnknownType::VECTOR_N)
+      if (unknown.type == chi_math::UnknownType::VECTOR_N)
       {
-        for (int comp=0; comp<unknown->num_components; ++comp)
+        for (int comp=0; comp<unknown.num_components; ++comp)
         {
           int component = ff->unknown_manager->MapUnknown(ref_unknown,comp);
 
           auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-          if (unknown->component_text_names[comp]=="")
+          if (unknown.component_text_names[comp]=="")
             unk_arr->SetName((std::string("Component_")+
                               std::to_string(comp)).c_str());
           else
-            unk_arr->SetName(unknown->component_text_names[comp].c_str());
+            unk_arr->SetName(unknown.component_text_names[comp].c_str());
 
           int c=-1;
           for (auto& cell : grid->local_cells)

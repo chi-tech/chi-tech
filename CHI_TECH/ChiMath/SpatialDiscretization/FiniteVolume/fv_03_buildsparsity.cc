@@ -30,7 +30,7 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
 
   for (int uk=0; uk<num_uk; ++uk)
   {
-    int num_comps = unknown_manager->unknowns[uk]->num_components;
+    int num_comps = unknown_manager->unknowns[uk].num_components;
     for (int comp=0; comp<num_comps; ++comp)
     {
       for (auto& cell : grid->local_cells)
