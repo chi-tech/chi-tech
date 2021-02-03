@@ -852,5 +852,5 @@ print("************* End of Regression Test *************")
 print("")
 if (num_failed > 0):
   sys.exit(1)
-else
+else:
   sys.exit(0)
