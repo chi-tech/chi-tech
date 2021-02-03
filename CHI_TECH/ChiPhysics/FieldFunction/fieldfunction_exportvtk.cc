@@ -22,12 +22,15 @@ void chi_physics::FieldFunction::ExportToVTK(const std::string& base_name,
     << "Exporting field function " << text_name
     << " to files with base name " << base_name;
 
+  typedef chi_math::SpatialDiscretizationType SDMType;
+  auto& field_sdm_type = spatial_discretization->type;
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PWLD NODES
-  if (type == chi_physics::FieldFunctionType::FV)
+  if (field_sdm_type == SDMType::FINITE_VOLUME)
     ExportToVTKFV(base_name,field_name);
-  if (type == chi_physics::FieldFunctionType::CFEM_PWL)
+  if (field_sdm_type == SDMType::PIECEWISE_LINEAR_CONTINUOUS)
     ExportToVTKPWLC(base_name,field_name);
-  if (type == chi_physics::FieldFunctionType::DFEM_PWL)
+  if (field_sdm_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
     ExportToVTKPWLD(base_name,field_name);
 
 }
@@ -44,12 +47,15 @@ void chi_physics::FieldFunction::ExportToVTKG(const std::string& base_name,
     << "Exporting field function " << text_name
     << " to files with base name " << base_name;
 
+  typedef chi_math::SpatialDiscretizationType SDMType;
+  auto& field_sdm_type = spatial_discretization->type;
+
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PWLD NODES
-  if (type == chi_physics::FieldFunctionType::FV)
+  if (field_sdm_type == SDMType::FINITE_VOLUME)
     ExportToVTKFVG(base_name,field_name);
-  if (type == chi_physics::FieldFunctionType::CFEM_PWL)
+  if (field_sdm_type == SDMType::PIECEWISE_LINEAR_CONTINUOUS)
     ExportToVTKPWLCG(base_name,field_name);
-  if (type == chi_physics::FieldFunctionType::DFEM_PWL)
+  if (field_sdm_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
     ExportToVTKPWLDG(base_name,field_name);
 
 }

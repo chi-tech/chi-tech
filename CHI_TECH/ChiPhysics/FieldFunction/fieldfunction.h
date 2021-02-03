@@ -8,16 +8,6 @@
 
 #include <petscksp.h>
 
-namespace chi_physics
-{
-  enum class FieldFunctionType
-  {
-    CFEM_PWL = 1,
-    DFEM_PWL = 2,
-    FV = 3
-  };
-}
-
 //###################################################################
 /** Implementation of an abstracted field function object holding
  * a reference to a contiguous vector of data associated with a
@@ -39,106 +29,74 @@ class chi_physics::FieldFunction
 {
 public:
   std::string               text_name;
-  int                       id;
-  FieldFunctionType         type;
+//  int                       id;
   chi_mesh::MeshContinuum*  grid;
   SpatialDiscretization*    spatial_discretization;
-  chi_math::UnknownManager* unknown_manager;
-  int                       num_components, num_sets;
-  int                       ref_component, ref_set;
-
-  std::vector<int>*         local_cell_dof_array_address;
+  chi_math::UnknownManager  unknown_manager;
+  const unsigned int        ref_component;
+  const unsigned int        ref_unknown;
 
   Vec*                      field_vector;
   std::vector<double>*      field_vector_local;
   bool                      using_petsc_field_vector;
 
-private:
-  std::vector<double>       temp_cell_dof_values;
-
 public:
-
-  /**Non-PETSc based field function constructor.*/
-  FieldFunction(std::string ff_text_name,
-                size_t ff_id,
-                FieldFunctionType ff_type,
-                chi_mesh::MeshContinuum* ff_grid,
-                SpatialDiscretization* ff_sdm,
-                int ff_num_components,
-                int ff_num_sets,
-                int ff_ref_component,
-                int ff_ref_set,
-                std::vector<int>* ff_dof_block_addresses,
-                std::vector<double>* ff_field_vector) :
-    text_name(std::move(ff_text_name)),
-    id(ff_id),
-    type(ff_type),
-    grid(ff_grid),
-    spatial_discretization(ff_sdm),
-    num_components(ff_num_components),
-    num_sets(ff_num_sets),
-    ref_component(ff_ref_component),
-    ref_set(ff_ref_set),
-    local_cell_dof_array_address(ff_dof_block_addresses),
-    field_vector(NULL),
-    field_vector_local(ff_field_vector),
-    using_petsc_field_vector(false)
-  {
-    unknown_manager = new chi_math::UnknownManager;
-
-    for (int set=0; set<ff_num_sets; ++set)
-      unknown_manager->AddUnknown(chi_math::UnknownType::VECTOR_N,
-                                  ff_num_components);
-  }
-
-  /**PETSc-vector based field function constructor.*/
-  FieldFunction(std::string ff_text_name,
-                size_t ff_id,
-                FieldFunctionType ff_type,
-                chi_mesh::MeshContinuum* ff_grid,
-                SpatialDiscretization* ff_sdm,
-                int ff_num_components,
-                int ff_num_sets,
-                int ff_ref_component,
-                int ff_ref_set,
-                std::vector<int>* ff_dof_block_addresses,
-                Vec* ff_field_vector) :
-    text_name(std::move(ff_text_name)),
-    id(ff_id),
-    type(ff_type),
-    grid(ff_grid),
-    spatial_discretization(ff_sdm),
-    num_components(ff_num_components),
-    num_sets(ff_num_sets),
-    ref_component(ff_ref_component),
-    ref_set(ff_ref_set),
-    local_cell_dof_array_address(ff_dof_block_addresses),
-    field_vector(ff_field_vector),
-    field_vector_local(nullptr),
-    using_petsc_field_vector(true)
-  {
-  }
-
-  /***/
+  /**Non-PETSc type field vector*/
   FieldFunction(std::string ff_tex_name,
-                FieldFunctionType ff_type,
                 SpatialDiscretization* ff_sdm,
-                chi_math::UnknownManager* ff_unknown_manager,
-                int ff_unknown_id,
-                std::vector<double>* ff_field_vector) :
-    text_name(ff_tex_name),
-    id(0),
-    type(ff_type),
+                std::vector<double>* ff_field_vector,
+                chi_math::UnknownManager& ff_unknown_manager,
+                int ff_unknown_id=0,
+                int ff_unknown_component_number=0) :
+    text_name(std::move(ff_tex_name)),
+//    id(0),
     grid(ff_sdm->ref_grid),
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),
-    ref_set(ff_unknown_id),
-    field_vector_local(ff_field_vector)
+    ref_component(ff_unknown_component_number),
+    ref_unknown(ff_unknown_id),
+    field_vector(nullptr),
+    field_vector_local(ff_field_vector),
+    using_petsc_field_vector(false)
+  {}
+
+  /**PETSc type field vector*/
+  FieldFunction(std::string ff_tex_name,
+                SpatialDiscretization* ff_sdm,
+                Vec* ff_field_vector,
+                chi_math::UnknownManager& ff_unknown_manager,
+                int ff_unknown_id=0,
+                int ff_unknown_component_number=0) :
+    text_name(std::move(ff_tex_name)),
+//    id(0),
+    grid(ff_sdm->ref_grid),
+    spatial_discretization(ff_sdm),
+    unknown_manager(ff_unknown_manager),
+    ref_component(ff_unknown_component_number),
+    ref_unknown(ff_unknown_id),
+    field_vector(ff_field_vector),
+    field_vector_local(nullptr),
+    using_petsc_field_vector(true)
   {}
 
 //  std::vector<double>& GetCellDOFValues(size_t cell_local_id,
 //                                        size_t component,
 //                                        size_t set);
+
+  //mapping
+  void
+  CreateFVMappingLocal(std::vector<std::pair<uint64_t,uint>>& cell_component_pairs,
+                       std::vector<uint64_t>& mapping);
+
+  void
+  CreateCFEMMappingLocal(Vec& x_mapped,
+                         std::vector<std::pair<uint64_t,uint>>& node_component_pairs,
+                         std::vector<uint64_t>& mapping);
+
+  void
+  CreatePWLDMappingLocal(
+    std::vector<std::tuple<uint64_t,uint,uint>>& cell_node_component_tuples,
+    std::vector<uint64_t>& mapping);
 
   //01
   void ExportToVTK(const std::string& base_name,

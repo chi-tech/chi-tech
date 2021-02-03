@@ -73,6 +73,8 @@ public:
   std::vector<double>                               zero_boundary;
   std::vector<SweepBndry*>                          sweep_boundaries;
 
+  chi_math::UnknownManager flux_moments_uk_man;
+
   int max_cell_dof_count;
   unsigned long long local_dof_count;
   unsigned long long glob_dof_count;

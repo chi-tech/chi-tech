@@ -55,21 +55,18 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     << domain_ownership.first << " "
     << domain_ownership.second;
 
+  //================================================== Initialize unknown manager
+  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
+
   //================================================== Initialize field function
   //                                                   if empty
   if (field_functions.empty())
   {
     auto initial_field_function = new chi_physics::FieldFunction(
       std::string("phi"),                           //Text name
-      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
-      chi_physics::FieldFunctionType::CFEM_PWL,     //Type
-      grid,                                         //Grid
       discretization,                               //Spatial Discretization
-      1,                                            //Number of components
-      1,                                            //Number of sets
-      0,0,                                          //Ref component, ref set
-      nullptr,                                      //Dof block address
-      &x);                                          //Data vector
+      &x,                                           //Data vector
+      unknown_manager);                             //Unknown Manager
 
     field_functions.push_back(initial_field_function);
     chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);

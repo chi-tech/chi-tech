@@ -49,7 +49,17 @@ int chiLBSGetFieldFunctionList(lua_State *L)
   for (int ff=0; ff<solver->field_functions.size(); ff++)
   {
     lua_pushnumber(L,ff+1);
-    lua_pushnumber(L,solver->field_functions[ff]->id);
+    int pff_count = -1;
+    for (auto pff : chi_physics_handler.fieldfunc_stack)
+    {
+      ++pff_count;
+      if (pff == solver->field_functions[ff])
+      {
+        lua_pushnumber(L,pff_count);
+        break;
+      }
+    }
+
     lua_settable(L,-3);
   }
 
@@ -108,7 +118,16 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
       {
         count++;
         lua_pushnumber(L,count);
-        lua_pushnumber(L,solver->field_functions[ff]->id);
+        int pff_count = -1;
+        for (auto pff : chi_physics_handler.fieldfunc_stack)
+        {
+          ++pff_count;
+          if (pff == solver->field_functions[ff])
+          {
+            lua_pushnumber(L,pff_count);
+            break;
+          }
+        }
         lua_settable(L,-3);
       }
     }

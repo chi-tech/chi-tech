@@ -57,6 +57,18 @@ CheckLineIntersectTriangle2(
   chi_mesh::Vector3& intersection_point,
   double* distance_to_intersection = nullptr);
 
+bool
+CheckPointInTriangle(const chi_mesh::Vector3& v0,
+                     const chi_mesh::Vector3& v1,
+                     const chi_mesh::Vector3& v2,
+                     const chi_mesh::Normal& n,
+                     const chi_mesh::Vector3& point);
+
+bool
+CheckPlaneTetIntersect(const chi_mesh::Normal& plane_normal,
+                       const chi_mesh::Vector3& plane_point,
+                       const std::vector<chi_mesh::Vector3>& tet_points);
+
 void PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum& grid,
   Cell& cell,
@@ -65,12 +77,7 @@ void PopulateRaySegmentLengths(
   const chi_mesh::Vector3& line_point1,
   const chi_mesh::Vector3& omega);
 
-bool
-CheckPointInTriangle(const chi_mesh::Vector3& v0,
-                     const chi_mesh::Vector3& v1,
-                     const chi_mesh::Vector3& v2,
-                     const chi_mesh::Normal& n,
-                     const chi_mesh::Vector3& point);
+
 
 }
 #endif

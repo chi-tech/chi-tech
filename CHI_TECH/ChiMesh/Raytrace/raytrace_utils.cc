@@ -180,7 +180,6 @@ chi_mesh::CheckLineIntersectTriangle2(
   {
     return false;
   }
-
 }
 
 //###################################################################
@@ -215,6 +214,40 @@ chi_mesh::CheckPointInTriangle(
     return false;
 
 }
+
+//###################################################################
+/** This functions checks the intersection of a plane with a tetrahedron.
+ * The equation of a plane is
+ *      nx(x-x0) + ny(y-y0) + nz(z-z0) = 0
+ * Where the plane normal is (nx,ny,nz) and the plane point is (x0,y0,z0).
+ * If we form a dot product between the normal and a vector
+ * (x-x0,y-y0,z-z0) then sign of the result gives the sense to the surface.
+ * Therefore, if we encounter differing senses then the plane is indeed
+ * intersecting.*/
+bool chi_mesh::
+CheckPlaneTetIntersect(const chi_mesh::Normal& plane_normal,
+                       const chi_mesh::Vector3& plane_point,
+                       const std::vector<chi_mesh::Vector3>& tet_points)
+{
+  bool current_sense = false;
+
+  size_t num_points = tet_points.size();
+  for (size_t i=0; i<num_points; i++)
+  {
+    chi_mesh::Vector3 v = tet_points[i] - plane_point;
+    double dotp = plane_normal.Dot(v);
+
+    bool new_sense = (dotp >= 0.0);
+
+    if (i==0)
+      current_sense = new_sense;
+    else if (new_sense != current_sense)
+      return true;
+  }
+  return false;
+}
+
+
 
 //###################################################################
 /** Populates segment lengths along a ray.*/

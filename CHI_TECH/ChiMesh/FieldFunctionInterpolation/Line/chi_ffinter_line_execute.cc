@@ -14,45 +14,61 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
     grid_view = field_functions[ff]->grid;
     FieldFunctionContext* ff_ctx = ff_contexts[ff];
 
-    if (field_functions[ff]->type == chi_physics::FieldFunctionType::CFEM_PWL)
+    typedef chi_math::SpatialDiscretizationType SDMType;
+    const auto& field_sdm_type = field_functions[ff]->spatial_discretization->type;
+
+    if (field_sdm_type == SDMType::PIECEWISE_LINEAR_CONTINUOUS)
     {
+      std::vector<std::pair<uint64_t,uint>> node_component_pairs;
+
+      for (auto node_id : ff_ctx->cfem_local_nodes_needed_unmapped)
+        node_component_pairs.emplace_back(node_id,ff_ctx->ref_ff->ref_component);
+
       Vec x_mapped;
       std::vector<uint64_t> mapping;
-      Vec x = *field_functions[ff]->field_vector;
-      CreateCFEMMapping(field_functions[ff]->num_components,
-                        field_functions[ff]->num_sets,
-                        field_functions[ff]->ref_component,
-                        field_functions[ff]->ref_set,
-                        x,x_mapped,
-                        ff_ctx->cfem_local_nodes_needed_unmapped,
-                        mapping,
-                        field_functions[ff]->spatial_discretization);
+
+      ff_ctx->ref_ff->CreateCFEMMappingLocal(x_mapped,
+                                             node_component_pairs,
+                                             mapping);
 
       CFEMInterpolate(x_mapped,mapping,ff_ctx);
 
+      VecDestroy(&x_mapped);
+
     }
-    else if (field_functions[ff]->type == chi_physics::FieldFunctionType::DFEM_PWL)
+    else if (field_sdm_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
     {
+      std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
+
+      size_t num_mappings = ff_ctx->pwld_local_cells_needed_unmapped.size();
+      for (size_t m=0; m<num_mappings; ++m)
+        cell_node_component_tuples.emplace_back(
+          ff_ctx->pwld_local_cells_needed_unmapped[m],
+          ff_ctx->pwld_local_nodes_needed_unmapped[m],
+          ff_ctx->ref_ff->ref_component);
+
       std::vector<uint64_t> mapping;
-      CreatePWLDMapping(field_functions[ff]->num_components,
-                        field_functions[ff]->num_sets,
-                        field_functions[ff]->ref_component,
-                        field_functions[ff]->ref_set,
-                        ff_ctx->pwld_local_nodes_needed_unmapped,
-                        ff_ctx->pwld_local_cells_needed_unmapped,
-                        field_functions[ff]->spatial_discretization->cell_dfem_block_address,
-                        mapping);
+
+      ff_ctx->ref_ff->CreatePWLDMappingLocal(cell_node_component_tuples,
+                                             mapping);
+
       PWLDInterpolate(mapping,ff_ctx);
     }
-    else if (field_functions[ff]->type == chi_physics::FieldFunctionType::FV)
+    else if (field_sdm_type == SDMType::FINITE_VOLUME)
     {
+      std::vector<std::pair<uint64_t,uint>> cell_component_pairs;
+
+      for (int p=0; p<number_of_points; ++p)
+        if (ff_ctx->interpolation_points_has_ass_cell[p])
+          cell_component_pairs.emplace_back(
+            ff_ctx->interpolation_points_ass_cell[p],
+            ff_ctx->ref_ff->ref_component);
+
       std::vector<uint64_t> mapping;
-      CreateFVMapping(field_functions[ff]->num_components,
-                      field_functions[ff]->num_sets,
-                      field_functions[ff]->ref_component,
-                      field_functions[ff]->ref_set,
-                      ff_ctx->interpolation_points_ass_cell,
-                      mapping);
+
+      ff_ctx->ref_ff->CreateFVMappingLocal(cell_component_pairs,
+                                           mapping);
+
       FVInterpolate(mapping,ff_ctx);
     }
   }
@@ -67,12 +83,14 @@ void chi_mesh::FieldFunctionInterpolationLine::
 {
   ff_ctx->interpolation_points_values.resize(interpolation_points.size(),0.0);
 
+  int counter=-1;
   for (size_t c=0; c<ff_ctx->interpolation_points_ass_cell.size(); c++)
   {
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
+    ++counter;
     ff_ctx->interpolation_points_values[c] =
-      ff_ctx->ref_ff->field_vector_local->operator[](mapping[c]);
+      ff_ctx->ref_ff->field_vector_local->operator[](mapping[counter]);
   }
 }
 

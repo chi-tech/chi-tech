@@ -48,23 +48,19 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
 
+  //================================================== Initialize unknown manager
+  unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N,G);
 
   //================================================== Initialize field function
   //                                                   if empty
   pwld_phi_local.resize(local_dof_count * G);
-  if (field_functions.size() == 0)
+  if (field_functions.empty())
   {
     auto initial_field_function = new chi_physics::FieldFunction(
       std::string("phi"),                           //Text name
-      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
-      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
-      grid,                                         //Grid
       discretization,                               //Spatial Discretization
-      1,                                            //Number of components
-      1,                                            //Number of sets
-      0,0,                                          //Ref component, ref set
-      &pwld_cell_dof_array_address,                 //Dof block address
-      &pwld_phi_local);                              //Data vector
+      &pwld_phi_local,                              //Data vector
+      unknown_manager);                             //Unknown Manager
 
     field_functions.push_back(initial_field_function);
     chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);

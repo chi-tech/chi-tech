@@ -160,6 +160,12 @@ void LinearBoltzmann::Solver::InitializeParrays()
     }//for local cell
   }//if empty
 
+  //================================================== Initialize unknown structure
+  for (int m=0; m<num_moments; m++)
+  {
+    flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N,groups.size());
+    auto& moment = flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
+  }
 
   //================================================== Initialize Field Functions
   if (field_functions.empty())
@@ -173,16 +179,12 @@ void LinearBoltzmann::Solver::InitializeParrays()
                                 std::string("_m") + std::to_string(m);
 
         auto group_ff = new chi_physics::FieldFunction(
-          text_name,                                    //Text name
-          chi_physics_handler.fieldfunc_stack.size(),   //FF-id
-          chi_physics::FieldFunctionType::DFEM_PWL,     //Type
-          grid,                                         //Grid
-          discretization,                               //Spatial Discretization
-          groups.size(),                                //Number of components
-          num_moments,                                  //Number of sets
-          g,m,                                          //Ref component, ref set
-          &local_cell_phi_dof_array_address,            //Dof block address
-          &phi_old_local);                              //Data vector
+          text_name,              //Field name
+          discretization,         //Spatial discretization
+          &phi_old_local,         //Data vector
+          flux_moments_uk_man,    //Unknown manager
+          m,                      //Reference unknown
+          g);                     //Reference component
 
         chi_physics_handler.fieldfunc_stack.push_back(group_ff);
         field_functions.push_back(group_ff);

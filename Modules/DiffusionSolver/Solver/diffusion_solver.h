@@ -80,9 +80,10 @@ public:
   std::string                              solver_name;
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuum*                 grid;
-  SpatialDiscretization*                      discretization;
-  SpatialDiscretization_PWL*                  pwl_sdm;
+  SpatialDiscretization*                   discretization;
+  SpatialDiscretization_PWL*               pwl_sdm;
   chi_mesh::VolumeMesher*                  mesher;
+  chi_math::UnknownManager                 unknown_manager;
   int fem_method;
 
   int   property_map_D;

@@ -1,7 +1,9 @@
 #include "chi_ffinter_slice.h"
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
+#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
+
+#include "ChiMesh/Raytrace/raytracing.h"
 
 #include <chi_log.h>
 
@@ -67,14 +69,14 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           int v0_i = edges[e][0];
           int v1_i = edges[e][1];
 
-          std::vector<chi_mesh::Vector3*> tet_points;
+          std::vector<chi_mesh::Vector3> tet_points;
 
-          tet_points.push_back(grid_view->vertices[v0_i]);
-          tet_points.push_back(grid_view->vertices[v1_i]);
-          tet_points.push_back(&polyh_cell->faces[f].centroid);
-          tet_points.push_back(&polyh_cell->centroid);
+          tet_points.push_back(*grid_view->vertices[v0_i]);
+          tet_points.push_back(*grid_view->vertices[v1_i]);
+          tet_points.push_back(polyh_cell->faces[f].centroid);
+          tet_points.push_back(polyh_cell->centroid);
 
-          if (CheckPlaneTetIntersect(this->normal,this->point,&tet_points))
+          if (CheckPlaneTetIntersect(this->normal,this->point,tet_points))
           {
             intersecting_cell_indices.push_back(cell_local_index);
             intersects = true;

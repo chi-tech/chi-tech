@@ -4,33 +4,44 @@
 /**Executes the slice interpolation.*/
 void chi_mesh::FieldFunctionInterpolationSlice::Execute()
 {
-  if (field_functions[0]->type == chi_physics::FieldFunctionType::CFEM_PWL)
+  auto& ref_ff = *field_functions.back();
+  const auto& field_sdm_type = ref_ff.spatial_discretization->type;
+
+  typedef chi_math::SpatialDiscretizationType SMDType;
+
+  if (field_sdm_type == SMDType::PIECEWISE_LINEAR_CONTINUOUS)
   {
+    std::vector<std::pair<uint64_t,uint>> node_component_pairs;
+
+    for (auto node_id : cfem_local_nodes_needed_unmapped)
+      node_component_pairs.emplace_back(node_id, ref_ff.ref_component);
+
     Vec x_mapped;
     std::vector<uint64_t> mapping;
-    Vec x = *field_functions[0]->field_vector;
 
-    CreateCFEMMapping(field_functions[0]->num_components,
-                      field_functions[0]->num_sets,
-                      field_functions[0]->ref_component,
-                      field_functions[0]->ref_set,
-                      x,x_mapped,cfem_local_nodes_needed_unmapped,mapping,
-                      field_functions[0]->spatial_discretization);
+    ref_ff.CreateCFEMMappingLocal(x_mapped,
+                                  node_component_pairs,
+                                  mapping);
 
     CFEMInterpolate(x_mapped,mapping);
 
   }
-  else if (field_functions[0]->type == chi_physics::FieldFunctionType::DFEM_PWL)
+  else if (field_sdm_type == SMDType::PIECEWISE_LINEAR_DISCONTINUOUS)
   {
+    std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
+
+    size_t num_mappings = pwld_local_cells_needed_unmapped.size();
+    for (size_t m=0; m<num_mappings; ++m)
+      cell_node_component_tuples.emplace_back(
+        pwld_local_cells_needed_unmapped[m],
+        pwld_local_nodes_needed_unmapped[m],
+        ref_ff.ref_component);
+
     std::vector<uint64_t> mapping;
-    CreatePWLDMapping(field_functions[0]->num_components,
-                      field_functions[0]->num_sets,
-                      field_functions[0]->ref_component,
-                      field_functions[0]->ref_set,
-                      pwld_local_nodes_needed_unmapped,
-                      pwld_local_cells_needed_unmapped,
-                      field_functions[0]->spatial_discretization->cell_dfem_block_address,
-                      mapping);
+
+    ref_ff.CreatePWLDMappingLocal(cell_node_component_tuples,
+                                  mapping);
+
     PWLDInterpolate(*field_functions[0]->field_vector_local,mapping);
   }
 }

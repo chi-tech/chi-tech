@@ -1,7 +1,5 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <ChiMesh/Cell/cell.h>
-
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
@@ -17,6 +15,9 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
 {
   if (groupset->apply_tgdsa)
   {
+    chi_math::UnknownManager scalar_uk_man;
+    scalar_uk_man.AddUnknown(chi_math::UnknownType::SCALAR);
+
     //================================= Initialize field function
     delta_phi_local.resize(local_dof_count,0.0);
     int g = 0;
@@ -24,20 +25,23 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
     std::string text_name = std::string("Sum_Sigma_s_DeltaPhi_g") +
                             std::to_string(g) +
                             std::string("_m") + std::to_string(m);
+//    auto deltaphi_ff = new chi_physics::FieldFunction(
+//      text_name,                                    //Text name
+//      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
+//      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
+//      grid,                                         //Grid
+//      discretization,                               //Spatial Discretization
+//      1,                                            //Number of components
+//      1,                                            //Number of sets
+//      g,m,                                          //Ref component, ref set
+//      nullptr,                                      //Dof block address
+//      &delta_phi_local);                            //Data vector
+
     auto deltaphi_ff = new chi_physics::FieldFunction(
       text_name,                                    //Text name
-      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
-      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
-      grid,                                         //Grid
       discretization,                               //Spatial Discretization
-      1,                                            //Number of components
-      1,                                            //Number of sets
-      g,m,                                          //Ref component, ref set
-      &local_cell_dof_array_address,                //Dof block address
-      &delta_phi_local);                            //Data vector
-
-    deltaphi_ff->local_cell_dof_array_address =
-      &local_cell_dof_array_address;
+      &delta_phi_local,                             //Data vector
+      scalar_uk_man);                               //Unknown manager
 
     chi_physics_handler.fieldfunc_stack.push_back(deltaphi_ff);
     field_functions.push_back(deltaphi_ff);

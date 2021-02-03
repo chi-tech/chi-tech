@@ -129,13 +129,15 @@ int chiDiffusionSetProperty(lua_State *L)
     int method = lua_tonumber(L,3);
     if (method == PWLC)
     {
-      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL;
+      auto discretization = new
+        SpatialDiscretization_PWL(0,chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS);
       solver->discretization = discretization;
       solver->fem_method = PWLC;
     }
     else if (method == PWLD_MIP)
     {
-      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL;
+      auto discretization = new
+        SpatialDiscretization_PWL(0,chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS);
       solver->discretization = discretization;
       solver->fem_method = PWLD_MIP;
     }

@@ -11,7 +11,6 @@ extern ChiMPI& chi_mpi;
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkDataSetMapper.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
@@ -43,9 +42,9 @@ void chi_physics::FieldFunction::
   }
 
   //============================================= Check spatial discretization
-  auto ff_type = ff_list.front()->type;
-  for (auto ff : ff_list)
-    if (ff->type != ff_type)
+  auto ff_type = ff_list.front()->spatial_discretization->type;
+  for (auto& ff : ff_list)
+    if (ff->spatial_discretization->type != ff_type)
     {
       chi_log.Log(LOG_ALLERROR)
         << "ExportMultipleFFToVTK: Dissimilar field-function type encountered "
@@ -71,10 +70,10 @@ void chi_physics::FieldFunction::
       exit(EXIT_FAILURE);
     }
 
-  //============================================= Instantiate grid
+  //============================================= Instantiate VTK grid
   auto ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
-  //============================================= Populate points
+  //============================================= Populate VTK points
   auto points = vtkSmartPointer<vtkPoints>::New();
   int vc=0;
   for (const auto& cell : grid->local_cells)
@@ -86,7 +85,7 @@ void chi_physics::FieldFunction::
     }
   ugrid->SetPoints(points);
 
-  //============================================= Populate cells
+  //============================================= Populate VTK cells
   auto material_array         = vtkSmartPointer<vtkIntArray>::New();
   auto partition_number_array = vtkSmartPointer<vtkIntArray>::New();
 
@@ -131,8 +130,6 @@ void chi_physics::FieldFunction::
           for (int v=0; v<cell.vertex_ids.size(); ++v)
             if (face.vertex_ids[fv] == cell.vertex_ids[v])
               fvertex_ids.push_back(vertex_ids[v]);
-//        for (int vid : face.vertex_ids)
-//          fvertex_ids.push_back(vid);
 
         faces->InsertNextCell(num_fverts,fvertex_ids.data());
       }//for faces
@@ -158,15 +155,15 @@ void chi_physics::FieldFunction::
 
 
   //=============================================
-  if (ff_type == FieldFunctionType::FV)
+  typedef chi_math::SpatialDiscretizationType SDMType;
+
+  if (ff_type == SDMType::FINITE_VOLUME)
   {
     auto fv = (SpatialDiscretization_FV*)ff_spatial_discretization;
     for (auto ff : ff_list)
     {
-      if (ff->unknown_manager== nullptr) continue;
-
-      int ref_unknown = ff->ref_set;
-      const auto& unknown = ff->unknown_manager->unknowns[ref_unknown];
+      int ref_unknown = ff->ref_unknown;
+      const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
 
       if (unknown.type == chi_math::UnknownType::SCALAR)
       {
@@ -176,7 +173,7 @@ void chi_physics::FieldFunction::
         for (auto& cell : grid->local_cells)
         {
           int local_mapping =
-            fv->MapDOFLocal(&cell,ff->unknown_manager,ref_unknown);
+            fv->MapDOFLocal(&cell,&ff->unknown_manager,ref_unknown);
 
           double value = (*ff->field_vector_local)[local_mapping];
 
@@ -189,23 +186,21 @@ void chi_physics::FieldFunction::
   }
 
   //=============================================
-  if (ff_type == FieldFunctionType::CFEM_PWL or
-      ff_type == FieldFunctionType::DFEM_PWL)
+  if (ff_type == SDMType::PIECEWISE_LINEAR_CONTINUOUS or
+      ff_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
   {
     int unk_number = -1;
     for (auto ff : ff_list)
     {
-      if (ff->unknown_manager== nullptr) continue;
-
-      int ref_unknown = ff->ref_set;
-      const auto& unknown = ff->unknown_manager->unknowns[ref_unknown];
+      int ref_unknown = ff->ref_unknown;
+      const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
       unk_number++;
 
-      int N = ff->unknown_manager->GetTotalUnknownSize();
+      int N = ff->unknown_manager.GetTotalUnknownSize();
 
       if (unknown.type == chi_math::UnknownType::SCALAR)
       {
-        int component = ff->unknown_manager->MapUnknown(ref_unknown,0);
+        int component = ff->unknown_manager.MapUnknown(ref_unknown,0);
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
         if (unknown.text_name == "")
@@ -234,7 +229,7 @@ void chi_physics::FieldFunction::
       {
         for (int comp=0; comp<unknown.num_components; ++comp)
         {
-          int component = ff->unknown_manager->MapUnknown(ref_unknown,comp);
+          int component = ff->unknown_manager.MapUnknown(ref_unknown,comp);
 
           auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
           if (unknown.component_text_names[comp]=="")

@@ -207,23 +207,30 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     if ((q_field != nullptr) and (cell_is_local))
     {
       std::vector<uint64_t> mapping;
-      std::vector<int> pwld_nodes;
-      std::vector<int> pwld_cells;
+//      std::vector<int> pwld_nodes;
+//      std::vector<int> pwld_cells;
+//
+//      for (int i=0; i<cell_dofs; i++)
+//      {
+//        pwld_nodes.push_back(i);
+//        pwld_cells.push_back(cell_local_id);
+//      }
+//
+//      chi_mesh::FieldFunctionInterpolation ffinterp;
+//      ffinterp.grid_view = grid;
+//      ffinterp.CreatePWLDMapping(q_field->num_components,
+//                                 q_field->num_sets,
+//                                 group-gi,moment,
+//                                 pwld_nodes,pwld_cells,
+//                                 pwl_sdm->cell_dfem_block_address,
+//                                 mapping);
+
+      std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
       for (int i=0; i<cell_dofs; i++)
-      {
-        pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_local_id);
-      }
+        cell_node_component_tuples.emplace_back(cell_local_id,i,group-gi);
 
-      chi_mesh::FieldFunctionInterpolation ffinterp;
-      ffinterp.grid_view = grid;
-      ffinterp.CreatePWLDMapping(q_field->num_components,
-                                 q_field->num_sets,
-                                 group-gi,moment,
-                                 pwld_nodes,pwld_cells,
-                                 pwl_sdm->cell_dfem_block_address,
-                                 mapping);
+      q_field->CreatePWLDMappingLocal(cell_node_component_tuples, mapping);
 
       for (int i=0; i<cell_dofs; i++)
       {
@@ -287,23 +294,30 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     if ((q_field != nullptr) and (cell_is_local))
     {
       std::vector<uint64_t> mapping;
-      std::vector<int> pwld_nodes;
-      std::vector<int> pwld_cells;
+//      std::vector<int> pwld_nodes;
+//      std::vector<int> pwld_cells;
+//
+//      for (int i=0; i<cell_dofs; i++)
+//      {
+//        pwld_nodes.push_back(i);
+//        pwld_cells.push_back(cell_local_id);
+//      }
+//
+//      chi_mesh::FieldFunctionInterpolation ffinterp;
+//      ffinterp.grid_view = grid;
+//      ffinterp.CreatePWLDMapping(q_field->num_components,
+//                                 q_field->num_sets,
+//                                 0,0,
+//                                 pwld_nodes,pwld_cells,
+//                                 pwl_sdm->cell_dfem_block_address,
+//                                 mapping);
+
+      std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
       for (int i=0; i<cell_dofs; i++)
-      {
-        pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_local_id);
-      }
+        cell_node_component_tuples.emplace_back(cell_local_id,i,0);
 
-      chi_mesh::FieldFunctionInterpolation ffinterp;
-      ffinterp.grid_view = grid;
-      ffinterp.CreatePWLDMapping(q_field->num_components,
-                                 q_field->num_sets,
-                                 0,0,
-                                 pwld_nodes,pwld_cells,
-                                 pwl_sdm->cell_dfem_block_address,
-                                 mapping);
+      q_field->CreatePWLDMappingLocal(cell_node_component_tuples, mapping);
 
       for (int i=0; i<cell_dofs; i++)
       {
@@ -370,23 +384,30 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
     if ((q_field != nullptr) and (cell_is_local))
     {
       std::vector<uint64_t> mapping;
-      std::vector<int> pwld_nodes;
-      std::vector<int> pwld_cells;
+//      std::vector<int> pwld_nodes;
+//      std::vector<int> pwld_cells;
+//
+//      for (int i=0; i<cell_dofs; i++)
+//      {
+//        pwld_nodes.push_back(i);
+//        pwld_cells.push_back(cell_local_id);
+//      }
+//
+//      chi_mesh::FieldFunctionInterpolation ffinterp;
+//      ffinterp.grid_view = grid;
+//      ffinterp.CreatePWLDMapping(q_field->num_components,
+//                                 q_field->num_sets,
+//                                 0,0,
+//                                 pwld_nodes,pwld_cells,
+//                                 pwl_sdm->cell_dfem_block_address,
+//                                 mapping);
+
+      std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
       for (int i=0; i<cell_dofs; i++)
-      {
-        pwld_nodes.push_back(i);
-        pwld_cells.push_back(cell_local_id);
-      }
+        cell_node_component_tuples.emplace_back(cell_local_id,i,0);
 
-      chi_mesh::FieldFunctionInterpolation ffinterp;
-      ffinterp.grid_view = grid;
-      ffinterp.CreatePWLDMapping(q_field->num_components,
-                                 q_field->num_sets,
-                                 0,0,
-                                 pwld_nodes,pwld_cells,
-                                 pwl_sdm->cell_dfem_block_address,
-                                 mapping);
+      q_field->CreatePWLDMappingLocal(cell_node_component_tuples, mapping);
 
       for (int i=0; i<cell_dofs; i++)
       {

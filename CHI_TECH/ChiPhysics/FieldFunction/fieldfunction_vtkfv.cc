@@ -5,11 +5,6 @@
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include "ChiPhysics/chi_physics.h"
 
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h"
-
 #include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 
 #include "chi_log.h"
@@ -21,18 +16,15 @@ extern ChiPhysics&  chi_physics_handler;
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkDataSetMapper.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkXMLPUnstructuredGridWriter.h>
+//#include <vtkXMLPUnstructuredGridWriter.h>
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
-#include <vtkFieldData.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
-#include <vtkStringArray.h>
 
 #include <vtkInformation.h>
 
@@ -45,13 +37,11 @@ extern ChiPhysics&  chi_physics_handler;
 void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
                                                const std::string& field_name)
 {
-  chi_mesh::FieldFunctionInterpolation ff_interpol;
-  ff_interpol.grid_view = grid;
-
   std::vector<std::vector<double>>    d_nodes;
 
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  auto points = vtkSmartPointer<vtkPoints>::New();
+
+  const auto& field_unknown = unknown_manager.unknowns[ref_unknown];
 
   //============================================= Init grid and material name
   vtkUnstructuredGrid* ugrid;
@@ -70,11 +60,12 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
   phiavgarray->SetName((field_name + std::string("-Avg")).c_str());
 
   //========================================= Populate nodes
-  for (int v=0; v<grid->vertices.size(); v++)
+  size_t vcount=0;
+  for (auto v_ptr : grid->vertices)
   {
     chi_mesh::Vertex vertex;
-    if (grid->vertices[v] != nullptr)
-      vertex = *grid->vertices[v];
+    if (v_ptr != nullptr)
+      vertex = *v_ptr;
     std::vector<double> d_node;
     d_node.push_back(vertex.x);
     d_node.push_back(vertex.y);
@@ -82,22 +73,19 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
     d_nodes.push_back(d_node);
 
-    points->InsertPoint(v,d_node.data());
+    points->InsertPoint(vcount,d_node.data());
+    ++vcount;
   }
 
   //======================================== populate cell mapping
   int num_loc_cells = grid->local_cells.size();
-  std::vector<uint64_t> cells_to_map(num_loc_cells);
+  std::vector<std::pair<uint64_t,uint>> cell_comps_to_map(num_loc_cells);
   std::vector<uint64_t> mapping;
   for (uint64_t lc=0; lc<num_loc_cells; lc++)
-    cells_to_map[lc] = lc;
+    cell_comps_to_map[lc] = std::make_pair(lc,0);
 
-  ff_interpol.CreateFVMapping(num_components,
-                              num_sets,
-                              ref_component,
-                              ref_set,
-                              cells_to_map,
-                              mapping);
+  CreateFVMappingLocal(cell_comps_to_map,
+                       mapping);
 
   //======================================== Populate cell information
   for (const auto& cell : grid->local_cells)
@@ -226,15 +214,16 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
   std::vector<std::vector<double>>    d_nodes;
 
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  auto points = vtkSmartPointer<vtkPoints>::New();
+
+  const auto& field_unknown = unknown_manager.unknowns[ref_unknown];
 
   //============================================= Init grid and material name
   vtkUnstructuredGrid* ugrid;
   vtkIntArray*      matarray;
   vtkIntArray*      pararray;
 
-  std::vector<vtkDoubleArray*>   phiavgarray(num_components);
+  std::vector<vtkDoubleArray*>   phiavgarray(field_unknown.num_components);
 
   ugrid    = vtkUnstructuredGrid::New();
   matarray = vtkIntArray::New();
@@ -242,7 +231,7 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
   pararray = vtkIntArray::New();
   pararray->SetName("Partition");
 
-  for (int g=0; g < num_components; g++)
+  for (int g=0; g < field_unknown.num_components; g++)
   {
     phiavgarray[g] = vtkDoubleArray::New();
     phiavgarray[g]->SetName((field_name +
@@ -252,12 +241,13 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
   }
 
 
-  //========================================= Populate dones
-  for (int v=0; v<grid->vertices.size(); v++)
+  //========================================= Populate nodes
+  size_t vcount=0;
+  for (auto v_ptr : grid->vertices)
   {
     chi_mesh::Vertex vertex;
-    if (grid->vertices[v] != nullptr)
-      vertex = *grid->vertices[v];
+    if (v_ptr != nullptr)
+      vertex = *v_ptr;
     std::vector<double> d_node;
     d_node.push_back(vertex.x);
     d_node.push_back(vertex.y);
@@ -265,24 +255,26 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
     d_nodes.push_back(d_node);
 
-    points->InsertPoint(v,d_node.data());
+    points->InsertPoint(vcount,d_node.data());
+    ++vcount;
   }
+
+  const auto& ff_uk = this->unknown_manager.unknowns[ref_unknown];
 
   //======================================== populate cell mapping
   int num_loc_cells = grid->local_cells.size();
-  std::vector<uint64_t> cells_to_map(num_loc_cells);
+  std::vector<std::pair<uint64_t,uint>> cell_comps_to_map(num_loc_cells);
   std::vector<uint64_t> mapping;
   for (uint64_t lc=0; lc<num_loc_cells; lc++)
-    cells_to_map[lc] = lc;
+    for (unsigned int g=0; g < ff_uk.num_components; g++)
+      cell_comps_to_map[lc] = std::make_pair(lc,g);
 
-  ff_interpol.CreateFVMapping(num_components,
-                              num_sets,
-                              ref_component,
-                              ref_set,
-                              cells_to_map,
-                              mapping);
+  CreateFVMappingLocal(cell_comps_to_map,
+                       mapping);
+
 
   //======================================== Populate cell information
+  int counter=-1;
   for (const auto& cell : grid->local_cells)
   {
     int lc = cell.local_id;
@@ -305,9 +297,10 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
 
-      for (int g=0; g < num_components; g++)
+      for (int g=0; g < ff_uk.num_components; g++)
       {
-        double phi_value = field_vector_local->operator[](mapping[lc]+g);
+        ++counter;
+        double phi_value = field_vector_local->operator[](mapping[counter]);
         phiavgarray[g]->InsertNextValue(phi_value);
       }//for g
 
@@ -331,9 +324,10 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
 
-      for (int g=0; g < num_components; g++)
+      for (int g=0; g < ff_uk.num_components; g++)
       {
-        double phi_value = field_vector_local->operator[](mapping[lc]+g);
+        ++counter;
+        double phi_value = field_vector_local->operator[](mapping[counter]);
         phiavgarray[g]->InsertNextValue(phi_value);
       }//for g
     }
@@ -369,9 +363,10 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
 
-      for (int g=0; g < num_components; g++)
+      for (int g=0; g < ff_uk.num_components; g++)
       {
-        double phi_value = field_vector_local->operator[](mapping[lc]+g);
+        ++counter;
+        double phi_value = field_vector_local->operator[](mapping[counter]);
         phiavgarray[g]->InsertNextValue(phi_value);
       }//for g
     }//polyhedron
@@ -392,7 +387,7 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
   ugrid->GetCellData()->AddArray(matarray);
   ugrid->GetCellData()->AddArray(pararray);
-  for (int g=0; g < num_components; g++)
+  for (int g=0; g < ff_uk.num_components; g++)
     ugrid->GetCellData()->AddArray(phiavgarray[g]);
 
   grid_writer->SetInputData(ugrid);
@@ -406,6 +401,6 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
   //============================================= Parallel summary file
   if (chi_mpi.location_id == 0)
   {
-      WritePVTU(base_filename, field_name, num_components);
+      WritePVTU(base_filename, field_name, (int)ff_uk.num_components);
   }
 }
