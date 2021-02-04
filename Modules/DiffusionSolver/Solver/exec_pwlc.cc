@@ -26,10 +26,6 @@ extern ChiTimer chi_program_timer;
 int chi_diffusion::Solver::ExecutePWLC(bool suppress_assembly,
                                        bool suppress_solve)
 {
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  mesher    = mesh_handler->volume_mesher;
-
-
   //################################################## Assemble Amatrix
   chi_log.Log(LOG_0) << "Diffusion Solver: Assembling A and b";
   chi_log.Log(LOG_0)

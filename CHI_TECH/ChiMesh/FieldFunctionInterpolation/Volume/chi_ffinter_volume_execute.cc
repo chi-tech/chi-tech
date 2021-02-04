@@ -55,8 +55,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 void chi_mesh::FieldFunctionInterpolationVolume::
   CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping)
 {
-  auto discretization =
-    (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
+  auto& discretization = static_cast<SpatialDiscretization_PWL&>(
+                         *field_functions[0]->spatial_discretization);
 
   int counter=-1;
   double total_volume = 0.0;
@@ -73,7 +73,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
 
     if (inside_logvolume)
     {
-      auto cell_fe_view = discretization->MapFeViewL(cell.local_id);
+      auto cell_fe_view = discretization.MapFeViewL(cell.local_id);
 
       for (int i=0; i<cell.vertex_ids.size(); i++)
       {
@@ -127,8 +127,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::
 void chi_mesh::FieldFunctionInterpolationVolume::
   PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping)
 {
-  auto discretization =
-    (SpatialDiscretization_PWL*) field_functions[0]->spatial_discretization;
+  auto& discretization = static_cast<SpatialDiscretization_PWL&>(
+                         *field_functions[0]->spatial_discretization);
 
   int counter=-1;
   op_value = 0.0;
@@ -146,7 +146,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
     if (inside_logvolume)
     {
       auto cell_fe_view =
-        (CellFEView*)discretization->MapFeViewL(cell.local_id);
+        (CellFEView*)discretization.MapFeViewL(cell.local_id);
 
       for (int i=0; i < cell.vertex_ids.size(); i++)
       {

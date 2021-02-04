@@ -29,9 +29,8 @@ class chi_physics::FieldFunction
 {
 public:
   std::string               text_name;
-//  int                       id;
   chi_mesh::MeshContinuum*  grid;
-  SpatialDiscretization*    spatial_discretization;
+  std::shared_ptr<SpatialDiscretization> spatial_discretization;
   chi_math::UnknownManager  unknown_manager;
   const unsigned int        ref_component;
   const unsigned int        ref_unknown;
@@ -43,13 +42,12 @@ public:
 public:
   /**Non-PETSc type field vector*/
   FieldFunction(std::string ff_tex_name,
-                SpatialDiscretization* ff_sdm,
+                std::shared_ptr<SpatialDiscretization> ff_sdm,
                 std::vector<double>* ff_field_vector,
                 chi_math::UnknownManager& ff_unknown_manager,
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
-//    id(0),
     grid(ff_sdm->ref_grid),
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),
@@ -62,13 +60,12 @@ public:
 
   /**PETSc type field vector*/
   FieldFunction(std::string ff_tex_name,
-                SpatialDiscretization* ff_sdm,
+                std::shared_ptr<SpatialDiscretization> ff_sdm,
                 Vec* ff_field_vector,
                 chi_math::UnknownManager& ff_unknown_manager,
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
-//    id(0),
     grid(ff_sdm->ref_grid),
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),

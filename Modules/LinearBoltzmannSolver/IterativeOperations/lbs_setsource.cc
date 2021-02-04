@@ -55,8 +55,7 @@ void LinearBoltzmann::Solver::SetSource(int group_set_num,
   //================================================== Loop over local cells
   for (const auto& cell : grid->local_cells)
   {
-    auto full_cell_view =
-      (LinearBoltzmann::CellViewFull*)cell_transport_views[cell.local_id];
+    auto& full_cell_view = cell_transport_views[cell.local_id];
 
     //=========================================== Obtain cross-section and src
     int cell_matid = cell.material_id;
@@ -85,7 +84,7 @@ void LinearBoltzmann::Solver::SetSource(int group_set_num,
     double sigma_sm = 0.0;
     double* q_mom;
     double* phi_oldp;
-    int num_dofs = full_cell_view->dofs;
+    int num_dofs = full_cell_view.dofs;
     int gprime;
     for (int i=0; i<num_dofs; i++)
     {
@@ -99,7 +98,7 @@ void LinearBoltzmann::Solver::SetSource(int group_set_num,
         for (int em=ellmin; em<=ellmax; em++)
         {
           m++;
-          int ir = full_cell_view->MapDOF(i,m,0);
+          int ir = full_cell_view.MapDOF(i,m,0);
           q_mom    = &q_moments_local[ir];
           phi_oldp = &phi_old_local[ir];
 

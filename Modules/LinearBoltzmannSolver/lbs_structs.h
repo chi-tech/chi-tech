@@ -1,5 +1,5 @@
-#ifndef _lbs_structs_h
-#define _lbs_structs_h
+#ifndef LBS_STRUCTS_H
+#define LBS_STRUCTS_H
 
 #define PARTITION_METHOD_SERIAL        1
 #define PARTITION_METHOD_FROM_SURFACE  2
@@ -21,59 +21,37 @@ enum class GeometryType
 struct Options
 {
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
-  int  scattering_order;
-  int  partition_method;
-  int  sweep_eager_limit;
+  int  scattering_order=1;
+  int  sweep_eager_limit= 32000;;
 
-  bool read_restart_data;
-  std::string read_restart_folder_name;
-  std::string read_restart_file_base;
+  bool read_restart_data=false;
+  std::string read_restart_folder_name = std::string("YRestart");
+  std::string read_restart_file_base   = std::string("restart");
 
-  bool write_restart_data;
-  std::string write_restart_folder_name;
-  std::string write_restart_file_base;
-  double write_restart_interval;
+  bool write_restart_data=false;
+  std::string write_restart_folder_name = std::string("YRestart");
+  std::string write_restart_file_base   = std::string("restart");
+  double write_restart_interval = 30.0;
 
-  Options()
-  {
-    scattering_order = 0;
-    partition_method = PARTITION_METHOD_SERIAL;
-    sweep_eager_limit= 32000;
-
-    read_restart_data = false;
-    read_restart_folder_name = std::string("YRestart");
-    read_restart_file_base   = std::string("restart");
-
-    write_restart_data = false;
-    write_restart_folder_name = std::string("YRestart");
-    write_restart_file_base   = std::string("restart");
-    write_restart_interval = 30.0;
-  }
+  Options() = default;
 };
-
-class CellViewBase
-{
-public:
-  std::vector<int> node_dof_mapping;
-};
-
 
 
 /**Transport view of a cell*/
-class CellViewFull : public CellViewBase
+class CellLBSView
 {
 public:
-  int dof_phi_map_start;
-  int dofs;
-  int xs_id;
-  std::vector<bool> face_local;
+  int dof_phi_map_start = 0;
+  int dofs = 0;
+  int xs_id = 0;
+  std::vector<bool> face_local = {};
 
 private:
-  int num_grps;
-  int num_moms;
+  int num_grps = 0;
+  int num_moms = 0;
 
 public:
-  CellViewFull(int in_dofs, int num_G, int num_m)
+  CellLBSView(int in_dofs, int num_G, int num_m)
   {
     dof_phi_map_start = -1;
     dofs = in_dofs;
@@ -81,7 +59,7 @@ public:
     num_moms = num_m;
   }
 
-  int MapDOF(int dof, int moment, int grp)
+  int MapDOF(int dof, int moment, int grp) const
   {
     return dof_phi_map_start + dof*num_grps*num_moms + num_grps*moment + grp;
   }

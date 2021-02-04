@@ -51,7 +51,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
                                 " is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  auto pwl_sdm = (SpatialDiscretization_PWL*)spatial_discretization;
+  auto& pwl_sdm = static_cast<SpatialDiscretization_PWL&>(*spatial_discretization);
 
   std::vector<std::vector<double>>    d_nodes;
 
@@ -179,7 +179,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeViewL(cell.local_id);
+      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm.MapFeViewL(cell.local_id);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
@@ -280,7 +280,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
                                 " is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  auto pwl_sdm = (SpatialDiscretization_PWL*)spatial_discretization;
+  auto& pwl_sdm = static_cast<SpatialDiscretization_PWL&>(*spatial_discretization);
 
   std::vector<std::vector<double>>    d_nodes;
 
@@ -430,7 +430,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm->MapFeViewL(cell.local_id);
+      auto cell_fe_view = (PolyhedronFEView*)pwl_sdm.MapFeViewL(cell.local_id);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);

@@ -1,5 +1,5 @@
-#ifndef _chi_discretization_h
-#define _chi_discretization_h
+#ifndef CHI_DISCRETIZATION_H
+#define CHI_DISCRETIZATION_H
 
 #include "ChiMesh/chi_mesh.h"
 #include "../Quadratures/quadrature.h"
@@ -41,12 +41,24 @@ protected:
 public:
   int              block_size_per_unknown=0;
 
-public:
-  //00
-  SpatialDiscretization(int dim,
-                        chi_math::SpatialDiscretizationType in_type =
-                          chi_math::SpatialDiscretizationType::UNDEFINED);
+private:
+  typedef chi_math::SpatialDiscretizationType SDMType;
 
+protected:
+  //00
+  explicit SpatialDiscretization(int dim, SDMType in_type =
+                                          SDMType::UNDEFINED);
+
+public:
+  //prevent anything else other than a shared pointer
+  static
+  std::shared_ptr<SpatialDiscretization>
+  New(int in_dim=0, SDMType in_sd_method =
+                    SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
+  { return std::shared_ptr<SpatialDiscretization>(
+      new SpatialDiscretization(in_dim, in_sd_method));}
+
+public:
   //01
   virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid);
 

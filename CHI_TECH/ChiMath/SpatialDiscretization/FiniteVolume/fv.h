@@ -1,5 +1,5 @@
-#ifndef _chi_discretization_fv_h
-#define _chi_discretization_fv_h
+#ifndef CHI_DISCRETIZATION_FV_H
+#define CHI_DISCRETIZATION_FV_H
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "CellViews/fv_cellbase.h"
@@ -21,10 +21,21 @@ private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
   std::vector<CellFVView*> neighbor_cell_fv_views;
 
+  typedef chi_math::SpatialDiscretizationType SDMType;
+
+private:
+  explicit
+  SpatialDiscretization_FV(int dim=0, SDMType sd_method =
+                                      SDMType::FINITE_VOLUME);
+
 public:
-  SpatialDiscretization_FV(int dim=0,
-                           chi_math::SpatialDiscretizationType sd_method =
-                           chi_math::SpatialDiscretizationType::FINITE_VOLUME);
+  //prevent anything else other than a shared pointer
+  static
+  std::shared_ptr<SpatialDiscretization_FV>
+  New(int in_dim=0, SDMType in_sd_method =
+                    SDMType::FINITE_VOLUME)
+  { return std::shared_ptr<SpatialDiscretization_FV>(
+    new SpatialDiscretization_FV(in_dim, in_sd_method));}
 
   //01
   void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;

@@ -1,5 +1,5 @@
-#ifndef _npt_sweepchunk_pwl_h
-#define _npt_sweepchunk_pwl_h
+#ifndef LBS_SWEEPCHUNK_PWL_H
+#define LBS_SWEEPCHUNK_PWL_H
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
@@ -35,8 +35,8 @@ class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
   chi_mesh::MeshContinuum* grid_view;
-  SpatialDiscretization_PWL* grid_fe_view;
-  const std::vector<LinearBoltzmann::CellViewBase*>* grid_transport_view;
+  SpatialDiscretization_PWL& grid_fe_view;
+  const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const LinearBoltzmann::Solver& ref_solver;
   const std::vector<double>* q_moments;
   const LBSGroupset* groupset;
@@ -53,8 +53,8 @@ protected:
 public:
   // ################################################## Constructor
   LBSSweepChunkPWL(chi_mesh::MeshContinuum* vol_continuum,
-                   SpatialDiscretization_PWL* discretization,
-                   const std::vector<LinearBoltzmann::CellViewBase*>* cell_transport_views,
+                   SpatialDiscretization_PWL& discretization,
+                   const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                    const LinearBoltzmann::Solver& in_ref_solver,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
@@ -108,12 +108,11 @@ public:
     {
       int cell_local_id = spds->spls.item_id[cr_i];
       auto cell = &grid_view->local_cells[cell_local_id];
-      auto cell_fe_view = grid_fe_view->MapFeViewL(cell->local_id);
+      auto cell_fe_view = grid_fe_view.MapFeViewL(cell->local_id);
       int num_faces = cell->faces.size();
       int num_dofs = cell_fe_view->dofs; 
-      auto transport_view =
-        static_cast<LinearBoltzmann::CellViewFull*>((*grid_transport_view)[cell->local_id]);
-      auto sigma_tg = (*xsections)[transport_view->xs_id]->sigma_tg;
+      auto& transport_view = grid_transport_view[cell->local_id];
+      auto sigma_tg = (*xsections)[transport_view.xs_id]->sigma_tg;
       std::vector<bool> face_incident_flags(num_faces, false);
 
       // =================================================== Get Cell matrices
@@ -154,7 +153,7 @@ public:
           if (mu < 0.0) // Upwind
           {
             face_incident_flags[f] = true;
-            bool local = transport_view->face_local[f];
+            bool local = transport_view.face_local[f];
             bool boundary = not face.has_neighbor;
             int num_face_indices = face.vertex_ids.size();
 
@@ -233,7 +232,7 @@ public:
             double temp_src = 0.0;
             for (int m = 0; m < num_moms; ++m)
             {
-              int ir = transport_view->MapDOF(i, m, g);
+              int ir = transport_view.MapDOF(i, m, g);
               temp_src += m2d_op[m][angle_num]*(*q_moments)[ir];
             }
             source[i] = temp_src;
@@ -263,7 +262,7 @@ public:
           double wn_d2m = d2m_op[m][angle_num];
           for (int i = 0; i < num_dofs; ++i)
           {
-            int ir = transport_view->MapDOF(i, m, gs_gi);
+            int ir = transport_view.MapDOF(i, m, gs_gi);
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               (*x)[ir + gsg] += wn_d2m*b[gsg][i];
 
@@ -281,7 +280,7 @@ public:
           // ============================= Set flags and counters
           out_face_counter++;
           auto& face = cell->faces[f];
-          bool local = transport_view->face_local[f];
+          bool local = transport_view.face_local[f];
           bool boundary = not face.has_neighbor;
           int num_face_indices = face.vertex_ids.size();
 

@@ -101,8 +101,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
                   std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
-  auto spatial_dm   =
-    (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;
+  auto& spatial_dm = static_cast<SpatialDiscretization_PWL&>(
+                     *ff_ctx->ref_ff->spatial_discretization);
 
   //================================================== Loop over node indices
   //                                                   that
@@ -114,7 +114,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm->MapFeViewL(cell_local_index);
+    auto cell_fe_view = spatial_dm.MapFeViewL(cell_local_index);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->dofs; i++)
@@ -146,8 +146,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
   PWLDInterpolate(std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
-  auto spatial_dm   =
-    (SpatialDiscretization_PWL*)ff_ctx->ref_ff->spatial_discretization;
+  auto& spatial_dm = static_cast<SpatialDiscretization_PWL&>(
+                     *ff_ctx->ref_ff->spatial_discretization);
 
   std::vector<double>& field = *ff_ctx->ref_ff->field_vector_local;
 
@@ -161,7 +161,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm->MapFeViewL(cell_local_index);
+    auto cell_fe_view = spatial_dm.MapFeViewL(cell_local_index);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->dofs; i++)

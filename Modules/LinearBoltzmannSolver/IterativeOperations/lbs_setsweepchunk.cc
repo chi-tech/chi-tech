@@ -10,13 +10,15 @@ SweepChunk* LinearBoltzmann::Solver::SetSweepChunk(int group_set_num)
   //================================================== Obtain groupset
   LBSGroupset* groupset = group_sets[group_set_num];
 
+  auto pwl_sdm = std::dynamic_pointer_cast<SpatialDiscretization_PWL>(discretization);
+
   //================================================== Setting up required
   //                                                   sweep chunks
   SweepChunk* sweep_chunk = new LBSSweepChunkPWL(
         grid,                                    //Spatial grid of cells
-        (SpatialDiscretization_PWL*)discretization, //Spatial discretization
-        &cell_transport_views,                   //Cell transport views
-        *this,
+        *pwl_sdm,                                //Spatial discretization
+        cell_transport_views,                    //Cell transport views
+        *this,                                   //Reference solver
         &phi_new_local,                          //Destination phi
         &q_moments_local,                        //Source moments
         groupset,                                //Reference groupset

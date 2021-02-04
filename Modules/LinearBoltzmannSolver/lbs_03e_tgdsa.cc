@@ -25,17 +25,6 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
     std::string text_name = std::string("Sum_Sigma_s_DeltaPhi_g") +
                             std::to_string(g) +
                             std::string("_m") + std::to_string(m);
-//    auto deltaphi_ff = new chi_physics::FieldFunction(
-//      text_name,                                    //Text name
-//      chi_physics_handler.fieldfunc_stack.size(),   //FF-id
-//      chi_physics::FieldFunctionType::DFEM_PWL,     //Type
-//      grid,                                         //Grid
-//      discretization,                               //Spatial Discretization
-//      1,                                            //Number of components
-//      1,                                            //Number of sets
-//      g,m,                                          //Ref component, ref set
-//      nullptr,                                      //Dof block address
-//      &delta_phi_local);                            //Data vector
 
     auto deltaphi_ff = new chi_physics::FieldFunction(
       text_name,                                    //Text name
@@ -124,8 +113,7 @@ void LinearBoltzmann::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
   {
     int c = cell.local_id;
 
-    auto transport_view =
-      (LinearBoltzmann::CellViewFull*)cell_transport_views[c];
+    auto& transport_view = cell_transport_views[c];
 
     int xs_id = matid_to_xs_map[cell.material_id];
     chi_math::SparseMatrix& S = material_xs[xs_id]->transfer_matrix[0];
@@ -134,7 +122,7 @@ void LinearBoltzmann::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
     {
       index++;
       int m = 0;
-      int mapping = transport_view->MapDOF(i,m,0); //phi_new & old location gsi
+      int mapping = transport_view.MapDOF(i,m,0); //phi_new & old location gsi
 
       double* phi_old_mapped = &ref_phi_old[mapping];
       double* phi_new_mapped = &ref_phi_new[mapping];
@@ -177,8 +165,7 @@ void LinearBoltzmann::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groups
   {
     int c = cell.local_id;
 
-    auto transport_view =
-      (LinearBoltzmann::CellViewFull*)cell_transport_views[c];
+    auto& transport_view = cell_transport_views[c];
 
     int xs_id = matid_to_xs_map[cell.material_id];
     std::vector<double>& xi_g = material_xs[xs_id]->xi_Jfull_g;
@@ -187,7 +174,7 @@ void LinearBoltzmann::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groups
     {
       index++;
       int m=0;
-      int mapping = transport_view->MapDOF(i,m,gsi); //phi_new & old location gsi
+      int mapping = transport_view.MapDOF(i,m,gsi); //phi_new & old location gsi
 
       double* phi_new_mapped = &ref_phi_new[mapping];
 

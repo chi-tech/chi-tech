@@ -428,8 +428,12 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
+    auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
+    auto& rpwl_sdm = *pwl_sdm;
+
+
     auto fe_view =
-      new PolygonFEView(cell, grid, (SpatialDiscretization_PWL*)discretization);
+      new PolygonFEView(cell, grid, &rpwl_sdm);
 
     fe_view->PreCompute();
 
@@ -439,7 +443,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
   else if (cell_info->cell_type == 5)
   {
-    chi_mesh::CellPolyhedron* cell = new chi_mesh::CellPolyhedron;
+    auto cell = new chi_mesh::CellPolyhedron;
     cell->partition_id = locI;
     cell->material_id = cell_info->cell_mat_id;
 
@@ -475,8 +479,11 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
+    auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
+    auto& rpwl_sdm = *pwl_sdm;
+
     PolyhedronFEView* fe_view =
-      new PolyhedronFEView(cell,grid,(SpatialDiscretization_PWL*)discretization);
+      new PolyhedronFEView(cell,grid,&rpwl_sdm);
 
     fe_view->PreCompute();
 

@@ -74,27 +74,28 @@ private:
   ChiTimer t_assembly;
   ChiTimer t_solve;
 
-  double time_assembly, time_solve;
-  bool verbose_info;
+  double time_assembly=0.0, time_solve=0.0;
+  bool verbose_info=true;
 public:
-  std::string                              solver_name;
+  std::string                              solver_name="Diffusion Solver";
   std::vector<chi_diffusion::Boundary*>    boundaries;
-  chi_mesh::MeshContinuum*                 grid;
-  SpatialDiscretization*                   discretization;
-  SpatialDiscretization_PWL*               pwl_sdm;
-  chi_mesh::VolumeMesher*                  mesher;
+  chi_mesh::MeshContinuum*                 grid = nullptr;
+
+  std::shared_ptr<SpatialDiscretization>     discretization;
+  std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;
+
   chi_math::UnknownManager                 unknown_manager;
-  int fem_method;
+  int                                      fem_method = 0;
 
-  int   property_map_D;
-  int   property_map_q;
-  int   property_map_sigma;
-  int   material_mode;
-  chi_physics::FieldFunction* D_field;
-  chi_physics::FieldFunction* q_field;
-  chi_physics::FieldFunction* sigma_field;
+  int   property_map_D     = 0;
+  int   property_map_q     = 1;
+  int   property_map_sigma = 2;
+  int   material_mode      = DIFFUSION_MATERIALS_REGULAR;
+  chi_physics::FieldFunction* D_field     = nullptr;
+  chi_physics::FieldFunction* q_field     = nullptr;
+  chi_physics::FieldFunction* sigma_field = nullptr;
 
-  bool common_items_initialized;
+  bool common_items_initialized=false;
 
   Vec            x;            // approx solution
   Vec            b;            // RHS
@@ -113,8 +114,7 @@ public:
   Mat            Aref;         // Reference linear system matrix
 
   PetscReal      norm;         /* norm of solution error */
-  PetscErrorCode ierr;
-//  PetscInt       local_rows_from, local_rows_to;
+  PetscErrorCode ierr;         // General error code
 
   std::vector<std::vector<int>>  nodal_connections;
   std::vector<std::vector<int>>  nodal_cell_connections;
@@ -122,9 +122,9 @@ public:
   std::vector<int>               nodal_nnz_in_diag;
   std::vector<int>               nodal_nnz_off_diag;
 
-  int                            local_dof_count;
-  int                            global_dof_count;
-  int                            pwld_local_dof_start;
+  int                            local_dof_count = 0;
+  int                            global_dof_count = 0;
+  int                            pwld_local_dof_start = 0;
   std::vector<DiffusionIPCellView*> ip_cell_views;
   IP_BORDERCELL_INFO             ip_locI_bordercell_info;
   IP_BORDERCELLS                 ip_locI_bordercells;
@@ -134,21 +134,21 @@ public:
   std::vector<double>            pwld_phi_local;
   std::vector<int>               pwld_cell_dof_array_address;
 
-  int    max_iters;
-  double residual_tolerance;
-  int    gi;
-  int    G;
+  int    max_iters = 500;
+  double residual_tolerance = 1.0e-8;
+  int    gi = 0;
+  int    G = 1;
   std::string options_string;
 
 public:
   //00
   Solver();
-  Solver(std::string in_solver_name);
-  ~Solver();
+  explicit Solver(std::string in_solver_name);
+  virtual ~Solver();
   //01 General
-  void GetMaterialProperties(int mat_id, double& diffCoeff,
-                                         double& sourceQ,
-                                         double& sigmaa);
+//  void GetMaterialProperties(int mat_id, double& diffCoeff,
+//                                         double& sourceQ,
+//                                         double& sigmaa);
   void GetMaterialProperties(int mat_id,
                              chi_mesh::Cell* cell,
                              int cell_dofs,

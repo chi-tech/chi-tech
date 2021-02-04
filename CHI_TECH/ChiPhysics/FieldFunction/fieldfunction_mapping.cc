@@ -53,7 +53,7 @@ void chi_physics::FieldFunction::
                                 " discretization is not of type "
                                 " FINITE_VOLUME.");
 
-  auto sdm_fv = (SpatialDiscretization_FV*)sdm;
+  auto sdm_fv = std::static_pointer_cast<SpatialDiscretization_FV>(sdm);
 
   for (auto& cell_index_component_pair : cell_component_pairs)
   {
@@ -85,7 +85,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
                                 " discretization is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  auto pwl_sdm = (SpatialDiscretization_PWL*)spatial_discretization;
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(spatial_discretization);
 
   size_t num_nodes_to_map = node_component_pairs.size();
   std::vector<int> mapped_nodes;
@@ -141,7 +141,7 @@ CreatePWLDMappingLocal(
                                 " discretization is not of type "
                                 " PIECEWISE_LINEAR_DISCONTINUOUS.");
 
-  auto pwl_sdm = (SpatialDiscretization_PWL*)spatial_discretization;
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(spatial_discretization);
 
   for (const auto& data : cell_node_component_tuples)
   {

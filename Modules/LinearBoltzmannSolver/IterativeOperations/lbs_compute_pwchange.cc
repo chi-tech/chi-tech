@@ -14,20 +14,19 @@ double LinearBoltzmann::Solver::ComputePiecewiseChange(LBSGroupset* groupset)
 
   for (const auto& cell : grid->local_cells)
   {
-    auto transport_view =
-      (LinearBoltzmann::CellViewFull*)cell_transport_views[cell.local_id];
+    auto& transport_view = cell_transport_views[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {
       for (int m=0; m<num_moments; m++)
       {
-        int mapping = transport_view->MapDOF(i,m,gsi);
+        int mapping = transport_view.MapDOF(i,m,gsi);
         double* phi_new_m = &phi_new_local.data()[mapping];
         double* phi_old_m = &phi_old_local.data()[mapping];
 
         for (int g=0; g<deltag; g++)
         {
-          int map0 = transport_view->MapDOF(i,0,gsi+g);
+          int map0 = transport_view.MapDOF(i,0,gsi+g);
 
           double abs_phi_m0     = fabs(phi_new_local[map0]);
           double abs_phi_old_m0 = fabs(phi_old_local[map0]);

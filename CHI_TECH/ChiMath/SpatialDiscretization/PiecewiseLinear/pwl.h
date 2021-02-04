@@ -1,5 +1,5 @@
-#ifndef _chi_discretization_pwl_h
-#define _chi_discretization_pwl_h
+#ifndef CHI_DISCRETIZATION_PWL_H
+#define CHI_DISCRETIZATION_PWL_H
 
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include"../../../ChiMesh/Region/chi_region.h"
@@ -35,11 +35,23 @@ private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
   std::vector<CellFEView*> neighbor_cell_fe_views;
 
-public:
+  typedef chi_math::SpatialDiscretizationType SDMType;
+
+private:
   //00
-  SpatialDiscretization_PWL(int dim=0,
-    chi_math::SpatialDiscretizationType sd_method =
-      chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS);
+  explicit
+  SpatialDiscretization_PWL(int dim=0, SDMType sd_method =
+                                       SDMType::PIECEWISE_LINEAR_DISCONTINUOUS);
+
+public:
+  //prevent anything else other than a shared pointer
+  static
+  std::shared_ptr<SpatialDiscretization_PWL>
+  New(int in_dim=0, SDMType in_sd_method =
+                    SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
+  { return std::shared_ptr<SpatialDiscretization_PWL>(
+    new SpatialDiscretization_PWL(in_dim, in_sd_method));}
+
   //01
   void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
   void AddViewOfNeighborContinuums(chi_mesh::MeshContinuum* grid);

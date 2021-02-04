@@ -49,9 +49,6 @@ extern ChiLog& chi_log;
 DISCRETIZATION_METHOD\n
  Discretization method.\n\n
 
-PARTITION_METHOD\n
- Multi-processor partitioning method.\n\n
-
 BOUNDARY_CONDITION\n
  Boundary condition type. See BoundaryIdentify.\n\n
 
@@ -177,18 +174,15 @@ int chiLBSSetProperty(lua_State *L)
     int method = lua_tonumber(L,3);
     if (method == PWLD1D)
     {
-      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL(1);
-      solver->discretization = discretization;
+      solver->discretization = SpatialDiscretization_PWL::New(1);
     }
     else if (method == PWLD2D)
     {
-      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL(2);
-      solver->discretization = discretization;
+      solver->discretization = SpatialDiscretization_PWL::New(2);
     }
     else if (method == PWLD3D)
     {
-      SpatialDiscretization_PWL* discretization = new SpatialDiscretization_PWL(3);
-      solver->discretization = discretization;
+      solver->discretization = SpatialDiscretization_PWL::New(3);
     }
     else
     {
@@ -196,12 +190,6 @@ int chiLBSSetProperty(lua_State *L)
                    "chiLBSSetProperty.\n";
       exit(EXIT_FAILURE);
     }
-  }
-  else if (property == PARTITION_METHOD)
-  {
-    int method = lua_tonumber(L,3);
-    solver->options.partition_method = method;
-    //printf("Partition method set to %d\n",method);
   }
   else if (property == BOUNDARY_CONDITION)
   {

@@ -7,9 +7,6 @@
 LinearBoltzmann::Solver::Solver()
 {
   //============================================= Default options
-  options.scattering_order  = 1;
-  options.partition_method = PARTITION_METHOD_SERIAL;
-
   max_cell_dof_count = 0;
 
   discretization = nullptr;

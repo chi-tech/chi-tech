@@ -20,20 +20,10 @@ DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 /**Initializes Piecewise Linear FEM for diffusion solver.*/
 int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
 {
-  //Right now I am only doing one region at a time.
-  //Later I want to support multiple regions with interfaces.
-//  chi_mesh::Region*     aregion = this->regions.back();
-//  grid = aregion->volume_mesh_continua.back();
-
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  mesher = mesh_handler->volume_mesher;
-
-  int num_nodes = grid->vertices.size();
-
   //================================================== Add pwl fem views
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
-  pwl_sdm = ((SpatialDiscretization_PWL*)(this->discretization));
+  pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   pwl_sdm->AddViewOfLocalContinuum(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 

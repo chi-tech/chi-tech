@@ -60,10 +60,10 @@ public:
   std::vector<int> matid_to_xs_map;
   std::vector<int> matid_to_src_map;
 
-  SpatialDiscretization *discretization;
+  std::shared_ptr<SpatialDiscretization> discretization;
   chi_mesh::MeshContinuum *grid;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings;
-  std::vector<LinearBoltzmann::CellViewBase *> cell_transport_views;
+  std::vector<LinearBoltzmann::CellLBSView> cell_transport_views;
 
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeLocalAndDownstreamBuffers
   //A default 0.0 incident boundary is loaded at the back of
@@ -90,7 +90,7 @@ public:
  public:
   //00
   Solver();
-  virtual ~Solver(){};
+  virtual ~Solver()=default;
   //01
   virtual void Initialize();
   //01a

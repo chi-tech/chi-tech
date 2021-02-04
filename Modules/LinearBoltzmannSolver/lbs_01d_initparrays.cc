@@ -47,7 +47,8 @@ away from exascale.
    */
 void LinearBoltzmann::Solver::InitializeParrays()
 {
-  auto pwl_discretization = (SpatialDiscretization_PWL*)discretization;
+  auto pwl_discretization =
+    std::dynamic_pointer_cast<SpatialDiscretization_PWL>(discretization);
 
   //================================================== Compute local # of dof
   auto domain_ownership = pwl_discretization->OrderNodesDFEM(grid);
@@ -99,20 +100,21 @@ void LinearBoltzmann::Solver::InitializeParrays()
     for (auto& cell : grid->local_cells)
     {
       auto cell_fe_view   = pwl_discretization->MapFeViewL(cell.local_id);
-      auto full_cell_view = new CellViewFull(cell_fe_view->dofs, num_grps, M);
+
+      CellLBSView cell_lbs_view(cell_fe_view->dofs, num_grps, M);
 
       int mat_id = cell.material_id;
 
-      full_cell_view->xs_id = matid_to_xs_map[mat_id];
+      cell_lbs_view.xs_id = matid_to_xs_map[mat_id];
 
-      full_cell_view->dof_phi_map_start = block_MG_counter;
+      cell_lbs_view.dof_phi_map_start = block_MG_counter;
       block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
 
       chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
       cell_nodal_mapping.reserve(cell.faces.size());
 
       //Init face upwind flags and adj_partition_id
-      full_cell_view->face_local.resize(cell.faces.size(),true);
+      cell_lbs_view.face_local.resize(cell.faces.size(), true);
       int f=0;
       for (auto& face : cell.faces)
       {
@@ -132,7 +134,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
         }//if bndry
 
         if (not face.IsNeighborLocal(grid))
-          full_cell_view->face_local[f] = false;
+          cell_lbs_view.face_local[f] = false;
 
         //Local nodal mappings
         std::vector<short> face_nodal_mapping;
@@ -150,12 +152,12 @@ void LinearBoltzmann::Solver::InitializeParrays()
       }//for f
 
       //Add address
-      local_cell_phi_dof_array_address.push_back(full_cell_view->dof_phi_map_start);
+      local_cell_phi_dof_array_address.push_back(cell_lbs_view.dof_phi_map_start);
 
       if (cell_fe_view->dofs > max_cell_dof_count)
         max_cell_dof_count = cell_fe_view->dofs;
 
-      cell_transport_views.push_back(full_cell_view);
+      cell_transport_views.push_back(cell_lbs_view);
       grid_nodal_mappings.push_back(cell_nodal_mapping);
     }//for local cell
   }//if empty

@@ -159,7 +159,7 @@ void chi_physics::FieldFunction::
 
   if (ff_type == SDMType::FINITE_VOLUME)
   {
-    auto fv = (SpatialDiscretization_FV*)ff_spatial_discretization;
+    auto& fv = static_cast<SpatialDiscretization_FV&>(*ff_spatial_discretization);
     for (auto ff : ff_list)
     {
       int ref_unknown = ff->ref_unknown;
@@ -173,7 +173,7 @@ void chi_physics::FieldFunction::
         for (auto& cell : grid->local_cells)
         {
           int local_mapping =
-            fv->MapDOFLocal(&cell,&ff->unknown_manager,ref_unknown);
+            fv.MapDOFLocal(&cell,&ff->unknown_manager,ref_unknown);
 
           double value = (*ff->field_vector_local)[local_mapping];
 
