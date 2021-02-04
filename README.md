@@ -1,4 +1,5 @@
 # Chi-Tech #
+https://img.shields.io/github/checks-status/wdhawkins/chi-tech/development
 
 A large-scale scientific simulation engine being developed at Texas A&M University 
 as part of a research study.
