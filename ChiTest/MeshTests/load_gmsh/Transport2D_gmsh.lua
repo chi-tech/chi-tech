@@ -6,9 +6,8 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromMshFiles(newSurfMesh,
-        "ChiResources/TestObjects/gmsh_2d_unstruct1.msh",true)
+chiSurfaceMeshCreate();
+chiUnpartitionedMeshFromMshFormat("ChiResources/TestObjects/gmsh_2d_unstruct1.msh")
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()
@@ -16,7 +15,7 @@ chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
 --############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED);
 
 chiSurfaceMesherSetProperty(PARTITION_X,2)
 chiSurfaceMesherSetProperty(PARTITION_Y,2)

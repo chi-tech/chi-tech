@@ -48,6 +48,18 @@ void chi_mesh::VolumeMesher::
   if (delete_surface_mesh_elements)
     surface_mesh->vertices = std::vector<chi_mesh::Vertex>(0);
 
+  //================================== Check if already have material ids
+  bool have_mat_ids = false;
+  if (surface_mesh->physical_region_map.size() == surface_mesh->poly_faces.size())
+    have_mat_ids = true;
+  else if (surface_mesh->physical_region_map.size())
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Material id's specified, but are inconsistent with mesh.";
+    exit(EXIT_FAILURE);
+  }
+
+
   //============================================= Process faces
   unsigned int num_cells = 0;
   for (auto& face : surface_mesh->faces)
@@ -154,7 +166,11 @@ void chi_mesh::VolumeMesher::
 
     cell->global_id = num_cells;
 
-    vol_continuum->cells.push_back(cell); ++num_cells;
+    if (have_mat_ids)
+      cell->material_id = surface_mesh->physical_region_map[num_cells];
+
+    vol_continuum->cells.push_back(cell);
+    ++num_cells;
 
     if (delete_surface_mesh_elements)
       delete face;
@@ -241,7 +257,10 @@ void chi_mesh::VolumeMesher::
 
     cell->global_id = num_cells;
 
-    grid->cells.push_back(cell); ++num_cells;
+    cell->material_id = raw_cell->material_id;
+
+    grid->cells.push_back(cell);
+    ++num_cells;
 
   }//for raw_cell
 }
