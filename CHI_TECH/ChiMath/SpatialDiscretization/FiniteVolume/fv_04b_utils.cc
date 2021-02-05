@@ -14,7 +14,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 unsigned int SpatialDiscretization_FV::
-  GetNumLocalDOFs(chi_mesh::MeshContinuum* grid,
+  GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                   chi_math::UnknownManager* unknown_manager)
 {
   unsigned int N = 1;
@@ -30,7 +30,7 @@ unsigned int SpatialDiscretization_FV::
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 unsigned int SpatialDiscretization_FV::
-  GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
+  GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                    chi_math::UnknownManager* unknown_manager)
 {
   unsigned int N = 1;
@@ -46,7 +46,7 @@ unsigned int SpatialDiscretization_FV::
 //###################################################################
 /**Get the number of ghost degrees-of-freedom.*/
 unsigned int SpatialDiscretization_FV::
-  GetNumGhostDOFs(chi_mesh::MeshContinuum* grid,
+  GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                   chi_math::UnknownManager* unknown_manager)
 {
   unsigned int N = 1;
@@ -60,7 +60,7 @@ unsigned int SpatialDiscretization_FV::
 //###################################################################
 /**Returns the ghost DOF indices.*/
 std::vector<int> SpatialDiscretization_FV::
-  GetGhostDOFIndices(chi_mesh::MeshContinuum* grid,
+  GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
                      chi_math::UnknownManager* unknown_manager,
                      unsigned int unknown_id)
 {

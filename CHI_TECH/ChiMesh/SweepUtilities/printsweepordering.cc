@@ -15,7 +15,7 @@
 /**Print a sweep ordering to file.*/
 void chi_mesh::sweep_management::
   PrintSweepOrdering(chi_mesh::sweep_management::SPDS *sweep_order,
-                     MeshContinuum* vol_continuum)
+                     MeshContinuumPtr vol_continuum)
 {
 //  double polar = sweep_order->polar;
 //  double azimuthal = sweep_order->azimuthal;

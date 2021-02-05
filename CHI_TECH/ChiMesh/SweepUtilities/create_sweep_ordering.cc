@@ -23,7 +23,7 @@ extern ChiTimer   chi_program_timer;
 std::shared_ptr<chi_mesh::sweep_management::SPDS>
 chi_mesh::sweep_management::
   CreateSweepOrder(double polar, double azimuthal,
-                   chi_mesh::MeshContinuum* grid,
+                   chi_mesh::MeshContinuumPtr grid,
                    bool cycle_allowance_flag)
 {
   auto sweep_order  = std::make_shared<chi_mesh::sweep_management::SPDS>();

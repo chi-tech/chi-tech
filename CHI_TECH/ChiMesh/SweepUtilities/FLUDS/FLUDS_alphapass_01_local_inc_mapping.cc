@@ -16,7 +16,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
                      SPDS_ptr spds,
                      std::vector<int>&  local_so_cell_mapping)
 {
-  chi_mesh::MeshContinuum* grid = spds->grid;
+  chi_mesh::MeshContinuumPtr grid = spds->grid;
   auto& cell_nodal_mapping = grid_nodal_mappings[cell->local_id];
   std::vector<std::pair<int,std::vector<short>>> inco_face_dof_mapping;
 

@@ -67,7 +67,7 @@ int chiRegionGetBoundarySurfaceMesh(lua_State *L)
   else if (num_args == 3)
   {
     int continuum_index = lua_tonumber(L,3);
-    chi_mesh::MeshContinuum* cur_cont;
+    chi_mesh::MeshContinuumPtr cur_cont;
     try{
       cur_cont = cur_boundary->mesh_continua.at(continuum_index);
     }

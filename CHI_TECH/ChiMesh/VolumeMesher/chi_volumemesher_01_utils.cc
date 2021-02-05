@@ -24,9 +24,145 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
-  AddContinuumToRegion(chi_mesh::MeshContinuum* grid, chi_mesh::Region& region)
+  AddContinuumToRegion(chi_mesh::MeshContinuumPtr grid, chi_mesh::Region& region)
 {
   region.volume_mesh_continua.push_back(grid);
+}
+
+//###################################################################
+/**Creates 2D polygon cells for each face of a surface mesh.*/
+void chi_mesh::VolumeMesher::
+CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
+                   chi_mesh::MeshContinuumPtr vol_continuum,
+                   bool delete_surface_mesh_elements,
+                   bool force_local)
+{
+  //============================================= Get current mesh handler
+  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+
+  //============================================= Copy nodes
+  for (auto& vertex : surface_mesh->vertices)
+    vol_continuum->vertices.push_back(new chi_mesh::Node(vertex));
+
+  //============================================= Delete nodes
+  if (delete_surface_mesh_elements)
+    surface_mesh->vertices = std::vector<chi_mesh::Vertex>(0);
+
+  //============================================= Process faces
+  unsigned int num_cells = 0;
+  for (auto& face : surface_mesh->faces)
+  {
+    auto cell = new chi_mesh::CellPolygon;
+
+    for (int k=0;k<3;k++)
+    {
+      cell->vertex_ids.push_back(face.v_index[k]);
+
+      chi_mesh::CellFace new_face;
+
+      new_face.vertex_ids.push_back(face.e_index[k][0]);
+      new_face.vertex_ids.push_back(face.e_index[k][1]);
+
+
+      chi_mesh::Vertex& v0 = *vol_continuum->vertices[face.e_index[k][0]];
+      chi_mesh::Vertex& v1 = *vol_continuum->vertices[face.e_index[k][1]];
+      new_face.centroid = v0*0.5 + v1*0.5;
+
+      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
+
+      chi_mesh::Vector3 va = v1 - v0;
+      chi_mesh::Vector3 vn = va.Cross(vk);
+      vn = vn/vn.Norm();
+      new_face.normal = vn;
+
+      if (face.e_index[k][2]>=0)
+      {
+        new_face.neighbor_id = face.e_index[k][2];
+        new_face.has_neighbor = true;
+      }
+
+      cell->faces.push_back(new_face);
+
+      cell->centroid = cell->centroid + surface_mesh->vertices[face.v_index[k]];
+    }
+    cell->centroid = cell->centroid/3;
+
+    //====================================== Compute xy partition id
+    auto xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = xy_partition_indices.second*
+                         handler->surface_mesher->partitioning_x +
+                         xy_partition_indices.first;
+
+    if (force_local)
+      cell->partition_id = chi_mpi.location_id;
+
+    cell->global_id = num_cells;
+
+    vol_continuum->cells.push_back(cell); ++num_cells;
+  }
+
+  for (auto face : surface_mesh->poly_faces)
+  {
+    auto cell = new chi_mesh::CellPolygon;
+
+    //====================================== Copy vertices
+    for (auto vid : face->v_indices)
+    {
+      cell->vertex_ids.push_back(vid);
+      cell->centroid = cell->centroid +
+                       *vol_continuum->vertices[vid];
+    }
+    cell->centroid = cell->centroid/cell->vertex_ids.size();
+
+    //====================================== Copy edges
+    for (auto src_side : face->edges)
+    {
+      chi_mesh::CellFace new_face;
+
+      new_face.vertex_ids.push_back(src_side[0]);
+      new_face.vertex_ids.push_back(src_side[1]);
+
+      chi_mesh::Vertex& v0 = *vol_continuum->vertices[src_side[0]];
+      chi_mesh::Vertex& v1 = *vol_continuum->vertices[src_side[1]];
+      new_face.centroid = v0*0.5 + v1*0.5;
+      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
+
+      chi_mesh::Vector3 va = v1 - v0;
+      chi_mesh::Vector3 vn = va.Cross(vk);
+      vn = vn/vn.Norm();
+      new_face.normal = vn;
+
+      if (src_side[2] >= 0)
+      {
+        new_face.neighbor_id = src_side[2];
+        new_face.has_neighbor = true;
+      }
+      else
+        new_face.neighbor_id = 0;
+
+      cell->faces.push_back(new_face);
+    }
+
+    //====================================== Compute partition id
+    auto xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = xy_partition_indices.second*
+                         handler->surface_mesher->partitioning_x +
+                         xy_partition_indices.first;
+
+    if (force_local)
+      cell->partition_id = chi_mpi.location_id;
+
+    cell->global_id = num_cells;
+
+    vol_continuum->cells.push_back(cell); ++num_cells;
+
+    if (delete_surface_mesh_elements)
+      delete face;
+  }
+
+  if (delete_surface_mesh_elements)
+    surface_mesh->poly_faces.clear();
+
 }
 
 //###################################################################
@@ -168,8 +304,61 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 //###################################################################
 /**Filters non-esential ghosts from the grid.*/
 void chi_mesh::VolumeMesher::
-  GridFilterGhosts(chi_mesh::MeshContinuum* in_grid,
-                   chi_mesh::MeshContinuum* out_grid)
+  GridFilterGhosts(chi_mesh::MeshContinuumPtr in_grid,
+                   chi_mesh::MeshContinuumPtr out_grid)
+{
+  chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
+  //======================================== Copy vertices
+  for (auto vertex : in_grid->vertices)
+    out_grid->vertices.push_back(new chi_mesh::Vertex(*vertex));
+
+  //======================================== Copy local cells
+  for (auto& cell : in_grid->local_cells)
+    out_grid->cells.push_back(&cell);
+
+
+
+  //======================================== Copy ghost cells only
+  //                                         if neighbor to current partition
+  auto in_ghost_ids = in_grid->cells.GetGhostGlobalIDs();
+  std::vector<Cell*> cells_to_delete;
+  for (int ghost_id : in_ghost_ids)
+  {
+    auto& ref_ghost_cell = in_grid->cells[ghost_id];
+
+    bool is_neighbor_to_this_loc = false;
+    for (auto& face : ref_ghost_cell.faces)
+    {
+      if (not face.has_neighbor) continue;
+
+      auto adj_cell = in_grid->cells[face.neighbor_id];
+      if (adj_cell.partition_id == chi_mpi.location_id)
+      {
+        is_neighbor_to_this_loc = true;
+        break;
+      }
+    }//for face
+
+    if (is_neighbor_to_this_loc)
+      out_grid->cells.push_back(&ref_ghost_cell);
+    else
+      cells_to_delete.push_back(&ref_ghost_cell);
+  }//for cell
+
+
+  //======================================== Deleting non-essential ghosts
+  for (auto cell : cells_to_delete)
+    delete cell;
+
+
+  chi_log.Log(LOG_0VERBOSE_1) << "Done filtering ghosts.";
+}
+
+//###################################################################
+/**Filters non-esential ghosts from the grid.*/
+void chi_mesh::VolumeMesher::
+GridFilterGhosts(chi_mesh::MeshContinuum* in_grid,
+                 chi_mesh::MeshContinuumPtr out_grid)
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
   //======================================== Copy vertices
@@ -504,7 +693,7 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
 //###################################################################
 /**Get a list of boundary cells.*/
 void chi_mesh::VolumeMesher::
- GetBoundaryCells(chi_mesh::MeshContinuum* vol_continuum)
+ GetBoundaryCells(chi_mesh::MeshContinuumPtr vol_continuum)
 {
   for (const auto& cell : vol_continuum->local_cells)
   {
@@ -541,7 +730,7 @@ void chi_mesh::VolumeMesher::
 
   //============================================= Get back mesh
   chi_mesh::Region* cur_region = handler->region_stack.back();
-  chi_mesh::MeshContinuum* vol_cont = cur_region->GetGrid();
+  chi_mesh::MeshContinuumPtr vol_cont = cur_region->GetGrid();
 
   int num_cells_modified = 0;
   for (auto& cell : vol_cont->local_cells)
@@ -571,7 +760,7 @@ void chi_mesh::VolumeMesher::
 
   //============================================= Get back mesh
   chi_mesh::Region* cur_region = handler->region_stack.back();
-  chi_mesh::MeshContinuum* vol_cont = cur_region->GetGrid();
+  chi_mesh::MeshContinuumPtr vol_cont = cur_region->GetGrid();
 
   int num_faces_modified = 0;
   for (auto& cell : vol_cont->local_cells)

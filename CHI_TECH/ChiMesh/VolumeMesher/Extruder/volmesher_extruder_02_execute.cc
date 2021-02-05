@@ -52,8 +52,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     //=========================================== Check for interfaces
 
     //=========================================== Create new continuum
-    auto grid = new chi_mesh::MeshContinuum;
-    auto temp_grid = new chi_mesh::MeshContinuum;
+    auto grid = chi_mesh::MeshContinuum::New();
+    auto temp_grid = chi_mesh::MeshContinuum::New();
     AddContinuumToRegion(grid, *region);
 
     //=========================================== Look over boundaries
@@ -78,7 +78,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         {single_surfacemesh_processed = true;}
 
         //================================== Assign reference continuum
-//        chi_mesh::MeshContinuum* ref_continuum = &bndry->initial_mesh_continuum;
+//        chi_mesh::MeshContinuumPtr ref_continuum = &bndry->initial_mesh_continuum;
 //        if (not bndry->mesh_continua.empty())
 //          ref_continuum = bndry->mesh_continua.back();
 
@@ -136,8 +136,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
 
         //================================== Clean-up temporary continuum
-        for (auto vert : temp_grid->vertices) delete vert;
-        delete temp_grid;
+//        for (auto vert : temp_grid->vertices) delete vert;
+//        delete temp_grid;
 
         //================================== Checking partitioning parameters
         if (!options.mesh_global)

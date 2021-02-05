@@ -18,7 +18,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                std::vector<std::pair<int,short>>& delayed_lock_box,
                std::set<int>& location_boundary_dependency_set)
 {
-  chi_mesh::MeshContinuum* grid = spds->grid;
+  chi_mesh::MeshContinuumPtr grid = spds->grid;
 
   chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);

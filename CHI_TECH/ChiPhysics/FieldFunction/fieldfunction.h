@@ -29,7 +29,7 @@ class chi_physics::FieldFunction
 {
 public:
   std::string               text_name;
-  chi_mesh::MeshContinuum*  grid;
+  chi_mesh::MeshContinuumPtr  grid;
   std::shared_ptr<SpatialDiscretization> spatial_discretization;
   chi_math::UnknownManager  unknown_manager;
   const unsigned int        ref_component;

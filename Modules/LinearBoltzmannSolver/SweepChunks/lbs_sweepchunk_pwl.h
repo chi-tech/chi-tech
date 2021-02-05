@@ -34,7 +34,7 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
-  chi_mesh::MeshContinuum* grid_view;
+  chi_mesh::MeshContinuumPtr grid_view;
   SpatialDiscretization_PWL& grid_fe_view;
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const LinearBoltzmann::Solver& ref_solver;
@@ -52,7 +52,7 @@ protected:
 
 public:
   // ################################################## Constructor
-  LBSSweepChunkPWL(chi_mesh::MeshContinuum* vol_continuum,
+  LBSSweepChunkPWL(chi_mesh::MeshContinuumPtr vol_continuum,
                    SpatialDiscretization_PWL& discretization,
                    const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                    const LinearBoltzmann::Solver& in_ref_solver,

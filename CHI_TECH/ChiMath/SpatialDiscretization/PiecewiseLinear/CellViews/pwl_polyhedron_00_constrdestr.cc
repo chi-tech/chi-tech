@@ -8,7 +8,7 @@ extern ChiLog& chi_log;
  *
  * */
 PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
-                                   chi_mesh::MeshContinuum* vol_continuum,
+                                   chi_mesh::MeshContinuumPtr vol_continuum,
                                    SpatialDiscretization_PWL *discretization):
   CellFEView(polyh_cell->vertex_ids.size())
 {

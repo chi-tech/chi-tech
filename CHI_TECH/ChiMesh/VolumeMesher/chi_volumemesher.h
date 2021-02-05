@@ -82,17 +82,23 @@ public:
   std::vector<int>                     reverse_node_ordering;
 public:
   //01 Utils
-  void AddContinuumToRegion(MeshContinuum* grid, Region& region);
+  void AddContinuumToRegion(MeshContinuumPtr grid, Region& region);
+  void CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
+                          chi_mesh::MeshContinuumPtr vol_continuum,
+                          bool delete_surface_mesh_elements=false,
+                          bool force_local=false);
   void CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
                           chi_mesh::MeshContinuum* vol_continuum,
                           bool delete_surface_mesh_elements=false,
                           bool force_local=false);
+  void GridFilterGhosts(chi_mesh::MeshContinuumPtr in_grid,
+                        chi_mesh::MeshContinuumPtr out_grid);
   void GridFilterGhosts(chi_mesh::MeshContinuum* in_grid,
-                        chi_mesh::MeshContinuum* out_grid);
+                        chi_mesh::MeshContinuumPtr out_grid);
   std::pair<int,int>  GetCellXYPartitionID(chi_mesh::Cell *cell);
   std::tuple<int,int,int>
                       GetCellXYZPartitionID(chi_mesh::Cell *cell);
-  void                GetBoundaryCells(chi_mesh::MeshContinuum* vol_continuum);
+  void                GetBoundaryCells(chi_mesh::MeshContinuumPtr vol_continuum);
   void                SetMatIDFromLogical(chi_mesh::LogicalVolume* log_vol,
                                           bool sense, int mat_id);
   void                SetBndryIDFromLogical(chi_mesh::LogicalVolume* log_vol,

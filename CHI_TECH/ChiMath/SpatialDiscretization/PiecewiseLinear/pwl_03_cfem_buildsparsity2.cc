@@ -11,7 +11,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/
 void SpatialDiscretization_PWL::
-  BuildCFEMSparsityPattern(chi_mesh::MeshContinuum* grid,
+  BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                            std::vector<int> &nodal_nnz_in_diag,
                            std::vector<int> &nodal_nnz_off_diag,
                            chi_math::UnknownManager* unknown_manager)

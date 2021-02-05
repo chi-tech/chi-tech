@@ -79,7 +79,7 @@ private:
 public:
   std::string                              solver_name="Diffusion Solver";
   std::vector<chi_diffusion::Boundary*>    boundaries;
-  chi_mesh::MeshContinuum*                 grid = nullptr;
+  chi_mesh::MeshContinuumPtr                 grid = nullptr;
 
   std::shared_ptr<SpatialDiscretization>     discretization;
   std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;

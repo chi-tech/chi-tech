@@ -165,7 +165,7 @@ void chi_mesh::VolumeMesherPredefined3D::Execute()
 
 
   //======================================== Apply partitioning scheme
-  auto grid = new chi_mesh::MeshContinuum;
+  auto grid = chi_mesh::MeshContinuum::New();
 
   if (options.partition_type == PartitionType::KBA_STYLE_XY or
       options.partition_type == PartitionType::KBA_STYLE_XYZ)

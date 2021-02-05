@@ -6,7 +6,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /** Obtains the latest created grid from the region.*/
-chi_mesh::MeshContinuum* chi_mesh::Region::GetGrid()
+chi_mesh::MeshContinuumPtr chi_mesh::Region::GetGrid()
 {
   if (this->volume_mesh_continua.empty())
   {

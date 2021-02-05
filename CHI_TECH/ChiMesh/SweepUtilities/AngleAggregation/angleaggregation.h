@@ -40,13 +40,13 @@ private:
   bool num_ang_unknowns_avail = false;
 
 public:
-  chi_mesh::MeshContinuum* grid = nullptr;
+  chi_mesh::MeshContinuumPtr grid = nullptr;
 
   void Setup(const std::vector<SweepBndry*>& in_sim_boundaries,
              int in_number_of_groups,
              int in_number_of_group_subsets,
              std::shared_ptr<chi_math::AngularQuadrature>& in_quadrature,
-             chi_mesh::MeshContinuum* in_grid);
+             chi_mesh::MeshContinuumPtr in_grid);
 
 public:
   double GetDelayedPsiNorm();

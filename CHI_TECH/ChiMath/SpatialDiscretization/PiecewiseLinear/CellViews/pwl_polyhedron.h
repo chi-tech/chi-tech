@@ -90,14 +90,14 @@ public:
 
 private:
   std::vector<chi_math::QuadratureTetrahedron*> quadratures; ///< Quadratures used by this method.
-  chi_mesh::MeshContinuum*       grid;                       ///< Pointer to the reference grid.
+  chi_mesh::MeshContinuumPtr       grid;                       ///< Pointer to the reference grid.
 
   bool                   precomputed = false;   ///< Are the integrals computed.
 
 
 public:
   PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
-                   chi_mesh::MeshContinuum* vol_continuum,
+                   chi_mesh::MeshContinuumPtr vol_continuum,
                    SpatialDiscretization_PWL* discretization= nullptr);
 
 

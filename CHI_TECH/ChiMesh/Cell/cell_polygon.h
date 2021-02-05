@@ -18,12 +18,12 @@ public:
   CellPolygon() : Cell(CellType::POLYGON) {}
 
 private:
-  void DevelopSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  void DevelopSegmentNormals(const chi_mesh::MeshContinuum& grid)
   {
     segment_normals.reserve(faces.size());
     for (auto& face : faces) //edges
     {
-      chi_mesh::Vertex &v0 = *grid->vertices[face.vertex_ids[0]];
+      chi_mesh::Vertex &v0 = *grid.vertices[face.vertex_ids[0]];
       const chi_mesh::Vertex &vc = centroid;
 
       chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
@@ -36,7 +36,7 @@ private:
     segment_normals_developed = true;
   }
 public:
-  std::vector<chi_mesh::Vector3>& GetSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  std::vector<chi_mesh::Vector3>& GetSegmentNormals(const chi_mesh::MeshContinuum& grid)
   {
     if (!segment_normals_developed)
       DevelopSegmentNormals(grid);

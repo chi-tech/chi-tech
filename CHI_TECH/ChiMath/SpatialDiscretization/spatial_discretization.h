@@ -19,7 +19,7 @@ public:
   int dim;
   const chi_math::SpatialDiscretizationType type;
 
-  chi_mesh::MeshContinuum* ref_grid;
+  chi_mesh::MeshContinuumPtr ref_grid;
 
 public:
   std::vector<int> node_mapping;
@@ -60,7 +60,7 @@ public:
 
 public:
   //01
-  virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid);
+  virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuumPtr grid);
 
   //02
   /**Develops a localized view of a petsc vector.

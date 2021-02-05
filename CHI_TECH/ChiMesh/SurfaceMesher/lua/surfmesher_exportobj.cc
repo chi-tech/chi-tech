@@ -41,7 +41,7 @@ int chiSurfaceMesherExportToObj(lua_State* L)
     {
       if ((*bndry)->initial_mesh_continuum->surface_mesh != nullptr)
       {
-        chi_mesh::MeshContinuum* twod_grid = (*bndry)->mesh_continua.back();
+        chi_mesh::MeshContinuumPtr twod_grid = (*bndry)->mesh_continua.back();
 
         twod_grid->surface_mesh->ExportToOBJFile(file_name);
       }

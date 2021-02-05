@@ -13,13 +13,13 @@ public:
   bool IsRawCellNeighborToPartitionKBA(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell);
   void KBA(chi_mesh::UnpartitionedMesh* umesh,
-           chi_mesh::MeshContinuum* grid);
+           chi_mesh::MeshContinuumPtr grid);
 
   bool IsRawCellNeighborToPartitionParmetis(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
     const std::vector<int>& cell_pids);
   void PARMETIS(chi_mesh::UnpartitionedMesh* umesh,
-                chi_mesh::MeshContinuum* grid);
+                chi_mesh::MeshContinuumPtr grid);
 };
 
 

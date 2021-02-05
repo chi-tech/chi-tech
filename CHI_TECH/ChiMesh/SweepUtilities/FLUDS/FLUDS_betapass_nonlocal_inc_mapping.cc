@@ -12,7 +12,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
   NonLocalIncidentMapping(chi_mesh::Cell *cell,
                           SPDS_ptr spds)
 {
-  chi_mesh::MeshContinuum*         grid = spds->grid;
+  chi_mesh::MeshContinuumPtr         grid = spds->grid;
 
   //=================================================== Loop over faces
   //           INCIDENT                                 but process

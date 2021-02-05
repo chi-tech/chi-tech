@@ -48,7 +48,7 @@ bool chi_mesh::VolumeMesherPredefined3D::
 /** Applies KBA-style partitioning to the mesh.*/
 void chi_mesh::VolumeMesherPredefined3D::
   PARMETIS(chi_mesh::UnpartitionedMesh* umesh,
-           chi_mesh::MeshContinuum* grid)
+           chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0) << "Partitioning mesh.";
   std::vector<int> cell_pids(umesh->raw_cells.size(),0);

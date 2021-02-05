@@ -18,7 +18,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* grid)
+  chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of local continuum.";
@@ -77,7 +77,7 @@ void SpatialDiscretization_FV::AddViewOfLocalContinuum(
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::
-  AddViewOfNeighborContinuums(chi_mesh::MeshContinuum* grid)
+  AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of neighbor continuums.";

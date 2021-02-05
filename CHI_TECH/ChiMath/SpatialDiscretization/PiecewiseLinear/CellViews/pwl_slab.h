@@ -10,7 +10,7 @@
 class SlabFEView : public CellFEView
 {
 private:
-  chi_mesh::MeshContinuum* grid;
+  chi_mesh::MeshContinuumPtr grid;
   int v0i;
   int v1i;
 public:
@@ -19,7 +19,7 @@ public:
 
   /**Constructor for a slab view.*/
   SlabFEView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuum* vol_continuum) :
+             chi_mesh::MeshContinuumPtr vol_continuum) :
     CellFEView(2)
   {
     grid = vol_continuum;

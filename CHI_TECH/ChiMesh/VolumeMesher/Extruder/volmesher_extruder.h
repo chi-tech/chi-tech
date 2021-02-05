@@ -33,12 +33,12 @@ public:
   //04
   void SetupLayers(int default_layer_count=1);
 
-  void CreateLocalAndBoundaryNodes(chi_mesh::MeshContinuum* template_continuum,
-                                   chi_mesh::MeshContinuum* vol_continuum);
+  void CreateLocalAndBoundaryNodes(chi_mesh::MeshContinuumPtr template_continuum,
+                                   chi_mesh::MeshContinuumPtr vol_continuum);
   //05
   chi_mesh::Vector3 ComputeTemplateCell3DCentroid(
                       chi_mesh::CellPolygon* n_template_cell,
-                      chi_mesh::MeshContinuum* template_continuum,
+                      chi_mesh::MeshContinuumPtr template_continuum,
                       int z_level_begin,int z_level_end);
 
   int GetCellPartitionIDFromCentroid(chi_mesh::Vector3& centroid,
@@ -46,14 +46,14 @@ public:
 
   bool IsTemplateCellNeighborToThisPartition(
     chi_mesh::CellPolygon* template_cell,
-    chi_mesh::MeshContinuum* template_continuum,
+    chi_mesh::MeshContinuumPtr template_continuum,
     chi_mesh::SurfaceMesher* surf_mesher,
     int z_level, int tc_index);
 
 
 
-  void ExtrudeCells(chi_mesh::MeshContinuum* template_continuum,
-                    chi_mesh::MeshContinuum* vol_continuum);
+  void ExtrudeCells(chi_mesh::MeshContinuumPtr template_continuum,
+                    chi_mesh::MeshContinuumPtr vol_continuum);
 
 };
 

@@ -15,7 +15,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
 InitializeAlphaElements(SPDS_ptr spds)
 {
-  chi_mesh::MeshContinuum*         grid = spds->grid;
+  chi_mesh::MeshContinuumPtr         grid = spds->grid;
   chi_mesh::sweep_management::SPLS& spls = spds->spls;
 
   //================================================== Initialize face

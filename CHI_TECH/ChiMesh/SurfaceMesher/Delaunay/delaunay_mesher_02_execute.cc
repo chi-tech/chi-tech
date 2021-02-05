@@ -63,7 +63,7 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
     //region->mesh_continua.clear();
 
     //=========================================== Create new continuum
-    //chi_mesh::MeshContinuum* remeshed_surfcont = new chi_mesh::MeshContinuum;
+    //chi_mesh::MeshContinuumPtr remeshed_surfcont = chi_mesh::MeshContinuum::New();
     //region->mesh_continua.push_back(remeshed_surfcont);
 
     //=========================================== Create Delaunay context for each boundary
@@ -115,7 +115,7 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
         cur_region->boundaries[b]->mesh_continua.clear();
 
         //============================= Create and assign new mesh continua
-        MeshContinuum* new_mesh_cont = new MeshContinuum;
+        MeshContinuumPtr new_mesh_cont = chi_mesh::MeshContinuum::New();
         new_mesh_cont->surface_mesh = cur_region_context->at(b)->remeshed_surface_mesh;
         printf("Surface mesh copied with %lu triangles and %lu vertices\n", new_mesh_cont->surface_mesh->faces.size(),
                new_mesh_cont->surface_mesh->vertices.size());

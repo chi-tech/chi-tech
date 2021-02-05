@@ -7,7 +7,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Obtains a pointer to the last created grid.*/
-chi_mesh::MeshContinuum* chi_mesh::MeshHandler::GetGrid(int region_index)
+chi_mesh::MeshContinuumPtr chi_mesh::MeshHandler::GetGrid(int region_index)
 {
   if (region_stack.empty())
   {

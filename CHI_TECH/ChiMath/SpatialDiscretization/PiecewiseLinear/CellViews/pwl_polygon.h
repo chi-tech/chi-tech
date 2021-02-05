@@ -63,14 +63,14 @@ private:
   std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntSi_shapeI_gradshapeJ;
 
 private:
-  chi_mesh::MeshContinuum* grid;
+  chi_mesh::MeshContinuumPtr grid;
 
   bool precomputed;
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonFEView(chi_mesh::CellPolygon* poly_cell,
-                chi_mesh::MeshContinuum* vol_continuum,
+                chi_mesh::MeshContinuumPtr vol_continuum,
                 SpatialDiscretization_PWL *discretization);
 
   double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override;

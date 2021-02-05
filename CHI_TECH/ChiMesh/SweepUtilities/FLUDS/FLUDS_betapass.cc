@@ -15,7 +15,7 @@ extern ChiMPI&      chi_mpi;
 void chi_mesh::sweep_management::PRIMARY_FLUDS::
 InitializeBetaElements(SPDS_ptr spds, int tag_index)
 {
-  chi_mesh::MeshContinuum*         grid = spds->grid;
+  chi_mesh::MeshContinuumPtr         grid = spds->grid;
   chi_mesh::sweep_management::SPLS& spls = spds->spls;
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

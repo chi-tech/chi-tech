@@ -13,7 +13,7 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Populates the local sub-grid connection information for sweep orderings.*/
 void chi_mesh::sweep_management::PopulateCellRelationships(
-         chi_mesh::MeshContinuum* grid,
+         chi_mesh::MeshContinuumPtr grid,
          const chi_mesh::Vector3& omega,
          std::set<int>& location_dependencies,
          std::set<int>& location_successors,

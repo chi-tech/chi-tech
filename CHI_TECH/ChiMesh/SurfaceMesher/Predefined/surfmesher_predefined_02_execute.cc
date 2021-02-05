@@ -36,7 +36,7 @@ void chi_mesh::SurfaceMesherPredefined::Execute()
 //    region->volume_mesh_continua.clear();
 
     //=========================================== Create new continuum
-//    chi_mesh::MeshContinuum* remeshed_surfcont = new chi_mesh::MeshContinuum;
+//    chi_mesh::MeshContinuumPtr remeshed_surfcont = chi_mesh::MeshContinuum::New();
 //    region->volume_mesh_continua.push_back(remeshed_surfcont);
 
   }

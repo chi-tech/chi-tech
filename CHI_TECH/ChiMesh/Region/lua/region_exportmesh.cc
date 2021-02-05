@@ -55,7 +55,7 @@ int chiRegionExportMeshToPython(lua_State *L)
 //  {
 //    int num_cont = cur_region->volume_mesh_continua.size();
 //
-//    chi_mesh::MeshContinuum* vol_cont;
+//    chi_mesh::MeshContinuumPtr vol_cont;
 //    if ((export_template) && (num_cont >= 2))
 //      vol_cont = cur_region->volume_mesh_continua[num_cont-2];
 //    else

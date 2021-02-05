@@ -51,8 +51,8 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
 //###################################################################
 /** Creates nodes that are owned locally.*/
 void chi_mesh::VolumeMesherExtruder::
-  CreateLocalAndBoundaryNodes(chi_mesh::MeshContinuum* template_continuum,
-                              chi_mesh::MeshContinuum* vol_continuum)
+  CreateLocalAndBoundaryNodes(chi_mesh::MeshContinuumPtr template_continuum,
+                              chi_mesh::MeshContinuumPtr vol_continuum)
 {
   //================================================== Get current handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();

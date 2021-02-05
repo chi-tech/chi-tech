@@ -59,6 +59,16 @@ public:
   std::shared_ptr<MeshContinuum> New()
   { return std::shared_ptr<MeshContinuum>(new MeshContinuum());}
 
+  /**Method to be called if cells and nodes have been transferred
+   * to another grid.*/
+  void ClearCellReferences()
+  {
+    native_cells.clear();
+    foreign_cells.clear();
+    global_cell_id_to_native_id_map.clear();
+    global_cell_id_to_foreign_id_map.clear();
+  }
+
   //01
   void ExportCellsToPython(const char* fileName,
                            bool surface_only=true,

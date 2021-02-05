@@ -9,15 +9,15 @@
 //######################################################### Class definition
 class chi_mesh::Region
 {
-  friend void VolumeMesher::AddContinuumToRegion(MeshContinuum* grid,
+  friend void VolumeMesher::AddContinuumToRegion(MeshContinuumPtr grid,
                                                  Region& region);
 public:
   std::vector<chi_mesh::Boundary*> boundaries;
 
 private:
-  std::vector<chi_mesh::MeshContinuum*> volume_mesh_continua;
+  std::vector<chi_mesh::MeshContinuumPtr> volume_mesh_continua;
 public:
-  chi_mesh::MeshContinuum* GetGrid();
+  chi_mesh::MeshContinuumPtr GetGrid();
 };
 
 #endif

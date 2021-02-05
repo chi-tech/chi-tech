@@ -49,7 +49,7 @@ private:
     edges_developed = true;
   }
 
-  void DevelopSegmentNormals(const chi_mesh::MeshContinuum* grid)
+  void DevelopSegmentNormals(const chi_mesh::MeshContinuumPtr grid)
   {
     auto& vcc = centroid;
 
@@ -85,7 +85,7 @@ public:
   }
 
   std::vector<std::vector<chi_mesh::Vector3>>&
-    GetSegmentNormals(const chi_mesh::MeshContinuum* grid)
+    GetSegmentNormals(const chi_mesh::MeshContinuumPtr grid)
   {
     if (!segment_normals_developed)
       DevelopSegmentNormals(grid);

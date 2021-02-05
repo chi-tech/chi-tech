@@ -38,17 +38,17 @@ public:
     new SpatialDiscretization_FV(in_dim, in_sd_method));}
 
   //01
-  void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
-  void AddViewOfNeighborContinuums(chi_mesh::MeshContinuum* grid);
+  void AddViewOfLocalContinuum(chi_mesh::MeshContinuumPtr grid) override;
+  void AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid);
 
   CellFVView* MapFeView(int cell_local_index);
   CellFVView* MapNeighborFeView(int cell_global_index);
 
   //02 node ordering
-  void ReOrderNodes(chi_mesh::MeshContinuum* grid);
+  void ReOrderNodes(chi_mesh::MeshContinuumPtr grid);
 
   //03 sparsity
-  void BuildSparsityPattern(chi_mesh::MeshContinuum* grid,
+  void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                             std::vector<int>& nodal_nnz_in_diag,
                             std::vector<int>& nodal_nnz_off_diag,
                             chi_math::UnknownManager* unknown_manager=nullptr);
@@ -69,14 +69,14 @@ public:
 
 
   //04b utils
-  unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuum* grid,
+  unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                                chi_math::UnknownManager* unknown_manager=nullptr);
-  unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
+  unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                                 chi_math::UnknownManager* unknown_manager=nullptr);
-  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuum* grid,
+  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                                chi_math::UnknownManager* unknown_manager);
 
-  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuum* grid,
+  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
                                       chi_math::UnknownManager* unknown_manager,
                                       unsigned int unknown_id=0);
   void LocalizePETScVector(Vec petsc_vector,

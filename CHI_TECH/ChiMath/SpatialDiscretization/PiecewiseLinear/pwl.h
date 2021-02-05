@@ -53,32 +53,32 @@ public:
     new SpatialDiscretization_PWL(in_dim, in_sd_method));}
 
   //01
-  void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
-  void AddViewOfNeighborContinuums(chi_mesh::MeshContinuum* grid);
+  void AddViewOfLocalContinuum(chi_mesh::MeshContinuumPtr grid) override;
+  void AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid);
   CellFEView* MapFeViewL(int cell_local_index);
 
   //02
-  std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuum* grid);
+  std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuumPtr grid);
 
   //03
-  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuum* grid,
+  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                                 std::vector<int>& nodal_nnz_in_diag,
                                 std::vector<int>& nodal_nnz_off_diag,
                                 const std::pair<int,int>& domain_ownership);
-  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuum* grid,
+  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                                 std::vector<int>& nodal_nnz_in_diag,
                                 std::vector<int>& nodal_nnz_off_diag,
                                 chi_math::UnknownManager* unknown_manager=nullptr);
 
   //04
-  std::pair<int,int> OrderNodesDFEM(chi_mesh::MeshContinuum* grid);
+  std::pair<int,int> OrderNodesDFEM(chi_mesh::MeshContinuumPtr grid);
 
   //05
-  void BuildDFEMSparsityPattern(chi_mesh::MeshContinuum* grid,
+  void BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                                 std::vector<int>& nodal_nnz_in_diag,
                                 std::vector<int>& nodal_nnz_off_diag,
                                 const std::pair<int,int>& domain_ownership);
-  void BuildDFEMSparsityPattern(chi_mesh::MeshContinuum* grid,
+  void BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                                 std::vector<int>& nodal_nnz_in_diag,
                                 std::vector<int>& nodal_nnz_off_diag,
                                 chi_math::UnknownManager* unknown_manager=nullptr);
@@ -110,14 +110,14 @@ public:
 
 
   //06b utils
-  unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuum* grid,
+  unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                                chi_math::UnknownManager* unknown_manager=nullptr);
-  unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
+  unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                                 chi_math::UnknownManager* unknown_manager=nullptr);
-  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuum* grid,
+  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                                chi_math::UnknownManager* unknown_manager);
 
-  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuum* grid,
+  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
                                       chi_math::UnknownManager* unknown_manager,
                                       unsigned int unknown_id=0);
 

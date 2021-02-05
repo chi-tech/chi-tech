@@ -70,7 +70,7 @@ IsRawCellNeighborToPartitionKBA(
 /** Applies KBA-style partitioning to the mesh.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::
 KBA(chi_mesh::UnpartitionedMesh* umesh,
-    chi_mesh::MeshContinuum* grid)
+    chi_mesh::MeshContinuumPtr grid)
 {
   //======================================== Load up the vertices
   for (auto vert : umesh->vertices)

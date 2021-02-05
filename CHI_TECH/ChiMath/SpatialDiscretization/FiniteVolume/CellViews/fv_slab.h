@@ -11,14 +11,14 @@
 class SlabFVView : public CellFVView
 {
 private:
-  chi_mesh::MeshContinuum* grid;
+  chi_mesh::MeshContinuumPtr grid;
   int v0i;
   int v1i;
 
 public:
 
   SlabFVView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuum* vol_continuum) :
+             chi_mesh::MeshContinuumPtr vol_continuum) :
              CellFVView(2)
   {
     grid = vol_continuum;

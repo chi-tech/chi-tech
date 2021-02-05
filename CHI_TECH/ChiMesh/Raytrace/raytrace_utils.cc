@@ -294,7 +294,7 @@ void chi_mesh::PopulateRaySegmentLengths(
       chi_mesh::Vertex& v0 = *grid.vertices[face.vertex_ids[0]];
       chi_mesh::Vertex& vc = cell.centroid;
 
-      auto& n0 = poly_cell.GetSegmentNormals(&grid)[f];
+      auto& n0 = poly_cell.GetSegmentNormals(grid)[f];
 
       chi_mesh::Vertex intersection_point;
       double d = 0.0;

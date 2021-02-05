@@ -11,7 +11,7 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
-  chi_mesh::MeshContinuum* grid)
+  chi_mesh::MeshContinuumPtr grid)
 {
   ref_grid = grid;
   //================================================== Create empty view
@@ -77,7 +77,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the neighboring cells.*/
 void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
-  chi_mesh::MeshContinuum* grid)
+  chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0)
     << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums.";

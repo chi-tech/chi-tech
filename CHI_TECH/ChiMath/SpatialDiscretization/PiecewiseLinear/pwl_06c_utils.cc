@@ -5,7 +5,7 @@
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 unsigned int SpatialDiscretization_PWL::
-  GetNumLocalDOFs(chi_mesh::MeshContinuum* grid,
+  GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                   chi_math::UnknownManager* unknown_manager)
 {
   unsigned int N = 1;
@@ -19,7 +19,7 @@ unsigned int SpatialDiscretization_PWL::
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 unsigned int SpatialDiscretization_PWL::
-  GetNumGlobalDOFs(chi_mesh::MeshContinuum* grid,
+  GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                    chi_math::UnknownManager* unknown_manager)
 {
   unsigned int N = 1;

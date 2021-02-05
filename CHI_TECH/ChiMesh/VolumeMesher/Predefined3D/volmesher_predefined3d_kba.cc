@@ -71,7 +71,7 @@ bool chi_mesh::VolumeMesherPredefined3D::
 /** Applies KBA-style partitioning to the mesh.*/
 void chi_mesh::VolumeMesherPredefined3D::
   KBA(chi_mesh::UnpartitionedMesh* umesh,
-      chi_mesh::MeshContinuum* grid)
+      chi_mesh::MeshContinuumPtr grid)
 {
   //======================================== Load up the vertices
   for (auto vert : umesh->vertices)

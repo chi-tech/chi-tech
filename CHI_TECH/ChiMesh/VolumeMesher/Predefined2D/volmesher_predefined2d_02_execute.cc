@@ -29,7 +29,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
   for (auto region : mesh_handler->region_stack)
   {
     //=========================================== Create new continuum
-    auto grid = new chi_mesh::MeshContinuum;
+    auto grid = chi_mesh::MeshContinuum::New();
     AddContinuumToRegion(grid, *region);
 
     //=========================================== Find the first boundary that
@@ -54,9 +54,11 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         {single_surfacemesh_processed = true;}
 
         //================================== Create cell for each face
-        auto temp_grid = new chi_mesh::MeshContinuum;
+        auto temp_grid = chi_mesh::MeshContinuum::New();
         this->CreatePolygonCells(surface_mesh, temp_grid);
         GridFilterGhosts(temp_grid,grid);
+
+        temp_grid->ClearCellReferences();
 
         int total_local_cells = grid->local_cells.size();
 

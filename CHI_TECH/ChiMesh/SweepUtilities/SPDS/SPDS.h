@@ -19,7 +19,7 @@ struct chi_mesh::sweep_management::SPDS
   double                   azimuthal;
   chi_mesh::Vector3        omega;
 
-  chi_mesh::MeshContinuum* grid;
+  chi_mesh::MeshContinuumPtr grid;
 
   SPLS                     spls;
   std::vector<STDG>        global_sweep_planes;  ///< Processor sweep planes

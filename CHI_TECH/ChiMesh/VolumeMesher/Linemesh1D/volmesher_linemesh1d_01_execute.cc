@@ -37,7 +37,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
       << std::endl;
 
     //=========================================== Create new continuum
-    auto grid = new chi_mesh::MeshContinuum;
+    auto grid = chi_mesh::MeshContinuum::New();
     AddContinuumToRegion(grid, *region);
 
     std::vector<chi_mesh::Boundary*>::iterator bndry;
