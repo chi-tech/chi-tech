@@ -1,9 +1,9 @@
-#ifndef _chi_mesh_h
-#define _chi_mesh_h
+#ifndef CHI_MESH_H
+#define CHI_MESH_H
 
 #include<vector>
 #include<iostream>
-
+#include<memory>
 
 
 /** # Namespace for all meshing features
@@ -61,6 +61,7 @@ namespace chi_mesh
   class SurfaceMesh;
   class UnpartitionedMesh;
   class MeshContinuum;
+  typedef std::shared_ptr<MeshContinuum> MeshContinuumPtr;
   namespace MeshContinuumUtils {};
 
   //=================================== Logical Volumes

@@ -55,6 +55,10 @@ public:
     line_mesh    = nullptr;
   }
 
+  static
+  std::shared_ptr<MeshContinuum> New()
+  { return std::shared_ptr<MeshContinuum>(new MeshContinuum());}
+
   //01
   void ExportCellsToPython(const char* fileName,
                            bool surface_only=true,
