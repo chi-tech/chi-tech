@@ -45,7 +45,7 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
         {
           if (not face.has_neighbor) continue;
 
-          if (face.IsNeighborLocal(grid))
+          if (face.IsNeighborLocal(*grid))
             nodal_nnz_in_diag[i] += 1;
           else
             nodal_nnz_off_diag[i] += 1;

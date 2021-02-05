@@ -27,10 +27,10 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
     {
 //      int neighbor = face.neighbor_id;
 
-      if ((face.has_neighbor) and (!face.IsNeighborLocal(grid)) )
+      if ((face.has_neighbor) and (!face.IsNeighborLocal(*grid)) )
       {
         //============================== Find prelocI
-        int locJ = face.GetNeighborPartitionID(grid);
+        int locJ = face.GetNeighborPartitionID(*grid);
         int prelocI = spds->MapLocJToPrelocI(locJ);
 
         //###########################################################

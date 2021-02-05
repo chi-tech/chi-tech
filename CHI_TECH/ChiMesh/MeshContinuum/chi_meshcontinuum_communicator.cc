@@ -26,8 +26,8 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
     for (auto& face : cell.faces)
     {
       if (face.has_neighbor)
-        if (not face.IsNeighborLocal(this))
-          local_graph_edges.insert(face.GetNeighborPartitionID(this));
+        if (not face.IsNeighborLocal(*this))
+          local_graph_edges.insert(face.GetNeighborPartitionID(*this));
     }//for f
   }//for local cells
 

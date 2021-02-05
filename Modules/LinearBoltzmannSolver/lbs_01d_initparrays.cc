@@ -133,17 +133,17 @@ void LinearBoltzmann::Solver::InitializeParrays()
           if (boundary_id >= 0) face.neighbor_id = boundary_id;
         }//if bndry
 
-        if (not face.IsNeighborLocal(grid))
+        if (not face.IsNeighborLocal(*grid))
           cell_lbs_view.face_local[f] = false;
 
         //Local nodal mappings
         std::vector<short> face_nodal_mapping;
         int ass_face = -1;
 
-        if (face.has_neighbor and face.IsNeighborLocal(grid))
+        if (face.has_neighbor and face.IsNeighborLocal(*grid))
         {
           grid->FindAssociatedVertices(face,face_nodal_mapping);
-          ass_face = face.GetNeighborAssociatedFace(grid);
+          ass_face = face.GetNeighborAssociatedFace(*grid);
         }
 
         cell_nodal_mapping.emplace_back(ass_face,face_nodal_mapping);

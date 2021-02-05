@@ -33,7 +33,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Incident face
     if (mu<(0.0-1.0e-16))
     {
-      if (face.IsNeighborLocal(grid))
+      if (face.IsNeighborLocal(*grid))
       {
         incoming_face_count++;
         //======================================== Find associated face for
@@ -45,7 +45,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
 
         //======================================== Find associated face
         //                                         counter for slot lookup
-        auto adj_cell     = &grid->local_cells[face.GetNeighborLocalID(grid)];
+        auto adj_cell     = &grid->local_cells[face.GetNeighborLocalID(*grid)];
         int  adj_so_index = local_so_cell_mapping[adj_cell->local_id];
         int  ass_f_counter=-1;
 
@@ -66,7 +66,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
           chi_log.Log(LOG_ALLERROR)
             << "Associated face counter not found"
             << ass_face << " " << face.neighbor_id;
-          face.GetNeighborAssociatedFace(grid);
+          face.GetNeighborAssociatedFace(*grid);
           exit(EXIT_FAILURE);
         }
 

@@ -28,11 +28,11 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       {
         if (cell.faces[f].has_neighbor) //Not bndry
         {
-          bool is_local = cell.faces[f].IsNeighborLocal(grid);
+          bool is_local = cell.faces[f].IsNeighborLocal(*grid);
 
           if (is_local)
           {
-            int neighbor_local_id = cell.faces[f].GetNeighborLocalID(grid);
+            int neighbor_local_id = cell.faces[f].GetNeighborLocalID(*grid);
             auto adj_cell = grid->local_cells[neighbor_local_id];
             nodal_nnz_in_diag[dof_count] += adj_cell.vertex_ids.size();
           }
@@ -242,11 +242,11 @@ void chi_diffusion::Solver::PWLDBuildSparsityPattern()
       {
         auto neighbor = cell.faces[f].neighbor_id;
         bool is_bndry = not cell.faces[f].has_neighbor;
-        bool is_local = cell.faces[f].IsNeighborLocal(grid);
+        bool is_local = cell.faces[f].IsNeighborLocal(*grid);
 
         if ((not is_bndry) and (not is_local))
         {
-          int adj_cell_partition_id = cell.faces[f].GetNeighborPartitionID(grid);
+          int adj_cell_partition_id = cell.faces[f].GetNeighborPartitionID(*grid);
           auto adj_polyh_cell = (chi_mesh::Cell*)
             GetBorderCell(adj_cell_partition_id, neighbor);
           nodal_nnz_off_diag[dof_count] += adj_polyh_cell->vertex_ids.size();

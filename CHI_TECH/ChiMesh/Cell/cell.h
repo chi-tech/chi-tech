@@ -35,13 +35,13 @@ public:
   uint64_t neighbor_id=0;           ///< If face has neighbor, contains the global id. 0 otherwise.
 
 public:
-  bool IsNeighborLocal(chi_mesh::MeshContinuum* grid) const;
-  int  GetNeighborPartitionID(chi_mesh::MeshContinuum* grid) const;
-  int  GetNeighborLocalID(chi_mesh::MeshContinuum* grid) const;
-  int  GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid) const;
+  bool IsNeighborLocal(chi_mesh::MeshContinuum& grid) const;
+  int  GetNeighborPartitionID(chi_mesh::MeshContinuum& grid) const;
+  int  GetNeighborLocalID(chi_mesh::MeshContinuum& grid) const;
+  int  GetNeighborAssociatedFace(chi_mesh::MeshContinuum& grid) const;
 
 public:
-  double ComputeFaceArea(chi_mesh::MeshContinuum* grid) const;
+  double ComputeFaceArea(chi_mesh::MeshContinuum& grid) const;
 
 };
 

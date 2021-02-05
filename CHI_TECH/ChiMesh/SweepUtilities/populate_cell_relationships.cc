@@ -42,14 +42,14 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
         if (face.has_neighbor)
         {
           //========================= If it is in the current location
-          if (face.IsNeighborLocal(grid))
+          if (face.IsNeighborLocal(*grid))
           {
-            double weight = dot_normal*face.ComputeFaceArea(grid);
+            double weight = dot_normal*face.ComputeFaceArea(*grid);
             cell_successors[c].insert(
-              std::make_pair(face.GetNeighborLocalID(grid),weight));
+              std::make_pair(face.GetNeighborLocalID(*grid),weight));
           }
           else
-            location_successors.insert(face.GetNeighborPartitionID(grid));
+            location_successors.insert(face.GetNeighborPartitionID(*grid));
         }
 
       }
@@ -58,8 +58,8 @@ void chi_mesh::sweep_management::PopulateCellRelationships(
       else
       {
         //================================if it is a cell and not bndry
-        if (face.has_neighbor and not face.IsNeighborLocal(grid))
-          location_dependencies.insert(face.GetNeighborPartitionID(grid));
+        if (face.has_neighbor and not face.IsNeighborLocal(*grid))
+          location_dependencies.insert(face.GetNeighborPartitionID(*grid));
       }
 
     }//for edge

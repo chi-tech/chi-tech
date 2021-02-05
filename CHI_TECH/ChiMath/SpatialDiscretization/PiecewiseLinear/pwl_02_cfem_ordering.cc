@@ -52,7 +52,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
       auto& face = cell.faces[f];
       if (face.has_neighbor)
       {
-        if (face.GetNeighborPartitionID(grid) != cell.partition_id)
+        if (face.GetNeighborPartitionID(*grid) != cell.partition_id)
         {
           for (auto v_index : face.vertex_ids)
           {

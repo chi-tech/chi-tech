@@ -38,9 +38,9 @@ void SpatialDiscretization_PWL::
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if (face.IsNeighborLocal(grid))
+      if (face.IsNeighborLocal(*grid))
       {
-        int  adj_cell_local_id = face.GetNeighborLocalID(grid);
+        int  adj_cell_local_id = face.GetNeighborLocalID(*grid);
         auto adj_cell_fe_view = cell_fe_views[adj_cell_local_id];
 
         for (int i=0; i<cell_fe_view->dofs; ++i)
@@ -64,7 +64,7 @@ void SpatialDiscretization_PWL::
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if ((face.has_neighbor) and (not face.IsNeighborLocal(grid)) )
+      if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)) )
       {
         auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor_id);
 
@@ -94,10 +94,10 @@ void SpatialDiscretization_PWL::
   {
     for (auto& face : cell.faces)
     {
-      if ((face.has_neighbor) and (not face.IsNeighborLocal(grid)) )
+      if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)) )
       {
         local_neighboring_cell_indices.insert(cell.local_id);
-        neighboring_partitions.insert(face.GetNeighborPartitionID(grid));
+        neighboring_partitions.insert(face.GetNeighborPartitionID(*grid));
       }
     }
   }
@@ -124,9 +124,9 @@ void SpatialDiscretization_PWL::
 
       for (auto& face : cell.faces)
       {
-        if ((face.has_neighbor) and (not face.IsNeighborLocal(grid)) )
+        if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)) )
         {
-          if (face.GetNeighborPartitionID(grid) == adj_part)
+          if (face.GetNeighborPartitionID(*grid) == adj_part)
             new_list.second.push_back(local_cell_index);
         }
       }//for faces

@@ -10,12 +10,12 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
 bool chi_mesh::CellFace::
-  IsNeighborLocal(chi_mesh::MeshContinuum* grid) const
+  IsNeighborLocal(chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return false;
   if (chi_mpi.process_count == 1) return true;
 
-  auto& adj_cell = grid->cells[neighbor_id];
+  auto& adj_cell = grid.cells[neighbor_id];
 
   return (adj_cell.partition_id == chi_mpi.location_id);
 }
@@ -23,12 +23,12 @@ bool chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's partition.*/
 int chi_mesh::CellFace::
-  GetNeighborPartitionID(chi_mesh::MeshContinuum* grid) const
+  GetNeighborPartitionID(chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return 0;
 
-  auto& adj_cell = grid->cells[neighbor_id];
+  auto& adj_cell = grid.cells[neighbor_id];
 
   return adj_cell.partition_id;
 }
@@ -36,12 +36,12 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's local id.*/
 int chi_mesh::CellFace::
-  GetNeighborLocalID(chi_mesh::MeshContinuum* grid) const
+  GetNeighborLocalID(chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return neighbor_id; //cause global_ids=local_ids
 
-  auto& adj_cell = grid->cells[neighbor_id];
+  auto& adj_cell = grid.cells[neighbor_id];
 
   if (adj_cell.partition_id != chi_mpi.location_id)
     throw std::logic_error("Cell local ID requested from a non-local cell.");
@@ -52,7 +52,7 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's associated face.*/
 int chi_mesh::CellFace::
-  GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid) const
+  GetNeighborAssociatedFace(chi_mesh::MeshContinuum& grid) const
 {
   const auto& cur_face = *this; //just for readability
   //======================================== Check index validity
@@ -67,7 +67,7 @@ int chi_mesh::CellFace::
     throw std::logic_error(outstr.str());
   }
 
-  const auto& adj_cell = grid->local_cells[cur_face.GetNeighborLocalID(grid)];
+  const auto& adj_cell = grid.local_cells[cur_face.GetNeighborLocalID(grid)];
 
   int associated_face = -1;
   std::set<uint64_t> cfvids(cur_face.vertex_ids.begin(),
@@ -108,14 +108,14 @@ int chi_mesh::CellFace::
 
 //###################################################################
 /**Computes the face area.*/
-double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum* grid) const
+double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum& grid) const
 {
   if (vertex_ids.size() <= 1)
     return 1.0;
   else if (vertex_ids.size() == 2)
   {
-    auto& v0 = *grid->vertices[vertex_ids[0]];
-    auto& v1 = *grid->vertices[vertex_ids[1]];
+    auto& v0 = *grid.vertices[vertex_ids[0]];
+    auto& v1 = *grid.vertices[vertex_ids[1]];
 
     return (v1 - v0).Norm();
   }
@@ -129,8 +129,8 @@ double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum* grid) const
       int vid0 = vertex_ids[v];
       int vid1 = (v < (num_verts-1))? vertex_ids[v+1] : vertex_ids[0];
 
-      auto& v0 = *grid->vertices[vid0];
-      auto& v1 = *grid->vertices[vid1];
+      auto& v0 = *grid.vertices[vid0];
+      auto& v1 = *grid.vertices[vid1];
 
       auto v01 = v1-v0;
       auto v02 = v2-v0;

@@ -35,7 +35,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   {
     for (auto& face : cell.faces)
     {
-      if (face.has_neighbor and (not face.IsNeighborLocal(this)))
+      if (face.has_neighbor and (not face.IsNeighborLocal(*this)))
       {
         local_neighboring_cell_indices.insert(cell.local_id);
         neighboring_partitions.insert(cells[face.neighbor_id].partition_id);
@@ -65,7 +65,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
 
       for (auto& face : cell.faces)
       {
-        if ((face.has_neighbor) and (not face.IsNeighborLocal(this)) )
+        if ((face.has_neighbor) and (not face.IsNeighborLocal(*this)) )
         {
           if (cells[face.neighbor_id].partition_id == adj_part)
             new_list.second.push_back(local_cell_index);

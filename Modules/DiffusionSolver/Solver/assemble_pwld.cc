@@ -73,9 +73,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       int                              fmap = -1;
 
       //========================= Get adj cell information
-      if (cell->faces[f].IsNeighborLocal(grid))  //Local
+      if (cell->faces[f].IsNeighborLocal(*grid))  //Local
       {
-        adj_cell      = &grid->local_cells[face.GetNeighborLocalID(grid)];
+        adj_cell      = &grid->local_cells[face.GetNeighborLocalID(*grid)];
         adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell->local_id);
       }//local
       else //Non-local
