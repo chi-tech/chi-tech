@@ -39,7 +39,7 @@ int chiSurfaceMesherExportToObj(lua_State* L)
          bndry != region->boundaries.end();
          bndry++)
     {
-      if ((*bndry)->initial_mesh_continuum.surface_mesh != nullptr)
+      if ((*bndry)->initial_mesh_continuum->surface_mesh != nullptr)
       {
         chi_mesh::MeshContinuum* twod_grid = (*bndry)->mesh_continua.back();
 

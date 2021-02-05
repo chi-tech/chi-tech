@@ -15,7 +15,7 @@ extern ChiLog& chi_log;
 chi_mesh::Vector3
 chi_mesh::VolumeMesherExtruder::ComputeTemplateCell3DCentroid(
   chi_mesh::CellPolygon *n_template_cell,
-  chi_mesh::MeshContinuum *template_continuum,
+  chi_mesh::MeshContinuum* template_continuum,
   int z_level_begin,int z_level_end)
 {
   chi_mesh::Vector3 n_centroid_precompd;
@@ -65,7 +65,7 @@ int chi_mesh::VolumeMesherExtruder::
 bool chi_mesh::VolumeMesherExtruder::
   IsTemplateCellNeighborToThisPartition(
     chi_mesh::CellPolygon *template_cell,
-    chi_mesh::MeshContinuum *template_continuum,
+    chi_mesh::MeshContinuum* template_continuum,
     chi_mesh::SurfaceMesher *surf_mesher,
     int z_level,int tc_index)
 {
@@ -136,8 +136,8 @@ bool chi_mesh::VolumeMesherExtruder::
 //###################################################################
 /**Extrude template cells into polygons.*/
 void chi_mesh::VolumeMesherExtruder::
-ExtrudeCells(chi_mesh::MeshContinuum *template_continuum,
-             chi_mesh::MeshContinuum *vol_continuum)
+ExtrudeCells(chi_mesh::MeshContinuum* template_continuum,
+             chi_mesh::MeshContinuum* vol_continuum)
 {
   //================================================== Get current handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();

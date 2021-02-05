@@ -18,7 +18,7 @@ private:
 public:
 
   SlabFVView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuum *vol_continuum) :
+             chi_mesh::MeshContinuum* vol_continuum) :
              CellFVView(2)
   {
     grid = vol_continuum;

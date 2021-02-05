@@ -59,8 +59,10 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     //=========================================== Look over boundaries
     for (auto bndry : region->boundaries)
     {
-      if (bndry->initial_mesh_continuum.surface_mesh!= nullptr)
+      if (bndry->initial_mesh_continuum->surface_mesh!= nullptr)
       {
+        auto surface_mesh = bndry->initial_mesh_continuum->surface_mesh;
+
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Processing surface mesh"
           << std::endl;
@@ -76,9 +78,9 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         {single_surfacemesh_processed = true;}
 
         //================================== Assign reference continuum
-        chi_mesh::MeshContinuum* ref_continuum = &bndry->initial_mesh_continuum;
-        if (not bndry->mesh_continua.empty())
-          ref_continuum = bndry->mesh_continua.back();
+//        chi_mesh::MeshContinuum* ref_continuum = &bndry->initial_mesh_continuum;
+//        if (not bndry->mesh_continua.empty())
+//          ref_continuum = bndry->mesh_continua.back();
 
         //We now have the surface we want to extrude
         chi_log.Log(LOG_0VERBOSE_1)
@@ -87,7 +89,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         SetupLayers();
 
         //================================== Get node_z_incr
-        node_z_index_incr = ref_continuum->surface_mesh->vertices.size();
+        node_z_index_incr = surface_mesh->vertices.size();
 
         //================================== Create baseline polygons in template
         //                                   continuum
@@ -96,11 +98,11 @@ void chi_mesh::VolumeMesherExtruder::Execute()
           << std::endl;
         const bool DELETE_SURFACE_MESH_ELEMENTS = true;
         const bool FORCE_LOCAL = true;
-        CreatePolygonCells(ref_continuum->surface_mesh,
+        CreatePolygonCells(surface_mesh,
                            temp_grid,
                            DELETE_SURFACE_MESH_ELEMENTS,
                            FORCE_LOCAL);
-        delete ref_continuum->surface_mesh;
+        delete surface_mesh;
 
         chi_log.Log(LOG_0VERBOSE_1)
           << "VolumeMesherExtruder: Creating local nodes"

@@ -24,7 +24,7 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
-  AddContinuumToRegion(chi_mesh::MeshContinuum *grid, chi_mesh::Region& region)
+  AddContinuumToRegion(chi_mesh::MeshContinuum* grid, chi_mesh::Region& region)
 {
   region.volume_mesh_continua.push_back(grid);
 }
@@ -33,7 +33,7 @@ void chi_mesh::VolumeMesher::
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
 CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                   chi_mesh::MeshContinuum *vol_continuum,
+                   chi_mesh::MeshContinuum* vol_continuum,
                    bool delete_surface_mesh_elements,
                    bool force_local)
 {
@@ -168,13 +168,13 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 //###################################################################
 /**Filters non-esential ghosts from the grid.*/
 void chi_mesh::VolumeMesher::
-  GridFilterGhosts(chi_mesh::MeshContinuum *in_grid,
-                   chi_mesh::MeshContinuum *out_grid)
+  GridFilterGhosts(chi_mesh::MeshContinuum* in_grid,
+                   chi_mesh::MeshContinuum* out_grid)
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
   //======================================== Copy vertices
   for (auto vertex : in_grid->vertices)
-    out_grid->vertices.push_back(vertex);
+    out_grid->vertices.push_back(new chi_mesh::Vertex(*vertex));
 
   //======================================== Copy local cells
   for (auto& cell : in_grid->local_cells)

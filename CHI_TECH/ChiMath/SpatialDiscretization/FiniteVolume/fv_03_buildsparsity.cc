@@ -6,7 +6,7 @@
 //###################################################################
 /**Builds finite volume based sparsity pattern.*/
 void SpatialDiscretization_FV::BuildSparsityPattern(
-  chi_mesh::MeshContinuum *grid,
+  chi_mesh::MeshContinuum* grid,
   std::vector<int> &nodal_nnz_in_diag,
   std::vector<int> &nodal_nnz_off_diag,
   chi_math::UnknownManager* unknown_manager)

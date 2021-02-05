@@ -36,10 +36,10 @@ void chi_mesh::SurfaceMesher::PrintLoadBalanceInfo()
          bndry != region->boundaries.end();
          bndry++)
     {
-      if ((*bndry)->initial_mesh_continuum.surface_mesh != nullptr)
+      if ((*bndry)->initial_mesh_continuum->surface_mesh != nullptr)
       {
         chi_mesh::SurfaceMesh* mesh =
-          (*bndry)->initial_mesh_continuum.surface_mesh;
+          (*bndry)->initial_mesh_continuum->surface_mesh;
 
         int num_x_sets = xcuts.size()+1;
         int num_y_sets = ycuts.size()+1;

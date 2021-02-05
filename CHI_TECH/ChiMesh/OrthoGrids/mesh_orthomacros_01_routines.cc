@@ -54,7 +54,7 @@ void chi_mesh::Create1DSlabMesh(std::vector<double>& vertices)
 
   //======================================== Add it to boundary
   auto bndry = new chi_mesh::Boundary;
-  bndry->initial_mesh_continuum.line_mesh = line_mesh;
+  bndry->initial_mesh_continuum->line_mesh = line_mesh;
 
   //======================================== Add boundary to region
   auto region = new chi_mesh::Region;
@@ -95,7 +95,7 @@ void chi_mesh::Create2DOrthoMesh(std::vector<double>& vertices_1d_x,
 
   //======================================== Add it to boundary
   auto bndry = new chi_mesh::Boundary;
-  bndry->initial_mesh_continuum.surface_mesh = surface_mesh;
+  bndry->initial_mesh_continuum->surface_mesh = surface_mesh;
 
   //======================================== Add boundary to region
   auto region = new chi_mesh::Region;
@@ -137,7 +137,7 @@ void chi_mesh::Create3DOrthoMesh(std::vector<double>& vertices_x,
 
   //======================================== Add it to boundary
   auto bndry = new chi_mesh::Boundary;
-  bndry->initial_mesh_continuum.surface_mesh = surface_mesh;
+  bndry->initial_mesh_continuum->surface_mesh = surface_mesh;
 
   //======================================== Add boundary to region
   auto region = new chi_mesh::Region;

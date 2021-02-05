@@ -14,7 +14,7 @@ extern ChiMPI& chi_mpi;
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
 std::pair<int,int> SpatialDiscretization_PWL::
-  OrderNodesCFEM(chi_mesh::MeshContinuum *grid)
+  OrderNodesCFEM(chi_mesh::MeshContinuum* grid)
 {
   ChiTimer t_stage[6];
 

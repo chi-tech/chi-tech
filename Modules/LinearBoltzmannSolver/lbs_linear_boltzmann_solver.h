@@ -61,7 +61,7 @@ public:
   std::vector<int> matid_to_src_map;
 
   std::shared_ptr<SpatialDiscretization> discretization;
-  chi_mesh::MeshContinuum *grid;
+  chi_mesh::MeshContinuum* grid;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings;
   std::vector<LinearBoltzmann::CellLBSView> cell_transport_views;
 

@@ -48,7 +48,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
          bndry != region->boundaries.end();
          bndry++)
     {
-      if ((*bndry)->initial_mesh_continuum.line_mesh != nullptr)
+      if ((*bndry)->initial_mesh_continuum->line_mesh != nullptr)
       {
         //================================== Check for duplicate linemesh
         if (single_linemesh_processed)
@@ -61,7 +61,7 @@ void chi_mesh::VolumeMesherLinemesh1D::Execute()
         {single_linemesh_processed = true;}
 
         chi_mesh::LineMesh* line_mesh =
-          (*bndry)->initial_mesh_continuum.line_mesh;
+          (*bndry)->initial_mesh_continuum->line_mesh;
 
         //================================== Populate nodes
         for (size_t v=0; v<line_mesh->vertices.size(); v++)

@@ -41,7 +41,7 @@ public:
   int  GetNeighborAssociatedFace(chi_mesh::MeshContinuum* grid) const;
 
 public:
-  double ComputeFaceArea(chi_mesh::MeshContinuum *grid) const;
+  double ComputeFaceArea(chi_mesh::MeshContinuum* grid) const;
 
 };
 

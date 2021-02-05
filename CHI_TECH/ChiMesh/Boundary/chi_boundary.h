@@ -8,13 +8,13 @@
 class chi_mesh::Boundary
 {
 public:
-  chi_mesh::MeshContinuum initial_mesh_continuum;
+  chi_mesh::MeshContinuum* initial_mesh_continuum;
   std::vector<chi_mesh::MeshContinuum*> mesh_continua;
 
 
 public:
   //00
-  Boundary();
+  Boundary() : initial_mesh_continuum(new chi_mesh::MeshContinuum()) {};
 
 };
 

@@ -19,7 +19,7 @@ public:
 
   /**Constructor for a slab view.*/
   SlabFEView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuum *vol_continuum) :
+             chi_mesh::MeshContinuum* vol_continuum) :
     CellFEView(2)
   {
     grid = vol_continuum;

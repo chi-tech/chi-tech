@@ -32,7 +32,7 @@ namespace sweep_management
   class SweepScheduler;
 
   void PopulateCellRelationships(
-    chi_mesh::MeshContinuum *grid,
+    chi_mesh::MeshContinuum* grid,
     const chi_mesh::Vector3& omega,
     std::set<int>& location_dependencies,
     std::set<int>& location_successors,
@@ -51,7 +51,7 @@ namespace sweep_management
     chi_graph::DirectedGraph& local_DG);
 
   std::shared_ptr<SPDS> CreateSweepOrder(double polar, double azimuthal,
-                            chi_mesh::MeshContinuum *grid,
+                            chi_mesh::MeshContinuum* grid,
                             bool cycle_allowance_flag=false);
 
   void PrintSweepOrdering(SPDS* sweep_order,

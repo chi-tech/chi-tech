@@ -22,7 +22,7 @@ public:
   std::vector<std::vector<std::vector<chi_mesh::Vector3>>> face_side_vectors;
 
   PolyhedronFVView(chi_mesh::CellPolyhedron* polyh_cell,
-                chi_mesh::MeshContinuum *vol_continuum) :
+                chi_mesh::MeshContinuum* vol_continuum) :
                 CellFVView(polyh_cell->vertex_ids.size())
   {
     grid = vol_continuum;

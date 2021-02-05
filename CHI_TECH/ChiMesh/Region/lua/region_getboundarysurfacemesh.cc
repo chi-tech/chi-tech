@@ -49,9 +49,9 @@ int chiRegionGetBoundarySurfaceMesh(lua_State *L)
 
   if (num_args == 2)
   {
-    if (cur_boundary->initial_mesh_continuum.surface_mesh != nullptr)
+    if (cur_boundary->initial_mesh_continuum->surface_mesh != nullptr)
     {
-      chi_mesh::SurfaceMesh* cur_surfmesh = cur_boundary->initial_mesh_continuum.surface_mesh;
+      chi_mesh::SurfaceMesh* cur_surfmesh = cur_boundary->initial_mesh_continuum->surface_mesh;
       cur_hndlr->surface_mesh_stack.push_back(cur_surfmesh);
 
       lua_pushnumber(L,cur_hndlr->surface_mesh_stack.size()-1);

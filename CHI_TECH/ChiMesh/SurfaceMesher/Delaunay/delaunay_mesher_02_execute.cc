@@ -75,13 +75,13 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
       DelaunayMeshContext* new_del_context
         = new DelaunayMeshContext;
       new_del_context->context_boundary = (*bndry);
-      if ((*bndry)->initial_mesh_continuum.line_mesh!= nullptr)
+      if ((*bndry)->initial_mesh_continuum->line_mesh!= nullptr)
       {
-        new_del_context->context_line_mesh = (*bndry)->initial_mesh_continuum.line_mesh;
+        new_del_context->context_line_mesh = (*bndry)->initial_mesh_continuum->line_mesh;
       }
-      if ((*bndry)->initial_mesh_continuum.surface_mesh!= nullptr)
+      if ((*bndry)->initial_mesh_continuum->surface_mesh!= nullptr)
       {
-        new_del_context->context_surface_mesh = (*bndry)->initial_mesh_continuum.surface_mesh;
+        new_del_context->context_surface_mesh = (*bndry)->initial_mesh_continuum->surface_mesh;
       }
 
       region_context->push_back(new_del_context);
@@ -109,7 +109,7 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
     //====================================== Loop over boundaries
     for (unsigned b=0; b<cur_region->boundaries.size(); b++)
     {
-      if (cur_region->boundaries[b]->initial_mesh_continuum.surface_mesh != nullptr)
+      if (cur_region->boundaries[b]->initial_mesh_continuum->surface_mesh != nullptr)
       {
         //============================= Clear the mesh continua
         cur_region->boundaries[b]->mesh_continua.clear();

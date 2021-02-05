@@ -13,7 +13,7 @@ void chi_mesh::sweep_management::AngleAggregation::
         int in_number_of_groups,
         int in_number_of_group_subsets,
         std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
-        chi_mesh::MeshContinuum *in_grid)
+        chi_mesh::MeshContinuum* in_grid)
 {
   sim_boundaries = in_sim_boundaries;
   number_of_groups = in_number_of_groups;

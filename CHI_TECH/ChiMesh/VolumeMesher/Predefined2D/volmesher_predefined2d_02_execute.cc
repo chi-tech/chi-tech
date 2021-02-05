@@ -32,18 +32,16 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
     auto grid = new chi_mesh::MeshContinuum;
     AddContinuumToRegion(grid, *region);
 
-    std::vector<chi_mesh::Boundary*>::iterator bndry;
     //=========================================== Find the first boundary that
     //                                            has a surface mesh and execute
     //                                            the meshing
     bool single_surfacemesh_processed = false;
 
-    for (bndry = region->boundaries.begin();
-         bndry != region->boundaries.end();
-         bndry++)
+    for (auto bndry : region->boundaries)
     {
-      if ((*bndry)->initial_mesh_continuum.surface_mesh!= nullptr)
+      if (bndry->initial_mesh_continuum->surface_mesh != nullptr)
       {
+        auto surface_mesh = bndry->initial_mesh_continuum->surface_mesh;
         //================================== Check if a surface has already
         //                                   been processed
         if (single_surfacemesh_processed)
@@ -55,32 +53,10 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         else
         {single_surfacemesh_processed = true;}
 
-        //================================== Assign reference continuum, if
-        //                                   a mesh operation has been performed
-        //                                   after loading the surface was
-        //                                   loaded the latest mesh will be used
-        chi_mesh::MeshContinuum* ref_continuum =
-                    &(*bndry)->initial_mesh_continuum;
-        if ((*bndry)->mesh_continua.size()>0)
-        {
-          ref_continuum = (*bndry)->mesh_continua.back();
-        }
-
         //================================== Create cell for each face
         auto temp_grid = new chi_mesh::MeshContinuum;
-        this->CreatePolygonCells(ref_continuum->surface_mesh, temp_grid);
+        this->CreatePolygonCells(surface_mesh, temp_grid);
         GridFilterGhosts(temp_grid,grid);
-
-//        //================================== Connect Boundaries
-//        for (auto& cell : grid->local_cells)
-//          cell.FindBoundary2D(region);
-
-//        //================================== Check all open item_id have
-//        //                                   boundaries
-//        int no_boundary_cells=0;
-//        for (auto cell : grid->local_cells)
-//          if (!cell.CheckBoundary2D())
-//            no_boundary_cells++;
 
         int total_local_cells = grid->local_cells.size();
 
@@ -90,18 +66,6 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
                       MPI_INT,
                       MPI_SUM,
                       MPI_COMM_WORLD);
-
-
-//        if (no_boundary_cells>0)
-//        {
-//          chi_log.Log(LOG_ALLVERBOSE_1)
-//            << "A total of "
-//            << no_boundary_cells
-//            << " out of "
-//            << total_global_cells
-//            << " item_id found with no boundary connection.\n";
-//          //temp_continuum->ExportCellsToPython("Zerror.py");
-//        }
 
         //================================== Checking partitioning parameters
         if (!options.mesh_global)
@@ -121,7 +85,6 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
             exit(EXIT_FAILURE);
           }
         }
-
 
         //================================== InitializeAlphaElements local cell indices
         chi_log.Log(LOG_ALLVERBOSE_1)

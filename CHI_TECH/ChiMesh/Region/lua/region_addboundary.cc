@@ -49,7 +49,7 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
   }
 
   chi_mesh::Boundary* new_boundary = new chi_mesh::Boundary;
-  new_boundary->initial_mesh_continuum.surface_mesh = cur_surfacemesh;
+  new_boundary->initial_mesh_continuum->surface_mesh = cur_surfacemesh;
 
   cur_region->boundaries.push_back(new_boundary);
 
@@ -100,7 +100,7 @@ int chiRegionAddLineBoundary(lua_State *L)
   }
 
   chi_mesh::Boundary* new_boundary = new chi_mesh::Boundary;
-  new_boundary->initial_mesh_continuum.line_mesh = cur_linemesh;
+  new_boundary->initial_mesh_continuum->line_mesh = cur_linemesh;
 
   cur_region->boundaries.push_back(new_boundary);
 
