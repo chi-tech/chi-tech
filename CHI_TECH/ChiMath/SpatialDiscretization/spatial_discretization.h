@@ -4,7 +4,7 @@
 #include "ChiMesh/chi_mesh.h"
 #include "../Quadratures/quadrature.h"
 #include "ChiMath/chi_math.h"
-#include "ChiMath/UnknownManager/unknown_manager.h"
+#include "ChiMath/NodalVariableStructure/nodal_variable_structure.h"
 
 #include <petscksp.h>
 
@@ -12,6 +12,9 @@
 #define DEG3         1
 #define DEG3_SURFACE 2
 
+class SpatialDiscretization;
+
+typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
 
 class SpatialDiscretization
 {
@@ -60,7 +63,7 @@ public:
 
 public:
   //01
-  virtual void AddViewOfLocalContinuum(chi_mesh::MeshContinuumPtr grid);
+  virtual void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid);
 
   //02
   /**Develops a localized view of a petsc vector.
@@ -68,7 +71,7 @@ public:
    * method.*/
   virtual void LocalizePETScVector(Vec petsc_vector,
                                    std::vector<double>& local_vector,
-                                   chi_math::UnknownManager* unknown_manager)
+                                   chi_math::NodalVariableStructure* unknown_manager)
   {}
 
 };

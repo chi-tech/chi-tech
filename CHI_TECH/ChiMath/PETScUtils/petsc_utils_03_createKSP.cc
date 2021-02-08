@@ -58,6 +58,8 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
   KSPSetConvergenceTest(setup.ksp,&RelativeResidualConvergenceTest,NULL,NULL);
   KSPSetFromOptions(setup.ksp);
 
+  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,NULL,NULL);
+
   return setup;
 }
 

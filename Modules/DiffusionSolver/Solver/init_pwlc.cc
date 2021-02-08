@@ -24,7 +24,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
   pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
-  pwl_sdm->AddViewOfLocalContinuum(grid);
+  pwl_sdm->PreComputeCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Reorder nodes
@@ -46,7 +46,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     << domain_ownership.second;
 
   //================================================== Initialize unknown manager
-  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
+  unknown_manager.AddVariable(chi_math::NodalVariableType::SCALAR);
 
   //================================================== Initialize field function
   //                                                   if empty
@@ -82,6 +82,13 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
                                     nodal_nnz_in_diag,
                                     nodal_nnz_off_diag,
                                     domain_ownership);
+
+//  auto nodal_var_strct = &unknown_manager;
+//
+//  pwl_sdm->BuildCFEMSparsityPattern(grid,
+//                                    nodal_nnz_in_diag,
+//                                    nodal_nnz_off_diag,
+//                                    nodal_var_strct);
 
 
   //================================================== Initialize x and b

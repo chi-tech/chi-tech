@@ -1,5 +1,5 @@
-#ifndef _pwl_slab_h
-#define _pwl_slab_h
+#ifndef PWL_SLAB_VALUES_H
+#define PWL_SLAB_VALUES_H
 
 #include "../pwl.h"
 #include <vector>
@@ -7,7 +7,7 @@
 
 //###################################################################
 /**Object for handling slab shaped piecewise linear shape functions.*/
-class SlabFEView : public CellFEView
+class SlabFEView : public CellFEValues
 {
 private:
   chi_mesh::MeshContinuumPtr grid;
@@ -19,10 +19,10 @@ public:
 
   /**Constructor for a slab view.*/
   SlabFEView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuumPtr vol_continuum) :
-    CellFEView(2)
+             chi_mesh::MeshContinuumPtr& in_grid) :
+    CellFEValues(2)
   {
-    grid = vol_continuum;
+    grid = in_grid;
     v0i = slab_cell->vertex_ids[0];
     v1i = slab_cell->vertex_ids[1];
     chi_mesh::Vertex v0 = *grid->vertices[v0i];

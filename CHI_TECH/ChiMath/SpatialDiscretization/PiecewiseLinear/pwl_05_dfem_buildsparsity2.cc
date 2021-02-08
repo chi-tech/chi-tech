@@ -12,7 +12,7 @@ void SpatialDiscretization_PWL::
   BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                            std::vector<int> &nodal_nnz_in_diag,
                            std::vector<int> &nodal_nnz_off_diag,
-                           chi_math::UnknownManager* unknown_manager)
+                           chi_math::NodalVariableStructure* unknown_manager)
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
   int local_dof_count = local_base_block_size;
@@ -237,7 +237,7 @@ void SpatialDiscretization_PWL::
     auto backup_nnz_in_diag  = nodal_nnz_in_diag;
     auto backup_nnz_off_diag = nodal_nnz_off_diag;
 
-    unsigned int N = unknown_manager->GetTotalUnknownSize();
+    unsigned int N = unknown_manager->GetTotalVariableStructureSize();
 
     nodal_nnz_in_diag.clear();
     nodal_nnz_off_diag.clear();
@@ -245,7 +245,7 @@ void SpatialDiscretization_PWL::
     nodal_nnz_in_diag.resize(local_base_block_size*N,0);
     nodal_nnz_off_diag.resize(local_base_block_size*N,0);
 
-    if (unknown_manager->dof_storage_type == chi_math::DOFStorageType::NODAL)
+    if (unknown_manager->dof_storage_type == chi_math::NodalStorageType::NODAL)
     {
       int ir = -1;
       for (int i=0; i<local_base_block_size; ++i)
@@ -258,7 +258,7 @@ void SpatialDiscretization_PWL::
         }//for j
       }//for i
     }
-    else if (unknown_manager->dof_storage_type == chi_math::DOFStorageType::BLOCK)
+    else if (unknown_manager->dof_storage_type == chi_math::NodalStorageType::BLOCK)
     {
       int ir = -1;
       for (int j=0; j<N; ++j)

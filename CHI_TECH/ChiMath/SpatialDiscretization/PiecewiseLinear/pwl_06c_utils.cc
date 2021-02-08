@@ -6,12 +6,12 @@
 /**Get the number of local degrees-of-freedom.*/
 unsigned int SpatialDiscretization_PWL::
   GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                  chi_math::UnknownManager* unknown_manager)
+                  chi_math::NodalVariableStructure* unknown_manager)
 {
   unsigned int N = 1;
 
   if (unknown_manager != nullptr)
-    N = unknown_manager->GetTotalUnknownSize();
+    N = unknown_manager->GetTotalVariableStructureSize();
 
   return local_base_block_size*N;
 }
@@ -20,12 +20,12 @@ unsigned int SpatialDiscretization_PWL::
 /**Get the number of global degrees-of-freedom.*/
 unsigned int SpatialDiscretization_PWL::
   GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                   chi_math::UnknownManager* unknown_manager)
+                   chi_math::NodalVariableStructure* unknown_manager)
 {
   unsigned int N = 1;
 
   if (unknown_manager != nullptr)
-    N = unknown_manager->GetTotalUnknownSize();
+    N = unknown_manager->GetTotalVariableStructureSize();
 
   return globl_base_block_size*N;
 }
@@ -35,7 +35,7 @@ unsigned int SpatialDiscretization_PWL::
 void SpatialDiscretization_PWL::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
-                      chi_math::UnknownManager* unknown_manager)
+                      chi_math::NodalVariableStructure* unknown_manager)
 {
   auto grid = ref_grid;
 

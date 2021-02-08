@@ -7,10 +7,10 @@ extern ChiLog& chi_log;
  * view.
  *
  * */
-PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
-                                   chi_mesh::MeshContinuumPtr vol_continuum,
-                                   SpatialDiscretization_PWL *discretization):
-  CellFEView(polyh_cell->vertex_ids.size())
+PolyhedronFEValues::PolyhedronFEValues(chi_mesh::CellPolyhedron *polyh_cell,
+                                       chi_mesh::MeshContinuumPtr vol_continuum,
+                                       SpatialDiscretization_PWL *discretization):
+  CellFEValues(polyh_cell->vertex_ids.size())
 {
   grid = vol_continuum;
   //=========================================== Create quadrature points

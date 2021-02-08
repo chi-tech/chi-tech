@@ -1,5 +1,5 @@
-#ifndef _fv_slab_h
-#define _fv_slab_h
+#ifndef SLAB_FV_VALUES_H
+#define SLAB_FV_VALUES_H
 
 #include "fv_cellbase.h"
 #include <ChiMesh/Cell/cell_slab.h>
@@ -8,7 +8,7 @@
 
 //######################################################### Class def
 /**Finite Volume implementation for a slab.*/
-class SlabFVView : public CellFVView
+class SlabFVValues : public CellFVValues
 {
 private:
   chi_mesh::MeshContinuumPtr grid;
@@ -17,9 +17,9 @@ private:
 
 public:
 
-  SlabFVView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuumPtr vol_continuum) :
-             CellFVView(2)
+  SlabFVValues(chi_mesh::CellSlab *slab_cell,
+               chi_mesh::MeshContinuumPtr& vol_continuum) :
+    CellFVValues(2)
   {
     grid = vol_continuum;
     v0i = slab_cell->vertex_ids[0];

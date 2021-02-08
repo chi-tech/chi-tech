@@ -1,5 +1,5 @@
-#ifndef _fv_polygon_h
-#define _fv_polygon_h
+#ifndef FV_POLYGON_VALUES_H
+#define FV_POLYGON_VALUES_H
 
 #include "fv_cellbase.h"
 #include <ChiMesh/Cell/cell_polygon.h>
@@ -11,7 +11,7 @@
  * - face_area[f] gives the area of the face.
  * - side_s_v[f][v] gives the vector for each leg of the
  *   triangle forming a side (face).*/
-class PolygonFVView : public CellFVView
+class PolygonFVValues : public CellFVValues
 {
 private:
   chi_mesh::MeshContinuumPtr grid;
@@ -19,9 +19,9 @@ private:
 public:
   std::vector<std::vector<chi_mesh::Vector3>> side_legs;
 
-  PolygonFVView(chi_mesh::CellPolygon* poly_cell,
-                chi_mesh::MeshContinuumPtr vol_continuum) :
-                CellFVView(poly_cell->vertex_ids.size())
+  PolygonFVValues(chi_mesh::CellPolygon* poly_cell,
+                  chi_mesh::MeshContinuumPtr& vol_continuum) :
+    CellFVValues(poly_cell->vertex_ids.size())
   {
     grid = vol_continuum;
 

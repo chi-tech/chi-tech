@@ -44,7 +44,7 @@ void LinearBoltzmann::Solver::Initialize()
 
   //================================================== Compute cell matrices
   chi_log.Log(LOG_0) << "Computing cell matrices.\n";
-  discretization->AddViewOfLocalContinuum(grid);
+  discretization->PreComputeCellSDValues(grid);
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)

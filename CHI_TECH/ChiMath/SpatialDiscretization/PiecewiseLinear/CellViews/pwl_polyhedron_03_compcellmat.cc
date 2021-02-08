@@ -2,8 +2,8 @@
 
 /**Precomputes the shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronFEView::PreShape(int face_index, int side_index,
-                                  int i, int qpoint_index, bool on_surface)
+double PolyhedronFEValues::PreShape(int face_index, int side_index,
+                                    int i, int qpoint_index, bool on_surface)
 {
   double value = 0.0;
   int    index = node_side_maps[i].face_map[face_index].
@@ -20,9 +20,9 @@ double PolyhedronFEView::PreShape(int face_index, int side_index,
 
 /**Precomputes the gradx-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronFEView::PreGradShape_x(int face_index,
-                                        int side_index,
-                                        int i)
+double PolyhedronFEValues::PreGradShape_x(int face_index,
+                                          int side_index,
+                                          int i)
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -56,9 +56,9 @@ double PolyhedronFEView::PreGradShape_x(int face_index,
 
 /**Precomputes the grady-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronFEView::PreGradShape_y(int face_index,
-                                        int side_index,
-                                        int i)
+double PolyhedronFEValues::PreGradShape_y(int face_index,
+                                          int side_index,
+                                          int i)
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -92,9 +92,9 @@ double PolyhedronFEView::PreGradShape_y(int face_index,
 
 /**Precomputes the gradz-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronFEView::PreGradShape_z(int face_index,
-                                        int side_index,
-                                        int i)
+double PolyhedronFEValues::PreGradShape_z(int face_index,
+                                          int side_index,
+                                          int i)
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -130,7 +130,7 @@ double PolyhedronFEView::PreGradShape_z(int face_index,
 
 
 /**Precomputes cell volume and surface integrals.*/
-void PolyhedronFEView::PreCompute()
+void PolyhedronFEValues::PreCompute()
 {
   // ==================================================== Precompute elements
   // Precomputing the values of shape functions and

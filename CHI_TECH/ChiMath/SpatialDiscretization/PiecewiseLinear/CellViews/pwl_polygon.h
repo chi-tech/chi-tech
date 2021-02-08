@@ -1,5 +1,5 @@
-#ifndef _pwl_polygon_h
-#define _pwl_polygon_h
+#ifndef PWL_POLYGON_VALUES_H
+#define PWL_POLYGON_VALUES_H
 
 #include "../pwl.h"
 #include <vector>
@@ -41,7 +41,7 @@ struct FEside_data2d
  * - node_to_side_map is indexed as [i][f]
  * - edge_dof_mappings, is indexed as [f][fi] and
  *    returns cell dof i.*/
-class PolygonFEView : public CellFEView
+class PolygonFEValues : public CellFEValues
 {
 private:
   std::vector<FEside_data2d*> sides;
@@ -69,12 +69,12 @@ private:
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonFEView(chi_mesh::CellPolygon* poly_cell,
-                chi_mesh::MeshContinuumPtr vol_continuum,
-                SpatialDiscretization_PWL *discretization);
+  PolygonFEValues(chi_mesh::CellPolygon* poly_cell,
+                  chi_mesh::MeshContinuumPtr vol_continuum,
+                  SpatialDiscretization_PWL *discretization);
 
-  double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
-  chi_mesh::Vector3 GradShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
+  double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
+  chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
 
 
   void ShapeValues(const chi_mesh::Vector3& xyz,
@@ -116,8 +116,6 @@ private:
   {
     return sides[side]->qp_data[i]->gradshapey_qp[qp];
   }
-
-
 
 public:
   void PreCompute();

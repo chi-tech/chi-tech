@@ -165,7 +165,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
   //================================================== Initialize unknown structure
   for (int m=0; m<num_moments; m++)
   {
-    flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N,groups.size());
+    flux_moments_uk_man.AddVariable(chi_math::NodalVariableType::VECTOR_N, groups.size());
     auto& moment = flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
   }
 

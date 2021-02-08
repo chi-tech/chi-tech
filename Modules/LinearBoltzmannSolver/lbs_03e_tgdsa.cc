@@ -15,8 +15,8 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
 {
   if (groupset->apply_tgdsa)
   {
-    chi_math::UnknownManager scalar_uk_man;
-    scalar_uk_man.AddUnknown(chi_math::UnknownType::SCALAR);
+    chi_math::NodalVariableStructure scalar_uk_man;
+    scalar_uk_man.AddVariable(chi_math::NodalVariableType::SCALAR);
 
     //================================= Initialize field function
     delta_phi_local.resize(local_dof_count,0.0);

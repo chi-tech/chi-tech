@@ -72,7 +72,7 @@ int SpatialDiscretization_PWL::MapDFEMDOFLocal(chi_mesh::Cell *cell,
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
 int SpatialDiscretization_PWL::
 MapDFEMDOF(chi_mesh::Cell *cell, int node,
-           chi_math::UnknownManager* unknown_manager,
+           chi_math::NodalVariableStructure* unknown_manager,
            unsigned int unknown_id,
            unsigned int component)
 {
@@ -80,12 +80,12 @@ MapDFEMDOF(chi_mesh::Cell *cell, int node,
 
   auto storage = unknown_manager->dof_storage_type;
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id,component);
+  size_t num_unknowns = unknown_manager->GetTotalVariableStructureSize();
+  size_t block_id     = unknown_manager->MapVariable(unknown_id, component);
 
   if (cell->partition_id == chi_mpi.location_id)
   {
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
     {
       int address = dfem_local_block_address*num_unknowns +
                     cell_dfem_block_address[cell->local_id] +
@@ -93,7 +93,7 @@ MapDFEMDOF(chi_mesh::Cell *cell, int node,
                     node;
       return address;
     }
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
     {
       int address = dfem_local_block_address*num_unknowns +
                     cell_dfem_block_address[cell->local_id]*num_unknowns +
@@ -123,7 +123,7 @@ MapDFEMDOF(chi_mesh::Cell *cell, int node,
       exit(EXIT_FAILURE);
     }
 
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
     {
       int address = locJ_block_address[cell->partition_id]*num_unknowns +
                     neighbor_cell_block_address[index].second +
@@ -131,7 +131,7 @@ MapDFEMDOF(chi_mesh::Cell *cell, int node,
                     node;
       return address;
     }
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
     {
       int address = locJ_block_address[cell->partition_id]*num_unknowns +
                     neighbor_cell_block_address[index].second*num_unknowns +
@@ -149,7 +149,7 @@ MapDFEMDOF(chi_mesh::Cell *cell, int node,
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
 int SpatialDiscretization_PWL::
 MapDFEMDOFLocal(chi_mesh::Cell *cell, int node,
-                chi_math::UnknownManager* unknown_manager,
+                chi_math::NodalVariableStructure* unknown_manager,
                 unsigned int unknown_id,
                 unsigned int component)
 {
@@ -157,19 +157,19 @@ MapDFEMDOFLocal(chi_mesh::Cell *cell, int node,
 
   auto storage = unknown_manager->dof_storage_type;
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id,component);
+  size_t num_unknowns = unknown_manager->GetTotalVariableStructureSize();
+  size_t block_id     = unknown_manager->MapVariable(unknown_id, component);
 
   if (cell->partition_id == chi_mpi.location_id)
   {
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
     {
       int address = cell_dfem_block_address[cell->local_id] +
                     local_base_block_size*block_id +
                     node;
       return address;
     }
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
     {
       int address = cell_dfem_block_address[cell->local_id]*num_unknowns +
                     node*num_unknowns +
@@ -198,14 +198,14 @@ MapDFEMDOFLocal(chi_mesh::Cell *cell, int node,
       exit(EXIT_FAILURE);
     }
 
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
     {
       int address = neighbor_cell_block_address[index].second +
                     locJ_block_size[cell->partition_id]*block_id +
                     node;
       return address;
     }
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
     {
       int address = neighbor_cell_block_address[index].second*num_unknowns +
                     node*num_unknowns +

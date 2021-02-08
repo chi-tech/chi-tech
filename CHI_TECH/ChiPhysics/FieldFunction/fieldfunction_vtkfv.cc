@@ -41,7 +41,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
   auto points = vtkSmartPointer<vtkPoints>::New();
 
-  const auto& field_unknown = unknown_manager.unknowns[ref_unknown];
+  const auto& field_unknown = unknown_manager.unknowns[ref_variable];
 
   //============================================= Init grid and material name
   vtkUnstructuredGrid* ugrid;
@@ -216,7 +216,7 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
   auto points = vtkSmartPointer<vtkPoints>::New();
 
-  const auto& field_unknown = unknown_manager.unknowns[ref_unknown];
+  const auto& field_unknown = unknown_manager.unknowns[ref_variable];
 
   //============================================= Init grid and material name
   vtkUnstructuredGrid* ugrid;
@@ -259,7 +259,7 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
     ++vcount;
   }
 
-  const auto& ff_uk = this->unknown_manager.unknowns[ref_unknown];
+  const auto& ff_uk = this->unknown_manager.unknowns[ref_variable];
 
   //======================================== populate cell mapping
   int num_loc_cells = grid->local_cells.size();

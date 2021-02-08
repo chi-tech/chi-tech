@@ -4,7 +4,7 @@
 #include "../chi_physics_namespace.h"
 #include "../../ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/UnknownManager/unknown_manager.h"
+#include "ChiMath/NodalVariableStructure/nodal_variable_structure.h"
 
 #include <petscksp.h>
 
@@ -31,9 +31,9 @@ public:
   std::string               text_name;
   chi_mesh::MeshContinuumPtr  grid;
   std::shared_ptr<SpatialDiscretization> spatial_discretization;
-  chi_math::UnknownManager  unknown_manager;
+  chi_math::NodalVariableStructure  unknown_manager;
   const unsigned int        ref_component;
-  const unsigned int        ref_unknown;
+  const unsigned int        ref_variable;
 
   Vec*                      field_vector;
   std::vector<double>*      field_vector_local;
@@ -44,7 +44,7 @@ public:
   FieldFunction(std::string ff_tex_name,
                 std::shared_ptr<SpatialDiscretization> ff_sdm,
                 std::vector<double>* ff_field_vector,
-                chi_math::UnknownManager& ff_unknown_manager,
+                chi_math::NodalVariableStructure& ff_unknown_manager,
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
@@ -52,7 +52,7 @@ public:
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),
     ref_component(ff_unknown_component_number),
-    ref_unknown(ff_unknown_id),
+    ref_variable(ff_unknown_id),
     field_vector(nullptr),
     field_vector_local(ff_field_vector),
     using_petsc_field_vector(false)
@@ -62,7 +62,7 @@ public:
   FieldFunction(std::string ff_tex_name,
                 std::shared_ptr<SpatialDiscretization> ff_sdm,
                 Vec* ff_field_vector,
-                chi_math::UnknownManager& ff_unknown_manager,
+                chi_math::NodalVariableStructure& ff_unknown_manager,
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
@@ -70,7 +70,7 @@ public:
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),
     ref_component(ff_unknown_component_number),
-    ref_unknown(ff_unknown_id),
+    ref_variable(ff_unknown_id),
     field_vector(ff_field_vector),
     field_vector_local(nullptr),
     using_petsc_field_vector(true)

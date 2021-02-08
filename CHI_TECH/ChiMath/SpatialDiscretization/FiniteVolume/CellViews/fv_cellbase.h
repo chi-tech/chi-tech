@@ -1,19 +1,19 @@
-#ifndef _fv_cellbase_h
-#define _fv_cellbase_h
+#ifndef CELL_FVDATA_BASE_H
+#define CELL_FVDATA_BASE_H
 
 //######################################################### Class def
 /**Base cell class for Finite Volume Method.*/
-class CellFVView
+class CellFVValues
 {
 public:
   int dofs;
-  double                volume;
-  std::vector<double>   face_area; ///< Actually areas
+  double                volume=0.0;
+  std::vector<double>   face_area = {}; ///< Actually areas
 
-  CellFVView(int num_dofs)
-  {
-    dofs=num_dofs;
-  }
+  explicit CellFVValues(int num_dofs) :
+    dofs(num_dofs),
+    face_area({})
+    {}
 
 };
 

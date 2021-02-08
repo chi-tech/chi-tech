@@ -63,7 +63,7 @@ void chi_physics::FieldFunction::
     auto& cell = grid->local_cells[cell_local_index];
     int address = sdm_fv->MapDOFLocal(&cell,
                                       &uk_man,
-                                      ref_unknown,
+                                      ref_variable,
                                       component);
 
     mapping.push_back(address);
@@ -93,7 +93,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
   {
     int ir = pwl_sdm->MapCFEMDOF(node_component_pairs[n].first,
                                  &unknown_manager,
-                                 ref_unknown,
+                                 ref_variable,
                                  node_component_pairs[n].second);
 
     mapped_nodes.push_back(ir);
@@ -154,7 +154,7 @@ CreatePWLDMappingLocal(
     int address = pwl_sdm->MapDFEMDOFLocal(&cell,
                                            node_number,
                                            &unknown_manager,
-                                           ref_unknown,
+                                           ref_variable,
                                            component_number);
 
     mapping.push_back(address);

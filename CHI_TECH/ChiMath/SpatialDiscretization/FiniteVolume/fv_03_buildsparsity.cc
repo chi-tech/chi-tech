@@ -1,7 +1,7 @@
 #include "fv.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMath/UnknownManager/unknown_manager.h"
+#include "ChiMath/NodalVariableStructure/nodal_variable_structure.h"
 
 //###################################################################
 /**Builds finite volume based sparsity pattern.*/
@@ -9,7 +9,7 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
   chi_mesh::MeshContinuumPtr grid,
   std::vector<int> &nodal_nnz_in_diag,
   std::vector<int> &nodal_nnz_off_diag,
-  chi_math::UnknownManager* unknown_manager)
+  chi_math::NodalVariableStructure* unknown_manager)
 {
   unsigned int num_uk = 1; //Number of unknowns
   unsigned int N = 1;      //Total number of unknowns
@@ -17,7 +17,7 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
   if (unknown_manager != nullptr)
   {
     num_uk = unknown_manager->unknowns.size();
-    N = unknown_manager->GetTotalUnknownSize();
+    N = unknown_manager->GetTotalVariableStructureSize();
   }
 
   nodal_nnz_in_diag.clear();

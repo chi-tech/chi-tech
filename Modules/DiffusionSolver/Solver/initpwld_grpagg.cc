@@ -24,7 +24,7 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
   pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
-  pwl_sdm->AddViewOfLocalContinuum(grid);
+  pwl_sdm->PreComputeCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Reorder nodes
@@ -39,7 +39,7 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
                        << t_reorder.GetTime()/1000.0;
 
   //================================================== Initialize unknown manager
-  unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N,G);
+  unknown_manager.AddVariable(chi_math::NodalVariableType::VECTOR_N, G);
 
   //================================================== Initialize field function
   //                                                   if empty

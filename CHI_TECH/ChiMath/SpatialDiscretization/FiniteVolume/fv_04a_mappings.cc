@@ -49,7 +49,7 @@ MapDOF(chi_mesh::Cell* cell)
 /**Maps a finite volume degree of freedom using an unknown manager.*/
 int SpatialDiscretization_FV::
 MapDOF(chi_mesh::Cell* cell,
-       chi_math::UnknownManager* unknown_manager,
+       chi_math::NodalVariableStructure* unknown_manager,
        unsigned int unknown_id,
        unsigned int component)
 {
@@ -63,8 +63,8 @@ MapDOF(chi_mesh::Cell* cell,
 
   auto storage = unknown_manager->dof_storage_type;
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id,component);
+  size_t num_unknowns = unknown_manager->GetTotalVariableStructureSize();
+  size_t block_id     = unknown_manager->MapVariable(unknown_id, component);
   size_t num_local_cells = ref_grid->local_cells.size();
 
   if (component >= num_unknowns) return -1;
@@ -73,11 +73,11 @@ MapDOF(chi_mesh::Cell* cell,
   int address=-1;
   if (cell->partition_id == chi_mpi.location_id)
   {
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
       address = fv_local_block_address*num_unknowns +
                 num_local_cells*block_id +
                 cell->local_id;
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
       address = fv_local_block_address*num_unknowns +
                 cell->local_id*num_unknowns +
                 block_id;
@@ -89,11 +89,11 @@ MapDOF(chi_mesh::Cell* cell,
       if (ghost->global_id == cell->global_id)
         ghost_local_id = ghost->local_id;
 
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
       address = locJ_block_address[cell->partition_id] * num_unknowns +
                 locJ_block_size[cell->partition_id] * block_id +
                 ghost_local_id;
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
       address = locJ_block_address[cell->partition_id] * num_unknowns +
                 ghost_local_id*num_unknowns +
                 block_id;
@@ -136,7 +136,7 @@ MapDOFLocal(chi_mesh::Cell* cell)
  * an unknown manager.*/
 int SpatialDiscretization_FV::
 MapDOFLocal(chi_mesh::Cell* cell,
-            chi_math::UnknownManager* unknown_manager,
+            chi_math::NodalVariableStructure* unknown_manager,
             unsigned int unknown_id,
             unsigned int component)
 {
@@ -150,8 +150,8 @@ MapDOFLocal(chi_mesh::Cell* cell,
 
   auto storage = unknown_manager->dof_storage_type;
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id,component);
+  size_t num_unknowns = unknown_manager->GetTotalVariableStructureSize();
+  size_t block_id     = unknown_manager->MapVariable(unknown_id, component);
   size_t num_local_cells = ref_grid->local_cells.size();
 
   if (component >= num_unknowns) return -1;
@@ -160,10 +160,10 @@ MapDOFLocal(chi_mesh::Cell* cell,
   int address=-1;
   if (cell->partition_id == chi_mpi.location_id)
   {
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
       address = num_local_cells*block_id +
                 cell->local_id;
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
       address = cell->local_id*num_unknowns +
                 block_id;
   }
@@ -174,10 +174,10 @@ MapDOFLocal(chi_mesh::Cell* cell,
       if (ghost->global_id == cell->global_id)
         ghost_local_id = ghost->local_id;
 
-    if (storage == chi_math::DOFStorageType::BLOCK)
+    if (storage == chi_math::NodalStorageType::BLOCK)
       address = locJ_block_size[cell->partition_id] * block_id +
                 ghost_local_id;
-    else if (storage == chi_math::DOFStorageType::NODAL)
+    else if (storage == chi_math::NodalStorageType::NODAL)
       address = ghost_local_id*num_unknowns + block_id;
 
   }

@@ -60,7 +60,7 @@ struct DiffusionIPBorderCell
 
 typedef std::vector<std::vector<DiffusionIPBorderCell*>> IP_BORDERCELL_INFO;
 typedef std::vector<std::vector<chi_mesh::Cell*>>          IP_BORDERCELLS;
-typedef std::vector<std::vector<CellFEView*>>              IP_BORDERFEVIEWS;
+typedef std::vector<std::vector<CellFEValues*>>              IP_BORDERFEVIEWS;
 typedef std::vector<std::vector<DiffusionIPCellView*>>       IP_BORDERIPVIEWS;
 
 //######################################################### Class def
@@ -84,7 +84,7 @@ public:
   std::shared_ptr<SpatialDiscretization>     discretization;
   std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;
 
-  chi_math::UnknownManager                 unknown_manager;
+  chi_math::NodalVariableStructure                 unknown_manager;
   int                                      fem_method = 0;
 
   int   property_map_D     = 0;
@@ -234,13 +234,13 @@ public:
   void SpawnBorderCell(int locI, int cell_border_index);
 
 
-  double HPerpendicular(chi_mesh::Cell* cell, CellFEView* fe_view, int f);
+  double HPerpendicular(chi_mesh::Cell* cell, CellFEValues* fe_view, int f);
   int MapCellDof(chi_mesh::Cell* cell, int ig);
   int MapCellFace(chi_mesh::Cell* cur_cell,
                   chi_mesh::Cell* adj_cell, int f);
 
   DiffusionIPCellView* GetBorderIPView(int locI, int cell_glob_index);
-  CellFEView* GetBorderFEView(int locI, int cell_glob_index);
+  CellFEValues* GetBorderFEView(int locI, int cell_glob_index);
   chi_mesh::Cell* GetBorderCell(int locI, int cell_glob_index);
 };
 

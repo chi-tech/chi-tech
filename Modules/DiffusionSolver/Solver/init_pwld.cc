@@ -31,7 +31,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
           "PIECEWISE_LINEAR_DISCONTINUOUS");
 
   pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
-  pwl_sdm->AddViewOfLocalContinuum(grid);
+  pwl_sdm->PreComputeCellSDValues(grid);
   pwl_sdm->AddViewOfNeighborContinuums(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -50,7 +50,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
                        << t_reorder.GetTime()/1000.0;
 
   //================================================== Initialize unknown manager
-  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
+  unknown_manager.AddVariable(chi_math::NodalVariableType::SCALAR);
 
   //================================================== Initialize field function
   //                                                   if empty
@@ -87,6 +87,13 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
                                     nodal_nnz_in_diag,
                                     nodal_nnz_off_diag,
                                     domain_ownership);
+
+    auto nodal_var_strct = &unknown_manager;
+
+  pwl_sdm->BuildDFEMSparsityPattern(grid,
+                                    nodal_nnz_in_diag,
+                                    nodal_nnz_off_diag,
+                                    nodal_var_strct);
 
 
   //================================================== Initialize x and b

@@ -2,10 +2,10 @@
 
 //###################################################################
 /** Constructor.*/
-PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
-                             chi_mesh::MeshContinuumPtr vol_continuum,
-                             SpatialDiscretization_PWL *discretization) :
-  CellFEView(poly_cell->vertex_ids.size())
+PolygonFEValues::PolygonFEValues(chi_mesh::CellPolygon* poly_cell,
+                                 chi_mesh::MeshContinuumPtr vol_continuum,
+                                 SpatialDiscretization_PWL *discretization) :
+  CellFEValues(poly_cell->vertex_ids.size())
 {
   precomputed = false;
   grid = vol_continuum;

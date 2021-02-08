@@ -1,5 +1,5 @@
-#ifndef _fv_polyhedron_h
-#define _fv_polyhedron_h
+#ifndef FV_POLYHEDRON_VALUES_H
+#define FV_POLYHEDRON_VALUES_H
 
 #include "fv_cellbase.h"
 #include <ChiMesh/Cell/cell_polyhedron.h>
@@ -11,7 +11,7 @@
  * - face_area[f] gives the area of the face.
  * - face_side_v[f][s][v] gives the vector for each leg of the
  *   tetrahedron forming a sides.*/
-class PolyhedronFVView : public CellFVView
+class PolyhedronFVValues : public CellFVValues
 {
 private:
   chi_mesh::MeshContinuumPtr grid;
@@ -21,9 +21,9 @@ public:
   std::vector<std::vector<double>>           face_side_volume;
   std::vector<std::vector<std::vector<chi_mesh::Vector3>>> face_side_vectors;
 
-  PolyhedronFVView(chi_mesh::CellPolyhedron* polyh_cell,
-                chi_mesh::MeshContinuumPtr vol_continuum) :
-                CellFVView(polyh_cell->vertex_ids.size())
+  PolyhedronFVValues(chi_mesh::CellPolyhedron* polyh_cell,
+                     chi_mesh::MeshContinuumPtr& vol_continuum) :
+    CellFVValues(polyh_cell->vertex_ids.size())
   {
     grid = vol_continuum;
 

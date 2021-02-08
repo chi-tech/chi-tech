@@ -20,7 +20,7 @@ int SpatialDiscretization_PWL::MapCFEMDOF(int vertex_id)
 /**Maps a vertex id according to a developed node ordering.*/
 int SpatialDiscretization_PWL::
   MapCFEMDOF(int vertex_id,
-             chi_math::UnknownManager* unknown_manager,
+             chi_math::NodalVariableStructure* unknown_manager,
              unsigned int unknown_id,
              unsigned int component)
 {
@@ -31,11 +31,11 @@ int SpatialDiscretization_PWL::
   int mapping = vertex_id;
   if (not node_mapping.empty()) mapping = node_mapping[vertex_id];
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id,component);
+  size_t num_unknowns = unknown_manager->GetTotalVariableStructureSize();
+  size_t block_id     = unknown_manager->MapVariable(unknown_id, component);
 
   int address=-1;
-  if (storage == chi_math::DOFStorageType::BLOCK)
+  if (storage == chi_math::NodalStorageType::BLOCK)
   {
     for (int locJ=0; locJ<chi_mpi.process_count; ++locJ)
     {
@@ -49,7 +49,7 @@ int SpatialDiscretization_PWL::
       break;
     }
   }
-  else if (storage == chi_math::DOFStorageType::NODAL)
+  else if (storage == chi_math::NodalStorageType::NODAL)
     address = mapping*num_unknowns + block_id;
 
   return address;

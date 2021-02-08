@@ -9,8 +9,8 @@ namespace chi_math
 {
 
 //#################################################################
-/**Different types of unknowns.*/
-enum class UnknownType
+/**Different types of variables.*/
+enum class NodalVariableType
 {
   SCALAR   = 1,
   VECTOR_2 = 2,
@@ -19,8 +19,8 @@ enum class UnknownType
   TENSOR   = 5
 };
 
-/**Degree-of-freedom storage format.*/
-enum class DOFStorageType
+/**Nodal variable storage format.*/
+enum class NodalStorageType
 {
   NODAL = 1,
   BLOCK = 2
@@ -29,15 +29,15 @@ enum class DOFStorageType
 //###################################################################
 /**General object for the management of unknowns in mesh-based
  * mathematical model.*/
-class UnknownManager
+class NodalVariableStructure
 {
 private:
   //#################################################################
-  /**Basic class for an unknown.*/
-  class Unknown
+  /**Basic class for an variable.*/
+  class Variable
   {
   public:
-    const UnknownType type;
+    const NodalVariableType type;
     const unsigned int num_components;
     const unsigned int map_begin;
     std::string text_name;
@@ -45,9 +45,9 @@ private:
     std::vector<int> num_off_block_connections;
 
   public:
-    explicit Unknown(UnknownType in_type,
-                     unsigned int in_num_components=1,
-                     unsigned int in_map_begin=0) :
+    explicit Variable(NodalVariableType in_type,
+                      unsigned int in_num_components=1,
+                      unsigned int in_map_begin=0) :
       type(in_type),
       num_components(in_num_components),
       map_begin(in_map_begin)
@@ -61,25 +61,25 @@ private:
       unsigned int map_value = 0;
       switch (type)
       {
-        case UnknownType::SCALAR:
+        case NodalVariableType::SCALAR:
           if (component_number >= num_components)
             throw std::out_of_range("Attempting to access component >=1"
                                     " for a SCALAR unknown.");
           map_value = 0;
           break;
-        case UnknownType::VECTOR_2:
+        case NodalVariableType::VECTOR_2:
           if (component_number >= num_components)
             throw std::out_of_range("Attempting to access component >=2"
                                     " for a VECTOR_2 unknown.");
           map_value = map_begin + component_number;
           break;
-        case UnknownType::VECTOR_3:
+        case NodalVariableType::VECTOR_3:
           if (component_number >= num_components)
             throw std::out_of_range("Attempting to access component >=3"
                                     " for a VECTOR_3 unknown.");
           map_value = map_begin + component_number;
           break;
-        case UnknownType::VECTOR_N:
+        case NodalVariableType::VECTOR_N:
           if (component_number >= num_components)
             throw std::out_of_range("Attempting to access component >="+
                                     std::to_string(num_components)+
@@ -95,33 +95,33 @@ private:
     unsigned int GetMapEnd() const {return map_begin + num_components - 1;}
   };
 
-
 public:
-  std::vector<Unknown> unknowns;
-  const DOFStorageType dof_storage_type;
+  std::vector<Variable> unknowns;
+  const NodalStorageType dof_storage_type;
 
-  explicit UnknownManager(DOFStorageType in_storage_type=DOFStorageType::NODAL) :
+  explicit NodalVariableStructure(NodalStorageType in_storage_type=
+                                  NodalStorageType::NODAL) :
     dof_storage_type(in_storage_type)
   {}
 
-  unsigned int AddUnknown(UnknownType unk_type, unsigned int dimension=0);
+  unsigned int AddVariable(NodalVariableType unk_type, unsigned int dimension= 0);
 
-  unsigned int MapUnknown(unsigned int unknown_id, unsigned int component = 0);
+  unsigned int MapVariable(unsigned int unknown_id, unsigned int component = 0);
 
-  unsigned int GetTotalUnknownSize();
+  unsigned int GetTotalVariableStructureSize();
 
-  void SetUnknownNumOffBlockConnections(unsigned int unknown_id,
-                                        int num_conn);
-  void SetComponentNumOffBlockConnections(unsigned int unknown_id,
-                                          unsigned int component,
-                                          int num_conn);
-  void SetUnknownTextName(unsigned int unknown_id,
-                          const std::string& in_text_name);
-  void SetUnknownComponentTextName(unsigned int unknown_id,
-                                   unsigned int component,
-                                   const std::string& in_text_name);
+  void SetVariableNumOffBlockConnections(unsigned int unknown_id,
+                                         int num_conn);
+  void SetVariableComponentNumOffBlockConnections(unsigned int unknown_id,
+                                                  unsigned int component,
+                                                  int num_conn);
+  void SetVariableTextName(unsigned int unknown_id,
+                           const std::string& in_text_name);
+  void SetVariableComponentTextName(unsigned int unknown_id,
+                                    unsigned int component,
+                                    const std::string& in_text_name);
 
-  ~UnknownManager() = default;
+  ~NodalVariableStructure() = default;
 };
 
 

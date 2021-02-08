@@ -1,5 +1,5 @@
-#ifndef _pwl_polyhedron_h
-#define _pwl_polyhedron_h
+#ifndef PWL_POLYHEDRON_VALUES_H
+#define PWL_POLYHEDRON_VALUES_H
 
 #include "../pwl.h"
 #include <vector>
@@ -79,7 +79,7 @@ struct FEnodeMap
  *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  * */
-class PolyhedronFEView : public CellFEView
+class PolyhedronFEValues : public CellFEValues
 {
 private:
   std::vector<double>            face_betaf;     ///< Face Beta-factor.
@@ -96,9 +96,9 @@ private:
 
 
 public:
-  PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
-                   chi_mesh::MeshContinuumPtr vol_continuum,
-                   SpatialDiscretization_PWL* discretization= nullptr);
+  PolyhedronFEValues(chi_mesh::CellPolyhedron* polyh_cell,
+                     chi_mesh::MeshContinuumPtr vol_continuum,
+                     SpatialDiscretization_PWL* discretization= nullptr);
 
 
   //################################################## Define standard

@@ -10,7 +10,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
+void SpatialDiscretization_PWL::PreComputeCellSDValues(
   chi_mesh::MeshContinuumPtr grid)
 {
   ref_grid = grid;
@@ -44,7 +44,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       else if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
         auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-        auto cell_fe_view = new PolygonFEView(poly_cell, grid, this);
+        auto cell_fe_view = new PolygonFEValues(poly_cell, grid, this);
 
         cell_fe_view->PreCompute();
 
@@ -55,7 +55,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
         auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-        auto cell_fe_view = new PolyhedronFEView(polyh_cell, grid, this);
+        auto cell_fe_view = new PolyhedronFEValues(polyh_cell, grid, this);
 
         cell_fe_view->PreCompute();
         cell_fe_view->CleanUp();
@@ -110,7 +110,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
-      auto cell_fe_view = new PolygonFEView(poly_cell, grid, this);
+      auto cell_fe_view = new PolygonFEValues(poly_cell, grid, this);
 
       cell_fe_view->PreCompute();
 
@@ -120,7 +120,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      auto cell_fe_view = new PolyhedronFEView(polyh_cell, grid, this);
+      auto cell_fe_view = new PolyhedronFEValues(polyh_cell, grid, this);
 
       cell_fe_view->PreCompute();
       cell_fe_view->CleanUp();
@@ -145,9 +145,9 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-CellFEView* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
+CellFEValues* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
 {
-  CellFEView* value;
+  CellFEValues* value;
   try { value = cell_fe_views.at(cell_local_index); }
   catch (const std::out_of_range& o)
   {

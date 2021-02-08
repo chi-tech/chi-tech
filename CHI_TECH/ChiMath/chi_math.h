@@ -87,7 +87,7 @@ namespace chi_math
                         VecDbl& e_vec, int max_it = 2000, double tol = 1.0e-13);
 
   //04 Unknown Managers
-  class UnknownManager;
+  class NodalVariableStructure;
 }
 
 

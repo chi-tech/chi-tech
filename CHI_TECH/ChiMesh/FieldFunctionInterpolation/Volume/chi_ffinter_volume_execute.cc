@@ -146,7 +146,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
     if (inside_logvolume)
     {
       auto cell_fe_view =
-        (CellFEView*)discretization.MapFeViewL(cell.local_id);
+        (CellFEValues*)discretization.MapFeViewL(cell.local_id);
 
       for (int i=0; i < cell.vertex_ids.size(); i++)
       {

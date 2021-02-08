@@ -17,7 +17,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->local_id);
+  auto fe_view = (CellFEValues*)pwl_sdm->MapFeViewL(cell->local_id);
 
   for (int gr=0; gr<G; gr++)
   {
@@ -81,7 +81,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
       if (face.has_neighbor)
       {
         chi_mesh::Cell*           adj_cell    = nullptr;
-        CellFEView*               adj_fe_view = nullptr;
+        CellFEValues*               adj_fe_view = nullptr;
         DiffusionIPCellView*     adj_ip_view  = nullptr;
         int                              fmap = -1;
 
@@ -91,14 +91,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
           int adj_cell_local_index = face.GetNeighborLocalID(*grid);
           adj_cell      = &grid->local_cells[adj_cell_local_index];
           adj_ip_view   = ip_cell_views[adj_cell_local_index];
-          adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell_local_index);
+          adj_fe_view   = (CellFEValues*)pwl_sdm->MapFeViewL(adj_cell_local_index);
         }//local
         else //Non-local
         {
           int locI = face.GetNeighborPartitionID(*grid);
           adj_ip_view = GetBorderIPView(locI,face.neighbor_id);
           adj_cell    = (chi_mesh::Cell*)GetBorderCell(locI,face.neighbor_id);
-          adj_fe_view = (CellFEView*)GetBorderFEView(locI,face.neighbor_id);
+          adj_fe_view = (CellFEValues*)GetBorderFEView(locI, face.neighbor_id);
         }//non-local
 
         //========================= Check valid information
@@ -370,7 +370,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->local_id);
+  auto fe_view = (CellFEValues*)pwl_sdm->MapFeViewL(cell->local_id);
 
   for (int gr=0; gr<G; gr++)
   {

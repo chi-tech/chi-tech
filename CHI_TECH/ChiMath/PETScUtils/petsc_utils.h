@@ -1,8 +1,7 @@
-#ifndef _chi_math_petscutils_h
-#define _chi_math_petscutils_h
+#ifndef CHI_MATH_PETSC_UTILS_H
+#define CHI_MATH_PETSC_UTILS_H
 
 #include <petscksp.h>
-
 #include <vector>
 
 namespace chi_math

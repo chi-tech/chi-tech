@@ -124,7 +124,7 @@ int chi_diffusion::Solver::MapBorderCell(int locI, int neighbor, int vglob_i)
  * Nv = Number of vertices. If Nv <= 4 then the perimeter parameter
  * should be replaced by edge length.*/
 double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
-                                             CellFEView* fe_view,
+                                             CellFEValues* fe_view,
                                              int f)
 {
   double hp = 1.0;
@@ -300,8 +300,8 @@ DiffusionIPCellView* chi_diffusion::Solver::GetBorderIPView(int locI,
 }
 
 /**Obtains a reference to a Finite Element view of a cell.*/
-CellFEView* chi_diffusion::Solver::GetBorderFEView(int locI,
-                                                   int cell_glob_index)
+CellFEValues* chi_diffusion::Solver::GetBorderFEView(int locI,
+                                                     int cell_glob_index)
 {
   int cell_border_index=-1;
   for (int c=0; c<ip_locI_bordercell_info[locI].size(); c++)
@@ -433,7 +433,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
 
     auto fe_view =
-      new PolygonFEView(cell, grid, &rpwl_sdm);
+      new PolygonFEValues(cell, grid, &rpwl_sdm);
 
     fe_view->PreCompute();
 
@@ -482,8 +482,8 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
     auto& rpwl_sdm = *pwl_sdm;
 
-    PolyhedronFEView* fe_view =
-      new PolyhedronFEView(cell,grid,&rpwl_sdm);
+    PolyhedronFEValues* fe_view =
+      new PolyhedronFEValues(cell, grid, &rpwl_sdm);
 
     fe_view->PreCompute();
 
