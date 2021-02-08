@@ -11,9 +11,9 @@ extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset& groupset)
 {
-  if (groupset->apply_tgdsa)
+  if (groupset.apply_tgdsa)
   {
     chi_math::NodalVariableStructure scalar_uk_man;
     scalar_uk_man.AddVariable(chi_math::NodalVariableType::SCALAR);
@@ -38,20 +38,20 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
     //================================= Set diffusion solver
     std::string solver_name = std::string("TGDSA");
     solver_name += std::string("[g=")
-                 + std::to_string(groupset->groups.front()->id)
+                 + std::to_string(groupset.groups.front().id)
                  + std::string("-")
-                 + std::to_string(groupset->groups.back()->id)
+                 + std::to_string(groupset.groups.back().id)
                  + std::string("]");
     auto dsolver = new chi_diffusion::Solver(solver_name);
-    groupset->tgdsa_solver = dsolver;
+    groupset.tgdsa_solver = dsolver;
 
     dsolver->regions.push_back(this->regions.back());
     dsolver->discretization = discretization;
     dsolver->fem_method = PWLD_MIP;
-    dsolver->residual_tolerance = groupset->tgdsa_tol;
-    dsolver->max_iters          = groupset->tgdsa_max_iters;
-    dsolver->options_string     = groupset->tgdsa_string;
-    if (groupset->apply_wgdsa)
+    dsolver->residual_tolerance = groupset.tgdsa_tol;
+    dsolver->max_iters          = groupset.tgdsa_max_iters;
+    dsolver->options_string     = groupset.tgdsa_string;
+    if (groupset.apply_wgdsa)
       dsolver->material_mode = DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF_JFULL;
     else
       dsolver->material_mode = DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF_JPART;
@@ -78,7 +78,7 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
 
     //================================= Initialize solver, assemble matrix A
     //                                  but suppress solution
-    bool verbose          = groupset->tgdsa_verbose;   //Disable normal info printing
+    bool verbose          = groupset.tgdsa_verbose;   //Disable normal info printing
     bool supress_assembly = false;   //Assemble the matrix
     bool supress_solver   = true;    //Suppress the solving
     dsolver->Initialize(verbose);
@@ -91,20 +91,20 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset *groupset)
 
 //###################################################################
 /**Cleans up memory consuming items. */
-void LinearBoltzmann::Solver::CleanUpTGDSA(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::CleanUpTGDSA(LBSGroupset& groupset)
 {
-  if (groupset->apply_tgdsa)
-    delete groupset->tgdsa_solver;
+  if (groupset.apply_tgdsa)
+    delete groupset.tgdsa_solver;
 }
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void LinearBoltzmann::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzmann::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                                           double *ref_phi_old,
                                                           double *ref_phi_new)
 {
-  int gsi = groupset->groups[0]->id;
-  int gss = groupset->groups.size();
+  int gsi = groupset.groups[0].id;
+  int gss = groupset.groups.size();
 
   delta_phi_local.resize(local_dof_count,0.0);
 
@@ -152,13 +152,13 @@ void LinearBoltzmann::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
 
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void LinearBoltzmann::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzmann::Solver::DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                                              double *ref_phi_new)
 {
-  int gsi = groupset->groups[0]->id;
-  int gss = groupset->groups.size();
+  int gsi = groupset.groups[0].id;
+  int gss = groupset.groups.size();
 
-  auto tgdsa_solver = (chi_diffusion::Solver*)groupset->tgdsa_solver;
+  auto tgdsa_solver = (chi_diffusion::Solver*)groupset.tgdsa_solver;
 
   int index = -1;
   for (const auto& cell : grid->local_cells)

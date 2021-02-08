@@ -37,9 +37,9 @@ protected:
   chi_mesh::MeshContinuumPtr grid_view;
   SpatialDiscretization_PWL& grid_fe_view;
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
-  const LinearBoltzmann::Solver& ref_solver;
+//  const LinearBoltzmann::Solver& ref_solver;
   const std::vector<double>* q_moments;
-  const LBSGroupset* groupset;
+  const LBSGroupset& groupset;
   const TCrossSections* xsections;
   const int num_moms;
   const int G;
@@ -52,32 +52,32 @@ protected:
 
 public:
   // ################################################## Constructor
-  LBSSweepChunkPWL(chi_mesh::MeshContinuumPtr vol_continuum,
+  LBSSweepChunkPWL(chi_mesh::MeshContinuumPtr grid_ptr,
                    SpatialDiscretization_PWL& discretization,
                    const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
-                   const LinearBoltzmann::Solver& in_ref_solver,
+//                   const LinearBoltzmann::Solver& in_ref_solver,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
-                   const LBSGroupset* in_groupset,
+                   const LBSGroupset& in_groupset,
                    const TCrossSections* in_xsections,
                    const int in_num_moms,
                    const int in_max_num_cell_dofs)
     : SweepChunk(destination_phi, false),
-      grid_view(vol_continuum),
+      grid_view(grid_ptr),
       grid_fe_view(discretization),
       grid_transport_view(cell_transport_views),
-      ref_solver(in_ref_solver),
+//      ref_solver(in_ref_solver),
       q_moments(source_moments),
       groupset(in_groupset),
       xsections(in_xsections),
       num_moms(in_num_moms),
-      G(in_groupset->groups.size()),
+      G(in_groupset.groups.size()),
       max_num_cell_dofs(in_max_num_cell_dofs),
       a_and_b_initialized(false)
   {}
 
   // ############################################################ Actual chunk
-  virtual void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override
+  void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override
   {
     if (!a_and_b_initialized)
     {
@@ -91,16 +91,16 @@ public:
     auto spds = angle_set->GetSPDS();
     auto fluds = angle_set->fluds;
 
-    const GsSubSet& subset = groupset->grp_subsets[angle_set->ref_subset];
-    int gs_ss_size  = groupset->grp_subset_sizes[angle_set->ref_subset];
+    const GsSubSet& subset = groupset.grp_subsets[angle_set->ref_subset];
+    int gs_ss_size  = groupset.grp_subset_sizes[angle_set->ref_subset];
     int gs_ss_begin = subset.first;
-    int gs_gi = groupset->groups[gs_ss_begin]->id; // Groupset subset first group number
+    int gs_gi = groupset.groups[gs_ss_begin].id; // Groupset subset first group number
 
     int deploc_face_counter = -1;
     int preloc_face_counter = -1;
 
-    auto const& d2m_op = groupset->quadrature->GetDiscreteToMomentOperator();
-    auto const& m2d_op = groupset->quadrature->GetMomentToDiscreteOperator();
+    auto const& d2m_op = groupset.quadrature->GetDiscreteToMomentOperator();
+    auto const& m2d_op = groupset.quadrature->GetMomentToDiscreteOperator();
 
     // ========================================================== Loop over each cell
     size_t num_loc_cells = spds->spls.item_id.size();
@@ -133,7 +133,7 @@ public:
         deploc_face_counter = ni_deploc_face_counter;
         preloc_face_counter = ni_preloc_face_counter;
         int angle_num = angle_set->angles[n];
-        chi_mesh::Vector3 omega = groupset->quadrature->omegas[angle_num];
+        chi_mesh::Vector3 omega = groupset.quadrature->omegas[angle_num];
 
         // ============================================ Gradient matrix
         for (int i = 0; i < num_dofs; ++i)
@@ -266,7 +266,7 @@ public:
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               (*x)[ir + gsg] += wn_d2m*b[gsg][i];
 
-            for (auto callback : groupset->moment_callbacks)
+            for (auto callback : groupset.moment_callbacks)
               for (int gsg=0; gsg<gs_ss_size; gsg++)
                 callback(cell->local_id, ir+gsg, i, gsg, m, angle_num, b[gsg][i]);
           }
@@ -324,7 +324,7 @@ public:
         }
       } // for n
     } // for cell
-  }
+  }//Sweep
 };
 
 #endif

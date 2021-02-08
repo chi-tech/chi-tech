@@ -1,7 +1,5 @@
 #include "../lbs_linear_boltzmann_solver.h"
 
-#include <ChiMesh/MeshHandler/chi_meshhandler.h>
-
 #include "ChiTimer/chi_timer.h"
 
 #include <chi_mpi.h>
@@ -9,8 +7,6 @@
 
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
-
-extern double chi_global_timings[20];
 
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
@@ -23,13 +19,10 @@ extern double chi_global_timings[20];
  * \param suppress_phi_old Flag indicating whether to suppress phi_old.
  *
  * */
-void LinearBoltzmann::Solver::SetSource(int group_set_num,
+void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
                                         bool apply_mat_src,
                                         bool suppress_phi_old)
 {
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
-
   bool OneD_Slab = false;
 
   if (options.geometry_type == GeometryType::ONED_SLAB)
@@ -37,20 +30,17 @@ void LinearBoltzmann::Solver::SetSource(int group_set_num,
 
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
-  //================================================== Get reference to groupset
-  LBSGroupset* groupset = group_sets[group_set_num];
+  //================================================== Get group setup
+  int gs_i = groupset.groups[0].id;
+  int gs_f = groupset.groups.back().id;
 
-  int gs_i = groupset->groups[0]->id;
-  int gs_f = groupset->groups.back()->id;
-
-  int first_grp = groups.front()->id;
-  int last_grp = groups.back()->id;
+  int first_grp = groups.front().id;
+  int last_grp = groups.back().id;
 
   std::vector<double> default_zero_src(groups.size(),0.0);
 
   //================================================== Reset source moments
   q_moments_local.assign(q_moments_local.size(),0.0);
-
 
   //================================================== Loop over local cells
   for (const auto& cell : grid->local_cells)
@@ -77,7 +67,6 @@ void LinearBoltzmann::Solver::SetSource(int group_set_num,
     double* src = default_zero_src.data();
     if ( (src_id >= 0) && (apply_mat_src) )
       src = material_srcs[src_id]->source_value_g.data();
-
 
     //=========================================== Loop over dofs
     double inscat_g = 0.0;
@@ -174,7 +163,6 @@ void LinearBoltzmann::Solver::SetSource(int group_set_num,
 
       }//for moment
     }//for dof i
-
   }//for cell
 
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_END);

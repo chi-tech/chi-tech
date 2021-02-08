@@ -26,15 +26,15 @@ extern ChiConsole&  chi_console;
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/
-void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
     << " Computing Sweep ordering.\n";
 
   //============================================= Clear sweep ordering
-  groupset->sweep_orderings.clear();
-  groupset->sweep_orderings.shrink_to_fit();
+  groupset.sweep_orderings.clear();
+  groupset.sweep_orderings.shrink_to_fit();
 
   chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
@@ -42,7 +42,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   //============================================= Check possibility of cycles
   if (mesher->options.partition_type ==
       chi_mesh::VolumeMesher::PartitionType::PARMETIS and
-      not groupset->allow_cycles)
+      not groupset.allow_cycles)
   {
     chi_log.Log(LOG_ALLERROR)
       << "When using PARMETIS type partitioning then groupset iterative method"
@@ -51,26 +51,26 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Single angle aggr.
-  if (groupset->angleagg_method == LinearBoltzmann::AngleAggregationType::SINGLE)
+  if (groupset.angleagg_method == LinearBoltzmann::AngleAggregationType::SINGLE)
   {
-    for (auto& angle : groupset->quadrature->abscissae)
+    for (auto& angle : groupset.quadrature->abscissae)
     {
       auto new_swp_order =
         chi_mesh::sweep_management::
         CreateSweepOrder(angle.theta,
                          angle.phi,
                          this->grid,
-                         groupset->allow_cycles);
-      groupset->sweep_orderings.push_back(new_swp_order);
+                         groupset.allow_cycles);
+      groupset.sweep_orderings.push_back(new_swp_order);
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D MESHES
   else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
   {
-    if (groupset->quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
+    if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
     {
       auto product_quadrature =
-        std::static_pointer_cast<chi_math::ProductQuadrature>(groupset->quadrature);
+        std::static_pointer_cast<chi_math::ProductQuadrature>(groupset.quadrature);
 
       int num_azi = product_quadrature->azimu_ang.size();
       int num_pol = product_quadrature->polar_ang.size();
@@ -89,16 +89,16 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
         CreateSweepOrder(product_quadrature->polar_ang[0],
                          product_quadrature->azimu_ang[0],
                          this->grid,
-                         groupset->allow_cycles);
-      groupset->sweep_orderings.push_back(new_swp_order);
+                         groupset.allow_cycles);
+      groupset.sweep_orderings.push_back(new_swp_order);
 
       new_swp_order =
         chi_mesh::sweep_management::
         CreateSweepOrder(product_quadrature->polar_ang[pa],
                          product_quadrature->azimu_ang[0],
                          this->grid,
-                         groupset->allow_cycles);
-      groupset->sweep_orderings.push_back(new_swp_order);
+                         groupset.allow_cycles);
+      groupset.sweep_orderings.push_back(new_swp_order);
     }
 
   }
@@ -107,10 +107,10 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
             (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
             (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)))
   {
-    if (groupset->quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
+    if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
     {
       auto product_quadrature =
-        std::static_pointer_cast<chi_math::ProductQuadrature>(groupset->quadrature);
+        std::static_pointer_cast<chi_math::ProductQuadrature>(groupset.quadrature);
 
 
       int num_azi = product_quadrature->azimu_ang.size();
@@ -144,8 +144,8 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
           CreateSweepOrder(product_quadrature->polar_ang[pa-1],
                            product_quadrature->azimu_ang[i],
                            this->grid,
-                           groupset->allow_cycles);
-        groupset->sweep_orderings.push_back(new_swp_order);
+                           groupset.allow_cycles);
+        groupset.sweep_orderings.push_back(new_swp_order);
       }
       //=========================================== BOTTOM HEMISPHERE
       for (int i=0; i<num_azi; i++)
@@ -155,8 +155,8 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset *groupset)
           CreateSweepOrder(product_quadrature->polar_ang[pa],
                            product_quadrature->azimu_ang[i],
                            this->grid,
-                           groupset->allow_cycles);
-        groupset->sweep_orderings.push_back(new_swp_order);
+                           groupset.allow_cycles);
+        groupset.sweep_orderings.push_back(new_swp_order);
       }
     }//if product quadrature
   }

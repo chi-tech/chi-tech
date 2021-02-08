@@ -67,9 +67,9 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
     << chi_program_timer.GetTimeString() << " "
     << offset
     << "WGS groups ["
-    << context->groupset->groups.front()->id
+    << context->groupset->groups.front().id
     << "-"
-    << context->groupset->groups.back()->id
+    << context->groupset->groups.back().id
     << "]"
     << " Iteration " << std::setw(5) << n
     << " Residual " << std::setw(9) << relative_residual;
@@ -97,7 +97,7 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
           KSPBuildSolution(ksp,NULL,&phi_new);
 
           context->solver->
-          DisAssembleVector(context->groupset, phi_new,
+          DisAssembleVector(*context->groupset, phi_new,
                             context->solver->phi_old_local.data(),
                             WITH_DELAYED_PSI);
 

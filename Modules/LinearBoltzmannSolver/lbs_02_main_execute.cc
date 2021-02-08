@@ -19,34 +19,34 @@ extern ChiConsole&  chi_console;
 void LinearBoltzmann::Solver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  for (int gs=0; gs<group_sets.size(); gs++)
+  int gs=-1;
+  for (auto& groupset : group_sets)
   {
+    ++gs;
     chi_log.Log(LOG_0)
       << "\n********* Initializing Groupset " << gs << "\n" << std::endl;
 
-    group_sets[gs]->BuildDiscMomOperator(options.scattering_order,
-                                         options.geometry_type);
-    group_sets[gs]->BuildMomDiscOperator(options.scattering_order,
-                                         options.geometry_type);
-    group_sets[gs]->BuildSubsets();
+    groupset.BuildDiscMomOperator(options.scattering_order,
+                                  options.geometry_type);
+    groupset.BuildMomDiscOperator(options.scattering_order,
+                                  options.geometry_type);
+    groupset.BuildSubsets();
 
-    ComputeSweepOrderings(group_sets[gs]);
-    InitFluxDataStructures(group_sets[gs]);
+    ComputeSweepOrderings(groupset);
+    InitFluxDataStructures(groupset);
 
-    InitWGDSA(group_sets[gs]);
-    InitTGDSA(group_sets[gs]);
+    InitWGDSA(groupset);
+    InitTGDSA(groupset);
 
-    SolveGroupset(gs);
+    SolveGroupset(groupset, gs);
 
-    CleanUpWGDSA(group_sets[gs]);
-    CleanUpTGDSA(group_sets[gs]);
+    CleanUpWGDSA(groupset);
+    CleanUpTGDSA(groupset);
 
-    ResetSweepOrderings(group_sets[gs]);
+    ResetSweepOrderings(groupset);
 
     MPI_Barrier(MPI_COMM_WORLD);
   }
-
-
 
   chi_log.Log(LOG_0) << "NPTransport solver execution completed\n";
 }
@@ -54,24 +54,26 @@ void LinearBoltzmann::Solver::Execute()
 
 //###################################################################
 /**Solves a single groupset.*/
-void LinearBoltzmann::Solver::SolveGroupset(int group_set_num)
+void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
+                                            int group_set_num)
 {
   source_event_tag = chi_log.GetRepeatingEventTag("Set Source");
-  LBSGroupset* group_set = group_sets[group_set_num];
 
   //================================================== Setting up required
   //                                                   sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(group_set_num);
+  SweepChunk* sweep_chunk = SetSweepChunk(groupset);
   MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    &group_set->angle_agg);
+                                    &groupset.angle_agg);
 
-  if (group_set->iterative_method == NPT_CLASSICRICHARDSON)
+  *(char *)0 = 0;
+
+  if (groupset.iterative_method == NPT_CLASSICRICHARDSON)
   {
-    ClassicRichardson(group_set_num, sweep_chunk, sweepScheduler);
+    ClassicRichardson(groupset, group_set_num, sweep_chunk, sweepScheduler);
   }
-  else if (group_set->iterative_method == NPT_GMRES)
+  else if (groupset.iterative_method == NPT_GMRES)
   {
-    GMRES(group_set_num, sweep_chunk, sweepScheduler);
+    GMRES(groupset, group_set_num, sweep_chunk, sweepScheduler);
   }
 
   delete sweep_chunk;

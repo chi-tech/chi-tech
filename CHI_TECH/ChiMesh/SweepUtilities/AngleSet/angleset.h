@@ -1,5 +1,5 @@
-#ifndef _chi_angleset_h
-#define _chi_angleset_h
+#ifndef CHI_ANGLESET_H
+#define CHI_ANGLESET_H
 
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/SweepUtilities/SweepBuffer/sweepbuffer.h"

@@ -17,8 +17,11 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
-void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
-                                    MainSweepScheduler & sweepScheduler, bool log_info /* = true*/)
+void LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
+                                    int group_set_num,
+                                    SweepChunk* sweep_chunk,
+                                    MainSweepScheduler& sweepScheduler,
+                                    bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
   if (log_info)
@@ -30,16 +33,12 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
       << " with GMRES.\n\n";
   }
 
-  //================================================== Obtain groupset
-  LBSGroupset* groupset = group_sets[group_set_num];
-  int groupset_numgrps = groupset->groups.size();
-
   if (log_info)
     chi_log.Log(LOG_0)
       << "Quadrature number of angles: "
-      << groupset->quadrature->abscissae.size() << "\n"
-      << "Groups " << groupset->groups.front()->id << " "
-      << groupset->groups.back()->id << "\n\n";
+      << groupset.quadrature->abscissae.size() << "\n"
+      << "Groups " << groupset.groups.front().id << " "
+      << groupset.groups.back().id << "\n\n";
 
   //=================================================== Create Data context
   //                                                    available inside
@@ -48,13 +47,14 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
   data_context.solver         = this;
   data_context.sweep_chunk    = sweep_chunk;
   data_context.group_set_num  = group_set_num;
-  data_context.groupset       = groupset;
+  data_context.groupset       = &groupset;
   data_context.sweepScheduler = &sweepScheduler;
 
 
   //=================================================== Create the matrix
   Mat A;
-  auto num_ang_unknowns = groupset->angle_agg.GetNumberOfAngularUnknowns();
+  int groupset_numgrps = groupset.groups.size();
+  auto num_ang_unknowns = groupset.angle_agg.GetNumberOfAngularUnknowns();
   int local_size = local_dof_count*num_moments*groupset_numgrps +
                    num_ang_unknowns.first;
   int globl_size = glob_dof_count*num_moments*groupset_numgrps +
@@ -64,7 +64,7 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
                                   globl_size,
                                   globl_size,
                                   &data_context,&A);
-  groupset->angle_agg.ZeroIncomingDelayedPsi();
+  groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Set the action-operator
   MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) LBSMatrixAction_Ax);
@@ -95,9 +95,9 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
   PCSetType(pc,PCNONE);
 
   KSPSetTolerances(ksp,1.e-50,
-                   groupset->residual_tolerance,1.0e50,
-                   groupset->max_iterations);
-  KSPGMRESSetRestart(ksp,groupset->gmres_restart_intvl);
+                   groupset.residual_tolerance,1.0e50,
+                   groupset.max_iterations);
+  KSPGMRESSetRestart(ksp,groupset.gmres_restart_intvl);
   KSPSetApplicationContext(ksp,&data_context);
   KSPSetConvergenceTest(ksp,&KSPConvergenceTestNPT,NULL,NULL);
   KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);
@@ -107,26 +107,27 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
   if (log_info)
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
 
-  SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE,
-                          SourceFlags::SUPPRESS_PHI_OLD);
+  SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,
+                     SourceFlags::SUPPRESS_PHI_OLD);
+
   sweep_chunk->SetDestinationPhi(&phi_new_local);
 
   phi_new_local.assign(phi_new_local.size(),0.0);
   sweepScheduler.Sweep(sweep_chunk);
 
   //=================================================== Apply DSA
-  if (groupset->apply_wgdsa)
+  if (groupset.apply_wgdsa)
   {
     std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
     AssembleWGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
-    ((chi_diffusion::Solver*)groupset->wgdsa_solver)->ExecuteS(true,false);
+    ((chi_diffusion::Solver*)groupset.wgdsa_solver)->ExecuteS(true,false);
     DisAssembleWGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
-  if (groupset->apply_tgdsa)
+  if (groupset.apply_tgdsa)
   {
     std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
     AssembleTGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
-    ((chi_diffusion::Solver*)groupset->tgdsa_solver)->ExecuteS(true,false);
+    ((chi_diffusion::Solver*)groupset.tgdsa_solver)->ExecuteS(true,false);
     DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
 
@@ -182,10 +183,10 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
   double source_time=
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
-  size_t num_angles = groupset->quadrature->abscissae.size();
+  size_t num_angles = groupset.quadrature->abscissae.size();
   long int num_unknowns = (long int)glob_dof_count*
                           (long int)num_angles*
-                          (long int)groupset->groups.size();
+                          (long int)groupset.groups.size();
 
   if (log_info)
   {
@@ -213,7 +214,7 @@ void LinearBoltzmann::Solver::GMRES(int group_set_num, SweepChunk* sweep_chunk,
     std::string("GS_") + std::to_string(group_set_num) +
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
-  groupset->PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+  groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
 }
 
 

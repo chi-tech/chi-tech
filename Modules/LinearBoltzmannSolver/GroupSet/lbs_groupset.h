@@ -1,5 +1,5 @@
-#ifndef _lbs_groupset_h
-#define _lbs_groupset_h
+#ifndef LBS_GROUPSET_H
+#define LBS_GROUPSET_H
 
 #include "lbs_group.h"
 #include "../IterativeMethods/lbs_iterativemethods.h"
@@ -36,7 +36,7 @@ class LBSGroupset
 protected:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
 public:
-  std::vector<LBSGroup*>                       groups;
+  std::vector<LBSGroup>                        groups;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
   std::vector<SPDS_ptr>                        sweep_orderings;

@@ -22,7 +22,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Initializes fluds data structures.*/
-void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
 {
   //================================================== Angle Aggregation
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
@@ -32,11 +32,11 @@ void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset *groupset)
       (typeid(mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
       (typeid(mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
   {
-    if      (groupset->angleagg_method == AngleAggregationType::SINGLE)
+    if      (groupset.angleagg_method == AngleAggregationType::SINGLE)
     {
       InitAngleAggSingle(groupset);
     }
-    else if (groupset->angleagg_method == AngleAggregationType::POLAR)
+    else if (groupset.angleagg_method == AngleAggregationType::POLAR)
     {
       InitAngleAggPolar(groupset);
     }

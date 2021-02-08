@@ -14,14 +14,14 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for
  * another.*/
-void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset& groupset)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "Resetting SPDS and FLUDS";
 
-  groupset->sweep_orderings.clear();
+  groupset.sweep_orderings.clear();
 
-  auto& angle_agg = groupset->angle_agg;
+  auto& angle_agg = groupset.angle_agg;
 
   for (auto& angset_grp : angle_agg.angle_set_groups)
   {

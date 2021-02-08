@@ -15,7 +15,7 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 
   LinearBoltzmann::Solver* solver = context->solver;
   SweepChunk* sweep_chunk = context->sweep_chunk;
-  LBSGroupset* groupset  = context->groupset;
+  LBSGroupset& groupset  = *context->groupset;
   MainSweepScheduler* sweepScheduler = context->sweepScheduler;
 
   //============================================= Copy krylov vector into local
@@ -25,31 +25,32 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 
   //============================================= Setting the source using
   //                                             updated phi_old
-  solver->SetSource(context->group_set_num,
-                    LinearBoltzmann::SourceFlags::USE_DLINV_SOURCE);
+  solver->SetSource(*context->groupset,
+                    LinearBoltzmann::SourceFlags::USE_DLINV_SOURCE,
+                    false);
 
   //============================================= Sweeping the new source
-  groupset->angle_agg.ZeroOutgoingDelayedPsi();
+  groupset.angle_agg.ZeroOutgoingDelayedPsi();
 
   solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
   sweepScheduler->Sweep(sweep_chunk);
 
   //=================================================== Apply WGDSA
-  if (groupset->apply_wgdsa)
+  if (groupset.apply_wgdsa)
   {
     solver->AssembleWGDSADeltaPhiVector(groupset,
                                         solver->phi_old_local.data(),
                                         solver->phi_new_local.data());
-    ((chi_diffusion::Solver*)groupset->wgdsa_solver)->ExecuteS(true,false);
+    ((chi_diffusion::Solver*)groupset.wgdsa_solver)->ExecuteS(true,false);
     solver->DisAssembleWGDSADeltaPhiVector(groupset,
                                            solver->phi_new_local.data());
   }
-  if (groupset->apply_tgdsa)
+  if (groupset.apply_tgdsa)
   {
     solver->AssembleTGDSADeltaPhiVector(groupset,
                                         solver->phi_old_local.data(),
                                         solver->phi_new_local.data());
-    ((chi_diffusion::Solver*)groupset->tgdsa_solver)->ExecuteS(true,false);
+    ((chi_diffusion::Solver*)groupset.tgdsa_solver)->ExecuteS(true,false);
     solver->DisAssembleTGDSADeltaPhiVector(groupset,
                                            solver->phi_new_local.data());
   }

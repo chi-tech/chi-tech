@@ -1,7 +1,5 @@
-#ifndef _chi_npt_iterativemethods_h
-#define _chi_npt_iterativemethods_h
-
-#define GROUPSET_ITERATIVEMETHOD 101
+#ifndef LBS_ITERATIVE_METHODS_H
+#define LBS_ITERATIVE_METHODS_H
 
 #define NPT_CLASSICRICHARDSON        1
 #define NPT_CLASSICRICHARDSON_CYCLES 2

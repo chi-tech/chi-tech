@@ -21,9 +21,9 @@ void LinearBoltzmann::Solver::PerformInputChecks()
     exit(EXIT_FAILURE);
   }
   int grpset_counter=0;
-  for (auto group_set : group_sets)
+  for (auto& group_set : group_sets)
   {
-    if (group_set->groups.empty())
+    if (group_set.groups.empty())
     {
       chi_log.Log(LOG_ALLERROR)
         << "LinearBoltzmann::Solver: No groups added to groupset "
@@ -46,6 +46,13 @@ void LinearBoltzmann::Solver::PerformInputChecks()
   }
   chi_mesh::Region*  aregion = regions.back();
   grid                       = aregion->GetGrid();
+
+  if (grid == nullptr)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "LinearBoltzmann::Solver: No grid available from region.";
+    exit(EXIT_FAILURE);
+  }
 
   //======================================== Determine geometry type
   if (grid->local_cells[0].Type() == chi_mesh::CellType::SLAB)

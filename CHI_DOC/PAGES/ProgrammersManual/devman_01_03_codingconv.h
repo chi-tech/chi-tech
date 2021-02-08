@@ -4,7 +4,9 @@
 
  In general we follow the
  <a href="https://google.github.io/styleguide/cppguide.html">Google C++ style guide</a>.
- We now will dictate a few specific items.
+ We now will dictate a few specific items. Refer to the image below for different
+ text case-namings:
+ \image html "Cases.png" "Different case names and how they look" width=150px
  \n\n
  Let us say it here explicitly, <B>all variable-, function-, method- names should be descriptive</B>,
  avoid abbreviation, rather sacrifice horizontal space for readability.
@@ -12,8 +14,9 @@
  \subsection devman1_sec0_1 File names
 
  - <B>Filenames</B> should be all lower case and may include "_" underscores. i.e.
-   chi_tech_main.cc
+   chi_tech_main.cc. snake_case is preferred.
  - Do not uses dashes `-` in file names
+ - Do not uses dashes spaces in file names (Them Windows users!)
  - Do not use filenames that already exist in `/usr/include`
  - In general, make your filenames very specific. For example, use
    `http_server_logs.h` rather than `logs.h`. A very common case is to have a pair

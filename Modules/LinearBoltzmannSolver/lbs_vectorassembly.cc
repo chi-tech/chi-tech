@@ -17,14 +17,14 @@ MapDOF(chi_mesh::Cell *cell, int dof, int mom, int g)
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-AssembleVector(LBSGroupset *groupset, Vec x, double *y,
+AssembleVector(LBSGroupset& groupset, Vec x, double *y,
                bool with_delayed_psi/*=false*/)
 {
   double* x_ref;
   VecGetArray(x,&x_ref);
 
-  int gsi = groupset->groups[0]->id;
-  int gsf = groupset->groups.back()->id;
+  int gsi = groupset.groups[0].id;
+  int gsf = groupset.groups.back().id;
   int gss = gsf-gsi+1;
 
   int index = -1;
@@ -48,7 +48,7 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y,
   }//for cell
 
   if (with_delayed_psi)
-    groupset->angle_agg.AssembleAngularUnknowns(index,x_ref);
+    groupset.angle_agg.AssembleAngularUnknowns(index,x_ref);
 
   VecRestoreArray(x,&x_ref);
 }
@@ -56,14 +56,14 @@ AssembleVector(LBSGroupset *groupset, Vec x, double *y,
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y,
+DisAssembleVector(LBSGroupset& groupset, Vec x_src, double *y,
                   bool with_delayed_psi/*=false*/)
 {
   const double* x_ref;
   VecGetArrayRead(x_src,&x_ref);
 
-  int gsi = groupset->groups[0]->id;
-  int gsf = groupset->groups.back()->id;
+  int gsi = groupset.groups[0].id;
+  int gsf = groupset.groups.back().id;
   int gss = gsf-gsi+1;
 
   int index = -1;
@@ -87,7 +87,7 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y,
   }//for cell
 
   if (with_delayed_psi)
-    groupset->angle_agg.DisassembleAngularUnknowns(index,x_ref);
+    groupset.angle_agg.DisassembleAngularUnknowns(index,x_ref);
 
   VecRestoreArrayRead(x_src,&x_ref);
 }
@@ -96,12 +96,12 @@ DisAssembleVector(LBSGroupset *groupset, Vec x_src, double *y,
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-DisAssembleVectorLocalToLocal(LBSGroupset *groupset, double* x_src, double *y)
+DisAssembleVectorLocalToLocal(LBSGroupset& groupset, double* x_src, double *y)
 {
   const double* x_ref=x_src;
 
-  int gsi = groupset->groups[0]->id;
-  int gss = groupset->groups.size();
+  int gsi = groupset.groups[0].id;
+  int gss = groupset.groups.size();
 
   int index = -1;
   for (const auto& cell : grid->local_cells)

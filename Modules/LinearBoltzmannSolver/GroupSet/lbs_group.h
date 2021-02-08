@@ -1,5 +1,5 @@
-#ifndef _lbs_group_h
-#define _lbs_group_h
+#ifndef LBS_GROUP
+#define LBS_GROUP
 
 //################################################################### Class def
 /**Object holding a grouping.*/
@@ -9,10 +9,8 @@ public:
   int id;
 
 public:
-  LBSGroup()
-  {
-    id = -1;
-  }
+  LBSGroup() : id(-1) {}
+  explicit LBSGroup(int in_id) : id(in_id) {}
 };
 
 #endif

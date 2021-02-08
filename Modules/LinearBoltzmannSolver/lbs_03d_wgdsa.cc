@@ -13,16 +13,16 @@ extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
 {
-  if (groupset->apply_wgdsa)
+  if (groupset.apply_wgdsa)
   {
     //================================= Initialize unknowns
     chi_math::NodalVariableStructure scalar_uk_man;
-    scalar_uk_man.AddVariable(chi_math::NodalVariableType::VECTOR_N, groupset->groups.size());
+    scalar_uk_man.AddVariable(chi_math::NodalVariableType::VECTOR_N, groupset.groups.size());
 
     //================================= Initialize field function
-    delta_phi_local.resize(local_dof_count*groupset->groups.size(),0.0);
+    delta_phi_local.resize(local_dof_count*groupset.groups.size(),0.0);
     int g = 0;
     int m = 0;
 
@@ -43,14 +43,14 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset *groupset)
     //================================= Set diffusion solver
     std::string solver_name = std::string("WGDSA");
     auto dsolver = new chi_diffusion::Solver(solver_name);
-    groupset->wgdsa_solver = dsolver;
+    groupset.wgdsa_solver = dsolver;
 
     dsolver->regions.push_back(this->regions.back());
     dsolver->discretization = discretization;
     dsolver->fem_method = PWLD_MIP_GAGG;
-    dsolver->residual_tolerance = groupset->wgdsa_tol;
-    dsolver->max_iters          = groupset->wgdsa_max_iters;
-    dsolver->options_string     = groupset->wgdsa_string;
+    dsolver->residual_tolerance = groupset.wgdsa_tol;
+    dsolver->max_iters          = groupset.wgdsa_max_iters;
+    dsolver->options_string     = groupset.wgdsa_string;
     dsolver->material_mode = DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF;
     dsolver->q_field = deltaphi_ff;
 
@@ -70,12 +70,12 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset *groupset)
 
     //================================= Redirect material lookup to use
     //                                  transport cross-sections
-    dsolver->G  = groupset->groups.size();
-    dsolver->gi = groupset->groups.front()->id;
+    dsolver->G  = groupset.groups.size();
+    dsolver->gi = groupset.groups.front().id;
 
     //================================= Initialize solver, assemble matrix A
     //                                  but suppress solution
-    bool verbose          = groupset->wgdsa_verbose;   //Disable normal info printing
+    bool verbose          = groupset.wgdsa_verbose;   //Disable normal info printing
     bool supress_assembly = false;   //Assemble the matrix
     bool supress_solver   = true;    //Suppress the solving
     dsolver->Initialize(verbose);
@@ -88,20 +88,20 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset *groupset)
 
 //###################################################################
 /**Cleans up memory consuming items. */
-void LinearBoltzmann::Solver::CleanUpWGDSA(LBSGroupset *groupset)
+void LinearBoltzmann::Solver::CleanUpWGDSA(LBSGroupset& groupset)
 {
-  if (groupset->apply_wgdsa)
-    delete groupset->wgdsa_solver;
+  if (groupset.apply_wgdsa)
+    delete groupset.wgdsa_solver;
 }
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
                                                           double *ref_phi_old,
                                                           double *ref_phi_new)
 {
-  int gsi = groupset->groups[0]->id;
-  int gss = groupset->groups.size();
+  int gsi = groupset.groups[0].id;
+  int gss = groupset.groups.size();
 
   delta_phi_local.resize(local_dof_count*gss,0.0);
 
@@ -135,13 +135,13 @@ void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
 
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void LinearBoltzmann::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset *groupset,
+void LinearBoltzmann::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
                                                              double *ref_phi_new)
 {
-  int gsi = groupset->groups[0]->id;
-  int gss = groupset->groups.size();
+  int gsi = groupset.groups[0].id;
+  int gss = groupset.groups.size();
 
-  auto wgdsa_solver = (chi_diffusion::Solver*)groupset->wgdsa_solver;
+  auto wgdsa_solver = (chi_diffusion::Solver*)groupset.wgdsa_solver;
 
   int index = -1;
   for (const auto& cell : grid->local_cells)

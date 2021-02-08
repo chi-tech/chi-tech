@@ -18,28 +18,25 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Solves a groupset using classic richardson.*/
 void LinearBoltzmann::Solver::
-  ClassicRichardson(int group_set_num,
+  ClassicRichardson(LBSGroupset& groupset,
+                    int group_set_num,
                     SweepChunk* sweep_chunk,
-                    MainSweepScheduler & sweepScheduler,
+                    MainSweepScheduler& sweepScheduler,
                     bool log_info /* = true*/)
 {
   if (log_info)
   {
     chi_log.Log(LOG_0) << "\n\n";
-    chi_log.Log(LOG_0) << "********** Solving groupset " << group_set_num
+    chi_log.Log(LOG_0) << "********** Solving groupset" << group_set_num
                        << " with Classic-Richardson.\n\n";
   }
-
-  //================================================== Obtain groupset
-  LBSGroupset* groupset = group_sets[group_set_num];
-  int groupset_numgrps = groupset->groups.size();
 
   if (log_info)
     chi_log.Log(LOG_0)
       << "Quadrature number of angles: "
-      << groupset->quadrature->abscissae.size() << "\n"
-      << "Groups " << groupset->groups.front()->id << " "
-      << groupset->groups.back()->id << "\n\n";
+      << groupset.quadrature->abscissae.size() << "\n"
+      << "Groups " << groupset.groups.front().id << " "
+      << groupset.groups.back().id << "\n\n";
 
   //================================================== Tool the sweep chunk
   sweep_chunk->SetDestinationPhi(&phi_new_local);
@@ -49,25 +46,25 @@ void LinearBoltzmann::Solver::
   double pw_change_prev = 1.0;
   double rho = 0.0;
   bool converged = false;
-  for (int k=0; k<groupset->max_iterations; k++)
+  for (int k=0; k<groupset.max_iterations; k++)
   {
-    SetSource(group_set_num,SourceFlags::USE_MATERIAL_SOURCE);
+    SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,false);
 
-    groupset->angle_agg.ZeroOutgoingDelayedPsi();
+    groupset.angle_agg.ZeroOutgoingDelayedPsi();
 
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
 
-    if (groupset->apply_wgdsa)
+    if (groupset.apply_wgdsa)
     {
       AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
-      ((chi_diffusion::Solver*)groupset->wgdsa_solver)->ExecuteS(true,false);
+      ((chi_diffusion::Solver*)groupset.wgdsa_solver)->ExecuteS(true,false);
       DisAssembleWGDSADeltaPhiVector(groupset, phi_new_local.data());
     }
-    if (groupset->apply_tgdsa)
+    if (groupset.apply_tgdsa)
     {
       AssembleTGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
-      ((chi_diffusion::Solver*)groupset->tgdsa_solver)->ExecuteS(true,false);
+      ((chi_diffusion::Solver*)groupset.tgdsa_solver)->ExecuteS(true,false);
       DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
     }
 
@@ -80,12 +77,12 @@ void LinearBoltzmann::Solver::
     pw_change_prev = pw_change;
 
     if (k==0) rho = 0.0;
-    if (pw_change<std::max(groupset->residual_tolerance*rho,1.0e-10))
+    if (pw_change<std::max(groupset.residual_tolerance*rho,1.0e-10))
       converged = true;
 
     //======================================== Print iteration information
     std::string offset;
-    if (groupset->apply_wgdsa || groupset->apply_tgdsa)
+    if (groupset.apply_wgdsa || groupset.apply_tgdsa)
       offset = std::string("    ");
 
     std::stringstream iter_info;
@@ -93,9 +90,9 @@ void LinearBoltzmann::Solver::
       << chi_program_timer.GetTimeString() << " "
       << offset
       << "WGS groups ["
-      << groupset->groups.front()->id
+      << groupset.groups.front().id
       << "-"
-      << groupset->groups.back()->id
+      << groupset.groups.back().id
       << "]"
       << " Iteration " << std::setw(5) << k
       << " Point-wise change " << std::setw(14) << pw_change;
@@ -125,10 +122,10 @@ void LinearBoltzmann::Solver::
   double source_time=
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
-  size_t num_angles = groupset->quadrature->abscissae.size();
+  size_t num_angles = groupset.quadrature->abscissae.size();
   long int num_unknowns = (long int)glob_dof_count*
                           (long int)num_angles*
-                          (long int)groupset->groups.size();
+                          (long int)groupset.groups.size();
 
   if (log_info)
   {
@@ -153,5 +150,5 @@ void LinearBoltzmann::Solver::
     std::string("GS_") + std::to_string(group_set_num) +
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
-  groupset->PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+  groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
 }
