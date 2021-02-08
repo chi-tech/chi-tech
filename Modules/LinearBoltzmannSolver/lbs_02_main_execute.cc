@@ -65,8 +65,6 @@ void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
   MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                     &groupset.angle_agg);
 
-  *(char *)0 = 0;
-
   if (groupset.iterative_method == NPT_CLASSICRICHARDSON)
   {
     ClassicRichardson(groupset, group_set_num, sweep_chunk, sweepScheduler);

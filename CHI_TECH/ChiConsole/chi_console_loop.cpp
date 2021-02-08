@@ -12,7 +12,8 @@ extern ChiLog& chi_log;
 void ChiConsole::RunConsoleLoop(char* fileName)
 {
 
-  chi_log.Log(LOG_0) << "Console loop started.";
+  chi_log.Log(LOG_0) << "Console loop started. "
+                     << "Type \"exit\" to quit (or Ctl-C).";
   exit_loop = false;
 
   while ((!exit_loop) and (!chi_termination_posted))

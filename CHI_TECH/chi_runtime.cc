@@ -33,6 +33,7 @@ ChiTimer    chi_program_timer;
 bool            chi_termination_posted = false;
 std::string     chi_input_file_name;
 bool            chi_sim_option_interactive = true;
+bool            chi_allow_petsc_error_handler = false;
 
 
 
@@ -49,23 +50,31 @@ void ChiTech::ParseArguments(int argc, char** argv)
   {
     std::string argument(argv[i]);
 
-    if ((argument.find('=') == std::string::npos) && (!input_file_found) )
+    chi_log.Log(LOG_0) << "Parsing argument " << i << " " << argument;
+
+    if (argument.find("-h")!=std::string::npos)
     {
-      chi_input_file_name = argument;
-      input_file_found = true;
-      chi_sim_option_interactive = false;
-    }//no =
-    else if (argument.find('=') != std::string::npos)
+      chi_log.Log(LOG_0)
+        << "\nUsage: exe inputfile [options values]\n"
+        << "\n"
+        << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
+        << "     a=b                        Executes argument as a lua string.\n"
+        << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
+
+      chi_log.Log(LOG_0) << "PETSc options:";
+      chi_termination_posted = true;
+    }
+    else if (argument.find("-allow_petsc_error_handler")!=std::string::npos)
     {
-      luaL_dostring(chi_console.consoleState, argument.c_str());
-    }//=
+      chi_allow_petsc_error_handler = true;
+    }
     //================================================ No-graphics option
-    if ((argument.find("-b")!=std::string::npos)  )
+    else if (argument.find("-b")!=std::string::npos)
     {
       chi_sim_option_interactive = false;
     }//-b
     //================================================ Verbosity
-    if (argument.find("-v") != std::string::npos)
+    else if (argument.find("-v") != std::string::npos)
     {
       if ((i+1) >= argc)
       {
@@ -89,6 +98,17 @@ void ChiTech::ParseArguments(int argc, char** argv)
       }
 
     }//-v
+    else if ((argument.find('=') == std::string::npos) && (!input_file_found) )
+    {
+      chi_input_file_name = argument;
+      input_file_found = true;
+      chi_sim_option_interactive = false;
+    }//no =
+    else if (argument.find('=') != std::string::npos)
+    {
+      luaL_dostring(chi_console.consoleState, argument.c_str());
+    }//=
+
   }//for argument
 }
 
@@ -172,8 +192,9 @@ int ChiTech::RunBatch(int argc, char** argv)
     chi_log.Log(LOG_0)
       << "\nUsage: exe inputfile [options values]\n"
       << "\n"
-      << "     -v    Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
-      << "     a=b   Executes argument as a lua string.\n\n\n";
+      << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
+      << "     a=b                        Executes argument as a lua string.\n"
+      << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
   int error_code = 0;
   if ( not chi_input_file_name.empty() )
