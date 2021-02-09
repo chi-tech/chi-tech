@@ -5,7 +5,7 @@
 
 //###################################################################
 /** Base class for all cell FE views.*/
-class CellFEValues
+class CellPWLFEValues
 {
 public:
   const int dofs;
@@ -21,11 +21,11 @@ public:
 
   std::vector<std::vector<int>> face_dof_mappings;
 
-  explicit CellFEValues(int num_dofs) :
+  explicit CellPWLFEValues(int num_dofs) :
     dofs(num_dofs)
   {}
 
-  virtual ~CellFEValues() = default;
+  virtual ~CellPWLFEValues() = default;
 
   /** Virtual function evaluation of the shape function. */
   virtual double ShapeValue(const int i, const chi_mesh::Vector3& xyz)

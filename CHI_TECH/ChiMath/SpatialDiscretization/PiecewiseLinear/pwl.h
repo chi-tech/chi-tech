@@ -19,7 +19,7 @@
 class SpatialDiscretization_PWL : public SpatialDiscretization
 {
 public:
-  std::vector<CellFEValues*> cell_fe_views;
+  std::vector<CellPWLFEValues*> cell_fe_views;
 
 private:
   std::vector<bool>        cell_view_added_flags;
@@ -33,7 +33,7 @@ public:
 
 private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
-  std::vector<CellFEValues*> neighbor_cell_fe_views;
+  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
 
   typedef chi_math::SpatialDiscretizationType SDMType;
 
@@ -55,7 +55,7 @@ public:
   //01
   void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) override;
   void AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid);
-  CellFEValues* MapFeViewL(int cell_local_index);
+  CellPWLFEValues* MapFeViewL(int cell_local_index);
 
   //02
   std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuumPtr grid);
@@ -83,7 +83,7 @@ public:
                                 std::vector<int>& nodal_nnz_off_diag,
                                 chi_math::NodalVariableStructure* unknown_manager=nullptr);
   chi_mesh::Cell* MapNeighborCell(int cell_glob_index);
-  CellFEValues* MapNeighborCellFeView(int cell_glob_index);
+  CellPWLFEValues* MapNeighborCellFeView(int cell_glob_index);
 
   //06a Mappings
   int MapCFEMDOF(int vertex_id);

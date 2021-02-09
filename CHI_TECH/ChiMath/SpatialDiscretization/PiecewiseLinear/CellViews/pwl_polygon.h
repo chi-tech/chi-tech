@@ -41,7 +41,7 @@ struct FEside_data2d
  * - node_to_side_map is indexed as [i][f]
  * - edge_dof_mappings, is indexed as [f][fi] and
  *    returns cell dof i.*/
-class PolygonFEValues : public CellFEValues
+class PolygonPWLFEValues : public CellPWLFEValues
 {
 private:
   std::vector<FEside_data2d*> sides;
@@ -69,9 +69,9 @@ private:
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonFEValues(chi_mesh::CellPolygon* poly_cell,
-                  chi_mesh::MeshContinuumPtr vol_continuum,
-                  SpatialDiscretization_PWL *discretization);
+  PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
+                     chi_mesh::MeshContinuumPtr vol_continuum,
+                     SpatialDiscretization_PWL *discretization);
 
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
   chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;

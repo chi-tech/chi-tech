@@ -1,8 +1,8 @@
 #include "pwl_polyhedron.h"
 
-double PolyhedronFEValues::TetShape(int index,
-                                    int qpoint_index,
-                                    bool on_surface)
+double PolyhedronPWLFEValues::TetShape(int index,
+                                       int qpoint_index,
+                                       bool on_surface)
 {
   chi_math::QuadraturePointXYZ* qpoint;
   if (!on_surface)
@@ -20,7 +20,7 @@ double PolyhedronFEValues::TetShape(int index,
   return value;
 }
 
-double PolyhedronFEValues::TetGradShape_x(const int index)
+double PolyhedronPWLFEValues::TetGradShape_x(const int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -31,7 +31,7 @@ double PolyhedronFEValues::TetGradShape_x(const int index)
   return value;
 }
 
-double PolyhedronFEValues::TetGradShape_y(const int index)
+double PolyhedronPWLFEValues::TetGradShape_y(const int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -42,7 +42,7 @@ double PolyhedronFEValues::TetGradShape_y(const int index)
   return value;
 }
 
-double PolyhedronFEValues::TetGradShape_z(const int index)
+double PolyhedronPWLFEValues::TetGradShape_z(const int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}

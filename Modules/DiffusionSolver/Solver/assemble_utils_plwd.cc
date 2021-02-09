@@ -124,7 +124,7 @@ int chi_diffusion::Solver::MapBorderCell(int locI, int neighbor, int vglob_i)
  * Nv = Number of vertices. If Nv <= 4 then the perimeter parameter
  * should be replaced by edge length.*/
 double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
-                                             CellFEValues* fe_view,
+                                             CellPWLFEValues* fe_view,
                                              int f)
 {
   double hp = 1.0;
@@ -135,7 +135,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    auto slab_fe_view = (SlabFEView*)fe_view;
+    auto slab_fe_view = (SlabPWLFEView*)fe_view;
     hp = slab_fe_view->h/2.0;
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
@@ -300,8 +300,8 @@ DiffusionIPCellView* chi_diffusion::Solver::GetBorderIPView(int locI,
 }
 
 /**Obtains a reference to a Finite Element view of a cell.*/
-CellFEValues* chi_diffusion::Solver::GetBorderFEView(int locI,
-                                                     int cell_glob_index)
+CellPWLFEValues* chi_diffusion::Solver::GetBorderFEView(int locI,
+                                                        int cell_glob_index)
 {
   int cell_border_index=-1;
   for (int c=0; c<ip_locI_bordercell_info[locI].size(); c++)
@@ -399,7 +399,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
-    auto fe_view = new SlabFEView(cell, grid);
+    auto fe_view = new SlabPWLFEView(cell, grid);
 
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
@@ -433,7 +433,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
 
     auto fe_view =
-      new PolygonFEValues(cell, grid, &rpwl_sdm);
+      new PolygonPWLFEValues(cell, grid, &rpwl_sdm);
 
     fe_view->PreCompute();
 
@@ -482,8 +482,8 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
     auto& rpwl_sdm = *pwl_sdm;
 
-    PolyhedronFEValues* fe_view =
-      new PolyhedronFEValues(cell, grid, &rpwl_sdm);
+    PolyhedronPWLFEValues* fe_view =
+      new PolyhedronPWLFEValues(cell, grid, &rpwl_sdm);
 
     fe_view->PreCompute();
 

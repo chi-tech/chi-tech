@@ -79,7 +79,7 @@ struct FEnodeMap
  *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  * */
-class PolyhedronFEValues : public CellFEValues
+class PolyhedronPWLFEValues : public CellPWLFEValues
 {
 private:
   std::vector<double>            face_betaf;     ///< Face Beta-factor.
@@ -96,9 +96,9 @@ private:
 
 
 public:
-  PolyhedronFEValues(chi_mesh::CellPolyhedron* polyh_cell,
-                     chi_mesh::MeshContinuumPtr vol_continuum,
-                     SpatialDiscretization_PWL* discretization= nullptr);
+  PolyhedronPWLFEValues(chi_mesh::CellPolyhedron* polyh_cell,
+                        chi_mesh::MeshContinuumPtr vol_continuum,
+                        SpatialDiscretization_PWL* discretization= nullptr);
 
 
   //################################################## Define standard

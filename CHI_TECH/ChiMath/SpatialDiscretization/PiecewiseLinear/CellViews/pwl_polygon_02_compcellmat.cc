@@ -3,7 +3,7 @@
 #define ON_SURFACE true
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Varphi_x
 /**Precomputation of the shape function at a quadrature point.*/
-double PolygonFEValues::PreShape(int s, int i, int qpoint_index, bool on_surface)
+double PolygonPWLFEValues::PreShape(int s, int i, int qpoint_index, bool on_surface)
 {
   double xi  = 0.0;
   double eta = 0.0;
@@ -40,7 +40,7 @@ double PolygonFEValues::PreShape(int s, int i, int qpoint_index, bool on_surface
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_x
 /**Precomputation of the partial derivative along x of the
  * shape function at a quadrature point.*/
-double PolygonFEValues::PreGradShape_x(int s, int i, int qpoint_index)
+double PolygonPWLFEValues::PreGradShape_x(int s, int i, int qpoint_index)
 {
   int index = node_to_side_map[i][s];
   double value = 0;
@@ -67,7 +67,7 @@ double PolygonFEValues::PreGradShape_x(int s, int i, int qpoint_index)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_y
 /**Precomputation of the partial derivative along y of the
  * shape function at a quadrature point.*/
-double PolygonFEValues::PreGradShape_y(int s, int i, int qpoint_index)
+double PolygonPWLFEValues::PreGradShape_y(int s, int i, int qpoint_index)
 {
   int index = node_to_side_map[i][s];
   double value = 0;
@@ -94,7 +94,7 @@ double PolygonFEValues::PreGradShape_y(int s, int i, int qpoint_index)
 
 //###################################################################
 /**Precomputes integrals of the shape functions.*/
-void PolygonFEValues::PreCompute()
+void PolygonPWLFEValues::PreCompute()
 {
   if (precomputed)
     return;
