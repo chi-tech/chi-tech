@@ -1,5 +1,4 @@
 # Chi-Tech #
-![GitHub branch checks state](https://img.shields.io/github/checks-status/wdhawkins/chi-tech/HEAD)
 
 A large-scale scientific simulation engine being developed at Texas A&M University 
 as part of a research study.
