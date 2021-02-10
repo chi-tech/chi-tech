@@ -42,6 +42,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include_directories("${LUA_ROOT}/include")
 include_directories("${PETSC_ROOT}/include")
 
+include_directories("${CHI_TECH_DIR}")
 include_directories("${CHI_TECH_DIR}/CHI_TECH")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiLua")
 include_directories("${CHI_TECH_DIR}/CHI_TECH/ChiMPI")

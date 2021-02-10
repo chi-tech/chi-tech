@@ -17,7 +17,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
                                                   int component,
                                                   int component_block_offset)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->local_id);
+  auto fe_view = (CellPWLFEView*)pwl_sdm->MapFeViewL(cell->local_id);
 
   //====================================== Process material id
   int mat_id = cell->material_id;
@@ -70,14 +70,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
     if (neighbor >=0)
     {
       chi_mesh::Cell*           adj_cell    = nullptr;
-      CellFEView*               adj_fe_view = nullptr;
+      CellPWLFEView*               adj_fe_view = nullptr;
       int                              fmap = -1;
 
       //========================= Get adj cell information
       if (cell->faces[f].IsNeighborLocal(grid))  //Local
       {
         adj_cell      = &grid->local_cells[face.GetNeighborLocalID(grid)];
-        adj_fe_view   = (CellFEView*)pwl_sdm->MapFeViewL(adj_cell->local_id);
+        adj_fe_view   = (CellPWLFEView*)pwl_sdm->MapFeViewL(adj_cell->local_id);
       }//local
       else //Non-local
       {
@@ -394,7 +394,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
                                             int component,
                                             int component_block_offset)
 {
-  auto fe_view = (CellFEView*)pwl_sdm->MapFeViewL(cell->local_id);
+  auto fe_view = (CellPWLFEView*)pwl_sdm->MapFeViewL(cell->local_id);
 
   //====================================== Process material id
   int mat_id = cell->material_id;

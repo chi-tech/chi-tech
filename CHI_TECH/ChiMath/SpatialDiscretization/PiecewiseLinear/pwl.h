@@ -7,19 +7,15 @@
 #include "../../Quadratures/quadrature_triangle.h"
 #include "../../Quadratures/quadrature_tetrahedron.h"
 
-
-
-
-
 //######################################################### Class def
 /**Generalization of the Galerkin Finite Element Method
  * with piecewise linear basis functions
- * for use by either a Continues Finite Element Method (CFEM)
+ * for use by either a Continuous Finite Element Method (CFEM)
  * or a Discontinuous Finite Element Method (DFEM). */
 class SpatialDiscretization_PWL : public SpatialDiscretization
 {
 public:
-  std::vector<CellFEView*> cell_fe_views;
+  std::vector<CellPWLFEView*> cell_fe_views;
 
 private:
   std::vector<bool>        cell_view_added_flags;
@@ -33,7 +29,7 @@ public:
 
 private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
-  std::vector<CellFEView*> neighbor_cell_fe_views;
+  std::vector<CellPWLFEView*> neighbor_cell_fe_views;
 
 public:
   //00
@@ -43,7 +39,7 @@ public:
   //01
   void AddViewOfLocalContinuum(chi_mesh::MeshContinuum* grid) override;
   void AddViewOfNeighborContinuums(chi_mesh::MeshContinuum* grid);
-  CellFEView* MapFeViewL(int cell_local_index);
+  CellPWLFEView* MapFeViewL(int cell_local_index);
 
   //02
   std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuum* grid);
@@ -71,7 +67,7 @@ public:
                                 std::vector<int>& nodal_nnz_off_diag,
                                 chi_math::UnknownManager* unknown_manager=nullptr);
   chi_mesh::Cell* MapNeighborCell(int cell_glob_index);
-  CellFEView* MapNeighborCellFeView(int cell_glob_index);
+  CellPWLFEView* MapNeighborCellFeView(int cell_glob_index);
 
   //06a Mappings
   int MapCFEMDOF(int vertex_id);

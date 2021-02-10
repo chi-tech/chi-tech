@@ -5,27 +5,6 @@
 #include <vector>
 #include <ChiMesh/Cell/cell_polygon.h>
 
-/**For a given side(triangle), this structure holds the values of
- * shape functions at each quadrature point.*/
-struct FEqp_data2d
-{
-  std::vector<double> shape_qp;
-  std::vector<double> shape_qp_surf;
-  std::vector<double> gradshapex_qp;
-  std::vector<double> gradshapey_qp;
-};
-//Goes into
-struct FEside_data2d
-{
-  double detJ;
-  double detJ_surf;
-  int*    v_index;
-  chi_mesh::Matrix3x3 J;
-  chi_mesh::Matrix3x3 Jinv;
-  chi_mesh::Matrix3x3 JTinv;
-  std::vector<FEqp_data2d*> qp_data;
-};
-
 //###################################################################
 /** Object for handling polygon shaped 2D cells.
  *
@@ -40,34 +19,66 @@ struct FEside_data2d
  * - IntS_shapeI_gradshapeJ is indexed as [f][i][j]
  * - node_to_side_map is indexed as [i][f]
  * - edge_dof_mappings, is indexed as [f][fi] and
- *    returns cell dof i.*/
-class PolygonFEView : public CellFEView
+ *    returns cell dof i.
+ **/
+class PolygonFEView : public CellPWLFEView
 {
 private:
+  /* For a given side(triangle), this structure holds the values of
+     shape functions at each quadrature point. */
+  struct FEqp_data2d
+  {
+    std::vector<double> shape_qp;
+    std::vector<double> shape_qp_surf;
+    std::vector<double> gradshapex_qp;
+    std::vector<double> gradshapey_qp;
+  };
+  
+  struct FEside_data2d
+  {
+    double detJ;
+    double detJ_surf;
+    int* v_index;
+    chi_mesh::Matrix3x3 J;
+    chi_mesh::Matrix3x3 Jinv;
+    chi_mesh::Matrix3x3 JTinv;
+    std::vector<FEqp_data2d*> qp_data;
+  };
+
+  double GetShape(int side, int i, int qp, bool surface = false)
+  {
+    if (surface)
+      return sides[side]->qp_data[i]->shape_qp_surf[qp];
+    else
+      return sides[side]->qp_data[i]->shape_qp[qp];
+  }
+
+  double GetGradShape_x(int side, int i, int qp)
+  {
+    return sides[side]->qp_data[i]->gradshapex_qp[qp];
+  }
+
+  double GetGradShape_y(int side, int i, int qp)
+  {
+    return sides[side]->qp_data[i]->gradshapey_qp[qp];
+  }
+
   std::vector<FEside_data2d*> sides;
   chi_math::QuadratureTriangle* vol_quadrature;
   chi_math::QuadratureTriangle* surf_quadrature;
+  std::vector<std::vector<std::vector<double>>> IntSi_shapeI_shapeJ;
+  std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntSi_shapeI_gradshapeJ;
+
 public:
-  int      num_of_subtris;
-  double   beta;
+  int num_of_subtris;
+  double beta;
   chi_mesh::Vertex vc;
   std::vector<double> detJ;
   std::vector<int*> node_to_side_map;
-
-
-
-public:
-  std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
-private:
-  std::vector<std::vector<std::vector<double>>>           IntSi_shapeI_shapeJ;
-  std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntSi_shapeI_gradshapeJ;
-
-private:
+  std::vector<chi_mesh::Vector3> IntV_gradshapeI;
   chi_mesh::MeshContinuum* grid;
-
   bool precomputed;
   
-public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonFEView(chi_mesh::CellPolygon* poly_cell,
                 chi_mesh::MeshContinuum* vol_continuum,
@@ -98,30 +109,7 @@ public:
       return sides[s]->detJ_surf;
   }
 
-private:
-  double GetShape(int side, int i, int qp, bool surface = false)
-  {
-    if (surface)
-      return sides[side]->qp_data[i]->shape_qp_surf[qp];
-    else
-      return sides[side]->qp_data[i]->shape_qp[qp];
-  }
-
-  double GetGradShape_x(int side, int i, int qp)
-  {
-    return sides[side]->qp_data[i]->gradshapex_qp[qp];
-  }
-
-  double GetGradShape_y(int side, int i, int qp)
-  {
-    return sides[side]->qp_data[i]->gradshapey_qp[qp];
-  }
-
-
-
-public:
   void PreCompute();
-
 };
 
 #endif

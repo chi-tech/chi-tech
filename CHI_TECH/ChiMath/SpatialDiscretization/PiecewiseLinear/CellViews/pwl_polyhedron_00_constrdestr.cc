@@ -9,10 +9,12 @@ extern ChiLog& chi_log;
  * */
 PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
                                    chi_mesh::MeshContinuum *vol_continuum,
-                                   SpatialDiscretization_PWL *discretization):
-  CellFEView(polyh_cell->vertex_ids.size())
+                                   SpatialDiscretization_PWL *discretization)
+  : CellPWLFEView(polyh_cell->vertex_ids.size()),
+    alphac(1.0/polyh_cell->vertex_ids.size()),
+    grid(vol_continuum),
+    precomputed(false)
 {
-  grid = vol_continuum;
   //=========================================== Create quadrature points
   if (discretization != nullptr)
   {
@@ -26,12 +28,8 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
     exit(EXIT_FAILURE);
   }
 
-
-  //=========================================== Assign cell centre
-  chi_mesh::Vertex& vcc = polyh_cell->centroid;
-  alphac = 1.0/polyh_cell->vertex_ids.size();
-
   //=========================================== For each face
+  chi_mesh::Vertex& vcc = polyh_cell->centroid;
   face_data.reserve(polyh_cell->faces.size());
   for (size_t f=0; f<polyh_cell->faces.size(); f++)
   {
@@ -46,7 +44,6 @@ PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
 
     //==================================== For each edge
     face_f_data.sides.reserve(edges.size());
-//    for (size_t e=0; e<edges.size(); e++)
     for (auto edge : edges)
     {
       FEside_data3d side_data;

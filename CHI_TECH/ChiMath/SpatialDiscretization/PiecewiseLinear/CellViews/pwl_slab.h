@@ -6,28 +6,27 @@
 #include <ChiMesh/Cell/cell_slab.h>
 
 //###################################################################
-/**Object for handling slab shaped piecewise linear shape functions.*/
-class SlabFEView : public CellFEView
+/** Object for handling slab shaped piecewise linear shape functions. */
+class SlabFEView : public CellPWLFEView
 {
 private:
   chi_mesh::MeshContinuum* grid;
   int v0i;
   int v1i;
+
 public:
   double h;
-public:
-
-  /**Constructor for a slab view.*/
+  
+  /** Constructor for a slab view. */
   SlabFEView(chi_mesh::CellSlab *slab_cell,
-             chi_mesh::MeshContinuum *vol_continuum) :
-    CellFEView(2)
+             chi_mesh::MeshContinuum *vol_continuum) 
+    : CellPWLFEView(2),
+      grid(vol_continuum),
+      v0i(slab_cell->vertex_ids[0]),
+      v1i(slab_cell->vertex_ids[1])
   {
-    grid = vol_continuum;
-    v0i = slab_cell->vertex_ids[0];
-    v1i = slab_cell->vertex_ids[1];
     chi_mesh::Vertex v0 = *grid->vertices[v0i];
     chi_mesh::Vertex v1 = *grid->vertices[v1i];
-
     chi_mesh::Vector3 v01 = v1 - v0;
     h = v01.Norm();
 
@@ -49,9 +48,6 @@ public:
     IntV_gradShapeI_gradShapeJ[0][1] = -1/h;
     IntV_gradShapeI_gradShapeJ[1][0] = -1/h;
     IntV_gradShapeI_gradShapeJ[1][1] = 1/h;
-
-//    IntV_shapeI_gradshapeJ.push_back(new double[2]);
-//    IntV_shapeI_gradshapeJ.push_back(new double[2]);
 
     IntV_shapeI_gradshapeJ.resize(2);
     IntV_shapeI_gradshapeJ[0].resize(2);
@@ -114,10 +110,10 @@ public:
 
     face_dof_mappings.emplace_back(1,0);
     face_dof_mappings.emplace_back(1,1);
-
   }
 
-  /**Shape function i evaluated at given point for the slab.*/
+  //###################################################################
+  /** Shape function i evaluated at given point for the slab. */
   double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override
   {
     chi_mesh::Vector3& p0 = *grid->vertices[v0i];
@@ -143,9 +139,10 @@ public:
     return 0.0;
   }
 
-  //#################################################################
-  /**Populates shape_values with the value of each shape function's
-   * value evaluate at the supplied point.*/
+  //###################################################################
+  /** Populates shape_values with the value of each shape function's
+   * value evaluate at the supplied point.
+   **/
   void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) override
   {

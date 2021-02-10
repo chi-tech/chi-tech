@@ -137,9 +137,9 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-CellFEView* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
+CellPWLFEView* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
 {
-  CellFEView* value;
+  CellPWLFEView* value;
   try { value = cell_fe_views.at(cell_local_index); }
   catch (const std::out_of_range& o)
   {

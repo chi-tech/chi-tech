@@ -5,13 +5,13 @@
 
 //###################################################################
 /** Base class for all cell FE views.*/
-class CellFEView
+class CellPWLFEView
 {
 public:
   int dofs;
 
   std::vector<std::vector<double>>              IntV_gradShapeI_gradShapeJ;
-  std::vector<std::vector<chi_mesh::Vector3>>    IntV_shapeI_gradshapeJ;
+  std::vector<std::vector<chi_mesh::Vector3>>   IntV_shapeI_gradshapeJ;
   std::vector<std::vector<double>>              IntV_shapeI_shapeJ;
   std::vector<double>                           IntV_shapeI;
 
@@ -21,12 +21,12 @@ public:
 
   std::vector<std::vector<int>> face_dof_mappings;
 
-  CellFEView(int num_dofs)
-  {
-    dofs=num_dofs;
-  }
+  CellPWLFEView(int num_dofs)
+    : dofs(num_dofs)
+  {}
 
-  virtual ~CellFEView() {};
+  virtual ~CellPWLFEView()
+  {};
 
   /** Virtual function evaluation of the shape function. */
   virtual double ShapeValue(const int i, const chi_mesh::Vector3& xyz)

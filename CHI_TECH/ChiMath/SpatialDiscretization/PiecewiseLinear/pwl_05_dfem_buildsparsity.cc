@@ -265,7 +265,7 @@ MapNeighborCell(int cell_glob_index)
 
 //###################################################################
 /**Maps a neigboring cell's fe view from a global cell index.*/
-CellFEView* SpatialDiscretization_PWL::
+CellPWLFEView* SpatialDiscretization_PWL::
   MapNeighborCellFeView(int cell_glob_index)
 {
   int index=0;

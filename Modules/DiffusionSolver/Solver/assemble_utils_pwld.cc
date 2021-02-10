@@ -124,7 +124,7 @@ int chi_diffusion::Solver::MapBorderCell(int locI, int neighbor, int vglob_i)
  * Nv = Number of vertices. If Nv <= 4 then the perimeter parameter
  * should be replaced by edge length.*/
 double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
-                                             CellFEView* fe_view,
+                                             CellPWLFEView* fe_view,
                                              int f)
 {
   double hp = 1.0;
@@ -300,7 +300,7 @@ DiffusionIPCellView* chi_diffusion::Solver::GetBorderIPView(int locI,
 }
 
 /**Obtains a reference to a Finite Element view of a cell.*/
-CellFEView* chi_diffusion::Solver::GetBorderFEView(int locI,
+CellPWLFEView* chi_diffusion::Solver::GetBorderFEView(int locI,
                                                    int cell_glob_index)
 {
   int cell_border_index=-1;

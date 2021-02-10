@@ -4,24 +4,16 @@
 /** Constructor.*/
 PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
                              chi_mesh::MeshContinuum* vol_continuum,
-                             SpatialDiscretization_PWL *discretization) :
-  CellFEView(poly_cell->vertex_ids.size())
+                             SpatialDiscretization_PWL *discretization)
+  : CellPWLFEView(poly_cell->vertex_ids.size()),
+    vol_quadrature(discretization->tri_quad_deg5),
+    surf_quadrature(discretization->tri_quad_deg3_surf),
+    num_of_subtris(poly_cell->faces.size()),
+    beta(1.0/num_of_subtris),
+    vc(poly_cell->centroid),
+    grid(vol_continuum),
+    precomputed(false)
 {
-  precomputed = false;
-  grid = vol_continuum;
-  num_of_subtris = poly_cell->faces.size();
-  beta = 1.0/num_of_subtris;
-
-  //=========================================== Create the single quad point
-  vol_quadrature = discretization->tri_quad_deg5;
-  surf_quadrature= discretization->tri_quad_deg3_surf;
-
-
-  //=========================================== Get raw vertices
-  vc = poly_cell->centroid;
-//
-//  printf("Cell vertices:\n");
-
   //=========================================== Calculate legs and determinants
   for (int side=0;side<num_of_subtris;side++)
   {
@@ -30,14 +22,9 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
     chi_mesh::Vertex v0 = *vol_continuum->vertices[face.vertex_ids[0]];
     chi_mesh::Vertex v1 = *vol_continuum->vertices[face.vertex_ids[1]];
     chi_mesh::Vertex v2 = vc;
-//
-//    std::cout<< v0.PrintS() << "\n";
 
     chi_mesh::Vector3 sidev01 = v1 - v0;
     chi_mesh::Vector3 sidev02 = v2 - v0;
-
-//    v01.push_back(sidev01);
-//    v02.push_back(sidev02);
 
     double sidedetJ = ((sidev01.x)*(sidev02.y) - (sidev02.x)*(sidev01.y));
     detJ.push_back(sidedetJ);
@@ -70,9 +57,7 @@ PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
     triangle_data->JTinv.SetIJ(0,1,-sidev01.y/sidedetJ);
     triangle_data->JTinv.SetIJ(1,1, sidev01.x/sidedetJ);
     triangle_data->JTinv.SetIJ(2,2,0.0);
-
-
-
+    
     sides.push_back(triangle_data);
   }
 
