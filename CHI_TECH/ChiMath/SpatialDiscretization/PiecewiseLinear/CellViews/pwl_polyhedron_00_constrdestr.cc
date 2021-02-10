@@ -10,20 +10,21 @@ extern ChiLog& chi_log;
 PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cell,
                                              chi_mesh::MeshContinuumPtr vol_continuum,
                                              SpatialDiscretization_PWL *discretization):
-  CellPWLFEValues(polyh_cell->vertex_ids.size())
+  CellPWLFEValues(polyh_cell->vertex_ids.size()),
+  volume_quadrature(discretization->tet_quad_order2),
+  surface_quadrature(discretization->tet_quad_order2_surface)
 {
   grid = vol_continuum;
   //=========================================== Create quadrature points
   if (discretization != nullptr)
   {
-    quadratures.push_back(discretization->tet_quad_deg1);
-    quadratures.push_back(discretization->tet_quad_deg3);
-    quadratures.push_back(discretization->tet_quad_deg3_surface);
+//    quadratures.push_back(discretization->tet_quad_order1);
+//    quadratures.push_back(discretization->tet_quad_order2);
+//    quadratures.push_back(discretization->tet_quad_order2_surface);
   } else
   {
-    fprintf(stderr,"ERROR!: Quadrature points not set for "
-                   "pwl_polyhedron.");
-    exit(EXIT_FAILURE);
+    throw std::invalid_argument("Pointer to discretization method not "
+                                "set in constructor for PolyhedronPWLFEValues.");
   }
 
 
@@ -46,7 +47,6 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
 
     //==================================== For each edge
     face_f_data.sides.reserve(edges.size());
-//    for (size_t e=0; e<edges.size(); e++)
     for (auto edge : edges)
     {
       FEside_data3d side_data;
@@ -94,10 +94,6 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
       // check if fabs(v01N.z) < epsilon and fabs(v02N.z) < epsilon
       chi_mesh::Vector3 v01N = Rinv * v01;
       chi_mesh::Vector3 v02N = Rinv * v02;
-//        if ( (std::fabs(v01N.z) > 1.0e-5) || (std::fabs(v01N.z) > 1.0e-5) )
-//        {
-//          printf("ERROR! v01\n");
-//        }
       side_data.detJ_surf = v01N.x*v02N.y - v01N.y*v02N.x;
 
       //============================= Compute Jacobian

@@ -1,5 +1,5 @@
-#ifndef _quadrature_tetrahedron_h
-#define _quadrature_tetrahedron_h
+#ifndef QUADRATURE_TETRAHEDRON_H
+#define QUADRATURE_TETRAHEDRON_H
 
 #include "quadrature.h"
 
@@ -10,15 +10,16 @@ namespace chi_math
 
 //###################################################################
 /**Quadrature set for tetrahedrons.*/
-class chi_math::QuadratureTetrahedron : public chi_math::Quadrature
+class chi_math::QuadratureTetrahedron
 {
 public:
-  std::vector<chi_math::QuadraturePointXYZ*> qpoints;
+  std::vector<chi_math::QuadraturePointXYZ> qpoints;
   std::vector<double>     weights;
 
 public:
   //00 Constructor
-  QuadratureTetrahedron(int num_points=4,bool surface=false);
+  explicit
+  QuadratureTetrahedron(QuadratureOrder order,bool surface=false);
 
 };
 

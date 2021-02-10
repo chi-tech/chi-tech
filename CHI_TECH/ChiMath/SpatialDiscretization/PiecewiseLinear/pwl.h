@@ -1,15 +1,13 @@
 #ifndef CHI_DISCRETIZATION_PWL_H
 #define CHI_DISCRETIZATION_PWL_H
 
-#include"ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include"../../../ChiMesh/Region/chi_region.h"
 #include "CellViews/pwl_cellbase.h"
-#include "../../Quadratures/quadrature_triangle.h"
-#include "../../Quadratures/quadrature_tetrahedron.h"
 
+#include "ChiMesh/Region/chi_region.h"
 
-
-
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/Quadratures/quadrature_triangle.h"
+#include "ChiMath/Quadratures/quadrature_tetrahedron.h"
 
 //######################################################### Class def
 /**Generalization of the Galerkin Finite Element Method
@@ -27,9 +25,11 @@ private:
 public:
   chi_math::QuadratureTriangle*    tri_quad_deg5;
   chi_math::QuadratureTriangle*    tri_quad_deg3_surf;
-  chi_math::QuadratureTetrahedron* tet_quad_deg1;
-  chi_math::QuadratureTetrahedron* tet_quad_deg3;
-  chi_math::QuadratureTetrahedron* tet_quad_deg3_surface;
+//  chi_math::QuadratureTetrahedron* tet_quad_order1;
+//  chi_math::QuadratureTetrahedron* tet_quad_order2;
+//  chi_math::QuadratureTetrahedron* tet_quad_order2_surface;
+  chi_math::QuadratureTetrahedron tet_quad_order2;
+  chi_math::QuadratureTetrahedron tet_quad_order2_surface;
 
 private:
   std::vector<chi_mesh::Cell*> neighbor_cells;

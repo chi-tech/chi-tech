@@ -89,7 +89,9 @@ public:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
-  std::vector<chi_math::QuadratureTetrahedron*> quadratures; ///< Quadratures used by this method.
+//  std::vector<chi_math::QuadratureTetrahedron*> quadratures; ///< Quadratures used by this method.
+  chi_math::QuadratureTetrahedron& volume_quadrature;
+  chi_math::QuadratureTetrahedron& surface_quadrature;
   chi_mesh::MeshContinuumPtr       grid;                       ///< Pointer to the reference grid.
 
   bool                   precomputed = false;   ///< Are the integrals computed.

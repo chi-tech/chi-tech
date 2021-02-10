@@ -151,30 +151,30 @@ void PolyhedronPWLFEValues::PreCompute()
 
         //========== Reserving data
         pernode_data.gradshapex_qp.reserve(
-          quadratures[DEG3]->qpoints.size());
+          volume_quadrature.qpoints.size());
         pernode_data.gradshapey_qp.reserve(
-          quadratures[DEG3]->qpoints.size());
+          volume_quadrature.qpoints.size());
         pernode_data.gradshapez_qp.reserve(
-          quadratures[DEG3]->qpoints.size());
+          volume_quadrature.qpoints.size());
         pernode_data.shape_qp.reserve(
-          quadratures[DEG3]->qpoints.size());
+          volume_quadrature.qpoints.size());
         pernode_data.shape_qp_surf.reserve(
-          quadratures[DEG3_SURFACE]->qpoints.size());
+          surface_quadrature.qpoints.size());
 
         //Prestore GradVarphi_xyz
-        for (size_t qp=0; qp<quadratures[DEG3]->qpoints.size(); qp++)
+        for (size_t qp=0; qp<volume_quadrature.qpoints.size(); qp++)
         {
           pernode_data.gradshapex_qp.push_back(PreGradShape_x(f, s, i));
           pernode_data.gradshapey_qp.push_back(PreGradShape_y(f, s, i));
           pernode_data.gradshapez_qp.push_back(PreGradShape_z(f, s, i));
         }
         //Prestore Varphi
-        for (size_t qp=0; qp<quadratures[DEG3]->qpoints.size(); qp++)
+        for (size_t qp=0; qp<volume_quadrature.qpoints.size(); qp++)
         {
           pernode_data.shape_qp.push_back(PreShape(f, s, i, qp));
         }
         //Prestore Varphi on surface
-        for (size_t qp=0; qp<quadratures[DEG3_SURFACE]->qpoints.size(); qp++)
+        for (size_t qp=0; qp<surface_quadrature.qpoints.size(); qp++)
         {
           pernode_data.shape_qp_surf.push_back(PreShape(f, s, i, qp, ON_SURFACE));
         }
@@ -215,20 +215,20 @@ void PolyhedronPWLFEValues::PreCompute()
       {
         for (size_t s = 0; s < face_data[f].sides.size(); s++)
         {
-          for (size_t qp=0; qp<quadratures[DEG3]->qpoints.size();qp++)
+          for (size_t qp=0; qp<volume_quadrature.qpoints.size();qp++)
           {
             gradijvalue_i[j]
-              += quadratures[DEG3]->weights[qp]*
+              += volume_quadrature.weights[qp]*
                  (GetGradShape_x(f, s, i, qp)*GetGradShape_x(f, s, j, qp) +
                   GetGradShape_y(f, s, i, qp)*GetGradShape_y(f, s, j, qp) +
                   GetGradShape_z(f, s, i, qp)*GetGradShape_z(f, s, j, qp))*
                  DetJ(f,s,qp);
           }//for qp
 
-          for (size_t qp=0; qp<quadratures[DEG3]->qpoints.size();qp++)
+          for (size_t qp=0; qp<volume_quadrature.qpoints.size();qp++)
           {
             double varphi_i = GetShape(f, s, i, qp);
-            double weight = quadratures[DEG3]->weights[qp];
+            double weight = volume_quadrature.weights[qp];
 
             varphi_i_gradj[j].x
               += weight*varphi_i* GetGradShape_x(f, s, j, qp)*DetJ(f,s,qp);
@@ -252,9 +252,9 @@ void PolyhedronPWLFEValues::PreCompute()
     {
       for (size_t s = 0; s < face_data[f].sides.size(); s++)
       {
-        for (size_t qp=0; qp<quadratures[DEG3]->qpoints.size();qp++)
+        for (size_t qp=0; qp<volume_quadrature.qpoints.size();qp++)
         {
-          valuei_i += quadratures[DEG3]->weights[qp]*
+          valuei_i += volume_quadrature.weights[qp]*
             GetShape(f, s, i, qp)*
                       DetJ(f,s,qp);
         }// for gp
@@ -288,28 +288,28 @@ void PolyhedronPWLFEValues::PreCompute()
 
         for (size_t s = 0; s < face_data[f].sides.size(); s++)
         {
-          for (size_t qp=0; qp<quadratures[DEG3_SURFACE]->qpoints.size();qp++)
+          for (size_t qp=0; qp<surface_quadrature.qpoints.size();qp++)
           {
             value_ij
-              += quadratures[DEG3_SURFACE]->weights[qp]*
+              += surface_quadrature.weights[qp]*
               GetShape(f, s, i, qp, ON_SURFACE)*
               GetShape(f, s, j, qp, ON_SURFACE)*
                  DetJ(f,s,qp,ON_SURFACE);
 
             value_x_ij
-              += quadratures[DEG3_SURFACE]->weights[qp]*
+              += surface_quadrature.weights[qp]*
                  GetShape(f, s, i, qp, ON_SURFACE)*
                  GetGradShape_x(f, s, j, qp)*
                  DetJ(f,s,qp,ON_SURFACE);
 
             value_y_ij
-              += quadratures[DEG3_SURFACE]->weights[qp]*
+              += surface_quadrature.weights[qp]*
                  GetShape(f, s, i, qp, ON_SURFACE)*
                  GetGradShape_y(f, s, j, qp)*
                  DetJ(f,s,qp,ON_SURFACE);
 
             value_z_ij
-              += quadratures[DEG3_SURFACE]->weights[qp]*
+              += surface_quadrature.weights[qp]*
                  GetShape(f, s, i, qp, ON_SURFACE)*
                  GetGradShape_z(f, s, j, qp)*
                  DetJ(f,s,qp,ON_SURFACE);
@@ -327,10 +327,10 @@ void PolyhedronPWLFEValues::PreCompute()
       double f_varphi_i_surf = 0.0;
       for (size_t s = 0; s < face_data[f].sides.size(); s++)
       {
-        for (size_t qp=0; qp<quadratures[DEG3_SURFACE]->qpoints.size();qp++)
+        for (size_t qp=0; qp<surface_quadrature.qpoints.size();qp++)
         {
           f_varphi_i_surf
-            += quadratures[DEG3_SURFACE]->weights[qp]*
+            += surface_quadrature.weights[qp]*
             GetShape(f, s, i, qp, ON_SURFACE)*
                DetJ(f,s,qp,ON_SURFACE);
         }// for gp
