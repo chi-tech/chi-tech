@@ -45,8 +45,8 @@ class PolygonPWLFEValues : public CellPWLFEValues
 {
 private:
   std::vector<FEside_data2d*> sides;
-  chi_math::QuadratureTriangle* vol_quadrature;
-  chi_math::QuadratureTriangle* surf_quadrature;
+  chi_math::QuadratureTriangle& volume_quadrature;
+  chi_math::QuadratureTriangle& surface_quadrature;
 public:
   int      num_of_subtris;
   double   beta;

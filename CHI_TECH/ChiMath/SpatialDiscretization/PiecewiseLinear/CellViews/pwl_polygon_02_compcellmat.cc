@@ -9,14 +9,14 @@ double PolygonPWLFEValues::PreShape(int s, int i, int qpoint_index, bool on_surf
   double eta = 0.0;
   if (!on_surface)
   {
-    chi_math::QuadraturePointXY* qpoint = vol_quadrature->qpoints.at(qpoint_index);
+    auto& qpoint = volume_quadrature.qpoints.at(qpoint_index);
 
-    xi = qpoint->x;
-    eta= qpoint->y;
+    xi = qpoint.x;
+    eta= qpoint.y;
   }
   else
   {
-    xi = surf_quadrature->abscissae[qpoint_index];
+    xi = surface_quadrature.qpoints[qpoint_index].x;
     eta = 0.0;
   }
 
@@ -105,14 +105,14 @@ void PolygonPWLFEValues::PreCompute()
     for (int i=0; i<dofs; i++)
     {
       FEqp_data2d* pernode_data = new FEqp_data2d;
-      for (int q=0; q<vol_quadrature->qpoints.size(); q++)
+      for (int q=0; q<volume_quadrature.qpoints.size(); q++)
       {
         pernode_data->shape_qp.push_back(PreShape(s, i, q));
         pernode_data->gradshapex_qp.push_back(PreGradShape_x(s, i, q));
         pernode_data->gradshapey_qp.push_back(PreGradShape_y(s, i, q));
       }//for qp
 
-      for (int q=0; q<surf_quadrature->abscissae.size(); q++)
+      for (int q=0; q<surface_quadrature.qpoints.size(); q++)
       {
         //printf("%g\n",PreShape(s,i,q,ON_SURFACE));
         pernode_data->shape_qp_surf.push_back(PreShape(s,i,q,ON_SURFACE));
@@ -139,10 +139,10 @@ void PolygonPWLFEValues::PreCompute()
 
       for (int s = 0; s < sides.size(); s++)
       {
-        for (int qp=0; qp<vol_quadrature->qpoints.size();qp++)
+        for (int qp=0; qp<volume_quadrature.qpoints.size();qp++)
         {
           gradijvalue_i[j]
-            += vol_quadrature->weights[qp]*
+            += volume_quadrature.weights[qp]*
                (GetGradShape_x(s, i, qp)*
                 GetGradShape_x(s, j, qp) +
                 GetGradShape_y(s, i, qp)*
@@ -150,10 +150,10 @@ void PolygonPWLFEValues::PreCompute()
                DetJ(s,qp);
         }//for qp
 
-        for (int qp=0; qp<vol_quadrature->qpoints.size();qp++)
+        for (int qp=0; qp<volume_quadrature.qpoints.size();qp++)
         {
           double varphi_i = GetShape(s, i, qp);
-          double weight = vol_quadrature->weights[qp];
+          double weight = volume_quadrature.weights[qp];
 
           varphi_i_gradj[j].x
             += weight*varphi_i* GetGradShape_x(s, j, qp)*DetJ(s,qp);
@@ -174,15 +174,15 @@ void PolygonPWLFEValues::PreCompute()
     chi_mesh::Vector3 gradvalue_i(0, 0, 0);
     for (int s = 0; s < sides.size(); s++)
     {
-      for (int qp=0; qp<vol_quadrature->qpoints.size();qp++)
+      for (int qp=0; qp<volume_quadrature.qpoints.size();qp++)
       {
-        valuei_i += vol_quadrature->weights[qp]*
+        valuei_i += volume_quadrature.weights[qp]*
                     GetShape(s, i, qp)*
                     DetJ(s,qp);
-        gradvalue_i.x += vol_quadrature->weights[qp]*
+        gradvalue_i.x += volume_quadrature.weights[qp]*
                          GetGradShape_x(s, i, qp)*
                          DetJ(s,qp);
-        gradvalue_i.y += vol_quadrature->weights[qp]*
+        gradvalue_i.y += volume_quadrature.weights[qp]*
                          GetGradShape_y(s, i, qp)*
                          DetJ(s,qp);
       }// for gp
@@ -215,22 +215,22 @@ void PolygonPWLFEValues::PreCompute()
 
 
 
-        for (int qp=0; qp<surf_quadrature->abscissae.size();qp++)
+        for (int qp=0; qp<surface_quadrature.qpoints.size();qp++)
         {
           value_ij
-            += surf_quadrature->weights[qp]*
+            += surface_quadrature.weights[qp]*
                GetShape(f, i, qp, ON_SURFACE)*
                GetShape(f, j, qp, ON_SURFACE)*
                DetJ(f,qp,ON_SURFACE);
 
           value_x_ij
-            += surf_quadrature->weights[qp]*
+            += surface_quadrature.weights[qp]*
                GetShape(f, i, qp, ON_SURFACE)*
                GetGradShape_x(f,j,qp)*
                DetJ(f,qp,ON_SURFACE);
 
           value_y_ij
-            += surf_quadrature->weights[qp]*
+            += surface_quadrature.weights[qp]*
                GetShape(f, i, qp, ON_SURFACE)*
                GetGradShape_y(f,j,qp)*
                DetJ(f,qp,ON_SURFACE);
@@ -246,10 +246,10 @@ void PolygonPWLFEValues::PreCompute()
 
       double f_varphi_i_surf = 0.0;
 
-      for (int qp=0; qp<surf_quadrature->abscissae.size();qp++)
+      for (int qp=0; qp<surface_quadrature.qpoints.size();qp++)
       {
         f_varphi_i_surf
-          += surf_quadrature->weights[qp]*
+          += surface_quadrature.weights[qp]*
              GetShape(f, i, qp, ON_SURFACE)*
              DetJ(f,qp,ON_SURFACE);
       }// for gp
