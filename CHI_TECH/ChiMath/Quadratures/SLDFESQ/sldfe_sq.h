@@ -1,5 +1,5 @@
-#ifndef _quadrature_sldfesq_h
-#define _quadrature_sldfesq_h
+#ifndef QUADRATURE_SLDFESQ_H
+#define QUADRATURE_SLDFESQ_H
 
 #include "ChiMesh/chi_mesh.h"
 

@@ -35,7 +35,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         auto slab_cell = (chi_mesh::CellSlab*)(&cell);
         auto cell_fe_view = new SlabPWLFEView(slab_cell, grid);
 
-        //cell_fe_view->PreCompute();
+        cell_fe_view->PreComputeValues();
         //cell_fe_view->CleanUp();
         cell_fe_views.push_back(cell_fe_view);
         cell_view_added_flags[cell.local_id] = true;
@@ -46,7 +46,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
         auto cell_fe_view = new PolygonPWLFEValues(poly_cell, grid, this);
 
-        cell_fe_view->PreCompute();
+        cell_fe_view->PreComputeValues();
 
         cell_fe_views.push_back(cell_fe_view);
         cell_view_added_flags[cell.local_id] = true;
@@ -57,7 +57,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
         auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell, grid, this);
 
-        cell_fe_view->PreCompute();
+        cell_fe_view->PreComputeValues();
         cell_fe_view->CleanUp();
         cell_fe_views.push_back(cell_fe_view);
         cell_view_added_flags[cell.local_id] = true;
@@ -102,7 +102,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
       auto slab_cell = (chi_mesh::CellSlab*)cell;
       auto cell_fe_view = new SlabPWLFEView(slab_cell, grid);
 
-      //cell_fe_view->PreCompute();
+      cell_fe_view->PreComputeValues();
 
       neighbor_cell_fe_views.push_back(cell_fe_view);
     }
@@ -112,7 +112,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
       auto cell_fe_view = new PolygonPWLFEValues(poly_cell, grid, this);
 
-      cell_fe_view->PreCompute();
+      cell_fe_view->PreComputeValues();
 
       neighbor_cell_fe_views.push_back(cell_fe_view);
     }
@@ -122,7 +122,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
       auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell, grid, this);
 
-      cell_fe_view->PreCompute();
+      cell_fe_view->PreComputeValues();
       cell_fe_view->CleanUp();
       neighbor_cell_fe_views.push_back(cell_fe_view);
     }

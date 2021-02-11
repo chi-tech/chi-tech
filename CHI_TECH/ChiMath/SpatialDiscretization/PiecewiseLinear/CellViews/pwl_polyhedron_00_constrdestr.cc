@@ -11,15 +11,15 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
                                              chi_mesh::MeshContinuumPtr vol_continuum,
                                              SpatialDiscretization_PWL *discretization):
   CellPWLFEValues(polyh_cell->vertex_ids.size()),
-  volume_quadrature(discretization->tet_quad_order2),
-  surface_quadrature(discretization->tet_quad_order2_surface)
+  default_volume_quadrature(discretization->tet_quad_order_second),
+  default_surface_quadrature(discretization->tri_quad_order_second)
 {
   grid = vol_continuum;
   //=========================================== Create quadrature points
   if (discretization != nullptr)
   {
 //    quadratures.push_back(discretization->tet_quad_order1);
-//    quadratures.push_back(discretization->tet_quad_order2);
+//    quadratures.push_back(discretization->tet_quad_order_second);
 //    quadratures.push_back(discretization->tet_quad_order2_surface);
   } else
   {
@@ -63,7 +63,7 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
       const chi_mesh::Vertex& v2 = *vol_continuum->vertices[v1index];
       const chi_mesh::Vertex& v3 = vcc;
 
-      side_data.side_centroid = (v0 + v1 + v2 + v3) / 4.0;
+//      side_data.side_centroid = (v0 + v1 + v2 + v3) / 4.0;
 
       //============================= Compute vectors
       chi_mesh::Vector3 v01 = v1 - v0;

@@ -435,7 +435,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     auto fe_view =
       new PolygonPWLFEValues(cell, grid, &rpwl_sdm);
 
-    fe_view->PreCompute();
+    fe_view->PreComputeValues();
 
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
@@ -485,7 +485,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     PolyhedronPWLFEValues* fe_view =
       new PolyhedronPWLFEValues(cell, grid, &rpwl_sdm);
 
-    fe_view->PreCompute();
+    fe_view->PreComputeValues();
 
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 

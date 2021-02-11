@@ -21,6 +21,13 @@ public:
 
   std::vector<std::vector<int>> face_dof_mappings;
 
+  bool precomputed = false;   ///< Are the integrals computed.
+
+protected:
+  std::vector<std::vector<double>>            shape_value;
+  std::vector<std::vector<chi_mesh::Vector3>> shape_grad;
+
+public:
   explicit CellPWLFEValues(int num_dofs) :
     dofs(num_dofs)
   {}
@@ -55,6 +62,7 @@ public:
     gradshape_values.resize(dofs,chi_mesh::Vector3());
   }
 
+  virtual void PreComputeValues() {}
 };
 
 

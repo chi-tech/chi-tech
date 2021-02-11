@@ -19,19 +19,9 @@ namespace chi_math
     FORTIETH = 40, FORTYFIRST = 41, FORTYSECOND = 42, FORTYTHIRD = 43,
     INVALID_ORDER
   };
-  struct QuadraturePointXY;
   struct QuadraturePointXYZ;
   class Quadrature;
 }
-
-struct chi_math::QuadraturePointXY
-{
-  double x=0.0;
-  double y=0.0;
-
-  QuadraturePointXY() = default;
-  QuadraturePointXY(double in_x, double in_y) : x(in_x), y(in_y) {}
-};
 
 struct chi_math::QuadraturePointXYZ
 {

@@ -7,10 +7,10 @@ double PolygonPWLFEValues::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 {
   for (int s=0; s<num_of_subtris; s++)
   {
-    chi_mesh::Vector3 p0 = *grid->vertices[sides[s]->v_index[0]];
+    chi_mesh::Vector3 p0 = *grid->vertices[sides[s].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-    chi_mesh::Vector3 xi_eta_zeta   = sides[s]->Jinv * xyz_ref;
+    chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * xyz_ref;
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
@@ -49,8 +49,8 @@ void PolygonPWLFEValues::ShapeValues(const chi_mesh::Vector3 &xyz,
   shape_values.resize(dofs,0.0);
   for (int s=0; s<num_of_subtris; s++)
   {
-    chi_mesh::Vector3 p0 = *grid->vertices[sides[s]->v_index[0]];
-    chi_mesh::Vector3 xi_eta_zeta   = sides[s]->Jinv * (xyz - p0);
+    chi_mesh::Vector3 p0 = *grid->vertices[sides[s].v_index[0]];
+    chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * (xyz - p0);
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
@@ -92,10 +92,10 @@ chi_mesh::Vector3 PolygonPWLFEValues::GradShapeValue(const int i,
 
   for (int e=0; e<num_of_subtris; e++)
   {
-    chi_mesh::Vector3 p0 = *grid->vertices[sides[e]->v_index[0]];
+    chi_mesh::Vector3 p0 = *grid->vertices[sides[e].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
-    chi_mesh::Vector3 xi_eta_zeta = sides[e]->Jinv * xyz_ref;
+    chi_mesh::Vector3 xi_eta_zeta = sides[e].Jinv * xyz_ref;
 
     double xi  = xi_eta_zeta.x;
     double eta = xi_eta_zeta.y;
@@ -118,7 +118,7 @@ chi_mesh::Vector3 PolygonPWLFEValues::GradShapeValue(const int i,
 
       grad_r.y += beta*1.0;
 
-      grad = sides[e]->JTinv*grad_r;
+      grad = sides[e].JTinv*grad_r;
 
       return grad;
     }

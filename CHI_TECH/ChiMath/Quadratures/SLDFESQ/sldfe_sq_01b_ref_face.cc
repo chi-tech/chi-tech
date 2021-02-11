@@ -15,8 +15,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   int Ns = (level + 1);  //Number of subdivisions
   int Np = Ns + 1;         //Number of diagonal points
 
-  chi_math::QuadratureGaussLegendre legendre;
-  legendre.Initialize(32);
+  chi_math::QuadratureGaussLegendre legendre(QuadratureOrder::THIRTYSECOND);
 
   //============================================= Generate xy_tilde values
   std::vector<VertList> vertices_xy_tilde_ij;

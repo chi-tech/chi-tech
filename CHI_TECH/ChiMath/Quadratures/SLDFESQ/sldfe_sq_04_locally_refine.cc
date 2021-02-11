@@ -90,8 +90,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   std::vector<SphericalQuadrilateral> new_deployment;
   new_deployment.reserve(deployed_SQs.size());
 
-  chi_math::QuadratureGaussLegendre legendre;
-  legendre.Initialize(32);
+  chi_math::QuadratureGaussLegendre legendre(QuadratureOrder::THIRTYSECOND);
 
   int num_refined = 0;
   for (auto& sq : deployed_SQs)

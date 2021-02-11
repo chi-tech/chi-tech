@@ -11,33 +11,49 @@ extern ChiLog& chi_log;
 #include <algorithm>
 
 //###################################################################
-/**Initializes the Legendre quadrature.*/
-void chi_math::QuadratureGaussLegendre::
-    Initialize(int N, int maxiters,
-               double tol,bool verbose)
+/**Populates the abscissae and weights for a Gauss-Legendre
+ * quadrature.*/
+chi_math::QuadratureGaussLegendre::
+  QuadratureGaussLegendre(QuadratureOrder order,
+                          int maxiters/*=1000*/,
+                          double tol/*=1.0e-12*/,
+                          bool verbose/*=false*/)
 {
-  if (verbose)
+  abscissae.clear();
+  weights.clear();
+
+  switch (order)
   {
-    printf("Initializing Gauss-Legendre Quadrature with %d q-points\n",N);
-  }
+    default:
+    {
+      int N = (int)order;
+      if (verbose)
+        chi_log.Log() << "Initializing Gauss-Legendre Quadrature "
+                         "with " << N << " q-points";
 
-  //========================= Compute the roots
-  abscissae = FindRoots(N, maxiters, tol);
+      //========================= Compute the roots
+      abscissae = FindRoots(N, maxiters, tol);
 
-  //========================= Compute the weights
-  weights.resize(N,1.0);
-  for (size_t k=0; k < abscissae.size(); k++)
-  {
-    weights[k] =
-      2.0 * (1.0 - abscissae[k] * abscissae[k]) /
-      ( (N + 1) * (N + 1) *
-        Legendre(N+1, abscissae[k]) * Legendre(N+1, abscissae[k]) );
+      //========================= Compute the weights
+      weights.resize(N,1.0);
+      for (size_t k=0; k < abscissae.size(); k++)
+      {
+        weights[k] =
+          2.0 * (1.0 - abscissae[k] * abscissae[k]) /
+          ( (N + 1) * (N + 1) *
+            Legendre(N+1, abscissae[k]) * Legendre(N+1, abscissae[k]) );
 
-    if (verbose)
-      chi_log.Log(LOG_0)
-        << "root[" << k << "]=" << abscissae[k]
-        << ", weight=" << weights[k];
-  }//for abscissae
+        if (verbose)
+          chi_log.Log(LOG_0)
+            << "root[" << k << "]=" << abscissae[k]
+            << ", weight=" << weights[k];
+      }//for abscissae
+
+      break;
+    }
+  }//switch order
+
+
 }
 
 //###################################################################

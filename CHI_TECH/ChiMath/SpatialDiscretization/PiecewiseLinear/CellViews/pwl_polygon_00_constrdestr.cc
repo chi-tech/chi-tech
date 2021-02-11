@@ -6,8 +6,8 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
                                        chi_mesh::MeshContinuumPtr vol_continuum,
                                        SpatialDiscretization_PWL *discretization) :
   CellPWLFEValues(poly_cell->vertex_ids.size()),
-  volume_quadrature(discretization->tri_quad_deg5),
-  surface_quadrature(discretization->tri_quad_deg3_surf)
+  default_volume_quadrature(discretization->tri_quad_order_second),
+  default_surface_quadrature(discretization->line_quad_order_second)
 {
   precomputed = false;
   grid = vol_continuum;
@@ -32,36 +32,33 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
     double sidedetJ = ((sidev01.x)*(sidev02.y) - (sidev02.x)*(sidev01.y));
     detJ.push_back(sidedetJ);
 
-    FEside_data2d* triangle_data = new FEside_data2d;
-    triangle_data->detJ = sidedetJ;
-    triangle_data->detJ_surf = sidev01.Norm();
-    triangle_data->v_index = new int[2];
+    FEside_data2d triangle_data;
+    triangle_data.detJ = sidedetJ;
+    triangle_data.detJ_surf = sidev01.Norm();
 
-    triangle_data->v_index[0] = face.vertex_ids[0];
-    triangle_data->v_index[1] = face.vertex_ids[1];
+    triangle_data.v_index[0] = face.vertex_ids[0];
+    triangle_data.v_index[1] = face.vertex_ids[1];
 
     //Set Jacobian
-    triangle_data->J.SetIJ(0,0,sidev01.x);
-    triangle_data->J.SetIJ(1,0,sidev01.y);
-    triangle_data->J.SetIJ(0,1,sidev02.x);
-    triangle_data->J.SetIJ(1,1,sidev02.y);
-    triangle_data->J.SetIJ(2,2,0.0);
+    triangle_data.J.SetIJ(0,0,sidev01.x);
+    triangle_data.J.SetIJ(1,0,sidev01.y);
+    triangle_data.J.SetIJ(0,1,sidev02.x);
+    triangle_data.J.SetIJ(1,1,sidev02.y);
+    triangle_data.J.SetIJ(2,2,0.0);
 
     //Set Jacobian inverse
-    triangle_data->Jinv.SetIJ(0,0,sidev02.y/sidedetJ);
-    triangle_data->Jinv.SetIJ(1,0,-sidev01.y/sidedetJ);
-    triangle_data->Jinv.SetIJ(0,1,-sidev02.x/sidedetJ);
-    triangle_data->Jinv.SetIJ(1,1,sidev01.x/sidedetJ);
-    triangle_data->Jinv.SetIJ(2,2,0.0);
+    triangle_data.Jinv.SetIJ(0,0,sidev02.y/sidedetJ);
+    triangle_data.Jinv.SetIJ(1,0,-sidev01.y/sidedetJ);
+    triangle_data.Jinv.SetIJ(0,1,-sidev02.x/sidedetJ);
+    triangle_data.Jinv.SetIJ(1,1,sidev01.x/sidedetJ);
+    triangle_data.Jinv.SetIJ(2,2,0.0);
 
     //Set Jacobian-Transpose inverse
-    triangle_data->JTinv.SetIJ(0,0, sidev02.y/sidedetJ);
-    triangle_data->JTinv.SetIJ(1,0,-sidev02.x/sidedetJ);
-    triangle_data->JTinv.SetIJ(0,1,-sidev01.y/sidedetJ);
-    triangle_data->JTinv.SetIJ(1,1, sidev01.x/sidedetJ);
-    triangle_data->JTinv.SetIJ(2,2,0.0);
-
-
+    triangle_data.JTinv.SetIJ(0,0, sidev02.y/sidedetJ);
+    triangle_data.JTinv.SetIJ(1,0,-sidev02.x/sidedetJ);
+    triangle_data.JTinv.SetIJ(0,1,-sidev01.y/sidedetJ);
+    triangle_data.JTinv.SetIJ(1,1, sidev01.x/sidedetJ);
+    triangle_data.JTinv.SetIJ(2,2,0.0);
 
     sides.push_back(triangle_data);
   }

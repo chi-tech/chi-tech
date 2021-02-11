@@ -12,6 +12,7 @@ chi_math::QuadratureTriangle::QuadratureTriangle(QuadratureOrder order, bool sur
   {
     switch (order)
     {
+      case QuadratureOrder::CONSTANT:
       case QuadratureOrder::FIRST:
       {
         qpoints.emplace_back(0.5,0.0,0.0);
@@ -36,6 +37,7 @@ chi_math::QuadratureTriangle::QuadratureTriangle(QuadratureOrder order, bool sur
   {
     switch (order)
     {
+      case QuadratureOrder::CONSTANT:
       case QuadratureOrder::FIRST:
       {
         x = 1.0/3.0;

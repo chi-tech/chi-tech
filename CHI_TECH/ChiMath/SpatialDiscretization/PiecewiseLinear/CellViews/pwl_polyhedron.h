@@ -26,7 +26,6 @@ struct FEside_data3d
   double                    detJ = 0.0;
   double                    detJ_surf = 0.0;
   std::vector<int>          v_index;
-  chi_mesh::Vector3         side_centroid;
   chi_mesh::Matrix3x3       J;
   chi_mesh::Matrix3x3       Jinv;
   chi_mesh::Matrix3x3       JTinv;
@@ -89,15 +88,13 @@ public:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
-//  std::vector<chi_math::QuadratureTetrahedron*> quadratures; ///< Quadratures used by this method.
-  chi_math::QuadratureTetrahedron& volume_quadrature;
-  chi_math::QuadratureTetrahedron& surface_quadrature;
+  chi_math::QuadratureTetrahedron& default_volume_quadrature;
+  chi_math::QuadratureTriangle&    default_surface_quadrature;
+
   chi_mesh::MeshContinuumPtr       grid;                       ///< Pointer to the reference grid.
 
-  bool                   precomputed = false;   ///< Are the integrals computed.
-
-
 public:
+  //00_constrdestr.cc
   PolyhedronPWLFEValues(chi_mesh::CellPolyhedron* polyh_cell,
                         chi_mesh::MeshContinuumPtr vol_continuum,
                         SpatialDiscretization_PWL* discretization= nullptr);
@@ -106,6 +103,7 @@ public:
   //################################################## Define standard
   //                                                   tetrahedron shape
   //                                                   functions
+  //01a_reftet.cc
 private:
   double TetShape(int index, int qpoint_index, bool on_surface = false);
   static double TetGradShape_x(int index);
@@ -113,41 +111,23 @@ private:
   static double TetGradShape_z(int index);
 
   //################################################## Shape functions per side
+  //01b_sidevalues.cc
 private:
-  /**Determinant evaluated at quadrature point*/
-  double DetJ(int face_index, int side_index,
-              int qpoint_index, bool on_surface=false)
-  {
-    if (on_surface)
-      return (face_data[face_index].sides[side_index].detJ_surf);
-    else
-      return (face_data[face_index].sides[side_index].detJ);
-  }
-  /**Shape function evaluation on a tet at a quadrature point*/
-  double GetShape(int face, int side, int i, int qp, bool surface = false)
-  {
-    if (surface)
-      return face_data[face].sides[side].qp_data[i].shape_qp_surf[qp];
-    else
-      return face_data[face].sides[side].qp_data[i].shape_qp[qp];
-  }
-  /**GradeShape-x function evaluation on a tet at a quadrature point*/
-  double GetGradShape_x(int face, int side, int i, int qp)
-  {
-    return face_data[face].sides[side].qp_data[i].gradshapex_qp[qp];
-  }
-  /**GradeShape-y function evaluation on a tet at a quadrature point*/
-  double GetGradShape_y(int face, int side, int i, int qp)
-  {
-    return face_data[face].sides[side].qp_data[i].gradshapey_qp[qp];
-  }
-  /**GradeShape-z function evaluation on a tet at a quadrature point*/
-  double GetGradShape_z(int face, int side, int i, int qp)
-  {
-    return face_data[face].sides[side].qp_data[i].gradshapez_qp[qp];
-  }
+  double FaceSideShape(int face_index, int side_index,
+                       int i, int qpoint_index, bool on_surface = false);
+
+  double FaceSideGradShape_x(int face_index, int side_index,
+                             int i);
+
+  double FaceSideGradShape_y(int face_index, int side_index,
+                             int i);
+
+  double FaceSideGradShape_z(int face_index, int side_index,
+                             int i);
 
   //############################################### Actual shape functions
+  //                                                as function of cartesian
+  //                                                coordinates
 public:
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
   chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
@@ -159,23 +139,11 @@ public:
   void GradShapeValues(const chi_mesh::Vector3& xyz,
                        std::vector<chi_mesh::Vector3>& gradshape_values) override;
 
-  //############################################### Precomputation cell matrices
-private:
-  double PreShape(int face_index, int side_index,
-                  int i, int qpoint_index, bool on_surface = false);
 
-  double PreGradShape_x(int face_index, int side_index,
-                        int i);
-
-  double PreGradShape_y(int face_index, int side_index,
-                        int i);
-
-  double PreGradShape_z(int face_index, int side_index,
-                        int i);
 
 public:
   //####################################################### Precomputing
-  void PreCompute();
+  void PreComputeValues() override;
 
 public:
   void CleanUp()

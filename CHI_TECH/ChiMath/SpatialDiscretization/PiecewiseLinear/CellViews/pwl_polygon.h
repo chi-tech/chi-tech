@@ -19,11 +19,11 @@ struct FEside_data2d
 {
   double detJ;
   double detJ_surf;
-  int*    v_index;
+  std::array<int,2> v_index;
   chi_mesh::Matrix3x3 J;
   chi_mesh::Matrix3x3 Jinv;
   chi_mesh::Matrix3x3 JTinv;
-  std::vector<FEqp_data2d*> qp_data;
+  std::vector<FEqp_data2d> qp_data;
 };
 
 //###################################################################
@@ -44,9 +44,9 @@ struct FEside_data2d
 class PolygonPWLFEValues : public CellPWLFEValues
 {
 private:
-  std::vector<FEside_data2d*> sides;
-  chi_math::QuadratureTriangle& volume_quadrature;
-  chi_math::QuadratureTriangle& surface_quadrature;
+  std::vector<FEside_data2d> sides;
+  chi_math::QuadratureTriangle&      default_volume_quadrature;
+  chi_math::QuadratureGaussLegendre& default_surface_quadrature;
 public:
   int      num_of_subtris;
   double   beta;
@@ -58,9 +58,7 @@ public:
 
 public:
   std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
-private:
-  std::vector<std::vector<std::vector<double>>>           IntSi_shapeI_shapeJ;
-  std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntSi_shapeI_gradshapeJ;
+
 
 private:
   chi_mesh::MeshContinuumPtr grid;
@@ -85,40 +83,22 @@ public:
 
 
   //############################################### Precomputation cell matrices
-  double PreShape(int s, int i, int qpoint_index, bool on_surface = false);
-  double PreGradShape_x(int s, int i, int qpoint_index);
-  double PreGradShape_y(int s, int i, int qpoint_index);
+  double SideShape(int side, int i, int qpoint_index, bool on_surface = false);
+  double SideGradShape_x(int side, int i);
+  double SideGradShape_y(int side, int i);
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Determinant J
   double DetJ(int s, int qpoint_index, bool on_surface=false)
   {
     if (!on_surface)
-      return sides[s]->detJ;
+      return sides[s].detJ;
     else
-      return sides[s]->detJ_surf;
+      return sides[s].detJ_surf;
   }
 
-private:
-  double GetShape(int side, int i, int qp, bool surface = false)
-  {
-    if (surface)
-      return sides[side]->qp_data[i]->shape_qp_surf[qp];
-    else
-      return sides[side]->qp_data[i]->shape_qp[qp];
-  }
-
-  double GetGradShape_x(int side, int i, int qp)
-  {
-    return sides[side]->qp_data[i]->gradshapex_qp[qp];
-  }
-
-  double GetGradShape_y(int side, int i, int qp)
-  {
-    return sides[side]->qp_data[i]->gradshapey_qp[qp];
-  }
 
 public:
-  void PreCompute();
+  void PreComputeValues() override;
 
 };
 

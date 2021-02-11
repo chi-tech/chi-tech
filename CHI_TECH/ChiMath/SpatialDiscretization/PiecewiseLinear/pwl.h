@@ -6,6 +6,7 @@
 #include "ChiMesh/Region/chi_region.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/Quadratures/quadrature_gausslegendre.h"
 #include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMath/Quadratures/quadrature_tetrahedron.h"
 
@@ -23,9 +24,11 @@ private:
   std::vector<bool>        cell_view_added_flags;
   bool                     mapping_initialized;
 public:
-  chi_math::QuadratureTriangle    tri_quad_deg5;
+  chi_math::QuadratureGaussLegendre line_quad_order_second;
+  chi_math::QuadratureTriangle      tri_quad_order_second;
+  chi_math::QuadratureTetrahedron   tet_quad_order_second;
+
   chi_math::QuadratureTriangle    tri_quad_deg3_surf;
-  chi_math::QuadratureTetrahedron tet_quad_order2;
   chi_math::QuadratureTetrahedron tet_quad_order2_surface;
 
 private:

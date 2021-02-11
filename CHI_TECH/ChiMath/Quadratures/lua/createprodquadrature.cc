@@ -70,8 +70,9 @@ int chiCreateProductQuadrature(lua_State *L)
 
     auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithGL(Np,verbose);
+
     chi_math_handler.angular_quadratures.push_back(new_quad);
-    int index = chi_math_handler.angular_quadratures.size() - 1;
+    int index = (int)chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
@@ -100,8 +101,9 @@ int chiCreateProductQuadrature(lua_State *L)
 
     auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithGLL(Np,Na,verbose);
+
     chi_math_handler.angular_quadratures.push_back(new_quad);
-    int index = chi_math_handler.angular_quadratures.size() - 1;
+    int index = (int)chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
@@ -130,8 +132,9 @@ int chiCreateProductQuadrature(lua_State *L)
 
     auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithGLC(Np,Na,verbose);
+
     chi_math_handler.angular_quadratures.push_back(new_quad);
-    int index = chi_math_handler.angular_quadratures.size() - 1;
+    int index = (int)chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
@@ -211,8 +214,9 @@ int chiCreateProductQuadrature(lua_State *L)
 
     auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
     new_quad->InitializeWithCustom(azimuthal,polar,weights,verbose);
+
     chi_math_handler.angular_quadratures.push_back(new_quad);
-    int index = chi_math_handler.angular_quadratures.size() - 1;
+    int index = (int)chi_math_handler.angular_quadratures.size() - 1;
     lua_pushnumber(L,index);
 
     if (verbose)
