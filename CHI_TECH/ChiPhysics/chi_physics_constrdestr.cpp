@@ -1,20 +1,13 @@
 #include "chi_physics.h"
 #include <petscksp.h>
 
-extern bool chi_allow_petsc_error_handler;
+#include "chi_runtime.h"
 
 //############################################################################# Default constructor
 /** Default constructor.*/
 ChiPhysics::ChiPhysics() noexcept
 {
-	this->physicsTimestep=16.66667;
-	//this->physicsTimestep=1000;
-	this->physicsTimeCost=0;
 
-	for (int k=0;k<10000;k++)
-	{
-		this->performanceData[k]=0.0;
-	}
 }
 
 /**Initializes PetSc for use by all entities.*/
@@ -24,7 +17,7 @@ int ChiPhysics::InitPetSc(int argc, char** argv)
 	PetscMPIInt    size;
 
   PetscOptionsInsertString(NULL,"-error_output_stderr");
-  if (not chi_allow_petsc_error_handler)
+  if (not ChiTech::allow_petsc_error_handler)
     PetscOptionsInsertString(NULL,"-no_signal_handler");
 //  PetscOptionsInsertString(NULL,"-on_error_abort");
 //TODO: Investigate this, causes cfem methods to fail

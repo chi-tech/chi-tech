@@ -1,13 +1,13 @@
-#include <iostream>
-#include <unistd.h>
-
 #include "chi_physics.h"
 #include"../ChiTimer/chi_timer.h"
-#include"../ChiConsole/chi_console.h"
 
+#include "chi_runtime.h"
+
+#include"../ChiConsole/chi_console.h"
 extern ChiConsole&  chi_console;
 
-extern bool    chi_termination_posted;
+#include <iostream>
+#include <unistd.h>
 
 //############################################################################# Run physics loop
 /** Timed loop executing all physics events.*/
@@ -26,7 +26,7 @@ void ChiPhysics::RunPhysicsLoop()
 	profilingTimer.Reset();
 	std::cout<<"Physics loop started.\n";
 
-	while (!chi_termination_posted)
+	while (!ChiTech::termination_posted)
 	{
 		physicsTime=physicsTiming.GetTime();
 
@@ -36,7 +36,7 @@ void ChiPhysics::RunPhysicsLoop()
 			physicsOldTime=physicsTime;
 
 			//============================================= Flushes the console
-			chi_console.flushConsole();
+      chi_console.FlushConsole();
 //			for (int k=0;k<chiconsoleInputBuffer.itemCount;k++)
 //			{
 //         int error = luaL_dostring(chi_console.consoleState, chiconsoleInputBuffer.GetItem(k));

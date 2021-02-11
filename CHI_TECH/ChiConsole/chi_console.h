@@ -9,8 +9,8 @@ extern "C"
 }
 #include "chi_console_structs.h"
 
-
-//template class CHI_VECTOR<CSTEvent>;
+#include <vector>
+#include <string>
 
 //############################################################################# CLASS DEF
 /** Class for handling the console and scripting.*/
@@ -18,20 +18,22 @@ class ChiConsole
 {
 public:
 	lua_State*							consoleState;             	///< Pointer to lua console state
-	bool                    exit_loop;
-	bool                    runDeveloper;
-	long                    currentSize;
-	long                    previousSize;
-	char                    buffer[2000];
-	int                     numberOfLines;
-	int                     xSize;
+	bool                    exit_loop=false;
+	bool                    runDeveloper=false;
+	long                    currentSize=0;
+	long                    previousSize=0;
+	char                    buffer[2000]={'\0'};
+	int                     numberOfLines=0;
+	int                     xSize=80;
+
+	std::vector<std::string> command_buffer;
 
 private:
   static ChiConsole       instance;
 	//00
 						  ChiConsole() noexcept;
 public:
-	static ChiConsole& GetInstance()
+	static ChiConsole& GetInstance() noexcept
   {return instance;}
 
   //01 Loop
@@ -42,7 +44,7 @@ public:
   void				PostEventToConsole(CSTEvent* inputEvent);
   void        PostMPIInfo(int location_id, int number_of_processes);
   //03
-  void        flushConsole();
+  void        FlushConsole();
   //04 Console Info
   int         GetNumCharsInConsoleBuffer();
   void        CopyConsole(char* destination,int lineNumber=0,int xSize=80);

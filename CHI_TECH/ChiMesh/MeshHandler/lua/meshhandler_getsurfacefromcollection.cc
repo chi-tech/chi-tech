@@ -3,8 +3,6 @@
 
 #include "../chi_meshhandler.h"
 
-extern std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
-extern int                                  chi_current_mesh_handler;
 /** \defgroup LuaMeshHandler Mesh Handler
  * \ingroup LuaMesh
 */
@@ -31,7 +29,7 @@ int chiMeshHandlerGetSurfaceFromCollection(lua_State *L)
     chi_mesh::SurfaceMesh* surf = curItem->at(surf_index);
 
     cur_hndlr->surface_mesh_stack.push_back(surf);
-    int index = cur_hndlr->surface_mesh_stack.size()-1;
+    int index = (int)cur_hndlr->surface_mesh_stack.size()-1;
     lua_pushnumber(L,index);
 
     std::cout << "chiMeshHandlerGetSurfaceFromCollection: Surface extracted = ";

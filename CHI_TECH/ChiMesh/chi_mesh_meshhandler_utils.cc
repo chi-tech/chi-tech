@@ -2,9 +2,8 @@
 #include<iostream>
 
 #include "MeshHandler/chi_meshhandler.h"
+#include "chi_runtime.h"
 
-extern std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
-extern int                                  chi_current_mesh_handler;
 
 //###################################################################
 /**Obtains a pointer to the current mesh handler from the global stack.
@@ -14,7 +13,7 @@ chi_mesh::MeshHandler* chi_mesh::GetCurrentHandler()
   chi_mesh::MeshHandler* cur_handler;
 
   try{
-    cur_handler = chi_meshhandler_stack.at(chi_current_mesh_handler);
+    cur_handler = ChiTech::meshhandler_stack.at(ChiTech::current_mesh_handler);
   }
   catch(const std::out_of_range& err){
     std::cerr << "ERROR: Invalid index to mesh handler.";
@@ -28,14 +27,14 @@ chi_mesh::MeshHandler* chi_mesh::GetCurrentHandler()
 //###################################################################
 /**Adds a new mesh handler to the stack, sets it as the current handler
  * and returns a handle to it.*/
-size_t chi_mesh::PushNewHandler()
+size_t chi_mesh::PushNewHandlerAndGetIndex()
 {
   auto new_handler = new chi_mesh::MeshHandler;
 
-  chi_meshhandler_stack.push_back(new_handler);
+  ChiTech::meshhandler_stack.push_back(new_handler);
 
-  int index = chi_meshhandler_stack.size()-1;
-  chi_current_mesh_handler = index;
+  int index = (int)ChiTech::meshhandler_stack.size()-1;
+  ChiTech::current_mesh_handler = index;
 
   return index;
 }
@@ -47,10 +46,10 @@ chi_mesh::MeshHandler* chi_mesh::GetNewHandler()
 {
   auto new_handler = new chi_mesh::MeshHandler;
 
-  chi_meshhandler_stack.push_back(new_handler);
+  ChiTech::meshhandler_stack.push_back(new_handler);
 
-  int index = chi_meshhandler_stack.size()-1;
-  chi_current_mesh_handler = index;
+  int index = (int)ChiTech::meshhandler_stack.size()-1;
+  ChiTech::current_mesh_handler = index;
 
   return new_handler;
 }

@@ -4,12 +4,6 @@
 /** Default constructor for the console*/
 ChiConsole::ChiConsole() noexcept
 {
-	this->currentSize=0;
-	this->previousSize=0;
-	this->buffer[0]='\0';
-	this->numberOfLines=0;
-	this->xSize=80;
-	runDeveloper=false;
 	//========================================== Initializing console
 	this->consoleState = luaL_newstate();
 	luaL_openlibs(this->consoleState);

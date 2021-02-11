@@ -32,7 +32,7 @@ private:
 	ChiMath() noexcept;
 
 public:
-  static ChiMath& GetInstance()
+  static ChiMath& GetInstance() noexcept
   {return instance;}
 	//01 Utility
 

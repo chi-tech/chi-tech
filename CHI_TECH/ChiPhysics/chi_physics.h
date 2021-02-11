@@ -14,9 +14,8 @@
 class ChiPhysics
 {
 public:
-	double    					physicsTimestep;
-	double              performanceData[10000];     ///< Misc performance data;
-	double              physicsTimeCost;
+	double    					physicsTimestep=16.66667;
+	double              physicsTimeCost=0.0;
 
   std::vector<chi_physics::Solver*>        solver_stack;
   std::vector<chi_physics::Material*>      material_stack;
@@ -30,7 +29,7 @@ private:
 	//00
 			ChiPhysics() noexcept;
 public:
-  static ChiPhysics& GetInstance()
+  static ChiPhysics& GetInstance() noexcept
   {return instance;}
 	int  InitPetSc(int argc, char** argv);
 	//01

@@ -1,10 +1,12 @@
 #include "chi_console.h"
+
+#include "chi_runtime.h"
+
+#include "chi_log.h"
+extern ChiLog& chi_log;
+
 #include <iostream>
 
-extern bool chi_termination_posted;
-
-#include <chi_log.h>
-extern ChiLog& chi_log;
 
 
 //############################################################################# Run Console loop
@@ -16,7 +18,7 @@ void ChiConsole::RunConsoleLoop(char* fileName)
                      << "Type \"exit\" to quit (or Ctl-C).";
   exit_loop = false;
 
-  while ((!exit_loop) and (!chi_termination_posted))
+  while ((!exit_loop) and (!ChiTech::termination_posted))
   {
     std::string console_input;
 
@@ -34,7 +36,7 @@ void ChiConsole::RunConsoleLoop(char* fileName)
       lua_pop(consoleState,1);
     }
   }
-  chi_termination_posted = true;
+  ChiTech::termination_posted = true;
 
   chi_log.Log(LOG_0) << "Console loop stopped successfully.";
 }

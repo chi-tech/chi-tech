@@ -103,7 +103,7 @@ namespace chi_mesh
 
   Boundary*              AssignSurfaceToBoundary(chi_mesh::SurfaceMesh* surface);
   MeshHandler*           GetCurrentHandler();
-  size_t                 PushNewHandler();
+  size_t                 PushNewHandlerAndGetIndex();
   MeshHandler*           GetNewHandler();
   EdgeLoopCollection*    SplitEdgeLoopByAngle(EdgeLoop* input,double angle=1);
 

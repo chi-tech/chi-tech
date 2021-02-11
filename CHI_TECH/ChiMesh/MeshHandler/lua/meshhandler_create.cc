@@ -1,16 +1,18 @@
-#include"../../../ChiLua/chi_lua.h"
-#include <iostream>
+#include"ChiLua/chi_lua.h"
 
 #include "../chi_meshhandler.h"
-#include <chi_log.h>
+#include "chi_runtime.h"
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
-extern std::vector<chi_mesh::MeshHandler*>  chi_meshhandler_stack;
-extern int                                  chi_current_mesh_handler;
+
 /** \defgroup LuaMeshHandler Mesh Handler
  * \ingroup LuaMesh
 */
+
+#include <iostream>
+
 //#############################################################################
 /** Creates a mesh handler and sets it as "current".
 
@@ -19,13 +21,8 @@ extern int                                  chi_current_mesh_handler;
 \author Jan*/
 int chiMeshHandlerCreate(lua_State *L)
 {
-  chi_mesh::MeshHandler* new_handler = new chi_mesh::MeshHandler;
-
-  chi_meshhandler_stack.push_back(new_handler);
-
-  int index = chi_meshhandler_stack.size()-1;
+  int index = (int) chi_mesh::PushNewHandlerAndGetIndex();
   lua_pushnumber(L,index);
-  chi_current_mesh_handler = index;
 
   chi_log.Log(LOG_ALLVERBOSE_2)
   << "chiMeshHandlerCreate: Mesh Handler " << index << " created\n";
@@ -50,7 +47,7 @@ int chiMeshHandlerSetCurrent(lua_State *L)
 
   int handle = lua_tonumber(L,1);
 
-  if ((handle < 0) or (handle >= chi_meshhandler_stack.size()))
+  if ((handle < 0) or (handle >= ChiTech::meshhandler_stack.size()))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to mesh handler specified "
@@ -58,7 +55,7 @@ int chiMeshHandlerSetCurrent(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  chi_current_mesh_handler = handle;
+  ChiTech::current_mesh_handler = handle;
 
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiMeshHandlerSetCurrent: set to " << handle;

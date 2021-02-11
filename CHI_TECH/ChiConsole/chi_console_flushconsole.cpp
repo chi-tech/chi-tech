@@ -11,8 +11,8 @@ extern ChiTimer        chi_program_timer;
 /* This function sends the commands contained in the input buffer to
 the lua state from where it is executed.
 */
-void ChiConsole::flushConsole()
+void ChiConsole::FlushConsole()
 {
-
-	return;
+  for (auto& command : command_buffer)
+    luaL_dostring(consoleState, command.c_str());
 }

@@ -46,7 +46,7 @@ private:
     process_count = 1;
   }
 public:
-  static ChiMPI& GetInstance()
+  static ChiMPI& GetInstance() noexcept
     {return instance;}
   //01
   void Initialize();
