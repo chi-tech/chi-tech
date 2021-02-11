@@ -24,7 +24,7 @@
  *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  **/
-class PolyhedronFEView : public CellPWLFEView
+class PolyhedronPWLFEView : public CellPWLFEView
 {
 private:
   /** For a given side(tet), this structure holds the values of
@@ -148,9 +148,9 @@ private:
                         int i);
 
 public:
-  PolyhedronFEView(chi_mesh::CellPolyhedron* polyh_cell,
-                   chi_mesh::MeshContinuum* vol_continuum,
-                   SpatialDiscretization_PWL* discretization = nullptr);
+  PolyhedronPWLFEView(chi_mesh::CellPolyhedron* polyh_cell,
+                      chi_mesh::MeshContinuum* vol_continuum,
+                      SpatialDiscretization_PWL* discretization = nullptr);
 
   std::vector<FEface_data> face_data;      ///< Holds determinants and data tet-by-tet.
   std::vector<FEnodeMap> node_side_maps;   ///< Maps nodes to side tets.

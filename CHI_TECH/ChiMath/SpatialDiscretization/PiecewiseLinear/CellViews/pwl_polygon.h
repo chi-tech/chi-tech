@@ -21,7 +21,7 @@
  * - edge_dof_mappings, is indexed as [f][fi] and
  *    returns cell dof i.
  **/
-class PolygonFEView : public CellPWLFEView
+class PolygonPWLFEView : public CellPWLFEView
 {
 private:
   /* For a given side(triangle), this structure holds the values of
@@ -80,7 +80,7 @@ public:
   bool precomputed;
   
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonFEView(chi_mesh::CellPolygon* poly_cell,
+  PolygonPWLFEView(chi_mesh::CellPolygon* poly_cell,
                 chi_mesh::MeshContinuum* vol_continuum,
                 SpatialDiscretization_PWL *discretization);
 

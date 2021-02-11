@@ -135,7 +135,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    auto slab_fe_view = (SlabFEView*)fe_view;
+    auto slab_fe_view = (SlabPWLFEView*)fe_view;
     hp = slab_fe_view->h/2.0;
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
@@ -399,7 +399,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
-    auto fe_view = new SlabFEView(cell, grid);
+    auto fe_view = new SlabPWLFEView(cell, grid);
 
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
@@ -429,7 +429,7 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
     auto fe_view =
-      new PolygonFEView(cell, grid, (SpatialDiscretization_PWL*)discretization);
+      new PolygonPWLFEView(cell, grid, (SpatialDiscretization_PWL*)discretization);
 
     fe_view->PreCompute();
 
@@ -475,8 +475,8 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
-    PolyhedronFEView* fe_view =
-      new PolyhedronFEView(cell,grid,(SpatialDiscretization_PWL*)discretization);
+    PolyhedronPWLFEView* fe_view =
+      new PolyhedronPWLFEView(cell,grid,(SpatialDiscretization_PWL*)discretization);
 
     fe_view->PreCompute();
 

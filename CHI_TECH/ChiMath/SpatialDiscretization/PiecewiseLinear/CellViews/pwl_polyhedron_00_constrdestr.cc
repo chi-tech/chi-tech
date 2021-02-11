@@ -7,9 +7,9 @@ extern ChiLog& chi_log;
  * view.
  *
  * */
-PolyhedronFEView::PolyhedronFEView(chi_mesh::CellPolyhedron *polyh_cell,
-                                   chi_mesh::MeshContinuum *vol_continuum,
-                                   SpatialDiscretization_PWL *discretization)
+PolyhedronPWLFEView::PolyhedronPWLFEView(chi_mesh::CellPolyhedron *polyh_cell,
+                                         chi_mesh::MeshContinuum *vol_continuum,
+                                         SpatialDiscretization_PWL *discretization)
   : CellPWLFEView(polyh_cell->vertex_ids.size()),
     alphac(1.0/polyh_cell->vertex_ids.size()),
     grid(vol_continuum),

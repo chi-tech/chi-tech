@@ -2,9 +2,9 @@
 
 //###################################################################
 /** Constructor.*/
-PolygonFEView::PolygonFEView(chi_mesh::CellPolygon* poly_cell,
-                             chi_mesh::MeshContinuum* vol_continuum,
-                             SpatialDiscretization_PWL *discretization)
+PolygonPWLFEView::PolygonPWLFEView(chi_mesh::CellPolygon* poly_cell,
+                                   chi_mesh::MeshContinuum* vol_continuum,
+                                   SpatialDiscretization_PWL *discretization)
   : CellPWLFEView(poly_cell->vertex_ids.size()),
     vol_quadrature(discretization->tri_quad_deg5),
     surf_quadrature(discretization->tri_quad_deg3_surf),

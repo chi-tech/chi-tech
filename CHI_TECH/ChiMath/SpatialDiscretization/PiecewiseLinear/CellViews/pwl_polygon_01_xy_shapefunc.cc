@@ -3,7 +3,7 @@
 //###################################################################
 /**Returns the value of the shape function given cartesian
  * coordinates.*/
-double PolygonFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
+double PolygonPWLFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 {
   for (int s=0; s<num_of_subtris; s++)
   {
@@ -43,8 +43,8 @@ double PolygonFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 //###################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void PolygonFEView::ShapeValues(const chi_mesh::Vector3 &xyz,
-                                std::vector<double> &shape_values)
+void PolygonPWLFEView::ShapeValues(const chi_mesh::Vector3 &xyz,
+                                   std::vector<double> &shape_values)
 {
   shape_values.resize(dofs,0.0);
   for (int s=0; s<num_of_subtris; s++)
@@ -84,8 +84,8 @@ void PolygonFEView::ShapeValues(const chi_mesh::Vector3 &xyz,
 
 //###################################################################
 /**Returns the evaluation of grad-shape function i at the supplied point.*/
-chi_mesh::Vector3 PolygonFEView::GradShapeValue(const int i,
-                                                const chi_mesh::Vector3& xyz)
+chi_mesh::Vector3 PolygonPWLFEView::GradShapeValue(const int i,
+                                                   const chi_mesh::Vector3& xyz)
 {
   chi_mesh::Vector3 grad_r;
   chi_mesh::Vector3 grad;
@@ -130,7 +130,7 @@ chi_mesh::Vector3 PolygonFEView::GradShapeValue(const int i,
 //###################################################################
 /**Populates gradshape_values with the value of each shape function's
  * gradient evaluated at the supplied point.*/
-void PolygonFEView::GradShapeValues(
+void PolygonPWLFEView::GradShapeValues(
   const chi_mesh::Vector3 &xyz,
   std::vector<chi_mesh::Vector3> &gradshape_values)
 {

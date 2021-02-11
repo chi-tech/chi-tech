@@ -33,7 +33,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       if (cell.Type() == chi_mesh::CellType::SLAB)
       {
         auto slab_cell = (chi_mesh::CellSlab*)(&cell);
-        auto cell_fe_view = new SlabFEView(slab_cell, grid);
+        auto cell_fe_view = new SlabPWLFEView(slab_cell, grid);
 
         //cell_fe_view->PreCompute();
         //cell_fe_view->CleanUp();
@@ -44,7 +44,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       else if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
         auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-        auto cell_fe_view = new PolygonFEView(poly_cell, grid, this);
+        auto cell_fe_view = new PolygonPWLFEView(poly_cell, grid, this);
 
         cell_fe_view->PreCompute();
 
@@ -55,7 +55,7 @@ void SpatialDiscretization_PWL::AddViewOfLocalContinuum(
       else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
         auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-        auto cell_fe_view = new PolyhedronFEView(polyh_cell, grid, this);
+        auto cell_fe_view = new PolyhedronPWLFEView(polyh_cell, grid, this);
 
         cell_fe_view->PreCompute();
         cell_fe_view->CleanUp();
@@ -92,7 +92,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto slab_cell = (chi_mesh::CellSlab*)cell;
-      auto cell_fe_view = new SlabFEView(slab_cell, grid);
+      auto cell_fe_view = new SlabPWLFEView(slab_cell, grid);
 
       //cell_fe_view->PreCompute();
 
@@ -102,7 +102,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)cell;
-      auto cell_fe_view = new PolygonFEView(poly_cell, grid, this);
+      auto cell_fe_view = new PolygonPWLFEView(poly_cell, grid, this);
 
       cell_fe_view->PreCompute();
 
@@ -112,7 +112,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      auto cell_fe_view = new PolyhedronFEView(polyh_cell, grid, this);
+      auto cell_fe_view = new PolyhedronPWLFEView(polyh_cell, grid, this);
 
       cell_fe_view->PreCompute();
       cell_fe_view->CleanUp();
