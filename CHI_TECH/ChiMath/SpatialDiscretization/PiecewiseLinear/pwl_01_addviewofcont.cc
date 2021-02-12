@@ -22,7 +22,6 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
     mapping_initialized = true;
   }
 
-
   //================================================== Swap views for
   //                                                   specified item_id
   for (const auto& cell : grid->local_cells)
@@ -36,7 +35,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         auto cell_fe_view = new SlabPWLFEView(slab_cell, grid);
 
         cell_fe_view->PreComputeValues();
-        //cell_fe_view->CleanUp();
+
         cell_fe_views.push_back(cell_fe_view);
         cell_view_added_flags[cell.local_id] = true;
       }
@@ -58,7 +57,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell, grid, this);
 
         cell_fe_view->PreComputeValues();
-        cell_fe_view->CleanUp();
+
         cell_fe_views.push_back(cell_fe_view);
         cell_view_added_flags[cell.local_id] = true;
       }
@@ -123,7 +122,7 @@ void SpatialDiscretization_PWL::AddViewOfNeighborContinuums(
       auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell, grid, this);
 
       cell_fe_view->PreComputeValues();
-      cell_fe_view->CleanUp();
+
       neighbor_cell_fe_views.push_back(cell_fe_view);
     }
     else

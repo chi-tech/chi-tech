@@ -7,8 +7,6 @@
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-#define ON_SURFACE true
-
 /**For a given side(tet), this structure holds the values of
  * shape functions at each quadrature point.*/
 struct FEqp_data3d
@@ -36,6 +34,7 @@ struct FEside_data3d
 struct FEface_data
 {
   std::vector<FEside_data3d> sides;
+  chi_mesh::Vector3 normal;
 };
 
 
@@ -99,9 +98,11 @@ public:
                         chi_mesh::MeshContinuumPtr vol_continuum,
                         SpatialDiscretization_PWL* discretization= nullptr);
 
+  void ComputeUnitIntegrals();
+  void InitializeQuadraturePointData();
 
   //################################################## Define standard
-  //                                                   tetrahedron shape
+  //                                                   tetrahedron linear shape
   //                                                   functions
   //01a_reftet.cc
 private:
@@ -110,20 +111,14 @@ private:
   static double TetGradShape_y(int index);
   static double TetGradShape_z(int index);
 
-  //################################################## Shape functions per side
+  //################################################## Shape functions per face-side
   //01b_sidevalues.cc
 private:
-  double FaceSideShape(int face_index, int side_index,
-                       int i, int qpoint_index, bool on_surface = false);
-
-  double FaceSideGradShape_x(int face_index, int side_index,
-                             int i);
-
-  double FaceSideGradShape_y(int face_index, int side_index,
-                             int i);
-
-  double FaceSideGradShape_z(int face_index, int side_index,
-                             int i);
+  double FaceSideShape(int face_index, int side_index, int i,
+                       int qpoint_index, bool on_surface = false);
+  double FaceSideGradShape_x(int face_index, int side_index, int i);
+  double FaceSideGradShape_y(int face_index, int side_index, int i);
+  double FaceSideGradShape_z(int face_index, int side_index, int i);
 
   //############################################### Actual shape functions
   //                                                as function of cartesian
@@ -144,14 +139,6 @@ public:
 public:
   //####################################################### Precomputing
   void PreComputeValues() override;
-
-public:
-  void CleanUp()
-  {
-    for (auto& face : face_data)
-      for (auto& side : face.sides)
-        side.qp_data = std::vector<FEqp_data3d>(0);
-  }
 
 };
 

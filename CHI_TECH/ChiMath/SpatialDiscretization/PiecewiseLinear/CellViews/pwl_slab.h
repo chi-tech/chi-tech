@@ -13,6 +13,7 @@ private:
   chi_mesh::MeshContinuumPtr grid;
   int v0i;
   int v1i;
+  chi_math::QuadratureGaussLegendre default_volume_quadrature;
 public:
   double h;
 public:
@@ -20,7 +21,8 @@ public:
   /**Constructor for a slab view.*/
   SlabPWLFEView(chi_mesh::CellSlab *slab_cell,
                 chi_mesh::MeshContinuumPtr& in_grid) :
-    CellPWLFEValues(2)
+    CellPWLFEValues(2),
+    default_volume_quadrature(chi_math::QuadratureGaussLegendre(chi_math::QuadratureOrder::SECOND))
   {
     grid = in_grid;
     v0i = slab_cell->vertex_ids[0];
@@ -38,86 +40,22 @@ public:
 
   void ComputeUnitIntegrals();
 
-  /**Shape function i evaluated at given point for the slab.*/
-  double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override
-  {
-    chi_mesh::Vector3& p0 = *grid->vertices[v0i];
-    chi_mesh::Vector3& p1 = *grid->vertices[v1i];
-    chi_mesh::Vector3 xyz_ref = xyz - p0;
+  //################################################## Define standard
+  //                                                   slab linear shape
+  //                                                   functions
+  double SlabShape(int index, int qpoint_index, bool on_surface=false);
 
-    chi_mesh::Vector3 v01 = p1 - p0;
+  //############################################### Actual shape functions
+  //                                                as function of cartesian
+  //                                                coordinates
+public:
+  double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
+  chi_mesh::Vector3 GradShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
 
-    double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
-
-    if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
-    {
-      if (i==0)
-      {
-        return 1.0 - xi;
-      }
-      else
-      {
-        return xi;
-      }
-    }
-
-    return 0.0;
-  }
-
-  //#################################################################
-  /**Populates shape_values with the value of each shape function's
-   * value evaluate at the supplied point.*/
   void ShapeValues(const chi_mesh::Vector3& xyz,
-                   std::vector<double>& shape_values) override
-  {
-    shape_values.resize(dofs,0.0);
-    chi_mesh::Vector3& p0 = *grid->vertices[v0i];
-    chi_mesh::Vector3& p1 = *grid->vertices[v1i];
-    chi_mesh::Vector3 xyz_ref = xyz - p0;
-
-    chi_mesh::Vector3 v01 = p1 - p0;
-
-    double xi   = v01.Dot(xyz_ref)/v01.Norm()/h;
-
-    if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
-    {
-      for (int i=0; i<dofs; i++)
-      {
-        if (i==0)
-        {
-          shape_values[i] = 1.0 - xi;
-        }
-        else
-        {
-          shape_values[i] = xi;
-        }
-      }//for dof
-
-      return;
-    }//if in cell
-
-  }
-
-  //###################################################################
-  /**Returns the evaluation of grad-shape function i at the supplied point.*/
-  chi_mesh::Vector3 GradShapeValue(const int i, const chi_mesh::Vector3& xyz) override
-  {
-    if (i==0)
-      return chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
-    else
-      return chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
-  }
-
-  //###################################################################
-  /**Populates shape_values with the value of each shape function's
-   * value evaluate at the supplied point.*/
+                   std::vector<double>& shape_values) override;
   void GradShapeValues(const chi_mesh::Vector3& xyz,
-                       std::vector<chi_mesh::Vector3>& gradshape_values) override
-  {
-    gradshape_values.clear();
-    gradshape_values.emplace_back(GradShapeValue(0,xyz));
-    gradshape_values.emplace_back(GradShapeValue(1,xyz));
-  }
+                       std::vector<chi_mesh::Vector3>& gradshape_values) override;
 
   void PreComputeValues() override;
 };

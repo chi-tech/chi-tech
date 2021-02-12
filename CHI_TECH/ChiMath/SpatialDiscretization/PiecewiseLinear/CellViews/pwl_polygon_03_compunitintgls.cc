@@ -1,105 +1,13 @@
 #include "pwl_polygon.h"
 
-#define ON_SURFACE true
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Varphi_x
-/**Precomputation of the shape function at a quadrature point.*/
-double PolygonPWLFEValues::SideShape(int side, int i, int qpoint_index, bool on_surface)
-{
-  double xi  = 0.0;
-  double eta = 0.0;
-  if (!on_surface)
-  {
-    auto& qpoint = default_volume_quadrature.qpoints.at(qpoint_index);
-
-    xi = qpoint.x;
-    eta= qpoint.y;
-  }
-  else
-  {
-    xi = 0.5*(default_surface_quadrature.abscissae[qpoint_index] + 1.0);
-    eta = 0.0;
-  }
-
-
-  int index = node_to_side_map[i][side];
-  double value = 0;
-  if (index==0)
-  {
-    value = 1.0 - xi - eta;
-  }
-  if (index==1)
-  {
-    value = xi;
-  }
-
-  value += beta*eta;
-
-  return value;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_x
-/**Precomputation of the partial derivative along x of the
- * shape function at a quadrature point.*/
-double PolygonPWLFEValues::SideGradShape_x(int side, int i)
-{
-  int index = node_to_side_map[i][side];
-  double value = 0;
-  if (index==0)
-  {
-
-    value = sides[side].JTinv.GetIJ(0, 0) * -1.0 +
-            sides[side].JTinv.GetIJ(0, 1) * -1.0;
-  }
-  if (index==1)
-  {
-
-    value = sides[side].JTinv.GetIJ(0, 0) * 1.0 +
-            sides[side].JTinv.GetIJ(0, 1) * 0.0;
-  }
-
-  value += beta*(sides[side].JTinv.GetIJ(0, 0) * 0.0 +
-                 sides[side].JTinv.GetIJ(0, 1) * 1.0);
-
-
-  return value;
-}
-
-//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_y
-/**Precomputation of the partial derivative along y of the
- * shape function at a quadrature point.*/
-double PolygonPWLFEValues::SideGradShape_y(int side, int i)
-{
-  int index = node_to_side_map[i][side];
-  double value = 0;
-  if (index==0)
-  {
-
-    value = sides[side].JTinv.GetIJ(1, 0) * -1.0 +
-            sides[side].JTinv.GetIJ(1, 1) * -1.0;
-  }
-  if (index==1)
-  {
-
-    value = sides[side].JTinv.GetIJ(1, 0) * 1.0 +
-            sides[side].JTinv.GetIJ(1, 1) * 0.0;
-  }
-
-  value += beta*(sides[side].JTinv.GetIJ(1, 0) * 0.0 +
-                 sides[side].JTinv.GetIJ(1, 1) * 1.0);
-
-
-  return value;
-}
-
-
 //###################################################################
-/**Precomputes integrals of the shape functions.*/
-void PolygonPWLFEValues::PreComputeValues()
+/**Computes cell volume and surface integrals.*/
+void PolygonPWLFEValues::ComputeUnitIntegrals()
 {
-  if (precomputed)
-    return;
+  const bool ON_SURFACE = true;
+  if (precomputed) return;
 
-  // ==================================================== Precompute elements
+  //============================================= Precompute elements
   for (int s=0; s<num_of_subtris; s++)
   {
     for (int i=0; i<dofs; i++)
@@ -313,5 +221,16 @@ void PolygonPWLFEValues::PreComputeValues()
     }
   }
 
+  //============================================= Cleanup
+  for (auto& side : sides)
+    side.qp_data = std::vector<FEqp_data2d>(0);
+
   precomputed = true;
+}
+
+//###################################################################
+/**Precomputes integrals of the shape functions.*/
+void PolygonPWLFEValues::PreComputeValues()
+{
+  ComputeUnitIntegrals();
 }

@@ -71,6 +71,18 @@ public:
                      chi_mesh::MeshContinuumPtr vol_continuum,
                      SpatialDiscretization_PWL *discretization);
 
+  void ComputeUnitIntegrals();
+
+  //################################################## Define standard
+  //                                                   triangle linear shape
+  //                                                   functions
+  double TriShape(int index, int qpoint_index, bool on_surface = false);
+
+  //############################################### Shape functions per side
+  double SideShape(int side, int i, int qpoint_index, bool on_surface = false);
+  double SideGradShape_x(int side, int i);
+  double SideGradShape_y(int side, int i);
+
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
   chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
 
@@ -80,12 +92,6 @@ public:
 
   void GradShapeValues(const chi_mesh::Vector3& xyz,
                        std::vector<chi_mesh::Vector3>& gradshape_values) override;
-
-
-  //############################################### Precomputation cell matrices
-  double SideShape(int side, int i, int qpoint_index, bool on_surface = false);
-  double SideGradShape_x(int side, int i);
-  double SideGradShape_y(int side, int i);
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Determinant J
   double DetJ(int s, int qpoint_index, bool on_surface=false)

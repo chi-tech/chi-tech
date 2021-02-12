@@ -3,6 +3,10 @@
 
 #include <ChiMesh/chi_mesh.h>
 
+#define PWL_CELL_THROW_QP_UNINIT throw std::invalid_argument(\
+                                       "InternalQuadraturePointData called "\
+                                       "without being initialized.")
+
 //###################################################################
 /** Base class for all cell FE views.*/
 class CellPWLFEValues
@@ -23,9 +27,57 @@ public:
 
   bool precomputed = false;   ///< Are the integrals computed.
 
-protected:
-  std::vector<std::vector<double>>            shape_value;
-  std::vector<std::vector<chi_mesh::Vector3>> shape_grad;
+public:
+  typedef std::vector<double> VecDbl;
+  typedef std::vector<chi_mesh::Vector3> VecVec3;
+
+  class InternalQuadraturePointData
+  {
+    friend class SlabPWLFEView;
+    friend class PolygonPWLFEValues;
+    friend class PolyhedronPWLFEValues;
+  public:
+    std::vector<unsigned int> quadrature_point_indices; ///< qp only
+  protected:
+    std::vector<VecDbl>       m_shape_value;              ///< Node i, then qp
+    std::vector<VecVec3>      m_shape_grad;               ///< Node i, then qp
+    VecDbl                    m_JxW;                      ///< Node i, then qp
+    bool                      initialized=false;
+
+  public:
+    double shape_value(unsigned int i, unsigned int qp) const
+    {
+      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      auto& qp_data = m_shape_value.at(i);
+      return qp_data.at(qp);
+    }
+    chi_mesh::Vector3 shape_grad(unsigned int i, unsigned int qp) const
+    {
+      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      auto& qp_data = m_shape_grad.at(i);
+      return qp_data.at(qp);
+    }
+    double JxW(unsigned int qp) const
+    {
+      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      return m_JxW.at(qp);
+    }
+  }internal_qp_data;
+
+  class FaceQuadraturePointData : InternalQuadraturePointData
+  {
+    friend class SlabPWLFEView;
+    friend class PolygonPWLFEValues;
+    friend class PolyhedronPWLFEValues;
+  public:
+    VecVec3                   m_normals;                  ///< node i, then qp
+    double normal(unsigned int qp) const
+    {
+      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      return m_JxW.at(qp);
+    }
+  };
+  std::vector<FaceQuadraturePointData> surface_qp_data;
 
 public:
   explicit CellPWLFEValues(int num_dofs) :

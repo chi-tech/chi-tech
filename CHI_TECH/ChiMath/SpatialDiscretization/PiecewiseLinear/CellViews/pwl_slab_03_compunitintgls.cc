@@ -1,6 +1,7 @@
 #include "pwl_slab.h"
 
-/***/
+//###################################################################
+/**Computes cell volume and surface integrals.*/
 void SlabPWLFEView::ComputeUnitIntegrals()
 {
   //gradShapeI_gradShapeJ

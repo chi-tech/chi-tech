@@ -1,14 +1,13 @@
 #include "pwl_polyhedron.h"
 
-/**Precomputes cell volume and surface integrals.*/
-void PolyhedronPWLFEValues::PreComputeValues()
+//###################################################################
+/**Computes cell volume and surface integrals.*/
+void PolyhedronPWLFEValues::ComputeUnitIntegrals()
 {
-  // ==================================================== Precompute elements
-  // Precomputing the values of shape functions and
-  // derivatives of shape functions at quadrature points
-  // for each tetrahedron
-  if (precomputed){return; }
+  const bool ON_SURFACE = true;
+  if (precomputed) return;
 
+  //============================================= Precompute elements
   for (size_t f=0; f < face_data.size(); f++)
   {
     for (size_t s=0; s < face_data[f].sides.size(); s++)
@@ -51,7 +50,7 @@ void PolyhedronPWLFEValues::PreComputeValues()
   //============================================= Lambdas for accessing data
   /**Determinant evaluated at quadrature point*/
   auto DetJ = [this](int face_index, int side_index,
-              int qpoint_index, bool on_surface=false)
+                     int qpoint_index, bool on_surface=false)
   {
     if (on_surface)
       return (face_data[face_index].sides[side_index].detJ_surf);
@@ -257,5 +256,17 @@ void PolyhedronPWLFEValues::PreComputeValues()
     }
   }
 
+  //============================================= Cleanup
+  for (auto& face : face_data)
+    for (auto& side : face.sides)
+      side.qp_data = std::vector<FEqp_data3d>(0);
+
   precomputed = true;
+}
+
+/**Precomputes cell volume and surface integrals.*/
+void PolyhedronPWLFEValues::PreComputeValues()
+{
+  ComputeUnitIntegrals();
+  InitializeQuadraturePointData();
 }

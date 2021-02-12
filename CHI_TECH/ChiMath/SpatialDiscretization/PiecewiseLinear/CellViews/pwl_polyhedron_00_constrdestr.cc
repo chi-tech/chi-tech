@@ -38,6 +38,9 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
   {
     chi_mesh::CellFace& face = polyh_cell->faces[f];
     FEface_data face_f_data;
+
+    face_f_data.normal = face.normal;
+
     face_betaf.push_back(1.0/face.vertex_ids.size());
 
     chi_mesh::Vertex& vfc = face.centroid;
