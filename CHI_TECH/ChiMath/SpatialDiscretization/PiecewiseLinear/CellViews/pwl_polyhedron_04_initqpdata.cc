@@ -5,7 +5,7 @@ void PolyhedronPWLFEValues::InitializeQuadraturePointData()
   auto& vol_quadrature = default_volume_quadrature;
   auto& srf_quadrature = default_surface_quadrature;
 
-  //=================================== Counting number of tets
+  //=================================== Determine number of internal qpoints
   size_t num_tets=0;
   for (auto& face : face_data)
     for (auto& side : face.sides)
@@ -37,9 +37,9 @@ void PolyhedronPWLFEValues::InitializeQuadraturePointData()
         for (size_t qp=0; qp<num_vol_qpoints; ++qp)
         {
           node_shape_value.push_back(FaceSideShape(f,s,i,qp));
-          node_shape_grad.emplace_back(FaceSideGradShape_x(f,s,i),
-                                       FaceSideGradShape_y(f,s,i),
-                                       FaceSideGradShape_z(f,s,i));
+          node_shape_grad.emplace_back(FaceSideGradShape_x(f,s,i),   //x
+                                       FaceSideGradShape_y(f,s,i),   //y
+                                       FaceSideGradShape_z(f,s,i));  //z
         }//for qp
       } //for side
     } //for face
@@ -97,9 +97,9 @@ void PolyhedronPWLFEValues::InitializeQuadraturePointData()
         for (size_t qp=0; qp<num_srf_qpoints; ++qp)
         {
           node_shape_value.push_back(FaceSideShape(f,s,i,qp,true));
-          node_shape_grad.emplace_back(FaceSideGradShape_x(f,s,i),
-                                       FaceSideGradShape_y(f,s,i),
-                                       FaceSideGradShape_z(f,s,i));
+          node_shape_grad.emplace_back(FaceSideGradShape_x(f,s,i),  //x
+                                       FaceSideGradShape_y(f,s,i),  //y
+                                       FaceSideGradShape_z(f,s,i)); //z
         }//for qp
       }//for s
       face_qp_data.m_shape_value.push_back(node_shape_value);

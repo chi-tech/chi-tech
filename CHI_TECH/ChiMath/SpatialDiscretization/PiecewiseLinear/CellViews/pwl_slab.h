@@ -13,6 +13,7 @@ private:
   chi_mesh::MeshContinuumPtr grid;
   int v0i;
   int v1i;
+  std::array<chi_mesh::Normal,2> normals;
   chi_math::QuadratureGaussLegendre default_volume_quadrature;
 public:
   double h;
@@ -36,14 +37,19 @@ public:
     face_dof_mappings.emplace_back(1,0);
     face_dof_mappings.emplace_back(1,1);
 
+    normals[0] = slab_cell->faces[0].normal;
+    normals[1] = slab_cell->faces[1].normal;
   }
 
   void ComputeUnitIntegrals();
+  void InitializeQuadraturePointData();
 
   //################################################## Define standard
   //                                                   slab linear shape
   //                                                   functions
   double SlabShape(int index, int qpoint_index, bool on_surface=false);
+  double SlabGradShape(int index);
+
 
   //############################################### Actual shape functions
   //                                                as function of cartesian

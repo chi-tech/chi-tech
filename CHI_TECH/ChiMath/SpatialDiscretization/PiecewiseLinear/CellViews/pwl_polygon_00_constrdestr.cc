@@ -60,6 +60,9 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
     triangle_data.JTinv.SetIJ(1,1, sidev01.x/sidedetJ);
     triangle_data.JTinv.SetIJ(2,2,0.0);
 
+    //Set face normal
+    triangle_data.normal = face.normal;
+
     sides.push_back(triangle_data);
   }
 

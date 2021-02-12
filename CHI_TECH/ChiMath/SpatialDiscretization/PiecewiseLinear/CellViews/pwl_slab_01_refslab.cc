@@ -17,3 +17,15 @@ double SlabPWLFEView::SlabShape(int index, int qpoint_index, bool on_surface)
 
   return value;
 }
+
+double SlabPWLFEView::SlabGradShape(int index)
+{
+  double value = 0.0;
+
+  if (index == 0)
+    value = -1.0/h;
+  else
+    value =  1.0/h;
+
+  return value;
+}

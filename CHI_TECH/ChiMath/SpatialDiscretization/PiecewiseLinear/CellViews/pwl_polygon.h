@@ -24,6 +24,7 @@ struct FEside_data2d
   chi_mesh::Matrix3x3 Jinv;
   chi_mesh::Matrix3x3 JTinv;
   std::vector<FEqp_data2d> qp_data;
+  chi_mesh::Vector3 normal;
 };
 
 //###################################################################
@@ -72,6 +73,7 @@ public:
                      SpatialDiscretization_PWL *discretization);
 
   void ComputeUnitIntegrals();
+  void InitializeQuadraturePointData();
 
   //################################################## Define standard
   //                                                   triangle linear shape

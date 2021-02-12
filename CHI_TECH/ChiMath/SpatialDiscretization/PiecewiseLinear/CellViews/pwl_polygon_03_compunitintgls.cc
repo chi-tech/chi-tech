@@ -233,4 +233,5 @@ void PolygonPWLFEValues::ComputeUnitIntegrals()
 void PolygonPWLFEValues::PreComputeValues()
 {
   ComputeUnitIntegrals();
+  InitializeQuadraturePointData();
 }

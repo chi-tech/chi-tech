@@ -93,4 +93,5 @@ void SlabPWLFEView::ComputeUnitIntegrals()
 void SlabPWLFEView::PreComputeValues()
 {
   ComputeUnitIntegrals();
+  InitializeQuadraturePointData();
 }
