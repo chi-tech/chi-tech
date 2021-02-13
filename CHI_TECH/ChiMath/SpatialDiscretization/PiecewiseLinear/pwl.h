@@ -3,7 +3,7 @@
 
 #include "CellViews/pwl_cellbase.h"
 
-#include "ChiMesh/Region/chi_region.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/Quadratures/quadrature_gausslegendre.h"
@@ -27,9 +27,6 @@ public:
   chi_math::QuadratureGaussLegendre line_quad_order_second;
   chi_math::QuadratureTriangle      tri_quad_order_second;
   chi_math::QuadratureTetrahedron   tet_quad_order_second;
-
-  chi_math::QuadratureTriangle    tri_quad_deg3_surf;
-  chi_math::QuadratureTetrahedron tet_quad_order2_surface;
 
 private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
@@ -68,7 +65,7 @@ public:
   void BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                                 std::vector<int>& nodal_nnz_in_diag,
                                 std::vector<int>& nodal_nnz_off_diag,
-                                chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                                chi_math::UnknownManager* unknown_manager=nullptr);
 
   //04
   std::pair<int,int> OrderNodesDFEM(chi_mesh::MeshContinuumPtr grid);
@@ -81,14 +78,14 @@ public:
   void BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                                 std::vector<int>& nodal_nnz_in_diag,
                                 std::vector<int>& nodal_nnz_off_diag,
-                                chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                                chi_math::UnknownManager* unknown_manager=nullptr);
   chi_mesh::Cell* MapNeighborCell(int cell_glob_index);
   CellPWLFEValues* MapNeighborCellFeView(int cell_glob_index);
 
   //06a Mappings
   int MapCFEMDOF(int vertex_id);
   int MapCFEMDOF(int vertex_id,
-                 chi_math::NodalVariableStructure* unknown_manager,
+                 chi_math::UnknownManager* unknown_manager,
                  unsigned int unknown_id,
                  unsigned int component=0);
 
@@ -100,30 +97,30 @@ public:
                       int component_block_offset=1);
 
   int MapDFEMDOF(chi_mesh::Cell* cell, int node,
-                 chi_math::NodalVariableStructure* unknown_manager,
+                 chi_math::UnknownManager* unknown_manager,
                  unsigned int unknown_id,
                  unsigned int component=0);
   int MapDFEMDOFLocal(chi_mesh::Cell* cell, int node,
-                      chi_math::NodalVariableStructure* unknown_manager,
+                      chi_math::UnknownManager* unknown_manager,
                       unsigned int unknown_id,
                       unsigned int component=0);
 
 
   //06b utils
   unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                               chi_math::UnknownManager* unknown_manager=nullptr);
   unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                                chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                                chi_math::UnknownManager* unknown_manager=nullptr);
   unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::NodalVariableStructure* unknown_manager);
+                               chi_math::UnknownManager* unknown_manager);
 
   std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-                                      chi_math::NodalVariableStructure* unknown_manager,
+                                      chi_math::UnknownManager* unknown_manager,
                                       unsigned int unknown_id=0);
 
   void LocalizePETScVector(Vec petsc_vector,
                            std::vector<double>& local_vector,
-                           chi_math::NodalVariableStructure* unknown_manager)
+                           chi_math::UnknownManager* unknown_manager)
                            override;
 };
 

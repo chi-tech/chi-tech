@@ -4,7 +4,7 @@
 #include "../chi_physics_namespace.h"
 #include "../../ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/NodalVariableStructure/nodal_variable_structure.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
 
 #include <petscksp.h>
 
@@ -31,7 +31,7 @@ public:
   std::string               text_name;
   chi_mesh::MeshContinuumPtr  grid;
   std::shared_ptr<SpatialDiscretization> spatial_discretization;
-  chi_math::NodalVariableStructure  unknown_manager;
+  chi_math::UnknownManager  unknown_manager;
   const unsigned int        ref_component;
   const unsigned int        ref_variable;
 
@@ -44,7 +44,7 @@ public:
   FieldFunction(std::string ff_tex_name,
                 std::shared_ptr<SpatialDiscretization> ff_sdm,
                 std::vector<double>* ff_field_vector,
-                chi_math::NodalVariableStructure& ff_unknown_manager,
+                chi_math::UnknownManager& ff_unknown_manager,
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
@@ -62,7 +62,7 @@ public:
   FieldFunction(std::string ff_tex_name,
                 std::shared_ptr<SpatialDiscretization> ff_sdm,
                 Vec* ff_field_vector,
-                chi_math::NodalVariableStructure& ff_unknown_manager,
+                chi_math::UnknownManager& ff_unknown_manager,
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),

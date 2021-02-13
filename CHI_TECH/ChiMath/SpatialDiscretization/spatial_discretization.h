@@ -4,7 +4,7 @@
 #include "ChiMesh/chi_mesh.h"
 #include "../Quadratures/quadrature.h"
 #include "ChiMath/chi_math.h"
-#include "ChiMath/NodalVariableStructure/nodal_variable_structure.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
 
 #include <petscksp.h>
 
@@ -71,7 +71,7 @@ public:
    * method.*/
   virtual void LocalizePETScVector(Vec petsc_vector,
                                    std::vector<double>& local_vector,
-                                   chi_math::NodalVariableStructure* unknown_manager)
+                                   chi_math::UnknownManager* unknown_manager)
   {}
 
 };

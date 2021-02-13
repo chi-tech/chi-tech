@@ -50,7 +50,7 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
                        << t_reorder.GetTime()/1000.0;
 
   //================================================== Initialize unknown manager
-  unknown_manager.AddVariable(chi_math::NodalVariableType::SCALAR);
+  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
 
   //================================================== Initialize field function
   //                                                   if empty

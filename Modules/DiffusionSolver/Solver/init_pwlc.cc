@@ -46,7 +46,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     << domain_ownership.second;
 
   //================================================== Initialize unknown manager
-  unknown_manager.AddVariable(chi_math::NodalVariableType::SCALAR);
+  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
 
   //================================================== Initialize field function
   //                                                   if empty

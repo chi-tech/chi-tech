@@ -18,8 +18,8 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
   if (groupset.apply_wgdsa)
   {
     //================================= Initialize unknowns
-    chi_math::NodalVariableStructure scalar_uk_man;
-    scalar_uk_man.AddVariable(chi_math::NodalVariableType::VECTOR_N, groupset.groups.size());
+    chi_math::UnknownManager scalar_uk_man;
+    scalar_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groupset.groups.size());
 
     //================================= Initialize field function
     delta_phi_local.resize(local_dof_count*groupset.groups.size(),0.0);

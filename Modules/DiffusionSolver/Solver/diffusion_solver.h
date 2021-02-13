@@ -84,7 +84,7 @@ public:
   std::shared_ptr<SpatialDiscretization>     discretization;
   std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;
 
-  chi_math::NodalVariableStructure                 unknown_manager;
+  chi_math::UnknownManager                 unknown_manager;
   int                                      fem_method = 0;
 
   int   property_map_D     = 0;

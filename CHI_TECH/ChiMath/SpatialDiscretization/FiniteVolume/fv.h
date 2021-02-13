@@ -3,7 +3,7 @@
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "CellViews/fv_cellbase.h"
-#include "ChiMath/NodalVariableStructure/nodal_variable_structure.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
 
 //###################################################################
 /**Spatial discretizations supporting Finite Volume representations.
@@ -51,37 +51,37 @@ public:
   void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                             std::vector<int>& nodal_nnz_in_diag,
                             std::vector<int>& nodal_nnz_off_diag,
-                            chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                            chi_math::UnknownManager* unknown_manager=nullptr);
 
   //04a mappings
   int MapDOF(chi_mesh::Cell* cell);
   int MapDOFLocal(chi_mesh::Cell* cell);
 
   int MapDOF(chi_mesh::Cell* cell,
-             chi_math::NodalVariableStructure* unknown_manager,
+             chi_math::UnknownManager* unknown_manager,
              unsigned int unknown_id,
              unsigned int component=0);
 
   int MapDOFLocal(chi_mesh::Cell* cell,
-                  chi_math::NodalVariableStructure* unknown_manager,
+                  chi_math::UnknownManager* unknown_manager,
                   unsigned int unknown_id,
                   unsigned int component=0);
 
 
   //04b utils
   unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                               chi_math::UnknownManager* unknown_manager=nullptr);
   unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                                chi_math::NodalVariableStructure* unknown_manager=nullptr);
+                                chi_math::UnknownManager* unknown_manager=nullptr);
   unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::NodalVariableStructure* unknown_manager);
+                               chi_math::UnknownManager* unknown_manager);
 
   std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-                                      chi_math::NodalVariableStructure* unknown_manager,
+                                      chi_math::UnknownManager* unknown_manager,
                                       unsigned int unknown_id=0);
   void LocalizePETScVector(Vec petsc_vector,
                            std::vector<double>& local_vector,
-                           chi_math::NodalVariableStructure* unknown_manager)
+                           chi_math::UnknownManager* unknown_manager)
                            override;
 };
 

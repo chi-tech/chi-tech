@@ -58,7 +58,7 @@ void ChiTech::ParseArguments(int argc, char** argv)
         << "\nUsage: exe inputfile [options values]\n"
         << "\n"
         << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
-        << "     a=b                        Executes argument as a lua string.\n"
+        << "     a=b                        Executes argument as a lua string. i.e. x=2 or y=[[\"string\"]]\n"
         << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
       chi_log.Log(LOG_0) << "PETSc options:";
@@ -196,7 +196,7 @@ int ChiTech::RunBatch(int argc, char** argv)
       << "\nUsage: exe inputfile [options values]\n"
       << "\n"
       << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
-      << "     a=b                        Executes argument as a lua string.\n"
+      << "     a=b                        Executes argument as a lua string. i.e. x=2 or y=[[\"string\"]]\n"
       << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
   chi_console.FlushConsole();

@@ -165,7 +165,7 @@ void chi_physics::FieldFunction::
       int ref_unknown = ff->ref_variable;
       const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
 
-      if (unknown.type == chi_math::NodalVariableType::SCALAR)
+      if (unknown.type == chi_math::UnknownType::SCALAR)
       {
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
         unk_arr->SetName(unknown.text_name.c_str());
@@ -196,11 +196,11 @@ void chi_physics::FieldFunction::
       const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
       unk_number++;
 
-      int N = ff->unknown_manager.GetTotalVariableStructureSize();
+      int N = ff->unknown_manager.GetTotalUnknownStructureSize();
 
-      if (unknown.type == chi_math::NodalVariableType::SCALAR)
+      if (unknown.type == chi_math::UnknownType::SCALAR)
       {
-        int component = ff->unknown_manager.MapVariable(ref_unknown, 0);
+        int component = ff->unknown_manager.MapUnknown(ref_unknown, 0);
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
         if (unknown.text_name == "")
@@ -225,11 +225,11 @@ void chi_physics::FieldFunction::
 
         ugrid->GetPointData()->AddArray(unk_arr);
       }//scalar
-      if (unknown.type == chi_math::NodalVariableType::VECTOR_N)
+      if (unknown.type == chi_math::UnknownType::VECTOR_N)
       {
         for (int comp=0; comp<unknown.num_components; ++comp)
         {
-          int component = ff->unknown_manager.MapVariable(ref_unknown, comp);
+          int component = ff->unknown_manager.MapUnknown(ref_unknown, comp);
 
           auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
           if (unknown.component_text_names[comp]=="")

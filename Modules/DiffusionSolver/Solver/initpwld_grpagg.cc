@@ -39,7 +39,7 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
                        << t_reorder.GetTime()/1000.0;
 
   //================================================== Initialize unknown manager
-  unknown_manager.AddVariable(chi_math::NodalVariableType::VECTOR_N, G);
+  unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
 
   //================================================== Initialize field function
   //                                                   if empty
