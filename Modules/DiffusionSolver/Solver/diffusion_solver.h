@@ -14,6 +14,7 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwlc.h"
 
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
@@ -82,7 +83,7 @@ public:
   chi_mesh::MeshContinuumPtr                 grid = nullptr;
 
   std::shared_ptr<SpatialDiscretization>     discretization;
-  std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;
+//  std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;
 
   chi_math::UnknownManager                 unknown_manager;
   int                                      fem_method = 0;

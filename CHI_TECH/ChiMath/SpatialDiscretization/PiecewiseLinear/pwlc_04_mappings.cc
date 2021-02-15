@@ -1,4 +1,4 @@
-#include "pwl.h"
+#include "pwlc.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -8,7 +8,7 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int SpatialDiscretization_PWL::MapCFEMDOF(int vertex_id)
+int SpatialDiscretization_PWLC::MapDOF(int vertex_id)
 {
   if (node_mapping.empty())
     return vertex_id;
@@ -18,11 +18,11 @@ int SpatialDiscretization_PWL::MapCFEMDOF(int vertex_id)
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int SpatialDiscretization_PWL::
-  MapCFEMDOF(int vertex_id,
-             chi_math::UnknownManager* unknown_manager,
-             unsigned int unknown_id,
-             unsigned int component)
+int SpatialDiscretization_PWLC::
+MapDOF(int vertex_id,
+       chi_math::UnknownManager* unknown_manager,
+       unsigned int unknown_id,
+       unsigned int component)
 {
   if (component < 0) return -1;
 

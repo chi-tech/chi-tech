@@ -1,4 +1,4 @@
-#include "pwl.h"
+#include "pwlc.h"
 
 #include "ChiTimer/chi_timer.h"
 
@@ -13,8 +13,8 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-std::pair<int,int> SpatialDiscretization_PWL::
-  OrderNodesCFEM(chi_mesh::MeshContinuumPtr grid)
+std::pair<int,int> SpatialDiscretization_PWLC::
+OrderNodes(chi_mesh::MeshContinuumPtr grid)
 {
   ChiTimer t_stage[6];
 
@@ -106,7 +106,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
              nonexclus_nodes.size(),
              MPI_INT,1,123,MPI_COMM_WORLD);
   }
-  // Location n=1..(N-1) first receives n-1
+    // Location n=1..(N-1) first receives n-1
   else
   {
     std::vector<int> upstream_nonex;
@@ -139,8 +139,8 @@ std::pair<int,int> SpatialDiscretization_PWL::
       MPI_Send(upstream_nonex.data(),upstream_nonex.size(),
                MPI_INT,chi_mpi.location_id+1,123,MPI_COMM_WORLD);
     }
-    // On the last location send the completed
-    // upstream_nonex back to all other locations
+      // On the last location send the completed
+      // upstream_nonex back to all other locations
     else
     {
       chi_log.Log(LOG_ALLVERBOSE_1)
@@ -349,9 +349,11 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //================================================== Initialize forward
   //                                                   ordering
   //Initially this is just pass through
-  std::vector<int> node_ordering;
-  int num_nodes = grid->vertices.size();
-  node_ordering.resize(num_nodes,-1);
+//  std::vector<int> node_ordering;
+//  int num_nodes = grid->vertices.size();
+//  node_ordering.resize(num_nodes,-1);
+
+  std::map<int,int> node_ordering;
 
 
   //================================================== Creating mapping of
@@ -380,24 +382,32 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //================================================== Push up these mappings
   //                                                   to the mesher
   node_mapping.clear();
-  reverse_node_mapping.clear();
-  node_mapping.reserve(num_nodes);
-  reverse_node_mapping.resize(num_nodes,-1);
-  int temp;
-  for (int i=0; i<num_nodes; i++)
-  {
-    node_mapping.push_back(node_ordering[i]);
-    temp = node_ordering[i];
+//  reverse_node_mapping.clear();
+//  node_mapping.reserve(num_nodes);
+//  reverse_node_mapping.resize(num_nodes,-1);
+//  int temp;
+//  for (int i=0; i<num_nodes; i++)
+//  {
+//    node_mapping.push_back(node_ordering[i]);
+//    temp = node_ordering[i];
+//
+//    if (temp>=0)
+//      reverse_node_mapping[node_ordering[i]] = i;
+//  }
 
-    if (temp>=0)
-      reverse_node_mapping[node_ordering[i]] = i;
+  for (auto& mapping : node_ordering)
+  {
+    node_mapping.insert(mapping);
+//    reverse_node_mapping.insert(std::pair<int,int>(
+//      mapping.second,
+//      mapping.first));
   }
 
   chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stages complete time: "
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
-  cfem_local_block_address = local_from;
+  local_block_address = local_from;
 
   local_base_block_size = local_to - local_from + 1;
   globl_base_block_size = grid->vertices.size();
@@ -405,7 +415,7 @@ std::pair<int,int> SpatialDiscretization_PWL::
   //======================================== Collect block addresses
   locJ_block_address.clear();
   locJ_block_address.resize(chi_mpi.process_count, 0);
-  MPI_Allgather(&cfem_local_block_address,    //send buf
+  MPI_Allgather(&local_block_address,    //send buf
                 1,                            //send count
                 MPI_INT,                      //send type
                 locJ_block_address.data(),    //recv buf

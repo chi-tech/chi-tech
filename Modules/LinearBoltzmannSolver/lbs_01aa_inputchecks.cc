@@ -32,7 +32,7 @@ void LinearBoltzmann::Solver::PerformInputChecks()
     }
     ++grpset_counter;
   }
-  if (discretization == nullptr)
+  if (options.sd_type == chi_math::SpatialDiscretizationType::UNDEFINED)
   {
     chi_log.Log(LOG_ALLERROR)
       << "LinearBoltzmann::Solver: No discretization method set.";

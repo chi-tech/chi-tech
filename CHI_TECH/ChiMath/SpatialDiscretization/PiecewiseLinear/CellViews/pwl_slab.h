@@ -10,7 +10,7 @@
 class SlabPWLFEView : public CellPWLFEValues
 {
 private:
-  chi_mesh::MeshContinuumPtr grid;
+//  chi_mesh::MeshContinuumPtr grid;
   int v0i;
   int v1i;
   std::array<chi_mesh::Normal,2> normals;
@@ -21,11 +21,12 @@ public:
 
   /**Constructor for a slab view.*/
   SlabPWLFEView(chi_mesh::CellSlab *slab_cell,
-                chi_mesh::MeshContinuumPtr& in_grid) :
-    CellPWLFEValues(2),
-    default_volume_quadrature(chi_math::QuadratureGaussLegendre(chi_math::QuadratureOrder::SECOND))
+                chi_mesh::MeshContinuumPtr& ref_grid,
+                chi_math::QuadratureGaussLegendre& minumum_volume_quadrature) :
+    CellPWLFEValues(2,ref_grid),
+    default_volume_quadrature(minumum_volume_quadrature)
   {
-    grid = in_grid;
+    grid = ref_grid;
     v0i = slab_cell->vertex_ids[0];
     v1i = slab_cell->vertex_ids[1];
     chi_mesh::Vertex v0 = *grid->vertices[v0i];

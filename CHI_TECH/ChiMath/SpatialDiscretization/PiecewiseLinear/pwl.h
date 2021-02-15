@@ -1,5 +1,5 @@
-#ifndef CHI_DISCRETIZATION_PWL_H
-#define CHI_DISCRETIZATION_PWL_H
+#ifndef SPATIAL_DISCRETIZATION_PWLD_H
+#define SPATIAL_DISCRETIZATION_PWLD_H
 
 #include "CellViews/pwl_cellbase.h"
 
@@ -28,95 +28,72 @@ public:
   chi_math::QuadratureTriangle      tri_quad_order_second;
   chi_math::QuadratureTetrahedron   tet_quad_order_second;
 
+//  std::map<int,int> node_mapping;
+
+  int              local_block_address = 0;
+  std::vector<int> cell_local_block_address;
+  std::vector<std::pair<int,int>> neighbor_cell_block_address;
+
+//  std::vector<int> locJ_block_address;
+  std::vector<int> locJ_block_size;
+
+  unsigned int local_base_block_size=0;
+  unsigned int globl_base_block_size=0;
+
 private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
   std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
 
-  typedef chi_math::SpatialDiscretizationType SDMType;
-
 private:
   //00
   explicit
-  SpatialDiscretization_PWL(int dim=0, SDMType sd_method =
-                                       SDMType::PIECEWISE_LINEAR_DISCONTINUOUS);
+  SpatialDiscretization_PWL(chi_mesh::MeshContinuumPtr in_grid);
 
 public:
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_PWL>
-  New(int in_dim=0, SDMType in_sd_method =
-                    SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
+  New(chi_mesh::MeshContinuumPtr in_grid)
   { return std::shared_ptr<SpatialDiscretization_PWL>(
-    new SpatialDiscretization_PWL(in_dim, in_sd_method));}
+    new SpatialDiscretization_PWL(in_grid));}
 
   //01
   void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) override;
-  void AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid);
+  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
   CellPWLFEValues* MapFeViewL(int cell_local_index);
 
   //02
-  std::pair<int,int> OrderNodesCFEM(chi_mesh::MeshContinuumPtr grid);
+  std::pair<int,int> OrderNodes(chi_mesh::MeshContinuumPtr grid);
 
   //03
-  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                                std::vector<int>& nodal_nnz_in_diag,
-                                std::vector<int>& nodal_nnz_off_diag,
-                                const std::pair<int,int>& domain_ownership);
-  void BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                                std::vector<int>& nodal_nnz_in_diag,
-                                std::vector<int>& nodal_nnz_off_diag,
-                                chi_math::UnknownManager* unknown_manager=nullptr);
-
-  //04
-  std::pair<int,int> OrderNodesDFEM(chi_mesh::MeshContinuumPtr grid);
-
-  //05
-  void BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                                std::vector<int>& nodal_nnz_in_diag,
-                                std::vector<int>& nodal_nnz_off_diag,
-                                const std::pair<int,int>& domain_ownership);
-  void BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                                std::vector<int>& nodal_nnz_in_diag,
-                                std::vector<int>& nodal_nnz_off_diag,
-                                chi_math::UnknownManager* unknown_manager=nullptr);
+  void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
+                            std::vector<int>& nodal_nnz_in_diag,
+                            std::vector<int>& nodal_nnz_off_diag,
+                            chi_math::UnknownManager* unknown_manager= nullptr);
   chi_mesh::Cell* MapNeighborCell(int cell_glob_index);
   CellPWLFEValues* MapNeighborCellFeView(int cell_glob_index);
 
-  //06a Mappings
-  int MapCFEMDOF(int vertex_id);
-  int MapCFEMDOF(int vertex_id,
-                 chi_math::UnknownManager* unknown_manager,
-                 unsigned int unknown_id,
-                 unsigned int component=0);
+  //04
+  int MapDOF(chi_mesh::Cell* cell, int node,
+             chi_math::UnknownManager* unknown_manager,
+             unsigned int unknown_id,
+             unsigned int component= 0);
+  int MapDOFLocal(chi_mesh::Cell* cell, int node,
+                  chi_math::UnknownManager* unknown_manager,
+                  unsigned int unknown_id,
+                  unsigned int component= 0);
 
-  int MapDFEMDOF(chi_mesh::Cell* cell, int dof,
-                 int component=0,
-                 int component_block_offset=1);
-  int MapDFEMDOFLocal(chi_mesh::Cell* cell, int dof,
-                      int component=0,
-                      int component_block_offset=1);
-
-  int MapDFEMDOF(chi_mesh::Cell* cell, int node,
-                 chi_math::UnknownManager* unknown_manager,
-                 unsigned int unknown_id,
-                 unsigned int component=0);
-  int MapDFEMDOFLocal(chi_mesh::Cell* cell, int node,
-                      chi_math::UnknownManager* unknown_manager,
-                      unsigned int unknown_id,
-                      unsigned int component=0);
-
-
-  //06b utils
+  //05
   unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                                chi_math::UnknownManager* unknown_manager=nullptr);
   unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                                 chi_math::UnknownManager* unknown_manager=nullptr);
-  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::UnknownManager* unknown_manager);
-
-  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-                                      chi_math::UnknownManager* unknown_manager,
-                                      unsigned int unknown_id=0);
+//  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
+//                               chi_math::UnknownManager* unknown_manager);
+//
+//  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
+//                                      chi_math::UnknownManager* unknown_manager,
+//                                      unsigned int unknown_id=0);
 
   void LocalizePETScVector(Vec petsc_vector,
                            std::vector<double>& local_vector,
@@ -124,4 +101,4 @@ public:
                            override;
 };
 
-#endif
+#endif //SPATIAL_DISCRETIZATION_PWLD_H

@@ -12,7 +12,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Develops node ordering per location.*/
 void SpatialDiscretization_FV::
-  ReOrderNodes(chi_mesh::MeshContinuumPtr grid)
+  OrderNodes(chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_ALLVERBOSE_1) << "FV discretization - Reordering nodes.";
 

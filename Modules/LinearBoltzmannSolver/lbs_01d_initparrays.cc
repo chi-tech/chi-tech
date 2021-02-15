@@ -51,12 +51,12 @@ void LinearBoltzmann::Solver::InitializeParrays()
     std::dynamic_pointer_cast<SpatialDiscretization_PWL>(discretization);
 
   //================================================== Compute local # of dof
-  auto domain_ownership = pwl_discretization->OrderNodesDFEM(grid);
+  auto domain_ownership = pwl_discretization->OrderNodes(grid);
 
   local_dof_count = domain_ownership.first;
   glob_dof_count  = domain_ownership.second;
 
-  local_cell_dof_array_address = pwl_discretization->cell_dfem_block_address;
+  local_cell_dof_array_address = pwl_discretization->cell_local_block_address;
 
   //================================================== Compute num of unknowns
   int num_grps = groups.size();

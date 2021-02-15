@@ -1,4 +1,4 @@
-#include "pwl.h"
+#include "pwlc.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -10,16 +10,16 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/
-void SpatialDiscretization_PWL::
-  BuildCFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                           std::vector<int> &nodal_nnz_in_diag,
-                           std::vector<int> &nodal_nnz_off_diag,
-                           chi_math::UnknownManager* unknown_manager)
+void SpatialDiscretization_PWLC::
+BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
+                     std::vector<int> &nodal_nnz_in_diag,
+                     std::vector<int> &nodal_nnz_off_diag,
+                     chi_math::UnknownManager* unknown_manager)
 {
   //======================================== Determine global domain ownership
   std::vector<int> locI_block_addr(chi_mpi.process_count, 0);
-  MPI_Allgather(&cfem_local_block_address,1,MPI_INT,
-                locI_block_addr.data()   ,1,MPI_INT,
+  MPI_Allgather(&local_block_address, 1, MPI_INT,
+                locI_block_addr.data()   , 1, MPI_INT,
                 MPI_COMM_WORLD);
 
   if (chi_mpi.location_id == 0)
@@ -53,8 +53,8 @@ void SpatialDiscretization_PWL::
   } dof_handler;
 
   //=================================== Set dof handler values
-  dof_handler.local_block_start = cfem_local_block_address;
-  dof_handler.local_block_end   = cfem_local_block_address +
+  dof_handler.local_block_start = local_block_address;
+  dof_handler.local_block_end   = local_block_address +
                                   local_base_block_size;
   dof_handler.locI_block_addr = locI_block_addr;
 
@@ -102,7 +102,7 @@ void SpatialDiscretization_PWL::
   {
     for (auto ivid : cell.vertex_ids)
     {
-      int ir = MapCFEMDOF(ivid); if (ir<0) IR_MAP_ERROR();
+      int ir = MapDOF(ivid); if (ir < 0) IR_MAP_ERROR();
 
       if (dof_handler.IsMapLocal(ir))
       {
@@ -111,7 +111,7 @@ void SpatialDiscretization_PWL::
 
         for (auto& jvid : cell.vertex_ids)
         {
-          int jr = MapCFEMDOF(jvid); if (jr<0) JR_MAP_ERROR();
+          int jr = MapDOF(jvid); if (jr < 0) JR_MAP_ERROR();
 
           if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
 
@@ -142,7 +142,7 @@ void SpatialDiscretization_PWL::
   {
     for (auto ivid : cell.vertex_ids)
     {
-      int ir = MapCFEMDOF(ivid); if (ir<0) IR_MAP_ERROR();
+      int ir = MapDOF(ivid); if (ir < 0) IR_MAP_ERROR();
 
       if (not dof_handler.IsMapLocal(ir))
       {
@@ -162,7 +162,7 @@ void SpatialDiscretization_PWL::
         auto& node_links = cur_ir_link->second;
         for (auto& jvid : cell.vertex_ids)
         {
-          int jr = MapCFEMDOF(jvid); if (jr<0) JR_MAP_ERROR();
+          int jr = MapDOF(jvid); if (jr < 0) JR_MAP_ERROR();
 
           if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
           else

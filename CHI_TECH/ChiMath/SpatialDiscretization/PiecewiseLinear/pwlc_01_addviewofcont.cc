@@ -1,4 +1,4 @@
-#include "pwl.h"
+#include "pwlc.h"
 
 #include "CellViews/pwl_slab.h"
 #include "CellViews/pwl_polygon.h"
@@ -10,7 +10,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_PWL::PreComputeCellSDValues(
+void SpatialDiscretization_PWLC::PreComputeCellSDValues(
   chi_mesh::MeshContinuumPtr grid)
 {
   ref_grid = grid;
@@ -83,7 +83,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the neighboring cells.*/
-void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
+void SpatialDiscretization_PWLC::PreComputeNeighborCellSDValues(
   chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0)
@@ -160,7 +160,7 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-CellPWLFEValues* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
+CellPWLFEValues* SpatialDiscretization_PWLC::MapFeViewL(int cell_local_index)
 {
   CellPWLFEValues* value;
   try { value = cell_fe_views.at(cell_local_index); }

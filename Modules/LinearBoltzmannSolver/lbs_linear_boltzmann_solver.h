@@ -100,6 +100,8 @@ public:
   //01b
   void InitMaterials(std::set<int> &material_ids);
   //01c
+  void InitializeSpatialDiscretization();
+  //01c
   void InitializeBoundaries();
   //01d
   virtual void InitializeParrays();

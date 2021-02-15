@@ -8,26 +8,13 @@ extern ChiLog& chi_log;
  *
  * */
 PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cell,
-                                             chi_mesh::MeshContinuumPtr vol_continuum,
-                                             SpatialDiscretization_PWL *discretization):
-  CellPWLFEValues(polyh_cell->vertex_ids.size()),
-  default_volume_quadrature(discretization->tet_quad_order_second),
-  default_surface_quadrature(discretization->tri_quad_order_second)
+                                             std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
+                                             chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
+                                             chi_math::QuadratureTriangle&    minumum_surface_quadrature):
+  CellPWLFEValues(polyh_cell->vertex_ids.size(),ref_grid),
+  default_volume_quadrature(minumum_volume_quadrature),
+  default_surface_quadrature(minumum_surface_quadrature)
 {
-  grid = vol_continuum;
-  //=========================================== Create quadrature points
-  if (discretization != nullptr)
-  {
-//    quadratures.push_back(discretization->tet_quad_order1);
-//    quadratures.push_back(discretization->tet_quad_order_second);
-//    quadratures.push_back(discretization->tet_quad_order2_surface);
-  } else
-  {
-    throw std::invalid_argument("Pointer to discretization method not "
-                                "set in constructor for PolyhedronPWLFEValues.");
-  }
-
-
   //=========================================== Assign cell centre
   chi_mesh::Vertex& vcc = polyh_cell->centroid;
   alphac = 1.0/polyh_cell->vertex_ids.size();
@@ -61,12 +48,10 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;
 
-      const chi_mesh::Vertex& v0 = *vol_continuum->vertices[v0index];
+      const chi_mesh::Vertex& v0 = *ref_grid->vertices[v0index];
       const chi_mesh::Vertex& v1 = vfc;
-      const chi_mesh::Vertex& v2 = *vol_continuum->vertices[v1index];
+      const chi_mesh::Vertex& v2 = *ref_grid->vertices[v1index];
       const chi_mesh::Vertex& v3 = vcc;
-
-//      side_data.side_centroid = (v0 + v1 + v2 + v3) / 4.0;
 
       //============================= Compute vectors
       chi_mesh::Vector3 v01 = v1 - v0;

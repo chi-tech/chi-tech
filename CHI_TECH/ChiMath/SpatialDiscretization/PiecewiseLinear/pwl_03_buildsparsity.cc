@@ -9,10 +9,10 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Builds the sparsity pattern for a Discontinuous Finite Element Method.*/
 void SpatialDiscretization_PWL::
-  BuildDFEMSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                           std::vector<int> &nodal_nnz_in_diag,
-                           std::vector<int> &nodal_nnz_off_diag,
-                           chi_math::UnknownManager* unknown_manager)
+BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
+                     std::vector<int> &nodal_nnz_in_diag,
+                     std::vector<int> &nodal_nnz_off_diag,
+                     chi_math::UnknownManager* unknown_manager)
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
   int local_dof_count = local_base_block_size;
@@ -31,7 +31,7 @@ void SpatialDiscretization_PWL::
     //==================================== Self connection
     for (int i=0; i<cell_fe_view->dofs; ++i)
     {
-      int ir = cell_dfem_block_address[lc] + i;
+      int ir = cell_local_block_address[lc] + i;
       nodal_nnz_in_diag[ir] += cell_fe_view->dofs;
     }
 
@@ -45,7 +45,7 @@ void SpatialDiscretization_PWL::
 
         for (int i=0; i<cell_fe_view->dofs; ++i)
         {
-          int ir = cell_dfem_block_address[lc] + i;
+          int ir = cell_local_block_address[lc] + i;
           nodal_nnz_in_diag[ir] += adj_cell_fe_view->dofs;
         }
       }
@@ -64,13 +64,13 @@ void SpatialDiscretization_PWL::
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)) )
+      if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
       {
         auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor_id);
 
         for (int i=0; i<cell_fe_view->dofs; ++i)
         {
-          int ir = cell_dfem_block_address[lc] + i;
+          int ir = cell_local_block_address[lc] + i;
           nodal_nnz_off_diag[ir] += adj_cell_fe_view->dofs;
         }
       }
@@ -94,7 +94,7 @@ void SpatialDiscretization_PWL::
   {
     for (auto& face : cell.faces)
     {
-      if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)) )
+      if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)))
       {
         local_neighboring_cell_indices.insert(cell.local_id);
         neighboring_partitions.insert(face.GetNeighborPartitionID(*grid));
@@ -158,7 +158,8 @@ void SpatialDiscretization_PWL::
       std::vector<int>& border_cell_info = new_serial_data.second;
 
       int cell_global_block_address =
-        cell_dfem_block_address[local_cell_index];
+        cell_local_block_address[local_cell_index] +
+        local_block_address;
 
       border_cell_info.push_back(cell.global_id);         //cell_glob_index
       border_cell_info.push_back(cell_global_block_address);   //block address
@@ -277,3 +278,52 @@ void SpatialDiscretization_PWL::
   chi_log.Log(LOG_0) << "Done building DFEM sparsity pattern";
 
 }
+
+//###################################################################
+/**Maps a neigboring cell from a global cell index.*/
+chi_mesh::Cell* SpatialDiscretization_PWL::
+MapNeighborCell(int cell_glob_index)
+{
+  int index=0;
+  for (auto cell : neighbor_cells)
+  {
+    if (cell->global_id == cell_glob_index) break;
+    ++index;
+  }
+
+  if ((index < 0) or (index >= neighbor_cells.size()))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "MapNeighborCellFeView. Make sure a call to "
+      << "AddViewOfNeighborContinuums has been made";
+    exit(EXIT_FAILURE);
+  }
+
+  return neighbor_cells[index];
+}
+
+//###################################################################
+/**Maps a neigboring cell's fe view from a global cell index.*/
+CellPWLFEValues* SpatialDiscretization_PWL::
+  MapNeighborCellFeView(int cell_glob_index)
+{
+  int index=0;
+  for (auto cell : neighbor_cells)
+  {
+    if (cell->global_id == cell_glob_index) break;
+    ++index;
+  }
+
+  if ((index < 0) or (index >= neighbor_cells.size()))
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "MapNeighborCellFeView. Make sure a call to "
+      << "AddViewOfNeighborContinuums has been made";
+    exit(EXIT_FAILURE);
+  }
+
+  return neighbor_cell_fe_views[index];
+}
+
+
+

@@ -1,5 +1,5 @@
-#ifndef CHI_DISCRETIZATION_H
-#define CHI_DISCRETIZATION_H
+#ifndef SPATIAL_DISCRETIZATION_H
+#define SPATIAL_DISCRETIZATION_H
 
 #include "ChiMesh/chi_mesh.h"
 #include "../Quadratures/quadrature.h"
@@ -24,42 +24,15 @@ public:
 
   chi_mesh::MeshContinuumPtr ref_grid;
 
-public:
-  std::vector<int> node_mapping;
-  std::vector<int> reverse_node_mapping;
-  int              fv_local_block_address = 0;
-  int              cfem_local_block_address = 0;
-  int              dfem_local_block_address = 0;
-  std::vector<int> cell_dfem_block_address;
-  std::vector<std::pair<int,int>> neighbor_cell_block_address;
-
 protected:
-  //Pretending that there is only one unknown
-  unsigned int local_base_block_size=0;
-  unsigned int globl_base_block_size=0;
-
-  std::vector<int> locJ_block_address;
-  std::vector<int> locJ_block_size;
-
-public:
-  int              block_size_per_unknown=0;
-
-private:
   typedef chi_math::SpatialDiscretizationType SDMType;
 
 protected:
   //00
-  explicit SpatialDiscretization(int dim, SDMType in_type =
+  explicit SpatialDiscretization(int dim,
+                                 chi_mesh::MeshContinuumPtr in_grid,
+                                 SDMType in_type =
                                           SDMType::UNDEFINED);
-
-public:
-  //prevent anything else other than a shared pointer
-  static
-  std::shared_ptr<SpatialDiscretization>
-  New(int in_dim=0, SDMType in_sd_method =
-                    SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
-  { return std::shared_ptr<SpatialDiscretization>(
-      new SpatialDiscretization(in_dim, in_sd_method));}
 
 public:
   //01

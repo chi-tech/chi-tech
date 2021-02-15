@@ -30,17 +30,18 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
           " Spatial discretization method is not of type "
           "PIECEWISE_LINEAR_DISCONTINUOUS");
 
-  pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
+  auto pwl_sdm =
+    std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   pwl_sdm->PreComputeCellSDValues(grid);
-  pwl_sdm->AddViewOfNeighborContinuums(grid);
+  pwl_sdm->PreComputeNeighborCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-//  ReorderNodesPWLD();
-  auto domain_ownership = pwl_sdm->OrderNodesDFEM(grid);
+
+  auto domain_ownership = pwl_sdm->OrderNodes(grid);
   local_dof_count = domain_ownership.first;
   global_dof_count   = domain_ownership.second;
 
@@ -82,19 +83,9 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
 
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-//  PWLDBuildSparsityPattern();
-  pwl_sdm->BuildDFEMSparsityPattern(grid,
-                                    nodal_nnz_in_diag,
-                                    nodal_nnz_off_diag,
-                                    domain_ownership);
-
-    auto nodal_var_strct = &unknown_manager;
-
-  pwl_sdm->BuildDFEMSparsityPattern(grid,
-                                    nodal_nnz_in_diag,
-                                    nodal_nnz_off_diag,
-                                    nodal_var_strct);
-
+  pwl_sdm->BuildSparsityPattern(grid,
+                                nodal_nnz_in_diag,
+                                nodal_nnz_off_diag);
 
   //================================================== Initialize x and b
   ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
@@ -189,8 +180,8 @@ int chi_diffusion::Solver::InitializePWLD(bool verbose)
   KSPSetConvergenceTest(ksp,&DiffusionConvergenceTestNPT,NULL,NULL);
 
   //=================================== Setup verbose_info viewer
-  if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
-    KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
+//  if (chi_log.GetVerbosity()>= LOG_0VERBOSE_2)
+//    KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);
 
   ierr = KSPSetTolerances(ksp,1.e-50,residual_tolerance,1.0e50,max_iters);
   ierr = KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);

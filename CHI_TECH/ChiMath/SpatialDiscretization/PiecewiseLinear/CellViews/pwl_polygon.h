@@ -59,18 +59,13 @@ public:
 
 public:
   std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
-
-
-private:
-  chi_mesh::MeshContinuumPtr grid;
-
-  bool precomputed;
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
-                     chi_mesh::MeshContinuumPtr vol_continuum,
-                     SpatialDiscretization_PWL *discretization);
+                     chi_mesh::MeshContinuumPtr ref_grid,
+                     chi_math::QuadratureTriangle&      minumum_volume_quadrature,
+                     chi_math::QuadratureGaussLegendre& minumum_surface_quadrature);
 
   void ComputeUnitIntegrals();
   void InitializeQuadraturePointData();

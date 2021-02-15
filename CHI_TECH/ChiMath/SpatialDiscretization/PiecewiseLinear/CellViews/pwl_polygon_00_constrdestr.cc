@@ -3,14 +3,13 @@
 //###################################################################
 /** Constructor.*/
 PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
-                                       chi_mesh::MeshContinuumPtr vol_continuum,
-                                       SpatialDiscretization_PWL *discretization) :
-  CellPWLFEValues(poly_cell->vertex_ids.size()),
-  default_volume_quadrature(discretization->tri_quad_order_second),
-  default_surface_quadrature(discretization->line_quad_order_second)
+                                       std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
+                                       chi_math::QuadratureTriangle&      minumum_volume_quadrature,
+                                       chi_math::QuadratureGaussLegendre& minumum_surface_quadrature) :
+  CellPWLFEValues(poly_cell->vertex_ids.size(),ref_grid),
+  default_volume_quadrature(minumum_volume_quadrature),
+  default_surface_quadrature(minumum_surface_quadrature)
 {
-  precomputed = false;
-  grid = vol_continuum;
   num_of_subtris = poly_cell->faces.size();
   beta = 1.0/num_of_subtris;
 
@@ -22,8 +21,8 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
   {
     chi_mesh::CellFace& face = poly_cell->faces[side];
 
-    chi_mesh::Vertex v0 = *vol_continuum->vertices[face.vertex_ids[0]];
-    chi_mesh::Vertex v1 = *vol_continuum->vertices[face.vertex_ids[1]];
+    chi_mesh::Vertex v0 = *ref_grid->vertices[face.vertex_ids[0]];
+    chi_mesh::Vertex v1 = *ref_grid->vertices[face.vertex_ids[1]];
     chi_mesh::Vertex v2 = vc;
 
     chi_mesh::Vector3 sidev01 = v1 - v0;

@@ -84,19 +84,19 @@ private:
   double                         alphac;         ///< Cell alpha-factor.
 public:
   std::vector<FEface_data>       face_data;      ///< Holds determinants and data tet-by-tet.
+private:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
   chi_math::QuadratureTetrahedron& default_volume_quadrature;
   chi_math::QuadratureTriangle&    default_surface_quadrature;
 
-  chi_mesh::MeshContinuumPtr       grid;                       ///< Pointer to the reference grid.
-
 public:
   //00_constrdestr.cc
   PolyhedronPWLFEValues(chi_mesh::CellPolyhedron* polyh_cell,
-                        chi_mesh::MeshContinuumPtr vol_continuum,
-                        SpatialDiscretization_PWL* discretization= nullptr);
+                        chi_mesh::MeshContinuumPtr ref_grid,
+                        chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
+                        chi_math::QuadratureTriangle&    minumum_surface_quadrature);
 
   void ComputeUnitIntegrals();
   void InitializeQuadraturePointData();

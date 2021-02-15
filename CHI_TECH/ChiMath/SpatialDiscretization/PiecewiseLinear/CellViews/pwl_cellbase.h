@@ -11,6 +11,8 @@
 /** Base class for all cell FE views.*/
 class CellPWLFEValues
 {
+protected:
+  chi_mesh::MeshContinuumPtr grid;
 public:
   const int dofs;
 
@@ -25,6 +27,7 @@ public:
 
   std::vector<std::vector<int>> face_dof_mappings;
 
+protected:
   bool precomputed = false;   ///< Are the integrals computed.
 
 public:
@@ -80,8 +83,10 @@ public:
   std::vector<FaceQuadraturePointData> surface_qp_data;
 
 public:
-  explicit CellPWLFEValues(int num_dofs) :
-    dofs(num_dofs)
+  explicit CellPWLFEValues(int num_dofs,
+                           chi_mesh::MeshContinuumPtr ref_grid) :
+                           grid(ref_grid),
+                           dofs(num_dofs)
   {}
 
   virtual ~CellPWLFEValues() = default;

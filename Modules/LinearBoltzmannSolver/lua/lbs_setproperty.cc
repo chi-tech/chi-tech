@@ -172,24 +172,22 @@ int chiLBSSetProperty(lua_State *L)
   if (property == DISCRETIZATION_METHOD)
   {
     int method = lua_tonumber(L,3);
-    if (method == PWLD1D)
+
+    typedef chi_math::SpatialDiscretizationType SDMType;
+
+    switch (method)
     {
-      solver->discretization = SpatialDiscretization_PWL::New(1);
-    }
-    else if (method == PWLD2D)
-    {
-      solver->discretization = SpatialDiscretization_PWL::New(2);
-    }
-    else if (method == PWLD3D)
-    {
-      solver->discretization = SpatialDiscretization_PWL::New(3);
-    }
-    else
-    {
-      std::cerr << "Invalid option for Discretization method in "
-                   "chiLBSSetProperty.\n";
-      exit(EXIT_FAILURE);
-    }
+      case PWLD1D:
+      case PWLD2D:
+      case PWLD3D:
+      {
+        solver->options.sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
+        break;
+      }
+      default:
+        throw std::invalid_argument(
+          "Invalid option for Discretization method in chiLBSSetProperty.\n");
+    }//case method
   }
   else if (property == BOUNDARY_CONDITION)
   {

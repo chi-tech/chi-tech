@@ -17,6 +17,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   auto fe_view = (CellPWLFEValues*)pwl_sdm->MapFeViewL(cell->local_id);
 
   for (int gr=0; gr<G; gr++)
@@ -370,6 +371,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(
                                                chi_mesh::Cell *cell,
                                                DiffusionIPCellView* cell_ip_view)
 {
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   auto fe_view = (CellPWLFEValues*)pwl_sdm->MapFeViewL(cell->local_id);
 
   for (int gr=0; gr<G; gr++)

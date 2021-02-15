@@ -21,31 +21,32 @@ private:
   std::vector<chi_mesh::Cell*> neighbor_cells;
   std::vector<CellFVValues*> neighbor_cell_fv_views;
 
-  typedef chi_math::SpatialDiscretizationType SDMType;
+public:
+  int              fv_local_block_address = 0;
+  std::vector<int> locJ_block_address;
+  std::vector<int> locJ_block_size;
 
 private:
   explicit
-  SpatialDiscretization_FV(int dim=0, SDMType sd_method =
-                                      SDMType::FINITE_VOLUME);
+  SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr in_grid);
 
 public:
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_FV>
-  New(int in_dim=0, SDMType in_sd_method =
-                    SDMType::FINITE_VOLUME)
+  New(chi_mesh::MeshContinuumPtr in_grid)
   { return std::shared_ptr<SpatialDiscretization_FV>(
-    new SpatialDiscretization_FV(in_dim, in_sd_method));}
+    new SpatialDiscretization_FV(in_grid));}
 
   //01
   void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) override;
-  void AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid);
+  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
 
   CellFVValues* MapFeView(int cell_local_index);
   CellFVValues* MapNeighborFeView(int cell_global_index);
 
   //02 node ordering
-  void ReOrderNodes(chi_mesh::MeshContinuumPtr grid);
+  void OrderNodes(chi_mesh::MeshContinuumPtr grid);
 
   //03 sparsity
   void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,

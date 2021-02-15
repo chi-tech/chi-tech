@@ -12,6 +12,7 @@ extern ChiPhysics&  chi_physics_handler;
 extern ChiLog& chi_log;
 
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwlc.h"
 
 #define DISCRETIZATION_METHOD 1
 #define MAX_ITERS             2
@@ -126,19 +127,16 @@ int chiDiffusionSetProperty(lua_State *L)
   //============================================= Handle properties
   if (property == DISCRETIZATION_METHOD)
   {
-    typedef chi_math::SpatialDiscretizationType SDMType;
     int method = lua_tonumber(L,3);
     if (method == PWLC)
     {
-      auto discretization =
-        SpatialDiscretization_PWL::New(0,SDMType::PIECEWISE_LINEAR_CONTINUOUS);
-      solver->discretization = discretization;
+      solver->discretization = SpatialDiscretization_PWLC::New(0);
       solver->fem_method = PWLC;
     }
     else if (method == PWLD_MIP)
     {
       auto discretization =
-        SpatialDiscretization_PWL::New(0,SDMType::PIECEWISE_LINEAR_DISCONTINUOUS);
+        SpatialDiscretization_PWL::New(0);
       solver->discretization = discretization;
       solver->fem_method = PWLD_MIP;
     }

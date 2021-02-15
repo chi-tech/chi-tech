@@ -365,6 +365,7 @@ chi_mesh::Cell* chi_diffusion::Solver::GetBorderCell(int locI,
  * of MIP.*/
 void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 {
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   //============================================= Obtain the border cell info
   DiffusionIPBorderCell* cell_info =
     ip_locI_bordercell_info[locI][cell_border_index];
@@ -399,7 +400,9 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
 
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
-    auto fe_view = new SlabPWLFEView(cell, grid);
+    auto fe_view = new SlabPWLFEView(cell,
+                                     grid,
+                                     pwl_sdm->line_quad_order_second);
 
     ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
 
@@ -429,11 +432,13 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
     auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
-    auto& rpwl_sdm = *pwl_sdm;
 
 
     auto fe_view =
-      new PolygonPWLFEValues(cell, grid, &rpwl_sdm);
+      new PolygonPWLFEValues(cell,
+                             grid,
+                             pwl_sdm_ptr->tri_quad_order_second,
+                             pwl_sdm_ptr->line_quad_order_second);
 
     fe_view->PreComputeValues();
 
@@ -480,10 +485,12 @@ void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
     ip_locI_bordercells[locI][cell_border_index] = cell;
 
     auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
-    auto& rpwl_sdm = *pwl_sdm;
 
     PolyhedronPWLFEValues* fe_view =
-      new PolyhedronPWLFEValues(cell, grid, &rpwl_sdm);
+      new PolyhedronPWLFEValues(cell,
+                                grid,
+                                pwl_sdm_ptr->tet_quad_order_second,
+                                pwl_sdm_ptr->tri_quad_order_second);
 
     fe_view->PreComputeValues();
 

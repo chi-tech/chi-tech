@@ -23,7 +23,7 @@ int chi_diffusion::Solver::InitializePWLDGroups(bool verbose)
   //================================================== Add pwl fem views
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
-  pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   pwl_sdm->PreComputeCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 

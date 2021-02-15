@@ -4,6 +4,8 @@
 #define PARTITION_METHOD_SERIAL        1
 #define PARTITION_METHOD_FROM_SURFACE  2
 
+#include "ChiMath/chi_math.h"
+
 namespace LinearBoltzmann
 {
 
@@ -20,7 +22,10 @@ enum class GeometryType
 /**Struct for storing LBS options.*/
 struct Options
 {
+  typedef chi_math::SpatialDiscretizationType SDMType;
+
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
+  SDMType sd_type = SDMType::UNDEFINED;
   int  scattering_order=1;
   int  sweep_eager_limit= 32000;;
 

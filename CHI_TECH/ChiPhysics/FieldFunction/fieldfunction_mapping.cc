@@ -2,6 +2,7 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwlc.h"
 
 #include <chi_log.h>
 extern ChiLog& chi_log;
@@ -85,16 +86,16 @@ CreateCFEMMappingLocal(Vec& x_mapped,
                                 " discretization is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(spatial_discretization);
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(spatial_discretization);
 
   size_t num_nodes_to_map = node_component_pairs.size();
   std::vector<int> mapped_nodes;
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
-    int ir = pwl_sdm->MapCFEMDOF(node_component_pairs[n].first,
-                                 &unknown_manager,
-                                 ref_variable,
-                                 node_component_pairs[n].second);
+    int ir = pwl_sdm->MapDOF(node_component_pairs[n].first,
+                             &unknown_manager,
+                             ref_variable,
+                             node_component_pairs[n].second);
 
     mapped_nodes.push_back(ir);
     mapping.push_back(n);
@@ -151,11 +152,11 @@ CreatePWLDMappingLocal(
 
     auto& cell = grid->local_cells[cell_local_index];
 
-    int address = pwl_sdm->MapDFEMDOFLocal(&cell,
-                                           node_number,
-                                           &unknown_manager,
-                                           ref_variable,
-                                           component_number);
+    int address = pwl_sdm->MapDOFLocal(&cell,
+                                       node_number,
+                                       &unknown_manager,
+                                       ref_variable,
+                                       component_number);
 
     mapping.push_back(address);
   }//for each tuple

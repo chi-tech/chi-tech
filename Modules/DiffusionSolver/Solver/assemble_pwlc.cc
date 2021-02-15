@@ -16,6 +16,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
                                                   chi_mesh::Cell *cell,
                                                   int group)
 {
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
   auto fe_view   = pwl_sdm->MapFeViewL(cell->local_id);
 
   //======================================== Process material id
@@ -43,7 +44,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
   //========================================= Loop over DOFs
   for (int i=0; i<fe_view->dofs; i++)
   {
-    dof_global_row_ind[i] = pwl_sdm->MapCFEMDOF(cell->vertex_ids[i]);
+    dof_global_row_ind[i] = pwl_sdm->MapDOF(cell->vertex_ids[i]);
 
     for (int j=0; j<fe_view->dofs; j++)
     {

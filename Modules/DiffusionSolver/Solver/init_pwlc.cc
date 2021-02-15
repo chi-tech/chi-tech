@@ -23,7 +23,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   //================================================== Add pwl fem views
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
-  pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
   pwl_sdm->PreComputeCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -32,7 +32,7 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
   ChiTimer t_reorder; t_reorder.Reset();
 
-  auto domain_ownership = pwl_sdm->OrderNodesCFEM(grid);
+  auto domain_ownership = pwl_sdm->OrderNodes(grid);
   local_dof_count = domain_ownership.first;
   global_dof_count   = domain_ownership.second;
 
@@ -78,17 +78,13 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
 
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  pwl_sdm->BuildCFEMSparsityPattern(grid,
-                                    nodal_nnz_in_diag,
-                                    nodal_nnz_off_diag,
-                                    domain_ownership);
 
-//  auto nodal_var_strct = &unknown_manager;
+  auto nodal_var_strct = &unknown_manager;
 //
-//  pwl_sdm->BuildCFEMSparsityPattern(grid,
-//                                    nodal_nnz_in_diag,
-//                                    nodal_nnz_off_diag,
-//                                    nodal_var_strct);
+  pwl_sdm->BuildSparsityPattern(grid,
+                                nodal_nnz_in_diag,
+                                nodal_nnz_off_diag,
+                                nodal_var_strct);
 
 
   //================================================== Initialize x and b

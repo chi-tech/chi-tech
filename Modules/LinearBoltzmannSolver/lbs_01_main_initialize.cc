@@ -42,15 +42,8 @@ void LinearBoltzmann::Solver::Initialize()
   //================================================== Initialize materials
   InitMaterials(unique_material_ids);
 
-  //================================================== Compute cell matrices
-  chi_log.Log(LOG_0) << "Computing cell matrices.\n";
-  discretization->PreComputeCellSDValues(grid);
-
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0)
-    << "Cell matrices computed.                   Process memory = "
-    << std::setprecision(3)
-    << chi_console.GetMemoryUsageInMB() << " MB";
+  //================================================== Init spatial discretization
+  InitializeSpatialDiscretization();
 
   //================================================== Initialize parrays
   chi_log.Log(LOG_0)

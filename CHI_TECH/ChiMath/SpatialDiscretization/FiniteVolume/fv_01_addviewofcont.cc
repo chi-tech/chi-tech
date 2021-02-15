@@ -77,7 +77,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::
-  AddViewOfNeighborContinuums(chi_mesh::MeshContinuumPtr grid)
+  PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of neighbor continuums.";
