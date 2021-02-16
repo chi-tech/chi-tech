@@ -54,7 +54,9 @@ public:
   static
   std::shared_ptr<SpatialDiscretization_PWLC>
   New(chi_mesh::MeshContinuumPtr in_grid)
-  { return std::shared_ptr<SpatialDiscretization_PWLC>(
+  { if (in_grid == nullptr) throw std::invalid_argument(
+      "Null supplied as grid to SpatialDiscretization_PWLC.");
+    return std::shared_ptr<SpatialDiscretization_PWLC>(
       new SpatialDiscretization_PWLC(in_grid));}
 
   //01
@@ -62,9 +64,11 @@ public:
   void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
   CellPWLFEValues* MapFeViewL(int cell_local_index);
 
+private:
   //02
   std::pair<int,int> OrderNodes(chi_mesh::MeshContinuumPtr grid);
 
+public:
   //03
   void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                             std::vector<int>& nodal_nnz_in_diag,
@@ -85,9 +89,9 @@ public:
 
   //05
   unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::UnknownManager* unknown_manager=nullptr);
+                               chi_math::UnknownManager& unknown_manager);
   unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                                chi_math::UnknownManager* unknown_manager=nullptr);
+                                chi_math::UnknownManager& unknown_manager);
 //  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
 //                               chi_math::UnknownManager* unknown_manager);
 //

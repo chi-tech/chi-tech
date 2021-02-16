@@ -23,30 +23,30 @@ int chi_diffusion::Solver::InitializePWLC(bool verbose)
   //================================================== Add pwl fem views
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
-  pwl_sdm->PreComputeCellSDValues(grid);
+  discretization = SpatialDiscretization_PWLC::New(grid);
+  auto pwl_sdm =
+    std::static_pointer_cast<SpatialDiscretization_PWLC>(discretization);
+//  pwl_sdm->PreComputeCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
+
+  //================================================== Initialize unknown manager
+  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
 
   //================================================== Reorder nodes
   if (verbose)
-    chi_log.Log(LOG_0) << "Computing nodal reorderings for CFEM";
+    chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
 
-  auto domain_ownership = pwl_sdm->OrderNodes(grid);
-  local_dof_count = domain_ownership.first;
-  global_dof_count   = domain_ownership.second;
+//  auto domain_ownership = pwl_sdm->OrderNodes(grid);
+//  local_dof_count = domain_ownership.first;
+//  global_dof_count   = domain_ownership.second;
+  local_dof_count = pwl_sdm->GetNumLocalDOFs(grid,unknown_manager);
+  global_dof_count = pwl_sdm->GetNumGlobalDOFs(grid,unknown_manager);
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
-  chi_log.Log(LOG_0)
-    << "Domain ownership: "
-    << domain_ownership.first << " "
-    << domain_ownership.second;
-
-  //================================================== Initialize unknown manager
-  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
 
   //================================================== Initialize field function
   //                                                   if empty

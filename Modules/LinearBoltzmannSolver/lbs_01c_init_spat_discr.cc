@@ -14,7 +14,7 @@ void LinearBoltzmann::Solver::InitializeSpatialDiscretization()
 {
   chi_log.Log(LOG_0) << "Initializing spatial discretization.\n";
   discretization = SpatialDiscretization_PWL::New(grid);
-  discretization->PreComputeCellSDValues(grid);
+//  discretization->PreComputeCellSDValues(grid);
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)

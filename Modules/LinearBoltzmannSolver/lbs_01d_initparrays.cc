@@ -50,11 +50,23 @@ void LinearBoltzmann::Solver::InitializeParrays()
   auto pwl_discretization =
     std::dynamic_pointer_cast<SpatialDiscretization_PWL>(discretization);
 
-  //================================================== Compute local # of dof
-  auto domain_ownership = pwl_discretization->OrderNodes(grid);
+  //================================================== Initialize unknown structure
+  for (int m=0; m<num_moments; m++)
+  {
+    flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groups.size());
+    auto& moment = flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
+  }
 
-  local_dof_count = domain_ownership.first;
-  glob_dof_count  = domain_ownership.second;
+  //================================================== Compute local # of dof
+//  auto domain_ownership = pwl_discretization->OrderNodes(grid);
+//
+//  local_dof_count = domain_ownership.first;
+//  glob_dof_count  = domain_ownership.second;
+
+  auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
+  local_dof_count = pwl_discretization->GetNumLocalDOFs(grid,flux_moments_uk_man)/GxM;
+  glob_dof_count = pwl_discretization->GetNumGlobalDOFs(grid,flux_moments_uk_man)/GxM;
+
 
   local_cell_dof_array_address = pwl_discretization->cell_local_block_address;
 
@@ -161,13 +173,6 @@ void LinearBoltzmann::Solver::InitializeParrays()
       grid_nodal_mappings.push_back(cell_nodal_mapping);
     }//for local cell
   }//if empty
-
-  //================================================== Initialize unknown structure
-  for (int m=0; m<num_moments; m++)
-  {
-    flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groups.size());
-    auto& moment = flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
-  }
 
   //================================================== Initialize Field Functions
   if (field_functions.empty())

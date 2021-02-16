@@ -6,12 +6,9 @@
 /**Get the number of local degrees-of-freedom.*/
 unsigned int SpatialDiscretization_PWLC::
 GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                chi_math::UnknownManager* unknown_manager)
+                chi_math::UnknownManager& unknown_manager)
 {
-  unsigned int N = 1;
-
-  if (unknown_manager != nullptr)
-    N = unknown_manager->GetTotalUnknownStructureSize();
+  unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
   return local_base_block_size*N;
 }
@@ -20,12 +17,9 @@ GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
 /**Get the number of global degrees-of-freedom.*/
 unsigned int SpatialDiscretization_PWLC::
 GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                 chi_math::UnknownManager* unknown_manager)
+                 chi_math::UnknownManager& unknown_manager)
 {
-  unsigned int N = 1;
-
-  if (unknown_manager != nullptr)
-    N = unknown_manager->GetTotalUnknownStructureSize();
+  unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
   return globl_base_block_size*N;
 }

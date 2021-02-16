@@ -34,10 +34,11 @@ protected:
                                  SDMType in_type =
                                           SDMType::UNDEFINED);
 
-public:
+protected:
   //01
   virtual void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid);
 
+protected:
   //02
   /**Develops a localized view of a petsc vector.
    * Each spatial discretization has a specialization of this

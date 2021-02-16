@@ -23,23 +23,30 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   //================================================== Add pwl fem views
   if (verbose)
     chi_log.Log(LOG_0) << "Computing cell matrices";
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
-  pwl_sdm->PreComputeCellSDValues(grid);
+  discretization = SpatialDiscretization_PWL::New(grid);
+  auto pwl_sdm =
+    std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
+//  pwl_sdm->PreComputeCellSDValues(grid);
   MPI_Barrier(MPI_COMM_WORLD);
+
+  //================================================== Initialize unknown manager
+  unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
 
   //================================================== Reorder nodes
   if (verbose)
     chi_log.Log(LOG_0) << "Computing nodal reorderings for PWLD";
   ChiTimer t_reorder; t_reorder.Reset();
-  ReorderNodesPWLD();
+
+//  auto domain_ownership = pwl_sdm->OrderNodes(grid);
+//  local_dof_count = domain_ownership.first;
+//  global_dof_count   = domain_ownership.second;
+  local_dof_count = pwl_sdm->GetNumLocalDOFs(grid,unknown_manager);
+  global_dof_count = pwl_sdm->GetNumGlobalDOFs(grid,unknown_manager);
 
   MPI_Barrier(MPI_COMM_WORLD);
   if (verbose)
     chi_log.Log(LOG_0) << "Time taken during nodal reordering "
                        << t_reorder.GetTime()/1000.0;
-
-  //================================================== Initialize unknown manager
-  unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
 
   //================================================== Initialize field function
   //                                                   if empty
@@ -61,25 +68,19 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   if (verbose)
     chi_log.Log(LOG_0) << "Determining nodal connections";
   ChiTimer t_connect; t_connect.Reset();
-  double t0 = 0.0;
-
 
   //================================================== Initialize nodal DOF
   //                                                   and connection info
   nodal_nnz_in_diag.resize(local_dof_count, 0);
   nodal_nnz_off_diag.resize(local_dof_count, 0);
   nodal_boundary_numbers.resize(grid->vertices.size(), 0);
-  int total_nnz = 0;
-
-
-
-
-
 
 
   //================================================== Building sparsity pattern
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  PWLDBuildSparsityPattern();
+  pwl_sdm->BuildSparsityPattern(grid,
+                                nodal_nnz_in_diag,
+                                nodal_nnz_off_diag);
 
 
   //================================================== Reshuffling nnz
@@ -119,7 +120,7 @@ int chi_diffusion::Solver::InitializePWLDGrpAgg(bool verbose)
   if (verbose)
   {
     chi_log.Log(LOG_0)
-      << "Setting matrix preallocation GAGG. Total non-zeros: " << total_nnz;
+      << "Setting matrix preallocation GAGG. Total non-zeros: " << 0;
   }
 
   MatMPIAIJSetPreallocation(A,0,G_nodal_nnz_in_diag.data(),

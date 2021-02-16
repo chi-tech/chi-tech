@@ -1,5 +1,5 @@
-#ifndef _chi_diffusion_solver_h
-#define _chi_diffusion_solver_h
+#ifndef CHI_DIFFUSION_SOLVER_H
+#define CHI_DIFFUSION_SOLVER_H
 
 #include "ChiMesh/Cell/cell.h"
 
@@ -82,8 +82,8 @@ public:
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuumPtr                 grid = nullptr;
 
-  std::shared_ptr<SpatialDiscretization>     discretization;
-//  std::shared_ptr<SpatialDiscretization_PWL> pwl_sdm;
+  std::shared_ptr<SpatialDiscretization>   discretization;
+  chi_math::SpatialDiscretizationType      sd_type;
 
   chi_math::UnknownManager                 unknown_manager;
   int                                      fem_method = 0;

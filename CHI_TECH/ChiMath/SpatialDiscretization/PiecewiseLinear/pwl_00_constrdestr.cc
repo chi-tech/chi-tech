@@ -11,5 +11,8 @@ SpatialDiscretization_PWL::
   tet_quad_order_second(chi_math::QuadratureOrder::SECOND)
 {
   mapping_initialized = false;
+  PreComputeCellSDValues(in_grid);
+  PreComputeNeighborCellSDValues(in_grid);
+  OrderNodes(in_grid);
 }
 

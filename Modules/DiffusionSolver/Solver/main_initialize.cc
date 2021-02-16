@@ -26,7 +26,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::Region* region = regions.back();
+  auto& region = regions.back();
   grid = region->GetGrid();
 
 
