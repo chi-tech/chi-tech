@@ -12,7 +12,7 @@ void SpatialDiscretization_PWL::
 BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                      std::vector<int> &nodal_nnz_in_diag,
                      std::vector<int> &nodal_nnz_off_diag,
-                     chi_math::UnknownManager* unknown_manager)
+                     chi_math::UnknownManager& unknown_manager)
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
   int local_dof_count = local_base_block_size;
@@ -233,46 +233,43 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
 
   //============================================= Spacing according to unknown
   //                                              manager
-  if (unknown_manager != nullptr)
+  auto backup_nnz_in_diag  = nodal_nnz_in_diag;
+  auto backup_nnz_off_diag = nodal_nnz_off_diag;
+
+  unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
+
+  nodal_nnz_in_diag.clear();
+  nodal_nnz_off_diag.clear();
+
+  nodal_nnz_in_diag.resize(local_base_block_size*N,0);
+  nodal_nnz_off_diag.resize(local_base_block_size*N,0);
+
+  if (unknown_manager.dof_storage_type == chi_math::UnknownStorageType::NODAL)
   {
-    auto backup_nnz_in_diag  = nodal_nnz_in_diag;
-    auto backup_nnz_off_diag = nodal_nnz_off_diag;
-
-    unsigned int N = unknown_manager->GetTotalUnknownStructureSize();
-
-    nodal_nnz_in_diag.clear();
-    nodal_nnz_off_diag.clear();
-
-    nodal_nnz_in_diag.resize(local_base_block_size*N,0);
-    nodal_nnz_off_diag.resize(local_base_block_size*N,0);
-
-    if (unknown_manager->dof_storage_type == chi_math::UnknownStorageType::NODAL)
+    int ir = -1;
+    for (int i=0; i<local_base_block_size; ++i)
     {
-      int ir = -1;
-      for (int i=0; i<local_base_block_size; ++i)
-      {
-        for (int j=0; j<N; ++j)
-        {
-          ++ir;
-          nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];
-          nodal_nnz_off_diag[ir] = backup_nnz_off_diag[i];
-        }//for j
-      }//for i
-    }
-    else if (unknown_manager->dof_storage_type == chi_math::UnknownStorageType::BLOCK)
-    {
-      int ir = -1;
       for (int j=0; j<N; ++j)
       {
-        for (int i=0; i<local_base_block_size; ++i)
-        {
-          ++ir;
-          nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];
-          nodal_nnz_off_diag[ir] = backup_nnz_off_diag[i];
-        }//for i
+        ++ir;
+        nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];
+        nodal_nnz_off_diag[ir] = backup_nnz_off_diag[i];
       }//for j
-    }
-  }//if unknown manager supplied
+    }//for i
+  }
+  else if (unknown_manager.dof_storage_type == chi_math::UnknownStorageType::BLOCK)
+  {
+    int ir = -1;
+    for (int j=0; j<N; ++j)
+    {
+      for (int i=0; i<local_base_block_size; ++i)
+      {
+        ++ir;
+        nodal_nnz_in_diag[ir] = backup_nnz_in_diag[i];
+        nodal_nnz_off_diag[ir] = backup_nnz_off_diag[i];
+      }//for i
+    }//for j
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0) << "Done building DFEM sparsity pattern";

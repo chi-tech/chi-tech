@@ -11,7 +11,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-std::pair<int,int> SpatialDiscretization_PWL::
+void SpatialDiscretization_PWL::
   OrderNodes(chi_mesh::MeshContinuumPtr grid)
 {
   ChiTimer t_stage[6];
@@ -97,7 +97,5 @@ std::pair<int,int> SpatialDiscretization_PWL::
                 1,                            //recv count
                 MPI_INT,                      //recv type
                 MPI_COMM_WORLD);              //communicator
-
-  return {local_dof_count, global_dof_count};
 }
 

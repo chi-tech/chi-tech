@@ -66,32 +66,36 @@ public:
 
 private:
   //02
-  std::pair<int,int> OrderNodes(chi_mesh::MeshContinuumPtr grid);
+  void OrderNodes(chi_mesh::MeshContinuumPtr grid);
 
 public:
   //03
   void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                             std::vector<int>& nodal_nnz_in_diag,
                             std::vector<int>& nodal_nnz_off_diag,
-                            chi_math::UnknownManager* unknown_manager= nullptr);
+                            chi_math::UnknownManager& unknown_manager) override;
   chi_mesh::Cell* MapNeighborCell(int cell_glob_index);
   CellPWLFEValues* MapNeighborCellFeView(int cell_glob_index);
 
   //04
-  int MapDOF(chi_mesh::Cell* cell, int node,
-             chi_math::UnknownManager* unknown_manager,
+  int MapDOF(chi_mesh::Cell& cell, int node,
+             chi_math::UnknownManager& unknown_manager,
              unsigned int unknown_id,
              unsigned int component= 0);
-  int MapDOFLocal(chi_mesh::Cell* cell, int node,
-                  chi_math::UnknownManager* unknown_manager,
+  int MapDOFLocal(chi_mesh::Cell& cell, int node,
+                  chi_math::UnknownManager& unknown_manager,
                   unsigned int unknown_id,
                   unsigned int component= 0);
+  int MapDOF(chi_mesh::Cell& cell, int node)
+  { return MapDOF(cell,node,ChiMath::UNITARY_UNKNOWN_MANAGER,0,0); }
+  int MapDOFLocal(chi_mesh::Cell& cell, int node)
+  { return MapDOFLocal(cell,node,ChiMath::UNITARY_UNKNOWN_MANAGER,0,0); }
 
   //05
-  unsigned int GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                               chi_math::UnknownManager& unknown_manager);
-  unsigned int GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                                chi_math::UnknownManager& unknown_manager);
+  size_t GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
+                         chi_math::UnknownManager& unknown_manager) override;
+  size_t GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
+                          chi_math::UnknownManager& unknown_manager) override;
 //  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
 //                               chi_math::UnknownManager* unknown_manager);
 //
@@ -101,7 +105,7 @@ public:
 
   void LocalizePETScVector(Vec petsc_vector,
                            std::vector<double>& local_vector,
-                           chi_math::UnknownManager* unknown_manager)
+                           chi_math::UnknownManager& unknown_manager)
                            override;
 };
 

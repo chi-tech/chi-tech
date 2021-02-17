@@ -13,11 +13,15 @@
 #include <iostream>
 
 //=============================================== Global variables
+chi_math::UnknownManager ChiMath::UNITARY_UNKNOWN_MANAGER;
+
 ChiConsole  ChiConsole::instance;
 ChiMath     ChiMath::instance;
 ChiMPI      ChiMPI::instance;
 ChiLog      ChiLog::instance;
 ChiPhysics  ChiPhysics::instance;
+
+
 
 ChiConsole&  chi_console = ChiConsole::GetInstance();
 ChiMath&     chi_math_handler = ChiMath::GetInstance();

@@ -4,9 +4,9 @@
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
-unsigned int SpatialDiscretization_PWLC::
-GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                chi_math::UnknownManager& unknown_manager)
+size_t SpatialDiscretization_PWLC::
+  GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
+                  chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -15,9 +15,9 @@ GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
 
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
-unsigned int SpatialDiscretization_PWLC::
-GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                 chi_math::UnknownManager& unknown_manager)
+size_t SpatialDiscretization_PWLC::
+  GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
+                   chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -29,7 +29,7 @@ GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
 void SpatialDiscretization_PWLC::
 LocalizePETScVector(Vec petsc_vector,
                     std::vector<double>& local_vector,
-                    chi_math::UnknownManager* unknown_manager)
+                    chi_math::UnknownManager& unknown_manager)
 {
   auto grid = ref_grid;
 
@@ -41,7 +41,7 @@ LocalizePETScVector(Vec petsc_vector,
       for (int vid : cell.vertex_ids)
       {
         int uk=-1;
-        for (const auto& unknown : unknown_manager->unknowns)
+        for (const auto& unknown : unknown_manager.unknowns)
         {
           ++uk;
           for (int c=0; c<unknown.num_components; ++c)

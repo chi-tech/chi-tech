@@ -38,6 +38,23 @@ protected:
   //01
   virtual void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid);
 
+public:
+  virtual
+  void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
+                            std::vector<int>& nodal_nnz_in_diag,
+                            std::vector<int>& nodal_nnz_off_diag,
+                            chi_math::UnknownManager& unknown_manager)
+                            {}
+
+  virtual
+  size_t GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
+                         chi_math::UnknownManager& unknown_manager)
+                         {return 0;}
+  virtual
+  size_t GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
+                          chi_math::UnknownManager& unknown_manager)
+                          {return 0;}
+
 protected:
   //02
   /**Develops a localized view of a petsc vector.
@@ -45,7 +62,7 @@ protected:
    * method.*/
   virtual void LocalizePETScVector(Vec petsc_vector,
                                    std::vector<double>& local_vector,
-                                   chi_math::UnknownManager* unknown_manager)
+                                   chi_math::UnknownManager& unknown_manager)
   {}
 
 };

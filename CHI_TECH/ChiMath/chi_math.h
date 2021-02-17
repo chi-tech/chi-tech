@@ -5,6 +5,7 @@
 
 #include "Quadratures/quadrature.h"
 #include "Quadratures/angular_quadrature_base.h"
+#include "UnknownManager/unknown_manager.h"
 
 #include <memory>
 
@@ -25,11 +26,16 @@ class ChiMath
 public:
 	std::vector<chi_math::Quadrature*> quadratures;
 	std::vector<std::shared_ptr<chi_math::AngularQuadrature>> angular_quadratures;
+
+  static chi_math::UnknownManager UNITARY_UNKNOWN_MANAGER;
 private:
   static ChiMath instance;
 private:
 	//00 Constructor
-	ChiMath() noexcept;
+  ChiMath() noexcept
+  {
+    UNITARY_UNKNOWN_MANAGER.AddUnknown(chi_math::UnknownType::SCALAR);
+  }
 
 public:
   static ChiMath& GetInstance() noexcept
@@ -40,6 +46,8 @@ public:
 
 namespace chi_math
 {
+
+
   enum class SpatialDiscretizationType
   {
     UNDEFINED                      = 0,

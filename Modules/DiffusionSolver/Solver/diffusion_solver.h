@@ -171,13 +171,13 @@ public:
   //01b
   int Initialize(bool verbose=true);
   //01c
-  int InitializePWLC(bool verbose=true);
-  //01d
-  int InitializePWLD(bool verbose=true);
-  //01e
-  int InitializePWLDGroups(bool verbose=true);
-  //01f
-  int InitializePWLDGrpAgg(bool verbose=true);
+//  int InitializePWLC(bool verbose=true);
+//  //01d
+//  int InitializePWLD(bool verbose=true);
+//  //01e
+//  int InitializePWLDGroups(bool verbose=true);
+//  //01f
+//  int InitializePWLDGrpAgg(bool verbose=true);
 
 
   //02a
@@ -208,11 +208,6 @@ public:
                        int component=0,
                        int component_block_offset=1);
 
-
-  //02d
-  int ExecutePWLD_MIP_GRPS(bool suppress_assembly = false,
-                           bool suppress_solve = false);
-
   //02e
   int ExecutePWLD_MIP_GAGG(bool suppress_assembly = false,
                            bool suppress_solve = false);
@@ -224,14 +219,7 @@ public:
                               DiffusionIPCellView* cell_ip_view);
 
 
-
-
-  //03a
-  void ReorderNodesPWLC();
-
   //03b
-  void ReorderNodesPWLD();
-  int  MapBorderCell(int locI, int neighbor, int vglob_i);
   void SpawnBorderCell(int locI, int cell_border_index);
 
 

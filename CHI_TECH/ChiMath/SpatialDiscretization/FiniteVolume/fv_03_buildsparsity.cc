@@ -9,16 +9,10 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
   chi_mesh::MeshContinuumPtr grid,
   std::vector<int> &nodal_nnz_in_diag,
   std::vector<int> &nodal_nnz_off_diag,
-  chi_math::UnknownManager* unknown_manager)
+  chi_math::UnknownManager& unknown_manager)
 {
-  unsigned int num_uk = 1; //Number of unknowns
-  unsigned int N = 1;      //Total number of unknowns
-
-  if (unknown_manager != nullptr)
-  {
-    num_uk = unknown_manager->unknowns.size();
-    N = unknown_manager->GetTotalUnknownStructureSize();
-  }
+  unsigned int num_uk = unknown_manager.unknowns.size(); //Number of unknowns
+  unsigned int N = unknown_manager.GetTotalUnknownStructureSize(); //Total number of unknowns
 
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
@@ -30,14 +24,12 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
 
   for (int uk=0; uk<num_uk; ++uk)
   {
-    int num_comps = unknown_manager->unknowns[uk].num_components;
+    int num_comps = unknown_manager.unknowns[uk].num_components;
     for (int comp=0; comp<num_comps; ++comp)
     {
       for (auto& cell : grid->local_cells)
       {
-        int i = cell.local_id*N + comp;
-        if (unknown_manager != nullptr)
-          i=MapDOFLocal(&cell,unknown_manager,uk,comp);
+        int i = MapDOFLocal(cell,unknown_manager,uk,comp);
 
         nodal_nnz_in_diag[i]   += 1;
 

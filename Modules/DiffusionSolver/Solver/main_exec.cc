@@ -14,9 +14,6 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   else if (fem_method == PWLD_MIP)
     ExecutePWLD_MIP(suppress_assembly,
                     suppress_solve);
-  else if (fem_method == PWLD_MIP_GRPS)
-    ExecutePWLD_MIP_GRPS(suppress_assembly,
-                         suppress_solve);
   else if (fem_method == PWLD_MIP_GAGG)
     ExecutePWLD_MIP_GAGG(suppress_assembly,
                          suppress_solve);

@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
-unsigned int SpatialDiscretization_PWL::
+size_t SpatialDiscretization_PWL::
   GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                   chi_math::UnknownManager& unknown_manager)
 {
@@ -15,7 +15,7 @@ unsigned int SpatialDiscretization_PWL::
 
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
-unsigned int SpatialDiscretization_PWL::
+size_t SpatialDiscretization_PWL::
   GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                    chi_math::UnknownManager& unknown_manager)
 {
@@ -29,7 +29,7 @@ unsigned int SpatialDiscretization_PWL::
 void SpatialDiscretization_PWL::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
-                      chi_math::UnknownManager* unknown_manager)
+                      chi_math::UnknownManager& unknown_manager)
 {
   auto grid = ref_grid;
 
@@ -66,12 +66,12 @@ void SpatialDiscretization_PWL::
       for (int i=0; i<cell.vertex_ids.size(); ++i)
       {
         int uk=-1;
-        for (const auto& unknown : unknown_manager->unknowns)
+        for (const auto& unknown : unknown_manager.unknowns)
         {
           ++uk;
           for (int c=0; c<unknown.num_components; ++c)
           {
-            int ir = MapDOF(&cell, i, unknown_manager, uk, c);
+            int ir = MapDOF(cell, i, unknown_manager, uk, c);
 
             global_indices.push_back(ir);
           }//for component

@@ -46,7 +46,6 @@ void chi_physics::FieldFunction::
                        std::vector<uint64_t>& mapping)
 {
   auto& sdm    = spatial_discretization;
-  auto& uk_man = unknown_manager;
 
   if (sdm->type != chi_math::SpatialDiscretizationType::FINITE_VOLUME)
     throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) +
@@ -62,8 +61,8 @@ void chi_physics::FieldFunction::
     unsigned int component    = cell_index_component_pair.second;
 
     auto& cell = grid->local_cells[cell_local_index];
-    int address = sdm_fv->MapDOFLocal(&cell,
-                                      &uk_man,
+    int address = sdm_fv->MapDOFLocal(cell,
+                                      unknown_manager,
                                       ref_variable,
                                       component);
 
@@ -93,7 +92,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
     int ir = pwl_sdm->MapDOF(node_component_pairs[n].first,
-                             &unknown_manager,
+                             unknown_manager,
                              ref_variable,
                              node_component_pairs[n].second);
 
@@ -152,9 +151,9 @@ CreatePWLDMappingLocal(
 
     auto& cell = grid->local_cells[cell_local_index];
 
-    int address = pwl_sdm->MapDOFLocal(&cell,
+    int address = pwl_sdm->MapDOFLocal(cell,
                                        node_number,
-                                       &unknown_manager,
+                                       unknown_manager,
                                        ref_variable,
                                        component_number);
 

@@ -71,25 +71,25 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
 int SpatialDiscretization_PWL::
-MapDOF(chi_mesh::Cell *cell, int node,
-       chi_math::UnknownManager* unknown_manager,
+MapDOF(chi_mesh::Cell& cell, int node,
+       chi_math::UnknownManager& unknown_manager,
        unsigned int unknown_id,
        unsigned int component)
 {
 //  if (component < 0) return -1;
   if (component < 0) throw std::logic_error(__FUNCTION__);
 
-  auto storage = unknown_manager->dof_storage_type;
+  auto storage = unknown_manager.dof_storage_type;
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownStructureSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id, component);
+  size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
+  size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
 
-  if (cell->partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi_mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
       int address = local_block_address * num_unknowns +
-                    cell_local_block_address[cell->local_id] +
+                    cell_local_block_address[cell.local_id] +
                     local_base_block_size*block_id +
                     node;
       return address;
@@ -97,7 +97,7 @@ MapDOF(chi_mesh::Cell *cell, int node,
     else if (storage == chi_math::UnknownStorageType::NODAL)
     {
       int address = local_block_address * num_unknowns +
-                    cell_local_block_address[cell->local_id] * num_unknowns +
+                    cell_local_block_address[cell.local_id] * num_unknowns +
                     node*num_unknowns +
                     block_id;
       return address;
@@ -109,7 +109,7 @@ MapDOF(chi_mesh::Cell *cell, int node,
     bool found = false;
     for (auto neighbor_info : neighbor_cell_block_address)
     {
-      if (neighbor_info.first == cell->global_id) {
+      if (neighbor_info.first == cell.global_id) {
         found = true; break;
       }
       ++index;
@@ -119,8 +119,8 @@ MapDOF(chi_mesh::Cell *cell, int node,
     {
       chi_log.Log(LOG_ALLERROR)
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
-        << "with global index " << cell->global_id << " and partition-ID "
-        << cell->partition_id;
+        << "with global index " << cell.global_id << " and partition-ID "
+        << cell.partition_id;
       exit(EXIT_FAILURE);
     }
 
@@ -128,7 +128,7 @@ MapDOF(chi_mesh::Cell *cell, int node,
     {
       int address = //locJ_block_address[cell->partition_id]*num_unknowns +
                     neighbor_cell_block_address[index].second +
-                    locJ_block_size[cell->partition_id]*block_id +
+                    locJ_block_size[cell.partition_id]*block_id +
                     node;
       return address;
     }
@@ -149,30 +149,30 @@ MapDOF(chi_mesh::Cell *cell, int node,
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
 int SpatialDiscretization_PWL::
-MapDOFLocal(chi_mesh::Cell *cell, int node,
-            chi_math::UnknownManager* unknown_manager,
+MapDOFLocal(chi_mesh::Cell& cell, int node,
+            chi_math::UnknownManager& unknown_manager,
             unsigned int unknown_id,
             unsigned int component)
 {
   if (component < 0) return -1;
 
-  auto storage = unknown_manager->dof_storage_type;
+  auto storage = unknown_manager.dof_storage_type;
 
-  size_t num_unknowns = unknown_manager->GetTotalUnknownStructureSize();
-  size_t block_id     = unknown_manager->MapUnknown(unknown_id, component);
+  size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
+  size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
 
-  if (cell->partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi_mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
-      int address = cell_local_block_address[cell->local_id] +
+      int address = cell_local_block_address[cell.local_id] +
                     local_base_block_size*block_id +
                     node;
       return address;
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
     {
-      int address = cell_local_block_address[cell->local_id] * num_unknowns +
+      int address = cell_local_block_address[cell.local_id] * num_unknowns +
                     node*num_unknowns +
                     block_id;
       return address;
@@ -184,7 +184,7 @@ MapDOFLocal(chi_mesh::Cell *cell, int node,
     bool found = false;
     for (auto neighbor_info : neighbor_cell_block_address)
     {
-      if (neighbor_info.first == cell->global_id) {
+      if (neighbor_info.first == cell.global_id) {
         found = true; break;
       }
       ++index;
@@ -194,15 +194,15 @@ MapDOFLocal(chi_mesh::Cell *cell, int node,
     {
       chi_log.Log(LOG_ALLERROR)
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
-        << "with global index " << cell->global_id << " and partition-ID "
-        << cell->partition_id;
+        << "with global index " << cell.global_id << " and partition-ID "
+        << cell.partition_id;
       exit(EXIT_FAILURE);
     }
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
       int address = neighbor_cell_block_address[index].second +
-                    locJ_block_size[cell->partition_id]*block_id +
+                    locJ_block_size[cell.partition_id]*block_id +
                     node;
       return address;
     }

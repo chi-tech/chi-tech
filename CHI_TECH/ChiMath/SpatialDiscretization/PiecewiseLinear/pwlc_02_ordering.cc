@@ -13,8 +13,8 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-std::pair<int,int> SpatialDiscretization_PWLC::
-OrderNodes(chi_mesh::MeshContinuumPtr grid)
+void SpatialDiscretization_PWLC::
+  OrderNodes(chi_mesh::MeshContinuumPtr grid)
 {
   ChiTimer t_stage[6];
 
@@ -126,19 +126,18 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
     //for (size_t i=0; i<nonexclus_nodes.size(); i++)
     for (auto& node : nonexclus_nodes)
     {
-      if (std::find(upstream_nonex.begin(),
-                    upstream_nonex.end(),
-                    node) == upstream_nonex.end())
+      auto node_location = std::find(upstream_nonex.begin(),
+                                     upstream_nonex.end(),
+                                     node);
+      if (node_location == upstream_nonex.end())
         upstream_nonex.push_back(node);
     }
 
     // If this location is not the last location
     // send the updated upstream_nonex to location n+1
     if (chi_mpi.location_id<(chi_mpi.process_count-1))
-    {
       MPI_Send(upstream_nonex.data(),upstream_nonex.size(),
                MPI_INT,chi_mpi.location_id+1,123,MPI_COMM_WORLD);
-    }
       // On the last location send the completed
       // upstream_nonex back to all other locations
     else
@@ -146,17 +145,16 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
       chi_log.Log(LOG_ALLVERBOSE_1)
         << "Total number of ghost nodes after collect: "
         << upstream_nonex.size();
-      std::copy(upstream_nonex.begin(),upstream_nonex.end(),std::back_inserter(global_ghost_nodes));
+      std::copy(upstream_nonex.begin(),
+                upstream_nonex.end(),
+                std::back_inserter(global_ghost_nodes));
+
       for (int loc=0; loc<(chi_mpi.process_count-1); loc++)
-      {
         MPI_Send(global_ghost_nodes.data(),global_ghost_nodes.size(),
                  MPI_INT,loc,124,MPI_COMM_WORLD);
-      }
 
     }
   }
-
-
 
   //================================================== Last location broadcasts
   if (chi_mpi.location_id<(chi_mpi.process_count-1))
@@ -170,8 +168,6 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
              MPI_INT,chi_mpi.process_count-1,124,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
   }
-
-
 
   chi_log.Log(LOG_ALLVERBOSE_1) << "Total number of ghost nodes: "
                                 << global_ghost_nodes.size() << std::endl;
@@ -197,10 +193,8 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
   // 2(N-1) halfs of the ghost nodes.
   int g_piece = 0;
   if (chi_mpi.process_count>1)
-  {
     g_piece = (int)floor(global_ghost_nodes.size()/
                          (2*(chi_mpi.process_count-1)));
-  }
 
   int g_from = 0;
   int g_to = 0;
@@ -213,7 +207,8 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
   {
     g_from = g_piece-1 + 2*g_piece*(chi_mpi.location_id-1)+1;
     g_to   = g_from + 2*g_piece-1;
-  } else
+  }
+  else
   {
     g_from = g_piece-1 + 2*g_piece*(chi_mpi.location_id-1)+1;
     g_to   = (int)global_ghost_nodes.size()-1;
@@ -255,10 +250,8 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
     local_to = local_from + (int)exclusive_nodes.size() - 1 + num_g_loc;
 
     if (chi_mpi.location_id<(chi_mpi.process_count-1))
-    {
       MPI_Send(&local_to,1,
                MPI_INT,chi_mpi.location_id+1,125,MPI_COMM_WORLD);
-    }
 
   }
   int tot_local_nodes = local_to - local_from + 1;
@@ -296,7 +289,6 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
   else
   {
     std::vector<int> upstream_ghost_mapping;
-    //world.recv(chi_mpi.location_id-1,126,upstream_ghost_mapping);
     MPI_Status status;
     MPI_Probe(chi_mpi.location_id-1,126,MPI_COMM_WORLD,&status);
     int num_to_recv=0;
@@ -314,27 +306,20 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
       int ghost_index = local_from + (int)exclusive_nodes.size() + g-g_from;
       ghost_mapping[g] = ghost_index;
     }
+
     if (chi_mpi.location_id<(chi_mpi.process_count-1))
-    {
       MPI_Send(ghost_mapping.data(),ghost_mapping.size(),
                MPI_INT,chi_mpi.location_id+1,126,MPI_COMM_WORLD);
-    }
     else
-    {
       for (int loc=0; loc<(chi_mpi.process_count-1); loc++)
-      {
-        //world.send(loc,127,ghost_mapping);//
         MPI_Send(ghost_mapping.data(),ghost_mapping.size(),
                  MPI_INT,loc,127,MPI_COMM_WORLD);
-      }
-    }
   }
 
   //================================================== Collect ghost mapping
   //                                                   from last location
   if (chi_mpi.location_id<(chi_mpi.process_count-1))
   {
-//    world.recv(chi_mpi.process_count-1,127,ghost_mapping);
     MPI_Status status;
     MPI_Probe(chi_mpi.process_count-1,127,MPI_COMM_WORLD,&status);
     int num_to_recv=0;
@@ -348,12 +333,7 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
 
   //================================================== Initialize forward
   //                                                   ordering
-  //Initially this is just pass through
-//  std::vector<int> node_ordering;
-//  int num_nodes = grid->vertices.size();
-//  node_ordering.resize(num_nodes,-1);
-
-  std::map<int,int> node_ordering;
+  node_mapping.clear();
 
 
   //================================================== Creating mapping of
@@ -362,7 +342,7 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
   for (int n=0; n<num_exl; n++)
   {
     int orig_index = exclusive_nodes[n];
-    node_ordering[orig_index] = local_from + n;
+    node_mapping[orig_index] = local_from + n;
   }
 
 
@@ -371,38 +351,14 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
   for (size_t n=0; n<global_ghost_nodes.size(); n++)
   {
     int orig_index = global_ghost_nodes[n];
-    node_ordering[orig_index] = ghost_mapping[n];
+    node_mapping[orig_index] = ghost_mapping[n];
   }
 
   chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 5 time: "
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
-
-  //================================================== Push up these mappings
-  //                                                   to the mesher
-  node_mapping.clear();
-//  reverse_node_mapping.clear();
-//  node_mapping.reserve(num_nodes);
-//  reverse_node_mapping.resize(num_nodes,-1);
-//  int temp;
-//  for (int i=0; i<num_nodes; i++)
-//  {
-//    node_mapping.push_back(node_ordering[i]);
-//    temp = node_ordering[i];
-//
-//    if (temp>=0)
-//      reverse_node_mapping[node_ordering[i]] = i;
-//  }
-
-  for (auto& mapping : node_ordering)
-  {
-    node_mapping.insert(mapping);
-//    reverse_node_mapping.insert(std::pair<int,int>(
-//      mapping.second,
-//      mapping.first));
-  }
-
+  //================================================== Compute block addresses
   chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stages complete time: "
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
@@ -433,6 +389,4 @@ OrderNodes(chi_mesh::MeshContinuumPtr grid)
                 1,                            //recv count
                 MPI_INT,                      //recv type
                 MPI_COMM_WORLD);              //communicator
-
-  return {local_to - local_from + 1,grid->vertices.size()};
 }
