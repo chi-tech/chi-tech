@@ -1,5 +1,5 @@
-#ifndef CHI_DISCRETIZATION_FV_H
-#define CHI_DISCRETIZATION_FV_H
+#ifndef SPATIAL_DISCRETIZATION_FV_H
+#define SPATIAL_DISCRETIZATION_FV_H
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "CellViews/fv_cellbase.h"

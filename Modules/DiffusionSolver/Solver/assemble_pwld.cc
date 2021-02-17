@@ -167,6 +167,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       }//for fi
 
 
+      //TODO: RESTORE POINT
+
+
       //========================= Assemble gradient terms
       // For the following comments we use the notation:
       // Dk = 0.5* n dot nabla bk
@@ -286,6 +289,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 //        }
 //      }
 
+//TODO: END RESTORE POINT
 
     }//if not bndry
     else

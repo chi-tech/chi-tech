@@ -5,7 +5,7 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 #include "ChiMath/Quadratures/quadrature_gausslegendre.h"
 #include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMath/Quadratures/quadrature_tetrahedron.h"
@@ -15,7 +15,7 @@
  * with piecewise linear basis functions
  * for use by either a Continues Finite Element Method (CFEM)
  * or a Discontinuous Finite Element Method (DFEM). */
-class SpatialDiscretization_PWLC : public SpatialDiscretization
+class SpatialDiscretization_PWLC : public SpatialDiscretization_FE
 {
 public:
   std::vector<CellPWLFEValues*> cell_fe_views;
