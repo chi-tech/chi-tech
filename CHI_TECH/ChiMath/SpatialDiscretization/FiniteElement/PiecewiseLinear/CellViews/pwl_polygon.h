@@ -1,7 +1,7 @@
 #ifndef PWL_POLYGON_VALUES_H
 #define PWL_POLYGON_VALUES_H
 
-#include "../pwl.h"
+#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include <vector>
 #include <ChiMesh/Cell/cell_polygon.h>
 

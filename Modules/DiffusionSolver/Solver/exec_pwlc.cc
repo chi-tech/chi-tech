@@ -1,8 +1,8 @@
 #include "diffusion_solver.h"
 
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 

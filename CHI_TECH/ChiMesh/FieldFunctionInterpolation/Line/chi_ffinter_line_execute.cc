@@ -1,5 +1,5 @@
 #include "chi_ffinter_line.h"
-#include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
+#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h>
 
 #include <chi_log.h>
 extern ChiLog&  chi_log;

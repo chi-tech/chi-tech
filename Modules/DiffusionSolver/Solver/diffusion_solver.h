@@ -13,8 +13,8 @@
 #include "Modules/DiffusionSolver/chi_diffusion.h"
 #include "ChiPhysics/SolverBase/chi_solver.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwlc.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 

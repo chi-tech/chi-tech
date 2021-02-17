@@ -1,8 +1,8 @@
 #include "diffusion_solver.h"
 
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
 #include "ChiTimer/chi_timer.h"
 

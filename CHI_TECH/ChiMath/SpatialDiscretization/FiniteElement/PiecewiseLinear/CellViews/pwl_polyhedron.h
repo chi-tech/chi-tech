@@ -1,7 +1,7 @@
 #ifndef PWL_POLYHEDRON_VALUES_H
 #define PWL_POLYHEDRON_VALUES_H
 
-#include "../pwl.h"
+#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include <vector>
 #include "ChiMath/Quadratures/quadrature.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"

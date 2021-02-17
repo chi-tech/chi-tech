@@ -1,7 +1,7 @@
 #include "fieldfunction.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;

@@ -4,7 +4,7 @@
 #include "ChiPhysics/chi_physics.h"
 #include "ChiMath/chi_math.h"
 
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 extern ChiPhysics&  chi_physics_handler;
 extern ChiMath&     chi_math_handler;

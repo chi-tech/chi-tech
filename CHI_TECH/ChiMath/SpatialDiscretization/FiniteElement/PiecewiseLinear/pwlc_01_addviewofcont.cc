@@ -1,8 +1,8 @@
 #include "pwlc.h"
 
-#include "CellViews/pwl_slab.h"
-#include "CellViews/pwl_polygon.h"
-#include "CellViews/pwl_polyhedron.h"
+#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
+#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
 #include <chi_log.h>
 

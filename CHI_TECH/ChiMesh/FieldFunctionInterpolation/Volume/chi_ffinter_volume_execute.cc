@@ -1,6 +1,6 @@
 #include "chi_ffinter_volume.h"
 #include <ChiMesh/Cell/cell.h>
-#include <ChiMath/SpatialDiscretization/PiecewiseLinear/pwl.h>
+#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h>
 
 #include <chi_mpi.h>
 

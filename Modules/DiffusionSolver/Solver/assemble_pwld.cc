@@ -1,6 +1,6 @@
 #include "diffusion_solver.h"
 
-#include "ChiMath/SpatialDiscretization/PiecewiseLinear/CellViews/pwl_cellbase.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
 
 #include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
