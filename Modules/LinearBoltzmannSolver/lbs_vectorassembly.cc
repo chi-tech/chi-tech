@@ -1,18 +1,18 @@
 #include "lbs_linear_boltzmann_solver.h"
 #include <ChiMesh/Cell/cell.h>
 
-//###################################################################
-/**Maps the local storage location of phi given a cell, the node of
- * the cell, the moment and the group.*/
-int LinearBoltzmann::Solver::
-MapDOF(chi_mesh::Cell *cell, int dof, int mom, int g)
-{
-  int G = groups.size();
-  int address = local_cell_dof_array_address[cell->local_id];
-//  int block_address = (address+dof)*num_moments*groups.size();
-
-  return (address+dof)*num_moments*G + G*mom + g;
-}
+////###################################################################
+///**Maps the local storage location of phi given a cell, the node of
+// * the cell, the moment and the group.*/
+//int LinearBoltzmann::Solver::
+//MapDOF(chi_mesh::Cell *cell, int dof, int mom, int g)
+//{
+//  int G = groups.size();
+//  int address = local_cell_dof_array_address[cell->local_id];
+////  int block_address = (address+dof)*num_moments*groups.size();
+//
+//  return (address+dof)*num_moments*G + G*mom + g;
+//}
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/

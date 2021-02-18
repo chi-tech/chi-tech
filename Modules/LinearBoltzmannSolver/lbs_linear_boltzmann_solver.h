@@ -84,9 +84,6 @@ public:
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
 
-  std::vector<int> local_cell_phi_dof_array_address;
-  std::vector<int> local_cell_dof_array_address;
-
  public:
   //00
   Solver();
@@ -157,7 +154,7 @@ public:
              bool log_info = true);
 
   //Vector assembly
-  int  MapDOF(chi_mesh::Cell* cell, int dof, int mom, int g);
+//  int  MapDOF(chi_mesh::Cell* cell, int dof, int mom, int g);
   void AssembleVector(LBSGroupset& groupset, Vec x, double *y,bool with_delayed_psi=false);
   void DisAssembleVector(LBSGroupset& groupset, Vec x_src, double *y,bool with_delayed_psi=false);
   void DisAssembleVectorLocalToLocal(LBSGroupset& groupset, double *x_src, double *y);

@@ -23,7 +23,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 {
   chi_log.Log(LOG_0) << "\n"
                      << chi_program_timer.GetTimeString() << " "
-                     << solver_name << ": Initializing Diffusion solver PETSc";
+                     << solver_name << ": Initializing Diffusion solver ";
   this->verbose_info = verbose;
 
   if (regions.empty())
@@ -45,18 +45,21 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   switch (fem_method)
   {
-    case PWLC:
+    case PWLC: {
       discretization = SpatialDiscretization_PWLC::New(grid);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
       break;
-    case PWLD_MIP:
+    }
+    case PWLD_MIP: {
       discretization = SpatialDiscretization_PWL::New(grid);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
       break;
-    case PWLD_MIP_GAGG:
+    }
+    case PWLD_MIP_GAGG: {
       discretization = SpatialDiscretization_PWL::New(grid);
-      unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N,G);
+      unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
       break;
+    }
     default:
     {
       chi_log.Log(LOG_0)
@@ -71,6 +74,10 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //============================================= Get DOF counts
   local_dof_count = sdm->GetNumLocalDOFs(grid, unknown_manager);
   global_dof_count = sdm->GetNumGlobalDOFs(grid, unknown_manager);
+  chi_log.Log(LOG_0)
+    << solver_name << ": Global number of DOFs="
+    << global_dof_count;
+
 
   //================================================== Initialize discretization
   //                                                   method
@@ -113,6 +120,8 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
+  std::vector<int> nodal_nnz_in_diag;
+  std::vector<int> nodal_nnz_off_diag;
   sdm->BuildSparsityPattern(grid,
                             nodal_nnz_in_diag,
                             nodal_nnz_off_diag,
@@ -243,6 +252,8 @@ DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
 
   double relative_residual = rnorm/rhs_norm;
+
+  chi_log.Log(LOG_0) << "Iteration " << n << " Residual " << rnorm/rhs_norm;
 
   if (relative_residual < tol)
     *convergedReason = KSP_CONVERGED_RTOL;

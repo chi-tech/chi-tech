@@ -34,8 +34,7 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
       text_name,                                    //Text name
       discretization,                               //Spatial Discretization
       &delta_phi_local,                             //Data vector
-      scalar_uk_man);                               //Unknown manager                            //Data vector
-
+      scalar_uk_man);                               //Unknown manager
 
     chi_physics_handler.fieldfunc_stack.push_back(deltaphi_ff);
     field_functions.push_back(deltaphi_ff);
@@ -63,9 +62,19 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
     for (auto lbs_bndry : sweep_boundaries)
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
+      {
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryReflecting());
+        chi_log.Log(LOG_0VERBOSE_1)
+          << "Reflecting boundary added (index "
+          << dsolver->boundaries.size()-1 <<  ").";
+      }
       else
+      {
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryDirichlet());
+        chi_log.Log(LOG_0VERBOSE_1)
+          << "Dirichlet boundary added (index "
+          << dsolver->boundaries.size()-1 <<  ").";
+      }
     }
 
     //================================= Redirect material lookup to use
@@ -103,6 +112,7 @@ void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
   int gsi = groupset.groups[0].id;
   int gss = groupset.groups.size();
 
+  delta_phi_local.clear();
   delta_phi_local.resize(local_dof_count*gss,0.0);
 
   int index = -1;

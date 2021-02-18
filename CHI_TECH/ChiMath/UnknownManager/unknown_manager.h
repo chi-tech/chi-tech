@@ -63,27 +63,31 @@ private:
       {
         case UnknownType::SCALAR:
           if (component_number >= num_components)
-            throw std::out_of_range("Attempting to access component >=1"
+            throw std::out_of_range("Attempting to access component "+
+                                    std::to_string(component_number)+">=1"
                                     " for a SCALAR unknown.");
           map_value = 0;
           break;
         case UnknownType::VECTOR_2:
           if (component_number >= num_components)
-            throw std::out_of_range("Attempting to access component >=2"
+            throw std::out_of_range("Attempting to access component "+
+                                    std::to_string(component_number)+">=2"
                                     " for a VECTOR_2 unknown.");
           map_value = map_begin + component_number;
           break;
         case UnknownType::VECTOR_3:
           if (component_number >= num_components)
-            throw std::out_of_range("Attempting to access component >=3"
+            throw std::out_of_range("Attempting to access component "+
+                                    std::to_string(component_number)+">=3"
                                     " for a VECTOR_3 unknown.");
           map_value = map_begin + component_number;
           break;
         case UnknownType::VECTOR_N:
           if (component_number >= num_components)
-            throw std::out_of_range("Attempting to access component >="+
+            throw std::out_of_range("Attempting to access component "+
+                                    std::to_string(component_number)+">="+
                                     std::to_string(num_components)+
-                                    " for a VECTOR_2 unknown.");
+                                    " for a VECTOR_N unknown.");
           map_value = map_begin + component_number;
           break;
         default:

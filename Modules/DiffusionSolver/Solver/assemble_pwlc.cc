@@ -12,8 +12,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/
-void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
-                                                  chi_mesh::Cell *cell,
+void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell *cell,
                                                   int group)
 {
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
@@ -130,7 +129,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
       cell_matrix[i] = std::vector<double>(fe_view->dofs,0.0);
       cell_matrix[i][i] = 1.0;
       int ir = dof_global_col_ind[i];
-      MatSetValue(Aref,ir,ir,1.0,ADD_VALUES);
+      MatSetValue(A,ir,ir,1.0,ADD_VALUES);
       dof_global_col_ind[i] = -1;
       cell_rhs[i] = dirichlet_value[i];
     }
@@ -155,16 +154,16 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(int cell_glob_index,
       cell_matrix_cont[n++] = cell_matrix[i][j];
 
   //======================================== Add to global
-  MatSetValues(Aref,
+  MatSetValues(A,
                fe_view->dofs,dof_global_row_ind.data(),
                fe_view->dofs,dof_global_col_ind.data(),
                cell_matrix_cont.data(), ADD_VALUES);
 
-  VecSetValues(bref,
+  VecSetValues(b,
                fe_view->dofs,dof_global_row_ind.data(),
                cell_rhs.data(),ADD_VALUES);
 
-  VecSetValues(xref,
+  VecSetValues(x,
                fe_view->dofs,
                dof_global_row_ind.data(),
                dirichlet_value.data(),INSERT_VALUES);

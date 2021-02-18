@@ -1,22 +1,14 @@
 #include "diffusion_solver.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/Region/chi_region.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Cell/cell.h"
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
-#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
-#include "ChiTimer/chi_timer.h"
 
-#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h>
-#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h>
-#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h>
 
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
 /**Still searching for a reference for this.
@@ -109,19 +101,26 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
 
 
 
-/**Given a global node index, returns the dof its associated on the
+/**Given a global node index, returns the local cell-node it's associated on the
  * referenced cell. Polyhedron overload.*/
-int chi_diffusion::Solver::MapCellDof(chi_mesh::Cell* cell, int ig)
+uint64_t chi_diffusion::Solver::MapCellLocalNodeIDFromGlobalID(chi_mesh::Cell* cell,
+                                                               uint64_t node_global_id)
 {
-  int imap = -1;
-  for (int ai=0; ai < cell->vertex_ids.size(); ai++)
+  size_t imap = 0;
+  bool map_found = false;
+  for (size_t ai=0; ai < cell->vertex_ids.size(); ai++)
   {
-    if (ig == cell->vertex_ids[ai])
+    if (node_global_id == cell->vertex_ids[ai])
     {
       imap = ai;
+      map_found = true;
       break;
     }
   }
+
+  if (not map_found)
+    throw std::logic_error(std::string(__FUNCTION__)+": Mapping failure.");
+
   return imap;
 }
 
@@ -129,288 +128,36 @@ int chi_diffusion::Solver::MapCellDof(chi_mesh::Cell* cell, int ig)
 
 /**Given the face index on the current cell, finds the
  * corresponding face index on the adjacent cell.*/
-int chi_diffusion::Solver::MapCellFace(chi_mesh::Cell* cur_cell,
-                                       chi_mesh::Cell* adj_cell,
-                                       int f)
+unsigned int
+chi_diffusion::Solver::MapCellFace(chi_mesh::Cell* cur_cell,
+                                   chi_mesh::Cell* adj_cell,
+                                   unsigned int f)
 {
-  int num_face_dofs = cur_cell->faces[f].vertex_ids.size();
-  int fmap = -1;
-  for (int af=0; af < adj_cell->faces.size(); af++)
+  const auto& ccface = cur_cell->faces[f]; //current cell face
+  std::set<uint64_t> ccface_vids;
+  for (auto vid : ccface.vertex_ids) ccface_vids.insert(vid);
+
+  size_t fmap;
+  bool map_found = false;
+  for (size_t af=0; af < adj_cell->faces.size(); af++)
   {
-    bool is_match = true;
+    const auto& acface = adj_cell->faces[af]; //adjacent cell face
 
-    for (int fi=0; fi<num_face_dofs; fi++)
+    std::set<uint64_t> acface_vids;
+    for (auto vid : acface.vertex_ids) acface_vids.insert(vid);
+
+    if (acface_vids == ccface_vids)
     {
-      bool found = false;
-
-      for (int afi=0; afi < adj_cell->faces[af].vertex_ids.size(); afi++)
-      {
-        if (cur_cell->faces[f].vertex_ids[fi] ==
-            adj_cell->faces[af].vertex_ids[afi])
-        {
-          found = true;
-          break;
-        }
-      }//for adj face verts
-
-      if (!found)
-      {
-        is_match = false;
-        break;
-      }
-    }//for cur face verts
-
-    if (is_match)
       fmap = af;
+      map_found = true;
+      break;
+    }
   }//for adj faces
 
-  if (fmap<0)
-  {
-    chi_log.Log(LOG_ALL)
-      << "Error fmap";
-    exit(EXIT_FAILURE);
-  }
+  if (not map_found)
+    throw std::logic_error(std::string(__FUNCTION__)+": Mapping failure.");
 
-  return fmap;
-}
-
-
-
-
-/**Obtains a reference to a Interior Penalty view of a cell.*/
-DiffusionIPCellView* chi_diffusion::Solver::GetBorderIPView(int locI,
-                                                          int cell_glob_index)
-{
-  int cell_border_index=-1;
-  for (int c=0; c<ip_locI_bordercell_info[locI].size(); c++)
-  {
-    if (ip_locI_bordercell_info[locI][c]->cell_glob_index == cell_glob_index)
-      cell_border_index = c;
-  }
-
-  if (cell_border_index<0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "In function chi_diffusion::Solver::GetBorderIPView: "
-         "Cell border index mapping failed.";
-    exit(EXIT_FAILURE);
-  }
-
-  if (ip_locI_borderipviews[locI][cell_border_index] == nullptr)
-  {
-    SpawnBorderCell(locI,cell_border_index);
-    return ip_locI_borderipviews[locI][cell_border_index];
-  }
-  else
-    return ip_locI_borderipviews[locI][cell_border_index];
-}
-
-/**Obtains a reference to a Finite Element view of a cell.*/
-CellPWLFEValues* chi_diffusion::Solver::GetBorderFEView(int locI,
-                                                        int cell_glob_index)
-{
-  int cell_border_index=-1;
-  for (int c=0; c<ip_locI_bordercell_info[locI].size(); c++)
-  {
-    if (ip_locI_bordercell_info[locI][c]->cell_glob_index == cell_glob_index)
-      cell_border_index = c;
-  }
-
-  if (cell_border_index<0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "In function chi_diffusion::Solver::GetBorderFEView: "
-         "Cell border index mapping failed.";
-    exit(EXIT_FAILURE);
-  }
-
-  if (ip_locI_borderipviews[locI][cell_border_index] == nullptr)
-  {
-    SpawnBorderCell(locI,cell_border_index);
-    return ip_locI_borderfeviews[locI][cell_border_index];
-  }
-  else
-    return ip_locI_borderfeviews[locI][cell_border_index];
-}
-
-/**Obtains a reference to a cell.*/
-chi_mesh::Cell* chi_diffusion::Solver::GetBorderCell(int locI,
-                                                     int cell_glob_index)
-{
-  int cell_border_index=-1;
-  for (int c=0; c<ip_locI_bordercell_info[locI].size(); c++)
-  {
-    if (ip_locI_bordercell_info[locI][c]->cell_glob_index == cell_glob_index)
-      cell_border_index = c;
-  }
-
-  if (cell_border_index<0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "In function chi_diffusion::Solver::GetBorderCell: "
-         "Cell border index mapping failed.";
-    exit(EXIT_FAILURE);
-  }
-
-  if (ip_locI_borderipviews[locI][cell_border_index] == nullptr)
-  {
-    SpawnBorderCell(locI,cell_border_index);
-    return ip_locI_bordercells[locI][cell_border_index];
-  }
-  else
-    return ip_locI_bordercells[locI][cell_border_index];
-}
-
-
-
-
-
-
-/**This function can be called from a number of places and is used to
- * generate the necessary information for the successful implementation
- * of MIP.*/
-void chi_diffusion::Solver::SpawnBorderCell(int locI, int cell_border_index)
-{
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
-  //============================================= Obtain the border cell info
-  DiffusionIPBorderCell* cell_info =
-    ip_locI_bordercell_info[locI][cell_border_index];
-
-  //============================================= Create IP view
-  DiffusionIPCellView* ip_view = new DiffusionIPCellView;
-  ip_view->cell_dof_start = cell_info->cell_dof_start;
-  ip_locI_borderipviews[locI][cell_border_index] = ip_view;
-
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-  if (cell_info->cell_type == 3)
-  {
-    auto cell = new chi_mesh::CellSlab;
-    cell->partition_id = locI;
-    cell->material_id = cell_info->cell_mat_id;
-
-    chi_mesh::Vector3 vc;
-    for (int v=0; v<cell_info->cell_dof_count; v++)
-    {
-      vc = vc + *grid->vertices[cell_info->v_indices[v]];
-      cell->vertex_ids.push_back(cell_info->v_indices[v]);
-    }
-    cell->centroid = vc/cell_info->cell_dof_count;
-
-    cell->faces.resize(cell_info->cell_face_count);
-    for (int f=0; f<cell_info->cell_face_count; f++)
-    {
-      for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
-        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
-    }
-
-    ip_locI_bordercells[locI][cell_border_index] = cell;
-
-    auto fe_view = new SlabPWLFEView(cell,
-                                     grid,
-                                     pwl_sdm->line_quad_order_second);
-
-    ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
-
-  }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-  else if (cell_info->cell_type == 4)
-  {
-    auto cell = new chi_mesh::CellPolygon;
-    cell->partition_id = locI;
-    cell->material_id = cell_info->cell_mat_id;
-
-    chi_mesh::Vector3 vc;
-    for (int v=0; v<cell_info->cell_dof_count; v++)
-    {
-      vc = vc + *grid->vertices[cell_info->v_indices[v]];
-      cell->vertex_ids.push_back(cell_info->v_indices[v]);
-    }
-    cell->centroid = vc/cell_info->cell_dof_count;
-
-    cell->faces.resize(cell_info->cell_face_count);
-    for (int f=0; f<cell_info->cell_face_count; f++)
-    {
-      for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
-        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
-    }
-
-    ip_locI_bordercells[locI][cell_border_index] = cell;
-
-    auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
-
-
-    auto fe_view =
-      new PolygonPWLFEValues(cell,
-                             grid,
-                             pwl_sdm_ptr->tri_quad_order_second,
-                             pwl_sdm_ptr->line_quad_order_second);
-
-    fe_view->PreComputeValues();
-
-    ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
-
-  }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-  else if (cell_info->cell_type == 5)
-  {
-    auto cell = new chi_mesh::CellPolyhedron;
-    cell->partition_id = locI;
-    cell->material_id = cell_info->cell_mat_id;
-
-    chi_mesh::Vector3 vc;
-    for (int v=0; v<cell_info->cell_dof_count; v++)
-    {
-      vc = vc + *grid->vertices[cell_info->v_indices[v]];
-      cell->vertex_ids.push_back(cell_info->v_indices[v]);
-    }
-    cell->centroid = vc/cell_info->cell_dof_count;
-
-    cell->faces.resize(cell_info->cell_face_count);
-    for (int f=0; f<cell_info->cell_face_count; f++)
-    {
-      chi_mesh::Vertex vfc;
-      for (int fv=0; fv<cell_info->face_v_indices[f].size(); fv++)
-      {
-        cell->faces[f].vertex_ids.push_back(cell_info->face_v_indices[f][fv]);
-        vfc = vfc + *grid->vertices[cell_info->face_v_indices[f][fv]];
-      }
-      vfc = vfc/cell_info->face_v_indices[f].size();
-      cell->faces[f].centroid = vfc;
-
-      chi_mesh::Vector3 v0fc = vfc - *grid->vertices[cell_info->face_v_indices[f][0]];
-      chi_mesh::Vector3 v01 = *grid->vertices[cell_info->face_v_indices[f][1]] -
-                              *grid->vertices[cell_info->face_v_indices[f][0]];
-
-      chi_mesh::Vector3 n = v01.Cross(v0fc);
-      cell->faces[f].normal = n/n.Norm();
-
-    }//for f
-
-
-    ip_locI_bordercells[locI][cell_border_index] = cell;
-
-    auto pwl_sdm_ptr = std::static_pointer_cast<SpatialDiscretization_PWL>(discretization);
-
-    PolyhedronPWLFEValues* fe_view =
-      new PolyhedronPWLFEValues(cell,
-                                grid,
-                                pwl_sdm_ptr->tet_quad_order_second,
-                                pwl_sdm_ptr->tri_quad_order_second);
-
-    fe_view->PreComputeValues();
-
-    ip_locI_borderfeviews[locI][cell_border_index] = fe_view;
-
-  }//polyhedron
-  else
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "In function chi_diffusion::Solver::SpawnBorderCell: "
-         "Unsupported cell type encountered.";
-    exit(EXIT_FAILURE);
-  }
-
+  return (unsigned int)fmap;
 }
 
 

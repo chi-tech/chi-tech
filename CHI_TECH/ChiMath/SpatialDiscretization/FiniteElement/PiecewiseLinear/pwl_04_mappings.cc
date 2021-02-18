@@ -76,8 +76,8 @@ MapDOF(chi_mesh::Cell& cell, int node,
        unsigned int unknown_id,
        unsigned int component)
 {
-//  if (component < 0) return -1;
   if (component < 0) throw std::logic_error(__FUNCTION__);
+  if (node < 0) throw std::logic_error(__FUNCTION__);
 
   auto storage = unknown_manager.dof_storage_type;
 
@@ -154,7 +154,8 @@ MapDOFLocal(chi_mesh::Cell& cell, int node,
             unsigned int unknown_id,
             unsigned int component)
 {
-  if (component < 0) return -1;
+  if (component < 0) throw std::logic_error(__FUNCTION__);
+  if (node < 0) throw std::logic_error(__FUNCTION__);
 
   auto storage = unknown_manager.dof_storage_type;
 

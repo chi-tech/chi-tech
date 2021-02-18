@@ -128,10 +128,10 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,5)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
-chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4)
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-2)
+-- chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
 
 gs1 = chiLBSCreateGroupset(phys1)
@@ -143,10 +143,10 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,5)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
-chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
-chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-2,false," ")
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-6,false," ")
 
 --========== Boundary conditions
 bsrc={}

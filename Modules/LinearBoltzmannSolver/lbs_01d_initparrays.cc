@@ -58,17 +58,9 @@ void LinearBoltzmann::Solver::InitializeParrays()
   }
 
   //================================================== Compute local # of dof
-//  auto domain_ownership = pwl_discretization->OrderNodes(grid);
-//
-//  local_dof_count = domain_ownership.first;
-//  glob_dof_count  = domain_ownership.second;
-
   auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
   local_dof_count = pwl_discretization->GetNumLocalDOFs(grid,flux_moments_uk_man)/GxM;
   glob_dof_count = pwl_discretization->GetNumGlobalDOFs(grid,flux_moments_uk_man)/GxM;
-
-
-  local_cell_dof_array_address = pwl_discretization->cell_local_block_address;
 
   //================================================== Compute num of unknowns
   int num_grps = groups.size();
@@ -162,9 +154,6 @@ void LinearBoltzmann::Solver::InitializeParrays()
 
         ++f;
       }//for f
-
-      //Add address
-      local_cell_phi_dof_array_address.push_back(cell_lbs_view.dof_phi_map_start);
 
       if (cell_fe_view->dofs > max_cell_dof_count)
         max_cell_dof_count = cell_fe_view->dofs;

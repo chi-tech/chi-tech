@@ -1,9 +1,5 @@
 #include "diffusion_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
-
 #include "ChiTimer/chi_timer.h"
 
 #include "chi_mpi.h"
@@ -22,36 +18,7 @@ extern ChiTimer chi_program_timer;
 int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
                                            bool suppress_solve)
 {
-
-  //=================================== Verbose print solver info
-  if (chi_log.GetVerbosity()>=LOG_0VERBOSE_1)
-  {
-    MatInfo info;
-    ierr = MatGetInfo(A,MAT_GLOBAL_SUM,&info);
-
-    chi_log.Log(LOG_0VERBOSE_1) << "Number of mallocs used = " << info.mallocs
-                              << "\nNumber of non-zeros allocated = "
-                              << info.nz_allocated
-                              << "\nNumber of non-zeros used = "
-                              << info.nz_used
-                              << "\nNumber of unneeded non-zeros = "
-                              << info.nz_unneeded;
-  }
-
-  //################################################## Assemble Amatrix
-  if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
-  {
-    chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString() << " "
-      << solver_name << ": Assembling A and b";
-    chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString() << " "
-      << solver_name << ": Local matrix instructions";
-  }
-
   t_assembly.Reset();
-
-  std::vector<int> boundary_nodes,boundary_numbers;
 
   if (chi_physics_handler.material_stack.empty())
   {
@@ -60,13 +27,8 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
     exit(0);
   }
 
-  //================================================== Setting references
-  xref = x;
-  bref = b;
-  Aref = A;
-
-  VecSet(xref,0.0);
-  VecSet(bref,0.0);
+  VecSet(x,0.0);
+  VecSet(b,0.0);
 
   if (!suppress_assembly)
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
@@ -74,15 +36,17 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
 
   //================================================== Loop over locally owned
   //                                                   cells
-  for (auto& cell : grid->local_cells)
-  {
-//    auto cell_ip_view = ip_cell_views[cell.cell_local_id];
+  if (!suppress_assembly)
+    for (auto& cell : grid->local_cells)
+      PWLD_Assemble_A_and_b(&cell,gi);
+  else
+    for (auto& cell : grid->local_cells)
+      PWLD_Assemble_b(&cell,gi);
 
-    if (!suppress_assembly)
-      PWLD_Assemble_A_and_b(cell.global_id, &cell,/*cell_ip_view*/nullptr, gi);
-    else
-      PWLD_Assemble_b(cell.global_id, &cell,/*cell_ip_view*/nullptr, gi);
-  }
+  if (!suppress_assembly)
+    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+                       << solver_name << ": Done Assembling A locally";
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //=================================== Call matrix assembly
   if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
@@ -92,6 +56,8 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
 
   if (!suppress_assembly)
   {
+    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+                       << solver_name << ": Assembling A globally";
     MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(A,MAT_FINAL_ASSEMBLY);
 
@@ -103,6 +69,8 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
 //      chi_log.Log(LOG_0WARNING)
 //        << "Assembled matrix is not symmetric";
 //    }
+
+    //================================= Matrix diagonal check
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
                        << solver_name << ": Diagonal check";
     PetscBool missing_diagonal;
@@ -111,6 +79,18 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
     if (missing_diagonal)
       chi_log.Log(LOG_ALLERROR) << chi_program_timer.GetTimeString() << " "
                                 << solver_name << ": Missing diagonal detected";
+
+    //================================= Matrix sparsity info
+    MatInfo info;
+    ierr = MatGetInfo(A,MAT_GLOBAL_SUM,&info);
+
+    chi_log.Log(LOG_0) << "Number of mallocs used = " << info.mallocs
+                       << "\nNumber of non-zeros allocated = "
+                       << info.nz_allocated
+                       << "\nNumber of non-zeros used = "
+                       << info.nz_used
+                       << "\nNumber of unneeded non-zeros = "
+                       << info.nz_unneeded;
   }
   if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
@@ -120,33 +100,24 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
 
-  MatInfo info;
-  ierr = MatGetInfo(A,MAT_GLOBAL_SUM,&info);
-
-  chi_log.Log(LOG_0) << "Number of mallocs used = " << info.mallocs
-                     << "\nNumber of non-zeros allocated = "
-                     << info.nz_allocated
-                     << "\nNumber of non-zeros used = "
-                     << info.nz_used
-                     << "\nNumber of unneeded non-zeros = "
-                     << info.nz_unneeded;
-
   time_assembly = t_assembly.GetTime()/1000.0;
 
   //=================================== Execute solve
   if (suppress_solve)
   {
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
-                       << solver_name
-                       << ": Setting up solver and preconditioner\n";
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString() << " "
+      << solver_name
+      << ": Setting up solver and preconditioner\n";
     PCSetUp(pc);
     KSPSetUp(ksp);
   }
   else
   {
     if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
-      chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
-                         << solver_name << ": Solving system\n";
+      chi_log.Log(LOG_0)
+        << chi_program_timer.GetTimeString() << " "
+        << solver_name << ": Solving system\n";
     t_solve.Reset();
     PCSetUp(pc);
     KSPSetUp(ksp);
@@ -156,21 +127,19 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
     //=================================== Populate field vector
     const double* x_ref;
     VecGetArrayRead(x,&x_ref);
-    double max =0.0;
 
     for (int i=0; i < local_dof_count; i++)
-    {
       pwld_phi_local[i] = x_ref[i];
-      if (x_ref[i]> max)
-        max = x_ref[i];
-    }
+
     VecRestoreArrayRead(x,&x_ref);
 
     //=================================== Get convergence reason
     KSPConvergedReason reason;
     KSPGetConvergedReason(ksp,&reason);
     if (verbose_info || reason != KSP_CONVERGED_RTOL)
-      chi_log.Log(LOG_0) << "Convergence reason: " << reason;
+      chi_log.Log(LOG_0)
+        << "Convergence reason: "
+        << chi_physics::GetPETScConvergedReasonstring(reason);
 
     //=================================== Location wise view
     if (chi_mpi.location_id == 0)
@@ -181,6 +150,7 @@ int chi_diffusion::Solver::ExecutePWLD_MIP(bool suppress_assembly,
         << chi_program_timer.GetTimeString() << " "
         << solver_name
         << ": Number of iterations =" << its;
+
       if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
       {
         chi_log.Log(LOG_0) << "Timing:";

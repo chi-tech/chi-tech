@@ -111,7 +111,6 @@ void ChiTech::ParseArguments(int argc, char** argv)
     else if (argument.find('=') != std::string::npos)
     {
       chi_console.command_buffer.push_back(argument);
-//      luaL_dostring(chi_console.consoleState, argument.c_str());
     }//=
 
   }//for argument

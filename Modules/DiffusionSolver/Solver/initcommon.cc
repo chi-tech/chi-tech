@@ -29,35 +29,26 @@ void chi_diffusion::Solver::InitializeCommonItems()
   {
     for (int b=0; b<(region->boundaries.size()-2); b++)
     {
-      chi_diffusion::Boundary* new_bndry =
-        new chi_diffusion::BoundaryDirichlet;
-      this->boundaries.push_back(new_bndry);
+      boundaries.push_back(new chi_diffusion::BoundaryDirichlet);
       chi_log.Log(LOG_0VERBOSE_1)
       << "Dirichlet boundary added (index " << boundaries.size()-1 <<  ").";
     }
-    chi_diffusion::Boundary* new_bndry;
 
-    new_bndry = new chi_diffusion::BoundaryReflecting;
-    this->boundaries.push_back(new_bndry);
+    boundaries.push_back(new chi_diffusion::BoundaryReflecting);
     chi_log.Log(LOG_0VERBOSE_1)
       << "Reflecting boundary added (index " << boundaries.size()-1 <<  ").";
 
-    new_bndry = new chi_diffusion::BoundaryReflecting;
-    this->boundaries.push_back(new_bndry);
+    boundaries.push_back(new chi_diffusion::BoundaryReflecting);
     chi_log.Log(LOG_0VERBOSE_1)
       << "Reflecting boundary added (index " << boundaries.size()-1 <<  ").";
   }
   else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
   {
-    chi_diffusion::Boundary* new_bndry =
-      new chi_diffusion::BoundaryDirichlet;
-    this->boundaries.push_back(new_bndry);
+    boundaries.push_back(new chi_diffusion::BoundaryDirichlet);
     chi_log.Log(LOG_0VERBOSE_1)
       << "Dirichlet boundary added (index " << boundaries.size()-1 <<  ").";
 
-    new_bndry =
-      new chi_diffusion::BoundaryDirichlet;
-    this->boundaries.push_back(new_bndry);
+    boundaries.push_back(new chi_diffusion::BoundaryDirichlet);
     chi_log.Log(LOG_0VERBOSE_1)
       << "Dirichlet boundary added (index " << boundaries.size()-1 <<  ").";
   }
@@ -65,9 +56,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
   {
     for (int b=0; b<std::max(1,(int)region->boundaries.size()); b++)
     {
-      chi_diffusion::Boundary* new_bndry =
-        new chi_diffusion::BoundaryDirichlet;
-      this->boundaries.push_back(new_bndry);
+      boundaries.push_back(new chi_diffusion::BoundaryDirichlet);
       chi_log.Log(LOG_0VERBOSE_1)
         << "Dirichlet boundary added (index " << boundaries.size()-1 <<  ").";
     }

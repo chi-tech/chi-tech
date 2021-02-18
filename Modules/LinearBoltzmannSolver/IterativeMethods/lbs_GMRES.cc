@@ -118,15 +118,13 @@ void LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   //=================================================== Apply DSA
   if (groupset.apply_wgdsa)
   {
-    std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
-    AssembleWGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
+    AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
     ((chi_diffusion::Solver*)groupset.wgdsa_solver)->ExecuteS(true,false);
     DisAssembleWGDSADeltaPhiVector(groupset, phi_new_local.data());
   }
   if (groupset.apply_tgdsa)
   {
-    std::vector<double> phi_old_gmres(phi_old_local.size(),0.0);
-    AssembleTGDSADeltaPhiVector(groupset, phi_old_gmres.data(), phi_new_local.data());
+    AssembleTGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
     ((chi_diffusion::Solver*)groupset.tgdsa_solver)->ExecuteS(true,false);
     DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
   }

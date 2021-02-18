@@ -14,11 +14,8 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
-void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
-                                                  chi_mesh::Cell *cell,
-                                                  DiffusionIPCellView* cell_ip_view,
-                                                  int component,
-                                                  int component_block_offset)
+void chi_diffusion::Solver::PWLD_Assemble_A_and_b(chi_mesh::Cell *cell,
+                                                  int component)
 {
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   auto fe_view = (CellPWLFEValues*)pwl_sdm->MapFeViewL(cell->local_id);
@@ -49,13 +46,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       jr_mat_entry +=
         siga[j]*fe_view->IntV_shapeI_shapeJ[i][j];
 
-      MatSetValue(Aref,ir,jr,jr_mat_entry,ADD_VALUES);
+      MatSetValue(A,ir,jr,jr_mat_entry,ADD_VALUES);
 
       rhsvalue += q[j]*fe_view->IntV_shapeI_shapeJ[i][j];
     }//for j
 
     //====================== Apply RHS entry
-    VecSetValue(bref,ir,rhsvalue,ADD_VALUES);
+    VecSetValue(b,ir,rhsvalue,ADD_VALUES);
 
   }//for i
 
@@ -73,9 +70,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
     if (face.has_neighbor)
     {
-      chi_mesh::Cell*           adj_cell    = nullptr;
-      CellPWLFEValues*               adj_fe_view = nullptr;
-      int                              fmap = -1;
+      chi_mesh::Cell*  adj_cell    = nullptr;
+      CellPWLFEValues* adj_fe_view = nullptr;
+      int               fmap = -1;
 
       //========================= Get adj cell information
       if (cell->faces[f].IsNeighborLocal(*grid))  //Local
@@ -88,6 +85,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
         adj_cell    = pwl_sdm->MapNeighborCell(face.neighbor_id);
         adj_fe_view = pwl_sdm->MapNeighborCellFeView(face.neighbor_id);
       }//non-local
+
       //========================= Check valid information
       if (adj_cell == nullptr || adj_fe_view == nullptr)
       {
@@ -130,7 +128,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
       for (int fi=0; fi<num_face_dofs; fi++)
       {
         int i    = fe_view->face_dof_mappings[f][fi];
-        int imap = MapCellDof(adj_cell,cell->vertex_ids[i]);
+        int imap = MapCellLocalNodeIDFromGlobalID(adj_cell, cell->vertex_ids[i]);
         adj_D_avg += adj_D[imap]*adj_fe_view->IntS_shapeI[imap][fmap];
         adj_intS += adj_fe_view->IntS_shapeI[imap][fmap];
       }
@@ -155,141 +153,60 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
         {
           int j     = fe_view->face_dof_mappings[f][fj];
           int jr    = pwl_sdm->MapDOF(*cell, j, unknown_manager, 0, component);
-          int jmap  = MapCellDof(adj_cell,cell->faces[f].vertex_ids[fj]);
+          int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, cell->faces[f].vertex_ids[fj]);
           int jrmap = pwl_sdm->MapDOF(*adj_cell, jmap, unknown_manager, 0, component);
 
           double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
 
-          MatSetValue(Aref,ir    ,jr   , aij,ADD_VALUES);
-          MatSetValue(Aref,ir    ,jrmap,-aij,ADD_VALUES);
+          MatSetValue(A,ir    ,jr   , aij,ADD_VALUES);
+          MatSetValue(A,ir    ,jrmap,-aij,ADD_VALUES);
         }//for fj
 
       }//for fi
-
-
-      //TODO: RESTORE POINT
-
 
       //========================= Assemble gradient terms
       // For the following comments we use the notation:
       // Dk = 0.5* n dot nabla bk
 
-      // -Di^- bj^- and
-      // -Dj^- bi^-
+      // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
       for (int i=0; i<fe_view->dofs; i++)
       {
         int ir = pwl_sdm->MapDOF(*cell, i, unknown_manager, 0, component);
+
+        for (int fj=0; fj<num_face_dofs; fj++)
+        {
+          int j     = fe_view->face_dof_mappings[f][fj];
+          int jr    = pwl_sdm->MapDOF(*cell, j, unknown_manager, 0, component);
+          int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, cell->faces[f].vertex_ids[fj]);
+          int jrmap = pwl_sdm->MapDOF(*adj_cell, jmap, unknown_manager, 0, component);
+
+          double aij =
+            -0.5*D_avg*n.Dot(fe_view->IntS_shapeI_gradshapeJ[f][j][i]);
+
+          MatSetValue(A,ir,jr   , aij,ADD_VALUES);
+          MatSetValue(A,ir,jrmap,-aij,ADD_VALUES);
+        }//for fj
+      }//for i
+
+      // 0.5*D* n dot (b_i^+ - b_i^-)*nabla b_j^-
+      for (int fi=0; fi<num_face_dofs; fi++)
+      {
+        int i     = fe_view->face_dof_mappings[f][fi];
+        int ir    = pwl_sdm->MapDOF(*cell, i, unknown_manager, 0, component);
+        int imap  = MapCellLocalNodeIDFromGlobalID(adj_cell, cell->faces[f].vertex_ids[fi]);
+        int irmap = pwl_sdm->MapDOF(*adj_cell, imap, unknown_manager, 0, component);
 
         for (int j=0; j<fe_view->dofs; j++)
         {
           int jr = pwl_sdm->MapDOF(*cell, j, unknown_manager, 0, component);
 
-          double gij =
-            n.Dot(fe_view->IntS_shapeI_gradshapeJ[f][i][j] +
-                  fe_view->IntS_shapeI_gradshapeJ[f][j][i]);
-          double aij = -0.5*D_avg*gij;
+          double aij =
+            -0.5*D_avg*n.Dot(fe_view->IntS_shapeI_gradshapeJ[f][i][j]);
 
-          MatSetValue(Aref,ir,jr,aij,ADD_VALUES);
+          MatSetValue(A,ir   ,jr, aij,ADD_VALUES);
+          MatSetValue(A,irmap,jr,-aij,ADD_VALUES);
         }//for j
-      }//for i
-
-
-//      // - Di^+ bj^-
-//      for (int imap=0; imap<adj_fe_view->dofs; imap++)
-//      {
-//        int irmap = adj_ip_view->MapDof(imap);
-//
-//        for (int fj=0; fj<num_face_dofs; fj++)
-//        {
-//          int jmap  = MapCellDof(adj_cell,polyh_cell->faces[f]->v_indices[fj]);
-//          int j     = MapCellDof(polyh_cell,polyh_cell->faces[f]->v_indices[fj]);
-//          int jr    = cell_ip_view->MapDof(j);
-//
-//          double gij =
-//            n.Dot(adj_fe_view->IntS_shapeI_gradshapeJ[fmap][jmap][imap]);
-//          double aij = -0.5*adj_D_avg*gij;
-//
-//          MatSetValue(Aref,irmap,jr,aij,ADD_VALUES);
-//        }//for j
-//      }//for i
-
-      //+ Di^- bj^+
-      for (int fj=0; fj<num_face_dofs; fj++)
-      {
-        int j     = MapCellDof(cell,cell->faces[f].vertex_ids[fj]);
-        int jmap  = MapCellDof(adj_cell,cell->faces[f].vertex_ids[fj]);
-        int jrmap = pwl_sdm->MapDOF(*adj_cell, jmap, unknown_manager, 0, component);
-
-        for (int i=0; i<fe_view->dofs; i++)
-        {
-          int ir = pwl_sdm->MapDOF(*cell, i, unknown_manager, 0, component);
-
-          double gij =
-            n.Dot(fe_view->IntS_shapeI_gradshapeJ[f][j][i]);
-          double aij = 0.5*D_avg*gij;
-
-          MatSetValue(Aref,ir,jrmap,aij,ADD_VALUES);
-        }//for i
-      }//for fj
-
-
-
-      // - Dj^+ bi^-
-      for (int fi=0; fi<num_face_dofs; fi++)
-      {
-        int imap  = MapCellDof(adj_cell,cell->faces[f].vertex_ids[fi]);
-        int i     = MapCellDof(cell,cell->faces[f].vertex_ids[fi]);
-        int ir = pwl_sdm->MapDOF(*cell, i, unknown_manager, 0, component);
-
-        for (int jmap=0; jmap<adj_fe_view->dofs; jmap++)
-        {
-          int jrmap = pwl_sdm->MapDOF(*adj_cell, jmap, unknown_manager, 0, component);
-
-          double gij =
-            n.Dot(adj_fe_view->IntS_shapeI_gradshapeJ[fmap][imap][jmap]);
-          double aij = -0.5*adj_D_avg*gij;
-
-          MatSetValue(Aref,ir,jrmap,aij,ADD_VALUES);
-        }//for j
-      }//for i
-
-//      for (int fi=0; fi<num_face_dofs; fi++)
-//      {
-//        int i    = MapCellDof(polyh_cell,polyh_cell->faces[f]->v_indices[fi]);
-//        int ir   = cell_ip_view->MapDof(i);
-//        int imap = MapCellDof(adj_cell,polyh_cell->faces[f]->v_indices[fi]);
-//
-//        for (int jmap=0; jmap<adj_fe_view->dofs; jmap++)
-//        {
-//          int jrmap = adj_ip_view->MapDof(jmap);
-//
-//          double gij =
-//            n.Dot(adj_fe_view->IntS_shapeI_gradshapeJ[fmap][jmap][imap]);
-//          double aij = -0.5*adj_D_avg*gij;
-//
-//          MatSetValue(Aref,ir,jrmap,aij,ADD_VALUES);
-//        }
-//      }
-//
-//      for (int i=0; i<fe_view->dofs; i++)
-//      {
-//        int ir   = cell_ip_view->MapDof(i);
-//
-//        for (int fj=0; fj<num_face_dofs; fj++)
-//        {
-//          int j     = MapCellDof(polyh_cell,polyh_cell->faces[f]->v_indices[fj]);
-//          int jmap  = MapCellDof(adj_cell,polyh_cell->faces[f]->v_indices[fj]);
-//          int jrmap = adj_ip_view->MapDof(jmap);
-//
-//          double gij =
-//            n.Dot(fe_view->IntS_shapeI_gradshapeJ[f][i][j]);
-//          double aij = 0.5*D_avg*gij;
-//
-//          MatSetValue(Aref,ir,jrmap,aij,ADD_VALUES);
-//        }
-//      }
-
-//TODO: END RESTORE POINT
+      }//for fi
 
     }//if not bndry
     else
@@ -337,8 +254,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
             double aij = kappa*fe_view->IntS_shapeI_shapeJ[f][i][j];
 
-            MatSetValue(Aref,ir    ,jr, aij,ADD_VALUES);
-            VecSetValue(bref,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
+            MatSetValue(A,ir    ,jr, aij,ADD_VALUES);
+            VecSetValue(b,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
           }//for fj
         }//for fi
 
@@ -357,8 +274,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
                     fe_view->IntS_shapeI_gradshapeJ[f][j][i]);
             double aij = -0.5*D_avg*gij;
 
-            MatSetValue(Aref,ir,jr,aij,ADD_VALUES);
-            VecSetValue(bref,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
+            MatSetValue(A,ir,jr,aij,ADD_VALUES);
+            VecSetValue(b,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
           }//for j
         }//for i
       }//Dirichlet
@@ -380,13 +297,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
             double aij = robin_bndry->a*fe_view->IntS_shapeI_shapeJ[f][i][j];
             aij /= robin_bndry->b;
 
-            MatSetValue(Aref,ir ,jr, aij,ADD_VALUES);
+            MatSetValue(A,ir ,jr, aij,ADD_VALUES);
           }//for fj
 
           double aii = robin_bndry->f*fe_view->IntS_shapeI[i][f];
           aii /= robin_bndry->b;
 
-          MatSetValue(Aref,ir ,ir, aii,ADD_VALUES);
+          MatSetValue(A,ir ,ir, aii,ADD_VALUES);
         }//for fi
       }//robin
     }
@@ -395,11 +312,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(int cell_glob_index,
 
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
-void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
-                                            chi_mesh::Cell *cell,
-                                            DiffusionIPCellView* cell_ip_view,
-                                            int component,
-                                            int component_block_offset)
+void chi_diffusion::Solver::PWLD_Assemble_b(chi_mesh::Cell *cell,
+                                            int component)
 {
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
   auto fe_view = (CellPWLFEValues*)pwl_sdm->MapFeViewL(cell->local_id);
@@ -424,7 +338,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(int cell_glob_index,
       rhsvalue += q[j]*fe_view->IntV_shapeI_shapeJ[i][j];
 
     //====================== Apply RHS entry
-    VecSetValue(bref,ir,rhsvalue,ADD_VALUES);
+    VecSetValue(b,ir,rhsvalue,ADD_VALUES);
 
   }//for i
 
