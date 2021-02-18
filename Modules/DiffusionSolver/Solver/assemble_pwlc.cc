@@ -1,31 +1,28 @@
 #include "diffusion_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
-
 #include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
 #include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
 
-#include <sstream>
 #include "chi_log.h"
 
 extern ChiLog& chi_log;
 
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/
-void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell *cell,
+void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
                                                   int group)
 {
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
-  auto fe_view   = pwl_sdm->MapFeViewL(cell->local_id);
+  auto fe_view   = pwl_sdm->MapFeViewL(cell.local_id);
 
   //======================================== Process material id
-  int mat_id = cell->material_id;
+  int mat_id = cell.material_id;
 
   std::vector<double> D(fe_view->dofs,1.0);
   std::vector<double> q(fe_view->dofs,1.0);
   std::vector<double> siga(fe_view->dofs,0.0);
 
-  GetMaterialProperties(mat_id,cell,fe_view->dofs,D,q,siga,group);
+  GetMaterialProperties(mat_id,&cell,fe_view->dofs,D,q,siga,group);
 
   //======================================== Init cell matrix info
   typedef std::vector<double> Row;
@@ -43,7 +40,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell *cell,
   //========================================= Loop over DOFs
   for (int i=0; i<fe_view->dofs; i++)
   {
-    dof_global_row_ind[i] = pwl_sdm->MapDOF(cell->vertex_ids[i]);
+    dof_global_row_ind[i] = pwl_sdm->MapDOF(cell.vertex_ids[i]);
 
     for (int j=0; j<fe_view->dofs; j++)
     {
@@ -64,11 +61,11 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell *cell,
 //  // Dirichlets are just collected
   std::vector<int>    dirichlet_count(fe_view->dofs,0);
   std::vector<double> dirichlet_value(fe_view->dofs,0.0);
-  for (int f=0; f<cell->faces.size(); f++)
+  for (int f=0; f<cell.faces.size(); f++)
   {
-    if (not cell->faces[f].has_neighbor)
+    if (not cell.faces[f].has_neighbor)
     {
-      int ir_boundary_index = cell->faces[f].neighbor_id;
+      int ir_boundary_index = cell.faces[f].neighbor_id;
       int ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
       if (ir_boundary_type == DIFFUSION_DIRICHLET)
@@ -76,7 +73,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell *cell,
         auto dirichlet_bndry =
           (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
 
-        int num_face_dofs = cell->faces[f].vertex_ids.size();
+        int num_face_dofs = cell.faces[f].vertex_ids.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i  = fe_view->face_dof_mappings[f][fi];
@@ -90,7 +87,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell *cell,
         auto robin_bndry =
           (chi_diffusion::BoundaryRobin*)boundaries[ir_boundary_index];
 
-        int num_face_dofs = cell->faces[f].vertex_ids.size();
+        int num_face_dofs = cell.faces[f].vertex_ids.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i  = fe_view->face_dof_mappings[f][fi];

@@ -112,29 +112,29 @@ public:
 
 
   //02b
-  int  ExecutePWLC(bool suppress_assembly = false,
-                   bool suppress_solve = false);
-  void CFEM_Assemble_A_and_b(chi_mesh::Cell *cell, int group=0);
+//  int  ExecutePWLC(bool suppress_assembly = false,
+//                   bool suppress_solve = false);
+  void CFEM_Assemble_A_and_b(chi_mesh::Cell& cell, int group=0);
 
 
 
 
   //02c
-  int ExecutePWLD_MIP(bool suppress_assembly = false,
-                      bool suppress_solve = false);
+//  int ExecutePWLD_MIP(bool suppress_assembly = false,
+//                      bool suppress_solve = false);
   //02c_c
-  void PWLD_Assemble_A_and_b(chi_mesh::Cell *cell,
+  void PWLD_Assemble_A_and_b(chi_mesh::Cell& cell,
                              int component=0);
-  void PWLD_Assemble_b(chi_mesh::Cell *cell,
+  void PWLD_Assemble_b(chi_mesh::Cell& cell,
                        int component=0);
 
   //02e
-  int ExecutePWLD_MIP_GAGG(bool suppress_assembly = false,
-                           bool suppress_solve = false);
+//  int ExecutePWLD_MIP_GAGG(bool suppress_assembly = false,
+//                           bool suppress_solve = false);
 
   //02e_c
-  void PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell *cell);
-  void PWLD_Assemble_b_GAGG(chi_mesh::Cell *cell);
+  void PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell);
+  void PWLD_Assemble_b_GAGG(chi_mesh::Cell& cell);
 
 
   //03b
