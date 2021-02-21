@@ -3,9 +3,7 @@
 
 #include <ChiMesh/chi_mesh.h>
 
-#define PWL_CELL_THROW_QP_UNINIT throw std::invalid_argument(\
-                                       "InternalQuadraturePointData called "\
-                                       "without being initialized.")
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 
 //###################################################################
 /** Base class for all cell FE views.*/
@@ -14,16 +12,22 @@ class CellPWLFEValues
 protected:
   chi_mesh::MeshContinuumPtr grid;
 public:
-  const int dofs;
+  const int num_nodes;
 
-  std::vector<std::vector<double>>              IntV_gradShapeI_gradShapeJ;
-  std::vector<std::vector<chi_mesh::Vector3>>   IntV_shapeI_gradshapeJ;
-  std::vector<std::vector<double>>              IntV_shapeI_shapeJ;
-  std::vector<double>                           IntV_shapeI;
+  typedef std::vector<double> VecDbl;
+  typedef std::vector<VecDbl> MatDbl;
+  typedef std::vector<chi_mesh::Vector3> VecVec3;
+  typedef std::vector<VecVec3> MatVec3;
 
-  std::vector<std::vector<std::vector<double>>> IntS_shapeI_shapeJ;
-  std::vector<std::vector<double>>              IntS_shapeI;
-  std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntS_shapeI_gradshapeJ;
+  MatDbl   IntV_gradShapeI_gradShapeJ;
+  MatVec3  IntV_shapeI_gradshapeJ;
+  MatDbl   IntV_shapeI_shapeJ;
+  VecDbl   IntV_shapeI;
+  VecVec3  IntV_gradshapeI;
+
+  std::vector<MatDbl>  IntS_shapeI_shapeJ;
+  std::vector<VecDbl>  IntS_shapeI;
+  std::vector<MatVec3> IntS_shapeI_gradshapeJ;
 
   std::vector<std::vector<int>> face_dof_mappings;
 
@@ -31,65 +35,21 @@ protected:
   bool precomputed = false;   ///< Are the integrals computed.
 
 public:
-  typedef std::vector<double> VecDbl;
-  typedef std::vector<chi_mesh::Vector3> VecVec3;
-
-  class InternalQuadraturePointData
-  {
-    friend class SlabPWLFEView;
-    friend class PolygonPWLFEValues;
-    friend class PolyhedronPWLFEValues;
-  public:
-    std::vector<unsigned int> quadrature_point_indices; ///< qp only
-  protected:
-    std::vector<VecDbl>       m_shape_value;              ///< Node i, then qp
-    std::vector<VecVec3>      m_shape_grad;               ///< Node i, then qp
-    VecDbl                    m_JxW;                      ///< Node i, then qp
-    bool                      initialized=false;
-
-  public:
-    double shape_value(unsigned int i, unsigned int qp) const
-    {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
-      auto& qp_data = m_shape_value.at(i);
-      return qp_data.at(qp);
-    }
-    chi_mesh::Vector3 shape_grad(unsigned int i, unsigned int qp) const
-    {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
-      auto& qp_data = m_shape_grad.at(i);
-      return qp_data.at(qp);
-    }
-    double JxW(unsigned int qp) const
-    {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
-      return m_JxW.at(qp);
-    }
-  }internal_qp_data;
-
-  class FaceQuadraturePointData : InternalQuadraturePointData
-  {
-    friend class SlabPWLFEView;
-    friend class PolygonPWLFEValues;
-    friend class PolyhedronPWLFEValues;
-  public:
-    VecVec3                   m_normals;                  ///< node i, then qp
-    double normal(unsigned int qp) const
-    {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
-      return m_JxW.at(qp);
-    }
-  };
-  std::vector<FaceQuadraturePointData> surface_qp_data;
-
-public:
   explicit CellPWLFEValues(int num_dofs,
                            chi_mesh::MeshContinuumPtr ref_grid) :
-                           grid(ref_grid),
-                           dofs(num_dofs)
+    grid(ref_grid),
+    num_nodes(num_dofs)
   {}
 
-  virtual ~CellPWLFEValues() = default;
+  virtual void
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) {}
+
+  virtual void
+  InitializeQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data,
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) {}
+
+  virtual void PreComputeValues() {}
 
   /** Virtual function evaluation of the shape function. */
   virtual double ShapeValue(const int i, const chi_mesh::Vector3& xyz)
@@ -102,7 +62,7 @@ public:
   virtual void ShapeValues(const chi_mesh::Vector3& xyz,
                            std::vector<double>& shape_values)
   {
-    shape_values.resize(dofs,0.0);
+    shape_values.resize(num_nodes, 0.0);
   }
 
   /** Virtual function evaluation of the grad-shape function. */
@@ -116,10 +76,9 @@ public:
   virtual void GradShapeValues(const chi_mesh::Vector3& xyz,
                                std::vector<chi_mesh::Vector3>& gradshape_values)
   {
-    gradshape_values.resize(dofs,chi_mesh::Vector3());
+    gradshape_values.resize(num_nodes, chi_mesh::Vector3());
   }
-
-  virtual void PreComputeValues() {}
+  virtual ~CellPWLFEValues() = default;
 };
 
 

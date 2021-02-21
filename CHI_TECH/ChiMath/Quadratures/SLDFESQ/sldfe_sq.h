@@ -125,7 +125,7 @@ private:
   static std::array<double,4> IntegrateLDFEShapeFunctions(
     const SphericalQuadrilateral& sq,
     std::array<chi_math::DVectorNX<double>,4> &shape_coeffs,
-    const std::vector<double>& legendre_qpoints,
+    const std::vector<chi_math::QuadraturePointXYZ>& legendre_qpoints,
     const std::vector<double>& legendre_qweights);
 
   void CopyToAllOctants();
@@ -172,7 +172,7 @@ struct chi_math::SimplifiedLDFESQ::FUNCTION_WEIGHT_FROM_RHO
   chi_math::DMatrixNX<double> A;
   chi_math::DMatrixNX<double> A_inv;
   std::array<chi_math::DVectorNX<double>, 4> c_coeffs;
-  std::vector<double>& lqp; //Legendre quadrature points
+  std::vector<chi_math::QuadraturePointXYZ>& lqp; //Legendre quadrature points
   std::vector<double>& lqw; //Legendre quadrature weights
 
   FUNCTION_WEIGHT_FROM_RHO(
@@ -187,7 +187,7 @@ struct chi_math::SimplifiedLDFESQ::FUNCTION_WEIGHT_FROM_RHO
     sq(in_sq),
     A(4,4),
     A_inv(4,4),
-    lqp(in_legendre_quadrature.abscissae),
+    lqp(in_legendre_quadrature.qpoints),
     lqw(in_legendre_quadrature.weights)
   {
     //============================ Init RHS

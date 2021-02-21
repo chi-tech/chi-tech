@@ -1,10 +1,6 @@
 #include <ChiLua/chi_lua.h>
 
-#include "ChiMesh/chi_mesh.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "ChiMath/Quadratures/quadrature_triangle.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
@@ -19,9 +15,28 @@ extern ChiMPI& chi_mpi;
  */
 int chiLuaTest(lua_State* L)
 {
-  chi_mesh::Vector3 a(1.0,1.0,1.0);
-//
-//  a = a + 2.0;
+  int order_in = lua_tonumber(L,1);
+
+  chi_log.Log() << "Hi";
+  auto order = (chi_math::QuadratureOrder)order_in;
+
+  chi_math::QuadratureTriangle qtri(order);
+
+  {
+    auto& quad = qtri;
+
+    size_t np = quad.qpoints.size();
+    for (size_t qp=0; qp<np; ++qp)
+      chi_log.Log()
+        << qp << " " << quad.weights[qp] << " " << quad.qpoints[qp].PrintS()
+        << (quad.qpoints[qp].x + quad.qpoints[qp].y < 1.0);
+
+    double weight_sum = 0.0;
+    for (auto w : quad.weights) weight_sum += w;
+
+    chi_log.Log() << weight_sum;
+  }
+
 
   return 0;
 }

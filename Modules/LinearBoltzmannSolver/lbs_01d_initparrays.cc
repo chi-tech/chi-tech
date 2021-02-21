@@ -105,14 +105,14 @@ void LinearBoltzmann::Solver::InitializeParrays()
     {
       auto cell_fe_view   = pwl_discretization->MapFeViewL(cell.local_id);
 
-      CellLBSView cell_lbs_view(cell_fe_view->dofs, num_grps, M);
+      CellLBSView cell_lbs_view(cell_fe_view->num_nodes, num_grps, M);
 
       int mat_id = cell.material_id;
 
       cell_lbs_view.xs_id = matid_to_xs_map[mat_id];
 
       cell_lbs_view.dof_phi_map_start = block_MG_counter;
-      block_MG_counter += cell_fe_view->dofs * num_grps * num_moments;
+      block_MG_counter += cell_fe_view->num_nodes * num_grps * num_moments;
 
       chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
       cell_nodal_mapping.reserve(cell.faces.size());
@@ -155,8 +155,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
         ++f;
       }//for f
 
-      if (cell_fe_view->dofs > max_cell_dof_count)
-        max_cell_dof_count = cell_fe_view->dofs;
+      if (cell_fe_view->num_nodes > max_cell_dof_count)
+        max_cell_dof_count = cell_fe_view->num_nodes;
 
       cell_transport_views.push_back(cell_lbs_view);
       grid_nodal_mappings.push_back(cell_nodal_mapping);

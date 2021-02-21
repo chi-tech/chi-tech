@@ -37,7 +37,7 @@ void SpatialDiscretization_PWL::
   {
     auto cell_fe_view = cell_fe_views[lc];
     cell_local_block_address[lc] = local_dof_count;
-    local_dof_count += cell_fe_view->dofs;
+    local_dof_count += cell_fe_view->num_nodes;
   }
 
   //================================================== Get global DOF count

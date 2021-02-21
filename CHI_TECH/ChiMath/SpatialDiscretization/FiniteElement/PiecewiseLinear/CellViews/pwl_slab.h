@@ -10,12 +10,10 @@
 class SlabPWLFEView : public CellPWLFEValues
 {
 private:
-//  chi_mesh::MeshContinuumPtr grid;
   int v0i;
   int v1i;
   std::array<chi_mesh::Normal,2> normals;
   chi_math::QuadratureGaussLegendre default_volume_quadrature;
-public:
   double h;
 public:
 
@@ -43,7 +41,13 @@ public:
   }
 
   void ComputeUnitIntegrals();
-  void InitializeQuadraturePointData();
+  void ComputeUnitIntegrals(
+    chi_math::finite_element::UnitIntegralData& ui_data) override;
+  void InitializeQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data,
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
+
+  void PreComputeValues() override;
 
   //################################################## Define standard
   //                                                   slab linear shape
@@ -64,6 +68,6 @@ public:
   void GradShapeValues(const chi_mesh::Vector3& xyz,
                        std::vector<chi_mesh::Vector3>& gradshape_values) override;
 
-  void PreComputeValues() override;
+
 };
 #endif

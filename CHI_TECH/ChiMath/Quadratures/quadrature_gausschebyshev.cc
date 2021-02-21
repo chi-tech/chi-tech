@@ -19,7 +19,7 @@ void chi_math::QuadratureGaussChebyshev::Initialize(int N,bool verbose)
     }
 
 
-    abscissae.push_back(xn);
+    qpoints.emplace_back(xn);
     weights.push_back(wn);
   }
 }

@@ -10,16 +10,15 @@ namespace chi_math
 
 //###################################################################
 /**Quadrature set for tetrahedrons.*/
-class chi_math::QuadratureTetrahedron
+class chi_math::QuadratureTetrahedron : public chi_math::Quadrature
 {
 public:
-  std::vector<chi_math::QuadraturePointXYZ> qpoints;
-  std::vector<double>     weights;
-
-public:
-  //00 Constructor
+  //Constructor
   explicit
-  QuadratureTetrahedron(QuadratureOrder order,bool surface=false);
+  QuadratureTetrahedron(QuadratureOrder order);
+
+  void KeastRule(const std::vector<std::vector<double>>& rule_data,
+                 const unsigned int n_pts);
 
 };
 

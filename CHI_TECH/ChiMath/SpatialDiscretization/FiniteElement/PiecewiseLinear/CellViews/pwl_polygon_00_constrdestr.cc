@@ -69,7 +69,7 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
   for (int v=0; v<poly_cell->vertex_ids.size(); v++)
   {
     int vindex = poly_cell->vertex_ids[v];
-    int* side_mapping = new int[num_of_subtris];
+    std::vector<int> side_mapping(num_of_subtris);
     for (int side=0;side<num_of_subtris;side++)
     {
       side_mapping[side] = -1;
@@ -101,7 +101,7 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
           face_dof_mappings[e][fv] = v;
           break;
         }
-      }
-    }
-  }
+      }//for v
+    }//for fv
+  }//for e
 }

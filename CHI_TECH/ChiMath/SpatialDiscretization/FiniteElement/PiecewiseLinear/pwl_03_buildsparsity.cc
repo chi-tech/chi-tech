@@ -29,10 +29,10 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
     auto cell_fe_view = cell_fe_views[lc];
 
     //==================================== Self connection
-    for (int i=0; i<cell_fe_view->dofs; ++i)
+    for (int i=0; i<cell_fe_view->num_nodes; ++i)
     {
       int ir = cell_local_block_address[lc] + i;
-      nodal_nnz_in_diag[ir] += cell_fe_view->dofs;
+      nodal_nnz_in_diag[ir] += cell_fe_view->num_nodes;
     }
 
     //==================================== Local adjacent cell connections
@@ -43,10 +43,10 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
         int  adj_cell_local_id = face.GetNeighborLocalID(*grid);
         auto adj_cell_fe_view = cell_fe_views[adj_cell_local_id];
 
-        for (int i=0; i<cell_fe_view->dofs; ++i)
+        for (int i=0; i<cell_fe_view->num_nodes; ++i)
         {
           int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_in_diag[ir] += adj_cell_fe_view->dofs;
+          nodal_nnz_in_diag[ir] += adj_cell_fe_view->num_nodes;
         }
       }
     }
@@ -68,10 +68,10 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
       {
         auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor_id);
 
-        for (int i=0; i<cell_fe_view->dofs; ++i)
+        for (int i=0; i<cell_fe_view->num_nodes; ++i)
         {
           int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_off_diag[ir] += adj_cell_fe_view->dofs;
+          nodal_nnz_off_diag[ir] += adj_cell_fe_view->num_nodes;
         }
       }
     }

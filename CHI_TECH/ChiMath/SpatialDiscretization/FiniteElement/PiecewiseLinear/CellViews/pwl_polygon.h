@@ -5,27 +5,7 @@
 #include <vector>
 #include <ChiMesh/Cell/cell_polygon.h>
 
-/**For a given side(triangle), this structure holds the values of
- * shape functions at each quadrature point.*/
-struct FEqp_data2d
-{
-  std::vector<double> shape_qp;
-  std::vector<double> shape_qp_surf;
-  std::vector<double> gradshapex_qp;
-  std::vector<double> gradshapey_qp;
-};
-//Goes into
-struct FEside_data2d
-{
-  double detJ;
-  double detJ_surf;
-  std::array<int,2> v_index;
-  chi_mesh::Matrix3x3 J;
-  chi_mesh::Matrix3x3 Jinv;
-  chi_mesh::Matrix3x3 JTinv;
-  std::vector<FEqp_data2d> qp_data;
-  chi_mesh::Vector3 normal;
-};
+
 
 //###################################################################
 /** Object for handling polygon shaped 2D cells.
@@ -45,20 +25,42 @@ struct FEside_data2d
 class PolygonPWLFEValues : public CellPWLFEValues
 {
 private:
+  /**For a given side(triangle), this structure holds the values of
+ * shape functions at each quadrature point.*/
+  struct FEqp_data2d
+  {
+    std::vector<double> shape_qp;
+    std::vector<double> shape_qp_surf;
+    std::vector<double> gradshapex_qp;
+    std::vector<double> gradshapey_qp;
+  };
+//Goes into
+  struct FEside_data2d
+  {
+    double detJ;
+    double detJ_surf;
+    std::array<int,2> v_index;
+    chi_mesh::Matrix3x3 J;
+    chi_mesh::Matrix3x3 Jinv;
+    chi_mesh::Matrix3x3 JTinv;
+    std::vector<FEqp_data2d> qp_data;
+    chi_mesh::Vector3 normal;
+  };
+
   std::vector<FEside_data2d> sides;
   chi_math::QuadratureTriangle&      default_volume_quadrature;
   chi_math::QuadratureGaussLegendre& default_surface_quadrature;
-public:
+private:
   int      num_of_subtris;
   double   beta;
   chi_mesh::Vertex vc;
   std::vector<double> detJ;
-  std::vector<int*> node_to_side_map;
+  std::vector<std::vector<int>> node_to_side_map;
 
 
 
-public:
-  std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
+//public:
+//  std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
@@ -68,7 +70,12 @@ public:
                      chi_math::QuadratureGaussLegendre& minumum_surface_quadrature);
 
   void ComputeUnitIntegrals();
-  void InitializeQuadraturePointData();
+  void ComputeUnitIntegrals(
+    chi_math::finite_element::UnitIntegralData& ui_data) override;
+  void InitializeQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data,
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
+  void PreComputeValues() override;
 
   //################################################## Define standard
   //                                                   triangle linear shape
@@ -98,10 +105,6 @@ public:
     else
       return sides[s].detJ_surf;
   }
-
-
-public:
-  void PreComputeValues() override;
 
 };
 

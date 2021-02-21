@@ -110,7 +110,7 @@ public:
       auto cell = &grid_view->local_cells[cell_local_id];
       auto cell_fe_view = grid_fe_view.MapFeViewL(cell->local_id);
       int num_faces = cell->faces.size();
-      int num_dofs = cell_fe_view->dofs; 
+      int num_dofs = cell_fe_view->num_nodes;
       auto& transport_view = grid_transport_view[cell->local_id];
       auto sigma_tg = (*xsections)[transport_view.xs_id]->sigma_tg;
       std::vector<bool> face_incident_flags(num_faces, false);
@@ -253,7 +253,7 @@ public:
           }
 
           // ============================= Solve system
-          chi_math::GaussElimination(Atemp, b[gsg], cell_fe_view->dofs);
+          chi_math::GaussElimination(Atemp, b[gsg], cell_fe_view->num_nodes);
         }
 
         // ============================= Accumulate flux

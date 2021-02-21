@@ -7,60 +7,7 @@
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-/**For a given side(tet), this structure holds the values of
- * shape functions at each quadrature point.*/
-struct FEqp_data3d
-{
-  std::vector<double> shape_qp;
-  std::vector<double> shape_qp_surf;
-  std::vector<double> gradshapex_qp;
-  std::vector<double> gradshapey_qp;
-  std::vector<double> gradshapez_qp;
-};
-//Goes into
-/**Stores the data for each side's tetrahedron. */
-struct FEside_data3d
-{
-  double                    detJ = 0.0;
-  double                    detJ_surf = 0.0;
-  std::vector<int>          v_index;
-  chi_mesh::Matrix3x3       J;
-  chi_mesh::Matrix3x3       Jinv;
-  chi_mesh::Matrix3x3       JTinv;
-  std::vector<FEqp_data3d>  qp_data;
-};
-//Goes into
-/**Stores data for each face.*/
-struct FEface_data
-{
-  std::vector<FEside_data3d> sides;
-  chi_mesh::Vector3 normal;
-};
 
-
-/**Lowest level of mapping dof i.*/
-struct FEnodeSideMap
-{
-  int index = -1;
-  bool part_of_face = false;
-};
-//Goes into
-/**Intermediate level of mapping.*/
-struct FEnodeFaceMap
-{
-  std::vector<FEnodeSideMap> side_map;
-};
-//Goes into
-/**Node map per face.*/
-struct FEnodeMap
-{
-  std::vector<FEnodeFaceMap> face_map;
-};
-//Goes into node_maps
-// node n
-// face f
-// side s
-// node_maps[n]->face_map[f]->side_map[s]
 
 //###################################################################
 /**Object for handling piecewise linear
@@ -80,9 +27,65 @@ struct FEnodeMap
 class PolyhedronPWLFEValues : public CellPWLFEValues
 {
 private:
+  /**For a given side(tet), this structure holds the values of
+ * shape functions at each quadrature point.*/
+  struct FEqp_data3d
+  {
+    std::vector<double> shape_qp;
+    std::vector<double> shape_qp_surf;
+    std::vector<double> gradshapex_qp;
+    std::vector<double> gradshapey_qp;
+    std::vector<double> gradshapez_qp;
+  };
+  //Goes into
+  /**Stores the data for each side's tetrahedron. */
+    struct FEside_data3d
+    {
+      double                    detJ = 0.0;
+      double                    detJ_surf = 0.0;
+      std::vector<int>          v_index;
+      chi_mesh::Matrix3x3       J;
+      chi_mesh::Matrix3x3       Jinv;
+      chi_mesh::Matrix3x3       JTinv;
+      std::vector<FEqp_data3d>  qp_data;
+    };
+  //Goes into
+  /**Stores data for each face.*/
+    struct FEface_data
+    {
+      std::vector<FEside_data3d> sides;
+      chi_mesh::Vector3 normal;
+    };
+
+
+  /**Lowest level of mapping dof i.*/
+    struct FEnodeSideMap
+    {
+      int index = -1;
+      bool part_of_face = false;
+    };
+  //Goes into
+  /**Intermediate level of mapping.*/
+    struct FEnodeFaceMap
+    {
+      std::vector<FEnodeSideMap> side_map;
+    };
+  //Goes into
+  /**Node map per face.*/
+    struct FEnodeMap
+    {
+      std::vector<FEnodeFaceMap> face_map;
+    };
+  //Goes into node_maps
+  // node n
+  // face f
+  // side s
+  // node_maps[n]->face_map[f]->side_map[s]
+
+private:
   std::vector<double>            face_betaf;     ///< Face Beta-factor.
   double                         alphac;         ///< Cell alpha-factor.
-public:
+
   std::vector<FEface_data>       face_data;      ///< Holds determinants and data tet-by-tet.
 private:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
@@ -99,7 +102,12 @@ public:
                         chi_math::QuadratureTriangle&    minumum_surface_quadrature);
 
   void ComputeUnitIntegrals();
-  void InitializeQuadraturePointData();
+  void ComputeUnitIntegrals(
+    chi_math::finite_element::UnitIntegralData& ui_data) override;
+  void InitializeQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data,
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
+  void PreComputeValues() override;
 
   //################################################## Define standard
   //                                                   tetrahedron linear shape
@@ -133,12 +141,6 @@ public:
 
   void GradShapeValues(const chi_mesh::Vector3& xyz,
                        std::vector<chi_mesh::Vector3>& gradshape_values) override;
-
-
-
-public:
-  //####################################################### Precomputing
-  void PreComputeValues() override;
 
 };
 

@@ -21,7 +21,7 @@ struct chi_mesh::Vector3
 
   /**Constructor where single element is initialized \f$ x[z]=a \f$.*/
   explicit Vector3(double a){
-    x=0.0; y=0.0; z=a;
+    x=a; y=0.0; z=0.0;
   }
 
   /**Constructor where \f$ x=a\f$ and \f$ y=b \f$. */

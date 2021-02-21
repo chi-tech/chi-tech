@@ -22,20 +22,20 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell)
     //====================================== Process material id
     int mat_id = cell.material_id;
 
-    std::vector<double> D(fe_view->dofs,1.0);
-    std::vector<double> q(fe_view->dofs,1.0);
-    std::vector<double> siga(fe_view->dofs,1.0);
+    std::vector<double> D(fe_view->num_nodes, 1.0);
+    std::vector<double> q(fe_view->num_nodes, 1.0);
+    std::vector<double> siga(fe_view->num_nodes, 1.0);
 
-    GetMaterialProperties(mat_id, &cell, fe_view->dofs, D, q, siga, gi + gr);
+    GetMaterialProperties(mat_id, &cell, fe_view->num_nodes, D, q, siga, gi + gr);
 
     //========================================= Loop over DOFs
-    for (int i=0; i<fe_view->dofs; i++)
+    for (int i=0; i<fe_view->num_nodes; i++)
     {
       int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, gr);
       double rhsvalue =0.0;
 
       //====================== Develop matrix entry
-      for (int j=0; j<fe_view->dofs; j++)
+      for (int j=0; j<fe_view->num_nodes; j++)
       {
         int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
@@ -103,7 +103,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell)
 
         GetMaterialProperties(adj_cell->material_id,
                               adj_cell,
-                              adj_fe_view->dofs,
+                              adj_fe_view->num_nodes,
                               adj_D,
                               adj_Q,
                               adj_sigma,
@@ -167,7 +167,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell)
         // Dk = 0.5* n dot nabla bk
 
         // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
-        for (int i=0; i<fe_view->dofs; i++)
+        for (int i=0; i<fe_view->num_nodes; i++)
         {
           int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, gr);
 
@@ -194,7 +194,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell)
           int imap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fi]);
           int irmap = pwl_sdm->MapDOF(*adj_cell, imap, unknown_manager, 0, gr);
 
-          for (int j=0; j<fe_view->dofs; j++)
+          for (int j=0; j<fe_view->num_nodes; j++)
           {
             int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
@@ -260,11 +260,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell)
 
           // -Di^- bj^- and
           // -Dj^- bi^-
-          for (int i=0; i<fe_view->dofs; i++)
+          for (int i=0; i<fe_view->num_nodes; i++)
           {
             int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, gr);
 
-            for (int j=0; j<fe_view->dofs; j++)
+            for (int j=0; j<fe_view->num_nodes; j++)
             {
               int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
@@ -322,20 +322,20 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(chi_mesh::Cell& cell)
     //====================================== Process material id
     int mat_id = cell.material_id;
 
-    std::vector<double> D(fe_view->dofs,1.0);
-    std::vector<double> q(fe_view->dofs,1.0);
-    std::vector<double> siga(fe_view->dofs,1.0);
+    std::vector<double> D(fe_view->num_nodes, 1.0);
+    std::vector<double> q(fe_view->num_nodes, 1.0);
+    std::vector<double> siga(fe_view->num_nodes, 1.0);
 
-    GetMaterialProperties(mat_id,&cell,fe_view->dofs,D,q,siga,gi+gr);
+    GetMaterialProperties(mat_id, &cell, fe_view->num_nodes, D, q, siga, gi + gr);
 
     //========================================= Loop over DOFs
-    for (int i=0; i<fe_view->dofs; i++)
+    for (int i=0; i<fe_view->num_nodes; i++)
     {
       int ir = pwl_sdm->MapDOF(cell,i,unknown_manager,0,gr);
 
       //====================== Develop rhs entry
       double rhsvalue =0.0;
-      for (int j=0; j<fe_view->dofs; j++)
+      for (int j=0; j<fe_view->num_nodes; j++)
         rhsvalue += q[j]*fe_view->IntV_shapeI_shapeJ[i][j];
 
       //====================== Apply RHS entry

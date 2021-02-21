@@ -104,7 +104,7 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
       side_data.Jinv  = Jinv;
       side_data.JTinv = JTinv;
 
-      side_data.qp_data.reserve(dofs);
+      side_data.qp_data.reserve(num_nodes);
       face_f_data.sides.push_back(side_data);
     }//for each edge
 
@@ -124,7 +124,7 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
   // which the side belongs and consequently allows
   // the determination of Nf. Nc is always evaluated
   // so no mapping is needed.
-  for (int i=0; i<dofs; i++)
+  for (int i=0; i < num_nodes; i++)
   {
     FEnodeMap newNodeMap;
     for (size_t f=0; f < face_data.size(); f++)

@@ -22,7 +22,6 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of local continuum.";
-  ref_grid = grid;
 
   //================================================== Create empty view
   //                                                 for each cell
@@ -81,7 +80,6 @@ void SpatialDiscretization_FV::
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of neighbor continuums.";
-  ref_grid = grid;
 
   grid->CommunicatePartitionNeighborCells(neighbor_cells);
 

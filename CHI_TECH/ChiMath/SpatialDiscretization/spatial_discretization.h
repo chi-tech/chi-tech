@@ -22,21 +22,26 @@ public:
   int dim;
   const chi_math::SpatialDiscretizationType type;
 
-  chi_mesh::MeshContinuumPtr ref_grid;
+  const chi_mesh::MeshContinuumPtr ref_grid;
 
 protected:
   typedef chi_math::SpatialDiscretizationType SDMType;
 
 protected:
   //00
-  explicit SpatialDiscretization(int dim,
-                                 chi_mesh::MeshContinuumPtr in_grid,
-                                 SDMType in_type =
-                                          SDMType::UNDEFINED);
+  explicit
+  SpatialDiscretization(int in_dim,
+                        chi_mesh::MeshContinuumPtr in_grid,
+                        SDMType in_type = SDMType::UNDEFINED) :
+    dim(in_dim),
+    type(in_type),
+    ref_grid(in_grid)
+  {
+  }
 
 protected:
   //01
-  virtual void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid);
+  virtual void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) {}
 
 public:
   virtual

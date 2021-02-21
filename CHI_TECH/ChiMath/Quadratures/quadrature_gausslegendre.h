@@ -16,10 +16,17 @@ class chi_math::QuadratureGaussLegendre : public chi_math::Quadrature
 public:
   //01
   explicit
-  QuadratureGaussLegendre(QuadratureOrder order,
+  QuadratureGaussLegendre(QuadratureOrder in_order,
                           int maxiters=1000,
                           double tol=1.0e-12,
                           bool verbose=false);
+
+  explicit
+  QuadratureGaussLegendre(unsigned int N,
+                          int maxiters=1000,
+                          double tol=1.0e-12,
+                          bool verbose=false);
+
 
   static std::vector<double> FindRoots(int N,
                                        int max_iters=1000,

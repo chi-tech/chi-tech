@@ -12,48 +12,96 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Populates the abscissae and weights for a Gauss-Legendre
- * quadrature.*/
+ * quadrature given the degree of the polynomial to integrate exactly.
+ * The number of points generated will be ceil((O+1)/2).*/
 chi_math::QuadratureGaussLegendre::
-  QuadratureGaussLegendre(QuadratureOrder order,
-                          int maxiters/*=1000*/,
-                          double tol/*=1.0e-12*/,
-                          bool verbose/*=false*/)
+QuadratureGaussLegendre(QuadratureOrder in_order,
+                        int maxiters/*=1000*/,
+                        double tol/*=1.0e-12*/,
+                        bool verbose/*=false*/) :
+                        chi_math::Quadrature(in_order)
 {
-  abscissae.clear();
+  unsigned int N = std::ceil(  ((int)order + 1)/2.0  );
+
+  qpoints.clear();
   weights.clear();
 
   switch (order)
   {
     default:
     {
-      int N = (int)order;
       if (verbose)
         chi_log.Log() << "Initializing Gauss-Legendre Quadrature "
                          "with " << N << " q-points";
 
       //========================= Compute the roots
-      abscissae = FindRoots(N, maxiters, tol);
+      auto roots = FindRoots(N, maxiters, tol);
+      for (auto v : roots) qpoints.emplace_back(v);
 
       //========================= Compute the weights
       weights.resize(N,1.0);
-      for (size_t k=0; k < abscissae.size(); k++)
+      for (size_t k=0; k < qpoints.size(); k++)
       {
         weights[k] =
-          2.0 * (1.0 - abscissae[k] * abscissae[k]) /
-          ( (N + 1) * (N + 1) *
-            Legendre(N+1, abscissae[k]) * Legendre(N+1, abscissae[k]) );
+          2.0 * (1.0 - qpoints[k][0] * qpoints[k][0]) /
+          ((N + 1) * (N + 1) *
+           Legendre(N+1, qpoints[k][0]) * Legendre(N + 1, qpoints[k][0]) );
 
         if (verbose)
           chi_log.Log(LOG_0)
-            << "root[" << k << "]=" << abscissae[k]
+            << "root[" << k << "]=" << qpoints[k][0]
             << ", weight=" << weights[k];
       }//for abscissae
 
       break;
     }
   }//switch order
+}
 
+//###################################################################
+/**Populates the abscissae and weights for a Gauss-Legendre
+ * quadrature given the number of desired quadrature points. The
+ * order of the quadrature will be 2N-1.*/
+chi_math::QuadratureGaussLegendre::
+  QuadratureGaussLegendre(unsigned int N,
+                          int maxiters/*=1000*/,
+                          double tol/*=1.0e-12*/,
+                          bool verbose/*=false*/) :
+                          chi_math::Quadrature((QuadratureOrder)(2*N-1))
+{
+  qpoints.clear();
+  weights.clear();
 
+  switch (order)
+  {
+    default:
+    {
+      if (verbose)
+        chi_log.Log() << "Initializing Gauss-Legendre Quadrature "
+                         "with " << N << " q-points";
+
+      //========================= Compute the roots
+      auto roots = FindRoots(N, maxiters, tol);
+      for (auto v : roots) qpoints.emplace_back(v);
+
+      //========================= Compute the weights
+      weights.resize(N,1.0);
+      for (size_t k=0; k < qpoints.size(); k++)
+      {
+        weights[k] =
+          2.0 * (1.0 - qpoints[k][0] * qpoints[k][0]) /
+          ((N + 1) * (N + 1) *
+           Legendre(N+1, qpoints[k][0]) * Legendre(N + 1, qpoints[k][0]) );
+
+        if (verbose)
+          chi_log.Log(LOG_0)
+            << "root[" << k << "]=" << qpoints[k][0]
+            << ", weight=" << weights[k];
+      }//for abscissae
+
+      break;
+    }
+  }//switch order
 }
 
 //###################################################################

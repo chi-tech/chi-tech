@@ -21,8 +21,7 @@ public:
   std::vector<CellPWLFEValues*> cell_fe_views;
 
 private:
-  std::vector<bool>        cell_view_added_flags;
-  bool                     mapping_initialized;
+  bool                     mapping_initialized=false;
 public:
   chi_math::QuadratureGaussLegendre line_quad_order_second;
   chi_math::QuadratureTriangle      tri_quad_order_second;

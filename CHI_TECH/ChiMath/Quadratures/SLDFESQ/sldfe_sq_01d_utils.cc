@@ -66,7 +66,7 @@ std::array<double,4> chi_math::SimplifiedLDFESQ::Quadrature::
 IntegrateLDFEShapeFunctions(
   const SphericalQuadrilateral &sq,
   std::array<chi_math::DVectorNX<double>,4>& shape_coeffs,
-  const std::vector<double>& legendre_qpoints,
+  const std::vector<chi_math::QuadraturePointXYZ>& legendre_qpoints,
   const std::vector<double>& legendre_qweights)
 {
   //=================================== Lambda to evaluate LDFE shape func
@@ -103,8 +103,8 @@ IntegrateLDFEShapeFunctions(
     for (int j=0; j<Nq; ++j)
     {
       //========================== Determine xy_tilde
-      double x_tilde = x_tilde_min + (1.0 + legendre_qpoints[j])*dx_tilde/2.0;
-      double y_tilde = y_tilde_min + (1.0 + legendre_qpoints[i])*dy_tilde/2.0;
+      double x_tilde = x_tilde_min + (1.0 + legendre_qpoints[j][0])*dx_tilde/2.0;
+      double y_tilde = y_tilde_min + (1.0 + legendre_qpoints[i][0])*dy_tilde/2.0;
       chi_mesh::Vector3 xy_tilde(x_tilde,y_tilde,0.0);
 
       //========================== Map to xyz

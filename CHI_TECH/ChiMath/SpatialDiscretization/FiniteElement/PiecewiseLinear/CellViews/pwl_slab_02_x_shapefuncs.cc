@@ -28,7 +28,7 @@ double SlabPWLFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 void SlabPWLFEView::ShapeValues(const chi_mesh::Vector3& xyz,
                  std::vector<double>& shape_values)
 {
-  shape_values.resize(dofs,0.0);
+  shape_values.resize(num_nodes, 0.0);
   chi_mesh::Vector3& p0 = *grid->vertices[v0i];
   chi_mesh::Vector3& p1 = *grid->vertices[v1i];
   chi_mesh::Vector3 xyz_ref = xyz - p0;
@@ -39,7 +39,7 @@ void SlabPWLFEView::ShapeValues(const chi_mesh::Vector3& xyz,
 
   if ((xi>=-1.0e-6) and (xi<=1.0+1.0e-6))
   {
-    for (int i=0; i<dofs; i++)
+    for (int i=0; i < num_nodes; i++)
     {
       if (i==0)
         shape_values[i] = 1.0 - xi;

@@ -117,7 +117,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     auto cell_fe_view = spatial_dm.MapFeViewL(cell_local_index);
 
     double weighted_value = 0.0;
-    for (int i=0; i<cell_fe_view->dofs; i++)
+    for (int i=0; i<cell_fe_view->num_nodes; i++)
     {
       double node_value=0.0;
       counter++;
@@ -164,7 +164,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     auto cell_fe_view = spatial_dm.MapFeViewL(cell_local_index);
 
     double weighted_value = 0.0;
-    for (int i=0; i<cell_fe_view->dofs; i++)
+    for (int i=0; i<cell_fe_view->num_nodes; i++)
     {
       double node_value=0.0;
       counter++;

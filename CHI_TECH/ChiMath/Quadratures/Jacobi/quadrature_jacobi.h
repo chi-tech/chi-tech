@@ -16,10 +16,11 @@ private:
   const unsigned int m_beta;
 public:
   QuadratureJacobi(QuadratureOrder order,
-                   unsigned int a,
-                   unsigned int b) :
-                   m_alpha(a),
-                   m_beta(b)
+                   unsigned int alpha,
+                   unsigned int beta) :
+                   chi_math::Quadrature(order),
+                   m_alpha(alpha),
+                   m_beta(beta)
   {
     Initialize(order);
   }

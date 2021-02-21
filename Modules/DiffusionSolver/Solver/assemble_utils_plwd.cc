@@ -33,8 +33,10 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell->Type() == chi_mesh::CellType::SLAB)
   {
-    auto slab_fe_view = (SlabPWLFEView*)fe_view;
-    hp = slab_fe_view->h/2.0;
+    auto v0 = *grid->vertices[cell->vertex_ids[0]];
+    auto v1 = *grid->vertices[cell->vertex_ids[1]];
+
+    hp = (v1-v0).Norm()/2.0;
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
   else if (cell->Type() == chi_mesh::CellType::POLYGON)
@@ -51,7 +53,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
     double perimeter = (v1 - v0).Norm();
 
     double area  = 0.0;
-    for (int i=0; i<fe_view->dofs; i++)
+    for (int i=0; i<fe_view->num_nodes; i++)
       area += fe_view->IntV_shapeI[i];
 
     if (Nv == 3)
@@ -73,7 +75,7 @@ double chi_diffusion::Solver::HPerpendicular(chi_mesh::Cell* cell,
   else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
   {
     double volume  = 0.0;
-    for (int i=0; i<fe_view->dofs; i++)
+    for (int i=0; i<fe_view->num_nodes; i++)
       volume += fe_view->IntV_shapeI[i];
 
     double area = 0.0;

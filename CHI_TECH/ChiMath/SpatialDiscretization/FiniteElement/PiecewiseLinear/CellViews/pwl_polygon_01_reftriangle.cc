@@ -14,7 +14,7 @@ double PolygonPWLFEValues::TriShape(int index, int qpoint_index,
   }
   else
   {
-    xi = 0.5*(default_surface_quadrature.abscissae[qpoint_index] + 1.0);
+    xi = 0.5*(default_surface_quadrature.qpoints[qpoint_index][0] + 1.0);
     eta = 0.0;
   }
 

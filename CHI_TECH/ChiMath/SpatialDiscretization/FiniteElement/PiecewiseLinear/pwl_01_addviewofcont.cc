@@ -13,20 +13,11 @@ extern ChiLog& chi_log;
 void SpatialDiscretization_PWL::PreComputeCellSDValues(
   chi_mesh::MeshContinuumPtr grid)
 {
-  ref_grid = grid;
   //================================================== Create empty view
   //                                                 for each cell
   if (!mapping_initialized)
   {
-    cell_view_added_flags.resize(grid->local_cells.size(),false);
-    mapping_initialized = true;
-  }
-
-  //================================================== Swap views for
-  //                                                   specified item_id
-  for (const auto& cell : grid->local_cells)
-  {
-    if (not cell_view_added_flags[cell.local_id])
+    for (const auto& cell : grid->local_cells)
     {
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
       if (cell.Type() == chi_mesh::CellType::SLAB)
@@ -39,7 +30,6 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         cell_fe_view->PreComputeValues();
 
         cell_fe_views.push_back(cell_fe_view);
-        cell_view_added_flags[cell.local_id] = true;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
       else if (cell.Type() == chi_mesh::CellType::POLYGON)
@@ -53,7 +43,6 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         cell_fe_view->PreComputeValues();
 
         cell_fe_views.push_back(cell_fe_view);
-        cell_view_added_flags[cell.local_id] = true;
       }
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
       else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
@@ -67,7 +56,6 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
         cell_fe_view->PreComputeValues();
 
         cell_fe_views.push_back(cell_fe_view);
-        cell_view_added_flags[cell.local_id] = true;
       }
       else
       {
@@ -76,8 +64,39 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
           << "Unsupported cell type encountered.";
         exit(EXIT_FAILURE);
       }
-    }//if mapping not yet assigned
-  }//for num cells
+    }//for num cells
+
+    mapping_initialized = true;
+  }
+
+  if (not integral_data_initialized)
+  {
+    fe_unit_integrals.reserve(cell_fe_views.size());
+    for (auto& cell_fe_view : cell_fe_views)
+    {
+      fe_unit_integrals.emplace_back();
+      cell_fe_view->ComputeUnitIntegrals(fe_unit_integrals.back());
+    }
+
+    integral_data_initialized = true;
+  }
+
+  if (not qp_data_initialized)
+  {
+    fe_vol_qp_data.reserve(cell_fe_views.size());
+    fe_srf_qp_data.reserve(cell_fe_views.size());
+    for (auto& cell_fe_view : cell_fe_views)
+    {
+      fe_vol_qp_data.emplace_back();
+      fe_srf_qp_data.emplace_back();
+      cell_fe_view->InitializeQuadraturePointData(fe_vol_qp_data.back(),
+                                                  fe_srf_qp_data.back());
+    }
+
+    qp_data_initialized = true;
+  }
+
+
 
 }//AddViewOfLocalContinuum
 
@@ -89,8 +108,6 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
   chi_log.Log(LOG_0)
     << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums.";
   MPI_Barrier(MPI_COMM_WORLD);
-
-  ref_grid = grid;
 
   grid->CommunicatePartitionNeighborCells(neighbor_cells);
 

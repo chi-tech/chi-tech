@@ -33,8 +33,8 @@ public:
   const chi_math::AngularQuadratureType type;
 public:
   std::vector<chi_math::QuadraturePointPhiTheta> abscissae;
-  std::vector<double>             weights;
-  std::vector<chi_mesh::Vector3> omegas;
+  std::vector<double>                            weights;
+  std::vector<chi_mesh::Vector3>                 omegas;
 
 protected:
   std::vector<std::vector<double>> d2m_op;

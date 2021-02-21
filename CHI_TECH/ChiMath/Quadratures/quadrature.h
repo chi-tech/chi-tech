@@ -1,6 +1,8 @@
 #ifndef QUADRATURE_H
 #define QUADRATURE_H
 
+#include "ChiMesh/chi_mesh.h"
+
 #include <vector>
 
 namespace chi_math
@@ -19,30 +21,27 @@ namespace chi_math
     FORTIETH = 40, FORTYFIRST = 41, FORTYSECOND = 42, FORTYTHIRD = 43,
     INVALID_ORDER
   };
-  struct QuadraturePointXYZ;
+  typedef chi_mesh::Vector3 QuadraturePointXYZ;
   class Quadrature;
 }
-
-struct chi_math::QuadraturePointXYZ
-{
-  double x=0.0;
-  double y=0.0;
-  double z=0.0;
-
-  QuadraturePointXYZ() = default;
-  QuadraturePointXYZ(double in_x,
-                     double in_y,
-                     double in_z) :
-                     x(in_x), y(in_y), z(in_z) {}
-};
 
 //######################################################### Class def
 /**Parent class for quadratures.*/
 class chi_math::Quadrature
 {
 public:
-  std::vector<double> abscissae;
+  const QuadratureOrder order;
+  std::vector<chi_math::QuadraturePointXYZ> qpoints;
   std::vector<double> weights;
+
+protected:
+  explicit
+  Quadrature(QuadratureOrder in_order) : order(in_order) {}
+
+public:
+  void Scale(std::pair<double,double> old_range,
+             std::pair<double,double> new_range);
+
 };
 
 

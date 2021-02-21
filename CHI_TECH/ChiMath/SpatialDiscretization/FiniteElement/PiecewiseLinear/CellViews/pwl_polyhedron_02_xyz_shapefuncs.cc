@@ -54,7 +54,7 @@ double PolyhedronPWLFEValues::ShapeValue(const int i, const chi_mesh::Vector3& x
 void PolyhedronPWLFEValues::ShapeValues(const chi_mesh::Vector3& xyz,
                                         std::vector<double>& shape_values)
 {
-  shape_values.resize(dofs,0.0);
+  shape_values.resize(num_nodes, 0.0);
   for (size_t f=0; f < face_data.size(); f++)
   {
     for (size_t s=0; s < face_data[f].sides.size(); s++)
@@ -73,7 +73,7 @@ void PolyhedronPWLFEValues::ShapeValues(const chi_mesh::Vector3& xyz,
       if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and (zeta>=-1.0e-12) and
           ((xi + eta + zeta)<=(1.0+1.0e-12)))
       {
-        for (int i=0; i<dofs; i++)
+        for (int i=0; i < num_nodes; i++)
         {
           auto side_map = node_side_maps[i].face_map[f].side_map[s];
 
@@ -168,6 +168,6 @@ void PolyhedronPWLFEValues::GradShapeValues(
   std::vector<chi_mesh::Vector3> &gradshape_values)
 {
   gradshape_values.clear();
-  for (int i=0; i<dofs; ++i)
+  for (int i=0; i < num_nodes; ++i)
     gradshape_values.emplace_back(GradShapeValue(i,xyz));
 }
