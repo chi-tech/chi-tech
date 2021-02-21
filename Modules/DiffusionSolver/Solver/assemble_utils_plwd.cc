@@ -217,6 +217,30 @@ uint64_t chi_diffusion::Solver::MapCellLocalNodeIDFromGlobalID(chi_mesh::Cell* c
   return imap;
 }
 
+/**Given a global node index, returns the local cell-node it's associated on the
+ * referenced cell. Polyhedron overload.*/
+uint64_t chi_diffusion::Solver::
+  MapCellLocalNodeIDFromGlobalID(const chi_mesh::Cell& cell,
+                                 uint64_t node_global_id)
+{
+  size_t imap = 0;
+  bool map_found = false;
+  for (size_t ai=0; ai < cell.vertex_ids.size(); ai++)
+  {
+    if (node_global_id == cell.vertex_ids[ai])
+    {
+      imap = ai;
+      map_found = true;
+      break;
+    }
+  }
+
+  if (not map_found)
+    throw std::logic_error(std::string(__FUNCTION__)+": Mapping failure.");
+
+  return imap;
+}
+
 
 
 /**Given the face index on the current cell, finds the
@@ -235,6 +259,40 @@ chi_diffusion::Solver::MapCellFace(chi_mesh::Cell* cur_cell,
   for (size_t af=0; af < adj_cell->faces.size(); af++)
   {
     const auto& acface = adj_cell->faces[af]; //adjacent cell face
+
+    std::set<uint64_t> acface_vids;
+    for (auto vid : acface.vertex_ids) acface_vids.insert(vid);
+
+    if (acface_vids == ccface_vids)
+    {
+      fmap = af;
+      map_found = true;
+      break;
+    }
+  }//for adj faces
+
+  if (not map_found)
+    throw std::logic_error(std::string(__FUNCTION__)+": Mapping failure.");
+
+  return (unsigned int)fmap;
+}
+
+/**Given the face index on the current cell, finds the
+ * corresponding face index on the adjacent cell.*/
+unsigned int
+chi_diffusion::Solver::MapCellFace(const chi_mesh::Cell& cur_cell,
+                                   const chi_mesh::Cell& adj_cell,
+                                   unsigned int f)
+{
+  const auto& ccface = cur_cell.faces[f]; //current cell face
+  std::set<uint64_t> ccface_vids;
+  for (auto vid : ccface.vertex_ids) ccface_vids.insert(vid);
+
+  size_t fmap;
+  bool map_found = false;
+  for (size_t af=0; af < adj_cell.faces.size(); af++)
+  {
+    const auto& acface = adj_cell.faces[af]; //adjacent cell face
 
     std::set<uint64_t> acface_vids;
     for (auto vid : acface.vertex_ids) acface_vids.insert(vid);

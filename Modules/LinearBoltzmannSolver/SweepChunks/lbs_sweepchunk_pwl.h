@@ -34,16 +34,17 @@ typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
 class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
-  chi_mesh::MeshContinuumPtr grid_view;
-  SpatialDiscretization_PWL& grid_fe_view;
+  const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
+  const SpatialDiscretization_PWL& grid_fe_view;
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
-//  const LinearBoltzmann::Solver& ref_solver;
   const std::vector<double>* q_moments;
   const LBSGroupset& groupset;
   const TCrossSections* xsections;
   const int num_moms;
   const int G;
   const int max_num_cell_dofs;
+
+  //Runtime params
   bool a_and_b_initialized;
   std::vector<std::vector<double>> Amat;
   std::vector<std::vector<double>> Atemp;
@@ -52,10 +53,9 @@ protected:
 
 public:
   // ################################################## Constructor
-  LBSSweepChunkPWL(chi_mesh::MeshContinuumPtr grid_ptr,
-                   SpatialDiscretization_PWL& discretization,
+  LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
+                   const SpatialDiscretization_PWL& discretization,
                    const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
-//                   const LinearBoltzmann::Solver& in_ref_solver,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
                    const LBSGroupset& in_groupset,
@@ -63,10 +63,9 @@ public:
                    const int in_num_moms,
                    const int in_max_num_cell_dofs)
     : SweepChunk(destination_phi, false),
-      grid_view(grid_ptr),
+      grid_view(std::move(grid_ptr)),
       grid_fe_view(discretization),
       grid_transport_view(cell_transport_views),
-//      ref_solver(in_ref_solver),
       q_moments(source_moments),
       groupset(in_groupset),
       xsections(in_xsections),
@@ -107,23 +106,23 @@ public:
     for (int cr_i = 0; cr_i < num_loc_cells; ++cr_i)
     {
       int cell_local_id = spds->spls.item_id[cr_i];
-      auto cell = &grid_view->local_cells[cell_local_id];
-      auto cell_fe_view = grid_fe_view.MapFeViewL(cell->local_id);
-      int num_faces = cell->faces.size();
-      int num_dofs = cell_fe_view->num_nodes;
-      auto& transport_view = grid_transport_view[cell->local_id];
+      const auto& cell = grid_view->local_cells[cell_local_id];
+      const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
+      int num_faces = cell.faces.size();
+      int num_dofs = fe_intgrl_values.num_nodes;
+      auto& transport_view = grid_transport_view[cell.local_id];
       auto sigma_tg = (*xsections)[transport_view.xs_id]->sigma_tg;
       std::vector<bool> face_incident_flags(num_faces, false);
 
       // =================================================== Get Cell matrices
       const std::vector<std::vector<chi_mesh::Vector3>>& L =
-        cell_fe_view->IntV_shapeI_gradshapeJ;
+        fe_intgrl_values.IntV_shapeI_gradshapeJ;
 
       const std::vector<std::vector<double>>& M =
-        cell_fe_view->IntV_shapeI_shapeJ;
+        fe_intgrl_values.IntV_shapeI_shapeJ;
 
       const std::vector<std::vector<std::vector<double>>>& N =
-        cell_fe_view->IntS_shapeI_shapeJ;
+        fe_intgrl_values.IntS_shapeI_shapeJ;
 
       // =================================================== Loop over angles in set
       int ni_deploc_face_counter = deploc_face_counter;
@@ -147,7 +146,7 @@ public:
         int in_face_counter = -1;
         for (int f = 0; f < num_faces; ++f)
         {
-          auto& face = cell->faces[f];
+          auto& face = cell.faces[f];
           double mu = omega.Dot(face.normal);
 
           if (mu < 0.0) // Upwind
@@ -162,10 +161,10 @@ public:
               in_face_counter++;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = cell_fe_view->face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.face_dof_mappings[f][fi];
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  int j = cell_fe_view->face_dof_mappings[f][fj];
+                  int j = fe_intgrl_values.face_dof_mappings[f][fj];
                   double *psi = fluds->UpwindPsi(cr_i,in_face_counter,fj,0,n);
                   double mu_Nij = -mu*N[f][i][j];
                   Amat[i][j] += mu_Nij;
@@ -179,10 +178,10 @@ public:
               preloc_face_counter++;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = cell_fe_view->face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.face_dof_mappings[f][fi];
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  int j = cell_fe_view->face_dof_mappings[f][fj];
+                  int j = fe_intgrl_values.face_dof_mappings[f][fj];
                   double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,n);
                   double mu_Nij = -mu*N[f][i][j];
                   Amat[i][j] += mu_Nij;
@@ -202,13 +201,13 @@ public:
               int bndry_index = face.neighbor_id;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = cell_fe_view->face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.face_dof_mappings[f][fi];
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  int j = cell_fe_view->face_dof_mappings[f][fj];
+                  int j = fe_intgrl_values.face_dof_mappings[f][fj];
                   double *psi = angle_set->PsiBndry(bndry_index,
                                                     angle_num,
-                                                    cell->local_id,
+                                                    cell.local_id,
                                                     f, fj, gs_gi, gs_ss_begin,
                                                     suppress_surface_src);
                   double mu_Nij = -mu*N[f][i][j];
@@ -253,7 +252,7 @@ public:
           }
 
           // ============================= Solve system
-          chi_math::GaussElimination(Atemp, b[gsg], cell_fe_view->num_nodes);
+          chi_math::GaussElimination(Atemp, b[gsg], fe_intgrl_values.num_nodes);
         }
 
         // ============================= Accumulate flux
@@ -266,9 +265,9 @@ public:
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               (*x)[ir + gsg] += wn_d2m*b[gsg][i];
 
-            for (auto callback : groupset.moment_callbacks)
+            for (const auto& callback : groupset.moment_callbacks)
               for (int gsg=0; gsg<gs_ss_size; gsg++)
-                callback(cell->local_id, ir+gsg, i, gsg, m, angle_num, b[gsg][i]);
+                callback(cell.local_id, ir+gsg, i, gsg, m, angle_num, b[gsg][i]);
           }
         }
 
@@ -279,7 +278,7 @@ public:
 
           // ============================= Set flags and counters
           out_face_counter++;
-          auto& face = cell->faces[f];
+          auto& face = cell.faces[f];
           bool local = transport_view.face_local[f];
           bool boundary = not face.has_neighbor;
           int num_face_indices = face.vertex_ids.size();
@@ -288,7 +287,7 @@ public:
           {
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              int i = cell_fe_view->face_dof_mappings[f][fi];
+              int i = fe_intgrl_values.face_dof_mappings[f][fi];
               double *psi = fluds->OutgoingPsi(cr_i, out_face_counter, fi, n);
               for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                 psi[gsg] = b[gsg][i];
@@ -299,7 +298,7 @@ public:
             deploc_face_counter++;
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              int i = cell_fe_view->face_dof_mappings[f][fi];
+              int i = fe_intgrl_values.face_dof_mappings[f][fi];
               double *psi = fluds->NLOutgoingPsi(deploc_face_counter, fi, n);
               for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                 psi[gsg] = b[gsg][i];
@@ -312,9 +311,9 @@ public:
             {
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = cell_fe_view->face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.face_dof_mappings[f][fi];
                 double *psi = angle_set->ReflectingPsiOutBoundBndry(bndry_index, angle_num,
-                                                                    cell->local_id, f,
+                                                                    cell.local_id, f,
                                                                     fi, gs_ss_begin);
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                   psi[gsg] = b[gsg][i];

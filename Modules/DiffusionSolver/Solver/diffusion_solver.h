@@ -93,7 +93,7 @@ public:
   virtual ~Solver();
   //01 General
   void GetMaterialProperties(int mat_id,
-                             chi_mesh::Cell* cell,
+                             const chi_mesh::Cell& cell,
                              int cell_dofs,
                              std::vector<double>& diffCoeff,
                              std::vector<double>& sourceQ,
@@ -112,14 +112,14 @@ public:
   void CFEM_Assemble_A_and_b(chi_mesh::Cell& cell, int group=0);
 
   //02c_c
-  void PWLD_Assemble_A_and_b(chi_mesh::Cell& cell,
+  void PWLD_Assemble_A_and_b(const chi_mesh::Cell& cell,
                              int component=0);
-  void PWLD_Assemble_b(chi_mesh::Cell& cell,
+  void PWLD_Assemble_b(const chi_mesh::Cell& cell,
                        int component=0);
 
   //02e_c
-  void PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell);
-  void PWLD_Assemble_b_GAGG(chi_mesh::Cell& cell);
+  void PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cell);
+  void PWLD_Assemble_b_GAGG(const chi_mesh::Cell& cell);
 
 
   //03b
@@ -132,8 +132,15 @@ public:
   uint64_t MapCellLocalNodeIDFromGlobalID(chi_mesh::Cell* cell,
                                           uint64_t node_global_id);
   static
+  uint64_t MapCellLocalNodeIDFromGlobalID(const chi_mesh::Cell& cell,
+                                          uint64_t node_global_id);
+  static
   unsigned int MapCellFace(chi_mesh::Cell* cur_cell,
                            chi_mesh::Cell* adj_cell,
+                           unsigned int f);
+  static
+  unsigned int MapCellFace(const chi_mesh::Cell& cur_cell,
+                           const chi_mesh::Cell& adj_cell,
                            unsigned int f);
 };
 

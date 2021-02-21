@@ -21,7 +21,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Gets material properties various sources.*/
 void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
-                                                  chi_mesh::Cell* cell,
+                                                  const chi_mesh::Cell& cell,
                                                   int cell_dofs,
                                                   std::vector<double>& diffCoeff,
                                                   std::vector<double>& sourceQ,
@@ -29,9 +29,9 @@ void chi_diffusion::Solver::GetMaterialProperties(int mat_id,
                                                   int group,
                                                   int moment)
 {
-  int cell_glob_index = cell->global_id;
-  bool cell_is_local = (cell->partition_id == chi_mpi.location_id);
-  int cell_local_id = cell->local_id;
+  int cell_glob_index = cell.global_id;
+  bool cell_is_local = (cell.partition_id == chi_mpi.location_id);
+  int cell_local_id = cell.local_id;
   if (mat_id<0)
   {
     chi_log.Log(LOG_0ERROR)

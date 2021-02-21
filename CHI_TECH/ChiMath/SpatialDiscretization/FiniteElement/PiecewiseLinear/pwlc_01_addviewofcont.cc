@@ -69,6 +69,37 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues(
     mapping_initialized = true;
   }
 
+  //============================================= Unit integrals
+  if (not integral_data_initialized)
+  {
+    fe_unit_integrals.reserve(cell_fe_views.size());
+    for (auto& cell_fe_view : cell_fe_views)
+    {
+      UIData ui_data;
+      cell_fe_view->ComputeUnitIntegrals(ui_data);
+
+      fe_unit_integrals.push_back(std::move(ui_data));
+    }
+
+    integral_data_initialized = true;
+  }
+
+  //============================================= Quadrature data
+  if (not qp_data_initialized)
+  {
+    fe_vol_qp_data.reserve(cell_fe_views.size());
+    fe_srf_qp_data.reserve(cell_fe_views.size());
+    for (auto& cell_fe_view : cell_fe_views)
+    {
+      fe_vol_qp_data.emplace_back();
+      fe_srf_qp_data.emplace_back();
+      cell_fe_view->InitializeQuadraturePointData(fe_vol_qp_data.back(),
+                                                  fe_srf_qp_data.back());
+    }
+
+    qp_data_initialized = true;
+  }
+
 }//AddViewOfLocalContinuum
 
 ////###################################################################

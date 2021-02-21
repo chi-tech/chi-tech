@@ -110,9 +110,9 @@ public:
 
   unsigned int AddUnknown(UnknownType unk_type, unsigned int dimension= 0);
 
-  unsigned int MapUnknown(unsigned int unknown_id, unsigned int component = 0);
+  unsigned int MapUnknown(unsigned int unknown_id, unsigned int component = 0) const;
 
-  unsigned int GetTotalUnknownStructureSize();
+  unsigned int GetTotalUnknownStructureSize() const;
 
   void SetUnknownNumOffBlockConnections(unsigned int unknown_id,
                                         int num_conn);

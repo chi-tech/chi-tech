@@ -70,7 +70,7 @@ unsigned int chi_math::UnknownManager::
 //###################################################################
 /**Maps the unknown's component within the storage of a node.*/
 unsigned int chi_math::UnknownManager::
-  MapUnknown(unsigned int unknown_id, unsigned int component)
+  MapUnknown(unsigned int unknown_id, unsigned int component) const
 {
   auto& log = ChiLog::GetInstance();
 
@@ -85,7 +85,7 @@ unsigned int chi_math::UnknownManager::
 
 //###################################################################
 /**Determines the total number of components over all unknowns.*/
-unsigned int chi_math::UnknownManager::GetTotalUnknownStructureSize()
+unsigned int chi_math::UnknownManager::GetTotalUnknownStructureSize() const
 {
   if (unknowns.empty())
     return 0;

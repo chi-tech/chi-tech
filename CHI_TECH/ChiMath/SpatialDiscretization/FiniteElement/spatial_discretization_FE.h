@@ -33,7 +33,7 @@ protected:
 public:
   virtual
   const chi_math::finite_element::UnitIntegralData&
-  GetUnitIntegrals(chi_mesh::Cell& cell) const
+    GetUnitIntegrals(const chi_mesh::Cell& cell) const
   {
     if (not integral_data_initialized)
       throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
@@ -43,7 +43,7 @@ public:
 
   virtual
   const chi_math::finite_element::InternalQuadraturePointData&
-  GetQPData_Volumetric(chi_mesh::Cell& cell) const
+    GetQPData_Volumetric(const chi_mesh::Cell& cell) const
   {
     if (not qp_data_initialized)
       throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
@@ -53,8 +53,8 @@ public:
 
   virtual
   const chi_math::finite_element::FaceQuadraturePointData&
-  GetQPData_Surface(const chi_mesh::Cell& cell,
-                       const unsigned int face) const
+    GetQPData_Surface(const chi_mesh::Cell& cell,
+                      const unsigned int face) const
   {
     if (not qp_data_initialized)
       throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "

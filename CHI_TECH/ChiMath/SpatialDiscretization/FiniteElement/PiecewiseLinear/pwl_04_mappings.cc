@@ -71,10 +71,11 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
 int SpatialDiscretization_PWL::
-MapDOF(chi_mesh::Cell& cell, int node,
-       chi_math::UnknownManager& unknown_manager,
-       unsigned int unknown_id,
-       unsigned int component)
+MapDOF(const chi_mesh::Cell& cell,
+       const int node,
+       const chi_math::UnknownManager& unknown_manager,
+       const unsigned int unknown_id,
+       const unsigned int component) const
 {
   if (component < 0) throw std::logic_error(__FUNCTION__);
   if (node < 0) throw std::logic_error(__FUNCTION__);
@@ -149,10 +150,11 @@ MapDOF(chi_mesh::Cell& cell, int node,
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
 int SpatialDiscretization_PWL::
-MapDOFLocal(chi_mesh::Cell& cell, int node,
-            chi_math::UnknownManager& unknown_manager,
-            unsigned int unknown_id,
-            unsigned int component)
+MapDOFLocal(const chi_mesh::Cell& cell,
+            const int node,
+            const chi_math::UnknownManager& unknown_manager,
+            const unsigned int unknown_id,
+            const unsigned int component) const
 {
   if (component < 0) throw std::logic_error(__FUNCTION__);
   if (node < 0) throw std::logic_error(__FUNCTION__);

@@ -89,17 +89,19 @@ public:
   CellPWLFEValues* MapNeighborCellFeView(int cell_glob_index);
 
   //04
-  int MapDOF(chi_mesh::Cell& cell, int node,
-             chi_math::UnknownManager& unknown_manager,
-             unsigned int unknown_id,
-             unsigned int component= 0);
-  int MapDOFLocal(chi_mesh::Cell& cell, int node,
-                  chi_math::UnknownManager& unknown_manager,
-                  unsigned int unknown_id,
-                  unsigned int component= 0);
-  int MapDOF(chi_mesh::Cell& cell, int node)
+  int MapDOF(const chi_mesh::Cell& cell,
+             const int node,
+             const chi_math::UnknownManager& unknown_manager,
+             const unsigned int unknown_id,
+             const unsigned int component= 0) const;
+  int MapDOFLocal(const chi_mesh::Cell& cell,
+                  const int node,
+                  const chi_math::UnknownManager& unknown_manager,
+                  const unsigned int unknown_id,
+                  const unsigned int component= 0) const;
+  int MapDOF(const chi_mesh::Cell& cell, int node)
   { return MapDOF(cell,node,ChiMath::UNITARY_UNKNOWN_MANAGER,0,0); }
-  int MapDOFLocal(chi_mesh::Cell& cell, int node)
+  int MapDOFLocal(const chi_mesh::Cell& cell, int node)
   { return MapDOFLocal(cell,node,ChiMath::UNITARY_UNKNOWN_MANAGER,0,0); }
 
   //05
@@ -121,7 +123,7 @@ public:
 
   //FE-utils
   const chi_math::finite_element::UnitIntegralData&
-  GetUnitIntegrals(chi_mesh::Cell& cell) const override
+    GetUnitIntegrals(const chi_mesh::Cell& cell) const override
   {
     if (ref_grid->IsCellLocal(cell.global_id))
     {
@@ -140,7 +142,7 @@ public:
   }
 
   const chi_math::finite_element::InternalQuadraturePointData&
-  GetQPData_Volumetric(chi_mesh::Cell& cell) const override
+    GetQPData_Volumetric(const chi_mesh::Cell& cell) const override
   {
     if (ref_grid->IsCellLocal(cell.global_id))
     {
@@ -159,8 +161,8 @@ public:
   }
 
   const chi_math::finite_element::FaceQuadraturePointData&
-  GetQPData_Surface(const chi_mesh::Cell& cell,
-                    const unsigned int face) const override
+    GetQPData_Surface(const chi_mesh::Cell& cell,
+                      const unsigned int face) const override
   {
     if (ref_grid->IsCellLocal(cell.global_id))
     {

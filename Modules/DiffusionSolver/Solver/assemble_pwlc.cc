@@ -13,16 +13,18 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
                                                   int group)
 {
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
-  auto fe_view   = pwl_sdm->MapFeViewL(cell.local_id);
+  const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
+
+  size_t num_nodes = fe_intgrl_values.num_nodes;
 
   //======================================== Process material id
   int mat_id = cell.material_id;
 
-  std::vector<double> D(fe_view->num_nodes, 1.0);
-  std::vector<double> q(fe_view->num_nodes, 1.0);
-  std::vector<double> siga(fe_view->num_nodes, 0.0);
+  std::vector<double> D(num_nodes, 1.0);
+  std::vector<double> q(num_nodes, 1.0);
+  std::vector<double> siga(num_nodes, 0.0);
 
-  GetMaterialProperties(mat_id, &cell, fe_view->num_nodes, D, q, siga, group);
+  GetMaterialProperties(mat_id, cell, num_nodes, D, q, siga, group);
 
   //======================================== Init cell matrix info
   typedef std::vector<double> Row;
@@ -31,36 +33,36 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   Matrix              cell_matrix;
   std::vector<double> cell_rhs;
 
-  cell_matrix.resize(fe_view->num_nodes, Row(fe_view->num_nodes, 0.0));
-  cell_rhs.resize(fe_view->num_nodes, 0.0);
+  cell_matrix.resize(num_nodes, Row(num_nodes, 0.0));
+  cell_rhs.resize(num_nodes, 0.0);
 
-  std::vector<int> dof_global_row_ind(fe_view->num_nodes, -1);
-  std::vector<int> dof_global_col_ind(fe_view->num_nodes, -1);
+  std::vector<int> dof_global_row_ind(num_nodes, -1);
+  std::vector<int> dof_global_col_ind(num_nodes, -1);
 
   //========================================= Loop over DOFs
-  for (int i=0; i<fe_view->num_nodes; i++)
+  for (int i=0; i<num_nodes; i++)
   {
     dof_global_row_ind[i] = pwl_sdm->MapDOF(cell.vertex_ids[i]);
 
-    for (int j=0; j<fe_view->num_nodes; j++)
+    for (int j=0; j<num_nodes; j++)
     {
       double mat_entry =
-        D[j]*fe_view->IntV_gradShapeI_gradShapeJ[i][j] +
-        siga[j]*fe_view->IntV_shapeI_shapeJ[i][j];
+        D[j]*fe_intgrl_values.IntV_gradShapeI_gradShapeJ[i][j] +
+        siga[j]*fe_intgrl_values.IntV_shapeI_shapeJ[i][j];
 
       cell_matrix[i][j] = mat_entry;
     }//for j
 
     //====================== Develop RHS entry
-    cell_rhs[i] = q[i]*fe_view->IntV_shapeI[i];
+    cell_rhs[i] = q[i]*fe_intgrl_values.IntV_shapeI[i];
   }//for i
   dof_global_col_ind = dof_global_row_ind;
 
 //  //======================================== Apply Dirichlet,Vacuum, Neumann and
 //  //                                         Robin BCs
 //  // Dirichlets are just collected
-  std::vector<int>    dirichlet_count(fe_view->num_nodes, 0);
-  std::vector<double> dirichlet_value(fe_view->num_nodes, 0.0);
+  std::vector<int>    dirichlet_count(num_nodes, 0);
+  std::vector<double> dirichlet_value(num_nodes, 0.0);
   for (int f=0; f<cell.faces.size(); f++)
   {
     if (not cell.faces[f].has_neighbor)
@@ -76,7 +78,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         int num_face_dofs = cell.faces[f].vertex_ids.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_view->face_dof_mappings[f][fi];
+          int i  = fe_intgrl_values.face_dof_mappings[f][fi];
           dirichlet_count[i] += 1;
           dirichlet_value[i] += dirichlet_bndry->boundary_value;
         }
@@ -90,19 +92,19 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         int num_face_dofs = cell.faces[f].vertex_ids.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_view->face_dof_mappings[f][fi];
+          int i  = fe_intgrl_values.face_dof_mappings[f][fi];
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_view->face_dof_mappings[f][fj];
+            int j  = fe_intgrl_values.face_dof_mappings[f][fj];
 
-            double aij = robin_bndry->a*fe_view->IntS_shapeI_shapeJ[f][i][j];
+            double aij = robin_bndry->a*fe_intgrl_values.IntS_shapeI_shapeJ[f][i][j];
             aij /= robin_bndry->b;
 
             cell_matrix[i][j] += aij;
           }//for fj
 
-          double aii = robin_bndry->f*fe_view->IntS_shapeI[i][f];
+          double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[i][f];
           aii /= robin_bndry->b;
 
           cell_matrix[i][i] += aii;
@@ -115,15 +117,15 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
 
   //======================================== Apply dirichlet BCs
   //Compute average dirichlet value
-  for (int i=0; i<fe_view->num_nodes; ++i)
+  for (int i=0; i<num_nodes; ++i)
     dirichlet_value[i] /= (dirichlet_count[i] > 0)? dirichlet_count[i] : 1;
 
-  for (int i=0; i<fe_view->num_nodes; ++i)
+  for (int i=0; i<num_nodes; ++i)
   {
     if (dirichlet_count[i] > 0)
     {
       cell_matrix[i].clear();
-      cell_matrix[i] = std::vector<double>(fe_view->num_nodes, 0.0);
+      cell_matrix[i] = std::vector<double>(num_nodes, 0.0);
       cell_matrix[i][i] = 1.0;
       int ir = dof_global_col_ind[i];
       MatSetValue(A,ir,ir,1.0,ADD_VALUES);
@@ -132,7 +134,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
     }
     else
     {
-      for (int j=0; j<fe_view->num_nodes; ++j)
+      for (int j=0; j<num_nodes; ++j)
       {
         if (dirichlet_count[j] > 0)
         {
@@ -144,24 +146,24 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   }
 
   //======================================== Make contiguous copy of matrix
-  std::vector<double> cell_matrix_cont(fe_view->num_nodes * fe_view->num_nodes, 0.0);
+  std::vector<double> cell_matrix_cont(num_nodes * num_nodes, 0.0);
   int n = 0;
-  for (int i=0; i<fe_view->num_nodes; ++i)
-    for (int j=0; j<fe_view->num_nodes; ++j)
+  for (int i=0; i<num_nodes; ++i)
+    for (int j=0; j<num_nodes; ++j)
       cell_matrix_cont[n++] = cell_matrix[i][j];
 
   //======================================== Add to global
   MatSetValues(A,
-               fe_view->num_nodes, dof_global_row_ind.data(),
-               fe_view->num_nodes, dof_global_col_ind.data(),
+               num_nodes, dof_global_row_ind.data(),
+               num_nodes, dof_global_col_ind.data(),
                cell_matrix_cont.data(), ADD_VALUES);
 
   VecSetValues(b,
-               fe_view->num_nodes, dof_global_row_ind.data(),
+               num_nodes, dof_global_row_ind.data(),
                cell_rhs.data(), ADD_VALUES);
 
   VecSetValues(x,
-               fe_view->num_nodes,
+               num_nodes,
                dof_global_row_ind.data(),
                dirichlet_value.data(),INSERT_VALUES);
 
