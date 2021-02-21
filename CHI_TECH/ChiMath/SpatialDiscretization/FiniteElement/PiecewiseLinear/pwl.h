@@ -40,8 +40,8 @@ public:
   unsigned int globl_base_block_size=0;
 
 private:
-  std::vector<chi_mesh::Cell*> neighbor_cells;
-  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
+  std::map<uint64_t, chi_mesh::Cell*>  neighbor_cells;
+  std::map<uint64_t, CellPWLFEValues*> neighbor_cell_fe_views;
 
 private:
   //00
@@ -106,6 +106,35 @@ public:
                            std::vector<double>& local_vector,
                            chi_math::UnknownManager& unknown_manager)
                            override;
+
+  //FE-utils
+  const chi_math::finite_element::UnitIntegralData&
+  GetUnitIntegrals(chi_mesh::Cell& cell) const override
+  {
+    if (not integral_data_initialized)
+      throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
+                                  "called without integrals being initialized.");
+    return fe_unit_integrals[cell.local_id];
+  }
+
+  const chi_math::finite_element::InternalQuadraturePointData&
+  GetQPData_Volumetric(chi_mesh::Cell& cell) const override
+  {
+    if (not qp_data_initialized)
+      throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
+                                  "called without integrals being initialized.");
+    return fe_vol_qp_data[cell.local_id];
+  }
+
+  const chi_math::finite_element::FaceQuadraturePointData&
+  GetQPData_Surface(const chi_mesh::Cell& cell,
+                    const unsigned int face) const override
+  {
+    if (not qp_data_initialized)
+      throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
+                                  "called without integrals being initialized.");
+    return fe_srf_qp_data[cell.local_id][face];
+  }
 };
 
 #endif //SPATIAL_DISCRETIZATION_PWLD_H

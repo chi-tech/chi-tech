@@ -97,29 +97,31 @@ void SpatialDiscretization_FV::
   {
     int ghost_local_index = grid->cells.GetGhostLocalID(ghost_id);
 
-    for (auto cell : neighbor_cells)
-      if (cell->global_id == ghost_id)
-        temp[ghost_local_index] = cell;
+    for (auto& cell_pair : neighbor_cells)
+      if (cell_pair.first == ghost_id)
+        temp[ghost_local_index] = cell_pair.second;
   }
   neighbor_cells.clear();
   for (auto tcell : temp)
     if (tcell != nullptr)
-      neighbor_cells.push_back(tcell);
+      neighbor_cells.insert(std::pair<uint64_t, chi_mesh::Cell*>(
+        tcell->global_id, tcell));
 
 
   chi_log.Log(LOG_0VERBOSE_1)
     << "Adding neighbor views";
   //================================================== Populate cell fe views
-  neighbor_cell_fv_views.reserve(neighbor_cells.size());
-  for (auto cell : neighbor_cells)
+  for (auto& cell_pair : neighbor_cells)
   {
+    auto& cell = cell_pair.second;
     //######################################### SLAB
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto view =
         new SlabFVValues((chi_mesh::CellSlab*)cell, grid);
 
-      neighbor_cell_fv_views.push_back(view);
+      neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
+        cell->global_id,view));
     }
 
     //######################################### POLYGON
@@ -128,7 +130,8 @@ void SpatialDiscretization_FV::
       auto view =
         new PolygonFVValues((chi_mesh::CellPolygon*)cell, grid);
 
-      neighbor_cell_fv_views.push_back(view);
+      neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
+        cell->global_id,view));
     }
 
     //######################################### POLYHEDRON
@@ -139,7 +142,8 @@ void SpatialDiscretization_FV::
           (chi_mesh::CellPolyhedron*)cell,
           grid);
 
-      neighbor_cell_fv_views.push_back(view);
+      neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
+        cell->global_id,view));
     }
   }//for num cells
 
@@ -171,19 +175,36 @@ CellFVValues* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 /**Maps the cell index to a position stored locally.*/
 CellFVValues* SpatialDiscretization_FV::MapNeighborFeView(int cell_global_index)
 {
-  auto& cell = ref_grid->cells[cell_global_index];
-
-  if (cell.partition_id == chi_mpi.location_id)
-    return MapFeView(cell.local_id);
-  else
+  //=================================== First check locally
+  if (ref_grid->IsCellLocal(cell_global_index))
   {
-    int index=0;
-    for (auto ncell : neighbor_cells)
-    {
-      if (ncell->global_id == cell_global_index)
-        break;
-      ++index;
-    }
-    return neighbor_cell_fv_views[index];
+    auto& neighbor_cell = ref_grid->cells[cell_global_index];
+    return MapFeView(neighbor_cell.local_id);
   }
+
+  //=================================== Now check neighbor cells
+  auto neighbor_location = neighbor_cell_fv_views.find(cell_global_index);
+
+  if (neighbor_location != neighbor_cell_fv_views.end())
+    return neighbor_cell_fv_views.at(cell_global_index);
+  else
+    throw std::logic_error(std::string(__FUNCTION__) +
+                           " Mapping of neighbor cell failed.");
+
+
+//  auto& cell = ref_grid->cells[cell_global_index];
+//
+//  if (cell.partition_id == chi_mpi.location_id)
+//    return MapFeView(cell.local_id);
+//  else
+//  {
+//    int index=0;
+//    for (auto ncell : neighbor_cells)
+//    {
+//      if (ncell->global_id == cell_global_index)
+//        break;
+//      ++index;
+//    }
+//    return neighbor_cell_fv_views[index];
+//  }
 }

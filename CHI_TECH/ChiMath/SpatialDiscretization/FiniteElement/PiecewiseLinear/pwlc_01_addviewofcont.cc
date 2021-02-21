@@ -71,79 +71,79 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues(
 
 }//AddViewOfLocalContinuum
 
-//###################################################################
-/**Adds a PWL Finite Element for each cell of the neighboring cells.*/
-void SpatialDiscretization_PWLC::PreComputeNeighborCellSDValues(
-  chi_mesh::MeshContinuumPtr grid)
-{
-  chi_log.Log(LOG_0)
-    << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums.";
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  grid->CommunicatePartitionNeighborCells(neighbor_cells);
-
-  chi_log.Log(LOG_0)
-    << "Done communicating neighbor cells.";
-  MPI_Barrier(MPI_COMM_WORLD);
-
-
-  //================================================== Populate cell fe views
-  neighbor_cell_fe_views.reserve(neighbor_cells.size());
-  for (auto cell : neighbor_cells)
-  {
-    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-    if (cell->Type() == chi_mesh::CellType::SLAB)
-    {
-      auto slab_cell = (chi_mesh::CellSlab*)cell;
-      auto cell_fe_view = new SlabPWLFEView(slab_cell,
-                                            grid,
-                                            line_quad_order_second);
-
-      cell_fe_view->PreComputeValues();
-
-      neighbor_cell_fe_views.push_back(cell_fe_view);
-    }
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-    else if (cell->Type() == chi_mesh::CellType::POLYGON)
-    {
-      auto poly_cell = (chi_mesh::CellPolygon*)cell;
-      auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
-                                                 grid,
-                                                 tri_quad_order_second,
-                                                 line_quad_order_second);
-
-      cell_fe_view->PreComputeValues();
-
-      neighbor_cell_fe_views.push_back(cell_fe_view);
-    }
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
-      auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
-                                                    grid,
-                                                    tet_quad_order_second,
-                                                    tri_quad_order_second);
-
-      cell_fe_view->PreComputeValues();
-
-      neighbor_cell_fe_views.push_back(cell_fe_view);
-    }
-    else
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums. "
-        << "Unsupported cell type encountered.";
-      exit(EXIT_FAILURE);
-    }
-  }//for num cells
-
-
-  chi_log.Log(LOG_ALLVERBOSE_1)
-    << "Number of neighbor cells added: "
-    << neighbor_cell_fe_views.size();
-
-}//AddViewOfNeighborContinuums
+////###################################################################
+///**Adds a PWL Finite Element for each cell of the neighboring cells.*/
+//void SpatialDiscretization_PWLC::PreComputeNeighborCellSDValues(
+//  chi_mesh::MeshContinuumPtr grid)
+//{
+//  chi_log.Log(LOG_0)
+//    << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums.";
+//  MPI_Barrier(MPI_COMM_WORLD);
+//
+//  grid->CommunicatePartitionNeighborCells(neighbor_cells);
+//
+//  chi_log.Log(LOG_0)
+//    << "Done communicating neighbor cells.";
+//  MPI_Barrier(MPI_COMM_WORLD);
+//
+//
+//  //================================================== Populate cell fe views
+//  neighbor_cell_fe_views.reserve(neighbor_cells.size());
+//  for (auto cell : neighbor_cells)
+//  {
+//    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
+//    if (cell->Type() == chi_mesh::CellType::SLAB)
+//    {
+//      auto slab_cell = (chi_mesh::CellSlab*)cell;
+//      auto cell_fe_view = new SlabPWLFEView(slab_cell,
+//                                            grid,
+//                                            line_quad_order_second);
+//
+//      cell_fe_view->PreComputeValues();
+//
+//      neighbor_cell_fe_views.push_back(cell_fe_view);
+//    }
+//      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
+//    else if (cell->Type() == chi_mesh::CellType::POLYGON)
+//    {
+//      auto poly_cell = (chi_mesh::CellPolygon*)cell;
+//      auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
+//                                                 grid,
+//                                                 tri_quad_order_second,
+//                                                 line_quad_order_second);
+//
+//      cell_fe_view->PreComputeValues();
+//
+//      neighbor_cell_fe_views.push_back(cell_fe_view);
+//    }
+//      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
+//    else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
+//    {
+//      auto polyh_cell = (chi_mesh::CellPolyhedron*)cell;
+//      auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
+//                                                    grid,
+//                                                    tet_quad_order_second,
+//                                                    tri_quad_order_second);
+//
+//      cell_fe_view->PreComputeValues();
+//
+//      neighbor_cell_fe_views.push_back(cell_fe_view);
+//    }
+//    else
+//    {
+//      chi_log.Log(LOG_ALLERROR)
+//        << "SpatialDiscretization_PWL::AddViewOfNeighborContinuums. "
+//        << "Unsupported cell type encountered.";
+//      exit(EXIT_FAILURE);
+//    }
+//  }//for num cells
+//
+//
+//  chi_log.Log(LOG_ALLVERBOSE_1)
+//    << "Number of neighbor cells added: "
+//    << neighbor_cell_fe_views.size();
+//
+//}//AddViewOfNeighborContinuums
 
 
 //###################################################################

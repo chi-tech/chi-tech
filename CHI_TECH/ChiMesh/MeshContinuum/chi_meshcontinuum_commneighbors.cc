@@ -15,13 +15,13 @@ extern ChiMPI& chi_mpi;
  * supplied vector neighbor_cells. The complete cell is
  * not populated, the face neighbors are not transferred.*/
 void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
-  std::vector<chi_mesh::Cell*>& neighbor_cells)
+  std::map<uint64_t, chi_mesh::Cell*>& neighbor_cells)
 {
   chi_log.Log(LOG_0)
     << "Communicating partition neighbors.";
   MPI_Barrier(MPI_COMM_WORLD);
 
-  std::set<int> local_neighboring_cell_indices;
+  std::set<uint64_t> local_neighboring_cell_indices;
   std::set<int> neighboring_partitions;
 
   //============================================= Collect local neighboring
@@ -64,13 +64,10 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
       auto& cell = local_cells[local_cell_index];
 
       for (auto& face : cell.faces)
-      {
         if ((face.has_neighbor) and (not face.IsNeighborLocal(*this)) )
-        {
           if (cells[face.neighbor_id].partition_id == adj_part)
             new_list.second.push_back(local_cell_index);
-        }
-      }//for faces
+
     }//for neighbor cells
 
     destination_subscriptions.push_back(new_list);
@@ -279,7 +276,7 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
         }
       }
 
-      neighbor_cells.push_back(cell);
+      neighbor_cells.insert(std::pair<uint64_t, Cell*>(cell->global_id,cell));
     }
   }
 

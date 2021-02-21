@@ -5,6 +5,8 @@
 #include "CellViews/fv_cellbase.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
+#include <map>
+
 //###################################################################
 /**Spatial discretizations supporting Finite Volume representations.
  * */
@@ -18,8 +20,8 @@ private:
   std::vector<bool>  cell_view_added_flags;
 
 private:
-  std::vector<chi_mesh::Cell*> neighbor_cells;
-  std::vector<CellFVValues*> neighbor_cell_fv_views;
+  std::map<uint64_t, chi_mesh::Cell*> neighbor_cells;
+  std::map<uint64_t, CellFVValues*> neighbor_cell_fv_views;
 
 public:
   int              fv_local_block_address = 0;

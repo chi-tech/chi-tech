@@ -33,10 +33,12 @@ MapDOF(chi_mesh::Cell& cell)
   }
   else
   {
-    int ghost_local_id = 0;
-    for (auto ghost : neighbor_cells)
-      if (ghost->global_id == cell.global_id)
-        ghost_local_id = ghost->local_id;
+    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+
+//    int ghost_local_id = 0;
+//    for (auto ghost : neighbor_cells)
+//      if (ghost->global_id == cell.global_id)
+//        ghost_local_id = ghost->local_id;
 
     address = locJ_block_address[cell.partition_id] +
               ghost_local_id;
@@ -84,10 +86,12 @@ MapDOF(chi_mesh::Cell& cell,
   }
   else
   {
-    int ghost_local_id = 0;
-    for (auto ghost : neighbor_cells)
-      if (ghost->global_id == cell.global_id)
-        ghost_local_id = ghost->local_id;
+    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+
+//    int ghost_local_id = 0;
+//    for (auto ghost : neighbor_cells)
+//      if (ghost->global_id == cell.global_id)
+//        ghost_local_id = ghost->local_id;
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = locJ_block_address[cell.partition_id] * num_unknowns +
@@ -120,10 +124,12 @@ MapDOFLocal(chi_mesh::Cell& cell)
     address = cell.local_id;
   else
   {
-    int ghost_local_id = 0;
-    for (auto ghost : neighbor_cells)
-      if (ghost->global_id == cell.global_id)
-        ghost_local_id = ghost->local_id;
+    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+
+//    int ghost_local_id = 0;
+//    for (auto ghost : neighbor_cells)
+//      if (ghost->global_id == cell.global_id)
+//        ghost_local_id = ghost->local_id;
 
     address = ghost_local_id;
   }
@@ -169,10 +175,12 @@ MapDOFLocal(chi_mesh::Cell& cell,
   }
   else
   {
-    int ghost_local_id = 0;
-    for (auto ghost : neighbor_cells)
-      if (ghost->global_id == cell.global_id)
-        ghost_local_id = ghost->local_id;
+    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+
+//    int ghost_local_id = 0;
+//    for (auto ghost : neighbor_cells)
+//      if (ghost->global_id == cell.global_id)
+//        ghost_local_id = ghost->local_id;
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = locJ_block_size[cell.partition_id] * block_id +

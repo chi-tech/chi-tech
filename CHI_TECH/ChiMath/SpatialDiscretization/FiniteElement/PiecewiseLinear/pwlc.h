@@ -60,7 +60,7 @@ public:
 
   //01
   void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) override;
-  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
+//  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
   CellPWLFEValues* MapFeViewL(int cell_local_index);
 
 private:

@@ -276,51 +276,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
 
 }
 
-//###################################################################
-/**Maps a neigboring cell from a global cell index.*/
-chi_mesh::Cell* SpatialDiscretization_PWL::
-MapNeighborCell(int cell_glob_index)
-{
-  int index=0;
-  for (auto cell : neighbor_cells)
-  {
-    if (cell->global_id == cell_glob_index) break;
-    ++index;
-  }
 
-  if ((index < 0) or (index >= neighbor_cells.size()))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "MapNeighborCellFeView. Make sure a call to "
-      << "AddViewOfNeighborContinuums has been made";
-    exit(EXIT_FAILURE);
-  }
-
-  return neighbor_cells[index];
-}
-
-//###################################################################
-/**Maps a neigboring cell's fe view from a global cell index.*/
-CellPWLFEValues* SpatialDiscretization_PWL::
-  MapNeighborCellFeView(int cell_glob_index)
-{
-  int index=0;
-  for (auto cell : neighbor_cells)
-  {
-    if (cell->global_id == cell_glob_index) break;
-    ++index;
-  }
-
-  if ((index < 0) or (index >= neighbor_cells.size()))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "MapNeighborCellFeView. Make sure a call to "
-      << "AddViewOfNeighborContinuums has been made";
-    exit(EXIT_FAILURE);
-  }
-
-  return neighbor_cell_fe_views[index];
-}
 
 
 

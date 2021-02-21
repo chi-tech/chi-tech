@@ -69,6 +69,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
     mapping_initialized = true;
   }
 
+  //============================================= Unit integrals
   if (not integral_data_initialized)
   {
     fe_unit_integrals.reserve(cell_fe_views.size());
@@ -81,6 +82,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
     integral_data_initialized = true;
   }
 
+  //============================================= Quadrature data
   if (not qp_data_initialized)
   {
     fe_vol_qp_data.reserve(cell_fe_views.size());
@@ -117,9 +119,10 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
 
 
   //================================================== Populate cell fe views
-  neighbor_cell_fe_views.reserve(neighbor_cells.size());
-  for (auto cell : neighbor_cells)
+  for (auto& cell_map : neighbor_cells)
   {
+    auto& cell = cell_map.second;
+
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
@@ -130,7 +133,8 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
 
       cell_fe_view->PreComputeValues();
 
-      neighbor_cell_fe_views.push_back(cell_fe_view);
+      neighbor_cell_fe_views.insert(std::pair<uint64_t, CellPWLFEValues*>(
+        cell->global_id,cell_fe_view));
     }
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     else if (cell->Type() == chi_mesh::CellType::POLYGON)
@@ -143,7 +147,8 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
 
       cell_fe_view->PreComputeValues();
 
-      neighbor_cell_fe_views.push_back(cell_fe_view);
+      neighbor_cell_fe_views.insert(std::pair<uint64_t, CellPWLFEValues*>(
+        cell->global_id,cell_fe_view));
     }
       //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
@@ -156,7 +161,8 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
 
       cell_fe_view->PreComputeValues();
 
-      neighbor_cell_fe_views.push_back(cell_fe_view);
+      neighbor_cell_fe_views.insert(std::pair<uint64_t, CellPWLFEValues*>(
+        cell->global_id,cell_fe_view));
     }
     else
     {
@@ -171,6 +177,8 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
   chi_log.Log(LOG_ALLVERBOSE_1)
     << "Number of neighbor cells added: "
     << neighbor_cell_fe_views.size();
+
+
 
 }//AddViewOfNeighborContinuums
 
@@ -191,4 +199,45 @@ CellPWLFEValues* SpatialDiscretization_PWL::MapFeViewL(int cell_local_index)
   }
 
   return value;
+}
+
+//###################################################################
+/**Maps a neigboring cell from a global cell index.*/
+chi_mesh::Cell* SpatialDiscretization_PWL::
+MapNeighborCell(int cell_glob_index)
+{
+  //=================================== First check locally
+  if (ref_grid->IsCellLocal(cell_glob_index))
+    return &ref_grid->cells[cell_glob_index];
+
+  //=================================== Now check neighbor cells
+  auto neighbor_location = neighbor_cells.find(cell_glob_index);
+
+  if (neighbor_location != neighbor_cells.end())
+    return neighbor_cells.at(cell_glob_index);
+  else
+    throw std::logic_error(std::string(__FUNCTION__) +
+                           " Mapping of neighbor cell failed.");
+}
+
+//###################################################################
+/**Maps a neigboring cell's fe view from a global cell index.*/
+CellPWLFEValues* SpatialDiscretization_PWL::
+MapNeighborCellFeView(int cell_glob_index)
+{
+  //=================================== First check locally
+  if (ref_grid->IsCellLocal(cell_glob_index))
+  {
+    auto& neighbor_cell = ref_grid->cells[cell_glob_index];
+    return MapFeViewL(neighbor_cell.local_id);
+  }
+
+  //=================================== Now check neighbor cells
+  auto neighbor_location = neighbor_cell_fe_views.find(cell_glob_index);
+
+  if (neighbor_location != neighbor_cell_fe_views.end())
+    return neighbor_cell_fe_views.at(cell_glob_index);
+  else
+    throw std::logic_error(std::string(__FUNCTION__) +
+                           " Mapping of neighbor cell failed.");
 }

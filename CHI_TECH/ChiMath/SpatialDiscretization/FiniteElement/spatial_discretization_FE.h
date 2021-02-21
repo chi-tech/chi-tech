@@ -11,7 +11,6 @@
 class SpatialDiscretization_FE : public SpatialDiscretization
 {
 protected:
-//  namespace fe_stuff = chi_math::finite_element;
   std::vector<chi_math::finite_element::UnitIntegralData> fe_unit_integrals;
   std::vector<chi_math::finite_element::InternalQuadraturePointData> fe_vol_qp_data;
   std::vector<std::vector<chi_math::finite_element::FaceQuadraturePointData>> fe_srf_qp_data;
@@ -28,6 +27,7 @@ protected:
   {}
 
 public:
+  virtual
   const chi_math::finite_element::UnitIntegralData&
   GetUnitIntegrals(chi_mesh::Cell& cell) const
   {
@@ -37,6 +37,7 @@ public:
     return fe_unit_integrals[cell.local_id];
   }
 
+  virtual
   const chi_math::finite_element::InternalQuadraturePointData&
   GetQPData_Volumetric(chi_mesh::Cell& cell) const
   {
@@ -46,6 +47,7 @@ public:
     return fe_vol_qp_data[cell.local_id];
   }
 
+  virtual
   const chi_math::finite_element::FaceQuadraturePointData&
   GetQPData_Surface(const chi_mesh::Cell& cell,
                        const unsigned int face) const

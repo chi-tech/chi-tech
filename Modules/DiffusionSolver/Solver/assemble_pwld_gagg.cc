@@ -68,32 +68,11 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(chi_mesh::Cell& cell)
 
       if (face.has_neighbor)
       {
-        chi_mesh::Cell*  adj_cell    = nullptr;
-        CellPWLFEValues* adj_fe_view = nullptr;
-        int               fmap = -1;
-
-        //========================= Get adj cell information
-        if (face.IsNeighborLocal(*grid))  //Local
-        {
-          adj_cell      = &grid->local_cells[face.GetNeighborLocalID(*grid)];
-          adj_fe_view   = (CellPWLFEValues*)pwl_sdm->MapFeViewL(adj_cell->local_id);
-        }//local
-        else //Non-local
-        {
-          adj_cell    = pwl_sdm->MapNeighborCell(face.neighbor_id);
-          adj_fe_view = pwl_sdm->MapNeighborCellFeView(face.neighbor_id);
-        }//non-local
-
-        //========================= Check valid information
-        if (adj_cell == nullptr || adj_fe_view == nullptr)
-        {
-          chi_log.Log(LOG_ALL)
-            << "Error in MIP cell information.";
-          exit(EXIT_FAILURE);
-        }
+        auto adj_cell    = pwl_sdm->MapNeighborCell(face.neighbor_id);
+        auto adj_fe_view = pwl_sdm->MapNeighborCellFeView(face.neighbor_id);
 
         //========================= Get the current map to the adj cell's face
-        fmap = MapCellFace(&cell,adj_cell,f);
+        unsigned int fmap = MapCellFace(&cell,adj_cell,f);
 
         //========================= Compute penalty coefficient
         double hp = HPerpendicular(adj_cell, adj_fe_view, fmap);
