@@ -270,7 +270,6 @@ void PolyhedronPWLFEValues::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
   const bool ON_SURFACE = true;
-  if (precomputed) return;
 
   //============================================= Precompute elements
   for (size_t f=0; f < face_data.size(); f++)
@@ -520,6 +519,9 @@ void PolyhedronPWLFEValues::
       }
     }
   }
+
+  ui_data.face_dof_mappings = face_dof_mappings;
+  ui_data.num_nodes = num_nodes;
 
   //============================================= Cleanup
   for (auto& face : face_data)

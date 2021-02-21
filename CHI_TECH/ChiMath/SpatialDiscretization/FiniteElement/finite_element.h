@@ -33,6 +33,9 @@ namespace finite_element
     std::vector<MatDbl>  IntS_shapeI_shapeJ;
     std::vector<VecDbl>  IntS_shapeI;
     std::vector<MatVec3> IntS_shapeI_gradshapeJ;
+
+    std::vector<std::vector<int>> face_dof_mappings;
+    size_t num_nodes=0;
   };
 
   //#############################################
@@ -42,7 +45,6 @@ namespace finite_element
   {
   public:
     std::vector<unsigned int> quadrature_point_indices; ///< qp only
-//  protected:
     std::vector<VecDbl>       m_shape_value;              ///< Node i, then qp
     std::vector<VecVec3>      m_shape_grad;               ///< Node i, then qp
     VecDbl                    m_JxW;                      ///< Node i, then qp

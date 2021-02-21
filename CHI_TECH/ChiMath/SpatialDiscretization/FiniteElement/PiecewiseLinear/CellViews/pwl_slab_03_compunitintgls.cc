@@ -178,6 +178,9 @@ void SlabPWLFEView::
   ui_data.IntS_shapeI_gradshapeJ[1][1][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
   ui_data.IntS_shapeI_gradshapeJ[1][1][1] = chi_mesh::Vector3(0.0, 0.0, 1.0 / h);
 
+  ui_data.face_dof_mappings = face_dof_mappings;
+  ui_data.num_nodes = num_nodes;
+
   precomputed = true;
 }
 

@@ -75,8 +75,10 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues(
     fe_unit_integrals.reserve(cell_fe_views.size());
     for (auto& cell_fe_view : cell_fe_views)
     {
-      fe_unit_integrals.emplace_back();
-      cell_fe_view->ComputeUnitIntegrals(fe_unit_integrals.back());
+      UIData ui_data;
+      cell_fe_view->ComputeUnitIntegrals(ui_data);
+
+      fe_unit_integrals.push_back(std::move(ui_data));
     }
 
     integral_data_initialized = true;
@@ -178,7 +180,42 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues(
     << "Number of neighbor cells added: "
     << neighbor_cell_fe_views.size();
 
+//============================================= Unit integrals
+  if (not nb_integral_data_initialized)
+  {
+    for (auto& cell_fe_view_pair : neighbor_cell_fe_views)
+    {
+      uint64_t cell_global_id = cell_fe_view_pair.first;
+      auto cell_fe_view = cell_fe_view_pair.second;
 
+      UIData ui_data;
+      cell_fe_view->ComputeUnitIntegrals(ui_data);
+
+      nb_fe_unit_integrals.insert(std::make_pair(cell_global_id,std::move(ui_data)));
+    }
+
+    nb_integral_data_initialized = true;
+  }
+
+  //============================================= Quadrature data
+  if (not nb_qp_data_initialized)
+  {
+    for (auto& cell_fe_view_pair : neighbor_cell_fe_views)
+    {
+      uint64_t cell_global_id = cell_fe_view_pair.first;
+      auto cell_fe_view = cell_fe_view_pair.second;
+
+      QPDataVol qp_data_vol;
+      std::vector<QPDataFace> qp_data_srf;
+      cell_fe_view->InitializeQuadraturePointData(qp_data_vol,
+                                                  qp_data_srf);
+
+      nb_fe_vol_qp_data.insert(std::make_pair(cell_global_id,std::move(qp_data_vol)));
+      nb_fe_srf_qp_data.insert(std::make_pair(cell_global_id,std::move(qp_data_srf)));
+    }
+
+    nb_qp_data_initialized = true;
+  }
 
 }//AddViewOfNeighborContinuums
 

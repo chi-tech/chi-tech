@@ -44,6 +44,18 @@ private:
   std::map<uint64_t, CellPWLFEValues*> neighbor_cell_fe_views;
 
 private:
+  typedef chi_math::finite_element::UnitIntegralData UIData;
+  typedef chi_math::finite_element::InternalQuadraturePointData QPDataVol;
+  typedef chi_math::finite_element::FaceQuadraturePointData QPDataFace;
+
+  std::map<uint64_t, UIData>                  nb_fe_unit_integrals;
+  std::map<uint64_t, QPDataVol>               nb_fe_vol_qp_data;
+  std::map<uint64_t, std::vector<QPDataFace>> nb_fe_srf_qp_data;
+
+  bool nb_integral_data_initialized=false;
+  bool nb_qp_data_initialized=false;
+
+private:
   //00
   explicit
   SpatialDiscretization_PWL(chi_mesh::MeshContinuumPtr in_grid);
@@ -111,29 +123,65 @@ public:
   const chi_math::finite_element::UnitIntegralData&
   GetUnitIntegrals(chi_mesh::Cell& cell) const override
   {
-    if (not integral_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
-                                  "called without integrals being initialized.");
-    return fe_unit_integrals[cell.local_id];
+    if (ref_grid->IsCellLocal(cell.global_id))
+    {
+      if (not integral_data_initialized)
+        throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
+                                    "called without integrals being initialized.");
+      return fe_unit_integrals[cell.local_id];
+    }
+    else
+    {
+      if (not nb_integral_data_initialized)
+        throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
+                                    "called without integrals being initialized.");
+      return nb_fe_unit_integrals.at(cell.global_id);
+    }
   }
 
   const chi_math::finite_element::InternalQuadraturePointData&
   GetQPData_Volumetric(chi_mesh::Cell& cell) const override
   {
-    if (not qp_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
-                                  "called without integrals being initialized.");
-    return fe_vol_qp_data[cell.local_id];
+    if (ref_grid->IsCellLocal(cell.global_id))
+    {
+      if (not qp_data_initialized)
+        throw std::invalid_argument("SpatialDiscretization_PWLD::GetQPData_Volumetric "
+                                    "called without integrals being initialized.");
+      return fe_vol_qp_data.at(cell.local_id);
+    }
+    else
+    {
+      if (not nb_qp_data_initialized)
+        throw std::invalid_argument("SpatialDiscretization_PWLD::GetQPData_Volumetric "
+                                    "called without quadrature data being initialized.");
+      return nb_fe_vol_qp_data.at(cell.global_id);
+    }
   }
 
   const chi_math::finite_element::FaceQuadraturePointData&
   GetQPData_Surface(const chi_mesh::Cell& cell,
                     const unsigned int face) const override
   {
-    if (not qp_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_PWLD::GetUnitIntegrals "
-                                  "called without integrals being initialized.");
-    return fe_srf_qp_data[cell.local_id][face];
+    if (ref_grid->IsCellLocal(cell.global_id))
+    {
+      if (not qp_data_initialized)
+        throw std::invalid_argument("SpatialDiscretization_PWLD::GetQPData_Surface "
+                                    "called without quadrature data being initialized.");
+
+      const auto& face_data = fe_srf_qp_data.at(cell.local_id);
+
+      return face_data.at(face);
+    }
+    else
+    {
+      if (not nb_qp_data_initialized)
+        throw std::invalid_argument("SpatialDiscretization_PWLD::GetQPData_Volumetric "
+                                    "called without quadrature data being initialized.");
+
+      const auto& face_data = nb_fe_srf_qp_data.at(cell.global_id);
+
+      return face_data.at(face);
+    }
   }
 };
 

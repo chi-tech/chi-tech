@@ -124,6 +124,9 @@ public:
 
   //03b
   double HPerpendicular(chi_mesh::Cell* cell, CellPWLFEValues* fe_view, int f);
+  double HPerpendicular(const chi_mesh::Cell& cell,
+                        const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
+                        int f);
 
   static
   uint64_t MapCellLocalNodeIDFromGlobalID(chi_mesh::Cell* cell,

@@ -234,7 +234,6 @@ void PolygonPWLFEValues::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
   const bool ON_SURFACE = true;
-  if (precomputed) return;
 
   //============================================= Precompute elements
   for (int s=0; s<num_of_subtris; s++)
@@ -449,6 +448,9 @@ void PolygonPWLFEValues::
       }
     }
   }
+
+  ui_data.face_dof_mappings = face_dof_mappings;
+  ui_data.num_nodes = num_nodes;
 
   //============================================= Cleanup
   for (auto& side : sides)

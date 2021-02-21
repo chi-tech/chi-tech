@@ -11,9 +11,13 @@
 class SpatialDiscretization_FE : public SpatialDiscretization
 {
 protected:
-  std::vector<chi_math::finite_element::UnitIntegralData> fe_unit_integrals;
-  std::vector<chi_math::finite_element::InternalQuadraturePointData> fe_vol_qp_data;
-  std::vector<std::vector<chi_math::finite_element::FaceQuadraturePointData>> fe_srf_qp_data;
+  typedef chi_math::finite_element::UnitIntegralData UIData;
+  typedef chi_math::finite_element::InternalQuadraturePointData QPDataVol;
+  typedef chi_math::finite_element::FaceQuadraturePointData QPDataFace;
+
+  std::vector<UIData>                  fe_unit_integrals;
+  std::vector<QPDataVol>               fe_vol_qp_data;
+  std::vector<std::vector<QPDataFace>> fe_srf_qp_data;
 
   bool integral_data_initialized=false;
   bool qp_data_initialized=false;
