@@ -1,8 +1,8 @@
 #include "pwlc.h"
 
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -23,7 +23,8 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
         auto slab_cell = (chi_mesh::CellSlab*)(&cell);
         auto cell_fe_view = new SlabPWLFEView(slab_cell,
                                               ref_grid,
-                                              line_quad_order_second);
+                                              line_quad_order_second,
+                                              line_quad_order_arbitrary);
 
         cell_fe_views.push_back(cell_fe_view);
       }
@@ -34,7 +35,9 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
         auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
                                                    ref_grid,
                                                    tri_quad_order_second,
-                                                   line_quad_order_second);
+                                                   line_quad_order_second,
+                                                   tri_quad_order_arbitrary,
+                                                   line_quad_order_arbitrary);
 
         cell_fe_views.push_back(cell_fe_view);
       }
@@ -45,7 +48,9 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
         auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
                                                       ref_grid,
                                                       tet_quad_order_second,
-                                                      tri_quad_order_second);
+                                                      tri_quad_order_second,
+                                                      tet_quad_order_arbitrary,
+                                                      tri_quad_order_arbitrary);
 
         cell_fe_views.push_back(cell_fe_view);
       }

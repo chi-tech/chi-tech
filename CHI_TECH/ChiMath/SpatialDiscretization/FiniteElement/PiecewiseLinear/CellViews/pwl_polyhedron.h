@@ -1,7 +1,7 @@
 #ifndef PWL_POLYHEDRON_VALUES_H
 #define PWL_POLYHEDRON_VALUES_H
 
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include <vector>
 #include "ChiMath/Quadratures/quadrature.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"
@@ -44,6 +44,7 @@ private:
     double                    detJ = 0.0;
     double                    detJ_surf = 0.0;
     std::vector<int>          v_index;
+    chi_mesh::Vector3         v0;
     chi_mesh::Matrix3x3       J;
     chi_mesh::Matrix3x3       Jinv;
     chi_mesh::Matrix3x3       JTinv;
@@ -95,12 +96,20 @@ private:
   chi_math::QuadratureTetrahedron& default_volume_quadrature;
   chi_math::QuadratureTriangle&    default_surface_quadrature;
 
+  chi_math::QuadratureTetrahedron& arbitrary_volume_quadrature;
+  chi_math::QuadratureTriangle&    arbitrary_surface_quadrature;
+
+  chi_math::QuadratureTetrahedron* active_volume_quadrature =nullptr;
+  chi_math::QuadratureTriangle*    active_surface_quadrature=nullptr;
+
 public:
   //00_constrdestr.cc
   PolyhedronPWLFEValues(chi_mesh::CellPolyhedron* polyh_cell,
                         chi_mesh::MeshContinuumPtr ref_grid,
                         chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                        chi_math::QuadratureTriangle&    minumum_surface_quadrature);
+                        chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+                        chi_math::QuadratureTetrahedron& arb_volume_quadrature,
+                        chi_math::QuadratureTriangle&    arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;

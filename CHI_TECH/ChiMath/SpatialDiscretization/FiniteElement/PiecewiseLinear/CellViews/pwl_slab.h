@@ -1,7 +1,7 @@
 #ifndef PWL_SLAB_VALUES_H
 #define PWL_SLAB_VALUES_H
 
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include <vector>
 #include <ChiMesh/Cell/cell_slab.h>
 
@@ -10,24 +10,28 @@
 class SlabPWLFEView : public CellPWLFEValues
 {
 private:
+  chi_mesh::Vector3 v0;
   int v0i;
   int v1i;
   std::array<chi_mesh::Normal,2> normals;
   chi_math::QuadratureGaussLegendre default_volume_quadrature;
+  chi_math::QuadratureGaussLegendre arbitrary_volume_quadrature;
   double h;
 public:
 
   /**Constructor for a slab view.*/
   SlabPWLFEView(chi_mesh::CellSlab *slab_cell,
                 chi_mesh::MeshContinuumPtr ref_grid,
-                chi_math::QuadratureGaussLegendre& minumum_volume_quadrature) :
+                chi_math::QuadratureGaussLegendre& minumum_volume_quadrature,
+                chi_math::QuadratureGaussLegendre& arb_volume_quadrature) :
     CellPWLFEValues(2,ref_grid),
-    default_volume_quadrature(minumum_volume_quadrature)
+    default_volume_quadrature(minumum_volume_quadrature),
+    arbitrary_volume_quadrature(arb_volume_quadrature)
   {
     grid = ref_grid;
     v0i = slab_cell->vertex_ids[0];
     v1i = slab_cell->vertex_ids[1];
-    chi_mesh::Vertex v0 = *grid->vertices[v0i];
+                     v0 = *grid->vertices[v0i];
     chi_mesh::Vertex v1 = *grid->vertices[v1i];
 
     chi_mesh::Vector3 v01 = v1 - v0;

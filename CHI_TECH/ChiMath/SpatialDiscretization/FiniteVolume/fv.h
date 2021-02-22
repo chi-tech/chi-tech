@@ -48,7 +48,7 @@ public:
   CellFVValues* MapNeighborFeView(int cell_global_index);
 
   //02 node ordering
-  void OrderNodes(chi_mesh::MeshContinuumPtr grid);
+  void OrderNodes();
 
   //03 sparsity
   void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,

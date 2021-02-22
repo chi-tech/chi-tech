@@ -1,7 +1,7 @@
 #ifndef PWL_POLYGON_VALUES_H
 #define PWL_POLYGON_VALUES_H
 
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include <vector>
 #include <ChiMesh/Cell/cell_polygon.h>
 
@@ -34,22 +34,30 @@ private:
     std::vector<double> gradshapex_qp;
     std::vector<double> gradshapey_qp;
   };
-//Goes into
+  //Goes into
   struct FEside_data2d
   {
     double detJ;
     double detJ_surf;
     std::array<int,2> v_index;
+    chi_mesh::Vector3   v0;
     chi_mesh::Matrix3x3 J;
     chi_mesh::Matrix3x3 Jinv;
     chi_mesh::Matrix3x3 JTinv;
     std::vector<FEqp_data2d> qp_data;
     chi_mesh::Vector3 normal;
   };
+  //Goes into sides
 
   std::vector<FEside_data2d> sides;
   chi_math::QuadratureTriangle&      default_volume_quadrature;
   chi_math::QuadratureGaussLegendre& default_surface_quadrature;
+
+  chi_math::QuadratureTriangle&      arbitrary_volume_quadrature;
+  chi_math::QuadratureGaussLegendre& arbitrary_surface_quadrature;
+
+  chi_math::QuadratureTriangle*      active_volume_quadrature = nullptr;
+  chi_math::QuadratureGaussLegendre* active_surface_quadrature= nullptr;
 private:
   int      num_of_subtris;
   double   beta;
@@ -67,7 +75,9 @@ public:
   PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
                      chi_mesh::MeshContinuumPtr ref_grid,
                      chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-                     chi_math::QuadratureGaussLegendre& minumum_surface_quadrature);
+                     chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
+                     chi_math::QuadratureTriangle&      arb_volume_quadrature,
+                     chi_math::QuadratureGaussLegendre& arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;

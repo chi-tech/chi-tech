@@ -5,10 +5,14 @@
 PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
                                        std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
                                        chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-                                       chi_math::QuadratureGaussLegendre& minumum_surface_quadrature) :
+                                       chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
+                                       chi_math::QuadratureTriangle&      arb_volume_quadrature,
+                                       chi_math::QuadratureGaussLegendre& arb_surface_quadrature) :
   CellPWLFEValues(poly_cell->vertex_ids.size(),ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
-  default_surface_quadrature(minumum_surface_quadrature)
+  default_surface_quadrature(minumum_surface_quadrature),
+  arbitrary_volume_quadrature(arb_volume_quadrature),
+  arbitrary_surface_quadrature(arb_surface_quadrature)
 {
   num_of_subtris = poly_cell->faces.size();
   beta = 1.0/num_of_subtris;
@@ -37,6 +41,8 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
 
     triangle_data.v_index[0] = face.vertex_ids[0];
     triangle_data.v_index[1] = face.vertex_ids[1];
+
+    triangle_data.v0 = v0;
 
     //Set Jacobian
     triangle_data.J.SetIJ(0,0,sidev01.x);

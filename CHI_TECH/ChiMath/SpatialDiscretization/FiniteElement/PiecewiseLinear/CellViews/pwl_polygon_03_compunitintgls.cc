@@ -5,6 +5,9 @@
 void PolygonPWLFEValues::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
+  active_volume_quadrature = &default_volume_quadrature;
+  active_surface_quadrature= &default_surface_quadrature;
+
   const bool ON_SURFACE = true;
 
   //============================================= Precompute elements

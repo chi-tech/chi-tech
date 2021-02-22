@@ -10,10 +10,14 @@ extern ChiLog& chi_log;
 PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cell,
                                              std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
                                              chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                                             chi_math::QuadratureTriangle&    minumum_surface_quadrature):
+                                             chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+                                             chi_math::QuadratureTetrahedron& arb_volume_quadrature,
+                                             chi_math::QuadratureTriangle&    arb_surface_quadrature):
   CellPWLFEValues(polyh_cell->vertex_ids.size(),ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
-  default_surface_quadrature(minumum_surface_quadrature)
+  default_surface_quadrature(minumum_surface_quadrature),
+  arbitrary_volume_quadrature(arb_volume_quadrature),
+  arbitrary_surface_quadrature(arb_surface_quadrature)
 {
   //=========================================== Assign cell centre
   chi_mesh::Vertex& vcc = polyh_cell->centroid;
@@ -52,6 +56,8 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
       const chi_mesh::Vertex& v1 = vfc;
       const chi_mesh::Vertex& v2 = *ref_grid->vertices[v1index];
       const chi_mesh::Vertex& v3 = vcc;
+
+      side_data.v0 = v0;
 
       //============================= Compute vectors
       chi_mesh::Vector3 v01 = v1 - v0;

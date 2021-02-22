@@ -1,7 +1,7 @@
 #ifndef SPATIAL_DISCRETIZATION_PWLD_H
 #define SPATIAL_DISCRETIZATION_PWLD_H
 
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 

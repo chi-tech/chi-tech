@@ -75,6 +75,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       const auto& adj_cell = pwl_sdm->MapNeighborCell(face.neighbor_id);
       const auto& adj_fe_intgrl_values = pwl_sdm->GetUnitIntegrals(adj_cell);
 
+
       //========================= Get the current map to the adj cell's face
       unsigned int fmap = MapCellFace(cell,adj_cell,f);
 

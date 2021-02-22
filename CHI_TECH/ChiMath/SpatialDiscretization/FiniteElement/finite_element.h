@@ -52,33 +52,72 @@ namespace finite_element
    * for volumetric integrals.*/
   class InternalQuadraturePointData
   {
-  public:
-    std::vector<unsigned int> quadrature_point_indices; ///< qp only
-    std::vector<VecDbl>       m_shape_value;              ///< Node i, then qp
-    std::vector<VecVec3>      m_shape_grad;               ///< Node i, then qp
-    VecDbl                    m_JxW;                      ///< Node i, then qp
-    bool                      initialized=false;
+  protected:
+    std::vector<unsigned int>     m_quadrature_point_indices; ///< qp index only
+    VecVec3                       m_qpoints_xyz             ; ///< qp index only
+    std::vector<VecDbl>           m_shape_value             ; ///< Node i, then qp
+    std::vector<VecVec3>          m_shape_grad              ; ///< Node i, then qp
+    VecDbl                        m_JxW                     ; ///< Node i, then qp
+    std::vector<std::vector<int>> m_face_dof_mappings       ;
+    size_t                        m_num_nodes                =0;
 
-    std::vector<std::vector<int>> face_dof_mappings;
-    size_t num_nodes=0;
+    bool                          m_initialized=false;
 
   public:
+    void InitializeData(std::vector<unsigned int> &quadrature_point_indices,
+                        VecVec3                   &qpoints_xyz,
+                        std::vector<VecDbl>       &shape_value,
+                        std::vector<VecVec3>      &shape_grad,
+                        VecDbl                    &JxW,
+                        std::vector<std::vector<int>> &face_dof_mappings,
+                        size_t num_nodes)
+    {
+      m_quadrature_point_indices= quadrature_point_indices;
+      m_qpoints_xyz             = qpoints_xyz             ;
+      m_shape_value             = shape_value             ;
+      m_shape_grad              = shape_grad              ;
+      m_JxW                     = JxW                     ;
+      m_face_dof_mappings       = face_dof_mappings       ;
+      m_num_nodes               = num_nodes               ;
+      m_initialized = true;
+    }
+    const std::vector<unsigned int>& quadrature_point_indices() const
+    {
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
+      return m_quadrature_point_indices;
+    }
+    chi_mesh::Vector3 qpoint_xyz(unsigned int qp) const
+    {
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
+      return m_qpoints_xyz.at(qp);
+    }
     double shape_value(unsigned int i, unsigned int qp) const
     {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
       auto& qp_data = m_shape_value.at(i);
       return qp_data.at(qp);
     }
     chi_mesh::Vector3 shape_grad(unsigned int i, unsigned int qp) const
     {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
       auto& qp_data = m_shape_grad.at(i);
       return qp_data.at(qp);
     }
     double JxW(unsigned int qp) const
     {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
       return m_JxW.at(qp);
+    }
+    int face_dof_mapping(size_t face, size_t face_node_index) const
+    {
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
+      auto& face_data = m_face_dof_mappings.at(face);
+      return face_data.at(face_node_index);
+    }
+    size_t num_nodes() const
+    {
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
+      return m_num_nodes;
     }
   };
 
@@ -87,11 +126,31 @@ namespace finite_element
    * for surface integrals.*/
   class FaceQuadraturePointData : public InternalQuadraturePointData
   {
-  public:
+  protected:
     VecVec3                   m_normals;                  ///< node i, then qp
+  public:
+    void InitializeData(std::vector<unsigned int> &quadrature_point_indices,
+                        VecVec3                   &qpoints_xyz,
+                        std::vector<VecDbl>       &shape_value,
+                        std::vector<VecVec3>      &shape_grad,
+                        VecDbl                    &JxW,
+                        VecVec3                   &normals,
+                        std::vector<std::vector<int>> &face_dof_mappings,
+                        size_t num_nodes)
+    {
+      m_quadrature_point_indices= quadrature_point_indices;
+      m_qpoints_xyz             = qpoints_xyz             ;
+      m_shape_value             = shape_value             ;
+      m_shape_grad              = shape_grad              ;
+      m_JxW                     = JxW                     ;
+      m_normals                 = normals                 ;
+      m_face_dof_mappings       = face_dof_mappings       ;
+      m_num_nodes               = num_nodes               ;
+      m_initialized = true;
+    }
     double normal(unsigned int qp) const
     {
-      if (not initialized) PWL_CELL_THROW_QP_UNINIT;
+      if (not m_initialized) PWL_CELL_THROW_QP_UNINIT;
       return m_JxW.at(qp);
     }
   };

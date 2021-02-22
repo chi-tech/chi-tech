@@ -7,4 +7,7 @@ SpatialDiscretization_FV::
   : SpatialDiscretization(0, in_grid, SDMType::FINITE_VOLUME)
 {
   mapping_initialized = false;
+  PreComputeCellSDValues();
+  PreComputeNeighborCellSDValues();
+  OrderNodes();
 }

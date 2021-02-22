@@ -7,14 +7,14 @@ double PolygonPWLFEValues::TriShape(int index, int qpoint_index,
   double eta = 0.0;
   if (!on_surface)
   {
-    auto& qpoint = default_volume_quadrature.qpoints.at(qpoint_index);
+    auto& qpoint = active_volume_quadrature->qpoints.at(qpoint_index);
 
     xi = qpoint.x;
     eta= qpoint.y;
   }
   else
   {
-    xi = 0.5*(default_surface_quadrature.qpoints[qpoint_index][0] + 1.0);
+    xi = 0.5*(active_surface_quadrature->qpoints[qpoint_index][0] + 1.0);
     eta = 0.0;
   }
 
