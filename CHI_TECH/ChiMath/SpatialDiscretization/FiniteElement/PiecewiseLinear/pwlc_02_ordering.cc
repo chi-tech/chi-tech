@@ -13,8 +13,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-void SpatialDiscretization_PWLC::
-  OrderNodes(chi_mesh::MeshContinuumPtr grid)
+void SpatialDiscretization_PWLC::OrderNodes()
 {
   ChiTimer t_stage[6];
 
@@ -24,7 +23,7 @@ void SpatialDiscretization_PWLC::
   //                                                   exclusive + non-exclusive
   //                                                   nodes
   std::set<int> exnonex_nodes_set;
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
     for (auto& vid : cell.vertex_ids)
       exnonex_nodes_set.insert(vid);
 
@@ -45,14 +44,14 @@ void SpatialDiscretization_PWLC::
   //================================================== Determine ghost flags
   //Run through each cell and for each local nodes deterime
   //if the nodes are ghosts to another location
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
   {
     for (size_t f=0; f < cell.faces.size(); f++)
     {
       auto& face = cell.faces[f];
       if (face.has_neighbor)
       {
-        if (face.GetNeighborPartitionID(*grid) != cell.partition_id)
+        if (face.GetNeighborPartitionID(*ref_grid) != cell.partition_id)
         {
           for (auto v_index : face.vertex_ids)
           {
@@ -366,7 +365,7 @@ void SpatialDiscretization_PWLC::
   local_block_address = local_from;
 
   local_base_block_size = local_to - local_from + 1;
-  globl_base_block_size = grid->vertices.size();
+  globl_base_block_size = ref_grid->vertices.size();
 
   //======================================== Collect block addresses
   locJ_block_address.clear();

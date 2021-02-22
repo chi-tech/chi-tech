@@ -6,11 +6,6 @@
 #include "ChiPhysics/chi_physics.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
-
-#include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
@@ -175,7 +170,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-      auto cell_fe_view = (PolyhedronPWLFEValues*)pwl_sdm.MapFeViewL(cell.local_id);
+      auto& cell_fe_view = pwl_sdm.GetCellFEView(cell.local_id);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
@@ -201,7 +196,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
-          int v = cell_fe_view->face_dof_mappings[f][fv];
+          int v = cell_fe_view.face_dof_mappings[f][fv];
           face[fv] = cell_info[v];
         }
 
@@ -437,7 +432,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-      auto cell_fe_view = (PolyhedronPWLFEValues*)pwl_sdm.MapFeViewL(cell.local_id);
+      auto& cell_fe_view = pwl_sdm.GetCellFEView(cell.local_id);
 
       int num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
@@ -463,7 +458,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
-          int v = cell_fe_view->face_dof_mappings[f][fv];
+          int v = cell_fe_view.face_dof_mappings[f][fv];
           face[fv] = cell_info[v];
         }
 

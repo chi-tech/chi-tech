@@ -11,14 +11,13 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-void SpatialDiscretization_PWL::
-  OrderNodes(chi_mesh::MeshContinuumPtr grid)
+void SpatialDiscretization_PWL::OrderNodes()
 {
   ChiTimer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Check cell views avail
-  size_t num_loc_cells = grid->local_cell_glob_indices.size();
+  size_t num_loc_cells = ref_grid->local_cell_glob_indices.size();
   if (num_loc_cells != cell_fe_views.size())
   {
     chi_log.Log(LOG_ALLERROR)

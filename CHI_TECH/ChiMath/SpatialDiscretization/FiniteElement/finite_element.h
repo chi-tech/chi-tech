@@ -5,7 +5,8 @@
 
 #define PWL_CELL_THROW_QP_UNINIT throw std::invalid_argument(\
                                        "InternalQuadraturePointData called "\
-                                       "without being initialized.")
+                                       "without being initialized. Set flag"\
+                                       " INIT_QP_DATA.")
 
 namespace chi_math
 {
@@ -13,6 +14,14 @@ namespace chi_math
 namespace finite_element
 {
   typedef std::vector<chi_mesh::Vector3> VecVec3;
+
+  //#############################################
+  enum SetupFlags : int
+  {
+    NO_FLAGS_SET           = 0,
+    COMPUTE_UNIT_INTEGRALS = (1 << 0),
+    INIT_QP_DATA           = (1 << 1)
+  };
 
   //#############################################
   /**Storage structure for unit integrals.*/
@@ -49,6 +58,9 @@ namespace finite_element
     std::vector<VecVec3>      m_shape_grad;               ///< Node i, then qp
     VecDbl                    m_JxW;                      ///< Node i, then qp
     bool                      initialized=false;
+
+    std::vector<std::vector<int>> face_dof_mappings;
+    size_t num_nodes=0;
 
   public:
     double shape_value(unsigned int i, unsigned int qp) const

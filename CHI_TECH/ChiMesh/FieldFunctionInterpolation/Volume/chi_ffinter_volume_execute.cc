@@ -73,7 +73,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
 
     if (inside_logvolume)
     {
-      auto cell_fe_view = discretization.MapFeViewL(cell.local_id);
+      const auto& fe_intgrl_values = discretization.GetUnitIntegrals(cell);
 
       for (int i=0; i<cell.vertex_ids.size(); i++)
       {
@@ -87,8 +87,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::
         if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
           value = CallLuaFunction(value,cell.material_id);
 
-        op_value += value*cell_fe_view->IntV_shapeI[i];
-        total_volume += cell_fe_view->IntV_shapeI[i];
+        op_value += value*fe_intgrl_values.IntV_shapeI[i];
+        total_volume += fe_intgrl_values.IntV_shapeI[i];
 
         if (!max_set)
         {
@@ -145,8 +145,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
 
     if (inside_logvolume)
     {
-      auto cell_fe_view =
-        (CellPWLFEValues*)discretization.MapFeViewL(cell.local_id);
+      const auto& fe_intgrl_values = discretization.GetUnitIntegrals(cell);
 
       for (int i=0; i < cell.vertex_ids.size(); i++)
       {
@@ -160,8 +159,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::
         if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
           value = CallLuaFunction(value,cell.material_id);
 
-        op_value += value*cell_fe_view->IntV_shapeI[i];
-        total_volume += cell_fe_view->IntV_shapeI[i];
+        op_value += value*fe_intgrl_values.IntV_shapeI[i];
+        total_volume += fe_intgrl_values.IntV_shapeI[i];
 
         if (!max_set)
         {

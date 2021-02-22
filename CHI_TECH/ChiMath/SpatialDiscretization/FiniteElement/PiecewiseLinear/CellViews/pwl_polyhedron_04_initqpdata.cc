@@ -62,6 +62,8 @@ void PolyhedronPWLFEValues::InitializeQuadraturePointData(
       }//for qp
     } //for side
   } //for face
+  internal_data.face_dof_mappings = face_dof_mappings;
+  internal_data.num_nodes = num_nodes;
   internal_data.initialized = true;
 
 
@@ -115,7 +117,8 @@ void PolyhedronPWLFEValues::InitializeQuadraturePointData(
         double w = srf_quadrature.weights[qp];
         face_qp_data.m_JxW.push_back(side.detJ_surf * w);
       }
-
+    face_qp_data.face_dof_mappings = face_dof_mappings;
+    face_qp_data.num_nodes = face_data[f].sides.size();
     face_qp_data.initialized = true;
   }//for face
 

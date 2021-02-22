@@ -69,13 +69,11 @@ public:
                      chi_math::QuadratureTriangle&      minumum_volume_quadrature,
                      chi_math::QuadratureGaussLegendre& minumum_surface_quadrature);
 
-  void ComputeUnitIntegrals();
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
   void InitializeQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-  void PreComputeValues() override;
 
   //################################################## Define standard
   //                                                   triangle linear shape

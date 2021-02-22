@@ -19,7 +19,7 @@ public:
 
   /**Constructor for a slab view.*/
   SlabPWLFEView(chi_mesh::CellSlab *slab_cell,
-                chi_mesh::MeshContinuumPtr& ref_grid,
+                chi_mesh::MeshContinuumPtr ref_grid,
                 chi_math::QuadratureGaussLegendre& minumum_volume_quadrature) :
     CellPWLFEValues(2,ref_grid),
     default_volume_quadrature(minumum_volume_quadrature)
@@ -40,14 +40,11 @@ public:
     normals[1] = slab_cell->faces[1].normal;
   }
 
-  void ComputeUnitIntegrals();
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
   void InitializeQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-
-  void PreComputeValues() override;
 
   //################################################## Define standard
   //                                                   slab linear shape

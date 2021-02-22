@@ -41,7 +41,7 @@ protected:
 
 protected:
   //01
-  virtual void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) {}
+  virtual void PreComputeCellSDValues() {}
 
 public:
   virtual

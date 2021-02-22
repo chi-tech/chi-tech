@@ -29,7 +29,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
   std::vector<double> q(num_nodes, 1.0);
   std::vector<double> siga(num_nodes, 0.0);
 
-  GetMaterialProperties(mat_id, cell, num_nodes, D, q, siga, component);
+  GetMaterialProperties(cell, num_nodes, D, q, siga, component);
 
   //========================================= Loop over DOFs
   for (int i=0; i<num_nodes; i++)
@@ -61,7 +61,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
   //========================================= Loop over faces
   int num_faces = cell.faces.size();
-  for (int f=0; f<num_faces; f++)
+  for (unsigned int f=0; f<num_faces; f++)
   {
     auto& face = cell.faces[f];
 
@@ -72,7 +72,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
     if (face.has_neighbor)
     {
-      const auto& adj_cell = *pwl_sdm->MapNeighborCell(face.neighbor_id);
+      const auto& adj_cell = pwl_sdm->MapNeighborCell(face.neighbor_id);
       const auto& adj_fe_intgrl_values = pwl_sdm->GetUnitIntegrals(adj_cell);
 
       //========================= Get the current map to the adj cell's face
@@ -84,8 +84,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
       std::vector<double> adj_D,adj_Q,adj_sigma;
 
-      GetMaterialProperties(adj_cell.material_id,
-                            adj_cell,
+      GetMaterialProperties(adj_cell,
                             adj_fe_intgrl_values.num_nodes,
                             adj_D,
                             adj_Q,
@@ -308,7 +307,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(const chi_mesh::Cell& cell,
   std::vector<double> q(num_nodes, 1.0);
   std::vector<double> siga(num_nodes, 1.0);
 
-  GetMaterialProperties(mat_id, cell, num_nodes, D, q, siga, component);
+  GetMaterialProperties(cell, num_nodes, D, q, siga, component);
 
   //========================================= Loop over DOFs
   for (int i=0; i<num_nodes; i++)

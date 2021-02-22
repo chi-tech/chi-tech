@@ -22,12 +22,17 @@ protected:
   bool integral_data_initialized=false;
   bool qp_data_initialized=false;
 
+  const chi_math::finite_element::SetupFlags setup_flags;
+
 protected:
   SpatialDiscretization_FE(int dim,
                            chi_mesh::MeshContinuumPtr in_grid,
                            SDMType in_type =
-                           SDMType::UNDEFINED) :
-    SpatialDiscretization(dim,in_grid,in_type)
+                           SDMType::UNDEFINED,
+                           chi_math::finite_element::SetupFlags in_setup_flags=
+                           chi_math::finite_element::SetupFlags::NO_FLAGS_SET) :
+    SpatialDiscretization(dim,in_grid,in_type),
+    setup_flags(in_setup_flags)
   {}
 
 public:
@@ -37,7 +42,8 @@ public:
   {
     if (not integral_data_initialized)
       throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
-                                  "called without integrals being initialized.");
+                                  "called without integrals being initialized."
+                                  " Set flag COMPUTE_UNIT_INTEGRALS.");
     return fe_unit_integrals[cell.local_id];
   }
 
@@ -47,7 +53,8 @@ public:
   {
     if (not qp_data_initialized)
       throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
-                                  "called without integrals being initialized.");
+                                  "called without integrals being initialized."
+                                  " Set flag INIT_QP_DATA.");
     return fe_vol_qp_data[cell.local_id];
   }
 
@@ -58,7 +65,8 @@ public:
   {
     if (not qp_data_initialized)
       throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
-                                  "called without integrals being initialized.");
+                                  "called without integrals being initialized."
+                                  " Set flag INIT_QP_DATA.");
     return fe_srf_qp_data[cell.local_id][face];
   }
 

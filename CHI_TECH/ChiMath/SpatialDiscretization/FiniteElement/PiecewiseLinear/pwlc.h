@@ -1,7 +1,7 @@
 #ifndef SPATIAL_DISCRETIZATION_PWLC_H
 #define SPATIAL_DISCRETIZATION_PWLC_H
 
-#include "CHI_TECH/ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -27,6 +27,10 @@ public:
   chi_math::QuadratureTriangle      tri_quad_order_second;
   chi_math::QuadratureTetrahedron   tet_quad_order_second;
 
+  chi_math::QuadratureGaussLegendre line_quad_order_arbitrary;
+  chi_math::QuadratureTriangle      tri_quad_order_arbitrary;
+  chi_math::QuadratureTetrahedron   tet_quad_order_arbitrary;
+
   std::map<int,int> node_mapping;
 
   int local_block_address = 0;
@@ -46,26 +50,32 @@ private:
 private:
   //00
   explicit
-  SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr in_grid);
+  SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr in_grid,
+                             chi_math::finite_element::SetupFlags setup_flags,
+                             chi_math::QuadratureOrder qorder);
 
 public:
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_PWLC>
-  New(chi_mesh::MeshContinuumPtr in_grid)
+  New(chi_mesh::MeshContinuumPtr in_grid,
+      chi_math::finite_element::SetupFlags setup_flags=
+      chi_math::finite_element::SetupFlags::NO_FLAGS_SET,
+      chi_math::QuadratureOrder qorder =
+      chi_math::QuadratureOrder::SECOND)
   { if (in_grid == nullptr) throw std::invalid_argument(
       "Null supplied as grid to SpatialDiscretization_PWLC.");
     return std::shared_ptr<SpatialDiscretization_PWLC>(
-      new SpatialDiscretization_PWLC(in_grid));}
+      new SpatialDiscretization_PWLC(in_grid,setup_flags,qorder));}
 
   //01
-  void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) override;
+  void PreComputeCellSDValues() override;
 //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
-  CellPWLFEValues* MapFeViewL(int cell_local_index);
+  CellPWLFEValues& GetCellFEView(int cell_local_index);
 
 private:
   //02
-  void OrderNodes(chi_mesh::MeshContinuumPtr grid);
+  void OrderNodes();
 
 public:
   //03

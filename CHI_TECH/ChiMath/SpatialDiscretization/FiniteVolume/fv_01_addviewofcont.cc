@@ -17,8 +17,7 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_FV::PreComputeCellSDValues(
-  chi_mesh::MeshContinuumPtr grid)
+void SpatialDiscretization_FV::PreComputeCellSDValues()
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of local continuum.";
@@ -27,14 +26,14 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
   //                                                 for each cell
   if (!mapping_initialized)
   {
-    cell_view_added_flags.resize(grid->local_cells.size(),false);
+    cell_view_added_flags.resize(ref_grid->local_cells.size(),false);
     mapping_initialized = true;
   }
 
 
   //================================================== Swap views for
   //                                                   specified item_id
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : ref_grid->local_cells)
   {
     if (not cell_view_added_flags[cell.local_id])
     {
@@ -42,7 +41,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
       if (cell.Type() == chi_mesh::CellType::SLAB)
       {
         auto view =
-          new SlabFVValues((chi_mesh::CellSlab*)(&cell), grid);
+          new SlabFVValues((chi_mesh::CellSlab*)(&cell), ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -52,7 +51,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
       if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
         auto view =
-          new PolygonFVValues((chi_mesh::CellPolygon*)(&cell), grid);
+          new PolygonFVValues((chi_mesh::CellPolygon*)(&cell), ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -64,7 +63,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
         auto view =
           new PolyhedronFVValues(
             (chi_mesh::CellPolyhedron*)(&cell),
-            grid);
+            ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -76,26 +75,26 @@ void SpatialDiscretization_FV::PreComputeCellSDValues(
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::
-  PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid)
+  PreComputeNeighborCellSDValues()
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of neighbor continuums.";
 
-  grid->CommunicatePartitionNeighborCells(neighbor_cells);
+  ref_grid->CommunicatePartitionNeighborCells(neighbor_cells);
 
   chi_log.Log(LOG_0VERBOSE_1)
     << "Number neighbor cells: " << neighbor_cells.size();
 
   //================================================== Reorder according to
   //                                                   ghost indices
-  std::vector<chi_mesh::Cell*> temp(grid->cells.GetNumGhosts(), nullptr);
+  std::vector<chi_mesh::Cell*> temp(ref_grid->cells.GetNumGhosts(), nullptr);
 
-  auto ghost_ids = grid->cells.GetGhostGlobalIDs();
+  auto ghost_ids = ref_grid->cells.GetGhostGlobalIDs();
   chi_log.Log(LOG_0VERBOSE_1)
     << "Number of ghost ids: " << ghost_ids.size();
   for (int ghost_id : ghost_ids)
   {
-    int ghost_local_index = grid->cells.GetGhostLocalID(ghost_id);
+    int ghost_local_index = ref_grid->cells.GetGhostLocalID(ghost_id);
 
     for (auto& cell_pair : neighbor_cells)
       if (cell_pair.first == ghost_id)
@@ -118,7 +117,7 @@ void SpatialDiscretization_FV::
     if (cell->Type() == chi_mesh::CellType::SLAB)
     {
       auto view =
-        new SlabFVValues((chi_mesh::CellSlab*)cell, grid);
+        new SlabFVValues((chi_mesh::CellSlab*)cell, ref_grid);
 
       neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
         cell->global_id,view));
@@ -128,7 +127,7 @@ void SpatialDiscretization_FV::
     if (cell->Type() == chi_mesh::CellType::POLYGON)
     {
       auto view =
-        new PolygonFVValues((chi_mesh::CellPolygon*)cell, grid);
+        new PolygonFVValues((chi_mesh::CellPolygon*)cell, ref_grid);
 
       neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
         cell->global_id,view));
@@ -140,7 +139,7 @@ void SpatialDiscretization_FV::
       auto view =
         new PolyhedronFVValues(
           (chi_mesh::CellPolyhedron*)cell,
-          grid);
+          ref_grid);
 
       neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
         cell->global_id,view));

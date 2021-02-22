@@ -52,6 +52,8 @@ void PolygonPWLFEValues::InitializeQuadraturePointData(
       internal_data.m_JxW.push_back(side.detJ * w);
     }//for qp
   } //for side
+  internal_data.face_dof_mappings = face_dof_mappings;
+  internal_data.num_nodes = num_nodes;
   internal_data.initialized = true;
 
   //=================================== Init surface quadrature
@@ -98,7 +100,8 @@ void PolygonPWLFEValues::InitializeQuadraturePointData(
       double w = srf_quadrature.weights[qp];
       face_qp_data.m_JxW.push_back(sides[s].detJ_surf * w);
     }
-
+    face_qp_data.face_dof_mappings = face_dof_mappings;
+    face_qp_data.num_nodes = 2;
     face_qp_data.initialized = true;
   }//for face
 }

@@ -44,6 +44,8 @@ void SlabPWLFEView::InitializeQuadraturePointData(
     double w = vol_quadrature.weights[qp];
     internal_data.m_JxW.push_back(J * w);
   }//for qp
+  internal_data.face_dof_mappings = face_dof_mappings;
+  internal_data.num_nodes = num_nodes;
   internal_data.initialized = true;
 
   //=================================== Init surface quadrature
@@ -90,7 +92,8 @@ void SlabPWLFEView::InitializeQuadraturePointData(
       double w = 1.0;
       face_qp_data.m_JxW.push_back(1.0 * w);
     }
-
+    face_qp_data.face_dof_mappings = face_dof_mappings;
+    face_qp_data.num_nodes = 1;
     face_qp_data.initialized = true;
   }//for face
 }

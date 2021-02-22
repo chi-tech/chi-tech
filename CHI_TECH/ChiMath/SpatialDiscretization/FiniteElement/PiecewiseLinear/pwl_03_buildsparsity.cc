@@ -66,12 +66,12 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
     {
       if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
       {
-        auto adj_cell_fe_view = MapNeighborCellFeView(face.neighbor_id);
+        auto& adj_cell_fe_view = GetNeighborCellFEView(face.neighbor_id);
 
         for (int i=0; i<cell_fe_view->num_nodes; ++i)
         {
           int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_off_diag[ir] += adj_cell_fe_view->num_nodes;
+          nodal_nnz_off_diag[ir] += adj_cell_fe_view.num_nodes;
         }
       }
     }

@@ -45,18 +45,22 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   switch (fem_method)
   {
+    using namespace chi_math::finite_element;
     case PWLC: {
-      discretization = SpatialDiscretization_PWLC::New(grid);
+      discretization =
+        SpatialDiscretization_PWLC::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
       break;
     }
     case PWLD_MIP: {
-      discretization = SpatialDiscretization_PWL::New(grid);
+      discretization =
+        SpatialDiscretization_PWL::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
       break;
     }
     case PWLD_MIP_GAGG: {
-      discretization = SpatialDiscretization_PWL::New(grid);
+      discretization =
+        SpatialDiscretization_PWL::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
       break;
     }

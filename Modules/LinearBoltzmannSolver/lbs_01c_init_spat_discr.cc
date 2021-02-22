@@ -12,9 +12,11 @@ extern ChiConsole&  chi_console;
 
 void LinearBoltzmann::Solver::InitializeSpatialDiscretization()
 {
+  using namespace chi_math::finite_element;
   chi_log.Log(LOG_0) << "Initializing spatial discretization.\n";
-  discretization = SpatialDiscretization_PWL::New(grid);
-//  discretization->PreComputeCellSDValues(grid);
+  discretization =
+    SpatialDiscretization_PWL::New(grid,COMPUTE_UNIT_INTEGRALS);
+
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)

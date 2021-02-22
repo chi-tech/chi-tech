@@ -41,8 +41,8 @@ public:
     new SpatialDiscretization_FV(in_grid));}
 
   //01
-  void PreComputeCellSDValues(chi_mesh::MeshContinuumPtr grid) override;
-  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
+  void PreComputeCellSDValues() override;
+  void PreComputeNeighborCellSDValues();
 
   CellFVValues* MapFeView(int cell_local_index);
   CellFVValues* MapNeighborFeView(int cell_global_index);

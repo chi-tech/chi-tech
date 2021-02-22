@@ -1,5 +1,7 @@
 #include "chi_ffinter_line.h"
-#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h>
+
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include <chi_log.h>
 extern ChiLog&  chi_log;
@@ -101,7 +103,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
                   std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
-  auto& spatial_dm = static_cast<SpatialDiscretization_PWL&>(
+  auto& spatial_dm = static_cast<SpatialDiscretization_PWLC&>(
                      *ff_ctx->ref_ff->spatial_discretization);
 
   //================================================== Loop over node indices
@@ -114,10 +116,10 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm.MapFeViewL(cell_local_index);
+    auto& cell_fe_view = spatial_dm.GetCellFEView(cell_local_index);
 
     double weighted_value = 0.0;
-    for (int i=0; i<cell_fe_view->num_nodes; i++)
+    for (int i=0; i<cell_fe_view.num_nodes; i++)
     {
       double node_value=0.0;
       counter++;
@@ -127,7 +129,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
       double weight=0.0;
       //Here I use c in interpolation_points because the vector should
       //be one-to-one with it.
-      weight = cell_fe_view->ShapeValue(i, interpolation_points[c]);
+      weight = cell_fe_view.ShapeValue(i, interpolation_points[c]);
 
       node_value *= weight;
 
@@ -161,10 +163,10 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm.MapFeViewL(cell_local_index);
+    auto& cell_fe_view = spatial_dm.GetCellFEView(cell_local_index);
 
     double weighted_value = 0.0;
-    for (int i=0; i<cell_fe_view->num_nodes; i++)
+    for (int i=0; i<cell_fe_view.num_nodes; i++)
     {
       double node_value=0.0;
       counter++;
@@ -174,7 +176,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
       double weight=0.0;
       //Here I use c in interpolation_points because the vector should
       //be one-to-one with it.
-      weight = cell_fe_view->ShapeValue(i, interpolation_points[c]);
+      weight = cell_fe_view.ShapeValue(i, interpolation_points[c]);
 
       node_value *= weight;
 

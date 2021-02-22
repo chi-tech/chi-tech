@@ -92,8 +92,7 @@ public:
   explicit Solver(std::string in_solver_name);
   virtual ~Solver();
   //01 General
-  void GetMaterialProperties(int mat_id,
-                             const chi_mesh::Cell& cell,
+  void GetMaterialProperties(const chi_mesh::Cell& cell,
                              int cell_dofs,
                              std::vector<double>& diffCoeff,
                              std::vector<double>& sourceQ,
@@ -123,21 +122,14 @@ public:
 
 
   //03b
-  double HPerpendicular(chi_mesh::Cell* cell, CellPWLFEValues* fe_view, int f);
   double HPerpendicular(const chi_mesh::Cell& cell,
                         const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
-                        int f);
+                        unsigned int f);
 
-  static
-  uint64_t MapCellLocalNodeIDFromGlobalID(chi_mesh::Cell* cell,
-                                          uint64_t node_global_id);
   static
   uint64_t MapCellLocalNodeIDFromGlobalID(const chi_mesh::Cell& cell,
                                           uint64_t node_global_id);
-  static
-  unsigned int MapCellFace(chi_mesh::Cell* cur_cell,
-                           chi_mesh::Cell* adj_cell,
-                           unsigned int f);
+
   static
   unsigned int MapCellFace(const chi_mesh::Cell& cur_cell,
                            const chi_mesh::Cell& adj_cell,

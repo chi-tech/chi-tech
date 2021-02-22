@@ -39,43 +39,44 @@ private:
   };
   //Goes into
   /**Stores the data for each side's tetrahedron. */
-    struct FEside_data3d
-    {
-      double                    detJ = 0.0;
-      double                    detJ_surf = 0.0;
-      std::vector<int>          v_index;
-      chi_mesh::Matrix3x3       J;
-      chi_mesh::Matrix3x3       Jinv;
-      chi_mesh::Matrix3x3       JTinv;
-      std::vector<FEqp_data3d>  qp_data;
-    };
+  struct FEside_data3d
+  {
+    double                    detJ = 0.0;
+    double                    detJ_surf = 0.0;
+    std::vector<int>          v_index;
+    chi_mesh::Matrix3x3       J;
+    chi_mesh::Matrix3x3       Jinv;
+    chi_mesh::Matrix3x3       JTinv;
+    std::vector<FEqp_data3d>  qp_data;
+  };
   //Goes into
   /**Stores data for each face.*/
-    struct FEface_data
-    {
-      std::vector<FEside_data3d> sides;
-      chi_mesh::Vector3 normal;
-    };
+  struct FEface_data
+  {
+    std::vector<FEside_data3d> sides;
+    chi_mesh::Vector3 normal;
+  };
+  //Goes int face_data
 
 
   /**Lowest level of mapping dof i.*/
-    struct FEnodeSideMap
-    {
-      int index = -1;
-      bool part_of_face = false;
-    };
+  struct FEnodeSideMap
+  {
+    int index = -1;
+    bool part_of_face = false;
+  };
   //Goes into
   /**Intermediate level of mapping.*/
-    struct FEnodeFaceMap
-    {
-      std::vector<FEnodeSideMap> side_map;
-    };
+  struct FEnodeFaceMap
+  {
+    std::vector<FEnodeSideMap> side_map;
+  };
   //Goes into
   /**Node map per face.*/
-    struct FEnodeMap
-    {
-      std::vector<FEnodeFaceMap> face_map;
-    };
+  struct FEnodeMap
+  {
+    std::vector<FEnodeFaceMap> face_map;
+  };
   //Goes into node_maps
   // node n
   // face f
@@ -101,13 +102,11 @@ public:
                         chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
                         chi_math::QuadratureTriangle&    minumum_surface_quadrature);
 
-  void ComputeUnitIntegrals();
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
   void InitializeQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-  void PreComputeValues() override;
 
   //################################################## Define standard
   //                                                   tetrahedron linear shape

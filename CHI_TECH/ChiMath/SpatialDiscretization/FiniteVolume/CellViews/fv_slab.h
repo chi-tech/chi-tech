@@ -18,7 +18,7 @@ private:
 public:
 
   SlabFVValues(chi_mesh::CellSlab *slab_cell,
-               chi_mesh::MeshContinuumPtr& vol_continuum) :
+               chi_mesh::MeshContinuumPtr vol_continuum) :
     CellFVValues(2)
   {
     grid = vol_continuum;

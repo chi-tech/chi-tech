@@ -24,7 +24,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   std::vector<double> q(num_nodes, 1.0);
   std::vector<double> siga(num_nodes, 0.0);
 
-  GetMaterialProperties(mat_id, cell, num_nodes, D, q, siga, group);
+  GetMaterialProperties(cell, num_nodes, D, q, siga, group);
 
   //======================================== Init cell matrix info
   typedef std::vector<double> Row;

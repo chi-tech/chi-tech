@@ -20,7 +20,7 @@ public:
   std::vector<std::vector<chi_mesh::Vector3>> side_legs;
 
   PolygonFVValues(chi_mesh::CellPolygon* poly_cell,
-                  chi_mesh::MeshContinuumPtr& vol_continuum) :
+                  chi_mesh::MeshContinuumPtr vol_continuum) :
     CellFVValues(poly_cell->vertex_ids.size())
   {
     grid = vol_continuum;
