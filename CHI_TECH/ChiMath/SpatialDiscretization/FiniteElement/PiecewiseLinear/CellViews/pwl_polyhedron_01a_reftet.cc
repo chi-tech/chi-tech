@@ -6,9 +6,9 @@ double PolyhedronPWLFEValues::TetShape(int index,
 {
   chi_math::QuadraturePointXYZ* qpoint;
   if (!on_surface)
-    qpoint = &default_volume_quadrature.qpoints.at(qpoint_index);
+    qpoint = &active_volume_quadrature->qpoints.at(qpoint_index);
   else
-    qpoint = &default_surface_quadrature.qpoints.at(qpoint_index);
+    qpoint = &active_surface_quadrature->qpoints.at(qpoint_index);
   double value = 0.0;
 
   if (index == 0)

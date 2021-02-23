@@ -1,8 +1,8 @@
-#ifndef _chi_mesh_cell_polygon_h
-#define _chi_mesh_cell_polygon_h
+#ifndef CHI_MESH_CELL_POLYGON_H
+#define CHI_MESH_CELL_POLYGON_H
 
 #include "cell.h"
-#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 namespace chi_mesh
 {
@@ -11,15 +11,14 @@ namespace chi_mesh
 /** Polygon cell definition.*/
 class CellPolygon : public Cell
 {
-private:
-  std::vector<chi_mesh::Vector3> segment_normals;
-  bool segment_normals_developed = false;
 public:
   CellPolygon() : Cell(CellType::POLYGON) {}
 
-private:
-  void DevelopSegmentNormals(const chi_mesh::MeshContinuum& grid)
+public:
+  std::vector<chi_mesh::Vector3>
+    GetSegmentNormals(const chi_mesh::MeshContinuum& grid) const
   {
+    std::vector<chi_mesh::Vector3> segment_normals;
     segment_normals.reserve(faces.size());
     for (auto& face : faces) //edges
     {
@@ -33,16 +32,10 @@ private:
 
       segment_normals.push_back(n0);
     }
-    segment_normals_developed = true;
-  }
-public:
-  std::vector<chi_mesh::Vector3>& GetSegmentNormals(const chi_mesh::MeshContinuum& grid)
-  {
-    if (!segment_normals_developed)
-      DevelopSegmentNormals(grid);
 
     return segment_normals;
   }
+
 };
 
 }

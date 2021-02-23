@@ -1,5 +1,5 @@
-#ifndef _chi_mesh_cell_slab_h
-#define _chi_mesh_cell_slab_h
+#ifndef CHI_MESH_CELL_SLAB_H
+#define CHI_MESH_CELL_SLAB_H
 
 #include "cell.h"
 
@@ -12,8 +12,6 @@ class CellSlab : public Cell
 {
 public:
   CellSlab() : Cell(CellType::SLAB) {}
-
-
 };
 
 }
