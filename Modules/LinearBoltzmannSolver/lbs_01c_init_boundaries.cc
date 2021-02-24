@@ -26,9 +26,9 @@ void LinearBoltzmann::Solver::InitializeBoundaries()
       int vec_index = bndry_type.second;
 
       if (bndry_type.first == LinearBoltzmann::BoundaryType::VACUUM)
-        sweep_boundaries.push_back(new SweepVacuumBndry(zero_boundary));
+        sweep_boundaries.emplace_back(new SweepVacuumBndry(zero_boundary));
       else if (bndry_type.first == LinearBoltzmann::BoundaryType::INCIDENT_ISOTROPIC)
-        sweep_boundaries.push_back(new SweepIncHomoBndry(flux_vec[vec_index]));
+        sweep_boundaries.emplace_back(new SweepIncHomoBndry(flux_vec[vec_index]));
       else if (bndry_type.first == LinearBoltzmann::BoundaryType::REFLECTING)
       {
         chi_mesh::Normal normal;
@@ -39,8 +39,7 @@ void LinearBoltzmann::Solver::InitializeBoundaries()
         if (bndry_id == 4) normal = khat;
         if (bndry_id == 5) normal = khat*-1.0;
 
-        sweep_boundaries.push_back(
-          new SweepReflectingBndry(zero_boundary, normal));
+        sweep_boundaries.emplace_back(new SweepReflectingBndry(zero_boundary, normal));
       }
 
       ++bndry_id;

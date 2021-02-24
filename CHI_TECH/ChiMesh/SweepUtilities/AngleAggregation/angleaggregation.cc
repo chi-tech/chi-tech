@@ -9,11 +9,11 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /** Sets up the angle-aggregation object. */
 void chi_mesh::sweep_management::AngleAggregation::
-  Setup(const std::vector<SweepBndry *> &in_sim_boundaries,
+  Setup(const std::vector<std::shared_ptr<SweepBndry>>& in_sim_boundaries,
         int in_number_of_groups,
         int in_number_of_group_subsets,
         std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
-        chi_mesh::MeshContinuumPtr in_grid)
+        chi_mesh::MeshContinuumPtr& in_grid)
 {
   sim_boundaries = in_sim_boundaries;
   number_of_groups = in_number_of_groups;
@@ -24,28 +24,28 @@ void chi_mesh::sweep_management::AngleAggregation::
   is_setup = true;
 }
 
-//###################################################################
-/** Gets the L^infinity norm of the relative change of the
- * delayed Psi values across either
- * intra-location or inter-location cyclic interfaces. */
-double chi_mesh::sweep_management::AngleAggregation::GetDelayedPsiNorm()
-{
-  double loc_ret_val = 0.0;
-
-  for (auto& angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp.angle_sets)
-      for (auto prelocI_norm : angset->delayed_prelocI_norm)
-        loc_ret_val = std::max(prelocI_norm,loc_ret_val);
-
-  for (auto& angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp.angle_sets)
-      loc_ret_val = std::max(angset->delayed_local_norm,loc_ret_val);
-
-  double ret_val = 0.0;
-
-  MPI_Allreduce(&loc_ret_val,&ret_val,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
-  return ret_val;
-}
+////###################################################################
+///** Gets the L^infinity norm of the relative change of the
+// * delayed Psi values across either
+// * intra-location or inter-location cyclic interfaces. */
+//double chi_mesh::sweep_management::AngleAggregation::GetDelayedPsiNorm()
+//{
+//  double loc_ret_val = 0.0;
+//
+//  for (auto& angsetgrp : angle_set_groups)
+//    for (auto& angset : angsetgrp.angle_sets)
+//      for (auto prelocI_norm : angset->delayed_prelocI_norm)
+//        loc_ret_val = std::max(prelocI_norm,loc_ret_val);
+//
+//  for (auto& angsetgrp : angle_set_groups)
+//    for (auto& angset : angsetgrp.angle_sets)
+//      loc_ret_val = std::max(angset->delayed_local_norm,loc_ret_val);
+//
+//  double ret_val = 0.0;
+//
+//  MPI_Allreduce(&loc_ret_val,&ret_val,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
+//  return ret_val;
+//}
 
 //###################################################################
 /** Resets all the outgoing intra-location and inter-location
@@ -53,12 +53,12 @@ double chi_mesh::sweep_management::AngleAggregation::GetDelayedPsiNorm()
 void chi_mesh::sweep_management::AngleAggregation::ZeroOutgoingDelayedPsi()
 {
   for (auto& angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp.angle_sets)
+    for (auto& angset : angsetgrp.angle_sets)
       for (auto& delayed_data : angset->delayed_prelocI_outgoing_psi)
         delayed_data.assign(delayed_data.size(),0.0);
 
   for (auto& angsetgrp : angle_set_groups)
-    for (auto angset : angsetgrp.angle_sets)
+    for (auto& angset : angsetgrp.angle_sets)
       angset->delayed_local_psi.assign(angset->delayed_local_psi.size(),0.0);
 }
 
@@ -68,14 +68,14 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroOutgoingDelayedPsi()
 void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
 {
   //======================================== Opposing reflecting bndries
-  for (auto bndry : sim_boundaries)
+  for (const auto& bndry : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry->opposing_reflected)
-        for (auto& angle : rbndry->hetero_boundary_flux_old)
+      if (rbndry.opposing_reflected)
+        for (auto& angle : rbndry.hetero_boundary_flux_old)
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -87,13 +87,13 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto& val : angle_set->delayed_local_psi_old)
         val = 0.0;
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
         for (auto& val : loc_vector)
           val = 0.0;
@@ -112,29 +112,29 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
   bool reflecting_bcs_initialized=false;
 
   int bndry_id=0;
-  for (auto bndry : sim_boundaries)
+  for (auto& bndry : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
       size_t tot_num_angles = quadrature->abscissae.size();
       size_t num_local_cells = grid->local_cell_glob_indices.size();
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      rbndry->reflected_anglenum.resize(tot_num_angles,-1);
-      rbndry->angle_readyflags.resize(tot_num_angles,
+      rbndry.reflected_anglenum.resize(tot_num_angles,-1);
+      rbndry.angle_readyflags.resize(tot_num_angles,
                         std::vector<bool>(number_of_group_subsets,false));
 
       //========================================= Determine reflected angle
       for (int n=0; n<tot_num_angles; ++n)
       {
         auto omega_reflected = (quadrature->omegas[n]) -
-                               rbndry->normal*
-                               quadrature->omegas[n].Dot(rbndry->normal)*2.0;
+                               rbndry.normal*
+                               quadrature->omegas[n].Dot(rbndry.normal)*2.0;
         for (int nstar=0; nstar<tot_num_angles; ++nstar)
           if (omega_reflected.Dot(quadrature->omegas[nstar])> (1.0-epsilon))
-            {rbndry->reflected_anglenum[n] = nstar;break;}
+            {rbndry.reflected_anglenum[n] = nstar;break;}
 
-        if (rbndry->reflected_anglenum[n]<0)
+        if (rbndry.reflected_anglenum[n]<0)
         {
           chi_log.Log(LOG_ALLERROR)
             << "Reflected angle not found for angle " << n
@@ -148,17 +148,17 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       }
 
       //========================================= For angles
-      rbndry->hetero_boundary_flux.clear();
-      rbndry->hetero_boundary_flux_old.clear();
-      rbndry->hetero_boundary_flux.resize(tot_num_angles);
+      rbndry.hetero_boundary_flux.clear();
+      rbndry.hetero_boundary_flux_old.clear();
+      rbndry.hetero_boundary_flux.resize(tot_num_angles);
       for (int n=0; n<tot_num_angles; ++n)
       {
         //Only continue if omega is outgoing
-        if ( quadrature->omegas[n].Dot(rbndry->normal)< 0.0 )
+        if ( quadrature->omegas[n].Dot(rbndry.normal)< 0.0 )
           continue;
 
         //================================== For cells
-        auto& cell_vec = rbndry->hetero_boundary_flux[n];
+        auto& cell_vec = rbndry.hetero_boundary_flux[n];
         cell_vec.resize(num_local_cells);
         for (const auto& cell : grid->local_cells)
         {
@@ -168,7 +168,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           bool on_ref_bndry = false;
           for (const auto& face : cell.faces){
             if ( (not face.has_neighbor) and
-                 (face.normal.Dot(rbndry->normal) > 0.999999) )
+                 (face.normal.Dot(rbndry.normal) > 0.999999) )
             {
               on_ref_bndry = true;
               break;
@@ -183,7 +183,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
           for (const auto& face : cell.faces)
           {
             if ( (not face.has_neighbor) and
-                 (face.normal.Dot(rbndry->normal) > 0.999999) )
+                 (face.normal.Dot(rbndry.normal) > 0.999999) )
             {
               cell_vec[c][f].clear();
               cell_vec[c][f].resize(face.vertex_ids.size(),
@@ -199,14 +199,14 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
       //========================================= Determine if boundary is
       //                                          opposing reflecting
       if ((bndry_id == 1) and (sim_boundaries[0]->IsReflecting()))
-        rbndry->opposing_reflected = true;
+        rbndry.opposing_reflected = true;
       if ((bndry_id == 3) and (sim_boundaries[2]->IsReflecting()))
-        rbndry->opposing_reflected = true;
+        rbndry.opposing_reflected = true;
       if ((bndry_id == 5) and (sim_boundaries[4]->IsReflecting()))
-        rbndry->opposing_reflected = true;
+        rbndry.opposing_reflected = true;
 
-      if (rbndry->opposing_reflected)
-        rbndry->hetero_boundary_flux_old = rbndry->hetero_boundary_flux;
+      if (rbndry.opposing_reflected)
+        rbndry.hetero_boundary_flux_old = rbndry.hetero_boundary_flux;
 
       reflecting_bcs_initialized = true;
     }//if reflecting
@@ -219,28 +219,28 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 
 }
 
-//###################################################################
-/** Initializes reflecting boundary conditions. */
-void chi_mesh::sweep_management::AngleAggregation::ResetReflectingBCs()
-{
-  for (auto bndry : sim_boundaries)
-  {
-    if (bndry->IsReflecting())
-    {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
-
-      for (auto& angle : rbndry->hetero_boundary_flux)
-        for (auto& cellvec : angle)
-          for (auto& facevec : cellvec)
-            for (auto& dofvec : facevec)
-              for (auto& val : dofvec)
-                val = 0.0;
-
-      if (rbndry->opposing_reflected)
-        rbndry->hetero_boundary_flux_old = rbndry->hetero_boundary_flux;
-    }//if reflecting
-  }//for bndry
-}
+////###################################################################
+///** Initializes reflecting boundary conditions. */
+//void chi_mesh::sweep_management::AngleAggregation::ResetReflectingBCs()
+//{
+//  for (auto& bndry : sim_boundaries)
+//  {
+//    if (bndry->IsReflecting())
+//    {
+//      auto& rbndry = (BoundaryReflecting&)(*bndry);
+//
+//      for (auto& angle : rbndry.hetero_boundary_flux)
+//        for (auto& cellvec : angle)
+//          for (auto& facevec : cellvec)
+//            for (auto& dofvec : facevec)
+//              for (auto& val : dofvec)
+//                val = 0.0;
+//
+//      if (rbndry.opposing_reflected)
+//        rbndry.hetero_boundary_flux_old = rbndry.hetero_boundary_flux;
+//    }//if reflecting
+//  }//for bndry
+//}
 
 //###################################################################
 /** Get number of angular unknowns. */
@@ -259,14 +259,14 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
   size_t local_ang_unknowns = 0;
 
   //======================================== Opposing reflecting bndries
-  for (auto bndry : sim_boundaries)
+  for (auto& bndry : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry->opposing_reflected)
-        for (auto& angle : rbndry->hetero_boundary_flux)
+      if (rbndry.opposing_reflected)
+        for (auto& angle : rbndry.hetero_boundary_flux)
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -310,14 +310,14 @@ void chi_mesh::sweep_management::AngleAggregation::
   AssembleAngularUnknowns(int &index, double* x_ref)
 {
   //======================================== Opposing reflecting bndries
-  for (auto bndry : sim_boundaries)
+  for (auto& bndry : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry->opposing_reflected)
-        for (auto& angle : rbndry->hetero_boundary_flux)
+      if (rbndry.opposing_reflected)
+        for (auto& angle : rbndry.hetero_boundary_flux)
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -329,13 +329,13 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto val : angle_set->delayed_local_psi)
       {index++; x_ref[index] = val;}
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
         for (auto val : loc_vector)
         {index++; x_ref[index] = val;}
@@ -347,14 +347,14 @@ void chi_mesh::sweep_management::AngleAggregation::
 DisassembleAngularUnknowns(int &index, const double* x_ref)
 {
   //======================================== Opposing reflecting bndries
-  for (auto bndry : sim_boundaries)
+  for (auto& bndry : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
 
-      if (rbndry->opposing_reflected)
-        for (auto& angle : rbndry->hetero_boundary_flux_old)
+      if (rbndry.opposing_reflected)
+        for (auto& angle : rbndry.hetero_boundary_flux_old)
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -366,13 +366,13 @@ DisassembleAngularUnknowns(int &index, const double* x_ref)
 
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto& val : angle_set->delayed_local_psi_old)
       {index++; val = x_ref[index];}
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
-    for (auto angle_set : as_group.angle_sets)
+    for (auto& angle_set : as_group.angle_sets)
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
         for (auto& val : loc_vector)
         {index++; val = x_ref[index];}

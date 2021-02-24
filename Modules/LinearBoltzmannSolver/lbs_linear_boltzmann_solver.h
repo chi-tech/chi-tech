@@ -71,7 +71,7 @@ public:
   std::vector<std::pair<BoundaryType, int>>         boundary_types;
   std::vector<std::vector<double>>                  incident_P0_mg_boundaries;
   std::vector<double>                               zero_boundary;
-  std::vector<SweepBndry*>                          sweep_boundaries;
+  std::vector<std::shared_ptr<SweepBndry>>          sweep_boundaries;
 
   chi_math::UnknownManager flux_moments_uk_man;
 

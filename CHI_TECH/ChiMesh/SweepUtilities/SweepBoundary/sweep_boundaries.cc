@@ -4,15 +4,15 @@
 #include <chi_mpi.h>
 extern ChiLog& chi_log;
 
-//###################################################################
-/**Returns a flag indicating whether this bndry is reflecting or not.*/
-bool chi_mesh::sweep_management::BoundaryBase::IsReflecting()
-{
-  if (this->Type() == BoundaryType::REFLECTING)
-    return true;
-  else
-    return false;
-}
+////###################################################################
+///**Returns a flag indicating whether this bndry is reflecting or not.*/
+//bool chi_mesh::sweep_management::BoundaryBase::IsReflecting()
+//{
+//  if (this->Type() == BoundaryType::REFLECTING)
+//    return true;
+//  else
+//    return false;
+//}
 
 //###################################################################
 /**Returns a pointer to a heterogenous flux storage location.*/

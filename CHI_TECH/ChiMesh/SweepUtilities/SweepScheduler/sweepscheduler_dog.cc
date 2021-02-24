@@ -236,7 +236,8 @@ void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
   {
     if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
     {
-      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
+      auto rbndry = std::static_pointer_cast<
+        chi_mesh::sweep_management::BoundaryReflecting>(bndry);
       rbndry->ResetAnglesReadyStatus();
     }
   }

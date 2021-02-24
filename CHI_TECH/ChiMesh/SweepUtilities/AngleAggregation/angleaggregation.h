@@ -28,10 +28,10 @@
 class chi_mesh::sweep_management::AngleAggregation
 {
 public:
-  std::vector<AngleSetGroup>   angle_set_groups;
-  std::vector<SweepBndry*>     sim_boundaries;
-  int                          number_of_groups=0;
-  int                          number_of_group_subsets=0;
+  std::vector<AngleSetGroup>                   angle_set_groups;
+  std::vector<std::shared_ptr<SweepBndry>>     sim_boundaries;
+  int                                          number_of_groups=0;
+  int                                          number_of_group_subsets=0;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature=nullptr;
 
 private:
@@ -42,19 +42,19 @@ private:
 public:
   chi_mesh::MeshContinuumPtr grid = nullptr;
 
-  void Setup(const std::vector<SweepBndry*>& in_sim_boundaries,
+  void Setup(const std::vector<std::shared_ptr<SweepBndry>>& in_sim_boundaries,
              int in_number_of_groups,
              int in_number_of_group_subsets,
              std::shared_ptr<chi_math::AngularQuadrature>& in_quadrature,
-             chi_mesh::MeshContinuumPtr in_grid);
+             chi_mesh::MeshContinuumPtr& in_grid);
 
 public:
-  double GetDelayedPsiNorm();
+//  double GetDelayedPsiNorm();
   void   ZeroOutgoingDelayedPsi();
   void   ZeroIncomingDelayedPsi();
 
   void InitializeReflectingBCs();
-  void ResetReflectingBCs();
+//  void ResetReflectingBCs();
 
   std::pair<size_t,size_t> GetNumberOfAngularUnknowns();
   void AssembleAngularUnknowns(int& index, double* x_ref);

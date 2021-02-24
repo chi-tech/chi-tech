@@ -1,12 +1,14 @@
-#ifndef _chi_sweep_bndry_base_h
-#define _chi_sweep_bndry_base_h
+#ifndef CHI_SWEEP_BOUNDARY_BASE_H
+#define CHI_SWEEP_BOUNDARY_BASE_H
 
 #include "ChiMesh/chi_mesh.h"
 
 #include <vector>
 #include <limits>
 
-namespace chi_mesh::sweep_management
+namespace chi_mesh
+{
+namespace sweep_management
 {
 
 enum class BoundaryType
@@ -35,9 +37,10 @@ public:
     zero_boundary_flux.resize(ref_boundary_flux.size(),0.0);
   }
 
-  virtual ~BoundaryBase() {}
-  const    BoundaryType Type() {return type;}
-  bool     IsReflecting();
+  virtual ~BoundaryBase() = default;
+  BoundaryType Type() const {return type;}
+  bool     IsReflecting() const
+  { return this->Type() == BoundaryType::REFLECTING; }
 
 
   virtual double* HeterogenousPsiIncoming(
@@ -134,7 +137,7 @@ public:
   bool CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss) override;
   void ResetAnglesReadyStatus();
 };
-
-}//namespace chi_mesh::sweep_management
+}//namespace chi_mesh
+}//namespace sweep_management
 
 #endif
