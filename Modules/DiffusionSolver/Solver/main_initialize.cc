@@ -91,11 +91,12 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     {
       case PWLC:
       {
-        auto initial_field_function = new chi_physics::FieldFunction(
-          std::string("phi"),                           //Text name
-          discretization,                               //Spatial Discretization
-          &x,                                           //Data vector
-          unknown_manager);                             //Unknown Manager
+        auto initial_field_function =
+          std::make_shared<chi_physics::FieldFunction>(
+                                std::string("phi"),   //Text name
+                                discretization,       //Spatial Discretization
+                                &x,                   //Data vector
+                                unknown_manager);     //Unknown Manager
 
         field_functions.push_back(initial_field_function);
         chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
@@ -107,11 +108,12 @@ int chi_diffusion::Solver::Initialize(bool verbose)
         pwld_phi_local.resize(local_dof_count);
         if (field_functions.empty())
         {
-          auto initial_field_function = new chi_physics::FieldFunction(
-            std::string("phi"),                           //Text name
-            discretization,                               //Spatial Discretization
-            &pwld_phi_local,                              //Data vector
-            unknown_manager);                             //Unknown Manager
+          auto initial_field_function =
+            std::make_shared<chi_physics::FieldFunction>(
+                                std::string("phi"),   //Text name
+                                discretization,       //Spatial Discretization
+                                &pwld_phi_local,      //Data vector
+                                unknown_manager);     //Unknown Manager
 
           field_functions.push_back(initial_field_function);
           chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);

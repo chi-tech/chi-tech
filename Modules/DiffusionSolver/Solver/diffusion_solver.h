@@ -60,9 +60,9 @@ public:
   int   property_map_q     = 1;
   int   property_map_sigma = 2;
   int   material_mode      = DIFFUSION_MATERIALS_REGULAR;
-  chi_physics::FieldFunction* D_field     = nullptr;
-  chi_physics::FieldFunction* q_field     = nullptr;
-  chi_physics::FieldFunction* sigma_field = nullptr;
+  std::shared_ptr<chi_physics::FieldFunction> D_field     = nullptr;
+  std::shared_ptr<chi_physics::FieldFunction> q_field     = nullptr;
+  std::shared_ptr<chi_physics::FieldFunction> sigma_field = nullptr;
 
   bool common_items_initialized=false;
 

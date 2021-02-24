@@ -13,7 +13,7 @@
 
 struct FieldFunctionContext
 {
-  chi_physics::FieldFunction*    ref_ff;
+  std::shared_ptr<chi_physics::FieldFunction>    ref_ff;
   std::vector<double>            interpolation_points_values;
   std::vector<int>               cfem_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_nodes_needed_unmapped;

@@ -26,7 +26,7 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset& groupset)
                             std::to_string(g) +
                             std::string("_m") + std::to_string(m);
 
-    auto deltaphi_ff = new chi_physics::FieldFunction(
+    auto deltaphi_ff = std::make_shared<chi_physics::FieldFunction>(
       text_name,                                    //Text name
       discretization,                               //Spatial Discretization
       &delta_phi_local,                             //Data vector
@@ -63,7 +63,7 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset& groupset)
 
     typedef chi_mesh::sweep_management::BoundaryType SwpBndryType;
     dsolver->boundaries.clear();
-    for (auto lbs_bndry : sweep_boundaries)
+    for (auto& lbs_bndry : sweep_boundaries)
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryReflecting());

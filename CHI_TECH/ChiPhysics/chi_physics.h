@@ -17,10 +17,10 @@ public:
 	double    					physicsTimestep=16.66667;
 	double              physicsTimeCost=0.0;
 
-  std::vector<chi_physics::Solver*>        solver_stack;
-  std::vector<chi_physics::Material*>      material_stack;
-  std::vector<chi_physics::TransportCrossSections*> trnsprt_xs_stack;
-  std::vector<chi_physics::FieldFunction*> fieldfunc_stack;
+  std::vector<chi_physics::Solver*>                        solver_stack;
+  std::vector<chi_physics::Material*>                      material_stack;
+  std::vector<chi_physics::TransportCrossSections*>        trnsprt_xs_stack;
+  std::vector<std::shared_ptr<chi_physics::FieldFunction>> fieldfunc_stack;
 
 private:
   static ChiPhysics instance;

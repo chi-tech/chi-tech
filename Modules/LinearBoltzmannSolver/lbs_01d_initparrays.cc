@@ -174,7 +174,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
                                 std::to_string(g) +
                                 std::string("_m") + std::to_string(m);
 
-        auto group_ff = new chi_physics::FieldFunction(
+        auto group_ff = std::make_shared<chi_physics::FieldFunction>(
           text_name,              //Field name
           discretization,         //Spatial discretization
           &phi_old_local,         //Data vector

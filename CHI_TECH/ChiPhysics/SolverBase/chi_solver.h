@@ -1,5 +1,5 @@
-#ifndef _chi_solver_h
-#define _chi_solver_h
+#ifndef CHI_PHYSICS_SOLVER_H
+#define CHI_PHYSICS_SOLVER_H
 #include<iostream>
 #include "../chi_physics_namespace.h"
 #include "../../ChiMesh/Region/chi_region.h"
@@ -15,7 +15,7 @@ class chi_physics::Solver
 {
 public:
   std::vector<chi_mesh::Region*>           regions;
-  std::vector<chi_physics::FieldFunction*> field_functions;
+  std::vector<std::shared_ptr<FieldFunction>> field_functions;
 
 public:
   virtual ~Solver() {};

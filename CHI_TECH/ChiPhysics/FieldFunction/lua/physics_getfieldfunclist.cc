@@ -39,7 +39,7 @@ int chiGetFieldFunctionList(lua_State* L)
   {
     lua_pushnumber(L,ff+1);
     int pff_count = -1;
-    for (auto pff : chi_physics_handler.fieldfunc_stack)
+    for (auto& pff : chi_physics_handler.fieldfunc_stack)
     {
       ++pff_count;
       if (pff == solver->field_functions[ff])

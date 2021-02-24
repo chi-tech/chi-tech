@@ -29,7 +29,7 @@ extern ChiMPI& chi_mpi;
 /**Exports multiple field functions to a VTK file collection.*/
 void chi_physics::FieldFunction::
   ExportMultipleFFToVTK(const std::string& file_base_name,
-                        std::vector<FieldFunction*> ff_list)
+                        const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list)
 {
   chi_log.Log(LOG_0) << "Exporting field functions to VTK.";
 

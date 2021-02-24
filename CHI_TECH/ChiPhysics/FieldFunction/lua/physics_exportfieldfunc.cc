@@ -30,7 +30,7 @@ int chiExportFieldFunctionToVTK(lua_State *L)
     field_name = lua_tostring(L,3);
 
   //======================================================= Getting solver
-  chi_physics::FieldFunction* ff;
+  std::shared_ptr<chi_physics::FieldFunction> ff;
   try{
     ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
   }
@@ -67,7 +67,7 @@ int chiExportFieldFunctionToVTKG(lua_State *L)
     field_name = lua_tostring(L,3);
 
   //======================================================= Getting solver
-  chi_physics::FieldFunction* ff;
+  std::shared_ptr<chi_physics::FieldFunction> ff;
   try{
     ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
   }
@@ -108,7 +108,7 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
     field_name = lua_tostring(L,4);
 
   //======================================================= Getting solver
-  chi_physics::FieldFunction* ff;
+  std::shared_ptr<chi_physics::FieldFunction> ff;
   try{
     ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
   }
@@ -119,7 +119,7 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  chi_physics::FieldFunction* ff_slave;
+  std::shared_ptr<chi_physics::FieldFunction> ff_slave;
   try{
     ff_slave = chi_physics_handler.fieldfunc_stack.at(ff_handle_slave);
   }
@@ -156,7 +156,7 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
   LuaCheckTableValue(__FUNCTION__,L,1);
 
   int table_size = lua_rawlen(L,1);
-  std::vector<chi_physics::FieldFunction*> ffs;
+  std::vector<std::shared_ptr<chi_physics::FieldFunction>> ffs;
   ffs.reserve(table_size);
   for (int i=0; i<table_size; ++i)
   {
@@ -167,7 +167,7 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
     lua_pop(L,1);
 
     //======================================================= Getting solver
-    chi_physics::FieldFunction* ff;
+    std::shared_ptr<chi_physics::FieldFunction> ff;
     try{
       ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
       ffs.push_back(ff);

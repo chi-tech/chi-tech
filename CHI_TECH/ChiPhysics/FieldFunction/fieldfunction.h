@@ -118,7 +118,7 @@ public:
 
   //fieldfunction_exportmultiple_fv.cc
   static void ExportMultipleFFToVTK(const std::string& file_base_name,
-                                    std::vector<FieldFunction*> ff_list);
+                                    const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list);
 
   void WritePVTU(std::string base_filename, std::string field_name, int num_grps=0);
 };
