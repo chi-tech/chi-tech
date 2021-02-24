@@ -19,7 +19,7 @@ SweepChunk* LinearBoltzmann::Solver::SetSweepChunk(LBSGroupset& groupset)
         &phi_new_local,                          //Destination phi
         &q_moments_local,                        //Source moments
         groupset,                                //Reference groupset
-        &material_xs,                            //Material cross-sections
+        material_xs,                            //Material cross-sections
         num_moments,max_cell_dof_count);
 
   return sweep_chunk;

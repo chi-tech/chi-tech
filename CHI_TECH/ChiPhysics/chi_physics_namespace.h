@@ -1,5 +1,5 @@
-#ifndef _chi_physics_namespace_h
-#define _chi_physics_namespace_h
+#ifndef CHI_PHYSICS_NAMESPACE_H
+#define CHI_PHYSICS_NAMESPACE_H
 /**\defgroup LuaPhysics C Physics*/
 
 #include <petscksp.h>
@@ -19,12 +19,6 @@ namespace chi_physics
 
   class FieldFunction;
   class Solver;
-  class Material;
-  class MaterialProperty;
-
-  class ScalarValue;
-  class TransportCrossSections;
-  class IsotropicMultiGrpSource;
 
   //03 Utils
   std::string GetPETScConvergedReasonstring(KSPConvergedReason reason);

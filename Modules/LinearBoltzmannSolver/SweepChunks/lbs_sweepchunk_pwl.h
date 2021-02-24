@@ -27,7 +27,7 @@ extern ChiMath& chi_math_handler;
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 
-typedef std::vector<chi_physics::TransportCrossSections*> TCrossSections;
+typedef std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
 
 // ###################################################################
 // Sweep chunk to compute the fixed source.
@@ -39,7 +39,7 @@ protected:
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const std::vector<double>* q_moments;
   const LBSGroupset& groupset;
-  const TCrossSections* xsections;
+  const TCrossSections& xsections;
   const int num_moms;
   const int G;
   const int max_num_cell_dofs;
@@ -59,7 +59,7 @@ public:
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
                    const LBSGroupset& in_groupset,
-                   const TCrossSections* in_xsections,
+                   const TCrossSections& in_xsections,
                    const int in_num_moms,
                    const int in_max_num_cell_dofs)
     : SweepChunk(destination_phi, false),
@@ -111,7 +111,7 @@ public:
       int num_faces = cell.faces.size();
       int num_dofs = fe_intgrl_values.num_nodes;
       auto& transport_view = grid_transport_view[cell.local_id];
-      auto sigma_tg = (*xsections)[transport_view.xs_id]->sigma_tg;
+      auto sigma_tg = xsections[transport_view.xs_id]->sigma_tg;
       std::vector<bool> face_incident_flags(num_faces, false);
 
       // =================================================== Get Cell matrices

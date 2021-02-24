@@ -60,8 +60,7 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
       exit(EXIT_FAILURE);
     }
 
-    chi_physics::TransportCrossSections* xs =
-      material_xs[xs_id];
+    auto xs = material_xs[xs_id];
 
     //=========================================== Obtain material source
     double* src = default_zero_src.data();

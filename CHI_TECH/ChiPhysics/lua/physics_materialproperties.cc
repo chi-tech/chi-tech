@@ -1,9 +1,9 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
 #include "ChiPhysics/chi_physics.h"
-#include "ChiPhysics/PhysicsMaterial/property01_scalarvalue.h"
-#include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
-#include "ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h"
+#include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
+#include "CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 extern ChiPhysics&  chi_physics_handler;
 
@@ -78,7 +78,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   }
 
   //============================================= Get reference to material
-  chi_physics::Material* cur_material;
+  std::shared_ptr<chi_physics::Material> cur_material;
   try {
     cur_material = chi_physics_handler.material_stack.at(material_index);
   }
@@ -94,7 +94,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   {
     //Duplicates are allowed
 
-    auto prop = new chi_physics::ScalarValue;
+    auto prop = std::make_shared<chi_physics::ScalarValue>();
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties.size());
@@ -124,7 +124,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
       }
     }
 
-    auto prop = new chi_physics::TransportCrossSections;
+    auto prop = std::make_shared<chi_physics::TransportCrossSections>();
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties.size());
@@ -161,7 +161,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
       }
     }
 
-    auto prop = new chi_physics::IsotropicMultiGrpSource;
+    auto prop = std::make_shared<chi_physics::IsotropicMultiGrpSource>();
 
     prop->property_name = std::string("Property ") +
                           std::to_string(cur_material->properties.size());
@@ -323,7 +323,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   int operation_index = lua_tonumber(L,3);
 
   //============================================= Get reference to material
-  chi_physics::Material* cur_material;
+  std::shared_ptr<chi_physics::Material> cur_material;
   try {
     cur_material = chi_physics_handler.material_stack.at(material_index);
   }
@@ -336,7 +336,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   //                                              find property index
   if (!lua_isnumber(L,2))
   {
-    for (auto property : cur_material->properties)
+    for (auto& property : cur_material->properties)
       if (property->property_name == property_index_name)
         property_index = static_cast<int>(property->Type());
   }
@@ -366,8 +366,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      auto prop =
-        (chi_physics::ScalarValue*)cur_material->properties[location_of_prop];
+      auto prop = std::static_pointer_cast<chi_physics::ScalarValue>(
+        cur_material->properties[location_of_prop]);
 
       //========================== Process operation
       if (operation_index == static_cast<int>(OpType::SINGLE_VALUE))
@@ -423,8 +423,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      auto prop = (chi_physics::TransportCrossSections*)
-                  cur_material->properties[location_of_prop];
+      auto prop = std::static_pointer_cast<chi_physics::TransportCrossSections>(
+                  cur_material->properties[location_of_prop]);
 
       //========================== Process operation
       if (operation_index == static_cast<int>(OpType::SIMPLEXS0))
@@ -478,7 +478,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
         LuaCheckNilValue("chiPhysicsMaterialSetProperty",L,4);
         int handle = lua_tonumber(L,4);
 
-        chi_physics::TransportCrossSections* xs;
+        std::shared_ptr<chi_physics::TransportCrossSections> xs;
         try {
           xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
         }
@@ -541,9 +541,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     //================================= If the property is valid
     if (location_of_prop>=0)
     {
-      auto prop =
-        (chi_physics::IsotropicMultiGrpSource*)
-          cur_material->properties[location_of_prop];
+      auto prop = std::static_pointer_cast<chi_physics::IsotropicMultiGrpSource>(
+          cur_material->properties[location_of_prop]);
 
 
       if (operation_index == static_cast<int>(OpType::SINGLE_VALUE))
@@ -648,7 +647,7 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
   }
 
   //============================================= Get reference to material
-  chi_physics::Material* cur_material;
+  std::shared_ptr<chi_physics::Material> cur_material;
   try {
     cur_material = chi_physics_handler.material_stack.at(material_index);
   }
@@ -661,14 +660,14 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
   //                                              find property index
   if (!lua_isnumber(L,2))
   {
-    for (auto property : cur_material->properties)
+    for (auto& property : cur_material->properties)
       if (property->property_name == property_index_name)
         property_index = static_cast<int>(property->Type());
   }
 
   //============================================= Process property
   bool property_polulated = false;
-  for (auto property : cur_material->properties)
+  for (auto& property : cur_material->properties)
   {
     if (static_cast<int>(property->Type()) == property_index)
     {

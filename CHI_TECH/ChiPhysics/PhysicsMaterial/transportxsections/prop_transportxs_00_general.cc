@@ -1,4 +1,4 @@
-#include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
+#include "material_property_transportxsections.h"
 
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
@@ -100,7 +100,7 @@ void chi_physics::TransportCrossSections::
   Reset();
 
   //======================================== Pickup all xs and make sure valid
-  std::vector<chi_physics::TransportCrossSections*> cross_secs;
+  std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> cross_secs;
   cross_secs.reserve(combinations.size());
   int num_grps_G=0;
   int num_precursors_J=0;
@@ -109,7 +109,7 @@ void chi_physics::TransportCrossSections::
   double Nf_total = 0.0;
   for (auto combo : combinations)
   {
-    chi_physics::TransportCrossSections* xs;
+    std::shared_ptr<chi_physics::TransportCrossSections> xs;
     try {
       xs = chi_physics_handler.trnsprt_xs_stack.at(combo.first);
     }

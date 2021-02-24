@@ -41,18 +41,13 @@ public:
   }
 
   //01
-  void Initialize();
+  void Initialize() override;
 
   //02
-  void Execute();
+  void Execute() override;
 
   void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
   void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping);
-
-  void ExportPython(std::string base_name)
-  {
-
-  }
 
   double CallLuaFunction(double ff_value, int mat_id);
 

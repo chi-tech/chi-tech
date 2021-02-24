@@ -1,4 +1,4 @@
-#include "chi_physicsmaterial.h"
+#include "material_property_base.h"
 
 //###################################################################
 /** Base class method for pushing lua table.*/

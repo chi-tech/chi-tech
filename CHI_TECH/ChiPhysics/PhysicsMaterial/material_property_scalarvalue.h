@@ -1,11 +1,15 @@
-#ifndef _chi_physics_property_scalarvalue_h
-#define _chi_physics_property_scalarvalue_h
+#ifndef CHI_PHYSICS_PROPERTY_SCALAR_VALUE_H
+#define CHI_PHYSICS_PROPERTY_SCALAR_VALUE_H
 
-#include "chi_physicsmaterial.h"
+#include "material_property_base.h"
+
+
+namespace chi_physics
+{
 
 //###################################################################
 /**Simple scalar material property.*/
-class chi_physics::ScalarValue : public chi_physics::MaterialProperty
+class ScalarValue : public chi_physics::MaterialProperty
 {
 public:
   double value=1.0;
@@ -27,4 +31,6 @@ public:
 
 };
 
-#endif
+}//namespace chi_physics
+
+#endif //CHI_PHYSICS_PROPERTY_SCALAR_VALUE_H

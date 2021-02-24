@@ -1,4 +1,4 @@
-#include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
+#include "material_property_transportxsections.h"
 
 #include <chi_log.h>
 

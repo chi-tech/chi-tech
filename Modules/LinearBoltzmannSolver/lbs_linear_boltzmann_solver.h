@@ -4,8 +4,8 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
 #include "GroupSet/lbs_groupset.h"
-#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
-#include <ChiPhysics/PhysicsMaterial/property11_isotropic_mg_src.h>
+#include <CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h>
+#include <ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h>
 #include"ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
@@ -55,8 +55,8 @@ public:
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> group_sets;
-  std::vector<chi_physics::TransportCrossSections *> material_xs;
-  std::vector<chi_physics::IsotropicMultiGrpSource *> material_srcs;
+  std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> material_xs;
+  std::vector<std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> material_srcs;
   std::vector<int> matid_to_xs_map;
   std::vector<int> matid_to_src_map;
 

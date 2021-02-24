@@ -27,19 +27,19 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
   material_srcs.clear();
   matid_to_xs_map.assign(num_physics_mats,-1);
   matid_to_src_map.assign(num_physics_mats,-1);
-  for (const int& id : material_ids)
+  for (const int& mat_id : material_ids)
   {
-    auto* current_material = chi_physics_handler.material_stack[id];
-    materials_list << "Material id " << id;
+    auto current_material = chi_physics_handler.material_stack[mat_id];
+    materials_list << "Material id " << mat_id;
 
     //====================================== Check valid ids
-    if (id<0)
+    if (mat_id < 0)
     {
       chi_log.Log(LOG_ALLERROR)
         << "LBS-InitMaterials: Cells encountered with no assigned material.";
       exit(EXIT_FAILURE);
     }
-    if (id>=num_physics_mats)
+    if (mat_id >= num_physics_mats)
     {
       chi_log.Log(LOG_ALLERROR)
         << "LBS-InitMaterials: Cells encountered with material id "
@@ -54,14 +54,16 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
     {
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
-        auto transp_xs = (chi_physics::TransportCrossSections*)property;
+        auto transp_xs =
+          std::static_pointer_cast<chi_physics::TransportCrossSections>(property);
         material_xs.push_back(transp_xs);
-        matid_to_xs_map[id] = material_xs.size()-1;
+        matid_to_xs_map[mat_id] = material_xs.size() - 1;
         found_transport_xs = true;
       }//transport xs
       if (property->Type() == MatProperty::ISOTROPIC_MG_SOURCE)
       {
-        auto mg_source = (chi_physics::IsotropicMultiGrpSource*)property;
+        auto mg_source =
+          std::static_pointer_cast<chi_physics::IsotropicMultiGrpSource>(property);
 
         if (mg_source->source_value_g.size() < groups.size())
         {
@@ -74,7 +76,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
         else
         {
           material_srcs.push_back(mg_source);
-          matid_to_src_map[id] = material_srcs.size()-1;
+          matid_to_src_map[mat_id] = material_srcs.size() - 1;
         }
       }//P0 source
     }//for property
@@ -89,31 +91,31 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
     }
 
     //====================================== Check number of groups legal
-    if (material_xs[matid_to_xs_map[id]]->G < groups.size())
+    if (material_xs[matid_to_xs_map[mat_id]]->G < groups.size())
     {
       chi_log.Log(LOG_ALLERROR)
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
-        << material_xs[matid_to_xs_map[id]]->G << " groups and"
+        << material_xs[matid_to_xs_map[mat_id]]->G << " groups and"
         << " the simulation has " << groups.size() << " groups."
         << " The material must have a greater or equal amount of groups.";
       exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
-    if (material_xs[matid_to_xs_map[id]]->L < options.scattering_order)
+    if (material_xs[matid_to_xs_map[mat_id]]->L < options.scattering_order)
     {
       chi_log.Log(LOG_0WARNING)
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
         << "a scattering order of "
-        << material_xs[matid_to_xs_map[id]]->L << " and"
+        << material_xs[matid_to_xs_map[mat_id]]->L << " and"
         << " the simulation has a scattering order of "
         << options.scattering_order << "."
         << " The higher moments will therefore not be used.";
     }
 
     materials_list
-    << " number of moments "
-    << material_xs[matid_to_xs_map[id]]->transfer_matrix.size() << "\n";
+      << " number of moments "
+      << material_xs[matid_to_xs_map[mat_id]]->transfer_matrix.size() << "\n";
   }//for material id
 
   chi_log.Log(LOG_0)
@@ -134,7 +136,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
   {
     chi_log.Log(LOG_0) << "Computing diffusion parameters.";
 
-    for (auto xs : material_xs)
+    for (auto& xs : material_xs)
       xs->ComputeDiffusionParameters();
   }
 

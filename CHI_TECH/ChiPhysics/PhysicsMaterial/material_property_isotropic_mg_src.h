@@ -1,11 +1,14 @@
-#ifndef _chi_physics_property_isotropic_mg_src_h
-#define _chi_physics_property_isotropic_mg_src_h
+#ifndef CHI_PHYSICS_PROPERTY_ISOTROPIC_MG_SRC_H
+#define CHI_PHYSICS_PROPERTY_ISOTROPIC_MG_SRC_H
 
-#include "chi_physicsmaterial.h"
+#include "material_property_base.h"
+
+namespace chi_physics
+{
 
 //###################################################################
 /** Basic thermal conductivity material property.*/
-class chi_physics::IsotropicMultiGrpSource : public chi_physics::MaterialProperty
+class IsotropicMultiGrpSource : public chi_physics::MaterialProperty
 {
 public:
   std::vector<double> source_value_g;
@@ -38,4 +41,6 @@ public:
   }
 };
 
-#endif
+}
+
+#endif //CHI_PHYSICS_PROPERTY_ISOTROPIC_MG_SRC_H

@@ -54,9 +54,9 @@ struct FFICellIntersection
 class chi_mesh::FieldFunctionInterpolationSlice : public chi_mesh::FieldFunctionInterpolation
 {
 public:
-  chi_mesh::Normal normal;
-  chi_mesh::Normal binorm;
-  chi_mesh::Normal tangent;
+  chi_mesh::Normal normal =chi_mesh::Normal(0.0,0.0,1.0);
+  chi_mesh::Normal binorm =chi_mesh::Normal(0.0,1.0,0.0);
+  chi_mesh::Normal tangent=chi_mesh::Normal(1.0,0.0,0.0);
   chi_mesh::Vector3 point;
 
 private:
@@ -66,18 +66,13 @@ private:
   std::vector<int>                    pwld_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_cells_needed_unmapped;
 public:
-  FieldFunctionInterpolationSlice()
-  {
-    normal = chi_mesh::Normal(0.0,0.0,1.0);
-    binorm = chi_mesh::Normal(0.0,1.0,0.0);
-    tangent= chi_mesh::Normal(1.0,0.0,0.0);
-  }
+  FieldFunctionInterpolationSlice() = default;
 
   //01
-  void Initialize();
+  void Initialize() override;
 
   //02
-  void Execute();
+  void Execute() override;
 private:
   void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
   void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t>& mapping);

@@ -1,8 +1,8 @@
-#ifndef _chi_physics_transportxsections_h
-#define _chi_physics_transportxsections_h
+#ifndef CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
+#define CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 
-#include "chi_physicsmaterial.h"
-#include <ChiMath/SparseMatrix/chi_math_sparse_matrix.h>
+#include "CHI_TECH/ChiPhysics/PhysicsMaterial/material_property_base.h"
+#include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 
 #define E_COLLAPSE_PARTIAL_JACOBI 1
 #define E_COLLAPSE_JACOBI         2
@@ -11,15 +11,18 @@
 
 typedef std::vector<std::pair<double,double>> Tvecdbl_vecdbl;
 
+namespace chi_physics
+{
+
 //###################################################################
 /** Basic thermal conductivity material property.*/
-class chi_physics::TransportCrossSections : public chi_physics::MaterialProperty
+class TransportCrossSections : public chi_physics::MaterialProperty
 {
 public:
-  int G=0;                 ///< Total number of Groups
-  int L=0;                 ///< Legendre scattering order
-  int J=0;                 ///< Number of precursors
-  bool is_fissile = false; ///< Fissile or not
+  int G=0;                                ///< Total number of Groups
+  int L=0;                                ///< Legendre scattering order
+  int J=0;                                ///< Number of precursors
+  bool is_fissile = false;                ///< Fissile or not
 
   std::vector<double> sigma_tg;           ///< Total cross-section
   std::vector<double> sigma_fg;           ///< Sigmaf cross-section
@@ -37,20 +40,20 @@ public:
 public:
   bool diffusion_initialized = false;
 public:
-  std::vector<double> diffg;        ///< Transport corrected Diffusion coeff
-  std::vector<double> sigma_rg;     ///< Removal cross-section
-  std::vector<double> sigma_ag;     ///< Pure absorption
-  std::vector<double> sigma_s_gtog; ///< Within-group scattering xs
+  std::vector<double> diffg;               ///< Transport corrected Diffusion coeff
+  std::vector<double> sigma_rg;            ///< Removal cross-section
+  std::vector<double> sigma_ag;            ///< Pure absorption
+  std::vector<double> sigma_s_gtog;        ///< Within-group scattering xs
 
   //Two-grid acceleration quantities
-  std::vector<double> xi_Jfull_g;   ///< Infinite medium spectrum Jfull
-  std::vector<double> xi_Jpart_g;   ///< Infinite medium spectrum Jpartial
+  std::vector<double> xi_Jfull_g;          ///< Infinite medium spectrum Jfull
+  std::vector<double> xi_Jpart_g;          ///< Infinite medium spectrum Jpartial
 
-  double D_jfull = 0.0;             ///< Collapsed Diffusion coefficient Jfull
-  double D_jpart = 0.0;             ///< Collapsed Diffusion coefficient Jpart
+  double D_jfull = 0.0;                    ///< Collapsed Diffusion coefficient Jfull
+  double D_jpart = 0.0;                    ///< Collapsed Diffusion coefficient Jpart
 
-  double sigma_a_jfull = 0.0;       ///< Collapsed absorption Jfull
-  double sigma_a_jpart = 0.0;       ///< Collapsed absorption Jpart
+  double sigma_a_jfull = 0.0;              ///< Collapsed absorption Jfull
+  double sigma_a_jpart = 0.0;              ///< Collapsed absorption Jpart
 
   //Monte-Carlo quantities
 public:
@@ -62,9 +65,7 @@ private:
 private:
   void Reset()
   {
-    int G=0;
-    int L=0;
-    int J=0;
+    G=L=J=0;
 
     sigma_tg.clear();
     sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
@@ -113,6 +114,8 @@ public:
 
 
 };
+
+}//namespace chi_physics
 
 
 #endif

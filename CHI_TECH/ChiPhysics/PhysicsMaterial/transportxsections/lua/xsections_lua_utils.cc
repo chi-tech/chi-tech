@@ -1,7 +1,7 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
 #include "ChiPhysics/chi_physics.h"
-#include "ChiPhysics/PhysicsMaterial/property10_transportxsections.h"
+#include "CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
 extern ChiPhysics&  chi_physics_handler;
 
@@ -29,7 +29,7 @@ chiPhysicsMaterialSetProperty(materials[2],
  * */
 int chiPhysicsTransportXSCreate(lua_State* L)
 {
-  auto xs = new chi_physics::TransportCrossSections;
+  auto xs = std::make_shared<chi_physics::TransportCrossSections>();
 
   chi_physics_handler.trnsprt_xs_stack.push_back(xs);
 
@@ -118,7 +118,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   int handle = lua_tonumber(L,1);
   int operation_index = lua_tonumber(L,2);
 
-  chi_physics::TransportCrossSections* xs;
+  std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
     xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
   }
@@ -215,7 +215,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
 
   int handle = lua_tonumber(L,1);
 
-  chi_physics::TransportCrossSections* xs;
+  std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
     xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
   }
@@ -325,7 +325,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
                        << " scalar value: " << elem.second;
 
   //======================================== Make the new cross-section
-  auto new_xs = new chi_physics::TransportCrossSections;
+  auto new_xs = std::make_shared<chi_physics::TransportCrossSections>();
 
   new_xs->MakeCombined(combinations);
 
@@ -384,7 +384,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   //======================================== Process handle
   int handle = lua_tonumber(L,1);
 
-  chi_physics::TransportCrossSections* xs;
+  std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
     xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
   }

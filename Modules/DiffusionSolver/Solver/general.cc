@@ -1,8 +1,8 @@
 #include "diffusion_solver.h"
 
 #include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
-#include <ChiPhysics/PhysicsMaterial/property01_scalarvalue.h>
-#include <ChiPhysics/PhysicsMaterial/property10_transportxsections.h>
+#include <ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h>
+#include <CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h>
 #include <ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h>
 #include <ChiPhysics/chi_physics.h>
 extern ChiPhysics&  chi_physics_handler;
@@ -69,7 +69,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     }
 
     //For now we can only support scalar values so lets check that
-    if (dynamic_cast<chi_physics::ScalarValue*>
+    if (std::dynamic_pointer_cast<chi_physics::ScalarValue>
         (material->properties[property_map_D]))
     {
       diffCoeff.assign(cell_dofs,
@@ -91,7 +91,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     if ((property_map_q < material->properties.size()) &&
         (property_map_q >= 0))
     {
-      if (dynamic_cast<chi_physics::ScalarValue*>
+      if (std::dynamic_pointer_cast<chi_physics::ScalarValue>
           (material->properties[property_map_q]))
       {
         sourceQ.assign(cell_dofs,
@@ -127,10 +127,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (dynamic_cast<chi_physics::TransportCrossSections*>
+      if (std::dynamic_pointer_cast<chi_physics::TransportCrossSections>
           (material->properties[p]))
       {
-        auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
+        auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
+          material->properties[p]);
 
         if (!xs->diffusion_initialized)
           xs->ComputeDiffusionParameters();
@@ -153,7 +154,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     if ((property_map_q < material->properties.size()) &&
         (property_map_q >= 0))
     {
-      if (dynamic_cast<chi_physics::ScalarValue*>
+      if (std::dynamic_pointer_cast<chi_physics::ScalarValue>
           (material->properties[property_map_q]))
       {
         sourceQ.assign(cell_dofs,
@@ -181,10 +182,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (dynamic_cast<chi_physics::TransportCrossSections*>
+      if (std::dynamic_pointer_cast<chi_physics::TransportCrossSections>
           (material->properties[p]))
       {
-        auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
+        auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
+          material->properties[p]);
 
         if (!xs->diffusion_initialized)
           xs->ComputeDiffusionParameters();
@@ -268,10 +270,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (dynamic_cast<chi_physics::TransportCrossSections*>
+      if (std::dynamic_pointer_cast<chi_physics::TransportCrossSections>
           (material->properties[p]))
       {
-        auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
+        auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
+          material->properties[p]);
 
         if (!xs->diffusion_initialized)
           xs->ComputeDiffusionParameters();
@@ -358,10 +361,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     bool transportxs_found = false;
     for (int p=0; p<material->properties.size(); p++)
     {
-      if (dynamic_cast<chi_physics::TransportCrossSections*>
+      if (std::dynamic_pointer_cast<chi_physics::TransportCrossSections>
           (material->properties[p]))
       {
-        auto xs = (chi_physics::TransportCrossSections*)material->properties[p];
+        auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
+          material->properties[p]);
 
         if (!xs->diffusion_initialized)
           xs->ComputeDiffusionParameters();

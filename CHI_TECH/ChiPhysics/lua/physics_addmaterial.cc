@@ -37,7 +37,7 @@ int chiPhysicsAddMaterial(lua_State *L)
 {
   int numArgs = lua_gettop(L);
 
-  chi_physics::Material* new_material = new chi_physics::Material;
+  auto new_material = std::make_shared<chi_physics::Material>();
   if (numArgs==1)
   {
     const char* temp = lua_tostring(L, 1);
@@ -46,7 +46,7 @@ int chiPhysicsAddMaterial(lua_State *L)
 
   chi_physics_handler.material_stack.push_back(new_material);
 
-  int index = chi_physics_handler.material_stack.size()-1;
+  size_t index = chi_physics_handler.material_stack.size()-1;
   lua_pushnumber(L,index);
 
   chi_log.Log(LOG_0VERBOSE_1) << "New material added at index " << index
