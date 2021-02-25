@@ -17,7 +17,7 @@ enum class CellType
 //  QUADRILATERAL = 5,
   POLYGON = 6,
 //  TETRAHEDRON = 7,
-//  HEXAHEDRON = 8,
+  HEXAHEDRON = 8,
   POLYHEDRON = 9,
 };
 
@@ -64,9 +64,14 @@ public:
 
 private:
   const CellType cell_type;
+  const CellType cell_sub_type;
 
 public:
-  explicit Cell(CellType in_cell_type) : cell_type(in_cell_type) {}
+  explicit Cell(CellType in_cell_type,
+                CellType in_cell_sub_type=CellType::HEXAHEDRON) :
+                cell_type(in_cell_type),
+                cell_sub_type(in_cell_sub_type)
+                {}
 
   virtual ~Cell() = default;
 

@@ -18,11 +18,15 @@ SpatialDiscretization_PWL::
                            SDMType::PIECEWISE_LINEAR_DISCONTINUOUS,
                            setup_flags),
   line_quad_order_second(chi_math::QuadratureOrder::SECOND),
-  tri_quad_order_second (chi_math::QuadratureOrder::SECOND),
-  tet_quad_order_second (chi_math::QuadratureOrder::SECOND),
+  tri_quad_order_second(chi_math::QuadratureOrder::SECOND),
+  quad_quad_order_second(chi_math::QuadratureOrder::SECOND),
+  tet_quad_order_second(chi_math::QuadratureOrder::SECOND),
+  hex_quad_order_second(chi_math::QuadratureOrder::SECOND),
   line_quad_order_arbitrary(qorder),
   tri_quad_order_arbitrary (qorder),
-  tet_quad_order_arbitrary (qorder)
+  quad_quad_order_arbitrary (qorder),
+  tet_quad_order_arbitrary (qorder),
+  hex_quad_order_arbitrary (qorder)
 {
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Creating Piecewise Linear Discontinuous "

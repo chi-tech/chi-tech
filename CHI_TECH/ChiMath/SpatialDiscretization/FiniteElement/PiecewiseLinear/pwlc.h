@@ -8,7 +8,9 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 #include "ChiMath/Quadratures/quadrature_gausslegendre.h"
 #include "ChiMath/Quadratures/quadrature_triangle.h"
+#include "ChiMath/Quadratures/quadrature_quadrilateral.h"
 #include "ChiMath/Quadratures/quadrature_tetrahedron.h"
+#include "ChiMath/Quadratures/quadrature_hexahedron.h"
 
 //######################################################### Class def
 /**Generalization of the Galerkin Finite Element Method
@@ -25,11 +27,15 @@ private:
 public:
   chi_math::QuadratureGaussLegendre line_quad_order_second;
   chi_math::QuadratureTriangle      tri_quad_order_second;
+  chi_math::QuadratureQuadrilateral quad_quad_order_second;
   chi_math::QuadratureTetrahedron   tet_quad_order_second;
+  chi_math::QuadratureHexahedron    hex_quad_order_second;
 
   chi_math::QuadratureGaussLegendre line_quad_order_arbitrary;
   chi_math::QuadratureTriangle      tri_quad_order_arbitrary;
+  chi_math::QuadratureQuadrilateral quad_quad_order_arbitrary;
   chi_math::QuadratureTetrahedron   tet_quad_order_arbitrary;
+  chi_math::QuadratureHexahedron    hex_quad_order_arbitrary;
 
   std::map<int,int> node_mapping;
 
@@ -44,8 +50,8 @@ public:
   unsigned int globl_base_block_size=0;
 
 private:
-  std::vector<chi_mesh::Cell*> neighbor_cells;
-  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
+//  std::vector<chi_mesh::Cell*> neighbor_cells;
+//  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
 
 private:
   //00
@@ -58,7 +64,7 @@ public:
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_PWLC>
-  New(chi_mesh::MeshContinuumPtr in_grid,
+  New(chi_mesh::MeshContinuumPtr& in_grid,
       chi_math::finite_element::SetupFlags setup_flags=
       chi_math::finite_element::SetupFlags::NO_FLAGS_SET,
       chi_math::QuadratureOrder qorder =

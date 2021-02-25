@@ -2,8 +2,9 @@
 #define PWL_POLYGON_VALUES_H
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+
 #include <vector>
-#include <ChiMesh/Cell/cell_polygon.h>
 
 
 
