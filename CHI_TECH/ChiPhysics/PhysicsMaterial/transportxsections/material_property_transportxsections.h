@@ -1,7 +1,7 @@
 #ifndef CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 #define CHI_PHYSICS_TRANSPORT_CROSS_SECTIONS_H
 
-#include "CHI_TECH/ChiPhysics/PhysicsMaterial/material_property_base.h"
+#include "ChiPhysics/PhysicsMaterial/material_property_base.h"
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 
 #define E_COLLAPSE_PARTIAL_JACOBI 1

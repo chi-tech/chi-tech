@@ -4,6 +4,9 @@
 
 extern ChiLog& chi_log;
 
+#include "ChiTimer/chi_timer.h"
+extern ChiTimer chi_program_timer;
+
 //###################################################################
 /**Establishes neighbor connectivity for the light-weight mesh.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::
@@ -28,7 +31,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
       face.neighbor = -1;
     }
 
-  chi_log.Log(LOG_0VERBOSE_1) << "Number of boundary faces "
+  chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                              << " Number of boundary faces "
                                  "before connectivity: " << num_bndry_faces;
 
   //======================================== Establish connectivity
@@ -40,11 +44,13 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     cells_to_search.clear();
     for (uint64_t vid : cell->vertex_ids)
       for (uint64_t cell_id : vertex_subs[vid])
-        cells_to_search.insert(cell_id);
+        if (cell_id != cur_cell_id)
+          cells_to_search.insert(cell_id);
 
     for (auto& cur_cell_face : cell->faces)
     {
       if (cur_cell_face.neighbor >= 0 ) continue;
+
       std::set<uint64_t> cfvids(cur_cell_face.vertex_ids.begin(),
                                 cur_cell_face.vertex_ids.end());
 
@@ -55,20 +61,20 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
         for (auto& adj_cell_face : adj_cell->faces)
         {
           if (adj_cell_face.neighbor >= 0) continue;
-          std::set<uint64_t> afvids(cur_cell_face.vertex_ids.begin(),
-                                    cur_cell_face.vertex_ids.end());
+          std::set<uint64_t> afvids(adj_cell_face.vertex_ids.begin(),
+                                    adj_cell_face.vertex_ids.end());
 
           if (cfvids == afvids)
           {
             cur_cell_face.neighbor = adj_cell_id;
             adj_cell_face.neighbor = cur_cell_id;
-            goto cell_neighbor_found;
+            goto face_neighbor_found;
           }
         }//for adjacent cell face
       }
+      face_neighbor_found:;
     }//for face
 
-    cell_neighbor_found:
     ++cur_cell_id;
   }//for cell
 
@@ -79,6 +85,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     for (auto& face : cell->faces)
       if (face.neighbor < 0) ++num_bndry_faces;
 
-  chi_log.Log(LOG_0VERBOSE_1) << "Number of boundary faces "
+  chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                              << " Number of boundary faces "
                                  "after connectivity: " << num_bndry_faces;
 }

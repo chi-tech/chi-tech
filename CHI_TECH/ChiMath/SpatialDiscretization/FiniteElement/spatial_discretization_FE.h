@@ -52,7 +52,7 @@ public:
     GetQPData_Volumetric(const chi_mesh::Cell& cell) const
   {
     if (not qp_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
+      throw std::invalid_argument("SpatialDiscretization_FE::GetQPData_Volumetric "
                                   "called without integrals being initialized."
                                   " Set flag INIT_QP_DATA.");
     return fe_vol_qp_data[cell.local_id];
@@ -64,7 +64,7 @@ public:
                       const unsigned int face) const
   {
     if (not qp_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
+      throw std::invalid_argument("SpatialDiscretization_FE::GetQPData_Surface "
                                   "called without integrals being initialized."
                                   " Set flag INIT_QP_DATA.");
     return fe_srf_qp_data[cell.local_id][face];

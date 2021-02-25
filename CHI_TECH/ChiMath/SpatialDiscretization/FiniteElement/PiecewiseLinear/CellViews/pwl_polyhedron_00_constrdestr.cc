@@ -24,8 +24,10 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
   alphac = 1.0/polyh_cell->vertex_ids.size();
 
   //=========================================== For each face
-  face_data.reserve(polyh_cell->faces.size());
-  for (size_t f=0; f<polyh_cell->faces.size(); f++)
+  size_t num_faces = polyh_cell->faces.size();
+  face_data.reserve(num_faces);
+  face_betaf.reserve(num_faces);
+  for (size_t f=0; f<num_faces; f++)
   {
     chi_mesh::CellFace& face = polyh_cell->faces[f];
     FEface_data face_f_data;
@@ -41,7 +43,7 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
 
     //==================================== For each edge
     face_f_data.sides.reserve(edges.size());
-    for (auto edge : edges)
+    for (auto& edge : edges)
     {
       FEside_data3d side_data;
 
@@ -183,17 +185,17 @@ PolyhedronPWLFEValues::PolyhedronPWLFEValues(chi_mesh::CellPolyhedron *polyh_cel
   // This mapping is not used by any of the methods in
   // this class but is used by methods requiring the
   // surface integrals of the shape functions.
-  for (size_t f=0; f<polyh_cell->faces.size(); f++)
+  face_dof_mappings.reserve(num_faces);
+  for (auto& face : polyh_cell->faces)
   {
     std::vector<int> face_dof_mapping;
-
-    for (size_t fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
+    face_dof_mapping.reserve(face.vertex_ids.size());
+    for (uint64_t fvid : face.vertex_ids)
     {
       int mapping = -1;
       for (size_t ci=0; ci<polyh_cell->vertex_ids.size(); ci++)
       {
-        if (polyh_cell->faces[f].vertex_ids[fi] ==
-            polyh_cell->vertex_ids[ci])
+        if (fvid == polyh_cell->vertex_ids[ci])
         {
           mapping = ci;
           break;

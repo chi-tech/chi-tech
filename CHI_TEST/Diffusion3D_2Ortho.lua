@@ -3,7 +3,30 @@ if (chi_location_id == 0) then
 end
 --dofile(CHI_LIBRARY)
 
-
+--############################################### Setup mesh
+-- chiMeshHandlerCreate()
+--
+-- L=2.0
+-- N=32
+-- ds=L/N
+-- xmesh={}
+-- for k=0,N do
+--     xmesh[k+1] = -1.0 + ds*k
+-- end
+-- zmesh={0.0,0.1,0.2}
+-- chiMeshCreateUnpartitioned3DOrthoMesh(xmesh,xmesh,zmesh)
+-- chiVolumeMesherSetProperty(PARTITION_TYPE,PARMETIS)
+-- chiVolumeMesherExecute();
+--
+-- --############################################### Set Boundary IDs
+-- bvol0 = chiLogicalVolumeCreate(RPP,-1000,-1000,-1000,1000,-1000,1000)
+-- chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,bvol0,0)
+--
+--
+-- bvol4 = chiLogicalVolumeCreate(RPP,-1000,-1000,-1000,1000,-1000,0.001)
+-- chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,bvol4,1)
+-- bvol5 = chiLogicalVolumeCreate(RPP,-1000,-1000,-1000,1000,0.2-0.001,1000)
+-- chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,bvol5,2)
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()

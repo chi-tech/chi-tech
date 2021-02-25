@@ -4,14 +4,20 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "ChiTimer/chi_timer.h"
+extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_PWL::PreComputeCellSDValues()
 {
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                              << " Add cell SD-values.";
+
   //================================================== Create empty view
   //                                                 for each cell
   if (!mapping_initialized)
@@ -66,12 +72,15 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues()
 
     mapping_initialized = true;
   }
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //============================================= Unit integrals
   {
     using namespace chi_math::finite_element;
     if (setup_flags & SetupFlags::COMPUTE_UNIT_INTEGRALS)
     {
+      chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                                  << " Computing unit integrals.";
       if (not integral_data_initialized)
       {
         fe_unit_integrals.reserve(cell_fe_views.size());
@@ -87,6 +96,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues()
       }
     }//if compute unit intgrls
   }
+  MPI_Barrier(MPI_COMM_WORLD);
 
 
   //============================================= Quadrature data
@@ -94,6 +104,8 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues()
     using namespace chi_math::finite_element;
     if (setup_flags & SetupFlags::INIT_QP_DATA)
     {
+      chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                                  << " Computing quadrature data.";
       if (not qp_data_initialized)
       {
         fe_vol_qp_data.reserve(cell_fe_views.size());
@@ -110,8 +122,9 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues()
       }
     }//if init qp data
   }
-
-
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                              << " Done adding cell SD-values.";
 
 }//AddViewOfLocalContinuum
 

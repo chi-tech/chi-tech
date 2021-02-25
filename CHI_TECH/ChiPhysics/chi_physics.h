@@ -6,7 +6,7 @@
 
 #include "SolverBase/chi_solver.h"
 #include "PhysicsMaterial/chi_physicsmaterial.h"
-#include "CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
 
 //############################################################################# CLASS DEF

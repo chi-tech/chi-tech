@@ -318,7 +318,7 @@ else:
 
 #=========================================== Test
 test_number += 1
-test_name = FormatFileName("Diffusion3D_2Ortho") + " 3D Diffusion Test - CFEM OrthoMesh 4 MPI Processes"
+test_name = FormatFileName("Diffusion3D_2Ortho") + " 3D Diffusion Test - CFEM OrthoMesh 1 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","1",kpath_to_exe,
                             "CHI_TEST/Diffusion3D_2Ortho.lua", "master_export=false"],

@@ -2,7 +2,7 @@
 #include<iostream>
 #include "ChiPhysics/chi_physics.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
-#include "CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 extern ChiPhysics&  chi_physics_handler;
