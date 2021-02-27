@@ -5,9 +5,6 @@
 void PolyhedronPWLFEValues::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
-  active_volume_quadrature = &default_volume_quadrature;
-  active_surface_quadrature= &default_surface_quadrature;
-
   const bool ON_SURFACE = true;
 
   //============================================= Precompute elements
@@ -37,12 +34,12 @@ void PolyhedronPWLFEValues::
           pernode_data.gradshapez_qp.push_back(FaceSideGradShape_z(f, s, i));
         }
         //Prestore Varphi
-        for (size_t qp=0; qp<num_vol_qpoints; qp++)
-          pernode_data.shape_qp.push_back(FaceSideShape(f, s, i, qp));
+        for (const auto& qpoint : default_volume_quadrature.qpoints)
+          pernode_data.shape_qp.push_back(FaceSideShape(f, s, i, qpoint));
 
         //Prestore Varphi on surface
-        for (size_t qp=0; qp<num_srf_qpoints; qp++)
-          pernode_data.shape_qp_surf.push_back(FaceSideShape(f, s, i, qp, ON_SURFACE));
+        for (const auto& qpoint : default_surface_quadrature.qpoints)
+          pernode_data.shape_qp_surf.push_back(FaceSideShape(f, s, i, qpoint, ON_SURFACE));
 
         face_data[f].sides[s].qp_data.push_back(pernode_data);
       } // for i

@@ -5,9 +5,6 @@
 void PolygonPWLFEValues::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
-  active_volume_quadrature = &default_volume_quadrature;
-  active_surface_quadrature= &default_surface_quadrature;
-
   const bool ON_SURFACE = true;
 
   //============================================= Precompute elements
@@ -16,18 +13,16 @@ void PolygonPWLFEValues::
     for (int i=0; i < num_nodes; i++)
     {
       FEqp_data2d pernode_data;
-      for (int q=0; q < default_volume_quadrature.qpoints.size(); q++)
+      for (const auto& qpoint : default_volume_quadrature.qpoints)
       {
-        pernode_data.shape_qp.push_back(SideShape(s, i, q));
+        pernode_data.shape_qp.push_back(SideShape(s, i, qpoint));
         pernode_data.gradshapex_qp.push_back(SideGradShape_x(s, i));
         pernode_data.gradshapey_qp.push_back(SideGradShape_y(s, i));
       }//for qp
 
-      for (int q=0; q < default_surface_quadrature.qpoints.size(); q++)
-      {
-        //printf("%g\n",PreShape(s,i,q,ON_SURFACE));
-        pernode_data.shape_qp_surf.push_back(SideShape(s, i, q, ON_SURFACE));
-      }
+      for (const auto& qpoint : default_surface_quadrature.qpoints)
+        pernode_data.shape_qp_surf.push_back(SideShape(s, i, qpoint, ON_SURFACE));
+
       sides[s].qp_data.push_back(pernode_data);
     }//for dof
   }//for side

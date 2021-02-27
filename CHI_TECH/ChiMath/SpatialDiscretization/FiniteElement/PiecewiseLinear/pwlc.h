@@ -54,6 +54,10 @@ private:
 //  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
 
 private:
+  chi_math::finite_element::InternalQuadraturePointData scratch_vol_qp_data;
+  chi_math::finite_element::FaceQuadraturePointData scratch_face_qp_data;
+
+private:
   //00
   explicit
   SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr in_grid,
@@ -75,6 +79,7 @@ public:
       new SpatialDiscretization_PWLC(in_grid,setup_flags,qorder));}
 
   //01
+  CellPWLFEValues* MakeCellPWLView(const chi_mesh::Cell& cell) const;
   void PreComputeCellSDValues() override;
 //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
   CellPWLFEValues& GetCellFEView(int cell_local_index);
@@ -118,6 +123,56 @@ public:
                            std::vector<double>& local_vector,
                            chi_math::UnknownManager& unknown_manager)
                            override;
+
+  //FE-utils
+  const chi_math::finite_element::UnitIntegralData&
+  GetUnitIntegrals(const chi_mesh::Cell& cell) const override
+  {
+    if (not integral_data_initialized)
+      throw std::invalid_argument("SpatialDiscretization_PWL::GetUnitIntegrals "
+                                  "called without integrals being initialized."
+                                  " Set flag COMPUTE_UNIT_INTEGRALS.");
+    return fe_unit_integrals[cell.local_id];
+//    if (not integral_data_initialized)
+//      return fe_unit_integrals[cell.local_id];
+  }
+
+  const chi_math::finite_element::InternalQuadraturePointData&
+  GetQPData_Volumetric(const chi_mesh::Cell& cell) const override
+  {
+    if (not qp_data_initialized)
+      throw std::invalid_argument("SpatialDiscretization_PWL::GetQPData_Volumetric "
+                                  "called without integrals being initialized."
+                                  " Set flag INIT_QP_DATA.");
+    return fe_vol_qp_data.at(cell.local_id);
+//    if (not qp_data_initialized)
+//      return fe_vol_qp_data.at(cell.local_id);
+//    else
+//    {
+//      auto cell_fe_view = MakeCellPWLView(cell);
+//      cell_fe_view->InitializeQuadraturePointData(scratch_vol_qp_data);
+//    }
+  }
+
+  const chi_math::finite_element::FaceQuadraturePointData&
+  GetQPData_Surface(const chi_mesh::Cell& cell,
+                    const unsigned int face) const override
+  {
+    if (not qp_data_initialized)
+      throw std::invalid_argument("SpatialDiscretization_PWL::GetQPData_Surface "
+                                  "called without quadrature data being initialized."
+                                  " Set flag INIT_QP_DATA.");
+
+    const auto& face_data = fe_srf_qp_data.at(cell.local_id);
+
+    return face_data.at(face);
+//    if (not qp_data_initialized)
+//    {
+//      const auto& face_data = fe_srf_qp_data.at(cell.local_id);
+//
+//      return face_data.at(face);
+//    }
+  }
 };
 
 #endif //SPATIAL_DISCRETIZATION_PWLC_H

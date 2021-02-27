@@ -87,6 +87,7 @@ public:
     new SpatialDiscretization_PWL(in_grid,setup_flags,qorder));}
 
   //01
+  CellPWLFEValues* MakeCellPWLView(const chi_mesh::Cell& cell);
   void PreComputeCellSDValues() override;
   void PreComputeNeighborCellSDValues();
   CellPWLFEValues& GetCellFEView(int cell_local_index);

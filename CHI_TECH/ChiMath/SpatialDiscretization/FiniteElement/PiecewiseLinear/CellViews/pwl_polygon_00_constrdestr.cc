@@ -2,28 +2,28 @@
 
 //###################################################################
 /** Constructor.*/
-PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
+PolygonPWLFEValues::PolygonPWLFEValues(const chi_mesh::CellPolygon& poly_cell,
                                        std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
-                                       chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-                                       chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
-                                       chi_math::QuadratureTriangle&      arb_volume_quadrature,
-                                       chi_math::QuadratureGaussLegendre& arb_surface_quadrature) :
-  CellPWLFEValues(poly_cell->vertex_ids.size(),ref_grid),
+                                       const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
+                                       const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
+                                       const chi_math::QuadratureTriangle&      arb_volume_quadrature,
+                                       const chi_math::QuadratureGaussLegendre& arb_surface_quadrature) :
+  CellPWLFEValues(poly_cell.vertex_ids.size(),ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   default_surface_quadrature(minumum_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),
   arbitrary_surface_quadrature(arb_surface_quadrature)
 {
-  num_of_subtris = poly_cell->faces.size();
+  num_of_subtris = poly_cell.faces.size();
   beta = 1.0/num_of_subtris;
 
   //=========================================== Get raw vertices
-  vc = poly_cell->centroid;
+  vc = poly_cell.centroid;
 
   //=========================================== Calculate legs and determinants
   for (int side=0;side<num_of_subtris;side++)
   {
-    chi_mesh::CellFace& face = poly_cell->faces[side];
+    const chi_mesh::CellFace& face = poly_cell.faces[side];
 
     chi_mesh::Vertex v0 = *ref_grid->vertices[face.vertex_ids[0]];
     chi_mesh::Vertex v1 = *ref_grid->vertices[face.vertex_ids[1]];
@@ -72,15 +72,15 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
   }
 
   //=========================================== Compute node to side mapping
-  for (int v=0; v<poly_cell->vertex_ids.size(); v++)
+  for (int v=0; v<poly_cell.vertex_ids.size(); v++)
   {
-    int vindex = poly_cell->vertex_ids[v];
+    int vindex = poly_cell.vertex_ids[v];
     std::vector<int> side_mapping(num_of_subtris);
     for (int side=0;side<num_of_subtris;side++)
     {
       side_mapping[side] = -1;
 
-      chi_mesh::CellFace& face = poly_cell->faces[side];
+      const chi_mesh::CellFace& face = poly_cell.faces[side];
       if (face.vertex_ids[0] == vindex)
       {
         side_mapping[side] = 0;
@@ -94,15 +94,15 @@ PolygonPWLFEValues::PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
   }
 
   //============================================= Compute edge dof mappings
-  face_dof_mappings.resize(poly_cell->faces.size());
-  for (int e=0; e<poly_cell->faces.size(); e++)
+  face_dof_mappings.resize(poly_cell.faces.size());
+  for (int e=0; e<poly_cell.faces.size(); e++)
   {
     face_dof_mappings[e].resize(2);
     for (int fv=0; fv<2; fv++)
     {
-      for (int v=0; v<poly_cell->vertex_ids.size(); v++)
+      for (int v=0; v<poly_cell.vertex_ids.size(); v++)
       {
-        if (poly_cell->faces[e].vertex_ids[fv] == poly_cell->vertex_ids[v])
+        if (poly_cell.faces[e].vertex_ids[fv] == poly_cell.vertex_ids[v])
         {
           face_dof_mappings[e][fv] = v;
           break;

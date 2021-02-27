@@ -93,23 +93,20 @@ private:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
-  chi_math::QuadratureTetrahedron& default_volume_quadrature;
-  chi_math::QuadratureTriangle&    default_surface_quadrature;
+  const chi_math::QuadratureTetrahedron& default_volume_quadrature;
+  const chi_math::QuadratureTriangle&    default_surface_quadrature;
 
-  chi_math::QuadratureTetrahedron& arbitrary_volume_quadrature;
-  chi_math::QuadratureTriangle&    arbitrary_surface_quadrature;
-
-  chi_math::QuadratureTetrahedron* active_volume_quadrature =nullptr;
-  chi_math::QuadratureTriangle*    active_surface_quadrature=nullptr;
+  const chi_math::QuadratureTetrahedron& arbitrary_volume_quadrature;
+  const chi_math::QuadratureTriangle&    arbitrary_surface_quadrature;
 
 public:
   //00_constrdestr.cc
-  PolyhedronPWLFEValues(chi_mesh::CellPolyhedron* polyh_cell,
+  PolyhedronPWLFEValues(const chi_mesh::CellPolyhedron& polyh_cell,
                         chi_mesh::MeshContinuumPtr ref_grid,
-                        chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                        chi_math::QuadratureTriangle&    minumum_surface_quadrature,
-                        chi_math::QuadratureTetrahedron& arb_volume_quadrature,
-                        chi_math::QuadratureTriangle&    arb_surface_quadrature);
+                        const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
+                        const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+                        const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
+                        const chi_math::QuadratureTriangle&    arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
@@ -117,24 +114,42 @@ public:
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
 
+  void InitializeQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
+
+  void InitializeQuadraturePointData(unsigned int face,
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
+
   //################################################## Define standard
   //                                                   tetrahedron linear shape
   //                                                   functions
   //01a_reftet.cc
 private:
-  double TetShape(int index, int qpoint_index, bool on_surface = false);
-  static double TetGradShape_x(int index);
-  static double TetGradShape_y(int index);
-  static double TetGradShape_z(int index);
+  static
+  double TetShape(unsigned int index,
+                  const chi_mesh::Vector3& qpoint,
+                  bool on_surface = false);
+  static double TetGradShape_x(unsigned int index);
+  static double TetGradShape_y(unsigned int index);
+  static double TetGradShape_z(unsigned int index);
 
   //################################################## Shape functions per face-side
   //01b_sidevalues.cc
 private:
-  double FaceSideShape(int face_index, int side_index, int i,
-                       int qpoint_index, bool on_surface = false);
-  double FaceSideGradShape_x(int face_index, int side_index, int i);
-  double FaceSideGradShape_y(int face_index, int side_index, int i);
-  double FaceSideGradShape_z(int face_index, int side_index, int i);
+  double FaceSideShape(unsigned int face_index,
+                       unsigned int side_index,
+                       unsigned int i,
+                       const chi_mesh::Vector3& qpoint,
+                       bool on_surface = false);
+  double FaceSideGradShape_x(unsigned int face_index,
+                             unsigned int side_index,
+                             unsigned int i);
+  double FaceSideGradShape_y(unsigned int face_index,
+                             unsigned int side_index,
+                             unsigned int i);
+  double FaceSideGradShape_z(unsigned int face_index,
+                             unsigned int side_index,
+                             unsigned int i);
 
   //############################################### Actual shape functions
   //                                                as function of cartesian

@@ -2,27 +2,30 @@
 
 /**Precomputes the shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronPWLFEValues::FaceSideShape(int face_index, int side_index,
-                                            int i, int qpoint_index, bool on_surface)
+double PolyhedronPWLFEValues::FaceSideShape(unsigned int face_index,
+                                            unsigned int side_index,
+                                            unsigned int i,
+                                            const chi_mesh::Vector3& qpoint,
+                                            bool on_surface/*=false*/)
 {
   double value = 0.0;
   int    index = node_side_maps[i].face_map[face_index].
     side_map[side_index].index;
   double betaf = face_betaf[face_index];
 
-  value += TetShape(index, qpoint_index, on_surface);
+  value += TetShape(index, qpoint, on_surface);
   if (node_side_maps[i].face_map[face_index].side_map[side_index].part_of_face){
-    value += betaf* TetShape(1, qpoint_index, on_surface);}
-  value += alphac* TetShape(3, qpoint_index, on_surface);
+    value += betaf* TetShape(1, qpoint, on_surface);}
+  value += alphac* TetShape(3, qpoint, on_surface);
 
   return value;
 }
 
 /**Precomputes the gradx-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronPWLFEValues::FaceSideGradShape_x(int face_index,
-                                                  int side_index,
-                                                  int i)
+double PolyhedronPWLFEValues::FaceSideGradShape_x(unsigned int face_index,
+                                                  unsigned int side_index,
+                                                  unsigned int i)
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -56,9 +59,9 @@ double PolyhedronPWLFEValues::FaceSideGradShape_x(int face_index,
 
 /**Precomputes the grady-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronPWLFEValues::FaceSideGradShape_y(int face_index,
-                                                  int side_index,
-                                                  int i)
+double PolyhedronPWLFEValues::FaceSideGradShape_y(unsigned int face_index,
+                                                  unsigned int side_index,
+                                                  unsigned int i)
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -92,9 +95,9 @@ double PolyhedronPWLFEValues::FaceSideGradShape_y(int face_index,
 
 /**Precomputes the gradz-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronPWLFEValues::FaceSideGradShape_z(int face_index,
-                                                  int side_index,
-                                                  int i)
+double PolyhedronPWLFEValues::FaceSideGradShape_z(unsigned int face_index,
+                                                  unsigned int side_index,
+                                                  unsigned int i)
 {
   double value = 0.0;
   double tetdfdx = 0.0;

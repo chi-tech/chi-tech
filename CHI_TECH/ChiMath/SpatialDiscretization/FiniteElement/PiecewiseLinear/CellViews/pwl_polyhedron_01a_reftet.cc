@@ -1,26 +1,21 @@
 #include "pwl_polyhedron.h"
 
-double PolyhedronPWLFEValues::TetShape(int index,
-                                       int qpoint_index,
-                                       bool on_surface)
+double PolyhedronPWLFEValues::TetShape(unsigned int index,
+                                       const chi_mesh::Vector3& qpoint,
+                                       bool on_surface/*=false*/)
 {
-  chi_math::QuadraturePointXYZ* qpoint;
-  if (!on_surface)
-    qpoint = &active_volume_quadrature->qpoints.at(qpoint_index);
-  else
-    qpoint = &active_surface_quadrature->qpoints.at(qpoint_index);
   double value = 0.0;
 
   if (index == 0)
-  {value = 1.0 - qpoint->x - qpoint->y - qpoint->z;}
-  if (index == 1){value = qpoint->x;}
-  if (index == 2){value = qpoint->y;}
-  if (index == 3){value = qpoint->z;}
+  {value = 1.0 - qpoint.x - qpoint.y - qpoint.z;}
+  if (index == 1){value = qpoint.x;}
+  if (index == 2){value = qpoint.y;}
+  if (index == 3){value = qpoint.z;}
 
   return value;
 }
 
-double PolyhedronPWLFEValues::TetGradShape_x(const int index)
+double PolyhedronPWLFEValues::TetGradShape_x(const unsigned int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -31,7 +26,7 @@ double PolyhedronPWLFEValues::TetGradShape_x(const int index)
   return value;
 }
 
-double PolyhedronPWLFEValues::TetGradShape_y(const int index)
+double PolyhedronPWLFEValues::TetGradShape_y(const unsigned int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -42,7 +37,7 @@ double PolyhedronPWLFEValues::TetGradShape_y(const int index)
   return value;
 }
 
-double PolyhedronPWLFEValues::TetGradShape_z(const int index)
+double PolyhedronPWLFEValues::TetGradShape_z(const unsigned int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}

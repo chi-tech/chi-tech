@@ -51,14 +51,12 @@ private:
   //Goes into sides
 
   std::vector<FEside_data2d> sides;
-  chi_math::QuadratureTriangle&      default_volume_quadrature;
-  chi_math::QuadratureGaussLegendre& default_surface_quadrature;
+  const chi_math::QuadratureTriangle&      default_volume_quadrature;
+  const chi_math::QuadratureGaussLegendre& default_surface_quadrature;
 
-  chi_math::QuadratureTriangle&      arbitrary_volume_quadrature;
-  chi_math::QuadratureGaussLegendre& arbitrary_surface_quadrature;
+  const chi_math::QuadratureTriangle&      arbitrary_volume_quadrature;
+  const chi_math::QuadratureGaussLegendre& arbitrary_surface_quadrature;
 
-  chi_math::QuadratureTriangle*      active_volume_quadrature = nullptr;
-  chi_math::QuadratureGaussLegendre* active_surface_quadrature= nullptr;
 private:
   int      num_of_subtris;
   double   beta;
@@ -73,12 +71,12 @@ private:
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonPWLFEValues(chi_mesh::CellPolygon* poly_cell,
+  PolygonPWLFEValues(const chi_mesh::CellPolygon& poly_cell,
                      chi_mesh::MeshContinuumPtr ref_grid,
-                     chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-                     chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
-                     chi_math::QuadratureTriangle&      arb_volume_quadrature,
-                     chi_math::QuadratureGaussLegendre& arb_surface_quadrature);
+                     const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
+                     const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
+                     const chi_math::QuadratureTriangle&      arb_volume_quadrature,
+                     const chi_math::QuadratureGaussLegendre& arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
@@ -86,15 +84,27 @@ public:
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
 
+  void InitializeQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
+
+  void InitializeQuadraturePointData(unsigned int face,
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
+
   //################################################## Define standard
   //                                                   triangle linear shape
   //                                                   functions
-  double TriShape(int index, int qpoint_index, bool on_surface = false);
+  static
+  double TriShape(int index,
+                  const chi_mesh::Vector3& qpoint,
+                  bool on_surface = false);
 
   //############################################### Shape functions per side
-  double SideShape(int side, int i, int qpoint_index, bool on_surface = false);
-  double SideGradShape_x(int side, int i);
-  double SideGradShape_y(int side, int i);
+  double SideShape(unsigned int side,
+                   unsigned int i,
+                   const chi_mesh::Vector3& qpoint,
+                   bool on_surface = false);
+  double SideGradShape_x(unsigned int side, int i);
+  double SideGradShape_y(unsigned int side, int i);
 
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
   chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;

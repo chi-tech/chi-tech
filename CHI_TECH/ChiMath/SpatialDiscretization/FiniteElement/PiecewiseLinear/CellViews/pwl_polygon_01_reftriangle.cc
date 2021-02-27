@@ -1,20 +1,19 @@
 #include "pwl_polygon.h"
 
-double PolygonPWLFEValues::TriShape(int index, int qpoint_index,
+double PolygonPWLFEValues::TriShape(int index,
+                                    const chi_mesh::Vector3& qpoint,
                                     bool on_surface/*false*/)
 {
-  double xi  = 0.0;
-  double eta = 0.0;
+  double xi ;
+  double eta;
   if (!on_surface)
   {
-    auto& qpoint = active_volume_quadrature->qpoints.at(qpoint_index);
-
     xi = qpoint.x;
     eta= qpoint.y;
   }
   else
   {
-    xi = 0.5*(active_surface_quadrature->qpoints[qpoint_index][0] + 1.0);
+    xi = 0.5*(qpoint[0] + 1.0);
     eta = 0.0;
   }
 
@@ -31,15 +30,17 @@ double PolygonPWLFEValues::TriShape(int index, int qpoint_index,
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Varphi_x
 /**Precomputation of the shape function at a quadrature point.*/
-double PolygonPWLFEValues::SideShape(int side, int i, int qpoint_index,
+double PolygonPWLFEValues::SideShape(unsigned int side,
+                                     unsigned int i,
+                                     const chi_mesh::Vector3& qpoint,
                                      bool on_surface/*=false*/)
 {
   int index = node_to_side_map[i][side];
   double value = 0.0;
   if (index == 0 or index == 1)
-    value = TriShape(index,qpoint_index,on_surface);
+    value = TriShape(index,qpoint,on_surface);
 
-  value += beta*TriShape(2,qpoint_index,on_surface);
+  value += beta*TriShape(2,qpoint,on_surface);
 
   return value;
 }
@@ -47,7 +48,7 @@ double PolygonPWLFEValues::SideShape(int side, int i, int qpoint_index,
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_x
 /**Precomputation of the partial derivative along x of the
  * shape function at a quadrature point.*/
-double PolygonPWLFEValues::SideGradShape_x(int side, int i)
+double PolygonPWLFEValues::SideGradShape_x(unsigned int side, int i)
 {
   int index = node_to_side_map[i][side];
   double value = 0;
@@ -74,7 +75,7 @@ double PolygonPWLFEValues::SideGradShape_x(int side, int i)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_y
 /**Precomputation of the partial derivative along y of the
  * shape function at a quadrature point.*/
-double PolygonPWLFEValues::SideGradShape_y(int side, int i)
+double PolygonPWLFEValues::SideGradShape_y(unsigned int side, int i)
 {
   int index = node_to_side_map[i][side];
   double value = 0;

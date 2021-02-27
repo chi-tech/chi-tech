@@ -258,16 +258,6 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
                             vmap[i+1][j+1][k+1],
                             vmap[i+1][j  ][k+1]};
 
-        //West face
-        {
-          UnpartitionedMesh::LightWeightFace face;
-
-          face.vertex_ids = {vmap[i  ][j  ][k],
-                             vmap[i  ][j  ][k+1],
-                             vmap[i+1][j  ][k+1],
-                             vmap[i+1][j  ][k]};
-          cell->faces.push_back(face);
-        }
         //East face
         {
           UnpartitionedMesh::LightWeightFace face;
@@ -278,14 +268,14 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j+1][k+1]};
           cell->faces.push_back(face);
         }
-        //South face
+        //West face
         {
           UnpartitionedMesh::LightWeightFace face;
 
           face.vertex_ids = {vmap[i  ][j  ][k],
-                             vmap[i  ][j+1][k],
-                             vmap[i  ][j+1][k+1],
-                             vmap[i  ][j  ][k+1]};
+                             vmap[i  ][j  ][k+1],
+                             vmap[i+1][j  ][k+1],
+                             vmap[i+1][j  ][k]};
           cell->faces.push_back(face);
         }
         //North face
@@ -298,14 +288,14 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i+1][j+1][k]};
           cell->faces.push_back(face);
         }
-        //Bottom face
+        //South face
         {
           UnpartitionedMesh::LightWeightFace face;
 
           face.vertex_ids = {vmap[i  ][j  ][k],
-                             vmap[i+1][j  ][k],
-                             vmap[i+1][j+1][k],
-                             vmap[i  ][j+1][k]};
+                             vmap[i  ][j+1][k],
+                             vmap[i  ][j+1][k+1],
+                             vmap[i  ][j  ][k+1]};
           cell->faces.push_back(face);
         }
         //Top face
@@ -316,6 +306,16 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
                              vmap[i  ][j+1][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j  ][k+1]};
+          cell->faces.push_back(face);
+        }
+        //Bottom face
+        {
+          UnpartitionedMesh::LightWeightFace face;
+
+          face.vertex_ids = {vmap[i  ][j  ][k],
+                             vmap[i+1][j  ][k],
+                             vmap[i+1][j+1][k],
+                             vmap[i  ][j+1][k]};
           cell->faces.push_back(face);
         }
 

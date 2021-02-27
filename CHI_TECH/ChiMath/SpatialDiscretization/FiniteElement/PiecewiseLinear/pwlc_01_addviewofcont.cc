@@ -11,6 +11,51 @@ extern ChiLog& chi_log;
 extern ChiTimer chi_program_timer;
 
 //###################################################################
+/**Makes a CellPWLView for a cell based in its type.*/
+CellPWLFEValues* SpatialDiscretization_PWLC::
+  MakeCellPWLView(const chi_mesh::Cell &cell) const
+{
+  switch (cell.Type())
+  {
+    case chi_mesh::CellType::SLAB:
+    {
+      const auto& slab_cell = (const chi_mesh::CellSlab&)(cell);
+      auto cell_fe_view = new SlabPWLFEView(slab_cell,
+                                            ref_grid,
+                                            line_quad_order_second,
+                                            line_quad_order_arbitrary);
+      return cell_fe_view;
+    }
+    case chi_mesh::CellType::POLYGON:
+    {
+      const auto& poly_cell = (const chi_mesh::CellPolygon&)(cell);
+      auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
+                                                 ref_grid,
+                                                 tri_quad_order_second,
+                                                 line_quad_order_second,
+                                                 tri_quad_order_arbitrary,
+                                                 line_quad_order_arbitrary);
+      return cell_fe_view;
+    }
+    case chi_mesh::CellType::POLYHEDRON:
+    {
+      const auto& polyh_cell = (const chi_mesh::CellPolyhedron&)(cell);
+      auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
+                                                    ref_grid,
+                                                    tet_quad_order_second,
+                                                    tri_quad_order_second,
+                                                    tet_quad_order_arbitrary,
+                                                    tri_quad_order_arbitrary);
+      return cell_fe_view;
+    }
+    default:
+      throw std::invalid_argument("SpatialDiscretization_PWL::MakeCellPWLView: "
+                                  "Unsupported cell type encountered.");
+  }
+
+}
+
+//###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 {
@@ -19,52 +64,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
   if (!mapping_initialized)
   {
     for (const auto& cell : ref_grid->local_cells)
-    {
-      //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
-      if (cell.Type() == chi_mesh::CellType::SLAB)
-      {
-        auto slab_cell = (chi_mesh::CellSlab*)(&cell);
-        auto cell_fe_view = new SlabPWLFEView(slab_cell,
-                                              ref_grid,
-                                              line_quad_order_second,
-                                              line_quad_order_arbitrary);
-
-        cell_fe_views.push_back(cell_fe_view);
-      }
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
-      else if (cell.Type() == chi_mesh::CellType::POLYGON)
-      {
-        auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-        auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
-                                                   ref_grid,
-                                                   tri_quad_order_second,
-                                                   line_quad_order_second,
-                                                   tri_quad_order_arbitrary,
-                                                   line_quad_order_arbitrary);
-
-        cell_fe_views.push_back(cell_fe_view);
-      }
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
-      else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-      {
-        auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-        auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
-                                                      ref_grid,
-                                                      tet_quad_order_second,
-                                                      tri_quad_order_second,
-                                                      tet_quad_order_arbitrary,
-                                                      tri_quad_order_arbitrary);
-
-        cell_fe_views.push_back(cell_fe_view);
-      }
-      else
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "SpatialDiscretization_PWL::AddViewOfLocalContinuum. "
-          << "Unsupported cell type encountered.";
-        exit(EXIT_FAILURE);
-      }
-    }//for num cells
+      cell_fe_views.push_back(MakeCellPWLView(cell));
 
     mapping_initialized = true;
   }
