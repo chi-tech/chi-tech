@@ -7,12 +7,14 @@ extern ChiLog& chi_log;
  * view.
  *
  * */
-PolyhedronPWLFEValues::PolyhedronPWLFEValues(const chi_mesh::CellPolyhedron& polyh_cell,
-                                             std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
-                                             const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                                             const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
-                                             const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
-                                             const chi_math::QuadratureTriangle&    arb_surface_quadrature):
+PolyhedronPWLFEValues::
+  PolyhedronPWLFEValues(
+    const chi_mesh::CellPolyhedron& polyh_cell,
+    const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
+    const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
+    const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+    const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
+    const chi_math::QuadratureTriangle&    arb_surface_quadrature):
   CellPWLFEValues(polyh_cell.vertex_ids.size(),ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   default_surface_quadrature(minumum_surface_quadrature),

@@ -103,7 +103,7 @@ public:
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
-  void InitializeQuadraturePointData(
+  void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
 

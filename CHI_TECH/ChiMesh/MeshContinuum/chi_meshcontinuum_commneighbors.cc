@@ -17,8 +17,6 @@ extern ChiMPI& chi_mpi;
 void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   std::map<uint64_t, chi_mesh::Cell*>& neighbor_cells)
 {
-  chi_log.Log(LOG_0)
-    << "Communicating partition neighbors.";
   MPI_Barrier(MPI_COMM_WORLD);
 
   std::set<uint64_t> local_neighboring_cell_indices;

@@ -8,25 +8,21 @@
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
+#include "ChiTimer/chi_timer.h"
+extern ChiTimer chi_program_timer;
+
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
 void SpatialDiscretization_PWL::OrderNodes()
 {
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Developing nodal ordering.";
   ChiTimer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Check cell views avail
-  size_t num_loc_cells = ref_grid->local_cell_glob_indices.size();
-  if (num_loc_cells != cell_fe_views.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "SpatialDiscretization_PWL::OrderNodesDFEM. Number of cell_fe_views ("
-      << cell_fe_views.size() << ") does not correspond to the number of cells ("
-      << num_loc_cells << "). Was a call to AddViewOfLocalContinuum made?";
-    exit(EXIT_FAILURE);
-  }
-
+  size_t num_loc_cells = ref_grid->local_cells.size();
 
   //================================================== Get local DOF count
   cell_local_block_address.resize(num_loc_cells, 0);
@@ -34,7 +30,7 @@ void SpatialDiscretization_PWL::OrderNodes()
   int local_dof_count=0;
   for (int lc=0; lc<num_loc_cells; lc++)
   {
-    auto cell_fe_view = cell_fe_views[lc];
+    auto cell_fe_view = GetCellPWLView(lc);
     cell_local_block_address[lc] = local_dof_count;
     local_dof_count += cell_fe_view->num_nodes;
   }

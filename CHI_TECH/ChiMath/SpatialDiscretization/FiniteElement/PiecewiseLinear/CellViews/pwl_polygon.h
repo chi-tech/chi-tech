@@ -72,7 +72,7 @@ private:
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonPWLFEValues(const chi_mesh::CellPolygon& poly_cell,
-                     chi_mesh::MeshContinuumPtr ref_grid,
+                     const chi_mesh::MeshContinuumPtr& ref_grid,
                      const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
                      const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
                      const chi_math::QuadratureTriangle&      arb_volume_quadrature,
@@ -80,14 +80,15 @@ public:
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
-  void InitializeQuadraturePointData(
+  void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
 
-  void InitializeQuadraturePointData(
+  void InitializeVolumeQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
 
-  void InitializeQuadraturePointData(unsigned int face,
+  void InitializeFaceQuadraturePointData(
+    unsigned int face,
     chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
 
   //################################################## Define standard

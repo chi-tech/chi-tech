@@ -9,7 +9,7 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Constructor.*/
 SpatialDiscretization_PWLC::
-  SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr in_grid,
+  SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr& in_grid,
                              chi_math::finite_element::SetupFlags setup_flags/*=
                             chi_math::finite_element::SetupFlags::NO_FLAGS_SET*/,
                              chi_math::QuadratureOrder qorder/*=
@@ -31,7 +31,9 @@ SpatialDiscretization_PWLC::
   chi_log.Log() << chi_program_timer.GetTimeString()
                 <<  " Creating Piecewise Linear Continuous "
                     "Finite Element spatial discretizaiton.";
-  PreComputeCellSDValues();
+
+  if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
+    PreComputeCellSDValues();
 
   OrderNodes();
   chi_log.Log() << chi_program_timer.GetTimeString()

@@ -15,7 +15,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
                      chi_math::UnknownManager& unknown_manager)
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
-  int local_dof_count = local_base_block_size;
+  size_t local_dof_count = local_base_block_size;
 
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
@@ -26,52 +26,51 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   int lc=0;
   for (auto& cell : grid->local_cells)
   {
-    auto cell_fe_view = cell_fe_views[lc];
+    auto cell_fe_view = GetCellPWLView(lc);
+    size_t num_nodes = cell_fe_view->num_nodes;
 
     //==================================== Self connection
-    for (int i=0; i<cell_fe_view->num_nodes; ++i)
+    for (int i=0; i<num_nodes; ++i)
     {
       int ir = cell_local_block_address[lc] + i;
-      nodal_nnz_in_diag[ir] += cell_fe_view->num_nodes;
+      nodal_nnz_in_diag[ir] += num_nodes;
     }
 
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if (face.IsNeighborLocal(*grid))
+      if (face.has_neighbor and face.IsNeighborLocal(*grid))
       {
-        int  adj_cell_local_id = face.GetNeighborLocalID(*grid);
-        auto adj_cell_fe_view = cell_fe_views[adj_cell_local_id];
+        auto& adj_cell = grid->cells[face.neighbor_id];
+        auto adj_cell_fe_view = GetCellPWLView(adj_cell.local_id);
 
-        for (int i=0; i<cell_fe_view->num_nodes; ++i)
+        for (int i=0; i<num_nodes; ++i)
         {
           int ir = cell_local_block_address[lc] + i;
           nodal_nnz_in_diag[ir] += adj_cell_fe_view->num_nodes;
         }
       }
-    }
+    }//for face
     ++lc;
   }//for local cell
-
-
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEIGHBORING CONNECTIVITY
   lc=0;
   for (auto& cell : grid->local_cells)
   {
-    auto cell_fe_view = cell_fe_views[lc];
+    auto cell_fe_view = GetCellPWLView(lc);
 
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
       if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
       {
-        auto& adj_cell_fe_view = GetNeighborCellFEView(face.neighbor_id);
+        auto adj_cell_fe_view = GetNeighborCellPWLView(face.neighbor_id);
 
         for (int i=0; i<cell_fe_view->num_nodes; ++i)
         {
           int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_off_diag[ir] += adj_cell_fe_view.num_nodes;
+          nodal_nnz_off_diag[ir] += adj_cell_fe_view->num_nodes;
         }
       }
     }

@@ -35,7 +35,7 @@ class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
-  const SpatialDiscretization_PWL& grid_fe_view;
+  SpatialDiscretization_PWL& grid_fe_view;
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const std::vector<double>* q_moments;
   const LBSGroupset& groupset;
@@ -54,7 +54,7 @@ protected:
 public:
   // ################################################## Constructor
   LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                   const SpatialDiscretization_PWL& discretization,
+                   SpatialDiscretization_PWL& discretization,
                    const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,

@@ -31,8 +31,17 @@ SpatialDiscretization_PWL::
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Creating Piecewise Linear Discontinuous "
                    "Finite Element spatial discretizaiton.";
-  PreComputeCellSDValues();
-  PreComputeNeighborCellSDValues();
+
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Communicating partition neighbors.";
+  ref_grid->CommunicatePartitionNeighborCells(neighbor_cells);
+
+  if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
+  {
+    PreComputeCellSDValues();
+    PreComputeNeighborCellSDValues();
+  }
+
   OrderNodes();
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Done creating Piecewise Linear Discontinuous "

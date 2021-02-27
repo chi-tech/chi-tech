@@ -14,9 +14,17 @@ namespace finite_element
   enum SetupFlags : int
   {
     NO_FLAGS_SET           = 0,
-    COMPUTE_UNIT_INTEGRALS = (1 << 0),
-    INIT_QP_DATA           = (1 << 1)
+    COMPUTE_CELL_VIEWS     = (1 << 0),
+    COMPUTE_UNIT_INTEGRALS = (1 << 1),
+    INIT_QP_DATA           = (1 << 2)
   };
+
+  inline SetupFlags
+  operator|(const SetupFlags f1, const SetupFlags f2)
+  {
+    return static_cast<SetupFlags>(static_cast<unsigned int>(f1) |
+                                   static_cast<unsigned int>(f2));
+  }
 
   //#############################################
   /**Storage structure for unit integrals.*/
@@ -40,6 +48,22 @@ namespace finite_element
 
     std::vector<std::vector<int>> face_dof_mappings;
     size_t num_nodes=0;
+
+    void Reset()
+    {
+      IntV_gradShapeI_gradShapeJ.clear();
+      IntV_shapeI_gradshapeJ.clear();
+      IntV_shapeI_shapeJ.clear();
+      IntV_shapeI.clear();
+      IntV_gradshapeI.clear();
+
+      IntS_shapeI_shapeJ.clear();
+      IntS_shapeI.clear();
+      IntS_shapeI_gradshapeJ.clear();
+
+      face_dof_mappings.clear();
+      num_nodes=0;
+    }
   };
 
   //#############################################

@@ -8,6 +8,9 @@
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
+#include "ChiTimer/chi_timer.h"
+extern ChiTimer chi_program_timer;
+
 #include <algorithm>
 
 //###################################################################
@@ -15,6 +18,8 @@ extern ChiMPI& chi_mpi;
  * Finite Element calculation.*/
 void SpatialDiscretization_PWLC::OrderNodes()
 {
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Developing nodal ordering.";
   ChiTimer t_stage[6];
 
   t_stage[0].Reset();

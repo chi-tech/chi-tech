@@ -21,39 +21,21 @@ public:
 
   /**Constructor for a slab view.*/
   SlabPWLFEView(const chi_mesh::CellSlab& slab_cell,
-                chi_mesh::MeshContinuumPtr ref_grid,
+                const chi_mesh::MeshContinuumPtr& ref_grid,
                 const chi_math::QuadratureGaussLegendre& minumum_volume_quadrature,
-                const chi_math::QuadratureGaussLegendre& arb_volume_quadrature) :
-    CellPWLFEValues(2,ref_grid),
-    default_volume_quadrature(minumum_volume_quadrature),
-    arbitrary_volume_quadrature(arb_volume_quadrature)
-  {
-    grid = ref_grid;
-    v0i = slab_cell.vertex_ids[0];
-    v1i = slab_cell.vertex_ids[1];
-                     v0 = *grid->vertices[v0i];
-    chi_mesh::Vertex v1 = *grid->vertices[v1i];
-
-    chi_mesh::Vector3 v01 = v1 - v0;
-    h = v01.Norm();
-
-    face_dof_mappings.emplace_back(1,0);
-    face_dof_mappings.emplace_back(1,1);
-
-    normals[0] = slab_cell.faces[0].normal;
-    normals[1] = slab_cell.faces[1].normal;
-  }
+                const chi_math::QuadratureGaussLegendre& arb_volume_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
-  void InitializeQuadraturePointData(
+  void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
 
-  void InitializeQuadraturePointData(
+  void InitializeVolumeQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
 
-  void InitializeQuadraturePointData(unsigned int face,
+  void InitializeFaceQuadraturePointData(
+    unsigned int face,
     chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
 
   //################################################## Define standard

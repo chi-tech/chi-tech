@@ -11,9 +11,9 @@ extern ChiLog& chi_log;
 extern ChiTimer chi_program_timer;
 
 //###################################################################
-/**Makes a CellPWLView for a cell based in its type.*/
-CellPWLFEValues* SpatialDiscretization_PWLC::
-  MakeCellPWLView(const chi_mesh::Cell &cell) const
+/**Makes a shared_ptr CellPWLView for a cell based on its type.*/
+std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWLC::
+  MakeCellPWLView(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
   {
@@ -24,7 +24,9 @@ CellPWLFEValues* SpatialDiscretization_PWLC::
                                             ref_grid,
                                             line_quad_order_second,
                                             line_quad_order_arbitrary);
-      return cell_fe_view;
+
+      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      return the_ptr;
     }
     case chi_mesh::CellType::POLYGON:
     {
@@ -35,7 +37,9 @@ CellPWLFEValues* SpatialDiscretization_PWLC::
                                                  line_quad_order_second,
                                                  tri_quad_order_arbitrary,
                                                  line_quad_order_arbitrary);
-      return cell_fe_view;
+
+      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      return the_ptr;
     }
     case chi_mesh::CellType::POLYHEDRON:
     {
@@ -46,27 +50,42 @@ CellPWLFEValues* SpatialDiscretization_PWLC::
                                                     tri_quad_order_second,
                                                     tet_quad_order_arbitrary,
                                                     tri_quad_order_arbitrary);
-      return cell_fe_view;
+
+      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      return the_ptr;
     }
     default:
-      throw std::invalid_argument("SpatialDiscretization_PWL::MakeCellPWLView: "
+      throw std::invalid_argument("SpatialDiscretization_PWLC::MakeCellPWLRawView: "
                                   "Unsupported cell type encountered.");
   }
-
 }
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 {
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                              << " Add cell SD-values.";
+
+  size_t num_local_cells = ref_grid->local_cells.size();
+
   //================================================== Create empty view
   //                                                 for each cell
-  if (!mapping_initialized)
   {
-    for (const auto& cell : ref_grid->local_cells)
-      cell_fe_views.push_back(MakeCellPWLView(cell));
+    using namespace chi_math::finite_element;
+    if (setup_flags & SetupFlags::COMPUTE_CELL_VIEWS)
+    {
+      chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                                  << " Computing unit integrals.";
+      if (!mapping_initialized)
+      {
+        for (const auto& cell : ref_grid->local_cells)
+          cell_fe_views.push_back(MakeCellPWLView(cell));
 
-    mapping_initialized = true;
+        mapping_initialized = true;
+      }
+    }
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -79,10 +98,12 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
                                 << " Computing unit integrals.";
       if (not integral_data_initialized)
       {
-        fe_unit_integrals.reserve(cell_fe_views.size());
-        for (auto& cell_fe_view : cell_fe_views)
+        fe_unit_integrals.reserve(num_local_cells);
+        for (size_t lc=0; lc<num_local_cells; ++lc)
         {
           UIData ui_data;
+
+          auto cell_fe_view = GetCellPWLView(lc);
           cell_fe_view->ComputeUnitIntegrals(ui_data);
 
           fe_unit_integrals.push_back(std::move(ui_data));
@@ -103,14 +124,16 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
                                   << " Computing quadrature data.";
       if (not qp_data_initialized)
       {
-        fe_vol_qp_data.reserve(cell_fe_views.size());
-        fe_srf_qp_data.reserve(cell_fe_views.size());
-        for (auto& cell_fe_view : cell_fe_views)
+        fe_vol_qp_data.reserve(num_local_cells);
+        fe_srf_qp_data.reserve(num_local_cells);
+        for (size_t lc=0; lc<num_local_cells; ++lc)
         {
           fe_vol_qp_data.emplace_back();
           fe_srf_qp_data.emplace_back();
-          cell_fe_view->InitializeQuadraturePointData(fe_vol_qp_data.back(),
-                                                      fe_srf_qp_data.back());
+
+          auto cell_fe_view = GetCellPWLView(lc);
+          cell_fe_view->InitializeAllQuadraturePointData(fe_vol_qp_data.back(),
+                                                         fe_srf_qp_data.back());
         }
 
         qp_data_initialized = true;
@@ -125,18 +148,28 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-CellPWLFEValues& SpatialDiscretization_PWLC::GetCellFEView(int cell_local_index)
+std::shared_ptr<CellPWLFEValues>
+  SpatialDiscretization_PWLC::GetCellPWLView(int cell_local_index)
 {
-  CellPWLFEValues* value;
-  try { value = cell_fe_views.at(cell_local_index); }
-  catch (const std::out_of_range& o)
+
+  if (mapping_initialized)
   {
-    chi_log.Log(LOG_ALLERROR)
-      << "SpatialDiscretization_PWL::MapFeView "
-         "Failure to map Finite Element View. The view is either not"
-         "available or the supplied local index is invalid.";
-    exit(EXIT_FAILURE);
+    try
+    {
+      return cell_fe_views.at(cell_local_index);
+    }
+    catch (const std::out_of_range& o)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "SpatialDiscretization_PWLC::MapFeView "
+           "Failure to map Finite Element View. The view is either not"
+           "available or the supplied local index is invalid.";
+      exit(EXIT_FAILURE);
+    }
+  }
+  else
+  {
+    return MakeCellPWLView(ref_grid->local_cells[cell_local_index]);
   }
 
-  return *value;
 }

@@ -33,18 +33,20 @@ public:
   }
 
   virtual void
-  InitializeQuadraturePointData(
+  InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) {}
 
   virtual void
-  InitializeQuadraturePointData(
+  InitializeVolumeQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data) {}
 
   virtual void
-  InitializeQuadraturePointData(unsigned int face,
+  InitializeFaceQuadraturePointData(
+    unsigned int face,
     chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) {}
 
+public:
   /** Virtual function evaluation of the shape function. */
   virtual double ShapeValue(const int i, const chi_mesh::Vector3& xyz)
   {
