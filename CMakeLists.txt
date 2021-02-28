@@ -36,11 +36,11 @@ project(${TARGET} C CXX)
 
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/ChiTech")
-set(CHI_TECH_MOD "Modules")
+set(CHI_TECH_MOD "ChiModules")
 
 #================================================ Set cmake variables
 find_package(MPI)
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CHI_RESOURCES/Macros")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/ChiResources/Macros")
 
 if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
@@ -109,7 +109,7 @@ else ()
   # vtk_module_autoinit is needed
   vtk_module_autoinit(
 		TARGETS ${TARGET}
-    MODULES ${VTK_LIBRARIES}
+          ChiModules ${VTK_LIBRARIES}
     )
 endif()
 
@@ -119,7 +119,7 @@ set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 include_directories("${CHI_TECH_DIR}/ChiLua")
 include_directories("${CHI_TECH_DIR}/ChiMPI")
 include_directories("${CHI_TECH_DIR}/ChiLog")
-include_directories("${PROJECT_SOURCE_DIR}/Modules")
+include_directories("${PROJECT_SOURCE_DIR}/ChiModules")
 
 #================================================ Define source directories
 set(SOURCES "${CHI_TECH_DIR}/chi_runtime.cc" "${CHI_TECH_DIR}/LuaTest/lua_test.cc")

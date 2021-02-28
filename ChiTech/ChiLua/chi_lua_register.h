@@ -218,7 +218,7 @@ RegisterConstant(EXISTING,               23);
 RegisterConstant(CHI_XSFILE,             24);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#include "../../Modules/module_lua_register.h"
+#include "../../ChiModules/module_lua_register.h"
 
 #endif
 //module:Test scripts

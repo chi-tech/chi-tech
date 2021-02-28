@@ -1,0 +1,1 @@
+digraph abc {rankdir=LR; a->b->c;}

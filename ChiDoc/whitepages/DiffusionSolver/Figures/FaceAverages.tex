@@ -1,0 +1,40 @@
+% \usepackage[usenames,dvipsnames]{pstricks}
+% \usepackage{epsfig}
+% \usepackage{pst-grad} % For gradients
+% \usepackage{pst-plot} % For axes
+% \usepackage[space]{grffile} % For spaces in paths
+% \usepackage{etoolbox} % For spaces in paths
+% \makeatletter % For spaces in paths
+% \patchcmd\Gread@eps{\@inputcheck#1 }{\@inputcheck"#1"\relax}{}{}
+% \makeatother
+% % User Packages:
+% 
+% 
+
+\psscalebox{1.0 1.0} % Change this value to rescale the drawing.
+{
+\begin{pspicture}(0,-3.6234586)(10.413652,3.6234586)
+\pspolygon[linecolor=black, linewidth=0.04](0.023652343,1.5991557)(2.8236523,3.5991557)(5.2236524,1.9991556)(3.6236525,-0.8008444)(0.8236523,-0.8008444)
+\psdots[linecolor=black, dotsize=0.2](2.4236524,1.1991556)
+\pspolygon[linecolor=black, linewidth=0.04](5.2236524,1.9991556)(7.6236525,1.9991556)(8.423653,-0.8008444)(6.8236523,-3.2008443)(4.0236526,-3.6008444)(3.6236525,-0.8008444)
+\psdots[linecolor=black, dotsize=0.2](6.0236526,-0.8008444)
+\rput[bl](0.8236523,-1.2008444){Current cell}
+\rput[bl](8.423653,-2.0008445){Adjacent cell}
+\psline[linecolor=black, linewidth=0.04, arrowsize=0.05291667cm 2.0,arrowlength=2.4,arrowinset=0.0]{->}(2.4236524,1.1991556)(6.0236526,-0.8008444)
+\psdots[linecolor=black, dotsize=0.2](4.363652,0.47915563)
+\psline[linecolor=black, linewidth=0.04, linestyle=dashed, dash=0.17638889cm 0.10583334cm, arrowsize=0.05291667cm 2.0,arrowlength=2.4,arrowinset=0.0]{->}(4.423652,0.45915562)(5.7836523,-0.30084437)
+\rput[bl](5.6836524,-0.16084439){$\mathbf{A}_f$}
+\rput[bl](4.943652,-0.6408444){$\mathbf{s}_\Delta$}
+\rput[bl](2.7436523,1.4391556){$\mathbf{u}^-$}
+\rput[bl](6.3236523,-0.7808444){$\mathbf{u}^+$}
+\rput[bl](2.7236524,1.0791556){$p^-$}
+\rput[bl](6.363652,-1.1608443){$p^+$}
+\psdots[linecolor=black, dotsize=0.2](4.2036524,0.19915561)
+\rput[bl](3.3436522,0.059155617){$\mathbf{u}_{avg}$}
+\rput[bl](3.3236523,-0.24084438){$p_{avg}$}
+\rput[bl](4.5636525,0.41915563){$\mathbf{v}_{fc}$}
+\rput[bl](1.9036523,0.7791556){$\mathbf{v}_{cc}^-$}
+\rput[bl](5.5236526,-1.2608443){$\mathbf{v}_{cc}^+$}
+\end{pspicture}
+}
+

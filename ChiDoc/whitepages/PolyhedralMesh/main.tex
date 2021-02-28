@@ -1,0 +1,160 @@
+\documentclass[11pt,letterpaper,titlepage]{article}
+\usepackage{fancyhdr}
+\usepackage[left=0.75in, right=0.75in, bottom=1.0in]{geometry}
+\usepackage{lastpage}
+\usepackage{titleref}
+\usepackage{booktabs}
+\usepackage{appendix}
+\appendixtitleon
+\appendixtitletocon
+
+\makeatletter
+
+%================== List of figures and tables mods
+\usepackage{tocloft}
+\usepackage[labelfont=bf]{caption}
+
+\renewcommand{\cftfigpresnum}{Figure\ }
+\renewcommand{\cfttabpresnum}{Table\ }
+
+\newlength{\mylenf}
+\settowidth{\mylenf}{\cftfigpresnum}
+\setlength{\cftfignumwidth}{\dimexpr\mylenf+1.5em}
+\setlength{\cfttabnumwidth}{\dimexpr\mylenf+1.5em}
+
+
+
+%=================== Graphics
+\usepackage{graphicx}
+\usepackage[breakwords]{truncate}
+\usepackage{float}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{mdframed}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usepackage{cancel}
+\usepackage{amssymb}
+\graphicspath{ {images/} }
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[defaultlines=2,all]{nowidow}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{Brown}{cmyk}{0,0.81,1,0.60}
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\usepackage{pdflscape}
+\usepackage{relsize}
+\usepackage{verbatim}
+
+
+%=================== Settings
+\renewcommand{\baselinestretch}{1.2}
+\definecolor{gray}{rgb}{0.4 0.4 0.4}
+\newcommand{\stimes}{{\times}}
+
+\begin{document}
+\newcommand{\NSCDOCNUMBR}{NSC-REP-15-X}         %Put document number here
+\newcommand{\NSCDOCSUBJT}{TECHNICAL REPORT: }   %Put document subject here
+\newcommand{\NSCDOCTITLE}{Polyhedral Meshes implemented in $JIC^{Lib2}$}       %Put document title here
+\newcommand{\NSCDOCDATE} {March, 2016}    %Put document date here
+\newcommand{\NSCDOCREV}  {Rev 1} %Put revision number here
+
+\lstset{language=C++,frame=ltrb,framesep=4pt,basicstyle=\linespread{0.8} \small,
+	keywordstyle=\ttfamily\color{OliveGreen},
+	identifierstyle=\ttfamily\color{CadetBlue}\bfseries,
+	commentstyle=\color{Brown},
+	stringstyle=\ttfamily,
+	showstringspaces=ture }
+
+
+%################################# TITLE PAGE ########################
+\begin{titlepage}
+	\pagestyle{fancy}
+	\vspace*{1.0cm}
+	\centering
+	%\includegraphics{NSC_Logo} \par
+	\vspace{1cm}
+	%\centering
+	%{\Large\bfseries  \NSCDOCNUMBR   \par}
+	\vspace{.25cm}
+	%\centering
+	{\Large\bfseries  \NSCDOCSUBJT \par} 
+	{\Large\bfseries \NSCDOCTITLE  \par}
+	\vspace{1cm}
+	\begin{center}
+		\begin{minipage}[c]{0.6\textwidth}
+	
+			\begin{figure}[H]
+			
+				\includegraphics[width=4.0in]{OctahedronDotted.png}
+				%\caption{Simple control volume for a structured mesh.}
+				\label{figure:TitlePageFigure}
+			\end{figure}
+		\end{minipage}
+	\end{center}
+	{\Large \NSCDOCDATE \par}
+	\vspace{1.0cm}
+	{\Large Jan Vermaak \par}
+	{\Large \NSCDOCREV \par}
+		
+	\begin{comment}
+	\renewcommand{\arraystretch}{2.0}
+	\begin{tabular}{| m{2.5cm} | m{4.5cm} | m{4.5cm} |}
+		\cline{2-3}
+		\multicolumn{1}{c|}{} & \bfseries{Name} & \bfseries{Signature \& Date} \\ \hline
+		\bfseries{Prepared} &     &     \\ \hline
+		\bfseries{Reviewed} &     &     \\ \hline
+		\bfseries{Reviewed} &     &     \\ \hline
+	    \bfseries{Approved} &     &     \\ \hline
+	\end{tabular} \par
+	\end{comment}
+	\vspace{2cm}
+	%NSC-FRM-15-1 Rev.1
+\end{titlepage}
+
+
+\pagestyle{fancy}
+\rfoot{Page \thepage \ of \pageref{LastPage}}
+%\cfoot{NSC-FRM-15-1 Rev.1}
+\cfoot{}
+\lfoot{\truncate{14cm}{\NSCDOCTITLE}}
+\rhead{}
+\chead{\currentname}
+\lhead{}
+\renewcommand{\footrulewidth}{0.4pt}
+\tableofcontents
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+
+\listoffigures
+\listoftables
+\chead{Contents}
+
+
+\newpage
+\chead{1 Importing surface meshes}
+\section{Importing surface meshes}
+$JIC^{LIB2}$ imports surface meshes in the following formats:
+\begin{itemize}
+\item Wavefront .obj file
+\item Surface pneumonics
+\end{itemize}
+
+
+
+\subsection{Wavefront object files}
+Wavefront object files have a simple format. They provide vertex and face information, with vertices shared between multiple faces. This type of surface is not yet suitable for a volume mesh generation because it would be too difficult for the internal mesher to define the surfaces with volumetric item_id at locations where the surface mesh size is not comparable to the volume mesh thats mapping to it.
+
+\begin{center}
+	\begin{minipage}[c]{0.8\textwidth}
+	
+		\begin{figure}[H]
+	
+			\includegraphics[width=6.0in]{SurfaceMesh.png}
+			\caption{Raw surface mesh for a pump.}
+			\label{figure:SurfaceMesh}
+		\end{figure}
+	\end{minipage}
+\end{center}
+
+\end{document}

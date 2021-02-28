@@ -1,0 +1,116 @@
+<?xml version="1.1" encoding="windows-1252"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+    xmlns:latexdraw="http://latexdraw.sourceforge.net/namespaces/latexdraw"
+    version="1.1" baseProfile="full">
+    <g>
+        <g latexdraw:type="rectangle" id="id491665840">
+            <rect x="221.0" y="241.0" width="198.0" height="118.0"
+                latexdraw:borderPos="outer" stroke-width="2.0"
+                stroke="black" fill="none"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id2068210993">
+            <rect x="501.0" y="161.0" width="178.0" height="118.0"
+                latexdraw:borderPos="outer" stroke-width="2.0"
+                stroke="black" fill="none"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1249903665">
+            <polyline
+                points="420.0,300.0 460.0,300.0 460.0,220.0 500.0,220.0 "
+                stroke-width="2.0" stroke="black" fill="none" latexdraw:rotationAngle="0.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id473663182">
+            <polyline
+                points="220.0,300.0 160.0,300.0 140.0,300.0 140.0,300.0 "
+                stroke-width="2.0" stroke="black" fill="none" latexdraw:rotationAngle="0.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1907961704">
+            <polyline
+                points="220.0,280.0 160.0,280.0 160.0,220.0 120.0,220.0 "
+                stroke-width="2.0" stroke="black" fill="none" latexdraw:rotationAngle="0.0"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id269942426">
+            <polyline
+                points="220.0,340.0 160.0,340.0 160.0,400.0 120.0,400.0 120.0,400.0 "
+                stroke-width="2.0" stroke="black" fill="none" latexdraw:rotationAngle="0.0"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id1931428918">
+            <rect x="521.0" y="301.0" width="178.0" height="118.0"
+                latexdraw:borderPos="outer" stroke-width="2.0"
+                stroke="black" fill="none"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id2029360572">
+            <polyline
+                points="420.0,320.0 460.0,320.0 460.0,360.0 520.0,360.0 "
+                stroke-width="2.0" stroke="black" fill="none" latexdraw:rotationAngle="0.0"/>
+        </g>
+        <g latexdraw:type="rectangle" id="id382375447">
+            <rect x="521.0" y="21.0" width="178.0" height="118.0"
+                latexdraw:borderPos="outer" stroke-width="2.0"
+                stroke="black" fill="none"/>
+        </g>
+        <g latexdraw:type="joinedLines" id="id1415072098">
+            <polyline
+                points="420.0,280.0 440.0,280.0 440.0,80.0 520.0,80.0 "
+                stroke-width="2.0" stroke="black" fill="none" latexdraw:rotationAngle="0.0"/>
+        </g>
+        <g latexdraw:type="text" id="id1562443908" fill="black" latexdraw:position="bl">
+            <text x="294.0" y="305.0">CV 001
+</text>
+        </g>
+        <g latexdraw:type="text" id="id404429081" fill="black" latexdraw:position="bl">
+            <text x="578.0" y="84.0">CV 002</text>
+        </g>
+        <g latexdraw:type="text" id="id1579630581" fill="black" latexdraw:position="bl">
+            <text x="557.0" y="226.0">CV 003</text>
+        </g>
+        <g latexdraw:type="text" id="id718353487" fill="black" latexdraw:position="bl">
+            <text x="585.0" y="366.0">CV 004</text>
+        </g>
+        <g latexdraw:type="text" id="id263216950" fill="black" latexdraw:position="bl">
+            <text x="136.0" y="215.0">CJ 001
+</text>
+        </g>
+        <g latexdraw:type="text" id="id628352047" fill="black" latexdraw:position="bl">
+            <text x="96.0" y="295.0">CJ 002
+</text>
+        </g>
+        <g latexdraw:type="text" id="id1550921148" fill="black" latexdraw:position="bl">
+            <text x="85.0" y="393.0">CJ 003
+</text>
+        </g>
+        <g latexdraw:type="text" id="id251210070" fill="black" latexdraw:position="bl">
+            <text x="407.0" y="75.0">CJ 004
+</text>
+        </g>
+        <g latexdraw:type="text" id="id519138802" fill="black" latexdraw:position="bl">
+            <text x="444.0" y="215.0">CJ 005
+</text>
+        </g>
+        <g latexdraw:type="text" id="id1177295715" fill="black" latexdraw:position="bl">
+            <text x="466.0" y="351.0">CJ 006
+</text>
+        </g>
+    </g>
+    <defs/>
+    <metadata>
+        <latexdraw:metadata>
+            <latexdraw:latexIncludes/>
+            <latexdraw:displayXScale>true</latexdraw:displayXScale>
+            <latexdraw:displayYScale>true</latexdraw:displayYScale>
+            <latexdraw:unit>CM</latexdraw:unit>
+            <latexdraw:zoom>1.0</latexdraw:zoom>
+            <latexdraw:magneticGridStyle>CUSTOMISED</latexdraw:magneticGridStyle>
+            <latexdraw:gridGap>20</latexdraw:gridGap>
+            <latexdraw:magneticGrid>false</latexdraw:magneticGrid>
+            <latexdraw:version>3.3.2</latexdraw:version>
+            <latexdraw:size>
+                <latexdraw:width>1936</latexdraw:width>
+                <latexdraw:height>1056</latexdraw:height>
+            </latexdraw:size>
+            <latexdraw:position>
+                <latexdraw:x>-8.0</latexdraw:x>
+                <latexdraw:y>-8.0</latexdraw:y>
+            </latexdraw:position>
+        </latexdraw:metadata>
+    </metadata>
+</svg>

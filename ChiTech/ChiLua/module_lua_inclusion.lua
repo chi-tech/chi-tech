@@ -30,7 +30,7 @@ Add_Folder("../ChiPhysics/lua")
 
 
 -- ==================================== Include modules
-MODULE_FOLDER = "../../Modules"
+MODULE_FOLDER = "../../ChiModules"
 
 dofile(MODULE_FOLDER.."/module_lua_inclusion.lua")
 
