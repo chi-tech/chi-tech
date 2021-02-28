@@ -35,6 +35,8 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
+  nu_p_sigma_fg.resize(in_G,0.0);
+  nu_d_sigma_fg.resize(in_G,0.0);
   ddt_coeff.resize(in_G,0.0);
 
   transfer_matrix.emplace_back(in_G,in_G);
@@ -60,6 +62,8 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
+  nu_p_sigma_fg.resize(in_G,0.0);
+  nu_d_sigma_fg.resize(in_G,0.0);
   ddt_coeff.resize(in_G,0.0);
 
   transfer_matrix.emplace_back(in_G,in_G);
@@ -125,8 +129,10 @@ void chi_physics::TransportCrossSections::
 
     // Increment combo factor totals
     N_total += combo.second;
-    if (xs->is_fissile) 
+    if (xs->is_fissile) {
+      this->is_fissile = true;
       Nf_total += combo.second;
+    }
 
     //============================ Check number of groups
     if (cross_secs.size() == 1)
@@ -172,6 +178,8 @@ void chi_physics::TransportCrossSections::
   sigma_captg.clear();
   chi_g.clear();
   nu_sigma_fg.clear();
+  nu_p_sigma_fg.clear();
+  nu_d_sigma_fg.clear();
   ddt_coeff.clear();
   lambda.clear();
   gamma.clear();
@@ -182,12 +190,14 @@ void chi_physics::TransportCrossSections::
   sigma_captg.resize(num_grps_G,0.0);
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
+  nu_p_sigma_fg.resize(num_grps_G,0.0);
+  nu_d_sigma_fg.resize(num_grps_G,0.0);
   ddt_coeff.resize(num_grps_G,0.0);
   lambda.resize(num_precursors_J,0.0);
   gamma.resize(num_precursors_J,0.0);
-  chi_d.resize(G);
+  chi_d.resize(num_grps_G);
   for (int g=0; g<G; ++g)
-    chi_d[g].resize(J,0.0);
+    chi_d[g].resize(num_precursors_J,0.0);
 
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
@@ -197,18 +207,20 @@ void chi_physics::TransportCrossSections::
     double f_i = N_i/N_total;
     double ff_i = N_i/Nf_total;
 
-    for (int g=0; g<G; g++)
+    for (int g=0; g<num_grps_G; g++)
     {
-      sigma_tg   [g] += cross_secs[x]->sigma_tg   [g] * N_i;
-      sigma_fg   [g] += cross_secs[x]->sigma_fg   [g] * N_i;
-      sigma_captg[g] += cross_secs[x]->sigma_captg[g] * N_i;
-      chi_g      [g] += cross_secs[x]->chi_g      [g] * ff_i;
-      nu_sigma_fg[g] += cross_secs[x]->nu_sigma_fg[g] * N_i;
-      ddt_coeff  [g] += cross_secs[x]->ddt_coeff  [g] * f_i;
+      sigma_tg     [g] += cross_secs[x]->sigma_tg     [g] * N_i;
+      sigma_fg     [g] += cross_secs[x]->sigma_fg     [g] * N_i;
+      sigma_captg  [g] += cross_secs[x]->sigma_captg  [g] * N_i;
+      chi_g        [g] += cross_secs[x]->chi_g        [g] * ff_i;
+      nu_sigma_fg  [g] += cross_secs[x]->nu_sigma_fg  [g] * N_i;
+      nu_p_sigma_fg[g] += cross_secs[x]->nu_p_sigma_fg[g] * N_i;
+      nu_d_sigma_fg[g] += cross_secs[x]->nu_d_sigma_fg[g] * N_i;
+      ddt_coeff    [g] += cross_secs[x]->ddt_coeff    [g] * f_i;
     }
     if ((cross_secs[x]->is_fissile) and (cross_secs[x]->J > 0))
     {
-      for (int j=0; j<J; ++j)
+      for (int j=0; j<num_precursors_J; ++j)
       {
         lambda[j] += cross_secs[x]->lambda[j] * ff_i;
         gamma [j] += cross_secs[x]->gamma [j] * ff_i;

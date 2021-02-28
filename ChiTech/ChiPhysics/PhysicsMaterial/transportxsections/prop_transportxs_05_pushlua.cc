@@ -80,6 +80,30 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   }
   lua_settable(L,-3);
 
+  lua_pushstring(L,"nu_p_sigma_fg");
+  lua_newtable(L);
+  g=0;
+  for (auto val : nu_p_sigma_fg)
+  {
+    ++g;
+    lua_pushnumber(L,g);
+    lua_pushnumber(L,val);
+    lua_settable(L,-3);
+  }
+  lua_settable(L,-3);
+
+  lua_pushstring(L,"nu_d_sigma_fg");
+  lua_newtable(L);
+  g=0;
+  for (auto val : nu_d_sigma_fg)
+  {
+    ++g;
+    lua_pushnumber(L,g);
+    lua_pushnumber(L,val);
+    lua_settable(L,-3);
+  }
+  lua_settable(L,-3);
+
   lua_pushstring(L,"diffg");
   lua_newtable(L);
   g=0;
