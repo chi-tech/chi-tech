@@ -277,6 +277,7 @@ void chi_physics::TransportCrossSections::
       {
         sigma_tg.resize(G,0.0);
         sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
+        nu_p_sigma_fg = nu_d_sigma_fg = nu_sigma_fg;
         transfer_matrix.resize(M,chi_math::SparseMatrix(G,G));
       }
     }
@@ -304,6 +305,8 @@ void chi_physics::TransportCrossSections::
       if (fw == "SIGMA_T_BEGIN")             Read1DXS ("SIGMA_T",sigma_tg,f,G,ln,ls);
       if (fw == "SIGMA_F_BEGIN")             Read1DXS("SIGMA_F",sigma_fg,f,G,ln,ls);
       if (fw == "NU_BEGIN")                  Read1DXS("NU",nu_sigma_fg,f,G,ln,ls);
+      if (fw == "NU_PROMPT_BEGIN")           Read1DXS("NU_PROMPT",nu_p_sigma_fg,f,G,ln,ls);
+      if (fw == "NU_DELAYED_BEGIN")          Read1DXS("NU_DELAYED",nu_d_sigma_fg,f,G,ln,ls);
       if (fw == "CHI_PROMPT_BEGIN")          Read1DXS("CHI_PROMPT",chi_g,f,G,ln,ls);
       if (fw == "DDT_COEFF_BEGIN")           Read1DXS("DDT_COEFF",ddt_coeff,f,G,ln,ls);
 
@@ -348,6 +351,8 @@ void chi_physics::TransportCrossSections::
   //changes nu_sigma_fg from nu to nu * sigma_fg
   for (int i = 0; i<G;++i){
     nu_sigma_fg[i] = nu_sigma_fg[i]*sigma_fg[i];
+    nu_p_sigma_fg[i] = nu_p_sigma_fg[i]*sigma_fg[i];
+    nu_d_sigma_fg[i] = nu_d_sigma_fg[i]*sigma_fg[i];
   }
 
   file.close();

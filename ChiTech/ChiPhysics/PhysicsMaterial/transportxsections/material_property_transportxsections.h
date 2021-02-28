@@ -29,6 +29,8 @@ public:
   std::vector<double> sigma_captg;        ///< Capture cross-section
   std::vector<double> chi_g;              ///< Fission spectrum
   std::vector<double> nu_sigma_fg;        ///< Nubar-Sigmaf cross-section
+  std::vector<double> nu_p_sigma_fg;      ///< Prompt-Nubar-Sigmaf cross-section
+  std::vector<double> nu_d_sigma_fg;      ///< Delayed-Nubar-Sigmaf cross-section
   std::vector<double> ddt_coeff;          ///< Time derivative coefficient
   std::vector<std::vector<double>> chi_d; ///< Delayed neutron fission spectrum
   std::vector<double> lambda;             ///< Delayed neutron decay constants
@@ -69,6 +71,7 @@ private:
 
     sigma_tg.clear();
     sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
+    nu_p_sigma_fg = nu_d_sigma_fg = nu_sigma_fg;
     transfer_matrix.clear();
     lambda.clear();
     gamma.clear();
