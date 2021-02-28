@@ -35,7 +35,7 @@ SET(TARGET ChiTech)
 project(${TARGET} C CXX)
 
 #================================================ Set variables
-set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/CHI_TECH")
+set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/ChiTech")
 set(CHI_TECH_MOD "Modules")
 
 #================================================ Set cmake variables
@@ -81,7 +81,7 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 include_directories("${LUA_ROOT}/include")
 include_directories("${PETSC_ROOT}/include")
 include_directories("${PROJECT_SOURCE_DIR}/")
-include_directories("${PROJECT_SOURCE_DIR}/CHI_TECH")
+include_directories("${PROJECT_SOURCE_DIR}/ChiTech")
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 

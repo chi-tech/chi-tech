@@ -4,9 +4,9 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
 #include "GroupSet/lbs_groupset.h"
-#include <CHI_TECH/ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h>
-#include <ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h>
-#include"ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
