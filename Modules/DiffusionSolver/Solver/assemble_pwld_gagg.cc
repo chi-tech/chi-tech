@@ -96,8 +96,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i = fe_intgrl_values.face_dof_mappings[f][fi];
-          D_avg += D[i]*fe_intgrl_values.IntS_shapeI[i][f];
-          intS += fe_intgrl_values.IntS_shapeI[i][f];
+          D_avg += D[i]*fe_intgrl_values.IntS_shapeI[f][i];
+          intS += fe_intgrl_values.IntS_shapeI[f][i];
         }
         D_avg /= intS;
 
@@ -108,8 +108,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
         {
           int i    = fe_intgrl_values.face_dof_mappings[f][fi];
           int imap = MapCellLocalNodeIDFromGlobalID(adj_cell, cell.vertex_ids[i]);
-          adj_D_avg += adj_D[imap]*adj_fe_intgrl_values.IntS_shapeI[imap][fmap];
-          adj_intS += adj_fe_intgrl_values.IntS_shapeI[imap][fmap];
+          adj_D_avg += adj_D[imap]*adj_fe_intgrl_values.IntS_shapeI[fmap][imap];
+          adj_intS += adj_fe_intgrl_values.IntS_shapeI[fmap][imap];
         }
         adj_D_avg /= adj_intS;
 
@@ -208,8 +208,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
           for (int fi=0; fi<num_face_dofs; fi++)
           {
             int i = fe_intgrl_values.face_dof_mappings[f][fi];
-            D_avg += D[i]*fe_intgrl_values.IntS_shapeI[i][f];
-            intS += fe_intgrl_values.IntS_shapeI[i][f];
+            D_avg += D[i]*fe_intgrl_values.IntS_shapeI[f][i];
+            intS += fe_intgrl_values.IntS_shapeI[f][i];
           }
           D_avg /= intS;
 
@@ -280,7 +280,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
               MatSetValue(A,ir ,jr, aij,ADD_VALUES);
             }//for fj
 
-            double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[i][f];
+            double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[f][i];
             aii /= robin_bndry->b;
 
             MatSetValue(A,ir ,ir, aii,ADD_VALUES);

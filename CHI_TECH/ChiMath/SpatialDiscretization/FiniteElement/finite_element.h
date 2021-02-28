@@ -36,34 +36,50 @@ namespace finite_element
     typedef std::vector<chi_mesh::Vector3> VecVec3;
     typedef std::vector<VecVec3> MatVec3;
 
-    MatDbl   IntV_gradShapeI_gradShapeJ;
-    MatVec3  IntV_shapeI_gradshapeJ;
-    MatDbl   IntV_shapeI_shapeJ;
-    VecDbl   IntV_shapeI;
-    VecVec3  IntV_gradshapeI;
 
-    std::vector<MatDbl>  IntS_shapeI_shapeJ;
-    std::vector<VecDbl>  IntS_shapeI;
+    MatDbl   IntV_gradShapeI_gradShapeJ;
+    MatVec3  IntV_shapeI_gradshapeJ    ;
+    MatDbl   IntV_shapeI_shapeJ        ;
+    VecDbl   IntV_shapeI               ;
+    VecVec3  IntV_gradshapeI           ;
+
+    std::vector<MatDbl>  IntS_shapeI_shapeJ    ;
+    std::vector<VecDbl>  IntS_shapeI           ;
     std::vector<MatVec3> IntS_shapeI_gradshapeJ;
 
     std::vector<std::vector<int>> face_dof_mappings;
     size_t num_nodes=0;
 
-    void Reset()
-    {
-      IntV_gradShapeI_gradShapeJ.clear();
-      IntV_shapeI_gradshapeJ.clear();
-      IntV_shapeI_shapeJ.clear();
-      IntV_shapeI.clear();
-      IntV_gradshapeI.clear();
+  public:
+    void Initialize(MatDbl   in_IntV_gradShapeI_gradShapeJ,
+                    MatVec3  in_IntV_shapeI_gradshapeJ,
+                    MatDbl   in_IntV_shapeI_shapeJ,
+                    VecDbl   in_IntV_shapeI,
+                    VecVec3  in_IntV_gradshapeI,
+                    std::vector<MatDbl>  in_IntS_shapeI_shapeJ,
+                    std::vector<VecDbl>  in_IntS_shapeI,
+                    std::vector<MatVec3> in_IntS_shapeI_gradshapeJ,
+                    std::vector<std::vector<int>> in_face_dof_mappings,
+                    size_t in_num_nodes);
 
-      IntS_shapeI_shapeJ.clear();
-      IntS_shapeI.clear();
-      IntS_shapeI_gradshapeJ.clear();
+    void Reset();
 
-      face_dof_mappings.clear();
-      num_nodes=0;
-    }
+    double FIntV_gradShapeI_gradShapeJ(unsigned int i,
+                                       unsigned int j);
+    chi_mesh::Vector3 FIntV_shapeI_gradshapeJ(unsigned int i,
+                                              unsigned int j);
+    double FIntV_shapeI_shapeJ(unsigned int i,
+                               unsigned int j);
+    double FIntV_shapeI(unsigned int i);
+    chi_mesh::Vector3 FIntV_gradshapeI(unsigned int i);
+
+    double FIntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j);
+
+    double FIntS_shapeI(unsigned int face, unsigned int i);
+
+    chi_mesh::Vector3 FIntS_shapeI_gradshapeJ(unsigned int face,
+                                              unsigned int i,
+                                              unsigned int j);
   };
 
   //#############################################
@@ -94,55 +110,21 @@ namespace finite_element
                         std::vector<VecVec3>      shape_grad,
                         VecDbl                    JxW,
                         std::vector<std::vector<int>> face_dof_mappings,
-                        size_t num_nodes)
-    {
-      m_quadrature_point_indices= std::move(quadrature_point_indices);
-      m_qpoints_xyz             = std::move(qpoints_xyz             );
-      m_shape_value             = std::move(shape_value             );
-      m_shape_grad              = std::move(shape_grad              );
-      m_JxW                     = std::move(JxW                     );
-      m_face_dof_mappings       = std::move(face_dof_mappings       );
-      m_num_nodes               = num_nodes               ;
-      m_initialized = true;
-    }
-    const std::vector<unsigned int>& quadrature_point_indices() const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      return m_quadrature_point_indices;
-    }
-    chi_mesh::Vector3 qpoint_xyz(unsigned int qp) const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      return m_qpoints_xyz.at(qp);
-    }
-    double shape_value(unsigned int i, unsigned int qp) const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      auto& qp_data = m_shape_value.at(i);
-      return qp_data.at(qp);
-    }
-    chi_mesh::Vector3 shape_grad(unsigned int i, unsigned int qp) const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      auto& qp_data = m_shape_grad.at(i);
-      return qp_data.at(qp);
-    }
-    double JxW(unsigned int qp) const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      return m_JxW.at(qp);
-    }
-    int face_dof_mapping(size_t face, size_t face_node_index) const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      auto& face_data = m_face_dof_mappings.at(face);
-      return face_data.at(face_node_index);
-    }
-    size_t num_nodes() const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      return m_num_nodes;
-    }
+                        size_t num_nodes);
+    const std::vector<unsigned int>&
+      quadrature_point_indices() const;
+    chi_mesh::Vector3
+      qpoint_xyz(unsigned int qp) const;
+    double
+      shape_value(unsigned int i, unsigned int qp) const;
+    chi_mesh::Vector3
+      shape_grad(unsigned int i, unsigned int qp) const;
+    double
+      JxW(unsigned int qp) const;
+    int
+      face_dof_mapping(size_t face, size_t face_node_index) const;
+    size_t
+      num_nodes() const;
   };
 
   //#############################################
@@ -160,23 +142,8 @@ namespace finite_element
                         VecDbl                        JxW,
                         VecVec3                       normals,
                         std::vector<std::vector<int>> face_dof_mappings,
-                        size_t num_nodes)
-    {
-      m_quadrature_point_indices= std::move(quadrature_point_indices);
-      m_qpoints_xyz             = std::move(qpoints_xyz             );
-      m_shape_value             = std::move(shape_value             );
-      m_shape_grad              = std::move(shape_grad              );
-      m_JxW                     = std::move(JxW                     );
-      m_normals                 = std::move(normals                 );
-      m_face_dof_mappings       = std::move(face_dof_mappings       );
-      m_num_nodes               = num_nodes               ;
-      m_initialized = true;
-    }
-    double normal(unsigned int qp) const
-    {
-      if (not m_initialized) THROW_QP_UNINIT();
-      return m_JxW.at(qp);
-    }
+                        size_t num_nodes);
+    double normal(unsigned int qp) const;
   };
 }
 

@@ -58,6 +58,7 @@ void SlabPWLFEView::
   ui_data.IntS_shapeI.emplace_back(2, 0.0);
   ui_data.IntS_shapeI.emplace_back(2, 0.0);
 
+  //f then i
   ui_data.IntS_shapeI[0][0] = 1.0;
   ui_data.IntS_shapeI[0][1] = 0.0;
   ui_data.IntS_shapeI[1][0] = 0.0;

@@ -104,7 +104,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
             cell_matrix[i][j] += aij;
           }//for fj
 
-          double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[i][f];
+          double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[f][i];
           aii /= robin_bndry->b;
 
           cell_matrix[i][i] += aii;

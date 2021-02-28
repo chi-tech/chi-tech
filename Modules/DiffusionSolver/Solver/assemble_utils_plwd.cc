@@ -76,7 +76,7 @@ double chi_diffusion::Solver::
     double area = 0.0;
     for (int fr=0; fr<Nf; fr++)
       for (int i=0; i<Nv; i++)
-        area += fe_intgrl_values.IntS_shapeI[i][fr];
+        area += fe_intgrl_values.IntS_shapeI[fr][i];
 
     if (Nf == 4)                  //Tet
       hp = 3*volume/area;

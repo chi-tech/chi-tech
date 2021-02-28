@@ -158,6 +158,7 @@ void PolyhedronPWLFEValues::
   //============================================= Surface integrals
   std::vector<std::vector<std::vector<double>>> IntSi_shapeI_shapeJ;
   std::vector<std::vector<std::vector<chi_mesh::Vector3>>> IntSi_shapeI_gradshapeJ;
+  std::vector<std::vector<double>> IntSi_shapeI;
 
   for (int i=0; i < num_nodes; i++)
   {
@@ -234,20 +235,23 @@ void PolyhedronPWLFEValues::
     }// for f
     IntSi_shapeI_shapeJ.push_back(std::move(varphi_i_varphi_j_surf));
     IntSi_shapeI_gradshapeJ.push_back(std::move(varphi_i_gradvarphi_j_surf));
-    ui_data.IntS_shapeI.push_back(std::move(varphi_i_surf));
+    IntSi_shapeI.push_back(std::move(varphi_i_surf));
   }// for i
 
   //============================================= Reindexing surface integrals
   ui_data.IntS_shapeI_shapeJ.resize(face_data.size());
   ui_data.IntS_shapeI_gradshapeJ.resize(face_data.size());
+  ui_data.IntS_shapeI.resize(face_data.size());
   for (size_t f=0; f < face_data.size(); f++)
   {
     ui_data.IntS_shapeI_shapeJ[f].resize(num_nodes);
     ui_data.IntS_shapeI_gradshapeJ[f].resize(num_nodes);
+    ui_data.IntS_shapeI[f].resize(num_nodes);
     for (int i=0; i < num_nodes; i++)
     {
       ui_data.IntS_shapeI_shapeJ[f][i].resize(num_nodes);
       ui_data.IntS_shapeI_gradshapeJ[f][i].resize(num_nodes);
+      ui_data.IntS_shapeI[f][i] = IntSi_shapeI[i][f];
       for (int j=0; j < num_nodes; j++)
       {
         ui_data.IntS_shapeI_shapeJ[f][i][j] = IntSi_shapeI_shapeJ[i][f][j];
