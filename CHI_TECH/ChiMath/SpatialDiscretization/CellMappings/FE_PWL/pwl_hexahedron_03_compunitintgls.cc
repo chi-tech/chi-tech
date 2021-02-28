@@ -2,7 +2,7 @@
 
 //###################################################################
 /**Computes cell volume and surface integrals.*/
-void HexahedronPWLFEValues::
+void HexahedronMappingFE_PWL::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
 //  size_t num_vol_qpoints = default_volume_quadrature.qpoints.size();

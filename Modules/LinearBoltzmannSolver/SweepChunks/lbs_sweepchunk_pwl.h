@@ -5,7 +5,7 @@
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polyhedron.h"
 
 #include "ChiMesh/Cell/cell.h"
 #include "ChiPhysics/chi_physics.h"

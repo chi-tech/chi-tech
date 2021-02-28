@@ -7,7 +7,7 @@
 
 //###################################################################
 /** Base class for all cell FE views.*/
-class CellMappingFEPWL
+class CellMappingFE_PWL
 {
 protected:
   chi_mesh::MeshContinuumPtr grid;
@@ -20,8 +20,8 @@ public:
   std::vector<std::vector<int>> face_dof_mappings;
 
 public:
-  explicit CellMappingFEPWL(int num_dofs,
-                            chi_mesh::MeshContinuumPtr ref_grid) :
+  explicit CellMappingFE_PWL(int num_dofs,
+                             chi_mesh::MeshContinuumPtr ref_grid) :
     grid(std::move(ref_grid)),
     num_nodes(num_dofs)
   {}
@@ -74,7 +74,7 @@ public:
   {
     gradshape_values.resize(num_nodes, chi_mesh::Vector3());
   }
-  virtual ~CellMappingFEPWL() = default;
+  virtual ~CellMappingFE_PWL() = default;
 };
 
 

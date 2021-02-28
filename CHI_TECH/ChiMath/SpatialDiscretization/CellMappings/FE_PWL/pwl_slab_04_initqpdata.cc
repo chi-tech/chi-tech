@@ -1,6 +1,6 @@
 #include "pwl_slab.h"
 
-void SlabPWLFEView::InitializeAllQuadraturePointData(
+void SlabMappingFE_PWL::InitializeAllQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data,
   std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data)
 {
@@ -10,7 +10,7 @@ void SlabPWLFEView::InitializeAllQuadraturePointData(
   InitializeVolumeQuadraturePointData(faces_qp_data[1]);
 }
 
-void SlabPWLFEView::InitializeVolumeQuadraturePointData(
+void SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data)
 {
   auto& vol_quadrature = arbitrary_volume_quadrature;
@@ -76,8 +76,8 @@ void SlabPWLFEView::InitializeVolumeQuadraturePointData(
                                V_num_nodes);
 }
 
-void SlabPWLFEView::InitializeFaceQuadraturePointData(unsigned int face,
-                                                      chi_math::finite_element::FaceQuadraturePointData& faces_qp_data)
+void SlabMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int face,
+                                                          chi_math::finite_element::FaceQuadraturePointData& faces_qp_data)
 {
 
   //=================================== Init surface quadrature

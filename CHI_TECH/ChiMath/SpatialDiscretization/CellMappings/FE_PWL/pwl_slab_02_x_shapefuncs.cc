@@ -1,7 +1,7 @@
 #include "pwl_slab.h"
 
 /**Shape function i evaluated at given point for the slab.*/
-double SlabPWLFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
+double SlabMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 {
   chi_mesh::Vector3& p0 = *grid->vertices[v0i];
   chi_mesh::Vector3& p1 = *grid->vertices[v1i];
@@ -25,8 +25,8 @@ double SlabPWLFEView::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 //#################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void SlabPWLFEView::ShapeValues(const chi_mesh::Vector3& xyz,
-                 std::vector<double>& shape_values)
+void SlabMappingFE_PWL::ShapeValues(const chi_mesh::Vector3& xyz,
+                                    std::vector<double>& shape_values)
 {
   shape_values.resize(num_nodes, 0.0);
   chi_mesh::Vector3& p0 = *grid->vertices[v0i];
@@ -54,7 +54,7 @@ void SlabPWLFEView::ShapeValues(const chi_mesh::Vector3& xyz,
 
 //###################################################################
 /**Returns the evaluation of grad-shape function i at the supplied point.*/
-chi_mesh::Vector3 SlabPWLFEView::GradShapeValue(const int i, const chi_mesh::Vector3& xyz)
+chi_mesh::Vector3 SlabMappingFE_PWL::GradShapeValue(const int i, const chi_mesh::Vector3& xyz)
 {
   if (i==0)
     return chi_mesh::Vector3(0.0, 0.0, -1.0 / h);
@@ -65,8 +65,8 @@ chi_mesh::Vector3 SlabPWLFEView::GradShapeValue(const int i, const chi_mesh::Vec
 //###################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void SlabPWLFEView::GradShapeValues(const chi_mesh::Vector3& xyz,
-                     std::vector<chi_mesh::Vector3>& gradshape_values)
+void SlabMappingFE_PWL::GradShapeValues(const chi_mesh::Vector3& xyz,
+                                        std::vector<chi_mesh::Vector3>& gradshape_values)
 {
   gradshape_values.clear();
   gradshape_values.emplace_back(GradShapeValue(0,xyz));

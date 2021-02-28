@@ -1,6 +1,6 @@
 #include "pwl_slab.h"
 
-double SlabPWLFEView::SlabShape(int index, int qpoint_index, bool on_surface)
+double SlabMappingFE_PWL::SlabShape(int index, int qpoint_index, bool on_surface)
 {
   double xi=0.0;
   if (!on_surface)
@@ -18,7 +18,7 @@ double SlabPWLFEView::SlabShape(int index, int qpoint_index, bool on_surface)
   return value;
 }
 
-double SlabPWLFEView::SlabGradShape(int index)
+double SlabMappingFE_PWL::SlabGradShape(int index)
 {
   double value = 0.0;
 

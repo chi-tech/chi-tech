@@ -23,7 +23,7 @@
  * - node_to_side_map is indexed as [i][f]
  * - edge_dof_mappings, is indexed as [f][fi] and
  *    returns cell dof i.*/
-class PolygonPWLFEValues : public CellMappingFEPWL
+class PolygonMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
   /**For a given side(triangle), this structure holds the values of
@@ -71,12 +71,12 @@ private:
   
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonPWLFEValues(const chi_mesh::CellPolygon& poly_cell,
-                     const chi_mesh::MeshContinuumPtr& ref_grid,
-                     const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-                     const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
-                     const chi_math::QuadratureTriangle&      arb_volume_quadrature,
-                     const chi_math::QuadratureGaussLegendre& arb_surface_quadrature);
+  PolygonMappingFE_PWL(const chi_mesh::CellPolygon& poly_cell,
+                       const chi_mesh::MeshContinuumPtr& ref_grid,
+                       const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
+                       const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
+                       const chi_math::QuadratureTriangle&      arb_volume_quadrature,
+                       const chi_math::QuadratureGaussLegendre& arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;

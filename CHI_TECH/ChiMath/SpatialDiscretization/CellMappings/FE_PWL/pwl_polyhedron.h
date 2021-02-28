@@ -24,7 +24,7 @@
  *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  * */
-class PolyhedronPWLFEValues : public CellMappingFEPWL
+class PolyhedronMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
   /**For a given side(tet), this structure holds the values of
@@ -101,12 +101,12 @@ private:
 
 public:
   //00_constrdestr.cc
-  PolyhedronPWLFEValues(const chi_mesh::CellPolyhedron& polyh_cell,
-                        const chi_mesh::MeshContinuumPtr& ref_grid,
-                        const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                        const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
-                        const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
-                        const chi_math::QuadratureTriangle&    arb_surface_quadrature);
+  PolyhedronMappingFE_PWL(const chi_mesh::CellPolyhedron& polyh_cell,
+                          const chi_mesh::MeshContinuumPtr& ref_grid,
+                          const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
+                          const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+                          const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
+                          const chi_math::QuadratureTriangle&    arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;

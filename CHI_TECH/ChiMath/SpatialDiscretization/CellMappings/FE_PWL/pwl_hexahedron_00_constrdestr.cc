@@ -1,51 +1,53 @@
-#include "pwl_polyhedron.h"
+#include "pwl_hexahedron.h"
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
-//###################################################################
-/**Constructor for the Piecewise Linear Polyhedron cell finite elment
- * view.
- *
- * */
-PolyhedronPWLFEValues::
-  PolyhedronPWLFEValues(
-    const chi_mesh::CellPolyhedron& polyh_cell,
-    const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
-    const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-    const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
-    const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
-    const chi_math::QuadratureTriangle&    arb_surface_quadrature):
-  CellMappingFEPWL(polyh_cell.vertex_ids.size(), ref_grid),
+HexahedronMappingFE_PWL::
+  HexahedronMappingFE_PWL(chi_mesh::CellPolyhedron *polyh_cell,
+                          std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
+                          chi_math::QuadratureHexahedron &minumum_volume_quadrature,
+                          chi_math::QuadratureQuadrilateral &minumum_surface_quadrature,
+                          chi_math::QuadratureHexahedron &arb_volume_quadrature,
+                          chi_math::QuadratureQuadrilateral &arb_surface_quadrature) :
+  CellMappingFE_PWL(polyh_cell->vertex_ids.size(), ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   default_surface_quadrature(minumum_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),
   arbitrary_surface_quadrature(arb_surface_quadrature)
 {
+  //=========================================== Copy nodal locations
+  for (unsigned int i=0; i<8; ++i)
+  {
+    const auto& v_i = *ref_grid->vertices[polyh_cell->vertex_ids[i]];
+    x_i[0] = v_i[0];
+    y_i[1] = v_i[1];
+    z_i[2] = v_i[2];
+  }
+
   //=========================================== Assign cell centre
-  const chi_mesh::Vertex& vcc = polyh_cell.centroid;
-  alphac = 1.0/polyh_cell.vertex_ids.size();
+  chi_mesh::Vertex& vcc = polyh_cell->centroid;
+  alphac = 1.0/polyh_cell->vertex_ids.size();
 
   //=========================================== For each face
-  size_t num_faces = polyh_cell.faces.size();
-  face_data.reserve(num_faces);
-  face_betaf.reserve(num_faces);
-  for (size_t f=0; f<num_faces; f++)
+  face_data.reserve(polyh_cell->faces.size());
+  for (size_t f=0; f<polyh_cell->faces.size(); f++)
   {
-    const chi_mesh::CellFace& face = polyh_cell.faces[f];
+    chi_mesh::CellFace& face = polyh_cell->faces[f];
     FEface_data face_f_data;
 
     face_f_data.normal = face.normal;
 
     face_betaf.push_back(1.0/face.vertex_ids.size());
 
-    const chi_mesh::Vertex& vfc = face.centroid;
+    chi_mesh::Vertex& vfc = face.centroid;
 
     //==================================== Build edges
-    std::vector<std::vector<int>> edges = polyh_cell.GetFaceEdges(f);
+    std::vector<std::vector<int>> edges = polyh_cell->GetFaceEdges(f);
 
     //==================================== For each edge
     face_f_data.sides.reserve(edges.size());
-    for (auto& edge : edges)
+    for (auto edge : edges)
     {
       FEside_data3d side_data;
 
@@ -146,12 +148,12 @@ PolyhedronPWLFEValues::
         newSideMap.part_of_face = false;
         int s0 = face_data[f].sides[s].v_index[0];
         int s1 = face_data[f].sides[s].v_index[1];
-        if      (polyh_cell.vertex_ids[i] == s0)
+        if      (polyh_cell->vertex_ids[i] == s0)
         {
           newSideMap.index = 0;
           newSideMap.part_of_face = true;
         }
-        else if (polyh_cell.vertex_ids[i] == s1)
+        else if (polyh_cell->vertex_ids[i] == s1)
         {
           newSideMap.index = 2;
           newSideMap.part_of_face = true;
@@ -159,10 +161,10 @@ PolyhedronPWLFEValues::
         else
         {
           newSideMap.index = -1;
-          for (size_t v=0; v<polyh_cell.faces[f].vertex_ids.size(); v++)
+          for (size_t v=0; v<polyh_cell->faces[f].vertex_ids.size(); v++)
           {
-            if (polyh_cell.vertex_ids[i] ==
-                polyh_cell.faces[f].vertex_ids[v])
+            if (polyh_cell->vertex_ids[i] ==
+                polyh_cell->faces[f].vertex_ids[v])
             {
               newSideMap.part_of_face = true;
               break;
@@ -187,17 +189,17 @@ PolyhedronPWLFEValues::
   // This mapping is not used by any of the methods in
   // this class but is used by methods requiring the
   // surface integrals of the shape functions.
-  face_dof_mappings.reserve(num_faces);
-  for (auto& face : polyh_cell.faces)
+  for (size_t f=0; f<polyh_cell->faces.size(); f++)
   {
     std::vector<int> face_dof_mapping;
-    face_dof_mapping.reserve(face.vertex_ids.size());
-    for (uint64_t fvid : face.vertex_ids)
+
+    for (size_t fi=0; fi<polyh_cell->faces[f].vertex_ids.size(); fi++)
     {
       int mapping = -1;
-      for (size_t ci=0; ci<polyh_cell.vertex_ids.size(); ci++)
+      for (size_t ci=0; ci<polyh_cell->vertex_ids.size(); ci++)
       {
-        if (fvid == polyh_cell.vertex_ids[ci])
+        if (polyh_cell->faces[f].vertex_ids[fi] ==
+            polyh_cell->vertex_ids[ci])
         {
           mapping = ci;
           break;

@@ -7,7 +7,7 @@
 
 //###################################################################
 /**Object for handling slab shaped piecewise linear shape functions.*/
-class SlabPWLFEView : public CellMappingFEPWL
+class SlabMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
   chi_mesh::Vector3 v0;
@@ -20,10 +20,10 @@ private:
 public:
 
   /**Constructor for a slab view.*/
-  SlabPWLFEView(const chi_mesh::CellSlab& slab_cell,
-                const chi_mesh::MeshContinuumPtr& ref_grid,
-                const chi_math::QuadratureGaussLegendre& minumum_volume_quadrature,
-                const chi_math::QuadratureGaussLegendre& arb_volume_quadrature);
+  SlabMappingFE_PWL(const chi_mesh::CellSlab& slab_cell,
+                    const chi_mesh::MeshContinuumPtr& ref_grid,
+                    const chi_math::QuadratureGaussLegendre& minumum_volume_quadrature,
+                    const chi_math::QuadratureGaussLegendre& arb_volume_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;

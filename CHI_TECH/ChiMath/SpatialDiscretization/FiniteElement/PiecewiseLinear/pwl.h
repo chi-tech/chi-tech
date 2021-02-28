@@ -1,7 +1,7 @@
 #ifndef SPATIAL_DISCRETIZATION_PWLD_H
 #define SPATIAL_DISCRETIZATION_PWLD_H
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_cellbase.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -20,7 +20,7 @@
 class SpatialDiscretization_PWLD : public SpatialDiscretization_FE
 {
 public:
-  std::vector<std::shared_ptr<CellMappingFEPWL>> cell_fe_views;
+  std::vector<std::shared_ptr<CellMappingFE_PWL>> cell_mappings;
 
 private:
   bool                     mapping_initialized=false;
@@ -52,7 +52,7 @@ public:
 
 private:
   std::map<uint64_t, chi_mesh::Cell*>  neighbor_cells;
-  std::map<uint64_t, std::shared_ptr<CellMappingFEPWL>> neighbor_cell_fe_views;
+  std::map<uint64_t, std::shared_ptr<CellMappingFE_PWL>> neighbor_cell_fe_views;
 
 private:
   typedef chi_math::finite_element::UnitIntegralData UIData;
@@ -67,7 +67,6 @@ private:
   bool nb_qp_data_initialized=false;
 
 private:
-  std::shared_ptr<CellMappingFEPWL> scratch_fe_value = nullptr;
   chi_math::finite_element::UnitIntegralData            scratch_intgl_data;
   chi_math::finite_element::InternalQuadraturePointData scratch_vol_qp_data;
   chi_math::finite_element::FaceQuadraturePointData     scratch_face_qp_data;
@@ -95,15 +94,15 @@ public:
 
   //01
 private:
-  std::shared_ptr<CellMappingFEPWL> MakeCellPWLView(const chi_mesh::Cell& cell) const;
+  std::shared_ptr<CellMappingFE_PWL> MakeCellMappingFE(const chi_mesh::Cell& cell) const;
 
 public:
 
   void PreComputeCellSDValues() override;
   void PreComputeNeighborCellSDValues();
-  std::shared_ptr<CellMappingFEPWL> GetCellPWLView(int cell_local_index);
+  std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(int cell_local_index);
   chi_mesh::Cell&  GetNeighborCell(int cell_glob_index);
-  std::shared_ptr<CellMappingFEPWL> GetNeighborCellPWLView(int cell_glob_index);
+  std::shared_ptr<CellMappingFE_PWL> GetNeighborCellMappingFE(int cell_glob_index);
 
 private:
   //02
@@ -159,7 +158,7 @@ public:
         return fe_unit_integrals.at(cell.local_id);
       else
       {
-        auto cell_fe_view = GetCellPWLView(cell.local_id);
+        auto cell_fe_view = GetCellMappingFE(cell.local_id);
         scratch_intgl_data.Reset();
         cell_fe_view->ComputeUnitIntegrals(scratch_intgl_data);
         return scratch_intgl_data;
@@ -171,7 +170,7 @@ public:
         return nb_fe_unit_integrals.at(cell.global_id);
       else
       {
-        auto cell_fe_view = GetNeighborCellPWLView(cell.global_id);
+        auto cell_fe_view = GetNeighborCellMappingFE(cell.global_id);
         cell_fe_view->ComputeUnitIntegrals(scratch_intgl_data);
         return scratch_intgl_data;
       }
@@ -187,7 +186,7 @@ public:
         return fe_vol_qp_data.at(cell.local_id);
       else
       {
-        auto cell_fe_view = GetCellPWLView(cell.local_id);
+        auto cell_fe_view = GetCellMappingFE(cell.local_id);
         cell_fe_view->InitializeVolumeQuadraturePointData(scratch_vol_qp_data);
         return scratch_vol_qp_data;
       }
@@ -198,7 +197,7 @@ public:
         return nb_fe_vol_qp_data.at(cell.global_id);
       else
       {
-        auto cell_fe_view = GetNeighborCellPWLView(cell.global_id);
+        auto cell_fe_view = GetNeighborCellMappingFE(cell.global_id);
         cell_fe_view->InitializeVolumeQuadraturePointData(scratch_vol_qp_data);
         return scratch_vol_qp_data;
       }
@@ -219,7 +218,7 @@ public:
       }
       else
       {
-        auto cell_fe_view = GetCellPWLView(cell.local_id);
+        auto cell_fe_view = GetCellMappingFE(cell.local_id);
         cell_fe_view->InitializeFaceQuadraturePointData(face, scratch_face_qp_data);
         return scratch_face_qp_data;
       }
@@ -234,7 +233,7 @@ public:
       }
       else
       {
-        auto cell_fe_view = GetNeighborCellPWLView(cell.global_id);
+        auto cell_fe_view = GetNeighborCellMappingFE(cell.global_id);
         cell_fe_view->InitializeFaceQuadraturePointData(face, scratch_face_qp_data);
         return scratch_face_qp_data;
       }

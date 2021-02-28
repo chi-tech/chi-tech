@@ -2,7 +2,7 @@
 
 //###################################################################
 /**Computes cell volume and surface integrals.*/
-void PolygonPWLFEValues::
+void PolygonMappingFE_PWL::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
 {
   const bool ON_SURFACE = true;

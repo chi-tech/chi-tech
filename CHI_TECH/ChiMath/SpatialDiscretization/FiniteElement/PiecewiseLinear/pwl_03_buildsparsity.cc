@@ -26,7 +26,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   int lc=0;
   for (auto& cell : grid->local_cells)
   {
-    auto cell_fe_view = GetCellPWLView(lc);
+    auto cell_fe_view = GetCellMappingFE(lc);
     size_t num_nodes = cell_fe_view->num_nodes;
 
     //==================================== Self connection
@@ -42,7 +42,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
       if (face.has_neighbor and face.IsNeighborLocal(*grid))
       {
         auto& adj_cell = grid->cells[face.neighbor_id];
-        auto adj_cell_fe_view = GetCellPWLView(adj_cell.local_id);
+        auto adj_cell_fe_view = GetCellMappingFE(adj_cell.local_id);
 
         for (int i=0; i<num_nodes; ++i)
         {
@@ -58,14 +58,14 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   lc=0;
   for (auto& cell : grid->local_cells)
   {
-    auto cell_fe_view = GetCellPWLView(lc);
+    auto cell_fe_view = GetCellMappingFE(lc);
 
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
       if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
       {
-        auto adj_cell_fe_view = GetNeighborCellPWLView(face.neighbor_id);
+        auto adj_cell_fe_view = GetNeighborCellMappingFE(face.neighbor_id);
 
         for (int i=0; i<cell_fe_view->num_nodes; ++i)
         {

@@ -1,11 +1,11 @@
 #include "pwl_slab.h"
 
-SlabPWLFEView::
-SlabPWLFEView(const chi_mesh::CellSlab &slab_cell,
-              const chi_mesh::MeshContinuumPtr &ref_grid,
-              const chi_math::QuadratureGaussLegendre &minumum_volume_quadrature,
-              const chi_math::QuadratureGaussLegendre &arb_volume_quadrature) :
-  CellMappingFEPWL(2, ref_grid),
+SlabMappingFE_PWL::
+SlabMappingFE_PWL(const chi_mesh::CellSlab &slab_cell,
+                  const chi_mesh::MeshContinuumPtr &ref_grid,
+                  const chi_math::QuadratureGaussLegendre &minumum_volume_quadrature,
+                  const chi_math::QuadratureGaussLegendre &arb_volume_quadrature) :
+  CellMappingFE_PWL(2, ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature)
 {

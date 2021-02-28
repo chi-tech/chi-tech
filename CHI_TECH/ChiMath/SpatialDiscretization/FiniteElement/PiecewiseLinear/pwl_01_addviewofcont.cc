@@ -1,8 +1,8 @@
 #include "pwl.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_slab.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polyhedron.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -12,46 +12,46 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
-std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLD::
-  MakeCellPWLView(const chi_mesh::Cell& cell) const
+std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
+  MakeCellMappingFE(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
   {
     case chi_mesh::CellType::SLAB:
     {
       const auto& slab_cell = (const chi_mesh::CellSlab&)(cell);
-      auto cell_fe_view = new SlabPWLFEView(slab_cell,
-                                            ref_grid,
-                                            line_quad_order_second,
-                                            line_quad_order_arbitrary);
+      auto cell_fe_view = new SlabMappingFE_PWL(slab_cell,
+                                                ref_grid,
+                                                line_quad_order_second,
+                                                line_quad_order_arbitrary);
 
-      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYGON:
     {
       const auto& poly_cell = (const chi_mesh::CellPolygon&)(cell);
-      auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
-                                                 ref_grid,
-                                                 tri_quad_order_second,
-                                                 line_quad_order_second,
-                                                 tri_quad_order_arbitrary,
-                                                 line_quad_order_arbitrary);
+      auto cell_fe_view = new PolygonMappingFE_PWL(poly_cell,
+                                                   ref_grid,
+                                                   tri_quad_order_second,
+                                                   line_quad_order_second,
+                                                   tri_quad_order_arbitrary,
+                                                   line_quad_order_arbitrary);
 
-      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYHEDRON:
     {
       const auto& polyh_cell = (const chi_mesh::CellPolyhedron&)(cell);
-      auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
-                                                    ref_grid,
-                                                    tet_quad_order_second,
-                                                    tri_quad_order_second,
-                                                    tet_quad_order_arbitrary,
-                                                    tri_quad_order_arbitrary);
+      auto cell_fe_view = new PolyhedronMappingFE_PWL(polyh_cell,
+                                                      ref_grid,
+                                                      tet_quad_order_second,
+                                                      tri_quad_order_second,
+                                                      tet_quad_order_arbitrary,
+                                                      tri_quad_order_arbitrary);
 
-      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     default:
@@ -77,7 +77,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
         chi_log.Log() << chi_program_timer.GetTimeString()
                       << " Computing cell views";
         for (const auto& cell : ref_grid->local_cells)
-          cell_fe_views.push_back(MakeCellPWLView(cell));
+          cell_mappings.push_back(MakeCellMappingFE(cell));
 
         mapping_initialized = true;
       }
@@ -99,7 +99,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
         {
           UIData ui_data;
 
-          auto cell_fe_view = GetCellPWLView(lc);
+          auto cell_fe_view = GetCellMappingFE(lc);
           cell_fe_view->ComputeUnitIntegrals(ui_data);
 
           fe_unit_integrals.push_back(std::move(ui_data));
@@ -128,7 +128,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
           fe_vol_qp_data.emplace_back();
           fe_srf_qp_data.emplace_back();
 
-          auto cell_fe_view = GetCellPWLView(lc);
+          auto cell_fe_view = GetCellMappingFE(lc);
           cell_fe_view->InitializeAllQuadraturePointData(fe_vol_qp_data.back(),
                                                          fe_srf_qp_data.back());
         }
@@ -157,7 +157,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
           const auto& cell = *cell_map.second;
 
           neighbor_cell_fe_views.insert(
-            std::make_pair(cell.global_id, MakeCellPWLView(cell)));
+            std::make_pair(cell.global_id, MakeCellMappingFE(cell)));
         }//for num cells
 
         nb_mapping_initialized = true;
@@ -178,7 +178,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
         for (auto& nb_cell : neighbor_cells)
         {
           uint64_t cell_global_id = nb_cell.first;
-          auto cell_fe_view = GetNeighborCellPWLView(cell_global_id);
+          auto cell_fe_view = GetNeighborCellMappingFE(cell_global_id);
 
           UIData ui_data;
           cell_fe_view->ComputeUnitIntegrals(ui_data);
@@ -204,7 +204,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
         for (auto& nb_cell : neighbor_cells)
         {
           uint64_t cell_global_id = nb_cell.first;
-          auto cell_fe_view = GetNeighborCellPWLView(cell_global_id);
+          auto cell_fe_view = GetNeighborCellMappingFE(cell_global_id);
 
           QPDataVol qp_data_vol;
           std::vector<QPDataFace> qp_data_srf;
@@ -225,14 +225,14 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-std::shared_ptr<CellMappingFEPWL>
-  SpatialDiscretization_PWLD::GetCellPWLView(int cell_local_index)
+std::shared_ptr<CellMappingFE_PWL>
+  SpatialDiscretization_PWLD::GetCellMappingFE(int cell_local_index)
 {
   if (mapping_initialized)
   {
     try
     {
-      return cell_fe_views.at(cell_local_index);
+      return cell_mappings.at(cell_local_index);
     }
     catch (const std::out_of_range& o)
     {
@@ -245,7 +245,7 @@ std::shared_ptr<CellMappingFEPWL>
   }
   else
   {
-    return MakeCellPWLView(ref_grid->local_cells[cell_local_index]);
+    return MakeCellMappingFE(ref_grid->local_cells[cell_local_index]);
   }
 }
 
@@ -271,14 +271,14 @@ chi_mesh::Cell& SpatialDiscretization_PWLD::
 
 //###################################################################
 /**Maps a neigboring cell's fe view from a global cell index.*/
-std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLD::
-  GetNeighborCellPWLView(int cell_glob_index)
+std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
+  GetNeighborCellMappingFE(int cell_glob_index)
 {
   //=================================== First check locally
   if (ref_grid->IsCellLocal(cell_glob_index))
   {
     auto& neighbor_cell = ref_grid->cells[cell_glob_index];
-    return GetCellPWLView(neighbor_cell.local_id);
+    return GetCellMappingFE(neighbor_cell.local_id);
   }
 
   //=================================== Now check neighbor cells
@@ -294,7 +294,7 @@ std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLD::
   }
   else
   {
-    return MakeCellPWLView(GetNeighborCell(cell_glob_index));
+    return MakeCellMappingFE(GetNeighborCell(cell_glob_index));
   }
 
 }

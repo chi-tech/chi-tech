@@ -1,8 +1,8 @@
 #include "pwlc.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_slab.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polygon.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/CellViews/pwl_polyhedron.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_slab.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polygon.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polyhedron.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -12,46 +12,46 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
-std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLC::
-  MakeCellPWLView(const chi_mesh::Cell& cell) const
+std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
+  MakeCellMappingFE(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
   {
     case chi_mesh::CellType::SLAB:
     {
       const auto& slab_cell = (const chi_mesh::CellSlab&)(cell);
-      auto cell_fe_view = new SlabPWLFEView(slab_cell,
-                                            ref_grid,
-                                            line_quad_order_second,
-                                            line_quad_order_arbitrary);
+      auto cell_fe_view = new SlabMappingFE_PWL(slab_cell,
+                                                ref_grid,
+                                                line_quad_order_second,
+                                                line_quad_order_arbitrary);
 
-      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYGON:
     {
       const auto& poly_cell = (const chi_mesh::CellPolygon&)(cell);
-      auto cell_fe_view = new PolygonPWLFEValues(poly_cell,
-                                                 ref_grid,
-                                                 tri_quad_order_second,
-                                                 line_quad_order_second,
-                                                 tri_quad_order_arbitrary,
-                                                 line_quad_order_arbitrary);
+      auto cell_fe_view = new PolygonMappingFE_PWL(poly_cell,
+                                                   ref_grid,
+                                                   tri_quad_order_second,
+                                                   line_quad_order_second,
+                                                   tri_quad_order_arbitrary,
+                                                   line_quad_order_arbitrary);
 
-      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYHEDRON:
     {
       const auto& polyh_cell = (const chi_mesh::CellPolyhedron&)(cell);
-      auto cell_fe_view = new PolyhedronPWLFEValues(polyh_cell,
-                                                    ref_grid,
-                                                    tet_quad_order_second,
-                                                    tri_quad_order_second,
-                                                    tet_quad_order_arbitrary,
-                                                    tri_quad_order_arbitrary);
+      auto cell_fe_view = new PolyhedronMappingFE_PWL(polyh_cell,
+                                                      ref_grid,
+                                                      tet_quad_order_second,
+                                                      tri_quad_order_second,
+                                                      tet_quad_order_arbitrary,
+                                                      tri_quad_order_arbitrary);
 
-      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     default:
@@ -81,7 +81,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
       if (!mapping_initialized)
       {
         for (const auto& cell : ref_grid->local_cells)
-          cell_fe_views.push_back(MakeCellPWLView(cell));
+          cell_mappings.push_back(MakeCellMappingFE(cell));
 
         mapping_initialized = true;
       }
@@ -103,7 +103,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
         {
           UIData ui_data;
 
-          auto cell_fe_view = GetCellPWLView(lc);
+          auto cell_fe_view = GetCellMappingFE(lc);
           cell_fe_view->ComputeUnitIntegrals(ui_data);
 
           fe_unit_integrals.push_back(std::move(ui_data));
@@ -131,7 +131,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
           fe_vol_qp_data.emplace_back();
           fe_srf_qp_data.emplace_back();
 
-          auto cell_fe_view = GetCellPWLView(lc);
+          auto cell_fe_view = GetCellMappingFE(lc);
           cell_fe_view->InitializeAllQuadraturePointData(fe_vol_qp_data.back(),
                                                          fe_srf_qp_data.back());
         }
@@ -148,15 +148,15 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-std::shared_ptr<CellMappingFEPWL>
-  SpatialDiscretization_PWLC::GetCellPWLView(int cell_local_index)
+std::shared_ptr<CellMappingFE_PWL>
+  SpatialDiscretization_PWLC::GetCellMappingFE(int cell_local_index)
 {
 
   if (mapping_initialized)
   {
     try
     {
-      return cell_fe_views.at(cell_local_index);
+      return cell_mappings.at(cell_local_index);
     }
     catch (const std::out_of_range& o)
     {
@@ -169,7 +169,7 @@ std::shared_ptr<CellMappingFEPWL>
   }
   else
   {
-    return MakeCellPWLView(ref_grid->local_cells[cell_local_index]);
+    return MakeCellMappingFE(ref_grid->local_cells[cell_local_index]);
   }
 
 }

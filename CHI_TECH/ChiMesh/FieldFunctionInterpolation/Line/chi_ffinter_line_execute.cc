@@ -116,7 +116,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm.GetCellPWLView(cell_local_index);
+    auto cell_fe_view = spatial_dm.GetCellMappingFE(cell_local_index);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->num_nodes; i++)
@@ -163,7 +163,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
     int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm.GetCellPWLView(cell_local_index);
+    auto cell_fe_view = spatial_dm.GetCellMappingFE(cell_local_index);
 
     double weighted_value = 0.0;
     for (int i=0; i<cell_fe_view->num_nodes; i++)

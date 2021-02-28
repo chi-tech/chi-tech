@@ -30,7 +30,7 @@ void SpatialDiscretization_PWLD::OrderNodes()
   int local_dof_count=0;
   for (int lc=0; lc<num_loc_cells; lc++)
   {
-    auto cell_fe_view = GetCellPWLView(lc);
+    auto cell_fe_view = GetCellMappingFE(lc);
     cell_local_block_address[lc] = local_dof_count;
     local_dof_count += cell_fe_view->num_nodes;
   }
