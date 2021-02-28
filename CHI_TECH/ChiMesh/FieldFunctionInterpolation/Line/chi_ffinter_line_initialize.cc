@@ -46,6 +46,7 @@ Initialize()
 
   //====================================================== Initialize scratch data
   std::vector<int>               cfem_local_nodes_needed_unmapped;
+  std::vector<int>               cfem_local_cells_needed_unmapped;
   std::vector<int>               pwld_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_cells_needed_unmapped;
   std::vector<uint64_t>          interpolation_points_ass_cell;
@@ -70,6 +71,7 @@ Initialize()
       interpolation_points_has_ass_cell.assign(number_of_points,false);
 
       cfem_local_nodes_needed_unmapped.clear();
+      cfem_local_cells_needed_unmapped.clear();
       pwld_local_nodes_needed_unmapped.clear();
       pwld_local_cells_needed_unmapped.clear();
 
@@ -227,7 +229,8 @@ Initialize()
 
           for (int i=0; i<2; i++)
           {
-            cfem_local_nodes_needed_unmapped.push_back(slab_cell.vertex_ids[i]);
+            cfem_local_nodes_needed_unmapped.push_back(i);
+            cfem_local_cells_needed_unmapped.push_back(cell_local_index);
             pwld_local_nodes_needed_unmapped.push_back(i);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
@@ -242,7 +245,8 @@ Initialize()
           size_t num_verts = poly_cell.vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
           {
-            cfem_local_nodes_needed_unmapped.push_back(poly_cell.vertex_ids[i]);
+            cfem_local_nodes_needed_unmapped.push_back(i);
+            cfem_local_cells_needed_unmapped.push_back(cell_local_index);
             pwld_local_nodes_needed_unmapped.push_back(i);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
@@ -257,7 +261,8 @@ Initialize()
           size_t num_verts = polyh_cell.vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
           {
-            cfem_local_nodes_needed_unmapped.push_back(polyh_cell.vertex_ids[i]);
+            cfem_local_nodes_needed_unmapped.push_back(i);
+            cfem_local_cells_needed_unmapped.push_back(cell_local_index);
             pwld_local_nodes_needed_unmapped.push_back(i);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);
           }
@@ -270,6 +275,7 @@ Initialize()
     //Copies the latest developed references to the specific
     //field function context
     ff_context->cfem_local_nodes_needed_unmapped  = cfem_local_nodes_needed_unmapped;
+    ff_context->cfem_local_cells_needed_unmapped  = cfem_local_cells_needed_unmapped;
     ff_context->pwld_local_nodes_needed_unmapped  = pwld_local_nodes_needed_unmapped;
     ff_context->pwld_local_cells_needed_unmapped  = pwld_local_cells_needed_unmapped;
     ff_context->interpolation_points_ass_cell     = interpolation_points_ass_cell;

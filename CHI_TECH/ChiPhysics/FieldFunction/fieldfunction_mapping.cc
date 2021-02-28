@@ -7,38 +7,6 @@
 #include <chi_log.h>
 extern ChiLog& chi_log;
 
-////###################################################################
-///***/
-//std::vector<double>& chi_physics::FieldFunction::
-//  GetCellDOFValues(size_t cell_local_id, size_t component, size_t set)
-//{
-//  if (using_petsc_field_vector)
-//  {
-//    chi_log.Log(LOG_ALLERROR)
-//      << "chi_physics::FieldFunction::GetCellDOFValues "
-//      << "does not yet support petsc vectors.";
-//    exit(EXIT_FAILURE);
-//  }
-//  else
-//  {
-//    auto cell = grid->local_cells[cell_local_id];
-//    int num_dofs = cell.vertex_ids.size();
-//
-//    temp_cell_dof_values.resize(num_dofs,0.0);
-//
-//    int block_map = (*local_cell_dof_array_address)[cell_local_id];
-//
-//    for (int dof=0; dof<num_dofs; ++dof)
-//    {
-//      int ir = block_map + dof*num_components*num_sets +
-//               num_components * set + component;
-//      temp_cell_dof_values[dof] = (*field_vector_local)[ir];
-//    }
-//  }
-//
-//  return temp_cell_dof_values;
-//}
-
 //###################################################################
 /**Computes mappings of cell-local id to unknown vector index.*/
 void chi_physics::FieldFunction::
@@ -75,7 +43,7 @@ void chi_physics::FieldFunction::
 /** Creates a mapping from a global vector */
 void chi_physics::FieldFunction::
 CreateCFEMMappingLocal(Vec& x_mapped,
-                       std::vector<std::pair<uint64_t,uint>>& node_component_pairs,
+                       std::vector<std::tuple<uint64_t,uint,uint>>& cell_node_component_tuples,
                        std::vector<uint64_t>& mapping)
 {
   if (spatial_discretization->type !=
@@ -87,14 +55,20 @@ CreateCFEMMappingLocal(Vec& x_mapped,
 
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(spatial_discretization);
 
-  size_t num_nodes_to_map = node_component_pairs.size();
+  size_t num_nodes_to_map = cell_node_component_tuples.size();
   std::vector<int> mapped_nodes;
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
-    int ir = pwl_sdm->MapDOF(node_component_pairs[n].first,
+    auto&    data             = cell_node_component_tuples[n];
+    uint64_t cell_local_index = std::get<0>(data);
+    uint     node_number      = std::get<1>(data);
+    uint     component_number = std::get<2>(data);
+
+    int ir = pwl_sdm->MapDOF(grid->local_cells[cell_local_index],
+                             node_number,
                              unknown_manager,
                              ref_variable,
-                             node_component_pairs[n].second);
+                             component_number);
 
     mapped_nodes.push_back(ir);
     mapping.push_back(n);

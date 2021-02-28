@@ -29,6 +29,8 @@ public:
 
 private:
   std::vector<int>                    cfem_local_nodes_needed_unmapped;
+  std::vector<int>                    cfem_local_cells_needed_unmapped;
+
   std::vector<int>                    pwld_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_cells_needed_unmapped;
 

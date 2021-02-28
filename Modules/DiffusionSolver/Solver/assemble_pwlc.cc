@@ -42,7 +42,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   //========================================= Loop over DOFs
   for (int i=0; i<num_nodes; i++)
   {
-    dof_global_row_ind[i] = pwl_sdm->MapDOF(cell.vertex_ids[i]);
+    dof_global_row_ind[i] = pwl_sdm->MapDOF(cell,i);
 
     for (int j=0; j<num_nodes; j++)
     {
@@ -58,9 +58,9 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   }//for i
   dof_global_col_ind = dof_global_row_ind;
 
-//  //======================================== Apply Dirichlet,Vacuum, Neumann and
-//  //                                         Robin BCs
-//  // Dirichlets are just collected
+  //======================================== Apply Dirichlet,Vacuum, Neumann and
+  //                                         Robin BCs
+  // Dirichlets are just collected
   std::vector<int>    dirichlet_count(num_nodes, 0);
   std::vector<double> dirichlet_value(num_nodes, 0.0);
   for (int f=0; f<cell.faces.size(); f++)

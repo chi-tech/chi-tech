@@ -87,7 +87,7 @@ public:
 
   void
   CreateCFEMMappingLocal(Vec& x_mapped,
-                         std::vector<std::pair<uint64_t,uint>>& node_component_pairs,
+                         std::vector<std::tuple<uint64_t,uint,uint>>& cell_node_component_tuples,
                          std::vector<uint64_t>& mapping);
 
   void

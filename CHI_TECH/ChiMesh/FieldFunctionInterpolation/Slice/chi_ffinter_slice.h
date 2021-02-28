@@ -63,6 +63,7 @@ private:
   std::vector<uint64_t>               intersecting_cell_indices;
   std::vector<FFICellIntersection>    cell_intersections;
   std::vector<int>                    cfem_local_nodes_needed_unmapped;
+  std::vector<int>                    cfem_local_cells_needed_unmapped;
   std::vector<int>                    pwld_local_nodes_needed_unmapped;
   std::vector<int>                    pwld_local_cells_needed_unmapped;
 public:

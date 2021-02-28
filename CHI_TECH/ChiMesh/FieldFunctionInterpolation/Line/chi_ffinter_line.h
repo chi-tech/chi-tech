@@ -16,6 +16,7 @@ struct FieldFunctionContext
   std::shared_ptr<chi_physics::FieldFunction>    ref_ff;
   std::vector<double>            interpolation_points_values;
   std::vector<int>               cfem_local_nodes_needed_unmapped;
+  std::vector<int>               cfem_local_cells_needed_unmapped;
   std::vector<int>               pwld_local_nodes_needed_unmapped;
   std::vector<int>               pwld_local_cells_needed_unmapped;
   std::vector<uint64_t>          interpolation_points_ass_cell;
@@ -37,12 +38,6 @@ public:
 
 private:
   double                         delta_d;
-//  std::vector<double>            interpolation_points_values;
-//  std::vector<int>               cfem_local_nodes_needed_unmapped;
-//  std::vector<int>               pwld_local_nodes_needed_unmapped;
-//  std::vector<int>               pwld_local_cells_needed_unmapped;
-//  std::vector<uint64_t>          interpolation_points_ass_cell;
-//  std::vector<bool>              interpolation_points_has_ass_cell;
 
 public:
   FieldFunctionInterpolationLine()

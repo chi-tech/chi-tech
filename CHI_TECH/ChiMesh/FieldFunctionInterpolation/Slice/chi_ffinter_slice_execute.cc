@@ -11,16 +11,20 @@ void chi_mesh::FieldFunctionInterpolationSlice::Execute()
 
   if (field_sdm_type == SMDType::PIECEWISE_LINEAR_CONTINUOUS)
   {
-    std::vector<std::pair<uint64_t,uint>> node_component_pairs;
+    std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
-    for (auto node_id : cfem_local_nodes_needed_unmapped)
-      node_component_pairs.emplace_back(node_id, ref_ff.ref_component);
+    size_t num_mappings = pwld_local_cells_needed_unmapped.size();
+    for (size_t m=0; m<num_mappings; ++m)
+      cell_node_component_tuples.emplace_back(
+        cfem_local_cells_needed_unmapped[m],
+        cfem_local_nodes_needed_unmapped[m],
+        ref_ff.ref_component);
 
     Vec x_mapped;
     std::vector<uint64_t> mapping;
 
     ref_ff.CreateCFEMMappingLocal(x_mapped,
-                                  node_component_pairs,
+                                  cell_node_component_tuples,
                                   mapping);
 
     CFEMInterpolate(x_mapped,mapping);

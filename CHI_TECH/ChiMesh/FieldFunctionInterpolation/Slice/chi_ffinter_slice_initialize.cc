@@ -154,8 +154,11 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
         cell_isds.intersections[p].point2d = vref;
 
-        cfem_local_nodes_needed_unmapped.push_back(cell_isds.intersections[p].v0_g_index);
-        cfem_local_nodes_needed_unmapped.push_back(cell_isds.intersections[p].v1_g_index);
+        cfem_local_nodes_needed_unmapped.push_back(cell_isds.intersections[p].v0_dofindex_cell);
+        cfem_local_nodes_needed_unmapped.push_back(cell_isds.intersections[p].v1_dofindex_cell);
+        cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+        cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+
         pwld_local_nodes_needed_unmapped.push_back(cell_isds.intersections[p].v0_dofindex_cell);
         pwld_local_nodes_needed_unmapped.push_back(cell_isds.intersections[p].v1_dofindex_cell);
         pwld_local_cells_needed_unmapped.push_back(cell_local_index);
@@ -295,8 +298,11 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       //Subsequent points are only added if they form a
       //convex line wrt the right hand rule.
       cell_isds.intersections.push_back(unsorted_points[0]);
-      cfem_local_nodes_needed_unmapped.push_back(unsorted_points[0].v0_g_index);
-      cfem_local_nodes_needed_unmapped.push_back(unsorted_points[0].v1_g_index);
+      cfem_local_nodes_needed_unmapped.push_back(unsorted_points[0].v0_dofindex_cell);
+      cfem_local_nodes_needed_unmapped.push_back(unsorted_points[0].v1_dofindex_cell);
+      cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+      cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+
       pwld_local_nodes_needed_unmapped.push_back(unsorted_points[0].v0_dofindex_cell);
       pwld_local_nodes_needed_unmapped.push_back(unsorted_points[0].v1_dofindex_cell);
       pwld_local_cells_needed_unmapped.push_back(cell_local_index);
@@ -329,8 +335,11 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           if (!illegal_value)
           {
             cell_isds.intersections.push_back(unsorted_points[p]);
-            cfem_local_nodes_needed_unmapped.push_back(unsorted_points[p].v0_g_index);
-            cfem_local_nodes_needed_unmapped.push_back(unsorted_points[p].v1_g_index);
+            cfem_local_nodes_needed_unmapped.push_back(unsorted_points[p].v0_dofindex_cell);
+            cfem_local_nodes_needed_unmapped.push_back(unsorted_points[p].v1_dofindex_cell);
+            cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+            cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+
             pwld_local_nodes_needed_unmapped.push_back(unsorted_points[p].v0_dofindex_cell);
             pwld_local_nodes_needed_unmapped.push_back(unsorted_points[p].v1_dofindex_cell);
             pwld_local_cells_needed_unmapped.push_back(cell_local_index);

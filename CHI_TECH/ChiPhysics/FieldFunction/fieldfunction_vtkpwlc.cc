@@ -70,17 +70,20 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   phiavgarray->SetName((field_name + std::string("-Avg")).c_str());
 
   //======================================== Precreate nodes to map
-  std::vector<std::pair<uint64_t,uint>> cfem_nodes_comps_pairs;
+  std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
   for (const auto& cell : grid->local_cells)
-    for (auto vid : cell.vertex_ids)
-      cfem_nodes_comps_pairs.emplace_back(vid,0);
+  {
+    auto cell_mapping = pwl_sdm.GetCellMappingFE(cell.local_id);
+    for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
+      cell_node_component_tuples.emplace_back(cell.local_id,i,0);
+  }
 
   std::vector<uint64_t> mapping;
   Vec phi_vec;
 
   CreateCFEMMappingLocal(phi_vec,
-                         cfem_nodes_comps_pairs,
+                         cell_node_component_tuples,
                          mapping);
 
 
@@ -313,18 +316,22 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
   }
 
   //======================================== Precreate nodes to map
-  std::vector<std::pair<uint64_t,uint>> cfem_nodes_comps_pairs;
 
-  for (int g=0; g < ff_uk.num_components; g++)
+  std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
+
+  for (unsigned int g=0; g < ff_uk.num_components; g++)
     for (const auto& cell : grid->local_cells)
-      for (auto vid : cell.vertex_ids)
-        cfem_nodes_comps_pairs.emplace_back(vid,g);
+    {
+      auto cell_mapping = pwl_sdm.GetCellMappingFE(cell.local_id);
+      for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
+        cell_node_component_tuples.emplace_back(cell.local_id,i,g);
+    }
 
   std::vector<uint64_t> mapping;
   Vec phi_vec;
 
   CreateCFEMMappingLocal(phi_vec,
-                         cfem_nodes_comps_pairs,
+                         cell_node_component_tuples,
                          mapping);
 
 

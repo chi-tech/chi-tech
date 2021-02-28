@@ -2,7 +2,6 @@
 #define SPATIAL_DISCRETIZATION_PWLC_H
 
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
-#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -104,15 +103,20 @@ public:
 //  CellPWLFEValues* MapNeighborCellFeView(int cell_glob_index);
 
   //04 Mappings
-  int MapDOF(int vertex_id);
-
-
-
-  int MapDOF(int vertex_id,
-             chi_math::UnknownManager& unknown_manager,
+  int MapDOF(const chi_mesh::Cell& cell,
+             int node,
+             const chi_math::UnknownManager& unknown_manager,
              unsigned int unknown_id,
-             unsigned int component= 0);
-
+             unsigned int component= 0) const;
+  int MapDOFLocal(const chi_mesh::Cell& cell,
+                  int node,
+                  const chi_math::UnknownManager& unknown_manager,
+                  unsigned int unknown_id,
+                  unsigned int component= 0) const;
+  int MapDOF(const chi_mesh::Cell& cell, int node) const
+  { return MapDOF(cell,node,ChiMath::UNITARY_UNKNOWN_MANAGER,0,0); }
+//  int MapDOFLocal(const chi_mesh::Cell& cell, int node)
+//  { return MapDOFLocal(cell,node,ChiMath::UNITARY_UNKNOWN_MANAGER,0,0); }
   //05
   size_t GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                          chi_math::UnknownManager& unknown_manager) override;

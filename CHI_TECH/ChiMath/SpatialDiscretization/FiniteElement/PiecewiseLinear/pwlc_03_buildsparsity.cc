@@ -100,18 +100,19 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
 
   for (auto& cell : grid->local_cells)
   {
-    for (auto ivid : cell.vertex_ids)
+    auto cell_mapping = GetCellMappingFE(cell.local_id);
+    for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
     {
-      int ir = MapDOF(ivid); if (ir < 0) IR_MAP_ERROR();
+      int ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
 
       if (dof_handler.IsMapLocal(ir))
       {
         int il = dof_handler.MapIRLocal(ir);
         std::vector<int>& node_links = nodal_connections[il];
 
-        for (auto& jvid : cell.vertex_ids)
+        for (unsigned int j=0; j<cell_mapping->num_nodes; ++j)
         {
-          int jr = MapDOF(jvid); if (jr < 0) JR_MAP_ERROR();
+          int jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
 
           if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
 
@@ -140,9 +141,11 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
 
   for (auto& cell : grid->local_cells)
   {
-    for (auto ivid : cell.vertex_ids)
+    auto cell_mapping = GetCellMappingFE(cell.local_id);
+
+    for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
     {
-      int ir = MapDOF(ivid); if (ir < 0) IR_MAP_ERROR();
+      int ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
 
       if (not dof_handler.IsMapLocal(ir))
       {
@@ -160,9 +163,9 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
 
         //============================= Now add links
         auto& node_links = cur_ir_link->second;
-        for (auto& jvid : cell.vertex_ids)
+        for (unsigned int j=0; j<cell_mapping->num_nodes; ++j)
         {
-          int jr = MapDOF(jvid); if (jr < 0) JR_MAP_ERROR();
+          int jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
 
           if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
           else

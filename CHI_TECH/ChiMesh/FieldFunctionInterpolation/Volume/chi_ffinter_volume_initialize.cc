@@ -1,8 +1,6 @@
 #include "chi_ffinter_volume.h"
-#include "ChiMesh/Cell/cell.h"
 
-
-#include <chi_log.h>
+#include "chi_log.h"
 
 extern ChiLog& chi_log;
 
@@ -36,7 +34,9 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
     {
       for (int i=0; i < cell.vertex_ids.size(); i++)
       {
-        cfem_local_nodes_needed_unmapped.push_back(cell.vertex_ids[i]);
+        cfem_local_nodes_needed_unmapped.push_back(i);
+        cfem_local_cells_needed_unmapped.push_back(cell_local_index);
+
         pwld_local_nodes_needed_unmapped.push_back(i);
         pwld_local_cells_needed_unmapped.push_back(cell_local_index);
       }//for dof
