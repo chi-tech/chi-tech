@@ -35,7 +35,7 @@ class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
-  SpatialDiscretization_PWL& grid_fe_view;
+  SpatialDiscretization_PWLD& grid_fe_view;
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const std::vector<double>* q_moments;
   const LBSGroupset& groupset;
@@ -54,7 +54,7 @@ protected:
 public:
   // ################################################## Constructor
   LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                   SpatialDiscretization_PWL& discretization,
+                   SpatialDiscretization_PWLD& discretization,
                    const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
@@ -109,20 +109,20 @@ public:
       const auto& cell = grid_view->local_cells[cell_local_id];
       const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
       int num_faces = cell.faces.size();
-      int num_dofs = fe_intgrl_values.num_nodes;
+      int num_dofs = fe_intgrl_values.NumNodes();
       auto& transport_view = grid_transport_view[cell.local_id];
       auto sigma_tg = xsections[transport_view.xs_id]->sigma_tg;
       std::vector<bool> face_incident_flags(num_faces, false);
 
       // =================================================== Get Cell matrices
       const std::vector<std::vector<chi_mesh::Vector3>>& L =
-        fe_intgrl_values.IntV_shapeI_gradshapeJ;
+        fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
 
       const std::vector<std::vector<double>>& M =
-        fe_intgrl_values.IntV_shapeI_shapeJ;
+        fe_intgrl_values.GetIntV_shapeI_shapeJ();
 
       const std::vector<std::vector<std::vector<double>>>& N =
-        fe_intgrl_values.IntS_shapeI_shapeJ;
+        fe_intgrl_values.GetIntS_shapeI_shapeJ();
 
       // =================================================== Loop over angles in set
       int ni_deploc_face_counter = deploc_face_counter;
@@ -161,10 +161,10 @@ public:
               in_face_counter++;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = fe_intgrl_values.face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.FaceDofMapping(f,fi);
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  int j = fe_intgrl_values.face_dof_mappings[f][fj];
+                  int j = fe_intgrl_values.FaceDofMapping(f,fj);
                   double *psi = fluds->UpwindPsi(cr_i,in_face_counter,fj,0,n);
                   double mu_Nij = -mu*N[f][i][j];
                   Amat[i][j] += mu_Nij;
@@ -178,10 +178,10 @@ public:
               preloc_face_counter++;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = fe_intgrl_values.face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.FaceDofMapping(f,fi);
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  int j = fe_intgrl_values.face_dof_mappings[f][fj];
+                  int j = fe_intgrl_values.FaceDofMapping(f,fj);
                   double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,n);
                   double mu_Nij = -mu*N[f][i][j];
                   Amat[i][j] += mu_Nij;
@@ -201,10 +201,10 @@ public:
               int bndry_index = face.neighbor_id;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = fe_intgrl_values.face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.FaceDofMapping(f,fi);
                 for (int fj = 0; fj < num_face_indices; ++fj)
                 {
-                  int j = fe_intgrl_values.face_dof_mappings[f][fj];
+                  int j = fe_intgrl_values.FaceDofMapping(f,fj);
                   double *psi = angle_set->PsiBndry(bndry_index,
                                                     angle_num,
                                                     cell.local_id,
@@ -252,7 +252,7 @@ public:
           }
 
           // ============================= Solve system
-          chi_math::GaussElimination(Atemp, b[gsg], fe_intgrl_values.num_nodes);
+          chi_math::GaussElimination(Atemp, b[gsg], fe_intgrl_values.NumNodes());
         }
 
         // ============================= Accumulate flux
@@ -287,7 +287,7 @@ public:
           {
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              int i = fe_intgrl_values.face_dof_mappings[f][fi];
+              int i = fe_intgrl_values.FaceDofMapping(f,fi);
               double *psi = fluds->OutgoingPsi(cr_i, out_face_counter, fi, n);
               for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                 psi[gsg] = b[gsg][i];
@@ -298,7 +298,7 @@ public:
             deploc_face_counter++;
             for (int fi = 0; fi < num_face_indices; ++fi)
             {
-              int i = fe_intgrl_values.face_dof_mappings[f][fi];
+              int i = fe_intgrl_values.FaceDofMapping(f,fi);
               double *psi = fluds->NLOutgoingPsi(deploc_face_counter, fi, n);
               for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                 psi[gsg] = b[gsg][i];
@@ -311,7 +311,7 @@ public:
             {
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
-                int i = fe_intgrl_values.face_dof_mappings[f][fi];
+                int i = fe_intgrl_values.FaceDofMapping(f,fi);
                 double *psi = angle_set->ReflectingPsiOutBoundBndry(bndry_index, angle_num,
                                                                     cell.local_id, f,
                                                                     fi, gs_ss_begin);

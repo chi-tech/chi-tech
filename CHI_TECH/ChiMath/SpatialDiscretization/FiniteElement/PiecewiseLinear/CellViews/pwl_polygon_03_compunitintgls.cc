@@ -54,6 +54,20 @@ void PolygonPWLFEValues::
   auto GetGradShape_y = [this](int side, int i, int qp)
   { return sides[side].qp_data[i].gradshapey_qp[qp]; };
 
+  // ==================================================== Integrals
+  typedef std::vector<chi_mesh::Vector3> VecVec3;
+  typedef std::vector<VecVec3> MatVec3;
+
+  MatDbl   IntV_gradShapeI_gradShapeJ;
+  MatVec3  IntV_shapeI_gradshapeJ    ;
+  MatDbl   IntV_shapeI_shapeJ        ;
+  VecDbl   IntV_shapeI               ;
+  VecVec3  IntV_gradshapeI           ;
+
+  std::vector<MatDbl>  IntS_shapeI_shapeJ    ;
+  std::vector<VecDbl>  IntS_shapeI           ;
+  std::vector<MatVec3> IntS_shapeI_gradshapeJ;
+
   // ==================================================== Volume integrals
   for (int i=0; i < num_nodes; i++)
   {
@@ -120,11 +134,11 @@ void PolygonPWLFEValues::
                          DetJ(s,qp);
       }// for gp
     } // for s
-    ui_data.IntV_gradShapeI_gradShapeJ.push_back(gradijvalue_i);
-    ui_data.IntV_shapeI_gradshapeJ.push_back(varphi_i_gradj);
-    ui_data.IntV_shapeI_shapeJ.push_back(varphi_i_varphi_j);
-    ui_data.IntV_shapeI.push_back(valuei_i);
-    ui_data.IntV_gradshapeI.push_back(gradvalue_i);
+    IntV_gradShapeI_gradShapeJ.push_back(gradijvalue_i);
+    IntV_shapeI_gradshapeJ.push_back(varphi_i_gradj);
+    IntV_shapeI_shapeJ.push_back(varphi_i_varphi_j);
+    IntV_shapeI.push_back(valuei_i);
+    IntV_gradshapeI.push_back(gradvalue_i);
   }
 
   //=================================================== Surface integrals
@@ -202,29 +216,37 @@ void PolygonPWLFEValues::
   }//for i
 
   //====================================== Reindexing surface integrals
-  ui_data.IntS_shapeI_shapeJ.resize(num_of_subtris);
-  ui_data.IntS_shapeI_gradshapeJ.resize(num_of_subtris);
-  ui_data.IntS_shapeI.resize(num_of_subtris);
+  IntS_shapeI_shapeJ.resize(num_of_subtris);
+  IntS_shapeI_gradshapeJ.resize(num_of_subtris);
+  IntS_shapeI.resize(num_of_subtris);
   for (int f=0; f< num_of_subtris; f++)
   {
-    ui_data.IntS_shapeI_shapeJ[f].resize(num_nodes);
-    ui_data.IntS_shapeI_gradshapeJ[f].resize(num_nodes);
-    ui_data.IntS_shapeI[f].resize(num_nodes);
+    IntS_shapeI_shapeJ[f].resize(num_nodes);
+    IntS_shapeI_gradshapeJ[f].resize(num_nodes);
+    IntS_shapeI[f].resize(num_nodes);
     for (int i=0; i < num_nodes; i++)
     {
-      ui_data.IntS_shapeI_shapeJ[f][i].resize(num_nodes);
-      ui_data.IntS_shapeI_gradshapeJ[f][i].resize(num_nodes);
-      ui_data.IntS_shapeI[f][i] = IntSi_shapeI[i][f];
+      IntS_shapeI_shapeJ[f][i].resize(num_nodes);
+      IntS_shapeI_gradshapeJ[f][i].resize(num_nodes);
+      IntS_shapeI[f][i] = IntSi_shapeI[i][f];
       for (int j=0; j < num_nodes; j++)
       {
-        ui_data.IntS_shapeI_shapeJ[f][i][j] = IntSi_shapeI_shapeJ[i][f][j];
-        ui_data.IntS_shapeI_gradshapeJ[f][i][j] = IntSi_shapeI_gradshapeJ[i][f][j];
+        IntS_shapeI_shapeJ[f][i][j] = IntSi_shapeI_shapeJ[i][f][j];
+        IntS_shapeI_gradshapeJ[f][i][j] = IntSi_shapeI_gradshapeJ[i][f][j];
       }
     }
   }
 
-  ui_data.face_dof_mappings = face_dof_mappings;
-  ui_data.num_nodes = num_nodes;
+  ui_data.Initialize(IntV_gradShapeI_gradShapeJ,
+                     IntV_shapeI_gradshapeJ,
+                     IntV_shapeI_shapeJ    ,
+                     IntV_shapeI           ,
+                     IntV_gradshapeI       ,
+                     IntS_shapeI_shapeJ    ,
+                     IntS_shapeI           ,
+                     IntS_shapeI_gradshapeJ,
+                     face_dof_mappings,
+                     num_nodes);
 
   //============================================= Cleanup
   for (auto& side : sides)

@@ -10,7 +10,7 @@ HexahedronPWLFEValues::
                         chi_math::QuadratureQuadrilateral &minumum_surface_quadrature,
                         chi_math::QuadratureHexahedron &arb_volume_quadrature,
                         chi_math::QuadratureQuadrilateral &arb_surface_quadrature) :
-  CellPWLFEValues(polyh_cell->vertex_ids.size(),ref_grid),
+  CellMappingFEPWL(polyh_cell->vertex_ids.size(), ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   default_surface_quadrature(minumum_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),

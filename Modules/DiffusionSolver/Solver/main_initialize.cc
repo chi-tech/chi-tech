@@ -54,13 +54,13 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     }
     case PWLD_MIP: {
       discretization =
-        SpatialDiscretization_PWL::New(grid, COMPUTE_UNIT_INTEGRALS);
+        SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
       break;
     }
     case PWLD_MIP_GAGG: {
       discretization =
-        SpatialDiscretization_PWL::New(grid, COMPUTE_UNIT_INTEGRALS);
+        SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
       break;
     }

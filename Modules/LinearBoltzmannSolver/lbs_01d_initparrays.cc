@@ -48,7 +48,7 @@ away from exascale.
 void LinearBoltzmann::Solver::InitializeParrays()
 {
   auto pwl_discretization =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWL>(discretization);
+    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
 
   //================================================== Initialize unknown structure
   for (int m=0; m<num_moments; m++)
@@ -105,14 +105,14 @@ void LinearBoltzmann::Solver::InitializeParrays()
     {
       const auto& fe_intgrl_values = pwl_discretization->GetUnitIntegrals(cell);
 
-      CellLBSView cell_lbs_view(fe_intgrl_values.num_nodes, num_grps, M);
+      CellLBSView cell_lbs_view(fe_intgrl_values.NumNodes(), num_grps, M);
 
       int mat_id = cell.material_id;
 
       cell_lbs_view.xs_id = matid_to_xs_map[mat_id];
 
       cell_lbs_view.dof_phi_map_start = block_MG_counter;
-      block_MG_counter += fe_intgrl_values.num_nodes * num_grps * num_moments;
+      block_MG_counter += fe_intgrl_values.NumNodes() * num_grps * num_moments;
 
       chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
       cell_nodal_mapping.reserve(cell.faces.size());
@@ -155,8 +155,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
         ++f;
       }//for f
 
-      if (fe_intgrl_values.num_nodes > max_cell_dof_count)
-        max_cell_dof_count = fe_intgrl_values.num_nodes;
+      if (fe_intgrl_values.NumNodes() > max_cell_dof_count)
+        max_cell_dof_count = fe_intgrl_values.NumNodes();
 
       cell_transport_views.push_back(cell_lbs_view);
       grid_nodal_mappings.push_back(cell_nodal_mapping);

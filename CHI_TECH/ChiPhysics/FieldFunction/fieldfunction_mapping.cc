@@ -141,7 +141,7 @@ CreatePWLDMappingLocal(
                                 " discretization is not of type "
                                 " PIECEWISE_LINEAR_DISCONTINUOUS.");
 
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(spatial_discretization);
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(spatial_discretization);
 
   for (const auto& data : cell_node_component_tuples)
   {

@@ -23,7 +23,7 @@
  * - node_to_side_map is indexed as [i][f]
  * - edge_dof_mappings, is indexed as [f][fi] and
  *    returns cell dof i.*/
-class PolygonPWLFEValues : public CellPWLFEValues
+class PolygonPWLFEValues : public CellMappingFEPWL
 {
 private:
   /**For a given side(triangle), this structure holds the values of

@@ -12,7 +12,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
-std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWL::
+std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLD::
   MakeCellPWLView(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
@@ -25,7 +25,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWL::
                                             line_quad_order_second,
                                             line_quad_order_arbitrary);
 
-      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYGON:
@@ -38,7 +38,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWL::
                                                  tri_quad_order_arbitrary,
                                                  line_quad_order_arbitrary);
 
-      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYHEDRON:
@@ -51,7 +51,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWL::
                                                     tet_quad_order_arbitrary,
                                                     tri_quad_order_arbitrary);
 
-      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     default:
@@ -62,7 +62,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWL::
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_PWL::PreComputeCellSDValues()
+void SpatialDiscretization_PWLD::PreComputeCellSDValues()
 {
   size_t num_local_cells = ref_grid->local_cells.size();
 
@@ -141,7 +141,7 @@ void SpatialDiscretization_PWL::PreComputeCellSDValues()
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the neighboring cells.*/
-void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues()
+void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
 {
   //================================================== Populate cell fe views
   {
@@ -225,8 +225,8 @@ void SpatialDiscretization_PWL::PreComputeNeighborCellSDValues()
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-std::shared_ptr<CellPWLFEValues>
-  SpatialDiscretization_PWL::GetCellPWLView(int cell_local_index)
+std::shared_ptr<CellMappingFEPWL>
+  SpatialDiscretization_PWLD::GetCellPWLView(int cell_local_index)
 {
   if (mapping_initialized)
   {
@@ -252,7 +252,7 @@ std::shared_ptr<CellPWLFEValues>
 //###################################################################
 /**Maps a neigboring cell from a global cell index. The spatial discretizations
  * maintains a non-ghost version of all neighboring cells.*/
-chi_mesh::Cell& SpatialDiscretization_PWL::
+chi_mesh::Cell& SpatialDiscretization_PWLD::
   GetNeighborCell(int cell_glob_index)
 {
   //=================================== First check locally
@@ -271,7 +271,7 @@ chi_mesh::Cell& SpatialDiscretization_PWL::
 
 //###################################################################
 /**Maps a neigboring cell's fe view from a global cell index.*/
-std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWL::
+std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLD::
   GetNeighborCellPWLView(int cell_glob_index)
 {
   //=================================== First check locally

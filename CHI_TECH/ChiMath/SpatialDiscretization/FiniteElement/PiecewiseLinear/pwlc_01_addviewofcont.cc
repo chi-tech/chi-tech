@@ -12,7 +12,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
-std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWLC::
+std::shared_ptr<CellMappingFEPWL> SpatialDiscretization_PWLC::
   MakeCellPWLView(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
@@ -25,7 +25,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWLC::
                                             line_quad_order_second,
                                             line_quad_order_arbitrary);
 
-      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYGON:
@@ -38,7 +38,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWLC::
                                                  tri_quad_order_arbitrary,
                                                  line_quad_order_arbitrary);
 
-      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     case chi_mesh::CellType::POLYHEDRON:
@@ -51,7 +51,7 @@ std::shared_ptr<CellPWLFEValues> SpatialDiscretization_PWLC::
                                                     tet_quad_order_arbitrary,
                                                     tri_quad_order_arbitrary);
 
-      std::shared_ptr<CellPWLFEValues> the_ptr(cell_fe_view);
+      std::shared_ptr<CellMappingFEPWL> the_ptr(cell_fe_view);
       return the_ptr;
     }
     default:
@@ -148,7 +148,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-std::shared_ptr<CellPWLFEValues>
+std::shared_ptr<CellMappingFEPWL>
   SpatialDiscretization_PWLC::GetCellPWLView(int cell_local_index)
 {
 

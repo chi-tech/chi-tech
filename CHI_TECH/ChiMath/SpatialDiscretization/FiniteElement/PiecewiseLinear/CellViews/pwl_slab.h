@@ -7,7 +7,7 @@
 
 //###################################################################
 /**Object for handling slab shaped piecewise linear shape functions.*/
-class SlabPWLFEView : public CellPWLFEValues
+class SlabPWLFEView : public CellMappingFEPWL
 {
 private:
   chi_mesh::Vector3 v0;

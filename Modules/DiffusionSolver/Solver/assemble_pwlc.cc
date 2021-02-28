@@ -15,7 +15,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
-  size_t num_nodes = fe_intgrl_values.num_nodes;
+  size_t num_nodes = fe_intgrl_values.NumNodes();
 
   //======================================== Process material id
   int mat_id = cell.material_id;
@@ -47,14 +47,14 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
     for (int j=0; j<num_nodes; j++)
     {
       double mat_entry =
-        D[j]*fe_intgrl_values.IntV_gradShapeI_gradShapeJ[i][j] +
-        siga[j]*fe_intgrl_values.IntV_shapeI_shapeJ[i][j];
+        D[j]*fe_intgrl_values.FIntV_gradShapeI_gradShapeJ(i,j) +
+        siga[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
 
       cell_matrix[i][j] = mat_entry;
     }//for j
 
     //====================== Develop RHS entry
-    cell_rhs[i] = q[i]*fe_intgrl_values.IntV_shapeI[i];
+    cell_rhs[i] = q[i]*fe_intgrl_values.FIntV_shapeI(i);
   }//for i
   dof_global_col_ind = dof_global_row_ind;
 
@@ -78,7 +78,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         int num_face_dofs = cell.faces[f].vertex_ids.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_intgrl_values.face_dof_mappings[f][fi];
+          int i  = fe_intgrl_values.FaceDofMapping(f,fi);
           dirichlet_count[i] += 1;
           dirichlet_value[i] += dirichlet_bndry->boundary_value;
         }
@@ -92,19 +92,19 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         int num_face_dofs = cell.faces[f].vertex_ids.size();
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_intgrl_values.face_dof_mappings[f][fi];
+          int i  = fe_intgrl_values.FaceDofMapping(f,fi);
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_intgrl_values.face_dof_mappings[f][fj];
+            int j  = fe_intgrl_values.FaceDofMapping(f,fj);
 
-            double aij = robin_bndry->a*fe_intgrl_values.IntS_shapeI_shapeJ[f][i][j];
+            double aij = robin_bndry->a*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
             aij /= robin_bndry->b;
 
             cell_matrix[i][j] += aij;
           }//for fj
 
-          double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[f][i];
+          double aii = robin_bndry->f*fe_intgrl_values.FIntS_shapeI(f,i);
           aii /= robin_bndry->b;
 
           cell_matrix[i][i] += aii;

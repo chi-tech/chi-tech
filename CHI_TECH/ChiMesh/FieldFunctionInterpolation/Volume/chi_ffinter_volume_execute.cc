@@ -55,7 +55,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 void chi_mesh::FieldFunctionInterpolationVolume::
   CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping)
 {
-  auto& discretization = static_cast<SpatialDiscretization_PWL&>(
+  auto& discretization = static_cast<SpatialDiscretization_PWLD&>(
                          *field_functions[0]->spatial_discretization);
 
   int counter=-1;
@@ -87,8 +87,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::
         if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
           value = CallLuaFunction(value,cell.material_id);
 
-        op_value += value*fe_intgrl_values.IntV_shapeI[i];
-        total_volume += fe_intgrl_values.IntV_shapeI[i];
+        op_value += value*fe_intgrl_values.FIntV_shapeI(i);
+        total_volume += fe_intgrl_values.FIntV_shapeI(i);
 
         if (!max_set)
         {
@@ -127,7 +127,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
 void chi_mesh::FieldFunctionInterpolationVolume::
   PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping)
 {
-  auto& discretization = static_cast<SpatialDiscretization_PWL&>(
+  auto& discretization = static_cast<SpatialDiscretization_PWLD&>(
                          *field_functions[0]->spatial_discretization);
 
   int counter=-1;
@@ -159,8 +159,8 @@ void chi_mesh::FieldFunctionInterpolationVolume::
         if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
           value = CallLuaFunction(value,cell.material_id);
 
-        op_value += value*fe_intgrl_values.IntV_shapeI[i];
-        total_volume += fe_intgrl_values.IntV_shapeI[i];
+        op_value += value*fe_intgrl_values.FIntV_shapeI(i);
+        total_volume += fe_intgrl_values.FIntV_shapeI(i);
 
         if (!max_set)
         {

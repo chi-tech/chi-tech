@@ -148,7 +148,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
   PWLDInterpolate(std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
-  auto& spatial_dm = static_cast<SpatialDiscretization_PWL&>(
+  auto& spatial_dm = static_cast<SpatialDiscretization_PWLD&>(
                      *ff_ctx->ref_ff->spatial_discretization);
 
   std::vector<double>& field = *ff_ctx->ref_ff->field_vector_local;

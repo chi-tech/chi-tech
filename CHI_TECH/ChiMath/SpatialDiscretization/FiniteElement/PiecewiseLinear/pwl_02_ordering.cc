@@ -14,7 +14,7 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-void SpatialDiscretization_PWL::OrderNodes()
+void SpatialDiscretization_PWLD::OrderNodes()
 {
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Developing nodal ordering.";

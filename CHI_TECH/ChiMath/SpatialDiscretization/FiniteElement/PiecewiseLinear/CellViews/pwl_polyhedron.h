@@ -24,7 +24,7 @@
  *  - face_dof_mappings, is as follows face_dof_mappings[f][fi] and
  *    returns cell i.
  * */
-class PolyhedronPWLFEValues : public CellPWLFEValues
+class PolyhedronPWLFEValues : public CellMappingFEPWL
 {
 private:
   /**For a given side(tet), this structure holds the values of

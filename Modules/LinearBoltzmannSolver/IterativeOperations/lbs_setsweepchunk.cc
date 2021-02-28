@@ -7,7 +7,7 @@ typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 /**Sets up the sweek chunk for the given discretization method.*/
 SweepChunk* LinearBoltzmann::Solver::SetSweepChunk(LBSGroupset& groupset)
 {
-  auto pwl_sdm = std::dynamic_pointer_cast<SpatialDiscretization_PWL>(discretization);
+  auto pwl_sdm = std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
 
   //================================================== Setting up required
   //                                                   sweep chunks

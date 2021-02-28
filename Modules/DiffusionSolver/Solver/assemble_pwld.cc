@@ -17,10 +17,10 @@ extern ChiMPI& chi_mpi;
 void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
                                                   int component)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
-  size_t num_nodes = fe_intgrl_values.num_nodes;
+  size_t num_nodes = fe_intgrl_values.NumNodes();
 
   //====================================== Process material id
   int mat_id = cell.material_id;
@@ -43,14 +43,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
 
       double jr_mat_entry =
-        D[j]*fe_intgrl_values.IntV_gradShapeI_gradShapeJ[i][j];
+        D[j]*fe_intgrl_values.FIntV_gradShapeI_gradShapeJ(i,j);
 
       jr_mat_entry +=
-        siga[j]*fe_intgrl_values.IntV_shapeI_shapeJ[i][j];
+        siga[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
 
       MatSetValue(A,ir,jr,jr_mat_entry,ADD_VALUES);
 
-      rhsvalue += q[j]*fe_intgrl_values.IntV_shapeI_shapeJ[i][j];
+      rhsvalue += q[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
     }//for j
 
     //====================== Apply RHS entry
@@ -86,7 +86,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       std::vector<double> adj_D,adj_Q,adj_sigma;
 
       GetMaterialProperties(adj_cell,
-                            adj_fe_intgrl_values.num_nodes,
+                            adj_fe_intgrl_values.NumNodes(),
                             adj_D,
                             adj_Q,
                             adj_sigma,
@@ -97,9 +97,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       double intS = 0.0;
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int i = fe_intgrl_values.face_dof_mappings[f][fi];
-        D_avg += D[i]*fe_intgrl_values.IntS_shapeI[f][i];
-        intS += fe_intgrl_values.IntS_shapeI[f][i];
+        int i = fe_intgrl_values.FaceDofMapping(f,fi);
+        D_avg += D[i]*fe_intgrl_values.FIntS_shapeI(f,i);
+        intS += fe_intgrl_values.FIntS_shapeI(f,i);
       }
       D_avg /= intS;
 
@@ -108,10 +108,10 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       double adj_intS = 0.0;
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int i    = fe_intgrl_values.face_dof_mappings[f][fi];
+        int i    = fe_intgrl_values.FaceDofMapping(f,fi);
         int imap = MapCellLocalNodeIDFromGlobalID(adj_cell, cell.vertex_ids[i]);
-        adj_D_avg += adj_D[imap]*adj_fe_intgrl_values.IntS_shapeI[fmap][imap];
-        adj_intS += adj_fe_intgrl_values.IntS_shapeI[fmap][imap];
+        adj_D_avg += adj_D[imap]*adj_fe_intgrl_values.FIntS_shapeI(fmap,imap);
+        adj_intS += adj_fe_intgrl_values.FIntS_shapeI(fmap,imap);
       }
       adj_D_avg /= adj_intS;
 
@@ -127,17 +127,17 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       //========================= Assembly penalty terms
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int i  = fe_intgrl_values.face_dof_mappings[f][fi];
+        int i  = fe_intgrl_values.FaceDofMapping(f,fi);
         int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
 
         for (int fj=0; fj<num_face_dofs; fj++)
         {
-          int j     = fe_intgrl_values.face_dof_mappings[f][fj];
+          int j     = fe_intgrl_values.FaceDofMapping(f,fj);
           int jr    = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
           int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fj]);
           int jrmap = pwl_sdm->MapDOF(adj_cell, jmap, unknown_manager, 0, component);
 
-          double aij = kappa*fe_intgrl_values.IntS_shapeI_shapeJ[f][i][j];
+          double aij = kappa*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
 
           MatSetValue(A,ir    ,jr   , aij,ADD_VALUES);
           MatSetValue(A,ir    ,jrmap,-aij,ADD_VALUES);
@@ -150,19 +150,19 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       // Dk = 0.5* n dot nabla bk
 
       // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
-      for (int i=0; i<fe_intgrl_values.num_nodes; i++)
+      for (int i=0; i<fe_intgrl_values.NumNodes(); i++)
       {
         int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
 
         for (int fj=0; fj<num_face_dofs; fj++)
         {
-          int j     = fe_intgrl_values.face_dof_mappings[f][fj];
+          int j     = fe_intgrl_values.FaceDofMapping(f,fj);
           int jr    = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
           int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fj]);
           int jrmap = pwl_sdm->MapDOF(adj_cell, jmap, unknown_manager, 0, component);
 
           double aij =
-            -0.5*D_avg*n.Dot(fe_intgrl_values.IntS_shapeI_gradshapeJ[f][j][i]);
+            -0.5*D_avg*n.Dot(fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,j,i));
 
           MatSetValue(A,ir,jr   , aij,ADD_VALUES);
           MatSetValue(A,ir,jrmap,-aij,ADD_VALUES);
@@ -172,17 +172,17 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
       // 0.5*D* n dot (b_i^+ - b_i^-)*nabla b_j^-
       for (int fi=0; fi<num_face_dofs; fi++)
       {
-        int i     = fe_intgrl_values.face_dof_mappings[f][fi];
+        int i     = fe_intgrl_values.FaceDofMapping(f,fi);
         int ir    = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
         int imap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fi]);
         int irmap = pwl_sdm->MapDOF(adj_cell, imap, unknown_manager, 0, component);
 
-        for (int j=0; j<fe_intgrl_values.num_nodes; j++)
+        for (int j=0; j<fe_intgrl_values.NumNodes(); j++)
         {
           int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
 
           double aij =
-            -0.5*D_avg*n.Dot(fe_intgrl_values.IntS_shapeI_gradshapeJ[f][i][j]);
+            -0.5*D_avg*n.Dot(fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,i,j));
 
           MatSetValue(A,ir   ,jr, aij,ADD_VALUES);
           MatSetValue(A,irmap,jr,-aij,ADD_VALUES);
@@ -208,9 +208,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
         double intS = 0.0;
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i = fe_intgrl_values.face_dof_mappings[f][fi];
-          D_avg += D[i]*fe_intgrl_values.IntS_shapeI[f][i];
-          intS += fe_intgrl_values.IntS_shapeI[f][i];
+          int i = fe_intgrl_values.FaceDofMapping(f,fi);
+          D_avg += D[i]*fe_intgrl_values.FIntS_shapeI(f,i);
+          intS += fe_intgrl_values.FIntS_shapeI(f,i);
         }
         D_avg /= intS;
 
@@ -225,15 +225,15 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
         //========================= Assembly penalty terms
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_intgrl_values.face_dof_mappings[f][fi];
+          int i  = fe_intgrl_values.FaceDofMapping(f,fi);
           int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_intgrl_values.face_dof_mappings[f][fj];
+            int j  = fe_intgrl_values.FaceDofMapping(f,fj);
             int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
 
-            double aij = kappa*fe_intgrl_values.IntS_shapeI_shapeJ[f][i][j];
+            double aij = kappa*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
 
             MatSetValue(A,ir    ,jr, aij,ADD_VALUES);
             VecSetValue(b,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
@@ -242,17 +242,17 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
         // -Di^- bj^- and
         // -Dj^- bi^-
-        for (int i=0; i<fe_intgrl_values.num_nodes; i++)
+        for (int i=0; i<fe_intgrl_values.NumNodes(); i++)
         {
           int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
 
-          for (int j=0; j<fe_intgrl_values.num_nodes; j++)
+          for (int j=0; j<fe_intgrl_values.NumNodes(); j++)
           {
             int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
 
             double gij =
-              n.Dot(fe_intgrl_values.IntS_shapeI_gradshapeJ[f][i][j] +
-                      fe_intgrl_values.IntS_shapeI_gradshapeJ[f][j][i]);
+              n.Dot(fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,i,j) +
+                    fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,j,i));
             double aij = -0.5*D_avg*gij;
 
             MatSetValue(A,ir,jr,aij,ADD_VALUES);
@@ -267,21 +267,21 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 
         for (int fi=0; fi<num_face_dofs; fi++)
         {
-          int i  = fe_intgrl_values.face_dof_mappings[f][fi];
+          int i  = fe_intgrl_values.FaceDofMapping(f,fi);
           int ir = pwl_sdm->MapDOF(cell, i, unknown_manager, 0, component);
 
           for (int fj=0; fj<num_face_dofs; fj++)
           {
-            int j  = fe_intgrl_values.face_dof_mappings[f][fj];
+            int j  = fe_intgrl_values.FaceDofMapping(f,fj);
             int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, component);
 
-            double aij = robin_bndry->a*fe_intgrl_values.IntS_shapeI_shapeJ[f][i][j];
+            double aij = robin_bndry->a*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
             aij /= robin_bndry->b;
 
             MatSetValue(A,ir ,jr, aij,ADD_VALUES);
           }//for fj
 
-          double aii = robin_bndry->f*fe_intgrl_values.IntS_shapeI[f][i];
+          double aii = robin_bndry->f*fe_intgrl_values.FIntS_shapeI(f,i);
           aii /= robin_bndry->b;
 
           MatSetValue(A,ir ,ir, aii,ADD_VALUES);
@@ -296,10 +296,10 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 void chi_diffusion::Solver::PWLD_Assemble_b(const chi_mesh::Cell& cell,
                                             int component)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWL>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
-  size_t num_nodes = fe_intgrl_values.num_nodes;
+  size_t num_nodes = fe_intgrl_values.NumNodes();
 
   //====================================== Process material id
   int mat_id = cell.material_id;
@@ -318,7 +318,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b(const chi_mesh::Cell& cell,
     //====================== Develop rhs entry
     double rhsvalue =0.0;
     for (int j=0; j<num_nodes; j++)
-      rhsvalue += q[j]*fe_intgrl_values.IntV_shapeI_shapeJ[i][j];
+      rhsvalue += q[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
 
     //====================== Apply RHS entry
     VecSetValue(b,ir,rhsvalue,ADD_VALUES);

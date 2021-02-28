@@ -6,7 +6,7 @@
 
 #include <vector>
 
-class HexahedronPWLFEValues : public CellPWLFEValues
+class HexahedronPWLFEValues : public CellMappingFEPWL
 {
 private:
   /**For a given side(tet), this structure holds the values of

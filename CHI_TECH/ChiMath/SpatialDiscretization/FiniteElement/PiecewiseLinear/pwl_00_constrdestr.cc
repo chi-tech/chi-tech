@@ -8,11 +8,11 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Constructor.*/
-SpatialDiscretization_PWL::
-  SpatialDiscretization_PWL(chi_mesh::MeshContinuumPtr in_grid,
-                            chi_math::finite_element::SetupFlags setup_flags/*=
+SpatialDiscretization_PWLD::
+  SpatialDiscretization_PWLD(chi_mesh::MeshContinuumPtr in_grid,
+                             chi_math::finite_element::SetupFlags setup_flags/*=
                             chi_math::finite_element::SetupFlags::NO_FLAGS_SET*/,
-                            chi_math::QuadratureOrder qorder/*=
+                             chi_math::QuadratureOrder qorder/*=
                             chi_math::QuadratureOrder::SECOND*/) :
   SpatialDiscretization_FE(0, in_grid,
                            SDMType::PIECEWISE_LINEAR_DISCONTINUOUS,

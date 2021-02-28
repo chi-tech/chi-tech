@@ -17,10 +17,10 @@
  * with piecewise linear basis functions
  * for use by either a Continues Finite Element Method (CFEM)
  * or a Discontinuous Finite Element Method (DFEM). */
-class SpatialDiscretization_PWL : public SpatialDiscretization_FE
+class SpatialDiscretization_PWLD : public SpatialDiscretization_FE
 {
 public:
-  std::vector<std::shared_ptr<CellPWLFEValues>> cell_fe_views;
+  std::vector<std::shared_ptr<CellMappingFEPWL>> cell_fe_views;
 
 private:
   bool                     mapping_initialized=false;
@@ -52,7 +52,7 @@ public:
 
 private:
   std::map<uint64_t, chi_mesh::Cell*>  neighbor_cells;
-  std::map<uint64_t, std::shared_ptr<CellPWLFEValues>> neighbor_cell_fe_views;
+  std::map<uint64_t, std::shared_ptr<CellMappingFEPWL>> neighbor_cell_fe_views;
 
 private:
   typedef chi_math::finite_element::UnitIntegralData UIData;
@@ -67,7 +67,7 @@ private:
   bool nb_qp_data_initialized=false;
 
 private:
-  std::shared_ptr<CellPWLFEValues> scratch_fe_value = nullptr;
+  std::shared_ptr<CellMappingFEPWL> scratch_fe_value = nullptr;
   chi_math::finite_element::UnitIntegralData            scratch_intgl_data;
   chi_math::finite_element::InternalQuadraturePointData scratch_vol_qp_data;
   chi_math::finite_element::FaceQuadraturePointData     scratch_face_qp_data;
@@ -75,14 +75,14 @@ private:
 private:
   //00
   explicit
-  SpatialDiscretization_PWL(chi_mesh::MeshContinuumPtr in_grid,
-                            chi_math::finite_element::SetupFlags setup_flags,
-                            chi_math::QuadratureOrder qorder);
+  SpatialDiscretization_PWLD(chi_mesh::MeshContinuumPtr in_grid,
+                             chi_math::finite_element::SetupFlags setup_flags,
+                             chi_math::QuadratureOrder qorder);
 
 public:
   //prevent anything else other than a shared pointer
   static
-  std::shared_ptr<SpatialDiscretization_PWL>
+  std::shared_ptr<SpatialDiscretization_PWLD>
   New(chi_mesh::MeshContinuumPtr& in_grid,
       chi_math::finite_element::SetupFlags setup_flags=
       chi_math::finite_element::SetupFlags::NO_FLAGS_SET,
@@ -90,20 +90,20 @@ public:
       chi_math::QuadratureOrder::SECOND)
   { if (in_grid == nullptr) throw std::invalid_argument(
         "Null supplied as grid to SpatialDiscretization_PWLC.");
-    return std::shared_ptr<SpatialDiscretization_PWL>(
-    new SpatialDiscretization_PWL(in_grid,setup_flags,qorder));}
+    return std::shared_ptr<SpatialDiscretization_PWLD>(
+    new SpatialDiscretization_PWLD(in_grid, setup_flags, qorder));}
 
   //01
 private:
-  std::shared_ptr<CellPWLFEValues> MakeCellPWLView(const chi_mesh::Cell& cell) const;
+  std::shared_ptr<CellMappingFEPWL> MakeCellPWLView(const chi_mesh::Cell& cell) const;
 
 public:
 
   void PreComputeCellSDValues() override;
   void PreComputeNeighborCellSDValues();
-  std::shared_ptr<CellPWLFEValues> GetCellPWLView(int cell_local_index);
+  std::shared_ptr<CellMappingFEPWL> GetCellPWLView(int cell_local_index);
   chi_mesh::Cell&  GetNeighborCell(int cell_glob_index);
-  std::shared_ptr<CellPWLFEValues> GetNeighborCellPWLView(int cell_glob_index);
+  std::shared_ptr<CellMappingFEPWL> GetNeighborCellPWLView(int cell_glob_index);
 
 private:
   //02

@@ -46,8 +46,8 @@ double chi_diffusion::Solver::
     double perimeter = (v1 - v0).Norm();
 
     double area  = 0.0;
-    for (int i=0; i<fe_intgrl_values.num_nodes; i++)
-      area += fe_intgrl_values.IntV_shapeI[i];
+    for (int i=0; i<fe_intgrl_values.NumNodes(); i++)
+      area += fe_intgrl_values.FIntV_shapeI(i);
 
     hp = area/perimeter;
 
@@ -70,13 +70,13 @@ double chi_diffusion::Solver::
   else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
   {
     double volume  = 0.0;
-    for (int i=0; i<fe_intgrl_values.num_nodes; i++)
-      volume += fe_intgrl_values.IntV_shapeI[i];
+    for (int i=0; i<fe_intgrl_values.NumNodes(); i++)
+      volume += fe_intgrl_values.FIntV_shapeI(i);
 
     double area = 0.0;
     for (int fr=0; fr<Nf; fr++)
       for (int i=0; i<Nv; i++)
-        area += fe_intgrl_values.IntS_shapeI[fr][i];
+        area += fe_intgrl_values.FIntS_shapeI(fr,i);
 
     if (Nf == 4)                  //Tet
       hp = 3*volume/area;

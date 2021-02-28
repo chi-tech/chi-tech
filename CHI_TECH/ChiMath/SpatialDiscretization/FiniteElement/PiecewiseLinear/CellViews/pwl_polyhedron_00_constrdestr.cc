@@ -15,7 +15,7 @@ PolyhedronPWLFEValues::
     const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
     const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
     const chi_math::QuadratureTriangle&    arb_surface_quadrature):
-  CellPWLFEValues(polyh_cell.vertex_ids.size(),ref_grid),
+  CellMappingFEPWL(polyh_cell.vertex_ids.size(), ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   default_surface_quadrature(minumum_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),

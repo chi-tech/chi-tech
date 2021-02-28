@@ -44,7 +44,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                                 " is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  auto& pwl_sdm = static_cast<SpatialDiscretization_PWL&>(*spatial_discretization);
+  auto& pwl_sdm = static_cast<SpatialDiscretization_PWLD&>(*spatial_discretization);
 
   std::vector<std::vector<double>>    d_nodes;
 
@@ -278,7 +278,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLDG(const std::string& base_name,
                                 " is not of type "
                                 " PIECEWISE_LINEAR_DISCONTINUOUS.");
 
-  auto& pwl_sdm = static_cast<SpatialDiscretization_PWL&>(*spatial_discretization);
+  auto& pwl_sdm = static_cast<SpatialDiscretization_PWLD&>(*spatial_discretization);
 
   std::vector<std::vector<double>>    d_nodes;
 

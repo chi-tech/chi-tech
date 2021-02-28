@@ -36,19 +36,19 @@ namespace finite_element
     typedef std::vector<chi_mesh::Vector3> VecVec3;
     typedef std::vector<VecVec3> MatVec3;
 
+  private:
+    MatDbl   m_IntV_gradShapeI_gradShapeJ;
+    MatVec3  m_IntV_shapeI_gradshapeJ    ;
+    MatDbl   m_IntV_shapeI_shapeJ        ;
+    VecDbl   m_IntV_shapeI               ;
+    VecVec3  m_IntV_gradshapeI           ;
 
-    MatDbl   IntV_gradShapeI_gradShapeJ;
-    MatVec3  IntV_shapeI_gradshapeJ    ;
-    MatDbl   IntV_shapeI_shapeJ        ;
-    VecDbl   IntV_shapeI               ;
-    VecVec3  IntV_gradshapeI           ;
+    std::vector<MatDbl>  m_IntS_shapeI_shapeJ    ;
+    std::vector<VecDbl>  m_IntS_shapeI           ;
+    std::vector<MatVec3> m_IntS_shapeI_gradshapeJ;
 
-    std::vector<MatDbl>  IntS_shapeI_shapeJ    ;
-    std::vector<VecDbl>  IntS_shapeI           ;
-    std::vector<MatVec3> IntS_shapeI_gradshapeJ;
-
-    std::vector<std::vector<int>> face_dof_mappings;
-    size_t num_nodes=0;
+    std::vector<std::vector<int>> m_face_dof_mappings;
+    size_t m_num_nodes=0;
 
   public:
     void Initialize(MatDbl   in_IntV_gradShapeI_gradShapeJ,
@@ -65,21 +65,40 @@ namespace finite_element
     void Reset();
 
     double FIntV_gradShapeI_gradShapeJ(unsigned int i,
-                                       unsigned int j);
+                                       unsigned int j) const;
     chi_mesh::Vector3 FIntV_shapeI_gradshapeJ(unsigned int i,
-                                              unsigned int j);
+                                              unsigned int j) const;
     double FIntV_shapeI_shapeJ(unsigned int i,
-                               unsigned int j);
-    double FIntV_shapeI(unsigned int i);
-    chi_mesh::Vector3 FIntV_gradshapeI(unsigned int i);
+                               unsigned int j) const;
+    double FIntV_shapeI(unsigned int i) const;
+    chi_mesh::Vector3 FIntV_gradshapeI(unsigned int i) const;
 
-    double FIntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j);
+    double FIntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const;
 
-    double FIntS_shapeI(unsigned int face, unsigned int i);
+    double FIntS_shapeI(unsigned int face, unsigned int i) const;
 
     chi_mesh::Vector3 FIntS_shapeI_gradshapeJ(unsigned int face,
                                               unsigned int i,
-                                              unsigned int j);
+                                              unsigned int j) const;
+    int FaceDofMapping(size_t face, size_t face_node_index) const
+    {
+      auto& face_data = m_face_dof_mappings.at(face);
+      return face_data.at(face_node_index);
+    }
+    size_t NumNodes() const
+    {
+      return m_num_nodes;
+    }
+
+    const MatDbl  & GetIntV_gradShapeI_gradShapeJ() const {return m_IntV_gradShapeI_gradShapeJ;}
+    const MatVec3 & GetIntV_shapeI_gradshapeJ()     const {return m_IntV_shapeI_gradshapeJ    ;}
+    const MatDbl  & GetIntV_shapeI_shapeJ()         const {return m_IntV_shapeI_shapeJ        ;}
+    const VecDbl  & GetIntV_shapeI()                const {return m_IntV_shapeI               ;}
+    const VecVec3 & GetIntV_gradshapeI()            const {return m_IntV_gradshapeI           ;}
+
+    const std::vector<MatDbl>&  GetIntS_shapeI_shapeJ()    const  {return m_IntS_shapeI_shapeJ    ;}
+    const std::vector<VecDbl>&  GetIntS_shapeI()           const  {return m_IntS_shapeI           ;}
+    const std::vector<MatVec3>& GetIntS_shapeI_gradshapeJ()const  {return m_IntS_shapeI_gradshapeJ;}
   };
 
   //#############################################

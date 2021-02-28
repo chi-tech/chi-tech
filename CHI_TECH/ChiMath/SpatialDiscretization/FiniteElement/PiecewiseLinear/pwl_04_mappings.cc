@@ -70,7 +70,7 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
-int SpatialDiscretization_PWL::
+int SpatialDiscretization_PWLD::
 MapDOF(const chi_mesh::Cell& cell,
        const int node,
        const chi_math::UnknownManager& unknown_manager,
@@ -149,7 +149,7 @@ MapDOF(const chi_mesh::Cell& cell,
 
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
-int SpatialDiscretization_PWL::
+int SpatialDiscretization_PWLD::
 MapDOFLocal(const chi_mesh::Cell& cell,
             const int node,
             const chi_math::UnknownManager& unknown_manager,

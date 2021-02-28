@@ -10,7 +10,7 @@ PolygonPWLFEValues::
     const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
     const chi_math::QuadratureTriangle&      arb_volume_quadrature,
     const chi_math::QuadratureGaussLegendre& arb_surface_quadrature) :
-  CellPWLFEValues(poly_cell.vertex_ids.size(),ref_grid),
+  CellMappingFEPWL(poly_cell.vertex_ids.size(), ref_grid),
   default_volume_quadrature(minumum_volume_quadrature),
   default_surface_quadrature(minumum_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),

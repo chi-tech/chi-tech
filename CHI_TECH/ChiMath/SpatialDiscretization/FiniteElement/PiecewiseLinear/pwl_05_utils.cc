@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
-size_t SpatialDiscretization_PWL::
+size_t SpatialDiscretization_PWLD::
   GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
                   chi_math::UnknownManager& unknown_manager)
 {
@@ -15,7 +15,7 @@ size_t SpatialDiscretization_PWL::
 
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
-size_t SpatialDiscretization_PWL::
+size_t SpatialDiscretization_PWLD::
   GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
                    chi_math::UnknownManager& unknown_manager)
 {
@@ -26,7 +26,7 @@ size_t SpatialDiscretization_PWL::
 
 //###################################################################
 /**Develops a localized view of a petsc vector.*/
-void SpatialDiscretization_PWL::
+void SpatialDiscretization_PWLD::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
                       chi_math::UnknownManager& unknown_manager)
