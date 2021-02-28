@@ -47,14 +47,14 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
     for (int j=0; j<num_nodes; j++)
     {
       double mat_entry =
-        D[j]*fe_intgrl_values.FIntV_gradShapeI_gradShapeJ(i,j) +
-        siga[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
+        D[j]* fe_intgrl_values.IntV_gradShapeI_gradShapeJ(i, j) +
+        siga[j]* fe_intgrl_values.IntV_shapeI_shapeJ(i, j);
 
       cell_matrix[i][j] = mat_entry;
     }//for j
 
     //====================== Develop RHS entry
-    cell_rhs[i] = q[i]*fe_intgrl_values.FIntV_shapeI(i);
+    cell_rhs[i] = q[i]* fe_intgrl_values.IntV_shapeI(i);
   }//for i
   dof_global_col_ind = dof_global_row_ind;
 
@@ -98,13 +98,13 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
           {
             int j  = fe_intgrl_values.FaceDofMapping(f,fj);
 
-            double aij = robin_bndry->a*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
+            double aij = robin_bndry->a* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
             aij /= robin_bndry->b;
 
             cell_matrix[i][j] += aij;
           }//for fj
 
-          double aii = robin_bndry->f*fe_intgrl_values.FIntS_shapeI(f,i);
+          double aii = robin_bndry->f* fe_intgrl_values.IntS_shapeI(f, i);
           aii /= robin_bndry->b;
 
           cell_matrix[i][i] += aii;

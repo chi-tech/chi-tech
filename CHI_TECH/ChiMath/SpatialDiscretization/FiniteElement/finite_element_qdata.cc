@@ -24,26 +24,26 @@ namespace chi_math
     }
 
     const std::vector<unsigned int>& InternalQuadraturePointData::
-    quadrature_point_indices() const
+    QuadraturePointIndices() const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       return m_quadrature_point_indices;
     }
     chi_mesh::Vector3 InternalQuadraturePointData::
-    qpoint_xyz(unsigned int qp) const
+    QPointXYZ(unsigned int qp) const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       return m_qpoints_xyz.at(qp);
     }
     double InternalQuadraturePointData::
-    shape_value(unsigned int i, unsigned int qp) const
+    ShapeValue(unsigned int i, unsigned int qp) const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       auto& qp_data = m_shape_value.at(i);
       return qp_data.at(qp);
     }
     chi_mesh::Vector3 InternalQuadraturePointData::
-    shape_grad(unsigned int i, unsigned int qp) const
+    ShapeGrad(unsigned int i, unsigned int qp) const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       auto& qp_data = m_shape_grad.at(i);
@@ -54,14 +54,14 @@ namespace chi_math
       if (not m_initialized) THROW_QP_UNINIT();
       return m_JxW.at(qp);
     }
-    int InternalQuadraturePointData::face_dof_mapping(size_t face,
-                                                      size_t face_node_index) const
+    int InternalQuadraturePointData::FaceDofMapping(size_t face,
+                                                    size_t face_node_index) const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       auto& face_data = m_face_dof_mappings.at(face);
       return face_data.at(face_node_index);
     }
-    size_t InternalQuadraturePointData::num_nodes() const
+    size_t InternalQuadraturePointData::NumNodes() const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       return m_num_nodes;
@@ -92,7 +92,7 @@ namespace chi_math
       m_initialized = true;
     }
 
-    double FaceQuadraturePointData::normal(unsigned int qp) const
+    double FaceQuadraturePointData::Normal(unsigned int qp) const
     {
       if (not m_initialized) THROW_QP_UNINIT();
       return m_JxW.at(qp);

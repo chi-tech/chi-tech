@@ -47,7 +47,7 @@ double chi_diffusion::Solver::
 
     double area  = 0.0;
     for (int i=0; i<fe_intgrl_values.NumNodes(); i++)
-      area += fe_intgrl_values.FIntV_shapeI(i);
+      area += fe_intgrl_values.IntV_shapeI(i);
 
     hp = area/perimeter;
 
@@ -71,12 +71,12 @@ double chi_diffusion::Solver::
   {
     double volume  = 0.0;
     for (int i=0; i<fe_intgrl_values.NumNodes(); i++)
-      volume += fe_intgrl_values.FIntV_shapeI(i);
+      volume += fe_intgrl_values.IntV_shapeI(i);
 
     double area = 0.0;
     for (int fr=0; fr<Nf; fr++)
       for (int i=0; i<Nv; i++)
-        area += fe_intgrl_values.FIntS_shapeI(fr,i);
+        area += fe_intgrl_values.IntS_shapeI(fr, i);
 
     if (Nf == 4)                  //Tet
       hp = 3*volume/area;

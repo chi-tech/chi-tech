@@ -64,22 +64,22 @@ namespace finite_element
 
     void Reset();
 
-    double FIntV_gradShapeI_gradShapeJ(unsigned int i,
-                                       unsigned int j) const;
-    chi_mesh::Vector3 FIntV_shapeI_gradshapeJ(unsigned int i,
-                                              unsigned int j) const;
-    double FIntV_shapeI_shapeJ(unsigned int i,
-                               unsigned int j) const;
-    double FIntV_shapeI(unsigned int i) const;
-    chi_mesh::Vector3 FIntV_gradshapeI(unsigned int i) const;
+    double IntV_gradShapeI_gradShapeJ(unsigned int i,
+                                      unsigned int j) const;
+    chi_mesh::Vector3 IntV_shapeI_gradshapeJ(unsigned int i,
+                                             unsigned int j) const;
+    double IntV_shapeI_shapeJ(unsigned int i,
+                              unsigned int j) const;
+    double IntV_shapeI(unsigned int i) const;
+    chi_mesh::Vector3 IntV_gradshapeI(unsigned int i) const;
 
-    double FIntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const;
+    double IntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const;
 
-    double FIntS_shapeI(unsigned int face, unsigned int i) const;
+    double IntS_shapeI(unsigned int face, unsigned int i) const;
 
-    chi_mesh::Vector3 FIntS_shapeI_gradshapeJ(unsigned int face,
-                                              unsigned int i,
-                                              unsigned int j) const;
+    chi_mesh::Vector3 IntS_shapeI_gradshapeJ(unsigned int face,
+                                             unsigned int i,
+                                             unsigned int j) const;
     int FaceDofMapping(size_t face, size_t face_node_index) const
     {
       auto& face_data = m_face_dof_mappings.at(face);
@@ -131,19 +131,19 @@ namespace finite_element
                         std::vector<std::vector<int>> face_dof_mappings,
                         size_t num_nodes);
     const std::vector<unsigned int>&
-      quadrature_point_indices() const;
+      QuadraturePointIndices() const;
     chi_mesh::Vector3
-      qpoint_xyz(unsigned int qp) const;
+      QPointXYZ(unsigned int qp) const;
     double
-      shape_value(unsigned int i, unsigned int qp) const;
+      ShapeValue(unsigned int i, unsigned int qp) const;
     chi_mesh::Vector3
-      shape_grad(unsigned int i, unsigned int qp) const;
+      ShapeGrad(unsigned int i, unsigned int qp) const;
     double
       JxW(unsigned int qp) const;
     int
-      face_dof_mapping(size_t face, size_t face_node_index) const;
+      FaceDofMapping(size_t face, size_t face_node_index) const;
     size_t
-      num_nodes() const;
+      NumNodes() const;
   };
 
   //#############################################
@@ -162,7 +162,7 @@ namespace finite_element
                         VecVec3                       normals,
                         std::vector<std::vector<int>> face_dof_mappings,
                         size_t num_nodes);
-    double normal(unsigned int qp) const;
+    double Normal(unsigned int qp) const;
   };
 }
 

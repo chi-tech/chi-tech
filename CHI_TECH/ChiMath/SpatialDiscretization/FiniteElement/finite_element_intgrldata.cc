@@ -45,8 +45,8 @@ namespace finite_element
   }
 
   double UnitIntegralData::
-    FIntV_gradShapeI_gradShapeJ(unsigned int i,
-                                unsigned int j) const
+    IntV_gradShapeI_gradShapeJ(unsigned int i,
+                               unsigned int j) const
   {
     double value;
     auto& row_I = m_IntV_gradShapeI_gradShapeJ.at(i);
@@ -54,8 +54,8 @@ namespace finite_element
     return value;
   }
   chi_mesh::Vector3 UnitIntegralData::
-    FIntV_shapeI_gradshapeJ(unsigned int i,
-                            unsigned int j) const
+    IntV_shapeI_gradshapeJ(unsigned int i,
+                           unsigned int j) const
   {
     chi_mesh::Vector3 value;
     auto & row_I = m_IntV_shapeI_gradshapeJ.at(i);
@@ -63,8 +63,8 @@ namespace finite_element
     return value;
   }
   double UnitIntegralData::
-    FIntV_shapeI_shapeJ(unsigned int i,
-                        unsigned int j) const
+    IntV_shapeI_shapeJ(unsigned int i,
+                       unsigned int j) const
   {
     double value;
     auto& row_I = m_IntV_shapeI_shapeJ.at(i);
@@ -72,20 +72,20 @@ namespace finite_element
     return value;
   }
   double UnitIntegralData::
-    FIntV_shapeI(unsigned int i) const
+    IntV_shapeI(unsigned int i) const
   {
     double value = m_IntV_shapeI.at(i);
     return value;
   }
   chi_mesh::Vector3 UnitIntegralData::
-    FIntV_gradshapeI(unsigned int i) const
+    IntV_gradshapeI(unsigned int i) const
   {
     chi_mesh::Vector3 value;
     value = m_IntV_gradshapeI.at(i);
     return value;
   }
   double UnitIntegralData::
-    FIntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const
+    IntS_shapeI_shapeJ(unsigned int face, unsigned int i, unsigned int j) const
   {
     double value;
     auto& face_data = m_IntS_shapeI_shapeJ.at(face);
@@ -95,7 +95,7 @@ namespace finite_element
   }
 
   double UnitIntegralData::
-    FIntS_shapeI(unsigned int face, unsigned int i) const
+    IntS_shapeI(unsigned int face, unsigned int i) const
   {
     double value;
     auto& face_data = m_IntS_shapeI.at(face);
@@ -104,9 +104,9 @@ namespace finite_element
   }
 
   chi_mesh::Vector3 UnitIntegralData::
-    FIntS_shapeI_gradshapeJ(unsigned int face,
-                            unsigned int i,
-                            unsigned int j) const
+    IntS_shapeI_gradshapeJ(unsigned int face,
+                           unsigned int i,
+                           unsigned int j) const
   {
     chi_mesh::Vector3 value;
     auto& face_data = m_IntS_shapeI_gradshapeJ.at(face);

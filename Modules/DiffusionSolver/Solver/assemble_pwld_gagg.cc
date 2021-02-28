@@ -43,14 +43,14 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
         int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
         double jr_mat_entry =
-          D[j]*fe_intgrl_values.FIntV_gradShapeI_gradShapeJ(i,j);
+          D[j]* fe_intgrl_values.IntV_gradShapeI_gradShapeJ(i, j);
 
         jr_mat_entry +=
-          siga[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
+          siga[j]* fe_intgrl_values.IntV_shapeI_shapeJ(i, j);
 
         MatSetValue(A,ir,jr,jr_mat_entry,ADD_VALUES);
 
-        rhsvalue += q[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
+        rhsvalue += q[j]* fe_intgrl_values.IntV_shapeI_shapeJ(i, j);
       }//for j
 
       //====================== Apply RHS entry
@@ -96,8 +96,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
         for (int fi=0; fi<num_face_dofs; fi++)
         {
           int i = fe_intgrl_values.FaceDofMapping(f,fi);
-          D_avg += D[i]*fe_intgrl_values.FIntS_shapeI(f,i);
-          intS += fe_intgrl_values.FIntS_shapeI(f,i);
+          D_avg += D[i]* fe_intgrl_values.IntS_shapeI(f, i);
+          intS += fe_intgrl_values.IntS_shapeI(f, i);
         }
         D_avg /= intS;
 
@@ -108,8 +108,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
         {
           int i    = fe_intgrl_values.FaceDofMapping(f,fi);
           int imap = MapCellLocalNodeIDFromGlobalID(adj_cell, cell.vertex_ids[i]);
-          adj_D_avg += adj_D[imap]*adj_fe_intgrl_values.FIntS_shapeI(fmap,imap);
-          adj_intS += adj_fe_intgrl_values.FIntS_shapeI(fmap,imap);
+          adj_D_avg += adj_D[imap]* adj_fe_intgrl_values.IntS_shapeI(fmap, imap);
+          adj_intS += adj_fe_intgrl_values.IntS_shapeI(fmap, imap);
         }
         adj_D_avg /= adj_intS;
 
@@ -135,7 +135,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
             int jmap  = MapCellLocalNodeIDFromGlobalID(adj_cell, face.vertex_ids[fj]);
             int jrmap = pwl_sdm->MapDOF(adj_cell, jmap, unknown_manager, 0, gr);
 
-            double aij = kappa*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
+            double aij = kappa* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
 
             MatSetValue(A,ir    ,jr   , aij,ADD_VALUES);
             MatSetValue(A,ir    ,jrmap,-aij,ADD_VALUES);
@@ -160,7 +160,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
             int jrmap = pwl_sdm->MapDOF(adj_cell, jmap, unknown_manager, 0, gr);
 
             double aij =
-              -0.5*D_avg*n.Dot(fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,j,i));
+              -0.5*D_avg*n.Dot(fe_intgrl_values.IntS_shapeI_gradshapeJ(f, j, i));
 
             MatSetValue(A,ir,jr   , aij,ADD_VALUES);
             MatSetValue(A,ir,jrmap,-aij,ADD_VALUES);
@@ -180,7 +180,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
             int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
             double aij =
-              -0.5*D_avg*n.Dot(fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,i,j));
+              -0.5*D_avg*n.Dot(fe_intgrl_values.IntS_shapeI_gradshapeJ(f, i, j));
 
             MatSetValue(A,ir   ,jr, aij,ADD_VALUES);
             MatSetValue(A,irmap,jr,-aij,ADD_VALUES);
@@ -208,8 +208,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
           for (int fi=0; fi<num_face_dofs; fi++)
           {
             int i = fe_intgrl_values.FaceDofMapping(f,fi);
-            D_avg += D[i]*fe_intgrl_values.FIntS_shapeI(f,i);
-            intS += fe_intgrl_values.FIntS_shapeI(f,i);
+            D_avg += D[i]* fe_intgrl_values.IntS_shapeI(f, i);
+            intS += fe_intgrl_values.IntS_shapeI(f, i);
           }
           D_avg /= intS;
 
@@ -232,7 +232,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
               int j  = fe_intgrl_values.FaceDofMapping(f,fj);
               int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
-              double aij = kappa*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
+              double aij = kappa* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
 
               MatSetValue(A,ir    ,jr, aij,ADD_VALUES);
 //              VecSetValue(b,ir,aij*dc_boundary->boundary_value,ADD_VALUES);
@@ -250,8 +250,8 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
               int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
               double gij =
-                n.Dot(fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,i,j) +
-                      fe_intgrl_values.FIntS_shapeI_gradshapeJ(f,j,i));
+                n.Dot(fe_intgrl_values.IntS_shapeI_gradshapeJ(f, i, j) +
+                      fe_intgrl_values.IntS_shapeI_gradshapeJ(f, j, i));
               double aij = -0.5*D_avg*gij;
 
               MatSetValue(A,ir,jr,aij,ADD_VALUES);
@@ -274,13 +274,13 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
               int j  = fe_intgrl_values.FaceDofMapping(f,fj);
               int jr = pwl_sdm->MapDOF(cell, j, unknown_manager, 0, gr);
 
-              double aij = robin_bndry->a*fe_intgrl_values.FIntS_shapeI_shapeJ(f,i,j);
+              double aij = robin_bndry->a* fe_intgrl_values.IntS_shapeI_shapeJ(f, i, j);
               aij /= robin_bndry->b;
 
               MatSetValue(A,ir ,jr, aij,ADD_VALUES);
             }//for fj
 
-            double aii = robin_bndry->f*fe_intgrl_values.FIntS_shapeI(f,i);
+            double aii = robin_bndry->f* fe_intgrl_values.IntS_shapeI(f, i);
             aii /= robin_bndry->b;
 
             MatSetValue(A,ir ,ir, aii,ADD_VALUES);
@@ -317,7 +317,7 @@ void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(const chi_mesh::Cell& cell)
       //====================== Develop rhs entry
       double rhsvalue =0.0;
       for (int j=0; j<num_nodes; j++)
-        rhsvalue += q[j]*fe_intgrl_values.FIntV_shapeI_shapeJ(i,j);
+        rhsvalue += q[j]* fe_intgrl_values.IntV_shapeI_shapeJ(i, j);
 
       //====================== Apply RHS entry
       VecSetValue(b,ir,rhsvalue,ADD_VALUES);
