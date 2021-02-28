@@ -1,7 +1,0 @@
-# Latex compile files
-*.aux
-*.lof
-*.log
-*.lot
-*.synctex.gz
-*.toc
