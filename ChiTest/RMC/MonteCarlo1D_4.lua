@@ -52,7 +52,7 @@ end
 
         newSurfMesh = chiSurfaceMeshCreate();
         chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-                "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
+                "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 
         region0 = chiRegionCreate()
         chiRegionAddSurfaceBoundary(region0,newSurfMesh);
@@ -90,7 +90,7 @@ end
 
         newSurfMesh = chiSurfaceMeshCreate();
         chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-                "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
+                "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 
         region0 = chiRegionCreate()
         chiRegionAddSurfaceBoundary(region0,newSurfMesh);

@@ -11,7 +11,7 @@ chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
+        "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 
 --############################################### Extract edges from surface mesh
 loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)

@@ -11,10 +11,10 @@ chiMeshHandlerCreate()
 newSurfMesh = chiSurfaceMeshCreate();
 if (support_cycles ~= nil) then
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic3.obj",true)
+            "ChiResources/TestObjects/Square2x2_partition_cyclic3.obj",true)
 else
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/Square2x2_partition_cyclic.obj",true)
+            "ChiResources/TestObjects/Square2x2_partition_cyclic.obj",true)
 end
 
 --############################################### Setup Regions

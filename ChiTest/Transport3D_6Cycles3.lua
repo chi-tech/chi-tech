@@ -1,6 +1,6 @@
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromEnsightGold("CHI_RESOURCES/TestObjects/Sphere.case")
+chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
 
 region1 = chiRegionCreate()
 chiRegionAddEmptyBoundary(region1)

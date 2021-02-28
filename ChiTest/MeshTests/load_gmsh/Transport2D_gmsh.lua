@@ -8,7 +8,7 @@ chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromMshFiles(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/gmsh_2d_unstruct1.msh",true)
+        "ChiResources/TestObjects/gmsh_2d_unstruct1.msh",true)
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()

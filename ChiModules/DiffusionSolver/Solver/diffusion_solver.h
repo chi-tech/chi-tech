@@ -6,9 +6,9 @@
 #define PROPERTY_D_MAP 5
 #define PROPERTY_Q_MAP 6
 
-#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
+#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
 
-#include "Modules/DiffusionSolver/chi_diffusion.h"
+#include "ChiModules/DiffusionSolver/chi_diffusion.h"
 #include "ChiPhysics/SolverBase/chi_solver.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"

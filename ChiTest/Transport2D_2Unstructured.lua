@@ -11,7 +11,7 @@ chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "CHI_RESOURCES/TestObjects/TriangleMesh2x2Cuts.obj",true)
+        "ChiResources/TestObjects/TriangleMesh2x2Cuts.obj",true)
 
 --############################################### Setup Regions
 region1 = chiRegionCreate()

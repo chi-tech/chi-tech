@@ -14,10 +14,10 @@ chiMeshHandlerCreate()
 newSurfMesh = chiSurfaceMeshCreate();
 if (reflecting) then
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlockHalfY.obj",true)
+            "ChiResources/TestObjects/SquareMesh2x2QuadsBlockHalfY.obj",true)
 else
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
+            "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 end
 
 --############################################### Setup Regions

@@ -2,12 +2,11 @@
 
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
-#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
-#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
+#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
+#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //###################################################################

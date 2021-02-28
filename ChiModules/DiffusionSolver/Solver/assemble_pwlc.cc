@@ -1,10 +1,9 @@
 #include "diffusion_solver.h"
 
-#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "Modules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
+#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
+#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
 
 #include "chi_log.h"
-
 extern ChiLog& chi_log;
 
 //###################################################################

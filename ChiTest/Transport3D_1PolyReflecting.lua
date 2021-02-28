@@ -20,13 +20,13 @@ chiMeshHandlerCreate()
 newSurfMesh = chiSurfaceMeshCreate();
 if (reflecting) then
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsHalfY.obj",true)
+            "ChiResources/TestObjects/SquareMesh2x2QuadsHalfY.obj",true)
 elseif (reflectingXY) then
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-                "CHI_RESOURCES/TestObjects/SquareMesh2x2QuadsHalfYHalfX.obj",true)
+                "ChiResources/TestObjects/SquareMesh2x2QuadsHalfYHalfX.obj",true)
 else
     chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-            "CHI_RESOURCES/TestObjects/SquareMesh2x2Quads.obj",true)
+            "ChiResources/TestObjects/SquareMesh2x2Quads.obj",true)
 end
 
 --############################################### Extract edges from surface mesh

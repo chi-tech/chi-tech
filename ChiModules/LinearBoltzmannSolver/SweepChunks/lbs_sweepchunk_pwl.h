@@ -11,8 +11,8 @@
 #include "ChiPhysics/chi_physics.h"
 
 #include "ChiMath/chi_math.h"
-#include "Modules/LinearBoltzmannSolver/GroupSet/lbs_groupset.h"
-#include "Modules/LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
+#include "ChiModules/LinearBoltzmannSolver/GroupSet/lbs_groupset.h"
+#include "ChiModules/LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
