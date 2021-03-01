@@ -32,6 +32,7 @@ RegisterFunction(chiCreateProductQuadrature)
     RegisterConstant(GAUSS_LEGENDRE_CHEBYSHEV,   4);
     RegisterConstant(CUSTOM_QUADRATURE,          5);
 RegisterFunction(chiCreateCustomAngularQuadrature)
+RegisterFunction(chiCreateGrissomCustomQuadrature)
 RegisterFunction(chiGetProductQuadrature)
 RegisterFunction(chiCreateSLDFESQAngularQuadrature)
 RegisterFunction(chiLocallyRefineSLDFESQAngularQuadrature)
