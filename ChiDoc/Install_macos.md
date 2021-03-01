@@ -192,7 +192,7 @@ Once configure.sh has completed, build **ChiTech** with:
 To check if the code compiled correctly execute the test scripts:
 
 ```bash
-    $ python3 CHI_TEST/Z_Run_all.py
+    $ python3 ChiTest/Z_Run_all.py
 ```
 
 
@@ -204,7 +204,7 @@ or generate it locally.
 To generate the documentation locally, Google and follow the online instructions
 for installing installing doxygen and lua then run:
 ```console
-    $ cd CHI_DOC/
+    $ cd ChiDoc/
     $ ./YReGenerateDocumentation.sh
 ```
-Open the documentation index file at CHI_DOC/HTMLdocs/html/index.html.
+Open the documentation index file at ChiDoc/HTMLdocs/html/index.html.
