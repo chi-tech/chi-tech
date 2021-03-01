@@ -27,7 +27,6 @@ def format3(number):
 def FormatFileName(filename):
   return "{:35s}".format(filename)
 
-
 #=========================================== Test
 test_number += 1
 test_name = FormatFileName("Diffusion1D") + " 1D Diffusion Test - CFEM 1 MPI Process"
@@ -838,6 +837,41 @@ else:
   print(" - FAILED!")
   num_failed += 1
 
+#=========================================== Test
+test_number += 1
+test_name = FormatFileName("KEigenvalueTransport1D_1G") + " 1D KSolver LinearBSolver Test - PWLD 4 MPI Processes"
+print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
+process = subprocess.Popen(["mpiexec","-np","4",kpath_to_exe,
+                            "ChiTest/KEigenvalueTransport1D_1G.lua", "master_export=false"],
+                           cwd=kchi_src_pth,
+                           stdout=subprocess.PIPE,
+                           universal_newlines=True)
+process.wait()
+out,err = process.communicate()
+
+#string to find in output
+find_str          = "[0]          Final k-eigenvalue    :"
+#start of the string (<0 if not found)
+test_str_start    = out.find(find_str)
+#end of the string to find
+test_str_end      = test_str_start + len(find_str)
+#end of the line at which string was found
+test_str_line_end = out.find("\n",test_str_start)
+
+test_passed = True
+if (test_str_start >= 0):
+    #convert value to number
+    test_val = float(out[test_str_end:test_str_line_end])
+    if (not abs(test_val-0.997501) < 1.0e-5):
+        test_passed = False
+else:
+    test_passed = False
+
+if (test_passed):
+    print(" - Passed")
+else:
+    print(" - FAILED!")
+    num_failed += 1
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
 print("")
