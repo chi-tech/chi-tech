@@ -190,6 +190,7 @@ RegisterFunction(chiPhysicsAddMaterial)
 RegisterFunction(chiPhysicsMaterialAddProperty)
 RegisterFunction(chiPhysicsMaterialSetProperty)
 RegisterFunction(chiPhysicsMaterialGetProperty)
+RegisterFunction(chiPhysicsMaterialModifyTotalCrossSection);
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)
 RegisterFunction(chiExportFieldFunctionToVTKG)

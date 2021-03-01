@@ -689,3 +689,52 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
   return 1;
 }
 
+
+//############################################################
+/**Set a cross section to a new value.*/
+int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L) {
+  int num_args = lua_gettop(L);
+
+  if (num_args != 3)
+    LuaPostArgAmountError(__FUNCTION__, 3, num_args);
+  LuaCheckNilValue(__FUNCTION__, L, 1);
+  LuaCheckNilValue(__FUNCTION__, L, 2);
+  LuaCheckNilValue(__FUNCTION__, L, 3);
+
+  int material_index = lua_tonumber(L, 1);
+  int group_num = lua_tointeger(L, 2);
+  double xs_val = lua_tonumber(L, 3);
+
+  std::shared_ptr<chi_physics::Material> cur_material;
+  try {
+    cur_material = chi_physics_handler.material_stack.at(material_index);
+  }
+  catch(const std::out_of_range& o) {
+    chi_log.Log(LOG_ALLERROR)
+      << "ERROR: Invalid material handle." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  using MatProperty = chi_physics::PropertyType;
+  using XS = chi_physics::TransportCrossSections;
+  bool xs_property_found = false;
+  for (auto& property : cur_material->properties)
+  {
+    auto ptype = MatProperty::TRANSPORT_XSECTIONS;
+    if (property->Type() == ptype) {
+      auto xs = std::dynamic_pointer_cast<XS>(property);
+      xs->sigma_tg[group_num] = xs_val;
+      chi_log.Log(LOG_0)
+        << "sigma_t for group " << group_num
+        << " in material " << material_index
+        << " changed to " << xs_val;
+      xs_property_found = true;
+    }
+  }
+  if (not xs_property_found)
+    chi_log.Log(LOG_ALLERROR)
+      << __FUNCTION__ << ": No cross section property for "
+                         "specified material.";
+  return 0;
+}
+
