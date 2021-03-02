@@ -5,9 +5,9 @@
 
 #include "ChiMath/chi_math.h"
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
-#include "ChiMath/chi_math_dynamic_vectorNX.h"
+#include "ChiMath/dynamic_vector.h"
 #include "ChiMath/Quadratures/quadrature_gausslegendre.h"
-#include "ChiMath/chi_math_dynamic_matrixNX.h"
+#include "ChiMath/dynamic_matrix.h"
 
 #include <vector>
 #include <array>
@@ -124,7 +124,7 @@ private:
 
   static std::array<double,4> IntegrateLDFEShapeFunctions(
     const SphericalQuadrilateral& sq,
-    std::array<chi_math::DVectorNX<double>,4> &shape_coeffs,
+    std::array<chi_math::DynamicVector<double>,4> &shape_coeffs,
     const std::vector<chi_math::QuadraturePointXYZ>& legendre_qpoints,
     const std::vector<double>& legendre_qweights);
 
@@ -168,10 +168,10 @@ struct chi_math::SimplifiedLDFESQ::FUNCTION_WEIGHT_FROM_RHO
   std::array<chi_mesh::Vector3,4>& radii_vectors_xy_tilde;
   SphericalQuadrilateral&          sq;
 
-  std::array<chi_math::DVectorNX<double>,4> rhs;
-  chi_math::DMatrixNX<double> A;
-  chi_math::DMatrixNX<double> A_inv;
-  std::array<chi_math::DVectorNX<double>, 4> c_coeffs;
+  std::array<chi_math::DynamicVector<double>,4> rhs;
+  chi_math::DynamicMatrix<double> A;
+  chi_math::DynamicMatrix<double> A_inv;
+  std::array<chi_math::DynamicVector<double>, 4> c_coeffs;
   std::vector<chi_math::QuadraturePointXYZ>& lqp; //Legendre quadrature points
   std::vector<double>& lqw; //Legendre quadrature weights
 
@@ -204,7 +204,7 @@ struct chi_math::SimplifiedLDFESQ::FUNCTION_WEIGHT_FROM_RHO
   /**Computes the quadrature point locations
    * from rho, followed by the shape-function coefficients and
    * then the integral of the shape function to get the weights.*/
-  std::array<double,4> operator()(const chi_math::DVectorNX<double>& rho)
+  std::array<double,4> operator()(const chi_math::DynamicVector<double>& rho)
   {
     //=============================== Determine qpoints from rho
     std::array<chi_mesh::Vector3,4> qpoints;
