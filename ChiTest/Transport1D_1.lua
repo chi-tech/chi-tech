@@ -18,28 +18,11 @@ for i=1,(N+1) do
     k=i-1
     mesh[i] = xmin + k*dx
 end
-line_mesh = chiLineMeshCreateFromArray(mesh)
-
-
-region1 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
-
---############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
-
-chiVolumeMesherSetProperty(PARTITION_Z,3)
-chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XY)
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
+chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
-
+chiVolumeMesherSetMatIDToAll(0)
 
 --############################################### Add materials
 materials = {}
@@ -144,7 +127,7 @@ end
 chiFFInterpolationInitialize(cline)
 chiFFInterpolationExecute(cline)
 
-
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)

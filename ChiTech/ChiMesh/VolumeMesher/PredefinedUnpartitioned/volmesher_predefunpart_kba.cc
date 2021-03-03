@@ -79,8 +79,6 @@ KBA(chi_mesh::UnpartitionedMesh* umesh,
   chi_log.Log(LOG_0) << "Vertices loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
-  int loc_id = chi_mpi.location_id;
-
   //======================================== Load up the cells
   int global_id=-1;
   for (auto raw_cell : umesh->raw_cells)
