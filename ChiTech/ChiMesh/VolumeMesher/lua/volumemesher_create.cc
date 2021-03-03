@@ -3,7 +3,7 @@
 #include "../Linemesh1D/volmesher_linemesh1d.h"
 #include "../Predefined2D/volmesher_predefined2d.h"
 #include "../Extruder/volmesher_extruder.h"
-#include "../Predefined3D/volmesher_predefined3d.h"
+#include "../PredefinedUnpartitioned/volmesher_predefunpart.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
 
@@ -78,9 +78,14 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     new_mesher = new chi_mesh::VolumeMesherExtruder;
   }
-  else if (type==chi_mesh::VolumeMesherType::PREDEFINED3D)  //VOLUMEMESHER_PREDEFINED3D
+//  else if (type==chi_mesh::VolumeMesherType::PREDEFINED3D)  //VOLUMEMESHER_PREDEFINED3D
+//  {
+//    new_mesher = new chi_mesh::VolumeMesherPredefined3D;
+//    throw std::logic_error("Unsupported mesher");
+//  }
+  else if (type==chi_mesh::VolumeMesherType::UNPARTITIONED)
   {
-    new_mesher = new chi_mesh::VolumeMesherPredefined3D;
+    new_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
   }
   else
   {
@@ -89,7 +94,7 @@ int chiVolumeMesherCreate(lua_State *L)
                                "VOLUMEMESHER_LINEMESH1D, "
                                "VOLUMEMESHER_PREDEFINED2D, "
                                "VOLUMEMESHER_EXTRUDER or "
-                               "VOLUMEMESHER_PREDEFINED3D";
+                               "VOLUMEMESHER_UNPARTITIONED";
     exit(EXIT_FAILURE);
   }
 

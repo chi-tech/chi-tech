@@ -115,6 +115,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(VOLUMEMESHER_PREDEFINED2D, 3);
       RegisterConstant(VOLUMEMESHER_EXTRUDER,     4);
       RegisterConstant(VOLUMEMESHER_PREDEFINED3D, 5)
+      RegisterConstant(VOLUMEMESHER_UNPARTITIONED, 6)
     RegisterFunction(chiVolumeMesherExecute)
     RegisterFunction(chiVolumeMesherSetProperty)
       RegisterConstant(FORCE_POLYGONS,   1);

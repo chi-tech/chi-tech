@@ -108,7 +108,7 @@ public:
                      int group_set_num);
 
   //03a
-  void ComputeSweepOrderings(LBSGroupset& groupset);
+  void ComputeSweepOrderings(LBSGroupset& groupset) const;
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
   //03c

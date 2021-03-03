@@ -12,10 +12,11 @@ namespace chi_mesh
 {
   enum VolumeMesherType
   {
-    LINEMESH1D   = 1,
-    PREDEFINED2D = 3,
-    EXTRUDER     = 4,
-    PREDEFINED3D = 5
+    LINEMESH1D    = 1,
+    PREDEFINED2D  = 3,
+    EXTRUDER      = 4,
+//    PREDEFINED3D  = 5,
+    UNPARTITIONED = 6
   };
   enum VolumeMesherProperty
   {

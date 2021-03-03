@@ -6,7 +6,7 @@ region1 = chiRegionCreate()
 chiRegionAddEmptyBoundary(region1)
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED3D)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
 
 chiVolumeMesherSetProperty(VOLUMEPARTITION_X,2)
 chiVolumeMesherSetProperty(VOLUMEPARTITION_Y,2)
