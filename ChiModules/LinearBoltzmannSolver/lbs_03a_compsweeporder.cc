@@ -16,10 +16,10 @@ extern ChiTimer chi_program_timer;
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
-#include <iomanip>
 #include "ChiConsole/chi_console.h"
-
 extern ChiConsole&  chi_console;
+
+#include <iomanip>
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/
@@ -36,10 +36,15 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
   auto mesh_handler = chi_mesh::GetCurrentHandler();
   auto mesher = mesh_handler->volume_mesher;
 
+  const auto parmetis_partitioning = chi_mesh::VolumeMesher::PartitionType::PARMETIS;
+
+  bool no_cycles_parmetis_partitioning =
+    (mesher->options.partition_type == parmetis_partitioning and
+                                       (not groupset.allow_cycles));
+  bool is_1D_geometry = options.geometry_type == GeometryType::ONED_SLAB;
+
   //============================================= Check possibility of cycles
-  if (mesher->options.partition_type ==
-      chi_mesh::VolumeMesher::PartitionType::PARMETIS and
-      not groupset.allow_cycles)
+  if (no_cycles_parmetis_partitioning and not is_1D_geometry)
   {
     chi_log.Log(LOG_ALLERROR)
       << "When using PARMETIS type partitioning then groupset iterative method"

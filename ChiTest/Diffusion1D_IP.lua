@@ -3,34 +3,49 @@ print("############################################### LuaTest")
 
 
 
+-- --############################################### Setup mesh
+-- chiMeshHandlerCreate()
+--
+-- mesh={}
+-- N=100
+-- L=2.0
+-- xmin = -1.0
+-- dx = L/N
+-- for i=1,(N+1) do
+--     k=i-1
+--     mesh[i] = xmin + k*dx
+-- end
+-- line_mesh = chiLineMeshCreateFromArray(mesh)
+--
+--
+-- region1 = chiRegionCreate()
+-- chiRegionAddLineBoundary(region1,line_mesh);
+--
+--
+-- --############################################### Create meshers
+-- chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
+-- chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
+--
+-- chiVolumeMesherSetProperty(PARTITION_Z,2)
+--
+--
+-- --############################################### Execute meshing
+-- chiSurfaceMesherExecute();
+-- chiVolumeMesherExecute();
+
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
 mesh={}
 N=100
 L=2.0
-xmin = -1.0
+xmin = 0.0
 dx = L/N
 for i=1,(N+1) do
     k=i-1
     mesh[i] = xmin + k*dx
 end
-line_mesh = chiLineMeshCreateFromArray(mesh)
-
-
-region1 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
-
---############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
-
-chiVolumeMesherSetProperty(PARTITION_Z,2)
-
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
+chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs

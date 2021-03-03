@@ -112,7 +112,11 @@ Initialize()
               interpolation_points_ass_cell[p] = cell_local_index;
               interpolation_points_has_ass_cell[p] = true;
               chi_log.Log(LOG_ALLVERBOSE_2)
-                << "Cell inter section found  " << p;
+                << "Cell inter section found  " << p
+                << " v0[" << v0_i << "]=" << v0.PrintS()
+                << " v1[" << v1_i << "]=" << v1.PrintS()
+                << " point=" << interpolation_points[p].PrintS();
+
             }
 
           }//for each point

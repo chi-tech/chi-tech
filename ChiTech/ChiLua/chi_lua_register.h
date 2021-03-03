@@ -133,6 +133,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(EXTRUSION_LAYER,   10);
       RegisterConstant(MATID_FROMLOGICAL,   11);
       RegisterConstant(BNDRYID_FROMLOGICAL, 12);
+    RegisterFunction(chiVolumeMesherSetMatIDToAll)
 //  Domain Decomposition
     RegisterFunction(chiDomDecompose2D)
     RegisterFunction(chiDecomposeSurfaceMeshPxPy)

@@ -28,9 +28,9 @@ void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher& mesher = *handler->volume_mesher;
 
-  if ((typeid(mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D)) or
-      (typeid(mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
-      (typeid(mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
+  if ( options.geometry_type == GeometryType::ONED_SLAB or
+       options.geometry_type == GeometryType::TWOD_CARTESIAN or
+       (typeid(mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
   {
     if      (groupset.angleagg_method == AngleAggregationType::SINGLE)
     {

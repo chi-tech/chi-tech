@@ -1,13 +1,14 @@
-#include "../../../ChiLua/chi_lua.h"
-#include <iostream>
-#include "../Predefined2D/volmesher_predefined2d.h"
+#include "ChiLua/chi_lua.h"
+#include "ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h"
 
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../SurfaceMesher/surfacemesher.h"
-#include "../../VolumeMesher/Extruder/volmesher_extruder.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/SurfaceMesher/surfacemesher.h"
+#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
-#include <chi_log.h>
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include <iostream>
 
 //#############################################################################
 /** Sets a volume mesher property.
