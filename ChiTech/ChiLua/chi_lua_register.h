@@ -134,6 +134,19 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(MATID_FROMLOGICAL,   11);
       RegisterConstant(BNDRYID_FROMLOGICAL, 12);
     RegisterFunction(chiVolumeMesherSetMatIDToAll)
+    RegisterFunction(chiVolumeMesherSetupOrthogonalBoundaries)
+    RegisterNamespace(OrthoBoundaryID)
+      AddNamedConstantToNamespace(XMAX,0,OrthoBoundaryID)
+      AddNamedConstantToNamespace(XMIN,1,OrthoBoundaryID)
+      AddNamedConstantToNamespace(YMAX,2,OrthoBoundaryID)
+      AddNamedConstantToNamespace(YMIN,3,OrthoBoundaryID)
+      AddNamedConstantToNamespace(ZMAX,4,OrthoBoundaryID)
+      AddNamedConstantToNamespace(ZMIN,5,OrthoBoundaryID)
+
+
+
+
+
 //  Domain Decomposition
     RegisterFunction(chiDomDecompose2D)
     RegisterFunction(chiDecomposeSurfaceMeshPxPy)

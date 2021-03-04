@@ -105,6 +105,8 @@ public:
                                           bool sense, int bndry_id);
   static
   void                SetMatIDToAll(int mat_id);
+  static
+  void                SetupOrthogonalBoundaries();
   //02
   virtual void Execute();
   

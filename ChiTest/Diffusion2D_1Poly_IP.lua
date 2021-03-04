@@ -72,11 +72,10 @@ chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,w_bndry,DIFFUSION_VACUUM)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,n_bndry,DIFFUSION_REFLECTING)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,s_bndry,DIFFUSION_REFLECTING)
 
---############################################### Initialize Solver
 chiDiffusionInitialize(phys1)
-fftemp,count = chiGetFieldFunctionList(phys1)
 chiDiffusionExecute(phys1)
 
+fftemp,count = chiGetFieldFunctionList(phys1)
 slice2 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
 chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp[1])

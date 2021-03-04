@@ -49,8 +49,8 @@ chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+chiVolumeMesherSetMatIDToAll(0)
+chiVolumeMesherSetupOrthogonalBoundaries()
 
 
 --############################################### Add materials
@@ -68,17 +68,15 @@ chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLD_MIP);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
 
-
+--############################################### Set boundary conditions
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_DIRICHLET,0.0)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_DIRICHLET,0.0)
 
 --############################################### Initialize Solver
 chiDiffusionInitialize(phys1)
-fftemp,count = chiGetFieldFunctionList(phys1)
---############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_DIRICHLET,0.0)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_DIRICHLET,0.0)
-
 chiDiffusionExecute(phys1)
 
+fftemp,count = chiGetFieldFunctionList(phys1)
 line0 = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(line0,LINE_FIRSTPOINT,0.1,0.0,-1.0)
 chiFFInterpolationSetProperty(line0,LINE_SECONDPOINT,0.1,0.0, 1.0)
@@ -89,6 +87,7 @@ chiFFInterpolationInitialize(line0)
 chiFFInterpolationExecute(line0)
 --chiFFInterpolationExportPython(line0)
 
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)

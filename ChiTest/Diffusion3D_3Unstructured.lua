@@ -57,6 +57,7 @@ chiVolumeMesherExecute();
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+chiVolumeMesherSetupOrthogonalBoundaries()
 
 
 --############################################### Add materials
@@ -75,24 +76,15 @@ chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
 
 --############################################### Set boundary conditions
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIRICHLET,0.1)
-
---############################################### Set boundary conditions
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,5,DIFFUSION_VACUUM)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,6,DIFFUSION_VACUUM)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_VACUUM)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_VACUUM)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,2,DIFFUSION_VACUUM)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,3,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_REFLECTING)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_REFLECTING)
 
 --############################################### Initialize Solver
 chiDiffusionInitialize(phys1)
-fftemp,count = chiGetFieldFunctionList(phys1)
-
-
 chiDiffusionExecute(phys1)
 
 --############################################### Set derived geometry
+fftemp,count = chiGetFieldFunctionList(phys1)
 slice1 = chiFFInterpolationCreate(SLICE)
 --chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,0.025)
 chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.008,0.0,0.0)
