@@ -336,7 +336,6 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
   chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* vol_mesher = mesh_handler->volume_mesher;
 
-  //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
   if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
   {
     auto line_mesher = (chi_mesh::VolumeMesherLinemesh1D*)vol_mesher;
@@ -368,7 +367,6 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
     std::get<1>(ijk_id) = ij_id.second;
     std::get<2>(ijk_id) = cur_loc;
   }
-  //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
   else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
   {
     auto extruder = (chi_mesh::VolumeMesherExtruder*)vol_mesher;
@@ -436,47 +434,42 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
       zmin = zmax;
     }
   }//if typeid
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
   else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
   {
     if (vol_mesher->zcuts.empty())
     {
-      std::get<0>(ijk_id) = ij_id.first;
-      std::get<1>(ijk_id) = ij_id.second;
-      std::get<2>(ijk_id) = 0;
-      found_partition = true;
+      throw std::invalid_argument("Cell z-partitioning cannot be determined "
+                                  "because no z-cuts are supplied to volume "
+                                  "mesher.");
     }
 
     //====================================== Scan cuts for location
-    if (not found_partition)
+    double zmin = -1.0e16;
+    double zmax =  1.0e16;
+    vol_mesher->zcuts.push_back(zmax);
+    for (int k=0; k<(vol_mesher->zcuts.size()); k++)
     {
-      double zmin = -1.0e16;
-      double zmax =  1.0e16;
-      vol_mesher->zcuts.push_back(zmax);
-      for (int k=0; k<(vol_mesher->zcuts.size()); k++)
+      zmax =  vol_mesher->zcuts[k];
+
+      double z = cell->centroid.z;
+
+      if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
       {
-        zmax =  vol_mesher->zcuts[k];
-
-        double z = cell->centroid.z;
-
-        if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
-        {
-          printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
-        }
+        printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
+      }
 
 
-        if ((z > zmin) && (z < zmax))
-        {
-          std::get<0>(ijk_id) = ij_id.first;
-          std::get<1>(ijk_id) = ij_id.second;
-          std::get<2>(ijk_id) = k;
+      if ((z > zmin) && (z < zmax))
+      {
+        std::get<0>(ijk_id) = ij_id.first;
+        std::get<1>(ijk_id) = ij_id.second;
+        std::get<2>(ijk_id) = k;
 
-          found_partition = true;
-          break;
-        }
-        zmin = zmax;
-      }//for k
-    }//if not found_partition
+        found_partition = true;
+        break;
+      }
+      zmin = zmax;
+    }//for k
   }//if typeid
   else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
   {

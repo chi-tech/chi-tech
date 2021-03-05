@@ -31,11 +31,11 @@ extern ChiLog& chi_log;
                    parameters: number of subdivisions (defaults to 1), and layer id (char)(defaults
                    to nothing). Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```. \n
- CUT_X = Adds a cut at the given x-value. Only supported if partition-type is
+ CUTS_X = Adds a cut at the given x-value. Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
- CUT_Y = Adds a cut at the given y-value. Only supported if partition-type is
+ CUTS_Y = Adds a cut at the given y-value. Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
- CUT_Z = Adds a cut at the given z-value. Only supported if partition-type is
+ CUTS_Z = Adds a cut at the given z-value. Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
  PARTITION_X   = <B>PropertyValue:[int]</B> Number of partitions in X.
                     Only supported if partition-type is
@@ -73,6 +73,12 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
   //============================================= Get property index
   int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+
   int property_index = lua_tonumber(L,1);
 
   typedef chi_mesh::VolumeMesherProperty VMP;
@@ -222,8 +228,8 @@ int chiVolumeMesherSetProperty(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR) << "Invalid property specified in call to "
-                               "chiVolumeMesherSetProperty().";
+    chi_log.Log(LOG_ALLERROR) << "Invalid property specified " << property_index
+                              << " in call to chiVolumeMesherSetProperty().";
     exit(EXIT_FAILURE);
   }
 

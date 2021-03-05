@@ -213,7 +213,7 @@ public:
   //01
   LogStream       Log(LOG_LVL level=LOG_0);
   void            SetVerbosity(int int_level);
-  int             GetVerbosity();
+  int             GetVerbosity() const;
 
 private:
   class RepeatingEvent;
