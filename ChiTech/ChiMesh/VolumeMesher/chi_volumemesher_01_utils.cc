@@ -233,8 +233,10 @@ std::pair<int,int> chi_mesh::VolumeMesher::
   if (chi_mpi.process_count == 1){return ij_id;}
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::SurfaceMesher* surf_mesher = mesh_handler->surface_mesher;
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  auto surf_mesher = mesh_handler->surface_mesher;
+  auto vol_mesher = mesh_handler->volume_mesher;
+
 
   if  (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined))
   {
@@ -313,6 +315,83 @@ std::pair<int,int> chi_mesh::VolumeMesher::
     ij_id.second= y;
 
   }//if typeid
+  else if  (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
+  {
+    //====================================== Sanity check on partitioning
+    size_t num_x_subsets = vol_mesher->options.xcuts.size()+1;
+    size_t num_y_subsets = vol_mesher->options.ycuts.size()+1;
+
+    size_t x_remainder = num_x_subsets%vol_mesher->options.partition_x;
+    size_t y_remainder = num_y_subsets%vol_mesher->options.partition_y;
+
+    if (x_remainder != 0)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "When specifying x-partitioning, the number of grp_subsets in x "
+           "needs to be divisible by the number of partitions in x.";
+      exit(EXIT_FAILURE);
+    }
+
+    if (y_remainder != 0)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "When specifying y-partitioning, the number of grp_subsets in y "
+           "needs to be divisible by the number of partitions in y.";
+      exit(EXIT_FAILURE);
+    }
+
+    size_t subsets_per_partitionx = num_x_subsets/vol_mesher->options.partition_x;
+    size_t subsets_per_partitiony = num_y_subsets/vol_mesher->options.partition_y;
+
+//    chi_log.Log(LOG_0ERROR) << num_x_subsets;
+//    chi_log.Log(LOG_0ERROR) << num_y_subsets;
+//    chi_log.Log(LOG_0ERROR) << subsets_per_partitionx;
+//    chi_log.Log(LOG_0ERROR) << subsets_per_partitiony;
+
+
+    //====================================== Determine x-partition
+    int x=-1;
+    int xcount=-1;
+    for (size_t i =  subsets_per_partitionx-1;
+         i <  vol_mesher->options.xcuts.size();
+         i += subsets_per_partitionx)
+    {
+      xcount++;
+      if (cell->centroid.x <= vol_mesher->options.xcuts[i])
+      {
+        x = xcount;
+        break;
+      }
+    }
+    if (x<0)
+    {
+      x = vol_mesher->options.partition_x-1;
+    }
+
+    //====================================== Determine y-partition
+    int y=-1;
+    int ycount=-1;
+    for (size_t i =  subsets_per_partitiony-1;
+         i <  vol_mesher->options.ycuts.size();
+         i += subsets_per_partitiony)
+    {
+      ycount++;
+      if (cell->centroid.y <= vol_mesher->options.ycuts[i])
+      {
+        y = ycount;
+        break;
+      }
+    }
+    if (y<0)
+    {
+      y = vol_mesher->options.partition_y - 1;
+    }
+
+    //====================================== Set partitioning
+    ij_id.first = x;
+    ij_id.second= y;
+
+  }//if typeid
 
   return ij_id;
 }
@@ -372,7 +451,7 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
     auto extruder = (chi_mesh::VolumeMesherExtruder*)vol_mesher;
 
     //====================================== Create virtual cuts
-    if (vol_mesher->zcuts.empty())
+    if (vol_mesher->options.zcuts.empty())
     {
       size_t num_sub_layers = extruder->vertex_layers.size()-1;
 
@@ -392,15 +471,15 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
         if (layer_index > (extruder->vertex_layers.size()-1))
         {
           layer_index = (int)extruder->vertex_layers.size()-1;
-          vol_mesher->zcuts.push_back(extruder->vertex_layers[layer_index]);
+          vol_mesher->options.zcuts.push_back(extruder->vertex_layers[layer_index]);
         }
         else
         {
-          vol_mesher->zcuts.push_back(extruder->vertex_layers[layer_index]);
+          vol_mesher->options.zcuts.push_back(extruder->vertex_layers[layer_index]);
 
           if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
           {
-            printf("Z-Cut %lu, %g\n",vol_mesher->zcuts.size(),
+            printf("Z-Cut %lu, %g\n",vol_mesher->options.zcuts.size(),
                    extruder->vertex_layers[layer_index]);
           }
         }
@@ -410,9 +489,9 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
 
     //====================================== Scan cuts for location
     double zmin = -1.0e-16;
-    for (int k=0; k<(vol_mesher->zcuts.size()); k++)
+    for (int k=0; k<(vol_mesher->options.zcuts.size()); k++)
     {
-      double zmax =  vol_mesher->zcuts[k];
+      double zmax =  vol_mesher->options.zcuts[k];
 
       double z = cell->centroid.z;
 
@@ -436,7 +515,7 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
   }//if typeid
   else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
   {
-    if (vol_mesher->zcuts.empty())
+    if (vol_mesher->options.zcuts.empty())
     {
       throw std::invalid_argument("Cell z-partitioning cannot be determined "
                                   "because no z-cuts are supplied to volume "
@@ -444,12 +523,13 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
     }
 
     //====================================== Scan cuts for location
+    std::vector<double> temp_zcuts = vol_mesher->options.zcuts;
     double zmin = -1.0e16;
     double zmax =  1.0e16;
-    vol_mesher->zcuts.push_back(zmax);
-    for (int k=0; k<(vol_mesher->zcuts.size()); k++)
+    temp_zcuts.push_back(zmax);
+    for (int k=0; k<(temp_zcuts.size()); k++)
     {
-      zmax =  vol_mesher->zcuts[k];
+      zmax =  temp_zcuts[k];
 
       double z = cell->centroid.z;
 

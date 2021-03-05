@@ -107,6 +107,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     int p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->partitioning_y = p;
+    cur_hndlr->volume_mesher->options.partition_y = p;
     chi_log.Log(LOG_ALLVERBOSE_1)
       << "Partition y set to " << p;
   }
@@ -114,23 +115,26 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     int p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->partitioning_x = p;
+    cur_hndlr->volume_mesher->options.partition_x = p;
     chi_log.Log(LOG_ALLVERBOSE_1)
       << "Partition x set to " << p;
   }
   else if (property_index == VMP::CUTS_Z)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr->volume_mesher->zcuts.push_back(p);
+    cur_hndlr->volume_mesher->options.zcuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_Y)
   {
     double p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->ycuts.push_back(p);
+    cur_hndlr->volume_mesher->options.ycuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_X)
   {
     double p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->xcuts.push_back(p);
+    cur_hndlr->volume_mesher->options.xcuts.push_back(p);
   }
   else if (property_index == VMP::PARTITION_TYPE)
   {
@@ -232,6 +236,98 @@ int chiVolumeMesherSetProperty(lua_State *L)
                               << " in call to chiVolumeMesherSetProperty().";
     exit(EXIT_FAILURE);
   }
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the Px, Py and Pz partititioning parameters for a
+ * KBA-type partitioning. This also fixes the process count required to
+ * a total of Px*Py*Pz.
+ *
+\param Px int Number partitions in x.
+\param Py int Number partitions in y.
+\param Pz int Number partitions in z.
+
+ */
+int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 3)
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
+
+  //============================================= Get current mesh handler
+  auto cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto vol_mesher= cur_hndlr->volume_mesher;
+
+  int px = lua_tonumber(L,1);
+  int py = lua_tonumber(L,2);
+  int pz = lua_tonumber(L,3);
+
+  vol_mesher->options.partition_x = px;
+  vol_mesher->options.partition_y = py;
+  vol_mesher->options.partition_z = pz;
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the x-cuts for KBA type partitioning with a lua array.*/
+int chiVolumeMesherSetKBACutsX(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+
+  std::vector<double> cuts;
+  LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
+
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler->volume_mesher->options.xcuts = cuts;
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the y-cuts for KBA type partitioning with a lua array.*/
+int chiVolumeMesherSetKBACutsY(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+
+  std::vector<double> cuts;
+  LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
+
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler->volume_mesher->options.ycuts = cuts;
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the z-cuts for KBA type partitioning with a lua array.*/
+int chiVolumeMesherSetKBACutsZ(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+
+  std::vector<double> cuts;
+  LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
+
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler->volume_mesher->options.zcuts = cuts;
 
   return 0;
 }

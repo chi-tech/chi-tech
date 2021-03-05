@@ -60,9 +60,6 @@ struct chi_mesh::CellIndexMap
 class chi_mesh::VolumeMesher
 {
 public:
-  std::vector<double> zcuts;
-
-public:
   enum PartitionType
   {
     KBA_STYLE_XY  = 1,
@@ -73,7 +70,13 @@ public:
   {
     bool         force_polygons = true;
     bool         mesh_global    = false;
+    int          partition_x    = 1;
+    int          partition_y    = 1;
     int          partition_z    = 1;
+
+    std::vector<double> xcuts;
+    std::vector<double> ycuts;
+    std::vector<double> zcuts;
     PartitionType partition_type = PARMETIS;
   };
   VOLUME_MESHER_OPTIONS options;

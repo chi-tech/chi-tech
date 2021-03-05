@@ -133,6 +133,10 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(EXTRUSION_LAYER,   10);
       RegisterConstant(MATID_FROMLOGICAL,   11);
       RegisterConstant(BNDRYID_FROMLOGICAL, 12);
+    RegisterFunction(chiVolumeMesherSetKBAPartitioningPxPyPz)
+    RegisterFunction(chiVolumeMesherSetKBACutsX)
+    RegisterFunction(chiVolumeMesherSetKBACutsY)
+    RegisterFunction(chiVolumeMesherSetKBACutsZ)
     RegisterFunction(chiVolumeMesherSetMatIDToAll)
     RegisterFunction(chiVolumeMesherSetupOrthogonalBoundaries)
     RegisterNamespace(OrthoBoundaryID)
