@@ -1,5 +1,19 @@
-print("############################################### LuaTest")
---dofile(CHI_LIBRARY)
+-- 1D Diffusion test with Vacuum BCs.
+-- SDM: PWLC
+-- Test: Max-value=2.50000
+num_procs = 2
+-- KBA-partitioning
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
+end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
@@ -15,17 +29,11 @@ for i=1,(N+1) do
 end
 chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 
-print(PARTITION_TYPE,KBA_STYLE_XYZ,CUT_Z,PARTITION_Z)
 chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
--- chiVolumeMesherSetProperty(CUTS_Z,L/2.0)
-chiVolumeMesherSetProperty(PARTITION_Z,2)
 
+chiVolumeMesherSetKBACutsZ({L/2})
+chiVolumeMesherSetKBAPartitioningPxPyPz(1,1,2)
 
-chiVolumeMesherExecute();
-
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
@@ -52,11 +60,14 @@ chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_VACUU
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_VACUUM)
 
 
---############################################### Initialize Solver
+--############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
 
+--############################################### Get field functions
 fftemp,count = chiGetFieldFunctionList(phys1)
+
+--############################################### Line plot
 ffi0 = chiFFInterpolationCreate(LINE)
 curffi = ffi0;
 chiFFInterpolationSetProperty(curffi,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
@@ -67,6 +78,7 @@ chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp[1])
 chiFFInterpolationInitialize(curffi)
 chiFFInterpolationExecute(curffi)
 
+--############################################### Volume integrations
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
@@ -80,8 +92,12 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 
-if (chi_location_id == 0 and master_export == nil) then
+--############################################### Exports
+if (master_export == nil) then
     chiFFInterpolationExportPython(ffi0)
+end
+
+if (chi_location_id == 0 and master_export == nil) then
 
     local handle = io.popen("python ZLFFI00.py")
 end

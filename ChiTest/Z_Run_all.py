@@ -65,6 +65,42 @@ else:
 
 #=========================================== Test
 test_number += 1
+test_name = FormatFileName("Diffusion1D_KBA") + " 1D Diffusion Test - CFEM 2 MPI Process"
+print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
+process = subprocess.Popen(["mpiexec","-np","2",kpath_to_exe,
+                            "ChiTest/Diffusion1D_KBA.lua", "master_export=false"],
+                           cwd=kchi_src_pth,
+                           stdout=subprocess.PIPE,
+                           universal_newlines=True)
+process.wait()
+out,err = process.communicate()
+
+#string to find in output
+find_str          = "[0]  Max-value="
+#start of the string (<0 if not found)
+test_str_start    = out.find(find_str)
+#end of the string to find
+test_str_end      = test_str_start + len(find_str)
+#end of the line at which string was found
+test_str_line_end = out.find("\n",test_str_start)
+
+test_passed = False
+if (test_str_start >= 0):
+  #convert value to number
+  test_val = float(out[test_str_end:test_str_line_end])
+  if (abs(test_val-2.5) < 1.0e-10):
+    test_passed = True
+else:
+  test_passed = False
+
+if (test_passed):
+  print(" - Passed")
+else:
+  print(" - FAILED!")
+  num_failed += 1
+
+#=========================================== Test
+test_number += 1
 test_name = FormatFileName("Diffusion1D_IP") + " 1D Diffusion Test - DFEM 2 MPI Processes"
 print("Running Test " + format3(test_number) + " " + test_name,end='',flush=True)
 process = subprocess.Popen(["mpiexec","-np","2",kpath_to_exe,
