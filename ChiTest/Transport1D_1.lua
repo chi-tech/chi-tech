@@ -1,10 +1,19 @@
-chiMPIBarrier()
-if (chi_location_id == 0) then
-    print("############################################### LuaTest")
+-- 1D Transport test with Vacuum and Incident-isotropic BC.
+-- SDM: PWLD
+-- Test: Max-value=0.49903 and 7.18243e-4
+num_procs = 3
+
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
 end
---dofile(CHI_LIBRARY)
-
-
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
@@ -53,10 +62,7 @@ end
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
-
-
 --############################################### Setup Physics
-
 phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
@@ -96,7 +102,7 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 --chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 --chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 
---========== Boundary conditions
+--############################################### Set boundary conditions
 bsrc={}
 for g=1,num_groups do
     bsrc[g] = 0.0
@@ -104,15 +110,17 @@ end
 bsrc[1] = 1.0/2
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
---========== Solvers
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,5)
 
+--############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
+--############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
+--############################################### Line plot
 --Testing consolidated interpolation
 cline = chiFFInterpolationCreate(LINE)
 chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,0.0,0.0001+xmin)
@@ -123,10 +131,10 @@ for k=165,165 do
     chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist[k])
 end
 
-
 chiFFInterpolationInitialize(cline)
 chiFFInterpolationExecute(cline)
 
+--############################################### Volume integrations
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
@@ -152,10 +160,12 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
+--############################################### Exports
 if (master_export == nil) then
     chiFFInterpolationExportPython(cline)
 end
 
+--############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
     local handle = io.popen("python3 ZLFFI00.py")
 end

@@ -1,10 +1,19 @@
-chiMPIBarrier()
-if (chi_location_id == 0) then
-    print("############################################### LuaTest")
+-- 3D Transport test with Vacuum and Incident-isotropic BC.
+-- SDM: PWLD
+-- Test: Nonce
+num_procs = 4
+
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
 end
---dofile(CHI_LIBRARY)
-
-
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
@@ -13,7 +22,6 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj",true)
 
---############################################### Extract edges from surface mesh
 loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
 
 line_mesh = {};
@@ -28,14 +36,12 @@ for k=1,loop_count do
 
 end
 
---############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 for k=1,line_mesh_count do
     chiRegionAddLineBoundary(region1,line_mesh[k]);
 end
 
---############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
 
@@ -56,12 +62,8 @@ chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
 chiVolumeMesherSetProperty(MESH_GLOBAL,false);
 chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
 
---############################################### Execute meshing
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
-
---chiRegionExportMeshToPython(region1,
---        "YMesh"..string.format("%d",chi_location_id)..".py",false)
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
@@ -69,7 +71,6 @@ chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
 vol1 = chiLogicalVolumeCreate(RPP,-10.0,10.0,-10.0,10.0,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
-
 
 --############################################### Add materials
 materials = {}
@@ -97,9 +98,6 @@ end
 --chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
-
-
-
 
 --############################################### Setup Physics
 phys1 = chiLBSCreateSolver()
@@ -148,7 +146,7 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
 chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-2,false," ")
 chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-6,false," ")
 
---========== Boundary conditions
+--############################################### Set boundary conditions
 bsrc={}
 for g=1,num_groups do
     bsrc[g] = 0.0
@@ -162,13 +160,16 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.INCIDENT_ISOTRO
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,INCIDENT_ISOTROPIC,bsrc);
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,INCIDENT_ISOTROPIC,bsrc);
 
-
-
+--############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
+--############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
+--############################################### Exports
 if (master_export == nil) then
     chiExportFieldFunctionToVTKG(fflist[1],"ZPhi","Phi")
 end
+
+--############################################### Plots
