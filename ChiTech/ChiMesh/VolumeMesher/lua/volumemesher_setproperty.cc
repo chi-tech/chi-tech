@@ -159,13 +159,13 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         subdivisions = lua_tonumber(L,3);
       }
-      auto new_layer = new MeshLayer;
-      new_layer->height = layer_height;
-      new_layer->sub_divisions = subdivisions;
+      chi_mesh::VolumeMesherExtruder::MeshLayer new_layer;
+      new_layer.height = layer_height;
+      new_layer.sub_divisions = subdivisions;
 
       if (num_args==4)
       {
-        new_layer->name = std::string(lua_tostring(L,4));
+        new_layer.name = std::string(lua_tostring(L,4));
       }
       mesher->input_layers.push_back(new_layer);
     }

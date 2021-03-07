@@ -91,7 +91,7 @@ void chi_mesh::Create3DOrthoMesh(std::vector<double>& vertices_x,
 
   //======================================== Create meshers
   handler->surface_mesher = new chi_mesh::SurfaceMesherPredefined;
-  auto extruder = new chi_mesh::VolumeMesherExtruder;
+  auto extruder = new chi_mesh::VolumeMesherExtruder(surface_mesh);
   handler->volume_mesher = extruder;
 
   //======================================== Populate layers
@@ -113,9 +113,9 @@ void chi_mesh::Create3DOrthoMesh(std::vector<double>& vertices_x,
 
   for (auto distance : distances)
   {
-    auto new_layer = new MeshLayer;
-    new_layer->height = distance;
-    new_layer->sub_divisions = 1;
+    chi_mesh::VolumeMesherExtruder::MeshLayer new_layer;
+    new_layer.height = distance;
+    new_layer.sub_divisions = 1;
     extruder->input_layers.push_back(new_layer);
   }
 

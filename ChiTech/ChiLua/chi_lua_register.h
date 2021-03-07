@@ -47,6 +47,7 @@ RegisterFunction(chiMeshCreateUnpartitioned3DOrthoMesh)
 
 RegisterFunction(chiUnpartitionedMeshFromVTU)
 RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
+RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ)
 
 
 //module:Mesh Utilities
@@ -115,6 +116,10 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(VOLUMEMESHER_EXTRUDER,     4);
       RegisterConstant(VOLUMEMESHER_PREDEFINED3D, 5)
       RegisterConstant(VOLUMEMESHER_UNPARTITIONED, 6)
+    RegisterNamespace(ExtruderTemplateType)
+      AddNamedConstantToNamespace(SURFACE_MESH,1,ExtruderTemplateType)
+      AddNamedConstantToNamespace(UNPARTITIONED_MESH,2,ExtruderTemplateType)
+
     RegisterFunction(chiVolumeMesherExecute)
     RegisterFunction(chiVolumeMesherSetProperty)
       RegisterConstant(FORCE_POLYGONS,   1);

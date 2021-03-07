@@ -28,10 +28,11 @@ end
 newSurfMesh = chiSurfaceMeshCreateFromArrays(xmesh,xmesh);
 
 region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
+chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
+                      ExtruderTemplateType.SURFACE_MESH,
+                      newSurfMesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");

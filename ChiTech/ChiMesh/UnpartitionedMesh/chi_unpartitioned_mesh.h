@@ -1,5 +1,5 @@
-#ifndef chi_mesh_unpartitionedmesh_h
-#define chi_mesh_unpartitionedmesh_h
+#ifndef CHI_MESH_UNPARTITIONED_MESH_H
+#define CHI_MESH_UNPARTITIONED_MESH_H
 
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/Cell/cell.h"
@@ -11,7 +11,6 @@
  * partitioning.*/
 class chi_mesh::UnpartitionedMesh
 {
-  friend class VolumeMesherPredefined3D;
   friend class VolumeMesherPredefinedUnpartitioned;
   friend void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices);
   friend void CreateUnpartitioned2DOrthoMesh(std::vector<double>& vertices_1d_x,
@@ -33,6 +32,7 @@ private:
     std::vector<uint64_t> vertex_ids;
     std::vector<LightWeightFace> faces;
 
+    explicit
     LightWeightCell(chi_mesh::CellType in_type) : type(in_type) {}
   };
 private:
@@ -69,7 +69,8 @@ public:
 
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);
+  void ReadFromWavefrontOBJ(const Options& options);
 };
 
 
-#endif
+#endif //CHI_MESH_UNPARTITIONED_MESH_H

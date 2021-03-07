@@ -28,11 +28,9 @@ chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
 
-chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+chiVolumeMesherSetKBACutsX({0.0})
+chiVolumeMesherSetKBACutsY({0.0})
 
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();

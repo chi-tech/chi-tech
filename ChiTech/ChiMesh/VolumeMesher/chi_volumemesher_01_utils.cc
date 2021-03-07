@@ -89,7 +89,7 @@ void chi_mesh::VolumeMesher::
     //====================================== Compute xy partition id
     auto xy_partition_indices = GetCellXYPartitionID(cell);
     cell->partition_id = xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
+                         handler->volume_mesher->options.partition_x +
                          xy_partition_indices.first;
 
     if (force_local)
@@ -145,7 +145,7 @@ void chi_mesh::VolumeMesher::
     //====================================== Compute partition id
     auto xy_partition_indices = GetCellXYPartitionID(cell);
     cell->partition_id = xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
+                         handler->volume_mesher->options.partition_x +
                          xy_partition_indices.first;
 
     if (force_local)
@@ -237,84 +237,78 @@ std::pair<int,int> chi_mesh::VolumeMesher::
   auto vol_mesher = mesh_handler->volume_mesher;
 
 
-  if  (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined))
-  {
-    //====================================== Sanity check on partitioning
-    size_t num_x_subsets = surf_mesher->xcuts.size()+1;
-    size_t num_y_subsets = surf_mesher->ycuts.size()+1;
-
-    size_t x_remainder = num_x_subsets%surf_mesher->partitioning_x;
-    size_t y_remainder = num_y_subsets%surf_mesher->partitioning_y;
-
-    if (x_remainder != 0)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "When specifying x-partitioning, the number of grp_subsets in x "
-           "needs to be divisible by the number of partitions in x.";
-      exit(EXIT_FAILURE);
-    }
-
-    if (y_remainder != 0)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "When specifying y-partitioning, the number of grp_subsets in y "
-           "needs to be divisible by the number of partitions in y.";
-      exit(EXIT_FAILURE);
-    }
-
-    size_t subsets_per_partitionx = num_x_subsets/surf_mesher->partitioning_x;
-    size_t subsets_per_partitiony = num_y_subsets/surf_mesher->partitioning_y;
-
-//    chi_log.Log(LOG_0ERROR) << num_x_subsets;
-//    chi_log.Log(LOG_0ERROR) << num_y_subsets;
-//    chi_log.Log(LOG_0ERROR) << subsets_per_partitionx;
-//    chi_log.Log(LOG_0ERROR) << subsets_per_partitiony;
-
-
-    //====================================== Determine x-partition
-    int x=-1;
-    int xcount=-1;
-    for (size_t i =  subsets_per_partitionx-1;
-                i <  surf_mesher->xcuts.size();
-                i += subsets_per_partitionx)
-    {
-      xcount++;
-      if (cell->centroid.x <= surf_mesher->xcuts[i])
-      {
-        x = xcount;
-        break;
-      }
-    }
-    if (x<0)
-    {
-      x = surf_mesher->partitioning_x-1;
-    }
-
-    //====================================== Determine y-partition
-    int y=-1;
-    int ycount=-1;
-    for (size_t i =  subsets_per_partitiony-1;
-                i <  surf_mesher->ycuts.size();
-                i += subsets_per_partitiony)
-    {
-      ycount++;
-      if (cell->centroid.y <= surf_mesher->ycuts[i])
-      {
-        y = ycount;
-        break;
-      }
-    }
-    if (y<0)
-    {
-      y = surf_mesher->partitioning_y - 1;
-    }
-
-    //====================================== Set partitioning
-    ij_id.first = x;
-    ij_id.second= y;
-
-  }//if typeid
-  else if  (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
+//  if  (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined))
+//  {
+////    //====================================== Sanity check on partitioning
+////    size_t num_x_subsets = surf_mesher->xcuts.size()+1;
+////    size_t num_y_subsets = surf_mesher->ycuts.size()+1;
+////
+////    size_t x_remainder = num_x_subsets%surf_mesher->partitioning_x;
+////    size_t y_remainder = num_y_subsets%surf_mesher->partitioning_y;
+////
+////    if (x_remainder != 0)
+////    {
+////      chi_log.Log(LOG_ALLERROR)
+////        << "When specifying x-partitioning, the number of grp_subsets in x "
+////           "needs to be divisible by the number of partitions in x.";
+////      exit(EXIT_FAILURE);
+////    }
+////
+////    if (y_remainder != 0)
+////    {
+////      chi_log.Log(LOG_ALLERROR)
+////        << "When specifying y-partitioning, the number of grp_subsets in y "
+////           "needs to be divisible by the number of partitions in y.";
+////      exit(EXIT_FAILURE);
+////    }
+////
+////    size_t subsets_per_partitionx = num_x_subsets/surf_mesher->partitioning_x;
+////    size_t subsets_per_partitiony = num_y_subsets/surf_mesher->partitioning_y;
+////
+////    //====================================== Determine x-partition
+////    int x=-1;
+////    int xcount=-1;
+////    for (size_t i =  subsets_per_partitionx-1;
+////                i <  surf_mesher->xcuts.size();
+////                i += subsets_per_partitionx)
+////    {
+////      xcount++;
+////      if (cell->centroid.x <= surf_mesher->xcuts[i])
+////      {
+////        x = xcount;
+////        break;
+////      }
+////    }
+////    if (x<0)
+////    {
+////      x = surf_mesher->partitioning_x-1;
+////    }
+////
+////    //====================================== Determine y-partition
+////    int y=-1;
+////    int ycount=-1;
+////    for (size_t i =  subsets_per_partitiony-1;
+////                i <  surf_mesher->ycuts.size();
+////                i += subsets_per_partitiony)
+////    {
+////      ycount++;
+////      if (cell->centroid.y <= surf_mesher->ycuts[i])
+////      {
+////        y = ycount;
+////        break;
+////      }
+////    }
+////    if (y<0)
+////    {
+////      y = surf_mesher->partitioning_y - 1;
+////    }
+////
+////    //====================================== Set partitioning
+////    ij_id.first = x;
+////    ij_id.second= y;
+//
+//  }//if typeid
+//  else if  (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
   {
     //====================================== Sanity check on partitioning
     size_t num_x_subsets = vol_mesher->options.xcuts.size()+1;
@@ -341,12 +335,6 @@ std::pair<int,int> chi_mesh::VolumeMesher::
 
     size_t subsets_per_partitionx = num_x_subsets/vol_mesher->options.partition_x;
     size_t subsets_per_partitiony = num_y_subsets/vol_mesher->options.partition_y;
-
-//    chi_log.Log(LOG_0ERROR) << num_x_subsets;
-//    chi_log.Log(LOG_0ERROR) << num_y_subsets;
-//    chi_log.Log(LOG_0ERROR) << subsets_per_partitionx;
-//    chi_log.Log(LOG_0ERROR) << subsets_per_partitiony;
-
 
     //====================================== Determine x-partition
     int x=-1;

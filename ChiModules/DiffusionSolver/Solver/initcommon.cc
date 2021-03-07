@@ -22,6 +22,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
 
   if (grid == nullptr) throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                                               " No grid defined.");
+
   auto globl_unique_bndry_ids = grid->GetDomainUniqueBoundaryIDs();
 
   uint64_t max_boundary_id = 0;

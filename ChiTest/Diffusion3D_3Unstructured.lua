@@ -22,29 +22,12 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "ChiResources/TestObjects/TriangleMesh2x2.obj")
 
-loops,loop_count = chiSurfaceMeshGetEdgeLoopsPoly(newSurfMesh)
-
-line_mesh = {};
-line_mesh_count = 0;
-
-for k=1,loop_count do
-    split_loops,split_count = chiEdgeLoopSplitByAngle(loops,k-1);
-    for m=1,split_count do
-        line_mesh_count = line_mesh_count + 1;
-        line_mesh[line_mesh_count] =
-        chiLineMeshCreateFromLoop(split_loops,m-1);
-    end
-
-end
-
 region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-for k=1,line_mesh_count do
-    chiRegionAddLineBoundary(region1,line_mesh[k]);
-end
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
+chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
+                      ExtruderTemplateType.SURFACE_MESH,
+                      newSurfMesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
@@ -52,10 +35,10 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+chiVolumeMesherSetKBACutsX({0.0})
+chiVolumeMesherSetKBACutsY({0.0})
+
 
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();

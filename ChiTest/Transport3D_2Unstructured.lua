@@ -26,12 +26,9 @@ region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
-
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
+                      ExtruderTemplateType.SURFACE_MESH,
+                      newSurfMesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
@@ -39,10 +36,10 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
 
-chiVolumeMesherSetProperty(PARTITION_Z,1);
+chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+chiVolumeMesherSetKBACutsX({0.0})
+chiVolumeMesherSetKBACutsY({0.0})
 
-chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
-chiVolumeMesherSetProperty(MESH_GLOBAL,false);
 chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
 
 chiSurfaceMesherExecute();

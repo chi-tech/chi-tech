@@ -41,6 +41,7 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
     {
       if (bndry->initial_mesh_continuum->surface_mesh != nullptr)
       {
+        chi_log.Log() << "Processing surface mesh";
         auto surface_mesh = bndry->initial_mesh_continuum->surface_mesh;
         //================================== Check if a surface has already
         //                                   been processed
@@ -72,8 +73,8 @@ void chi_mesh::VolumeMesherPredefined2D::Execute()
         //================================== Checking partitioning parameters
         if (!options.mesh_global)
         {
-          int p_tot = mesh_handler->surface_mesher->partitioning_x*
-                      mesh_handler->surface_mesher->partitioning_y;
+          int p_tot = options.partition_x*
+                      options.partition_y;
           if (chi_mpi.process_count != p_tot)
           {
             chi_log.Log(LOG_ALLERROR) <<
