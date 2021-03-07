@@ -29,26 +29,6 @@ namespace chi_mesh
   };
 };
 
-struct chi_mesh::CellIndexMap
-{
-  int mapped_from;
-  int mapped_to;
-  int mapped_level;
-
-  CellIndexMap()
-  {
-    mapped_from  = -1;
-    mapped_to    = -1;
-    mapped_level = -1;
-  }
-  CellIndexMap(int from,int to)
-  {
-    mapped_from  = from;
-    mapped_to    = to;
-    mapped_level = -1;
-  }
-};
-
 //######################################################### Class def
 /**Parent volume mesher class.*/
 class chi_mesh::VolumeMesher
@@ -74,10 +54,6 @@ public:
     PartitionType partition_type = PARMETIS;
   };
   VOLUME_MESHER_OPTIONS options;
-public:
-  std::vector<chi_mesh::CellIndexMap*> cell_ordering;
-  std::vector<chi_mesh::NodeIndexMap*> node_ordering;
-  std::vector<int>                     reverse_node_ordering;
 public:
   //01 Utils
   static
