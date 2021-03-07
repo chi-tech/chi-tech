@@ -18,24 +18,16 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "ChiResources/TestObjects/SquareMesh2x2Quads.obj",true)
-
-region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
-
-chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
-
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,-0.5)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
-
-chiSurfaceMesherExecute();
+mesh={}
+N=32
+L=2.0
+xmin = -1.0
+dx = L/N
+for i=1,(N+1) do
+    k=i-1
+    mesh[i] = xmin + k*dx
+end
+chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
