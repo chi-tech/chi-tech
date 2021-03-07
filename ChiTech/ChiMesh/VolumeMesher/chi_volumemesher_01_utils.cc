@@ -3,7 +3,6 @@
 #include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 #include "ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h"
-#include "ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 #include "ChiMesh/Cell/cell_polygon.h"

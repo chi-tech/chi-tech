@@ -8,7 +8,6 @@ namespace chi_mesh
 {
   enum VolumeMesherType
   {
-    PREDEFINED2D  = 3,
     EXTRUDER      = 4,
     UNPARTITIONED = 6
   };

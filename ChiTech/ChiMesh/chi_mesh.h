@@ -90,10 +90,7 @@ namespace chi_mesh
 
   //==================================== Volume meshers
   class VolumeMesher;
-//  class VolumeMesherLinemesh1D;
-  class VolumeMesherPredefined2D;
   class VolumeMesherExtruder;
-//  class VolumeMesherPredefined3D;
   class VolumeMesherPredefinedUnpartitioned;
 
 
@@ -116,16 +113,6 @@ namespace chi_mesh
                                 Vertex* line_point_0,
                                 Vertex* line_point_1,
                                 double tolerance);
-
-  //=================================== OrthoMeshes
-  void Create1DSlabMesh(std::vector<double>& vertices_1d);
-
-  void Create2DOrthoMesh(std::vector<double>& vertices_1d_x,
-                         std::vector<double>& vertices_1d_y);
-
-  void Create3DOrthoMesh(std::vector<double>& vertices_1d_x,
-                         std::vector<double>& vertices_1d_y,
-                         std::vector<double>& vertices_1d_z);
 
   void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices_1d);
 

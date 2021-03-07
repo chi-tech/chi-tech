@@ -1,5 +1,4 @@
 #include "../../../ChiLua/chi_lua.h"
-#include "../Predefined2D/volmesher_predefined2d.h"
 #include "../Extruder/volmesher_extruder.h"
 #include "../PredefinedUnpartitioned/volmesher_predefunpart.h"
 
@@ -88,11 +87,7 @@ int chiVolumeMesherCreate(lua_State *L)
 
   chi_mesh::VolumeMesher* new_mesher;
 
-  if (type==chi_mesh::VolumeMesherType::PREDEFINED2D)
-  {
-    new_mesher = new chi_mesh::VolumeMesherPredefined2D;
-  }
-  else if (type==chi_mesh::VolumeMesherType::EXTRUDER)
+  if (type==chi_mesh::VolumeMesherType::EXTRUDER)
   {
     if (num_args != 3)
     {
@@ -164,7 +159,6 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     chi_log.Log(LOG_0ERROR) << "Invalid Volume mesher type in function "
                                "chiVolumeMesherCreate. Allowed options are"
-                               "VOLUMEMESHER_PREDEFINED2D, "
                                "VOLUMEMESHER_EXTRUDER or "
                                "VOLUMEMESHER_UNPARTITIONED";
     exit(EXIT_FAILURE);
