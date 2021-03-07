@@ -131,7 +131,7 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(CUTS_Y,   7);
       RegisterConstant(CUTS_X,   8);
       RegisterConstant(PARTITION_TYPE,   9);
-        RegisterConstant(KBA_STYLE_XY,   1);
+//        RegisterConstant(KBA_STYLE_XY,   1);
         RegisterConstant(KBA_STYLE_XYZ,   2);
         RegisterConstant(PARMETIS,   3);
       RegisterConstant(EXTRUSION_LAYER,   10);

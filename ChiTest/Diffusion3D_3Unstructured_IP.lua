@@ -35,6 +35,7 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
 
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
 chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
 chiVolumeMesherSetKBACutsX({0.0})
 chiVolumeMesherSetKBACutsY({0.0})

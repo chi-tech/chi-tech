@@ -36,7 +36,7 @@ class chi_mesh::VolumeMesher
 public:
   enum PartitionType
   {
-    KBA_STYLE_XY  = 1,
+//    KBA_STYLE_XY  = 1,
     KBA_STYLE_XYZ = 2,
     PARMETIS      = 3
   };
@@ -58,8 +58,14 @@ public:
   //01 Utils
   static
   void AddContinuumToRegion(MeshContinuumPtr& grid, Region& region);
+  static
   void CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
                           chi_mesh::MeshContinuumPtr& vol_continuum,
+                          bool delete_surface_mesh_elements=false,
+                          bool force_local=false);
+  static
+  void CreatePolygonCells(chi_mesh::UnpartitionedMesh* umesh,
+                          chi_mesh::MeshContinuumPtr& grid,
                           bool delete_surface_mesh_elements=false,
                           bool force_local=false);
 
@@ -68,8 +74,9 @@ public:
                         chi_mesh::MeshContinuumPtr& out_grid);
   static
   std::pair<int,int>  GetCellXYPartitionID(chi_mesh::Cell *cell);
+  static
   std::tuple<int,int,int>
-                      GetCellXYZPartitionID(chi_mesh::Cell *cell) const;
+                      GetCellXYZPartitionID(chi_mesh::Cell *cell);
   static
   void                SetMatIDFromLogical(chi_mesh::LogicalVolume* log_vol,
                                           bool sense, int mat_id);

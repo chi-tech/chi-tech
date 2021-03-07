@@ -18,22 +18,16 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "ChiResources/TestObjects/TriangleMesh2x2.obj",true)
+chiUnpartitionedMeshFromWavefrontOBJ("ChiResources/TestObjects/TriangleMesh2x2.obj")
 
 region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
+chiRegionAddEmptyBoundary(region1)
 
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
 
-chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
-chiVolumeMesherSetKBACutsX({0.0})
-chiVolumeMesherSetKBACutsY({0.0})
-
-chiSurfaceMesherExecute();
-chiVolumeMesherExecute();
+chiSurfaceMesherExecute()
+chiVolumeMesherExecute()
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)

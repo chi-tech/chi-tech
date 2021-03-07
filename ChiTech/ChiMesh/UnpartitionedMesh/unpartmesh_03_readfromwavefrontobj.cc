@@ -2,6 +2,7 @@
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
+#include "chi_mpi.h"
 
 #include <algorithm>
 
@@ -19,6 +20,10 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
       << "to ImportFromOBJFile \n";
     exit(EXIT_FAILURE);
   }
+
+  chi_log.Log() << "Making Unpartitioned mesh from wavefront file "
+                << options.file_name;
+  MPI_Barrier(MPI_COMM_WORLD);
 
   //===================================================== Reading every line and determining size
   std::string file_line;
@@ -110,7 +115,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
 
         face.vertex_ids.resize(2);
         face.vertex_ids[0] = cell->vertex_ids[v];
-        face.vertex_ids[1] = (v<(num_verts-1))? cell->vertex_ids[v+1] : 0;
+        face.vertex_ids[1] = (v<(num_verts-1))? cell->vertex_ids[v+1] :
+                                                cell->vertex_ids[0];
 
         cell->faces.push_back(std::move(face));
       }
@@ -119,4 +125,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
     }
   }
   file.close();
+
+  //======================================== Always do this
+  BuildMeshConnectivity();
+  ComputeCentroids();
 }

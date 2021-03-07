@@ -11,9 +11,7 @@ class chi_mesh::VolumeMesherPredefinedUnpartitioned :
                             public chi_mesh::VolumeMesher
 {
 public:
-  void Execute();
-
-  void BuildMeshConnectivity(chi_mesh::UnpartitionedMesh* umesh);
+  void Execute() override;
 
   int GetPartitionIDFromCentroid(const chi_mesh::Vertex& centroid);
 

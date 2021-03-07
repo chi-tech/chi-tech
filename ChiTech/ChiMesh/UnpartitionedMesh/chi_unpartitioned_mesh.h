@@ -11,14 +11,7 @@
  * partitioning.*/
 class chi_mesh::UnpartitionedMesh
 {
-  friend class VolumeMesherPredefinedUnpartitioned;
-  friend void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices);
-  friend void CreateUnpartitioned2DOrthoMesh(std::vector<double>& vertices_1d_x,
-                                             std::vector<double>& vertices_1d_y);
-  friend void CreateUnpartitioned3DOrthoMesh(std::vector<double>& vertices_1d_x,
-                                             std::vector<double>& vertices_1d_y,
-                                             std::vector<double>& vertices_1d_z);
-private:
+public:
   struct LightWeightFace
   {
     int neighbor=-1;
@@ -35,7 +28,8 @@ private:
     explicit
     LightWeightCell(chi_mesh::CellType in_type) : type(in_type) {}
   };
-private:
+
+public:
   std::vector<chi_mesh::Vertex*>  vertices;
   std::vector<LightWeightCell*>    raw_cells;
 
@@ -66,6 +60,9 @@ public:
   LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
   LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
   LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
+
+  void BuildMeshConnectivity();
+  void ComputeCentroids();
 
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);

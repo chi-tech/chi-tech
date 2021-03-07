@@ -55,8 +55,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   int Pz = 1;
   if (options.partition_type == KBA_STYLE_XYZ)
   {
-    Px = mesh_handler->surface_mesher->partitioning_x;
-    Py = mesh_handler->surface_mesher->partitioning_y;
+    Px = mesh_handler->volume_mesher->options.partition_x;
+    Py = mesh_handler->volume_mesher->options.partition_y;
     Pz = mesh_handler->volume_mesher->options.partition_z;
 
     int desired_process_count = Px*Py*Pz;
@@ -73,19 +73,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     }
   }
 
-  //======================================== Build mesh connectivity
+  //======================================== Get unpartitioned mesh
   auto umesh = mesh_handler->unpartitionedmesh_stack.back();
-  BuildMeshConnectivity(umesh);
-
-  //======================================== Compute centroids
-  for (auto cell : umesh->raw_cells)
-  {
-    cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
-    for (auto vid : cell->vertex_ids)
-      cell->centroid = cell->centroid + *umesh->vertices[vid];
-
-    cell->centroid = cell->centroid/(cell->vertex_ids.size());
-  }
 
   chi_log.Log(LOG_0) << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
@@ -94,8 +83,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   //======================================== Apply partitioning scheme
   auto grid = chi_mesh::MeshContinuum::New();
 
-  if (options.partition_type == PartitionType::KBA_STYLE_XY or
-      options.partition_type == PartitionType::KBA_STYLE_XYZ)
+  if (options.partition_type == PartitionType::KBA_STYLE_XYZ)
     KBA(umesh, grid);
   else
     PARMETIS(umesh,grid);

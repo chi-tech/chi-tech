@@ -10,6 +10,8 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -165,6 +167,87 @@ void chi_mesh::VolumeMesher::
 }
 
 //###################################################################
+/**Creates 2D polygon cells for each face of a surface mesh.*/
+void chi_mesh::VolumeMesher::
+  CreatePolygonCells(chi_mesh::UnpartitionedMesh* umesh,
+                     chi_mesh::MeshContinuumPtr& grid,
+                     bool delete_surface_mesh_elements,
+                     bool force_local)
+{
+  //============================================= Get current mesh handler
+  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+
+  //============================================= Copy nodes
+  for (auto& vertex : umesh->vertices)
+    grid->vertices.push_back(new chi_mesh::Node(*vertex));
+
+  size_t num_cells=0;
+  for (auto& raw_cell : umesh->raw_cells)
+  {
+    if (raw_cell->type != chi_mesh::CellType::POLYGON)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chi_mesh::VolumeMesher::CreatePolygonCells "
+           "called with a cell not being of primary type"
+           " chi_mesh::CellType::POLYGON.";
+      exit(EXIT_FAILURE);
+    }
+
+    auto cell = new chi_mesh::CellPolygon;
+
+    //====================================== Copy vertices and centroid
+    cell->vertex_ids = raw_cell->vertex_ids;
+    cell->centroid = raw_cell->centroid;
+
+    //====================================== Copy faces
+//    for (auto src_side : raw_cell->edges)
+    for (auto& raw_face : raw_cell->faces)
+    {
+      chi_mesh::CellFace new_face;
+
+      new_face.vertex_ids  = raw_face.vertex_ids;
+
+      chi_mesh::Vertex& v0 = *grid->vertices[new_face.vertex_ids[0]];
+      chi_mesh::Vertex& v1 = *grid->vertices[new_face.vertex_ids[1]];
+      new_face.centroid = v0*0.5 + v1*0.5;
+      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
+
+      chi_mesh::Vector3 va = v1 - v0;
+      chi_mesh::Vector3 vn = va.Cross(vk);
+      vn = vn/vn.Norm();
+      new_face.normal = vn;
+
+      if (raw_face.neighbor >= 0)
+      {
+        new_face.neighbor_id = raw_face.neighbor;
+        new_face.has_neighbor = true;
+      }
+      else
+      {
+        new_face.neighbor_id = 0;
+        new_face.has_neighbor = false;
+      }
+
+      cell->faces.push_back(new_face);
+    }
+
+    //====================================== Compute partition id
+    auto xy_partition_indices = GetCellXYPartitionID(cell);
+    cell->partition_id = xy_partition_indices.second*
+                         handler->volume_mesher->options.partition_x +
+                         xy_partition_indices.first;
+
+    if (force_local)
+      cell->partition_id = chi_mpi.location_id;
+
+    cell->global_id = num_cells;
+
+    grid->cells.push_back(cell); ++num_cells;
+
+  }//for raw_cell
+}
+
+//###################################################################
 /**Filters non-esential ghosts from the grid.*/
 void chi_mesh::VolumeMesher::
   GridFilterGhosts(chi_mesh::MeshContinuumPtr& in_grid,
@@ -233,152 +316,75 @@ std::pair<int,int> chi_mesh::VolumeMesher::
 
   //================================================== Get the current handler
   auto mesh_handler = chi_mesh::GetCurrentHandler();
-  auto surf_mesher = mesh_handler->surface_mesher;
   auto vol_mesher = mesh_handler->volume_mesher;
 
+//====================================== Sanity check on partitioning
+  size_t num_x_subsets = vol_mesher->options.xcuts.size()+1;
+  size_t num_y_subsets = vol_mesher->options.ycuts.size()+1;
 
-//  if  (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined))
-//  {
-////    //====================================== Sanity check on partitioning
-////    size_t num_x_subsets = surf_mesher->xcuts.size()+1;
-////    size_t num_y_subsets = surf_mesher->ycuts.size()+1;
-////
-////    size_t x_remainder = num_x_subsets%surf_mesher->partitioning_x;
-////    size_t y_remainder = num_y_subsets%surf_mesher->partitioning_y;
-////
-////    if (x_remainder != 0)
-////    {
-////      chi_log.Log(LOG_ALLERROR)
-////        << "When specifying x-partitioning, the number of grp_subsets in x "
-////           "needs to be divisible by the number of partitions in x.";
-////      exit(EXIT_FAILURE);
-////    }
-////
-////    if (y_remainder != 0)
-////    {
-////      chi_log.Log(LOG_ALLERROR)
-////        << "When specifying y-partitioning, the number of grp_subsets in y "
-////           "needs to be divisible by the number of partitions in y.";
-////      exit(EXIT_FAILURE);
-////    }
-////
-////    size_t subsets_per_partitionx = num_x_subsets/surf_mesher->partitioning_x;
-////    size_t subsets_per_partitiony = num_y_subsets/surf_mesher->partitioning_y;
-////
-////    //====================================== Determine x-partition
-////    int x=-1;
-////    int xcount=-1;
-////    for (size_t i =  subsets_per_partitionx-1;
-////                i <  surf_mesher->xcuts.size();
-////                i += subsets_per_partitionx)
-////    {
-////      xcount++;
-////      if (cell->centroid.x <= surf_mesher->xcuts[i])
-////      {
-////        x = xcount;
-////        break;
-////      }
-////    }
-////    if (x<0)
-////    {
-////      x = surf_mesher->partitioning_x-1;
-////    }
-////
-////    //====================================== Determine y-partition
-////    int y=-1;
-////    int ycount=-1;
-////    for (size_t i =  subsets_per_partitiony-1;
-////                i <  surf_mesher->ycuts.size();
-////                i += subsets_per_partitiony)
-////    {
-////      ycount++;
-////      if (cell->centroid.y <= surf_mesher->ycuts[i])
-////      {
-////        y = ycount;
-////        break;
-////      }
-////    }
-////    if (y<0)
-////    {
-////      y = surf_mesher->partitioning_y - 1;
-////    }
-////
-////    //====================================== Set partitioning
-////    ij_id.first = x;
-////    ij_id.second= y;
-//
-//  }//if typeid
-//  else if  (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
+  size_t x_remainder = num_x_subsets%vol_mesher->options.partition_x;
+  size_t y_remainder = num_y_subsets%vol_mesher->options.partition_y;
+
+  if (x_remainder != 0)
   {
-    //====================================== Sanity check on partitioning
-    size_t num_x_subsets = vol_mesher->options.xcuts.size()+1;
-    size_t num_y_subsets = vol_mesher->options.ycuts.size()+1;
+    chi_log.Log(LOG_ALLERROR)
+      << "When specifying x-partitioning, the number of grp_subsets in x "
+         "needs to be divisible by the number of partitions in x.";
+    exit(EXIT_FAILURE);
+  }
 
-    size_t x_remainder = num_x_subsets%vol_mesher->options.partition_x;
-    size_t y_remainder = num_y_subsets%vol_mesher->options.partition_y;
+  if (y_remainder != 0)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "When specifying y-partitioning, the number of grp_subsets in y "
+         "needs to be divisible by the number of partitions in y.";
+    exit(EXIT_FAILURE);
+  }
 
-    if (x_remainder != 0)
+  size_t subsets_per_partitionx = num_x_subsets/vol_mesher->options.partition_x;
+  size_t subsets_per_partitiony = num_y_subsets/vol_mesher->options.partition_y;
+
+  //====================================== Determine x-partition
+  int x=-1;
+  int xcount=-1;
+  for (size_t i =  subsets_per_partitionx-1;
+       i <  vol_mesher->options.xcuts.size();
+       i += subsets_per_partitionx)
+  {
+    xcount++;
+    if (cell->centroid.x <= vol_mesher->options.xcuts[i])
     {
-      chi_log.Log(LOG_ALLERROR)
-        << "When specifying x-partitioning, the number of grp_subsets in x "
-           "needs to be divisible by the number of partitions in x.";
-      exit(EXIT_FAILURE);
+      x = xcount;
+      break;
     }
+  }
+  if (x<0)
+  {
+    x = vol_mesher->options.partition_x-1;
+  }
 
-    if (y_remainder != 0)
+  //====================================== Determine y-partition
+  int y=-1;
+  int ycount=-1;
+  for (size_t i =  subsets_per_partitiony-1;
+       i <  vol_mesher->options.ycuts.size();
+       i += subsets_per_partitiony)
+  {
+    ycount++;
+    if (cell->centroid.y <= vol_mesher->options.ycuts[i])
     {
-      chi_log.Log(LOG_ALLERROR)
-        << "When specifying y-partitioning, the number of grp_subsets in y "
-           "needs to be divisible by the number of partitions in y.";
-      exit(EXIT_FAILURE);
+      y = ycount;
+      break;
     }
+  }
+  if (y<0)
+  {
+    y = vol_mesher->options.partition_y - 1;
+  }
 
-    size_t subsets_per_partitionx = num_x_subsets/vol_mesher->options.partition_x;
-    size_t subsets_per_partitiony = num_y_subsets/vol_mesher->options.partition_y;
-
-    //====================================== Determine x-partition
-    int x=-1;
-    int xcount=-1;
-    for (size_t i =  subsets_per_partitionx-1;
-         i <  vol_mesher->options.xcuts.size();
-         i += subsets_per_partitionx)
-    {
-      xcount++;
-      if (cell->centroid.x <= vol_mesher->options.xcuts[i])
-      {
-        x = xcount;
-        break;
-      }
-    }
-    if (x<0)
-    {
-      x = vol_mesher->options.partition_x-1;
-    }
-
-    //====================================== Determine y-partition
-    int y=-1;
-    int ycount=-1;
-    for (size_t i =  subsets_per_partitiony-1;
-         i <  vol_mesher->options.ycuts.size();
-         i += subsets_per_partitiony)
-    {
-      ycount++;
-      if (cell->centroid.y <= vol_mesher->options.ycuts[i])
-      {
-        y = ycount;
-        break;
-      }
-    }
-    if (y<0)
-    {
-      y = vol_mesher->options.partition_y - 1;
-    }
-
-    //====================================== Set partitioning
-    ij_id.first = x;
-    ij_id.second= y;
-
-  }//if typeid
+  //====================================== Set partitioning
+  ij_id.first = x;
+  ij_id.second= y;
 
   return ij_id;
 }
@@ -388,7 +394,7 @@ std::pair<int,int> chi_mesh::VolumeMesher::
  * Cell xy_partition ids are obtained from
  * the surface mesher. z id is obtained from the volume mesher.*/
 std::tuple<int,int,int> chi_mesh::VolumeMesher::
-  GetCellXYZPartitionID(chi_mesh::Cell *cell) const
+  GetCellXYZPartitionID(chi_mesh::Cell *cell)
 {
   std::tuple<int,int,int> ijk_id(0,0,0);
   bool found_partition = false;
@@ -402,7 +408,14 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
   chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* vol_mesher = mesh_handler->volume_mesher;
 
-  if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+  if (vol_mesher->options.partition_z == 1)
+  {
+    found_partition = true;
+    std::get<0>(ijk_id) = ij_id.first;
+    std::get<1>(ijk_id) = ij_id.second;
+    std::get<2>(ijk_id) = 0;
+  }
+  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
   {
     auto extruder = (chi_mesh::VolumeMesherExtruder*)vol_mesher;
 
@@ -507,13 +520,6 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
       zmin = zmax;
     }//for k
   }//if typeid
-  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
-  {
-    found_partition = true;
-    std::get<0>(ijk_id) = ij_id.first;
-    std::get<1>(ijk_id) = ij_id.second;
-    std::get<2>(ijk_id) = 0;
-  }
 
   //================================================== Report unallocated item_id
   if (!found_partition)

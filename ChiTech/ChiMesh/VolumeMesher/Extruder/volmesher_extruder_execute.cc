@@ -3,6 +3,7 @@
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
 #include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/Boundary/chi_boundary.h"
+#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -49,58 +50,15 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << "VolumeMesherExtruder: Setting up layers" << std::endl;
   SetupLayers();
 
-  //=========================================== Look over boundaries
-//  for (auto bndry : region->boundaries)
-//  {
-//    if (bndry->initial_mesh_continuum->surface_mesh!= nullptr)
-//    {
-//      auto surface_mesher = mesh_handler->surface_mesher;
-//      options.partition_x = surface_mesher->partitioning_x;
-//      options.partition_y = surface_mesher->partitioning_y;
-//      auto surface_mesh = bndry->initial_mesh_continuum->surface_mesh;
-//
-//      chi_log.Log(LOG_0VERBOSE_1)
-//        << "VolumeMesherExtruder: Processing surface mesh"
-//        << std::endl;
-//
-//      //================================== Check for duplicate surface
-//      if (single_surfacemesh_processed)
-//      {
-//        std::cerr << "ERROR: Only 1 SurfaceMesh Boundary may be specified ";
-//        std::cerr << "for VolumeMesherExtruder.";
-//        exit(EXIT_FAILURE);
-//      }
-//      else
-//      {single_surfacemesh_processed = true;}
-//
-//      //================================== Get node_z_incr
-//      node_z_index_incr = surface_mesh->vertices.size();
-//
-//      //================================== Create baseline polygons in template
-//      //                                   continuum
-//      chi_log.Log(LOG_0VERBOSE_1)
-//        << "VolumeMesherExtruder: Creating template cells" << std::endl;
-//      const bool DELETE_SURFACE_MESH_ELEMENTS = true;
-//      const bool FORCE_LOCAL = true;
-//      CreatePolygonCells(surface_mesh,
-//                         temp_grid,
-//                         DELETE_SURFACE_MESH_ELEMENTS,
-//                         FORCE_LOCAL);
-//      delete surface_mesh;
-//
-//    }//if surface mesh
-//  }//for bndry
-
+  //================================== Process templates
   if (template_type == TemplateType::SURFACE_MESH)
   {
-      auto surface_mesh = template_surface_mesh;
-
       chi_log.Log(LOG_0VERBOSE_1)
         << "VolumeMesherExtruder: Processing surface mesh"
         << std::endl;
 
       //================================== Get node_z_incr
-      node_z_index_incr = surface_mesh->vertices.size();
+      node_z_index_incr = template_surface_mesh->vertices.size();
 
       //================================== Create baseline polygons in template
       //                                   continuum
@@ -108,15 +66,31 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         << "VolumeMesherExtruder: Creating template cells" << std::endl;
       const bool DELETE_SURFACE_MESH_ELEMENTS = true;
       const bool FORCE_LOCAL = true;
-      CreatePolygonCells(surface_mesh,
+      CreatePolygonCells(template_surface_mesh,
                          temp_grid,
                          DELETE_SURFACE_MESH_ELEMENTS,
                          FORCE_LOCAL);
-      delete surface_mesh;
+      delete template_surface_mesh;
   }
   else if (template_type == TemplateType::UNPARTITIONED_MESH)
   {
+    chi_log.Log(LOG_0VERBOSE_1)
+      << "VolumeMesherExtruder: Processing unpartitioned mesh"
+      << std::endl;
 
+    //================================== Get node_z_incr
+    node_z_index_incr = template_unpartitioned_mesh->vertices.size();
+
+    //================================== Create baseline polygons in template
+    //                                   continuum
+    chi_log.Log(LOG_0VERBOSE_1)
+      << "VolumeMesherExtruder: Creating template cells" << std::endl;
+    const bool DELETE_SURFACE_MESH_ELEMENTS = true;
+    const bool FORCE_LOCAL = true;
+    CreatePolygonCells(template_unpartitioned_mesh,
+                       temp_grid,
+                       DELETE_SURFACE_MESH_ELEMENTS,
+                       FORCE_LOCAL);
   }
 
   chi_log.Log(LOG_0VERBOSE_1)
@@ -148,9 +122,17 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << std::endl;
 
   //================================== Checking partitioning parameters
+  if (options.partition_type != KBA_STYLE_XYZ)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "Any partitioning scheme other than KBA_STYLE_XYZ is currently not"
+         " supported by VolumeMesherExtruder. No worries. There are plans"
+         " to develop this support.";
+    exit(EXIT_FAILURE);
+  }
   if (!options.mesh_global)
   {
-    int p_tot = options.partition_x* options.partition_y* options.partition_z;
+    int p_tot = options.partition_x*options.partition_y*options.partition_z;
 
     if (chi_mpi.process_count != p_tot)
     {

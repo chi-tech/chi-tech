@@ -18,21 +18,19 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "ChiResources/TestObjects/TriangleMesh2x2Cuts.obj",true)
+chiUnpartitionedMeshFromWavefrontOBJ(
+        "ChiResources/TestObjects/TriangleMesh2x2Cuts.obj")
 
 region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED);
 
 chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
 chiVolumeMesherSetKBACutsX({0.0})
 chiVolumeMesherSetKBACutsY({0.0})
 
-chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XY)
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
 
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();

@@ -60,7 +60,6 @@ extern ChiLog& chi_log;
 
 ### PartitionType
 Can be any of the following:
- - KBA_STYLE_XY
  - KBA_STYLE_XYZ
  - PARMETIS
 
@@ -139,11 +138,17 @@ int chiVolumeMesherSetProperty(lua_State *L)
   else if (property_index == VMP::PARTITION_TYPE)
   {
     int p = lua_tonumber(L,2);
-    if (p >= chi_mesh::VolumeMesher::PartitionType::KBA_STYLE_XY and
+    if (p >= chi_mesh::VolumeMesher::PartitionType::KBA_STYLE_XYZ and
         p <= chi_mesh::VolumeMesher::PartitionType::PARMETIS)
-
-    cur_hndlr->volume_mesher->options.partition_type =
-      (chi_mesh::VolumeMesher::PartitionType)p;
+      cur_hndlr->volume_mesher->options.partition_type =
+        (chi_mesh::VolumeMesher::PartitionType)p;
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported partition type used in call to "
+        << __FUNCTION__ << ".";
+      exit(EXIT_FAILURE);
+    }
   }
 
   else if (property_index == VMP::EXTRUSION_LAYER)

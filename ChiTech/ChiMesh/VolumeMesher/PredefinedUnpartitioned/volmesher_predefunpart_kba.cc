@@ -15,12 +15,12 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Gets the partition ID from a centroid for KBA-style partitioning.*/
 int chi_mesh::VolumeMesherPredefinedUnpartitioned::
-GetPartitionIDFromCentroid(const chi_mesh::Vertex& centroid)
+  GetPartitionIDFromCentroid(const chi_mesh::Vertex& centroid)
 {
   auto handler = chi_mesh::GetCurrentHandler();
 
-  int Px = handler->surface_mesher->partitioning_x;
-  int Py = handler->surface_mesher->partitioning_y;
+  int Px = handler->volume_mesher->options.partition_x;
+  int Py = handler->volume_mesher->options.partition_y;
 
 
   chi_mesh::Cell temp_cell(chi_mesh::CellType::GHOST);
