@@ -1,11 +1,11 @@
 #include "../../../ChiLua/chi_lua.h"
-#include <iostream>
-#include "../Linemesh1D/volmesher_linemesh1d.h"
 #include "../Predefined2D/volmesher_predefined2d.h"
 #include "../Extruder/volmesher_extruder.h"
 #include "../PredefinedUnpartitioned/volmesher_predefunpart.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
+
+#include <iostream>
 
 /** \defgroup LuaVolumeMesher Volume Meshers
  * \ingroup LuaMesh
@@ -52,10 +52,10 @@ extern ChiLog& chi_log;
 \param Type int Volume Remesher type.
 
 Remesher types:\n
- VOLUMEMESHER_LINEMESH1D = Creates 1D slab cells from a linemesh.\n
  VOLUMEMESHER_PREDEFINED2D = No remeshing is performed.\n
  VOLUMEMESHER_EXTRUDER = Extruder the first surface mesh found.\n
- VOLUMEMESHER_PREDEFINED3D = Create the mesh from the latest UnpartitionedMesh.\n
+ VOLUMEMESHER_UNPARTITIONED = Create the mesh from the latest UnpartitionedMesh.\n
+
 
 \ingroup LuaVolumeMesher
 \author Jan*/
@@ -66,11 +66,8 @@ int chiVolumeMesherCreate(lua_State *L)
   int type = lua_tonumber(L,1);
 
   chi_mesh::VolumeMesher* new_mesher;
-  if (type==chi_mesh::VolumeMesherType::LINEMESH1D)  //VOLUMEMESHER_LINEMESH1D
-  {
-    new_mesher = new chi_mesh::VolumeMesherLinemesh1D;
-  }
-  else if (type==chi_mesh::VolumeMesherType::PREDEFINED2D)  //VOLUMEMESHER_PREDEFINED2D
+
+  if (type==chi_mesh::VolumeMesherType::PREDEFINED2D)  //VOLUMEMESHER_PREDEFINED2D
   {
     new_mesher = new chi_mesh::VolumeMesherPredefined2D;
   }
@@ -78,11 +75,6 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     new_mesher = new chi_mesh::VolumeMesherExtruder;
   }
-//  else if (type==chi_mesh::VolumeMesherType::PREDEFINED3D)  //VOLUMEMESHER_PREDEFINED3D
-//  {
-//    new_mesher = new chi_mesh::VolumeMesherPredefined3D;
-//    throw std::logic_error("Unsupported mesher");
-//  }
   else if (type==chi_mesh::VolumeMesherType::UNPARTITIONED)
   {
     new_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
@@ -91,7 +83,6 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     chi_log.Log(LOG_0ERROR) << "Invalid Volume mesher type in function "
                                "chiVolumeMesherCreate. Allowed options are"
-                               "VOLUMEMESHER_LINEMESH1D, "
                                "VOLUMEMESHER_PREDEFINED2D, "
                                "VOLUMEMESHER_EXTRUDER or "
                                "VOLUMEMESHER_UNPARTITIONED";

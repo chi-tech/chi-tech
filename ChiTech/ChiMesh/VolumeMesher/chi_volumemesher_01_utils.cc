@@ -6,7 +6,6 @@
 #include "ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
-#include "ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h"
 #include "ChiMesh/Cell/cell_polygon.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
@@ -32,10 +31,10 @@ void chi_mesh::VolumeMesher::
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
-CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                   chi_mesh::MeshContinuumPtr& vol_continuum,
-                   bool delete_surface_mesh_elements,
-                   bool force_local)
+  CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
+                     chi_mesh::MeshContinuumPtr& vol_continuum,
+                     bool delete_surface_mesh_elements,
+                     bool force_local)
 {
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
@@ -415,38 +414,7 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
   chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* vol_mesher = mesh_handler->volume_mesher;
 
-  if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
-  {
-    auto line_mesher = (chi_mesh::VolumeMesherLinemesh1D*)vol_mesher;
-
-    if (chi_mpi.process_count != options.partition_z and !options.mesh_global)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Number of process requested, " << options.partition_z
-        << ", in PARTITION_Z does not match the amount of processes "
-        << "available " << chi_mpi.process_count;
-      exit(EXIT_FAILURE);
-    }
-
-    int cells_per_loc =
-      ceil(line_mesher->num_slab_cells/(double)options.partition_z);
-
-    int cur_loc = 0;
-    for (int k=0; k<chi_mpi.process_count; k++)
-    {
-      if (cell->global_id < ((k + 1) * cells_per_loc))
-      {
-        cur_loc = k;
-        found_partition = true;
-        break;
-      }
-    }//for k
-
-    std::get<0>(ijk_id) = ij_id.first;
-    std::get<1>(ijk_id) = ij_id.second;
-    std::get<2>(ijk_id) = cur_loc;
-  }
-  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+  if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
   {
     auto extruder = (chi_mesh::VolumeMesherExtruder*)vol_mesher;
 

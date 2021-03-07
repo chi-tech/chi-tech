@@ -1,18 +1,14 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
-#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/SweepUtilities/FLUDS/AUX_FLUDS.h>
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+#include "ChiMesh/SweepUtilities/FLUDS/AUX_FLUDS.h"
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
-#include <chi_log.h>
+#include "chi_log.h"
 
 extern ChiLog& chi_log;
-
-typedef chi_mesh::sweep_management::AngleSet TAngleSet;
-typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -22,7 +18,10 @@ extern ChiTimer chi_program_timer;
 
 extern ChiConsole& chi_console;
 
-#include "iomanip"
+typedef chi_mesh::sweep_management::AngleSet TAngleSet;
+typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
+
+#include <iomanip>
 
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/

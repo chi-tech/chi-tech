@@ -1,18 +1,12 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
-#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/SweepUtilities/FLUDS/AUX_FLUDS.h>
+#include "ChiMesh/SweepUtilities/FLUDS/AUX_FLUDS.h"
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
-#include <chi_log.h>
+#include "chi_log.h"
 
 extern ChiLog& chi_log;
-
-typedef chi_mesh::sweep_management::AngleSet TAngleSet;
-typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -22,7 +16,10 @@ extern ChiTimer chi_program_timer;
 
 extern ChiConsole& chi_console;
 
-#include "iomanip"
+typedef chi_mesh::sweep_management::AngleSet TAngleSet;
+typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
+
+#include <iomanip>
 
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
@@ -45,14 +42,10 @@ void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset& groupset)
   auto product_quadrature =
     std::static_pointer_cast<chi_math::ProductQuadrature>(groupset.quadrature);
 
-
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
-
   int d_azi   = std::max((int)(product_quadrature->azimu_ang.size()/4),1);
   int num_azi = product_quadrature->azimu_ang.size();
   int num_pol = product_quadrature->polar_ang.size();
-  int pa = num_pol/2;
+//  int pa = num_pol/2;
 
   int num_angset_grps = 4; //Default Extruded and 2D
   if (options.geometry_type == GeometryType::ONED_SLAB)

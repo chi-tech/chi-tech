@@ -38,7 +38,6 @@ RegisterFunction(chiLocallyRefineSLDFESQAngularQuadrature)
 RegisterFunction(chiPrintToPythonSLDFESQAngularQuadrature)
 
 //module:Mesh Macros
-RegisterFunction(chiMeshCreate1DSlabMesh)
 RegisterFunction(chiMeshCreate2DOrthoMesh)
 RegisterFunction(chiMeshCreate3DOrthoMesh)
 

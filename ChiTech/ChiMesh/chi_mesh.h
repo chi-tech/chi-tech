@@ -90,7 +90,7 @@ namespace chi_mesh
 
   //==================================== Volume meshers
   class VolumeMesher;
-  class VolumeMesherLinemesh1D;
+//  class VolumeMesherLinemesh1D;
   class VolumeMesherPredefined2D;
   class VolumeMesherExtruder;
 //  class VolumeMesherPredefined3D;

@@ -13,72 +13,72 @@ extern ChiLog&  chi_log;
  * \ingroup LuaMesh
 */
 
-//###################################################################
-/** Creates a 1D Mesh from an array of 1D vertices.
-
-\param x_nodes array_float An Array of floating point numbers denoting
-                           1D nodes along x-axis.
-
-\return Two handles: line-mesh, region
-
-\ingroup LuaMeshMacros
-
-##_
-
-### Example
-An example 1D mesh creation below:
-\code
-chiMeshHandlerCreate()
-nodes={0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0}
-chiMeshCreate1DSlabMesh(nodes)
-chiVolumeMesherExecute();
-\endcode
-
- \author Nak*/
-int chiMeshCreate1DSlabMesh(lua_State* L)
-{
-  //=================================== Check argc
-  const char func_name[] = "chiMeshCreate1DSlabMesh";
-  int num_args = lua_gettop(L);
-  if (num_args != 1)
-    LuaPostArgAmountError(func_name,1,num_args);
-
-  //=================================== Check args table
-  if (not lua_istable(L,1))
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << func_name << ": First argument found to not be an array.";
-    exit(EXIT_FAILURE);
-  }
-
-  //=================================== Decl vars
-  int table_index=0;
-  int N=0;
-  std::vector<std::vector<double>> array(3);
-
-  //=================================== Get first array
-  table_index = 1;
-  N = lua_rawlen(L,table_index);
-  array[table_index-1].resize(N);
-  for (int k=0; k<N; k++)
-  {
-    lua_pushnumber(L,k+1);
-    lua_gettable(L,table_index);
-
-    array[table_index-1][k] = lua_tonumber(L,-1);
-    lua_pop(L,1);
-  }
-
-  //=================================== Create mesh
-  chi_mesh::Create1DSlabMesh(array[0]);
-
-  //=================================== Push handles
-  auto handler = chi_mesh::GetCurrentHandler();
-  lua_pushnumber(L,handler->linemesh_stack.size()-1);
-  lua_pushnumber(L,handler->region_stack.size()-1);
-
-  return 2;
-}
+////###################################################################
+///** Creates a 1D Mesh from an array of 1D vertices.
+//
+//\param x_nodes array_float An Array of floating point numbers denoting
+//                           1D nodes along x-axis.
+//
+//\return Two handles: line-mesh, region
+//
+//\ingroup LuaMeshMacros
+//
+//##_
+//
+//### Example
+//An example 1D mesh creation below:
+//\code
+//chiMeshHandlerCreate()
+//nodes={0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0}
+//chiMeshCreate1DSlabMesh(nodes)
+//chiVolumeMesherExecute();
+//\endcode
+//
+// \author Nak*/
+//int chiMeshCreate1DSlabMesh(lua_State* L)
+//{
+//  //=================================== Check argc
+//  const char func_name[] = "chiMeshCreate1DSlabMesh";
+//  int num_args = lua_gettop(L);
+//  if (num_args != 1)
+//    LuaPostArgAmountError(func_name,1,num_args);
+//
+//  //=================================== Check args table
+//  if (not lua_istable(L,1))
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << func_name << ": First argument found to not be an array.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  //=================================== Decl vars
+//  int table_index=0;
+//  int N=0;
+//  std::vector<std::vector<double>> array(3);
+//
+//  //=================================== Get first array
+//  table_index = 1;
+//  N = lua_rawlen(L,table_index);
+//  array[table_index-1].resize(N);
+//  for (int k=0; k<N; k++)
+//  {
+//    lua_pushnumber(L,k+1);
+//    lua_gettable(L,table_index);
+//
+//    array[table_index-1][k] = lua_tonumber(L,-1);
+//    lua_pop(L,1);
+//  }
+//
+//  //=================================== Create mesh
+//  chi_mesh::Create1DSlabMesh(array[0]);
+//
+//  //=================================== Push handles
+//  auto handler = chi_mesh::GetCurrentHandler();
+//  lua_pushnumber(L,handler->linemesh_stack.size()-1);
+//  lua_pushnumber(L,handler->region_stack.size()-1);
+//
+//  return 2;
+//}
 
 //###################################################################
 /** Creates a 1D Mesh from an array of 1D vertices.

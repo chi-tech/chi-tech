@@ -1,21 +1,15 @@
-#ifndef _chi_volumemesher_h
-#define _chi_volumemesher_h
+#ifndef CHI_VOLUMEMESHER_H
+#define CHI_VOLUMEMESHER_H
 
-#include "../chi_mesh.h"
+#include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/Cell/cell.h"
-
-//#define VOLUMEMESHER_LINEMESH1D 1
-//#define VOLUMEMESHER_PREDEFINED2D 3
-//#define VOLUMEMESHER_EXTRUDER 4
 
 namespace chi_mesh
 {
   enum VolumeMesherType
   {
-    LINEMESH1D    = 1,
     PREDEFINED2D  = 3,
     EXTRUDER      = 4,
-//    PREDEFINED3D  = 5,
     UNPARTITIONED = 6
   };
   enum VolumeMesherProperty
@@ -116,4 +110,4 @@ public:
 
 };
 
-#endif
+#endif //CHI_VOLUMEMESHER_H
