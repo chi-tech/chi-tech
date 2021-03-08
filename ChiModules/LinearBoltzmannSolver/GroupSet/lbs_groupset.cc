@@ -40,8 +40,6 @@ LBSGroupset::LBSGroupset()
   allow_cycles = false;
 
   log_sweep_events = false;
-
-  latest_convergence_metric = 1.0;
 }
 
 //###################################################################

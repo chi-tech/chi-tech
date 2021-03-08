@@ -115,7 +115,7 @@ bsrc[1] = 1.0/4.0/math.pi
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
                         LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
 --############################################### Initialize and Execute Solver

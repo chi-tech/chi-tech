@@ -30,8 +30,7 @@ int LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
                     false);
 
   //============================================= Sweeping the new source
-  groupset.angle_agg.ZeroOutgoingDelayedPsi();
-
+  groupset.ZeroPsiDataStructures();
   solver->phi_new_local.assign(solver->phi_new_local.size(),0.0);
   sweepScheduler->Sweep(sweep_chunk);
 

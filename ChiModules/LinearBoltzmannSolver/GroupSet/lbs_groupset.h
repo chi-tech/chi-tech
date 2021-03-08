@@ -4,13 +4,15 @@
 #include "lbs_group.h"
 #include "../IterativeMethods/lbs_iterativemethods.h"
 
-#include <ChiMath/Quadratures/LegendrePoly/legendrepoly.h>
-#include <ChiMath/Quadratures/angular_quadrature_base.h>
-#include <ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h>
+#include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
+#include "ChiMath/Quadratures/angular_quadrature_base.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
+
+#include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 
 #include "../lbs_structs.h"
 
-#include <ChiPhysics/chi_physics_namespace.h>
+#include "ChiPhysics/chi_physics_namespace.h"
 
 #include <functional>
 
@@ -69,11 +71,13 @@ public:
 
   chi_physics::Solver*                         wgdsa_solver;
   chi_physics::Solver*                         tgdsa_solver;
-  std::vector<int>                             wgdsa_cell_dof_array_address;
 
   bool                                         log_sweep_events;
 
-  double                                       latest_convergence_metric;
+  chi_math::UnknownManager                     psi_uk_man;
+  bool                                         psi_to_be_saved=false;
+  size_t                                       num_psi_unknowns_local=0;
+  std::vector<double>                          psi_new_local;
 
   /**
    * Convenient typdef for the moment call back function. See moment_callbacks.
@@ -101,6 +105,12 @@ public:
   void BuildMomDiscOperator(int scatt_order,
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildSubsets();
+  void ZeroPsiDataStructures()
+  {
+    if (psi_to_be_saved)
+      psi_new_local.assign(num_psi_unknowns_local,0.0);
+    angle_agg.ZeroOutgoingDelayedPsi();
+  }
 public:
   void PrintSweepInfoFile(size_t ev_tag,const std::string& file_name);
 };

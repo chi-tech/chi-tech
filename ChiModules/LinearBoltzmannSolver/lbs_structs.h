@@ -42,6 +42,8 @@ struct Options
   double tolerance    = 1e-8;
   bool use_precursors = false;
 
+  bool save_angular_flux = false;
+
   Options() = default;
 };
 
