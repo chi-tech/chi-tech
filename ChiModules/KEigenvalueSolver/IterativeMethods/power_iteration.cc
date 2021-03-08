@@ -24,22 +24,13 @@ using namespace LinearBoltzmann;
  * Note that this routine currently only works when the problem 
  * is defined by a single groupset.
 */
-void KEigenvalue::Solver::PowerIteration(int groupset_num)
+void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
 {
   chi_log.Log(LOG_0)
     << "\n\n";
   chi_log.Log(LOG_0)
     << "********** Solving k-eigenvalue problem with "
     << "the Power Method.\n\n";
-
-  // ----- Obtain groupset
-  LBSGroupset& groupset = group_sets[groupset_num];
-  int groupset_numgrps = groupset.groups.size();
-  chi_log.Log(LOG_0)
-    << "Quadrature number of angles: "
-    << groupset.quadrature->abscissae.size() << "\n"
-    << "Groups " << groupset.groups.front().id << " "
-    << groupset.groups.back().id << "\n\n";
 
   // ----- Setting up required sweep chunks
   SweepChunk* sweep_chunk = SetSweepChunk(groupset);
@@ -79,7 +70,7 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
     for (int si_nit=0; si_nit<groupset.max_iterations; si_nit++)
     {
       // ----- Set source and sweep
-      SetKSource(groupset_num, SourceFlags::USE_MATERIAL_SOURCE);
+      SetKSource(groupset, SourceFlags::USE_MATERIAL_SOURCE);
       groupset.angle_agg.ZeroOutgoingDelayedPsi();
       phi_new_local.assign(phi_new_local.size(),0.0);
       SweepScheduler.Sweep(sweep_chunk);
@@ -116,21 +107,16 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
 
       if (si_converged) {
         chi_log.Log(LOG_0VERBOSE_1)
-            << "\n**********\n"
-            << "Source iterations converged.\n"
-            << "Iterations:   "      << si_nit << "\n"
-            << "Final PW Change:   " << pw_change
-            << "\n**********\n";
+            << "\nSource iterations converged in "
+            << si_nit << " iteratrions.\n";
         break;
       }
-    }//for source iterations      
+    }//for source iterations
 
     if (!si_converged) {
       chi_log.Log(LOG_ALLVERBOSE_1)
-          << "\n**********\n"
-          << "!!!WARNING!!! Source iterations did not converge.\n"
-          << "Final PW Change:   " << pw_change
-          << "\n**********\n";
+          << "\n!!!WARNING!!! "
+             "Source iterations did not converge.\n";
     }
 
     // ----- Recompute eigenvalue
@@ -191,8 +177,9 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
   chi_log.Log(LOG_0)
     << "\n\n";
 
+  // GS_0 because we solve k-eigenvalue problems with 1 groupset right now.
   std::string sweep_log_file_name =
-    std::string("GS_") + std::to_string(groupset_num) +
+    std::string("GS_") + std::to_string(0) +
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
   groupset.PrintSweepInfoFile(SweepScheduler.sweep_event_tag,sweep_log_file_name);

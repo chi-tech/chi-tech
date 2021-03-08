@@ -26,7 +26,7 @@ using namespace LinearBoltzmann;
  * \param suppress_phi_old Flag indicating whether to suppress phi_old.
  *
  * */
-void KEigenvalue::Solver::SetKSource(int groupset_num,
+void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
                                      bool apply_mat_src,
                                      bool suppress_phi_old)
 {
@@ -41,9 +41,7 @@ void KEigenvalue::Solver::SetKSource(int groupset_num,
 
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
-  // ----- Get reference to groupset
-  LBSGroupset& groupset = group_sets[groupset_num];
-
+  // ----- Groupset group information
   int gs_i = groupset.groups[0].id;
   int gs_f = groupset.groups.back().id;
 

@@ -22,10 +22,10 @@ public:
   std::vector<double> phi_prev_local;
 
   // Iterative methods
-  void PowerIteration(int groupset_num);
+  void PowerIteration(LBSGroupset& groupset);
   
   // Iterative operations
-  void SetKSource(int groupset_num,
+  void SetKSource(LBSGroupset& groupset,
                   bool apply_mat_src=true,
                   bool suppress_phi_old=false);
   double ComputeProduction();
