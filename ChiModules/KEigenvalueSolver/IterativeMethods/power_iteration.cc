@@ -67,8 +67,8 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
 
   while (nit < options.max_iterations)
   {
-    if (verbose)
-      chi_log.Log(LOG_0) << "\n********** Starting source iterations";
+    chi_log.Log(LOG_0VERBOSE_2)
+      << "\n********** Starting source iterations";
 
 
     // ----- Start inner source iterations
@@ -97,28 +97,25 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
         si_converged = true;
 
       // ----- Print iteration information
-      if (verbose) {
-        std::string offset = "    ";
-        std::stringstream si_iter_info;
-        si_iter_info
-          << chi_program_timer.GetTimeString() << " "
-          << offset
-          << "WGS groups ["
-          << groupset.groups.front().id
-          << "-"
-          << groupset.groups.back().id
-          << "]"
-          << " Source Iteration " << std::setw(5) << si_nit
-          << " Point-wise change " << std::setw(14) << pw_change;
+      std::string offset = "    ";
+      std::stringstream si_iter_info;
+      si_iter_info
+        << chi_program_timer.GetTimeString() << " "
+        << offset
+        << "WGS groups ["
+        << groupset.groups.front().id
+        << "-"
+        << groupset.groups.back().id
+        << "]"
+        << " Source Iteration " << std::setw(5) << si_nit
+        << " Point-wise change " << std::setw(14) << pw_change;
         
-        if (si_converged) 
-          si_iter_info << " CONVERGED\n";
+      if (si_converged)
+        si_iter_info << " CONVERGED\n";
+      chi_log.Log(LOG_ALLVERBOSE_2) << si_iter_info.str();
 
-        chi_log.Log(LOG_0) << si_iter_info.str();
-      }
-
-      if ((si_converged) and (verbose)) {
-        chi_log.Log(LOG_0) 
+      if (si_converged) {
+        chi_log.Log(LOG_0VERBOSE_1)
             << "\n**********\n"
             << "Source iterations converged.\n"
             << "Iterations:   "      << si_nit << "\n"
@@ -128,8 +125,8 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
       }
     }//for source iterations      
 
-    if ((!si_converged) and (verbose)) {
-      chi_log.Log(LOG_0) 
+    if (!si_converged) {
+      chi_log.Log(LOG_ALLVERBOSE_1)
           << "\n**********\n"
           << "!!!WARNING!!! Source iterations did not converge.\n"
           << "Final PW Change:   " << pw_change
@@ -151,19 +148,17 @@ void KEigenvalue::Solver::PowerIteration(int groupset_num)
       k_converged = true;    
 
     // ----- Print iteration summary
-    if (verbose) {
-      std::stringstream k_iter_info;
-      k_iter_info
-        << chi_program_timer.GetTimeString() << " "
-        << "  Iteration " << std::setw(5) << nit
-        << "  k_eff " << std::setw(10) << k_eff
-        << "  k_eff change " << std::setw(10) << k_eff_change
-        << "  reactivity " << std::setw(10) << reactivity * 1e5;
-      if (k_converged) {
-        k_iter_info << " CONVERGED\n";
-      }
-      chi_log.Log(LOG_0) << k_iter_info.str();
+    std::stringstream k_iter_info;
+    k_iter_info
+      << chi_program_timer.GetTimeString() << " "
+      << "  Iteration " << std::setw(5) << nit
+      << "  k_eff " << std::setw(10) << k_eff
+      << "  k_eff change " << std::setw(10) << k_eff_change
+      << "  reactivity " << std::setw(10) << reactivity * 1e5;
+    if (k_converged) {
+      k_iter_info << " CONVERGED\n";
     }
+    chi_log.Log(LOG_0VERBOSE_1) << k_iter_info.str();
 
     if (k_converged) break;
 

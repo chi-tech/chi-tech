@@ -15,8 +15,6 @@ private:
   size_t source_event_tag;
 
 public:
-  bool verbose = false;
-
   int num_precursors;
   
   double k_eff = 1.0;
