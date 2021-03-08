@@ -1,3 +1,20 @@
+-- 1D KEigen solver test with Vacuum BC.
+-- SDM: PWLD
+-- Test: Final k-eigenvalue: 0.997501
+num_procs = 4
+
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
+end
+
 chiMPIBarrier()
 
 -- ##################################################
@@ -38,7 +55,7 @@ end
 -- ##### Run problem #####
 -- ##################################################
 
--- ############################## Mesh
+--############################################### Setup mesh
 -- Define nodes
 nodes = {}
 dx = L/n_cells
@@ -52,11 +69,11 @@ _, region = chiMeshCreateUnpartitioned1DOrthoMesh(nodes)
 chiVolumeMesherSetProperty(PARTITION_TYPE, PARMETIS)
 chiVolumeMesherExecute()
 
--- Assign material ids
+--############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
--- ############################## Materials
+--############################################### Add materials
 materials = {}
 
 -- Define cross sections
@@ -73,7 +90,7 @@ G = chiPhysicsMaterialGetProperty(materials[1],TRANSPORT_XSECTIONS)["G"]
 
 chiPhysicsMaterialModifyTotalCrossSection(materials[1], 0, sigma_t)
 
--- ############################## Setup physics
+--############################################### Setup Physics
 -- Define solver
 phys = chiKEigenvalueLBSCreateSolver()
 
@@ -104,6 +121,12 @@ chiLBSSetMaxKIterations(phys,max_k_iters)
 chiLBSSetKTolerance(phys,k_tol)
 chiLBSSetUsePrecursors(phys,use_precursors)
 
--- ############################## Run the problem
+--############################################### Initialize and Execute Solver
 chiKEigenvalueLBSInitialize(phys)
 chiKEigenvalueLBSExecute(phys)
+
+--############################################### Get field functions
+--############################################### Line plot
+--############################################### Volume integrations
+--############################################### Exports
+--############################################### Plots

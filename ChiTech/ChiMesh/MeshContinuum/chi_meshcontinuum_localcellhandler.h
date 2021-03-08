@@ -31,6 +31,7 @@ public:
   }
 
   chi_mesh::Cell& operator[](uint64_t cell_local_index);
+  const chi_mesh::Cell& operator[](uint64_t cell_local_index) const;
 
 
   //##################################### iterator Class Definition

@@ -65,12 +65,12 @@ double chi_math::SimplifiedLDFESQ::Quadrature::
 std::array<double,4> chi_math::SimplifiedLDFESQ::Quadrature::
 IntegrateLDFEShapeFunctions(
   const SphericalQuadrilateral &sq,
-  std::array<chi_math::DVectorNX<double>,4>& shape_coeffs,
+  std::array<chi_math::DynamicVector<double>,4>& shape_coeffs,
   const std::vector<chi_math::QuadraturePointXYZ>& legendre_qpoints,
   const std::vector<double>& legendre_qweights)
 {
   //=================================== Lambda to evaluate LDFE shape func
-  auto EvaluateShapeFunction = [](chi_math::DVectorNX<double>& shape_coeffs,
+  auto EvaluateShapeFunction = [](chi_math::DynamicVector<double>& shape_coeffs,
                                   chi_mesh::Vector3& mu_eta_xi)
   {
     return shape_coeffs[0] + shape_coeffs[1]*mu_eta_xi[0] +

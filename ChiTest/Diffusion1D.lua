@@ -1,7 +1,19 @@
-print("############################################### LuaTest")
---dofile(CHI_LIBRARY)
+-- 1D Diffusion test with Vacuum BCs.
+-- SDM: PWLC
+-- Test: Max-value=2.50000
+num_procs = 1
 
 
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
+end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
@@ -9,32 +21,18 @@ chiMeshHandlerCreate()
 mesh={}
 N=100
 L=2.0
-xmin = -1.0
+xmin = 0.0
 dx = L/N
 for i=1,(N+1) do
     k=i-1
     mesh[i] = xmin + k*dx
 end
-line_mesh = chiLineMeshCreateFromArray(mesh)
-
-
-region1 = chiRegionCreate()
-chiRegionAddLineBoundary(region1,line_mesh);
-
-
---############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_LINEMESH1D);
-
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
+chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
-
+chiVolumeMesherSetMatIDToAll(0)
+chiVolumeMesherSetupOrthogonalBoundaries()
 
 --############################################### Add materials
 materials = {}
@@ -43,26 +41,24 @@ materials[0] = chiPhysicsAddMaterial("Test Material");
 chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
 chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
-
-
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
 
-
-
---############################################### Initialize Solver
-chiDiffusionInitialize(phys1)
-fftemp,count = chiGetFieldFunctionList(phys1)
 --############################################### Set boundary conditions
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_DIRICHLET,0.0)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_DIRICHLET,1.0)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_VACUUM)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_VACUUM)
 
+--############################################### Initialize and Execute Solver
+chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
+
+--############################################### Get field functions
+fftemp,count = chiGetFieldFunctionList(phys1)
+
+--############################################### Line plot
 ffi0 = chiFFInterpolationCreate(LINE)
 curffi = ffi0;
 chiFFInterpolationSetProperty(curffi,LINE_FIRSTPOINT,0.0,0.0,0.0+xmin)
@@ -73,6 +69,8 @@ chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fftemp[1])
 chiFFInterpolationInitialize(curffi)
 chiFFInterpolationExecute(curffi)
 
+--############################################### Volume integrations
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
@@ -85,8 +83,12 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
 
+--############################################### Exports
 if (master_export == nil) then
     chiFFInterpolationExportPython(ffi0)
+end
 
+--############################################### Plots
+if (chi_location_id == 0 and master_export == nil) then
     local handle = io.popen("python ZLFFI00.py")
 end

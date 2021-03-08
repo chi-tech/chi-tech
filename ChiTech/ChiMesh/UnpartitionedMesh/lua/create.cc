@@ -75,3 +75,35 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 
   return 1;
 }
+
+//###################################################################
+/**Creates an unpartitioned mesh from a wavefront .obj file.
+ *
+ * \param file_name char Filename of the .case file.
+ *
+ * \ingroup LuaUnpartitionedMesh
+ *
+ * \return A handle to the newly created UnpartitionedMesh*/
+int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
+{
+  const char func_name[] = "chiUnpartitionedMeshFromWavefrontOBJ";
+  int num_args = lua_gettop(L);
+  if (num_args <1)
+    LuaPostArgAmountError(func_name,1,num_args);
+
+  const char* temp = lua_tostring(L,1);
+
+  auto new_object = new chi_mesh::UnpartitionedMesh;
+
+  chi_mesh::UnpartitionedMesh::Options options;
+  options.file_name = std::string(temp);
+
+  new_object->ReadFromWavefrontOBJ(options);
+
+  auto handler = chi_mesh::GetCurrentHandler();
+  handler->unpartitionedmesh_stack.push_back(new_object);
+
+  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
+
+  return 1;
+}

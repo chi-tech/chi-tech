@@ -49,7 +49,7 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
   //======================================== Create vertices
   umesh->vertices.reserve(zverts.size());
-  for (auto& vertex : vertices)
+  for (auto& vertex : zverts)
     umesh->vertices.push_back(new chi_mesh::Vertex(vertex));
 
   //======================================== Create cells
@@ -71,6 +71,8 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
     umesh->raw_cells.push_back(cell);
   }
 
+  umesh->BuildMeshConnectivity();
+  umesh->ComputeCentroids();
   handler->unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create region
@@ -162,6 +164,8 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
     }//for j
   }//for i
 
+  umesh->BuildMeshConnectivity();
+  umesh->ComputeCentroids();
   handler->unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create region
@@ -324,6 +328,8 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
     }//for j
   }//for i
 
+  umesh->BuildMeshConnectivity();
+  umesh->ComputeCentroids();
   handler->unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create region

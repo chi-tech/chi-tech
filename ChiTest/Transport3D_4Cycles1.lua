@@ -1,34 +1,34 @@
-chiMPIBarrier()
-if (chi_location_id == 0) then
-    print("############################################### LuaTest")
-end
---dofile(CHI_LIBRARY)
+-- 3D Transport test with Vacuum and Incident-isotropic BC.
+-- SDM: PWLD
+-- Test: Max-value=3.74343e-04
+num_procs = 4
 
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
+end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
 newSurfMesh = chiSurfaceMeshCreate();
---chiSurfaceMeshImportFromOBJFile(newSurfMesh,
---        "ChiResources/TestObjects/Square2x2_partition_cyclic3.obj",true)
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "ChiResources/TestObjects/Square2x2_partition_cyclic3.obj",true)
 
---############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
---############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
-
-
-
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
-
+chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
+                      ExtruderTemplateType.SURFACE_MESH,
+                      newSurfMesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
@@ -36,15 +36,13 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
 
-chiVolumeMesherSetProperty(PARTITION_Z,1);
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
+chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+chiVolumeMesherSetKBACutsX({0.0})
+chiVolumeMesherSetKBACutsY({0.0})
 
-chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
-chiVolumeMesherSetProperty(MESH_GLOBAL,false);
-
---############################################### Execute meshing
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
-
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
@@ -52,7 +50,6 @@ chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
 vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
-
 
 --############################################### Add materials
 materials = {}
@@ -79,8 +76,6 @@ end
 
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
-
-
 
 --############################################### Setup Physics
 
@@ -116,7 +111,7 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
 --chiLBSGroupsetAddGroups(phys1,gs1,63,167)
 --chiLBSGroupsetSetQuadrature(phys1,gs1,pquad)
 
---========== Boundary conditions
+--############################################### Set boundary conditions
 bsrc={}
 for g=1,num_groups do
     bsrc[g] = 0.0
@@ -126,15 +121,16 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,LBSBoundaryTypes.INCIDENT_ISOTRO
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMAX,LBSBoundaryTypes.REFLECTING);
 
---========== Solvers
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 
+--############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
-
-
+--############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
+
+--############################################### Slice plot
 --slices = {}
 --for k=1,count do
 --    slices[k] = chiFFInterpolationCreate(SLICE)
@@ -148,6 +144,7 @@ fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 --    chiFFInterpolationExportPython(slices[k])
 --end
 
+--############################################### Volume integrations
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
@@ -172,14 +169,7 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
-if (chi_location_id == 0 and master_export == nil) then
-
-    --os.execute("python ZPFFI00.py")
-    ----os.execute("python ZPFFI11.py")
-    --local handle = io.popen("python ZPFFI00.py")
-    print("Execution completed")
-end
-
+--############################################### Exports
 if (master_export == nil) then
     chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 
@@ -194,3 +184,13 @@ if (master_export == nil) then
 
     chiFFInterpolationExportPython(line,"Line")
 end
+
+--############################################### Plots
+if (chi_location_id == 0 and master_export == nil) then
+
+    --os.execute("python ZPFFI00.py")
+    ----os.execute("python ZPFFI11.py")
+    --local handle = io.popen("python ZPFFI00.py")
+    print("Execution completed")
+end
+

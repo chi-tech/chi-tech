@@ -2,10 +2,6 @@
 
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
-#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
-#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
-
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -191,9 +187,9 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
       else
       {
         int ir_boundary_index = face.neighbor_id;
-        int ir_boundary_type  = boundaries[ir_boundary_index]->type;
+        auto ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
-        if (ir_boundary_type == DIFFUSION_DIRICHLET)
+        if (ir_boundary_type == BoundaryType::Dirichlet)
         {
 //          auto dc_boundary =
 //            (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
@@ -258,7 +254,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
             }//for j
           }//for i
         }//Dirichlet
-        else if (ir_boundary_type == DIFFUSION_ROBIN)
+        else if (ir_boundary_type == BoundaryType::Robin)
         {
           auto robin_bndry =
             (chi_diffusion::BoundaryRobin*)boundaries[ir_boundary_index];

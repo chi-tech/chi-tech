@@ -56,7 +56,7 @@ void chi_mesh::UnpartitionedMesh::
 
   //======================================== Separate the blocks
   auto multiblock = reader->GetOutput();
-  int num_blocks = multiblock->GetNumberOfBlocks();
+  size_t num_blocks = multiblock->GetNumberOfBlocks();
   chi_log.Log(LOG_0) << "Number of blocks in file: " << num_blocks;
 
   std::vector<vtkSmartPointer<vtkUnstructuredGrid>> grid_blocks;
@@ -71,7 +71,7 @@ void chi_mesh::UnpartitionedMesh::
   // and tries to find 3D cells. If it does the
   // overall mesh is classified as 3D.
   bool mesh_is_3D = false;
-  for (auto ugrid : grid_blocks)
+  for (auto& ugrid : grid_blocks)
   {
     if (ugrid->GetNumberOfCells() == 0) continue;
 
@@ -87,14 +87,13 @@ void chi_mesh::UnpartitionedMesh::
     }
   }//for grid block
 
-
   //========================================= Process each block
   vtkSmartPointer<vtkAppendFilter> append =
     vtkSmartPointer<vtkAppendFilter>::New();
   std::vector<int> block_mat_id;
   int total_cells = 0;
   int ug=-1;
-  for (auto ugrid : grid_blocks)
+  for (auto& ugrid : grid_blocks)
   {
     ++ug;
     int num_cells  = ugrid->GetNumberOfCells();
@@ -214,23 +213,7 @@ void chi_mesh::UnpartitionedMesh::
     if (point[2] > bound_box.zmax) bound_box.zmax = point[2];
   }
 
-//  std::stringstream ostr;
-//
-//  ostr << "Cell 0 vids: ";
-//  auto first_cell = raw_cells[0];
-//  for (auto vid : first_cell->vertex_ids)
-//    ostr << vid << " " << vertices[vid]->PrintS();
-//  ostr << "\n";
-//  int f=-1;
-//  for (auto& face : first_cell->faces)
-//  {
-//    ++f;
-//    ostr << "Face " << f << ": ";
-//    for (auto vid : face.vertex_ids)
-//      ostr << vid << " ";
-//    ostr << "\n";
-//  }
-//
-//  chi_log.Log(LOG_0) << ostr.str();
-
+  //======================================== Always do this
+  BuildMeshConnectivity();
+  ComputeCentroids();
 }

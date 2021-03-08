@@ -1,14 +1,11 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <ChiMesh/Cell/cell.h>
-
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
-#include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "../DiffusionSolver/Boundaries/chi_diffusion_bndry_reflecting.h"
-#include <ChiPhysics/chi_physics.h>
-#include <chi_log.h>
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################

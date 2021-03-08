@@ -1,15 +1,12 @@
 #include "lbs_linear_boltzmann_solver.h"
-#include <ChiMesh/MeshHandler/chi_meshhandler.h>
-#include <ChiMesh/VolumeMesher/chi_volumemesher.h>
-#include <ChiMesh/VolumeMesher/Linemesh1D/volmesher_linemesh1d.h>
-#include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
-#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
-#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "chi_mpi.h"
+#include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
 extern ChiMPI& chi_mpi;
@@ -19,14 +16,14 @@ extern ChiTimer chi_program_timer;
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
-#include <iomanip>
 #include "ChiConsole/chi_console.h"
-
 extern ChiConsole&  chi_console;
+
+#include <iomanip>
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/
-void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset)
+void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
@@ -36,13 +33,18 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset)
   groupset.sweep_orderings.clear();
   groupset.sweep_orderings.shrink_to_fit();
 
-  chi_mesh::MeshHandler*    mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher*         mesher = mesh_handler->volume_mesher;
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  auto mesher = mesh_handler->volume_mesher;
+
+  const auto parmetis_partitioning = chi_mesh::VolumeMesher::PartitionType::PARMETIS;
+
+  bool no_cycles_parmetis_partitioning =
+    (mesher->options.partition_type == parmetis_partitioning and
+                                       (not groupset.allow_cycles));
+  bool is_1D_geometry = options.geometry_type == GeometryType::ONED_SLAB;
 
   //============================================= Check possibility of cycles
-  if (mesher->options.partition_type ==
-      chi_mesh::VolumeMesher::PartitionType::PARMETIS and
-      not groupset.allow_cycles)
+  if (no_cycles_parmetis_partitioning and not is_1D_geometry)
   {
     chi_log.Log(LOG_ALLERROR)
       << "When using PARMETIS type partitioning then groupset iterative method"
@@ -65,7 +67,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset)
     }
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D MESHES
-  else if (typeid(*mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  else if (options.geometry_type == GeometryType::ONED_SLAB)
   {
     if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
     {
@@ -103,9 +105,12 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset)
 
   }
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D 3D MESHES
-  else if ( (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
+  else if ( options.geometry_type == GeometryType::TWOD_CARTESIAN or
+            (options.geometry_type == GeometryType::THREED_CARTESIAN and
+              typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder))/*
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherExtruder)) or
             (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined2D)) or
-            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D)))
+            (typeid(*mesher) == typeid(chi_mesh::VolumeMesherPredefined3D))*/)
   {
     if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
     {
@@ -159,12 +164,22 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset)
         groupset.sweep_orderings.push_back(new_swp_order);
       }
     }//if product quadrature
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
+           "and therefore only certain angular quadrature types are supported. "
+           "i.e., for now just AngularQuadratureType::ProductQuadrature.";
+      exit(EXIT_FAILURE);
+    }
   }
   else
   {
     chi_log.Log(LOG_ALLERROR)
       << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
-         "and therefore only certain mesh types are supported.";
+         "and therefore only certain geometry types are supported. i.e., "
+         "GeometryType::ONED_SLAB, GeometryType::TWOD_CARTESIAN, "
+         "GeometryType::THREED_CARTESIAN.";
     exit(EXIT_FAILURE);
   }
 

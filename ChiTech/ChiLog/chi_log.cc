@@ -1,12 +1,11 @@
 #include "chi_log.h"
-#include <chi_mpi.h>
-#include <ChiTimer/chi_timer.h>
+#include "chi_mpi.h"
+#include "ChiTimer/chi_timer.h"
 
 extern ChiMPI&     chi_mpi;
 extern ChiTimer  chi_program_timer;
 
 #include <sstream>
-#include <iomanip>
 
 //###################################################################
 /** Default constructor*/
@@ -147,7 +146,7 @@ void ChiLog::SetVerbosity(int int_level)
 
 //###################################################################
 /** Gets the current verbosity level.*/
-int ChiLog::GetVerbosity()
+int ChiLog::GetVerbosity() const
 {
   return verbosity;
 }

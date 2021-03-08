@@ -88,7 +88,7 @@ Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech 
 Go to the chi-tech folder and type:
 ```bash
     $ cd chi-tech
-    $ python3 CHI_RESOURCES/configure_dependencies.py
+    $ python3 ChiResources/configure_dependencies.py
 ```
 The configure script will attempt to download and install all the necessary 
 dependencies **and may take a long time**
@@ -150,14 +150,14 @@ The documentation is contained in the *CHI_DOC* folder and can be generated
 using a script provided in that folder:
 
 ```bash
-cd CHI_DOC/
+cd ChiDoc/
 ./YReGenerateDocumentation.sh
 ```
 
 Once finished, you can view the generated documentation by opening
 
 ```bash
-CHI_DOC/HTMLdocs/html/index.html
+ChiDoc/HTMLdocs/html/index.html
 ```
 
 in your favorite browser.

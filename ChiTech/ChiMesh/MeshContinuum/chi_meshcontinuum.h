@@ -7,9 +7,6 @@
 
 #include "chi_mpi.h"
 
-
-
-
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
@@ -98,6 +95,8 @@ public:
   ChiMPICommunicatorSet& GetCommunicator();
 
   size_t GetGlobalNumberOfCells();
+
+  std::vector<uint64_t> GetDomainUniqueBoundaryIDs();
 };
 
 #endif //CHI_MESHCONTINUUM_H_

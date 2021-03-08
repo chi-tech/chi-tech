@@ -10,10 +10,15 @@ extern "C"
 
 #include <typeinfo>
 #include <string>
+#include <vector>
 
 void LuaPostArgAmountError(const char* func_name,int expected, int given);
 void LuaCheckNilValue(const char* func_name, lua_State* L, int arg);
 void LuaCheckTableValue(const char* func_name, lua_State* L, int arg);
 std::string LuaSourceInfo(lua_State* L, const char* func_name);
+void LuaPopulateVectorFrom1DArray(const char* func_name,
+                                  lua_State* L,
+                                  int table_arg_index,
+                                  std::vector<double>& vec);
 
 #endif

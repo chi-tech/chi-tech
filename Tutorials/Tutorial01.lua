@@ -7,13 +7,7 @@ ds=2.0/N
 for i=0,N do
     nodes[i+1] = -1.0 + i*ds
 end
-surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
---surf_mesh,region1 = chiMeshCreate2DOrthoMesh(nodes,nodes)
---
---chiSurfaceMesherSetProperty(PARTITION_X,2)
---chiSurfaceMesherSetProperty(PARTITION_Y,2)
---chiSurfaceMesherSetProperty(CUT_X,0.0)
---chiSurfaceMesherSetProperty(CUT_Y,0.0)
+surf_mesh,region1 = chiMeshCreateUnpartitioned3DOrthoMesh(nodes,nodes,nodes)
 
 chiVolumeMesherExecute();
 
@@ -40,12 +34,12 @@ phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
---
-----############################################### Initialize and
-----                                                Execute Solver
+
+--############################################### Initialize and
+--                                                Execute Solver
 chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
---
+
 ----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
 chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")

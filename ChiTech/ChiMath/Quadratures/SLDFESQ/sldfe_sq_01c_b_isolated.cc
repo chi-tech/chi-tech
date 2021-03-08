@@ -20,10 +20,10 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
                                           sq_xy_tilde_centroid,
                                           radii_vectors_xy_tilde, sq, legendre);
   double d = 1.0/sqrt(3.0);
-  chi_math::DVectorNX<double> rho = {d,d,d,d};
+  chi_math::DynamicVector<double> rho = {d, d, d, d};
   double epsilon = 1.0e-1;
-  chi_math::DVectorNX<double> delta = {epsilon,epsilon,epsilon,epsilon};
-  chi_math::DVectorNX<double> drho_df = {0.0,0.0,0.0,0.0};
+  chi_math::DynamicVector<double> delta = {epsilon, epsilon, epsilon, epsilon};
+  chi_math::DynamicVector<double> drho_df = {0.0, 0.0, 0.0, 0.0};
 
   //============================================= Compute initial weights
   auto weights = ComputeWeights(rho);

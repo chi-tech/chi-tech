@@ -38,16 +38,13 @@ RegisterFunction(chiLocallyRefineSLDFESQAngularQuadrature)
 RegisterFunction(chiPrintToPythonSLDFESQAngularQuadrature)
 
 //module:Mesh Macros
-RegisterFunction(chiMeshCreate1DSlabMesh)
-RegisterFunction(chiMeshCreate2DOrthoMesh)
-RegisterFunction(chiMeshCreate3DOrthoMesh)
-
 RegisterFunction(chiMeshCreateUnpartitioned1DOrthoMesh)
 RegisterFunction(chiMeshCreateUnpartitioned2DOrthoMesh)
 RegisterFunction(chiMeshCreateUnpartitioned3DOrthoMesh)
 
 RegisterFunction(chiUnpartitionedMeshFromVTU)
 RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
+RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ)
 
 
 //module:Mesh Utilities
@@ -111,10 +108,12 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
     RegisterFunction(chiSurfaceMesherExportToObj)
 //  VolumeMesher
     RegisterFunction(chiVolumeMesherCreate)
-      RegisterConstant(VOLUMEMESHER_LINEMESH1D,   1);
-      RegisterConstant(VOLUMEMESHER_PREDEFINED2D, 3);
       RegisterConstant(VOLUMEMESHER_EXTRUDER,     4);
-      RegisterConstant(VOLUMEMESHER_PREDEFINED3D, 5)
+      RegisterConstant(VOLUMEMESHER_UNPARTITIONED, 6)
+    RegisterNamespace(ExtruderTemplateType)
+      AddNamedConstantToNamespace(SURFACE_MESH,1,ExtruderTemplateType)
+      AddNamedConstantToNamespace(UNPARTITIONED_MESH,2,ExtruderTemplateType)
+
     RegisterFunction(chiVolumeMesherExecute)
     RegisterFunction(chiVolumeMesherSetProperty)
       RegisterConstant(FORCE_POLYGONS,   1);
@@ -126,12 +125,29 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
       RegisterConstant(CUTS_Y,   7);
       RegisterConstant(CUTS_X,   8);
       RegisterConstant(PARTITION_TYPE,   9);
-        RegisterConstant(KBA_STYLE_XY,   1);
         RegisterConstant(KBA_STYLE_XYZ,   2);
         RegisterConstant(PARMETIS,   3);
       RegisterConstant(EXTRUSION_LAYER,   10);
       RegisterConstant(MATID_FROMLOGICAL,   11);
       RegisterConstant(BNDRYID_FROMLOGICAL, 12);
+    RegisterFunction(chiVolumeMesherSetKBAPartitioningPxPyPz)
+    RegisterFunction(chiVolumeMesherSetKBACutsX)
+    RegisterFunction(chiVolumeMesherSetKBACutsY)
+    RegisterFunction(chiVolumeMesherSetKBACutsZ)
+    RegisterFunction(chiVolumeMesherSetMatIDToAll)
+    RegisterFunction(chiVolumeMesherSetupOrthogonalBoundaries)
+    RegisterNamespace(OrthoBoundaryID)
+      AddNamedConstantToNamespace(XMAX,0,OrthoBoundaryID)
+      AddNamedConstantToNamespace(XMIN,1,OrthoBoundaryID)
+      AddNamedConstantToNamespace(YMAX,2,OrthoBoundaryID)
+      AddNamedConstantToNamespace(YMIN,3,OrthoBoundaryID)
+      AddNamedConstantToNamespace(ZMAX,4,OrthoBoundaryID)
+      AddNamedConstantToNamespace(ZMIN,5,OrthoBoundaryID)
+
+
+
+
+
 //  Domain Decomposition
     RegisterFunction(chiDomDecompose2D)
     RegisterFunction(chiDecomposeSurfaceMeshPxPy)

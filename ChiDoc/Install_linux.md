@@ -233,7 +233,7 @@ will use threading where possible.
 To check if the code compiled correctly, execute the test scripts:
 
 ```bash
-    $ python3 CHI_TEST/Z_Run_all.py
+    $ python3 ChiTest/Z_Run_all.py
 ```
 
 
@@ -252,14 +252,14 @@ The documentation is contained in the *CHI_DOC* folder and can be generated
 using a script provided in that folder:
 
 ```bash
-cd CHI_DOC/
+cd ChiDoc/
 ./YReGenerateDocumentation.sh
 ```
 
 Once finished, you can view the generated documentation by opening
 
 ```bash
-CHI_DOC/HTMLdocs/html/index.html
+ChiDoc/HTMLdocs/html/index.html
 ```
 
 in your favorite browser.
