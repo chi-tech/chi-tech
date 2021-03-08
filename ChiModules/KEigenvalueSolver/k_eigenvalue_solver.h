@@ -17,7 +17,6 @@ private:
 public:
   bool verbose = false;
 
-  int num_groups;
   int num_precursors;
   
   double k_eff = 1.0;
@@ -32,9 +31,6 @@ public:
                   bool apply_mat_src=true,
                   bool suppress_phi_old=false);
   double ComputeProduction();
-
-  std::vector<double>
-  IntegrateVolume(std::vector<double> phi);
 
   // Execute method
   void InitializeKSolver();
