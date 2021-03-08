@@ -25,16 +25,15 @@ We will be adding some items to this input file.
 
 \code
 slice1 = chiFFInterpolationCreate(SLICE)
-chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,1.5)
+chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,0.0)
 chiFFInterpolationSetProperty(slice1,ADD_FIELDFUNCTION,fflist[1])
 \endcode
 
 The first call creates a interpolator of type SLICE. At the time of writing this
  tutorial we support LINE, SLICE and VOLUME. The default orientation of a slice
  interpolator is with the cutting plane's normal pointing in the direction
- of \f$ \hat{k} \f$ and the reference point at (0,0,0). We can keep the same
- orientation but move the reference point to the center of the extrusion
- (i.e. 1.5). This is achieved with a call to chiFFInterpolationSetProperty() with
+ of \f$ \hat{k} \f$ and the reference point at (0,0,0). A change in reference
+ point is achieved with a call to chiFFInterpolationSetProperty() with
  a property index SLICE_POINT. The last line here is to add a field function to
  this interpolator. We use the same function but this time with a property index
  ADD_FIELDFUNCTION.
@@ -70,7 +69,7 @@ Being a useful scripting system, the lua console can itself invoke processes.
 local handle = io.popen("python ZPFFI00.py")
 \endcode
 
-The output procuded is shown below:
+The output produced is shown below:
 
  \image html "Physics/FFOutput.png" "Figure 2 - Output produced by python script" width=600px
 
@@ -86,13 +85,12 @@ ds=2.0/N
 for i=0,N do
     nodes[i+1] = -1.0 + i*ds
 end
-surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
---surf_mesh,region1 = chiMeshCreate2DOrthoMesh(nodes,nodes)
+surf_mesh,region1 = chiMeshCreateUnpartitioned3DOrthoMesh(nodes,nodes,nodes)
 
---chiSurfaceMesherSetProperty(PARTITION_X,2)
---chiSurfaceMesherSetProperty(PARTITION_Y,2)
---chiSurfaceMesherSetProperty(CUT_X,0.0)
---chiSurfaceMesherSetProperty(CUT_Y,0.0)
+-- chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
+-- chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+-- chiVolumeMesherSetKBACutsX({0.0})
+-- chiVolumeMesherSetKBACutsY({0.0})
 
 chiVolumeMesherExecute();
 
@@ -130,7 +128,7 @@ fflist,count = chiGetFieldFunctionList(phys1)
 chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")
 
 slice1 = chiFFInterpolationCreate(SLICE)
-chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,1.5)
+chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,0.0)
 chiFFInterpolationSetProperty(slice1,ADD_FIELDFUNCTION,fflist[1])
 
 chiFFInterpolationInitialize(slice1)

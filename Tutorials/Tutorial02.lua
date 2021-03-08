@@ -7,13 +7,12 @@ ds=2.0/N
 for i=0,N do
     nodes[i+1] = -1.0 + i*ds
 end
-surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
---surf_mesh,region1 = chiMeshCreate2DOrthoMesh(nodes,nodes)
+surf_mesh,region1 = chiMeshCreateUnpartitioned3DOrthoMesh(nodes,nodes,nodes)
 
---chiSurfaceMesherSetProperty(PARTITION_X,2)
---chiSurfaceMesherSetProperty(PARTITION_Y,2)
---chiSurfaceMesherSetProperty(CUT_X,0.0)
---chiSurfaceMesherSetProperty(CUT_Y,0.0)
+-- chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
+-- chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+-- chiVolumeMesherSetKBACutsX({0.0})
+-- chiVolumeMesherSetKBACutsY({0.0})
 
 chiVolumeMesherExecute();
 
@@ -51,7 +50,7 @@ fflist,count = chiGetFieldFunctionList(phys1)
 chiExportFieldFunctionToVTK(fflist[1],"Tutorial1Output","Temperature")
 
 slice1 = chiFFInterpolationCreate(SLICE)
-chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,1.5)
+chiFFInterpolationSetProperty(slice1,SLICE_POINT,0.0,0.0,0.0)
 chiFFInterpolationSetProperty(slice1,ADD_FIELDFUNCTION,fflist[1])
 
 chiFFInterpolationInitialize(slice1)
