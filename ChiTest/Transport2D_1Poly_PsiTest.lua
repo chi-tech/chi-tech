@@ -121,14 +121,18 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 chiLBSSetProperty(phys1,LBSProperty.SAVE_ANGULAR_FLUX,true)
 
 --############################################### Initialize and Execute Solver
+-- chiLBSWriteGroupsetAngularFlux(phys1,gs0,"ZPsi")
 chiLBSInitialize(phys1)
-chiLBSExecute(phys1)
-
---############################################### Get field functions
-chiLBSWriteGroupsetAngularFlux(phys1,gs0,"ZPsi")
 if (chi_location_id == 0) then
     chiLBSReadGroupsetAngularFlux(phys1,gs0,"ZPsi")
 end
+chiLBSExecute(phys1)
+
+--############################################### Get field functions
+-- chiLBSWriteGroupsetAngularFlux(phys1,gs0,"ZPsi")
+-- if (chi_location_id == 0) then
+--     chiLBSReadGroupsetAngularFlux(phys1,gs0,"ZPsi")
+-- end
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 --############################################### Slice plot

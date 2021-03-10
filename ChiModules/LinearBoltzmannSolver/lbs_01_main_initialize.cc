@@ -60,4 +60,7 @@ void LinearBoltzmann::Solver::Initialize()
   //================================================== Initialize boundaries
   InitializeBoundaries();
 
+  //================================================== Initialize groupsets
+  InitializeGroupsets();
+
 }

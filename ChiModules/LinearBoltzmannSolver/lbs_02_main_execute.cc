@@ -27,12 +27,6 @@ void LinearBoltzmann::Solver::Execute()
     chi_log.Log(LOG_0)
       << "\n********* Initializing Groupset " << gs << "\n" << std::endl;
 
-    groupset.BuildDiscMomOperator(options.scattering_order,
-                                  options.geometry_type);
-    groupset.BuildMomDiscOperator(options.scattering_order,
-                                  options.geometry_type);
-    groupset.BuildSubsets();
-
     ComputeSweepOrderings(groupset);
     InitFluxDataStructures(groupset);
 

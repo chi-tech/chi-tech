@@ -102,6 +102,8 @@ public:
   void InitializeBoundaries();
   //01d
   virtual void InitializeParrays();
+  //01e
+  void InitializeGroupsets();
   //02
   void Execute() override;
   void SolveGroupset(LBSGroupset& groupset,
@@ -137,7 +139,7 @@ public:
   void ReadRestartData(std::string folder_name, std::string file_base);
   void WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
                                   const std::string& file_base);
-  void ReadGroupsetAngularFluxes(const LBSGroupset& groupset,
+  void ReadGroupsetAngularFluxes(LBSGroupset& groupset,
                                  const std::string& file_base);
 
   //IterativeMethods
