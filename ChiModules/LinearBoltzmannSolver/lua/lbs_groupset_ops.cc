@@ -1,16 +1,16 @@
 #include "ChiLua/chi_lua.h"
 
 #include "../lbs_linear_boltzmann_solver.h"
-#include "ChiPhysics/chi_physics.h"
-#include "ChiMath/chi_math.h"
 #include "ChiMath/Quadratures/product_quadrature.h"
 
-
-#include <chi_log.h>
-
-extern ChiPhysics&  chi_physics_handler;
-extern ChiMath&     chi_math_handler;
+#include "chi_log.h"
 extern ChiLog&     chi_log;
+
+#include "ChiMath/chi_math.h"
+extern ChiMath&     chi_math_handler;
+
+#include "ChiPhysics/chi_physics.h"
+extern ChiPhysics&  chi_physics_handler;
 
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 
@@ -185,7 +185,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 4)
-    LuaPostArgAmountError("chiLBSGroupsetAddGroups",4,num_args);
+    LuaPostArgAmountError(__FUNCTION__,4,num_args);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int from = lua_tonumber(L,3);
@@ -284,11 +284,11 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetQuadrature",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetQuadrature",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetQuadrature",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetQuadrature",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
 
 
   int solver_index = lua_tonumber(L,1);
@@ -404,11 +404,11 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetAngleAggregationType",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetAngleAggregationType",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int agg_type = lua_tonumber(L,3);
@@ -502,11 +502,11 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetAngleAggDiv",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetAngleAggDiv",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetAngleAggDiv",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetAngleAggDiv",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
@@ -587,11 +587,11 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetGroupSubsets",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetGroupSubsets",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetGroupSubsets",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetGroupSubsets",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
@@ -687,11 +687,11 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetIterativeMethod",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetIterativeMethod",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetIterativeMethod",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetIterativeMethod",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int iter_method  = lua_tonumber(L,3);
@@ -788,11 +788,11 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetResidualTolerance",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetResidualTolerance",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetResidualTolerance",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetResidualTolerance",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   double resid_tol = lua_tonumber(L,3);
@@ -876,11 +876,11 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetMaxIterations",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetMaxIterations",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetMaxIterations",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetMaxIterations",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_iter = lua_tonumber(L,3);
@@ -961,11 +961,11 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetGMRESRestartIntvl",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetGMRESRestartIntvl",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetGMRESRestartIntvl",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetGMRESRestartIntvl",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int restart_intvl = lua_tonumber(L,3);
@@ -1047,11 +1047,11 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError("chiLBSGroupsetSetEnableSweepLog",3,num_args);
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetEnableSweepLog",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetEnableSweepLog",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetEnableSweepLog",L,3);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   bool log_flag = lua_toboolean(L,3);
@@ -1138,12 +1138,12 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError("chiLBSGroupsetSetWGDSA",4,num_args);
+    LuaPostArgAmountError(__FUNCTION__,4,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,3);
-  LuaCheckNilValue("chiLBSGroupsetSetWGDSA",L,4);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
+  LuaCheckNilValue(__FUNCTION__,L,4);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
@@ -1245,12 +1245,12 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
   //============================================= Get arguments
   int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError("TGDSA",4,num_args);
+    LuaPostArgAmountError(__FUNCTION__,4,num_args);
 
-  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,1);
-  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,2);
-  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,3);
-  LuaCheckNilValue("chiLBSGroupsetSetTGDSA",L,4);
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
+  LuaCheckNilValue(__FUNCTION__,L,4);
   int solver_index = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);

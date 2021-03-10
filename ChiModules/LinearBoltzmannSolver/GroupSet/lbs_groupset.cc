@@ -214,3 +214,4 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
 
   ofile.close();
 }
+

@@ -71,6 +71,8 @@ RegisterFunction(chiLBSInitialize)
 RegisterFunction(chiLBSExecute)
 RegisterFunction(chiLBSGetFieldFunctionList)
 RegisterFunction(chiLBSGetScalarFieldFunctionList)
+RegisterFunction(chiLBSWriteGroupsetAngularFlux)
+RegisterFunction(chiLBSReadGroupsetAngularFlux)
 
 //module:Linear Boltzmann Solver - Groupset manipulation
 //\ref LuaLBSGroupsets Main page

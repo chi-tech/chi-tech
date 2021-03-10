@@ -1,12 +1,15 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <sys/stat.h>
-#include <fstream>
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "chi_log.h"
+#include "chi_mpi.h"
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
+
+#include <sys/stat.h>
+#include <fstream>
+#include <cstring>
 
 //###################################################################
 /**Writes phi_old to restart file.*/
@@ -166,4 +169,168 @@ void LinearBoltzmann::Solver::ReadRestartData(std::string folder_name,
       << "Failed to read restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
+}
+
+//###################################################################
+/**Prints the groupset's angular fluxes to file.*/
+void LinearBoltzmann::Solver::
+  WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
+                             const std::string& file_base)
+{
+  std::string file_name =
+    file_base + std::to_string(chi_mpi.location_id) + ".data";
+
+  //============================================= Open file
+  std::ofstream file(file_name,
+                     std::ofstream::binary | //binary file
+                     std::ofstream::out |    //no accidental reading
+                     std::ofstream::trunc);  //clear file contents when opened
+
+  //============================================= Check file is open
+  if (not file.is_open())
+  {
+    chi_log.Log(LOG_ALLWARNING)
+      << __FUNCTION__ << "Failed to open " << file_name;
+    return;
+  }
+
+  //============================================= Write header
+  std::string header_info =
+    "Chi-Tech LinearBoltzmann::Groupset angular flux file\n"
+    "Header size: 320 bytes\n"
+    "Structure(type-info):\n"
+    "size_t-num_local_nodes\n"
+    "size_t-num_angles\n"
+    "size_t-num_groups\n"
+    "size_t-num_records\n"
+    "Each record:\n"
+    "size_t-cell_global_id\n"
+    "unsigned int-node_number\n"
+    "unsigned int-angle_num\n"
+    "unsigned int-group_num\n";
+
+  int header_size = (int)header_info.length();
+
+  char header_bytes[320];
+  memset(header_bytes, '-', 320);
+  strncpy(header_bytes, header_info.c_str(),std::min(header_size,319));
+  header_bytes[319]='\0';
+
+  file << header_bytes;
+
+  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+
+  //============================================= Get relevant items
+  auto fe = std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+  if (not fe) {file.close(); return;}
+  size_t num_local_nodes = discretization->GetNumLocalDOFs(grid,NODES_ONLY);
+  size_t num_angles      = groupset.quadrature->abscissae.size();
+  size_t num_groups      = groupset.groups.size();
+  size_t num_local_dofs  = groupset.num_psi_unknowns_local;
+  auto   dof_handler     = groupset.psi_uk_man;
+
+  //============================================= Write quantities
+  file.write((char*)&num_local_nodes,sizeof(size_t));
+  file.write((char*)&num_angles     ,sizeof(size_t));
+  file.write((char*)&num_groups     ,sizeof(size_t));
+  file.write((char*)&num_local_dofs ,sizeof(size_t));
+
+  //============================================= Write per node data
+  size_t dof_count=0;
+  for (const auto& cell : grid->local_cells)
+  {
+    const auto cell_fe_mapping = fe->GetCellMappingFE(cell.local_id);
+    for (unsigned int i=0; i<cell_fe_mapping->num_nodes; ++i)
+      for (unsigned int n=0; n<num_angles; ++n)
+        for (unsigned int g=0; g<num_groups; ++g)
+        {
+          if (++dof_count > num_local_dofs) goto close_file;
+          uint64_t dof_map = fe->MapDOFLocal(cell,i,dof_handler,n,g);
+          double value = groupset.psi_new_local[dof_map];
+
+          file.write((char*)&cell.global_id,sizeof(size_t));
+          file.write((char*)&i             ,sizeof(unsigned int));
+          file.write((char*)&n             ,sizeof(unsigned int));
+          file.write((char*)&g             ,sizeof(unsigned int));
+          file.write((char*)&value         ,sizeof(double));
+        }
+  }
+
+  //============================================= Clean-up
+close_file:
+  file.close();
+}
+
+//###################################################################
+/**Prints the groupset's angular fluxes to file.*/
+void LinearBoltzmann::Solver::
+  ReadGroupsetAngularFluxes(const LBSGroupset& groupset,
+                           const std::string& file_base)
+{
+  std::string file_name =
+    file_base + std::to_string(chi_mpi.location_id) + ".data";
+
+  //============================================= Open file
+  std::ifstream file(file_name,
+                     std::ofstream::binary | //binary file
+                     std::ofstream::in);     //no accidental writing
+
+  //============================================= Check file is open
+  if (not file.is_open())
+  {
+    chi_log.Log(LOG_ALLWARNING)
+      << __FUNCTION__ << "Failed to open " << file_name;
+    return;
+  }
+
+  size_t num_local_nodes;
+  size_t num_angles     ;
+  size_t num_groups     ;
+  size_t num_local_dofs ;
+
+  std::vector<double> psi;
+
+  //============================================= Read header
+  char header_bytes[320]; header_bytes[319] = '\0';
+  file.read(header_bytes,319);
+
+  file.read((char*)&num_local_nodes,sizeof(size_t));
+  file.read((char*)&num_angles     ,sizeof(size_t));
+  file.read((char*)&num_groups     ,sizeof(size_t));
+  file.read((char*)&num_local_dofs ,sizeof(size_t));
+
+  chi_log.Log(LOG_ALL) << header_bytes;
+
+  {
+    std::stringstream outstr;
+    outstr << "num_local_nodes: " << num_local_nodes << "\n";
+    outstr << "num_angles     : " << num_angles      << "\n";
+    outstr << "num_groups     : " << num_groups      << "\n";
+    outstr << "num_local_dofs : " << num_local_dofs  << "\n";
+    chi_log.Log(LOG_ALL) << outstr.str();
+  }
+
+  psi.reserve(num_local_dofs);
+  std::set<uint64_t> cells_touched;
+  for (size_t dof=0; dof<num_local_dofs; ++dof)
+  {
+    uint64_t     cell_global_id;
+    unsigned int node;
+    unsigned int angle_num;
+    unsigned int group;
+    double       psi_value;
+
+    file.read((char*)&cell_global_id,sizeof(uint64_t));
+    file.read((char*)&node          ,sizeof(unsigned int));
+    file.read((char*)&angle_num     ,sizeof(unsigned int));
+    file.read((char*)&group         ,sizeof(unsigned int));
+    file.read((char*)&psi_value     ,sizeof(double));
+
+    cells_touched.insert(cell_global_id);
+  }
+
+  chi_log.Log(LOG_ALL) << "Number of cells read: " << cells_touched.size();
+
+  //============================================= Clean-up
+  file.close();
 }

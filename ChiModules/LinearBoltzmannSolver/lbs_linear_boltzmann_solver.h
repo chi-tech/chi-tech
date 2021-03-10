@@ -135,6 +135,10 @@ public:
   //04
   void WriteRestartData(std::string folder_name, std::string file_base);
   void ReadRestartData(std::string folder_name, std::string file_base);
+  void WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
+                                  const std::string& file_base);
+  void ReadGroupsetAngularFluxes(const LBSGroupset& groupset,
+                                 const std::string& file_base);
 
   //IterativeMethods
   virtual void SetSource(LBSGroupset& groupset,
