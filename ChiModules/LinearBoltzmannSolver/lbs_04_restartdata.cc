@@ -207,7 +207,8 @@ void LinearBoltzmann::Solver::
     "size_t-cell_global_id\n"
     "unsigned int-node_number\n"
     "unsigned int-angle_num\n"
-    "unsigned int-group_num\n";
+    "unsigned int-group_num\n"
+    "double-angular_flux\n";
 
   int header_size = (int)header_info.length();
 
