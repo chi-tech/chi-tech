@@ -1,11 +1,9 @@
 #include "pwlc.h"
 
-#include "ChiTimer/chi_timer.h"
-
-#include <chi_log.h>
-#include <chi_mpi.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
 #include "ChiTimer/chi_timer.h"

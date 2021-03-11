@@ -173,7 +173,7 @@ void chi_physics::FieldFunction::
         for (auto& cell : grid->local_cells)
         {
           int local_mapping =
-            fv.MapDOFLocal(cell,ff->unknown_manager,ref_unknown);
+            fv.MapDOFLocal(cell,0,ff->unknown_manager,ref_unknown,0);
 
           double value = (*ff->field_vector_local)[local_mapping];
 

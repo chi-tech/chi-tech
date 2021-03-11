@@ -26,7 +26,7 @@ protected:
 
 protected:
   SpatialDiscretization_FE(int dim,
-                           chi_mesh::MeshContinuumPtr in_grid,
+                           chi_mesh::MeshContinuumPtr& in_grid,
                            SDMType in_type =
                            SDMType::UNDEFINED,
                            chi_math::finite_element::SetupFlags in_setup_flags=

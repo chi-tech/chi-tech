@@ -70,7 +70,7 @@ void LinearBoltzmann::Solver::
     return;
   }
 
-  size_t num_local_nodes = discretization->GetNumLocalDOFs(grid,NODES_ONLY);
+  size_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles      = groupset.quadrature->abscissae.size();
   size_t num_groups      = groupset.groups.size();
   size_t num_local_dofs  = groupset.num_psi_unknowns_local;
@@ -144,7 +144,7 @@ void LinearBoltzmann::Solver::
     return;
   }
 
-  size_t num_local_nodes   = discretization->GetNumLocalDOFs(grid,NODES_ONLY);
+  size_t num_local_nodes   = discretization->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles        = groupset.quadrature->abscissae.size();
   size_t num_groups        = groupset.groups.size();
   size_t num_local_dofs    = groupset.num_psi_unknowns_local;
