@@ -23,8 +23,8 @@ public:
 
   std::vector<chi_mesh::EdgeLoopCollection*>         edge_loop_collections;
 
-  chi_mesh::SurfaceMesher* surface_mesher;
-  chi_mesh::VolumeMesher*  volume_mesher;
+  chi_mesh::SurfaceMesher* surface_mesher = nullptr;
+  chi_mesh::VolumeMesher*  volume_mesher = nullptr;
 
 
 public:
