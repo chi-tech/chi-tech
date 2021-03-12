@@ -18,7 +18,7 @@ void KEigenvalue::Solver::ExecuteKSolver()
   int gs = 0;
 
   chi_log.Log(LOG_0)
-    << "\n********* Initializing Groupset " << gs << "\n" << std::endl;
+    << "\n********* Initializing Groupset " << gs << std::endl;
 
   group_sets[gs].BuildDiscMomOperator(options.scattering_order,
                                       options.geometry_type);
@@ -33,7 +33,7 @@ void KEigenvalue::Solver::ExecuteKSolver()
 
   ResetSweepOrderings(group_sets[gs]);
  
-  chi_log.Log(LOG_0) << "k eigenvalue solver execution completed\n"; 
+  chi_log.Log(LOG_0) << "KEigenvalueSolver execution completed\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

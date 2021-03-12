@@ -106,7 +106,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
       chi_log.Log(LOG_ALLVERBOSE_2) << si_iter_info.str();
 
       if (si_converged) {
-        chi_log.Log(LOG_0VERBOSE_1)
+        chi_log.Log(LOG_ALLVERBOSE_1)
             << "\nSource iterations converged in "
             << si_nit << " iteratrions.\n";
         break;
@@ -159,7 +159,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
                           (long int)num_angles*
                           (long int)groupset.groups.size();
   chi_log.Log(LOG_0)
-    << "\n\n";
+    << "\n";
   chi_log.Log(LOG_0)
     << "        Final k-eigenvalue    :        "
     << std::setprecision(6) << k_eff;
