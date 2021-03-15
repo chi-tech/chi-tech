@@ -45,7 +45,7 @@ RegisterFunction(chiMeshCreateUnpartitioned3DOrthoMesh)
 RegisterFunction(chiUnpartitionedMeshFromVTU)
 RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
 RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ)
-
+RegisterFunction(chiUnpartitionedMeshFromMshFormat)
 
 //module:Mesh Utilities
 RegisterFunction(chiEdgeLoopSplitByAngle)

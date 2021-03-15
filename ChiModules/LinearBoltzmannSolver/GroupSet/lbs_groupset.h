@@ -14,8 +14,6 @@
 
 #include "ChiPhysics/chi_physics_namespace.h"
 
-#include <functional>
-
 namespace LinearBoltzmann
 {
   enum class AngleAggregationType
@@ -78,25 +76,6 @@ public:
   bool                                         psi_to_be_saved=false;
   size_t                                       num_psi_unknowns_local=0;
   std::vector<double>                          psi_new_local;
-
-  /**
-   * Convenient typdef for the moment call back function. See moment_callbacks.
-   *  Arguments are:
-   *  int cell_id, the value cell->local_id for the current cell
-   *  int dof_mapping, local DOF-address with moment and group folded in.
-   *  int dof_index, dof for the solution psi from ((CellFEView*)grid_fe_view->MapFeViewL(cell->local_id))->dofs
-   *  int moment, the moment number.
-   *  int angle_num, the reference angle number in the angular quadrature
-   *  double psi, angular flux for the given dof and angle_num.
-   */
-  typedef std::function<void(int cell_id, int dof_mapping, int dof_index, int group, int moment, int angle_num, double psi)> MomentCallbackF;
-  /**
-   * Functions of type MomentCallbackF can be added to the moment_callbacks
-   * vector and these can be called from within functions taking a
-   * LBSGroupset instance. The intention is that this function can
-   * be used as a general interface to retrieve angular flux values
-   */
-  std::vector<MomentCallbackF> moment_callbacks;
 
   //npt_groupset.cc
        LBSGroupset();

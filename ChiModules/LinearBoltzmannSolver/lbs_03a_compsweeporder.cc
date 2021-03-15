@@ -44,7 +44,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
   bool is_1D_geometry = options.geometry_type == GeometryType::ONED_SLAB;
 
   //============================================= Check possibility of cycles
-  if (no_cycles_parmetis_partitioning and not is_1D_geometry)
+  if (no_cycles_parmetis_partitioning and not is_1D_geometry and chi_mpi.process_count>1)
   {
     chi_log.Log(LOG_ALLERROR)
       << "When using PARMETIS type partitioning then groupset iterative method"

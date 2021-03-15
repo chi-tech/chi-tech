@@ -23,6 +23,8 @@ public:
    */
   std::vector<chi_mesh::PolyFace*> poly_faces; ///<Polygonal faces
 
+  std::vector<int> physical_region_map;
+
 public:
   //constrdestr.cc
         SurfaceMesh();

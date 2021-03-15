@@ -148,12 +148,12 @@ public:
                  bool suppress_phi_old);
   double ComputePiecewiseChange(LBSGroupset& groupset);
   SweepChunk *SetSweepChunk(LBSGroupset& groupset);
-  void ClassicRichardson(LBSGroupset& groupset,
+  bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
                          SweepChunk* sweep_chunk,
                          MainSweepScheduler & sweepScheduler,
                          bool log_info = true);
-  void GMRES(LBSGroupset& groupset,
+  bool GMRES(LBSGroupset& groupset,
              int group_set_num,
              SweepChunk* sweep_chunk,
              MainSweepScheduler & sweepScheduler,

@@ -67,6 +67,8 @@ public:
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);
   void ReadFromWavefrontOBJ(const Options& options);
+
+  void ReadFromMsh(const Options& options);
 };
 
 

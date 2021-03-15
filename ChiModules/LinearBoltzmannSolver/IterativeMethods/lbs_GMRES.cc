@@ -19,7 +19,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
-void LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
+bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
                                     int group_set_num,
                                     SweepChunk* sweep_chunk,
                                     MainSweepScheduler& sweepScheduler,
@@ -165,7 +165,6 @@ void LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       << "GMRES solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
-
   DisAssembleVector(groupset, phi_new, phi_new_local.data(),WITH_DELAYED_PSI);
   DisAssembleVector(groupset, phi_new, phi_old_local.data(),WITH_DELAYED_PSI);
 
@@ -219,6 +218,14 @@ void LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
     groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,
                                 sweep_log_file_name);
   }
+
+  std::string sweep_log_file_name =
+    std::string("GS_") + std::to_string(group_set_num) +
+    std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+    std::string(".log");
+  groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+
+  return reason == KSP_CONVERGED_RTOL;
 }
 
 

@@ -15,8 +15,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-void LinearBoltzmann::Solver::
-  ClassicRichardson(LBSGroupset& groupset,
+bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
                     int group_set_num,
                     SweepChunk* sweep_chunk,
                     MainSweepScheduler& sweepScheduler,
@@ -42,7 +41,7 @@ void LinearBoltzmann::Solver::
   //================================================== Now start iterating
   double pw_change = 0.0;
   double pw_change_prev = 1.0;
-  double spectral_radius_estimate = 0.0;
+  double rho = 0.0;
   bool converged = false;
   for (int k=0; k<groupset.max_iterations; k++)
   {
@@ -70,12 +69,12 @@ void LinearBoltzmann::Solver::
     DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(),
                                            phi_old_local.data());
 
-    spectral_radius_estimate = sqrt(pw_change / pw_change_prev);
+    rho = sqrt(pw_change / pw_change_prev);
     pw_change_prev = pw_change;
 
-    if (k==0) spectral_radius_estimate = 0.0;
-    if (pw_change<std::max(groupset.residual_tolerance *
-                           spectral_radius_estimate, 1.0e-10))
+    if (k==0) rho = 0.0;
+
+    if (pw_change<std::max(groupset.residual_tolerance*(1.0-rho),1.0e-10))
       converged = true;
 
     //======================================== Print iteration information
@@ -84,17 +83,18 @@ void LinearBoltzmann::Solver::
       if (groupset.apply_wgdsa || groupset.apply_tgdsa)
         offset = std::string("    ");
 
-      std::stringstream iter_info;
-      iter_info
-        << chi_program_timer.GetTimeString() << " "
-        << offset
-        << "WGS groups ["
-        << groupset.groups.front().id
-        << "-"
-        << groupset.groups.back().id
-        << "]"
-        << " Iteration " << std::setw(5) << k
-        << " Point-wise change " << std::setw(14) << pw_change;
+    std::stringstream iter_info;
+    iter_info
+      << chi_program_timer.GetTimeString() << " "
+      << offset
+      << "WGS groups ["
+      << groupset.groups.front().id
+      << "-"
+      << groupset.groups.back().id
+      << "]"
+      << " Iteration " << std::setw(5) << k
+      << " Point-wise change " << std::setw(14) << pw_change
+      <<" Spectral Radius Estimate " << std::setw(10) << rho;
 
       if (converged)
         iter_info << " CONVERGED\n";
@@ -155,4 +155,12 @@ void LinearBoltzmann::Solver::
     groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
   }//print solution info
 
+  std::string sweep_log_file_name =
+    std::string("GS_") + std::to_string(group_set_num) +
+    std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+    std::string(".log");
+
+  groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+
+  return converged;
 }
