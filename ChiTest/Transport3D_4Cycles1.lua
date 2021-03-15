@@ -121,7 +121,7 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,LBSBoundaryTypes.INCIDENT_ISOTRO
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMAX,LBSBoundaryTypes.REFLECTING);
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)

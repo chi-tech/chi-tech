@@ -30,13 +30,13 @@ public:
 
 private:
   explicit
-  SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr in_grid);
+  SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr& in_grid);
 
 public:
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_FV>
-  New(chi_mesh::MeshContinuumPtr in_grid)
+  New(chi_mesh::MeshContinuumPtr& in_grid)
   { return std::shared_ptr<SpatialDiscretization_FV>(
     new SpatialDiscretization_FV(in_grid));}
 
@@ -51,31 +51,29 @@ public:
   void OrderNodes();
 
   //03 sparsity
-  void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                            std::vector<int>& nodal_nnz_in_diag,
+  void BuildSparsityPattern(std::vector<int>& nodal_nnz_in_diag,
                             std::vector<int>& nodal_nnz_off_diag,
                             chi_math::UnknownManager& unknown_manager) override;
 
   //04a mappings
-  int MapDOF(chi_mesh::Cell& cell);
-  int MapDOFLocal(chi_mesh::Cell& cell);
-
-  int MapDOF(chi_mesh::Cell& cell,
-             chi_math::UnknownManager& unknown_manager,
+  int MapDOF(const chi_mesh::Cell& cell,
+             unsigned int node,
+             const chi_math::UnknownManager& unknown_manager,
              unsigned int unknown_id,
-             unsigned int component=0);
+             unsigned int component) const override;
 
-  int MapDOFLocal(chi_mesh::Cell& cell,
-                  chi_math::UnknownManager& unknown_manager,
+  int MapDOFLocal(const chi_mesh::Cell& cell,
+                  unsigned int node,
+                  const chi_math::UnknownManager& unknown_manager,
                   unsigned int unknown_id,
-                  unsigned int component=0);
+                  unsigned int component) const override;
 
+  int MapDOF(const chi_mesh::Cell& cell, unsigned int node) const override;
+  int MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override;
 
   //04b utils
-  size_t GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                         chi_math::UnknownManager& unknown_manager) override;
-  size_t GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                          chi_math::UnknownManager& unknown_manager) override;
+  size_t GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager) override;
+  size_t GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager) override;
   size_t GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                          chi_math::UnknownManager& unknown_manager);
 

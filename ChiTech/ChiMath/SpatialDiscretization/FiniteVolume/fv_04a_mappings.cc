@@ -13,15 +13,8 @@ extern ChiMPI& chi_mpi;
 /**Maps a finite volume degree of freedom. The default behavior is to
  * assume a nodal DOF storage scheme.*/
 int SpatialDiscretization_FV::
-MapDOF(chi_mesh::Cell& cell)
+  MapDOF(const chi_mesh::Cell& cell, const unsigned int) const
 {
-//  if (cell == nullptr)
-//  {
-//    chi_log.Log(LOG_ALLERROR)
-//      << "SpatialDiscretization_FV::MapDOF reference cell is nullptr.";
-//    exit(EXIT_FAILURE);
-//  }
-
   size_t num_local_cells = ref_grid->local_cells.size();
 
 
@@ -33,12 +26,7 @@ MapDOF(chi_mesh::Cell& cell)
   }
   else
   {
-    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
-
-//    int ghost_local_id = 0;
-//    for (auto ghost : neighbor_cells)
-//      if (ghost->global_id == cell.global_id)
-//        ghost_local_id = ghost->local_id;
+    int ghost_local_id = neighbor_cells.at(cell.global_id)->local_id;
 
     address = locJ_block_address[cell.partition_id] +
               ghost_local_id;
@@ -50,17 +38,12 @@ MapDOF(chi_mesh::Cell& cell)
 //###################################################################
 /**Maps a finite volume degree of freedom using an unknown manager.*/
 int SpatialDiscretization_FV::
-MapDOF(chi_mesh::Cell& cell,
-       chi_math::UnknownManager& unknown_manager,
-       unsigned int unknown_id,
-       unsigned int component)
+  MapDOF(const chi_mesh::Cell& cell,
+         const unsigned int,
+         const chi_math::UnknownManager& unknown_manager,
+         const unsigned int unknown_id,
+         const unsigned int component) const
 {
-//  if (cell == nullptr)
-//  {
-//    chi_log.Log(LOG_ALLERROR)
-//      << "SpatialDiscretization_FV::MapDOF reference cell is nullptr.";
-//    exit(EXIT_FAILURE);
-//  }
   if (component < 0) return -1;
 
   auto storage = unknown_manager.dof_storage_type;
@@ -86,7 +69,7 @@ MapDOF(chi_mesh::Cell& cell,
   }
   else
   {
-    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+    int ghost_local_id = neighbor_cells.at(cell.global_id)->local_id;
 
 //    int ghost_local_id = 0;
 //    for (auto ghost : neighbor_cells)
@@ -110,7 +93,7 @@ MapDOF(chi_mesh::Cell& cell,
 /**Maps a finite volume degree of freedom to a local address.
  * The default behavior is to assume a nodal DOF storage scheme.*/
 int SpatialDiscretization_FV::
-MapDOFLocal(chi_mesh::Cell& cell)
+  MapDOFLocal(const chi_mesh::Cell& cell, unsigned int) const
 {
 //  if (cell == nullptr)
 //  {
@@ -124,7 +107,7 @@ MapDOFLocal(chi_mesh::Cell& cell)
     address = cell.local_id;
   else
   {
-    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+    int ghost_local_id = neighbor_cells.at(cell.global_id)->local_id;
 
 //    int ghost_local_id = 0;
 //    for (auto ghost : neighbor_cells)
@@ -141,10 +124,11 @@ MapDOFLocal(chi_mesh::Cell& cell)
 /**Maps a finite volume degree of freedom to a local address using
  * an unknown manager.*/
 int SpatialDiscretization_FV::
-MapDOFLocal(chi_mesh::Cell& cell,
-            chi_math::UnknownManager& unknown_manager,
-            unsigned int unknown_id,
-            unsigned int component)
+  MapDOFLocal(const chi_mesh::Cell& cell,
+              const unsigned int,
+              const chi_math::UnknownManager& unknown_manager,
+              const unsigned int unknown_id,
+              const unsigned int component) const
 {
 //  if (cell == nullptr)
 //  {
@@ -175,7 +159,7 @@ MapDOFLocal(chi_mesh::Cell& cell,
   }
   else
   {
-    int ghost_local_id = neighbor_cells[cell.global_id]->local_id;
+    int ghost_local_id = neighbor_cells.at(cell.global_id)->local_id;
 
 //    int ghost_local_id = 0;
 //    for (auto ghost : neighbor_cells)

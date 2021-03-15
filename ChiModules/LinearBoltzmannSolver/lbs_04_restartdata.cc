@@ -1,12 +1,15 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <sys/stat.h>
-#include <fstream>
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "chi_log.h"
+#include "chi_mpi.h"
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
+
+#include <sys/stat.h>
+#include <fstream>
+#include <cstring>
 
 //###################################################################
 /**Writes phi_old to restart file.*/

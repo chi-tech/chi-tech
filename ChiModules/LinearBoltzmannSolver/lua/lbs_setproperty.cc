@@ -4,17 +4,14 @@
 #include "ChiPhysics/chi_physics.h"
 #include "ChiMath/chi_math.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-
 extern ChiPhysics&  chi_physics_handler;
 extern ChiMath&     chi_math_handler;
 
 #define DISCRETIZATION_METHOD 1
+  #define PWLD   3
   #define PWLD1D 4
   #define PWLD2D 5
   #define PWLD3D 6
-
-#define PARTITION_METHOD 2
 
 #define BOUNDARY_CONDITION 3
   #define XMAX 31
@@ -32,8 +29,9 @@ extern ChiMath&     chi_math_handler;
 
 #define WRITE_RESTART_DATA 7
 
-#include <chi_log.h>
+#define SAVE_ANGULAR_FLUX 8
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 
@@ -141,6 +139,11 @@ the parallel efficiency will actually get worse so use with caution.
 int chiLBSSetProperty(lua_State *L)
 {
   int numArgs = lua_gettop(L);
+  if (numArgs < 2)
+    LuaPostArgAmountError(__FUNCTION__, 2, numArgs);
+
+  LuaCheckNilValue(__FUNCTION__, L, 1);
+
   int solver_index = lua_tonumber(L,1);
 
   //============================================= Get pointer to solver
@@ -166,20 +169,23 @@ int chiLBSSetProperty(lua_State *L)
   }
 
   //============================================= Get property index
+  LuaCheckNilValue(__FUNCTION__, L, 2);
+
   int property = lua_tonumber(L,2);
+
 
   //============================================= Handle properties
   if (property == DISCRETIZATION_METHOD)
   {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
     int method = lua_tonumber(L,3);
 
     typedef chi_math::SpatialDiscretizationType SDMType;
 
     switch (method)
     {
-      case PWLD1D:
-      case PWLD2D:
-      case PWLD3D:
+      case PWLD:
       {
         solver->options.sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
         break;
@@ -193,6 +199,9 @@ int chiLBSSetProperty(lua_State *L)
   {
     if (numArgs<4)
       LuaPostArgAmountError("chiLBSSetProperty",4,numArgs);
+
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(__FUNCTION__, L, 4);
 
     int bident = lua_tonumber(L,3);
     int btype  = lua_tonumber(L,4);
@@ -288,6 +297,8 @@ int chiLBSSetProperty(lua_State *L)
   }
   else if (property == SCATTERING_ORDER)
   {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
     int scat_order = lua_tonumber(L,3);
 
     if (scat_order<0)
@@ -307,6 +318,8 @@ int chiLBSSetProperty(lua_State *L)
       LuaPostArgAmountError("chiLBSSetProperty:SWEEP_EAGER_LIMIT",
                             3,numArgs);
 
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
     int limit = lua_tonumber(L,3);
     if (limit<=64000)
     {
@@ -317,12 +330,16 @@ int chiLBSSetProperty(lua_State *L)
   {
     if (numArgs >= 3)
     {
+      LuaCheckNilValue(__FUNCTION__, L, 3);
+
       const char* folder = lua_tostring(L,3);
       solver->options.read_restart_folder_name = std::string(folder);
       chi_log.Log(LOG_0) << "Restart input folder set to " << folder;
     }
     if (numArgs >= 4)
     {
+      LuaCheckNilValue(__FUNCTION__, L, 4);
+
       const char* filebase = lua_tostring(L,4);
       solver->options.read_restart_file_base = std::string(filebase);
       chi_log.Log(LOG_0) << "Restart input filebase set to " << filebase;
@@ -333,22 +350,38 @@ int chiLBSSetProperty(lua_State *L)
   {
     if (numArgs >= 3)
     {
+      LuaCheckNilValue(__FUNCTION__, L, 3);
+
       const char* folder = lua_tostring(L,3);
       solver->options.write_restart_folder_name = std::string(folder);
       chi_log.Log(LOG_0) << "Restart output folder set to " << folder;
     }
     if (numArgs >= 4)
     {
+      LuaCheckNilValue(__FUNCTION__, L, 4);
+
       const char* filebase = lua_tostring(L,4);
       solver->options.write_restart_file_base = std::string(filebase);
       chi_log.Log(LOG_0) << "Restart output filebase set to " << filebase;
     }
     if (numArgs == 5)
     {
+      LuaCheckNilValue(__FUNCTION__, L, 5);
+
       double interval = lua_tonumber(L,5);
       solver->options.write_restart_interval = interval;
     }
     solver->options.write_restart_data = true;
+  }
+  else if (property == SAVE_ANGULAR_FLUX)
+  {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
+    bool save_flag = lua_toboolean(L, 3);
+
+    solver->options.save_angular_flux = save_flag;
+
+    chi_log.Log() << "LBS option to save angular flux set to " << save_flag;
   }
   else
   {

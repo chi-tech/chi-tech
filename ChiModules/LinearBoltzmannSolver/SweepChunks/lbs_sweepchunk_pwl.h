@@ -38,7 +38,7 @@ protected:
   SpatialDiscretization_PWLD& grid_fe_view;
   const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const std::vector<double>* q_moments;
-  const LBSGroupset& groupset;
+        LBSGroupset& groupset;
   const TCrossSections& xsections;
   const int num_moms;
   const int G;
@@ -60,7 +60,7 @@ public:
                    const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
-                   const LBSGroupset& in_groupset,
+                         LBSGroupset& in_groupset,
                    const TCrossSections& in_xsections,
                    const int in_num_moms,
                    const int in_max_num_cell_dofs)
@@ -272,6 +272,19 @@ public:
 
         for (auto callback : moment_callbacks)
           callback(this, angle_set);
+
+        // ============================= Save angular fluxes if needed
+        if (groupset.psi_to_be_saved)
+        {
+          auto& psi = groupset.psi_new_local;
+          auto& psi_uk_man = groupset.psi_uk_man;
+          for (int i = 0; i < num_dofs; ++i)
+          {
+            int ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+            for (int gsg = 0; gsg < gs_ss_size; ++gsg)
+              psi[ir + gsg] = b[gsg][i];
+          }//for i
+        }//if save psi
 
         int out_face_counter = -1;
         for (int f = 0; f < num_faces; ++f)

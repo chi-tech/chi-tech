@@ -72,6 +72,15 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.push_back(CreateCellFromVTKHexahedron(vtk_cell));
     else if (vtk_celltype == VTK_TETRA)
       raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
+    else if (vtk_celltype == VTK_POLYGON)
+      raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+    else if (vtk_celltype == VTK_QUAD)
+      raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
+    else if (vtk_celltype == VTK_TRIANGLE)
+      raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
+    else
+      throw std::invalid_argument(std::string(__FUNCTION__) +
+                                  ": Unsupported cell type.");
   }//for c
 
   //======================================== Push points

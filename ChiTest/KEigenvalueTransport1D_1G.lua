@@ -96,7 +96,7 @@ phys = chiKEigenvalueLBSCreateSolver()
 
 -- Add region and discretization
 chiSolverAddRegion(phys, region)
-chiLBSSetProperty(phys,DISCRETIZATION_METHOD,PWLD1D)
+chiLBSSetProperty(phys,DISCRETIZATION_METHOD,PWLD)
 
 -- Create quadrature and define scattering order
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,n_angles)

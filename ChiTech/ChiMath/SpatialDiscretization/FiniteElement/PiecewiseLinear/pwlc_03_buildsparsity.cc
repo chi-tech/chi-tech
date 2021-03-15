@@ -11,8 +11,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/
 void SpatialDiscretization_PWLC::
-BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                     std::vector<int> &nodal_nnz_in_diag,
+BuildSparsityPattern(std::vector<int> &nodal_nnz_in_diag,
                      std::vector<int> &nodal_nnz_off_diag,
                      chi_math::UnknownManager& unknown_manager)
 {
@@ -98,7 +97,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   nodal_nnz_in_diag .resize(local_node_count, 0);
   nodal_nnz_off_diag.resize(local_node_count, 0);
 
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
   {
     auto cell_mapping = GetCellMappingFE(cell.local_id);
     for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
@@ -139,7 +138,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   typedef std::pair<int,std::vector<int>> ROWJLINKS;
   std::vector<ROWJLINKS> ir_links;
 
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
   {
     auto cell_mapping = GetCellMappingFE(cell.local_id);
 

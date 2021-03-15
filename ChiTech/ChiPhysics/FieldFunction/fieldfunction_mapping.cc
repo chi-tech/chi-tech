@@ -29,7 +29,7 @@ void chi_physics::FieldFunction::
     unsigned int component    = cell_index_component_pair.second;
 
     auto& cell = grid->local_cells[cell_local_index];
-    int address = sdm_fv->MapDOFLocal(cell,
+    int address = sdm_fv->MapDOFLocal(cell, 0,
                                       unknown_manager,
                                       ref_variable,
                                       component);
