@@ -17,8 +17,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-void LinearBoltzmann::Solver::
-  ClassicRichardson(LBSGroupset& groupset,
+bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
                     int group_set_num,
                     SweepChunk* sweep_chunk,
                     MainSweepScheduler& sweepScheduler,
@@ -77,7 +76,8 @@ void LinearBoltzmann::Solver::
     pw_change_prev = pw_change;
 
     if (k==0) rho = 0.0;
-    if (pw_change<std::max(groupset.residual_tolerance*rho,1.0e-10))
+
+    if (pw_change<std::max(groupset.residual_tolerance*(1.0-rho),1.0e-10))
       converged = true;
 
     //======================================== Print iteration information
@@ -95,7 +95,8 @@ void LinearBoltzmann::Solver::
       << groupset.groups.back().id
       << "]"
       << " Iteration " << std::setw(5) << k
-      << " Point-wise change " << std::setw(14) << pw_change;
+      << " Point-wise change " << std::setw(14) << pw_change
+      <<" Spectral Radius Estimate " << std::setw(10) << rho;
 
     if (converged)
       iter_info << " CONVERGED\n";
@@ -150,5 +151,8 @@ void LinearBoltzmann::Solver::
     std::string("GS_") + std::to_string(group_set_num) +
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
+
   groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+
+  return converged;
 }
