@@ -752,7 +752,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
 
   for (int n=0; n<num_elems; n++)
   {
-    int elem_type, num_tags, tag, element_index;
+    int elem_type, num_tags, physical_reg, tag, element_index;
     chi_mesh::PolyFace* newFace = new chi_mesh::PolyFace;
     std::getline(file, line);
     iss = std::istringstream(line);
@@ -763,7 +763,13 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
       exit(EXIT_FAILURE);
     }
 
-    for (int i=0; i<num_tags; i++)
+    if( !(iss>>physical_reg) )
+    {
+      chi_log.Log(LOG_ALLERROR)<<"Failed while reading physical region.\n";
+      exit(EXIT_FAILURE);
+    }
+
+    for (int i=1; i<num_tags; i++)
       if( !(iss >> tag) )
       {
         chi_log.Log(LOG_ALLERROR)<<"Failed when reading tags.\n";
@@ -804,7 +810,6 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
 
     } else
     {
-
       continue;
     }
 
@@ -827,7 +832,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
     }
 
     poly_faces.push_back(newFace);
-
+    physical_region_map.push_back(physical_reg);
   }
 
   file.close();
