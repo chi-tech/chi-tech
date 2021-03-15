@@ -59,8 +59,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
 
   //================================================== Compute local # of dof
   auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
-  local_dof_count = pwl_discretization->GetNumLocalDOFs(grid,flux_moments_uk_man)/GxM;
-  glob_dof_count = pwl_discretization->GetNumGlobalDOFs(grid,flux_moments_uk_man)/GxM;
+  local_dof_count = pwl_discretization->GetNumLocalDOFs(flux_moments_uk_man)/GxM;
+  glob_dof_count = pwl_discretization->GetNumGlobalDOFs(flux_moments_uk_man)/GxM;
 
   //================================================== Compute num of unknowns
   int num_grps = groups.size();

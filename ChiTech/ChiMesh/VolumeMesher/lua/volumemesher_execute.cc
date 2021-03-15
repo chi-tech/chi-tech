@@ -28,6 +28,14 @@ int chiVolumeMesherExecute(lua_State *L)
   //Get memory before
   CSTMemory mem_before = chi_console.GetMemoryUsage();
 
+  if (cur_hndlr->volume_mesher == nullptr)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << __FUNCTION__ << ": called without a volume mesher set. Make a "
+                         "call to chiVolumeMesherCreate.";
+    exit(EXIT_FAILURE);
+  }
+
   cur_hndlr->volume_mesher->Execute();
 
   //Get memory usage

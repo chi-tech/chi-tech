@@ -9,8 +9,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Builds the sparsity pattern for a Discontinuous Finite Element Method.*/
 void SpatialDiscretization_PWLD::
-BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                     std::vector<int> &nodal_nnz_in_diag,
+BuildSparsityPattern(std::vector<int> &nodal_nnz_in_diag,
                      std::vector<int> &nodal_nnz_off_diag,
                      chi_math::UnknownManager& unknown_manager)
 {
@@ -24,7 +23,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   nodal_nnz_off_diag.resize(local_dof_count,0);
 
   int lc=0;
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
   {
     auto cell_fe_view = GetCellMappingFE(lc);
     size_t num_nodes = cell_fe_view->num_nodes;
@@ -39,9 +38,9 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if (face.has_neighbor and face.IsNeighborLocal(*grid))
+      if (face.has_neighbor and face.IsNeighborLocal(*ref_grid))
       {
-        auto& adj_cell = grid->cells[face.neighbor_id];
+        auto& adj_cell = ref_grid->cells[face.neighbor_id];
         auto adj_cell_fe_view = GetCellMappingFE(adj_cell.local_id);
 
         for (int i=0; i<num_nodes; ++i)
@@ -56,14 +55,14 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NEIGHBORING CONNECTIVITY
   lc=0;
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
   {
     auto cell_fe_view = GetCellMappingFE(lc);
 
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
-      if (face.has_neighbor and (not face.IsNeighborLocal(*grid)))
+      if (face.has_neighbor and (not face.IsNeighborLocal(*ref_grid)))
       {
         auto adj_cell_fe_view = GetNeighborCellMappingFE(face.neighbor_id);
 
@@ -89,14 +88,14 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
   // neighbors to other partitions. Build a set
   // of local cells and a set of destination
   // partitions.
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : ref_grid->local_cells)
   {
     for (auto& face : cell.faces)
     {
-      if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)))
+      if ((face.has_neighbor) and (not face.IsNeighborLocal(*ref_grid)))
       {
         local_neighboring_cell_indices.insert(cell.local_id);
-        neighboring_partitions.insert(face.GetNeighborPartitionID(*grid));
+        neighboring_partitions.insert(face.GetNeighborPartitionID(*ref_grid));
       }
     }
   }
@@ -119,13 +118,13 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
     new_list.first = adj_part;
     for (int local_cell_index : local_neighboring_cell_indices)
     {
-      auto& cell = grid->local_cells[local_cell_index];
+      auto& cell = ref_grid->local_cells[local_cell_index];
 
       for (auto& face : cell.faces)
       {
-        if ((face.has_neighbor) and (not face.IsNeighborLocal(*grid)) )
+        if ((face.has_neighbor) and (not face.IsNeighborLocal(*ref_grid)) )
         {
-          if (face.GetNeighborPartitionID(*grid) == adj_part)
+          if (face.GetNeighborPartitionID(*ref_grid) == adj_part)
             new_list.second.push_back(local_cell_index);
         }
       }//for faces
@@ -152,7 +151,7 @@ BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
     new_serial_data.first = cell_list.first;
     for (int local_cell_index : cell_list.second)
     {
-      auto& cell = grid->local_cells[local_cell_index];
+      auto& cell = ref_grid->local_cells[local_cell_index];
 
       std::vector<int>& border_cell_info = new_serial_data.second;
 

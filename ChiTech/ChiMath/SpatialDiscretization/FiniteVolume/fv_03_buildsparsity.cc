@@ -6,7 +6,6 @@
 //###################################################################
 /**Builds finite volume based sparsity pattern.*/
 void SpatialDiscretization_FV::BuildSparsityPattern(
-  chi_mesh::MeshContinuumPtr grid,
   std::vector<int> &nodal_nnz_in_diag,
   std::vector<int> &nodal_nnz_off_diag,
   chi_math::UnknownManager& unknown_manager)
@@ -17,7 +16,7 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
-  const size_t num_local_cells = grid->local_cells.size();
+  const size_t num_local_cells = ref_grid->local_cells.size();
 
   nodal_nnz_in_diag.resize(num_local_cells*N,0.0);
   nodal_nnz_off_diag.resize(num_local_cells*N,0.0);
@@ -27,9 +26,9 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
     int num_comps = unknown_manager.unknowns[uk].num_components;
     for (int comp=0; comp<num_comps; ++comp)
     {
-      for (auto& cell : grid->local_cells)
+      for (auto& cell : ref_grid->local_cells)
       {
-        int i = MapDOFLocal(cell,unknown_manager,uk,comp);
+        int i = MapDOFLocal(cell,0,unknown_manager,uk,comp);
 
         nodal_nnz_in_diag[i]   += 1;
 
@@ -37,7 +36,7 @@ void SpatialDiscretization_FV::BuildSparsityPattern(
         {
           if (not face.has_neighbor) continue;
 
-          if (face.IsNeighborLocal(*grid))
+          if (face.IsNeighborLocal(*ref_grid))
             nodal_nnz_in_diag[i] += 1;
           else
             nodal_nnz_off_diag[i] += 1;

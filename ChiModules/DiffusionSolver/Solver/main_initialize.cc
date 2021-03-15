@@ -65,8 +65,8 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   auto& sdm = discretization;
 
   //============================================= Get DOF counts
-  local_dof_count = sdm->GetNumLocalDOFs(grid, unknown_manager);
-  global_dof_count = sdm->GetNumGlobalDOFs(grid, unknown_manager);
+  local_dof_count = sdm->GetNumLocalDOFs(unknown_manager);
+  global_dof_count = sdm->GetNumGlobalDOFs(unknown_manager);
   chi_log.Log(LOG_0)
     << solver_name << ": Global number of DOFs="
     << global_dof_count;
@@ -117,8 +117,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
   std::vector<int> nodal_nnz_in_diag;
   std::vector<int> nodal_nnz_off_diag;
-  sdm->BuildSparsityPattern(grid,
-                            nodal_nnz_in_diag,
+  sdm->BuildSparsityPattern(nodal_nnz_in_diag,
                             nodal_nnz_off_diag,
                             unknown_manager);
 

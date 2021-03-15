@@ -14,6 +14,7 @@ void chi_mesh::VolumeMesherExtruder::
   ExtrudeCells(chi_mesh::MeshContinuum& template_grid,
                chi_mesh::MeshContinuum& grid)
 {
+  const chi_mesh::Vector3 khat(0.0,0.0,1.0);
   //================================================== Start extrusion
   int num_global_cells = 0;
   for (int iz=0; iz<(vertex_layers.size()-1); iz++)
@@ -30,6 +31,21 @@ void chi_mesh::VolumeMesherExtruder::
       }
       auto template_cell = (chi_mesh::CellPolygon&)(template_grid.local_cells[tc]);
 
+      //========================================= Check for inverted cells
+      {
+        auto& v0 = template_cell.centroid;
+        auto& v1 = *template_grid.vertices[template_cell.vertex_ids[0]];
+        auto& v2 = *template_grid.vertices[template_cell.vertex_ids[1]];
+
+        auto v01 = v1 - v0;
+        auto v02 = v2 - v0;
+
+        if (v01.Cross(v02).Dot(khat)<0.0)
+          throw std::logic_error("Extruder attempting to extrude a template"
+                                 " cell with a normal pointing downward. This"
+                                 " causes erratic behavior and needs to be"
+                                 " corrected.");
+      }
 
       //========================================= Precompute centroid
       auto centroid_precompd = ComputeTemplateCell3DCentroid(

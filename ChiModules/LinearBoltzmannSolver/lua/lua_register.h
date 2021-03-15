@@ -3,9 +3,10 @@ RegisterFunction(chiLBSCreateSolver)
 
 RegisterFunction(chiLBSSetProperty)
 RegisterConstant(DISCRETIZATION_METHOD,   1);
-RegisterConstant(PWLD1D,   4);
-RegisterConstant(PWLD2D,   5);
-RegisterConstant(PWLD3D,   6);
+RegisterConstant(PWLD, 3);
+RegisterConstant(PWLD1D, 4);
+RegisterConstant(PWLD2D, 5);
+RegisterConstant(PWLD3D, 6);
 RegisterConstant(PARTITION_METHOD,   2);
 RegisterConstant(SERIAL,   1);
 RegisterConstant(FROM_SURFACE,   2);
@@ -16,7 +17,31 @@ RegisterConstant(YMAX,   33);
 RegisterConstant(YMIN,   34);
 RegisterConstant(ZMAX,   35);
 RegisterConstant(ZMIN,   36);
+RegisterConstant(SCATTERING_ORDER,   4);
+RegisterConstant(SWEEP_EAGER_LIMIT,   5);
+RegisterConstant(READ_RESTART_DATA,   6);
+RegisterConstant(WRITE_RESTART_DATA,  7);
+RegisterConstant(SAVE_ANGULAR_FLUX,8)
 
+RegisterNamespace(LBSProperty);
+AddNamedConstantToNamespace(DISCRETIZATION_METHOD, 1, LBSProperty);
+AddNamedConstantToNamespace(BOUNDARY_CONDITION,    3, LBSProperty);
+AddNamedConstantToNamespace(SCATTERING_ORDER,      4, LBSProperty);
+AddNamedConstantToNamespace(SWEEP_EAGER_LIMIT,     5, LBSProperty);
+AddNamedConstantToNamespace(READ_RESTART_DATA,     6, LBSProperty);
+AddNamedConstantToNamespace(WRITE_RESTART_DATA,    7, LBSProperty);
+AddNamedConstantToNamespace(SAVE_ANGULAR_FLUX,     8, LBSProperty);
+
+RegisterNamespace(LBSSpatialDiscretizations)
+AddNamedConstantToNamespace(PWLD, 3, LBSSpatialDiscretizations)
+
+RegisterNamespace(LBSBoundaryID)
+AddNamedConstantToNamespace(XMAX,   31, LBSBoundaryID);
+AddNamedConstantToNamespace(XMIN,   32, LBSBoundaryID);
+AddNamedConstantToNamespace(YMAX,   33, LBSBoundaryID);
+AddNamedConstantToNamespace(YMIN,   34, LBSBoundaryID);
+AddNamedConstantToNamespace(ZMAX,   35, LBSBoundaryID);
+AddNamedConstantToNamespace(ZMIN,   36, LBSBoundaryID);
 
 RegisterNamespace(LBSBoundaryTypes);
 AddNamedConstantToNamespace(VACUUM            ,1,LBSBoundaryTypes)
@@ -42,14 +67,12 @@ RegisterConstant(GROUPSET_TGDSA_MAXITERATIONS,109);
 RegisterConstant(GROUPSET_WGDSA_TOLERANCE,110);
 RegisterConstant(GROUPSET_TGDSA_TOLERANCE,111);
 
-RegisterConstant(SCATTERING_ORDER,   4);
-RegisterConstant(SWEEP_EAGER_LIMIT,   5);
-RegisterConstant(READ_RESTART_DATA,   6);
-RegisterConstant(WRITE_RESTART_DATA,  7);
 RegisterFunction(chiLBSInitialize)
 RegisterFunction(chiLBSExecute)
 RegisterFunction(chiLBSGetFieldFunctionList)
 RegisterFunction(chiLBSGetScalarFieldFunctionList)
+RegisterFunction(chiLBSWriteGroupsetAngularFlux)
+RegisterFunction(chiLBSReadGroupsetAngularFlux)
 
 //module:Linear Boltzmann Solver - Groupset manipulation
 //\ref LuaLBSGroupsets Main page

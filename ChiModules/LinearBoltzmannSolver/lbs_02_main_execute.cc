@@ -3,12 +3,13 @@
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-#include <ChiConsole/chi_console.h>
-
-extern ChiMPI&      chi_mpi;
+#include "chi_log.h"
 extern ChiLog&     chi_log;
+
+#include "chi_mpi.h"
+extern ChiMPI&      chi_mpi;
+
+#include "ChiConsole/chi_console.h"
 extern ChiConsole&  chi_console;
 
 #include <iomanip>
@@ -25,12 +26,6 @@ void LinearBoltzmann::Solver::Execute()
     ++gs;
     chi_log.Log(LOG_0)
       << "\n********* Initializing Groupset " << gs << "\n" << std::endl;
-
-    groupset.BuildDiscMomOperator(options.scattering_order,
-                                  options.geometry_type);
-    groupset.BuildMomDiscOperator(options.scattering_order,
-                                  options.geometry_type);
-    groupset.BuildSubsets();
 
     ComputeSweepOrderings(groupset);
     InitFluxDataStructures(groupset);
