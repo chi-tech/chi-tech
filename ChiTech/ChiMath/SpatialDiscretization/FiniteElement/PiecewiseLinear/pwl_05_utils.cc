@@ -58,7 +58,7 @@ void SpatialDiscretization_PWLD::
 //  }//if PWLC
 //  else if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS)
   {
-    std::vector<int> global_indices;
+    std::vector<int64_t> global_indices;
     for (auto& cell : grid->local_cells)
     {
       for (int i=0; i<cell.vertex_ids.size(); ++i)

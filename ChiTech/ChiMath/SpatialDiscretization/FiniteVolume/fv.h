@@ -51,8 +51,8 @@ public:
   void OrderNodes();
 
   //03 sparsity
-  void BuildSparsityPattern(std::vector<int>& nodal_nnz_in_diag,
-                            std::vector<int>& nodal_nnz_off_diag,
+  void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
+                            std::vector<int64_t>& nodal_nnz_off_diag,
                             chi_math::UnknownManager& unknown_manager) override;
 
   //04a mappings

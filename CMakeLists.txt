@@ -50,6 +50,7 @@ endif()
 #================================================ Include macros
 include(GNUInstallDirs)
 include(Filter)
+include(Checks)
 
 #================================================ Precompiler flags
 #LUA CONSOLE

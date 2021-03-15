@@ -33,7 +33,7 @@ LocalizePETScVector(Vec petsc_vector,
 
   if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS)
   {
-    std::vector<int> global_indices;
+    std::vector<int64_t> global_indices;
     for (auto& cell : grid->local_cells)
     {
       auto cell_mapping = GetCellMappingFE(cell.local_id);

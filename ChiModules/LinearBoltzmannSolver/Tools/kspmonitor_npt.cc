@@ -50,7 +50,7 @@ KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
   //======================================== Compute test criterion
   double tol;
-  int    maxIts;
+  int64_t    maxIts;
   KSPGetTolerances(ksp,NULL,&tol,NULL,&maxIts);
 
   double relative_residual = rnorm/rhs_norm;

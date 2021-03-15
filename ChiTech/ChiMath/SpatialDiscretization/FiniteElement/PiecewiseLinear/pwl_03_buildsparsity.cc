@@ -9,8 +9,8 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Builds the sparsity pattern for a Discontinuous Finite Element Method.*/
 void SpatialDiscretization_PWLD::
-BuildSparsityPattern(std::vector<int> &nodal_nnz_in_diag,
-                     std::vector<int> &nodal_nnz_off_diag,
+BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
+                     std::vector<int64_t> &nodal_nnz_off_diag,
                      chi_math::UnknownManager& unknown_manager)
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY

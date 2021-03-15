@@ -37,8 +37,8 @@ protected:
 
 public:
   virtual
-  void BuildSparsityPattern(std::vector<int>& nodal_nnz_in_diag,
-                            std::vector<int>& nodal_nnz_off_diag,
+  void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
+                            std::vector<int64_t>& nodal_nnz_off_diag,
                             chi_math::UnknownManager& unknown_manager)
                             {}
 

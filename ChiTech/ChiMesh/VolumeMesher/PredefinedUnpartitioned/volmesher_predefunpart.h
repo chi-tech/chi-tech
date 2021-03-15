@@ -23,7 +23,7 @@ public:
 
   bool IsRawCellNeighborToPartitionParmetis(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
-    const std::vector<int>& cell_pids);
+    const std::vector<int64_t>& cell_pids);
 
   void PARMETIS(chi_mesh::UnpartitionedMesh* umesh,
                 chi_mesh::MeshContinuumPtr grid);

@@ -127,7 +127,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
     {
       double node_value=0.0;
       counter++;
-      int ir = mapping[counter];
+      int64_t ir = mapping[counter];
       VecGetValues(field,1,&ir,&node_value);
 
       double weight=0.0;
