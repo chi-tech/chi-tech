@@ -1,13 +1,13 @@
-#include "../../../ChiLua/chi_lua.h"
-#include <iostream>
-#include "../Predefined2D/volmesher_predefined2d.h"
+#include "ChiLua/chi_lua.h"
 
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../SurfaceMesher/surfacemesher.h"
-#include "../../VolumeMesher/Extruder/volmesher_extruder.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/SurfaceMesher/surfacemesher.h"
+#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
-#include <chi_log.h>
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include <iostream>
 
 //#############################################################################
 /** Sets a volume mesher property.
@@ -30,11 +30,11 @@ extern ChiLog& chi_log;
                    parameters: number of subdivisions (defaults to 1), and layer id (char)(defaults
                    to nothing). Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```. \n
- CUT_X = Adds a cut at the given x-value. Only supported if partition-type is
+ CUTS_X = Adds a cut at the given x-value. Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
- CUT_Y = Adds a cut at the given y-value. Only supported if partition-type is
+ CUTS_Y = Adds a cut at the given y-value. Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
- CUT_Z = Adds a cut at the given z-value. Only supported if partition-type is
+ CUTS_Z = Adds a cut at the given z-value. Only supported if partition-type is
                    ```KBA_STYLE_XY``` or ```KBA_STYLE_XYZ```.\n
  PARTITION_X   = <B>PropertyValue:[int]</B> Number of partitions in X.
                     Only supported if partition-type is
@@ -59,7 +59,6 @@ extern ChiLog& chi_log;
 
 ### PartitionType
 Can be any of the following:
- - KBA_STYLE_XY
  - KBA_STYLE_XYZ
  - PARMETIS
 
@@ -72,6 +71,12 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
   //============================================= Get property index
   int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+
   int property_index = lua_tonumber(L,1);
 
   typedef chi_mesh::VolumeMesherProperty VMP;
@@ -100,6 +105,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     int p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->partitioning_y = p;
+    cur_hndlr->volume_mesher->options.partition_y = p;
     chi_log.Log(LOG_ALLVERBOSE_1)
       << "Partition y set to " << p;
   }
@@ -107,32 +113,41 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     int p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->partitioning_x = p;
+    cur_hndlr->volume_mesher->options.partition_x = p;
     chi_log.Log(LOG_ALLVERBOSE_1)
       << "Partition x set to " << p;
   }
   else if (property_index == VMP::CUTS_Z)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr->volume_mesher->zcuts.push_back(p);
+    cur_hndlr->volume_mesher->options.zcuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_Y)
   {
     double p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->ycuts.push_back(p);
+    cur_hndlr->volume_mesher->options.ycuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_X)
   {
     double p = lua_tonumber(L,2);
     cur_hndlr->surface_mesher->xcuts.push_back(p);
+    cur_hndlr->volume_mesher->options.xcuts.push_back(p);
   }
   else if (property_index == VMP::PARTITION_TYPE)
   {
     int p = lua_tonumber(L,2);
-    if (p >= chi_mesh::VolumeMesher::PartitionType::KBA_STYLE_XY and
+    if (p >= chi_mesh::VolumeMesher::PartitionType::KBA_STYLE_XYZ and
         p <= chi_mesh::VolumeMesher::PartitionType::PARMETIS)
-
-    cur_hndlr->volume_mesher->options.partition_type =
-      (chi_mesh::VolumeMesher::PartitionType)p;
+      cur_hndlr->volume_mesher->options.partition_type =
+        (chi_mesh::VolumeMesher::PartitionType)p;
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported partition type used in call to "
+        << __FUNCTION__ << ".";
+      exit(EXIT_FAILURE);
+    }
   }
 
   else if (property_index == VMP::EXTRUSION_LAYER)
@@ -148,13 +163,13 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         subdivisions = lua_tonumber(L,3);
       }
-      auto new_layer = new MeshLayer;
-      new_layer->height = layer_height;
-      new_layer->sub_divisions = subdivisions;
+      chi_mesh::VolumeMesherExtruder::MeshLayer new_layer;
+      new_layer.height = layer_height;
+      new_layer.sub_divisions = subdivisions;
 
       if (num_args==4)
       {
-        new_layer->name = std::string(lua_tostring(L,4));
+        new_layer.name = std::string(lua_tostring(L,4));
       }
       mesher->input_layers.push_back(new_layer);
     }
@@ -221,10 +236,102 @@ int chiVolumeMesherSetProperty(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR) << "Invalid property specified in call to "
-                               "chiVolumeMesherSetProperty().";
+    chi_log.Log(LOG_ALLERROR) << "Invalid property specified " << property_index
+                              << " in call to chiVolumeMesherSetProperty().";
     exit(EXIT_FAILURE);
   }
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the Px, Py and Pz partititioning parameters for a
+ * KBA-type partitioning. This also fixes the process count required to
+ * a total of Px*Py*Pz.
+ *
+\param Px int Number partitions in x.
+\param Py int Number partitions in y.
+\param Pz int Number partitions in z.
+
+ */
+int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 3)
+    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(__FUNCTION__,L,3);
+
+  //============================================= Get current mesh handler
+  auto cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto vol_mesher= cur_hndlr->volume_mesher;
+
+  int px = lua_tonumber(L,1);
+  int py = lua_tonumber(L,2);
+  int pz = lua_tonumber(L,3);
+
+  vol_mesher->options.partition_x = px;
+  vol_mesher->options.partition_y = py;
+  vol_mesher->options.partition_z = pz;
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the x-cuts for KBA type partitioning with a lua array.*/
+int chiVolumeMesherSetKBACutsX(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+
+  std::vector<double> cuts;
+  LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
+
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler->volume_mesher->options.xcuts = cuts;
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the y-cuts for KBA type partitioning with a lua array.*/
+int chiVolumeMesherSetKBACutsY(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+
+  std::vector<double> cuts;
+  LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
+
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler->volume_mesher->options.ycuts = cuts;
+
+  return 0;
+}
+
+//###################################################################
+/**Sets the z-cuts for KBA type partitioning with a lua array.*/
+int chiVolumeMesherSetKBACutsZ(lua_State *L)
+{
+  int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+
+  LuaCheckNilValue(__FUNCTION__,L,1);
+
+  std::vector<double> cuts;
+  LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
+
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler->volume_mesher->options.zcuts = cuts;
 
   return 0;
 }

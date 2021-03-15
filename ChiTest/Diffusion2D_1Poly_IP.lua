@@ -1,32 +1,33 @@
-print("############################################### LuaTest")
---dofile(CHI_LIBRARY)
+-- 2D Diffusion test with Vacuum and Reflecting BCs.
+-- SDM: PWLD
+-- Test: Max-value=2.50000
+num_procs = 4
+--Also tests integrating with a lua-function
 
 
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
+end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "ChiResources/TestObjects/SquareMesh2x2Quads.obj",true)
-
---############################################### Setup Regions
-region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
-
---############################################### Create meshers
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED2D);
-
-chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
-
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,-0.5)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
-
---############################################### Execute meshing
-chiSurfaceMesherExecute();
+mesh={}
+N=32
+L=2.0
+xmin = -1.0
+dx = L/N
+for i=1,(N+1) do
+    k=i-1
+    mesh[i] = xmin + k*dx
+end
+chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
@@ -72,11 +73,14 @@ chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,w_bndry,DIFFUSION_VACUUM)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,n_bndry,DIFFUSION_REFLECTING)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,s_bndry,DIFFUSION_REFLECTING)
 
---############################################### Initialize Solver
+--############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)
-fftemp,count = chiGetFieldFunctionList(phys1)
 chiDiffusionExecute(phys1)
 
+--############################################### Get field functions
+fftemp,count = chiGetFieldFunctionList(phys1)
+
+--############################################### Slice plot
 slice2 = chiFFInterpolationCreate(SLICE)
 chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
 chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp[1])
@@ -84,7 +88,7 @@ chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fftemp[1])
 chiFFInterpolationInitialize(slice2)
 chiFFInterpolationExecute(slice2)
 
-
+--############################################### Volume integrations
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
@@ -113,11 +117,13 @@ chiFFInterpolationExecute(curffi)
 print(chiFFInterpolationGetValue(curffi))
 --==========================================
 
+--############################################### Exports
 if (master_export == nil) then
     chiFFInterpolationExportPython(slice2)
     chiExportFieldFunctionToVTK(fftemp,"ZPhi")
 end
 
+--############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
     local handle = io.popen("python ZPFFI00.py")
 end

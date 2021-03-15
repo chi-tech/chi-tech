@@ -7,8 +7,7 @@ ds=2.0/N
 for i=0,N do
     nodes[i+1] = -1.0 + i*ds
 end
---surf_mesh,region1 = chiMeshCreate1DSlabMesh(nodes)
-surf_mesh,region1 = chiMeshCreate3DOrthoMesh(nodes,nodes,nodes)
+surf_mesh,region1 = chiMeshCreateUnpartitioned3DOrthoMesh(nodes,nodes,nodes)
 
 --chiSurfaceMesherSetProperty(PARTITION_X,2)
 --chiSurfaceMesherSetProperty(PARTITION_Y,2)
@@ -47,6 +46,8 @@ pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2,2)
 gs0 = chiLBSCreateGroupset(phys1)
 chiLBSGroupsetAddGroups(phys1,gs0,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,gs0,pquad)
+chiLBSGroupsetSetAngleAggregationType(phys1,gs0,LBSGroupset.ANGLE_AGG_SINGLE)
+chiLBSGroupsetSetIterativeMethod(phys1,gs0,NPT_GMRES_CYCLES)
 
 --========== Boundary conditions
 bsrc = {}

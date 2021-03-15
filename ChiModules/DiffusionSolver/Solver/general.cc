@@ -3,20 +3,14 @@
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
-#include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
-#include "../Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "../Boundaries/chi_diffusion_bndry_reflecting.h"
-
-#include <chi_log.h>
+#include "chi_log.h"
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
-
-
 
 //###################################################################
 /**Gets material properties various sources.*/

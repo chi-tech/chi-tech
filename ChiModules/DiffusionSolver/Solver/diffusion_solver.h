@@ -46,8 +46,15 @@ private:
 
   double time_assembly=0.0, time_solve=0.0;
   bool verbose_info=true;
+
+public:
+  typedef unsigned int uint;
+  typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
+  typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
+
 public:
   std::string                              solver_name="Diffusion Solver";
+  BoundaryPreferences                      boundary_preferences;
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuumPtr                 grid = nullptr;
 

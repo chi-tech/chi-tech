@@ -1,21 +1,20 @@
 #include "chi_volumemesher.h"
-#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
-#include <ChiMesh/Region/chi_region.h>
-#include <ChiMesh/SurfaceMesh/chi_surfacemesh.h>
-#include <ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h>
-#include <ChiMesh/VolumeMesher/Predefined2D/volmesher_predefined2d.h>
-#include <ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h>
-#include <ChiMesh/VolumeMesher/Predefined3D/volmesher_predefined3d.h>
-#include "Linemesh1D/volmesher_linemesh1d.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiMesh/Region/chi_region.h"
+#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
+#include "ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h"
+#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
+#include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
+#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-#include <ChiMesh/Cell/cell_polygon.h>
-#include "../MeshHandler/chi_meshhandler.h"
-#include "../../ChiMPI/chi_mpi.h"
-#include "../LogicalVolume/chi_mesh_logicalvolume.h"
+#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "ChiMPI/chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
 #include <ChiTimer/chi_timer.h>
@@ -24,7 +23,8 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
-  AddContinuumToRegion(chi_mesh::MeshContinuumPtr grid, chi_mesh::Region& region)
+  AddContinuumToRegion(chi_mesh::MeshContinuumPtr& grid,
+                       chi_mesh::Region& region)
 {
   region.volume_mesh_continua.push_back(grid);
 }
@@ -32,10 +32,10 @@ void chi_mesh::VolumeMesher::
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
-CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                   chi_mesh::MeshContinuumPtr vol_continuum,
-                   bool delete_surface_mesh_elements,
-                   bool force_local)
+  CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
+                     chi_mesh::MeshContinuumPtr& vol_continuum,
+                     bool delete_surface_mesh_elements,
+                     bool force_local)
 {
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
@@ -90,7 +90,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     //====================================== Compute xy partition id
     auto xy_partition_indices = GetCellXYPartitionID(cell);
     cell->partition_id = xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
+                         handler->volume_mesher->options.partition_x +
                          xy_partition_indices.first;
 
     if (force_local)
@@ -146,7 +146,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     //====================================== Compute partition id
     auto xy_partition_indices = GetCellXYPartitionID(cell);
     cell->partition_id = xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
+                         handler->volume_mesher->options.partition_x +
                          xy_partition_indices.first;
 
     if (force_local)
@@ -168,98 +168,46 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 //###################################################################
 /**Creates 2D polygon cells for each face of a surface mesh.*/
 void chi_mesh::VolumeMesher::
-CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                   chi_mesh::MeshContinuum* vol_continuum,
-                   bool delete_surface_mesh_elements,
-                   bool force_local)
+  CreatePolygonCells(chi_mesh::UnpartitionedMesh* umesh,
+                     chi_mesh::MeshContinuumPtr& grid,
+                     bool delete_surface_mesh_elements,
+                     bool force_local)
 {
   //============================================= Get current mesh handler
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Copy nodes
-  for (auto& vertex : surface_mesh->vertices)
-    vol_continuum->vertices.push_back(new chi_mesh::Node(vertex));
+  for (auto& vertex : umesh->vertices)
+    grid->vertices.push_back(new chi_mesh::Node(*vertex));
 
-  //============================================= Delete nodes
-  if (delete_surface_mesh_elements)
-    surface_mesh->vertices = std::vector<chi_mesh::Vertex>(0);
-
-  //============================================= Process faces
-  unsigned int num_cells = 0;
-  for (auto& face : surface_mesh->faces)
+  size_t num_cells=0;
+  for (auto& raw_cell : umesh->raw_cells)
   {
+    if (raw_cell->type != chi_mesh::CellType::POLYGON)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "chi_mesh::VolumeMesher::CreatePolygonCells "
+           "called with a cell not being of primary type"
+           " chi_mesh::CellType::POLYGON.";
+      exit(EXIT_FAILURE);
+    }
+
     auto cell = new chi_mesh::CellPolygon;
 
-    for (int k=0;k<3;k++)
-    {
-      cell->vertex_ids.push_back(face.v_index[k]);
+    //====================================== Copy vertices and centroid
+    cell->vertex_ids = raw_cell->vertex_ids;
+    cell->centroid = raw_cell->centroid;
 
-      chi_mesh::CellFace new_face;
-
-      new_face.vertex_ids.push_back(face.e_index[k][0]);
-      new_face.vertex_ids.push_back(face.e_index[k][1]);
-
-
-      chi_mesh::Vertex& v0 = *vol_continuum->vertices[face.e_index[k][0]];
-      chi_mesh::Vertex& v1 = *vol_continuum->vertices[face.e_index[k][1]];
-      new_face.centroid = v0*0.5 + v1*0.5;
-
-      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
-
-      chi_mesh::Vector3 va = v1 - v0;
-      chi_mesh::Vector3 vn = va.Cross(vk);
-      vn = vn/vn.Norm();
-      new_face.normal = vn;
-
-      if (face.e_index[k][2]>=0)
-      {
-        new_face.neighbor_id = face.e_index[k][2];
-        new_face.has_neighbor = true;
-      }
-
-      cell->faces.push_back(new_face);
-
-      cell->centroid = cell->centroid + surface_mesh->vertices[face.v_index[k]];
-    }
-    cell->centroid = cell->centroid/3;
-
-    //====================================== Compute xy partition id
-    auto xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
-                         xy_partition_indices.first;
-
-    if (force_local)
-      cell->partition_id = chi_mpi.location_id;
-
-    cell->global_id = num_cells;
-
-    vol_continuum->cells.push_back(cell); ++num_cells;
-  }
-
-  for (auto face : surface_mesh->poly_faces)
-  {
-    auto cell = new chi_mesh::CellPolygon;
-
-    //====================================== Copy vertices
-    for (auto vid : face->v_indices)
-    {
-      cell->vertex_ids.push_back(vid);
-      cell->centroid = cell->centroid +
-                       *vol_continuum->vertices[vid];
-    }
-    cell->centroid = cell->centroid/cell->vertex_ids.size();
-
-    //====================================== Copy edges
-    for (auto src_side : face->edges)
+    //====================================== Copy faces
+//    for (auto src_side : raw_cell->edges)
+    for (auto& raw_face : raw_cell->faces)
     {
       chi_mesh::CellFace new_face;
 
-      new_face.vertex_ids.push_back(src_side[0]);
-      new_face.vertex_ids.push_back(src_side[1]);
+      new_face.vertex_ids  = raw_face.vertex_ids;
 
-      chi_mesh::Vertex& v0 = *vol_continuum->vertices[src_side[0]];
-      chi_mesh::Vertex& v1 = *vol_continuum->vertices[src_side[1]];
+      chi_mesh::Vertex& v0 = *grid->vertices[new_face.vertex_ids[0]];
+      chi_mesh::Vertex& v1 = *grid->vertices[new_face.vertex_ids[1]];
       new_face.centroid = v0*0.5 + v1*0.5;
       chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
@@ -268,13 +216,16 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
-      if (src_side[2] >= 0)
+      if (raw_face.neighbor >= 0)
       {
-        new_face.neighbor_id = src_side[2];
+        new_face.neighbor_id = raw_face.neighbor;
         new_face.has_neighbor = true;
       }
       else
+      {
         new_face.neighbor_id = 0;
+        new_face.has_neighbor = false;
+      }
 
       cell->faces.push_back(new_face);
     }
@@ -282,7 +233,7 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
     //====================================== Compute partition id
     auto xy_partition_indices = GetCellXYPartitionID(cell);
     cell->partition_id = xy_partition_indices.second*
-                         handler->surface_mesher->partitioning_x +
+                         handler->volume_mesher->options.partition_x +
                          xy_partition_indices.first;
 
     if (force_local)
@@ -290,75 +241,16 @@ CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
 
     cell->global_id = num_cells;
 
-    vol_continuum->cells.push_back(cell); ++num_cells;
+    grid->cells.push_back(cell); ++num_cells;
 
-    if (delete_surface_mesh_elements)
-      delete face;
-  }
-
-  if (delete_surface_mesh_elements)
-    surface_mesh->poly_faces.clear();
-
+  }//for raw_cell
 }
 
 //###################################################################
 /**Filters non-esential ghosts from the grid.*/
 void chi_mesh::VolumeMesher::
-  GridFilterGhosts(chi_mesh::MeshContinuumPtr in_grid,
-                   chi_mesh::MeshContinuumPtr out_grid)
-{
-  chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
-  //======================================== Copy vertices
-  for (auto vertex : in_grid->vertices)
-    out_grid->vertices.push_back(new chi_mesh::Vertex(*vertex));
-
-  //======================================== Copy local cells
-  for (auto& cell : in_grid->local_cells)
-    out_grid->cells.push_back(&cell);
-
-
-
-  //======================================== Copy ghost cells only
-  //                                         if neighbor to current partition
-  auto in_ghost_ids = in_grid->cells.GetGhostGlobalIDs();
-  std::vector<Cell*> cells_to_delete;
-  for (int ghost_id : in_ghost_ids)
-  {
-    auto& ref_ghost_cell = in_grid->cells[ghost_id];
-
-    bool is_neighbor_to_this_loc = false;
-    for (auto& face : ref_ghost_cell.faces)
-    {
-      if (not face.has_neighbor) continue;
-
-      auto adj_cell = in_grid->cells[face.neighbor_id];
-      if (adj_cell.partition_id == chi_mpi.location_id)
-      {
-        is_neighbor_to_this_loc = true;
-        break;
-      }
-    }//for face
-
-    if (is_neighbor_to_this_loc)
-      out_grid->cells.push_back(&ref_ghost_cell);
-    else
-      cells_to_delete.push_back(&ref_ghost_cell);
-  }//for cell
-
-
-  //======================================== Deleting non-essential ghosts
-  for (auto cell : cells_to_delete)
-    delete cell;
-
-
-  chi_log.Log(LOG_0VERBOSE_1) << "Done filtering ghosts.";
-}
-
-//###################################################################
-/**Filters non-esential ghosts from the grid.*/
-void chi_mesh::VolumeMesher::
-GridFilterGhosts(chi_mesh::MeshContinuum* in_grid,
-                 chi_mesh::MeshContinuumPtr out_grid)
+  GridFilterGhosts(chi_mesh::MeshContinuumPtr& in_grid,
+                   chi_mesh::MeshContinuumPtr& out_grid)
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
   //======================================== Copy vertices
@@ -418,91 +310,80 @@ std::pair<int,int> chi_mesh::VolumeMesher::
  GetCellXYPartitionID(chi_mesh::Cell *cell)
 {
   std::pair<int,int> ij_id(0,0);
-  bool found_partition = false;
 
   if (chi_mpi.process_count == 1){return ij_id;}
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::SurfaceMesher* surf_mesher = mesh_handler->surface_mesher;
+  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  auto vol_mesher = mesh_handler->volume_mesher;
 
-  if  (typeid(*surf_mesher) == typeid(chi_mesh::SurfaceMesherPredefined))
+//====================================== Sanity check on partitioning
+  size_t num_x_subsets = vol_mesher->options.xcuts.size()+1;
+  size_t num_y_subsets = vol_mesher->options.ycuts.size()+1;
+
+  size_t x_remainder = num_x_subsets%vol_mesher->options.partition_x;
+  size_t y_remainder = num_y_subsets%vol_mesher->options.partition_y;
+
+  if (x_remainder != 0)
   {
-    //====================================== Sanity check on partitioning
-    int num_x_subsets = surf_mesher->xcuts.size()+1;
-    int num_y_subsets = surf_mesher->ycuts.size()+1;
+    chi_log.Log(LOG_ALLERROR)
+      << "When specifying x-partitioning, the number of grp_subsets in x "
+         "needs to be divisible by the number of partitions in x.";
+    exit(EXIT_FAILURE);
+  }
 
-    int x_remainder = num_x_subsets%surf_mesher->partitioning_x;
-    int y_remainder = num_y_subsets%surf_mesher->partitioning_y;
+  if (y_remainder != 0)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "When specifying y-partitioning, the number of grp_subsets in y "
+         "needs to be divisible by the number of partitions in y.";
+    exit(EXIT_FAILURE);
+  }
 
-    if (x_remainder != 0)
+  size_t subsets_per_partitionx = num_x_subsets/vol_mesher->options.partition_x;
+  size_t subsets_per_partitiony = num_y_subsets/vol_mesher->options.partition_y;
+
+  //====================================== Determine x-partition
+  int x=-1;
+  int xcount=-1;
+  for (size_t i =  subsets_per_partitionx-1;
+       i <  vol_mesher->options.xcuts.size();
+       i += subsets_per_partitionx)
+  {
+    xcount++;
+    if (cell->centroid.x <= vol_mesher->options.xcuts[i])
     {
-      chi_log.Log(LOG_ALLERROR)
-        << "When specifying x-partitioning, the number of grp_subsets in x "
-           "needs to be divisible by the number of partitions in x.";
-      exit(EXIT_FAILURE);
+      x = xcount;
+      break;
     }
+  }
+  if (x<0)
+  {
+    x = vol_mesher->options.partition_x-1;
+  }
 
-    if (y_remainder != 0)
+  //====================================== Determine y-partition
+  int y=-1;
+  int ycount=-1;
+  for (size_t i =  subsets_per_partitiony-1;
+       i <  vol_mesher->options.ycuts.size();
+       i += subsets_per_partitiony)
+  {
+    ycount++;
+    if (cell->centroid.y <= vol_mesher->options.ycuts[i])
     {
-      chi_log.Log(LOG_ALLERROR)
-        << "When specifying y-partitioning, the number of grp_subsets in y "
-           "needs to be divisible by the number of partitions in y.";
-      exit(EXIT_FAILURE);
+      y = ycount;
+      break;
     }
+  }
+  if (y<0)
+  {
+    y = vol_mesher->options.partition_y - 1;
+  }
 
-    int subsets_per_partitionx = num_x_subsets/surf_mesher->partitioning_x;
-    int subsets_per_partitiony = num_y_subsets/surf_mesher->partitioning_y;
-
-//    chi_log.Log(LOG_0ERROR) << num_x_subsets;
-//    chi_log.Log(LOG_0ERROR) << num_y_subsets;
-//    chi_log.Log(LOG_0ERROR) << subsets_per_partitionx;
-//    chi_log.Log(LOG_0ERROR) << subsets_per_partitiony;
-
-
-    //====================================== Determine x-partition
-    int x=-1;
-    int xcount=-1;
-    for (int i =  subsets_per_partitionx-1;
-             i <  surf_mesher->xcuts.size();
-             i += subsets_per_partitionx)
-    {
-      xcount++;
-      if (cell->centroid.x <= surf_mesher->xcuts[i])
-      {
-        x = xcount;
-        break;
-      }
-    }
-    if (x<0)
-    {
-      x = surf_mesher->partitioning_x-1;
-    }
-
-    //====================================== Determine y-partition
-    int y=-1;
-    int ycount=-1;
-    for (int i =  subsets_per_partitiony-1;
-         i <  surf_mesher->ycuts.size();
-         i += subsets_per_partitiony)
-    {
-      ycount++;
-      if (cell->centroid.y <= surf_mesher->ycuts[i])
-      {
-        y = ycount;
-        break;
-      }
-    }
-    if (y<0)
-    {
-      y = surf_mesher->partitioning_y - 1;
-    }
-
-    //====================================== Set partitioning
-    ij_id.first = x;
-    ij_id.second= y;
-
-  }//if typeid
+  //====================================== Set partitioning
+  ij_id.first = x;
+  ij_id.second= y;
 
   return ij_id;
 }
@@ -522,52 +403,25 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
   //================================================== Get ij indices
   std::pair<int,int> ij_id = GetCellXYPartitionID(cell);
 
-
   //================================================== Get the current handler
   chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher* vol_mesher = mesh_handler->volume_mesher;
 
-  //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& SLAB
-  if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherLinemesh1D))
+  if (vol_mesher->options.partition_z == 1)
   {
-    auto line_mesher = (chi_mesh::VolumeMesherLinemesh1D*)vol_mesher;
-
-    if (chi_mpi.process_count != options.partition_z and !options.mesh_global)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Number of process requested, " << options.partition_z
-        << ", in PARTITION_Z does not match the amount of processes "
-        << "available " << chi_mpi.process_count;
-      exit(EXIT_FAILURE);
-    }
-
-    int cells_per_loc =
-      ceil(line_mesher->num_slab_cells/(double)options.partition_z);
-
-    int cur_loc = 0;
-    for (int k=0; k<chi_mpi.process_count; k++)
-    {
-      if (cell->global_id < ((k + 1) * cells_per_loc))
-      {
-        cur_loc = k;
-        found_partition = true;
-        break;
-      }
-    }//for k
-
+    found_partition = true;
     std::get<0>(ijk_id) = ij_id.first;
     std::get<1>(ijk_id) = ij_id.second;
-    std::get<2>(ijk_id) = cur_loc;
+    std::get<2>(ijk_id) = 0;
   }
-  //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
   else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
   {
     auto extruder = (chi_mesh::VolumeMesherExtruder*)vol_mesher;
 
     //====================================== Create virtual cuts
-    if (vol_mesher->zcuts.empty())
+    if (vol_mesher->options.zcuts.empty())
     {
-      int num_sub_layers = extruder->vertex_layers.size()-1;
+      size_t num_sub_layers = extruder->vertex_layers.size()-1;
 
       if ((num_sub_layers%vol_mesher->options.partition_z) != 0)
       {
@@ -585,15 +439,15 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
         if (layer_index > (extruder->vertex_layers.size()-1))
         {
           layer_index = (int)extruder->vertex_layers.size()-1;
-          vol_mesher->zcuts.push_back(extruder->vertex_layers[layer_index]);
+          vol_mesher->options.zcuts.push_back(extruder->vertex_layers[layer_index]);
         }
         else
         {
-          vol_mesher->zcuts.push_back(extruder->vertex_layers[layer_index]);
+          vol_mesher->options.zcuts.push_back(extruder->vertex_layers[layer_index]);
 
           if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
           {
-            printf("Z-Cut %lu, %g\n",vol_mesher->zcuts.size(),
+            printf("Z-Cut %lu, %g\n",vol_mesher->options.zcuts.size(),
                    extruder->vertex_layers[layer_index]);
           }
         }
@@ -603,10 +457,9 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
 
     //====================================== Scan cuts for location
     double zmin = -1.0e-16;
-    double zmax =  1.0e-16;
-    for (int k=0; k<(vol_mesher->zcuts.size()); k++)
+    for (int k=0; k<(vol_mesher->options.zcuts.size()); k++)
     {
-      zmax =  vol_mesher->zcuts[k];
+      double zmax =  vol_mesher->options.zcuts[k];
 
       double z = cell->centroid.z;
 
@@ -628,24 +481,23 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
       zmin = zmax;
     }
   }//if typeid
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& POLYHEDRON
-  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefined3D))
+  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefinedUnpartitioned))
   {
-    if (vol_mesher->zcuts.empty())
+    if (vol_mesher->options.zcuts.empty())
     {
-      std::get<0>(ijk_id) = ij_id.first;
-      std::get<1>(ijk_id) = ij_id.second;
-      std::get<2>(ijk_id) = 0;
-      found_partition = true;
+      throw std::invalid_argument("Cell z-partitioning cannot be determined "
+                                  "because no z-cuts are supplied to volume "
+                                  "mesher.");
     }
 
     //====================================== Scan cuts for location
+    std::vector<double> temp_zcuts = vol_mesher->options.zcuts;
     double zmin = -1.0e16;
     double zmax =  1.0e16;
-    vol_mesher->zcuts.push_back(zmax);
-    for (int k=0; k<(vol_mesher->zcuts.size()); k++)
+    temp_zcuts.push_back(zmax);
+    for (int k=0; k<(temp_zcuts.size()); k++)
     {
-      zmax =  vol_mesher->zcuts[k];
+      zmax =  temp_zcuts[k];
 
       double z = cell->centroid.z;
 
@@ -665,15 +517,8 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
         break;
       }
       zmin = zmax;
-    }
+    }//for k
   }//if typeid
-  else if (typeid(*vol_mesher) == typeid(chi_mesh::VolumeMesherPredefined2D))
-  {
-    found_partition = true;
-    std::get<0>(ijk_id) = ij_id.first;
-    std::get<1>(ijk_id) = ij_id.second;
-    std::get<2>(ijk_id) = 0;
-  }
 
   //================================================== Report unallocated item_id
   if (!found_partition)
@@ -686,35 +531,6 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
 
   return ijk_id;
 }
-
-
-
-
-//###################################################################
-/**Get a list of boundary cells.*/
-void chi_mesh::VolumeMesher::
- GetBoundaryCells(chi_mesh::MeshContinuumPtr vol_continuum)
-{
-  for (const auto& cell : vol_continuum->local_cells)
-  {
-
-    for (int f=0; f<cell.faces.size(); f++)
-    {
-      if (not cell.faces[f].has_neighbor)
-      {
-        vol_continuum->boundary_cell_indices.push_back(cell.global_id);
-        break;
-      }
-    }
-  }//for local item_id
-  printf("Number of boundary item_id: %lu\n",vol_continuum->boundary_cell_indices.size());
-
-  vol_continuum->ExportCellsToPython(
-    "BoundaryCells.py",true,
-    &vol_continuum->boundary_cell_indices);
-}
-
-
 
 
 //###################################################################
@@ -750,7 +566,7 @@ void chi_mesh::VolumeMesher::
 //###################################################################
 /**Sets material id's using a logical volume.*/
 void chi_mesh::VolumeMesher::
- SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
+  SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
@@ -779,4 +595,73 @@ void chi_mesh::VolumeMesher::
     << chi_program_timer.GetTimeString()
     << " Done setting boundary id from logical volume. "
     << "Number of faces modified = " << num_faces_modified << ".";
+}
+
+//###################################################################
+/**Sets material id's for all cells to the specified material id.*/
+void chi_mesh::VolumeMesher::
+  SetMatIDToAll(int mat_id)
+{
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Setting material id " << mat_id << "to all cells.";
+
+  //============================================= Get current mesh handler
+  auto handler = chi_mesh::GetCurrentHandler();
+
+  //============================================= Get back mesh
+  auto cur_region = handler->region_stack.back();
+  auto vol_cont = cur_region->GetGrid();
+
+  for (auto& cell : vol_cont->local_cells)
+    cell.material_id = mat_id;
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Done setting material id " << mat_id << " to all cells";
+}
+
+//###################################################################
+/**Sets boundary numbers on boundaries orthogonal to the cardinal directions
+ * as xmax=0, xmin=1, ymax=2, ymin=3, zmax=4, zmin=5.*/
+void chi_mesh::VolumeMesher::
+  SetupOrthogonalBoundaries()
+{
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Setting orthogonal boundaries.";
+
+  //============================================= Get current mesh handler
+  auto handler = chi_mesh::GetCurrentHandler();
+
+  //============================================= Get back mesh
+  auto cur_region = handler->region_stack.back();
+  auto vol_cont = cur_region->GetGrid();
+
+  const chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
+  const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
+  const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
+
+  for (auto& cell : vol_cont->local_cells)
+    for (auto& face : cell.faces)
+      if (not face.has_neighbor)
+      {
+        chi_mesh::Vector3& n = face.normal;
+
+        int boundary_id = -1;
+        if      (n.Dot(ihat)>0.999)  boundary_id = 0;
+        else if (n.Dot(ihat)<-0.999) boundary_id = 1;
+        else if (n.Dot(jhat)> 0.999) boundary_id = 2;
+        else if (n.Dot(jhat)<-0.999) boundary_id = 3;
+        else if (n.Dot(khat)> 0.999) boundary_id = 4;
+        else if (n.Dot(khat)<-0.999) boundary_id = 5;
+
+        if (boundary_id >= 0) face.neighbor_id = boundary_id;
+      }//if bndry
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log(LOG_0)
+    << chi_program_timer.GetTimeString()
+    << " Done setting orthogonal boundaries.";
 }

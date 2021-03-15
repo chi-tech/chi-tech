@@ -1,8 +1,5 @@
 #include "diffusion_solver.h"
 
-#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_dirichlet.h"
-#include "ChiModules/DiffusionSolver/Boundaries/chi_diffusion_bndry_robin.h"
-
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -17,8 +14,6 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   size_t num_nodes = fe_intgrl_values.NumNodes();
 
   //======================================== Process material id
-  int mat_id = cell.material_id;
-
   std::vector<double> D(num_nodes, 1.0);
   std::vector<double> q(num_nodes, 1.0);
   std::vector<double> siga(num_nodes, 0.0);
@@ -67,9 +62,9 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
     if (not cell.faces[f].has_neighbor)
     {
       int ir_boundary_index = cell.faces[f].neighbor_id;
-      int ir_boundary_type  = boundaries[ir_boundary_index]->type;
+      auto ir_boundary_type  = boundaries[ir_boundary_index]->type;
 
-      if (ir_boundary_type == DIFFUSION_DIRICHLET)
+      if (ir_boundary_type == BoundaryType::Dirichlet)
       {
         auto dirichlet_bndry =
           (chi_diffusion::BoundaryDirichlet*)boundaries[ir_boundary_index];
@@ -83,7 +78,7 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
         }
       }
 
-      if (ir_boundary_type == DIFFUSION_ROBIN)
+      if (ir_boundary_type == BoundaryType::Robin)
       {
         auto robin_bndry =
           (chi_diffusion::BoundaryRobin*)boundaries[ir_boundary_index];

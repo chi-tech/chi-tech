@@ -1,8 +1,8 @@
 -- 1D Diffusion test with Vacuum BCs.
 -- SDM: PWLC
 -- Test: Max-value=2.50000
-num_procs = 1
-
+num_procs = 2
+-- KBA-partitioning
 
 
 
@@ -28,11 +28,18 @@ for i=1,(N+1) do
     mesh[i] = xmin + k*dx
 end
 chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
+
+chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
+
+chiVolumeMesherSetKBACutsZ({L/2})
+chiVolumeMesherSetKBAPartitioningPxPyPz(1,1,2)
+
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 chiVolumeMesherSetupOrthogonalBoundaries()
+
 
 --############################################### Add materials
 materials = {}
@@ -41,15 +48,17 @@ materials[0] = chiPhysicsAddMaterial("Test Material");
 chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
 chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
+
+
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
 chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
 chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
 
---############################################### Set boundary conditions
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_VACUUM)
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_VACUUM)
+
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)
@@ -88,7 +97,7 @@ if (master_export == nil) then
     chiFFInterpolationExportPython(ffi0)
 end
 
---############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
+
     local handle = io.popen("python ZLFFI00.py")
 end

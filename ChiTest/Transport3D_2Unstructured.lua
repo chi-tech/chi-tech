@@ -1,10 +1,19 @@
-chiMPIBarrier()
-if (chi_location_id == 0) then
-    print("############################################### LuaTest")
+-- 3D Transport test with Vacuum and Incident-isotropic BC.
+-- SDM: PWLD
+-- Test: Max-value=5.41465e-01 and 3.78243e-04
+num_procs = 4
+
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
 end
---dofile(CHI_LIBRARY)
-
-
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
@@ -13,18 +22,13 @@ newSurfMesh = chiSurfaceMeshCreate();
 chiSurfaceMeshImportFromOBJFile(newSurfMesh,
         "ChiResources/TestObjects/TriangleMesh2x2Cuts.obj",true)
 
---############################################### Setup Regions
 region1 = chiRegionCreate()
 chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
---############################################### Create meshers
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER);
-
-chiSurfaceMesherSetProperty(PARTITION_X,2)
-chiSurfaceMesherSetProperty(PARTITION_Y,2)
-chiSurfaceMesherSetProperty(CUT_X,0.0)
-chiSurfaceMesherSetProperty(CUT_Y,0.0)
+chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
+                      ExtruderTemplateType.SURFACE_MESH,
+                      newSurfMesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
@@ -32,18 +36,14 @@ chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.8
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--1.6
 
-chiVolumeMesherSetProperty(PARTITION_Z,1);
+chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
+chiVolumeMesherSetKBACutsX({0.0})
+chiVolumeMesherSetKBACutsY({0.0})
 
-chiVolumeMesherSetProperty(FORCE_POLYGONS,true);
-chiVolumeMesherSetProperty(MESH_GLOBAL,false);
 chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
 
---############################################### Execute meshing
 chiSurfaceMesherExecute();
 chiVolumeMesherExecute();
-
---chiRegionExportMeshToPython(region1,
---        "YMesh"..string.format("%d",chi_location_id)..".py",false)
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
@@ -51,7 +51,6 @@ chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 
 vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
-
 
 --############################################### Add materials
 materials = {}
@@ -78,8 +77,6 @@ end
 
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
-
-
 
 --############################################### Setup Physics
 
@@ -126,9 +123,10 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
-
-
+--############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
+
+--############################################### Slice plot
 --slices = {}
 --for k=1,count do
 --    slices[k] = chiFFInterpolationCreate(SLICE)
@@ -142,6 +140,7 @@ fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 --    chiFFInterpolationExportPython(slices[k])
 --end
 
+--############################################### Volume integrations
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
@@ -166,15 +165,17 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
+--############################################### Exports
+if (master_export == nil) then
+    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
+end
+
+--############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
 
     --os.execute("python ZPFFI00.py")
     ----os.execute("python ZPFFI11.py")
     --local handle = io.popen("python ZPFFI00.py")
     print("Execution completed")
-end
-
-if (master_export == nil) then
-    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 end
 

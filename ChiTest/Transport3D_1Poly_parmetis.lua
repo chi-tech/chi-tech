@@ -1,10 +1,19 @@
-chiMPIBarrier()
-if (chi_location_id == 0) then
-    print("############################################### LuaTest")
+-- 3D Transport test with Vacuum and Incident-isotropic BC.
+-- SDM: PWLD
+-- Test: Max-value=0.49903 and 7.18243e-4
+num_procs = 4
+
+
+
+
+
+--############################################### Check num_procs
+if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+                      "Expected "..tostring(num_procs)..
+                      ". Pass check_num_procs=false to override if possible.")
+    os.exit(false)
 end
---dofile(CHI_LIBRARY)
-
-
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
@@ -24,10 +33,6 @@ end
 chiMeshCreateUnpartitioned3DOrthoMesh(nodesxy,nodesxy,nodesz)
 chiVolumeMesherSetProperty(PARTITION_TYPE,PARMETIS)
 chiVolumeMesherExecute();
-
-
---chiRegionExportMeshToPython(region1,
---        "YMesh"..string.format("%d",chi_location_id)..".py",false)
 
 --############################################### Set Material IDs
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
@@ -96,7 +101,7 @@ end
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
---========== Boundary conditions
+--############################################### Set boundary conditions
 bsrc={}
 for g=1,num_groups do
     bsrc[g] = 0.0
@@ -104,15 +109,16 @@ end
 bsrc[1] = 1.0/4.0/math.pi;
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
---========== Solvers
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
 
+--############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
-
-
+--############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
+
+--############################################### Slice plot
 --slices = {}
 --for k=1,count do
 --    slices[k] = chiFFInterpolationCreate(SLICE)
@@ -126,6 +132,7 @@ fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 --    chiFFInterpolationExportPython(slices[k])
 --end
 
+--############################################### Volume integrations
 ffi1 = chiFFInterpolationCreate(VOLUME)
 curffi = ffi1
 chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
@@ -150,15 +157,17 @@ maxval = chiFFInterpolationGetValue(curffi)
 
 chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 
+--############################################### Exports
+if (master_export == nil) then
+    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
+end
+
+--############################################### Plots
 if (chi_location_id == 0 and master_export == nil) then
 
     --os.execute("python ZPFFI00.py")
     ----os.execute("python ZPFFI11.py")
     --local handle = io.popen("python ZPFFI00.py")
     print("Execution completed")
-end
-
-if (master_export == nil) then
-    chiExportFieldFunctionToVTKG(fflist[1],"ZPhi3D","Phi")
 end
 

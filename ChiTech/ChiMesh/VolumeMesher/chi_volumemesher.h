@@ -1,21 +1,15 @@
-#ifndef _chi_volumemesher_h
-#define _chi_volumemesher_h
+#ifndef CHI_VOLUMEMESHER_H
+#define CHI_VOLUMEMESHER_H
 
-#include "../chi_mesh.h"
+#include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/Cell/cell.h"
-
-//#define VOLUMEMESHER_LINEMESH1D 1
-//#define VOLUMEMESHER_PREDEFINED2D 3
-//#define VOLUMEMESHER_EXTRUDER 4
 
 namespace chi_mesh
 {
   enum VolumeMesherType
   {
-    LINEMESH1D   = 1,
-    PREDEFINED2D = 3,
-    EXTRUDER     = 4,
-    PREDEFINED3D = 5
+    EXTRUDER      = 4,
+    UNPARTITIONED = 6
   };
   enum VolumeMesherProperty
   {
@@ -34,37 +28,14 @@ namespace chi_mesh
   };
 };
 
-struct chi_mesh::CellIndexMap
-{
-  int mapped_from;
-  int mapped_to;
-  int mapped_level;
-
-  CellIndexMap()
-  {
-    mapped_from  = -1;
-    mapped_to    = -1;
-    mapped_level = -1;
-  }
-  CellIndexMap(int from,int to)
-  {
-    mapped_from  = from;
-    mapped_to    = to;
-    mapped_level = -1;
-  }
-};
-
 //######################################################### Class def
 /**Parent volume mesher class.*/
 class chi_mesh::VolumeMesher
 {
 public:
-  std::vector<double> zcuts;
-
-public:
   enum PartitionType
   {
-    KBA_STYLE_XY  = 1,
+//    KBA_STYLE_XY  = 1,
     KBA_STYLE_XYZ = 2,
     PARMETIS      = 3
   };
@@ -72,43 +43,53 @@ public:
   {
     bool         force_polygons = true;
     bool         mesh_global    = false;
+    int          partition_x    = 1;
+    int          partition_y    = 1;
     int          partition_z    = 1;
+
+    std::vector<double> xcuts;
+    std::vector<double> ycuts;
+    std::vector<double> zcuts;
     PartitionType partition_type = PARMETIS;
   };
   VOLUME_MESHER_OPTIONS options;
 public:
-  std::vector<chi_mesh::CellIndexMap*> cell_ordering;
-  std::vector<chi_mesh::NodeIndexMap*> node_ordering;
-  std::vector<int>                     reverse_node_ordering;
-public:
   //01 Utils
-  void AddContinuumToRegion(MeshContinuumPtr grid, Region& region);
+  static
+  void AddContinuumToRegion(MeshContinuumPtr& grid, Region& region);
+  static
   void CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
-                          chi_mesh::MeshContinuumPtr vol_continuum,
+                          chi_mesh::MeshContinuumPtr& vol_continuum,
                           bool delete_surface_mesh_elements=false,
                           bool force_local=false);
-  void CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
-                          chi_mesh::MeshContinuum* vol_continuum,
+  static
+  void CreatePolygonCells(chi_mesh::UnpartitionedMesh* umesh,
+                          chi_mesh::MeshContinuumPtr& grid,
                           bool delete_surface_mesh_elements=false,
                           bool force_local=false);
-  void GridFilterGhosts(chi_mesh::MeshContinuumPtr in_grid,
-                        chi_mesh::MeshContinuumPtr out_grid);
-  void GridFilterGhosts(chi_mesh::MeshContinuum* in_grid,
-                        chi_mesh::MeshContinuumPtr out_grid);
+
+  static
+  void GridFilterGhosts(chi_mesh::MeshContinuumPtr& in_grid,
+                        chi_mesh::MeshContinuumPtr& out_grid);
+  static
   std::pair<int,int>  GetCellXYPartitionID(chi_mesh::Cell *cell);
+  static
   std::tuple<int,int,int>
                       GetCellXYZPartitionID(chi_mesh::Cell *cell);
-  void                GetBoundaryCells(chi_mesh::MeshContinuumPtr vol_continuum);
+  static
   void                SetMatIDFromLogical(chi_mesh::LogicalVolume* log_vol,
                                           bool sense, int mat_id);
+  static
   void                SetBndryIDFromLogical(chi_mesh::LogicalVolume* log_vol,
                                           bool sense, int bndry_id);
+  static
+  void                SetMatIDToAll(int mat_id);
+  static
+  void                SetupOrthogonalBoundaries();
   //02
   virtual void Execute();
-  int          MapNode(int iref);
-  int          ReverseMapNode(int i);
   
 
 };
 
-#endif
+#endif //CHI_VOLUMEMESHER_H

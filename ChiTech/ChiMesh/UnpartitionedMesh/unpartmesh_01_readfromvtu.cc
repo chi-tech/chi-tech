@@ -89,4 +89,7 @@ void chi_mesh::UnpartitionedMesh::
 
   }
 
+  //======================================== Always do this
+  BuildMeshConnectivity();
+  ComputeCentroids();
 }
