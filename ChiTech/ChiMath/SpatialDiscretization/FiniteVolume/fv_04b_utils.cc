@@ -14,23 +14,21 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 size_t SpatialDiscretization_FV::
-  GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                  chi_math::UnknownManager& unknown_manager)
+  GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return grid->local_cells.size()*N;
+  return ref_grid->local_cells.size()*N;
 }
 
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 size_t SpatialDiscretization_FV::
-  GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                   chi_math::UnknownManager& unknown_manager)
+  GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  const int num_globl_cells = grid->GetGlobalNumberOfCells();
+  const int num_globl_cells = ref_grid->GetGlobalNumberOfCells();
 
   return num_globl_cells*N;
 }
@@ -63,7 +61,7 @@ std::vector<int> SpatialDiscretization_FV::
     for (int comp=0; comp<N; ++comp)
     {
       dof_ids.push_back(
-        MapDOF(grid->cells[cell_id],unknown_manager,unknown_id,comp) );
+        MapDOF(grid->cells[cell_id],0,unknown_manager,unknown_id,comp) );
     }
 
   return dof_ids;
@@ -76,7 +74,7 @@ void SpatialDiscretization_FV::
                       std::vector<double>& local_vector,
                       chi_math::UnknownManager& unknown_manager)
 {
-  size_t num_local_dofs = GetNumLocalDOFs(ref_grid,unknown_manager);
+  size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
 
   chi_math::PETScUtils::CopyVecToSTLvector(petsc_vector,
                                            local_vector,

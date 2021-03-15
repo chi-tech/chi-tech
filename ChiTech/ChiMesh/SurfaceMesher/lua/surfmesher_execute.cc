@@ -23,6 +23,15 @@ int chiSurfaceMesherExecute(lua_State *L)
 
   chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
   chi_log.Log(LOG_ALLVERBOSE_2) << "Executing surface mesher\n";
+
+  if (cur_hndlr->surface_mesher == nullptr)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << __FUNCTION__ << ": called without a surface mesher set. Make a "
+                         "call to chiSurfaceMesherCreate.";
+    exit(EXIT_FAILURE);
+  }
+
   cur_hndlr->surface_mesher->Execute();
 
   bool export_load_balance = false;

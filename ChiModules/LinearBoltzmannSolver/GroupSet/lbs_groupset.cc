@@ -40,8 +40,6 @@ LBSGroupset::LBSGroupset()
   allow_cycles = false;
 
   log_sweep_events = false;
-
-  latest_convergence_metric = 1.0;
 }
 
 //###################################################################
@@ -216,3 +214,4 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
 
   ofile.close();
 }
+

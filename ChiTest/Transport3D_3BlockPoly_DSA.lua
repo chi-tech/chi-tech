@@ -82,7 +82,7 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 phys1 = chiLBSCreateSolver()
 chiSolverAddRegion(phys1,region1)
 
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
 --========== Groups

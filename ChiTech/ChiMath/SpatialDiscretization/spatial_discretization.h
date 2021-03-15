@@ -8,14 +8,6 @@
 
 #include <petscksp.h>
 
-#define DEG1         0
-#define DEG3         1
-#define DEG3_SURFACE 2
-
-class SpatialDiscretization;
-
-typedef std::shared_ptr<SpatialDiscretization> SpatialDiscretizationPtr;
-
 class SpatialDiscretization
 {
 public:
@@ -31,7 +23,7 @@ protected:
   //00
   explicit
   SpatialDiscretization(int in_dim,
-                        chi_mesh::MeshContinuumPtr in_grid,
+                        chi_mesh::MeshContinuumPtr& in_grid,
                         SDMType in_type = SDMType::UNDEFINED) :
     dim(in_dim),
     type(in_type),
@@ -45,19 +37,35 @@ protected:
 
 public:
   virtual
-  void BuildSparsityPattern(chi_mesh::MeshContinuumPtr grid,
-                            std::vector<int>& nodal_nnz_in_diag,
+  void BuildSparsityPattern(std::vector<int>& nodal_nnz_in_diag,
                             std::vector<int>& nodal_nnz_off_diag,
                             chi_math::UnknownManager& unknown_manager)
                             {}
 
   virtual
-  size_t GetNumLocalDOFs(chi_mesh::MeshContinuumPtr grid,
-                         chi_math::UnknownManager& unknown_manager)
+  int MapDOF(const chi_mesh::Cell& cell,
+             unsigned int node,
+             const chi_math::UnknownManager& unknown_manager,
+             unsigned int unknown_id,
+             unsigned int component) const {return 0;}
+
+  virtual
+  int MapDOFLocal(const chi_mesh::Cell& cell,
+                  unsigned int node,
+                  const chi_math::UnknownManager& unknown_manager,
+                  unsigned int unknown_id,
+                  unsigned int component) const {return 0;}
+
+  virtual
+  int MapDOF(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+  virtual
+  int MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+
+  virtual
+  size_t GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)
                          {return 0;}
   virtual
-  size_t GetNumGlobalDOFs(chi_mesh::MeshContinuumPtr grid,
-                          chi_math::UnknownManager& unknown_manager)
+  size_t GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager)
                           {return 0;}
 
 protected:

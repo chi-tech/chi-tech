@@ -30,19 +30,19 @@ void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
        options.geometry_type == GeometryType::TWOD_CARTESIAN or
        (typeid(mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
   {
-    if      (groupset.angleagg_method == AngleAggregationType::SINGLE)
+    switch (groupset.angleagg_method)
     {
-      InitAngleAggSingle(groupset);
-    }
-    else if (groupset.angleagg_method == AngleAggregationType::POLAR)
-    {
-      InitAngleAggPolar(groupset);
-    }
-  }
+      case AngleAggregationType::SINGLE:
+        InitAngleAggSingle(groupset); break;
+      case AngleAggregationType::POLAR:
+        InitAngleAggPolar(groupset); break;
+      default:
+        throw std::logic_error(std::string(__FUNCTION__) +
+                               " Invalid angle aggregation type.");
+    }//switch on method
+  }//if aggregatable
   else
-  {
     InitAngleAggSingle(groupset);
-  }
 
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()

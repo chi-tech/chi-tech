@@ -138,38 +138,37 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKPolygon(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
   auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_polygon->GetNumberOfPoints();
-  auto num_cfaces  = vtk_polygon->GetNumberOfFaces();
+  auto num_cfaces  = num_cpoints;
 
-  polyh_cell->vertex_ids.reserve(num_cpoints);
+  poly_cell->vertex_ids.reserve(num_cpoints);
   auto point_ids   = vtk_polygon->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
     int point_id = point_ids->GetId(p);
-    polyh_cell->vertex_ids.push_back(point_id);
+    poly_cell->vertex_ids.push_back(point_id);
   }//for p
 
-  polyh_cell->faces.reserve(num_cfaces);
+  poly_cell->faces.reserve(num_cfaces);
   for (int f=0; f<num_cfaces; ++f)
   {
     LightWeightFace face;
-    auto vtk_face = vtk_polygon->GetFace(f);
-    auto num_face_points = vtk_face->GetNumberOfPoints();
 
-    face.vertex_ids.reserve(num_face_points);
-    auto face_point_ids = vtk_face->GetPointIds();
-    for (int p = 0; p < num_face_points; ++p) {
-      int point_id = face_point_ids->GetId(p);
-      face.vertex_ids.push_back(point_id);
-    }
+    auto v0_id = poly_cell->vertex_ids[f];
+    auto v1_id = (f<(num_cfaces-1))? poly_cell->vertex_ids[f+1] :
+                                     poly_cell->vertex_ids[0];
 
-    polyh_cell->faces.push_back(face);
+    face.vertex_ids.reserve(2);
+    face.vertex_ids.push_back(v0_id);
+    face.vertex_ids.push_back(v1_id);
+
+    poly_cell->faces.push_back(face);
   }
 
-  return polyh_cell;
+  return poly_cell;
 }
 
 //###################################################################
@@ -177,38 +176,37 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKQuad(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
-  auto vtk_quad    = vtkQuad::SafeDownCast(vtk_cell);
-  auto num_cpoints = vtk_quad->GetNumberOfPoints();
-  auto num_cfaces  = vtk_quad->GetNumberOfFaces();
+  auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
+  auto num_cpoints = vtk_polygon->GetNumberOfPoints();
+  auto num_cfaces  = num_cpoints;
 
-  polyh_cell->vertex_ids.reserve(num_cpoints);
-  auto point_ids   = vtk_quad->GetPointIds();
+  poly_cell->vertex_ids.reserve(num_cpoints);
+  auto point_ids   = vtk_polygon->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
     int point_id = point_ids->GetId(p);
-    polyh_cell->vertex_ids.push_back(point_id);
+    poly_cell->vertex_ids.push_back(point_id);
   }//for p
 
-  polyh_cell->faces.reserve(num_cfaces);
+  poly_cell->faces.reserve(num_cfaces);
   for (int f=0; f<num_cfaces; ++f)
   {
     LightWeightFace face;
-    auto vtk_face = vtk_quad->GetFace(f);
-    auto num_face_points = vtk_face->GetNumberOfPoints();
 
-    face.vertex_ids.reserve(num_face_points);
-    auto face_point_ids = vtk_face->GetPointIds();
-    for (int p = 0; p < num_face_points; ++p) {
-      int point_id = face_point_ids->GetId(p);
-      face.vertex_ids.push_back(point_id);
-    }
+    auto v0_id = poly_cell->vertex_ids[f];
+    auto v1_id = (f<(num_cfaces-1))? poly_cell->vertex_ids[f+1] :
+                 poly_cell->vertex_ids[0];
 
-    polyh_cell->faces.push_back(face);
+    face.vertex_ids.reserve(2);
+    face.vertex_ids.push_back(v0_id);
+    face.vertex_ids.push_back(v1_id);
+
+    poly_cell->faces.push_back(face);
   }
 
-  return polyh_cell;
+  return poly_cell;
 }
 
 //###################################################################
@@ -216,38 +214,37 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKTriangle(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
-  auto vtk_triangle = vtkTriangle::SafeDownCast(vtk_cell);
-  auto num_cpoints = vtk_triangle->GetNumberOfPoints();
-  auto num_cfaces  = vtk_triangle->GetNumberOfFaces();
+  auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
+  auto num_cpoints = vtk_polygon->GetNumberOfPoints();
+  auto num_cfaces  = num_cpoints;
 
-  polyh_cell->vertex_ids.reserve(num_cpoints);
-  auto point_ids   = vtk_triangle->GetPointIds();
+  poly_cell->vertex_ids.reserve(num_cpoints);
+  auto point_ids   = vtk_polygon->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
     int point_id = point_ids->GetId(p);
-    polyh_cell->vertex_ids.push_back(point_id);
+    poly_cell->vertex_ids.push_back(point_id);
   }//for p
 
-  polyh_cell->faces.reserve(num_cfaces);
+  poly_cell->faces.reserve(num_cfaces);
   for (int f=0; f<num_cfaces; ++f)
   {
     LightWeightFace face;
-    auto vtk_face = vtk_triangle->GetFace(f);
-    auto num_face_points = vtk_face->GetNumberOfPoints();
 
-    face.vertex_ids.reserve(num_face_points);
-    auto face_point_ids = vtk_face->GetPointIds();
-    for (int p = 0; p < num_face_points; ++p) {
-      int point_id = face_point_ids->GetId(p);
-      face.vertex_ids.push_back(point_id);
-    }
+    auto v0_id = poly_cell->vertex_ids[f];
+    auto v1_id = (f<(num_cfaces-1))? poly_cell->vertex_ids[f+1] :
+                 poly_cell->vertex_ids[0];
 
-    polyh_cell->faces.push_back(face);
+    face.vertex_ids.reserve(2);
+    face.vertex_ids.push_back(v0_id);
+    face.vertex_ids.push_back(v1_id);
+
+    poly_cell->faces.push_back(face);
   }
 
-  return polyh_cell;
+  return poly_cell;
 }
 
 //###################################################################
@@ -266,12 +263,15 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   }
 
   int num_bndry_faces = 0;
-  for (auto cell : raw_cells)
+  int cell_cnt = 0;
+  for (auto& cell : raw_cells)
+  {
     for (auto& face : cell->faces)
     {
       if (face.neighbor < 0) ++num_bndry_faces;
       face.neighbor = -1;
     }
+  }
 
   chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                               << " Number of boundary faces "
@@ -335,6 +335,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 /**Compute centroids for all cells.*/
 void chi_mesh::UnpartitionedMesh::ComputeCentroids()
 {
+  chi_log.Log() << "Computing cell-centroids.";
   for (auto cell : raw_cells)
   {
     cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
@@ -343,4 +344,5 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroids()
 
     cell->centroid = cell->centroid/(cell->vertex_ids.size());
   }
+  chi_log.Log() << "Done computing cell-centroids.";
 }
