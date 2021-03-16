@@ -43,23 +43,23 @@ public:
                             {}
 
   virtual
-  int MapDOF(const chi_mesh::Cell& cell,
-             unsigned int node,
-             const chi_math::UnknownManager& unknown_manager,
-             unsigned int unknown_id,
-             unsigned int component) const {return 0;}
+  int64_t MapDOF(const chi_mesh::Cell& cell,
+                 unsigned int node,
+                 const chi_math::UnknownManager& unknown_manager,
+                 unsigned int unknown_id,
+                 unsigned int component) const {return 0;}
 
   virtual
-  int MapDOFLocal(const chi_mesh::Cell& cell,
-                  unsigned int node,
-                  const chi_math::UnknownManager& unknown_manager,
-                  unsigned int unknown_id,
-                  unsigned int component) const {return 0;}
+  int64_t MapDOFLocal(const chi_mesh::Cell& cell,
+                      unsigned int node,
+                      const chi_math::UnknownManager& unknown_manager,
+                      unsigned int unknown_id,
+                      unsigned int component) const {return 0;}
 
   virtual
-  int MapDOF(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+  int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
   virtual
-  int MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+  int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
 
   virtual
   size_t GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)

@@ -24,7 +24,7 @@ bool chi_mesh::VolumeMesherPredefinedUnpartitioned::
     const std::vector<int64_t>& cell_pids)
 {
   auto handler = chi_mesh::GetCurrentHandler();
-PetscInt
+
   auto umesh = handler->unpartitionedmesh_stack.back();
 
   bool is_neighbor = false;
