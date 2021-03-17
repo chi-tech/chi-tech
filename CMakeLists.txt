@@ -35,7 +35,7 @@ SET(TARGET ChiTech)
 project(${TARGET} C CXX)
 
 #================================================ Set variables
-set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}/ChiTech")
+set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}")
 set(CHI_TECH_MOD "ChiModules")
 
 #================================================ Set cmake variables
@@ -44,101 +44,102 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/ChiResources/Macros")
 
 if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+    set(CONFIG_FILE_NAME "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config.cmake")
 endif()
 
+#================================================ Export vars to config file
+file(WRITE  "${CONFIG_FILE_NAME}" "set(PETSC_ROOT ${PETSC_ROOT})\n")
+file(APPEND "${CONFIG_FILE_NAME}" "set(LUA_ROOT ${LUA_ROOT})")
 
 #================================================ Include macros
 include(GNUInstallDirs)
 include(Filter)
 include(Checks)
 
-#================================================ Precompiler flags
-#LUA CONSOLE
-add_definitions(-DNO_FONTGENESIS)
-
-
-#================================================ Compiler flags
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
-  set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-c++17-extensions")
-  set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable -Wno-sign-compare")
-  set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-#elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-#elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-endif()
-
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Force -O3 in release builds (some OS's might downgrade it)
-string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-
-#================================================ Include directories
+#================================================ Default include directories
 include_directories("${LUA_ROOT}/include")
 include_directories("${PETSC_ROOT}/include")
-include_directories("${PROJECT_SOURCE_DIR}/")
-include_directories("${PROJECT_SOURCE_DIR}/ChiTech")
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
+include_directories("${CHI_TECH_DIR}/ChiTech")
+include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
+include_directories("${CHI_TECH_DIR}/ChiTech/ChiMPI")
+include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
+include_directories("${CHI_TECH_DIR}/ChiResources")
+include_directories("${CHI_TECH_DIR}/ChiModules")
+include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
+
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
 link_directories("${PETSC_ROOT}/lib")
+
 # --------------------------- VTK
 find_package(VTK COMPONENTS
-             vtkCommonCore vtkCommonDataModel
-	         vtkIOLegacy vtkIOCore
-	         vtkIOXML vtkParallelCore vtkIOParallelXML
-             vtkFiltersCore
-             vtkIOEnSight
-             REQUIRED PATHS $ENV{VTK_DIR})
+        vtkCommonCore vtkCommonDataModel
+        vtkIOLegacy vtkIOCore
+        vtkIOXML vtkParallelCore vtkIOParallelXML
+        vtkFiltersCore
+        vtkIOEnSight
+        REQUIRED PATHS $ENV{VTK_DIR})
 if (NOT VTK_FOUND)
-  message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
+    message(FATAL_ERROR "VTK not found: ${VTK_NOT_FOUND_MESSAGE}")
 endif()
 
 message (STATUS "VTK_VERSION: ${VTK_VERSION}")
 
 if (VTK_VERSION VERSION_LESS "8.90.0")
-  # old system
-  include(${VTK_USE_FILE})
+    # old system
+    include(${VTK_USE_FILE})
 else ()
-  # vtk_module_autoinit is needed
-  vtk_module_autoinit(
-		TARGETS ${TARGET}
-          ChiModules ${VTK_LIBRARIES}
+    # vtk_module_autoinit is needed
+    vtk_module_autoinit(
+            TARGETS ${TARGET}
+            ChiModules ${VTK_LIBRARIES}
     )
 endif()
 
 set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
-#================================================ Default include directories
-include_directories("${CHI_TECH_DIR}/ChiLua")
-include_directories("${CHI_TECH_DIR}/ChiMPI")
-include_directories("${CHI_TECH_DIR}/ChiLog")
-include_directories("${PROJECT_SOURCE_DIR}/ChiModules")
+#================================================ Compiler flags
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
+    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-c++17-extensions")
+    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable -Wno-sign-compare")
+    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+    #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+endif()
+
+# Force -O3 in release builds (some OS's might downgrade it)
+string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/chi_runtime.cc" "${CHI_TECH_DIR}/LuaTest/lua_test.cc")
-add_subdirectory("${CHI_TECH_DIR}/ChiConsole")
-add_subdirectory("${CHI_TECH_DIR}/ChiLua")
-add_subdirectory("${CHI_TECH_DIR}/ChiMath")
-add_subdirectory("${CHI_TECH_DIR}/ChiPhysics")
-add_subdirectory("${CHI_TECH_DIR}/ChiGraph")
+set(SOURCES "${CHI_TECH_DIR}/ChiTech/chi_runtime.cc"
+            "${CHI_TECH_DIR}/ChiTech/LuaTest/lua_test.cc")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiConsole")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLua")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMath")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiPhysics")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiGraph")
 
-add_subdirectory("${CHI_TECH_DIR}/ChiTimer")
-add_subdirectory("${CHI_TECH_DIR}/ChiMesh")
-add_subdirectory("${CHI_TECH_DIR}/ChiMPI")
-add_subdirectory("${CHI_TECH_DIR}/ChiLog")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiTimer")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMesh")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMPI")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLog")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
 add_library(ChiLib STATIC ${SOURCES})
-add_executable(${TARGET} "${CHI_TECH_DIR}/chi_tech_main.cc")
+add_executable(${TARGET} "${CHI_TECH_DIR}/ChiTech/chi_tech_main.cc")
 target_link_libraries(${TARGET} ChiLib)
 target_link_libraries(ChiLib ${CHI_LIBS})
 
