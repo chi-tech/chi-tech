@@ -40,7 +40,7 @@ CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,
                         const chi_mesh::Vector3& line_point_0,
                         const chi_mesh::Vector3& line_point_1,
                         chi_mesh::Vector3& intersection_point,
-                        std::pair<double,double>& weights)
+                        std::pair<double,double>* weights/*=nullptr*/)
 {
   chi_mesh::Vector3 v0 = line_point_0 - plane_point;
   chi_mesh::Vector3 v1 = line_point_1 - plane_point;
@@ -54,12 +54,12 @@ CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,
   if (sense_0 != sense_1)
   {
     double dotp_total = std::fabs(dotp_0) + std::fabs(dotp_1);
-    weights.first = (std::fabs(dotp_0)/dotp_total);
-    weights.second = 1.0 - weights.first;
-    intersection_point =
-      line_point_0*weights.second +
-      line_point_1*weights.first;
+    double w0 = (std::fabs(dotp_0)/dotp_total);
+    double w1 = 1.0 - w0;
+    intersection_point = line_point_0*w1 + line_point_1*w0;
 
+    if (weights != nullptr)
+      *weights = {w0,w1};
     return true;
   }
 
@@ -91,7 +91,7 @@ bool chi_mesh::CheckLineIntersectStrip(
   bool intersects_plane = chi_mesh::CheckPlaneLineIntersect(
     strip_normal, strip_point0,
     line_point0, line_point1,
-    plane_intersection_point, weights);
+    plane_intersection_point, &weights);
 
   if (!intersects_plane) return false;
 

@@ -198,7 +198,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           //=========================== Check if intersects plane
           if (CheckPlaneLineIntersect(this->normal,this->point,
                                       v0,v1,interstion_point,
-                                      weights))
+                                      &weights))
           {
             //==================== Check for duplicate
             bool duplicate_found = false;

@@ -35,7 +35,7 @@ CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,
                         const chi_mesh::Vector3& line_point_0,
                         const chi_mesh::Vector3& line_point_1,
                         chi_mesh::Vector3& intersection_point,
-                        std::pair<double,double>& weights);
+                        std::pair<double,double>* weights=nullptr);
 
 bool
 CheckLineIntersectStrip(
