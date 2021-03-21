@@ -127,6 +127,6 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
   file.close();
 
   //======================================== Always do this
+  ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
-  ComputeCentroids();
 }
