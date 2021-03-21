@@ -333,7 +333,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 }
 
 /**Compute centroids for all cells.*/
-void chi_mesh::UnpartitionedMesh::ComputeCentroids()
+void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 {
   chi_log.Log() << "Computing cell-centroids.";
   for (auto cell : raw_cells)
@@ -345,4 +345,45 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroids()
     cell->centroid = cell->centroid/(cell->vertex_ids.size());
   }
   chi_log.Log() << "Done computing cell-centroids.";
+
+  chi_log.Log() << "Checking cell-center-to-face orientations";
+  size_t check0_corrections=0;
+  for (auto cell : raw_cells)
+    if (cell->type == CellType::POLYHEDRON)
+      for (auto& face : cell->faces)
+      {
+        chi_mesh::Vector3 face_centroid;
+        for (uint64_t vid : face.vertex_ids)
+          face_centroid += *vertices[vid];
+        face_centroid /= face.vertex_ids.size();
+
+        if (face.vertex_ids.size()<3)
+          throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+            ": cell-center-to-face check encountered face with less than"
+            " 3 vertices on a face, making normal computation impossible.");
+
+        const auto& fv0 = face_centroid;
+        const auto& fv1 = *vertices[face.vertex_ids[0]];
+        const auto& fv2 = *vertices[face.vertex_ids[1]];
+
+        auto E0 = fv1-fv0;
+        auto E1 = fv2-fv0;
+        auto n  = E1.Cross(E0); n.Normalize();
+
+        auto CC = face_centroid - cell->centroid;
+
+        if (n.Dot(CC) < 0.0)
+        {
+          std::vector<uint64_t> reversed_verts(face.vertex_ids.rbegin(),
+                                               face.vertex_ids.rend());
+          face.vertex_ids = reversed_verts;
+          ++check0_corrections;
+        }
+      }
+  if (check0_corrections > 0)
+    chi_log.Log(LOG_ALLWARNING)
+      << "Cell-center-to-face orientation detected " << check0_corrections
+      << " faces that violated quality requirements. An attempt to fix it"
+      << " was made.";
+  chi_log.Log() << "Done checking cell-center-to-face orientations";
 }
