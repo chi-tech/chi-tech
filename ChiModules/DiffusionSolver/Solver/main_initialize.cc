@@ -115,8 +115,8 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   //================================================== Determine nodal DOF
   chi_log.Log(LOG_0) << "Building sparsity pattern.";
-  std::vector<int> nodal_nnz_in_diag;
-  std::vector<int> nodal_nnz_off_diag;
+  std::vector<int64_t> nodal_nnz_in_diag;
+  std::vector<int64_t> nodal_nnz_off_diag;
   sdm->BuildSparsityPattern(nodal_nnz_in_diag,
                             nodal_nnz_off_diag,
                             unknown_manager);
@@ -241,7 +241,7 @@ DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
 
   //======================================================= Compute test criterion
   double tol;
-  int    maxIts;
+  int64_t    maxIts;
   KSPGetTolerances(ksp,NULL,&tol,NULL,&maxIts);
 
 

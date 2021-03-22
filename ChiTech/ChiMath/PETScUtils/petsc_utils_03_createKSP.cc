@@ -36,7 +36,7 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
   std::string in_solver_type,
   std::string in_preconditioner_type,
   double in_relative_residual_tolerance,
-  int in_maximum_iterations)
+  int64_t in_maximum_iterations)
 {
   PETScSolverSetup setup;
 
@@ -91,7 +91,7 @@ chi_math::PETScUtils::RelativeResidualConvergenceTest(
 
   //============================== Compute test criterion
   double tol;
-  int    maxIts;
+  int64_t maxIts;
   KSPGetTolerances(ksp,NULL,&tol,NULL,&maxIts);
 
   double relative_residual = rnorm/rhs_norm;
@@ -119,12 +119,12 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
   KSPGetOptionsPrefix(ksp,&ksp_name);
   if (rnorm/rhs_norm < 1.0e-2)
   {
-    snprintf(buff,100,"%s iteration %4d - Residual %.3e\n",
+    snprintf(buff,100,"%s iteration %4lld - Residual %.3e\n",
              ksp_name,n,rnorm/rhs_norm);
   }
   else
   {
-    snprintf(buff,100,"%s iteration %4d - Residual %.7f\n",
+    snprintf(buff,100,"%s iteration %4lld - Residual %.7f\n",
              ksp_name,n,rnorm/rhs_norm);
   }
 

@@ -51,25 +51,25 @@ public:
   void OrderNodes();
 
   //03 sparsity
-  void BuildSparsityPattern(std::vector<int>& nodal_nnz_in_diag,
-                            std::vector<int>& nodal_nnz_off_diag,
+  void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
+                            std::vector<int64_t>& nodal_nnz_off_diag,
                             chi_math::UnknownManager& unknown_manager) override;
 
   //04a mappings
-  int MapDOF(const chi_mesh::Cell& cell,
-             unsigned int node,
-             const chi_math::UnknownManager& unknown_manager,
-             unsigned int unknown_id,
-             unsigned int component) const override;
+  int64_t MapDOF(const chi_mesh::Cell& cell,
+                 unsigned int node,
+                 const chi_math::UnknownManager& unknown_manager,
+                 unsigned int unknown_id,
+                 unsigned int component) const override;
 
-  int MapDOFLocal(const chi_mesh::Cell& cell,
+  int64_t MapDOFLocal(const chi_mesh::Cell& cell,
                   unsigned int node,
                   const chi_math::UnknownManager& unknown_manager,
                   unsigned int unknown_id,
                   unsigned int component) const override;
 
-  int MapDOF(const chi_mesh::Cell& cell, unsigned int node) const override;
-  int MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override;
+  int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const override;
+  int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override;
 
   //04b utils
   size_t GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager) override;

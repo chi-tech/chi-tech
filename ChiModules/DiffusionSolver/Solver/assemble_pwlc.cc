@@ -30,8 +30,8 @@ void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
   cell_matrix.resize(num_nodes, Row(num_nodes, 0.0));
   cell_rhs.resize(num_nodes, 0.0);
 
-  std::vector<int> dof_global_row_ind(num_nodes, -1);
-  std::vector<int> dof_global_col_ind(num_nodes, -1);
+  std::vector<int64_t> dof_global_row_ind(num_nodes, -1);
+  std::vector<int64_t> dof_global_col_ind(num_nodes, -1);
 
   //========================================= Loop over DOFs
   for (int i=0; i<num_nodes; i++)

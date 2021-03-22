@@ -56,7 +56,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
   auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(spatial_discretization);
 
   size_t num_nodes_to_map = cell_node_component_tuples.size();
-  std::vector<int> mapped_nodes;
+  std::vector<int64_t> mapped_nodes;
   for (size_t n=0; n< num_nodes_to_map; n++)
   {
     auto&    data             = cell_node_component_tuples[n];
@@ -79,7 +79,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
   VecCreateSeq(PETSC_COMM_SELF,mapped_nodes.size()+1,&x_mapped);
   VecSet(x_mapped, 0.0);
 
-  std::vector<int> int_mapping;
+  std::vector<int64_t> int_mapping;
 
   std::copy(mapping.begin(),
             mapping.end(),

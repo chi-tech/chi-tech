@@ -37,29 +37,29 @@ protected:
 
 public:
   virtual
-  void BuildSparsityPattern(std::vector<int>& nodal_nnz_in_diag,
-                            std::vector<int>& nodal_nnz_off_diag,
+  void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
+                            std::vector<int64_t>& nodal_nnz_off_diag,
                             chi_math::UnknownManager& unknown_manager)
                             {}
 
   virtual
-  int MapDOF(const chi_mesh::Cell& cell,
-             unsigned int node,
-             const chi_math::UnknownManager& unknown_manager,
-             unsigned int unknown_id,
-             unsigned int component) const {return 0;}
+  int64_t MapDOF(const chi_mesh::Cell& cell,
+                 unsigned int node,
+                 const chi_math::UnknownManager& unknown_manager,
+                 unsigned int unknown_id,
+                 unsigned int component) const {return 0;}
 
   virtual
-  int MapDOFLocal(const chi_mesh::Cell& cell,
-                  unsigned int node,
-                  const chi_math::UnknownManager& unknown_manager,
-                  unsigned int unknown_id,
-                  unsigned int component) const {return 0;}
+  int64_t MapDOFLocal(const chi_mesh::Cell& cell,
+                      unsigned int node,
+                      const chi_math::UnknownManager& unknown_manager,
+                      unsigned int unknown_id,
+                      unsigned int component) const {return 0;}
 
   virtual
-  int MapDOF(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+  int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
   virtual
-  int MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+  int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
 
   virtual
   size_t GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)

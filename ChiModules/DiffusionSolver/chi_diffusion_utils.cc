@@ -1,10 +1,10 @@
 #include "chi_diffusion.h"
 
-#include "ChiMPI/chi_mpi.h"
-#include <chi_log.h>
-
-extern ChiMPI& chi_mpi;
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "ChiMPI/chi_mpi.h"
+extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Customized monitor for PETSc Krylov sub-space solvers.*/
@@ -25,11 +25,11 @@ KSPMonitorAChiTech(KSP ksp, PetscInt n, PetscReal rnorm, void *monitordestroy)
     char buff[100];
     if (rnorm/rhs_norm < 1.0e-2)
     {
-      snprintf(buff,100,"Diffusion iteration %4d - Residual %.3e\n",n,rnorm/rhs_norm);
+      snprintf(buff,100,"Diffusion iteration %4lld - Residual %.3e\n",n,rnorm/rhs_norm);
     }
     else
     {
-      snprintf(buff,100,"Diffusion iteration %4d - Residual %.7f\n",n,rnorm/rhs_norm);
+      snprintf(buff,100,"Diffusion iteration %4lld - Residual %.7f\n",n,rnorm/rhs_norm);
     }
 
     chi_log.Log(LOG_0) << buff;

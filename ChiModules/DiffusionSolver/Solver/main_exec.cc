@@ -172,7 +172,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
     //=================================== Location wise view
     if (chi_mpi.location_id == 0)
     {
-      int its;
+      int64_t its;
       ierr = KSPGetIterationNumber(ksp,&its);
       chi_log.Log(LOG_0)
         << chi_program_timer.GetTimeString() << " "

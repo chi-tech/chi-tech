@@ -24,14 +24,14 @@ void chi_math::PETScUtils::CopyVecToSTLvector(
 /**Copies global values from a PETSc vector to a STL vector.*/
 void chi_math::PETScUtils::CopyGlobalVecToSTLvector(
   Vec x,
-  const std::vector<int>& global_indices,
+  const std::vector<int64_t>& global_indices,
   std::vector<double> &data)
 {
   //=================================== Populating local indices
   size_t N = global_indices.size();
-  std::vector<int> local_indices(N,0);
-  unsigned int counter=0;
-  for (unsigned int val : global_indices)
+  std::vector<int64_t> local_indices(N,0);
+  size_t counter=0;
+  for (auto val : global_indices)
   {
     local_indices[counter] = counter;
     ++counter;

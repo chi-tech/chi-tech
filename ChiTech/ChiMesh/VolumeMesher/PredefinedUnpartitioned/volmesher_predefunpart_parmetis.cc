@@ -21,7 +21,7 @@ extern ChiMPI& chi_mpi;
 bool chi_mesh::VolumeMesherPredefinedUnpartitioned::
   IsRawCellNeighborToPartitionParmetis(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
-    const std::vector<int>& cell_pids)
+    const std::vector<int64_t>& cell_pids)
 {
   auto handler = chi_mesh::GetCurrentHandler();
 
@@ -50,14 +50,14 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
            chi_mesh::MeshContinuumPtr grid)
 {
   chi_log.Log(LOG_0) << "Partitioning mesh.";
-  std::vector<int> cell_pids(umesh->raw_cells.size(),0);
+  std::vector<int64_t> cell_pids(umesh->raw_cells.size(),0);
   if (chi_mpi.location_id == 0)
   {
     //======================================== Build indices
-    std::vector<int> i_indices(umesh->raw_cells.size()+1,0);
-    std::vector<int> j_indices;
-    int i=-1;
-    int icount = 0;
+    std::vector<int64_t> i_indices(umesh->raw_cells.size()+1,0);
+    std::vector<int64_t> j_indices;
+    int64_t i=-1;
+    int64_t icount = 0;
     for (auto cell : umesh->raw_cells)
     {
       ++i;
@@ -74,15 +74,15 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     chi_log.Log(LOG_0VERBOSE_1) << "Done building indices.";
 
     //======================================== Copy to raw arrays
-    int* i_indices_raw;
-    int* j_indices_raw;
-    PetscMalloc(i_indices.size()*sizeof(int),&i_indices_raw);
-    PetscMalloc(j_indices.size()*sizeof(int),&j_indices_raw);
+    int64_t* i_indices_raw;
+    int64_t* j_indices_raw;
+    PetscMalloc(i_indices.size()*sizeof(int64_t),&i_indices_raw);
+    PetscMalloc(j_indices.size()*sizeof(int64_t),&j_indices_raw);
 
-    for (int j=0; j<i_indices.size(); ++j)
+    for (int64_t j=0; j<i_indices.size(); ++j)
       i_indices_raw[j] = i_indices[j];
 
-    for (int j=0; j<j_indices.size(); ++j)
+    for (int64_t j=0; j<j_indices.size(); ++j)
       j_indices_raw[j] = j_indices[j];
 
     chi_log.Log(LOG_0VERBOSE_1) << "Done copying to raw indices.";
@@ -90,8 +90,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     //========================================= Create adjacency matrix
     Mat Adj; //Adjacency matrix
     MatCreateMPIAdj(PETSC_COMM_SELF,
-                    (int)umesh->raw_cells.size(),
-                    (int)umesh->raw_cells.size(),
+                    (int64_t)umesh->raw_cells.size(),
+                    (int64_t)umesh->raw_cells.size(),
                     i_indices_raw,j_indices_raw,NULL,&Adj);
 
     chi_log.Log(LOG_0VERBOSE_1) << "Done creating adjacency matrix.";
@@ -110,7 +110,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     chi_log.Log(LOG_0VERBOSE_1) << "Done building paritioned index set.";
 
     //========================================= Get cell global indices
-    const int* cell_pids_raw;
+    const int64_t* cell_pids_raw;
     ISGetIndices(is,&cell_pids_raw);
     i=0;
     for (auto cell : umesh->raw_cells)
@@ -127,7 +127,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   //                                         locations
   MPI_Bcast(cell_pids.data(),        //buffer [IN/OUT]
             umesh->raw_cells.size(), //count
-            MPI_INT,                 //data type
+            MPI_LONG_LONG_INT,       //data type
             0,                       //root
             MPI_COMM_WORLD);         //communicator
   chi_log.Log(LOG_0) << "Done partitioning mesh.";

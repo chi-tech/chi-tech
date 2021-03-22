@@ -203,8 +203,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
   file.close();
 
   //======================================== Always do this
+  ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
-  ComputeCentroids();
 }
 
 
