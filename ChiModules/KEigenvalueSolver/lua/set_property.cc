@@ -1,6 +1,6 @@
 #include "ChiLua/chi_lua.h"
 
-#include "ChiModules/KEigenvalueSolver/k_eigenvalue_solver.h"
+#include "KEigenvalueSolver/k_eigenvalue_solver.h"
 
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics& chi_physics_handler;

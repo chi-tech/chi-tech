@@ -8,7 +8,7 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int SpatialDiscretization_PWLC::
+int64_t SpatialDiscretization_PWLC::
   MapDOF(const chi_mesh::Cell& cell,
          const unsigned int node,
          const chi_math::UnknownManager& unknown_manager,
@@ -47,7 +47,7 @@ int SpatialDiscretization_PWLC::
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int SpatialDiscretization_PWLC::
+int64_t SpatialDiscretization_PWLC::
   MapDOFLocal(const chi_mesh::Cell& cell,
               const unsigned int node,
               const chi_math::UnknownManager& unknown_manager,

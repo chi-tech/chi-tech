@@ -53,6 +53,7 @@ void chi_mesh::UnpartitionedMesh::
   cleaner->SetInputData(reader->GetOutput());
   cleaner->Update();
   auto ugrid = cleaner->GetOutput();
+//  auto ugrid = reader->GetOutput();
   int total_cell_count  = ugrid->GetNumberOfCells();
   int total_point_count = ugrid->GetNumberOfPoints();
 
@@ -62,26 +63,57 @@ void chi_mesh::UnpartitionedMesh::
     << total_point_count;
 
   //======================================== Push cells
+  size_t num_polyhedrons  = 0;
+  size_t num_hexahedrons  = 0;
+  size_t num_tetrahedrons = 0;
+  size_t num_polygons     = 0;
+  size_t num_quads        = 0;
+  size_t num_triangles    = 0;
   for (int c=0; c<total_cell_count; ++c)
   {
     auto vtk_cell = ugrid->GetCell(c);
     auto vtk_celltype = vtk_cell->GetCellType();
     if (vtk_celltype == VTK_POLYHEDRON)
+    {
       raw_cells.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
+      ++num_polyhedrons;
+    }
     else if (vtk_celltype == VTK_HEXAHEDRON)
+    {
       raw_cells.push_back(CreateCellFromVTKHexahedron(vtk_cell));
+      ++num_hexahedrons;
+    }
     else if (vtk_celltype == VTK_TETRA)
+    {
       raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
+      ++num_tetrahedrons;
+    }
     else if (vtk_celltype == VTK_POLYGON)
+    {
       raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+      ++num_polygons;
+    }
     else if (vtk_celltype == VTK_QUAD)
+    {
       raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
+      ++num_quads;
+    }
     else if (vtk_celltype == VTK_TRIANGLE)
+    {
       raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
+      ++num_triangles;
+    }
     else
       throw std::invalid_argument(std::string(__FUNCTION__) +
                                   ": Unsupported cell type.");
   }//for c
+  chi_log.Log() << "Number cells read: " << total_cell_count << "\n"
+    << "polyhedrons  : " << num_polyhedrons  << "\n"
+    << "hexahedrons  : " << num_hexahedrons  << "\n"
+    << "tetrahedrons : " << num_tetrahedrons << "\n"
+    << "polygons     : " << num_polygons     << "\n"
+    << "quads        : " << num_quads        << "\n"
+    << "triangles    : " << num_triangles;
 
   //======================================== Push points
   for (int p=0; p<total_point_count; ++p)
@@ -99,6 +131,6 @@ void chi_mesh::UnpartitionedMesh::
   }
 
   //======================================== Always do this
+  ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
-  ComputeCentroids();
 }

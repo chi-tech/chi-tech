@@ -24,19 +24,19 @@ namespace chi_math
     };
 
     //01
-    Vec CreateVector(int local_size, int global_size);
-    void CreateVector(Vec& x, int local_size, int global_size);
+    Vec CreateVector(int64_t local_size, int64_t global_size);
+    void CreateVector(Vec& x, int64_t local_size, int64_t global_size);
 
-    Vec CreateVectorWithGhosts(int local_size, int global_size,
-                               int nghosts,
-                               std::vector<int>& ghost_indices);
+    Vec CreateVectorWithGhosts(int64_t local_size, int64_t global_size,
+                               int64_t nghosts,
+                               std::vector<int64_t>& ghost_indices);
 
     //02
-    Mat CreateSquareMatrix(int local_size, int global_size);
-    void CreateSquareMatrix(Mat& A, int local_size, int global_size);
+    Mat CreateSquareMatrix(int64_t local_size, int64_t global_size);
+    void CreateSquareMatrix(Mat& A, int64_t local_size, int64_t global_size);
     void InitMatrixSparsity(Mat A,
-                            std::vector<int>& nodal_nnz_in_diag,
-                            std::vector<int>& nodal_nnz_off_diag);
+                            std::vector<int64_t>& nodal_nnz_in_diag,
+                            std::vector<int64_t>& nodal_nnz_off_diag);
 
     //03
     PETScSolverSetup CreateCommonKrylovSolverSetup(
@@ -45,7 +45,7 @@ namespace chi_math
       std::string in_solver_type = KSPGMRES,
       std::string in_preconditioner_type = PCNONE,
       double in_relative_residual_tolerance = 1.0e-6,
-      int in_maximum_iterations = 100);
+      int64_t in_maximum_iterations = 100);
 
     PetscErrorCode RelativeResidualConvergenceTest(
       KSP ksp, PetscInt n,
@@ -62,7 +62,7 @@ namespace chi_math
 
     void CopyGlobalVecToSTLvector(
       Vec x,
-      const std::vector<int>& global_indices,
+      const std::vector<int64_t>& global_indices,
       std::vector<double>& data);
 
     void CommunicateGhostEntries(Vec x);

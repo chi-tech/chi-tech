@@ -82,7 +82,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
       for (int i=0; i<cell.vertex_ids.size(); i++)
       {
         double value = 0.0;
-        int ir = -1;
+        int64_t ir = -1;
 
         counter++;
         ir = mapping[counter];

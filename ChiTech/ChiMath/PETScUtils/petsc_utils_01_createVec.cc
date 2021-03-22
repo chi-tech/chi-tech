@@ -17,7 +17,7 @@ VecSetOption(x,VEC_IGNORE_NEGATIVE_INDICES,PETSC_TRUE);
 return x;
 \endcode*/
 Vec chi_math::PETScUtils::
-CreateVector(int local_size, int global_size)
+CreateVector(int64_t local_size, int64_t global_size)
 {
   Vec x;
   VecCreate(PETSC_COMM_WORLD,&x);
@@ -39,7 +39,7 @@ VecSetSizes(x, local_size, global_size);
 VecSetOption(x,VEC_IGNORE_NEGATIVE_INDICES,PETSC_TRUE);
 \endcode*/
 void chi_math::PETScUtils::
-CreateVector(Vec& x, int local_size, int global_size)
+CreateVector(Vec& x, int64_t local_size, int64_t global_size)
 {
   VecCreate(PETSC_COMM_WORLD,&x);
   VecSetType(x,VECMPI);
@@ -65,9 +65,9 @@ VecSetOption(x,VEC_IGNORE_NEGATIVE_INDICES,PETSC_TRUE);
 return x;
 \endcode*/
 Vec chi_math::PETScUtils::
-CreateVectorWithGhosts(int local_size, int global_size,
-                       int nghosts,
-                       std::vector<int>& ghost_indices)
+CreateVectorWithGhosts(int64_t local_size, int64_t global_size,
+                       int64_t nghosts,
+                       std::vector<int64_t>& ghost_indices)
 {
   Vec x;
   VecCreateGhost(PETSC_COMM_WORLD,

@@ -18,7 +18,7 @@ MatSetSizes(A,local_size, local_size,
 \endcode
 
 */
-Mat chi_math::PETScUtils::CreateSquareMatrix(int local_size, int global_size)
+Mat chi_math::PETScUtils::CreateSquareMatrix(int64_t local_size, int64_t global_size)
 {
   Mat A;
   MatCreate(PETSC_COMM_WORLD,&A);
@@ -42,7 +42,7 @@ MatSetSizes(A,local_size, local_size,
 
 */
 void chi_math::PETScUtils::
-CreateSquareMatrix(Mat& A, int local_size, int global_size)
+CreateSquareMatrix(Mat& A, int64_t local_size, int64_t global_size)
 {
   MatCreate(PETSC_COMM_WORLD,&A);
   MatSetType(A,MATMPIAIJ);
@@ -64,8 +64,8 @@ MatSetUp(A);
 */
 void chi_math::PETScUtils::InitMatrixSparsity(
   Mat A,
-  std::vector<int>& nodal_nnz_in_diag,
-  std::vector<int>& nodal_nnz_off_diag)
+  std::vector<int64_t>& nodal_nnz_in_diag,
+  std::vector<int64_t>& nodal_nnz_off_diag)
 {
   MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
                             0,nodal_nnz_off_diag.data());

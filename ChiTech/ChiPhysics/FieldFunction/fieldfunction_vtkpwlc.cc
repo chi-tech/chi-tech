@@ -125,7 +125,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
       for (int v=0; v<num_verts; v++)
       {
         counter++;
-        int ir = mapping[counter];
+        int64_t ir = mapping[counter];
         double dof_value = 0.0;
         VecGetValues(phi_vec,1,&ir,&dof_value);;
         cell_avg_value+= dof_value;
@@ -164,7 +164,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
       for (int v=0; v<num_verts; v++)
       {
         counter++;
-        int ir = mapping[counter];
+        int64_t ir = mapping[counter];
         double dof_value = 0.0;
         VecGetValues(phi_vec,1,&ir,&dof_value);;
         cell_avg_value+= dof_value;
@@ -222,7 +222,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
       for (int v=0; v<num_verts; v++)
       {
         counter++;
-        int ir = mapping[counter];
+        int64_t ir = mapping[counter];
         double dof_value = 0.0;
         VecGetValues(phi_vec,1,&ir,&dof_value);;
         cell_avg_value+= dof_value;
@@ -373,7 +373,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
         for (int v=0; v<num_verts; v++)
         {
           counter++;
-          int ir = mapping[counter];
+          int64_t ir = mapping[counter];
           double dof_value = 0.0;
           VecGetValues(phi_vec,1,&ir,&dof_value);;
           cell_avg_value+= dof_value;
@@ -418,7 +418,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
         for (int v=0; v<num_verts; v++)
         {
           counter++;
-          int ir = (int)mapping[counter]+g;
+          int64_t ir = mapping[counter]+g;
           double dof_value = 0.0;
           VecGetValues(phi_vec,1,&ir,&dof_value);;
           cell_avg_value+= dof_value;
@@ -479,7 +479,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLCG(const std::string& base_name,
         for (int v=0; v<num_verts; v++)
         {
           counter++;
-          int ir = mapping[counter];
+          int64_t ir = mapping[counter];
           double dof_value = 0.0;
           VecGetValues(phi_vec,1,&ir,&dof_value);;
           cell_avg_value+= dof_value;

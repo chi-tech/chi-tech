@@ -71,6 +71,7 @@ def run_test(file_name, comment, num_procs,
     else:
         print(" - FAILED!")
         num_failed += 1
+        print(out)
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
@@ -145,6 +146,12 @@ run_test(
     comment="3D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29632, 1.0e-4]])
+
+run_test(
+    file_name="Diffusion3D_4VTU",
+    comment="3D Diffusion Test VTU Mesh - CFEM",
+    num_procs=4,
+    search_strings_vals_tols=[["[0]  Max-value=", 0.07373, 1.0e-6]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Transport cases
 run_test(

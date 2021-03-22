@@ -1,7 +1,5 @@
 message (STATUS "Loading Downstream.cmake")
 
-set(CHI_TECH_DIR "${CMAKE_CURRENT_LIST_DIR}/../../")
-
 if(UNIX AND NOT APPLE)
     add_definitions(-DUNIX_ENV)
 elseif(APPLE)
@@ -12,6 +10,17 @@ else()
 endif()
 
 #------------------------------------------------ DEPENDENCIES
+if (NOT DEFINED CHI_TECH_DIR)
+    if (NOT (DEFINED ENV{CHI_TECH_DIR}))
+        message(FATAL_ERROR "***** CHI_TECH_DIR is not set *****")
+    else()
+        set(CHI_TECH_DIR    "$ENV{CHI_TECH_DIR}")
+    endif()
+endif()
+message(STATUS "CHI_TECH_DIR set to ${CHI_TECH_DIR}")
+
+include("${CHI_TECH_DIR}/bin/config.cmake")
+
 if (NOT DEFINED PETSC_ROOT)
     if (NOT (DEFINED ENV{PETSC_ROOT}))
         message(FATAL_ERROR "***** PETSC_ROOT is not set *****")
@@ -31,9 +40,12 @@ endif()
 message(STATUS "LUA_ROOT set to ${LUA_ROOT}")
 
 find_package(MPI)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CHI_TECH_DIR}/ChiResources/Macros")
 
+#================================================ Include macros
 include(GNUInstallDirs)
-include(${CHI_TECH_DIR}/ChiResources/Macros/Filter.cmake)
+include(Filter)
+include(Checks)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -50,15 +62,12 @@ include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
 
-
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
 link_directories("${PETSC_ROOT}/lib")
 link_directories("${CHI_TECH_DIR}/chi_build")
-
 
 # --------------------------- VTK
 find_package(VTK COMPONENTS

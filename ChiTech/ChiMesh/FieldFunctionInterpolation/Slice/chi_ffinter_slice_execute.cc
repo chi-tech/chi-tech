@@ -66,7 +66,7 @@ CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping)
     for (int is=0; is<num_is; is++)
     {
       double value = 0.0;
-      int ir = -1;
+      int64_t ir = -1;
 
       counter++;
       ir = mapping[counter];
