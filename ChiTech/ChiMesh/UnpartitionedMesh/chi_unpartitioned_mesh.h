@@ -62,7 +62,7 @@ public:
   LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
 
   void BuildMeshConnectivity();
-  void ComputeCentroids();
+  void ComputeCentroidsAndCheckQuality();
 
   void ReadFromVTU(const Options& options);
   void ReadFromEnsightGold(const Options& options);

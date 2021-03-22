@@ -214,6 +214,6 @@ void chi_mesh::UnpartitionedMesh::
   }
 
   //======================================== Always do this
+  ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
-  ComputeCentroids();
 }

@@ -282,6 +282,7 @@ def InstallPETSc():
         "--download-parmetis=1 " \
         "--download-superlu_dist=1 " \
         "--with-cxx-dialect=C++11 " \
+        "--with-64-bit-indices " \
         "CFLAGS='-fPIC -fopenmp' " \
         "CXXFLAGS='-fPIC -fopenmp' " \
         "FFLAGS='-fPIC -fopenmp' " \
