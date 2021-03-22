@@ -224,7 +224,7 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
   for (auto& vec : vertex_ijk_to_i_map)
     vec.resize(Nx,VecInt(Nz));
 
-  umesh->vertices.reserve(Nx*Ny);
+  umesh->vertices.reserve(Nx*Ny*Nz);
   int c=-1;
   for (int i=0; i<Ny; ++i)
   {

@@ -340,7 +340,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
   {
     cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
     for (auto vid : cell->vertex_ids)
-      cell->centroid = cell->centroid + *vertices[vid];
+      cell->centroid += *vertices[vid];
 
     cell->centroid = cell->centroid/(cell->vertex_ids.size());
   }
@@ -357,18 +357,17 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
           face_centroid += *vertices[vid];
         face_centroid /= face.vertex_ids.size();
 
-        if (face.vertex_ids.size()<3)
+        if (face.vertex_ids.size()<2)
           throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-            ": cell-center-to-face check encountered face with less than"
-            " 3 vertices on a face, making normal computation impossible.");
+                                 ": cell-center-to-face check encountered face with less than"
+                                 " 2 vertices on a face, making normal computation impossible.");
 
-        const auto& fv0 = face_centroid;
         const auto& fv1 = *vertices[face.vertex_ids[0]];
         const auto& fv2 = *vertices[face.vertex_ids[1]];
 
-        auto E0 = fv1-fv0;
-        auto E1 = fv2-fv0;
-        auto n  = E1.Cross(E0); n.Normalize();
+        auto E0 = fv1-face_centroid;
+        auto E1 = fv2-face_centroid;
+        auto n  = E0.Cross(E1); n.Normalize();
 
         auto CC = face_centroid - cell->centroid;
 
@@ -379,7 +378,8 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
           face.vertex_ids = reversed_verts;
           ++check0_corrections;
         }
-      }
+      }//for face
+
   if (check0_corrections > 0)
     chi_log.Log(LOG_ALLWARNING)
       << "Cell-center-to-face orientation detected " << check0_corrections
