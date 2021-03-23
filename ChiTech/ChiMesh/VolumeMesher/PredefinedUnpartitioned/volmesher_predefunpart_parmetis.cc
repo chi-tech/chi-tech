@@ -53,74 +53,78 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   std::vector<int64_t> cell_pids(umesh->raw_cells.size(),0);
   if (chi_mpi.location_id == 0)
   {
-    //======================================== Build indices
-    std::vector<int64_t> i_indices(umesh->raw_cells.size()+1,0);
-    std::vector<int64_t> j_indices;
-    int64_t i=-1;
-    int64_t icount = 0;
-    for (auto cell : umesh->raw_cells)
+    if (umesh->raw_cells.size() > 1)
     {
-      ++i;
-      i_indices[i] = icount;
+      //======================================== Build indices
+      std::vector<int64_t> i_indices(umesh->raw_cells.size()+1,0);
+      std::vector<int64_t> j_indices;
+      int64_t i=-1;
+      int64_t icount = 0;
+      for (auto cell : umesh->raw_cells)
+      {
+        ++i;
+        i_indices[i] = icount;
 
-      for (auto& face : cell->faces)
-        if (face.neighbor >= 0)
-        {
-          j_indices.push_back(face.neighbor);
-          ++icount;
-        }
-    }
-    i_indices[i+1] = icount;
-    chi_log.Log(LOG_0VERBOSE_1) << "Done building indices.";
+        for (auto& face : cell->faces)
+          if (face.neighbor >= 0)
+          {
+            j_indices.push_back(face.neighbor);
+            ++icount;
+          }
+      }
+      i_indices[i+1] = icount;
+      chi_log.Log(LOG_0VERBOSE_1) << "Done building indices.";
 
-    //======================================== Copy to raw arrays
-    int64_t* i_indices_raw;
-    int64_t* j_indices_raw;
-    PetscMalloc(i_indices.size()*sizeof(int64_t),&i_indices_raw);
-    PetscMalloc(j_indices.size()*sizeof(int64_t),&j_indices_raw);
+      //======================================== Copy to raw arrays
+      int64_t* i_indices_raw;
+      int64_t* j_indices_raw;
+      PetscMalloc(i_indices.size()*sizeof(int64_t),&i_indices_raw);
+      PetscMalloc(j_indices.size()*sizeof(int64_t),&j_indices_raw);
 
-    for (int64_t j=0; j<i_indices.size(); ++j)
-      i_indices_raw[j] = i_indices[j];
+      for (int64_t j=0; j<i_indices.size(); ++j)
+        i_indices_raw[j] = i_indices[j];
 
-    for (int64_t j=0; j<j_indices.size(); ++j)
-      j_indices_raw[j] = j_indices[j];
+      for (int64_t j=0; j<j_indices.size(); ++j)
+        j_indices_raw[j] = j_indices[j];
 
-    chi_log.Log(LOG_0VERBOSE_1) << "Done copying to raw indices.";
+      chi_log.Log(LOG_0VERBOSE_1) << "Done copying to raw indices.";
 
-    //========================================= Create adjacency matrix
-    Mat Adj; //Adjacency matrix
-    MatCreateMPIAdj(PETSC_COMM_SELF,
-                    (int64_t)umesh->raw_cells.size(),
-                    (int64_t)umesh->raw_cells.size(),
-                    i_indices_raw,j_indices_raw,NULL,&Adj);
+      //========================================= Create adjacency matrix
+      Mat Adj; //Adjacency matrix
+      MatCreateMPIAdj(PETSC_COMM_SELF,
+                      (int64_t)umesh->raw_cells.size(),
+                      (int64_t)umesh->raw_cells.size(),
+                      i_indices_raw,j_indices_raw,NULL,&Adj);
 
-    chi_log.Log(LOG_0VERBOSE_1) << "Done creating adjacency matrix.";
+      chi_log.Log(LOG_0VERBOSE_1) << "Done creating adjacency matrix.";
 
-    //========================================= Create partitioning
-    MatPartitioning part;
-    IS is,isg;
-    MatPartitioningCreate(MPI_COMM_SELF,&part);
-    MatPartitioningSetAdjacency(part,Adj);
-    MatPartitioningSetType(part,"parmetis");
-    MatPartitioningSetNParts(part,chi_mpi.process_count);
-    MatPartitioningApply(part,&is);
-    MatPartitioningDestroy(&part);
-    MatDestroy(&Adj);
-    ISPartitioningToNumbering(is,&isg);
-    chi_log.Log(LOG_0VERBOSE_1) << "Done building paritioned index set.";
+      //========================================= Create partitioning
+      MatPartitioning part;
+      IS is,isg;
+      MatPartitioningCreate(MPI_COMM_SELF,&part);
+      MatPartitioningSetAdjacency(part,Adj);
+      MatPartitioningSetType(part,"parmetis");
+      MatPartitioningSetNParts(part,chi_mpi.process_count);
+      MatPartitioningApply(part,&is);
+      MatPartitioningDestroy(&part);
+      MatDestroy(&Adj);
+      ISPartitioningToNumbering(is,&isg);
+      chi_log.Log(LOG_0VERBOSE_1) << "Done building paritioned index set.";
 
-    //========================================= Get cell global indices
-    const int64_t* cell_pids_raw;
-    ISGetIndices(is,&cell_pids_raw);
-    i=0;
-    for (auto cell : umesh->raw_cells)
-    {
-      cell_pids[i] = cell_pids_raw[i];
-      ++i;
-    }
-    ISRestoreIndices(is,&cell_pids_raw);
+      //========================================= Get cell global indices
+      const int64_t* cell_pids_raw;
+      ISGetIndices(is,&cell_pids_raw);
+      i=0;
+      for (auto cell : umesh->raw_cells)
+      {
+        cell_pids[i] = cell_pids_raw[i];
+        ++i;
+      }
+      ISRestoreIndices(is,&cell_pids_raw);
 
-    chi_log.Log(LOG_0VERBOSE_1) << "Done retrieving cell global indices.";
+      chi_log.Log(LOG_0VERBOSE_1) << "Done retrieving cell global indices.";
+    }//if more than 1 cell
+
   }
 
   //======================================== Broadcast partitioning to all
