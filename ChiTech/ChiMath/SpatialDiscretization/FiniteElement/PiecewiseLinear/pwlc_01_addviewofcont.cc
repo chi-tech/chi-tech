@@ -74,7 +74,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
   //                                                 for each cell
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::COMPUTE_CELL_VIEWS)
+    if (setup_flags & SetupFlags::COMPUTE_CELL_MAPPINGS)
     {
       chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                                   << " Computing unit integrals.";
@@ -118,7 +118,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
   //============================================= Quadrature data
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::INIT_QP_DATA)
+    if (setup_flags & SetupFlags::COMPUTE_QP_DATA)
     {
       chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                                   << " Computing quadrature data.";
