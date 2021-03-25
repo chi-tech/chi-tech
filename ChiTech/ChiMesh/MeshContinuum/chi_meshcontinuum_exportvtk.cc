@@ -57,15 +57,11 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     for (auto vid : cell.vertex_ids)
       cfem_nodes.push_back(vid);
 
-  chi_log.Log() << "Check A";
-
   //======================================== Populate cell information
   int nc=0;
   for (const auto& cell : grid->local_cells)
   {
     int mat_id = cell.material_id;
-
-    chi_log.Log() << "cell";
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell.Type() == chi_mesh::CellType::SLAB)
@@ -97,7 +93,6 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      chi_log.Log() << "Polygon cell.";
       auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
       int num_verts = poly_cell->vertex_ids.size();
