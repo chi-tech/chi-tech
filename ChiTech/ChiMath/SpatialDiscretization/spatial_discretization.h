@@ -11,10 +11,11 @@
 class SpatialDiscretization
 {
 public:
-  int dim;
+  const int dim;
   const chi_math::SpatialDiscretizationType type;
 
   const chi_mesh::MeshContinuumPtr ref_grid;
+  const chi_math::CoordinateSystemType cs_type;
 
 protected:
   typedef chi_math::SpatialDiscretizationType SDMType;
@@ -24,10 +25,12 @@ protected:
   explicit
   SpatialDiscretization(int in_dim,
                         chi_mesh::MeshContinuumPtr& in_grid,
+                        chi_math::CoordinateSystemType in_cs_type,
                         SDMType in_type = SDMType::UNDEFINED) :
     dim(in_dim),
     type(in_type),
-    ref_grid(in_grid)
+    ref_grid(in_grid),
+    cs_type(in_cs_type)
   {
   }
 
