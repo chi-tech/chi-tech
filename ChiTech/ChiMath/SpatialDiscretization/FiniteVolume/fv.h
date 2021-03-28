@@ -30,15 +30,18 @@ public:
 
 private:
   explicit
-  SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr& in_grid);
+  SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr& in_grid,
+                           chi_math::CoordinateSystemType in_cs_type);
 
 public:
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_FV>
-  New(chi_mesh::MeshContinuumPtr& in_grid)
+  New(chi_mesh::MeshContinuumPtr& in_grid,
+      chi_math::CoordinateSystemType in_cs_type =
+      chi_math::CoordinateSystemType::CARTESIAN)
   { return std::shared_ptr<SpatialDiscretization_FV>(
-    new SpatialDiscretization_FV(in_grid));}
+    new SpatialDiscretization_FV(in_grid, in_cs_type));}
 
   //01
   void PreComputeCellSDValues() override;
