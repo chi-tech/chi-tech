@@ -46,8 +46,15 @@ public:
 
 namespace chi_math
 {
-
-
+  /**Coordinate system type.*/
+  enum class CoordinateSystemType
+  {
+    UNDEFINED   = 0,
+    CARTESIAN   = 1,
+  //CYLINDRICAL = 2,
+  //SPHERICAL   = 3,
+  };
+  /**Spatial discretization type.*/
   enum class SpatialDiscretizationType
   {
     UNDEFINED                      = 0,
