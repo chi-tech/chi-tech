@@ -8,9 +8,6 @@ void KEigenvalue::Solver::InitializeKSolver()
   // ----- General LBS init
   Initialize();
 
-  // ----- Number of groups
-  num_groups = material_xs[0]->G;
-
   // ----- Number of precursors
   // NOTE: This is only applicable for problems where 
   // precursors only live within one material.
