@@ -103,10 +103,10 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
         
       if (si_converged)
         si_iter_info << " CONVERGED\n";
-      chi_log.Log(LOG_ALLVERBOSE_2) << si_iter_info.str();
+      chi_log.Log(LOG_0VERBOSE_1) << si_iter_info.str();
 
       if (si_converged) {
-        chi_log.Log(LOG_ALLVERBOSE_1)
+        chi_log.Log(LOG_0VERBOSE_1)
             << "\nSource iterations converged in "
             << si_nit << " iteratrions.\n";
         break;
