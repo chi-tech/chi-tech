@@ -36,9 +36,19 @@ public:
   std::vector<double>                            weights;
   std::vector<chi_mesh::Vector3>                 omegas;
 
+  struct HarmonicIndices
+  {
+    unsigned int ell=0;
+    int          m=0;
+
+    HarmonicIndices()=default;
+    HarmonicIndices(unsigned int in_ell, int in_m) : ell(in_ell),m(in_m){}
+  };
+
 protected:
   std::vector<std::vector<double>> d2m_op;
   std::vector<std::vector<double>> m2d_op;
+  std::vector<HarmonicIndices>     m_to_ell_em_map;
   bool                             d2m_op_built = false;
   bool                             m2d_op_built = false;
 
@@ -59,20 +69,18 @@ public:
                        std::vector<double>& polar,
                        std::vector<double>& in_weights, bool verbose=false);
 
-  virtual void BuildDiscreteToMomentOperator(int scatt_order, bool oneD);
-  virtual void BuildMomentToDiscreteOperator(int scatt_order, bool oneD);
+  virtual void MakeHarmonicIndices(int scatt_order, int dimension);
+  virtual void BuildDiscreteToMomentOperator(int scatt_order, int dimension);
+  virtual void BuildMomentToDiscreteOperator(int scatt_order, int dimension);
 
-  std::vector<std::vector<double>>&
-  GetDiscreteToMomentOperator() {return d2m_op;}
   std::vector<std::vector<double>> const&
   GetDiscreteToMomentOperator() const {return d2m_op;}
 
-  std::vector<std::vector<double>>&
-  GetMomentToDiscreteOperator() {return m2d_op;}
   std::vector<std::vector<double>> const&
   GetMomentToDiscreteOperator() const {return m2d_op;}
 
-
+  const std::vector<HarmonicIndices>&
+  GetMomentToHarmonicsIndexMap() {return m_to_ell_em_map;}
 };
 
 #endif

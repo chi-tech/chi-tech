@@ -48,16 +48,17 @@ void LBSGroupset::BuildDiscMomOperator(
   int scatt_order,
   LinearBoltzmann::GeometryType geometry_type)
 {
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D Slab
   if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB)
   {
-    quadrature->BuildDiscreteToMomentOperator(scatt_order,true);
+    quadrature->BuildDiscreteToMomentOperator(scatt_order,1);
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
-  else if ((geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN) or
-           (geometry_type == LinearBoltzmann::GeometryType::THREED_CARTESIAN) )
+  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN)
   {
-    quadrature->BuildDiscreteToMomentOperator(scatt_order,false);
+    quadrature->BuildDiscreteToMomentOperator(scatt_order,2);
+  }
+  else if (geometry_type == LinearBoltzmann::GeometryType::THREED_CARTESIAN)
+  {
+    quadrature->BuildDiscreteToMomentOperator(scatt_order,3);
   }
 }
 
@@ -67,16 +68,17 @@ void LBSGroupset::BuildMomDiscOperator(
   int scatt_order,
   LinearBoltzmann::GeometryType geometry_type)
 {
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 1D Slab
   if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB)
   {
-    quadrature->BuildMomentToDiscreteOperator(scatt_order,true);
+    quadrature->BuildMomentToDiscreteOperator(scatt_order,1);
   }
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D and 3D
-  else if ((geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN) or
-           (geometry_type == LinearBoltzmann::GeometryType::THREED_CARTESIAN) )
+  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN)
   {
-    quadrature->BuildMomentToDiscreteOperator(scatt_order,false);
+    quadrature->BuildMomentToDiscreteOperator(scatt_order,2);
+  }
+  else if (geometry_type == LinearBoltzmann::GeometryType::THREED_CARTESIAN)
+  {
+    quadrature->BuildMomentToDiscreteOperator(scatt_order,3);
   }
 }
 
