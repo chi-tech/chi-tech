@@ -55,12 +55,11 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Single angle aggr.
   if (groupset.angleagg_method == LinearBoltzmann::AngleAggregationType::SINGLE)
   {
-    for (auto& angle : groupset.quadrature->abscissae)
+    for (const auto& omega : groupset.quadrature->omegas)
     {
       auto new_swp_order =
         chi_mesh::sweep_management::
-        CreateSweepOrder(angle.theta,
-                         angle.phi,
+        CreateSweepOrder(omega,
                          this->grid,
                          groupset.allow_cycles);
       groupset.sweep_orderings.push_back(new_swp_order);
@@ -88,16 +87,14 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
 
       auto new_swp_order =
         chi_mesh::sweep_management::
-        CreateSweepOrder(product_quadrature->polar_ang[0],
-                         product_quadrature->azimu_ang[0],
+        CreateSweepOrder(product_quadrature->omegas[product_quadrature->GetAngleNum(0, 0)],
                          this->grid,
                          groupset.allow_cycles);
       groupset.sweep_orderings.push_back(new_swp_order);
 
       new_swp_order =
         chi_mesh::sweep_management::
-        CreateSweepOrder(product_quadrature->polar_ang[pa],
-                         product_quadrature->azimu_ang[0],
+        CreateSweepOrder(product_quadrature->omegas[product_quadrature->GetAngleNum(pa, 0)],
                          this->grid,
                          groupset.allow_cycles);
       groupset.sweep_orderings.push_back(new_swp_order);
@@ -146,8 +143,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
       {
         auto new_swp_order =
           chi_mesh::sweep_management::
-          CreateSweepOrder(product_quadrature->polar_ang[pa-1],
-                           product_quadrature->azimu_ang[i],
+          CreateSweepOrder(product_quadrature->omegas[product_quadrature->GetAngleNum(pa-1, i)],
                            this->grid,
                            groupset.allow_cycles);
         groupset.sweep_orderings.push_back(new_swp_order);
@@ -157,8 +153,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
       {
         auto new_swp_order =
           chi_mesh::sweep_management::
-          CreateSweepOrder(product_quadrature->polar_ang[pa],
-                           product_quadrature->azimu_ang[i],
+          CreateSweepOrder(product_quadrature->omegas[product_quadrature->GetAngleNum(pa, i)],
                            this->grid,
                            groupset.allow_cycles);
         groupset.sweep_orderings.push_back(new_swp_order);
