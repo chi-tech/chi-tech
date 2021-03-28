@@ -63,7 +63,8 @@ private:
   explicit
   SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr& in_grid,
                              chi_math::finite_element::SetupFlags setup_flags,
-                             chi_math::QuadratureOrder qorder);
+                             chi_math::QuadratureOrder qorder,
+                             chi_math::CoordinateSystemType in_cs_type);
 
 public:
   //prevent anything else other than a shared pointer
@@ -73,11 +74,13 @@ public:
       chi_math::finite_element::SetupFlags setup_flags=
       chi_math::finite_element::SetupFlags::NO_FLAGS_SET,
       chi_math::QuadratureOrder qorder =
-      chi_math::QuadratureOrder::SECOND)
+      chi_math::QuadratureOrder::SECOND,
+      chi_math::CoordinateSystemType in_cs_type =
+      chi_math::CoordinateSystemType::CARTESIAN)
   { if (in_grid == nullptr) throw std::invalid_argument(
       "Null supplied as grid to SpatialDiscretization_PWLC.");
     return std::shared_ptr<SpatialDiscretization_PWLC>(
-      new SpatialDiscretization_PWLC(in_grid,setup_flags,qorder));}
+    new SpatialDiscretization_PWLC(in_grid, setup_flags, qorder, in_cs_type));}
 
   //01
 private:
