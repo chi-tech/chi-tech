@@ -1,13 +1,6 @@
 #include "legendrepoly.h"
+
 #include <cmath>
-
-double fac(int x)
-{
-  if (x==0) return 1;
-  if (x==1) return 1;
-
-  return fac(x-1)*x;
-}
 
 //###################################################################
 /**Implementation of the tesseral spherical harmonics.
@@ -15,26 +8,35 @@ double fac(int x)
  * This code has a whitepaper associated with it
  * <a href="SphericalHarmonics.pdf" target="_blank"><b>Spherical Harmonics</b></a>
  * */
-double chi_math::Ylm(int ell, int m, double varphi, double theta)
+double chi_math::Ylm(unsigned int ell, int m, double varphi, double theta)
 {
-  double el = 1.0*ell;
-  double em = 1.0*m;
+  auto fac = [](unsigned int x)
+  {
+    if (x==0) return 1;
+    if (x==1) return 1;
 
-  if (em<0)
+    int factorial = 1;
+    for (int i=2; i<=x; ++i)
+      factorial *= i;
+
+    return factorial;
+  };
+
+  if (m<0)
   {
-    return sqrt( ( 2.0 ) * fac(el-std::fabs(em))/fac(el+std::fabs(em)) )*
-           AssocLegendre(el,std::fabs(em),cos(theta))*
-           sin(std::fabs(em)*varphi);
+    return sqrt( ( 2.0 ) * fac(ell-std::abs(m))/fac(ell+std::abs(m)) )*
+           AssocLegendre(ell,std::abs(m),cos(theta))*
+           sin(std::fabs(m)*varphi);
   }
-  else if(em==0)
+  else if(m==0)
   {
-    return AssocLegendre(el,em,cos(theta));
+    return AssocLegendre(ell,m,cos(theta));
   }
   else
   {
-    return  sqrt( ( 2.0 ) * fac(el-em)/fac(el+em) )*
-            AssocLegendre(el,em,cos(theta))*
-            cos(em*varphi);
+    return  sqrt( ( 2.0 ) * fac(ell-m)/fac(ell+m) )*
+            AssocLegendre(ell,m,cos(theta))*
+            cos(m*varphi);
   }
 
   return 0.0;
