@@ -70,7 +70,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
   //                                                 for each cell
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::COMPUTE_CELL_VIEWS)
+    if (setup_flags & SetupFlags::COMPUTE_CELL_MAPPINGS)
     {
       if (!mapping_initialized)
       {
@@ -115,7 +115,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
   //============================================= Quadrature data
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::INIT_QP_DATA)
+    if (setup_flags & SetupFlags::COMPUTE_QP_DATA)
     {
       if (not qp_data_initialized)
       {
@@ -146,7 +146,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
   //================================================== Populate cell fe views
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::COMPUTE_CELL_VIEWS)
+    if (setup_flags & SetupFlags::COMPUTE_CELL_MAPPINGS)
     {
       if (not nb_mapping_initialized)
       {
@@ -195,7 +195,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
   //============================================= Quadrature data
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::INIT_QP_DATA)
+    if (setup_flags & SetupFlags::COMPUTE_QP_DATA)
     {
       if (not nb_qp_data_initialized)
       {

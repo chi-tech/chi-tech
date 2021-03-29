@@ -220,7 +220,7 @@ run_test(
     file_name="KEigenvalueTransport1D_1G",
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
-    search_strings_vals_tols=[["[0]          Final k-eigenvalue    :", 0.997501, 1.0e-5]])
+    search_strings_vals_tols=[["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
 print("")

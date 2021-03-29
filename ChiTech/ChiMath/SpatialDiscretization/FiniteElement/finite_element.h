@@ -14,9 +14,9 @@ namespace finite_element
   enum SetupFlags : int
   {
     NO_FLAGS_SET           = 0,
-    COMPUTE_CELL_VIEWS     = (1 << 0),
+    COMPUTE_CELL_MAPPINGS  = (1 << 0),
     COMPUTE_UNIT_INTEGRALS = (1 << 1),
-    INIT_QP_DATA           = (1 << 2)
+    COMPUTE_QP_DATA        = (1 << 2)
   };
 
   inline SetupFlags
