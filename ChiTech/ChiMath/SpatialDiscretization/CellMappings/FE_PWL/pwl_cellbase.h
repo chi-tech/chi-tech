@@ -72,6 +72,16 @@ public:
     gradshape_values.resize(num_nodes, chi_mesh::Vector3());
   }
   virtual ~CellMappingFE_PWL() = default;
+
+protected:
+  /** Spatial weight function. See also ComputeWeightedUnitIntegrals. */
+  virtual double SpatialWeightFunction(const chi_mesh::Vector3& pt) const
+  { return static_cast<double>(0); }
+  /** Compute spatially-weighted unit integrals from quadrature point data.
+   *  Spatial weighting is given by SpatialWeightFunction evaluated at
+   *  the real quadrature points. */
+  void
+  ComputeWeightedUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const;
 };
 
 
