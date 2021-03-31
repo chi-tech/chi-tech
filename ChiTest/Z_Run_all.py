@@ -20,6 +20,9 @@ print("")
 test_number = 0
 num_failed = 0
 
+# Determine if we are on TACC (each test will require a separate job)
+hostname = subprocess.check_output(['hostname']).decode('utf-8')
+tacc = True if "tacc.utexas.edu" in hostname else False
 
 def format3(number):
     return "{:3d}".format(number)
@@ -28,22 +31,8 @@ def format3(number):
 def format_filename(filename):
     return "{:35s}".format(filename)
 
-
-def run_test(file_name, comment, num_procs,
-             search_strings_vals_tols):
-    global test_number
+def parse_output(out, search_strings_vals_tols):
     global num_failed
-    test_number += 1
-    test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
-    print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
-    process = subprocess.Popen(["mpiexec", "-np", str(num_procs), kpath_to_exe,
-                                "ChiTest/" + file_name + ".lua", "master_export=false"],
-                               cwd=kchi_src_pth,
-                               stdout=subprocess.PIPE,
-                               universal_newlines=True)
-    process.wait()
-    out, err = process.communicate()
-
     test_passed = True
     for search in search_strings_vals_tols:
         find_str = search[0]
@@ -73,6 +62,62 @@ def run_test(file_name, comment, num_procs,
         num_failed += 1
         print(out)
 
+    return test_passed
+
+def run_test_tacc(file_name, comment, num_procs,
+		search_strings_vals_tols):
+    test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
+    print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
+    with open(f"ChiTest/{file_name}.job", 'w') as job_file:
+        job_file.write(
+f"""#!/usr/bin/bash
+#
+#SBATCH -J {file_name} # Job name
+#SBATCH -o ChiTest/{file_name}.o # output file
+#SBATCH -e ChiTest/{file_name}.e # error file
+#SBATCH -p skx-normal # Queue (partition) name
+#SBATCH -N {num_procs // 48 + 1} # Total # of nodes
+#SBATCH -n {num_procs} # Total # of mpi tasks
+#SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
+#SBATCH -A Massively-Parallel-R # Allocation name (req'd if you have more than 1)
+
+ibrun {kpath_to_exe} ChiTest/{file_name}.lua master_export=false"""
+        )
+    os.system(f"sbatch -W ChiTest/{file_name}.job > /dev/null")  # -W means wait for job to finish
+    with open(f"ChiTest/{file_name}.o", 'r') as outfile:
+        out = outfile.read()
+
+    passed = parse_output(out, search_strings_vals_tols)
+
+    # Cleanup
+    if passed:
+        os.system(f"rm ChiTest/{file_name}.job ChiTest/{file_name}.o ChiTest/{file_name}.e")
+
+
+def run_test_local(file_name, comment, num_procs,
+		search_strings_vals_tols):
+    test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
+    print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
+    process = subprocess.Popen(["mpiexec", "-np", str(num_procs), kpath_to_exe,
+                                "ChiTest/" + file_name + ".lua", "master_export=false"],
+                               cwd=kchi_src_pth,
+                               stdout=subprocess.PIPE,
+                               universal_newlines=True)
+    process.wait()
+    out, err = process.communicate()
+
+    parse_output(out, search_strings_vals_tols)
+
+def run_test(file_name, comment, num_procs,
+		search_strings_vals_tols):
+    global test_number
+    test_number += 1
+    if tacc:
+        run_test_tacc(file_name, comment, num_procs,
+			search_strings_vals_tols)
+    else:
+        run_test_local(file_name, comment, num_procs,
+			search_strings_vals_tols)
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
 run_test(
