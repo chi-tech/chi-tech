@@ -16,6 +16,8 @@ int chiCutMesh(lua_State* L)
   LuaCheckNilValue(fname,L,1);
   LuaCheckNilValue(fname,L,2);
 
+  lua_isn
+
   std::vector<double> p_raw;
   std::vector<double> n_raw;
   LuaPopulateVectorFrom1DArray(fname,L,1,p_raw);

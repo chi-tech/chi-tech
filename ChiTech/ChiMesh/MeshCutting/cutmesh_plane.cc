@@ -9,54 +9,6 @@ extern ChiLog& chi_log;
 #include <algorithm>
 
 //###################################################################
-/**Make an edge for a polygon given its edge index.*/
-std::pair<uint64_t,uint64_t> chi_mesh::mesh_cutting::
-  MakeEdgeFromPolygonEdgeIndex(const chi_mesh::Cell &cell, int edge_index)
-{
-  int e = edge_index;
-  size_t num_verts = cell.vertex_ids.size();
-
-  int next_v = (e < (num_verts-1)) ? e+1 : 0;
-  uint64_t v0_id = cell.vertex_ids[e];
-  uint64_t v1_id = cell.vertex_ids[next_v];
-
-  return std::make_pair(v0_id,v1_id);
-}
-
-//###################################################################
-/***/
-void chi_mesh::mesh_cutting::
-  PopulatePolygonFacesFromVertices(const MeshContinuum &mesh,
-                                   const std::vector<uint64_t> &vertex_ids,
-                                   chi_mesh::Cell &cell)
-{
-  cell.faces.clear();
-  cell.faces.reserve(vertex_ids.size());
-  cell.vertex_ids = vertex_ids;
-
-  size_t num_verts = vertex_ids.size();
-  for (size_t v=0; v<num_verts; ++v)
-  {
-    size_t v1_ref = (v < (num_verts-1))? v+1 : 0;
-
-    uint64_t v0id = cell.vertex_ids[v];
-    uint64_t v1id = cell.vertex_ids[v1_ref];
-
-    const chi_mesh::Vertex& v0 = *mesh.vertices[v0id];
-    const chi_mesh::Vertex& v1 = *mesh.vertices[v1id];
-
-    chi_mesh::Vector3 v01 = v1 - v0;
-
-    chi_mesh::CellFace face;
-    face.vertex_ids = {v0id,v1id};
-    face.normal     = v01.Cross(chi_mesh::Normal(0.0,0.0,1.0)).Normalized();
-    face.centroid   = (v0+v1)/2.0;
-
-    cell.faces.push_back(face);
-  }
-}
-
-//###################################################################
 /**Cuts a mesh with a plane.*/
 void chi_mesh::mesh_cutting::
   CutMeshWithPlane(MeshContinuum& mesh,
@@ -88,8 +40,6 @@ void chi_mesh::mesh_cutting::
 
     return std::make_pair(v_min,v_max);
   };
-
-
 
   //============================================= Snap vertices to plane within
   //                                              merge tolerance to avoid
@@ -144,6 +94,21 @@ void chi_mesh::mesh_cutting::
   //============================================= Two-D algorithm
   if (mesh.local_cells[0].Type() == CellType::POLYGON)
   {
+    //====================================== Determine cut vertices
+    std::set<uint64_t> cut_vertices;
+    {
+      for (auto cell_ptr : cells_to_cut)
+        for (uint64_t vid : cell_ptr->vertex_ids)
+        {
+          const auto vertex = *mesh.vertices[vid];
+          double dv = std::fabs((vertex-p).Dot(n));
+          if (dv<float_compare)
+            cut_vertices.insert(vid);
+        }//for vid
+    }//populate cut_vertices
+
+    chi_log.Log() << "Number of cut vertices: " << cut_vertices.size();
+
     //====================================== Build unique edges
     size_t num_edges_cut=0;
     std::set<Edge> edges_set;
@@ -180,21 +145,6 @@ void chi_mesh::mesh_cutting::
     }//populate edges cut
 
     chi_log.Log() << "Number of cut edges: " << num_edges_cut;
-
-    //====================================== Determine cut vertices
-    std::set<uint64_t> cut_vertices;
-    {
-      for (auto cell_ptr : cells_to_cut)
-        for (uint64_t vid : cell_ptr->vertex_ids)
-        {
-          const auto vertex = *mesh.vertices[vid];
-          double dv = std::fabs((vertex-p).Dot(n));
-          if (dv<float_compare)
-            cut_vertices.insert(vid);
-        }//for vid
-    }
-
-    chi_log.Log() << "Number of cut vertices: " << cut_vertices.size();
 
     //====================================== Process cells that are cut
     for (auto cell_ptr : cells_to_cut)

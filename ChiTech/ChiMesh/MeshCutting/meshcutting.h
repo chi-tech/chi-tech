@@ -34,7 +34,8 @@ namespace mesh_cutting
     }
   };
 
-  void SplitConcavePolygon(MeshContinuum& mesh,chi_mesh::CellPolygon& cell);
+  void SplitConcavePolygons(MeshContinuum& mesh,
+                            std::vector<chi_mesh::Cell*>& cell_list);
 
   std::pair<uint64_t,uint64_t>
     MakeEdgeFromPolygonEdgeIndex(const chi_mesh::Cell& cell, int edge_index);

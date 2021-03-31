@@ -16,13 +16,8 @@ void chi_mesh::mesh_cutting::
              MeshContinuum &mesh,
              chi_mesh::CellPolygon &cell)
 {
-//  chi_log.Log() << "Processing cell cut";
-
   const auto& p = plane_point;
   const auto& n = plane_normal;
-
-  const double merge_tolerance = 1.0e-3;
-  const double float_compare   = 1.0e-10;
 
   auto VertexIsCut = [&cut_vertices](uint64_t vid)
   {
@@ -52,7 +47,8 @@ void chi_mesh::mesh_cutting::
     return std::make_pair(false,*result);
   };
 
-  //============================================= Set vertex and edge cut flags
+  //============================================= Create and set vertex and edge
+  //                                              cut flags for the current cell
   size_t num_verts = cell.vertex_ids.size();
   size_t num_edges = num_verts;
 
@@ -70,7 +66,7 @@ void chi_mesh::mesh_cutting::
     if (cut_nature.first) edge_cut_info[e] = cut_nature.second;
 
     edge_cut_info[e].vertex_ids = edge;
-  }
+  }//populate flags
 
   //============================================= Lamda for edge loop
   enum class CurVertex
@@ -93,17 +89,21 @@ void chi_mesh::mesh_cutting::
       which_vertex(in_which_vertex) {}
   };
 
-  /**Follow edge loop.*/
+  /**This lamda function starts from a current cut-edge, which is either
+   * an edge where the first vertex is cut or an edge that is cut
+   * somewhere along its length, and then follows the edges in a ccw fashion
+   * until it finds another cut. This last cut is just as either an edge
+   * cut along its length or cut at the second vertex. This then completes
+   * an edge loop that can be used to define another polygon.*/
   auto GetVerticesTillNextCut =
     [&cell,&edge_cut_flags,&edge_cut_info,&VertexIsCut](
       CurCutInfo start_cut_info)
   {
     size_t num_verts = cell.vertex_ids.size();
     std::vector<uint64_t> vertex_ids;
-    vertex_ids.reserve(num_verts);
+    vertex_ids.reserve(num_verts); //Ought to be more than enough
 
-    int e = start_cut_info.which_edge;
-
+    int  e        = start_cut_info.which_edge;
     auto end_type = CurVertex::NONE;
 
     switch (start_cut_info.which_vertex)
@@ -138,7 +138,7 @@ void chi_mesh::mesh_cutting::
       case CurVertex::NONE:
       default:
         break;
-    }
+    }//switch type of starting cut
 
     //Look at downstream ccw edges and check for
     //edges cut or end-point cuts
@@ -146,10 +146,7 @@ void chi_mesh::mesh_cutting::
     {
       e = (e<(num_verts-1))? e+1 : 0;
 
-      if (e == start_cut_info.which_edge)
-      {
-        break;
-      }
+      if (e == start_cut_info.which_edge) break;
 
       if (edge_cut_flags[e])
       {
@@ -165,7 +162,7 @@ void chi_mesh::mesh_cutting::
       }
       else
         vertex_ids.push_back(edge_cut_info[e].vertex_ids.second);
-    }
+    }//for eref
 
   skip_to_return_portion:
     CurCutInfo end_cut_info(e, end_type);
@@ -175,203 +172,60 @@ void chi_mesh::mesh_cutting::
 
   typedef std::pair<std::vector<uint64_t>,CurCutInfo> LoopInfo;
 
-  //============================================= Process all edges
-  std::vector<chi_mesh::Cell*> cells_to_add_to_mesh;
+  //============================================= Process all edges and create
+  //                                              edge loops with associated
+  //                                              cells
+  std::vector<std::vector<uint64_t>> loops_to_add_to_mesh;
   std::vector<CurCutInfo> cut_history;
   for (size_t e=0; e<num_edges; ++e)
   {
-//    chi_log.Log() << "Inspecting edge " << e
-//                  << " from " << edge_cut_info[e].vertex_ids.first
-//                  << " to " << edge_cut_info[e].vertex_ids.second;
-
-    std::vector<uint64_t> verts_to_next_cut;
-    int           end_e = e;
-    CurVertex end_type = CurVertex::NONE;
     LoopInfo loop_info;
 
     if (vertex_cut_flags[e])
-    {
-//      chi_log.Log() << "  Vertex cut " << e;
-      cut_history.emplace_back(e,CurVertex::AT_FIRST);
-      loop_info = GetVerticesTillNextCut(cut_history.back());
-    }
+      loop_info = GetVerticesTillNextCut(CurCutInfo(e,CurVertex::AT_FIRST));
     else if (edge_cut_flags[e])
-    {
-//      chi_log.Log() << "  Edge cut " << e;
-      cut_history.emplace_back(e,CurVertex::AT_CUT_POINT);
-      loop_info = GetVerticesTillNextCut(cut_history.back());
-    }
+      loop_info = GetVerticesTillNextCut(CurCutInfo(e,CurVertex::AT_CUT_POINT));
     else continue;
 
-    verts_to_next_cut = loop_info.first;
-    end_e = loop_info.second.which_edge;
-    end_type = loop_info.second.which_vertex;
+    std::vector<uint64_t> verts_to_next_cut = loop_info.first;
+    int                   end_edge          = loop_info.second.which_edge;
+    CurVertex             end_type          = loop_info.second.which_vertex;
 
-//    chi_log.Log() << "  edge_end & num_verts " << end_e
-//                  << " " << verts_to_next_cut.size();
+    //Notes:
+    // - If the end_edge == e then this means trouble as a polygon cannot
+    //   be cut like that.
+    // - If end_edge < e then the end-edge is definitely the edge right before
+    //   the first cut edge. We should still process this edge-loop, but stop
+    //   searching.
 
-    if (end_e < e) //if looped past num_edges
-      e = (int)num_edges-1; //stop search
+    if (end_edge < e) //if looped past num_edges
+      e = int(num_edges)-1; //stop search
     else if (end_type == CurVertex::AT_SECOND)
-      e = end_e;            //resume search after end_e
+      e = end_edge;            //resume search after end_e
     else
-      e = end_e - 1;        //resume search at end_e
+      e = end_edge - 1;        //resume search at end_e. e will get ++ to end_edge
 
-    auto new_cell = new chi_mesh::CellPolygon;
-    PopulatePolygonFacesFromVertices(mesh,verts_to_next_cut,*new_cell);
-    cells_to_add_to_mesh.push_back(new_cell);
+    loops_to_add_to_mesh.push_back(verts_to_next_cut);
   }//for e
 
-//  chi_log.Log() << "Cells to add to the mesh: " << cells_to_add_to_mesh.size();
+  //================================================== Add derivative cells to
+  //                                                   mesh
 
-  if (cells_to_add_to_mesh.size()>2)
+  // Take the back cell and paste onto
+  // the current cell reference
+  if (not loops_to_add_to_mesh.empty())
   {
-//    //=========================================== Make cell-edge pairs, with the
-//    //                                            edge being on the cut-plane
-//    typedef std::pair<chi_mesh::Cell*,int> CellEdgePair;
-//    std::vector<CellEdgePair> cell_edge_pairs_on_plane;
-//    size_t cell_counter = 0;
-//    for (auto cell_ptr : cells_to_add_to_mesh)
-//    {
-//      for (int e=0; e<cell_ptr->vertex_ids.size(); ++e)
-//      {
-//        auto edge = MakeEdgeFromPolygonEdgeIndex(*cell_ptr,e);
-//
-//        const auto& v0 = *mesh.vertices[edge.first];
-//        const auto& v1 = *mesh.vertices[edge.second];
-//
-//        double dv0 = (v0-p).Dot(n);
-//        double dv1 = (v1-p).Dot(n);
-//
-//        bool v0_on_plane = std::fabs(dv0) < float_compare;
-//        bool v1_on_plane = std::fabs(dv1) < float_compare;
-//
-//        chi_log.Log() << cell_counter << " "
-//                      << edge.first << "->" << edge.second << " "
-//                      << dv0 << " " << dv1;
-//
-//        if (v0_on_plane and v1_on_plane)
-//          cell_edge_pairs_on_plane.emplace_back(cell_ptr,e);
-//      }
-//      ++cell_counter;
-//    }
-//
-//    chi_log.Log() << "Number of edges on plane: " << cell_edge_pairs_on_plane.size();
-//
-//    //=========================================== Find an edge of a cell-edge
-//    //                                            that contains the other edges
-//    CellEdgePair master_cell_edge_pair(nullptr,-1);
-//    for (const auto& cell_edge_i_pair : cell_edge_pairs_on_plane)
-//    {
-//      bool assumption_contains_all = true;
-//      const auto& cell_i = *cell_edge_i_pair.first;
-//      auto edge_i = MakeEdgeFromPolygonEdgeIndex(cell_i, cell_edge_i_pair.second);
-//
-//      const auto& v0_edge_i = *mesh.vertices[edge_i.first];
-//      const auto& v1_edge_i = *mesh.vertices[edge_i.second];
-//
-//      auto   v01_edge_i = v1_edge_i - v0_edge_i;
-//      double D = v01_edge_i.Norm();
-//      auto   hat_v01_edge_i = v01_edge_i / D;
-//
-//      for (const auto& cell_edge_j_pair : cell_edge_pairs_on_plane)
-//        if (cell_edge_i_pair.first == cell_edge_j_pair.first)
-//          continue;
-//        else
-//        {
-//          const auto& cell_j = *cell_edge_j_pair.first;
-//          auto edge_j = MakeEdgeFromPolygonEdgeIndex(cell_j, cell_edge_j_pair.second);
-//
-//          const auto& v0_edge_j = *mesh.vertices[edge_j.first];
-//          const auto& v1_edge_j = *mesh.vertices[edge_j.second];
-//
-//          auto v0j_v0i = v0_edge_j - v0_edge_i;
-//          auto v1j_v0i = v1_edge_j - v0_edge_i;
-//
-//          double d_v0j_v0i = v0j_v0i.Dot(hat_v01_edge_i);
-//          double d_v1j_v0i = v1j_v0i.Dot(hat_v01_edge_i);
-//
-//          bool contains_v0j = (d_v0j_v0i >= (0.0-float_compare)) and
-//                              (d_v0j_v0i < (D+float_compare));
-//          bool contains_v1j = (d_v1j_v0i >= (0.0-float_compare)) and
-//                              (d_v1j_v0i < (D+float_compare));
-//
-//          if ((not contains_v0j) or (not contains_v1j))
-//          {
-//            assumption_contains_all = false;
-//            break;
-//          }
-//        }
-//
-//      if (assumption_contains_all)
-//      {
-//        master_cell_edge_pair = cell_edge_i_pair;
-//        break;
-//      }
-//    }//for cell-edge pair
-//
-//    if (master_cell_edge_pair.first != nullptr)
-//    {
-//      std::set<uint64_t> vertex_ids_set;
-//
-//      auto& master_cell = *master_cell_edge_pair.first;
-//      int   master_edge_index = master_cell_edge_pair.second;
-//      auto master_edge = MakeEdgeFromPolygonEdgeIndex(master_cell,master_edge_index);
-//      int master_vid = master_edge.first;
-//
-//      chi_log.Log() << "Master edge identified "
-//                    << master_edge.first << "->" << master_edge.second;
-//
-//      const auto& master_vertex = *mesh.vertices[master_vid];
-//
-////      vertex_ids.insert(master_edge.first);
-//      vertex_ids_set.insert(master_edge.second);
-//
-//      for (auto& cell_edge_pair : cell_edge_pairs_on_plane)
-//        if (cell_edge_pair.first == master_cell_edge_pair.first)
-//          continue;
-//        else
-//        {
-//          auto& slave_cell = *cell_edge_pair.first;
-//          int   slave_edge_index = cell_edge_pair.second;
-//          auto slave_edge = MakeEdgeFromPolygonEdgeIndex(slave_cell,slave_edge_index);
-//
-//          vertex_ids_set.insert(slave_edge.first);
-//          vertex_ids_set.insert(slave_edge.second);
-//        }
-//
-//      std::vector<uint64_t> vertex_ids(vertex_ids_set.begin(),
-//                                       vertex_ids_set.end());
-//
-//      auto VertexComparator = [&mesh,&master_vertex](
-//        const uint64_t& v0id, const uint64_t& v1id)
-//      {
-//        const auto& v0 = *mesh.vertices[v0id];
-//        const auto& v1 = *mesh.vertices[v1id];
-//
-//        double dv0 = (v0 - master_vertex).NormSquare();
-//        double dv1 = (v1 - master_vertex).NormSquare();
-//
-//        return dv0 < dv1;
-//      };
-//
-//      std::sort(vertex_ids.begin(),vertex_ids.end(),VertexComparator);
-//
-//      chi_log.Log() << "Sorted list of vids relative to " << master_vid <<":";
-//      for (auto vid : vertex_ids)
-//        chi_log.Log() << vid;
-//    }
-  }//If more than 2 cells
+    auto& back_loop = loops_to_add_to_mesh.back();
+    PopulatePolygonFacesFromVertices(mesh,back_loop,cell);
 
+    loops_to_add_to_mesh.pop_back();
+  }//if there are cells to add
 
-//  //============================================= Verbose output
-//  for (auto cell_ptr : cells_to_add_to_mesh)
-//  {
-//    chi_log.Log() << "new_cell:";
-//    for (auto vid : cell_ptr->vertex_ids)
-//      chi_log.Log() << vid;
-//  }
-//
-//  chi_log.Log() << "Done processing cell cut";
-
+  // Now push-up new cells from the remainder
+  for (auto& loop : loops_to_add_to_mesh)
+  {
+    auto new_cell = new chi_mesh::CellPolygon;
+    PopulatePolygonFacesFromVertices(mesh,loop,*new_cell);
+    mesh.cells.push_back(new_cell);
+  }
 }
