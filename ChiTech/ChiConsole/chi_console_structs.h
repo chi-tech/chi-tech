@@ -1,46 +1,16 @@
 #ifndef CHI_CONSOLE_STRUCTS_H
 #define CHI_CONSOLE_STRUCTS_H
 
-
-//=============================================================================
-/**Stores data relevant to events*/
-struct CSTEvent
-{
-  char  eventTitle[100];
-  char  sPar[6][100];
-  int   iPar[6];
-  float fPar[6];
-  bool  bPar[6];
-
-  CSTEvent()
-  {
-    eventTitle[0] = '\0';
-    for (int k = 0; k < 6; ++k)
-    {
-      sPar[k][0] = '\0';
-      iPar[k]    = 0;
-      fPar[k]    = 0.0;
-      bPar[k]    = false;
-    }
-  }
-};
-
 //=============================================================================
 /**Simple structure for memory usage.*/
 struct CSTMemory
 {
-  double memory_bytes;
-  double memory_kbytes;
-  double memory_mbytes;
-  double memory_gbytes;
+  double memory_bytes  = 0.0;
+  double memory_kbytes = 0.0;
+  double memory_mbytes = 0.0;
+  double memory_gbytes = 0.0;
 
-  CSTMemory()
-  {
-    memory_bytes  = 0.0;
-    memory_kbytes = 0.0;
-    memory_mbytes = 0.0;
-    memory_gbytes = 0.0;
-  }
+  CSTMemory() = default;
 
   explicit CSTMemory(double in_mem)
   {
@@ -50,14 +20,7 @@ struct CSTMemory
     memory_gbytes = in_mem/1024.0/1024.0;
   }
 
-  CSTMemory& operator=(const CSTMemory& in_struct)
-  {
-    memory_bytes  = in_struct.memory_bytes ;
-    memory_kbytes = in_struct.memory_kbytes;
-    memory_mbytes = in_struct.memory_mbytes;
-    memory_gbytes = in_struct.memory_gbytes;
-    return *this;
-  }
+  CSTMemory& operator=(const CSTMemory& in_struct) = default;
 };
 
 #endif
