@@ -9,10 +9,10 @@ namespace chi_math
   double dLegendredx(int N, double x);
   double d2Legendredx2(int N, double x);
 
-  double AssocLegendre(int ell, int m, double x);
+  double AssocLegendre(unsigned int ell, int m, double x);
 
-  double Ylm(int ell, int m, double varphi, double theta);
-};
+  double Ylm(unsigned int ell, int m, double varphi, double theta);
+}
 
 
 #endif

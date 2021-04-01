@@ -13,7 +13,7 @@ This code has a whitepaper associated with it
  \param ell int The ell order of the polynomial.
  \param m int The m-th moment of the polynomial
  \param x double The evaluation point.*/
-double chi_math::AssocLegendre(int ell, int m, double x)
+double chi_math::AssocLegendre(unsigned int ell, int m, double x)
 {
   if (abs(m)>ell) return 0.0;
 
@@ -34,11 +34,11 @@ double chi_math::AssocLegendre(int ell, int m, double x)
     if (m== 1) return Pnpos;
   }
 
-  double Pmlp1 = 0.0;
+  double Pmlp1;
   if (ell==m)
   {
     Pmlp1 = -(2.0*ell-1.0)*sqrt(1.0 - x*x) *
-      AssocLegendre(ell-1,ell-1,x);
+      AssocLegendre(ell-1,int(ell)-1,x);
   }
   else
   {

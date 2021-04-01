@@ -22,7 +22,7 @@ extern ChiTimer   chi_program_timer;
  * cells.*/
 std::shared_ptr<chi_mesh::sweep_management::SPDS>
 chi_mesh::sweep_management::
-  CreateSweepOrder(double polar, double azimuthal,
+  CreateSweepOrder(const chi_mesh::Vector3& omega,
                    chi_mesh::MeshContinuumPtr grid,
                    bool cycle_allowance_flag)
 {
@@ -31,15 +31,8 @@ chi_mesh::sweep_management::
 
   size_t num_loc_cells = grid->local_cell_glob_indices.size();
 
-  //============================================= Compute direction vector
-  sweep_order->polar     = polar;
-  sweep_order->azimuthal = azimuthal;
-
-  sweep_order->omega.x = sin(polar)*cos(azimuthal);
-  sweep_order->omega.y = sin(polar)*sin(azimuthal);
-  sweep_order->omega.z = cos(polar);
-
-  chi_mesh::Vector3& omega = sweep_order->omega; //shorter name
+  //============================================= Assign direction vector
+  sweep_order->omega = omega;
 
   chi_log.Log(LOG_0VERBOSE_1)
     << chi_program_timer.GetTimeString()

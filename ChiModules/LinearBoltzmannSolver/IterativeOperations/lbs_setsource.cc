@@ -23,11 +23,6 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
                                         bool apply_mat_src,
                                         bool suppress_phi_old)
 {
-  bool OneD_Slab = false;
-
-  if (options.geometry_type == GeometryType::ONED_SLAB)
-    OneD_Slab = true;
-
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
   //================================================== Get group setup
@@ -36,6 +31,8 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
 
   int first_grp = groups.front().id;
   int last_grp = groups.back().id;
+
+  const auto& m_to_ell_em_map = groupset.quadrature->GetMomentToHarmonicsIndexMap();
 
   std::vector<double> default_zero_src(groups.size(),0.0);
 
@@ -76,91 +73,82 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
     int gprime;
     for (int i=0; i<num_dofs; i++)
     {
-      //==================================== Loop over moments
-      int m=-1;
-      for (int ell=0; ell<=options.scattering_order; ell++)
+      for (int m=0; m<num_moments; ++m)
       {
-        int ellmin = OneD_Slab? 0 : -ell;
-        int ellmax = OneD_Slab? 0 :  ell;
+        unsigned int ell = m_to_ell_em_map[m].ell;
 
-        for (int em=ellmin; em<=ellmax; em++)
+        int64_t ir = full_cell_view.MapDOF(i,m,0);
+        q_mom      = &q_moments_local[ir];
+        phi_oldp   = &phi_old_local[ir];
+
+        //============================= Loop over groupset groups
+        for (int g=gs_i; g<=gs_f; g++)
         {
-          m++;
-          int ir = full_cell_view.MapDOF(i,m,0);
-          q_mom    = &q_moments_local[ir];
-          phi_oldp = &phi_old_local[ir];
+          if (apply_mat_src && (m==0))
+            q_mom[g] += src[g];
 
-          //============================= Loop over groupset groups
-          for (int g=gs_i; g<=gs_f; g++)
+          inscat_g = 0.0;
+          //====================== Apply across-groupset scattering
+          if ((ell < xs->transfer_matrix.size()) && (apply_mat_src) )
           {
-            if (apply_mat_src && (m==0))
-              q_mom[g] += src[g];
-
-
-            inscat_g = 0.0;
-            //====================== Apply across-groupset scattering
-            if ((ell < xs->transfer_matrix.size()) && (apply_mat_src) )
+            int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            for (int t=0; t<num_transfers; t++)
             {
-              int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
-              for (int t=0; t<num_transfers; t++)
+              gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
+              if ((gprime < gs_i) || (gprime > gs_f))
               {
-                gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
-                if ((gprime < gs_i) || (gprime > gs_f))
-                {
-                  sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
-                  inscat_g += sigma_sm * phi_oldp[gprime];
-                }
+                sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
+                inscat_g += sigma_sm * phi_oldp[gprime];
               }
-            }//if moment avail
+            }
+          }//if moment avail
 
-            //====================== Apply within-groupset scattering
-            if ((ell < xs->transfer_matrix.size()) && (!suppress_phi_old) )
+          //====================== Apply within-groupset scattering
+          if ((ell < xs->transfer_matrix.size()) && (!suppress_phi_old) )
+          {
+            int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            for (int t=0; t<num_transfers; t++)
             {
-              int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
-              for (int t=0; t<num_transfers; t++)
+              gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
+              if ((gprime >= gs_i) && (gprime<=gs_f))
               {
-                gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
-                if ((gprime >= gs_i) && (gprime<=gs_f))
-                {
-                  sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
-                  inscat_g += sigma_sm * phi_oldp[gprime];
-                }
+                sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
+                inscat_g += sigma_sm * phi_oldp[gprime];
               }
-            }//if moment avail
+            }
+          }//if moment avail
 
-            q_mom[g] += inscat_g;
+          q_mom[g] += inscat_g;
 
-            //====================== Apply accross-groupset fission
-            if ((ell == 0) and (apply_mat_src))
+          //====================== Apply accross-groupset fission
+          if ((ell == 0) and (apply_mat_src))
+          {
+            for (gprime=first_grp; gprime<=last_grp; ++gprime)
             {
-              for (gprime=first_grp; gprime<=last_grp; ++gprime)
+              if ((gprime < gs_i) || (gprime > gs_f))
               {
-                if ((gprime < gs_i) || (gprime > gs_f))
-                {
-                  q_mom[g] += xs->chi_g[g]*
-                              xs->nu_sigma_fg[gprime]*
-                              phi_oldp[gprime];
-                }
-              }//for gprime
-            }//if zeroth moment
+                q_mom[g] += xs->chi_g[g]*
+                            xs->nu_sigma_fg[gprime]*
+                            phi_oldp[gprime];
+              }
+            }//for gprime
+          }//if zeroth moment
 
-            //====================== Apply within-groupset fission
-            if ((ell == 0) and (!suppress_phi_old))
+          //====================== Apply within-groupset fission
+          if ((ell == 0) and (!suppress_phi_old))
+          {
+            for (gprime=first_grp; gprime<=last_grp; ++gprime)
             {
-              for (gprime=first_grp; gprime<=last_grp; ++gprime)
+              if ((gprime >= gs_i) && (gprime<=gs_f))
               {
-                if ((gprime >= gs_i) && (gprime<=gs_f))
-                {
-                  q_mom[g] += xs->chi_g[g]*
-                              xs->nu_sigma_fg[gprime]*
-                              phi_oldp[gprime];
-                }
-              }//for gprime
-            }//if zeroth moment
-          }//for g
-        }
-
-      }//for moment
+                q_mom[g] += xs->chi_g[g]*
+                            xs->nu_sigma_fg[gprime]*
+                            phi_oldp[gprime];
+              }
+            }//for gprime
+          }//if zeroth moment
+        }//for g
+      }//for m
     }//for dof i
   }//for cell
 
