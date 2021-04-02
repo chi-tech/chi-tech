@@ -50,12 +50,7 @@ int chiCreateQuadrature(lua_State *L)
   if (ident == 1) //GAUSS_LEGENDRE
   {
     chi_log.Log(LOG_0) << "Creating Gauss-Legendre Quadrature\n";
-    auto new_quad =
-      new chi_math::QuadratureGaussLegendre((chi_math::QuadratureOrder)N,
-                                            1000,
-                                            1.0e-12,
-                                            verbose);
-
+    auto new_quad = new chi_math::QuadratureGaussLegendre(N, verbose);
     chi_math_handler.quadratures.push_back(new_quad);
     int index = (int)chi_math_handler.quadratures.size()-1;
     lua_pushnumber(L,index);
@@ -64,8 +59,7 @@ int chiCreateQuadrature(lua_State *L)
   else if (ident == 2) //GAUSS_CHEBYSHEV
   {
     chi_log.Log(LOG_0) << "Creating Gauss-Chebyshev Quadrature\n";
-    auto new_quad = new chi_math::QuadratureGaussChebyshev;
-    new_quad->Initialize(N,verbose);
+    auto new_quad = new chi_math::QuadratureGaussChebyshev(N, verbose);
     chi_math_handler.quadratures.push_back(new_quad);
     int index = (int)chi_math_handler.quadratures.size()-1;
     lua_pushnumber(L,index);

@@ -169,9 +169,7 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
 void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose)
 {
   chi_math::QuadratureGaussLegendre gl_polar(Np*2);
-  auto gl_azimu = new chi_math::QuadratureGaussChebyshev;
-
-  gl_azimu->Initialize(Na*4);
+  chi_math::QuadratureGaussChebyshev gc_azimu(Na*4);
 
   double weight     = 0.0;
   double weight_sum = 0.0;
@@ -205,7 +203,7 @@ void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose
 
       abscissae.push_back(new_pair);
 
-      weight = 2*gl_azimu->weights[i]*gl_polar.weights[j];
+      weight = 2*gc_azimu.weights[i]*gl_polar.weights[j];
 
       weights.push_back(weight);
       weight_sum += weight;
