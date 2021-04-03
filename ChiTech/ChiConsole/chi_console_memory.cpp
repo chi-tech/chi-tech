@@ -62,12 +62,3 @@ double ChiConsole::GetMemoryUsageInMB()
 
   return  mem_struct.memory_mbytes;
 }
-
-//###################################################################
-/**Gets the current memory usage in megabytes.*/
-double ChiConsole::GetMemoryUsageInBytes()
-{
-  CSTMemory mem_struct = GetMemoryUsage();
-
-  return  mem_struct.memory_bytes;
-}
