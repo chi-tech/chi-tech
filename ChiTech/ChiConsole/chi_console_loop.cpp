@@ -11,7 +11,7 @@ extern ChiLog& chi_log;
 
 //############################################################################# Run Console loop
 /** Executes the loop for the console.*/
-void ChiConsole::RunConsoleLoop(char* fileName)
+void ChiConsole::RunConsoleLoop(char*)
 {
 
   chi_log.Log(LOG_0) << "Console loop started. "
