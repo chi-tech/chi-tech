@@ -9,14 +9,32 @@
 
 //###################################################################
 /**Creates an unpartitioned mesh from VTK Unstructured mesh files.
- *
- * \image html "InProgressImage.png" width=200px
- *
- * \param file_name char Filename of the .vtu file.
- *
- * \ingroup LuaUnpartitionedMesh
- *
- * \return A handle to the newly created UnpartitionedMesh*/
+
+\param file_name char Filename of the .vtu file.
+
+\ingroup LuaUnpartitionedMesh
+
+##_
+
+### Example
+An example mesh creation below:
+\code
+chiMeshHandlerCreate()
+
+umesh = chiUnpartitionedMeshFromVTU("ZMeshTest_0.vtu")
+
+region1 = chiRegionCreate()
+chiRegionAddEmptyBoundary(region1)
+
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
+
+chiSurfaceMesherExecute()
+chiVolumeMesherExecute()
+\endcode
+
+
+\return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromVTU(lua_State* L)
 {
   const char func_name[] = "chiUnpartitionedMeshFromVTU";
@@ -42,14 +60,33 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
 
 //###################################################################
 /**Creates an unpartitioned mesh from starccm+ exported
- * Ensight Gold mesh files.
- *
- * \param file_name char Filename of the .case file.
- * \param scale float Scale to apply to the mesh
- *
- * \ingroup LuaUnpartitionedMesh
- *
- * \return A handle to the newly created UnpartitionedMesh*/
+Ensight Gold mesh files.
+
+\param file_name char Filename of the .case file.
+\param scale float Scale to apply to the mesh
+
+\ingroup LuaUnpartitionedMesh
+
+##_
+
+### Example
+An example mesh creation below:
+\code
+chiMeshHandlerCreate()
+
+chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
+
+region1 = chiRegionCreate()
+chiRegionAddEmptyBoundary(region1)
+
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
+
+chiSurfaceMesherExecute()
+chiVolumeMesherExecute()
+\endcode
+
+\return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 {
   const char func_name[] = "chiUnpartitionedMeshFromEnsightGold";
@@ -78,12 +115,31 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 
 //###################################################################
 /**Creates an unpartitioned mesh from a wavefront .obj file.
- *
- * \param file_name char Filename of the .case file.
- *
- * \ingroup LuaUnpartitionedMesh
- *
- * \return A handle to the newly created UnpartitionedMesh*/
+
+\param file_name char Filename of the .case file.
+
+\ingroup LuaUnpartitionedMesh
+
+##_
+
+### Example
+An example mesh creation below:
+\code
+chiMeshHandlerCreate()
+
+chiUnpartitionedMeshFromWavefrontOBJ("ChiResources/TestObjects/TriangleMesh2x2.obj")
+
+region1 = chiRegionCreate()
+chiRegionAddEmptyBoundary(region1)
+
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
+
+chiSurfaceMesherExecute()
+chiVolumeMesherExecute()
+\endcode
+
+\return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
 {
   const char func_name[] = "chiUnpartitionedMeshFromWavefrontOBJ";
@@ -110,12 +166,32 @@ int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
 
 //###################################################################
 /**Creates an unpartitioned mesh from a .msh file.
- *
- * \param file_name char Filename of the .msh file.
- *
- * \ingroup LuaUnpartitionedMesh
- *
- * \return A handle to the newly created UnpartitionedMesh*/
+
+\param file_name char Filename of the .msh file.
+
+\ingroup LuaUnpartitionedMesh
+
+##_
+
+### Example
+An example mesh creation below:
+\code
+chiMeshHandlerCreate()
+
+chiUnpartitionedMeshFromMshFormat("File.msh")
+
+region1 = chiRegionCreate()
+chiRegionAddEmptyBoundary(region1)
+
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
+
+chiSurfaceMesherExecute()
+chiVolumeMesherExecute()
+\endcode
+
+
+\return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromMshFormat(lua_State* L)
 {
   const char func_name[] = "chiUnpartitionedMeshFromMshFormat";
