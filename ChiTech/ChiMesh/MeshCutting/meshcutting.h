@@ -34,20 +34,29 @@ namespace mesh_cutting
     }
   };
 
-  void SplitConcavePolygons(MeshContinuum& mesh,
-                            std::vector<chi_mesh::Cell*>& cell_list);
-
+  //2D_utils
   std::pair<uint64_t,uint64_t>
-    MakeEdgeFromPolygonEdgeIndex(const chi_mesh::Cell& cell, int edge_index);
+    MakeEdgeFromPolygonEdgeIndex(const std::vector<uint64_t>& vertex_ids,
+                                 int edge_index);
 
   void PopulatePolygonFacesFromVertices(
     const MeshContinuum& mesh,
     const std::vector<uint64_t>& vertex_ids,
     chi_mesh::Cell& cell);
 
+  bool CheckPolygonQuality(const MeshContinuum& mesh, const chi_mesh::Cell& cell);
+
+  void SplitConcavePolygonsIntoTriangles(MeshContinuum& mesh,
+                                         std::vector<chi_mesh::Cell*>& cell_list);
+
+  //plane
   void CutMeshWithPlane(MeshContinuum& mesh,
                         const Vector3& plane_point,
-                        const Vector3& plane_normal);
+                        const Vector3& plane_normal,
+                        double merge_tolerance=1.0e-3,
+                        double float_compare=1.0e-10);
+
+  //a_2D_cellcut
   void CutPolygon(const std::vector<ECI>& cut_edges,
                   const std::set<uint64_t>& cut_vertices,
                   const Vector3 &plane_point,

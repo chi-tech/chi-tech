@@ -13,33 +13,18 @@ extern ChiLog& chi_log;
 void chi_mesh::mesh_cutting::
   CutMeshWithPlane(MeshContinuum& mesh,
                    const Vector3 &plane_point,
-                   const Vector3 &plane_normal)
+                   const Vector3 &plane_normal,
+                   double merge_tolerance/*=1.0e-3*/,
+                   double float_compare/*=1.0e-10*/)
 {
-  chi_log.Log() << "Cutting mesh with plane.";
+  const std::string function_name = __FUNCTION__;
 
   const auto& p = plane_point;
-  const auto& n = plane_normal;
+  const auto& n = plane_normal.Normalized();
 
-  const double merge_tolerance = 1.0e-3;
-  const double float_compare   = 1.0e-10;
-
-  /**What the name says.*/
-  auto MakeEdgeSetFromPolygonEdgeIndex = [](
-    const chi_mesh::Cell& cell,
-    int edge_index)
-  {
-    int e = edge_index;
-    size_t num_verts = cell.vertex_ids.size();
-
-    int next_v = (e < (num_verts-1)) ? e+1 : 0;
-    uint64_t v0_id = cell.vertex_ids[e];
-    uint64_t v1_id = cell.vertex_ids[next_v];
-
-    uint64_t v_max = std::max(v0_id,v1_id);
-    uint64_t v_min = std::min(v0_id,v1_id);
-
-    return std::make_pair(v_min,v_max);
-  };
+  chi_log.Log() << "Cutting mesh with plane. "
+                << "Ref. Point: " << p.PrintS()
+                << " Normal: " << n.PrintS();
 
   //============================================= Snap vertices to plane within
   //                                              merge tolerance to avoid
@@ -62,12 +47,30 @@ void chi_mesh::mesh_cutting::
   chi_log.Log() << "Number of vertices snapped to plane: "
                 << num_verts_snapped;
 
+  //============================================= Perform quality checks
+  size_t num_bad_quality_cells = 0;
+  for (const auto& cell : mesh.local_cells)
+  {
+    if (cell.Type() == CellType::POLYGON)
+    {
+      if (not CheckPolygonQuality(mesh,cell))
+        ++num_bad_quality_cells;
+    }
+    else
+      throw std::logic_error(function_name + ": Called for a mesh containing"
+                             " an unsupported cell-type.");
+  }
+  if (num_bad_quality_cells > 0)
+    throw std::logic_error(function_name + ": Called for a mesh containing " +
+                           std::to_string(num_bad_quality_cells) +
+                           " bad quality cells.");
+
   //============================================= Determine cells to cut
   // Order N, num_cells
   // A cell is a candidate for cutting if its
   // vertices lay on both sides of the plane.
   // So this algorithm just checks the sense wrt
-  // the plane.
+  // the plane. Works for both 2D and 3D
   std::vector<chi_mesh::Cell*> cells_to_cut;
 
   for (auto& cell : mesh.local_cells)
@@ -94,6 +97,10 @@ void chi_mesh::mesh_cutting::
   //============================================= Two-D algorithm
   if (mesh.local_cells[0].Type() == CellType::POLYGON)
   {
+    //====================================== Split concave cells
+    //This may add cells to cells_to_cut
+    SplitConcavePolygonsIntoTriangles(mesh, cells_to_cut);
+
     //====================================== Determine cut vertices
     std::set<uint64_t> cut_vertices;
     {
@@ -116,8 +123,13 @@ void chi_mesh::mesh_cutting::
     {
       const auto& cell = *cell_ptr;
       const size_t num_edges = cell.vertex_ids.size();
+
       for (int e=0; e<num_edges; ++e)
-        edges_set.insert(MakeEdgeSetFromPolygonEdgeIndex(cell, e));
+      {
+        auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids,e);
+        edges_set.insert(std::make_pair(std::min(edge.first,edge.second),
+                                        std::max(edge.first,edge.second)));
+      }
     }//for cell - built edges_set
 
     //====================================== Determine cut edges
@@ -153,8 +165,6 @@ void chi_mesh::mesh_cutting::
 
       CutPolygon(cut_edges,cut_vertices,p,n,mesh,cell);
     }//for cell_ptr
-
-
   }//two-D
 
   //============================================= Three-D algorithm
