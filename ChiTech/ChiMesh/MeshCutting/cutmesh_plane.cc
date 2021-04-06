@@ -56,6 +56,11 @@ void chi_mesh::mesh_cutting::
       if (not CheckPolygonQuality(mesh,cell))
         ++num_bad_quality_cells;
     }
+    else if (cell.Type() == CellType::POLYHEDRON)
+    {
+      if (not CheckPolyhedronQuality(mesh,cell))
+        ++num_bad_quality_cells;
+    }
     else
       throw std::logic_error(function_name + ": Called for a mesh containing"
                              " an unsupported cell-type.");
@@ -170,7 +175,72 @@ void chi_mesh::mesh_cutting::
   //============================================= Three-D algorithm
   if (mesh.local_cells[0].Type() == CellType::POLYHEDRON)
   {
+    //====================================== Determine cut vertices
+    std::set<uint64_t> cut_vertices;
+    {
+      for (auto cell_ptr : cells_to_cut)
+        for (uint64_t vid : cell_ptr->vertex_ids)
+        {
+          const auto vertex = *mesh.vertices[vid];
+          double dv = std::fabs((vertex-p).Dot(n));
+          if (dv<float_compare)
+            cut_vertices.insert(vid);
+        }//for vid
+    }//populate cut_vertices
 
+    //====================================== Build unique edges
+    size_t num_edges_cut=0;
+    std::set<Edge> edges_set;
+    for (auto cell_ptr : cells_to_cut)
+    {
+      const auto& cell = *cell_ptr;
+
+      for (auto& face : cell.faces)
+      {
+        const size_t num_edges = face.vertex_ids.size();
+
+        for (int e=0; e<num_edges; ++e)
+        {
+          auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids,e);
+          edges_set.insert(std::make_pair(std::min(edge.first,edge.second),
+                                          std::max(edge.first,edge.second)));
+        }
+      }//for face
+    }//for cell - built edges_set
+
+    //====================================== Determine cut edges
+    std::vector<ECI> cut_edges;
+    {
+      for (auto& edge : edges_set)
+      {
+        const auto& v0 = *mesh.vertices[edge.first];
+        const auto& v1 = *mesh.vertices[edge.second];
+
+        chi_mesh::Vector3 cut_point;
+
+        if (CheckPlaneLineIntersect(n,p,v0,v1,cut_point))
+        {
+          double dv0 = std::fabs((v0-p).Dot(n));
+          double dv1 = std::fabs((v1-p).Dot(n));
+          if (dv0>float_compare and dv1>float_compare)
+          {
+            mesh.vertices.push_back(new chi_mesh::Vector3(cut_point));
+            cut_edges.emplace_back(edge, mesh.vertices.size() - 1);
+            ++num_edges_cut;
+          }
+        }
+      }//for edge - determine cut
+    }//populate edges cut
+
+    chi_log.Log() << "Number of cut edges: " << num_edges_cut;
+
+    //====================================== Process cells that are cut
+    for (auto cell_ptr : cells_to_cut)
+    {
+      auto& cell = *(chi_mesh::CellPolyhedron*)cell_ptr;
+
+      CutTetrahedron(cut_edges, cut_vertices, p, n, mesh, cell);
+    }//for cell_ptr
   }
 
   chi_log.Log() << "Done cutting mesh with plane. Num cells = "

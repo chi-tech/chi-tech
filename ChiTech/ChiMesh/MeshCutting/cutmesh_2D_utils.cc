@@ -21,9 +21,9 @@ std::pair<uint64_t,uint64_t> chi_mesh::mesh_cutting::
 //###################################################################
 /***/
 void chi_mesh::mesh_cutting::
-PopulatePolygonFacesFromVertices(const MeshContinuum &mesh,
-                                 const std::vector<uint64_t> &vertex_ids,
-                                 chi_mesh::Cell &cell)
+  PopulatePolygonFromVertices(const MeshContinuum &mesh,
+                              const std::vector<uint64_t> &vertex_ids,
+                              chi_mesh::Cell &cell)
 {
   cell.faces.clear();
   cell.faces.reserve(vertex_ids.size());
@@ -57,7 +57,9 @@ PopulatePolygonFacesFromVertices(const MeshContinuum &mesh,
 }
 
 //###################################################################
-/**Performs a quality check of a given polygon.*/
+/**Performs a quality check of a given polygon. The simple quality requirement
+ * is that, if we form a triangle with the cell-centroid and the vertices of
+ * each edge (in ccw orientation), no inverted triangles are present.*/
 bool chi_mesh::mesh_cutting::
   CheckPolygonQuality(const MeshContinuum &mesh, const chi_mesh::Cell &cell)
 {
@@ -143,18 +145,18 @@ void chi_mesh::mesh_cutting::
         const auto& edge = cell_edges[e];
 
         auto new_cell = new chi_mesh::CellPolygon;
-        PopulatePolygonFacesFromVertices(mesh,
-                                         {edge.first,edge.second,centroid_id},
-                                         *new_cell);
+        PopulatePolygonFromVertices(mesh,
+                                    {edge.first, edge.second, centroid_id},
+                                    *new_cell);
         mesh.cells.push_back(new_cell);
         cell_list.push_back(new_cell);
       }
       //Make the current cell morph to the last triangle
       {
         const auto& edge = cell_edges[num_edges-1];
-        PopulatePolygonFacesFromVertices(mesh,
-                                         {edge.first,edge.second,centroid_id},
-                                         cell);
+        PopulatePolygonFromVertices(mesh,
+                                    {edge.first, edge.second, centroid_id},
+                                    cell);
       }
     }//if has concavity
   }//for cell
@@ -163,12 +165,12 @@ void chi_mesh::mesh_cutting::
 //###################################################################
 /**Cuts a polygon.*/
 void chi_mesh::mesh_cutting::
-CutPolygon(const std::vector<ECI> &cut_edges,
-           const std::set<uint64_t> &cut_vertices,
-           const Vector3 &plane_point,
-           const Vector3 &plane_normal,
-           MeshContinuum &mesh,
-           chi_mesh::CellPolygon &cell)
+  CutPolygon(const std::vector<ECI> &cut_edges,
+             const std::set<uint64_t> &cut_vertices,
+             const Vector3 &plane_point,
+             const Vector3 &plane_normal,
+             MeshContinuum &mesh,
+             chi_mesh::CellPolygon &cell)
 {
   const auto& p = plane_point;
   const auto& n = plane_normal;
@@ -373,7 +375,7 @@ CutPolygon(const std::vector<ECI> &cut_edges,
   if (not loops_to_add_to_mesh.empty())
   {
     auto& back_loop = loops_to_add_to_mesh.back();
-    PopulatePolygonFacesFromVertices(mesh,back_loop,cell);
+    PopulatePolygonFromVertices(mesh, back_loop, cell);
 
     loops_to_add_to_mesh.pop_back();
   }//if there are cells to add
@@ -382,7 +384,7 @@ CutPolygon(const std::vector<ECI> &cut_edges,
   for (auto& loop : loops_to_add_to_mesh)
   {
     auto new_cell = new chi_mesh::CellPolygon;
-    PopulatePolygonFacesFromVertices(mesh,loop,*new_cell);
+    PopulatePolygonFromVertices(mesh, loop, *new_cell);
     mesh.cells.push_back(new_cell);
   }
 }

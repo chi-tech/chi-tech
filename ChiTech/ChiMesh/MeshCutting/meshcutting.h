@@ -3,6 +3,7 @@
 
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell_polyhedron.h"
 
 namespace chi_mesh
 {
@@ -16,7 +17,7 @@ namespace mesh_cutting
   struct ECI    //EdgeCutInfo
   {
     Edge vertex_ids;
-    uint64_t cut_point_id;
+    uint64_t cut_point_id=0;
 
     ECI() = default;
 
@@ -39,7 +40,7 @@ namespace mesh_cutting
     MakeEdgeFromPolygonEdgeIndex(const std::vector<uint64_t>& vertex_ids,
                                  int edge_index);
 
-  void PopulatePolygonFacesFromVertices(
+  void PopulatePolygonFromVertices(
     const MeshContinuum& mesh,
     const std::vector<uint64_t>& vertex_ids,
     chi_mesh::Cell& cell);
@@ -49,20 +50,35 @@ namespace mesh_cutting
   void SplitConcavePolygonsIntoTriangles(MeshContinuum& mesh,
                                          std::vector<chi_mesh::Cell*>& cell_list);
 
-  //plane
-  void CutMeshWithPlane(MeshContinuum& mesh,
-                        const Vector3& plane_point,
-                        const Vector3& plane_normal,
-                        double merge_tolerance=1.0e-3,
-                        double float_compare=1.0e-10);
-
-  //a_2D_cellcut
   void CutPolygon(const std::vector<ECI>& cut_edges,
                   const std::set<uint64_t>& cut_vertices,
                   const Vector3 &plane_point,
                   const Vector3 &plane_normal,
                   MeshContinuum& mesh,
                   chi_mesh::CellPolygon& cell);
+
+  //3D_utils
+  bool CheckPolyhedronQuality(const MeshContinuum& mesh,
+                              const chi_mesh::Cell& cell);
+
+  void PopulatePolyhedronFromFaces(
+    const MeshContinuum& mesh,
+    const std::vector<std::vector<uint64_t>>& raw_faces,
+    chi_mesh::Cell& cell);
+
+  void CutTetrahedron(const std::vector<ECI>& cut_edges,
+                      const std::set<uint64_t>& cut_vertices,
+                      const Vector3 &plane_point,
+                      const Vector3 &plane_normal,
+                      MeshContinuum& mesh,
+                      chi_mesh::CellPolyhedron& cell);
+
+  //plane
+  void CutMeshWithPlane(MeshContinuum& mesh,
+                        const Vector3& plane_point,
+                        const Vector3& plane_normal,
+                        double merge_tolerance=1.0e-3,
+                        double float_compare=1.0e-10);
 }
 }
 
