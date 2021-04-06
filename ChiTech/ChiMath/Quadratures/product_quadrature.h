@@ -2,20 +2,22 @@
 #define _product_quadrature_h
 
 #include <vector>
-#include "../../ChiMesh/chi_mesh.h"
-
-#define GAUSS_LEGENDRE           1
-#define GAUSS_CHEBYSHEV          2
-#define GAUSS_LEGENDRE_LEGENDRE  3
-#define GAUSS_LEGENDRE_CHEBYSHEV 4
-#define CUSTOM_QUADRATURE        5
 
 #include "angular_quadrature_base.h"
 
 namespace chi_math
 {
-  class ProductQuadrature;
+  enum class ProductQuadratureType
+  {
+    UNKNOWN                  = 0,
+    GAUSS_LEGENDRE           = 1,
+    GAUSS_CHEBYSHEV          = 2,
+    GAUSS_LEGENDRE_LEGENDRE  = 3,
+    GAUSS_LEGENDRE_CHEBYSHEV = 4,
+    CUSTOM_QUADRATURE        = 5,
+  };
 
+  class ProductQuadrature;
 }
 
 //######################################################### Class def

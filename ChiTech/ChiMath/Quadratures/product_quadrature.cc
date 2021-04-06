@@ -1,6 +1,6 @@
-#include"product_quadrature.h"
-#include"quadrature_gausslegendre.h"
-#include"quadrature_gausschebyshev.h"
+#include "product_quadrature.h"
+#include "quadrature_gausslegendre.h"
+#include "quadrature_gausschebyshev.h"
 
 #include <cmath>
 #include <sstream>
