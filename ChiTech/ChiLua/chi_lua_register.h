@@ -14,10 +14,8 @@
         lua_getglobal(this->consoleState,#namespace_name); \
         lua_pushstring(this->consoleState,#const_name); \
         lua_pushnumber(this->consoleState,const_value); \
-        lua_settable(this->consoleState,-3);
-
-
-
+        lua_settable(this->consoleState,-3); \
+        lua_pop(this->consoleState,1);
 
 //#################################### MODULES
 //module:Math Utilities

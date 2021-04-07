@@ -14,4 +14,5 @@
         lua_getglobal(L,#namespace_name); \
         lua_pushstring(L,#const_name); \
         lua_pushnumber(L,const_value); \
-        lua_settable(L,-3);
+        lua_settable(L,-3); \
+        lua_pop(L,1);
