@@ -122,6 +122,10 @@ void chi_math::ProductQuadrature::
   }
 
   //================================================== Create angle pairs
+  map_directions.clear();
+  for (unsigned int j = 0; j < Np; ++j)
+    map_directions.emplace(j, std::vector<unsigned int>());
+
   abscissae.clear();
   weights.clear();
   std::stringstream ostr;
@@ -130,6 +134,8 @@ void chi_math::ProductQuadrature::
   {
     for (unsigned int j = 0; j < Np; ++j)
     {
+      map_directions[j].emplace_back(i*Np+j);
+
       chi_math::QuadraturePointPhiTheta new_pair;
 
       new_pair.phi   = azimu_ang[i];
@@ -175,14 +181,4 @@ void chi_math::ProductQuadrature::
       << "Weight sum=" << weight_sum;
   }
 
-}
-
-//###################################################################
-/**Obtains the abscissae index given the indices of the
- * polar angle index and the azimuthal angle index.*/
-int chi_math::ProductQuadrature::
-  GetAngleNum(int polar_angle_index, int azimu_ang_index)
-{
-  return azimu_ang_index*polar_ang.size() +
-         polar_angle_index;
 }
