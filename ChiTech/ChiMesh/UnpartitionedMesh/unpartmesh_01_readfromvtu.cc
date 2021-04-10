@@ -24,6 +24,10 @@ extern ChiMPI& chi_mpi;
 #include <vtkQuad.h>
 #include <vtkTriangle.h>
 
+#include <vtkLine.h>
+
+#include <vtkVertex.h>
+
 //###################################################################
 /**Creates a raw polyhedron cell from a vtk-polyhedron.*/
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
@@ -256,6 +260,63 @@ CreateCellFromVTKTriangle(vtkCell *vtk_cell)
 }
 
 //###################################################################
+/**Creates a raw slab cell from a vtk-line.*/
+chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
+  CreateCellFromVTKLine(vtkCell *vtk_cell)
+{
+  auto slab_cell   = new LightWeightCell(chi_mesh::CellType::SLAB);
+
+  auto vtk_line    = vtkLine::SafeDownCast(vtk_cell);
+  auto num_cpoints = vtk_line->GetNumberOfPoints();
+  auto num_cfaces  = num_cpoints;
+
+  slab_cell->vertex_ids.reserve(num_cpoints);
+  auto point_ids   = vtk_line->GetPointIds();
+  for (int p=0; p<num_cpoints; ++p)
+  {
+    uint64_t point_id = point_ids->GetId(p);
+    slab_cell->vertex_ids.push_back(point_id);
+  }//for p
+
+  slab_cell->faces.reserve(num_cfaces);
+  for (int f=0; f<num_cfaces; ++f)
+  {
+    LightWeightFace face;
+
+    auto v_id = slab_cell->vertex_ids[f];
+
+    face.vertex_ids.reserve(1);
+    face.vertex_ids.push_back(v_id);
+
+    slab_cell->faces.push_back(face);
+  }
+
+  return slab_cell;
+}
+
+//###################################################################
+/**Creates a raw point cell from a vtk-vertex.*/
+chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
+  CreateCellFromVTKVertex(vtkCell *vtk_cell)
+{
+  auto point_cell  = new LightWeightCell(chi_mesh::CellType::GHOST);
+
+  auto vtk_vertex  = vtkVertex::SafeDownCast(vtk_cell);
+  auto num_cpoints = vtk_vertex->GetNumberOfPoints();
+  auto num_cfaces  = num_cpoints;
+
+  point_cell->vertex_ids.reserve(num_cpoints);
+  auto point_ids   = vtk_vertex->GetPointIds();
+  for (int p=0; p<num_cpoints; ++p)
+  {
+    uint64_t point_id = point_ids->GetId(p);
+    point_cell->vertex_ids.push_back(point_id);
+  }//for p
+
+  return point_cell;
+}
+
+//###################################################################
 /**Reads a VTK unstructured mesh.*/
 void chi_mesh::UnpartitionedMesh::
   ReadFromVTU(const chi_mesh::UnpartitionedMesh::Options &options)
@@ -300,25 +361,23 @@ void chi_mesh::UnpartitionedMesh::
     << total_cell_count << " "
     << total_point_count;
 
-  //======================================== Lambda's
-  auto CellIs3D = [](int vtk_celltype)
+
+  //======================================== Scan for mesh dimension
+  int mesh_dim = 0;
+  for (unsigned int c = 0; c < total_cell_count; ++c)
   {
-    if (vtk_celltype == VTK_POLYHEDRON or
-        vtk_celltype == VTK_HEXAHEDRON or
-        vtk_celltype == VTK_TETRA)
-      return true;
+    const auto vtk_cell = ugrid->GetCell(c);
+    const auto vtk_cell_dim = vtk_cell->GetCellDimension();
+    mesh_dim = std::max(vtk_cell_dim, mesh_dim);
+  }
 
-    return false;
-  };
-
-  //======================================== Scan cells for 3D
-  bool mesh_is_2D = true;
-  for (int c=0; c<total_cell_count; ++c)
-    if (CellIs3D(ugrid->GetCell(c)->GetCellType()))
-    {
-      mesh_is_2D = false;
-      break;
-    }
+  if (mesh_dim < 1 || mesh_dim > 3)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "The VTU file : \"" << options.file_name << "\" "
+      << "does not identify a mesh of valid dimension.";
+    std::exit(EXIT_FAILURE);
+  }
 
   //======================================== Push cells
   size_t num_polyhedrons  = 0;
@@ -327,52 +386,65 @@ void chi_mesh::UnpartitionedMesh::
   size_t num_polygons     = 0;
   size_t num_quads        = 0;
   size_t num_triangles    = 0;
-  for (int c=0; c<total_cell_count; ++c)
+  size_t num_lines        = 0;
+  size_t num_vertices     = 0;
+  for (unsigned int c = 0; c < total_cell_count; ++c)
   {
-    auto vtk_cell = ugrid->GetCell(c);
-    auto vtk_celltype = vtk_cell->GetCellType();
+    const auto vtk_cell = ugrid->GetCell(c);
+    const auto vtk_celltype = vtk_cell->GetCellType();
+    const auto vtk_cell_dim = vtk_cell->GetCellDimension();
+
+    //  construct cell
+    LightWeightCell* chi_lwc = nullptr;
     if (vtk_celltype == VTK_POLYHEDRON)
     {
-      raw_cells.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
+      chi_lwc = CreateCellFromVTKPolyhedron(vtk_cell);
       ++num_polyhedrons;
     }
     else if (vtk_celltype == VTK_HEXAHEDRON)
     {
-      raw_cells.push_back(CreateCellFromVTKHexahedron(vtk_cell));
+      chi_lwc = CreateCellFromVTKHexahedron(vtk_cell);
       ++num_hexahedrons;
     }
     else if (vtk_celltype == VTK_TETRA)
     {
-      raw_cells.push_back(CreateCellFromVTKTetrahedron(vtk_cell));
+      chi_lwc = CreateCellFromVTKTetrahedron(vtk_cell);
       ++num_tetrahedrons;
     }
     else if (vtk_celltype == VTK_POLYGON)
     {
-      if (mesh_is_2D)
-        raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
-      else
-        raw_boundary_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+      chi_lwc = CreateCellFromVTKPolygon(vtk_cell);
       ++num_polygons;
     }
     else if (vtk_celltype == VTK_QUAD)
     {
-      if (mesh_is_2D)
-        raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
-      else
-        raw_boundary_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
+      chi_lwc = CreateCellFromVTKQuad(vtk_cell);
       ++num_quads;
     }
     else if (vtk_celltype == VTK_TRIANGLE)
     {
-      if (mesh_is_2D)
-        raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
-      else
-        raw_boundary_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
+      chi_lwc = CreateCellFromVTKTriangle(vtk_cell);
       ++num_triangles;
+    }
+    else if (vtk_celltype == VTK_LINE)
+    {
+      chi_lwc = CreateCellFromVTKLine(vtk_cell);
+      ++num_lines;
+    }
+    else if (vtk_celltype == VTK_VERTEX)
+    {
+      chi_lwc = CreateCellFromVTKVertex(vtk_cell);
+      ++num_vertices;
     }
     else
       throw std::invalid_argument(std::string(__FUNCTION__) +
                                   ": Unsupported cell type.");
+
+    //  append to appropriate collection
+    if (vtk_cell_dim == mesh_dim)
+      raw_cells.emplace_back(chi_lwc);
+    else if (vtk_cell_dim == mesh_dim-1)
+      raw_boundary_cells.emplace_back(chi_lwc);
   }//for c
   chi_log.Log() << "Number cells read: " << total_cell_count << "\n"
     << "polyhedrons  : " << num_polyhedrons  << "\n"
@@ -380,7 +452,9 @@ void chi_mesh::UnpartitionedMesh::
     << "tetrahedrons : " << num_tetrahedrons << "\n"
     << "polygons     : " << num_polygons     << "\n"
     << "quads        : " << num_quads        << "\n"
-    << "triangles    : " << num_triangles;
+    << "triangles    : " << num_triangles    << "\n"
+    << "lines        : " << num_lines        << "\n"
+    << "vertices     : " << num_vertices;
 
   //======================================== Push points
   for (int p=0; p<total_point_count; ++p)
