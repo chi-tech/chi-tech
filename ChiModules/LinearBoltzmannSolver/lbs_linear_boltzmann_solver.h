@@ -151,7 +151,7 @@ public:
                  bool apply_mat_src,
                  bool suppress_phi_old);
   double ComputePiecewiseChange(LBSGroupset& groupset);
-  SweepChunk *SetSweepChunk(LBSGroupset& groupset);
+  virtual SweepChunk* SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
                          SweepChunk* sweep_chunk,
