@@ -34,10 +34,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
 
   //=================================================== Check the format of this input
   while (std::getline(file, file_line))
-  {
-    if ( format_section_name.compare(file_line)==0 )
-      break;
-  }
+    if ( format_section_name == file_line ) break;
+
   std::getline(file, file_line);
   iss = std::istringstream(file_line);
   double format;
@@ -46,12 +44,11 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
   else if (format != 2.2)
     throw std::logic_error(fname + ": Currently, only msh format 2.2 is supported.");
 
-
   //=================================================== Find section with node information
   //                                                    and then read information
   file.seekg(0);
   while (std::getline(file, file_line))
-    if ( node_section_name.compare(file_line)==0 ) break;
+    if ( node_section_name == file_line ) break;
 
   std::getline(file, file_line);
   iss = std::istringstream(file_line);
@@ -78,11 +75,54 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       throw std::logic_error(fname + ": Failed while reading the vertex coordinates.");
   }
 
-  //=================================================== Determine mesh type 2D/3D
+  //================================================== Define utility lambdas
+  /**Lambda for reading nodes.*/
+  auto ReadNodes = [&iss,&fname](int num_nodes)
+  {
+    std::vector<int> raw_nodes(num_nodes,0);
+    for (int i=0; i<num_nodes; ++i)
+      if ( !(iss >> raw_nodes[i]) )
+        throw std::logic_error(fname + ": Failed when reading element node index.");
+
+    std::vector<uint64_t> nodes(num_nodes,0);
+    for (int i=0; i<num_nodes; ++i)
+      if ((raw_nodes[i]-1)>=0)
+        nodes[i] = raw_nodes[i]-1;
+    return nodes;
+  };
+
+  /**Lamda for checking if an element is 2D.*/
+  auto IsElementType2D = [](int element_type)
+  {
+    if (element_type == 2 or element_type == 3)
+      return true;
+
+    return false;
+  };
+
+  /**Lamda for checking if an element is 2D.*/
+  auto IsElementType3D = [](int element_type)
+  {
+    if (element_type >= 4 and element_type <= 7)
+      return true;
+
+    return false;
+  };
+
+  /**Lambda for checking supported elements.*/
+  auto IsElementSupported = [](int element_type)
+  {
+    if (element_type >= 2 and element_type <= 7)
+      return true;
+
+    return false;
+  };
+
+  //================================================== Determine mesh type 2D/3D
   bool mesh_is_2D_assumption = true;
   file.seekg(0);
   while (std::getline(file, file_line))
-    if ( elements_section_name.compare(file_line)==0 ) break;
+    if ( elements_section_name == file_line ) break;
 
   std::getline(file, file_line);
   iss = std::istringstream(file_line);
@@ -108,39 +148,29 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       if( !(iss >> tag) )
         throw std::logic_error(fname + ": Failed when reading tags.");
 
-    if (elem_type >= 4 and elem_type <= 7)
+    if (IsElementType3D(elem_type))
+    {
       mesh_is_2D_assumption = false;
+      break; //have the answer now leave loop
+    }
 
-    if (not (elem_type >= 3 and elem_type <= 7))
+    if (elem_type == 15 or elem_type == 1) //skip point and edge
+      continue;
+
+    if (not IsElementSupported(elem_type))
       throw std::logic_error(fname + ": Unsupported element encountered.");
   }//for n
 
-  //=================================================== Find the element listing section
-  //                                                    and first read the boundary data
+  //================================================== Return to the element
+  //                                                   listing section
   file.seekg(0);
   while (std::getline(file, file_line))
-    if ( elements_section_name.compare(file_line)==0 ) break;
+    if ( elements_section_name == file_line ) break;
 
   std::getline(file, file_line);
   iss = std::istringstream(file_line);
-//  int num_elems;
   if (!(iss >> num_elems))
     throw std::logic_error(fname + ": Failed to read number of elements.");
-
-  /**Lambda for reading nodes.*/
-  auto ReadNodes = [&iss,&fname](int num_nodes)
-  {
-    std::vector<int> raw_nodes(num_nodes,0);
-    for (int i=0; i<num_nodes; ++i)
-      if ( !(iss >> raw_nodes[i]) )
-        throw std::logic_error(fname + ": Failed when reading element node index.");
-
-    std::vector<uint64_t> nodes(num_nodes,0);
-    for (int i=0; i<num_nodes; ++i)
-      if ((raw_nodes[i]-1)>=0)
-        nodes[i] = raw_nodes[i]-1;
-    return nodes;
-  };
 
   for (int n=0; n<num_elems; n++)
   {
@@ -160,7 +190,19 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       if ( !(iss >> tag) )
         throw std::logic_error(fname + ": Failed when reading tags.");
 
-    int num_cell_nodes = 0;
+    if (elem_type == 15 or elem_type == 1) //skip point and edge type elements
+      continue;
+
+    if (not mesh_is_2D_assumption and IsElementType2D(elem_type))
+      continue;
+
+    if (mesh_is_2D_assumption and (not IsElementType2D(elem_type)))
+      continue;
+
+    if (not IsElementSupported(elem_type))
+      throw std::logic_error(fname + ": Unsupported element encountered.");
+
+    int num_cell_nodes;
     if (elem_type == 2)      //3-node triangle
       num_cell_nodes = 3;
     else if (elem_type == 3 or elem_type == 4) //4-node quadrangle or tet
@@ -170,6 +212,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     else
       continue;
 
+    //====================================== Make the cell
     if (mesh_is_2D_assumption)
       raw_cells.push_back(new LightWeightCell(CellType::POLYGON));
     else
@@ -179,7 +222,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     cell.material_id = physical_reg;
     cell.vertex_ids = ReadNodes(num_cell_nodes);
 
-    if (elem_type == 2 or elem_type == 3) //Polygon
+    //====================================== Populate faces
+    if (elem_type == 2 or elem_type == 3) //3-node triangle or 4-node quadrangle
     {
       size_t num_verts = cell.vertex_ids.size();
       for (int e=0; e<num_verts; e++)
@@ -207,16 +251,15 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     {
       auto& v = cell.vertex_ids;
       std::vector<LightWeightFace> lw_faces(6);
-      lw_faces[0].vertex_ids = {v[5], v[1], v[2], v[6]};
-      lw_faces[1].vertex_ids = {v[0], v[4], v[7], v[3]};
-      lw_faces[2].vertex_ids = {v[0], v[3], v[2], v[1]};
-      lw_faces[3].vertex_ids = {v[4], v[5], v[6], v[7]};
-      lw_faces[4].vertex_ids = {v[2], v[3], v[7], v[6]};
-      lw_faces[5].vertex_ids = {v[0], v[1], v[5], v[4]};
+      lw_faces[0].vertex_ids = {v[5], v[1], v[2], v[6]}; //East face
+      lw_faces[1].vertex_ids = {v[0], v[4], v[7], v[3]}; //West face
+      lw_faces[2].vertex_ids = {v[0], v[3], v[2], v[1]}; //North face
+      lw_faces[3].vertex_ids = {v[4], v[5], v[6], v[7]}; //South face
+      lw_faces[4].vertex_ids = {v[2], v[3], v[7], v[6]}; //Top face
+      lw_faces[5].vertex_ids = {v[0], v[1], v[5], v[4]}; //Bottom face
 
       for (auto& lw_face : lw_faces) cell.faces.push_back(lw_face);
     }
-
 
   }//for elements
 
@@ -225,6 +268,10 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
   //======================================== Always do this
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
+
+  chi_log.Log() << "Done processing " << options.file_name << ".\n"
+                << "Number of nodes read: " << vertices.size() << "\n"
+                << "Number of cells read: " << raw_cells.size();
 }
 
 

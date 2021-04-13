@@ -66,8 +66,8 @@ namespace mesh_cutting
     const std::vector<std::vector<uint64_t>>& raw_faces,
     chi_mesh::Cell& cell);
 
-  void CutTetrahedron(const std::vector<ECI>& cut_edges,
-                      const std::set<uint64_t>& cut_vertices,
+  void CutTetrahedron(const std::vector<ECI>& global_cut_edges,
+                      const std::set<uint64_t>& global_cut_vertices,
                       const Vector3 &plane_point,
                       const Vector3 &plane_normal,
                       MeshContinuum& mesh,
