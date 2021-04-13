@@ -111,6 +111,8 @@ public:
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
+  void ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const;
+  void ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const;
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
   //03c
