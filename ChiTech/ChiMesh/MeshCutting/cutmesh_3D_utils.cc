@@ -154,6 +154,15 @@ void chi_mesh::mesh_cutting::
     return (straight or criss_cross);
   };
 
+  bool verbose = true;
+  //======================================== Verbose output
+  if (verbose)
+  {
+    chi_log.Log() << "Cell:";
+    for (uint64_t vid : cell.vertex_ids)
+      chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+  }
+
   //======================================== Build cell unique edges
   std::set<Edge> edges_set;
   for (const auto& face : cell.faces)
@@ -226,7 +235,8 @@ void chi_mesh::mesh_cutting::
   //   CF = cut-face
   if (num_edges_cut == 3 and num_vertices_cut == 0)
   {
-    chi_log.Log(LOG_0VERBOSE_1) << "Cell split case 1";
+    if (verbose)
+      chi_log.Log(LOG_0VERBOSE_1) << "Cell split case 1";
     RawFaces raw_faces_polyhedron;
     RawFaces raw_faces_slivertet;
 
@@ -298,6 +308,16 @@ void chi_mesh::mesh_cutting::
 
     std::vector<uint64_t> IF_vids_reverse(IF_vids.rbegin(),IF_vids.rend());
 
+    if (verbose)
+    {
+      chi_log.Log() << "IF:";
+      for (uint64_t vid : IF_vids)
+        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+      chi_log.Log() << "IFrev:";
+      for (uint64_t vid : IF_vids_reverse)
+        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+    }
+
     //================================= Process cut faces to form faces
     //                                  for the polyhedron
     // This process also identifies the
@@ -320,12 +340,7 @@ void chi_mesh::mesh_cutting::
 
         ECI curr_eci = CCC[CF_id][e].second;
 
-        if (not curr_edge_cut)
-        {
-          raw_face.push_back(curr_eci.vertex_ids.first);
-          raw_face.push_back(curr_eci.vertex_ids.second);
-        }
-        else if (curr_edge_cut and next_edge_cut)
+        if (curr_edge_cut and next_edge_cut)
         {
           raw_face.push_back(curr_eci.vertex_ids.first);
           raw_face.push_back(curr_eci.cut_point_id);
@@ -353,7 +368,7 @@ void chi_mesh::mesh_cutting::
     {
       auto edge = MakeEdgeFromPolygonEdgeIndex(IF_vids_reverse,e);
 
-      RawPolygon raw_face = {edge.first,edge.second,dangling_vertex_id};
+      RawPolygon raw_face = {edge.second,edge.first,dangling_vertex_id};
       raw_faces_slivertet.emplace_back(raw_face);
     }//for e
 
@@ -364,6 +379,32 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_slivertet,*new_cell);
 
     mesh.cells.push_back(new_cell);
+
+    bool checkA = CheckPolyhedronQuality(mesh, cell);
+    bool checkB = CheckPolyhedronQuality(mesh, *new_cell);
+
+    if (verbose)
+    {
+      chi_log.Log() << "Cell A.";
+      for (auto& face : cell.faces)
+      {
+        chi_log.Log() << "Face:";
+        for (auto vid : face.vertex_ids)
+          chi_log.Log() << vid;
+      }
+      chi_log.Log() << "Cell B.";
+      for (auto& face : new_cell->faces)
+      {
+        chi_log.Log() << "Face:";
+        for (auto vid : face.vertex_ids)
+          chi_log.Log() << vid;
+      }
+    }
+
+    if (not checkA)
+      throw std::logic_error(fname + ": Cell quality check A failed");
+    if (not checkB)
+      throw std::logic_error(fname + ": Cell quality check B failed");
   }//end Case 1
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Case 2
   // 2 Edges 1 Verts indicates again 1 uncut
@@ -378,9 +419,9 @@ void chi_mesh::mesh_cutting::
     //================================= Build interface face
     std::vector<uint64_t> IF_vids;
     IF_vids.reserve(3);
-    for (auto& cut_edge : global_cut_edges)
+    for (auto& cut_edge : cell_cut_edges)
       IF_vids.push_back(cut_edge.cut_point_id);
-    for (auto& cut_vertex : global_cut_vertices)
+    for (auto& cut_vertex : cell_cut_vertices)
       IF_vids.push_back(cut_vertex);
 
     if (IF_vids.size() != 3)
@@ -440,6 +481,16 @@ void chi_mesh::mesh_cutting::
 
     std::vector<uint64_t> IF_vids_reverse(IF_vids.rbegin(),IF_vids.rend());
 
+    if (verbose)
+    {
+      chi_log.Log() << "IF:";
+      for (uint64_t vid : IF_vids)
+        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+      chi_log.Log() << "IFrev:";
+      for (uint64_t vid : IF_vids_reverse)
+        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+    }
+
     //================================= Process cut faces to form faces
     //                                  for the polyhedron
     // This process also identifies the
@@ -470,12 +521,12 @@ void chi_mesh::mesh_cutting::
 
         if (face_num_cut_edges == 1)
         {
-          bool end_vertex_cut = VertexIsCut(ep1);
+          bool end_vertex_cut = VertexIsCut(curr_eci.vertex_ids.second);
 
           if ((not curr_edge_cut) and (not end_vertex_cut))
           {
             raw_face.push_back(curr_eci.vertex_ids.first);
-            raw_face.push_back(curr_eci.vertex_ids.second);
+//            raw_face.push_back(curr_eci.vertex_ids.second);
           }
           else if (curr_edge_cut)
           {
@@ -491,12 +542,12 @@ void chi_mesh::mesh_cutting::
 
           if (not curr_edge_cut)
           {
-            raw_face.push_back(curr_eci.vertex_ids.first);
+//            raw_face.push_back(curr_eci.vertex_ids.first);
             raw_face.push_back(curr_eci.vertex_ids.second);
           }
           else if (curr_edge_cut and next_edge_cut)
           {
-            raw_face.push_back(curr_eci.vertex_ids.first);
+//            raw_face.push_back(curr_eci.vertex_ids.first);
             raw_face.push_back(curr_eci.cut_point_id);
             dangling_vertex_id = curr_eci.vertex_ids.second;
           }
@@ -537,6 +588,32 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_slivertet,*new_cell);
 
     mesh.cells.push_back(new_cell);
+
+    bool checkA = CheckPolyhedronQuality(mesh, cell);
+    bool checkB = CheckPolyhedronQuality(mesh, *new_cell);
+
+    if (verbose)
+    {
+      chi_log.Log() << "Cell A.";
+      for (auto& face : cell.faces)
+      {
+        chi_log.Log() << "Face:";
+        for (auto vid : face.vertex_ids)
+          chi_log.Log() << vid;
+      }
+      chi_log.Log() << "Cell B.";
+      for (auto& face : new_cell->faces)
+      {
+        chi_log.Log() << "Face:";
+        for (auto vid : face.vertex_ids)
+          chi_log.Log() << vid;
+      }
+    }
+
+    if (not checkA)
+      throw std::logic_error(fname + ": Cell quality check A failed");
+    if (not checkB)
+      throw std::logic_error(fname + ": Cell quality check B failed");
   }//end Case 2
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Case 3
   // This type of cut results in two tets
@@ -609,7 +686,7 @@ void chi_mesh::mesh_cutting::
     {
       auto edge = MakeEdgeFromPolygonEdgeIndex(IF_vids,e);
 
-      RawPolygon raw_face = {edge.first,edge.second,dangling_vertex_ids[0]};
+      RawPolygon raw_face = {edge.second,edge.first,dangling_vertex_ids[0]};
       raw_faces_tetA.emplace_back(raw_face);
     }//for e
 
@@ -618,7 +695,7 @@ void chi_mesh::mesh_cutting::
     {
       auto edge = MakeEdgeFromPolygonEdgeIndex(IF_vids_reverse,e);
 
-      RawPolygon raw_face = {edge.first,edge.second,dangling_vertex_ids[1]};
+      RawPolygon raw_face = {edge.second,edge.first,dangling_vertex_ids[1]};
       raw_faces_tetB.emplace_back(raw_face);
     }//for e
 
@@ -629,7 +706,15 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_tetB,*new_cell);
 
     mesh.cells.push_back(new_cell);
-  }
+
+    bool checkA = CheckPolyhedronQuality(mesh, cell);
+    bool checkB = CheckPolyhedronQuality(mesh, *new_cell);
+
+    if (not checkA)
+      throw std::logic_error(fname + ": Cell quality check A failed");
+    if (not checkB)
+      throw std::logic_error(fname + ": Cell quality check B failed");
+  }//end Case 3
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Case 4
   // This results in 2 polyhedra.
   // All faces are cut at 2 points.
@@ -845,7 +930,33 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedronB,*new_cell);
 
     mesh.cells.push_back(new_cell);
-  }
+
+    bool checkA = CheckPolyhedronQuality(mesh, cell);
+    bool checkB = CheckPolyhedronQuality(mesh, *new_cell);
+
+    if (verbose)
+    {
+      chi_log.Log() << "Cell A.";
+      for (auto& face : cell.faces)
+      {
+        chi_log.Log() << "Face:";
+        for (auto vid : face.vertex_ids)
+          chi_log.Log() << vid;
+      }
+      chi_log.Log() << "Cell B.";
+      for (auto& face : new_cell->faces)
+      {
+        chi_log.Log() << "Face:";
+        for (auto vid : face.vertex_ids)
+          chi_log.Log() << vid;
+      }
+    }
+
+    if (not checkA)
+      throw std::logic_error(fname + ": Cell quality check A failed");
+    if (not checkB)
+      throw std::logic_error(fname + ": Cell quality check B failed");
+  }//end Case 4
   else
     throw std::logic_error(fname + ": Unsupported cut case. "
                            "num_edges_cut=" + std::to_string(num_edges_cut) +
