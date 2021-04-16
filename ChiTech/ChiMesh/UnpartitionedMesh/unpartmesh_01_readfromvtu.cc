@@ -13,8 +13,8 @@ extern ChiMPI& chi_mpi;
 #include <vtkUnstructuredGrid.h>
 #include "vtkCleanUnstructuredGrid.h"
 #include <vtkCellType.h>
-
-#include <vtkDataObject.h>
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
 
 #include <vtkPolyhedron.h>
 #include <vtkHexahedron.h>
@@ -361,6 +361,77 @@ void chi_mesh::UnpartitionedMesh::
     << total_cell_count << " "
     << total_point_count;
 
+  //======================================== Determine if reading
+  //                                         cell identifiers
+  if (options.material_id_fieldname != options.boundary_id_fieldname)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << "The VTU reader expects material identifiers and boundary identifiers "
+      << "to be defined in the same field.";
+    std::exit(EXIT_FAILURE);
+  }
+
+  vtkDataArray* cell_id_array_ptr = nullptr;
+  if (options.material_id_fieldname.size() == 0)
+  {
+    chi_log.Log(LOG_0)
+      << "A user-supplied field name from which to recover cell identifiers "
+      << "has not been provided. Only the mesh will be read.";
+  }
+  else
+  {
+    chi_log.Log(LOG_0)
+      << "A user-supplied field name from which to recover cell identifiers "
+      << "has been provided. The mesh will be read and both material ID and "
+      << "boundary ID will be read from the vtkCellData field with name : \""
+      << options.material_id_fieldname << "\".";
+
+    const auto vtk_abstract_array_ptr =
+      ugrid->GetCellData()->GetAbstractArray(options.material_id_fieldname.c_str());
+    if (!vtk_abstract_array_ptr)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "The VTU file : \"" << options.file_name << "\" "
+        << "does not contain a vtkCellData field of name : \""
+        << options.material_id_fieldname << "\".";
+      std::exit(EXIT_FAILURE);
+    }
+
+    cell_id_array_ptr = vtkArrayDownCast<vtkDataArray>(vtk_abstract_array_ptr);
+    if (!cell_id_array_ptr)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "The VTU file : \"" << options.file_name << "\" "
+        << "with vtkCellData field of name : \""
+        << options.material_id_fieldname << "\" "
+        << "cannot be downcast to vtkDataArray";
+      std::exit(EXIT_FAILURE);
+    }
+
+    const auto cell_id_n_tup = cell_id_array_ptr->GetNumberOfTuples();
+    if (cell_id_n_tup != total_cell_count)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "The VTU file : \"" << options.file_name << "\" "
+        << "with vtkCellData field of name : \""
+        << options.material_id_fieldname << "\" has n. tuples : "
+        << cell_id_n_tup << ", but differs from the value expected : "
+        << total_cell_count << ".";
+      std::exit(EXIT_FAILURE);
+    }
+
+    const auto cell_id_n_val = cell_id_array_ptr->GetNumberOfValues();
+    if (cell_id_n_val != total_cell_count)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "The VTU file : \"" << options.file_name << "\" "
+        << "with vtkCellData field of name : \""
+        << options.material_id_fieldname << "\" has n. values : "
+        << cell_id_n_val << ", but differs from the value expected : "
+        << total_cell_count << ".";
+      std::exit(EXIT_FAILURE);
+    }
+  }
 
   //======================================== Scan for mesh dimension
   int mesh_dim = 0;
@@ -445,6 +516,19 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.emplace_back(chi_lwc);
     else if (vtk_cell_dim == mesh_dim-1)
       raw_boundary_cells.emplace_back(chi_lwc);
+
+    //  apply cell identifier
+    if (cell_id_array_ptr)
+    {
+      std::vector<double> cell_id_vec(1);
+      cell_id_array_ptr->GetTuple(c, cell_id_vec.data());
+      const auto cell_id = (int)cell_id_vec.front();
+
+      if (vtk_cell_dim == mesh_dim)
+        raw_cells.back()->material_id = cell_id;
+      else if (vtk_cell_dim == mesh_dim-1)
+        raw_boundary_cells.back()->material_id = cell_id;
+    }
   }//for c
   chi_log.Log() << "Number cells read: " << total_cell_count << "\n"
     << "polyhedrons  : " << num_polyhedrons  << "\n"
