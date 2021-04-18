@@ -115,6 +115,17 @@ void chi_mesh::mesh_cutting::
 
   ChiLog& chi_log = ChiLog::GetInstance();
 
+  /**Utility lambda to check if a vertex is in generic list.*/
+  auto VertexInList = [](const std::vector<uint64_t>& list, uint64_t vid)
+  {
+    auto result = std::find(list.begin(),list.end(),vid);
+
+    if (result != list.end())
+      return true;
+
+    return false;
+  };
+
   /**Utility lambda to check if a vertex is in "cut_vertices" list.*/
   auto VertexIsCut = [&global_cut_vertices](uint64_t vid)
   {
@@ -145,6 +156,7 @@ void chi_mesh::mesh_cutting::
     return std::make_pair(false,*result);
   };
 
+  /**Utility lambda to check if two edges have vertices from the same set.*/
   auto EdgesHaveSameVerts = [](const Edge& edgeA, const Edge& edgeB)
   {
     bool criss_cross = ((edgeA.first == edgeB.second) and
@@ -154,7 +166,7 @@ void chi_mesh::mesh_cutting::
     return (straight or criss_cross);
   };
 
-  bool verbose = true;
+  bool verbose = false;
   //======================================== Verbose output
   if (verbose)
   {
@@ -449,6 +461,18 @@ void chi_mesh::mesh_cutting::
 
     const auto& BF = cell.faces[BF_id]; //Base-face
 
+    //================================= Find dangling vertex
+    // The tet has 4 verts. In this case the
+    // dangling vertex is the one that is
+    // not part of the base face.
+    uint64_t dangling_vertex_id = 0;
+    for (uint64_t vid : cell.vertex_ids)
+      if (not VertexInList(BF.vertex_ids,vid))
+      {
+        dangling_vertex_id = vid;
+        break;
+      }
+
     //================================= Establish order of vertices
     //                                  for polyhedron and sliver-Tet
 
@@ -498,7 +522,6 @@ void chi_mesh::mesh_cutting::
     // part of the sliver Tet.
     // - 2 cut-faces. 1 edge is cut, 1 vertex is cut
     // - 1 cut-face. 2 edges are cut.
-    uint64_t dangling_vertex_id = 0;
     for (int CF_id : CF_ids)
     {
       auto& face = cell.faces[CF_id];
@@ -516,25 +539,25 @@ void chi_mesh::mesh_cutting::
         int ep1 = (e<(num_edges-1))? e+1 : 0;
 
         bool curr_edge_cut = CCC[CF_id][e].first;
-
         ECI curr_eci = CCC[CF_id][e].second;
+        Edge& edge = curr_eci.vertex_ids;
+
+        bool starts_on_bf   = VertexInList(BF.vertex_ids,edge.first);
+        bool ends_on_bf     = VertexInList(BF.vertex_ids,edge.second);
+        bool end_vertex_cut = VertexIsCut(edge.second);
 
         if (face_num_cut_edges == 1)
         {
-          bool end_vertex_cut = VertexIsCut(curr_eci.vertex_ids.second);
 
-          if ((not curr_edge_cut) and (not end_vertex_cut))
+          if ((not curr_edge_cut) and (starts_on_bf and ends_on_bf))
           {
-            raw_face.push_back(curr_eci.vertex_ids.first);
-//            raw_face.push_back(curr_eci.vertex_ids.second);
+            raw_face.push_back(edge.first);
+            raw_face.push_back(edge.second);
           }
           else if (curr_edge_cut)
           {
-            raw_face.push_back(curr_eci.vertex_ids.first);
             raw_face.push_back(curr_eci.cut_point_id);
-            dangling_vertex_id = curr_eci.vertex_ids.second;
           }
-          // The third edge is discarded
         }
         else if (face_num_cut_edges == 2)
         {
@@ -542,19 +565,12 @@ void chi_mesh::mesh_cutting::
 
           if (not curr_edge_cut)
           {
-//            raw_face.push_back(curr_eci.vertex_ids.first);
+            raw_face.push_back(curr_eci.vertex_ids.first);
             raw_face.push_back(curr_eci.vertex_ids.second);
           }
-          else if (curr_edge_cut and next_edge_cut)
-          {
-//            raw_face.push_back(curr_eci.vertex_ids.first);
-            raw_face.push_back(curr_eci.cut_point_id);
-            dangling_vertex_id = curr_eci.vertex_ids.second;
-          }
-          else if (curr_edge_cut and (not next_edge_cut))
+          else if (curr_edge_cut)
           {
             raw_face.push_back(curr_eci.cut_point_id);
-            raw_face.push_back(curr_eci.vertex_ids.second);
           }
         }
         else
@@ -566,7 +582,7 @@ void chi_mesh::mesh_cutting::
 
     //================================= Add base-face and interface-face
     //                                  to polyhedron raw faces
-    raw_faces_polyhedron.push_back(cell.faces[BF_id].vertex_ids);
+    raw_faces_polyhedron.push_back(BF.vertex_ids);
     raw_faces_polyhedron.push_back(IF_vids);
 
     //================================= Build the faces of the sliver-tet
@@ -577,7 +593,7 @@ void chi_mesh::mesh_cutting::
     {
       auto edge = MakeEdgeFromPolygonEdgeIndex(IF_vids_reverse,e);
 
-      RawPolygon raw_face = {edge.first,edge.second,dangling_vertex_id};
+      RawPolygon raw_face = {edge.second,edge.first,dangling_vertex_id};
       raw_faces_slivertet.emplace_back(raw_face);
     }//for e
 
@@ -638,7 +654,7 @@ void chi_mesh::mesh_cutting::
     std::vector<uint64_t> dangling_vertex_ids;
     dangling_vertex_ids.reserve(2);
     for (uint64_t vid : cell.vertex_ids)
-      if (!VertexIsCut(vid)) dangling_vertex_ids.push_back(vid);
+      if (not VertexIsCut(vid)) dangling_vertex_ids.push_back(vid);
 
     if (dangling_vertex_ids.size() != 2)
       throw std::logic_error(fname + ": Case 3 dangling_vertices.size() != 2.");
@@ -958,8 +974,15 @@ void chi_mesh::mesh_cutting::
       throw std::logic_error(fname + ": Cell quality check B failed");
   }//end Case 4
   else
+  {
+    std::stringstream info;
+    info << "Cell:\n";
+    for (uint64_t vid : cell.vertex_ids)
+      info << vid << " " << mesh.vertices[vid]->PrintS() << "\n";
     throw std::logic_error(fname + ": Unsupported cut case. "
                            "num_edges_cut=" + std::to_string(num_edges_cut) +
-                           " num_vertices_cut=" + std::to_string(num_vertices_cut));
+                           " num_vertices_cut=" + std::to_string(num_vertices_cut) +
+                           "\n" + info.str());
+  }
 
 }

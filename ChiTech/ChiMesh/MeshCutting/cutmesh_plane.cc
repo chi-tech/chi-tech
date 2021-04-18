@@ -87,8 +87,8 @@ void chi_mesh::mesh_cutting::
       const auto& x = *mesh.vertices[vid];
       double new_sense = n.Dot(x-p);
 
-      if (new_sense < 0.0) ++num_neg_senses;
-      if (new_sense > 0.0) ++num_pos_senses;
+      if (new_sense < (0.0-float_compare)) ++num_neg_senses;
+      if (new_sense > (0.0+float_compare)) ++num_pos_senses;
 
       if (num_neg_senses>0 && num_pos_senses>0)
       {
