@@ -43,6 +43,11 @@ public:
 
     HarmonicIndices()=default;
     HarmonicIndices(unsigned int in_ell, int in_m) : ell(in_ell),m(in_m){}
+
+    bool operator==(const HarmonicIndices& other) const
+      {
+        return (ell == other.ell and m == other.m);
+      }
   };
 
 protected:
