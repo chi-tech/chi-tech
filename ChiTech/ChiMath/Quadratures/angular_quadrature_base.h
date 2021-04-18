@@ -80,7 +80,7 @@ public:
   GetMomentToDiscreteOperator() const {return m2d_op;}
 
   const std::vector<HarmonicIndices>&
-  GetMomentToHarmonicsIndexMap() {return m_to_ell_em_map;}
+  GetMomentToHarmonicsIndexMap() const {return m_to_ell_em_map;}
 };
 
 #endif
