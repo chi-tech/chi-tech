@@ -2,9 +2,7 @@
 #include "LegendrePoly/legendrepoly.h"
 #include <cmath>
 
-using namespace chi_math;
-
-#include <chi_log.h>
+#include "chi_log.h"
 
 extern ChiLog& chi_log;
 
@@ -12,50 +10,20 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Populates the abscissae and weights for a Gauss-Legendre
- * quadrature given the degree of the polynomial to integrate exactly.
+ * quadrature given the degree \f$ p \f$ of the mononomial such that
+ * the quadrature rule integrates exactly the weighted integrand
+ * \f$ \rho(x) x^{p} \f$, with \f$ \rho(x) := 1 \f$,
+ * on the interval \f$ [-1;+1] \f$.
  * The number of points generated will be ceil((O+1)/2).*/
 chi_math::QuadratureGaussLegendre::
-QuadratureGaussLegendre(QuadratureOrder in_order,
-                        int maxiters/*=1000*/,
-                        double tol/*=1.0e-12*/,
-                        bool verbose/*=false*/) :
-                        chi_math::Quadrature(in_order)
+  QuadratureGaussLegendre(QuadratureOrder in_order,
+                          bool verbose,
+                          unsigned int max_iters,
+                          double tol)
+  : chi_math::Quadrature(in_order)
 {
-  unsigned int N = std::ceil(  ((int)order + 1)/2.0  );
-
-  qpoints.clear();
-  weights.clear();
-
-  switch (order)
-  {
-    default:
-    {
-      if (verbose)
-        chi_log.Log() << "Initializing Gauss-Legendre Quadrature "
-                         "with " << N << " q-points";
-
-      //========================= Compute the roots
-      auto roots = FindRoots(N, maxiters, tol);
-      for (auto v : roots) qpoints.emplace_back(v);
-
-      //========================= Compute the weights
-      weights.resize(N,1.0);
-      for (size_t k=0; k < qpoints.size(); k++)
-      {
-        weights[k] =
-          2.0 * (1.0 - qpoints[k][0] * qpoints[k][0]) /
-          ((N + 1) * (N + 1) *
-           Legendre(N+1, qpoints[k][0]) * Legendre(N + 1, qpoints[k][0]) );
-
-        if (verbose)
-          chi_log.Log(LOG_0)
-            << "root[" << k << "]=" << qpoints[k][0]
-            << ", weight=" << weights[k];
-      }//for abscissae
-
-      break;
-    }
-  }//switch order
+  const unsigned int N = std::ceil( ((int)order + 1)/2.0 );
+  Initialize(N, verbose, max_iters, tol);
 }
 
 //###################################################################
@@ -64,14 +32,21 @@ QuadratureGaussLegendre(QuadratureOrder in_order,
  * order of the quadrature will be 2N-1.*/
 chi_math::QuadratureGaussLegendre::
   QuadratureGaussLegendre(unsigned int N,
-                          int maxiters/*=1000*/,
-                          double tol/*=1.0e-12*/,
-                          bool verbose/*=false*/) :
-                          chi_math::Quadrature((QuadratureOrder)(2*N-1))
+                          bool verbose,
+                          unsigned int max_iters,
+                          double tol)
+  : chi_math::Quadrature((QuadratureOrder)(2*N-1))
 {
-  qpoints.clear();
-  weights.clear();
+  Initialize(N, verbose, max_iters, tol);
+}
 
+//###################################################################
+/**Populates the abscissae and weights for a Gauss-Legendre
+ * quadrature given the number of desired quadrature points.*/
+void
+chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
+                                              unsigned int max_iters, double tol)
+{
   switch (order)
   {
     default:
@@ -81,7 +56,7 @@ chi_math::QuadratureGaussLegendre::
                          "with " << N << " q-points";
 
       //========================= Compute the roots
-      auto roots = FindRoots(N, maxiters, tol);
+      auto roots = FindRoots(N, max_iters, tol);
       for (auto v : roots) qpoints.emplace_back(v);
 
       //========================= Compute the weights
@@ -103,6 +78,7 @@ chi_math::QuadratureGaussLegendre::
     }
   }//switch order
 }
+
 
 //###################################################################
 /** Finds the roots of the Legendre polynomial.
@@ -122,7 +98,7 @@ chi_math::QuadratureGaussLegendre::
  *
  * \author Jan*/
 std::vector<double> chi_math::QuadratureGaussLegendre::FindRoots(
-  int N, int max_iters, double tol)
+  unsigned int N, unsigned int max_iters, double tol)
 {
   //======================================== Populate init guess
   //This initial guess proved to be quite important

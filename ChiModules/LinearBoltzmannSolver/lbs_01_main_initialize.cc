@@ -19,7 +19,6 @@ extern ChiConsole&  chi_console;
 void LinearBoltzmann::Solver::Initialize()
 {
   PerformInputChecks();
-  ComputeNumberOfMoments();
   PrintSimHeader();
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -45,6 +44,12 @@ void LinearBoltzmann::Solver::Initialize()
   //================================================== Init spatial discretization
   InitializeSpatialDiscretization();
 
+  //================================================== Initialize groupsets
+  InitializeGroupsets();
+
+  //================================================== Compute n. moments
+  ComputeNumberOfMoments();
+
   //================================================== Initialize parrays
   chi_log.Log(LOG_0)
     << "Initializing parallel arrays. " << std::endl;
@@ -59,8 +64,5 @@ void LinearBoltzmann::Solver::Initialize()
 
   //================================================== Initialize boundaries
   InitializeBoundaries();
-
-  //================================================== Initialize groupsets
-  InitializeGroupsets();
 
 }

@@ -1,6 +1,6 @@
-#include"product_quadrature.h"
-#include"quadrature_gausslegendre.h"
-#include"quadrature_gausschebyshev.h"
+#include "product_quadrature.h"
+#include "quadrature_gausslegendre.h"
+#include "quadrature_gausschebyshev.h"
 
 #include <cmath>
 #include <sstream>
@@ -15,74 +15,20 @@ void chi_math::ProductQuadrature::InitializeWithGL(int Np, bool verbose)
 {
   chi_math::QuadratureGaussLegendre gl_polar(Np*2);
 
-  double weight     = 0.0;
-  double weight_sum = 0.0;
-
   //================================================= Create azimuthal angles
-  azimu_ang.push_back(0.0);
+  azimu_ang.clear();
+  azimu_ang.emplace_back(0.0);
 
   //================================================== Create polar angles
-  if (verbose) chi_log.Log(LOG_0) << "Polar angles:";
-  for (unsigned j=0; j<(Np*2); j++)
-  {
-    polar_ang.push_back(M_PI-acos(gl_polar.qpoints[j][0]));
-    if (verbose) chi_log.Log(LOG_0) << polar_ang.back();
-  }
+  polar_ang.clear();
+  for (unsigned int j = 0; j < (Np*2); ++j)
+    polar_ang.emplace_back(M_PI-acos(gl_polar.qpoints[j][0]));
 
-  //================================================== Create angle pairs
-  std::stringstream ostr;
-  for (unsigned i=0; i<(1); i++)
-  {
-    for (unsigned j=0; j<(Np*2); j++)
-    {
-      chi_math::QuadraturePointPhiTheta new_pair;
+  //================================================== Create combined weights
+  auto& weights = gl_polar.weights;
 
-      new_pair.phi   = 0.0;
-      new_pair.theta = M_PI-acos(gl_polar.qpoints[j][0]);
-
-      abscissae.push_back(new_pair);
-
-      weight = gl_polar.weights[j];
-
-      weights.push_back(weight);
-      weight_sum += weight;
-
-      if (verbose)
-      {
-        char buf[200];
-        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair.phi*180.0/M_PI,
-                new_pair.theta*180.0/M_PI,
-                weight);
-        ostr << buf;
-      }
-    }
-  }
-
-  //================================================== Create omega list
-  for (size_t n=0; n<abscissae.size(); n++)
-  {
-    const chi_math::QuadraturePointPhiTheta& qpoint = abscissae[n];
-
-    chi_mesh::Vector3 new_omega;
-    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
-    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
-    new_omega.z = cos(qpoint.theta);
-
-    chi_log.Log(LOG_0VERBOSE_1)
-    << "Quadrature angle " << n
-    << " " << new_omega.PrintS();
-
-    omegas.push_back(new_omega);
-  }
-
-  if (verbose)
-  {
-    chi_log.Log(LOG_0)
-      << ostr.str() << "\n"
-      << "Weight sum=" << weight_sum;
-  }
-
+  //================================================== Initialize
+  InitializeWithCustom(azimu_ang, polar_ang, weights, verbose);
 }
 
 //#########################################################
@@ -93,75 +39,25 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
   chi_math::QuadratureGaussLegendre gl_polar(Np*2);
   chi_math::QuadratureGaussLegendre gl_azimu(Na*4);
 
-  double weight     = 0.0;
-  double weight_sum = 0.0;
-
   //================================================= Create azimuthal angles
-  if (verbose) chi_log.Log(LOG_0) << "Azimuthal angles:";
-  for (unsigned i=0; i<(Na*4); i++)
-  {
-    azimu_ang.push_back(M_PI*gl_azimu.qpoints[i][0] + M_PI);
-    if (verbose) chi_log.Log(LOG_0) << azimu_ang.back();
-  }
+  azimu_ang.clear();
+  for (unsigned int i = 0; i < (Na*4); ++i)
+    azimu_ang.emplace_back(M_PI*gl_azimu.qpoints[i][0] + M_PI);
 
   //================================================== Create polar angles
-  if (verbose) chi_log.Log(LOG_0) << "Polar angles:";
-  for (unsigned j=0; j<(Np*2); j++)
-  {
-    polar_ang.push_back(M_PI-acos(gl_polar.qpoints[j][0]));
-    if (verbose) chi_log.Log(LOG_0) << polar_ang.back();
-  }
+  polar_ang.clear();
+  for (unsigned int j = 0; j < (Np*2); ++j)
+    polar_ang.emplace_back(M_PI-acos(gl_polar.qpoints[j][0]));
 
-  //================================================== Create angle pairs
-  std::stringstream ostr;
-  for (unsigned i=0; i<(Na*4); i++)
-  {
-    for (unsigned j=0; j<(Np*2); j++)
-    {
-      chi_math::QuadraturePointPhiTheta new_pair;
+  //================================================== Create combined weights
+  std::vector<double> weights;
+  for (unsigned int i = 0; i < azimu_ang.size(); ++i)
+    for (unsigned int j = 0; j < polar_ang.size(); ++j)
+      weights.emplace_back(M_PI*gl_azimu.weights[i]*gl_polar.weights[j]);
 
-      new_pair.phi   = M_PI*gl_azimu.qpoints[i][0] + M_PI;
-      new_pair.theta = M_PI-acos(gl_polar.qpoints[j][0]);
-
-      abscissae.push_back(new_pair);
-
-      weight = M_PI*gl_azimu.weights[i]*gl_polar.weights[j];
-
-      weights.push_back(weight);
-      weight_sum += weight;
-
-      if (verbose)
-      {
-        char buf[200];
-        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair.phi*180.0/M_PI,
-                new_pair.theta*180.0/M_PI,
-                weight);
-        ostr << buf;
-      }
-    }
-  }
-
-  //================================================== Create omega list
-  for (auto& qpoint : abscissae)
-  {
-    chi_mesh::Vector3 new_omega;
-    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
-    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
-    new_omega.z = cos(qpoint.theta);
-
-    omegas.push_back(new_omega);
-  }
-
-  if (verbose)
-  {
-    chi_log.Log(LOG_0)
-      << ostr.str() << "\n"
-      << "Weight sum=" << weight_sum;
-  }
-
+  //================================================== Initialize
+  InitializeWithCustom(azimu_ang, polar_ang, weights, verbose);
 }
-
 
 //###################################################################
 /**Initializes the quadrature with Gauss-Legendre for the polar
@@ -169,77 +65,26 @@ void chi_math::ProductQuadrature::InitializeWithGLL(int Na, int Np, bool verbose
 void chi_math::ProductQuadrature::InitializeWithGLC(int Na, int Np, bool verbose)
 {
   chi_math::QuadratureGaussLegendre gl_polar(Np*2);
-  auto gl_azimu = new chi_math::QuadratureGaussChebyshev;
-
-  gl_azimu->Initialize(Na*4);
-
-  double weight     = 0.0;
-  double weight_sum = 0.0;
+  chi_math::QuadratureGaussChebyshev gc_azimu(Na*4);
 
   //================================================= Create azimuthal angles
-  if (verbose) chi_log.Log(LOG_0) << "Azimuthal angles:";
-  for (unsigned i=0; i<(Na*4); i++)
-  {
-    azimu_ang.push_back(M_PI*(2*(i+1)-1)/(Na*4));
-    if (verbose) chi_log.Log(LOG_0) << azimu_ang.back();
-  }
+  azimu_ang.clear();
+  for (unsigned int i = 0; i < (Na*4); ++i)
+    azimu_ang.emplace_back(M_PI*(2*(i+1)-1)/(Na*4));
 
   //================================================== Create polar angles
-  if (verbose) chi_log.Log(LOG_0) << "Polar angles:";
-  for (unsigned j=0; j<(Np*2); j++)
-  {
-    polar_ang.push_back(M_PI-acos(gl_polar.qpoints[j][0]));
-    if (verbose) chi_log.Log(LOG_0) << polar_ang.back();
-  }
+  polar_ang.clear();
+  for (unsigned int j = 0; j < (Np*2); ++j)
+    polar_ang.emplace_back(M_PI-acos(gl_polar.qpoints[j][0]));
 
-  //================================================== Create angle pairs
-  std::stringstream ostr;
-  for (unsigned i=0; i<(Na*4); i++)
-  {
-    for (unsigned j=0; j<(Np*2); j++)
-    {
-      chi_math::QuadraturePointPhiTheta new_pair;
+  //================================================== Create combined weights
+  std::vector<double> weights;
+  for (unsigned int i = 0; i < azimu_ang.size(); ++i)
+    for (unsigned int j = 0; j < polar_ang.size(); ++j)
+      weights.emplace_back(2*gc_azimu.weights[i]*gl_polar.weights[j]);
 
-      new_pair.phi   = M_PI*(2*(i+1)-1)/(Na*4);
-      new_pair.theta = M_PI-acos(gl_polar.qpoints[j][0]);
-
-      abscissae.push_back(new_pair);
-
-      weight = 2*gl_azimu->weights[i]*gl_polar.weights[j];
-
-      weights.push_back(weight);
-      weight_sum += weight;
-
-      if (verbose)
-      {
-        char buf[200];
-        sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair.phi*180.0/M_PI,
-                new_pair.theta*180.0/M_PI,
-                weight);
-        ostr << buf;
-      }
-    }
-  }
-
-  //================================================== Create omega list
-  for (auto& qpoint : abscissae)
-  {
-    chi_mesh::Vector3 new_omega;
-    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
-    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
-    new_omega.z = cos(qpoint.theta);
-
-    omegas.push_back(new_omega);
-  }
-
-  if (verbose)
-  {
-    chi_log.Log(LOG_0)
-      << ostr.str() << "\n"
-      << "Weight sum=" << weight_sum;
-  }
-
+  //================================================== Initialize
+  InitializeWithCustom(azimu_ang, polar_ang, weights, verbose);
 }
 
 //###################################################################
@@ -265,24 +110,41 @@ void chi_math::ProductQuadrature::
   azimu_ang = azimuthal;
   polar_ang = polar;
 
+  if (verbose)
+  {
+    chi_log.Log(LOG_0) << "Azimuthal angles:";
+    for (const auto& ang : azimu_ang)
+      chi_log.Log(LOG_0) << ang;
+
+    chi_log.Log(LOG_0) << "Polar angles:";
+    for (const auto& ang : polar_ang)
+      chi_log.Log(LOG_0) << ang;
+  }
+
   //================================================== Create angle pairs
+  map_directions.clear();
+  for (unsigned int j = 0; j < Np; ++j)
+    map_directions.emplace(j, std::vector<unsigned int>());
+
+  abscissae.clear();
+  weights.clear();
   std::stringstream ostr;
   double weight_sum = 0.0;
-  int nw = -1;
-  for (unsigned i=0; i<Na; i++)
+  for (unsigned int i = 0; i < Na; ++i)
   {
-    for (unsigned j=0; j<Np; j++)
+    for (unsigned int j = 0; j < Np; ++j)
     {
-      ++nw;
+      map_directions[j].emplace_back(i*Np+j);
+
       chi_math::QuadraturePointPhiTheta new_pair;
 
-      new_pair.phi   = azimuthal[i];
-      new_pair.theta = polar[j];
+      new_pair.phi   = azimu_ang[i];
+      new_pair.theta = polar_ang[j];
 
-      abscissae.push_back(new_pair);
+      abscissae.emplace_back(new_pair);
 
-      double weight = in_weights[nw];
-      weights.push_back(weight);
+      double weight = in_weights[i*Np+j];
+      weights.emplace_back(weight);
       weight_sum += weight;
 
       if (verbose)
@@ -298,14 +160,18 @@ void chi_math::ProductQuadrature::
   }
 
   //================================================== Create omega list
-  for (auto qpoint : abscissae)
+  omegas.clear();
+  for (const auto& qpoint : abscissae)
   {
     chi_mesh::Vector3 new_omega;
     new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
     new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
     new_omega.z = cos(qpoint.theta);
 
-    omegas.push_back(new_omega);
+    omegas.emplace_back(new_omega);
+
+    if (verbose)
+      chi_log.Log(LOG_0) << "Quadrature angle=" << new_omega.PrintS();
   }
 
   if (verbose)
@@ -315,14 +181,4 @@ void chi_math::ProductQuadrature::
       << "Weight sum=" << weight_sum;
   }
 
-}
-
-//###################################################################
-/**Obtains the abscissae index given the indices of the
- * polar angle index and the azimuthal angle index.*/
-int chi_math::ProductQuadrature::
-  GetAngleNum(int polar_angle_index, int azimu_ang_index)
-{
-  return azimu_ang_index*polar_ang.size() +
-         polar_angle_index;
 }

@@ -57,7 +57,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
 
 
-  if (ident == GAUSS_LEGENDRE) //GAUSS_LEGENDRE
+  if (ident == (int)chi_math::ProductQuadratureType::GAUSS_LEGENDRE)
   {
     if (num_args<2)
       LuaPostArgAmountError("chiCreateProductQuadrature",2,num_args);
@@ -87,7 +87,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     return 1;
   }
-  else if (ident == GAUSS_LEGENDRE_LEGENDRE) //GAUSS_LEGENDRE_LEGENDRE
+  else if (ident == (int)chi_math::ProductQuadratureType::GAUSS_LEGENDRE_LEGENDRE)
   {
     if (num_args<3)
       LuaPostArgAmountError("chiCreateProductQuadrature",3,num_args);
@@ -118,7 +118,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     return 1;
   }
-  else if (ident == GAUSS_LEGENDRE_CHEBYSHEV) //GAUSS_LEGENDRE_CHEBYSHEV
+  else if (ident == (int)chi_math::ProductQuadratureType::GAUSS_LEGENDRE_CHEBYSHEV)
   {
     if (num_args<3)
       LuaPostArgAmountError("chiCreateProductQuadrature",3,num_args);
@@ -149,7 +149,7 @@ int chiCreateProductQuadrature(lua_State *L)
 
     return 1;
   }
-  else if (ident == CUSTOM_QUADRATURE) //CUSTOM_QUADRATURE
+  else if (ident == (int)chi_math::ProductQuadratureType::CUSTOM_QUADRATURE)
   {
     if (num_args<4)
       LuaPostArgAmountError("chiCreateProductQuadrature:CUSTOM_QUADRATURE",3,num_args);
