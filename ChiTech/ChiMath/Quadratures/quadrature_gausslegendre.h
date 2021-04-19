@@ -2,7 +2,6 @@
 #define QUADRATURE_GAUSS_LEGENDRE_H
 
 #include "quadrature.h"
-#include <stdio.h>
 
 namespace chi_math
 {
@@ -14,22 +13,24 @@ namespace chi_math
 class chi_math::QuadratureGaussLegendre : public chi_math::Quadrature
 {
 public:
-  //01
   explicit
   QuadratureGaussLegendre(QuadratureOrder in_order,
-                          int maxiters=1000,
-                          double tol=1.0e-12,
-                          bool verbose=false);
+                          bool verbose=false,
+                          unsigned int max_iters=1000,
+                          double tol=1.0e-12);
 
   explicit
   QuadratureGaussLegendre(unsigned int N,
-                          int maxiters=1000,
-                          double tol=1.0e-12,
-                          bool verbose=false);
+                          bool verbose=false,
+                          unsigned int max_iters=1000,
+                          double tol=1.0e-12);
 
+private:
+  void Initialize(unsigned int N, bool verbose,
+                  unsigned int max_iters, double tol);
 
-  static std::vector<double> FindRoots(int N,
-                                       int max_iters=1000,
+  static std::vector<double> FindRoots(unsigned int N,
+                                       unsigned int max_iters=1000,
                                        double tol=1.0e-12);
 };
 

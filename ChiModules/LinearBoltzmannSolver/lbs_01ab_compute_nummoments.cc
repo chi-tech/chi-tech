@@ -1,30 +1,22 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
-
 //###################################################################
 /** Computes the number of moments for the given mesher types*/
 void LinearBoltzmann::Solver::ComputeNumberOfMoments()
 {
-  int L = options.scattering_order;
+  for (size_t gs = 1; gs < group_sets.size(); ++gs)
+    if (group_sets[gs].quadrature->GetMomentToHarmonicsIndexMap()
+        != group_sets[0].quadrature->GetMomentToHarmonicsIndexMap())
+      throw std::logic_error("LinearBoltzmann::Solver::ComputeNumberOfMoments : "
+                             "Moment-to-Harmonics mapping differs between "
+                             "groupsets, which is not allowed.");
 
-  if (options.geometry_type == GeometryType::ONED_SLAB)
-  {
-    this->num_moments = L+1;
-  }
-  else if (options.geometry_type == GeometryType::TWOD_CARTESIAN)
-  {
-    this->num_moments = 0;
-    for (int ell=0; ell<=L; ell++)
-      for (int m=-ell; m<=ell; m+=2)
-        if (ell == 0 or m != 0)
-          ++this->num_moments;
-  }
-  else if (options.geometry_type == GeometryType::THREED_CARTESIAN)
-  {
-    this->num_moments = (L+1)*(L+1);
-  }
+  num_moments =
+    (int)group_sets.front().quadrature->GetMomentToHarmonicsIndexMap().size();
+
+  if (num_moments == 0)
+    throw std::logic_error("LinearBoltzmann::Solver::ComputeNumberOfMoments : "
+                           "unable to infer number of moments from angular "
+                           "quadrature.");
 }
 

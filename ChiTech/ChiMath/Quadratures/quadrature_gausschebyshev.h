@@ -13,12 +13,16 @@ namespace chi_math
 class chi_math::QuadratureGaussChebyshev : public chi_math::Quadrature
 {
 public:
-  QuadratureGaussChebyshev() :
-    chi_math::Quadrature(QuadratureOrder::CONSTANT)
-  {}
-  //01
-  void Initialize(int N, bool verbose=false);
+  explicit
+  QuadratureGaussChebyshev(QuadratureOrder in_order,
+                           bool verbose=false);
 
+  explicit
+  QuadratureGaussChebyshev(unsigned int N,
+                           bool verbose=false);
+
+private:
+  void Initialize(unsigned int N, bool verbose);
 };
 
 #endif

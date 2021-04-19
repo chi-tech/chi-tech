@@ -134,13 +134,13 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 }
 
 //###################################################################
-/**Creates a raw polyhedron cell from a vtk-polygon.*/
+/**Creates a raw polygon cell from a vtk-polygon.*/
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKPolygon(vtkCell *vtk_cell)
 {
-  auto poly_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell   = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
-  auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
+  auto vtk_polygon = vtkPolygon::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_polygon->GetNumberOfPoints();
   auto num_cfaces  = num_cpoints;
 
@@ -172,18 +172,18 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 }
 
 //###################################################################
-/**Creates a raw polyhedron cell from a vtk-quad.*/
+/**Creates a raw polygon cell from a vtk-quad.*/
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKQuad(vtkCell *vtk_cell)
 {
-  auto poly_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell   = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
-  auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
-  auto num_cpoints = vtk_polygon->GetNumberOfPoints();
+  auto vtk_quad    = vtkQuad::SafeDownCast(vtk_cell);
+  auto num_cpoints = vtk_quad->GetNumberOfPoints();
   auto num_cfaces  = num_cpoints;
 
   poly_cell->vertex_ids.reserve(num_cpoints);
-  auto point_ids   = vtk_polygon->GetPointIds();
+  auto point_ids   = vtk_quad->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
     int point_id = point_ids->GetId(p);
@@ -210,18 +210,18 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 }
 
 //###################################################################
-/**Creates a raw polyhedron cell from a vtk-triangle.*/
+/**Creates a raw polygon cell from a vtk-triangle.*/
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKTriangle(vtkCell *vtk_cell)
 {
-  auto poly_cell  = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell   = new LightWeightCell(chi_mesh::CellType::POLYGON);
 
-  auto vtk_polygon    = vtkPolygon::SafeDownCast(vtk_cell);
-  auto num_cpoints = vtk_polygon->GetNumberOfPoints();
+  auto vtk_triangle= vtkTriangle::SafeDownCast(vtk_cell);
+  auto num_cpoints = vtk_triangle->GetNumberOfPoints();
   auto num_cfaces  = num_cpoints;
 
   poly_cell->vertex_ids.reserve(num_cpoints);
-  auto point_ids   = vtk_polygon->GetPointIds();
+  auto point_ids   = vtk_triangle->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
     int point_id = point_ids->GetId(p);
