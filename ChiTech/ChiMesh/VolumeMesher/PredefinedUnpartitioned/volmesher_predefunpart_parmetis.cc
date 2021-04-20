@@ -23,16 +23,11 @@ bool chi_mesh::VolumeMesherPredefinedUnpartitioned::
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
     const std::vector<int64_t>& cell_pids)
 {
-  auto handler = chi_mesh::GetCurrentHandler();
-
-  auto umesh = handler->unpartitionedmesh_stack.back();
-
   bool is_neighbor = false;
   for (const auto& face : lwcell.faces)
   {
-    if (face.neighbor < 0) continue;
-    auto adj_cell = umesh->raw_cells[face.neighbor];
-    int partition_id = cell_pids[face.neighbor];
+    if (not face.neighbor) continue;
+    int64_t partition_id = cell_pids[face.neighbor];
     if (partition_id == chi_mpi.location_id)
     {
       is_neighbor = true;
@@ -47,7 +42,7 @@ bool chi_mesh::VolumeMesherPredefinedUnpartitioned::
 /** Applies KBA-style partitioning to the mesh.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   PARMETIS(chi_mesh::UnpartitionedMesh* umesh,
-           chi_mesh::MeshContinuumPtr grid)
+           chi_mesh::MeshContinuumPtr& grid)
 {
   chi_log.Log(LOG_0) << "Partitioning mesh.";
   std::vector<int64_t> cell_pids(umesh->raw_cells.size(),0);
@@ -66,9 +61,9 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
         i_indices[i] = icount;
 
         for (auto& face : cell->faces)
-          if (face.neighbor >= 0)
+          if (face.has_neighbor)
           {
-            j_indices.push_back(face.neighbor);
+            j_indices.push_back(int64_t(face.neighbor));
             ++icount;
           }
       }
@@ -94,7 +89,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
       MatCreateMPIAdj(PETSC_COMM_SELF,
                       (int64_t)umesh->raw_cells.size(),
                       (int64_t)umesh->raw_cells.size(),
-                      i_indices_raw,j_indices_raw,NULL,&Adj);
+                      i_indices_raw, j_indices_raw, nullptr, &Adj);
 
       chi_log.Log(LOG_0VERBOSE_1) << "Done creating adjacency matrix.";
 
@@ -115,7 +110,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
       const int64_t* cell_pids_raw;
       ISGetIndices(is,&cell_pids_raw);
       i=0;
-      for (auto cell : umesh->raw_cells)
+      for (__unused auto cell : umesh->raw_cells)
       {
         cell_pids[i] = cell_pids_raw[i];
         ++i;

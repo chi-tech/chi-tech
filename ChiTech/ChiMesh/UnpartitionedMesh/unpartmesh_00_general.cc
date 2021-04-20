@@ -31,7 +31,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   auto point_ids   = vtk_polyh->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
-    int point_id = point_ids->GetId(p);
+    uint64_t point_id = point_ids->GetId(p);
     polyh_cell->vertex_ids.push_back(point_id);
   }//for p
 
@@ -45,7 +45,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
     face.vertex_ids.reserve(num_face_points);
     auto face_point_ids = vtk_face->GetPointIds();
     for (int p = 0; p < num_face_points; ++p) {
-      int point_id = face_point_ids->GetId(p);
+      uint64_t point_id = face_point_ids->GetId(p);
       face.vertex_ids.push_back(point_id);
     }
 
@@ -70,7 +70,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   auto point_ids   = vtk_hex->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
-    int point_id = point_ids->GetId(p);
+    uint64_t point_id = point_ids->GetId(p);
     polyh_cell->vertex_ids.push_back(point_id);
   }//for p
 
@@ -84,7 +84,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
     face.vertex_ids.reserve(num_face_points);
     auto face_point_ids = vtk_face->GetPointIds();
     for (int p = 0; p < num_face_points; ++p) {
-      int point_id = face_point_ids->GetId(p);
+      uint64_t point_id = face_point_ids->GetId(p);
       face.vertex_ids.push_back(point_id);
     }
 
@@ -109,7 +109,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   auto point_ids   = vtk_tet->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
-    int point_id = point_ids->GetId(p);
+    uint64_t point_id = point_ids->GetId(p);
     polyh_cell->vertex_ids.push_back(point_id);
   }//for p
 
@@ -123,7 +123,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
     face.vertex_ids.reserve(num_face_points);
     auto face_point_ids = vtk_face->GetPointIds();
     for (int p = 0; p < num_face_points; ++p) {
-      int point_id = face_point_ids->GetId(p);
+      uint64_t point_id = face_point_ids->GetId(p);
       face.vertex_ids.push_back(point_id);
     }
 
@@ -148,7 +148,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   auto point_ids   = vtk_polygon->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
-    int point_id = point_ids->GetId(p);
+    uint64_t point_id = point_ids->GetId(p);
     poly_cell->vertex_ids.push_back(point_id);
   }//for p
 
@@ -186,7 +186,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   auto point_ids   = vtk_quad->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
-    int point_id = point_ids->GetId(p);
+    uint64_t point_id = point_ids->GetId(p);
     poly_cell->vertex_ids.push_back(point_id);
   }//for p
 
@@ -224,7 +224,7 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   auto point_ids   = vtk_triangle->GetPointIds();
   for (int p=0; p<num_cpoints; ++p)
   {
-    int point_id = point_ids->GetId(p);
+    uint64_t point_id = point_ids->GetId(p);
     poly_cell->vertex_ids.push_back(point_id);
   }//for p
 
@@ -254,13 +254,8 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   //======================================== Reset all cell neighbors
   int num_bndry_faces = 0;
   for (auto& cell : raw_cells)
-  {
     for (auto& face : cell->faces)
-    {
-      if (face.neighbor < 0) ++num_bndry_faces;
-      face.neighbor = -1;
-    }
-  }
+      if (not face.has_neighbor) ++num_bndry_faces;
 
   chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                               << " Number of unconnected faces "
@@ -292,7 +287,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
     for (auto& cur_cell_face : cell->faces)
     {
-      if (cur_cell_face.neighbor >= 0 ) continue;
+      if (cur_cell_face.has_neighbor) continue;
 
       std::set<uint64_t> cfvids(cur_cell_face.vertex_ids.begin(),
                                 cur_cell_face.vertex_ids.end());
@@ -303,7 +298,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
         for (auto& adj_cell_face : adj_cell->faces)
         {
-          if (adj_cell_face.neighbor >= 0) continue;
+          if (adj_cell_face.has_neighbor) continue;
           std::set<uint64_t> afvids(adj_cell_face.vertex_ids.begin(),
                                     adj_cell_face.vertex_ids.end());
 
@@ -311,6 +306,10 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
           {
             cur_cell_face.neighbor = adj_cell_id;
             adj_cell_face.neighbor = cur_cell_id;
+
+            cur_cell_face.has_neighbor = true;
+            adj_cell_face.has_neighbor = true;
+
             goto face_neighbor_found;
           }
         }//for adjacent cell face
@@ -328,7 +327,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   {
     bool cell_on_boundary = false;
     for (auto& face : cell->faces)
-      if (face.neighbor < 0)
+      if (not face.has_neighbor)
       { cell_on_boundary = true; break; }
 
     if (cell_on_boundary) internal_cells_on_boundary.push_back(cell);
@@ -348,24 +347,38 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   // Process boundary cells
   cur_cell_id=0;
   for (auto& cell : internal_cells_on_boundary)
-  {
-    cells_to_search.clear();
-    for (uint64_t vid : cell->vertex_ids)
-      for (uint64_t cell_id : vertex_subs[vid])
-        if (cell_id != cur_cell_id)
+    for (auto& face : cell->faces)
+    {
+      if (face.has_neighbor) continue;
+      std::set<uint64_t> cfvids(face.vertex_ids.begin(),
+                                face.vertex_ids.end());
+
+      cells_to_search.clear();
+      for (uint64_t vid : face.vertex_ids)
+        for (uint64_t cell_id : vertex_subs[vid])
           cells_to_search.insert(cell_id);
 
+      for (uint64_t adj_cell_id : cells_to_search)
+      {
+        auto& adj_cell = raw_boundary_cells[adj_cell_id];
 
+        std::set<uint64_t> afvids(adj_cell->vertex_ids.begin(),
+                                  adj_cell->vertex_ids.end());
 
-    ++cur_cell_id;
-  }
+        if (cfvids == afvids)
+        {
+          face.neighbor = adj_cell->material_id;
+          break;
+        }
+      }//for adj_cell_id
+    }//for face
 
   chi_log.Log() << "Done establishing cell connectivity.";
 
   num_bndry_faces = 0;
   for (auto cell : raw_cells)
     for (auto& face : cell->faces)
-      if (face.neighbor < 0) ++num_bndry_faces;
+      if (not face.has_neighbor) ++num_bndry_faces;
 
   chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                               << " Number of boundary faces "
@@ -382,7 +395,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
     for (auto vid : cell->vertex_ids)
       cell->centroid += *vertices[vid];
 
-    cell->centroid = cell->centroid/(cell->vertex_ids.size());
+    cell->centroid = cell->centroid/double(cell->vertex_ids.size());
   }
   chi_log.Log() << "Done computing cell-centroids.";
 
@@ -395,7 +408,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
         chi_mesh::Vector3 face_centroid;
         for (uint64_t vid : face.vertex_ids)
           face_centroid += *vertices[vid];
-        face_centroid /= face.vertex_ids.size();
+        face_centroid /= double(face.vertex_ids.size());
 
         if (face.vertex_ids.size()<2)
           throw std::logic_error(std::string(__PRETTY_FUNCTION__) +

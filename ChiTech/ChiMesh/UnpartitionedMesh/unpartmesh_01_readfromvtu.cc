@@ -54,8 +54,8 @@ void chi_mesh::UnpartitionedMesh::
   cleaner->Update();
   auto ugrid = cleaner->GetOutput();
 //  auto ugrid = reader->GetOutput();
-  int total_cell_count  = ugrid->GetNumberOfCells();
-  int total_point_count = ugrid->GetNumberOfPoints();
+  uint64_t total_cell_count  = ugrid->GetNumberOfCells();
+  uint64_t total_point_count = ugrid->GetNumberOfPoints();
 
   chi_log.Log(LOG_0)
     << "Clean grid num cells and points: "

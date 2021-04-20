@@ -16,7 +16,7 @@ public:
   {
     std::vector<uint64_t> vertex_ids;
     bool has_neighbor = false;
-    int neighbor=-1;
+    uint64_t neighbor=0;
   };
   struct LightWeightCell
   {
@@ -55,13 +55,13 @@ public:
            zmin=0.0, zmax=0.0;
   } bound_box;
 
-  LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
 
-  LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
 
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();
