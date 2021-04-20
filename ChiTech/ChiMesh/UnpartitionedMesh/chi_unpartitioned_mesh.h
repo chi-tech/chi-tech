@@ -14,8 +14,9 @@ class chi_mesh::UnpartitionedMesh
 public:
   struct LightWeightFace
   {
-    int neighbor=-1;
     std::vector<uint64_t> vertex_ids;
+    bool has_neighbor = false;
+    int neighbor=-1;
   };
   struct LightWeightCell
   {
@@ -30,8 +31,9 @@ public:
   };
 
 public:
-  std::vector<chi_mesh::Vertex*>  vertices;
+  std::vector<chi_mesh::Vertex*>   vertices;
   std::vector<LightWeightCell*>    raw_cells;
+  std::vector<LightWeightCell*>    raw_boundary_cells;
 
 public:
   enum class ParallelMethod

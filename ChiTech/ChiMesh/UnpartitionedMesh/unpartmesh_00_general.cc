@@ -251,19 +251,8 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 /**Establishes neighbor connectivity for the light-weight mesh.*/
 void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 {
-  //======================================== Populate vertex
-  //                                                   subscriptionns
-  std::vector<std::set<size_t>> vertex_subs(vertices.size());
-  uint64_t cur_cell_id=0;
-  for (auto& cell : raw_cells)
-  {
-    for (auto vid : cell->vertex_ids)
-      vertex_subs[vid].insert(cur_cell_id);
-    ++cur_cell_id;
-  }
-
+  //======================================== Reset all cell neighbors
   int num_bndry_faces = 0;
-  int cell_cnt = 0;
   for (auto& cell : raw_cells)
   {
     for (auto& face : cell->faces)
@@ -274,12 +263,24 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   }
 
   chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
-                              << " Number of boundary faces "
+                              << " Number of unconnected faces "
                                  "before connectivity: " << num_bndry_faces;
 
-  //======================================== Establish connectivity
   chi_log.Log() << "Establishing cell connectivity.";
-  std::set<size_t> cells_to_search;
+
+  //======================================== Establish internal connectivity
+  // Populate vertex subscriptions to internal cells
+  std::vector<std::set<size_t>> vertex_subs(vertices.size());
+  uint64_t cur_cell_id=0;
+  for (auto& cell : raw_cells)
+  {
+    for (auto vid : cell->vertex_ids)
+      vertex_subs[vid].insert(cur_cell_id);
+    ++cur_cell_id;
+  }
+
+  // Process raw cells
+  std::set<size_t> cells_to_search; //This will be used and abused below
   cur_cell_id=0;
   for (auto& cell : raw_cells)
   {
@@ -319,6 +320,45 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
     ++cur_cell_id;
   }//for cell
+
+  //======================================== Establish boundary connectivity
+  // Make list of boundary cells
+  std::vector<LightWeightCell*> internal_cells_on_boundary;
+  for (auto& cell : raw_cells)
+  {
+    bool cell_on_boundary = false;
+    for (auto& face : cell->faces)
+      if (face.neighbor < 0)
+      { cell_on_boundary = true; break; }
+
+    if (cell_on_boundary) internal_cells_on_boundary.push_back(cell);
+  }
+
+  // Populate vertex subscriptions to boundary cells
+  vertex_subs.clear();
+  vertex_subs.assign(vertices.size(),std::set<size_t>());
+  cur_cell_id=0;
+  for (auto& cell : raw_boundary_cells)
+  {
+    for (auto vid : cell->vertex_ids)
+      vertex_subs[vid].insert(cur_cell_id);
+    ++cur_cell_id;
+  }
+
+  // Process boundary cells
+  cur_cell_id=0;
+  for (auto& cell : internal_cells_on_boundary)
+  {
+    cells_to_search.clear();
+    for (uint64_t vid : cell->vertex_ids)
+      for (uint64_t cell_id : vertex_subs[vid])
+        if (cell_id != cur_cell_id)
+          cells_to_search.insert(cell_id);
+
+
+
+    ++cur_cell_id;
+  }
 
   chi_log.Log() << "Done establishing cell connectivity.";
 
