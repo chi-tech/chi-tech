@@ -44,6 +44,8 @@ public:
   struct Options
   {
     std::string file_name;
+    std::string material_id_fieldname;
+    std::string boundary_id_fieldname;
     double scale=1.0;
     ParallelMethod parallel_method = ParallelMethod::ALL_FROM_HOME;
   }mesh_options;

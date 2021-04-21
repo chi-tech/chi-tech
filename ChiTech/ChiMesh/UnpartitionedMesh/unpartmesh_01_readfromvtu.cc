@@ -53,7 +53,7 @@ void chi_mesh::UnpartitionedMesh::
   cleaner->SetInputData(reader->GetOutput());
   cleaner->Update();
   auto ugrid = cleaner->GetOutput();
-//  auto ugrid = reader->GetOutput();
+
   uint64_t total_cell_count  = ugrid->GetNumberOfCells();
   uint64_t total_point_count = ugrid->GetNumberOfPoints();
 
@@ -61,6 +61,26 @@ void chi_mesh::UnpartitionedMesh::
     << "Clean grid num cells and points: "
     << total_cell_count << " "
     << total_point_count;
+
+  //======================================== Lambda's
+  auto CellIs3D = [](int vtk_celltype)
+  {
+    if (vtk_celltype == VTK_POLYHEDRON or
+        vtk_celltype == VTK_HEXAHEDRON or
+        vtk_celltype == VTK_TETRA)
+      return true;
+
+    return false;
+  };
+
+  //======================================== Scan cells for 3D
+  bool mesh_is_2D = true;
+  for (int c=0; c<total_cell_count; ++c)
+    if (CellIs3D(ugrid->GetCell(c)->GetCellType()))
+    {
+      mesh_is_2D = false;
+      break;
+    }
 
   //======================================== Push cells
   size_t num_polyhedrons  = 0;
@@ -90,17 +110,26 @@ void chi_mesh::UnpartitionedMesh::
     }
     else if (vtk_celltype == VTK_POLYGON)
     {
-      raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+      if (mesh_is_2D)
+        raw_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
+      else
+        raw_boundary_cells.push_back(CreateCellFromVTKPolygon(vtk_cell));
       ++num_polygons;
     }
     else if (vtk_celltype == VTK_QUAD)
     {
-      raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
+      if (mesh_is_2D)
+        raw_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
+      else
+        raw_boundary_cells.push_back(CreateCellFromVTKQuad(vtk_cell));
       ++num_quads;
     }
     else if (vtk_celltype == VTK_TRIANGLE)
     {
-      raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
+      if (mesh_is_2D)
+        raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
+      else
+        raw_boundary_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
       ++num_triangles;
     }
     else

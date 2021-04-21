@@ -172,6 +172,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if (IsElementType3D(elem_type))
     {
       mesh_is_2D_assumption = false;
+      chi_log.Log() << "Mesh identified as 3D.";
       break; //have the answer now leave loop
     }
 
@@ -218,6 +219,9 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if (not IsElementSupported(elem_type))
       throw std::logic_error(fname + ": Unsupported element encountered.");
 
+    chi_log.Log(LOG_0VERBOSE_1) << "Reading element: " << file_line
+                                << " type: " << elem_type;
+
     int num_cell_nodes;
     if (elem_type == 1)
       num_cell_nodes = 2;
@@ -239,11 +243,13 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       {
         raw_cell = new LightWeightCell(CellType::SLAB);
         raw_boundary_cells.push_back(raw_cell);
+        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_boundary_cells.";
       }
       else if (IsElementType2D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYGON);
         raw_cells.push_back(raw_cell);
+        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_cells.";
       }
     }
     else
@@ -252,16 +258,17 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       {
         raw_cell = new LightWeightCell(CellType::POLYGON);
         raw_boundary_cells.push_back(raw_cell);
+        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_boundary_cells.";
       }
-      else if (IsElementType3D)
+      else if (IsElementType3D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYHEDRON);
         raw_cells.push_back(raw_cell);
+        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_cells.";
       }
     }
 
-    if (raw_cell == nullptr)
-      throw std::logic_error(fname + ": Bad trouble making a cell.");
+    if (raw_cell == nullptr) continue;
 
     auto& cell = *raw_cell;
     cell.material_id = physical_reg;
@@ -296,7 +303,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     {
       auto& v = cell.vertex_ids;
       std::vector<LightWeightFace> lw_faces(4);
-      lw_faces[0].vertex_ids = {v[0], v[2], v[1]};
+      lw_faces[0].vertex_ids = {v[0], v[2], v[1]}; //base-face
       lw_faces[1].vertex_ids = {v[0], v[3], v[2]};
       lw_faces[2].vertex_ids = {v[3], v[1], v[2]};
       lw_faces[3].vertex_ids = {v[3], v[0], v[1]};
