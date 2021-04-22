@@ -2,7 +2,10 @@
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
+
 #include "chi_mpi.h"
+
+#include <map>
 
 //###################################################################
 /**Reads an unpartitioned mesh from a gmesh .msh legacy ASCII format 2 file.*/
@@ -327,6 +330,35 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
   }//for elements
 
   file.close();
+
+  //======================================== Remap material-ids
+  std::set<int>     material_ids_set_as_read;
+  std::map<int,int> material_mapping;
+
+  for (auto& cell : raw_cells)
+    material_ids_set_as_read.insert(cell->material_id);
+
+  std::set<int>     boundary_ids_set_as_read;
+  std::map<int,int> boundary_mapping;
+
+  for (auto& cell : raw_boundary_cells)
+    boundary_ids_set_as_read.insert(cell->material_id);
+
+  {
+    int m=0;
+    for (const auto& mat_id : material_ids_set_as_read)
+      material_mapping.insert(std::make_pair(mat_id,m++));
+
+    int b=0;
+    for (const auto& bndry_id : boundary_ids_set_as_read)
+      boundary_mapping.insert(std::make_pair(bndry_id,b++));
+  }
+
+  for (auto& cell : raw_cells)
+    cell->material_id = material_mapping[cell->material_id];
+
+  for (auto& cell : raw_boundary_cells)
+    cell->material_id = boundary_mapping[cell->material_id];
 
   //======================================== Always do this
   ComputeCentroidsAndCheckQuality();

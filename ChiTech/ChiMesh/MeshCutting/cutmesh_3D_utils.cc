@@ -388,6 +388,7 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedron,cell);
 
     auto new_cell = new chi_mesh::CellPolyhedron;
+    new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_slivertet,*new_cell);
 
     mesh.cells.push_back(new_cell);
@@ -601,6 +602,7 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedron,cell);
 
     auto new_cell = new chi_mesh::CellPolyhedron;
+    new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_slivertet,*new_cell);
 
     mesh.cells.push_back(new_cell);
@@ -719,6 +721,7 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_tetA,cell);
 
     auto new_cell = new chi_mesh::CellPolyhedron;
+    new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_tetB,*new_cell);
 
     mesh.cells.push_back(new_cell);
@@ -943,6 +946,7 @@ void chi_mesh::mesh_cutting::
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedronA,cell);
 
     auto new_cell = new chi_mesh::CellPolyhedron;
+    new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedronB,*new_cell);
 
     mesh.cells.push_back(new_cell);
