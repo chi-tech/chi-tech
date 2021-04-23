@@ -31,7 +31,7 @@ public:
   };
 
 public:
-  std::vector<chi_mesh::Vertex*>   vertices;
+  std::vector<chi_mesh::Vertex>    vertices;
   std::vector<LightWeightCell*>    raw_cells;
   std::vector<LightWeightCell*>    raw_boundary_cells;
 

@@ -90,11 +90,11 @@ Initialize()
           {
             //Assume each point is inside the cell, now try to disprove it
             bool is_inside = true;
-            int v0_i = slab_cell->vertex_ids[0];
-            int v1_i = slab_cell->vertex_ids[1];
+            uint64_t v0_i = slab_cell->vertex_ids[0];
+            uint64_t v1_i = slab_cell->vertex_ids[1];
 
-            chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
-            chi_mesh::Vector3 v1 = *grid_view->vertices[v1_i];
+            const auto& v0 = grid_view->vertices[v0_i];
+            const auto& v1 = grid_view->vertices[v1_i];
 
             chi_mesh::Vector3 v01 = v1 - v0;
             chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
@@ -140,8 +140,8 @@ Initialize()
               int v0_i = poly_cell->faces[e].vertex_ids[0];
               int v1_i = poly_cell->faces[e].vertex_ids[1];
 
-              chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
-              chi_mesh::Vector3 v1 = *grid_view->vertices[v1_i];
+              const auto& v0 = grid_view->vertices[v0_i];
+              const auto& v1 = grid_view->vertices[v1_i];
 
               chi_mesh::Vector3 v01 = v1 - v0;
               chi_mesh::Vector3   n = v01.Cross(nref);
@@ -188,7 +188,7 @@ Initialize()
               {
                 int v0_i = edges[e][0];
 
-                chi_mesh::Vector3 v0 = *grid_view->vertices[v0_i];
+                const auto& v0 = grid_view->vertices[v0_i];
                 chi_mesh::Vector3 n  = polyh_cell->faces[f].normal;
 
                 chi_mesh::Vector3 v0p = interpolation_points[p] - v0;

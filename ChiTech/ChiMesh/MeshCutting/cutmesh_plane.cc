@@ -32,9 +32,8 @@ void chi_mesh::mesh_cutting::
   //                                              parallel faces
   // Order N, num_vertices
   size_t num_verts_snapped=0;
-  for (auto vertex_ptr : mesh.vertices)
+  for (auto& vertex : mesh.vertices)
   {
-    auto& vertex = *vertex_ptr;
     double d_from_plane = n.Dot(vertex - p);
 
     if (std::fabs(d_from_plane) < merge_tolerance)
@@ -84,7 +83,7 @@ void chi_mesh::mesh_cutting::
     size_t num_pos_senses = 0;
     for (auto vid : cell.vertex_ids)
     {
-      const auto& x = *mesh.vertices[vid];
+      const auto& x = mesh.vertices[vid];
       double new_sense = n.Dot(x-p);
 
       if (new_sense < (0.0-float_compare)) ++num_neg_senses;
@@ -112,7 +111,7 @@ void chi_mesh::mesh_cutting::
       for (auto cell_ptr : cells_to_cut)
         for (uint64_t vid : cell_ptr->vertex_ids)
         {
-          const auto vertex = *mesh.vertices[vid];
+          const auto vertex = mesh.vertices[vid];
           double dv = std::fabs((vertex-p).Dot(n));
           if (dv<float_compare)
             cut_vertices.insert(vid);
@@ -142,8 +141,8 @@ void chi_mesh::mesh_cutting::
     {
       for (auto& edge : edges_set)
       {
-        const auto& v0 = *mesh.vertices[edge.first];
-        const auto& v1 = *mesh.vertices[edge.second];
+        const auto& v0 = mesh.vertices[edge.first];
+        const auto& v1 = mesh.vertices[edge.second];
 
         chi_mesh::Vector3 cut_point;
 
@@ -153,7 +152,7 @@ void chi_mesh::mesh_cutting::
           double dv1 = std::fabs((v1-p).Dot(n));
           if (dv0>float_compare and dv1>float_compare)
           {
-            mesh.vertices.push_back(new chi_mesh::Vector3(cut_point));
+            mesh.vertices.push_back(cut_point);
             cut_edges.emplace_back(edge, mesh.vertices.size() - 1);
             ++num_edges_cut;
           }
@@ -181,7 +180,7 @@ void chi_mesh::mesh_cutting::
       for (auto cell_ptr : cells_to_cut)
         for (uint64_t vid : cell_ptr->vertex_ids)
         {
-          const auto vertex = *mesh.vertices[vid];
+          const auto& vertex = mesh.vertices[vid];
           double dv = std::fabs((vertex-p).Dot(n));
           if (dv<float_compare)
             cut_vertices.insert(vid);
@@ -213,8 +212,8 @@ void chi_mesh::mesh_cutting::
     {
       for (auto& edge : edges_set)
       {
-        const auto& v0 = *mesh.vertices[edge.first];
-        const auto& v1 = *mesh.vertices[edge.second];
+        const auto& v0 = mesh.vertices[edge.first];
+        const auto& v1 = mesh.vertices[edge.second];
 
         chi_mesh::Vector3 cut_point;
 
@@ -224,7 +223,7 @@ void chi_mesh::mesh_cutting::
           double dv1 = std::fabs((v1-p).Dot(n));
           if (dv0>float_compare and dv1>float_compare)
           {
-            mesh.vertices.push_back(new chi_mesh::Vector3(cut_point));
+            mesh.vertices.push_back(cut_point);
             cut_edges.emplace_back(edge, mesh.vertices.size() - 1);
             ++num_edges_cut;
           }

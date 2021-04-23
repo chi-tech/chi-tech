@@ -132,8 +132,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   chi_log.Log(LOG_0) << "Done partitioning mesh.";
 
   //======================================== Load up the vertices
-  for (auto vert : umesh->vertices)
-    grid->vertices.push_back(new chi_mesh::Vertex(*vert));
+  for (auto& vert : umesh->vertices)
+    grid->vertices.push_back(vert);
 
   MPI_Barrier(MPI_COMM_WORLD);
 

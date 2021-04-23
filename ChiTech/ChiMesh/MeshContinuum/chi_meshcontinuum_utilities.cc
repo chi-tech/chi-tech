@@ -258,7 +258,7 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::
   }
   chi_mesh::Vector3 centroid;
   for (auto node_id : list)
-    centroid = centroid + *vertices[node_id];
+    centroid = centroid + vertices[node_id];
 
   return centroid/double(list.size());
 }

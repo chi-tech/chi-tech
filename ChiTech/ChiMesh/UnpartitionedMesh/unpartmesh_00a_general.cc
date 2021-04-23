@@ -16,7 +16,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
   {
     cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
     for (auto vid : cell->vertex_ids)
-      cell->centroid += *vertices[vid];
+      cell->centroid += vertices[vid];
 
     cell->centroid = cell->centroid/double(cell->vertex_ids.size());
   }
@@ -30,7 +30,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
       {
         chi_mesh::Vector3 face_centroid;
         for (uint64_t vid : face.vertex_ids)
-          face_centroid += *vertices[vid];
+          face_centroid += vertices[vid];
         face_centroid /= double(face.vertex_ids.size());
 
         if (face.vertex_ids.size()<2)
@@ -38,8 +38,8 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
                                  ": cell-center-to-face check encountered face with less than"
                                  " 2 vertices on a face, making normal computation impossible.");
 
-        const auto& fv1 = *vertices[face.vertex_ids[0]];
-        const auto& fv2 = *vertices[face.vertex_ids[1]];
+        const auto& fv1 = vertices[face.vertex_ids[0]];
+        const auto& fv2 = vertices[face.vertex_ids[1]];
 
         auto E0 = fv1-face_centroid;
         auto E1 = fv2-face_centroid;

@@ -42,7 +42,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
     //===================================================== Keyword "v" for Vertex
     if (first_word == "v")
     {
-      auto newVertex = new chi_mesh::Vertex;
+      chi_mesh::Vertex newVertex;
       for (int k=1;k<=3;k++)
       {
         //================================== Extract sub word
@@ -56,11 +56,11 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
           double numValue = std::stod(sub_word);
 
           if (k==1)
-            newVertex->x = numValue;
+            newVertex.x = numValue;
           else if (k==2)
-            newVertex->y = numValue;
+            newVertex.y = numValue;
           else if (k==3)
-            newVertex->z = numValue;
+            newVertex.z = numValue;
         }
 
           //============================= Catch conversion error

@@ -71,8 +71,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
           std::vector<chi_mesh::Vector3> tet_points;
 
-          tet_points.push_back(*grid_view->vertices[v0_i]);
-          tet_points.push_back(*grid_view->vertices[v1_i]);
+          tet_points.push_back(grid_view->vertices[v0_i]);
+          tet_points.push_back(grid_view->vertices[v1_i]);
           tet_points.push_back(polyh_cell->faces[f].centroid);
           tet_points.push_back(polyh_cell->centroid);
 
@@ -134,7 +134,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
         face_isds.v1_dofindex_cell = v;
 
         face_isds.weights = std::pair<double,double>(0.5,0.5);
-        face_isds.point   = *grid_view->vertices[v0gi];
+        face_isds.point   = grid_view->vertices[v0gi];
 
         cell_isds.intersections.push_back(face_isds);
       }
@@ -189,8 +189,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::
           int v0gi = edges[e][0]; //global index v0
           int v1gi = edges[e][1]; //global index v1
 
-          chi_mesh::Vertex v0 = (*grid_view->vertices[v0gi]);
-          chi_mesh::Vertex v1 = (*grid_view->vertices[v1gi]);
+          const auto& v0 = grid_view->vertices[v0gi];
+          const auto& v1 = grid_view->vertices[v1gi];
 
           chi_mesh::Vertex interstion_point;            //Placeholder
           std::pair<double,double> weights;

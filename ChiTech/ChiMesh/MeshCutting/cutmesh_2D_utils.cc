@@ -31,8 +31,8 @@ void chi_mesh::mesh_cutting::
 
   cell.centroid = chi_mesh::Vector3(0.0,0.0,0.0);
   for (uint64_t vid : cell.vertex_ids)
-    cell.centroid += *mesh.vertices[vid];
-  cell.centroid /= cell.vertex_ids.size();
+    cell.centroid += mesh.vertices[vid];
+  cell.centroid /= double(cell.vertex_ids.size());
 
   size_t num_verts = vertex_ids.size();
   for (size_t v=0; v<num_verts; ++v)
@@ -42,8 +42,8 @@ void chi_mesh::mesh_cutting::
     uint64_t v0id = cell.vertex_ids[v];
     uint64_t v1id = cell.vertex_ids[v1_ref];
 
-    const chi_mesh::Vertex& v0 = *mesh.vertices[v0id];
-    const chi_mesh::Vertex& v1 = *mesh.vertices[v1id];
+    const auto& v0 = mesh.vertices[v0id];
+    const auto& v1 = mesh.vertices[v1id];
 
     chi_mesh::Vector3 v01 = v1 - v0;
 
@@ -72,8 +72,8 @@ bool chi_mesh::mesh_cutting::
   {
     auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids,e);
 
-    auto& v1 = *mesh.vertices[edge.first];
-    auto& v2 = *mesh.vertices[edge.second];
+    const auto& v1 = mesh.vertices[edge.first];
+    const auto& v2 = mesh.vertices[edge.second];
 
     auto v01 = v1-v0;
     auto v02 = v2-v0;
@@ -117,9 +117,9 @@ void chi_mesh::mesh_cutting::
       auto& edge0 = cell_edges[e  ];
       auto& edge1 = cell_edges[ep1];
 
-      const auto& v0 = *mesh.vertices[edge0.first];
-      const auto& v1 = *mesh.vertices[edge0.second];
-      const auto& v2 = *mesh.vertices[edge1.second];
+      const auto& v0 = mesh.vertices[edge0.first];
+      const auto& v1 = mesh.vertices[edge0.second];
+      const auto& v2 = mesh.vertices[edge1.second];
 
       auto v01 = v1-v0;
       auto v12 = v2-v1;
@@ -134,7 +134,7 @@ void chi_mesh::mesh_cutting::
     if (has_concavity)
     {
       //======================================== Push centroid as vertex
-      mesh.vertices.push_back(new chi_mesh::Vector3(cell.centroid));
+      mesh.vertices.push_back(cell.centroid);
       size_t centroid_id = mesh.vertices.size()-1;
 
       //======================================== Make triangles

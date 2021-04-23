@@ -31,7 +31,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids)
-      vfc = vfc + *grid.vertices[fvid];
+      vfc = vfc + grid.vertices[fvid];
     newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     // A slab face is very easy. If it is the first face
@@ -74,7 +74,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids)
-      vfc = vfc + *grid.vertices[fvid];
+      vfc = vfc + grid.vertices[fvid];
     newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     // A polygon face is just a line so we can just grab
@@ -82,7 +82,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     // centroid. The normal is then just khat
     // cross-product with this vector.
     uint64_t fvid = newFace.vertex_ids[0];
-    auto vec_vvc = *grid.vertices[fvid] - newFace.centroid;
+    auto vec_vvc = grid.vertices[fvid] - newFace.centroid;
 
     newFace.normal = chi_mesh::Vector3(0.0,0.0,1.0).Cross(vec_vvc);
     newFace.normal.Normalize();
@@ -119,7 +119,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids)
-      vfc = vfc + *grid.vertices[fvid];
+      vfc = vfc + grid.vertices[fvid];
     newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     newFace.normal = chi_mesh::Normal(0.0,0.0,0.0);
@@ -129,8 +129,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
       uint64_t fvid_m = newFace.vertex_ids[fv];
       uint64_t fvid_p = (fv == last_vert_ind)? newFace.vertex_ids[0] :
                                                newFace.vertex_ids[fv+1];
-      auto leg_m = *grid.vertices[fvid_m] - newFace.centroid;
-      auto leg_p = *grid.vertices[fvid_p] - newFace.centroid;
+      auto leg_m = grid.vertices[fvid_m] - newFace.centroid;
+      auto leg_p = grid.vertices[fvid_p] - newFace.centroid;
 
       auto vn = leg_m.Cross(leg_p);
 

@@ -293,8 +293,8 @@ void chi_mesh::PopulateRaySegmentLengths(
     for (auto& face : cell.faces) //edges
     {
       f++;
-      chi_mesh::Vertex& v0 = *grid.vertices[face.vertex_ids[0]];
-      chi_mesh::Vertex& vc = cell.centroid;
+      const auto& v0 = grid.vertices[face.vertex_ids[0]];
+      const auto& vc = cell.centroid;
 
       auto& n0 = segment_normals[f];
 
@@ -326,7 +326,7 @@ void chi_mesh::PopulateRaySegmentLengths(
       //===================== Face center to vertex segments
       for (auto vi : face.vertex_ids)
       {
-        auto& vert = *grid.vertices[vi];
+        auto& vert = grid.vertices[vi];
 
         chi_mesh::Vertex intersection_point;
 
@@ -344,13 +344,13 @@ void chi_mesh::PopulateRaySegmentLengths(
       //===================== Face edge to cell center segments
       for (int v=0; v<face.vertex_ids.size(); ++v)
       {
-        int vid_0 = face.vertex_ids[v];
-        int vid_1 = (v<(face.vertex_ids.size()-1))?
-                    face.vertex_ids[v+1] :
-                    face.vertex_ids[0];
+        uint64_t vid_0 = face.vertex_ids[v];
+        uint64_t vid_1 = (v<(face.vertex_ids.size()-1))?
+                         face.vertex_ids[v+1] :
+                         face.vertex_ids[0];
 
-        auto& v0 = *grid.vertices[vid_0];
-        auto& v1 = *grid.vertices[vid_1];
+        auto& v0 = grid.vertices[vid_0];
+        auto& v1 = grid.vertices[vid_1];
         auto& v2 = vcc;
 
         chi_mesh::Vertex intersection_point;

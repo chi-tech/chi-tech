@@ -64,8 +64,6 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
 
   vertices.clear();
   vertices.resize(num_nodes);
-  for (unsigned int ii = 0; ii < num_nodes; ++ii)
-    vertices[ii] = new chi_mesh::Vertex;
 
   for (int n=0; n<num_nodes; n++)
   {
@@ -76,9 +74,9 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if ( !(iss >> vert_index) )
       throw std::logic_error(fname + ": Failed to read vertex index.");
 
-    if (!(iss >> vertices[vert_index-1]->x
-              >> vertices[vert_index-1]->y
-              >> vertices[vert_index-1]->z))
+    if (!(iss >> vertices[vert_index-1].x
+              >> vertices[vert_index-1].y
+              >> vertices[vert_index-1].z))
       throw std::logic_error(fname + ": Failed while reading the vertex "
                                      "coordinates.");
   }

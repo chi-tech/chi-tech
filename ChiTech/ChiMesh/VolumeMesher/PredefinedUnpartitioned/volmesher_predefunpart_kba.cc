@@ -72,8 +72,8 @@ KBA(chi_mesh::UnpartitionedMesh* umesh,
     chi_mesh::MeshContinuumPtr& grid)
 {
   //======================================== Load up the vertices
-  for (auto vert : umesh->vertices)
-    grid->vertices.push_back(new chi_mesh::Vertex(*vert));
+  for (auto& vert : umesh->vertices)
+    grid->vertices.push_back(vert);
 
   chi_log.Log(LOG_0) << "Vertices loaded.";
   MPI_Barrier(MPI_COMM_WORLD);

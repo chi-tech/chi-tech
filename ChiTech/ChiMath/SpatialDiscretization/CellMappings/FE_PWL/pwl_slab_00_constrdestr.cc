@@ -12,8 +12,8 @@ SlabMappingFE_PWL(const chi_mesh::CellSlab &slab_cell,
   grid = ref_grid;
   v0i = slab_cell.vertex_ids[0];
   v1i = slab_cell.vertex_ids[1];
-  v0 = *grid->vertices[v0i];
-  chi_mesh::Vertex v1 = *grid->vertices[v1i];
+  v0 = grid->vertices[v0i];
+  const auto& v1 = grid->vertices[v1i];
 
   chi_mesh::Vector3 v01 = v1 - v0;
   h = v01.Norm();

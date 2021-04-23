@@ -77,11 +77,11 @@ void chi_physics::FieldFunction::
   auto points = vtkSmartPointer<vtkPoints>::New();
   int vc=0;
   for (const auto& cell : grid->local_cells)
-    for (int vid : cell.vertex_ids)
+    for (uint64_t vid : cell.vertex_ids)
     {
       auto vertex = grid->vertices[vid];
 
-      points->InsertPoint(vc++,vertex->x, vertex->y, vertex->z);
+      points->InsertPoint(vc++,vertex.x, vertex.y, vertex.z);
     }
   ugrid->SetPoints(points);
 

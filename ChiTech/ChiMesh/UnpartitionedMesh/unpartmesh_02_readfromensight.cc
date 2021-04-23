@@ -203,7 +203,7 @@ void chi_mesh::UnpartitionedMesh::
     point[2] = point[2]*options.scale;
 
 
-    vertices.push_back(new chi_mesh::Vertex(point[0],point[1],point[2]));
+    vertices.emplace_back(point[0],point[1],point[2]);
 
     if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
     if (point[0] > bound_box.xmax) bound_box.xmax = point[0];

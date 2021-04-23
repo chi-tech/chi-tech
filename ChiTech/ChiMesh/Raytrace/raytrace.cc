@@ -53,8 +53,8 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     int num_faces = 2;
     for (int f=0; f<num_faces; f++)
     {
-      int fpi = slab_cell.vertex_ids[f]; //face point index
-      chi_mesh::Vertex face_point = *grid.vertices[fpi];
+      uint64_t fpi = slab_cell.vertex_ids[f]; //face point index
+      chi_mesh::Vertex face_point = grid.vertices[fpi];
 
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
         slab_cell.faces[f].normal, face_point,
@@ -87,10 +87,10 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     int num_faces = poly_cell.faces.size();
     for (int f=0; f<num_faces; f++)
     {
-      int fpi = poly_cell.faces[f].vertex_ids[0]; //face point index 0
-      int fpf = poly_cell.faces[f].vertex_ids[1]; //face point index 1
-      chi_mesh::Vertex& face_point_i = *grid.vertices[fpi];
-      chi_mesh::Vertex& face_point_f = *grid.vertices[fpf];
+      uint64_t fpi = poly_cell.faces[f].vertex_ids[0]; //face point index 0
+      uint64_t fpf = poly_cell.faces[f].vertex_ids[1]; //face point index 1
+      const chi_mesh::Vertex& face_point_i = grid.vertices[fpi];
+      const chi_mesh::Vertex& face_point_f = grid.vertices[fpf];
 
       bool intersects = chi_mesh::CheckLineIntersectStrip(
         face_point_i, face_point_f, poly_cell.faces[f].normal,
@@ -132,9 +132,9 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         size_t v1_index = (s<(num_sides-1))?     //if not last vertex
                           face.vertex_ids[s+1] :
                           face.vertex_ids[0];    //else
-        chi_mesh::Vertex& v0 = *grid.vertices[v0_index];
-        chi_mesh::Vertex& v1 = *grid.vertices[v1_index];
-        const chi_mesh::Vertex& v2 = polyh_cell.faces[f].centroid;
+        const auto& v0 = grid.vertices[v0_index];
+        const auto& v1 = grid.vertices[v1_index];
+        const auto& v2 = polyh_cell.faces[f].centroid;
 
         bool intersects =
           chi_mesh::CheckLineIntersectTriangle2(v0,v1,v2,pos_i,omega_i,ip);
@@ -211,7 +211,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       << " with vertices: \n";
 
     for (auto vi : cell.vertex_ids)
-      outstr << grid.vertices[vi]->PrintS() << "\n";
+      outstr << grid.vertices[vi].PrintS() << "\n";
 
 //    int f=0;
     for (auto& face : cell.faces)
@@ -219,7 +219,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       outstr << "Face with centroid: " << face.centroid.PrintS() << " ";
       outstr << "n=" << face.normal.PrintS() << "\n";
       for (auto vi : face.vertex_ids)
-        outstr << grid.vertices[vi]->PrintS() << "\n";
+        outstr << grid.vertices[vi].PrintS() << "\n";
     }
 
 

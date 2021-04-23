@@ -29,8 +29,8 @@ bool chi_mesh::mesh_cutting::
     {
       auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids,e);
 
-      const auto& v1 = *mesh.vertices[edge.first];
-      const auto& v2 = *mesh.vertices[edge.second];
+      const auto& v1 = mesh.vertices[edge.first];
+      const auto& v2 = mesh.vertices[edge.second];
 
       auto v01 = v1-v0;
       auto v02 = v2-v0;
@@ -75,7 +75,7 @@ void chi_mesh::mesh_cutting::
     chi_mesh::Vector3 face_centroid;
     for (uint64_t vid : raw_face)
     {
-      face_centroid += *mesh.vertices[vid];
+      face_centroid += mesh.vertices[vid];
       AddIDToCellVertexIDs(vid);
     }
     face_centroid /= (double)raw_face.size();
@@ -90,7 +90,7 @@ void chi_mesh::mesh_cutting::
   //======================================== Compute cell centroid
   chi_mesh::Vector3 cell_centroid;
   for (uint64_t vid : cell_vertex_ids)
-    cell_centroid += *mesh.vertices[vid];
+    cell_centroid += mesh.vertices[vid];
   cell_centroid /= (double)cell_vertex_ids.size();
 
   cell.centroid = cell_centroid;
@@ -172,7 +172,7 @@ void chi_mesh::mesh_cutting::
   {
     chi_log.Log() << "Cell:";
     for (uint64_t vid : cell.vertex_ids)
-      chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+      chi_log.Log() << vid << " " << mesh.vertices[vid].PrintS();
   }
 
   //======================================== Build cell unique edges
@@ -294,7 +294,7 @@ void chi_mesh::mesh_cutting::
     // Compute interface-face centroid (IFC)
     chi_mesh::Vector3 IFC;
     for (auto ivid : IF_vids)
-      IFC += *mesh.vertices[ivid];
+      IFC += mesh.vertices[ivid];
     IFC /= (double)IF_vids.size();
 
     // Form vector from base-face centroid to
@@ -303,9 +303,9 @@ void chi_mesh::mesh_cutting::
 
     // Take existing interface-face vertex ordering
     // and build a normal for the interface-face
-    const auto& IFv0 = *mesh.vertices[IF_vids[0]];
-    const auto& IFv1 = *mesh.vertices[IF_vids[1]];
-    const auto& IFv2 = *mesh.vertices[IF_vids[2]];
+    const auto& IFv0 = mesh.vertices[IF_vids[0]];
+    const auto& IFv1 = mesh.vertices[IF_vids[1]];
+    const auto& IFv2 = mesh.vertices[IF_vids[2]];
 
     auto IFv01 = IFv1 - IFv0;
     auto IFv02 = IFv2 - IFv0;
@@ -324,10 +324,10 @@ void chi_mesh::mesh_cutting::
     {
       chi_log.Log() << "IF:";
       for (uint64_t vid : IF_vids)
-        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+        chi_log.Log() << vid << " " << mesh.vertices[vid].PrintS();
       chi_log.Log() << "IFrev:";
       for (uint64_t vid : IF_vids_reverse)
-        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+        chi_log.Log() << vid << " " << mesh.vertices[vid].PrintS();
     }
 
     //================================= Process cut faces to form faces
@@ -480,7 +480,7 @@ void chi_mesh::mesh_cutting::
     // Compute interface-face centroid (IFC)
     chi_mesh::Vector3 IFC;
     for (auto ivid : IF_vids)
-      IFC += *mesh.vertices[ivid];
+      IFC += mesh.vertices[ivid];
     IFC /= (double)IF_vids.size();
 
     // Form vector from base-face centroid to
@@ -489,9 +489,9 @@ void chi_mesh::mesh_cutting::
 
     // Take existing interface-face vertex ordering
     // and build a normal for the interface-face
-    const auto& IFv0 = *mesh.vertices[IF_vids[0]];
-    const auto& IFv1 = *mesh.vertices[IF_vids[1]];
-    const auto& IFv2 = *mesh.vertices[IF_vids[2]];
+    const auto& IFv0 = mesh.vertices[IF_vids[0]];
+    const auto& IFv1 = mesh.vertices[IF_vids[1]];
+    const auto& IFv2 = mesh.vertices[IF_vids[2]];
 
     auto IFv01 = IFv1 - IFv0;
     auto IFv02 = IFv2 - IFv0;
@@ -510,10 +510,10 @@ void chi_mesh::mesh_cutting::
     {
       chi_log.Log() << "IF:";
       for (uint64_t vid : IF_vids)
-        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+        chi_log.Log() << vid << " " << mesh.vertices[vid].PrintS();
       chi_log.Log() << "IFrev:";
       for (uint64_t vid : IF_vids_reverse)
-        chi_log.Log() << vid << " " << mesh.vertices[vid]->PrintS();
+        chi_log.Log() << vid << " " << mesh.vertices[vid].PrintS();
     }
 
     //================================= Process cut faces to form faces
@@ -667,19 +667,19 @@ void chi_mesh::mesh_cutting::
     // Compute interface-face centroid (IFC)
     chi_mesh::Vector3 IFC;
     for (auto ivid : IF_vids)
-      IFC += *mesh.vertices[ivid];
+      IFC += mesh.vertices[ivid];
     IFC /= (double)IF_vids.size();
 
     // Form vector from DV0 to
     // interface-face centroid
-    const auto& DV0 = *mesh.vertices[dangling_vertex_ids[0]];
+    const auto& DV0 = mesh.vertices[dangling_vertex_ids[0]];
     auto BFC_IFC = IFC - DV0;
 
     // Take existing interface-face vertex ordering
     // and build a normal for the interface-face
-    const auto& IFv0 = *mesh.vertices[IF_vids[0]];
-    const auto& IFv1 = *mesh.vertices[IF_vids[1]];
-    const auto& IFv2 = *mesh.vertices[IF_vids[2]];
+    const auto& IFv0 = mesh.vertices[IF_vids[0]];
+    const auto& IFv1 = mesh.vertices[IF_vids[1]];
+    const auto& IFv2 = mesh.vertices[IF_vids[2]];
 
     auto IFv01 = IFv1 - IFv0;
     auto IFv02 = IFv2 - IFv0;
@@ -763,7 +763,7 @@ void chi_mesh::mesh_cutting::
     size_t num_dv_B = 0;
     for (uint64_t vid : cell.vertex_ids)
     {
-      const auto& v = *mesh.vertices[vid];
+      const auto& v = mesh.vertices[vid];
 
       if ((v-p).Dot(n) < 0.0) dangling_verticesA[num_dv_A++] = vid;
       else                    dangling_verticesB[num_dv_B++] = vid;
@@ -773,8 +773,8 @@ void chi_mesh::mesh_cutting::
       throw std::logic_error(fname + ": Case 4 num_dv_A != 2 or num_dv_B != 2.");
 
     //================================= Compute dangling verticesA centroids
-    chi_mesh::Vector3 DVC_A = 0.5*(*mesh.vertices[dangling_verticesA[0]] +
-                                   *mesh.vertices[dangling_verticesA[1]]);
+    chi_mesh::Vector3 DVC_A = 0.5*(mesh.vertices[dangling_verticesA[0]] +
+                                   mesh.vertices[dangling_verticesA[1]]);
 
     //================================= Build interface-face edges (unordered)
     std::vector<Edge> IF_edges_unordered;
@@ -831,7 +831,7 @@ void chi_mesh::mesh_cutting::
     // Compute interface-face centroid (IFC)
     chi_mesh::Vector3 IFC;
     for (auto ivid : IF_vids)
-      IFC += *mesh.vertices[ivid];
+      IFC += mesh.vertices[ivid];
     IFC /= (double)IF_vids.size();
 
     // Form a vector from dangling vertex centroid
@@ -840,9 +840,9 @@ void chi_mesh::mesh_cutting::
 
     // Take existing interface-face vertex ordering
     // and build a normal for the interface-face
-    const auto& IFv0 = *mesh.vertices[IF_vids[0]];
-    const auto& IFv1 = *mesh.vertices[IF_vids[1]];
-    const auto& IFv2 = *mesh.vertices[IF_vids[2]];
+    const auto& IFv0 = mesh.vertices[IF_vids[0]];
+    const auto& IFv1 = mesh.vertices[IF_vids[1]];
+    const auto& IFv2 = mesh.vertices[IF_vids[2]];
 
     auto IFv01 = IFv1 - IFv0;
     auto IFv02 = IFv2 - IFv0;
@@ -982,7 +982,7 @@ void chi_mesh::mesh_cutting::
     std::stringstream info;
     info << "Cell:\n";
     for (uint64_t vid : cell.vertex_ids)
-      info << vid << " " << mesh.vertices[vid]->PrintS() << "\n";
+      info << vid << " " << mesh.vertices[vid].PrintS() << "\n";
     throw std::logic_error(fname + ": Unsupported cut case. "
                            "num_edges_cut=" + std::to_string(num_edges_cut) +
                            " num_vertices_cut=" + std::to_string(num_vertices_cut) +
