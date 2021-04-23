@@ -50,14 +50,11 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Check partitioning params
-  int Px = 1;
-  int Py = 1;
-  int Pz = 1;
   if (options.partition_type == KBA_STYLE_XYZ)
   {
-    Px = mesh_handler->volume_mesher->options.partition_x;
-    Py = mesh_handler->volume_mesher->options.partition_y;
-    Pz = mesh_handler->volume_mesher->options.partition_z;
+    int Px = mesh_handler->volume_mesher->options.partition_x;
+    int Py = mesh_handler->volume_mesher->options.partition_y;
+    int Pz = mesh_handler->volume_mesher->options.partition_z;
 
     int desired_process_count = Px*Py*Pz;
 
@@ -106,13 +103,13 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     << "] amount of local cells="
     << grid->local_cell_glob_indices.size();
 
-  int total_local_cells = grid->local_cells.size();
-  int total_global_cells = 0;
+  uint64_t total_local_cells = grid->local_cells.size();
+  uint64_t total_global_cells = 0;
 
   MPI_Allreduce(&total_local_cells,
                 &total_global_cells,
                 1,
-                MPI_INT,
+                MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
                 MPI_COMM_WORLD);
 

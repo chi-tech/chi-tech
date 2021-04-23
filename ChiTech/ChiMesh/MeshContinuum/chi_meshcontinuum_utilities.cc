@@ -1,11 +1,13 @@
 #include "chi_meshcontinuum.h"
 #include "ChiMesh/Cell/cell_slab.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-extern ChiMPI& chi_mpi;
+#include "chi_log.h"
 extern ChiLog&  chi_log;
+
+#include "chi_mpi.h"
+extern ChiMPI& chi_mpi;
 
 #include <algorithm>
 
@@ -87,7 +89,7 @@ void chi_mesh::MeshContinuum::
       running_face_size = face_size_histogram[f];
       running_total_face_dofs += face_size_histogram[f];
       running_face_count++;
-      running_average = (double)running_total_face_dofs/running_face_count;
+      running_average = (double)running_total_face_dofs/double(running_face_count);
       last_bin_num_faces = running_face_count;
     }
   }
@@ -144,7 +146,7 @@ size_t chi_mesh::MeshContinuum::GetFaceHistogramBinDOFSize(size_t category)
 {
   if (!face_histogram_available) BuildFaceHistogramInfo();
 
-  size_t face_dof_size = 0;
+  size_t face_dof_size;
 
   try {
     face_dof_size = face_categories.at(category).first;
@@ -212,32 +214,6 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
   chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(*this)];
 
   dof_mapping.reserve(cur_face.vertex_ids.size());
-//  for (short cfv=0; cfv<cur_face.vertex_ids.size(); cfv++)
-//  {
-//    bool found = false;
-//    for (short afv=0;
-//         afv < adj_cell->faces[associated_face].vertex_ids.size(); afv++)
-//    {
-//      if (cur_face.vertex_ids[cfv] ==
-//        adj_cell->faces[associated_face].vertex_ids[afv])
-//      {
-//        dof_mapping.push_back(afv);
-//        found = true;
-//        break;
-//      }
-//    }
-//
-//    if (!found)
-//    {
-//      chi_log.Log(LOG_ALLERROR)
-//        << "Face DOF mapping failed in call to "
-//        << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
-//           "node."
-//        << cur_face.neighbor << " " << cur_face.centroid.PrintS();
-//      exit(EXIT_FAILURE);
-//    }
-//
-//  }//for cfv
 
   const auto& adj_face = adj_cell->faces[associated_face];
 
@@ -284,5 +260,28 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::
   for (auto node_id : list)
     centroid = centroid + *vertices[node_id];
 
-  return centroid/list.size();
+  return centroid/double(list.size());
+}
+
+//###################################################################
+/**Counts the number of cells within a logical volume across all
+ * partitions.*/
+size_t chi_mesh::MeshContinuum::
+  CountCellsInLogicalVolume(chi_mesh::LogicalVolume &log_vol)
+{
+  size_t local_count=0;
+  for (const auto& cell : local_cells)
+    if (log_vol.Inside(cell.centroid))
+      ++local_count;
+
+  size_t global_count=0;
+
+  MPI_Allreduce(&local_count,           //sendbuf
+                &global_count,          //recvbuf
+                1,                      //count
+                MPI_UNSIGNED_LONG_LONG, //datatype
+                MPI_SUM,                //op
+                MPI_COMM_WORLD);        //communicator
+
+  return global_count;
 }

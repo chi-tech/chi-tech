@@ -34,20 +34,18 @@ extern ChiPhysics&  chi_physics_handler;
 /**On hold*/
 void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 {
+  chi_log.Log() << "Exporting mesh to VTK. " << local_cells.size();
   std::vector<std::vector<double>>    d_nodes;
 
   vtkSmartPointer<vtkPoints> points =
     vtkSmartPointer<vtkPoints>::New();
 
   //============================================= Init grid and material name
-  vtkUnstructuredGrid* ugrid;
-  vtkIntArray*      matarray;
-  vtkIntArray*      pararray;
+  auto ugrid    = vtkUnstructuredGrid::New();
+  auto matarray = vtkIntArray::New();
+  auto pararray = vtkIntArray::New();
 
-  ugrid    = vtkUnstructuredGrid::New();
-  matarray = vtkIntArray::New();
   matarray->SetName("Material");
-  pararray = vtkIntArray::New();
   pararray->SetName("Partition");
 
   //======================================== Precreate nodes to map
@@ -85,9 +83,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
         cell_info[v] = nc; nc++;
       }
 
-      ugrid->
-        InsertNextCell(VTK_LINE,2,
-                       cell_info.data());
+      ugrid->InsertNextCell(VTK_LINE, 2, cell_info.data());
 
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
@@ -113,9 +109,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
         cell_info[v] = nc; nc++;
       }
 
-      ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
-                       cell_info.data());
+      ugrid->InsertNextCell(VTK_POLYGON, num_verts, cell_info.data());
 
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
@@ -240,4 +234,6 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 
     ofile.close();
   }
+
+  chi_log.Log() << "Done exporting mesh to VTK.";
 }

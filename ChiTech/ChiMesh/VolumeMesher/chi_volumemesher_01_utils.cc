@@ -232,16 +232,8 @@ void chi_mesh::VolumeMesher::
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
-      if (raw_face.neighbor >= 0)
-      {
-        new_face.neighbor_id = raw_face.neighbor;
-        new_face.has_neighbor = true;
-      }
-      else
-      {
-        new_face.neighbor_id = 0;
-        new_face.has_neighbor = false;
-      }
+      new_face.has_neighbor = raw_face.has_neighbor;
+      new_face.neighbor_id = raw_face.neighbor;
 
       cell->faces.push_back(new_face);
     }

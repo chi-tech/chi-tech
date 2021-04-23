@@ -59,7 +59,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
         slab_cell.faces[f].normal, face_point,
         pos_i, pos_f_line,
-        intersection_point, weights);
+        intersection_point, &weights);
 
       double D = weights.first*extension_distance;
 

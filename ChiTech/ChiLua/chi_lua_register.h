@@ -149,6 +149,8 @@ RegisterFunction(chiEdgeLoopSplitByAngle)
 //  Domain Decomposition
     RegisterFunction(chiDomDecompose2D)
     RegisterFunction(chiDecomposeSurfaceMeshPxPy)
+    RegisterFunction(chiCutMesh)
+    RegisterFunction(chiCountMeshInLogicalVolume)
 //module:Field-function Manipulation
     RegisterFunction(chiFFInterpolationCreate)
       RegisterConstant(SLICE,   1);
