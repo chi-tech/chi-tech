@@ -114,8 +114,8 @@ double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum& grid) const
     return 1.0;
   else if (vertex_ids.size() == 2)
   {
-    auto& v0 = *grid.vertices[vertex_ids[0]];
-    auto& v1 = *grid.vertices[vertex_ids[1]];
+    const auto& v0 = grid.vertices[vertex_ids[0]];
+    const auto& v1 = grid.vertices[vertex_ids[1]];
 
     return (v1 - v0).Norm();
   }
@@ -126,11 +126,11 @@ double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum& grid) const
     const auto num_verts = vertex_ids.size();
     for (int v=0; v<num_verts; ++v)
     {
-      int vid0 = vertex_ids[v];
-      int vid1 = (v < (num_verts-1))? vertex_ids[v+1] : vertex_ids[0];
+      uint64_t vid0 = vertex_ids[v];
+      uint64_t vid1 = (v < (num_verts-1))? vertex_ids[v+1] : vertex_ids[0];
 
-      auto& v0 = *grid.vertices[vid0];
-      auto& v1 = *grid.vertices[vid1];
+      const auto& v0 = grid.vertices[vid0];
+      const auto& v1 = grid.vertices[vid1];
 
       auto v01 = v1-v0;
       auto v02 = v2-v0;

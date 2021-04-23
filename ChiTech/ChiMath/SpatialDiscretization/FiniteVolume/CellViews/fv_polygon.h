@@ -34,8 +34,8 @@ public:
       int v0i = poly_cell->faces[f].vertex_ids[0];
       int v1i = poly_cell->faces[f].vertex_ids[1];
 
-      chi_mesh::Vector3 v0 = *grid->vertices[v0i];
-      chi_mesh::Vector3 v1 = *grid->vertices[v1i];
+      const auto& v0 = grid->vertices[v0i];
+      const auto& v1 = grid->vertices[v1i];
       chi_mesh::Vector3 v2 = poly_cell->centroid;
 
       face_area.push_back((v1-v0).Norm());

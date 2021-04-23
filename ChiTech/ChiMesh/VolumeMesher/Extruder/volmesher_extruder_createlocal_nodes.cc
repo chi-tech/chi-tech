@@ -64,26 +64,25 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
 
   //============================================= Now add all nodes
   //                                              that are local or neighboring
-  for (auto vert : grid.vertices) delete vert;
   grid.vertices.clear();
 
   for (auto layer_z_level : vertex_layers)
   {
-    for (auto vertex : template_grid.vertices)
+    for (auto& vertex : template_grid.vertices)
     {
-      int new_vert_index = grid.vertices.size();
+      size_t new_vert_index = grid.vertices.size();
 
       auto local_index = local_vert_ids.find(new_vert_index);
 
       if (local_index != local_vert_ids.end())
       {
-        auto node = new chi_mesh::Node(*vertex);
-        node->z = layer_z_level;
+        auto node = vertex;
+        node.z = layer_z_level;
 
         grid.vertices.push_back(node);
       }
       else
-        grid.vertices.push_back(nullptr);
+        grid.vertices.emplace_back();
 
     }//for vertex
   }//for layer

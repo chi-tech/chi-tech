@@ -14,8 +14,9 @@ class chi_mesh::UnpartitionedMesh
 public:
   struct LightWeightFace
   {
-    int neighbor=-1;
     std::vector<uint64_t> vertex_ids;
+    bool has_neighbor = false;
+    uint64_t neighbor=0;
   };
   struct LightWeightCell
   {
@@ -30,8 +31,9 @@ public:
   };
 
 public:
-  std::vector<chi_mesh::Vertex*>  vertices;
+  std::vector<chi_mesh::Vertex>    vertices;
   std::vector<LightWeightCell*>    raw_cells;
+  std::vector<LightWeightCell*>    raw_boundary_cells;
 
 public:
   enum class ParallelMethod
@@ -42,6 +44,8 @@ public:
   struct Options
   {
     std::string file_name;
+    std::string material_id_fieldname;
+    std::string boundary_id_fieldname;
     double scale=1.0;
     ParallelMethod parallel_method = ParallelMethod::ALL_FROM_HOME;
   }mesh_options;
@@ -53,13 +57,13 @@ public:
            zmin=0.0, zmax=0.0;
   } bound_box;
 
-  LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKPolyhedron(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKHexahedron(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKTetrahedron(vtkCell* vtk_cell);
 
-  LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
-  LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKPolygon(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
+  static LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
 
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();

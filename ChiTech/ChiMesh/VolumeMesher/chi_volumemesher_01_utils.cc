@@ -42,7 +42,7 @@ void chi_mesh::VolumeMesher::
 
   //============================================= Copy nodes
   for (auto& vertex : surface_mesh->vertices)
-    vol_continuum->vertices.push_back(new chi_mesh::Node(vertex));
+    vol_continuum->vertices.push_back(vertex);
 
   //============================================= Delete nodes
   if (delete_surface_mesh_elements)
@@ -76,8 +76,8 @@ void chi_mesh::VolumeMesher::
       new_face.vertex_ids.push_back(face.e_index[k][1]);
 
 
-      chi_mesh::Vertex& v0 = *vol_continuum->vertices[face.e_index[k][0]];
-      chi_mesh::Vertex& v1 = *vol_continuum->vertices[face.e_index[k][1]];
+      const auto& v0 = vol_continuum->vertices[face.e_index[k][0]];
+      const auto& v1 = vol_continuum->vertices[face.e_index[k][1]];
       new_face.centroid = v0*0.5 + v1*0.5;
 
       chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
@@ -121,8 +121,7 @@ void chi_mesh::VolumeMesher::
     for (auto vid : face->v_indices)
     {
       cell->vertex_ids.push_back(vid);
-      cell->centroid = cell->centroid +
-                       *vol_continuum->vertices[vid];
+      cell->centroid = cell->centroid + vol_continuum->vertices[vid];
     }
     cell->centroid = cell->centroid/cell->vertex_ids.size();
 
@@ -134,8 +133,8 @@ void chi_mesh::VolumeMesher::
       new_face.vertex_ids.push_back(src_side[0]);
       new_face.vertex_ids.push_back(src_side[1]);
 
-      chi_mesh::Vertex& v0 = *vol_continuum->vertices[src_side[0]];
-      chi_mesh::Vertex& v1 = *vol_continuum->vertices[src_side[1]];
+      const auto& v0 = vol_continuum->vertices[src_side[0]];
+      const auto& v1 = vol_continuum->vertices[src_side[1]];
       new_face.centroid = v0*0.5 + v1*0.5;
       chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
@@ -194,7 +193,7 @@ void chi_mesh::VolumeMesher::
 
   //============================================= Copy nodes
   for (auto& vertex : umesh->vertices)
-    grid->vertices.push_back(new chi_mesh::Node(*vertex));
+    grid->vertices.push_back(vertex);
 
   size_t num_cells=0;
   for (auto& raw_cell : umesh->raw_cells)
@@ -222,8 +221,8 @@ void chi_mesh::VolumeMesher::
 
       new_face.vertex_ids  = raw_face.vertex_ids;
 
-      chi_mesh::Vertex& v0 = *grid->vertices[new_face.vertex_ids[0]];
-      chi_mesh::Vertex& v1 = *grid->vertices[new_face.vertex_ids[1]];
+      const auto& v0 = grid->vertices[new_face.vertex_ids[0]];
+      const auto& v1 = grid->vertices[new_face.vertex_ids[1]];
       new_face.centroid = v0*0.5 + v1*0.5;
       chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
 
@@ -232,16 +231,8 @@ void chi_mesh::VolumeMesher::
       vn = vn/vn.Norm();
       new_face.normal = vn;
 
-      if (raw_face.neighbor >= 0)
-      {
-        new_face.neighbor_id = raw_face.neighbor;
-        new_face.has_neighbor = true;
-      }
-      else
-      {
-        new_face.neighbor_id = 0;
-        new_face.has_neighbor = false;
-      }
+      new_face.has_neighbor = raw_face.has_neighbor;
+      new_face.neighbor_id = raw_face.neighbor;
 
       cell->faces.push_back(new_face);
     }
@@ -273,8 +264,8 @@ void chi_mesh::VolumeMesher::
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Filtering ghosts.";
   //======================================== Copy vertices
-  for (auto vertex : in_grid->vertices)
-    out_grid->vertices.push_back(new chi_mesh::Vertex(*vertex));
+  for (auto& vertex : in_grid->vertices)
+    out_grid->vertices.push_back(vertex);
 
   //======================================== Copy local cells
   for (auto& cell : in_grid->local_cells)

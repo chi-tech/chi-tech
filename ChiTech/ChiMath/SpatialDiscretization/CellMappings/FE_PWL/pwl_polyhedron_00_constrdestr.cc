@@ -56,10 +56,10 @@ PolyhedronMappingFE_PWL::
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;
 
-      const chi_mesh::Vertex& v0 = *ref_grid->vertices[v0index];
-      const chi_mesh::Vertex& v1 = vfc;
-      const chi_mesh::Vertex& v2 = *ref_grid->vertices[v1index];
-      const chi_mesh::Vertex& v3 = vcc;
+      const auto& v0 = ref_grid->vertices[v0index];
+      const auto& v1 = vfc;
+      const auto& v2 = ref_grid->vertices[v1index];
+      const auto& v3 = vcc;
 
       side_data.v0 = v0;
 

@@ -19,7 +19,7 @@ HexahedronMappingFE_PWL::
   //=========================================== Copy nodal locations
   for (unsigned int i=0; i<8; ++i)
   {
-    const auto& v_i = *ref_grid->vertices[polyh_cell->vertex_ids[i]];
+    const auto& v_i = ref_grid->vertices[polyh_cell->vertex_ids[i]];
     x_i[0] = v_i[0];
     y_i[1] = v_i[1];
     z_i[2] = v_i[2];
@@ -58,9 +58,9 @@ HexahedronMappingFE_PWL::
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;
 
-      const chi_mesh::Vertex& v0 = *ref_grid->vertices[v0index];
+      const chi_mesh::Vertex& v0 = ref_grid->vertices[v0index];
       const chi_mesh::Vertex& v1 = vfc;
-      const chi_mesh::Vertex& v2 = *ref_grid->vertices[v1index];
+      const chi_mesh::Vertex& v2 = ref_grid->vertices[v1index];
       const chi_mesh::Vertex& v3 = vcc;
 
       side_data.v0 = v0;

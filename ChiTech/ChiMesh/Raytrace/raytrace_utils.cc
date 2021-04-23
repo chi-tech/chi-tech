@@ -40,7 +40,7 @@ CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,
                         const chi_mesh::Vector3& line_point_0,
                         const chi_mesh::Vector3& line_point_1,
                         chi_mesh::Vector3& intersection_point,
-                        std::pair<double,double>& weights)
+                        std::pair<double,double>* weights/*=nullptr*/)
 {
   chi_mesh::Vector3 v0 = line_point_0 - plane_point;
   chi_mesh::Vector3 v1 = line_point_1 - plane_point;
@@ -54,12 +54,12 @@ CheckPlaneLineIntersect(const chi_mesh::Normal& plane_normal,
   if (sense_0 != sense_1)
   {
     double dotp_total = std::fabs(dotp_0) + std::fabs(dotp_1);
-    weights.first = (std::fabs(dotp_0)/dotp_total);
-    weights.second = 1.0 - weights.first;
-    intersection_point =
-      line_point_0*weights.second +
-      line_point_1*weights.first;
+    double w0 = (std::fabs(dotp_0)/dotp_total);
+    double w1 = 1.0 - w0;
+    intersection_point = line_point_0*w1 + line_point_1*w0;
 
+    if (weights != nullptr)
+      *weights = {w0,w1};
     return true;
   }
 
@@ -91,7 +91,7 @@ bool chi_mesh::CheckLineIntersectStrip(
   bool intersects_plane = chi_mesh::CheckPlaneLineIntersect(
     strip_normal, strip_point0,
     line_point0, line_point1,
-    plane_intersection_point, weights);
+    plane_intersection_point, &weights);
 
   if (!intersects_plane) return false;
 
@@ -293,8 +293,8 @@ void chi_mesh::PopulateRaySegmentLengths(
     for (auto& face : cell.faces) //edges
     {
       f++;
-      chi_mesh::Vertex& v0 = *grid.vertices[face.vertex_ids[0]];
-      chi_mesh::Vertex& vc = cell.centroid;
+      const auto& v0 = grid.vertices[face.vertex_ids[0]];
+      const auto& vc = cell.centroid;
 
       auto& n0 = segment_normals[f];
 
@@ -326,7 +326,7 @@ void chi_mesh::PopulateRaySegmentLengths(
       //===================== Face center to vertex segments
       for (auto vi : face.vertex_ids)
       {
-        auto& vert = *grid.vertices[vi];
+        auto& vert = grid.vertices[vi];
 
         chi_mesh::Vertex intersection_point;
 
@@ -344,13 +344,13 @@ void chi_mesh::PopulateRaySegmentLengths(
       //===================== Face edge to cell center segments
       for (int v=0; v<face.vertex_ids.size(); ++v)
       {
-        int vid_0 = face.vertex_ids[v];
-        int vid_1 = (v<(face.vertex_ids.size()-1))?
-                    face.vertex_ids[v+1] :
-                    face.vertex_ids[0];
+        uint64_t vid_0 = face.vertex_ids[v];
+        uint64_t vid_1 = (v<(face.vertex_ids.size()-1))?
+                         face.vertex_ids[v+1] :
+                         face.vertex_ids[0];
 
-        auto& v0 = *grid.vertices[vid_0];
-        auto& v1 = *grid.vertices[vid_1];
+        auto& v0 = grid.vertices[vid_0];
+        auto& v1 = grid.vertices[vid_1];
         auto& v2 = vcc;
 
         chi_mesh::Vertex intersection_point;

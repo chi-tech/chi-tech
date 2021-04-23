@@ -1,5 +1,5 @@
-#ifndef _volmesher_predefunpart_h
-#define _volmesher_predefunpart_h
+#ifndef VOLMESHER_PREDEFUNPART_H
+#define VOLMESHER_PREDEFUNPART_H
 
 #include "../chi_volumemesher.h"
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
@@ -13,32 +13,40 @@ class chi_mesh::VolumeMesherPredefinedUnpartitioned :
 public:
   void Execute() override;
 
+  static
   int GetPartitionIDFromCentroid(const chi_mesh::Vertex& centroid);
 
+  static
   bool IsRawCellNeighborToPartitionKBA(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell);
 
+  static
   void KBA(chi_mesh::UnpartitionedMesh* umesh,
-           chi_mesh::MeshContinuumPtr grid);
+           chi_mesh::MeshContinuumPtr& grid);
 
+  static
   bool IsRawCellNeighborToPartitionParmetis(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
     const std::vector<int64_t>& cell_pids);
 
+  static
   void PARMETIS(chi_mesh::UnpartitionedMesh* umesh,
-                chi_mesh::MeshContinuumPtr grid);
+                chi_mesh::MeshContinuumPtr& grid);
 
+  static
   void AddSlabToGrid(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
     const chi_mesh::Cell& temp_cell,
     chi_mesh::MeshContinuum& grid);
+  static
   void AddPolygonToGrid(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
     const chi_mesh::Cell& temp_cell,
     chi_mesh::MeshContinuum& grid);
+  static
   void AddPolyhedronToGrid(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
     const chi_mesh::Cell& temp_cell,
     chi_mesh::MeshContinuum& grid);
 };
-#endif
+#endif //VOLMESHER_PREDEFUNPART_H
