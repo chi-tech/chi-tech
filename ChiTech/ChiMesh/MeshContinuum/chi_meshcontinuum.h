@@ -97,6 +97,8 @@ public:
   size_t GetGlobalNumberOfCells();
 
   std::vector<uint64_t> GetDomainUniqueBoundaryIDs();
+
+  size_t CountCellsInLogicalVolume(chi_mesh::LogicalVolume& log_vol);
 };
 
 #endif //CHI_MESHCONTINUUM_H_

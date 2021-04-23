@@ -1,7 +1,6 @@
-#ifndef _chi_meshhandler_h
-#define _chi_meshhandler_h
+#ifndef CHI_MESHHANDLER_H
+#define CHI_MESHHANDLER_H
 
-#include<stdio.h>
 #include <vector>
 
 #include"../chi_mesh.h"
@@ -31,4 +30,4 @@ public:
   chi_mesh::MeshContinuumPtr GetGrid(int region_index=-1);
 };
 
-#endif
+#endif//CHI_MESHHANDLER_H
