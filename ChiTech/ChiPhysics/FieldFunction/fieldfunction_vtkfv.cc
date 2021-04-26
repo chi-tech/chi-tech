@@ -61,11 +61,8 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
   //========================================= Populate nodes
   size_t vcount=0;
-  for (auto v_ptr : grid->vertices)
+  for (const auto& vertex : grid->vertices)
   {
-    chi_mesh::Vertex vertex;
-    if (v_ptr != nullptr)
-      vertex = *v_ptr;
     std::vector<double> d_node;
     d_node.push_back(vertex.x);
     d_node.push_back(vertex.y);
@@ -243,11 +240,8 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
   //========================================= Populate nodes
   size_t vcount=0;
-  for (auto v_ptr : grid->vertices)
+  for (const auto& vertex : grid->vertices)
   {
-    chi_mesh::Vertex vertex;
-    if (v_ptr != nullptr)
-      vertex = *v_ptr;
     std::vector<double> d_node;
     d_node.push_back(vertex.x);
     d_node.push_back(vertex.y);

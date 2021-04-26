@@ -90,14 +90,14 @@ void chi_mesh::UnpartitionedMesh::
   //========================================= Process each block
   vtkSmartPointer<vtkAppendFilter> append =
     vtkSmartPointer<vtkAppendFilter>::New();
-  std::vector<int> block_mat_id;
-  int total_cells = 0;
+  std::vector<uint64_t> block_mat_id;
+  size_t total_cells = 0;
   int ug=-1;
   for (auto& ugrid : grid_blocks)
   {
     ++ug;
-    int num_cells  = ugrid->GetNumberOfCells();
-    int num_points = ugrid->GetNumberOfPoints();
+    uint64_t num_cells  = ugrid->GetNumberOfCells();
+    uint64_t num_points = ugrid->GetNumberOfPoints();
 
     std::stringstream outstr;
     outstr
@@ -154,8 +154,8 @@ void chi_mesh::UnpartitionedMesh::
   cleaner->SetInputData(dirty_ugrid);
   cleaner->Update();
   auto ugrid = cleaner->GetOutput();
-  int total_cell_count  = ugrid->GetNumberOfCells();
-  int total_point_count = ugrid->GetNumberOfPoints();
+  uint64_t total_cell_count  = ugrid->GetNumberOfCells();
+  uint64_t total_point_count = ugrid->GetNumberOfPoints();
 
   chi_log.Log(LOG_0)
     << "Clean grid num cells and points: "
@@ -181,7 +181,7 @@ void chi_mesh::UnpartitionedMesh::
       raw_cells.push_back(CreateCellFromVTKTriangle(vtk_cell));
 
     int mat_id=-1;
-    int prev_block_lim = -1;
+    uint64_t prev_block_lim = 0;
     for (auto block_lim : block_mat_id)
     {
       ++mat_id;
@@ -203,7 +203,7 @@ void chi_mesh::UnpartitionedMesh::
     point[2] = point[2]*options.scale;
 
 
-    vertices.push_back(new chi_mesh::Vertex(point[0],point[1],point[2]));
+    vertices.emplace_back(point[0],point[1],point[2]);
 
     if (point[0] < bound_box.xmin) bound_box.xmin = point[0];
     if (point[0] > bound_box.xmax) bound_box.xmax = point[0];

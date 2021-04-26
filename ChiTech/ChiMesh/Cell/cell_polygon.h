@@ -22,8 +22,8 @@ public:
     segment_normals.reserve(faces.size());
     for (auto& face : faces) //edges
     {
-      chi_mesh::Vertex &v0 = *grid.vertices[face.vertex_ids[0]];
-      const chi_mesh::Vertex &vc = centroid;
+      const auto& v0 = grid.vertices[face.vertex_ids[0]];
+      const auto& vc = centroid;
 
       chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
       auto vc0 = vc - v0;

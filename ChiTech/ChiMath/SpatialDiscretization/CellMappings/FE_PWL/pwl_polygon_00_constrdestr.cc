@@ -27,8 +27,8 @@ PolygonMappingFE_PWL::
   {
     const chi_mesh::CellFace& face = poly_cell.faces[side];
 
-    chi_mesh::Vertex v0 = *ref_grid->vertices[face.vertex_ids[0]];
-    chi_mesh::Vertex v1 = *ref_grid->vertices[face.vertex_ids[1]];
+    const auto& v0 = ref_grid->vertices[face.vertex_ids[0]];
+    const auto& v1 = ref_grid->vertices[face.vertex_ids[1]];
     chi_mesh::Vertex v2 = vc;
 
     chi_mesh::Vector3 sidev01 = v1 - v0;

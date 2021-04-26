@@ -21,8 +21,6 @@ void LinearBoltzmann::Solver::PrintSimHeader()
                        << groups.size() << std::endl;
     chi_log.Log(LOG_0) << "Number of Group sets: "
                        << group_sets.size() << std::endl;
-    chi_log.Log(LOG_0) << "Number of Moments   : "
-                       << num_moments << std::endl;
 
     //================================================== Output Groupsets
     for (int gs=0; gs<group_sets.size(); gs++)

@@ -22,7 +22,6 @@ int chi_mesh::VolumeMesherPredefinedUnpartitioned::
   int Px = handler->volume_mesher->options.partition_x;
   int Py = handler->volume_mesher->options.partition_y;
 
-
   chi_mesh::Cell temp_cell(chi_mesh::CellType::GHOST);
   temp_cell.centroid = centroid;
 
@@ -53,7 +52,7 @@ IsRawCellNeighborToPartitionKBA(
   bool is_neighbor = false;
   for (const auto& face : lwcell.faces)
   {
-    if (face.neighbor < 0) continue;
+    if (not face.has_neighbor) continue;
     auto adj_cell = umesh->raw_cells[face.neighbor];
     int partition_id = GetPartitionIDFromCentroid(adj_cell->centroid);
     if (partition_id == chi_mpi.location_id)
@@ -70,11 +69,11 @@ IsRawCellNeighborToPartitionKBA(
 /** Applies KBA-style partitioning to the mesh.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::
 KBA(chi_mesh::UnpartitionedMesh* umesh,
-    chi_mesh::MeshContinuumPtr grid)
+    chi_mesh::MeshContinuumPtr& grid)
 {
   //======================================== Load up the vertices
-  for (auto vert : umesh->vertices)
-    grid->vertices.push_back(new chi_mesh::Vertex(*vert));
+  for (auto& vert : umesh->vertices)
+    grid->vertices.push_back(vert);
 
   chi_log.Log(LOG_0) << "Vertices loaded.";
   MPI_Barrier(MPI_COMM_WORLD);

@@ -44,10 +44,10 @@ public:
         int v0i = edge[0];
         int v1i = edge[1];
 
-        chi_mesh::Vector3& v0 = *grid->vertices[v0i];
-        chi_mesh::Vector3& v1 = polyh_cell->faces[f].centroid;
-        chi_mesh::Vector3& v2 = *grid->vertices[v1i];
-        chi_mesh::Vector3& v3 = vcc;
+        const auto& v0 = grid->vertices[v0i];
+        const auto& v1 = polyh_cell->faces[f].centroid;
+        const auto& v2 = grid->vertices[v1i];
+        const auto& v3 = vcc;
 
         std::vector<chi_mesh::Vector3> side_legs(3);
         side_legs[0] = v1-v0;

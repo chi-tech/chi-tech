@@ -25,17 +25,14 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     ++fc;
     chi_mesh::CellFace newFace;
 
-    if (raw_face.neighbor>=0)
-    {
-      newFace.neighbor_id = raw_face.neighbor;
-      newFace.has_neighbor = true;
-    }
+    newFace.has_neighbor = raw_face.has_neighbor;
+    newFace.neighbor_id = raw_face.neighbor;
 
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids)
-      vfc = vfc + *grid.vertices[fvid];
-    newFace.centroid = vfc / newFace.vertex_ids.size();
+      vfc = vfc + grid.vertices[fvid];
+    newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     // A slab face is very easy. If it is the first face
     // the normal is -khat. If it is the second face then
@@ -71,24 +68,21 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   {
     chi_mesh::CellFace newFace;
 
-    if (raw_face.neighbor>=0)
-    {
-      newFace.neighbor_id = raw_face.neighbor;
-      newFace.has_neighbor = true;
-    }
+    newFace.has_neighbor = raw_face.has_neighbor;
+    newFace.neighbor_id = raw_face.neighbor;
 
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids)
-      vfc = vfc + *grid.vertices[fvid];
-    newFace.centroid = vfc / newFace.vertex_ids.size();
+      vfc = vfc + grid.vertices[fvid];
+    newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     // A polygon face is just a line so we can just grab
     // the first vertex and form a vector with the face
     // centroid. The normal is then just khat
     // cross-product with this vector.
-    int fvid = newFace.vertex_ids[0];
-    auto vec_vvc = *grid.vertices[fvid] - newFace.centroid;
+    uint64_t fvid = newFace.vertex_ids[0];
+    auto vec_vvc = grid.vertices[fvid] - newFace.centroid;
 
     newFace.normal = chi_mesh::Vector3(0.0,0.0,1.0).Cross(vec_vvc);
     newFace.normal.Normalize();
@@ -119,33 +113,30 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   {
     chi_mesh::CellFace newFace;
 
-    if (raw_face.neighbor>=0)
-    {
-      newFace.neighbor_id = raw_face.neighbor;
-      newFace.has_neighbor = true;
-    }
+    newFace.has_neighbor = raw_face.has_neighbor;
+    newFace.neighbor_id = raw_face.neighbor;
 
     newFace.vertex_ids = raw_face.vertex_ids;
     auto vfc = chi_mesh::Vertex(0.0, 0.0, 0.0);
     for (auto fvid : newFace.vertex_ids)
-      vfc = vfc + *grid.vertices[fvid];
-    newFace.centroid = vfc / newFace.vertex_ids.size();
+      vfc = vfc + grid.vertices[fvid];
+    newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     newFace.normal = chi_mesh::Normal(0.0,0.0,0.0);
-    int last_vert_ind = newFace.vertex_ids.size()-1;
+    int last_vert_ind = int(newFace.vertex_ids.size()-1);
     for (int fv=0; fv<newFace.vertex_ids.size(); ++fv)
     {
-      int fvid_m = newFace.vertex_ids[fv];
-      int fvid_p = (fv == last_vert_ind)? newFace.vertex_ids[0] :
-                   newFace.vertex_ids[fv+1];
-      auto leg_m = *grid.vertices[fvid_m] - newFace.centroid;
-      auto leg_p = *grid.vertices[fvid_p] - newFace.centroid;
+      uint64_t fvid_m = newFace.vertex_ids[fv];
+      uint64_t fvid_p = (fv == last_vert_ind)? newFace.vertex_ids[0] :
+                                               newFace.vertex_ids[fv+1];
+      auto leg_m = grid.vertices[fvid_m] - newFace.centroid;
+      auto leg_p = grid.vertices[fvid_p] - newFace.centroid;
 
       auto vn = leg_m.Cross(leg_p);
 
       newFace.normal = newFace.normal + vn.Normalized();
     }
-    newFace.normal = (newFace.normal/newFace.vertex_ids.size()).Normalized();
+    newFace.normal = (newFace.normal/double(newFace.vertex_ids.size())).Normalized();
 
     polyh_cell->faces.push_back(newFace);
   }

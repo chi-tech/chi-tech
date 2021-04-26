@@ -7,7 +7,7 @@ double PolygonMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xy
 {
   for (int s=0; s<num_of_subtris; s++)
   {
-    chi_mesh::Vector3 p0 = *grid->vertices[sides[s].v_index[0]];
+    const auto& p0 = grid->vertices[sides[s].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
     chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * xyz_ref;
@@ -49,7 +49,7 @@ void PolygonMappingFE_PWL::ShapeValues(const chi_mesh::Vector3 &xyz,
   shape_values.resize(num_nodes, 0.0);
   for (int s=0; s<num_of_subtris; s++)
   {
-    chi_mesh::Vector3 p0 = *grid->vertices[sides[s].v_index[0]];
+    const auto& p0 = grid->vertices[sides[s].v_index[0]];
     chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * (xyz - p0);
 
     double xi  = xi_eta_zeta.x;
@@ -92,7 +92,7 @@ chi_mesh::Vector3 PolygonMappingFE_PWL::GradShapeValue(const int i,
 
   for (int e=0; e<num_of_subtris; e++)
   {
-    chi_mesh::Vector3 p0 = *grid->vertices[sides[e].v_index[0]];
+    const auto& p0 = grid->vertices[sides[e].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
     chi_mesh::Vector3 xi_eta_zeta = sides[e].Jinv * xyz_ref;

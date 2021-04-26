@@ -19,14 +19,14 @@ chi_mesh::VolumeMesherExtruder::ComputeTemplateCell3DCentroid(
 
   for (auto tc_vid : n_template_cell.vertex_ids)
   {
-    auto temp_vert = *template_continuum.vertices[tc_vid];
+    auto temp_vert = template_continuum.vertices[tc_vid];
     temp_vert.z = vertex_layers[z_level_begin];
     n_centroid_precompd = n_centroid_precompd + temp_vert;
   }
 
   for (auto tc_vid : n_template_cell.vertex_ids)
   {
-    auto temp_vert = *template_continuum.vertices[tc_vid];
+    auto temp_vert = template_continuum.vertices[tc_vid];
     temp_vert.z = vertex_layers[z_level_end];
     n_centroid_precompd = n_centroid_precompd + temp_vert;
   }

@@ -67,9 +67,9 @@ void chi_mesh::MeshContinuum::
       int node_g_index = node;
       node_mapping[node_g_index] = node_counter;
 
-      chi_mesh::Vertex* cur_v = vertices[node_g_index];
+      chi_mesh::Vertex cur_v = vertices[node_g_index];
 
-      fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v->x,cur_v->y,cur_v->z);
+      fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v.x,cur_v.y,cur_v.z);
     }
 
     //====================================== Write face normals
@@ -183,9 +183,9 @@ void chi_mesh::MeshContinuum::
         int node_g_index = node;
         node_mapping[node_g_index] = node_counter;
 
-        chi_mesh::Vertex* cur_v = vertices[node_g_index];
+        chi_mesh::Vertex cur_v = vertices[node_g_index];
 
-        fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v->x,cur_v->y,cur_v->z);
+        fprintf(of,"v %9.6f %9.6f %9.6f\n",cur_v.x,cur_v.y,cur_v.z);
       }
 
       //====================================== Write face normals
