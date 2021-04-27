@@ -110,7 +110,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
       const int64_t* cell_pids_raw;
       ISGetIndices(is,&cell_pids_raw);
       i=0;
-      for (__unused auto cell : umesh->raw_cells)
+      for (auto cell : umesh->raw_cells)
       {
         cell_pids[i] = cell_pids_raw[i];
         ++i;
