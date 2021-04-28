@@ -31,6 +31,8 @@ void KEigenvalue::Solver::ExecuteKSolver()
 
   PowerIteration(group_sets[0]);
 
+  chi_log.Log() << "Nj size:\t" << Nj_new_local.size();
+
   ResetSweepOrderings(group_sets[gs]);
  
   chi_log.Log(LOG_0) << "KEigenvalueSolver execution completed\n";
