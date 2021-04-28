@@ -41,8 +41,7 @@ void chi_mesh::UnpartitionedMesh::
 
   //======================================== Read the file
   mesh_options = options;
-  vtkSmartPointer<vtkEnSightGoldBinaryReader> reader =
-    vtkSmartPointer<vtkEnSightGoldBinaryReader>::New();
+  auto reader = vtkSmartPointer<vtkEnSightGoldBinaryReader>::New();
   reader->SetCaseFileName(options.file_name.c_str());
   chi_log.Log(LOG_0)
     << "Reading Ensight-Gold file     : \""
@@ -88,8 +87,7 @@ void chi_mesh::UnpartitionedMesh::
   }//for grid block
 
   //========================================= Process each block
-  vtkSmartPointer<vtkAppendFilter> append =
-    vtkSmartPointer<vtkAppendFilter>::New();
+  auto append = vtkSmartPointer<vtkAppendFilter>::New();
   std::vector<uint64_t> block_mat_id;
   size_t total_cells = 0;
   int ug=-1;
@@ -119,6 +117,7 @@ void chi_mesh::UnpartitionedMesh::
       else
       {
         append->AddInputData(ugrid);
+        append->Update();
         total_cells += num_cells;
         block_mat_id.push_back(total_cells);
       }
@@ -132,6 +131,7 @@ void chi_mesh::UnpartitionedMesh::
       else
       {
         append->AddInputData(ugrid);
+        append->Update();
         total_cells += num_cells;
         block_mat_id.push_back(total_cells);
       }
@@ -139,7 +139,9 @@ void chi_mesh::UnpartitionedMesh::
 
    chi_log.Log(LOG_0VERBOSE_1) << outstr.str();
   }
-  append->Update();
+  chi_log.Log(LOG_0VERBOSE_1) << "Updating appended filter.";
+//  append->Update();
+  chi_log.Log(LOG_0VERBOSE_1) << "Getting dirty grid.";
   auto dirty_ugrid = vtkSmartPointer<vtkUnstructuredGrid>(
     vtkUnstructuredGrid::SafeDownCast(append->GetOutput()));
 
@@ -149,8 +151,7 @@ void chi_mesh::UnpartitionedMesh::
     << dirty_ugrid->GetNumberOfPoints();
 
   //======================================== Remove duplicate vertices
-  vtkSmartPointer<vtkCleanUnstructuredGrid> cleaner =
-    vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
+  auto cleaner = vtkSmartPointer<vtkCleanUnstructuredGrid>::New();
   cleaner->SetInputData(dirty_ugrid);
   cleaner->Update();
   auto ugrid = cleaner->GetOutput();
