@@ -124,7 +124,7 @@ string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
 #================================================ Define source directories
 set(SOURCES "${CHI_TECH_DIR}/ChiTech/chi_runtime.cc"
-            "${CHI_TECH_DIR}/ChiTech/LuaTest/lua_test.cc" ChiModules/KEigenvalueSolver/initialize_precursors.cc)
+            "${CHI_TECH_DIR}/ChiTech/LuaTest/lua_test.cc")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiConsole")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMath")
