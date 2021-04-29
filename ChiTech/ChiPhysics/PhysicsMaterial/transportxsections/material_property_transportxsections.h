@@ -23,6 +23,7 @@ public:
   int L=0;                                ///< Legendre scattering order
   int J=0;                                ///< Number of precursors
   bool is_fissile = false;                ///< Fissile or not
+  std::vector<int> precursor_map;         ///< Precursor mapping
 
   std::vector<double> sigma_tg;           ///< Total cross-section
   std::vector<double> sigma_fg;           ///< Sigmaf cross-section
@@ -76,6 +77,7 @@ private:
     lambda.clear();
     gamma.clear();
     chi_d.clear();
+    precursor_map.clear();
 
     diffusion_initialized = false;
     scattering_initialized = false;

@@ -147,8 +147,9 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     chi_log.Log(LOG_0VERBOSE_1) << k_iter_info.str();
 
     if (k_converged) break;
-
   }//for k iterations
+
+  InitializePrecursors();
   
   double sweep_time = SweepScheduler.GetAverageSweepTime();
   double source_time=

@@ -106,9 +106,9 @@ void chi_physics::TransportCrossSections::
   //======================================== Pickup all xs and make sure valid
   std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> cross_secs;
   cross_secs.reserve(combinations.size());
-  int num_grps_G=0;
-  int num_precursors_J=0;
-  int count=0;
+  int num_grps_G = 0;
+  int num_precursors_J = 0;
+  int count = 0;
   double N_total = 0.0;
   double Nf_total = 0.0;
   for (auto combo : combinations)
@@ -198,6 +198,7 @@ void chi_physics::TransportCrossSections::
   chi_d.resize(num_grps_G);
   for (int g=0; g<G; ++g)
     chi_d[g].resize(num_precursors_J,0.0);
+  precursor_map.resize(num_precursors_J,0);
 
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
