@@ -77,6 +77,8 @@ chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
       break;
     }
   }//switch order
+
+  range = {-1, +1};
 }
 
 

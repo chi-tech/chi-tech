@@ -10,8 +10,7 @@ void chi_math::QuadratureConical::Initialize_Conical_Product_Tri()
   QuadratureGaussLegendre legendre((QuadratureOrder)std::floor(((int)order+1)/2.0));
   QuadratureJacobi        jacobiA(order, /*alpha=*/1, /*beta=*/0);
 
-  legendre.Scale({-1.0, 1.0},
-                 { 0.0, 1.0});
+  legendre.SetRange({0, 1});
 
   const size_t np = legendre.qpoints.size();
 
@@ -40,8 +39,7 @@ void chi_math::QuadratureConical::Initialize_Conical_Product_Tet()
   QuadratureJacobi        jacobiA(order, /*alpha=*/1, /*beta=*/0);
   QuadratureJacobi        jacobiB(order, /*alpha=*/2, /*beta=*/0);
 
-  legendre.Scale({-1.0, 1.0},
-                 { 0.0, 1.0});
+  legendre.SetRange({0, 1});
 
   const size_t np = legendre.qpoints.size();
 
