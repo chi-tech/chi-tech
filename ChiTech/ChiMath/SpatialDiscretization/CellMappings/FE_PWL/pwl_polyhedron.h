@@ -1,11 +1,10 @@
 #ifndef PWL_POLYHEDRON_VALUES_H
 #define PWL_POLYHEDRON_VALUES_H
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include <vector>
-#include "ChiMath/Quadratures/quadrature.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
+#include "ChiMath/Quadratures/quadrature_tetrahedron.h"
+#include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 
 
@@ -103,8 +102,8 @@ public:
   //00_constrdestr.cc
   PolyhedronMappingFE_PWL(const chi_mesh::CellPolyhedron& polyh_cell,
                           const chi_mesh::MeshContinuumPtr& ref_grid,
-                          const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                          const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+                          const chi_math::QuadratureTetrahedron& min_volume_quadrature,
+                          const chi_math::QuadratureTriangle&    min_surface_quadrature,
                           const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
                           const chi_math::QuadratureTriangle&    arb_surface_quadrature);
 

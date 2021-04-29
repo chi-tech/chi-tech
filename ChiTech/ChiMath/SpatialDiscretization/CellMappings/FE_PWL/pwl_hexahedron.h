@@ -96,8 +96,8 @@ private:
 public:
   HexahedronMappingFE_PWL(chi_mesh::CellPolyhedron* polyh_cell,
                           chi_mesh::MeshContinuumPtr ref_grid,
-                          chi_math::QuadratureHexahedron&    minumum_volume_quadrature,
-                          chi_math::QuadratureQuadrilateral& minumum_surface_quadrature,
+                          chi_math::QuadratureHexahedron&    min_volume_quadrature,
+                          chi_math::QuadratureQuadrilateral& min_surface_quadrature,
                           chi_math::QuadratureHexahedron&    arb_volume_quadrature,
                           chi_math::QuadratureQuadrilateral& arb_surface_quadrature);
 

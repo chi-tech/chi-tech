@@ -1,5 +1,6 @@
 #include "pwl_polyhedron.h"
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -11,13 +12,13 @@ PolyhedronMappingFE_PWL::
   PolyhedronMappingFE_PWL(
     const chi_mesh::CellPolyhedron& polyh_cell,
     const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
-    const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-    const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
+    const chi_math::QuadratureTetrahedron& min_volume_quadrature,
+    const chi_math::QuadratureTriangle&    min_surface_quadrature,
     const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
     const chi_math::QuadratureTriangle&    arb_surface_quadrature):
   CellMappingFE_PWL(polyh_cell.vertex_ids.size(), ref_grid),
-  default_volume_quadrature(minumum_volume_quadrature),
-  default_surface_quadrature(minumum_surface_quadrature),
+  default_volume_quadrature(min_volume_quadrature),
+  default_surface_quadrature(min_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),
   arbitrary_surface_quadrature(arb_surface_quadrature)
 {

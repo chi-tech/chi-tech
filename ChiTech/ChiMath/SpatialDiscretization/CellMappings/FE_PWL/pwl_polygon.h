@@ -1,10 +1,10 @@
 #ifndef PWL_POLYGON_VALUES_H
 #define PWL_POLYGON_VALUES_H
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
+#include "ChiMath/Quadratures/quadrature_line.h"
+#include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMesh/Cell/cell_polygon.h"
-
-#include <vector>
 
 
 
@@ -51,11 +51,11 @@ private:
   //Goes into sides
 
   std::vector<FEside_data2d> sides;
-  const chi_math::QuadratureTriangle&      default_volume_quadrature;
-  const chi_math::QuadratureGaussLegendre& default_surface_quadrature;
+  const chi_math::QuadratureTriangle& default_volume_quadrature;
+  const chi_math::QuadratureLine&     default_surface_quadrature;
 
-  const chi_math::QuadratureTriangle&      arbitrary_volume_quadrature;
-  const chi_math::QuadratureGaussLegendre& arbitrary_surface_quadrature;
+  const chi_math::QuadratureTriangle& arbitrary_volume_quadrature;
+  const chi_math::QuadratureLine&     arbitrary_surface_quadrature;
 
 private:
   int      num_of_subtris;
@@ -66,17 +66,14 @@ private:
 
 
 
-//public:
-//  std::vector<chi_mesh::Vector3>                 IntV_gradshapeI;
-  
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonMappingFE_PWL(const chi_mesh::CellPolygon& poly_cell,
                        const chi_mesh::MeshContinuumPtr& ref_grid,
-                       const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-                       const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
-                       const chi_math::QuadratureTriangle&      arb_volume_quadrature,
-                       const chi_math::QuadratureGaussLegendre& arb_surface_quadrature);
+                       const chi_math::QuadratureTriangle& min_volume_quadrature,
+                       const chi_math::QuadratureLine&     min_surface_quadrature,
+                       const chi_math::QuadratureTriangle& arb_volume_quadrature,
+                       const chi_math::QuadratureLine&     arb_surface_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
@@ -116,16 +113,6 @@ public:
 
   void GradShapeValues(const chi_mesh::Vector3& xyz,
                        std::vector<chi_mesh::Vector3>& gradshape_values) override;
-
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Determinant J
-  double DetJ(int s, int qpoint_index, bool on_surface=false)
-  {
-    if (!on_surface)
-      return sides[s].detJ;
-    else
-      return sides[s].detJ_surf;
-  }
-
 };
 
 #endif

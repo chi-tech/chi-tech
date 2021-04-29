@@ -6,13 +6,13 @@ PolygonMappingFE_PWL::
   PolygonMappingFE_PWL(
     const chi_mesh::CellPolygon& poly_cell,
     const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
-    const chi_math::QuadratureTriangle&      minumum_volume_quadrature,
-    const chi_math::QuadratureGaussLegendre& minumum_surface_quadrature,
-    const chi_math::QuadratureTriangle&      arb_volume_quadrature,
-    const chi_math::QuadratureGaussLegendre& arb_surface_quadrature) :
+    const chi_math::QuadratureTriangle& min_volume_quadrature,
+    const chi_math::QuadratureLine&     min_surface_quadrature,
+    const chi_math::QuadratureTriangle& arb_volume_quadrature,
+    const chi_math::QuadratureLine&     arb_surface_quadrature) :
   CellMappingFE_PWL(poly_cell.vertex_ids.size(), ref_grid),
-  default_volume_quadrature(minumum_volume_quadrature),
-  default_surface_quadrature(minumum_surface_quadrature),
+  default_volume_quadrature(min_volume_quadrature),
+  default_surface_quadrature(min_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),
   arbitrary_surface_quadrature(arb_surface_quadrature)
 {

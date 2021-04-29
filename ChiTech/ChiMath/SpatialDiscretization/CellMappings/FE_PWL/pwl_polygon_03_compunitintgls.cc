@@ -172,19 +172,19 @@ void PolygonMappingFE_PWL::
         for (int qp=0; qp < default_surface_quadrature.qpoints.size(); qp++)
         {
           value_ij
-            += default_surface_quadrature.weights[qp] * 0.5 *
+            += default_surface_quadrature.weights[qp] *
                GetShape(f, i, qp, ON_SURFACE) *
                GetShape(f, j, qp, ON_SURFACE) *
                DetJ(f,qp,ON_SURFACE);
 
           value_x_ij
-            += default_surface_quadrature.weights[qp] * 0.5 *
+            += default_surface_quadrature.weights[qp] *
                GetShape(f, i, qp, ON_SURFACE) *
                GetGradShape_x(f,j,qp) *
                DetJ(f,qp,ON_SURFACE);
 
           value_y_ij
-            += default_surface_quadrature.weights[qp] * 0.5 *
+            += default_surface_quadrature.weights[qp] *
                GetShape(f, i, qp, ON_SURFACE) *
                GetGradShape_y(f,j,qp) *
                DetJ(f,qp,ON_SURFACE);
@@ -203,7 +203,7 @@ void PolygonMappingFE_PWL::
       for (int qp=0; qp < default_surface_quadrature.qpoints.size(); qp++)
       {
         f_varphi_i_surf
-          += default_surface_quadrature.weights[qp] * 0.5 *
+          += default_surface_quadrature.weights[qp] *
              GetShape(f, i, qp, ON_SURFACE) *
              DetJ(f,qp,ON_SURFACE);
       }// for gp

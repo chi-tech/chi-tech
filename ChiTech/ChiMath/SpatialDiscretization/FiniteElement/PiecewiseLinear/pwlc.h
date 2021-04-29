@@ -6,7 +6,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
-#include "ChiMath/Quadratures/quadrature_gausslegendre.h"
+#include "ChiMath/Quadratures/quadrature_line.h"
 #include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMath/Quadratures/quadrature_quadrilateral.h"
 #include "ChiMath/Quadratures/quadrature_tetrahedron.h"
@@ -25,13 +25,13 @@ public:
 private:
   bool                     mapping_initialized=false;
 public:
-  chi_math::QuadratureGaussLegendre line_quad_order_second;
+  chi_math::QuadratureLine          line_quad_order_second;
   chi_math::QuadratureTriangle      tri_quad_order_second;
   chi_math::QuadratureQuadrilateral quad_quad_order_second;
   chi_math::QuadratureTetrahedron   tet_quad_order_second;
   chi_math::QuadratureHexahedron    hex_quad_order_second;
 
-  chi_math::QuadratureGaussLegendre line_quad_order_arbitrary;
+  chi_math::QuadratureLine          line_quad_order_arbitrary;
   chi_math::QuadratureTriangle      tri_quad_order_arbitrary;
   chi_math::QuadratureQuadrilateral quad_quad_order_arbitrary;
   chi_math::QuadratureTetrahedron   tet_quad_order_arbitrary;

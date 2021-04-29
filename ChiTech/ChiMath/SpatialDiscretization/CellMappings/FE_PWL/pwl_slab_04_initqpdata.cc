@@ -13,10 +13,10 @@ void SlabMappingFE_PWL::InitializeAllQuadraturePointData(
 void SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data)
 {
-  auto& vol_quadrature = arbitrary_volume_quadrature;
+  auto& volume_quadrature = arbitrary_volume_quadrature;
 
   //=================================== Determine number of internal qpoints
-  size_t ttl_num_vol_qpoints = vol_quadrature.qpoints.size();
+  size_t ttl_num_vol_qpoints = volume_quadrature.qpoints.size();
 
   //=================================== Declare necessary vars
   std::vector<unsigned int>     V_quadrature_point_indices;
@@ -50,7 +50,7 @@ void SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
                                    0.0,                //y
                                    SlabGradShape(i));  //z
 
-      double qp_xyz_tilde = (vol_quadrature.qpoints[qp][0]+1.0)/2.0;
+      const double qp_xyz_tilde = volume_quadrature.qpoints[qp][0];
       V_qpoints_xyz.push_back(v0 +
                               h*chi_mesh::Vector3(0.0,0.0,qp_xyz_tilde));
     }//for qp
@@ -60,10 +60,10 @@ void SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
   }//for i
 
   V_JxW.reserve(ttl_num_vol_qpoints);
-  double J = h/2.0;
+  const double J = h;
   for (size_t qp=0; qp<ttl_num_vol_qpoints; ++qp)
   {
-    double w = vol_quadrature.weights[qp];
+    const double w = volume_quadrature.weights[qp];
     V_JxW.push_back(J * w);
   }//for qp
   V_num_nodes = num_nodes;

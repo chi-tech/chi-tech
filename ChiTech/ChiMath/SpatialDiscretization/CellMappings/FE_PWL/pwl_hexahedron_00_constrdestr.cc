@@ -6,13 +6,13 @@ extern ChiLog& chi_log;
 HexahedronMappingFE_PWL::
   HexahedronMappingFE_PWL(chi_mesh::CellPolyhedron *polyh_cell,
                           std::shared_ptr<chi_mesh::MeshContinuum> ref_grid,
-                          chi_math::QuadratureHexahedron &minumum_volume_quadrature,
-                          chi_math::QuadratureQuadrilateral &minumum_surface_quadrature,
+                          chi_math::QuadratureHexahedron &min_volume_quadrature,
+                          chi_math::QuadratureQuadrilateral &min_surface_quadrature,
                           chi_math::QuadratureHexahedron &arb_volume_quadrature,
                           chi_math::QuadratureQuadrilateral &arb_surface_quadrature) :
   CellMappingFE_PWL(polyh_cell->vertex_ids.size(), ref_grid),
-  default_volume_quadrature(minumum_volume_quadrature),
-  default_surface_quadrature(minumum_surface_quadrature),
+  default_volume_quadrature(min_volume_quadrature),
+  default_surface_quadrature(min_surface_quadrature),
   arbitrary_volume_quadrature(arb_volume_quadrature),
   arbitrary_surface_quadrature(arb_surface_quadrature)
 {
