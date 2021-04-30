@@ -44,6 +44,9 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
   if (num_args < 1)
     LuaPostArgAmountError(func_name,1,num_args);
 
+  LuaCheckNilValue(func_name,L,1);
+  if (num_args >= 2) LuaCheckNilValue(func_name,L,2);
+
   const char* temp = lua_tostring(L,1);
   const char* field = "";
   if (num_args >= 2) field = lua_tostring(L,2);
@@ -100,6 +103,9 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
 
+  LuaCheckNilValue(func_name,L,1);
+  if (num_args >= 2) LuaCheckNilValue(func_name,L,2);
+
   const char* temp = lua_tostring(L,1);
   double scale = 1.0;
   if (num_args >= 2) scale = lua_tonumber(L,2);
@@ -153,6 +159,8 @@ int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
 
+  LuaCheckNilValue(func_name,L,1);
+
   const char* temp = lua_tostring(L,1);
 
   auto new_object = new chi_mesh::UnpartitionedMesh;
@@ -204,6 +212,8 @@ int chiUnpartitionedMeshFromMshFormat(lua_State* L)
   int num_args = lua_gettop(L);
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
+
+  LuaCheckNilValue(func_name,L,1);
 
   const char* temp = lua_tostring(L,1);
 

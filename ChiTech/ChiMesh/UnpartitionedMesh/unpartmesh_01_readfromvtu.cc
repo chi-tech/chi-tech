@@ -303,7 +303,6 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 
   auto vtk_vertex  = vtkVertex::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_vertex->GetNumberOfPoints();
-  auto num_cfaces  = num_cpoints;
 
   point_cell->vertex_ids.reserve(num_cpoints);
   auto point_ids   = vtk_vertex->GetPointIds();
@@ -372,7 +371,7 @@ void chi_mesh::UnpartitionedMesh::
   }
 
   vtkDataArray* cell_id_array_ptr = nullptr;
-  if (options.material_id_fieldname.size() == 0)
+  if (options.material_id_fieldname.empty())
   {
     chi_log.Log(LOG_0)
       << "A user-supplied field name from which to recover cell identifiers "
