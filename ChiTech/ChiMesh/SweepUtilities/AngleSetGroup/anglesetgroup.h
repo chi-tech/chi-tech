@@ -1,5 +1,5 @@
-#ifndef _chi_angleset_group_h
-#define _chi_angleset_group_h
+#ifndef CHI_ANGLESET_GROUP_H
+#define CHI_ANGLESET_GROUP_H
 
 #include "ChiMesh/SweepUtilities/AngleSet/angleset.h"
 
@@ -59,10 +59,10 @@ public:
   {
     current_angle_set = 0;
 
-    for (int as=0; as<angle_sets.size(); as++)
-      angle_sets[as]->ResetSweepBuffers();
+    for (auto& angle_set : angle_sets)
+      angle_set->ResetSweepBuffers();
   }
 
 };
 
-#endif
+#endif //CHI_ANGLESET_GROUP_H

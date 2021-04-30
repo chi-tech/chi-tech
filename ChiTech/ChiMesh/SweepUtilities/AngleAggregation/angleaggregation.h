@@ -1,5 +1,5 @@
-#ifndef _chi_angleaggregation_h
-#define _chi_angleaggregation_h
+#ifndef CHI_ANGLEAGGREGATION_H
+#define CHI_ANGLEAGGREGATION_H
 
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
@@ -63,4 +63,4 @@ public:
 };
 
 
-#endif
+#endif //CHI_ANGLEAGGREGATION_H
