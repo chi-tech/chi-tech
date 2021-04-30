@@ -18,6 +18,7 @@ kscript_path = os.path.dirname(os.path.abspath(__file__))
 kchi_src_pth = kscript_path + '/../'
 kpath_to_exe = kchi_src_pth + '/bin/ChiTech'
 tests_to_run = []
+print_only   = False
 
 print("")
 if len(sys.argv) >= 2:
@@ -75,6 +76,7 @@ def run_test_tacc(file_name, comment, num_procs,
 		search_strings_vals_tols):
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
+    if print_only: print(""); return
     with open(f"ChiTest/{file_name}.job", 'w') as job_file:
         job_file.write(
 f"""#!/usr/bin/bash
@@ -105,6 +107,7 @@ def run_test_local(file_name, comment, num_procs,
 		search_strings_vals_tols):
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
+    if print_only: print(""); return
     process = subprocess.Popen(["mpiexec", "-np", str(num_procs), kpath_to_exe,
                                 "ChiTest/" + file_name + ".lua", "master_export=false"],
                                cwd=kchi_src_pth,
