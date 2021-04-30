@@ -40,9 +40,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
   fprintf(of, "xyz=np.zeros((%lu,%d))\n", vertices.size(), 3);
   for (int n=0; n < vertices.size(); n++)
   {
-    fprintf(of, "xyz[%d][%d]=%f;  ", n, 0, vertices[n]->x);
-    fprintf(of, "xyz[%d][%d]=%f;  ", n, 1, vertices[n]->y);
-    fprintf(of, "xyz[%d][%d]=%f;\n", n, 2, vertices[n]->z);
+    fprintf(of, "xyz[%d][%d]=%f;  ", n, 0, vertices[n].x);
+    fprintf(of, "xyz[%d][%d]=%f;  ", n, 1, vertices[n].y);
+    fprintf(of, "xyz[%d][%d]=%f;\n", n, 2, vertices[n].z);
   }
 
   //============================================= Find amount of faces

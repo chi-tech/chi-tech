@@ -1,5 +1,7 @@
 #include "chi_console.h"
 
+#include <iostream>
+
 //############################################################################# Default constructor
 /** Default constructor for the console*/
 ChiConsole::ChiConsole() noexcept

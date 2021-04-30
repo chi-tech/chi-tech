@@ -21,7 +21,7 @@ private:
 
 
 public:
-  std::vector<chi_mesh::Node*>   vertices;
+  std::vector<chi_mesh::Node>    vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
@@ -97,6 +97,8 @@ public:
   size_t GetGlobalNumberOfCells();
 
   std::vector<uint64_t> GetDomainUniqueBoundaryIDs();
+
+  size_t CountCellsInLogicalVolume(chi_mesh::LogicalVolume& log_vol);
 };
 
 #endif //CHI_MESHCONTINUUM_H_

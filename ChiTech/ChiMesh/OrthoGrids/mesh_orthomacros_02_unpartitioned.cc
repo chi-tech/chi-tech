@@ -50,7 +50,7 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   //======================================== Create vertices
   umesh->vertices.reserve(zverts.size());
   for (auto& vertex : zverts)
-    umesh->vertices.push_back(new chi_mesh::Vertex(vertex));
+    umesh->vertices.push_back(vertex);
 
   //======================================== Create cells
   for (size_t c=0; c<(zverts.size()-1); ++c)
@@ -131,9 +131,9 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
     {
       ++k;
       vertex_ij_to_i_map[i][j] = k;
-      umesh->vertices.push_back(new chi_mesh::Vertex(vertices_1d_x[j],
-                                                     vertices_1d_y[i],
-                                                     0.0));
+      umesh->vertices.emplace_back(vertices_1d_x[j],
+                                   vertices_1d_y[i],
+                                   0.0);
     }//for j
   }//for i
 
@@ -234,9 +234,9 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
       {
         ++c;
         vertex_ijk_to_i_map[i][j][k] = c;
-        umesh->vertices.push_back(new chi_mesh::Vertex(vertices_1d_x[j],
-                                                       vertices_1d_y[i],
-                                                       vertices_1d_z[k]));
+        umesh->vertices.emplace_back(vertices_1d_x[j],
+                                     vertices_1d_y[i],
+                                     vertices_1d_z[k]);
       }//for k
     }//for j
   }//for i

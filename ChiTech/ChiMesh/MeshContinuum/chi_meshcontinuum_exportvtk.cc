@@ -34,20 +34,18 @@ extern ChiPhysics&  chi_physics_handler;
 /**On hold*/
 void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 {
+  chi_log.Log() << "Exporting mesh to VTK. " << local_cells.size();
   std::vector<std::vector<double>>    d_nodes;
 
   vtkSmartPointer<vtkPoints> points =
     vtkSmartPointer<vtkPoints>::New();
 
   //============================================= Init grid and material name
-  vtkUnstructuredGrid* ugrid;
-  vtkIntArray*      matarray;
-  vtkIntArray*      pararray;
+  auto ugrid    = vtkUnstructuredGrid::New();
+  auto matarray = vtkIntArray::New();
+  auto pararray = vtkIntArray::New();
 
-  ugrid    = vtkUnstructuredGrid::New();
-  matarray = vtkIntArray::New();
   matarray->SetName("Material");
-  pararray = vtkIntArray::New();
   pararray->SetName("Partition");
 
   //======================================== Precreate nodes to map
@@ -76,18 +74,16 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       {
         int vgi = slab_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->vertices[vgi]->x;
-        d_node[1] = grid->vertices[vgi]->y;
-        d_node[2] = grid->vertices[vgi]->z;
+        d_node[0] = grid->vertices[vgi].x;
+        d_node[1] = grid->vertices[vgi].y;
+        d_node[2] = grid->vertices[vgi].z;
 
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;
       }
 
-      ugrid->
-        InsertNextCell(VTK_LINE,2,
-                       cell_info.data());
+      ugrid->InsertNextCell(VTK_LINE, 2, cell_info.data());
 
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
@@ -99,23 +95,21 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     {
       auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
 
-      int num_verts = poly_cell->vertex_ids.size();
+      size_t num_verts = poly_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = poly_cell->vertex_ids[v];
+        uint64_t vgi = poly_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->vertices[vgi]->x;
-        d_node[1] = grid->vertices[vgi]->y;
-        d_node[2] = grid->vertices[vgi]->z;
+        d_node[0] = grid->vertices[vgi].x;
+        d_node[1] = grid->vertices[vgi].y;
+        d_node[2] = grid->vertices[vgi].z;
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;
       }
 
-      ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
-                       cell_info.data());
+      ugrid->InsertNextCell(VTK_POLYGON, num_verts, cell_info.data());
 
       matarray->InsertNextValue(mat_id);
       pararray->InsertNextValue(cell.partition_id);
@@ -127,15 +121,15 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
 
-      int num_verts = polyh_cell->vertex_ids.size();
+      size_t num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = polyh_cell->vertex_ids[v];
+        uint64_t vgi = polyh_cell->vertex_ids[v];
         std::vector<double> d_node(3);
-        d_node[0] = grid->vertices[vgi]->x;
-        d_node[1] = grid->vertices[vgi]->y;
-        d_node[2] = grid->vertices[vgi]->z;
+        d_node[0] = grid->vertices[vgi].x;
+        d_node[1] = grid->vertices[vgi].y;
+        d_node[2] = grid->vertices[vgi].z;
 
         points->InsertPoint(nc,d_node.data());
         cell_info[v] = nc; nc++;
@@ -144,10 +138,10 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       vtkSmartPointer<vtkCellArray> faces =
         vtkSmartPointer<vtkCellArray>::New();
 
-      int num_faces = polyh_cell->faces.size();
+      size_t num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+        size_t num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
         {
@@ -240,4 +234,6 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 
     ofile.close();
   }
+
+  chi_log.Log() << "Done exporting mesh to VTK.";
 }

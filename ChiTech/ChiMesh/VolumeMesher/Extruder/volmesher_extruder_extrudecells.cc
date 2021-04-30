@@ -33,9 +33,9 @@ void chi_mesh::VolumeMesherExtruder::
 
       //========================================= Check for inverted cells
       {
-        auto& v0 = template_cell.centroid;
-        auto& v1 = *template_grid.vertices[template_cell.vertex_ids[0]];
-        auto& v2 = *template_grid.vertices[template_cell.vertex_ids[1]];
+        const auto& v0 = template_cell.centroid;
+        const auto& v1 = template_grid.vertices[template_cell.vertex_ids[0]];
+        const auto& v2 = template_grid.vertices[template_cell.vertex_ids[1]];
 
         auto v01 = v1 - v0;
         auto v02 = v2 - v0;
@@ -107,10 +107,10 @@ void chi_mesh::VolumeMesherExtruder::
           newFace.vertex_ids[3] = face.vertex_ids[0] + (iz+1)*node_z_index_incr;
 
           //Compute centroid
-          chi_mesh::Vertex& v0 = *grid.vertices[newFace.vertex_ids[0]];
-          chi_mesh::Vertex& v1 = *grid.vertices[newFace.vertex_ids[1]];
-          chi_mesh::Vertex& v2 = *grid.vertices[newFace.vertex_ids[2]];
-          chi_mesh::Vertex& v3 = *grid.vertices[newFace.vertex_ids[3]];
+          const auto& v0 = grid.vertices[newFace.vertex_ids[0]];
+          const auto& v1 = grid.vertices[newFace.vertex_ids[1]];
+          const auto& v2 = grid.vertices[newFace.vertex_ids[2]];
+          const auto& v3 = grid.vertices[newFace.vertex_ids[3]];
 
           chi_mesh::Vertex vfc = (v0+v1+v2+v3)/4.0;
           newFace.centroid = vfc;
@@ -155,7 +155,7 @@ void chi_mesh::VolumeMesherExtruder::
         {
           newFace.vertex_ids.push_back(template_cell.vertex_ids[tv]
                                        + iz*node_z_index_incr);
-          chi_mesh::Vertex v = *grid.vertices[newFace.vertex_ids.back()];
+          const auto& v = grid.vertices[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }
 
@@ -164,8 +164,8 @@ void chi_mesh::VolumeMesherExtruder::
         newFace.centroid = vfc;
 
         //Compute normal
-        va = *grid.vertices[newFace.vertex_ids[0]] - vfc;
-        vb = *grid.vertices[newFace.vertex_ids[1]] - vfc;
+        va = grid.vertices[newFace.vertex_ids[0]] - vfc;
+        vb = grid.vertices[newFace.vertex_ids[1]] - vfc;
 
         vn = va.Cross(vb);
         newFace.normal = vn/vn.Norm();
@@ -192,17 +192,17 @@ void chi_mesh::VolumeMesherExtruder::
         for (auto tc_vid : template_cell.vertex_ids)
         {
           newFace.vertex_ids.push_back(tc_vid + (iz+1)*node_z_index_incr);
-          chi_mesh::Vertex v = *grid.vertices[newFace.vertex_ids.back()];
+          const auto& v = grid.vertices[newFace.vertex_ids.back()];
           vfc = vfc + v;
         }
 
         //Compute centroid
-        vfc = vfc/template_cell.vertex_ids.size();
+        vfc = vfc/double(template_cell.vertex_ids.size());
         newFace.centroid = vfc;
 
         //Compute normal
-        va = *grid.vertices[newFace.vertex_ids[0]] - vfc;
-        vb = *grid.vertices[newFace.vertex_ids[1]] - vfc;
+        va = grid.vertices[newFace.vertex_ids[0]] - vfc;
+        vb = grid.vertices[newFace.vertex_ids[1]] - vfc;
 
         vn = va.Cross(vb);
         newFace.normal = vn/vn.Norm();

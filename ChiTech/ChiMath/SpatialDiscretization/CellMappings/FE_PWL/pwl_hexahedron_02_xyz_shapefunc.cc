@@ -9,7 +9,7 @@ double HexahedronMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3&
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector3& p0 = *grid->vertices[face_data[f].sides[s].v_index[0]];
+      const auto& p0 = grid->vertices[face_data[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
       chi_mesh::Vector3 xi_eta_zeta   = face_data[f].sides[s].Jinv * xyz_ref;
@@ -61,7 +61,7 @@ void HexahedronMappingFE_PWL::ShapeValues(const chi_mesh::Vector3& xyz,
     {
       auto& side_fe_info = face_data[f].sides[s];
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector3& p0 = *grid->vertices[side_fe_info.v_index[0]];
+      const auto& p0 = grid->vertices[side_fe_info.v_index[0]];
       chi_mesh::Vector3 xi_eta_zeta   = side_fe_info.Jinv * (xyz - p0);
 
       double xi  = xi_eta_zeta.x;
@@ -108,7 +108,7 @@ chi_mesh::Vector3 HexahedronMappingFE_PWL::GradShapeValue(const int i,
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      chi_mesh::Vector3 p0 = *grid->vertices[face_data[f].sides[s].v_index[0]];
+      const auto& p0 = grid->vertices[face_data[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
       chi_mesh::Vector3 xi_eta_zeta = face_data[f].sides[s].Jinv * xyz_ref;
