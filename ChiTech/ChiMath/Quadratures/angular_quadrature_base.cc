@@ -6,6 +6,7 @@
 extern ChiLog& chi_log;
 
 #include <iomanip>
+#include <numeric>
 
 //###################################################################
 /**Initializes the quadrature with custom angles and weights.*/
@@ -169,10 +170,8 @@ void chi_math::AngularQuadrature::
   int num_angles = abscissae.size();
   int num_moms = m_to_ell_em_map.size();
 
-  double normalization = 1.0;
-  if (dimension == 1) normalization = 2.0;
-  if (dimension == 2) normalization = 4.0*M_PI;
-  if (dimension == 3) normalization = 4.0*M_PI;
+  const auto normalization =
+    std::accumulate(weights.begin(), weights.end(), static_cast<double>(0));
 
   for (const auto& ell_em : m_to_ell_em_map)
   {
