@@ -75,8 +75,6 @@ public:
                        const chi_math::QuadratureTriangle& arb_volume_quadrature,
                        const chi_math::QuadratureLine&     arb_surface_quadrature);
 
-  void ComputeUnitIntegrals(
-    chi_math::finite_element::UnitIntegralData& ui_data) override;
   void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
