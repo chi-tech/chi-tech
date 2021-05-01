@@ -24,6 +24,8 @@ RegisterFunction(chiLegendreDerivative)
 RegisterFunction(chiYlm)
 RegisterFunction(chiCreateQuadrature)
 RegisterFunction(chiCreateProductQuadrature)
+RegisterFunction(chiCreateCylindricalProductQuadrature)
+RegisterFunction(chiCreateSphericalProductQuadrature)
     RegisterConstant(GAUSS_LEGENDRE,             1);
     RegisterConstant(GAUSS_CHEBYSHEV,            2);
     RegisterConstant(GAUSS_LEGENDRE_LEGENDRE,    3);
