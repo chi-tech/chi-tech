@@ -27,10 +27,7 @@ public:
   {}
 
   virtual void
-  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
-  {
-    throw std::logic_error("Trouble in base-class ComputeUnitIntegrals");
-  }
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data);
 
   virtual void
   InitializeAllQuadraturePointData(
