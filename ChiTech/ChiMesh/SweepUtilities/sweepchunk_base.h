@@ -1,5 +1,5 @@
-#ifndef _chi_sweepchunk_base_h
-#define _chi_sweepchunk_base_h
+#ifndef CHI_SWEEPCHUNK_BASE_H
+#define CHI_SWEEPCHUNK_BASE_H
 
 #include <functional>
 
@@ -37,12 +37,11 @@ public:
     x = destination_phi;
   }
 
-  virtual ~SweepChunk()
-  {};
+  virtual ~SweepChunk() = default;
 
   /**Sweep chunks should override this.*/
   virtual void Sweep(AngleSet* angle_set)
   {}
 };
 
-#endif
+#endif //CHI_SWEEPCHUNK_BASE_H

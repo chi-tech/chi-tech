@@ -140,4 +140,4 @@ public:
 }//namespace chi_mesh
 }//namespace sweep_management
 
-#endif
+#endif //CHI_SWEEP_BOUNDARY_BASE_H

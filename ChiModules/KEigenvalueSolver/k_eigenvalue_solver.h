@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace  LinearBoltzmann::KEigenvalue
+namespace  LinearBoltzmann { namespace KEigenvalue
 {
 
 /**A k-eigenvalue neutron transport solver.*/
@@ -42,6 +42,6 @@ public:
   
 };
 
-}
+} }
 
 #endif

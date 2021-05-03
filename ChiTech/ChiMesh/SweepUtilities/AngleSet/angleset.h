@@ -86,4 +86,4 @@ public:
                                      int gs_ss_begin);
 };
 
-#endif
+#endif //CHI_ANGLESET_H

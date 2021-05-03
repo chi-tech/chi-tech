@@ -1,11 +1,10 @@
-#ifndef _chi_FLUDS_h
-#define _chi_FLUDS_h
-
-
-#include <stdio.h>
+#ifndef CHI_FLUDS_H
+#define CHI_FLUDS_H
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include <ChiMesh/Cell/cell.h>
+#include "ChiMesh/Cell/cell.h"
+
+#include <iostream>
 
 //face_slot index, vertex ids
 typedef std::pair<int,std::vector<uint64_t>>             CompactFaceView;
@@ -13,7 +12,7 @@ typedef std::pair<int,std::vector<uint64_t>>             CompactFaceView;
 //cell_global_id, faces
 typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;
 
-namespace chi_mesh::sweep_management
+namespace chi_mesh { namespace sweep_management
 {
   struct FaceNodalMapping
   {
@@ -97,7 +96,7 @@ namespace chi_mesh::sweep_management
       delete [] upwind_dof_mapping;
     }
   };
-}
+} }
 
 //###################################################################
 /**Improved Flux Data Structure (FLUDS).*/
@@ -312,7 +311,7 @@ public:
   double*  NLUpwindPsi(int nonl_inc_face_counter,
                        int face_dof,int g, int n) override;
 
-  ~PRIMARY_FLUDS()
+  ~PRIMARY_FLUDS() override
   {
     for (auto& val : so_cell_outb_face_slot_indices) delete [] val;
     for (auto& val : so_cell_outb_face_face_category) delete [] val;
@@ -323,4 +322,4 @@ public:
 
 };
 
-#endif
+#endif //CHI_FLUDS_H

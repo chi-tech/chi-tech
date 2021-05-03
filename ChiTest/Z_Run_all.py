@@ -1,5 +1,9 @@
 import subprocess
 import os
+import sys
+
+# To run a range of tests pass a text string via the command line.
+# i.e., "tests_to_run=[*range(14,16)]"
 
 # This python script executes the regression test suite.
 # In order to add your own test, copy one of the test blocks
@@ -13,8 +17,12 @@ import os
 kscript_path = os.path.dirname(os.path.abspath(__file__))
 kchi_src_pth = kscript_path + '/../'
 kpath_to_exe = kchi_src_pth + '/bin/ChiTech'
+tests_to_run = []
+print_only   = False
 
 print("")
+if len(sys.argv) >= 2:
+    exec(sys.argv[1])
 print("************* ChiTech Regression Test *************")
 print("")
 test_number = 0
@@ -68,6 +76,7 @@ def run_test_tacc(file_name, comment, num_procs,
 		search_strings_vals_tols):
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
+    if print_only: print(""); return
     with open(f"ChiTest/{file_name}.job", 'w') as job_file:
         job_file.write(
 f"""#!/usr/bin/bash
@@ -98,6 +107,7 @@ def run_test_local(file_name, comment, num_procs,
 		search_strings_vals_tols):
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
+    if print_only: print(""); return
     process = subprocess.Popen(["mpiexec", "-np", str(num_procs), kpath_to_exe,
                                 "ChiTest/" + file_name + ".lua", "master_export=false"],
                                cwd=kchi_src_pth,
@@ -112,12 +122,14 @@ def run_test(file_name, comment, num_procs,
 		search_strings_vals_tols):
     global test_number
     test_number += 1
-    if tacc:
-        run_test_tacc(file_name, comment, num_procs,
-			search_strings_vals_tols)
-    else:
-        run_test_local(file_name, comment, num_procs,
-			search_strings_vals_tols)
+    if ((tests_to_run) and (test_number in tests_to_run)) or \
+       (not tests_to_run):
+        if tacc:
+            run_test_tacc(file_name, comment, num_procs,
+                search_strings_vals_tols)
+        else:
+            run_test_local(file_name, comment, num_procs,
+                search_strings_vals_tols)
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
 run_test(

@@ -1,19 +1,13 @@
-#ifndef _chi_sweepbuffer_h
-#define _chi_sweepbuffer_h
+#ifndef CHI_SWEEPBUFFER_H
+#define CHI_SWEEPBUFFER_H
 
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
-#include <chi_mpi.h>
-
-//#ifndef FLAG_FINISHED
-//  #define FLAG_FINISHED     true
-//  #define FLAG_NOT_FINISHED false
-//#endif
+#include "chi_mpi.h"
 
 typedef unsigned long long int u_ll_int;
 
-namespace chi_mesh::sweep_management
+namespace chi_mesh { namespace sweep_management
 {
-
 
 //###################################################################
 /**Handles the swift communication of interprocess communication
@@ -70,5 +64,5 @@ public:
   void Reset();
 
 };
-}
-#endif
+} }
+#endif //CHI_SWEEPBUFFER_H
