@@ -19,7 +19,7 @@ void PolyhedronMappingFE_PWL::InitializeVolumeQuadraturePointData(
     for (auto& side : face.sides)
       ++num_tets;
 
-  size_t num_vol_qpoints = arbitrary_volume_quadrature.qpoints.size();
+  size_t num_vol_qpoints = volume_quadrature.qpoints.size();
   size_t ttl_num_vol_qpoints = num_tets * num_vol_qpoints;
 
   //=================================== Declare necessary vars
@@ -49,7 +49,7 @@ void PolyhedronMappingFE_PWL::InitializeVolumeQuadraturePointData(
     {
       for (size_t s=0; s < face_data[f].sides.size(); s++)
       {
-        for (const auto& qpoint : arbitrary_volume_quadrature.qpoints)
+        for (const auto& qpoint : volume_quadrature.qpoints)
         {
           node_shape_value.push_back(FaceSideShape(f,s,i,qpoint));
           node_shape_grad.emplace_back(FaceSideGradShape_x(f,s,i),   //x
@@ -71,10 +71,10 @@ void PolyhedronMappingFE_PWL::InitializeVolumeQuadraturePointData(
     {
       for (size_t qp=0; qp<num_vol_qpoints; ++qp)
       {
-        const auto w = arbitrary_volume_quadrature.weights[qp];
+        const auto w = volume_quadrature.weights[qp];
         V_JxW.push_back(side.detJ * w);
 
-        const auto& qp_xyz_tilde = arbitrary_volume_quadrature.qpoints[qp];
+        const auto& qp_xyz_tilde = volume_quadrature.qpoints[qp];
         V_qpoints_xyz.push_back(side.v0 + side.J * qp_xyz_tilde);
       }//for qp
     } //for side
@@ -97,7 +97,7 @@ void PolyhedronMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int fac
   const bool ON_SURFACE = true;
 
   //=================================== Init surface quadrature
-  size_t num_srf_qpoints = arbitrary_surface_quadrature.qpoints.size();
+  size_t num_srf_qpoints = surface_quadrature.qpoints.size();
 
   unsigned int f=face;
   {
@@ -133,7 +133,7 @@ void PolyhedronMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int fac
 
       for (size_t s=0; s < face_data[f].sides.size(); s++)
       {
-        for (const auto& qpoint : arbitrary_surface_quadrature.qpoints)
+        for (const auto& qpoint : surface_quadrature.qpoints)
         {
           node_shape_value.push_back(FaceSideShape(f,s,i,qpoint,ON_SURFACE));
           node_shape_grad.emplace_back(FaceSideGradShape_x(f,s,i),  //x
@@ -150,10 +150,10 @@ void PolyhedronMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int fac
     for (const auto& side : face_data[f].sides)
       for (size_t qp=0; qp<num_srf_qpoints; ++qp)
       {
-        const auto w = arbitrary_surface_quadrature.weights[qp];
+        const auto w = surface_quadrature.weights[qp];
         F_JxW.push_back(side.detJ_surf * w);
 
-        const auto& qp_xyz_tilde = arbitrary_surface_quadrature.qpoints[qp];
+        const auto& qp_xyz_tilde = surface_quadrature.qpoints[qp];
         F_qpoints_xyz.push_back(side.v0 + side.J * qp_xyz_tilde);
       }
 

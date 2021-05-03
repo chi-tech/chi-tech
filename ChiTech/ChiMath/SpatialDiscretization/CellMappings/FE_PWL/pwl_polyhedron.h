@@ -92,20 +92,15 @@ private:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
-  const chi_math::QuadratureTetrahedron& default_volume_quadrature;
-  const chi_math::QuadratureTriangle&    default_surface_quadrature;
-
-  const chi_math::QuadratureTetrahedron& arbitrary_volume_quadrature;
-  const chi_math::QuadratureTriangle&    arbitrary_surface_quadrature;
+  const chi_math::QuadratureTetrahedron& volume_quadrature;
+  const chi_math::QuadratureTriangle&    surface_quadrature;
 
 public:
   //00_constrdestr.cc
   PolyhedronMappingFE_PWL(const chi_mesh::CellPolyhedron& polyh_cell,
                           const chi_mesh::MeshContinuumPtr& ref_grid,
-                          const chi_math::QuadratureTetrahedron& min_volume_quadrature,
-                          const chi_math::QuadratureTriangle&    min_surface_quadrature,
-                          const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
-                          const chi_math::QuadratureTriangle&    arb_surface_quadrature);
+                          const chi_math::QuadratureTetrahedron& volume_quadrature,
+                          const chi_math::QuadratureTriangle&    surface_quadrature);
 
   void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,

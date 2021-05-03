@@ -87,19 +87,14 @@ private:
   static std::vector<MatDbl> qp_df_dg_default;
   static std::vector<MatDbl> qp_df_dg_arbitrary;
 
-  chi_math::QuadratureHexahedron&    default_volume_quadrature;
-  chi_math::QuadratureQuadrilateral& default_surface_quadrature;
-
-  chi_math::QuadratureHexahedron&    arbitrary_volume_quadrature;
-  chi_math::QuadratureQuadrilateral& arbitrary_surface_quadrature;
+  chi_math::QuadratureHexahedron&    volume_quadrature;
+  chi_math::QuadratureQuadrilateral& surface_quadrature;
 
 public:
   HexahedronMappingFE_PWL(chi_mesh::CellPolyhedron* polyh_cell,
                           chi_mesh::MeshContinuumPtr ref_grid,
-                          chi_math::QuadratureHexahedron&    min_volume_quadrature,
-                          chi_math::QuadratureQuadrilateral& min_surface_quadrature,
-                          chi_math::QuadratureHexahedron&    arb_volume_quadrature,
-                          chi_math::QuadratureQuadrilateral& arb_surface_quadrature);
+                          chi_math::QuadratureHexahedron&    volume_quadrature,
+                          chi_math::QuadratureQuadrilateral& surface_quadrature);
 
   void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,

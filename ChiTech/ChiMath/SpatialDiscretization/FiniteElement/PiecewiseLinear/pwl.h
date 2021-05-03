@@ -26,12 +26,6 @@ private:
   bool                     mapping_initialized=false;
   bool                     nb_mapping_initialized=false;
 public:
-  chi_math::QuadratureLine          line_quad_order_second;
-  chi_math::QuadratureTriangle      tri_quad_order_second;
-  chi_math::QuadratureQuadrilateral quad_quad_order_second;
-  chi_math::QuadratureTetrahedron   tet_quad_order_second;
-  chi_math::QuadratureHexahedron    hex_quad_order_second;
-
   chi_math::QuadratureLine          line_quad_order_arbitrary;
   chi_math::QuadratureTriangle      tri_quad_order_arbitrary;
   chi_math::QuadratureQuadrilateral quad_quad_order_arbitrary;

@@ -14,16 +14,14 @@ private:
   int v0i;
   int v1i;
   std::array<chi_mesh::Normal,2> normals;
-  const chi_math::QuadratureLine& default_volume_quadrature;
-  const chi_math::QuadratureLine& arbitrary_volume_quadrature;
+  const chi_math::QuadratureLine& volume_quadrature;
   double h;
 public:
 
   /**Constructor for a slab view.*/
   SlabMappingFE_PWL(const chi_mesh::CellSlab& slab_cell,
                     const chi_mesh::MeshContinuumPtr& ref_grid,
-                    const chi_math::QuadratureLine& min_volume_quadrature,
-                    const chi_math::QuadratureLine& arb_volume_quadrature);
+                    const chi_math::QuadratureLine& volume_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;

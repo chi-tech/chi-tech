@@ -51,11 +51,8 @@ private:
   //Goes into sides
 
   std::vector<FEside_data2d> sides;
-  const chi_math::QuadratureTriangle& default_volume_quadrature;
-  const chi_math::QuadratureLine&     default_surface_quadrature;
-
-  const chi_math::QuadratureTriangle& arbitrary_volume_quadrature;
-  const chi_math::QuadratureLine&     arbitrary_surface_quadrature;
+  const chi_math::QuadratureTriangle& volume_quadrature;
+  const chi_math::QuadratureLine&     surface_quadrature;
 
 private:
   int      num_of_subtris;
@@ -70,10 +67,8 @@ public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
   PolygonMappingFE_PWL(const chi_mesh::CellPolygon& poly_cell,
                        const chi_mesh::MeshContinuumPtr& ref_grid,
-                       const chi_math::QuadratureTriangle& min_volume_quadrature,
-                       const chi_math::QuadratureLine&     min_surface_quadrature,
-                       const chi_math::QuadratureTriangle& arb_volume_quadrature,
-                       const chi_math::QuadratureLine&     arb_surface_quadrature);
+                       const chi_math::QuadratureTriangle& volume_quadrature,
+                       const chi_math::QuadratureLine&     surface_quadrature);
 
   void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,

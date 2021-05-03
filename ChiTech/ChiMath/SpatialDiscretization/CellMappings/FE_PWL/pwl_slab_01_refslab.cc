@@ -4,7 +4,7 @@ double SlabMappingFE_PWL::SlabShape(int index, int qpoint_index, bool on_surface
 {
   double xi=0.0;
   if (!on_surface)
-    xi = arbitrary_volume_quadrature.qpoints.at(qpoint_index)[0];
+    xi = volume_quadrature.qpoints.at(qpoint_index)[0];
   else
     xi = static_cast<double>(index);
 

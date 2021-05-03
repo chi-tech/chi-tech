@@ -13,8 +13,6 @@ void SlabMappingFE_PWL::InitializeAllQuadraturePointData(
 void SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data)
 {
-  auto& volume_quadrature = arbitrary_volume_quadrature;
-
   //=================================== Determine number of internal qpoints
   size_t ttl_num_vol_qpoints = volume_quadrature.qpoints.size();
 

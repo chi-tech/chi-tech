@@ -22,7 +22,6 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
       const auto& slab_cell = (const chi_mesh::CellSlab&)(cell);
       auto cell_fe_view = new SlabMappingFE_PWL(slab_cell,
                                                 ref_grid,
-                                                line_quad_order_second,
                                                 line_quad_order_arbitrary);
 
       std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
@@ -33,8 +32,6 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
       const auto& poly_cell = (const chi_mesh::CellPolygon&)(cell);
       auto cell_fe_view = new PolygonMappingFE_PWL(poly_cell,
                                                    ref_grid,
-                                                   tri_quad_order_second,
-                                                   line_quad_order_second,
                                                    tri_quad_order_arbitrary,
                                                    line_quad_order_arbitrary);
 
@@ -46,8 +43,6 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
       const auto& polyh_cell = (const chi_mesh::CellPolyhedron&)(cell);
       auto cell_fe_view = new PolyhedronMappingFE_PWL(polyh_cell,
                                                       ref_grid,
-                                                      tet_quad_order_second,
-                                                      tri_quad_order_second,
                                                       tet_quad_order_arbitrary,
                                                       tri_quad_order_arbitrary);
 
