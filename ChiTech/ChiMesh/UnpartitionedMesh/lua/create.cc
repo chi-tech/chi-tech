@@ -11,6 +11,8 @@
 /**Creates an unpartitioned mesh from VTK Unstructured mesh files.
 
 \param file_name char Filename of the .vtu file.
+\param field char Name of the cell data field from which to read
+                  material and boundary identifiers (optional).
 
 \ingroup LuaUnpartitionedMesh
 
@@ -39,14 +41,21 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
 {
   const char func_name[] = "chiUnpartitionedMeshFromVTU";
   int num_args = lua_gettop(L);
-  if (num_args != 1)
+  if (num_args < 1)
     LuaPostArgAmountError(func_name,1,num_args);
 
+  LuaCheckNilValue(func_name,L,1);
+  if (num_args >= 2) LuaCheckNilValue(func_name,L,2);
+
   const char* temp = lua_tostring(L,1);
+  const char* field = "";
+  if (num_args >= 2) field = lua_tostring(L,2);
   auto new_object = new chi_mesh::UnpartitionedMesh;
 
   chi_mesh::UnpartitionedMesh::Options options;
   options.file_name = std::string(temp);
+  options.material_id_fieldname = field;
+  options.boundary_id_fieldname = field;
 
   new_object->ReadFromVTU(options);
 
@@ -93,6 +102,9 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
   int num_args = lua_gettop(L);
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
+
+  LuaCheckNilValue(func_name,L,1);
+  if (num_args >= 2) LuaCheckNilValue(func_name,L,2);
 
   const char* temp = lua_tostring(L,1);
   double scale = 1.0;
@@ -147,6 +159,8 @@ int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
 
+  LuaCheckNilValue(func_name,L,1);
+
   const char* temp = lua_tostring(L,1);
 
   auto new_object = new chi_mesh::UnpartitionedMesh;
@@ -198,6 +212,8 @@ int chiUnpartitionedMeshFromMshFormat(lua_State* L)
   int num_args = lua_gettop(L);
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
+
+  LuaCheckNilValue(func_name,L,1);
 
   const char* temp = lua_tostring(L,1);
 
