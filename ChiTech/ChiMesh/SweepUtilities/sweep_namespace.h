@@ -1,5 +1,5 @@
-#ifndef _chi_sweep_h
-#define _chi_sweep_h
+#ifndef CHI_SWEEP_H
+#define CHI_SWEEP_H
 
 #include "../chi_mesh.h"
 #include <set>
@@ -73,4 +73,4 @@ namespace sweep_management
 
 #include "sweepchunk_base.h"
 
-#endif
+#endif //CHI_SWEEP_H

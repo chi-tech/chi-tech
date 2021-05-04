@@ -65,6 +65,10 @@ public:
   static LightWeightCell* CreateCellFromVTKQuad(vtkCell* vtk_cell);
   static LightWeightCell* CreateCellFromVTKTriangle(vtkCell* vtk_cell);
 
+  static LightWeightCell* CreateCellFromVTKLine(vtkCell* vtk_cell);
+
+  static LightWeightCell* CreateCellFromVTKVertex(vtkCell* vtk_cell);
+
   void BuildMeshConnectivity();
   void ComputeCentroidsAndCheckQuality();
 

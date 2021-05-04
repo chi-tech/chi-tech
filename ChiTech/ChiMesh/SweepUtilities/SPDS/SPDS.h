@@ -1,15 +1,14 @@
-#ifndef _chi_spds_h
-#define _chi_spds_h
+#ifndef CHI_SPDS_H
+#define CHI_SPDS_H
 
 #include "ChiMesh/SweepUtilities/SPLS/SPLS.h"
 
 #include <memory>
 
-namespace chi_mesh::sweep_management
+namespace chi_mesh { namespace sweep_management
 {
   struct SPDS;
-//  typedef std::shared_ptr<SPDS> SPDS_ptr;
-}
+} }
 
 //###################################################################
 /**Contains multiple levels*/
@@ -31,8 +30,7 @@ struct chi_mesh::sweep_management::SPDS
   std::vector<std::vector<int>> global_dependencies;
 
   //======================================== Default constructor
-  SPDS()
-  {  }
+  SPDS() = default;
 
   int MapLocJToPrelocI(int locJ);
   int MapLocJToDeplocI(int locJ);
@@ -40,4 +38,4 @@ struct chi_mesh::sweep_management::SPDS
   void BuildTaskDependencyGraph(bool cycle_allowance_flag);
 };
 
-#endif
+#endif //CHI_SPDS_H

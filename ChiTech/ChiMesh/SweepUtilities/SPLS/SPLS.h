@@ -1,5 +1,5 @@
-#ifndef _chi_spls_h
-#define _chi_spls_h
+#ifndef CHI_SPLS_H
+#define CHI_SPLS_H
 
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
@@ -20,4 +20,4 @@ struct chi_mesh::sweep_management::STDG
 
 
 
-#endif
+#endif //CHI_SPLS_H

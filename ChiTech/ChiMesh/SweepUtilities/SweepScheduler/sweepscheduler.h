@@ -1,17 +1,17 @@
-#ifndef _chi_sweepscheduler_H
-#define _chi_sweepscheduler_H
+#ifndef CHI_SWEEPSCHEDULER_H
+#define CHI_SWEEPSCHEDULER_H
 
 #include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
 
-namespace chi_mesh::sweep_management
+namespace chi_mesh { namespace sweep_management
 {
   enum class SchedulingAlgorithm {
     FIRST_IN_FIRST_OUT = 1,
     DEPTH_OF_GRAPH = 2
   };
-}
+} }
 
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 typedef chi_mesh::sweep_management::AngleSet      TAngleSet;
@@ -36,7 +36,7 @@ private:
     int        sign_of_omegaz;
     size_t     set_index;
 
-    explicit RULE_VALUES(std::shared_ptr<TAngleSet> ref_as) :
+    explicit RULE_VALUES(std::shared_ptr<TAngleSet>& ref_as) :
       angle_set(ref_as)
     {
       depth_of_graph = 0;
@@ -54,7 +54,7 @@ public:
   SweepScheduler(SchedulingAlgorithm in_scheduler_type,
                  AngleAggregation* in_angle_agg);
 
-  void Sweep(SweepChunk* in_sweep_chunk=NULL);
+  void Sweep(SweepChunk* in_sweep_chunk=nullptr);
   double GetAverageSweepTime();
   std::vector<double> GetAngleSetTimings();
 
@@ -66,4 +66,4 @@ private:
   void ScheduleAlgoDOG();
 };
 
-#endif
+#endif //CHI_SWEEPSCHEDULER_H
