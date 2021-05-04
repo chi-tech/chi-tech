@@ -30,6 +30,36 @@ SpatialDiscretization_PWLD::
                 << " Communicating partition neighbors.";
   ref_grid->CommunicatePartitionNeighborCells(neighbor_cells);
 
+  if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
+  {
+    const auto qorder_min = (int)chi_math::QuadratureOrder::SECOND;
+
+    if ((int)line_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
+        << "(int)line_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)tri_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
+        << "(int)tri_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)quad_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
+        << "(int)quad_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)tet_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
+        << "(int)tet_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)hex_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
+        << "(int)hex_quad_order_arbitrary.order < " << qorder_min << ".";
+  }
+
   if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
   {
     PreComputeCellSDValues();

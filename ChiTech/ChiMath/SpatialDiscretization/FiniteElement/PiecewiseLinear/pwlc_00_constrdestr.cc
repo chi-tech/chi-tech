@@ -26,6 +26,36 @@ SpatialDiscretization_PWLC::
                 << " Creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
 
+  if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
+  {
+    const auto qorder_min = (int)chi_math::QuadratureOrder::SECOND;
+
+    if ((int)line_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "(int)line_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)tri_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "(int)tri_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)quad_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "(int)quad_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)tet_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "(int)tet_quad_order_arbitrary.order < " << qorder_min << ".";
+
+    if ((int)hex_quad_order_arbitrary.order < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "(int)hex_quad_order_arbitrary.order < " << qorder_min << ".";
+  }
+
   if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
     PreComputeCellSDValues();
 
