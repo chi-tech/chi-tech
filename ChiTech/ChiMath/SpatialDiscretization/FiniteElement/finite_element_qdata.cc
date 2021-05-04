@@ -92,10 +92,10 @@ namespace chi_math
       m_initialized = true;
     }
 
-    double FaceQuadraturePointData::Normal(unsigned int qp) const
+    chi_mesh::Vector3 FaceQuadraturePointData::Normal(unsigned int qp) const
     {
       if (not m_initialized) THROW_QP_UNINIT();
-      return m_JxW.at(qp);
+      return m_normals.at(qp);
     }
   }
 }
