@@ -23,6 +23,8 @@ struct chi_math::QuadraturePointPhiTheta
 {
   double phi=0.0;
   double theta=0.0;
+  QuadraturePointPhiTheta(const double phi, const double theta)
+  : phi(phi), theta(theta) {}
 };
 
 //################################################################### Class def

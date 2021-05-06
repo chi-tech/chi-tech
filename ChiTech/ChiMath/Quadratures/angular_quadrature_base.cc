@@ -31,16 +31,14 @@ void chi_math::AngularQuadrature::
   std::stringstream ostr;
   double weight_sum = 0.0;
 
-  for (unsigned i=0; i<Na; i++)
+  for (unsigned int i=0; i<Na; i++)
   {
-    chi_math::QuadraturePointPhiTheta new_pair;
+    const auto abscissa =
+      chi_math::QuadraturePointPhiTheta(azimuthal[i], polar[i]);
 
-    new_pair.phi   = azimuthal[i];
-    new_pair.theta = polar[i];
+    abscissae.push_back(abscissa);
 
-    abscissae.push_back(new_pair);
-
-    double weight = in_weights[i];
+    const double weight = in_weights[i];
     weights.push_back(weight);
     weight_sum += weight;
 
@@ -48,15 +46,15 @@ void chi_math::AngularQuadrature::
     {
       char buf[200];
       sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-              new_pair.phi*180.0/M_PI,
-              new_pair.theta*180.0/M_PI,
+              abscissa.phi*180.0/M_PI,
+              abscissa.theta*180.0/M_PI,
               weight);
       ostr << buf;
     }
   }
 
   //================================================== Create omega list
-  for (auto qpoint : abscissae)
+  for (const auto& qpoint : abscissae)
   {
     chi_mesh::Vector3 new_omega;
     new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
