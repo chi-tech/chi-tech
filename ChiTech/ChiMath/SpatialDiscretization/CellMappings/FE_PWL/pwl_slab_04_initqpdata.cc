@@ -39,9 +39,9 @@ void SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
     node_shape_value.reserve(ttl_num_vol_qpoints);
     node_shape_grad.reserve(ttl_num_vol_qpoints);
 
-    for (size_t qp=0; qp<ttl_num_vol_qpoints; ++qp)
+    for (const auto& qpoint : volume_quadrature.qpoints)
     {
-      node_shape_value.push_back(SlabShape(i,qp));
+      node_shape_value.push_back(SlabShape(i,qpoint));
       node_shape_grad.emplace_back(0.0,                //x
                                    0.0,                //y
                                    SlabGradShape(i));  //z
@@ -113,9 +113,9 @@ void SlabMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int face,
       node_shape_value.reserve(ttl_num_face_qpoints);
       node_shape_grad.reserve(ttl_num_face_qpoints);
 
-      for (size_t qp=0; qp<num_srf_qpoints; ++qp)
+      for (const auto& qpoint : {chi_mesh::Vector3(0.0,0.0,0.0)})
       {
-        node_shape_value.push_back(SlabShape(i,qp,ON_SURFACE));
+        node_shape_value.push_back(SlabShape(i,qpoint,ON_SURFACE,f));
         node_shape_grad.emplace_back(0.0,                //x
                                      0.0,                //y
                                      SlabGradShape(i));  //z
@@ -131,7 +131,7 @@ void SlabMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int face,
     {
       F_JxW.push_back(JxW);
 
-      F_qpoints_xyz.push_back(chi_mesh::Vector3(0.0,0.0,0.0));
+      F_qpoints_xyz.push_back(chi_mesh::Vector3(0.0,0.0,f));
     }
 
     F_num_nodes = 1;

@@ -39,7 +39,10 @@ public:
   //################################################## Define standard
   //                                                   slab linear shape
   //                                                   functions
-  double SlabShape(int index, int qpoint_index, bool on_surface=false);
+  double SlabShape(int index,
+                   const chi_mesh::Vector3& qpoint,
+                   bool on_surface=false,
+                   const int edge=0);
   double SlabGradShape(int index);
 
 

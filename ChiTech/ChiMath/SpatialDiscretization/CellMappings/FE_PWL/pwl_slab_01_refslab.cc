@@ -1,12 +1,15 @@
 #include "pwl_slab.h"
 
-double SlabMappingFE_PWL::SlabShape(int index, int qpoint_index, bool on_surface)
+double SlabMappingFE_PWL::SlabShape(int index,
+                                    const chi_mesh::Vector3& qpoint,
+                                    bool on_surface,
+                                    const int edge)
 {
   double xi=0.0;
   if (!on_surface)
-    xi = volume_quadrature.qpoints.at(qpoint_index)[0];
+    xi = qpoint.x;
   else
-    xi = static_cast<double>(index);
+    xi = static_cast<double>(edge);
 
   double value = 0.0;
   if      (index == 0)
