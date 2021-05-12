@@ -48,11 +48,14 @@ void LBSGroupset::BuildDiscMomOperator(
   int scatt_order,
   LinearBoltzmann::GeometryType geometry_type)
 {
-  if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB)
+  if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB ||
+      geometry_type == LinearBoltzmann::GeometryType::ONED_CYLINDRICAL ||
+      geometry_type == LinearBoltzmann::GeometryType::ONED_SPHERICAL)
   {
     quadrature->BuildDiscreteToMomentOperator(scatt_order,1);
   }
-  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN)
+  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN ||
+           geometry_type == LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL)
   {
     quadrature->BuildDiscreteToMomentOperator(scatt_order,2);
   }
@@ -68,11 +71,14 @@ void LBSGroupset::BuildMomDiscOperator(
   int scatt_order,
   LinearBoltzmann::GeometryType geometry_type)
 {
-  if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB)
+  if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB ||
+      geometry_type == LinearBoltzmann::GeometryType::ONED_CYLINDRICAL ||
+      geometry_type == LinearBoltzmann::GeometryType::ONED_SPHERICAL)
   {
     quadrature->BuildMomentToDiscreteOperator(scatt_order,1);
   }
-  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN)
+  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN ||
+           geometry_type == LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL)
   {
     quadrature->BuildMomentToDiscreteOperator(scatt_order,2);
   }

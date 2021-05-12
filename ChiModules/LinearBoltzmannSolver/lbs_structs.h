@@ -13,10 +13,11 @@ enum class GeometryType
 {
   NO_GEOMETRY_SET  = 0,
   ONED_SLAB        = 1,
-  ONED_SPHERICAL   = 2,
-  TWOD_CARTESIAN   = 3,
-  TWOD_CYLINDRICAL = 4,
-  THREED_CARTESIAN = 5
+  ONED_CYLINDRICAL = 2,
+  ONED_SPHERICAL   = 3,
+  TWOD_CARTESIAN   = 4,
+  TWOD_CYLINDRICAL = 5,
+  THREED_CARTESIAN = 6
 };
 
 /**Struct for storing LBS options.*/
