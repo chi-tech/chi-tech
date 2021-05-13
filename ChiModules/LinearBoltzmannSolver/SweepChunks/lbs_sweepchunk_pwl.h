@@ -115,7 +115,7 @@ public:
       const int num_faces = cell.faces.size();
       const int num_dofs = fe_intgrl_values.NumNodes();
       const auto & transport_view = grid_transport_view[cell.local_id];
-      const auto & sigma_tg = xsections[transport_view.xs_id]->sigma_tg;
+      const auto & sigma_tg = xsections[transport_view.xs_mapping]->sigma_tg;
       std::vector<bool> face_incident_flags(num_faces, false);
 
       // =================================================== Get Cell matrices

@@ -180,10 +180,10 @@ HexahedronMappingFE_PWL::
   }//for i
 
   //================================================ Compute Face DOF mapping
-  // This section just determines a mapping of face dofs
-  // to cell dofs. This is pretty simple since we can
+  // This section just determines a mapping of face num_nodes
+  // to cell num_nodes. This is pretty simple since we can
   // just loop over each face dof then subsequently
-  // loop over cell dofs, if the face dof node index equals
+  // loop over cell num_nodes, if the face dof node index equals
   // the cell dof node index then the mapping is assigned.
   //
   // This mapping is not used by any of the methods in

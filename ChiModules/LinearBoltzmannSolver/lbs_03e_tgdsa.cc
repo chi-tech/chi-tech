@@ -18,7 +18,7 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset& groupset)
     scalar_uk_man.AddUnknown(chi_math::UnknownType::SCALAR);
 
     //================================= Initialize field function
-    delta_phi_local.resize(local_dof_count,0.0);
+    delta_phi_local.resize(local_node_count, 0.0);
     int g = 0;
     int m = 0;
     std::string text_name = std::string("Sum_Sigma_s_DeltaPhi_g") +
@@ -105,7 +105,7 @@ void LinearBoltzmann::Solver::AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
   int gsi = groupset.groups[0].id;
   int gss = groupset.groups.size();
 
-  delta_phi_local.resize(local_dof_count,0.0);
+  delta_phi_local.resize(local_node_count, 0.0);
 
   int index = -1;
   for (const auto& cell : grid->local_cells)

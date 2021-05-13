@@ -81,7 +81,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             exit(EXIT_FAILURE);
           }
 
-          //============================== Map dofs
+          //============================== Map num_nodes
           std::pair<int,std::vector<int>> dof_mapping;
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<uint64_t>* ass_face_verts =
@@ -176,7 +176,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             exit(EXIT_FAILURE);
           }
 
-          //============================== Map dofs
+          //============================== Map num_nodes
           std::pair<int,std::vector<int>> dof_mapping;
           dof_mapping.first = adj_cell_view->second[ass_face].first;
           std::vector<uint64_t>* ass_face_verts =

@@ -33,7 +33,7 @@ private:
   bool                           face_histogram_available = false;
   bool                           communicators_available  = false;
 
-  //Pair.first is the max dofs-per-face for the category and Pair.second
+  //Pair.first is the max num_nodes-per-face for the category and Pair.second
   //is the number of faces in this category
   std::vector<std::pair<size_t,size_t>> face_categories;
 

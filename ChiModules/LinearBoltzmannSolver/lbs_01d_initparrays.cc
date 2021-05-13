@@ -59,21 +59,21 @@ void LinearBoltzmann::Solver::InitializeParrays()
 
   //================================================== Compute local # of dof
   auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
-  local_dof_count = pwl_discretization->GetNumLocalDOFs(flux_moments_uk_man)/GxM;
-  glob_dof_count = pwl_discretization->GetNumGlobalDOFs(flux_moments_uk_man)/GxM;
+  local_node_count = pwl_discretization->GetNumLocalDOFs(flux_moments_uk_man) / GxM;
+  globl_node_count = pwl_discretization->GetNumGlobalDOFs(flux_moments_uk_man) / GxM;
 
   //================================================== Compute num of unknowns
-  int num_grps = groups.size();
-  int M = num_moments;
-  unsigned long long local_unknown_count = local_dof_count * num_grps * M;
+  size_t num_grps = groups.size();
+  size_t M = num_moments;
+  size_t local_dof_count = local_node_count * num_grps * M;
 
   chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
-                                << local_unknown_count;
+                                << local_dof_count;
 
   //================================================== Size local vectors
-  q_moments_local.assign(local_unknown_count,0.0);
-  phi_old_local.assign(local_unknown_count,0.0);
-  phi_new_local.assign(local_unknown_count,0.0);
+  q_moments_local.assign(local_dof_count, 0.0);
+  phi_old_local.assign(local_dof_count, 0.0);
+  phi_new_local.assign(local_dof_count, 0.0);
 
   //================================================== Read Restart data
   if (options.read_restart_data)
@@ -89,10 +89,10 @@ void LinearBoltzmann::Solver::InitializeParrays()
   //
   // Also, for a given cell, within a given sweep chunk,
   // we need to solve a matrix which square size is the
-  // amount of dofs on the cell. max_cell_dof_count is
+  // amount of num_nodes on the cell. max_cell_dof_count is
   // initialized here.
   //
-  int block_MG_counter = 0;       //Counts the strides of moment and group
+  size_t block_MG_counter = 0;       //Counts the strides of moment and group
 
   chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
@@ -105,20 +105,15 @@ void LinearBoltzmann::Solver::InitializeParrays()
     {
       const auto& fe_intgrl_values = pwl_discretization->GetUnitIntegrals(cell);
 
-      CellLBSView cell_lbs_view(fe_intgrl_values.NumNodes(), num_grps, M);
-
-      int mat_id = cell.material_id;
-
-      cell_lbs_view.xs_id = matid_to_xs_map[mat_id];
-
-      cell_lbs_view.dof_phi_map_start = block_MG_counter;
-      block_MG_counter += fe_intgrl_values.NumNodes() * num_grps * num_moments;
-
       chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
       cell_nodal_mapping.reserve(cell.faces.size());
 
+      size_t cell_phi_address = block_MG_counter;
+      block_MG_counter += fe_intgrl_values.NumNodes() * num_grps * num_moments;
+
       //Init face upwind flags and adj_partition_id
-      cell_lbs_view.face_local.resize(cell.faces.size(), true);
+      std::vector<bool> face_local_flags;
+      face_local_flags.resize(cell.faces.size(), true);
       int f=0;
       for (auto& face : cell.faces)
       {
@@ -138,7 +133,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
         }//if bndry
 
         if (not face.IsNeighborLocal(*grid))
-          cell_lbs_view.face_local[f] = false;
+          face_local_flags[f] = false;
 
         //Local nodal mappings
         std::vector<short> face_nodal_mapping;
@@ -158,7 +153,11 @@ void LinearBoltzmann::Solver::InitializeParrays()
       if (fe_intgrl_values.NumNodes() > max_cell_dof_count)
         max_cell_dof_count = fe_intgrl_values.NumNodes();
 
-      cell_transport_views.push_back(cell_lbs_view);
+      cell_transport_views.emplace_back(cell_phi_address,
+                                        fe_intgrl_values.NumNodes(),
+                                        matid_to_xs_map[cell.material_id],
+                                        face_local_flags,
+                                        num_grps, M);
       grid_nodal_mappings.push_back(cell_nodal_mapping);
     }//for local cell
   }//if empty

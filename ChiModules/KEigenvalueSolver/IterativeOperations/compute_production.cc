@@ -29,7 +29,7 @@ double KEigenvalue::Solver::ComputeProduction()
     auto& cell_fe_view = pwl->GetUnitIntegrals(cell);
     auto& transport_view = cell_transport_views[cell.local_id];
 
-    // ----- Loop over cell dofs
+    // ----- Loop over cell num_nodes
     for (int i=0; i<cell_fe_view.NumNodes(); i++)
     {
       int ir = transport_view.MapDOF(i,0,0);

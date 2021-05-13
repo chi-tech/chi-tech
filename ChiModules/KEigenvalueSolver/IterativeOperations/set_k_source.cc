@@ -71,8 +71,8 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
     double* phi_prevp;
     int gprime;
 
-    // ----- Loop over dofs
-    int num_dofs = full_cell_view.dofs;
+    // ----- Loop over num_nodes
+    int num_dofs = full_cell_view.num_nodes;
     for (int i=0; i<num_dofs; i++)
     {
       // ----- Loop over moments
