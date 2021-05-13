@@ -15,15 +15,15 @@ extern ChiMPI& chi_mpi;
 /**Populates a face histogram.
  *
  * \param master_tolerance Multiple histograms will only be attempted
- * if the ratio of the maximum dofs-per-face to the average dofs-per-face
+ * if the ratio of the maximum num_nodes-per-face to the average num_nodes-per-face
  * is greater than this value. Default 1.2.
  *
- * \param slave_tolerance While traversing a sorted list of dofs-per-face,
- * a new bin will only be generated when the ratio of the listed dofs-per-face
+ * \param slave_tolerance While traversing a sorted list of num_nodes-per-face,
+ * a new bin will only be generated when the ratio of the listed num_nodes-per-face
  * to a running bin average exceeds this value. Defualt 1.1.
  *
  * The function populates face_categories which is a structure containing
- * pairs. Pair.first is the max dofs-per-face for the category and Pair.second
+ * pairs. Pair.first is the max num_nodes-per-face for the category and Pair.second
  * is the number of faces in this category.
  *
  * */
@@ -40,7 +40,7 @@ void chi_mesh::MeshContinuum::
 
   std::stable_sort(face_size_histogram.begin(), face_size_histogram.end());
 
-  //================================================== Determine total face dofs
+  //================================================== Determine total face num_nodes
   size_t total_face_dofs_count = 0;
   for (auto face_size : face_size_histogram)
     total_face_dofs_count += face_size;
@@ -54,9 +54,9 @@ void chi_mesh::MeshContinuum::
   std::stringstream outstr;
   outstr << "\nSmallest face = " << smallest_face;
   outstr << "\nLargest face = " << largest_face;
-  outstr << "\nTotal face dofs = " << total_face_dofs_count;
+  outstr << "\nTotal face num_nodes = " << total_face_dofs_count;
   outstr << "\nTotal faces = " << face_size_histogram.size();
-  outstr << "\nAverage dofs/face = " << average_dofs_per_face;
+  outstr << "\nAverage num_nodes/face = " << average_dofs_per_face;
   outstr << "\nMax to avg ratio = " << largest_face/average_dofs_per_face;
   chi_log.Log(LOG_ALLVERBOSE_1) << outstr.str();
 
@@ -65,7 +65,7 @@ void chi_mesh::MeshContinuum::
   if ((largest_face/average_dofs_per_face) > master_tolerance)
   {
     chi_log.Log(LOG_ALLVERBOSE_1)
-    << "The ratio of max face dofs to average face dofs "
+    << "The ratio of max face num_nodes to average face num_nodes "
     << "is larger than " << master_tolerance
     << ", therefore a binned histogram "
     << "will be constructed.";
@@ -106,7 +106,7 @@ void chi_mesh::MeshContinuum::
   {
     outstr
     << "Bin " << ++bin_counter << ": "
-    << bins.second << " faces with max face dofs " << bins.first << "\n";
+    << bins.second << " faces with max face num_nodes " << bins.first << "\n";
   }
 
   chi_log.Log(LOG_ALLVERBOSE_1) << outstr.str();

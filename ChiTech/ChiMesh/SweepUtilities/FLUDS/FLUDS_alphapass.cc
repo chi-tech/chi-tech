@@ -41,7 +41,7 @@ InitializeAlphaElements(SPDS_ptr spds)
   std::vector<int>  local_so_cell_mapping;
   local_so_cell_mapping.resize(grid->local_cell_glob_indices.size(),0);
 
-  largest_face = 0; // Will contain the max dofs per face
+  largest_face = 0; // Will contain the max num_nodes per face
   std::vector<LockBox> lock_boxes(num_face_categories); //cell,face index pairs
   LockBox              delayed_lock_box;
   std::set<int> location_boundary_dependency_set;

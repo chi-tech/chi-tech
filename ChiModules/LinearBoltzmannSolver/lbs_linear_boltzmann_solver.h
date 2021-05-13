@@ -51,7 +51,7 @@ public:
   double last_restart_write=0.0;
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
 
-  int num_moments;
+  size_t num_moments;
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> group_sets;
@@ -75,9 +75,9 @@ public:
 
   chi_math::UnknownManager flux_moments_uk_man;
 
-  int max_cell_dof_count;
-  unsigned long long local_dof_count;
-  unsigned long long glob_dof_count;
+  size_t max_cell_dof_count;
+  size_t local_node_count;
+  size_t globl_node_count;
 
   Vec phi_new, phi_old, q_fixed;
   std::vector<double> q_moments_local;

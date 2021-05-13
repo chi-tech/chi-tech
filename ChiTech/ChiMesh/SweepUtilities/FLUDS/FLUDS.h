@@ -37,7 +37,7 @@ namespace chi_mesh { namespace sweep_management
 
   public:
     // This is a small vector [deplocI] that holds the number of
-    // face dofs for each dependent location.
+    // face num_nodes for each dependent location.
     std::vector<int>    deplocI_face_dof_count;
 
     // Very small vector listing the boundaries this location depends on
@@ -45,7 +45,7 @@ namespace chi_mesh { namespace sweep_management
 
   public:
     // This is a small vector [prelocI] that holds the number of
-    // face dofs for each predecessor location.
+    // face num_nodes for each predecessor location.
     std::vector<int>    prelocI_face_dof_count;
 
     std::vector<int>    delayed_prelocI_face_dof_count;
@@ -116,7 +116,7 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
 //
 //public:
 //  // This is a small vector [deplocI] that holds the number of
-//  // face dofs for each dependent location.
+//  // face num_nodes for each dependent location.
 //  std::vector<int>    deplocI_face_dof_count;
 //
 //  // Very small vector listing the boundaries this location depends on
@@ -124,7 +124,7 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
 //
 //public:
 //  // This is a small vector [prelocI] that holds the number of
-//  // face dofs for each predecessor location.
+//  // face num_nodes for each predecessor location.
 //  std::vector<int>    prelocI_face_dof_count;
 //
 //  std::vector<int>    delayed_prelocI_face_dof_count;
@@ -179,7 +179,7 @@ private:
   // This is a vector [cell_sweep_order_index][incoming_face_count]
   // that will hold a structure. struct.slot_address holds the slot address
   // where this face's upwind data is stored. struct.upwind_dof_mapping is
-  // a mapping of each of this face's dofs to the upwinded face's dofs
+  // a mapping of each of this face's num_nodes to the upwinded face's num_nodes
 private:
   std::vector<INCOMING_FACE_INFO*>
     so_cell_inco_face_dof_indices;

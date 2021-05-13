@@ -125,8 +125,8 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
       chi_log.ProcessEvent(source_event_tag,
                            ChiLog::EventOperation::AVERAGE_DURATION);
     size_t num_angles = groupset.quadrature->abscissae.size();
-    long int num_unknowns = (long int)glob_dof_count*
-                            (long int)num_angles*
+    long int num_unknowns = (long int)globl_node_count *
+                            (long int)num_angles *
                             (long int)groupset.groups.size();
 
     if (log_info)
