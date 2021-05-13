@@ -27,7 +27,7 @@ void KEigenvalue::Solver::InitializePrecursors()
     auto cell_fe_view = pwl->GetCellMappingFE(cell.local_id);
     auto& transport_view = cell_transport_views[cell.local_id];
 
-    // ----- Loop over cell dofs
+    // ----- Loop over cell num_nodes
     for (int i = 0; i < cell_fe_view->num_nodes; ++i)
     {
       int64_t ir = transport_view.MapDOF(i,0,0);

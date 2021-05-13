@@ -52,27 +52,33 @@ struct Options
 class CellLBSView
 {
 public:
-  int dof_phi_map_start = 0;
-  int dofs = 0;
-  int xs_id = 0;
+  size_t phi_address = 0;
+  int num_nodes;
+  int xs_mapping = 0;
   std::vector<bool> face_local = {};
 
 private:
-  int num_grps = 0;
-  int num_moms = 0;
+  int num_grps;
+  int num_moms;
 
 public:
-  CellLBSView(int in_dofs, int num_G, int num_m)
-  {
-    dof_phi_map_start = -1;
-    dofs = in_dofs;
-    num_grps = num_G;
-    num_moms = num_m;
-  }
+  CellLBSView(size_t in_phi_address,
+              size_t in_num_nodes,
+              size_t in_xs_mapping,
+              const std::vector<bool>& face_local_flags,
+              size_t num_G,
+              size_t num_m) :
+    phi_address(in_phi_address),
+    num_nodes(in_num_nodes),
+    xs_mapping(in_xs_mapping),
+    face_local(face_local_flags),
+    num_grps(num_G),
+    num_moms(num_m)
+  {}
 
   int MapDOF(int dof, int moment, int grp) const
   {
-    return dof_phi_map_start + dof*num_grps*num_moms + num_grps*moment + grp;
+    return phi_address + dof * num_grps * num_moms + num_grps * moment + grp;
   }
 };
 

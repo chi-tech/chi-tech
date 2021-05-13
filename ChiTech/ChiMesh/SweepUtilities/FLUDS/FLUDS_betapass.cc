@@ -199,7 +199,7 @@ SerializeCellInfo(std::vector<CompactCellView>* cell_views,
 {
   int num_cells = cell_views->size();
 
-  //======================== First entry is number of face dofs
+  //======================== First entry is number of face num_nodes
   face_indices.push_back(num_face_dofs);
 
   //======================== Second entry is amount of cells

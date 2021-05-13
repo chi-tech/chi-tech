@@ -55,9 +55,9 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   Mat A;
   int groupset_numgrps = groupset.groups.size();
   auto num_ang_unknowns = groupset.angle_agg.GetNumberOfAngularUnknowns();
-  int local_size = local_dof_count*num_moments*groupset_numgrps +
+  int local_size = local_node_count * num_moments * groupset_numgrps +
                    num_ang_unknowns.first;
-  int globl_size = glob_dof_count*num_moments*groupset_numgrps +
+  int globl_size = globl_node_count * num_moments * groupset_numgrps +
                    num_ang_unknowns.second;
   MatCreateShell(PETSC_COMM_WORLD,local_size,
                                   local_size,
@@ -185,8 +185,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       chi_log.ProcessEvent(source_event_tag,
                            ChiLog::EventOperation::AVERAGE_DURATION);
     size_t num_angles = groupset.quadrature->abscissae.size();
-    long int num_unknowns = (long int)glob_dof_count*
-                            (long int)num_angles*
+    long int num_unknowns = (long int)globl_node_count *
+                            (long int)num_angles *
                             (long int)groupset.groups.size();
 
     if (log_info)
