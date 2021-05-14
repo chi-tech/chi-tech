@@ -57,7 +57,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
   //
   // Also, for a given cell, within a given sweep chunk,
   // we need to solve a matrix which square size is the
-  // amount of num_nodes on the cell. max_cell_dof_count is
+  // amount of nodes on the cell. max_cell_node_count is
   // initialized here.
   //
   size_t block_MG_counter = 0;       //Counts the strides of moment and group
@@ -72,17 +72,16 @@ void LinearBoltzmann::Solver::InitializeParrays()
     const auto& fe_intgrl_values = pwl_discretization->GetUnitIntegrals(cell);
     size_t cell_num_nodes = fe_intgrl_values.NumNodes();
 
-      chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
-      cell_nodal_mapping.reserve(cell.faces.size());
+    size_t cell_phi_address = block_MG_counter;
+    block_MG_counter += cell_num_nodes * num_grps * num_moments;
 
-      size_t cell_phi_address = block_MG_counter;
-      block_MG_counter += fe_intgrl_values.NumNodes() * num_grps * num_moments;
-
-      //Init face upwind flags and adj_partition_id
-      std::vector<bool> face_local_flags;
-      face_local_flags.resize(cell.faces.size(), true);
-      int f=0;
-      for (auto& face : cell.faces)
+    //Init face upwind flags and adj_partition_id
+    std::vector<bool> face_local_flags;
+    face_local_flags.resize(cell.faces.size(), true);
+    int f=0;
+    for (auto& face : cell.faces)
+    {
+      if (not face.has_neighbor)
       {
         chi_mesh::Vector3& n = face.normal;
 
@@ -97,8 +96,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
         if (boundary_id >= 0) face.neighbor_id = boundary_id;
       }//if bndry
 
-        if (not face.IsNeighborLocal(*grid))
-          face_local_flags[f] = false;
+      if (not face.IsNeighborLocal(*grid))
+        face_local_flags[f] = false;
 
       ++f;
     }//for f
@@ -109,23 +108,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
                                       fe_intgrl_values.NumNodes(),
                                       matid_to_xs_map[cell.material_id],
                                       face_local_flags,
-                                      num_grps, num_moments);
+                                      num_grps, M);
   }//for local cell
-
-        ++f;
-      }//for f
-
-      if (fe_intgrl_values.NumNodes() > max_cell_dof_count)
-        max_cell_dof_count = fe_intgrl_values.NumNodes();
-
-      cell_transport_views.emplace_back(cell_phi_address,
-                                        fe_intgrl_values.NumNodes(),
-                                        matid_to_xs_map[cell.material_id],
-                                        face_local_flags,
-                                        num_grps, M);
-      grid_nodal_mappings.push_back(cell_nodal_mapping);
-    }//for local cell
-  }//if empty
 
   //================================================== Initialize Field Functions
   if (field_functions.empty())
