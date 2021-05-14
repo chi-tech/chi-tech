@@ -7,7 +7,7 @@
 LinearBoltzmann::Solver::Solver()
 {
   //============================================= Default options
-  max_cell_dof_count = 0;
+  max_cell_node_count = 0;
 
   discretization = nullptr;
 

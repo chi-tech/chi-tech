@@ -75,7 +75,7 @@ public:
 
   chi_math::UnknownManager flux_moments_uk_man;
 
-  size_t max_cell_dof_count;
+  size_t max_cell_node_count;
   size_t local_node_count;
   size_t globl_node_count;
 
