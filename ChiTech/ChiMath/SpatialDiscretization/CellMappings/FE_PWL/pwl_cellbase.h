@@ -27,21 +27,21 @@ public:
   {}
 
   virtual void
-  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data);
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const;
 
   virtual void
   InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) {}
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) const;
 
   virtual void
   InitializeVolumeQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data) {}
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) const = 0;
 
   virtual void
   InitializeFaceQuadraturePointData(
     unsigned int face,
-    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) {}
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const = 0;
 
 public:
   /** Virtual function evaluation of the shape function. */

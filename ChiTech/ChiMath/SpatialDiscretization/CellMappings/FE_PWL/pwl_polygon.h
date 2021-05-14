@@ -58,16 +58,12 @@ public:
                        const chi_math::QuadratureTriangle& volume_quadrature,
                        const chi_math::QuadratureLine&     surface_quadrature);
 
-  void InitializeAllQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-
   void InitializeVolumeQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) const override;
 
   void InitializeFaceQuadraturePointData(
     unsigned int face,
-    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const override;
 
   //################################################## Define standard
   //                                                   triangle linear shape
@@ -81,9 +77,9 @@ public:
   double SideShape(unsigned int side,
                    unsigned int i,
                    const chi_mesh::Vector3& qpoint,
-                   bool on_surface = false);
-  double SideGradShape_x(unsigned int side, int i);
-  double SideGradShape_y(unsigned int side, int i);
+                   bool on_surface = false) const;
+  double SideGradShape_x(unsigned int side, int i) const;
+  double SideGradShape_y(unsigned int side, int i) const;
 
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
   chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;

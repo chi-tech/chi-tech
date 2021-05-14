@@ -1,17 +1,7 @@
 #include "pwl_polyhedron.h"
 
-void PolyhedronMappingFE_PWL::InitializeAllQuadraturePointData(
-  chi_math::finite_element::InternalQuadraturePointData& internal_data,
-  std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data)
-{
-  InitializeVolumeQuadraturePointData(internal_data);
-  faces_qp_data.resize(face_data.size());
-  for (size_t f = 0; f < faces_qp_data.size(); ++f)
-    InitializeFaceQuadraturePointData(f, faces_qp_data[f]);
-}
-
 void PolyhedronMappingFE_PWL::InitializeVolumeQuadraturePointData(
-  chi_math::finite_element::InternalQuadraturePointData& internal_data)
+  chi_math::finite_element::InternalQuadraturePointData& internal_data) const
 {
   //=================================== Determine number of internal qpoints
   size_t num_tets=0;
@@ -92,7 +82,7 @@ void PolyhedronMappingFE_PWL::InitializeVolumeQuadraturePointData(
 }
 
 void PolyhedronMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int face,
-                                                                chi_math::finite_element::FaceQuadraturePointData& faces_qp_data)
+  chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const
 {
   const bool ON_SURFACE = true;
 

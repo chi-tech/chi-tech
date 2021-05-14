@@ -3,7 +3,20 @@
 
 void
 CellMappingFE_PWL::
-  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
+  InitializeAllQuadraturePointData(
+    chi_math::finite_element::InternalQuadraturePointData& internal_data,
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) const
+{
+  InitializeVolumeQuadraturePointData(internal_data);
+  faces_qp_data.resize(face_dof_mappings.size());
+  for (size_t f = 0; f < faces_qp_data.size(); ++f)
+    InitializeFaceQuadraturePointData(f, faces_qp_data[f]);
+}
+
+
+void
+CellMappingFE_PWL::
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const
 {
   //  quadrature point data
   chi_math::finite_element::InternalQuadraturePointData internal_data;
