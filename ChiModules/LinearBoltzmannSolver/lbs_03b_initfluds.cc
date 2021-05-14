@@ -22,6 +22,35 @@ extern ChiTimer chi_program_timer;
 /**Initializes fluds data structures.*/
 void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
 {
+  //================================================== Initialize grid vertex
+  //                                                   mapping
+  // This is crucial information for the transfer of
+  // information during a sweep. And is used my all the
+  // flux data structures.
+  grid_nodal_mappings.clear();
+  grid_nodal_mappings.reserve(grid->local_cells.size());
+  for (auto& cell : grid->local_cells)
+  {
+    using namespace chi_mesh::sweep_management;
+    CellFaceNodalMapping cell_nodal_mapping;
+
+    cell_nodal_mapping.reserve(cell.faces.size());
+    for (auto& face : cell.faces)
+    {
+      std::vector<short> face_nodal_mapping;
+      int ass_face = -1;
+      if (face.has_neighbor and face.IsNeighborLocal(*grid))
+      {
+        grid->FindAssociatedVertices(face,face_nodal_mapping);
+        ass_face = face.GetNeighborAssociatedFace(*grid);
+      }
+
+      cell_nodal_mapping.emplace_back(ass_face,face_nodal_mapping);
+    }//for f
+
+    grid_nodal_mappings.push_back(std::move(cell_nodal_mapping));
+  }//for local cell
+
   //================================================== Angle Aggregation
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
   chi_mesh::VolumeMesher& mesher = *handler->volume_mesher;
