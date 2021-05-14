@@ -12,7 +12,7 @@ SweepChunk* LinearBoltzmann::Solver::SetSweepChunk(LBSGroupset& groupset)
   //================================================== Setting up required
   //                                                   sweep chunks
   SweepChunk* sweep_chunk = new LBSSweepChunkPWL(
-        grid,                                    //Spatial grid of cells
+    grid,                                    //Spatial grid of cells
         *pwl_sdm,                                //Spatial discretization
         cell_transport_views,                    //Cell transport views
         &phi_new_local,                          //Destination phi
@@ -20,7 +20,7 @@ SweepChunk* LinearBoltzmann::Solver::SetSweepChunk(LBSGroupset& groupset)
         groupset,                                //Reference groupset
         material_xs,                             //Material cross-sections
         num_moments,
-        max_cell_dof_count);
+    max_cell_node_count);
 
   return sweep_chunk;
 }
