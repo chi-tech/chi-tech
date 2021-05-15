@@ -26,16 +26,6 @@
 class PolygonMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
-  /**For a given side(triangle), this structure holds the values of
- * shape functions at each quadrature point.*/
-  struct FEqp_data2d
-  {
-    std::vector<double> shape_qp;
-    std::vector<double> shape_qp_surf;
-    std::vector<double> gradshapex_qp;
-    std::vector<double> gradshapey_qp;
-  };
-  //Goes into
   struct FEside_data2d
   {
     double detJ;
@@ -45,7 +35,6 @@ private:
     chi_mesh::Matrix3x3 J;
     chi_mesh::Matrix3x3 Jinv;
     chi_mesh::Matrix3x3 JTinv;
-    std::vector<FEqp_data2d> qp_data;
     chi_mesh::Vector3 normal;
   };
   //Goes into sides
@@ -58,7 +47,6 @@ private:
   int      num_of_subtris;
   double   beta;
   chi_mesh::Vertex vc;
-  std::vector<double> detJ;
   std::vector<std::vector<int>> node_to_side_map;
 
 

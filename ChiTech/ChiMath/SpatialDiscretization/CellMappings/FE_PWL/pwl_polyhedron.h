@@ -26,17 +26,6 @@
 class PolyhedronMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
-  /**For a given side(tet), this structure holds the values of
- * shape functions at each quadrature point.*/
-  struct FEqp_data3d
-  {
-    std::vector<double> shape_qp;
-    std::vector<double> shape_qp_surf;
-    std::vector<double> gradshapex_qp;
-    std::vector<double> gradshapey_qp;
-    std::vector<double> gradshapez_qp;
-  };
-  //Goes into
   /**Stores the data for each side's tetrahedron. */
   struct FEside_data3d
   {
@@ -47,7 +36,6 @@ private:
     chi_mesh::Matrix3x3       J;
     chi_mesh::Matrix3x3       Jinv;
     chi_mesh::Matrix3x3       JTinv;
-    std::vector<FEqp_data3d>  qp_data;
   };
   //Goes into
   /**Stores data for each face.*/

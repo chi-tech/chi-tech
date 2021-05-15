@@ -111,7 +111,6 @@ PolyhedronMappingFE_PWL::
       side_data.Jinv  = Jinv;
       side_data.JTinv = JTinv;
 
-      side_data.qp_data.reserve(num_nodes);
       face_f_data.sides.push_back(side_data);
     }//for each edge
 
