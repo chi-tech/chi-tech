@@ -1,9 +1,6 @@
 #ifndef LBS_STRUCTS_H
 #define LBS_STRUCTS_H
 
-#define PARTITION_METHOD_SERIAL        1
-#define PARTITION_METHOD_FROM_SURFACE  2
-
 #include "ChiMath/chi_math.h"
 
 namespace LinearBoltzmann
@@ -51,15 +48,15 @@ struct Options
 /**Transport view of a cell*/
 class CellLBSView
 {
-public:
-  size_t phi_address = 0;
-  int num_nodes;
-  int xs_mapping = 0;
-  std::vector<bool> face_local = {};
-
 private:
+  size_t phi_address;
+  int num_nodes;
+  int xs_mapping;
+  std::vector<bool> face_local = {};
   int num_grps;
   int num_moms;
+
+  std::vector<double> outflow;
 
 public:
   CellLBSView(size_t in_phi_address,
@@ -67,18 +64,31 @@ public:
               size_t in_xs_mapping,
               const std::vector<bool>& face_local_flags,
               size_t num_G,
-              size_t num_m) :
+              size_t num_m,
+              bool has_boundary_faces) :
     phi_address(in_phi_address),
     num_nodes(in_num_nodes),
     xs_mapping(in_xs_mapping),
     face_local(face_local_flags),
     num_grps(num_G),
     num_moms(num_m)
-  {}
+  {
+    if (has_boundary_faces) outflow.assign(num_grps,0.0);
+  }
 
-  int MapDOF(int dof, int moment, int grp) const
+  size_t MapDOF(int dof, int moment, int grp) const
   {
     return phi_address + dof * num_grps * num_moms + num_grps * moment + grp;
+  }
+
+  int NumNodes() const {return num_nodes;}
+  int XSMapping() const {return xs_mapping;}
+  bool IsFaceLocal(int f) const {return face_local[f];}
+  void ZeroOutflow() {outflow.assign(num_grps,0.0);}
+  void AddOutflow(int g, double value)
+  {
+    if (outflow.empty()) return;
+    outflow[g] += value;
   }
 };
 

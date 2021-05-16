@@ -69,9 +69,8 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
     double sigma_sm = 0.0;
     double* q_mom;
     double* phi_oldp;
-    int num_dofs = full_cell_view.num_nodes;
     int gprime;
-    for (int i=0; i<num_dofs; i++)
+    for (int i=0; i<full_cell_view.NumNodes(); i++)
     {
       for (int m=0; m<num_moments; ++m)
       {

@@ -108,6 +108,9 @@ public:
   void Execute() override;
   void SolveGroupset(LBSGroupset& groupset,
                      int group_set_num);
+  //02b
+  void ComputeBalance();
+  void SweepAllGroupSets();
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;

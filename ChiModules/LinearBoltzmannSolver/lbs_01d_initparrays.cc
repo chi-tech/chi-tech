@@ -69,11 +69,13 @@ void LinearBoltzmann::Solver::InitializeParrays()
     //Init face upwind flags and adj_partition_id
     std::vector<bool> face_local_flags;
     face_local_flags.resize(cell.faces.size(), true);
+    bool cell_has_bndry_faces = false;
     int f=0;
     for (auto& face : cell.faces)
     {
       if (not face.has_neighbor)
       {
+        cell_has_bndry_faces = true;
         chi_mesh::Vector3& n = face.normal;
 
         int boundary_id = -1;
@@ -99,7 +101,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
                                       cell_num_nodes,
                                       matid_to_xs_map[cell.material_id],
                                       face_local_flags,
-                                      num_grps, num_moments);
+                                      num_grps, num_moments,
+                                      cell_has_bndry_faces);
   }//for local cell
 
   //================================================== Initialize Field Functions

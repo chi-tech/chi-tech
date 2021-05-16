@@ -72,8 +72,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
     int gprime;
 
     // ----- Loop over num_nodes
-    int num_dofs = full_cell_view.num_nodes;
-    for (int i=0; i<num_dofs; i++)
+    for (int i=0; i<full_cell_view.NumNodes(); i++)
     {
       // ----- Loop over moments
       for (int m=0; m<num_moments; ++m)

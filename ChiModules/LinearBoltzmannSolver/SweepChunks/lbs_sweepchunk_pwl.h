@@ -36,7 +36,7 @@ class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
   SpatialDiscretization_PWLD& grid_fe_view;
-  const std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
+  std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
   const std::vector<double>* q_moments;
         LBSGroupset& groupset;
   const TCrossSections& xsections;
@@ -57,7 +57,7 @@ public:
   // ################################################## Constructor
   LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                    SpatialDiscretization_PWLD& discretization,
-                   const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                   std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                    std::vector<double>* destination_phi,
                    const std::vector<double>* source_moments,
                          LBSGroupset& in_groupset,
@@ -114,9 +114,10 @@ public:
       const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
       const int num_faces = cell.faces.size();
       const int num_dofs = fe_intgrl_values.NumNodes();
-      const auto & transport_view = grid_transport_view[cell.local_id];
-      const auto & sigma_tg = xsections[transport_view.xs_mapping]->sigma_tg;
-      std::vector<bool> face_incident_flags(num_faces, false);
+      auto & transport_view = grid_transport_view[cell.local_id];
+      const auto & sigma_tg = xsections[transport_view.XSMapping()]->sigma_tg;
+      std::vector<bool>   face_incident_flags(num_faces, false);
+      std::vector<double> face_mu_values(num_faces, 0.0);
 
       // =================================================== Get Cell matrices
       const std::vector<std::vector<chi_mesh::Vector3>>& L =
@@ -127,6 +128,9 @@ public:
 
       const std::vector<std::vector<std::vector<double>>>& N =
         fe_intgrl_values.GetIntS_shapeI_shapeJ();
+
+      const std::vector<std::vector<double>>& IntS_shapeI =
+        fe_intgrl_values.GetIntS_shapeI();
 
       // =================================================== Loop over angles in set
       const int ni_deploc_face_counter = deploc_face_counter;
@@ -153,10 +157,12 @@ public:
           const auto& face = cell.faces[f];
           const double mu = omega.Dot(face.normal);
 
+          face_mu_values[f] = mu;
+
           if (mu < 0.0) // Upwind
           {
             face_incident_flags[f] = true;
-            const bool local = transport_view.face_local[f];
+            const bool local = transport_view.IsFaceLocal(f);
             const bool boundary = not face.has_neighbor;
             const int num_face_indices = face.vertex_ids.size();
             if (local)
@@ -290,11 +296,12 @@ public:
         for (int f = 0; f < num_faces; ++f)
         {
           if (face_incident_flags[f]) continue;
+          double mu = face_mu_values[f];
 
           // ============================= Set flags and counters
           out_face_counter++;
           const auto& face = cell.faces[f];
-          const bool local = transport_view.face_local[f];
+          const bool local = transport_view.IsFaceLocal(f);
           const bool boundary = not face.has_neighbor;
           const int num_face_indices = face.vertex_ids.size();
 
@@ -330,8 +337,12 @@ public:
                 double *psi = angle_set->ReflectingPsiOutBoundBndry(bndry_index, angle_num,
                                                                     cell.local_id, f,
                                                                     fi, gs_ss_begin);
+                IntS_shapeI[f][i];
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
+                {
                   psi[gsg] = b[gsg][i];
+                  transport_view.AddOutflow(gs_gi+gsg,b[gsg][i]*mu*IntS_shapeI[f][i]);
+                }
               }
             }
           }
