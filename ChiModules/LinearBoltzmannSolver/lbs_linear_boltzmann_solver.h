@@ -111,11 +111,15 @@ public:
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
+  void ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const;
+  void ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const;
+  void ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const;
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
   //03c
   void InitAngleAggPolar(LBSGroupset& groupset);
   void InitAngleAggSingle(LBSGroupset& groupset);
+  void InitAngleAggAzimuthal(LBSGroupset& groupset);
   //03d
   void InitWGDSA(LBSGroupset& groupset);
   void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset, double *ref_phi_old,
@@ -147,7 +151,7 @@ public:
                  bool apply_mat_src,
                  bool suppress_phi_old);
   double ComputePiecewiseChange(LBSGroupset& groupset);
-  SweepChunk *SetSweepChunk(LBSGroupset& groupset);
+  virtual SweepChunk* SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
                          SweepChunk* sweep_chunk,
