@@ -1,71 +1,38 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiPhysics/chi_physics.h"
 #include "chi_log.h"
-#include "chi_mpi.h"
-
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
-extern ChiPhysics&  chi_physics_handler;
+#include "ChiPhysics/chi_physics.h"
 
 //###################################################################
-/**Initializes p_arrays.\n
-The question arises of what datatype can store the total amount of
-unknowns. For now we will say we want to be
-designing for 100 billion cells with
-an assumed shape of a truncated octahedron which has 24 vertices.
-We will also assume that we will be able to do 2000 energy groups
-and finally we will assume we will do scattering orders up to 16
-which requires 289 moments.
-   DOFS per truncated octahedron = 24\n
-   Energy groups                 = 2000\n
-   Moments                       = 289\n
-   # of cells                    =   100,000,000,000\n
-   Total DOFS                    = 2,400,000,000,000\n
-   Unknowns per cell             =        13,872,000\n
-   Total Unknowns                = A crap ton\n
-\n
-It is easy to see here that this is a hell of a lot so how about we think about
-something more modest. Like 200 energy groups scattering order 5 (36 moments)
-and 2 billion cells.\n
-   Energy groups                 = 200\n
-   Moments                       = 36\n
-   # of cells                    =     2,000,000,000\n
-   Total DOFS                    =    48,000,000,000\n
-   Unknowns per cell             =             7,200\n
-   Total Unknowns                = 1.44xe13\n
-\n
-A long int only supports up to 4.29e9. This obviously requires
-unsigned long long int which can hold up to 2x2e63.\n
-\n
-Another interesting aspect is what it will take to get to exascale. For a
-discrete ordinates code this will undoubtly be evident in the amount of angular flux
-unknowns. 1 billion cells, 24 vertices, 200 groups, 48 azimuthal angles per
-octant, 8 polar angles per octant (3072) angles. 1.47456e16. Just a factor 68
-away from exascale.
-   */
+/**Initializes data arrays and other data.*/
 void LinearBoltzmann::Solver::InitializeParrays()
 {
+  auto& chi_log = ChiLog::GetInstance();
+  auto& physics_handler = ChiPhysics::GetInstance();
+
   auto pwl_discretization =
     std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+
+  if (not pwl_discretization)
+    throw std::logic_error(std::string(__FUNCTION__) +
+                           ": Unknown trouble with spatial discretization.");
 
   //================================================== Initialize unknown structure
   for (int m=0; m<num_moments; m++)
   {
     flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groups.size());
-    auto& moment = flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
+    flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
   }
 
   //================================================== Compute local # of dof
-  auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
-  local_node_count = pwl_discretization->GetNumLocalDOFs(flux_moments_uk_man) / GxM;
-  globl_node_count = pwl_discretization->GetNumGlobalDOFs(flux_moments_uk_man) / GxM;
+  auto& per_node = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  local_node_count = pwl_discretization->GetNumLocalDOFs(per_node);
+  globl_node_count = pwl_discretization->GetNumGlobalDOFs(per_node);
 
   //================================================== Compute num of unknowns
   size_t num_grps = groups.size();
-  size_t M = num_moments;
-  size_t local_dof_count = local_node_count * num_grps * M;
+  size_t local_dof_count = local_node_count * num_grps * num_moments;
 
   chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
                                 << local_dof_count;
@@ -140,7 +107,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
                                       fe_intgrl_values.NumNodes(),
                                       matid_to_xs_map[cell.material_id],
                                       face_local_flags,
-                                      num_grps, M);
+                                      num_grps, num_moments);
   }//for local cell
 
   //================================================== Initialize Field Functions
@@ -162,7 +129,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
           m,                      //Reference unknown
           g);                     //Reference component
 
-        chi_physics_handler.fieldfunc_stack.push_back(group_ff);
+        physics_handler.fieldfunc_stack.push_back(group_ff);
         field_functions.push_back(group_ff);
       }//for m
     }//for g
