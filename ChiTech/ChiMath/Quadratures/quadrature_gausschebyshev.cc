@@ -57,4 +57,6 @@ chi_math::QuadratureGaussChebyshev::Initialize(unsigned int N, bool verbose)
         << "root[" << n << "]=" << qpoints[n][0]
         << ", weight=" << weights[n];
   }
+
+  range = {-1, +1};
 }

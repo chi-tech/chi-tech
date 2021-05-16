@@ -33,16 +33,25 @@ public:
   const QuadratureOrder order;
   std::vector<chi_math::QuadraturePointXYZ> qpoints;
   std::vector<double> weights;
+protected:
+  /**Interval on which the quadrature is defined
+   * (relevant for one-dimensional quadratures only).*/
+  std::pair<double, double> range;
 
 protected:
   explicit
-  Quadrature(QuadratureOrder in_order) : order(in_order) {}
+  Quadrature(QuadratureOrder in_order) : order(in_order), range({0, 0}) {}
 
 public:
-  void Scale(std::pair<double,double> old_range,
-             std::pair<double,double> new_range);
-
+  /**Get the range on which the quadrature is defined
+   * (relevant for one-dimensional quadratures only).*/
+  const std::pair<double, double>& GetRange() const
+  { return range; }
+  /**Set the range on which the quadrature is defined.
+   * (relevant for one-dimensional quadratures only).
+   * Note that calling this method results in translation
+   * of the abscissae and scaling of the weights.*/
+  void SetRange(const std::pair<double, double>& in_range);
 };
-
 
 #endif

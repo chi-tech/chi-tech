@@ -13,8 +13,8 @@ double PolygonMappingFE_PWL::TriShape(int index,
   }
   else
   {
-    xi = 0.5*(qpoint[0] + 1.0);
-    eta = 0.0;
+    xi = qpoint.x;
+    eta= 0.0;
   }
 
   double value = 0.0;

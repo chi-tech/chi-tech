@@ -1,9 +1,9 @@
 #ifndef PWL_SLAB_VALUES_H
 #define PWL_SLAB_VALUES_H
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include <vector>
-#include <ChiMesh/Cell/cell_slab.h>
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
+#include "ChiMath/Quadratures/quadrature_line.h"
+#include "ChiMesh/Cell/cell_slab.h"
 
 //###################################################################
 /**Object for handling slab shaped piecewise linear shape functions.*/
@@ -14,16 +14,14 @@ private:
   int v0i;
   int v1i;
   std::array<chi_mesh::Normal,2> normals;
-  const chi_math::QuadratureGaussLegendre& default_volume_quadrature;
-  const chi_math::QuadratureGaussLegendre& arbitrary_volume_quadrature;
+  const chi_math::QuadratureLine& volume_quadrature;
   double h;
 public:
 
   /**Constructor for a slab view.*/
   SlabMappingFE_PWL(const chi_mesh::CellSlab& slab_cell,
                     const chi_mesh::MeshContinuumPtr& ref_grid,
-                    const chi_math::QuadratureGaussLegendre& minumum_volume_quadrature,
-                    const chi_math::QuadratureGaussLegendre& arb_volume_quadrature);
+                    const chi_math::QuadratureLine& volume_quadrature);
 
   void ComputeUnitIntegrals(
     chi_math::finite_element::UnitIntegralData& ui_data) override;
