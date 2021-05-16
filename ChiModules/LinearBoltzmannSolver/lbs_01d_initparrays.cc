@@ -11,13 +11,6 @@ void LinearBoltzmann::Solver::InitializeParrays()
   auto& chi_log = ChiLog::GetInstance();
   auto& physics_handler = ChiPhysics::GetInstance();
 
-  auto pwl_discretization =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
-
-  if (not pwl_discretization)
-    throw std::logic_error(std::string(__FUNCTION__) +
-                           ": Unknown trouble with spatial discretization.");
-
   //================================================== Initialize unknown structure
   for (int m=0; m<num_moments; m++)
   {
@@ -27,8 +20,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
 
   //================================================== Compute local # of dof
   auto& per_node = ChiMath::UNITARY_UNKNOWN_MANAGER;
-  local_node_count = pwl_discretization->GetNumLocalDOFs(per_node);
-  globl_node_count = pwl_discretization->GetNumGlobalDOFs(per_node);
+  local_node_count = discretization->GetNumLocalDOFs(per_node);
+  globl_node_count = discretization->GetNumGlobalDOFs(per_node);
 
   //================================================== Compute num of unknowns
   size_t num_grps = groups.size();
@@ -68,8 +61,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
   cell_transport_views.clear();
   for (auto& cell : grid->local_cells)
   {
-    const auto& fe_intgrl_values = pwl_discretization->GetUnitIntegrals(cell);
-    size_t cell_num_nodes = fe_intgrl_values.NumNodes();
+    size_t cell_num_nodes = discretization->GetCellNumNodes(cell);
 
     size_t cell_phi_address = block_MG_counter;
     block_MG_counter += cell_num_nodes * num_grps * num_moments;
@@ -104,7 +96,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
     max_cell_node_count = std::max(max_cell_node_count,cell_num_nodes);
 
     cell_transport_views.emplace_back(cell_phi_address,
-                                      fe_intgrl_values.NumNodes(),
+                                      cell_num_nodes,
                                       matid_to_xs_map[cell.material_id],
                                       face_local_flags,
                                       num_grps, num_moments);
