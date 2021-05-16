@@ -1,11 +1,10 @@
 #ifndef PWL_POLYHEDRON_VALUES_H
 #define PWL_POLYHEDRON_VALUES_H
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include <vector>
-#include "ChiMath/Quadratures/quadrature.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
+#include "ChiMath/Quadratures/quadrature_tetrahedron.h"
+#include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"
-#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 
 
@@ -93,23 +92,16 @@ private:
   std::vector<FEnodeMap>         node_side_maps; ///< Maps nodes to side tets.
 
 private:
-  const chi_math::QuadratureTetrahedron& default_volume_quadrature;
-  const chi_math::QuadratureTriangle&    default_surface_quadrature;
-
-  const chi_math::QuadratureTetrahedron& arbitrary_volume_quadrature;
-  const chi_math::QuadratureTriangle&    arbitrary_surface_quadrature;
+  const chi_math::QuadratureTetrahedron& volume_quadrature;
+  const chi_math::QuadratureTriangle&    surface_quadrature;
 
 public:
   //00_constrdestr.cc
   PolyhedronMappingFE_PWL(const chi_mesh::CellPolyhedron& polyh_cell,
                           const chi_mesh::MeshContinuumPtr& ref_grid,
-                          const chi_math::QuadratureTetrahedron& minumum_volume_quadrature,
-                          const chi_math::QuadratureTriangle&    minumum_surface_quadrature,
-                          const chi_math::QuadratureTetrahedron& arb_volume_quadrature,
-                          const chi_math::QuadratureTriangle&    arb_surface_quadrature);
+                          const chi_math::QuadratureTetrahedron& volume_quadrature,
+                          const chi_math::QuadratureTriangle&    surface_quadrature);
 
-  void ComputeUnitIntegrals(
-    chi_math::finite_element::UnitIntegralData& ui_data) override;
   void InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;

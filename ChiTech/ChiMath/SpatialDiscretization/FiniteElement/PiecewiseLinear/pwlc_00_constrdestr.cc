@@ -16,20 +16,50 @@ SpatialDiscretization_PWLC::
   SpatialDiscretization_FE(0, in_grid, in_cs_type,
                            SDMType::PIECEWISE_LINEAR_CONTINUOUS,
                            setup_flags),
-  line_quad_order_second(chi_math::QuadratureOrder::SECOND),
-  tri_quad_order_second(chi_math::QuadratureOrder::SECOND),
-  quad_quad_order_second(chi_math::QuadratureOrder::SECOND),
-  tet_quad_order_second(chi_math::QuadratureOrder::SECOND),
-  hex_quad_order_second(chi_math::QuadratureOrder::SECOND),
   line_quad_order_arbitrary(qorder),
-  tri_quad_order_arbitrary (qorder),
-  quad_quad_order_arbitrary (qorder),
-  tet_quad_order_arbitrary (qorder),
-  hex_quad_order_arbitrary (qorder)
+  tri_quad_order_arbitrary(qorder),
+  quad_quad_order_arbitrary(qorder),
+  tet_quad_order_arbitrary(qorder),
+  hex_quad_order_arbitrary(qorder)
 {
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
+
+  if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
+  {
+    const auto qorder_min = static_cast<int>(chi_math::QuadratureOrder::SECOND);
+
+    if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "static_cast<int>(line_quad_order_arbitrary.order) < "
+        << qorder_min << ".";
+
+    if (static_cast<int>(tri_quad_order_arbitrary.order) < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "static_cast<int>(tri_quad_order_arbitrary.order) < "
+        << qorder_min << ".";
+
+    if (static_cast<int>(quad_quad_order_arbitrary.order) < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "static_cast<int>(quad_quad_order_arbitrary.order) < "
+        << qorder_min << ".";
+
+    if (static_cast<int>(tet_quad_order_arbitrary.order) < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "static_cast<int>(tet_quad_order_arbitrary.order) < "
+        << qorder_min << ".";
+
+    if (static_cast<int>(hex_quad_order_arbitrary.order) < qorder_min)
+      chi_log.Log(LOG_ALLWARNING)
+        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+        << "static_cast<int>(hex_quad_order_arbitrary.order) < "
+        << qorder_min << ".";
+  }
 
   if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
     PreComputeCellSDValues();

@@ -116,7 +116,7 @@ namespace finite_element
     VecVec3                       m_qpoints_xyz             ; ///< qp index only
     std::vector<VecDbl>           m_shape_value             ; ///< Node i, then qp
     std::vector<VecVec3>          m_shape_grad              ; ///< Node i, then qp
-    VecDbl                        m_JxW                     ; ///< Node i, then qp
+    VecDbl                        m_JxW                     ; ///< qp index only
     std::vector<std::vector<int>> m_face_dof_mappings       ; ///< Face f,then fi
     size_t                        m_num_nodes                =0;
 
@@ -162,7 +162,8 @@ namespace finite_element
                         VecVec3                       normals,
                         std::vector<std::vector<int>> face_dof_mappings,
                         size_t num_nodes);
-    double Normal(unsigned int qp) const;
+    chi_mesh::Vector3
+      Normal(unsigned int qp) const;
   };
 }
 

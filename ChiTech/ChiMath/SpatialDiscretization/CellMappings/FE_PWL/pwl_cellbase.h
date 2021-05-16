@@ -1,7 +1,7 @@
 #ifndef CELL_MAPPING_FE_PWL_BASE_H
 #define CELL_MAPPING_FE_PWL_BASE_H
 
-#include <ChiMesh/chi_mesh.h>
+#include "ChiMesh/chi_mesh.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 
@@ -27,10 +27,7 @@ public:
   {}
 
   virtual void
-  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
-  {
-    throw std::logic_error("Trouble in base-class ComputeUnitIntegrals");
-  }
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data);
 
   virtual void
   InitializeAllQuadraturePointData(

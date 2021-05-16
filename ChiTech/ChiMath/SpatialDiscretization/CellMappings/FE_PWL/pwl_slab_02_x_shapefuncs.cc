@@ -1,4 +1,5 @@
 #include "pwl_slab.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 /**Shape function i evaluated at given point for the slab.*/
 double SlabMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
