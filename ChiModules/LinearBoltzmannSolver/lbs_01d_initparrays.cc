@@ -47,20 +47,17 @@ away from exascale.
    */
 void LinearBoltzmann::Solver::InitializeParrays()
 {
-  auto pwl_discretization =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
-
   //================================================== Initialize unknown structure
   for (int m=0; m<num_moments; m++)
   {
     flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groups.size());
-    auto& moment = flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
+    flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
   }
 
   //================================================== Compute local # of dof
   auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
-  local_dof_count = pwl_discretization->GetNumLocalDOFs(flux_moments_uk_man)/GxM;
-  glob_dof_count = pwl_discretization->GetNumGlobalDOFs(flux_moments_uk_man)/GxM;
+  local_dof_count = discretization->GetNumLocalDOFs(flux_moments_uk_man)/GxM;
+  glob_dof_count = discretization->GetNumGlobalDOFs(flux_moments_uk_man)/GxM;
 
   //================================================== Compute num of unknowns
   int num_grps = groups.size();
@@ -103,16 +100,16 @@ void LinearBoltzmann::Solver::InitializeParrays()
   {
     for (auto& cell : grid->local_cells)
     {
-      const auto& fe_intgrl_values = pwl_discretization->GetUnitIntegrals(cell);
+      size_t num_nodes = discretization->GetCellNumNodes(cell);
 
-      CellLBSView cell_lbs_view(fe_intgrl_values.NumNodes(), num_grps, M);
+      CellLBSView cell_lbs_view(num_nodes, num_grps, M);
 
       int mat_id = cell.material_id;
 
       cell_lbs_view.xs_id = matid_to_xs_map[mat_id];
 
       cell_lbs_view.dof_phi_map_start = block_MG_counter;
-      block_MG_counter += fe_intgrl_values.NumNodes() * num_grps * num_moments;
+      block_MG_counter += num_nodes * num_grps * num_moments;
 
       chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
       cell_nodal_mapping.reserve(cell.faces.size());
@@ -155,8 +152,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
         ++f;
       }//for f
 
-      if (fe_intgrl_values.NumNodes() > max_cell_dof_count)
-        max_cell_dof_count = fe_intgrl_values.NumNodes();
+      if (num_nodes > max_cell_dof_count)
+        max_cell_dof_count = num_nodes;
 
       cell_transport_views.push_back(cell_lbs_view);
       grid_nodal_mappings.push_back(cell_nodal_mapping);
