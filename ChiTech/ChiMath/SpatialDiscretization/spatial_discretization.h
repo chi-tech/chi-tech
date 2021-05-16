@@ -72,7 +72,7 @@ public:
                           {return 0;}
 
   virtual
-  size_t GetCellNumNodes(const chi_mesh::Cell& cell) = 0;
+  size_t GetCellNumNodes(const chi_mesh::Cell& cell) const = 0;
 
 protected:
   //02

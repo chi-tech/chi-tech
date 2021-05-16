@@ -80,7 +80,7 @@ public:
   size_t GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                          chi_math::UnknownManager& unknown_manager);
 
-  size_t GetCellNumNodes(const chi_mesh::Cell& cell) override {return 1;}
+  size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override {return 1;}
 
   std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
                                       chi_math::UnknownManager& unknown_manager,
