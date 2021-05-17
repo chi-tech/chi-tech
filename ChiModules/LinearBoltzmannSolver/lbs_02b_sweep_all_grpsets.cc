@@ -18,7 +18,8 @@ void LinearBoltzmann::Solver::SweepAllGroupSets()
     ComputeSweepOrderings(groupset);
     InitFluxDataStructures(groupset);
 
-    SweepChunk* sweep_chunk = SetSweepChunk(groupset);
+    auto sweep_chunk = SetSweepChunk(groupset);
+    sweep_chunk->suppress_surface_src = false;
     MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                       &groupset.angle_agg);
 
@@ -26,9 +27,7 @@ void LinearBoltzmann::Solver::SweepAllGroupSets()
 
     groupset.ZeroPsiDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
-    sweepScheduler.Sweep(sweep_chunk);
-
-    delete sweep_chunk;
+    sweepScheduler.Sweep(*sweep_chunk);
 
     ResetSweepOrderings(groupset);
 

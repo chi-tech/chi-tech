@@ -31,8 +31,9 @@ enum class BoundaryType
 struct SourceFlags
 {
   static const bool USE_MATERIAL_SOURCE = true;
-  static const bool USE_DLINV_SOURCE = false;
-  static const bool SUPPRESS_PHI_OLD = true;
+  static const bool NO_MATERIAL_SOURCE = false;
+  static const bool USE_PHI_SCATTER_SOURCE = true;
+  static const bool NO_PHI_SCATTER_SOURCE = false;
 };
 
 
@@ -152,7 +153,7 @@ public:
   //IterativeMethods
   virtual void SetSource(LBSGroupset& groupset,
                  bool apply_mat_src,
-                 bool suppress_phi_old);
+                 bool apply_phi_old_scatter_src);
   double ComputePiecewiseChange(LBSGroupset& groupset);
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,

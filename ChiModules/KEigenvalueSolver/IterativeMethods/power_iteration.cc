@@ -172,7 +172,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     << sweep_time;
   chi_log.Log(LOG_0)
     << "        Sweep Time/Unknown (ns):       "
-    << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+    << sweep_time*1.0e9*chi_mpi.process_count/static_cast<double>(num_unknowns);
   chi_log.Log(LOG_0)
     << "        Number of unknowns per sweep:  " << num_unknowns;
   chi_log.Log(LOG_0)

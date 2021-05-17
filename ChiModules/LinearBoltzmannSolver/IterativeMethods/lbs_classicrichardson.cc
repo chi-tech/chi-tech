@@ -45,7 +45,8 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   bool converged = false;
   for (int k=0; k<groupset.max_iterations; k++)
   {
-    SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,false);
+    SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,
+                       SourceFlags::USE_PHI_SCATTER_SOURCE);
 
     groupset.ZeroPsiDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
@@ -141,7 +142,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
         << sweep_time;
       chi_log.Log(LOG_0)
         << "        Sweep Time/Unknown (ns):       "
-        << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+        << sweep_time*1.0e9*chi_mpi.process_count/static_cast<double>(num_unknowns);
       chi_log.Log(LOG_0)
         << "        Number of unknowns per sweep:  " << num_unknowns;
       chi_log.Log(LOG_0)

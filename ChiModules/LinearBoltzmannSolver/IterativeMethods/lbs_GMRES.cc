@@ -98,7 +98,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   }
 
   SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,
-                     SourceFlags::SUPPRESS_PHI_OLD);
+                     SourceFlags::NO_PHI_SCATTER_SOURCE);
 
   sweep_chunk.SetDestinationPhi(&phi_new_local);
 

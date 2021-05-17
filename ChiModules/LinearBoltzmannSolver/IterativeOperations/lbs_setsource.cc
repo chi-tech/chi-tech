@@ -16,12 +16,12 @@ extern ChiLog& chi_log;
  *        to be applied to the routine. This is useful for GMRES
  *        since the material source only features during the computing b.
  *        On this note we also need to treat inscattering this way.
- * \param suppress_phi_old Flag indicating whether to suppress phi_old.
+ * \param apply_phi_old_scatter_src Flag indicating whether to suppress phi_old.
  *
  * */
 void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
                                         bool apply_mat_src,
-                                        bool suppress_phi_old)
+                                        bool apply_phi_old_scatter_src)
 {
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
@@ -69,14 +69,13 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
     double sigma_sm = 0.0;
     double* q_mom;
     double* phi_oldp;
-    int gprime;
     for (int i=0; i<full_cell_view.NumNodes(); i++)
     {
       for (int m=0; m<num_moments; ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        int64_t ir = full_cell_view.MapDOF(i,m,0);
+        size_t ir  = full_cell_view.MapDOF(i,m,0);
         q_mom      = &q_moments_local[ir];
         phi_oldp   = &phi_old_local[ir];
 
@@ -90,10 +89,10 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
           //====================== Apply across-groupset scattering
           if ((ell < xs->transfer_matrix.size()) && (apply_mat_src) )
           {
-            int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
             {
-              gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
+              auto gprime = xs->transfer_matrix[ell].rowI_indices[g][t];
               if ((gprime < gs_i) || (gprime > gs_f))
               {
                 sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
@@ -103,12 +102,12 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
           }//if moment avail
 
           //====================== Apply within-groupset scattering
-          if ((ell < xs->transfer_matrix.size()) && (!suppress_phi_old) )
+          if ((ell < xs->transfer_matrix.size()) && (apply_phi_old_scatter_src) )
           {
-            int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
             {
-              gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
+              auto gprime = xs->transfer_matrix[ell].rowI_indices[g][t];
               if ((gprime >= gs_i) && (gprime<=gs_f))
               {
                 sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
@@ -122,7 +121,7 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
           //====================== Apply accross-groupset fission
           if ((ell == 0) and (apply_mat_src))
           {
-            for (gprime=first_grp; gprime<=last_grp; ++gprime)
+            for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
             {
               if ((gprime < gs_i) || (gprime > gs_f))
               {
@@ -134,9 +133,9 @@ void LinearBoltzmann::Solver::SetSource(LBSGroupset& groupset,
           }//if zeroth moment
 
           //====================== Apply within-groupset fission
-          if ((ell == 0) and (!suppress_phi_old))
+          if ((ell == 0) and (apply_phi_old_scatter_src))
           {
-            for (gprime=first_grp; gprime<=last_grp; ++gprime)
+            for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
             {
               if ((gprime >= gs_i) && (gprime<=gs_f))
               {

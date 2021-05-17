@@ -26,8 +26,8 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   //============================================= Setting the source using
   //                                             updated phi_old
   solver.SetSource(context->groupset,
-                   LinearBoltzmann::SourceFlags::USE_DLINV_SOURCE,
-                   false);
+                   LinearBoltzmann::SourceFlags::NO_MATERIAL_SOURCE,
+                   LinearBoltzmann::SourceFlags::USE_PHI_SCATTER_SOURCE);
 
   //============================================= Sweeping the new source
   groupset.ZeroPsiDataStructures();
@@ -53,7 +53,7 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
     solver.DisAssembleTGDSADeltaPhiVector(groupset,
                                           solver.phi_new_local.data());
   }
-  
+
   solver.AssembleVector(groupset,
                         context->operating_vector,
                         solver.phi_new_local.data(),WITH_DELAYED_PSI);
