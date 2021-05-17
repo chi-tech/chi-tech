@@ -115,7 +115,8 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
 
 //###################################################################
 /**Executes the Depth-Of-Graph algorithm.*/
-void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoDOG()
+void chi_mesh::sweep_management::SweepScheduler::
+  ScheduleAlgoDOG(SweepChunk& sweep_chunk)
 {
   typedef ExecutionPermission ExePerm;
   typedef AngleSetStatus Status;

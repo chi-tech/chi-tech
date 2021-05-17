@@ -17,7 +17,7 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using classic richardson.*/
 bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
                     int group_set_num,
-                    SweepChunk* sweep_chunk,
+                    SweepChunk& sweep_chunk,
                     MainSweepScheduler& sweepScheduler,
                     bool log_info /* = true*/)
 {
@@ -36,7 +36,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Tool the sweep chunk
-  sweep_chunk->SetDestinationPhi(&phi_new_local);
+  sweep_chunk.SetDestinationPhi(&phi_new_local);
 
   //================================================== Now start iterating
   double pw_change = 0.0;

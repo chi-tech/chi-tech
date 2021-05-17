@@ -33,7 +33,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     << "the Power Method.\n\n";
 
   // ----- Setting up required sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(groupset);
+  auto sweep_chunk = SetSweepChunk(groupset);
 
   // ----- Set sweep scheduler
   MainSweepScheduler SweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
@@ -73,7 +73,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
       SetKSource(groupset, SourceFlags::USE_MATERIAL_SOURCE);
       groupset.angle_agg.ZeroOutgoingDelayedPsi();
       phi_new_local.assign(phi_new_local.size(),0.0);
-      SweepScheduler.Sweep(sweep_chunk);
+      SweepScheduler.Sweep(*sweep_chunk);
 
       // ----- Compute convergence parameters
       pw_change = ComputePiecewiseChange(groupset);

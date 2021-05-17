@@ -1,5 +1,8 @@
 #include <petscksp.h>
 
+namespace LinearBoltzmann
+{
+
 PetscErrorCode KSPMonitorNPT(KSP ksp,
                              PetscInt n,
                              PetscReal rnorm,
@@ -8,3 +11,4 @@ PetscErrorCode KSPMonitorNPT(KSP ksp,
 PetscErrorCode KSPConvergenceTestNPT(
                 KSP ksp, PetscInt n, PetscReal rnorm,
                 KSPConvergedReason* convergedReason, void *monitordestroy);
+}

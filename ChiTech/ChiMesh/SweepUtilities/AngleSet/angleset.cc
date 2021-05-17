@@ -51,7 +51,7 @@ InitializeDelayedUpstreamData()
 /**This function advances the work stages of an angleset.*/
 chi_mesh::sweep_management::AngleSetStatus
 chi_mesh::sweep_management::AngleSet::
-AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
+AngleSetAdvance(chi_mesh::sweep_management::SweepChunk& sweep_chunk,
                 int angle_set_num,
                 const std::vector<size_t>& timing_tags,
                 chi_mesh::sweep_management::ExecutionPermission permission)
@@ -80,7 +80,7 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
     sweep_buffer.InitializeLocalAndDownstreamBuffers();
 
     chi_log.LogEvent(timing_tags[0],ChiLog::EventType::EVENT_BEGIN);
-    sweep_chunk->Sweep(this); //Execute chunk
+    sweep_chunk.Sweep(this); //Execute chunk
     chi_log.LogEvent(timing_tags[0],ChiLog::EventType::EVENT_END);
 
     //Send outgoing psi and clear local and receive buffers

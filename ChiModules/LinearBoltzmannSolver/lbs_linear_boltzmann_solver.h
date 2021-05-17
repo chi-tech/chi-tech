@@ -154,15 +154,15 @@ public:
                  bool apply_mat_src,
                  bool suppress_phi_old);
   double ComputePiecewiseChange(LBSGroupset& groupset);
-  virtual SweepChunk* SetSweepChunk(LBSGroupset& groupset);
+  virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
-                         SweepChunk* sweep_chunk,
+                         SweepChunk& sweep_chunk,
                          MainSweepScheduler & sweepScheduler,
                          bool log_info = true);
   bool GMRES(LBSGroupset& groupset,
              int group_set_num,
-             SweepChunk* sweep_chunk,
+             SweepChunk& sweep_chunk,
              MainSweepScheduler & sweepScheduler,
              bool log_info = true);
 
