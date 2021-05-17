@@ -23,7 +23,8 @@ void LinearBoltzmann::Solver::SweepAllGroupSets()
     MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                       &groupset.angle_agg);
 
-    SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,false);
+    SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,
+                       SourceFlags::USE_PHI_SCATTER_SOURCE);
 
     groupset.ZeroPsiDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
