@@ -71,6 +71,9 @@ public:
   size_t GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager)
                           {return 0;}
 
+  virtual
+  size_t GetCellNumNodes(const chi_mesh::Cell& cell) const = 0;
+
 protected:
   //02
   /**Develops a localized view of a petsc vector.
