@@ -133,6 +133,8 @@ void chi_physics::TransportCrossSections::
       this->is_fissile = true;
       Nf_total += combo.second;
     }
+    if (Nf_total < 1.0e-28)
+      Nf_total = 1.0; //Avoids divide by 0 when non-fissile
 
     //============================ Check number of groups
     if (cross_secs.size() == 1)
