@@ -33,7 +33,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     << "the Power Method.\n\n";
 
   // ----- Setting up required sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(groupset);
+  auto sweep_chunk = SetSweepChunk(groupset);
 
   // ----- Set sweep scheduler
   MainSweepScheduler SweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
@@ -70,10 +70,12 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     for (int si_nit=0; si_nit<groupset.max_iterations; si_nit++)
     {
       // ----- Set source and sweep
-      SetKSource(groupset, SourceFlags::USE_MATERIAL_SOURCE);
+      SetKSource(groupset, APPLY_MATERIAL_SOURCE |
+                           APPLY_SCATTER_SOURCE |
+                           APPLY_FISSION_SOURCE);
       groupset.angle_agg.ZeroOutgoingDelayedPsi();
       phi_new_local.assign(phi_new_local.size(),0.0);
-      SweepScheduler.Sweep(sweep_chunk);
+      SweepScheduler.Sweep(*sweep_chunk);
 
       // ----- Compute convergence parameters
       pw_change = ComputePiecewiseChange(groupset);
@@ -156,8 +158,8 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
   size_t num_angles = groupset.quadrature->abscissae.size();
-  long int num_unknowns = (long int)glob_dof_count*
-                          (long int)num_angles*
+  long int num_unknowns = (long int)glob_node_count *
+                          (long int)num_angles *
                           (long int)groupset.groups.size();
   chi_log.Log(LOG_0)
     << "\n";

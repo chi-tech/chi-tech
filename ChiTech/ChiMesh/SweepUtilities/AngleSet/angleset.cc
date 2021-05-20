@@ -51,10 +51,10 @@ InitializeDelayedUpstreamData()
 /**This function advances the work stages of an angleset.*/
 chi_mesh::sweep_management::AngleSetStatus
 chi_mesh::sweep_management::AngleSet::
-AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
-                int angle_set_num,
-                const std::vector<size_t>& timing_tags,
-                chi_mesh::sweep_management::ExecutionPermission permission)
+  AngleSetAdvance(chi_mesh::sweep_management::SweepChunk& sweep_chunk,
+                  int angle_set_num,
+                  const std::vector<size_t>& timing_tags,
+                  chi_mesh::sweep_management::ExecutionPermission permission)
 {
   typedef AngleSetStatus Status;
 
@@ -69,7 +69,7 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
   Status status = sweep_buffer.ReceiveUpstreamPsi(angle_set_num);
 
   //Also check boundaries
-  for (auto bndry : ref_boundaries)
+  for (auto& bndry : ref_boundaries)
     if (not bndry->CheckAnglesReadyStatus(angles,ref_subset))
       {status = Status::RECEIVING; break;}
 
@@ -80,7 +80,7 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
     sweep_buffer.InitializeLocalAndDownstreamBuffers();
 
     chi_log.LogEvent(timing_tags[0],ChiLog::EventType::EVENT_BEGIN);
-    sweep_chunk->Sweep(this); //Execute chunk
+    sweep_chunk.Sweep(this); //Execute chunk
     chi_log.LogEvent(timing_tags[0],ChiLog::EventType::EVENT_END);
 
     //Send outgoing psi and clear local and receive buffers
@@ -88,7 +88,7 @@ AngleSetAdvance(chi_mesh::sweep_management::SweepChunk *sweep_chunk,
     sweep_buffer.ClearLocalAndReceiveBuffers();
 
     //Update boundary readiness
-    for (auto bndry : ref_boundaries)
+    for (auto& bndry : ref_boundaries)
       bndry->UpdateAnglesReadyStatus(angles,ref_subset);
 
     executed = true;
@@ -166,21 +166,16 @@ PsiBndry(int bndry_map,
          int fi,
          int g,
          int gs_ss_begin,
-         bool suppress_surface_src)
+         bool surface_source_active)
 {
-  double* Psi = &ref_boundaries[bndry_map]->boundary_flux[g];
-
-  if (suppress_surface_src)
-    Psi = &ref_boundaries[bndry_map]->zero_boundary_flux[g];
+  if (not surface_source_active)
+    return &ref_boundaries[bndry_map]->zero_boundary_flux[g];
 
   if (ref_boundaries[bndry_map]->IsReflecting())
-  {
-    Psi = ref_boundaries[bndry_map]->HeterogenousPsiIncoming(
+    return ref_boundaries[bndry_map]->HeterogenousPsiIncoming(
       angle_num, cell_local_id, face_num, fi, gs_ss_begin);
 
-  }
-
-  return Psi;
+  return &ref_boundaries[bndry_map]->boundary_flux[g];
 }
 
 //###################################################################

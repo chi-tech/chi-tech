@@ -56,20 +56,23 @@ void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
 
   //================================================== Setting up required
   //                                                   sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(groupset);
+  auto sweep_chunk = SetSweepChunk(groupset);
   MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                     &groupset.angle_agg);
 
   if (groupset.iterative_method == NPT_CLASSICRICHARDSON)
   {
-    ClassicRichardson(groupset, group_set_num, sweep_chunk, sweepScheduler);
+    ClassicRichardson(groupset, group_set_num, *sweep_chunk, sweepScheduler,
+                      APPLY_MATERIAL_SOURCE |
+                      APPLY_SCATTER_SOURCE |
+                      APPLY_FISSION_SOURCE);
   }
   else if (groupset.iterative_method == NPT_GMRES)
   {
-    GMRES(groupset, group_set_num, sweep_chunk, sweepScheduler);
+    GMRES(groupset, group_set_num, *sweep_chunk, sweepScheduler,
+          APPLY_SCATTER_SOURCE | APPLY_FISSION_SOURCE,
+          APPLY_MATERIAL_SOURCE);
   }
-
-  delete sweep_chunk;
 
   if (options.write_restart_data)
     WriteRestartData(options.write_restart_folder_name,

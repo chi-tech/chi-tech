@@ -62,7 +62,7 @@ public:
   int GetNumGrps();
 
   AngleSetStatus AngleSetAdvance(
-             SweepChunk *sweep_chunk,
+             SweepChunk& sweep_chunk,
              int angle_set_num,
              const std::vector<size_t>& timing_tags,
              ExecutionPermission permission = ExecutionPermission::EXECUTE);
@@ -77,7 +77,7 @@ public:
                    int fi,
                    int g,
                    int gs_ss_begin,
-                   bool suppress_surface_src);
+                   bool surface_source_active);
   double* ReflectingPsiOutBoundBndry(int bndry_map,
                                      int angle_num,
                                      int cell_local_id,
