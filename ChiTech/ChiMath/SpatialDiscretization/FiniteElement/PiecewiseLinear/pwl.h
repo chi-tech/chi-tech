@@ -138,6 +138,9 @@ public:
 //                                      chi_math::UnknownManager* unknown_manager,
 //                                      unsigned int unknown_id=0);
 
+  size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override
+  {return cell.vertex_ids.size();}
+
   void LocalizePETScVector(Vec petsc_vector,
                            std::vector<double>& local_vector,
                            chi_math::UnknownManager& unknown_manager)
