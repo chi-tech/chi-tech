@@ -168,7 +168,9 @@ void chi_physics::TransportCrossSections::
       }
     }
     ++count;
-  }
+  }//for auto
+  if (Nf_total < 1.0e-28)
+    Nf_total = 1.0; //Avoids divide by 0 when non-fissile
 
   //======================================== Combine 1D cross-sections
   this->G = num_grps_G;
