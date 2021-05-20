@@ -340,7 +340,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
 }
 
 
-SweepChunk*
+std::shared_ptr<SweepChunk>
 LBSCurvilinear::Solver::SetSweepChunk(LBSGroupset& groupset)
 {
   auto pwld_sdm_primary =
@@ -348,17 +348,17 @@ LBSCurvilinear::Solver::SetSweepChunk(LBSGroupset& groupset)
   auto pwld_sdm_secondary =
     std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization_secondary);
 
-  SweepChunk* sweep_chunk =
-    new SweepChunkPWL(grid,
-                      *pwld_sdm_primary,
-                      *pwld_sdm_secondary,
-                      cell_transport_views,
-                      &phi_new_local,
-                      &q_moments_local,
-                      groupset,
-                      material_xs,
-                      num_moments,
-                      max_cell_dof_count);
+   auto sweep_chunk =
+     std::make_shared<SweepChunkPWL>(grid,
+                                     *pwld_sdm_primary,
+                                     *pwld_sdm_secondary,
+                                     cell_transport_views,
+                                     &phi_new_local,
+                                     &q_moments_local,
+                                     groupset,
+                                     material_xs,
+                                     num_moments,
+                                     max_cell_dof_count);
 
   return sweep_chunk;
 }

@@ -34,7 +34,7 @@ public:
   void PerformInputChecks() override;
   void InitializeSpatialDiscretization() override;
 private:
-  SweepChunk* SetSweepChunk(LBSGroupset& groupset) override;
+  std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset) override;
 };
 
 #endif // LBS_CURVILINEAR_SOLVER_H
