@@ -26,7 +26,7 @@ namespace chi_mesh
     MATID_FROMLOGICAL   = 11,
     BNDRYID_FROMLOGICAL = 12
   };
-};
+}
 
 //######################################################### Class def
 /**Parent volume mesher class.*/
