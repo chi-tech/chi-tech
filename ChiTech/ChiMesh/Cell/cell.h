@@ -65,13 +65,10 @@ public:
 
 private:
   const CellType cell_type;
-  const CellType cell_sub_type;
 
 public:
-  explicit Cell(CellType in_cell_type,
-                CellType in_cell_sub_type=CellType::HEXAHEDRON) :
-                cell_type(in_cell_type),
-                cell_sub_type(in_cell_sub_type)
+  explicit Cell(CellType in_cell_type) :
+                cell_type(in_cell_type)
                 {}
 
   virtual ~Cell() = default;

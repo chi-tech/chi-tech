@@ -155,7 +155,7 @@ public:
     //====================================== Building rotation matrix
     chi_mesh::Vector3 binorm;
     chi_mesh::Vector3 tangent;
-    if (abs(vd.Dot(k)/vd.Norm())>(1.0-1.0e-12))
+    if (std::abs(vd.Dot(k) / vd.Norm()) > (1.0 - 1.0e-12))
     {
       binorm = chi_mesh::Vector3(0.0, 1.0, 0.0);
       tangent = chi_mesh::Vector3(1.0, 0.0, 0.0);
@@ -181,20 +181,18 @@ public:
     chi_log.Log(LOG_0) << "Inverted p: \n" << p01T.PrintS();
 
     //====================================== Determine if point is within cylinder
-    bool in_cylinder = false;
     double r2 = p01T.x*p01T.x + p01T.y*p01T.y;
 
-    if (r2 <(this->r*this->r))
-      in_cylinder = true;
+    if (r2 <= r*r)
+    {
+      double dotP = p01T.Dot(vd);
+      if ((dotP >= 0.0) && (dotP <= 1.0))
+        return true;
+      else
+        return false;
+    }
     else
       return false;
-
-    //====================================== Determine if point is within extents
-    double dotP = p01T.Dot(vd);
-    if ((dotP>=0.0) and (dotP<=1.0))
-      return true;
-
-    return false;
   }
 };
 

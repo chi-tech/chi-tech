@@ -16,7 +16,7 @@ public:
 
   ScalarValue() : MaterialProperty(PropertyType::SCALAR_VALUE) {}
 
-  double GetScalarValue() {return value;}
+  double GetScalarValue() override {return value;}
   void PushLuaTable(lua_State* L) override
   {
     lua_newtable(L);
