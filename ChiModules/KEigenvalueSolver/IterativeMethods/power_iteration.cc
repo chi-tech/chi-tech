@@ -33,7 +33,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     << "the Power Method.\n\n";
 
   // ----- Setting up required sweep chunks
-  SweepChunk* sweep_chunk = SetSweepChunk(groupset);
+  auto sweep_chunk = SetSweepChunk(groupset);
 
   // ----- Set sweep scheduler
   MainSweepScheduler SweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
@@ -48,12 +48,10 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
                                          phi_old_local.data()); 
 
   // ----- Start outer k iterations
-  double F_new = 0.0;
-  double F_prev = 1.0;
+  double F_new = 0.0;        //Production source new (0.0 is not used)
+  double F_prev = 1.0;       //Production source prev
   double k_eff_prev = k_eff;
-  double k_eff_change = 0.0;
-  double reactivity = 0.0;
-  int nit = 0;
+  int nit = 0;               //number of iterations
   bool k_converged = false;
 
   while (nit < options.max_iterations)
@@ -63,23 +61,23 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
 
 
     // ----- Start inner source iterations
-    double pw_change = 0.0;
     double pw_change_prev = 1.0;
-    double rho = 0.0;
     bool si_converged = false;
     for (int si_nit=0; si_nit<groupset.max_iterations; si_nit++)
     {
       // ----- Set source and sweep
-      SetKSource(groupset, SourceFlags::USE_MATERIAL_SOURCE);
+      SetKSource(groupset, APPLY_MATERIAL_SOURCE |
+                           APPLY_SCATTER_SOURCE |
+                           APPLY_FISSION_SOURCE);
       groupset.angle_agg.ZeroOutgoingDelayedPsi();
       phi_new_local.assign(phi_new_local.size(),0.0);
-      SweepScheduler.Sweep(sweep_chunk);
+      SweepScheduler.Sweep(*sweep_chunk);
 
       // ----- Compute convergence parameters
-      pw_change = ComputePiecewiseChange(groupset);
+      double pw_change = ComputePiecewiseChange(groupset);
       DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(),
                                              phi_old_local.data());
-      rho = sqrt(pw_change/pw_change_prev);
+      double rho = sqrt(pw_change/pw_change_prev);
       pw_change_prev = pw_change;
       nit += 1;
 
@@ -122,10 +120,10 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     // ----- Recompute eigenvalue
     F_new = ComputeProduction();
     k_eff = F_new/F_prev * k_eff;
-    reactivity = (k_eff - 1.0) / k_eff;
+    double reactivity = (k_eff - 1.0) / k_eff;
 
     // ----- Compute convergence parameters and bump values
-    k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
+    double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff; F_prev = F_new;
     DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(),
                                            phi_prev_local.data());
@@ -156,9 +154,9 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
   size_t num_angles = groupset.quadrature->abscissae.size();
-  long int num_unknowns = (long int)glob_dof_count*
-                          (long int)num_angles*
-                          (long int)groupset.groups.size();
+  size_t num_unknowns = glob_node_count *
+                        num_angles *
+                        groupset.groups.size();
   chi_log.Log(LOG_0)
     << "\n";
   chi_log.Log(LOG_0)
@@ -172,7 +170,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     << sweep_time;
   chi_log.Log(LOG_0)
     << "        Sweep Time/Unknown (ns):       "
-    << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+    << sweep_time*1.0e9*chi_mpi.process_count/static_cast<double>(num_unknowns);
   chi_log.Log(LOG_0)
     << "        Number of unknowns per sweep:  " << num_unknowns;
   chi_log.Log(LOG_0)

@@ -17,8 +17,9 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using classic richardson.*/
 bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
                     int group_set_num,
-                    SweepChunk* sweep_chunk,
+                    SweepChunk& sweep_chunk,
                     MainSweepScheduler& sweepScheduler,
+                    SourceFlags source_flags,
                     bool log_info /* = true*/)
 {
   if (log_info)
@@ -36,7 +37,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Tool the sweep chunk
-  sweep_chunk->SetDestinationPhi(&phi_new_local);
+  sweep_chunk.SetDestinationPhi(&phi_new_local);
 
   //================================================== Now start iterating
   double pw_change = 0.0;
@@ -45,9 +46,9 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   bool converged = false;
   for (int k=0; k<groupset.max_iterations; k++)
   {
-    SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,false);
+    SetSource(groupset,source_flags);
 
-    groupset.ZeroPsiDataStructures();
+    groupset.ZeroAngularFluxDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweepScheduler.Sweep(sweep_chunk);
 
@@ -125,9 +126,9 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
       chi_log.ProcessEvent(source_event_tag,
                            ChiLog::EventOperation::AVERAGE_DURATION);
     size_t num_angles = groupset.quadrature->abscissae.size();
-    long int num_unknowns = (long int)glob_dof_count*
-                            (long int)num_angles*
-                            (long int)groupset.groups.size();
+    size_t num_unknowns = glob_node_count *
+                          num_angles *
+                          groupset.groups.size();
 
     if (log_info)
     {
@@ -141,7 +142,8 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
         << sweep_time;
       chi_log.Log(LOG_0)
         << "        Sweep Time/Unknown (ns):       "
-        << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+        << sweep_time*1.0e9*chi_mpi.process_count/
+            static_cast<double>(num_unknowns);
       chi_log.Log(LOG_0)
         << "        Number of unknowns per sweep:  " << num_unknowns;
       chi_log.Log(LOG_0)

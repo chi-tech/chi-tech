@@ -209,10 +209,10 @@ public:
                 {
                   const int j = fe_intgrl_values.FaceDofMapping(f,fj);
                   const double *psi = angle_set->PsiBndry(bndry_index,
-                                                    angle_num,
-                                                    cell.local_id,
-                                                    f, fj, gs_gi, gs_ss_begin,
-                                                    suppress_surface_src);
+                                                          angle_num,
+                                                          cell.local_id,
+                                                          f, fj, gs_gi, gs_ss_begin,
+                                                          surface_source_active);
                   const double mu_Nij = -mu*N[f][i][j];
                   Amat[i][j] += mu_Nij;
                   for (int gsg = 0; gsg < gs_ss_size; ++gsg)

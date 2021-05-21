@@ -55,14 +55,14 @@ void LinearBoltzmann::Solver::InitializeParrays()
   }
 
   //================================================== Compute local # of dof
-  auto GxM = flux_moments_uk_man.GetTotalUnknownStructureSize();
-  local_dof_count = discretization->GetNumLocalDOFs(flux_moments_uk_man)/GxM;
-  glob_dof_count = discretization->GetNumGlobalDOFs(flux_moments_uk_man)/GxM;
+  auto& per_node = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  local_node_count = discretization->GetNumLocalDOFs(per_node);
+  glob_node_count = discretization->GetNumGlobalDOFs(per_node);
 
   //================================================== Compute num of unknowns
   int num_grps = groups.size();
   int M = num_moments;
-  unsigned long long local_unknown_count = local_dof_count * num_grps * M;
+  unsigned long long local_unknown_count = local_node_count * num_grps * M;
 
   chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
                                 << local_unknown_count;
