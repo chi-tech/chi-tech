@@ -76,8 +76,8 @@ void chi_physics::TransportCrossSections::
   file.getline(line,250);
 
   //====================================== Resizing cross-sections
-  G = num_grps_G;
-  L = scat_order;
+  num_groups = num_grps_G;
+  scattering_order = scat_order;
   sigma_tg.clear();
   sigma_tg.resize(num_grps_G,0.0);
   sigma_fg.resize(num_grps_G,0.0);
@@ -135,16 +135,16 @@ void chi_physics::TransportCrossSections::
   {
     mt_number = AdvanceToNextMT(file,file_name);
 
-    if (mt_number == 1)    Read1DXS(sigma_tg,file,G);
-    if (mt_number == 18)   Read1DXS(sigma_fg,file,G);
-    if (mt_number == 27)   Read1DXS(sigma_captg,file,G);
-    if (mt_number == 2018) Read1DXS(chi_g,file,G);
-    if (mt_number == 2452) Read1DXS(nu_sigma_fg,file,G);
+    if (mt_number == 1)    Read1DXS(sigma_tg, file, num_groups);
+    if (mt_number == 18)   Read1DXS(sigma_fg, file, num_groups);
+    if (mt_number == 27)   Read1DXS(sigma_captg, file, num_groups);
+    if (mt_number == 2018) Read1DXS(chi_g, file, num_groups);
+    if (mt_number == 2452) Read1DXS(nu_sigma_fg, file, num_groups);
 
     if (mt_number == mt_transfer)
     {
       ++mom;
-      for (int g=0; g<G; g++)
+      for (int g=0; g < num_groups; g++)
       {
         int sink=-1,gprime_first=-1, gprime_last=-2;
         file.getline(line,250);

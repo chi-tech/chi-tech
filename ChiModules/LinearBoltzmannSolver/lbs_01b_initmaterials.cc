@@ -91,23 +91,23 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
     }
 
     //====================================== Check number of groups legal
-    if (material_xs[matid_to_xs_map[mat_id]]->G < groups.size())
+    if (material_xs[matid_to_xs_map[mat_id]]->num_groups < groups.size())
     {
       chi_log.Log(LOG_ALLERROR)
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
-        << material_xs[matid_to_xs_map[mat_id]]->G << " groups and"
+        << material_xs[matid_to_xs_map[mat_id]]->num_groups << " groups and"
         << " the simulation has " << groups.size() << " groups."
         << " The material must have a greater or equal amount of groups.";
       exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
-    if (material_xs[matid_to_xs_map[mat_id]]->L < options.scattering_order)
+    if (material_xs[matid_to_xs_map[mat_id]]->scattering_order < options.scattering_order)
     {
       chi_log.Log(LOG_0WARNING)
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
         << "a scattering order of "
-        << material_xs[matid_to_xs_map[mat_id]]->L << " and"
+        << material_xs[matid_to_xs_map[mat_id]]->scattering_order << " and"
         << " the simulation has a scattering order of "
         << options.scattering_order << "."
         << " The higher moments will therefore not be used.";

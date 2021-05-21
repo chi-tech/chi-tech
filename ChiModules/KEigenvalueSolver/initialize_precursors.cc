@@ -36,9 +36,9 @@ void KEigenvalue::Solver::InitializePrecursors()
       double* phi_newp = &phi_new_local[ir];
 
       // ----- If a fissial material with precursors
-      if ((xs->is_fissile) and (xs->J > 0)) {
+      if ((xs->is_fissile) and (xs->num_precursors > 0)) {
         // ----- Loop over precursors
-        for (int j = 0; j < xs->J; ++j)
+        for (int j = 0; j < xs->num_precursors; ++j)
         {
           int j_map = xs->precursor_map[j];
 

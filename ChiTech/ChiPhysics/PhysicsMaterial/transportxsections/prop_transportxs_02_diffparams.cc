@@ -9,17 +9,17 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
   if (diffusion_initialized)
     return;
 
-  diffg.resize(G,1.0);
-  sigma_s_gtog.resize(G,0.0);
-  sigma_rg.resize(G,0.1);
-  sigma_ag.resize(G,0.0);
-  for (int g=0; g<G; g++)
+  diffg.resize(num_groups, 1.0);
+  sigma_s_gtog.resize(num_groups, 0.0);
+  sigma_rg.resize(num_groups, 0.1);
+  sigma_ag.resize(num_groups, 0.0);
+  for (int g=0; g < num_groups; g++)
   {
     //====================================== Determine transport correction
     double sigs_g_1 = 0.0;
     if (transfer_matrix.size()>1)
     {
-      for (int gp=0; gp<G; gp++)
+      for (int gp=0; gp < num_groups; gp++)
       {
         int num_cols = transfer_matrix[1].rowI_indices[gp].size();
         for (int j=0; j<num_cols; j++)
@@ -65,11 +65,11 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
   }//for g
 
   //====================================== Determine absorbtion x-section
-  for (int g=0; g<G; g++)
+  for (int g=0; g < num_groups; g++)
   {
     sigma_ag[g] = sigma_tg[g];
 
-    for (int g2=0; g2<G; g2++)
+    for (int g2=0; g2 < num_groups; g2++)
     {
       int num_cols = transfer_matrix[0].rowI_indices[g2].size();
       for (int j=0; j<num_cols; j++)

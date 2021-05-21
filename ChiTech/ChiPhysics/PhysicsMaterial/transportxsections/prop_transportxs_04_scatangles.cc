@@ -23,15 +23,15 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   std::vector<std::vector<double>> prob_gprime_g;        //Dense version of S[0]
   std::vector<std::vector<double>> prob_gprime_g_normed; //Normalized
 
-  prob_gprime_g.       resize(G,std::vector<double>(G,0.0));
-  prob_gprime_g_normed.resize(G,std::vector<double>(G,0.0));
-  std::vector<double>  prob_sum(G,0.0);
+  prob_gprime_g.       resize(num_groups, std::vector<double>(num_groups, 0.0));
+  prob_gprime_g_normed.resize(num_groups, std::vector<double>(num_groups, 0.0));
+  std::vector<double>  prob_sum(num_groups, 0.0);
 
   std::vector<std::vector<double>> prob_g_gprime_normed; //Transpose to be computed
-  prob_g_gprime_normed.resize(G,std::vector<double>(G,0.0));
+  prob_g_gprime_normed.resize(num_groups, std::vector<double>(num_groups, 0.0));
 
   //============================================= Extract the dense version
-  for (int g=0; g<G; g++)
+  for (int g=0; g < num_groups; g++)
   {
     int num_transfer = transfer_matrix[0].rowI_indices[g].size();
     for (int j=0; j<num_transfer; j++)
@@ -42,9 +42,9 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   }//for g
 
   //============================================= Compute the column sum
-  for (int gp=0; gp<G; gp++)
+  for (int gp=0; gp < num_groups; gp++)
   {
-    for (int g=0; g<G; g++)
+    for (int g=0; g < num_groups; g++)
     {
       prob_gprime_g_normed[g][gp] = prob_gprime_g[g][gp];
 
@@ -57,16 +57,16 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   //============================================= Compute normalization (CDF)
   //This step just normalizes a given row so
   //that its L1-norm is 1.0
-  for (int g=0; g<G; g++)
-    for (int gp=0; gp<G; gp++)
+  for (int g=0; g < num_groups; g++)
+    for (int gp=0; gp < num_groups; gp++)
       prob_gprime_g_normed[g][gp] /= prob_sum[gp];
 
 
   //============================================= copy cdf
   //This will make the CDF from 0.0 to 1.0
-  cdf_gprime_g.resize(G,std::vector<double>(G,0.0));
-  for (int gp=0; gp<G; gp++)
-    for (int g=0; g<G; g++)
+  cdf_gprime_g.resize(num_groups, std::vector<double>(num_groups, 0.0));
+  for (int gp=0; gp < num_groups; gp++)
+    for (int g=0; g < num_groups; g++)
       cdf_gprime_g[g][gp] = prob_gprime_g_normed[g][gp];
 
    cdf_gprime_g = chi_math::Transpose(cdf_gprime_g);
@@ -76,13 +76,13 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   //the moments so we can construct the angles
   std::vector<std::vector<std::vector<double>>> moment_gprime_g_m;
   int max_ord = in_L;
-  if (in_L > L) max_ord = L;
+  if (in_L > scattering_order) max_ord = scattering_order;
 
-  moment_gprime_g_m.resize(G);
-  for (int gp=0; gp<G; gp++)
+  moment_gprime_g_m.resize(num_groups);
+  for (int gp=0; gp < num_groups; gp++)
   {
-    moment_gprime_g_m[gp].resize(G);
-    for (int g=0; g<G; g++)
+    moment_gprime_g_m[gp].resize(num_groups);
+    for (int g=0; g < num_groups; g++)
     {
       moment_gprime_g_m[gp][g].resize(max_ord+1,0.0);
       for (int m=0; m<=max_ord; m++)
@@ -94,12 +94,12 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
 
   //============================================= Compute angles
   GolubFischer gb;
-  scat_angles_gprime_g.resize(G);
-  for (int gp=0; gp<G; gp++)
+  scat_angles_gprime_g.resize(num_groups);
+  for (int gp=0; gp < num_groups; gp++)
   {
-    scat_angles_gprime_g[gp].resize(G);
+    scat_angles_gprime_g[gp].resize(num_groups);
 
-    for (int g=0; g<G; g++)
+    for (int g=0; g < num_groups; g++)
     {
       if (transfer_matrix[0].ValueIJ(g,gp) < 1.0e-16) continue;
 

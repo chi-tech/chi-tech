@@ -29,14 +29,14 @@ void KEigenvalue::Solver::InitializeKSolver()
     **/
     num_precursors = 0;
     for (int x = 0; x < material_xs.size(); x++) {
-      if (material_xs[x]->J > 0) {
+      if (material_xs[x]->num_precursors > 0) {
         // Define the precursor mapping for this material
-        for (int j = 0; j < material_xs[x]->J; ++j) {
+        for (int j = 0; j < material_xs[x]->num_precursors; ++j) {
           material_xs[x]->precursor_map[j] = num_precursors + j;
         }
 
         // Increment the total number of precursors
-        num_precursors += material_xs[x]->J;
+        num_precursors += material_xs[x]->num_precursors;
       }
     }
 
