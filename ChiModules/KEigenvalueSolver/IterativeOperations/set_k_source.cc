@@ -56,7 +56,7 @@ void KEigenvalue::Solver::
     int cell_matid = cell.material_id;
     int xs_id = matid_to_xs_map[cell_matid];
 
-    if ((xs_id<0) || (xs_id>=material_xs.size()))
+    if ( (xs_id<0) || (xs_id>=material_xs.size()) )
     {
       chi_log.Log(LOG_ALLERROR)
       << "Cross-section lookup error\n";
@@ -85,7 +85,7 @@ void KEigenvalue::Solver::
         {
           // ----- Contribute scattering
           double inscat_g = 0.0;
-          if ((ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
@@ -99,7 +99,7 @@ void KEigenvalue::Solver::
 
           // ----- Contribute fission
           double fission_g = 0.0;
-          if ((ell == 0) and (apply_fission_src))
+          if ( (ell == 0) and (apply_fission_src) )
           {
             if (xs->is_fissile)
             {
@@ -116,9 +116,9 @@ void KEigenvalue::Solver::
 
           // ----- Contribute precursors
           double precursor_g = 0.0;
-          if ((ell == 0) and (options.use_precursors))
+          if ( (ell == 0) and (options.use_precursors) )
           {
-            if ((apply_mat_src) and (xs->J > 0))
+            if ( (apply_mat_src) and (xs->J > 0) )
             {
               for (int j=0; j<num_precursors; ++j)
               {
