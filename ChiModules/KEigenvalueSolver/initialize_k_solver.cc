@@ -18,6 +18,8 @@ void KEigenvalue::Solver::InitializeKSolver()
 
   // ----- Init precursors
   if (options.use_precursors) {
+    num_precursors = 0;
+
     // ----- Count precursors and define mapping
     /** NOTE: This computes the total number of precursors
      //       in the problem across all materials and assigns
@@ -27,17 +29,24 @@ void KEigenvalue::Solver::InitializeKSolver()
      //       precursor IDs 0-5 and material 1 will receive
      //       precursor IDs 6-11.
     **/
-    num_precursors = 0;
+    precursor_map.clear();
+
+    // Loop over materials
     for (int x = 0; x < material_xs.size(); x++) {
+      // Material precursor mapping vector
+      std::vector<size_t> mat_map;
+
+      // Define the precursor mapping for this material
       if (material_xs[x]->J > 0) {
-        // Define the precursor mapping for this material
-        for (int j = 0; j < material_xs[x]->J; ++j) {
-          material_xs[x]->precursor_map[j] = num_precursors + j;
-        }
+        for (int j = 0; j < material_xs[x]->J; ++j)
+           mat_map.emplace_back(num_precursors + j);
 
         // Increment the total number of precursors
         num_precursors += material_xs[x]->J;
       }
+
+      // Add mapping to the precursor map
+      precursor_map.emplace_back(mat_map);
     }
 
     // -----Initialize precursor unknown manager and vector

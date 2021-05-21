@@ -16,7 +16,8 @@ private:
   size_t source_event_tag;
 
 public:
-  int num_precursors = 0;
+  int num_precursors;
+  std::vector<std::vector<size_t>> precursor_map;
   double k_eff = 1.0;
 
   // Additional phi vector

@@ -23,7 +23,8 @@ void KEigenvalue::Solver::InitializePrecursors()
   for (auto& cell : grid->local_cells)
   {
     // ----- Cell information
-    auto xs = material_xs[matid_to_xs_map[cell.material_id]];
+    const auto xs_id = matid_to_xs_map[cell.material_id];
+    auto xs = material_xs[xs_id];
     auto cell_fe_view = pwl->GetCellMappingFE(cell.local_id);
     auto& transport_view = cell_transport_views[cell.local_id];
 
@@ -40,7 +41,7 @@ void KEigenvalue::Solver::InitializePrecursors()
         // ----- Loop over precursors
         for (int j = 0; j < xs->J; ++j)
         {
-          int j_map = xs->precursor_map[j];
+          int j_map = precursor_map[xs_id][j];
 
           // ----- Initialize precursors
           double coeff = xs->gamma[j] / xs->lambda[j];

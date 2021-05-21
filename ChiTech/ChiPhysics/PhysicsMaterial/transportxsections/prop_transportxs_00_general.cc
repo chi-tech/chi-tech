@@ -200,7 +200,6 @@ void chi_physics::TransportCrossSections::
   chi_d.resize(num_grps_G);
   for (int g=0; g<G; ++g)
     chi_d[g].resize(num_precursors_J,0.0);
-  precursor_map.resize(num_precursors_J,0);
 
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
