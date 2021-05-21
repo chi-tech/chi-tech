@@ -17,7 +17,7 @@ struct KSPDataContext
   Vec&                     operating_vector;
   chi_mesh::sweep_management::SweepScheduler& sweepScheduler;
   SourceFlags    lhs_scope;
-  size_t last_iteration = -1;
+  int64_t last_iteration = -1;
 
   KSPDataContext(LinearBoltzmann::Solver& in_solver,
                  SweepChunk& in_sweep_chunk,

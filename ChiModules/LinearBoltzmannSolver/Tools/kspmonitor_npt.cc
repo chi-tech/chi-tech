@@ -61,14 +61,14 @@ PetscErrorCode LinearBoltzmann::
 
 
   chi_log.Log(LOG_0) << iter_info.str() << std::endl;
-
+  const double SIXTY_SECOND_INTERVAL = 60000.0; //time in milliseconds
   if (context->groupset.iterative_method == NPT_GMRES)
   {
     if (context->last_iteration == n)
     {
       if (context->solver.options.write_restart_data)
       {
-        if ((chi_program_timer.GetTime()/60000.0) >
+        if ((chi_program_timer.GetTime()/SIXTY_SECOND_INTERVAL) >
           context->solver.last_restart_write +
           context->solver.options.write_restart_interval)
         {
@@ -80,7 +80,8 @@ PetscErrorCode LinearBoltzmann::
                             context->solver.phi_old_local.data(),
                             WITH_DELAYED_PSI);
 
-          context->solver.last_restart_write = chi_program_timer.GetTime()/60000.0;
+          context->solver.last_restart_write =
+            chi_program_timer.GetTime()/SIXTY_SECOND_INTERVAL;
           context->solver.WriteRestartData(
             context->solver.options.write_restart_folder_name,
             context->solver.options.write_restart_file_base);
