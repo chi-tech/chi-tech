@@ -19,7 +19,7 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
     scalar_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groupset.groups.size());
 
     //================================= Initialize field function
-    delta_phi_local.resize(local_dof_count*groupset.groups.size(),0.0);
+    delta_phi_local.resize(local_node_count * groupset.groups.size(), 0.0);
     int g = 0;
     int m = 0;
 
@@ -110,7 +110,7 @@ void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
   int gss = groupset.groups.size();
 
   delta_phi_local.clear();
-  delta_phi_local.resize(local_dof_count*gss,0.0);
+  delta_phi_local.resize(local_node_count * gss, 0.0);
 
   int index = -1;
   for (const auto& cell : grid->local_cells)

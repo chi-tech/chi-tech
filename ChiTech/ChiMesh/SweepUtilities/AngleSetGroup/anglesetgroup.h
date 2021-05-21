@@ -19,7 +19,7 @@ private:
 public:
 
   //###################################################################
-  AngleSetStatus AngleSetGroupAdvance(SweepChunk *sweep_chunk,
+  AngleSetStatus AngleSetGroupAdvance(SweepChunk& sweep_chunk,
                                       int anglesetgroup_number,
                                       const std::vector<size_t>& timing_tags)
   {

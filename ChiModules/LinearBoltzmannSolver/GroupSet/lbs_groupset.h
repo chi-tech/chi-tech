@@ -86,7 +86,7 @@ public:
   void BuildMomDiscOperator(int scatt_order,
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildSubsets();
-  void ZeroPsiDataStructures()
+  void ZeroAngularFluxDataStructures()
   {
     if (psi_to_be_saved)
       psi_new_local.assign(num_psi_unknowns_local,0.0);

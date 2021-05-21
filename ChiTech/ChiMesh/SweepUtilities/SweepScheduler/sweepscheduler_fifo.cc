@@ -9,7 +9,8 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Applies a First-In-First-Out sweep scheduling.*/
-void chi_mesh::sweep_management::SweepScheduler::ScheduleAlgoFIFO()
+void chi_mesh::sweep_management::SweepScheduler::
+  ScheduleAlgoFIFO(SweepChunk& sweep_chunk)
 {
   chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
