@@ -25,11 +25,13 @@ KSPMonitorAChiTech(KSP ksp, PetscInt n, PetscReal rnorm, void *monitordestroy)
     char buff[100];
     if (rnorm/rhs_norm < 1.0e-2)
     {
-      snprintf(buff,100,"Diffusion iteration %4lld - Residual %.3e\n",n,rnorm/rhs_norm);
+      snprintf(buff,100,"Diffusion iteration %4ld - Residual %.3e\n",
+               n,rnorm/rhs_norm);
     }
     else
     {
-      snprintf(buff,100,"Diffusion iteration %4lld - Residual %.7f\n",n,rnorm/rhs_norm);
+      snprintf(buff,100,"Diffusion iteration %4ld - Residual %.7f\n",
+               n,rnorm/rhs_norm);
     }
 
     chi_log.Log(LOG_0) << buff;

@@ -123,7 +123,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
       for (uint64_t v=0; v<poly_cell.vertex_ids.size(); v++)
       {
-        fprintf(of,"face_vertindi[%d][%llu]=%llu\n",cell_g_index,v,poly_cell.vertex_ids[v]);
+        fprintf(of,"face_vertindi[%d][%lu]=%lu\n",cell_g_index,v,poly_cell.vertex_ids[v]);
       }
     }//polygon
 
@@ -173,7 +173,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
             for (uint64_t v=0; v<face.vertex_ids.size(); v++)
             {
-              fprintf(of,"face_vertindi[%d][%llu]=%llu\n",f,v,face.vertex_ids[v]);
+              fprintf(of,"face_vertindi[%d][%lu]=%lu\n",f,v,face.vertex_ids[v]);
             }
           }
 
@@ -206,7 +206,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
           for (uint64_t v=0; v<face.vertex_ids.size(); v++)
           {
-            fprintf(of,"face_vertindi[%d][%llu]=%llu\n",f,v,face.vertex_ids[v]);
+            fprintf(of,"face_vertindi[%d][%lu]=%lu\n",f,v,face.vertex_ids[v]);
           }
 
         }

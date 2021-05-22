@@ -119,12 +119,12 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
   KSPGetOptionsPrefix(ksp,&ksp_name);
   if (rnorm/rhs_norm < 1.0e-2)
   {
-    snprintf(buff,100,"%s iteration %4lld - Residual %.3e\n",
+    snprintf(buff,100,"%s iteration %4ld - Residual %.3e\n",
              ksp_name,n,rnorm/rhs_norm);
   }
   else
   {
-    snprintf(buff,100,"%s iteration %4lld - Residual %.7f\n",
+    snprintf(buff,100,"%s iteration %4ld - Residual %.7f\n",
              ksp_name,n,rnorm/rhs_norm);
   }
 
