@@ -103,9 +103,9 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
   int ff_handle = lua_tonumber(L,1);
   int ff_handle_slave = lua_tonumber(L,2);
   const char* base_name = lua_tostring(L,3);
-  const char* field_name = base_name;
-  if (num_args == 4)
-    field_name = lua_tostring(L,4);
+//const char* field_name = base_name;
+//if (num_args == 4)
+//  field_name = lua_tostring(L,4);
 
   //======================================================= Getting solver
   std::shared_ptr<chi_physics::FieldFunction> ff;
@@ -115,7 +115,7 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
   catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-      << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
+      << "Invalid field function handle in chiExportMultiFieldFunctionToVTKG";
     exit(EXIT_FAILURE);
   }
 
@@ -126,13 +126,16 @@ int chiExportMultiFieldFunctionToVTKG(lua_State *L)
   catch(const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-      << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
+      << "Invalid field function handle in chiExportMultiFieldFunctionToVTKG";
     exit(EXIT_FAILURE);
   }
 
 //  ff->ExportToVTKG(base_name,field_name);
 
 //  ff->ExportMultiToVTKG(ff_slave,base_name,field_name);
+
+  throw std::logic_error("chiExportMultiFieldFunctionToVTKG : not implemented.");
+
   return 0;
 }
 
