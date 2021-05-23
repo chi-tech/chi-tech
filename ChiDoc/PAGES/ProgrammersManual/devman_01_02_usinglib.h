@@ -40,7 +40,7 @@ cmake_minimum_required(VERSION 3.2)
 set(TARGET test_app)
 project(${TARGET} C CXX)
 set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")
-include("${CHI_TECH_DIR}/CHI_RESOURCES/Macros/Downstream.cmake")
+include("${CHI_TECH_DIR}/ChiResources/Macros/Downstream.cmake")
 
 file (GLOB_RECURSE SOURCES "*.cc")
 add_executable(${TARGET} "${SOURCES}")
