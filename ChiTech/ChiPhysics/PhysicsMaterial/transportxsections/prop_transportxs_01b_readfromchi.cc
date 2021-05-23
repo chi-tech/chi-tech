@@ -1,15 +1,15 @@
 #include "material_property_transportxsections.h"
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 #include <string>
 
-/**\defgroup ChiXSFile Chi-Tech Cross-section format
+/**\defgroup ChiXSFile Chi-Tech Cross-section format 1
  *\ingroup LuaPhysicsMaterials
  *
- * An example Chi-Tech cross-section file is shown below:
+ * An example Chi-Tech cross-section file is shown below. The bare-bones
+ * format is shown below with more examples below:
 \code
 # Bla bla bla
 # This header can be as large as you please. The actual processing
@@ -24,20 +24,158 @@ SIGMA_T_END
 
 Comments Bla Bla
 
+TRANSFER_MOMENTS_BEGIN
+#Zeroth moment (l=0)
+M_GPRIME_G_VAL 0 0 0 0.01
+M_GPRIME_G_VAL 0 0 1 0.09
+M_GPRIME_G_VAL 0 1 1 0.08
+
+#(l=1)
+M_GPRIME_G_VAL 1 0 0 -0.001
+M_GPRIME_G_VAL 1 0 1 0.001
+M_GPRIME_G_VAL 1 1 1 0.001
+TRANSFER_MOMENTS_END
+\endcode
+
+## Steady state simulations:
+
+The cross sections can be used in simulations solving the steady state
+Linear Boltzmann Equation of the form:
+
+\f[
+\vec{\Omega}_n \boldsymbol{\cdot} \vec{\nabla} \psi_{ng} +
+\sigma_{tg} \psi_{ng} =
+\sum_{\ell=0}^L \sum_{m=-\ell}^{+\ell} \frac{2\ell+1}{4\pi}
+    Y_{\ell m} (\vec{\Omega}_n)
+    \sum_{g'=0}^{G-1} \sigma_{s\ell,g'{\to}g} \phi_{\ell m,g'} +
+    q_{ext,ng} + q_{fission,ng}
+\f]
+
+The two most prominent items required here includes \f$ \sigma_{tg} \f$ and
+ \f$ \sigma_{s\ell,g'{\to}g} \f$. The latter is an entry in a structure we
+ call a generic transfer matrix for moment \f$ \ell \f$ with rows \f$g=0..G-1\f$
+ and columns \f$g'=0..G-1\f$. These two items are often the only items required
+ in a transport simulation.
+
+ In simulations with fission-sources, cross sections
+ support two formats, the simple combined cross sections without delayed
+ neutrons
+
+\f[
+q_{fission,ng} = \frac{\chi_g}{4\pi}
+ \sum_{g'=0}^{G-1} \nu_{g'} \sigma_{fg'} \phi_{00g'}
+\f]
+
+and those with delayed neutrons, the latter which are currently only used in the
+KEigen solver.
+
+## KEigen-value related items
+As stated before, the cross section file supports two formats, the simple combined cross sections without delayed
+neutrons which are depicted above and those with delayed neutrons shown below
+
+\f[
+q_{fission,ng} = \frac{\chi_g}{4\phi}
+ \sum_{g'=0}^{G-1} \nu_{prompt,g'} \sigma_{fg'} \phi_{00g'}
+ + \sum_{j=0}^{J-1} \frac{\chi_{delayed,jg}}{4\phi} \gamma_j
+    \sum_{g'=0}^{G-1} \nu_{delayed,g'} \sigma_{fg'} \phi_{00g'}
+\f].
+
+## Keyword definitions
+
+- NUM_GROUPS num_groups Required. Specifies the number of groups for this
+  cross-section. Symbol \f$ G \f$.
+- NUM_MOMENTS num_moments Required. The number of transfer matrices to allocate
+  for this cross-section (whether used or not). Typically this number is one
+  greater than the scattering order (i.e., \f$ L+1 \f$)
+- NUM_PRECURSORS num_precursors Optional. Indicates how many precursors are used
+  in this cross section. Symbol \f$ J \f$
+- Optional key words per line:
+  - SIGMA_T_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_T_END.
+    Each line in the block processes the first two words as [Group, sigma_t].
+    Populates the sigma_tg field. Symbol \f$ \sigma_{tg} \f$.
+  - SIGMA_F_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_F_END.
+    Each line in the block processes the first two words as [Group, sigma_f].
+    Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
+  - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END. Each line in
+    the block processes the first two words as [Group, nu]. Populates the
+    nu_sigma_fg field. Upon completing the file processing the nu_sigma_fg field
+    gets multiplied by sigma_fg. Symbol \f$ \nu_g \f$.
+  - NU_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
+    NU_PROMPT_END. Each line in the block processes the first two words as
+    [Group, nu]. Populates the nu_p_sigma_fg field. Upon completing the file
+    processing the nu_p_sigma_fg field gets multiplied by sigma_fg.
+    Symbol \f$ \nu_{prompt,g} \f$.
+  - NU_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
+    NU_DELAYED_END. Each line in the block processes the first two words as
+    [Group, nu]. Populates the nu_d_sigma_fg field. Upon completing the file
+    processing the nu_d_sigma_fg field gets multiplied by sigma_fg.
+    Symbol \f$ \nu_{delayed,g} \f$.
+  - CHI_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
+    CHI_PROMPT_END. Each line in the block processes the first two words as
+    [Group, chi]. Populates the chi_g field. Symbol \f$ \chi_{g} \f$.
+  - DDT_COEFF_BEGIN. Optional. Starts a block that is terminated by a line
+    DDT_COEFF_END. Each line in the block processes the first two words as
+    [Group, ddt_coeff]. Populates the ddt_coeff field.
+    Symbol \f$ \frac{1}{v_g} \f$.
+
+  - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a line
+    PRECURSOR_LAMBDA_END. Each line in the block processes the first two words as
+    [precursor, lambda]. Populates the lambda field (the precursor decay
+    constant). Symbol \f$ \lambda_j \f$.
+  - PRECURSOR_GAMMA_BEGIN. Optional. Starts a block that is terminated by a line
+    PRECURSOR_GAMMA_END. Each line in the block processes the first two words as
+    [precursor, gamma]. Populates the lambda field (the precursor production
+    fraction per fission). Symbol \f$ \gamma_j \f$.
+
+  - CHI_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
+    CHI_DELAYED_END. Each line in the block processes the first word as the
+    group index and the remaining NUM_PRECURSORS words as the the individual
+    precursor's associated delayed spectrum (chi). Populates the chi_d field.
+    Symbol \f$ \chi_{delayed,jg} \f$.
+
+  - TRANSFER_MOMENTS_BEGIN. Optional. Starts a block that is terminated by a line
+    TRANSFER_MOMENTS_END. Each line in the block processes a line only if it
+    starts with the keyword M_GPRIME_G_VAL which needs to be followed by four
+    values [moment,gprime,g,value]. Populates transfer-matrix for moment m,
+    row g, column gprime, with value. Symbol \f$ \sigma_{s\ell,g'{\to}g} \f$.
+- Comments can be between individual blocks but only the TRANSFER_MOMENTS block
+  may have comments between the _BEGIN and _END
+- Comments do not have to start with any specific character since the file
+  format is keyword driven.
+- Any number that is not convertible to its required type (integer, double)
+  will throw an error to that effect.
+- All errors will indicate the current file, line number and nature of the error.
+
+## More Advanced Examples
+\code
+# Bla bla bla
+# This header can be as large as you please. The actual processing
+# starts at NUM_GROUPS as the first word. After that, NUM_MOMENTS needs to
+# be processed before any of the other keywords.
+NUM_GROUPS 2
+NUM_MOMENTS 2
+NUM_PRECURSORS 3
+SIGMA_T_BEGIN
+0   0.5
+1   0.5
+SIGMA_T_END
+
+Comments Bla Bla
+
 
 SIGMA_F_BEGIN
 0   0.01
 1   0.40737
 SIGMA_F_END
 
-NU_BEGIN
-0    2.5
-1    2.5
-NU_END
-CHI_BEGIN
+NU_PROMPT_BEGIN
+0    2.45
+1    2.45
+NU_PROMPT_END
+CHI_PROMPT_BEGIN
 0    1.0
 1    0.0
-CHI_END
+CHI_PROMPT_END
 
 # 1/v terms
 DDT_COEFF_BEGIN
@@ -57,24 +195,32 @@ M_GPRIME_G_VAL 1 0 0 -0.001
 M_GPRIME_G_VAL 1 0 1 0.001
 M_GPRIME_G_VAL 1 1 1 0.001
 TRANSFER_MOMENTS_END
+
+PRECURSOR_LAMBDA_BEGIN
+0		0.1
+1   0.2
+2   0.3
+PRECURSOR_LAMBDA_END
+PRECURSOR_GAMMA_BEGIN
+0		0.25
+1   0.5
+2   0.25
+PRECURSOR_GAMMA_END
+NU_DELAYED_BEGIN
+0		0.01
+1   0.02
+2   0.01
+NU_DELAYED_END
+CHI_DELAYED_BEGIN
+G_PRECURSORJ_VAL 0  0	1.0
+G_PRECURSORJ_VAL 0  1	1.0
+G_PRECURSORJ_VAL 0  2	1.0
+
+G_PRECURSORJ_VAL 1  0	0.0
+G_PRECURSORJ_VAL 1  1	0.0
+G_PRECURSORJ_VAL 1  2	0.0
+CHI_DELAYED_END
 \endcode
-
-## Details:
-
-- NUM_GROUPS     G       Required. Specified the number of groups for this cross-section
-- NUM_MOMENTS   M    Required. Transfer matrices to allocate for this cross-section (whether used or not).
-- Optional key words per line:
-  - SIGMA_T_BEGIN.   Starts a block that is terminated by a line SIGMA_T_END. Each line in the block processes the first two words as [Group, sigma_t]. Populates the sigma_tg field.
-  - SIGMA_F_BEGIN.   Starts a block that is terminated by a line SIGMA_F_END. Each line in the block processes the first two words as [Group, sigma_f]. Populates the sigma_fg field.
-  - NU_BEGIN.   Starts a block that is terminated by a line NU_END. Each line in the block processes the first two words as [Group, nu]. Populates the nu_sigma_fg field. Upon completing the file processing the nu_sigma_fg field gets multiplied by sigma_fg.
-  - CHI_BEGIN.   Starts a block that is terminated by a line CHI_END. Each line in the block processes the first two words as [Group, chi]. Populates the chi_g field.
-  - DDT_COEFF_BEGIN.   Starts a block that is terminated by a line DDT_COEFF_END. Each line in the block processes the first two words as [Group, ddt_coeff]. Populates the ddt_coeff field.
-  - TRANSFER_MOMENTS_BEGIN. Starts a block that is terminated by a line TRANSFER_MOMENTS_END. Each line in the block processes a line only if it starts with the keyword M_GPRIME_G_VAL which needs to be followed by four values [moment,gprime,g,value]. Populates transfer-matrix for moment m, row g, column gprime, with value.
-- Comments can be between individual blocks but only the TRANSFER_MOMENTS block may have comments between the _BEGIN and _END
-- Comments do not have to start with any specific character since the file format is keyword driven.
-- Any number that is not convertible to its required type (integer, double) will throw an error to that effect.
-- All errors will indicate the current file, line number and nature of the error.
-
  * */
 
 //###################################################################
@@ -240,7 +386,7 @@ void chi_physics::TransportCrossSections::
         if (value_str0[0]==0 or value_str1[0]==0 or
             value_str2[0]==0 or value_str3[0]==0)
           throw std::runtime_error("Invalid amount of arguments. "
-                                   "Requires 4 numbers.");
+                                   "Requires 4 numbers.\nLine:" + line_stream.str());
 
         int m        = StrToI(value_str0);
         int gprime   = StrToI(value_str1);
@@ -254,6 +400,8 @@ void chi_physics::TransportCrossSections::
       file.getline(line,250); ++line_number;
       line_stream = std::istringstream(line);
       line_stream >> first_word;
+      if (line_stream.str().empty())
+        sprintf(first_word," ");
     }
   };
 
@@ -266,8 +414,6 @@ void chi_physics::TransportCrossSections::
   {
     std::istringstream line_stream(line);
     line_stream >> first_word;
-
-//    chi_log.Log(LOG_0) << line << " _" << first_word << "_";
 
     if (first_word == "NUM_GROUPS") {line_stream >> G; grabbed_G = true;}
     if (first_word == "NUM_MOMENTS")
@@ -339,13 +485,13 @@ void chi_physics::TransportCrossSections::
     catch (...)
     {
       chi_log.Log(LOG_ALLERROR)
-        << "Nope";
+        << "Unknown error in " << std::string(__FUNCTION__);
       exit(EXIT_FAILURE);
     }
 
     first_word = "";
     not_eof = bool(std::getline(file,line)); ++line_number;
-  }
+  }//while not EOF, read each lines
   L = M-1;
 
   //changes nu_sigma_fg from nu to nu * sigma_fg
