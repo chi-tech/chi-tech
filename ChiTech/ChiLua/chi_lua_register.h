@@ -219,6 +219,7 @@ RegisterFunction(chiPhysicsTransportXSCreate)
 RegisterFunction(chiPhysicsTransportXSSet)
 RegisterFunction(chiPhysicsTransportXSMakeCombined)
 RegisterFunction(chiPhysicsTransportXSGet)
+RegisterFunction(chiPhysicsTransportXSExportToChiTechFormat)
 
 //Property indices
 RegisterConstant(SCALAR_VALUE,           1);

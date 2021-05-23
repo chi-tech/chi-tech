@@ -65,9 +65,9 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 21
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"ChiTest/xs_graphite_pure.data")
+        CHI_XSFILE,"ChiTest/xs_graphite_pure.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"ChiTest/xs_graphite_pure.data")
+        CHI_XSFILE,"ChiTest/xs_graphite_pure.cxs")
 
 src={}
 for g=1,num_groups do

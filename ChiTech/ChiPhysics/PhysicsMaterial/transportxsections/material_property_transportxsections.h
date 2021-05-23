@@ -117,6 +117,9 @@ public:
   //05
   void PushLuaTable(lua_State* L) override;
 
+  //06
+  void ExportToChiFormat(const std::string& file_name);
+
 
 };
 
