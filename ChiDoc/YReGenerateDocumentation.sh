@@ -14,4 +14,3 @@ cd ../../..
 
 #============================== Making main documentation
 doxygen "ChiDoc/DoxyfileLua"
-cd CHI_BUILD
