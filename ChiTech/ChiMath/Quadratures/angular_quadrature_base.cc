@@ -169,7 +169,7 @@ void chi_math::AngularQuadrature::
   int num_moms = m_to_ell_em_map.size();
 
   const auto normalization =
-    std::accumulate(weights.begin(), weights.end(), static_cast<double>(0));
+    std::accumulate(weights.begin(), weights.end(), 0.0);
 
   for (const auto& ell_em : m_to_ell_em_map)
   {

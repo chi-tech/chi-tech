@@ -74,8 +74,7 @@ chi_math::CylindricalAngularQuadrature::
 
   //  weights sum to 2
   const auto integral_weights =
-    std::accumulate(polar_quad.weights.begin(), polar_quad.weights.end(),
-                    static_cast<double>(0));
+    std::accumulate(polar_quad.weights.begin(), polar_quad.weights.end(), 0.0);
   if (std::abs(integral_weights) > 0)
   {
     const auto fac = polar_quad_sum_weights / integral_weights;
@@ -102,8 +101,7 @@ chi_math::CylindricalAngularQuadrature::
   {
     //  weights sum to $\pi$
     const auto integral_weights =
-      std::accumulate(azimu_quad.weights.begin(), azimu_quad.weights.end(),
-                      static_cast<double>(0));
+      std::accumulate(azimu_quad.weights.begin(), azimu_quad.weights.end(), 0.0);
     if (std::abs(integral_weights) > 0)
     {
       const auto fac = azimu_quad_sum_weights / integral_weights;
@@ -220,7 +218,7 @@ chi_math::CylindricalAngularQuadrature::
         << ", fac_diamond_difference = " << fac_diamond_difference[k]
         << ", fac_streaming_operator = " << fac_streaming_operator[k] << std::endl;
     const auto sum_weights =
-      std::accumulate(weights.begin(), weights.end(), static_cast<double>(0));
+      std::accumulate(weights.begin(), weights.end(), 0.0);
     chi_log.Log(LOG_0) << "sum(weights) = " << sum_weights << std::endl;
   }
 }

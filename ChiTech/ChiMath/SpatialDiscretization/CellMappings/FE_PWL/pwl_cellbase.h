@@ -76,7 +76,7 @@ public:
 protected:
   /** Spatial weight function. See also ComputeWeightedUnitIntegrals. */
   virtual double SpatialWeightFunction(const chi_mesh::Vector3& pt) const
-  { return static_cast<double>(0); }
+  { return 0.0; }
   /** Compute spatially-weighted unit integrals from quadrature point data.
    *  Spatial weighting is given by SpatialWeightFunction evaluated at
    *  the real quadrature points. */
