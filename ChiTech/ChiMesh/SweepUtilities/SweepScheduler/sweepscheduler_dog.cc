@@ -17,9 +17,9 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
   //                                                   in preperation for
   //                                                   sorting
   //======================================== Loop over angleset groups
-  for (size_t q=0; q<angle_agg->angle_set_groups.size(); q++)
+  for (size_t q=0; q<angle_agg.angle_set_groups.size(); q++)
   {
-    TAngleSetGroup& angleset_group = angle_agg->angle_set_groups[q];
+    TAngleSetGroup& angleset_group = angle_agg.angle_set_groups[q];
 
     //================================= Loop over anglesets in group
     size_t num_anglesets = angleset_group.angle_sets.size();
@@ -192,18 +192,6 @@ void chi_mesh::sweep_management::SweepScheduler::
         finished = false;
     }//for each angleset rule
   }//while not finished
-
-//  //================================================== Reset all
-//  for (auto angset_group : angle_agg->angle_set_groups)
-//    angset_group->ResetSweep();
-//
-//  for (auto bndry : angle_agg->sim_boundaries)
-//  {
-//    if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
-//    {
-//      auto rbndry = (chi_mesh::sweep_management::BoundaryReflecting*)bndry;
-//      rbndry->ResetAnglesReadyStatus();
-//    }
 //  }
 
   //================================================== Receive delayed data
@@ -212,28 +200,21 @@ void chi_mesh::sweep_management::SweepScheduler::
   while (not received_delayed_data)
   {
     received_delayed_data = true;
-    for (auto sorted_angleset : rule_values)
+    for (auto& sorted_angleset : rule_values)
     {
       auto angleset = sorted_angleset.angle_set;
 
       if (angleset->FlushSendBuffers() == Status::MESSAGES_PENDING)
         received_delayed_data = false;
-      angleset->ReceiveDelayedData(sorted_angleset.set_index);
+      angleset->ReceiveDelayedData(static_cast<int>(sorted_angleset.set_index));
     }
   }
 
-//  for (auto sorted_angleset : rule_values)
-//  {
-//    TAngleSet *angleset = sorted_angleset.angle_set;
-//    angleset->ReceiveDelayedData(sorted_angleset.set_index);
-//  }
-
-
   //================================================== Reset all
-  for (auto& angset_group : angle_agg->angle_set_groups)
+  for (auto& angset_group : angle_agg.angle_set_groups)
     angset_group.ResetSweep();
 
-  for (auto bndry : angle_agg->sim_boundaries)
+  for (auto& bndry : angle_agg.sim_boundaries)
   {
     if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
     {

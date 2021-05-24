@@ -51,7 +51,7 @@ public:
   std::vector<AngSubSet>                       ang_subsets_bot;
   std::vector<int>                             ang_subset_sizes_bot;
 
-  int                                          iterative_method;
+  LinearBoltzmann::IterativeMethod             iterative_method;
   LinearBoltzmann::AngleAggregationType        angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;

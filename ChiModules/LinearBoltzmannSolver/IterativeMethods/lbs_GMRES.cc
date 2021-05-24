@@ -23,7 +23,6 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using GMRES.*/
 bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
                                     int group_set_num,
-                                    SweepChunk& sweep_chunk,
                                     MainSweepScheduler& sweepScheduler,
                                     SourceFlags lhs_src_scope,
                                     SourceFlags rhs_src_scope,
@@ -64,7 +63,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   //=================================================== Create Data context
   //                                                    available inside
   //                                                    Action
-  KSPDataContext data_context(*this, sweep_chunk, groupset, x_temp,
+  KSPDataContext data_context(*this, groupset, x_temp,
                               sweepScheduler, lhs_src_scope);
 
   //=================================================== Create the matrix-shell
@@ -102,14 +101,14 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   //Prepare for sweep
   SetSource(groupset, rhs_src_scope);
 
-  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
-  sweep_chunk.SetDestinationPhi(&phi_new_local);
+  sweepScheduler.sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweepScheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
   groupset.angle_agg.ZeroIncomingDelayedPsi();
   groupset.ZeroAngularFluxDataStructures();
   phi_new_local.assign(phi_new_local.size(),0.0);
 
   //Sweep
-  sweepScheduler.Sweep(sweep_chunk);
+  sweepScheduler.Sweep();
 
   //=================================================== Apply DSA
   if (groupset.apply_wgdsa)
@@ -126,12 +125,12 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   }
 
   //=================================================== Assemble vectors
-  AssembleVector(groupset,q_fixed,phi_new_local.data(),WITH_DELAYED_PSI);
-  AssembleVector(groupset,phi_old,phi_old_local.data(),WITH_DELAYED_PSI);
+  AssemblePETScVecFromSTLvector(groupset, q_fixed, phi_new_local, WITH_DELAYED_PSI);
+  AssemblePETScVecFromSTLvector(groupset, phi_old, phi_old_local, WITH_DELAYED_PSI);
 
   //=================================================== Retool for GMRES
-  sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
-  sweep_chunk.SetDestinationPhi(&phi_new_local);
+  sweepScheduler.sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweepScheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
 
   double phi_old_norm=0.0;
   VecNorm(phi_old,NORM_2,&phi_old_norm);
@@ -160,8 +159,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       << "GMRES solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
-  DisAssembleVector(groupset, phi_new, phi_new_local.data(),WITH_DELAYED_PSI);
-  DisAssembleVector(groupset, phi_new, phi_old_local.data(),WITH_DELAYED_PSI);
+  DisAssemblePETScVecToSTLvector(groupset, phi_new, phi_new_local, WITH_DELAYED_PSI);
+  DisAssemblePETScVecToSTLvector(groupset, phi_new, phi_old_local, WITH_DELAYED_PSI);
 
   //==================================================== Clean up
   KSPDestroy(&ksp);

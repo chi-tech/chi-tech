@@ -17,7 +17,6 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using classic richardson.*/
 bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
                     int group_set_num,
-                    SweepChunk& sweep_chunk,
                     MainSweepScheduler& sweepScheduler,
                     SourceFlags source_flags,
                     bool log_info /* = true*/)
@@ -37,12 +36,10 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Tool the sweep chunk
-  sweep_chunk.SetDestinationPhi(&phi_new_local);
+  sweepScheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
 
   //================================================== Now start iterating
-  double pw_change = 0.0;
   double pw_change_prev = 1.0;
-  double rho = 0.0;
   bool converged = false;
   for (int k=0; k<groupset.max_iterations; k++)
   {
@@ -50,7 +47,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
 
     groupset.ZeroAngularFluxDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
-    sweepScheduler.Sweep(sweep_chunk);
+    sweepScheduler.Sweep();
 
     if (groupset.apply_wgdsa)
     {
@@ -65,12 +62,11 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
       DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
     }
 
-    pw_change = ComputePiecewiseChange(groupset);
+    double pw_change = ComputePiecewiseChange(groupset);
 
-    DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(),
-                                           phi_old_local.data());
+    CopySTLvectorToSTLvector(groupset, phi_new_local, phi_old_local);
 
-    rho = sqrt(pw_change / pw_change_prev);
+    double rho = sqrt(pw_change / pw_change_prev);
     pw_change_prev = pw_change;
 
     if (k==0) rho = 0.0;

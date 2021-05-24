@@ -14,7 +14,6 @@ extern ChiConsole&  chi_console;
 
 #include <iomanip>
 
-
 //###################################################################
 /**Execute the solver.*/
 void LinearBoltzmann::Solver::Execute()
@@ -57,19 +56,20 @@ void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = SetSweepChunk(groupset);
-  MainSweepScheduler sweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    &groupset.angle_agg);
+  MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
+                                     groupset.angle_agg,
+                                     *sweep_chunk);
 
-  if (groupset.iterative_method == NPT_CLASSICRICHARDSON)
+  if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
   {
-    ClassicRichardson(groupset, group_set_num, *sweep_chunk, sweepScheduler,
+    ClassicRichardson(groupset, group_set_num, sweep_scheduler,
                       APPLY_MATERIAL_SOURCE |
                       APPLY_SCATTER_SOURCE |
                       APPLY_FISSION_SOURCE);
   }
-  else if (groupset.iterative_method == NPT_GMRES)
+  else if (groupset.iterative_method == IterativeMethod::GMRES)
   {
-    GMRES(groupset, group_set_num, *sweep_chunk, sweepScheduler,
+    GMRES(groupset, group_set_num, sweep_scheduler,
           APPLY_SCATTER_SOURCE | APPLY_FISSION_SOURCE,
           APPLY_MATERIAL_SOURCE);
   }

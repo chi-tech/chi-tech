@@ -36,7 +36,7 @@ AngleSet(int in_numgrps,
   sweep_buffer.BuildMessageStructure();
 
   delayed_local_norm = 0.0;
-};
+}
 
 //###################################################################
 /**Initializes delayed upstream data. This method gets called
@@ -122,7 +122,7 @@ std::shared_ptr<chi_mesh::sweep_management::SPDS>
 
 //###################################################################
 /**Returns the maximum buffer size from the sweepbuffer.*/
-int chi_mesh::sweep_management::AngleSet::GetMaxBufferMessages()
+int chi_mesh::sweep_management::AngleSet::GetMaxBufferMessages() const
 {
   return sweep_buffer.max_num_mess;
 }
@@ -136,7 +136,7 @@ void chi_mesh::sweep_management::AngleSet::SetMaxBufferMessages(int new_max)
 
 //###################################################################
 /**Returns the number of groups associated with the angleset.*/
-int chi_mesh::sweep_management::AngleSet::GetNumGrps()
+int chi_mesh::sweep_management::AngleSet::GetNumGrps() const
 {
   return num_grps;
 }
@@ -159,9 +159,9 @@ void chi_mesh::sweep_management::AngleSet::ReceiveDelayedData(int angle_set_num)
 //###################################################################
 /**Returns a pointer to a boundary flux data.*/
 double* chi_mesh::sweep_management::AngleSet::
-PsiBndry(int bndry_map,
+PsiBndry(uint64_t bndry_map,
          int angle_num,
-         int cell_local_id,
+         uint64_t cell_local_id,
          int face_num,
          int fi,
          int g,
@@ -181,9 +181,9 @@ PsiBndry(int bndry_map,
 //###################################################################
 /**Returns a pointer to outbound boundary flux data.*/
 double* chi_mesh::sweep_management::AngleSet::
-ReflectingPsiOutBoundBndry(int bndry_map,
+ReflectingPsiOutBoundBndry(uint64_t bndry_map,
                            int angle_num,
-                           int cell_local_id,
+                           uint64_t cell_local_id,
                            int face_num,
                            int fi,
                            int gs_ss_begin)
