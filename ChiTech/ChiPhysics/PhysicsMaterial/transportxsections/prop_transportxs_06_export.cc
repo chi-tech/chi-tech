@@ -18,10 +18,10 @@ void chi_physics::TransportCrossSections::
   //======================================== Writing header info
   ofile << "# Exported cross section from ChiTech\n";
   ofile << "# Date: " << ChiTimer::GetLocalDateTimeString() << "\n";
-  ofile << "NUM_GROUPS " << G << "\n";
-  ofile << "NUM_MOMENTS " << L+1 << "\n";
-  if (J>0)
-    ofile << "NUM_PRECURSORS " << J << "\n";
+  ofile << "NUM_GROUPS " << num_groups << "\n";
+  ofile << "NUM_MOMENTS " << scattering_order+1 << "\n";
+  if (num_precursors>0)
+    ofile << "NUM_PRECURSORS " << num_precursors << "\n";
 
   //======================================== Sigma_t
   ofile << "\n";

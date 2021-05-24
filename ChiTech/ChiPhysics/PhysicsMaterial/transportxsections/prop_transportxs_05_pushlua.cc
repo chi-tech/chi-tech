@@ -11,15 +11,15 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_settable(L,-3);
 
   lua_pushstring(L,"G");
-  lua_pushinteger(L,G);
+  lua_pushinteger(L,static_cast<lua_Integer>(num_groups));
   lua_settable(L,-3);
 
   lua_pushstring(L,"L");
-  lua_pushinteger(L,this->L);
+  lua_pushinteger(L,static_cast<lua_Integer>(scattering_order));
   lua_settable(L,-3);
 
   lua_pushstring(L,"J");
-  lua_pushinteger(L,J);
+  lua_pushinteger(L,static_cast<lua_Integer>(num_precursors));
   lua_settable(L,-3);
 
   lua_pushstring(L,"is_fissile");

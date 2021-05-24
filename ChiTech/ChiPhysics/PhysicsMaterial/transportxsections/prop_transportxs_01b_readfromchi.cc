@@ -415,7 +415,7 @@ void chi_physics::TransportCrossSections::
     std::istringstream line_stream(line);
     line_stream >> first_word;
 
-    if (first_word == "NUM_GROUPS") {line_stream >> G; grabbed_G = true;}
+    if (first_word == "NUM_GROUPS") {line_stream >> num_groups; grabbed_G = true;}
     if (first_word == "NUM_MOMENTS")
     {
       line_stream >> M;
@@ -492,7 +492,7 @@ void chi_physics::TransportCrossSections::
     first_word = "";
     not_eof = bool(std::getline(file,line)); ++line_number;
   }//while not EOF, read each lines
-  L = M-1;
+  scattering_order = M-1;
 
   //changes nu_sigma_fg from nu to nu * sigma_fg
   for (int i = 0; i < num_groups; ++i){
