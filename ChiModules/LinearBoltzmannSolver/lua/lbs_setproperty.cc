@@ -226,7 +226,7 @@ int chiLBSSetProperty(lua_State *L)
       if (numArgs!=5)
         LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
 
-      if (solver->groups.size() == 0)
+      if (solver->groups.empty())
       {
         chi_log.Log(LOG_0ERROR)
           << "In call to chiLBSSetProperty, setting "
@@ -246,7 +246,7 @@ int chiLBSSetProperty(lua_State *L)
         exit(EXIT_FAILURE);
       }
 
-      int table_len = lua_rawlen(L,5);
+      size_t table_len = lua_rawlen(L,5);
       std::vector<double> values(table_len,0.0);
       for (int g=0; g<table_len; g++)
       {
@@ -269,13 +269,13 @@ int chiLBSSetProperty(lua_State *L)
       }
 
       solver->incident_P0_mg_boundaries.push_back(values);
-      int index = solver->incident_P0_mg_boundaries.size()-1;
+      size_t index = solver->incident_P0_mg_boundaries.size()-1;
 
       //bid = XMIN or XMAX or YMIN ... etc
       //index is where it is on the incident_P0_mg_boundaries stack
       solver->boundary_types[bid].first =
         LinearBoltzmann::BoundaryType::INCIDENT_ISOTROPIC;
-      solver->boundary_types[bid].second= index;
+      solver->boundary_types[bid].second= static_cast<int>(index);
 
       chi_log.Log(LOG_0)
         << "Isotropic boundary condition for boundary " << bid

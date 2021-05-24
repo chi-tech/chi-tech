@@ -17,8 +17,8 @@ std::shared_ptr<SweepChunk> LinearBoltzmann::Solver::
         grid,                                    //Spatial grid of cells
         *pwl_sdm,                                //Spatial discretization
         cell_transport_views,                    //Cell transport views
-        &phi_new_local,                          //Destination phi
-        &q_moments_local,                        //Source moments
+        phi_new_local,                           //Destination phi
+        q_moments_local,                        //Source moments
         groupset,                                //Reference groupset
         material_xs,                             //Material cross-sections
         num_moments,

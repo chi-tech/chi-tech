@@ -99,7 +99,7 @@ int chiLBSCreateGroupset(lua_State *L)
   //============================================= Create groupset
   solver->group_sets.emplace_back();
 
-  lua_pushnumber(L,solver->group_sets.size()-1);
+  lua_pushinteger(L,static_cast<lua_Integer>(solver->group_sets.size())-1);
   return 1;
 }
 
@@ -737,31 +737,36 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  if (iter_method == NPT_CLASSICRICHARDSON)
   {
-    groupset->iterative_method = NPT_CLASSICRICHARDSON;
+    using LinearBoltzmann::IterativeMethod;
+    if (iter_method == static_cast<int>(IterativeMethod::CLASSICRICHARDSON))
+    {
+      groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
+    }
+    else if (iter_method ==
+                static_cast<int>(IterativeMethod::CLASSICRICHARDSON_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
+    }
+    else if (iter_method == static_cast<int>(IterativeMethod::GMRES))
+    {
+      groupset->iterative_method = IterativeMethod::GMRES;
+    }
+    else if (iter_method == static_cast<int>(IterativeMethod::GMRES_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::GMRES;
+    }
+    else
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << "Unsupported iterative method specified in call to "
+        << "chiLBSGroupsetSetIterativeMethod.";
+      exit(EXIT_FAILURE);
+    }
   }
-  else if (iter_method == NPT_CLASSICRICHARDSON_CYCLES)
-  {
-    groupset->allow_cycles = true;
-    groupset->iterative_method = NPT_CLASSICRICHARDSON;
-  }
-  else if (iter_method == NPT_GMRES)
-  {
-    groupset->iterative_method = NPT_GMRES;
-  }
-  else if (iter_method == NPT_GMRES_CYCLES)
-  {
-    groupset->allow_cycles = true;
-    groupset->iterative_method = NPT_GMRES;
-  }
-  else
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Unsupported iterative method specified in call to "
-      << "chiLBSGroupsetSetIterativeMethod.";
-    exit(EXIT_FAILURE);
-  }
+
 
   return 0;
 }

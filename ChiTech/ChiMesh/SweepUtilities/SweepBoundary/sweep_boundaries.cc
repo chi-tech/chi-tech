@@ -19,7 +19,7 @@ extern ChiLog& chi_log;
 double* chi_mesh::sweep_management::BoundaryBase::
 HeterogenousPsiIncoming(
                 int angle_num,
-                int cell_local_id,
+                uint64_t cell_local_id,
                 int face_num,
                 int fi,
                 int gs_ss_begin)
@@ -35,7 +35,7 @@ HeterogenousPsiIncoming(
 double* chi_mesh::sweep_management::BoundaryBase::
 HeterogenousPsiOutgoing(
                 int angle_num,
-                int cell_local_id,
+                uint64_t cell_local_id,
                 int face_num,
                 int fi,
                 int gs_ss_begin)
@@ -51,7 +51,7 @@ HeterogenousPsiOutgoing(
 double* chi_mesh::sweep_management::BoundaryReflecting::
 HeterogenousPsiIncoming(
                 int angle_num,
-                int cell_local_id,
+                uint64_t cell_local_id,
                 int face_num,
                 int fi,
                 int gs_ss_begin)
@@ -83,7 +83,7 @@ HeterogenousPsiIncoming(
 double* chi_mesh::sweep_management::BoundaryReflecting::
 HeterogenousPsiOutgoing(
   int angle_num,
-  int cell_local_id,
+  uint64_t cell_local_id,
   int face_num,
   int fi,
   int gs_ss_begin)

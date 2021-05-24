@@ -82,12 +82,12 @@ void LinearBoltzmann::Solver::
         //============================= Loop over groupset groups
         for (int g=gs_i; g<=gs_f; g++)
         {
-          if (apply_mat_src && (m==0))
+          if ( apply_mat_src && (ell == 0) )
             q_mom[g] += src[g];
 
           double inscat_g = 0.0;
           //====================== Apply across-groupset scattering
-          if ((ell < xs->transfer_matrix.size()) && (apply_mat_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_mat_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
@@ -102,7 +102,7 @@ void LinearBoltzmann::Solver::
           }//if moment avail
 
           //====================== Apply within-groupset scattering
-          if ((ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
@@ -119,7 +119,7 @@ void LinearBoltzmann::Solver::
           q_mom[g] += inscat_g;
 
           //====================== Apply accross-groupset fission
-          if ((ell == 0) and (apply_fission_src))
+          if ( (ell == 0) and (apply_fission_src) )
           {
             for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
             {
@@ -133,7 +133,7 @@ void LinearBoltzmann::Solver::
           }//if zeroth moment
 
           //====================== Apply within-groupset fission
-          if ((ell == 0) and (apply_fission_src))
+          if ( (ell == 0) and (apply_fission_src) )
           {
             for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
             {

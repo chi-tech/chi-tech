@@ -160,22 +160,26 @@ public:
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
-                         SweepChunk& sweep_chunk,
-                         MainSweepScheduler & sweepScheduler,
+                         MainSweepScheduler& sweepScheduler,
                          SourceFlags source_flags,
                          bool log_info = true);
   bool GMRES(LBSGroupset& groupset,
              int group_set_num,
-             SweepChunk& sweep_chunk,
-             MainSweepScheduler & sweepScheduler,
+             MainSweepScheduler& sweepScheduler,
              SourceFlags lhs_src_scope,
              SourceFlags rhs_src_scope,
              bool log_info = true);
 
   //Vector assembly
-  void AssembleVector(LBSGroupset& groupset, Vec x, double *y,bool with_delayed_psi=false);
-  void DisAssembleVector(LBSGroupset& groupset, Vec x_src, double *y,bool with_delayed_psi=false);
-  void DisAssembleVectorLocalToLocal(LBSGroupset& groupset, double *x_src, double *y);
+  void AssemblePETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
+                                     const std::vector<double>& y,
+                                     bool with_delayed_psi=false);
+  void DisAssemblePETScVecToSTLvector(LBSGroupset& groupset, Vec x_src,
+                                      std::vector<double>& y,
+                                      bool with_delayed_psi=false);
+  void CopySTLvectorToSTLvector(LBSGroupset& groupset,
+                                const std::vector<double>& x_src,
+                                std::vector<double>& y);
 
 };
 

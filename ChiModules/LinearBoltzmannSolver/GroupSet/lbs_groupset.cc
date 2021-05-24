@@ -15,7 +15,7 @@ extern ChiMPI& chi_mpi;
 LBSGroupset::LBSGroupset()
 {
   quadrature = nullptr;
-  iterative_method = NPT_GMRES;
+  iterative_method = LinearBoltzmann::IterativeMethod::NONE;
   angleagg_method  = LinearBoltzmann::AngleAggregationType::POLAR;
   master_num_grp_subsets = 1;
   master_num_ang_subsets = 1;
