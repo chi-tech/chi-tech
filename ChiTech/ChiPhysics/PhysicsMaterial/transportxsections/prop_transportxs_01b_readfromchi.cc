@@ -74,11 +74,14 @@ As stated before, the cross section file supports two formats, the simple combin
 neutrons which are depicted above and those with delayed neutrons shown below
 
 \f[
-q_{fission,ng} = \frac{\chi_g}{4\phi}
+q_{fission,ng} = \frac{\chi_g}{4\pi}
  \sum_{g'=0}^{G-1} \nu_{prompt,g'} \sigma_{fg'} \phi_{00g'}
- + \sum_{j=0}^{J-1} \frac{\chi_{delayed,jg}}{4\phi} \gamma_j
+ + \sum_{j=0}^{J-1} \frac{\chi_{delayed,jg}}{4\pi} \gamma_j
     \sum_{g'=0}^{G-1} \nu_{delayed,g'} \sigma_{fg'} \phi_{00g'}
 \f].
+
+Codes may also choose to update precursor concentrations for which their decay
+constants, \f$ \lambda_j \f$ are required.
 
 ## Keyword definitions
 
