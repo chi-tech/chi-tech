@@ -19,11 +19,11 @@ namespace chi_physics
 class TransportCrossSections : public chi_physics::MaterialProperty
 {
 public:
-  int G=0;                                ///< Total number of Groups
-  int L=0;                                ///< Legendre scattering order
-  int J=0;                                ///< Number of precursors
-  bool is_fissile = false;                ///< Fissile or not
-  std::vector<int> precursor_map;         ///< Precursor mapping
+  size_t num_groups=0;                     ///< Total number of Groups
+  size_t scattering_order=0;               ///< Legendre scattering order
+  size_t num_precursors=0;                 ///< Number of precursors
+  bool is_fissile = false;                 ///< Fissile or not
+  std::vector<size_t> precursor_map;       ///< Precursor mapping
 
   std::vector<double> sigma_tg;           ///< Total cross-section
   std::vector<double> sigma_fg;           ///< Sigmaf cross-section
@@ -68,7 +68,7 @@ private:
 private:
   void Reset()
   {
-    G=L=J=0;
+    num_groups= scattering_order= num_precursors=0;
 
     sigma_tg.clear();
     sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
