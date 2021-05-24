@@ -105,7 +105,7 @@ void chi_physics::TransportCrossSections::
   std::string sectionChecker;
 
   //num moments
-  int M = L;
+  int M = scattering_order;
 
   //#############################################
   /**Lambda for converting strings to doubles.*/
@@ -269,29 +269,29 @@ void chi_physics::TransportCrossSections::
 
 //    chi_log.Log(LOG_0) << line << " _" << first_word << "_";
 
-    if (first_word == "NUM_GROUPS") {line_stream >> G; grabbed_G = true;}
+    if (first_word == "NUM_GROUPS") {line_stream >> num_groups; grabbed_G = true;}
     if (first_word == "NUM_MOMENTS")
     {
       line_stream >> M;
       if (grabbed_G)
       {
-        sigma_tg.resize(G,0.0);
+        sigma_tg.resize(num_groups, 0.0);
         sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
         nu_p_sigma_fg = nu_d_sigma_fg = nu_sigma_fg;
-        transfer_matrix.resize(M,chi_math::SparseMatrix(G,G));
+        transfer_matrix.resize(M,chi_math::SparseMatrix(num_groups, num_groups));
       }
     }
     if (first_word == "NUM_PRECURSORS")
     {
-      line_stream >> J;
-      lambda.resize(J,0.0);
+      line_stream >> num_precursors;
+      lambda.resize(num_precursors, 0.0);
       gamma = lambda;
     
       if (grabbed_G)
       {
-        chi_d.resize(G);
-        for (int g=0; g<G; ++g)
-          chi_d[g].resize(J);
+        chi_d.resize(num_groups);
+        for (int g=0; g < num_groups; ++g)
+          chi_d[g].resize(num_precursors);
       }
     }
 
@@ -302,16 +302,16 @@ void chi_physics::TransportCrossSections::
       auto& f = file;
       auto& fw = first_word;
 
-      if (fw == "SIGMA_T_BEGIN")             Read1DXS ("SIGMA_T",sigma_tg,f,G,ln,ls);
-      if (fw == "SIGMA_F_BEGIN")             Read1DXS("SIGMA_F",sigma_fg,f,G,ln,ls);
-      if (fw == "NU_BEGIN")                  Read1DXS("NU",nu_sigma_fg,f,G,ln,ls);
-      if (fw == "NU_PROMPT_BEGIN")           Read1DXS("NU_PROMPT",nu_p_sigma_fg,f,G,ln,ls);
-      if (fw == "NU_DELAYED_BEGIN")          Read1DXS("NU_DELAYED",nu_d_sigma_fg,f,G,ln,ls);
-      if (fw == "CHI_PROMPT_BEGIN")          Read1DXS("CHI_PROMPT",chi_g,f,G,ln,ls);
-      if (fw == "DDT_COEFF_BEGIN")           Read1DXS("DDT_COEFF",ddt_coeff,f,G,ln,ls);
+      if (fw == "SIGMA_T_BEGIN")             Read1DXS ("SIGMA_T", sigma_tg, f, num_groups, ln, ls);
+      if (fw == "SIGMA_F_BEGIN")             Read1DXS("SIGMA_F", sigma_fg, f, num_groups, ln, ls);
+      if (fw == "NU_BEGIN")                  Read1DXS("NU", nu_sigma_fg, f, num_groups, ln, ls);
+      if (fw == "NU_PROMPT_BEGIN")           Read1DXS("NU_PROMPT", nu_p_sigma_fg, f, num_groups, ln, ls);
+      if (fw == "NU_DELAYED_BEGIN")          Read1DXS("NU_DELAYED", nu_d_sigma_fg, f, num_groups, ln, ls);
+      if (fw == "CHI_PROMPT_BEGIN")          Read1DXS("CHI_PROMPT", chi_g, f, num_groups, ln, ls);
+      if (fw == "DDT_COEFF_BEGIN")           Read1DXS("DDT_COEFF", ddt_coeff, f, num_groups, ln, ls);
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
-        ReadTransferMatrix("TRANSFER_MOMENTS",transfer_matrix,f,G,ln,ls);
+        ReadTransferMatrix("TRANSFER_MOMENTS", transfer_matrix, f, num_groups, ln, ls);
 
       for (auto& sig_f : sigma_fg) {
         if (sig_f > 0.0) {
@@ -320,11 +320,11 @@ void chi_physics::TransportCrossSections::
         }
       }
 
-      if ((J>0) and (is_fissile)) {
-        if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA",lambda,f,J,ln,ls);
-        if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA",gamma,f,J,ln,ls);
+      if ((num_precursors > 0) and (is_fissile)) {
+        if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA", lambda, f, num_precursors, ln, ls);
+        if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA", gamma, f, num_precursors, ln, ls);
         if (fw == "CHI_DELAYED_BEGIN")
-          ReadDelayedChi("CHI_DELAYED",chi_d,f,G,ln,ls);   
+          ReadDelayedChi("CHI_DELAYED", chi_d, f, num_groups, ln, ls);
       } 
     }
 
@@ -346,10 +346,10 @@ void chi_physics::TransportCrossSections::
     first_word = "";
     not_eof = bool(std::getline(file,line)); ++line_number;
   }
-  L = M-1;
+  scattering_order = M - 1;
 
   //changes nu_sigma_fg from nu to nu * sigma_fg
-  for (int i = 0; i<G;++i){
+  for (int i = 0; i < num_groups; ++i){
     nu_sigma_fg[i] = nu_sigma_fg[i]*sigma_fg[i];
     nu_p_sigma_fg[i] = nu_p_sigma_fg[i]*sigma_fg[i];
     nu_d_sigma_fg[i] = nu_d_sigma_fg[i]*sigma_fg[i];

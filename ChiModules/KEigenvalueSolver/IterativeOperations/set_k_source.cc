@@ -118,7 +118,7 @@ void KEigenvalue::Solver::
           double precursor_g = 0.0;
           if ( (ell == 0) and (options.use_precursors) )
           {
-            if ( (apply_mat_src) and (xs->J > 0) )
+            if ((apply_mat_src) and (xs->num_precursors > 0))
             {
               for (int j=0; j<num_precursors; ++j)
               {
