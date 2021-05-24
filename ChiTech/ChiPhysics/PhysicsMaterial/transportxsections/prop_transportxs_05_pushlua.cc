@@ -11,11 +11,11 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_settable(L,-3);
 
   lua_pushstring(L,"G");
-  lua_pushnumber(L, num_groups);
+  lua_pushinteger(L,G);
   lua_settable(L,-3);
 
   lua_pushstring(L,"L");
-  lua_pushnumber(L,this->scattering_order);
+  lua_pushinteger(L,this->L);
   lua_settable(L,-3);
 
   lua_pushstring(L,"J");
