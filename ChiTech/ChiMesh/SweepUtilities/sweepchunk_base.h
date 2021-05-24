@@ -7,17 +7,20 @@
 /**Sweep work function*/
 class chi_mesh::sweep_management::SweepChunk
 {
-public:
-  std::vector<double>*        x;
-  bool                        surface_source_active;
+private:
+  std::vector<double>* x;
+  bool surface_source_active;
 
+public:
   /**
    * Convenient typdef for the moment call back function. See moment_callbacks.
    *  Arguments are:
    *  chi_mesh::sweep_management::SweepChunk *
    *  chi_mesh::sweep_management::AngleSet *
    */
-  typedef std::function<void(chi_mesh::sweep_management::SweepChunk * sweeper, chi_mesh::sweep_management::AngleSet* angle_set)> MomentCallbackF;
+  typedef std::function<void(chi_mesh::sweep_management::SweepChunk * sweeper,
+                             chi_mesh::sweep_management::AngleSet* angle_set)>
+                             MomentCallbackF;
 
   /**
    * Functions of type MomentCallbackF can be added to the moment_callbacks
@@ -27,14 +30,20 @@ public:
    */
   std::vector<MomentCallbackF> moment_callbacks;
 
-  SweepChunk(std::vector<double>* destination_phi, bool suppress_src)
-    : x(destination_phi), surface_source_active(suppress_src)
+  SweepChunk(std::vector<double>& destination_phi, bool suppress_src)
+    : x(&destination_phi), surface_source_active(suppress_src)
   {}
 
   /**Sets the location where flux moments are to be written.*/
-  void SetDestinationPhi(std::vector<double>* destination_phi)
+  void SetDestinationPhi(std::vector<double>& destination_phi)
   {
-    x = destination_phi;
+    x = (&destination_phi);
+  }
+
+  /**Returns a reference to the output vector.*/
+  std::vector<double>& GetDestinationPhi()
+  {
+    return *x;
   }
 
   /**Activates or deactives the surface src flag.*/
@@ -42,6 +51,10 @@ public:
   {
     surface_source_active = flag_value;
   }
+
+  /**Returns the surface src-active flag.*/
+  bool IsSurfaceSourceActive() const
+  {return surface_source_active;}
 
   virtual ~SweepChunk() = default;
 

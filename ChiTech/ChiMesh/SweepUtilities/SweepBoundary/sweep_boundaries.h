@@ -45,13 +45,13 @@ public:
 
   virtual double* HeterogenousPsiIncoming(
                                   int angle_num,
-                                  int cell_local_id,
+                                  uint64_t cell_local_id,
                                   int face_num,
                                   int fi,
                                   int gs_ss_begin);
   virtual double* HeterogenousPsiOutgoing(
                                   int angle_num,
-                                  int cell_local_id,
+                                  uint64_t cell_local_id,
                                   int face_num,
                                   int fi,
                                   int gs_ss_begin);
@@ -122,13 +122,13 @@ public:
 
   double* HeterogenousPsiIncoming(
                           int angle_num,
-                          int cell_local_id,
+                          uint64_t cell_local_id,
                           int face_num,
                           int fi,
                           int gs_ss_begin) override;
   double* HeterogenousPsiOutgoing(
                           int angle_num,
-                          int cell_local_id,
+                          uint64_t cell_local_id,
                           int face_num,
                           int fi,
                           int gs_ss_begin) override;
