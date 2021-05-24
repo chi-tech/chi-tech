@@ -88,7 +88,7 @@ void LinearBoltzmann::Solver::
 
           double inscat_g = 0.0;
           //====================== Apply across-groupset scattering
-          if ( (ell < xs->transfer_matrix.size()) && (apply_ags_scatter_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_mat_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
@@ -103,7 +103,7 @@ void LinearBoltzmann::Solver::
           }//if moment avail
 
           //====================== Apply within-groupset scattering
-          if ( (ell < xs->transfer_matrix.size()) && (apply_wgs_scatter_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
