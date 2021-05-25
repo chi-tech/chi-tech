@@ -85,19 +85,19 @@ void chi_physics::TransportCrossSections::
   {
     ofile << "\n";
     ofile << "TRANSFER_MOMENTS_BEGIN\n";
-    for (int ell=0; ell<transfer_matrix.size(); ++ell)
+    for (size_t ell=0; ell<transfer_matrix.size(); ++ell)
     {
       if (ell==0) ofile << "#Zeroth moment (l=0)\n";
       else        ofile << "#(l=" << ell << ")\n";
 
       const auto& matrix = transfer_matrix[ell];
 
-      for (int g=0; g<matrix.rowI_values.size(); ++g)
+      for (size_t g=0; g<matrix.rowI_values.size(); ++g)
       {
         const auto& col_indices = matrix.rowI_indices[g];
         const auto& col_values  = matrix.rowI_values[g];
 
-        for (int k=0; k<col_indices.size(); ++k)
+        for (size_t k=0; k<col_indices.size(); ++k)
         {
           size_t gprime = col_indices[k];
           ofile << "M_GPRIME_G_VAL " << ell << " "

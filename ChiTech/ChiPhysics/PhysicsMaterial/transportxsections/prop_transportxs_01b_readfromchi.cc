@@ -11,7 +11,6 @@ extern ChiLog& chi_log;
  * An example Chi-Tech cross-section file is shown below. The bare-bones
  * format is shown below with more examples below:
 \code
-# Bla bla bla
 # This header can be as large as you please. The actual processing
 # starts at NUM_GROUPS as the first word. After that, NUM_MOMENTS needs to
 # be processed before any of the other keywords.
@@ -22,7 +21,7 @@ SIGMA_T_BEGIN
 1   0.5
 SIGMA_T_END
 
-Comments Bla Bla
+Comments
 
 TRANSFER_MOMENTS_BEGIN
 #Zeroth moment (l=0)
@@ -153,7 +152,6 @@ constants, \f$ \lambda_j \f$ are required.
 
 ## More Advanced Examples
 \code
-# Bla bla bla
 # This header can be as large as you please. The actual processing
 # starts at NUM_GROUPS as the first word. After that, NUM_MOMENTS needs to
 # be processed before any of the other keywords.
@@ -165,7 +163,7 @@ SIGMA_T_BEGIN
 1   0.5
 SIGMA_T_END
 
-Comments Bla Bla
+Comments
 
 
 SIGMA_F_BEGIN
@@ -254,6 +252,8 @@ void chi_physics::TransportCrossSections::
   std::string line;
   std::string word, first_word;
   std::string sectionChecker;
+  bool grabbed_G = false;
+  bool grabbed_M = false;
 
   //num moments
   size_t M = scattering_order+1; //just to init M
@@ -288,13 +288,21 @@ void chi_physics::TransportCrossSections::
     return value;
   };
 
+  auto ThrowGandMError = [file_name]()
+  {
+    throw std::runtime_error("ChiTech format cross-section file "
+                             + file_name + "is trying to write data without "
+                             "first processing NUM_GROUPS and NUM_MOMENTS.");
+  };
+
   //#############################################
   /**Lambda function for reading in the 1d vectors.*/
-  auto Read1DXS = [StrToD,StrToI]
+  auto Read1DXS = [StrToD,StrToI,grabbed_G,grabbed_M,ThrowGandMError]
     (std::string keyword,std::vector<double>& xs,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
   {
+    if ((not grabbed_G) or (not grabbed_M)) ThrowGandMError();
     int g=-1;
     char first_word[250];
     char line[250];
@@ -324,11 +332,12 @@ void chi_physics::TransportCrossSections::
 
   //#############################################
   /**Lambda reading the delayed chi matrix.*/
-  auto ReadDelayedChi = [StrToD,StrToI]
+  auto ReadDelayedChi = [StrToD,StrToI,grabbed_G,grabbed_M,ThrowGandMError]
     (std::string keyword,std::vector<std::vector<double>>& chi,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
   {
+    if ((not grabbed_G) or (not grabbed_M)) ThrowGandMError();
     char first_word[250];
     char line[250];
     char value_str0[250],value_str1[250],value_str2[250];
@@ -367,11 +376,12 @@ void chi_physics::TransportCrossSections::
 
   //#############################################
   /**Lambda reading a transfer matrix.*/
-  auto ReadTransferMatrix = [StrToD,StrToI]
+  auto ReadTransferMatrix = [StrToD,StrToI,grabbed_G,grabbed_M,ThrowGandMError]
     (std::string keyword,std::vector<chi_math::SparseMatrix>& matrix,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
   {
+    if ((not grabbed_G) or (not grabbed_M)) ThrowGandMError();
     char first_word[250];
     char line[250];
     char value_str0[250],value_str1[250],value_str2[250],value_str3[250];
@@ -413,7 +423,6 @@ void chi_physics::TransportCrossSections::
   };
 
   //================================================== Read file line by line
-  bool grabbed_G = false;
   int line_number=0;
   bool not_eof = bool(std::getline(file,line)); ++line_number;
   while (not_eof)
@@ -429,6 +438,7 @@ void chi_physics::TransportCrossSections::
     if (first_word == "NUM_MOMENTS")
     {
       line_stream >> M;
+      grabbed_M = true;
       if (grabbed_G)
       {
         sigma_tg.resize(num_groups, 0.0);
