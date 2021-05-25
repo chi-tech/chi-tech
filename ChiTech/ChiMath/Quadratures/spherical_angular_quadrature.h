@@ -24,7 +24,7 @@ public:
   /** Default destructor. */
   virtual ~SphericalAngularQuadrature() = default;
 
-  void MakeHarmonicIndices(int scatt_order, int dimension) override;
+  void MakeHarmonicIndices(unsigned int scattering_order, int dimension) override;
 private:
   /** Initialize with one-dimensional quadrature. */
   void Initialize(const chi_math::Quadrature& quad_polar,

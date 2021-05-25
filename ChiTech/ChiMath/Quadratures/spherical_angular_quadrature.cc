@@ -191,12 +191,12 @@ chi_math::SphericalAngularQuadrature::InitializeParameters()
 
 
 void
-chi_math::SphericalAngularQuadrature::MakeHarmonicIndices(int scatt_order, int dimension)
+chi_math::SphericalAngularQuadrature::MakeHarmonicIndices(unsigned int scattering_order, int dimension)
 {
   if (m_to_ell_em_map.empty())
   {
     if (dimension == 1)
-      for (unsigned int l = 0; l <= scatt_order; ++l)
+      for (unsigned int l = 0; l <= scattering_order; ++l)
         m_to_ell_em_map.emplace_back(l, 0);
     else
       throw std::invalid_argument("chi_math::SphericalAngularQuadrature::MakeHarmonicIndices : "

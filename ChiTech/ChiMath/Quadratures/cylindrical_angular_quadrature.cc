@@ -263,19 +263,19 @@ chi_math::CylindricalAngularQuadrature::InitializeParameters()
 
 
 void
-chi_math::CylindricalAngularQuadrature::MakeHarmonicIndices(int scatt_order, int dimension)
+chi_math::CylindricalAngularQuadrature::MakeHarmonicIndices(unsigned int scattering_order, int dimension)
 {
   if (m_to_ell_em_map.empty())
   {
     if (dimension == 1)
     {
-      for (unsigned int l = 0; l <= scatt_order; ++l)
+      for (unsigned int l = 0; l <= scattering_order; ++l)
         for (int m = 0; m <= l; ++m)
           if ((l + m) % 2 == 0)
             m_to_ell_em_map.emplace_back(l, m);
     }
     else if (dimension == 2)
-      for (unsigned int l = 0; l <= scatt_order; ++l)
+      for (unsigned int l = 0; l <= scattering_order; ++l)
         for (int m = 0; m <= l; ++m)
           m_to_ell_em_map.emplace_back(l, m);
     else

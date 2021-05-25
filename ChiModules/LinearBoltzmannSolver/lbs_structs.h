@@ -27,7 +27,7 @@ struct Options
 
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
   SDMType sd_type = SDMType::UNDEFINED;
-  int  scattering_order=1;
+  unsigned int scattering_order=1;
   int  sweep_eager_limit= 32000;;
 
   bool read_restart_data=false;

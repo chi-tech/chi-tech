@@ -34,7 +34,7 @@ public:
   /** Default destructor. */
   virtual ~CylindricalAngularQuadrature() = default;
 
-  void MakeHarmonicIndices(int scatt_order, int dimension) override;
+  void MakeHarmonicIndices(unsigned int scattering_order, int dimension) override;
 private:
   /** Initialize with one-dimensional quadratures: a polar quadrature and
    *  a possibly unique azimuthal quadrature for each polar level. */

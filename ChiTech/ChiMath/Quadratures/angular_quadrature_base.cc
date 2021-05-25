@@ -77,22 +77,22 @@ void chi_math::AngularQuadrature::
 /**Populates a map of moment m to the Spherical Harmonic indices
  * required.*/
 void chi_math::AngularQuadrature::
-MakeHarmonicIndices(int scatt_order, int dimension)
+MakeHarmonicIndices(unsigned int scattering_order, int dimension)
 {
   if (m_to_ell_em_map.empty())
   {
     if (dimension == 1)
-      for (int ell=0; ell<=scatt_order; ell++)
+      for (unsigned int ell=0; ell<=scattering_order; ell++)
         m_to_ell_em_map.emplace_back(ell,0);
     else if (dimension == 2)
-      for (int ell=0; ell<=scatt_order; ell++)
+      for (unsigned int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m+=2)
         {
           if (ell == 0 or m != 0)
             m_to_ell_em_map.emplace_back(ell,m);
         }
     else if (dimension == 3)
-      for (int ell=0; ell<=scatt_order; ell++)
+      for (unsigned int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m++)
           m_to_ell_em_map.emplace_back(ell,m);
   }
@@ -101,12 +101,12 @@ MakeHarmonicIndices(int scatt_order, int dimension)
 //###################################################################
 /**Computes the discrete to moment operator.*/
 void chi_math::AngularQuadrature::
-  BuildDiscreteToMomentOperator(int scatt_order, int dimension)
+  BuildDiscreteToMomentOperator(unsigned int scattering_order, int dimension)
 {
   if (d2m_op_built) return;
 
   d2m_op.clear();
-  MakeHarmonicIndices(scatt_order,dimension);
+  MakeHarmonicIndices(scattering_order,dimension);
 
   int num_angles = abscissae.size();
   int num_moms = m_to_ell_em_map.size();
@@ -158,12 +158,12 @@ void chi_math::AngularQuadrature::
 //###################################################################
 /**Computes the moment to discrete operator.*/
 void chi_math::AngularQuadrature::
-  BuildMomentToDiscreteOperator(int scatt_order, int dimension)
+  BuildMomentToDiscreteOperator(unsigned int scattering_order, int dimension)
 {
   if (m2d_op_built) return;
 
   m2d_op.clear();
-  MakeHarmonicIndices(scatt_order,dimension);
+  MakeHarmonicIndices(scattering_order,dimension);
 
   int num_angles = abscissae.size();
   int num_moms = m_to_ell_em_map.size();
