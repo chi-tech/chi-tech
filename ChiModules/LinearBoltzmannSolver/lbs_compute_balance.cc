@@ -11,8 +11,6 @@ extern ChiLog& chi_log;
 /**Compute balance.*/
 void LinearBoltzmann::Solver::ComputeBalance()
 {
-  chi_log.Log() << "Computing balance.";
-
   auto pwld =
     std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
   if (not pwld) throw std::logic_error("Trouble getting PWLD-SDM in " +
@@ -26,44 +24,28 @@ void LinearBoltzmann::Solver::ComputeBalance()
   //======================================== Sweep all groupsets to populate
   //                                         outflow
   auto phi_temp = phi_new_local;
-  auto mat_src = phi_temp;
-  mat_src.assign(mat_src.size(),0.0);
-  int gs=0;
   for (auto& groupset : group_sets)
   {
-    chi_log.Log() << "******************** Sweeping GS " << gs;
-    ComputeSweepOrderings(groupset);
-    InitFluxDataStructures(groupset);
-
     auto sweep_chunk = SetSweepChunk(groupset);
     MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
                                        groupset.angle_agg,
                                        *sweep_chunk);
 
+
     sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_temp);
     sweep_scheduler.sweep_chunk.SetSurfaceSourceActiveFlag(true);
     SetSource(groupset,APPLY_MATERIAL_SOURCE);
 
-    for (size_t i=0; i<mat_src.size(); ++i)
-      mat_src[i] += q_moments_local[i];
-
     phi_temp.assign(phi_temp.size(),0.0);
     sweep_scheduler.Sweep();
-
-    ResetSweepOrderings(groupset);
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    ++gs;
   }//for groupset
-
-  chi_log.Log() << "Computing items";
 
   //======================================== Compute absorbtion, material-source
   //                                         and in-flow
   double out_flow=0.0;
   double in_flow=0.0;
   double absorbtion=0.0;
-  double IntV_q=0.0;
+  double mat_source=0.0;
   size_t num_groups=groups.size();
   for (auto& cell : grid->local_cells)
   {
@@ -83,15 +65,15 @@ void LinearBoltzmann::Solver::ComputeBalance()
       {
         size_t imap = transport_view.MapDOF(i,0,g);
         double phi_0g = phi_old_local[imap];
-        double q_0g   = mat_src[imap];
+        double q_0g   = q_moments_local[imap];
 
-//        absorbtion += sigma_ag[g]*phi_0g*IntV_shapeI[i];
-        IntV_q += q_0g * IntV_shapeI[i];
+        absorbtion += sigma_ag[g]*phi_0g*IntV_shapeI[i];
+        mat_source += q_0g*IntV_shapeI[i];
       }//for g
   }//for cell
 
   //======================================== Consolidate local balances
-  double local_balance = IntV_q + in_flow - absorbtion - out_flow;
+  double local_balance = mat_source + in_flow - absorbtion - out_flow;
   double globl_balance = 0.0;
 
   MPI_Allreduce(&local_balance,   //sendbuf
@@ -100,10 +82,6 @@ void LinearBoltzmann::Solver::ComputeBalance()
                 MPI_SUM,          //operation
                 MPI_COMM_WORLD);  //communicator
 
-  chi_log.Log(LOG_ALL) << "Local balance: "
-                << std::setprecision(6) << std::scientific
-                << local_balance;
-  MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log() << "Global balance: "
                 << std::setprecision(6) << std::scientific
                 << globl_balance;
