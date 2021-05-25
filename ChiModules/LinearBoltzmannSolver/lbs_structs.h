@@ -92,7 +92,11 @@ public:
 
   void ZeroOutflow() {outflow.assign(outflow.size(),0.0);}
   void AddOutflow(int g, double intS_mu_psi) {outflow[g] += intS_mu_psi;}
-  double GetOutflow(int g) const {return outflow[g];}
+  double GetOutflow(int g) const
+  {
+    if (g<outflow.size()) return outflow[g];
+    else return 0.0;
+  }
 };
 
 }
