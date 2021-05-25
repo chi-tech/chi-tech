@@ -144,7 +144,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 //###################################################################
 /**Returns a locally stored finite element view.*/
 std::shared_ptr<CellMappingFE_PWL>
-  SpatialDiscretization_PWLC::GetCellMappingFE(int cell_local_index)
+  SpatialDiscretization_PWLC::GetCellMappingFE(uint64_t cell_local_index)
 {
 
   if (mapping_initialized)
