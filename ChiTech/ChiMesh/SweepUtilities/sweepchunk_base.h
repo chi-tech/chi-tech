@@ -9,7 +9,7 @@ class chi_mesh::sweep_management::SweepChunk
 {
 public:
   std::vector<double>*        x;
-  bool                        suppress_surface_src;
+  bool                        surface_source_active;
 
   /**
    * Convenient typdef for the moment call back function. See moment_callbacks.
@@ -28,13 +28,19 @@ public:
   std::vector<MomentCallbackF> moment_callbacks;
 
   SweepChunk(std::vector<double>* destination_phi, bool suppress_src)
-    : x(destination_phi), suppress_surface_src(suppress_src)
+    : x(destination_phi), surface_source_active(suppress_src)
   {}
 
   /**Sets the location where flux moments are to be written.*/
   void SetDestinationPhi(std::vector<double>* destination_phi)
   {
     x = destination_phi;
+  }
+
+  /**Activates or deactives the surface src flag.*/
+  void SetSurfaceSourceActiveFlag(bool flag_value)
+  {
+    surface_source_active = flag_value;
   }
 
   virtual ~SweepChunk() = default;

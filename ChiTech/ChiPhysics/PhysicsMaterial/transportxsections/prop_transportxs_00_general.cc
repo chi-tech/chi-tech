@@ -11,8 +11,8 @@ extern ChiLog& chi_log;
 chi_physics::TransportCrossSections::TransportCrossSections() :
   chi_physics::MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
 {
-  G = 0;
-  L = 0;
+  num_groups = 0;
+  scattering_order = 0;
 
   diffusion_initialized = false;
   scattering_initialized = false;
@@ -26,8 +26,8 @@ void chi_physics::TransportCrossSections::
   //======================================== Clear any previous data
   Reset();
 
-  G = in_G;
-  L = 0;
+  num_groups = in_G;
+  scattering_order = 0;
 
   sigma_tg.clear();
   sigma_tg.resize(in_G,in_sigmat);
@@ -52,8 +52,8 @@ void chi_physics::TransportCrossSections::
   //======================================== Clear any previous data
   Reset();
 
-  G = in_G;
-  L = 0;
+  num_groups = in_G;
+  scattering_order = 0;
 
   sigma_tg.resize(in_G,in_sigmat);
   sigma_tg.clear();
@@ -70,7 +70,7 @@ void chi_physics::TransportCrossSections::
 
   auto& ref_matrix = transfer_matrix.back();
 
-  if (G == 1)
+  if (num_groups == 1)
     ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c));
   else
     ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c*2.0/4.0));
@@ -137,13 +137,13 @@ void chi_physics::TransportCrossSections::
     //============================ Check number of groups
     if (cross_secs.size() == 1)
     {
-      num_grps_G = xs->G;
+      num_grps_G = xs->num_groups;
       if (xs->is_fissile)
-        num_precursors_J = xs->J;
+        num_precursors_J = xs->num_precursors;
     }
     else
     {
-      if (xs->G != num_grps_G)
+      if (xs->num_groups != num_grps_G)
       {
         chi_log.Log(LOG_ALLERROR)
           << "In call to TransportCrossSections::MakeCombined: "
@@ -153,10 +153,10 @@ void chi_physics::TransportCrossSections::
       if (xs->is_fissile)
       {
         if (num_precursors_J == 0) 
-          num_precursors_J = xs->J;
+          num_precursors_J = xs->num_precursors;
         else
         {
-          if (xs->J != num_precursors_J)
+          if (xs->num_precursors != num_precursors_J)
           {
             chi_log.Log(LOG_ALLERROR)
               << "In call to TransportCrossSections::MakeCombined: "
@@ -173,8 +173,8 @@ void chi_physics::TransportCrossSections::
     Nf_total = 1.0; //Avoids divide by 0 when non-fissile
 
   //======================================== Combine 1D cross-sections
-  this->G = num_grps_G;
-  this->J = num_precursors_J;
+  this->num_groups = num_grps_G;
+  this->num_precursors = num_precursors_J;
   sigma_tg.clear();
   sigma_fg.clear();
   sigma_captg.clear();
@@ -198,12 +198,12 @@ void chi_physics::TransportCrossSections::
   lambda.resize(num_precursors_J,0.0);
   gamma.resize(num_precursors_J,0.0);
   chi_d.resize(num_grps_G);
-  for (int g=0; g<G; ++g)
+  for (int g=0; g < num_groups; ++g)
     chi_d[g].resize(num_precursors_J,0.0);
 
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
-    this->L = std::max(this->L,cross_secs[x]->L);
+    this->scattering_order = std::max(this->scattering_order, cross_secs[x]->scattering_order);
 
     double N_i = combinations[x].second;
     double f_i = N_i/N_total;
@@ -220,13 +220,13 @@ void chi_physics::TransportCrossSections::
       nu_d_sigma_fg[g] += cross_secs[x]->nu_d_sigma_fg[g] * N_i;
       ddt_coeff    [g] += cross_secs[x]->ddt_coeff    [g] * f_i;
     }
-    if ((cross_secs[x]->is_fissile) and (cross_secs[x]->J > 0))
+    if ((cross_secs[x]->is_fissile) and (cross_secs[x]->num_precursors > 0))
     {
       for (int j=0; j<num_precursors_J; ++j)
       {
         lambda[j] += cross_secs[x]->lambda[j] * ff_i;
         gamma [j] += cross_secs[x]->gamma [j] * ff_i;
-        for (int g=0; g<G; g++)
+        for (int g=0; g < num_groups; g++)
           chi_d[g][j] += cross_secs[x]->chi_d[g][j] * ff_i;
       }
     }
@@ -238,14 +238,14 @@ void chi_physics::TransportCrossSections::
   // and therefore simply adding them together has to take
   // the sparse matrix's protection mechanisms into account.
   transfer_matrix.clear();
-  transfer_matrix.resize(this->L+1,
+  transfer_matrix.resize(this->scattering_order + 1,
                          chi_math::SparseMatrix(num_grps_G,num_grps_G));
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
-    for (int m=0; m<(cross_secs[x]->L+1); ++m)
+    for (int m=0; m<(cross_secs[x]->scattering_order + 1); ++m)
     {
       auto& xs_tm = cross_secs[x]->transfer_matrix[m];
-      for (int i=0; i<G; ++i)
+      for (int i=0; i < num_groups; ++i)
       {
         for (auto j : xs_tm.rowI_indices[i])
         {

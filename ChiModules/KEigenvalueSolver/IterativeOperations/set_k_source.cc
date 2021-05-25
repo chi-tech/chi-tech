@@ -23,11 +23,14 @@ using namespace LinearBoltzmann;
  * \param suppress_phi_old Flag indicating whether to suppress phi_old.
  *
  * */
-void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
-                                     bool apply_mat_src,
-                                     bool suppress_phi_old)
+void KEigenvalue::Solver::
+  SetKSource(LBSGroupset& groupset, SourceFlags source_flags)
 {
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
+
+  const bool apply_mat_src     = (source_flags & APPLY_MATERIAL_SOURCE);
+  const bool apply_scatter_src = (source_flags & APPLY_SCATTER_SOURCE);
+  const bool apply_fission_src = (source_flags & APPLY_FISSION_SOURCE);
 
   // ----- Groupset group information
   int gs_i = groupset.groups[0].id;
@@ -53,7 +56,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
     int cell_matid = cell.material_id;
     int xs_id = matid_to_xs_map[cell_matid];
 
-    if ((xs_id<0) || (xs_id>=material_xs.size()))
+    if ( (xs_id<0) || (xs_id>=material_xs.size()) )
     {
       chi_log.Log(LOG_ALLERROR)
       << "Cross-section lookup error\n";
@@ -61,15 +64,6 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
     }
 
     auto xs = material_xs[xs_id];
-    
-    double inscat_g = 0.0;
-    double sigma_sm = 0.0;
-    double fission_g = 0.0;
-    double precursor_g = 0.0;
-    double* q_mom;
-    double* phi_oldp;
-    double* phi_prevp;
-    int gprime;
 
     // ----- Loop over dofs
     int num_dofs = full_cell_view.dofs;
@@ -80,36 +74,36 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        int64_t ir = full_cell_view.MapDOF(i,m,0);
-        q_mom      = &q_moments_local[ir];
+        int64_t ir        = full_cell_view.MapDOF(i,m,0);
+        double* q_mom     = &q_moments_local[ir];
 
-        phi_oldp  = &phi_old_local[ir];
-        phi_prevp = &phi_prev_local[ir];
+        double* phi_oldp  = &phi_old_local[ir];
+        double* phi_prevp = &phi_prev_local[ir];
 
         // ----- Loop over groupset groups
         for (int g=gs_i; g<=gs_f; g++)
         {
           // ----- Contribute scattering
-          inscat_g = 0.0;
-          if ((ell < xs->transfer_matrix.size()) && (!suppress_phi_old) )
+          double inscat_g = 0.0;
+          if ( (ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
           {
-            int num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
             {
-              gprime    = xs->transfer_matrix[ell].rowI_indices[g][t];
-              sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
+              size_t gprime = xs->transfer_matrix[ell].rowI_indices[g][t];
+              double sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
               inscat_g += sigma_sm * phi_oldp[gprime];
             }
           }
           q_mom[g] += inscat_g;
 
           // ----- Contribute fission
-          fission_g = 0.0;
-          if ((ell == 0) and (apply_mat_src))
+          double fission_g = 0.0;
+          if ( (ell == 0) and (apply_fission_src) )
           {
             if (xs->is_fissile)
             {
-              for (gprime=first_grp; gprime<=last_grp; ++gprime)
+              for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
                 if (options.use_precursors)
                   fission_g += xs->chi_g[g]*xs->nu_p_sigma_fg[gprime]*
                                phi_prevp[gprime]/k_eff;
@@ -121,14 +115,14 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
           q_mom[g] += fission_g;
 
           // ----- Contribute precursors
-          precursor_g = 0.0;
-          if ((ell == 0) and (options.use_precursors))
+          double precursor_g = 0.0;
+          if ( (ell == 0) and (options.use_precursors) )
           {
-            if ((apply_mat_src) and (xs->J > 0))
+            if ((apply_mat_src) and (xs->num_precursors > 0))
             {
               for (int j=0; j<num_precursors; ++j)
               {
-                for (gprime=first_grp; gprime<=last_grp; ++gprime)
+                for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
                 {
                   precursor_g += xs->chi_d[g][j]*xs->gamma[j]*
                                  xs->nu_d_sigma_fg[gprime]*

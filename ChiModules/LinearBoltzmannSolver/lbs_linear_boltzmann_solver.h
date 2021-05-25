@@ -28,12 +28,20 @@ enum class BoundaryType
   INCIDENT_ISOTROPIC = 2,
   REFLECTING = 3
 };
-struct SourceFlags
-{
-  static const bool USE_MATERIAL_SOURCE = true;
-  static const bool USE_DLINV_SOURCE = false;
-  static const bool SUPPRESS_PHI_OLD = true;
-};
+  enum SourceFlags : int
+  {
+    NO_FLAGS_SET           = 0,
+    APPLY_MATERIAL_SOURCE  = (1 << 0),
+    APPLY_SCATTER_SOURCE   = (1 << 1),
+    APPLY_FISSION_SOURCE   = (1 << 2)
+  };
+
+  inline SourceFlags operator|(const SourceFlags f1,
+                               const SourceFlags f2)
+  {
+    return static_cast<SourceFlags>(static_cast<int>(f1) |
+                                    static_cast<int>(f2));
+  }
 
 
 
@@ -76,8 +84,8 @@ public:
   chi_math::UnknownManager flux_moments_uk_man;
 
   int max_cell_dof_count;
-  unsigned long long local_dof_count;
-  unsigned long long glob_dof_count;
+  unsigned long long local_node_count;
+  unsigned long long glob_node_count;
 
   Vec phi_new, phi_old, q_fixed;
   std::vector<double> q_moments_local;
@@ -147,20 +155,21 @@ public:
                                  const std::string& file_base);
 
   //IterativeMethods
-  virtual void SetSource(LBSGroupset& groupset,
-                 bool apply_mat_src,
-                 bool suppress_phi_old);
+  virtual void SetSource(LBSGroupset& groupset, SourceFlags source_flags);
   double ComputePiecewiseChange(LBSGroupset& groupset);
-  virtual SweepChunk* SetSweepChunk(LBSGroupset& groupset);
+  virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
-                         SweepChunk* sweep_chunk,
+                         SweepChunk& sweep_chunk,
                          MainSweepScheduler & sweepScheduler,
+                         SourceFlags source_flags,
                          bool log_info = true);
   bool GMRES(LBSGroupset& groupset,
              int group_set_num,
-             SweepChunk* sweep_chunk,
+             SweepChunk& sweep_chunk,
              MainSweepScheduler & sweepScheduler,
+             SourceFlags lhs_src_scope,
+             SourceFlags rhs_src_scope,
              bool log_info = true);
 
   //Vector assembly

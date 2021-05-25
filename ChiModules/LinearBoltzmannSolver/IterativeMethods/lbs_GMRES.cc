@@ -8,6 +8,8 @@
 
 #include "ChiPhysics/chi_physics.h"
 
+#include "ChiMath/PETScUtils/petsc_utils.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -21,8 +23,10 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using GMRES.*/
 bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
                                     int group_set_num,
-                                    SweepChunk* sweep_chunk,
+                                    SweepChunk& sweep_chunk,
                                     MainSweepScheduler& sweepScheduler,
+                                    SourceFlags lhs_src_scope,
+                                    SourceFlags rhs_src_scope,
                                     bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
@@ -40,65 +44,53 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       << groupset.groups.back().id << "\n\n";
   }
 
+  //================================================== Get groupset dof sizes
+  size_t groupset_numgrps = groupset.groups.size();
+  auto num_delayed_ang_unknowns = groupset.angle_agg.GetNumberOfAngularUnknowns();
+  size_t local_size = local_node_count * num_moments * groupset_numgrps +
+                      num_delayed_ang_unknowns.first;
+  size_t globl_size = glob_node_count * num_moments * groupset_numgrps +
+                      num_delayed_ang_unknowns.second;
+
+  //================================================== Create PETSc vectors
+  phi_new = chi_math::PETScUtils::CreateVector(static_cast<int64_t>(local_size),
+                                               static_cast<int64_t>(globl_size));
+  Vec x_temp;
+  VecSet(phi_new,0.0);
+  VecDuplicate(phi_new,&phi_old);
+  VecDuplicate(phi_new,&q_fixed);
+  VecDuplicate(phi_new,&x_temp);
 
   //=================================================== Create Data context
   //                                                    available inside
   //                                                    Action
-  KSPDataContext data_context;
-  data_context.solver         = this;
-  data_context.sweep_chunk    = sweep_chunk;
-  data_context.group_set_num  = group_set_num;
-  data_context.groupset       = &groupset;
-  data_context.sweepScheduler = &sweepScheduler;
+  KSPDataContext data_context(*this, sweep_chunk, groupset, x_temp,
+                              sweepScheduler, lhs_src_scope);
 
   //=================================================== Create the matrix-shell
   Mat A;
-  int groupset_numgrps = groupset.groups.size();
-  auto num_ang_unknowns = groupset.angle_agg.GetNumberOfAngularUnknowns();
-  int local_size = local_dof_count*num_moments*groupset_numgrps +
-                   num_ang_unknowns.first;
-  int globl_size = glob_dof_count*num_moments*groupset_numgrps +
-                   num_ang_unknowns.second;
-  MatCreateShell(PETSC_COMM_WORLD,local_size,
-                                  local_size,
-                                  globl_size,
-                                  globl_size,
+  MatCreateShell(PETSC_COMM_WORLD,static_cast<int64_t>(local_size),
+                                  static_cast<int64_t>(local_size),
+                                  static_cast<int64_t>(globl_size),
+                                  static_cast<int64_t>(globl_size),
                                   &data_context,&A);
-  groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Set the action-operator
-  MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) LBSMatrixAction_Ax);
-
-  //================================================== Initial vector assembly
-  VecCreate(PETSC_COMM_WORLD,&phi_new);
-  VecCreate(PETSC_COMM_WORLD,&phi_old);
-  VecCreate(PETSC_COMM_WORLD,&q_fixed);
-
-  VecSetSizes(phi_new, local_size, globl_size);
-  VecSetType(phi_new,VECMPI);
-  VecSet(phi_new,0.0);
-  VecDuplicate(phi_new,&phi_old);
-  VecDuplicate(phi_new,&q_fixed);
-  VecDuplicate(phi_new,&data_context.x_temp);
+  MatShellSetOperation(A, MATOP_MULT, (void (*)()) LBSMatrixAction_Ax);
 
   //================================================== Create Krylov Solver
   KSP ksp;
   KSPCreate(PETSC_COMM_WORLD, &ksp);
   KSPSetType(ksp,KSPGMRES);
   KSPSetOperators(ksp,A,A);
-  data_context.krylov_solver = ksp;
-
-  PC pc;
-  KSPGetPC(ksp,&pc);
-  PCSetType(pc,PCNONE);
 
   KSPSetTolerances(ksp,1.e-50,
                    groupset.residual_tolerance,1.0e50,
                    groupset.max_iterations);
-  KSPGMRESSetRestart(ksp,groupset.gmres_restart_intvl);
-  KSPSetApplicationContext(ksp,&data_context);
-  KSPSetConvergenceTest(ksp,&KSPConvergenceTestNPT,NULL,NULL);
-  KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);
+  KSPGMRESSetRestart(ksp, groupset.gmres_restart_intvl);
+  KSPSetApplicationContext(ksp, &data_context);
+  KSPSetConvergenceTest(ksp, &KSPConvergenceTestNPT, nullptr, nullptr);
+  KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
   KSPSetUp(ksp);
 
   //================================================== Compute b
@@ -107,13 +99,16 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
   }
 
-  SetSource(groupset,SourceFlags::USE_MATERIAL_SOURCE,
-                     SourceFlags::SUPPRESS_PHI_OLD);
+  //Prepare for sweep
+  SetSource(groupset, rhs_src_scope);
 
-  sweep_chunk->SetDestinationPhi(&phi_new_local);
-
-  groupset.ZeroPsiDataStructures();
+  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweep_chunk.SetDestinationPhi(&phi_new_local);
+  groupset.angle_agg.ZeroIncomingDelayedPsi();
+  groupset.ZeroAngularFluxDataStructures();
   phi_new_local.assign(phi_new_local.size(),0.0);
+
+  //Sweep
   sweepScheduler.Sweep(sweep_chunk);
 
   //=================================================== Apply DSA
@@ -135,8 +130,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   AssembleVector(groupset,phi_old,phi_old_local.data(),WITH_DELAYED_PSI);
 
   //=================================================== Retool for GMRES
-  sweep_chunk->SetDestinationPhi(&phi_new_local);
-  sweep_chunk->suppress_surface_src = true; //Action of Ax specific
+  sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweep_chunk.SetDestinationPhi(&phi_new_local);
 
   double phi_old_norm=0.0;
   VecNorm(phi_old,NORM_2,&phi_old_norm);
@@ -173,7 +168,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   VecDestroy(&phi_new);
   VecDestroy(&phi_old);
   VecDestroy(&q_fixed);
-  VecDestroy(&data_context.x_temp);
+  VecDestroy(&x_temp);
   MatDestroy(&A);
 
 
@@ -185,9 +180,9 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       chi_log.ProcessEvent(source_event_tag,
                            ChiLog::EventOperation::AVERAGE_DURATION);
     size_t num_angles = groupset.quadrature->abscissae.size();
-    long int num_unknowns = (long int)glob_dof_count*
-                            (long int)num_angles*
-                            (long int)groupset.groups.size();
+    size_t num_unknowns = glob_node_count *
+                          num_angles *
+                          groupset.groups.size();
 
     if (log_info)
     {
@@ -204,7 +199,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
         << chunk_overhead_ratio;
       chi_log.Log(LOG_0)
         << "        Sweep Time/Unknown (ns):       "
-        << sweep_time*1.0e9*chi_mpi.process_count/num_unknowns;
+        << sweep_time*1.0e9*chi_mpi.process_count/
+           static_cast<double>(num_unknowns);
       chi_log.Log(LOG_0)
         << "        Number of unknowns per sweep:  " << num_unknowns;
       chi_log.Log(LOG_0)

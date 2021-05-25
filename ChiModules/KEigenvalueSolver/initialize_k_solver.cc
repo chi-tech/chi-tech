@@ -37,13 +37,11 @@ void KEigenvalue::Solver::InitializeKSolver()
       std::vector<size_t> mat_map;
 
       // Define the precursor mapping for this material
-      if (material_xs[x]->J > 0) {
-        for (int j = 0; j < material_xs[x]->J; ++j)
-           mat_map.emplace_back(num_precursors + j);
+      for (int j = 0; j < material_xs[x]->num_precursors; ++j)
+         mat_map.emplace_back(num_precursors + j);
 
-        // Increment the total number of precursors
-        num_precursors += material_xs[x]->J;
-      }
+      // Increment the total number of precursors
+      num_precursors += material_xs[x]->num_precursors;
 
       // Add mapping to the precursor map
       precursor_map.emplace_back(mat_map);

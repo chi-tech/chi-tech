@@ -31,9 +31,7 @@ public:
   void PowerIteration(LBSGroupset& groupset);
   
   // Iterative operations
-  void SetKSource(LBSGroupset& groupset,
-                  bool apply_mat_src=true,
-                  bool suppress_phi_old=false);
+  void SetKSource(LBSGroupset& groupset, SourceFlags source_flags);
   double ComputeProduction();
   void InitializePrecursors();
 
