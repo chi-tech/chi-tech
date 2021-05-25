@@ -10,41 +10,7 @@ extern ChiMPI& chi_mpi;
 extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
-/**Initializes p_arrays.\n
-The question arises of what datatype can store the total amount of
-unknowns. For now we will say we want to be
-designing for 100 billion cells with
-an assumed shape of a truncated octahedron which has 24 vertices.
-We will also assume that we will be able to do 2000 energy groups
-and finally we will assume we will do scattering orders up to 16
-which requires 289 moments.
-   DOFS per truncated octahedron = 24\n
-   Energy groups                 = 2000\n
-   Moments                       = 289\n
-   # of cells                    =   100,000,000,000\n
-   Total DOFS                    = 2,400,000,000,000\n
-   Unknowns per cell             =        13,872,000\n
-   Total Unknowns                = A crap ton\n
-\n
-It is easy to see here that this is a hell of a lot so how about we think about
-something more modest. Like 200 energy groups scattering order 5 (36 moments)
-and 2 billion cells.\n
-   Energy groups                 = 200\n
-   Moments                       = 36\n
-   # of cells                    =     2,000,000,000\n
-   Total DOFS                    =    48,000,000,000\n
-   Unknowns per cell             =             7,200\n
-   Total Unknowns                = 1.44xe13\n
-\n
-A long int only supports up to 4.29e9. This obviously requires
-unsigned long long int which can hold up to 2x2e63.\n
-\n
-Another interesting aspect is what it will take to get to exascale. For a
-discrete ordinates code this will undoubtly be evident in the amount of angular flux
-unknowns. 1 billion cells, 24 vertices, 200 groups, 48 azimuthal angles per
-octant, 8 polar angles per octant (3072) angles. 1.47456e16. Just a factor 68
-away from exascale.
-   */
+/**Initializes parallel arrays.*/
 void LinearBoltzmann::Solver::InitializeParrays()
 {
   //================================================== Initialize unknown structure
@@ -60,9 +26,8 @@ void LinearBoltzmann::Solver::InitializeParrays()
   glob_node_count = discretization->GetNumGlobalDOFs(per_node);
 
   //================================================== Compute num of unknowns
-  int num_grps = groups.size();
-  int M = num_moments;
-  unsigned long long local_unknown_count = local_node_count * num_grps * M;
+  size_t num_grps = groups.size();
+  size_t local_unknown_count = local_node_count * num_grps * num_moments;
 
   chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
                                 << local_unknown_count;
@@ -86,79 +51,90 @@ void LinearBoltzmann::Solver::InitializeParrays()
   //
   // Also, for a given cell, within a given sweep chunk,
   // we need to solve a matrix which square size is the
-  // amount of dofs on the cell. max_cell_dof_count is
+  // amount of nodes on the cell. max_cell_dof_count is
   // initialized here.
   //
-  int block_MG_counter = 0;       //Counts the strides of moment and group
+  size_t block_MG_counter = 0;       //Counts the strides of moment and group
 
   chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
-  grid_nodal_mappings.reserve(grid->local_cells.size());
-  if (cell_transport_views.empty())
+  cell_transport_views.clear();
+  cell_transport_views.reserve(grid->local_cells.size());
+  for (auto& cell : grid->local_cells)
   {
-    for (auto& cell : grid->local_cells)
+    size_t num_nodes  = discretization->GetCellNumNodes(cell);
+    int    mat_id     = cell.material_id;
+    int    xs_mapping = matid_to_xs_map[mat_id];
+
+    size_t cell_phi_address = block_MG_counter;
+
+    std::vector<bool> face_local_flags;
+    face_local_flags.resize(cell.faces.size(), true);
+    bool cell_on_boundary = false;
+    int f=0;
+    for (auto& face : cell.faces)
     {
-      size_t num_nodes = discretization->GetCellNumNodes(cell);
-
-      CellLBSView cell_lbs_view(num_nodes, num_grps, M);
-
-      int mat_id = cell.material_id;
-
-      cell_lbs_view.xs_id = matid_to_xs_map[mat_id];
-
-      cell_lbs_view.dof_phi_map_start = block_MG_counter;
-      block_MG_counter += num_nodes * num_grps * num_moments;
-
-      chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
-      cell_nodal_mapping.reserve(cell.faces.size());
-
-      //Init face upwind flags and adj_partition_id
-      cell_lbs_view.face_local.resize(cell.faces.size(), true);
-      int f=0;
-      for (auto& face : cell.faces)
+      if (not face.has_neighbor)
       {
-        if (not face.has_neighbor)
-        {
-          chi_mesh::Vector3& n = face.normal;
+        chi_mesh::Vector3& n = face.normal;
 
-          int boundary_id = -1;
-          if      (n.Dot(ihat)>0.999)  boundary_id = 0;
-          else if (n.Dot(ihat)<-0.999) boundary_id = 1;
-          else if (n.Dot(jhat)> 0.999) boundary_id = 2;
-          else if (n.Dot(jhat)<-0.999) boundary_id = 3;
-          else if (n.Dot(khat)> 0.999) boundary_id = 4;
-          else if (n.Dot(khat)<-0.999) boundary_id = 5;
+        int boundary_id = -1;
+        if      (n.Dot(ihat)>0.999)  boundary_id = 0;
+        else if (n.Dot(ihat)<-0.999) boundary_id = 1;
+        else if (n.Dot(jhat)> 0.999) boundary_id = 2;
+        else if (n.Dot(jhat)<-0.999) boundary_id = 3;
+        else if (n.Dot(khat)> 0.999) boundary_id = 4;
+        else if (n.Dot(khat)<-0.999) boundary_id = 5;
 
-          if (boundary_id >= 0) face.neighbor_id = boundary_id;
-        }//if bndry
+        if (boundary_id >= 0) face.neighbor_id = boundary_id;
+        cell_on_boundary = true;
+      }//if bndry
 
-        if (not face.IsNeighborLocal(*grid))
-          cell_lbs_view.face_local[f] = false;
+      if (not face.IsNeighborLocal(*grid))
+        face_local_flags[f] = false;
+      ++f;
+    }//for f
 
-        //Local nodal mappings
-        std::vector<short> face_nodal_mapping;
-        int ass_face = -1;
+    if (num_nodes > max_cell_dof_count)
+      max_cell_dof_count = num_nodes;
 
-        if (face.has_neighbor and face.IsNeighborLocal(*grid))
-        {
-          grid->FindAssociatedVertices(face,face_nodal_mapping);
-          ass_face = face.GetNeighborAssociatedFace(*grid);
-        }
+    cell_transport_views.emplace_back(cell_phi_address,
+                                      num_nodes,
+                                      num_grps,
+                                      num_moments,
+                                      xs_mapping,
+                                      face_local_flags,
+                                      cell_on_boundary);
+    block_MG_counter += num_nodes * num_grps * num_moments;
+  }//for local cell
 
-        cell_nodal_mapping.emplace_back(ass_face,face_nodal_mapping);
+  //================================================== Populate grid nodal mappings
+  // This is used in the Flux Data Structures (FLUDS)
+  grid_nodal_mappings.clear();
+  grid_nodal_mappings.reserve(grid->local_cells.size());
+  for (auto& cell : grid->local_cells)
+  {
+    chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
+    cell_nodal_mapping.reserve(cell.faces.size());
 
-        ++f;
-      }//for f
+    for (auto& face : cell.faces)
+    {
+      std::vector<short> face_nodal_mapping;
+      int ass_face = -1;
 
-      if (num_nodes > max_cell_dof_count)
-        max_cell_dof_count = num_nodes;
+      if (face.has_neighbor and face.IsNeighborLocal(*grid))
+      {
+        grid->FindAssociatedVertices(face,face_nodal_mapping);
+        ass_face = face.GetNeighborAssociatedFace(*grid);
+      }
 
-      cell_transport_views.push_back(cell_lbs_view);
-      grid_nodal_mappings.push_back(cell_nodal_mapping);
-    }//for local cell
-  }//if empty
+      cell_nodal_mapping.emplace_back(ass_face,face_nodal_mapping);
+    }//for f
+
+    grid_nodal_mappings.push_back(cell_nodal_mapping);
+  }//for local cell
 
   //================================================== Initialize Field Functions
   if (field_functions.empty())
