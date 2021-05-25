@@ -4,6 +4,7 @@
 #include "ChiTimer/chi_timer.h"
 
 #include <iostream>
+#include <iomanip>
 
 //###################################################################
 /**Exports the cross-section information to ChiTech format.*/
@@ -13,6 +14,33 @@ void chi_physics::TransportCrossSections::
   ChiLog& chi_log = ChiLog::GetInstance();
   chi_log.Log() << "Exporting transport cross section to file: " << file_name;
 
+  //======================================== Lamdas
+  /**Lambda to print a 1D-xs*/
+  auto Print1DXS = [](std::ofstream& ofile,
+                      const std::string& prefix,
+                      const std::vector<double>& xs,
+                      double min_value=-1.0)
+  {
+    bool proceed = false;
+    if (min_value>=0.0)
+    {
+      for (auto val : xs) if (val > min_value) {proceed = true; break;}
+
+      if (not proceed) return;
+    }
+
+    ofile << "\n";
+    ofile << prefix << "_BEGIN\n";
+    {
+      int g=0;
+      for (auto val : xs)
+        ofile << g++ << " "
+              << val << "\n";
+    }
+    ofile << prefix << "_END\n";
+  };
+
+  //======================================== Open file
   std::ofstream ofile(file_name);
 
   //======================================== Writing header info
@@ -23,135 +51,39 @@ void chi_physics::TransportCrossSections::
   if (num_precursors>0)
     ofile << "NUM_PRECURSORS " << num_precursors << "\n";
 
-  //======================================== Sigma_t
-  ofile << "\n";
-  ofile << "SIGMA_T_BEGIN\n";
-  {
-    int g=0;
-    for (auto val : sigma_tg)
-      ofile << g++ << " " << val << "\n";
-  }
-  ofile << "SIGMA_T_END\n";
-
-  //======================================== Sigma_f
-  bool sigma_f_filled = false;
-  for (auto val : sigma_fg)
-    if (val > 1.0e-20) sigma_f_filled = true;
-
-  if (sigma_f_filled)
-  {
-    ofile << "\n";
-    ofile << "SIGMA_F_BEGIN\n";
-    {
-      int g=0;
-      for (auto val : sigma_tg)
-        ofile << g++ << " " << val << "\n";
-    }
-    ofile << "SIGMA_F_END\n";
-  }
-
-  //======================================== Nu
-  bool nu_filled = false;
-  for (auto val : nu_sigma_fg)
-    if (val > 1.0e-20) nu_filled = true;
-
-  if (nu_filled)
-  {
-    ofile << "\n";
-    ofile << "NU_BEGIN\n";
-    {
-      int g=0;
-      for (auto val : nu_sigma_fg)
-      {
-        int gval = g++;
-        ofile << gval << " " << val/sigma_fg[g-1] << "\n";
-      }
-    }
-    ofile << "NU_END\n";
-  }
-
-  //======================================== Nu-prompt
-  bool nu_prompt_filled = false;
-  for (auto val : nu_p_sigma_fg)
-    if (val > 1.0e-20) nu_prompt_filled = true;
-
-  if (nu_prompt_filled)
-  {
-    ofile << "\n";
-    ofile << "NU_PROMPT_BEGIN\n";
-    {
-      int g=0;
-      for (auto val : nu_p_sigma_fg)
-      {
-        int gval = g++;
-        ofile << gval << " " << val/sigma_fg[g-1] << "\n";
-      }
-    }
-    ofile << "NU_PROMPT_END\n";
-  }
-
-  //======================================== Nu-delayed
-  bool nu_delayed_filled = false;
-  for (auto val : nu_d_sigma_fg)
-    if (val > 1.0e-20) nu_delayed_filled = true;
-
-  if (nu_delayed_filled)
-  {
-    ofile << "\n";
-    ofile << "NU_DELAYED_BEGIN\n";
-    {
-      int g=0;
-      for (auto val : nu_d_sigma_fg)
-      {
-        int gval = g++;
-        ofile << gval << " " << val/sigma_fg[g-1] << "\n";
-      }
-    }
-    ofile << "NU_DELAYED_END\n";
-  }
-
-  //======================================== Chi-prompt
-  bool chi_prompt_filled = false;
-  for (auto val : chi_g)
-    if (val > 1.0e-20) chi_prompt_filled = true;
-
-  if (chi_prompt_filled)
-  {
-    ofile << "\n";
-    ofile << "CHI_PROMPT_BEGIN\n";
-    {
-      int g=0;
-      for (auto val : chi_g)
-      {
-        int gval = g++;
-        ofile << gval << " " << val << "\n";
-      }
-    }
-    ofile << "CHI_PROMPT_END\n";
-  }
+  Print1DXS(ofile,"SIGMA_T"   ,sigma_tg);
+  Print1DXS(ofile,"SIGMA_F"   ,sigma_fg  ,1.0e-20);
+  Print1DXS(ofile,"NU"        ,nu        ,1.0e-20);
+  Print1DXS(ofile,"NU_PROMPT" ,nu_prompt ,1.0e-20);
+  Print1DXS(ofile,"NU_DELAYED",nu_delayed,1.0e-20);
+  Print1DXS(ofile,"CHI_PROMPT",chi_g     ,1.0e-20);
+  Print1DXS(ofile,"DDT_COEFF" ,ddt_coeff ,1.0e-20);
 
   //======================================== Chi-delayed
-
-  //======================================== ddt-coeff
-  bool ddt_filled = false;
-  for (auto val : ddt_coeff)
-    if (val > 1.0e-20) ddt_filled = true;
-
-  if (ddt_filled)
+  if (not chi_d.empty())
   {
     ofile << "\n";
-    ofile << "DDT_COEFF_BEGIN\n";
+    ofile << "CHI_DELAYED_BEGIN\n";
+    int g=0;
+    for (auto& chi_d_g : chi_d)
     {
-      int g=0;
-      for (auto val : ddt_coeff)
-        ofile << g++ << " " << val << "\n";
+      int gval = g++;
+      int j=0;
+      for (double val : chi_d_g)
+      {
+        ofile << "G_PRECURSORJ_VAL" << " " << gval
+                                    << " " << j
+                                    << " " << val << "\n";
+        ++j;
+      }
     }
-    ofile << "DDT_COEFF_END\n";
+    ofile << "CHI_DELAYED_END\n";
   }
 
   //======================================== Transfer matrices
   if (not transfer_matrix.empty())
   {
+    ofile << "\n";
     ofile << "TRANSFER_MOMENTS_BEGIN\n";
     for (int ell=0; ell<transfer_matrix.size(); ++ell)
     {

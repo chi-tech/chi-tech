@@ -1,5 +1,5 @@
 # Exported cross section from ChiTech
-# Date: 2021-05-22 20:06:27
+# Date: 2021-05-25 13:56:26
 NUM_GROUPS 168
 NUM_MOMENTS 8
 
@@ -173,6 +173,7 @@ SIGMA_T_BEGIN
 166 0.0235821
 167 0
 SIGMA_T_END
+
 TRANSFER_MOMENTS_BEGIN
 #Zeroth moment (l=0)
 M_GPRIME_G_VAL 0 0 0 0.0196514

@@ -101,17 +101,19 @@ constants, \f$ \lambda_j \f$ are required.
     Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
   - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END. Each line in
     the block processes the first two words as [Group, nu]. Populates the
-    nu_sigma_fg field. Upon completing the file processing the nu_sigma_fg field
-    gets multiplied by sigma_fg. Symbol \f$ \nu_g \f$.
+    nu field. Upon completing the file processing the nu_sigma_fg field
+    gets populated from the product of nu and sigma_fg. Symbol \f$ \nu_g \f$.
   - NU_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     NU_PROMPT_END. Each line in the block processes the first two words as
-    [Group, nu]. Populates the nu_p_sigma_fg field. Upon completing the file
-    processing the nu_p_sigma_fg field gets multiplied by sigma_fg.
+    [Group, nu]. Populates the nu_prompt field. Upon completing the file
+    processing the nu_p_sigma_fg field gets populated from the product of
+    nu_prompt and sigma_fg.
     Symbol \f$ \nu_{prompt,g} \f$.
   - NU_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
     NU_DELAYED_END. Each line in the block processes the first two words as
-    [Group, nu]. Populates the nu_d_sigma_fg field. Upon completing the file
-    processing the nu_d_sigma_fg field gets multiplied by sigma_fg.
+    [Group, nu]. Populates the nu_delayed field. Upon completing the file
+    processing the nu_d_sigma_fg field gets populated from the product of
+    nu_delayed and sigma_fg.
     Symbol \f$ \nu_{delayed,g} \f$.
   - CHI_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_PROMPT_END. Each line in the block processes the first two words as
@@ -127,7 +129,7 @@ constants, \f$ \lambda_j \f$ are required.
     constant). Symbol \f$ \lambda_j \f$.
   - PRECURSOR_GAMMA_BEGIN. Optional. Starts a block that is terminated by a line
     PRECURSOR_GAMMA_END. Each line in the block processes the first two words as
-    [precursor, gamma]. Populates the lambda field (the precursor production
+    [precursor, gamma]. Populates the gamma field (the precursor production
     fraction per fission). Symbol \f$ \gamma_j \f$.
 
   - CHI_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
@@ -254,7 +256,7 @@ void chi_physics::TransportCrossSections::
   std::string sectionChecker;
 
   //num moments
-  int M = scattering_order;
+  size_t M = scattering_order+1; //just to init M
 
   //#############################################
   /**Lambda for converting strings to doubles.*/
@@ -290,7 +292,7 @@ void chi_physics::TransportCrossSections::
   /**Lambda function for reading in the 1d vectors.*/
   auto Read1DXS = [StrToD,StrToI]
     (std::string keyword,std::vector<double>& xs,
-     std::ifstream& file, int Gtot, int& line_number,
+     std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
   {
     int g=-1;
@@ -324,7 +326,7 @@ void chi_physics::TransportCrossSections::
   /**Lambda reading the delayed chi matrix.*/
   auto ReadDelayedChi = [StrToD,StrToI]
     (std::string keyword,std::vector<std::vector<double>>& chi,
-     std::ifstream& file, int Gtot, int& line_number,
+     std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
   {
     char first_word[250];
@@ -358,6 +360,8 @@ void chi_physics::TransportCrossSections::
       file.getline(line,250); ++line_number;
       line_stream = std::istringstream(line);
       line_stream >> first_word;
+      if (line_stream.str().empty())
+        sprintf(first_word," ");
     }
   };
 
@@ -365,7 +369,7 @@ void chi_physics::TransportCrossSections::
   /**Lambda reading a transfer matrix.*/
   auto ReadTransferMatrix = [StrToD,StrToI]
     (std::string keyword,std::vector<chi_math::SparseMatrix>& matrix,
-     std::ifstream& file, int Gtot, int& line_number,
+     std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
   {
     char first_word[250];
@@ -410,7 +414,6 @@ void chi_physics::TransportCrossSections::
 
   //================================================== Read file line by line
   bool grabbed_G = false;
-  bool grabbed_J = false;
   int line_number=0;
   bool not_eof = bool(std::getline(file,line)); ++line_number;
   while (not_eof)
@@ -418,15 +421,21 @@ void chi_physics::TransportCrossSections::
     std::istringstream line_stream(line);
     line_stream >> first_word;
 
-    if (first_word == "NUM_GROUPS") {line_stream >> num_groups; grabbed_G = true;}
+    if (first_word == "NUM_GROUPS")
+    {
+      line_stream >> num_groups;
+      grabbed_G = true;
+    }
     if (first_word == "NUM_MOMENTS")
     {
       line_stream >> M;
       if (grabbed_G)
       {
         sigma_tg.resize(num_groups, 0.0);
-        sigma_fg = sigma_captg = chi_g = nu_sigma_fg = ddt_coeff = sigma_tg;
-        nu_p_sigma_fg = nu_d_sigma_fg = nu_sigma_fg;
+        sigma_fg = sigma_captg = chi_g = sigma_tg;
+        nu = nu_prompt = nu_delayed = sigma_tg;
+        nu_sigma_fg = nu_p_sigma_fg = nu_d_sigma_fg = sigma_tg;
+        ddt_coeff = sigma_tg;
         transfer_matrix.resize(M,chi_math::SparseMatrix(num_groups, num_groups));
       }
     }
@@ -451,32 +460,28 @@ void chi_physics::TransportCrossSections::
       auto& f = file;
       auto& fw = first_word;
 
-      if (fw == "SIGMA_T_BEGIN")             Read1DXS ("SIGMA_T", sigma_tg, f, num_groups, ln, ls);
-      if (fw == "SIGMA_F_BEGIN")             Read1DXS("SIGMA_F", sigma_fg, f, num_groups, ln, ls);
-      if (fw == "NU_BEGIN")                  Read1DXS("NU", nu_sigma_fg, f, num_groups, ln, ls);
-      if (fw == "NU_PROMPT_BEGIN")           Read1DXS("NU_PROMPT", nu_p_sigma_fg, f, num_groups, ln, ls);
-      if (fw == "NU_DELAYED_BEGIN")          Read1DXS("NU_DELAYED", nu_d_sigma_fg, f, num_groups, ln, ls);
-      if (fw == "CHI_PROMPT_BEGIN")          Read1DXS("CHI_PROMPT", chi_g, f, num_groups, ln, ls);
-      if (fw == "DDT_COEFF_BEGIN")           Read1DXS("DDT_COEFF", ddt_coeff, f, num_groups, ln, ls);
+      if (fw == "SIGMA_T_BEGIN")    Read1DXS ("SIGMA_T"  , sigma_tg  , f, num_groups, ln, ls);
+      if (fw == "SIGMA_F_BEGIN")    Read1DXS("SIGMA_F"   , sigma_fg  , f, num_groups, ln, ls);
+      if (fw == "NU_BEGIN")         Read1DXS("NU"        , nu        , f, num_groups, ln, ls);
+      if (fw == "NU_PROMPT_BEGIN")  Read1DXS("NU_PROMPT" , nu_prompt , f, num_groups, ln, ls);
+      if (fw == "NU_DELAYED_BEGIN") Read1DXS("NU_DELAYED", nu_delayed, f, num_groups, ln, ls);
+      if (fw == "CHI_PROMPT_BEGIN") Read1DXS("CHI_PROMPT", chi_g     , f, num_groups, ln, ls);
+      if (fw == "CHI_BEGIN")        Read1DXS("CHI_"      , chi_g     , f, num_groups, ln, ls);
+      if (fw == "DDT_COEFF_BEGIN")  Read1DXS("DDT_COEFF" , ddt_coeff , f, num_groups, ln, ls);
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
-        ReadTransferMatrix("TRANSFER_MOMENTS", transfer_matrix, f, num_groups, ln, ls);
+        ReadTransferMatrix("TRANSFER_MOMENTS",
+                           transfer_matrix, f, num_groups, ln, ls);
 
-      for (auto& sig_f : sigma_fg) {
-        if (sig_f > 0.0) {
-          is_fissile = true;
-          break;
-        }
-      }
-
-      if ((num_precursors > 0) and (is_fissile)) {
-        if (fw == "PRECURSOR_LAMBDA_BEGIN")    Read1DXS("PRECURSOR_LAMBDA", lambda, f, num_precursors, ln, ls);
-        if (fw == "PRECURSOR_GAMMA_BEGIN")     Read1DXS("PRECURSOR_GAMMA", gamma, f, num_precursors, ln, ls);
+      if (num_precursors > 0) {
+        if (fw == "PRECURSOR_LAMBDA_BEGIN")
+          Read1DXS("PRECURSOR_LAMBDA", lambda, f, num_precursors, ln, ls);
+        if (fw == "PRECURSOR_GAMMA_BEGIN")
+          Read1DXS("PRECURSOR_GAMMA", gamma, f, num_precursors, ln, ls);
         if (fw == "CHI_DELAYED_BEGIN")
           ReadDelayedChi("CHI_DELAYED", chi_d, f, num_groups, ln, ls);
       } 
-    }
-
+    }//try
     catch (const std::runtime_error& err)
     {
       chi_log.Log(LOG_ALLERROR)
@@ -497,11 +502,15 @@ void chi_physics::TransportCrossSections::
   }//while not EOF, read each lines
   scattering_order = M-1;
 
+  for (auto& sig_f : sigma_fg)
+    if (sig_f > 0.0) { is_fissile = true; break; }
+
   //changes nu_sigma_fg from nu to nu * sigma_fg
-  for (int i = 0; i < num_groups; ++i){
-    nu_sigma_fg[i] = nu_sigma_fg[i]*sigma_fg[i];
-    nu_p_sigma_fg[i] = nu_p_sigma_fg[i]*sigma_fg[i];
-    nu_d_sigma_fg[i] = nu_d_sigma_fg[i]*sigma_fg[i];
+  for (int g = 0; g < num_groups; ++g)
+  {
+    nu_sigma_fg  [g] = nu        [g]*sigma_fg[g];
+    nu_p_sigma_fg[g] = nu_prompt [g]*sigma_fg[g];
+    nu_d_sigma_fg[g] = nu_delayed[g]*sigma_fg[g];
   }
 
   file.close();
