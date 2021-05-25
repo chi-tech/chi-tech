@@ -24,9 +24,10 @@ void LinearBoltzmann::Solver::
 {
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_mat_src     = (source_flags & APPLY_MATERIAL_SOURCE);
-  const bool apply_scatter_src = (source_flags & APPLY_SCATTER_SOURCE);
-  const bool apply_fission_src = (source_flags & APPLY_FISSION_SOURCE);
+  const bool apply_mat_src         = (source_flags & APPLY_MATERIAL_SOURCE);
+  const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
+  const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCE);
+  const bool apply_fission_src     = (source_flags & APPLY_FISSION_SOURCE);
 
   //================================================== Get group setup
   int gs_i = groupset.groups[0].id;
@@ -68,8 +69,8 @@ void LinearBoltzmann::Solver::
       src = material_srcs[src_id]->source_value_g.data();
 
     //=========================================== Loop over dofs
-    int num_dofs = full_cell_view.dofs;
-    for (int i=0; i<num_dofs; i++)
+    int num_nodes = full_cell_view.NumNodes();
+    for (int i=0; i <num_nodes; i++)
     {
       for (int m=0; m<num_moments; ++m)
       {
@@ -87,7 +88,7 @@ void LinearBoltzmann::Solver::
 
           double inscat_g = 0.0;
           //====================== Apply across-groupset scattering
-          if ( (ell < xs->transfer_matrix.size()) && (apply_mat_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_ags_scatter_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
@@ -102,7 +103,7 @@ void LinearBoltzmann::Solver::
           }//if moment avail
 
           //====================== Apply within-groupset scattering
-          if ( (ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
+          if ( (ell < xs->transfer_matrix.size()) && (apply_wgs_scatter_src) )
           {
             size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)

@@ -32,8 +32,9 @@ enum class BoundaryType
   {
     NO_FLAGS_SET           = 0,
     APPLY_MATERIAL_SOURCE  = (1 << 0),
-    APPLY_SCATTER_SOURCE   = (1 << 1),
-    APPLY_FISSION_SOURCE   = (1 << 2)
+    APPLY_WGS_SCATTER_SOURCE   = (1 << 1),
+    APPLY_AGS_SCATTER_SOURCE   = (1 << 2),
+    APPLY_FISSION_SOURCE       = (1 << 3)
   };
 
   inline SourceFlags operator|(const SourceFlags f1,
@@ -83,7 +84,7 @@ public:
 
   chi_math::UnknownManager flux_moments_uk_man;
 
-  int max_cell_dof_count;
+  size_t max_cell_dof_count;
   unsigned long long local_node_count;
   unsigned long long glob_node_count;
 
@@ -180,6 +181,9 @@ public:
   void CopySTLvectorToSTLvector(LBSGroupset& groupset,
                                 const std::vector<double>& x_src,
                                 std::vector<double>& y);
+
+  //compute_balance
+  void ComputeBalance();
 
 };
 
