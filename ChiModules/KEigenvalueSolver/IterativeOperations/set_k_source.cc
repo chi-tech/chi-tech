@@ -29,7 +29,7 @@ void KEigenvalue::Solver::
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
   const bool apply_mat_src     = (source_flags & APPLY_MATERIAL_SOURCE);
-  const bool apply_scatter_src = (source_flags & APPLY_SCATTER_SOURCE);
+  const bool apply_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
   const bool apply_fission_src = (source_flags & APPLY_FISSION_SOURCE);
 
   // ----- Groupset group information
@@ -66,8 +66,8 @@ void KEigenvalue::Solver::
     auto xs = material_xs[xs_id];
 
     // ----- Loop over dofs
-    int num_dofs = full_cell_view.dofs;
-    for (int i=0; i<num_dofs; i++)
+    int num_nodes = full_cell_view.NumNodes();
+    for (int i=0; i <num_nodes; i++)
     {
       // ----- Loop over moments
       for (int m=0; m<num_moments; ++m)
