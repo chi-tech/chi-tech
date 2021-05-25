@@ -84,7 +84,7 @@ public:
 
   void PreComputeCellSDValues() override;
 //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
-  std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(int cell_local_index);
+  std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
 
 private:
   //02
