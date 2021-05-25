@@ -297,7 +297,7 @@ void chi_physics::TransportCrossSections::
 
   //#############################################
   /**Lambda function for reading in the 1d vectors.*/
-  auto Read1DXS = [StrToD,StrToI,grabbed_G,grabbed_M,ThrowGandMError]
+  auto Read1DXS = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
     (std::string keyword,std::vector<double>& xs,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
@@ -332,7 +332,7 @@ void chi_physics::TransportCrossSections::
 
   //#############################################
   /**Lambda reading the delayed chi matrix.*/
-  auto ReadDelayedChi = [StrToD,StrToI,grabbed_G,grabbed_M,ThrowGandMError]
+  auto ReadDelayedChi = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
     (std::string keyword,std::vector<std::vector<double>>& chi,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
@@ -376,7 +376,7 @@ void chi_physics::TransportCrossSections::
 
   //#############################################
   /**Lambda reading a transfer matrix.*/
-  auto ReadTransferMatrix = [StrToD,StrToI,grabbed_G,grabbed_M,ThrowGandMError]
+  auto ReadTransferMatrix = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
     (std::string keyword,std::vector<chi_math::SparseMatrix>& matrix,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
