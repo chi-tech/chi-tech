@@ -59,7 +59,7 @@ LBSCurvilinear::SweepChunkPWL::
     }
 
   //  set normal vector for symmetric boundary condition
-   const int d =
+  const int d =
     (grid_view->local_cells[0].Type() == chi_mesh::CellType::SLAB) ? 2 : 0;
   normal_vector_boundary = chi_mesh::Vector3(0.0, 0.0, 0.0);
   normal_vector_boundary(d) = 1;
@@ -103,8 +103,8 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
     const auto& cell = grid_view->local_cells[cell_local_id];
     const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
     const auto& fe_intgrl_values_secondary = grid_fe_view_secondary.GetUnitIntegrals(cell);
-    const int num_faces = cell.faces.size();
-    const int num_dofs = fe_intgrl_values.NumNodes();
+    const auto num_faces = cell.faces.size();
+    const auto num_dofs = fe_intgrl_values.NumNodes();
     const auto& transport_view = grid_transport_view[cell.local_id];
     const auto& sigma_tg = xsections[transport_view.xs_id]->sigma_tg;
     std::vector<bool> face_incident_flags(num_faces, false);
@@ -139,27 +139,27 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
 
       // ============================================ Gradient matrix
-      for (unsigned int i = 0; i < num_dofs; ++i)
-        for (unsigned int j = 0; j < num_dofs; ++j)
+      for (size_t i = 0; i < num_dofs; ++i)
+        for (size_t j = 0; j < num_dofs; ++j)
           Amat[i][j] = omega.Dot(G[i][j]) + fac_streaming_operator * Maux[i][j];
 
 
       // ============================================ Source initialization
-      for (unsigned int gsg = 0; gsg < gs_ss_size; ++gsg)
+      for (int gsg = 0; gsg < gs_ss_size; ++gsg)
         b[gsg].assign(num_dofs, 0);
 
-      for (unsigned int i = 0; i < num_dofs; ++i)
-        for (unsigned int j = 0; j < num_dofs; ++j)
+      for (size_t i = 0; i < num_dofs; ++i)
+        for (size_t j = 0; j < num_dofs; ++j)
         {
           const auto jr = grid_fe_view.MapDOFLocal(cell, j, unknown_manager, polar_level, gs_gi);
-          for (unsigned int gsg = 0; gsg < gs_ss_size; ++gsg)
+          for (int gsg = 0; gsg < gs_ss_size; ++gsg)
             b[gsg][i] += fac_streaming_operator * Maux[i][j] * psi_sweep[jr+gsg];
         }
 
 
       // ============================================ Surface integrals
       int in_face_counter = -1;
-      for (int f = 0; f < num_faces; ++f)
+      for (size_t f = 0; f < num_faces; ++f)
       {
         const auto& face = cell.faces[f];
         const double mu = omega.Dot(face.normal);
@@ -264,15 +264,15 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
 
       // ========================================== Looping over groups
-      for (unsigned int gsg = 0; gsg < gs_ss_size; ++gsg)
+      for (int gsg = 0; gsg < gs_ss_size; ++gsg)
       {
         const auto g = gs_gi+gsg;
 
         // ============================= Contribute source moments
-        for (unsigned int i = 0; i < num_dofs; ++i)
+        for (size_t i = 0; i < num_dofs; ++i)
         {
           source[i] = 0;
-          for (unsigned int m = 0; m < num_moms; ++m)
+          for (int m = 0; m < num_moms; ++m)
           {
             const int ir = transport_view.MapDOF(i, m, g);
             source[i] += m2d_op[m][angle_num] * (*q_moments)[ir];
@@ -281,8 +281,8 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
         // ============================= Mass Matrix and Source
         const auto& sigma_tgr = sigma_tg[g];
-        for (unsigned int i = 0; i < num_dofs; ++i)
-          for (unsigned int j = 0; j < num_dofs; ++j)
+        for (size_t i = 0; i < num_dofs; ++i)
+          for (size_t j = 0; j < num_dofs; ++j)
           {
             Atemp[i][j] = Amat[i][j] + M[i][j] * sigma_tgr;
             b[gsg][i] += M[i][j] * source[j];
@@ -294,7 +294,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
 
       // ============================= Accumulate flux
-      for (unsigned int m = 0; m < num_moms; ++m)
+      for (int m = 0; m < num_moms; ++m)
       {
         const double wn_d2m = d2m_op[m][angle_num];
         for (int i = 0; i < num_dofs; ++i)
@@ -327,7 +327,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
       //============================================= Outgoing fluxes
       int out_face_counter = -1;
-      for (int f = 0; f < num_faces; ++f)
+      for (size_t f = 0; f < num_faces; ++f)
       {
         if (face_incident_flags[f]) continue;
 
@@ -380,10 +380,10 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
       //  store starting direction angular intensity for each polar level
       if (start_direction)
-        for (unsigned int i = 0; i < num_dofs; ++i)
+        for (size_t i = 0; i < num_dofs; ++i)
         {
           const auto ir = grid_fe_view.MapDOFLocal(cell, i, unknown_manager, polar_level, gs_gi);
-          for (unsigned int gsg = 0; gsg < gs_ss_size; ++gsg)
+          for (int gsg = 0; gsg < gs_ss_size; ++gsg)
             psi_start[ir+gsg] = b[gsg][i];
         }
 
@@ -391,10 +391,10 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
       //  (incoming for next interval)
       const auto f0 = 1/fac_diamond_difference;
       const auto f1 = f0 - 1;
-      for (unsigned int i = 0; i < num_dofs; ++i)
+      for (size_t i = 0; i < num_dofs; ++i)
       {
         const auto ir = grid_fe_view.MapDOFLocal(cell, i, unknown_manager, polar_level, gs_gi);
-        for (unsigned int gsg = 0; gsg < gs_ss_size; ++gsg)
+        for (int gsg = 0; gsg < gs_ss_size; ++gsg)
           psi_sweep[ir+gsg] = f0 * b[gsg][i] - f1 * psi_sweep[ir+gsg];
       }
 

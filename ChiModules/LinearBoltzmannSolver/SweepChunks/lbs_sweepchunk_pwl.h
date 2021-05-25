@@ -52,7 +52,7 @@ protected:
 
 public:
   std::vector<std::vector<double>> b;
-  int spls_index, angle_set_index;
+  size_t spls_index, angle_set_index;
 
   // ################################################## Constructor
   LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
