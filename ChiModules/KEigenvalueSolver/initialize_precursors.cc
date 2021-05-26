@@ -41,7 +41,7 @@ void KEigenvalue::Solver::InitializePrecursors()
         // ----- Loop over precursors
         for (size_t j = 0; j < xs->num_precursors; ++j)
         {
-          int j_map = precursor_map[xs_id][j];
+          size_t j_map = precursor_map[xs_id][j];
 
           // ----- Initialize precursors
           double coeff = xs->gamma[j] / xs->lambda[j];
