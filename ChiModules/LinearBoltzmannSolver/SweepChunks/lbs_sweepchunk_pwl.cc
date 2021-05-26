@@ -104,6 +104,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
       preloc_face_counter = ni_preloc_face_counter;
       const int angle_num = angle_set->angles[angle_set_index];
       const chi_mesh::Vector3 omega = groupset.quadrature->omegas[angle_num];
+      const double wt = groupset.quadrature->weights[angle_num];
 
       // ============================================ Gradient matrix
       for (int i = 0; i < num_nodes; ++i)
@@ -232,7 +233,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
         const double wn_d2m = d2m_op[m][angle_num];
         for (int i = 0; i < num_nodes; ++i)
         {
-          const int ir = transport_view.MapDOF(i, m, gs_gi);
+          const size_t ir = transport_view.MapDOF(i, m, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
             output_vector[ir + gsg] += wn_d2m*b[gsg][i];
         }
@@ -301,11 +302,18 @@ void LinearBoltzmann::LBSSweepChunkPWL::
                                                                   cell.local_id, f,
                                                                   fi, gs_ss_begin);
               for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-              {
                 psi[gsg] = b[gsg][i];
+            }
+          }
+          else
+          {
+            for (int fi = 0; fi < num_face_indices; ++fi)
+            {
+              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+
+              for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                 transport_view.AddOutflow(gs_gi + gsg,
-                                          mu*b[gsg][i]*IntF_shapeI[i]);
-              }//for gsg
+                                          wt*mu*b[gsg][i]*IntF_shapeI[i]);
             }
           }
         }//bndry
