@@ -3,7 +3,7 @@
 //###################################################################
 /**Computes cell volume and surface integrals.*/
 void SlabMappingFE_PWL::
-  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data)
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const
 {
   typedef std::vector<chi_mesh::Vector3> VecVec3;
   typedef std::vector<VecVec3> MatVec3;

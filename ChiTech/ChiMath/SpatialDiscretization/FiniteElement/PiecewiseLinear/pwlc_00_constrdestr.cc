@@ -28,7 +28,28 @@ SpatialDiscretization_PWLC::
 
   if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
   {
-    const auto qorder_min = static_cast<int>(chi_math::QuadratureOrder::SECOND);
+    int qorder_min = static_cast<int>(chi_math::QuadratureOrder::INVALID_ORDER);
+    switch (cs_type)
+    {
+      case chi_math::CoordinateSystemType::CARTESIAN:
+      {
+        qorder_min = static_cast<int>(chi_math::QuadratureOrder::SECOND);
+        break;
+      }
+      case chi_math::CoordinateSystemType::CYLINDRICAL:
+      {
+        qorder_min = static_cast<int>(chi_math::QuadratureOrder::THIRD);
+        break;
+      }
+      case chi_math::CoordinateSystemType::SPHERICAL:
+      {
+        qorder_min = static_cast<int>(chi_math::QuadratureOrder::FOURTH);
+        break;
+      }
+      default:
+        throw std::invalid_argument("SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+                                    "Unsupported coordinate system type encountered.");
+    }
 
     if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)
       chi_log.Log(LOG_ALLWARNING)

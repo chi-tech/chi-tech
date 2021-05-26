@@ -96,10 +96,6 @@ public:
                           chi_math::QuadratureHexahedron&    volume_quadrature,
                           chi_math::QuadratureQuadrilateral& surface_quadrature);
 
-  void InitializeAllQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-
 
   //################################################## Define standard
   //                                                   hexahedron linear shape

@@ -299,9 +299,9 @@ int chiLBSSetProperty(lua_State *L)
   {
     LuaCheckNilValue(__FUNCTION__, L, 3);
 
-    int scat_order = lua_tonumber(L,3);
+    int scattering_order = lua_tonumber(L,3);
 
-    if (scat_order<0)
+    if (scattering_order<0)
     {
       chi_log.Log(LOG_0ERROR)
         << "Invalid scattering order in call to "
@@ -310,7 +310,7 @@ int chiLBSSetProperty(lua_State *L)
       exit(EXIT_FAILURE);
     }
 
-    solver->options.scattering_order = scat_order;
+    solver->options.scattering_order = scattering_order;
   }
   else if (property == SWEEP_EAGER_LIMIT)
   {

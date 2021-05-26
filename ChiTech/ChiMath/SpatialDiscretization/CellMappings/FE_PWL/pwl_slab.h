@@ -24,23 +24,23 @@ public:
                     const chi_math::QuadratureLine& volume_quadrature);
 
   void ComputeUnitIntegrals(
-    chi_math::finite_element::UnitIntegralData& ui_data) override;
-  void InitializeAllQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
+    chi_math::finite_element::UnitIntegralData& ui_data) const override;
 
   void InitializeVolumeQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) const override;
 
   void InitializeFaceQuadraturePointData(
     unsigned int face,
-    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const override;
 
   //################################################## Define standard
   //                                                   slab linear shape
   //                                                   functions
-  double SlabShape(int index, int qpoint_index, bool on_surface=false);
-  double SlabGradShape(int index);
+  double SlabShape(int index,
+                   const chi_mesh::Vector3& qpoint,
+                   bool on_surface=false,
+                   const int edge=0) const;
+  double SlabGradShape(int index) const;
 
 
   //############################################### Actual shape functions

@@ -248,12 +248,12 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PopulateQuadratureAbscissae()
   weights.clear();
   omegas.clear();
 
-  for (auto& sq : deployed_SQs)
+  for (const auto& sq : deployed_SQs)
   {
     for (int i=0;i<4;++i)
     {
-      auto& omega = sq.sub_sqr_points[i];
-      double weight = sq.sub_sqr_weights[i];
+      const auto& omega = sq.sub_sqr_points[i];
+      const double weight = sq.sub_sqr_weights[i];
 
       double theta = acos(omega.z);
       double phi = acos(omega.x/sin(theta));
@@ -261,11 +261,9 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PopulateQuadratureAbscissae()
       if (omega.y/sin(theta)<0.0)
         phi = 2.0*M_PI - phi;
 
-      chi_math::QuadraturePointPhiTheta qp;
-      qp.phi = phi;
-      qp.theta = theta;
+      const auto abscissa = chi_math::QuadraturePointPhiTheta(phi, theta);
 
-      abscissae.push_back(qp);
+      abscissae.push_back(abscissa);
       weights.push_back(weight);
       omegas.push_back(omega);
     }
