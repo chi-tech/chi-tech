@@ -8,31 +8,26 @@ num_procs = 4
 
 
 --############################################### Check num_procs
-if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
-    chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
-                      "Expected "..tostring(num_procs)..
-                      ". Pass check_num_procs=false to override if possible.")
-    os.exit(false)
-end
+-- if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
+--     chiLog(LOG_0ERROR,"Incorrect amount of processors. " ..
+--                       "Expected "..tostring(num_procs)..
+--                       ". Pass check_num_procs=false to override if possible.")
+--     os.exit(false)
+-- end
 
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromWavefrontOBJ(
-        "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj")
-
-region1 = chiRegionCreate()
-
-chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED);
-
-chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
-chiVolumeMesherSetKBACutsX({0.0})
-chiVolumeMesherSetKBACutsY({0.0})
-
-chiVolumeMesherSetProperty(PARTITION_TYPE,KBA_STYLE_XYZ)
-
-chiSurfaceMesherExecute();
+mesh={}
+N=20
+L=5
+xmin = -L/2
+dx = L/N
+for i=1,(N+1) do
+    k=i-1
+    mesh[i] = xmin + k*dx
+end
+chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
@@ -54,11 +49,11 @@ chiPhysicsMaterialAddProperty(materials[1],ISOTROPIC_MG_SOURCE)
 chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 
-num_groups = 168
+num_groups = 1
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"ChiTest/xs_3_170.data")
+        CHI_XSFILE,"ChiTest/simple_scatter.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        PDT_XSFILE,"ChiTest/xs_3_170.data")
+        CHI_XSFILE,"ChiTest/simple_scatter.cxs")
 
 --chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
 --chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,SIMPLEXS0,num_groups,0.1)
@@ -82,32 +77,42 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
+fac=10
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4*fac, 3*fac)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
+chiLBSGroupsetAddGroups(phys1,cur_gs,0,0)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
-gs1 = chiLBSCreateGroupset(phys1)
-cur_gs = gs1
-chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+-- gs0 = chiLBSCreateGroupset(phys1)
+-- cur_gs = gs0
+-- chiLBSGroupsetAddGroups(phys1,cur_gs,1,62)
+-- chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+-- chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+-- chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
+-- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+-- chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+-- chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+-- chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+
+-- gs1 = chiLBSCreateGroupset(phys1)
+-- cur_gs = gs1
+-- chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
+-- chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+-- chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+-- chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
+-- chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
+-- chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
+-- chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+-- chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 
 --############################################### Set boundary conditions
 -- bsrc={}
@@ -119,7 +124,7 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
 --                         LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
-chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 
 --############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)

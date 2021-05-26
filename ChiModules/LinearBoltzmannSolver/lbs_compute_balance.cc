@@ -58,13 +58,20 @@ void LinearBoltzmann::Solver::ComputeBalance()
 
   chi_log.Log() << "Computing items";
 
+  //======================================== Initialize diffusion params
+  //                                         for xs
+  for (auto& xs : material_xs)
+    if (not xs->diffusion_initialized)
+      xs->ComputeDiffusionParameters();
+
   //======================================== Compute absorbtion, material-source
   //                                         and in-flow
-  double out_flow=0.0;
-  double in_flow=0.0;
-  double absorbtion=0.0;
-  double IntV_q=0.0;
   size_t num_groups=groups.size();
+  std::vector<double> out_flow    (num_groups,0.0);
+  std::vector<double> in_flow     (num_groups,0.0);
+  std::vector<double> removal     (num_groups, 0.0);
+  std::vector<double> exterior_src(num_groups, 0.0);
+  std::vector<double> flux_intgl  (num_groups, 0.0);
   for (auto& cell : grid->local_cells)
   {
     const auto& transport_view = cell_transport_views[cell.local_id];
@@ -74,9 +81,12 @@ void LinearBoltzmann::Solver::ComputeBalance()
     const auto& IntV_shapeI = fe_intgrl_values.GetIntV_shapeI();
 
     for (int g=0; g<num_groups; ++g)
-      out_flow += transport_view.GetOutflow(g);
+      out_flow[g] += transport_view.GetOutflow(g);
 
     auto& sigma_ag = material_xs[transport_view.XSMapping()]->sigma_ag;
+    auto& sigma_rg = material_xs[transport_view.XSMapping()]->sigma_rg;
+    auto& sigma_sgs = material_xs[transport_view.XSMapping()]->sigma_s_gtog;
+    auto& xs = *material_xs[transport_view.XSMapping()];
 
     for (int i=0; i<num_nodes; ++i)
       for (int g=0; g<num_groups; ++g)
@@ -85,13 +95,16 @@ void LinearBoltzmann::Solver::ComputeBalance()
         double phi_0g = phi_old_local[imap];
         double q_0g   = mat_src[imap];
 
-//        absorbtion += sigma_ag[g]*phi_0g*IntV_shapeI[i];
-        IntV_q += q_0g * IntV_shapeI[i];
+        removal     [g] += xs.sigma_rg[g] * phi_0g * IntV_shapeI[i];
+        exterior_src[g] += q_0g * IntV_shapeI[i];
+        flux_intgl  [g] += phi_0g * IntV_shapeI[i];
       }//for g
   }//for cell
 
   //======================================== Consolidate local balances
-  double local_balance = IntV_q + in_flow - absorbtion - out_flow;
+  double local_balance = 0.0;
+  for (int g=0; g<num_groups; ++g)
+    local_balance += exterior_src[g] + in_flow[g] - removal[g] - out_flow[g];
   double globl_balance = 0.0;
 
   MPI_Allreduce(&local_balance,   //sendbuf
@@ -100,11 +113,20 @@ void LinearBoltzmann::Solver::ComputeBalance()
                 MPI_SUM,          //operation
                 MPI_COMM_WORLD);  //communicator
 
-  chi_log.Log(LOG_ALL) << "Local balance: "
-                << std::setprecision(6) << std::scientific
-                << local_balance;
-  MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log() << "Global balance: "
-                << std::setprecision(6) << std::scientific
-                << globl_balance;
+  chi_log.Log(LOG_ALL)
+    << "Local quantities: "
+    << exterior_src[0] << " "
+    << in_flow[0] << " "
+    << removal[0] << " "
+    << out_flow[0] << " "
+    << exterior_src[0] + in_flow[0] - removal[0] - out_flow[0] << " "
+    << (exterior_src[0] + in_flow[0] - removal[0] - out_flow[0])/flux_intgl[0] << " ";
+
+//  chi_log.Log(LOG_ALL) << "Local balance: "
+//                << std::setprecision(6) << std::scientific
+//                << local_balance;
+//  MPI_Barrier(MPI_COMM_WORLD);
+//  chi_log.Log() << "Global balance: "
+//                << std::setprecision(6) << std::scientific
+//                << globl_balance;
 }
