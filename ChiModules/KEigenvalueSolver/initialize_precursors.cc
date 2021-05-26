@@ -24,7 +24,7 @@ void KEigenvalue::Solver::InitializePrecursors()
   {
     // ----- Cell information
     const auto xs_id = matid_to_xs_map[cell.material_id];
-    auto xs = material_xs[xs_id];
+    auto& xs = material_xs[xs_id];
     auto cell_fe_view = pwl->GetCellMappingFE(cell.local_id);
     auto& transport_view = cell_transport_views[cell.local_id];
 
@@ -39,7 +39,7 @@ void KEigenvalue::Solver::InitializePrecursors()
       // ----- If a fissial material with precursors
       if ((xs->is_fissile) and (xs->num_precursors > 0)) {
         // ----- Loop over precursors
-        for (int j = 0; j < xs->num_precursors; ++j)
+        for (size_t j = 0; j < xs->num_precursors; ++j)
         {
           int j_map = precursor_map[xs_id][j];
 
