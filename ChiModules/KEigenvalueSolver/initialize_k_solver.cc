@@ -18,26 +18,33 @@ void KEigenvalue::Solver::InitializeKSolver()
 
   // ----- Init precursors
   if (options.use_precursors) {
-    // ----- Count precursors and define mapping
-    /** NOTE: This computes the total number of precursors
-     //       in the problem across all materials and assigns
-     //       a global mapping to the material. For example,
-     //       if material 0 has 6 precursors and material 1
-     //       has 6, the global mapping will give material 0
-     //       precursor IDs 0-5 and material 1 will receive
-     //       precursor IDs 6-11.
-    **/
     num_precursors = 0;
-    for (int x = 0; x < material_xs.size(); x++) {
-      if (material_xs[x]->num_precursors > 0) {
-        // Define the precursor mapping for this material
-        for (int j = 0; j < material_xs[x]->num_precursors; ++j) {
-          material_xs[x]->precursor_map[j] = num_precursors + j;
-        }
 
-        // Increment the total number of precursors
-        num_precursors += material_xs[x]->num_precursors;
-      }
+    // ----- Count precursors and define mapping
+    /** This computes the total number of precursors
+     // in the problem across all materials and assigns
+     //  a global mapping to the material. For example,
+     //  if material 0 has 6 precursors and material 1
+     //  has 6, the global mapping will give material 0
+     //  precursor IDs 0-5 and material 1 will receive
+     //  precursor IDs 6-11.
+    **/
+    precursor_map.clear();
+
+    // Loop over materials
+    for (auto& xs : material_xs) {
+      // Material precursor mapping vector
+      std::vector<size_t> mat_map;
+
+      // Define the precursor mapping for this material
+      for (size_t j = 0; j < xs->num_precursors; ++j)
+         mat_map.emplace_back(num_precursors + j);
+
+      // Increment the total number of precursors
+      num_precursors += xs->num_precursors;
+
+      // Add mapping to the precursor map
+      precursor_map.emplace_back(mat_map);
     }
 
     // -----Initialize precursor unknown manager and vector
