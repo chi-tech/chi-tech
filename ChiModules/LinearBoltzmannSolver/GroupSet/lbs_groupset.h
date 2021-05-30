@@ -81,9 +81,9 @@ public:
 
   //npt_groupset.cc
        LBSGroupset();
-  void BuildDiscMomOperator(int scatt_order,
+  void BuildDiscMomOperator(unsigned int scattering_order,
                             LinearBoltzmann::GeometryType geometry_type);
-  void BuildMomDiscOperator(int scatt_order,
+  void BuildMomDiscOperator(unsigned int scattering_order,
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildSubsets();
   void ZeroAngularFluxDataStructures()

@@ -51,8 +51,8 @@ namespace chi_math
   {
     UNDEFINED   = 0,
     CARTESIAN   = 1,
-  //CYLINDRICAL = 2,
-  //SPHERICAL   = 3,
+    CYLINDRICAL = 2,
+    SPHERICAL   = 3,
   };
   /**Spatial discretization type.*/
   enum class SpatialDiscretizationType

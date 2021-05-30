@@ -5,7 +5,7 @@
 #include <cmath>
 #include <sstream>
 
-#include <ChiLog/chi_log.h>
+#include "ChiLog/chi_log.h"
 extern ChiLog& chi_log;
 
 //#########################################################
@@ -136,14 +136,12 @@ void chi_math::ProductQuadrature::
     {
       map_directions[j].emplace_back(i*Np+j);
 
-      chi_math::QuadraturePointPhiTheta new_pair;
+      const auto abscissa =
+        chi_math::QuadraturePointPhiTheta(azimu_ang[i], polar_ang[j]);
 
-      new_pair.phi   = azimu_ang[i];
-      new_pair.theta = polar_ang[j];
+      abscissae.emplace_back(abscissa);
 
-      abscissae.emplace_back(new_pair);
-
-      double weight = in_weights[i*Np+j];
+      const double weight = in_weights[i*Np+j];
       weights.emplace_back(weight);
       weight_sum += weight;
 
@@ -151,8 +149,8 @@ void chi_math::ProductQuadrature::
       {
         char buf[200];
         sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-                new_pair.phi*180.0/M_PI,
-                new_pair.theta*180.0/M_PI,
+                abscissa.phi*180.0/M_PI,
+                abscissa.theta*180.0/M_PI,
                 weight);
         ostr << buf;
       }

@@ -13,10 +13,11 @@ enum class GeometryType
 {
   NO_GEOMETRY_SET  = 0,
   ONED_SLAB        = 1,
-  ONED_SPHERICAL   = 2,
-  TWOD_CARTESIAN   = 3,
-  TWOD_CYLINDRICAL = 4,
-  THREED_CARTESIAN = 5
+  ONED_CYLINDRICAL = 2,
+  ONED_SPHERICAL   = 3,
+  TWOD_CARTESIAN   = 4,
+  TWOD_CYLINDRICAL = 5,
+  THREED_CARTESIAN = 6
 };
 
 /**Struct for storing LBS options.*/
@@ -26,7 +27,7 @@ struct Options
 
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
   SDMType sd_type = SDMType::UNDEFINED;
-  int  scattering_order=1;
+  unsigned int scattering_order=1;
   int  sweep_eager_limit= 32000;;
 
   bool read_restart_data=false;

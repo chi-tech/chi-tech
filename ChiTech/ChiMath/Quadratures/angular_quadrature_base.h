@@ -23,6 +23,8 @@ struct chi_math::QuadraturePointPhiTheta
 {
   double phi=0.0;
   double theta=0.0;
+  QuadraturePointPhiTheta(const double phi, const double theta)
+  : phi(phi), theta(theta) {}
 };
 
 //################################################################### Class def
@@ -74,9 +76,9 @@ public:
                        std::vector<double>& polar,
                        std::vector<double>& in_weights, bool verbose=false);
 
-  virtual void MakeHarmonicIndices(int scatt_order, int dimension);
-  virtual void BuildDiscreteToMomentOperator(int scatt_order, int dimension);
-  virtual void BuildMomentToDiscreteOperator(int scatt_order, int dimension);
+  virtual void MakeHarmonicIndices(unsigned int scattering_order, int dimension);
+  virtual void BuildDiscreteToMomentOperator(unsigned int scattering_order, int dimension);
+  virtual void BuildMomentToDiscreteOperator(unsigned int scattering_order, int dimension);
 
   std::vector<std::vector<double>> const&
   GetDiscreteToMomentOperator() const {return d2m_op;}

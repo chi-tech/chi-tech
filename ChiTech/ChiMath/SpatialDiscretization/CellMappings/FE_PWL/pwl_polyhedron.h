@@ -26,17 +26,6 @@
 class PolyhedronMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
-  /**For a given side(tet), this structure holds the values of
- * shape functions at each quadrature point.*/
-  struct FEqp_data3d
-  {
-    std::vector<double> shape_qp;
-    std::vector<double> shape_qp_surf;
-    std::vector<double> gradshapex_qp;
-    std::vector<double> gradshapey_qp;
-    std::vector<double> gradshapez_qp;
-  };
-  //Goes into
   /**Stores the data for each side's tetrahedron. */
   struct FEside_data3d
   {
@@ -47,7 +36,6 @@ private:
     chi_mesh::Matrix3x3       J;
     chi_mesh::Matrix3x3       Jinv;
     chi_mesh::Matrix3x3       JTinv;
-    std::vector<FEqp_data3d>  qp_data;
   };
   //Goes into
   /**Stores data for each face.*/
@@ -102,16 +90,12 @@ public:
                           const chi_math::QuadratureTetrahedron& volume_quadrature,
                           const chi_math::QuadratureTriangle&    surface_quadrature);
 
-  void InitializeAllQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-
   void InitializeVolumeQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) const override;
 
   void InitializeFaceQuadraturePointData(
     unsigned int face,
-    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const override;
 
   //################################################## Define standard
   //                                                   tetrahedron linear shape
@@ -133,16 +117,16 @@ private:
                        unsigned int side_index,
                        unsigned int i,
                        const chi_mesh::Vector3& qpoint,
-                       bool on_surface = false);
+                       bool on_surface = false) const;
   double FaceSideGradShape_x(unsigned int face_index,
                              unsigned int side_index,
-                             unsigned int i);
+                             unsigned int i) const;
   double FaceSideGradShape_y(unsigned int face_index,
                              unsigned int side_index,
-                             unsigned int i);
+                             unsigned int i) const;
   double FaceSideGradShape_z(unsigned int face_index,
                              unsigned int side_index,
-                             unsigned int i);
+                             unsigned int i) const;
 
   //############################################### Actual shape functions
   //                                                as function of cartesian

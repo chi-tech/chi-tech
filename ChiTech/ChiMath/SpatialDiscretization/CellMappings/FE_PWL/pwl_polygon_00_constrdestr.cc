@@ -31,7 +31,6 @@ PolygonMappingFE_PWL::
     chi_mesh::Vector3 sidev02 = v2 - v0;
 
     double sidedetJ = ((sidev01.x)*(sidev02.y) - (sidev02.x)*(sidev01.y));
-    detJ.push_back(sidedetJ);
 
     FEside_data2d triangle_data;
     triangle_data.detJ = sidedetJ;

@@ -33,25 +33,25 @@ public:
 
   /** Compute unit integrals. */
   virtual void
-  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data);
+  ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const;
 
   /** Initialize volume quadrature point data and
    *  surface quadrature point data for all faces. */
   virtual void
   InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) {}
+    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) const;
 
   /** Initialize volume quadrature point data. */
   virtual void
   InitializeVolumeQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data) {}
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) const = 0;
 
   /** Initialize surface quadrature point data for face index \p face. */
   virtual void
   InitializeFaceQuadraturePointData(
     unsigned int face,
-    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) {}
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const = 0;
 
 public:
   /** Virtual function evaluation of the shape function. */
@@ -84,6 +84,16 @@ public:
 
   /** Destructor. */
   virtual ~CellMappingFE_PWL() = default;
+
+protected:
+  /** Spatial weight function. See also ComputeWeightedUnitIntegrals. */
+  virtual double SpatialWeightFunction(const chi_mesh::Vector3& pt) const
+  { return 0.0; }
+  /** Compute spatially-weighted unit integrals from quadrature point data.
+   *  Spatial weighting is given by SpatialWeightFunction evaluated at
+   *  the real quadrature points. */
+  void
+  ComputeWeightedUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const;
 };
 
 

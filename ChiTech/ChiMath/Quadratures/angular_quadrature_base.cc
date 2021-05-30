@@ -6,6 +6,7 @@
 extern ChiLog& chi_log;
 
 #include <iomanip>
+#include <numeric>
 
 //###################################################################
 /**Initializes the quadrature with custom angles and weights.*/
@@ -30,16 +31,14 @@ void chi_math::AngularQuadrature::
   std::stringstream ostr;
   double weight_sum = 0.0;
 
-  for (unsigned i=0; i<Na; i++)
+  for (unsigned int i=0; i<Na; i++)
   {
-    chi_math::QuadraturePointPhiTheta new_pair;
+    const auto abscissa =
+      chi_math::QuadraturePointPhiTheta(azimuthal[i], polar[i]);
 
-    new_pair.phi   = azimuthal[i];
-    new_pair.theta = polar[i];
+    abscissae.push_back(abscissa);
 
-    abscissae.push_back(new_pair);
-
-    double weight = in_weights[i];
+    const double weight = in_weights[i];
     weights.push_back(weight);
     weight_sum += weight;
 
@@ -47,15 +46,15 @@ void chi_math::AngularQuadrature::
     {
       char buf[200];
       sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-              new_pair.phi*180.0/M_PI,
-              new_pair.theta*180.0/M_PI,
+              abscissa.phi*180.0/M_PI,
+              abscissa.theta*180.0/M_PI,
               weight);
       ostr << buf;
     }
   }
 
   //================================================== Create omega list
-  for (auto qpoint : abscissae)
+  for (const auto& qpoint : abscissae)
   {
     chi_mesh::Vector3 new_omega;
     new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
@@ -78,22 +77,22 @@ void chi_math::AngularQuadrature::
 /**Populates a map of moment m to the Spherical Harmonic indices
  * required.*/
 void chi_math::AngularQuadrature::
-MakeHarmonicIndices(int scatt_order, int dimension)
+MakeHarmonicIndices(unsigned int scattering_order, int dimension)
 {
   if (m_to_ell_em_map.empty())
   {
     if (dimension == 1)
-      for (int ell=0; ell<=scatt_order; ell++)
+      for (unsigned int ell=0; ell<=scattering_order; ell++)
         m_to_ell_em_map.emplace_back(ell,0);
     else if (dimension == 2)
-      for (int ell=0; ell<=scatt_order; ell++)
+      for (unsigned int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m+=2)
         {
           if (ell == 0 or m != 0)
             m_to_ell_em_map.emplace_back(ell,m);
         }
     else if (dimension == 3)
-      for (int ell=0; ell<=scatt_order; ell++)
+      for (unsigned int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m++)
           m_to_ell_em_map.emplace_back(ell,m);
   }
@@ -102,12 +101,12 @@ MakeHarmonicIndices(int scatt_order, int dimension)
 //###################################################################
 /**Computes the discrete to moment operator.*/
 void chi_math::AngularQuadrature::
-  BuildDiscreteToMomentOperator(int scatt_order, int dimension)
+  BuildDiscreteToMomentOperator(unsigned int scattering_order, int dimension)
 {
   if (d2m_op_built) return;
 
   d2m_op.clear();
-  MakeHarmonicIndices(scatt_order,dimension);
+  MakeHarmonicIndices(scattering_order,dimension);
 
   int num_angles = abscissae.size();
   int num_moms = m_to_ell_em_map.size();
@@ -159,20 +158,18 @@ void chi_math::AngularQuadrature::
 //###################################################################
 /**Computes the moment to discrete operator.*/
 void chi_math::AngularQuadrature::
-  BuildMomentToDiscreteOperator(int scatt_order, int dimension)
+  BuildMomentToDiscreteOperator(unsigned int scattering_order, int dimension)
 {
   if (m2d_op_built) return;
 
   m2d_op.clear();
-  MakeHarmonicIndices(scatt_order,dimension);
+  MakeHarmonicIndices(scattering_order,dimension);
 
   int num_angles = abscissae.size();
   int num_moms = m_to_ell_em_map.size();
 
-  double normalization = 1.0;
-  if (dimension == 1) normalization = 2.0;
-  if (dimension == 2) normalization = 4.0*M_PI;
-  if (dimension == 3) normalization = 4.0*M_PI;
+  const auto normalization =
+    std::accumulate(weights.begin(), weights.end(), 0.0);
 
   for (const auto& ell_em : m_to_ell_em_map)
   {

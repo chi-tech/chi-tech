@@ -99,13 +99,13 @@ public:
   //01
   virtual void Initialize();
   //01a
-  void PerformInputChecks();
+  virtual void PerformInputChecks();
   void ComputeNumberOfMoments();
   void PrintSimHeader();
   //01b
   void InitMaterials(std::set<int> &material_ids);
   //01c
-  void InitializeSpatialDiscretization();
+  virtual void InitializeSpatialDiscretization();
   //01c
   void InitializeBoundaries();
   //01d

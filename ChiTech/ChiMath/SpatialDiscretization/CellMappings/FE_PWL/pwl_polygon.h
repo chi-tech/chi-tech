@@ -26,16 +26,6 @@
 class PolygonMappingFE_PWL : public CellMappingFE_PWL
 {
 private:
-  /**For a given side(triangle), this structure holds the values of
- * shape functions at each quadrature point.*/
-  struct FEqp_data2d
-  {
-    std::vector<double> shape_qp;
-    std::vector<double> shape_qp_surf;
-    std::vector<double> gradshapex_qp;
-    std::vector<double> gradshapey_qp;
-  };
-  //Goes into
   struct FEside_data2d
   {
     double detJ;
@@ -45,7 +35,6 @@ private:
     chi_mesh::Matrix3x3 J;
     chi_mesh::Matrix3x3 Jinv;
     chi_mesh::Matrix3x3 JTinv;
-    std::vector<FEqp_data2d> qp_data;
     chi_mesh::Vector3 normal;
   };
   //Goes into sides
@@ -58,7 +47,6 @@ private:
   int      num_of_subtris;
   double   beta;
   chi_mesh::Vertex vc;
-  std::vector<double> detJ;
   std::vector<std::vector<int>> node_to_side_map;
 
 
@@ -70,16 +58,12 @@ public:
                        const chi_math::QuadratureTriangle& volume_quadrature,
                        const chi_math::QuadratureLine&     surface_quadrature);
 
-  void InitializeAllQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data,
-    std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) override;
-
   void InitializeVolumeQuadraturePointData(
-    chi_math::finite_element::InternalQuadraturePointData& internal_data) override;
+    chi_math::finite_element::InternalQuadraturePointData& internal_data) const override;
 
   void InitializeFaceQuadraturePointData(
     unsigned int face,
-    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) override;
+    chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const override;
 
   //################################################## Define standard
   //                                                   triangle linear shape
@@ -93,9 +77,9 @@ public:
   double SideShape(unsigned int side,
                    unsigned int i,
                    const chi_mesh::Vector3& qpoint,
-                   bool on_surface = false);
-  double SideGradShape_x(unsigned int side, int i);
-  double SideGradShape_y(unsigned int side, int i);
+                   bool on_surface = false) const;
+  double SideGradShape_x(unsigned int side, int i) const;
+  double SideGradShape_y(unsigned int side, int i) const;
 
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
   chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
