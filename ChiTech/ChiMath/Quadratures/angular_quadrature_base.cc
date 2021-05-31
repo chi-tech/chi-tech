@@ -82,17 +82,17 @@ MakeHarmonicIndices(unsigned int scattering_order, int dimension)
   if (m_to_ell_em_map.empty())
   {
     if (dimension == 1)
-      for (unsigned int ell=0; ell<=scattering_order; ell++)
+      for (int ell=0; ell<=scattering_order; ell++)
         m_to_ell_em_map.emplace_back(ell,0);
     else if (dimension == 2)
-      for (unsigned int ell=0; ell<=scattering_order; ell++)
+      for (int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m+=2)
         {
           if (ell == 0 or m != 0)
             m_to_ell_em_map.emplace_back(ell,m);
         }
     else if (dimension == 3)
-      for (unsigned int ell=0; ell<=scattering_order; ell++)
+      for (int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m++)
           m_to_ell_em_map.emplace_back(ell,m);
   }
