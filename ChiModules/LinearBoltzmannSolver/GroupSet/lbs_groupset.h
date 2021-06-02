@@ -25,7 +25,6 @@ namespace LinearBoltzmann
   };
 }
 
-typedef chi_mesh::sweep_management::AngleAggregation AngleAgg;
 typedef std::pair<int,int> GsSubSet;
 typedef std::pair<int,int> AngSubSet;
 

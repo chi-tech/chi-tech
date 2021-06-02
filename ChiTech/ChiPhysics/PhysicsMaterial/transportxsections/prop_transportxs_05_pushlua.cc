@@ -26,117 +26,34 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushboolean(L,is_fissile);
   lua_settable(L,-3);
 
-  lua_pushstring(L,"sigma_tg");
-  lua_newtable(L);
+  auto Push1DXS = [L](const std::vector<double>& xs, const std::string& name)
   {
-    int g=0;
-    for (auto val : sigma_tg)
+    lua_pushstring(L,name.c_str());
+    lua_newtable(L);
     {
-      ++g;
-      lua_pushinteger(L,g);
-      lua_pushnumber(L,val);
-      lua_settable(L,-3);
+      int g=0;
+      for (auto val : xs)
+      {
+        ++g;
+        lua_pushinteger(L,g);
+        lua_pushnumber(L,val);
+        lua_settable(L,-3);
+      }
     }
-  }
-  lua_settable(L,-3);
+    lua_settable(L,-3);
+  };
 
-  lua_pushstring(L,"sigma_fg");
-  lua_newtable(L);
-  {
-    int g=0;
-    for (auto val : sigma_fg)
-    {
-      ++g;
-      lua_pushinteger(L,g);
-      lua_pushnumber(L,val);
-      lua_settable(L,-3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"sigma_captg");
-  lua_newtable(L);
-  {
-    int g=0;
-    for (auto val : sigma_captg)
-    {
-      ++g;
-      lua_pushinteger(L,g);
-      lua_pushnumber(L,val);
-      lua_settable(L,-3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"chi_g");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : chi_g)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"nu_sigma_fg");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : nu_sigma_fg)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"nu_p_sigma_fg");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : nu_p_sigma_fg)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"nu_d_sigma_fg");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : nu_d_sigma_fg)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"ddt_coeff");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : ddt_coeff)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
+  Push1DXS(sigma_tg,"sigma_tg");
+  Push1DXS(sigma_fg,"sigma_fg");
+  Push1DXS(sigma_ag,"sigma_ag");
+  Push1DXS(chi_g,"chi_g");
+  Push1DXS(nu,"nu");
+  Push1DXS(nu_prompt,"nu_prompt");
+  Push1DXS(nu_delayed,"nu_delayed");
+  Push1DXS(nu_sigma_fg,"nu_sigma_fg");
+  Push1DXS(nu_p_sigma_fg,"nu_p_sigma_fg");
+  Push1DXS(nu_d_sigma_fg,"nu_d_sigma_fg");
+  Push1DXS(ddt_coeff,"ddt_coeff");
 
   lua_pushstring(L,"chi_d");
   lua_newtable(L);
@@ -223,89 +140,11 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
 
 
   //============================================= Diffusion quantities
-  lua_pushstring(L,"diffg");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : diffg)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"sigma_rg");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : sigma_rg)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"sigma_ag");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : sigma_ag)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"sigma_s_gtog");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : sigma_s_gtog)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"xi_Jfull_g");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : xi_Jfull_g)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"xi_Jpart_g");
-  lua_newtable(L);
-  {
-    int g = 0;
-    for (auto val : xi_Jpart_g)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
-  }
-  lua_settable(L,-3);
+  Push1DXS(diffg,"diffg");
+  Push1DXS(sigma_rg,"sigma_rg");
+  Push1DXS(sigma_s_gtog,"sigma_s_gtog");
+  Push1DXS(xi_Jfull_g,"xi_Jfull_g");
+  Push1DXS(xi_Jpart_g,"xi_Jpart_g");
 
   lua_pushstring(L,"D_jfull");
   lua_pushnumber(L,D_jfull);

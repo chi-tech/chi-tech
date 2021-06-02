@@ -8,7 +8,7 @@ extern ChiLog& chi_log;
 /**This method populates a transport cross-section from
  * a PDT cross-section file.*/
 void chi_physics::TransportCrossSections::
-  MakeFromPDTxsFile(const std::string &file_name,std::string MT_TRANSFER)
+  MakeFromPDTxsFile(const std::string &file_name,const std::string& MT_TRANSFER)
 {
   //======================================== Clear any previous data
   Reset();
@@ -81,7 +81,7 @@ void chi_physics::TransportCrossSections::
   sigma_tg.clear();
   sigma_tg.resize(num_grps_G,0.0);
   sigma_fg.resize(num_grps_G,0.0);
-  sigma_captg.resize(num_grps_G,0.0);
+  sigma_ag.resize(num_grps_G,0.0);
   chi_g.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
   ddt_coeff.resize(num_grps_G, 0.0);
@@ -113,7 +113,7 @@ void chi_physics::TransportCrossSections::
   };
 
   //======================================== Lambda for reading 1D xs
-  auto Read1DXS = [](std::vector<double>& xs, std::ifstream& file, int G)
+  auto Read1DXS = [](std::vector<double>& xs, std::ifstream& file, size_t G)
   {
     for (int g=0; g<G; g++)
     {
@@ -137,7 +137,7 @@ void chi_physics::TransportCrossSections::
 
     if (mt_number == 1)    Read1DXS(sigma_tg, file, num_groups);
     if (mt_number == 18)   Read1DXS(sigma_fg, file, num_groups);
-    if (mt_number == 27)   Read1DXS(sigma_captg, file, num_groups);
+    if (mt_number == 27)   Read1DXS(sigma_ag, file, num_groups);
     if (mt_number == 2018) Read1DXS(chi_g, file, num_groups);
     if (mt_number == 2452) Read1DXS(nu_sigma_fg, file, num_groups);
 
@@ -150,7 +150,7 @@ void chi_physics::TransportCrossSections::
         file.getline(line,250);
         linestring = std::stringstream(line);
 
-        //      Sink,   first,  last:   165     104             167
+        //            Sink,   first,  last:   165     104             167
         linestring >> word >> word >> word >> sink >> gprime_first >> gprime_last;
 
         if (sink != g)

@@ -91,7 +91,8 @@ public:
 
   int NumNodes() const {return num_nodes;}
 
-  void ZeroOutflow() {outflow.assign(outflow.size(),0.0);}
+  void ZeroOutflow(     ) {outflow.assign(outflow.size(),0.0);}
+  void ZeroOutflow(int g) {if (g<outflow.size()) outflow[g]=0.0;}
   void AddOutflow(int g, double intS_mu_psi) {outflow[g] += intS_mu_psi;}
   double GetOutflow(int g) const
   {

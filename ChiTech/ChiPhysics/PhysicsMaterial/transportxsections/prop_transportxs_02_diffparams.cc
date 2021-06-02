@@ -12,7 +12,6 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
   diffg.resize(num_groups, 1.0);
   sigma_s_gtog.resize(num_groups, 0.0);
   sigma_rg.resize(num_groups, 0.1);
-  sigma_ag.resize(num_groups, 0.0);
   for (int g=0; g < num_groups; g++)
   {
     //====================================== Determine transport correction
@@ -21,7 +20,7 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     {
       for (int gp=0; gp < num_groups; gp++)
       {
-        int num_cols = transfer_matrix[1].rowI_indices[gp].size();
+        size_t num_cols = transfer_matrix[1].rowI_indices[gp].size();
         for (int j=0; j<num_cols; j++)
         {
           if (transfer_matrix[1].rowI_indices[gp][j] == g)
@@ -47,7 +46,7 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     //diffg[g] = 1.0/3.0/(sigma_tg[g]-sigs_g_1);
 
     //====================================== Determine in group scattering
-    int num_cols = transfer_matrix[0].rowI_indices[g].size();
+    size_t num_cols = transfer_matrix[0].rowI_indices[g].size();
     for (int j=0; j<num_cols; j++)
     {
       if (transfer_matrix[0].rowI_indices[g][j] == g)
@@ -59,33 +58,7 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 
     //====================================== Determine removal cross-section
     sigma_rg[g] = std::max(0.0,sigma_tg[g] - sigma_s_gtog[g]);
-
-
-
   }//for g
-
-  //====================================== Determine absorbtion x-section
-  for (int g=0; g < num_groups; g++)
-  {
-    sigma_ag[g] = sigma_tg[g];
-
-    for (int g2=0; g2 < num_groups; g2++)
-    {
-      int num_cols = transfer_matrix[0].rowI_indices[g2].size();
-      for (int j=0; j<num_cols; j++)
-      {
-        if (transfer_matrix[0].rowI_indices[g2][j] == g)
-        {
-          sigma_ag[g] -= transfer_matrix[0].rowI_values[g2][j];
-          break;
-        }
-      }//for j
-    }//for gp
-
-    sigma_ag[g] = std::max(0.0,sigma_ag[g]);
-  }
-
-
 
   //======================================== Compute two grid energy collapse
   chi_log.Log(LOG_0) << "Performing Energy collapse.";

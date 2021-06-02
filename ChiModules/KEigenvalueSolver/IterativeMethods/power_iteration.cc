@@ -46,7 +46,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
 
   // ----- Set starting guess to a unit magnitude flux
   phi_prev_local.assign(phi_prev_local.size(),1.0);
-  CopySTLvectorToSTLvector(groupset, phi_prev_local, phi_old_local);
+  ScopedCopySTLvectors(groupset, phi_prev_local, phi_old_local);
 
   // ----- Start outer k iterations
   double F_prev = 1.0;       //Production source prev
@@ -75,7 +75,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
 
       // ----- Compute convergence parameters
       double pw_change = ComputePiecewiseChange(groupset);
-      CopySTLvectorToSTLvector(groupset, phi_new_local, phi_old_local);
+      ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
       double rho = sqrt(pw_change/pw_change_prev);
       pw_change_prev = pw_change;
       nit += 1;
@@ -124,7 +124,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     // ----- Compute convergence parameters and bump values
     double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff; F_prev = F_new;
-    CopySTLvectorToSTLvector(groupset, phi_new_local, phi_prev_local);
+    ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
                                           
     if (k_eff_change<std::max(options.tolerance, 1.0e-12))
       k_converged = true;    

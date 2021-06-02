@@ -25,7 +25,7 @@ protected:
   LBSGroupset& groupset;
   const TCrossSections& xsections;
   const int num_moms;
-  const size_t G;
+  const size_t num_grps;
   const int max_num_cell_dofs;
 
   //Runtime params

@@ -32,7 +32,7 @@ double KEigenvalue::Solver::ComputeProduction()
     // ----- Loop over cell dofs
     for (int i=0; i<cell_fe_view.NumNodes(); i++)
     {
-      int ir = transport_view.MapDOF(i,0,0);
+      size_t ir = transport_view.MapDOF(i,0,0);
       double* phi_newp = &phi_new_local[ir];
 
       double intV_shapeI = cell_fe_view.IntV_shapeI(i);

@@ -22,18 +22,18 @@ LinearBoltzmann::LBSSweepChunkPWL::
                    const int in_num_moms,
                    const int in_max_num_cell_dofs)
                     : SweepChunk(destination_phi, false),
-                   grid_view(std::move(grid_ptr)),
-                   grid_fe_view(discretization),
-                   grid_transport_view(cell_transport_views),
-                   q_moments(source_moments),
-                   groupset(in_groupset),
-                   xsections(in_xsections),
-                   num_moms(in_num_moms),
-                   G(in_groupset.groups.size()),
-                   max_num_cell_dofs(in_max_num_cell_dofs),
-                   a_and_b_initialized(false),
-                   spls_index(0),
-                   angle_set_index(0)
+                      grid_view(std::move(grid_ptr)),
+                      grid_fe_view(discretization),
+                      grid_transport_view(cell_transport_views),
+                      q_moments(source_moments),
+                      groupset(in_groupset),
+                      xsections(in_xsections),
+                      num_moms(in_num_moms),
+                      num_grps(in_groupset.groups.size()),
+                      max_num_cell_dofs(in_max_num_cell_dofs),
+                      a_and_b_initialized(false),
+                      spls_index(0),
+                      angle_set_index(0)
 {}
 
 //###################################################################
@@ -45,7 +45,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
   {
     Amat.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
     Atemp.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-    b.resize(G, std::vector<double>(max_num_cell_dofs, 0.0));
+    b.resize(num_grps, std::vector<double>(max_num_cell_dofs, 0.0));
     source.resize(max_num_cell_dofs, 0.0);
     a_and_b_initialized = true;
   }
@@ -73,7 +73,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
     const int cell_local_id = spds->spls.item_id[spls_index];
     const auto& cell = grid_view->local_cells[cell_local_id];
     const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
-    const size_t num_faces = cell.faces.size();
+    const auto num_faces = cell.faces.size();
     const int num_nodes = static_cast<int>(fe_intgrl_values.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
     const int xs_mapping = transport_view.XSMapping();
@@ -82,17 +82,10 @@ void LinearBoltzmann::LBSSweepChunkPWL::
     std::vector<double> face_mu_values(num_faces, 0.0);
 
     // =================================================== Get Cell matrices
-    const std::vector<std::vector<chi_mesh::Vector3>>& L =
-      fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
-
-    const std::vector<std::vector<double>>& M =
-      fe_intgrl_values.GetIntV_shapeI_shapeJ();
-
-    const std::vector<std::vector<std::vector<double>>>& N =
-      fe_intgrl_values.GetIntS_shapeI_shapeJ();
-
-    const std::vector<std::vector<double>>& IntS_shapeI =
-      fe_intgrl_values.GetIntS_shapeI();
+    const auto& G           = fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
+    const auto& M           = fe_intgrl_values.GetIntV_shapeI_shapeJ();
+    const auto& M_surf      = fe_intgrl_values.GetIntS_shapeI_shapeJ();
+    const auto& IntS_shapeI = fe_intgrl_values.GetIntS_shapeI();
 
     // =================================================== Loop over angles in set
     const int ni_deploc_face_counter = deploc_face_counter;
@@ -109,7 +102,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
       // ============================================ Gradient matrix
       for (int i = 0; i < num_nodes; ++i)
         for (int j = 0; j < num_nodes; ++j)
-          Amat[i][j] = omega.Dot(L[i][j]);
+          Amat[i][j] = omega.Dot(G[i][j]);
 
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
         b[gsg].assign(num_nodes, 0.0);
@@ -138,7 +131,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
               {
                 const int j = fe_intgrl_values.FaceDofMapping(f,fj);
                 const double *psi = fluds->UpwindPsi(spls_index,in_face_counter,fj,0,angle_set_index);
-                const double mu_Nij = -mu*N[f][i][j];
+                const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                   b[gsg][i] += psi[gsg]*mu_Nij;
@@ -155,7 +148,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
               {
                 const int j = fe_intgrl_values.FaceDofMapping(f,fj);
                 const double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,angle_set_index);
-                const double mu_Nij = -mu*N[f][i][j];
+                const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                   b[gsg][i] += psi[gsg]*mu_Nij;
@@ -182,7 +175,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
                                                         cell.local_id,
                                                         f, fj, gs_gi, gs_ss_begin,
                                                         surface_source_active);
-                const double mu_Nij = -mu*N[f][i][j];
+                const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                   b[gsg][i] += psi[gsg]*mu_Nij;
@@ -203,7 +196,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
           double temp_src = 0.0;
           for (int m = 0; m < num_moms; ++m)
           {
-            const int ir = transport_view.MapDOF(i, m, g);
+            const size_t ir = transport_view.MapDOF(i, m, g);
             temp_src += m2d_op[m][angle_num]*q_moments[ir];
           }
           source[i] = temp_src;

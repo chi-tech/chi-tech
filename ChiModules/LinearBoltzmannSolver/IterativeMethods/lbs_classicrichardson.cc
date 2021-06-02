@@ -64,7 +64,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
 
     double pw_change = ComputePiecewiseChange(groupset);
 
-    CopySTLvectorToSTLvector(groupset, phi_new_local, phi_old_local);
+    ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
 
     double rho = sqrt(pw_change / pw_change_prev);
     pw_change_prev = pw_change;

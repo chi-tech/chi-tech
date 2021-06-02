@@ -53,6 +53,7 @@ void chi_physics::TransportCrossSections::
 
   Print1DXS(ofile,"SIGMA_T"   ,sigma_tg);
   Print1DXS(ofile,"SIGMA_F"   ,sigma_fg  ,1.0e-20);
+  Print1DXS(ofile,"SIGMA_A"   ,sigma_ag  ,1.0e-20);
   Print1DXS(ofile,"NU"        ,nu        ,1.0e-20);
   Print1DXS(ofile,"NU_PROMPT" ,nu_prompt ,1.0e-20);
   Print1DXS(ofile,"NU_DELAYED",nu_delayed,1.0e-20);

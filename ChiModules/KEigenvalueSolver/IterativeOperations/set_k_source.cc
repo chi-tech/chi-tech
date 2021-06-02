@@ -74,7 +74,7 @@ void KEigenvalue::Solver::
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        int64_t ir        = full_cell_view.MapDOF(i,m,0);
+        size_t  ir        = full_cell_view.MapDOF(i,m,0);
         double* q_mom     = &q_moments_local[ir];
 
         double* phi_oldp  = &phi_old_local[ir];

@@ -32,7 +32,7 @@ void chi_physics::TransportCrossSections::
   sigma_tg.clear();
   sigma_tg.resize(in_G,in_sigmat);
   sigma_fg.resize(in_G,0.0);
-  sigma_captg.resize(in_G,0.0);
+  sigma_ag.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
   nu_p_sigma_fg.resize(in_G,0.0);
@@ -59,7 +59,7 @@ void chi_physics::TransportCrossSections::
   sigma_tg.clear();
   sigma_tg.resize(in_G,in_sigmat);
   sigma_fg.resize(in_G,0.0);
-  sigma_captg.resize(in_G,0.0);
+  sigma_ag.resize(in_G,0.0);
   chi_g.resize(in_G,0.0);
   nu_sigma_fg.resize(in_G,0.0);
   nu_p_sigma_fg.resize(in_G,0.0);
@@ -106,8 +106,8 @@ void chi_physics::TransportCrossSections::
   //======================================== Pickup all xs and make sure valid
   std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> cross_secs;
   cross_secs.reserve(combinations.size());
-  int num_grps_G = 0;
-  int num_precursors_J = 0;
+  size_t num_grps_G = 0;
+  size_t num_precursors_J = 0;
   int count = 0;
   double N_total = 0.0;
   double Nf_total = 0.0;
@@ -177,8 +177,11 @@ void chi_physics::TransportCrossSections::
   this->num_precursors = num_precursors_J;
   sigma_tg.clear();
   sigma_fg.clear();
-  sigma_captg.clear();
+  sigma_ag.clear();
   chi_g.clear();
+  nu.clear();
+  nu_prompt.clear();
+  nu_delayed.clear();
   nu_sigma_fg.clear();
   nu_p_sigma_fg.clear();
   nu_d_sigma_fg.clear();
@@ -189,8 +192,11 @@ void chi_physics::TransportCrossSections::
 
   sigma_tg.resize(num_grps_G,0.0);
   sigma_fg.resize(num_grps_G,0.0);
-  sigma_captg.resize(num_grps_G,0.0);
+  sigma_ag.resize(num_grps_G,0.0);
   chi_g.resize(num_grps_G,0.0);
+  nu.resize(num_grps_G,0.0);
+  nu_prompt.resize(num_grps_G,0.0);
+  nu_delayed.resize(num_grps_G,0.0);
   nu_sigma_fg.resize(num_grps_G,0.0);
   nu_p_sigma_fg.resize(num_grps_G,0.0);
   nu_d_sigma_fg.resize(num_grps_G,0.0);
@@ -203,7 +209,8 @@ void chi_physics::TransportCrossSections::
 
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
-    this->scattering_order = std::max(this->scattering_order, cross_secs[x]->scattering_order);
+    scattering_order = std::max(this->scattering_order,
+                                cross_secs[x]->scattering_order);
 
     double N_i = combinations[x].second;
     double f_i = N_i/N_total;
@@ -213,8 +220,11 @@ void chi_physics::TransportCrossSections::
     {
       sigma_tg     [g] += cross_secs[x]->sigma_tg     [g] * N_i;
       sigma_fg     [g] += cross_secs[x]->sigma_fg     [g] * N_i;
-      sigma_captg  [g] += cross_secs[x]->sigma_captg  [g] * N_i;
+      sigma_ag     [g] += cross_secs[x]->sigma_ag     [g] * N_i;
       chi_g        [g] += cross_secs[x]->chi_g        [g] * ff_i;
+      nu           [g] += cross_secs[x]->nu           [g] * ff_i;
+      nu_prompt    [g] += cross_secs[x]->nu_prompt    [g] * ff_i;
+      nu_delayed   [g] += cross_secs[x]->nu_delayed   [g] * ff_i;
       nu_sigma_fg  [g] += cross_secs[x]->nu_sigma_fg  [g] * N_i;
       nu_p_sigma_fg[g] += cross_secs[x]->nu_p_sigma_fg[g] * N_i;
       nu_d_sigma_fg[g] += cross_secs[x]->nu_d_sigma_fg[g] * N_i;

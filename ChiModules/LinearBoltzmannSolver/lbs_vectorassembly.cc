@@ -3,9 +3,9 @@
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-  AssemblePETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
-                                const std::vector<double>& y,
-                                bool with_delayed_psi/*=false*/)
+  SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
+                           const std::vector<double>& y,
+                           bool with_delayed_psi/*=false*/)
 {
   double* x_ref;
   VecGetArray(x,&x_ref);
@@ -23,7 +23,7 @@ void LinearBoltzmann::Solver::
     {
       for (int m=0; m<num_moments; m++)
       {
-        int mapping = transport_view.MapDOF(i,m,gsi);
+        size_t mapping = transport_view.MapDOF(i,m,gsi);
         for (int g=0; g<gss; g++)
         {
           index++;
@@ -34,7 +34,7 @@ void LinearBoltzmann::Solver::
   }//for cell
 
   if (with_delayed_psi)
-    groupset.angle_agg.AssembleAngularUnknowns(index,x_ref);
+    groupset.angle_agg.AppendDelayedAngularDOFsToArray(index, x_ref);
 
   VecRestoreArray(x,&x_ref);
 }
@@ -42,9 +42,9 @@ void LinearBoltzmann::Solver::
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-  DisAssemblePETScVecToSTLvector(LBSGroupset& groupset, Vec x_src,
-                                 std::vector<double>& y,
-                                 bool with_delayed_psi/*=false*/)
+  SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
+                           std::vector<double>& y,
+                           bool with_delayed_psi/*=false*/)
 {
   const double* x_ref;
   VecGetArrayRead(x_src,&x_ref);
@@ -62,7 +62,7 @@ void LinearBoltzmann::Solver::
     {
       for (int m=0; m<num_moments; m++)
       {
-        int mapping = transport_view.MapDOF(i,m,gsi);
+        size_t mapping = transport_view.MapDOF(i,m,gsi);
         for (int g=0; g<gss; g++)
         {
           index++;
@@ -73,7 +73,7 @@ void LinearBoltzmann::Solver::
   }//for cell
 
   if (with_delayed_psi)
-    groupset.angle_agg.DisassembleAngularUnknowns(index,x_ref);
+    groupset.angle_agg.SetDelayedAngularDOFsFromArray(index, x_ref);
 
   VecRestoreArrayRead(x_src,&x_ref);
 }
@@ -82,9 +82,9 @@ void LinearBoltzmann::Solver::
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
 void LinearBoltzmann::Solver::
-  CopySTLvectorToSTLvector(LBSGroupset& groupset,
-                           const std::vector<double>& x_src,
-                           std::vector<double>& y)
+  ScopedCopySTLvectors(LBSGroupset& groupset,
+                       const std::vector<double>& x_src,
+                       std::vector<double>& y)
 {
   int gsi = groupset.groups[0].id;
   size_t gss = groupset.groups.size();
@@ -98,7 +98,7 @@ void LinearBoltzmann::Solver::
     {
       for (int m=0; m<num_moments; m++)
       {
-        int mapping = transport_view.MapDOF(i,m,gsi);
+        size_t mapping = transport_view.MapDOF(i,m,gsi);
         for (int g=0; g<gss; g++)
         {
           index++;

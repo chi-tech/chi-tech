@@ -7,14 +7,15 @@ LBSCurvilinear::SweepChunkPWL::
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                 SpatialDiscretization_PWLD& discretization_primary,
                 SpatialDiscretization_PWLD& discretization_secondary,
-                const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
-                std::vector<double>* destination_phi,
-                const std::vector<double>* source_moments,
-                      LBSGroupset& in_groupset,
+                std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                std::vector<double>& destination_phi,
+                const std::vector<double>& source_moments,
+                LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs)
-  : LBSSweepChunkPWL(grid_ptr,
+  : LinearBoltzmann::LBSSweepChunkPWL(
+                     std::move(grid_ptr),
                      discretization_primary,
                      cell_transport_views,
                      destination_phi,
@@ -73,13 +74,15 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
   {
     Amat.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
     Atemp.resize(max_num_cell_dofs, std::vector<double>(max_num_cell_dofs));
-    b.resize(G, std::vector<double>(max_num_cell_dofs, 0.0));
+    b.resize(num_grps, std::vector<double>(max_num_cell_dofs, 0.0));
     source.resize(max_num_cell_dofs, 0.0);
     a_and_b_initialized = true;
   }
 
   const auto spds = angle_set->GetSPDS();
   const auto fluds = angle_set->fluds;
+  const bool surface_source_active = IsSurfaceSourceActive();
+  std::vector<double>& output_vector = GetDestinationPhi();
 
   const GsSubSet& subset = groupset.grp_subsets[angle_set->ref_subset];
   const int gs_ss_size  = groupset.grp_subset_sizes[angle_set->ref_subset];
@@ -104,18 +107,19 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
     const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
     const auto& fe_intgrl_values_secondary = grid_fe_view_secondary.GetUnitIntegrals(cell);
     const auto num_faces = cell.faces.size();
-    const auto num_dofs = fe_intgrl_values.NumNodes();
-    const auto& transport_view = grid_transport_view[cell.local_id];
-    const auto& sigma_tg = xsections[transport_view.xs_id]->sigma_tg;
+    const int num_nodes = static_cast<int>(fe_intgrl_values.NumNodes());
+    auto& transport_view = grid_transport_view[cell.local_id];
+    const int xs_mapping = transport_view.XSMapping();
+    const auto& sigma_tg = xsections[xs_mapping]->sigma_tg;
     std::vector<bool> face_incident_flags(num_faces, false);
-
+    std::vector<double> face_mu_values(num_faces, 0.0);
 
     //=================================================== Get Cell matrices
-    const auto& G = fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
-    const auto& M = fe_intgrl_values.GetIntV_shapeI_shapeJ();
-    const auto& N = fe_intgrl_values.GetIntS_shapeI_shapeJ();
+    const auto& G      = fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
+    const auto& M      = fe_intgrl_values.GetIntV_shapeI_shapeJ();
+    const auto& M_surf = fe_intgrl_values.GetIntS_shapeI_shapeJ();
 
-    const auto& Maux = fe_intgrl_values_secondary.GetIntV_shapeI_shapeJ();
+    const auto& Maux   = fe_intgrl_values_secondary.GetIntV_shapeI_shapeJ();
 
 
     //=================================================== Loop over angles in set
@@ -139,17 +143,17 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
 
       // ============================================ Gradient matrix
-      for (size_t i = 0; i < num_dofs; ++i)
-        for (size_t j = 0; j < num_dofs; ++j)
+      for (size_t i = 0; i < num_nodes; ++i)
+        for (size_t j = 0; j < num_nodes; ++j)
           Amat[i][j] = omega.Dot(G[i][j]) + fac_streaming_operator * Maux[i][j];
 
 
       // ============================================ Source initialization
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-        b[gsg].assign(num_dofs, 0);
+        b[gsg].assign(num_nodes, 0);
 
-      for (size_t i = 0; i < num_dofs; ++i)
-        for (size_t j = 0; j < num_dofs; ++j)
+      for (size_t i = 0; i < num_nodes; ++i)
+        for (size_t j = 0; j < num_nodes; ++j)
         {
           const auto jr = grid_fe_view.MapDOFLocal(cell, j, unknown_manager, polar_level, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
@@ -159,7 +163,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
       // ============================================ Surface integrals
       int in_face_counter = -1;
-      for (size_t f = 0; f < num_faces; ++f)
+      for (int f = 0; f < num_faces; ++f)
       {
         const auto& face = cell.faces[f];
         const double mu = omega.Dot(face.normal);
@@ -167,9 +171,9 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
         if (mu < 0.0) // Upwind
         {
           face_incident_flags[f] = true;
-          const bool local = transport_view.face_local[f];
+          const bool local = transport_view.IsFaceLocal(f);
           const bool boundary = not face.has_neighbor;
-          const int num_face_indices = face.vertex_ids.size();
+          const size_t num_face_indices = face.vertex_ids.size();
           if (local)
           {
             in_face_counter++;
@@ -180,7 +184,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
               {
                 const int j = fe_intgrl_values.FaceDofMapping(f,fj);
                 const double *psi = fluds->UpwindPsi(spls_index,in_face_counter,fj,0,angle_set_index);
-                const double mu_Nij = -mu*N[f][i][j];
+                const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                   b[gsg][i] += psi[gsg]*mu_Nij;
@@ -197,7 +201,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
               {
                 const int j = fe_intgrl_values.FaceDofMapping(f,fj);
                 const double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,angle_set_index);
-                const double mu_Nij = -mu*N[f][i][j];
+                const double mu_Nij = -mu * M_surf[f][i][j];
                 Amat[i][j] += mu_Nij;
                 for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                   b[gsg][i] += psi[gsg]*mu_Nij;
@@ -220,7 +224,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
               (face.normal.Dot(normal_vector_boundary) < -0.999999);
             if (!incident_on_symmetric_boundary)
             {
-              const int bndry_index = face.neighbor_id;
+              const uint64_t bndry_index = face.neighbor_id;
               for (int fi = 0; fi < num_face_indices; ++fi)
               {
                 const int i = fe_intgrl_values.FaceDofMapping(f,fi);
@@ -232,7 +236,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
                                                           cell.local_id,
                                                           f, fj, gs_gi, gs_ss_begin,
                                                           surface_source_active);
-                  const double mu_Nij = -mu*N[f][i][j];
+                  const double mu_Nij = -mu * M_surf[f][i][j];
                   Amat[i][j] += mu_Nij;
                   for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                     b[gsg][i] += psi[gsg]*mu_Nij;
@@ -249,7 +253,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
                   const int j = fe_intgrl_values.FaceDofMapping(f,fj);
                   const auto jr = grid_fe_view.MapDOFLocal(cell, j, unknown_manager, polar_level, gs_gi);
                   const double* psi = &psi_start[jr];
-                  const double mu_Nij = -mu*N[f][i][j];
+                  const double mu_Nij = -mu * M_surf[f][i][j];
                   Amat[i][j] += mu_Nij;
                   for (int gsg = 0; gsg < gs_ss_size; ++gsg)
                     b[gsg][i] += psi[gsg]*mu_Nij;
@@ -269,27 +273,27 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
         const auto g = gs_gi+gsg;
 
         // ============================= Contribute source moments
-        for (size_t i = 0; i < num_dofs; ++i)
+        for (int i = 0; i < num_nodes; ++i)
         {
           source[i] = 0;
           for (int m = 0; m < num_moms; ++m)
           {
-            const int ir = transport_view.MapDOF(i, m, g);
-            source[i] += m2d_op[m][angle_num] * (*q_moments)[ir];
+            const size_t ir = transport_view.MapDOF(i, m, g);
+            source[i] += m2d_op[m][angle_num] * q_moments[ir];
           }
         }
 
         // ============================= Mass Matrix and Source
         const auto& sigma_tgr = sigma_tg[g];
-        for (size_t i = 0; i < num_dofs; ++i)
-          for (size_t j = 0; j < num_dofs; ++j)
+        for (size_t i = 0; i < num_nodes; ++i)
+          for (size_t j = 0; j < num_nodes; ++j)
           {
             Atemp[i][j] = Amat[i][j] + M[i][j] * sigma_tgr;
             b[gsg][i] += M[i][j] * source[j];
           }
 
         // ============================= Solve system
-        chi_math::GaussElimination(Atemp, b[gsg], num_dofs);
+        chi_math::GaussElimination(Atemp, b[gsg], num_nodes);
       }
 
 
@@ -297,17 +301,17 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
       for (int m = 0; m < num_moms; ++m)
       {
         const double wn_d2m = d2m_op[m][angle_num];
-        for (int i = 0; i < num_dofs; ++i)
+        for (int i = 0; i < num_nodes; ++i)
         {
-          const int ir = transport_view.MapDOF(i, m, gs_gi);
+          const size_t ir = transport_view.MapDOF(i, m, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            (*x)[ir + gsg] += wn_d2m*b[gsg][i];
+            output_vector[ir + gsg] += wn_d2m*b[gsg][i];
         }
       }
 
 
       // ============================= Moment callbacks
-      for (auto callback : moment_callbacks)
+      for (auto& callback : moment_callbacks)
         callback(this, angle_set);
 
 
@@ -316,9 +320,9 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
       {
         auto& psi = groupset.psi_new_local;
         auto& psi_uk_man = groupset.psi_uk_man;
-        for (int i = 0; i < num_dofs; ++i)
+        for (int i = 0; i < num_nodes; ++i)
         {
-          int ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+          int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
             psi[ir + gsg] = b[gsg][i];
         }
@@ -327,16 +331,16 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
       //============================================= Outgoing fluxes
       int out_face_counter = -1;
-      for (size_t f = 0; f < num_faces; ++f)
+      for (int f = 0; f < num_faces; ++f)
       {
         if (face_incident_flags[f]) continue;
 
         // ============================= Set flags and counters
         out_face_counter++;
         const auto& face = cell.faces[f];
-        const bool local = transport_view.face_local[f];
+        const bool local = transport_view.IsFaceLocal(f);
         const bool boundary = not face.has_neighbor;
-        const int num_face_indices = face.vertex_ids.size();
+        const size_t num_face_indices = face.vertex_ids.size();
 
         if (local)
         {
@@ -361,7 +365,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
         }
         else // Store outgoing reflecting Psi
         {
-          const int bndry_index = face.neighbor_id;
+          const uint64_t bndry_index = face.neighbor_id;
           if (angle_set->ref_boundaries[bndry_index]->IsReflecting())
           {
             for (int fi = 0; fi < num_face_indices; ++fi)
@@ -380,7 +384,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
       //  store starting direction angular intensity for each polar level
       if (start_direction)
-        for (size_t i = 0; i < num_dofs; ++i)
+        for (size_t i = 0; i < num_nodes; ++i)
         {
           const auto ir = grid_fe_view.MapDOFLocal(cell, i, unknown_manager, polar_level, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
@@ -391,7 +395,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
       //  (incoming for next interval)
       const auto f0 = 1/fac_diamond_difference;
       const auto f1 = f0 - 1;
-      for (size_t i = 0; i < num_dofs; ++i)
+      for (size_t i = 0; i < num_nodes; ++i)
       {
         const auto ir = grid_fe_view.MapDOFLocal(cell, i, unknown_manager, polar_level, gs_gi);
         for (int gsg = 0; gsg < gs_ss_size; ++gsg)

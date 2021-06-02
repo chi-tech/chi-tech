@@ -77,9 +77,9 @@ PetscErrorCode LinearBoltzmann::
           KSPBuildSolution(ksp, nullptr,&phi_new);
 
           context->solver.
-            DisAssemblePETScVecToSTLvector(context->groupset, phi_new,
-                                           context->solver.phi_old_local,
-                                           WITH_DELAYED_PSI);
+            SetSTLvectorFromPETScVec(context->groupset, phi_new,
+                                     context->solver.phi_old_local,
+                                     WITH_DELAYED_PSI);
 
           context->solver.last_restart_write =
             chi_program_timer.GetTime()/SIXTY_SECOND_INTERVAL;

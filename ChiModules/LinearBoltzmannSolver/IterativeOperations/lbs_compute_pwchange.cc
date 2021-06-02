@@ -20,13 +20,13 @@ double LinearBoltzmann::Solver::ComputePiecewiseChange(LBSGroupset& groupset)
     {
       for (int m=0; m<num_moments; m++)
       {
-        int mapping = transport_view.MapDOF(i,m,gsi);
+        size_t mapping = transport_view.MapDOF(i,m,gsi);
         double* phi_new_m = &phi_new_local.data()[mapping];
         double* phi_old_m = &phi_old_local.data()[mapping];
 
         for (int g=0; g<deltag; g++)
         {
-          int map0 = transport_view.MapDOF(i,0,gsi+g);
+          size_t map0 = transport_view.MapDOF(i,0,gsi+g);
 
           double abs_phi_m0     = fabs(phi_new_local[map0]);
           double abs_phi_old_m0 = fabs(phi_old_local[map0]);

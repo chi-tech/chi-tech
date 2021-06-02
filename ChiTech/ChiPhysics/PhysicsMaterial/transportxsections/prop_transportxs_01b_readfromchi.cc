@@ -98,6 +98,11 @@ constants, \f$ \lambda_j \f$ are required.
   - SIGMA_F_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_F_END.
     Each line in the block processes the first two words as [Group, sigma_f].
     Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
+  - SIGMA_A_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_A_END.
+    Each line in the block processes the first two words as [Group, sigma_a].
+    Populates the sigma_ag field. Symbol \f$ \sigma_{ag} \f$. If this is
+    not supplied then sigma_a is estimated from the transfer matrix and
+    may erroneously estimate balance.
   - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END. Each line in
     the block processes the first two words as [Group, nu]. Populates the
     nu field. Upon completing the file processing the nu_sigma_fg field
@@ -441,10 +446,17 @@ void chi_physics::TransportCrossSections::
       grabbed_M = true;
       if (grabbed_G)
       {
-        sigma_tg.resize(num_groups, 0.0);
-        sigma_fg = sigma_captg = chi_g = sigma_tg;
-        nu = nu_prompt = nu_delayed = sigma_tg;
-        nu_sigma_fg = nu_p_sigma_fg = nu_d_sigma_fg = sigma_tg;
+        sigma_tg.clear();
+        sigma_tg.assign(num_groups, 0.0);
+        sigma_fg = sigma_tg;
+        sigma_ag = sigma_tg;
+        chi_g = sigma_tg;
+        nu = sigma_tg;
+        nu_prompt = sigma_tg;
+        nu_delayed = sigma_tg;
+        nu_sigma_fg = sigma_tg;
+        nu_p_sigma_fg = sigma_tg;
+        nu_d_sigma_fg = sigma_tg;
         ddt_coeff = sigma_tg;
         transfer_matrix.resize(M,chi_math::SparseMatrix(num_groups, num_groups));
       }
@@ -472,6 +484,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "SIGMA_T_BEGIN")    Read1DXS ("SIGMA_T"  , sigma_tg  , f, num_groups, ln, ls);
       if (fw == "SIGMA_F_BEGIN")    Read1DXS("SIGMA_F"   , sigma_fg  , f, num_groups, ln, ls);
+      if (fw == "SIGMA_A_BEGIN")    Read1DXS("SIGMA_A"   , sigma_ag  , f, num_groups, ln, ls);
       if (fw == "NU_BEGIN")         Read1DXS("NU"        , nu        , f, num_groups, ln, ls);
       if (fw == "NU_PROMPT_BEGIN")  Read1DXS("NU_PROMPT" , nu_prompt , f, num_groups, ln, ls);
       if (fw == "NU_DELAYED_BEGIN") Read1DXS("NU_DELAYED", nu_delayed, f, num_groups, ln, ls);
@@ -512,6 +525,37 @@ void chi_physics::TransportCrossSections::
   }//while not EOF, read each lines
   scattering_order = M-1;
 
+  //======================================== Estimates sigma_a group-by-group
+  auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, int col)
+  {
+    double sum = 0.0;
+
+    for (int row=0; row<matrix.NumRows(); ++row)
+    {
+      auto& row_col_indices = matrix.rowI_indices[row];
+      auto& row_values = matrix.rowI_values[row];
+      for (int j=0; j<row_col_indices.size(); ++j)
+        if (row_col_indices[j] == col)
+          sum += row_values[j];
+    }
+
+    return sum;
+  };
+
+  double sigma_a_sum = 0.0;
+  for (int g=0; g<num_groups; ++g)
+    sigma_a_sum += sigma_ag[g];
+
+  if (not transfer_matrix.empty() and (sigma_a_sum < 1.0e-28))
+  {
+    for (int g = 0; g < num_groups; ++g)
+      sigma_ag[g] = sigma_tg[g] - GetMatrixColumnSum(transfer_matrix[0],g);
+
+    chi_log.Log(LOG_0WARNING)
+      << __FUNCTION__ << ": sigma_a was estimated from the transfer matrix.";
+  }
+
+  //======================================== Process fission items
   for (auto& sig_f : sigma_fg)
     if (sig_f > 0.0) { is_fissile = true; break; }
 

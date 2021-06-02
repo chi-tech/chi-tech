@@ -172,17 +172,18 @@ public:
              bool log_info = true);
 
   //Vector assembly
-  void AssemblePETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
-                                     const std::vector<double>& y,
-                                     bool with_delayed_psi=false);
-  void DisAssemblePETScVecToSTLvector(LBSGroupset& groupset, Vec x_src,
-                                      std::vector<double>& y,
-                                      bool with_delayed_psi=false);
-  void CopySTLvectorToSTLvector(LBSGroupset& groupset,
-                                const std::vector<double>& x_src,
-                                std::vector<double>& y);
+  void SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
+                                const std::vector<double>& y,
+                                bool with_delayed_psi= false);
+  void SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
+                                std::vector<double>& y,
+                                bool with_delayed_psi= false);
+  void ScopedCopySTLvectors(LBSGroupset& groupset,
+                            const std::vector<double>& x_src,
+                            std::vector<double>& y);
 
   //compute_balance
+  void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
 
 };

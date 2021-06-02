@@ -49,16 +49,16 @@ public:
              chi_mesh::MeshContinuumPtr& in_grid);
 
 public:
-//  double GetDelayedPsiNorm();
   void   ZeroOutgoingDelayedPsi();
   void   ZeroIncomingDelayedPsi();
 
   void InitializeReflectingBCs();
-//  void ResetReflectingBCs();
 
-  std::pair<size_t,size_t> GetNumberOfAngularUnknowns();
-  void AssembleAngularUnknowns(int& index, double* x_ref);
-  void DisassembleAngularUnknowns(int& index, const double* x_ref);
+  std::pair<size_t,size_t> GetNumDelayedAngularDOFs();
+  void AppendDelayedAngularDOFsToArray(int& index, double* x_ref);
+  void SetDelayedAngularDOFsFromArray(int& index, const double* x_ref);
+  std::vector<double> GetDelayedAngularDOFsAsSTLVector();
+  void SetDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
 
 };
 

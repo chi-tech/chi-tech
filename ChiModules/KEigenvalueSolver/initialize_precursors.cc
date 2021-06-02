@@ -31,7 +31,7 @@ void KEigenvalue::Solver::InitializePrecursors()
     // ----- Loop over cell dofs
     for (int i = 0; i < cell_fe_view->num_nodes; ++i)
     {
-      int64_t ir = transport_view.MapDOF(i,0,0);
+      size_t ir = transport_view.MapDOF(i,0,0);
       int64_t jr = pwl->MapDOFLocal(cell, i, Nj_unk_man, 0, 0);
       double* Nj_newp  = &Nj_new_local[jr];
       double* phi_newp = &phi_new_local[ir];

@@ -12,7 +12,7 @@ namespace LBSCurvilinear
 
 /** A sweep-chunk in point-symmetric and axial-symmetric
  *  curvilinear coordinates. */
-class LBSCurvilinear::SweepChunkPWL : public LBSSweepChunkPWL
+class LBSCurvilinear::SweepChunkPWL : public LinearBoltzmann::LBSSweepChunkPWL
 {
 //  Attributes
 private:
@@ -38,10 +38,10 @@ public:
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                 SpatialDiscretization_PWLD& discretization_primary,
                 SpatialDiscretization_PWLD& discretization_secondary,
-                const std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
-                std::vector<double>* destination_phi,
-                const std::vector<double>* source_moments,
-                      LBSGroupset& in_groupset,
+                std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                std::vector<double>& destination_phi,
+                const std::vector<double>& source_moments,
+                LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs);

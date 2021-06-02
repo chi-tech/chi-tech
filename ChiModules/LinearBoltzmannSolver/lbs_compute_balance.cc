@@ -8,10 +8,21 @@ extern ChiLog& chi_log;
 #include <iomanip>
 
 //###################################################################
+/**Zeroes all the outflow data-structures required to compute
+ * balance.*/
+void LinearBoltzmann::Solver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
+{
+  for (auto& cell_transport_view : cell_transport_views)
+    for (auto& group : groupset.groups)
+      cell_transport_view.ZeroOutflow(group.id);
+}
+
+//###################################################################
 /**Compute balance.*/
 void LinearBoltzmann::Solver::ComputeBalance()
 {
-  chi_log.Log() << "Computing balance.";
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log() << "\n********** Computing balance\n";
 
   auto pwld =
     std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
@@ -19,114 +30,138 @@ void LinearBoltzmann::Solver::ComputeBalance()
                                       std::string(__FUNCTION__));
   SpatialDiscretization_PWLD& grid_fe_view = *pwld;
 
-  //======================================== Zero outflow
-  for (auto& cell_transport_view : cell_transport_views)
-    cell_transport_view.ZeroOutflow();
-
-  //======================================== Sweep all groupsets to populate
-  //                                         outflow
-  auto phi_temp = phi_new_local;
-  auto mat_src = phi_temp;
+  //======================================== Get material source
+  // This is done using the SetSource routine
+  // because it allows a lot of flexibility.
+  auto mat_src = phi_old_local;
   mat_src.assign(mat_src.size(),0.0);
-  int gs=0;
   for (auto& groupset : group_sets)
   {
-    chi_log.Log() << "******************** Sweeping GS " << gs;
-    ComputeSweepOrderings(groupset);
-    InitFluxDataStructures(groupset);
-
-    auto sweep_chunk = SetSweepChunk(groupset);
-    MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                       groupset.angle_agg,
-                                       *sweep_chunk);
-
-    sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_temp);
-    sweep_scheduler.sweep_chunk.SetSurfaceSourceActiveFlag(true);
-    SetSource(groupset,APPLY_MATERIAL_SOURCE);
-
-    for (size_t i=0; i<mat_src.size(); ++i)
-      mat_src[i] += q_moments_local[i];
-
-    phi_temp.assign(phi_temp.size(),0.0);
-    sweep_scheduler.Sweep();
-
-    ResetSweepOrderings(groupset);
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    ++gs;
-  }//for groupset
-
-  chi_log.Log() << "Computing items";
+    SetSource(groupset, APPLY_MATERIAL_SOURCE | APPLY_FISSION_SOURCE);
+    ScopedCopySTLvectors(groupset, q_moments_local, mat_src);
+  }
 
   //======================================== Initialize diffusion params
   //                                         for xs
+  // This populates sigma_a
   for (auto& xs : material_xs)
     if (not xs->diffusion_initialized)
       xs->ComputeDiffusionParameters();
 
-  //======================================== Compute absorbtion, material-source
+  //======================================== Compute absorption, material-source
   //                                         and in-flow
   size_t num_groups=groups.size();
-  std::vector<double> out_flow    (num_groups,0.0);
-  std::vector<double> in_flow     (num_groups,0.0);
-  std::vector<double> removal     (num_groups, 0.0);
-  std::vector<double> exterior_src(num_groups, 0.0);
-  std::vector<double> flux_intgl  (num_groups, 0.0);
-  for (auto& cell : grid->local_cells)
+  double local_out_flow   = 0.0;
+  double local_in_flow    = 0.0;
+  double local_absorption = 0.0;
+  double local_production = 0.0;
+  for (const auto& cell : grid->local_cells)
   {
-    const auto& transport_view = cell_transport_views[cell.local_id];
-    const auto& fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
-    const size_t num_nodes = transport_view.NumNodes();
+    const auto&  transport_view   = cell_transport_views[cell.local_id];
+    const auto&  fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
+    const size_t num_nodes        = transport_view.NumNodes();
+    const auto&  IntV_shapeI      = fe_intgrl_values.GetIntV_shapeI();
+    const auto&  IntS_shapeI      = fe_intgrl_values.GetIntS_shapeI();
 
-    const auto& IntV_shapeI = fe_intgrl_values.GetIntV_shapeI();
+    //====================================== Inflow
+    // This is essentially an integration over
+    // all faces, all angles, and all groups.
+    // Only the cosines that are negative are
+    // added to the integral.
+    for (int f=0; f<cell.faces.size(); ++f)
+    {
+      const auto& face  = cell.faces[f];
 
+      for (const auto& groupset : group_sets)
+      {
+        for (int n = 0; n < groupset.quadrature->omegas.size(); ++n)
+        {
+          const auto &omega = groupset.quadrature->omegas[n];
+          const double wt = groupset.quadrature->weights[n];
+          const double mu = omega.Dot(face.normal);
+
+          if (mu < 0.0 and (not face.has_neighbor)) //mu<0 and bndry
+          {
+            const auto &bndry = sweep_boundaries[face.neighbor_id];
+            for (int fi = 0; fi < face.vertex_ids.size(); ++fi)
+            {
+              const int i = fe_intgrl_values.FaceDofMapping(f, fi);
+              const auto &IntFi_shapeI = IntS_shapeI[f][i];
+
+              for (const auto &group : groupset.groups)
+              {
+                const int g = group.id;
+                const double psi = bndry->boundary_flux[g];
+                local_in_flow -= mu * wt * psi * IntFi_shapeI;
+              }//for g
+            }//for fi
+          }//if bndry
+        }//for n
+      }//for groupset
+    }//for f
+
+
+    //====================================== Outflow
+    //The group-wise outflow was determined
+    //during a solve so here we just
+    //consolidate it.
     for (int g=0; g<num_groups; ++g)
-      out_flow[g] += transport_view.GetOutflow(g);
+      local_out_flow += transport_view.GetOutflow(g);
 
-    auto& sigma_ag = material_xs[transport_view.XSMapping()]->sigma_ag;
-    auto& sigma_rg = material_xs[transport_view.XSMapping()]->sigma_rg;
-    auto& sigma_sgs = material_xs[transport_view.XSMapping()]->sigma_s_gtog;
+    //====================================== Absorption and Src
+    //Isotropic flux based absorption and source
     auto& xs = *material_xs[transport_view.XSMapping()];
-
     for (int i=0; i<num_nodes; ++i)
       for (int g=0; g<num_groups; ++g)
       {
-        size_t imap = transport_view.MapDOF(i,0,g);
+        size_t imap   = transport_view.MapDOF(i,0,g);
         double phi_0g = phi_old_local[imap];
         double q_0g   = mat_src[imap];
 
-        removal     [g] += xs.sigma_rg[g] * phi_0g * IntV_shapeI[i];
-        exterior_src[g] += q_0g * IntV_shapeI[i];
-        flux_intgl  [g] += phi_0g * IntV_shapeI[i];
+        local_absorption += xs.sigma_ag[g] * phi_0g * IntV_shapeI[i];
+        local_production += q_0g * IntV_shapeI[i];
       }//for g
   }//for cell
 
   //======================================== Consolidate local balances
-  double local_balance = 0.0;
-  for (int g=0; g<num_groups; ++g)
-    local_balance += exterior_src[g] + in_flow[g] - removal[g] - out_flow[g];
-  double globl_balance = 0.0;
+  double local_balance = local_production + local_in_flow
+                       - local_absorption - local_out_flow;
+  double local_gain    = local_production + local_in_flow;
 
-  MPI_Allreduce(&local_balance,   //sendbuf
-                &globl_balance,   //recvbuf
-                1,MPI_DOUBLE,     //count + datatype
-                MPI_SUM,          //operation
-                MPI_COMM_WORLD);  //communicator
+  std::vector<double> local_balance_table = {local_absorption,
+                                             local_production,
+                                             local_in_flow,
+                                             local_out_flow,
+                                             local_balance,
+                                             local_gain};
+  size_t table_size = local_balance_table.size();
 
-  chi_log.Log(LOG_ALL)
-    << "Local quantities: "
-    << exterior_src[0] << " "
-    << in_flow[0] << " "
-    << removal[0] << " "
-    << out_flow[0] << " "
-    << exterior_src[0] + in_flow[0] - removal[0] - out_flow[0] << " "
-    << (exterior_src[0] + in_flow[0] - removal[0] - out_flow[0])/flux_intgl[0] << " ";
+  std::vector<double> globl_balance_table(table_size,0.0);
 
-//  chi_log.Log(LOG_ALL) << "Local balance: "
-//                << std::setprecision(6) << std::scientific
-//                << local_balance;
-//  MPI_Barrier(MPI_COMM_WORLD);
-//  chi_log.Log() << "Global balance: "
-//                << std::setprecision(6) << std::scientific
-//                << globl_balance;
+  MPI_Allreduce(local_balance_table.data(),      //sendbuf
+                globl_balance_table.data(),      //recvbuf
+                table_size,MPI_DOUBLE,           //count + datatype
+                MPI_SUM,                         //operation
+                MPI_COMM_WORLD);                 //communicator
+
+  double globl_absorption = globl_balance_table.at(0);
+  double globl_production = globl_balance_table.at(1);
+  double globl_in_flow    = globl_balance_table.at(2);
+  double globl_out_flow   = globl_balance_table.at(3);
+  double globl_balance    = globl_balance_table.at(4);
+  double globl_gain       = globl_balance_table.at(5);
+
+  chi_log.Log() << "Balance table:\n"
+    << std::setprecision(5) << std::scientific
+    << " Absorption rate          = " << globl_absorption               << "\n"
+    << " Production rate          = " << globl_production               << "\n"
+    << " In-flow rate             = " << globl_in_flow                  << "\n"
+    << " Out-flow rate            = " << globl_out_flow                 << "\n"
+    << " Integrated scalar flux   = " << globl_gain                     << "\n"
+    << " Net Gain/Loss            = " << globl_balance                  << "\n"
+    << " Net Gain/Loss normalized = " << globl_balance/globl_gain       << "\n";
+
+  chi_log.Log() << "\n********** Done computing balance\n";
+
+  MPI_Barrier(MPI_COMM_WORLD);
 }
