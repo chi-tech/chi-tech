@@ -145,7 +145,8 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     if (k_converged) break;
   }//for k iterations
 
-  InitializePrecursors();
+  if (options.use_precursors)
+    InitializePrecursors();
   
   double sweep_time = SweepScheduler.GetAverageSweepTime();
   double source_time=
