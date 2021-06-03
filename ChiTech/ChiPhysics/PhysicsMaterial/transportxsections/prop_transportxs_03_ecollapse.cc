@@ -19,11 +19,11 @@ void chi_physics::TransportCrossSections::
   for (int g=0; g < num_groups; g++)
   {
     S[g][g] = 1.0;
-    int num_transfer = transfer_matrix[0].rowI_indices[g].size();
+    int num_transfer = transfer_matrices[0].rowI_indices[g].size();
     for (int j=0; j<num_transfer; j++)
     {
-      int gprime   = transfer_matrix[0].rowI_indices[g][j];
-      S[g][gprime] = transfer_matrix[0].rowI_values[g][j];
+      int gprime   = transfer_matrices[0].rowI_indices[g][j];
+      S[g][gprime] = transfer_matrices[0].rowI_values[g][j];
     }//for j
   }//for g
 
@@ -35,7 +35,7 @@ void chi_physics::TransportCrossSections::
   {
     if      (collapse_type == E_COLLAPSE_JACOBI)
     {
-      A[g][g] = sigma_tg[g] - S[g][g];
+      A[g][g] = sigma_t[g] - S[g][g];
       for (int gp=0; gp<g; gp++)
         B[g][gp] = S[g][gp];
 
@@ -44,13 +44,13 @@ void chi_physics::TransportCrossSections::
     }
     else if (collapse_type == E_COLLAPSE_PARTIAL_JACOBI)
     {
-      A[g][g] = sigma_tg[g];
+      A[g][g] = sigma_t[g];
       for (int gp=0; gp < num_groups; gp++)
         B[g][gp] = S[g][gp];
     }
     else if (collapse_type == E_COLLAPSE_GAUSS)
     {
-      A[g][g] = sigma_tg[g] - S[g][g];
+      A[g][g] = sigma_t[g] - S[g][g];
       for (int gp=0; gp<g; gp++)
         A[g][gp] = -S[g][gp];
 
@@ -59,7 +59,7 @@ void chi_physics::TransportCrossSections::
     }
     else if (collapse_type == E_COLLAPSE_PARTIAL_GAUSS)
     {
-      A[g][g] = sigma_tg[g];
+      A[g][g] = sigma_t[g];
       for (int gp=0; gp<g; gp++)
         A[g][gp] = -S[g][gp];
 
@@ -75,7 +75,7 @@ void chi_physics::TransportCrossSections::
   //it will screw up the power iteration
   //initial guess of 1.0. Here we reset them
   for (int g=0; g < num_groups; g++)
-    if (sigma_tg[g] < 1.0e-16)
+    if (sigma_t[g] < 1.0e-16)
       A[g][g] = 1.0;
 
   MatDbl Ainv = chi_math::Inverse(A);
@@ -99,9 +99,9 @@ void chi_physics::TransportCrossSections::
   sigma_a = 0.0;
   for (int g=0; g < num_groups; g++)
   {
-    D += diffg[g]*ref_xi[g];
+    D += diffusion_coeff[g] * ref_xi[g];
 
-    sigma_a += sigma_tg[g]*ref_xi[g];
+    sigma_a += sigma_t[g] * ref_xi[g];
 
     for (int gp=0; gp < num_groups; gp++)
       sigma_a -= S[g][gp]*ref_xi[gp];

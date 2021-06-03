@@ -44,12 +44,12 @@ void KEigenvalue::Solver::InitializePrecursors()
           size_t j_map = precursor_map[xs_id][j];
 
           // ----- Initialize precursors
-          double coeff = xs->gamma[j] / xs->lambda[j];
+          double coeff = xs->precursor_gamma[j] / xs->precursor_lambda[j];
 
 
           // ----- Loop over groups
           for (int g = 0; g < groups.size(); ++g)
-            Nj_newp[j_map] += coeff * xs->nu_d_sigma_fg[g] *
+            Nj_newp[j_map] += coeff * xs->nu_delayed_sigma_f[g] *
                               phi_newp[g] / k_eff;
         }//for j
       }//if fissile and J > 0

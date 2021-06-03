@@ -78,17 +78,17 @@ void chi_physics::TransportCrossSections::
   //====================================== Resizing cross-sections
   num_groups = num_grps_G;
   scattering_order = scat_order;
-  sigma_tg.clear();
-  sigma_tg.resize(num_grps_G,0.0);
-  sigma_fg.resize(num_grps_G,0.0);
-  sigma_ag.resize(num_grps_G,0.0);
-  chi_g.resize(num_grps_G,0.0);
-  nu_sigma_fg.resize(num_grps_G,0.0);
-  ddt_coeff.resize(num_grps_G, 0.0);
+  sigma_t.clear();
+  sigma_t.resize(num_grps_G, 0.0);
+  sigma_f.resize(num_grps_G, 0.0);
+  sigma_a.resize(num_grps_G, 0.0);
+  chi.resize(num_grps_G, 0.0);
+  nu_sigma_f.resize(num_grps_G, 0.0);
+  inv_velocity.resize(num_grps_G, 0.0);
 
-  transfer_matrix.clear();
-  transfer_matrix.resize(scat_order+1,
-                         chi_math::SparseMatrix(num_grps_G,num_grps_G));
+  transfer_matrices.clear();
+  transfer_matrices.resize(scat_order + 1,
+                           chi_math::SparseMatrix(num_grps_G,num_grps_G));
 
   //======================================== Lambda for advancing to MT
   auto AdvanceToNextMT = [](std::ifstream& file,
@@ -135,11 +135,11 @@ void chi_physics::TransportCrossSections::
   {
     mt_number = AdvanceToNextMT(file,file_name);
 
-    if (mt_number == 1)    Read1DXS(sigma_tg, file, num_groups);
-    if (mt_number == 18)   Read1DXS(sigma_fg, file, num_groups);
-    if (mt_number == 27)   Read1DXS(sigma_ag, file, num_groups);
-    if (mt_number == 2018) Read1DXS(chi_g, file, num_groups);
-    if (mt_number == 2452) Read1DXS(nu_sigma_fg, file, num_groups);
+    if (mt_number == 1)    Read1DXS(sigma_t, file, num_groups);
+    if (mt_number == 18)   Read1DXS(sigma_f, file, num_groups);
+    if (mt_number == 27)   Read1DXS(sigma_a, file, num_groups);
+    if (mt_number == 2018) Read1DXS(chi, file, num_groups);
+    if (mt_number == 2452) Read1DXS(nu_sigma_f, file, num_groups);
 
     if (mt_number == mt_transfer)
     {
@@ -166,7 +166,7 @@ void chi_physics::TransportCrossSections::
         {
           double value = 0.0;
           file >> value;
-          transfer_matrix[mom].Insert(g,gprime,value);
+          transfer_matrices[mom].Insert(g, gprime, value);
         }
         file.getline(line,250);
       }

@@ -15,7 +15,7 @@ namespace LinearBoltzmann
 {
 //###################################################################
 /**Sweep chunk for cartesian PWLD discretization.*/
-class LBSSweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
+class SweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
@@ -38,15 +38,15 @@ public:
   std::vector<std::vector<double>> b;
   size_t spls_index, angle_set_index;
 
-  LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                   SpatialDiscretization_PWLD& discretization,
-                   std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
-                   std::vector<double>& destination_phi,
-                   const std::vector<double>& source_moments,
-                   LBSGroupset& in_groupset,
-                   const TCrossSections& in_xsections,
-                   int in_num_moms,
-                   int in_max_num_cell_dofs);
+  SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
+                SpatialDiscretization_PWLD& discretization,
+                std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                std::vector<double>& destination_phi,
+                const std::vector<double>& source_moments,
+                LBSGroupset& in_groupset,
+                const TCrossSections& in_xsections,
+                int in_num_moms,
+                int in_max_num_cell_dofs);
 
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
 };

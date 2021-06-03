@@ -43,23 +43,23 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
     lua_settable(L,-3);
   };
 
-  Push1DXS(sigma_tg,"sigma_tg");
-  Push1DXS(sigma_fg,"sigma_fg");
-  Push1DXS(sigma_ag,"sigma_ag");
-  Push1DXS(chi_g,"chi_g");
+  Push1DXS(sigma_t, "sigma_tg");
+  Push1DXS(sigma_f, "sigma_fg");
+  Push1DXS(sigma_a, "sigma_ag");
+  Push1DXS(chi, "chi_g");
   Push1DXS(nu,"nu");
   Push1DXS(nu_prompt,"nu_prompt");
   Push1DXS(nu_delayed,"nu_delayed");
-  Push1DXS(nu_sigma_fg,"nu_sigma_fg");
-  Push1DXS(nu_p_sigma_fg,"nu_p_sigma_fg");
-  Push1DXS(nu_d_sigma_fg,"nu_d_sigma_fg");
-  Push1DXS(ddt_coeff,"ddt_coeff");
+  Push1DXS(nu_sigma_f, "nu_sigma_fg");
+  Push1DXS(nu_prompt_sigma_f, "nu_p_sigma_fg");
+  Push1DXS(nu_delayed_sigma_f, "nu_d_sigma_fg");
+  Push1DXS(inv_velocity, "ddt_coeff");
 
   lua_pushstring(L,"chi_d");
   lua_newtable(L);
   {
     int g = 0;
-    for (auto& row : chi_d)
+    for (auto& row : chi_delayed)
     {
       ++g;
       lua_pushinteger(L, g);
@@ -81,7 +81,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_newtable(L);
   {
     int j = 0;
-    for (auto val : lambda)
+    for (auto val : precursor_lambda)
     {
       ++j;
       lua_pushinteger(L, j);
@@ -95,7 +95,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_newtable(L);
   {
     int j = 0;
-    for (auto val : gamma)
+    for (auto val : precursor_gamma)
     {
       ++j;
       lua_pushinteger(L, j);
@@ -110,7 +110,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_newtable(L);
   {
     int ell = 0;
-    for (const auto& matrix : transfer_matrix)
+    for (const auto& matrix : transfer_matrices)
     {
       ++ell;
       lua_pushinteger(L, ell);
@@ -140,11 +140,11 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
 
 
   //============================================= Diffusion quantities
-  Push1DXS(diffg,"diffg");
-  Push1DXS(sigma_rg,"sigma_rg");
+  Push1DXS(diffusion_coeff, "diffg");
+  Push1DXS(sigma_removal, "sigma_rg");
   Push1DXS(sigma_s_gtog,"sigma_s_gtog");
-  Push1DXS(xi_Jfull_g,"xi_Jfull_g");
-  Push1DXS(xi_Jpart_g,"xi_Jpart_g");
+  Push1DXS(xi_Jfull, "xi_Jfull_g");
+  Push1DXS(xi_Jpart, "xi_Jpart_g");
 
   lua_pushstring(L,"D_jfull");
   lua_pushnumber(L,D_jfull);

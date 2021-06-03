@@ -248,7 +248,7 @@ edits_vals={}
 for g=1,num_groups do
 
     function F(ff_value,mat_id)
-        return ff_value*mat0_xs.sigma_tg[g]
+        return ff_value*mat0_xs.sigma_t[g]
     end
 
     curffi = chiFFInterpolationCreate(VOLUME)

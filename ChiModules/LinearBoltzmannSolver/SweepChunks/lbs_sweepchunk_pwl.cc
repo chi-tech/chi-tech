@@ -11,16 +11,16 @@ extern ChiMath& chi_math_handler;
 
 //###################################################################
 /**Constructor.*/
-LinearBoltzmann::LBSSweepChunkPWL::
-  LBSSweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                   SpatialDiscretization_PWLD& discretization,
-                   std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
-                   std::vector<double>& destination_phi,
-                   const std::vector<double>& source_moments,
-                   LBSGroupset& in_groupset,
-                   const TCrossSections& in_xsections,
-                   const int in_num_moms,
-                   const int in_max_num_cell_dofs)
+LinearBoltzmann::SweepChunkPWL::
+  SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
+                SpatialDiscretization_PWLD& discretization,
+                std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                std::vector<double>& destination_phi,
+                const std::vector<double>& source_moments,
+                LBSGroupset& in_groupset,
+                const TCrossSections& in_xsections,
+                const int in_num_moms,
+                const int in_max_num_cell_dofs)
                     : SweepChunk(destination_phi, false),
                       grid_view(std::move(grid_ptr)),
                       grid_fe_view(discretization),
@@ -38,7 +38,7 @@ LinearBoltzmann::LBSSweepChunkPWL::
 
 //###################################################################
 /**Actual sweep function*/
-void LinearBoltzmann::LBSSweepChunkPWL::
+void LinearBoltzmann::SweepChunkPWL::
   Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
 {
   if (!a_and_b_initialized)
@@ -77,7 +77,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
     const int num_nodes = static_cast<int>(fe_intgrl_values.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
     const int xs_mapping = transport_view.XSMapping();
-    const auto& sigma_tg = xsections[xs_mapping]->sigma_tg;
+    const auto& sigma_tg = xsections[xs_mapping]->sigma_t;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 
@@ -96,7 +96,7 @@ void LinearBoltzmann::LBSSweepChunkPWL::
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
       const int angle_num = angle_set->angles[angle_set_index];
-      const chi_mesh::Vector3 omega = groupset.quadrature->omegas[angle_num];
+      const chi_mesh::Vector3& omega = groupset.quadrature->omegas[angle_num];
       const double wt = groupset.quadrature->weights[angle_num];
 
       // ============================================ Gradient matrix

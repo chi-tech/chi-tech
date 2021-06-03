@@ -88,30 +88,30 @@ void LinearBoltzmann::Solver::
 
           double inscat_g = 0.0;
           //====================== Apply across-groupset scattering
-          if ( (ell < xs->transfer_matrix.size()) && (apply_ags_scatter_src) )
+          if ((ell < xs->transfer_matrices.size()) && (apply_ags_scatter_src) )
           {
-            size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            size_t num_transfers = xs->transfer_matrices[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
             {
-              size_t gprime = xs->transfer_matrix[ell].rowI_indices[g][t];
+              size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
               if ((gprime < gs_i) || (gprime > gs_f))
               {
-                double sigma_sm = xs->transfer_matrix[ell].rowI_values[g][t];
+                double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
                 inscat_g += sigma_sm * phi_oldp[gprime];
               }
             }
           }//if moment avail
 
           //====================== Apply within-groupset scattering
-          if ( (ell < xs->transfer_matrix.size()) && (apply_wgs_scatter_src) )
+          if ((ell < xs->transfer_matrices.size()) && (apply_wgs_scatter_src) )
           {
-            size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            size_t num_transfers = xs->transfer_matrices[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
             {
-              size_t gprime = xs->transfer_matrix[ell].rowI_indices[g][t];
+              size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
               if ((gprime >= gs_i) && (gprime<=gs_f))
               {
-                double sigma_sm = xs->transfer_matrix[ell].rowI_values[g][t];
+                double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
                 inscat_g += sigma_sm * phi_oldp[gprime];
               }
             }
@@ -126,8 +126,8 @@ void LinearBoltzmann::Solver::
             {
               if ((gprime < gs_i) || (gprime > gs_f))
               {
-                q_mom[g] += xs->chi_g[g]*
-                            xs->nu_sigma_fg[gprime]*
+                q_mom[g] += xs->chi[g] *
+                            xs->nu_sigma_f[gprime] *
                             phi_oldp[gprime];
               }
             }//for gprime
@@ -140,8 +140,8 @@ void LinearBoltzmann::Solver::
             {
               if ((gprime >= gs_i) && (gprime<=gs_f))
               {
-                q_mom[g] += xs->chi_g[g]*
-                            xs->nu_sigma_fg[gprime]*
+                q_mom[g] += xs->chi[g] *
+                            xs->nu_sigma_f[gprime] *
                             phi_oldp[gprime];
               }
             }//for gprime

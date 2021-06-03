@@ -14,7 +14,7 @@ LBSCurvilinear::SweepChunkPWL::
                 const TCrossSections& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs)
-  : LinearBoltzmann::LBSSweepChunkPWL(
+  : LinearBoltzmann::SweepChunkPWL(
                      std::move(grid_ptr),
                      discretization_primary,
                      cell_transport_views,
@@ -110,7 +110,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
     const int num_nodes = static_cast<int>(fe_intgrl_values.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
     const int xs_mapping = transport_view.XSMapping();
-    const auto& sigma_tg = xsections[xs_mapping]->sigma_tg;
+    const auto& sigma_tg = xsections[xs_mapping]->sigma_t;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 

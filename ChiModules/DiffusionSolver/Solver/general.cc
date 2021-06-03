@@ -130,8 +130,8 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         if (!xs->diffusion_initialized)
           xs->ComputeDiffusionParameters();
 
-        diffCoeff.assign(cell_dofs,xs->diffg[group]);
-        sigmaa.assign(cell_dofs,xs->sigma_rg[group]);
+        diffCoeff.assign(cell_dofs,xs->diffusion_coeff[group]);
+        sigmaa.assign(cell_dofs,xs->sigma_removal[group]);
         transportxs_found = true;
       }
     }//for properties
@@ -185,8 +185,8 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         if (!xs->diffusion_initialized)
           xs->ComputeDiffusionParameters();
 
-        diffCoeff.assign(cell_dofs,xs->diffg[group]);
-        sigmaa.assign(cell_dofs,xs->sigma_rg[group]);
+        diffCoeff.assign(cell_dofs,xs->diffusion_coeff[group]);
+        sigmaa.assign(cell_dofs,xs->sigma_removal[group]);
         transportxs_found = true;
       }
     }//for properties

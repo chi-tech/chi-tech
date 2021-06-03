@@ -446,32 +446,32 @@ void chi_physics::TransportCrossSections::
       grabbed_M = true;
       if (grabbed_G)
       {
-        sigma_tg.clear();
-        sigma_tg.assign(num_groups, 0.0);
-        sigma_fg = sigma_tg;
-        sigma_ag = sigma_tg;
-        chi_g = sigma_tg;
-        nu = sigma_tg;
-        nu_prompt = sigma_tg;
-        nu_delayed = sigma_tg;
-        nu_sigma_fg = sigma_tg;
-        nu_p_sigma_fg = sigma_tg;
-        nu_d_sigma_fg = sigma_tg;
-        ddt_coeff = sigma_tg;
-        transfer_matrix.resize(M,chi_math::SparseMatrix(num_groups, num_groups));
+        sigma_t.clear();
+        sigma_t.assign(num_groups, 0.0);
+        sigma_f = sigma_t;
+        sigma_a = sigma_t;
+        chi = sigma_t;
+        nu = sigma_t;
+        nu_prompt = sigma_t;
+        nu_delayed = sigma_t;
+        nu_sigma_f = sigma_t;
+        nu_prompt_sigma_f = sigma_t;
+        nu_delayed_sigma_f = sigma_t;
+        inv_velocity = sigma_t;
+        transfer_matrices.resize(M, chi_math::SparseMatrix(num_groups, num_groups));
       }
     }
     if (first_word == "NUM_PRECURSORS")
     {
       line_stream >> num_precursors;
-      lambda.resize(num_precursors, 0.0);
-      gamma = lambda;
+      precursor_lambda.resize(num_precursors, 0.0);
+      precursor_gamma = precursor_lambda;
     
       if (grabbed_G)
       {
-        chi_d.resize(num_groups);
+        chi_delayed.resize(num_groups);
         for (int g=0; g < num_groups; ++g)
-          chi_d[g].resize(num_precursors);
+          chi_delayed[g].resize(num_precursors);
       }
     }
 
@@ -482,27 +482,27 @@ void chi_physics::TransportCrossSections::
       auto& f = file;
       auto& fw = first_word;
 
-      if (fw == "SIGMA_T_BEGIN")    Read1DXS ("SIGMA_T"  , sigma_tg  , f, num_groups, ln, ls);
-      if (fw == "SIGMA_F_BEGIN")    Read1DXS("SIGMA_F"   , sigma_fg  , f, num_groups, ln, ls);
-      if (fw == "SIGMA_A_BEGIN")    Read1DXS("SIGMA_A"   , sigma_ag  , f, num_groups, ln, ls);
+      if (fw == "SIGMA_T_BEGIN")    Read1DXS ("SIGMA_T"  , sigma_t  , f, num_groups, ln, ls);
+      if (fw == "SIGMA_F_BEGIN")    Read1DXS("SIGMA_F"   , sigma_f  , f, num_groups, ln, ls);
+      if (fw == "SIGMA_A_BEGIN")    Read1DXS("SIGMA_A"   , sigma_a  , f, num_groups, ln, ls);
       if (fw == "NU_BEGIN")         Read1DXS("NU"        , nu        , f, num_groups, ln, ls);
       if (fw == "NU_PROMPT_BEGIN")  Read1DXS("NU_PROMPT" , nu_prompt , f, num_groups, ln, ls);
       if (fw == "NU_DELAYED_BEGIN") Read1DXS("NU_DELAYED", nu_delayed, f, num_groups, ln, ls);
-      if (fw == "CHI_PROMPT_BEGIN") Read1DXS("CHI_PROMPT", chi_g     , f, num_groups, ln, ls);
-      if (fw == "CHI_BEGIN")        Read1DXS("CHI_"      , chi_g     , f, num_groups, ln, ls);
-      if (fw == "DDT_COEFF_BEGIN")  Read1DXS("DDT_COEFF" , ddt_coeff , f, num_groups, ln, ls);
+      if (fw == "CHI_PROMPT_BEGIN") Read1DXS("CHI_PROMPT", chi     , f, num_groups, ln, ls);
+      if (fw == "CHI_BEGIN")        Read1DXS("CHI_"      , chi     , f, num_groups, ln, ls);
+      if (fw == "DDT_COEFF_BEGIN")  Read1DXS("DDT_COEFF" , inv_velocity , f, num_groups, ln, ls);
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",
-                           transfer_matrix, f, num_groups, ln, ls);
+                           transfer_matrices, f, num_groups, ln, ls);
 
       if (num_precursors > 0) {
         if (fw == "PRECURSOR_LAMBDA_BEGIN")
-          Read1DXS("PRECURSOR_LAMBDA", lambda, f, num_precursors, ln, ls);
+          Read1DXS("PRECURSOR_LAMBDA", precursor_lambda, f, num_precursors, ln, ls);
         if (fw == "PRECURSOR_GAMMA_BEGIN")
-          Read1DXS("PRECURSOR_GAMMA", gamma, f, num_precursors, ln, ls);
+          Read1DXS("PRECURSOR_GAMMA", precursor_gamma, f, num_precursors, ln, ls);
         if (fw == "CHI_DELAYED_BEGIN")
-          ReadDelayedChi("CHI_DELAYED", chi_d, f, num_groups, ln, ls);
+          ReadDelayedChi("CHI_DELAYED", chi_delayed, f, num_groups, ln, ls);
       } 
     }//try
     catch (const std::runtime_error& err)
@@ -544,27 +544,27 @@ void chi_physics::TransportCrossSections::
 
   double sigma_a_sum = 0.0;
   for (int g=0; g<num_groups; ++g)
-    sigma_a_sum += sigma_ag[g];
+    sigma_a_sum += sigma_a[g];
 
-  if (not transfer_matrix.empty() and (sigma_a_sum < 1.0e-28))
+  if (not transfer_matrices.empty() and (sigma_a_sum < 1.0e-28))
   {
     for (int g = 0; g < num_groups; ++g)
-      sigma_ag[g] = sigma_tg[g] - GetMatrixColumnSum(transfer_matrix[0],g);
+      sigma_a[g] = sigma_t[g] - GetMatrixColumnSum(transfer_matrices[0], g);
 
     chi_log.Log(LOG_0WARNING)
       << __FUNCTION__ << ": sigma_a was estimated from the transfer matrix.";
   }
 
   //======================================== Process fission items
-  for (auto& sig_f : sigma_fg)
+  for (auto& sig_f : sigma_f)
     if (sig_f > 0.0) { is_fissile = true; break; }
 
   //changes nu_sigma_fg from nu to nu * sigma_fg
   for (int g = 0; g < num_groups; ++g)
   {
-    nu_sigma_fg  [g] = nu        [g]*sigma_fg[g];
-    nu_p_sigma_fg[g] = nu_prompt [g]*sigma_fg[g];
-    nu_d_sigma_fg[g] = nu_delayed[g]*sigma_fg[g];
+    nu_sigma_f  [g] = nu        [g] * sigma_f[g];
+    nu_prompt_sigma_f[g] = nu_prompt [g] * sigma_f[g];
+    nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
   }
 
   file.close();

@@ -14,7 +14,7 @@ struct KSPDataContext
   LinearBoltzmann::Solver& solver;
   LBSGroupset&             groupset;
   Vec&                     operating_vector;
-  chi_mesh::sweep_management::SweepScheduler& sweepScheduler;
+  chi_mesh::sweep_management::SweepScheduler& sweep_scheduler;
   SourceFlags    lhs_scope;
   int64_t last_iteration = -1;
 
@@ -26,7 +26,7 @@ struct KSPDataContext
     solver(in_solver),
     groupset(in_groupset),
     operating_vector(in_operating_vector),
-    sweepScheduler(in_sweep_scheduler),
+    sweep_scheduler(in_sweep_scheduler),
     lhs_scope(in_lhs_scope) {}
 };
 

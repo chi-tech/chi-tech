@@ -118,7 +118,7 @@ void LinearBoltzmann::Solver::ComputeBalance()
         double phi_0g = phi_old_local[imap];
         double q_0g   = mat_src[imap];
 
-        local_absorption += xs.sigma_ag[g] * phi_0g * IntV_shapeI[i];
+        local_absorption += xs.sigma_a[g] * phi_0g * IntV_shapeI[i];
         local_production += q_0g * IntV_shapeI[i];
       }//for g
   }//for cell

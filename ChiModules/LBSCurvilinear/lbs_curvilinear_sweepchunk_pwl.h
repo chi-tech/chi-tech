@@ -12,7 +12,7 @@ namespace LBSCurvilinear
 
 /** A sweep-chunk in point-symmetric and axial-symmetric
  *  curvilinear coordinates. */
-class LBSCurvilinear::SweepChunkPWL : public LinearBoltzmann::LBSSweepChunkPWL
+class LBSCurvilinear::SweepChunkPWL : public LinearBoltzmann::SweepChunkPWL
 {
 //  Attributes
 private:

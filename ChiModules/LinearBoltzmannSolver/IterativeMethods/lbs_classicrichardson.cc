@@ -17,7 +17,7 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using classic richardson.*/
 bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
                     int group_set_num,
-                    MainSweepScheduler& sweepScheduler,
+                    MainSweepScheduler& sweep_scheduler,
                     SourceFlags source_flags,
                     bool log_info /* = true*/)
 {
@@ -36,7 +36,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Tool the sweep chunk
-  sweepScheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
+  sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
 
   //================================================== Now start iterating
   double pw_change_prev = 1.0;
@@ -47,7 +47,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
 
     groupset.ZeroAngularFluxDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
-    sweepScheduler.Sweep();
+    sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)
     {
@@ -117,7 +117,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
 
   //============================================= Print solution info
   {
-    double sweep_time = sweepScheduler.GetAverageSweepTime();
+    double sweep_time = sweep_scheduler.GetAverageSweepTime();
     double source_time=
       chi_log.ProcessEvent(source_event_tag,
                            ChiLog::EventOperation::AVERAGE_DURATION);
@@ -150,7 +150,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
       std::string("GS_") + std::to_string(group_set_num) +
       std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
       std::string(".log");
-    groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+    groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
   }//print solution info
 
   std::string sweep_log_file_name =
@@ -158,7 +158,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
 
-  groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+  groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
 
   return converged;
 }

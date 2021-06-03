@@ -15,49 +15,53 @@ namespace chi_physics
 {
 
 //###################################################################
-/** Basic thermal conductivity material property.*/
+/** Class for handling Transport-Theory related cross sections.*/
 class TransportCrossSections : public chi_physics::MaterialProperty
 {
 public:
-  size_t num_groups=0;                     ///< Total number of Groups
-  size_t scattering_order=0;               ///< Legendre scattering order
-  size_t num_precursors=0;                 ///< Number of precursors
-  bool is_fissile = false;                 ///< Fissile or not
+  size_t num_groups=0;                          ///< Total number of Groups
+  size_t scattering_order=0;                    ///< Legendre scattering order
+  size_t num_precursors=0;                      ///< Number of precursors
+  bool is_fissile = false;                      ///< Fissile or not
 
-  std::vector<double> sigma_tg;           ///< Total cross section
-  std::vector<double> sigma_fg;           ///< Sigmaf cross section
-  std::vector<double> sigma_ag;           ///< Pure absorption
-  std::vector<double> chi_g;              ///< Fission spectrum
-  std::vector<double> nu;                 ///< Nubar
-  std::vector<double> nu_prompt;          ///< Nubar-prompt
-  std::vector<double> nu_delayed;         ///< Nubar-delayed
-  std::vector<double> nu_sigma_fg;        ///< Nubar-Sigmaf cross section
-  std::vector<double> nu_p_sigma_fg;      ///< Prompt-Nubar-Sigmaf cross section
-  std::vector<double> nu_d_sigma_fg;      ///< Delayed-Nubar-Sigmaf cross section
-  std::vector<double> ddt_coeff;          ///< Time derivative coefficient
-  std::vector<double> lambda;             ///< Delayed neutron decay constants
-  std::vector<double> gamma;              ///< Delayed neutron yields
-  std::vector<std::vector<double>> chi_d; ///< Delayed neutron fission spectrum
+  typedef double GrpVal;                        ///< Denoting value per group
+  typedef double PrecursorVal;                  ///< Denoting value per precursor
 
-  std::vector<chi_math::SparseMatrix> transfer_matrix;
+  std::vector<GrpVal> sigma_t;                  ///< Total cross section
+  std::vector<GrpVal> sigma_f;                  ///< Sigmaf cross section
+  std::vector<GrpVal> sigma_a;                  ///< Pure absorption
+  std::vector<GrpVal> chi;                      ///< Fission spectrum
+  std::vector<GrpVal> nu;                       ///< Nubar
+  std::vector<GrpVal> nu_prompt;                ///< Nubar-prompt
+  std::vector<GrpVal> nu_delayed;               ///< Nubar-delayed
+  std::vector<GrpVal> nu_sigma_f;               ///< Nubar-Sigmaf cross section
+  std::vector<GrpVal> nu_prompt_sigma_f;        ///< Prompt-Nubar-Sigmaf cross section
+  std::vector<GrpVal> nu_delayed_sigma_f;       ///< Delayed-Nubar-Sigmaf cross section
+  std::vector<GrpVal> inv_velocity;             ///< Time derivative coefficient
+
+  std::vector<chi_math::SparseMatrix> transfer_matrices;
+
+  std::vector<PrecursorVal> precursor_lambda;         ///< Delayed neutron decay constants
+  std::vector<PrecursorVal> precursor_gamma;          ///< Delayed neutron yields
+  std::vector<std::vector<PrecursorVal>> chi_delayed; ///< Delayed neutron fission spectrum
 
   //Diffusion quantities
 public:
   bool diffusion_initialized = false;
 public:
-  std::vector<double> diffg;               ///< Transport corrected Diffusion coeff
-  std::vector<double> sigma_rg;            ///< Removal cross section
-  std::vector<double> sigma_s_gtog;        ///< Within-group scattering xs
+  std::vector<GrpVal> diffusion_coeff; ///< Transport corrected Diffusion coeff
+  std::vector<GrpVal> sigma_removal;   ///< Removal cross section
+  std::vector<GrpVal> sigma_s_gtog;    ///< Within-group scattering xs
 
   //Two-grid acceleration quantities
-  std::vector<double> xi_Jfull_g;          ///< Infinite medium spectrum Jfull
-  std::vector<double> xi_Jpart_g;          ///< Infinite medium spectrum Jpartial
+  std::vector<GrpVal> xi_Jfull;        ///< Infinite medium spectrum full Jacobian
+  std::vector<GrpVal> xi_Jpart;        ///< Infinite medium spectrum partial Jacobian
 
-  double D_jfull = 0.0;                    ///< Collapsed Diffusion coefficient Jfull
-  double D_jpart = 0.0;                    ///< Collapsed Diffusion coefficient Jpart
+  double D_jfull = 0.0;                ///< Collapsed Diffusion coeff full Jacobian
+  double D_jpart = 0.0;                ///< Collapsed Diffusion coeff partial Jacobian
 
-  double sigma_a_jfull = 0.0;              ///< Collapsed absorption Jfull
-  double sigma_a_jpart = 0.0;              ///< Collapsed absorption Jpart
+  double sigma_a_jfull = 0.0;          ///< Collapsed absorption full Jacobian
+  double sigma_a_jpart = 0.0;          ///< Collapsed absorption partial Jacobian
 
   //Monte-Carlo quantities
 public:
@@ -74,32 +78,32 @@ private:
     num_precursors = 0;
     is_fissile = false;
 
-    sigma_tg.clear(); sigma_tg.shrink_to_fit();
-    sigma_fg      = sigma_tg;
-    sigma_ag      = sigma_tg;
-    chi_g         = sigma_tg;
-    nu            = sigma_tg;
-    nu_prompt     = sigma_tg;
-    nu_delayed    = sigma_tg;
-    nu_sigma_fg   = sigma_tg;
-    nu_p_sigma_fg = sigma_tg;
-    nu_d_sigma_fg = sigma_tg;
-    ddt_coeff     = sigma_tg;
-    lambda.clear();
-    gamma.clear();
-    chi_d.clear();
+    sigma_t.clear(); sigma_t.shrink_to_fit();
+    sigma_f      = sigma_t;
+    sigma_a      = sigma_t;
+    chi         = sigma_t;
+    nu            = sigma_t;
+    nu_prompt     = sigma_t;
+    nu_delayed    = sigma_t;
+    nu_sigma_f   = sigma_t;
+    nu_prompt_sigma_f = sigma_t;
+    nu_delayed_sigma_f = sigma_t;
+    inv_velocity     = sigma_t;
+    precursor_lambda.clear();
+    precursor_gamma.clear();
+    chi_delayed.clear();
 
-    transfer_matrix.clear();
+    transfer_matrices.clear();
 
     //Diffusion quantities
     diffusion_initialized = false;
-    diffg        = sigma_tg;
-    sigma_rg     = sigma_tg;
-    sigma_s_gtog = sigma_tg;
+    diffusion_coeff        = sigma_t;
+    sigma_removal     = sigma_t;
+    sigma_s_gtog = sigma_t;
 
     //Two-grid acceleration quantities
-    xi_Jfull_g = sigma_tg;
-    xi_Jpart_g = sigma_tg;
+    xi_Jfull = sigma_t;
+    xi_Jpart = sigma_t;
 
     D_jfull = 0.0;
     D_jpart = 0.0;
