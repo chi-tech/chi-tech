@@ -6,6 +6,8 @@
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
+#include <vtkUnstructuredGrid.h>
+
 #include <petscksp.h>
 
 //###################################################################
@@ -121,6 +123,11 @@ public:
                                     const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list);
 
   void WritePVTU(std::string base_filename, std::string field_name, int num_grps=0);
+
+  void UploadCellGeometry(const chi_mesh::Cell& cell,
+                          int64_t& node_counter,
+                          vtkNew<vtkPoints>& points,
+                          vtkNew<vtkUnstructuredGrid>& ugrid);
 };
 
 

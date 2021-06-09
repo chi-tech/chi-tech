@@ -1,7 +1,7 @@
 #include "fieldfunction.h"
 
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -15,13 +15,11 @@ extern ChiMPI& chi_mpi;
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
 
-#include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
 #include <vtkFieldData.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
-#include <vtkStringArray.h>
 
 #include <vtkInformation.h>
 
@@ -58,7 +56,7 @@ void chi_physics::FieldFunction::
 
   //============================================= Check grid
   auto grid = ff_list.front()->spatial_discretization->ref_grid;
-  for (auto ff : ff_list)
+  for (auto& ff : ff_list)
     if (ff->spatial_discretization->ref_grid != grid)
     {
       chi_log.Log(LOG_ALLERROR)
@@ -75,7 +73,7 @@ void chi_physics::FieldFunction::
 
   //============================================= Populate VTK points
   auto points = vtkSmartPointer<vtkPoints>::New();
-  int vc=0;
+  int64_t vc=0;
   for (const auto& cell : grid->local_cells)
     for (uint64_t vid : cell.vertex_ids)
     {
@@ -95,34 +93,34 @@ void chi_physics::FieldFunction::
   for (const auto& cell : grid->local_cells)
   {
     material_array->InsertNextValue(cell.material_id);
-    partition_number_array->InsertNextValue(cell.partition_id);
+    partition_number_array->InsertNextValue(static_cast<int>(cell.partition_id));
 
     //================================= Build cell vertices
-    int num_verts = cell.vertex_ids.size();
+    size_t num_verts = cell.vertex_ids.size();
     std::vector<vtkIdType> vertex_ids;
     vertex_ids.reserve(num_verts);
-    for (int vid : cell.vertex_ids)
+    for (auto& vid : cell.vertex_ids)
       vertex_ids.push_back(vc++);
 
     //================================= Handle cell specific items
     if (cell.Type() == chi_mesh::CellType::SLAB)
       ugrid->
         InsertNextCell(VTK_LINE,
-                       num_verts,
+                       static_cast<vtkIdType>(num_verts),
                        vertex_ids.data());
     else if (cell.Type() == chi_mesh::CellType::POLYGON)
       ugrid->
         InsertNextCell(VTK_POLYGON,
-                       num_verts,
+                       static_cast<vtkIdType>(num_verts),
                        vertex_ids.data());
     else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto faces = vtkSmartPointer<vtkCellArray>::New();
+      vtkNew<vtkIdList> faces;
 
-      int num_faces = cell.faces.size();
+      size_t num_faces = cell.faces.size();
       for (const auto& face : cell.faces)
       {
-        int num_fverts = face.vertex_ids.size();
+        size_t num_fverts = face.vertex_ids.size();
         std::vector<vtkIdType> fvertex_ids;
         fvertex_ids.reserve(num_fverts);
 
@@ -131,15 +129,17 @@ void chi_physics::FieldFunction::
             if (face.vertex_ids[fv] == cell.vertex_ids[v])
               fvertex_ids.push_back(vertex_ids[v]);
 
-        faces->InsertNextCell(num_fverts,fvertex_ids.data());
+        faces->InsertNextId(static_cast<vtkIdType>(num_fverts));
+        for (auto vid : fvertex_ids)
+          faces->InsertNextId(vid);
       }//for faces
 
       ugrid->
         InsertNextCell(VTK_POLYHEDRON,
-                       num_verts,
+                       static_cast<vtkIdType>(num_verts),
                        vertex_ids.data(),
-                       num_faces,
-                       faces->GetPointer());
+                       static_cast<vtkIdType>(num_faces),
+                       faces->GetPointer(0));
     }//polyhedron
     else
     {
@@ -152,17 +152,19 @@ void chi_physics::FieldFunction::
   ugrid->GetCellData()->AddArray(material_array);
   ugrid->GetCellData()->AddArray(partition_number_array);
 
-
-
   //=============================================
   typedef chi_math::SpatialDiscretizationType SDMType;
+  typedef SpatialDiscretization_FV SDMFV;
 
   if (ff_type == SDMType::FINITE_VOLUME)
   {
-    auto& fv = static_cast<SpatialDiscretization_FV&>(*ff_spatial_discretization);
-    for (auto ff : ff_list)
+    auto fv_ptr = std::dynamic_pointer_cast<SDMFV>(ff_spatial_discretization);
+    if (not fv_ptr) throw std::logic_error(std::string(__FUNCTION__) +
+                                       ": Failed to obtain fv-sdm.");
+    auto& fv = *fv_ptr;
+    for (auto& ff : ff_list)
     {
-      int ref_unknown = ff->ref_variable;
+      unsigned int ref_unknown = ff->ref_variable;
       const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
 
       if (unknown.type == chi_math::UnknownType::SCALAR)
@@ -172,7 +174,7 @@ void chi_physics::FieldFunction::
 
         for (auto& cell : grid->local_cells)
         {
-          int local_mapping =
+          int64_t local_mapping =
             fv.MapDOFLocal(cell,0,ff->unknown_manager,ref_unknown,0);
 
           double value = (*ff->field_vector_local)[local_mapping];
@@ -190,32 +192,32 @@ void chi_physics::FieldFunction::
       ff_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
   {
     int unk_number = -1;
-    for (auto ff : ff_list)
+    for (auto& ff : ff_list)
     {
-      int ref_unknown = ff->ref_variable;
+      unsigned int ref_unknown = ff->ref_variable;
       const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
       unk_number++;
 
-      int N = ff->unknown_manager.GetTotalUnknownStructureSize();
+      unsigned int N = ff->unknown_manager.GetTotalUnknownStructureSize();
 
       if (unknown.type == chi_math::UnknownType::SCALAR)
       {
-        int component = ff->unknown_manager.MapUnknown(ref_unknown, 0);
+        unsigned int component = ff->unknown_manager.MapUnknown(ref_unknown, 0);
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        if (unknown.text_name == "")
+        if (unknown.text_name.empty())
           unk_arr->SetName((std::string("Unknown_")+
                             std::to_string(unk_number)).c_str());
         else
           unk_arr->SetName(unknown.text_name.c_str());
 
-        int c=-1;
+        uint64_t c=0;
         for (auto& cell : grid->local_cells)
         {
-          for (int vid : cell.vertex_ids)
+          for (int v=0; v < cell.vertex_ids.size(); ++v)
           {
+            uint64_t local_mapping = c*N + component;
             ++c;
-            int local_mapping = c*N + component;
 
             double value = (*ff->field_vector_local)[local_mapping];
 
@@ -229,22 +231,22 @@ void chi_physics::FieldFunction::
       {
         for (int comp=0; comp<unknown.num_components; ++comp)
         {
-          int component = ff->unknown_manager.MapUnknown(ref_unknown, comp);
+          unsigned int component = ff->unknown_manager.MapUnknown(ref_unknown, comp);
 
           auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-          if (unknown.component_text_names[comp]=="")
+          if (unknown.component_text_names[comp].empty())
             unk_arr->SetName((std::string("Component_")+
                               std::to_string(comp)).c_str());
           else
             unk_arr->SetName(unknown.component_text_names[comp].c_str());
 
-          int c=-1;
+          uint64_t c=0;
           for (auto& cell : grid->local_cells)
           {
-            for (int vid : cell.vertex_ids)
+            for (int v=0; v < cell.vertex_ids.size(); ++v)
             {
+              uint64_t local_mapping = c*N + component;
               ++c;
-              int local_mapping = c*N + component;
 
               double value = (*ff->field_vector_local)[local_mapping];
 
