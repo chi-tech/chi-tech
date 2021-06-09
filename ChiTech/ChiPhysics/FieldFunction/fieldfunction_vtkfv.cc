@@ -18,13 +18,12 @@ extern ChiPhysics&  chi_physics_handler;
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-//#include <vtkXMLPUnstructuredGridWriter.h>
 
-#include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
+#include <vtkUnsignedIntArray.h>
 
 #include <vtkInformation.h>
 
@@ -70,24 +69,23 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
     d_nodes.push_back(d_node);
 
-    points->InsertPoint(vcount,d_node.data());
+    points->InsertPoint(static_cast<vtkIdType>(vcount),d_node.data());
     ++vcount;
   }
 
   //======================================== populate cell mapping
-  int num_loc_cells = grid->local_cells.size();
+  size_t num_loc_cells = grid->local_cells.size();
   std::vector<std::pair<uint64_t,uint>> cell_comps_to_map(num_loc_cells);
   std::vector<uint64_t> mapping;
   for (uint64_t lc=0; lc<num_loc_cells; lc++)
     cell_comps_to_map[lc] = std::make_pair(lc,0);
 
-  CreateFVMappingLocal(cell_comps_to_map,
-                       mapping);
+  CreateFVMappingLocal(cell_comps_to_map, mapping);
 
   //======================================== Populate cell information
   for (const auto& cell : grid->local_cells)
   {
-    int lc = cell.local_id;
+    uint64_t lc = cell.local_id;
 
     int mat_id = cell.material_id;
 
@@ -97,15 +95,15 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
       auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
       std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->vertex_ids[0]);
-      cell_info.push_back(slab_cell->vertex_ids[1]);
+      cell_info.push_back(static_cast<vtkIdType>(slab_cell->vertex_ids[0]));
+      cell_info.push_back(static_cast<vtkIdType>(slab_cell->vertex_ids[1]));
 
       ugrid->
         InsertNextCell(VTK_LINE,2,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
       double phi_value = field_vector_local->operator[](mapping[lc]);
       phiavgarray->InsertNextValue(phi_value);
@@ -118,16 +116,17 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
       std::vector<vtkIdType> cell_info;
 
-      int num_verts = poly_cell->vertex_ids.size();
+      size_t num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->vertex_ids[v]);
+        cell_info.push_back(static_cast<vtkIdType>(poly_cell->vertex_ids[v]));
 
       ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
+        InsertNextCell(VTK_POLYGON,
+                       static_cast<vtkIdType>(num_verts),
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
       double phi_value = field_vector_local->operator[](mapping[lc]);
       phiavgarray->InsertNextValue(phi_value);
@@ -138,31 +137,35 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
 
-      int num_verts = polyh_cell->vertex_ids.size();
+      size_t num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->vertex_ids[v];
+        cell_info[v] = static_cast<vtkIdType>(polyh_cell->vertex_ids[v]);
 
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
+      vtkNew<vtkIdList> faces;
 
-      int num_faces = polyh_cell->faces.size();
+      size_t num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+        size_t num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f].vertex_ids[fv];
+          face[fv] = static_cast<vtkIdType>(polyh_cell->faces[f].vertex_ids[fv]);
 
-        faces->InsertNextCell(num_fverts,face.data());
+        faces->InsertNextId(static_cast<vtkIdType>(num_fverts));
+        for (auto vid : face)
+          faces->InsertNextId(vid);
       }//for f
 
       ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
+        InsertNextCell(VTK_POLYHEDRON,
+                       static_cast<vtkIdType>(num_verts),
+                       cell_info.data(),
+                       static_cast<vtkIdType>(num_faces),
+                       faces->GetPointer(0));
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
       double phi_value = field_vector_local->operator[](mapping[lc]);
       phiavgarray->InsertNextValue(phi_value);
@@ -249,30 +252,26 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
     d_nodes.push_back(d_node);
 
-    points->InsertPoint(vcount,d_node.data());
+    points->InsertPoint(static_cast<vtkIdType>(vcount),d_node.data());
     ++vcount;
   }
 
   const auto& ff_uk = this->unknown_manager.unknowns[ref_variable];
 
   //======================================== populate cell mapping
-  int num_loc_cells = grid->local_cells.size();
+  size_t num_loc_cells = grid->local_cells.size();
   std::vector<std::pair<uint64_t,uint>> cell_comps_to_map(num_loc_cells);
   std::vector<uint64_t> mapping;
   for (uint64_t lc=0; lc<num_loc_cells; lc++)
     for (unsigned int g=0; g < ff_uk.num_components; g++)
       cell_comps_to_map[lc] = std::make_pair(lc,g);
 
-  CreateFVMappingLocal(cell_comps_to_map,
-                       mapping);
-
+  CreateFVMappingLocal(cell_comps_to_map, mapping);
 
   //======================================== Populate cell information
   int counter=-1;
   for (const auto& cell : grid->local_cells)
   {
-    int lc = cell.local_id;
-
     int mat_id = cell.material_id;
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
@@ -281,15 +280,15 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
       auto slab_cell = (chi_mesh::CellSlab*)(&cell);
 
       std::vector<vtkIdType> cell_info;
-      cell_info.push_back(slab_cell->vertex_ids[0]);
-      cell_info.push_back(slab_cell->vertex_ids[1]);
+      cell_info.push_back(static_cast<vtkIdType>(slab_cell->vertex_ids[0]));
+      cell_info.push_back(static_cast<vtkIdType>(slab_cell->vertex_ids[1]));
 
       ugrid->
         InsertNextCell(VTK_LINE,2,
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
       for (int g=0; g < ff_uk.num_components; g++)
       {
@@ -307,16 +306,17 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
 
       std::vector<vtkIdType> cell_info;
 
-      int num_verts = poly_cell->vertex_ids.size();
+      size_t num_verts = poly_cell->vertex_ids.size();
       for (int v=0; v<num_verts; v++)
-        cell_info.push_back(poly_cell->vertex_ids[v]);
+        cell_info.push_back(static_cast<vtkIdType>(poly_cell->vertex_ids[v]));
 
       ugrid->
-        InsertNextCell(VTK_POLYGON,num_verts,
+        InsertNextCell(VTK_POLYGON,
+                       static_cast<vtkIdType>(num_verts),
                        cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
       for (int g=0; g < ff_uk.num_components; g++)
       {
@@ -331,31 +331,35 @@ void chi_physics::FieldFunction::ExportToVTKFVG(const std::string& base_name,
     {
       auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
 
-      int num_verts = polyh_cell->vertex_ids.size();
+      size_t num_verts = polyh_cell->vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
-        cell_info[v] = polyh_cell->vertex_ids[v];
+        cell_info[v] = static_cast<vtkIdType>(polyh_cell->vertex_ids[v]);
 
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
+      vtkNew<vtkIdList> faces;
 
-      int num_faces = polyh_cell->faces.size();
+      size_t num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
       {
-        int num_fverts = polyh_cell->faces[f].vertex_ids.size();
+        size_t num_fverts = polyh_cell->faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
         for (int fv=0; fv<num_fverts; fv++)
-          face[fv] = polyh_cell->faces[f].vertex_ids[fv];
+          face[fv] = static_cast<vtkIdType>(polyh_cell->faces[f].vertex_ids[fv]);
 
-        faces->InsertNextCell(num_fverts,face.data());
+        faces->InsertNextId(static_cast<vtkIdType>(num_fverts));
+        for (auto vid : face)
+          faces->InsertNextId(vid);
       }//for f
 
       ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
+        InsertNextCell(VTK_POLYHEDRON,
+                       static_cast<vtkIdType>(num_verts),
+                       cell_info.data(),
+                       static_cast<vtkIdType>(num_faces),
+                       faces->GetPointer(0));
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
       for (int g=0; g < ff_uk.num_components; g++)
       {
