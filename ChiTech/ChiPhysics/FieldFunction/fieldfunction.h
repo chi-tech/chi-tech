@@ -7,6 +7,7 @@
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
 #include <vtkUnstructuredGrid.h>
+#include <vtkPointData.h>
 
 #include <petscksp.h>
 
@@ -44,7 +45,7 @@ public:
 public:
   /**Non-PETSc type field vector*/
   FieldFunction(std::string ff_tex_name,
-                std::shared_ptr<SpatialDiscretization> ff_sdm,
+                std::shared_ptr<SpatialDiscretization>& ff_sdm,
                 std::vector<double>* ff_field_vector,
                 chi_math::UnknownManager& ff_unknown_manager,
                 int ff_unknown_id=0,
@@ -62,7 +63,7 @@ public:
 
   /**PETSc type field vector*/
   FieldFunction(std::string ff_tex_name,
-                std::shared_ptr<SpatialDiscretization> ff_sdm,
+                std::shared_ptr<SpatialDiscretization>& ff_sdm,
                 Vec* ff_field_vector,
                 chi_math::UnknownManager& ff_unknown_manager,
                 int ff_unknown_id=0,
@@ -77,10 +78,6 @@ public:
     field_vector_local(nullptr),
     using_petsc_field_vector(true)
   {}
-
-//  std::vector<double>& GetCellDOFValues(size_t cell_local_id,
-//                                        size_t component,
-//                                        size_t set);
 
   //mapping
   void
@@ -98,31 +95,31 @@ public:
     std::vector<uint64_t>& mapping);
 
   //01
+  void ExportToVTKComponentOnly(const std::string& base_name,
+                                const std::string& field_name);
   void ExportToVTK(const std::string& base_name,
                    const std::string& field_name);
-  void ExportToVTKG(const std::string& base_name,
-                    const std::string& field_name);
   //01a
   void ExportToVTKFV(const std::string& base_name,
-                     const std::string& field_name);
-  void ExportToVTKFVG(const std::string& base_name,
-                      const std::string& field_name);
+                     const std::string& field_name,
+                     bool all_components=false);
   //01b
   void ExportToVTKPWLC(const std::string& base_name,
-                       const std::string& field_name);
-  void ExportToVTKPWLCG(const std::string& base_name,
-                        const std::string& field_name);
+                       const std::string& field_name,
+                       bool all_components=false);
   //01c
-  void ExportToVTKPWLD(const std::string& base_name,
-                       const std::string& field_name);
-  void ExportToVTKPWLDG(const std::string& base_name,
-                        const std::string& field_name);
+  void ExportToVTKPWLD(const std::string& num_nodes,
+                       const std::string& field_name,
+                       bool all_components=false);
 
   //fieldfunction_exportmultiple_fv.cc
   static void ExportMultipleFFToVTK(const std::string& file_base_name,
                                     const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list);
 
-  void WritePVTU(std::string base_filename, std::string field_name, int num_grps=0);
+
+  static void WritePVTU(const std::string& base_filename,
+                        const std::string& field_name,
+                        const std::vector<std::string>& component_names);
 
   void UploadCellGeometry(const chi_mesh::Cell& cell,
                           int64_t& node_counter,

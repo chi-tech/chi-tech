@@ -29,10 +29,11 @@ void chi_physics::FieldFunction::
     unsigned int component    = cell_index_component_pair.second;
 
     auto& cell = grid->local_cells[cell_local_index];
-    int address = sdm_fv->MapDOFLocal(cell, 0,
-                                      unknown_manager,
-                                      ref_variable,
-                                      component);
+    int64_t address = sdm_fv->MapDOFLocal(cell,
+                                          0,
+                                          unknown_manager,
+                                          ref_variable,
+                                          component);
 
     mapping.push_back(address);
   }
@@ -64,19 +65,20 @@ CreateCFEMMappingLocal(Vec& x_mapped,
     uint     node_number      = std::get<1>(data);
     uint     component_number = std::get<2>(data);
 
-    int ir = pwl_sdm->MapDOF(grid->local_cells[cell_local_index],
-                             node_number,
-                             unknown_manager,
-                             ref_variable,
-                             component_number);
+    int64_t ir = pwl_sdm->MapDOF(grid->local_cells[cell_local_index],
+                                 node_number,
+                                 unknown_manager,
+                                 ref_variable,
+                                 component_number);
 
     mapped_nodes.push_back(ir);
     mapping.push_back(n);
   }
 
   Vec x = *field_vector;
+  PetscInt num_mapped_nodes = static_cast<PetscInt>(mapped_nodes.size())+1;
 
-  VecCreateSeq(PETSC_COMM_SELF,mapped_nodes.size()+1,&x_mapped);
+  VecCreateSeq(PETSC_COMM_SELF,num_mapped_nodes,&x_mapped);
   VecSet(x_mapped, 0.0);
 
   std::vector<int64_t> int_mapping;
@@ -87,9 +89,13 @@ CreateCFEMMappingLocal(Vec& x_mapped,
 
   IS global_set;
   IS local_set;
-  ISCreateGeneral(PETSC_COMM_WORLD, num_nodes_to_map, mapped_nodes.data(),
+  ISCreateGeneral(PETSC_COMM_WORLD,
+                  static_cast<PetscInt>(num_nodes_to_map),
+                  mapped_nodes.data(),
                   PETSC_COPY_VALUES,&global_set);
-  ISCreateGeneral(PETSC_COMM_WORLD, num_nodes_to_map, int_mapping.data(),
+  ISCreateGeneral(PETSC_COMM_WORLD,
+                  static_cast<PetscInt>(num_nodes_to_map),
+                  int_mapping.data(),
                   PETSC_COPY_VALUES,&local_set);
   VecScatter scat;
   VecScatterCreate(x, global_set, x_mapped, local_set, &scat);
@@ -125,11 +131,11 @@ CreatePWLDMappingLocal(
 
     auto& cell = grid->local_cells[cell_local_index];
 
-    int address = pwl_sdm->MapDOFLocal(cell,
-                                       node_number,
-                                       unknown_manager,
-                                       ref_variable,
-                                       component_number);
+    int64_t address = pwl_sdm->MapDOFLocal(cell,
+                                           node_number,
+                                           unknown_manager,
+                                           ref_variable,
+                                           component_number);
 
     mapping.push_back(address);
   }//for each tuple

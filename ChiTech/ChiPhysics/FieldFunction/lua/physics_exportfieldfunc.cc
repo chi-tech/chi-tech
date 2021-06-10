@@ -41,7 +41,7 @@ int chiExportFieldFunctionToVTK(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  ff->ExportToVTK(base_name,field_name);
+  ff->ExportToVTKComponentOnly(base_name, field_name);
 
   return 0;
 }
@@ -78,7 +78,7 @@ int chiExportFieldFunctionToVTKG(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  ff->ExportToVTKG(base_name,field_name);
+  ff->ExportToVTK(base_name, field_name);
 
   return 0;
 }
