@@ -302,3 +302,7 @@ else:
 print("")
 print("************* End of Regression Test *************")
 print("")
+if num_failed == 0:
+    sys.exit(0);
+else:
+    sys.exit(1); 
