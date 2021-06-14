@@ -47,8 +47,8 @@ public:
   void PreComputeCellSDValues() override;
   void PreComputeNeighborCellSDValues();
 
-  CellFVValues* MapFeView(int cell_local_index);
-  CellFVValues* MapNeighborFeView(int cell_global_index);
+  CellFVValues* MapFeView(uint64_t cell_local_index);
+  CellFVValues* MapNeighborFeView(uint64_t cell_global_index);
 
   //02 node ordering
   void OrderNodes();

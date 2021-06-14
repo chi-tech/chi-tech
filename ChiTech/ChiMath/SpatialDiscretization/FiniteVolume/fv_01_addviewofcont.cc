@@ -154,7 +154,7 @@ void SpatialDiscretization_FV::
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVValues* SpatialDiscretization_FV::MapFeView(int cell_local_index)
+CellFVValues* SpatialDiscretization_FV::MapFeView(uint64_t cell_local_index)
 {
   CellFVValues* value;
   try { value = cell_fv_views.at(cell_local_index); }
@@ -172,7 +172,7 @@ CellFVValues* SpatialDiscretization_FV::MapFeView(int cell_local_index)
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVValues* SpatialDiscretization_FV::MapNeighborFeView(int cell_global_index)
+CellFVValues* SpatialDiscretization_FV::MapNeighborFeView(uint64_t cell_global_index)
 {
   //=================================== First check locally
   if (ref_grid->IsCellLocal(cell_global_index))
