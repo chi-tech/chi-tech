@@ -82,7 +82,8 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
     for (int c=0; c < num_components; ++c)
     {
       double dof_value = field_vector_local->operator[](mapping[c]);
-      field_node_array[c]->InsertNextValue(dof_value);
+      for (int v=0; v<cell.vertex_ids.size(); ++v)
+        field_node_array[c]->InsertNextValue(dof_value);
       field_cell_avg_array[c]->InsertNextValue(dof_value);
     }//for component
   }//for local cells
