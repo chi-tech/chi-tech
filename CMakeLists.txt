@@ -102,7 +102,7 @@ else ()
     )
 endif()
 
-set(CHI_LIBS lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
+set(CHI_LIBS stdc++ lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 #================================================ Compiler flags
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
