@@ -90,6 +90,8 @@ f"""#!/usr/bin/bash
 #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
 #SBATCH -A Massively-Parallel-R # Allocation name (req'd if you have more than 1)
 
+export I_MPI_SHM=disable
+
 ibrun {kpath_to_exe} ChiTest/{file_name}.lua master_export=false"""
         )
     os.system(f"sbatch -W ChiTest/{file_name}.job > /dev/null")  # -W means wait for job to finish
