@@ -187,7 +187,7 @@ void chi_physics::TransportCrossSections::
   nu_delayed_sigma_f.clear();
   inv_velocity.clear();
   precursor_lambda.clear();
-  precursor_gamma.clear();
+  precursor_yield.clear();
   chi_delayed.clear();
 
   sigma_t.resize(num_grps_G, 0.0);
@@ -202,7 +202,7 @@ void chi_physics::TransportCrossSections::
   nu_delayed_sigma_f.resize(num_grps_G, 0.0);
   inv_velocity.resize(num_grps_G, 0.0);
   precursor_lambda.resize(num_precursors_J, 0.0);
-  precursor_gamma.resize(num_precursors_J, 0.0);
+  precursor_yield.resize(num_precursors_J, 0.0);
   chi_delayed.resize(num_grps_G);
   for (int g=0; g < num_groups; ++g)
     chi_delayed[g].resize(num_precursors_J, 0.0);
@@ -235,7 +235,7 @@ void chi_physics::TransportCrossSections::
       for (int j=0; j<num_precursors_J; ++j)
       {
         precursor_lambda[j] += cross_secs[x]->precursor_lambda[j] * ff_i;
-        precursor_gamma [j] += cross_secs[x]->precursor_gamma [j] * ff_i;
+        precursor_yield [j] += cross_secs[x]->precursor_yield [j] * ff_i;
         for (int g=0; g < num_groups; g++)
           chi_delayed[g][j] += cross_secs[x]->chi_delayed[g][j] * ff_i;
       }

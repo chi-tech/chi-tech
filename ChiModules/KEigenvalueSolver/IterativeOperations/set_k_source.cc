@@ -124,7 +124,7 @@ void KEigenvalue::Solver::
               {
                 for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
                 {
-                  precursor_g += xs->chi_delayed[g][j] * xs->precursor_gamma[j] *
+                  precursor_g += xs->chi_delayed[g][j] * xs->precursor_yield[j] *
                                  xs->nu_delayed_sigma_f[gprime] *
                                  phi_prevp[gprime] / k_eff;
                 }

@@ -465,7 +465,7 @@ void chi_physics::TransportCrossSections::
     {
       line_stream >> num_precursors;
       precursor_lambda.resize(num_precursors, 0.0);
-      precursor_gamma = precursor_lambda;
+      precursor_yield = precursor_lambda;
     
       if (grabbed_G)
       {
@@ -500,7 +500,7 @@ void chi_physics::TransportCrossSections::
         if (fw == "PRECURSOR_LAMBDA_BEGIN")
           Read1DXS("PRECURSOR_LAMBDA", precursor_lambda, f, num_precursors, ln, ls);
         if (fw == "PRECURSOR_GAMMA_BEGIN")
-          Read1DXS("PRECURSOR_GAMMA", precursor_gamma, f, num_precursors, ln, ls);
+          Read1DXS("PRECURSOR_GAMMA", precursor_yield, f, num_precursors, ln, ls);
         if (fw == "CHI_DELAYED_BEGIN")
           ReadDelayedChi("CHI_DELAYED", chi_delayed, f, num_groups, ln, ls);
       } 

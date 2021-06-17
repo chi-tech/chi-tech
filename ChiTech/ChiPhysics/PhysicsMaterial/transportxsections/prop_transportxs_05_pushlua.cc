@@ -95,7 +95,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_newtable(L);
   {
     int j = 0;
-    for (auto val : precursor_gamma)
+    for (auto val : precursor_yield)
     {
       ++j;
       lua_pushinteger(L, j);

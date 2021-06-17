@@ -42,7 +42,7 @@ public:
   std::vector<chi_math::SparseMatrix> transfer_matrices;
 
   std::vector<PrecursorVal> precursor_lambda;         ///< Delayed neutron decay constants
-  std::vector<PrecursorVal> precursor_gamma;          ///< Delayed neutron yields
+  std::vector<PrecursorVal> precursor_yield;          ///< Delayed neutron yields
   std::vector<std::vector<PrecursorVal>> chi_delayed; ///< Delayed neutron fission spectrum
 
   //Diffusion quantities
@@ -90,7 +90,7 @@ private:
     nu_delayed_sigma_f = sigma_t;
     inv_velocity     = sigma_t;
     precursor_lambda.clear();
-    precursor_gamma.clear();
+    precursor_yield.clear();
     chi_delayed.clear();
 
     transfer_matrices.clear();
