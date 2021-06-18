@@ -448,16 +448,16 @@ void chi_physics::TransportCrossSections::
       {
         sigma_t.clear();
         sigma_t.assign(num_groups, 0.0);
-        sigma_f = sigma_t;
-        sigma_a = sigma_t;
-        chi = sigma_t;
-        nu = sigma_t;
-        nu_prompt = sigma_t;
-        nu_delayed = sigma_t;
-        nu_sigma_f = sigma_t;
-        nu_prompt_sigma_f = sigma_t;
-        nu_delayed_sigma_f = sigma_t;
-        inv_velocity = sigma_t;
+        sigma_f.assign(num_groups, 0.0);
+        sigma_a.assign(num_groups, 0.0);
+        chi.assign(num_groups, 0.0);
+        nu.assign(num_groups, 0.0);
+        nu_prompt.assign(num_groups, 0.0);
+        nu_delayed.assign(num_groups, 0.0);
+        nu_sigma_f.assign(num_groups, 0.0);
+        nu_prompt_sigma_f.assign(num_groups, 0.0);
+        nu_delayed_sigma_f.assign(num_groups, 0.0);
+        inv_velocity.assign(num_groups, 0.0);
         transfer_matrices.resize(M, chi_math::SparseMatrix(num_groups, num_groups));
       }
     }

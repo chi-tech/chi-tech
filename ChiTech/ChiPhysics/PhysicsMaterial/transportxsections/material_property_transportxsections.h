@@ -78,17 +78,17 @@ private:
     num_precursors = 0;
     is_fissile = false;
 
-    sigma_t.clear(); sigma_t.shrink_to_fit();
-    sigma_f            = sigma_t;
-    sigma_a            = sigma_t;
-    chi                = sigma_t;
-    nu                 = sigma_t;
-    nu_prompt          = sigma_t;
-    nu_delayed         = sigma_t;
-    nu_sigma_f         = sigma_t;
-    nu_prompt_sigma_f  = sigma_t;
-    nu_delayed_sigma_f = sigma_t;
-    inv_velocity       = sigma_t;
+    sigma_t.clear();
+    sigma_f.clear();
+    sigma_a.clear();
+    chi.clear();
+    nu.clear();
+    nu_prompt.clear();
+    nu_delayed.clear();
+    nu_sigma_f.clear();
+    nu_prompt_sigma_f.clear();
+    nu_delayed_sigma_f.clear();
+    inv_velocity.clear();
     precursor_lambda.clear();
     precursor_yield.clear();
     chi_delayed.clear();
@@ -97,13 +97,13 @@ private:
 
     //Diffusion quantities
     diffusion_initialized = false;
-    diffusion_coeff        = sigma_t;
-    sigma_removal          = sigma_t;
-    sigma_s_gtog           = sigma_t;
+    diffusion_coeff.clear();
+    sigma_removal.clear();
+    sigma_s_gtog.clear();
 
     //Two-grid acceleration quantities
-    xi_Jfull = sigma_t;
-    xi_Jpart = sigma_t;
+    xi_Jfull.clear();
+    xi_Jpart.clear();
 
     D_jfull = 0.0;
     D_jpart = 0.0;
