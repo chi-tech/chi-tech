@@ -36,7 +36,6 @@ protected:
 
 public:
   std::vector<std::vector<double>> b;
-  size_t spls_index, angle_set_index;
 
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                 SpatialDiscretization_PWLD& discretization,

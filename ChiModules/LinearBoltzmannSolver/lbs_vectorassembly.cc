@@ -27,7 +27,7 @@ void LinearBoltzmann::Solver::
         for (int g=0; g<gss; g++)
         {
           index++;
-          x_ref[index] = y[mapping+g]; //On purpose
+          x_ref[index] = y[mapping+g]; //Offset on purpose
         }//for g
       }//for moment
     }//for dof

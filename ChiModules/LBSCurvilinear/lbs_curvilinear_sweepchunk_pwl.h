@@ -43,8 +43,8 @@ public:
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
-                const int in_num_moms,
-                const int in_max_num_cell_dofs);
+                int in_num_moms,
+                int in_max_num_cell_dofs);
 
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
 };

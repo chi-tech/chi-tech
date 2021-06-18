@@ -31,9 +31,7 @@ LinearBoltzmann::SweepChunkPWL::
                       num_moms(in_num_moms),
                       num_grps(in_groupset.groups.size()),
                       max_num_cell_dofs(in_max_num_cell_dofs),
-                      a_and_b_initialized(false),
-                      spls_index(0),
-                      angle_set_index(0)
+                      a_and_b_initialized(false)
 {}
 
 //###################################################################
@@ -68,7 +66,7 @@ void LinearBoltzmann::SweepChunkPWL::
 
   // ========================================================== Loop over each cell
   size_t num_loc_cells = spds->spls.item_id.size();
-  for (spls_index = 0; spls_index < num_loc_cells; ++spls_index)
+  for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
   {
     const int cell_local_id = spds->spls.item_id[spls_index];
     const auto& cell = grid_view->local_cells[cell_local_id];
@@ -91,7 +89,7 @@ void LinearBoltzmann::SweepChunkPWL::
     const int ni_deploc_face_counter = deploc_face_counter;
     const int ni_preloc_face_counter = preloc_face_counter;
     const size_t as_num_angles = angle_set->angles.size();
-    for (angle_set_index = 0; angle_set_index<as_num_angles; ++angle_set_index)
+    for (size_t angle_set_index = 0; angle_set_index<as_num_angles; ++angle_set_index)
     {
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;

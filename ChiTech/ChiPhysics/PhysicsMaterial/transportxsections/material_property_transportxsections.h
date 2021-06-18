@@ -54,14 +54,14 @@ public:
   std::vector<GrpVal> sigma_s_gtog;    ///< Within-group scattering xs
 
   //Two-grid acceleration quantities
-  std::vector<GrpVal> xi_Jfull;        ///< Infinite medium spectrum full Jacobian
-  std::vector<GrpVal> xi_Jpart;        ///< Infinite medium spectrum partial Jacobian
+  std::vector<GrpVal> xi_Jfull;        ///< Infinite medium spectrum full Jacobi-Splitting
+  std::vector<GrpVal> xi_Jpart;        ///< Infinite medium spectrum partial Jacobi-Splitting
 
-  double D_jfull = 0.0;                ///< Collapsed Diffusion coeff full Jacobian
-  double D_jpart = 0.0;                ///< Collapsed Diffusion coeff partial Jacobian
+  double D_jfull = 0.0;                ///< Collapsed Diffusion coeff full Jacobi-Splitting
+  double D_jpart = 0.0;                ///< Collapsed Diffusion coeff partial Jacobi-Splitting
 
-  double sigma_a_jfull = 0.0;          ///< Collapsed absorption full Jacobian
-  double sigma_a_jpart = 0.0;          ///< Collapsed absorption partial Jacobian
+  double sigma_a_jfull = 0.0;          ///< Collapsed absorption full Jacobi-Splitting
+  double sigma_a_jpart = 0.0;          ///< Collapsed absorption partial Jacobi-Splitting
 
   //Monte-Carlo quantities
 public:
@@ -79,16 +79,16 @@ private:
     is_fissile = false;
 
     sigma_t.clear(); sigma_t.shrink_to_fit();
-    sigma_f      = sigma_t;
-    sigma_a      = sigma_t;
-    chi         = sigma_t;
-    nu            = sigma_t;
-    nu_prompt     = sigma_t;
-    nu_delayed    = sigma_t;
-    nu_sigma_f   = sigma_t;
-    nu_prompt_sigma_f = sigma_t;
+    sigma_f            = sigma_t;
+    sigma_a            = sigma_t;
+    chi                = sigma_t;
+    nu                 = sigma_t;
+    nu_prompt          = sigma_t;
+    nu_delayed         = sigma_t;
+    nu_sigma_f         = sigma_t;
+    nu_prompt_sigma_f  = sigma_t;
     nu_delayed_sigma_f = sigma_t;
-    inv_velocity     = sigma_t;
+    inv_velocity       = sigma_t;
     precursor_lambda.clear();
     precursor_yield.clear();
     chi_delayed.clear();
@@ -98,8 +98,8 @@ private:
     //Diffusion quantities
     diffusion_initialized = false;
     diffusion_coeff        = sigma_t;
-    sigma_removal     = sigma_t;
-    sigma_s_gtog = sigma_t;
+    sigma_removal          = sigma_t;
+    sigma_s_gtog           = sigma_t;
 
     //Two-grid acceleration quantities
     xi_Jfull = sigma_t;

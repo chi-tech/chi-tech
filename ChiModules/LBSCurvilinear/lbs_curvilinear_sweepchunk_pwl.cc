@@ -100,7 +100,7 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
   //========================================================== Loop over each cell
   size_t num_loc_cells = spds->spls.item_id.size();
-  for (spls_index = 0; spls_index < num_loc_cells; ++spls_index)
+  for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
   {
     const int cell_local_id = spds->spls.item_id[spls_index];
     const auto& cell = grid_view->local_cells[cell_local_id];
@@ -125,7 +125,8 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
     //=================================================== Loop over angles in set
     const int ni_deploc_face_counter = deploc_face_counter;
     const int ni_preloc_face_counter = preloc_face_counter;
-    for (angle_set_index = 0; angle_set_index < angle_set->angles.size(); ++angle_set_index)
+    const size_t as_num_angles = angle_set->angles.size();
+    for (size_t angle_set_index = 0; angle_set_index < as_num_angles; ++angle_set_index)
     {
       deploc_face_counter = ni_deploc_face_counter;
       preloc_face_counter = ni_preloc_face_counter;
