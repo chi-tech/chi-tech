@@ -482,15 +482,15 @@ void chi_physics::TransportCrossSections::
       auto& f = file;
       auto& fw = first_word;
 
-      if (fw == "SIGMA_T_BEGIN")    Read1DXS ("SIGMA_T"  , sigma_t  , f, num_groups, ln, ls);
-      if (fw == "SIGMA_F_BEGIN")    Read1DXS("SIGMA_F"   , sigma_f  , f, num_groups, ln, ls);
-      if (fw == "SIGMA_A_BEGIN")    Read1DXS("SIGMA_A"   , sigma_a  , f, num_groups, ln, ls);
-      if (fw == "NU_BEGIN")         Read1DXS("NU"        , nu        , f, num_groups, ln, ls);
-      if (fw == "NU_PROMPT_BEGIN")  Read1DXS("NU_PROMPT" , nu_prompt , f, num_groups, ln, ls);
-      if (fw == "NU_DELAYED_BEGIN") Read1DXS("NU_DELAYED", nu_delayed, f, num_groups, ln, ls);
-      if (fw == "CHI_PROMPT_BEGIN") Read1DXS("CHI_PROMPT", chi     , f, num_groups, ln, ls);
-      if (fw == "CHI_BEGIN")        Read1DXS("CHI_"      , chi     , f, num_groups, ln, ls);
-      if (fw == "DDT_COEFF_BEGIN")  Read1DXS("DDT_COEFF" , inv_velocity , f, num_groups, ln, ls);
+      if (fw == "SIGMA_T_BEGIN")    Read1DXS ("SIGMA_T"  , sigma_t     , f, num_groups, ln, ls);
+      if (fw == "SIGMA_F_BEGIN")    Read1DXS("SIGMA_F"   , sigma_f     , f, num_groups, ln, ls);
+      if (fw == "SIGMA_A_BEGIN")    Read1DXS("SIGMA_A"   , sigma_a     , f, num_groups, ln, ls);
+      if (fw == "NU_BEGIN")         Read1DXS("NU"        , nu          , f, num_groups, ln, ls);
+      if (fw == "NU_PROMPT_BEGIN")  Read1DXS("NU_PROMPT" , nu_prompt   , f, num_groups, ln, ls);
+      if (fw == "NU_DELAYED_BEGIN") Read1DXS("NU_DELAYED", nu_delayed  , f, num_groups, ln, ls);
+      if (fw == "CHI_PROMPT_BEGIN") Read1DXS("CHI_PROMPT", chi         , f, num_groups, ln, ls);
+      if (fw == "CHI_BEGIN")        Read1DXS("CHI"       , chi         , f, num_groups, ln, ls);
+      if (fw == "DDT_COEFF_BEGIN")  Read1DXS("DDT_COEFF" , inv_velocity, f, num_groups, ln, ls);
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",
