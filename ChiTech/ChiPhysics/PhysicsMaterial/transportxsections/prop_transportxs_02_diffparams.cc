@@ -9,24 +9,23 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
   if (diffusion_initialized)
     return;
 
-  diffg.resize(num_groups, 1.0);
+  diffusion_coeff.resize(num_groups, 1.0);
   sigma_s_gtog.resize(num_groups, 0.0);
-  sigma_rg.resize(num_groups, 0.1);
-  sigma_ag.resize(num_groups, 0.0);
+  sigma_removal.resize(num_groups, 0.1);
   for (int g=0; g < num_groups; g++)
   {
     //====================================== Determine transport correction
     double sigs_g_1 = 0.0;
-    if (transfer_matrix.size()>1)
+    if (transfer_matrices.size() > 1)
     {
       for (int gp=0; gp < num_groups; gp++)
       {
-        int num_cols = transfer_matrix[1].rowI_indices[gp].size();
+        size_t num_cols = transfer_matrices[1].rowI_indices[gp].size();
         for (int j=0; j<num_cols; j++)
         {
-          if (transfer_matrix[1].rowI_indices[gp][j] == g)
+          if (transfer_matrices[1].rowI_indices[gp][j] == g)
           {
-            sigs_g_1 += transfer_matrix[1].rowI_values[gp][j];
+            sigs_g_1 += transfer_matrices[1].rowI_values[gp][j];
             break;
           }
         }//for j
@@ -34,63 +33,37 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     }//if moment 1 available
 
     //====================================== Determine diffcoeff
-    if (sigs_g_1 >= sigma_tg[g])
+    if (sigs_g_1 >= sigma_t[g])
     {
       sigs_g_1 = 0.0;
       chi_log.Log(LOG_0WARNING)
         << "Transport corrected diffusion coefficient failed for group "
         << g << " in call to "
         << "chi_physics::TransportCrossSections::ComputeDiffusionParameters."
-        << " sigma_t=" << sigma_tg[g] << " sigs_g_(m=1)=" << sigs_g_1;
+        << " sigma_t=" << sigma_t[g] << " sigs_g_(m=1)=" << sigs_g_1;
     }
-    diffg[g] = (fmin(1.0e12,1.0/3.0/(sigma_tg[g]-sigs_g_1)));
+    diffusion_coeff[g] = (fmin(1.0e12, 1.0 / 3.0 / (sigma_t[g] - sigs_g_1)));
     //diffg[g] = 1.0/3.0/(sigma_tg[g]-sigs_g_1);
 
     //====================================== Determine in group scattering
-    int num_cols = transfer_matrix[0].rowI_indices[g].size();
+    size_t num_cols = transfer_matrices[0].rowI_indices[g].size();
     for (int j=0; j<num_cols; j++)
     {
-      if (transfer_matrix[0].rowI_indices[g][j] == g)
+      if (transfer_matrices[0].rowI_indices[g][j] == g)
       {
-        sigma_s_gtog[g] = transfer_matrix[0].rowI_values[g][j];
+        sigma_s_gtog[g] = transfer_matrices[0].rowI_values[g][j];
         break;
       }
     }
 
     //====================================== Determine removal cross-section
-    sigma_rg[g] = std::max(0.0,sigma_tg[g] - sigma_s_gtog[g]);
-
-
-
+    sigma_removal[g] = std::max(0.0, sigma_t[g] - sigma_s_gtog[g]);
   }//for g
-
-  //====================================== Determine absorbtion x-section
-  for (int g=0; g < num_groups; g++)
-  {
-    sigma_ag[g] = sigma_tg[g];
-
-    for (int g2=0; g2 < num_groups; g2++)
-    {
-      int num_cols = transfer_matrix[0].rowI_indices[g2].size();
-      for (int j=0; j<num_cols; j++)
-      {
-        if (transfer_matrix[0].rowI_indices[g2][j] == g)
-        {
-          sigma_ag[g] -= transfer_matrix[0].rowI_values[g2][j];
-          break;
-        }
-      }//for j
-    }//for gp
-
-    sigma_ag[g] = std::max(0.0,sigma_ag[g]);
-  }
-
-
 
   //======================================== Compute two grid energy collapse
   chi_log.Log(LOG_0) << "Performing Energy collapse.";
-  EnergyCollapse(xi_Jfull_g,D_jfull,sigma_a_jfull,E_COLLAPSE_JACOBI);
-  EnergyCollapse(xi_Jpart_g,D_jpart,sigma_a_jpart,E_COLLAPSE_PARTIAL_JACOBI);
+  EnergyCollapse(xi_Jfull, D_jfull, sigma_a_jfull, E_COLLAPSE_JACOBI);
+  EnergyCollapse(xi_Jpart, D_jpart, sigma_a_jpart, E_COLLAPSE_PARTIAL_JACOBI);
 
   diffusion_initialized = true;
 }

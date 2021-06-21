@@ -33,11 +33,11 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
   //============================================= Extract the dense version
   for (int g=0; g < num_groups; g++)
   {
-    int num_transfer = transfer_matrix[0].rowI_indices[g].size();
+    int num_transfer = transfer_matrices[0].rowI_indices[g].size();
     for (int j=0; j<num_transfer; j++)
     {
-      int gp = transfer_matrix[0].rowI_indices[g][j];
-      prob_gprime_g[g][gp] = transfer_matrix[0].rowI_values[g][j];
+      int gp = transfer_matrices[0].rowI_indices[g][j];
+      prob_gprime_g[g][gp] = transfer_matrices[0].rowI_values[g][j];
     }//for j
   }//for g
 
@@ -87,7 +87,7 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
       moment_gprime_g_m[gp][g].resize(max_ord+1,0.0);
       for (int m=0; m<=max_ord; m++)
       {
-        moment_gprime_g_m[gp][g][m] = transfer_matrix[m].ValueIJ(g,gp);
+        moment_gprime_g_m[gp][g][m] = transfer_matrices[m].ValueIJ(g, gp);
       }
     }
   }
@@ -101,7 +101,7 @@ void chi_physics::TransportCrossSections::ComputeDiscreteScattering(int in_L)
 
     for (int g=0; g < num_groups; g++)
     {
-      if (transfer_matrix[0].ValueIJ(g,gp) < 1.0e-16) continue;
+      if (transfer_matrices[0].ValueIJ(g, gp) < 1.0e-16) continue;
 
       Tvecdbl_vecdbl angles = gb.GetDiscreteScatAngles(moment_gprime_g_m[gp][g]);
       std::copy(angles.begin(),angles.end(),

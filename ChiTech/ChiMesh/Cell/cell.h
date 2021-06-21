@@ -32,7 +32,8 @@ public:
   Normal normal;                    ///< The average/geometric normal
   Vertex centroid;                  ///< The face centroid
   bool has_neighbor=false;          ///< Flag indicating whether face has a neighbor
-  uint64_t neighbor_id=0;           ///< If face has neighbor, contains the global id. 0 otherwise.
+  uint64_t neighbor_id=0;           ///< If face has neighbor, contains the global_id.
+                                    ///< Otherwise contains boundary_id.
 
 public:
   bool IsNeighborLocal(chi_mesh::MeshContinuum& grid) const;

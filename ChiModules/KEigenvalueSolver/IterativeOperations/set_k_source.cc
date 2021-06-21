@@ -29,7 +29,7 @@ void KEigenvalue::Solver::
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
   const bool apply_mat_src     = (source_flags & APPLY_MATERIAL_SOURCE);
-  const bool apply_scatter_src = (source_flags & APPLY_SCATTER_SOURCE);
+  const bool apply_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
   const bool apply_fission_src = (source_flags & APPLY_FISSION_SOURCE);
 
   // ----- Groupset group information
@@ -66,15 +66,15 @@ void KEigenvalue::Solver::
     auto xs = material_xs[xs_id];
 
     // ----- Loop over dofs
-    int num_dofs = full_cell_view.dofs;
-    for (int i=0; i<num_dofs; i++)
+    int num_nodes = full_cell_view.NumNodes();
+    for (int i=0; i <num_nodes; i++)
     {
       // ----- Loop over moments
       for (int m=0; m<num_moments; ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        int64_t ir        = full_cell_view.MapDOF(i,m,0);
+        size_t  ir        = full_cell_view.MapDOF(i,m,0);
         double* q_mom     = &q_moments_local[ir];
 
         double* phi_oldp  = &phi_old_local[ir];
@@ -85,13 +85,13 @@ void KEigenvalue::Solver::
         {
           // ----- Contribute scattering
           double inscat_g = 0.0;
-          if ( (ell < xs->transfer_matrix.size()) && (apply_scatter_src) )
+          if ((ell < xs->transfer_matrices.size()) && (apply_scatter_src) )
           {
-            size_t num_transfers = xs->transfer_matrix[ell].rowI_indices[g].size();
+            size_t num_transfers = xs->transfer_matrices[ell].rowI_indices[g].size();
             for (int t=0; t<num_transfers; t++)
             {
-              size_t gprime = xs->transfer_matrix[ell].rowI_indices[g][t];
-              double sigma_sm  = xs->transfer_matrix[ell].rowI_values[g][t];
+              size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
+              double sigma_sm  = xs->transfer_matrices[ell].rowI_values[g][t];
               inscat_g += sigma_sm * phi_oldp[gprime];
             }
           }
@@ -105,11 +105,11 @@ void KEigenvalue::Solver::
             {
               for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
                 if (options.use_precursors)
-                  fission_g += xs->chi_g[g]*xs->nu_p_sigma_fg[gprime]*
-                               phi_prevp[gprime]/k_eff;
+                  fission_g += xs->chi[g] * xs->nu_prompt_sigma_f[gprime] *
+                               phi_prevp[gprime] / k_eff;
                 else
-                  fission_g += xs->chi_g[g]*xs->nu_sigma_fg[gprime]*
-                               phi_prevp[gprime]/k_eff;
+                  fission_g += xs->chi[g] * xs->nu_sigma_f[gprime] *
+                               phi_prevp[gprime] / k_eff;
             }
           }
           q_mom[g] += fission_g;
@@ -124,9 +124,9 @@ void KEigenvalue::Solver::
               {
                 for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
                 {
-                  precursor_g += xs->chi_d[g][j]*xs->gamma[j]*
-                                 xs->nu_d_sigma_fg[gprime]*
-                                 phi_prevp[gprime]/k_eff;
+                  precursor_g += xs->chi_delayed[g][j] * xs->precursor_yield[j] *
+                                 xs->nu_delayed_sigma_f[gprime] *
+                                 phi_prevp[gprime] / k_eff;
                 }
               }
             }

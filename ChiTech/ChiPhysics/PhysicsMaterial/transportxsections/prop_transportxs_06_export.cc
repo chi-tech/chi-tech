@@ -51,21 +51,22 @@ void chi_physics::TransportCrossSections::
   if (num_precursors>0)
     ofile << "NUM_PRECURSORS " << num_precursors << "\n";
 
-  Print1DXS(ofile,"SIGMA_T"   ,sigma_tg);
-  Print1DXS(ofile,"SIGMA_F"   ,sigma_fg  ,1.0e-20);
+  Print1DXS(ofile, "SIGMA_T"   , sigma_t);
+  Print1DXS(ofile, "SIGMA_F"   , sigma_f  , 1.0e-20);
+  Print1DXS(ofile, "SIGMA_A"   , sigma_a  , 1.0e-20);
   Print1DXS(ofile,"NU"        ,nu        ,1.0e-20);
   Print1DXS(ofile,"NU_PROMPT" ,nu_prompt ,1.0e-20);
   Print1DXS(ofile,"NU_DELAYED",nu_delayed,1.0e-20);
-  Print1DXS(ofile,"CHI_PROMPT",chi_g     ,1.0e-20);
-  Print1DXS(ofile,"DDT_COEFF" ,ddt_coeff ,1.0e-20);
+  Print1DXS(ofile, "CHI_PROMPT", chi     , 1.0e-20);
+  Print1DXS(ofile, "DDT_COEFF" , inv_velocity , 1.0e-20);
 
   //======================================== Chi-delayed
-  if (not chi_d.empty())
+  if (not chi_delayed.empty())
   {
     ofile << "\n";
     ofile << "CHI_DELAYED_BEGIN\n";
     int g=0;
-    for (auto& chi_d_g : chi_d)
+    for (auto& chi_d_g : chi_delayed)
     {
       int gval = g++;
       int j=0;
@@ -81,16 +82,16 @@ void chi_physics::TransportCrossSections::
   }
 
   //======================================== Transfer matrices
-  if (not transfer_matrix.empty())
+  if (not transfer_matrices.empty())
   {
     ofile << "\n";
     ofile << "TRANSFER_MOMENTS_BEGIN\n";
-    for (size_t ell=0; ell<transfer_matrix.size(); ++ell)
+    for (size_t ell=0; ell < transfer_matrices.size(); ++ell)
     {
       if (ell==0) ofile << "#Zeroth moment (l=0)\n";
       else        ofile << "#(l=" << ell << ")\n";
 
-      const auto& matrix = transfer_matrix[ell];
+      const auto& matrix = transfer_matrices[ell];
 
       for (size_t g=0; g<matrix.rowI_values.size(); ++g)
       {

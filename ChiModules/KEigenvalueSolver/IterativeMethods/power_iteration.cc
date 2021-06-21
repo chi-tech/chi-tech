@@ -2,26 +2,27 @@
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
-#include <ChiTimer/chi_timer.h>
-
-#include <iomanip>
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
+
+#include "ChiTimer/chi_timer.h"
+extern ChiTimer chi_program_timer;
 
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;
 typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
-extern ChiTimer chi_program_timer;
-
 using namespace LinearBoltzmann;
+
+#include <iomanip>
 
 //###################################################################
 /**Power iterative scheme for k-eigenvalue calculations.
- * Note that this routine currently only works when the problem 
+ * Note that this routine currently only works when the problem
  * is defined by a single groupset.
 */
 void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
@@ -37,18 +38,17 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
 
   // ----- Set sweep scheduler
   MainSweepScheduler SweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    &groupset.angle_agg);
+                                    groupset.angle_agg,
+                                    *sweep_chunk);
 
   // ----- Tool the sweep chunk
-  sweep_chunk->SetDestinationPhi(&phi_new_local);
+  sweep_chunk->SetDestinationPhi(phi_new_local);
 
   // ----- Set starting guess to a unit magnitude flux
   phi_prev_local.assign(phi_prev_local.size(),1.0);
-  DisAssembleVectorLocalToLocal(groupset,phi_prev_local.data(),
-                                         phi_old_local.data()); 
+  ScopedCopySTLvectors(groupset, phi_prev_local, phi_old_local);
 
   // ----- Start outer k iterations
-  double F_new = 0.0;        //Production source new (0.0 is not used)
   double F_prev = 1.0;       //Production source prev
   double k_eff_prev = k_eff;
   int nit = 0;               //number of iterations
@@ -67,16 +67,15 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     {
       // ----- Set source and sweep
       SetKSource(groupset, APPLY_MATERIAL_SOURCE |
-                           APPLY_SCATTER_SOURCE |
+                           APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
                            APPLY_FISSION_SOURCE);
       groupset.angle_agg.ZeroOutgoingDelayedPsi();
       phi_new_local.assign(phi_new_local.size(),0.0);
-      SweepScheduler.Sweep(*sweep_chunk);
+      SweepScheduler.Sweep();
 
       // ----- Compute convergence parameters
       double pw_change = ComputePiecewiseChange(groupset);
-      DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(),
-                                             phi_old_local.data());
+      ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
       double rho = sqrt(pw_change/pw_change_prev);
       pw_change_prev = pw_change;
       nit += 1;
@@ -118,15 +117,14 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     }
 
     // ----- Recompute eigenvalue
-    F_new = ComputeProduction();
+    double F_new = ComputeProduction();
     k_eff = F_new/F_prev * k_eff;
     double reactivity = (k_eff - 1.0) / k_eff;
 
     // ----- Compute convergence parameters and bump values
     double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff; F_prev = F_new;
-    DisAssembleVectorLocalToLocal(groupset,phi_new_local.data(),
-                                           phi_prev_local.data());
+    ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
                                           
     if (k_eff_change<std::max(options.tolerance, 1.0e-12))
       k_converged = true;    
@@ -147,7 +145,8 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     if (k_converged) break;
   }//for k iterations
 
-  InitializePrecursors();
+  if (options.use_precursors)
+    InitializePrecursors();
   
   double sweep_time = SweepScheduler.GetAverageSweepTime();
   double source_time=

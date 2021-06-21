@@ -97,9 +97,9 @@ public:
 
   void PreComputeCellSDValues() override;
   void PreComputeNeighborCellSDValues();
-  std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(int cell_local_index);
-  chi_mesh::Cell&  GetNeighborCell(int cell_glob_index);
-  std::shared_ptr<CellMappingFE_PWL> GetNeighborCellMappingFE(int cell_glob_index);
+  std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
+  chi_mesh::Cell&  GetNeighborCell(uint64_t cell_glob_index);
+  std::shared_ptr<CellMappingFE_PWL> GetNeighborCellMappingFE(uint64_t cell_glob_index);
 
 private:
   //02

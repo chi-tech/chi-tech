@@ -52,28 +52,55 @@ struct Options
 /**Transport view of a cell*/
 class CellLBSView
 {
-public:
-  int dof_phi_map_start = 0;
-  int dofs = 0;
-  int xs_id = 0;
-  std::vector<bool> face_local = {};
-
 private:
-  int num_grps = 0;
-  int num_moms = 0;
+  size_t phi_address;
+  int num_nodes;
+  int num_grps;
+  int num_grps_moms;
+  int xs_mapping;
+  std::vector<bool> face_local_flags = {};
+  std::vector<double> outflow;
 
 public:
-  CellLBSView(int in_dofs, int num_G, int num_m)
+  CellLBSView(size_t in_phi_address,
+              int in_num_nodes,
+              int in_num_grps,
+              int in_num_moms,
+              int in_xs_mapping,
+              const std::vector<bool>& in_face_local_flags,
+              bool cell_on_boundary) :
+    phi_address(in_phi_address),
+    num_nodes(in_num_nodes),
+    num_grps(in_num_grps),
+    num_grps_moms(in_num_grps*in_num_moms),
+    xs_mapping(0),
+    face_local_flags(in_face_local_flags)
   {
-    dof_phi_map_start = -1;
-    dofs = in_dofs;
-    num_grps = num_G;
-    num_moms = num_m;
+    if (cell_on_boundary)
+      outflow.resize(num_grps,0.0);
   }
 
-  int MapDOF(int dof, int moment, int grp) const
+  size_t MapDOF(int node, int moment, int grp) const
   {
-    return dof_phi_map_start + dof*num_grps*num_moms + num_grps*moment + grp;
+    return phi_address + node * num_grps_moms + num_grps * moment + grp;
+  }
+
+  int XSMapping() const {return xs_mapping;}
+
+  bool IsFaceLocal(int f) const {return face_local_flags[f];}
+
+  int NumNodes() const {return num_nodes;}
+
+  void ZeroOutflow(     ) {outflow.assign(outflow.size(),0.0);}
+  void ZeroOutflow(int g) {if (g<outflow.size()) outflow[g]=0.0;}
+  void AddOutflow(int g, double intS_mu_psi)
+  {
+    if (g<outflow.size()) outflow[g] += intS_mu_psi;
+  }
+  double GetOutflow(int g) const
+  {
+    if (g<outflow.size()) return outflow[g];
+    else return 0.0;
   }
 };
 

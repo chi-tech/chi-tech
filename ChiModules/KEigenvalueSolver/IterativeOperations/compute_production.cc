@@ -32,7 +32,7 @@ double KEigenvalue::Solver::ComputeProduction()
     // ----- Loop over cell dofs
     for (int i=0; i<cell_fe_view.NumNodes(); i++)
     {
-      int ir = transport_view.MapDOF(i,0,0);
+      size_t ir = transport_view.MapDOF(i,0,0);
       double* phi_newp = &phi_new_local[ir];
 
       double intV_shapeI = cell_fe_view.IntV_shapeI(i);
@@ -44,10 +44,10 @@ double KEigenvalue::Solver::ComputeProduction()
         {
           double nu_sigma_f = 0.0;
           if (options.use_precursors)
-            nu_sigma_f = xs->nu_p_sigma_fg[g]+
-                         xs->nu_d_sigma_fg[g];
+            nu_sigma_f = xs->nu_prompt_sigma_f[g] +
+                         xs->nu_delayed_sigma_f[g];
           else
-            nu_sigma_f = xs->nu_p_sigma_fg[g];
+            nu_sigma_f = xs->nu_prompt_sigma_f[g];
 
           local_F += nu_sigma_f * phi_newp[g] * intV_shapeI; 
         }

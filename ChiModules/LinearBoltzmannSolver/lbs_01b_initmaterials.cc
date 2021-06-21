@@ -115,7 +115,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
 
     materials_list
       << " number of moments "
-      << material_xs[matid_to_xs_map[mat_id]]->transfer_matrix.size() << "\n";
+      << material_xs[matid_to_xs_map[mat_id]]->transfer_matrices.size() << "\n";
   }//for material id
 
   chi_log.Log(LOG_0)

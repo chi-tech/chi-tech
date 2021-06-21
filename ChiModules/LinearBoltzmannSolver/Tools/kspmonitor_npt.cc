@@ -62,7 +62,8 @@ PetscErrorCode LinearBoltzmann::
 
   chi_log.Log(LOG_0) << iter_info.str() << std::endl;
   const double SIXTY_SECOND_INTERVAL = 60000.0; //time in milliseconds
-  if (context->groupset.iterative_method == NPT_GMRES)
+  if (context->groupset.iterative_method == IterativeMethod::GMRES or
+      context->groupset.iterative_method == IterativeMethod::GMRES_CYCLES)
   {
     if (context->last_iteration == n)
     {
@@ -76,9 +77,9 @@ PetscErrorCode LinearBoltzmann::
           KSPBuildSolution(ksp, nullptr,&phi_new);
 
           context->solver.
-          DisAssembleVector(context->groupset, phi_new,
-                            context->solver.phi_old_local.data(),
-                            WITH_DELAYED_PSI);
+            SetSTLvectorFromPETScVec(context->groupset, phi_new,
+                                     context->solver.phi_old_local,
+                                     WITH_DELAYED_PSI);
 
           context->solver.last_restart_write =
             chi_program_timer.GetTime()/SIXTY_SECOND_INTERVAL;

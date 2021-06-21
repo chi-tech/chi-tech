@@ -23,8 +23,7 @@ extern ChiTimer chi_program_timer;
 /**Solves a groupset using GMRES.*/
 bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
                                     int group_set_num,
-                                    SweepChunk& sweep_chunk,
-                                    MainSweepScheduler& sweepScheduler,
+                                    MainSweepScheduler& sweep_scheduler,
                                     SourceFlags lhs_src_scope,
                                     SourceFlags rhs_src_scope,
                                     bool log_info /* = true*/)
@@ -46,11 +45,11 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
 
   //================================================== Get groupset dof sizes
   size_t groupset_numgrps = groupset.groups.size();
-  auto num_delayed_ang_unknowns = groupset.angle_agg.GetNumberOfAngularUnknowns();
+  auto num_delayed_ang_DOFs = groupset.angle_agg.GetNumDelayedAngularDOFs();
   size_t local_size = local_node_count * num_moments * groupset_numgrps +
-                      num_delayed_ang_unknowns.first;
+                      num_delayed_ang_DOFs.first;
   size_t globl_size = glob_node_count * num_moments * groupset_numgrps +
-                      num_delayed_ang_unknowns.second;
+                      num_delayed_ang_DOFs.second;
 
   //================================================== Create PETSc vectors
   phi_new = chi_math::PETScUtils::CreateVector(static_cast<int64_t>(local_size),
@@ -64,8 +63,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   //=================================================== Create Data context
   //                                                    available inside
   //                                                    Action
-  KSPDataContext data_context(*this, sweep_chunk, groupset, x_temp,
-                              sweepScheduler, lhs_src_scope);
+  KSPDataContext data_context(*this, groupset, x_temp,
+                              sweep_scheduler, lhs_src_scope);
 
   //=================================================== Create the matrix-shell
   Mat A;
@@ -94,6 +93,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   KSPSetUp(ksp);
 
   //================================================== Compute b
+  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
   if (log_info)
   {
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
@@ -103,13 +103,13 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   SetSource(groupset, rhs_src_scope);
 
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
-  sweep_chunk.SetDestinationPhi(&phi_new_local);
+  sweep_chunk.SetDestinationPhi(phi_new_local);
   groupset.angle_agg.ZeroIncomingDelayedPsi();
   groupset.ZeroAngularFluxDataStructures();
-  phi_new_local.assign(phi_new_local.size(),0.0);
 
   //Sweep
-  sweepScheduler.Sweep(sweep_chunk);
+  phi_new_local.assign(phi_new_local.size(),0.0);
+  sweep_scheduler.Sweep();
 
   //=================================================== Apply DSA
   if (groupset.apply_wgdsa)
@@ -126,12 +126,12 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   }
 
   //=================================================== Assemble vectors
-  AssembleVector(groupset,q_fixed,phi_new_local.data(),WITH_DELAYED_PSI);
-  AssembleVector(groupset,phi_old,phi_old_local.data(),WITH_DELAYED_PSI);
+  SetPETScVecFromSTLvector(groupset, q_fixed, phi_new_local, WITH_DELAYED_PSI);
+  SetPETScVecFromSTLvector(groupset, phi_old, phi_old_local, WITH_DELAYED_PSI);
 
   //=================================================== Retool for GMRES
   sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
-  sweep_chunk.SetDestinationPhi(&phi_new_local);
+  sweep_chunk.SetDestinationPhi(phi_new_local);
 
   double phi_old_norm=0.0;
   VecNorm(phi_old,NORM_2,&phi_old_norm);
@@ -160,8 +160,22 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       << "GMRES solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
-  DisAssembleVector(groupset, phi_new, phi_new_local.data(),WITH_DELAYED_PSI);
-  DisAssembleVector(groupset, phi_new, phi_old_local.data(),WITH_DELAYED_PSI);
+  SetSTLvectorFromPETScVec(groupset, phi_new, phi_new_local, WITH_DELAYED_PSI);
+  SetSTLvectorFromPETScVec(groupset, phi_new, phi_old_local, WITH_DELAYED_PSI);
+
+  //================================================== Perform final sweep
+  //                                                   with converged phi and
+  //                                                   delayed psi dofs
+  ZeroOutflowBalanceVars(groupset);
+
+  sweep_chunk.SetDestinationPhi(phi_new_local);
+  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
+  SetSource(groupset, lhs_src_scope | rhs_src_scope);
+
+  phi_new_local.assign(phi_new_local.size(),0.0);
+  sweep_scheduler.Sweep();
+
+  ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
 
   //==================================================== Clean up
   KSPDestroy(&ksp);
@@ -171,11 +185,10 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   VecDestroy(&x_temp);
   MatDestroy(&A);
 
-
   //==================================================== Print solution info
   {
-    double sweep_time = sweepScheduler.GetAverageSweepTime();
-    double chunk_overhead_ratio = 1.0-sweepScheduler.GetAngleSetTimings()[2];
+    double sweep_time = sweep_scheduler.GetAverageSweepTime();
+    double chunk_overhead_ratio = 1.0 - sweep_scheduler.GetAngleSetTimings()[2];
     double source_time=
       chi_log.ProcessEvent(source_event_tag,
                            ChiLog::EventOperation::AVERAGE_DURATION);
@@ -211,7 +224,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
       std::string("GS_") + std::to_string(group_set_num) +
       std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
       std::string(".log");
-    groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,
+    groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag,
                                 sweep_log_file_name);
   }
 
@@ -219,7 +232,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
     std::string("GS_") + std::to_string(group_set_num) +
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
-  groupset.PrintSweepInfoFile(sweepScheduler.sweep_event_tag,sweep_log_file_name);
+  groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
 
   return reason == KSP_CONVERGED_RTOL;
 }

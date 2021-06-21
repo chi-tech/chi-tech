@@ -124,7 +124,7 @@ void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
     {
       index++;
       int m = 0;
-      int mapping = transport_view.MapDOF(i,m,gsi); //phi_new & old location gsi
+      size_t mapping = transport_view.MapDOF(i,m,gsi); //phi_new & old location gsi
 
       double* phi_old_mapped = &ref_phi_old[mapping];
       double* phi_new_mapped = &ref_phi_new[mapping];
@@ -160,7 +160,7 @@ void LinearBoltzmann::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groups
     {
       index++;
       int m=0;
-      int mapping = transport_view.MapDOF(i,m,gsi); //phi_new & old location gsi
+      size_t mapping = transport_view.MapDOF(i,m,gsi); //phi_new & old location gsi
 
       double* phi_new_mapped = &ref_phi_new[mapping];
 
