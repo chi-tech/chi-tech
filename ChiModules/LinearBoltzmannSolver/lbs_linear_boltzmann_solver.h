@@ -32,8 +32,9 @@ enum class BoundaryType
   {
     NO_FLAGS_SET           = 0,
     APPLY_MATERIAL_SOURCE  = (1 << 0),
-    APPLY_SCATTER_SOURCE   = (1 << 1),
-    APPLY_FISSION_SOURCE   = (1 << 2)
+    APPLY_WGS_SCATTER_SOURCE   = (1 << 1),
+    APPLY_AGS_SCATTER_SOURCE   = (1 << 2),
+    APPLY_FISSION_SOURCE       = (1 << 3)
   };
 
   inline SourceFlags operator|(const SourceFlags f1,
@@ -83,7 +84,7 @@ public:
 
   chi_math::UnknownManager flux_moments_uk_man;
 
-  int max_cell_dof_count;
+  size_t max_cell_dof_count;
   unsigned long long local_node_count;
   unsigned long long glob_node_count;
 
@@ -160,22 +161,30 @@ public:
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
                          int group_set_num,
-                         SweepChunk& sweep_chunk,
-                         MainSweepScheduler & sweepScheduler,
+                         MainSweepScheduler& sweep_scheduler,
                          SourceFlags source_flags,
                          bool log_info = true);
   bool GMRES(LBSGroupset& groupset,
              int group_set_num,
-             SweepChunk& sweep_chunk,
-             MainSweepScheduler & sweepScheduler,
+             MainSweepScheduler& sweep_scheduler,
              SourceFlags lhs_src_scope,
              SourceFlags rhs_src_scope,
              bool log_info = true);
 
   //Vector assembly
-  void AssembleVector(LBSGroupset& groupset, Vec x, double *y,bool with_delayed_psi=false);
-  void DisAssembleVector(LBSGroupset& groupset, Vec x_src, double *y,bool with_delayed_psi=false);
-  void DisAssembleVectorLocalToLocal(LBSGroupset& groupset, double *x_src, double *y);
+  void SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
+                                const std::vector<double>& y,
+                                bool with_delayed_psi= false);
+  void SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
+                                std::vector<double>& y,
+                                bool with_delayed_psi= false);
+  void ScopedCopySTLvectors(LBSGroupset& groupset,
+                            const std::vector<double>& x_src,
+                            std::vector<double>& y);
+
+  //compute_balance
+  void ZeroOutflowBalanceVars(LBSGroupset& groupset);
+  void ComputeBalance();
 
 };
 

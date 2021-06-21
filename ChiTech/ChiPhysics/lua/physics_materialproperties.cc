@@ -723,7 +723,7 @@ int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L) {
     auto ptype = MatProperty::TRANSPORT_XSECTIONS;
     if (property->Type() == ptype) {
       auto xs = std::dynamic_pointer_cast<XS>(property);
-      xs->sigma_tg[group_num] = xs_val;
+      xs->sigma_t[group_num] = xs_val;
       chi_log.Log(LOG_0)
         << "sigma_t for group " << group_num
         << " in material " << material_index

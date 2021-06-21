@@ -55,11 +55,11 @@ public:
 
   std::shared_ptr<chi_mesh::sweep_management::SPDS> GetSPDS();
 
-  int GetMaxBufferMessages();
+  int GetMaxBufferMessages() const;
 
   void SetMaxBufferMessages(int new_max);
 
-  int GetNumGrps();
+  int GetNumGrps() const;
 
   AngleSetStatus AngleSetAdvance(
              SweepChunk& sweep_chunk,
@@ -70,17 +70,17 @@ public:
   void ResetSweepBuffers();
   void ReceiveDelayedData(int angle_set_num);
 
-  double* PsiBndry(int bndry_map,
+  double* PsiBndry(uint64_t bndry_map,
                    int angle_num,
-                   int cell_local_id,
+                   uint64_t cell_local_id,
                    int face_num,
                    int fi,
                    int g,
                    int gs_ss_begin,
                    bool surface_source_active);
-  double* ReflectingPsiOutBoundBndry(int bndry_map,
+  double* ReflectingPsiOutBoundBndry(uint64_t bndry_map,
                                      int angle_num,
-                                     int cell_local_id,
+                                     uint64_t cell_local_id,
                                      int face_num,
                                      int fi,
                                      int gs_ss_begin);

@@ -25,7 +25,6 @@ namespace LinearBoltzmann
   };
 }
 
-typedef chi_mesh::sweep_management::AngleAggregation AngleAgg;
 typedef std::pair<int,int> GsSubSet;
 typedef std::pair<int,int> AngSubSet;
 
@@ -51,7 +50,7 @@ public:
   std::vector<AngSubSet>                       ang_subsets_bot;
   std::vector<int>                             ang_subset_sizes_bot;
 
-  int                                          iterative_method;
+  LinearBoltzmann::IterativeMethod             iterative_method;
   LinearBoltzmann::AngleAggregationType        angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;

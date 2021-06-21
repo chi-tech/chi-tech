@@ -31,7 +31,7 @@ void KEigenvalue::Solver::InitializePrecursors()
     // ----- Loop over cell dofs
     for (int i = 0; i < cell_fe_view->num_nodes; ++i)
     {
-      int64_t ir = transport_view.MapDOF(i,0,0);
+      size_t ir = transport_view.MapDOF(i,0,0);
       int64_t jr = pwl->MapDOFLocal(cell, i, Nj_unk_man, 0, 0);
       double* Nj_newp  = &Nj_new_local[jr];
       double* phi_newp = &phi_new_local[ir];
@@ -44,12 +44,12 @@ void KEigenvalue::Solver::InitializePrecursors()
           size_t j_map = precursor_map[xs_id][j];
 
           // ----- Initialize precursors
-          double coeff = xs->gamma[j] / xs->lambda[j];
+          double coeff = xs->precursor_yield[j] / xs->precursor_lambda[j];
 
 
           // ----- Loop over groups
           for (int g = 0; g < groups.size(); ++g)
-            Nj_newp[j_map] += coeff * xs->nu_d_sigma_fg[g] *
+            Nj_newp[j_map] += coeff * xs->nu_delayed_sigma_f[g] *
                               phi_newp[g] / k_eff;
         }//for j
       }//if fissile and J > 0

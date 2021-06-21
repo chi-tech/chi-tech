@@ -15,15 +15,14 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 
   //Shorten some names
   LinearBoltzmann::Solver& solver = context->solver;
-  SweepChunk& sweep_chunk = context->sweep_chunk;
   LBSGroupset& groupset  = context->groupset;
-  MainSweepScheduler& sweepScheduler = context->sweepScheduler;
+  MainSweepScheduler& sweepScheduler = context->sweep_scheduler;
   SourceFlags& lhs_source_scope = context->lhs_scope;
 
   //============================================= Copy krylov vector into local
-  solver.DisAssembleVector(groupset,
-                           krylov_vector,
-                           solver.phi_old_local.data(),WITH_DELAYED_PSI);
+  solver.SetSTLvectorFromPETScVec(groupset,
+                                  krylov_vector,
+                                  solver.phi_old_local, WITH_DELAYED_PSI);
 
   //============================================= Setting the source using
   //                                             updated phi_old
@@ -32,7 +31,7 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   //============================================= Sweeping the new source
   groupset.ZeroAngularFluxDataStructures();
   solver.phi_new_local.assign(solver.phi_new_local.size(),0.0);
-  sweepScheduler.Sweep(sweep_chunk);
+  sweepScheduler.Sweep();
 
   //=================================================== Apply WGDSA
   if (groupset.apply_wgdsa)
@@ -54,10 +53,9 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
                                           solver.phi_new_local.data());
   }
 
-
-  solver.AssembleVector(groupset,
-                        context->operating_vector,
-                        solver.phi_new_local.data(),WITH_DELAYED_PSI);
+  solver.SetPETScVecFromSTLvector(groupset,
+                                  context->operating_vector,
+                                  solver.phi_new_local, WITH_DELAYED_PSI);
 
 
   //============================================= Computing action

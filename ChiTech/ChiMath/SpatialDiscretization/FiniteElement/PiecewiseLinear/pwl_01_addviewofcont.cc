@@ -279,7 +279,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
 //###################################################################
 /**Returns a locally stored finite element view.*/
 std::shared_ptr<CellMappingFE_PWL>
-  SpatialDiscretization_PWLD::GetCellMappingFE(int cell_local_index)
+  SpatialDiscretization_PWLD::GetCellMappingFE(uint64_t cell_local_index)
 {
   if (mapping_initialized)
   {
@@ -306,7 +306,7 @@ std::shared_ptr<CellMappingFE_PWL>
 /**Maps a neigboring cell from a global cell index. The spatial discretizations
  * maintains a non-ghost version of all neighboring cells.*/
 chi_mesh::Cell& SpatialDiscretization_PWLD::
-  GetNeighborCell(int cell_glob_index)
+  GetNeighborCell(uint64_t cell_glob_index)
 {
   //=================================== First check locally
   if (ref_grid->IsCellLocal(cell_glob_index))
@@ -325,7 +325,7 @@ chi_mesh::Cell& SpatialDiscretization_PWLD::
 //###################################################################
 /**Maps a neigboring cell's fe view from a global cell index.*/
 std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
-  GetNeighborCellMappingFE(int cell_glob_index)
+  GetNeighborCellMappingFE(uint64_t cell_glob_index)
 {
   //=================================== First check locally
   if (ref_grid->IsCellLocal(cell_glob_index))

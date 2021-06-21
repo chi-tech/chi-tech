@@ -23,8 +23,7 @@ class chi_mesh::sweep_management::SweepScheduler
 {
 private:
   SchedulingAlgorithm       scheduler_type;
-  AngleAggregation*         angle_agg;
-
+  AngleAggregation&         angle_agg;
 
   struct RULE_VALUES
   {
@@ -47,14 +46,16 @@ private:
   };
   std::vector<RULE_VALUES> rule_values;
 public:
+  SweepChunk& sweep_chunk;
   const size_t sweep_event_tag;
   const std::vector<size_t> sweep_timing_events_tag;
 public:
   SweepScheduler(SchedulingAlgorithm in_scheduler_type,
-                 AngleAggregation* in_angle_agg);
+                 AngleAggregation& in_angle_agg,
+                 SweepChunk& in_sweep_chunk);
 
-  void Sweep(SweepChunk& in_sweep_chunk);
-  double GetAverageSweepTime();
+  void Sweep();
+  double GetAverageSweepTime() const;
   std::vector<double> GetAngleSetTimings();
 
 private:
