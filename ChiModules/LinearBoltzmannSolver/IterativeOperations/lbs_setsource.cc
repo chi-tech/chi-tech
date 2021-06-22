@@ -29,7 +29,7 @@ void LinearBoltzmann::Solver::
   const bool apply_mat_src         = (source_flags & APPLY_MATERIAL_SOURCE);
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
   const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCE);
-  const bool apply_fission_src     = (source_flags & APPLY_FISSION_SOURCE);
+  const bool apply_fission_src     = (source_flags & APPLY_WGS_FISSION_SOURCE);
 
   //================================================== Get group setup
   int gs_i = groupset.groups[0].id;

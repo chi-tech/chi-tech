@@ -66,13 +66,15 @@ void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
                       APPLY_MATERIAL_SOURCE |
                       APPLY_AGS_SCATTER_SOURCE |
                       APPLY_WGS_SCATTER_SOURCE |
-                      APPLY_FISSION_SOURCE);
+                      APPLY_AGS_FISSION_SOURCE |
+                      APPLY_WGS_FISSION_SOURCE);
   }
   else if (groupset.iterative_method == IterativeMethod::GMRES)
   {
     GMRES(groupset, group_set_num, sweep_scheduler,
-          APPLY_WGS_SCATTER_SOURCE | APPLY_FISSION_SOURCE,   //lhs_scope
-          APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE); //rhs_scope
+          APPLY_WGS_SCATTER_SOURCE | APPLY_WGS_FISSION_SOURCE,   //lhs_scope
+          APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE |
+          APPLY_AGS_SCATTER_SOURCE); //rhs_scope
   }
 
   if (options.write_restart_data)

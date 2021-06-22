@@ -30,11 +30,12 @@ enum class BoundaryType
 };
   enum SourceFlags : int
   {
-    NO_FLAGS_SET           = 0,
-    APPLY_MATERIAL_SOURCE  = (1 << 0),
+    NO_FLAGS_SET               = 0,
+    APPLY_MATERIAL_SOURCE      = (1 << 0),
     APPLY_WGS_SCATTER_SOURCE   = (1 << 1),
     APPLY_AGS_SCATTER_SOURCE   = (1 << 2),
-    APPLY_FISSION_SOURCE       = (1 << 3)
+    APPLY_WGS_FISSION_SOURCE   = (1 << 3),
+    APPLY_AGS_FISSION_SOURCE   = (1 << 4)
   };
 
   inline SourceFlags operator|(const SourceFlags f1,

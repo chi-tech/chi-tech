@@ -30,7 +30,7 @@ void KEigenvalue::Solver::
 
   const bool apply_mat_src     = (source_flags & APPLY_MATERIAL_SOURCE);
   const bool apply_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
-  const bool apply_fission_src = (source_flags & APPLY_FISSION_SOURCE);
+  const bool apply_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCE);
 
   // ----- Groupset group information
   int gs_i = groupset.groups[0].id;

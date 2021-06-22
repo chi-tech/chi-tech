@@ -68,7 +68,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
       // ----- Set source and sweep
       SetKSource(groupset, APPLY_MATERIAL_SOURCE |
                            APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
-                           APPLY_FISSION_SOURCE);
+                           APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
       groupset.angle_agg.ZeroOutgoingDelayedPsi();
       phi_new_local.assign(phi_new_local.size(),0.0);
       SweepScheduler.Sweep();
