@@ -20,7 +20,9 @@ extern ChiLog& chi_log;
  *
  * */
 void LinearBoltzmann::Solver::
-  SetSource(LBSGroupset& groupset, SourceFlags source_flags)
+  SetSource(LBSGroupset& groupset,
+            std::vector<double>& destination_q,
+            SourceFlags source_flags)
 {
   chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
 
@@ -39,9 +41,6 @@ void LinearBoltzmann::Solver::
   const auto& m_to_ell_em_map = groupset.quadrature->GetMomentToHarmonicsIndexMap();
 
   std::vector<double> default_zero_src(groups.size(),0.0);
-
-  //================================================== Reset source moments
-  q_moments_local.assign(q_moments_local.size(),0.0);
 
   //================================================== Loop over local cells
   for (const auto& cell : grid->local_cells)
@@ -77,7 +76,7 @@ void LinearBoltzmann::Solver::
         unsigned int ell = m_to_ell_em_map[m].ell;
 
         size_t ir      = full_cell_view.MapDOF(i,m,0);
-        double* q_mom    = &q_moments_local[ir];
+        double* q_mom    = &destination_q[ir];
         double* phi_oldp = &phi_old_local[ir];
 
         //============================= Loop over groupset groups

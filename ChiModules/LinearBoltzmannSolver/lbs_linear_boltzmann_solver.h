@@ -156,7 +156,9 @@ public:
                                  const std::string& file_base);
 
   //IterativeMethods
-  virtual void SetSource(LBSGroupset& groupset, SourceFlags source_flags);
+  virtual void SetSource(LBSGroupset& groupset,
+                         std::vector<double>&  destination_q,
+                         SourceFlags source_flags);
   double ComputePiecewiseChange(LBSGroupset& groupset);
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
