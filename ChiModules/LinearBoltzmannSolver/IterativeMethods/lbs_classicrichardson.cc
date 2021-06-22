@@ -43,7 +43,8 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   bool converged = false;
   for (int k=0; k<groupset.max_iterations; k++)
   {
-    SetSource(groupset,source_flags);
+    q_moments_local.assign(q_moments_local.size(), 0.0); //Clear source moments
+    SetSource(groupset, q_moments_local, source_flags);
 
     groupset.ZeroAngularFluxDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0

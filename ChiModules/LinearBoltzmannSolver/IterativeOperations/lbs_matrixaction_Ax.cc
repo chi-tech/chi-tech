@@ -26,7 +26,8 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 
   //============================================= Setting the source using
   //                                             updated phi_old
-  solver.SetSource(groupset, lhs_source_scope);
+  solver.q_moments_local.assign(solver.q_moments_local.size(), 0.0);
+  solver.SetSource(groupset, solver.q_moments_local, lhs_source_scope);
 
   //============================================= Sweeping the new source
   groupset.ZeroAngularFluxDataStructures();

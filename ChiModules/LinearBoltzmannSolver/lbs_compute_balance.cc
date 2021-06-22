@@ -37,7 +37,9 @@ void LinearBoltzmann::Solver::ComputeBalance()
   mat_src.assign(mat_src.size(),0.0);
   for (auto& groupset : group_sets)
   {
-    SetSource(groupset, APPLY_MATERIAL_SOURCE | APPLY_FISSION_SOURCE);
+    q_moments_local.assign(q_moments_local.size(), 0.0);
+    SetSource(groupset, q_moments_local,
+              APPLY_MATERIAL_SOURCE | APPLY_FISSION_SOURCE);
     ScopedCopySTLvectors(groupset, q_moments_local, mat_src);
   }
 

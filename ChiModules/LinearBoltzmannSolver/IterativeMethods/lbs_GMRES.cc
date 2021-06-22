@@ -100,7 +100,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   }
 
   //Prepare for sweep
-  SetSource(groupset, rhs_src_scope);
+  q_moments_local.assign(q_moments_local.size(), 0.0);
+  SetSource(groupset, q_moments_local, rhs_src_scope);
 
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
   sweep_chunk.SetDestinationPhi(phi_new_local);
@@ -170,7 +171,9 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
 
   sweep_chunk.SetDestinationPhi(phi_new_local);
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
-  SetSource(groupset, lhs_src_scope | rhs_src_scope);
+
+  q_moments_local.assign(q_moments_local.size(), 0.0);
+  SetSource(groupset, q_moments_local, lhs_src_scope | rhs_src_scope);
 
   phi_new_local.assign(phi_new_local.size(),0.0);
   sweep_scheduler.Sweep();
