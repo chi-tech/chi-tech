@@ -42,6 +42,7 @@ struct Options
   int max_iterations = 1000;
   double tolerance    = 1e-8;
   bool use_precursors = false;
+  bool use_src_moments = false;
 
   bool save_angular_flux = false;
 

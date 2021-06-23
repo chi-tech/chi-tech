@@ -83,8 +83,10 @@ void LinearBoltzmann::Solver::
         //============================= Loop over groupset groups
         for (int g=gs_i; g<=gs_f; g++)
         {
-          if ( apply_mat_src && (ell == 0) )
+          if ( apply_mat_src and (ell == 0) and (not options.use_src_moments))
             q_mom[g] += src[g];
+          else if (apply_mat_src and options.use_src_moments)
+            q_mom[g] += ext_src_moments_local[ir+g];
 
           double inscat_g = 0.0;
           //====================== Apply across-groupset scattering
