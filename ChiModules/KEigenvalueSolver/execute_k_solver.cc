@@ -29,7 +29,7 @@ void KEigenvalue::Solver::ExecuteKSolver()
   ComputeSweepOrderings(group_sets[gs]);
   InitFluxDataStructures(group_sets[gs]);
 
-  PowerIteration(group_sets[0]);
+  PowerIteration();
 
   ResetSweepOrderings(group_sets[gs]);
  

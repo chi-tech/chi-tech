@@ -46,11 +46,13 @@ public:
   std::vector<double> Nj_new_local;
   chi_math::UnknownManager Nj_unk_man;
 
-  // Iterative methods
-  void PowerIteration(LBSGroupset& groupset);
+  // IterativeMethods
+  void PowerIteration();
   
   // Iterative operations
-  void SetKSource(LBSGroupset& groupset, SourceFlags source_flags);
+  void SetKSource(LBSGroupset& groupset,
+                  std::vector<double>& destination_q,
+                  SourceFlags source_flags);
   double ComputeProduction();
   void InitializePrecursors();
 
