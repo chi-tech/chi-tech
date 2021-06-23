@@ -28,9 +28,7 @@ using namespace LinearBoltzmann;
 void KEigenvalue::Solver::PowerIteration()
 {
   chi_log.Log(LOG_0)
-    << "\n\n";
-  chi_log.Log(LOG_0)
-    << "********** Solving k-eigenvalue problem with "
+    << "\n\n********** Solving k-eigenvalue problem with "
     << "the Power Method.\n\n";
 
   LBSGroupset&  groupset = group_sets[0];
@@ -51,88 +49,54 @@ void KEigenvalue::Solver::PowerIteration()
   ScopedCopySTLvectors(groupset, phi_prev_local, phi_old_local);
 
   //======================================== Start power iterations
-  double F_prev     = 1.0;    //production source prev
-  double k_eff_prev = k_eff;
+  double F_prev     = 1.0;
+  double k_eff_prev = 1.0;
   int nit           = 0;      //number of iterations
-  bool k_converged  = false;
-
+  bool converged  = false;
   while (nit < options.max_iterations)
   {
-    chi_log.Log(LOG_0VERBOSE_2)
-      << "\n********** Starting source iterations";
-
-    // ----- Start inner source iterations
-    double pw_change_prev = 1.0;
-    bool si_converged = false;
-    for (int si_nit=0; si_nit<groupset.max_iterations; si_nit++)
+    //============================== Loop over groupsets
+    int gs = -1;
+    for (auto& groupset : group_sets)
     {
-      // ----- Set source and sweep
+      ++gs;
+
+      //============================== Clear source moments
       q_moments_local.assign(q_moments_local.size(), 0.0);
+
+      //============================== Set the fission source
       SetKSource(groupset, q_moments_local,
-                 APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
                  APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
 
-      groupset.ZeroAngularFluxDataStructures();
-      phi_new_local.assign(phi_new_local.size(),0.0);
-      sweep_scheduler.Sweep();
-
-      //======================================== Compute convergence params
-      double pw_change = ComputePiecewiseChange(groupset);
-      ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
-      double rho = sqrt(pw_change/pw_change_prev);
-      pw_change_prev = pw_change;
-      nit += 1;
-
-      if (si_nit==0) rho = 0.0;
-      if (pw_change<std::max(groupset.residual_tolerance*rho,1.0e-10))
-        si_converged = true;
-
-      //============================== Print iteration information
-      std::string offset = "    ";
-      std::stringstream si_iter_info;
-      si_iter_info
-        << chi_program_timer.GetTimeString() << " "
-        << offset
-        << "WGS groups ["
-        << groupset.groups.front().id
-        << "-"
-        << groupset.groups.back().id
-        << "]"
-        << " Source Iteration " << std::setw(5) << si_nit
-        << " Point-wise change " << std::setw(14) << pw_change;
-
-      if (si_converged)
-        si_iter_info << " CONVERGED\n";
-      chi_log.Log(LOG_0VERBOSE_1) << si_iter_info.str();
-
-      if (si_converged) {
-        chi_log.Log(LOG_0VERBOSE_1)
-            << "\nSource iterations converged in "
-            << si_nit << " iteratrions.\n";
-        break;
+      //============================== Converge the scattering source with
+      //                               a fixed fission source
+      if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON) {
+        ClassicRichardson(groupset, gs, sweep_scheduler,
+                          APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
+                          false);
       }
-    }//for source iterations
-
-    if (!si_converged) {
-      chi_log.Log(LOG_ALLVERBOSE_1)
-          << "\n!!!WARNING!!! "
-             "Source iterations did not converge.\n";
+      else if (groupset.iterative_method == IterativeMethod::GMRES) {
+        chi_log.Log(LOG_ALLERROR)
+          << "GMRES has not yet been implemented for this solver.";
+        exit(EXIT_FAILURE);
+      }
     }
 
-    // ----- Recompute eigenvalue
+    //============================== Recompute k-eigenvalue
     double F_new = ComputeProduction();
-    k_eff = F_new/F_prev * k_eff;
+    k_eff = F_new / F_prev * k_eff;
     double reactivity = (k_eff - 1.0) / k_eff;
 
-    // ----- Compute convergence parameters and bump values
+    //============================== Check convergence, reset book-keeping
     double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
-    k_eff_prev = k_eff; F_prev = F_new;
+    k_eff_prev = k_eff;
+    F_prev = F_new;
     ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
-                                          
-    if (k_eff_change<std::max(options.tolerance, 1.0e-12))
-      k_converged = true;    
 
-    // ----- Print iteration summary
+    if (k_eff_change<std::max(options.tolerance, 1.0e-12))
+      converged = true;
+
+    //============================== Print iteration summary
     std::stringstream k_iter_info;
     k_iter_info
       << chi_program_timer.GetTimeString() << " "
@@ -140,16 +104,16 @@ void KEigenvalue::Solver::PowerIteration()
       << "  k_eff " << std::setw(10) << k_eff
       << "  k_eff change " << std::setw(10) << k_eff_change
       << "  reactivity " << std::setw(10) << reactivity * 1e5;
-    if (k_converged) {
+    if (converged) {
       k_iter_info << " CONVERGED\n";
     }
-    chi_log.Log(LOG_0VERBOSE_1) << k_iter_info.str();
+    chi_log.Log() << k_iter_info.str();
 
-    if (k_converged) break;
+    if (converged) break;
   }//for k iterations
 
-  if (options.use_precursors)
-    InitializePrecursors();
+  //============================== Initialize the precursor vector
+  InitializePrecursors();
   
   double sweep_time = sweep_scheduler.GetAverageSweepTime();
   double source_time=

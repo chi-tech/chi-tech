@@ -15,24 +15,19 @@ using namespace LinearBoltzmann;
 void KEigenvalue::Solver::ExecuteKSolver()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  int gs = 0;
 
-  chi_log.Log(LOG_0)
-    << "\n********* Initializing Groupset " << gs << std::endl;
-
-  group_sets[gs].BuildDiscMomOperator(options.scattering_order,
-                                      options.geometry_type);
-  group_sets[gs].BuildMomDiscOperator(options.scattering_order,
-                                      options.geometry_type);
-  group_sets[gs].BuildSubsets();
-
-  ComputeSweepOrderings(group_sets[gs]);
-  InitFluxDataStructures(group_sets[gs]);
+  for (auto& groupset : group_sets) {
+    ComputeSweepOrderings(groupset);
+    InitFluxDataStructures(groupset);
+  }
 
   PowerIteration();
 
-  ResetSweepOrderings(group_sets[gs]);
- 
+  for (auto& groupset : group_sets) {
+    ResetSweepOrderings(groupset);
+  }
+
+
   chi_log.Log(LOG_0) << "KEigenvalueSolver execution completed\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
