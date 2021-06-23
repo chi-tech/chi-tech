@@ -113,13 +113,15 @@ chiLBSGroupsetAddGroups(phys,gs,0,G-1)
 chiLBSGroupsetSetQuadrature(phys,gs,pquad)
 chiLBSGroupsetSetMaxIterations(phys,gs,max_si_iters)
 chiLBSGroupsetSetResidualTolerance(phys,gs,si_tol)
-chiLBSGroupsetSetIterativeMethod(phys,gs,NPT_CLASSICRICHARDSON_CYCLES)
+chiLBSGroupsetSetIterativeMethod(phys,gs,NPT_GMRES_CYCLES)
 chiLBSGroupsetSetAngleAggregationType(phys,gs,LBSGroupset.ANGLE_AGG_SINGLE)
 
 -- Additional parameters
 chiLBSSetMaxKIterations(phys,max_k_iters)
 chiLBSSetKTolerance(phys,k_tol)
 chiLBSSetUsePrecursors(phys,use_precursors)
+chiLBSSetProperty(phys,VERBOSE_INNER_ITERATIONS,true)
+chiLBSSetProperty(phys,VERBOSE_OUTER_ITERATIONS,true)
 
 --############################################### Initialize and Execute Solver
 chiKEigenvalueLBSInitialize(phys)

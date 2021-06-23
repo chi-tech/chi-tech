@@ -28,7 +28,7 @@ struct Options
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
   SDMType sd_type = SDMType::UNDEFINED;
   unsigned int scattering_order=1;
-  int  sweep_eager_limit= 32000;;
+  int  sweep_eager_limit= 32000;
 
   bool read_restart_data=false;
   std::string read_restart_folder_name = std::string("YRestart");
@@ -41,9 +41,13 @@ struct Options
 
   int max_iterations = 1000;
   double tolerance    = 1e-8;
+
   bool use_precursors = false;
 
   bool save_angular_flux = false;
+
+  bool verbose_inner_iterations = true;
+  bool verbose_outer_iterations = true;
 
   Options() = default;
 };

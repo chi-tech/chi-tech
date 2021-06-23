@@ -25,7 +25,7 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
                                   solver.phi_old_local, WITH_DELAYED_PSI);
 
   //============================================= Setting the source using
-  //                                             updated phi_old
+  //                                              updated phi_old
   solver.q_moments_local.assign(solver.q_moments_local.size(), 0.0);
   solver.SetSource(groupset, solver.q_moments_local, lhs_source_scope);
 

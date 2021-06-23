@@ -61,7 +61,8 @@ void KEigenvalue::Solver::PowerIteration()
 
     //============================== Set the fission source
     SetKSource(groupset, q_moments_local,
-               APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
+               APPLY_AGS_FISSION_SOURCE |
+               APPLY_WGS_FISSION_SOURCE);
 
     //============================== Converge the scattering source with
     //                               a fixed fission source
@@ -71,9 +72,9 @@ void KEigenvalue::Solver::PowerIteration()
                         false);
     }
     else if (groupset.iterative_method == IterativeMethod::GMRES) {
-      chi_log.Log(LOG_ALLERROR)
-        << "GMRES has not yet been implemented for this solver.";
-      exit(EXIT_FAILURE);
+      GMRES(groupset, 0, sweep_scheduler,
+            APPLY_WGS_SCATTER_SOURCE, APPLY_AGS_SCATTER_SOURCE,
+            false);
     }
 
     //============================== Recompute k-eigenvalue
@@ -92,17 +93,19 @@ void KEigenvalue::Solver::PowerIteration()
       converged = true;
 
     //============================== Print iteration summary
-    std::stringstream k_iter_info;
-    k_iter_info
-      << chi_program_timer.GetTimeString() << " "
-      << "  Iteration " << std::setw(5) << nit
-      << "  k_eff " << std::setw(10) << k_eff
-      << "  k_eff change " << std::setw(10) << k_eff_change
-      << "  reactivity " << std::setw(10) << reactivity * 1e5;
-    if (converged) {
-      k_iter_info << " CONVERGED\n";
+    if (options.verbose_outer_iterations) {
+      std::stringstream k_iter_info;
+      k_iter_info
+          << chi_program_timer.GetTimeString() << " "
+          << "  Iteration " << std::setw(5) << nit
+          << "  k_eff " << std::setw(10) << k_eff
+          << "  k_eff change " << std::setw(10) << k_eff_change
+          << "  reactivity " << std::setw(10) << reactivity * 1e5;
+      if (converged) {
+        k_iter_info << " CONVERGED\n";
+      }
+      chi_log.Log(LOG_0) << k_iter_info.str();
     }
-    chi_log.Log() << k_iter_info.str();
 
     if (converged) break;
   }//for k iterations

@@ -51,6 +51,10 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   size_t globl_size = glob_node_count * num_moments * groupset_numgrps +
                       num_delayed_ang_DOFs.second;
 
+  if (log_info)
+    chi_log.Log(LOG_0)
+      << "Number of angular unknowns: " << num_delayed_ang_DOFs.second;
+
   //================================================== Create PETSc vectors
   phi_new = chi_math::PETScUtils::CreateVector(static_cast<int64_t>(local_size),
                                                static_cast<int64_t>(globl_size));
@@ -99,8 +103,10 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
   }
 
+  //Store inittial q_moments_local
+  auto init_q_moments_local = q_moments_local;
+
   //Prepare for sweep
-  q_moments_local.assign(q_moments_local.size(), 0.0);
   SetSource(groupset, q_moments_local, rhs_src_scope);
 
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
@@ -172,7 +178,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   sweep_chunk.SetDestinationPhi(phi_new_local);
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
 
-  q_moments_local.assign(q_moments_local.size(), 0.0);
+  q_moments_local = init_q_moments_local;
   SetSource(groupset, q_moments_local, lhs_src_scope | rhs_src_scope);
 
   phi_new_local.assign(phi_new_local.size(),0.0);
