@@ -25,7 +25,7 @@ using namespace LinearBoltzmann;
  * Note that this routine currently only works when the problem
  * is defined by a single groupset.
 */
-void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
+void KEigenvalue::Solver::PowerIteration()
 {
   chi_log.Log(LOG_0)
     << "\n\n";
@@ -33,32 +33,33 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     << "********** Solving k-eigenvalue problem with "
     << "the Power Method.\n\n";
 
-  // ----- Setting up required sweep chunks
+  LBSGroupset&  groupset = group_sets[0];
+
+  groupset.angle_agg.ZeroIncomingDelayedPsi();
+
+  //======================================== Setup sweep chunk
   auto sweep_chunk = SetSweepChunk(groupset);
+  MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
+                                     groupset.angle_agg,
+                                     *sweep_chunk);
 
-  // ----- Set sweep scheduler
-  MainSweepScheduler SweepScheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                    groupset.angle_agg,
-                                    *sweep_chunk);
+  //======================================== Tool the sweep chunk
+  sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
 
-  // ----- Tool the sweep chunk
-  sweep_chunk->SetDestinationPhi(phi_new_local);
-
-  // ----- Set starting guess to a unit magnitude flux
+  //======================================== Initial guess
   phi_prev_local.assign(phi_prev_local.size(),1.0);
   ScopedCopySTLvectors(groupset, phi_prev_local, phi_old_local);
 
-  // ----- Start outer k iterations
-  double F_prev = 1.0;       //Production source prev
+  //======================================== Start power iterations
+  double F_prev     = 1.0;    //production source prev
   double k_eff_prev = k_eff;
-  int nit = 0;               //number of iterations
-  bool k_converged = false;
+  int nit           = 0;      //number of iterations
+  bool k_converged  = false;
 
   while (nit < options.max_iterations)
   {
     chi_log.Log(LOG_0VERBOSE_2)
       << "\n********** Starting source iterations";
-
 
     // ----- Start inner source iterations
     double pw_change_prev = 1.0;
@@ -66,14 +67,16 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     for (int si_nit=0; si_nit<groupset.max_iterations; si_nit++)
     {
       // ----- Set source and sweep
-      SetKSource(groupset, APPLY_MATERIAL_SOURCE |
-                           APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
-                           APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
-      groupset.angle_agg.ZeroOutgoingDelayedPsi();
-      phi_new_local.assign(phi_new_local.size(),0.0);
-      SweepScheduler.Sweep();
+      q_moments_local.assign(q_moments_local.size(), 0.0);
+      SetKSource(groupset, q_moments_local,
+                 APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
+                 APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
 
-      // ----- Compute convergence parameters
+      groupset.ZeroAngularFluxDataStructures();
+      phi_new_local.assign(phi_new_local.size(),0.0);
+      sweep_scheduler.Sweep();
+
+      //======================================== Compute convergence params
       double pw_change = ComputePiecewiseChange(groupset);
       ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
       double rho = sqrt(pw_change/pw_change_prev);
@@ -84,7 +87,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
       if (pw_change<std::max(groupset.residual_tolerance*rho,1.0e-10))
         si_converged = true;
 
-      // ----- Print iteration information
+      //============================== Print iteration information
       std::string offset = "    ";
       std::stringstream si_iter_info;
       si_iter_info
@@ -97,7 +100,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
         << "]"
         << " Source Iteration " << std::setw(5) << si_nit
         << " Point-wise change " << std::setw(14) << pw_change;
-        
+
       if (si_converged)
         si_iter_info << " CONVERGED\n";
       chi_log.Log(LOG_0VERBOSE_1) << si_iter_info.str();
@@ -148,7 +151,7 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
   if (options.use_precursors)
     InitializePrecursors();
   
-  double sweep_time = SweepScheduler.GetAverageSweepTime();
+  double sweep_time = sweep_scheduler.GetAverageSweepTime();
   double source_time=
     chi_log.ProcessEvent(source_event_tag,
                          ChiLog::EventOperation::AVERAGE_DURATION);
@@ -180,6 +183,6 @@ void KEigenvalue::Solver::PowerIteration(LBSGroupset& groupset)
     std::string("GS_") + std::to_string(0) +
     std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
     std::string(".log");
-  groupset.PrintSweepInfoFile(SweepScheduler.sweep_event_tag,sweep_log_file_name);
+  groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag,sweep_log_file_name);
   
 }

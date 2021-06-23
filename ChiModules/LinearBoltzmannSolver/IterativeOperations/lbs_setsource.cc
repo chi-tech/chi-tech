@@ -44,8 +44,7 @@ void LinearBoltzmann::Solver::
   std::vector<double> default_zero_src(groups.size(),0.0);
 
   //======================================== Loop over local cells
-  for (const auto& cell : grid->local_cells)
-  {
+  for (const auto& cell : grid->local_cells) {
     auto& full_cell_view = cell_transport_views[cell.local_id];
 
     //==================== Obtain cross-section and src
@@ -53,8 +52,7 @@ void LinearBoltzmann::Solver::
     int xs_id = matid_to_xs_map[cell_matid];
     int src_id= matid_to_src_map[cell_matid];
 
-    if ((xs_id<0) || (xs_id>=material_xs.size()))
-    {
+    if ((xs_id<0) || (xs_id>=material_xs.size())) {
       chi_log.Log(LOG_ALLERROR)
       << "Cross-section lookup error\n";
       exit(EXIT_FAILURE);
@@ -69,11 +67,9 @@ void LinearBoltzmann::Solver::
 
     //============================== Loop over nodes
     int num_nodes = full_cell_view.NumNodes();
-    for (int i = 0; i < num_nodes; ++i)
-    {
+    for (int i = 0; i < num_nodes; ++i) {
       //============================== Loop over moments
-      for (int m = 0; m < num_moments; ++m)
-      {
+      for (int m = 0; m < num_moments; ++m) {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
         size_t ir        = full_cell_view.MapDOF(i,m,0);
@@ -81,28 +77,24 @@ void LinearBoltzmann::Solver::
         double* phi_oldp = &phi_old_local[ir];
 
         //============================== Loop over groupset groups
-        for (int g = gs_i; g <= gs_f; ++g)
-        {
+        for (int g = gs_i; g <= gs_f; ++g) {
           //======================================== Apply material source
           if (apply_mat_src && (ell == 0))
             q_mom[g] += src[g];
 
           //======================================== Apply scattering
-          if (ell < xs->transfer_matrices.size())
-          {
+          if (ell < xs->transfer_matrices.size()) {
             double inscat_g = 0.0;
+
             //======================================== Across-groupset
-            if (apply_ags_scatter_src)
-            {
+            if (apply_ags_scatter_src) {
               size_t num_transfers =
                   xs->transfer_matrices[ell].rowI_indices[g].size();
 
               //============================== Loop over transfers
-              for (int t = 0; t < num_transfers; ++t)
-              {
+              for (int t = 0; t < num_transfers; ++t) {
                 size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
-                if ((gprime < gs_i) or (gprime > gs_f))
-                {
+                if ((gprime < gs_i) or (gprime > gs_f)) {
                   double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
                   inscat_g += sigma_sm * phi_oldp[gprime];
                 }
@@ -110,17 +102,14 @@ void LinearBoltzmann::Solver::
             }
 
             //======================================== Within-groupset
-            if (apply_wgs_scatter_src)
-            {
+            if (apply_wgs_scatter_src) {
               size_t num_transfers =
                   xs->transfer_matrices[ell].rowI_indices[g].size();
 
               //============================== Loop over transfers
-              for (int t = 0; t < num_transfers; ++t)
-              {
+              for (int t = 0; t < num_transfers; ++t) {
                 size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
-                if ((gprime >= gs_i) and (gprime <= gs_f))
-                {
+                if ((gprime >= gs_i) and (gprime <= gs_f)) {
                   double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
                   inscat_g += sigma_sm * phi_oldp[gprime];
                 }
@@ -130,15 +119,13 @@ void LinearBoltzmann::Solver::
           }//if moment avail
 
           //======================================== Apply fission
-          if ((xs->is_fissile) and (ell == 0))
-          {
+          if ((xs->is_fissile) and (ell == 0)) {
             double infission_g = 0.0;
+
             //======================================== Across-groupset
-            if (apply_ags_fission_src)
-            {
+            if (apply_ags_fission_src) {
               //================================ Loop over groups
-              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
-              {
+              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime) {
                 if ((gprime < gs_i) or (gprime > gs_f))
                   infission_g += xs->chi[g] *
                                  xs->nu_sigma_f[gprime] *
@@ -147,11 +134,9 @@ void LinearBoltzmann::Solver::
             }//if zeroth moment
 
             //======================================== Within-groupset
-            if (apply_wgs_fission_src)
-            {
+            if (apply_wgs_fission_src) {
               //============================== Loop over groups
-              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
-              {
+              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime) {
                 if ((gprime >= gs_i) and (gprime <= gs_f))
                   infission_g += xs->chi[g] *
                                  xs->nu_sigma_f[gprime] *
