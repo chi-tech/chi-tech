@@ -76,7 +76,7 @@ int chiLBSReadFluxMoments(lua_State *L)
 {
   //============================================= Get arguments
   int num_args = lua_gettop(L);
-  if ((num_args != 2) and (num_args != 3) and (num_args != 4))
+  if (num_args != 2)
     LuaPostArgAmountError(__FUNCTION__,2,num_args);
 
   LuaCheckNilValue(__FUNCTION__,L,1);
@@ -84,20 +84,6 @@ int chiLBSReadFluxMoments(lua_State *L)
 
   int      solver_index = lua_tonumber(L,1);
   std::string file_base = lua_tostring(L,2);
-
-  bool single_file_flag = false;
-  if (num_args >= 3)
-  {
-    LuaCheckBoolValue(__FUNCTION__, L, 3);
-    single_file_flag = lua_toboolean(L, 3);
-  }
-
-  bool file_is_flux = false;
-  if (num_args == 4)
-  {
-    LuaCheckBoolValue(__FUNCTION__, L, 4);
-    file_is_flux = lua_toboolean(L, 4);
-  }
 
   //============================================= Get pointer to solver
   chi_physics::Solver* psolver;
@@ -123,18 +109,7 @@ int chiLBSReadFluxMoments(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  solver->ReadFluxMoments(file_base,
-                          solver->ext_src_moments_local,
-                          single_file_flag);
-
-  if (file_is_flux)
-  {
-    chi_log.Log() << "Making source moments from flux file." << single_file_flag << file_is_flux;
-    auto temp_phi = solver->phi_old_local;
-    solver->phi_old_local = solver->ext_src_moments_local;
-    solver->MakeSourceMomentsFromPhi(solver->ext_src_moments_local);
-    solver->phi_old_local.assign(solver->phi_old_local.size(),0.0);
-  }
+  solver->ReadFluxMoments(file_base, solver->ext_src_moments_local);
 
   return 0;
 }

@@ -390,16 +390,6 @@ int chiLBSSetProperty(lua_State *L)
 
     chi_log.Log() << "LBS option to use source moments set to " << use_flag;
   }
-  else if (property == USE_SOURCE_MOMENTS)
-  {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
-
-    bool use_flag = lua_toboolean(L, 3);
-
-    solver->options.use_src_moments = use_flag;
-
-    chi_log.Log() << "LBS option to use source moments set to " << use_flag;
-  }
   else if (property == VERBOSE_INNER_ITERATIONS)
   {
     LuaCheckNilValue(__FUNCTION__, L, 3);
