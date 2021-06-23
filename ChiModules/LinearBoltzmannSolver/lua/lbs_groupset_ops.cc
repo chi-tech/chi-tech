@@ -55,7 +55,7 @@ it contains. A great deal of care must be taken with intergroupset transfer
 since the order in which the groupsets are executed determine what information
 will be available to them.
 
-\ingroup LuaNPT*/
+\ingroup LuaLBS*/
 
 //###################################################################
 /**Create a groupset.

@@ -33,20 +33,26 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
       << groupset.groups.back().id << "\n\n";
   }
 
+  //================================================== Sweepchunk settings
+  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+  bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
+                                 (not options.use_src_moments);
+  sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
+  sweep_chunk.SetDestinationPhi(phi_new_local);
   groupset.angle_agg.ZeroIncomingDelayedPsi();
-
-  //================================================== Tool the sweep chunk
-  sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
 
   //================================================== Now start iterating
   double pw_change_prev = 1.0;
   bool converged = false;
   for (int k=0; k<groupset.max_iterations; k++)
   {
+    //Prepare for sweep
     SetSource(groupset,source_flags);
 
     groupset.ZeroAngularFluxDataStructures();
-    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
+
+    //Sweep
+    phi_new_local.assign(phi_new_local.size(),0.0);
     sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)

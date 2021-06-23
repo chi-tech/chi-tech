@@ -13,7 +13,7 @@ extern ChiLog& chi_log;
  *
 \param SolverIndex int Handle to the solver for which the list is to be obtained.
 
-\ingroup LuaNPT
+\ingroup LuaLBS
 \author Jan*/
 int chiLBSComputeBalance(lua_State *L)
 {
