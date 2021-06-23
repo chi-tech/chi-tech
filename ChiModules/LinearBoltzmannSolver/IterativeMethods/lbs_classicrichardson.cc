@@ -50,7 +50,9 @@ ClassicRichardson(LBSGroupset& groupset,
     SetSource(groupset, q_moments_local, source_flags);
 
     groupset.ZeroAngularFluxDataStructures();
-    phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
+
+    //Sweep
+    phi_new_local.assign(phi_new_local.size(),0.0);
     sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)

@@ -83,9 +83,10 @@ SetSource(LBSGroupset& groupset,
         //=================================== Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
-          //=================================== Apply material source
-          if (apply_mat_src && (ell == 0))
-            destination_q[ir + g] += src[g];
+          if ( apply_mat_src and (ell == 0) and (not options.use_src_moments))
+            q_mom[g] += src[g];
+          else if (apply_mat_src and options.use_src_moments)
+            q_mom[g] += ext_src_moments_local[ir+g];
 
           double inscatter_g = 0.0;
           const bool moment_avail = (ell < xs->transfer_matrices.size());

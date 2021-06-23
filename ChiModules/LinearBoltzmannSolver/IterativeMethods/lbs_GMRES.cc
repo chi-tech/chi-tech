@@ -97,6 +97,8 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
 
   //================================================== Compute b
   auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+  bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
+                                 (not options.use_src_moments);
   if (log_info)
   {
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
@@ -108,7 +110,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   //Prepare for sweep
   SetSource(groupset, q_moments_local, rhs_src_scope);
 
-  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
   sweep_chunk.SetDestinationPhi(phi_new_local);
   groupset.angle_agg.ZeroIncomingDelayedPsi();
   groupset.ZeroAngularFluxDataStructures();

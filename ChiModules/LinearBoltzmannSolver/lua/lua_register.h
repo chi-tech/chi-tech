@@ -21,7 +21,8 @@ RegisterConstant(SCATTERING_ORDER,   4);
 RegisterConstant(SWEEP_EAGER_LIMIT,   5);
 RegisterConstant(READ_RESTART_DATA,   6);
 RegisterConstant(WRITE_RESTART_DATA,  7);
-RegisterConstant(SAVE_ANGULAR_FLUX,8)
+RegisterConstant(SAVE_ANGULAR_FLUX, 8)
+RegisterConstant(USE_SOURCE_MOMENTS, 9)
 RegisterConstant(VERBOSE_INNER_ITERATIONS, 10);
 RegisterConstant(VERBOSE_OUTER_ITERATIONS, 11);
 RegisterConstant(USE_PRECURSORS, 12);
@@ -77,6 +78,8 @@ RegisterFunction(chiLBSGetFieldFunctionList)
 RegisterFunction(chiLBSGetScalarFieldFunctionList)
 RegisterFunction(chiLBSWriteGroupsetAngularFlux)
 RegisterFunction(chiLBSReadGroupsetAngularFlux)
+RegisterFunction(chiLBSWriteFluxMoments)
+RegisterFunction(chiLBSReadFluxMoments)
 RegisterFunction(chiLBSComputeBalance)
 
 //module:Linear Boltzmann Solver - Groupset manipulation
