@@ -62,7 +62,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        uint64_t vgi = slab_cell->vertex_ids[v];
+        uint64_t vgi = slab_cell->vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
@@ -87,7 +87,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        uint64_t vgi = poly_cell->vertex_ids[v];
+        uint64_t vgi = poly_cell->vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
@@ -115,7 +115,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        uint64_t vgi = polyh_cell->vertex_ids[v];
+        uint64_t vgi = polyh_cell->vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
