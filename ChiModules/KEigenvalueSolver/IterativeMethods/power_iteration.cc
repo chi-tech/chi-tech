@@ -55,31 +55,25 @@ void KEigenvalue::Solver::PowerIteration()
   bool converged  = false;
   while (nit < options.max_iterations)
   {
-    //============================== Loop over groupsets
-    int gs = -1;
-    for (auto& groupset : group_sets)
-    {
-      ++gs;
 
-      //============================== Clear source moments
-      q_moments_local.assign(q_moments_local.size(), 0.0);
+    //============================== Clear source moments
+    q_moments_local.assign(q_moments_local.size(), 0.0);
 
-      //============================== Set the fission source
-      SetKSource(groupset, q_moments_local,
-                 APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
+    //============================== Set the fission source
+    SetKSource(groupset, q_moments_local,
+               APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
 
-      //============================== Converge the scattering source with
-      //                               a fixed fission source
-      if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON) {
-        ClassicRichardson(groupset, gs, sweep_scheduler,
-                          APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
-                          false);
-      }
-      else if (groupset.iterative_method == IterativeMethod::GMRES) {
-        chi_log.Log(LOG_ALLERROR)
-          << "GMRES has not yet been implemented for this solver.";
-        exit(EXIT_FAILURE);
-      }
+    //============================== Converge the scattering source with
+    //                               a fixed fission source
+    if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON) {
+      ClassicRichardson(groupset, 0, sweep_scheduler,
+                        APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
+                        false);
+    }
+    else if (groupset.iterative_method == IterativeMethod::GMRES) {
+      chi_log.Log(LOG_ALLERROR)
+        << "GMRES has not yet been implemented for this solver.";
+      exit(EXIT_FAILURE);
     }
 
     //============================== Recompute k-eigenvalue
@@ -88,10 +82,11 @@ void KEigenvalue::Solver::PowerIteration()
     double reactivity = (k_eff - 1.0) / k_eff;
 
     //============================== Check convergence, reset book-keeping
+    ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
     double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff;
     F_prev = F_new;
-    ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
+    nit += 1;
 
     if (k_eff_change<std::max(options.tolerance, 1.0e-12))
       converged = true;
