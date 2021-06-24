@@ -22,8 +22,9 @@ public:
 
   std::vector<double> phi_prev_local;
 
+  //
   std::vector<double> Nj_new_local;
-  chi_math::UnknownManager Nj_unk_man;
+  chi_math::UnknownManager Nj_uk_man;
 
   // This structure maps local precursor indices to
   // global precursor indices. This is used to assign
