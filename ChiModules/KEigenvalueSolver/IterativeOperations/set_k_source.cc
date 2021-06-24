@@ -24,11 +24,11 @@ using namespace LinearBoltzmann;
  *
  * */
 void KEigenvalue::Solver::
-  SetKSource(LBSGroupset& groupset,
-             std::vector<double>& destination_q,
-             SourceFlags source_flags)
+SetKSource(LBSGroupset& groupset,
+           std::vector<double>& destination_q,
+           SourceFlags source_flags)
 {
-  chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
+  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
   const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCE);
@@ -44,19 +44,21 @@ void KEigenvalue::Solver::
 
   const auto& m_to_ell_em_map = groupset.quadrature->GetMomentToHarmonicsIndexMap();
 
-  std::vector<double> default_zero_src(groups.size(),0.0);
+  std::vector<double> default_zero_src(groups.size(), 0.0);
 
   //============================== Loop over local cells
-  for (auto& cell : grid->local_cells) {
+  for (auto& cell : grid->local_cells)
+  {
     auto& full_cell_view = cell_transport_views[cell.local_id];
 
     //==================== Obtain cross-section and src
     int cell_matid = cell.material_id;
     int xs_id = matid_to_xs_map[cell_matid];
 
-    if ((xs_id<0) || (xs_id>=material_xs.size())) {
+    if ((xs_id < 0) || (xs_id >= material_xs.size()))
+    {
       chi_log.Log(LOG_ALLERROR)
-      << "Cross-section lookup error\n";
+          << "Cross-section lookup error\n";
       exit(EXIT_FAILURE);
     }
 
@@ -64,32 +66,39 @@ void KEigenvalue::Solver::
 
     //============================== Loop over nodes
     int num_nodes = full_cell_view.NumNodes();
-    for (int i = 0; i < num_nodes; ++i) {
+    for (int i = 0; i < num_nodes; ++i)
+    {
       //============================== Loop over moments
-      for (int m = 0; m < num_moments; ++m) {
+      for (int m = 0; m < num_moments; ++m)
+      {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        size_t  ir        = full_cell_view.MapDOF(i,m,0);
-        double* q_mom     = &destination_q[ir];
+        size_t ir = full_cell_view.MapDOF(i, m, 0);
+        double* q_mom = &destination_q[ir];
 
-        double* phi_oldp  = &phi_old_local[ir];
+        double* phi_oldp = &phi_old_local[ir];
         double* phi_prevp = &phi_prev_local[ir];
 
         //============================== Loop over groupset groups
-        for (int g = gs_i; g <= gs_f; ++g) {
+        for (int g = gs_i; g <= gs_f; ++g)
+        {
           //======================================== Apply scattering
           double inscatter_g = 0.0;
-          if (ell < xs->transfer_matrices.size()) {
+          if (ell < xs->transfer_matrices.size())
+          {
             //============================== Across-groupset
-            if (apply_ags_scatter_src) {
+            if (apply_ags_scatter_src)
+            {
               size_t num_transfers =
                   xs->transfer_matrices[ell].rowI_indices[g].size();
 
               //============================== Loop over transfers
-              for (int t = 0; t < num_transfers; ++t) {
+              for (int t = 0; t < num_transfers; ++t)
+              {
                 size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
 
-                if ((gprime < gs_i) or (gprime > gs_f)) {
+                if ((gprime < gs_i) or (gprime > gs_f))
+                {
                   double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
                   inscatter_g += sigma_sm * phi_oldp[gprime];
                 }
@@ -97,15 +106,18 @@ void KEigenvalue::Solver::
             }
 
             //============================== Within-groupset
-            if (apply_wgs_scatter_src) {
-              size_t  num_transfers =
+            if (apply_wgs_scatter_src)
+            {
+              size_t num_transfers =
                   xs->transfer_matrices[ell].rowI_indices[g].size();
 
               //============================== Loop over transfers
-              for (int t = 0; t < num_transfers; ++t) {
+              for (int t = 0; t < num_transfers; ++t)
+              {
                 size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
 
-                if ((gprime >= gs_i) and (gprime <= gs_f)) {
+                if ((gprime >= gs_i) and (gprime <= gs_f))
+                {
                   double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
                   inscatter_g += sigma_sm * phi_oldp[gprime];
                 }
@@ -116,23 +128,29 @@ void KEigenvalue::Solver::
           q_mom[g] += inscatter_g;
 
           //======================================== Apply fission
-          if (xs->is_fissile and (ell == 0)) {
+          if (xs->is_fissile and (ell == 0))
+          {
             double fission_g = 0.0;
             //============================== Across-groupset
-            if (apply_ags_fission_src) {
+            if (apply_ags_fission_src)
+            {
               //============================== Loop over groups
-              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime) {
+              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
+              {
                 double nu_sig_f = (options.use_precursors) ?
-                    xs->nu_prompt_sigma_f[gprime] : xs->nu_sigma_f[gprime];
+                                  xs->nu_prompt_sigma_f[gprime] : xs->nu_sigma_f[gprime];
 
-                if ((gprime < gs_i) or (gprime > gs_f)) {
+                if ((gprime < gs_i) or (gprime > gs_f))
+                {
                   fission_g += xs->chi[g] * nu_sig_f *
                                phi_prevp[gprime] / k_eff;
 
                   //============================== Delayed contributions
-                  if (options.use_precursors and xs->num_precursors > 0) {
+                  if (options.use_precursors and xs->num_precursors > 0)
+                  {
                     //============================== Loop over precursors
-                    for (int j = 0; j < xs->num_precursors; ++j) {
+                    for (int j = 0; j < xs->num_precursors; ++j)
+                    {
                       fission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
                                    xs->nu_delayed_sigma_f[gprime] *
@@ -144,20 +162,25 @@ void KEigenvalue::Solver::
             }//if across-groupset
 
             //============================== Across-groupset
-            if (apply_wgs_fission_src) {
+            if (apply_wgs_fission_src)
+            {
               //============================== Loop over groups
-              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime) {
+              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
+              {
                 double nu_sig_f = (options.use_precursors) ?
                                   xs->nu_prompt_sigma_f[gprime] : xs->nu_sigma_f[gprime];
 
-                if ((gprime >= gs_i) and (gprime <= gs_f)) {
+                if ((gprime >= gs_i) and (gprime <= gs_f))
+                {
                   fission_g += xs->chi[g] * nu_sig_f *
                                phi_prevp[gprime] / k_eff;
 
                   //============================== Delayed contributions
-                  if (options.use_precursors and xs->num_precursors > 0) {
+                  if (options.use_precursors and xs->num_precursors > 0)
+                  {
                     //============================== Loop over precursors
-                    for (int j = 0; j < xs->num_precursors; ++j) {
+                    for (int j = 0; j < xs->num_precursors; ++j)
+                    {
                       fission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
                                    xs->nu_delayed_sigma_f[gprime] *
@@ -176,5 +199,5 @@ void KEigenvalue::Solver::
     }//for i
   }//for cell
 
-  chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_END);
+  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
 }

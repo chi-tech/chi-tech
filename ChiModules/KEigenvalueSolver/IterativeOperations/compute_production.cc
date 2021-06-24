@@ -4,6 +4,7 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
+
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
@@ -30,17 +31,17 @@ double KEigenvalue::Solver::ComputeProduction()
     auto& transport_view = cell_transport_views[cell.local_id];
 
     // ----- Loop over cell dofs
-    for (int i=0; i<cell_fe_view.NumNodes(); i++)
+    for (int i = 0; i < cell_fe_view.NumNodes(); i++)
     {
-      size_t ir = transport_view.MapDOF(i,0,0);
+      size_t ir = transport_view.MapDOF(i, 0, 0);
       double* phi_newp = &phi_new_local[ir];
 
       double intV_shapeI = cell_fe_view.IntV_shapeI(i);
 
       // ----- Contribute fission source
-      if (xs->is_fissile) 
+      if (xs->is_fissile)
       {
-        for (int g=first_grp; g<=last_grp; g++)
+        for (int g = first_grp; g <= last_grp; g++)
         {
           double nu_sigma_f = 0.0;
           if (options.use_precursors)
@@ -49,14 +50,14 @@ double KEigenvalue::Solver::ComputeProduction()
           else
             nu_sigma_f = xs->nu_prompt_sigma_f[g];
 
-          local_F += nu_sigma_f * phi_newp[g] * intV_shapeI; 
+          local_F += nu_sigma_f * phi_newp[g] * intV_shapeI;
         }
       }
     }//for i
   }//for c
 
   double global_F = 0.0;
-  MPI_Allreduce(&local_F,&global_F,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+  MPI_Allreduce(&local_F, &global_F, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
   return global_F;
 }
