@@ -3,42 +3,39 @@
 #include "ChiMesh/Cell/cell_slab.h"
 #include "ChiMesh/Cell/cell_polygon.h"
 #include "ChiMesh/Cell/cell_polyhedron.h"
-#include <ChiPhysics/chi_physics.h>
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
+
+#include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkXMLPUnstructuredGridWriter.h>
 
-#include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
 #include <vtkFieldData.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
-#include <vtkStringArray.h>
 
 #include <vtkInformation.h>
 
 //###################################################################
-/**On hold*/
+/**Exports just the mesh to VTK format.*/
 void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 {
   chi_log.Log() << "Exporting mesh to VTK. " << local_cells.size();
-  std::vector<std::vector<double>>    d_nodes;
+  std::vector<std::vector<double>> d_nodes;
 
-  vtkSmartPointer<vtkPoints> points =
-    vtkSmartPointer<vtkPoints>::New();
+  auto points = vtkSmartPointer<vtkPoints>::New();
 
   //============================================= Init grid and material name
   auto ugrid    = vtkUnstructuredGrid::New();
@@ -48,17 +45,10 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
   matarray->SetName("Material");
   pararray->SetName("Partition");
 
-  //======================================== Precreate nodes to map
-  std::vector<int> cfem_nodes;
-
   auto grid = this;
 
-  for (const auto& cell : grid->local_cells)
-    for (auto vid : cell.vertex_ids)
-      cfem_nodes.push_back(vid);
-
   //======================================== Populate cell information
-  int nc=0;
+  int64_t node_count = 0;
   for (const auto& cell : grid->local_cells)
   {
     int mat_id = cell.material_id;
@@ -72,22 +62,20 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        int vgi = slab_cell->vertex_ids[v];
+        uint64_t vgi = slab_cell->vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
         d_node[2] = grid->vertices[vgi].z;
 
-
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
+        points->InsertPoint(node_count, d_node.data());
+        cell_info[v] = node_count++;
       }
 
       ugrid->InsertNextCell(VTK_LINE, 2, cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
-
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
@@ -99,20 +87,22 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        uint64_t vgi = poly_cell->vertex_ids[v];
+        uint64_t vgi = poly_cell->vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
         d_node[2] = grid->vertices[vgi].z;
 
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
+        points->InsertPoint(node_count, d_node.data());
+        cell_info[v] = node_count++;
       }
 
-      ugrid->InsertNextCell(VTK_POLYGON, num_verts, cell_info.data());
+      ugrid->InsertNextCell(VTK_POLYGON,
+                            static_cast<vtkIdType>(num_verts),
+                            cell_info.data());
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
 
     }
 
@@ -125,18 +115,17 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
       std::vector<vtkIdType> cell_info(num_verts);
       for (int v=0; v<num_verts; v++)
       {
-        uint64_t vgi = polyh_cell->vertex_ids[v];
+        uint64_t vgi = polyh_cell->vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
         d_node[2] = grid->vertices[vgi].z;
 
-        points->InsertPoint(nc,d_node.data());
-        cell_info[v] = nc; nc++;
+        points->InsertPoint(node_count, d_node.data());
+        cell_info[v] = node_count++;
       }
 
-      vtkSmartPointer<vtkCellArray> faces =
-        vtkSmartPointer<vtkCellArray>::New();
+      vtkNew<vtkIdList> faces;
 
       size_t num_faces = polyh_cell->faces.size();
       for (int f=0; f<num_faces; f++)
@@ -155,16 +144,20 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
           face[fv] = cell_info[v];
         }
 
-
-        faces->InsertNextCell(num_fverts,face.data());
+        faces->InsertNextId(static_cast<vtkIdType>(num_fverts));
+        for (auto vid : face)
+          faces->InsertNextId(vid);
       }//for f
 
       ugrid->
-        InsertNextCell(VTK_POLYHEDRON,num_verts,
-                       cell_info.data(),num_faces,faces->GetPointer());
+        InsertNextCell(VTK_POLYHEDRON,
+                       static_cast<vtkIdType>(num_verts),
+                       cell_info.data(),
+                       static_cast<vtkIdType>(num_faces),
+                       faces->GetPointer(0));
 
       matarray->InsertNextValue(mat_id);
-      pararray->InsertNextValue(cell.partition_id);
+      pararray->InsertNextValue(static_cast<int>(cell.partition_id));
     }//polyhedron
   }//for local cells
 
@@ -178,8 +171,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
                                   std::string(".vtu");
 
   //============================================= Serial Output each piece
-  vtkXMLUnstructuredGridWriter* grid_writer =
-    vtkXMLUnstructuredGridWriter::New();
+  auto grid_writer = vtkXMLUnstructuredGridWriter::New();
 
   ugrid->GetCellData()->AddArray(matarray);
   ugrid->GetCellData()->AddArray(pararray);
