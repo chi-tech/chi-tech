@@ -41,11 +41,11 @@ void KEigenvalue::Solver::InitializeKSolver()
     if (num_precursors > 0) {
       //============================== Initialize precursor unknown manager
       auto pwl = std::static_pointer_cast<SpatialDiscretization_PWLD>(discretization);
-      Nj_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, num_precursors);
+      precursor_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, num_precursors);
 
       //============================== Initialize precursor vector
-      int local_Nj_dof_count = pwl->GetNumLocalDOFs(Nj_uk_man);
-      Nj_new_local.resize(local_Nj_dof_count, 0.0);
+      int local_Nj_dof_count = pwl->GetNumLocalDOFs(precursor_uk_man);
+      precursor_new_local.resize(local_Nj_dof_count, 0.0);
     }
   }
 }

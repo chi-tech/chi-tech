@@ -18,7 +18,7 @@ void KEigenvalue::Solver::InitializePrecursors()
   if (options.use_precursors) {
     auto pwl = std::static_pointer_cast<SpatialDiscretization_PWLD>(discretization);
 
-    Nj_new_local.assign(Nj_new_local.size(), 0.0);
+    precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
     //======================================== Loop over cells
     for (auto &cell : grid->local_cells) {
@@ -31,8 +31,8 @@ void KEigenvalue::Solver::InitializePrecursors()
       //============================== Loop over nodes
       for (int i = 0; i < cell_fe_view->num_nodes; ++i) {
         size_t ir = transport_view.MapDOF(i, 0, 0);
-        int64_t jr = pwl->MapDOFLocal(cell, i, Nj_uk_man, 0, 0);
-        double *Nj_newp = &Nj_new_local[jr];
+        int64_t jr = pwl->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
+        double *Nj_newp = &precursor_new_local[jr];
         double *phi_newp = &phi_new_local[ir];
 
         //============================== If fissile with precursors
