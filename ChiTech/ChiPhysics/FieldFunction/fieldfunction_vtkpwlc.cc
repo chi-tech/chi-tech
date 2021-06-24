@@ -70,7 +70,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
                                           std::string("-avg")).c_str());
   }
   else
-    for (int c=0; c < num_components; c++)
+    for (int c=0; c < num_components; ++c)
     {
       component_names[c] = field_name + ff_uk.component_text_names[c];
       field_node_array[c]->SetName(component_names[c].c_str());
@@ -109,10 +109,10 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
     //Populate Arrays
     size_t num_nodes = cell.vertex_ids.size();
     const double dnum_nodes = static_cast<double>(num_nodes);
-    for (int c=0; c < num_components; c++)
+    for (int c=0; c < num_components; ++c)
     {
       double cell_avg_value = 0.0;
-      for (int v=0; v<num_nodes; v++)
+      for (int v=0; v<num_nodes; ++v)
       {
         int64_t ir = static_cast<int64_t>(mapping[mapping_counter]);
         double dof_value = 0.0;

@@ -65,13 +65,13 @@ CreateCFEMMappingLocal(Vec& x_mapped,
     uint     node_number      = std::get<1>(data);
     uint     component_number = std::get<2>(data);
 
-    int64_t ir = pwl_sdm->MapDOF(grid->local_cells[cell_local_index],
-                                 node_number,
-                                 unknown_manager,
-                                 ref_variable,
-                                 component_number);
+    int64_t address = pwl_sdm->MapDOF(grid->local_cells[cell_local_index],
+                                      node_number,
+                                      unknown_manager,
+                                      ref_variable,
+                                      component_number);
 
-    mapped_nodes.push_back(ir);
+    mapped_nodes.push_back(address);
     mapping.push_back(n);
   }
 

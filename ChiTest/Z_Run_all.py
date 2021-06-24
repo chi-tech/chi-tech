@@ -90,6 +90,8 @@ f"""#!/usr/bin/bash
 #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
 #SBATCH -A Massively-Parallel-R # Allocation name (req'd if you have more than 1)
 
+export I_MPI_SHM=disable
+
 ibrun {kpath_to_exe} ChiTest/{file_name}.lua master_export=false"""
         )
     os.system(f"sbatch -W ChiTest/{file_name}.job > /dev/null")  # -W means wait for job to finish
@@ -204,11 +206,11 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29632, 1.0e-4]])
 
-run_test(
-    file_name="Diffusion3D_4VTU",
-    comment="3D Diffusion Test VTU Mesh - CFEM",
-    num_procs=4,
-    search_strings_vals_tols=[["[0]  Max-value=", 0.07373, 1.0e-6]])
+# run_test(
+#     file_name="Diffusion3D_4VTU",
+#     comment="3D Diffusion Test VTU Mesh - CFEM",
+#     num_procs=4,
+#     search_strings_vals_tols=[["[0]  Max-value=", 0.07373, 1.0e-6]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Transport cases
 run_test(

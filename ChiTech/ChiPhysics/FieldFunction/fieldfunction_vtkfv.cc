@@ -53,7 +53,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
                                           std::string("-avg")).c_str());
   }
   else
-    for (int c=0; c < num_components; c++)
+    for (int c=0; c < num_components; ++c)
     {
       component_names[c] = field_name + ff_uk.component_text_names[c];
       field_node_array[c]->SetName(component_names[c].c_str());

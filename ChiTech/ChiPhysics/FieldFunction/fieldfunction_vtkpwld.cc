@@ -60,7 +60,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                                           std::string("-avg")).c_str());
   }
   else
-    for (int c=0; c < num_components; c++)
+    for (int c=0; c < num_components; ++c)
     {
       component_names[c] = field_name + ff_uk.component_text_names[c];
       field_node_array[c]->SetName(component_names[c].c_str());
@@ -83,24 +83,24 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     std::vector<uint64_t> mapping;
     std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
-    for (int c=0; c < num_components; c++)
-      for (int v=0; v < num_nodes; v++)
+    for (int c=0; c < num_components; ++c)
+      for (int v=0; v < num_nodes; ++v)
         cell_node_component_tuples.emplace_back(cell.local_id, v,
                                                 (num_components==1)?
                                                 ref_component : c);
 
     CreatePWLDMappingLocal(cell_node_component_tuples, mapping);
 
-    int counter=-1;
+    size_t counter=0;
     for (int c=0; c < num_components; ++c)
     {
       double cell_avg_value = 0.0;
-      for (int v=0; v < num_nodes; v++)
+      for (int v=0; v < num_nodes; ++v)
       {
-        ++counter;
         double dof_value = field_vector_local->operator[](mapping[counter]);
         cell_avg_value+= dof_value;
         field_node_array[c]->InsertNextValue(dof_value);
+        ++counter;
       }
       field_cell_avg_array[c]->InsertNextValue(cell_avg_value /
                                                static_cast<double>(num_nodes));

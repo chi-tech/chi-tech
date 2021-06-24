@@ -73,13 +73,13 @@ void chi_physics::FieldFunction::
 
   //============================================= Populate VTK points
   auto points = vtkSmartPointer<vtkPoints>::New();
-  int64_t vc=0;
+  int64_t vertex_counter=0;
   for (const auto& cell : grid->local_cells)
     for (uint64_t vid : cell.vertex_ids)
     {
       auto vertex = grid->vertices[vid];
 
-      points->InsertPoint(vc++,vertex.x, vertex.y, vertex.z);
+      points->InsertPoint(vertex_counter++, vertex.x, vertex.y, vertex.z);
     }
   ugrid->SetPoints(points);
 
@@ -89,7 +89,7 @@ void chi_physics::FieldFunction::
 
   material_array->SetName("Material");
   partition_number_array->SetName("Partition");
-  vc=0;
+  vertex_counter=0;
   for (const auto& cell : grid->local_cells)
   {
     material_array->InsertNextValue(cell.material_id);
@@ -100,7 +100,7 @@ void chi_physics::FieldFunction::
     std::vector<vtkIdType> vertex_ids;
     vertex_ids.reserve(num_verts);
     for (auto& vid : cell.vertex_ids)
-      vertex_ids.push_back(vc++);
+      vertex_ids.push_back(vertex_counter++);
 
     //================================= Handle cell specific items
     if (cell.Type() == chi_mesh::CellType::SLAB)
