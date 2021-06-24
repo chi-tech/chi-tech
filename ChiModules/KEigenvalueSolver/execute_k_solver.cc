@@ -3,8 +3,8 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI&      chi_mpi;
-extern ChiLog&     chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
 
 #include <iomanip>
 
@@ -16,7 +16,7 @@ void KEigenvalue::Solver::ExecuteKSolver()
 {
   MPI_Barrier(MPI_COMM_WORLD);
 
-  LBSGroupset&  groupset = group_sets[0];
+  LBSGroupset& groupset = group_sets[0];
 
   ComputeSweepOrderings(groupset);
   InitFluxDataStructures(groupset);

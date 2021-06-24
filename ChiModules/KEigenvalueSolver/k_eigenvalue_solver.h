@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace  LinearBoltzmann::KEigenvalue
+namespace LinearBoltzmann::KEigenvalue
 {
 
 /**A k-eigenvalue neutron transport solver.*/
@@ -35,7 +35,7 @@ public:
 
   // IterativeMethods
   void PowerIteration();
-  
+
   // Iterative operations
   void SetKSource(LBSGroupset& groupset,
                   std::vector<double>& destination_q,

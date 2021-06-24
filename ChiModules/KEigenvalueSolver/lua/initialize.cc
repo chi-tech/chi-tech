@@ -3,23 +3,26 @@
 #include "../k_eigenvalue_solver.h"
 
 #include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
+
+extern ChiPhysics& chi_physics_handler;
 
 #include <chi_log.h>
+
 extern ChiLog& chi_log;
 
 using namespace LinearBoltzmann;
 
 //###################################################################
 /**Initializes the k-eigenvalue solver.*/
-int chiKEigenvalueLBSInitialize(lua_State *L)
+int chiKEigenvalueLBSInitialize(lua_State* L)
 {
-  int solver_index = lua_tonumber(L,1);
+  int solver_index = lua_tonumber(L, 1);
 
   // ----- Get pointer to solver
   chi_physics::Solver* psolver;
   KEigenvalue::Solver* solver;
-  try{
+  try
+  {
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
     solver = dynamic_cast<KEigenvalue::Solver*>(psolver);
@@ -31,10 +34,10 @@ int chiKEigenvalueLBSInitialize(lua_State *L)
       exit(EXIT_FAILURE);
     }
   }
-  catch(const std::out_of_range& o)
+  catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-      << "chiLBSKEigenvalueInitialize: Invalid handle to solver.\n";
+        << "chiLBSKEigenvalueInitialize: Invalid handle to solver.\n";
     exit(EXIT_FAILURE);
   }
 
