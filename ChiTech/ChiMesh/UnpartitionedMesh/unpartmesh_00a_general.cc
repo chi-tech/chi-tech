@@ -84,8 +84,9 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 
   if (num_negative_volume_elements > 0)
     chi_log.Log(LOG_ALLWARNING)
-      << "Cell-center-to-face orientation detected " << num_negative_volume_elements
-      << " negative volume elements. This would result in incorrect quantities"
+      << "Cell quality checks detected " << num_negative_volume_elements
+      << " negative volume sub-elements (sub-triangle or sub-tetrahedron)."
+      << " This issue could result in incorrect quantities"
       << " under some circumstances.";
   chi_log.Log() << "Done checking cell-center-to-face orientations";
 }
