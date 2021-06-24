@@ -53,6 +53,12 @@ private:
       map_begin(in_map_begin)
     {
       component_text_names.resize(in_num_components,std::string());
+      for (int c=0; c<num_components; ++c)
+      {
+
+        char buffer[100]; snprintf(buffer,100," %03d",c);
+        component_text_names[c] = buffer;
+      }
       num_off_block_connections.resize(in_num_components, 0);
     }
 
@@ -125,7 +131,7 @@ public:
                                    unsigned int component,
                                    const std::string& in_text_name);
 
-  ~UnknownManager() = default;
+  ~UnknownManager() {};
 };
 
 
