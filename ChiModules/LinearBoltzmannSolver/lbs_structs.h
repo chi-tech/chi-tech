@@ -73,7 +73,7 @@ public:
     num_nodes(in_num_nodes),
     num_grps(in_num_grps),
     num_grps_moms(in_num_grps*in_num_moms),
-    xs_mapping(0),
+    xs_mapping(in_xs_mapping),
     face_local_flags(in_face_local_flags)
   {
     if (cell_on_boundary)
