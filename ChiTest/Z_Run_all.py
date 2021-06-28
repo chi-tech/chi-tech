@@ -277,7 +277,7 @@ run_test(
                               ["[0]  Max-value2=", 1.42458e-03, 1.0e-4]])
 
 run_test(
-    file_name="Transport3D_1Poly_parmetis",
+    file_name="Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.27450e-01, 1.0e-4],
