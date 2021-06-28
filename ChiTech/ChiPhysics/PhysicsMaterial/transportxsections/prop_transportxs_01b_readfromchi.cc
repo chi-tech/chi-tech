@@ -119,12 +119,15 @@ constants, \f$ \lambda_j \f$ are required.
     processing the nu_d_sigma_fg field gets populated from the product of
     nu_delayed and sigma_fg.
     Symbol \f$ \nu_{delayed,g} \f$.
+  - CHI_BEGIN. Optional. Starts a block that is terminated by a line
+    CHI_END. Each line in the block processes the first two words as
+    [Group, chi]. Populates the chi field. Symbol \f$ \chi_{g} \f$.
   - CHI_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_PROMPT_END. Each line in the block processes the first two words as
-    [Group, chi]. Populates the chi_g field. Symbol \f$ \chi_{g} \f$.
-  - DDT_COEFF_BEGIN. Optional. Starts a block that is terminated by a line
-    DDT_COEFF_END. Each line in the block processes the first two words as
-    [Group, ddt_coeff]. Populates the ddt_coeff field.
+    [Group, chi]. Populates the chi_prompt field. Symbol \f$ \chi_{prompt, g} \f$.
+  - INV_VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
+    INV_VELOCITY_END. Each line in the block processes the first two words as
+    [Group, ddt_coeff]. Populates the inv_velocity field.
     Symbol \f$ \frac{1}{v_g} \f$.
 
   - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a line
@@ -186,10 +189,10 @@ CHI_PROMPT_BEGIN
 CHI_PROMPT_END
 
 # 1/v terms
-DDT_COEFF_BEGIN
+INV_VELOCITY_BEGIN
 0    4.5454e-10   #1/2.2e10
 1    3.6745e-3
-DDT_COEFF_END
+INV_VELOCITY_END
 
 
 TRANSFER_MOMENTS_BEGIN
