@@ -47,6 +47,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   Push1DXS(sigma_f, "sigma_fg");
   Push1DXS(sigma_a, "sigma_ag");
   Push1DXS(chi, "chi_g");
+  Push1DXS(chi_prompt, "chi_prompt");
   Push1DXS(nu,"nu");
   Push1DXS(nu_prompt,"nu_prompt");
   Push1DXS(nu_delayed,"nu_delayed");

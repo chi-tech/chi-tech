@@ -31,6 +31,7 @@ public:
   std::vector<GrpVal> sigma_f;                  ///< Sigmaf cross section
   std::vector<GrpVal> sigma_a;                  ///< Pure absorption
   std::vector<GrpVal> chi;                      ///< Fission spectrum
+  std::vector<GrpVal> chi_prompt;               ///< Prompt fission spectrum
   std::vector<GrpVal> nu;                       ///< Nubar
   std::vector<GrpVal> nu_prompt;                ///< Nubar-prompt
   std::vector<GrpVal> nu_delayed;               ///< Nubar-delayed
@@ -82,6 +83,7 @@ private:
     sigma_f.clear();
     sigma_a.clear();
     chi.clear();
+    chi_prompt.clear();
     nu.clear();
     nu_prompt.clear();
     nu_delayed.clear();

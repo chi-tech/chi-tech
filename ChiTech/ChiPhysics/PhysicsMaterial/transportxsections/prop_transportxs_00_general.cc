@@ -34,6 +34,7 @@ void chi_physics::TransportCrossSections::
   sigma_f.resize(in_G, 0.0);
   sigma_a.resize(in_G, 0.0);
   chi.resize(in_G, 0.0);
+  chi_prompt.resize(in_G, 0.0);
   nu_sigma_f.resize(in_G, 0.0);
   nu_prompt_sigma_f.resize(in_G, 0.0);
   nu_delayed_sigma_f.resize(in_G, 0.0);
@@ -61,6 +62,7 @@ void chi_physics::TransportCrossSections::
   sigma_f.resize(in_G, 0.0);
   sigma_a.resize(in_G, 0.0);
   chi.resize(in_G, 0.0);
+  chi_prompt.resize(in_G, 0.0);
   nu_sigma_f.resize(in_G, 0.0);
   nu_prompt_sigma_f.resize(in_G, 0.0);
   nu_delayed_sigma_f.resize(in_G, 0.0);
@@ -108,7 +110,6 @@ void chi_physics::TransportCrossSections::
   cross_secs.reserve(combinations.size());
   size_t num_grps_G = 0;
   size_t num_precursors_J = 0;
-  int count = 0;
   double N_total = 0.0;
   double Nf_total = 0.0;
   for (auto combo : combinations)
@@ -167,7 +168,6 @@ void chi_physics::TransportCrossSections::
         }
       }
     }
-    ++count;
   }//for auto
   if (Nf_total < 1.0e-28)
     Nf_total = 1.0; //Avoids divide by 0 when non-fissile
@@ -179,6 +179,7 @@ void chi_physics::TransportCrossSections::
   sigma_f.clear();
   sigma_a.clear();
   chi.clear();
+  chi_prompt.clear();
   nu.clear();
   nu_prompt.clear();
   nu_delayed.clear();
@@ -194,6 +195,7 @@ void chi_physics::TransportCrossSections::
   sigma_f.resize(num_grps_G, 0.0);
   sigma_a.resize(num_grps_G, 0.0);
   chi.resize(num_grps_G, 0.0);
+  chi_prompt.resize(num_grps_G, 0.0);
   nu.resize(num_grps_G,0.0);
   nu_prompt.resize(num_grps_G,0.0);
   nu_delayed.resize(num_grps_G,0.0);
@@ -222,6 +224,7 @@ void chi_physics::TransportCrossSections::
       sigma_f     [g] += cross_secs[x]->sigma_f     [g] * N_i;
       sigma_a     [g] += cross_secs[x]->sigma_a     [g] * N_i;
       chi        [g] += cross_secs[x]->chi        [g] * ff_i;
+      chi_prompt [g] += cross_secs[x]->chi_prompt[g] * ff_i;
       nu           [g] += cross_secs[x]->nu           [g] * ff_i;
       nu_prompt    [g] += cross_secs[x]->nu_prompt    [g] * ff_i;
       nu_delayed   [g] += cross_secs[x]->nu_delayed   [g] * ff_i;
