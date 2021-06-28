@@ -73,13 +73,13 @@ void KEigenvalue::Solver::PowerIteration()
     {
       ClassicRichardson(groupset, 0, sweep_scheduler,
                         APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
-                        false);
+                        options.verbose_inner_iterations);
     }
     else if (groupset.iterative_method == IterativeMethod::GMRES)
     {
       GMRES(groupset, 0, sweep_scheduler,
             APPLY_WGS_SCATTER_SOURCE, APPLY_AGS_SCATTER_SOURCE,
-            false);
+            options.verbose_inner_iterations);
     }
 
     //============================== Recompute k-eigenvalue
