@@ -19,19 +19,12 @@ public:
   double k_eff = 1.0;
 
   size_t num_precursors;
+  size_t max_num_precursors_per_material;
 
-  std::vector<double> phi_prev_local;
-
-  // Precursor vector and unknown manager
-  std::vector<double> precursor_new_local;
   chi_math::UnknownManager precursor_uk_man;
 
-  // This structure maps local precursor indices to
-  // global precursor indices. This is used to assign
-  // a global numbering system for precursors which
-  // becomes important when multiple materials with
-  // precursors exist within a problem.
-  std::vector<std::vector<size_t>> precursor_map;
+  std::vector<double> phi_prev_local;
+  std::vector<double> precursor_new_local;
 
   // IterativeMethods
   void PowerIteration();

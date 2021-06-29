@@ -17,37 +17,31 @@ void KEigenvalue::Solver::InitializeKSolver()
   //============================== Initialize phi vector
   phi_prev_local.resize(phi_old_local.size(), 0.0);
 
-  //============================== Initialize precursors
+  //============================== Init precursors
   if (options.use_precursors)
   {
-    num_precursors = 0;
-    precursor_map.clear();
+    //clear precursor properties
+    num_precursors = 0.0;
+    max_num_precursors_per_material = 0.0;
 
-    //============================== Loop over materials
+    //accumulate precursor count and set max
     for (auto& xs : material_xs)
     {
-      //============================== Setup map for material
-      std::vector<size_t> mat_map(xs->num_precursors);
-
-      //============================== Loop over precursors
-      for (size_t j = 0; j < xs->num_precursors; ++j)
-        mat_map.emplace_back(num_precursors + j);
-
-      //============================== Increment precursors
       num_precursors += xs->num_precursors;
-
-      //============================== Add mapping to structure
-      precursor_map.emplace_back(mat_map);
+      if (xs->num_precursors > max_num_precursors_per_material)
+        max_num_precursors_per_material = xs->num_precursors;
     }
 
-
+    //============================== Initialize precursor vector and
+    //                               unknown manager
     if (num_precursors > 0)
     {
-      //============================== Initialize precursor unknown manager
-      auto pwl = std::static_pointer_cast<SpatialDiscretization_PWLD>(discretization);
-      precursor_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, num_precursors);
+      typedef SpatialDiscretization_PWLD  PWLD;
+      auto pwl = std::static_pointer_cast<PWLD>(discretization);
 
-      //============================== Initialize precursor vector
+      precursor_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N,
+                                  max_num_precursors_per_material);
+
       int local_Nj_dof_count = pwl->GetNumLocalDOFs(precursor_uk_man);
       precursor_new_local.resize(local_Nj_dof_count, 0.0);
     }

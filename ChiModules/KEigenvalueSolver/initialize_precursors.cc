@@ -17,7 +17,8 @@ void KEigenvalue::Solver::InitializePrecursors()
 {
   if (options.use_precursors)
   {
-    auto pwl = std::static_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+    typedef SpatialDiscretization_PWLD  PWLD;
+    auto pwl = std::static_pointer_cast<PWLD>(discretization);
 
     precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
@@ -34,28 +35,27 @@ void KEigenvalue::Solver::InitializePrecursors()
       for (int i = 0; i < cell_fe_view->num_nodes; ++i)
       {
         size_t ir = transport_view.MapDOF(i, 0, 0);
-        int64_t jr = pwl->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
+        size_t jr = pwl->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
         double* Nj_newp = &precursor_new_local[jr];
         double* phi_newp = &phi_new_local[ir];
 
-        //============================== If fissile with precursors
-        if ((xs->is_fissile) and (xs->num_precursors > 0))
+        // Contribute if precursors live on this material
+        if (xs->num_precursors > 0)
         {
           //======================================== Loop over precursors
           for (size_t j = 0; j < xs->num_precursors; ++j)
           {
-            size_t j_map = precursor_map[xs_id][j];
 
             //======================================== Loop over groups
             for (int g = 0; g < groups.size(); ++g)
-              Nj_newp[j_map] += xs->precursor_yield[j] /
-                                xs->precursor_lambda[j] *
-                                xs->nu_delayed_sigma_f[g] *
-                                phi_newp[g] / k_eff;
+              Nj_newp[j] += xs->precursor_yield[j] /
+                            xs->precursor_lambda[j] *
+                            xs->nu_delayed_sigma_f[g] *
+                            phi_newp[g] / k_eff;
           }//for precursors
-        }//if fissile and num_precursors > 0
-      } //for i
-    }//for c
+        }//if num_precursors > 0
+      } //for node
+    }//for cell
   }
 }
 
