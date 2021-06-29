@@ -122,7 +122,7 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
   // Cut off path to base_filename
   std::string filename_short = base_filename.substr(base_filename.find_last_of("/\\")+1);
 
-  for (int p=0; p<chi_mpi.process_count; p++)
+  for (int p=0; p<chi_mpi.process_count; ++p)
   {
     if (is_global_mesh and p!=0) continue;
 
