@@ -12,7 +12,7 @@ extern ChiMPI& chi_mpi;
 #include <vtkCellType.h>
 
 #include <fstream>
-#include<sstream>
+#include <sstream>
 
 //###################################################################
 /**Exports a field function to VTK format.
