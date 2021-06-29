@@ -12,7 +12,6 @@ extern ChiMPI& chi_mpi;
 #include <vtkCellType.h>
 
 #include <fstream>
-#include <sstream>
 
 //###################################################################
 /**Exports a field function to VTK format.
@@ -121,10 +120,7 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
     chi_mesh::GetCurrentHandler()->volume_mesher->options.mesh_global;
   
   // Cut off path to base_filename
-  std::string filename_short;
-  std::istringstream iss(base_filename);
-  while (std::getline(iss, filename_short, '/'))
-    continue;
+  std::string filename_short = base_filename.substr(base_filename.find_last_of("/\\")+1);
 
   for (int p=0; p<chi_mpi.process_count; p++)
   {
