@@ -94,6 +94,8 @@ public:
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
 
+  std::vector<std::vector<double>> groupset_psi_new_local;
+
  public:
   //00
   Solver();

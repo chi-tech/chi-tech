@@ -12,7 +12,8 @@ extern ChiMPI& chi_mpi;
 
 //##############################################
 /**Groupset constructor.*/
-LBSGroupset::LBSGroupset()
+LBSGroupset::LBSGroupset(std::vector<double>& in_psi_new_local) :
+    psi_new_local(in_psi_new_local)
 {
   quadrature = nullptr;
   iterative_method = LinearBoltzmann::IterativeMethod::CLASSICRICHARDSON;
