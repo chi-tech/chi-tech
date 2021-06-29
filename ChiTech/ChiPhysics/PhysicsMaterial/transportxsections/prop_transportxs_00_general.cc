@@ -110,15 +110,20 @@ void chi_physics::TransportCrossSections::
   cross_secs.reserve(combinations.size());
   size_t num_grps_G = 0;
   size_t num_precursors_J = 0;
-  double N_total = 0.0;
-  double Nf_total = 0.0;
+
+  double N_total  = 0.0; // total density
+  double Nf_total = 0.0; // total density of fissile materials
+  double Np_total = 0.0; // total density of materials with precursors
+
   for (auto combo : combinations)
   {
     std::shared_ptr<chi_physics::TransportCrossSections> xs;
-    try {
+    try
+    {
       xs = chi_physics_handler.trnsprt_xs_stack.at(combo.first);
     }
-    catch(const std::out_of_range& o){
+    catch(const std::out_of_range& o)
+    {
       chi_log.Log(LOG_ALLERROR)
         << "ERROR: Invalid cross-section handle"
         << " in call to chiPhysicsMaterialSetProperty."
@@ -130,45 +135,42 @@ void chi_physics::TransportCrossSections::
 
     // Increment combo factor totals
     N_total += combo.second;
-    if (xs->is_fissile) {
+    if (xs->is_fissile)
+    {
       this->is_fissile = true;
       Nf_total += combo.second;
+
+      if (xs->num_precursors > 0)
+        Np_total += combo.second;
     }
 
-    //============================ Check number of groups
+    //============================ Define and check number of groups
     if (cross_secs.size() == 1)
-    {
       num_grps_G = xs->num_groups;
-      if (xs->is_fissile)
-        num_precursors_J = xs->num_precursors;
-    }
     else
     {
       if (xs->num_groups != num_grps_G)
       {
         chi_log.Log(LOG_ALLERROR)
-          << "In call to TransportCrossSections::MakeCombined: "
+          << "In call to " << __FUNCTION__ << ": "
           << "all cross-sections must have the same number of groups.";
         exit(EXIT_FAILURE);
       }
-      if (xs->is_fissile)
+
+      //============================ Increment number of precursors
+      if (not xs->is_fissile and xs->num_precursors > 0)
       {
-        if (num_precursors_J == 0) 
-          num_precursors_J = xs->num_precursors;
-        else
-        {
-          if (xs->num_precursors != num_precursors_J)
-          {
-            chi_log.Log(LOG_ALLERROR)
-              << "In call to TransportCrossSections::MakeCombined: "
-              << "all fissile cross-sections must have the same number "
-              << "of precursors.";
-            exit(EXIT_FAILURE);
-          }
-        }
+        chi_log.Log(LOG_ALLERROR)
+            << "In call to " << __FUNCTION__ << ": "
+            << "only fissile materials are allowed to have delayed "
+            << "neutron precursors.";
+        exit(EXIT_FAILURE);
       }
+      num_precursors_J += xs->num_precursors;
     }
-  }//for auto
+  }//for cross-section
+
+  //this should be unnecessary with the added condition check later
   if (Nf_total < 1.0e-28)
     Nf_total = 1.0; //Avoids divide by 0 when non-fissile
 
@@ -209,39 +211,76 @@ void chi_physics::TransportCrossSections::
   for (int g=0; g < num_groups; ++g)
     chi_delayed[g].resize(num_precursors_J, 0.0);
 
+  int precursor_count = 0;
   for (size_t x=0; x<cross_secs.size(); ++x)
   {
     scattering_order = std::max(this->scattering_order,
                                 cross_secs[x]->scattering_order);
 
+    // Atom density
     double N_i = combinations[x].second;
-    double f_i = N_i/N_total;
-    double ff_i = N_i/Nf_total;
 
-    for (int g=0; g<num_grps_G; g++)
+    // Fraction of fissile density
+    double ff_i = 0.0;
+    if (cross_secs[x]->is_fissile)
+      ff_i = N_i / Nf_total;
+
+    // Fraction of precursor density
+    double pf_i = 0.0;
+    if (cross_secs[x]->num_precursors > 0)
+      pf_i = N_i / Np_total;
+
+    //======================================== Combine cross-sections
+    for (int g = 0; g < num_grps_G; ++g)
     {
       sigma_t     [g] += cross_secs[x]->sigma_t     [g] * N_i;
       sigma_f     [g] += cross_secs[x]->sigma_f     [g] * N_i;
       sigma_a     [g] += cross_secs[x]->sigma_a     [g] * N_i;
-      chi        [g] += cross_secs[x]->chi        [g] * ff_i;
-      chi_prompt [g] += cross_secs[x]->chi_prompt[g] * ff_i;
-      nu           [g] += cross_secs[x]->nu           [g] * ff_i;
-      nu_prompt    [g] += cross_secs[x]->nu_prompt    [g] * ff_i;
-      nu_delayed   [g] += cross_secs[x]->nu_delayed   [g] * ff_i;
-      nu_sigma_f  [g] += cross_secs[x]->nu_sigma_f  [g] * N_i;
-      nu_prompt_sigma_f[g] += cross_secs[x]->nu_prompt_sigma_f[g] * N_i;
+
+      chi         [g] += cross_secs[x]->chi        [g] * ff_i;
+      chi_prompt  [g] += cross_secs[x]->chi_prompt [g] * ff_i;
+
+      nu          [g] += cross_secs[x]->nu           [g] * ff_i;
+      nu_prompt   [g] += cross_secs[x]->nu_prompt    [g] * ff_i;
+      nu_delayed  [g] += cross_secs[x]->nu_delayed   [g] * ff_i;
+
+      nu_sigma_f        [g] += cross_secs[x]->nu_sigma_f        [g] * N_i;
+      nu_prompt_sigma_f [g] += cross_secs[x]->nu_prompt_sigma_f [g] * N_i;
       nu_delayed_sigma_f[g] += cross_secs[x]->nu_delayed_sigma_f[g] * N_i;
-      inv_velocity    [g] += cross_secs[x]->inv_velocity    [g] * f_i;
-    }
-    if ((cross_secs[x]->is_fissile) and (cross_secs[x]->num_precursors > 0))
-    {
-      for (int j=0; j<num_precursors_J; ++j)
+
+      if (x == 0)
+        inv_velocity[g] = cross_secs[x]->inv_velocity[g];
+      else
       {
-        precursor_lambda[j] += cross_secs[x]->precursor_lambda[j] * ff_i;
-        precursor_yield [j] += cross_secs[x]->precursor_yield [j] * ff_i;
-        for (int g=0; g < num_groups; g++)
-          chi_delayed[g][j] += cross_secs[x]->chi_delayed[g][j] * ff_i;
+        chi_log.Log(LOG_ALLERROR)
+            << "In call to " << __FUNCTION__
+            << ": all materials must have the same inverse velocity "
+            << "term per group. Invalid inverse velocity encountered "
+            << "in material " << x << ", group " << g << ".";
+        exit(EXIT_FAILURE);
       }
+    }
+
+    //======================================== Compute precursor
+    // Here, all precursors are across all materials are stored.
+    // The decay constants and delayed spectrum are what they are,
+    // however, some special treatment must be given to the yields.
+    // Because the yield tells us what fraction of delayed neutrons
+    // are produced from a given family, the sum over all families
+    // must yield unity. To achieve this end, we must scale all
+    // precursor yields based on the fraction of the total density
+    // of materials with precursors they make up.
+    if (cross_secs[x]->num_precursors > 0)
+    {
+      for (int j = 0; j < cross_secs[x]->num_precursors; ++j)
+      {
+        int j_map = precursor_count + j;
+        precursor_lambda[j_map] = cross_secs[x]->precursor_lambda[j];
+        precursor_yield [j_map] = cross_secs[x]->precursor_yield [j] * pf_i;
+        for (int g=0; g < num_groups; g++)
+          chi_delayed[g][j_map] = cross_secs[x]->chi_delayed[g][j];
+      }
+      precursor_count += cross_secs[x]->num_precursors;
     }
   }
 
