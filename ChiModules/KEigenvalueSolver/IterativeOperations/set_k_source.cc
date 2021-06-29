@@ -105,7 +105,8 @@ void KEigenvalue::Solver::
             {
               for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
                 if (options.use_precursors)
-                  fission_g += xs->chi[g] * xs->nu_prompt_sigma_f[gprime] *
+                  fission_g += xs->chi_prompt[g] *
+                               xs->nu_prompt_sigma_f[gprime] *
                                phi_prevp[gprime] / k_eff;
                 else
                   fission_g += xs->chi[g] * xs->nu_sigma_f[gprime] *
