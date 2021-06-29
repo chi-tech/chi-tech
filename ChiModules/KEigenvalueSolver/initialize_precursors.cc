@@ -15,7 +15,8 @@ using namespace LinearBoltzmann;
 /**Computes the point wise delayed neutron precursor concentrations.*/
 void KEigenvalue::Solver::InitializePrecursors()
 {
-  auto pwl = std::static_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+  typedef SpatialDiscretization_PWLD  PWLD;
+  auto pwl = std::static_pointer_cast<PWLD>(discretization);
 
   Nj_new_local.assign(Nj_new_local.size(), 0.0);
 
@@ -29,10 +30,10 @@ void KEigenvalue::Solver::InitializePrecursors()
     auto& transport_view = cell_transport_views[cell.local_id];
 
     // ----- Loop over cell dofs
-    for (int i = 0; i < cell_fe_view->num_nodes; ++i)
+    for (int i = 0; i < transport_view.NumNodes(); ++i)
     {
-      size_t ir = transport_view.MapDOF(i,0,0);
-      int64_t jr = pwl->MapDOFLocal(cell, i, Nj_unk_man, 0, 0);
+      size_t ir = transport_view.MapDOF(i, 0, 0);
+      size_t jr = pwl->MapDOFLocal(cell, i, Nj_unk_man, 0, 0);
       double* Nj_newp  = &Nj_new_local[jr];
       double* phi_newp = &phi_new_local[ir];
 
@@ -41,15 +42,13 @@ void KEigenvalue::Solver::InitializePrecursors()
         // ----- Loop over precursors
         for (size_t j = 0; j < xs->num_precursors; ++j)
         {
-          size_t j_map = precursor_map[xs_id][j];
-
           // ----- Initialize precursors
           double coeff = xs->precursor_yield[j] / xs->precursor_lambda[j];
 
 
           // ----- Loop over groups
           for (int g = 0; g < groups.size(); ++g)
-            Nj_newp[j_map] += coeff * xs->nu_delayed_sigma_f[g] *
+            Nj_newp[j] += coeff * xs->nu_delayed_sigma_f[g] *
                               phi_newp[g] / k_eff;
         }//for j
       }//if fissile and J > 0
