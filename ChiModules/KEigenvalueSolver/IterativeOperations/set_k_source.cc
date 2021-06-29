@@ -61,7 +61,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
     auto xs = material_xs[xs_id];
 
     //======================================== Loop over nodes
-    int num_nodes = full_cell_view.NumNodes();
+    const int num_nodes = full_cell_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
       size_t ir = full_cell_view.MapDOF(i, 0, 0);

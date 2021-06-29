@@ -22,24 +22,34 @@ void KEigenvalue::Solver::InitializePrecursors()
 
     precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
-    //======================================== Loop over cells
+    //================================================== Loop over cells
     for (auto& cell : grid->local_cells)
     {
-      //==================== Cell information
-      const auto xs_id = matid_to_xs_map[cell.material_id];
-      auto& xs = material_xs[xs_id];
-      auto cell_fe_view = pwl->GetCellMappingFE(cell.local_id);
-      auto& transport_view = cell_transport_views[cell.local_id];
+      auto& full_cell_view = cell_transport_views[cell.local_id];
 
-      //============================== Loop over nodes
-      for (int i = 0; i < cell_fe_view->num_nodes; ++i)
+      //==================== Obtain xs
+      int cell_matid = cell.material_id;
+      int xs_id = matid_to_xs_map[cell_matid];
+
+      if ((xs_id < 0) || (xs_id >= material_xs.size()))
       {
-        size_t ir = transport_view.MapDOF(i, 0, 0);
+        chi_log.Log(LOG_ALLERROR)
+            << "Cross-section lookup error\n";
+        exit(EXIT_FAILURE);
+      }
+
+      auto xs = material_xs[xs_id];
+
+      //======================================== Loop over nodes
+      const int num_nodes = full_cell_view.NumNodes();
+      for (int i = 0; i < num_nodes; ++i)
+      {
+        size_t ir = full_cell_view.MapDOF(i, 0, 0);
         size_t jr = pwl->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
         double* Nj_newp = &precursor_new_local[jr];
         double* phi_newp = &phi_new_local[ir];
 
-        // Contribute if precursors live on this material
+        // contribute if precursors live on this material
         if (xs->num_precursors > 0)
         {
           //======================================== Loop over precursors

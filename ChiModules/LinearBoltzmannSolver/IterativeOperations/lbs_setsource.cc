@@ -69,7 +69,7 @@ SetSource(LBSGroupset& groupset,
       src = material_srcs[src_id]->source_value_g.data();
 
     //======================================== Loop over nodes
-    int num_nodes = full_cell_view.NumNodes();
+    const int num_nodes = full_cell_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
       //======================================== Loop over moments
