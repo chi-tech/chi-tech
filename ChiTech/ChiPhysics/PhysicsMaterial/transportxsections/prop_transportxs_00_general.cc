@@ -193,7 +193,7 @@ void chi_physics::TransportCrossSections::
     chi_delayed[g].resize(num_precursors_J, 0.0);
 
   int precursor_count = 0;
-  for (size_t x=0; x<cross_secs.size(); ++x)
+  for (size_t x = 0; x < cross_secs.size(); ++x)
   {
     scattering_order = std::max(this->scattering_order,
                                 cross_secs[x]->scattering_order);
@@ -263,7 +263,7 @@ void chi_physics::TransportCrossSections::
       }
       precursor_count += cross_secs[x]->num_precursors;
     }
-  }
+  }//for cross sections
 
   //======================================== Combine transfer matrices
   // This step is somewhat tricky. The cross-sections
