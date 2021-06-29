@@ -86,7 +86,7 @@ xs_macro = chiPhysicsTransportXSMakeCombined(combo)
 materials[1] = chiPhysicsAddMaterial("Fissile Material")
 chiPhysicsMaterialAddProperty(materials[1], TRANSPORT_XSECTIONS)
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,EXISTING,xs_macro)
-G = chiPhysicsMaterialGetProperty(materials[1],TRANSPORT_XSECTIONS)["G"]
+G = chiPhysicsMaterialGetProperty(materials[1],TRANSPORT_XSECTIONS)["num_groups"]
 
 chiPhysicsMaterialModifyTotalCrossSection(materials[1], 0, sigma_t)
 

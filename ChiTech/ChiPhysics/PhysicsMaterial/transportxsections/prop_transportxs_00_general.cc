@@ -57,8 +57,6 @@ void chi_physics::TransportCrossSections::
   scattering_order = 0;
 
   sigma_t.resize(in_G, in_sigmat);
-  sigma_t.clear();
-  sigma_t.resize(in_G, in_sigmat);
   sigma_f.resize(in_G, 0.0);
   sigma_a.resize(in_G, 0.0);
   chi.resize(in_G, 0.0);
@@ -147,27 +145,25 @@ void chi_physics::TransportCrossSections::
     //============================ Define and check number of groups
     if (cross_secs.size() == 1)
       num_grps_G = xs->num_groups;
-    else
+    else if (xs->num_groups != num_grps_G)
     {
-      if (xs->num_groups != num_grps_G)
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "In call to " << __FUNCTION__ << ": "
-          << "all cross-sections must have the same number of groups.";
-        exit(EXIT_FAILURE);
-      }
-
-      //============================ Increment number of precursors
-      if (not xs->is_fissile and xs->num_precursors > 0)
-      {
-        chi_log.Log(LOG_ALLERROR)
-            << "In call to " << __FUNCTION__ << ": "
-            << "only fissile materials are allowed to have delayed "
-            << "neutron precursors.";
-        exit(EXIT_FAILURE);
-      }
-      num_precursors_J += xs->num_precursors;
+      chi_log.Log(LOG_ALLERROR)
+        << "In call to " << __FUNCTION__ << ": "
+        << "all cross-sections must have the same number of groups.";
+      exit(EXIT_FAILURE);
     }
+
+    //============================ Increment number of precursors
+    if (not xs->is_fissile and xs->num_precursors > 0)
+    {
+      chi_log.Log(LOG_ALLERROR)
+          << "In call to " << __FUNCTION__ << ": "
+          << "only fissile materials are allowed to have delayed "
+          << "neutron precursors.";
+      exit(EXIT_FAILURE);
+    }
+    chi_log.Log(LOG_0) << "NUMBER OF PRECURSORS" << xs->num_precursors;
+    num_precursors_J += xs->num_precursors;
   }//for cross-section
 
   //this should be unnecessary with the added condition check later
@@ -177,21 +173,6 @@ void chi_physics::TransportCrossSections::
   //======================================== Combine 1D cross-sections
   this->num_groups = num_grps_G;
   this->num_precursors = num_precursors_J;
-  sigma_t.clear();
-  sigma_f.clear();
-  sigma_a.clear();
-  chi.clear();
-  chi_prompt.clear();
-  nu.clear();
-  nu_prompt.clear();
-  nu_delayed.clear();
-  nu_sigma_f.clear();
-  nu_prompt_sigma_f.clear();
-  nu_delayed_sigma_f.clear();
-  inv_velocity.clear();
-  precursor_lambda.clear();
-  precursor_yield.clear();
-  chi_delayed.clear();
 
   sigma_t.resize(num_grps_G, 0.0);
   sigma_f.resize(num_grps_G, 0.0);
@@ -208,7 +189,7 @@ void chi_physics::TransportCrossSections::
   precursor_lambda.resize(num_precursors_J, 0.0);
   precursor_yield.resize(num_precursors_J, 0.0);
   chi_delayed.resize(num_grps_G);
-  for (int g=0; g < num_groups; ++g)
+  for (int g = 0; g < num_groups; ++g)
     chi_delayed[g].resize(num_precursors_J, 0.0);
 
   int precursor_count = 0;
