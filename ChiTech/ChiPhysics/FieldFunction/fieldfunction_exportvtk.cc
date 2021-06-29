@@ -118,13 +118,16 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
 
   bool is_global_mesh =
     chi_mesh::GetCurrentHandler()->volume_mesher->options.mesh_global;
+  
+  // Cut off path to base_filename
+  std::string filename_short = base_filename.substr(base_filename.find_last_of("/\\")+1);
 
-  for (int p=0; p<chi_mpi.process_count; p++)
+  for (int p=0; p<chi_mpi.process_count; ++p)
   {
     if (is_global_mesh and p!=0) continue;
 
     ofile << "      <Piece Source=\""
-          << base_filename +
+          << filename_short +
              std::string("_") +
              std::to_string(p) +
              std::string(".vtu")
