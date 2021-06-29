@@ -23,7 +23,6 @@ public:
 
   chi_math::UnknownManager precursor_uk_man;
 
-  std::vector<double> phi_prev_local;
   std::vector<double> precursor_new_local;
 
   // IterativeMethods

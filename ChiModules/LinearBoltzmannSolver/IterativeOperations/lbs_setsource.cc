@@ -11,12 +11,12 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
  *
- * \param group_set_num Identifies the groupset under consideration.
- * \param apply_mat_src Flag indicating whether the material source needs
- *        to be applied to the routine. This is useful for GMRES
- *        since the material source only features during the computing b.
- *        On this note we also need to treat inscattering this way.
- * \param suppress_phi_old Flag indicating whether to suppress phi_old.
+ * \param groupset_num Identifies the groupset under consideration.
+ * \param destination_q A vector to contribute the source to.
+ * \param source_flags Flags for adding specific terms into the
+ *        destination vector. Available flags are for applying
+ *        the material source, across/within-group scattering,
+ *        and across/within-groups fission.
  *
  * */
 void LinearBoltzmann::Solver::
@@ -32,7 +32,7 @@ SetSource(LBSGroupset& groupset,
   const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCE);
   const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCE);
 
-  //======================================== Get group setup
+  //================================================== Get group setup
   int gs_i = groupset.groups[0].id;
   int gs_f = groupset.groups.back().id;
 
@@ -44,12 +44,12 @@ SetSource(LBSGroupset& groupset,
 
   std::vector<double> default_zero_src(groups.size(), 0.0);
 
-  //======================================== Loop over local cells
+  //================================================== Loop over local cells
   for (const auto& cell : grid->local_cells)
   {
     auto& full_cell_view = cell_transport_views[cell.local_id];
 
-    //==================== Obtain xs and src
+    //==================== Obtain xs
     int cell_matid = cell.material_id;
     int xs_id = matid_to_xs_map[cell_matid];
     int src_id = matid_to_src_map[cell_matid];
@@ -63,16 +63,16 @@ SetSource(LBSGroupset& groupset,
 
     auto xs = material_xs[xs_id];
 
-    //======================================== Apply material source
+    //==================== Obtain src
     double* src = default_zero_src.data();
     if ((src_id >= 0) && (apply_mat_src))
       src = material_srcs[src_id]->source_value_g.data();
 
-    //============================== Loop over nodes
+    //======================================== Loop over nodes
     int num_nodes = full_cell_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
-      //============================== Loop over moments
+      //======================================== Loop over moments
       for (int m = 0; m < num_moments; ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
@@ -81,7 +81,7 @@ SetSource(LBSGroupset& groupset,
         double* q_mom = &destination_q[ir];
         double* phi_oldp = &phi_old_local[ir];
 
-        //============================== Loop over groupset groups
+        //======================================== Loop over groupset groups
         for (int g = gs_i; g <= gs_f; ++g)
         {
           //======================================== Apply material source
@@ -137,7 +137,7 @@ SetSource(LBSGroupset& groupset,
           //============================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
           {
-            //================================ Loop over groups
+            //=============================== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime < gs_i) or (gprime > gs_f))
@@ -150,7 +150,7 @@ SetSource(LBSGroupset& groupset,
           //============================== Apply within-groupset fission
           if (fission_avail and apply_wgs_fission_src)
           {
-            //================================ Loop over groups
+            //============================== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime >= gs_i) or (gprime <= gs_f))
@@ -159,7 +159,6 @@ SetSource(LBSGroupset& groupset,
                                phi_oldp[gprime];
             }
           }
-
           q_mom[g] += infission_g;
 
         }//for g

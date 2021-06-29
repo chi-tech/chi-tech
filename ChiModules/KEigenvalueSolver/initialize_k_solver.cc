@@ -13,8 +13,6 @@ void KEigenvalue::Solver::InitializeKSolver()
 {
   Initialize(); // LinearBoltzmann::Solver initialize
 
-  phi_prev_local.resize(phi_old_local.size(), 0.0);
-
   //======================================== Initialize precursors
   if (options.use_precursors)
   {

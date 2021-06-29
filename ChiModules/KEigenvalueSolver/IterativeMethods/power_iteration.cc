@@ -34,8 +34,7 @@ void KEigenvalue::Solver::PowerIteration()
       << "\n\n********** Solving k-eigenvalue problem with "
       << "the Power Method.\n\n";
 
-  phi_prev_local.assign(phi_prev_local.size(), 1.0);
-  phi_old_local = phi_prev_local;
+  phi_old_local.assign(phi_old_local.size(), 1.0);
 
   double F_prev = 1.0;
   double k_eff_prev = 1.0;
@@ -101,7 +100,6 @@ void KEigenvalue::Solver::PowerIteration()
     double reactivity = (k_eff - 1.0) / k_eff;
 
     //======================================== Check convergence, book-keeping
-    phi_prev_local = phi_new_local;
     k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff;
     F_prev = F_new;
