@@ -97,7 +97,8 @@ int chiLBSCreateGroupset(lua_State *L)
   }
 
   //============================================= Create groupset
-  solver->group_sets.emplace_back();
+  solver->groupset_psi_new_local.emplace_back();
+  solver->group_sets.emplace_back(solver->groupset_psi_new_local.back());
 
   lua_pushinteger(L,static_cast<lua_Integer>(solver->group_sets.size())-1);
   return 1;
