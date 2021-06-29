@@ -10,15 +10,15 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushboolean(L,false);
   lua_settable(L,-3);
 
-  lua_pushstring(L,"G");
+  lua_pushstring(L,"num_groups");
   lua_pushinteger(L,static_cast<lua_Integer>(num_groups));
   lua_settable(L,-3);
 
-  lua_pushstring(L,"L");
+  lua_pushstring(L,"scattering_order");
   lua_pushinteger(L,static_cast<lua_Integer>(scattering_order));
   lua_settable(L,-3);
 
-  lua_pushstring(L,"J");
+  lua_pushstring(L,"num_precursors");
   lua_pushinteger(L,static_cast<lua_Integer>(num_precursors));
   lua_settable(L,-3);
 
@@ -43,19 +43,20 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
     lua_settable(L,-3);
   };
 
-  Push1DXS(sigma_t, "sigma_tg");
-  Push1DXS(sigma_f, "sigma_fg");
-  Push1DXS(sigma_a, "sigma_ag");
-  Push1DXS(chi, "chi_g");
+  Push1DXS(sigma_t, "sigma_t");
+  Push1DXS(sigma_f, "sigma_f");
+  Push1DXS(sigma_a, "sigma_a");
+  Push1DXS(chi, "chi");
+  Push1DXS(chi_prompt, "chi_prompt");
   Push1DXS(nu,"nu");
   Push1DXS(nu_prompt,"nu_prompt");
   Push1DXS(nu_delayed,"nu_delayed");
-  Push1DXS(nu_sigma_f, "nu_sigma_fg");
-  Push1DXS(nu_prompt_sigma_f, "nu_p_sigma_fg");
-  Push1DXS(nu_delayed_sigma_f, "nu_d_sigma_fg");
-  Push1DXS(inv_velocity, "ddt_coeff");
+  Push1DXS(nu_sigma_f, "nu_sigma_f");
+  Push1DXS(nu_prompt_sigma_f, "nu_prompt_sigma_f");
+  Push1DXS(nu_delayed_sigma_f, "nu_delayed_sigma_f");
+  Push1DXS(inv_velocity, "inv_velocity");
 
-  lua_pushstring(L,"chi_d");
+  lua_pushstring(L,"chi_delayed");
   lua_newtable(L);
   {
     int g = 0;
@@ -77,7 +78,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   }
   lua_settable(L,-3);
 
-  lua_pushstring(L,"lambda");
+  lua_pushstring(L,"precursor_lambda");
   lua_newtable(L);
   {
     int j = 0;
@@ -91,7 +92,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   }
   lua_settable(L,-3);
 
-  lua_pushstring(L,"gamma");
+  lua_pushstring(L,"precursor_yield");
   lua_newtable(L);
   {
     int j = 0;
@@ -140,11 +141,11 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
 
 
   //============================================= Diffusion quantities
-  Push1DXS(diffusion_coeff, "diffg");
-  Push1DXS(sigma_removal, "sigma_rg");
+  Push1DXS(diffusion_coeff, "diffusion_coeff");
+  Push1DXS(sigma_removal, "sigma_removal");
   Push1DXS(sigma_s_gtog,"sigma_s_gtog");
-  Push1DXS(xi_Jfull, "xi_Jfull_g");
-  Push1DXS(xi_Jpart, "xi_Jpart_g");
+  Push1DXS(xi_Jfull, "xi_Jfull");
+  Push1DXS(xi_Jpart, "xi_Jpart");
 
   lua_pushstring(L,"D_jfull");
   lua_pushnumber(L,D_jfull);
