@@ -57,12 +57,13 @@ void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
   else
     InitAngleAggSingle(groupset);
 
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Initialized Angle Aggregation.   "
-    << "         Process memory = "
-    << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
-    << " MB.";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Initialized Angle Aggregation.   "
+      << "         Process memory = "
+      << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+      << " MB.";
 
 
   MPI_Barrier(MPI_COMM_WORLD);

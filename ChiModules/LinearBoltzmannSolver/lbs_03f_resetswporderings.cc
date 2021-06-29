@@ -35,10 +35,11 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset& groupset)
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  chi_log.Log(LOG_0)
-    << "SPDS and FLUDS reset complete.            Process memory = "
-    << std::setprecision(3)
-    << chi_console.GetMemoryUsageInMB() << " MB";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << "SPDS and FLUDS reset complete.            Process memory = "
+      << std::setprecision(3)
+      << chi_console.GetMemoryUsageInMB() << " MB";
 
   double local_app_memory =
     chi_log.ProcessEvent(ChiLog::StdTags::MAX_MEMORY_USAGE,
@@ -50,11 +51,12 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset& groupset)
   MPI_Allreduce(&local_app_memory,&max_proc_memory,
                 1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
 
-  chi_log.Log(LOG_0)
-    << "\n" << std::setprecision(3)
-    << "           Total application memory (max): "
-    << total_app_memory/1000.0 << " GB\n"
-    << "           Maximum process memory        : "
-    << max_proc_memory/1000.0 << " GB\n\n";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << "\n" << std::setprecision(3)
+      << "           Total application memory (max): "
+      << total_app_memory/1000.0 << " GB\n"
+      << "           Maximum process memory        : "
+      << max_proc_memory/1000.0 << " GB\n\n";
 
 }
