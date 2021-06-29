@@ -16,16 +16,8 @@ void KEigenvalue::Solver::ExecuteKSolver()
 {
   MPI_Barrier(MPI_COMM_WORLD);
 
-  LBSGroupset& groupset = group_sets[0];
-
-  ComputeSweepOrderings(groupset);
-  InitFluxDataStructures(groupset);
-
   PowerIteration();
-
-  ResetSweepOrderings(groupset);
-
-  chi_log.Log(LOG_0) << "KEigenvalueSolver execution completed\n";
+  chi_log.Log(LOG_0) << "KEigenvalue::Solver execution completed\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

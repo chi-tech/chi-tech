@@ -34,62 +34,75 @@ void KEigenvalue::Solver::PowerIteration()
       << "\n\n********** Solving k-eigenvalue problem with "
       << "the Power Method.\n\n";
 
-  LBSGroupset& groupset = group_sets[0];
-
-  groupset.angle_agg.ZeroIncomingDelayedPsi();
-
-  //======================================== Setup sweep chunk
-  auto sweep_chunk = SetSweepChunk(groupset);
-  MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                     groupset.angle_agg,
-                                     *sweep_chunk);
-
-  //======================================== Tool the sweep chunk
-  sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
-
-  //======================================== Initial guess
   phi_prev_local.assign(phi_prev_local.size(), 1.0);
-  ScopedCopySTLvectors(groupset, phi_prev_local, phi_old_local);
+  phi_old_local = phi_prev_local;
 
-  //======================================== Start power iterations
   double F_prev = 1.0;
   double k_eff_prev = 1.0;
-  int nit = 0;      //number of iterations
+  double k_eff_change = 1.0;
+
+  //================================================== Start power iterations
+  int nit = 0;
   bool converged = false;
   while (nit < options.max_iterations)
   {
-
-    //============================== Clear source moments
-    q_moments_local.assign(q_moments_local.size(), 0.0);
-
-    //============================== Set the fission source
-    SetKSource(groupset, q_moments_local,
-               APPLY_AGS_FISSION_SOURCE |
-               APPLY_WGS_FISSION_SOURCE);
-
-    //============================== Converge the scattering source with
-    //                               a fixed fission source
-    if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
+    //============================================= Loop over groupsets
+    MPI_Barrier(MPI_COMM_WORLD);
+    int gs = -1;
+    for (auto& groupset : group_sets)
     {
-      ClassicRichardson(groupset, 0, sweep_scheduler,
-                        APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
-                        options.verbose_inner_iterations);
-    }
-    else if (groupset.iterative_method == IterativeMethod::GMRES)
-    {
-      GMRES(groupset, 0, sweep_scheduler,
-            APPLY_WGS_SCATTER_SOURCE, APPLY_AGS_SCATTER_SOURCE,
-            options.verbose_inner_iterations);
-    }
+      ComputeSweepOrderings(groupset);
+      InitFluxDataStructures(groupset);
 
-    //============================== Recompute k-eigenvalue
+      InitWGDSA(groupset);
+      InitTGDSA(groupset);
+
+      groupset.angle_agg.ZeroIncomingDelayedPsi();
+
+      //======================================== Setup sweep chunk
+      auto sweep_chunk = SetSweepChunk(groupset);
+      MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
+                                         groupset.angle_agg,
+                                         *sweep_chunk);
+
+      //======================================== Tool the sweep chunk
+      sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
+
+      //======================================== Precompute the fission source
+      q_moments_local.assign(q_moments_local.size(), 0.0);
+      SetKSource(groupset, q_moments_local,
+                 APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
+
+      //======================================== Converge the scattering source
+      //                                         with a fixed fission source
+      if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
+      {
+        ClassicRichardson(groupset, gs, sweep_scheduler,
+                          APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
+                          false);
+      }
+      else if (groupset.iterative_method == IterativeMethod::GMRES)
+      {
+        GMRES(groupset, gs, sweep_scheduler, APPLY_WGS_SCATTER_SOURCE,
+              APPLY_AGS_SCATTER_SOURCE, false);
+      }
+
+      CleanUpWGDSA(groupset);
+      CleanUpTGDSA(groupset);
+
+      ResetSweepOrderings(groupset);
+
+      MPI_Barrier(MPI_COMM_WORLD);
+    }//for groupset
+
+    //======================================== Recompute k-eigenvalue
     double F_new = ComputeProduction();
     k_eff = F_new / F_prev * k_eff;
     double reactivity = (k_eff - 1.0) / k_eff;
 
-    //============================== Check convergence, reset book-keeping
-    ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
-    double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
+    //======================================== Check convergence, book-keeping
+    phi_prev_local = phi_new_local;
+    k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff;
     F_prev = F_new;
     nit += 1;
@@ -97,7 +110,7 @@ void KEigenvalue::Solver::PowerIteration()
     if (k_eff_change < std::max(options.tolerance, 1.0e-12))
       converged = true;
 
-    //============================== Print iteration summary
+    //======================================== Print iteration summary
     if (options.verbose_outer_iterations)
     {
       std::stringstream k_iter_info;
@@ -115,41 +128,16 @@ void KEigenvalue::Solver::PowerIteration()
     if (converged) break;
   }//for k iterations
 
-  //============================== Initialize the precursor vector
+  //================================================== Initialize the precursors
   InitializePrecursors();
 
-  double sweep_time = sweep_scheduler.GetAverageSweepTime();
-  double source_time =
-      chi_log.ProcessEvent(source_event_tag,
-                           ChiLog::EventOperation::AVERAGE_DURATION);
-  size_t num_angles = groupset.quadrature->abscissae.size();
-  size_t num_unknowns = glob_node_count *
-                        num_angles *
-                        groupset.groups.size();
+  //================================================== Print summary
   chi_log.Log(LOG_0)
       << "\n";
   chi_log.Log(LOG_0)
       << "        Final k-eigenvalue    :        "
       << std::setprecision(6) << k_eff;
   chi_log.Log(LOG_0)
-      << "        Set Src Time/sweep (s):        "
-      << source_time;
-  chi_log.Log(LOG_0)
-      << "        Average sweep time (s):        "
-      << sweep_time;
-  chi_log.Log(LOG_0)
-      << "        Sweep Time/Unknown (ns):       "
-      << sweep_time * 1.0e9 * chi_mpi.process_count / static_cast<double>(num_unknowns);
-  chi_log.Log(LOG_0)
-      << "        Number of unknowns per sweep:  " << num_unknowns;
-  chi_log.Log(LOG_0)
-      << "\n\n";
-
-  // GS_0 because we solve k-eigenvalue problems with 1 groupset right now.
-  std::string sweep_log_file_name =
-      std::string("GS_") + std::to_string(0) +
-      std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
-      std::string(".log");
-  groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
-
+      << "        Final change          :        "
+      << std::setprecision(6) << k_eff_change;
 }
