@@ -132,7 +132,7 @@ SetSource(LBSGroupset& groupset,
 
 
           double infission_g = 0.0;
-          const bool fission_avail = ((xs->is_fissile) and (ell == 0));
+          const bool fission_avail = (xs->is_fissile and ell == 0);
 
           //============================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
@@ -165,7 +165,7 @@ SetSource(LBSGroupset& groupset,
                 }
               }
             }//for gprime
-          }//if zeroth moment
+          }//if fission_avail
 
           //============================== Apply within-groupset fission
           if (fission_avail and apply_wgs_fission_src)
@@ -197,8 +197,8 @@ SetSource(LBSGroupset& groupset,
                                    phi_oldp[gprime];
                 }
               }
-            }
-          }
+            }//for gprime
+          }//if fission_avail
           q_mom[g] += infission_g;
 
         }//for g

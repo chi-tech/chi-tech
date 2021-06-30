@@ -72,7 +72,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
       for (int g = gs_i; g <= gs_f; ++g)
       {
         double infission_g = 0.0;
-        const bool fission_avail = (xs->is_fissile);
+        const bool fission_avail = xs->is_fissile;
 
         //=================================== Apply across-groupset fission
         if (fission_avail and apply_ags_fission_src)
