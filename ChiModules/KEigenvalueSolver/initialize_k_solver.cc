@@ -31,14 +31,11 @@ void KEigenvalue::Solver::InitializeKSolver()
 
     if (num_precursors > 0)
     {
-      typedef SpatialDiscretization_PWLD  PWLD;
-      auto pwl = std::static_pointer_cast<PWLD>(discretization);
-
       precursor_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N,
                                   max_num_precursors_per_material);
 
-      int local_precursor_dof_count = pwl->GetNumLocalDOFs(precursor_uk_man);
-      precursor_new_local.resize(local_precursor_dof_count, 0.0);
+      size_t local_dof_count = discretization->GetNumLocalDOFs(precursor_uk_man);
+      precursor_new_local.resize(local_dof_count, 0.0);
     }
   }//if use precursors
 }
