@@ -141,9 +141,29 @@ SetSource(LBSGroupset& groupset,
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime < gs_i) or (gprime > gs_f))
-                infission_g += xs->chi[g] *
-                               xs->nu_sigma_f[gprime] *
-                               phi_oldp[gprime];
+              {
+                // without delayed neutrons
+                if (not options.use_precursors)
+                  infission_g += xs->chi[g] *
+                                 xs->nu_sigma_f[gprime] *
+                                 phi_oldp[gprime];
+
+                // with delayed neutrons
+                else
+                {
+                  //============================== Prompt fission
+                  infission_g += xs->chi_prompt[g] *
+                                 xs->nu_prompt_sigma_f[gprime] *
+                                 phi_oldp[gprime];
+
+                  //============================== Delayed fission
+                  for (size_t j = 0; j < xs->num_precursors; ++j)
+                    infission_g += xs->chi_delayed[g][j] *
+                                   xs->precursor_yield[j] *
+                                   xs->nu_delayed_sigma_f[gprime] *
+                                   phi_oldp[gprime];
+                }
+              }
             }//for gprime
           }//if zeroth moment
 
@@ -154,9 +174,29 @@ SetSource(LBSGroupset& groupset,
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime >= gs_i) or (gprime <= gs_f))
-                infission_g += xs->chi[g] *
-                               xs->nu_sigma_f[gprime] *
-                               phi_oldp[gprime];
+              {
+                // without delayed neutrons
+                if (not options.use_precursors)
+                  infission_g += xs->chi[g] *
+                                 xs->nu_sigma_f[gprime] *
+                                 phi_oldp[gprime];
+
+                  // with delayed neutrons
+                else
+                {
+                  //============================== Prompt fission
+                  infission_g += xs->chi_prompt[g] *
+                                 xs->nu_prompt_sigma_f[gprime] *
+                                 phi_oldp[gprime];
+
+                  //============================== Delayed fission
+                  for (size_t j = 0; j < xs->num_precursors; ++j)
+                    infission_g += xs->chi_delayed[g][j] *
+                                   xs->precursor_yield[j] *
+                                   xs->nu_delayed_sigma_f[gprime] *
+                                   phi_oldp[gprime];
+                }
+              }
             }
           }
           q_mom[g] += infission_g;
