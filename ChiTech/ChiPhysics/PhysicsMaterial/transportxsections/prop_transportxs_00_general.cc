@@ -106,8 +106,8 @@ void chi_physics::TransportCrossSections::
   //======================================== Pickup all xs and make sure valid
   std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> cross_secs;
   cross_secs.reserve(combinations.size());
-  int num_grps_G = 0;
-  int num_precursors_J = 0;
+  size_t num_grps_G = 0;
+  size_t num_precursors_J = 0;
 
   double N_total  = 0.0; // total density
   double Nf_total = 0.0; // total density of fissile materials
@@ -157,10 +157,12 @@ void chi_physics::TransportCrossSections::
     if (not xs->is_fissile and xs->num_precursors > 0)
     {
       chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": only fissile materials can have "
-          << "delayed neutron precursors.";
+          << "In call to " << __FUNCTION__ << ": "
+          << "only fissile materials are allowed to have delayed "
+          << "neutron precursors.";
       exit(EXIT_FAILURE);
     }
+    chi_log.Log(LOG_0) << "NUMBER OF PRECURSORS" << xs->num_precursors;
     num_precursors_J += xs->num_precursors;
   }//for cross-section
 
@@ -187,11 +189,11 @@ void chi_physics::TransportCrossSections::
   precursor_lambda.resize(num_precursors_J, 0.0);
   precursor_yield.resize(num_precursors_J, 0.0);
   chi_delayed.resize(num_grps_G);
-  for (int g = 0; g < num_groups; ++g)
+  for (size_t g = 0; g < num_groups; ++g)
     chi_delayed[g].resize(num_precursors_J, 0.0);
 
-  int count = 0;
-  for (int x = 0; x < cross_secs.size(); ++x)
+  size_t precursor_count = 0;
+  for (size_t x = 0; x < cross_secs.size(); ++x)
   {
     scattering_order = std::max(this->scattering_order,
                                 cross_secs[x]->scattering_order);
@@ -210,7 +212,7 @@ void chi_physics::TransportCrossSections::
       pf_i = N_i / Np_total;
 
     //======================================== Combine cross-sections
-    for (int g = 0; g < num_grps_G; ++g)
+    for (size_t g = 0; g < num_grps_G; ++g)
     {
       sigma_t     [g] += cross_secs[x]->sigma_t     [g] * N_i;
       sigma_f     [g] += cross_secs[x]->sigma_f     [g] * N_i;
@@ -251,14 +253,15 @@ void chi_physics::TransportCrossSections::
     // of materials with precursors they make up.
     if (cross_secs[x]->num_precursors > 0)
     {
-      for (int j = 0; j < cross_secs[x]->num_precursors; ++j)
+      for (size_t j = 0; j < cross_secs[x]->num_precursors; ++j)
       {
-        precursor_lambda[count + j] = cross_secs[x]->precursor_lambda[j];
-        precursor_yield[count + j] = cross_secs[x]->precursor_yield[j] * pf_i;
-        for (int g = 0; g < num_groups; g++)
-          chi_delayed[g][count + j] = cross_secs[x]->chi_delayed[g][j];
+        size_t j_map = precursor_count + j;
+        precursor_lambda[j_map] = cross_secs[x]->precursor_lambda[j];
+        precursor_yield [j_map] = cross_secs[x]->precursor_yield [j] * pf_i;
+        for (int g=0; g < num_groups; g++)
+          chi_delayed[g][j_map] = cross_secs[x]->chi_delayed[g][j];
       }
-      count += cross_secs[x]->num_precursors;
+      precursor_count += cross_secs[x]->num_precursors;
     }
   }//for cross sections
 
@@ -270,12 +273,12 @@ void chi_physics::TransportCrossSections::
   transfer_matrices.clear();
   transfer_matrices.resize(this->scattering_order + 1,
                            chi_math::SparseMatrix(num_grps_G,num_grps_G));
-  for (int x = 0; x < cross_secs.size(); ++x)
+  for (size_t x = 0; x < cross_secs.size(); ++x)
   {
     for (int m=0; m<(cross_secs[x]->scattering_order + 1); ++m)
     {
       auto& xs_tm = cross_secs[x]->transfer_matrices[m];
-      for (int i = 0; i < num_groups; ++i)
+      for (size_t i = 0; i < num_groups; ++i)
       {
         for (auto j : xs_tm.rowI_indices[i])
         {
