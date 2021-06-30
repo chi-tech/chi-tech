@@ -69,21 +69,28 @@ void KEigenvalue::Solver::PowerIteration()
 
       //======================================== Precompute the fission source
       q_moments_local.assign(q_moments_local.size(), 0.0);
-      SetKSource(groupset, q_moments_local,
-                 APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
+      SetSource(groupset, q_moments_local,
+                APPLY_AGS_FISSION_SOURCE |
+                APPLY_WGS_FISSION_SOURCE);
+
+      //normalize q by k_eff
+      for (auto& q : q_moments_local) q /= k_eff;
 
       //======================================== Converge the scattering source
       //                                         with a fixed fission source
       if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
       {
         ClassicRichardson(groupset, gs, sweep_scheduler,
-                          APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
+                          APPLY_WGS_SCATTER_SOURCE |
+                          APPLY_AGS_SCATTER_SOURCE,
                           false);
       }
       else if (groupset.iterative_method == IterativeMethod::GMRES)
       {
-        GMRES(groupset, gs, sweep_scheduler, APPLY_WGS_SCATTER_SOURCE,
-              APPLY_AGS_SCATTER_SOURCE, false);
+        GMRES(groupset, gs, sweep_scheduler,
+              APPLY_WGS_SCATTER_SOURCE,
+              APPLY_AGS_SCATTER_SOURCE,
+              false);
       }
 
       CleanUpWGDSA(groupset);
