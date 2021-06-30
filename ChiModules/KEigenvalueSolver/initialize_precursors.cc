@@ -17,9 +17,6 @@ void KEigenvalue::Solver::InitializePrecursors()
 {
   if (options.use_precursors)
   {
-    typedef SpatialDiscretization_PWLD  PWLD;
-    auto pwl = std::static_pointer_cast<PWLD>(discretization);
-
     precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
     //======================================== Loop over cells
@@ -28,14 +25,14 @@ void KEigenvalue::Solver::InitializePrecursors()
       //==================== Cell information
       const auto xs_id = matid_to_xs_map[cell.material_id];
       auto& xs = material_xs[xs_id];
-      auto cell_fe_view = pwl->GetCellMappingFE(cell.local_id);
       auto& transport_view = cell_transport_views[cell.local_id];
 
       //============================== Loop over nodes
-      for (int i = 0; i < cell_fe_view->num_nodes; ++i)
+      const int num_nodes = transport_view.NumNodes();
+      for (int i = 0; i < num_nodes; ++i)
       {
         size_t ir = transport_view.MapDOF(i, 0, 0);
-        size_t jr = pwl->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
+        size_t jr = discretization->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
         double* Nj_newp = &precursor_new_local[jr];
         double* phi_newp = &phi_new_local[ir];
 
@@ -47,7 +44,7 @@ void KEigenvalue::Solver::InitializePrecursors()
           {
 
             //======================================== Loop over groups
-            for (int g = 0; g < groups.size(); ++g)
+            for (size_t g = 0; g < groups.size(); ++g)
               Nj_newp[j] += xs->precursor_yield[j] /
                             xs->precursor_lambda[j] *
                             xs->nu_delayed_sigma_f[g] *
