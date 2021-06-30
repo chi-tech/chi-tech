@@ -168,12 +168,12 @@ PsiBndry(uint64_t bndry_map,
          int gs_ss_begin,
          bool surface_source_active)
 {
-  if (not surface_source_active)
-    return &ref_boundaries[bndry_map]->zero_boundary_flux[g];
-
   if (ref_boundaries[bndry_map]->IsReflecting())
     return ref_boundaries[bndry_map]->HeterogenousPsiIncoming(
       angle_num, cell_local_id, face_num, fi, gs_ss_begin);
+
+  if (not surface_source_active)
+    return &ref_boundaries[bndry_map]->zero_boundary_flux[g];
 
   return &ref_boundaries[bndry_map]->boundary_flux[g];
 }
