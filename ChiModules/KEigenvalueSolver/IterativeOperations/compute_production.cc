@@ -14,9 +14,8 @@ using namespace LinearBoltzmann;
 /**Compute the total fission production in the problem.*/
 double KEigenvalue::Solver::ComputeProduction()
 {
-  typedef SpatialDiscretization_PWLD PWLD;
-  auto grid_fe_view = std::static_pointer_cast<PWLD>(discretization);
-
+  typedef SpatialDiscretization_FE  FE;
+  const auto grid_fe_view = std::static_pointer_cast<FE>(discretization);
 
   int first_grp = groups.front().id;
   int last_grp = groups.back().id;
