@@ -29,14 +29,14 @@ int chiKEigenvalueLBSExecute(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
           << __FUNCTION__ << ": Incorrect solver-type. "
-          << "Cannot cast to KEigenvalue::Solver\n";
+          << "Cannot cast to KEigenvalue::Solver.";
       exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver\n";
+        << __FUNCTION__ << ": Invalid handle to solver.";
     exit(EXIT_FAILURE);
   }
 
