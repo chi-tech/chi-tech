@@ -41,7 +41,7 @@ double KEigenvalue::Solver::ComputeProduction()
       // ----- Contribute fission source
       if (xs->is_fissile)
       {
-        for (int g = first_grp; g <= last_grp; g++)
+        for (int g = first_grp; g <= last_grp; ++g)
         {
           double nu_sigma_f = 0.0;
           if (options.use_precursors)
