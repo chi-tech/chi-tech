@@ -42,7 +42,7 @@ void KEigenvalue::Solver::InitializePrecursors()
       for (int i = 0; i < num_nodes; ++i)
       {
         size_t ir = full_cell_view.MapDOF(i, 0, 0);
-        size_t jr = pwl->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
+        size_t jr = discretization->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
         double* Nj_newp = &precursor_new_local[jr];
         double* phi_newp = &phi_new_local[ir];
 
