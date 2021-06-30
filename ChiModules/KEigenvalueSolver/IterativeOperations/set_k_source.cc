@@ -74,13 +74,9 @@ SetKSource(LBSGroupset& groupset,
         unsigned int ell = m_to_ell_em_map[m].ell;
 
         size_t ir = full_cell_view.MapDOF(i, m, 0);
-        double* q_mom = &destination_q[ir];
-
-        double* phi_oldp = &phi_old_local[ir];
-        double* phi_prevp = &phi_prev_local[ir];
 
         //============================== Loop over groupset groups
-        for (int g = gs_i; g <= gs_f; ++g)
+        for (size_t g = gs_i; g <= gs_f; ++g)
         {
           //======================================== Apply scattering
           double inscatter_g = 0.0;
@@ -100,7 +96,7 @@ SetKSource(LBSGroupset& groupset,
                 if ((gprime < gs_i) or (gprime > gs_f))
                 {
                   double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
-                  inscatter_g += sigma_sm * phi_oldp[gprime];
+                  inscatter_g += sigma_sm * phi_old_local[ir + gprime];
                 }
               }
             }
@@ -119,13 +115,12 @@ SetKSource(LBSGroupset& groupset,
                 if ((gprime >= gs_i) and (gprime <= gs_f))
                 {
                   double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
-                  inscatter_g += sigma_sm * phi_oldp[gprime];
+                  inscatter_g += sigma_sm * phi_old_local[ir + gprime];
                 }
               }
             }
           }//if moment avail
-
-          q_mom[g] += inscatter_g;
+          destination_q[ir + g] += inscatter_g;
 
           //======================================== Apply fission
           if (xs->is_fissile and (ell == 0))
@@ -138,12 +133,13 @@ SetKSource(LBSGroupset& groupset,
               for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
               {
                 double nu_sig_f = (options.use_precursors) ?
-                                  xs->nu_prompt_sigma_f[gprime] : xs->nu_sigma_f[gprime];
+                                  xs->nu_prompt_sigma_f[gprime] :
+                                  xs->nu_sigma_f[gprime];
 
                 if ((gprime < gs_i) or (gprime > gs_f))
                 {
                   fission_g += xs->chi[g] * nu_sig_f *
-                               phi_prevp[gprime] / k_eff;
+                               phi_prev_local[ir + gprime] / k_eff;
 
                   //============================== Delayed contributions
                   if (options.use_precursors and xs->num_precursors > 0)
@@ -154,7 +150,7 @@ SetKSource(LBSGroupset& groupset,
                       fission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
                                    xs->nu_delayed_sigma_f[gprime] *
-                                   phi_prevp[gprime] / k_eff;
+                                   phi_prev_local[ir + gprime] / k_eff;
                     }
                   }//if use precursors and has precursors
                 }//if across groupset
@@ -173,7 +169,7 @@ SetKSource(LBSGroupset& groupset,
                 if ((gprime >= gs_i) and (gprime <= gs_f))
                 {
                   fission_g += xs->chi[g] * nu_sig_f *
-                               phi_prevp[gprime] / k_eff;
+                               phi_prev_local[ir + gprime] / k_eff;
 
                   //============================== Delayed contributions
                   if (options.use_precursors and xs->num_precursors > 0)
@@ -184,14 +180,14 @@ SetKSource(LBSGroupset& groupset,
                       fission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
                                    xs->nu_delayed_sigma_f[gprime] *
-                                   phi_prevp[gprime] / k_eff;
+                                   phi_prev_local[ir + gprime] / k_eff;
                     }
                   }//if use precursors and has precursors
                 }//if across groupset
               }//for gprime
             }//if within-groupset
+            destination_q[ir + g] += fission_g;
 
-            q_mom[g] += fission_g;
           }//if fissile and ell == 0
 
         }//for g

@@ -34,14 +34,13 @@ double KEigenvalue::Solver::ComputeProduction()
     for (int i = 0; i < cell_fe_view.NumNodes(); ++i)
     {
       size_t ir = transport_view.MapDOF(i, 0, 0);
-      double* phi_newp = &phi_new_local[ir];
 
       double intV_shapeI = cell_fe_view.IntV_shapeI(i);
 
       // ----- Contribute fission source
       if (xs->is_fissile)
       {
-        for (int g = first_grp; g <= last_grp; ++g)
+        for (size_t g = first_grp; g <= last_grp; ++g)
         {
           double nu_sigma_f = 0.0;
           if (options.use_precursors)
@@ -50,7 +49,7 @@ double KEigenvalue::Solver::ComputeProduction()
           else
             nu_sigma_f = xs->nu_prompt_sigma_f[g];
 
-          local_F += nu_sigma_f * phi_newp[g] * intV_shapeI;
+          local_F += nu_sigma_f * phi_new_local[ir + g] * intV_shapeI;
         }
       }
     }//for i
