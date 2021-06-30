@@ -98,7 +98,7 @@ SetSource(LBSGroupset& groupset,
                 xs->transfer_matrices[ell].rowI_indices[g].size();
 
             //============================== Loop over transfers
-            for (int t = 0; t < num_transfers; ++t)
+            for (size_t t = 0; t < num_transfers; ++t)
             {
               size_t gprime =
                   xs->transfer_matrices[ell].rowI_indices[g][t];
@@ -118,7 +118,7 @@ SetSource(LBSGroupset& groupset,
                 xs->transfer_matrices[ell].rowI_indices[g].size();
 
             //============================== Loop over transfers
-            for (int t = 0; t < num_transfers; ++t)
+            for (size_t t = 0; t < num_transfers; ++t)
             {
               size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
               if ((gprime >= gs_i) and (gprime <= gs_f))

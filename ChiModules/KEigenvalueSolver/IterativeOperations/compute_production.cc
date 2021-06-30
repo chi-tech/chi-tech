@@ -52,7 +52,7 @@ double KEigenvalue::Solver::ComputeProduction()
       if (xs->is_fissile)
       {
         //=================================== Loop over groups
-        for (int g = first_grp; g <= last_grp; g++)
+        for (int g = first_grp; g <= last_grp; ++g)
         {
           //TODO: Once checks are in place to ensure nu = nu_prompt +
           //      nu_delayed, nu_sigma_f can be universally used here.
