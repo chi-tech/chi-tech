@@ -1,7 +1,6 @@
+#include "../k_eigenvalue_solver.h"
+
 #include "ChiLua/chi_lua.h"
-
-#include "KEigenvalueSolver/k_eigenvalue_solver.h"
-
 #include "ChiPhysics/chi_physics.h"
 
 #include <chi_log.h>
@@ -36,15 +35,15 @@ int chiLBSSetUsePrecursors(lua_State* L)
     if (not solver)
     {
       chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Incorrect solver-type."
-          << " Cannot cast to KEigenvalue::Solver\n";
+          << __FUNCTION__ << ": Incorrect solver-type. "
+          << "Cannot cast to KEigenvalue::Solver";
       exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver";
+        << __FUNCTION__ << ": Invalid handle to solver.";
     exit(EXIT_FAILURE);
   }
   solver->options.use_precursors = use_precursors;
@@ -80,7 +79,7 @@ int chiLBSSetMaxKIterations(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
           << __FUNCTION__ << ": Incorrect solver-type. "
-          << "Cannot cast to KEigenvalue::Solver\n";
+          << "Cannot cast to KEigenvalue::Solver";
       exit(EXIT_FAILURE);
     }
   }
@@ -101,7 +100,7 @@ int chiLBSSetMaxKIterations(lua_State* L)
   solver->options.max_iterations = num_iter;
 
   chi_log.Log(LOG_0)
-      << "Eigenvalue max # iterations set to " << num_iter;
+      << "Eigenvalue max # iterations set to " << num_iter << ".";
 
   return 0;
 }
@@ -131,7 +130,7 @@ int chiLBSSetKTolerance(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
           << __FUNCTION__ << ": Incorrect solver-type. "
-          << "Cannot cast to KEigenvalue::Solver\n";
+          << "Cannot cast to KEigenvalue::Solver.";
       exit(EXIT_FAILURE);
     }
   }

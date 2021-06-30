@@ -1,13 +1,11 @@
-#include "ChiLua/chi_lua.h"
-
 #include "../k_eigenvalue_solver.h"
 
+#include "ChiLua/chi_lua.h"
 #include "ChiPhysics/chi_physics.h"
-
-extern ChiPhysics& chi_physics_handler;
 
 #include <chi_log.h>
 
+extern ChiPhysics& chi_physics_handler;
 extern ChiLog& chi_log;
 
 using namespace LinearBoltzmann;
@@ -29,15 +27,16 @@ int chiKEigenvalueLBSInitialize(lua_State* L)
 
     if (not solver)
     {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSKEigenvalueInitialize: Incorrect solver-type."
-                                   " Cannot cast to KEigenvalue::Solver\n";
+      chi_log.Log(LOG_ALLERROR)
+          << __FUNCTION__ << ": Incorrect solver-type. "
+          << "Cannot cast to KEigenvalue::Solver\n";
       exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-        << "chiLBSKEigenvalueInitialize: Invalid handle to solver.\n";
+        << __FUNCTION__ << ": Invalid handle to solver.\n";
     exit(EXIT_FAILURE);
   }
 

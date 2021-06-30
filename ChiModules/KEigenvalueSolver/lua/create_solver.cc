@@ -1,13 +1,11 @@
-#include <ChiLua/chi_lua.h>
-
 #include "../k_eigenvalue_solver.h"
 
-#include <ChiPhysics//chi_physics.h>
+#include "ChiLua/chi_lua.h"
+#include "ChiPhysics/chi_physics.h"
+
+#include <chi_log.h>
 
 extern ChiPhysics& chi_physics_handler;
-
-#include "chi_log.h"
-
 extern ChiLog& chi_log;
 
 using namespace LinearBoltzmann;
