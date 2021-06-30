@@ -19,10 +19,10 @@ namespace chi_physics
 class TransportCrossSections : public chi_physics::MaterialProperty
 {
 public:
-  size_t num_groups=0;                          ///< Total number of Groups
-  size_t scattering_order=0;                    ///< Legendre scattering order
-  size_t num_precursors=0;                      ///< Number of precursors
-  bool is_fissile = false;                      ///< Fissile or not
+  int num_groups = 0;                            ///< Total number of Groups
+  int scattering_order = 0;                      ///< Legendre scattering order
+  int num_precursors  = 0;                       ///< Number of precursors
+  bool is_fissile = false;                       ///< Fissile or not
 
   typedef double GrpVal;                        ///< Denoting value per group
   typedef double PrecursorVal;                  ///< Denoting value per precursor

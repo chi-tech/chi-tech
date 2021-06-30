@@ -525,7 +525,7 @@ void chi_physics::TransportCrossSections::
     first_word = "";
     not_eof = bool(std::getline(file,line)); ++line_number;
   }//while not EOF, read each lines
-  scattering_order = M-1;
+  scattering_order = M - 1;
 
   //======================================== Estimates sigma_a group-by-group
   auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, int col)
@@ -536,7 +536,7 @@ void chi_physics::TransportCrossSections::
     {
       auto& row_col_indices = matrix.rowI_indices[row];
       auto& row_values = matrix.rowI_values[row];
-      for (int j=0; j<row_col_indices.size(); ++j)
+      for (int j = 0; j < row_col_indices.size(); ++j)
         if (row_col_indices[j] == col)
           sum += row_values[j];
     }
@@ -557,9 +557,15 @@ void chi_physics::TransportCrossSections::
       << __FUNCTION__ << ": sigma_a was estimated from the transfer matrix.";
   }
 
-  //======================================== Process fission items
-  for (auto& sig_f : sigma_f)
-    if (sig_f > 0.0) {is_fissile = true; break;}
+  //================================================== Set is_fissile flag
+  for (int g = 0; g < num_groups; ++g)
+  {
+    if (sigma_f[g] > 0.0)
+    {
+      is_fissile = true;
+      break;
+    }
+  }//for group
 
   //precompute nu_sigma_f terms
   for (int g = 0; g < num_groups; ++g)
@@ -569,7 +575,7 @@ void chi_physics::TransportCrossSections::
     nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
   }
 
-  //======================================== Check delayed neutron terms
+  //================================================== Check delayed terms
   if (num_precursors > 0)
   {
     // Check that the material is fissile
