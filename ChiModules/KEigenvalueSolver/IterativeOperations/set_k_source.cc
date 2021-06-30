@@ -93,7 +93,7 @@ SetKSource(LBSGroupset& groupset,
                   xs->transfer_matrices[ell].rowI_indices[g].size();
 
               //============================== Loop over transfers
-              for (int t = 0; t < num_transfers; ++t)
+              for (size_t t = 0; t < num_transfers; ++t)
               {
                 size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
 
@@ -112,7 +112,7 @@ SetKSource(LBSGroupset& groupset,
                   xs->transfer_matrices[ell].rowI_indices[g].size();
 
               //============================== Loop over transfers
-              for (int t = 0; t < num_transfers; ++t)
+              for (size_t t = 0; t < num_transfers; ++t)
               {
                 size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
 
@@ -149,7 +149,7 @@ SetKSource(LBSGroupset& groupset,
                   if (options.use_precursors and xs->num_precursors > 0)
                   {
                     //============================== Loop over precursors
-                    for (int j = 0; j < xs->num_precursors; ++j)
+                    for (size_t j = 0; j < xs->num_precursors; ++j)
                     {
                       fission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
@@ -179,7 +179,7 @@ SetKSource(LBSGroupset& groupset,
                   if (options.use_precursors and xs->num_precursors > 0)
                   {
                     //============================== Loop over precursors
-                    for (int j = 0; j < xs->num_precursors; ++j)
+                    for (size_t j = 0; j < xs->num_precursors; ++j)
                     {
                       fission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
