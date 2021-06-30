@@ -80,7 +80,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
           //============================== Loop over groups
           for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
           {
-            if (gprime < gs_i or gprime > gs_f)
+            if ((gprime < gs_i) or (gprime > gs_f))
             {
               // without delayed neutrons
               if (not options.use_precursors)
@@ -114,7 +114,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
           //============================== Loop over groups
           for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
           {
-            if (gprime >= gs_i and gprime <= gs_f)
+            if ((gprime >= gs_i) and (gprime <= gs_f))
             {
               // without delayed neutrons
               if (not options.use_precursors)
