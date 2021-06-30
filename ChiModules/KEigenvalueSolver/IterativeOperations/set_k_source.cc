@@ -92,7 +92,7 @@ void KEigenvalue::Solver::SetKSource(LBSGroupset& groupset,
               else
               {
                 //============================== Prompt fission
-                infission_g += xs->chi[g] *
+                infission_g += xs->chi_prompt[g] *
                                xs->nu_prompt_sigma_f[gprime] *
                                phi_oldp[gprime] / k_eff;
 
