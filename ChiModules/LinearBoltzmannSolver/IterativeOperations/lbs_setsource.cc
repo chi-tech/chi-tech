@@ -78,15 +78,13 @@ SetSource(LBSGroupset& groupset,
         unsigned int ell = m_to_ell_em_map[m].ell;
 
         size_t ir = full_cell_view.MapDOF(i, m, 0);
-        double* q_mom = &destination_q[ir];
-        double* phi_oldp = &phi_old_local[ir];
 
         //======================================== Loop over groupset groups
-        for (int g = gs_i; g <= gs_f; ++g)
+        for (size_t g = gs_i; g <= gs_f; ++g)
         {
           //======================================== Apply material source
           if (apply_mat_src && (ell == 0))
-            q_mom[g] += src[g];
+            destination_q[ir + g] += src[g];
 
           double inscatter_g = 0.0;
           const bool moment_avail = (ell < xs->transfer_matrices.size());
@@ -106,7 +104,7 @@ SetSource(LBSGroupset& groupset,
               if ((gprime < gs_i) or (gprime > gs_f))
               {
                 double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
-                inscatter_g += sigma_sm * phi_oldp[gprime];
+                inscatter_g += sigma_sm * phi_old_local[ir + gprime];
               }
             }
           }//if moment_avail
@@ -124,11 +122,11 @@ SetSource(LBSGroupset& groupset,
               if ((gprime >= gs_i) and (gprime <= gs_f))
               {
                 double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
-                inscatter_g += sigma_sm * phi_oldp[gprime];
+                inscatter_g += sigma_sm * phi_old_local[ir + gprime];
               }
             }
           }
-          q_mom[g] += inscatter_g;
+          destination_q[ir + g] += inscatter_g;
 
 
           double infission_g = 0.0;
@@ -146,7 +144,7 @@ SetSource(LBSGroupset& groupset,
                 if (not options.use_precursors)
                   infission_g += xs->chi[g] *
                                  xs->nu_sigma_f[gprime] *
-                                 phi_oldp[gprime];
+                                 phi_old_local[ir + gprime];
 
                 // with delayed neutrons
                 else
@@ -154,14 +152,14 @@ SetSource(LBSGroupset& groupset,
                   //============================== Prompt fission
                   infission_g += xs->chi_prompt[g] *
                                  xs->nu_prompt_sigma_f[gprime] *
-                                 phi_oldp[gprime];
+                                 phi_old_local[ir + gprime];
 
                   //============================== Delayed fission
                   for (size_t j = 0; j < xs->num_precursors; ++j)
                     infission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
                                    xs->nu_delayed_sigma_f[gprime] *
-                                   phi_oldp[gprime];
+                                   phi_old_local[ir + gprime];
                 }
               }
             }//for gprime
@@ -179,7 +177,7 @@ SetSource(LBSGroupset& groupset,
                 if (not options.use_precursors)
                   infission_g += xs->chi[g] *
                                  xs->nu_sigma_f[gprime] *
-                                 phi_oldp[gprime];
+                                 phi_old_local[ir + gprime];
 
                   // with delayed neutrons
                 else
@@ -187,19 +185,19 @@ SetSource(LBSGroupset& groupset,
                   //============================== Prompt fission
                   infission_g += xs->chi_prompt[g] *
                                  xs->nu_prompt_sigma_f[gprime] *
-                                 phi_oldp[gprime];
+                                 phi_old_local[ir + gprime];
 
                   //============================== Delayed fission
                   for (size_t j = 0; j < xs->num_precursors; ++j)
                     infission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
                                    xs->nu_delayed_sigma_f[gprime] *
-                                   phi_oldp[gprime];
+                                   phi_old_local[ir + gprime];
                 }
               }
             }//for gprime
           }//if fission_avail
-          q_mom[g] += infission_g;
+          destination_q[ir + g] += infission_g;
 
         }//for g
       }//for m

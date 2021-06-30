@@ -44,7 +44,8 @@ double KEigenvalue::Solver::ComputeProduction()
     const int num_nodes = full_cell_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
-      size_t ir = transport_view.MapDOF(i, 0, 0);
+      size_t ir = full_cell_view.MapDOF(i, 0, 0);
+      double IntV_ShapeI = fe_intgrl_values.IntV_shapeI(i);
 
       // only fissile materials contribute
       if (xs->is_fissile)
@@ -57,7 +58,7 @@ double KEigenvalue::Solver::ComputeProduction()
               (not options.use_precursors) ? xs->nu_sigma_f[g] :
               xs->nu_prompt_sigma_f[g] + xs->nu_delayed_sigma_f[g];
 
-          local_production += nu_sigma_f * phi_new_local[ir + g] * intV_shapeI;
+          local_production += nu_sigma_f * phi_new_local[ir + g] * IntV_ShapeI;
         }// for group
       }
     }//for node
