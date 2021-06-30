@@ -4,10 +4,9 @@
 
 #include "ChiPhysics/chi_physics.h"
 
-extern ChiPhysics& chi_physics_handler;
-
 #include <chi_log.h>
 
+extern ChiPhysics& chi_physics_handler;
 extern ChiLog& chi_log;
 
 using namespace LinearBoltzmann;
@@ -38,7 +37,7 @@ int chiLBSSetUsePrecursors(lua_State* L)
     {
       chi_log.Log(LOG_ALLERROR)
           << __FUNCTION__ << ": Incorrect solver-type."
-                             " Cannot cast to KEigenvalue::Solver\n";
+          << " Cannot cast to KEigenvalue::Solver\n";
       exit(EXIT_FAILURE);
     }
   }
@@ -69,7 +68,6 @@ int chiLBSSetMaxKIterations(lua_State* L)
   int solver_index = lua_tonumber(L, 1);
   int num_iter = lua_tointeger(L, 2);
 
-  // ----- Get pointer to solver
   chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try
@@ -81,23 +79,22 @@ int chiLBSSetMaxKIterations(lua_State* L)
     if (not solver)
     {
       chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Incorrect solver-type."
-                             " Cannot cast to KEigenvalue::Solver\n";
+          << __FUNCTION__ << ": Incorrect solver-type. "
+          << "Cannot cast to KEigenvalue::Solver\n";
       exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver";
+        << __FUNCTION__ << ": Invalid handle to solver.";
     exit(EXIT_FAILURE);
   }
 
   if (num_iter < 0)
   {
     chi_log.Log(LOG_ALLERROR)
-        << "Invalid number of iterations "
-        << "in call to chiLBSSetMaxKIterations. "
+        << __FUNCTION__  << ": Invalid number of iterations. "
         << "Must be >= 0.";
     exit(EXIT_FAILURE);
   }
@@ -122,7 +119,6 @@ int chiLBSSetKTolerance(lua_State* L)
   int solver_index = lua_tonumber(L, 1);
   double tol = lua_tonumber(L, 2);
 
-  // ----- Get pointer to solver
   chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try
@@ -134,22 +130,23 @@ int chiLBSSetKTolerance(lua_State* L)
     if (not solver)
     {
       chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Incorrect solver-type."
-                             " Cannot cast to KEigenvalue::Solver\n";
+          << __FUNCTION__ << ": Incorrect solver-type. "
+          << "Cannot cast to KEigenvalue::Solver\n";
       exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
   {
     chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver";
+        << __FUNCTION__ << ": Invalid handle to solver.";
     exit(EXIT_FAILURE);
   }
 
   if (tol < 0)
   {
     chi_log.Log(LOG_ALLERROR)
-        << "Invalid tolerance specified. Must be >= 0.0";
+        << __FUNCTION__  << ": Invalid tolerance specified. "
+        << "Must be >= 0.0.";
     exit(EXIT_FAILURE);
   }
   solver->options.tolerance = tol;
@@ -158,7 +155,7 @@ int chiLBSSetKTolerance(lua_State* L)
   sprintf(buff, "%.4e", tol);
 
   chi_log.Log(LOG_0)
-      << "k-eigenvalue tolerance set to " << buff;
+      << "k-eigenvalue tolerance set to " << buff << ".";
 
   return 0;
 }

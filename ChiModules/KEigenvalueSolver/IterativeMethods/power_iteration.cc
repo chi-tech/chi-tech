@@ -1,17 +1,14 @@
 #include "../k_eigenvalue_solver.h"
-
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "chi_log.h"
-
-extern ChiLog& chi_log;
-
 #include "chi_mpi.h"
-
-extern ChiMPI& chi_mpi;
-
 #include "ChiTimer/chi_timer.h"
 
+#include <iomanip>
+
+extern ChiLog& chi_log;
+extern ChiMPI& chi_mpi;
 extern ChiTimer chi_program_timer;
 
 namespace sweep_namespace = chi_mesh::sweep_management;
@@ -21,7 +18,6 @@ typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 using namespace LinearBoltzmann;
 
-#include <iomanip>
 
 //###################################################################
 /**Power iterative scheme for k-eigenvalue calculations.
