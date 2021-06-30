@@ -17,9 +17,6 @@ void KEigenvalue::Solver::InitializePrecursors()
 {
   if (options.use_precursors)
   {
-    typedef SpatialDiscretization_PWLD  PWLD;
-    auto pwl = std::static_pointer_cast<PWLD>(discretization);
-
     precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
     //================================================== Loop over cells
@@ -57,7 +54,7 @@ void KEigenvalue::Solver::InitializePrecursors()
           {
 
             //======================================== Loop over groups
-            for (int g = 0; g < groups.size(); ++g)
+            for (size_t g = 0; g < groups.size(); ++g)
               Nj_newp[j] += xs->precursor_yield[j] /
                             xs->precursor_lambda[j] *
                             xs->nu_delayed_sigma_f[g] *
