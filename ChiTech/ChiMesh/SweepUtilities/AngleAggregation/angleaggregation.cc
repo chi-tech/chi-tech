@@ -204,11 +204,7 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
 {
   //======================================== Check if this is already developed
   if (num_ang_unknowns_avail)
-  {
-    chi_log.Log(LOG_0) << "Number of angular unknowns: "
-                       << number_angular_unknowns.second;
     return number_angular_unknowns;
-  }
 
   //======================================== If not developed
   size_t local_ang_unknowns = 0;
@@ -250,8 +246,6 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
                 MPI_UNSIGNED_LONG_LONG,
                 MPI_SUM,
                 MPI_COMM_WORLD);
-
-  chi_log.Log(LOG_0) << "Number of angular unknowns: " << global_ang_unknowns;
 
   number_angular_unknowns = {local_ang_unknowns,global_ang_unknowns};
 

@@ -15,45 +15,43 @@ using namespace LinearBoltzmann;
 /**Computes the point wise delayed neutron precursor concentrations.*/
 void KEigenvalue::Solver::InitializePrecursors()
 {
-  typedef SpatialDiscretization_PWLD  PWLD;
-  auto pwl = std::static_pointer_cast<PWLD>(discretization);
-
-  Nj_new_local.assign(Nj_new_local.size(), 0.0);
-
-  // ----- Loop over cells
-  for (auto& cell : grid->local_cells)
+  if (options.use_precursors)
   {
-    // ----- Cell information
-    const auto xs_id = matid_to_xs_map[cell.material_id];
-    auto& xs = material_xs[xs_id];
-    auto cell_fe_view = pwl->GetCellMappingFE(cell.local_id);
-    auto& transport_view = cell_transport_views[cell.local_id];
+    precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
-    // ----- Loop over cell dofs
-    for (int i = 0; i < transport_view.NumNodes(); ++i)
+    //======================================== Loop over cells
+    for (auto& cell : grid->local_cells)
     {
-      size_t ir = transport_view.MapDOF(i, 0, 0);
-      size_t jr = pwl->MapDOFLocal(cell, i, Nj_unk_man, 0, 0);
-      double* Nj_newp  = &Nj_new_local[jr];
-      double* phi_newp = &phi_new_local[ir];
+      //==================== Cell information
+      const auto xs_id = matid_to_xs_map[cell.material_id];
+      auto& xs = material_xs[xs_id];
+      auto& transport_view = cell_transport_views[cell.local_id];
 
-      // ----- If a fissial material with precursors
-      if ((xs->is_fissile) and (xs->num_precursors > 0)) {
-        // ----- Loop over precursors
-        for (size_t j = 0; j < xs->num_precursors; ++j)
+      //============================== Loop over nodes
+      const int num_nodes = transport_view.NumNodes();
+      for (int i = 0; i < num_nodes; ++i)
+      {
+        size_t ir = transport_view.MapDOF(i, 0, 0);
+        size_t jr = discretization->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
+        double* Nj_newp = &precursor_new_local[jr];
+
+        // Contribute if precursors live on this material
+        if (xs->num_precursors > 0)
         {
-          // ----- Initialize precursors
-          double coeff = xs->precursor_yield[j] / xs->precursor_lambda[j];
+          //======================================== Loop over precursors
+          for (size_t j = 0; j < xs->num_precursors; ++j)
+          {
 
-
-          // ----- Loop over groups
-          for (int g = 0; g < groups.size(); ++g)
-            Nj_newp[j] += coeff * xs->nu_delayed_sigma_f[g] *
-                              phi_newp[g] / k_eff;
-        }//for j
-      }//if fissile and J > 0
-    } //for i
-  }//for c
+            //======================================== Loop over groups
+            for (size_t g = 0; g < groups.size(); ++g)
+              precursor_new_local[jr + j] +=
+                  xs->precursor_yield[j] / xs->precursor_lambda[j] *
+                  xs->nu_delayed_sigma_f[g] * phi_new_local[ir + g] / k_eff;
+          }//for precursors
+        }//if num_precursors > 0
+      } //for node
+    }//for cell
+  }
 }
 
 

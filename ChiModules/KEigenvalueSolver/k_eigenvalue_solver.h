@@ -6,7 +6,7 @@
 
 #include <string>
 
-namespace  LinearBoltzmann { namespace KEigenvalue
+namespace LinearBoltzmann::KEigenvalue
 {
 
 /**A k-eigenvalue neutron transport solver.*/
@@ -16,35 +16,31 @@ private:
   size_t source_event_tag;
 
 public:
-
-  // Total number of precursors on all materials
-  size_t  num_precursors;
-  size_t  max_num_precursors_per_node;
-
-  // Current estimate of the k-eigenvalue
   double k_eff = 1.0;
 
-  // Additional phi vector
+  size_t num_precursors;
+  size_t max_num_precursors_per_material;
+
+  chi_math::UnknownManager precursor_uk_man;
+
   std::vector<double> phi_prev_local;
+  std::vector<double> precursor_new_local;
 
-  // Precursor vector and unknown manager
-  std::vector<double> Nj_new_local;
-  chi_math::UnknownManager Nj_unk_man;
+  // IterativeMethods
+  void PowerIteration();
 
-  // Iterative methods
-  void PowerIteration(LBSGroupset& groupset);
-  
   // Iterative operations
-  void SetKSource(LBSGroupset& groupset, SourceFlags source_flags);
+  void SetKSource(LBSGroupset& groupset,
+                  std::vector<double>& destination_q,
+                  SourceFlags source_flags);
   double ComputeProduction();
   void InitializePrecursors();
 
   // Execute method
   void InitializeKSolver();
   void ExecuteKSolver();
-  
 };
 
-} }
+}
 
 #endif
