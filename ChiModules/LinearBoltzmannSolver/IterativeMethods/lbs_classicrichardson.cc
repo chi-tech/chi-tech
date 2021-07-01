@@ -33,6 +33,8 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
       << groupset.groups.back().id << "\n\n";
   }
 
+  std::vector<double> init_q_moments_local = q_moments_local;
+
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Tool the sweep chunk
@@ -42,9 +44,10 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   //================================================== Now start iterating
   double pw_change_prev = 1.0;
   bool converged = false;
-  for (int k=0; k<groupset.max_iterations; k++)
+  for (int k = 0; k < groupset.max_iterations; ++k)
   {
-    SetSource(groupset,source_flags);
+    q_moments_local = init_q_moments_local;
+    SetSource(groupset, q_moments_local, source_flags);
 
     groupset.ZeroAngularFluxDataStructures();
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
@@ -145,21 +148,14 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
         << "        Number of unknowns per sweep:  " << num_unknowns;
       chi_log.Log(LOG_0)
         << "\n\n";
+
+      std::string sweep_log_file_name =
+          std::string("GS_") + std::to_string(group_set_num) +
+          std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+          std::string(".log");
+      groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
     }
-
-    std::string sweep_log_file_name =
-      std::string("GS_") + std::to_string(group_set_num) +
-      std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
-      std::string(".log");
-    groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
   }//print solution info
-
-  std::string sweep_log_file_name =
-    std::string("GS_") + std::to_string(group_set_num) +
-    std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
-    std::string(".log");
-
-  groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
 
   return converged;
 }

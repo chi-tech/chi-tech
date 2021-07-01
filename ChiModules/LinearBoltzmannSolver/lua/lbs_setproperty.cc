@@ -31,6 +31,9 @@ extern ChiMath&     chi_math_handler;
 
 #define SAVE_ANGULAR_FLUX 8
 
+#define VERBOSE_INNER_ITERATIONS 10
+#define VERBOSE_OUTER_ITERATIONS 11
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -382,6 +385,26 @@ int chiLBSSetProperty(lua_State *L)
     solver->options.save_angular_flux = save_flag;
 
     chi_log.Log() << "LBS option to save angular flux set to " << save_flag;
+  }
+  else if (property == VERBOSE_INNER_ITERATIONS)
+  {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
+    bool flag = lua_toboolean(L, 3);
+
+    solver->options.verbose_inner_iterations = flag;
+
+    chi_log.Log() << "LBS option: verbose_inner_iterations set to " << flag;
+  }
+  else if (property == VERBOSE_OUTER_ITERATIONS)
+  {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
+    bool flag = lua_toboolean(L, 3);
+
+    solver->options.verbose_outer_iterations = flag;
+
+    chi_log.Log() << "LBS option: verbose_outer_iterations set to " << flag;
   }
   else
   {
