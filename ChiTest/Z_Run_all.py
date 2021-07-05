@@ -36,7 +36,7 @@ tacc = False
 tamu = False
 if "tacc.utexas.edu" in hostname:
     tacc = True
-elif "ne.tamu.edu" in hostname:
+elif "ne.tamu.edu" in hostname and "orchard" in hostname:
     tamu = True
 
 def format3(number):
