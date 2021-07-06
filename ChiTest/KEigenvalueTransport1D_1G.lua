@@ -120,6 +120,8 @@ chiLBSGroupsetSetAngleAggregationType(phys,gs,LBSGroupset.ANGLE_AGG_SINGLE)
 chiLBSSetMaxKIterations(phys,max_k_iters)
 chiLBSSetKTolerance(phys,k_tol)
 chiLBSSetUsePrecursors(phys,use_precursors)
+chiLBSSetProperty(phys,VERBOSE_INNER_ITERATIONS,false)
+chiLBSSetProperty(phys,VERBOSE_OUTER_ITERATIONS,false)
 
 --############################################### Initialize and Execute Solver
 chiKEigenvalueLBSInitialize(phys)

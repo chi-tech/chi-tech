@@ -60,19 +60,25 @@ void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
                                      groupset.angle_agg,
                                      *sweep_chunk);
 
+  q_moments_local.assign(q_moments_local.size(), 0.0);
+
   if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
   {
     ClassicRichardson(groupset, group_set_num, sweep_scheduler,
                       APPLY_MATERIAL_SOURCE |
                       APPLY_AGS_SCATTER_SOURCE |
                       APPLY_WGS_SCATTER_SOURCE |
-                      APPLY_FISSION_SOURCE);
+                      APPLY_AGS_FISSION_SOURCE |
+                      APPLY_WGS_FISSION_SOURCE,
+                      options.verbose_inner_iterations);
   }
   else if (groupset.iterative_method == IterativeMethod::GMRES)
   {
     GMRES(groupset, group_set_num, sweep_scheduler,
-          APPLY_WGS_SCATTER_SOURCE | APPLY_FISSION_SOURCE,   //lhs_scope
-          APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE); //rhs_scope
+          APPLY_WGS_SCATTER_SOURCE | APPLY_WGS_FISSION_SOURCE,  //lhs_scope
+          APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE |
+          APPLY_AGS_FISSION_SOURCE,
+          options.verbose_inner_iterations);  //rhs_scope
   }
 
   if (options.write_restart_data)

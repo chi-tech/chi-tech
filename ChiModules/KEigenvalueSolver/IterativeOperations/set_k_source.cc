@@ -24,15 +24,18 @@ using namespace LinearBoltzmann;
  *
  * */
 void KEigenvalue::Solver::
-  SetKSource(LBSGroupset& groupset, SourceFlags source_flags)
+SetKSource(LBSGroupset& groupset,
+           std::vector<double>& destination_q,
+           SourceFlags source_flags)
 {
-  chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_BEGIN);
+  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_mat_src     = (source_flags & APPLY_MATERIAL_SOURCE);
-  const bool apply_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
-  const bool apply_fission_src = (source_flags & APPLY_FISSION_SOURCE);
+  const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
+  const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCE);
+  const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCE);
+  const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCE);
 
-  // ----- Groupset group information
+  //============================== Get group setup
   int gs_i = groupset.groups[0].id;
   int gs_f = groupset.groups.back().id;
 
@@ -41,103 +44,156 @@ void KEigenvalue::Solver::
 
   const auto& m_to_ell_em_map = groupset.quadrature->GetMomentToHarmonicsIndexMap();
 
-  std::vector<double> default_zero_src(groups.size(),0.0);
+  std::vector<double> default_zero_src(groups.size(), 0.0);
 
-  // ----- Reset source moments
-  q_moments_local.assign(q_moments_local.size(),0.0);
-
-
-  // ----- Loop over local cells
+  //============================== Loop over local cells
   for (auto& cell : grid->local_cells)
   {
     auto& full_cell_view = cell_transport_views[cell.local_id];
 
-    // ----- Obtain cross-section and src
+    //==================== Obtain cross-section and src
     int cell_matid = cell.material_id;
     int xs_id = matid_to_xs_map[cell_matid];
 
-    if ( (xs_id<0) || (xs_id>=material_xs.size()) )
+    if ((xs_id < 0) || (xs_id >= material_xs.size()))
     {
       chi_log.Log(LOG_ALLERROR)
-      << "Cross-section lookup error\n";
+          << "Cross-section lookup error\n";
       exit(EXIT_FAILURE);
     }
 
     auto xs = material_xs[xs_id];
 
-    // ----- Loop over dofs
+    //============================== Loop over nodes
     int num_nodes = full_cell_view.NumNodes();
-    for (int i=0; i <num_nodes; i++)
+    for (int i = 0; i < num_nodes; ++i)
     {
-      // ----- Loop over moments
-      for (int m=0; m<num_moments; ++m)
+      //============================== Loop over moments
+      for (int m = 0; m < num_moments; ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        size_t  ir        = full_cell_view.MapDOF(i,m,0);
-        double* q_mom     = &q_moments_local[ir];
+        size_t ir = full_cell_view.MapDOF(i, m, 0);
 
-        double* phi_oldp  = &phi_old_local[ir];
-        double* phi_prevp = &phi_prev_local[ir];
-
-        // ----- Loop over groupset groups
-        for (int g=gs_i; g<=gs_f; g++)
+        //============================== Loop over groupset groups
+        for (size_t g = gs_i; g <= gs_f; ++g)
         {
-          // ----- Contribute scattering
-          double inscat_g = 0.0;
-          if ((ell < xs->transfer_matrices.size()) && (apply_scatter_src) )
+          //======================================== Apply scattering
+          double inscatter_g = 0.0;
+          if (ell < xs->transfer_matrices.size())
           {
-            size_t num_transfers = xs->transfer_matrices[ell].rowI_indices[g].size();
-            for (int t=0; t<num_transfers; t++)
+            //============================== Across-groupset
+            if (apply_ags_scatter_src)
             {
-              size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
-              double sigma_sm  = xs->transfer_matrices[ell].rowI_values[g][t];
-              inscat_g += sigma_sm * phi_oldp[gprime];
-            }
-          }
-          q_mom[g] += inscat_g;
+              size_t num_transfers =
+                  xs->transfer_matrices[ell].rowI_indices[g].size();
 
-          // ----- Contribute fission
-          double fission_g = 0.0;
-          if ( (ell == 0) and (apply_fission_src) )
-          {
-            if (xs->is_fissile)
-            {
-              for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
-                if (options.use_precursors)
-                  fission_g += xs->chi_prompt[g] *
-                               xs->nu_prompt_sigma_f[gprime] *
-                               phi_prevp[gprime] / k_eff;
-                else
-                  fission_g += xs->chi[g] * xs->nu_sigma_f[gprime] *
-                               phi_prevp[gprime] / k_eff;
-            }
-          }
-          q_mom[g] += fission_g;
-
-          // ----- Contribute precursors
-          double precursor_g = 0.0;
-          if ( (ell == 0) and (options.use_precursors) )
-          {
-            if ((apply_mat_src) and (xs->num_precursors > 0))
-            {
-              for (int j=0; j<num_precursors; ++j)
+              //============================== Loop over transfers
+              for (size_t t = 0; t < num_transfers; ++t)
               {
-                for (size_t gprime=first_grp; gprime<=last_grp; ++gprime)
+                size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
+
+                if ((gprime < gs_i) or (gprime > gs_f))
                 {
-                  precursor_g += xs->chi_delayed[g][j] * xs->precursor_yield[j] *
-                                 xs->nu_delayed_sigma_f[gprime] *
-                                 phi_prevp[gprime] / k_eff;
+                  double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
+                  inscatter_g += sigma_sm * phi_old_local[ir + gprime];
                 }
               }
             }
-          }
-          q_mom[g] += precursor_g;
+
+            //============================== Within-groupset
+            if (apply_wgs_scatter_src)
+            {
+              size_t num_transfers =
+                  xs->transfer_matrices[ell].rowI_indices[g].size();
+
+              //============================== Loop over transfers
+              for (size_t t = 0; t < num_transfers; ++t)
+              {
+                size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
+
+                if ((gprime >= gs_i) and (gprime <= gs_f))
+                {
+                  double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
+                  inscatter_g += sigma_sm * phi_old_local[ir + gprime];
+                }
+              }
+            }
+          }//if moment avail
+          destination_q[ir + g] += inscatter_g;
+
+          //======================================== Apply fission
+          if (xs->is_fissile and (ell == 0))
+          {
+            double fission_g = 0.0;
+            //============================== Across-groupset
+            if (apply_ags_fission_src)
+            {
+              //============================== Loop over groups
+              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
+              {
+                double nu_sig_f = (options.use_precursors) ?
+                                  xs->nu_prompt_sigma_f[gprime] :
+                                  xs->nu_sigma_f[gprime];
+
+                if ((gprime < gs_i) or (gprime > gs_f))
+                {
+                  fission_g += xs->chi[g] * nu_sig_f *
+                               phi_prev_local[ir + gprime] / k_eff;
+
+                  //============================== Delayed contributions
+                  if (options.use_precursors and xs->num_precursors > 0)
+                  {
+                    //============================== Loop over precursors
+                    for (size_t j = 0; j < xs->num_precursors; ++j)
+                    {
+                      fission_g += xs->chi_delayed[g][j] *
+                                   xs->precursor_yield[j] *
+                                   xs->nu_delayed_sigma_f[gprime] *
+                                   phi_prev_local[ir + gprime] / k_eff;
+                    }
+                  }//if use precursors and has precursors
+                }//if across groupset
+              }//for gprime
+            }//if across-groupset
+
+            //============================== Across-groupset
+            if (apply_wgs_fission_src)
+            {
+              //============================== Loop over groups
+              for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
+              {
+                double nu_sig_f = (options.use_precursors) ?
+                                  xs->nu_prompt_sigma_f[gprime] : xs->nu_sigma_f[gprime];
+
+                if ((gprime >= gs_i) and (gprime <= gs_f))
+                {
+                  fission_g += xs->chi[g] * nu_sig_f *
+                               phi_prev_local[ir + gprime] / k_eff;
+
+                  //============================== Delayed contributions
+                  if (options.use_precursors and xs->num_precursors > 0)
+                  {
+                    //============================== Loop over precursors
+                    for (size_t j = 0; j < xs->num_precursors; ++j)
+                    {
+                      fission_g += xs->chi_delayed[g][j] *
+                                   xs->precursor_yield[j] *
+                                   xs->nu_delayed_sigma_f[gprime] *
+                                   phi_prev_local[ir + gprime] / k_eff;
+                    }
+                  }//if use precursors and has precursors
+                }//if across groupset
+              }//for gprime
+            }//if within-groupset
+            destination_q[ir + g] += fission_g;
+
+          }//if fissile and ell == 0
 
         }//for g
       }//for m
     }//for i
   }//for cell
 
-  chi_log.LogEvent(source_event_tag,ChiLog::EventType::EVENT_END);
+  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
 }

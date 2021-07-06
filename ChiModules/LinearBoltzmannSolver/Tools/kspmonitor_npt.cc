@@ -59,8 +59,9 @@ PetscErrorCode LinearBoltzmann::
     iter_info << " CONVERGED\n";
   }
 
+  if (context->solver.options.verbose_inner_iterations)
+    chi_log.Log(LOG_0) << iter_info.str() << std::endl;
 
-  chi_log.Log(LOG_0) << iter_info.str() << std::endl;
   const double SIXTY_SECOND_INTERVAL = 60000.0; //time in milliseconds
   if (context->groupset.iterative_method == IterativeMethod::GMRES or
       context->groupset.iterative_method == IterativeMethod::GMRES_CYCLES)

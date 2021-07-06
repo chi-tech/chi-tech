@@ -3,8 +3,8 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI&      chi_mpi;
-extern ChiLog&     chi_log;
+extern ChiMPI& chi_mpi;
+extern ChiLog& chi_log;
 
 #include <iomanip>
 
@@ -15,24 +15,16 @@ using namespace LinearBoltzmann;
 void KEigenvalue::Solver::ExecuteKSolver()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  int gs = 0;
 
-  chi_log.Log(LOG_0)
-    << "\n********* Initializing Groupset " << gs << std::endl;
+  LBSGroupset& groupset = group_sets[0];
 
-  group_sets[gs].BuildDiscMomOperator(options.scattering_order,
-                                      options.geometry_type);
-  group_sets[gs].BuildMomDiscOperator(options.scattering_order,
-                                      options.geometry_type);
-  group_sets[gs].BuildSubsets();
+  ComputeSweepOrderings(groupset);
+  InitFluxDataStructures(groupset);
 
-  ComputeSweepOrderings(group_sets[gs]);
-  InitFluxDataStructures(group_sets[gs]);
+  PowerIteration();
 
-  PowerIteration(group_sets[0]);
+  ResetSweepOrderings(groupset);
 
-  ResetSweepOrderings(group_sets[gs]);
- 
   chi_log.Log(LOG_0) << "KEigenvalueSolver execution completed\n";
 
   MPI_Barrier(MPI_COMM_WORLD);

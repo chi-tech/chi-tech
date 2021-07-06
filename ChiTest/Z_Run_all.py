@@ -36,7 +36,7 @@ tacc = False
 tamu = False
 if "tacc.utexas.edu" in hostname:
     tacc = True
-elif "ne.tamu.edu" in hostname:
+elif "ne.tamu.edu" in hostname and "orchard" in hostname:
     tamu = True
 
 def format3(number):
@@ -277,11 +277,18 @@ run_test(
                               ["[0]  Max-value2=", 1.42458e-03, 1.0e-4]])
 
 run_test(
-    file_name="Transport3D_1Poly",
+    file_name="Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.27450e-01, 1.0e-4],
                               ["[0]  Max-value2=", 3.76339e-04, 1.0e-4]])
+
+run_test(
+    file_name="Transport3D_1b_Ortho",
+    comment="3D LinearBSolver Test - PWLD Reflecting BC",
+    num_procs=4,
+    search_strings_vals_tols=[["[0]  Max-value1=", 5.28310e-01, 1.0e-4],
+                              ["[0]  Max-value2=", 8.04576e-04, 1.0e-4]])
 
 run_test(
     file_name="Transport3D_1Poly_parmetis",
