@@ -171,7 +171,7 @@ SetSource(LBSGroupset& groupset,
             //============================== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
-              if ((gprime >= gs_i) or (gprime <= gs_f))
+              if ((gprime >= gs_i) and (gprime <= gs_f))
               {
                 // without delayed neutrons
                 if (not options.use_precursors)
@@ -179,7 +179,7 @@ SetSource(LBSGroupset& groupset,
                                  xs->nu_sigma_f[gprime] *
                                  phi_old_local[ir + gprime];
 
-                  // with delayed neutrons
+                // with delayed neutrons
                 else
                 {
                   //============================== Prompt fission
