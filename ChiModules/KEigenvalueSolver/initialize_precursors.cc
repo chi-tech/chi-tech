@@ -43,7 +43,6 @@ void KEigenvalue::Solver::InitializePrecursors()
       {
         size_t ir = full_cell_view.MapDOF(i, 0, 0);
         size_t jr = discretization->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
-        double* Nj_newp = &precursor_new_local[jr];
 
         // contribute if precursors live on this material
         if (xs->num_precursors > 0)
@@ -51,7 +50,6 @@ void KEigenvalue::Solver::InitializePrecursors()
           //======================================== Loop over precursors
           for (size_t j = 0; j < xs->num_precursors; ++j)
           {
-
             //======================================== Loop over groups
             for (size_t g = 0; g < groups.size(); ++g)
               precursor_new_local[jr + j] +=
