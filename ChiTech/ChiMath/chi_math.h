@@ -69,6 +69,9 @@ namespace chi_math
   class CDFSampler;
   int SampleCDF(double x, std::vector<double> cdf_bin);
 
+  //01 Utility
+  double Factorial(const int x);
+
   //02 Vector operations
   void   PrintVector(const VecDbl& x);
   void   Scale(VecDbl& x, const double& val);
