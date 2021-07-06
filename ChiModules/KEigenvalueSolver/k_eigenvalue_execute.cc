@@ -12,7 +12,7 @@ extern ChiLog& chi_log;
 using namespace LinearBoltzmann;
 
 //###################################################################
-void KEigenvalue::Solver::ExecuteKSolver()
+void KEigenvalue::Solver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
 

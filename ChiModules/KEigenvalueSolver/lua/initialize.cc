@@ -40,7 +40,7 @@ int chiKEigenvalueLBSInitialize(lua_State* L)
     exit(EXIT_FAILURE);
   }
 
-  solver->InitializeKSolver();
+  solver->Initialize();
 
   return 1;
 }

@@ -5,13 +5,12 @@
 
 extern ChiLog& chi_log;
 
-
 using namespace LinearBoltzmann;
 
 //###################################################################
-void KEigenvalue::Solver::InitializeKSolver()
+void KEigenvalue::Solver::Initialize()
 {
-  Initialize(); // LinearBoltzmann::Solver initialize
+  LinearBoltzmann::Solver::Initialize();
 
   //======================================== Initialize precursors
   // clear precursor properties

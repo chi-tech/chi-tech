@@ -40,7 +40,7 @@ int chiKEigenvalueLBSExecute(lua_State* L)
     exit(EXIT_FAILURE);
   }
 
-  solver->ExecuteKSolver();
+  solver->Execute();
 
   return 1;
 }

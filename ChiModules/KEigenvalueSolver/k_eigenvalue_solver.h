@@ -12,9 +12,6 @@ namespace LinearBoltzmann::KEigenvalue
 /**A k-eigenvalue neutron transport solver.*/
 class Solver : public LinearBoltzmann::Solver
 {
-private:
-  size_t source_event_tag;
-
 public:
   double k_eff = 1.0;
 
@@ -29,15 +26,12 @@ public:
   void PowerIteration();
 
   // Iterative operations
-  void SetKSource(LBSGroupset& groupset,
-                  std::vector<double>& destination_q,
-                  SourceFlags source_flags);
   double ComputeProduction();
   void InitializePrecursors();
 
   // Execute method
-  void InitializeKSolver();
-  void ExecuteKSolver();
+  void Initialize() override;
+  void Execute() override;
 };
 
 }
