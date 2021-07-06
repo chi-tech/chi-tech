@@ -77,9 +77,11 @@ public:
   bool                                         psi_to_be_saved=false;
   size_t                                       num_psi_unknowns_local=0;
   std::vector<double>&                         psi_new_local;
+  std::vector<double>&                         psi_prev_local;
 
   //npt_groupset.cc
-       LBSGroupset(std::vector<double>& in_psi_new_local);
+       LBSGroupset(std::vector<double>& in_psi_new_local,
+                   std::vector<double>& in_psi_prev_local);
   void BuildDiscMomOperator(unsigned int scattering_order,
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildMomDiscOperator(unsigned int scattering_order,
