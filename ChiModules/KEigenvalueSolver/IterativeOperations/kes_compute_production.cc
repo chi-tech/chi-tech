@@ -15,7 +15,7 @@ using namespace LinearBoltzmann;
 double KEigenvalue::Solver::ComputeFissionProduction()
 {
   typedef SpatialDiscretization_FE  FE;
-  const auto grid_fe_view = std::static_pointer_cast<FE>(discretization);
+  const auto grid_fe_view = std::dynamic_pointer_cast<FE>(discretization);
 
   int first_grp = groups.front().id;
   int last_grp = groups.back().id;
