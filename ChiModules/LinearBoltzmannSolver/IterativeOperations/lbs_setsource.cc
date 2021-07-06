@@ -11,7 +11,7 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
  *
- * \param groupset_num Identifies the groupset under consideration.
+ * \param groupset The groupset the under consideration.
  * \param destination_q A vector to contribute the source to.
  * \param source_flags Flags for adding specific terms into the
  *        destination vector. Available flags are for applying
