@@ -12,7 +12,7 @@ using namespace LinearBoltzmann;
 
 //###################################################################
 /**Compute the total fission production in the problem.*/
-double KEigenvalue::Solver::ComputeProduction()
+double KEigenvalue::Solver::ComputeFissionProduction()
 {
   typedef SpatialDiscretization_FE  FE;
   const auto grid_fe_view = std::static_pointer_cast<FE>(discretization);

@@ -98,7 +98,7 @@ void KEigenvalue::Solver::PowerIteration()
     }//for groupset
 
     //======================================== Recompute k-eigenvalue
-    double F_new = ComputeProduction();
+    double F_new = ComputeFissionProduction();
     k_eff = F_new / F_prev * k_eff;
     double reactivity = (k_eff - 1.0) / k_eff;
 
@@ -130,7 +130,7 @@ void KEigenvalue::Solver::PowerIteration()
   }//for k iterations
 
   //================================================== Initialize the precursors
-  InitializePrecursors();
+  ComputePrecursors();
 
   //================================================== Print summary
   chi_log.Log(LOG_0)

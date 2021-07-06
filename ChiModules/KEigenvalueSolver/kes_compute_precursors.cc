@@ -13,7 +13,7 @@ using namespace LinearBoltzmann;
 
 //###################################################################
 /**Computes the point wise delayed neutron precursor concentrations.*/
-void KEigenvalue::Solver::InitializePrecursors()
+void KEigenvalue::Solver::ComputePrecursors()
 {
   if (options.use_precursors)
   {

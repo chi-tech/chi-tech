@@ -22,16 +22,15 @@ public:
 
   std::vector<double> precursor_new_local;
 
+  void Initialize() override;
+  void Execute() override;
+  virtual void ComputePrecursors();
+
   // IterativeMethods
   void PowerIteration();
 
   // Iterative operations
-  double ComputeProduction();
-  void InitializePrecursors();
-
-  // Execute method
-  void Initialize() override;
-  void Execute() override;
+  double ComputeFissionProduction();
 };
 
 }
