@@ -1,4 +1,4 @@
-#include "k_eigenvalue_solver.h"
+#include "kes_k_eigenvalue_solver.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>

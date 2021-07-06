@@ -1,4 +1,4 @@
-#include "../k_eigenvalue_solver.h"
+#include "../kes_k_eigenvalue_solver.h"
 
 #include "ChiLua/chi_lua.h"
 #include "ChiPhysics/chi_physics.h"

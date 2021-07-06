@@ -1,4 +1,4 @@
-#include "k_eigenvalue_solver.h"
+#include "kes_k_eigenvalue_solver.h"
 
 #include <ChiMesh/Cell/cell.h>
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"

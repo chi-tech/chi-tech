@@ -1,4 +1,4 @@
-#include "../k_eigenvalue_solver.h"
+#include "../kes_k_eigenvalue_solver.h"
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "chi_log.h"
