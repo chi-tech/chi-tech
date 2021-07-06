@@ -55,8 +55,8 @@ void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset& groupset)
     chi_log.Log(LOG_0)
       << "\n" << std::setprecision(3)
       << "           Total application memory (max): "
-      << total_app_memory/1000.0 << " GB\n"
+      << total_app_memory/1024.0 << " GB\n"
       << "           Maximum process memory        : "
-      << max_proc_memory/1000.0 << " GB\n\n";
+      << max_proc_memory/1024.0 << " GB\n\n";
 
 }
