@@ -166,9 +166,14 @@ void chi_physics::TransportCrossSections::
     num_precursors_J += xs->num_precursors;
   }//for cross-section
 
-  //this should be unnecessary with the added condition check later
-  if (Nf_total < 1.0e-28)
-    Nf_total = 1.0; //Avoids divide by 0 when non-fissile
+  // Check that the fissile and precursor densities are greater than
+  // machine precision * the total density. If this condition is not met,
+  // the material is assumed to be either not fissile or have zero precursors.
+  double eps = std::numeric_limits<double>::epsilon(); //machine precision
+  if (Nf_total < eps * N_total)
+    this->is_fissile = false;
+  if (Np_total < eps * N_total)
+    this->num_precursors = 0;
 
   //======================================== Combine 1D cross-sections
   this->num_groups = num_grps_G;
