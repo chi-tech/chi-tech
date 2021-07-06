@@ -95,7 +95,7 @@ public:
   std::vector<double> delta_phi_local;
 
   std::vector<std::vector<double>> psi_new_local;
-  std::vector<std::vector<double>> psi_prev_local
+  std::vector<std::vector<double>> psi_prev_local;
 
 
  public:
