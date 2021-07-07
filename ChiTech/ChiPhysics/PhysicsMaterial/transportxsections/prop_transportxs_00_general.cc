@@ -162,7 +162,6 @@ void chi_physics::TransportCrossSections::
           << "neutron precursors.";
       exit(EXIT_FAILURE);
     }
-    chi_log.Log(LOG_0) << "NUMBER OF PRECURSORS" << xs->num_precursors;
     num_precursors_J += xs->num_precursors;
   }//for cross-section
 
