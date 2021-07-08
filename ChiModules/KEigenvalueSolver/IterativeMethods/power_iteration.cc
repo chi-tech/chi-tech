@@ -56,7 +56,7 @@ void KEigenvalue::Solver::PowerIteration()
   double k_eff_prev = 1.0;
   int nit = 0;      //number of iterations
   bool converged = false;
-  while (nit < options.max_iterations)
+  while (nit < max_iterations)
   {
 
     //============================== Clear source moments
@@ -94,7 +94,7 @@ void KEigenvalue::Solver::PowerIteration()
     F_prev = F_new;
     nit += 1;
 
-    if (k_eff_change < std::max(options.tolerance, 1.0e-12))
+    if (k_eff_change < std::max(tolerance, 1.0e-12))
       converged = true;
 
     //============================== Print iteration summary

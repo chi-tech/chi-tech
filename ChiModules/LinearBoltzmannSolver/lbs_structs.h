@@ -39,9 +39,6 @@ struct Options
   std::string write_restart_file_base   = std::string("restart");
   double write_restart_interval = 30.0;
 
-  int max_iterations = 1000;
-  double tolerance    = 1e-8;
-
   bool use_precursors = false;
 
   bool save_angular_flux = false;
