@@ -131,7 +131,7 @@ SetSource(LBSGroupset& groupset,
 
 
           double infission_g = 0.0;
-          const bool fission_avail = ((xs->is_fissile) and (ell == 0));
+          const bool fission_avail = (xs->is_fissile and ell == 0);
 
           //=================================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
@@ -140,9 +140,29 @@ SetSource(LBSGroupset& groupset,
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime < gs_i) or (gprime > gs_f))
-                infission_g += xs->chi[g] *
-                               xs->nu_sigma_f[gprime] *
-                               phi_old_local[ir + gprime];
+              {
+                //without delayed neutron precursors
+                if (not options.use_precursors)
+                  infission_g += xs->chi[g] *
+                                 xs->nu_sigma_f[gprime] *
+                                 phi_old_local[ir + gprime];
+
+                //with delayed neutron precursors
+                else
+                {
+                  //==================== Prompt fission
+                  infission_g += xs->chi_prompt[g] *
+                                 xs->nu_prompt_sigma_f[gprime] *
+                                 phi_old_local[ir + gprime];
+
+                  //==================== Delayed fission
+                  for (size_t j = 0; j < xs->num_precursors; ++j)
+                    infission_g += xs->chi_delayed[g][j] *
+                                   xs->precursor_yield[j] *
+                                   xs->nu_delayed_sigma_f[gprime] *
+                                   phi_old_local[ir + gprime];
+                }
+              }
             }//for gprime
           }//if zeroth moment
 
@@ -152,10 +172,30 @@ SetSource(LBSGroupset& groupset,
             //============================== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
-              if ((gprime >= gs_i) or (gprime <= gs_f))
-                infission_g += xs->chi[g] *
-                               xs->nu_sigma_f[gprime] *
-                               phi_old_local[ir + gprime];
+              if ((gprime >= gs_i) and (gprime <= gs_f))
+              {
+                //without delayed neutron precursors
+                if (not options.use_precursors)
+                  infission_g += xs->chi[g] *
+                                 xs->nu_sigma_f[gprime] *
+                                 phi_old_local[ir + gprime];
+
+                  //with delayed neutron precursors
+                else
+                {
+                  //==================== Prompt fission
+                  infission_g += xs->chi_prompt[g] *
+                                 xs->nu_prompt_sigma_f[gprime] *
+                                 phi_old_local[ir + gprime];
+
+                  //==================== Delayed fission
+                  for (size_t j = 0; j < xs->num_precursors; ++j)
+                    infission_g += xs->chi_delayed[g][j] *
+                                   xs->precursor_yield[j] *
+                                   xs->nu_delayed_sigma_f[gprime] *
+                                   phi_old_local[ir + gprime];
+                }
+              }
             }
           }
           destination_q[ir + g] += infission_g;
