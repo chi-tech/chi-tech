@@ -25,9 +25,10 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 /**Initializes angle aggregation for a groupset.*/
 void LinearBoltzmann::Solver::InitAngleAggPolar(LBSGroupset& groupset)
 {
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Initializing angle aggregation: Polar";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Initializing angle aggregation: Polar";
 
   if (groupset.quadrature->type !=
     chi_math::AngularQuadratureType::ProductQuadrature)

@@ -25,9 +25,10 @@ extern ChiConsole&  chi_console;
 /**Initializes the sweep ordering for the given groupset.*/
 void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
 {
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Computing Sweep ordering.\n";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Computing Sweep ordering.\n";
 
   //============================================= Clear sweep ordering
   groupset.sweep_orderings.clear();
@@ -66,21 +67,22 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
                              " Invalid angle aggregation type.");
   }//switch on method
 
-
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Done computing sweep orderings.           Process memory = "
-    << std::setprecision(3)
-    << chi_console.GetMemoryUsageInMB() << " MB";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Done computing sweep orderings.           Process memory = "
+      << std::setprecision(3)
+      << chi_console.GetMemoryUsageInMB() << " MB";
 
 }
 
 
 void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const
 {
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Computing Sweep ordering - Angle aggregation: Single";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Computing Sweep ordering - Angle aggregation: Single";
 
   for (const auto& omega : groupset.quadrature->omegas)
   {
@@ -96,9 +98,10 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& g
 
 void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const
 {
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Computing Sweep ordering - Angle aggregation: Polar";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Computing Sweep ordering - Angle aggregation: Polar";
 
   const auto mesher = chi_mesh::GetCurrentHandler()->volume_mesher;
 
@@ -119,7 +122,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& gr
       {
         if (num_azi != 1)
         {
-          chi_log.Log(LOG_0)
+          chi_log.Log(LOG_ALLERROR)
             << "Incompatible number of azimuthal angles in quadrature set "
             << "for a 1D simulation.";
           std::exit(EXIT_FAILURE);
@@ -129,7 +132,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& gr
       {
         if (num_azi < 4)
         {
-          chi_log.Log(LOG_0)
+          chi_log.Log(LOG_ALLERROR)
             << "Incompatible number of azimuthal angles in quadrature set "
             << "for a 2D or 3D simulation.";
           std::exit(EXIT_FAILURE);
@@ -138,7 +141,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& gr
 
       if ((num_pol < 2) || (num_pol % 2 != 0))
       {
-        chi_log.Log(LOG_0)
+        chi_log.Log(LOG_ALLERROR)
           << "Incompatible number of polar angles in quadrature set.";
         std::exit(EXIT_FAILURE);
       }
@@ -194,9 +197,10 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& gr
 
 void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const
 {
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
-    << " Computing Sweep ordering - Angle aggregation: Azimuthal";
+  if (options.verbose_inner_iterations)
+    chi_log.Log(LOG_0)
+      << chi_program_timer.GetTimeString()
+      << " Computing Sweep ordering - Angle aggregation: Azimuthal";
 
   if (options.geometry_type == GeometryType::ONED_SPHERICAL ||
       options.geometry_type == GeometryType::TWOD_CYLINDRICAL)
