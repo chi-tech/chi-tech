@@ -11,12 +11,12 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
  *
- * \param group_set_num Identifies the groupset under consideration.
- * \param apply_mat_src Flag indicating whether the material source needs
- *        to be applied to the routine. This is useful for GMRES
- *        since the material source only features during the computing b.
- *        On this note we also need to treat inscattering this way.
- * \param suppress_phi_old Flag indicating whether to suppress phi_old.
+ * \param groupset The groupset the under consideration.
+ * \param destination_q A vector to contribute the source to.
+ * \param source_flags Flags for adding specific terms into the
+ *        destination vector. Available flags are for applying
+ *        the material source, across/within-group scattering,
+ *        and across/within-groups fission.
  *
  * */
 void LinearBoltzmann::Solver::
