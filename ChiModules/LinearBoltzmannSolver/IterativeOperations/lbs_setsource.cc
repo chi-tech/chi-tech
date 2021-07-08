@@ -33,11 +33,11 @@ SetSource(LBSGroupset& groupset,
   const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCE);
 
   //======================================== Get group setup
-  int gs_i = groupset.groups[0].id;
-  int gs_f = groupset.groups.back().id;
+  auto gs_i = static_cast<size_t>(groupset.groups[0].id);
+  auto gs_f = static_cast<size_t>(groupset.groups.back().id);
 
-  int first_grp = groups.front().id;
-  int last_grp = groups.back().id;
+  auto first_grp = static_cast<size_t>(groups.front().id);
+  auto last_grp = static_cast<size_t>(groups.back().id);
 
   const auto& m_to_ell_em_map =
       groupset.quadrature->GetMomentToHarmonicsIndexMap();
@@ -82,7 +82,7 @@ SetSource(LBSGroupset& groupset,
         double* phi_oldp = &phi_old_local[ir];
 
         //============================== Loop over groupset groups
-        for (int g = gs_i; g <= gs_f; ++g)
+        for (size_t g = gs_i; g <= gs_f; ++g)
         {
           //======================================== Apply material source
           if (apply_mat_src && (ell == 0))
