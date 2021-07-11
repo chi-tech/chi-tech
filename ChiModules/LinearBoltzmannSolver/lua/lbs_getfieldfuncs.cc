@@ -29,7 +29,7 @@ int chiLBSGetFieldFunctionList(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGetFieldFunctionList: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
@@ -90,7 +90,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSGetScalarFieldFunctionList: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
