@@ -25,7 +25,7 @@ int chiLBSInitialize(lua_State *L)
 
     solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
 
-    if (not psolver)
+    if (not solver)
     {
       chi_log.Log(LOG_ALLERROR) << "chiLBSInitialize: Incorrect solver-type."
                                    " Cannot cast to LinearBoltzmann::Solver\n";
