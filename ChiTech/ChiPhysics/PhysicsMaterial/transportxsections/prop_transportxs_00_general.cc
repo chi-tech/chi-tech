@@ -169,9 +169,9 @@ void chi_physics::TransportCrossSections::
   // machine precision * the total density. If this condition is not met,
   // the material is assumed to be either not fissile or have zero precursors.
   double eps = std::numeric_limits<double>::epsilon(); //machine precision
-  if (Nf_total < eps * N_total)
+  if (Nf_total < eps)
     this->is_fissile = false;
-  if (Np_total < eps * N_total)
+  if (Np_total < eps)
     this->num_precursors = 0;
 
   //======================================== Combine 1D cross-sections
