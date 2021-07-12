@@ -64,7 +64,7 @@ public:
   int num_moments;
 
   std::vector<LBSGroup> groups;
-  std::vector<LBSGroupset> group_sets;
+  std::vector<LBSGroupset> groupsets;
   std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> material_xs;
   std::vector<std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> material_srcs;
   std::vector<int> matid_to_xs_map;

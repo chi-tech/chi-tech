@@ -20,10 +20,10 @@ void LinearBoltzmann::Solver::PrintSimHeader()
     chi_log.Log(LOG_0) << "Number of Groups    : "
                        << groups.size() << std::endl;
     chi_log.Log(LOG_0) << "Number of Group sets: "
-                       << group_sets.size() << std::endl;
+                       << groupsets.size() << std::endl;
 
     //================================================== Output Groupsets
-    for (int gs=0; gs<group_sets.size(); gs++)
+    for (int gs=0; gs < groupsets.size(); gs++)
     {
       char buf_pol[20];
       std::string outstr;
@@ -33,7 +33,7 @@ void LinearBoltzmann::Solver::PrintSimHeader()
       chi_log.Log(LOG_0) << "Groups: ";
       outstr = std::string("");
       counter = 0;
-      for (auto group : group_sets[gs].groups)
+      for (auto group : groupsets[gs].groups)
       {
         snprintf(buf_pol,20,"%5d ",group.id);
         outstr += std::string(buf_pol);
@@ -49,7 +49,7 @@ void LinearBoltzmann::Solver::PrintSimHeader()
       chi_log.Log(LOG_0) << outstr << "\n\n";
 
 
-      auto quad = group_sets[gs].quadrature;
+      auto quad = groupsets[gs].quadrature;
 
       if (quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
       {

@@ -16,7 +16,7 @@ void KEigenvalue::Solver::ExecuteKSolver()
 {
   MPI_Barrier(MPI_COMM_WORLD);
 
-  LBSGroupset& groupset = group_sets[0];
+  LBSGroupset& groupset = groupsets[0];
 
   ComputeSweepOrderings(groupset);
   InitFluxDataStructures(groupset);

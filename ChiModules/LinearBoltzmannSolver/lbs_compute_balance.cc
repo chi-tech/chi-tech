@@ -35,7 +35,7 @@ void LinearBoltzmann::Solver::ComputeBalance()
   // because it allows a lot of flexibility.
   auto mat_src = phi_old_local;
   mat_src.assign(mat_src.size(),0.0);
-  for (auto& groupset : group_sets)
+  for (auto& groupset : groupsets)
   {
     q_moments_local.assign(q_moments_local.size(), 0.0);
     SetSource(groupset, q_moments_local,
@@ -75,7 +75,7 @@ void LinearBoltzmann::Solver::ComputeBalance()
     {
       const auto& face  = cell.faces[f];
 
-      for (const auto& groupset : group_sets)
+      for (const auto& groupset : groupsets)
       {
         for (int n = 0; n < groupset.quadrature->omegas.size(); ++n)
         {

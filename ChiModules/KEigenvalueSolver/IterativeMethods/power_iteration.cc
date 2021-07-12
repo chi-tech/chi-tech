@@ -34,7 +34,7 @@ void KEigenvalue::Solver::PowerIteration()
       << "\n\n********** Solving k-eigenvalue problem with "
       << "the Power Method.\n\n";
 
-  LBSGroupset& groupset = group_sets[0];
+  LBSGroupset& groupset = groupsets[0];
 
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 

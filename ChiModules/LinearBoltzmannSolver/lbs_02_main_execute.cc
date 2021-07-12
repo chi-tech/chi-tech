@@ -19,7 +19,7 @@ extern ChiConsole&  chi_console;
 void LinearBoltzmann::Solver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  for (auto& groupset : group_sets)
+  for (auto& groupset : groupsets)
   {
     chi_log.Log(LOG_0)
       << "\n********* Initializing Groupset " << groupset.id
