@@ -37,6 +37,7 @@ class LBSGroupset
 protected:
   typedef std::shared_ptr<chi_mesh::sweep_management::SPDS> SPDS_ptr;
 public:
+  int                                          id;
   std::vector<LBSGroup>                        groups;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
@@ -78,8 +79,9 @@ public:
   size_t                                       num_psi_unknowns_local=0;
   std::vector<double>                          psi_new_local;
 
-  //npt_groupset.cc
-       LBSGroupset();
+  //lbs_groupset.cc
+  explicit LBSGroupset(int in_id);
+  LBSGroupset() : LBSGroupset(-1) {};
   void BuildDiscMomOperator(unsigned int scattering_order,
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildMomDiscOperator(unsigned int scattering_order,
