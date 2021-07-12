@@ -116,8 +116,7 @@ public:
   void InitializeGroupsets();
   //02
   void Execute() override;
-  void SolveGroupset(LBSGroupset& groupset,
-                     int group_set_num);
+  void SolveGroupset(LBSGroupset& groupset);
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
@@ -163,12 +162,10 @@ public:
   double ComputePiecewiseChange(LBSGroupset& groupset);
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   bool ClassicRichardson(LBSGroupset& groupset,
-                         int group_set_num,
                          MainSweepScheduler& sweep_scheduler,
                          SourceFlags source_flags,
                          bool log_info = true);
   bool GMRES(LBSGroupset& groupset,
-             int group_set_num,
              MainSweepScheduler& sweep_scheduler,
              SourceFlags lhs_src_scope,
              SourceFlags rhs_src_scope,

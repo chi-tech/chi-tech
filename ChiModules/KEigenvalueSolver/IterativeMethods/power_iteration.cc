@@ -71,14 +71,16 @@ void KEigenvalue::Solver::PowerIteration()
     //                               a fixed fission source
     if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
     {
-      ClassicRichardson(groupset, 0, sweep_scheduler,
-                        APPLY_WGS_SCATTER_SOURCE | APPLY_AGS_SCATTER_SOURCE,
+      ClassicRichardson(groupset, sweep_scheduler,
+                        APPLY_WGS_SCATTER_SOURCE |
+                        APPLY_AGS_SCATTER_SOURCE,
                         options.verbose_inner_iterations);
     }
     else if (groupset.iterative_method == IterativeMethod::GMRES)
     {
-      GMRES(groupset, 0, sweep_scheduler,
-            APPLY_WGS_SCATTER_SOURCE, APPLY_AGS_SCATTER_SOURCE,
+      GMRES(groupset, sweep_scheduler,
+            APPLY_WGS_SCATTER_SOURCE,           //lhs_scope
+            APPLY_AGS_SCATTER_SOURCE,           //rhs_scope
             options.verbose_inner_iterations);
     }
 
