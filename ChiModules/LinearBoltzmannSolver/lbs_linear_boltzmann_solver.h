@@ -93,6 +93,7 @@ public:
   std::vector<double> q_moments_local;
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
+  std::vector<std::vector<double>> psi_new_local;
 
  public:
   //00
