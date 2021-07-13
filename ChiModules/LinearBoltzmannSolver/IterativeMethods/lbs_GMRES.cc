@@ -181,7 +181,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   q_moments_local = init_q_moments_local;
   SetSource(groupset, q_moments_local, lhs_src_scope | rhs_src_scope);
 
-  phi_new_local.assign(phi_new_local.size(),0.0);
+  sweep_chunk.ZeroDestinationPhi();
   sweep_scheduler.Sweep();
 
   ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);

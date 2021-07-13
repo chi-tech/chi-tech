@@ -33,6 +33,8 @@ ClassicRichardson(LBSGroupset& groupset,
       << groupset.groups.back().id << "\n\n";
   }
 
+  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+
   std::vector<double> init_q_moments_local = q_moments_local;
 
   //================================================== Sweepchunk settings

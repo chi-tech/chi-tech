@@ -40,6 +40,12 @@ public:
     x = (&destination_phi);
   }
 
+  /**Sets all elements of the output vector to zero.*/
+  void ZeroDestinationPhi()
+  {
+    (*x).assign((*x).size(), 0.0);
+  }
+
   /**Returns a reference to the output vector.*/
   std::vector<double>& GetDestinationPhi()
   {
