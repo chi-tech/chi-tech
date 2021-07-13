@@ -30,7 +30,7 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   solver.SetSource(groupset, solver.q_moments_local, lhs_source_scope);
 
   //============================================= Sweeping the new source
-  groupset.ZeroAngularFluxDataStructures();
+  solver.ZeroAngularFluxDataStructures(groupset);
   solver.phi_new_local.assign(solver.phi_new_local.size(),0.0);
   sweepScheduler.Sweep();
 

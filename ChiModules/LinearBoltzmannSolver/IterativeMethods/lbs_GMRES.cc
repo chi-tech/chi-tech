@@ -111,7 +111,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
   sweep_chunk.SetDestinationPhi(phi_new_local);
   groupset.angle_agg.ZeroIncomingDelayedPsi();
-  groupset.ZeroAngularFluxDataStructures();
+  ZeroAngularFluxDataStructures(groupset);
 
   //Sweep
   phi_new_local.assign(phi_new_local.size(),0.0);

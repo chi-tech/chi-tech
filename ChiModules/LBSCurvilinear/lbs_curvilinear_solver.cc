@@ -354,6 +354,7 @@ LBSCurvilinear::Solver::SetSweepChunk(LBSGroupset& groupset)
                                      *pwld_sdm_secondary,
                                      cell_transport_views,
                                      phi_new_local,
+                                     psi_new_local[groupset.id],
                                      q_moments_local,
                                      groupset,
                                      material_xs,

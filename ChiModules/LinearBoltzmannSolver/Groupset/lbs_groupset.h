@@ -75,9 +75,7 @@ public:
   bool                                         log_sweep_events;
 
   chi_math::UnknownManager                     psi_uk_man;
-  bool                                         psi_to_be_saved=false;
   size_t                                       num_psi_unknowns_local=0;
-  std::vector<double>                          psi_new_local;
 
   //lbs_groupset.cc
   explicit LBSGroupset(int in_id);
@@ -87,12 +85,6 @@ public:
   void BuildMomDiscOperator(unsigned int scattering_order,
                             LinearBoltzmann::GeometryType geometry_type);
   void BuildSubsets();
-  void ZeroAngularFluxDataStructures()
-  {
-    if (psi_to_be_saved)
-      psi_new_local.assign(num_psi_unknowns_local,0.0);
-    angle_agg.ZeroOutgoingDelayedPsi();
-  }
 public:
   void PrintSweepInfoFile(size_t ev_tag,const std::string& file_name);
 };

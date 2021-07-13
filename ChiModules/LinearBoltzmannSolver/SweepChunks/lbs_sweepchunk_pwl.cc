@@ -16,6 +16,7 @@ LinearBoltzmann::SweepChunkPWL::
                 SpatialDiscretization_PWLD& discretization,
                 std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
+                std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
@@ -25,12 +26,14 @@ LinearBoltzmann::SweepChunkPWL::
                       grid_view(std::move(grid_ptr)),
                       grid_fe_view(discretization),
                       grid_transport_view(cell_transport_views),
+                      psi_new_local(destination_psi),
                       q_moments(source_moments),
                       groupset(in_groupset),
                       xsections(in_xsections),
                       num_moms(in_num_moms),
                       num_grps(in_groupset.groups.size()),
                       max_num_cell_dofs(in_max_num_cell_dofs),
+                      save_angular_flux(!psi_new_local.empty()),
                       a_and_b_initialized(false)
 {}
 
@@ -234,15 +237,14 @@ void LinearBoltzmann::SweepChunkPWL::
         callback(this, angle_set);
 
       // ============================= Save angular fluxes if needed
-      if (groupset.psi_to_be_saved)
+      if (save_angular_flux)
       {
-        auto& psi = groupset.psi_new_local;
-        auto& psi_uk_man = groupset.psi_uk_man;
+        const auto& psi_uk_man = groupset.psi_uk_man;
         for (int i = 0; i < num_nodes; ++i)
         {
           int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            psi[ir + gsg] = b[gsg][i];
+            psi_new_local[ir + gsg] = b[gsg][i];
         }//for i
       }//if save psi
 

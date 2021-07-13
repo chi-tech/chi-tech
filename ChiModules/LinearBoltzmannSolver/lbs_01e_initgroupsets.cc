@@ -21,9 +21,7 @@ void LinearBoltzmann::Solver::InitializeGroupsets()
     if (options.save_angular_flux)
     {
       size_t num_ang_unknowns = discretization->GetNumLocalDOFs(grpset_psi_uk_man);
-      groupset.psi_to_be_saved = true;
       groupset.num_psi_unknowns_local = num_ang_unknowns;
-      groupset.psi_new_local.assign(num_ang_unknowns,0.0);
       psi_new_local.back().assign(num_ang_unknowns, 0.0);
     }
 

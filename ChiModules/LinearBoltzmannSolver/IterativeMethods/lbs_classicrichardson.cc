@@ -49,7 +49,7 @@ ClassicRichardson(LBSGroupset& groupset,
     q_moments_local = init_q_moments_local;
     SetSource(groupset, q_moments_local, source_flags);
 
-    groupset.ZeroAngularFluxDataStructures();
+    ZeroAngularFluxDataStructures(groupset);
     phi_new_local.assign(phi_new_local.size(),0.0); //Ensure phi_new=0.0
     sweep_scheduler.Sweep();
 

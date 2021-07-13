@@ -99,6 +99,7 @@ public:
   //00
   Solver();
   ~Solver() override =default;
+
   //01
   virtual void Initialize();
   //01a
@@ -115,6 +116,7 @@ public:
   virtual void InitializeParrays();
   //01e
   void InitializeGroupsets();
+
   //02
   void Execute() override;
   void SolveGroupset(LBSGroupset& groupset);
@@ -144,13 +146,14 @@ public:
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                       double *ref_phi_new);
   void CleanUpTGDSA(LBSGroupset& groupset);
-
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
   //04
   void WriteRestartData(std::string folder_name, std::string file_base);
   void ReadRestartData(std::string folder_name, std::string file_base);
+
+  //05
   void WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
                                   const std::string& file_base);
   void ReadGroupsetAngularFluxes(LBSGroupset& groupset,
@@ -186,6 +189,17 @@ public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
+
+  //
+  void ZeroAngularFluxDataStructures(LBSGroupset& groupset)
+  {
+    if (options.save_angular_flux)
+    {
+      auto& psi = psi_new_local[groupset.id];
+      psi.assign(psi.size(), 0.0);
+    }
+    groupset.angle_agg.ZeroOutgoingDelayedPsi();
+  }
 
 };
 

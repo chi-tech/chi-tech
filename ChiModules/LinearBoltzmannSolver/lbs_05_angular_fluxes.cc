@@ -95,7 +95,7 @@ void LinearBoltzmann::Solver::
           if (++dof_count > num_local_dofs) goto close_file;
 
           uint64_t dof_map = fe->MapDOFLocal(cell,i,dof_handler,n,g);
-          double value = groupset.psi_new_local[dof_map];
+          double value = psi_new_local[groupset.id][dof_map];
 
           file.write((char*)&cell.global_id,sizeof(size_t));
           file.write((char*)&i             ,sizeof(unsigned int));
@@ -148,7 +148,7 @@ void LinearBoltzmann::Solver::
   size_t num_angles        = groupset.quadrature->abscissae.size();
   size_t num_groups        = groupset.groups.size();
   size_t num_local_dofs    = groupset.num_psi_unknowns_local;
-  std::vector<double>& psi = groupset.psi_new_local;
+  std::vector<double>& psi = psi_new_local[groupset.id];
   auto   dof_handler       = groupset.psi_uk_man;
 
   size_t file_num_local_nodes;
