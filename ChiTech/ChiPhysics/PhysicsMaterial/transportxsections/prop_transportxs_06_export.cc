@@ -57,8 +57,9 @@ void chi_physics::TransportCrossSections::
   Print1DXS(ofile,"NU"        ,nu        ,1.0e-20);
   Print1DXS(ofile,"NU_PROMPT" ,nu_prompt ,1.0e-20);
   Print1DXS(ofile,"NU_DELAYED",nu_delayed,1.0e-20);
-  Print1DXS(ofile, "CHI_PROMPT", chi     , 1.0e-20);
-  Print1DXS(ofile, "DDT_COEFF" , inv_velocity , 1.0e-20);
+  Print1DXS(ofile, "CHI", chi     , 1.0e-20);
+  Print1DXS(ofile, "CHI_PROMPT", chi_prompt     , 1.0e-20);
+  Print1DXS(ofile, "INV_VELOCITY" , inv_velocity , 1.0e-20);
 
   //======================================== Chi-delayed
   if (not chi_delayed.empty())
