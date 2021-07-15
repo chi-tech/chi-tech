@@ -17,6 +17,7 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   LinearBoltzmann::Solver& solver = context->solver;
   LBSGroupset& groupset  = context->groupset;
   MainSweepScheduler& sweep_scheduler = context->sweep_scheduler;
+  auto& sweep_chunk = context->sweep_scheduler.sweep_chunk;
   SourceFlags& lhs_source_scope = context->lhs_scope;
 
   //============================================= Copy krylov vector into local
