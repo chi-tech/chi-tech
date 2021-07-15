@@ -19,13 +19,11 @@ int chiKEigenvalueLBSInitialize(lua_State* L)
   int solver_index = lua_tonumber(L, 1);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
   KEigenvalue::Solver* solver;
   try
   {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<KEigenvalue::Solver*>(psolver);
+    solver = dynamic_cast<KEigenvalue::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {

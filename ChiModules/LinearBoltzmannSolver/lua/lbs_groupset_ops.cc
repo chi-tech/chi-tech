@@ -75,12 +75,10 @@ int chiLBSCreateGroupset(lua_State *L)
   int solver_index = lua_tonumber(L,1);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -124,12 +122,10 @@ int chiLBSCreateGroup(lua_State *L)
   int solver_index = lua_tonumber(L,1);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -192,12 +188,10 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -296,12 +290,10 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -417,12 +409,10 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -517,12 +507,10 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -602,12 +590,10 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -702,12 +688,10 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -808,12 +792,10 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -896,12 +878,10 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -981,12 +961,10 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -1067,12 +1045,10 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -1168,12 +1144,10 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -1275,12 +1249,10 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {

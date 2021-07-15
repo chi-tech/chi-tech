@@ -37,12 +37,10 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -107,12 +105,10 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
