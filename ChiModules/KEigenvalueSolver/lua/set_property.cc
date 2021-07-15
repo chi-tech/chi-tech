@@ -26,13 +26,11 @@ int chiLBSSetUsePrecursors(lua_State* L)
   bool use_precursors = lua_toboolean(L, 2);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try
   {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -70,13 +68,11 @@ int chiLBSSetMaxKIterations(lua_State* L)
   int num_iter = lua_tointeger(L, 2);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try
   {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -123,13 +119,11 @@ int chiLBSSetKTolerance(lua_State* L)
   double tol = lua_tonumber(L, 2);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try
   {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {

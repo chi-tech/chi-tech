@@ -22,12 +22,10 @@ int chiLBSGetFieldFunctionList(lua_State *L)
   int solver_index = lua_tonumber(L,1);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
@@ -83,12 +81,10 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
   int solver_index = lua_tonumber(L,1);
 
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
   LinearBoltzmann::Solver* solver;
   try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
 
     if (not solver)
     {
