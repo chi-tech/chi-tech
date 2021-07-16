@@ -69,8 +69,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #================================================ Default include directories
-include_directories("${LUA_ROOT}/include")
-include_directories("${PETSC_ROOT}/include")
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+include_directories(SYSTEM "${LUA_ROOT}/include")
+include_directories(SYSTEM "${PETSC_ROOT}/include")
 
 include_directories("${CHI_TECH_DIR}/ChiTech")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
@@ -79,8 +80,6 @@ include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
 include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
-
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
