@@ -1,10 +1,11 @@
 #include "chi_meshcontinuum.h"
+#include <cinttypes>
 #include <fstream>
 #include "ChiMesh/Cell/cell_polyhedron.h"
 #include "ChiMesh/Cell/cell_polygon.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
@@ -121,9 +122,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         }
       }
 
-      for (uint64_t v=0; v<poly_cell.vertex_ids.size(); v++)
+      for (size_t v=0; v<poly_cell.vertex_ids.size(); v++)
       {
-        fprintf(of,"face_vertindi[%d][%lu]=%lu\n",cell_g_index,v,poly_cell.vertex_ids[v]);
+        fprintf(of,"face_vertindi[%d][%lu]=%" PRIu64 "\n",cell_g_index,v,poly_cell.vertex_ids[v]);
       }
     }//polygon
 
@@ -171,9 +172,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
             chi_mesh::CellFace& face = polyh_cell.faces[s];
 
-            for (uint64_t v=0; v<face.vertex_ids.size(); v++)
+            for (size_t v=0; v<face.vertex_ids.size(); v++)
             {
-              fprintf(of,"face_vertindi[%d][%lu]=%lu\n",f,v,face.vertex_ids[v]);
+              fprintf(of,"face_vertindi[%d][%lu]=%" PRIu64 "\n",f,v,face.vertex_ids[v]);
             }
           }
 
@@ -204,9 +205,9 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
           chi_mesh::CellFace& face = polyh_cell.faces[s];
 
-          for (uint64_t v=0; v<face.vertex_ids.size(); v++)
+          for (size_t v=0; v<face.vertex_ids.size(); v++)
           {
-            fprintf(of,"face_vertindi[%d][%lu]=%lu\n",f,v,face.vertex_ids[v]);
+            fprintf(of,"face_vertindi[%d][%lu]=%" PRIu64 "\n",f,v,face.vertex_ids[v]);
           }
 
         }

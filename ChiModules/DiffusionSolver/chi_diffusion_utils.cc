@@ -1,5 +1,7 @@
 #include "chi_diffusion.h"
 
+#include <iomanip>
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -21,20 +23,18 @@ KSPMonitorAChiTech(KSP ksp, PetscInt n, PetscReal rnorm, void *monitordestroy)
 
   if (chi_mpi.location_id == 0)
   {
+    const auto ksp_name = "Diffusion";
 
-    char buff[100];
-    if (rnorm/rhs_norm < 1.0e-2)
-    {
-      snprintf(buff,100,"Diffusion iteration %4ld - Residual %.3e\n",
-               n,rnorm/rhs_norm);
-    }
-    else
-    {
-      snprintf(buff,100,"Diffusion iteration %4ld - Residual %.7f\n",
-               n,rnorm/rhs_norm);
-    }
+    std::stringstream buff;
+    buff
+      << ksp_name
+      << " iteration "
+      << std::setw(4) << n
+      << " - Residual "
+      << std::scientific << std::setprecision(7) << rnorm / rhs_norm
+      << std::endl;
 
-    chi_log.Log(LOG_0) << buff;
+    chi_log.Log(LOG_0) << buff.str();
   }
 
 
