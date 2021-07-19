@@ -94,6 +94,7 @@ if (VTK_VERSION VERSION_LESS "8.90.0")
             REQUIRED PATHS ${VTK_DIR})
     # old system
     include(${VTK_USE_FILE})
+    include_directories(SYSTEM ${VTK_INCLUDE_DIRS})
 else ()
     find_package(VTK COMPONENTS
             CommonCore CommonDataModel
