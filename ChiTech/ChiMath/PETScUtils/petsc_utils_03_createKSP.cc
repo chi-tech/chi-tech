@@ -1,5 +1,7 @@
 #include "petsc_utils.h"
 
+#include <iomanip>
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -114,23 +116,19 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
   if (rhs_norm < 1.0e-12)
     rhs_norm = 1.0;
 
-  char buff[100];
   const char* ksp_name;
   KSPGetOptionsPrefix(ksp,&ksp_name);
-  if (rnorm/rhs_norm < 1.0e-2)
-  {
-    snprintf(buff,100,"%s iteration %4lld - Residual %.3e\n",
-             ksp_name,n,rnorm/rhs_norm);
-  }
-  else
-  {
-    snprintf(buff,100,"%s iteration %4lld - Residual %.7f\n",
-             ksp_name,n,rnorm/rhs_norm);
-  }
 
-  chi_log.Log(LOG_0) << buff;
+  std::stringstream buff;
+  buff
+    << ksp_name
+    << " iteration "
+    << std::setw(4) << n
+    << " - Residual "
+    << std::scientific << std::setprecision(7) << rnorm / rhs_norm
+    << std::endl;
 
-
+  chi_log.Log(LOG_0) << buff.str();
 
   return 0;
 }

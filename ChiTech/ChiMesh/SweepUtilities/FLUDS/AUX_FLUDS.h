@@ -35,7 +35,6 @@ public:
 //  std::vector<int>    delayed_prelocI_face_dof_count;
 
 private:
-  const int largest_face;
   const int G;
 
   //local_psi_n_block_stride[fc]. Given face category fc, the value is

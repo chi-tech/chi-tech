@@ -69,8 +69,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #================================================ Default include directories
-include_directories("${LUA_ROOT}/include")
-include_directories("${PETSC_ROOT}/include")
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+include_directories(SYSTEM "${LUA_ROOT}/include")
+include_directories(SYSTEM "${PETSC_ROOT}/include")
 
 include_directories("${CHI_TECH_DIR}/ChiTech")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
@@ -79,8 +80,6 @@ include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
 include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
-
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
@@ -103,6 +102,7 @@ if (VTK_VERSION VERSION_LESS "8.90.0")
             REQUIRED PATHS ${VTK_DIR})
     # old system
     include(${VTK_USE_FILE})
+    include_directories(SYSTEM ${VTK_INCLUDE_DIRS})
 else ()
     find_package(VTK COMPONENTS
             CommonCore CommonDataModel
@@ -119,14 +119,17 @@ set(CHI_LIBS stdc++ lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 #================================================ Compiler flags
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
     set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-c++17-extensions")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
     set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable -Wno-sign-compare")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
     set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
     #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
     #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
