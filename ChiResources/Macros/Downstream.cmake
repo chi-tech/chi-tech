@@ -60,9 +60,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #================================================ Include directories
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
 include_directories(SYSTEM "${LUA_ROOT}/include")
 include_directories(SYSTEM "${PETSC_ROOT}/include")
+
+include_directories(SYSTEM "${CHI_TECH_DIR}/ThirdParty/paraview")
 
 include_directories("${CHI_TECH_DIR}/ChiTech")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
@@ -75,7 +77,7 @@ include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
 link_directories("${PETSC_ROOT}/lib")
-link_directories("${CHI_TECH_DIR}/chi_build")
+link_directories("${CHI_TECH_DIR}/lib")
 
 # --------------------------- VTK
 find_package(VTK PATHS ${VTK_DIR} QUIET)
@@ -107,4 +109,11 @@ else ()
     vtk_module_autoinit(TARGETS ${TARGET} MODULES ${VTK_LIBRARIES})
 endif()
 
-set(CHI_LIBS stdc++ ChiLib lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
+set(CHI_LIBS stdc++ lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
+set(CHI_LIBS ${CHI_LIBS} ChiLib ThirdParty)
+
+#================================================ Compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
+
+#================================================ Linker flags
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
