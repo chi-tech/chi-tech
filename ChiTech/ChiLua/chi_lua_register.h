@@ -212,7 +212,6 @@ RegisterFunction(chiPhysicsMaterialModifyTotalCrossSection);
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)
 RegisterFunction(chiExportFieldFunctionToVTKG)
-RegisterFunction(chiExportMultiFieldFunctionToVTKG)
 RegisterFunction(chiExportMultiFieldFunctionToVTK)
 
 //module:Transport interaction cross-sections

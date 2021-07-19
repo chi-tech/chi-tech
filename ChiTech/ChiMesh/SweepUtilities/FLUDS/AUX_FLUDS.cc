@@ -12,7 +12,6 @@ extern ChiLog&     chi_log;
 chi_mesh::sweep_management::AUX_FLUDS::
   AUX_FLUDS(PRIMARY_FLUDS &primary, int in_G) :
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Initializing references
-  largest_face( primary.largest_face ),
   G( in_G ),
 
   local_psi_Gn_block_stride( primary.local_psi_n_block_stride ),

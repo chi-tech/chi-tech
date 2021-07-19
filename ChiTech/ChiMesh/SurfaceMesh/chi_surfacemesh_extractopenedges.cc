@@ -45,10 +45,9 @@ void chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj(const char *fileName)
       << "v " << v1.x << " " << v1.y << " " << v1.z << "\n";
   }
 
-  int v_count=-1;
-  for (auto vert_pair : edges)
+  for (size_t e = 0; e < edges.size(); ++e)
   {
-    v_count += 2;
+    const auto v_count = 2 * e + 1;
     outfile << "l " << v_count << " " << v_count + 1 << "\n";
   }
 

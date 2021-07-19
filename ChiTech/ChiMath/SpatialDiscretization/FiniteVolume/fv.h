@@ -34,6 +34,7 @@ private:
                            chi_math::CoordinateSystemType in_cs_type);
 
 public:
+  virtual ~SpatialDiscretization_FV() = default;
   //prevent anything else other than a shared pointer
   static
   std::shared_ptr<SpatialDiscretization_FV>
