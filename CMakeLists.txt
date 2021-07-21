@@ -87,7 +87,6 @@ include_directories("${CHI_TECH_DIR}/ChiTech/ChiMPI")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
 include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
