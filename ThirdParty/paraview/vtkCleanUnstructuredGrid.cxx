@@ -40,11 +40,10 @@ vtkCleanUnstructuredGrid::~vtkCleanUnstructuredGrid()
 }
 
 //----------------------------------------------------------------------------
-//void vtkCleanUnstructuredGrid::PrintSelf(ostream& os, vtkIndent indent)
-//{
-////  this->Superclass::PrintSelf(os, indent);
-//  return;
-//}
+void vtkCleanUnstructuredGrid::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
 
 //----------------------------------------------------------------------------
 int vtkCleanUnstructuredGrid::RequestData(vtkInformation* vtkNotUsed(request),
