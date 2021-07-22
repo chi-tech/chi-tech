@@ -20,24 +20,24 @@ extern ChiLog& chi_log;
  *
  * */
 void LinearBoltzmann::Solver::
-SetSource(LBSGroupset& groupset,
-          std::vector<double>& destination_q,
-          SourceFlags source_flags)
+  SetSource(LBSGroupset& groupset,
+            std::vector<double>& destination_q,
+            SourceFlags source_flags)
 {
   chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_mat_src = (source_flags & APPLY_MATERIAL_SOURCE);
+  const bool apply_mat_src         = (source_flags & APPLY_MATERIAL_SOURCE);
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
   const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCE);
   const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCE);
   const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCE);
 
   //======================================== Get group setup
-  int gs_i = groupset.groups[0].id;
-  int gs_f = groupset.groups.back().id;
+  size_t gs_i = groupset.groups[0].id;
+  size_t gs_f = groupset.groups.back().id;
 
-  int first_grp = groups.front().id;
-  int last_grp = groups.back().id;
+  size_t first_grp = groups.front().id;
+  size_t last_grp = groups.back().id;
 
   const auto& m_to_ell_em_map =
       groupset.quadrature->GetMomentToHarmonicsIndexMap();
@@ -54,7 +54,9 @@ SetSource(LBSGroupset& groupset,
     int xs_id = matid_to_xs_map[cell_matid];
     int src_id = matid_to_src_map[cell_matid];
 
-    if ((xs_id < 0) || (xs_id >= material_xs.size()))
+    int num_mat_xs = static_cast<int>(material_xs.size());
+
+    if ((xs_id < 0) || (xs_id >= num_mat_xs))
     {
       chi_log.Log(LOG_ALLERROR)
           << "Cross-section lookup error\n";
@@ -77,17 +79,15 @@ SetSource(LBSGroupset& groupset,
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        size_t ir = full_cell_view.MapDOF(i, m, 0);
-        double* q_mom = &destination_q[ir];
-        double* phi_oldp = &phi_old_local[ir];
+        size_t uk_map = full_cell_view.MapDOF(i, m, 0); //unknown map
 
         //============================== Loop over groupset groups
-        for (int g = gs_i; g <= gs_f; ++g)
+        for (size_t g = gs_i; g <= gs_f; ++g)
         {
           if ( apply_mat_src and (ell == 0) and (not options.use_src_moments))
-            q_mom[g] += src[g];
+            destination_q[uk_map + g] += src[g];
           else if (apply_mat_src and options.use_src_moments)
-            q_mom[g] += ext_src_moments_local[ir+g];
+            destination_q[uk_map + g] += ext_src_moments_local[uk_map + g];
 
           double inscatter_g = 0.0;
           const bool moment_avail = (ell < xs->transfer_matrices.size());
@@ -107,7 +107,7 @@ SetSource(LBSGroupset& groupset,
               if ((gprime < gs_i) or (gprime > gs_f))
               {
                 double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
-                inscatter_g += sigma_sm * phi_oldp[gprime];
+                inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
               }
             }
           }//if moment_avail
@@ -125,11 +125,11 @@ SetSource(LBSGroupset& groupset,
               if ((gprime >= gs_i) and (gprime <= gs_f))
               {
                 double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
-                inscatter_g += sigma_sm * phi_oldp[gprime];
+                inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
               }
             }
           }
-          q_mom[g] += inscatter_g;
+          destination_q[uk_map + g] += inscatter_g;
 
 
           double infission_g = 0.0;
@@ -144,7 +144,7 @@ SetSource(LBSGroupset& groupset,
               if ((gprime < gs_i) or (gprime > gs_f))
                 infission_g += xs->chi[g] *
                                xs->nu_sigma_f[gprime] *
-                               phi_oldp[gprime];
+                               phi_old_local[uk_map + gprime];
             }//for gprime
           }//if zeroth moment
 
@@ -157,11 +157,11 @@ SetSource(LBSGroupset& groupset,
               if ((gprime >= gs_i) or (gprime <= gs_f))
                 infission_g += xs->chi[g] *
                                xs->nu_sigma_f[gprime] *
-                               phi_oldp[gprime];
+                               phi_old_local[uk_map + gprime];
             }
           }
 
-          q_mom[g] += infission_g;
+          destination_q[uk_map + g] += infission_g;
 
         }//for g
       }//for m

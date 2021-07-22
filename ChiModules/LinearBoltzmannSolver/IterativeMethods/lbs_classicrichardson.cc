@@ -38,8 +38,10 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
   groupset.angle_agg.ZeroIncomingDelayedPsi();
 
   //================================================== Tool the sweep chunk
+  bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
+                                 (not options.use_src_moments);
   sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
-  sweep_scheduler.sweep_chunk.SetSurfaceSourceActiveFlag(source_flags & APPLY_MATERIAL_SOURCE);
+  sweep_scheduler.sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
 
   //================================================== Now start iterating
   double pw_change_prev = 1.0;
