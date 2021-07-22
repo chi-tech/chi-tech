@@ -126,6 +126,18 @@ public:
   size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override
   {return cell.vertex_ids.size();}
 
+  std::vector<chi_mesh::Vector3>
+  GetCellNodeLocations(const chi_mesh::Cell& cell) const override
+  {
+    std::vector<chi_mesh::Vector3> node_locations;
+    node_locations.reserve(cell.vertex_ids.size());
+
+    for (auto& vid : cell.vertex_ids)
+      node_locations.emplace_back(ref_grid->vertices[vid]);
+
+    return node_locations;
+  }
+
   void LocalizePETScVector(Vec petsc_vector,
                            std::vector<double>& local_vector,
                            chi_math::UnknownManager& unknown_manager)
