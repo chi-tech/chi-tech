@@ -162,6 +162,8 @@ void LinearBoltzmann::Solver::
           }
           destination_q[ir + g] += infission_g;
 
+          destination_q[uk_map + g] += infission_g;
+
         }//for g
       }//for m
     }//for dof i
