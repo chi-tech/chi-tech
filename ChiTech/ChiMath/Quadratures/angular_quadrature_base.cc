@@ -183,10 +183,6 @@ void chi_math::AngularQuadrature::
                      chi_math::Ylm(ell_em.ell,ell_em.m,
                                    cur_angle.phi,
                                    cur_angle.theta);
-//      double value =
-//                     chi_math::Ylm(ell_em.ell,ell_em.m,
-//                                   cur_angle.phi,
-//                                   cur_angle.theta);
       cur_mom.push_back(value);
     }
 
