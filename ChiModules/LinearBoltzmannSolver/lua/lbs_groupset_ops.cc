@@ -1,4 +1,5 @@
 #include "ChiLua/chi_lua.h"
+#include "lbs_lua_utils.h"
 
 #include "../lbs_linear_boltzmann_solver.h"
 #include "ChiMath/Quadratures/product_quadrature.h"
@@ -8,9 +9,6 @@ extern ChiLog&     chi_log;
 
 #include "ChiMath/chi_math.h"
 extern ChiMath&     chi_math_handler;
-
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 
@@ -72,32 +70,14 @@ gs0 = chiLBSCreateGroupset(phys1)
 */
 int chiLBSCreateGroupset(lua_State *L)
 {
-  int solver_index = lua_tonumber(L,1);
-
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSCreateGroupset: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chiLBSCreateGroupset: Invalid handle to solver\n";
-    exit(EXIT_FAILURE);
-  }
+  int solver_index = lua_tonumber(L,1);
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSCreateGroupset");
 
   //============================================= Create groupset
-  solver->group_sets.emplace_back();
+  lbs_solver->group_sets.emplace_back();
 
-  lua_pushinteger(L,static_cast<lua_Integer>(solver->group_sets.size())-1);
+  lua_pushinteger(L,static_cast<lua_Integer>(lbs_solver->group_sets.size())-1);
   return 1;
 }
 
@@ -119,32 +99,14 @@ grp[g] = chiLBSCreateGroup(phys1)
 */
 int chiLBSCreateGroup(lua_State *L)
 {
-  int solver_index = lua_tonumber(L,1);
-
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSCreateGroup: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chiLBSCreateGroup: Invalid handle to solver\n";
-    exit(EXIT_FAILURE);
-  }
+  int solver_index = lua_tonumber(L,1);
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSCreateGroup");
 
   //============================================= Create groupset
-  solver->groups.emplace_back((int)solver->groups.size());
+  lbs_solver->groups.emplace_back((int)lbs_solver->groups.size());
 
-  lua_pushnumber(L,solver->groups.back().id);
+  lua_pushnumber(L,lbs_solver->groups.back().id);
   return 1;
 }
 
@@ -188,29 +150,12 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetAddGroups: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chiLBSGroupsetAddGroups: Invalid handle to solver\n";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetAddGroups");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -235,7 +180,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     LBSGroup* group;
     //================================= Check valid group
     try {
-      group = &solver->groups.at(k);
+      group = &lbs_solver->groups.at(k);
     }
     catch (const std::out_of_range& o)
     {
@@ -290,29 +235,12 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetQuadrature: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR) << "Invalid handle to solver"
-                                 "in chiLBSGroupsetSetQuadrature.";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetQuadrature");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -409,30 +337,12 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetAngleAggregationType: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetAngleAggregationType";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetAngleAggregationType");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -507,30 +417,12 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetAngleAggDiv: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetAngleAggDiv";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetAngleAggDiv");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -590,30 +482,12 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetGroupSubsets: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetGroupSubsets";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetGroupSubsets");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -688,30 +562,12 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetIterativeMethod: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetGroupSubsets";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetIterativeMethod");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -792,30 +648,12 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetResidualTolerance: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetGroupSubsets";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetResidualTolerance");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -878,30 +716,12 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetMaxIterations: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetMaxIterations";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetMaxIterations");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -961,30 +781,12 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetGMRESRestartIntvl: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetGMRESRestartIntvl";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetGMRESRestartIntvl");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -1045,30 +847,12 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetEnableSweepLog: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetEnableSweepLog";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetEnableSweepLog");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -1144,30 +928,12 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetWGDSA: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetWGDSA";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetWGDSA");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -1249,30 +1015,12 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGroupsetSetTGDSA: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to chiLBSGroupsetSetTGDSA";
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetTGDSA");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {

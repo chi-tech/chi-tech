@@ -1,12 +1,10 @@
 #include "ChiLua/chi_lua.h"
+#include "lbs_lua_utils.h"
 
 #include "../lbs_linear_boltzmann_solver.h"
 
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
-
-#include <chi_log.h>
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Obtains a list of field functions from the transport solver.
@@ -19,39 +17,20 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiLBSGetFieldFunctionList(lua_State *L)
 {
-  int solver_index = lua_tonumber(L,1);
-
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGetFieldFunctionList: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      <<"Invalid handle to solver"
-        "in chiLBSGetFieldFunctionList\n";
-    exit(EXIT_FAILURE);
-  }
+  int solver_index = lua_tonumber(L,1);
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGetFieldFunctionList");
 
   //============================================= Push up new table
   lua_newtable(L);
-  for (int ff=0; ff<solver->field_functions.size(); ff++)
+  for (int ff=0; ff<lbs_solver->field_functions.size(); ff++)
   {
     lua_pushnumber(L,ff+1);
     int pff_count = -1;
     for (auto& pff : chi_physics_handler.fieldfunc_stack)
     {
       ++pff_count;
-      if (pff == solver->field_functions[ff])
+      if (pff == lbs_solver->field_functions[ff])
       {
         lua_pushnumber(L,pff_count);
         break;
@@ -61,7 +40,7 @@ int chiLBSGetFieldFunctionList(lua_State *L)
     lua_settable(L,-3);
   }
 
-  lua_pushnumber(L,solver->field_functions.size());
+  lua_pushnumber(L,lbs_solver->field_functions.size());
 
 return 2;
 }
@@ -78,36 +57,18 @@ from the transport solver.
 \author Jan*/
 int chiLBSGetScalarFieldFunctionList(lua_State *L)
 {
-  int solver_index = lua_tonumber(L,1);
-
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSGetScalarFieldFunctionList: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    fprintf(stderr,"ERROR: Invalid handle to solver"
-                   "in chiLBSGetScalarFieldFunctionList\n");
-    exit(EXIT_FAILURE);
-  }
+  int solver_index = lua_tonumber(L,1);
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGetScalarFieldFunctionList");
 
   //============================================= Push up new table
   lua_newtable(L);
   int ff=-1;
   int count=0;
 
-  for (int g=0; g<solver->groups.size(); g++)
+  for (int g=0; g<lbs_solver->groups.size(); g++)
   {
-    for (int m=0; m<solver->num_moments; m++)
+    for (int m=0; m<lbs_solver->num_moments; m++)
     {
       ff++;
       if (m==0)
@@ -118,7 +79,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
         for (auto& pff : chi_physics_handler.fieldfunc_stack)
         {
           ++pff_count;
-          if (pff == solver->field_functions[ff])
+          if (pff == lbs_solver->field_functions[ff])
           {
             lua_pushnumber(L,pff_count);
             break;
@@ -128,7 +89,6 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
       }
     }
   }
-
 
   lua_pushnumber(L,count);
   return 2;

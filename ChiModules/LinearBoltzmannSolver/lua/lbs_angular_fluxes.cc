@@ -1,12 +1,10 @@
 #include "ChiLua/chi_lua.h"
+#include "lbs_lua_utils.h"
 
 #include "../lbs_linear_boltzmann_solver.h"
 
 #include "chi_log.h"
 extern ChiLog&     chi_log;
-
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Writes the angular fluxes of a LBS groupset to file.
@@ -37,31 +35,12 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Incorrect solver-type."
-                           " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to " << __FUNCTION__;
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSWriteGroupsetAngularFlux");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -71,7 +50,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  solver->WriteGroupsetAngularFluxes(*groupset, file_base);
+  lbs_solver->WriteGroupsetAngularFluxes(*groupset, file_base);
 
   return 0;
 }
@@ -105,31 +84,12 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  LinearBoltzmann::Solver* solver;
-  try{
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(chi_physics_handler.solver_stack.at(solver_index));
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Incorrect solver-type."
-                           " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid handle to solver "
-      << "in call to " << __FUNCTION__;
-    exit(EXIT_FAILURE);
-  }
+  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSReadGroupsetAngularFlux");
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->group_sets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -139,7 +99,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  solver->ReadGroupsetAngularFluxes(*groupset, file_base);
+  lbs_solver->ReadGroupsetAngularFluxes(*groupset, file_base);
 
   return 0;
 }
