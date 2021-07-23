@@ -1,7 +1,6 @@
 #include "chi_lua.h"
 
 #include "chi_log.h"
-extern ChiLog&  chi_log;
 
 #include <string>
 #include <sstream>
@@ -10,41 +9,90 @@ extern ChiLog&  chi_log;
 
 /**Posts a generalized error message indicating that the
  * expected amount of arguments don't match the given amount.*/
-void LuaPostArgAmountError(const char* func_name,int expected, int given)
+void LuaPostArgAmountError(const std::string& func_name,int expected, int given)
 {
-  chi_log.Log(LOG_ALLERROR)
-  << "Incorrect amount of arguments supplied in "
-  << std::string(func_name)
-  << " expected " << expected << " arguments "
-  << " but " << given << " provided";
-  exit(EXIT_FAILURE);
+  throw std::invalid_argument(
+  "Incorrect amount of arguments supplied in " +
+  func_name +
+  " expected " + std::to_string(expected) + " arguments " +
+  " but " + std::to_string(given) + " provided");
 }
 
 /**Checks if the lua variable at the stack location indicated by <arg>
  * is a nil value. Throws an error if it is.*/
-void LuaCheckNilValue(const char* func_name, lua_State* L, int arg)
+void LuaCheckNilValue(const std::string& func_name, lua_State* L, int arg)
 {
   if (lua_isnil(L,arg))
   {
-    chi_log.Log(LOG_ALLERROR)
-      << "Nil -value supplied in "
-      << std::string(func_name)
-      << " argument " << arg;
-    exit(EXIT_FAILURE);
+    throw std::invalid_argument(
+      "Nil -value supplied in " +
+      func_name +
+      " argument " + std::to_string(arg));
+  }
+}
+
+/**Checks if the lua variable at the stack location indicated by <arg>
+ * is a string. Throws an error if it is not.*/
+void LuaCheckStringValue(const std::string& func_name, lua_State* L, int arg)
+{
+  if (not lua_isstring(L,arg))
+  {
+    throw std::invalid_argument(
+      "Non-string value supplied in " +
+      func_name +
+      " argument " + std::to_string(arg));
+  }
+}
+
+/**Checks if the lua variable at the stack location indicated by <arg>
+ * is a boolean. Throws an error if it is not.*/
+void LuaCheckBoolValue(const std::string& func_name, lua_State* L, int arg)
+{
+  if (not lua_isboolean(L,arg))
+  {
+    throw std::invalid_argument(
+      "Non-boolean value supplied in " +
+      func_name +
+      " argument " + std::to_string(arg));
+  }
+}
+
+/**Checks if the lua variable at the stack location indicated by <arg>
+ * is a number. Throws an error if it is not.*/
+void LuaCheckNumberValue(const std::string& func_name, lua_State* L, int arg)
+{
+  if (not lua_isnumber(L,arg))
+  {
+    throw std::invalid_argument(
+      "Non-number value supplied in " +
+      func_name +
+      " argument " + std::to_string(arg));
+  }
+}
+
+/**Checks if the lua variable at the stack location indicated by <arg>
+ * is an integer. Throws an error if it is not.*/
+void LuaCheckIntegerValue(const std::string& func_name, lua_State* L, int arg)
+{
+  if (not lua_isinteger(L,arg))
+  {
+    throw std::invalid_argument(
+      "Non-integer value supplied in " +
+      func_name +
+      " argument " + std::to_string(arg));
   }
 }
 
 /**Checks if the lua variable at the stack location indicated by <arg>
  * is an actual table. Throws an error if it is not.*/
-void LuaCheckTableValue(const char* func_name, lua_State* L, int arg)
+void LuaCheckTableValue(const std::string& func_name, lua_State* L, int arg)
 {
   if (not lua_istable(L,arg))
   {
-    chi_log.Log(LOG_ALLERROR)
-      << "Non-table value supplied in "
-      << std::string(func_name)
-      << " argument " << arg;
-    exit(EXIT_FAILURE);
+    throw std::invalid_argument(
+      "Non-table value supplied in " +
+      func_name +
+      " argument " + std::to_string(arg));
   }
 }
 
@@ -66,7 +114,7 @@ std::string LuaSourceInfo(lua_State* L, const char* func_name)
 /**Performs the necessary checks and converts a lua-table, formatted
  * as a 1D array (i.e. numerical keys) to a std::vector. If the table
  * is not convertable, an error message is posted.*/
-void LuaPopulateVectorFrom1DArray(const char* func_name,
+void LuaPopulateVectorFrom1DArray(const std::string& func_name,
                                   lua_State* L,
                                   int table_arg_index,
                                   std::vector<double>& vec)
@@ -101,6 +149,5 @@ void LuaPopulateVectorFrom1DArray(const char* func_name,
   }
 
   invalid_table:
-    throw std::invalid_argument("Invalid table used in call to " +
-                                 std::string(func_name));
+    throw std::invalid_argument("Invalid table used in call to " + func_name);
 }
