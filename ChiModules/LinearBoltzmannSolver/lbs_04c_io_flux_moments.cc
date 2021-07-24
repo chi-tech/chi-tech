@@ -228,7 +228,7 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
 
   //============================================= Read cell nodal locations
   std::map<uint64_t, std::map<size_t,size_t>> file_cell_nodal_mapping;
-  for (size_t c=0; c < num_local_cells; ++c)
+  for (size_t c=0; c < file_num_local_cells; ++c)
   {
     //============================ Read cell-id and num_nodes
     uint64_t cell_global_id;
@@ -236,12 +236,6 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
 
     file.read((char*)&cell_global_id, sizeof(uint64_t));
     file.read((char*)&num_nodes     , sizeof(size_t));
-
-    if (not grid->IsCellLocal(cell_global_id))
-      throw std::logic_error(std::string(__FUNCTION__) +
-      ": Cell read from file that is not among local cells.");
-
-    const auto& cell = grid->cells[cell_global_id];
 
     //============================ Read node locations
     std::vector<chi_mesh::Vector3> file_node_locations;
@@ -256,6 +250,10 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
       file_node_locations.emplace_back(x,y,z);
     }//for file node n
 
+    if (not grid->IsCellLocal(cell_global_id)) continue;
+
+    const auto& cell = grid->cells[cell_global_id];
+
     //================ Now map file nodes to system nodes
     auto system_node_locations = discretization->GetCellNodeLocations(cell);
     std::map<size_t,size_t> mapping;
@@ -266,7 +264,7 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
            ": Incompatible number of nodes for a cell was encountered. Mapping "
            "could not be performed.");
 
-    bool mapping_successful = true;
+    bool mapping_successful = true; //Assume true, now try to disprove
 
     const auto &sys_nodes = system_node_locations;
     const auto &file_nodes = file_node_locations;
@@ -311,6 +309,7 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
       const auto& node_mapping = file_cell_nodal_mapping.at(cell_global_id);
 
       size_t node_mapped = node_mapping.at(node);
+//      auto node_mapped = node;
 
       size_t dof_map = sdm->MapDOFLocal(cell,
                                         node_mapped,
