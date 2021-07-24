@@ -235,7 +235,7 @@ void chi_physics::TransportCrossSections::
 
       if (x == 0)
         inv_velocity[g] = cross_secs[x]->inv_velocity[g];
-      else if (inv_velocity[g] != cross_secs[x]->inv_velocity[g]);
+      else if (inv_velocity[g] != cross_secs[x]->inv_velocity[g])
       {
         chi_log.Log(LOG_ALLERROR)
             << "In call to " << __FUNCTION__
