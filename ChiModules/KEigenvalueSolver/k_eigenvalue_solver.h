@@ -18,6 +18,9 @@ private:
 public:
   double k_eff = 1.0;
 
+  size_t max_iterations = 1000;
+  double tolerance = 1.0e-8;
+
   size_t num_precursors;
   size_t max_num_precursors_per_material;
 

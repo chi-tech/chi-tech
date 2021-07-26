@@ -24,6 +24,7 @@ RegisterConstant(WRITE_RESTART_DATA,  7);
 RegisterConstant(SAVE_ANGULAR_FLUX,8)
 RegisterConstant(VERBOSE_INNER_ITERATIONS, 10);
 RegisterConstant(VERBOSE_OUTER_ITERATIONS, 11);
+RegisterConstant(USE_PRECURSORS, 12);
 
 
 RegisterNamespace(LBSProperty);

@@ -28,7 +28,7 @@ struct Options
   GeometryType geometry_type = GeometryType::NO_GEOMETRY_SET;
   SDMType sd_type = SDMType::UNDEFINED;
   unsigned int scattering_order=1;
-  int  sweep_eager_limit= 32000;
+  int  sweep_eager_limit= 32000; //see chiLBSSetProperty documentation
 
   bool read_restart_data=false;
   std::string read_restart_folder_name = std::string("YRestart");
@@ -38,9 +38,6 @@ struct Options
   std::string write_restart_folder_name = std::string("YRestart");
   std::string write_restart_file_base   = std::string("restart");
   double write_restart_interval = 30.0;
-
-  int max_iterations = 1000;
-  double tolerance    = 1e-8;
 
   bool use_precursors = false;
 
