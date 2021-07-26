@@ -34,6 +34,8 @@ extern ChiMath&     chi_math_handler;
 #define VERBOSE_INNER_ITERATIONS 10
 #define VERBOSE_OUTER_ITERATIONS 11
 
+#define USE_PRECURSORS 12
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -68,6 +70,20 @@ READ_RESTART_DATA\n
  optional strings. The first is the folder name which can be relative or
  absolute, and the second is the file base name. These are defaulted to
  "YRestart" and "restart" respectively.\n\n
+
+VERBOSE_INNER_ITERATIONS\n
+ Flag for printing inner iteration information. This is primarily used
+ for printing information related to group-set-level iterative methods.
+ Default true. Expects to be followed by a boolean.\n\n
+
+VERBOSE_OUTER_ITERATIONS\n
+ Flag for printing outer iteration information. This is primarily used
+ for printing information aggregated over group sets such as k-eigenvalue
+ iterations. Default true. Expects to be followed by a boolean.\n\n
+
+USE_PRECURSORS\n
+ Flag for using delayed neutron precursors. Default false. This expects
+ to be followed by a boolean.\n\n
 
 \code
 chiLBSSetProperty(phys1,READ_RESTART_DATA,"YRestart1")
@@ -405,6 +421,16 @@ int chiLBSSetProperty(lua_State *L)
     solver->options.verbose_outer_iterations = flag;
 
     chi_log.Log() << "LBS option: verbose_outer_iterations set to " << flag;
+  }
+  else if (property == USE_PRECURSORS)
+  {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
+    bool flag = lua_toboolean(L, 3);
+
+    solver->options.use_precursors = flag;
+
+    chi_log.Log() << "LBS option: use_precursors set to " << flag;
   }
   else
   {

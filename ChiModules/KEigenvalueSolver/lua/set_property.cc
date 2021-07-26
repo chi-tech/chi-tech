@@ -71,12 +71,12 @@ int chiLBSSetMaxKIterations(lua_State* L)
 
   // ----- Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmann::Solver* solver;
+  KEigenvalue::Solver* solver;
   try
   {
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<KEigenvalue::Solver*>(psolver);
 
     if (not solver)
     {
@@ -101,7 +101,7 @@ int chiLBSSetMaxKIterations(lua_State* L)
         << "Must be >= 0.";
     exit(EXIT_FAILURE);
   }
-  solver->options.max_iterations = num_iter;
+  solver->max_iterations = num_iter;
 
   chi_log.Log(LOG_0)
       << "Eigenvalue max # iterations set to " << num_iter;
@@ -124,12 +124,12 @@ int chiLBSSetKTolerance(lua_State* L)
 
   // ----- Get pointer to solver
   chi_physics::Solver* psolver;
-  LinearBoltzmann::Solver* solver;
+  KEigenvalue::Solver* solver;
   try
   {
     psolver = chi_physics_handler.solver_stack.at(solver_index);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
+    solver = dynamic_cast<KEigenvalue::Solver*>(psolver);
 
     if (not solver)
     {
@@ -152,7 +152,7 @@ int chiLBSSetKTolerance(lua_State* L)
         << "Invalid tolerance specified. Must be >= 0.0";
     exit(EXIT_FAILURE);
   }
-  solver->options.tolerance = tol;
+  solver->tolerance = tol;
 
   char buff[100];
   sprintf(buff, "%.4e", tol);
