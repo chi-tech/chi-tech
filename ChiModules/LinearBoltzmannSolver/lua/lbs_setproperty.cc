@@ -31,6 +31,7 @@ extern ChiMath&     chi_math_handler;
 #define USE_SOURCE_MOMENTS 9
 
 #define VERBOSE_INNER_ITERATIONS 10
+
 #define VERBOSE_OUTER_ITERATIONS 11
 
 #define USE_PRECURSORS 12
