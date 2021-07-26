@@ -1,7 +1,7 @@
-#ifndef LBS_LUA_UTILS_H
-#define LBS_LUA_UTILS_H
+#ifndef KEIGEN_SOLVER_H
+#define KEIGEN_SOLVER_H
 
-#include "../lbs_linear_boltzmann_solver.h"
+#include "../k_eigenvalue_solver.h"
 
 namespace LinearBoltzmann
 {
@@ -17,7 +17,8 @@ namespace LinearBoltzmann
      *                              should uniquely identify the calling function.
      *
      */
-    LinearBoltzmann::Solver* GetSolverByHandle(int handle, const std::string& calling_function_name);
+    LinearBoltzmann::KEigenvalue::Solver*
+      GetKEigenvalueSolverByHandle(int handle, const std::string& calling_function_name);
   }
 }
 
