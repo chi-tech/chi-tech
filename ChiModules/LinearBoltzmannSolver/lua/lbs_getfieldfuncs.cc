@@ -19,7 +19,8 @@ int chiLBSGetFieldFunctionList(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGetFieldFunctionList");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Push up new table
   lua_newtable(L);

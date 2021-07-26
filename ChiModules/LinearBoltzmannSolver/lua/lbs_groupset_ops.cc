@@ -1,7 +1,6 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "chi_log.h"
@@ -72,7 +71,8 @@ int chiLBSCreateGroupset(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSCreateGroupset");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Create groupset
   lbs_solver->group_sets.emplace_back();
@@ -101,7 +101,8 @@ int chiLBSCreateGroup(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSCreateGroup");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Create groupset
   lbs_solver->groups.emplace_back((int)lbs_solver->groups.size());
@@ -150,7 +151,8 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetAddGroups");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -235,7 +237,8 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetQuadrature");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -337,7 +340,8 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetAngleAggregationType");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -417,7 +421,8 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetAngleAggDiv");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -482,7 +487,8 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetGroupSubsets");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -562,7 +568,8 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetIterativeMethod");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -648,7 +655,8 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetResidualTolerance");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -716,7 +724,8 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetMaxIterations");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -781,7 +790,8 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetGMRESRestartIntvl");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -847,7 +857,8 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetEnableSweepLog");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -928,7 +939,8 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetWGDSA");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
@@ -1015,7 +1027,8 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSGroupsetSetTGDSA");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;

@@ -12,7 +12,8 @@ int chiLBSExecute(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSExecute");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   lbs_solver->Execute();
 

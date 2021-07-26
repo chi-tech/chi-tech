@@ -21,7 +21,8 @@ int chiLBSComputeBalance(lua_State *L)
 
   //============================================= Get pointer to solver
   int solver_handle = lua_tonumber(L, 1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_handle, "chiLBSComputeBalance");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_handle, __FUNCTION__);
 
   lbs_solver->ComputeBalance();
 

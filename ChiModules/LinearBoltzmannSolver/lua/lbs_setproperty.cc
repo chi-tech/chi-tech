@@ -164,7 +164,8 @@ int chiLBSSetProperty(lua_State *L)
 
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::GetSolverByHandle(solver_index, "chiLBSSetProperty");
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Get property index
   LuaCheckNilValue(__FUNCTION__, L, 2);
@@ -407,7 +408,7 @@ int chiLBSSetProperty(lua_State *L)
 
     bool flag = lua_toboolean(L, 3);
 
-    solver->options.use_precursors = flag;
+    lbs_solver->options.use_precursors = flag;
 
     chi_log.Log() << "LBS option: use_precursors set to " << flag;
   }
