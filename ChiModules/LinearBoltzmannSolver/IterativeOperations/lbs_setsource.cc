@@ -160,8 +160,6 @@ void LinearBoltzmann::Solver::
                                phi_old_local[uk_map + gprime];
             }
           }
-          destination_q[ir + g] += infission_g;
-
           destination_q[uk_map + g] += infission_g;
 
         }//for g
