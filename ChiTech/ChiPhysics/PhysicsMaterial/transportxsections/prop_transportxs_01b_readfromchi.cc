@@ -5,6 +5,8 @@ extern ChiLog& chi_log;
 
 #include <string>
 
+double eps = std::numeric_limits<float>::epsilon();
+
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
  *\ingroup LuaPhysicsMaterials
  *
@@ -557,56 +559,193 @@ void chi_physics::TransportCrossSections::
       << __FUNCTION__ << ": sigma_a was estimated from the transfer matrix.";
   }
 
-  //======================================== Process fission items
+  //======================================== Check/process fission terms
+  //determine fissile status
   for (auto& sig_f : sigma_f)
     if (sig_f > 0.0) {is_fissile = true; break;}
 
-  //precompute nu_sigma_f terms
-  for (int g = 0; g < num_groups; ++g)
+  //ensure precursors exist only if fissile
+  if (not is_fissile and num_precursors > 0)
+  {
+    chi_log.Log(LOG_ALLERROR)
+      << __FUNCTION__ << ": Non-fissile materials cannot have precursors.";
+    exit(EXIT_FAILURE);
+  }
+
+  //check fission quantities
+  if (is_fissile)
+  {
+    //determine total/prompt/delayed quantities parsed
+    bool has_total = false;
+    bool has_prompt = false;
+    bool has_delayed = false;
+    for (size_t g = 0; g < num_groups; ++g)
+    {
+      if (nu[g] > 0.0 and chi[g] > 0.0) has_total = true;
+      if (nu_prompt[g] > 0.0 and chi_prompt[g] > 0.0) has_prompt = true;
+      if (num_precursors > 0)
+        for (size_t j = 0; j < num_precursors; ++j)
+          if (nu_delayed[g] > 0.0 and chi_delayed[g][j] > 0.0)
+            has_delayed = true;
+    }
+
+    //ensure minimums are provided
+    if (not has_total and not has_prompt)
+    {
+      chi_log.Log(LOG_ALLERROR)
+          << __FUNCTION__ << ": Fissile cross-sections must have either "
+          << "total or prompt quantities specified.";
+      exit(EXIT_FAILURE);
+    }
+    if (num_precursors > 0 and not has_delayed)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << __FUNCTION__ << ": Delayed nu and chi must be provided "
+        << "if num_precursors is non-zero.";
+      exit(EXIT_FAILURE);
+    }
+
+    //check precursor properties, if provided
+    if (num_precursors > 0)
+    {
+      size_t num_lambdas = 0;
+      size_t num_yields = 0;
+      size_t num_spectra = 0;
+      double yield_sum = 0.0;
+      for (size_t j = 0; j < num_precursors; ++j)
+      {
+        yield_sum += precursor_yield[j];
+        if (precursor_lambda[j] > 0.0) num_lambdas += 1;
+        if (precursor_yield[j] > 0.0) num_yields += 1;
+        for (size_t g = 0; g < num_groups; ++g)
+        {
+          if (chi_delayed[g][j] > 0.0)
+          {
+            num_spectra += 1;
+            break;
+          }
+        }
+      }
+
+
+      if (num_lambdas != num_precursors)
+      {
+        chi_log.Log(LOG_ALLERROR)
+            << __FUNCTION__ << ": There must be " << num_precursors
+            << " precursor_lambda values. Only " << num_lambdas << " found.";
+        exit(EXIT_FAILURE);
+      }
+      if (num_yields != num_precursors)
+      {
+        chi_log.Log(LOG_ALLERROR)
+            << __FUNCTION__ << ": There must be " << num_precursors
+            << " precursor_yield values. Only " << num_yields << " found.";
+        exit(EXIT_FAILURE);
+      }
+      if (num_spectra != num_precursors)
+      {
+        chi_log.Log(LOG_ALLERROR)
+            << __FUNCTION__ << ": There must be " << num_precursors
+            << " non-zero chi_delayed spectra. Only "
+            << num_spectra << " found.";
+        exit(EXIT_FAILURE);
+      }
+
+      //normalize yield to sum to unity, if it does not
+      if (fabs(yield_sum - 1.0) > eps)
+      {
+        chi_log.Log(LOG_ALLWARNING)
+          << __FUNCTION__ << ": precursor_yield does not sum to unity. "
+          << "Normalizing precursor_yield.";
+        for (size_t j = 0; j < num_precursors; ++j)
+          precursor_yield[j] /= yield_sum;
+      }
+    }//if num_precursors > 0
+
+    //ensure unit total spectra, if provided and no delayed provided
+    if (has_total and not has_delayed)
+    {
+      double spectra_sum = 0.0;
+      for (size_t g = 0; g < num_groups; ++g)
+        spectra_sum += chi[g];
+
+      if (fabs(spectra_sum - 1.0) > eps)
+      {
+        chi_log.Log(LOG_ALLWARNING)
+            << __FUNCTION__ << ": Provided chi does not sum to unity. "
+            << "Normalizing the spectrum.";
+        for (size_t g = 0; g < num_groups; ++g)
+          chi[g] /= spectra_sum;
+      }
+    }
+
+    //ensure unit prompt spectra, if provided
+    if (has_prompt)
+    {
+      double spectra_sum = 0.0;
+      for (size_t g = 0; g < num_groups; ++g)
+        spectra_sum += chi_prompt[g];
+
+      if (fabs(spectra_sum - 1.0) > eps)
+      {
+        chi_log.Log(LOG_ALLWARNING)
+            << __FUNCTION__ << ": Provided chi_prompt does not sum to unity. "
+            << "Normalizing the spectrum.";
+        for (size_t g = 0; g < num_groups; ++g)
+          chi_prompt[g] /= spectra_sum;
+      }
+    }
+
+    //ensure unit delayed spectra, if provided
+    if (has_delayed)
+    {
+      for (size_t j = 0; j < num_precursors; ++j)
+      {
+        double spectra_sum = 0.0;
+        for (size_t g = 0; g < num_groups; ++g)
+          spectra_sum += chi_delayed[g][j];
+
+        if (fabs(spectra_sum - 1.0) > eps)
+        {
+          chi_log.Log(LOG_ALLWARNING)
+              << __FUNCTION__ << ": Provided chi_delayed does not "
+              << "sum to unity. Normalizing the spectrum.";
+          for (size_t g = 0; g < num_groups; ++g)
+            chi_delayed[g][j] /= spectra_sum;
+        }
+      }
+    }
+
+    //compute total from prompt and delayed
+    if (has_prompt and has_delayed)
+    {
+      if (has_total)
+        chi_log.Log(LOG_ALLWARNING)
+          << __FUNCTION__ << ": Total, prompt, and delayed nu/chi "
+          << "were provided. Overwriting nu/chi total using prompt "
+          << "and delayed nu/chi.";
+
+      nu.assign(num_groups, 0.0);
+      chi.assign(num_groups, 0.0);
+      for (size_t g = 0; g < num_groups; ++g)
+      {
+        nu[g] = nu_prompt[g] + nu_delayed[g];
+
+        double prompt_frac = nu_prompt[g] / nu[g];
+        double delayed_frac = nu_delayed[g] / nu[g];
+        chi[g] += prompt_frac * chi_prompt[g];
+        for (size_t j = 0; j < num_precursors; ++j)
+          chi[g] += delayed_frac * precursor_yield[j] * chi_delayed[g][j];
+      }
+    }
+  }//if is_fissile
+
+  //compute nu_sigma_f terms
+  for (size_t g = 0; g < num_groups; ++g)
   {
     nu_sigma_f        [g] = nu        [g] * sigma_f[g];
     nu_prompt_sigma_f [g] = nu_prompt [g] * sigma_f[g];
     nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
-  }
-
-  //======================================== Check delayed neutron terms
-  if (num_precursors > 0)
-  {
-    // Check that the material is fissile
-    if (not is_fissile)
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": cross-sections with precursors must contain "
-          << "non-zero sigma_f values.";
-      exit(EXIT_FAILURE);
-    }
-
-    // Check that yield sums to unity
-    double yield_sum = 0.0;
-    for (int j = 0; j < num_precursors; ++j)
-      yield_sum += precursor_yield[j];
-
-    if (abs(yield_sum - 1.0) > 1.0e-10)
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": precursor_yield must sum to unity.";
-      exit(EXIT_FAILURE);
-    }
-
-    // Check that each spectra sums to unity
-    for (int j = 0; j < num_precursors; ++j)
-    {
-      double chi_delayed_sum = 0.0;
-      for (int g = 0; g < num_groups; ++g)
-        chi_delayed_sum += chi_delayed[g][j];
-
-      if (abs(chi_delayed_sum - 1.0) > 1.0e-10)
-      {
-        chi_log.Log(LOG_ALLERROR)
-            << __FUNCTION__ << ": all delayed spectra must sum to unity.";
-        exit(EXIT_FAILURE);
-      }
-    }
   }
 
   file.close();
