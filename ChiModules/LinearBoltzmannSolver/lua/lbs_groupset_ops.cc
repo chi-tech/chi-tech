@@ -75,9 +75,9 @@ int chiLBSCreateGroupset(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Create groupset
-  lbs_solver->groupsets.emplace_back();
+  lbs_solver->groupsets.emplace_back((int)lbs_solver->groupsets.size());
 
-  lua_pushinteger(L,static_cast<lua_Integer>(lbs_solver->groupsets.size())-1);
+  lua_pushinteger(L, lbs_solver->groupsets.back().id);
   return 1;
 }
 
