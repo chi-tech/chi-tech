@@ -126,7 +126,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
   //                                                   properties
   bool develop_diffusion_properties = false;
-  for (auto& group_set : group_sets)
+  for (auto& group_set : groupsets)
   {
     if (group_set.apply_wgdsa || group_set.apply_tgdsa)
       develop_diffusion_properties = true;

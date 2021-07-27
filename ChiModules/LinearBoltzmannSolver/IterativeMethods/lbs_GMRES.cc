@@ -22,7 +22,6 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Solves a groupset using GMRES.*/
 bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
-                                    int group_set_num,
                                     MainSweepScheduler& sweep_scheduler,
                                     SourceFlags lhs_src_scope,
                                     SourceFlags rhs_src_scope,
@@ -34,7 +33,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
     chi_log.Log(LOG_0)
       << "\n\n";
     chi_log.Log(LOG_0)
-      << "********** Solving groupset " << group_set_num
+      << "********** Solving groupset " << groupset.id
       << " with GMRES.\n\n";
     chi_log.Log(LOG_0)
       << "Quadrature number of angles: "
@@ -229,7 +228,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
         << "\n\n";
 
       std::string sweep_log_file_name =
-          std::string("GS_") + std::to_string(group_set_num) +
+          std::string("GS_") + std::to_string(groupset.id) +
           std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
           std::string(".log");
       groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag,

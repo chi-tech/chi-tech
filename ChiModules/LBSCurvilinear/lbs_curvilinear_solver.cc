@@ -107,10 +107,10 @@ LBSCurvilinear::Solver::PerformInputChecks()
     }
   }
 
-  for (size_t gs = 0; gs < group_sets.size(); ++gs)
+  for (size_t gs = 0; gs < groupsets.size(); ++gs)
   {
     //  angular quadrature type must be compatible with coordinate system
-    const auto angular_quad_ptr = group_sets[gs].quadrature;
+    const auto angular_quad_ptr = groupsets[gs].quadrature;
     switch (coord_system_type)
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:
@@ -154,7 +154,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
     }
 
     //  angle aggregation type must be compatible with coordinate system
-    const auto angleagg_method = group_sets[gs].angleagg_method;
+    const auto angleagg_method = groupsets[gs].angleagg_method;
     switch (coord_system_type)
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:

@@ -14,14 +14,14 @@ void LinearBoltzmann::Solver::PerformInputChecks()
       << "LinearBoltzmann::Solver: No groups added to solver.";
     exit(EXIT_FAILURE);
   }
-  if (group_sets.empty())
+  if (groupsets.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "LinearBoltzmann::Solver: No group-sets added to solver.";
     exit(EXIT_FAILURE);
   }
   int grpset_counter=0;
-  for (auto& group_set : group_sets)
+  for (auto& group_set : groupsets)
   {
     if (group_set.groups.empty())
     {

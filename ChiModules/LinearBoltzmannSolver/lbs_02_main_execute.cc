@@ -19,12 +19,11 @@ extern ChiConsole&  chi_console;
 void LinearBoltzmann::Solver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  int gs=-1;
-  for (auto& groupset : group_sets)
+  for (auto& groupset : groupsets)
   {
-    ++gs;
     chi_log.Log(LOG_0)
-      << "\n********* Initializing Groupset " << gs << "\n" << std::endl;
+      << "\n********* Initializing Groupset " << groupset.id
+      << "\n" << std::endl;
 
     ComputeSweepOrderings(groupset);
     InitFluxDataStructures(groupset);
@@ -32,7 +31,7 @@ void LinearBoltzmann::Solver::Execute()
     InitWGDSA(groupset);
     InitTGDSA(groupset);
 
-    SolveGroupset(groupset, gs);
+    SolveGroupset(groupset);
 
     CleanUpWGDSA(groupset);
     CleanUpTGDSA(groupset);
@@ -48,8 +47,7 @@ void LinearBoltzmann::Solver::Execute()
 
 //###################################################################
 /**Solves a single groupset.*/
-void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
-                                            int group_set_num)
+void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset)
 {
   source_event_tag = chi_log.GetRepeatingEventTag("Set Source");
 
@@ -64,21 +62,19 @@ void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset,
 
   if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
   {
-    ClassicRichardson(groupset, group_set_num, sweep_scheduler,
+    ClassicRichardson(groupset, sweep_scheduler,
                       APPLY_MATERIAL_SOURCE |
-                      APPLY_AGS_SCATTER_SOURCE |
-                      APPLY_WGS_SCATTER_SOURCE |
-                      APPLY_AGS_FISSION_SOURCE |
-                      APPLY_WGS_FISSION_SOURCE,
+                      APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
+                      APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE,
                       options.verbose_inner_iterations);
   }
   else if (groupset.iterative_method == IterativeMethod::GMRES)
   {
-    GMRES(groupset, group_set_num, sweep_scheduler,
+    GMRES(groupset, sweep_scheduler,
           APPLY_WGS_SCATTER_SOURCE | APPLY_WGS_FISSION_SOURCE,  //lhs_scope
           APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE |
-          APPLY_AGS_FISSION_SOURCE,
-          options.verbose_inner_iterations);  //rhs_scope
+          APPLY_AGS_FISSION_SOURCE,                             //rhs_scope
+          options.verbose_inner_iterations);
   }
 
   if (options.write_restart_data)

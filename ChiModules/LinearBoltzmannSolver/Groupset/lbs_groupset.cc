@@ -12,7 +12,7 @@ extern ChiMPI& chi_mpi;
 
 //##############################################
 /**Groupset constructor.*/
-LBSGroupset::LBSGroupset()
+LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 {
   quadrature = nullptr;
   iterative_method = LinearBoltzmann::IterativeMethod::CLASSICRICHARDSON;
