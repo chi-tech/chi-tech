@@ -41,7 +41,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -91,7 +91,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->group_sets.at(grpset_index);
+    groupset = &lbs_solver->groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
