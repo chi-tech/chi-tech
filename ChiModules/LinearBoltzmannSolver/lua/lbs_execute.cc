@@ -1,11 +1,7 @@
 #include "ChiLua/chi_lua.h"
+#include "lbs_lua_utils.h"
 
 #include "../lbs_linear_boltzmann_solver.h"
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
-
-#include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Executes the LBS solver.
@@ -14,30 +10,12 @@ extern ChiLog& chi_log;
  */
 int chiLBSExecute(lua_State *L)
 {
-  int solver_index = lua_tonumber(L,1);
-
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
-  LinearBoltzmann::Solver* solver;
-  try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
+  int solver_index = lua_tonumber(L,1);
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSExecute: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR) << "chiLBSExecute: Invalid handle to solver\n";
-    exit(EXIT_FAILURE);
-  }
-
-  solver->Execute();
+  lbs_solver->Execute();
 
   return 0;
 }

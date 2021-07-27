@@ -1,10 +1,9 @@
 #include "ChiLua/chi_lua.h"
+#include "lbs_lua_utils.h"
 
 #include "../lbs_linear_boltzmann_solver.h"
-#include "ChiPhysics/chi_physics.h"
 #include "ChiMath/chi_math.h"
 
-extern ChiPhysics&  chi_physics_handler;
 extern ChiMath&     chi_math_handler;
 
 #define DISCRETIZATION_METHOD 1
@@ -163,29 +162,10 @@ int chiLBSSetProperty(lua_State *L)
 
   LuaCheckNilValue(__FUNCTION__, L, 1);
 
-  int solver_index = lua_tonumber(L,1);
-
   //============================================= Get pointer to solver
-  chi_physics::Solver* psolver;
-  LinearBoltzmann::Solver* solver;
-  try{
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR) << "chiLBSSetProperty: Incorrect solver-type."
-                                   " Cannot cast to LinearBoltzmann::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chiLBSSetProperty: Invalid handle to solver";
-    exit(EXIT_FAILURE);
-  }
+  int solver_index = lua_tonumber(L,1);
+  auto lbs_solver = LinearBoltzmann::lua_utils::
+    GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Get property index
   LuaCheckNilValue(__FUNCTION__, L, 2);
@@ -206,7 +186,7 @@ int chiLBSSetProperty(lua_State *L)
     {
       case PWLD:
       {
-        solver->options.sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
+    	lbs_solver->options.sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
         break;
       }
       default:
@@ -237,7 +217,7 @@ int chiLBSSetProperty(lua_State *L)
 
     if (btype == (int)LinearBoltzmann::BoundaryType::VACUUM)
     {
-      solver->boundary_types[bid].first = LinearBoltzmann::BoundaryType::VACUUM;
+      lbs_solver->boundary_types[bid].first = LinearBoltzmann::BoundaryType::VACUUM;
       chi_log.Log(LOG_0) << "Boundary " << bid << " set to Vacuum.";
     }
     else if (btype == (int)LinearBoltzmann::BoundaryType::INCIDENT_ISOTROPIC)
@@ -245,7 +225,7 @@ int chiLBSSetProperty(lua_State *L)
       if (numArgs!=5)
         LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
 
-      if (solver->groups.empty())
+      if (lbs_solver->groups.empty())
       {
         chi_log.Log(LOG_0ERROR)
           << "In call to chiLBSSetProperty, setting "
@@ -276,25 +256,25 @@ int chiLBSSetProperty(lua_State *L)
 //        chi_log.Log(LOG_0) << g << " " << values[g];
       }
 
-      if (table_len != solver->groups.size())
+      if (table_len != lbs_solver->groups.size())
       {
         chi_log.Log(LOG_0ERROR)
           << "In call to chiLBSSetProperty, setting "
           << "incident isotropic flux boundary type: "
           << "Number of groups in boundary flux specification is "
           << table_len << " but solver has a total of "
-          << solver->groups.size() << " groups. These two must be equal.";
+          << lbs_solver->groups.size() << " groups. These two must be equal.";
         exit(EXIT_FAILURE);
       }
 
-      solver->incident_P0_mg_boundaries.push_back(values);
-      size_t index = solver->incident_P0_mg_boundaries.size()-1;
+      lbs_solver->incident_P0_mg_boundaries.push_back(values);
+      size_t index = lbs_solver->incident_P0_mg_boundaries.size()-1;
 
       //bid = XMIN or XMAX or YMIN ... etc
       //index is where it is on the incident_P0_mg_boundaries stack
-      solver->boundary_types[bid].first =
+      lbs_solver->boundary_types[bid].first =
         LinearBoltzmann::BoundaryType::INCIDENT_ISOTROPIC;
-      solver->boundary_types[bid].second= static_cast<int>(index);
+      lbs_solver->boundary_types[bid].second= static_cast<int>(index);
 
       chi_log.Log(LOG_0)
         << "Isotropic boundary condition for boundary " << bid
@@ -302,7 +282,7 @@ int chiLBSSetProperty(lua_State *L)
     }
     else if (btype == (int)LinearBoltzmann::BoundaryType::REFLECTING)
     {
-      solver->boundary_types[bid].first = LinearBoltzmann::BoundaryType::REFLECTING;
+      lbs_solver->boundary_types[bid].first = LinearBoltzmann::BoundaryType::REFLECTING;
       chi_log.Log(LOG_0) << "Boundary " << bid << " set to Reflecting.";
     }
     else
@@ -329,7 +309,7 @@ int chiLBSSetProperty(lua_State *L)
       exit(EXIT_FAILURE);
     }
 
-    solver->options.scattering_order = scattering_order;
+    lbs_solver->options.scattering_order = scattering_order;
   }
   else if (property == SWEEP_EAGER_LIMIT)
   {
@@ -342,7 +322,7 @@ int chiLBSSetProperty(lua_State *L)
     int limit = lua_tonumber(L,3);
     if (limit<=64000)
     {
-      solver->options.sweep_eager_limit = limit;
+      lbs_solver->options.sweep_eager_limit = limit;
     }
   }
   else if (property == READ_RESTART_DATA)
@@ -352,7 +332,7 @@ int chiLBSSetProperty(lua_State *L)
       LuaCheckNilValue(__FUNCTION__, L, 3);
 
       const char* folder = lua_tostring(L,3);
-      solver->options.read_restart_folder_name = std::string(folder);
+      lbs_solver->options.read_restart_folder_name = std::string(folder);
       chi_log.Log(LOG_0) << "Restart input folder set to " << folder;
     }
     if (numArgs >= 4)
@@ -360,10 +340,10 @@ int chiLBSSetProperty(lua_State *L)
       LuaCheckNilValue(__FUNCTION__, L, 4);
 
       const char* filebase = lua_tostring(L,4);
-      solver->options.read_restart_file_base = std::string(filebase);
+      lbs_solver->options.read_restart_file_base = std::string(filebase);
       chi_log.Log(LOG_0) << "Restart input filebase set to " << filebase;
     }
-    solver->options.read_restart_data = true;
+    lbs_solver->options.read_restart_data = true;
   }
   else if (property == WRITE_RESTART_DATA)
   {
@@ -372,7 +352,7 @@ int chiLBSSetProperty(lua_State *L)
       LuaCheckNilValue(__FUNCTION__, L, 3);
 
       const char* folder = lua_tostring(L,3);
-      solver->options.write_restart_folder_name = std::string(folder);
+      lbs_solver->options.write_restart_folder_name = std::string(folder);
       chi_log.Log(LOG_0) << "Restart output folder set to " << folder;
     }
     if (numArgs >= 4)
@@ -380,7 +360,7 @@ int chiLBSSetProperty(lua_State *L)
       LuaCheckNilValue(__FUNCTION__, L, 4);
 
       const char* filebase = lua_tostring(L,4);
-      solver->options.write_restart_file_base = std::string(filebase);
+      lbs_solver->options.write_restart_file_base = std::string(filebase);
       chi_log.Log(LOG_0) << "Restart output filebase set to " << filebase;
     }
     if (numArgs == 5)
@@ -388,9 +368,9 @@ int chiLBSSetProperty(lua_State *L)
       LuaCheckNilValue(__FUNCTION__, L, 5);
 
       double interval = lua_tonumber(L,5);
-      solver->options.write_restart_interval = interval;
+      lbs_solver->options.write_restart_interval = interval;
     }
-    solver->options.write_restart_data = true;
+    lbs_solver->options.write_restart_data = true;
   }
   else if (property == SAVE_ANGULAR_FLUX)
   {
@@ -398,7 +378,7 @@ int chiLBSSetProperty(lua_State *L)
 
     bool save_flag = lua_toboolean(L, 3);
 
-    solver->options.save_angular_flux = save_flag;
+    lbs_solver->options.save_angular_flux = save_flag;
 
     chi_log.Log() << "LBS option to save angular flux set to " << save_flag;
   }
@@ -408,7 +388,7 @@ int chiLBSSetProperty(lua_State *L)
 
     bool flag = lua_toboolean(L, 3);
 
-    solver->options.verbose_inner_iterations = flag;
+    lbs_solver->options.verbose_inner_iterations = flag;
 
     chi_log.Log() << "LBS option: verbose_inner_iterations set to " << flag;
   }
@@ -418,7 +398,7 @@ int chiLBSSetProperty(lua_State *L)
 
     bool flag = lua_toboolean(L, 3);
 
-    solver->options.verbose_outer_iterations = flag;
+    lbs_solver->options.verbose_outer_iterations = flag;
 
     chi_log.Log() << "LBS option: verbose_outer_iterations set to " << flag;
   }
@@ -428,7 +408,7 @@ int chiLBSSetProperty(lua_State *L)
 
     bool flag = lua_toboolean(L, 3);
 
-    solver->options.use_precursors = flag;
+    lbs_solver->options.use_precursors = flag;
 
     chi_log.Log() << "LBS option: use_precursors set to " << flag;
   }
