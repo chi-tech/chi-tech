@@ -32,6 +32,9 @@ private:
   explicit
   SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr& in_grid,
                            chi_math::CoordinateSystemType in_cs_type);
+  //01
+  void PreComputeCellSDValues() override;
+  void PreComputeNeighborCellSDValues();
 
 public:
   virtual ~SpatialDiscretization_FV() = default;
@@ -43,10 +46,6 @@ public:
       chi_math::CoordinateSystemType::CARTESIAN)
   { return std::shared_ptr<SpatialDiscretization_FV>(
     new SpatialDiscretization_FV(in_grid, in_cs_type));}
-
-  //01
-  void PreComputeCellSDValues() override;
-  void PreComputeNeighborCellSDValues();
 
   CellFVValues* MapFeView(uint64_t cell_local_index);
   CellFVValues* MapNeighborFeView(uint64_t cell_global_index);

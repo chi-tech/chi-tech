@@ -28,22 +28,6 @@ namespace finite_element
     m_num_nodes                  = in_num_nodes;
   }
 
-  void UnitIntegralData::Reset()
-  {
-    m_IntV_gradShapeI_gradShapeJ.clear();
-    m_IntV_shapeI_gradshapeJ.clear();
-    m_IntV_shapeI_shapeJ.clear();
-    m_IntV_shapeI.clear();
-    m_IntV_gradshapeI.clear();
-
-    m_IntS_shapeI_shapeJ.clear();
-    m_IntS_shapeI.clear();
-    m_IntS_shapeI_gradshapeJ.clear();
-
-    m_face_dof_mappings.clear();
-    m_num_nodes=0;
-  }
-
   double UnitIntegralData::
     IntV_gradShapeI_gradShapeJ(unsigned int i,
                                unsigned int j) const

@@ -26,64 +26,60 @@ SpatialDiscretization_PWLC::
                 << " Creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
 
-  if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
+  int qorder_min = static_cast<int>(chi_math::QuadratureOrder::INVALID_ORDER);
+  switch (cs_type)
   {
-    int qorder_min = static_cast<int>(chi_math::QuadratureOrder::INVALID_ORDER);
-    switch (cs_type)
+    case chi_math::CoordinateSystemType::CARTESIAN:
     {
-      case chi_math::CoordinateSystemType::CARTESIAN:
-      {
-        qorder_min = static_cast<int>(chi_math::QuadratureOrder::SECOND);
-        break;
-      }
-      case chi_math::CoordinateSystemType::CYLINDRICAL:
-      {
-        qorder_min = static_cast<int>(chi_math::QuadratureOrder::THIRD);
-        break;
-      }
-      case chi_math::CoordinateSystemType::SPHERICAL:
-      {
-        qorder_min = static_cast<int>(chi_math::QuadratureOrder::FOURTH);
-        break;
-      }
-      default:
-        throw std::invalid_argument("SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-                                    "Unsupported coordinate system type encountered.");
+      qorder_min = static_cast<int>(chi_math::QuadratureOrder::SECOND);
+      break;
     }
-
-    if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(line_quad_order_arbitrary.order) < "
-        << qorder_min << ".";
-
-    if (static_cast<int>(tri_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(tri_quad_order_arbitrary.order) < "
-        << qorder_min << ".";
-
-    if (static_cast<int>(quad_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(quad_quad_order_arbitrary.order) < "
-        << qorder_min << ".";
-
-    if (static_cast<int>(tet_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(tet_quad_order_arbitrary.order) < "
-        << qorder_min << ".";
-
-    if (static_cast<int>(hex_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
-        << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-        << "static_cast<int>(hex_quad_order_arbitrary.order) < "
-        << qorder_min << ".";
+    case chi_math::CoordinateSystemType::CYLINDRICAL:
+    {
+      qorder_min = static_cast<int>(chi_math::QuadratureOrder::THIRD);
+      break;
+    }
+    case chi_math::CoordinateSystemType::SPHERICAL:
+    {
+      qorder_min = static_cast<int>(chi_math::QuadratureOrder::FOURTH);
+      break;
+    }
+    default:
+      throw std::invalid_argument("SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+                                  "Unsupported coordinate system type encountered.");
   }
 
-  if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
-    PreComputeCellSDValues();
+  if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)
+    chi_log.Log(LOG_ALLWARNING)
+      << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+      << "static_cast<int>(line_quad_order_arbitrary.order) < "
+      << qorder_min << ".";
+
+  if (static_cast<int>(tri_quad_order_arbitrary.order) < qorder_min)
+    chi_log.Log(LOG_ALLWARNING)
+      << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+      << "static_cast<int>(tri_quad_order_arbitrary.order) < "
+      << qorder_min << ".";
+
+  if (static_cast<int>(quad_quad_order_arbitrary.order) < qorder_min)
+    chi_log.Log(LOG_ALLWARNING)
+      << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+      << "static_cast<int>(quad_quad_order_arbitrary.order) < "
+      << qorder_min << ".";
+
+  if (static_cast<int>(tet_quad_order_arbitrary.order) < qorder_min)
+    chi_log.Log(LOG_ALLWARNING)
+      << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+      << "static_cast<int>(tet_quad_order_arbitrary.order) < "
+      << qorder_min << ".";
+
+  if (static_cast<int>(hex_quad_order_arbitrary.order) < qorder_min)
+    chi_log.Log(LOG_ALLWARNING)
+      << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+      << "static_cast<int>(hex_quad_order_arbitrary.order) < "
+      << qorder_min << ".";
+
+  PreComputeCellSDValues();
 
   OrderNodes();
   chi_log.Log() << chi_program_timer.GetTimeString()

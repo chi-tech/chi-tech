@@ -13,10 +13,7 @@ namespace finite_element
   //#############################################
   enum SetupFlags : int
   {
-    NO_FLAGS_SET           = 0,
-    COMPUTE_CELL_MAPPINGS  = (1 << 0),
-    COMPUTE_UNIT_INTEGRALS = (1 << 1),
-    COMPUTE_QP_DATA        = (1 << 2)
+    NO_FLAGS_SET = 0
   };
 
   inline SetupFlags
@@ -61,8 +58,6 @@ namespace finite_element
                     std::vector<MatVec3> in_IntS_shapeI_gradshapeJ,
                     std::vector<std::vector<int>> in_face_dof_mappings,
                     size_t in_num_nodes);
-
-    void Reset();
 
     double IntV_gradShapeI_gradShapeJ(unsigned int i,
                                       unsigned int j) const;

@@ -127,76 +127,51 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
   //                                                 for each cell
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::COMPUTE_CELL_MAPPINGS)
-    {
-      chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
-                                  << " Computing unit integrals.";
-      if (!mapping_initialized)
-      {
-        for (const auto& cell : ref_grid->local_cells)
-          cell_mappings.push_back(MakeCellMappingFE(cell));
-
-        mapping_initialized = true;
-      }
-    }
+    chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                                << " Computing unit integrals.";
+    for (const auto& cell : ref_grid->local_cells)
+      cell_mappings.push_back(MakeCellMappingFE(cell));
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
   //============================================= Unit integrals
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::COMPUTE_UNIT_INTEGRALS)
-    {
     chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                                 << " Computing unit integrals.";
-      if (not integral_data_initialized)
-      {
-        fe_unit_integrals.reserve(num_local_cells);
-        for (size_t lc=0; lc<num_local_cells; ++lc)
-        {
-          UIData ui_data;
+    fe_unit_integrals.reserve(num_local_cells);
+    for (size_t lc=0; lc<num_local_cells; ++lc)
+    {
+      UIData ui_data;
 
-          auto cell_fe_view = GetCellMappingFE(lc);
-          cell_fe_view->ComputeUnitIntegrals(ui_data);
+      auto cell_fe_view = GetCellMappingFE(lc);
+      cell_fe_view->ComputeUnitIntegrals(ui_data);
 
-          fe_unit_integrals.push_back(std::move(ui_data));
-        }
-
-        integral_data_initialized = true;
-      }
-    }//if compute unit intgrls
+      fe_unit_integrals.push_back(std::move(ui_data));
+    }
   }
   MPI_Barrier(MPI_COMM_WORLD);
 
   //============================================= Quadrature data
   {
     using namespace chi_math::finite_element;
-    if (setup_flags & SetupFlags::COMPUTE_QP_DATA)
+    chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
+                                << " Computing quadrature data.";
+    fe_vol_qp_data.reserve(num_local_cells);
+    fe_srf_qp_data.reserve(num_local_cells);
+    for (size_t lc=0; lc<num_local_cells; ++lc)
     {
-      chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
-                                  << " Computing quadrature data.";
-      if (not qp_data_initialized)
-      {
-        fe_vol_qp_data.reserve(num_local_cells);
-        fe_srf_qp_data.reserve(num_local_cells);
-        for (size_t lc=0; lc<num_local_cells; ++lc)
-        {
-          fe_vol_qp_data.emplace_back();
-          fe_srf_qp_data.emplace_back();
+      fe_vol_qp_data.emplace_back();
+      fe_srf_qp_data.emplace_back();
 
-          auto cell_fe_view = GetCellMappingFE(lc);
-          cell_fe_view->InitializeAllQuadraturePointData(fe_vol_qp_data.back(),
-                                                         fe_srf_qp_data.back());
-        }
-
-        qp_data_initialized = true;
-      }
-    }//if init qp data
+      auto cell_fe_view = GetCellMappingFE(lc);
+      cell_fe_view->InitializeAllQuadraturePointData(fe_vol_qp_data.back(),
+                                                     fe_srf_qp_data.back());
+    }
   }
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                               << " Done adding cell SD-values.";
-
 }//AddViewOfLocalContinuum
 
 //###################################################################
@@ -204,25 +179,16 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 std::shared_ptr<CellMappingFE_PWL>
   SpatialDiscretization_PWLC::GetCellMappingFE(uint64_t cell_local_index)
 {
-
-  if (mapping_initialized)
+  try
   {
-    try
-    {
-      return cell_mappings.at(cell_local_index);
-    }
-    catch (const std::out_of_range& o)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "SpatialDiscretization_PWLC::MapFeView "
-           "Failure to map Finite Element View. The view is either not"
-           "available or the supplied local index is invalid.";
-      exit(EXIT_FAILURE);
-    }
+    return cell_mappings.at(cell_local_index);
   }
-  else
+  catch (const std::out_of_range& o)
   {
-    return MakeCellMappingFE(ref_grid->local_cells[cell_local_index]);
+    chi_log.Log(LOG_ALLERROR)
+      << "SpatialDiscretization_PWLC::MapFeView "
+         "Failure to map Finite Element View. The view is either not"
+         "available or the supplied local index is invalid.";
+    exit(EXIT_FAILURE);
   }
-
 }

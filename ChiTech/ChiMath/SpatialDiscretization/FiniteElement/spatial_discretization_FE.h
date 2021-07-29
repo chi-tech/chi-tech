@@ -19,9 +19,6 @@ protected:
   std::vector<QPDataVol>               fe_vol_qp_data;
   std::vector<std::vector<QPDataFace>> fe_srf_qp_data;
 
-  bool integral_data_initialized=false;
-  bool qp_data_initialized=false;
-
   const chi_math::finite_element::SetupFlags setup_flags;
 
 protected:
@@ -40,37 +37,16 @@ protected:
 public:
   virtual
   const chi_math::finite_element::UnitIntegralData&
-    GetUnitIntegrals(const chi_mesh::Cell& cell)
-  {
-    if (not integral_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_FE::GetUnitIntegrals "
-                                  "called without integrals being initialized."
-                                  " Set flag COMPUTE_UNIT_INTEGRALS.");
-    return fe_unit_integrals[cell.local_id];
-  }
+    GetUnitIntegrals(const chi_mesh::Cell& cell) = 0;
 
   virtual
   const chi_math::finite_element::InternalQuadraturePointData&
-    GetQPData_Volumetric(const chi_mesh::Cell& cell)
-  {
-    if (not qp_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_FE::GetQPData_Volumetric "
-                                  "called without integrals being initialized."
-                                  " Set flag INIT_QP_DATA.");
-    return fe_vol_qp_data[cell.local_id];
-  }
+    GetQPData_Volumetric(const chi_mesh::Cell& cell) = 0;
 
   virtual
   const chi_math::finite_element::FaceQuadraturePointData&
     GetQPData_Surface(const chi_mesh::Cell& cell,
-                      const unsigned int face)
-  {
-    if (not qp_data_initialized)
-      throw std::invalid_argument("SpatialDiscretization_FE::GetQPData_Surface "
-                                  "called without integrals being initialized."
-                                  " Set flag INIT_QP_DATA.");
-    return fe_srf_qp_data[cell.local_id][face];
-  }
+                      const unsigned int face) = 0;
 
   virtual ~SpatialDiscretization_FE() = default;
 };
