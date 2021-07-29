@@ -15,16 +15,16 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
-                    int group_set_num,
-                    MainSweepScheduler& sweep_scheduler,
-                    SourceFlags source_flags,
-                    bool log_info /* = true*/)
+bool LinearBoltzmann::Solver::
+ClassicRichardson(LBSGroupset& groupset,
+                  MainSweepScheduler& sweep_scheduler,
+                  SourceFlags source_flags,
+                  bool log_info /* = true*/)
 {
   if (log_info)
   {
     chi_log.Log(LOG_0) << "\n\n";
-    chi_log.Log(LOG_0) << "********** Solving groupset" << group_set_num
+    chi_log.Log(LOG_0) << "********** Solving groupset" << groupset.id
                        << " with Classic-Richardson.\n\n";
     chi_log.Log(LOG_0)
       << "Quadrature number of angles: "
@@ -150,7 +150,7 @@ bool LinearBoltzmann::Solver::ClassicRichardson(LBSGroupset& groupset,
         << "\n\n";
 
       std::string sweep_log_file_name =
-          std::string("GS_") + std::to_string(group_set_num) +
+          std::string("GS_") + std::to_string(groupset.id) +
           std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
           std::string(".log");
       groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);

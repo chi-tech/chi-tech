@@ -1,16 +1,13 @@
 #include "ChiLua/chi_lua.h"
 
 #include "KEigenvalueSolver/k_eigenvalue_solver.h"
+#include "lua_utils.h"
 
 #include "ChiPhysics/chi_physics.h"
-
 extern ChiPhysics& chi_physics_handler;
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
-
-using namespace LinearBoltzmann;
 
 //############################################################
 /**Set boolean for using precursors.*/
@@ -20,34 +17,20 @@ int chiLBSSetUsePrecursors(lua_State* L)
 
   if (num_args != 2)
     LuaPostArgAmountError(__FUNCTION__, 2, num_args);
+
+  LuaCheckNilValue(__FUNCTION__, L, 1);
   LuaCheckNilValue(__FUNCTION__, L, 2);
+
+  LuaCheckIntegerValue(__FUNCTION__, L, 1);
+  LuaCheckBoolValue(__FUNCTION__, L, 2);
 
   int solver_index = lua_tonumber(L, 1);
   bool use_precursors = lua_toboolean(L, 2);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
-  LinearBoltzmann::Solver* solver;
-  try
-  {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
+  auto solver = LinearBoltzmann::lua_utils::
+  GetKEigenvalueSolverByHandle(solver_index, __FUNCTION__);
 
-    solver = dynamic_cast<LinearBoltzmann::Solver*>(psolver);
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Incorrect solver-type."
-                             " Cannot cast to KEigenvalue::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch (const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver";
-    exit(EXIT_FAILURE);
-  }
   solver->options.use_precursors = use_precursors;
 
   chi_log.Log(LOG_0)
@@ -64,34 +47,19 @@ int chiLBSSetMaxKIterations(lua_State* L)
 
   if (num_args != 2)
     LuaPostArgAmountError(__FUNCTION__, 2, num_args);
+
+  LuaCheckNilValue(__FUNCTION__, L, 1);
   LuaCheckNilValue(__FUNCTION__, L, 2);
+
+  LuaCheckIntegerValue(__FUNCTION__, L, 1);
+  LuaCheckIntegerValue(__FUNCTION__, L, 2);
 
   int solver_index = lua_tonumber(L, 1);
   int num_iter = lua_tointeger(L, 2);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
-  KEigenvalue::Solver* solver;
-  try
-  {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    solver = dynamic_cast<KEigenvalue::Solver*>(psolver);
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Incorrect solver-type."
-                             " Cannot cast to KEigenvalue::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch (const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver";
-    exit(EXIT_FAILURE);
-  }
+  auto solver = LinearBoltzmann::lua_utils::
+  GetKEigenvalueSolverByHandle(solver_index, __FUNCTION__);
 
   if (num_iter < 0)
   {
@@ -117,34 +85,19 @@ int chiLBSSetKTolerance(lua_State* L)
 
   if (num_args != 2)
     LuaPostArgAmountError(__FUNCTION__, 2, num_args);
+
+  LuaCheckNilValue(__FUNCTION__, L, 1);
   LuaCheckNilValue(__FUNCTION__, L, 2);
+
+  LuaCheckIntegerValue(__FUNCTION__, L, 1);
+  LuaCheckNumberValue(__FUNCTION__, L, 2);
 
   int solver_index = lua_tonumber(L, 1);
   double tol = lua_tonumber(L, 2);
 
   // ----- Get pointer to solver
-  chi_physics::Solver* psolver;
-  KEigenvalue::Solver* solver;
-  try
-  {
-    psolver = chi_physics_handler.solver_stack.at(solver_index);
-
-    solver = dynamic_cast<KEigenvalue::Solver*>(psolver);
-
-    if (not solver)
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Incorrect solver-type."
-                             " Cannot cast to KEigenvalue::Solver\n";
-      exit(EXIT_FAILURE);
-    }
-  }
-  catch (const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Invalid handle to solver";
-    exit(EXIT_FAILURE);
-  }
+  auto solver = LinearBoltzmann::lua_utils::
+  GetKEigenvalueSolverByHandle(solver_index, __FUNCTION__);
 
   if (tol < 0)
   {

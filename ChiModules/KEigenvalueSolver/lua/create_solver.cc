@@ -22,7 +22,8 @@ int chiKEigenvalueLBSCreateSolver(lua_State* L)
 
   chi_physics_handler.solver_stack.push_back(solver);
 
-  lua_pushnumber(L, chi_physics_handler.solver_stack.size() - 1);
+  lua_pushinteger(L,
+        static_cast<lua_Integer>(chi_physics_handler.solver_stack.size() - 1));
   return 1;
 }
 

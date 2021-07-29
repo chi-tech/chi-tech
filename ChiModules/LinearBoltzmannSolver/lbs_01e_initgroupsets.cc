@@ -4,7 +4,7 @@
 /**Initializes common groupset items.*/
 void LinearBoltzmann::Solver::InitializeGroupsets()
 {
-  for (auto& groupset : group_sets)
+  for (auto& groupset : groupsets)
   {
     //================================================== Build groupset angular
     //                                                   flux unknown manager
