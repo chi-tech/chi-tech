@@ -301,14 +301,14 @@ run_test(
 
 run_test(
     file_name="Transport3D_1Poly_qmom_part1",
-    comment="3D LinearBSolver Test Ortho Grid Parmetis - PWLD",
+    comment="3D LinearBSolver Test Source moment writing - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 1.08320e-01, 1.0e-6],
                               ["[0]  Max-value2=", 0.000000000, 1.0e-10]])
 
 run_test(
     file_name="Transport3D_1Poly_qmom_part2",
-    comment="3D LinearBSolver Test Ortho Grid Parmetis - PWLD",
+    comment="3D LinearBSolver Test Source moment reading - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 1.08197e-01, 1.0e-6],
                               ["[0]  Max-value2=", 9.14681e-06, 1.0e-10]])
