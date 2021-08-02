@@ -118,7 +118,7 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
 chiLBSInitialize(phys1)
-chiLBSReadFluxMoments(phys1,"Qmoms")
+chiLBSReadSourceMoments(phys1,"Qmoms")
 chiLBSSetProperty(phys1,USE_SOURCE_MOMENTS,true)
 chiLBSExecute(phys1)
 

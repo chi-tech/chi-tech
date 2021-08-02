@@ -12,12 +12,12 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Makes a source-moments vector from scattering and fission based
  * on the latest phi-solution.*/
-void LinearBoltzmann::Solver::
-  MakeSourceMomentsFromPhi(std::vector<double> &source_moments)
+std::vector<double> LinearBoltzmann::Solver::
+  MakeSourceMomentsFromPhi()
 {
   size_t num_local_dofs = discretization->GetNumLocalDOFs(flux_moments_uk_man);
 
-  source_moments.assign(num_local_dofs,0.0);
+  std::vector<double> source_moments(num_local_dofs,0.0);
   for (auto& groupset : groupsets)
   {
     SetSource(groupset,
@@ -25,6 +25,8 @@ void LinearBoltzmann::Solver::
               APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
               APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
   }
+
+  return source_moments;
 }
 
 
@@ -58,14 +60,14 @@ void LinearBoltzmann::Solver::
     "Chi-Tech LinearBoltzmann: Flux moments file\n"
     "Header size: 500 bytes\n"
     "Structure(type-info):\n"
-    "size_t num_local_nodes\n"
-    "size_t num_moments\n"
-    "size_t num_groups\n"
-    "size_t num_records\n"
-    "size_t num_cells\n"
+    "uint64_t num_local_nodes\n"
+    "uint64_t num_moments\n"
+    "uint64_t num_groups\n"
+    "uint64_t num_records\n"
+    "uint64_t num_cells\n"
     "Each cell:\n"
     "  uint64_t cell_global_id\n"
-    "  size_t   num_nodes\n"
+    "  uint64_t num_nodes\n"
     "  Each node:\n"
     "    double   x_position\n"
     "    double   y_position\n"
@@ -89,27 +91,28 @@ void LinearBoltzmann::Solver::
   //============================================= Get relevant items
   auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
   auto& sdm = discretization;
-  size_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
-  size_t num_moments_t   = static_cast<size_t>(num_moments);
-  size_t num_groups      = groups.size();
-  size_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
-  size_t num_local_cells = grid->local_cells.size();
+  uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
+  uint64_t num_moments_t   = static_cast<size_t>(num_moments);
+  uint64_t num_groups      = groups.size();
+  uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
+  uint64_t num_local_cells = grid->local_cells.size();
 
   //============================================= Write num_ quantities
-  file.write((char*)&num_local_nodes,sizeof(size_t));
-  file.write((char*)&num_moments_t  ,sizeof(size_t));
-  file.write((char*)&num_groups     ,sizeof(size_t));
-  file.write((char*)&num_local_dofs ,sizeof(size_t));
-  file.write((char*)&num_local_cells,sizeof(size_t));
+  file.write((char*)&num_local_nodes,sizeof(uint64_t));
+  file.write((char*)&num_moments_t  ,sizeof(uint64_t));
+  file.write((char*)&num_groups     ,sizeof(uint64_t));
+  file.write((char*)&num_local_dofs ,sizeof(uint64_t));
+  file.write((char*)&num_local_cells,sizeof(uint64_t));
 
   //============================================= Write nodal positions for
   //                                              each cell
   for (const auto& cell : grid->local_cells)
   {
-    file.write((char *) &cell.global_id, sizeof(uint64_t));
+    uint64_t cell_global_id = static_cast<uint64_t>(cell.global_id);
+    file.write((char *) &cell_global_id, sizeof(uint64_t));
 
-    size_t num_nodes      = discretization->GetCellNumNodes(cell);
-    file.write((char *) &num_nodes, sizeof(size_t));
+    uint64_t num_nodes = discretization->GetCellNumNodes(cell);
+    file.write((char *) &num_nodes, sizeof(uint64_t));
 
     auto   node_locations = discretization->GetCellNodeLocations(cell);
     for (const auto& node : node_locations)
@@ -127,10 +130,11 @@ void LinearBoltzmann::Solver::
         for (unsigned int m=0; m<num_moments_t; ++m)
           for (unsigned int g=0; g<num_groups; ++g)
           {
+            uint64_t cell_global_id = static_cast<uint64_t>(cell.global_id);
             uint64_t dof_map = sdm->MapDOFLocal(cell,i,flux_moments_uk_man,m,g);
             double value = flux_moments.at(dof_map);
 
-            file.write((char*)&cell.global_id,sizeof(uint64_t));
+            file.write((char*)&cell_global_id,sizeof(uint64_t));
             file.write((char*)&i             ,sizeof(unsigned int));
             file.write((char*)&m             ,sizeof(unsigned int));
             file.write((char*)&g             ,sizeof(unsigned int));
@@ -149,7 +153,7 @@ void LinearBoltzmann::Solver::
 
 
 //###################################################################
-/**Writes a flux-moments vector from a file in the specified vector.*/
+/**Reads a flux-moments vector from a file in the specified vector.*/
 void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
                                               std::vector<double>& flux_moments,
                                               bool single_file/*=false*/)
@@ -176,17 +180,17 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
   //============================================= Get relevant items
   auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
   auto& sdm = discretization;
-  size_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
-  size_t num_moments_t   = static_cast<size_t>(num_moments);
-  size_t num_groups      = groups.size();
-  size_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
-  size_t num_local_cells = grid->local_cells.size();
+  uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
+  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
+  uint64_t num_groups      = groups.size();
+  uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
+  uint64_t num_local_cells = grid->local_cells.size();
 
-  size_t file_num_local_nodes;
-  size_t file_num_moments    ;
-  size_t file_num_groups     ;
-  size_t file_num_local_dofs ;
-  size_t file_num_local_cells;
+  uint64_t file_num_local_nodes;
+  uint64_t file_num_moments    ;
+  uint64_t file_num_groups     ;
+  uint64_t file_num_local_dofs ;
+  uint64_t file_num_local_cells;
 
   flux_moments.assign(num_local_dofs,0.0);
 
@@ -194,11 +198,11 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
   char header_bytes[500]; header_bytes[499] = '\0';
   file.read(header_bytes,499);
 
-  file.read((char*)&file_num_local_nodes, sizeof(size_t));
-  file.read((char*)&file_num_moments    , sizeof(size_t));
-  file.read((char*)&file_num_groups     , sizeof(size_t));
-  file.read((char*)&file_num_local_dofs , sizeof(size_t));
-  file.read((char*)&file_num_local_cells, sizeof(size_t));
+  file.read((char*)&file_num_local_nodes, sizeof(uint64_t));
+  file.read((char*)&file_num_moments    , sizeof(uint64_t));
+  file.read((char*)&file_num_groups     , sizeof(uint64_t));
+  file.read((char*)&file_num_local_dofs , sizeof(uint64_t));
+  file.read((char*)&file_num_local_cells, sizeof(uint64_t));
 
   //============================================= Check compatibility
   if (not single_file)
@@ -232,15 +236,15 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
   {
     //============================ Read cell-id and num_nodes
     uint64_t cell_global_id;
-    size_t   num_nodes;
+    uint64_t num_nodes;
 
     file.read((char*)&cell_global_id, sizeof(uint64_t));
-    file.read((char*)&num_nodes     , sizeof(size_t));
+    file.read((char*)&num_nodes     , sizeof(uint64_t));
 
     //============================ Read node locations
     std::vector<chi_mesh::Vector3> file_node_locations;
     file_node_locations.reserve(num_nodes);
-    for (size_t n=0; n < num_nodes; ++n)
+    for (uint64_t n=0; n < num_nodes; ++n)
     {
       double x,y,z;
       file.read((char*)&x, sizeof(double));
@@ -309,7 +313,6 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
       const auto& node_mapping = file_cell_nodal_mapping.at(cell_global_id);
 
       size_t node_mapped = node_mapping.at(node);
-//      auto node_mapped = node;
 
       size_t dof_map = sdm->MapDOFLocal(cell,
                                         node_mapped,

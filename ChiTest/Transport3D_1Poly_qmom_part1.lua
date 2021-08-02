@@ -123,7 +123,7 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSInitialize(phys1)
 chiLBSExecute(phys1)
 
-chiLBSWriteFluxMoments(phys1,"Qmoms")
+chiLBSCreateAndWriteSourceMoments(phys1,"Qmoms")
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)

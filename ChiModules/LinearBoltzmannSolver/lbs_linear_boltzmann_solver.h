@@ -159,7 +159,7 @@ public:
                                  const std::string& file_base);
 
   //04c
-  void MakeSourceMomentsFromPhi(std::vector<double>& source_moments);
+  std::vector<double> MakeSourceMomentsFromPhi();
   void WriteFluxMoments(const std::string& file_base,
                         const std::vector<double>& flux_moments);
   void ReadFluxMoments(const std::string& file_base,

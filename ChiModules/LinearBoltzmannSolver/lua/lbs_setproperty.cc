@@ -70,6 +70,11 @@ READ_RESTART_DATA\n
  absolute, and the second is the file base name. These are defaulted to
  "YRestart" and "restart" respectively.\n\n
 
+USE_SOURCE_MOMENTS\n
+ Flag for using a vector of source moments instead the regular material/boundary
+  source. Default false. This expects
+ to be followed by a boolean.\n\n
+
 VERBOSE_INNER_ITERATIONS\n
  Flag for printing inner iteration information. This is primarily used
  for printing information related to group-set-level iterative methods.
