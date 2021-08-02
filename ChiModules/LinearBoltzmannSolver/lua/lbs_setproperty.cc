@@ -387,7 +387,7 @@ int chiLBSSetProperty(lua_State *L)
 
     bool use_flag = lua_toboolean(L, 3);
 
-    solver->options.use_src_moments = use_flag;
+    lbs_solver->options.use_src_moments = use_flag;
 
     chi_log.Log() << "LBS option to use source moments set to " << use_flag;
   }

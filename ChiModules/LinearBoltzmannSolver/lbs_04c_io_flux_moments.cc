@@ -18,7 +18,7 @@ void LinearBoltzmann::Solver::
   size_t num_local_dofs = discretization->GetNumLocalDOFs(flux_moments_uk_man);
 
   source_moments.assign(num_local_dofs,0.0);
-  for (auto& groupset : group_sets)
+  for (auto& groupset : groupsets)
   {
     SetSource(groupset,
               source_moments,
