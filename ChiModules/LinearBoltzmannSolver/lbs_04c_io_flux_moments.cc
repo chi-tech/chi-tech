@@ -8,6 +8,7 @@ extern ChiMPI& chi_mpi;
 
 #include <fstream>
 #include <cstring>
+#include <assert.h>
 
 //###################################################################
 /**Makes a source-moments vector from scattering and fission based
@@ -124,28 +125,23 @@ void LinearBoltzmann::Solver::
   }//for cell
 
   //============================================= Write per dof data
-  try {
-    for (const auto& cell : grid->local_cells)
-      for (unsigned int i=0; i<sdm->GetCellNumNodes(cell); ++i)
-        for (unsigned int m=0; m<num_moments_t; ++m)
-          for (unsigned int g=0; g<num_groups; ++g)
-          {
-            uint64_t cell_global_id = static_cast<uint64_t>(cell.global_id);
-            uint64_t dof_map = sdm->MapDOFLocal(cell,i,flux_moments_uk_man,m,g);
-            double value = flux_moments.at(dof_map);
+  for (const auto& cell : grid->local_cells)
+    for (unsigned int i=0; i<sdm->GetCellNumNodes(cell); ++i)
+      for (unsigned int m=0; m<num_moments_t; ++m)
+        for (unsigned int g=0; g<num_groups; ++g)
+        {
+          uint64_t cell_global_id = cell.global_id;
+          uint64_t dof_map = sdm->MapDOFLocal(cell,i,flux_moments_uk_man,m,g);
 
-            file.write((char*)&cell_global_id,sizeof(uint64_t));
-            file.write((char*)&i             ,sizeof(unsigned int));
-            file.write((char*)&m             ,sizeof(unsigned int));
-            file.write((char*)&g             ,sizeof(unsigned int));
-            file.write((char*)&value         ,sizeof(double));
-          }
-  }
-  catch (const std::out_of_range& e)
-  {
-    chi_log.Log(LOG_ALLWARNING) << __FUNCTION__ << ": The given flux_moments-"
-                               << "vector was accessed out of range.";
-  }
+          assert(dof_map < flux_moments.size());
+          double value = flux_moments[dof_map];
+
+          file.write((char*)&cell_global_id,sizeof(uint64_t));
+          file.write((char*)&i             ,sizeof(unsigned int));
+          file.write((char*)&m             ,sizeof(unsigned int));
+          file.write((char*)&g             ,sizeof(unsigned int));
+          file.write((char*)&value         ,sizeof(double));
+        }
 
   //============================================= Clean-up
   file.close();
@@ -231,8 +227,8 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
     }
 
   //============================================= Read cell nodal locations
-  std::map<uint64_t, std::map<size_t,size_t>> file_cell_nodal_mapping;
-  for (size_t c=0; c < file_num_local_cells; ++c)
+  std::map<uint64_t, std::map<uint64_t,uint64_t>> file_cell_nodal_mapping;
+  for (uint64_t c=0; c < file_num_local_cells; ++c)
   {
     //============================ Read cell-id and num_nodes
     uint64_t cell_global_id;
@@ -260,7 +256,7 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
 
     //================ Now map file nodes to system nodes
     auto system_node_locations = discretization->GetCellNodeLocations(cell);
-    std::map<size_t,size_t> mapping;
+    std::map<uint64_t,uint64_t> mapping;
 
     //Check num_nodes equal
     if (system_node_locations.size() != num_nodes)
@@ -272,11 +268,12 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
 
     const auto &sys_nodes = system_node_locations;
     const auto &file_nodes = file_node_locations;
+    size_t num_system_nodes = system_node_locations.size();
 
-    for (size_t n = 0; n < num_nodes; ++n)
+    for (uint64_t n = 0; n < num_nodes; ++n)
     {
       bool mapping_found = false;
-      for (size_t m = 0; m < num_nodes; ++m)
+      for (uint64_t m = 0; m < num_system_nodes; ++m)
         if ((sys_nodes[m] - file_nodes[n]).NormSquare() < 1.0e-12) {
           mapping[n] = m; mapping_found = true; }
 
@@ -320,7 +317,8 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
                                         moment,
                                         group);
 
-      flux_moments.at(dof_map) = flux_value;
+      assert(dof_map < flux_moments.size());
+      flux_moments[dof_map] = flux_value;
     }//if cell is local
   }//for dof
 
