@@ -53,7 +53,7 @@ ClassicRichardson(LBSGroupset& groupset,
     q_moments_local = init_q_moments_local;
     SetSource(groupset, q_moments_local, source_flags);
 
-    ZeroFluxDataStructures(groupset);
+    sweep_chunk.ZeroFluxDataStructures();
     sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)

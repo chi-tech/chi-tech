@@ -31,8 +31,8 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   solver.SetSource(groupset, solver.q_moments_local, lhs_source_scope);
 
   //============================================= Sweeping the new source
-  solver.ZeroFluxDataStructures(groupset);
-  sweepScheduler.Sweep();
+  sweep_chunk.ZeroFluxDataStructures();
+  sweep_scheduler.Sweep();
 
   //=================================================== Apply WGDSA
   if (groupset.apply_wgdsa)
