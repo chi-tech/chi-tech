@@ -182,7 +182,7 @@ void LinearBoltzmann::Solver::
                                  xs->nu_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
-                  //with delayed neutron precursors
+                //with delayed neutron precursors
                 else
                 {
                   //==================== Prompt fission
