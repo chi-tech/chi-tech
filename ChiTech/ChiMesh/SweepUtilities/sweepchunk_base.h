@@ -49,6 +49,7 @@ public:
   virtual void ZeroDestinationPsi() = 0;
   virtual void ZeroIncomingDelayedPsi() = 0;
   virtual void ZeroOutgoingDelayedPsi() = 0;
+  virtual void ZeroFluxDataStructures() = 0;
 
   /**Returns a reference to the output vector.*/
   std::vector<double>& GetDestinationPhi()

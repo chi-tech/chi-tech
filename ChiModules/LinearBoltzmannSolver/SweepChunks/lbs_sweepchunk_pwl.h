@@ -60,6 +60,13 @@ public:
 
   void ZeroOutgoingDelayedPsi() override
     {groupset.angle_agg.ZeroOutgoingDelayedPsi();}
+
+  void ZeroFluxDataStructures() override
+  {
+    ZeroDestinationPhi();
+    ZeroDestinationPsi();
+    ZeroOutgoingDelayedPsi();
+  }
 };
 }
 
