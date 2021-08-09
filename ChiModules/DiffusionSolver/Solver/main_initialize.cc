@@ -23,7 +23,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 {
   chi_log.Log(LOG_0) << "\n"
                      << chi_program_timer.GetTimeString() << " "
-                     << solver_name << ": Initializing Diffusion solver ";
+                     << TextName() << ": Initializing Diffusion solver ";
   this->verbose_info = verbose;
 
 
@@ -68,7 +68,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   local_dof_count = sdm->GetNumLocalDOFs(unknown_manager);
   global_dof_count = sdm->GetNumGlobalDOFs(unknown_manager);
   chi_log.Log(LOG_0)
-    << solver_name << ": Global number of DOFs="
+    << TextName() << ": Global number of DOFs="
     << global_dof_count;
 
 
@@ -123,7 +123,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString() << " "
-    << solver_name << ": Diffusion Solver initialization time "
+    << TextName() << ": Diffusion Solver initialization time "
     << t_init.GetTime()/1000.0 << std::endl;
 
   //================================================== Initialize x and b

@@ -4,13 +4,9 @@
 
 //###################################################################
 /**Constructor for LBS*/
-LinearBoltzmann::Solver::Solver()
+LinearBoltzmann::Solver::Solver(const std::string& in_text_name) :
+  chi_physics::Solver(in_text_name)
 {
-  //============================================= Default options
-  max_cell_dof_count = 0;
-
-  discretization = nullptr;
-
   boundary_types.resize(6,
     std::pair<BoundaryType,int>(LinearBoltzmann::BoundaryType::VACUUM, -1));
 }

@@ -53,7 +53,6 @@ public:
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
 
 public:
-  std::string                              solver_name="Diffusion Solver";
   BoundaryPreferences                      boundary_preferences;
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuumPtr                 grid = nullptr;
@@ -73,14 +72,14 @@ public:
 
   bool common_items_initialized=false;
 
-  Vec            x;            // approx solution
-  Vec            b;            // RHS
-  Mat            A;            // linear system matrix
-  KSP            ksp;          // linear solver context
-  PC             pc;           // preconditioner context
+  Vec            x = nullptr;            // approx solution
+  Vec            b = nullptr;            // RHS
+  Mat            A = nullptr;            // linear system matrix
+  KSP            ksp = nullptr;          // linear solver context
+  PC             pc = nullptr;           // preconditioner context
 
-  PetscReal      norm;         /* norm of solution error */
-  PetscErrorCode ierr;         // General error code
+  PetscReal      norm = 0.0;         /* norm of solution error */
+  PetscErrorCode ierr = 0;         // General error code
 
   int                            local_dof_count = 0;
   int                            global_dof_count = 0;
@@ -95,8 +94,8 @@ public:
 
 public:
   //00
-  Solver();
-  explicit Solver(std::string in_solver_name);
+//  Solver();
+  explicit Solver(const std::string& in_solver_name);
   virtual ~Solver();
   //01 General
   void GetMaterialProperties(const chi_mesh::Cell& cell,
@@ -113,6 +112,8 @@ public:
   int Initialize(bool verbose=true);
 
   //02a
+  void Execute() override
+  { ExecuteS(); }
   int ExecuteS(bool suppress_assembly = false, bool suppress_solve = false);
 
   void CFEM_Assemble_A_and_b(chi_mesh::Cell& cell, int group=0);

@@ -61,7 +61,7 @@ public:
   double last_restart_write=0.0;
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
 
-  int num_moments;
+  int num_moments=0;
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> groupsets;
@@ -70,7 +70,7 @@ public:
   std::vector<int> matid_to_xs_map;
   std::vector<int> matid_to_src_map;
 
-  std::shared_ptr<SpatialDiscretization> discretization;
+  std::shared_ptr<SpatialDiscretization> discretization = nullptr;
   chi_mesh::MeshContinuumPtr grid;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings;
   std::vector<LinearBoltzmann::CellLBSView> cell_transport_views;
@@ -85,18 +85,18 @@ public:
 
   chi_math::UnknownManager flux_moments_uk_man;
 
-  size_t max_cell_dof_count;
-  unsigned long long local_node_count;
-  unsigned long long glob_node_count;
+  size_t max_cell_dof_count = 0;
+  unsigned long long local_node_count = 0;
+  unsigned long long glob_node_count = 0;
 
-  Vec phi_new, phi_old, q_fixed;
+  Vec phi_new = nullptr, phi_old = nullptr, q_fixed = nullptr;
   std::vector<double> q_moments_local, ext_src_moments_local;
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
 
  public:
   //00
-  Solver();
+  explicit Solver(const std::string& in_text_name);
   ~Solver() override =default;
   //01
   virtual void Initialize();

@@ -25,8 +25,9 @@ private:
 //  Methods
 public:
   /** Constructor. */
-  Solver(const chi_math::CoordinateSystemType& coord_system_type)
-  : LinearBoltzmann::Solver()
+  Solver(const chi_math::CoordinateSystemType& coord_system_type,
+         const std::string& in_text_name)
+  : LinearBoltzmann::Solver(in_text_name)
   , coord_system_type(coord_system_type)
   , discretization_secondary()
   {}
