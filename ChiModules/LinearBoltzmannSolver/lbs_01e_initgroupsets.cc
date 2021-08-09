@@ -16,15 +16,6 @@ void LinearBoltzmann::Solver::InitializeGroupsets()
     for (unsigned int n=0; n<num_angles; ++n)
       grpset_psi_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, num_groups);
 
-    //================================================== Setup group angular flux
-    psi_new_local.emplace_back();
-    if (options.save_angular_flux)
-    {
-      size_t num_ang_unknowns = discretization->GetNumLocalDOFs(grpset_psi_uk_man);
-      groupset.num_psi_unknowns_local = num_ang_unknowns;
-      psi_new_local.back().assign(num_ang_unknowns, 0.0);
-    }
-
     groupset.BuildDiscMomOperator(options.scattering_order,
                                   options.geometry_type);
     groupset.BuildMomDiscOperator(options.scattering_order,

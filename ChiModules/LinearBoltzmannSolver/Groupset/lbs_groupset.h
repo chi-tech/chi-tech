@@ -75,7 +75,6 @@ public:
   bool                                         log_sweep_events;
 
   chi_math::UnknownManager                     psi_uk_man;
-  size_t                                       num_psi_unknowns_local=0;
 
   //lbs_groupset.cc
   explicit LBSGroupset(int in_id);
