@@ -5,7 +5,7 @@ extern ChiLog& chi_log;
 
 #include <string>
 
-double eps = std::numeric_limits<float>::epsilon();
+double eps = 1.0e-8;
 
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
  *\ingroup LuaPhysicsMaterials
