@@ -70,35 +70,38 @@ void LinearBoltzmann::Solver::
     if ((src_id >= 0) && (apply_mat_src))
       src = material_srcs[src_id]->source_value_g.data();
 
-    //======================================== Loop over nodes
+    //=========================================== Loop over nodes
     const int num_nodes = full_cell_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
-      //=================================== Loop over moments
+      //==================================== Loop over moments
       for (int m = 0; m < num_moments; ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
         size_t uk_map = full_cell_view.MapDOF(i, m, 0); //unknown map
 
-        //============================== Loop over groupset groups
+        //============================= Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
-          if ( apply_mat_src and (ell == 0) and (not options.use_src_moments))
-            destination_q[uk_map + g] += src[g];
-          else if (apply_mat_src and options.use_src_moments)
+          if (not options.use_src_moments) //using regular material src
+          {
+            if (apply_mat_src and ell == 0)
+              destination_q[uk_map + g] += src[g];
+          }
+          else if (apply_mat_src)  //using ext_src_moments
             destination_q[uk_map + g] += ext_src_moments_local[uk_map + g];
 
           double inscatter_g = 0.0;
           const bool moment_avail = (ell < xs->transfer_matrices.size());
 
-          //=================================== Apply across-groupset scattering
+          //====================== Apply across-groupset scattering
           if (moment_avail and apply_ags_scatter_src)
           {
             size_t num_transfers =
                 xs->transfer_matrices[ell].rowI_indices[g].size();
 
-            //============================== Loop over transfers
+            //=============== Loop over transfers
             for (size_t t = 0; t < num_transfers; ++t)
             {
               size_t gprime =
@@ -112,13 +115,13 @@ void LinearBoltzmann::Solver::
             }
           }//if moment_avail
 
-          //=================================== Apply within-groupset scattering
+          //====================== Apply within-groupset scattering
           if (moment_avail and apply_wgs_scatter_src)
           {
             size_t num_transfers =
                 xs->transfer_matrices[ell].rowI_indices[g].size();
 
-            //============================== Loop over transfers
+            //=============== Loop over transfers
             for (size_t t = 0; t < num_transfers; ++t)
             {
               size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
@@ -135,10 +138,10 @@ void LinearBoltzmann::Solver::
           double infission_g = 0.0;
           const bool fission_avail = (xs->is_fissile and ell == 0);
 
-          //=================================== Apply accross-groupset fission
+          //====================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
           {
-            //================================ Loop over groups
+            //=============== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime < gs_i) or (gprime > gs_f))
@@ -152,12 +155,12 @@ void LinearBoltzmann::Solver::
                 //with delayed neutron precursors
                 else
                 {
-                  //==================== Prompt fission
+                  //Prompt fission
                   infission_g += xs->chi_prompt[g] *
                                  xs->nu_prompt_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
-                  //==================== Delayed fission
+                  //Delayed fission
                   for (size_t j = 0; j < xs->num_precursors; ++j)
                     infission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
@@ -168,10 +171,10 @@ void LinearBoltzmann::Solver::
             }//for gprime
           }//if zeroth moment
 
-          //=================================== Apply within-groupset fission
+          //====================== Apply within-groupset fission
           if (fission_avail and apply_wgs_fission_src)
           {
-            //============================== Loop over groups
+            //=============== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
               if ((gprime >= gs_i) and (gprime <= gs_f))
@@ -185,12 +188,12 @@ void LinearBoltzmann::Solver::
                 //with delayed neutron precursors
                 else
                 {
-                  //==================== Prompt fission
+                  //Prompt fission
                   infission_g += xs->chi_prompt[g] *
                                  xs->nu_prompt_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
-                  //==================== Delayed fission
+                  //Delayed fission
                   for (size_t j = 0; j < xs->num_precursors; ++j)
                     infission_g += xs->chi_delayed[g][j] *
                                    xs->precursor_yield[j] *
