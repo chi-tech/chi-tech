@@ -191,8 +191,9 @@ public:
   void ComputeBalance();
 
   //
-  void ZeroAngularFluxDataStructures(LBSGroupset& groupset)
+  void ZeroFluxDataStructures(LBSGroupset& groupset)
   {
+    phi_new_local.assign(phi_new_local.size(), 0.0);
     if (options.save_angular_flux)
     {
       auto& psi = psi_new_local[groupset.id];
