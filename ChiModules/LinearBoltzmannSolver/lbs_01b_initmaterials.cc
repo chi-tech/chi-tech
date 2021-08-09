@@ -112,38 +112,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
         << options.scattering_order << "."
         << " The higher moments will therefore not be used.";
     }
-
-    //====================================== Check fission cross sections
-    if (material_xs[matid_to_xs_map[mat_id]]->is_fissile)
-    {
-      auto xs =
-          std::static_pointer_cast<chi_physics::TransportCrossSections>(
-              material_xs[matid_to_xs_map[mat_id]]);
-
-      //check what quantities have been provided
-      bool has_total = false;
-      bool has_prompt = false;
-      for (size_t g = 0; g < xs->num_groups; ++g)
-      {
-        if (xs->nu[g] > 0.0 and xs->chi[g] > 0.0)
-          has_total = true;
-        if (xs->nu_prompt[g] > 0.0 and xs->chi_prompt[g] > 0.0)
-          has_prompt = true;
-      }
-
-      //ensure correct quantities have been provided
-      if (not options.use_precursors)
-      {
-        if (not has_total and has_prompt)
-        {
-          chi_log.Log(LOG_ALLWARNING)
-              << __FUNCTION__ << ": Total nu/chi were not provided for "
-              << "a calculation without precursors. Setting nu/chi to "
-              << "the nu/chi prompt values.";
-        }
-      }
-    }
-
+    
     materials_list
       << " number of moments "
       << material_xs[matid_to_xs_map[mat_id]]->transfer_matrices.size() << "\n";

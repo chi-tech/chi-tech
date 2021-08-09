@@ -627,7 +627,6 @@ void chi_physics::TransportCrossSections::
         }
       }
 
-
       if (num_lambdas != num_precursors)
       {
         chi_log.Log(LOG_ALLERROR)
