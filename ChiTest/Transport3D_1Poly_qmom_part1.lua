@@ -1,6 +1,6 @@
--- 3D Transport test with Vacuum and Incident-isotropic BC.
+-- 3D Transport test with Vacuum BCs and a material source writing source moments.
 -- SDM: PWLD
--- Test: Max-value=5.27450e-01 and 3.76339e-04
+-- Test: Max-value=1.08320e-01 and 0.0
 num_procs = 4
 
 

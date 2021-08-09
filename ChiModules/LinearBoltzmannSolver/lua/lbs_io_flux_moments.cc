@@ -1,6 +1,6 @@
 #include "ChiLua/chi_lua.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
+#include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
 
 #include "lbs_lua_utils.h"
 

@@ -8,7 +8,7 @@ extern ChiMPI& chi_mpi;
 
 #include <fstream>
 #include <cstring>
-#include <assert.h>
+#include <cassert>
 
 //###################################################################
 /**Makes a source-moments vector from scattering and fission based
