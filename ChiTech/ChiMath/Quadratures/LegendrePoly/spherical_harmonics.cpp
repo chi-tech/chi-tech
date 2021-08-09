@@ -1,5 +1,6 @@
 #include "legendrepoly.h"
 
+#include "ChiMath/chi_math.h"
 #include <cmath>
 
 //###################################################################
@@ -10,34 +11,26 @@
  * */
 double chi_math::Ylm(unsigned int ell, int m, double varphi, double theta)
 {
-  auto fac = [](unsigned int x)
-  {
-    if (x==0) return 1;
-    if (x==1) return 1;
-
-    int factorial = 1;
-    for (int i=2; i<=x; ++i)
-      factorial *= i;
-
-    return factorial;
-  };
+  const int _ell = static_cast<int>(ell);
+  const int _m   = std::abs(m);
+  const double Plm = AssocLegendre(ell,_m,cos(theta));
 
   if (m<0)
   {
-    return sqrt( ( 2.0 ) * fac(ell-std::abs(m))/fac(ell+std::abs(m)) )*
-           AssocLegendre(ell,std::abs(m),cos(theta))*
-           sin(std::fabs(m)*varphi);
+    return pow(-1.0, _m) *
+           sqrt(2.0 * Factorial(_ell - _m)/
+                      Factorial(_ell + _m) ) *
+           Plm * sin(_m * varphi);
   }
-  else if(m==0)
+  else if (m==0)
   {
-    return AssocLegendre(ell,m,cos(theta));
+    return Plm;
   }
   else
   {
-    return  sqrt( ( 2.0 ) * fac(ell-m)/fac(ell+m) )*
-            AssocLegendre(ell,m,cos(theta))*
-            cos(m*varphi);
+    return pow(-1.0, _m) *
+           sqrt(2.0 * Factorial(_ell - _m)/
+                      Factorial(_ell + _m) ) *
+           Plm * cos(_m * varphi);
   }
-
-  return 0.0;
 }
