@@ -29,7 +29,7 @@ int chiDiffusionInitialize(lua_State *L)
   }
 
   bool success=false;
-  success = solver->Initialize();
+  success = solver->Initialize(true);
 
   lua_pushnumber(L,success);
   return 1;

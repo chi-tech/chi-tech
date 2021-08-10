@@ -109,7 +109,8 @@ public:
   void InitializeCommonItems();
 
   //01b
-  int Initialize(bool verbose=true);
+  void Initialize() override {Initialize(true);}
+  int Initialize(bool verbose);
 
   //02a
   void Execute() override

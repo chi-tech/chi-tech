@@ -152,12 +152,6 @@ int chiDiffusionSetProperty(lua_State *L)
 
   else if (property == BOUNDARY_TYPE)
   {
-//    if (not solver->common_items_initialized)
-//      solver->InitializeCommonItems();
-//
-//    chi_log.Log(LOG_0) << "Number of accessable boundaries: "
-//                       << solver->boundaries.size();
-
     if (num_args < 4)
     {
       chi_log.Log(LOG_0ERROR)
@@ -168,13 +162,6 @@ int chiDiffusionSetProperty(lua_State *L)
     }
 
     int bound_index = lua_tonumber(L,3);
-//    if (bound_index >= solver->boundaries.size())
-//    {
-//      chi_log.Log(LOG_0ERROR)
-//      << "Invalid boundary handle used in"
-//      << " chiDiffusionSetProperty(...,BOUNDARY_TYPE....";
-//      exit(EXIT_FAILURE);
-//    }
 
     int type_index = lua_tonumber(L,4);
 
@@ -189,9 +176,6 @@ int chiDiffusionSetProperty(lua_State *L)
           << " 4 arguments are expected.";
         exit(EXIT_FAILURE);
       }
-
-//      auto bound = new chi_diffusion::BoundaryReflecting;
-//      solver->boundaries[bound_index] = bound;
 
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Reflecting;
@@ -215,10 +199,6 @@ int chiDiffusionSetProperty(lua_State *L)
 
       double b_value = lua_tonumber(L,5);
 
-//      auto bound = new chi_diffusion::BoundaryDirichlet;
-//      bound->boundary_value = b_value;
-//      solver->boundaries[bound_index] = bound;
-
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Dirichlet;
       bndry_info.second = {b_value};
@@ -241,9 +221,6 @@ int chiDiffusionSetProperty(lua_State *L)
 
       double f_value = lua_tonumber(L,5);
 
-//      auto bound = new chi_diffusion::BoundaryRobin(0.0,1.0,f_value);
-//      solver->boundaries[bound_index] = bound;
-
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.0,1.0,f_value};
@@ -264,9 +241,6 @@ int chiDiffusionSetProperty(lua_State *L)
           << " 4 arguments are expected.";
         exit(EXIT_FAILURE);
       }
-
-//      auto bound = new chi_diffusion::BoundaryRobin(0.25,0.5,0.0);
-//      solver->boundaries[bound_index] = bound;
 
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Robin;
@@ -291,9 +265,6 @@ int chiDiffusionSetProperty(lua_State *L)
       double a_value = lua_tonumber(L,5);
       double b_value = lua_tonumber(L,6);
       double f_value = lua_tonumber(L,7);
-
-//      auto bound = new chi_diffusion::BoundaryRobin(a_value,b_value,f_value);
-//      solver->boundaries[bound_index] = bound;
 
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Robin;

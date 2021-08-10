@@ -43,6 +43,7 @@ public:
   void InitializePrecursors();
 
   // Execute method
+  void Initialize() override {InitializeKSolver();}
   void InitializeKSolver();
   void ExecuteKSolver();
 };

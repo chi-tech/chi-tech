@@ -99,7 +99,7 @@ public:
   explicit Solver(const std::string& in_text_name);
   ~Solver() override =default;
   //01
-  virtual void Initialize();
+  void Initialize() override;
   //01a
   virtual void PerformInputChecks();
   void ComputeNumberOfMoments();
