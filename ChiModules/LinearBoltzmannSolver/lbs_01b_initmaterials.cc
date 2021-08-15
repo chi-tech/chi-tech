@@ -50,7 +50,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
     //====================================== Extract properties
     using MatProperty = chi_physics::PropertyType;
     bool found_transport_xs = false;
-    for (auto property : current_material->properties)
+    for (const auto& property : current_material->properties)
     {
       if (property->Type() == MatProperty::TRANSPORT_XSECTIONS)
       {
@@ -112,7 +112,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
         << options.scattering_order << "."
         << " The higher moments will therefore not be used.";
     }
-
+    
     materials_list
       << " number of moments "
       << material_xs[matid_to_xs_map[mat_id]]->transfer_matrices.size() << "\n";
