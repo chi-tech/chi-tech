@@ -9,6 +9,7 @@ LBSCurvilinear::SweepChunkPWL::
                 SpatialDiscretization_PWLD& discretization_secondary,
                 std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
+                std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
@@ -19,6 +20,7 @@ LBSCurvilinear::SweepChunkPWL::
                      discretization_primary,
                      cell_transport_views,
                      destination_phi,
+                     destination_psi,
                      source_moments,
                      in_groupset,
                      in_xsections,
@@ -317,15 +319,14 @@ LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle
 
 
       // ============================= Save angular fluxes if needed
-      if (groupset.psi_to_be_saved)
+      if (save_angular_flux)
       {
-        auto& psi = groupset.psi_new_local;
-        auto& psi_uk_man = groupset.psi_uk_man;
+        const auto& psi_uk_man = groupset.psi_uk_man;
         for (int i = 0; i < num_nodes; ++i)
         {
           int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            psi[ir + gsg] = b[gsg][i];
+            psi_new_local[ir + gsg] = b[gsg][i];
         }
       }//if save psi
 

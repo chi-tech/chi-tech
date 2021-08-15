@@ -40,6 +40,7 @@ public:
                 SpatialDiscretization_PWLD& discretization_secondary,
                 std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
+                std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
