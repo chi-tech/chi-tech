@@ -6,7 +6,7 @@
 //###################################################################
 /**Executes the LBS solver.
 \param SolverIndex int Handle to the solver.
- \ingroup LuaNPT
+ \ingroup LuaLBS
  */
 int chiLBSExecute(lua_State *L)
 {

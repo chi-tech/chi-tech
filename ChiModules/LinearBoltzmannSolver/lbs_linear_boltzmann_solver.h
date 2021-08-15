@@ -90,7 +90,7 @@ public:
   unsigned long long glob_node_count;
 
   Vec phi_new, phi_old, q_fixed;
-  std::vector<double> q_moments_local;
+  std::vector<double> q_moments_local, ext_src_moments_local;
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
   std::vector<std::vector<double>> psi_new_local;
@@ -149,7 +149,8 @@ public:
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
-  //04
+  //04 File IO
+  //04a
   void WriteRestartData(std::string folder_name, std::string file_base);
   void ReadRestartData(std::string folder_name, std::string file_base);
 
@@ -158,6 +159,14 @@ public:
                                   const std::string& file_base);
   void ReadGroupsetAngularFluxes(LBSGroupset& groupset,
                                  const std::string& file_base);
+
+  //04c
+  std::vector<double> MakeSourceMomentsFromPhi();
+  void WriteFluxMoments(const std::string& file_base,
+                        const std::vector<double>& flux_moments);
+  void ReadFluxMoments(const std::string& file_base,
+                       std::vector<double>& flux_moments,
+                       bool single_file=false);
 
   //IterativeMethods
   virtual void SetSource(LBSGroupset& groupset,

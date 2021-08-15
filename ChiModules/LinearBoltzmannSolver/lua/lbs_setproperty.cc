@@ -8,9 +8,6 @@ extern ChiMath&     chi_math_handler;
 
 #define DISCRETIZATION_METHOD 1
   #define PWLD   3
-  #define PWLD1D 4
-  #define PWLD2D 5
-  #define PWLD3D 6
 
 #define BOUNDARY_CONDITION 3
   #define XMAX 31
@@ -30,7 +27,10 @@ extern ChiMath&     chi_math_handler;
 
 #define SAVE_ANGULAR_FLUX 8
 
+#define USE_SOURCE_MOMENTS 9
+
 #define VERBOSE_INNER_ITERATIONS 10
+
 #define VERBOSE_OUTER_ITERATIONS 11
 
 #define USE_PRECURSORS 12
@@ -70,6 +70,11 @@ READ_RESTART_DATA\n
  absolute, and the second is the file base name. These are defaulted to
  "YRestart" and "restart" respectively.\n\n
 
+USE_SOURCE_MOMENTS\n
+ Flag for using a vector of source moments instead the regular material/boundary
+  source. Default false. This expects
+ to be followed by a boolean.\n\n
+
 VERBOSE_INNER_ITERATIONS\n
  Flag for printing inner iteration information. This is primarily used
  for printing information related to group-set-level iterative methods.
@@ -102,8 +107,7 @@ chiLBSSetProperty(phys1,WRITE_RESTART_DATA,"YRestart1","restart",1)
 \endcode
 
 ###Discretization methods
- PWLD2D = Piecewise Linear Finite Element 2D.\n
- PWLD3D = Piecewise Linear Finite Element 3D.
+ PWLD = Piecewise Linear Finite Element.\n
 
 ###Partitioning methods
  SERIAL = No multi-processing.\n
@@ -153,7 +157,7 @@ on the given platform will start to suffer. One can gain a small amount of
 parallel efficiency by lowering this limit, however, there is a point where
 the parallel efficiency will actually get worse so use with caution.
 
-\ingroup LuaNPT*/
+\ingroup LuaLBS*/
 int chiLBSSetProperty(lua_State *L)
 {
   int numArgs = lua_gettop(L);
@@ -381,6 +385,16 @@ int chiLBSSetProperty(lua_State *L)
     lbs_solver->options.save_angular_flux = save_flag;
 
     chi_log.Log() << "LBS option to save angular flux set to " << save_flag;
+  }
+  else if (property == USE_SOURCE_MOMENTS)
+  {
+    LuaCheckNilValue(__FUNCTION__, L, 3);
+
+    bool use_flag = lua_toboolean(L, 3);
+
+    lbs_solver->options.use_src_moments = use_flag;
+
+    chi_log.Log() << "LBS option to use source moments set to " << use_flag;
   }
   else if (property == VERBOSE_INNER_ITERATIONS)
   {
