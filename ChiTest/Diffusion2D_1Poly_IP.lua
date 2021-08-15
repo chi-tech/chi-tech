@@ -64,8 +64,8 @@ end
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
-chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLD_MIP);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-8)
+chiSolverSetBasicOption(phys1,"discretization_method","PWLD_MIP")
+chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-8)
 
 --############################################### Set boundary conditions
 chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,e_bndry,DIFFUSION_VACUUM)

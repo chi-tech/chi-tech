@@ -119,38 +119,7 @@ int chiDiffusionSetProperty(lua_State *L)
   int property = lua_tonumber(L,2);
 
   //============================================= Handle properties
-  if (property == DISCRETIZATION_METHOD)
-  {
-    int method = lua_tonumber(L,3);
-    if (method == PWLC)
-    {
-      solver->fem_method = PWLC;
-    }
-    else if (method == PWLD_MIP)
-    {
-      solver->fem_method = PWLD_MIP;
-    }
-    else
-    {
-      chi_log.Log(LOG_0ERROR) << "Invalid option for Discretization method in "
-                   "chiDiffusionSetProperty.";
-      exit(EXIT_FAILURE);
-    }
-  }
-  else if (property == MAX_ITERS)
-  {
-    int num_iters = lua_tonumber(L,3);
-    solver->max_iters = num_iters;
-    chi_log.Log(LOG_ALLVERBOSE_2)
-      << "Diffusion Solver: Maximum iterations set to " << solver->max_iters;
-  }
-  else if (property == RESIDUAL_TOL)
-  {
-    double tol = lua_tonumber(L,3);
-    solver->residual_tolerance = tol;
-  }
-
-  else if (property == BOUNDARY_TYPE)
+  if (property == BOUNDARY_TYPE)
   {
     if (num_args < 4)
     {
@@ -285,18 +254,6 @@ int chiDiffusionSetProperty(lua_State *L)
         << type_index;
       exit(EXIT_FAILURE);
     }
-  }
-  else if (property == PROPERTY_D_MAP)
-  {
-    solver->property_map_D = lua_tonumber(L,3);
-  }
-  else if (property == PROPERTY_Q_MAP)
-  {
-    solver->property_map_q = lua_tonumber(L,3);
-  }
-  else if (property == PROPERTY_SIGMAA_MAP)
-  {
-    solver->property_map_sigma = lua_tonumber(L,3);
   }
   else
   {

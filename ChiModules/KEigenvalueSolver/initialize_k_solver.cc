@@ -11,7 +11,7 @@ using namespace LinearBoltzmann;
 //###################################################################
 void KEigenvalue::Solver::InitializeKSolver()
 {
-  Initialize(); // LinearBoltzmann::Solver initialize
+  LinearBoltzmann::Solver::Initialize(); // LinearBoltzmann::Solver initialize
 
   phi_prev_local.resize(phi_old_local.size(), 0.0);
 

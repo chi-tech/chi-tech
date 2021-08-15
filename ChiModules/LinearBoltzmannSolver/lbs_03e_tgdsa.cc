@@ -46,9 +46,11 @@ void LinearBoltzmann::Solver::InitTGDSA(LBSGroupset& groupset)
 
     dsolver->regions.push_back(this->regions.back());
     dsolver->discretization = discretization;
-    dsolver->fem_method = PWLD_MIP;
-    dsolver->residual_tolerance = groupset.tgdsa_tol;
-    dsolver->max_iters          = groupset.tgdsa_max_iters;
+
+    dsolver->basic_options["discretization_method"].SetStringValue("PWLD_MIP");
+    dsolver->basic_options["residual_tolerance"].SetFloatValue(groupset.tgdsa_tol);
+    dsolver->basic_options["max_iters"].SetIntegerValue(groupset.tgdsa_max_iters);
+
     dsolver->options_string     = groupset.tgdsa_string;
     if (groupset.apply_wgdsa)
       dsolver->material_mode = DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF_JFULL;

@@ -151,6 +151,7 @@ add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiTimer")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMesh")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLog")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiDataTypes")
 
 add_subdirectory("${CHI_TECH_MOD}")
 

@@ -3,9 +3,6 @@
 
 #include "ChiMesh/Cell/cell.h"
 
-#define PROPERTY_D_MAP 5
-#define PROPERTY_Q_MAP 6
-
 #include "DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
 
 #include "DiffusionSolver/chi_diffusion.h"
@@ -20,12 +17,6 @@
 #include "ChiTimer/chi_timer.h"
 
 #include <petscksp.h>
-
-#define PWLC          3
-#define PWLD_MIP      4
-#define PWLC_GRPS     5
-#define PWLD_MIP_GRPS 6
-#define PWLD_MIP_GAGG 7
 
 #define DIFFUSION_MATERIALS_REGULAR                       10
 #define DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTR          11
@@ -60,11 +51,7 @@ public:
   std::shared_ptr<SpatialDiscretization>   discretization;
 
   chi_math::UnknownManager                 unknown_manager;
-  int                                      fem_method = 0;
 
-  int   property_map_D     = 0;
-  int   property_map_q     = 1;
-  int   property_map_sigma = 2;
   int   material_mode      = DIFFUSION_MATERIALS_REGULAR;
   std::shared_ptr<chi_physics::FieldFunction> D_field     = nullptr;
   std::shared_ptr<chi_physics::FieldFunction> q_field     = nullptr;
@@ -81,20 +68,17 @@ public:
   PetscReal      norm = 0.0;         /* norm of solution error */
   PetscErrorCode ierr = 0;         // General error code
 
-  int                            local_dof_count = 0;
-  int                            global_dof_count = 0;
+  size_t         local_dof_count = 0;
+  size_t         global_dof_count = 0;
 
   std::vector<double>            pwld_phi_local;
 
-  int    max_iters = 500;
-  double residual_tolerance = 1.0e-8;
   int    gi = 0;
   int    G = 1;
   std::string options_string;
 
 public:
   //00
-//  Solver();
   explicit Solver(const std::string& in_solver_name);
   virtual ~Solver();
   //01 General

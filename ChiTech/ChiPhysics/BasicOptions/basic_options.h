@@ -1,55 +1,43 @@
 #ifndef CHI_BASIC_OPTIONS_H
 #define CHI_BASIC_OPTIONS_H
 
+#include "ChiDataTypes/varying.h"
+
 namespace chi_physics
 {
-
-enum class BasicOptionType : int
-{
-  STRING  = 1,
-  BOOL    = 2,
-  INTEGER = 3,
-  FLOAT   = 4
-};
-
 //###################################################################
 /**Class for option.*/
 class BasicOption
 {
 private:
-  BasicOptionType type;
   std::string     name;
-
-  std::string     string_value;
-  bool            bool_value = false;
-  int64_t         integer_value = 0;
-  double          float_value = 0.0;
+  chi_data_types::Varying         value;
 
 public:
   BasicOption(const std::string& name, const std::string& string_value) :
-    type(BasicOptionType::STRING), name(name), string_value(string_value) {}
+    name(name), value(string_value) {}
 
   BasicOption(const std::string& name, const bool& bool_value) :
-    type(BasicOptionType::BOOL), name(name), bool_value(bool_value) {}
+    name(name), value(bool_value) {}
 
   BasicOption(const std::string& name, const int64_t& integer_value) :
-    type(BasicOptionType::INTEGER), name(name), integer_value(integer_value) {}
+    name(name), value(integer_value) {}
 
   BasicOption(const std::string& name, const double& float_value) :
-    type(BasicOptionType::FLOAT), name(name), float_value(float_value) {}
+    name(name), value(float_value) {}
 
-  BasicOptionType Type() const {return type;}
+  chi_data_types::VaryingDataType Type() const {return value.Type();}
 
   std::string Name() const {return name;}
-  std::string StringValue() const {return string_value;}
-  bool        BoolValue() const {return bool_value;}
-  int64_t     IntegerValue() const {return integer_value;}
-  double      FloatValue() const {return float_value;}
+  std::string StringValue() const  {return value.StringValue();}
+  bool        BoolValue() const    {return value.BoolValue();}
+  int64_t     IntegerValue() const {return value.IntegerValue();}
+  double      FloatValue() const   {return value.FloatValue();}
 
-  void SetStringValue(const std::string& in_string_value) {string_value = in_string_value;}
-  void SetBoolValue(const bool& in_bool_value)            {bool_value = in_bool_value;}
-  void SetIntegerValue(const int64_t& in_integer_value)   {integer_value = in_integer_value;}
-  void SetFloatValue(const double& in_float_value)        {float_value = in_float_value;}
+  void SetStringValue(const std::string& in_string_value) {value = in_string_value;}
+  void SetBoolValue(const bool& in_bool_value)            {value = in_bool_value;}
+  void SetIntegerValue(const int64_t& in_integer_value)   {value = in_integer_value;}
+  void SetFloatValue(const double& in_float_value)        {value = in_float_value;}
 
 };
 
@@ -63,49 +51,38 @@ private:
 public:
   BasicOptions() = default;
 
-  BasicOptions(std::initializer_list<BasicOption> in_options)
-  {
-    for (auto& option : in_options)
-      options.push_back(option);
-  }
+  /**Constructor with initializer list.*/
+  BasicOptions(std::initializer_list<BasicOption> in_options) :
+    options(in_options)
+  {  }
 
-  const BasicOption& operator()(const std::string& option_name)
-  {
-    for (const auto& option : options)
-      if (option.Name() == option_name)
-        return option;
+  /**Returns a constant reference to an option that matches the
+   * requested name. If no name-match is found the method will throw
+   * a std::out_of_range exception.*/
+  const BasicOption& operator()(const std::string& option_name) const;
 
-    throw std::out_of_range("Basic option " + option_name +
-                            " does not appear to exist.");
-  }
+  /**Returns a constant reference to an option at the given
+   * index. If the index is out of range then a std::out_of_range
+   * exception is thrown. This method can potentially be faster than
+   * the string comparison equivalent.*/
+  const BasicOption& operator()(size_t index) const;
 
-  const BasicOption& operator()(size_t index)
-  {
-    if (index < options.size())
-      return options[index];
+  /**Returns a non-constant reference to an option that matches the
+   * requested name. If no name-match is found the method will throw
+   * a std::out_of_range exception.*/
+  BasicOption& operator[](const std::string& option_name);
 
-    throw std::out_of_range("Basic option with index " + std::to_string(index) +
-    " does not appear to exist.");
-  }
+  /**Returns a non-constant reference to an option at the given
+   * index. If the index is out of range then a std::out_of_range
+   * exception is thrown. This method can potentially be faster than
+   * the string comparison equivalent.*/
+  BasicOption& operator[](size_t index);
 
-  BasicOption& operator[](const std::string& option_name)
-  {
-    for (auto& option : options)
-      if (option.Name() == option_name)
-        return option;
-
-    throw std::out_of_range("Basic option " + option_name +
-    " does not appear to exist.");
-  }
-
-  BasicOption& operator[](size_t index)
-  {
-    if (index < options.size())
-      return options[index];
-
-    throw std::out_of_range("Basic option with index " + std::to_string(index) +
-    " does not appear to exist.");
-  }
+  /**Attempts to find an option that matches the requested name.
+   * If one is found then its corresponding index is
+   * returned. If it is not found then a std::out_of_range
+   * exception is thrown.*/
+  size_t GetOptionIndexFromName(const std::string& option_name) const;
 
 };
 

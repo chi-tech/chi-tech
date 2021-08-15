@@ -35,14 +35,15 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
 
   //================================================== Loop over locally owned
   //                                                   cells
-  if (fem_method == PWLC)
+  auto fem_method = basic_options("discretization_method").StringValue();
+  if (fem_method == "PWLC")
   {
     if (!suppress_assembly)
       for (auto& cell : grid->local_cells)
         CFEM_Assemble_A_and_b(cell, gi);
     else {}
   }
-  else if (fem_method == PWLD_MIP)
+  else if (fem_method == "PWLD_MIP")
   {
     if (!suppress_assembly)
       for (auto& cell : grid->local_cells)
@@ -51,7 +52,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
       for (auto& cell : grid->local_cells)
         PWLD_Assemble_b(cell,gi);
   }
-  else if (fem_method == PWLD_MIP_GAGG)
+  else if (fem_method == "PWLD_MIP_GAGG")
   {
     if (!suppress_assembly)
       for (auto& cell : grid->local_cells)
@@ -150,7 +151,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
     time_solve = t_solve.GetTime()/1000.0;
 
     //=================================== Populate field vector
-    if (fem_method == PWLD_MIP or fem_method == PWLD_MIP_GAGG)
+    if (fem_method == "PWLD_MIP" or fem_method == "PWLD_MIP_GAGG")
     {
       const double* x_ref;
       VecGetArrayRead(x,&x_ref);

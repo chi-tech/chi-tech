@@ -1,7 +1,5 @@
 #include "diffusion_solver.h"
 
-
-
 #include "ChiTimer/chi_timer.h"
 #include "chi_mpi.h"
 #include "chi_log.h"
@@ -12,11 +10,6 @@ extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 extern ChiPhysics&  chi_physics_handler;
 
-PetscErrorCode
-DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
-                            KSPConvergedReason* convergedReason,
-                            void *monitordestroy);
-
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
 int chi_diffusion::Solver::Initialize(bool verbose)
@@ -26,41 +19,38 @@ int chi_diffusion::Solver::Initialize(bool verbose)
                      << TextName() << ": Initializing Diffusion solver ";
   this->verbose_info = verbose;
 
-
   if (not common_items_initialized)
     InitializeCommonItems(); //Mostly boundaries
 
   ChiTimer t_init; t_init.Reset();
 
-  switch (fem_method)
+  auto sdm_string = basic_options("discretization_method").StringValue();
   {
     using namespace chi_math::finite_element;
-    case PWLC: {
+    if      (sdm_string == "PWLC")
+    {
       discretization =
         SpatialDiscretization_PWLC::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
-      break;
     }
-    case PWLD_MIP: {
+    else if (sdm_string == "PWLD_MIP")
+    {
       discretization =
         SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
-      break;
     }
-    case PWLD_MIP_GAGG: {
+    else if (sdm_string == "PWLD_MIP_GAGG")
+    {
       discretization =
         SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
-      break;
     }
-    default:
-    {
-      chi_log.Log(LOG_0)
-        << "Diffusion Solver: Finite Element Discretization "
-           "method not specified.";
-      exit(EXIT_FAILURE);
-    }
-  }//switch fem_method
+    else
+      throw std::invalid_argument(
+        TextName() + ": Invalid spatial discretization method, " +
+        sdm_string + ", specified.");
+  }
+
   MPI_Barrier(MPI_COMM_WORLD);
   auto& sdm = discretization;
 
@@ -76,40 +66,34 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //                                                   method
   if (field_functions.empty())
   {
-    switch (fem_method)
+    if (sdm_string == "PWLC")
     {
-      case PWLC:
-      {
-        auto initial_field_function =
-          std::make_shared<chi_physics::FieldFunction>(
-                                std::string("phi"),   //Text name
-                                discretization,       //Spatial Discretization
-                                &x,                   //Data vector
-                                unknown_manager);     //Unknown Manager
-
-        field_functions.push_back(initial_field_function);
-        chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
-        break;
-      }
-      case PWLD_MIP:
-      case PWLD_MIP_GAGG:
-      {
-        pwld_phi_local.resize(local_dof_count);
-        if (field_functions.empty())
-        {
-          auto initial_field_function =
-            std::make_shared<chi_physics::FieldFunction>(
-                                std::string("phi"),   //Text name
-                                discretization,       //Spatial Discretization
-                                &pwld_phi_local,      //Data vector
-                                unknown_manager);     //Unknown Manager
+      auto initial_field_function =
+        std::make_shared<chi_physics::FieldFunction>(
+          std::string("phi"),   //Text name
+          discretization,       //Spatial Discretization
+          &x,                   //Data vector
+          unknown_manager);     //Unknown Manager
 
           field_functions.push_back(initial_field_function);
           chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
-        }
-        break;
+    }
+    else if (sdm_string == "PWLD_MIP" or sdm_string == "PWLD_MIP_GAGG")
+    {
+      pwld_phi_local.resize(local_dof_count);
+      if (field_functions.empty())
+      {
+        auto initial_field_function =
+          std::make_shared<chi_physics::FieldFunction>(
+            std::string("phi"),   //Text name
+            discretization,       //Spatial Discretization
+            &pwld_phi_local,      //Data vector
+            unknown_manager);     //Unknown Manager
+
+            field_functions.push_back(initial_field_function);
+            chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
       }
-    }//switch fem_method
+    }
   }//if not ff set
 
 
@@ -129,7 +113,8 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //================================================== Initialize x and b
   ierr = VecCreate(PETSC_COMM_WORLD,&x);CHKERRQ(ierr);
   ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-  ierr = VecSetSizes(x, local_dof_count, global_dof_count);CHKERRQ(ierr);
+  ierr = VecSetSizes(x, static_cast<PetscInt>(local_dof_count),
+                        static_cast<PetscInt>(global_dof_count));CHKERRQ(ierr);
   ierr = VecSetType(x,VECMPI);CHKERRQ(ierr);
   ierr = VecDuplicate(x,&b);CHKERRQ(ierr);
 
@@ -138,8 +123,10 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   //################################################## Create matrix
   ierr = MatCreate(PETSC_COMM_WORLD,&A);CHKERRQ(ierr);
-  ierr = MatSetSizes(A, local_dof_count, local_dof_count,
-                     global_dof_count, global_dof_count);CHKERRQ(ierr);
+  ierr = MatSetSizes(A, static_cast<PetscInt>(local_dof_count),
+                        static_cast<PetscInt>(local_dof_count),
+                        static_cast<PetscInt>(global_dof_count),
+                        static_cast<PetscInt>(global_dof_count));CHKERRQ(ierr);
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
@@ -217,40 +204,14 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   if (verbose)
     ierr = KSPMonitorSet(ksp,&chi_diffusion::KSPMonitorAChiTech,NULL,NULL);
 
-  KSPSetConvergenceTest(ksp,&DiffusionConvergenceTestNPT,NULL,NULL);
+  KSPSetConvergenceTest(ksp,&chi_diffusion::DiffusionConvergenceTestNPT,NULL,NULL);
 
-  ierr = KSPSetTolerances(ksp,1.e-50,residual_tolerance,1.0e50,max_iters);
+  ierr = KSPSetTolerances(ksp,
+                          1.e-50,
+                          basic_options("residual_tolerance").FloatValue(),
+                          1.0e50,
+                          basic_options("max_iters").IntegerValue());
   ierr = KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);
 
   return false;
-}
-
-//###################################################################
-/**Customized convergence test.*/
-PetscErrorCode
-DiffusionConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
-                            KSPConvergedReason* convergedReason, void *monitordestroy)
-{
-  //======================================================= Compute rhs norm
-  Vec Rhs;
-  KSPGetRhs(ksp,&Rhs);
-  double rhs_norm;
-  VecNorm(Rhs,NORM_2,&rhs_norm);
-  if (rhs_norm < 1.0e-25)
-    rhs_norm = 1.0;
-
-  //======================================================= Compute test criterion
-  double tol;
-  int64_t    maxIts;
-  KSPGetTolerances(ksp,NULL,&tol,NULL,&maxIts);
-
-
-  double relative_residual = rnorm/rhs_norm;
-
-  chi_log.Log(LOG_0) << "Iteration " << n << " Residual " << rnorm/rhs_norm;
-
-  if (relative_residual < tol)
-    *convergedReason = KSP_CONVERGED_RTOL;
-
-  return KSP_CONVERGED_ITERATING;
 }

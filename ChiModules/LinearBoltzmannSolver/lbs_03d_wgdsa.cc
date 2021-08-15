@@ -43,9 +43,11 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
 
     dsolver->regions.push_back(this->regions.back());
     dsolver->discretization = discretization;
-    dsolver->fem_method = PWLD_MIP_GAGG;
-    dsolver->residual_tolerance = groupset.wgdsa_tol;
-    dsolver->max_iters          = groupset.wgdsa_max_iters;
+
+    dsolver->basic_options["discretization_method"].SetStringValue("PWLD_MIP_GAGG");
+    dsolver->basic_options["residual_tolerance"].SetFloatValue(groupset.wgdsa_tol);
+    dsolver->basic_options["max_iters"].SetIntegerValue(groupset.wgdsa_max_iters);
+
     dsolver->options_string     = groupset.wgdsa_string;
     dsolver->material_mode = DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF;
     dsolver->q_field = deltaphi_ff;

@@ -143,7 +143,11 @@ int chiSolverSetBasicOption(lua_State* L)
 
     switch (option.Type())
     {
-      case chi_physics::BasicOptionType::STRING:
+      case chi_data_types::VaryingDataType::VOID:
+        throw std::logic_error("Solver:" + solver->TextName() +
+                               " option:" + option_name + " is of invalid type."
+                               " This indicates an implementation problem.");
+      case chi_data_types::VaryingDataType::STRING:
         LuaCheckStringValue(fname, L, 3);
         option.SetStringValue(lua_tostring(L, 3));
         chi_log.Log() << "Solver:" << solver->TextName()
@@ -151,30 +155,30 @@ int chiSolverSetBasicOption(lua_State* L)
         << " set to " << option.StringValue()
         << ".";
         break;
-        case chi_physics::BasicOptionType::BOOL:
-          LuaCheckBoolValue(fname, L, 3);
-          option.SetBoolValue(lua_toboolean(L, 3));
-          chi_log.Log() << "Solver:" << solver->TextName()
-          << " option:" << option_name
-          << " set to " << ((option.BoolValue())? "true" : "false")
-          << ".";
-          break;
-          case chi_physics::BasicOptionType::INTEGER:
-            LuaCheckIntegerValue(fname, L, 3);
-            option.SetIntegerValue(lua_tointeger(L, 3));
-            chi_log.Log() << "Solver:" << solver->TextName()
-            << " option:" << option_name
-            << " set to " << option.IntegerValue()
-            << ".";
-            break;
-            case chi_physics::BasicOptionType::FLOAT:
-              LuaCheckNumberValue(fname, L, 3);
-              option.SetFloatValue(lua_tonumber(L, 3));
-              chi_log.Log() << "Solver:" << solver->TextName()
-              << " option:" << option_name
-              << " set to " << option.FloatValue()
-              << ".";
-              break;
+      case chi_data_types::VaryingDataType::BOOL:
+        LuaCheckBoolValue(fname, L, 3);
+        option.SetBoolValue(lua_toboolean(L, 3));
+        chi_log.Log() << "Solver:" << solver->TextName()
+        << " option:" << option_name
+        << " set to " << ((option.BoolValue())? "true" : "false")
+        << ".";
+        break;
+      case chi_data_types::VaryingDataType::INTEGER:
+        LuaCheckIntegerValue(fname, L, 3);
+        option.SetIntegerValue(lua_tointeger(L, 3));
+        chi_log.Log() << "Solver:" << solver->TextName()
+        << " option:" << option_name
+        << " set to " << option.IntegerValue()
+        << ".";
+        break;
+      case chi_data_types::VaryingDataType::FLOAT:
+        LuaCheckNumberValue(fname, L, 3);
+        option.SetFloatValue(lua_tonumber(L, 3));
+        chi_log.Log() << "Solver:" << solver->TextName()
+        << " option:" << option_name
+        << " set to " << option.FloatValue()
+        << ".";
+        break;
     }
   }
   catch (const std::out_of_range& oor)
