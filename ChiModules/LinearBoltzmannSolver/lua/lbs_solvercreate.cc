@@ -6,9 +6,6 @@
 extern ChiPhysics&  chi_physics_handler;
 extern ChiLog& chi_log;
 
-/** \defgroup LuaNPT Linear Boltzmann Solver
- * \ingroup LuaModules*/
-
 //###################################################################
 /**Creates a Neutral Particle Transport solver.
 
@@ -20,7 +17,7 @@ chiSolverAddRegion(phys1,region1)
 --
 -- Add Groupset construction here
 --
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD3D)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 --
 chiLBSInitialize(phys1)
@@ -30,7 +27,7 @@ fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 \endcode
 
 
-\ingroup LuaNPT
+\ingroup LuaLBS
  */
 int chiLBSCreateSolver(lua_State *L)
 {

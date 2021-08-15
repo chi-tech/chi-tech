@@ -13,7 +13,7 @@ extern ChiPhysics&  chi_physics_handler;
 
 \return table,count Returns an array of handles and the amount of elements in
         it (indexed from 1).
-\ingroup LuaNPT
+\ingroup LuaLBS
 \author Jan*/
 int chiLBSGetFieldFunctionList(lua_State *L)
 {
@@ -54,7 +54,7 @@ from the transport solver.
 
 \return table,count Returns an array of handles and the amount of elements in
         it (indexed from 1).
-\ingroup LuaNPT
+\ingroup LuaLBS
 \author Jan*/
 int chiLBSGetScalarFieldFunctionList(lua_State *L)
 {

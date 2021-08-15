@@ -7,7 +7,7 @@
 /**Initializes the solver.
 
 \param SolverIndex int Handle to the solver.
- \ingroup LuaNPT
+ \ingroup LuaLBS
  */
 int chiLBSInitialize(lua_State *L)
 {

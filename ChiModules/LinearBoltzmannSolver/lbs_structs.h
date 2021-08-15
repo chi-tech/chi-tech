@@ -40,6 +40,7 @@ struct Options
   double write_restart_interval = 30.0;
 
   bool use_precursors = false;
+  bool use_src_moments = false;
 
   bool save_angular_flux = false;
 
