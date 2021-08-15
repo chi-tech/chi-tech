@@ -60,3 +60,6 @@ ChiTech/UnitTests/Output
 
 #Scratch directory
 scratch/
+
+#general data files
+*.data

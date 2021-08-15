@@ -5,6 +5,7 @@
 #include "../Quadratures/quadrature.h"
 #include "ChiMath/chi_math.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include <petscksp.h>
 
@@ -73,6 +74,10 @@ public:
 
   virtual
   size_t GetCellNumNodes(const chi_mesh::Cell& cell) const = 0;
+
+  virtual
+  std::vector<chi_mesh::Vector3>
+    GetCellNodeLocations(const chi_mesh::Cell& cell) const = 0;
 
 protected:
   //02
