@@ -33,11 +33,9 @@ ClassicRichardson(LBSGroupset& groupset,
       << groupset.groups.back().id << "\n\n";
   }
 
-  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
-
   std::vector<double> init_q_moments_local = q_moments_local;
 
-  //================================================== Sweepchunk settings
+  //================================================== Sweep chunk settings
   auto& sweep_chunk = sweep_scheduler.sweep_chunk;
   bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
                                  (not options.use_src_moments);

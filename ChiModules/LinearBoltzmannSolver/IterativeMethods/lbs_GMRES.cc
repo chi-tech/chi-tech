@@ -96,28 +96,22 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   KSPSetUp(ksp);
 
   //================================================== Compute b
-  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
-  bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
-                                 (not options.use_src_moments);
   if (log_info)
   {
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
   }
 
-  //Store inittial q_moments_local
+  //SetSource for RHS
   auto init_q_moments_local = q_moments_local;
-
-  //Prepare for sweep
   SetSource(groupset, q_moments_local, rhs_src_scope);
 
+  //Tool the sweep chunk
+  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+  bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
+                                 (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
   sweep_chunk.SetDestinationPhi(phi_new_local);
   sweep_chunk.ZeroIncomingDelayedPsi();
-
-
-  //SetSource
-  auto init_q_moments_local = q_moments_local;
-  SetSource(groupset, q_moments_local, rhs_src_scope);
 
   //Sweep
   sweep_chunk.ZeroFluxDataStructures();
