@@ -86,6 +86,8 @@ public:
   //@}
 
   void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintHeader(ostream& os, vtkIndent indent) override {};
+  void PrintTrailer(ostream& os, vtkIndent indent) override {};
 
 protected:
   vtkCleanUnstructuredGrid() = default;
