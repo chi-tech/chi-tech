@@ -30,13 +30,14 @@
 #ifndef vtkCleanUnstructuredGrid_h
 #define vtkCleanUnstructuredGrid_h
 
-#include "vtkFiltersCoreModule.h" //needed for exports
+#include "vtkPVVTKExtensionsFiltersGeneralModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkIncrementalPointLocator;
 class vtkDataSet;
 
-class VTKFILTERSCORE_EXPORT vtkCleanUnstructuredGrid : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSFILTERSGENERAL_EXPORT vtkCleanUnstructuredGrid
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCleanUnstructuredGrid* New();
@@ -84,19 +85,9 @@ public:
   vtkGetMacro(OutputPointsPrecision, int);
   //@}
 
-//  void PrintSelf(ostream& os, vtkIndent indent) override;
-  void PrintSelf(ostream& os, vtkIndent indent) override
-  {
-    return;
-  }
-  void PrintHeader(ostream& os, vtkIndent indent) override
-  {
-    return;
-  }
-  void PrintTrailer(ostream& os, vtkIndent indent) override
-  {
-    return;
-  }
+  void PrintSelf(ostream& os, vtkIndent indent) override;
+  void PrintHeader(ostream& os, vtkIndent indent) override {};
+  void PrintTrailer(ostream& os, vtkIndent indent) override {};
 
 protected:
   vtkCleanUnstructuredGrid() = default;

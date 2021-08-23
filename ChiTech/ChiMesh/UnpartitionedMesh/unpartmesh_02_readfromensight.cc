@@ -11,7 +11,6 @@ extern ChiMPI& chi_mpi;
 #include <vtkSmartPointer.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkUnstructuredGrid.h>
-#include "vtkCleanUnstructuredGrid.h"
 #include <vtkCell.h>
 #include <vtkPolyhedron.h>
 #include <vtkEnSightGoldBinaryReader.h>
@@ -20,6 +19,7 @@ extern ChiMPI& chi_mpi;
 
 #include <vtkAppendFilter.h>
 
+#include <vtkCleanUnstructuredGrid.h>
 
 //###################################################################
 /**Reads an Ensight-Gold unstructured mesh.*/
