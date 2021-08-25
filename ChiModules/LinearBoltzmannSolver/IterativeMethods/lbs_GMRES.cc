@@ -110,7 +110,6 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
-  sweep_chunk.SetDestinationPhi(phi_new_local);
   sweep_chunk.ZeroIncomingDelayedPsi();
 
   //Sweep

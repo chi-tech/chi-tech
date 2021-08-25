@@ -40,8 +40,7 @@ ClassicRichardson(LBSGroupset& groupset,
   bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
-  sweep_chunk.SetDestinationPhi(phi_new_local);
-  groupset.angle_agg.ZeroIncomingDelayedPsi();
+  sweep_chunk.ZeroIncomingDelayedPsi();
 
   //================================================== Now start iterating
   double pw_change_prev = 1.0;
