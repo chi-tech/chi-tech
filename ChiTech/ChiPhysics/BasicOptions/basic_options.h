@@ -56,6 +56,7 @@ public:
     options(in_options)
   {  }
 
+  //Operators
   /**Returns a constant reference to an option that matches the
    * requested name. If no name-match is found the method will throw
    * a std::out_of_range exception.*/
@@ -78,6 +79,11 @@ public:
    * the string comparison equivalent.*/
   BasicOption& operator[](size_t index);
 
+  //AddOption
+  template<typename T>
+  void AddOption(const std::string& option_name, const T& value);
+
+  //Utilities
   /**Attempts to find an option that matches the requested name.
    * If one is found then its corresponding index is
    * returned. If it is not found then a std::out_of_range

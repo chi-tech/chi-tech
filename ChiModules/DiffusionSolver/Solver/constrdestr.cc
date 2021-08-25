@@ -17,7 +17,7 @@ property_map_sigma    | int    | 2             | Material property index to use 
  * Very nice stuff.*/
 
 chi_diffusion::Solver::Solver(const std::string& in_solver_name):
-  chi_physics::Solver(in_solver_name, {{"discretization_method", std::string()},
+  chi_physics::Solver(in_solver_name, {{"discretization_method", std::string("None")},
                                        {"max_iters", int64_t(500)},
                                        {"residual_tolerance", 1.0e-8},
                                        {"property_map_D",int64_t(0)},

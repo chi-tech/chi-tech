@@ -1,68 +1,92 @@
 #include "varying.h"
 
+#include <algorithm>
+
 /**Provides a string-name for an enumerated VaryingDataType.*/
 std::string chi_data_types::
   VaryingDataTypeStringName(chi_data_types::VaryingDataType type)
 {
   switch (type)
   {
-    case VaryingDataType::VOID:    return "VOID";
-    case VaryingDataType::STRING:  return "STRING";
-    case VaryingDataType::BOOL:    return "BOOL";
-    case VaryingDataType::INTEGER: return "INTEGER";
-    case VaryingDataType::FLOAT:   return "FLOAT";
+    case VaryingDataType::VOID:            return "VOID";
+    case VaryingDataType::ARBITRARY_BYTES: return "ARBITRARY_BYTES";
+    case VaryingDataType::STRING:          return "STRING";
+    case VaryingDataType::BOOL:            return "BOOL";
+    case VaryingDataType::INTEGER:         return "INTEGER";
+    case VaryingDataType::FLOAT:           return "FLOAT";
     default: return "UNKNOWN";
   }
 }
 
-//################################################################### Constructors
-/**Constructor for a string value.*/
-chi_data_types::Varying::Varying(const std::string& value) :
-  m_data_initialized(true),
-  m_type(VaryingDataType::STRING)
+//###################################################################
+/**PopulateRaw template specialization for std::string.*/
+template<>
+void chi_data_types::Varying::PopulateRaw(const std::string& value)
 {
-  m_raw_data  = std::vector<RawByte>(value.begin(), value.end());
-  m_raw_data.push_back('\0'); //Necessary to complete c_str()
-  m_num_bytes = m_raw_data.size();
+  m_raw_data.resize(value.size());
+  std::transform(value.begin(),value.end(),m_raw_data.begin(),
+                 [](char c){return std::byte(c);});
+  if (value.back() != '\0')
+    m_raw_data.push_back(std::byte('\0'));
+
+  m_data_initialized = true;
 }
+
+//################################################################### Constructors
+/**Constructor for an arbitrary sequence of bytes value.*/
+chi_data_types::Varying::
+  Varying(const std::vector<std::byte>& value) :
+  m_type(VaryingDataType::ARBITRARY_BYTES),
+  m_type_name(VaryingDataTypeStringName(m_type))
+{
+  m_raw_data = value;
+  m_data_initialized = true;
+}
+
+/**Constructor for a string value.*/
+chi_data_types::Varying::
+  Varying(const std::string& value) :
+  m_type(VaryingDataType::STRING),
+  m_type_name(VaryingDataTypeStringName(m_type))
+{ PopulateRaw<std::string>(value); }
 
 /**Constructor for a bool value.*/
-chi_data_types::Varying::Varying(const bool& value) :
-  m_type(VaryingDataType::BOOL)
-{
-  PopulateRaw<bool>(value);
-}
+chi_data_types::Varying::
+  Varying(const bool& value) :
+  m_type(VaryingDataType::BOOL),
+  m_type_name(VaryingDataTypeStringName(m_type))
+{ PopulateRaw<bool>(value); }
 
 /**Constructor for an integer value.*/
-chi_data_types::Varying::Varying(const int64_t& value) :
-  m_type(VaryingDataType::INTEGER)
-{
-  PopulateRaw<int64_t>(value);
-}
+chi_data_types::Varying::
+  Varying(const int64_t& value) :
+  m_type(VaryingDataType::INTEGER),
+  m_type_name(VaryingDataTypeStringName(m_type))
+{ PopulateRaw<int64_t>(value); }
 
 /**Constructor for a floating point value.*/
-chi_data_types::Varying::Varying(const double& value) :
-  m_type(VaryingDataType::FLOAT)
-{
-  PopulateRaw<double>(value);
-}
+chi_data_types::Varying::
+  Varying(const double& value) :
+  m_type(VaryingDataType::FLOAT),
+  m_type_name(VaryingDataTypeStringName(m_type))
+{ PopulateRaw<double>(value); }
 
 /**Copy constructor.*/
 chi_data_types::Varying::Varying(const Varying& other)
 {
-  m_type             = other.m_type;
-  m_num_bytes        = other.m_num_bytes;
   m_raw_data         = other.m_raw_data;
   m_data_initialized = other.m_data_initialized;
+  m_type             = other.m_type;
+  m_type_name        = other.m_type_name;
 }
 
 /**Move constructor.*/
 chi_data_types::Varying::Varying(Varying&& other) noexcept
 {
-  std::swap(m_type, other.m_type);
-  std::swap(m_num_bytes, other.m_num_bytes);
   std::swap(m_raw_data, other.m_raw_data);
   std::swap(m_data_initialized, other.m_data_initialized);
+  std::swap(m_type, other.m_type);
+  std::swap(m_type_name, other.m_type_name);
 }
 
 /**Assignment operator. i.e., type_A = type_B*/
@@ -70,27 +94,33 @@ chi_data_types::Varying& chi_data_types::Varying::operator=(const Varying& other
 {
   if (this != &other)
   {
-    m_type             = other.m_type;
-    m_num_bytes        = other.m_num_bytes;
     m_raw_data         = other.m_raw_data;
     m_data_initialized = other.m_data_initialized;
+    m_type             = other.m_type;
+    m_type_name        = other.m_type_name;
   }
   return *this;
 }
 
 //################################################################### Assignments
+/**Assigns an arbitrary sequence of bytes value.*/
+chi_data_types::Varying&
+  chi_data_types::Varying::operator=(const std::vector<std::byte> &value)
+{
+  m_type = VaryingDataType::ARBITRARY_BYTES;
+  m_type_name = VaryingDataTypeStringName(m_type);
+  m_raw_data = value;
+  m_data_initialized = true;
+  return *this;
+}
 
 /**Assigns a string value.*/
 chi_data_types::Varying&
   chi_data_types::Varying::operator=(const std::string& value)
 {
   m_type = VaryingDataType::STRING;
-
-  m_raw_data  = std::vector<RawByte>(value.begin(), value.end());
-  m_raw_data.push_back('\0');
-  m_num_bytes = m_raw_data.size();
-
-  m_data_initialized = true;
+  m_type_name = VaryingDataTypeStringName(m_type);
+  PopulateRaw<std::string>(value);
   return *this;
 }
 
@@ -98,6 +128,7 @@ chi_data_types::Varying&
 chi_data_types::Varying& chi_data_types::Varying::operator=(const bool& value)
 {
   m_type = VaryingDataType::BOOL;
+  m_type_name = VaryingDataTypeStringName(m_type);
   PopulateRaw<bool>(value);
 
   return *this;
@@ -107,6 +138,7 @@ chi_data_types::Varying& chi_data_types::Varying::operator=(const bool& value)
 chi_data_types::Varying& chi_data_types::Varying::operator=(const int64_t& value)
 {
   m_type = VaryingDataType::INTEGER;
+  m_type_name = VaryingDataTypeStringName(m_type);
   PopulateRaw<int64_t>(value);
 
   return *this;
@@ -116,6 +148,7 @@ chi_data_types::Varying& chi_data_types::Varying::operator=(const int64_t& value
 chi_data_types::Varying& chi_data_types::Varying::operator=(const double& value)
 {
   m_type = VaryingDataType::FLOAT;
+  m_type_name = VaryingDataTypeStringName(m_type);
   PopulateRaw<double>(value);
 
   return *this;
@@ -148,7 +181,7 @@ std::string chi_data_types::Varying::StringValue() const
   CheckTypeMatch(m_type, VaryingDataType::STRING);
   CheckDataInitialized();
 
-  return std::string(m_raw_data.data());
+  return std::string(reinterpret_cast<const char*>(m_raw_data.data()));
 }
 
 /**Returns the bool value if valid. Otherwise throws std::logic_error.*/
@@ -176,4 +209,10 @@ double chi_data_types::Varying::FloatValue() const
   CheckDataInitialized();
 
   return *reinterpret_cast<const double*>(&m_raw_data[0]);
+}
+
+/**Returns the raw byte size associated with the type.*/
+size_t chi_data_types::Varying::ByteSize() const
+{
+  return m_raw_data.size();
 }

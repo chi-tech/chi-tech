@@ -60,6 +60,36 @@ chi_physics::BasicOption& chi_physics::BasicOptions::
                           " does not appear to exist.");
 }
 
+/**Adds an option to the options list.*/
+template<>
+void chi_physics::BasicOptions::
+  AddOption<std::string>(const std::string &option_name,
+                         const std::string& value)
+{
+  options.emplace_back(option_name, value);
+}
+
+template<>
+void chi_physics::BasicOptions::
+  AddOption<bool>(const std::string &option_name, const bool& value)
+{
+  options.emplace_back(option_name, value);
+}
+
+template<>
+void chi_physics::BasicOptions::
+  AddOption<int64_t>(const std::string &option_name, const int64_t& value)
+{
+  options.emplace_back(option_name, value);
+}
+
+template<>
+void chi_physics::BasicOptions::
+  AddOption<double>(const std::string &option_name, const double& value)
+{
+  options.emplace_back(option_name, value);
+}
+
 /**Attempts to find an option that matches the requested name.
  * If one is found then its corresponding index is
  * returned. If it is not found then a std::out_of_range

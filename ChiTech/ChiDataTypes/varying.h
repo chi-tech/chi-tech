@@ -11,35 +11,40 @@ namespace chi_data_types
 {
 class Varying
 {
-public:
-  typedef char RawByte;
 private:
-  /**Byte size of the raw data*/
-  size_t                m_num_bytes = 0;
   /**Raw byte-value data*/
-  std::vector<RawByte>  m_raw_data;
+  std::vector<std::byte>  m_raw_data;
   /**Flag indicating whether initialized or not*/
-  bool                  m_data_initialized = false;
+  bool                    m_data_initialized = false;
   /**Type specification*/
-  VaryingDataType       m_type = VaryingDataType::VOID;
+  VaryingDataType         m_type      = VaryingDataType::VOID;
+  std::string             m_type_name = "VOID";
 
 private:
   /**Utility that converts a type to a byte vector provided that
    * it has the sizeof() function defined for it.*/
   template<typename T> void PopulateRaw(const T& value)
-    {
-    auto src = reinterpret_cast<const RawByte*>(&value);
+  {
+    auto src = reinterpret_cast<const std::byte*>(&value);
 
-    m_num_bytes = sizeof(T);
-    m_raw_data.resize(m_num_bytes);
+    size_t num_bytes = sizeof(T);
+    m_raw_data.resize(num_bytes);
 
-    std::copy(src, src + m_num_bytes, &m_raw_data[0]);
+    std::copy(src, src + num_bytes, &m_raw_data[0]);
 
     m_data_initialized = true;
-    }
+  }
+  /**Checks if two VaryingDataType values match.
+   * Type A is matched against type B.*/
+  static void CheckTypeMatch(VaryingDataType type_A,
+                             VaryingDataType type_B_required);
+  /**Checks whether the data has been initialized.*/
+  void CheckDataInitialized() const;
 
 public:
   //Constructors
+  /**Constructor for an arbitrary sequence of bytes value.*/
+  explicit Varying(const std::vector<std::byte>& value);
   /**Constructor for a string value.*/
   explicit Varying(const std::string& value);
   /**Constructor for a bool value.*/
@@ -56,10 +61,13 @@ public:
   Varying(Varying&& other) noexcept;
 
 public:
-  //Assignment operators
+  //Copy assignment operator
   /**Assignment operator. i.e., type_A = type_B*/
   Varying& operator=(const Varying& other);
 
+  //Assignment operators
+  /**Assigns an arbitrary sequence of bytes value.*/
+  Varying& operator=(const std::vector<std::byte>& value);
   /**Assigns a string value.*/
   Varying& operator=(const std::string& value);
   /**Assigns a bool value.*/
@@ -69,13 +77,6 @@ public:
   /**Assign a floating point value.*/
   Varying& operator=(const double& value);
 
-private:
-  /**Checks if two VaryingDataType values match.
- * Type A is matched against type B.*/
-  static void CheckTypeMatch(VaryingDataType type_A,
-                             VaryingDataType type_B_required);
-  /**Checks whether the data has been initialized.*/
-  void CheckDataInitialized() const;
 
 public:
   /**Returns the string value if valid. Otherwise throws std::logic_error.*/
@@ -87,9 +88,15 @@ public:
   /**Returns the float value if valid. Otherwise throws std::logic_error.*/
   double      FloatValue() const;
 
+  /**Returns the raw byte size associated with the type.*/
+  size_t      ByteSize() const;
+
+
 public:
   /**Returns the current-type of the variable.*/
   VaryingDataType Type() const {return m_type;}
+  /**Returns the string type name of the type.*/
+  std::string TypeName() const {return m_type_name;}
 
 public:
   ~Varying() = default;

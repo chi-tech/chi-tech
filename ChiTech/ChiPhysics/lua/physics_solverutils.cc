@@ -144,6 +144,7 @@ int chiSolverSetBasicOption(lua_State* L)
     switch (option.Type())
     {
       case chi_data_types::VaryingDataType::VOID:
+      case chi_data_types::VaryingDataType::ARBITRARY_BYTES:
         throw std::logic_error("Solver:" + solver->TextName() +
                                " option:" + option_name + " is of invalid type."
                                " This indicates an implementation problem.");
