@@ -51,22 +51,6 @@ public:
                 int in_max_num_cell_dofs);
 
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
-
-//  void ZeroDestinationPsi() override
-//    {psi_new_local.assign(psi_new_local.size(), 0.0);}
-
-  void ZeroIncomingDelayedPsi() override
-    {groupset.angle_agg.ZeroIncomingDelayedPsi();}
-
-  void ZeroOutgoingDelayedPsi() override
-    {groupset.angle_agg.ZeroOutgoingDelayedPsi();}
-
-  void ZeroFluxDataStructures() override
-  {
-    ZeroDestinationPhi();
-    ZeroDestinationPsi();
-    ZeroOutgoingDelayedPsi();
-  }
 };
 }
 

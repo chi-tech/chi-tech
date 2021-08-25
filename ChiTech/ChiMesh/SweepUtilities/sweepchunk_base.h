@@ -1,6 +1,8 @@
 #ifndef CHI_SWEEPCHUNK_BASE_H
 #define CHI_SWEEPCHUNK_BASE_H
 
+#include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
+
 #include <functional>
 
 //###################################################################
@@ -10,6 +12,7 @@ class chi_mesh::sweep_management::SweepChunk
 private:
   std::vector<double>* destination_phi;
   std::vector<double>* destination_psi;
+  AngleAggregation& angle_agg;
   bool surface_source_active;
 
 public:
@@ -33,9 +36,11 @@ public:
 
   SweepChunk(std::vector<double>& in_destination_phi,
              std::vector<double>& in_destination_psi,
+             AngleAggregation& in_angle_agg,
              bool suppress_src)
     : destination_phi(&in_destination_phi),
       destination_psi(&in_destination_psi),
+      angle_agg(in_angle_agg),
       surface_source_active(suppress_src)
   {}
 
@@ -75,9 +80,29 @@ public:
     return *destination_psi;
   }
 
-  virtual void ZeroIncomingDelayedPsi() = 0;
-  virtual void ZeroOutgoingDelayedPsi() = 0;
-  virtual void ZeroFluxDataStructures() = 0;
+  /** Resets all the incoming intra-location and inter-location
+   * cyclic interfaces.*/
+  void ZeroIncomingDelayedPsi()
+  {
+   angle_agg.ZeroIncomingDelayedPsi();
+  }
+
+  /** Resets all the outgoing intra-location and inter-location
+   * cyclic interfaces.*/
+  void ZeroOutgoingDelayedPsi()
+  {
+    angle_agg.ZeroOutgoingDelayedPsi();
+  }
+
+  /** Clear the output angular flux vector, the flux moments
+   * vector, and the outgoing delayed psi.
+   */
+  void ZeroFluxDataStructures()
+  {
+    ZeroDestinationPsi();
+    ZeroDestinationPhi();
+    ZeroOutgoingDelayedPsi();
+  }
 
   /**Returns a reference to the output vector.*/
   std::vector<double>& GetDestinationPhi()

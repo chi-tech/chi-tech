@@ -22,9 +22,8 @@ LinearBoltzmann::SweepChunkPWL::
                 const TCrossSections& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs)
-                    : SweepChunk(destination_phi,
-                                 destination_psi,
-                                 false),
+                    : SweepChunk(destination_phi, destination_psi,
+                                 in_groupset.angle_agg, false),
                       grid_view(std::move(grid_ptr)),
                       grid_fe_view(discretization),
                       grid_transport_view(cell_transport_views),
