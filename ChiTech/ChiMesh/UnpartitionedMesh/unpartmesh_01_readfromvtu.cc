@@ -11,7 +11,6 @@ extern ChiMPI& chi_mpi;
 #include <vtkSmartPointer.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkUnstructuredGrid.h>
-#include "vtkCleanUnstructuredGrid.h"
 #include <vtkCellType.h>
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
@@ -27,6 +26,8 @@ extern ChiMPI& chi_mpi;
 #include <vtkLine.h>
 
 #include <vtkVertex.h>
+
+#include <vtkCleanUnstructuredGrid.h>
 
 //###################################################################
 /**Creates a raw polyhedron cell from a vtk-polyhedron.*/
