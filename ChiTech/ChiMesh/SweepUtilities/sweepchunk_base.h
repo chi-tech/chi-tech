@@ -8,7 +8,8 @@
 class chi_mesh::sweep_management::SweepChunk
 {
 private:
-  std::vector<double>* x;
+  std::vector<double>* destination_phi;
+  std::vector<double>* destination_psi;
   bool surface_source_active;
 
 public:
@@ -30,8 +31,12 @@ public:
    */
   std::vector<MomentCallbackF> moment_callbacks;
 
-  SweepChunk(std::vector<double>& destination_phi, bool suppress_src)
-    : x(&destination_phi), surface_source_active(suppress_src)
+  SweepChunk(std::vector<double>& in_destination_phi,
+             std::vector<double>& in_destination_psi,
+             bool suppress_src)
+    : destination_phi(&in_destination_phi),
+      destination_psi(&in_destination_psi),
+      surface_source_active(suppress_src)
   {}
 
   /**Sets the location where flux moments are to be written.*/
@@ -46,7 +51,30 @@ public:
     (*x).assign((*x).size(), 0.0);
   }
 
-  virtual void ZeroDestinationPsi() = 0;
+  /**Returns a reference to the output flux moments vector.*/
+  std::vector<double>& GetDestinationPhi()
+  {
+    return *destination_phi;
+  }
+
+  /**Sets the location where angular fluxes are to be written.*/
+  void SetDestinationPsi(std::vector<double>& in_destination_psi)
+  {
+    destination_psi = (&in_destination_psi);
+  }
+
+  /**Sets all elements of the output angular flux vector to zero.*/
+  void ZeroDestinationPsi()
+  {
+    (*destination_psi).assign((*destination_psi).size(), 0.0);
+  }
+
+  /**Returns a reference to the output angular flux vector.*/
+  std::vector<double>& GetDestinationPsi()
+  {
+    return *destination_psi;
+  }
+
   virtual void ZeroIncomingDelayedPsi() = 0;
   virtual void ZeroOutgoingDelayedPsi() = 0;
   virtual void ZeroFluxDataStructures() = 0;
