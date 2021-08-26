@@ -45,15 +45,15 @@ public:
   {}
 
   /**Sets the location where flux moments are to be written.*/
-  void SetDestinationPhi(std::vector<double>& destination_phi)
+  void SetDestinationPhi(std::vector<double>& in_destination_phi)
   {
-    x = (&destination_phi);
+    destination_phi = (&in_destination_phi);
   }
 
   /**Sets all elements of the output vector to zero.*/
   void ZeroDestinationPhi()
   {
-    (*x).assign((*x).size(), 0.0);
+    (*destination_phi).assign((*destination_phi).size(), 0.0);
   }
 
   /**Returns a reference to the output flux moments vector.*/
@@ -102,12 +102,6 @@ public:
     ZeroDestinationPsi();
     ZeroDestinationPhi();
     ZeroOutgoingDelayedPsi();
-  }
-
-  /**Returns a reference to the output vector.*/
-  std::vector<double>& GetDestinationPhi()
-  {
-    return *x;
   }
 
   /**Activates or deactives the surface src flag.*/
