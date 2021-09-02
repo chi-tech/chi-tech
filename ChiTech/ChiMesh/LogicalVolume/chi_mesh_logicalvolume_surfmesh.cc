@@ -1,22 +1,17 @@
 #include "chi_mesh_logicalvolume.h"
-#include "../chi_mesh.h"
-#include <ChiMesh/SurfaceMesh/chi_surfacemesh.h>
+#include "ChiMesh/chi_mesh.h"
+#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
+#include "ChiMesh/Raytrace/raytracing.h"
 
 //###################################################################
 /**Constructor to compute bound box information.*/
 chi_mesh::SurfaceMeshLogicalVolume::
-  SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh *in_surf_mesh)
+  SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh *in_surf_mesh) :
+  xbounds({1.0e6,-1.0e6}),
+  ybounds({1.0e6,-1.0e6}),
+  zbounds({1.0e6,-1.0e6}),
+  surf_mesh(in_surf_mesh)
 {
-  surf_mesh = in_surf_mesh;
-
-  xbounds[0] =  1e6;
-  xbounds[1] = -1e6;
-  ybounds[0] =  1e6;
-  ybounds[1] = -1e6;
-  zbounds[0] =  1e6;
-  zbounds[1] = -1e6;
-
-
   for (size_t v=0; v<surf_mesh->vertices.size(); v++)
   {
     double x = surf_mesh->vertices[v].x;
@@ -35,7 +30,8 @@ chi_mesh::SurfaceMeshLogicalVolume::
 
 //###################################################################
 /**Logical operation for surface mesh.*/
-bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
+bool chi_mesh::SurfaceMeshLogicalVolume::
+  Inside(const chi_mesh::Vector3& point) const
 {
   double tolerance = 1.0e-5;
 
@@ -57,7 +53,7 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
   // If it does then .. bonus .. we don't need to do
   // anything more because the surface is probably convex.
   bool cheap_pass = true; // now try to disprove
-  for (int f=0; f<surf_mesh->faces.size(); f++)
+  for (size_t f=0; f<surf_mesh->faces.size(); f++)
   {
     chi_mesh::Vector3 fc      = surf_mesh->faces[f].face_centroid;
     chi_mesh::Vector3 p_to_fc = fc - point;
@@ -79,7 +75,7 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
   //============================================= Expensive pass
   // Getting to here means the cheap pass produced
   // a negative and now we need to do more work.
-  for (int f=0; f<surf_mesh->faces.size(); f++)
+  for (size_t f=0; f<surf_mesh->faces.size(); f++)
   {
     chi_mesh::Vector3 fc      = surf_mesh->faces[f].face_centroid;
     chi_mesh::Vector3 p_to_fc = fc - point;
@@ -96,7 +92,7 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
     if (sense < (0.0-tolerance))
     {
       good_to_go = false;
-      for (int fi=0; fi<surf_mesh->faces.size(); fi++)
+      for (size_t fi=0; fi<surf_mesh->faces.size(); fi++)
       {
         if (fi==f) continue;  //Skip same face
 
@@ -113,10 +109,10 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
         //=========================== Check if the line intersects plane
         chi_mesh::Vertex         intp;           //Intersection point
         std::pair<double,double> weights;
-        bool intersects_plane =
+        bool intersects_plane = chi_mesh::
                CheckPlaneLineIntersect(surf_mesh->faces[fi].geometric_normal,v0,
                                        point,fc,intp,
-                                       weights);
+                                       &weights);
         if (!intersects_plane) continue;
 
         //=========================== Check if the line intersects the triangle
@@ -179,42 +175,4 @@ bool chi_mesh::SurfaceMeshLogicalVolume::Inside(chi_mesh::Vector3 point)
   }//for f
 
   return true;
-}
-
-
-
-
-//###################################################################
-/** This routine is copied from field function interpolation and
- * probably needs to find a home in math somewhere (or mesh).*/
-bool chi_mesh::SurfaceMeshLogicalVolume::
-CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                        chi_mesh::Vector3 plane_point,
-                        chi_mesh::Vector3 line_point_0,
-                        chi_mesh::Vector3 line_point_1,
-                        chi_mesh::Vector3& intersection_point,
-                        std::pair<double,double>& weights)
-{
-  chi_mesh::Vector3 v0 = line_point_0 - plane_point;
-  chi_mesh::Vector3 v1 = line_point_1 - plane_point;
-
-  double dotp_0 = plane_normal.Dot(v0);
-  double dotp_1 = plane_normal.Dot(v1);
-
-  bool sense_0 = (dotp_0 >= 0.0);
-  bool sense_1 = (dotp_1 >= 0.0);
-
-  if (sense_0 != sense_1)
-  {
-    double dotp_total = std::fabs(dotp_0) + std::fabs(dotp_1);
-    weights.first = (std::fabs(dotp_0)/dotp_total);
-    weights.second = 1.0 - weights.first;
-    intersection_point =
-      line_point_0*weights.second +
-      line_point_1*weights.first;
-
-    return true;
-  }
-
-  return false;
 }
