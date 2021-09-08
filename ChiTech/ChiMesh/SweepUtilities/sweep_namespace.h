@@ -71,6 +71,5 @@ namespace sweep_management
 }
 }
 
-#include "sweepchunk_base.h"
 
 #endif //CHI_SWEEP_H

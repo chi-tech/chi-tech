@@ -198,19 +198,6 @@ public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
-
-  //
-  void ZeroFluxDataStructures(LBSGroupset& groupset)
-  {
-    phi_new_local.assign(phi_new_local.size(), 0.0);
-    if (options.save_angular_flux)
-    {
-      auto& psi = psi_new_local[groupset.id];
-      psi.assign(psi.size(), 0.0);
-    }
-    groupset.angle_agg.ZeroOutgoingDelayedPsi();
-  }
-
 };
 
 }

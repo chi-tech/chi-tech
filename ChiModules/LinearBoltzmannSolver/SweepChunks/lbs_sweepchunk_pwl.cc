@@ -22,18 +22,18 @@ LinearBoltzmann::SweepChunkPWL::
                 const TCrossSections& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs)
-                    : SweepChunk(destination_phi, false),
+                    : SweepChunk(destination_phi, destination_psi,
+                                 in_groupset.angle_agg, false),
                       grid_view(std::move(grid_ptr)),
                       grid_fe_view(discretization),
                       grid_transport_view(cell_transport_views),
-                      psi_new_local(destination_psi),
                       q_moments(source_moments),
                       groupset(in_groupset),
                       xsections(in_xsections),
                       num_moms(in_num_moms),
                       num_grps(in_groupset.groups.size()),
                       max_num_cell_dofs(in_max_num_cell_dofs),
-                      save_angular_flux(!psi_new_local.empty()),
+                      save_angular_flux(!destination_psi.empty()),
                       a_and_b_initialized(false)
 {}
 
@@ -54,7 +54,8 @@ void LinearBoltzmann::SweepChunkPWL::
   const auto spds = angle_set->GetSPDS();
   const auto fluds = angle_set->fluds;
   const bool surface_source_active = IsSurfaceSourceActive();
-  std::vector<double>& output_vector = GetDestinationPhi();
+  std::vector<double>& output_phi = GetDestinationPhi();
+  std::vector<double>& output_psi = GetDestinationPsi();
 
   const GsSubSet& subset = groupset.grp_subsets[angle_set->ref_subset];
   const int gs_ss_size  = groupset.grp_subset_sizes[angle_set->ref_subset];
@@ -229,7 +230,7 @@ void LinearBoltzmann::SweepChunkPWL::
         {
           const size_t ir = transport_view.MapDOF(i, m, gs_gi);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            output_vector[ir + gsg] += wn_d2m*b[gsg][i];
+            output_phi[ir + gsg] += wn_d2m * b[gsg][i];
         }
       }
 
@@ -244,7 +245,7 @@ void LinearBoltzmann::SweepChunkPWL::
         {
           int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            psi_new_local[ir + gsg] = b[gsg][i];
+            output_psi[ir + gsg] = b[gsg][i];
         }//for i
       }//if save psi
 

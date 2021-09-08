@@ -96,26 +96,24 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   KSPSetUp(ksp);
 
   //================================================== Compute b
-  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
-  bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
-                                 (not options.use_src_moments);
   if (log_info)
   {
     chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
   }
 
-  //Store inittial q_moments_local
+  //SetSource for RHS
   auto init_q_moments_local = q_moments_local;
-
-  //Prepare for sweep
   SetSource(groupset, q_moments_local, rhs_src_scope);
 
+  //Tool the sweep chunk
+  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+  bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
+                                 (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
-  sweep_chunk.SetDestinationPhi(phi_new_local);
-  groupset.angle_agg.ZeroIncomingDelayedPsi();
+  sweep_chunk.ZeroIncomingDelayedPsi();
 
   //Sweep
-  ZeroFluxDataStructures(groupset);
+  sweep_chunk.ZeroFluxDataStructures();
   sweep_scheduler.Sweep();
 
   //=================================================== Apply DSA
@@ -181,7 +179,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
   q_moments_local = init_q_moments_local;
   SetSource(groupset, q_moments_local, lhs_src_scope | rhs_src_scope);
 
-  phi_new_local.assign(phi_new_local.size(),0.0);
+  sweep_chunk.ZeroDestinationPhi();
   sweep_scheduler.Sweep();
 
   ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
