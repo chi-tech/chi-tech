@@ -1,6 +1,7 @@
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "angleset.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
+#include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
 #include <chi_mpi.h>
 extern ChiMPI& chi_mpi;

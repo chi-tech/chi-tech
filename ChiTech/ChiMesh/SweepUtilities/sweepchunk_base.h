@@ -1,6 +1,8 @@
 #ifndef CHI_SWEEPCHUNK_BASE_H
 #define CHI_SWEEPCHUNK_BASE_H
 
+#include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
+
 #include <functional>
 
 //###################################################################
@@ -8,7 +10,9 @@
 class chi_mesh::sweep_management::SweepChunk
 {
 private:
-  std::vector<double>* x;
+  std::vector<double>* destination_phi;
+  std::vector<double>* destination_psi;
+  AngleAggregation& angle_agg;
   bool surface_source_active;
 
 public:
@@ -30,20 +34,74 @@ public:
    */
   std::vector<MomentCallbackF> moment_callbacks;
 
-  SweepChunk(std::vector<double>& destination_phi, bool suppress_src)
-    : x(&destination_phi), surface_source_active(suppress_src)
+  SweepChunk(std::vector<double>& in_destination_phi,
+             std::vector<double>& in_destination_psi,
+             AngleAggregation& in_angle_agg,
+             bool suppress_src)
+    : destination_phi(&in_destination_phi),
+      destination_psi(&in_destination_psi),
+      angle_agg(in_angle_agg),
+      surface_source_active(suppress_src)
   {}
 
   /**Sets the location where flux moments are to be written.*/
-  void SetDestinationPhi(std::vector<double>& destination_phi)
+  void SetDestinationPhi(std::vector<double>& in_destination_phi)
   {
-    x = (&destination_phi);
+    destination_phi = (&in_destination_phi);
   }
 
-  /**Returns a reference to the output vector.*/
+  /**Sets all elements of the output vector to zero.*/
+  void ZeroDestinationPhi()
+  {
+    (*destination_phi).assign((*destination_phi).size(), 0.0);
+  }
+
+  /**Returns a reference to the output flux moments vector.*/
   std::vector<double>& GetDestinationPhi()
   {
-    return *x;
+    return *destination_phi;
+  }
+
+  /**Sets the location where angular fluxes are to be written.*/
+  void SetDestinationPsi(std::vector<double>& in_destination_psi)
+  {
+    destination_psi = (&in_destination_psi);
+  }
+
+  /**Sets all elements of the output angular flux vector to zero.*/
+  void ZeroDestinationPsi()
+  {
+    (*destination_psi).assign((*destination_psi).size(), 0.0);
+  }
+
+  /**Returns a reference to the output angular flux vector.*/
+  std::vector<double>& GetDestinationPsi()
+  {
+    return *destination_psi;
+  }
+
+  /** Resets all the incoming intra-location and inter-location
+   * cyclic interfaces.*/
+  void ZeroIncomingDelayedPsi()
+  {
+   angle_agg.ZeroIncomingDelayedPsi();
+  }
+
+  /** Resets all the outgoing intra-location and inter-location
+   * cyclic interfaces.*/
+  void ZeroOutgoingDelayedPsi()
+  {
+    angle_agg.ZeroOutgoingDelayedPsi();
+  }
+
+  /** Clear the output angular flux vector, the flux moments
+   * vector, and the outgoing delayed psi.
+   */
+  void ZeroFluxDataStructures()
+  {
+    ZeroDestinationPsi();
+    ZeroDestinationPhi();
+    ZeroOutgoingDelayedPsi();
   }
 
   /**Activates or deactives the surface src flag.*/

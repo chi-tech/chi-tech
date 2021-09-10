@@ -46,49 +46,34 @@ if (sigma_t == nil) then sigma_t = 1.0 end
 -- NOTE: For command line inputs, specify as:
 --       variable=[[argument]]
 
--- Cross section file
-if (xsfile == nil) then
-    xsfile = "ChiTest/simple_fissile.csx"
-end
+
 
 -- ##################################################
 -- ##### Run problem #####
 -- ##################################################
 
 --############################################### Setup mesh
--- Define nodes
+chiMeshHandlerCreate()
 nodes = {}
 dx = L/n_cells
 for i=0,n_cells do
   nodes[i+1] = i*dx
 end
-
--- Create the mesh
-chiMeshHandlerCreate()
-_, region = chiMeshCreateUnpartitioned1DOrthoMesh(nodes)
-chiVolumeMesherSetProperty(PARTITION_TYPE, PARMETIS)
+chiMeshCreateUnpartitioned1DOrthoMesh(nodes)
 chiVolumeMesherExecute()
 
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+chiVolumeMesherSetMatIDToAll(0)
 
 --############################################### Add materials
 materials = {}
-
--- Define cross sections
-xs = chiPhysicsTransportXSCreate()
-chiPhysicsTransportXSSet(xs,CHI_XSFILE,xsfile)
-combo = {{xs, 1.0}}
-xs_macro = chiPhysicsTransportXSMakeCombined(combo)
-
--- Add material1
 materials[1] = chiPhysicsAddMaterial("Fissile Material")
-chiPhysicsMaterialAddProperty(materials[1], TRANSPORT_XSECTIONS)
-chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,EXISTING,xs_macro)
-G = chiPhysicsMaterialGetProperty(materials[1],TRANSPORT_XSECTIONS)["num_groups"]
 
-chiPhysicsMaterialModifyTotalCrossSection(materials[1], 0, sigma_t)
+chiPhysicsMaterialAddProperty(materials[1], TRANSPORT_XSECTIONS)
+
+num_groups = 1
+chiPhysicsMaterialSetProperty(materials[1], TRANSPORT_XSECTIONS,
+                              CHI_XSFILE, "ChiTest/simple_fissile.cxs")
 
 --############################################### Setup Physics
 -- Define solver
@@ -103,13 +88,13 @@ pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE,n_angles)
 chiLBSSetProperty(phys,SCATTERING_ORDER,scat_order)
 
 -- Create groups
-for g=0,G-1 do
+for g=0, num_groups - 1 do
     chiLBSCreateGroup(phys)
 end
 
 -- Create groupset
 gs = chiLBSCreateGroupset(phys)
-chiLBSGroupsetAddGroups(phys,gs,0,G-1)
+chiLBSGroupsetAddGroups(phys,gs,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys,gs,pquad)
 chiLBSGroupsetSetMaxIterations(phys,gs,max_si_iters)
 chiLBSGroupsetSetResidualTolerance(phys,gs,si_tol)

@@ -21,7 +21,6 @@ protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
   SpatialDiscretization_PWLD& grid_fe_view;
   std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
-  std::vector<double>& psi_new_local;
   const std::vector<double>& q_moments;
   LBSGroupset& groupset;
   const TCrossSections& xsections;

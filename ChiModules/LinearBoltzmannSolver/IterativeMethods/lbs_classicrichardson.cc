@@ -35,13 +35,12 @@ ClassicRichardson(LBSGroupset& groupset,
 
   std::vector<double> init_q_moments_local = q_moments_local;
 
-  //================================================== Sweepchunk settings
+  //================================================== Sweep chunk settings
   auto& sweep_chunk = sweep_scheduler.sweep_chunk;
   bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
-  sweep_chunk.SetDestinationPhi(phi_new_local);
-  groupset.angle_agg.ZeroIncomingDelayedPsi();
+  sweep_chunk.ZeroIncomingDelayedPsi();
 
   //================================================== Now start iterating
   double pw_change_prev = 1.0;
@@ -51,7 +50,7 @@ ClassicRichardson(LBSGroupset& groupset,
     q_moments_local = init_q_moments_local;
     SetSource(groupset, q_moments_local, source_flags);
 
-    ZeroFluxDataStructures(groupset);
+    sweep_chunk.ZeroFluxDataStructures();
     sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)
