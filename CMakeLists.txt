@@ -52,13 +52,19 @@ find_package(MPI)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/ChiResources/Macros")
 
 if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+
     set(CONFIG_FILE_NAME "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config.cmake")
+    file(WRITE "${CONFIG_FILE_NAME}"
+        "# Environment configuration file for ChiTech.\n")
 endif()
 
 #================================================ Export vars to config file
-file(WRITE  "${CONFIG_FILE_NAME}" "set(PETSC_ROOT ${PETSC_ROOT})\n")
-file(APPEND "${CONFIG_FILE_NAME}" "set(LUA_ROOT ${LUA_ROOT})")
+file(APPEND "${CONFIG_FILE_NAME}" "set(PETSC_ROOT ${PETSC_ROOT})\n")
+file(APPEND "${CONFIG_FILE_NAME}" "set(LUA_ROOT ${LUA_ROOT})\n")
+file(APPEND "${CONFIG_FILE_NAME}" "set(VTK_DIR ${VTK_DIR})\n")
 
 #================================================ Include macros
 include(GNUInstallDirs)
@@ -69,9 +75,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #================================================ Default include directories
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
 include_directories(SYSTEM "${LUA_ROOT}/include")
 include_directories(SYSTEM "${PETSC_ROOT}/include")
+
+include_directories(SYSTEM "${CHI_TECH_DIR}/ThirdParty/paraview")
 
 include_directories("${CHI_TECH_DIR}/ChiTech")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
@@ -79,7 +87,6 @@ include_directories("${CHI_TECH_DIR}/ChiTech/ChiMPI")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
 include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiMath/SpatialDiscretization")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
@@ -118,25 +125,38 @@ endif()
 set(CHI_LIBS stdc++ lua m dl ${MPI_CXX_LIBRARIES} petsc ${VTK_LIBRARIES})
 
 #================================================ Compiler flags
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
-    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
-    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
-    set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-    #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    #elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-endif()
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Force -O3 in release builds (some OS's might downgrade it)
 string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_MINSIZEREL})
+
+set(CHI_CXX_FLAGS)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    list(APPEND CHI_CXX_FLAGS "-pedantic")
+    list(APPEND CHI_CXX_FLAGS "-Wall")
+    list(APPEND CHI_CXX_FLAGS "-Wno-unused-variable")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+    list(APPEND CHI_CXX_FLAGS "-pedantic")
+    list(APPEND CHI_CXX_FLAGS "-Wall")
+    list(APPEND CHI_CXX_FLAGS "-Wno-unused-variable")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    list(APPEND CHI_CXX_FLAGS "-pedantic")
+    list(APPEND CHI_CXX_FLAGS "-Wall")
+    list(APPEND CHI_CXX_FLAGS "-Wno-unused-variable")
+    list(APPEND CHI_CXX_FLAGS "-Wno-sign-compare")
+#elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+#elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+else()
+    message(WARNING "Untested CMAKE_CXX_COMPILER_ID : ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+#================================================ Linker flags
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
+
+#================================================ Third-party library
+add_subdirectory("${CHI_TECH_DIR}/ThirdParty")
 
 #================================================ Define source directories
 set(SOURCES "${CHI_TECH_DIR}/ChiTech/chi_runtime.cc"
@@ -155,10 +175,14 @@ add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiDataTypes")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
+#================================================ Define targets
 add_library(ChiLib STATIC ${SOURCES})
+target_link_libraries(ChiLib ${CHI_LIBS} $<TARGET_FILE:ThirdParty>)
+target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
+
 add_executable(${TARGET} "${CHI_TECH_DIR}/ChiTech/chi_tech_main.cc")
 target_link_libraries(${TARGET} ChiLib)
-target_link_libraries(ChiLib ${CHI_LIBS})
+target_compile_options(${TARGET} PUBLIC ${CHI_CXX_FLAGS})
 
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"

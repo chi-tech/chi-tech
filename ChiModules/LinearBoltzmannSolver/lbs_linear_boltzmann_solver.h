@@ -93,11 +93,13 @@ public:
   std::vector<double> q_moments_local, ext_src_moments_local;
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
+  std::vector<std::vector<double>> psi_new_local;
 
  public:
   //00
   explicit Solver(const std::string& in_text_name);
   ~Solver() override =default;
+
   //01
   void Initialize() override;
   //01a
@@ -114,6 +116,7 @@ public:
   virtual void InitializeParrays();
   //01e
   void InitializeGroupsets();
+
   //02
   void Execute() override;
   void SolveGroupset(LBSGroupset& groupset);
@@ -143,7 +146,6 @@ public:
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                       double *ref_phi_new);
   void CleanUpTGDSA(LBSGroupset& groupset);
-
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
@@ -152,7 +154,7 @@ public:
   void WriteRestartData(std::string folder_name, std::string file_base);
   void ReadRestartData(std::string folder_name, std::string file_base);
 
-  //04b
+  //05
   void WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
                                   const std::string& file_base);
   void ReadGroupsetAngularFluxes(LBSGroupset& groupset,
@@ -196,7 +198,6 @@ public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
-
 };
 
 }

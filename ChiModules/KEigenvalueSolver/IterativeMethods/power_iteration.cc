@@ -36,33 +36,28 @@ void KEigenvalue::Solver::PowerIteration()
 
   LBSGroupset& groupset = groupsets[0];
 
-  groupset.angle_agg.ZeroIncomingDelayedPsi();
-
-  //======================================== Setup sweep chunk
-  auto sweep_chunk = SetSweepChunk(groupset);
-  MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                     groupset.angle_agg,
-                                     *sweep_chunk);
-
-  //======================================== Tool the sweep chunk
-  sweep_scheduler.sweep_chunk.SetDestinationPhi(phi_new_local);
-
   //======================================== Initial guess
   phi_prev_local.assign(phi_prev_local.size(), 1.0);
   ScopedCopySTLvectors(groupset, phi_prev_local, phi_old_local);
 
-  //======================================== Start power iterations
   double F_prev = 1.0;
   double k_eff_prev = 1.0;
+  double k_eff_change = 1.0;
+
+  //======================================== Start power iterations
   int nit = 0;      //number of iterations
   bool converged = false;
   while (nit < max_iterations)
   {
 
-    //============================== Clear source moments
-    q_moments_local.assign(q_moments_local.size(), 0.0);
+    //======================================== Setup sweep chunk
+    auto sweep_chunk = SetSweepChunk(groupset);
+    MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
+                                       groupset.angle_agg,
+                                       *sweep_chunk);
 
     //============================== Set the fission source
+    q_moments_local.assign(q_moments_local.size(), 0.0);
     SetKSource(groupset, q_moments_local,
                APPLY_AGS_FISSION_SOURCE |
                APPLY_WGS_FISSION_SOURCE);
@@ -91,7 +86,7 @@ void KEigenvalue::Solver::PowerIteration()
 
     //============================== Check convergence, reset book-keeping
     ScopedCopySTLvectors(groupset, phi_new_local, phi_prev_local);
-    double k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
+    k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff;
     F_prev = F_new;
     nit += 1;
@@ -120,38 +115,14 @@ void KEigenvalue::Solver::PowerIteration()
   //============================== Initialize the precursor vector
   InitializePrecursors();
 
-  double sweep_time = sweep_scheduler.GetAverageSweepTime();
-  double source_time =
-      chi_log.ProcessEvent(source_event_tag,
-                           ChiLog::EventOperation::AVERAGE_DURATION);
-  size_t num_angles = groupset.quadrature->abscissae.size();
-  size_t num_unknowns = glob_node_count *
-                        num_angles *
-                        groupset.groups.size();
-  chi_log.Log(LOG_0)
-      << "\n";
+
+  //================================================== Print summary
+  chi_log.Log(LOG_0) << "\n";
   chi_log.Log(LOG_0)
       << "        Final k-eigenvalue    :        "
       << std::setprecision(6) << k_eff;
   chi_log.Log(LOG_0)
-      << "        Set Src Time/sweep (s):        "
-      << source_time;
-  chi_log.Log(LOG_0)
-      << "        Average sweep time (s):        "
-      << sweep_time;
-  chi_log.Log(LOG_0)
-      << "        Sweep Time/Unknown (ns):       "
-      << sweep_time * 1.0e9 * chi_mpi.process_count / static_cast<double>(num_unknowns);
-  chi_log.Log(LOG_0)
-      << "        Number of unknowns per sweep:  " << num_unknowns;
-  chi_log.Log(LOG_0)
-      << "\n\n";
-
-  // GS_0 because we solve k-eigenvalue problems with 1 groupset right now.
-  std::string sweep_log_file_name =
-      std::string("GS_") + std::to_string(0) +
-      std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
-      std::string(".log");
-  groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
-
+      << "        Final change          :        "
+      << std::setprecision(6) << k_eff_change;
+  chi_log.Log(LOG_0) << "\n";
 }

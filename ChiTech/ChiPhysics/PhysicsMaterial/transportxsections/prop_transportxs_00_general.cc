@@ -236,18 +236,16 @@ void chi_physics::TransportCrossSections::
       if (x == 0)
         inv_velocity[g] = cross_secs[x]->inv_velocity[g];
       else if (inv_velocity[g] != cross_secs[x]->inv_velocity[g])
-      {
-        chi_log.Log(LOG_ALLERROR)
+        chi_log.Log(LOG_ALLWARNING)
             << "In call to " << __FUNCTION__
             << ": all materials must have the same inverse velocity "
-            << "term per group. Invalid inverse velocity encountered "
-            << "in material " << x << ", group " << g << ".";
-        exit(EXIT_FAILURE);
-      }
+            << "term per group. Invalid value encountered in "
+            << "material " << x << " group " << g << ". Using the "
+            << "value from the first cross-section set.";
     }
 
     //======================================== Compute precursor
-    // Here, all precursors are across all materials are stored.
+    // Here, all precursors across all materials are stored.
     // The decay constants and delayed spectrum are what they are,
     // however, some special treatment must be given to the yields.
     // Because the yield tells us what fraction of delayed neutrons
@@ -259,11 +257,11 @@ void chi_physics::TransportCrossSections::
     {
       for (size_t j = 0; j < cross_secs[x]->num_precursors; ++j)
       {
-        size_t j_map = precursor_count + j;
-        precursor_lambda[j_map] = cross_secs[x]->precursor_lambda[j];
-        precursor_yield [j_map] = cross_secs[x]->precursor_yield [j] * pf_i;
-        for (int g=0; g < num_groups; g++)
-          chi_delayed[g][j_map] = cross_secs[x]->chi_delayed[g][j];
+        size_t count = precursor_count + j;
+        precursor_lambda[count] = cross_secs[x]->precursor_lambda[j];
+        precursor_yield [count] = cross_secs[x]->precursor_yield [j] * pf_i;
+        for (size_t g = 0; g < num_groups; ++g)
+          chi_delayed[g][count] = cross_secs[x]->chi_delayed[g][j];
       }
       precursor_count += cross_secs[x]->num_precursors;
     }

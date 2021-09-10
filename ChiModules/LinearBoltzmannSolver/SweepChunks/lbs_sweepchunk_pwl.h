@@ -27,6 +27,7 @@ protected:
   const int num_moms;
   const size_t num_grps;
   const int max_num_cell_dofs;
+  const bool save_angular_flux;
 
   //Runtime params
   bool a_and_b_initialized;
@@ -41,6 +42,7 @@ public:
                 SpatialDiscretization_PWLD& discretization,
                 std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
+                std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
                 LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,

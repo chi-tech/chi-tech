@@ -37,6 +37,18 @@ void LinearBoltzmann::Solver::InitializeParrays()
   phi_old_local.assign(local_unknown_count,0.0);
   phi_new_local.assign(local_unknown_count,0.0);
 
+  //============================================= Setup groupset psi vectors
+  for (auto& groupset : groupsets)
+  {
+    psi_new_local.emplace_back();
+    if (options.save_angular_flux)
+    {
+      size_t num_ang_unknowns =
+          discretization->GetNumLocalDOFs(groupset.psi_uk_man);
+      psi_new_local.back().assign(num_ang_unknowns, 0.0);
+    }
+  }
+
   //================================================== Read Restart data
   if (options.read_restart_data)
     ReadRestartData(options.read_restart_folder_name,

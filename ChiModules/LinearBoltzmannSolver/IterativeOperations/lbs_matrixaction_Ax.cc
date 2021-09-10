@@ -16,7 +16,8 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   //Shorten some names
   LinearBoltzmann::Solver& solver = context->solver;
   LBSGroupset& groupset  = context->groupset;
-  MainSweepScheduler& sweepScheduler = context->sweep_scheduler;
+  MainSweepScheduler& sweep_scheduler = context->sweep_scheduler;
+  auto& sweep_chunk = context->sweep_scheduler.sweep_chunk;
   SourceFlags& lhs_source_scope = context->lhs_scope;
 
   //============================================= Copy krylov vector into local
@@ -30,9 +31,8 @@ int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   solver.SetSource(groupset, solver.q_moments_local, lhs_source_scope);
 
   //============================================= Sweeping the new source
-  groupset.ZeroAngularFluxDataStructures();
-  solver.phi_new_local.assign(solver.phi_new_local.size(),0.0);
-  sweepScheduler.Sweep();
+  sweep_chunk.ZeroFluxDataStructures();
+  sweep_scheduler.Sweep();
 
   //=================================================== Apply WGDSA
   if (groupset.apply_wgdsa)
