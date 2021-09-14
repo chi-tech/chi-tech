@@ -52,9 +52,10 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
   if (sigma_f_sum > 1.0e-28) is_fissile = true;
   if (not is_fissile and num_precursors > 0)
   {
-    precursor_lambda.assign(num_precursors, 0.0);
-    precursor_yield.assign(num_precursors, 0.0);
-    chi_delayed.assign(num_groups, std::vector<double>(num_precursors, 0.0));
+    num_precursors = 0;
+    precursor_lambda.clear();
+    precursor_yield.clear();
+    chi_delayed.clear();
 
     chi_log.Log(LOG_ALLWARNING)
         << __FUNCTION__
