@@ -7,7 +7,7 @@ extern ChiLog& chi_log;
 
 
 
-void chi_physics::TransportCrossSections::ValidateCrossSections()
+void chi_physics::TransportCrossSections::FinalizeCrossSections()
 {
   double eps = 1.0e-8;
 

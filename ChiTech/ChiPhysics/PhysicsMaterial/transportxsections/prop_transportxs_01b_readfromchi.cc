@@ -530,7 +530,7 @@ void chi_physics::TransportCrossSections::
   scattering_order = M-1;
 
   //perform checks and enforce physical relationships
-  ValidateCrossSections();
+  FinalizeCrossSections();
 
 
   file.close();
