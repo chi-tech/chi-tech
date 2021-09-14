@@ -260,5 +260,14 @@ void chi_physics::TransportCrossSections::ValidateCrossSections()
         exit(EXIT_FAILURE);
       }
     }
+
+    //compute nu_sigma_f terms
+    for (size_t g = 0; g < num_groups; ++g)
+    {
+      nu_sigma_f        [g] = nu        [g] * sigma_f[g];
+      nu_prompt_sigma_f [g] = nu_prompt [g] * sigma_f[g];
+      nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
+    }
+
   }//if fissile
 }
