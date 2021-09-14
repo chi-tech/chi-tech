@@ -38,7 +38,7 @@ void chi_physics::TransportCrossSections::
   nu_sigma_f.resize(in_G, 0.0);
   nu_prompt_sigma_f.resize(in_G, 0.0);
   nu_delayed_sigma_f.resize(in_G, 0.0);
-  inv_velocity.resize(in_G, 0.0);
+  velocity.resize(in_G, 0.0);
 
   transfer_matrices.emplace_back(in_G, in_G);
 }
@@ -64,7 +64,7 @@ void chi_physics::TransportCrossSections::
   nu_sigma_f.resize(in_G, 0.0);
   nu_prompt_sigma_f.resize(in_G, 0.0);
   nu_delayed_sigma_f.resize(in_G, 0.0);
-  inv_velocity.resize(in_G, 0.0);
+  velocity.resize(in_G, 0.0);
 
   transfer_matrices.emplace_back(in_G, in_G);
 
@@ -189,7 +189,7 @@ void chi_physics::TransportCrossSections::
   nu_sigma_f.resize(num_grps_G, 0.0);
   nu_prompt_sigma_f.resize(num_grps_G, 0.0);
   nu_delayed_sigma_f.resize(num_grps_G, 0.0);
-  inv_velocity.resize(num_grps_G, 0.0);
+  velocity.resize(num_grps_G, 0.0);
   precursor_lambda.resize(num_precursors_J, 0.0);
   precursor_yield.resize(num_precursors_J, 0.0);
   chi_delayed.resize(num_grps_G);
@@ -234,8 +234,8 @@ void chi_physics::TransportCrossSections::
       nu_delayed_sigma_f[g] += cross_secs[x]->nu_delayed_sigma_f[g] * N_i;
 
       if (x == 0)
-        inv_velocity[g] = cross_secs[x]->inv_velocity[g];
-      else if (inv_velocity[g] != cross_secs[x]->inv_velocity[g])
+        velocity[g] = cross_secs[x]->velocity[g];
+      else if (velocity[g] != cross_secs[x]->velocity[g])
         chi_log.Log(LOG_ALLWARNING)
             << "In call to " << __FUNCTION__
             << ": all materials must have the same inverse velocity "

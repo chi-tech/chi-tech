@@ -54,7 +54,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   Push1DXS(nu_sigma_f, "nu_sigma_f");
   Push1DXS(nu_prompt_sigma_f, "nu_prompt_sigma_f");
   Push1DXS(nu_delayed_sigma_f, "nu_delayed_sigma_f");
-  Push1DXS(inv_velocity, "inv_velocity");
+  Push1DXS(velocity, "velocity");
 
   lua_pushstring(L,"chi_delayed");
   lua_newtable(L);
