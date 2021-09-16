@@ -60,6 +60,7 @@ private:
   int num_grps;
   int num_grps_moms;
   int xs_mapping;
+  double volume;
   std::vector<bool> face_local_flags = {};
   std::vector<double> outflow;
 
@@ -69,6 +70,7 @@ public:
               int in_num_grps,
               int in_num_moms,
               int in_xs_mapping,
+              double in_volume,
               const std::vector<bool>& in_face_local_flags,
               bool cell_on_boundary) :
     phi_address(in_phi_address),
@@ -76,6 +78,7 @@ public:
     num_grps(in_num_grps),
     num_grps_moms(in_num_grps*in_num_moms),
     xs_mapping(in_xs_mapping),
+    volume(in_volume),
     face_local_flags(in_face_local_flags)
   {
     if (cell_on_boundary)
@@ -92,6 +95,8 @@ public:
   bool IsFaceLocal(int f) const {return face_local_flags[f];}
 
   int NumNodes() const {return num_nodes;}
+
+  double Volume() const {return volume;}
 
   void ZeroOutflow(     ) {outflow.assign(outflow.size(),0.0);}
   void ZeroOutflow(int g) {if (g<outflow.size()) outflow[g]=0.0;}
