@@ -72,20 +72,20 @@ void LinearBoltzmann::Solver::InitializeParrays()
   chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
   chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
+  auto pwl =
+      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+
   cell_transport_views.clear();
   cell_transport_views.reserve(grid->local_cells.size());
   for (auto& cell : grid->local_cells)
   {
-    auto pwl =
-        std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
-    auto& fe_values = pwl->GetUnitIntegrals(cell);
-
     size_t num_nodes  = discretization->GetCellNumNodes(cell);
     int    mat_id     = cell.material_id;
     int    xs_mapping = matid_to_xs_map[mat_id];
 
     //compute cell volumes
     double cell_volume = 0.0;
+    auto& fe_values = pwl->GetUnitIntegrals(cell);
     for (int i = 0; i < fe_values.NumNodes(); ++i)
       cell_volume += fe_values.IntV_shapeI(i);
 
