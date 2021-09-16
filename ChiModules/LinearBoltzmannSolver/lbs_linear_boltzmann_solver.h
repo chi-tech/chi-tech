@@ -87,7 +87,6 @@ public:
   std::vector<std::shared_ptr<SweepBndry>>          sweep_boundaries;
 
   chi_math::UnknownManager flux_moments_uk_man;
-  chi_math::UnknownManager precursor_uk_man;
 
   size_t max_cell_dof_count = 0;
   unsigned long long local_node_count = 0;
@@ -203,6 +202,9 @@ public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
+
+  //precursors
+  void ComputePrecursors();
 };
 
 }
