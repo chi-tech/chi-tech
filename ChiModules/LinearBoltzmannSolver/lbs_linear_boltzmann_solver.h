@@ -61,7 +61,10 @@ public:
   double last_restart_write=0.0;
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
 
-  int num_moments=0;
+  int num_moments;
+  int num_groups;
+  int num_precursors;
+  int max_precursors_per_material;
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> groupsets;
@@ -84,6 +87,7 @@ public:
   std::vector<std::shared_ptr<SweepBndry>>          sweep_boundaries;
 
   chi_math::UnknownManager flux_moments_uk_man;
+  chi_math::UnknownManager precursor_uk_man;
 
   size_t max_cell_dof_count = 0;
   unsigned long long local_node_count = 0;
@@ -94,6 +98,7 @@ public:
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
   std::vector<std::vector<double>> psi_new_local;
+  std::vector<double> precursor_new_local;
 
  public:
   //00
