@@ -12,7 +12,7 @@ void LinearBoltzmann::Solver::ComputePrecursors()
 {
   auto pwl =
       std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
-  const int J = max_precursors_per_material;
+  const size_t J = max_precursors_per_material;
 
   precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
@@ -37,7 +37,7 @@ void LinearBoltzmann::Solver::ComputePrecursors()
     auto xs = material_xs[xs_id];
 
     //======================================== Loop over precursors
-    for (int j = 0; j < xs->num_precursors; ++j)
+    for (size_t j = 0; j < xs->num_precursors; ++j)
     {
       size_t dof = cell.local_id * J + j;
       const double coeff = xs->precursor_yield[j] /
