@@ -62,9 +62,9 @@ public:
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
 
   int num_moments;
-  int num_groups;
-  int num_precursors;
-  int max_precursors_per_material;
+  size_t num_groups;
+  size_t num_precursors;
+  size_t max_precursors_per_material;
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> groupsets;
