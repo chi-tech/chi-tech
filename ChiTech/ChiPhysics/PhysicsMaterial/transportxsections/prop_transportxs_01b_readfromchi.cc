@@ -128,9 +128,12 @@ constants, \f$ \lambda_j \f$ are required.
     [Group, chi]. Populates the chi_prompt field. Symbol \f$ \chi_{prompt, g} \f$.
   - VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
     VELOCITY_END. Each line in the block processes the first two words as
-    [Group, velocity]. Populates the velocity field.
+    [Group, velocity]. Populates the inv_velocity field by inverting parsed values.
     Symbol \f$ \frac{1}{v_g} \f$.
-
+  - INV_VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
+    INV_VELOCITY_END. Each line in the block processes the first two words as
+    [Group, inv_velocity]. Populates the inv_velocity field.
+    Symbol \f$ \frac{1}{v_g} \f$.
   - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a line
     PRECURSOR_LAMBDA_END. Each line in the block processes the first two words as
     [precursor, lambda]. Populates the lambda field (the precursor decay
@@ -435,6 +438,8 @@ void chi_physics::TransportCrossSections::
   //================================================== Read file line by line
   int line_number=0;
   bool not_eof = bool(std::getline(file,line)); ++line_number;
+  bool found_velocity = false;
+  bool found_inv_velocity = false;
   while (not_eof)
   {
     std::istringstream line_stream(line);
@@ -455,7 +460,7 @@ void chi_physics::TransportCrossSections::
       nu_sigma_f.assign(num_groups, 0.0);
       nu_prompt_sigma_f.assign(num_groups, 0.0);
       nu_delayed_sigma_f.assign(num_groups, 0.0);
-      velocity.assign(num_groups, 0.0);
+      inv_velocity.assign(num_groups, 0.0);
     }
     if (first_word == "NUM_MOMENTS")
     {
@@ -493,7 +498,17 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_DELAYED_BEGIN")    Read1DXS("NU_DELAYED"  , nu_delayed , f, num_groups, ln, ls);
       if (fw == "CHI_BEGIN")           Read1DXS("CHI"         , chi        , f, num_groups, ln, ls);
       if (fw == "CHI_PROMPT_BEGIN")    Read1DXS("CHI_PROMPT"  , chi_prompt , f, num_groups, ln, ls);
-      if (fw == "VELOCITY_BEGIN")      Read1DXS("VELOCITY"    , velocity   , f, num_groups, ln, ls);
+
+      if (fw == "VELOCITY_BEGIN")
+      {
+        Read1DXS("VELOCITY", inv_velocity, f, num_groups, ln, ls);
+        found_velocity = true;
+      }
+      if (fw == "INV_VELOCITY_BEGIN")
+      {
+        Read1DXS("INV_VELOCITY", inv_velocity, f, num_groups, ln, ls);
+        found_inv_velocity = true;
+      }
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",
@@ -528,6 +543,10 @@ void chi_physics::TransportCrossSections::
     not_eof = bool(std::getline(file,line)); ++line_number;
   }//while not EOF, read each lines
   scattering_order = M-1;
+
+  //compute inv_velocity if necessary
+  if (found_velocity and not found_inv_velocity)
+    for (auto& v : inv_velocity) v = 1.0 / v;
 
   //perform checks and enforce physical relationships
   FinalizeCrossSections();
