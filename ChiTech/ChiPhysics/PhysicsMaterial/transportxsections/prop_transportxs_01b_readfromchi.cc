@@ -499,7 +499,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "CHI_BEGIN")           Read1DXS("CHI"         , chi        , f, num_groups, ln, ls);
       if (fw == "CHI_PROMPT_BEGIN")    Read1DXS("CHI_PROMPT"  , chi_prompt , f, num_groups, ln, ls);
 
-      if (fw == "VELOCITY_BEGIN")
+      if (fw == "VELOCITY_BEGIN" and not found_inv_velocity)
       {
         Read1DXS("VELOCITY", inv_velocity, f, num_groups, ln, ls);
         found_velocity = true;
@@ -545,7 +545,7 @@ void chi_physics::TransportCrossSections::
   scattering_order = M-1;
 
   //compute inv_velocity if necessary
-  if (found_velocity and not found_inv_velocity)
+  if (found_velocity)
     for (auto& v : inv_velocity) v = 1.0 / v;
 
   //perform checks and enforce physical relationships
