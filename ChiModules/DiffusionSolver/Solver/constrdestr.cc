@@ -8,7 +8,7 @@ extern ChiLog& chi_log;
  *
 Option name           | Type   | Default Value | Description
 ----------------------|------- |---------------|------------
-discretization_method | string | 500           | Spatial discretization method.
+discretization_method | string | "None"        | Spatial discretization method.
 max_iters             | int    | 500           | Maximum iterations for solver convergence.
 residual_tolerance    | float  | 1.0e-8        | Residual convergence tolerance.
 property_map_D        | int    | 0             | Material property index to use for diffusion coefficient
