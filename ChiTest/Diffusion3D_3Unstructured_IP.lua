@@ -58,12 +58,12 @@ chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
-chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLD_MIP);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-6)
+chiSolverSetBasicOption(phys1,"discretization_method","PWLD_MIP")
+chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-6)
 
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_REFLECTING)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_REFLECTING)
+chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMIN,"reflecting")
+chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMAX,"reflecting")
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)

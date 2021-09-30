@@ -32,7 +32,7 @@ public:
 
   void   Insert(size_t i, size_t j, double value);
   void   InsertAdd(size_t i, size_t j, double value);
-  double ValueIJ(size_t i, size_t j);
+  double ValueIJ(size_t i, size_t j) const;
   void   SetDiagonal(const std::vector<double>& diag);
 
   void Compress();

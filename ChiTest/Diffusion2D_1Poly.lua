@@ -44,14 +44,14 @@ chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 --############################################### Setup Physics
 phys1 = chiDiffusionCreateSolver();
 chiSolverAddRegion(phys1,region1)
-chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
+chiSolverSetBasicOption(phys1,"discretization_method","PWLC")
+chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-4)
 
 --############################################### Set boundary conditions
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_REFLECTING,1.0)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_VACUUM,2.0)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,2,DIFFUSION_REFLECTING,3.0)
---chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,3,DIFFUSION_VACUUM,4.0)
+--chiDiffusionSetProperty(phys1,"boundary_type",0,"reflecting",1.0)
+--chiDiffusionSetProperty(phys1,"boundary_type",1,"vacuum",2.0)
+--chiDiffusionSetProperty(phys1,"boundary_type",2,"reflecting",3.0)
+--chiDiffusionSetProperty(phys1,"boundary_type",3,"vacuum",4.0)
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)

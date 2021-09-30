@@ -75,7 +75,7 @@ def parse_output(out, search_strings_vals_tols):
     else:
         print(" - FAILED!")
         num_failed += 1
-        print(out)
+        # print(out)
 
     return test_passed
 

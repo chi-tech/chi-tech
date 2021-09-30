@@ -12,9 +12,17 @@ namespace chi_diffusion
   class BoundaryReflecting;
   class BoundaryRobin;
 
-  PetscErrorCode KSPMonitorAChiTech(KSP ksp,PetscInt n,
-                                    PetscReal rnorm,
-                                    void* monitordestroy);
+  PetscErrorCode KSPMonitorAChiTech(
+    KSP ksp,
+    PetscInt n,
+    PetscReal rnorm,
+    void* monitordestroy);
+
+  PetscErrorCode DiffusionConvergenceTestNPT(
+    KSP ksp,
+    PetscInt n,
+    PetscReal rnorm,
+    KSPConvergedReason* convergedReason, void *monitordestroy);
 }
 
 

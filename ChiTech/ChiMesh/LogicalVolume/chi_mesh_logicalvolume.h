@@ -23,7 +23,12 @@ public:
     type_index = 0;
   }
 
-  virtual bool Inside(chi_mesh::Vector3 point)
+  int Type() const
+  {
+    return type_index;
+  }
+
+  virtual bool Inside(const chi_mesh::Vector3& point) const
   {
     return false;
   }
@@ -58,7 +63,7 @@ public:
     z0 = in_z;
   }
 
-  bool Inside(chi_mesh::Vector3 point)
+  bool Inside(const chi_mesh::Vector3& point) const override
   {
     double dx = point.x - x0;
     double dy = point.y - y0;
@@ -100,7 +105,7 @@ public:
     zmin = z0; zmax = z1;
   }
 
-  bool Inside(chi_mesh::Vector3 point)
+  bool Inside(const chi_mesh::Vector3& point) const override
   {
     if ((point.x <= xmax) && (point.x >= xmin) &&
         (point.y <= ymax) && (point.y >= ymin) &&
@@ -143,8 +148,9 @@ public:
     r = ir;
   }
 
-  bool Inside(chi_mesh::Vector3 p1)
+  bool Inside(const chi_mesh::Vector3& point) const override
   {
+    auto& p1 = point;
     auto& chi_log = ChiLog::GetInstance();
     chi_mesh::Vector3 p0(x0, y0, z0);
     chi_mesh::Vector3 vd(vx, vy, vz);
@@ -201,22 +207,16 @@ public:
 class chi_mesh::SurfaceMeshLogicalVolume : public LogicalVolume
 {
 private:
-  double xbounds[2];
-  double ybounds[2];
-  double zbounds[2];
+  std::array<double,2> xbounds;
+  std::array<double,2> ybounds;
+  std::array<double,2> zbounds;
 public:
-  chi_mesh::SurfaceMesh* surf_mesh;
+  chi_mesh::SurfaceMesh* surf_mesh = nullptr;
 
+  explicit
   SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh* in_surf_mesh);
 
-  bool Inside(chi_mesh::Vector3 point);
-private:
-  bool CheckPlaneLineIntersect(chi_mesh::Normal plane_normal,
-                               chi_mesh::Vector3 plane_point,
-                               chi_mesh::Vector3 line_point_0,
-                               chi_mesh::Vector3 line_point_1,
-                               chi_mesh::Vector3& intersection_point,
-                               std::pair<double,double>& weights);
+  bool Inside(const chi_mesh::Vector3& point) const override;
 };
 
 
@@ -227,9 +227,9 @@ class chi_mesh::BooleanLogicalVolume : public LogicalVolume
 public:
   std::vector<std::pair<bool,LogicalVolume*>> parts;
 
-  bool Inside(chi_mesh::Vector3 point)
+  bool Inside(const chi_mesh::Vector3& point) const override
   {
-    for (int p=0;p<parts.size();p++)
+    for (size_t p=0; p<parts.size();p++)
     {
       if (not (parts[p].first && parts[p].second->Inside(point)))
         return false;

@@ -203,12 +203,16 @@ RegisterConstant(LOG_ALLVERBOSE_2, 12);
 
 //module:Physics Utilities
 RegisterFunction(chiSolverAddRegion)
+RegisterFunction(chiSolverInitialize)
 RegisterFunction(chiSolverExecute)
+RegisterFunction(chiSolverSetBasicOption)
+
 RegisterFunction(chiPhysicsAddMaterial)
 RegisterFunction(chiPhysicsMaterialAddProperty)
 RegisterFunction(chiPhysicsMaterialSetProperty)
 RegisterFunction(chiPhysicsMaterialGetProperty)
-RegisterFunction(chiPhysicsMaterialModifyTotalCrossSection);
+RegisterFunction(chiPhysicsMaterialModifyTotalCrossSection)
+
 RegisterFunction(chiGetFieldFunctionHandleByName)
 RegisterFunction(chiGetFieldFunctionList)
 RegisterFunction(chiExportFieldFunctionToVTK)

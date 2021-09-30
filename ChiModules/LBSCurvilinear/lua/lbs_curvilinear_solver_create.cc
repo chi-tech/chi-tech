@@ -21,11 +21,12 @@ extern ChiPhysics& chi_physics_handler;
  */
 int chiLBSCurvilinearCreateSolver(lua_State *L)
 {
+  const std::string fname = __FUNCTION__;
   const int num_args = lua_gettop(L);
-  if (num_args != 1)
-    LuaPostArgAmountError(__FUNCTION__, 1, num_args);
+  if ((num_args != 1) and (num_args != 2))
+    LuaPostArgAmountError(fname, 1, num_args);
 
-  LuaCheckNilValue(__FUNCTION__, L, 1);
+  LuaCheckNilValue(fname, L, 1);
   const int coord_system = lua_tonumber(L, 1);
   const auto coord_system_type =
     static_cast<chi_math::CoordinateSystemType>(coord_system);
@@ -33,11 +34,19 @@ int chiLBSCurvilinearCreateSolver(lua_State *L)
   chi_log.Log(LOG_ALLVERBOSE_1)
     << "Creating Curvilinear Linear Boltzman solver";
 
-  const auto new_solver = new LBSCurvilinear::Solver(coord_system_type);
+  std::string solver_name = "LBCurvilinearSolver";
+  if (num_args == 2)
+  {
+    LuaCheckStringValue(fname, L, 2);
+    solver_name = lua_tostring(L, 2);
+  }
+
+  const auto new_solver =
+    new LBSCurvilinear::Solver(coord_system_type, solver_name);
 
   chi_physics_handler.solver_stack.push_back(new_solver);
-  const int index = chi_physics_handler.solver_stack.size() - 1;
-  lua_pushnumber(L,index);
+  const auto index = chi_physics_handler.solver_stack.size() - 1;
+  lua_pushinteger(L,static_cast<lua_Integer>(index));
 
   return 1;
 }

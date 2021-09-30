@@ -57,8 +57,8 @@ chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
 --############################################### Initialize Solver
 chiDiffusionInitialize(phys1)
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,0,DIFFUSION_DIRICHLET,1.0)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,1,DIFFUSION_DIRICHLET,1.0)
+chiDiffusionSetProperty(phys1,"boundary_type",0,"dirichlet",1.0)
+chiDiffusionSetProperty(phys1,"boundary_type",1,"dirichlet",1.0)
 
 chiDiffusionExecute(phys1)
 line0 = chiFFInterpolationCreate(LINE)
