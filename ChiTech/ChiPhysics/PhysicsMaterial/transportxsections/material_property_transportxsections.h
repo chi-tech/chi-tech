@@ -38,7 +38,7 @@ public:
   std::vector<GrpVal> nu_sigma_f;               ///< Nubar-Sigmaf cross section
   std::vector<GrpVal> nu_prompt_sigma_f;        ///< Prompt-Nubar-Sigmaf cross section
   std::vector<GrpVal> nu_delayed_sigma_f;       ///< Delayed-Nubar-Sigmaf cross section
-  std::vector<GrpVal> inv_velocity;             ///< Time derivative coefficient
+  std::vector<GrpVal> inv_velocity;             ///< Groupwise inverse velocities
 
   std::vector<chi_math::SparseMatrix> transfer_matrices;
 
@@ -132,6 +132,7 @@ public:
   //01
   void MakeFromPDTxsFile(const std::string &file_name,const std::string& MT_TRANSFER);
   void MakeFromCHIxsFile(const std::string &file_name);
+  void FinalizeCrossSections();
 
   //02
   void ComputeDiffusionParameters();
