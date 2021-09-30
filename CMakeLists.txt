@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.12)
 
 message(STATUS "Configuring ${CMAKE_BUILD_TYPE} build of ChiTech.")
 
