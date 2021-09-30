@@ -5,7 +5,6 @@ extern ChiLog& chi_log;
 
 #include <string>
 
-double eps = 1.0e-8;
 
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
  *\ingroup LuaPhysicsMaterials
@@ -127,11 +126,14 @@ constants, \f$ \lambda_j \f$ are required.
   - CHI_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_PROMPT_END. Each line in the block processes the first two words as
     [Group, chi]. Populates the chi_prompt field. Symbol \f$ \chi_{prompt, g} \f$.
+  - VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
+    VELOCITY_END. Each line in the block processes the first two words as
+    [Group, velocity]. Populates the inv_velocity field by inverting parsed values.
+    Symbol \f$ \frac{1}{v_g} \f$.
   - INV_VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
     INV_VELOCITY_END. Each line in the block processes the first two words as
-    [Group, ddt_coeff]. Populates the inv_velocity field.
+    [Group, inv_velocity]. Populates the inv_velocity field.
     Symbol \f$ \frac{1}{v_g} \f$.
-
   - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a line
     PRECURSOR_LAMBDA_END. Each line in the block processes the first two words as
     [precursor, lambda]. Populates the lambda field (the precursor decay
@@ -175,7 +177,6 @@ SIGMA_T_END
 
 Comments
 
-
 SIGMA_F_BEGIN
 0   0.01
 1   0.40737
@@ -185,17 +186,16 @@ NU_PROMPT_BEGIN
 0    2.45
 1    2.45
 NU_PROMPT_END
+
 CHI_PROMPT_BEGIN
 0    1.0
 1    0.0
 CHI_PROMPT_END
 
-# 1/v terms
-INV_VELOCITY_BEGIN
-0    4.5454e-10   #1/2.2e10
-1    3.6745e-3
-INV_VELOCITY_END
-
+VELOCITY_BEGIN
+0    2.2e10
+1    272.145
+VELOCITY_END
 
 TRANSFER_MOMENTS_BEGIN
 #Zeroth moment (l=0)
@@ -214,16 +214,19 @@ PRECURSOR_LAMBDA_BEGIN
 1   0.2
 2   0.3
 PRECURSOR_LAMBDA_END
+
 PRECURSOR_GAMMA_BEGIN
 0		0.25
 1   0.5
 2   0.25
 PRECURSOR_GAMMA_END
+
 NU_DELAYED_BEGIN
 0		0.01
 1   0.02
 2   0.01
 NU_DELAYED_END
+
 CHI_DELAYED_BEGIN
 G_PRECURSORJ_VAL 0  0	1.0
 G_PRECURSORJ_VAL 0  1	1.0
@@ -341,8 +344,8 @@ void chi_physics::TransportCrossSections::
   };
 
   //#############################################
-  /**Lambda reading the delayed chi matrix.*/
-  auto ReadDelayedChi = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
+  /**Lambda reading the chi delayed matrix.*/
+  auto ReadChiDelayed = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
     (const std::string& keyword,std::vector<std::vector<double>>& spectra,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)
@@ -435,6 +438,8 @@ void chi_physics::TransportCrossSections::
   //================================================== Read file line by line
   int line_number=0;
   bool not_eof = bool(std::getline(file,line)); ++line_number;
+  bool found_velocity = false;
+  bool found_inv_velocity = false;
   while (not_eof)
   {
     std::istringstream line_stream(line);
@@ -485,15 +490,25 @@ void chi_physics::TransportCrossSections::
       auto& f  = file;
       auto& fw = first_word;
 
-      if (fw == "SIGMA_T_BEGIN")       Read1DXS ("SIGMA_T"     , sigma_t     , f, num_groups, ln, ls);
-      if (fw == "SIGMA_F_BEGIN")       Read1DXS("SIGMA_F"      , sigma_f     , f, num_groups, ln, ls);
-      if (fw == "SIGMA_A_BEGIN")       Read1DXS("SIGMA_A"      , sigma_a     , f, num_groups, ln, ls);
-      if (fw == "NU_BEGIN")            Read1DXS("NU"           , nu          , f, num_groups, ln, ls);
-      if (fw == "NU_PROMPT_BEGIN")     Read1DXS("NU_PROMPT"    , nu_prompt   , f, num_groups, ln, ls);
-      if (fw == "NU_DELAYED_BEGIN")    Read1DXS("NU_DELAYED"   , nu_delayed  , f, num_groups, ln, ls);
-      if (fw == "CHI_BEGIN")           Read1DXS("CHI"          , chi         , f, num_groups, ln, ls);
-      if (fw == "CHI_PROMPT_BEGIN")    Read1DXS("CHI_PROMPT"   , chi_prompt  , f, num_groups, ln, ls);
-      if (fw == "INV_VELOCITY_BEGIN")  Read1DXS("INV_VELOCITY" , inv_velocity, f, num_groups, ln, ls);
+      if (fw == "SIGMA_T_BEGIN")       Read1DXS ("SIGMA_T"    , sigma_t    , f, num_groups, ln, ls);
+      if (fw == "SIGMA_F_BEGIN")       Read1DXS("SIGMA_F"     , sigma_f    , f, num_groups, ln, ls);
+      if (fw == "SIGMA_A_BEGIN")       Read1DXS("SIGMA_A"     , sigma_a    , f, num_groups, ln, ls);
+      if (fw == "NU_BEGIN")            Read1DXS("NU"          , nu         , f, num_groups, ln, ls);
+      if (fw == "NU_PROMPT_BEGIN")     Read1DXS("NU_PROMPT"   , nu_prompt  , f, num_groups, ln, ls);
+      if (fw == "NU_DELAYED_BEGIN")    Read1DXS("NU_DELAYED"  , nu_delayed , f, num_groups, ln, ls);
+      if (fw == "CHI_BEGIN")           Read1DXS("CHI"         , chi        , f, num_groups, ln, ls);
+      if (fw == "CHI_PROMPT_BEGIN")    Read1DXS("CHI_PROMPT"  , chi_prompt , f, num_groups, ln, ls);
+
+      if (fw == "VELOCITY_BEGIN" and not found_inv_velocity)
+      {
+        Read1DXS("VELOCITY", inv_velocity, f, num_groups, ln, ls);
+        found_velocity = true;
+      }
+      if (fw == "INV_VELOCITY_BEGIN")
+      {
+        Read1DXS("INV_VELOCITY", inv_velocity, f, num_groups, ln, ls);
+        found_inv_velocity = true;
+      }
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrix("TRANSFER_MOMENTS",
@@ -506,7 +521,7 @@ void chi_physics::TransportCrossSections::
         if (fw == "PRECURSOR_YIELD_BEGIN")
           Read1DXS("PRECURSOR_YIELD", precursor_yield, f, num_precursors, ln, ls);
         if (fw == "CHI_DELAYED_BEGIN")
-          ReadDelayedChi("CHI_DELAYED", chi_delayed, f, num_groups, ln, ls);
+          ReadChiDelayed("CHI_DELAYED", chi_delayed, f, num_groups, ln, ls);
       }
     }//try
     catch (const std::runtime_error& err)
@@ -529,223 +544,13 @@ void chi_physics::TransportCrossSections::
   }//while not EOF, read each lines
   scattering_order = M-1;
 
-  //======================================== Estimates sigma_a group-by-group
-  auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, int col)
-  {
-    double sum = 0.0;
+  //compute inv_velocity if necessary
+  if (found_velocity)
+    for (auto& v : inv_velocity) v = 1.0 / v;
 
-    for (int row=0; row<matrix.NumRows(); ++row)
-    {
-      auto& row_col_indices = matrix.rowI_indices[row];
-      auto& row_values = matrix.rowI_values[row];
-      for (int j=0; j<row_col_indices.size(); ++j)
-        if (row_col_indices[j] == col)
-          sum += row_values[j];
-    }
+  //perform checks and enforce physical relationships
+  FinalizeCrossSections();
 
-    return sum;
-  };
-
-  double sigma_a_sum = 0.0;
-  for (int g = 0; g < num_groups; ++g)
-    sigma_a_sum += sigma_a[g];
-
-  if (not transfer_matrices.empty() and (sigma_a_sum < 1.0e-28))
-  {
-    for (int g = 0; g < num_groups; ++g)
-      sigma_a[g] = sigma_t[g] - GetMatrixColumnSum(transfer_matrices[0], g);
-
-    chi_log.Log(LOG_0WARNING)
-      << __FUNCTION__ << ": sigma_a was estimated from the transfer matrix.";
-  }
-
-  //======================================== Check/process fission terms
-  //determine fissile status
-  for (auto& sig_f : sigma_f)
-    if (sig_f > 0.0) {is_fissile = true; break;}
-
-  //ensure precursors exist only if fissile
-  if (not is_fissile and num_precursors > 0)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << __FUNCTION__ << ": Non-fissile materials cannot have precursors.";
-    exit(EXIT_FAILURE);
-  }
-
-  //check fission quantities
-  if (is_fissile)
-  {
-    //determine total/prompt/delayed quantities parsed
-    bool has_total = false;
-    bool has_prompt = false;
-    bool has_delayed = false;
-    for (size_t g = 0; g < num_groups; ++g)
-    {
-      if (nu[g] > 0.0 and chi[g] > 0.0) has_total = true;
-      if (nu_prompt[g] > 0.0 and chi_prompt[g] > 0.0) has_prompt = true;
-      if (num_precursors > 0)
-        for (size_t j = 0; j < num_precursors; ++j)
-          if (nu_delayed[g] > 0.0 and chi_delayed[g][j] > 0.0)
-            has_delayed = true;
-    }
-
-    //ensure minimums are provided
-    if (not has_total and not has_prompt)
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << __FUNCTION__ << ": Fissile cross-sections must have either "
-          << "total or prompt quantities specified.";
-      exit(EXIT_FAILURE);
-    }
-    if (num_precursors > 0 and not has_delayed)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << __FUNCTION__ << ": Delayed nu and chi must be provided "
-        << "if num_precursors is non-zero.";
-      exit(EXIT_FAILURE);
-    }
-
-    //check precursor properties, if provided
-    if (num_precursors > 0)
-    {
-      size_t num_lambdas = 0;
-      size_t num_yields = 0;
-      size_t num_spectra = 0;
-      double yield_sum = 0.0;
-      for (size_t j = 0; j < num_precursors; ++j)
-      {
-        yield_sum += precursor_yield[j];
-        if (precursor_lambda[j] > 0.0) num_lambdas += 1;
-        if (precursor_yield[j] > 0.0) num_yields += 1;
-        for (size_t g = 0; g < num_groups; ++g)
-        {
-          if (chi_delayed[g][j] > 0.0)
-          {
-            num_spectra += 1;
-            break;
-          }
-        }
-      }
-
-      if (num_lambdas != num_precursors)
-      {
-        chi_log.Log(LOG_ALLERROR)
-            << __FUNCTION__ << ": There must be " << num_precursors
-            << " precursor_lambda values. Only " << num_lambdas << " found.";
-        exit(EXIT_FAILURE);
-      }
-      if (num_yields != num_precursors)
-      {
-        chi_log.Log(LOG_ALLERROR)
-            << __FUNCTION__ << ": There must be " << num_precursors
-            << " precursor_yield values. Only " << num_yields << " found.";
-        exit(EXIT_FAILURE);
-      }
-      if (num_spectra != num_precursors)
-      {
-        chi_log.Log(LOG_ALLERROR)
-            << __FUNCTION__ << ": There must be " << num_precursors
-            << " non-zero chi_delayed spectra. Only "
-            << num_spectra << " found.";
-        exit(EXIT_FAILURE);
-      }
-
-      //normalize yield to sum to unity, if it does not
-      if (fabs(yield_sum - 1.0) > eps)
-      {
-        chi_log.Log(LOG_ALLWARNING)
-          << __FUNCTION__ << ": precursor_yield does not sum to unity. "
-          << "Normalizing precursor_yield.";
-        for (size_t j = 0; j < num_precursors; ++j)
-          precursor_yield[j] /= yield_sum;
-      }
-    }//if num_precursors > 0
-
-    //ensure unit total spectra, if provided and no delayed provided
-    if (has_total and not has_delayed)
-    {
-      double spectra_sum = 0.0;
-      for (size_t g = 0; g < num_groups; ++g)
-        spectra_sum += chi[g];
-
-      if (fabs(spectra_sum - 1.0) > eps)
-      {
-        chi_log.Log(LOG_ALLWARNING)
-            << __FUNCTION__ << ": Provided chi does not sum to unity. "
-            << "Normalizing the spectrum.";
-        for (size_t g = 0; g < num_groups; ++g)
-          chi[g] /= spectra_sum;
-      }
-    }
-
-    //ensure unit prompt spectra, if provided
-    if (has_prompt)
-    {
-      double spectra_sum = 0.0;
-      for (size_t g = 0; g < num_groups; ++g)
-        spectra_sum += chi_prompt[g];
-
-      if (fabs(spectra_sum - 1.0) > eps)
-      {
-        chi_log.Log(LOG_ALLWARNING)
-            << __FUNCTION__ << ": Provided chi_prompt does not sum to unity. "
-            << "Normalizing the spectrum.";
-        for (size_t g = 0; g < num_groups; ++g)
-          chi_prompt[g] /= spectra_sum;
-      }
-    }
-
-    //ensure unit delayed spectra, if provided
-    if (has_delayed)
-    {
-      for (size_t j = 0; j < num_precursors; ++j)
-      {
-        double spectra_sum = 0.0;
-        for (size_t g = 0; g < num_groups; ++g)
-          spectra_sum += chi_delayed[g][j];
-
-        if (fabs(spectra_sum - 1.0) > eps)
-        {
-          chi_log.Log(LOG_ALLWARNING)
-              << __FUNCTION__ << ": Provided chi_delayed does not "
-              << "sum to unity. Normalizing the spectrum.";
-          for (size_t g = 0; g < num_groups; ++g)
-            chi_delayed[g][j] /= spectra_sum;
-        }
-      }
-    }
-
-    //compute total from prompt and delayed
-    if (has_prompt and has_delayed)
-    {
-      if (has_total)
-        chi_log.Log(LOG_ALLWARNING)
-          << __FUNCTION__ << ": Total, prompt, and delayed nu/chi "
-          << "were provided. Overwriting nu/chi total using prompt "
-          << "and delayed nu/chi.";
-
-      nu.assign(num_groups, 0.0);
-      chi.assign(num_groups, 0.0);
-      for (size_t g = 0; g < num_groups; ++g)
-      {
-        nu[g] = nu_prompt[g] + nu_delayed[g];
-
-        double prompt_frac = nu_prompt[g] / nu[g];
-        double delayed_frac = nu_delayed[g] / nu[g];
-        chi[g] += prompt_frac * chi_prompt[g];
-        for (size_t j = 0; j < num_precursors; ++j)
-          chi[g] += delayed_frac * precursor_yield[j] * chi_delayed[g][j];
-      }
-    }
-  }//if is_fissile
-
-  //compute nu_sigma_f terms
-  for (size_t g = 0; g < num_groups; ++g)
-  {
-    nu_sigma_f        [g] = nu        [g] * sigma_f[g];
-    nu_prompt_sigma_f [g] = nu_prompt [g] * sigma_f[g];
-    nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
-  }
 
   file.close();
 }

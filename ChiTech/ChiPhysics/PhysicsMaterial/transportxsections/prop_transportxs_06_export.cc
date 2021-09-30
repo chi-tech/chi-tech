@@ -51,15 +51,15 @@ void chi_physics::TransportCrossSections::
   if (num_precursors>0)
     ofile << "NUM_PRECURSORS " << num_precursors << "\n";
 
-  Print1DXS(ofile, "SIGMA_T"   , sigma_t);
-  Print1DXS(ofile, "SIGMA_F"   , sigma_f  , 1.0e-20);
-  Print1DXS(ofile, "SIGMA_A"   , sigma_a  , 1.0e-20);
-  Print1DXS(ofile,"NU"        ,nu        ,1.0e-20);
-  Print1DXS(ofile,"NU_PROMPT" ,nu_prompt ,1.0e-20);
-  Print1DXS(ofile,"NU_DELAYED",nu_delayed,1.0e-20);
-  Print1DXS(ofile, "CHI", chi     , 1.0e-20);
-  Print1DXS(ofile, "CHI_PROMPT", chi_prompt     , 1.0e-20);
-  Print1DXS(ofile, "INV_VELOCITY" , inv_velocity , 1.0e-20);
+  Print1DXS(ofile, "SIGMA_T"     , sigma_t              );
+  Print1DXS(ofile, "SIGMA_F"     , sigma_f     , 1.0e-20);
+  Print1DXS(ofile, "SIGMA_A"     , sigma_a     , 1.0e-20);
+  Print1DXS(ofile, "NU"          , nu          , 1.0e-20);
+  Print1DXS(ofile, "NU_PROMPT"   , nu_prompt   , 1.0e-20);
+  Print1DXS(ofile, "NU_DELAYED"  , nu_delayed  , 1.0e-20);
+  Print1DXS(ofile, "CHI"         , chi         , 1.0e-20);
+  Print1DXS(ofile, "CHI_PROMPT"  , chi_prompt  , 1.0e-20);
+  Print1DXS(ofile, "INV_VELOCITY", inv_velocity, 1.0e-20);
 
   //======================================== Chi-delayed
   if (not chi_delayed.empty())
