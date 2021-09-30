@@ -89,8 +89,8 @@ public:
   chi_math::UnknownManager flux_moments_uk_man;
 
   size_t max_cell_dof_count = 0;
-  unsigned long long local_node_count = 0;
-  unsigned long long glob_node_count = 0;
+  uint64_t local_node_count = 0;
+  uint64_t glob_node_count = 0;
 
   Vec phi_new = nullptr, phi_old = nullptr, q_fixed = nullptr;
   std::vector<double> q_moments_local, ext_src_moments_local;
