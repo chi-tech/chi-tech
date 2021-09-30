@@ -4,6 +4,8 @@
 #include "../chi_physics_namespace.h"
 #include "../../ChiMesh/Region/chi_region.h"
 
+#include "ChiPhysics/BasicOptions/basic_options.h"
+
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 
@@ -13,17 +15,27 @@
 //######################################################### Solver parent class
 class chi_physics::Solver
 {
+private:
+  std::string text_name;
 public:
-  std::vector<chi_mesh::Region*>           regions;
+  BasicOptions basic_options;
+  std::vector<chi_mesh::Region*> regions;
   std::vector<std::shared_ptr<FieldFunction>> field_functions;
 
 public:
+  explicit
+  Solver(const std::string& in_text_name) : text_name(in_text_name) {}
+  Solver(const std::string& in_text_name,
+         std::initializer_list<BasicOption> in_options) :
+         text_name(in_text_name),
+         basic_options(in_options) {}
   virtual ~Solver() {};
-  //01
-  void AddRegion(chi_mesh::Region* region);
 
-  //02
-  virtual void Execute();
+  std::string TextName() const {return text_name;}
+
+  void AddRegion(chi_mesh::Region* region);
+  virtual void Initialize() = 0;
+  virtual void Execute() = 0;
 };
 
 

@@ -137,7 +137,7 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
 /**Returns the value in the matrix at the given location. This
  * is a rather inefficient routine. Use the columns and values
  * rather than directly this function.*/
-double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j)
+double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
 {
   double retval = 0.0;
   if ((i<0) || (i >= rowI_indices.size()))

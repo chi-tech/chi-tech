@@ -42,14 +42,16 @@ chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
 chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
 --############################################### Setup Physics
+print("Before")
 phys1 = chiDiffusionCreateSolver();
+print("After")
 chiSolverAddRegion(phys1,region1)
-chiDiffusionSetProperty(phys1,DISCRETIZATION_METHOD,PWLC);
-chiDiffusionSetProperty(phys1,RESIDUAL_TOL,1.0e-4)
+chiSolverSetBasicOption(phys1,"discretization_method","PWLC")
+chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-4)
 
 --############################################### Set boundary conditions
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMIN,DIFFUSION_VACUUM)
-chiDiffusionSetProperty(phys1,BOUNDARY_TYPE,OrthoBoundaryID.ZMAX,DIFFUSION_VACUUM)
+chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMIN,"vacuum")
+chiDiffusionSetProperty(phys1,"boundary_type",OrthoBoundaryID.ZMAX,"vacuum")
 
 --############################################### Initialize and Execute Solver
 chiDiffusionInitialize(phys1)

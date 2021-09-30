@@ -3,9 +3,6 @@
 
 #include "ChiMesh/Cell/cell.h"
 
-#define PROPERTY_D_MAP 5
-#define PROPERTY_Q_MAP 6
-
 #include "DiffusionSolver/Boundaries/chi_diffusion_bndry.h"
 
 #include "DiffusionSolver/chi_diffusion.h"
@@ -20,12 +17,6 @@
 #include "ChiTimer/chi_timer.h"
 
 #include <petscksp.h>
-
-#define PWLC          3
-#define PWLD_MIP      4
-#define PWLC_GRPS     5
-#define PWLD_MIP_GRPS 6
-#define PWLD_MIP_GAGG 7
 
 #define DIFFUSION_MATERIALS_REGULAR                       10
 #define DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTR          11
@@ -53,7 +44,6 @@ public:
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
 
 public:
-  std::string                              solver_name="Diffusion Solver";
   BoundaryPreferences                      boundary_preferences;
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuumPtr                 grid = nullptr;
@@ -61,11 +51,7 @@ public:
   std::shared_ptr<SpatialDiscretization>   discretization;
 
   chi_math::UnknownManager                 unknown_manager;
-  int                                      fem_method = 0;
 
-  int   property_map_D     = 0;
-  int   property_map_q     = 1;
-  int   property_map_sigma = 2;
   int   material_mode      = DIFFUSION_MATERIALS_REGULAR;
   std::shared_ptr<chi_physics::FieldFunction> D_field     = nullptr;
   std::shared_ptr<chi_physics::FieldFunction> q_field     = nullptr;
@@ -73,30 +59,27 @@ public:
 
   bool common_items_initialized=false;
 
-  Vec            x;            // approx solution
-  Vec            b;            // RHS
-  Mat            A;            // linear system matrix
-  KSP            ksp;          // linear solver context
-  PC             pc;           // preconditioner context
+  Vec            x = nullptr;            // approx solution
+  Vec            b = nullptr;            // RHS
+  Mat            A = nullptr;            // linear system matrix
+  KSP            ksp = nullptr;          // linear solver context
+  PC             pc = nullptr;           // preconditioner context
 
-  PetscReal      norm;         /* norm of solution error */
-  PetscErrorCode ierr;         // General error code
+  PetscReal      norm = 0.0;         /* norm of solution error */
+  PetscErrorCode ierr = 0;         // General error code
 
-  int                            local_dof_count = 0;
-  int                            global_dof_count = 0;
+  size_t         local_dof_count = 0;
+  size_t         global_dof_count = 0;
 
   std::vector<double>            pwld_phi_local;
 
-  int    max_iters = 500;
-  double residual_tolerance = 1.0e-8;
   int    gi = 0;
   int    G = 1;
   std::string options_string;
 
 public:
   //00
-  Solver();
-  explicit Solver(std::string in_solver_name);
+  explicit Solver(const std::string& in_solver_name);
   virtual ~Solver();
   //01 General
   void GetMaterialProperties(const chi_mesh::Cell& cell,
@@ -110,9 +93,12 @@ public:
   void InitializeCommonItems();
 
   //01b
-  int Initialize(bool verbose=true);
+  void Initialize() override {Initialize(true);}
+  int Initialize(bool verbose);
 
   //02a
+  void Execute() override
+  { ExecuteS(); }
   int ExecuteS(bool suppress_assembly = false, bool suppress_solve = false);
 
   void CFEM_Assemble_A_and_b(chi_mesh::Cell& cell, int group=0);

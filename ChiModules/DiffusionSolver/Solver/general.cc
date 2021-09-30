@@ -42,6 +42,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     exit(EXIT_FAILURE);
   }
 
+  auto property_map_D     = basic_options("property_map_D").IntegerValue();
+  auto property_map_q     = basic_options("property_map_q").IntegerValue();
+  auto property_map_sigma = basic_options("property_map_sigma").IntegerValue();
+
   auto material = chi_physics_handler.material_stack[mat_id];
 
   //====================================== Process material properties

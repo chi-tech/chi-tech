@@ -29,6 +29,9 @@ public:
   std::vector<double> phi_prev_local;
   std::vector<double> precursor_new_local;
 
+  explicit Solver(const std::string& in_text_name) :
+    LinearBoltzmann::Solver(in_text_name) {}
+
   // IterativeMethods
   void PowerIteration();
 
@@ -40,6 +43,7 @@ public:
   void InitializePrecursors();
 
   // Execute method
+  void Initialize() override {InitializeKSolver();}
   void InitializeKSolver();
   void ExecuteKSolver();
 };
