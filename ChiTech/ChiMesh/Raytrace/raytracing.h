@@ -71,7 +71,7 @@ CheckPlaneTetIntersect(const chi_mesh::Normal& plane_normal,
 
 void PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum& grid,
-  Cell& cell,
+  const Cell& cell,
   std::vector<double> &segment_lengths,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,
