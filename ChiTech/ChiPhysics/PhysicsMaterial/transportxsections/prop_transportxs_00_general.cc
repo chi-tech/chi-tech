@@ -238,7 +238,7 @@ void chi_physics::TransportCrossSections::
       else if (inv_velocity[g] != cross_secs[x]->inv_velocity[g])
         chi_log.Log(LOG_ALLWARNING)
             << "In call to " << __FUNCTION__
-            << ": all materials must have the same inverse velocity "
+            << ": all materials must have the same inv_velocity "
             << "term per group. Invalid value encountered in "
             << "material " << x << " group " << g << ". Using the "
             << "value from the first cross-section set.";
