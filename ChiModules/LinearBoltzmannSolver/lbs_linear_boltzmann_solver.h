@@ -61,7 +61,7 @@ public:
   double last_restart_write=0.0;
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
 
-  int num_moments;
+  size_t num_moments;
   size_t num_groups;
   size_t num_precursors;
   size_t max_precursors_per_material;
