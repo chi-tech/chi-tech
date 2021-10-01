@@ -118,7 +118,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
       << material_xs[matid_to_xs_map[mat_id]]->transfer_matrices.size() << "\n";
   }//for material id
 
-  num_groups = int(groups.size());
+  num_groups = groups.size();
 
   chi_log.Log(LOG_0)
     << "Materials Initialized:\n" << materials_list.str() << "\n";

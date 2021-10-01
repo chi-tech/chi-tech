@@ -10,16 +10,16 @@ extern ChiLog& chi_log;
 /**Compute the steady state delayed neutron precursor concentrations.*/
 void LinearBoltzmann::Solver::ComputePrecursors()
 {
-  auto pwl =
+  auto fe =
       std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
   const size_t J = max_precursors_per_material;
 
   precursor_new_local.assign(precursor_new_local.size(), 0.0);
 
   //================================================== Loop over cells
-  for (auto& cell : grid->local_cells)
+  for (const auto& cell : grid->local_cells)
   {
-    const auto& fe_values = pwl->GetUnitIntegrals(cell);
+    const auto& fe_values = fe->GetUnitIntegrals(cell);
     const auto& transport_view = cell_transport_views[cell.local_id];
     const double volume = transport_view.Volume();
 
@@ -34,14 +34,14 @@ void LinearBoltzmann::Solver::ComputePrecursors()
       exit(EXIT_FAILURE);
     }
 
-    auto xs = material_xs[xs_id];
+    const auto& xs = *material_xs[xs_id];
 
     //======================================== Loop over precursors
-    for (size_t j = 0; j < xs->num_precursors; ++j)
+    for (size_t j = 0; j < xs.num_precursors; ++j)
     {
       size_t dof = cell.local_id * J + j;
-      const double coeff = xs->precursor_yield[j] /
-                           xs->precursor_lambda[j];
+      const double coeff = xs.precursor_yield[j] /
+                           xs.precursor_lambda[j];
 
       //=================================== Loop over nodes
       for (int i = 0; i < transport_view.NumNodes(); ++i)
@@ -51,7 +51,7 @@ void LinearBoltzmann::Solver::ComputePrecursors()
 
         //============================== Loop over groups
         for (int g = 0; g < groups.size(); ++g)
-          precursor_new_local[dof] += coeff * xs->nu_delayed_sigma_f[g] *
+          precursor_new_local[dof] += coeff * xs.nu_delayed_sigma_f[g] *
                                       phi_new_local[uk_map + g] *
                                       IntV_ShapeI / volume;
       }//for node i
