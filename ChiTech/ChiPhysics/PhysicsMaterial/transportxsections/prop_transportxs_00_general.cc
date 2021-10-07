@@ -94,7 +94,7 @@ void chi_physics::TransportCrossSections::
     }
   }//for g
 
-  sigma_a = Compute_sigma_a_FromTransfer();
+  sigma_a = ComputeAbsorptionXSFromTransfer();
 }
 
 //###################################################################
@@ -295,7 +295,7 @@ void chi_physics::TransportCrossSections::
 }
 
 std::vector<chi_physics::TransportCrossSections::GrpVal>
-  chi_physics::TransportCrossSections::Compute_sigma_a_FromTransfer()
+  chi_physics::TransportCrossSections::ComputeAbsorptionXSFromTransfer()
 {
   auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, size_t col)
   {
