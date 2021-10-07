@@ -38,9 +38,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
 
 
   //============================================= Init vtk items
-  const auto& ff_uk = this->unknown_manager.unknowns[ref_variable];
+  const auto& ff_unknown = this->unknown_manager.unknowns[ref_variable];
 
-  size_t num_components = all_components? ff_uk.num_components : 1;
+  size_t num_components = all_components ? ff_unknown.num_components : 1;
   vtkNew<vtkUnstructuredGrid>         ugrid;
   vtkNew<vtkPoints>                   points;
   vtkNew<vtkIntArray>                 material_array;
@@ -60,13 +60,15 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                                           std::string("-avg")).c_str());
   }
   else
-    for (int c=0; c < num_components; ++c)
+  {
+    for (size_t c=0; c < num_components; ++c)
     {
-      component_names[c] = field_name + ff_uk.component_text_names[c];
+      component_names[c] = field_name + ff_unknown.component_text_names[c];
       field_node_array[c]->SetName(component_names[c].c_str());
       field_cell_avg_array[c]->SetName((component_names[c] +
                                         std::string("-avg")).c_str());
-    }
+    }//for c
+  }
 
 
   //############################################# Populate cell information
@@ -83,8 +85,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     std::vector<uint64_t> mapping;
     std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
-    for (int c=0; c < num_components; ++c)
-      for (int v=0; v < num_nodes; ++v)
+    for (size_t c=0; c < num_components; ++c)
+      for (size_t v=0; v < num_nodes; ++v)
         cell_node_component_tuples.emplace_back(cell.local_id, v,
                                                 (num_components==1)?
                                                 ref_component : c);
@@ -92,10 +94,10 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
     CreatePWLDMappingLocal(cell_node_component_tuples, mapping);
 
     size_t counter=0;
-    for (int c=0; c < num_components; ++c)
+    for (size_t c=0; c < num_components; ++c)
     {
       double cell_avg_value = 0.0;
-      for (int v=0; v < num_nodes; ++v)
+      for (size_t v=0; v < num_nodes; ++v)
       {
         double dof_value = field_vector_local->operator[](mapping[counter]);
         cell_avg_value+= dof_value;
@@ -121,7 +123,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
 
   ugrid->GetCellData()->AddArray(material_array);
   ugrid->GetCellData()->AddArray(partition_id_array);
-  for (int c=0; c<num_components; ++c)
+  for (size_t c=0; c<num_components; ++c)
   {
     ugrid->GetPointData()->AddArray(field_node_array[c]);
     ugrid->GetCellData()->AddArray(field_cell_avg_array[c]);
