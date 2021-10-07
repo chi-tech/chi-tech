@@ -119,7 +119,7 @@ private:
     scat_angles_gprime_g.clear();
   }
 
-  std::vector<GrpVal> Compute_sigma_a_FromTransfer();
+  std::vector<GrpVal> ComputeAbsorptionXSFromTransfer();
 
 public:
   //00
@@ -143,9 +143,9 @@ public:
                       int collapse_type = E_COLLAPSE_JACOBI);
 
   //04
-  void ComputeDiscreteScattering(int in_L);
-  int  Sample_gprime(int g,double rn);
-  double SampleMu_gprime_g(int g, int gprime, double rn, bool isotropic = false);
+//  void ComputeDiscreteScattering(int in_L);
+//  int  Sample_gprime(int g,double rn);
+//  double SampleMu_gprime_g(int g, int gprime, double rn, bool isotropic = false);
 
   //05
   void PushLuaTable(lua_State* L) override;
