@@ -118,6 +118,9 @@ private:
     cdf_gprime_g.clear();
     scat_angles_gprime_g.clear();
   }
+
+  std::vector<GrpVal> ComputeAbsorptionXSFromTransfer();
+
 public:
   //00
   TransportCrossSections();
