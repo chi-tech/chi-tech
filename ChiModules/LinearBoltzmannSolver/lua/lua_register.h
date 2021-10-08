@@ -1,4 +1,5 @@
 //module:Linear Boltzmann Solver
+//\ref LuaLBS Documentation page
 RegisterFunction(chiLBSCreateSolver)
 
 RegisterFunction(chiLBSSetProperty)
