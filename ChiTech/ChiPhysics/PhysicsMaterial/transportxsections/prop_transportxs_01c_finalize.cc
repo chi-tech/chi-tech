@@ -11,33 +11,14 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
 {
   double eps = 1.0e-8;
 
-  //#############################################
-  /**Lambda for summing matrix columns.*/
-  auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, int col)
-  {
-    double sum = 0.0;
-
-    for (int row = 0; row < matrix.NumRows(); ++row)
-    {
-      auto& row_col_indices = matrix.rowI_indices[row];
-      auto& row_values = matrix.rowI_values[row];
-      for (int j = 0; j < row_col_indices.size(); ++j)
-        if (row_col_indices[j] == col)
-          sum += row_values[j];
-    }
-
-    return sum;
-  };
-
   //======================================== Estimates sigma_a group-by-group
   double sigma_a_sum = 0.0;
-  for (int g = 0; g < num_groups; ++g)
+  for (size_t g = 0; g < num_groups; ++g)
     sigma_a_sum += sigma_a[g];
 
   if (not transfer_matrices.empty() and (sigma_a_sum < 1.0e-28))
   {
-    for (int g = 0; g < num_groups; ++g)
-      sigma_a[g] = sigma_t[g] - GetMatrixColumnSum(transfer_matrices[0], g);
+    sigma_a = ComputeAbsorptionXSFromTransfer();
 
     chi_log.Log(LOG_0WARNING)
         << __FUNCTION__
