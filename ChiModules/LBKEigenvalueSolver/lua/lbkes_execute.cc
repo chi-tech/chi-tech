@@ -10,7 +10,7 @@ int chiLBKESExecute(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbkes_solver = LinearBoltzmann::lua_utils::
+  auto lbkes_solver = LinearBoltzmann::k_eigenvalue_lua_utils::
   GetSolverByHandle(solver_index, __FUNCTION__);
 
   lbkes_solver->Execute();

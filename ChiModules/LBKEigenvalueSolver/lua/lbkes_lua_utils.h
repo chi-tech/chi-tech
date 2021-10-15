@@ -5,7 +5,7 @@
 
 namespace LinearBoltzmann
 {
-namespace lua_utils
+namespace k_eigenvalue_lua_utils
 {
 //###################################################################
 /** Obtains a pointer to a LinearBoltzmann::Solver object or an object

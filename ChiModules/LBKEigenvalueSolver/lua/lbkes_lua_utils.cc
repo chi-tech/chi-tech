@@ -3,7 +3,7 @@
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
-LinearBoltzmann::KEigenvalueSolver* LinearBoltzmann::lua_utils::
+LinearBoltzmann::KEigenvalueSolver* LinearBoltzmann::k_eigenvalue_lua_utils::
   GetSolverByHandle(int handle, const std::string& calling_function_name)
 {
   LinearBoltzmann::KEigenvalueSolver* lbkes_solver;
