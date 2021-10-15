@@ -118,10 +118,25 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
       << material_xs[matid_to_xs_map[mat_id]]->transfer_matrices.size() << "\n";
   }//for material id
 
+  num_groups = groups.size();
+
   chi_log.Log(LOG_0)
     << "Materials Initialized:\n" << materials_list.str() << "\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize precursor
+  //                                                   properties
+  num_precursors = 0;
+  max_precursors_per_material = 0;
+  for (auto& xs : material_xs)
+  {
+    num_precursors += xs->num_precursors;
+    if (xs->num_precursors > max_precursors_per_material)
+      max_precursors_per_material = xs->num_precursors;
+  }
+  if (num_precursors == 0)
+    options.use_precursors = false;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
   //                                                   properties
