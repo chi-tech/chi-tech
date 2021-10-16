@@ -49,6 +49,14 @@ void LinearBoltzmann::Solver::InitializeParrays()
     }
   }
 
+  //============================================= Setup precursor vector
+  if (options.use_precursors)
+  {
+    size_t num_precursor_dofs =
+        grid->local_cells.size() * max_precursors_per_material;
+    precursor_new_local.assign(num_precursor_dofs, 0.0);
+  }
+
   //================================================== Read Restart data
   if (options.read_restart_data)
     ReadRestartData(options.read_restart_folder_name,

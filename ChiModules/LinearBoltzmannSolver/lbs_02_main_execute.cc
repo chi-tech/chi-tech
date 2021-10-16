@@ -41,6 +41,9 @@ void LinearBoltzmann::Solver::Execute()
     MPI_Barrier(MPI_COMM_WORLD);
   }
 
+  if (options.use_precursors)
+    ComputePrecursors();
+
   chi_log.Log(LOG_0) << "NPTransport solver execution completed\n";
 }
 
