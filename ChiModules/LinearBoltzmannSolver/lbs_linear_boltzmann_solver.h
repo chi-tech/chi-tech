@@ -61,7 +61,10 @@ public:
   double last_restart_write=0.0;
   LinearBoltzmann::Options options;    //In chi_npt_structs.h
 
-  int num_moments=0;
+  size_t num_moments;
+  size_t num_groups;
+  size_t num_precursors;
+  size_t max_precursors_per_material;
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> groupsets;
@@ -86,14 +89,15 @@ public:
   chi_math::UnknownManager flux_moments_uk_man;
 
   size_t max_cell_dof_count = 0;
-  unsigned long long local_node_count = 0;
-  unsigned long long glob_node_count = 0;
+  uint64_t local_node_count = 0;
+  uint64_t glob_node_count = 0;
 
   Vec phi_new = nullptr, phi_old = nullptr, q_fixed = nullptr;
   std::vector<double> q_moments_local, ext_src_moments_local;
   std::vector<double> phi_new_local, phi_old_local;
   std::vector<double> delta_phi_local;
   std::vector<std::vector<double>> psi_new_local;
+  std::vector<double> precursor_new_local;
 
  public:
   //00
@@ -198,6 +202,9 @@ public:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
   void ComputeBalance();
+
+  //precursors
+  void ComputePrecursors();
 };
 
 }
