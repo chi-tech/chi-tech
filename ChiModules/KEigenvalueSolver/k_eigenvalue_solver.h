@@ -21,13 +21,7 @@ public:
   size_t max_iterations = 1000;
   double tolerance = 1.0e-8;
 
-  size_t num_precursors;
-  size_t max_num_precursors_per_material;
-
-  chi_math::UnknownManager precursor_uk_man;
-
   std::vector<double> phi_prev_local;
-  std::vector<double> precursor_new_local;
 
   explicit Solver(const std::string& in_text_name) :
     LinearBoltzmann::Solver(in_text_name) {}

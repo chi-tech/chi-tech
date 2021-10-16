@@ -32,8 +32,7 @@ void KEigenvalue::Solver::InitializePrecursors()
       for (int i = 0; i < num_nodes; ++i)
       {
         size_t ir = transport_view.MapDOF(i, 0, 0);
-        size_t jr = discretization->MapDOFLocal(cell, i, precursor_uk_man, 0, 0);
-        double* Nj_newp = &precursor_new_local[jr];
+        size_t jr = cell.local_id * max_precursors_per_material;
 
         // Contribute if precursors live on this material
         if (xs->num_precursors > 0)
