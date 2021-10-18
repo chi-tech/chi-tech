@@ -142,11 +142,6 @@ public:
                       double& D, double& sigma_a,
                       int collapse_type = E_COLLAPSE_JACOBI);
 
-  //04
-  void ComputeDiscreteScattering(int in_L);
-  int  Sample_gprime(int g,double rn);
-  double SampleMu_gprime_g(int g, int gprime, double rn, bool isotropic = false);
-
   //05
   void PushLuaTable(lua_State* L) override;
 
