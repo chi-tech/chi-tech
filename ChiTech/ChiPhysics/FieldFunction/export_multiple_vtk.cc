@@ -227,7 +227,9 @@ void chi_physics::FieldFunction::
 
         ugrid->GetPointData()->AddArray(unk_arr);
       }//scalar
-      if (unknown.type == chi_math::UnknownType::VECTOR_N)
+      if (unknown.type == chi_math::UnknownType::VECTOR_2 or
+          unknown.type == chi_math::UnknownType::VECTOR_3 or
+          unknown.type == chi_math::UnknownType::VECTOR_N)
       {
         for (int comp=0; comp<unknown.num_components; ++comp)
         {
@@ -243,7 +245,7 @@ void chi_physics::FieldFunction::
           uint64_t c=0;
           for (auto& cell : grid->local_cells)
           {
-            for (int v=0; v < cell.vertex_ids.size(); ++v)
+            for (size_t v=0; v < cell.vertex_ids.size(); ++v)
             {
               uint64_t local_mapping = c*N + component;
               ++c;
