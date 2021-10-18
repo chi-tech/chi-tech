@@ -1,25 +1,23 @@
-#include <ChiLua/chi_lua.h>
+#include "../lbkes_k_eigenvalue_solver.h"
 
-#include "../k_eigenvalue_solver.h"
+#include <chi_lua.h>
 
-#include <ChiPhysics//chi_physics.h>
-
+#include "ChiPhysics/chi_physics.h"
 extern ChiPhysics& chi_physics_handler;
 
-#include "chi_log.h"
-
+#include <chi_log.h>
 extern ChiLog& chi_log;
 
 using namespace LinearBoltzmann;
 
 //###################################################################
-/**Creates a k-eigenvalue solver.*/
-int chiKEigenvalueLBSCreateSolver(lua_State* L)
+/**Create the solver.*/
+int chiLBKESCreateSolver(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
   int num_args = lua_gettop(L);
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Creating K-Eigenvalue solver.";
+  chi_log.Log(LOG_ALLVERBOSE_1) << "Creating k-eigenvalue solver.";
 
   std::string solver_name = "KEigenvalueSolver";
   if (num_args == 1)
@@ -28,15 +26,11 @@ int chiKEigenvalueLBSCreateSolver(lua_State* L)
     solver_name = lua_tostring(L, 1);
   }
 
-  auto solver = new KEigenvalue::Solver(solver_name);
+  auto solver = new KEigenvalueSolver(solver_name);
 
   chi_physics_handler.solver_stack.push_back(solver);
 
-  lua_pushinteger(L,
-        static_cast<lua_Integer>(chi_physics_handler.solver_stack.size() - 1));
+  auto n = static_cast<lua_Integer>(chi_physics_handler.solver_stack.size() - 1);
+  lua_pushinteger(L, n);
   return 1;
 }
-
-
-
-
