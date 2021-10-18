@@ -9,7 +9,7 @@ extern ChiLog& chi_log;
 
 void chi_physics::TransportCrossSections::FinalizeCrossSections()
 {
-  double eps = 1.0e-8;
+  const double eps = 1.0e-8;
 
   //======================================== Estimates sigma_a group-by-group
   double sigma_a_sum = 0.0;
