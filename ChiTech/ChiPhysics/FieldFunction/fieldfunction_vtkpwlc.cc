@@ -70,22 +70,24 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
                                           std::string("-avg")).c_str());
   }
   else
-    for (int c=0; c < num_components; ++c)
+  {
+    for (size_t c=0; c < num_components; ++c)
     {
       component_names[c] = field_name + ff_uk.component_text_names[c];
       field_node_array[c]->SetName(component_names[c].c_str());
       field_cell_avg_array[c]->SetName((component_names[c] +
                                         std::string("-avg")).c_str());
-    }
+    }//for c
+  }
 
   //======================================== Precreate nodes to map
   std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
-  for (unsigned int c=0; c < num_components; ++c)
+  for (size_t c=0; c < num_components; ++c)
     for (const auto& cell : grid->local_cells)
     {
       auto cell_mapping = pwlc_sdm.GetCellMappingFE(cell.local_id);
-      for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
+      for (int i=0; i<cell_mapping->num_nodes; ++i)
         cell_node_component_tuples.emplace_back(cell.local_id,i,
                                                 (num_components==1)?
                                                 ref_component : c);
@@ -109,10 +111,10 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
     //Populate Arrays
     size_t num_nodes = cell.vertex_ids.size();
     const double dnum_nodes = static_cast<double>(num_nodes);
-    for (int c=0; c < num_components; ++c)
+    for (size_t c=0; c < num_components; ++c)
     {
       double cell_avg_value = 0.0;
-      for (int v=0; v<num_nodes; ++v)
+      for (size_t v=0; v<num_nodes; ++v)
       {
         int64_t ir = static_cast<int64_t>(mapping[mapping_counter]);
         double dof_value = 0.0;
@@ -139,7 +141,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
 
   ugrid->GetCellData()->AddArray(material_array);
   ugrid->GetCellData()->AddArray(partition_id_array);
-  for (int c=0; c<num_components; ++c)
+  for (size_t c=0; c<num_components; ++c)
   {
     ugrid->GetPointData()->AddArray(field_node_array[c]);
     ugrid->GetCellData()->AddArray(field_cell_avg_array[c]);

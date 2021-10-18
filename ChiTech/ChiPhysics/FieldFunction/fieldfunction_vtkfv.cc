@@ -53,13 +53,15 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
                                           std::string("-avg")).c_str());
   }
   else
-    for (int c=0; c < num_components; ++c)
+  {
+    for (size_t c=0; c < num_components; ++c)
     {
       component_names[c] = field_name + ff_uk.component_text_names[c];
       field_node_array[c]->SetName(component_names[c].c_str());
       field_cell_avg_array[c]->SetName((component_names[c] +
                                         std::string("-avg")).c_str());
-    }
+    }//for c
+  }
 
   //############################################# Populate cell information
   int64_t node_count=0;
@@ -73,16 +75,16 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
     //Populate Arrays
     std::vector<std::pair<uint64_t,uint>> cell_comps_to_map(num_components);
     std::vector<uint64_t> mapping;
-    for (int c=0; c<num_components; ++c)
+    for (size_t c=0; c<num_components; ++c)
       cell_comps_to_map[c] = std::make_pair(cell.local_id,(num_components==1)?
                                                           ref_component : c);
 
     CreateFVMappingLocal(cell_comps_to_map, mapping);
 
-    for (int c=0; c < num_components; ++c)
+    for (size_t c=0; c < num_components; ++c)
     {
       double dof_value = field_vector_local->operator[](mapping[c]);
-      for (int v=0; v<cell.vertex_ids.size(); ++v)
+      for (size_t v=0; v<cell.vertex_ids.size(); ++v)
         field_node_array[c]->InsertNextValue(dof_value);
       field_cell_avg_array[c]->InsertNextValue(dof_value);
     }//for component
@@ -102,7 +104,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
   ugrid->GetCellData()->AddArray(material_array);
   ugrid->GetCellData()->AddArray(partition_id_array);
-  for (int c=0; c<num_components; ++c)
+  for (size_t c=0; c<num_components; ++c)
   {
     ugrid->GetPointData()->AddArray(field_node_array[c]);
     ugrid->GetCellData()->AddArray(field_cell_avg_array[c]);
