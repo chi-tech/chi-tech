@@ -20,6 +20,7 @@ namespace chi_data_types
   std::string VaryingDataTypeStringName(VaryingDataType type);
 
   class Varying;
+  class ByteArray;
 }//namespace chi_data_types
 
 #endif //CHI_DATA_TYPES_CHI_DATA_TYPES_H

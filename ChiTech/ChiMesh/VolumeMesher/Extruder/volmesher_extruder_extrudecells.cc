@@ -1,6 +1,7 @@
 #include "volmesher_extruder.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
+
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
@@ -29,7 +30,7 @@ void chi_mesh::VolumeMesherExtruder::
         chi_log.Log(LOG_ALLERROR) << "Extruder: Template cell error.";
         exit(EXIT_FAILURE);
       }
-      auto template_cell = (chi_mesh::CellPolygon&)(template_grid.local_cells[tc]);
+      auto& template_cell = template_grid.local_cells[tc];
 
       //========================================= Check for inverted cells
       {
@@ -53,7 +54,7 @@ void chi_mesh::VolumeMesherExtruder::
 
       //========================================= Create a template empty
       //                                          cell
-      auto tcell = new chi_mesh::Cell(chi_mesh::CellType::GHOST);
+      auto tcell = new chi_mesh::Cell(CellType::GHOST, CellType::GHOST);
       tcell->centroid = centroid_precompd;
 
       //========================================= Get the partition id
@@ -81,7 +82,7 @@ void chi_mesh::VolumeMesherExtruder::
       else
       {
         //========================================= Create polyhedron
-        auto cell = new chi_mesh::CellPolyhedron;
+        auto cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
         cell->partition_id = tcell->partition_id;
         delete tcell;
 

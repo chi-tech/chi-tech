@@ -11,7 +11,7 @@ class PolygonMappingFE_PWL_Cylindrical : public PolygonMappingFE_PWL
 //  Methods
 public:
   PolygonMappingFE_PWL_Cylindrical(
-    const chi_mesh::CellPolygon& poly_cell,
+    const chi_mesh::Cell& poly_cell,
     const chi_mesh::MeshContinuumPtr& ref_grid,
     const chi_math::QuadratureTriangle& volume_quadrature,
     const chi_math::QuadratureLine&     surface_quadrature)

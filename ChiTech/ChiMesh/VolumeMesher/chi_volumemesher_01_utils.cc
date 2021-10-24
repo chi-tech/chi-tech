@@ -5,7 +5,7 @@
 #include "ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
-#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
@@ -64,7 +64,7 @@ void chi_mesh::VolumeMesher::
   unsigned int num_cells = 0;
   for (auto& face : surface_mesh->faces)
   {
-    auto cell = new chi_mesh::CellPolygon;
+    auto cell = new chi_mesh::Cell(CellType::POLYGON,CellType::TRIANGLE);
 
     for (int k=0;k<3;k++)
     {
@@ -115,7 +115,13 @@ void chi_mesh::VolumeMesher::
 
   for (auto face : surface_mesh->poly_faces)
   {
-    auto cell = new chi_mesh::CellPolygon;
+    CellType sub_type = CellType::POLYGON;
+
+    const size_t num_verts = face->v_indices.size();
+    if      (num_verts == 3) sub_type = CellType::TRIANGLE;
+    else if (num_verts == 4) sub_type = CellType::QUADRILATERAL;
+
+    auto cell = new chi_mesh::Cell(CellType::POLYGON, sub_type);
 
     //====================================== Copy vertices
     for (auto vid : face->v_indices)
@@ -207,7 +213,7 @@ void chi_mesh::VolumeMesher::
       exit(EXIT_FAILURE);
     }
 
-    auto cell = new chi_mesh::CellPolygon;
+    auto cell = new chi_mesh::Cell(CellType::POLYGON, raw_cell->sub_type);
 
     //====================================== Copy vertices and centroid
     cell->vertex_ids = raw_cell->vertex_ids;

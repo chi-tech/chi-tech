@@ -1,7 +1,6 @@
 #include "volmesher_predefunpart.h"
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################
 /**Adds a slab to the grid from a light-weight cell.*/
@@ -11,7 +10,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     const chi_mesh::Cell &temp_cell,
     chi_mesh::MeshContinuum &grid)
 {
-  auto slab_cell = new chi_mesh::CellSlab;
+  auto slab_cell = new chi_mesh::Cell(CellType::SLAB, CellType::SLAB);
   slab_cell->centroid = temp_cell.centroid;
   slab_cell->global_id = temp_cell.global_id;
   slab_cell->partition_id = temp_cell.partition_id;
@@ -56,7 +55,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     const chi_mesh::Cell &temp_cell,
     chi_mesh::MeshContinuum &grid)
 {
-  auto poly_cell = new chi_mesh::CellPolygon;
+  auto poly_cell = new chi_mesh::Cell(CellType::POLYGON, raw_cell.sub_type);
   poly_cell->centroid = temp_cell.centroid;
   poly_cell->global_id = temp_cell.global_id;
   poly_cell->partition_id = temp_cell.partition_id;
@@ -101,7 +100,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     const chi_mesh::Cell &temp_cell,
     chi_mesh::MeshContinuum &grid)
 {
-  auto polyh_cell = new chi_mesh::CellPolyhedron;
+  auto polyh_cell = new chi_mesh::Cell(CellType::POLYHEDRON, raw_cell.sub_type);
   polyh_cell->centroid = temp_cell.centroid;
   polyh_cell->global_id = temp_cell.global_id;
   polyh_cell->partition_id = temp_cell.partition_id;
@@ -123,8 +122,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
     newFace.centroid = vfc / double(newFace.vertex_ids.size());
 
     newFace.normal = chi_mesh::Normal(0.0,0.0,0.0);
-    int last_vert_ind = int(newFace.vertex_ids.size()-1);
-    for (int fv=0; fv<newFace.vertex_ids.size(); ++fv)
+    size_t last_vert_ind = newFace.vertex_ids.size()-1;
+    for (size_t fv=0; fv<newFace.vertex_ids.size(); ++fv)
     {
       uint64_t fvid_m = newFace.vertex_ids[fv];
       uint64_t fvid_p = (fv == last_vert_ind)? newFace.vertex_ids[0] :

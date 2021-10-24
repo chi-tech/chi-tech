@@ -2,6 +2,7 @@
 #define CHI_CELL_H
 
 #include"../chi_mesh.h"
+#include "ChiDataTypes/chi_data_types.h"
 #include <tuple>
 
 //Appending cell types to namespace
@@ -13,13 +14,16 @@ enum class CellType
   SLAB = 1,
 //  SPHERICAL_SHELL = 2,
 //  CYLINDRICAL_ANNULUS = 3,
-//  TRIANGLE = 4,
-//  QUADRILATERAL = 5,
+  TRIANGLE = 4,
+  QUADRILATERAL = 5,
   POLYGON = 6,
-//  TETRAHEDRON = 7,
+  TETRAHEDRON = 7,
   HEXAHEDRON = 8,
   POLYHEDRON = 9,
+  POINT = 99
 };
+
+std::string CellTypeName(CellType type);
 
 //######################################################### Class def
 /** In this paradigm a face is an object which largely
@@ -44,6 +48,11 @@ public:
 public:
   double ComputeFaceArea(chi_mesh::MeshContinuum& grid) const;
 
+  chi_data_types::ByteArray Serialize() const;
+  static CellFace DeSerialize(const chi_data_types::ByteArray& raw,
+                              size_t& address);
+  std::string ToString() const;
+
 };
 
 
@@ -53,6 +62,10 @@ public:
 /**Generic mesh cell object*/
 class Cell
 {
+private:
+  const CellType cell_type;     ///< Primary type, i.e. SLAB, POLYGON, POLYHEDRON
+  const CellType cell_sub_type; ///< Sub-type i.e. SLAB, QUADRILATERAL, HEXAHEDRON
+
 public:
   uint64_t global_id = 0;
   uint64_t local_id  = 0;
@@ -63,18 +76,25 @@ public:
   std::vector<uint64_t> vertex_ids;
   std::vector<CellFace> faces;
 
-private:
-  const CellType cell_type;
-
 public:
-  explicit Cell(CellType in_cell_type) :
-                cell_type(in_cell_type)
+  Cell(const Cell& other);
+  Cell(Cell&& other) noexcept;
+  explicit Cell(CellType in_cell_type,
+                CellType in_cell_sub_type) :
+                cell_type(in_cell_type),
+                cell_sub_type(in_cell_sub_type)
                 {}
 
   virtual ~Cell() = default;
 
 public:
   CellType Type() const {return cell_type;}
+  CellType SubType() const {return cell_sub_type;}
+
+  chi_data_types::ByteArray Serialize() const;
+  static Cell DeSerialize(const chi_data_types::ByteArray& raw,
+                          size_t& address);
+  std::string ToString() const;
 };
 
 }

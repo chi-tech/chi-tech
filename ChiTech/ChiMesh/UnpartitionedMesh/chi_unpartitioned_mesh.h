@@ -21,13 +21,17 @@ public:
   struct LightWeightCell
   {
     const chi_mesh::CellType type;
+    const chi_mesh::CellType sub_type;
     chi_mesh::Vertex centroid;
     int material_id=-1;
     std::vector<uint64_t> vertex_ids;
     std::vector<LightWeightFace> faces;
 
     explicit
-    LightWeightCell(chi_mesh::CellType in_type) : type(in_type) {}
+    LightWeightCell(chi_mesh::CellType in_type,
+                    chi_mesh::CellType in_sub_type) :
+                    type(in_type),
+                    sub_type(in_sub_type) {}
   };
 
 public:

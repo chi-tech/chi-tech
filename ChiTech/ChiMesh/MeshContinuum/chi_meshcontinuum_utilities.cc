@@ -1,5 +1,5 @@
 #include "chi_meshcontinuum.h"
-#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 

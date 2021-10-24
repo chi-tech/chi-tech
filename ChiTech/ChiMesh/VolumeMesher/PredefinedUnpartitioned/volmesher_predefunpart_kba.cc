@@ -22,7 +22,7 @@ int chi_mesh::VolumeMesherPredefinedUnpartitioned::
   int Px = handler->volume_mesher->options.partition_x;
   int Py = handler->volume_mesher->options.partition_y;
 
-  chi_mesh::Cell temp_cell(chi_mesh::CellType::GHOST);
+  chi_mesh::Cell temp_cell(CellType::GHOST, CellType::GHOST);
   temp_cell.centroid = centroid;
 
   auto xyz = GetCellXYZPartitionID(&temp_cell);
@@ -83,7 +83,7 @@ KBA(chi_mesh::UnpartitionedMesh* umesh,
   for (auto raw_cell : umesh->raw_cells)
   {
     ++global_id;
-    auto temp_cell = new chi_mesh::Cell(chi_mesh::CellType::GHOST);
+    auto temp_cell = new chi_mesh::Cell(CellType::GHOST, CellType::GHOST);
     temp_cell->centroid = raw_cell->centroid;
     temp_cell->global_id = global_id;
     temp_cell->partition_id = GetPartitionIDFromCentroid(temp_cell->centroid);

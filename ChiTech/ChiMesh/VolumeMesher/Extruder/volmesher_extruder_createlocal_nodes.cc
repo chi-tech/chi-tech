@@ -1,5 +1,7 @@
 #include "volmesher_extruder.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -26,7 +28,7 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
           << "Extruder::CreateLocalAndBoundaryNodes: Template cell error.";
         exit(EXIT_FAILURE);
       }
-      auto& template_cell = (chi_mesh::CellPolygon&)(template_grid.local_cells[tc]);
+      auto& template_cell = template_grid.local_cells[tc];
 
       //========================================= Precompute centroid
       auto centroid_precompd = ComputeTemplateCell3DCentroid(

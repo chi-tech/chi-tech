@@ -81,9 +81,13 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
       size_t number_of_verts =
         std::count(file_line.begin(), file_line.end(), '/')/2;
 
-      auto cell = new LightWeightCell(CellType::POLYGON);
+      CellType sub_type = CellType::POLYGON;
+      if      (number_of_verts == 3) sub_type = CellType::TRIANGLE;
+      else if (number_of_verts == 4) sub_type = CellType::QUADRILATERAL;
 
-      for (int k=1;k<=number_of_verts;k++)
+      auto cell = new LightWeightCell(CellType::POLYGON, sub_type);
+
+      for (size_t k=1;k<=number_of_verts;k++)
       {
         //================================== Extract sub word
         beg_of_word = file_line.find_first_not_of(delimiter, end_of_word);

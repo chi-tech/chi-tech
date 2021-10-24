@@ -1,6 +1,6 @@
 #include "chi_unpartitioned_mesh.h"
 
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;

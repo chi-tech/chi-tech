@@ -1,9 +1,6 @@
 #include "raytracing.h"
 
 #include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
-#include <ChiMesh/Cell/cell_slab.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
 
 #include <chi_log.h>
 
@@ -45,19 +42,17 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ SLAB
   if (cell.Type() == chi_mesh::CellType::SLAB)
   {
-    const auto& slab_cell = (chi_mesh::CellSlab&)cell;
-
     chi_mesh::Vector3 intersection_point;
     std::pair<double,double> weights;
 
     int num_faces = 2;
     for (int f=0; f<num_faces; f++)
     {
-      uint64_t fpi = slab_cell.vertex_ids[f]; //face point index
+      uint64_t fpi = cell.vertex_ids[f]; //face point index
       chi_mesh::Vertex face_point = grid.vertices[fpi];
 
       bool intersects = chi_mesh::CheckPlaneLineIntersect(
-        slab_cell.faces[f].normal, face_point,
+        cell.faces[f].normal, face_point,
         pos_i, pos_f_line,
         intersection_point, &weights);
 
@@ -69,7 +64,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         pos_f = intersection_point;
 
         dest_info.destination_face_index = f;
-        dest_info.destination_face_neighbor = slab_cell.faces[f].neighbor_id;
+        dest_info.destination_face_neighbor = cell.faces[f].neighbor_id;
         intersection_found = true;
         break;
       }
@@ -80,20 +75,18 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYGON
   else if (cell.Type() == chi_mesh::CellType::POLYGON)
   {
-    const auto& poly_cell = (chi_mesh::CellPolygon&)cell;
-
     chi_mesh::Vector3 ip; //intersection point
 
-    int num_faces = poly_cell.faces.size();
-    for (int f=0; f<num_faces; f++)
+    size_t num_faces = cell.faces.size();
+    for (size_t f=0; f<num_faces; f++)
     {
-      uint64_t fpi = poly_cell.faces[f].vertex_ids[0]; //face point index 0
-      uint64_t fpf = poly_cell.faces[f].vertex_ids[1]; //face point index 1
+      uint64_t fpi = cell.faces[f].vertex_ids[0]; //face point index 0
+      uint64_t fpf = cell.faces[f].vertex_ids[1]; //face point index 1
       const chi_mesh::Vertex& face_point_i = grid.vertices[fpi];
       const chi_mesh::Vertex& face_point_f = grid.vertices[fpf];
 
       bool intersects = chi_mesh::CheckLineIntersectStrip(
-        face_point_i, face_point_f, poly_cell.faces[f].normal,
+        face_point_i, face_point_f, cell.faces[f].normal,
         pos_i, pos_f_line, ip);
 
       double D = (ip - pos_i).Norm();
@@ -104,7 +97,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
         pos_f = ip;
 
         dest_info.destination_face_index = f;
-        dest_info.destination_face_neighbor = poly_cell.faces[f].neighbor_id;
+        dest_info.destination_face_neighbor = cell.faces[f].neighbor_id;
         intersection_found = true;
         break;
       }//if intersects
@@ -115,15 +108,12 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ POLYHEDRON
   else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    const auto& polyh_cell = (chi_mesh::CellPolyhedron&)cell;
-
     chi_mesh::Vector3 ip = pos_i; //Intersection point
 
-    int num_faces = polyh_cell.faces.size();
-    for (int f=0; f<num_faces; f++)
+    size_t num_faces = cell.faces.size();
+    for (size_t f=0; f<num_faces; f++)
     {
-//      const auto& edges = polyh_cell.GetFaceEdges(f);
-      const auto& face = polyh_cell.faces[f];
+      const auto& face = cell.faces[f];
 
       size_t num_sides = face.vertex_ids.size();
       for (size_t s=0; s<num_sides; s++)
@@ -134,7 +124,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
                           face.vertex_ids[0];    //else
         const auto& v0 = grid.vertices[v0_index];
         const auto& v1 = grid.vertices[v1_index];
-        const auto& v2 = polyh_cell.faces[f].centroid;
+        const auto& v2 = cell.faces[f].centroid;
 
         bool intersects =
           chi_mesh::CheckLineIntersectTriangle2(v0,v1,v2,pos_i,omega_i,ip);
@@ -145,7 +135,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
           pos_f = ip;
 
           dest_info.destination_face_index = f;
-          dest_info.destination_face_neighbor = polyh_cell.faces[f].neighbor_id;
+          dest_info.destination_face_neighbor = cell.faces[f].neighbor_id;
 
           intersection_found = true;
           break;

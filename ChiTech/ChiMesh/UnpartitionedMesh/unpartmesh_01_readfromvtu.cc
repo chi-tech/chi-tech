@@ -34,7 +34,8 @@ extern ChiMPI& chi_mpi;
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 CreateCellFromVTKPolyhedron(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYHEDRON);
+  auto polyh_cell  = new LightWeightCell(CellType::POLYHEDRON,
+                                         CellType::POLYHEDRON);
 
   auto vtk_polyh   = vtkPolyhedron::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_polyh->GetNumberOfPoints();
@@ -73,7 +74,8 @@ CreateCellFromVTKPolyhedron(vtkCell *vtk_cell)
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 CreateCellFromVTKHexahedron(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYHEDRON);
+  auto polyh_cell  = new LightWeightCell(CellType::POLYHEDRON,
+                                         CellType::HEXAHEDRON);
 
   auto vtk_hex     = vtkHexahedron::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_hex->GetNumberOfPoints();
@@ -112,7 +114,8 @@ CreateCellFromVTKHexahedron(vtkCell *vtk_cell)
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 CreateCellFromVTKTetrahedron(vtkCell *vtk_cell)
 {
-  auto polyh_cell  = new LightWeightCell(chi_mesh::CellType::POLYHEDRON);
+  auto polyh_cell  = new LightWeightCell(CellType::POLYHEDRON,
+                                         CellType::TETRAHEDRON);
 
   auto vtk_tet     = vtkTetra::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_tet->GetNumberOfPoints();
@@ -151,7 +154,8 @@ CreateCellFromVTKTetrahedron(vtkCell *vtk_cell)
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 CreateCellFromVTKPolygon(vtkCell *vtk_cell)
 {
-  auto poly_cell   = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell   = new LightWeightCell(CellType::POLYGON,
+                                         CellType::POLYGON);
 
   auto vtk_polygon = vtkPolygon::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_polygon->GetNumberOfPoints();
@@ -189,7 +193,8 @@ CreateCellFromVTKPolygon(vtkCell *vtk_cell)
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 CreateCellFromVTKQuad(vtkCell *vtk_cell)
 {
-  auto poly_cell   = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell   = new LightWeightCell(CellType::POLYGON,
+                                         CellType::QUADRILATERAL);
 
   auto vtk_quad    = vtkQuad::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_quad->GetNumberOfPoints();
@@ -227,7 +232,8 @@ CreateCellFromVTKQuad(vtkCell *vtk_cell)
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 CreateCellFromVTKTriangle(vtkCell *vtk_cell)
 {
-  auto poly_cell   = new LightWeightCell(chi_mesh::CellType::POLYGON);
+  auto poly_cell   = new LightWeightCell(CellType::POLYGON,
+                                         CellType::TRIANGLE);
 
   auto vtk_triangle= vtkTriangle::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_triangle->GetNumberOfPoints();
@@ -265,7 +271,8 @@ CreateCellFromVTKTriangle(vtkCell *vtk_cell)
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKLine(vtkCell *vtk_cell)
 {
-  auto slab_cell   = new LightWeightCell(chi_mesh::CellType::SLAB);
+  auto slab_cell   = new LightWeightCell(CellType::SLAB,
+                                         CellType::SLAB);
 
   auto vtk_line    = vtkLine::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_line->GetNumberOfPoints();
@@ -300,7 +307,8 @@ chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
 chi_mesh::UnpartitionedMesh::LightWeightCell* chi_mesh::UnpartitionedMesh::
   CreateCellFromVTKVertex(vtkCell *vtk_cell)
 {
-  auto point_cell  = new LightWeightCell(chi_mesh::CellType::GHOST);
+  auto point_cell  = new LightWeightCell(CellType::GHOST,
+                                         CellType::POINT);
 
   auto vtk_vertex  = vtkVertex::SafeDownCast(vtk_cell);
   auto num_cpoints = vtk_vertex->GetNumberOfPoints();
@@ -353,8 +361,8 @@ void chi_mesh::UnpartitionedMesh::
   cleaner->Update();
   auto ugrid = cleaner->GetOutput();
 
-  uint64_t total_cell_count  = ugrid->GetNumberOfCells();
-  uint64_t total_point_count = ugrid->GetNumberOfPoints();
+  auto total_cell_count  = ugrid->GetNumberOfCells();
+  auto total_point_count = ugrid->GetNumberOfPoints();
 
   chi_log.Log(LOG_0)
     << "Clean grid num cells and points: "

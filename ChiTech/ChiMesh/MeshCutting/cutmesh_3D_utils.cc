@@ -1,5 +1,7 @@
 #include "meshcutting.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include <algorithm>
 #include <stdexcept>
 
@@ -105,7 +107,7 @@ void chi_mesh::mesh_cutting::
                  const Vector3 &plane_point,
                  const Vector3 &plane_normal,
                  MeshContinuum &mesh,
-                 chi_mesh::CellPolyhedron &cell)
+                 chi_mesh::Cell& cell)
 {
   const std::string fname = __FUNCTION__;
   const auto& p = plane_point;
@@ -387,7 +389,7 @@ void chi_mesh::mesh_cutting::
     //================================= Complete cell definitions
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedron,cell);
 
-    auto new_cell = new chi_mesh::CellPolyhedron;
+    auto new_cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
     new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_slivertet,*new_cell);
 
@@ -601,7 +603,7 @@ void chi_mesh::mesh_cutting::
     //================================= Complete cell definitions
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedron,cell);
 
-    auto new_cell = new chi_mesh::CellPolyhedron;
+    auto new_cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
     new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_slivertet,*new_cell);
 
@@ -720,7 +722,7 @@ void chi_mesh::mesh_cutting::
     //================================= Complete cell definitions
     PopulatePolyhedronFromFaces(mesh,raw_faces_tetA,cell);
 
-    auto new_cell = new chi_mesh::CellPolyhedron;
+    auto new_cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
     new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_tetB,*new_cell);
 
@@ -945,7 +947,7 @@ void chi_mesh::mesh_cutting::
 
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedronA,cell);
 
-    auto new_cell = new chi_mesh::CellPolyhedron;
+    auto new_cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
     new_cell->material_id = cell.material_id;
     PopulatePolyhedronFromFaces(mesh,raw_faces_polyhedronB,*new_cell);
 

@@ -142,7 +142,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::
   for (auto raw_cell : umesh->raw_cells)
   {
     ++global_id;
-    auto temp_cell = new chi_mesh::Cell(chi_mesh::CellType::GHOST);
+    auto temp_cell = new chi_mesh::Cell(CellType::GHOST, CellType::GHOST);
     temp_cell->centroid = raw_cell->centroid;
     temp_cell->global_id = global_id;
     temp_cell->partition_id = cell_pids[global_id];

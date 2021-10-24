@@ -2,8 +2,7 @@
 #define CHI_MESH_MESH_CUTTING_H
 
 #include "ChiMesh/chi_mesh.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
 
 namespace chi_mesh
 {
@@ -55,7 +54,7 @@ namespace mesh_cutting
                   const Vector3 &plane_point,
                   const Vector3 &plane_normal,
                   MeshContinuum& mesh,
-                  chi_mesh::CellPolygon& cell);
+                  chi_mesh::Cell& cell);
 
   //3D_utils
   bool CheckPolyhedronQuality(const MeshContinuum& mesh,
@@ -71,7 +70,7 @@ namespace mesh_cutting
                       const Vector3 &plane_point,
                       const Vector3 &plane_normal,
                       MeshContinuum& mesh,
-                      chi_mesh::CellPolyhedron& cell);
+                      chi_mesh::Cell& cell);
 
   //plane
   void CutMeshWithPlane(MeshContinuum& mesh,

@@ -4,7 +4,7 @@
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 #include "ChiMath/Quadratures/quadrature_line.h"
 #include "ChiMath/Quadratures/quadrature_triangle.h"
-#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell.h"
 
 
 
@@ -53,7 +53,7 @@ private:
 
 public:
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
-  PolygonMappingFE_PWL(const chi_mesh::CellPolygon& poly_cell,
+  PolygonMappingFE_PWL(const chi_mesh::Cell& poly_cell,
                        const chi_mesh::MeshContinuumPtr& ref_grid,
                        const chi_math::QuadratureTriangle& volume_quadrature,
                        const chi_math::QuadratureLine&     surface_quadrature);
