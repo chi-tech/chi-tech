@@ -28,7 +28,7 @@ extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Exports just the mesh to VTK format.*/
-void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
+void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
 {
   chi_log.Log() << "Exporting mesh to VTK. " << local_cells.size();
   std::vector<std::vector<double>> d_nodes;

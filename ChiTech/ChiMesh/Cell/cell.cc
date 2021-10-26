@@ -63,7 +63,7 @@ chi_mesh::Cell::Cell(Cell &&other) noexcept :
 //###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
 bool chi_mesh::CellFace::
-  IsNeighborLocal(chi_mesh::MeshContinuum& grid) const
+  IsNeighborLocal(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return false;
   if (chi_mpi.process_count == 1) return true;
@@ -76,7 +76,7 @@ bool chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's partition.*/
 int chi_mesh::CellFace::
-  GetNeighborPartitionID(chi_mesh::MeshContinuum& grid) const
+  GetNeighborPartitionID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return 0;
@@ -89,7 +89,7 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's local id.*/
 int chi_mesh::CellFace::
-  GetNeighborLocalID(chi_mesh::MeshContinuum& grid) const
+  GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return neighbor_id; //cause global_ids=local_ids
@@ -105,7 +105,7 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's associated face.*/
 int chi_mesh::CellFace::
-  GetNeighborAssociatedFace(chi_mesh::MeshContinuum& grid) const
+  GetNeighborAssociatedFace(const chi_mesh::MeshContinuum& grid) const
 {
   const auto& cur_face = *this; //just for readability
   //======================================== Check index validity

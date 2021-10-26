@@ -40,10 +40,10 @@ public:
                                     ///< Otherwise contains boundary_id.
 
 public:
-  bool IsNeighborLocal(chi_mesh::MeshContinuum& grid) const;
-  int  GetNeighborPartitionID(chi_mesh::MeshContinuum& grid) const;
-  int  GetNeighborLocalID(chi_mesh::MeshContinuum& grid) const;
-  int  GetNeighborAssociatedFace(chi_mesh::MeshContinuum& grid) const;
+  bool IsNeighborLocal(const chi_mesh::MeshContinuum& grid) const;
+  int  GetNeighborPartitionID(const chi_mesh::MeshContinuum& grid) const;
+  int  GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const;
+  int  GetNeighborAssociatedFace(const chi_mesh::MeshContinuum& grid) const;
 
 public:
   double ComputeFaceArea(chi_mesh::MeshContinuum& grid) const;

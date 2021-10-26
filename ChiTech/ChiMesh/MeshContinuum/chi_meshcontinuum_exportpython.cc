@@ -14,7 +14,7 @@ extern ChiLog& chi_log;
 void chi_mesh::MeshContinuum::
 ExportCellsToPython(const char* fileName, bool surface_only,
                     std::vector<int>* cell_flags,
-                    int options)
+                    int options) const
 {
   FILE* of = fopen(fileName,"w");
 
@@ -166,7 +166,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
             }
 
 
-            chi_mesh::CellFace& face = cell.faces[s];
+            const chi_mesh::CellFace& face = cell.faces[s];
 
             for (size_t v=0; v<face.vertex_ids.size(); v++)
             {
@@ -199,7 +199,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
             }
           }
 
-          chi_mesh::CellFace& face = cell.faces[s];
+          const chi_mesh::CellFace& face = cell.faces[s];
 
           for (size_t v=0; v<face.vertex_ids.size(); v++)
           {
