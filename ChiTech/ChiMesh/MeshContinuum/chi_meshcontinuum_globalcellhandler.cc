@@ -11,7 +11,7 @@ extern ChiLog& chi_log;
 void chi_mesh::GlobalCellHandler::
   push_back(chi_mesh::Cell *new_cell)
 {
-  if (new_cell->partition_id == chi_mpi.location_id)
+  if (new_cell->partition_id == static_cast<uint64_t>(chi_mpi.location_id))
   {
     local_cell_glob_indices.push_back(new_cell->global_id);
     size_t local_cell_index = local_cell_glob_indices.size() - 1;

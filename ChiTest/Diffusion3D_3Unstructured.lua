@@ -16,33 +16,6 @@ if (check_num_procs==nil and chi_number_of_processes ~= num_procs) then
 end
 
 --############################################### Setup mesh
--- chiMeshHandlerCreate()
---
--- newSurfMesh = chiSurfaceMeshCreate();
--- chiSurfaceMeshImportFromOBJFile(newSurfMesh,
---         "ChiResources/TestObjects/TriangleMesh2x2.obj")
---
--- region1 = chiRegionCreate()
---
--- chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
--- chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
---                       ExtruderTemplateType.SURFACE_MESH,
---                       newSurfMesh);
---
--- NZ=2
--- chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
--- --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
--- --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
--- --chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");
---
--- chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
--- chiVolumeMesherSetKBACutsX({0.0})
--- chiVolumeMesherSetKBACutsY({0.0})
---
---
--- chiSurfaceMesherExecute();
--- chiVolumeMesherExecute();
-
 chiMeshHandlerCreate()
 
 unpart_mesh = chiUnpartitionedMeshFromWavefrontOBJ(

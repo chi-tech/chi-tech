@@ -53,24 +53,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   //================================== Process templates
   if (template_type == TemplateType::SURFACE_MESH)
   {
-      chi_log.Log(LOG_0VERBOSE_1)
-        << "VolumeMesherExtruder: Processing surface mesh"
-        << std::endl;
-
-      //================================== Get node_z_incr
-      node_z_index_incr = template_surface_mesh->vertices.size();
-
-      //================================== Create baseline polygons in template
-      //                                   continuum
-      chi_log.Log(LOG_0VERBOSE_1)
-        << "VolumeMesherExtruder: Creating template cells" << std::endl;
-      const bool DELETE_SURFACE_MESH_ELEMENTS = true;
-      const bool FORCE_LOCAL = true;
-      CreatePolygonCells(template_surface_mesh,
-                         temp_grid,
-                         DELETE_SURFACE_MESH_ELEMENTS,
-                         FORCE_LOCAL);
-      delete template_surface_mesh;
+    throw std::logic_error("VolumeMesherExtruder: Surfacemesh extrusions"
+                           " no longer supported.");
   }
   else if (template_type == TemplateType::UNPARTITIONED_MESH)
   {
@@ -85,12 +69,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     //                                   continuum
     chi_log.Log(LOG_0VERBOSE_1)
       << "VolumeMesherExtruder: Creating template cells" << std::endl;
-    const bool DELETE_SURFACE_MESH_ELEMENTS = true;
-    const bool FORCE_LOCAL = true;
-    CreatePolygonCells(template_unpartitioned_mesh,
-                       temp_grid,
-                       DELETE_SURFACE_MESH_ELEMENTS,
-                       FORCE_LOCAL);
+    CreatePolygonCells(*template_unpartitioned_mesh, temp_grid);
   }
 
   chi_log.Log(LOG_0VERBOSE_1)

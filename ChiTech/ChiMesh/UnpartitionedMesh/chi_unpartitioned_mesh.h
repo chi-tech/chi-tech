@@ -38,6 +38,7 @@ public:
   std::vector<chi_mesh::Vertex>    vertices;
   std::vector<LightWeightCell*>    raw_cells;
   std::vector<LightWeightCell*>    raw_boundary_cells;
+  std::vector<std::set<uint64_t>>  vertex_cell_subscriptions;
 
 public:
   enum class ParallelMethod

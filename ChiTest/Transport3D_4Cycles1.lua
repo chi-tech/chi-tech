@@ -18,17 +18,15 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-newSurfMesh = chiSurfaceMeshCreate();
-chiSurfaceMeshImportFromOBJFile(newSurfMesh,
-        "ChiResources/TestObjects/Square2x2_partition_cyclic3.obj",true)
+unpart_mesh = chiUnpartitionedMeshFromWavefrontOBJ(
+        "ChiResources/TestObjects/Square2x2_partition_cyclic3.obj")
 
 region1 = chiRegionCreate()
-chiRegionAddSurfaceBoundary(region1,newSurfMesh);
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
-                      ExtruderTemplateType.SURFACE_MESH,
-                      newSurfMesh);
+                      ExtruderTemplateType.UNPARTITIONED_MESH,
+                      unpart_mesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2*NZ,NZ,"Charlie");--0.4
