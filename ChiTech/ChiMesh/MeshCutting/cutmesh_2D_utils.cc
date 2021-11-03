@@ -8,10 +8,10 @@
 /**Make an edge for a polygon given its edge index.*/
 std::pair<uint64_t,uint64_t> chi_mesh::mesh_cutting::
   MakeEdgeFromPolygonEdgeIndex(const std::vector<uint64_t>& vertex_ids,
-                               int edge_index)
+                               size_t edge_index)
 {
-  int e = edge_index;
-  size_t num_verts = vertex_ids.size();
+  const int e = static_cast<int>(edge_index);
+  const int num_verts = static_cast<int>(vertex_ids.size());
 
   int next_v = (e < (num_verts-1)) ? e+1 : 0;
   uint64_t v0_id = vertex_ids[e];

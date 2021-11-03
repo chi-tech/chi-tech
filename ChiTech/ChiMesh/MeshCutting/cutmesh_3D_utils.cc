@@ -25,9 +25,9 @@ bool chi_mesh::mesh_cutting::
   for (auto& face : cell.faces)
   {
     const auto& v0 = face.centroid;
-    size_t num_edges = face.vertex_ids.size();
+    const size_t num_edges = face.vertex_ids.size();
 
-    for (int e=0; e<num_edges; ++e)
+    for (size_t e=0; e<num_edges; ++e)
     {
       auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids,e);
 

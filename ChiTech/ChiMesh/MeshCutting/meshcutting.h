@@ -37,7 +37,7 @@ namespace mesh_cutting
   //2D_utils
   std::pair<uint64_t,uint64_t>
     MakeEdgeFromPolygonEdgeIndex(const std::vector<uint64_t>& vertex_ids,
-                                 int edge_index);
+                                 size_t edge_index);
 
   void PopulatePolygonFromVertices(
     const MeshContinuum& mesh,
