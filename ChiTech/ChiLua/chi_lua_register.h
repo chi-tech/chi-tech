@@ -47,6 +47,12 @@ RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
 RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ)
 RegisterFunction(chiUnpartitionedMeshFromMshFormat)
 
+//module:Manual Unpartitioned Mesh
+RegisterFunction(chiCreateEmptyUnpartitionedMesh)
+RegisterFunction(chiUnpartitionedMeshUploadVertex)
+RegisterFunction(chiUnpartitionedMeshUploadCell)
+RegisterFunction(chiUnpartitionedMeshFinalizeEmpty)
+
 //module:Mesh Utilities
 RegisterFunction(chiEdgeLoopSplitByAngle)
 //  LineMesh

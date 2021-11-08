@@ -61,6 +61,22 @@ chi_mesh::Cell::Cell(Cell &&other) noexcept :
 
 
 //###################################################################
+/**Copy operator.*/
+chi_mesh::Cell& chi_mesh::Cell::operator=(const Cell &other)
+{
+  global_id    = other.global_id;
+  local_id     = other.local_id;
+  partition_id = other.partition_id;
+  centroid     = other.centroid;
+  material_id  = other.material_id;
+  vertex_ids   = other.vertex_ids;
+  faces        = other.faces;
+
+  return *this;
+}
+
+
+//###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
 bool chi_mesh::CellFace::
   IsNeighborLocal(const chi_mesh::MeshContinuum& grid) const
@@ -349,6 +365,7 @@ std::string chi_mesh::Cell::ToString() const
   }
 
   {
+    outstr << "num_faces: " << faces.size() << "\n";
     size_t f=0;
     for (const auto& face : faces)
       outstr << "Face " << f++ << ":\n" << face.ToString();

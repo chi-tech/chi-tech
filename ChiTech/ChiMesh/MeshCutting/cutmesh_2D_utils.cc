@@ -21,6 +21,18 @@ std::pair<uint64_t,uint64_t> chi_mesh::mesh_cutting::
 }
 
 //###################################################################
+/**Computes the centroid of an edge.*/
+chi_mesh::Vector3 chi_mesh::mesh_cutting::
+  GetEdgeCentroid(const Edge &edge,
+                  const chi_mesh::MeshContinuum &grid)
+{
+  auto& v0 = grid.vertices[edge.first];
+  auto& v1 = grid.vertices[edge.second];
+
+  return 0.5*(v0 + v1);
+}
+
+//###################################################################
 /***/
 void chi_mesh::mesh_cutting::
   PopulatePolygonFromVertices(const MeshContinuum &mesh,

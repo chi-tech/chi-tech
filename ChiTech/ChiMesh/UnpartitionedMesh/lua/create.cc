@@ -1,11 +1,29 @@
-#include "../../../ChiLua/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 
-#include "../chi_unpartitioned_mesh.h"
+#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
 /** \defgroup LuaUnpartitionedMesh Unpartitioned Mesh-Reader
  * \ingroup LuaMesh
  */
+
+//###################################################################
+/**Creates an empty unpartitioned mesh.
+
+\ingroup LuaUnpartitionedMesh*/
+int chiCreateEmptyUnpartitionedMesh(lua_State* L)
+{
+  const std::string func_name = __FUNCTION__;
+
+  auto handler = chi_mesh::GetCurrentHandler();
+  handler->unpartitionedmesh_stack.push_back(
+    new chi_mesh::UnpartitionedMesh());
+
+  lua_pushnumber(L,
+    static_cast<lua_Number>(handler->unpartitionedmesh_stack.size()-1));
+
+  return 1;
+}
 
 //###################################################################
 /**Creates an unpartitioned mesh from VTK Unstructured mesh files.
@@ -39,7 +57,7 @@ chiVolumeMesherExecute()
 \return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromVTU(lua_State* L)
 {
-  const char func_name[] = "chiUnpartitionedMeshFromVTU";
+  const std::string func_name = __FUNCTION__;
   int num_args = lua_gettop(L);
   if (num_args < 1)
     LuaPostArgAmountError(func_name,1,num_args);
@@ -62,7 +80,8 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
   auto handler = chi_mesh::GetCurrentHandler();
   handler->unpartitionedmesh_stack.push_back(new_object);
 
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,
+    static_cast<lua_Number>(handler->unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -98,7 +117,7 @@ chiVolumeMesherExecute()
 \return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 {
-  const char func_name[] = "chiUnpartitionedMeshFromEnsightGold";
+  const std::string func_name = __FUNCTION__;
   int num_args = lua_gettop(L);
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
@@ -120,7 +139,8 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
   auto handler = chi_mesh::GetCurrentHandler();
   handler->unpartitionedmesh_stack.push_back(new_object);
 
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,
+    static_cast<lua_Number>(handler->unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -154,7 +174,7 @@ chiVolumeMesherExecute()
 \return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
 {
-  const char func_name[] = "chiUnpartitionedMeshFromWavefrontOBJ";
+  const std::string func_name = __FUNCTION__;
   int num_args = lua_gettop(L);
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
@@ -173,7 +193,8 @@ int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
   auto handler = chi_mesh::GetCurrentHandler();
   handler->unpartitionedmesh_stack.push_back(new_object);
 
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,
+    static_cast<lua_Number>(handler->unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -208,7 +229,7 @@ chiVolumeMesherExecute()
 \return A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromMshFormat(lua_State* L)
 {
-  const char func_name[] = "chiUnpartitionedMeshFromMshFormat";
+  const std::string func_name = __FUNCTION__;
   int num_args = lua_gettop(L);
   if (num_args <1)
     LuaPostArgAmountError(func_name,1,num_args);
@@ -227,7 +248,8 @@ int chiUnpartitionedMeshFromMshFormat(lua_State* L)
   auto handler = chi_mesh::GetCurrentHandler();
   handler->unpartitionedmesh_stack.push_back(new_object);
 
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,
+    static_cast<lua_Number>(handler->unpartitionedmesh_stack.size()-1));
 
   return 1;
 }

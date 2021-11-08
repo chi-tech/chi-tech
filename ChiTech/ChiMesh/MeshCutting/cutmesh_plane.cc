@@ -75,7 +75,7 @@ void chi_mesh::mesh_cutting::
   // vertices lay on both sides of the plane.
   // So this algorithm just checks the sense wrt
   // the plane. Works for both 2D and 3D
-  std::vector<std::unique_ptr<chi_mesh::Cell>> cells_to_cut;
+  std::vector<chi_mesh::Cell*> cells_to_cut;
 
   for (auto& cell : mesh.local_cells)
   {
@@ -232,9 +232,10 @@ void chi_mesh::mesh_cutting::
     //====================================== Process cells that are cut
     for (auto& cell_ptr : cells_to_cut)
     {
-      auto& cell = *cell_ptr;
-
-      CutTetrahedron(cut_edges, cut_vertices, p, n, mesh, cell);
+      Cut3DCell(cut_edges, cut_vertices,
+                plane_point,plane_normal,
+                float_compare,
+                mesh,*cell_ptr);
     }//for cell_ptr
   }
 
