@@ -65,7 +65,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     size_t cf=0;
     for (auto& cur_cell_face : cell->faces)
     {
-      if (cur_cell_face.has_neighbor) continue;
+      if (cur_cell_face.has_neighbor) {++cf; continue;}
       const auto& cfvids = cell_faces_sets[cur_cell_id][cf];
 
       for (uint64_t adj_cell_id : cells_to_search)
@@ -75,7 +75,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
         size_t af=0;
         for (auto& adj_cell_face : adj_cell->faces)
         {
-          if (adj_cell_face.has_neighbor) continue;
+          if (adj_cell_face.has_neighbor) {++af; continue;}
           const auto& afvids = cell_faces_sets[adj_cell_id][af];
 
           if (cfvids == afvids)
