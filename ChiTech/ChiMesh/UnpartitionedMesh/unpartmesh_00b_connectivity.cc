@@ -34,23 +34,6 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     ++cur_cell_id;
   }
 
-  // Build face sets
-  typedef std::set<uint64_t> SetUInt64;
-  typedef std::vector<SetUInt64> FacesSets;
-  std::vector<FacesSets> cell_faces_sets(raw_cells.size());
-  {
-    uint64_t c = 0;
-    for (const auto& cell : raw_cells)
-    {
-      auto& facesSets = cell_faces_sets[c++];
-      facesSets.resize(cell->faces.size());
-      size_t f=0;
-      for (const auto& face : cell->faces)
-        facesSets[f++] = SetUInt64(face.vertex_ids.begin(),
-                                   face.vertex_ids.end());
-    }
-  }
-
   // Process raw cells
   std::set<size_t> cells_to_search; //This will be used and abused below
   cur_cell_id=0;
@@ -66,7 +49,8 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     for (auto& cur_cell_face : cell->faces)
     {
       if (cur_cell_face.has_neighbor) {++cf; continue;}
-      const auto& cfvids = cell_faces_sets[cur_cell_id][cf];
+      const std::set<uint64_t> cfvids(cur_cell_face.vertex_ids.begin(),
+                                      cur_cell_face.vertex_ids.end());
 
       for (uint64_t adj_cell_id : cells_to_search)
       {
@@ -76,7 +60,8 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
         for (auto& adj_cell_face : adj_cell->faces)
         {
           if (adj_cell_face.has_neighbor) {++af; continue;}
-          const auto& afvids = cell_faces_sets[adj_cell_id][af];
+          const std::set<uint64_t> afvids(adj_cell_face.vertex_ids.begin(),
+                                          adj_cell_face.vertex_ids.end());
 
           if (cfvids == afvids)
           {

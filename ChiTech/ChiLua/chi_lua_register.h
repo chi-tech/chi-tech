@@ -49,6 +49,7 @@ RegisterFunction(chiUnpartitionedMeshFromMshFormat)
 
 //module:Manual Unpartitioned Mesh
 RegisterFunction(chiCreateEmptyUnpartitionedMesh)
+RegisterFunction(chiDestroyUnpartitionedMesh)
 RegisterFunction(chiUnpartitionedMeshUploadVertex)
 RegisterFunction(chiUnpartitionedMeshUploadCell)
 RegisterFunction(chiUnpartitionedMeshFinalizeEmpty)

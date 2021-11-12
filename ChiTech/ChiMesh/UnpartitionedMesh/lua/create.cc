@@ -26,6 +26,42 @@ int chiCreateEmptyUnpartitionedMesh(lua_State* L)
 }
 
 //###################################################################
+/**Destroy an unpartitioned mesh.
+ *
+\param handle int Handle to mesh.
+
+\ingroup LuaUnpartitionedMesh*/
+int chiDestroyUnpartitionedMesh(lua_State* L)
+{
+  const std::string func_name = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(func_name, 1, num_args);
+
+  LuaCheckNilValue(func_name, L, 1);
+
+  const int handle = lua_tointeger(L, 1);
+
+  auto handler = chi_mesh::GetCurrentHandler();
+
+  chi_mesh::UnpartitionedMesh* mesh_ptr;
+
+  try{
+    mesh_ptr = handler->unpartitionedmesh_stack.at(handle);
+    if (mesh_ptr == nullptr) throw std::out_of_range("");
+  }//try
+  catch(const std::out_of_range& o) {
+    throw std::logic_error(func_name + ": Invalid mesh-handle (" +
+                           std::to_string(handle) + ").");
+  }
+
+  delete mesh_ptr;
+  handler->unpartitionedmesh_stack[handle] = nullptr;
+
+  return 0;
+}
+
+//###################################################################
 /**Creates an unpartitioned mesh from VTK Unstructured mesh files.
 
 \param file_name char Filename of the .vtu file.

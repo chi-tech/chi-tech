@@ -93,6 +93,12 @@ public:
                      int cell_num_faces,
                      int cell_material_id,
                      const std::vector<std::vector<uint64_t>>& proxy_faces);
+
+  ~UnpartitionedMesh()
+  {
+    for (auto& cell : raw_cells)          delete cell;
+    for (auto& cell : raw_boundary_cells) delete cell;
+  }
 };
 
 

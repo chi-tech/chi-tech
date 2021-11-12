@@ -16,7 +16,10 @@ chi_mesh::UnpartitionedMesh&
 
   chi_mesh::UnpartitionedMesh* mesh_ptr;
 
-  try{mesh_ptr = handler->unpartitionedmesh_stack.at(handle); }//try
+  try{
+    mesh_ptr = handler->unpartitionedmesh_stack.at(handle);
+    if (mesh_ptr == nullptr) throw std::out_of_range("");
+  }//try
   catch(const std::out_of_range& o) {
     throw std::logic_error(calling_function_name + ": Invalid mesh-handle (" +
                            std::to_string(handle) + ").");
