@@ -1,8 +1,7 @@
 #include "chi_meshcontinuum.h"
 #include <cinttypes>
 #include <fstream>
-#include "ChiMesh/Cell/cell_polyhedron.h"
-#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include "chi_mpi.h"
 #include "chi_log.h"
@@ -15,7 +14,7 @@ extern ChiLog& chi_log;
 void chi_mesh::MeshContinuum::
 ExportCellsToPython(const char* fileName, bool surface_only,
                     std::vector<int>* cell_flags,
-                    int options)
+                    int options) const
 {
   FILE* of = fopen(fileName,"w");
 
@@ -50,8 +49,8 @@ ExportCellsToPython(const char* fileName, bool surface_only,
   int num_faces=0;
   for (int lc=0; lc<local_cell_glob_indices.size(); lc++)
   {
-    int cell_g_index = local_cell_glob_indices[lc];
-    auto& cell = cells[cell_g_index];
+    uint64_t cell_g_index = local_cell_glob_indices[lc];
+    const auto& cell = cells[cell_g_index];
 
     if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
@@ -60,18 +59,17 @@ ExportCellsToPython(const char* fileName, bool surface_only,
 
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto& polyh_cell = (chi_mesh::CellPolyhedron&)cell;
       if (surface_only)
       {
-        for (int f=0; f<polyh_cell.faces.size(); f++)
+        for (int f=0; f<cell.faces.size(); f++)
         {
-          if (not polyh_cell.faces[f].has_neighbor)
+          if (not cell.faces[f].has_neighbor)
           {
             num_faces++;
           }
           else
           {
-            auto& adj_cell = cells[polyh_cell.faces[f].neighbor_id];
+            auto& adj_cell = cells[cell.faces[f].neighbor_id];
             if (adj_cell.partition_id != chi_mpi.location_id)
             {
               num_faces++;
@@ -80,7 +78,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         }
       }
       else
-        num_faces+=polyh_cell.faces.size();
+        num_faces+=cell.faces.size();
 
     }
   }
@@ -101,9 +99,8 @@ ExportCellsToPython(const char* fileName, bool surface_only,
     //################################################### POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto& poly_cell = (chi_mesh::CellPolygon&)cell;
       fprintf(of,"face_numverts[%d,0]=%lu   \n",cell_g_index,
-              poly_cell.vertex_ids.size());
+              cell.vertex_ids.size());
 
       bool flagged = false;
       if (cell_flags != nullptr)
@@ -122,27 +119,26 @@ ExportCellsToPython(const char* fileName, bool surface_only,
         }
       }
 
-      for (size_t v=0; v<poly_cell.vertex_ids.size(); v++)
+      for (size_t v=0; v<cell.vertex_ids.size(); v++)
       {
-        fprintf(of,"face_vertindi[%d][%lu]=%" PRIu64 "\n",cell_g_index,v,poly_cell.vertex_ids[v]);
+        fprintf(of,"face_vertindi[%d][%lu]=%" PRIu64 "\n",cell_g_index,v,cell.vertex_ids[v]);
       }
     }//polygon
 
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto& polyh_cell = (chi_mesh::CellPolyhedron&)cell;
       if (surface_only)
       {
-        for (int s=0; s< polyh_cell.faces.size(); s++)
+        for (int s=0; s< cell.faces.size(); s++)
         {
           bool export_face = false;
-          if (not polyh_cell.faces[s].has_neighbor)
+          if (not cell.faces[s].has_neighbor)
           {
             export_face = true;
           }
           else
           {
-            auto& adj_cell = cells[polyh_cell.faces[s].neighbor_id];
+            auto& adj_cell = cells[cell.faces[s].neighbor_id];
             if (adj_cell.partition_id != chi_mpi.location_id)
             {
               export_face = true;
@@ -153,7 +149,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           {
             f++;
             fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
-                    polyh_cell.faces[s].vertex_ids.size());
+                    cell.faces[s].vertex_ids.size());
 
             bool flagged = false;
             if (cell_flags != nullptr)
@@ -170,7 +166,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
             }
 
 
-            chi_mesh::CellFace& face = polyh_cell.faces[s];
+            const chi_mesh::CellFace& face = cell.faces[s];
 
             for (size_t v=0; v<face.vertex_ids.size(); v++)
             {
@@ -183,11 +179,11 @@ ExportCellsToPython(const char* fileName, bool surface_only,
       }
       else
       {
-        for (int s=0; s< polyh_cell.faces.size(); s++)
+        for (int s=0; s< cell.faces.size(); s++)
         {
           f++;
           fprintf(of,"face_numverts[%d,0]=%lu   \n",f,
-                  polyh_cell.faces[s].vertex_ids.size());
+                  cell.faces[s].vertex_ids.size());
 
           bool flagged = false;
           if (cell_flags != nullptr)
@@ -203,7 +199,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
             }
           }
 
-          chi_mesh::CellFace& face = polyh_cell.faces[s];
+          const chi_mesh::CellFace& face = cell.faces[s];
 
           for (size_t v=0; v<face.vertex_ids.size(); v++)
           {

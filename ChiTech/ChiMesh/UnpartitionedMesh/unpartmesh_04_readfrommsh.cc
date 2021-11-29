@@ -134,6 +134,22 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     return false;
   };
 
+  /**Lambda giving the cell subtype, given the MSH cell type.*/
+  auto CellTypeFromMSHTypeID = [](int element_type)
+  {
+    CellType cell_type = CellType::GHOST;
+
+    if      (element_type == 1) cell_type = CellType::SLAB;
+    else if (element_type == 2) cell_type = CellType::TRIANGLE;
+    else if (element_type == 3) cell_type = CellType::QUADRILATERAL;
+    else if (element_type == 4) cell_type = CellType::TETRAHEDRON;
+    else if (element_type == 5) cell_type = CellType::HEXAHEDRON;
+    else if (element_type == 6 or                                 //Prism
+             element_type == 7) cell_type = CellType::POLYHEDRON; //Pyramid
+
+    return cell_type;
+  };
+
   //================================================== Determine mesh type 2D/3D
   // Only 2D and 3D meshes are supported. If the mesh
   // is 1D then no elements will be read but the state
@@ -242,13 +258,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     {
       if (IsElementType1D(elem_type))
       {
-        raw_cell = new LightWeightCell(CellType::SLAB);
+        raw_cell = new LightWeightCell(CellType::SLAB, CellType::SLAB);
         raw_boundary_cells.push_back(raw_cell);
         chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_boundary_cells.";
       }
       else if (IsElementType2D(elem_type))
       {
-        raw_cell = new LightWeightCell(CellType::POLYGON);
+        raw_cell = new LightWeightCell(CellType::POLYGON,
+                                       CellTypeFromMSHTypeID(elem_type));
         raw_cells.push_back(raw_cell);
         chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_cells.";
       }
@@ -257,13 +274,15 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     {
       if (IsElementType2D(elem_type))
       {
-        raw_cell = new LightWeightCell(CellType::POLYGON);
+        raw_cell = new LightWeightCell(CellType::POLYGON,
+                                       CellTypeFromMSHTypeID(elem_type));
         raw_boundary_cells.push_back(raw_cell);
         chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_boundary_cells.";
       }
       else if (IsElementType3D(elem_type))
       {
-        raw_cell = new LightWeightCell(CellType::POLYHEDRON);
+        raw_cell = new LightWeightCell(CellType::POLYHEDRON,
+                                       CellTypeFromMSHTypeID(elem_type));
         raw_cells.push_back(raw_cell);
         chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_cells.";
       }
@@ -290,9 +309,9 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     else if (elem_type == 2 or elem_type == 3) //3-node triangle or 4-node quadrangle
     {
       size_t num_verts = cell.vertex_ids.size();
-      for (int e=0; e<num_verts; e++)
+      for (size_t e=0; e<num_verts; e++)
       {
-        int ep1 = (e<(num_verts-1))? e+1 : 0;
+        size_t ep1 = (e<(num_verts-1))? e+1 : 0;
         LightWeightFace face;
 
         face.vertex_ids = {cell.vertex_ids[e], cell.vertex_ids[ep1]};

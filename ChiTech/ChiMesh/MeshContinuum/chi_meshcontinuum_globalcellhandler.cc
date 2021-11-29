@@ -11,7 +11,7 @@ extern ChiLog& chi_log;
 void chi_mesh::GlobalCellHandler::
   push_back(chi_mesh::Cell *new_cell)
 {
-  if (new_cell->partition_id == chi_mpi.location_id)
+  if (new_cell->partition_id == static_cast<uint64_t>(chi_mpi.location_id))
   {
     local_cell_glob_indices.push_back(new_cell->global_id);
     size_t local_cell_index = local_cell_glob_indices.size() - 1;
@@ -33,7 +33,7 @@ void chi_mesh::GlobalCellHandler::
 }
 
 //###################################################################
-/**Returns a pointer to a cell given its global cell index.*/
+/**Returns a reference to a cell given its global cell index.*/
 chi_mesh::Cell& chi_mesh::GlobalCellHandler::
   operator[](uint64_t cell_global_index)
 {
@@ -57,8 +57,32 @@ chi_mesh::Cell& chi_mesh::GlobalCellHandler::
 }
 
 //###################################################################
+/**Returns a const reference to a cell given its global cell index.*/
+const chi_mesh::Cell& chi_mesh::GlobalCellHandler::
+  operator[](uint64_t cell_global_index) const
+{
+  auto native_location = global_cell_id_to_native_id_map.find(cell_global_index);
+
+  if (native_location != global_cell_id_to_native_id_map.end())
+    return *native_cells[native_location->second];
+  else
+  {
+    auto foreign_location = global_cell_id_to_foreign_id_map.find(cell_global_index);
+    if (foreign_location != global_cell_id_to_foreign_id_map.end())
+      return *foreign_cells[foreign_location->second];
+  }
+
+  std::stringstream ostr;
+  ostr << "chi_mesh::MeshContinuum::cells. Mapping error."
+       << "\n"
+       << cell_global_index;
+
+  throw std::invalid_argument(ostr.str());
+}
+
+//###################################################################
 /**Returns the total number of global cells.*/
-size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells()
+size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells() const
 {
   size_t num_local_cells = native_cells.size();
   size_t num_globl_cells = 0;

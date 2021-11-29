@@ -14,39 +14,22 @@ public:
   void Execute() override;
 
   static
-  int GetPartitionIDFromCentroid(const chi_mesh::Vertex& centroid);
-
-  static
-  bool IsRawCellNeighborToPartitionKBA(
-    const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell);
-
-  static
-  void KBA(chi_mesh::UnpartitionedMesh* umesh,
-           chi_mesh::MeshContinuumPtr& grid);
-
-  static
-  bool IsRawCellNeighborToPartitionParmetis(
+  bool CellHasLocalScope(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& lwcell,
-    const std::vector<int64_t>& cell_pids);
+    uint64_t cell_global_id,
+    const std::vector<std::set<uint64_t>>& vertex_subscriptions,
+    const std::vector<int64_t>& cell_partition_ids);
 
   static
-  void PARMETIS(chi_mesh::UnpartitionedMesh* umesh,
-                chi_mesh::MeshContinuumPtr& grid);
+  std::vector<int64_t> KBA(const chi_mesh::UnpartitionedMesh& umesh);
 
   static
-  void AddSlabToGrid(
+  std::vector<int64_t> PARMETIS(const UnpartitionedMesh &umesh);
+
+  static chi_mesh::Cell* MakeCell(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
-    const chi_mesh::Cell& temp_cell,
-    chi_mesh::MeshContinuum& grid);
-  static
-  void AddPolygonToGrid(
-    const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
-    const chi_mesh::Cell& temp_cell,
-    chi_mesh::MeshContinuum& grid);
-  static
-  void AddPolyhedronToGrid(
-    const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
-    const chi_mesh::Cell& temp_cell,
-    chi_mesh::MeshContinuum& grid);
+    uint64_t global_id,
+    uint64_t partition_id,
+    const std::vector<chi_mesh::Vector3>& vertices);
 };
 #endif //VOLMESHER_PREDEFUNPART_H

@@ -1,5 +1,7 @@
 #include "pwl_polyhedron.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -10,7 +12,7 @@ extern ChiLog& chi_log;
  * */
 PolyhedronMappingFE_PWL::
   PolyhedronMappingFE_PWL(
-    const chi_mesh::CellPolyhedron& polyh_cell,
+    const chi_mesh::Cell& polyh_cell,
     const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
     const chi_math::QuadratureTetrahedron& volume_quadrature,
     const chi_math::QuadratureTriangle&    surface_quadrature):
@@ -37,18 +39,17 @@ PolyhedronMappingFE_PWL::
 
     const chi_mesh::Vertex& vfc = face.centroid;
 
-    //==================================== Build edges
-    std::vector<std::vector<int>> edges = polyh_cell.GetFaceEdges(f);
-
     //==================================== For each edge
-    face_f_data.sides.reserve(edges.size());
-    for (auto& edge : edges)
+    const size_t num_edges = face.vertex_ids.size();
+    face_f_data.sides.reserve(num_edges);
+    for (size_t e=0; e<num_edges; ++e)
     {
       FEside_data3d side_data;
 
       //============================= Assign vertices of tetrahedron
-      int v0index = edge[0];
-      int v1index = edge[1];
+      size_t ep1 = (e < (num_edges-1))? e+1 : 0;
+      uint64_t v0index = face.vertex_ids[e  ];
+      uint64_t v1index = face.vertex_ids[ep1];
       side_data.v_index.resize(2,-1);
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;

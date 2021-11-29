@@ -1,5 +1,7 @@
 #include "pwl_polygon.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 //###################################################################
 /**Returns the value of the shape function given cartesian
  * coordinates.*/

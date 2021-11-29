@@ -52,6 +52,20 @@ struct chi_mesh::Vector3
     return *this;
   }
 
+  Vector3& operator=(std::initializer_list<double> list)
+  {
+    if (not empty(list))
+    {
+      std::vector<double> vec = list;
+      for (size_t i=0; ( (i<3) and ( i<vec.size() ) ); ++i)
+      {
+        this->operator()(i) = vec[i];
+      }
+    }
+
+    return *this;
+  }
+
   //============================================= Addition
   /**Component-wise addition of two vectors.
    * \f$ \vec{w} = \vec{x} + \vec{y} \f$*/
@@ -219,9 +233,9 @@ struct chi_mesh::Vector3
 
   //============================================= Element access
   /**Returns a copy of the value at the given index.*/
-  double operator[](const int i) const
+  double operator[](const size_t i) const
   {
-         if (i==0) return this->x;
+    if (i==0)      return this->x;
     else if (i==1) return this->y;
     else if (i==2) return this->z;
 
@@ -229,7 +243,7 @@ struct chi_mesh::Vector3
   }
 
   /**Returns a reference of the value at the given index.*/
-  double& operator()(const int i)
+  double& operator()(const size_t i)
   {
     if (i==0)      return this->x;
     else if (i==1) return this->y;
@@ -288,7 +302,7 @@ struct chi_mesh::Vector3
   /**Computes the square of the L2-norm of the vector. This eliminates the
    * usage of the square root and is therefore less expensive that a proper
    * L2-norm. Useful if only comparing distances.*/
-  double NormSquare()
+  double NormSquare() const
   {
     double value = 0.0;
     value += this->x*this->x;
@@ -365,7 +379,7 @@ struct chi_mesh::Vector3
   }
 
   /**Prints the vector to std::cout.*/
-  void Print()
+  void Print() const
   {
     std::cout<<this->x << " ";
     std::cout<<this->y << " ";
@@ -379,8 +393,17 @@ struct chi_mesh::Vector3
     return out;
   }
 
+  /**Deprecated. Prints the vector to a string and then returns the string.*/
+  std::string PrintS() const //TODO: Deprecated
+  {
+    std::stringstream out;
+    out << "[" << x << " " << y << " " << z << "]";
+
+    return out.str();
+  }
+
   /**Prints the vector to a string and then returns the string.*/
-  std::string PrintS() const
+  std::string PrintStr() const
   {
     std::stringstream out;
     out << "[" << x << " " << y << " " << z << "]";

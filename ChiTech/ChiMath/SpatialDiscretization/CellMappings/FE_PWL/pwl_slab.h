@@ -3,7 +3,7 @@
 
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 #include "ChiMath/Quadratures/quadrature_line.h"
-#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell.h"
 
 //###################################################################
 /**Object for handling slab shaped piecewise linear shape functions.*/
@@ -19,7 +19,7 @@ private:
 public:
 
   /**Constructor for a slab view.*/
-  SlabMappingFE_PWL(const chi_mesh::CellSlab& slab_cell,
+  SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
                     const chi_mesh::MeshContinuumPtr& ref_grid,
                     const chi_math::QuadratureLine& volume_quadrature);
 

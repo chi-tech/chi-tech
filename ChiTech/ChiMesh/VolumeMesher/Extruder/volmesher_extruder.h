@@ -1,8 +1,8 @@
 #ifndef VOLUME_MESHER_EXTRUDER_H
 #define VOLUME_MESHER_EXTRUDER_H
 
-#include "../chi_volumemesher.h"
-#include "ChiMesh/Cell/cell_polygon.h"
+#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
+#include "ChiMesh/Cell/cell.h"
 
 
 
@@ -29,7 +29,7 @@ private:
 public:
   std::vector<MeshLayer> input_layers;
   std::vector<double> vertex_layers;
-  int node_z_index_incr=0;
+  size_t node_z_index_incr=0;
 
 public:
   explicit
@@ -42,34 +42,35 @@ public:
     template_type(TemplateType::UNPARTITIONED_MESH),
     template_unpartitioned_mesh(in_unpartitioned_mesh)
   {}
-  //02
+
   void Execute() override;
-  //03
-  //ReorderDOFs
-  //04
+
+private:
+  //utils
   void SetupLayers(int default_layer_count=1);
+
+  chi_mesh::Vector3 ProjectCentroidToLevel(const chi_mesh::Vector3& centroid,
+                                           size_t level);
+  int GetCellKBAPartitionIDFromCentroid(chi_mesh::Vector3& centroid);
+
+
+  bool HasLocalScope(
+    const chi_mesh::Cell& template_cell,
+    const chi_mesh::MeshContinuum& template_continuum,
+    size_t z_level);
+
+  chi_mesh::Cell* MakeExtrudedCell(const chi_mesh::Cell& template_cell,
+                                   const chi_mesh::MeshContinuum& grid,
+                                   size_t z_level,
+                                   uint64_t cell_global_id,
+                                   int partition_id,
+                                   size_t num_template_cells);
 
   void CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
                         chi_mesh::MeshContinuum& grid);
 
   void ExtrudeCells(chi_mesh::MeshContinuum& template_grid,
                     chi_mesh::MeshContinuum& grid);
-
-  //utils
-  chi_mesh::Vector3 ComputeTemplateCell3DCentroid(
-                      const chi_mesh::CellPolygon& n_template_cell,
-                      const chi_mesh::MeshContinuum& template_continuum,
-                      int z_level_begin,int z_level_end);
-
-  int GetCellPartitionIDFromCentroid(chi_mesh::Vector3& centroid);
-
-  bool IsTemplateCellNeighborToThisPartition(
-    const chi_mesh::CellPolygon& template_cell,
-    const chi_mesh::MeshContinuum& template_continuum,
-    int z_level, int tc_index);
-
-
-
 
 };
 

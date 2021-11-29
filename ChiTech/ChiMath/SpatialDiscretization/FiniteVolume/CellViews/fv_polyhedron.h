@@ -2,8 +2,8 @@
 #define FV_POLYHEDRON_VALUES_H
 
 #include "fv_cellbase.h"
-#include <ChiMesh/Cell/cell_polyhedron.h>
-#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
+#include "ChiMesh/Cell/cell.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //################################################################### Class def
 /**Finite Volume implementation for a polyhedron.
@@ -13,40 +13,36 @@
  *   tetrahedron forming a sides.*/
 class PolyhedronFVValues : public CellFVValues
 {
-private:
-  chi_mesh::MeshContinuumPtr grid;
-
 public:
   std::vector<std::vector<double>>           face_side_area;
   std::vector<std::vector<double>>           face_side_volume;
   std::vector<std::vector<std::vector<chi_mesh::Vector3>>> face_side_vectors;
 
-  PolyhedronFVValues(chi_mesh::CellPolyhedron* polyh_cell,
-                     chi_mesh::MeshContinuumPtr vol_continuum) :
-    CellFVValues(polyh_cell->vertex_ids.size())
+  PolyhedronFVValues(const chi_mesh::Cell& polyh_cell,
+                     const chi_mesh::MeshContinuum& grid) :
+    CellFVValues(polyh_cell.vertex_ids.size())
   {
-    grid = vol_continuum;
-
     volume = 0.0;
-    chi_mesh::Vector3& vcc = polyh_cell->centroid;
+    auto& vcc = polyh_cell.centroid;
 
-    int num_faces = polyh_cell->faces.size();
+    size_t num_faces = polyh_cell.faces.size();
     face_side_vectors.resize(num_faces);
     face_side_area.resize(num_faces);
     face_side_volume.resize(num_faces);
     face_area.resize(num_faces,0.0);
-    for (int f=0; f<num_faces; f++)
+    for (size_t f=0; f<num_faces; f++)
     {
-      std::vector<std::vector<int>> edges = polyh_cell->GetFaceEdges(f);
-
-      for (auto edge : edges)
+      const auto& face = polyh_cell.faces[f];
+      const size_t num_edges = face.vertex_ids.size();
+      for (size_t e=0; e<num_edges; ++e)
       {
-        int v0i = edge[0];
-        int v1i = edge[1];
+        size_t ep1 = (e < (num_edges-1))? e+1 : 0;
+        uint64_t v0i = face.vertex_ids[e  ];
+        uint64_t v1i = face.vertex_ids[ep1];
 
-        const auto& v0 = grid->vertices[v0i];
-        const auto& v1 = polyh_cell->faces[f].centroid;
-        const auto& v2 = grid->vertices[v1i];
+        const auto& v0 = grid.vertices[v0i];
+        const auto& v1 = polyh_cell.faces[f].centroid;
+        const auto& v2 = grid.vertices[v1i];
         const auto& v3 = vcc;
 
         std::vector<chi_mesh::Vector3> side_legs(3);
@@ -73,8 +69,6 @@ public:
 
         face_side_volume[f].emplace_back(side_volume);
         volume += side_volume;
-
-
       }//for edge
 
     }//for face

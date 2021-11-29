@@ -39,6 +39,7 @@ private:
 public:
   void push_back(chi_mesh::Cell* new_cell);
   chi_mesh::Cell& operator[](uint64_t cell_global_index);
+  const chi_mesh::Cell& operator[](uint64_t cell_global_index) const;
 
   size_t GetNumGhosts() {return global_cell_id_to_foreign_id_map.size();}
 

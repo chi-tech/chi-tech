@@ -1,5 +1,8 @@
 #include "volmesher_extruder.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
+
 #include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
@@ -7,43 +10,68 @@ extern ChiMPI& chi_mpi;
 extern ChiLog& chi_log;
 
 //###################################################################
-/**Computes the partition id of a template cell's projection onto 3D.*/
-chi_mesh::Vector3
-chi_mesh::VolumeMesherExtruder::ComputeTemplateCell3DCentroid(
-  const chi_mesh::CellPolygon& n_template_cell,
-  const chi_mesh::MeshContinuum& template_continuum,
-  int z_level_begin,int z_level_end)
+/** Creates actual z-levels for the input layer specification.*/
+void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
 {
-  chi_mesh::Vector3 n_centroid_precompd;
-  size_t tc_num_verts = n_template_cell.vertex_ids.size();
-
-  for (auto tc_vid : n_template_cell.vertex_ids)
+  //================================================== Create default layers if no
+  //                                                   input layers are provided
+  if (input_layers.empty())
   {
-    auto temp_vert = template_continuum.vertices[tc_vid];
-    temp_vert.z = vertex_layers[z_level_begin];
-    n_centroid_precompd = n_centroid_precompd + temp_vert;
+    chi_log.Log(LOG_0WARNING)
+      << "VolumeMesherExtruder: No extrusion layers have been specified. "
+      << "A default single layer will be used with height 1.0 and a single "
+      << "subdivision.";
+    double dz = 1.0/default_layer_count;
+    for (int k=0; k<=default_layer_count; k++)
+    {
+      vertex_layers.push_back(k*dz);
+    }
+  }
+  else
+  {
+    double last_z=0.0;
+    vertex_layers.push_back(last_z);
+
+    for (const auto& input_layer : input_layers)
+    {
+      double dz = input_layer.height/input_layer.sub_divisions;
+
+      for (int k=0; k<input_layer.sub_divisions; k++)
+      {
+        last_z += dz;
+        vertex_layers.push_back(last_z);
+      }
+    }
   }
 
-  for (auto tc_vid : n_template_cell.vertex_ids)
-  {
-    auto temp_vert = template_continuum.vertices[tc_vid];
-    temp_vert.z = vertex_layers[z_level_end];
-    n_centroid_precompd = n_centroid_precompd + temp_vert;
-  }
-  n_centroid_precompd = n_centroid_precompd/(2*(double)tc_num_verts);
+  chi_log.Log(LOG_0)
+    << "VolumeMesherExtruder: Total number of cell layers is "
+    << vertex_layers.size()-1;
+}
 
-  return n_centroid_precompd;
+//###################################################################
+/**Projects a centroid to an extruded equivalent layer.*/
+chi_mesh::Vector3 chi_mesh::VolumeMesherExtruder::
+  ProjectCentroidToLevel(const chi_mesh::Vector3 &centroid,
+                         const size_t level)
+{
+  double z_location = 0.5 * (vertex_layers[level] + vertex_layers[level+1]);
+
+  auto centroid_projected = centroid;
+  centroid_projected.z = z_location;
+
+  return centroid_projected;
 }
 
 //###################################################################
 /**Computes a cell's partition id based on a centroid.*/
 int chi_mesh::VolumeMesherExtruder::
-GetCellPartitionIDFromCentroid(chi_mesh::Vector3& centroid)
+  GetCellKBAPartitionIDFromCentroid(chi_mesh::Vector3& centroid)
 {
   int px = options.partition_x;
   int py = options.partition_y;
 
-  chi_mesh::Cell n_gcell(chi_mesh::CellType::GHOST);
+  chi_mesh::Cell n_gcell(CellType::GHOST, CellType::GHOST);
   n_gcell.centroid = centroid;
 
   auto xyz_partition_indices = GetCellXYZPartitionID(&n_gcell);
@@ -55,74 +83,227 @@ GetCellPartitionIDFromCentroid(chi_mesh::Vector3& centroid)
   return nzi*px*py + nyi*px + nxi;
 }
 
+
 //###################################################################
-/**Determines if a template cell is neighbor to the current partition.*/
+/**Determines if a template cell is in the current partition or a
+ * direct neighbor to the current partition.*/
 bool chi_mesh::VolumeMesherExtruder::
-IsTemplateCellNeighborToThisPartition(
-  const chi_mesh::CellPolygon& template_cell,
-  const chi_mesh::MeshContinuum& template_continuum,
-  int z_level,int tc_index)
+  HasLocalScope(
+    const chi_mesh::Cell& template_cell,
+    const chi_mesh::MeshContinuum& template_continuum,
+    size_t z_level)
 {
-  int iz = z_level;
-  int tc = tc_index;
-
-  //========================= Loop over template cell neighbors
-  //                          for side neighbors
-  bool is_neighbor_to_partition = false;
-  for (auto& tc_face : template_cell.faces)
+  //======================================== Check if the template cell
+  //                                         is in the current partition
   {
-    if (tc_face.has_neighbor)
+    auto& centroid = template_cell.centroid;
+    auto projected_centroid = ProjectCentroidToLevel(centroid, z_level);
+    int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
+    if (pid == chi_mpi.location_id)
+      return true;
+  }
+
+  const size_t last_z_level = vertex_layers.size() - 1;
+  const size_t z_level_below = z_level - 1;
+  const size_t z_level_above = z_level + 1;
+
+  //======================================== Build z-levels to search
+  std::vector<size_t> z_levels_to_search;
+  z_levels_to_search.reserve(3);
+
+                                   z_levels_to_search.push_back(z_level);
+  if (z_level != 0)                z_levels_to_search.push_back(z_level_below);
+  if (z_level != (last_z_level-1)) z_levels_to_search.push_back(z_level_above);
+
+  //======================================== Search template cell's
+  //                                         lateral neighbors
+  const auto& vertex_subs =
+    template_unpartitioned_mesh->vertex_cell_subscriptions;
+  for (uint64_t vid : template_cell.vertex_ids)
+    for (uint64_t cid : vertex_subs[vid])
     {
-      auto n_template_cell = (chi_mesh::CellPolygon&)(
-        template_continuum.local_cells[tc_face.neighbor_id]);
+      if (cid == template_cell.local_id) continue;
 
-      auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
-        n_template_cell, template_continuum, iz, iz+1);
+      auto& candidate_cell =
+        template_continuum.local_cells[cid];
+      auto& cc_centroid = candidate_cell.centroid;
 
-      int n_gcell_partition_id =
-        GetCellPartitionIDFromCentroid(n_centroid_precompd);
-
-      if (n_gcell_partition_id == chi_mpi.location_id)
+      for (size_t z : z_levels_to_search)
       {
-        is_neighbor_to_partition = true;
-        break;
+        auto projected_centroid = ProjectCentroidToLevel(cc_centroid, z);
+        int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
+        if (pid == chi_mpi.location_id)
+          return true;
       }
-    }//if neighbor not border
-  }//for neighbors
+    }//for cid
 
-  //========================= Now look at bottom neighbor
-  //Bottom face
-  if (iz != 0)
+  //======================================== Search template cell's
+  //                                         longitudinal neighbors
+  for (size_t z : z_levels_to_search)
   {
-    auto n_template_cell = (chi_mesh::CellPolygon&)
-      (template_continuum.local_cells[tc]);
+    if (z == z_level) continue;
 
-    auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
-      n_template_cell, template_continuum, iz-1, iz);
+    auto projected_centroid = ProjectCentroidToLevel(template_cell.centroid, z);
+    int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
+    if (pid == chi_mpi.location_id)
+      return true;
+  }//for z
 
-    int n_gcell_partition_id =
-      GetCellPartitionIDFromCentroid(n_centroid_precompd);
+  return false;
+}
 
-    if (n_gcell_partition_id == chi_mpi.location_id)
-      is_neighbor_to_partition = true;
-  }//if neighbor not border
+//###################################################################
+/**Makes an extruded cell from a template cell.*/
+chi_mesh::Cell* chi_mesh::VolumeMesherExtruder::
+  MakeExtrudedCell(const chi_mesh::Cell &template_cell,
+                   const chi_mesh::MeshContinuum &grid,
+                   size_t z_level,
+                   uint64_t cell_global_id,
+                   int partition_id,
+                   size_t num_template_cells)
+{
+  const size_t tc_num_verts = template_cell.vertex_ids.size();
 
-  //========================= Now look at top neighbor
-  //Top Face
-  if (iz != (vertex_layers.size()-2))
+  //========================================= Create polyhedron
+  auto cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
+  cell->global_id    = cell_global_id;
+  //cell->local_id set when added to mesh
+  cell->partition_id = partition_id;
+  cell->centroid = ProjectCentroidToLevel(template_cell.centroid, z_level);
+
+  //========================================= Populate cell v-indices
+  cell->vertex_ids.reserve(2*tc_num_verts);
+  for (auto tc_vid : template_cell.vertex_ids)
+    cell->vertex_ids.push_back(tc_vid + z_level*node_z_index_incr);
+
+  for (auto tc_vid : template_cell.vertex_ids)
+    cell->vertex_ids.push_back(tc_vid + (z_level+1)*node_z_index_incr);
+
+
+  //========================================= Create side faces
+  for (auto& face : template_cell.faces)
   {
-    auto n_template_cell = (chi_mesh::CellPolygon&)
-      (template_continuum.local_cells[tc]);
+    chi_mesh::CellFace newFace;
 
-    auto n_centroid_precompd = ComputeTemplateCell3DCentroid(
-      n_template_cell, template_continuum, iz+1, iz+2);
+    newFace.vertex_ids.resize(4,-1);
+    newFace.vertex_ids[0] = face.vertex_ids[0] + z_level*node_z_index_incr;
+    newFace.vertex_ids[1] = face.vertex_ids[1] + z_level*node_z_index_incr;
+    newFace.vertex_ids[2] = face.vertex_ids[1] + (z_level+1)*node_z_index_incr;
+    newFace.vertex_ids[3] = face.vertex_ids[0] + (z_level+1)*node_z_index_incr;
 
-    int n_gcell_partition_id =
-      GetCellPartitionIDFromCentroid(n_centroid_precompd);
+    //Compute centroid
+    const auto& v0 = grid.vertices[newFace.vertex_ids[0]];
+    const auto& v1 = grid.vertices[newFace.vertex_ids[1]];
+    const auto& v2 = grid.vertices[newFace.vertex_ids[2]];
+    const auto& v3 = grid.vertices[newFace.vertex_ids[3]];
 
-    if (n_gcell_partition_id == chi_mpi.location_id)
-      is_neighbor_to_partition = true;
-  }//if neighbor not border
+    chi_mesh::Vertex vfc = (v0+v1+v2+v3)/4.0;
+    newFace.centroid = vfc;
 
-  return is_neighbor_to_partition;
+    //Compute normal
+    chi_mesh::Vector3 va = v0 - vfc;
+    chi_mesh::Vector3 vb = v1 - vfc;
+
+    chi_mesh::Vector3 vn = va.Cross(vb);
+
+    newFace.normal = (vn/vn.Norm());
+
+    //Set neighbor
+    //The side connections have the same connections as the
+    //template cell + the z_level specifiers of the layer.
+    if (face.has_neighbor)
+    {
+      newFace.neighbor_id = face.neighbor_id +
+                            z_level*num_template_cells;
+      newFace.has_neighbor = true;
+    }
+    else
+      newFace.neighbor_id = face.neighbor_id;
+
+    cell->faces.push_back(newFace);
+  } //for side faces
+
+  //========================================= Create top and bottom faces
+  //=============================== Bottom face
+  {
+    chi_mesh::CellFace newFace;
+    //Vertices
+    auto vfc = chi_mesh::Vertex(0.0,0.0,0.0);
+    newFace.vertex_ids.reserve(tc_num_verts);
+    for (int tv=(static_cast<int>(tc_num_verts)-1); tv>=0; tv--)
+    {
+      newFace.vertex_ids.push_back(template_cell.vertex_ids[tv]
+                                   + z_level*node_z_index_incr);
+      const auto& v = grid.vertices[newFace.vertex_ids.back()];
+      vfc = vfc + v;
+    }
+
+    //Compute centroid
+    vfc = vfc/static_cast<double>(tc_num_verts);
+    newFace.centroid = vfc;
+
+    //Compute normal
+    auto va = grid.vertices[newFace.vertex_ids[0]] - vfc;
+    auto vb = grid.vertices[newFace.vertex_ids[1]] - vfc;
+
+    auto vn = va.Cross(vb);
+    newFace.normal = vn/vn.Norm();
+
+    //Set neighbor
+    if (z_level==0)
+    {
+      newFace.neighbor_id = 0;
+      newFace.has_neighbor = false;
+    }
+    else
+    {
+      newFace.neighbor_id = template_cell.local_id +
+        (z_level-1)*num_template_cells;
+      newFace.has_neighbor = true;
+    }
+
+    cell->faces.push_back(newFace);
+  }
+
+  //=============================== Top face
+  {
+    chi_mesh::CellFace newFace;
+    //Vertices
+    auto vfc = chi_mesh::Vertex(0.0,0.0,0.0);
+    newFace.vertex_ids.reserve(tc_num_verts);
+    for (auto tc_vid : template_cell.vertex_ids)
+    {
+      newFace.vertex_ids.push_back(tc_vid + (z_level+1)*node_z_index_incr);
+      const auto& v = grid.vertices[newFace.vertex_ids.back()];
+      vfc = vfc + v;
+    }
+
+    //Compute centroid
+    vfc = vfc/static_cast<double>(tc_num_verts);
+    newFace.centroid = vfc;
+
+    //Compute normal
+    auto va = grid.vertices[newFace.vertex_ids[0]] - vfc;
+    auto vb = grid.vertices[newFace.vertex_ids[1]] - vfc;
+
+    auto vn = va.Cross(vb);
+    newFace.normal = vn/vn.Norm();
+
+    //Set neighbor
+    if (z_level==(vertex_layers.size()-2))
+    {
+      newFace.neighbor_id = 0;
+      newFace.has_neighbor = false;
+    }
+    else
+    {
+      newFace.neighbor_id = template_cell.local_id +
+        (z_level+1)*num_template_cells;
+      newFace.has_neighbor = true;
+    }
+
+    cell->faces.push_back(newFace);
+  }
+
+  return cell;
 }

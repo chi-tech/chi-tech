@@ -1,5 +1,7 @@
-#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
 #include "cell.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include "ChiDataTypes/byte_array.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
@@ -8,22 +10,73 @@ extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
 //###################################################################
+/**Provides the text name associated with a cell type.*/
+std::string chi_mesh::CellTypeName(const CellType type)
+{
+  switch (type)
+  {
+    case CellType::GHOST:               return "GHOST";
+    case CellType::SLAB:                return "SLAB";
+//    case CellType::SPHERICAL_SHELL:     return "SPHERICAL_SHELL";
+//    case CellType::CYLINDRICAL_ANNULUS: return "CYLINDRICAL_ANNULUS";
+    case CellType::TRIANGLE:            return "TRIANGLE";
+    case CellType::QUADRILATERAL:       return "QUADRILATERAL";
+    case CellType::POLYGON:             return "POLYGON";
+    case CellType::TETRAHEDRON:         return "TETRAHEDRON";
+    case CellType::HEXAHEDRON:          return "HEXAHEDRON";
+    case CellType::POLYHEDRON:          return "POLYHEDRON";
+    default: return "NONE";
+  }
+}
+
+//###################################################################
+/**Copy constructor*/
+chi_mesh::Cell::Cell(const Cell &other) :
+  cell_type(other.cell_type),
+  cell_sub_type(other.cell_sub_type),
+  global_id(other.global_id),
+  local_id(other.local_id),
+  partition_id(other.partition_id),
+  centroid(other.centroid),
+  material_id(other.material_id),
+  vertex_ids(other.vertex_ids),
+  faces(other.faces)
+{
+}
+
+//###################################################################
+/**Move constructor*/
+chi_mesh::Cell::Cell(Cell &&other) noexcept :
+  cell_type(other.cell_type),
+  cell_sub_type(other.cell_sub_type),
+  global_id(other.global_id),
+  local_id(other.local_id),
+  partition_id(other.partition_id),
+  centroid(other.centroid),
+  material_id(other.material_id),
+  vertex_ids(std::move(other.vertex_ids)),
+  faces(std::move(other.faces))
+{
+}
+
+
+//###################################################################
 /**Determines the neighbor's partition and whether its local or not.*/
 bool chi_mesh::CellFace::
-  IsNeighborLocal(chi_mesh::MeshContinuum& grid) const
+  IsNeighborLocal(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return false;
   if (chi_mpi.process_count == 1) return true;
 
   auto& adj_cell = grid.cells[neighbor_id];
 
-  return (adj_cell.partition_id == chi_mpi.location_id);
+  return (adj_cell.partition_id == static_cast<uint64_t>(chi_mpi.location_id));
 }
 
 //###################################################################
 /**Determines the neighbor's partition.*/
 int chi_mesh::CellFace::
-  GetNeighborPartitionID(chi_mesh::MeshContinuum& grid) const
+  GetNeighborPartitionID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return 0;
@@ -36,7 +89,7 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's local id.*/
 int chi_mesh::CellFace::
-  GetNeighborLocalID(chi_mesh::MeshContinuum& grid) const
+  GetNeighborLocalID(const chi_mesh::MeshContinuum& grid) const
 {
   if (not has_neighbor) return -1;
   if (chi_mpi.process_count == 1) return neighbor_id; //cause global_ids=local_ids
@@ -52,7 +105,7 @@ int chi_mesh::CellFace::
 //###################################################################
 /**Determines the neighbor's associated face.*/
 int chi_mesh::CellFace::
-  GetNeighborAssociatedFace(chi_mesh::MeshContinuum& grid) const
+  GetNeighborAssociatedFace(const chi_mesh::MeshContinuum& grid) const
 {
   const auto& cur_face = *this; //just for readability
   //======================================== Check index validity
@@ -94,7 +147,7 @@ int chi_mesh::CellFace::
       << "Reference face with centroid at: "
       << cur_face.centroid.PrintS() << "\n"
       << "Adjacent cell: " << adj_cell.global_id << "\n";
-    for (int afi=0; afi < adj_cell.faces.size(); afi++)
+    for (size_t afi=0; afi < adj_cell.faces.size(); afi++)
     {
       outstr
         << "Adjacent cell face " << afi << " centroid "
@@ -124,7 +177,7 @@ double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum& grid) const
     double area = 0.0;
     auto& v2 = centroid;
     const auto num_verts = vertex_ids.size();
-    for (int v=0; v<num_verts; ++v)
+    for (uint64_t v=0; v<num_verts; ++v)
     {
       uint64_t vid0 = vertex_ids[v];
       uint64_t vid1 = (v < (num_verts-1))? vertex_ids[v+1] : vertex_ids[0];
@@ -146,4 +199,160 @@ double chi_mesh::CellFace::ComputeFaceArea(chi_mesh::MeshContinuum& grid) const
     return area;
   }
 
+}
+
+//###################################################################
+/**Serializes a face into a vector of bytes.*/
+chi_data_types::ByteArray chi_mesh::CellFace::Serialize() const
+{
+  chi_data_types::ByteArray raw;
+
+  raw.Write<size_t>(vertex_ids.size());
+  for (uint64_t vid : vertex_ids)
+    raw.Write<uint64_t>(vid);
+
+  raw.Write<chi_mesh::Vector3>(normal);
+  raw.Write<chi_mesh::Vector3>(centroid);
+  raw.Write<bool>(has_neighbor);
+  raw.Write<uint64_t>(neighbor_id);
+
+  return raw;
+}
+
+//###################################################################
+/**Deserializes a face from a set of raw data*/
+chi_mesh::CellFace chi_mesh::CellFace::
+  DeSerialize(const chi_data_types::ByteArray& raw,
+              size_t& address)
+{
+
+  CellFace face;
+
+  const size_t num_face_verts = raw.Read<size_t>(address, &address);
+  face.vertex_ids.reserve(num_face_verts);
+  for (size_t fv=0; fv<num_face_verts; ++fv)
+    face.vertex_ids.push_back(raw.Read<uint64_t>(address, &address));
+
+  face.normal       = raw.Read<chi_mesh::Vector3>(address, &address);
+  face.centroid     = raw.Read<chi_mesh::Vector3>(address, &address);
+  face.has_neighbor = raw.Read<bool>             (address, &address);
+  face.neighbor_id  = raw.Read<uint64_t>         (address, &address);
+
+  return face;
+}
+
+
+//###################################################################
+/**Provides string information of the face.*/
+std::string chi_mesh::CellFace::ToString() const
+{
+  std::stringstream outstr;
+
+  outstr << "num_vertex_ids: " << vertex_ids.size() << "\n";
+  {
+    size_t counter=0;
+    for (uint64_t vid : vertex_ids)
+      outstr << "vid" << counter++ << ": " << vid << "\n";
+  }
+
+  outstr << "normal: " << normal.PrintS() << "\n";
+  outstr << "centroid: " << centroid.PrintS() << "\n";
+  outstr << "has_neighbor: " << has_neighbor << "\n";
+  outstr << "neighbor_id: " << neighbor_id << "\n";
+
+  return outstr.str();
+}
+
+
+//###################################################################
+/**Serializes a cell into a vector of bytes.*/
+chi_data_types::ByteArray chi_mesh::Cell::Serialize() const
+{
+  chi_data_types::ByteArray raw;
+
+  raw.Write<uint64_t>(global_id);
+  raw.Write<uint64_t>(local_id);
+  raw.Write<uint64_t>(partition_id);
+  raw.Write<chi_mesh::Vector3>(centroid);
+  raw.Write<int>(material_id);
+
+  raw.Write<CellType>(cell_type);
+  raw.Write<CellType>(cell_sub_type);
+
+  raw.Write<size_t>(vertex_ids.size());
+  for (uint64_t vid : vertex_ids)
+    raw.Write<uint64_t>(vid);
+
+  raw.Write<size_t>(faces.size());
+  for (const auto& face : faces)
+    raw.Append(face.Serialize());
+
+  return raw;
+}
+
+//###################################################################
+/**Deserializes a cell from a vector of bytes.*/
+chi_mesh::Cell chi_mesh::Cell::
+  DeSerialize(const chi_data_types::ByteArray& raw,
+              size_t& address)
+{
+  typedef chi_mesh::Vector3 Vec3;
+  auto cell_global_id = raw.Read<uint64_t>(address, &address);
+  auto cell_local_id  = raw.Read<uint64_t>(address, &address);
+  auto cell_prttn_id  = raw.Read<uint64_t>(address, &address);
+  auto cell_centroid  = raw.Read<Vec3>    (address, &address);
+  auto cell_matrl_id  = raw.Read<int>     (address, &address);
+
+  auto cell_type      = raw.Read<CellType>(address, &address);
+  auto cell_sub_type  = raw.Read<CellType>(address, &address);
+
+  Cell cell(cell_type, cell_sub_type);
+  cell.global_id    = cell_global_id;
+  cell.local_id     = cell_local_id;
+  cell.partition_id = cell_prttn_id;
+  cell.centroid     = cell_centroid;
+  cell.material_id  = cell_matrl_id;
+
+  auto num_vertex_ids = raw.Read<size_t>(address, &address);
+  cell.vertex_ids.reserve(num_vertex_ids);
+  for (size_t v=0; v<num_vertex_ids; ++v)
+    cell.vertex_ids.push_back(raw.Read<uint64_t>(address, &address));
+
+  auto num_faces = raw.Read<size_t>(address, &address);
+  cell.faces.reserve(num_faces);
+  for (size_t f=0; f<num_faces; ++f)
+    cell.faces.push_back(chi_mesh::CellFace::DeSerialize(raw, address));
+
+  return cell;
+}
+
+
+//###################################################################
+/**Provides string information of the cell.*/
+std::string chi_mesh::Cell::ToString() const
+{
+  std::stringstream outstr;
+
+  outstr << "cell_type: "     << CellTypeName(cell_type) << "\n";
+  outstr << "cell_sub_type: " << CellTypeName(cell_sub_type) << "\n";
+  outstr << "global_id: "     << global_id << "\n";
+  outstr << "local_id: "      << local_id << "\n";
+  outstr << "partition_id: "  << partition_id << "\n";
+  outstr << "centroid: "      << centroid.PrintS() << "\n";
+  outstr << "material_id: "   << material_id << "\n";
+
+  outstr << "num_vertex_ids: " << vertex_ids.size() << "\n";
+  {
+    size_t counter=0;
+    for (uint64_t vid : vertex_ids)
+      outstr << "vid" << counter++ << ": " << vid << "\n";
+  }
+
+  {
+    size_t f=0;
+    for (const auto& face : faces)
+      outstr << "Face " << f++ << ":\n" << face.ToString();
+  }
+
+  return outstr.str();
 }

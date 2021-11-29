@@ -1,5 +1,7 @@
 #include "meshcutting.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include <algorithm>
 
 //###################################################################
@@ -99,7 +101,7 @@ void chi_mesh::mesh_cutting::
   //======================================== Loop over cells in original list
   for (auto& cell_ptr : original_cell_list)
   {
-    auto&  cell      = *(chi_mesh::CellPolygon*)cell_ptr;
+    auto&  cell = *cell_ptr; //cannot be const
 
     //======================================== Get cell info
     size_t num_edges = cell.vertex_ids.size();
@@ -144,7 +146,7 @@ void chi_mesh::mesh_cutting::
       {
         const auto& edge = cell_edges[e];
 
-        auto new_cell = new chi_mesh::CellPolygon;
+        auto new_cell = new chi_mesh::Cell(CellType::POLYGON,CellType::TRIANGLE);
         PopulatePolygonFromVertices(mesh,
                                     {edge.first, edge.second, centroid_id},
                                     *new_cell);
@@ -170,7 +172,7 @@ void chi_mesh::mesh_cutting::
              const Vector3 &plane_point,
              const Vector3 &plane_normal,
              MeshContinuum &mesh,
-             chi_mesh::CellPolygon &cell)
+             chi_mesh::Cell& cell)
 {
   const auto& p = plane_point;
   const auto& n = plane_normal;
@@ -383,7 +385,7 @@ void chi_mesh::mesh_cutting::
   // Now push-up new cells from the remainder
   for (auto& loop : loops_to_add_to_mesh)
   {
-    auto new_cell = new chi_mesh::CellPolygon;
+    auto new_cell = new chi_mesh::Cell(CellType::POLYGON,CellType::TRIANGLE);
     PopulatePolygonFromVertices(mesh, loop, *new_cell);
     mesh.cells.push_back(new_cell);
   }

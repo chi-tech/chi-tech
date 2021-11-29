@@ -1,5 +1,5 @@
 #include "chi_meshcontinuum.h"
-#include "ChiMesh/Cell/cell_slab.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
@@ -164,7 +164,7 @@ size_t chi_mesh::MeshContinuum::GetFaceHistogramBinDOFSize(size_t category)
 //###################################################################
 /**Check whether a cell is local by attempting to find the key in
  * the native index map.*/
-bool chi_mesh::MeshContinuum::IsCellLocal(uint64_t cell_global_index)
+bool chi_mesh::MeshContinuum::IsCellLocal(uint64_t cell_global_index) const
 {
   auto native_index = global_cell_id_to_native_id_map.find(cell_global_index);
 
@@ -178,7 +178,7 @@ bool chi_mesh::MeshContinuum::IsCellLocal(uint64_t cell_global_index)
 //###################################################################
 /**Check whether a cell is a boundary by checking if the key is
  * found in the native or foreign cell maps.*/
-bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index)
+bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index) const
 {
   auto native_index = global_cell_id_to_native_id_map.find(cell_global_index);
   auto foreign_index = global_cell_id_to_foreign_id_map.find(cell_global_index);
@@ -198,7 +198,7 @@ bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index)
 /**General map vertices*/
 void chi_mesh::MeshContinuum::
 FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                       std::vector<short>& dof_mapping)
+                       std::vector<short>& dof_mapping) const
 {
   int associated_face = cur_face.GetNeighborAssociatedFace(*this);
   //======================================== Check index validity
@@ -211,11 +211,11 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
     exit(EXIT_FAILURE);
   }
 
-  chi_mesh::Cell* adj_cell = &local_cells[cur_face.GetNeighborLocalID(*this)];
+  auto& adj_cell = local_cells[cur_face.GetNeighborLocalID(*this)];
 
   dof_mapping.reserve(cur_face.vertex_ids.size());
 
-  const auto& adj_face = adj_cell->faces[associated_face];
+  const auto& adj_face = adj_cell.faces[associated_face];
 
   for (auto cfvid : cur_face.vertex_ids)
   {
@@ -249,7 +249,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 //###################################################################
 /**Computes the centroid from nodes specified by the given list.*/
 chi_mesh::Vector3 chi_mesh::MeshContinuum::
-  ComputeCentroidFromListOfNodes(const std::vector<uint64_t> &list)
+  ComputeCentroidFromListOfNodes(const std::vector<uint64_t> &list) const
 {
   if (list.empty())
   {
@@ -267,7 +267,7 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::
 /**Counts the number of cells within a logical volume across all
  * partitions.*/
 size_t chi_mesh::MeshContinuum::
-  CountCellsInLogicalVolume(chi_mesh::LogicalVolume &log_vol)
+  CountCellsInLogicalVolume(chi_mesh::LogicalVolume &log_vol) const
 {
   size_t local_count=0;
   for (const auto& cell : local_cells)

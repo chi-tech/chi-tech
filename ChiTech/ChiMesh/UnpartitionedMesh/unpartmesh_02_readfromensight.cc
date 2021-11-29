@@ -60,7 +60,7 @@ void chi_mesh::UnpartitionedMesh::
 
   std::vector<vtkSmartPointer<vtkUnstructuredGrid>> grid_blocks;
   grid_blocks.reserve(num_blocks);
-  for (int b=0; b<num_blocks; ++b)
+  for (size_t b=0; b<num_blocks; ++b)
     grid_blocks.emplace_back(
         vtkUnstructuredGrid::SafeDownCast(multiblock->GetBlock(b))
       );
@@ -164,9 +164,9 @@ void chi_mesh::UnpartitionedMesh::
     << total_point_count;
 
   //======================================== Push cells
-  for (int c=0; c<total_cell_count; ++c)
+  for (size_t c=0; c<total_cell_count; ++c)
   {
-    auto vtk_cell = ugrid->GetCell(c);
+    auto vtk_cell = ugrid->GetCell(static_cast<vtkIdType>(c));
     auto vtk_celltype = vtk_cell->GetCellType();
     if (vtk_celltype == VTK_POLYHEDRON)
       raw_cells.push_back(CreateCellFromVTKPolyhedron(vtk_cell));
@@ -195,9 +195,9 @@ void chi_mesh::UnpartitionedMesh::
   }//for c
 
   //======================================== Push points
-  for (int p=0; p<total_point_count; ++p)
+  for (size_t p=0; p<total_point_count; ++p)
   {
-    auto point = ugrid->GetPoint(p);
+    auto point = ugrid->GetPoint(static_cast<vtkIdType>(p));
 
     point[0] = point[0]*options.scale;
     point[1] = point[1]*options.scale;

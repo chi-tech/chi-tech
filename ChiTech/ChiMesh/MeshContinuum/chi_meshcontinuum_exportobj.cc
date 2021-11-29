@@ -17,7 +17,7 @@ extern ChiLog& chi_log;
  *
  * \todo Export Cells to OBJ needs polygon support. */
 void chi_mesh::MeshContinuum::
- ExportCellsToObj(const char* fileName, bool per_material, int options)
+ ExportCellsToObj(const char* fileName, bool per_material, int options) const
 {
   if (!per_material)
   {

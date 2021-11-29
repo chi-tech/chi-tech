@@ -11,7 +11,7 @@ class SlabMappingFE_PWL_Spherical : public SlabMappingFE_PWL
 //  Methods
 public:
   SlabMappingFE_PWL_Spherical(
-    const chi_mesh::CellSlab& slab_cell,
+    const chi_mesh::Cell& slab_cell,
     const chi_mesh::MeshContinuumPtr& ref_grid,
     const chi_math::QuadratureLine& volume_quadrature)
   : SlabMappingFE_PWL(slab_cell, ref_grid, volume_quadrature)

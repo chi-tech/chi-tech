@@ -9,7 +9,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Builds and returns a vector of unique boundary id's present in
  * the mesh.*/
-std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs()
+std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() const
 {
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log() << "Identifying unique boundary-ids.";

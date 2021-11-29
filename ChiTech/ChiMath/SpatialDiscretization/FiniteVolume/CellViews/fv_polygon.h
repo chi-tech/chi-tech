@@ -2,8 +2,8 @@
 #define FV_POLYGON_VALUES_H
 
 #include "fv_cellbase.h"
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
+#include "ChiMesh/Cell/cell.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //################################################################### Class def
 /**Finite Volume implementation for a polygon.
@@ -13,30 +13,25 @@
  *   triangle forming a side (face).*/
 class PolygonFVValues : public CellFVValues
 {
-private:
-  chi_mesh::MeshContinuumPtr grid;
-
 public:
   std::vector<std::vector<chi_mesh::Vector3>> side_legs;
 
-  PolygonFVValues(chi_mesh::CellPolygon* poly_cell,
-                  chi_mesh::MeshContinuumPtr vol_continuum) :
-    CellFVValues(poly_cell->vertex_ids.size())
+  PolygonFVValues(const chi_mesh::Cell& poly_cell,
+                  const chi_mesh::MeshContinuum& grid) :
+    CellFVValues(poly_cell.vertex_ids.size())
   {
-    grid = vol_continuum;
-
     volume = 0.0;
 
-    int num_faces = poly_cell->faces.size();
+    size_t num_faces = poly_cell.faces.size();
     side_legs.resize(num_faces);
-    for (int f=0; f<num_faces; f++)
+    for (size_t f=0; f<num_faces; f++)
     {
-      int v0i = poly_cell->faces[f].vertex_ids[0];
-      int v1i = poly_cell->faces[f].vertex_ids[1];
+      uint64_t v0i = poly_cell.faces[f].vertex_ids[0];
+      uint64_t v1i = poly_cell.faces[f].vertex_ids[1];
 
-      const auto& v0 = grid->vertices[v0i];
-      const auto& v1 = grid->vertices[v1i];
-      chi_mesh::Vector3 v2 = poly_cell->centroid;
+      const auto& v0 = grid.vertices[v0i];
+      const auto& v1 = grid.vertices[v1i];
+      chi_mesh::Vector3 v2 = poly_cell.centroid;
 
       face_area.push_back((v1-v0).Norm());
 
