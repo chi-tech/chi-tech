@@ -92,14 +92,14 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
                                        static_cast<double>(num_raw_cells);
       if (fraction_complete >= static_cast<double>(aux_counter+1)*0.1)
       {
-        chi_log.Log() << "Surpassing cell " << cur_cell_id
+        chi_log.Log() << chi_program_timer.GetTimeString()
+                      << " Surpassing cell " << cur_cell_id
                       << " of " << num_raw_cells
                       << " (" << (aux_counter+1)*10 << "%)";
         ++aux_counter;
       }
     }//for cell
   }
-  chi_log.Log() << "Check point2";
 
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Establishing cell boundary connectivity.";

@@ -57,7 +57,7 @@ void chi_mesh::mesh_cutting::
     }
     else if (cell.Type() == CellType::POLYHEDRON)
     {
-      if (not CheckPolyhedronQuality(mesh,cell))
+      if (not CheckPolyhedronQuality(mesh,cell,/*check_convexity*/true))
         ++num_bad_quality_cells;
     }
     else

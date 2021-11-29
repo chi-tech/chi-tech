@@ -47,7 +47,7 @@ extern ChiLog& chi_log;
 
 ##_
 
-###PropertyIndex\n
+###PropertyIndex
 DISCRETIZATION_METHOD\n
  Discretization method.\n\n
 
@@ -108,10 +108,6 @@ chiLBSSetProperty(phys1,WRITE_RESTART_DATA,"YRestart1","restart",1)
 
 ###Discretization methods
  PWLD = Piecewise Linear Finite Element.\n
-
-###Partitioning methods
- SERIAL = No multi-processing.\n
- FROM_SURFACE = Same partitioning as used on Surface mesh.
 
 ###BoundaryIdentify
 This value follows the argument BOUNDARY_CONDITION and identifies which

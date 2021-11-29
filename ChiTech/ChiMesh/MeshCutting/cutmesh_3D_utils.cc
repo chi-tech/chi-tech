@@ -9,14 +9,19 @@
 /**Checks the quality of a polyhedron against the following.
  *
  * Take each face and form triangles using the face edges and the face
- * centroid. Each triangle must ccw-orientation and have a normal pointing
- * in the same general direction as the average face normal.
+ * centroid. Now take each triangle and form a tetrahedron with the
+ * cell-centroid as the 4th vertex. The quality requirement for this tetrahedron
+ * is that its primary face must not be inverted with respect to the
+ * cell-centroid.
  *
- * Now take each triangle and form a tetrahedron with the cell-centroid. The
- * quality requirement is that no inverted tetrahedron face is inverted with
- * respect to the cell-centroid.*/
+ * Another optional requirement is that the cell must be convex. This is checked
+ * by using a face centroid CFC and any neighboring face's centroid NFC and normal, n_N. If
+ * the dot-product of (NFC-CFC) with n_N is negative, then the
+ * cell cannot be classified as convex.*/
 bool chi_mesh::mesh_cutting::
-  CheckPolyhedronQuality(const MeshContinuum &mesh, const chi_mesh::Cell& cell)
+  CheckPolyhedronQuality(const MeshContinuum &mesh,
+                         const chi_mesh::Cell& cell,
+                         const bool check_convexity/*=false*/)
 {
   const auto& C = cell.centroid;
 
@@ -40,17 +45,82 @@ bool chi_mesh::mesh_cutting::
 
       auto CC = C_tri - C;
 
-      if (CC.Dot(n)<0.0)
-        return false;
+      if (CC.Dot(n)<0.0) return false;
     }
   }//for face
+
+  //============================================= Optional convexity check
+  if (check_convexity)
+  {
+    std::vector<std::vector<uint64_t>> proxy_faces;
+    for (const auto& face : cell.faces)
+      proxy_faces.push_back(face.vertex_ids);
+
+    size_t f=0;
+    for (const auto& face : cell.faces)
+    {
+      std::set<size_t> neighbor_face_indices =
+        FindNeighborFaceIndices(proxy_faces, f);
+
+      for (size_t ofi : neighbor_face_indices)
+      {
+        auto& other_face = cell.faces[ofi];
+        auto CFC_OFC = other_face.centroid - face.centroid;
+
+        if (CFC_OFC.Dot(other_face.normal) < 0.0)
+          return false;
+      }
+      ++f;
+    }//for f
+  }
 
   return true;
 }
 
 
 //###################################################################
-/**Finds the non-manifold edges of a collected of faces.*/
+/**Returns the face-indices that have adjacent edges to face with
+ * index face_index.*/
+std::set<size_t> chi_mesh::mesh_cutting::
+  FindNeighborFaceIndices(const std::vector<std::vector<uint64_t>> &proxy_faces,
+                          const size_t face_index)
+{
+  const auto& face = proxy_faces.at(face_index);
+  const size_t num_faces = proxy_faces.size();
+
+  std::set<size_t> neighbor_face_indices;
+  const size_t face_num_edges = face.size();
+  for (size_t e=0; e<face_num_edges; ++e)
+  {
+    auto face_edge = MakeEdgeFromPolygonEdgeIndex(face,e);
+    auto face_uniq_edge = MakeUniqueEdge(face_edge);
+
+    for (size_t of=0; of<num_faces; ++of)//other face
+    {
+      if (of == face_index) continue;
+      const auto& other_face = proxy_faces[of];
+
+      const size_t other_face_num_edges = other_face.size();
+      for (size_t ofe=0; ofe<other_face_num_edges; ++ofe)//other face edge
+      {
+        auto other_face_edge = MakeEdgeFromPolygonEdgeIndex(other_face, ofe);
+        auto other_face_uniq_edge = MakeUniqueEdge(other_face_edge);
+
+        if (face_uniq_edge == other_face_uniq_edge)
+        {
+          neighbor_face_indices.insert(of);
+          break; //from ofe-loop
+        }
+      }//for ofe
+    }//for of
+  }//for face edge
+
+  return neighbor_face_indices;
+}
+
+
+//###################################################################
+/**Finds the non-manifold edges of a collection of faces.*/
 std::vector<chi_mesh::mesh_cutting::Edge> chi_mesh::mesh_cutting::
   FindNonManifoldEdges(const std::vector<std::vector<uint64_t>>& proxy_faces)
 {
@@ -61,13 +131,6 @@ std::vector<chi_mesh::mesh_cutting::Edge> chi_mesh::mesh_cutting::
   //on average hexagons so lets fluff this by an additional 4 edges
   //and call 10 edges a good estimate.
   non_manifold_edges.reserve(10);
-
-  // This lambda simply turns an edge into a unique edge
-  auto MakeUniqueEdge = [](const Edge& edge)
-  {
-    return std::make_pair(std::min(edge.first, edge.second),
-                          std::max(edge.first, edge.second));
-  };
 
   //=================================== Build edges for each proxy face
   // This saves us some readability later on
@@ -118,35 +181,51 @@ std::vector<chi_mesh::mesh_cutting::Edge> chi_mesh::mesh_cutting::
 std::vector<chi_mesh::mesh_cutting::Edge> chi_mesh::mesh_cutting::
   StitchEdgesEndToEnd(const std::vector<Edge>& edges)
 {
+  const std::string fname = __FUNCTION__;
   std::vector<Edge> stitched_nm_edges;
   stitched_nm_edges.reserve(edges.size());
 
+  //=================================== Declaring two queues used to
+  //                                    stitch
   std::queue<Edge> unused_candidate_edges;
   std::queue<Edge> unused_noncandidate_edges;
+
+  // All the edges are initially candidates
   for (auto& edge : edges)
     unused_candidate_edges.push(edge);
 
+  // Begin the stitch using the first candidate
+  // edge. This edge is no longer part of the game
   stitched_nm_edges.push_back(unused_candidate_edges.front());
   unused_candidate_edges.pop();
+
+  //=================================== Attempt to add all candidate edges
+  //                                    to the stitch
   const size_t num_candidates = unused_candidate_edges.size();
   for (size_t k=0; k<num_candidates; ++k)
   {
-    const auto& last_edge = stitched_nm_edges.back();
+    const auto& edge_previously_added = stitched_nm_edges.back();
+
+    // The following while loop is gauranteed to terminate
+    // because we pop the first element each time.
     while (not unused_candidate_edges.empty())
     {
       const auto& edge = unused_candidate_edges.front();
 
-      if (edge.first == last_edge.second)
+      if (edge.first == edge_previously_added.second)
         stitched_nm_edges.push_back(edge);
       else
         unused_noncandidate_edges.push(edge);
 
-      unused_candidate_edges.pop();
+      unused_candidate_edges.pop(); //removes first element
     }
 
     std::swap(unused_noncandidate_edges, unused_candidate_edges);
     if (unused_candidate_edges.empty()) break;
   }//for k
+
+  if (stitched_nm_edges.size() != edges.size())
+    throw std::logic_error(fname + ": stitching failed.");
 
   return stitched_nm_edges;
 }

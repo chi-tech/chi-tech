@@ -20,7 +20,6 @@ void chi_mesh::mesh_cutting::
             chi_mesh::Cell &cell,
             bool verbose/*=false*/)
 {
-//  if (cell.local_id == 20) verbose = true;
   const auto& p = plane_point;
   const auto& n = plane_normal;
   const size_t cell_num_faces = cell.faces.size();
