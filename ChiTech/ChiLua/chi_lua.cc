@@ -138,12 +138,12 @@ void LuaPopulateVectorFrom1DArray(const std::string& func_name,
 
   //=================================== Populate vector
   {
-    size_t vec_size = vec_map.rbegin()->first;
+    const size_t vec_size = vec_map.size();
     vec.clear();
     vec.resize(vec_size, 0.0);
 
     for (auto v_i : vec_map)
-      vec[v_i.first - 1] = v_i.second;
+      vec.at(v_i.first - 1) = v_i.second;
 
     return;
   }

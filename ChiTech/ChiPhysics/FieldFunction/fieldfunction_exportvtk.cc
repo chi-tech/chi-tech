@@ -88,9 +88,9 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
   ofile << "  <PUnstructuredGrid GhostLevel=\"0\">" << std::endl;
   ofile << "    <PPointData Scalars=\"scalars\">" << std::endl;
 
-  size_t num_components = component_names.size();
+  const size_t num_components = component_names.size();
 
-  for (int c=0; c < num_components; c++)
+  for (size_t c=0; c < num_components; c++)
   {
     ofile << "      <PDataArray type=\"Float64\" Name=\""
           << component_names[c]
@@ -104,7 +104,7 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
   ofile << "      <PDataArray type=\"UInt32\" Name=\"Partition\""
         << " format=\"ascii\"/>" << std::endl;
 
-  for (int c=0; c < num_components; c++)
+  for (size_t c=0; c < num_components; c++)
   {
     ofile << "      <PDataArray type=\"Float64\" Name=\""
           << component_names[c] + std::string("-avg")
@@ -152,7 +152,7 @@ void chi_physics::FieldFunction::
   size_t num_verts = cell.vertex_ids.size();
 
   std::vector<vtkIdType> cell_vids(num_verts);
-  for (int v=0; v<num_verts; v++)
+  for (size_t v=0; v<num_verts; v++)
   {
     uint64_t vgi = cell.vertex_ids[v];
     std::vector<double> d_node(3);
@@ -186,10 +186,10 @@ void chi_physics::FieldFunction::
     {
       size_t num_fverts = face.vertex_ids.size();
       std::vector<vtkIdType> face_info(num_fverts);
-      for (int fv=0; fv<num_fverts; fv++)
+      for (size_t fv=0; fv<num_fverts; fv++)
       {
-        int v = 0;
-        for (int cv=0; cv<num_verts; ++cv)
+        size_t v = 0;
+        for (size_t cv=0; cv<num_verts; ++cv)
           if (cell.vertex_ids[cv] == face.vertex_ids[fv])
           { v = cv; break; }
 

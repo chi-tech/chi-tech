@@ -6,10 +6,15 @@ extern ChiLog& chi_log;
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
 
+#include "chi_mpi.h"
+
 //###################################################################
 /**Establishes neighbor connectivity for the light-weight mesh.*/
 void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 {
+  const size_t num_raw_cells = raw_cells.size();
+  const size_t num_raw_vertices = vertices.size();
+
   //======================================== Reset all cell neighbors
   int num_bndry_faces = 0;
   for (auto& cell : raw_cells)
@@ -20,66 +25,84 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
                               << " Number of unconnected faces "
                                  "before connectivity: " << num_bndry_faces;
 
-  chi_log.Log() << "Establishing cell connectivity.";
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Establishing cell connectivity.";
 
   //======================================== Establish internal connectivity
   // Populate vertex subscriptions to internal cells
-  vertex_cell_subscriptions.resize(vertices.size());
-  uint64_t cur_cell_id=0;
-  for (auto& cell : raw_cells)
+  vertex_cell_subscriptions.resize(num_raw_vertices);
   {
-    for (auto vid : cell->vertex_ids)
-      vertex_cell_subscriptions[vid].insert(cur_cell_id);
-    ++cur_cell_id;
+    uint64_t cur_cell_id=0;
+    for (const auto& cell : raw_cells)
+    {
+      for (auto vid : cell->vertex_ids)
+        vertex_cell_subscriptions.at(vid).insert(cur_cell_id);
+      ++cur_cell_id;
+    }
   }
 
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Vertex cell subscriptions complete.";
+
   // Process raw cells
-  std::set<size_t> cells_to_search; //This will be used and abused below
-  cur_cell_id=0;
-  for (auto& cell : raw_cells)
   {
-    cells_to_search.clear();
-    for (uint64_t vid : cell->vertex_ids)
-      for (uint64_t cell_id : vertex_cell_subscriptions[vid])
-        if (cell_id != cur_cell_id)
-          cells_to_search.insert(cell_id);
-
-    for (auto& cur_cell_face : cell->faces)
+    uint64_t aux_counter = 0;
+    uint64_t cur_cell_id=0;
+    for (auto& cell : raw_cells)
     {
-      if (cur_cell_face.has_neighbor) continue;
-
-      std::set<uint64_t> cfvids(cur_cell_face.vertex_ids.begin(),
-                                cur_cell_face.vertex_ids.end());
-
-      for (uint64_t adj_cell_id : cells_to_search)
+      for (auto& cur_cell_face : cell->faces)
       {
-        auto adj_cell = raw_cells[adj_cell_id];
+        if (cur_cell_face.has_neighbor) {continue;}
+        const std::set<uint64_t> cfvids(cur_cell_face.vertex_ids.begin(),
+                                        cur_cell_face.vertex_ids.end());
 
-        for (auto& adj_cell_face : adj_cell->faces)
+        std::set<size_t> cells_to_search;
+        for (uint64_t vid : cfvids)
+          for (uint64_t cell_id : vertex_cell_subscriptions.at(vid))
+            if (cell_id != cur_cell_id)
+              cells_to_search.insert(cell_id);
+
+        for (uint64_t adj_cell_id : cells_to_search)
         {
-          if (adj_cell_face.has_neighbor) continue;
-          std::set<uint64_t> afvids(adj_cell_face.vertex_ids.begin(),
-                                    adj_cell_face.vertex_ids.end());
+          auto adj_cell = raw_cells.at(adj_cell_id);
 
-          if (cfvids == afvids)
+          for (auto& adj_cell_face : adj_cell->faces)
           {
-            cur_cell_face.neighbor = adj_cell_id;
-            adj_cell_face.neighbor = cur_cell_id;
+            if (adj_cell_face.has_neighbor) {continue;}
+            const std::set<uint64_t> afvids(adj_cell_face.vertex_ids.begin(),
+                                            adj_cell_face.vertex_ids.end());
 
-            cur_cell_face.has_neighbor = true;
-            adj_cell_face.has_neighbor = true;
+            if (cfvids == afvids)
+            {
+              cur_cell_face.neighbor = adj_cell_id;
+              adj_cell_face.neighbor = cur_cell_id;
 
-            goto face_neighbor_found;
-          }
-        }//for adjacent cell face
+              cur_cell_face.has_neighbor = true;
+              adj_cell_face.has_neighbor = true;
+
+              goto face_neighbor_found;
+            }
+          }//for adjacent cell face
+        }
+        face_neighbor_found:;
+      }//for face
+
+      ++cur_cell_id;
+      const double fraction_complete = static_cast<double>(cur_cell_id)/
+                                       static_cast<double>(num_raw_cells);
+      if (fraction_complete >= static_cast<double>(aux_counter+1)*0.1)
+      {
+        chi_log.Log() << chi_program_timer.GetTimeString()
+                      << " Surpassing cell " << cur_cell_id
+                      << " of " << num_raw_cells
+                      << " (" << (aux_counter+1)*10 << "%)";
+        ++aux_counter;
       }
-      face_neighbor_found:;
-    }//for face
+    }//for cell
+  }
 
-    ++cur_cell_id;
-  }//for cell
-
-  chi_log.Log() << "Establishing cell boundary connectivity.";
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Establishing cell boundary connectivity.";
 
   //======================================== Establish boundary connectivity
   // Make list of internal cells on the boundary
@@ -95,18 +118,18 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   }
 
   // Populate vertex subscriptions to boundary cells
-  std::vector<std::set<uint64_t>>
-    vertex_bndry_cell_subscriptions(vertices.size());
-  cur_cell_id=0;
-  for (auto& cell : raw_boundary_cells)
+  std::vector<std::set<uint64_t>> vertex_bndry_cell_subscriptions(vertices.size());
   {
-    for (auto vid : cell->vertex_ids)
-      vertex_bndry_cell_subscriptions[vid].insert(cur_cell_id);
-    ++cur_cell_id;
+    uint64_t cur_cell_id=0;
+    for (auto& cell : raw_boundary_cells)
+    {
+      for (auto vid : cell->vertex_ids)
+        vertex_bndry_cell_subscriptions.at(vid).insert(cur_cell_id);
+      ++cur_cell_id;
+    }
   }
 
   // Process boundary cells
-  cur_cell_id=0;
   for (auto& cell : internal_cells_on_boundary)
     for (auto& face : cell->faces)
     {
@@ -114,7 +137,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
       std::set<uint64_t> cfvids(face.vertex_ids.begin(),
                                 face.vertex_ids.end());
 
-      cells_to_search.clear();
+      std::set<size_t> cells_to_search;
       for (uint64_t vid : face.vertex_ids)
         for (uint64_t cell_id : vertex_bndry_cell_subscriptions[vid])
           cells_to_search.insert(cell_id);
@@ -134,8 +157,6 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
       }//for adj_cell_id
     }//for face
 
-  chi_log.Log() << "Done establishing cell connectivity.";
-
   num_bndry_faces = 0;
   for (auto cell : raw_cells)
     for (auto& face : cell->faces)
@@ -144,4 +165,9 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   chi_log.Log(LOG_0VERBOSE_1) << chi_program_timer.GetTimeString()
                               << " Number of boundary faces "
                                  "after connectivity: " << num_bndry_faces;
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi_log.Log() << chi_program_timer.GetTimeString()
+                << " Done establishing cell connectivity.";
+
 }
