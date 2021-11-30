@@ -1,8 +1,6 @@
 #include "chi_meshcontinuum.h"
 
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
@@ -30,7 +28,7 @@ extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Exports just the mesh to VTK format.*/
-void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
+void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
 {
   chi_log.Log() << "Exporting mesh to VTK. " << local_cells.size();
   std::vector<std::vector<double>> d_nodes;
@@ -56,13 +54,11 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      auto slab_cell = (chi_mesh::CellSlab*)(&cell);
-
-      int num_verts = 2;
+      size_t num_verts = 2;
       std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
+      for (size_t v=0; v<num_verts; v++)
       {
-        uint64_t vgi = slab_cell->vertex_ids[v]; //vertex global id
+        uint64_t vgi = cell.vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
@@ -81,13 +77,11 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-
-      size_t num_verts = poly_cell->vertex_ids.size();
+      size_t num_verts = cell.vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
+      for (size_t v=0; v<num_verts; v++)
       {
-        uint64_t vgi = poly_cell->vertex_ids[v]; //vertex global id
+        uint64_t vgi = cell.vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
@@ -109,13 +103,11 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-
-      size_t num_verts = polyh_cell->vertex_ids.size();
+      size_t num_verts = cell.vertex_ids.size();
       std::vector<vtkIdType> cell_info(num_verts);
-      for (int v=0; v<num_verts; v++)
+      for (size_t v=0; v<num_verts; v++)
       {
-        uint64_t vgi = polyh_cell->vertex_ids[v]; //vertex global id
+        uint64_t vgi = cell.vertex_ids[v]; //vertex global id
         std::vector<double> d_node(3);
         d_node[0] = grid->vertices[vgi].x;
         d_node[1] = grid->vertices[vgi].y;
@@ -127,16 +119,16 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName)
 
       vtkNew<vtkIdList> faces;
 
-      size_t num_faces = polyh_cell->faces.size();
-      for (int f=0; f<num_faces; f++)
+      size_t num_faces = cell.faces.size();
+      for (size_t f=0; f<num_faces; f++)
       {
-        size_t num_fverts = polyh_cell->faces[f].vertex_ids.size();
+        size_t num_fverts = cell.faces[f].vertex_ids.size();
         std::vector<vtkIdType> face(num_fverts);
-        for (int fv=0; fv<num_fverts; fv++)
+        for (size_t fv=0; fv<num_fverts; fv++)
         {
           int v = -1;
-          for (int vr=0; vr<cell.vertex_ids.size(); ++vr)
-            if (polyh_cell->faces[f].vertex_ids[fv] ==
+          for (size_t vr=0; vr<cell.vertex_ids.size(); ++vr)
+            if (cell.faces[f].vertex_ids[fv] ==
                 cell.vertex_ids[vr])
             {
               v = vr; break;

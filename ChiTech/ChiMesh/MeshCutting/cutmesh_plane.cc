@@ -165,7 +165,7 @@ void chi_mesh::mesh_cutting::
     //====================================== Process cells that are cut
     for (auto cell_ptr : cells_to_cut)
     {
-      auto& cell = *(chi_mesh::CellPolygon*)cell_ptr;
+      auto& cell = *cell_ptr;
 
       CutPolygon(cut_edges,cut_vertices,p,n,mesh,cell);
     }//for cell_ptr
@@ -236,7 +236,7 @@ void chi_mesh::mesh_cutting::
     //====================================== Process cells that are cut
     for (auto cell_ptr : cells_to_cut)
     {
-      auto& cell = *(chi_mesh::CellPolyhedron*)cell_ptr;
+      auto& cell = *cell_ptr;
 
       CutTetrahedron(cut_edges, cut_vertices, p, n, mesh, cell);
     }//for cell_ptr

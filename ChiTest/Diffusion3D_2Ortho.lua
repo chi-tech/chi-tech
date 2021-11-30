@@ -25,14 +25,12 @@ xmesh={}
 for k=0,N do
     xmesh[k+1] = -1.0 + ds*k
 end
-newSurfMesh = chiSurfaceMeshCreateFromArrays(xmesh,xmesh);
-
-region1 = chiRegionCreate()
+umesh, region1 = chiMeshCreateUnpartitioned2DOrthoMesh(xmesh,xmesh);
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
-                      ExtruderTemplateType.SURFACE_MESH,
-                      newSurfMesh);
+                      ExtruderTemplateType.UNPARTITIONED_MESH,
+                      umesh);
 
 NZ=2
 chiVolumeMesherSetProperty(EXTRUSION_LAYER,0.2,NZ,"Charlie");

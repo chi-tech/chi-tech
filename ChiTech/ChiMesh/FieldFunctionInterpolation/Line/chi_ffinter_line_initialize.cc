@@ -1,11 +1,8 @@
 #include "chi_ffinter_line.h"
 
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -84,14 +81,12 @@ Initialize()
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell.Type() == chi_mesh::CellType::SLAB)
         {
-          auto slab_cell = (chi_mesh::CellSlab*)(&cell);
-
           for (int p=0; p<number_of_points; p++)
           {
             //Assume each point is inside the cell, now try to disprove it
             bool is_inside = true;
-            uint64_t v0_i = slab_cell->vertex_ids[0];
-            uint64_t v1_i = slab_cell->vertex_ids[1];
+            uint64_t v0_i = cell.vertex_ids[0];
+            uint64_t v1_i = cell.vertex_ids[1];
 
             const auto& v0 = grid_view->vertices[v0_i];
             const auto& v1 = grid_view->vertices[v1_i];
@@ -125,9 +120,7 @@ Initialize()
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
         else if (cell.Type() == chi_mesh::CellType::POLYGON)
         {
-          auto poly_cell = (chi_mesh::CellPolygon*)(&cell);
-
-          size_t num_edges = poly_cell->faces.size();
+          size_t num_edges = cell.faces.size();
 
           for (int p=0; p<number_of_points; p++)
           {
@@ -137,8 +130,8 @@ Initialize()
             for (size_t e=0; e<num_edges; e++)
             {
               chi_mesh::Vector3 nref(0.0, 0.0, 1.0);
-              int v0_i = poly_cell->faces[e].vertex_ids[0];
-              int v1_i = poly_cell->faces[e].vertex_ids[1];
+              uint64_t v0_i = cell.faces[e].vertex_ids[0];
+              uint64_t v1_i = cell.faces[e].vertex_ids[1];
 
               const auto& v0 = grid_view->vertices[v0_i];
               const auto& v1 = grid_view->vertices[v1_i];
@@ -171,9 +164,7 @@ Initialize()
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
         else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          auto polyh_cell = (chi_mesh::CellPolyhedron*)(&cell);
-
-          size_t num_faces = polyh_cell->faces.size();
+          size_t num_faces = cell.faces.size();
 
           for (int p=0; p<number_of_points; p++)
           {
@@ -181,15 +172,15 @@ Initialize()
             bool is_inside = true;
             for (size_t f=0; f<num_faces; f++)
             {
-              std::vector<std::vector<int>> edges = polyh_cell->GetFaceEdges(f);
-              size_t num_edges = edges.size();
+              const auto& face = cell.faces[f];
+              size_t num_edges = face.vertex_ids.size();
               //Form a plane for each side
               for (size_t e=0; e<num_edges; e++)
               {
-                int v0_i = edges[e][0];
+                uint64_t v0_i = face.vertex_ids[e];
 
                 const auto& v0 = grid_view->vertices[v0_i];
-                chi_mesh::Vector3 n  = polyh_cell->faces[f].normal;
+                chi_mesh::Vector3 n  = cell.faces[f].normal;
 
                 chi_mesh::Vector3 v0p = interpolation_points[p] - v0;
                 v0p=v0p/v0p.Norm();
@@ -223,14 +214,12 @@ Initialize()
       {
         if (not interpolation_points_has_ass_cell[c]) continue;
 
-        int cell_local_index = interpolation_points_ass_cell[c];
+        uint64_t cell_local_index = interpolation_points_ass_cell[c];
         const auto& cell = grid_view->local_cells[cell_local_index];
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
         if (cell.Type() == chi_mesh::CellType::SLAB)
         {
-          const auto& slab_cell = (chi_mesh::CellSlab&)cell;
-
           for (int i=0; i<2; i++)
           {
             cfem_local_nodes_needed_unmapped.push_back(i);
@@ -244,9 +233,7 @@ Initialize()
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
         if (cell.Type() == chi_mesh::CellType::POLYGON)
         {
-          const auto& poly_cell = (chi_mesh::CellPolygon&)cell;
-
-          size_t num_verts = poly_cell.vertex_ids.size();
+          size_t num_verts = cell.vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
           {
             cfem_local_nodes_needed_unmapped.push_back(i);
@@ -260,9 +247,7 @@ Initialize()
           //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
         else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
         {
-          const auto& polyh_cell = (chi_mesh::CellPolyhedron&)cell;
-
-          size_t num_verts = polyh_cell.vertex_ids.size();
+          size_t num_verts = cell.vertex_ids.size();
           for (size_t i=0; i<num_verts; i++)
           {
             cfem_local_nodes_needed_unmapped.push_back(i);

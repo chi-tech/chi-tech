@@ -55,7 +55,8 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   //======================================== Create cells
   for (size_t c=0; c<(zverts.size()-1); ++c)
   {
-    auto cell = new UnpartitionedMesh::LightWeightCell(chi_mesh::CellType::SLAB);
+    auto cell = new UnpartitionedMesh::LightWeightCell(CellType::SLAB,
+                                                       CellType::SLAB);
 
     cell->vertex_ids = {c,c+1};
 
@@ -122,15 +123,15 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
 
-  std::vector<std::vector<uint64_t>> vertex_ij_to_i_map(Ny,std::vector<uint64_t>(Nx));
+  typedef std::vector<uint64_t> VecIDs;
+  std::vector<VecIDs> vertex_ij_to_i_map(Ny,VecIDs(Nx));
   umesh->vertices.reserve(Nx*Ny);
-  int k=-1;
-  for (int i=0; i<Ny; ++i)
+  uint64_t k=0;
+  for (size_t i=0; i<Ny; ++i)
   {
-    for (int j=0; j<Nx; ++j)
+    for (size_t j=0; j<Nx; ++j)
     {
-      ++k;
-      vertex_ij_to_i_map[i][j] = k;
+      vertex_ij_to_i_map[i][j] = k++;
       umesh->vertices.emplace_back(vertices_1d_x[j],
                                    vertices_1d_y[i],
                                    0.0);
@@ -139,12 +140,13 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
 
   //======================================== Create cells
   auto& vmap = vertex_ij_to_i_map;
-  for (int i=0; i<(Ny-1); ++i)
+  for (size_t i=0; i<(Ny-1); ++i)
   {
-    for (int j=0; j<(Nx-1); ++j)
+    for (size_t j=0; j<(Nx-1); ++j)
     {
       auto cell =
-        new UnpartitionedMesh::LightWeightCell(chi_mesh::CellType::POLYGON);
+        new UnpartitionedMesh::LightWeightCell(CellType::POLYGON,
+                                               CellType::QUADRILATERAL);
 
       cell->vertex_ids = {vmap[i][j],vmap[i][j+1],vmap[i+1][j+1],vmap[i+1][j]};
 
@@ -200,7 +202,9 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
   std::vector<double>& vertices_1d_z)
 {
   //======================================== Checks if vertices are empty
-  if (vertices_1d_x.empty() or vertices_1d_y.empty() or vertices_1d_z.empty())
+  if (vertices_1d_x.empty() or
+      vertices_1d_y.empty() or
+      vertices_1d_z.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "chi_mesh::CreateUnpartitioned3DOrthoMesh. Empty vertex list.";
@@ -218,22 +222,26 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
   size_t Ny = vertices_1d_y.size();
   size_t Nz = vertices_1d_z.size();
 
-  typedef std::vector<uint64_t>    VecInt;
-  typedef std::vector<VecInt> VecVecInt;
-  std::vector<VecVecInt> vertex_ijk_to_i_map(Ny);
+  // i is j, and j is i, MADNESS explanation:
+  // In math convention the i-index refers to the ith row
+  // and the j-index refers to the jth row. We try to follow
+  // the same logic here.
+
+  typedef std::vector<uint64_t>    VecIDs;
+  typedef std::vector<VecIDs> VecVecIDs;
+  std::vector<VecVecIDs> vertex_ijk_to_i_map(Ny);
   for (auto& vec : vertex_ijk_to_i_map)
-    vec.resize(Nx,VecInt(Nz));
+    vec.resize(Nx,VecIDs(Nz));
 
   umesh->vertices.reserve(Nx*Ny*Nz);
-  int c=-1;
-  for (int i=0; i<Ny; ++i)
+  uint64_t c=0;
+  for (size_t i=0; i<Ny; ++i)
   {
-    for (int j=0; j<Nx; ++j)
+    for (size_t j=0; j<Nx; ++j)
     {
-      for (int k=0; k<Nz; ++k)
+      for (size_t k=0; k<Nz; ++k)
       {
-        ++c;
-        vertex_ijk_to_i_map[i][j][k] = c;
+        vertex_ijk_to_i_map[i][j][k] = c++;
         umesh->vertices.emplace_back(vertices_1d_x[j],
                                      vertices_1d_y[i],
                                      vertices_1d_z[k]);
@@ -243,14 +251,15 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
 
   //======================================== Create cells
   auto& vmap = vertex_ijk_to_i_map;
-  for (int i=0; i<(Ny-1); ++i)
+  for (size_t i=0; i<(Ny-1); ++i)
   {
-    for (int j=0; j<(Nx-1); ++j)
+    for (size_t j=0; j<(Nx-1); ++j)
     {
-      for (int k=0; k<(Nz-1); ++k)
+      for (size_t k=0; k<(Nz-1); ++k)
       {
         auto cell =
-          new UnpartitionedMesh::LightWeightCell(chi_mesh::CellType::POLYHEDRON);
+          new UnpartitionedMesh::LightWeightCell(CellType::POLYHEDRON,
+                                                 CellType::HEXAHEDRON);
 
         cell->vertex_ids = {vmap[i  ][j  ][k],
                             vmap[i  ][j+1][k],

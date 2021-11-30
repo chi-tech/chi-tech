@@ -1,5 +1,7 @@
 #include "volmesher_extruder.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -13,51 +15,25 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
                  chi_mesh::MeshContinuum& grid)
 {
   //================================================== For each layer
-  std::set<int> local_vert_ids;
-  for (int iz=0; iz<(vertex_layers.size()-1); iz++)
+  std::set<uint64_t> local_vertices_global_ids;
+  for (size_t iz=0; iz<(vertex_layers.size()-1); iz++)
   {
-    for (int tc=0; tc < template_grid.local_cells.size(); tc++)
+    for (const auto& template_cell : template_grid.local_cells)
     {
-      //========================================= Get template cell
-      if (template_grid.local_cells[tc].Type() !=
-          chi_mesh::CellType::POLYGON)
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "Extruder::CreateLocalAndBoundaryNodes: Template cell error.";
-        exit(EXIT_FAILURE);
-      }
-      auto& template_cell = (chi_mesh::CellPolygon&)(template_grid.local_cells[tc]);
+      // Check template cell type
+      if (template_cell.Type() != chi_mesh::CellType::POLYGON)
+        throw std::logic_error("Extruder::CreateLocalNodes: "
+                               "Template cell error. Not of base type POLYGON");
 
-      //========================================= Precompute centroid
-      auto centroid_precompd = ComputeTemplateCell3DCentroid(
-        template_cell, template_grid, iz, iz + 1);
+      bool has_local_scope = HasLocalScope(template_cell, template_grid, iz);
 
-      //========================================= Get the partition id
-      int tcell_partition_id = GetCellPartitionIDFromCentroid(centroid_precompd);
-
-      //###################### NOT A LOCAL CELL ############################
-      if (tcell_partition_id != chi_mpi.location_id)
-      {
-        bool is_neighbor_to_partition = IsTemplateCellNeighborToThisPartition(
-          template_cell, template_grid, iz, tc);
-
-        if (is_neighbor_to_partition)
-        {
-          for (auto tc_vid : template_cell.vertex_ids)
-            local_vert_ids.insert(tc_vid + iz*node_z_index_incr);
-
-          for (auto tc_vid : template_cell.vertex_ids)
-            local_vert_ids.insert(tc_vid + (iz+1)*node_z_index_incr);
-        }
-      }
-        //####################### LOCAL CELL ###############################
-      else
+      if (has_local_scope)
       {
         for (auto tc_vid : template_cell.vertex_ids)
-          local_vert_ids.insert(tc_vid + iz*node_z_index_incr);
+          local_vertices_global_ids.insert(tc_vid + iz * node_z_index_incr);
 
         for (auto tc_vid : template_cell.vertex_ids)
-          local_vert_ids.insert(tc_vid + (iz+1)*node_z_index_incr);
+          local_vertices_global_ids.insert(tc_vid + (iz + 1) * node_z_index_incr);
       }
     }//for template cell
   }//for layer
@@ -72,15 +48,10 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
     {
       size_t new_vert_index = grid.vertices.size();
 
-      auto local_index = local_vert_ids.find(new_vert_index);
+      auto local_index = local_vertices_global_ids.find(new_vert_index);
 
-      if (local_index != local_vert_ids.end())
-      {
-        auto node = vertex;
-        node.z = layer_z_level;
-
-        grid.vertices.push_back(node);
-      }
+      if (local_index != local_vertices_global_ids.end())
+        grid.vertices.emplace_back(vertex.x, vertex.y, layer_z_level);
       else
         grid.vertices.emplace_back();
 

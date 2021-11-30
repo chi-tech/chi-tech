@@ -41,8 +41,8 @@ public:
   };
   struct VOLUME_MESHER_OPTIONS
   {
-    bool         force_polygons = true;
-    bool         mesh_global    = false;
+    bool         force_polygons = true;  //TODO: Remove this option
+    bool         mesh_global    = false; //TODO: Remove this option
     int          partition_x    = 1;
     int          partition_y    = 1;
     int          partition_z    = 1;
@@ -63,14 +63,8 @@ public:
                           bool delete_surface_mesh_elements=false,
                           bool force_local=false);
   static
-  void CreatePolygonCells(chi_mesh::UnpartitionedMesh* umesh,
-                          chi_mesh::MeshContinuumPtr& grid,
-                          bool delete_surface_mesh_elements=false,
-                          bool force_local=false);
-
-  static
-  void GridFilterGhosts(chi_mesh::MeshContinuumPtr& in_grid,
-                        chi_mesh::MeshContinuumPtr& out_grid);
+  void CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
+                          chi_mesh::MeshContinuumPtr& grid);
   static
   std::pair<int,int>  GetCellXYPartitionID(chi_mesh::Cell *cell);
   static

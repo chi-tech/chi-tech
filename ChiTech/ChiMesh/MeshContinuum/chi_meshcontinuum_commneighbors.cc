@@ -1,12 +1,13 @@
 #include "chi_meshcontinuum.h"
 
-#include "ChiMesh/Cell/cell_slab.h"
-#include "ChiMesh/Cell/cell_polygon.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "ChiDataTypes/byte_array.h"
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
 //###################################################################
@@ -19,8 +20,8 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
 {
   MPI_Barrier(MPI_COMM_WORLD);
 
-  std::set<uint64_t> local_neighboring_cell_indices;
-  std::set<int> neighboring_partitions;
+  std::set<uint64_t> local_cells_on_partition_bndry;
+  std::set<uint64_t> neighboring_partitions;
 
   //============================================= Collect local neighboring
   //                                              cell indices and neighboring
@@ -30,16 +31,12 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   // of local cells and a set of destination
   // partitions.
   for (auto& cell : local_cells)
-  {
     for (auto& face : cell.faces)
-    {
       if (face.has_neighbor and (not face.IsNeighborLocal(*this)))
       {
-        local_neighboring_cell_indices.insert(cell.local_id);
+        local_cells_on_partition_bndry.insert(cell.local_id);
         neighboring_partitions.insert(cells[face.neighbor_id].partition_id);
       }
-    }
-  }
 
   //============================================= Subscribe neighbor-partitions
   //                                              the local cells they need
@@ -48,16 +45,16 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
   // pair.second is the list of cells to be sent to that location.
   size_t num_neighbor_partitions = neighboring_partitions.size();
 
-  typedef std::pair<int,std::vector<int>> ListOfCells;
+  typedef std::pair<uint64_t ,std::vector<uint64_t>> LocationListOfCells;
 
-  std::vector<ListOfCells> destination_subscriptions;
+  std::vector<LocationListOfCells> destination_subscriptions;
   destination_subscriptions.reserve(num_neighbor_partitions);
-  for (int adj_part : neighboring_partitions)
+  for (uint64_t adj_part : neighboring_partitions)
   {
-    ListOfCells new_list;
+    LocationListOfCells new_list;
 
     new_list.first = adj_part;
-    for (int local_cell_index : local_neighboring_cell_indices)
+    for (uint64_t local_cell_index : local_cells_on_partition_bndry)
     {
       auto& cell = local_cells[local_cell_index];
 
@@ -71,213 +68,91 @@ void chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells(
     destination_subscriptions.push_back(new_list);
   }//for adj partition
 
-  //============================================= Serialize
-  // For each location we now serialize the cells
-  // it needs.
-  // The serialized values will be as follows
-  // - cell_type
-  // - cell_glob_index
 
-  // - cell_local_index
-
-  // - cell_mat_id
-  // - cell_dof_count
-  // - cell_face_count
-  //
-  // - dof 0 glob_index
-  //     to
-  // - dof N glob_index
-  //
-  // - face_0 dof_count
-  // - face_0 dof 0 glob_index
-  //     to
-  // - face_0 dof fN glob_index
-  //
-  // - repeat all face info
-  std::vector<ListOfCells> destination_serialized_data;
-
-  destination_serialized_data.reserve(num_neighbor_partitions);
-
-  int total_serial_size = 0;
-  for (auto& cell_list : destination_subscriptions)
+  //======================================== Build serial data for specific
+  //                                         locations
+  // This is needed to later build send-counts
+  // and displacements
+  std::vector<chi_data_types::ByteArray> locI_serial_data(chi_mpi.process_count);
+  for (const auto& cell_list : destination_subscriptions)
   {
-    ListOfCells new_serial_data;
+    const size_t locID                      = cell_list.first;
+    const std::vector<uint64_t>& index_list = cell_list.second;
 
-    new_serial_data.first = cell_list.first;
-    for (int local_cell_index : cell_list.second)
+    for (uint64_t cell_local_id : index_list)
     {
-      auto& cell = local_cells[local_cell_index];
-
-      std::vector<int>& border_cell_info = new_serial_data.second;
-
-      if (cell.Type() == chi_mesh::CellType::SLAB)
-        border_cell_info.push_back(3);                         //cell_type
-      else if (cell.Type() == chi_mesh::CellType::POLYGON)
-        border_cell_info.push_back(4);                         //cell_type
-      else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-        border_cell_info.push_back(5);                         //cell_type
-      else
-        border_cell_info.push_back(-1);                        //cell_type
-
-      border_cell_info.push_back(cell.global_id);         //cell_glob_index
-      border_cell_info.push_back(cell.local_id);         //cell_local_index
-      border_cell_info.push_back(cell.material_id);            //cell_mat_id
-      border_cell_info.push_back(cell.partition_id);           //cell_par_id
-      border_cell_info.push_back(cell.vertex_ids.size());      //cell_dof_count
-      border_cell_info.push_back(cell.faces.size());           //cell_face_count
-
-      for (auto vid : cell.vertex_ids) //vid = vertex-id
-        border_cell_info.push_back(vid);//dof 0 to N
-
-      for (auto& face : cell.faces)
-      {
-        int face_dof_count = face.vertex_ids.size();
-        border_cell_info.push_back(face_dof_count);         //face dof_count
-        for (int fvid : face.vertex_ids) //fvid = face-vertex-id
-          border_cell_info.push_back(fvid);
-        //face dof 0 to fN
-      }
+      auto& cell = local_cells[cell_local_id];
+      locI_serial_data[locID].Append(cell.Serialize());
     }
-    total_serial_size += new_serial_data.second.size();
-    destination_serialized_data.push_back(new_serial_data);
   }
 
-  //============================================= Build send-counts and
-  //                                              send-displacements arrays, and
-  //                                              serialized vector
-  std::vector<int> send_counts(chi_mpi.process_count,0);
-  std::vector<int> send_displs(chi_mpi.process_count,0);
-  std::vector<int> global_serialized_data;
+  //======================================== Declare communication arrays
+  std::vector<int> sendcounts(chi_mpi.process_count, 0);
+  std::vector<int> senddispls(chi_mpi.process_count, 0);
+  std::vector<int> recvcounts(chi_mpi.process_count, 0);
+  std::vector<int> recvdispls(chi_mpi.process_count, 0);
 
-  global_serialized_data.reserve(total_serial_size);
-
-  int displacement = 0;
-  for (auto& info : destination_serialized_data)
+  //======================================== Populate sendcounts and senddispls
   {
-    send_counts[info.first] = info.second.size();
-    send_displs[info.first] = displacement;
-    displacement += info.second.size();
-
-    for (int val : info.second)
-      global_serialized_data.push_back(val);
-  }
-
-  //============================================= Communicate counts
-  std::vector<int> recv_counts(chi_mpi.process_count,0);
-
-  MPI_Alltoall(send_counts.data(), 1, MPI_INT,
-               recv_counts.data(), 1, MPI_INT, MPI_COMM_WORLD);
-
-  //============================================= Build receive displacements
-  std::vector<int> recv_displs(chi_mpi.process_count,0);
-  int total_receive_size = 0;
-  int c=0;
-  for (auto val : recv_counts)
-  {
-    recv_displs[c] = total_receive_size;
-    total_receive_size += val;
-    ++c;
-  }
-
-  //============================================= Receive serialized data
-  std::vector<int> global_receive_data(total_receive_size,0);
-  MPI_Alltoallv(global_serialized_data.data(),
-                send_counts.data(),
-                send_displs.data(),
-                MPI_INT,
-                global_receive_data.data(),
-                recv_counts.data(),
-                recv_displs.data(),
-                MPI_INT,
-                MPI_COMM_WORLD);
-
-  //============================================= Deserialize
-  {
-    int k=0;
-    while (k<global_receive_data.size())
+    int displacement=0;
+    for (int locI=0; locI<chi_mpi.process_count; ++locI)
     {
+      sendcounts[locI] = static_cast<int>(locI_serial_data[locI].Size());
+      senddispls[locI] = displacement;
+      displacement += sendcounts[locI];
+    }//for locI
+  }
 
-      int cell_type       = global_receive_data[k]; k++;
-      chi_mesh::Cell* cell;
-      if (cell_type == 3)
-        cell = new chi_mesh::CellSlab;
-      else if (cell_type == 4)
-        cell = new chi_mesh::CellPolygon;
-      else if (cell_type == 5)
-        cell = new chi_mesh::CellPolyhedron;
-      else
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "chi_mesh::MeshContinuum::CommunicatePartitionNeighborCells, "
-          << "unsupported cell type encountered during deserialization."
-          << " " << cell_type << " " << k << " " << global_receive_data.size();
-        exit(EXIT_FAILURE);
-      }
+  //======================================== Communicate to populate recvcounts
+  MPI_Alltoall(sendcounts.data(), //sendbuf
+               1, MPI_INT,        //sendcount, sendtype
+               recvcounts.data(), //recvbuf
+               1, MPI_INT,        //recvcount, recvtype
+               MPI_COMM_WORLD);   //communicator
 
-      cell->global_id = global_receive_data[k]; k++;
-      cell->local_id = global_receive_data[k]; k++;
-      cell->material_id    = global_receive_data[k]; k++;
-      cell->partition_id   = global_receive_data[k]; k++;
-      int cell_dof_count  = global_receive_data[k]; k++;
-      int cell_face_count = global_receive_data[k]; k++;
+  //======================================== Populate recvdispls and
+  //                                         total_recv_count
+  size_t total_recv_count;
+  {
+    int displacement=0;
+    for (int locI=0; locI<chi_mpi.process_count; ++locI)
+    {
+      recvdispls[locI] = displacement;
+      displacement += recvcounts[locI];
+    }//for locI
+    total_recv_count = displacement;
+  }
 
-      cell->vertex_ids.reserve(cell_dof_count);
-      for (int v=0; v<cell_dof_count; ++v)
-      {
-        cell->vertex_ids.push_back(global_receive_data[k]);
-        k++;
-      }
+  //======================================== Make a consolidated send buffer
+  chi_data_types::ByteArray sendbuf_serial_data;
+  for (const auto& serial_data : locI_serial_data)
+    sendbuf_serial_data.Append(serial_data);
 
-      cell->centroid = ComputeCentroidFromListOfNodes(cell->vertex_ids);
+  //======================================== Make a recvbuf
+  chi_data_types::ByteArray recvbuf(total_recv_count);
 
-      for (int f=0; f<cell_face_count; ++f)
-      {
-        int face_dof_count = global_receive_data[k]; k++;
-        cell->faces.emplace_back();
-        cell->faces[f].vertex_ids.reserve(face_dof_count);
-        for (int fv=0; fv<face_dof_count; fv++)
-        {
-          int vgi = global_receive_data[k]; k++;
-          cell->faces[f].vertex_ids.push_back(vgi);
-        }
-        cell->faces[f].centroid =
-          ComputeCentroidFromListOfNodes(cell->faces[f].vertex_ids);
+  //======================================== Communicate serial data
+  MPI_Alltoallv(sendbuf_serial_data.Data().data(), //sendbuf
+                sendcounts.data(),                 //sendcounts
+                senddispls.data(),                 //senddispls
+                MPI_BYTE,                          //sendtype
+                recvbuf.Data().data(),             //recvbuf
+                recvcounts.data(),                 //recvcounts
+                recvdispls.data(),                 //recvdispls
+                MPI_BYTE,                          //recvtype
+                MPI_COMM_WORLD);                   //comm
 
-        if (cell->Type() == chi_mesh::CellType::SLAB)
-        {
-          if (f == 0)
-            cell->faces[f].normal = chi_mesh::Normal(0.0,0.0,-1.0);
-          else
-            cell->faces[f].normal = chi_mesh::Normal(0.0,0.0, 1.0);
-        }
-        else if (cell->Type() == chi_mesh::CellType::POLYGON)
-        {
-          auto k_hat = chi_mesh::Normal(0.0,0.0, 1.0);
-
-          const auto& v0 = vertices[cell->faces[f].vertex_ids[0]];
-          const auto& v1 = vertices[cell->faces[f].vertex_ids[1]];
-
-          auto v01 = v1 - v0;
-
-          cell->faces[f].normal = (v01.Cross(k_hat)).Normalized();
-        }
-        else if (cell->Type() == chi_mesh::CellType::POLYHEDRON)
-        {
-          const auto& v0 = vertices[cell->faces[f].vertex_ids[0]];
-          const auto& v1 = vertices[cell->faces[f].vertex_ids[1]];
-          const auto& v2 = cell->faces[f].centroid;
-
-          auto v01 = v1 - v0;
-          auto v12 = v2 - v1;
-
-          cell->faces[f].normal = (v01.Cross(v12)).Normalized();
-        }
-      }
+  //======================================== Read cells from the received buffer
+  if (recvbuf.Size()>0)
+  {
+    size_t address=0;
+    while (address < recvbuf.Size())
+    {
+      auto cell_read = chi_mesh::Cell::DeSerialize(recvbuf, address);
+      auto cell = new chi_mesh::Cell(std::move(cell_read));
 
       neighbor_cells.insert(std::pair<uint64_t, Cell*>(cell->global_id,cell));
     }
   }
-
-
 
 }

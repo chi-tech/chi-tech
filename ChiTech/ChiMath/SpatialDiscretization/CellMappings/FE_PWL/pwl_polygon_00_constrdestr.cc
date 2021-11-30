@@ -1,10 +1,12 @@
 #include "pwl_polygon.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 //###################################################################
 /** Constructor.*/
 PolygonMappingFE_PWL::
   PolygonMappingFE_PWL(
-    const chi_mesh::CellPolygon& poly_cell,
+    const chi_mesh::Cell& poly_cell,
     const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
     const chi_math::QuadratureTriangle& volume_quadrature,
     const chi_math::QuadratureLine&     surface_quadrature) :

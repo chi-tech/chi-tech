@@ -2,7 +2,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 SlabMappingFE_PWL::
-SlabMappingFE_PWL(const chi_mesh::CellSlab &slab_cell,
+SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
                   const chi_mesh::MeshContinuumPtr &ref_grid,
                   const chi_math::QuadratureLine &volume_quadrature) :
   CellMappingFE_PWL(2, ref_grid),

@@ -4,7 +4,7 @@
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 #include "ChiMath/Quadratures/quadrature_tetrahedron.h"
 #include "ChiMath/Quadratures/quadrature_triangle.h"
-#include "ChiMesh/Cell/cell_polyhedron.h"
+#include "ChiMesh/Cell/cell.h"
 
 
 
@@ -31,7 +31,7 @@ private:
   {
     double                    detJ = 0.0;
     double                    detJ_surf = 0.0;
-    std::vector<int>          v_index;
+    std::vector<uint64_t>     v_index;
     chi_mesh::Vector3         v0;
     chi_mesh::Matrix3x3       J;
     chi_mesh::Matrix3x3       Jinv;
@@ -85,7 +85,7 @@ private:
 
 public:
   //00_constrdestr.cc
-  PolyhedronMappingFE_PWL(const chi_mesh::CellPolyhedron& polyh_cell,
+  PolyhedronMappingFE_PWL(const chi_mesh::Cell& polyh_cell,
                           const chi_mesh::MeshContinuumPtr& ref_grid,
                           const chi_math::QuadratureTetrahedron& volume_quadrature,
                           const chi_math::QuadratureTriangle&    surface_quadrature);

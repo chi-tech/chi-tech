@@ -70,35 +70,36 @@ public:
   void ExportCellsToPython(const char* fileName,
                            bool surface_only=true,
                            std::vector<int>* cell_flags = nullptr,
-                           int options = 0);
+                           int options = 0) const;
   void ExportCellsToObj(const char* fileName,
                            bool per_material=false,
-                           int options = 0);
-  void ExportCellsToVTK(const char* baseName);
+                           int options = 0) const;
+  void ExportCellsToVTK(const char* baseName) const;
 
   //02
   void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
   size_t NumberOfFaceHistogramBins();
   size_t MapFaceHistogramBins(size_t num_face_dofs);
   size_t GetFaceHistogramBinDOFSize(size_t category);
-  bool IsCellLocal(uint64_t cell_global_index);
-  bool IsCellBndry(uint64_t cell_global_index);
+  bool IsCellLocal(uint64_t cell_global_index) const;
+  bool IsCellBndry(uint64_t cell_global_index) const;
 
   void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
-                              std::vector<short>& dof_mapping);
+                              std::vector<short>& dof_mapping) const;
 
-  chi_mesh::Vector3 ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list);
+  chi_mesh::Vector3
+  ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
 
   void CommunicatePartitionNeighborCells(
     std::map<uint64_t, chi_mesh::Cell*>& neighbor_cells);
 
   ChiMPICommunicatorSet& GetCommunicator();
 
-  size_t GetGlobalNumberOfCells();
+  size_t GetGlobalNumberOfCells() const;
 
-  std::vector<uint64_t> GetDomainUniqueBoundaryIDs();
+  std::vector<uint64_t> GetDomainUniqueBoundaryIDs() const;
 
-  size_t CountCellsInLogicalVolume(chi_mesh::LogicalVolume& log_vol);
+  size_t CountCellsInLogicalVolume(chi_mesh::LogicalVolume& log_vol) const;
 };
 
 #endif //CHI_MESHCONTINUUM_H_

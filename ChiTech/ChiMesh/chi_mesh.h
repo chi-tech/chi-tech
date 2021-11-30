@@ -45,10 +45,6 @@ namespace chi_mesh
 
   //=================================== Cells
   class Cell;
-//  class CellSlab;
-//  class CellTriangle;
-//  class CellPolygon;
-//  class CellPolyhedron;
 
   //=================================== Field function interpolation
   class FieldFunctionInterpolation;

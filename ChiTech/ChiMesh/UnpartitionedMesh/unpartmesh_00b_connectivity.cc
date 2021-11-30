@@ -24,12 +24,12 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
   //======================================== Establish internal connectivity
   // Populate vertex subscriptions to internal cells
-  std::vector<std::set<size_t>> vertex_subs(vertices.size());
+  vertex_cell_subscriptions.resize(vertices.size());
   uint64_t cur_cell_id=0;
   for (auto& cell : raw_cells)
   {
     for (auto vid : cell->vertex_ids)
-      vertex_subs[vid].insert(cur_cell_id);
+      vertex_cell_subscriptions[vid].insert(cur_cell_id);
     ++cur_cell_id;
   }
 
@@ -40,7 +40,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   {
     cells_to_search.clear();
     for (uint64_t vid : cell->vertex_ids)
-      for (uint64_t cell_id : vertex_subs[vid])
+      for (uint64_t cell_id : vertex_cell_subscriptions[vid])
         if (cell_id != cur_cell_id)
           cells_to_search.insert(cell_id);
 
@@ -79,6 +79,8 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
     ++cur_cell_id;
   }//for cell
 
+  chi_log.Log() << "Establishing cell boundary connectivity.";
+
   //======================================== Establish boundary connectivity
   // Make list of internal cells on the boundary
   std::vector<LightWeightCell*> internal_cells_on_boundary;
@@ -93,13 +95,13 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
   }
 
   // Populate vertex subscriptions to boundary cells
-  vertex_subs.clear();
-  vertex_subs.assign(vertices.size(),std::set<size_t>());
+  std::vector<std::set<uint64_t>>
+    vertex_bndry_cell_subscriptions(vertices.size());
   cur_cell_id=0;
   for (auto& cell : raw_boundary_cells)
   {
     for (auto vid : cell->vertex_ids)
-      vertex_subs[vid].insert(cur_cell_id);
+      vertex_bndry_cell_subscriptions[vid].insert(cur_cell_id);
     ++cur_cell_id;
   }
 
@@ -114,7 +116,7 @@ void chi_mesh::UnpartitionedMesh::BuildMeshConnectivity()
 
       cells_to_search.clear();
       for (uint64_t vid : face.vertex_ids)
-        for (uint64_t cell_id : vertex_subs[vid])
+        for (uint64_t cell_id : vertex_bndry_cell_subscriptions[vid])
           cells_to_search.insert(cell_id);
 
       for (uint64_t adj_cell_id : cells_to_search)

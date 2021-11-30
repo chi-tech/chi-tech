@@ -1,8 +1,6 @@
 #include "raytracing.h"
-#include <ChiMesh/Cell/cell.h>
-#include <ChiMesh/Cell/cell_polygon.h>
-#include <ChiMesh/Cell/cell_polyhedron.h>
-#include <ChiMesh/MeshContinuum/chi_meshcontinuum.h>
+#include "ChiMesh/Cell/cell.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include <algorithm>
 
@@ -259,6 +257,7 @@ void chi_mesh::PopulateRaySegmentLengths(
   const chi_mesh::Vector3& line_point1,
   const chi_mesh::Vector3& omega)
 {
+  const chi_mesh::Vector3 khat(0,0,1);
   std::set<double> distance_set;
 
   double track_length;
@@ -285,10 +284,6 @@ void chi_mesh::PopulateRaySegmentLengths(
   // segment lengths from the strip defined by v0 to vc.
   if (cell.Type() == chi_mesh::CellType::POLYGON)
   {
-    auto& poly_cell = (chi_mesh::CellPolygon&)cell;
-
-    auto segment_normals = poly_cell.GetSegmentNormals(grid);
-
     int f=-1;
     for (auto& face : cell.faces) //edges
     {
@@ -296,7 +291,7 @@ void chi_mesh::PopulateRaySegmentLengths(
       const auto& v0 = grid.vertices[face.vertex_ids[0]];
       const auto& vc = cell.centroid;
 
-      auto& n0 = segment_normals[f];
+      auto n0 = (vc-v0).Cross(khat).Normalized();
 
       chi_mesh::Vertex intersection_point;
       double d = 0.0;

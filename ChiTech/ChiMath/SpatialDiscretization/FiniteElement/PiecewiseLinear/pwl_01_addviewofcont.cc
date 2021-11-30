@@ -22,12 +22,11 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
   {
     case chi_mesh::CellType::SLAB:
     {
-      const auto& slab_cell = static_cast<const chi_mesh::CellSlab&>(cell);
       switch (cs_type)
       {
         case chi_math::CoordinateSystemType::CARTESIAN:
         {
-          auto cell_fe_view = new SlabMappingFE_PWL(slab_cell,
+          auto cell_fe_view = new SlabMappingFE_PWL(cell,
                                                     ref_grid,
                                                     line_quad_order_arbitrary);
 
@@ -36,7 +35,7 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
         }
         case chi_math::CoordinateSystemType::CYLINDRICAL:
         {
-          auto cell_fe_view = new SlabMappingFE_PWL_Cylindrical(slab_cell,
+          auto cell_fe_view = new SlabMappingFE_PWL_Cylindrical(cell,
                                                                 ref_grid,
                                                                 line_quad_order_arbitrary);
 
@@ -45,7 +44,7 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
         }
         case chi_math::CoordinateSystemType::SPHERICAL:
         {
-          auto cell_fe_view = new SlabMappingFE_PWL_Spherical(slab_cell,
+          auto cell_fe_view = new SlabMappingFE_PWL_Spherical(cell,
                                                               ref_grid,
                                                               line_quad_order_arbitrary);
 
@@ -59,12 +58,11 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
     }
     case chi_mesh::CellType::POLYGON:
     {
-      const auto& poly_cell = static_cast<const chi_mesh::CellPolygon&>(cell);
       switch (cs_type)
       {
         case chi_math::CoordinateSystemType::CARTESIAN:
         {
-          auto cell_fe_view = new PolygonMappingFE_PWL(poly_cell,
+          auto cell_fe_view = new PolygonMappingFE_PWL(cell,
                                                        ref_grid,
                                                        tri_quad_order_arbitrary,
                                                        line_quad_order_arbitrary);
@@ -74,7 +72,7 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
         }
         case chi_math::CoordinateSystemType::CYLINDRICAL:
         {
-          auto cell_fe_view = new PolygonMappingFE_PWL_Cylindrical(poly_cell,
+          auto cell_fe_view = new PolygonMappingFE_PWL_Cylindrical(cell,
                                                                    ref_grid,
                                                                    tri_quad_order_arbitrary,
                                                                    line_quad_order_arbitrary);
@@ -89,12 +87,11 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLD::
     }
     case chi_mesh::CellType::POLYHEDRON:
     {
-      const auto& polyh_cell = static_cast<const chi_mesh::CellPolyhedron&>(cell);
       switch (cs_type)
       {
         case chi_math::CoordinateSystemType::CARTESIAN:
         {
-          auto cell_fe_view = new PolyhedronMappingFE_PWL(polyh_cell,
+          auto cell_fe_view = new PolyhedronMappingFE_PWL(cell,
                                                           ref_grid,
                                                           tet_quad_order_arbitrary,
                                                           tri_quad_order_arbitrary);

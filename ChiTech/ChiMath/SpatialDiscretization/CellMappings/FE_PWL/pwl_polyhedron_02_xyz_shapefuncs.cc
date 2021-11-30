@@ -1,5 +1,7 @@
 #include "pwl_polyhedron.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 //###################################################################
 /**Returns the evaluation of shape function i at the supplied point.*/
 double PolyhedronMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
