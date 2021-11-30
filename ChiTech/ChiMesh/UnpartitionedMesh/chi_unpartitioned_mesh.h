@@ -17,6 +17,11 @@ public:
     std::vector<uint64_t> vertex_ids;
     bool has_neighbor = false;
     uint64_t neighbor=0;
+
+    LightWeightFace() = default;
+    explicit
+    LightWeightFace(std::vector<uint64_t> in_vertex_ids) :
+      vertex_ids(std::move(in_vertex_ids)) {}
   };
   struct LightWeightCell
   {
@@ -82,6 +87,18 @@ public:
   void ReadFromWavefrontOBJ(const Options& options);
 
   void ReadFromMsh(const Options& options);
+
+  void PushProxyCell(const std::string& type_str,
+                     const std::string& sub_type_str,
+                     int cell_num_faces,
+                     int cell_material_id,
+                     const std::vector<std::vector<uint64_t>>& proxy_faces);
+
+  ~UnpartitionedMesh()
+  {
+    for (auto& cell : raw_cells)          delete cell;
+    for (auto& cell : raw_boundary_cells) delete cell;
+  }
 };
 
 

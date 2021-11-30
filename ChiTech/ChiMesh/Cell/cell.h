@@ -85,6 +85,8 @@ public:
                 cell_sub_type(in_cell_sub_type)
                 {}
 
+  Cell& operator=(const Cell& other);
+
   virtual ~Cell() = default;
 
 public:

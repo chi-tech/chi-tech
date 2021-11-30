@@ -57,7 +57,7 @@ void chi_mesh::mesh_cutting::
     }
     else if (cell.Type() == CellType::POLYHEDRON)
     {
-      if (not CheckPolyhedronQuality(mesh,cell))
+      if (not CheckPolyhedronQuality(mesh,cell,/*check_convexity*/true))
         ++num_bad_quality_cells;
     }
     else
@@ -91,7 +91,7 @@ void chi_mesh::mesh_cutting::
 
       if (num_neg_senses>0 && num_pos_senses>0)
       {
-        cells_to_cut.push_back(&cell);
+        cells_to_cut.emplace_back(&cell);
         break;
       }
     }//for vid
@@ -101,14 +101,10 @@ void chi_mesh::mesh_cutting::
   //============================================= Two-D algorithm
   if (mesh.local_cells[0].Type() == CellType::POLYGON)
   {
-    //====================================== Split concave cells
-    //This may add cells to cells_to_cut
-    SplitConcavePolygonsIntoTriangles(mesh, cells_to_cut);
-
     //====================================== Determine cut vertices
     std::set<uint64_t> cut_vertices;
     {
-      for (auto cell_ptr : cells_to_cut)
+      for (auto& cell_ptr : cells_to_cut)
         for (uint64_t vid : cell_ptr->vertex_ids)
         {
           const auto vertex = mesh.vertices[vid];
@@ -123,12 +119,12 @@ void chi_mesh::mesh_cutting::
     //====================================== Build unique edges
     size_t num_edges_cut=0;
     std::set<Edge> edges_set;
-    for (auto cell_ptr : cells_to_cut)
+    for (auto& cell_ptr : cells_to_cut)
     {
       const auto& cell = *cell_ptr;
       const size_t num_edges = cell.vertex_ids.size();
 
-      for (int e=0; e<num_edges; ++e)
+      for (size_t e=0; e<num_edges; ++e)
       {
         auto edge = MakeEdgeFromPolygonEdgeIndex(cell.vertex_ids,e);
         edges_set.insert(std::make_pair(std::min(edge.first,edge.second),
@@ -163,7 +159,7 @@ void chi_mesh::mesh_cutting::
     chi_log.Log() << "Number of cut edges: " << num_edges_cut;
 
     //====================================== Process cells that are cut
-    for (auto cell_ptr : cells_to_cut)
+    for (auto& cell_ptr : cells_to_cut)
     {
       auto& cell = *cell_ptr;
 
@@ -177,7 +173,7 @@ void chi_mesh::mesh_cutting::
     //====================================== Determine cut vertices
     std::set<uint64_t> cut_vertices;
     {
-      for (auto cell_ptr : cells_to_cut)
+      for (auto& cell_ptr : cells_to_cut)
         for (uint64_t vid : cell_ptr->vertex_ids)
         {
           const auto& vertex = mesh.vertices[vid];
@@ -190,7 +186,7 @@ void chi_mesh::mesh_cutting::
     //====================================== Build unique edges
     size_t num_edges_cut=0;
     std::set<Edge> edges_set;
-    for (auto cell_ptr : cells_to_cut)
+    for (auto& cell_ptr : cells_to_cut)
     {
       const auto& cell = *cell_ptr;
 
@@ -198,7 +194,7 @@ void chi_mesh::mesh_cutting::
       {
         const size_t num_edges = face.vertex_ids.size();
 
-        for (int e=0; e<num_edges; ++e)
+        for (size_t e=0; e<num_edges; ++e)
         {
           auto edge = MakeEdgeFromPolygonEdgeIndex(face.vertex_ids,e);
           edges_set.insert(std::make_pair(std::min(edge.first,edge.second),
@@ -234,11 +230,12 @@ void chi_mesh::mesh_cutting::
     chi_log.Log() << "Number of cut edges: " << num_edges_cut;
 
     //====================================== Process cells that are cut
-    for (auto cell_ptr : cells_to_cut)
+    for (auto& cell_ptr : cells_to_cut)
     {
-      auto& cell = *cell_ptr;
-
-      CutTetrahedron(cut_edges, cut_vertices, p, n, mesh, cell);
+      Cut3DCell(cut_edges, cut_vertices,
+                plane_point,plane_normal,
+                float_compare,
+                mesh,*cell_ptr);
     }//for cell_ptr
   }
 
