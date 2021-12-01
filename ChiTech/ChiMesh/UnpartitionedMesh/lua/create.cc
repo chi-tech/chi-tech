@@ -8,7 +8,18 @@
  */
 
 //###################################################################
-/**Creates an empty unpartitioned mesh.
+/**Creates an empty unpartitioned mesh. An empty unpartitioned mesh
+ * is meant to be manipulated with calls to chiUnpartitionedMeshUploadVertex()
+ * and chiUnpartitionedMeshUploadCell(). It essentially supports building a mesh
+ * manually.
+ *
+##_
+
+###Example
+Example usage
+\code
+umesh = chiCreateEmptyUnpartitionedMesh()
+\endcode
 
 \ingroup LuaUnpartitionedMesh*/
 int chiCreateEmptyUnpartitionedMesh(lua_State* L)
@@ -26,9 +37,19 @@ int chiCreateEmptyUnpartitionedMesh(lua_State* L)
 }
 
 //###################################################################
-/**Destroy an unpartitioned mesh.
+/**Destroy an unpartitioned mesh. This routine should be called for
+ * memory sensitive simulations because each process will have a full
+ * copy of this data.
  *
 \param handle int Handle to mesh.
+
+##_
+
+###Example
+Example usage
+\code
+chiDestroyUnpartitionedMesh(umesh)
+\endcode
 
 \ingroup LuaUnpartitionedMesh*/
 int chiDestroyUnpartitionedMesh(lua_State* L)
