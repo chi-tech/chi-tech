@@ -138,11 +138,11 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << total_global_cells
     << std::endl;
 
-  chi_log.Log(LOG_0)
-    << "VolumeMesherExtruder: Number of nodes in region = "
-    << grid->vertices.size()
-    << std::endl;
-  grid->vertices.shrink_to_fit();
+//  chi_log.Log(LOG_0)
+//    << "VolumeMesherExtruder: Number of nodes in region = "
+//    << grid->vertices.size()
+//    << std::endl;
+//  grid->vertices.shrink_to_fit();
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

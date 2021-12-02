@@ -58,7 +58,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
     {
       uint64_t vgi = cell.vertex_ids[v]; //vertex global id
       std::vector<double> d_node(3);
-      auto vertex = grid->vertices.at(vgi);
+      auto vertex = grid->vertices[vgi];
       d_node[0] = vertex.x;
       d_node[1] = vertex.y;
       d_node[2] = vertex.z;

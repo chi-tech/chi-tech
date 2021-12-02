@@ -15,7 +15,7 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
                  chi_mesh::MeshContinuum& grid)
 {
   //================================================== For each layer
-  std::set<uint64_t> local_vertices_global_ids;
+  std::set<uint64_t> vertex_ids_with_local_scope;
   for (size_t iz=0; iz<(vertex_layers.size()-1); iz++)
   {
     for (const auto& template_cell : template_grid.local_cells)
@@ -29,32 +29,32 @@ CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
 
       if (has_local_scope)
       {
+        auto& vertex_set = vertex_ids_with_local_scope;
         for (auto tc_vid : template_cell.vertex_ids)
-          local_vertices_global_ids.insert(tc_vid + iz * node_z_index_incr);
+          vertex_set.insert(tc_vid + iz * node_z_index_incr);
 
         for (auto tc_vid : template_cell.vertex_ids)
-          local_vertices_global_ids.insert(tc_vid + (iz + 1) * node_z_index_incr);
+          vertex_set.insert(tc_vid + (iz + 1) * node_z_index_incr);
       }
     }//for template cell
   }//for layer
 
   //============================================= Now add all nodes
   //                                              that are local or neighboring
-  grid.vertices.clear();
-
+  uint64_t vid = 0;
   for (auto layer_z_level : vertex_layers)
   {
-    for (auto& vertex : template_grid.vertices)
+    for (auto& id_vertex : template_grid.vertices)
     {
-      size_t new_vert_index = grid.vertices.size();
+      const auto& vertex = id_vertex.second;
+      auto local_scope = vertex_ids_with_local_scope.find(vid);
 
-      auto local_index = local_vertices_global_ids.find(new_vert_index);
+      if (local_scope != vertex_ids_with_local_scope.end())
+        grid.vertices.Insert(vid, Vector3(vertex.x, vertex.y, layer_z_level));
 
-      if (local_index != local_vertices_global_ids.end())
-        grid.vertices.emplace_back(vertex.x, vertex.y, layer_z_level);
-      else
-        grid.vertices.emplace_back();
-
+      ++vid;
     }//for vertex
   }//for layer
+
+  grid.SetGlobalVertexCount(vid);
 }

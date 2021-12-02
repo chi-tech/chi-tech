@@ -58,7 +58,7 @@ void chi_mesh::MeshContinuum::
     fprintf(of,"o %s\n",file_base_name.c_str());
 
     //====================================== Develop node mapping and write them
-    std::vector<int> node_mapping(vertices.size(), -1);
+    std::vector<int> node_mapping(GetGlobalVertexCount(), -1);
 
     int node_counter=0;
     for (auto node : nodes_set)
@@ -174,7 +174,7 @@ void chi_mesh::MeshContinuum::
       fprintf(of,"o %s\n",mat_base_name.c_str());
 
       //====================================== Develop node mapping and write them
-      std::vector<int> node_mapping(vertices.size(), -1);
+      std::vector<int> node_mapping(GetGlobalVertexCount(), -1);
 
       int node_counter=0;
       for (auto node : nodes_set)

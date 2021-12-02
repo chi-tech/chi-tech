@@ -4,6 +4,7 @@
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
 #include "chi_meshcontinuum_globalcellhandler.h"
+#include "chi_meshcontinuum_vertexhandler.h"
 
 #include "chi_mpi.h"
 
@@ -19,9 +20,11 @@ private:
   std::map<uint64_t,uint64_t> global_cell_id_to_native_id_map;
   std::map<uint64_t,uint64_t> global_cell_id_to_foreign_id_map;
 
+  uint64_t global_vertex_count=0;
 
 public:
-  std::vector<chi_mesh::Node>    vertices;
+  VertexHandler                  vertices;
+//  std::vector<chi_mesh::Node>    vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
@@ -51,6 +54,9 @@ public:
     surface_mesh = nullptr;
     line_mesh    = nullptr;
   }
+
+  void SetGlobalVertexCount(const uint64_t count) {global_vertex_count = count;}
+  uint64_t GetGlobalVertexCount() const {return global_vertex_count;}
 
   static
   std::shared_ptr<MeshContinuum> New()

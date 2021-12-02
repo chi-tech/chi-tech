@@ -368,7 +368,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
   local_block_address = local_from;
 
   local_base_block_size = local_to - local_from + 1;
-  globl_base_block_size = ref_grid->vertices.size();
+  globl_base_block_size = ref_grid->GetGlobalVertexCount();
 
   //======================================== Collect block addresses
   locJ_block_address.clear();

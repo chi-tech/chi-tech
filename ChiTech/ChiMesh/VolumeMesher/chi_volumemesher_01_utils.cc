@@ -41,8 +41,11 @@ void chi_mesh::VolumeMesher::
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Copy nodes
-  for (auto& vertex : surface_mesh->vertices)
-    vol_continuum->vertices.push_back(vertex);
+  {
+    uint64_t id = 0;
+    for (auto& vertex : surface_mesh->vertices)
+      vol_continuum->vertices.Insert(id++, vertex);
+  }
 
   //============================================= Delete nodes
   if (delete_surface_mesh_elements)
@@ -192,10 +195,12 @@ void chi_mesh::VolumeMesher::
   CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
                      chi_mesh::MeshContinuumPtr& grid)
 {
-  auto handler = chi_mesh::GetCurrentHandler();
-
-  // Copy nodes
-  grid->vertices = umesh.vertices;
+  //=================================== Copy nodes
+  {
+    uint64_t id = 0;
+    for (const auto& vertex : umesh.vertices)
+      grid->vertices.Insert(id++, vertex);
+  }
 
   size_t num_cells=0;
   for (auto& raw_cell : umesh.raw_cells)
@@ -215,11 +220,6 @@ void chi_mesh::VolumeMesher::
 
     cell->global_id = num_cells;
     cell->local_id  = num_cells;
-
-//    auto xy_partition_indices = GetCellXYPartitionID(cell);
-//    cell->partition_id = xy_partition_indices.second*
-//                         handler->volume_mesher->options.partition_x +
-//                         xy_partition_indices.first;
     cell->partition_id = chi_mpi.location_id;
 
     cell->centroid    = raw_cell->centroid;

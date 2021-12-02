@@ -86,10 +86,6 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   else
     cell_pids = PARMETIS(*umesh);
 
-  //======================================== Load up the vertices
-  for (auto& vert : umesh->vertices)
-    grid->vertices.push_back(vert);
-
   //======================================== Load up the cells
   auto& vertex_subs = umesh->vertex_cell_subscriptions;
   size_t cell_globl_id = 0;
@@ -99,11 +95,17 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     {
       auto cell = MakeCell(*raw_cell, cell_globl_id,
                            cell_pids[cell_globl_id], umesh->vertices);
+
+      for (uint64_t vid : cell->vertex_ids)
+        grid->vertices.Insert(vid, umesh->vertices[vid]);
+
       grid->cells.push_back(cell);
     }
 
     ++cell_globl_id;
   }//for raw_cell
+
+  grid->SetGlobalVertexCount(umesh->vertices.size());
 
   chi_log.Log(LOG_0) << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
@@ -112,11 +114,11 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
 
   //======================================== Concluding messages
-  chi_log.Log(LOG_0)
-    << "VolumeMesherPredefinedUnpartitioned: Number of nodes in region = "
-    << grid->vertices.size()
-    << std::endl;
-  grid->vertices.shrink_to_fit();
+//  chi_log.Log(LOG_0)
+//    << "VolumeMesherPredefinedUnpartitioned: Number of nodes in region = "
+//    << grid->vertices.size()
+//    << std::endl;
+//  grid->vertices.shrink_to_fit();
 
   chi_log.Log(LOG_ALLVERBOSE_1)
     << "### LOCATION[" << chi_mpi.location_id
