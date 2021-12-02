@@ -3,6 +3,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include <algorithm>
+#include <functional>
 
 //###################################################################
 /**Cuts a polygon.*/
