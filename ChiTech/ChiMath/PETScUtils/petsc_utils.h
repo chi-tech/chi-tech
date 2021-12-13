@@ -35,8 +35,8 @@ namespace chi_math
     Mat CreateSquareMatrix(int64_t local_size, int64_t global_size);
     void CreateSquareMatrix(Mat& A, int64_t local_size, int64_t global_size);
     void InitMatrixSparsity(Mat A,
-                            std::vector<int64_t>& nodal_nnz_in_diag,
-                            std::vector<int64_t>& nodal_nnz_off_diag);
+                            const std::vector<int64_t>& nodal_nnz_in_diag,
+                            const std::vector<int64_t>& nodal_nnz_off_diag);
 
     //03
     PETScSolverSetup CreateCommonKrylovSolverSetup(
