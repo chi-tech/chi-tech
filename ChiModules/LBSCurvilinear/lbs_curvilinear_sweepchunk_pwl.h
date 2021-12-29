@@ -23,14 +23,10 @@ private:
   chi_math::SpatialDiscretization_PWLD& grid_fe_view_secondary;
   /** Unknown manager. */
   chi_math::UnknownManager unknown_manager;
-  /** Starting direction angular intensity (for each polar level). */
-  std::vector<double> psi_start;
   /** Sweeping dependency angular intensity (for each polar level). */
   std::vector<double> psi_sweep;
   /** Mapping from direction linear index to direction polar level. */
   std::map<unsigned int, unsigned int> map_polar_level;
-  /** Mapping from direction linear index to information on start/final. */
-  std::map<unsigned int, std::pair<bool, bool>> map_start_final;
   /** Normal vector to determine symmetric boundary condition. */
   chi_mesh::Vector3 normal_vector_boundary;
 
