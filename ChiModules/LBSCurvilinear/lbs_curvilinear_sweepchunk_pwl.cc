@@ -28,7 +28,6 @@ lbs_curvilinear::SweepChunkPWL::
                      in_max_num_cell_dofs)
   , grid_fe_view_secondary(discretization_secondary)
   , unknown_manager()
-  , psi_start()
   , psi_sweep()
   , normal_vector_boundary()
 {
@@ -44,22 +43,15 @@ lbs_curvilinear::SweepChunkPWL::
     unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N,
                                groupset.groups.size());
 
-  //  allocate storage for starting direction and for sweeping dependency
+  //  allocate storage for sweeping dependency
   const unsigned int n_dof =
     discretization_primary.GetNumLocalDOFs(unknown_manager);
-  psi_start.resize(n_dof);
   psi_sweep.resize(n_dof);
 
   //  initialise mappings from direction linear index
   for (const auto& dir_set : curvilinear_product_quadrature->GetDirectionMap())
     for (const auto& dir_idx : dir_set.second)
-    {
       map_polar_level.emplace(dir_idx, dir_set.first);
-
-      const auto dir_start = (dir_idx == dir_set.second.front());
-      const auto dir_final = (dir_idx == dir_set.second.back());
-      map_start_final.emplace(dir_idx, std::make_pair(dir_start, dir_final));
-    }
 
   //  set normal vector for symmetric boundary condition
   const int d =
@@ -137,8 +129,6 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       const auto& omega = groupset.quadrature->omegas[angle_num];
 
       const auto polar_level = map_polar_level[angle_num];
-      const auto start_direction = map_start_final[angle_num].first;
-    //const auto final_direction = map_start_final[angle_num].second;
 
       const auto& fac_diamond_difference =
         curvilinear_product_quadrature->GetDiamondDifferenceFactor()[angle_num];
@@ -240,23 +230,6 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
                                                           cell.local_id,
                                                           f, fj, gs_gi, gs_ss_begin,
                                                           surface_source_active);
-                  const double mu_Nij = -mu * M_surf[f][i][j];
-                  Amat[i][j] += mu_Nij;
-                  for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                    b[gsg][i] += psi[gsg]*mu_Nij;
-                }
-              }
-            }
-            else
-            {
-              for (int fi = 0; fi < num_face_indices; ++fi)
-              {
-                const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-                for (int fj = 0; fj < num_face_indices; ++fj)
-                {
-                  const int j = fe_intgrl_values.FaceDofMapping(f,fj);
-                  const auto jr = grid_fe_view.MapDOFLocal(cell, j, unknown_manager, polar_level, gs_gi);
-                  const double* psi = &psi_start[jr];
                   const double mu_Nij = -mu * M_surf[f][i][j];
                   Amat[i][j] += mu_Nij;
                   for (int gsg = 0; gsg < gs_ss_size; ++gsg)
@@ -385,18 +358,9 @@ lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angl
       }
 
 
-      //  store starting direction angular intensity for each polar level
-      if (start_direction)
-        for (size_t i = 0; i < num_nodes; ++i)
-        {
-          const auto ir = grid_fe_view.MapDOFLocal(cell, i, unknown_manager, polar_level, gs_gi);
-          for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            psi_start[ir+gsg] = b[gsg][i];
-        }
-
       //  update sweeping dependency angular intensity for each polar level
       //  (incoming for next interval)
-      const auto f0 = 1/fac_diamond_difference;
+      const auto f0 = 1 / fac_diamond_difference;
       const auto f1 = f0 - 1;
       for (size_t i = 0; i < num_nodes; ++i)
       {
