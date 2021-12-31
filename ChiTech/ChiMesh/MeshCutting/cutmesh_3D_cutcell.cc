@@ -7,6 +7,7 @@ extern ChiLog& chi_log;
 
 #include <queue>
 #include <algorithm>
+#include <functional>
 
 //###################################################################
 /***/
