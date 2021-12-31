@@ -1,6 +1,7 @@
 #ifndef CHITECH_BYTE_ARRAY_H
 #define CHITECH_BYTE_ARRAY_H
 
+#include <cstddef>
 #include <vector>
 #include <stdexcept>
 

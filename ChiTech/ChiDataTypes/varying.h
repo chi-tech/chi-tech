@@ -3,6 +3,7 @@
 
 #include "chi_data_types.h"
 
+#include <cstddef>
 #include <iostream>
 #include <vector>
 #include <memory>
