@@ -110,7 +110,7 @@ public:
   UnknownStorageType dof_storage_type;
 
   explicit UnknownManager(UnknownStorageType in_storage_type=
-                                  UnknownStorageType::NODAL) :
+                                  UnknownStorageType::NODAL) noexcept :
     dof_storage_type(in_storage_type)
   {}
 

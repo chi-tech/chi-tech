@@ -1,8 +1,10 @@
-#ifndef _chi_mpi_h
-#define _chi_mpi_h
+#ifndef CHI_MPI_H
+#define CHI_MPI_H
 
 #include <mpi.h>
 #include "../ChiMesh/chi_mesh.h"
+
+#include "chi_runtime.h"
 
 //################################################################### Class def
 /**Simple implementation a communicator set.*/
@@ -28,44 +30,23 @@ public:
 /**An object for storing various MPI states.*/
 class ChiMPI
 {
+private:
+  int m_location_id = 0;
+  int m_process_count = 1;
 public:
-  int location_id;
-  int process_count;
-  MPI_Datatype NODE_INFO_C;
-  MPI_Datatype TRIFACE_INFO_C;
-  MPI_Datatype CELL_INFO_C;
+  const int& location_id = m_location_id;
+  const int& process_count = m_process_count;
 
-  MPI_Datatype LOC_SWP_DEP_C;
-
-  static ChiMPI instance;
 
 private:
-  ChiMPI() noexcept
-  {
-    location_id = 0;
-    process_count = 1;
-  }
+  static ChiMPI instance;
+  friend int ChiTech::Initialize(int argc, char **argv);
+
+  ChiMPI() noexcept {}
+  void SetLocationID(int in_location_id) {m_location_id = in_location_id;}
+  void SetProcessCount(int in_process_count) {m_process_count = in_process_count;}
 public:
-  static ChiMPI& GetInstance() noexcept
-    {return instance;}
-  //01
-  void Initialize();
-
-  //02
-//  void BroadcastCellSets();
-//  void ReceiveCellSets();
-
-  //03a
-  void BroadcastNodes(std::vector<chi_mesh::Vertex>* nodes);
-  void ReceiveNodes(std::vector<chi_mesh::Vertex>* nodes);
-
-  //03a
-  void BroadcastTriFaces(std::vector<chi_mesh::Face>* faces);
-  void ReceiveTriFaces(std::vector<chi_mesh::Face>* faces);
-
-  //03c
-//  void SendSweepDependency(int dest, std::vector<int>* dependencies);
-//  void ReceiveSweepDependency(int sorc, std::vector<int>* dependencies);
+  static ChiMPI& GetInstance() noexcept {return instance;}
 };
 
 
