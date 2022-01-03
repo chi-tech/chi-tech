@@ -7,8 +7,9 @@ extern ChiPhysics&   		chi_physics_handler;
 extern ChiTimer        chi_program_timer;
 
 //###################################################################
-/* This function sends the commands contained in the input buffer to
-the lua state from where it is executed. */
+/** This function sends the commands contained in the command_buffer to
+the lua state from where it is executed. These could be commands passed
+ via the command line or loaded elsewhere.*/
 void ChiConsole::FlushConsole()
 {
   for (auto& command : command_buffer)
