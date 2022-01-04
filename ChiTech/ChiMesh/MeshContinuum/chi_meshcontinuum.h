@@ -94,8 +94,7 @@ public:
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
 
-  void CommunicatePartitionNeighborCells(
-    std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>>& neighbor_cells);
+  std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
 
   ChiMPICommunicatorSet& GetCommunicator();
 

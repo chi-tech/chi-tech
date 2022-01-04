@@ -72,7 +72,12 @@ void SpatialDiscretization_FV::
   chi_log.Log(LOG_0VERBOSE_1)
     << "SpatialDiscretization_FV - Adding view of neighbor continuums.";
 
-  ref_grid->CommunicatePartitionNeighborCells(neighbor_cells);
+  auto ghost_cells = ref_grid->GetGhostCells();
+
+  neighbor_cells.clear();
+  for (auto& cell_ptr : ghost_cells)
+    neighbor_cells.insert(
+      std::make_pair(cell_ptr->global_id,std::move(cell_ptr)));
 
   chi_log.Log(LOG_0VERBOSE_1)
     << "Number neighbor cells: " << neighbor_cells.size();
