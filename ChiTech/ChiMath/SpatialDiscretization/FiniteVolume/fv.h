@@ -20,7 +20,7 @@ private:
   std::vector<bool>  cell_view_added_flags;
 
 private:
-  std::map<uint64_t, chi_mesh::Cell*> neighbor_cells;
+  std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>> neighbor_cells;
   std::map<uint64_t, CellFVValues*> neighbor_cell_fv_views;
 
 public:

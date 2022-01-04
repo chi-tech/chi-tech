@@ -509,6 +509,15 @@ void chi_mesh::VolumeMesher::
       ++num_cells_modified;
     }
   }
+
+  const auto& ghost_ids = vol_cont->cells.GetGhostGlobalIDs();
+  for (uint64_t ghost_id : ghost_ids)
+  {
+    auto& cell = vol_cont->cells[ghost_id];
+    if (log_vol->Inside(cell.centroid) && sense)
+      cell.material_id = mat_id;
+  }
+
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
@@ -568,6 +577,10 @@ void chi_mesh::VolumeMesher::
 
   for (auto& cell : vol_cont->local_cells)
     cell.material_id = mat_id;
+
+  const auto& ghost_ids = vol_cont->cells.GetGhostGlobalIDs();
+  for (uint64_t ghost_id : ghost_ids)
+    vol_cont->cells[ghost_id].material_id = mat_id;
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)

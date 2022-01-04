@@ -45,7 +45,7 @@ public:
   unsigned int globl_base_block_size=0;
 
 private:
-  std::map<uint64_t, chi_mesh::Cell*>  neighbor_cells;
+  std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>>  neighbor_cells;
   std::map<uint64_t, std::shared_ptr<CellMappingFE_PWL>> neighbor_cell_fe_views;
 
 private:

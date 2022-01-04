@@ -77,28 +77,6 @@ void SpatialDiscretization_FV::
   chi_log.Log(LOG_0VERBOSE_1)
     << "Number neighbor cells: " << neighbor_cells.size();
 
-  //================================================== Reorder according to
-  //                                                   ghost indices
-  std::vector<chi_mesh::Cell*> temp(ref_grid->cells.GetNumGhosts(), nullptr);
-
-  auto ghost_ids = ref_grid->cells.GetGhostGlobalIDs();
-  chi_log.Log(LOG_0VERBOSE_1)
-    << "Number of ghost ids: " << ghost_ids.size();
-  for (uint64_t ghost_id : ghost_ids)
-  {
-    uint64_t ghost_local_index = ref_grid->cells.GetGhostLocalID(ghost_id);
-
-    for (auto& cell_pair : neighbor_cells)
-      if (cell_pair.first == ghost_id)
-        temp[ghost_local_index] = cell_pair.second;
-  }
-  neighbor_cells.clear();
-  for (auto tcell : temp)
-    if (tcell != nullptr)
-      neighbor_cells.insert(std::pair<uint64_t, chi_mesh::Cell*>(
-        tcell->global_id, tcell));
-
-
   chi_log.Log(LOG_0VERBOSE_1)
     << "Adding neighbor views";
   //================================================== Populate cell fe views

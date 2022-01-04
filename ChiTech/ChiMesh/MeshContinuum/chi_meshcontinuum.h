@@ -24,13 +24,11 @@ private:
 
 public:
   VertexHandler                  vertices;
-//  std::vector<chi_mesh::Node>    vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
   chi_mesh::LineMesh*            line_mesh;
   std::vector<uint64_t>          local_cell_glob_indices;
-  std::vector<int>               boundary_cell_indices;
 
 private:
   bool                           face_histogram_available = false;
@@ -97,7 +95,7 @@ public:
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
 
   void CommunicatePartitionNeighborCells(
-    std::map<uint64_t, chi_mesh::Cell*>& neighbor_cells);
+    std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>>& neighbor_cells);
 
   ChiMPICommunicatorSet& GetCommunicator();
 
