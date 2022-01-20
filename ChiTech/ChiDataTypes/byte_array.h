@@ -31,7 +31,6 @@ namespace chi_data_types
       const std::byte* value_byte_array =
         reinterpret_cast<const std::byte*>(&value);
 
-      m_raw_data.reserve(m_raw_data.size() + num_bytes);
       for (size_t b=0; b<num_bytes; ++b)
         m_raw_data.push_back(value_byte_array[b]);
     }
@@ -95,7 +94,6 @@ namespace chi_data_types
     void Append(const ByteArray& other_raw)
     {
       auto& master = m_raw_data;
-      master.reserve(this->Size() + other_raw.Size());
 
       const auto& slave = other_raw.Data();
       for (std::byte slave_value : slave)
@@ -107,7 +105,6 @@ namespace chi_data_types
     void Append(const std::vector<std::byte>& other_raw)
     {
       auto& master = m_raw_data;
-      master.reserve(this->Size() + other_raw.size());
 
       const auto& slave = other_raw;
       for (std::byte slave_value : slave)

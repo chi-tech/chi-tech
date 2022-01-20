@@ -53,6 +53,8 @@ public:
                               size_t& address);
   std::string ToString() const;
 
+  void RecomputeCentroid(const chi_mesh::MeshContinuum& grid);
+
 };
 
 
@@ -97,6 +99,8 @@ public:
   static Cell DeSerialize(const chi_data_types::ByteArray& raw,
                           size_t& address);
   std::string ToString() const;
+
+  void RecomputeCentroidsAndNormals(const chi_mesh::MeshContinuum& grid);
 };
 
 }

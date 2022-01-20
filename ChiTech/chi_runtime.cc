@@ -123,19 +123,18 @@ void ChiTech::ParseArguments(int argc, char** argv)
  */
 int ChiTech::Initialize(int argc, char** argv)
 {
-  ParseArguments(argc, argv);
-  
-  int location_id, number_processes;
+  int location_id = 0, number_processes = 1;
 
   MPI_Init (&argc, &argv);                           /* starts MPI */
   MPI_Comm_rank (MPI_COMM_WORLD, &location_id);      /* get current process id */
   MPI_Comm_size (MPI_COMM_WORLD, &number_processes); /* get number of processes */
 
-  chi_mpi.location_id = location_id;
-  chi_mpi.process_count = number_processes;
+  chi_mpi.SetLocationID(location_id);
+  chi_mpi.SetProcessCount(number_processes);
 
   chi_console.PostMPIInfo(location_id, number_processes);
-  chi_mpi.Initialize();
+
+  ParseArguments(argc, argv);
 
   chi_physics_handler.InitPetSc(argc,argv);
 
@@ -156,7 +155,7 @@ void ChiTech::Finalize()
 int ChiTech::RunInteractive(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetLocalDateTimeString()
+    << ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in interactive-mode with "
     << chi_mpi.process_count << " processes.";
 
@@ -175,7 +174,7 @@ int ChiTech::RunInteractive(int argc, char** argv)
     << "Final program time " << chi_program_timer.GetTimeString();
 
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetLocalDateTimeString()
+    << ChiTimer::GetLocalDateTimeString()
     << " ChiTech finished execution.";
 
   return 0;
@@ -186,7 +185,7 @@ int ChiTech::RunInteractive(int argc, char** argv)
 int ChiTech::RunBatch(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetLocalDateTimeString()
+    << ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in batch-mode with "
     << chi_mpi.process_count << " processes.";
 
@@ -212,7 +211,7 @@ int ChiTech::RunBatch(int argc, char** argv)
     << "Final program time " << chi_program_timer.GetTimeString();
 
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetLocalDateTimeString()
+    << ChiTimer::GetLocalDateTimeString()
     << " ChiTech finished execution of " << ChiTech::input_file_name;
 
   return error_code;

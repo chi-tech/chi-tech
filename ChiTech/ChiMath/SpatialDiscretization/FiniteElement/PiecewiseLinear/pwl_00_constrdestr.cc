@@ -28,7 +28,12 @@ SpatialDiscretization_PWLD::
 
   chi_log.Log() << chi_program_timer.GetTimeString()
                 << " Communicating partition neighbors.";
-  ref_grid->CommunicatePartitionNeighborCells(neighbor_cells);
+  auto ghost_cells = ref_grid->GetGhostCells();
+
+  neighbor_cells.clear();
+  for (auto& cell_ptr : ghost_cells)
+    neighbor_cells.insert(
+      std::make_pair(cell_ptr->global_id,std::move(cell_ptr)));
 
   if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
   {

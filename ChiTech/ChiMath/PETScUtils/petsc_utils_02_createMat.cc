@@ -64,8 +64,8 @@ MatSetUp(A);
 */
 void chi_math::PETScUtils::InitMatrixSparsity(
   Mat A,
-  std::vector<int64_t>& nodal_nnz_in_diag,
-  std::vector<int64_t>& nodal_nnz_off_diag)
+  const std::vector<int64_t>& nodal_nnz_in_diag,
+  const std::vector<int64_t>& nodal_nnz_off_diag)
 {
   MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
                             0,nodal_nnz_off_diag.data());
