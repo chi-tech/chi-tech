@@ -14,7 +14,7 @@ extern ChiPhysics&  chi_physics_handler;
  * href="../../whitepages/DiffusionSolver/DiffusionSolver.pdf">
  * Diffusion Whitepaper</a>)
 
-
+\n\n Additional basic options can be set as indicated in \ref LuaDiffusionBasicOptions
 
 \param SolverHandle int Handle to an existing diffusion solver.
 \param PropertyName string Name for a specific property.
