@@ -345,15 +345,6 @@ void chi_mesh::mesh_cutting::
                   << cell_B_ptr->ToString();
   }
 
-  //Check cell-vertex id integrity
-  for (uint64_t vid : cell_A_ptr->vertex_ids)
-    if (vid >= mesh.vertices.size())
-      throw std::logic_error("Cell A corrupted");
-
-  for (uint64_t vid : cell_B_ptr->vertex_ids)
-    if (vid >= mesh.vertices.size())
-      throw std::logic_error("Cell B corrupted");
-
   cell = cell_A;
   mesh.cells.push_back(cell_B_ptr);
 

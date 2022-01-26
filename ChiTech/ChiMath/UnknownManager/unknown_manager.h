@@ -53,7 +53,7 @@ private:
       map_begin(in_map_begin)
     {
       component_text_names.resize(in_num_components,std::string());
-      for (int c=0; c<num_components; ++c)
+      for (unsigned int c=0; c<num_components; ++c)
       {
 
         char buffer[100]; snprintf(buffer,100," %03d",c);
@@ -107,12 +107,19 @@ private:
 
 public:
   std::vector<Unknown> unknowns;
-  const UnknownStorageType dof_storage_type;
+  UnknownStorageType dof_storage_type;
 
   explicit UnknownManager(UnknownStorageType in_storage_type=
-                                  UnknownStorageType::NODAL) :
+                                  UnknownStorageType::NODAL) noexcept :
     dof_storage_type(in_storage_type)
   {}
+
+  void SetDOFStorageType(const UnknownStorageType in_storage_type)
+  {dof_storage_type = in_storage_type;}
+
+  UnknownStorageType GetDOFStorageType() const {return dof_storage_type;}
+
+  void Clear() {unknowns.clear();}
 
   unsigned int AddUnknown(UnknownType unk_type, unsigned int dimension= 0);
 

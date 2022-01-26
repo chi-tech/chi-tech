@@ -4,6 +4,7 @@
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
 #include "chi_meshcontinuum_globalcellhandler.h"
+#include "chi_meshcontinuum_vertexhandler.h"
 
 #include "chi_mpi.h"
 
@@ -19,15 +20,15 @@ private:
   std::map<uint64_t,uint64_t> global_cell_id_to_native_id_map;
   std::map<uint64_t,uint64_t> global_cell_id_to_foreign_id_map;
 
+  uint64_t global_vertex_count=0;
 
 public:
-  std::vector<chi_mesh::Node>    vertices;
+  VertexHandler                  vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
   chi_mesh::SurfaceMesh*         surface_mesh;
   chi_mesh::LineMesh*            line_mesh;
   std::vector<uint64_t>          local_cell_glob_indices;
-  std::vector<int>               boundary_cell_indices;
 
 private:
   bool                           face_histogram_available = false;
@@ -51,6 +52,9 @@ public:
     surface_mesh = nullptr;
     line_mesh    = nullptr;
   }
+
+  void SetGlobalVertexCount(const uint64_t count) {global_vertex_count = count;}
+  uint64_t GetGlobalVertexCount() const {return global_vertex_count;}
 
   static
   std::shared_ptr<MeshContinuum> New()
@@ -90,8 +94,7 @@ public:
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
 
-  void CommunicatePartitionNeighborCells(
-    std::map<uint64_t, chi_mesh::Cell*>& neighbor_cells);
+  std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
 
   ChiMPICommunicatorSet& GetCommunicator();
 

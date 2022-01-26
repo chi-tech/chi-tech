@@ -34,18 +34,18 @@ public:
 
 //  std::map<int,int> node_mapping;
 
-  int              local_block_address = 0;
-  std::vector<int> cell_local_block_address;
-  std::vector<std::pair<int,int>> neighbor_cell_block_address;
+  int64_t              local_block_address = 0;
+  std::vector<int64_t> cell_local_block_address;
+  std::vector<std::pair<uint64_t, int64_t>> neighbor_cell_block_address;
 
 //  std::vector<int> locJ_block_address;
-  std::vector<int> locJ_block_size;
+  std::vector<uint64_t> locJ_block_size;
 
   unsigned int local_base_block_size=0;
   unsigned int globl_base_block_size=0;
 
 private:
-  std::map<uint64_t, chi_mesh::Cell*>  neighbor_cells;
+  std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>>  neighbor_cells;
   std::map<uint64_t, std::shared_ptr<CellMappingFE_PWL>> neighbor_cell_fe_views;
 
 private:

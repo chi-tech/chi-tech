@@ -32,8 +32,9 @@ void chi_mesh::mesh_cutting::
   //                                              parallel faces
   // Order N, num_vertices
   size_t num_verts_snapped=0;
-  for (auto& vertex : mesh.vertices)
+  for (auto& id_vertex : mesh.vertices)
   {
+    auto& vertex = id_vertex.second;
     double d_from_plane = n.Dot(vertex - p);
 
     if (std::fabs(d_from_plane) < merge_tolerance)
@@ -132,6 +133,8 @@ void chi_mesh::mesh_cutting::
       }
     }//for cell - built edges_set
 
+    uint64_t new_vertex_address = mesh.GetGlobalVertexCount();
+
     //====================================== Determine cut edges
     std::vector<ECI> cut_edges;
     {
@@ -148,8 +151,8 @@ void chi_mesh::mesh_cutting::
           double dv1 = std::fabs((v1-p).Dot(n));
           if (dv0>float_compare and dv1>float_compare)
           {
-            mesh.vertices.push_back(cut_point);
-            cut_edges.emplace_back(edge, mesh.vertices.size() - 1);
+            mesh.vertices.Insert(new_vertex_address,cut_point);
+            cut_edges.emplace_back(edge, new_vertex_address++);
             ++num_edges_cut;
           }
         }
@@ -203,6 +206,8 @@ void chi_mesh::mesh_cutting::
       }//for face
     }//for cell - built edges_set
 
+    uint64_t new_vertex_address = mesh.GetGlobalVertexCount();
+
     //====================================== Determine cut edges
     std::vector<ECI> cut_edges;
     {
@@ -219,8 +224,8 @@ void chi_mesh::mesh_cutting::
           double dv1 = std::fabs((v1-p).Dot(n));
           if (dv0>float_compare and dv1>float_compare)
           {
-            mesh.vertices.push_back(cut_point);
-            cut_edges.emplace_back(edge, mesh.vertices.size() - 1);
+            mesh.vertices.Insert(new_vertex_address,cut_point);
+            cut_edges.emplace_back(edge, new_vertex_address++);
             ++num_edges_cut;
           }
         }
