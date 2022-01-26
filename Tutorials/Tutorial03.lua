@@ -59,7 +59,7 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,
                   YMIN,LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
 
 --========== Solvers
-chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD1D)
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 
 chiLBSInitialize(phys1)
