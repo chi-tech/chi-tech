@@ -40,7 +40,7 @@ for k=1,num_groups do
     chiLBSCreateGroup(phys1)
 end
 
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2,2)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,4,4)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
@@ -69,7 +69,7 @@ chiLBSExecute(phys1)
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 cline = chiFFInterpolationCreate(LINE)
-chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0,1.0)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,0.0,-1.0,-1.0)
 chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,0.0, 1.0,1.0)
 chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 50)
 
