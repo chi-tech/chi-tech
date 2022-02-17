@@ -59,10 +59,10 @@ void SlabMappingFE_PWL::
   IntS_shapeI_shapeJ[0][0][0] =  1.0;
   IntS_shapeI_shapeJ[0][0][1] =  0.0;
   IntS_shapeI_shapeJ[0][1][0] =  0.0;
-  IntS_shapeI_shapeJ[0][1][1] =  1.0;
+  IntS_shapeI_shapeJ[0][1][1] =  0.0;
 
   //Right face
-  IntS_shapeI_shapeJ[1][0][0] =  1.0;
+  IntS_shapeI_shapeJ[1][0][0] =  0.0;
   IntS_shapeI_shapeJ[1][0][1] =  0.0;
   IntS_shapeI_shapeJ[1][1][0] =  0.0;
   IntS_shapeI_shapeJ[1][1][1] =  1.0;
