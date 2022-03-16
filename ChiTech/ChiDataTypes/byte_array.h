@@ -19,6 +19,8 @@ namespace chi_data_types
     ByteArray(const size_t raw_data_size) : m_raw_data(raw_data_size) {}
     explicit
     ByteArray(std::vector<std::byte>&& raw_data) : m_raw_data(std::move(raw_data)) {}
+    explicit
+    ByteArray(const std::vector<std::byte>& raw_data) : m_raw_data(raw_data) {}
 
 
     /**Uses the template type T to convert an associated value (of type T)
