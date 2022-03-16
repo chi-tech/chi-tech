@@ -191,12 +191,12 @@ void chi_physics::FieldFunction::
   if (ff_type == SDMType::PIECEWISE_LINEAR_CONTINUOUS or
       ff_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
   {
-    int unk_number = -1;
+    int ff_number = -1;
     for (auto& ff : ff_list)
     {
       unsigned int ref_unknown = ff->ref_variable;
       const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
-      unk_number++;
+      ff_number++;
 
       unsigned int N = ff->unknown_manager.GetTotalUnknownStructureSize();
 
@@ -206,10 +206,12 @@ void chi_physics::FieldFunction::
 
         auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
         if (unknown.text_name.empty())
-          unk_arr->SetName((std::string("Unknown_")+
-                            std::to_string(unk_number)).c_str());
+          unk_arr->SetName((std::string("FF_")+
+                            std::to_string(ff_number)).c_str());
         else
-          unk_arr->SetName(unknown.text_name.c_str());
+          unk_arr->SetName((std::string("FF_") +
+                            std::to_string(ff_number) +
+                            unknown.text_name).c_str());
 
         uint64_t c=0;
         for (auto& cell : grid->local_cells)
@@ -237,10 +239,14 @@ void chi_physics::FieldFunction::
 
           auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
           if (unknown.component_text_names[comp].empty())
-            unk_arr->SetName((std::string("Component_")+
+            unk_arr->SetName((std::string("FF_") +
+                              std::to_string(ff_number) +
+                              std::string("Component_") +
                               std::to_string(comp)).c_str());
           else
-            unk_arr->SetName(unknown.component_text_names[comp].c_str());
+            unk_arr->SetName((std::string("FF_") +
+                              std::to_string(ff_number) +
+                              unknown.component_text_names[comp]).c_str());
 
           uint64_t c=0;
           for (auto& cell : grid->local_cells)
