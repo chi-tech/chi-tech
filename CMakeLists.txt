@@ -85,6 +85,7 @@ include_directories("${CHI_TECH_DIR}/ChiTech")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiMPI")
 include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
+include_directories("${CHI_TECH_DIR}/ChiTech/ChiMiscUtils")
 include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
 
@@ -159,8 +160,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
 add_subdirectory("${CHI_TECH_DIR}/ThirdParty")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/ChiTech/chi_runtime.cc"
-            "${CHI_TECH_DIR}/ChiTech/LuaTest/lua_test.cc")
+set(SOURCES "${CHI_TECH_DIR}/ChiTech/chi_runtime.cc")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiConsole")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLua")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMath")
@@ -172,6 +172,8 @@ add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMesh")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMPI")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLog")
 add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiDataTypes")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMiscUtils")
+add_subdirectory("${CHI_TECH_DIR}/ChiTech/LuaTest")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
