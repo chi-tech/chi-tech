@@ -1,5 +1,7 @@
 #include <ChiLua/chi_lua.h>
 
+#include "lua_test.h"
+
 #include "unit_tests.h"
 
 #include "chi_log.h"
@@ -7,6 +9,8 @@
 
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
+
+#define LUA_FMACRO1(x) lua_register(L, #x, x)
 
 //###################################################################
 /**This is a lua test function.
@@ -29,3 +33,9 @@ int chiLuaTest(lua_State* L)
 
   return 0;
 }
+
+void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
+{
+  LUA_FMACRO1(chiLuaTest);
+}
+

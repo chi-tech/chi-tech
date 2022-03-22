@@ -13,4 +13,5 @@ ${LUA} Z0_MakeDoxy.lua
 cd ../../..
 
 #============================== Making main documentation
+echo "Running DoxyGen"
 doxygen "ChiDoc/DoxyfileLua"
