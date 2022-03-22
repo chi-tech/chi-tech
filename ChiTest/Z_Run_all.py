@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+import shutil
 import textwrap
 
 # To run a range of tests pass a text string via the command line.
@@ -35,6 +36,9 @@ hostname = subprocess.check_output(['hostname']).decode('utf-8')
 tacc = False
 if "tacc.utexas.edu" in hostname:
     tacc = True
+
+# Get the correct mpiexec executable for the local machine
+mpiexec = shutil.which("mpiexec")
 
 def format3(number):
     return "{:3d}".format(number)
@@ -114,7 +118,8 @@ def run_test_local(file_name, comment, num_procs,
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
-    process = subprocess.Popen(["mpiexec", "-np", str(num_procs), kpath_to_exe,
+
+    process = subprocess.Popen([mpiexec, "-np", str(num_procs), kpath_to_exe,
                                 "ChiTest/" + file_name + ".lua", "master_export=false"],
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
@@ -136,6 +141,7 @@ def run_test(file_name, comment, num_procs,
         else:
             run_test_local(file_name, comment, num_procs,
                 search_strings_vals_tols)
+
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
 run_test(
