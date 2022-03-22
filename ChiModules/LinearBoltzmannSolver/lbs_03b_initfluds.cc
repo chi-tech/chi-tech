@@ -19,7 +19,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Initializes fluds data structures.*/
-void LinearBoltzmann::Solver::InitFluxDataStructures(LBSGroupset& groupset)
+void lbs::SteadySolver::InitFluxDataStructures(LBSGroupset& groupset)
 {
   //================================================== Angle Aggregation
   chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();

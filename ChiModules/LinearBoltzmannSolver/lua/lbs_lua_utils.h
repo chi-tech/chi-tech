@@ -35,7 +35,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L);
 int chiLBSGroupsetSetWGDSA(lua_State *L);
 int chiLBSGroupsetSetTGDSA(lua_State *L);
 
-namespace LinearBoltzmann
+namespace lbs
 {
   namespace lua_utils
   {
@@ -49,7 +49,7 @@ namespace LinearBoltzmann
      *                              should uniquely identify the calling function.
      *
      */
-    LinearBoltzmann::Solver* GetSolverByHandle(int handle, const std::string& calling_function_name);
+    lbs::SteadySolver* GetSolverByHandle(int handle, const std::string& calling_function_name);
 
     void RegisterLuaEntities(lua_State* L);
   }

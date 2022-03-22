@@ -7,8 +7,8 @@
 
 void chi_modules::lua_utils::RegisterLuaEntities(lua_State *L)
 {
-  LinearBoltzmann::lua_utils::RegisterLuaEntities(L);
+  lbs::lua_utils::RegisterLuaEntities(L);
   diffusion_solver::lua_utils::RegisterLuaEntities(L);
   LBSCurvilinear::lua_utils::RegisterLuaEntities(L);
-  LinearBoltzmann::k_eigenvalue_lua_utils::RegisterLuaEntities(L);
+  lbs::k_eigenvalue_lua_utils::RegisterLuaEntities(L);
 }

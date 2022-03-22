@@ -8,7 +8,7 @@
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
 
-using namespace LinearBoltzmann;
+using namespace lbs;
 
 //###################################################################
 /**Compute the total fission production in the problem.*/
@@ -28,17 +28,7 @@ double KEigenvalueSolver::ComputeFissionProduction()
     const auto& fe_values = grid_fe_view->GetUnitIntegrals(cell);
 
     //==================== Obtain xs
-    int cell_matid = cell.material_id;
-    int xs_id = matid_to_xs_map[cell_matid];
-
-    if ((xs_id < 0) || (xs_id >= material_xs.size()))
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << "Cross-section lookup error\n";
-      exit(EXIT_FAILURE);
-    }
-
-    auto xs = material_xs[xs_id];
+    auto xs = transport_view.XS();
 
     //======================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -49,7 +39,7 @@ double KEigenvalueSolver::ComputeFissionProduction()
 
       //=================================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs->nu_sigma_f[g] *
+        local_production += xs.nu_sigma_f[g] *
                             phi_new_local[uk_map + g] *
                             IntV_ShapeI;
     }//for node

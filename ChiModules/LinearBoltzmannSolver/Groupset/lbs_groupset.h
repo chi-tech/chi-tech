@@ -14,7 +14,7 @@
 
 #include "ChiPhysics/chi_physics_namespace.h"
 
-namespace LinearBoltzmann
+namespace lbs
 {
   enum class AngleAggregationType
   {
@@ -51,8 +51,8 @@ public:
   std::vector<AngSubSet>                       ang_subsets_bot;
   std::vector<int>                             ang_subset_sizes_bot;
 
-  LinearBoltzmann::IterativeMethod             iterative_method;
-  LinearBoltzmann::AngleAggregationType        angleagg_method;
+  lbs::IterativeMethod             iterative_method;
+  lbs::AngleAggregationType        angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;
   int                                          gmres_restart_intvl;
@@ -80,9 +80,9 @@ public:
   explicit LBSGroupset(int in_id);
   LBSGroupset() : LBSGroupset(-1) {};
   void BuildDiscMomOperator(unsigned int scattering_order,
-                            LinearBoltzmann::GeometryType geometry_type);
+                            lbs::GeometryType geometry_type);
   void BuildMomDiscOperator(unsigned int scattering_order,
-                            LinearBoltzmann::GeometryType geometry_type);
+                            lbs::GeometryType geometry_type);
   void BuildSubsets();
 public:
   void PrintSweepInfoFile(size_t ev_tag,const std::string& file_name);

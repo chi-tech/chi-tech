@@ -10,7 +10,7 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Prints header information of simulation.*/
-void LinearBoltzmann::Solver::PrintSimHeader()
+void lbs::SteadySolver::PrintSimHeader()
 {
   if (chi_mpi.location_id == 0)
   {

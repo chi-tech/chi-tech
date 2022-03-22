@@ -9,7 +9,7 @@ extern ChiLog& chi_log;
 #define MAX_ITERATIONS  1
 #define TOLERANCE       2
 
-using namespace LinearBoltzmann;
+using namespace lbs;
 
 //############################################################
 /**Set properties for the solver.*/
@@ -21,7 +21,7 @@ int chiLBKESSetProperty(lua_State *L)
 
   LuaCheckNilValue(__FUNCTION__, L, 1);
   int solver_index = lua_tonumber(L, 1);
-  auto solver = LinearBoltzmann::k_eigenvalue_lua_utils::
+  auto solver = lbs::k_eigenvalue_lua_utils::
   GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Get property index

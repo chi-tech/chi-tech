@@ -11,7 +11,7 @@ extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes parallel arrays.*/
-void LinearBoltzmann::Solver::InitializeParrays()
+void lbs::SteadySolver::InitializeParrays()
 {
   //================================================== Initialize unknown structure
   for (int m=0; m<num_moments; m++)
@@ -76,9 +76,9 @@ void LinearBoltzmann::Solver::InitializeParrays()
   //
   size_t block_MG_counter = 0;       //Counts the strides of moment and group
 
-  chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
-  chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
-  chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
+  const chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);
+  const chi_mesh::Vector3 jhat(0.0, 1.0, 0.0);
+  const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   auto pwl =
       std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
@@ -89,12 +89,11 @@ void LinearBoltzmann::Solver::InitializeParrays()
   {
     size_t num_nodes  = discretization->GetCellNumNodes(cell);
     int    mat_id     = cell.material_id;
-    int    xs_mapping = matid_to_xs_map[mat_id];
 
     //compute cell volumes
     double cell_volume = 0.0;
     auto& fe_values = pwl->GetUnitIntegrals(cell);
-    for (int i = 0; i < fe_values.NumNodes(); ++i)
+    for (size_t i = 0; i < fe_values.NumNodes(); ++i)
       cell_volume += fe_values.IntV_shapeI(i);
 
     size_t cell_phi_address = block_MG_counter;
@@ -133,7 +132,7 @@ void LinearBoltzmann::Solver::InitializeParrays()
                                       num_nodes,
                                       num_grps,
                                       num_moments,
-                                      xs_mapping,
+                                      *matid_to_xs_map[mat_id],
                                       cell_volume,
                                       face_local_flags,
                                       cell_on_boundary);

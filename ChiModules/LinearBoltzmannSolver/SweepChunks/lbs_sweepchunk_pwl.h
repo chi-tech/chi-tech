@@ -9,9 +9,9 @@
 
 #include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
 
-typedef std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
+typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
 
-namespace LinearBoltzmann
+namespace lbs
 {
 //###################################################################
 /**Sweep chunk for cartesian PWLD discretization.*/
@@ -20,7 +20,7 @@ class SweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 protected:
   const std::shared_ptr<chi_mesh::MeshContinuum> grid_view;
   SpatialDiscretization_PWLD& grid_fe_view;
-  std::vector<LinearBoltzmann::CellLBSView>& grid_transport_view;
+  std::vector<lbs::CellLBSView>& grid_transport_view;
   const std::vector<double>& q_moments;
   LBSGroupset& groupset;
   const TCrossSections& xsections;
@@ -40,7 +40,7 @@ public:
 
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                 SpatialDiscretization_PWLD& discretization,
-                std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,

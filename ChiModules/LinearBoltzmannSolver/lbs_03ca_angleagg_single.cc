@@ -25,7 +25,7 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 //###################################################################
 /**Initializes angle aggregation for a groupset.*/
-void LinearBoltzmann::Solver::InitAngleAggSingle(LBSGroupset& groupset)
+void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)

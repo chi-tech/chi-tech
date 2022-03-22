@@ -16,7 +16,7 @@ extern ChiConsole&  chi_console;
 
 //###################################################################
 /** Initialize the solver.*/
-void LinearBoltzmann::Solver::Initialize()
+void lbs::SteadySolver::Initialize()
 {
   PerformInputChecks();
   PrintSimHeader();

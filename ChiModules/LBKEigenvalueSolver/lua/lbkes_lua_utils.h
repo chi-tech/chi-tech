@@ -10,7 +10,7 @@ int chiLBKESInitialize(lua_State *L);
 int chiLBKESExecute(lua_State *L);
 int chiLBKESSetProperty(lua_State *L);
 
-namespace LinearBoltzmann
+namespace lbs
 {
   namespace k_eigenvalue_lua_utils
   {
@@ -24,7 +24,7 @@ namespace LinearBoltzmann
      *                              should uniquely identify the calling function.
      *
      */
-    LinearBoltzmann::KEigenvalueSolver* GetSolverByHandle(
+    lbs::KEigenvalueSolver* GetSolverByHandle(
         int handle, const std::string& calling_function_name);
 
     void RegisterLuaEntities(lua_State *L);

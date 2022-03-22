@@ -3,7 +3,7 @@
 
 #include <petscksp.h>
 
-namespace LinearBoltzmann
+namespace lbs
 {
 PetscErrorCode KSPConvergenceTestNPT(
                 KSP ksp, PetscInt n, PetscReal rnorm,

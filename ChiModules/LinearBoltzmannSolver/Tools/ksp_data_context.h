@@ -3,7 +3,7 @@
 
 #include "../lbs_linear_boltzmann_solver.h"
 
-namespace LinearBoltzmann
+namespace lbs
 {
 
 //###################################################################
@@ -11,14 +11,14 @@ namespace LinearBoltzmann
  * objects needed in matrix free operations.*/
 struct KSPDataContext
 {
-  LinearBoltzmann::Solver& solver;
+  lbs::SteadySolver& solver;
   LBSGroupset&             groupset;
   Vec&                     operating_vector;
   chi_mesh::sweep_management::SweepScheduler& sweep_scheduler;
   SourceFlags    lhs_scope;
   int64_t last_iteration = -1;
 
-  KSPDataContext(LinearBoltzmann::Solver& in_solver,
+  KSPDataContext(lbs::SteadySolver& in_solver,
                  LBSGroupset& in_groupset,
                  Vec& in_operating_vector,
                  chi_mesh::sweep_management::SweepScheduler& in_sweep_scheduler,

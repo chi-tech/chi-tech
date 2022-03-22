@@ -7,14 +7,14 @@
 typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 //###################################################################
 /**Computes the action of the transport matrix on a vector.*/
-int LinearBoltzmann::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
+int lbs::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 {
   constexpr bool WITH_DELAYED_PSI = true;
   KSPDataContext* context;
   MatShellGetContext(matrix,&context);
 
   //Shorten some names
-  LinearBoltzmann::Solver& solver = context->solver;
+  lbs::SteadySolver& solver = context->solver;
   LBSGroupset& groupset  = context->groupset;
   MainSweepScheduler& sweep_scheduler = context->sweep_scheduler;
   auto& sweep_chunk = context->sweep_scheduler.sweep_chunk;

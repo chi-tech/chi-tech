@@ -5,7 +5,7 @@ extern ChiLog& chi_log;
 
 #include <iomanip>
 
-using namespace LinearBoltzmann;
+using namespace lbs;
 
 //###################################################################
 /**Execute a k-eigenvalue linear boltzmann solver.*/

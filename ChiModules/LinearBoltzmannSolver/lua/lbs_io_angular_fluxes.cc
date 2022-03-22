@@ -35,7 +35,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::
+  auto lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
@@ -85,7 +85,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = LinearBoltzmann::lua_utils::
+  auto lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset

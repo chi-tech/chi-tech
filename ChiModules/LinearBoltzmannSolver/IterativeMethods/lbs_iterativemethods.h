@@ -1,7 +1,7 @@
 #ifndef LBS_ITERATIVE_METHODS_H
 #define LBS_ITERATIVE_METHODS_H
 
-namespace LinearBoltzmann
+namespace lbs
 {
   enum class IterativeMethod : int
   {

@@ -16,7 +16,7 @@ extern ChiConsole&  chi_console;
 
 //###################################################################
 /**Execute the solver.*/
-void LinearBoltzmann::Solver::Execute()
+void lbs::SteadySolver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
   for (auto& groupset : groupsets)
@@ -50,7 +50,7 @@ void LinearBoltzmann::Solver::Execute()
 
 //###################################################################
 /**Solves a single groupset.*/
-void LinearBoltzmann::Solver::SolveGroupset(LBSGroupset& groupset)
+void lbs::SteadySolver::SolveGroupset(LBSGroupset& groupset)
 {
   source_event_tag = chi_log.GetRepeatingEventTag("Set Source");
 

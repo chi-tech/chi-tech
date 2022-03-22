@@ -13,7 +13,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Makes a source-moments vector from scattering and fission based
  * on the latest phi-solution.*/
-std::vector<double> LinearBoltzmann::Solver::
+std::vector<double> lbs::SteadySolver::
   MakeSourceMomentsFromPhi()
 {
   size_t num_local_dofs = discretization->GetNumLocalDOFs(flux_moments_uk_man);
@@ -33,7 +33,7 @@ std::vector<double> LinearBoltzmann::Solver::
 
 //###################################################################
 /**Writes a given flux-moments vector to file.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   WriteFluxMoments(const std::string &file_base,
                    const std::vector<double>& flux_moments)
 {
@@ -150,9 +150,9 @@ void LinearBoltzmann::Solver::
 
 //###################################################################
 /**Reads a flux-moments vector from a file in the specified vector.*/
-void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
-                                              std::vector<double>& flux_moments,
-                                              bool single_file/*=false*/)
+void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
+                                        std::vector<double>& flux_moments,
+                                        bool single_file/*=false*/)
 {
   std::string file_name =
     file_base + std::to_string(chi_mpi.location_id) + ".data";

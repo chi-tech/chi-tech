@@ -21,11 +21,11 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
-bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
-                                    MainSweepScheduler& sweep_scheduler,
-                                    SourceFlags lhs_src_scope,
-                                    SourceFlags rhs_src_scope,
-                                    bool log_info /* = true*/)
+bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
+                              MainSweepScheduler& sweep_scheduler,
+                              SourceFlags lhs_src_scope,
+                              SourceFlags rhs_src_scope,
+                              bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
   if (log_info)
