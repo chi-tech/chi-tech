@@ -93,15 +93,15 @@ void lbs::SteadySolver::
   auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
-  uint64_t num_moments_t   = static_cast<size_t>(num_moments);
-  uint64_t num_groups      = groups.size();
+  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
+  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups);
   uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
   uint64_t num_local_cells = grid->local_cells.size();
 
   //============================================= Write num_ quantities
   file.write((char*)&num_local_nodes,sizeof(uint64_t));
   file.write((char*)&num_moments_t  ,sizeof(uint64_t));
-  file.write((char*)&num_groups     ,sizeof(uint64_t));
+  file.write((char*)&num_groups_t   ,sizeof(uint64_t));
   file.write((char*)&num_local_dofs ,sizeof(uint64_t));
   file.write((char*)&num_local_cells,sizeof(uint64_t));
 
@@ -178,7 +178,7 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
-  uint64_t num_groups      = groups.size();
+  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups);
   uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
   uint64_t num_local_cells = grid->local_cells.size();
 
@@ -204,7 +204,7 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
   if (not single_file)
     if (file_num_local_nodes != num_local_nodes or
         file_num_moments     != num_moments_t   or
-        file_num_groups      != num_groups      or
+        file_num_groups      != num_groups_t    or
         file_num_local_dofs  != num_local_dofs  or
         file_num_local_cells != num_local_cells)
     {

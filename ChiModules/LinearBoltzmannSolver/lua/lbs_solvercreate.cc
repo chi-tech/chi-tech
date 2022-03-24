@@ -9,6 +9,8 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Creates a Neutral Particle Transport solver.
 
+\param SolverName string String name of the solver.
+
 \return SolverHandle int Handle to the solver created.
 
 \code

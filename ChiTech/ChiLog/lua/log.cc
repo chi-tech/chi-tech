@@ -86,7 +86,7 @@ int chiLog(lua_State* L)
   int         mode    = lua_tonumber(L,1);
   const char* message = lua_tostring(L,2);
 
-  chi_log.Log((LOG_LVL)mode) << message;
+  chi_log.Log((LOG_LVL)mode) << message << std::endl;
 
   return 0;
 }

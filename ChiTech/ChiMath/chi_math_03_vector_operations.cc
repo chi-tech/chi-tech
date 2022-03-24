@@ -132,3 +132,26 @@ double chi_math::VecPNorm(const VecDbl &x, const double& p)
   return std::pow(val, 1./p);
 }
 
+/**Adds two vectors component-wise.*/
+VecDbl chi_math::operator+(const VecDbl& a, const VecDbl& b)
+{
+  assert(a.size() == b.size());
+  VecDbl result(a.size(), 0.0);
+
+  for (size_t i=0; i<a.size(); ++i)
+    result[i] = a[i] + b[i];
+
+  return result;
+}
+
+/**Subtracts two vectors component-wise.*/
+VecDbl chi_math::operator-(const VecDbl& a, const VecDbl& b)
+{
+  assert(a.size() == b.size());
+  VecDbl result(a.size(), 0.0);
+
+  for (size_t i=0; i<a.size(); ++i)
+    result[i] = a[i] - b[i];
+
+  return result;
+}

@@ -14,7 +14,7 @@ extern ChiPhysics&  chi_physics_handler;
 void lbs::SteadySolver::InitializeParrays()
 {
   //================================================== Initialize unknown structure
-  for (int m=0; m<num_moments; m++)
+  for (size_t m=0; m<num_moments; m++)
   {
     flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groups.size());
     flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
@@ -168,13 +168,17 @@ void lbs::SteadySolver::InitializeParrays()
   //================================================== Initialize Field Functions
   if (field_functions.empty())
   {
-    for (int g=0; g<groups.size(); g++)
+    for (size_t g=0; g<groups.size(); g++)
     {
-      for (int m=0; m<num_moments; m++)
+      for (size_t m=0; m<num_moments; m++)
       {
-        std::string text_name = std::string("Flux_g") +
-                                std::to_string(g) +
-                                std::string("_m") + std::to_string(m);
+        std::string solver_name;
+        if (not TextName().empty()) solver_name = TextName() + "-";
+
+        const std::string text_name = solver_name +
+                                      std::string("Flux_g") +
+                                      std::to_string(g) +
+                                      std::string("_m") + std::to_string(m);
 
         auto group_ff = std::make_shared<chi_physics::FieldFunction>(
           text_name,              //Field name
