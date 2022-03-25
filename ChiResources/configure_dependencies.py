@@ -33,9 +33,10 @@ versions = {"readline": "8.0", "ncurses": "6.1", "lua": "5.3.5",
 packages = list(versions.keys())
 
 for arg in sys.argv:
+    arg = arg.lower()
     for package in packages:
         req_version = versions[package]
-        if package in arg:
+        if package in arg.lower():
             if "=" not in arg:
                 print("To specify a version use \"<package>=<version>\".")
                 print(f" Defaulting {package.upper()} "
