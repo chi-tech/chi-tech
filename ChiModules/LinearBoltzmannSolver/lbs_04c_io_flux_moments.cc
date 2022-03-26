@@ -173,6 +173,8 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
     return;
   }
 
+//  chi_log.Log(LOG_ALL) << "Checkpoint -A"; //TODO: Remove
+
   //============================================= Get relevant items
   auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
   auto& sdm = discretization;
@@ -190,6 +192,8 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
 
   flux_moments.assign(num_local_dofs,0.0);
 
+//  chi_log.Log(LOG_ALL) << "Checkpoint A"; //TODO: Remove
+
   //============================================= Read header
   char header_bytes[500]; header_bytes[499] = '\0';
   file.read(header_bytes,499);
@@ -199,6 +203,8 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
   file.read((char*)&file_num_groups     , sizeof(uint64_t));
   file.read((char*)&file_num_local_dofs , sizeof(uint64_t));
   file.read((char*)&file_num_local_cells, sizeof(uint64_t));
+
+//  chi_log.Log(LOG_ALL) << "Checkpoint B"; //TODO: Remove
 
   //============================================= Check compatibility
   if (not single_file)
@@ -225,6 +231,8 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
       file.close();
       return;
     }
+
+//  chi_log.Log(LOG_ALL) << "Checkpoint C"; //TODO: Remove
 
   //============================================= Read cell nodal locations
   std::map<uint64_t, std::map<uint64_t,uint64_t>> file_cell_nodal_mapping;

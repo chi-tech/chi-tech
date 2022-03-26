@@ -45,6 +45,7 @@ void lbs::SteadySolver::
   std::vector<double> default_zero_src(groups.size(), 0.0);
 
   //================================================== Loop over local cells
+  // Apply all nodal sources
   for (const auto& cell : grid->local_cells)
   {
     auto& transport_view = cell_transport_views[cell.local_id];
@@ -199,6 +200,29 @@ void lbs::SteadySolver::
       }//for m
     }//for dof i
   }//for cell
+
+  //================================================== Apply point sources
+  if ((not options.use_src_moments) and apply_mat_src)
+  {
+    for (const auto& point_source : point_sources)
+    {
+      if (not point_source.LocallyOwned()) continue;
+      const uint64_t cell_local_id = point_source.OwningCellLocalID();
+
+      auto& transport_view = cell_transport_views[cell_local_id];
+
+      const auto& strength = point_source.Strength();
+      const auto& shape_values = point_source.NodalWeights();
+
+      const int num_nodes = transport_view.NumNodes();
+      for (int i = 0; i < num_nodes; ++i)
+      {
+        const size_t uk_map = transport_view.MapDOF(i, /*moment=*/0, /*grp=*/0);
+        for (size_t g = gs_i; g <= gs_f; ++g)
+          destination_q[uk_map + g] += strength[g] * shape_values[i];
+      }//for node i
+    }//for point source
+  }//if apply mat src
 
   chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
 }

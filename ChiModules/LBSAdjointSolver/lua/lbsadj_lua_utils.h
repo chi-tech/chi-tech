@@ -23,9 +23,10 @@ namespace lbs_adjoint
       int handle, const std::string& calling_function_name);
 
     int chiAdjointSolverCreate(lua_State* L);
-    int chiAdjointSolverSetQOI(lua_State* L);
+    int chiAdjointSolverAddResponseFunction(lua_State* L);
     int chiAdjointSolverMakeExpRepFromP1Moments(lua_State* L);
     int chiAdjointSolverExportImportanceMapBinary(lua_State* L);
+    int chiAdjointSolverComputeInnerProduct(lua_State* L);
 
     void RegisterLuaEntities(lua_State* L);
   }//namespace lua_utils

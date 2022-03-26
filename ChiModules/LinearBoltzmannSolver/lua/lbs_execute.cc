@@ -1,8 +1,6 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
-
 //###################################################################
 /**Executes the LBS solver.
 \param SolverIndex int Handle to the solver.

@@ -52,7 +52,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
 
   if (log_info)
     chi_log.Log(LOG_0)
-      << "Number of angular unknowns: " << num_delayed_ang_DOFs.second;
+      << "Number of lagged angular unknowns: " << num_delayed_ang_DOFs.second;
 
   //================================================== Create PETSc vectors
   phi_new = chi_math::PETScUtils::CreateVector(static_cast<int64_t>(local_size),

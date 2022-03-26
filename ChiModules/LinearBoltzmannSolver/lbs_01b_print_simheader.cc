@@ -14,7 +14,8 @@ void lbs::SteadySolver::PrintSimHeader()
 {
   if (chi_mpi.location_id == 0)
   {
-    chi_log.Log(LOG_0) << "Initializing LBS Solver\n";
+    chi_log.Log(LOG_0) << "\nInitializing LBS Solver with name: "
+                       << TextName() << "\n\n";
     chi_log.Log(LOG_0) << "Scattering order    : "
                        << options.scattering_order << std::endl;
     chi_log.Log(LOG_0) << "Number of Groups    : "

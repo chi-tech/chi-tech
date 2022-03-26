@@ -35,6 +35,8 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L);
 int chiLBSGroupsetSetWGDSA(lua_State *L);
 int chiLBSGroupsetSetTGDSA(lua_State *L);
 
+int chiLBSAddPointSource(lua_State *L);
+
 namespace lbs
 {
   namespace lua_utils

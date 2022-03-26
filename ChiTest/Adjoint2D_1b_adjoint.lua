@@ -1,7 +1,7 @@
--- 2D Transport test with Vacuum and Incident-isotropic BC.
+-- 2D Transport test with localized material source adjoint formulation
 -- SDM: PWLD
--- Test: Max-value=0.50758 and 2.52527e-04
-num_procs = 6
+-- Test: None
+num_procs = 4
 
 
 
@@ -43,9 +43,6 @@ vol0b = chiLogicalVolumeCreate(RPP,-0.166666+2.5,0.166666+2.5,-1000,1000,-1000,1
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0b,0)
 
 vol2 = chiLogicalVolumeCreate(RPP,-0.166666+2.5,0.166666+2.5,0.0,2*0.166666,-1000,1000)
--- vol2 = chiLogicalVolumeCreate(RPP,-1000,1000,0.0,2*0.166666,-1000,1000)
--- vol2 = chiLogicalVolumeCreate(RPP,2.3333,2.6666,4.16666,4.33333,-1000,1000) -- center
-vol2 = chiLogicalVolumeCreate(RPP,0.5   ,0.8333,4.16666,4.33333,-1000,1000) -- offset
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol2,2)
 
 vol1b = chiLogicalVolumeCreate(RPP,-1+2.5,1+2.5,0.9*L,L,-1000,1000)
@@ -91,8 +88,8 @@ chiPhysicsMaterialSetProperty(materials[3],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 
 --############################################### Setup Physics
-if (forward ~= nil) then phys1 = chiLBSCreateSolver() end
-if (forward == nil) then phys1 = chiAdjointSolverCreate() end
+solver_name = "LBAdjoint"
+phys1 = chiAdjointSolverCreate(solver_name)
 
 chiSolverAddRegion(phys1,region1)
 
@@ -103,7 +100,7 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,48, 6)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
@@ -127,71 +124,40 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 tvol0 = chiLogicalVolumeCreate(RPP,2.3333,2.6666,4.16666,4.33333,-1000,1000)
 tvol1 = chiLogicalVolumeCreate(RPP,0.5   ,0.8333,4.16666,4.33333,-1000,1000)
 
-if (forward == nil) then
-    chiAdjointSolverSetQOI(phys1,"QOI0",tvol0)
-    chiAdjointSolverSetQOI(phys1,"QOI1",tvol1)
-    chiSolverSetBasicOption(phys1, "REFERENCE_QOI", "QOI1")
-end
+chiAdjointSolverAddResponseFunction(phys1,"QOI0",tvol0)
+chiAdjointSolverAddResponseFunction(phys1,"QOI1",tvol1)
+chiSolverSetBasicOption(phys1, "REFERENCE_RF", "QOI1")
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-chiLBSWriteFluxMoments(phys1, "FluxMoments")
+chiLBSWriteFluxMoments(phys1, "Adjoint2D_1b_adjoint")
+
+
 
 --############################################### Get field functions
---fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
-
-ff_m0 = chiGetFieldFunctionHandleByName("AdjointSolver-Flux_g0_m0")
-ff_m1 = chiGetFieldFunctionHandleByName("AdjointSolver-Flux_g0_m1")
-ff_m2 = chiGetFieldFunctionHandleByName("AdjointSolver-Flux_g0_m2")
-ff_m3 = chiGetFieldFunctionHandleByName("AdjointSolver-Flux_g0_m3")
+ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m0")
+ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m1")
+ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
 
 
 --############################################### Slice plot
---slice2 = chiFFInterpolationCreate(SLICE)
---chiFFInterpolationSetProperty(slice2,SLICE_POINT,0.0,0.0,0.025)
---chiFFInterpolationSetProperty(slice2,ADD_FIELDFUNCTION,fflist[1])
---
---chiFFInterpolationInitialize(slice2)
---chiFFInterpolationExecute(slice2)
 
 --############################################### Volume integrations
---ffi1 = chiFFInterpolationCreate(VOLUME)
---curffi = ffi1
---chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
---chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
---chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[1])
---
---chiFFInterpolationInitialize(curffi)
---chiFFInterpolationExecute(curffi)
---maxval = chiFFInterpolationGetValue(curffi)
---
---chiLog(LOG_0,string.format("Max-value1=%.5f", maxval))
 
---############################################### Volume integrations
---ffi1 = chiFFInterpolationCreate(VOLUME)
---curffi = ffi1
---chiFFInterpolationSetProperty(curffi,OPERATION,OP_MAX)
---chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
---chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[160])
---
---chiFFInterpolationInitialize(curffi)
---chiFFInterpolationExecute(curffi)
---maxval = chiFFInterpolationGetValue(curffi)
---
---chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
+
+
+
+
+
+
+
+
+
+
 
 --############################################### Exports
---if master_export == nil then
---    --chiFFInterpolationExportPython(slice2)
-    chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi3DColl")
---end
-
---############################################### Plots
---if (chi_location_id == 0 and master_export == nil) then
---    --local handle = io.popen("python ZPFFI00.py")
---end
-
---chiLog(LOG_ALL, "Done")
---chiMPIBarrier()
+if master_export == nil then
+    chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_"..solver_name)
+end

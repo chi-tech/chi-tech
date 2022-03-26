@@ -39,7 +39,7 @@ void lbs_adjoint::AdjointSolver::Initialize()
   }//for each mat
 
   //============================================= Initialize QOIs
-  for (auto& qoi_pair : QOI_cell_subscriptions)
+  for (auto& qoi_pair : response_functions)
   {
     const auto& qoi_designation = qoi_pair.first;
     auto& qoi_cell_subscription = qoi_pair.second;

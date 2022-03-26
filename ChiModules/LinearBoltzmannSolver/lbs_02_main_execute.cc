@@ -44,7 +44,7 @@ void lbs::SteadySolver::Execute()
   if (options.use_precursors)
     ComputePrecursors();
 
-  chi_log.Log(LOG_0) << "NPTransport solver execution completed\n";
+  chi_log.Log(LOG_0) << "LB solver " << TextName() << " execution completed\n";
 }
 
 

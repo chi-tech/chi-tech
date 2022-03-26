@@ -177,16 +177,18 @@ void lbs_adjoint::AdjointSolver::
   //================================================== Apply reference QOI
   if (apply_mat_src)
   {
-    for (const auto& qoi_data : QOI_cell_subscriptions)
+    for (const auto& qoi_data : response_functions)
     {
       const auto& qoi_designation = qoi_data.first;
       const auto& qoi_cell_subscription = qoi_data.second;
 
-      if (qoi_data.first.name == basic_options("REFERENCE_QOI").StringValue())
+      if (qoi_designation.name == basic_options("REFERENCE_RF").StringValue())
       {
         for (size_t local_id : qoi_cell_subscription)
         {
-          auto& full_cell_view = cell_transport_views[local_id];
+          const auto& full_cell_view = cell_transport_views[local_id];
+          const auto& cell = grid->local_cells[local_id];
+          const auto& response = qoi_designation.GetMGResponse(cell, num_groups);
           const int num_nodes = full_cell_view.NumNodes();
           for (int i = 0; i < num_nodes; ++i)
           {
@@ -194,7 +196,7 @@ void lbs_adjoint::AdjointSolver::
 
             for (size_t g = gs_i; g <= gs_f; ++g)
             {
-              destination_q[uk_map + g] += 1.0;
+              destination_q[uk_map + g] += response[g];
             }//for group
           }//for node
         }//for local cell-id of qoi

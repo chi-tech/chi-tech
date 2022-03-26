@@ -146,4 +146,7 @@ void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiLBSGroupsetSetEnableSweepLog);
   LUA_FMACRO1(chiLBSGroupsetSetWGDSA);
   LUA_FMACRO1(chiLBSGroupsetSetTGDSA);
+
+  //=================================== Point source
+  LUA_FMACRO1(chiLBSAddPointSource);
 }

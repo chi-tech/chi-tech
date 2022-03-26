@@ -5,5 +5,5 @@
 lbs_adjoint::AdjointSolver::AdjointSolver(const std::string &solver_name) :
   lbs::SteadySolver(solver_name)
 {
-  basic_options.AddOption<std::string>("REFERENCE_QOI", std::string());
+  basic_options.AddOption<std::string>("REFERENCE_RF", std::string());
 }

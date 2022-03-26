@@ -40,10 +40,12 @@ void lbs_adjoint::lua_utils::RegisterLuaEntities(lua_State* L)
 {
   lua_register(L, "chiAdjointSolverCreate",
                lbs_adjoint::lua_utils::chiAdjointSolverCreate);
-  lua_register(L, "chiAdjointSolverSetQOI",
-               lbs_adjoint::lua_utils::chiAdjointSolverSetQOI);
+  lua_register(L, "chiAdjointSolverAddResponseFunction",
+               lbs_adjoint::lua_utils::chiAdjointSolverAddResponseFunction);
   lua_register(L, "chiAdjointSolverMakeExpRepFromP1Moments",
                lbs_adjoint::lua_utils::chiAdjointSolverMakeExpRepFromP1Moments);
   lua_register(L, "chiAdjointSolverExportImportanceMapBinary",
                lbs_adjoint::lua_utils::chiAdjointSolverExportImportanceMapBinary);
+  lua_register(L, "chiAdjointSolverComputeInnerProduct",
+               lbs_adjoint::lua_utils::chiAdjointSolverComputeInnerProduct);
 }
