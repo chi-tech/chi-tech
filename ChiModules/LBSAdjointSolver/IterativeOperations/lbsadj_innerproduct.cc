@@ -49,24 +49,24 @@ double lbs_adjoint::AdjointSolver::ComputeInnerProduct()
     const auto& cell = grid->local_cells[cell_local_id];
     const auto& transport_view = cell_transport_views[cell.local_id];
     const auto& source_strength = point_source.Strength();
-    const auto& shape_values = point_source.NodalWeights();
+    const auto& shape_values = point_source.ShapeValues();
     const auto& fe_values = pwl->GetUnitIntegrals(cell);
 
     for (const auto& group : groups)
     {
       const int g = group.id;
-      const double Q = source_strength[g];
+      const double S = source_strength[g];
 
-      if (Q > 0.0)
+      if (S > 0.0)
       {
         const int num_nodes = transport_view.NumNodes();
         for (int i = 0; i < num_nodes; ++i)
         {
           const size_t dof_map = transport_view.MapDOF(i, 0, g); //unknown map
 
-          const double phi = phi_old_local[dof_map];
+          const double phi_i = phi_old_local[dof_map];
 
-          local_integral += Q * phi * shape_values[i] * fe_values.IntV_shapeI(i);
+          local_integral += S * phi_i * shape_values[i];
         }//for node
       }//check source value >0
     }//for group

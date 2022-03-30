@@ -114,21 +114,28 @@ void lbs::SteadySolver::InitializePointSources()
       if (inside)
       {
         const auto& cell_view = pwld->GetCellMappingFE(cell.local_id);
+        const auto& fe_values = pwld->GetUnitIntegrals(cell);
+        const auto& M = fe_values.GetIntV_shapeI_shapeJ();
 
-        std::vector<double> nodal_weights;
-        cell_view->ShapeValues(point_source.Location(), nodal_weights/**ByRef*/);
+
+        std::vector<double> shape_values;
+        cell_view->ShapeValues(point_source.Location(), shape_values/**ByRef*/);
+
+        const auto M_inv = chi_math::Inverse(M);
+
+        const auto q_p_weights = chi_math::MatMul(M_inv, shape_values);
 
         std::stringstream output;
         output << "Point source at " << p.PrintStr() << " assigned to cell "
-               << cell.global_id << " with weights ";
-        for (double val : nodal_weights)
+               << cell.global_id << " with shape values ";
+        for (double val : shape_values)
           output << val << " ";
 
         chi_log.Log(LOG_ALL) << output.str();
 
-        point_source.SetOwningCellLocalIDAndWeights(cell.local_id, nodal_weights);
+        point_source.SetOwningCellData(cell.local_id, shape_values, q_p_weights);
         break;
-      }
+      }//if inside
     }//for cell
   }//for point_source
 }

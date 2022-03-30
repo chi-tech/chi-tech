@@ -212,14 +212,14 @@ void lbs::SteadySolver::
       auto& transport_view = cell_transport_views[cell_local_id];
 
       const auto& strength = point_source.Strength();
-      const auto& shape_values = point_source.NodalWeights();
+      const auto& node_weights = point_source.NodeWeights();
 
       const int num_nodes = transport_view.NumNodes();
       for (int i = 0; i < num_nodes; ++i)
       {
         const size_t uk_map = transport_view.MapDOF(i, /*moment=*/0, /*grp=*/0);
         for (size_t g = gs_i; g <= gs_f; ++g)
-          destination_q[uk_map + g] += strength[g] * shape_values[i];
+          destination_q[uk_map + g] += strength[g] * node_weights[i];
       }//for node i
     }//for point source
   }//if apply mat src

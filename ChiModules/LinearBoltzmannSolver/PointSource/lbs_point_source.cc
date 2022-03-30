@@ -13,18 +13,29 @@ const std::vector<double>& lbs::PointSource::Strength() const
 }
 
 void lbs::PointSource::
-  SetOwningCellLocalIDAndWeights(uint64_t owning_cell_local_id,
-                                 const std::vector<double>& node_weights)
+  SetOwningCellData(uint64_t owning_cell_local_id,
+                    const std::vector<double>& shape_values,
+                    const std::vector<double>& node_weights)
 {
   m_owning_cell_local_id = owning_cell_local_id;
+  m_owning_cell_shape_values = shape_values;
   m_owning_cell_node_weights = node_weights;
   m_owning_cell_set = true;
 }
 
-const std::vector<double>& lbs::PointSource::NodalWeights() const
+const std::vector<double>& lbs::PointSource::ShapeValues() const
 {
   if (not m_owning_cell_set)
-    throw std::logic_error("lbs::PointSource::NodalWeights failed because the "
+    throw std::logic_error("lbs::PointSource::ShapeValues failed because the "
+                           "owning cell weights have not been initialized.");
+
+  return m_owning_cell_shape_values;
+}
+
+const std::vector<double>& lbs::PointSource::NodeWeights() const
+{
+  if (not m_owning_cell_set)
+    throw std::logic_error("lbs::PointSource::NodeWeights failed because the "
                            "owning cell weights have not been initialized.");
 
   return m_owning_cell_node_weights;
