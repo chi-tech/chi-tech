@@ -1,5 +1,5 @@
 ./configure  \
---prefix=$PWD/install  \
+--prefix=$PWD/../petsc-3.12.5-install  \
 --download-hypre=1  \
 --with-ssl=0  \
 --with-debugging=0  \
