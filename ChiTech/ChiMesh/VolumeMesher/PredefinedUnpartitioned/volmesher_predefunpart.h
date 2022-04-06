@@ -26,7 +26,8 @@ public:
   static
   std::vector<int64_t> PARMETIS(const UnpartitionedMesh &umesh);
 
-  static chi_mesh::Cell* MakeCell(
+  static std::unique_ptr<chi_mesh::Cell>
+  MakeCell(
     const chi_mesh::UnpartitionedMesh::LightWeightCell& raw_cell,
     uint64_t global_id,
     uint64_t partition_id,

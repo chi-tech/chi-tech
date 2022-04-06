@@ -11,7 +11,10 @@ std::vector<std::unique_ptr<chi_mesh::Cell>> chi_mesh::MeshContinuum::
   ghost_cells.reserve(ghost_cell_ids.size());
 
   for (uint64_t global_id : ghost_cell_ids)
-    ghost_cells.emplace_back(&cells[global_id]);
+  {
+    auto cell_copy = std::make_unique<chi_mesh::Cell>(cells[global_id]);
+    ghost_cells.push_back(std::move(cell_copy));
+  }
 
   return ghost_cells;
 }
