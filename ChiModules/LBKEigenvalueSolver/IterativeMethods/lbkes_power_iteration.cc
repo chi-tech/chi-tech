@@ -14,7 +14,7 @@ namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;
 typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
-using namespace LinearBoltzmann;
+using namespace lbs;
 
 
 //###################################################################

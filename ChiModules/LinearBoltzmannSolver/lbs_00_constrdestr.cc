@@ -4,9 +4,9 @@
 
 //###################################################################
 /**Constructor for LBS*/
-LinearBoltzmann::Solver::Solver(const std::string& in_text_name) :
+lbs::SteadySolver::SteadySolver(const std::string& in_text_name) :
   chi_physics::Solver(in_text_name)
 {
   boundary_types.resize(6,
-    std::pair<BoundaryType,int>(LinearBoltzmann::BoundaryType::VACUUM, -1));
+    std::pair<BoundaryType,int>(lbs::BoundaryType::VACUUM, -1));
 }

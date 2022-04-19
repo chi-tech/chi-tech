@@ -16,10 +16,10 @@ extern ChiConsole&  chi_console;
 
 //###################################################################
 /** Initialize the solver.*/
-void LinearBoltzmann::Solver::Initialize()
+void lbs::SteadySolver::Initialize()
 {
-  PerformInputChecks();
-  PrintSimHeader();
+  PerformInputChecks(); //a
+  PrintSimHeader(); //b
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Add unique material ids
@@ -39,22 +39,22 @@ void LinearBoltzmann::Solver::Initialize()
   }
 
   //================================================== Initialize materials
-  InitMaterials(unique_material_ids);
+  InitMaterials(unique_material_ids); //c
 
   //================================================== Init spatial discretization
-  InitializeSpatialDiscretization();
+  InitializeSpatialDiscretization(); //d
 
   //================================================== Initialize groupsets
-  InitializeGroupsets();
+  InitializeGroupsets(); //e
 
   //================================================== Compute n. moments
-  ComputeNumberOfMoments();
+  ComputeNumberOfMoments(); //f
 
   //================================================== Initialize parrays
   chi_log.Log(LOG_0)
     << "Initializing parallel arrays. " << std::endl;
 
-  InitializeParrays();
+  InitializeParrays();//g
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
@@ -63,6 +63,9 @@ void LinearBoltzmann::Solver::Initialize()
     << chi_console.GetMemoryUsageInMB() << " MB" << std::endl;
 
   //================================================== Initialize boundaries
-  InitializeBoundaries();
+  InitializeBoundaries();//h
+
+  //================================================== Initialize sources
+  InitializePointSources();
 
 }

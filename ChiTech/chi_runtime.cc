@@ -180,6 +180,8 @@ int ChiTech::RunInteractive(int argc, char** argv)
   return 0;
 }
 
+#include <unistd.h>
+
 //############################################### Batch interface
 /**Runs ChiTech in pure batch mode. Start then finish.*/
 int ChiTech::RunBatch(int argc, char** argv)
@@ -202,6 +204,16 @@ int ChiTech::RunBatch(int argc, char** argv)
       << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
   chi_console.FlushConsole();
+
+  chi_log.Log(LOG_0) << "Waiting...";
+//  if (chi_mpi.location_id == 1)
+//    for (int k=0; k<100; ++k)
+//    {
+//      usleep(1000000);
+//      chi_log.Log(LOG_0) << k;
+//    }
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   int error_code = 0;
   if ( not ChiTech::input_file_name.empty() )

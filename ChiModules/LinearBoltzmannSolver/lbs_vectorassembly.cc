@@ -2,7 +2,7 @@
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
                            const std::vector<double>& y,
                            bool with_delayed_psi/*=false*/)
@@ -41,7 +41,7 @@ void LinearBoltzmann::Solver::
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
                            std::vector<double>& y,
                            bool with_delayed_psi/*=false*/)
@@ -81,7 +81,7 @@ void LinearBoltzmann::Solver::
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   ScopedCopySTLvectors(LBSGroupset& groupset,
                        const std::vector<double>& x_src,
                        std::vector<double>& y)

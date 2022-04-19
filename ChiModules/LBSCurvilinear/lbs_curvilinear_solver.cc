@@ -27,7 +27,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
   //  perform all verifications of Cartesian LBS
   //  --------------------------------------------------------------------------
 
-  LinearBoltzmann::Solver::PerformInputChecks();
+  lbs::SteadySolver::PerformInputChecks();
 
   //  --------------------------------------------------------------------------
   //  perform additional verifications for curvilinear LBS
@@ -47,7 +47,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
   //  re-interpret geometry type to curvilinear
   switch (options.geometry_type)
   {
-    case LinearBoltzmann::GeometryType::ONED_SLAB:
+    case lbs::GeometryType::ONED_SLAB:
     {
       switch (coord_system_type)
       {
@@ -74,13 +74,13 @@ LBSCurvilinear::Solver::PerformInputChecks()
       }
       break;
     }
-    case LinearBoltzmann::GeometryType::TWOD_CARTESIAN:
+    case lbs::GeometryType::TWOD_CARTESIAN:
     {
       switch (coord_system_type)
       {
         case chi_math::CoordinateSystemType::CYLINDRICAL:
         {
-          options.geometry_type = LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL;
+          options.geometry_type = lbs::GeometryType::TWOD_CYLINDRICAL;
           break;
         }
         default:
@@ -159,7 +159,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:
       {
-        if (angleagg_method != LinearBoltzmann::AngleAggregationType::AZIMUTHAL)
+        if (angleagg_method != lbs::AngleAggregationType::AZIMUTHAL)
         {
           chi_log.Log(LOG_ALLERROR)
             << "LBSCurvilinear::Solver::PerformInputChecks : "
@@ -172,7 +172,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
       }
       case chi_math::CoordinateSystemType::SPHERICAL:
       {
-        if (angleagg_method != LinearBoltzmann::AngleAggregationType::POLAR)
+        if (angleagg_method != lbs::AngleAggregationType::POLAR)
         {
           chi_log.Log(LOG_ALLERROR)
             << "LBSCurvilinear::Solver::PerformInputChecks : "
@@ -263,19 +263,19 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
   //  primary discretisation
   switch (options.geometry_type)
   {
-    case LinearBoltzmann::GeometryType::ONED_SPHERICAL:
+    case lbs::GeometryType::ONED_SPHERICAL:
     {
       qorder = chi_math::QuadratureOrder::FOURTH;
       system = chi_math::CoordinateSystemType::SPHERICAL;
       break;
     }
-    case LinearBoltzmann::GeometryType::ONED_CYLINDRICAL:
+    case lbs::GeometryType::ONED_CYLINDRICAL:
     {
       qorder = chi_math::QuadratureOrder::THIRD;
       system = chi_math::CoordinateSystemType::CYLINDRICAL;
       break;
     }
-    case LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL:
+    case lbs::GeometryType::TWOD_CYLINDRICAL:
     {
       qorder = chi_math::QuadratureOrder::THIRD;
       system = chi_math::CoordinateSystemType::CYLINDRICAL;
@@ -300,19 +300,19 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
   //  than the primary discretisation
   switch (options.geometry_type)
   {
-    case LinearBoltzmann::GeometryType::ONED_SPHERICAL:
+    case lbs::GeometryType::ONED_SPHERICAL:
     {
       qorder = chi_math::QuadratureOrder::THIRD;
       system = chi_math::CoordinateSystemType::CYLINDRICAL;
       break;
     }
-    case LinearBoltzmann::GeometryType::ONED_CYLINDRICAL:
+    case lbs::GeometryType::ONED_CYLINDRICAL:
     {
       qorder = chi_math::QuadratureOrder::SECOND;
       system = chi_math::CoordinateSystemType::CARTESIAN;
       break;
     }
-    case LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL:
+    case lbs::GeometryType::TWOD_CYLINDRICAL:
     {
       qorder = chi_math::QuadratureOrder::SECOND;
       system = chi_math::CoordinateSystemType::CARTESIAN;
@@ -357,7 +357,7 @@ LBSCurvilinear::Solver::SetSweepChunk(LBSGroupset& groupset)
                                      psi_new_local[groupset.id],
                                      q_moments_local,
                                      groupset,
-                                     material_xs,
+                                     matid_to_xs_map,
                                      num_moments,
                                      max_cell_dof_count);
 

@@ -39,7 +39,7 @@ LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header);
+        return LogStream(&dummy_stream, header, true);
       }
     }
     case LOG_0WARNING:
@@ -53,7 +53,7 @@ LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header);
+        return LogStream(&dummy_stream, header, true);
       }
     }
     case LOG_0ERROR:
@@ -67,7 +67,7 @@ LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header);
+        return LogStream(&dummy_stream, header, true);
       }
     }
     case LOG_0VERBOSE_0:
@@ -82,7 +82,7 @@ LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header);
+        return LogStream(&dummy_stream, header, true);
       }
     }
     case LOG_ALL:
@@ -115,14 +115,13 @@ LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header);
+        return LogStream(&dummy_stream, header, true);
       }
     }
+    default:
+      std::string header = " ";
+      return LogStream(&dummy_stream, header);
   }
-
-
-  std::string header = " ";
-  return LogStream(&dummy_stream, header);
 }
 
 
@@ -171,7 +170,7 @@ size_t ChiLog::GetRepeatingEventTag(std::string event_name)
 /**Logs an event with the supplied event information.*/
 void ChiLog::LogEvent(size_t ev_tag,
                       EventType ev_type,
-                      std::shared_ptr<EventInfo> ev_info)
+                      const std::shared_ptr<EventInfo>& ev_info)
 {
   if (ev_tag >= repeating_events.size())
     return;

@@ -15,37 +15,26 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Initializes default materials and physics materials.*/
-void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
+void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
 {
   chi_log.Log(LOG_0VERBOSE_1) << "Initializing Materials";
 
   std::stringstream materials_list;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process materials found
-  int num_physics_mats = chi_physics_handler.material_stack.size();
-  material_xs.clear();
-  material_srcs.clear();
-  matid_to_xs_map.assign(num_physics_mats,-1);
-  matid_to_src_map.assign(num_physics_mats,-1);
+  size_t num_physics_mats = chi_physics_handler.material_stack.size();
+
   for (const int& mat_id : material_ids)
   {
     auto current_material = chi_physics_handler.material_stack[mat_id];
     materials_list << "Material id " << mat_id;
 
     //====================================== Check valid ids
-    if (mat_id < 0)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "LBS-InitMaterials: Cells encountered with no assigned material.";
-      exit(EXIT_FAILURE);
-    }
-    if (mat_id >= num_physics_mats)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "LBS-InitMaterials: Cells encountered with material id "
-        << "that matches no material in physics material library.";
-      exit(EXIT_FAILURE);
-    }
+    if (mat_id < 0) {throw std::logic_error(
+      "LBS-InitMaterials: Cells encountered with no assigned material.");}
+    if (static_cast<size_t>(mat_id) >= num_physics_mats) {
+      throw std::logic_error("LBS-InitMaterials: Cells encountered with "
+        "material id that matches no material in physics material library.");}
 
     //====================================== Extract properties
     using MatProperty = chi_physics::PropertyType;
@@ -56,8 +45,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
       {
         auto transp_xs =
           std::static_pointer_cast<chi_physics::TransportCrossSections>(property);
-        material_xs.push_back(transp_xs);
-        matid_to_xs_map[mat_id] = material_xs.size() - 1;
+        matid_to_xs_map[mat_id] = transp_xs;
         found_transport_xs = true;
       }//transport xs
       if (property->Type() == MatProperty::ISOTROPIC_MG_SOURCE)
@@ -75,8 +63,7 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
         }
         else
         {
-          material_srcs.push_back(mg_source);
-          matid_to_src_map[mat_id] = material_srcs.size() - 1;
+          matid_to_src_map[mat_id] = mg_source;
         }
       }//P0 source
     }//for property
@@ -89,33 +76,32 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
         << "material \"" << current_material->name << "\".";
       exit(EXIT_FAILURE);
     }
-
     //====================================== Check number of groups legal
-    if (material_xs[matid_to_xs_map[mat_id]]->num_groups < groups.size())
+    if (matid_to_xs_map[mat_id]->num_groups < groups.size())
     {
       chi_log.Log(LOG_ALLERROR)
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
-        << material_xs[matid_to_xs_map[mat_id]]->num_groups << " groups and"
+        << matid_to_xs_map[mat_id]->num_groups << " groups and"
         << " the simulation has " << groups.size() << " groups."
         << " The material must have a greater or equal amount of groups.";
       exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments
-    if (material_xs[matid_to_xs_map[mat_id]]->scattering_order < options.scattering_order)
+    if (matid_to_xs_map[mat_id]->scattering_order < options.scattering_order)
     {
       chi_log.Log(LOG_0WARNING)
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
         << "a scattering order of "
-        << material_xs[matid_to_xs_map[mat_id]]->scattering_order << " and"
+        << matid_to_xs_map[mat_id]->scattering_order << " and"
         << " the simulation has a scattering order of "
         << options.scattering_order << "."
         << " The higher moments will therefore not be used.";
     }
-    
+
     materials_list
       << " number of moments "
-      << material_xs[matid_to_xs_map[mat_id]]->transfer_matrices.size() << "\n";
+      << matid_to_xs_map[mat_id]->transfer_matrices.size() << "\n";
   }//for material id
 
   num_groups = groups.size();
@@ -129,8 +115,9 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
   //                                                   properties
   num_precursors = 0;
   max_precursors_per_material = 0;
-  for (auto& xs : material_xs)
+  for (const auto& mat_id_xs : matid_to_xs_map)
   {
+    const auto& xs = mat_id_xs.second;
     num_precursors += xs->num_precursors;
     if (xs->num_precursors > max_precursors_per_material)
       max_precursors_per_material = xs->num_precursors;
@@ -151,8 +138,8 @@ void LinearBoltzmann::Solver::InitMaterials(std::set<int>& material_ids)
   {
     chi_log.Log(LOG_0) << "Computing diffusion parameters.";
 
-    for (auto& xs : material_xs)
-      xs->ComputeDiffusionParameters();
+    for (const auto& mat_id_xs : matid_to_xs_map)
+      mat_id_xs.second->ComputeDiffusionParameters();
   }
 
 }

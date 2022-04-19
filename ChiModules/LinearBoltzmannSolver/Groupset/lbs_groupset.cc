@@ -15,8 +15,8 @@ extern ChiMPI& chi_mpi;
 LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 {
   quadrature = nullptr;
-  iterative_method = LinearBoltzmann::IterativeMethod::CLASSICRICHARDSON;
-  angleagg_method  = LinearBoltzmann::AngleAggregationType::POLAR;
+  iterative_method = lbs::IterativeMethod::CLASSICRICHARDSON;
+  angleagg_method  = lbs::AngleAggregationType::POLAR;
   master_num_grp_subsets = 1;
   master_num_ang_subsets = 1;
   residual_tolerance = 1.0e-6;
@@ -46,20 +46,20 @@ LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 /**Computes the discrete to moment operator.*/
 void LBSGroupset::BuildDiscMomOperator(
   unsigned int scattering_order,
-  LinearBoltzmann::GeometryType geometry_type)
+  lbs::GeometryType geometry_type)
 {
-  if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB ||
-      geometry_type == LinearBoltzmann::GeometryType::ONED_CYLINDRICAL ||
-      geometry_type == LinearBoltzmann::GeometryType::ONED_SPHERICAL)
+  if (geometry_type == lbs::GeometryType::ONED_SLAB ||
+      geometry_type == lbs::GeometryType::ONED_CYLINDRICAL ||
+      geometry_type == lbs::GeometryType::ONED_SPHERICAL)
   {
     quadrature->BuildDiscreteToMomentOperator(scattering_order,1);
   }
-  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN ||
-           geometry_type == LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL)
+  else if (geometry_type == lbs::GeometryType::TWOD_CARTESIAN ||
+           geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
   {
     quadrature->BuildDiscreteToMomentOperator(scattering_order,2);
   }
-  else if (geometry_type == LinearBoltzmann::GeometryType::THREED_CARTESIAN)
+  else if (geometry_type == lbs::GeometryType::THREED_CARTESIAN)
   {
     quadrature->BuildDiscreteToMomentOperator(scattering_order,3);
   }
@@ -69,20 +69,20 @@ void LBSGroupset::BuildDiscMomOperator(
 /**Computes the moment to discrete operator.*/
 void LBSGroupset::BuildMomDiscOperator(
   unsigned int scattering_order,
-  LinearBoltzmann::GeometryType geometry_type)
+  lbs::GeometryType geometry_type)
 {
-  if (geometry_type == LinearBoltzmann::GeometryType::ONED_SLAB ||
-      geometry_type == LinearBoltzmann::GeometryType::ONED_CYLINDRICAL ||
-      geometry_type == LinearBoltzmann::GeometryType::ONED_SPHERICAL)
+  if (geometry_type == lbs::GeometryType::ONED_SLAB ||
+      geometry_type == lbs::GeometryType::ONED_CYLINDRICAL ||
+      geometry_type == lbs::GeometryType::ONED_SPHERICAL)
   {
     quadrature->BuildMomentToDiscreteOperator(scattering_order,1);
   }
-  else if (geometry_type == LinearBoltzmann::GeometryType::TWOD_CARTESIAN ||
-           geometry_type == LinearBoltzmann::GeometryType::TWOD_CYLINDRICAL)
+  else if (geometry_type == lbs::GeometryType::TWOD_CARTESIAN ||
+           geometry_type == lbs::GeometryType::TWOD_CYLINDRICAL)
   {
     quadrature->BuildMomentToDiscreteOperator(scattering_order,2);
   }
-  else if (geometry_type == LinearBoltzmann::GeometryType::THREED_CARTESIAN)
+  else if (geometry_type == lbs::GeometryType::THREED_CARTESIAN)
   {
     quadrature->BuildMomentToDiscreteOperator(scattering_order,3);
   }
@@ -149,7 +149,7 @@ void LBSGroupset::BuildSubsets()
       ang_subsets_top.emplace_back(subset_ranki,subset_ranki+subset_size-1);
       ang_subset_sizes_top.push_back(subset_size);
 
-      if (angleagg_method != LinearBoltzmann::AngleAggregationType::SINGLE)
+      if (angleagg_method != lbs::AngleAggregationType::SINGLE)
         chi_log.Log(LOG_0)
           << "Top-hemi Angle subset " << ss << " "
           << subset_ranki << "->" << subset_ranki+subset_size-1;
@@ -168,7 +168,7 @@ void LBSGroupset::BuildSubsets()
       ang_subsets_bot.emplace_back(subset_ranki,subset_ranki+subset_size-1);
       ang_subset_sizes_bot.push_back(subset_size);
 
-      if (angleagg_method != LinearBoltzmann::AngleAggregationType::SINGLE)
+      if (angleagg_method != lbs::AngleAggregationType::SINGLE)
         chi_log.Log(LOG_0)
           << "Bot-hemi Angle subset " << ss << " "
           << subset_ranki << "->" << subset_ranki+subset_size-1;

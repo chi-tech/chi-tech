@@ -12,7 +12,7 @@ extern ChiTimer   chi_program_timer;
 
 //###################################################################
 /**Customized convergence test.*/
-PetscErrorCode LinearBoltzmann::
+PetscErrorCode lbs::
   KSPConvergenceTestNPT(KSP ksp, PetscInt n, PetscReal rnorm,
                         KSPConvergedReason* convergedReason, void*)
 {

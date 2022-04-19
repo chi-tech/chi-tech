@@ -164,7 +164,7 @@ int chiLBSSetProperty(lua_State *L)
 
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = LinearBoltzmann::lua_utils::
+  auto lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Get property index
@@ -215,12 +215,12 @@ int chiLBSSetProperty(lua_State *L)
 
     int bid = bident - 31;
 
-    if (btype == (int)LinearBoltzmann::BoundaryType::VACUUM)
+    if (btype == (int)lbs::BoundaryType::VACUUM)
     {
-      lbs_solver->boundary_types[bid].first = LinearBoltzmann::BoundaryType::VACUUM;
+      lbs_solver->boundary_types[bid].first = lbs::BoundaryType::VACUUM;
       chi_log.Log(LOG_0) << "Boundary " << bid << " set to Vacuum.";
     }
-    else if (btype == (int)LinearBoltzmann::BoundaryType::INCIDENT_ISOTROPIC)
+    else if (btype == (int)lbs::BoundaryType::INCIDENT_ISOTROPIC)
     {
       if (numArgs!=5)
         LuaPostArgAmountError("chiLBSSetProperty",5,numArgs);
@@ -273,16 +273,16 @@ int chiLBSSetProperty(lua_State *L)
       //bid = XMIN or XMAX or YMIN ... etc
       //index is where it is on the incident_P0_mg_boundaries stack
       lbs_solver->boundary_types[bid].first =
-        LinearBoltzmann::BoundaryType::INCIDENT_ISOTROPIC;
+        lbs::BoundaryType::INCIDENT_ISOTROPIC;
       lbs_solver->boundary_types[bid].second= static_cast<int>(index);
 
       chi_log.Log(LOG_0)
         << "Isotropic boundary condition for boundary " << bid
         << " loaded with " << table_len << " groups.";
     }
-    else if (btype == (int)LinearBoltzmann::BoundaryType::REFLECTING)
+    else if (btype == (int)lbs::BoundaryType::REFLECTING)
     {
-      lbs_solver->boundary_types[bid].first = LinearBoltzmann::BoundaryType::REFLECTING;
+      lbs_solver->boundary_types[bid].first = lbs::BoundaryType::REFLECTING;
       chi_log.Log(LOG_0) << "Boundary " << bid << " set to Reflecting.";
     }
     else

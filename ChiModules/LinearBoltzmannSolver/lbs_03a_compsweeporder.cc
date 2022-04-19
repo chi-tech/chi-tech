@@ -23,7 +23,7 @@ extern ChiConsole&  chi_console;
 
 //###################################################################
 /**Initializes the sweep ordering for the given groupset.*/
-void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
+void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
@@ -77,7 +77,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderings(LBSGroupset& groupset) const
 }
 
 
-void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const
+void lbs::SteadySolver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
@@ -96,7 +96,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& g
 }
 
 
-void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const
+void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
@@ -195,7 +195,7 @@ void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& gr
 }
 
 
-void LinearBoltzmann::Solver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const
+void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)

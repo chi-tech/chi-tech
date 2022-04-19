@@ -15,7 +15,7 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using classic richardson.*/
-bool LinearBoltzmann::Solver::
+bool lbs::SteadySolver::
 ClassicRichardson(LBSGroupset& groupset,
                   MainSweepScheduler& sweep_scheduler,
                   SourceFlags source_flags,

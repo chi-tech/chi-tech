@@ -3,13 +3,13 @@
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
-LinearBoltzmann::Solver* LinearBoltzmann::lua_utils::
+lbs::SteadySolver* lbs::lua_utils::
   GetSolverByHandle(int handle, const std::string& calling_function_name)
 {
-  LinearBoltzmann::Solver* lbs_solver;
+  lbs::SteadySolver* lbs_solver;
   try{
 
-    lbs_solver = dynamic_cast<LinearBoltzmann::Solver*>(
+    lbs_solver = dynamic_cast<lbs::SteadySolver*>(
       chi_physics_handler.solver_stack.at(handle));
 
     if (not lbs_solver)
@@ -42,7 +42,7 @@ LinearBoltzmann::Solver* LinearBoltzmann::lua_utils::
         lua_settable(L,-3); \
         lua_pop(L,1)
 
-void LinearBoltzmann::lua_utils::RegisterLuaEntities(lua_State *L)
+void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   LUA_FMACRO1(chiLBSCreateSolver);
 
@@ -146,4 +146,7 @@ void LinearBoltzmann::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiLBSGroupsetSetEnableSweepLog);
   LUA_FMACRO1(chiLBSGroupsetSetWGDSA);
   LUA_FMACRO1(chiLBSGroupsetSetTGDSA);
+
+  //=================================== Point source
+  LUA_FMACRO1(chiLBSAddPointSource);
 }

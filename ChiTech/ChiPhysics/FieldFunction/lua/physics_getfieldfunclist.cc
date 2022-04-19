@@ -35,9 +35,9 @@ int chiGetFieldFunctionList(lua_State* L)
 
   //============================================= Push up new table
   lua_newtable(L);
-  for (int ff=0; ff<solver->field_functions.size(); ff++)
+  for (size_t ff=0; ff<solver->field_functions.size(); ff++)
   {
-    lua_pushnumber(L,ff+1);
+    lua_pushinteger(L,static_cast<lua_Integer>(ff)+1);
     int pff_count = -1;
     for (auto& pff : chi_physics_handler.fieldfunc_stack)
     {
@@ -51,7 +51,7 @@ int chiGetFieldFunctionList(lua_State* L)
     lua_settable(L,-3);
   }
 
-  lua_pushnumber(L,solver->field_functions.size());
+  lua_pushinteger(L,static_cast<lua_Integer>(solver->field_functions.size()));
 
   return 2;
 }
@@ -79,7 +79,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
 
   size_t ff_handle_counter = 0;
   std::vector<size_t> handles_that_matched;
-  for (auto& pff : chi_physics_handler.fieldfunc_stack)
+  for (const auto& pff : chi_physics_handler.fieldfunc_stack)
   {
     if (pff->text_name == ff_name)
       handles_that_matched.emplace_back(ff_handle_counter);
@@ -92,9 +92,9 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
   {
     chi_log.Log(LOG_0WARNING) << fname << ": No field-functions were found that "
                               << "matched the requested name. A null handle will "
-                              << "be returned.";
-    lua_pushnil(L);
-    return 1;
+                              << "be returned." << std::endl;
+
+    return 0;
   }
 
   if (num_handles > 1)

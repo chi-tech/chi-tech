@@ -13,7 +13,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Makes a source-moments vector from scattering and fission based
  * on the latest phi-solution.*/
-std::vector<double> LinearBoltzmann::Solver::
+std::vector<double> lbs::SteadySolver::
   MakeSourceMomentsFromPhi()
 {
   size_t num_local_dofs = discretization->GetNumLocalDOFs(flux_moments_uk_man);
@@ -33,7 +33,7 @@ std::vector<double> LinearBoltzmann::Solver::
 
 //###################################################################
 /**Writes a given flux-moments vector to file.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   WriteFluxMoments(const std::string &file_base,
                    const std::vector<double>& flux_moments)
 {
@@ -93,15 +93,15 @@ void LinearBoltzmann::Solver::
   auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
-  uint64_t num_moments_t   = static_cast<size_t>(num_moments);
-  uint64_t num_groups      = groups.size();
+  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
+  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups);
   uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
   uint64_t num_local_cells = grid->local_cells.size();
 
   //============================================= Write num_ quantities
   file.write((char*)&num_local_nodes,sizeof(uint64_t));
   file.write((char*)&num_moments_t  ,sizeof(uint64_t));
-  file.write((char*)&num_groups     ,sizeof(uint64_t));
+  file.write((char*)&num_groups_t   ,sizeof(uint64_t));
   file.write((char*)&num_local_dofs ,sizeof(uint64_t));
   file.write((char*)&num_local_cells,sizeof(uint64_t));
 
@@ -150,9 +150,9 @@ void LinearBoltzmann::Solver::
 
 //###################################################################
 /**Reads a flux-moments vector from a file in the specified vector.*/
-void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
-                                              std::vector<double>& flux_moments,
-                                              bool single_file/*=false*/)
+void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
+                                        std::vector<double>& flux_moments,
+                                        bool single_file/*=false*/)
 {
   std::string file_name =
     file_base + std::to_string(chi_mpi.location_id) + ".data";
@@ -173,12 +173,14 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
     return;
   }
 
+//  chi_log.Log(LOG_ALL) << "Checkpoint -A"; //TODO: Remove
+
   //============================================= Get relevant items
   auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
-  uint64_t num_groups      = groups.size();
+  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups);
   uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
   uint64_t num_local_cells = grid->local_cells.size();
 
@@ -190,6 +192,8 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
 
   flux_moments.assign(num_local_dofs,0.0);
 
+//  chi_log.Log(LOG_ALL) << "Checkpoint A"; //TODO: Remove
+
   //============================================= Read header
   char header_bytes[500]; header_bytes[499] = '\0';
   file.read(header_bytes,499);
@@ -200,11 +204,13 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
   file.read((char*)&file_num_local_dofs , sizeof(uint64_t));
   file.read((char*)&file_num_local_cells, sizeof(uint64_t));
 
+//  chi_log.Log(LOG_ALL) << "Checkpoint B"; //TODO: Remove
+
   //============================================= Check compatibility
   if (not single_file)
     if (file_num_local_nodes != num_local_nodes or
         file_num_moments     != num_moments_t   or
-        file_num_groups      != num_groups      or
+        file_num_groups      != num_groups_t    or
         file_num_local_dofs  != num_local_dofs  or
         file_num_local_cells != num_local_cells)
     {
@@ -225,6 +231,8 @@ void LinearBoltzmann::Solver::ReadFluxMoments(const std::string &file_base,
       file.close();
       return;
     }
+
+//  chi_log.Log(LOG_ALL) << "Checkpoint C"; //TODO: Remove
 
   //============================================= Read cell nodal locations
   std::map<uint64_t, std::map<uint64_t,uint64_t>> file_cell_nodal_mapping;

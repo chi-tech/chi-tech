@@ -2,7 +2,7 @@
 
 //###################################################################
 /** Computes the number of moments for the given mesher types*/
-void LinearBoltzmann::Solver::ComputeNumberOfMoments()
+void lbs::SteadySolver::ComputeNumberOfMoments()
 {
   for (size_t gs = 1; gs < groupsets.size(); ++gs)
     if (groupsets[gs].quadrature->GetMomentToHarmonicsIndexMap()

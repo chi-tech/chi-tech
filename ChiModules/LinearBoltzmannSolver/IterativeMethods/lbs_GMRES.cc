@@ -21,11 +21,11 @@ extern ChiTimer chi_program_timer;
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
-bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
-                                    MainSweepScheduler& sweep_scheduler,
-                                    SourceFlags lhs_src_scope,
-                                    SourceFlags rhs_src_scope,
-                                    bool log_info /* = true*/)
+bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
+                              MainSweepScheduler& sweep_scheduler,
+                              SourceFlags lhs_src_scope,
+                              SourceFlags rhs_src_scope,
+                              bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
   if (log_info)
@@ -52,7 +52,7 @@ bool LinearBoltzmann::Solver::GMRES(LBSGroupset& groupset,
 
   if (log_info)
     chi_log.Log(LOG_0)
-      << "Number of angular unknowns: " << num_delayed_ang_DOFs.second;
+      << "Number of lagged angular unknowns: " << num_delayed_ang_DOFs.second;
 
   //================================================== Create PETSc vectors
   phi_new = chi_math::PETScUtils::CreateVector(static_cast<int64_t>(local_size),

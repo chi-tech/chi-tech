@@ -10,7 +10,7 @@ extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
-void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
+void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
 {
   if (groupset.apply_wgdsa)
   {
@@ -96,7 +96,7 @@ void LinearBoltzmann::Solver::InitWGDSA(LBSGroupset& groupset)
 
 //###################################################################
 /**Cleans up memory consuming items. */
-void LinearBoltzmann::Solver::CleanUpWGDSA(LBSGroupset& groupset)
+void lbs::SteadySolver::CleanUpWGDSA(LBSGroupset& groupset)
 {
   if (groupset.apply_wgdsa)
     delete groupset.wgdsa_solver;
@@ -104,9 +104,9 @@ void LinearBoltzmann::Solver::CleanUpWGDSA(LBSGroupset& groupset)
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                                          double *ref_phi_old,
-                                                          double *ref_phi_new)
+void lbs::SteadySolver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                                                    double *ref_phi_old,
+                                                    double *ref_phi_new)
 {
   int gsi = groupset.groups[0].id;
   int gss = groupset.groups.size();
@@ -119,10 +119,9 @@ void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
   {
     auto& transport_view = cell_transport_views[cell.local_id];
 
-    int xs_id = matid_to_xs_map[cell.material_id];
-    std::vector<double>& sigma_s = material_xs[xs_id]->sigma_s_gtog;
+    std::vector<double>& sigma_s = matid_to_xs_map[cell.material_id]->sigma_s_gtog;
 
-    for (int i=0; i < cell.vertex_ids.size(); i++)
+    for (int i=0; i < static_cast<int>(cell.vertex_ids.size()); i++)
     {
       index++;
       int m = 0;
@@ -144,8 +143,8 @@ void LinearBoltzmann::Solver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
 
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void LinearBoltzmann::Solver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                                             double *ref_phi_new)
+void lbs::SteadySolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                                                       double *ref_phi_new)
 {
   int gsi = groupset.groups[0].id;
   int gss = groupset.groups.size();
