@@ -8,6 +8,8 @@ end
 
 --Add_Folder("../CHI_MODULES/CHI_THERMOALPHA/lua")
 
+Add_Folder("../ChiLua")
+
 Add_Folder("../ChiMath/Quadratures/lua")
 Add_Folder("../ChiMath/Quadratures/LegendrePoly/lua")
 Add_Folder("../ChiMath/Quadratures/SLDFESQ/lua")
