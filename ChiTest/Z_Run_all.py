@@ -39,6 +39,7 @@ if "tacc.utexas.edu" in hostname:
 
 # Get the correct mpiexec executable for the local machine
 mpiexec = shutil.which("mpiexec")
+print("Using mpiexec at: ", mpiexec)
 
 def format3(number):
     return "{:3d}".format(number)

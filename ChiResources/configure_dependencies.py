@@ -29,7 +29,7 @@ if not os.path.exists(install_dir):
 
 ####################################### Parsing versions
 versions = {"readline": "8.0", "ncurses": "6.1", "lua": "5.3.5",
-            "petsc": "3.12.5", "vtk": "8.2.0"}
+            "petsc": "3.17.0", "vtk": "9.1.0"}
 packages = list(versions.keys())
 
 for arg in sys.argv:
@@ -341,6 +341,7 @@ def InstallPETSc():
                    f"--download-superlu_dist=1 " \
                    f"--with-cxx-dialect=C++11 " \
                    f"--with-64-bit-indices " \
+                   f"CC=$CC CXX=$CXX FC=$FC " \
                    f"CFLAGS='-fPIC -fopenmp' " \
                    f"CXXFLAGS='-fPIC -fopenmp' " \
                    f"FFLAGS='-fPIC -fopenmp' " \
