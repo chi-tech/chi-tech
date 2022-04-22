@@ -29,7 +29,7 @@ if not os.path.exists(install_dir):
 
 ####################################### Parsing versions
 versions = {"readline": "8.0", "ncurses": "6.1", "lua": "5.3.5",
-            "petsc": "3.17.0", "vtk": "9.1.0"}
+            "petsc": "3.17.0", "VTK": "9.1.0"}
 packages = list(versions.keys())
 
 for arg in sys.argv:
