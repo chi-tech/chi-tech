@@ -29,7 +29,7 @@ if not os.path.exists(install_dir):
 
 ####################################### Parsing versions
 versions = {"readline": "8.0", "ncurses": "6.1", "lua": "5.3.5",
-            "petsc": "3.17.0", "vtk": "9.1.0"}
+            "petsc": "3.17.0", "VTK": "9.1.0"}
 packages = list(versions.keys())
 
 for arg in sys.argv:
@@ -72,7 +72,7 @@ readline_install = f"{install_dir}/READLINE/readline-{versions['ncurses']}/build
 ncurses_install = f"{install_dir}/NCURSES/ncurses-{versions['ncurses']}/build"
 lua_install = f"{install_dir}/LUA/lua-{versions['lua']}/install"
 petsc_install = f"{install_dir}/PETSC/petsc-{versions['petsc']}-install"
-vtk_install = f"{install_dir}/VTK/VTK-{versions['vtk']}-install"
+vtk_install = f"{install_dir}/VTK/VTK-{versions['VTK']}-install"
 
 log_file = open(f"{install_dir}/log.txt", "w+")
 roots_file = open(f"{install_dir}/configure_deproots.sh", "w+")
@@ -364,13 +364,13 @@ def InstallPETSc():
 
 
 ####################################### Install VTK
-# vtk_dir = ".".join(versions['vtk'].split(".")[:2])
-# vtk_url = f"https://www.vtk.org/files/release/{vtk_dir}/VTK-{versions['vtk']}.tar.gz"
-# vtk_install = f"{install_dir}/VTK/VTK-{versions['vtk']}-install"
+# vtk_dir = ".".join(versions['VTK'].split(".")[:2])
+# vtk_url = f"https://www.vtk.org/files/release/{vtk_dir}/VTK-{versions['VTK']}.tar.gz"
+# vtk_install = f"{install_dir}/VTK/VTK-{versions['VTK']}-install"
 
 
 def InstallVTK():
-    pkg, ver = 'vtk', versions['vtk']
+    pkg, ver = 'VTK', versions['VTK']
     vtk_dir = ".".join(ver.split(".")[:2])
     url = f"https://www.vtk.org/files/release/{vtk_dir}/{pkg.upper()}-{ver}.tar.gz"
     DownloadPackage(url, pkg, ver, upper=True)
