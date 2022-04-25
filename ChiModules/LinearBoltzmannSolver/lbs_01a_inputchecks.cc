@@ -6,7 +6,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Performs general input checks before initialization continues.*/
-void LinearBoltzmann::Solver::PerformInputChecks()
+void lbs::SteadySolver::PerformInputChecks()
 {
   if (groups.empty())
   {

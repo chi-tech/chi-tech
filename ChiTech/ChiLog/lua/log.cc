@@ -2,10 +2,17 @@
 
 #include <chi_log.h>
 
+#include "lua/chi_log_lua.h"
+
 extern ChiLog& chi_log;
 
 /** \defgroup LuaLogging D Output and Logging
  * \ingroup LuaUtilities*/
+
+#define LUA_FMACRO1(x) lua_register(L, #x, x)
+#define LUA_CMACRO1(x,y) \
+        lua_pushnumber(L, y); \
+        lua_setglobal(L, #x)
 
 //###################################################################
 /** Sets the verbosity level of the Logger.
@@ -79,7 +86,25 @@ int chiLog(lua_State* L)
   int         mode    = lua_tonumber(L,1);
   const char* message = lua_tostring(L,2);
 
-  chi_log.Log((LOG_LVL)mode) << message;
+  chi_log.Log((LOG_LVL)mode) << message << std::endl;
 
   return 0;
+}
+
+void chi_log_utils::lua_utils::RegisterLuaEntities(lua_State *L)
+{
+  LUA_FMACRO1(chiLogSetVerbosity);
+  LUA_FMACRO1(chiLog);
+  LUA_CMACRO1(LOG_0,          1);
+  LUA_CMACRO1(LOG_0WARNING,   2);
+  LUA_CMACRO1(LOG_0ERROR,     3);
+  LUA_CMACRO1(LOG_0VERBOSE_0, 4);
+  LUA_CMACRO1(LOG_0VERBOSE_1, 5);
+  LUA_CMACRO1(LOG_0VERBOSE_2, 6);
+  LUA_CMACRO1(LOG_ALL,          7);
+  LUA_CMACRO1(LOG_ALLWARNING,   8);
+  LUA_CMACRO1(LOG_ALLERROR,     9);
+  LUA_CMACRO1(LOG_ALLVERBOSE_0, 10);
+  LUA_CMACRO1(LOG_ALLVERBOSE_1, 11);
+  LUA_CMACRO1(LOG_ALLVERBOSE_2, 12);
 }

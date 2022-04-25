@@ -13,6 +13,8 @@
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
+#include "PointSource/lbs_point_source.h"
+
 #include <petscksp.h>
 
 namespace sweep_namespace = chi_mesh::sweep_management;
@@ -20,7 +22,7 @@ typedef sweep_namespace::SweepChunk SweepChunk;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;
 typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
-namespace LinearBoltzmann
+namespace lbs
 {
 enum class BoundaryType
 {
@@ -51,7 +53,7 @@ enum class BoundaryType
 
 //################################################################### Class def
 /**A neutral particle transport solver.*/
-class Solver : public chi_physics::Solver
+class SteadySolver : public chi_physics::Solver
 {
   typedef chi_mesh::sweep_management::CellFaceNodalMapping CellFaceNodalMapping;
 protected:
@@ -59,7 +61,7 @@ protected:
 
 public:
   double last_restart_write=0.0;
-  LinearBoltzmann::Options options;    //In chi_npt_structs.h
+  lbs::Options options;
 
   size_t num_moments;
   size_t num_groups;
@@ -68,15 +70,17 @@ public:
 
   std::vector<LBSGroup> groups;
   std::vector<LBSGroupset> groupsets;
-  std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> material_xs;
-  std::vector<std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> material_srcs;
-  std::vector<int> matid_to_xs_map;
-  std::vector<int> matid_to_src_map;
+
+  std::vector<PointSource> point_sources;
+
+
+  std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> matid_to_xs_map;
+  std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> matid_to_src_map;
 
   std::shared_ptr<SpatialDiscretization> discretization = nullptr;
   chi_mesh::MeshContinuumPtr grid;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings;
-  std::vector<LinearBoltzmann::CellLBSView> cell_transport_views;
+  std::vector<lbs::CellLBSView> cell_transport_views;
 
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeLocalAndDownstreamBuffers
   //A default 0.0 incident boundary is loaded at the back of
@@ -101,25 +105,34 @@ public:
 
  public:
   //00
-  explicit Solver(const std::string& in_text_name);
-  ~Solver() override =default;
+  explicit SteadySolver(const std::string& in_text_name);
+  ~SteadySolver() override =default;
 
   //01
   void Initialize() override;
   //01a
   virtual void PerformInputChecks();
-  void ComputeNumberOfMoments();
-  void PrintSimHeader();
   //01b
+  void PrintSimHeader();
+  //01c
   void InitMaterials(std::set<int> &material_ids);
-  //01c
-  virtual void InitializeSpatialDiscretization();
-  //01c
-  void InitializeBoundaries();
   //01d
-  virtual void InitializeParrays();
+  virtual void InitializeSpatialDiscretization();
   //01e
   void InitializeGroupsets();
+  //01f
+  void ComputeNumberOfMoments();
+  //01g
+  virtual void InitializeParrays();
+  //01h
+  void InitializeBoundaries();
+  //01i
+  void InitializePointSources();
+
+
+
+
+
 
   //02
   void Execute() override;

@@ -2,7 +2,7 @@
 
 //###################################################################
 /**Initializes common groupset items.*/
-void LinearBoltzmann::Solver::InitializeGroupsets()
+void lbs::SteadySolver::InitializeGroupsets()
 {
   for (auto& groupset : groupsets)
   {

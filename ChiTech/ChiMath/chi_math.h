@@ -81,6 +81,8 @@ namespace chi_math
   double VecInfinityNorm(const VecDbl& x);
   double VecPNorm(const VecDbl& x, const double& p);
   double Dot(const VecDbl& x, const VecDbl& y);
+  VecDbl operator+(const VecDbl& a, const VecDbl& b);
+  VecDbl operator-(const VecDbl& a, const VecDbl& b);
 
   //03 Matrix operations
   void   PrintMatrix(const MatDbl& A);
@@ -106,7 +108,7 @@ namespace chi_math
 
   //04 Unknown Managers
   class UnknownManager;
-}
+}//namespace chi_math
 
 
 #endif

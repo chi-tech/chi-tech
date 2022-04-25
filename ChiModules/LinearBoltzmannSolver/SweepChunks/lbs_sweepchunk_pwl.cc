@@ -11,10 +11,10 @@ extern ChiMath& chi_math_handler;
 
 //###################################################################
 /**Constructor.*/
-LinearBoltzmann::SweepChunkPWL::
+lbs::SweepChunkPWL::
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
                 SpatialDiscretization_PWLD& discretization,
-                std::vector<LinearBoltzmann::CellLBSView>& cell_transport_views,
+                std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
@@ -39,7 +39,7 @@ LinearBoltzmann::SweepChunkPWL::
 
 //###################################################################
 /**Actual sweep function*/
-void LinearBoltzmann::SweepChunkPWL::
+void lbs::SweepChunkPWL::
   Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
 {
   if (!a_and_b_initialized)
@@ -78,8 +78,7 @@ void LinearBoltzmann::SweepChunkPWL::
     const auto num_faces = cell.faces.size();
     const int num_nodes = static_cast<int>(fe_intgrl_values.NumNodes());
     auto& transport_view = grid_transport_view[cell.local_id];
-    const int xs_mapping = transport_view.XSMapping();
-    const auto& sigma_tg = xsections[xs_mapping]->sigma_t;
+    const auto& sigma_tg = transport_view.XS().sigma_t;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
 

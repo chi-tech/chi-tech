@@ -1,10 +1,9 @@
-#include"../../../ChiLua/chi_lua.h"
+#include"chi_lua.h"
 #include <iostream>
 
 #include "../chi_mesh_logicalvolume.h"
 
-#include "../../chi_mesh.h"
-#include "../../MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include <chi_log.h>
 
 extern ChiLog& chi_log;

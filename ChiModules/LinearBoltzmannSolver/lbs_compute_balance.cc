@@ -10,7 +10,7 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Zeroes all the outflow data-structures required to compute
  * balance.*/
-void LinearBoltzmann::Solver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
+void lbs::SteadySolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 {
   for (auto& cell_transport_view : cell_transport_views)
     for (auto& group : groupset.groups)
@@ -19,7 +19,7 @@ void LinearBoltzmann::Solver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 
 //###################################################################
 /**Compute balance.*/
-void LinearBoltzmann::Solver::ComputeBalance()
+void lbs::SteadySolver::ComputeBalance()
 {
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log() << "\n********** Computing balance\n";
@@ -47,9 +47,12 @@ void LinearBoltzmann::Solver::ComputeBalance()
   //======================================== Initialize diffusion params
   //                                         for xs
   // This populates sigma_a
-  for (auto& xs : material_xs)
+  for (const auto& mat_id_xs : matid_to_xs_map)
+  {
+    const auto& xs = mat_id_xs.second;
     if (not xs->diffusion_initialized)
       xs->ComputeDiffusionParameters();
+  }
 
   //======================================== Compute absorption, material-source
   //                                         and in-flow
@@ -113,7 +116,7 @@ void LinearBoltzmann::Solver::ComputeBalance()
 
     //====================================== Absorption and Src
     //Isotropic flux based absorption and source
-    auto& xs = *material_xs[transport_view.XSMapping()];
+    auto& xs = transport_view.XS();
     for (int i=0; i<num_nodes; ++i)
       for (int g=0; g<num_groups; ++g)
       {

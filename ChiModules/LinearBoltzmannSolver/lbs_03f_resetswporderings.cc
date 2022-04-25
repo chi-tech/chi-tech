@@ -14,7 +14,7 @@ extern ChiMPI& chi_mpi;
 //###################################################################
 /**Clears all the sweep orderings for a groupset in preperation for
  * another.*/
-void LinearBoltzmann::Solver::ResetSweepOrderings(LBSGroupset& groupset)
+void lbs::SteadySolver::ResetSweepOrderings(LBSGroupset& groupset)
 {
   chi_log.Log(LOG_0VERBOSE_1)
     << "Resetting SPDS and FLUDS";

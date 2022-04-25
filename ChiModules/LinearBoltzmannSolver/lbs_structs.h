@@ -1,12 +1,10 @@
 #ifndef LBS_STRUCTS_H
 #define LBS_STRUCTS_H
 
-#define PARTITION_METHOD_SERIAL        1
-#define PARTITION_METHOD_FROM_SURFACE  2
+#include <ChiMath/chi_math.h>
+#include <ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h>
 
-#include "ChiMath/chi_math.h"
-
-namespace LinearBoltzmann
+namespace lbs
 {
 
 enum class GeometryType
@@ -59,7 +57,7 @@ private:
   int num_nodes;
   int num_grps;
   int num_grps_moms;
-  int xs_mapping;
+  const chi_physics::TransportCrossSections& xs;
   double volume;
   std::vector<bool> face_local_flags = {};
   std::vector<double> outflow;
@@ -69,7 +67,7 @@ public:
               int in_num_nodes,
               int in_num_grps,
               int in_num_moms,
-              int in_xs_mapping,
+              const chi_physics::TransportCrossSections& in_xs_mapping,
               double in_volume,
               const std::vector<bool>& in_face_local_flags,
               bool cell_on_boundary) :
@@ -77,7 +75,7 @@ public:
     num_nodes(in_num_nodes),
     num_grps(in_num_grps),
     num_grps_moms(in_num_grps*in_num_moms),
-    xs_mapping(in_xs_mapping),
+    xs(in_xs_mapping),
     volume(in_volume),
     face_local_flags(in_face_local_flags)
   {
@@ -90,7 +88,8 @@ public:
     return phi_address + node * num_grps_moms + num_grps * moment + grp;
   }
 
-  int XSMapping() const {return xs_mapping;}
+   const chi_physics::TransportCrossSections& XS() const
+  {return xs;}
 
   bool IsFaceLocal(int f) const {return face_local_flags[f];}
 

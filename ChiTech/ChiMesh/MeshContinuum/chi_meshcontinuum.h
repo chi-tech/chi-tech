@@ -14,8 +14,8 @@
 class chi_mesh::MeshContinuum
 {
 private:
-  std::vector<chi_mesh::Cell*> native_cells;  ///< Actual native cells
-  std::vector<chi_mesh::Cell*> foreign_cells; ///< Locally stored ghosts
+  std::vector<std::unique_ptr<chi_mesh::Cell>> native_cells;  ///< Actual native cells
+  std::vector<std::unique_ptr<chi_mesh::Cell>> foreign_cells; ///< Locally stored ghosts
 
   std::map<uint64_t,uint64_t> global_cell_id_to_native_id_map;
   std::map<uint64_t,uint64_t> global_cell_id_to_foreign_id_map;
@@ -42,7 +42,7 @@ private:
 
 public:
   MeshContinuum() :
-    local_cells(native_cells, foreign_cells),
+    local_cells(native_cells),
     cells(local_cell_glob_indices,
           native_cells,
           foreign_cells,

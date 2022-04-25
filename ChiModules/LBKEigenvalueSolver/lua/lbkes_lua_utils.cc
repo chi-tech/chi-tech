@@ -3,13 +3,13 @@
 #include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
-LinearBoltzmann::KEigenvalueSolver* LinearBoltzmann::k_eigenvalue_lua_utils::
+lbs::KEigenvalueSolver* lbs::k_eigenvalue_lua_utils::
   GetSolverByHandle(int handle, const std::string& calling_function_name)
 {
-  LinearBoltzmann::KEigenvalueSolver* lbkes_solver;
+  lbs::KEigenvalueSolver* lbkes_solver;
   try{
 
-    lbkes_solver = dynamic_cast<LinearBoltzmann::KEigenvalueSolver*>(
+    lbkes_solver = dynamic_cast<lbs::KEigenvalueSolver*>(
       chi_physics_handler.solver_stack.at(handle));
 
     if (not lbkes_solver)
@@ -24,4 +24,20 @@ LinearBoltzmann::KEigenvalueSolver* LinearBoltzmann::k_eigenvalue_lua_utils::
   }
 
   return lbkes_solver;
+}
+
+#define LUA_FMACRO1(x) lua_register(L, #x, x)
+#define LUA_CMACRO1(x,y) \
+        lua_pushnumber(L, y); \
+        lua_setglobal(L, #x)
+
+void lbs::k_eigenvalue_lua_utils::RegisterLuaEntities(lua_State *L)
+{
+  LUA_FMACRO1(chiLBKESCreateSolver);
+  LUA_FMACRO1(chiLBKESInitialize);
+  LUA_FMACRO1(chiLBKESExecute);
+  LUA_FMACRO1(chiLBKESSetProperty);
+
+  LUA_CMACRO1(MAX_ITERATIONS, 1);
+  LUA_CMACRO1(TOLERANCE     , 2);
 }

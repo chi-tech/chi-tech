@@ -3,7 +3,7 @@
 
 //###################################################################
 /**Computes the point wise change between phi_new and phi_old.*/
-double LinearBoltzmann::Solver::ComputePiecewiseChange(LBSGroupset& groupset)
+double lbs::SteadySolver::ComputePiecewiseChange(LBSGroupset& groupset)
 {
   double pw_change = 0.0;
   double sum_m0 = 0.0;

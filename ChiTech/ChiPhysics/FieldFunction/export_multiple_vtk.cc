@@ -17,7 +17,6 @@ extern ChiMPI& chi_mpi;
 
 #include <vtkCellData.h>
 #include <vtkPointData.h>
-#include <vtkFieldData.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 
@@ -29,7 +28,8 @@ void chi_physics::FieldFunction::
   ExportMultipleFFToVTK(const std::string& file_base_name,
                         const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list)
 {
-  chi_log.Log(LOG_0) << "Exporting field functions to VTK.";
+  chi_log.Log(LOG_0) << "Exporting field functions to VTK with file base \""
+                     << file_base_name << "\"";
 
   //============================================= Check ff_list populated
   if (ff_list.empty())
@@ -124,8 +124,8 @@ void chi_physics::FieldFunction::
         std::vector<vtkIdType> fvertex_ids;
         fvertex_ids.reserve(num_fverts);
 
-        for (int fv=0; fv<num_fverts; fv++)
-          for (int v=0; v<cell.vertex_ids.size(); ++v)
+        for (size_t fv=0; fv<num_fverts; fv++)
+          for (size_t v=0; v<cell.vertex_ids.size(); ++v)
             if (face.vertex_ids[fv] == cell.vertex_ids[v])
               fvertex_ids.push_back(vertex_ids[v]);
 
@@ -216,7 +216,7 @@ void chi_physics::FieldFunction::
         uint64_t c=0;
         for (auto& cell : grid->local_cells)
         {
-          for (int v=0; v < cell.vertex_ids.size(); ++v)
+          for (size_t v=0; v < cell.vertex_ids.size(); ++v)
           {
             uint64_t local_mapping = c*N + component;
             ++c;
@@ -233,7 +233,7 @@ void chi_physics::FieldFunction::
           unknown.type == chi_math::UnknownType::VECTOR_3 or
           unknown.type == chi_math::UnknownType::VECTOR_N)
       {
-        for (int comp=0; comp<unknown.num_components; ++comp)
+        for (unsigned int comp=0; comp<unknown.num_components; ++comp)
         {
           unsigned int component = ff->unknown_manager.MapUnknown(ref_unknown, comp);
 

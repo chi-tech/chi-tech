@@ -10,7 +10,7 @@ extern ChiConsole&  chi_console;
 
 #include <iomanip>
 
-void LinearBoltzmann::Solver::InitializeSpatialDiscretization()
+void lbs::SteadySolver::InitializeSpatialDiscretization()
 {
   using namespace chi_math::finite_element;
   chi_log.Log(LOG_0) << "Initializing spatial discretization.\n";

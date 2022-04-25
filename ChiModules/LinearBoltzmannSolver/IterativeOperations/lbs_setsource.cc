@@ -19,7 +19,7 @@ extern ChiLog& chi_log;
  *        and across/within-groups fission.
  *
  * */
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   SetSource(LBSGroupset& groupset,
             std::vector<double>& destination_q,
             SourceFlags source_flags)
@@ -45,41 +45,32 @@ void LinearBoltzmann::Solver::
   std::vector<double> default_zero_src(groups.size(), 0.0);
 
   //================================================== Loop over local cells
+  // Apply all nodal sources
   for (const auto& cell : grid->local_cells)
   {
-    auto& full_cell_view = cell_transport_views[cell.local_id];
+    auto& transport_view = cell_transport_views[cell.local_id];
 
     //==================== Obtain xs
-    int cell_matid = cell.material_id;
-    int xs_id = matid_to_xs_map[cell_matid];
-    int src_id = matid_to_src_map[cell_matid];
+    auto xs = transport_view.XS();
+    auto P0_src = matid_to_src_map[cell.material_id];
 
-    int num_mat_xs = static_cast<int>(material_xs.size());
-
-    if ((xs_id < 0) || (xs_id >= num_mat_xs))
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << "Cross-section lookup error\n";
-      exit(EXIT_FAILURE);
-    }
-
-    auto xs = material_xs[xs_id];
+    const auto& S = xs.transfer_matrices;
 
     //==================== Obtain src
     double* src = default_zero_src.data();
-    if ((src_id >= 0) && (apply_mat_src))
-      src = material_srcs[src_id]->source_value_g.data();
+    if (P0_src and apply_mat_src)
+      src = P0_src->source_value_g.data();
 
     //=========================================== Loop over nodes
-    const int num_nodes = full_cell_view.NumNodes();
+    const int num_nodes = transport_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
       //==================================== Loop over moments
-      for (int m = 0; m < num_moments; ++m)
+      for (int m = 0; m < static_cast<int>(num_moments); ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
-        size_t uk_map = full_cell_view.MapDOF(i, m, 0); //unknown map
+        size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
         //============================= Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
@@ -93,23 +84,23 @@ void LinearBoltzmann::Solver::
             destination_q[uk_map + g] += ext_src_moments_local[uk_map + g];
 
           double inscatter_g = 0.0;
-          const bool moment_avail = (ell < xs->transfer_matrices.size());
+          const bool moment_avail = (ell < S.size());
 
           //====================== Apply across-groupset scattering
           if (moment_avail and apply_ags_scatter_src)
           {
             size_t num_transfers =
-                xs->transfer_matrices[ell].rowI_indices[g].size();
+                S[ell].rowI_indices[g].size();
 
             //=============== Loop over transfers
             for (size_t t = 0; t < num_transfers; ++t)
             {
               size_t gprime =
-                  xs->transfer_matrices[ell].rowI_indices[g][t];
+                  S[ell].rowI_indices[g][t];
 
               if ((gprime < gs_i) or (gprime > gs_f))
               {
-                double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
+                double sigma_sm = S[ell].rowI_values[g][t];
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
               }
             }
@@ -119,15 +110,15 @@ void LinearBoltzmann::Solver::
           if (moment_avail and apply_wgs_scatter_src)
           {
             size_t num_transfers =
-                xs->transfer_matrices[ell].rowI_indices[g].size();
+                S[ell].rowI_indices[g].size();
 
             //=============== Loop over transfers
             for (size_t t = 0; t < num_transfers; ++t)
             {
-              size_t gprime = xs->transfer_matrices[ell].rowI_indices[g][t];
+              size_t gprime = S[ell].rowI_indices[g][t];
               if ((gprime >= gs_i) and (gprime <= gs_f))
               {
-                double sigma_sm = xs->transfer_matrices[ell].rowI_values[g][t];
+                double sigma_sm = S[ell].rowI_values[g][t];
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
               }
             }
@@ -136,7 +127,7 @@ void LinearBoltzmann::Solver::
 
 
           double infission_g = 0.0;
-          const bool fission_avail = (xs->is_fissile and ell == 0);
+          const bool fission_avail = (xs.is_fissile and ell == 0);
 
           //====================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
@@ -148,23 +139,23 @@ void LinearBoltzmann::Solver::
               {
                 //without delayed neutron precursors
                 if (not options.use_precursors)
-                  infission_g += xs->chi[g] *
-                                 xs->nu_sigma_f[gprime] *
+                  infission_g += xs.chi[g] *
+                                 xs.nu_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
                 //with delayed neutron precursors
                 else
                 {
                   //Prompt fission
-                  infission_g += xs->chi_prompt[g] *
-                                 xs->nu_prompt_sigma_f[gprime] *
+                  infission_g += xs.chi_prompt[g] *
+                                 xs.nu_prompt_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
                   //Delayed fission
-                  for (size_t j = 0; j < xs->num_precursors; ++j)
-                    infission_g += xs->chi_delayed[g][j] *
-                                   xs->precursor_yield[j] *
-                                   xs->nu_delayed_sigma_f[gprime] *
+                  for (size_t j = 0; j < xs.num_precursors; ++j)
+                    infission_g += xs.chi_delayed[g][j] *
+                                   xs.precursor_yield[j] *
+                                   xs.nu_delayed_sigma_f[gprime] *
                                    phi_old_local[uk_map + gprime];
                 }
               }
@@ -181,23 +172,23 @@ void LinearBoltzmann::Solver::
               {
                 //without delayed neutron precursors
                 if (not options.use_precursors)
-                  infission_g += xs->chi[g] *
-                                 xs->nu_sigma_f[gprime] *
+                  infission_g += xs.chi[g] *
+                                 xs.nu_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
                 //with delayed neutron precursors
                 else
                 {
                   //Prompt fission
-                  infission_g += xs->chi_prompt[g] *
-                                 xs->nu_prompt_sigma_f[gprime] *
+                  infission_g += xs.chi_prompt[g] *
+                                 xs.nu_prompt_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
 
                   //Delayed fission
-                  for (size_t j = 0; j < xs->num_precursors; ++j)
-                    infission_g += xs->chi_delayed[g][j] *
-                                   xs->precursor_yield[j] *
-                                   xs->nu_delayed_sigma_f[gprime] *
+                  for (size_t j = 0; j < xs.num_precursors; ++j)
+                    infission_g += xs.chi_delayed[g][j] *
+                                   xs.precursor_yield[j] *
+                                   xs.nu_delayed_sigma_f[gprime] *
                                    phi_old_local[uk_map + gprime];
                 }
               }
@@ -209,6 +200,29 @@ void LinearBoltzmann::Solver::
       }//for m
     }//for dof i
   }//for cell
+
+  //================================================== Apply point sources
+  if ((not options.use_src_moments) and apply_mat_src)
+  {
+    for (const auto& point_source : point_sources)
+    {
+      if (not point_source.LocallyOwned()) continue;
+      const uint64_t cell_local_id = point_source.OwningCellLocalID();
+
+      auto& transport_view = cell_transport_views[cell_local_id];
+
+      const auto& strength = point_source.Strength();
+      const auto& node_weights = point_source.NodeWeights();
+
+      const int num_nodes = transport_view.NumNodes();
+      for (int i = 0; i < num_nodes; ++i)
+      {
+        const size_t uk_map = transport_view.MapDOF(i, /*moment=*/0, /*grp=*/0);
+        for (size_t g = gs_i; g <= gs_f; ++g)
+          destination_q[uk_map + g] += strength[g] * node_weights[i];
+      }//for node i
+    }//for point source
+  }//if apply mat src
 
   chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
 }

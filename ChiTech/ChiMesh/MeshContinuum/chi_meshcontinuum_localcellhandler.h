@@ -12,24 +12,16 @@ class LocalCellHandler
 {
   friend class MeshContinuum;
 public:
-  std::vector<chi_mesh::Cell*>& native_cells;
-  std::vector<chi_mesh::Cell*>& foreign_cells;
+  std::vector<std::unique_ptr<chi_mesh::Cell>>& native_cells;
 
 private:
   /**Constructor.*/
-  LocalCellHandler(std::vector<chi_mesh::Cell*>& in_native_cells,
-                   std::vector<chi_mesh::Cell*>& in_foreign_cells) :
-    native_cells(in_native_cells),
-    foreign_cells(in_foreign_cells)
+  explicit
+  LocalCellHandler(std::vector<std::unique_ptr<chi_mesh::Cell>>& in_native_cells) :
+    native_cells(in_native_cells)
   {}
 
 public:
-  ~LocalCellHandler()
-  {
-    for (auto& cell : native_cells) delete cell;
-    for (auto& cell : foreign_cells) delete cell;
-  }
-
   chi_mesh::Cell& operator[](uint64_t cell_local_index);
   const chi_mesh::Cell& operator[](uint64_t cell_local_index) const;
 
@@ -50,7 +42,6 @@ public:
     iterator operator++(int) { ref_element++; return *this; }
 
     chi_mesh::Cell& operator*() { return *(ref_block.native_cells[ref_element]); }
-    chi_mesh::Cell* operator->() { return ref_block.native_cells[ref_element]; }
     bool operator==(const iterator& rhs) const { return ref_element == rhs.ref_element; }
     bool operator!=(const iterator& rhs) const { return ref_element != rhs.ref_element; }
   };
@@ -70,7 +61,6 @@ public:
     const_iterator operator++(int) { ref_element++; return *this; }
 
     const chi_mesh::Cell& operator*() { return *(ref_block.native_cells[ref_element]); }
-    const chi_mesh::Cell* operator->() { return ref_block.native_cells[ref_element]; }
     bool operator==(const const_iterator& rhs) const { return ref_element == rhs.ref_element; }
     bool operator!=(const const_iterator& rhs) const { return ref_element != rhs.ref_element; }
   };

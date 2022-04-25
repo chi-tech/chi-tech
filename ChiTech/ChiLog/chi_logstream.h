@@ -11,26 +11,20 @@ class LogStream : public std::stringstream
 private:
   std::ostream* log_stream;
   std::string  log_header;
+  const bool dummy = false;
 
 public:
   /** Creates a string stream.*/
-  LogStream(std::ostream* output_stream, std::string header)
-  : log_stream(output_stream),
-    log_header(std::move(header))
+  LogStream(std::ostream* output_stream,
+            std::string header,
+            bool dummy_flag=false) :
+    log_stream(output_stream),
+    log_header(std::move(header)),
+    dummy(dummy_flag)
   { }
 
   /** Flushes the broken-up/headered stream to the output.*/
-  virtual ~LogStream()
-  {
-    std::string line, oline;
-    while (std::getline(*this, line))
-    {
-      oline += log_header + line + '\n';
-    }
-
-    if (!oline.empty())
-      *log_stream << oline << std::flush;
-  }
+  virtual ~LogStream();
 
   LogStream(const LogStream& other)
   {
@@ -47,6 +41,8 @@ struct DummyStream: public std::ostream
   } buffer;
 
   DummyStream(): std::ostream(&buffer) {}
+
+  ~DummyStream() {}
 };
 
 #endif

@@ -13,8 +13,8 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Writes phi_old to restart file.*/
-void LinearBoltzmann::Solver::WriteRestartData(std::string folder_name,
-                                               std::string file_base)
+void lbs::SteadySolver::WriteRestartData(std::string folder_name,
+                                         std::string file_base)
 {
   typedef struct stat Stat;
   Stat st;
@@ -92,8 +92,8 @@ void LinearBoltzmann::Solver::WriteRestartData(std::string folder_name,
 
 //###################################################################
 /**Read phi_old from restart file.*/
-void LinearBoltzmann::Solver::ReadRestartData(std::string folder_name,
-                                              std::string file_base)
+void lbs::SteadySolver::ReadRestartData(std::string folder_name,
+                                        std::string file_base)
 {
   MPI_Barrier(MPI_COMM_WORLD);
 

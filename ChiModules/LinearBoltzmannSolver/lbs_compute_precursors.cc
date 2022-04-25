@@ -8,7 +8,7 @@ extern ChiLog& chi_log;
 
 //###################################################################
 /**Compute the steady state delayed neutron precursor concentrations.*/
-void LinearBoltzmann::Solver::ComputePrecursors()
+void lbs::SteadySolver::ComputePrecursors()
 {
   auto fe =
       std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
@@ -24,17 +24,7 @@ void LinearBoltzmann::Solver::ComputePrecursors()
     const double volume = transport_view.Volume();
 
     //==================== Obtain xs
-    int cell_matid = cell.material_id;
-    int xs_id = matid_to_xs_map[cell_matid];
-
-    if ((xs_id < 0) || (xs_id >= material_xs.size()))
-    {
-      chi_log.Log(LOG_ALLERROR)
-          << "Cross-section lookup error\n";
-      exit(EXIT_FAILURE);
-    }
-
-    const auto& xs = *material_xs[xs_id];
+    auto xs = transport_view.XS();
 
     //======================================== Loop over precursors
     for (size_t j = 0; j < xs.num_precursors; ++j)

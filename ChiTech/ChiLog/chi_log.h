@@ -247,7 +247,7 @@ public:
   size_t GetRepeatingEventTag(std::string event_name);
   void   LogEvent(size_t ev_tag,
                   EventType ev_type,
-                  std::shared_ptr<EventInfo> ev_info);
+                  const std::shared_ptr<EventInfo>& ev_info);
   void   LogEvent(size_t ev_tag,
                   EventType ev_type);
   std::string PrintEventHistory(size_t ev_tag);

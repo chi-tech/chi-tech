@@ -1,145 +1,67 @@
-
-dofile("module_lua_inclusion.lua")
-
 --[[
-Function that reads in the file into memory and loads it into a table for parsing.
+To keep the lua code a little bit cleaner a simple function was
+written which takes a table and outputs the size of the table.
+
+** Note:
+Used for testing purposes.
 ]]--
-function readCXXFile()
-	local fTable, fName, fContent;
-	local index, value;
-
-	fTable = scanDirectory();
-
-	for index,value in pairs(fTable) do
-		fName = io.open(value, 'r+');
-		fContent = fName:read("*all");
-		print("Searching: "..value)
-		searchCXXFile(fContent);
-		fName:close();
-	end
-
-	print("=============== Finished Reading lua files ===============")
+function TableSize(tTable)
+	local counter = 0;
+	for _ in pairs(tTable) do counter = counter + 1; end
+	return counter;
 end
 
-
 --[[
-Funtion that goes link by line looking for file contents.
+Searches directories for .cc and .cpp files and adds these
+file names to a list.
+
+** Note:
+The function already contains the absolute path.
 ]]--
-function searchCXXFile(fileContent)
-	local line, wIndex, pCount, count 		= 0, 0, 0, 1;
-	local inComment, inFunction, inParam  	= false, false, false;
-	local wTable, pTable, wTable2			= {}, {}, {};
-	local fLine, fParam						= "","";
+function ScanDirectories(dirs_to_scan)
+	print("ScanDirectories: Generating list of cc and cpp files.");
 
-	for line in string.gmatch(fileContent, "[^\r\n]+") do
-		fParam = "";
+	local fIndex, fTable = 0, {};
+	local fFile;
 
+	--================================= Make a clean list
+	os.execute("mkdir LUA_DOCUMENTATION")
+	os.execute(">LUA_DOCUMENTATION/Z_GeneratedFileList.txt")
 
-		--============================ Searching for doxygen style comments
-		if (string.find(line, "/%*%*") ~= nil) then
-			wIndex 			= wIndex + 1;
-			inComment 		= true;
-			wTable[wIndex] 	= "";
-			wTable2[wIndex] = "";
-		end
+	--================================= Scan each directory
+    if (dirs_to_scan.itemCount>0) then
+        for folderDex=1,dirs_to_scan.itemCount do
+			os.execute("find \""..dirs_to_scan[folderDex].."\" -name \"*.cpp\""..
+					   " >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
+			os.execute("find \""..dirs_to_scan[folderDex].."\" -name \"*.cc\""..
+					   " >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
+        end
 
-		if (inComment == true) then
-			wTable[wIndex] 	= wTable[wIndex]..line.."\n";
-		end
+    end
 
-		if (string.find(line, "%*/") ~= nil) then
-			inComment 		= false;
-			if (wTable[wIndex] ~= nil) then
-				--print(wTable[wIndex]);
-			end
-		end
+	--================================= Convert file-list to table
+	fFile = io.open("LUA_DOCUMENTATION/Z_GeneratedFileList.txt","r");
 
-
-		--============================ Searching for doxygen param
-		if (string.find(line, "\\param") ~= nil) then
-			wIndex 			= wIndex + 1;
-			pCount 			= pCount + 1;
-			inParam 		= true;
-			wTable[wIndex] 	= "";
-			wTable2[wIndex] = "";
-            
-		end
-
-		if (inParam == true) then
-			pTable[pCount] 	= extractParameter(line);
-            inParam 		= false;
-		end
-
-		if (string.find(line, "|") ~= nil) then
-			inParam 		= false;
-			if (wTable[wIndex] ~= nil) then
-				--print(wTable[wIndex]);
-			end
-		end
-
-
-		--============================ Searching for function name
-		if ((string.find(line,"lua_State") ~= nil) and (string.find(line,"chi") ~= nil)) then
-			wIndex 			= wIndex + 1;
-			inFunction 		= true;
-			wTable[wIndex] 	= "";
-			wTable2[wIndex] = "";
-		end
-
-		if (inFunction == true) then
-
-			while (count <= pCount) do
-				local item = pTable[count];
-				if (count == pCount) then
-					fParam = fParam..item[1].." "..item[2];
-				else
-					fParam = fParam..item[1].." "..item[2]..", ";
-				end
-				count = count + 1;
-			end
-
-			count 			= 1;
-			pCount 			= 0;
-
-			local lBegin, lEnd = string.find(line,"chi");
-
-			--fLine = string.sub(line,1,lBegin-1);
-			--fLine = fLine..string.sub(line,lEnd+1);
-               --fLine = string.sub(line,lEnd+1);
-               fLine = string.sub(line,lBegin);
-            --fLine = line;
-            --print(fLine)
-
-			local cBegin, cEnd = string.find(fLine,"%(");
-			local fLine2 = string.sub(fLine,1,cBegin-1);
-
-            
-			wTable2[wIndex] 	= wTable2[wIndex].."int "..fLine2.."("..fParam..");\n";
-            
-
-
-			local cBegin, cEnd = string.find(fLine,"%(");
-			local fLine3 = string.sub(fLine,1,cBegin-1);
-
-            
-			wTable[wIndex] 	= wTable[wIndex].."int chi_lua::"..fLine3.."("..fParam..")\n".."{return;} \n";
-            
-			--print(fParam)
-			--print(wTable[wIndex])
-			inFunction 		= false;
-
-			lBegin, lEnd, cBegin = 0,0,0;
-		end
+	for filename in fFile:lines() do
+		fIndex = fIndex + 1;
+		fTable[fIndex] = filename;
 	end
-	writeDocoFile(wTable);
-	writeDocoFile2(wTable2);
+
+	fFile:close();
+
+	return fTable
 end
 
-
 --[[
-Function that fractures strings into words, and extracts the parameter followed by the value
+Function that fractures strings into words, and extracts the parameter
+followed by the value.
+
+This expects a parameter line to look like this:
+   \param ParamName ParamType Description
+
+The returned table is [ParamType, ParamName]
 ]]--
-function extractParameter(fString)
+function ExtractParameter(fString)
 	local sIndex = 0;
 	local sTable = {};
 	local sParam = {};
@@ -157,82 +79,107 @@ end
 
 
 --[[
-Function that writes the extracted strings into a seperate file.
+Function that scans through a cxx file looking for certain
+keywords/identifiers that will identify a lua wrapper function.
 ]]--
-function writeDocoFile(wordTable)
-	local index, value;
+function ProcessCXXFileLuaFunctions(fileContent)
+	local inComment, inFunction, inParam  	           = false, false, false;
+	local function_line, comment_string, param_strings = "", "", {};
 
-	for index,value in pairs(wordTable) do
-		newFile:write(value);
+	for line in string.gmatch(fileContent, "[^\r\n]+") do
+
+		--============================ Searching for doxygen style comments
+		--Looking for opening comment block /**
+		if (string.find(line, "/%*%*") ~= nil) then
+			inComment 		= true;
+			comment_string = ""
+			param_strings = {};
+		end
+
+		if (inComment == true) then
+			comment_string 	= comment_string..line.."\n";
+		end
+
+		--Looking for closing comment block */
+		if (string.find(line, "%*/") ~= nil) then
+			inComment 		= false;
+		end
+
+
+		--============================ Searching for doxygen param
+		--Looking for the \param keyword
+		if (string.find(line, "\\param") ~= nil) then
+			inParam 		= true;
+		end
+
+		if (inParam == true) then
+			params = ExtractParameter(line);
+			table.insert(param_strings, params[1].." "..params[2])
+            inParam 		= false;
+		end
+
+		if (string.find(line, "|") ~= nil) then
+			inParam 		= false;
+		end
+
+		--============================ Searching for function name
+		-- Looking for keywords chi and lua_State
+		if ((string.find(line,"lua_State") ~= nil) and
+			(string.find(line,"chi") ~= nil)) then
+			inFunction 		= true;
+		end
+
+		if (inFunction == true) then
+			local fParam = ""
+			tlen = TableSize(param_strings)
+			if (tlen > 0) then
+				for k=1,tlen-1 do
+					fParam = fParam..param_strings[k]..", "
+				end
+				fParam = fParam..param_strings[tlen]
+			end
+
+			local lBegin = string.find(line,"chi");
+
+			function_line = string.sub(line,lBegin);
+
+			local cBegin = string.find(function_line,"%(");
+			local fName = string.sub(function_line,1,cBegin-1);
+
+			inFunction 		= false;
+
+			function_definition=""
+			function_declaration=""
+			if (fName ~= "") then
+				function_definition = comment_string..
+					"int chi_lua::"..fName.."("..fParam..")\n".."{return;} \n";
+				function_declaration = "int ".. fName .."("..fParam..");\n";
+			end
+
+
+			definition_file:write(function_definition);
+			declaration_file:write(function_declaration);
+		end
 	end
 end
 
-
 --[[
-Function that writes the extracted strings into a seperate file.
+Function that reads in the file into memory and loads it into a table for parsing.
 ]]--
-function writeDocoFile2(wordTable)
-	local index, value;
+function ProcessCXXFiles(dirs_to_scan)
+	local fTable, fName, fContent;
 
-	for index,value in pairs(wordTable) do
-		newFile2:write(value);
-	end
-end
+	fTable = ScanDirectories(dirs_to_scan);
 
-
---[[
-Windows specific funtion that goes through directories
-recursively and creates a table with the various filenames.
-
-** Note:
-The function already contains the absolute path.
-]]--
-function scanDirectory()
-	local fIndex, fTable, popen = 0, {}, io.popen;
-	local fFile;
-
-	--os.execute("dir /B/S *.cpp > LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-	print("Generating filelist");
-	os.execute("mkdir LUA_DOCUMENTATION")
-	os.execute(">LUA_DOCUMENTATION/Z_GeneratedFileList.txt")
-	os.execute("find . -name \"*.cc\" >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-	os.execute("find . -name \"*.cpp\">> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-
-
-    
-    if (moduleFolders.itemCount>0) then
-        for folderDex=1,moduleFolders.itemCount do 
-            --os.execute("dir \""..moduleFolders[folderDex].."\" /B/S *.cpp >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-						os.execute("find \""..moduleFolders[folderDex].."\" -name \"*.cpp\" >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-						os.execute("find \""..moduleFolders[folderDex].."\" -name \"*.cc\" >> LUA_DOCUMENTATION/Z_GeneratedFileList.txt");
-        end
-        
-    end
-
-	fFile = io.open('LUA_DOCUMENTATION/Z_GeneratedFileList.txt',"r");
-
-	for filename in fFile:lines() do
-		fIndex = fIndex + 1;
-		fTable[fIndex] = filename;
+	for _,value in pairs(fTable) do
+		fName = io.open(value, 'r+');
+		fContent = fName:read("*all");
+		print("Processing: "..value)
+		ProcessCXXFileLuaFunctions(fContent);
+		fName:close();
 	end
 
-	fFile:close();
-
-	return fTable
-end
-
-
---[[
-To keep the lua code a little bit cleaner a simple function was
-written which takes a table and outputs the size of the table.
-
-** Note:
-Used for testing purposes.
-]]--
-function tableSize(tTable)
-	local counter = 0;
-	for _ in pairs(tTable) do counter = counter + 1; end
-	return counter;
+	print("=============== Finished Reading lua files ===============")
 end
 
 --[[
@@ -264,16 +211,16 @@ end
 This function reads the lua register and creates a formatted table
 containing all the function names.
 ]]--
-function generateFunctionList()
+function GenerateFunctionList()
 	print("Generating function list for main page")
-	newFile = io.open("../../ChiDoc/PAGES/MainPage.h","w");
+	main_page_file = io.open("../../ChiDoc/PAGES/MainPage.h","w");
 	headFile = io.open("../../ChiDoc/PAGES/mp_header.txt","r")
 	reg = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_register.txt","r");
 
 	--=============================== Write header
 	line = headFile:read("L")
 	while (line ~= nil) do
-		newFile:write(line)
+		main_page_file:write(line)
 		line = headFile:read("L")
 	end
 
@@ -303,7 +250,7 @@ function generateFunctionList()
 		modulestr = string.find(line,"module:", 0,true)
 		if (modulestr ~= nil) then
 			if (rawlen(table_vals) > 0) then
-				WriteTableHTML(newFile, table_name, table_ref, table_vals)
+				WriteTableHTML(main_page_file, table_name, table_ref, table_vals)
 			end
 			table_name = string.sub(line,modulestr+7,-1)
 			table_vals = {}
@@ -337,29 +284,25 @@ function generateFunctionList()
 			end
 		end
 
-
-
-
-
 		line = reg:read()
 		linecount = linecount + 1
 	end
 
 	--======================================== Last table in buffer
 	if (rawlen(table_vals) > 0) then
-		WriteTableHTML(newFile, table_name, table_ref, table_vals)
+		WriteTableHTML(main_page_file, table_name, table_ref, table_vals)
 	end
 	--======================================== END OF WRITES A TABLE
 
 	if (strword ~= nil) then
-		newFile:write(string.sub(strline,10).."\n")
+		main_page_file:write(string.sub(strline,10).."\n")
 	end
 
-	newFile:write("\n\n*/\n")
+	main_page_file:write("\n\n*/\n")
 
 	headFile:close()
 	reg:close();
-	newFile:close();
+	main_page_file:close();
 
 	print("Done generating function list for main page")
 end
@@ -418,14 +361,15 @@ function ConsolidateRegisters()
 	print("Done consolidating lua register")
 end
 
-newFile = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_functions.c","w");
-newFile2 = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_namespace.hpp","w");
-newFile2:write("namespace chi_lua \n {\n");
-readCXXFile()
-newFile2:write("}\n");
-newFile2:close();
-newFile:close();
+dofile("module_lua_inclusion.lua") --Defines moduleFolders
+
+definition_file = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_functions.c","w");
+declaration_file = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_namespace.hpp","w");
+declaration_file:write("namespace chi_lua \n {\n");
+ProcessCXXFiles(moduleFolders)
+declaration_file:write("}\n");
+declaration_file:close();
+definition_file:close();
 
 ConsolidateRegisters()
-generateFunctionList()
-
+GenerateFunctionList()

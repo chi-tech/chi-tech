@@ -39,10 +39,15 @@ w_vol = chiLogicalVolumeCreate(RPP,-1000,-0.99999,-1000,1000,-1000,1000)
 n_vol = chiLogicalVolumeCreate(RPP,-1000,1000,0.99999,1000,-1000,1000)
 s_vol = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,-0.99999,-1000,1000)
 
-e_bndry = chiRegionAddEmptyBoundary(region1);
-w_bndry = chiRegionAddEmptyBoundary(region1);
-n_bndry = chiRegionAddEmptyBoundary(region1);
-s_bndry = chiRegionAddEmptyBoundary(region1);
+--e_bndry = chiRegionAddEmptyBoundary(region1);
+--w_bndry = chiRegionAddEmptyBoundary(region1);
+--n_bndry = chiRegionAddEmptyBoundary(region1);
+--s_bndry = chiRegionAddEmptyBoundary(region1);
+
+e_bndry = 0
+w_bndry = 1
+n_bndry = 2
+s_bndry = 3
 
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,e_vol,e_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,w_vol,w_bndry)

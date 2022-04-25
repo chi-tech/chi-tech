@@ -21,7 +21,7 @@ chiMeshHandlerCreate()
 chiUnpartitionedMeshFromWavefrontOBJ("ChiResources/TestObjects/TriangleMesh2x2.obj")
 
 region1 = chiRegionCreate()
-chiRegionAddEmptyBoundary(region1)
+--chiRegionAddEmptyBoundary(region1)
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
 chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)

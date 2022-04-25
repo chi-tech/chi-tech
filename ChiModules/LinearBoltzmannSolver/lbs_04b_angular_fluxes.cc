@@ -12,7 +12,7 @@ extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Writes the groupset's angular fluxes to file.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
                              const std::string& file_base)
 {
@@ -112,7 +112,7 @@ void LinearBoltzmann::Solver::
 
 //###################################################################
 /**Prints the groupset's angular fluxes to file.*/
-void LinearBoltzmann::Solver::
+void lbs::SteadySolver::
   ReadGroupsetAngularFluxes(LBSGroupset& groupset,
                             const std::string& file_base)
 {

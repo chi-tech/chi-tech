@@ -226,9 +226,10 @@ void chi_mesh::mesh_cutting::
   // Now push-up new cells from the remainder
   for (auto& loop : loops_to_add_to_mesh)
   {
-    auto new_cell = new chi_mesh::Cell(CellType::POLYGON,CellType::TRIANGLE);
+    auto new_cell = std::make_unique<chi_mesh::Cell>(CellType::POLYGON,
+                                                     CellType::TRIANGLE);
     PopulatePolygonFromVertices(mesh, loop, *new_cell);
-    mesh.cells.push_back(new_cell);
+    mesh.cells.push_back(std::move(new_cell));
   }
 }
 

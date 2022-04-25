@@ -17,7 +17,13 @@ extern ChiLog& chi_log;
  * \param d_to_surface  A reference to a variable that will receive the distance to the
  *        surface.
  * \param pos_f         A reference to the vector to receive the final position.
- * \param get_segments  (Optional) A flag indicating .*/
+ * \param epsilon_nudge Scale to use for nudging.
+ * \param backward_tolerance Tolerance for assessing backward travelling
+ *                           particles.
+ * \param extension_distance Distance to extend lines when using lines-based
+ *                           algorithms.
+ * \param func_depth         Depth of function.
+ * */
 chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   const chi_mesh::MeshContinuum& grid,
   const chi_mesh::Cell &cell,
@@ -25,10 +31,10 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   const chi_mesh::Vector3 &omega_i,
   double& d_to_surface,
   chi_mesh::Vector3 &pos_f,
-  double epsilon_nudge,
-  double backward_tolerance,
-  double extension_distance,
-  int func_depth)
+  double epsilon_nudge/*=1.0e-8*/,
+  double backward_tolerance/*=1.0e-10*/,
+  double extension_distance/*=1.0e5*/,
+  int func_depth/*=0*/)
 {
   chi_mesh::RayDestinationInfo dest_info;
 

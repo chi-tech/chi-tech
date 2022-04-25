@@ -14,36 +14,36 @@ extern ChiLog&     chi_log;
 //#include <memory>
 
 /** Creates a curvilinear product quadrature suitable for cylindrical geometries.
- *
- * \param QuadratureType int Quadrature identifier.
- * \param values varying Varying options based on the quadrature type.
- *
- * ##_
- *
- * ###QuadratureType:\n
- * GAUSS_LEGENDRE_CHEBYSHEV\n
- *   Gauss-Legendre quadrature for the polar angle and Gauss-Chebyshev quadrature
- *   for the azimuthal angle.
- *   Arguments for this quadrature type, in order:
- *   - Np : (int) number of polar angles
- *   - Na : (int) number of azimuthal angles (unique number at each polar level), or
- *          (table<int>) number of azimuthal angles (diverse number at each polar level)
- *   - verbose : (bool) verbosity flag (optional).
- *
- * ###QuadratureType:\n
- * GAUSS_LEGENDRE_LEGENDRE\n
- *   Gauss-Legendre quadrature for the polar angle and Gauss-Legendre quadrature
- *   for the azimuthal angle.
- *   Arguments for this quadrature type, in order:
- *   - Np : (int) number of polar angles
- *   - Na : (int) number of azimuthal angles (unique number at each polar level), or
- *          (table<int>) number of azimuthal angles (diverse number at each polar level)
- *   - verbose : (bool) verbosity flag (optional).
- *
- *
- * \return Returns a unique handle to the created product quadrature rule
- *
- * \ingroup LuaQuadrature
+
+ \param QuadratureType int Quadrature identifier.
+ \param values varying Varying options based on the quadrature type.
+
+ ##_
+
+ ###QuadratureType:\n
+ GAUSS_LEGENDRE_CHEBYSHEV\n
+   Gauss-Legendre quadrature for the polar angle and Gauss-Chebyshev quadrature
+   for the azimuthal angle.
+   Arguments for this quadrature type, in order:
+   - Np : (int) number of polar angles
+   - Na : (int) number of azimuthal angles (unique number at each polar level), or
+          (table<int>) number of azimuthal angles (diverse number at each polar level)
+   - verbose : (bool) verbosity flag (optional).
+
+ ###QuadratureType:\n
+ GAUSS_LEGENDRE_LEGENDRE\n
+   Gauss-Legendre quadrature for the polar angle and Gauss-Legendre quadrature
+   for the azimuthal angle.
+   Arguments for this quadrature type, in order:
+   - Np : (int) number of polar angles
+   - Na : (int) number of azimuthal angles (unique number at each polar level), or
+          (table<int>) number of azimuthal angles (diverse number at each polar level)
+   - verbose : (bool) verbosity flag (optional).
+
+
+ \return Returns a unique handle to the created product quadrature rule
+
+ \ingroup LuaQuadrature
  */
 int chiCreateCylindricalProductQuadrature(lua_State *L)
 {
@@ -147,32 +147,32 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
 
 
 /** Creates a curvilinear product quadrature suitable for spherical geometries.
- *
- * \param QuadratureType int Quadrature identifier.
- * \param values varying Varying options based on the quadrature type.
- *
- * ##_
- *
- * ###QuadratureType:\n
- * GAUSS_CHEBYSHEV\n
- *   Gauss-Chebyshev quadrature for the polar angle and no quadrature
- *   for the azimuthal angle.
- *   Arguments for this quadrature type, in order:
- *   - Np : (int) number of polar angles
- *   - verbose : (bool) verbosity flag (optional).
- *
- * ###QuadratureType:\n
- * GAUSS_LEGENDRE\n
- *   Gauss-Legendre quadrature for the polar angle and no quadrature
- *   for the azimuthal angle.
- *   Arguments for this quadrature type, in order:
- *   - Np : (int) number of polar angles
- *   - verbose : (bool) verbosity flag (optional).
- *
- *
- * \return Returns a unique handle to the created product quadrature rule
- *
- * \ingroup LuaQuadrature
+
+ \param QuadratureType int Quadrature identifier.
+ \param values varying Varying options based on the quadrature type.
+
+ ##_
+
+ ###QuadratureType:\n
+ GAUSS_CHEBYSHEV\n
+   Gauss-Chebyshev quadrature for the polar angle and no quadrature
+   for the azimuthal angle.
+   Arguments for this quadrature type, in order:
+   - Np : (int) number of polar angles
+   - verbose : (bool) verbosity flag (optional).
+
+ ###QuadratureType:\n
+ GAUSS_LEGENDRE\n
+   Gauss-Legendre quadrature for the polar angle and no quadrature
+   for the azimuthal angle.
+   Arguments for this quadrature type, in order:
+   - Np : (int) number of polar angles
+   - verbose : (bool) verbosity flag (optional).
+
+
+ \return Returns a unique handle to the created product quadrature rule
+
+ \ingroup LuaQuadrature
  */
 int chiCreateSphericalProductQuadrature(lua_State *L)
 {

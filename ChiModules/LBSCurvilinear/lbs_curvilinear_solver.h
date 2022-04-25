@@ -12,7 +12,7 @@ namespace LBSCurvilinear
 
 /** A neutral particle transport solver in point-symmetric and axial-symmetric
  *  curvilinear coordinates. */
-class LBSCurvilinear::Solver : public LinearBoltzmann::Solver
+class LBSCurvilinear::Solver : public lbs::SteadySolver
 {
 //  Attributes
 private:
@@ -27,7 +27,7 @@ public:
   /** Constructor. */
   Solver(const chi_math::CoordinateSystemType& coord_system_type,
          const std::string& in_text_name)
-  : LinearBoltzmann::Solver(in_text_name)
+  : lbs::SteadySolver(in_text_name)
   , coord_system_type(coord_system_type)
   , discretization_secondary()
   {}

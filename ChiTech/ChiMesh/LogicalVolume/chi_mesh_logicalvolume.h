@@ -48,7 +48,7 @@ public:
     r  = 1.0; x0 = 0.0; y0 = 0.0; z0 = 0.0;
   }
 
-  SphereLogicalVolume(double in_radius)
+  explicit SphereLogicalVolume(double in_radius)
   {
     type_index = SPHERE_ORIGIN;
     r  = in_radius; x0 = 0.0; y0 = 0.0; z0 = 0.0;
@@ -150,53 +150,50 @@ public:
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {
-    auto& p1 = point;
+    typedef chi_mesh::Vector3 Vec3;
     auto& chi_log = ChiLog::GetInstance();
-    chi_mesh::Vector3 p0(x0, y0, z0);
-    chi_mesh::Vector3 vd(vx, vy, vz);
-    chi_mesh::Vector3 k(0.0, 0.0, 1.0);
 
-    chi_mesh::Vector3 p01 = p1 - p0;
+    const auto& pr = point;              //reference point
+    const Vec3  p0(x0, y0, z0);          //cylinder root
+    const Vec3  cyl_dir_vec(vx, vy, vz); //cylinder direction vector
+    const Vec3  k_hat(0.0, 0.0, 1.0);    //k_hat
+
+    const Vec3 p0r = pr - p0;
+    const Vec3 cyl_unit_dir = cyl_dir_vec.Normalized(); //aka cud
+    const double cyl_length = cyl_dir_vec.Norm();
+
+    //====================================== Check if point is within
+    //                                       normal extents
+    const double p0r_dot_cud = p0r.Dot(cyl_unit_dir);
+    if (p0r_dot_cud < 0.0 or p0r_dot_cud > cyl_length)
+      return false;
 
     //====================================== Building rotation matrix
-    chi_mesh::Vector3 binorm;
-    chi_mesh::Vector3 tangent;
-    if (std::abs(vd.Dot(k) / vd.Norm()) > (1.0 - 1.0e-12))
+    //This rotation matrix must be such that,
+    //when a coordinate system is rotated with it,
+    //the new normal vector points along the
+    Vec3 binorm;
+    Vec3 tangent;
+    if (std::abs(cyl_dir_vec.Dot(k_hat) / cyl_dir_vec.Norm()) > (1.0 - 1.0e-12))
     {
-      binorm = chi_mesh::Vector3(0.0, 1.0, 0.0);
-      tangent = chi_mesh::Vector3(1.0, 0.0, 0.0);
+      binorm  = Vec3(0.0, 1.0, 0.0);
+      tangent = Vec3(1.0, 0.0, 0.0);
     }
     else
     {
-      binorm = k.Cross(vd);
-      binorm = binorm/binorm.Norm();
-      tangent = binorm.Cross(vd);
+      binorm  = k_hat.Cross(cyl_dir_vec);
+      binorm  = binorm/binorm.Norm();
+      tangent = binorm.Cross(cyl_dir_vec);
       tangent = tangent/tangent.Norm();
     }
 
-    chi_mesh::Matrix3x3 R;
-
-    R.SetColJVec(0,tangent);
-    R.SetColJVec(1,binorm);
-    R.SetColJVec(2,vd);
-
-    //====================================== Rotate point to ref coords
-    chi_mesh::Matrix3x3 Rinv = R.Inverse();
-    chi_mesh::Vector3 p01T = Rinv * p01;
-
-    chi_log.Log(LOG_0) << "Inverted p: \n" << p01T.PrintS();
+    //====================================== Project p0r onto the binorm and
+    //                                       tangent
+    const Vec3 p0r_projected(p0r.Dot(tangent), p0r.Dot(binorm), 0.0);
 
     //====================================== Determine if point is within cylinder
-    double r2 = p01T.x*p01T.x + p01T.y*p01T.y;
-
-    if (r2 <= r*r)
-    {
-      double dotP = p01T.Dot(vd);
-      if ((dotP >= 0.0) && (dotP <= 1.0))
-        return true;
-      else
-        return false;
-    }
+    if (p0r_projected.NormSquare() <= r*r)
+      return true;
     else
       return false;
   }

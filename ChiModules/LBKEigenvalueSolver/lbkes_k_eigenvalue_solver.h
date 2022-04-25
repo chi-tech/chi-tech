@@ -6,11 +6,11 @@
 
 #include <string>
 
-namespace LinearBoltzmann
+namespace lbs
 {
 
 /**A k-eigenvalue linear boltzmann transport solver.*/
-class KEigenvalueSolver : public LinearBoltzmann::Solver
+class KEigenvalueSolver : public lbs::SteadySolver
 {
 public:
   /**The current k-eigenvalue estimate.*/
@@ -22,7 +22,7 @@ public:
 
 public:
   explicit KEigenvalueSolver(const std::string& in_text_name) :
-    LinearBoltzmann::Solver(in_text_name) {}
+    lbs::SteadySolver(in_text_name) {}
 
   void Execute() override;
 
