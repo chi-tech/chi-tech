@@ -188,7 +188,7 @@ def DownloadPackage(url, pkg, ver, upper=False):
 
 ####################################### Get package
 def ExtractPackage(pkg, ver):
-    success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz", log_file)
+    success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz --one-top-level={pkg}-{ver}/ --strip-components=1", log_file)
 
     os.chdir(f"{pkg}-{ver}")
 
@@ -370,7 +370,7 @@ def InstallPETSc():
 
 
 def InstallVTK():
-    pkg, ver = 'VTK', versions['VTK']
+    pkg, ver = 'vtk', versions['VTK']
     vtk_dir = ".".join(ver.split(".")[:2])
     url = f"https://www.vtk.org/files/release/{vtk_dir}/{pkg.upper()}-{ver}.tar.gz"
     DownloadPackage(url, pkg, ver, upper=True)
