@@ -41,13 +41,13 @@ int chiPhysicsTransportXSCreate(lua_State* L)
 
 //###################################################################
 /**Sets the properties of a transport cross-section.
- *
- * \param XS_handle int Handle to the cross-section to be modified.
- * \param OperationIndex int Method used for setting the xs property.
- * \param Information varying Varying information depending on the operation.
- *
- * ##_
- *
+
+ \param XS_handle int Handle to the cross-section to be modified.
+ \param OperationIndex int Method used for setting the xs property.
+ \param Information varying Varying information depending on the operation.
+
+ ##_
+
 ###OperationIndex
 SINGLE_VALUE\n
 Sets the property based on a single value. Requires a single value as additional
@@ -188,12 +188,12 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
 //###################################################################
 /**Obtains a lua table of all the cross-section values.
- *
- * \param XS_handle int Handle to the cross-section to be modified.
- *
- * ## _
- *
- * To print the contents of the table, execute the following:
+
+ \param XS_handle int Handle to the cross-section to be modified.
+
+ ## _
+
+ To print the contents of the table, execute the following:
 \code
 xs = chiPhysicsTransportXSGet(xs_handle)
 for i,v in pairs(xs) do
@@ -234,13 +234,13 @@ int chiPhysicsTransportXSGet(lua_State* L)
 
 //###################################################################
 /**Makes a combined cross-section from multiple other cross-sections.
- *
- * \param Combinations table A lua-table with each element another table
- *                           containing a handle to an existing xs and a
- *                           scalar multiplier.
- *
- * ## _
- *
+
+ \param Combinations table A lua-table with each element another table
+                           containing a handle to an existing xs and a
+                           scalar multiplier.
+
+ ## _
+
 ###Example:
 Example lua code:
 \code
@@ -262,12 +262,12 @@ chiPhysicsMaterialSetProperty(materials[1],
                               TRANSPORT_XSECTIONS,
                               EXISTING,aerated_graphite)
 \endcode
- *
- * \return Returns a handle to another cross-section object that contains the
- *         desired combination.
- *
- * \ingroup LuaPhysicsMaterials
- * */
+
+ \return Returns a handle to another cross-section object that contains the
+         desired combination.
+
+ \ingroup LuaPhysicsMaterials
+ */
 int chiPhysicsTransportXSMakeCombined(lua_State* L)
 {
   int num_args = lua_gettop(L);
@@ -338,15 +338,15 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
 //###################################################################
 /**Sets a combined cross-section from multiple other cross-sections. This
- * function can be called multiple times on the same cross-section handle.
- *
- * \param XS_handle int Handle to the cross-section to be modified.
- * \param Combinations table A lua-table with each element another table
- *                           containing a handle to an existing xs and a
- *                           scalar multiplier.
- *
- * ## _
- *
+ function can be called multiple times on the same cross-section handle.
+
+ \param XS_handle int Handle to the cross-section to be modified.
+ \param Combinations table A lua-table with each element another table
+                           containing a handle to an existing xs and a
+                           scalar multiplier.
+
+ ## _
+
 ###Example:
 Example lua code:
 \code

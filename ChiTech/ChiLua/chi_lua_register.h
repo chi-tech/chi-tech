@@ -83,19 +83,19 @@
 //    RegisterFunction(chiRegionExportMeshToObj)
 //    RegisterFunction(chiRegionExportMeshToVTK)
 //  SurfaceMesh
-//    RegisterFunction(chiSurfaceMeshCreate) //TODO: Remove
+//    RegisterFunction(chiSurfaceMeshCreate)
 //    RegisterFunction(chiSurfaceMeshCreateFromArrays) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshImportFromOBJFile) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshImportFromTriangleFiles) //TODO: Remove
+//    RegisterFunction(chiSurfaceMeshImportFromOBJFile)
+//    RegisterFunction(chiSurfaceMeshImportFromTriangleFiles)
 //    RegisterFunction(chiSurfaceMeshImportFromMshFiles) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshExportToObj) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshExportPolyFile) //TODO: Remove
+//    RegisterFunction(chiSurfaceMeshExportToObj)
+//    RegisterFunction(chiSurfaceMeshExportPolyFile)
 //    RegisterFunction(chiSurfaceMeshGetEdgeLoops) //TODO: Remove
 //    RegisterFunction(chiSurfaceMeshGetEdgeLoopsPoly) //TODO: Remove
 //    RegisterFunction(chiSurfaceMeshSplitByPatch) //TODO: Remove
 //    RegisterFunction(chiSurfaceMeshExtractOpenEdgesToObj) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshCheckCycles) //TODO: Remove
-//    RegisterFunction(chiComputeLoadBalancing) //TODO: Remove
+//    RegisterFunction(chiSurfaceMeshCheckCycles)
+//    RegisterFunction(chiComputeLoadBalancing)
 //  SurfaceMesher
 //    RegisterFunction(chiSurfaceMesherCreate)
 //      RegisterConstant(SURFACEMESHER_PREDEFINED,   1);
@@ -157,7 +157,7 @@
 
 
 //  Domain Decomposition
-//    RegisterFunction(chiDomDecompose2D) //TODO: Remove
+//    Register--Function(chiDomDecompose2D) //TODO: Remove
 //    RegisterFunction(chiDecomposeSurfaceMeshPxPy)
 //    RegisterFunction(chiCutMesh)
 //    RegisterFunction(chiCountMeshInLogicalVolume)

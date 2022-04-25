@@ -68,8 +68,7 @@ void chi_physics::FieldFunction::ExportToVTK(const std::string& base_name,
 
 \param base_filename Base name for all vtu file. .pvtu will get appended to it.
 \param field_name Name of the field to be exported
-\param num_components Optional. Defaults to 0. If greater than zero then
-                        exports components.
+\param component_names Names to use for individual components.
 \author Jason*/
 void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
                                            const std::string& field_name,
