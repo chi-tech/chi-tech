@@ -1,5 +1,6 @@
 /**\page DevManUsingLib Using Chi-Tech as a library
  *
+ *
  * \section devman01_02 So you want to use Chi-Tech as a library
  *
  * \subsection devman01_02_01 Step 1 - Make a application directory and empty source file
@@ -67,6 +68,7 @@ include-files will be usable.
 ## _
 
 \subsection devman01_02_04 Step 4 - Add the basic code to test.cc
+
 
 \code
 #include "chi_runtime.h"
@@ -163,7 +165,9 @@ make -j4
  * In preparation for adding many more sources to the ```lua``` folder, edit the
  * CMakeLists.txt file as follows:
  *
-\code
+ *
+ *
+\code{cmake}
 cmake_minimum_required(VERSION 3.2)
 
 SET(TARGET test)
@@ -180,13 +184,15 @@ set(SOURCES ${SOURCES} ${MORE_SOURCES})
 add_executable(${TARGET} "${SOURCES}")
 target_link_libraries(${TARGET} ${CHI_LIBS})
 \endcode
-
 This will allow any ```.cc``` file in the ```lua``` folder to be compiled with
 the project. The line
 
- \code
+
+ \code{cmake}
  file (GLOB_RECURSE MORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lua/*.cc")
  \endcode
+
+
 
  recursively searches through the specified folder and pumps any filenames
  ending with .cc into the variable ```MORE_SOURCES```. This variable gets added
@@ -195,6 +201,7 @@ the project. The line
  \code
  set(SOURCES ${SOURCES} ${MORE_SOURCES})
  \endcode
+
 
  ## _
  * \subsection devman01_03_04a Step 4 - Modify test.cc to register the lua function
@@ -221,23 +228,30 @@ int main(int argc, char* argv[])
 
 Notice here that we firstly included the header file for the ```ChiConsole```
 object. This is the object that allows us to connect to the lua state.
- \code
- #include "ChiConsole/chi_console.h"
- \endcode
 
- Next we obtained a reference to the console through
+\code
+#include "ChiConsole/chi_console.h"
+\endcode
 
- \code
- ChiConsole& console = ChiConsole::GetInstance();
- \endcode
+
+
+Next we obtained a reference to the console through
+
+\code
+ChiConsole& console = ChiConsole::GetInstance();
+\endcode
+
 
  We then setup the variable ```L```, which is needed by the macro file
- ```ChiMacros/lua_register_macro.h```.
+ ``` ChiMacros/lua_register_macro.h ```.
 
- \code
- auto L = console.consoleState;
- #include "ChiMacros/lua_register_macro.h"
- \endcode
+
+\code
+auto L = console.consoleState;
+#include "ChiMacros/lua_register_macro.h"
+\endcode
+
+
 
  This macro file exposes numerous lua macros, one of which is the
  ```RegisterFunction(x)``` macro where we will supply the ```x``` as the

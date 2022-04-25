@@ -154,7 +154,7 @@ bool chi_mesh::VolumeMesherExtruder::
 
 //###################################################################
 /**Makes an extruded cell from a template cell.*/
-chi_mesh::Cell* chi_mesh::VolumeMesherExtruder::
+std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherExtruder::
   MakeExtrudedCell(const chi_mesh::Cell &template_cell,
                    const chi_mesh::MeshContinuum &grid,
                    size_t z_level,
@@ -165,7 +165,8 @@ chi_mesh::Cell* chi_mesh::VolumeMesherExtruder::
   const size_t tc_num_verts = template_cell.vertex_ids.size();
 
   //========================================= Create polyhedron
-  auto cell = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
+  auto cell = std::make_unique<chi_mesh::Cell>(CellType::POLYHEDRON,
+                                               CellType::POLYHEDRON);
   cell->global_id    = cell_global_id;
   //cell->local_id set when added to mesh
   cell->partition_id = partition_id;

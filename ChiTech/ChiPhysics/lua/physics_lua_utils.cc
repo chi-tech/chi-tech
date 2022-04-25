@@ -60,6 +60,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiPhysicsTransportXSCreate);
   LUA_FMACRO1(chiPhysicsTransportXSSet);
   LUA_FMACRO1(chiPhysicsTransportXSMakeCombined);
+  LUA_FMACRO1(chiPhysicsTransportXSSetCombined);
   LUA_FMACRO1(chiPhysicsTransportXSGet);
   LUA_FMACRO1(chiPhysicsTransportXSExportToChiTechFormat);
 

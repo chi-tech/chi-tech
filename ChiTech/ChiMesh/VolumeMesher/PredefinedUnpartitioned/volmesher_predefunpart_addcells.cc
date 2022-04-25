@@ -4,14 +4,14 @@
 
 //###################################################################
 /**Adds a cell to the grid from a light-weight cell.*/
-chi_mesh::Cell* chi_mesh::VolumeMesherPredefinedUnpartitioned::
+std::unique_ptr<chi_mesh::Cell> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   MakeCell(
     const chi_mesh::UnpartitionedMesh::LightWeightCell &raw_cell,
     uint64_t global_id,
     uint64_t partition_id,
     const std::vector<chi_mesh::Vector3>& vertices)
 {
-  auto cell = new chi_mesh::Cell(raw_cell.type, raw_cell.sub_type);
+  auto cell = std::make_unique<chi_mesh::Cell>(raw_cell.type, raw_cell.sub_type);
   cell->centroid     = raw_cell.centroid;
   cell->global_id    = global_id;
   cell->partition_id = partition_id;

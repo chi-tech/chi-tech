@@ -1,5 +1,5 @@
 ./configure  \
---prefix=$PWD/../petsc-3.12.5-install  \
+--prefix=$PWD/../petsc-3.17.0-install  \
 --download-hypre=1  \
 --with-ssl=0  \
 --with-debugging=0  \
@@ -11,6 +11,7 @@
 --download-superlu_dist=1  \
 --with-cxx-dialect=C++11  \
 --with-64-bit-indices \
+CC=$CC CXX=$CXX FC=$FC \
 CFLAGS='-fPIC -fopenmp'  \
 CXXFLAGS='-fPIC -fopenmp'  \
 FFLAGS='-fPIC -fopenmp'  \

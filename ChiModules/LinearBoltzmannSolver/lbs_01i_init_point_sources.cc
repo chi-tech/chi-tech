@@ -20,7 +20,7 @@ void lbs::SteadySolver::InitializePointSources()
 
     const auto pc = point - c;
 
-    if (pc.Dot(n) < 0.0)
+    if (pc.Dot(n) > 0.0)
       return true;
     else
       return false;
@@ -72,6 +72,7 @@ void lbs::SteadySolver::InitializePointSources()
 
       if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
+        inside = false;
         //form tetra hedrons
         const auto& vcc = cell.centroid;
         for (const auto& face : cell.faces)
@@ -95,19 +96,24 @@ void lbs::SteadySolver::InitializePointSources()
             tet_faces.emplace_back(v1, v3, v2);
             tet_faces.emplace_back(v0, v3, v1);
 
+            bool inside_tet = true;
             for (const auto& tet_face : tet_faces)
             {
               if (not InsideTet(p, std::get<0>(tet_face),
                                    std::get<1>(tet_face),
                                    std::get<2>(tet_face)))
               {
-                inside = false;
+                inside_tet = false;
                 break;
               }
-            }//for tri_face
-            if (not inside) break;
+            }//for triangular tet_face
+            if (inside_tet)
+            {
+              inside = true;
+              break;
+            }
           }//for side
-          if (not inside) break;
+          if (inside) break;
         }//for face
       }//polyhedron
 

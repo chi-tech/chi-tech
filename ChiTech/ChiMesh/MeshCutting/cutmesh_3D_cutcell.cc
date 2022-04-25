@@ -315,7 +315,8 @@ void chi_mesh::mesh_cutting::
 
   chi_mesh::Cell cell_A(CellType::POLYHEDRON, CellType::POLYHEDRON);
   auto cell_A_ptr = &cell_A;
-  auto cell_B_ptr = new chi_mesh::Cell(CellType::POLYHEDRON, CellType::POLYHEDRON);
+  auto cell_B_ptr = std::make_unique<chi_mesh::Cell>(CellType::POLYHEDRON,
+                                                     CellType::POLYHEDRON);
 
   PopulatePolyhedronFromFaces(mesh, proxies_A, *cell_A_ptr);
   PopulatePolyhedronFromFaces(mesh, proxies_B, *cell_B_ptr);
@@ -346,7 +347,7 @@ void chi_mesh::mesh_cutting::
   }
 
   cell = cell_A;
-  mesh.cells.push_back(cell_B_ptr);
+  mesh.cells.push_back(std::move(cell_B_ptr));
 
 
 }

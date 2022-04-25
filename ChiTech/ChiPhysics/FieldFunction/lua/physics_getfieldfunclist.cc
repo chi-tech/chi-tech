@@ -9,8 +9,8 @@ extern ChiLog     chi_log;
 
 //###################################################################
 /**Obtains a named list of the field functions associated with a solver.
- *
- * \param SolverHandle int A handle to the reference solver.
+
+\param SolverHandle int A handle to the reference solver.
 
  \ingroup LuaSolver */
 int chiGetFieldFunctionList(lua_State* L)

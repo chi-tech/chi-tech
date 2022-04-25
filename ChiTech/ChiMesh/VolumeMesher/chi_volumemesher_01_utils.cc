@@ -29,168 +29,168 @@ void chi_mesh::VolumeMesher::
   region.volume_mesh_continua.push_back(grid);
 }
 
+////###################################################################
+///**Creates 2D polygon cells for each face of a surface mesh.*/
+//void chi_mesh::VolumeMesher::
+//  CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
+//                     chi_mesh::MeshContinuumPtr& vol_continuum,
+//                     bool delete_surface_mesh_elements,
+//                     bool force_local)
+//{
+//  //============================================= Get current mesh handler
+//  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+//
+//  //============================================= Copy nodes
+//  {
+//    uint64_t id = 0;
+//    for (auto& vertex : surface_mesh->vertices)
+//      vol_continuum->vertices.Insert(id++, vertex);
+//  }
+//
+//  //============================================= Delete nodes
+//  if (delete_surface_mesh_elements)
+//    surface_mesh->vertices = std::vector<chi_mesh::Vertex>(0);
+//
+//  //================================== Check if already have material ids
+//  bool have_mat_ids = false;
+//  if (surface_mesh->physical_region_map.size() == surface_mesh->poly_faces.size())
+//    have_mat_ids = true;
+//  else if (surface_mesh->physical_region_map.size())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "Material id's specified, but are inconsistent with mesh.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//
+//  //============================================= Process faces
+//  unsigned int num_cells = 0;
+//  for (auto& face : surface_mesh->faces)
+//  {
+//    auto cell = new chi_mesh::Cell(CellType::POLYGON,CellType::TRIANGLE);
+//
+//    for (int k=0;k<3;k++)
+//    {
+//      cell->vertex_ids.push_back(face.v_index[k]);
+//
+//      chi_mesh::CellFace new_face;
+//
+//      new_face.vertex_ids.push_back(face.e_index[k][0]);
+//      new_face.vertex_ids.push_back(face.e_index[k][1]);
+//
+//
+//      const auto& v0 = vol_continuum->vertices[face.e_index[k][0]];
+//      const auto& v1 = vol_continuum->vertices[face.e_index[k][1]];
+//      new_face.centroid = v0*0.5 + v1*0.5;
+//
+//      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
+//
+//      chi_mesh::Vector3 va = v1 - v0;
+//      chi_mesh::Vector3 vn = va.Cross(vk);
+//      vn = vn/vn.Norm();
+//      new_face.normal = vn;
+//
+//      if (face.e_index[k][2]>=0)
+//      {
+//        new_face.neighbor_id = face.e_index[k][2];
+//        new_face.has_neighbor = true;
+//      }
+//
+//      cell->faces.push_back(new_face);
+//
+//      cell->centroid = cell->centroid + surface_mesh->vertices[face.v_index[k]];
+//    }
+//    cell->centroid = cell->centroid/3;
+//
+//    //====================================== Compute xy partition id
+//    auto xy_partition_indices = GetCellXYPartitionID(cell);
+//    cell->partition_id = xy_partition_indices.second*
+//                         handler->volume_mesher->options.partition_x +
+//                         xy_partition_indices.first;
+//
+//    if (force_local)
+//      cell->partition_id = chi_mpi.location_id;
+//
+//    cell->global_id = num_cells;
+//
+//    vol_continuum->cells.push_back(cell); ++num_cells;
+//  }
+//
+//  for (auto face : surface_mesh->poly_faces)
+//  {
+//    CellType sub_type = CellType::POLYGON;
+//
+//    const size_t num_verts = face->v_indices.size();
+//    if      (num_verts == 3) sub_type = CellType::TRIANGLE;
+//    else if (num_verts == 4) sub_type = CellType::QUADRILATERAL;
+//
+//    auto cell = new chi_mesh::Cell(CellType::POLYGON, sub_type);
+//
+//    //====================================== Copy vertices
+//    for (auto vid : face->v_indices)
+//    {
+//      cell->vertex_ids.push_back(vid);
+//      cell->centroid = cell->centroid + vol_continuum->vertices[vid];
+//    }
+//    cell->centroid = cell->centroid/cell->vertex_ids.size();
+//
+//    //====================================== Copy edges
+//    for (auto src_side : face->edges)
+//    {
+//      chi_mesh::CellFace new_face;
+//
+//      new_face.vertex_ids.push_back(src_side[0]);
+//      new_face.vertex_ids.push_back(src_side[1]);
+//
+//      const auto& v0 = vol_continuum->vertices[src_side[0]];
+//      const auto& v1 = vol_continuum->vertices[src_side[1]];
+//      new_face.centroid = v0*0.5 + v1*0.5;
+//      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
+//
+//      chi_mesh::Vector3 va = v1 - v0;
+//      chi_mesh::Vector3 vn = va.Cross(vk);
+//      vn = vn/vn.Norm();
+//      new_face.normal = vn;
+//
+//      if (src_side[2] >= 0)
+//      {
+//        new_face.neighbor_id = src_side[2];
+//        new_face.has_neighbor = true;
+//      }
+//      else
+//        new_face.neighbor_id = 0;
+//
+//      cell->faces.push_back(new_face);
+//    }
+//
+//    //====================================== Compute partition id
+//    auto xy_partition_indices = GetCellXYPartitionID(cell);
+//    cell->partition_id = xy_partition_indices.second*
+//                         handler->volume_mesher->options.partition_x +
+//                         xy_partition_indices.first;
+//
+//    if (force_local)
+//      cell->partition_id = chi_mpi.location_id;
+//
+//    cell->global_id = num_cells;
+//
+//    if (have_mat_ids)
+//      cell->material_id = surface_mesh->physical_region_map[num_cells];
+//
+//    vol_continuum->cells.push_back(cell);
+//    ++num_cells;
+//
+//    if (delete_surface_mesh_elements)
+//      delete face;
+//  }
+//
+//  if (delete_surface_mesh_elements)
+//    surface_mesh->poly_faces.clear();
+//
+//}
+
 //###################################################################
-/**Creates 2D polygon cells for each face of a surface mesh.*/
-void chi_mesh::VolumeMesher::
-  CreatePolygonCells(chi_mesh::SurfaceMesh *surface_mesh,
-                     chi_mesh::MeshContinuumPtr& vol_continuum,
-                     bool delete_surface_mesh_elements,
-                     bool force_local)
-{
-  //============================================= Get current mesh handler
-  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
-
-  //============================================= Copy nodes
-  {
-    uint64_t id = 0;
-    for (auto& vertex : surface_mesh->vertices)
-      vol_continuum->vertices.Insert(id++, vertex);
-  }
-
-  //============================================= Delete nodes
-  if (delete_surface_mesh_elements)
-    surface_mesh->vertices = std::vector<chi_mesh::Vertex>(0);
-
-  //================================== Check if already have material ids
-  bool have_mat_ids = false;
-  if (surface_mesh->physical_region_map.size() == surface_mesh->poly_faces.size())
-    have_mat_ids = true;
-  else if (surface_mesh->physical_region_map.size())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Material id's specified, but are inconsistent with mesh.";
-    exit(EXIT_FAILURE);
-  }
-
-
-  //============================================= Process faces
-  unsigned int num_cells = 0;
-  for (auto& face : surface_mesh->faces)
-  {
-    auto cell = new chi_mesh::Cell(CellType::POLYGON,CellType::TRIANGLE);
-
-    for (int k=0;k<3;k++)
-    {
-      cell->vertex_ids.push_back(face.v_index[k]);
-
-      chi_mesh::CellFace new_face;
-
-      new_face.vertex_ids.push_back(face.e_index[k][0]);
-      new_face.vertex_ids.push_back(face.e_index[k][1]);
-
-
-      const auto& v0 = vol_continuum->vertices[face.e_index[k][0]];
-      const auto& v1 = vol_continuum->vertices[face.e_index[k][1]];
-      new_face.centroid = v0*0.5 + v1*0.5;
-
-      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
-
-      chi_mesh::Vector3 va = v1 - v0;
-      chi_mesh::Vector3 vn = va.Cross(vk);
-      vn = vn/vn.Norm();
-      new_face.normal = vn;
-
-      if (face.e_index[k][2]>=0)
-      {
-        new_face.neighbor_id = face.e_index[k][2];
-        new_face.has_neighbor = true;
-      }
-
-      cell->faces.push_back(new_face);
-
-      cell->centroid = cell->centroid + surface_mesh->vertices[face.v_index[k]];
-    }
-    cell->centroid = cell->centroid/3;
-
-    //====================================== Compute xy partition id
-    auto xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = xy_partition_indices.second*
-                         handler->volume_mesher->options.partition_x +
-                         xy_partition_indices.first;
-
-    if (force_local)
-      cell->partition_id = chi_mpi.location_id;
-
-    cell->global_id = num_cells;
-
-    vol_continuum->cells.push_back(cell); ++num_cells;
-  }
-
-  for (auto face : surface_mesh->poly_faces)
-  {
-    CellType sub_type = CellType::POLYGON;
-
-    const size_t num_verts = face->v_indices.size();
-    if      (num_verts == 3) sub_type = CellType::TRIANGLE;
-    else if (num_verts == 4) sub_type = CellType::QUADRILATERAL;
-
-    auto cell = new chi_mesh::Cell(CellType::POLYGON, sub_type);
-
-    //====================================== Copy vertices
-    for (auto vid : face->v_indices)
-    {
-      cell->vertex_ids.push_back(vid);
-      cell->centroid = cell->centroid + vol_continuum->vertices[vid];
-    }
-    cell->centroid = cell->centroid/cell->vertex_ids.size();
-
-    //====================================== Copy edges
-    for (auto src_side : face->edges)
-    {
-      chi_mesh::CellFace new_face;
-
-      new_face.vertex_ids.push_back(src_side[0]);
-      new_face.vertex_ids.push_back(src_side[1]);
-
-      const auto& v0 = vol_continuum->vertices[src_side[0]];
-      const auto& v1 = vol_continuum->vertices[src_side[1]];
-      new_face.centroid = v0*0.5 + v1*0.5;
-      chi_mesh::Vector3 vk = chi_mesh::Vector3(0.0, 0.0, 1.0);
-
-      chi_mesh::Vector3 va = v1 - v0;
-      chi_mesh::Vector3 vn = va.Cross(vk);
-      vn = vn/vn.Norm();
-      new_face.normal = vn;
-
-      if (src_side[2] >= 0)
-      {
-        new_face.neighbor_id = src_side[2];
-        new_face.has_neighbor = true;
-      }
-      else
-        new_face.neighbor_id = 0;
-
-      cell->faces.push_back(new_face);
-    }
-
-    //====================================== Compute partition id
-    auto xy_partition_indices = GetCellXYPartitionID(cell);
-    cell->partition_id = xy_partition_indices.second*
-                         handler->volume_mesher->options.partition_x +
-                         xy_partition_indices.first;
-
-    if (force_local)
-      cell->partition_id = chi_mpi.location_id;
-
-    cell->global_id = num_cells;
-
-    if (have_mat_ids)
-      cell->material_id = surface_mesh->physical_region_map[num_cells];
-
-    vol_continuum->cells.push_back(cell);
-    ++num_cells;
-
-    if (delete_surface_mesh_elements)
-      delete face;
-  }
-
-  if (delete_surface_mesh_elements)
-    surface_mesh->poly_faces.clear();
-
-}
-
-//###################################################################
-/**Creates 2D polygon cells for each face of a surface mesh.*/
+/**Creates 2D polygon cells for each face of an unpartitioned mesh.*/
 void chi_mesh::VolumeMesher::
   CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
                      chi_mesh::MeshContinuumPtr& grid)
@@ -216,7 +216,8 @@ void chi_mesh::VolumeMesher::
     }
 
     //====================================== Make cell
-    auto cell = new chi_mesh::Cell(CellType::POLYGON, raw_cell->sub_type);
+    auto cell = std::make_unique<chi_mesh::Cell>(CellType::POLYGON,
+                                                 raw_cell->sub_type);
 
     cell->global_id = num_cells;
     cell->local_id  = num_cells;
@@ -250,7 +251,7 @@ void chi_mesh::VolumeMesher::
     }
 
     //====================================== Push to grid
-    grid->cells.push_back(cell);
+    grid->cells.push_back(std::move(cell));
     ++num_cells;
   }//for raw_cell
 }

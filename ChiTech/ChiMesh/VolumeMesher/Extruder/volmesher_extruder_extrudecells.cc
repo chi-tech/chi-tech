@@ -57,7 +57,7 @@ void chi_mesh::VolumeMesherExtruder::
                                      pid,
                                      template_grid.local_cells.size());
 
-        grid.cells.push_back(cell);
+        grid.cells.push_back(std::move(cell));
       }
       ++num_global_cells;
 

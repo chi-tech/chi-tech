@@ -59,12 +59,13 @@ private:
     const chi_mesh::MeshContinuum& template_continuum,
     size_t z_level);
 
-  chi_mesh::Cell* MakeExtrudedCell(const chi_mesh::Cell& template_cell,
-                                   const chi_mesh::MeshContinuum& grid,
-                                   size_t z_level,
-                                   uint64_t cell_global_id,
-                                   int partition_id,
-                                   size_t num_template_cells);
+  std::unique_ptr<chi_mesh::Cell>
+  MakeExtrudedCell(const chi_mesh::Cell& template_cell,
+                   const chi_mesh::MeshContinuum& grid,
+                   size_t z_level,
+                   uint64_t cell_global_id,
+                   int partition_id,
+                   size_t num_template_cells);
 
   void CreateLocalNodes(chi_mesh::MeshContinuum& template_grid,
                         chi_mesh::MeshContinuum& grid);

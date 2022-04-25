@@ -9,7 +9,7 @@ extern ChiLog& chi_log;
 //###################################################################
 /**Adds a new cell to grid registry.*/
 void chi_mesh::GlobalCellHandler::
-  push_back(chi_mesh::Cell *new_cell)
+  push_back(std::unique_ptr<chi_mesh::Cell> new_cell)
 {
   if (new_cell->partition_id == static_cast<uint64_t>(chi_mpi.location_id))
   {
@@ -17,17 +17,21 @@ void chi_mesh::GlobalCellHandler::
     size_t local_cell_index = local_cell_glob_indices.size() - 1;
     new_cell->local_id = local_cell_index;
 
-    native_cells.push_back(new_cell);
+    native_cells.push_back(std::move(new_cell));
+
+    const auto& cell = native_cells.back();
 
     global_cell_id_to_native_id_map.insert(std::make_pair(
-      new_cell->global_id, native_cells.size()-1));
+      cell->global_id, native_cells.size()-1));
   }
   else
   {
-    foreign_cells.push_back(new_cell);
+    foreign_cells.push_back(std::move(new_cell));
+
+    const auto& cell = foreign_cells.back();
 
     global_cell_id_to_foreign_id_map.insert(std::make_pair(
-      new_cell->global_id, foreign_cells.size() - 1));
+      cell->global_id, foreign_cells.size() - 1));
   }
 
 }

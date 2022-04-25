@@ -99,7 +99,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
       for (uint64_t vid : cell->vertex_ids)
         grid->vertices.Insert(vid, umesh->vertices[vid]);
 
-      grid->cells.push_back(cell);
+      grid->cells.push_back(std::move(cell));
     }
 
     ++cell_globl_id;

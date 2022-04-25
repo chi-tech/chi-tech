@@ -10,6 +10,7 @@
 #include "ChiMesh/DomainDecomposition/lua/domaindecomp_lua.h"
 #include "ChiMesh/MeshCutting/lua/meshcutting_lua.h"
 #include "ChiMesh/FieldFunctionInterpolation/lua/ffinterpol_lua.h"
+#include "ChiMesh/SurfaceMesh/lua/lua_surface_mesh.h"
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 #define LUA_CMACRO1(x,y) \
@@ -153,6 +154,17 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiFFInterpolationExecute);
   LUA_FMACRO1(chiFFInterpolationExportPython);
   LUA_FMACRO1(chiFFInterpolationGetValue);
+
+  //=================================== Surface Mesh
+  LUA_FMACRO1(chiSurfaceMeshCreate);
+  LUA_FMACRO1(chiSurfaceMeshImportFromOBJFile);
+  LUA_FMACRO1(chiSurfaceMeshImportFromTriangleFiles);
+
+  LUA_FMACRO1(chiSurfaceMeshExportToObj);
+  LUA_FMACRO1(chiSurfaceMeshExportPolyFile);
+
+  LUA_FMACRO1(chiSurfaceMeshCheckCycles);
+  LUA_FMACRO1(chiComputeLoadBalancing);
 
 
 }
