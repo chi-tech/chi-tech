@@ -20,18 +20,18 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiSurfaceMeshGetEdgeLoops(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int surf_handle = lua_tonumber(L,1);
 
   try{
     chi_mesh::SurfaceMesh* curItem =
-            cur_hndlr->surface_mesh_stack.at(surf_handle);
+            cur_hndlr.surface_mesh_stack.at(surf_handle);
     chi_mesh::EdgeLoopCollection* loops;
     loops = curItem->GetEdgeLoops();
 
-    cur_hndlr->edge_loop_collections.push_back(loops);
-    int index = cur_hndlr->edge_loop_collections.size()-1;
+    cur_hndlr.edge_loop_collections.push_back(loops);
+    int index = cur_hndlr.edge_loop_collections.size()-1;
     lua_pushnumber(L,index);
     lua_pushnumber(L,loops->size());
 
@@ -65,18 +65,18 @@ int chiSurfaceMeshGetEdgeLoops(lua_State *L)
 \author Jan*/
 int chiSurfaceMeshGetEdgeLoopsPoly(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int surf_handle = lua_tonumber(L,1);
 
   try{
     chi_mesh::SurfaceMesh* curItem =
-      cur_hndlr->surface_mesh_stack.at(surf_handle);
+      cur_hndlr.surface_mesh_stack.at(surf_handle);
     chi_mesh::EdgeLoopCollection* loops;
     loops = curItem->GetEdgeLoopsPoly();
 
-    cur_hndlr->edge_loop_collections.push_back(loops);
-    int index = cur_hndlr->edge_loop_collections.size()-1;
+    cur_hndlr.edge_loop_collections.push_back(loops);
+    int index = cur_hndlr.edge_loop_collections.size()-1;
     lua_pushnumber(L,index);
     lua_pushnumber(L,loops->size());
 

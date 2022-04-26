@@ -39,7 +39,7 @@ int chiSolverAddRegion(lua_State *L)
   int solver_handle = lua_tointeger(L, 1);
   int region_handle = lua_tointeger(L, 2);
 
-  auto cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //======================================================= Getting solver
   auto solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle, fname);
@@ -47,7 +47,7 @@ int chiSolverAddRegion(lua_State *L)
   //======================================================= Getting region
   chi_mesh::Region* region;
 
-  try{ region = cur_hndlr->region_stack.at(region_handle); }
+  try{ region = cur_hndlr.region_stack.at(region_handle); }
 
   catch(const std::out_of_range& o)
   { std::cout << "Invalid region handle" << std::endl; return 0; }

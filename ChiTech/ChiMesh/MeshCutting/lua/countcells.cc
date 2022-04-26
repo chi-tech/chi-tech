@@ -22,14 +22,14 @@ int chiCountMeshInLogicalVolume(lua_State* L)
 
   int log_vol_handle = lua_tonumber(L,1);
 
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   chi_mesh::LogicalVolume* log_vol;
-  try {log_vol = handler->logicvolume_stack.at(log_vol_handle);}
+  try {log_vol = handler.logicvolume_stack.at(log_vol_handle);}
   catch (const std::out_of_range& oor)
   {throw std::invalid_argument(fname + ": Invalid handle to logical volume.");}
 
-  auto grid = handler->GetGrid();
+  auto grid = handler.GetGrid();
 
   size_t count = grid->CountCellsInLogicalVolume(*log_vol);
 

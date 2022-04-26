@@ -797,8 +797,8 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
       const int num_nodes = 4;
 
       int nodes[num_nodes];
-      for (int i=0; i<num_nodes; i++)
-        if ( !(iss >> nodes[i]) )
+      for (int & node : nodes)
+        if ( !(iss >> node) )
         {
           chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
           exit(EXIT_FAILURE);
@@ -813,9 +813,9 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
       continue;
     }
 
-    const int total_nodes = newFace->v_indices.size();
+    const size_t total_nodes = newFace->v_indices.size();
 
-    for (int e=0; e<total_nodes; e++)
+    for (size_t e=0; e<total_nodes; e++)
     {
       int* side_indices = new int[total_nodes];
       side_indices[0] = newFace->v_indices[e];
@@ -838,29 +838,25 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
   file.close();
 
   //======================================================= Calculate face properties
-  std::vector<chi_mesh::Face>::iterator curFace;
-  std::vector<chi_mesh::PolyFace*>::iterator curPFace;
-  for (curPFace = this->poly_faces.begin();
-       curPFace!=this->poly_faces.end();
-       curPFace++)
+  for (const auto& poly_face : poly_faces)
   {
     chi_mesh::Vector3 centroid;
-    int num_verts = (*curPFace)->v_indices.size();
+    size_t num_verts = poly_face->v_indices.size();
 
-    for (int v=0; v<num_verts; v++)
-      centroid = centroid + vertices[(*curPFace)->v_indices[v]];
+    for (size_t v=0; v<num_verts; v++)
+      centroid = centroid + vertices[poly_face->v_indices[v]];
 
-    centroid = centroid/num_verts;
+    centroid = centroid/static_cast<double>(num_verts);
 
-    (*curPFace)->face_centroid = centroid;
+    poly_face->face_centroid = centroid;
 
-    chi_mesh::Vector3 n = (vertices[(*curPFace)->v_indices[1]] -
-                          vertices[(*curPFace)->v_indices[0]]).Cross(
-                          centroid - vertices[(*curPFace)->v_indices[1]]);
+    chi_mesh::Vector3 n = (vertices[poly_face->v_indices[1]] -
+                          vertices[poly_face->v_indices[0]]).Cross(
+                          centroid - vertices[poly_face->v_indices[1]]);
 
     n = n/n.Norm();
 
-    (*curPFace)->geometric_normal = n;
+    poly_face->geometric_normal = n;
   }
 
   UpdateInternalConnectivity();
@@ -880,7 +876,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
 //    return;
 //  }
   FILE* outputFile = fopen(fileName,"w");
-  if (outputFile==NULL)
+  if (outputFile==nullptr)
   {
     printf("Error creating file %s!\n",fileName);
     return;
@@ -903,7 +899,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
                                     lines[ell].v_index[1]+1);
   }
 
-  if (faces.size()>0)
+  if (!faces.empty())
   {
     chi_mesh::Face first_face = this->faces.front();
     fprintf(outputFile,"vn %.4f %.4f %.4f\n", first_face.geometric_normal.x,
@@ -921,7 +917,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
               cur_face->v_index[2]+1);
     }
   }
-  if (poly_faces.size()>0)
+  if (!poly_faces.empty())
   {
     chi_mesh::PolyFace* first_face = this->poly_faces.front();
     fprintf(outputFile,"vn %.4f %.4f %.4f\n", first_face->geometric_normal.x,
@@ -929,12 +925,12 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
             first_face->geometric_normal.z);
     fprintf(outputFile,"s off\n");
 
-    for (int f=0; f<poly_faces.size(); f++)
+    for (auto & poly_face : poly_faces)
     {
       fprintf(outputFile,"f ");
-      for (int v=0; v<poly_faces[f]->v_indices.size(); v++)
+      for (int v_indice : poly_face->v_indices)
       {
-        fprintf(outputFile,"%d//1 ",poly_faces[f]->v_indices[v]+1);
+        fprintf(outputFile,"%d//1 ",v_indice+1);
       }
       fprintf(outputFile,"\n");
     }
@@ -949,7 +945,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
 void chi_mesh::SurfaceMesh::ExportToPolyFile(const char *fileName)
 {
   FILE* outputFile = fopen(fileName,"w");
-  if (outputFile==NULL)
+  if (outputFile==nullptr)
   {
     printf("Error creating file %s!\n",fileName);
     return;

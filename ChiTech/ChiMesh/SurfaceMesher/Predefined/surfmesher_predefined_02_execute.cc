@@ -13,10 +13,10 @@ void chi_mesh::SurfaceMesherPredefined::Execute()
   chi_log.Log(LOG_0VERBOSE_1) << "SurfaceMesherPredefined executed";
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Check empty region list
-  if (mesh_handler->region_stack.empty())
+  if (mesh_handler.region_stack.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "SurfaceMesherPredefined: No region added.";
@@ -28,7 +28,7 @@ void chi_mesh::SurfaceMesherPredefined::Execute()
 //  for (region_iter = mesh_handler->region_stack.begin();
 //       region_iter != mesh_handler->region_stack.end();
 //       region_iter++)
-  for (auto region : mesh_handler->region_stack)
+  for (auto region : mesh_handler.region_stack)
   {
 //    chi_mesh::Region* region = *region_iter;
     //=========================================== Check for interfaces

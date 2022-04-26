@@ -106,12 +106,12 @@ int chiRegionExportMeshToObj(lua_State *L)
   if (num_args == 3) per_material = lua_toboolean(L,3);
 
   //============================================= Get current handler
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Attempt to obtain region
   chi_mesh::Region* cur_region;
   try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
+    cur_region = cur_hndlr.region_stack.at(region_index);
   }
   catch(const std::invalid_argument& ia)
   {
@@ -148,12 +148,12 @@ int chiRegionExportMeshToVTK(lua_State *L)
 
 
   //============================================= Get current handler
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Attempt to obtain region
   chi_mesh::Region* cur_region;
   try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
+    cur_region = cur_hndlr.region_stack.at(region_index);
   }
   catch(const std::invalid_argument& ia)
   {

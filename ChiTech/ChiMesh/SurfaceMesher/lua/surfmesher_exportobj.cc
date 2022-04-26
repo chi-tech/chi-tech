@@ -23,12 +23,12 @@ int chiSurfaceMesherExportToObj(lua_State* L)
   const char* file_name = lua_tostring(L,1);
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Loop over all regions
   std::vector<chi_mesh::Region*>::iterator region_iter;
-  for (region_iter = mesh_handler->region_stack.begin();
-       region_iter != mesh_handler->region_stack.end();
+  for (region_iter = mesh_handler.region_stack.begin();
+       region_iter != mesh_handler.region_stack.end();
        region_iter++)
   {
     chi_mesh::Region *region = *region_iter;

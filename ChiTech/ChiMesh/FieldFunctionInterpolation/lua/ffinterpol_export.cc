@@ -21,7 +21,7 @@ extern ChiPhysics&  chi_physics_handler;
 \author Jan*/
 int chiFFInterpolationExportPython(lua_State* L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int num_args = lua_gettop(L);
 
@@ -29,7 +29,7 @@ int chiFFInterpolationExportPython(lua_State* L)
   int ffihandle = lua_tonumber(L,1);
   chi_mesh::FieldFunctionInterpolation* cur_ffi;
   try {
-    cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
+    cur_ffi = cur_hndlr.ffinterpolation_stack.at(ffihandle);
   }
   catch(const std::out_of_range& o)
   {

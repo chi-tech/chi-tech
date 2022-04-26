@@ -94,9 +94,9 @@ namespace chi_mesh
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ROUTINES
 
   Boundary*              AssignSurfaceToBoundary(chi_mesh::SurfaceMesh* surface);
-  MeshHandler*           GetCurrentHandler();
+  MeshHandler&           GetCurrentHandler();
   size_t                 PushNewHandlerAndGetIndex();
-  MeshHandler*           GetNewHandler();
+  MeshHandler&           GetNewHandler();
   EdgeLoopCollection*    SplitEdgeLoopByAngle(EdgeLoop* input,double angle=1);
 
   //=================================== Domain decompositions

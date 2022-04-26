@@ -116,7 +116,7 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
   ofile << "    </PPoints>" << std::endl;
 
   bool is_global_mesh =
-    chi_mesh::GetCurrentHandler()->volume_mesher->options.mesh_global;
+    chi_mesh::GetCurrentHandler().volume_mesher->options.mesh_global;
   
   // Cut off path to base_filename
   std::string filename_short = base_filename.substr(base_filename.find_last_of("/\\")+1);

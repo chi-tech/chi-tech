@@ -34,7 +34,7 @@ VOLUME          = Volume either referring to the entire volume or that of a
 \author Jan*/
 int chiFFInterpolationCreate(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //================================================== Process types
   int ffitype = lua_tonumber(L,1);
@@ -43,8 +43,8 @@ int chiFFInterpolationCreate(lua_State *L)
     chi_mesh::FieldFunctionInterpolationSlice* new_ffi =
       new chi_mesh::FieldFunctionInterpolationSlice;
 
-    cur_hndlr->ffinterpolation_stack.push_back(new_ffi);
-    int index = cur_hndlr->ffinterpolation_stack.size()-1;
+    cur_hndlr.ffinterpolation_stack.push_back(new_ffi);
+    int index = cur_hndlr.ffinterpolation_stack.size()-1;
     chi_log.Log(LOG_ALLVERBOSE_2)
     << "Created slice Field Function Interpolation";
     lua_pushnumber(L,index);
@@ -55,8 +55,8 @@ int chiFFInterpolationCreate(lua_State *L)
     chi_mesh::FieldFunctionInterpolationLine* new_ffi =
       new chi_mesh::FieldFunctionInterpolationLine;
 
-    cur_hndlr->ffinterpolation_stack.push_back(new_ffi);
-    int index = cur_hndlr->ffinterpolation_stack.size()-1;
+    cur_hndlr.ffinterpolation_stack.push_back(new_ffi);
+    int index = cur_hndlr.ffinterpolation_stack.size()-1;
     chi_log.Log(LOG_ALLVERBOSE_2)
       << "Created line Field Function Interpolation";
     lua_pushnumber(L,index);
@@ -67,8 +67,8 @@ int chiFFInterpolationCreate(lua_State *L)
     chi_mesh::FieldFunctionInterpolationVolume* new_ffi =
       new chi_mesh::FieldFunctionInterpolationVolume;
 
-    cur_hndlr->ffinterpolation_stack.push_back(new_ffi);
-    int index = cur_hndlr->ffinterpolation_stack.size()-1;
+    cur_hndlr.ffinterpolation_stack.push_back(new_ffi);
+    int index = cur_hndlr.ffinterpolation_stack.size()-1;
     chi_log.Log(LOG_ALLVERBOSE_2)
       << "Created Volume Field Function Interpolation";
     lua_pushnumber(L,index);

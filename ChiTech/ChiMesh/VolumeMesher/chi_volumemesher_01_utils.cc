@@ -268,8 +268,8 @@ std::pair<int,int> chi_mesh::VolumeMesher::
   if (chi_mpi.process_count == 1){return ij_id;}
 
   //================================================== Get the current handler
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-  auto vol_mesher = mesh_handler->volume_mesher;
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
+  auto vol_mesher = mesh_handler.volume_mesher;
 
 //====================================== Sanity check on partitioning
   size_t num_x_subsets = vol_mesher->options.xcuts.size()+1;
@@ -358,8 +358,8 @@ std::tuple<int,int,int> chi_mesh::VolumeMesher::
   std::pair<int,int> ij_id = GetCellXYPartitionID(cell);
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler*  mesh_handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher* vol_mesher = mesh_handler->volume_mesher;
+  auto&  mesh_handler = chi_mesh::GetCurrentHandler();
+  chi_mesh::VolumeMesher* vol_mesher = mesh_handler.volume_mesher;
 
   if (vol_mesher->options.partition_z == 1)
   {
@@ -496,10 +496,10 @@ void chi_mesh::VolumeMesher::
     << chi_program_timer.GetTimeString()
     << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
-  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Get back mesh
-  chi_mesh::Region* cur_region = handler->region_stack.back();
+  chi_mesh::Region* cur_region = handler.region_stack.back();
   chi_mesh::MeshContinuumPtr vol_cont = cur_region->GetGrid();
 
   int num_cells_modified = 0;
@@ -535,10 +535,10 @@ void chi_mesh::VolumeMesher::
     << chi_program_timer.GetTimeString()
     << " Setting boundary id from logical volume.";
   //============================================= Get current mesh handler
-  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Get back mesh
-  chi_mesh::Region* cur_region = handler->region_stack.back();
+  chi_mesh::Region* cur_region = handler.region_stack.back();
   chi_mesh::MeshContinuumPtr vol_cont = cur_region->GetGrid();
 
   int num_faces_modified = 0;
@@ -570,10 +570,10 @@ void chi_mesh::VolumeMesher::
     << " Setting material id " << mat_id << "to all cells.";
 
   //============================================= Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Get back mesh
-  auto cur_region = handler->region_stack.back();
+  auto cur_region = handler.region_stack.back();
   auto vol_cont = cur_region->GetGrid();
 
   for (auto& cell : vol_cont->local_cells)
@@ -600,10 +600,10 @@ void chi_mesh::VolumeMesher::
     << " Setting orthogonal boundaries.";
 
   //============================================= Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //============================================= Get back mesh
-  auto cur_region = handler->region_stack.back();
+  auto cur_region = handler.region_stack.back();
   auto vol_cont = cur_region->GetGrid();
 
   const chi_mesh::Vector3 ihat(1.0, 0.0, 0.0);

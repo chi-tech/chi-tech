@@ -25,14 +25,14 @@ int chiSurfaceMeshCheckCycles(lua_State *L)
   if (num_args != 2)
     LuaPostArgAmountError("chiSurfaceMeshCheckCycles",2,num_args);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int surf_handle = lua_tonumber(L,1);
   int num_angles  = lua_tonumber(L,2);
 
   try{
     chi_mesh::SurfaceMesh* curItem =
-      cur_hndlr->surface_mesh_stack.at(surf_handle);
+      cur_hndlr.surface_mesh_stack.at(surf_handle);
 
     curItem->CheckCyclicDependencies(num_angles);
   }
@@ -62,10 +62,10 @@ int chiComputeLoadBalancing(lua_State *L)
 
   //======================================== Get reference surface mesh
   int surf_handle = lua_tonumber(L,1);
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   chi_mesh::SurfaceMesh* cur_surf;
   try{
-    cur_surf = cur_hndlr->surface_mesh_stack.at(surf_handle);
+    cur_surf = cur_hndlr.surface_mesh_stack.at(surf_handle);
   }
   catch(const std::out_of_range& o){
     std::cerr << "chiComputeLoadBalancing: Invalid index to surface mesh.\n";

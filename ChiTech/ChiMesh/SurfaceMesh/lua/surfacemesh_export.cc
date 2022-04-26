@@ -18,7 +18,7 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiSurfaceMeshExportToObj(lua_State* L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get arguments
   int num_args = lua_gettop(L);
@@ -33,7 +33,7 @@ int chiSurfaceMeshExportToObj(lua_State* L)
 
 
   try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr->surface_mesh_stack.at(handle);
+    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
 
     curItem->ExportToOBJFile(temp);
   }
@@ -55,7 +55,7 @@ int chiSurfaceMeshExportToObj(lua_State* L)
 \author Jan*/
 int chiSurfaceMeshExportPolyFile(lua_State* L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get arguments
   int num_args = lua_gettop(L);
@@ -70,7 +70,7 @@ int chiSurfaceMeshExportPolyFile(lua_State* L)
 
 
   try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr->surface_mesh_stack.at(handle);
+    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
 
     curItem->ExportToPolyFile(temp);
   }

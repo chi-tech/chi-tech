@@ -25,14 +25,14 @@ int chiSurfaceMeshExtractOpenEdgesToObj(lua_State *L)
   if (num_args != 2)
     LuaPostArgAmountError("chiSurfaceMeshExtractOpenEdgesToObj",2,num_args);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int         surf_handle = lua_tonumber(L,1);
   const char* file_name   = lua_tostring(L,2);
 
   try{
     chi_mesh::SurfaceMesh* curItem =
-      cur_hndlr->surface_mesh_stack.at(surf_handle);
+      cur_hndlr.surface_mesh_stack.at(surf_handle);
 
     curItem->ExtractOpenEdgesToObj(file_name);
   }

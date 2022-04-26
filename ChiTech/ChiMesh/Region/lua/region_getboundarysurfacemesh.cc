@@ -21,7 +21,7 @@
 \author Jan*/
 int chiRegionGetBoundarySurfaceMesh(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int num_args = lua_gettop(L);
   int region_index = lua_tonumber(L,1);
@@ -30,7 +30,7 @@ int chiRegionGetBoundarySurfaceMesh(lua_State *L)
   chi_mesh::Region* cur_region;
   chi_mesh::Boundary* cur_boundary;
   try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
+    cur_region = cur_hndlr.region_stack.at(region_index);
   }
   catch(const std::invalid_argument& ia)
   {
@@ -52,9 +52,9 @@ int chiRegionGetBoundarySurfaceMesh(lua_State *L)
     if (cur_boundary->initial_mesh_continuum->surface_mesh != nullptr)
     {
       chi_mesh::SurfaceMesh* cur_surfmesh = cur_boundary->initial_mesh_continuum->surface_mesh;
-      cur_hndlr->surface_mesh_stack.push_back(cur_surfmesh);
+      cur_hndlr.surface_mesh_stack.push_back(cur_surfmesh);
 
-      lua_pushnumber(L,cur_hndlr->surface_mesh_stack.size()-1);
+      lua_pushnumber(L,cur_hndlr.surface_mesh_stack.size()-1);
       printf("Hello\n");
       return 1;
     } else
@@ -79,9 +79,9 @@ int chiRegionGetBoundarySurfaceMesh(lua_State *L)
     if (cur_cont->surface_mesh != nullptr)
     {
       chi_mesh::SurfaceMesh* cur_surfmesh = cur_cont->surface_mesh;
-      cur_hndlr->surface_mesh_stack.push_back(cur_surfmesh);
+      cur_hndlr.surface_mesh_stack.push_back(cur_surfmesh);
 
-      lua_pushnumber(L,cur_hndlr->surface_mesh_stack.size()-1);
+      lua_pushnumber(L,cur_hndlr.surface_mesh_stack.size()-1);
       return 1;
     } else
     {

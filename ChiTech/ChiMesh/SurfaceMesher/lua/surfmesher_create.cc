@@ -46,7 +46,7 @@ SurfaceMesherType.Delaunay:\n
 \author Jan*/
 int chiSurfaceMesherCreate(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get argument
   LuaCheckNilValue("chiSurfaceMesherCreate",L,1);
@@ -73,7 +73,7 @@ int chiSurfaceMesherCreate(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  cur_hndlr->surface_mesher = new_mesher;
+  cur_hndlr.surface_mesher = new_mesher;
 
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiSurfaceMesherCreate: Surface remesher created."

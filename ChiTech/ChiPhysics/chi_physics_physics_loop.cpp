@@ -26,7 +26,7 @@ void ChiPhysics::RunPhysicsLoop()
 	profilingTimer.Reset();
 	std::cout<<"Physics loop started.\n";
 
-	while (!ChiTech::termination_posted)
+	while (!chi::run_time::termination_posted)
 	{
 		physicsTime=physicsTiming.GetTime();
 

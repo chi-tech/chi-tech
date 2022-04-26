@@ -12,6 +12,10 @@
 
 #include <iostream>
 
+#ifndef NDEBUG
+#include <unistd.h>
+#endif
+
 //=============================================== Global variables
 chi_math::UnknownManager ChiMath::UNITARY_UNKNOWN_MANAGER;
 
@@ -32,12 +36,13 @@ ChiPhysics&  chi_physics_handler = ChiPhysics::GetInstance();
 ChiTimer    chi_program_timer;
 
 /** Global stack of handlers */
-std::vector<chi_mesh::MeshHandler*>  ChiTech::meshhandler_stack;
-int                                  ChiTech::current_mesh_handler=-1;
-bool                                 ChiTech::termination_posted = false;
-std::string                          ChiTech::input_file_name;
-bool                                 ChiTech::sim_option_interactive = true;
-bool                                 ChiTech::allow_petsc_error_handler = false;
+std::vector<std::shared_ptr<chi_mesh::MeshHandler>>  chi::meshhandler_stack;
+int                                  chi::current_mesh_handler=-1;
+
+bool        chi::run_time::termination_posted = false;
+std::string chi::run_time::input_file_name;
+bool        chi::run_time::sim_option_interactive = true;
+bool        chi::run_time::allow_petsc_error_handler = false;
 
 
 
@@ -47,7 +52,7 @@ bool                                 ChiTech::allow_petsc_error_handler = false;
 \param argc int    Number of arguments supplied.
 \param argv char** Array of strings representing each argument.
  */
-void ChiTech::ParseArguments(int argc, char** argv)
+void chi::run_time::ParseArguments(int argc, char** argv)
 {
   bool input_file_found = false;
   for (int i=1; i<argc; i++)
@@ -66,16 +71,16 @@ void ChiTech::ParseArguments(int argc, char** argv)
         << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
       chi_log.Log(LOG_0) << "PETSc options:";
-      ChiTech::termination_posted = true;
+      chi::run_time::termination_posted = true;
     }
     else if (argument.find("-allow_petsc_error_handler")!=std::string::npos)
     {
-      ChiTech::allow_petsc_error_handler = true;
+      chi::run_time::allow_petsc_error_handler = true;
     }
     //================================================ No-graphics option
     else if (argument.find("-b")!=std::string::npos)
     {
-      ChiTech::sim_option_interactive = false;
+      chi::run_time::sim_option_interactive = false;
     }//-b
     //================================================ Verbosity
     else if (argument.find("-v") != std::string::npos)
@@ -104,9 +109,9 @@ void ChiTech::ParseArguments(int argc, char** argv)
     }//-v
     else if ((argument.find('=') == std::string::npos) && (!input_file_found) )
     {
-      ChiTech::input_file_name = argument;
+      chi::run_time::input_file_name = argument;
       input_file_found = true;
-      ChiTech::sim_option_interactive = false;
+      chi::run_time::sim_option_interactive = false;
     }//no =
     else if (argument.find('=') != std::string::npos)
     {
@@ -121,7 +126,7 @@ void ChiTech::ParseArguments(int argc, char** argv)
 \param argc int    Number of arguments supplied.
 \param argv char** Array of strings representing each argument.
  */
-int ChiTech::Initialize(int argc, char** argv)
+int chi::run_time::Initialize(int argc, char** argv)
 {
   int location_id = 0, number_processes = 1;
 
@@ -144,7 +149,7 @@ int ChiTech::Initialize(int argc, char** argv)
 //############################################### Finalize ChiTech
 /**Finalizes ChiTech.
  * */
-void ChiTech::Finalize()
+void chi::run_time::Finalize()
 {
   PetscFinalize();
   MPI_Finalize();
@@ -152,7 +157,7 @@ void ChiTech::Finalize()
 
 //############################################### Interactive interface
 /**Runs the interactive chitech engine*/
-int ChiTech::RunInteractive(int argc, char** argv)
+int chi::run_time::RunInteractive(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
     << ChiTimer::GetLocalDateTimeString()
@@ -165,8 +170,8 @@ int ChiTech::RunInteractive(int argc, char** argv)
 
   chi_console.FlushConsole();
 
-  if ( not ChiTech::input_file_name.empty() )
-    chi_console.ExecuteFile(ChiTech::input_file_name.c_str(), argc, argv);
+  if ( not chi::run_time::input_file_name.empty() )
+    chi_console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
 
   chi_console.RunConsoleLoop();
 
@@ -180,11 +185,11 @@ int ChiTech::RunInteractive(int argc, char** argv)
   return 0;
 }
 
-#include <unistd.h>
+
 
 //############################################### Batch interface
 /**Runs ChiTech in pure batch mode. Start then finish.*/
-int ChiTech::RunBatch(int argc, char** argv)
+int chi::run_time::RunBatch(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
     << ChiTimer::GetLocalDateTimeString()
@@ -205,26 +210,28 @@ int ChiTech::RunBatch(int argc, char** argv)
 
   chi_console.FlushConsole();
 
+#ifndef NDEBUG
   chi_log.Log(LOG_0) << "Waiting...";
-//  if (chi_mpi.location_id == 1)
-//    for (int k=0; k<100; ++k)
-//    {
-//      usleep(1000000);
-//      chi_log.Log(LOG_0) << k;
-//    }
+  if (chi_mpi.location_id == 1)
+    for (int k=0; k<100; ++k)
+    {
+      usleep(1000000);
+      chi_log.Log(LOG_0) << k;
+    }
 
   MPI_Barrier(MPI_COMM_WORLD);
+#endif
 
   int error_code = 0;
-  if ( not ChiTech::input_file_name.empty() )
-    error_code = chi_console.ExecuteFile(ChiTech::input_file_name.c_str(), argc, argv);
+  if ( not chi::run_time::input_file_name.empty() )
+    error_code = chi_console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
 
   chi_log.Log(LOG_0)
     << "Final program time " << chi_program_timer.GetTimeString();
 
   chi_log.Log(LOG_0)
     << ChiTimer::GetLocalDateTimeString()
-    << " ChiTech finished execution of " << ChiTech::input_file_name;
+    << " ChiTech finished execution of " << chi::run_time::input_file_name;
 
   return error_code;
 }

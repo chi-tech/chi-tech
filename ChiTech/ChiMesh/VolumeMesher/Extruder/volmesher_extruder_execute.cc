@@ -18,7 +18,6 @@ extern ChiTimer chi_program_timer;
 extern ChiConsole&   chi_console;
 
 #include <iostream>
-#include <vector>
 
 //###################################################################
 /**Execution... nough said.*/
@@ -31,8 +30,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << std::endl;
 
   //================================================== Get the current handler
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-  auto region = mesh_handler->region_stack.back();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
+  auto region = mesh_handler.region_stack.back();
 
   //================================================== Loop over all regions
   chi_log.Log(LOG_0VERBOSE_1)

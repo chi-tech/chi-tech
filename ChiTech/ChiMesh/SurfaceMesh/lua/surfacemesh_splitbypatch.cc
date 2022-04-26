@@ -20,21 +20,21 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiSurfaceMeshSplitByPatch(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int surf_handle = lua_tonumber(L,1);
 
   try{
     chi_mesh::SurfaceMesh* curItem =
-      cur_hndlr->surface_mesh_stack.at(surf_handle);
+      cur_hndlr.surface_mesh_stack.at(surf_handle);
 
     chi_mesh::MeshHandler::SurfaceMeshCollection* new_coll =
       new chi_mesh::MeshHandler::SurfaceMeshCollection;
 
     curItem->SplitByPatch(*new_coll);
 
-    cur_hndlr->surface_mesh_collections.push_back(new_coll);
-    int index = cur_hndlr->surface_mesh_collections.size()-1;
+    cur_hndlr.surface_mesh_collections.push_back(new_coll);
+    int index = cur_hndlr.surface_mesh_collections.size()-1;
     lua_pushnumber(L,index);
     lua_pushnumber(L,new_coll->size());
 

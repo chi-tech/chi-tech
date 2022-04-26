@@ -22,8 +22,8 @@ extern ChiTimer chi_program_timer;
 void lbs::SteadySolver::InitFluxDataStructures(LBSGroupset& groupset)
 {
   //================================================== Angle Aggregation
-  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher& mesher = *handler->volume_mesher;
+  auto& handler = chi_mesh::GetCurrentHandler();
+  chi_mesh::VolumeMesher& mesher = *handler.volume_mesher;
 
   if ( options.geometry_type == GeometryType::ONED_SLAB or
        options.geometry_type == GeometryType::TWOD_CARTESIAN or

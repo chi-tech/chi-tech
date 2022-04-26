@@ -36,7 +36,7 @@ BOOLEAN= Boolean combination of other volumes.
 \author Jan*/
 int chiLogicalVolumeCreate(lua_State *L)
 {
-  chi_mesh::MeshHandler* handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
 
   int num_args = lua_gettop(L);
@@ -55,8 +55,8 @@ int chiLogicalVolumeCreate(lua_State *L)
     chi_mesh::SphereLogicalVolume* log_vol =
       new chi_mesh::SphereLogicalVolume(r);
 
-    handler->logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler->logicvolume_stack.size()-1);
+    handler.logicvolume_stack.push_back(log_vol);
+    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
   }
 
   //================================================== Sphere at arb loc
@@ -75,8 +75,8 @@ int chiLogicalVolumeCreate(lua_State *L)
     chi_mesh::SphereLogicalVolume* log_vol =
       new chi_mesh::SphereLogicalVolume(x,y,z,r);
 
-    handler->logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler->logicvolume_stack.size()-1);
+    handler.logicvolume_stack.push_back(log_vol);
+    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
   }
 
   //================================================== RPP
@@ -97,8 +97,8 @@ int chiLogicalVolumeCreate(lua_State *L)
     chi_mesh::RPPLogicalVolume* log_vol =
       new chi_mesh::RPPLogicalVolume(xmin,xmax,ymin,ymax,zmin,zmax);
 
-    handler->logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler->logicvolume_stack.size()-1);
+    handler.logicvolume_stack.push_back(log_vol);
+    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
   }
 
   //================================================== RCC
@@ -120,8 +120,8 @@ int chiLogicalVolumeCreate(lua_State *L)
     chi_mesh::RCCLogicalVolume* log_vol =
       new chi_mesh::RCCLogicalVolume(x0,y0,z0,vx,vy,vz,r);
 
-    handler->logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler->logicvolume_stack.size()-1);
+    handler.logicvolume_stack.push_back(log_vol);
+    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
 
     chi_mesh::Vector3 point(-0.5, 0.0, 0.1);
     printf("MATRIX %d\n", log_vol->Inside(point));
@@ -135,7 +135,7 @@ int chiLogicalVolumeCreate(lua_State *L)
 
     chi_mesh::SurfaceMesh* surf_mesh;
     try {
-      surf_mesh = handler->surface_mesh_stack.at(surf_mesh_hndle);
+      surf_mesh = handler.surface_mesh_stack.at(surf_mesh_hndle);
     }
     catch(const std::out_of_range& o)
     {
@@ -148,8 +148,8 @@ int chiLogicalVolumeCreate(lua_State *L)
     chi_mesh::SurfaceMeshLogicalVolume* surf_vol =
       new chi_mesh::SurfaceMeshLogicalVolume(surf_mesh);
 
-    handler->logicvolume_stack.push_back(surf_vol);
-    lua_pushnumber(L,handler->logicvolume_stack.size()-1);
+    handler.logicvolume_stack.push_back(surf_vol);
+    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
   }
   //================================================== BOOLEAN
   else if (type_index == BOOLEAN)
@@ -184,7 +184,7 @@ int chiLogicalVolumeCreate(lua_State *L)
                                    "number. Found not to be";
         exit(EXIT_FAILURE);
       }
-      if (lua_tonumber(L,2*p+1)>=handler->logicvolume_stack.size())
+      if (lua_tonumber(L,2*p+1)>=handler.logicvolume_stack.size())
       {
         chi_log.Log(LOG_0ERROR) << "chiMeshCreateLogicalVolume(BOOLEAN..."
                                    " argument " << 2*p+1
@@ -195,13 +195,13 @@ int chiLogicalVolumeCreate(lua_State *L)
       bool logic  = lua_toboolean(L,2*p);
       bool handle = lua_tonumber(L,2*p+1);
 
-      chi_mesh::LogicalVolume* ref_vol = handler->logicvolume_stack[handle];
+      chi_mesh::LogicalVolume* ref_vol = handler.logicvolume_stack[handle];
       std::pair<bool,chi_mesh::LogicalVolume*> combo(logic,ref_vol);
 
       bool_vol->parts.push_back(combo);
     }
 
-    handler->logicvolume_stack.push_back(bool_vol);
+    handler.logicvolume_stack.push_back(bool_vol);
   }
 
   //================================================== Unrecognized option

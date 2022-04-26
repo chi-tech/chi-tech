@@ -17,7 +17,7 @@ int ChiPhysics::InitPetSc(int argc, char** argv)
 	PetscMPIInt    size;
 
   PetscOptionsInsertString(NULL,"-error_output_stderr");
-  if (not ChiTech::allow_petsc_error_handler)
+  if (not chi::run_time::allow_petsc_error_handler)
     PetscOptionsInsertString(NULL,"-no_signal_handler");
 //  PetscOptionsInsertString(NULL,"-on_error_abort");
 //TODO: Investigate this, causes cfem methods to fail

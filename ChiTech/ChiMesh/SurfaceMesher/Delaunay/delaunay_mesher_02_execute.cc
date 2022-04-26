@@ -36,10 +36,10 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
   tmesh_timer.Reset();
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Check empty region list
-  if (mesh_handler->region_stack.empty())
+  if (mesh_handler.region_stack.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "SurfaceMesherPredefined: No region added.";
@@ -48,8 +48,8 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
 
   //================================================== Loop over all regions
   std::vector<chi_mesh::Region*>::iterator region_iter;
-  for (region_iter = mesh_handler->region_stack.begin();
-       region_iter != mesh_handler->region_stack.end();
+  for (region_iter = mesh_handler.region_stack.begin();
+       region_iter != mesh_handler.region_stack.end();
        region_iter++)
   {
     chi_mesh::Region* region = *region_iter;
@@ -101,9 +101,9 @@ void chi_mesh::SurfaceMesherDelaunay::Execute()
 
   //================================================== Copy surface meshes
   //============================================= Loop over regions
-  for (unsigned r=0; r<mesh_handler->region_stack.size(); r++)
+  for (unsigned r=0; r<mesh_handler.region_stack.size(); r++)
   {
-    chi_mesh::Region*          cur_region = mesh_handler->region_stack[r];
+    chi_mesh::Region*          cur_region = mesh_handler.region_stack[r];
     RegionDelaunyContexts* cur_region_context = region_contexts[r];
 
     //====================================== Loop over boundaries

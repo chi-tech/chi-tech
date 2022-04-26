@@ -25,10 +25,10 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   //                                         from centroid
   auto GetPIDFromCentroid = [](const chi_mesh::Vertex& centroid)
   {
-    auto handler = chi_mesh::GetCurrentHandler();
+    auto& handler = chi_mesh::GetCurrentHandler();
 
-    int Px = handler->volume_mesher->options.partition_x;
-    int Py = handler->volume_mesher->options.partition_y;
+    int Px = handler.volume_mesher->options.partition_x;
+    int Py = handler.volume_mesher->options.partition_y;
 
     chi_mesh::Cell temp_cell(CellType::GHOST, CellType::GHOST);
     temp_cell.centroid = centroid;

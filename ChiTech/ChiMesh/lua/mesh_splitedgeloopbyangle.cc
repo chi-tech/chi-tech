@@ -23,14 +23,14 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiEdgeLoopSplitByAngle(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get the loop collection
   int loop_coll_index = lua_tonumber(L,1);
 
   chi_mesh::EdgeLoopCollection* cur_coll;
   try{
-    cur_coll = cur_hndlr->edge_loop_collections.at(loop_coll_index);
+    cur_coll = cur_hndlr.edge_loop_collections.at(loop_coll_index);
   }
   catch(const std::out_of_range& o)
   {
@@ -71,9 +71,9 @@ int chiEdgeLoopSplitByAngle(lua_State *L)
     new_coll = chi_mesh::SplitEdgeLoopByAngle(cur_loop);
   }
 
-  cur_hndlr->edge_loop_collections.push_back(new_coll);
+  cur_hndlr.edge_loop_collections.push_back(new_coll);
 
-  int index = cur_hndlr->edge_loop_collections.size()-1;
+  int index = cur_hndlr.edge_loop_collections.size()-1;
   lua_pushnumber(L,index);
   lua_pushnumber(L,new_coll->size());
 

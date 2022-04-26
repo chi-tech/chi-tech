@@ -18,7 +18,7 @@ void ChiConsole::RunConsoleLoop(char*)
                      << "Type \"exit\" to quit (or Ctl-C).";
   exit_loop = false;
 
-  while ((!exit_loop) and (!ChiTech::termination_posted))
+  while ((!exit_loop) and (!chi::run_time::termination_posted))
   {
     std::string console_input;
 
@@ -36,7 +36,7 @@ void ChiConsole::RunConsoleLoop(char*)
       lua_pop(consoleState,1);
     }
   }
-  ChiTech::termination_posted = true;
+  chi::run_time::termination_posted = true;
 
   chi_log.Log(LOG_0) << "Console loop stopped successfully.";
 }

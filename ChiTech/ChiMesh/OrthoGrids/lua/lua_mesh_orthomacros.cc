@@ -74,9 +74,9 @@ int chiMeshCreateUnpartitioned1DOrthoMesh(lua_State* L)
   chi_mesh::CreateUnpartitioned1DOrthoMesh(array[0]);
 
   //=================================== Push handles
-  auto handler = chi_mesh::GetCurrentHandler();
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
-  lua_pushnumber(L,handler->region_stack.size()-1);
+  auto& handler = chi_mesh::GetCurrentHandler();
+  lua_pushnumber(L,handler.unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,handler.region_stack.size()-1);
 
   return 2;
 }
@@ -163,9 +163,9 @@ int chiMeshCreateUnpartitioned2DOrthoMesh(lua_State* L)
   chi_mesh::CreateUnpartitioned2DOrthoMesh(array[0],array[1]);
 
   //=================================== Push handles
-  auto handler = chi_mesh::GetCurrentHandler();
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
-  lua_pushnumber(L,handler->region_stack.size()-1);
+  auto& handler = chi_mesh::GetCurrentHandler();
+  lua_pushnumber(L,handler.unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,handler.region_stack.size()-1);
 
   return 2;
 }
@@ -274,9 +274,9 @@ int chiMeshCreateUnpartitioned3DOrthoMesh(lua_State* L)
   chi_mesh::CreateUnpartitioned3DOrthoMesh(array[0],array[1],array[2]);
 
   //=================================== Push handles
-  auto handler = chi_mesh::GetCurrentHandler();
-  lua_pushnumber(L,handler->unpartitionedmesh_stack.size()-1);
-  lua_pushnumber(L,handler->region_stack.size()-1);
+  auto& handler = chi_mesh::GetCurrentHandler();
+  lua_pushnumber(L,handler.unpartitionedmesh_stack.size()-1);
+  lua_pushnumber(L,handler.region_stack.size()-1);
 
   return 2;
 }

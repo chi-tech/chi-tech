@@ -23,12 +23,12 @@ extern ChiConsole&        chi_console;
 \author Jan*/
 int chiVolumeMesherExecute(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //Get memory before
   CSTMemory mem_before = chi_console.GetMemoryUsage();
 
-  if (cur_hndlr->volume_mesher == nullptr)
+  if (cur_hndlr.volume_mesher == nullptr)
   {
     chi_log.Log(LOG_ALLERROR)
       << __FUNCTION__ << ": called without a volume mesher set. Make a "
@@ -36,7 +36,7 @@ int chiVolumeMesherExecute(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  cur_hndlr->volume_mesher->Execute();
+  cur_hndlr.volume_mesher->Execute();
 
   //Get memory usage
   CSTMemory mem_after = chi_console.GetMemoryUsage();

@@ -23,7 +23,7 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
   if (num_args != 2)
     LuaPostArgAmountError("chiRegionAddSurfaceBoundary",2,num_args);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int region_index = lua_tonumber(L,1);
   int surface_index = lua_tonumber(L,2);
@@ -31,7 +31,7 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
   chi_mesh::Region* cur_region;
   chi_mesh::SurfaceMesh* cur_surfacemesh;
   try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
+    cur_region = cur_hndlr.region_stack.at(region_index);
   }
   catch(const std::out_of_range& o)
   {
@@ -40,7 +40,7 @@ int chiRegionAddSurfaceBoundary(lua_State *L)
   }
 
   try{
-    cur_surfacemesh = cur_hndlr->surface_mesh_stack.at(surface_index);
+    cur_surfacemesh = cur_hndlr.surface_mesh_stack.at(surface_index);
   }
   catch(const std::out_of_range& o)
   {
@@ -74,7 +74,7 @@ int chiRegionAddLineBoundary(lua_State *L)
   if (num_args != 2)
     LuaPostArgAmountError("chiRegionAddLineBoundary",2,num_args);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int region_index = lua_tonumber(L,1);
   int line_index = lua_tonumber(L,2);
@@ -82,7 +82,7 @@ int chiRegionAddLineBoundary(lua_State *L)
   chi_mesh::Region* cur_region;
   chi_mesh::LineMesh* cur_linemesh;
   try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
+    cur_region = cur_hndlr.region_stack.at(region_index);
   }
   catch(const std::out_of_range& o)
   {
@@ -91,7 +91,7 @@ int chiRegionAddLineBoundary(lua_State *L)
   }
 
   try{
-    cur_linemesh = cur_hndlr->linemesh_stack.at(line_index);
+    cur_linemesh = cur_hndlr.linemesh_stack.at(line_index);
   }
   catch(const std::out_of_range& o)
   {
@@ -124,13 +124,13 @@ int chiRegionAddEmptyBoundary(lua_State *L)
   if (num_args != 1)
     LuaPostArgAmountError("chiRegionAddEmptyBoundary",1,num_args);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   int region_index = lua_tonumber(L,1);
 
   chi_mesh::Region* cur_region;
   try{
-    cur_region = cur_hndlr->region_stack.at(region_index);
+    cur_region = cur_hndlr.region_stack.at(region_index);
   }
   catch(const std::out_of_range& o)
   {

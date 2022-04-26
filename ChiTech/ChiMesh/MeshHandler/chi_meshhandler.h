@@ -28,6 +28,9 @@ public:
 
 public:
   chi_mesh::MeshContinuumPtr GetGrid(int region_index=-1);
+  MeshHandler() = default;
+  MeshHandler(const MeshHandler&) = delete;
+  MeshHandler& operator=(const MeshHandler&) = delete;
 };
 
 #endif//CHI_MESHHANDLER_H

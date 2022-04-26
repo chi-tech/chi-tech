@@ -98,13 +98,13 @@ volume `vol0`.
 int chiFFInterpolationSetProperty(lua_State *L)
 {
   int numArgs = lua_gettop(L);
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //================================================== Get handle to field function
   int ffihandle = lua_tonumber(L,1);
   chi_mesh::FieldFunctionInterpolation* cur_ffi;
   try {
-    cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
+    cur_ffi = cur_hndlr.ffinterpolation_stack.at(ffihandle);
   }
   catch(const std::out_of_range& o)
   {
@@ -331,7 +331,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     chi_mesh::LogicalVolume* logvol;
 
     try {
-      logvol = cur_hndlr->logicvolume_stack.at(logvol_hndle);
+      logvol = cur_hndlr.logicvolume_stack.at(logvol_hndle);
     }
     catch(const std::out_of_range& o)
     {

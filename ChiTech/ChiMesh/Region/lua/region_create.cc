@@ -16,13 +16,13 @@
 \author Jan*/
 int chiRegionCreate(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   chi_mesh::Region* new_region = new chi_mesh::Region;
 
-  cur_hndlr->region_stack.push_back(new_region);
+  cur_hndlr.region_stack.push_back(new_region);
 
-  lua_pushnumber(L,cur_hndlr->region_stack.size()-1);
+  lua_pushnumber(L,cur_hndlr.region_stack.size()-1);
 
   return 1;
 }

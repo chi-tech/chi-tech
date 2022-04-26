@@ -15,10 +15,10 @@ void chi_mesh::SurfaceMesherPassthrough::Execute()
   chi_log.Log(LOG_0VERBOSE_1) << "SurfaceMesherPassthrough executed";
 
   //================================================== Get the current handler
-  chi_mesh::MeshHandler* mesh_handler = chi_mesh::GetCurrentHandler();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
 
   //================================================== Check empty region list
-  if (mesh_handler->region_stack.empty())
+  if (mesh_handler.region_stack.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "SurfaceMesherPassthrough: No region added.";
@@ -26,7 +26,7 @@ void chi_mesh::SurfaceMesherPassthrough::Execute()
   }
 
   //================================================== Loop over all regions
-  for (auto region : mesh_handler->region_stack)
+  for (auto region : mesh_handler.region_stack)
   {
   }
 

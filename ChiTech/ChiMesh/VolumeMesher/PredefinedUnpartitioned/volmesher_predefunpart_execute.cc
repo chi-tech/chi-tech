@@ -30,10 +30,10 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     << std::endl;
 
   //======================================== Get the current handler
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Check empty region list
-  if (mesh_handler->region_stack.empty())
+  if (mesh_handler.region_stack.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "VolumeMesherPredefinedUnpartitioned: No region added.";
@@ -41,7 +41,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Check unpartitioned mesh available
-  if (mesh_handler->unpartitionedmesh_stack.empty())
+  if (mesh_handler.unpartitionedmesh_stack.empty())
   {
     chi_log.Log(LOG_ALLERROR)
       << "VolumeMesherPredefinedUnpartitioned: "
@@ -52,9 +52,9 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   //======================================== Check partitioning params
   if (options.partition_type == KBA_STYLE_XYZ)
   {
-    int Px = mesh_handler->volume_mesher->options.partition_x;
-    int Py = mesh_handler->volume_mesher->options.partition_y;
-    int Pz = mesh_handler->volume_mesher->options.partition_z;
+    int Px = mesh_handler.volume_mesher->options.partition_x;
+    int Py = mesh_handler.volume_mesher->options.partition_y;
+    int Pz = mesh_handler.volume_mesher->options.partition_z;
 
     int desired_process_count = Px*Py*Pz;
 
@@ -71,7 +71,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Get unpartitioned mesh
-  auto umesh = mesh_handler->unpartitionedmesh_stack.back();
+  auto umesh = mesh_handler.unpartitionedmesh_stack.back();
 
   chi_log.Log(LOG_0) << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
@@ -110,7 +110,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   chi_log.Log(LOG_0) << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
-  AddContinuumToRegion(grid, *mesh_handler->region_stack.back());
+  AddContinuumToRegion(grid, *mesh_handler.region_stack.back());
 
 
   //======================================== Concluding messages

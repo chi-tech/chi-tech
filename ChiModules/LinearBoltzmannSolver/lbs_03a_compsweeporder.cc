@@ -34,8 +34,8 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
   groupset.sweep_orderings.clear();
   groupset.sweep_orderings.shrink_to_fit();
 
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-  auto mesher = mesh_handler->volume_mesher;
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
+  auto mesher = mesh_handler.volume_mesher;
 
   const auto parmetis_partitioning = chi_mesh::VolumeMesher::PartitionType::PARMETIS;
 
@@ -103,7 +103,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
       << chi_program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Polar";
 
-  const auto mesher = chi_mesh::GetCurrentHandler()->volume_mesher;
+  const auto mesher = chi_mesh::GetCurrentHandler().volume_mesher;
 
   if (options.geometry_type == GeometryType::ONED_SLAB ||
       options.geometry_type == GeometryType::TWOD_CARTESIAN ||

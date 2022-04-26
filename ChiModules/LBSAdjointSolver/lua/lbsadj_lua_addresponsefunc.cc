@@ -38,10 +38,10 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
 
   auto solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
 
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
 
   chi_mesh::LogicalVolume* logical_volume;
-  try {logical_volume = mesh_handler->logicvolume_stack.at(logvol_handle);}
+  try {logical_volume = mesh_handler.logicvolume_stack.at(logvol_handle);}
   catch (const std::out_of_range& oor)
   {throw std::invalid_argument(fname + ": Invalid handle to logical volume.");}
 

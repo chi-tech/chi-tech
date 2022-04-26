@@ -21,10 +21,10 @@ int chiSurfaceMesherExecute(lua_State *L)
 {
   int numArgs = lua_gettop(L);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   chi_log.Log(LOG_ALLVERBOSE_2) << "Executing surface mesher\n";
 
-  if (cur_hndlr->surface_mesher == nullptr)
+  if (cur_hndlr.surface_mesher == nullptr)
   {
     chi_log.Log(LOG_ALLERROR)
       << __FUNCTION__ << ": called without a surface mesher set. Make a "
@@ -32,13 +32,13 @@ int chiSurfaceMesherExecute(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  cur_hndlr->surface_mesher->Execute();
+  cur_hndlr.surface_mesher->Execute();
 
   bool export_load_balance = false;
   if (numArgs==1) export_load_balance = lua_toboolean(L,1);
 
   if (export_load_balance)
-    cur_hndlr->surface_mesher->PrintLoadBalanceInfo();
+    cur_hndlr.surface_mesher->PrintLoadBalanceInfo();
 
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiSurfaceMesherExecute: Surface mesher execution completed."

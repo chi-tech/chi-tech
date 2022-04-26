@@ -25,7 +25,7 @@ int chiDecomposeSurfaceMeshPxPy(lua_State *L)
     LuaPostArgAmountError("chiDecomposeSurfaceMeshPxPy",3,num_args);
 
   //================================================== Get current handler
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //================================================== Extract arguments
   int surface_hndl = lua_tonumber(L,1);
@@ -35,7 +35,7 @@ int chiDecomposeSurfaceMeshPxPy(lua_State *L)
 
   chi_mesh::SurfaceMesh* surf_mesh;
   try{
-    surf_mesh = cur_hndlr->surface_mesh_stack.at(surface_hndl);
+    surf_mesh = cur_hndlr.surface_mesh_stack.at(surface_hndl);
   }
   catch(const std::invalid_argument& ia)
   {

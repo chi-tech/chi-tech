@@ -24,9 +24,9 @@ Properties:\n
 \author Jan*/
 int chiSurfaceMesherSetProperty(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
-  chi_mesh::SurfaceMesher* surf_mesher = cur_hndlr->surface_mesher;
+  chi_mesh::SurfaceMesher* surf_mesher = cur_hndlr.surface_mesher;
 
   //================================================== Get property number
   int property_num = lua_tonumber(L,1);

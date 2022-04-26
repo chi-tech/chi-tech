@@ -19,12 +19,12 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiSurfaceMeshCreate(lua_State *L)
 {
-  auto cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   auto new_mesh = new chi_mesh::SurfaceMesh;
 
-  cur_hndlr->surface_mesh_stack.push_back(new_mesh);
+  cur_hndlr.surface_mesh_stack.push_back(new_mesh);
 
-  int index = cur_hndlr->surface_mesh_stack.size()-1;
+  int index = cur_hndlr.surface_mesh_stack.size()-1;
   lua_pushnumber(L,index);
 
   chi_log.Log(LOG_ALLVERBOSE_2) << "chiSurfaceMeshCreate: "
@@ -104,10 +104,10 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
     chi_mesh::SurfaceMesh::CreateFromDivisions(values_x,values_y);
 
   //============================================= Push to stack
-  auto cur_hndlr = chi_mesh::GetCurrentHandler();
-  cur_hndlr->surface_mesh_stack.push_back(surface_mesh);
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+  cur_hndlr.surface_mesh_stack.push_back(surface_mesh);
 
-  int index = cur_hndlr->surface_mesh_stack.size()-1;
+  int index = cur_hndlr.surface_mesh_stack.size()-1;
   lua_pushnumber(L,index);
 
   chi_log.Log(LOG_ALLVERBOSE_2)

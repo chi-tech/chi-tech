@@ -32,7 +32,7 @@ int chiLineMeshCreateFromArray(lua_State *L)
   if (num_args != 1)
     LuaPostArgAmountError("chiLineMeshCreateFromTable",1,num_args);
 
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Create LineMesh
   auto new_line = new chi_mesh::LineMesh;
@@ -105,9 +105,9 @@ int chiLineMeshCreateFromArray(lua_State *L)
   }
 
   //============================================= Add to handler
-  cur_hndlr->linemesh_stack.push_back(new_line);
+  cur_hndlr.linemesh_stack.push_back(new_line);
 
-  int index = cur_hndlr->linemesh_stack.size()-1;
+  int index = cur_hndlr.linemesh_stack.size()-1;
   lua_pushnumber(L,index);
 
   chi_log.Log(LOG_ALLVERBOSE_2)

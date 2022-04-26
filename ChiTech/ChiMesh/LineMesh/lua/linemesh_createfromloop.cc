@@ -22,14 +22,14 @@ extern ChiLog&  chi_log;
 \author Jan*/
 int chiLineMeshCreateFromLoop(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get the loop collection
   int loop_coll_index = lua_tonumber(L,1);
 
   chi_mesh::EdgeLoopCollection* cur_coll;
   try{
-    cur_coll = cur_hndlr->edge_loop_collections.at(loop_coll_index);
+    cur_coll = cur_hndlr.edge_loop_collections.at(loop_coll_index);
   }
   catch(const std::out_of_range& o)
   {
@@ -72,9 +72,9 @@ int chiLineMeshCreateFromLoop(lua_State *L)
   new_line->vertices.push_back(vf);
 
   //============================================= Add to handler
-  cur_hndlr->linemesh_stack.push_back(new_line);
+  cur_hndlr.linemesh_stack.push_back(new_line);
 
-  int index = cur_hndlr->linemesh_stack.size()-1;
+  int index = cur_hndlr.linemesh_stack.size()-1;
   lua_pushnumber(L,index);
 
   chi_log.Log(LOG_ALLVERBOSE_2)

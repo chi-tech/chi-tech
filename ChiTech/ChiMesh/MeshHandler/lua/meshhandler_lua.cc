@@ -47,7 +47,7 @@ int chiMeshHandlerSetCurrent(lua_State *L)
 
   int handle = lua_tonumber(L,1);
 
-  if ((handle < 0) or (handle >= ChiTech::meshhandler_stack.size()))
+  if ((handle < 0) or (handle >= chi::meshhandler_stack.size()))
   {
     chi_log.Log(LOG_ALLERROR)
       << "Invalid handle to mesh handler specified "
@@ -55,7 +55,7 @@ int chiMeshHandlerSetCurrent(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  ChiTech::current_mesh_handler = handle;
+  chi::current_mesh_handler = handle;
 
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiMeshHandlerSetCurrent: set to " << handle;

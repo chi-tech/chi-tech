@@ -108,13 +108,13 @@ int chiVolumeMesherCreate(lua_State *L)
     const auto UNPART_MESH_TEMPLATE =
       chi_mesh::VolumeMesherExtruder::TemplateType::UNPARTITIONED_MESH;
 
-    auto handler = chi_mesh::GetCurrentHandler();
+    auto& handler = chi_mesh::GetCurrentHandler();
 
     if      (template_type == (int)SURFACE_MESH_TEMPLATE)
     {
       chi_mesh::SurfaceMesh* surfaceMesh;
       try {
-        surfaceMesh = handler->surface_mesh_stack.at(template_handle);
+        surfaceMesh = handler.surface_mesh_stack.at(template_handle);
       }
       catch (const std::out_of_range& o)
       {
@@ -130,7 +130,7 @@ int chiVolumeMesherCreate(lua_State *L)
     {
       chi_mesh::UnpartitionedMesh* unpartitionedMesh;
       try {
-        unpartitionedMesh = handler->unpartitionedmesh_stack.at(template_handle);
+        unpartitionedMesh = handler.unpartitionedmesh_stack.at(template_handle);
       }
       catch (const std::out_of_range& o)
       {
@@ -164,8 +164,8 @@ int chiVolumeMesherCreate(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  auto cur_hndlr = chi_mesh::GetCurrentHandler();
-  cur_hndlr->volume_mesher = new_mesher;
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+  cur_hndlr.volume_mesher = new_mesher;
 
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiVolumeMesherCreate: Volume mesher created."

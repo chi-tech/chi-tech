@@ -23,7 +23,7 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiSurfaceMeshImportFromOBJFile(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get arguments
   int num_args = lua_gettop(L);
@@ -39,7 +39,7 @@ int chiSurfaceMeshImportFromOBJFile(lua_State *L)
   }
 
   try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr->surface_mesh_stack.at(handle);
+    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
     std::stringstream outtext;
     outtext << "chiSurfaceMeshImportFromOBJFile: "
                  "Loading Wavefront .obj file: ";
@@ -70,7 +70,7 @@ int chiSurfaceMeshImportFromOBJFile(lua_State *L)
 \author Jan*/
 int chiSurfaceMeshImportFromTriangleFiles(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get arguments
   int num_args = lua_gettop(L);
@@ -86,7 +86,7 @@ int chiSurfaceMeshImportFromTriangleFiles(lua_State *L)
   }
 
   try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr->surface_mesh_stack.at(handle);
+    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
     std::stringstream outtext;
     outtext << "chiSurfaceMeshImportFromTriangleFiles: "
                "Loading Wavefront .obj file: ";
@@ -105,7 +105,7 @@ int chiSurfaceMeshImportFromTriangleFiles(lua_State *L)
 
 int chiSurfaceMeshImportFromMshFiles(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get arguments
   int num_args = lua_gettop(L);
@@ -121,7 +121,7 @@ int chiSurfaceMeshImportFromMshFiles(lua_State *L)
   }
 
   try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr->surface_mesh_stack.at(handle);
+    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
     std::stringstream outtext;
     outtext << "chiSurfaceMeshImportFromMshFiles: "
                "Loading a gmsh ascii file: ";

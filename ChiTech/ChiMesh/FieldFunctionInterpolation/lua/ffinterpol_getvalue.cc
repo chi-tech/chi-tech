@@ -31,11 +31,11 @@ int chiFFInterpolationGetValue(lua_State *L)
     LuaPostArgAmountError("chiFFInterpolationGetValue",1,num_args);
 
   //================================================== Get handle to field function
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   int ffihandle = lua_tonumber(L,1);
   chi_mesh::FieldFunctionInterpolation* cur_ffi;
   try {
-    cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
+    cur_ffi = cur_hndlr.ffinterpolation_stack.at(ffihandle);
   }
   catch(const std::out_of_range& o)
   {

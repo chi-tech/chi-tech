@@ -25,7 +25,7 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   }
 
   //======================================== Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Reorient 1D verts along z
   std::vector<double> distances;
@@ -74,18 +74,18 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler->unpartitionedmesh_stack.push_back(umesh);
+  handler.unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create region
   auto region = new chi_mesh::Region;
 
-  handler->region_stack.push_back(region);
+  handler.region_stack.push_back(region);
 
   //======================================== Create meshers
-  handler->surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler->volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
+  handler.volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
 
-  handler->surface_mesher->Execute();
+  handler.surface_mesher->Execute();
 }
 
 //###################################################################
@@ -114,7 +114,7 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
   }
 
   //======================================== Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
@@ -168,18 +168,18 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler->unpartitionedmesh_stack.push_back(umesh);
+  handler.unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create region
   auto region = new chi_mesh::Region;
 
-  handler->region_stack.push_back(region);
+  handler.region_stack.push_back(region);
 
   //======================================== Create meshers
-  handler->surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler->volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
+  handler.volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
 
-  handler->surface_mesher->Execute();
+  handler.surface_mesher->Execute();
 }
 
 //###################################################################
@@ -212,7 +212,7 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
   }
 
   //======================================== Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
@@ -339,16 +339,16 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler->unpartitionedmesh_stack.push_back(umesh);
+  handler.unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create region
   auto region = new chi_mesh::Region;
 
-  handler->region_stack.push_back(region);
+  handler.region_stack.push_back(region);
 
   //======================================== Create meshers
-  handler->surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler->volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
+  handler.volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
 
-  handler->surface_mesher->Execute();
+  handler.surface_mesher->Execute();
 }

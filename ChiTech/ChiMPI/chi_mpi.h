@@ -4,8 +4,6 @@
 #include <mpi.h>
 #include "../ChiMesh/chi_mesh.h"
 
-#include "chi_runtime.h"
-
 //################################################################### Class def
 /**Simple implementation a communicator set.*/
 class ChiMPICommunicatorSet
@@ -33,19 +31,31 @@ class ChiMPI
 private:
   int m_location_id = 0;
   int m_process_count = 1;
+
+  bool m_location_id_set = false;
+  bool m_process_count_set = false;
+
 public:
   const int& location_id = m_location_id;
   const int& process_count = m_process_count;
 
-
 private:
   static ChiMPI instance;
-  friend int ChiTech::Initialize(int argc, char **argv);
+  ChiMPI() = default;
 
-  ChiMPI() noexcept {}
-  void SetLocationID(int in_location_id) {m_location_id = in_location_id;}
-  void SetProcessCount(int in_process_count) {m_process_count = in_process_count;}
 public:
+  void SetLocationID(int in_location_id)
+  {
+    if (not m_location_id_set)
+      m_location_id = in_location_id;
+    m_location_id_set = true;
+  }
+  void SetProcessCount(int in_process_count)
+  {
+    if (not m_process_count_set)
+      m_process_count = in_process_count;
+    m_process_count_set = true;
+  }
   static ChiMPI& GetInstance() noexcept {return instance;}
 };
 
