@@ -105,18 +105,9 @@
 //      RegisterConstant(SURFACEMESHER_PREDEFINED,   1);
 //      RegisterConstant(SURFACEMESHER_DELAUNAY,   2);
 
-//    RegisterNamespace(SurfaceMesherType) //TODO: Remove
-//    AddNamedConstantToNamespace(Passthrough,1,SurfaceMesherType) //TODO: Remove
-//    AddNamedConstantToNamespace(Delaunay,2,SurfaceMesherType) //TODO: Remove
-
-
 //    RegisterFunction(chiSurfaceMesherExecute)
 //    RegisterFunction(chiSurfaceMesherSetProperty)
 //      RegisterConstant(MAX_AREA,   1);
-//      RegisterConstant(PARTITION_X,   2);
-//      RegisterConstant(PARTITION_Y,   3);
-//      RegisterConstant(CUT_X,   4);
-//      RegisterConstant(CUT_Y,   5);
 //  VolumeMesher
 //    RegisterFunction(chiVolumeMesherCreate)
 //      RegisterConstant(VOLUMEMESHER_EXTRUDER,     4);

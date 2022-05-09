@@ -4,7 +4,6 @@
 #include "ChiMesh/UnpartitionedMesh/lua/unpartition_mesh_lua_utils.h"
 #include "ChiMesh/LogicalVolume/lua/logicvolume_lua.h"
 #include "ChiMesh/MeshHandler/lua/meshhandler_lua.h"
-#include "ChiMesh/Region/lua/region_lua.h"
 #include "ChiMesh/SurfaceMesher/lua/surfmesher_lua.h"
 #include "ChiMesh/VolumeMesher/lua/volumemesher_lua.h"
 #include "ChiMesh/DomainDecomposition/lua/domaindecomp_lua.h"
@@ -62,22 +61,12 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiMeshHandlerExportMeshToObj);
   LUA_FMACRO1(chiMeshHandlerExportMeshToVTK);
 
-  //=================================== Region
-  LUA_FMACRO1(chiRegionExportMeshToObj);
-  LUA_FMACRO1(chiRegionExportMeshToVTK);
-
   //=================================== Surface Mesher
   LUA_FMACRO1(chiSurfaceMesherCreate);
     LUA_CMACRO1(SURFACEMESHER_PREDEFINED, 1);
-//    LUA_CMACRO1(SURFACEMESHER_DELAUNAY  , 2);
   LUA_FMACRO1(chiSurfaceMesherExecute);
   LUA_FMACRO1(chiSurfaceMesherSetProperty);
     LUA_CMACRO1(MAX_AREA   , 1);
-//    LUA_CMACRO1(PARTITION_X, 2);
-//    LUA_CMACRO1(PARTITION_Y, 3);
-//    LUA_CMACRO1(CUT_X      , 4);
-//    LUA_CMACRO1(CUT_Y      , 5);
-//  LUA_FMACRO1(chiSurfaceMesherExportToObj);
 
   //=================================== Volume Mesher
   LUA_FMACRO1(chiVolumeMesherCreate);
