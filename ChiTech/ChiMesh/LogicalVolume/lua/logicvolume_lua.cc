@@ -8,9 +8,6 @@
 
 extern ChiLog& chi_log;
 
-/** \defgroup LuaLogicVolumes Logical Volumes
- * \ingroup LuaMesh*/
-
 //###################################################################
 /** Creates a logical volume.
 

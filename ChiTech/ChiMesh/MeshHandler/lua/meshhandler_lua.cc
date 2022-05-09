@@ -6,11 +6,6 @@
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
-
-/** \defgroup LuaMeshHandler Mesh Handler
- * \ingroup LuaMesh
-*/
-
 #include <iostream>
 
 //#############################################################################

@@ -7,7 +7,7 @@ extern ChiLog& chi_log;
 
 
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
- *\ingroup LuaPhysicsMaterials
+ *\ingroup LuaPhysics
  *
  * An example Chi-Tech cross-section file is shown below. The bare-bones
  * format is shown below with more examples below:

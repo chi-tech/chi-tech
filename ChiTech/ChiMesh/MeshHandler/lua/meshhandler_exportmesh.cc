@@ -11,6 +11,7 @@ extern ChiLog& chi_log;
 \param FileName char Name of the file to be used.
 \param ExportByMaterial bool Default: False. Flag indicating whether to export
                      the extruder's surface mesh by material.
+\ingroup LuaMeshHandler
 */
 int chiMeshHandlerExportMeshToObj(lua_State* L)
 {
@@ -38,6 +39,7 @@ int chiMeshHandlerExportMeshToObj(lua_State* L)
 //###################################################################
 /**Exports the mesh to a wavefront.obj format.
 \param FileName char Name of the file to be used.
+\ingroup LuaMeshHandler
 */
 int chiMeshHandlerExportMeshToVTK(lua_State* L)
 {

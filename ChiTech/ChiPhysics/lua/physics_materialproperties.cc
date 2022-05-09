@@ -691,7 +691,9 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
 
 
 //############################################################
-/**Set a cross section to a new value.*/
+/**Set a cross section to a new value.
+\ingroup LuaPhysicsMaterials
+ */
 int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L) {
   int num_args = lua_gettop(L);
 

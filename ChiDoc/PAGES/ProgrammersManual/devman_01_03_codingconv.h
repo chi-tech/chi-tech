@@ -6,7 +6,7 @@
  <a href="https://google.github.io/styleguide/cppguide.html">Google C++ style guide</a>.
  We now will dictate a few specific items. Refer to the image below for different
  text case-namings:
- \image html "Cases.png" "Different case names and how they look" width=150px
+ \image html "Cases.png" "Different case names and how they look" width=220px
  \n\n
  Let us say it here explicitly, <B>all variable-, function-, method- names should be descriptive</B>,
  avoid abbreviation, rather sacrifice horizontal space for readability.

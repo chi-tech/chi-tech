@@ -85,7 +85,7 @@ The underlying mesher for a 3D mesh is an extruded mesh from 2D. This mesh
 chiVolumeMesherExecute();
 \endcode
 
-## Step 5 - Assign material ID's
+## Step 5 - Assign material- and boundary IDs and
 
 Materials ID's can conveniently be specified using logical volumes. There are
 many options for logical volumes ranging from primitive parametric surfaces
@@ -116,11 +116,25 @@ Actually setting the mesh's material id's is a utility facilitated by a
  volume mesher property and hence we call chiVolumeMesherSetProperty()
  with a property index MATID_FROMLOGICAL. Next we provided a handle to the
  logical volume (vol0) and the desired material id. Logical volumes are very
- diverse and their uses are discussed elsewhere.
+ diverse and their uses are discussed elsewhere. There is an additional utility,
+ chiVolumeMesherSetMatIDToAll(), which will set all cell-material-ids without
+ requiring a logical volume, however, in this tutorial we opted to show the
+ logical volume route.
+
+### Boundary IDs
+By default all boundaries are unassigned (i.e., -1). There are two utilities
+ that set the boundary id's the first of which is essentially identical to how
+ material ids are set, chiVolumeMesherSetProperty(), but this time the property
+ index is BNDRYID_FROMLOGICAL. The second way is to use
+ chiVolumeMesherSetupOrthogonalBoundaries() which requires no arguments and will
+ asssign standard indices to a boundary if it is aligned with the orthogonal
+ cartesian directions.
 
 The culmination of this step is all done within a physics agnostic framework.
 The user can even export the mesh for visualization using the function
- chiRegionExportMeshToObj(). The extruded mesh is shown below:
+ chiMeshHandlerExportMeshToObj().
+
+### Boundary IDs
 
 
 ## Step 5 - Adding material properties
@@ -158,8 +172,7 @@ Material property values are set using the function
 The following sequence of function calls completely define the diffusion solver.
 
 \code
-phys1 = chiDiffusionCreateSolver();
-chiSolverAddRegion(phys1,region1)
+phys1 = chiDiffusionCreateSolver()
 chiSolverSetBasicOption(phys1,"discretization_method","PWLC")
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-6)
 \endcode
@@ -167,12 +180,9 @@ chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-6)
 We first create the diffusion solver with a call to
  chiDiffusionCreateSolver(). This creates the solver and pushes it onto
  the physics handler. The function returns the handle.
- We then add our mesh region to this solver using the function
- chiSolverAddRegion() which expects a handle to the reference solver
- followed by the handle to the relevant region.
 
 Next we can set numerous diffusion solver properties which can comprehensively
- viewed in its specific documentation (chiDiffusionSetProperty()).
+ be viewed in its specific documentation (chiDiffusionSetProperty()).
 
 ## Step 7 - Initialize and Solve
 
@@ -221,7 +231,7 @@ material = chiPhysicsAddMaterial("Test Material");
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,material)
 
-chiRegionExportMeshToVTK(region1,"Mesh")
+chiMeshHandlerExportMeshToVTK("Mesh")
 --############################################### Add material properties
 
 
@@ -234,8 +244,7 @@ chiPhysicsMaterialSetProperty(material,"q",SINGLE_VALUE,1.0)
 
 
 --############################################### Setup Physics
-phys1 = chiDiffusionCreateSolver();
-chiSolverAddRegion(phys1,region1)
+phys1 = chiDiffusionCreateSolver()
 chiSolverSetBasicOption(phys1,"discretization_method","PWLC");
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-6)
 
@@ -263,7 +272,7 @@ The output produced will look as follows:
 
 \verbatim
 [0]  Parsing argument 1 Tutorials/Tutorial01.lua
-[0]  2022-01-26 16:35:03 Running ChiTech in batch-mode with 1 processes.
+[0]  2022-05-09 14:01:21 Running ChiTech in batch-mode with 1 processes.
 [0]  ChiTech number of arguments supplied: 1
 [0]  Computing cell-centroids.
 [0]  Done computing cell-centroids.
@@ -278,78 +287,78 @@ The output produced will look as follows:
 [0]  00:00:00 Surpassing cell 16384 of 32768 (50%)
 [0]  00:00:00 Surpassing cell 19661 of 32768 (60%)
 [0]  00:00:00 Surpassing cell 22938 of 32768 (70%)
-[0]  00:00:01 Surpassing cell 26215 of 32768 (80%)
-[0]  00:00:01 Surpassing cell 29492 of 32768 (90%)
-[0]  00:00:01 Surpassing cell 32768 of 32768 (100%)
-[0]  00:00:01 Establishing cell boundary connectivity.
-[0]  00:00:01 Done establishing cell connectivity.
-[0]  00:00:01 VolumeMesherPredefinedUnpartitioned executing. Memory in use = 58.4766 MB
+[0]  00:00:00 Surpassing cell 26215 of 32768 (80%)
+[0]  00:00:00 Surpassing cell 29492 of 32768 (90%)
+[0]  00:00:00 Surpassing cell 32768 of 32768 (100%)
+[0]  00:00:00 Establishing cell boundary connectivity.
+[0]  00:00:00 Done establishing cell connectivity.
+[0]  00:00:00 VolumeMesherPredefinedUnpartitioned executing. Memory in use = 61 MB
 [0]  Computed centroids
 [0]  Partitioning mesh with ParMETIS.
 [0]  Done partitioning mesh.
 [0]  Cells loaded.
 [0]  VolumeMesherPredefinedUnpartitioned: Cells created = 32768
-[0]  00:00:01 chiVolumeMesherExecute: Volume meshing completed. Memory used = 42.9 MB
-[0]  Total process memory used after meshing 101 MB
-[0]  00:00:01 Setting material id from logical volume.
-[0]  00:00:01 Done setting material id from logical volume. Number of cells modified = 32768.
+[0]  00:00:00 chiVolumeMesherExecute: Volume meshing completed. Memory used = 43.5 MB
+[0]  Total process memory used after meshing 104 MB
+[0]  00:00:00 Setting material id from logical volume.
+[0]  00:00:00 Done setting material id from logical volume. Number of cells modified = 32768.
 [0]  Exporting mesh to VTK. 32768
 [0]  Done exporting mesh to VTK.
 [0]  Solver:DiffusionSolver option:discretization_method set to PWLC.
 [0]  Solver:DiffusionSolver option:residual_tolerance set to 1e-06.
 [0]
-[0]  00:00:01 DiffusionSolver: Initializing Diffusion solver
+[0]  00:00:00 DiffusionSolver: Initializing Diffusion solver
 [0]  Identifying unique boundary-ids.
 [0]  Max boundary id identified: 0
-[0]  00:00:01 Creating Piecewise Linear Continuous Finite Element spatial discretizaiton.
-[0]  00:00:18 Developing nodal ordering.
-[0]  00:00:18 Done creating Piecewise Linear Continuous Finite Element spatial discretizaiton.
+[0]  00:00:00 Creating Piecewise Linear Continuous Finite Element spatial discretizaiton.
+[0]  00:00:08 Developing nodal ordering.
+[0]  00:00:08 Done creating Piecewise Linear Continuous Finite Element spatial discretizaiton.
 [0]  DiffusionSolver: Global number of DOFs=35937
 [0]  Building sparsity pattern.
-[0]  00:00:21 DiffusionSolver: Diffusion Solver initialization time 19.1648
+[0]  00:00:09 DiffusionSolver: Diffusion Solver initialization time 8.76791
 [0]  Setting matrix preallocation.
-[0]  00:00:21 DiffusionSolver: Assembling A locally
-[0]  00:00:21 DiffusionSolver: Done Assembling A locally
-[0]  00:00:21 DiffusionSolver: Communicating matrix assembly
-[0]  00:00:21 DiffusionSolver: Assembling A globally
-[0]  00:00:21 DiffusionSolver: Diagonal check
+[0]  00:00:09 DiffusionSolver: Assembling A locally
+[0]  00:00:09 DiffusionSolver: Done Assembling A locally
+[0]  00:00:09 DiffusionSolver: Communicating matrix assembly
+[0]  00:00:09 DiffusionSolver: Assembling A globally
+[0]  00:00:09 DiffusionSolver: Diagonal check
 [0]  Number of mallocs used = 0
 [0]  Number of non-zeros allocated = 912673
 [0]  Number of non-zeros used = 759717
 [0]  Number of unneeded non-zeros = 152956
-[0]  00:00:21 DiffusionSolver: Assembling x and b
-[0]  00:00:21 DiffusionSolver: Solving system
-[0]  Diffusion iteration    0 - Residual 2.6521943e+02
-[0]  Iteration 0 Residual 265.219
-[0]  Diffusion iteration    1 - Residual 3.1006358e+01
-[0]  Iteration 1 Residual 31.0064
-[0]  Diffusion iteration    2 - Residual 4.0467778e+00
-[0]  Iteration 2 Residual 4.04678
-[0]  Diffusion iteration    3 - Residual 4.9168053e-01
-[0]  Iteration 3 Residual 0.491681
-[0]  Diffusion iteration    4 - Residual 5.5399515e-02
+[0]  00:00:09 DiffusionSolver: Assembling x and b
+[0]  00:00:09 DiffusionSolver: Solving system
+[0]  Diffusion iteration    0 - Residual 2.6521952e+02
+[0]  Iteration 0 Residual 265.22
+[0]  Diffusion iteration    1 - Residual 3.1006314e+01
+[0]  Iteration 1 Residual 31.0063
+[0]  Diffusion iteration    2 - Residual 4.0467718e+00
+[0]  Iteration 2 Residual 4.04677
+[0]  Diffusion iteration    3 - Residual 4.9168004e-01
+[0]  Iteration 3 Residual 0.49168
+[0]  Diffusion iteration    4 - Residual 5.5399485e-02
 [0]  Iteration 4 Residual 0.0553995
-[0]  Diffusion iteration    5 - Residual 7.3127782e-03
-[0]  Iteration 5 Residual 0.00731278
-[0]  Diffusion iteration    6 - Residual 1.3609942e-03
-[0]  Iteration 6 Residual 0.00136099
-[0]  Diffusion iteration    7 - Residual 1.7105417e-04
+[0]  Diffusion iteration    5 - Residual 7.3128018e-03
+[0]  Iteration 5 Residual 0.0073128
+[0]  Diffusion iteration    6 - Residual 1.3610040e-03
+[0]  Iteration 6 Residual 0.001361
+[0]  Diffusion iteration    7 - Residual 1.7105415e-04
 [0]  Iteration 7 Residual 0.000171054
-[0]  Diffusion iteration    8 - Residual 2.2641466e-05
-[0]  Iteration 8 Residual 2.26415e-05
-[0]  Diffusion iteration    9 - Residual 3.3728384e-06
-[0]  Iteration 9 Residual 3.37284e-06
-[0]  Diffusion iteration   10 - Residual 3.1009691e-07
-[0]  Iteration 10 Residual 3.10097e-07
+[0]  Diffusion iteration    8 - Residual 2.2641339e-05
+[0]  Iteration 8 Residual 2.26413e-05
+[0]  Diffusion iteration    9 - Residual 3.3728166e-06
+[0]  Iteration 9 Residual 3.37282e-06
+[0]  Diffusion iteration   10 - Residual 3.1009104e-07
+[0]  Iteration 10 Residual 3.10091e-07
 [0]  Convergence reason: KSP_CONVERGED_RTOL
-[0]  00:00:21 DiffusionSolver[g=0-0]: Number of iterations =10
+[0]  00:00:09 DiffusionSolver[g=0-0]: Number of iterations =10
 [0]  Timing:
-[0]  Assembling the matrix: 0.231278
-[0]  Solving the system   : 0.221738
+[0]  Assembling the matrix: 0.085187
+[0]  Solving the system   : 0.075084
 [0]  Diffusion Solver execution completed!
 [0]  Exporting field function phi to files with base name Tutorial1Output
-[0]  Final program time 00:00:23
-[0]  2022-01-26 16:35:27 ChiTech finished execution of Tutorials/Tutorial01.lua
+[0]  Final program time 00:00:10
+[0]  2022-05-09 14:01:32 ChiTech finished execution of Tutorials/Tutorial01.lua
 \endverbatim
 
 \image html "Meshing/CubeSolutionTut1.png"  "Figure 2 - Solution viewed in Paraview" width=700px

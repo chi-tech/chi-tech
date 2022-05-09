@@ -12,7 +12,7 @@ extern ChiLog     chi_log;
 
 \param SolverHandle int A handle to the reference solver.
 
- \ingroup LuaSolver */
+\ingroup LuaSolver */
 int chiGetFieldFunctionList(lua_State* L)
 {
   int num_args = lua_gettop(L);
@@ -64,7 +64,10 @@ int chiGetFieldFunctionList(lua_State* L)
 \return handle If the field-function was found and a handle identified the valid
                handle will be returned (i.e., a natural number >= 0). If the
                field-function by the given name was not found then the function
-               will return null.*/
+               will return null.
+
+\ingroup LuaFieldFunc
+ */
 int chiGetFieldFunctionHandleByName(lua_State* L)
 {
   const std::string fname = __FUNCTION__;

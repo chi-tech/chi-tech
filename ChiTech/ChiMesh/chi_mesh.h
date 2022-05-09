@@ -23,25 +23,13 @@ namespace chi_mesh
   struct Matrix3x3;
   struct TensorRank2Dim3;
 
-  struct Face;     //Triangle
+  struct Face;
   struct Edge;
-  struct EdgeLoop;
   struct PolyFace;
-
-  typedef Edge Line;
   typedef std::vector<Edge>      EdgeList;
-  typedef std::vector<EdgeLoop*> EdgeLoopCollection;
 
-  struct CellIndexMap;
-  typedef CellIndexMap NodeIndexMap;
 
-  struct CELL_SET;
-
-  struct SweepPlane;
   struct SPDS;
-
-  //=================================== Boundary
-  class Boundary;
 
   //=================================== Cells
   class Cell;
@@ -53,7 +41,6 @@ namespace chi_mesh
   class FieldFunctionInterpolationVolume;
 
   //=================================== Meshes
-  class LineMesh;
   class SurfaceMesh;
   class UnpartitionedMesh;
   class MeshContinuum;
@@ -70,18 +57,10 @@ namespace chi_mesh
   //=================================== Mesh handler
   class MeshHandler;
 
-  //=================================== Region
-  class Region;
-  class EmptyRegion;
-
   //=================================== Surface Meshers
   class SurfaceMesher;
   class SurfaceMesherPassthrough;
   class SurfaceMesherPredefined;
-  class SurfaceMesherDelaunay;
-  class SurfaceMesherTriangle;
-
-  struct Interface;
 
   //==================================== Volume meshers
   class VolumeMesher;
@@ -92,22 +71,14 @@ namespace chi_mesh
 
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ROUTINES
-
-  Boundary*              AssignSurfaceToBoundary(chi_mesh::SurfaceMesh* surface);
   MeshHandler&           GetCurrentHandler();
   size_t                 PushNewHandlerAndGetIndex();
-  MeshHandler&           GetNewHandler();
-  EdgeLoopCollection*    SplitEdgeLoopByAngle(EdgeLoop* input,double angle=1);
 
   //=================================== Domain decompositions
   double ComputeLBF(std::vector<Vector3>& points,
                     std::vector<double>& x_cuts,
                     std::vector<double>& y_cuts);
   void   DecomposeSurfaceMeshPxPy(SurfaceMesh* smesh, int Px, int Py);
-  void   SurfaceMeshImprintLine(SurfaceMesh* smesh,
-                                Vertex* line_point_0,
-                                Vertex* line_point_1,
-                                double tolerance);
 
   void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices_1d);
 
@@ -124,7 +95,6 @@ namespace chi_mesh
 #include "chi_meshtensor_rank2_dim3.h"
 #include "chi_meshface.h"
 #include "chi_mesh_edgeloops.h"
-#include "chi_mesh_interface.h"
 
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 

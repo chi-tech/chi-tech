@@ -6,12 +6,7 @@
 
 extern ChiLog&  chi_log;
 
-/** \defgroup LuaMeshMacros Mesh Macros
- * These functions are considered "macros" because they encapsulate
- * functionality available from lower level function calls.
- *
- * \ingroup LuaMesh
-*/
+
 
 //###################################################################
 /** Creates a 1D Mesh from an array of 1D vertices.

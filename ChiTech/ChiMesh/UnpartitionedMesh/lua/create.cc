@@ -3,10 +3,6 @@
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
-/** \defgroup LuaUnpartitionedMesh Unpartitioned Mesh-Reader
- * \ingroup LuaMesh
- */
-
 //###################################################################
 /**Creates an empty unpartitioned mesh. An empty unpartitioned mesh
  * is meant to be manipulated with calls to chiUnpartitionedMeshUploadVertex()

@@ -1,8 +1,6 @@
 #include "ChiMesh/chi_mesh.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/LineMesh/chi_linemesh.h"
-#include "ChiMesh/Boundary/chi_boundary.h"
 #include "ChiMesh/SurfaceMesher/PassThrough/surfmesher_passthrough.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 

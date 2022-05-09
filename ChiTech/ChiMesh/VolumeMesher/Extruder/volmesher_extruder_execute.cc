@@ -1,7 +1,7 @@
 #include "volmesher_extruder.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
-#include "ChiMesh/Boundary/chi_boundary.h"
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include "chi_log.h"

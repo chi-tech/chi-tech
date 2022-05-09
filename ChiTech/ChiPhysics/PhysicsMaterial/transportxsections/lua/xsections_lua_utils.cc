@@ -13,7 +13,7 @@ extern ChiLog& chi_log;
 /**Creates a stand-alone transport cross-section.
  *
  *
-\ingroup LuaPhysicsMaterials
+
 
 \code
 xs_grph_clean = chiPhysicsTransportXSCreate()
@@ -26,7 +26,8 @@ chiPhysicsMaterialSetProperty(materials[2],
 \endcode
  * \return Returns a handle to the cross-section.
  *
- * */
+\ingroup LuaTransportXSs
+ */
 int chiPhysicsTransportXSCreate(lua_State* L)
 {
   auto xs = std::make_shared<chi_physics::TransportCrossSections>();
@@ -100,7 +101,7 @@ chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
 \endcode
  *
  *
-\ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  * \return */
 int chiPhysicsTransportXSSet(lua_State* L)
 {
@@ -200,7 +201,7 @@ for i,v in pairs(xs) do
     print(i,v)
 end
 \endcode
- * */
+\ingroup LuaTransportXSs*/
 int chiPhysicsTransportXSGet(lua_State* L)
 {
   int num_args = lua_gettop(L);
@@ -266,7 +267,7 @@ chiPhysicsMaterialSetProperty(materials[1],
  \return Returns a handle to another cross-section object that contains the
          desired combination.
 
- \ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  */
 int chiPhysicsTransportXSMakeCombined(lua_State* L)
 {
@@ -366,7 +367,7 @@ chiPhysicsTransportXSSetCombined(xs_4,combo)
 
 \endcode
  *
- * \ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  * */
 int chiPhysicsTransportXSSetCombined(lua_State* L)
 {
@@ -450,7 +451,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 \param XS_handle int Handle to the cross-section to be exported.
 \param file_name string The name of the file to which the XS is to be exported.
 
-* \ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  */
 int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 {

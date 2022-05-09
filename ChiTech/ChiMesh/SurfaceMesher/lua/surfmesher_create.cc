@@ -1,15 +1,8 @@
 #include "../../../ChiLua/chi_lua.h"
 #include <iostream>
 #include "../Predefined/surfmesher_predefined.h"
-#include "../PassThrough/surfmesher_passthrough.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
-
-/** \defgroup LuaSurfaceMesher Surface Re-meshers
- * \ingroup LuaMesh
- *
- * chi_mesh::SurfaceMesherDelaunay
-*/
 
 #include <chi_log.h>
 

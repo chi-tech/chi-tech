@@ -6,9 +6,6 @@
 
 extern ChiLog& chi_log;
 
-/** \defgroup LuaLogging D Output and Logging
- * \ingroup LuaUtilities*/
-
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 #define LUA_CMACRO1(x,y) \
         lua_pushnumber(L, y); \

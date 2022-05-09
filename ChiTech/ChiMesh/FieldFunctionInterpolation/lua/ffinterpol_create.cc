@@ -5,10 +5,6 @@
 #include "../../FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
 #include "../../../ChiPhysics/chi_physics.h"
 
-/** \defgroup LuaFFInterpol Field Function Interpolation
- * \ingroup LuaMesh
-*/
-
 #include <chi_log.h>
 
 extern ChiLog& chi_log;

@@ -250,7 +250,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
 \param Px int Number partitions in x.
 \param Py int Number partitions in y.
 \param Pz int Number partitions in z.
-
+\ingroup LuaVolumeMesher
  */
 int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
 {
@@ -278,7 +278,9 @@ int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
 }
 
 //###################################################################
-/**Sets the x-cuts for KBA type partitioning with a lua array.*/
+/**Sets the x-cuts for KBA type partitioning with a lua array.
+\ingroup LuaVolumeMesher
+ */
 int chiVolumeMesherSetKBACutsX(lua_State *L)
 {
   int num_args = lua_gettop(L);
@@ -297,7 +299,9 @@ int chiVolumeMesherSetKBACutsX(lua_State *L)
 }
 
 //###################################################################
-/**Sets the y-cuts for KBA type partitioning with a lua array.*/
+/**Sets the y-cuts for KBA type partitioning with a lua array.
+\ingroup LuaVolumeMesher
+ */
 int chiVolumeMesherSetKBACutsY(lua_State *L)
 {
   int num_args = lua_gettop(L);
@@ -316,7 +320,9 @@ int chiVolumeMesherSetKBACutsY(lua_State *L)
 }
 
 //###################################################################
-/**Sets the z-cuts for KBA type partitioning with a lua array.*/
+/**Sets the z-cuts for KBA type partitioning with a lua array.
+\ingroup LuaVolumeMesher
+ */
 int chiVolumeMesherSetKBACutsZ(lua_State *L)
 {
   int num_args = lua_gettop(L);

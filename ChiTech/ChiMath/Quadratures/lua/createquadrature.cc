@@ -9,10 +9,6 @@ extern ChiMath&     chi_math_handler;
 
 extern ChiLog& chi_log;
 
-
-/**\defgroup LuaQuadrature Quadrature rules
- * \ingroup LuaMath*/
-
 //########################################################## Create empty system
 /** Creates a quadrature.
  *

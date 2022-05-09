@@ -26,8 +26,6 @@ public:
   VertexHandler                  vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
-  chi_mesh::SurfaceMesh*         surface_mesh;
-  chi_mesh::LineMesh*            line_mesh;
   std::vector<uint64_t>          local_cell_glob_indices;
 
 private:
@@ -49,8 +47,6 @@ public:
           global_cell_id_to_native_id_map,
           global_cell_id_to_foreign_id_map)
   {
-    surface_mesh = nullptr;
-    line_mesh    = nullptr;
   }
 
   void SetGlobalVertexCount(const uint64_t count) {global_vertex_count = count;}
