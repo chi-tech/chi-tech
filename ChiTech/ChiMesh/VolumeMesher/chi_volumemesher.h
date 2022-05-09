@@ -32,10 +32,11 @@ namespace chi_mesh
 /**Parent volume mesher class.*/
 class chi_mesh::VolumeMesher
 {
+private:
+  chi_mesh::MeshContinuumPtr m_grid;
 public:
   enum PartitionType
   {
-//    KBA_STYLE_XY  = 1,
     KBA_STYLE_XYZ = 2,
     PARMETIS      = 3
   };
@@ -55,13 +56,11 @@ public:
   VOLUME_MESHER_OPTIONS options;
 public:
   //01 Utils
-  static
-  void AddContinuumToRegion(MeshContinuumPtr& grid, Region& region);
-  static
-  void CreatePolygonCells(chi_mesh::SurfaceMesh* surface_mesh,
-                          chi_mesh::MeshContinuumPtr& vol_continuum,
-                          bool delete_surface_mesh_elements=false,
-                          bool force_local=false);
+//  static
+//  void AddContinuumToRegion(MeshContinuumPtr& grid, Region& region);
+  void SetContinuum(MeshContinuumPtr& grid);
+  MeshContinuumPtr& GetContinuum();
+
   static
   void CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
                           chi_mesh::MeshContinuumPtr& grid);

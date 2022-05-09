@@ -42,8 +42,7 @@ chiPhysicsMaterialAddProperty(materials[0],SCALAR_VALUE)
 chiPhysicsMaterialSetProperty(materials[0],SCALAR_VALUE,SINGLE_VALUE,1.0)
 
 --############################################### Setup Physics
-phys1 = chiDiffusionCreateSolver();
-chiSolverAddRegion(phys1,region1)
+phys1 = chiDiffusionCreateSolver()
 chiSolverSetBasicOption(phys1,"discretization_method","PWLC")
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-4)
 

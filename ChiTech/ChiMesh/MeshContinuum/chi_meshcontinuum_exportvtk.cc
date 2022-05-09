@@ -3,6 +3,7 @@
 #include "ChiMesh/Cell/cell.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;

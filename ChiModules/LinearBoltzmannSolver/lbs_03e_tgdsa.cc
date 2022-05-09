@@ -44,7 +44,6 @@ void lbs::SteadySolver::InitTGDSA(LBSGroupset& groupset)
     auto dsolver = new chi_diffusion::Solver(solver_name);
     groupset.tgdsa_solver = dsolver;
 
-    dsolver->regions.push_back(this->regions.back());
     dsolver->discretization = discretization;
 
     dsolver->basic_options["discretization_method"].SetStringValue("PWLD_MIP");

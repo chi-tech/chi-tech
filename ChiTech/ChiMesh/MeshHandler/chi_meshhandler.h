@@ -14,7 +14,6 @@ public:
   typedef std::vector<chi_mesh::SurfaceMesh*> SurfaceMeshCollection;
   std::vector<SurfaceMeshCollection*>                surface_mesh_collections;
   std::vector<chi_mesh::SurfaceMesh*>                surface_mesh_stack;
-  std::vector<chi_mesh::Region*>                     region_stack;
   std::vector<chi_mesh::LineMesh*>                   linemesh_stack;
   std::vector<chi_mesh::LogicalVolume*>              logicvolume_stack;
   std::vector<chi_mesh::FieldFunctionInterpolation*> ffinterpolation_stack;
@@ -27,7 +26,7 @@ public:
 
 
 public:
-  chi_mesh::MeshContinuumPtr GetGrid(int region_index=-1);
+  chi_mesh::MeshContinuumPtr& GetGrid() const;
   MeshHandler() = default;
   MeshHandler(const MeshHandler&) = delete;
   MeshHandler& operator=(const MeshHandler&) = delete;

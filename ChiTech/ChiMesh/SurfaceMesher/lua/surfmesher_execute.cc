@@ -34,12 +34,6 @@ int chiSurfaceMesherExecute(lua_State *L)
 
   cur_hndlr.surface_mesher->Execute();
 
-  bool export_load_balance = false;
-  if (numArgs==1) export_load_balance = lua_toboolean(L,1);
-
-  if (export_load_balance)
-    cur_hndlr.surface_mesher->PrintLoadBalanceInfo();
-
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiSurfaceMesherExecute: Surface mesher execution completed."
     << std::endl;

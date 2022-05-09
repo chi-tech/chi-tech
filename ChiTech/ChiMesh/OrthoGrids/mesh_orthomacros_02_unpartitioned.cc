@@ -3,7 +3,6 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LineMesh/chi_linemesh.h"
 #include "ChiMesh/Boundary/chi_boundary.h"
-#include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/SurfaceMesher/PassThrough/surfmesher_passthrough.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
@@ -75,11 +74,6 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
   handler.unpartitionedmesh_stack.push_back(umesh);
-
-  //======================================== Create region
-  auto region = new chi_mesh::Region;
-
-  handler.region_stack.push_back(region);
 
   //======================================== Create meshers
   handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
@@ -169,11 +163,6 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
   handler.unpartitionedmesh_stack.push_back(umesh);
-
-  //======================================== Create region
-  auto region = new chi_mesh::Region;
-
-  handler.region_stack.push_back(region);
 
   //======================================== Create meshers
   handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
@@ -340,11 +329,6 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
   handler.unpartitionedmesh_stack.push_back(umesh);
-
-  //======================================== Create region
-  auto region = new chi_mesh::Region;
-
-  handler.region_stack.push_back(region);
 
   //======================================== Create meshers
   handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;

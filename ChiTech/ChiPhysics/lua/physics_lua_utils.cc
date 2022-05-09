@@ -37,7 +37,6 @@ chi_physics::Solver* chi_physics::lua_utils::
 void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   //=================================== Solver
-  LUA_FMACRO1(chiSolverAddRegion);
   LUA_FMACRO1(chiSolverInitialize);
   LUA_FMACRO1(chiSolverExecute);
   LUA_FMACRO1(chiSolverSetBasicOption);

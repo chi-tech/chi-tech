@@ -31,7 +31,7 @@ for d = 1, dim do
     nodes[d][i+1] = i*delta
   end
 end
-surf_mesh, region0 = chiMeshCreateUnpartitioned2DOrthoMesh(nodes[1], nodes[2])
+surf_mesh = chiMeshCreateUnpartitioned2DOrthoMesh(nodes[1], nodes[2])
 chiVolumeMesherSetProperty(PARTITION_TYPE, PARMETIS)
 chiVolumeMesherExecute()
 
@@ -62,7 +62,6 @@ chiPhysicsMaterialSetProperty(material0, ISOTROPIC_MG_SOURCE,
 --  physics
 --------------------------------------------------------------------------------
 phys0 = chiLBSCurvilinearCreateSolver(LBSCurvilinear.CYLINDRICAL)
-chiSolverAddRegion(phys0, region0)
 
 --  angular quadrature
 pquad = chiCreateCylindricalProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV, 4, 8)

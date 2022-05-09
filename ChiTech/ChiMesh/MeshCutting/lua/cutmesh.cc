@@ -44,7 +44,7 @@ int chiCutMesh(lua_State* L)
 
   auto& handler = chi_mesh::GetCurrentHandler();
 
-  auto grid = handler.GetGrid();
+  auto& grid = handler.GetGrid();
 
   chi_mesh::Vector3 p(p_raw[0],p_raw[1],p_raw[2]);
   chi_mesh::Vector3 n(n_raw[0],n_raw[1],n_raw[2]);

@@ -104,7 +104,6 @@ int chiVolumeMesherSetProperty(lua_State *L)
   else if (property_index == VMP::PARTITION_Y)
   {
     int p = lua_tonumber(L,2);
-    cur_hndlr.surface_mesher->partitioning_y = p;
     cur_hndlr.volume_mesher->options.partition_y = p;
     chi_log.Log(LOG_ALLVERBOSE_1)
       << "Partition y set to " << p;
@@ -112,7 +111,6 @@ int chiVolumeMesherSetProperty(lua_State *L)
   else if (property_index == VMP::PARTITION_X)
   {
     int p = lua_tonumber(L,2);
-    cur_hndlr.surface_mesher->partitioning_x = p;
     cur_hndlr.volume_mesher->options.partition_x = p;
     chi_log.Log(LOG_ALLVERBOSE_1)
       << "Partition x set to " << p;

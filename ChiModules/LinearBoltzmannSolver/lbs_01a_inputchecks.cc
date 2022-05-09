@@ -1,5 +1,7 @@
 #include "lbs_linear_boltzmann_solver.h"
 
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+
 #include <chi_log.h>
 
 extern ChiLog& chi_log;
@@ -38,14 +40,16 @@ void lbs::SteadySolver::PerformInputChecks()
       << "LinearBoltzmann::Solver: No discretization method set.";
     exit(EXIT_FAILURE);
   }
-  if (regions.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "LinearBoltzmann::Solver: No regions added to solver.";
-    exit(EXIT_FAILURE);
-  }
-  chi_mesh::Region*  aregion = regions.back();
-  grid                       = aregion->GetGrid();
+//  if (regions.empty())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "LinearBoltzmann::Solver: No regions added to solver.";
+//    exit(EXIT_FAILURE);
+//  }
+//  chi_mesh::Region*  aregion = regions.back();
+//  grid                       = aregion->GetGrid();
+
+  grid = chi_mesh::GetCurrentHandler().GetGrid();
 
   if (grid == nullptr)
   {

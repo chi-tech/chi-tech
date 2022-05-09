@@ -1,5 +1,7 @@
 #include "diffusion_solver.h"
 
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -10,18 +12,21 @@ extern ChiMPI& chi_mpi;
 /**Initialization of common to all solver types.*/
 void chi_diffusion::Solver::InitializeCommonItems()
 {
-  if (regions.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chi_diffusion::Solver::InitializeCommonItems: No region added to solver.";
-    exit(EXIT_FAILURE);
-  }
+//  if (regions.empty())
+//  {
+//    chi_log.Log(LOG_ALLERROR)
+//      << "chi_diffusion::Solver::InitializeCommonItems: No region added to solver.";
+//    exit(EXIT_FAILURE);
+//  }
+//
+//  auto& region = regions.back();
+//  grid = region->GetGrid();
 
-  auto& region = regions.back();
-  grid = region->GetGrid();
+  grid = chi_mesh::GetCurrentHandler().GetGrid();
 
-  if (grid == nullptr) throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
-                                              " No grid defined.");
+  if (grid == nullptr)
+    throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
+                           " No grid defined.");
 
   auto globl_unique_bndry_ids = grid->GetDomainUniqueBoundaryIDs();
 

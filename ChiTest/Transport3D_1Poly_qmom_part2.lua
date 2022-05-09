@@ -21,8 +21,6 @@ chiMeshHandlerCreate()
 unpart_mesh = chiUnpartitionedMeshFromWavefrontOBJ(
         "ChiResources/TestObjects/SquareMesh2x2Quads.obj")
 
-region1 = chiRegionCreate()
-
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
                       ExtruderTemplateType.UNPARTITIONED_MESH,
@@ -79,7 +77,6 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 --############################################### Setup Physics
 
 phys1 = chiLBSCreateSolver()
-chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}
@@ -176,5 +173,9 @@ if (chi_location_id == 0 and master_export == nil) then
     ----os.execute("python ZPFFI11.py")
     --local handle = io.popen("python ZPFFI00.py")
     print("Execution completed")
+end
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm Qmoms*")
 end
 

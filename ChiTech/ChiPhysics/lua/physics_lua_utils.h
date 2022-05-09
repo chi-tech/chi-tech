@@ -4,7 +4,6 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 #include "chi_lua.h"
 
-int chiSolverAddRegion(lua_State *L);
 int chiSolverInitialize(lua_State *L);
 int chiSolverExecute(lua_State *L);
 int chiSolverSetBasicOption(lua_State *L);

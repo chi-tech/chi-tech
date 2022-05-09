@@ -18,6 +18,25 @@
         lua_pop(this->consoleState,1);
 
 //#################################### MODULES
+//module:MPI Utilities
+//RegisterFunction(chiMPIBarrier)
+
+//module:Logging Utilities
+//RegisterFunction(chiLogSetVerbosity)
+//RegisterFunction(chiLog)
+//RegisterConstant(LOG_0,          1);
+//RegisterConstant(LOG_0WARNING,   2);
+//RegisterConstant(LOG_0ERROR,     3);
+//RegisterConstant(LOG_0VERBOSE_0, 4);
+//RegisterConstant(LOG_0VERBOSE_1, 5);
+//RegisterConstant(LOG_0VERBOSE_2, 6);
+//RegisterConstant(LOG_ALL,          7);
+//RegisterConstant(LOG_ALLWARNING,   8);
+//RegisterConstant(LOG_ALLERROR,     9);
+//RegisterConstant(LOG_ALLVERBOSE_0, 10);
+//RegisterConstant(LOG_ALLVERBOSE_1, 11);
+//RegisterConstant(LOG_ALLVERBOSE_2, 12);
+
 //module:Math Utilities
 //RegisterFunction(chiLegendre)
 //RegisterFunction(chiLegendreDerivative)
@@ -37,31 +56,25 @@
 //RegisterFunction(chiLocallyRefineSLDFESQAngularQuadrature)
 //RegisterFunction(chiPrintToPythonSLDFESQAngularQuadrature)
 
-//module:Mesh Macros
+//module:Orthogonal Meshes
 //RegisterFunction(chiMeshCreateUnpartitioned1DOrthoMesh)
 //RegisterFunction(chiMeshCreateUnpartitioned2DOrthoMesh)
 //RegisterFunction(chiMeshCreateUnpartitioned3DOrthoMesh)
 
-
-//module:Manual Unpartitioned Mesh
-//RegisterFunction(chiCreateEmptyUnpartitionedMesh)
-//RegisterFunction(chiDestroyUnpartitionedMesh)
-
+//module:Loading a Mesh from File
 //RegisterFunction(chiUnpartitionedMeshFromVTU)
 //RegisterFunction(chiUnpartitionedMeshFromEnsightGold)
 //RegisterFunction(chiUnpartitionedMeshFromWavefrontOBJ)
 //RegisterFunction(chiUnpartitionedMeshFromMshFormat)
 
+//module:Manual Unpartitioned Mesh
+//RegisterFunction(chiCreateEmptyUnpartitionedMesh)
 //RegisterFunction(chiUnpartitionedMeshUploadVertex)
 //RegisterFunction(chiUnpartitionedMeshUploadCell)
 //RegisterFunction(chiUnpartitionedMeshFinalizeEmpty)
+//RegisterFunction(chiDestroyUnpartitionedMesh)
 
-//module:Mesh Utilities
-//RegisterFunction(chiEdgeLoopSplitByAngle) //TODO: Remove
-//  LineMesh
-//    RegisterFunction(chiLineMeshCreateFromLoop) //TODO: Remove
-//    RegisterFunction(chiLineMeshCreateFromArray) //TODO: Remove
-//  Logical volumes
+//module:Logical Volumes
 //    RegisterFunction(chiLogicalVolumeCreate)
 //      RegisterConstant(SPHERE,   1);
 //      RegisterConstant(SPHERE_ORIGIN,   2);
@@ -69,33 +82,24 @@
 //      RegisterConstant(RCC,   4);
 //      RegisterConstant(SURFACE,   9);
 //      RegisterConstant(BOOLEAN,   10);
-//  Handler
+
+//module:Mesh Handler
 //    RegisterFunction(chiMeshHandlerCreate)
-//    RegisterFunction(chiMeshHandlerGetSurfaceFromCollection) //TODO: Remove
 //    RegisterFunction(chiMeshHandlerSetCurrent)
-//  Region
-//    RegisterFunction(chiRegionCreate)
-//    RegisterFunction(chiRegionAddSurfaceBoundary) //TODO: Remove
-//    RegisterFunction(chiRegionAddLineBoundary) //TODO: Remove
-//    RegisterFunction(chiRegionAddEmptyBoundary) //TODO: Remove
-//    RegisterFunction(chiRegionGetBoundarySurfaceMesh) //TODO: Remove
-//    RegisterFunction(chiRegionExportMeshToPython)
-//    RegisterFunction(chiRegionExportMeshToObj)
-//    RegisterFunction(chiRegionExportMeshToVTK)
-//  SurfaceMesh
+//    RegisterFunction(chiMeshHandlerExportMeshToObj)
+//    RegisterFunction(chiMeshHandlerExportMeshToVTK)
+
+
+//module:Surface Meshes
 //    RegisterFunction(chiSurfaceMeshCreate)
-//    RegisterFunction(chiSurfaceMeshCreateFromArrays) //TODO: Remove
 //    RegisterFunction(chiSurfaceMeshImportFromOBJFile)
 //    RegisterFunction(chiSurfaceMeshImportFromTriangleFiles)
-//    RegisterFunction(chiSurfaceMeshImportFromMshFiles) //TODO: Remove
 //    RegisterFunction(chiSurfaceMeshExportToObj)
 //    RegisterFunction(chiSurfaceMeshExportPolyFile)
-//    RegisterFunction(chiSurfaceMeshGetEdgeLoops) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshGetEdgeLoopsPoly) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshSplitByPatch) //TODO: Remove
-//    RegisterFunction(chiSurfaceMeshExtractOpenEdgesToObj) //TODO: Remove
 //    RegisterFunction(chiSurfaceMeshCheckCycles)
 //    RegisterFunction(chiComputeLoadBalancing)
+
+//module:Meshers
 //  SurfaceMesher
 //    RegisterFunction(chiSurfaceMesherCreate)
 //      RegisterConstant(SURFACEMESHER_PREDEFINED,   1);
@@ -113,7 +117,6 @@
 //      RegisterConstant(PARTITION_Y,   3);
 //      RegisterConstant(CUT_X,   4);
 //      RegisterConstant(CUT_Y,   5);
-//    RegisterFunction(chiSurfaceMesherExportToObj)
 //  VolumeMesher
 //    RegisterFunction(chiVolumeMesherCreate)
 //      RegisterConstant(VOLUMEMESHER_EXTRUDER,     4);
@@ -152,15 +155,18 @@
 //      AddNamedConstantToNamespace(ZMAX,4,OrthoBoundaryID)
 //      AddNamedConstantToNamespace(ZMIN,5,OrthoBoundaryID)
 
-
-
-
-
-//  Domain Decomposition
-//    Register--Function(chiDomDecompose2D) //TODO: Remove
+//module:Experimental
 //    RegisterFunction(chiDecomposeSurfaceMeshPxPy)
 //    RegisterFunction(chiCutMesh)
 //    RegisterFunction(chiCountMeshInLogicalVolume)
+
+//module:Field-functions
+//RegisterFunction(chiGetFieldFunctionHandleByName)
+//RegisterFunction(chiGetFieldFunctionList)
+//RegisterFunction(chiExportFieldFunctionToVTK)
+//RegisterFunction(chiExportFieldFunctionToVTKG)
+//RegisterFunction(chiExportMultiFieldFunctionToVTK)
+
 //module:Field-function Manipulation
 //    RegisterFunction(chiFFInterpolationCreate)
 //      RegisterConstant(SLICE,   1);
@@ -189,28 +195,7 @@
 //    RegisterFunction(chiFFInterpolationExportPython)
 //    RegisterFunction(chiFFInterpolationGetValue)
 
-
-//module:MPI Utilities
-//RegisterFunction(chiMPIBarrier)
-
-//module:Logging Utilities
-//RegisterFunction(chiLogSetVerbosity)
-//RegisterFunction(chiLog)
-//RegisterConstant(LOG_0,          1);
-//RegisterConstant(LOG_0WARNING,   2);
-//RegisterConstant(LOG_0ERROR,     3);
-//RegisterConstant(LOG_0VERBOSE_0, 4);
-//RegisterConstant(LOG_0VERBOSE_1, 5);
-//RegisterConstant(LOG_0VERBOSE_2, 6);
-//RegisterConstant(LOG_ALL,          7);
-//RegisterConstant(LOG_ALLWARNING,   8);
-//RegisterConstant(LOG_ALLERROR,     9);
-//RegisterConstant(LOG_ALLVERBOSE_0, 10);
-//RegisterConstant(LOG_ALLVERBOSE_1, 11);
-//RegisterConstant(LOG_ALLVERBOSE_2, 12);
-
 //module:Physics Utilities
-//RegisterFunction(chiSolverAddRegion)
 //RegisterFunction(chiSolverInitialize)
 //RegisterFunction(chiSolverExecute)
 //RegisterFunction(chiSolverSetBasicOption)
@@ -220,12 +205,6 @@
 //RegisterFunction(chiPhysicsMaterialSetProperty)
 //RegisterFunction(chiPhysicsMaterialGetProperty)
 //RegisterFunction(chiPhysicsMaterialModifyTotalCrossSection)
-
-//RegisterFunction(chiGetFieldFunctionHandleByName)
-//RegisterFunction(chiGetFieldFunctionList)
-//RegisterFunction(chiExportFieldFunctionToVTK)
-//RegisterFunction(chiExportFieldFunctionToVTKG)
-//RegisterFunction(chiExportMultiFieldFunctionToVTK)
 
 //module:Transport interaction cross-sections
 //\ref ChiXSFile Chi-Tech native cross-section file format

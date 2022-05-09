@@ -40,8 +40,7 @@ int chiFFInterpolationExportPython(lua_State* L)
 
   if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationSlice))
   {
-    chi_mesh::FieldFunctionInterpolationSlice* cur_ffi_slice =
-      (chi_mesh::FieldFunctionInterpolationSlice*)cur_ffi;
+    auto cur_ffi_slice = (chi_mesh::FieldFunctionInterpolationSlice*)cur_ffi;
 
     std::string base_name = std::string("ZPFFI") + std::to_string(ffihandle);
     if (num_args==2)
@@ -55,8 +54,7 @@ int chiFFInterpolationExportPython(lua_State* L)
 
   if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationLine))
   {
-    chi_mesh::FieldFunctionInterpolationLine* cur_ffi_line =
-      (chi_mesh::FieldFunctionInterpolationLine*)cur_ffi;
+    auto cur_ffi_line = (chi_mesh::FieldFunctionInterpolationLine*)cur_ffi;
 
     std::string base_name = std::string("ZLFFI") + std::to_string(ffihandle);
     if (num_args==2)

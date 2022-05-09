@@ -2,7 +2,6 @@
 #include <iostream>
 #include "../Predefined/surfmesher_predefined.h"
 #include "../PassThrough/surfmesher_passthrough.h"
-#include "../Delaunay/delaunay_mesher.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
 
@@ -19,28 +18,19 @@ extern ChiLog& chi_log;
 //#############################################################################
 /** Creates a surface preprocessor.
  *
-\param Type int Surface Remesher type. See SurfaceMesherType.
+\param SurfaceMesherType int Surface Remesher type. See SurfaceMesherType.
 
 ## _
 
 ###SurfaceMesherType:\n
-SurfaceMesherType.Passthrough\n
+SURFACEMESHER_PREDEFINED\n
  Makes no modification to the region surfaces.\n\n
 
 \code
-chiSurfaceMesherCreate(SurfaceMesherType.Passthrough)
+chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
 \endcode
 
-SurfaceMesherType.Delaunay:\n
- Experimental. Performs a Delaunay triangulation of the region surfaces.
-
 ## _
-
-### Legacy
-
- SURFACEMESHER_PREDEFINED = No remeshing is performed.\n
- SURFACEMESHER_DELAUNAY   = Delaunay surface remesher.\n
- SURFACEMESHER_TRIANGLE   = Triangle surface remesher.
 
 \ingroup LuaSurfaceMesher
 \author Jan*/
@@ -54,18 +44,10 @@ int chiSurfaceMesherCreate(lua_State *L)
 
   //============================================= Create the surface mesher
   chi_mesh::SurfaceMesher* new_mesher;
-  if (type==(int)chi_mesh::SurfaceMesherType::Passthrough)
+  if (type==(int)chi_mesh::SurfaceMesherType::Predefined)
   {
     new_mesher = new chi_mesh::SurfaceMesherPredefined;
   }
-  else if (type==(int)chi_mesh::SurfaceMesherType::Delaunay)
-  {
-    new_mesher = new chi_mesh::SurfaceMesherDelaunay;
-  }
-//  else if (type==3)
-//  {
-//    new_mesher = new chi_mesh::SurfaceMesherTriangle;
-//  }
   else
   {
     std::cerr << "ERROR: Illegal surface mesher specified"

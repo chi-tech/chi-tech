@@ -13,51 +13,6 @@ extern ChiLog& chi_log;
  * \ingroup LuaPhysics*/
 
 //#############################################################################
-/** Adds a region to a solver.
- *
-\param solver_handle int Handle to the solver.
-\param region_handle int Handle to the region.
-
-\ingroup LuaSolver
-\author Jan*/
-int chiSolverAddRegion(lua_State *L)
-{
-  const std::string fname = __FUNCTION__;
-  const int num_args = lua_gettop(L);
-
-  if (num_args != 2)
-    LuaPostArgAmountError(fname, 2, num_args);
-
-  // Please note that we allow pretty much anything
-  // for the region handle, including nil and a string.
-  // This is because the handle's validity is checked
-  // separately.
-
-  LuaCheckNilValue(fname, L, 1);
-  LuaCheckIntegerValue(fname, L, 1);
-
-  int solver_handle = lua_tointeger(L, 1);
-  int region_handle = lua_tointeger(L, 2);
-
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-
-  //======================================================= Getting solver
-  auto solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle, fname);
-
-  //======================================================= Getting region
-  chi_mesh::Region* region;
-
-  try{ region = cur_hndlr.region_stack.at(region_handle); }
-
-  catch(const std::out_of_range& o)
-  { std::cout << "Invalid region handle" << std::endl; return 0; }
-
-  solver->AddRegion(region);
-
-  return 0;
-}
-
-//#############################################################################
 /** Initializes the solver at the given handle.
 
 \param solver_handle int Handle to the solver.

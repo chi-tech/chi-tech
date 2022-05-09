@@ -5,7 +5,6 @@
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Region//chi_region.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
@@ -31,14 +30,6 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
   //======================================== Get the current handler
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
-
-  //======================================== Check empty region list
-  if (mesh_handler.region_stack.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "VolumeMesherPredefinedUnpartitioned: No region added.";
-    exit(EXIT_FAILURE);
-  }
 
   //======================================== Check unpartitioned mesh available
   if (mesh_handler.unpartitionedmesh_stack.empty())
@@ -110,7 +101,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   chi_log.Log(LOG_0) << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
-  AddContinuumToRegion(grid, *mesh_handler.region_stack.back());
+//  AddContinuumToRegion(grid, *mesh_handler.region_stack.back());
+  SetContinuum(grid);
 
 
   //======================================== Concluding messages

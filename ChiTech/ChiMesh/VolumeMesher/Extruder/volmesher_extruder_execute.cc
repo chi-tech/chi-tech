@@ -1,7 +1,6 @@
 #include "volmesher_extruder.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
-#include "ChiMesh/Region/chi_region.h"
 #include "ChiMesh/Boundary/chi_boundary.h"
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
@@ -31,7 +30,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
   //================================================== Get the current handler
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
-  auto region = mesh_handler.region_stack.back();
 
   //================================================== Loop over all regions
   chi_log.Log(LOG_0VERBOSE_1)
@@ -41,7 +39,8 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   //=========================================== Create new continuum
   auto grid = chi_mesh::MeshContinuum::New();
   auto temp_grid = chi_mesh::MeshContinuum::New();
-  AddContinuumToRegion(grid, *region);
+//  AddContinuumToRegion(grid, *region);
+  SetContinuum(grid);
 
   //================================== Setup layers
   // populates vertex-layers

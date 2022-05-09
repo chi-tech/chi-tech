@@ -21,8 +21,6 @@ chiMeshHandlerCreate()
 unpart_mesh = chiUnpartitionedMeshFromWavefrontOBJ(
         "ChiResources/TestObjects/Square2x2_partition_cyclic3.obj")
 
-region1 = chiRegionCreate()
-
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,
                       ExtruderTemplateType.UNPARTITIONED_MESH,
@@ -78,7 +76,6 @@ chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 --############################################### Setup Physics
 
 phys1 = chiLBSCreateSolver()
-chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}

@@ -29,7 +29,7 @@ int chiCountMeshInLogicalVolume(lua_State* L)
   catch (const std::out_of_range& oor)
   {throw std::invalid_argument(fname + ": Invalid handle to logical volume.");}
 
-  auto grid = handler.GetGrid();
+  auto& grid = handler.GetGrid();
 
   size_t count = grid->CountCellsInLogicalVolume(*log_vol);
 

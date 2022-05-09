@@ -59,25 +59,25 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
   //=================================== Mesh handler
   LUA_FMACRO1(chiMeshHandlerCreate);
   LUA_FMACRO1(chiMeshHandlerSetCurrent);
+  LUA_FMACRO1(chiMeshHandlerExportMeshToObj);
+  LUA_FMACRO1(chiMeshHandlerExportMeshToVTK);
 
   //=================================== Region
-  LUA_FMACRO1(chiRegionCreate);
-  LUA_FMACRO1(chiRegionExportMeshToPython);
   LUA_FMACRO1(chiRegionExportMeshToObj);
   LUA_FMACRO1(chiRegionExportMeshToVTK);
 
   //=================================== Surface Mesher
   LUA_FMACRO1(chiSurfaceMesherCreate);
     LUA_CMACRO1(SURFACEMESHER_PREDEFINED, 1);
-    LUA_CMACRO1(SURFACEMESHER_DELAUNAY  , 2);
+//    LUA_CMACRO1(SURFACEMESHER_DELAUNAY  , 2);
   LUA_FMACRO1(chiSurfaceMesherExecute);
   LUA_FMACRO1(chiSurfaceMesherSetProperty);
     LUA_CMACRO1(MAX_AREA   , 1);
-    LUA_CMACRO1(PARTITION_X, 2);
-    LUA_CMACRO1(PARTITION_Y, 3);
-    LUA_CMACRO1(CUT_X      , 4);
-    LUA_CMACRO1(CUT_Y      , 5);
-  LUA_FMACRO1(chiSurfaceMesherExportToObj);
+//    LUA_CMACRO1(PARTITION_X, 2);
+//    LUA_CMACRO1(PARTITION_Y, 3);
+//    LUA_CMACRO1(CUT_X      , 4);
+//    LUA_CMACRO1(CUT_Y      , 5);
+//  LUA_FMACRO1(chiSurfaceMesherExportToObj);
 
   //=================================== Volume Mesher
   LUA_FMACRO1(chiVolumeMesherCreate);
