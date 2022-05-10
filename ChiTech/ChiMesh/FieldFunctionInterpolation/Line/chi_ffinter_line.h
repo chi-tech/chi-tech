@@ -59,7 +59,9 @@ private:
   void FVInterpolate(std::vector<uint64_t>& mapping,
                      FieldFunctionContext* ff_ctx);
 public:
-  void ExportPython(std::string base_name);
+  std::string GetDefaultFileBaseName() const override
+  {return "ZLFFI";}
+  void ExportPython(std::string base_name) override;
 };
 
 #endif

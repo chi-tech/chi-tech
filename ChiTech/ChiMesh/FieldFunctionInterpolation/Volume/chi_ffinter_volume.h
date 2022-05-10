@@ -48,6 +48,9 @@ public:
 
   double CallLuaFunction(double ff_value, int mat_id);
 
+  std::string GetDefaultFileBaseName() const override
+  {return "ZVFFI";}
+  void ExportPython(std::string base_name) override {}
 };
 
 

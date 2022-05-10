@@ -79,7 +79,9 @@ private:
   void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t>& mapping);
 public:
   //03
-  void ExportPython(std::string base_name);
+  std::string GetDefaultFileBaseName() const override
+  {return "ZPFFI";}
+  void ExportPython(std::string base_name) override;
 };
 
 

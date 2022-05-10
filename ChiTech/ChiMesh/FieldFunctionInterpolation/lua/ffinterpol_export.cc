@@ -1,13 +1,13 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../../ChiPhysics/chi_physics.h"
+#include "ChiLua/chi_lua.h"
+
 #include "../chi_ffinterpolation.h"
-#include "../Slice/chi_ffinter_slice.h"
-#include "../Line/chi_ffinter_line.h"
 
-#include <chi_log.h>
+#include "chi_runtime.h"
 
+#include "chi_log.h"
 extern ChiLog&  chi_log;
+
+#include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
@@ -21,51 +21,24 @@ extern ChiPhysics&  chi_physics_handler;
 \author Jan*/
 int chiFFInterpolationExportPython(lua_State* L)
 {
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+  const std::string fname =  __FUNCTION__;
 
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(fname, 1, num_args);
 
   //================================================== Get handle to field function
-  int ffihandle = lua_tonumber(L,1);
-  chi_mesh::FieldFunctionInterpolation* cur_ffi;
-  try {
-    cur_ffi = cur_hndlr.ffinterpolation_stack.at(ffihandle);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid ffi handle in chiFFInterpolationSetProperty.";
-    exit(EXIT_FAILURE);
-  }
+  const size_t ffihandle = lua_tonumber(L,1);
 
-  if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationSlice))
-  {
-    auto cur_ffi_slice = (chi_mesh::FieldFunctionInterpolationSlice*)cur_ffi;
+  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+                                    ffihandle, fname);
 
-    std::string base_name = std::string("ZPFFI") + std::to_string(ffihandle);
-    if (num_args==2)
-    {
-      const char* name = lua_tostring(L,2);
-      base_name = std::string(name);
-    }
+  std::string base_name = p_ffi->GetDefaultFileBaseName() +
+                          std::to_string(ffihandle);
+  if (num_args==2)
+    base_name = lua_tostring(L,2);
 
-    cur_ffi_slice->ExportPython(base_name);
-  }
-
-  if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationLine))
-  {
-    auto cur_ffi_line = (chi_mesh::FieldFunctionInterpolationLine*)cur_ffi;
-
-    std::string base_name = std::string("ZLFFI") + std::to_string(ffihandle);
-    if (num_args==2)
-    {
-      const char* name = lua_tostring(L,2);
-      base_name = std::string(name);
-    }
-
-    cur_ffi_line->ExportPython(base_name);
-  }
-
+  p_ffi->ExportPython(base_name);
 
   return 0;
 }

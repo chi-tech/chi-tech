@@ -41,6 +41,7 @@ int                                     chi::current_mesh_handler=-1;
 
 std::vector<chi_mesh::SurfaceMeshPtr>   chi::surface_mesh_stack;
 std::vector<chi_mesh::LogicalVolumePtr> chi::logicvolume_stack;
+std::vector<chi_mesh::FFInterpPtr>      chi::field_func_interpolation_stack;
 
 bool        chi::run_time::termination_posted = false;
 std::string chi::run_time::input_file_name;
