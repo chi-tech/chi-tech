@@ -4,6 +4,10 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+
+#include "chi_runtime.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -24,14 +28,12 @@ int chiCountMeshInLogicalVolume(lua_State* L)
 
   auto& handler = chi_mesh::GetCurrentHandler();
 
-  chi_mesh::LogicalVolume* log_vol;
-  try {log_vol = handler.logicvolume_stack.at(log_vol_handle);}
-  catch (const std::out_of_range& oor)
-  {throw std::invalid_argument(fname + ": Invalid handle to logical volume.");}
+  const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
+    chi::logicvolume_stack, log_vol_handle, fname);
 
   auto& grid = handler.GetGrid();
 
-  size_t count = grid->CountCellsInLogicalVolume(*log_vol);
+  size_t count = grid->CountCellsInLogicalVolume(log_vol);
 
   lua_pushinteger(L,int(count));
   return 1;

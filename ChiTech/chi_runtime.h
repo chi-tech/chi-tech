@@ -13,6 +13,9 @@ namespace chi_mesh
 
   class SurfaceMesh;
   typedef std::shared_ptr<SurfaceMesh> SurfaceMeshPtr;
+
+  class LogicalVolume;
+  typedef std::shared_ptr<LogicalVolume> LogicalVolumePtr;
 }
 
 
@@ -20,10 +23,11 @@ namespace chi_mesh
 class chi
 {
 public:
-  static std::vector<chi_mesh::MeshHandlerPtr>  meshhandler_stack;
+  static std::vector<chi_mesh::MeshHandlerPtr>   meshhandler_stack;
   static int         current_mesh_handler;
 
-  static std::vector<chi_mesh::SurfaceMeshPtr>  surface_mesh_stack;
+  static std::vector<chi_mesh::SurfaceMeshPtr>   surface_mesh_stack;
+  static std::vector<chi_mesh::LogicalVolumePtr> logicvolume_stack;
 
   class run_time
   {

@@ -11,8 +11,6 @@
 class chi_mesh::MeshHandler
 {
 public:
-//  std::vector<chi_mesh::SurfaceMesh*>                surface_mesh_stack;
-  std::vector<chi_mesh::LogicalVolume*>              logicvolume_stack;
   std::vector<chi_mesh::FieldFunctionInterpolation*> ffinterpolation_stack;
   std::vector<chi_mesh::UnpartitionedMesh*>          unpartitionedmesh_stack;
 

@@ -223,13 +223,13 @@ public:
 class chi_mesh::BooleanLogicalVolume : public LogicalVolume
 {
 public:
-  std::vector<std::pair<bool,LogicalVolume*>> parts;
+  std::vector<std::pair<bool,std::shared_ptr<LogicalVolume>>> parts;
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {
-    for (size_t p=0; p<parts.size();p++)
+    for (const auto & part : parts)
     {
-      if (not (parts[p].first && parts[p].second->Inside(point)))
+      if (not (part.first && part.second->Inside(point)))
         return false;
     }
     return true;

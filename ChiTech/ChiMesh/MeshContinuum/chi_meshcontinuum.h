@@ -1,6 +1,8 @@
 #ifndef CHI_MESHCONTINUUM_H_
 #define CHI_MESHCONTINUUM_H_
 
+#include <memory>
+
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
 #include "chi_meshcontinuum_globalcellhandler.h"
@@ -54,7 +56,7 @@ public:
 
   static
   std::shared_ptr<MeshContinuum> New()
-  { return std::shared_ptr<MeshContinuum>(new MeshContinuum());}
+  { return std::make_shared<MeshContinuum>();}
 
   /**Method to be called if cells and nodes have been transferred
    * to another grid.*/
@@ -98,7 +100,7 @@ public:
 
   std::vector<uint64_t> GetDomainUniqueBoundaryIDs() const;
 
-  size_t CountCellsInLogicalVolume(chi_mesh::LogicalVolume& log_vol) const;
+  size_t CountCellsInLogicalVolume(const chi_mesh::LogicalVolume& log_vol) const;
 };
 
 #endif //CHI_MESHCONTINUUM_H_

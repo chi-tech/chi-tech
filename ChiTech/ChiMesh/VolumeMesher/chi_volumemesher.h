@@ -70,10 +70,10 @@ public:
   std::tuple<int,int,int>
                       GetCellXYZPartitionID(chi_mesh::Cell *cell);
   static
-  void                SetMatIDFromLogical(chi_mesh::LogicalVolume* log_vol,
+  void                SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,
                                           bool sense, int mat_id);
   static
-  void                SetBndryIDFromLogical(chi_mesh::LogicalVolume* log_vol,
+  void                SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,
                                           bool sense, int bndry_id);
   static
   void                SetMatIDToAll(int mat_id);

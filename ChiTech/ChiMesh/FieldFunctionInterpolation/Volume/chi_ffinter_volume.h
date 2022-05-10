@@ -22,10 +22,10 @@ class chi_mesh::FieldFunctionInterpolationVolume :
   public chi_mesh::FieldFunctionInterpolation
 {
 public:
-  chi_mesh::LogicalVolume* logical_volume;
-  int op_type;
+  std::shared_ptr<chi_mesh::LogicalVolume> logical_volume = nullptr;
+  int op_type = OP_SUM;
   std::string op_lua_func;
-  double op_value;
+  double op_value = 0.0;
 
 private:
   std::vector<int>                    cfem_local_nodes_needed_unmapped;
@@ -35,12 +35,7 @@ private:
   std::vector<int>                    pwld_local_cells_needed_unmapped;
 
 public:
-  FieldFunctionInterpolationVolume()
-  {
-    logical_volume = nullptr;
-    op_type = OP_SUM;
-    op_value = 0.0;
-  }
+  FieldFunctionInterpolationVolume() = default;
 
   //01
   void Initialize() override;

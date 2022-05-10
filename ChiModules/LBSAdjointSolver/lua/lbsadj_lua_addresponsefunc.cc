@@ -1,12 +1,11 @@
 #include "LBSAdjointSolver/lbsadj_solver.h"
 #include "lbsadj_lua_utils.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "chi_runtime.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-namespace lbs_adjoint
-{
-namespace lua_utils
+
+namespace lbs_adjoint::lua_utils
 {
 
 int chiAdjointSolverAddResponseFunction(lua_State* L)
@@ -38,21 +37,16 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
 
   auto solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
 
-  auto& mesh_handler = chi_mesh::GetCurrentHandler();
-
-  chi_mesh::LogicalVolume* logical_volume;
-  try {logical_volume = mesh_handler.logicvolume_stack.at(logvol_handle);}
-  catch (const std::out_of_range& oor)
-  {throw std::invalid_argument(fname + ": Invalid handle to logical volume.");}
+  auto p_logical_volume = chi::GetStackItemPtr(
+    chi::logicvolume_stack, logvol_handle, fname);
 
   size_t qoi_index = solver->AddResponseFunction(qoi_name,
-                                                 *logical_volume,
+                                                 p_logical_volume,
                                                  lua_function);
   lua_pushinteger(L, static_cast<lua_Integer>(qoi_index));
 
   return 1;
 }
 
-}//namespace lua_utils
 }//namespace lbs_adjoint
 

@@ -4,6 +4,9 @@
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
+#include "chi_runtime.h"
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -193,17 +196,10 @@ int chiVolumeMesherSetProperty(lua_State *L)
     int sense = true;
     if (num_args==4) sense = lua_toboolean(L,4);
 
-    if (volume_hndl >= cur_hndlr.logicvolume_stack.size())
-    {
-      chi_log.Log(LOG_ALLERROR) << "Invalid logical volume specified in "
-                                 "chiVolumeMesherSetProperty("
-                                 "MATID_FROMLOGICAL...";
-      exit(EXIT_FAILURE);
-    }
+    const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
+      chi::logicvolume_stack, volume_hndl, __FUNCTION__);
 
-    chi_mesh::LogicalVolume* volume_ptr =
-      cur_hndlr.logicvolume_stack[volume_hndl];
-    cur_hndlr.volume_mesher->SetMatIDFromLogical(volume_ptr,sense,mat_id);
+    chi_mesh::VolumeMesher::SetMatIDFromLogical(log_vol,sense,mat_id);
   }
 
   else if (property_index == VMP::BNDRYID_FROMLOGICAL)
@@ -220,17 +216,10 @@ int chiVolumeMesherSetProperty(lua_State *L)
     int sense = true;
     if (num_args==4) sense = lua_toboolean(L,4);
 
-    if (volume_hndl >= cur_hndlr.logicvolume_stack.size())
-    {
-      chi_log.Log(LOG_ALLERROR) << "Invalid logical volume specified in "
-                                 "chiVolumeMesherSetProperty("
-                                 "BNDRYID_FROMLOGICAL...";
-      exit(EXIT_FAILURE);
-    }
+    const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
+      chi::logicvolume_stack, volume_hndl, __FUNCTION__);
 
-    chi_mesh::LogicalVolume* volume_ptr =
-      cur_hndlr.logicvolume_stack[volume_hndl];
-    cur_hndlr.volume_mesher->SetBndryIDFromLogical(volume_ptr,sense,bndry_id);
+    chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_id);
   }
   else
   {

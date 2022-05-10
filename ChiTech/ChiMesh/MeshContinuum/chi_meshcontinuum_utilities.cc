@@ -267,7 +267,7 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::
 /**Counts the number of cells within a logical volume across all
  * partitions.*/
 size_t chi_mesh::MeshContinuum::
-  CountCellsInLogicalVolume(chi_mesh::LogicalVolume &log_vol) const
+  CountCellsInLogicalVolume(const chi_mesh::LogicalVolume &log_vol) const
 {
   size_t local_count=0;
   for (const auto& cell : local_cells)

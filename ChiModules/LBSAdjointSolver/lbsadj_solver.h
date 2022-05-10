@@ -35,7 +35,7 @@ public:
 
   //04
   size_t AddResponseFunction(const std::string& qoi_name,
-                             const chi_mesh::LogicalVolume& logical_volume,
+                             std::shared_ptr<chi_mesh::LogicalVolume> logical_volume,
                              const std::string& lua_function_name);
   //05a
   void ExportImportanceMap(const std::string& file_name);

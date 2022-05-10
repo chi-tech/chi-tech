@@ -3,12 +3,14 @@
 #include "../../FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
 #include "../../FieldFunctionInterpolation/Line/chi_ffinter_line.h"
 #include "../../FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
-#include <ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h>
-#include "../../../ChiPhysics/chi_physics.h"
 
-#include <chi_log.h>
+#include "chi_runtime.h"
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "ChiPhysics/chi_physics.h"
 extern ChiPhysics&  chi_physics_handler;
 
 #define FFI_FIELD_FUNCTION 0
@@ -328,17 +330,9 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     int logvol_hndle = lua_tonumber(L,3);
 
-    chi_mesh::LogicalVolume* logvol;
-
-    try {
-      logvol = cur_hndlr.logicvolume_stack.at(logvol_hndle);
-    }
-    catch(const std::out_of_range& o)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Invalid logical volume handle in chiFFInterpolationSetProperty.";
-      exit(EXIT_FAILURE);
-    }
+    auto p_logical_volume = chi::GetStackItemPtr(chi::logicvolume_stack,
+                                                 logvol_hndle,
+                                                 __FUNCTION__);
 
     if (typeid(*cur_ffi) != typeid(chi_mesh::FieldFunctionInterpolationVolume))
     {
@@ -351,7 +345,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     auto cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume*)cur_ffi;
 
-    cur_ffi_volume->logical_volume = logvol;
+    cur_ffi_volume->logical_volume = p_logical_volume;
   }
   else                                              //Fall back
   {

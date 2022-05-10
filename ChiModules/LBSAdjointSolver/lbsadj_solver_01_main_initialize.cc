@@ -45,7 +45,7 @@ void lbs_adjoint::AdjointSolver::Initialize()
     auto& qoi_cell_subscription = qoi_pair.second;
 
     for (const auto& cell : grid->local_cells)
-      if (qoi_designation.logical_volume.Inside(cell.centroid))
+      if (qoi_designation.logical_volume->Inside(cell.centroid))
         qoi_cell_subscription.push_back(cell.local_id);
 
     //TODO: Change the verbosity of next statement

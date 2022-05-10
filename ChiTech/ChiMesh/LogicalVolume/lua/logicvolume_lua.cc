@@ -52,8 +52,9 @@ int chiLogicalVolumeCreate(lua_State *L)
     double r = lua_tonumber(L,2);
     auto log_vol = new chi_mesh::SphereLogicalVolume(r);
 
-    handler.logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
+    chi::logicvolume_stack.emplace_back(log_vol);
+    const size_t index = chi::logicvolume_stack.size()-1;
+    lua_pushnumber(L,static_cast<lua_Number>(index));
   }
 
   //================================================== Sphere at arb loc
@@ -71,8 +72,9 @@ int chiLogicalVolumeCreate(lua_State *L)
     double r = lua_tonumber(L,5);
     auto log_vol = new chi_mesh::SphereLogicalVolume(x,y,z,r);
 
-    handler.logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
+    chi::logicvolume_stack.emplace_back(log_vol);
+    const size_t index = chi::logicvolume_stack.size()-1;
+    lua_pushnumber(L,static_cast<lua_Number>(index));
   }
 
   //================================================== RPP
@@ -92,8 +94,9 @@ int chiLogicalVolumeCreate(lua_State *L)
     double zmax = lua_tonumber(L,7);
     auto log_vol = new chi_mesh::RPPLogicalVolume(xmin,xmax,ymin,ymax,zmin,zmax);
 
-    handler.logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
+    chi::logicvolume_stack.emplace_back(log_vol);
+    const size_t index = chi::logicvolume_stack.size()-1;
+    lua_pushnumber(L,static_cast<lua_Number>(index));
   }
 
   //================================================== RCC
@@ -114,8 +117,9 @@ int chiLogicalVolumeCreate(lua_State *L)
     double r    = lua_tonumber(L,7);
     auto log_vol = new chi_mesh::RCCLogicalVolume(x0,y0,z0,vx,vy,vz,r);
 
-    handler.logicvolume_stack.push_back(log_vol);
-    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
+    chi::logicvolume_stack.emplace_back(log_vol);
+    const size_t index = chi::logicvolume_stack.size()-1;
+    lua_pushnumber(L,static_cast<lua_Number>(index));
 
     chi_mesh::Vector3 point(-0.5, 0.0, 0.1);
     printf("MATRIX %d\n", log_vol->Inside(point));
@@ -130,10 +134,11 @@ int chiLogicalVolumeCreate(lua_State *L)
     auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
       chi::surface_mesh_stack, surf_mesh_hndle, fname);
 
-    auto surf_vol = new chi_mesh::SurfaceMeshLogicalVolume(surf_mesh_ptr);
+    auto log_vol = new chi_mesh::SurfaceMeshLogicalVolume(surf_mesh_ptr);
 
-    handler.logicvolume_stack.push_back(surf_vol);
-    lua_pushnumber(L,handler.logicvolume_stack.size()-1);
+    chi::logicvolume_stack.emplace_back(log_vol);
+    const size_t index = chi::logicvolume_stack.size()-1;
+    lua_pushnumber(L,static_cast<lua_Number>(index));
   }
   //================================================== BOOLEAN
   else if (type_index == BOOLEAN)
@@ -167,7 +172,8 @@ int chiLogicalVolumeCreate(lua_State *L)
                                    "number. Found not to be";
         exit(EXIT_FAILURE);
       }
-      if (lua_tonumber(L,2*p+1)>=handler.logicvolume_stack.size())
+      if (lua_tonumber(L,2*p+1) >=
+          static_cast<lua_Number>(chi::logicvolume_stack.size()))
       {
         chi_log.Log(LOG_0ERROR) << "chiMeshCreateLogicalVolume(BOOLEAN..."
                                    " argument " << 2*p+1
@@ -178,13 +184,19 @@ int chiLogicalVolumeCreate(lua_State *L)
       bool logic  = lua_toboolean(L,2*p);
       bool handle = lua_tonumber(L,2*p+1);
 
-      chi_mesh::LogicalVolume* ref_vol = handler.logicvolume_stack[handle];
-      std::pair<bool,chi_mesh::LogicalVolume*> combo(logic,ref_vol);
+      auto p_ref_vol = chi::GetStackItemPtr(chi::logicvolume_stack,
+                                            handle, fname);
+
+      typedef std::shared_ptr<chi_mesh::LogicalVolume> LogVolPtr;
+
+      std::pair<bool,LogVolPtr> combo(logic,p_ref_vol);
 
       bool_vol->parts.push_back(combo);
     }
 
-    handler.logicvolume_stack.push_back(bool_vol);
+    chi::logicvolume_stack.emplace_back(bool_vol);
+    const size_t index = chi::logicvolume_stack.size()-1;
+    lua_pushnumber(L,static_cast<lua_Number>(index));
   }
 
   //================================================== Unrecognized option

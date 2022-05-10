@@ -13,7 +13,7 @@ extern ChiTimer chi_program_timer;
 //###################################################################
 /**Sets material id's using a logical volume.*/
 void chi_mesh::VolumeMesher::
-SetMatIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int mat_id)
+SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_id)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
@@ -27,7 +27,7 @@ SetMatIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int mat_id)
   int num_cells_modified = 0;
   for (auto& cell : vol_cont->local_cells)
   {
-    if (log_vol->Inside(cell.centroid) && sense){
+    if (log_vol.Inside(cell.centroid) && sense){
       cell.material_id = mat_id;
       ++num_cells_modified;
     }
@@ -37,7 +37,7 @@ SetMatIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int mat_id)
   for (uint64_t ghost_id : ghost_ids)
   {
     auto& cell = vol_cont->cells[ghost_id];
-    if (log_vol->Inside(cell.centroid) && sense)
+    if (log_vol.Inside(cell.centroid) && sense)
       cell.material_id = mat_id;
   }
 
@@ -51,7 +51,7 @@ SetMatIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int mat_id)
 //###################################################################
 /**Sets material id's using a logical volume.*/
 void chi_mesh::VolumeMesher::
-SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
+SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int bndry_id)
 {
   chi_log.Log(LOG_0)
     << chi_program_timer.GetTimeString()
@@ -68,7 +68,7 @@ SetBndryIDFromLogical(chi_mesh::LogicalVolume *log_vol,bool sense, int bndry_id)
     for (auto& face : cell.faces)
     {
       if (face.has_neighbor) continue;
-      if (log_vol->Inside(face.centroid) && sense){
+      if (log_vol.Inside(face.centroid) && sense){
         face.neighbor_id = abs(bndry_id);
         ++num_faces_modified;
       }
