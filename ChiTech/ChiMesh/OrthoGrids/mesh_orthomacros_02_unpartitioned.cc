@@ -1,17 +1,19 @@
 #include "ChiMesh/chi_mesh.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/SurfaceMesher/PassThrough/surfmesher_passthrough.h"
+#include "ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
+
+#include "chi_runtime.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
 //###################################################################
 /**Creates a 1D slab mesh from a set of vertices.*/
-void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
+size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 {
   //======================================== Checks if vertices are empty
   if (vertices.empty())
@@ -71,13 +73,18 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler.unpartitionedmesh_stack.push_back(umesh);
+
+  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
+  chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler.volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = new chi_mesh::SurfaceMesherPredefined;
+  handler.volume_mesher =
+    new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
 
   handler.surface_mesher->Execute();
+
+  return chi::unpartitionedmesh_stack.size()-1;
 }
 
 //###################################################################
@@ -93,7 +100,7 @@ chi_mesh::CreateUnpartitioned2DOrthoMesh(vertices_x,vertices_y);
 This code will create a 2x2 mesh with \f$ \vec{x} \in [0,2]^2 \f$.
 
  */
-void chi_mesh::CreateUnpartitioned2DOrthoMesh(
+size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   std::vector<double>& vertices_1d_x,
   std::vector<double>& vertices_1d_y)
 {
@@ -160,13 +167,18 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler.unpartitionedmesh_stack.push_back(umesh);
+
+  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
+  chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler.volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = new chi_mesh::SurfaceMesherPredefined;
+  handler.volume_mesher =
+    new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
 
   handler.surface_mesher->Execute();
+
+  return chi::unpartitionedmesh_stack.size()-1;
 }
 
 //###################################################################
@@ -183,7 +195,7 @@ chi_mesh::CreateUnpartitioned3DOrthoMesh(vertices_x,vertices_y,vertices_z);
 This code will create a 2x2 mesh with \f$ \vec{x} \in [0,2]^2 \f$.
 
  */
-void chi_mesh::CreateUnpartitioned3DOrthoMesh(
+size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   std::vector<double>& vertices_1d_x,
   std::vector<double>& vertices_1d_y,
   std::vector<double>& vertices_1d_z)
@@ -326,11 +338,16 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler.unpartitionedmesh_stack.push_back(umesh);
+
+  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
+  chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler.volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = new chi_mesh::SurfaceMesherPredefined;
+  handler.volume_mesher =
+    new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
 
   handler.surface_mesher->Execute();
+
+  return chi::unpartitionedmesh_stack.size()-1;
 }

@@ -28,24 +28,12 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
     << chi_console.GetMemoryUsageInMB() << " MB"
     << std::endl;
 
-  //======================================== Get the current handler
-  auto& mesh_handler = chi_mesh::GetCurrentHandler();
-
-  //======================================== Check unpartitioned mesh available
-  if (mesh_handler.unpartitionedmesh_stack.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "VolumeMesherPredefinedUnpartitioned: "
-         "No unpartitioned mesh to operate on.";
-    exit(EXIT_FAILURE);
-  }
-
   //======================================== Check partitioning params
   if (options.partition_type == KBA_STYLE_XYZ)
   {
-    int Px = mesh_handler.volume_mesher->options.partition_x;
-    int Py = mesh_handler.volume_mesher->options.partition_y;
-    int Pz = mesh_handler.volume_mesher->options.partition_z;
+    int Px = this->options.partition_x;
+    int Py = this->options.partition_y;
+    int Pz = this->options.partition_z;
 
     int desired_process_count = Px*Py*Pz;
 
@@ -62,7 +50,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   }
 
   //======================================== Get unpartitioned mesh
-  auto umesh = mesh_handler.unpartitionedmesh_stack.back();
+  auto umesh = m_umesh;
 
   chi_log.Log(LOG_0) << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
@@ -106,12 +94,6 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
 
   //======================================== Concluding messages
-//  chi_log.Log(LOG_0)
-//    << "VolumeMesherPredefinedUnpartitioned: Number of nodes in region = "
-//    << grid->vertices.size()
-//    << std::endl;
-//  grid->vertices.shrink_to_fit();
-
   chi_log.Log(LOG_ALLVERBOSE_1)
     << "### LOCATION[" << chi_mpi.location_id
     << "] amount of local cells="

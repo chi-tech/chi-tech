@@ -20,6 +20,10 @@ namespace chi_mesh
   class FieldFunctionInterpolation;
   typedef FieldFunctionInterpolation FFInterp;
   typedef std::shared_ptr<FFInterp> FFInterpPtr;
+
+  class UnpartitionedMesh;
+  typedef std::shared_ptr<UnpartitionedMesh> UnpartitionedMeshPtr;
+  typedef UnpartitionedMeshPtr UnpartMeshPtr;
 }
 
 
@@ -33,6 +37,7 @@ public:
   static std::vector<chi_mesh::SurfaceMeshPtr>   surface_mesh_stack;
   static std::vector<chi_mesh::LogicalVolumePtr> logicvolume_stack;
   static std::vector<chi_mesh::FFInterpPtr>      field_func_interpolation_stack;
+  static std::vector<chi_mesh::UnpartMeshPtr>    unpartitionedmesh_stack;
 
   class run_time
   {

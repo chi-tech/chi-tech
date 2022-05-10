@@ -3,6 +3,7 @@
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include <iostream>
 
@@ -16,56 +17,61 @@ extern ChiLog& chi_log;
 /** Creates a new volume mesher.
  *
 \param Type int Volume Remesher type.
+\param OtherArgs varying Additional arguments depending on `Type`.
 
 Remesher types:\n
- VOLUMEMESHER_PREDEFINED2D = No remeshing is performed.\n
  VOLUMEMESHER_EXTRUDER = Creates an extruded mesh from a 2D template mesh.
- Requires two additional arguments. <I>TemplateType</I> and <I>handle</I>. See below.\n
- VOLUMEMESHER_UNPARTITIONED = Create the mesh from the latest UnpartitionedMesh.\n
+ Requires two additional arguments. `TemplateType` and `handle`. See below.\n
+ VOLUMEMESHER_UNPARTITIONED = Create the mesh from the latest UnpartitionedMesh.
+ Requires a single additional argument, `handle`, which is a handle to
+ a valid unpartitioned mesh.\n
 
 ##_
 
 ###Extruder parameters
 
 When the mesher type is specified to be VOLUMEMESHER_EXTRUDER then two
-additional arguments are required. <I>TemplateType</I> and <I>handle</I>.\n
+additional arguments are required. `TemplateType` and `handle`.\n
 
-- <I>TemplateType</I> can be either ExtruderTemplateType.SURFACE_MESH or
- ExtruderTemplateType.UNPARTITIONED_MESH.\n
-- <I>handle</I> is a handle to the template mesh. When <I>TemplateType</I> is
- set to ExtruderTemplateType.SURFACE_MESH then this must be a handle to a valid
- surface mesh. Similarly, when <I>TemplateType</I> is set to
- ExtruderTemplateType.UNPARTITIONED_MESH then the handle must point to a valid
+- `TemplateType` can be either `ExtruderTemplateType.SURFACE_MESH` or
+ `ExtruderTemplateType.UNPARTITIONED_MESH`.\n
+- `handle` is a handle to the template mesh. When `TemplateType` is
+ set to `ExtruderTemplateType.SURFACE_MESH` then this must be a handle to a valid
+ surface mesh. Similarly, when `TemplateType` is set to
+ `ExtruderTemplateType.UNPARTITIONED_MESH` then the handle must point to a valid
  unpartitioned mesh.
 
 \ingroup LuaVolumeMesher
 \author Jan*/
 int chiVolumeMesherCreate(lua_State *L)
 {
+  const std::string fname = __FUNCTION__;
+
   //============================================= Arguments check
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args < 1)
-    LuaPostArgAmountError(__FUNCTION__, 1, num_args);
+    LuaPostArgAmountError(fname, 1, num_args);
 
-  LuaCheckNilValue(__FUNCTION__, L, 1);
+  LuaCheckNilValue(fname, L, 1);
 
-  //============================================= Process type
-  int type = lua_tonumber(L,1);
+  //============================================= Mesher type
+  const int mesher_type = lua_tonumber(L, 1);
 
   chi_mesh::VolumeMesher* new_mesher;
 
-  if (type==chi_mesh::VolumeMesherType::EXTRUDER)
+  if (mesher_type == chi_mesh::VolumeMesherType::EXTRUDER)
   {
     if (num_args != 3)
     {
       chi_log.Log(LOG_ALLERROR)
-        << "When specifying VOLUMEMESHER_EXTRUDER, the template type and "
+        << fname + ": "
+           "When specifying VOLUMEMESHER_EXTRUDER, the template type and "
            "handle must also be supplied.";
       exit(EXIT_FAILURE);
     }
 
-    LuaCheckNilValue(__FUNCTION__,L,2);
-    LuaCheckNilValue(__FUNCTION__,L,3);
+    LuaCheckNilValue(fname,L,2);
+    LuaCheckNilValue(fname,L,3);
 
     int template_type   = lua_tonumber(L,2);
     int template_handle = lua_tonumber(L,3);
@@ -79,25 +85,17 @@ int chiVolumeMesherCreate(lua_State *L)
 
     if      (template_type == (int)SURFACE_MESH_TEMPLATE)
     {
-      auto surface_mesh_ptr = chi::GetStackItemPtr(
-        chi::surface_mesh_stack, template_handle, __FUNCTION__);
+      auto surface_mesh_ptr = chi::GetStackItemPtr(chi::surface_mesh_stack,
+                                                   template_handle, fname);
+
       new_mesher = new chi_mesh::VolumeMesherExtruder(surface_mesh_ptr);
     }
     else if (template_type == (int)UNPART_MESH_TEMPLATE)
     {
-      chi_mesh::UnpartitionedMesh* unpartitionedMesh;
-      try {
-        unpartitionedMesh = handler.unpartitionedmesh_stack.at(template_handle);
-      }
-      catch (const std::out_of_range& o)
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "In call to " << __FUNCTION__ << ", with template type"
-          << " ExtruderTemplateType.UNPARTITIONED_MESH. Invalid handle "
-          << template_handle << " to unpartitioned mesh.";
-        exit(EXIT_FAILURE);
-      }
-      new_mesher = new chi_mesh::VolumeMesherExtruder(unpartitionedMesh);
+      auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
+                                          template_handle, fname);
+
+      new_mesher = new chi_mesh::VolumeMesherExtruder(p_umesh);
     }
     else
     {
@@ -108,9 +106,24 @@ int chiVolumeMesherCreate(lua_State *L)
 
 
   }
-  else if (type==chi_mesh::VolumeMesherType::UNPARTITIONED)
+  else if (mesher_type == chi_mesh::VolumeMesherType::UNPARTITIONED)
   {
-    new_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+    if (num_args != 2)
+    {
+      chi_log.Log(LOG_ALLERROR)
+        << fname + ": "
+                   "When specifying VOLUMEMESHER_UNPARTITIONED, the "
+                   "handle must also be supplied.";
+      exit(EXIT_FAILURE);
+    }
+
+    LuaCheckNilValue(fname,L,2);
+    const int template_handle = lua_tonumber(L,2);
+
+    auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
+                                        template_handle, fname);
+
+    new_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
   }
   else
   {

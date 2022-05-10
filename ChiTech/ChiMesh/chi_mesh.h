@@ -78,14 +78,14 @@ namespace chi_mesh
                     std::vector<double>& y_cuts);
   void   DecomposeSurfaceMeshPxPy(const SurfaceMesh& smesh, int Px, int Py);
 
-  void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices_1d);
+  size_t CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices_1d);
 
-  void CreateUnpartitioned2DOrthoMesh(std::vector<double>& vertices_1d_x,
-                                      std::vector<double>& vertices_1d_y);
+  size_t CreateUnpartitioned2DOrthoMesh(std::vector<double>& vertices_1d_x,
+                                        std::vector<double>& vertices_1d_y);
 
-  void CreateUnpartitioned3DOrthoMesh(std::vector<double>& vertices_1d_x,
-                                      std::vector<double>& vertices_1d_y,
-                                      std::vector<double>& vertices_1d_z);
+  size_t CreateUnpartitioned3DOrthoMesh(std::vector<double>& vertices_1d_x,
+                                        std::vector<double>& vertices_1d_y,
+                                        std::vector<double>& vertices_1d_z);
 }
 
 #include "chi_meshvector.h"

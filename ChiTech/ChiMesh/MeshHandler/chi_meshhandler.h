@@ -11,8 +11,6 @@
 class chi_mesh::MeshHandler
 {
 public:
-  std::vector<chi_mesh::UnpartitionedMesh*>          unpartitionedmesh_stack;
-
   chi_mesh::SurfaceMesher* surface_mesher = nullptr;
   chi_mesh::VolumeMesher*  volume_mesher = nullptr;
 

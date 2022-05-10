@@ -1,7 +1,7 @@
 #include "ChiLua/chi_lua.h"
 
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "chi_runtime.h"
 
 //###################################################################
 /**Creates an empty unpartitioned mesh. An empty unpartitioned mesh
@@ -23,11 +23,11 @@ int chiCreateEmptyUnpartitionedMesh(lua_State* L)
   const std::string func_name = __FUNCTION__;
 
   auto& handler = chi_mesh::GetCurrentHandler();
-  handler.unpartitionedmesh_stack.push_back(
+  chi::unpartitionedmesh_stack.emplace_back(
     new chi_mesh::UnpartitionedMesh());
 
   lua_pushnumber(L,
-    static_cast<lua_Number>(handler.unpartitionedmesh_stack.size()-1));
+    static_cast<lua_Number>(chi::unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -61,19 +61,11 @@ int chiDestroyUnpartitionedMesh(lua_State* L)
 
   auto& handler = chi_mesh::GetCurrentHandler();
 
-  chi_mesh::UnpartitionedMesh* mesh_ptr;
+  auto mesh_ptr = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
+                                       handle, func_name);
 
-  try{
-    mesh_ptr = handler.unpartitionedmesh_stack.at(handle);
-    if (mesh_ptr == nullptr) throw std::out_of_range("");
-  }//try
-  catch(const std::out_of_range& o) {
-    throw std::logic_error(func_name + ": Invalid mesh-handle (" +
-                           std::to_string(handle) + ").");
-  }
-
-  delete mesh_ptr;
-  handler.unpartitionedmesh_stack[handle] = nullptr;
+  mesh_ptr->CleanUp();
+  chi::unpartitionedmesh_stack[handle] = nullptr;
 
   return 0;
 }
@@ -130,11 +122,10 @@ int chiUnpartitionedMeshFromVTU(lua_State* L)
 
   new_object->ReadFromVTU(options);
 
-  auto& handler = chi_mesh::GetCurrentHandler();
-  handler.unpartitionedmesh_stack.push_back(new_object);
+  chi::unpartitionedmesh_stack.emplace_back(new_object);
 
   lua_pushnumber(L,
-    static_cast<lua_Number>(handler.unpartitionedmesh_stack.size()-1));
+    static_cast<lua_Number>(chi::unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -189,11 +180,10 @@ int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 
   new_object->ReadFromEnsightGold(options);
 
-  auto& handler = chi_mesh::GetCurrentHandler();
-  handler.unpartitionedmesh_stack.push_back(new_object);
+  chi::unpartitionedmesh_stack.emplace_back(new_object);
 
   lua_pushnumber(L,
-    static_cast<lua_Number>(handler.unpartitionedmesh_stack.size()-1));
+    static_cast<lua_Number>(chi::unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -243,11 +233,10 @@ int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
 
   new_object->ReadFromWavefrontOBJ(options);
 
-  auto& handler = chi_mesh::GetCurrentHandler();
-  handler.unpartitionedmesh_stack.push_back(new_object);
+  chi::unpartitionedmesh_stack.emplace_back(new_object);
 
   lua_pushnumber(L,
-    static_cast<lua_Number>(handler.unpartitionedmesh_stack.size()-1));
+    static_cast<lua_Number>(chi::unpartitionedmesh_stack.size()-1));
 
   return 1;
 }
@@ -298,11 +287,10 @@ int chiUnpartitionedMeshFromMshFormat(lua_State* L)
 
   new_object->ReadFromMsh(options);
 
-  auto& handler = chi_mesh::GetCurrentHandler();
-  handler.unpartitionedmesh_stack.push_back(new_object);
+  chi::unpartitionedmesh_stack.emplace_back(new_object);
 
   lua_pushnumber(L,
-    static_cast<lua_Number>(handler.unpartitionedmesh_stack.size()-1));
+    static_cast<lua_Number>(chi::unpartitionedmesh_stack.size()-1));
 
   return 1;
 }

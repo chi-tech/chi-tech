@@ -18,10 +18,10 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromWavefrontOBJ("ChiResources/TestObjects/TriangleMesh2x2.obj")
+umesh = chiUnpartitionedMeshFromWavefrontOBJ("ChiResources/TestObjects/TriangleMesh2x2.obj")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
-chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED,umesh)
 
 chiSurfaceMesherExecute()
 chiVolumeMesherExecute()

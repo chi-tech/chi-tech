@@ -27,7 +27,7 @@ public:
 private:
   const TemplateType template_type;
   std::shared_ptr<SurfaceMesh> template_surface_mesh = nullptr;
-  UnpartitionedMesh* template_unpartitioned_mesh = nullptr;
+  std::shared_ptr<UnpartitionedMesh> template_unpartitioned_mesh = nullptr;
 public:
   std::vector<MeshLayer> input_layers;
   std::vector<double> vertex_layers;
@@ -40,9 +40,9 @@ public:
     template_surface_mesh(std::move(in_surface_mesh))
   {}
   explicit
-  VolumeMesherExtruder(chi_mesh::UnpartitionedMesh* in_unpartitioned_mesh) :
+  VolumeMesherExtruder(std::shared_ptr<chi_mesh::UnpartitionedMesh> in_unpartitioned_mesh) :
     template_type(TemplateType::UNPARTITIONED_MESH),
-    template_unpartitioned_mesh(in_unpartitioned_mesh)
+    template_unpartitioned_mesh(std::move(in_unpartitioned_mesh))
   {}
 
   void Execute() override;

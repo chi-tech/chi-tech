@@ -18,11 +18,11 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromWavefrontOBJ(
+umesh = chiUnpartitionedMeshFromWavefrontOBJ(
         "ChiResources/TestObjects/SquareMesh2x2QuadsBlock.obj")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
-chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED);
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh);
 
 chiVolumeMesherSetKBAPartitioningPxPyPz(2,2,1)
 chiVolumeMesherSetKBACutsX({0.0})
