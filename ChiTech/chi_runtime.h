@@ -9,6 +9,7 @@
 namespace chi_mesh
 {
   class MeshHandler;
+  typedef std::shared_ptr<MeshHandler> MeshHandlerPtr;
 }
 
 
@@ -16,7 +17,7 @@ namespace chi_mesh
 class chi
 {
 public:
-  static std::vector<std::shared_ptr<chi_mesh::MeshHandler>>  meshhandler_stack;
+  static std::vector<chi_mesh::MeshHandlerPtr>  meshhandler_stack;
   static int         current_mesh_handler;
 
   class run_time

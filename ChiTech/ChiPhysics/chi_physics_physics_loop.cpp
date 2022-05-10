@@ -53,11 +53,8 @@ void ChiPhysics::RunPhysicsLoop()
 
 			if (cycleCollected>=10)
 			{
-
-				physicsTimeCost=timeCollected/cycleCollected;
 				timeCollected=0;
 				cycleCollected=0;
-
 			}
 		}
 
