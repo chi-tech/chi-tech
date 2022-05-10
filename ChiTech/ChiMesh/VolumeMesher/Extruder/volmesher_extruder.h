@@ -1,6 +1,8 @@
 #ifndef VOLUME_MESHER_EXTRUDER_H
 #define VOLUME_MESHER_EXTRUDER_H
 
+#include <utility>
+
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 #include "ChiMesh/Cell/cell.h"
 
@@ -24,7 +26,7 @@ public:
   };
 private:
   const TemplateType template_type;
-  SurfaceMesh*       template_surface_mesh = nullptr;
+  std::shared_ptr<SurfaceMesh> template_surface_mesh = nullptr;
   UnpartitionedMesh* template_unpartitioned_mesh = nullptr;
 public:
   std::vector<MeshLayer> input_layers;
@@ -33,9 +35,9 @@ public:
 
 public:
   explicit
-  VolumeMesherExtruder(chi_mesh::SurfaceMesh* in_surface_mesh) :
+  VolumeMesherExtruder(std::shared_ptr<chi_mesh::SurfaceMesh> in_surface_mesh) :
     template_type(TemplateType::SURFACE_MESH),
-    template_surface_mesh(in_surface_mesh)
+    template_surface_mesh(std::move(in_surface_mesh))
   {}
   explicit
   VolumeMesherExtruder(chi_mesh::UnpartitionedMesh* in_unpartitioned_mesh) :

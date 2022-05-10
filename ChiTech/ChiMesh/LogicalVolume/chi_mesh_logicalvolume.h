@@ -204,14 +204,15 @@ public:
 class chi_mesh::SurfaceMeshLogicalVolume : public LogicalVolume
 {
 private:
+  typedef std::shared_ptr<chi_mesh::SurfaceMesh> SurfaceMeshPtr;
   std::array<double,2> xbounds;
   std::array<double,2> ybounds;
   std::array<double,2> zbounds;
 public:
-  chi_mesh::SurfaceMesh* surf_mesh = nullptr;
+  const SurfaceMeshPtr surf_mesh = nullptr;
 
   explicit
-  SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh* in_surf_mesh);
+  SurfaceMeshLogicalVolume(SurfaceMeshPtr in_surf_mesh);
 
   bool Inside(const chi_mesh::Vector3& point) const override;
 };

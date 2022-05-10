@@ -1,11 +1,12 @@
-#include"../../../ChiLua/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 
 #include <iostream>
-#include <sstream>
-#include "../chi_surfacemesh.h"
+#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 #include "../../MeshHandler/chi_meshhandler.h"
-#include <chi_log.h>
 
+#include "chi_runtime.h"
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 
@@ -38,20 +39,15 @@ int chiSurfaceMeshImportFromOBJFile(lua_State *L)
     as_poly = lua_toboolean(L,3);
   }
 
-  try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
-    std::stringstream outtext;
-    outtext << "chiSurfaceMeshImportFromOBJFile: "
-                 "Loading Wavefront .obj file: ";
-    outtext << temp << std::endl;
-    chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
-    curItem->ImportFromOBJFile(temp,as_poly);
-  }
+  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, handle, __FUNCTION__);
 
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  std::stringstream outtext;
+  outtext << "chiSurfaceMeshImportFromOBJFile: "
+             "Loading Wavefront .obj file: ";
+  outtext << temp << std::endl;
+  chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
+  surface_mesh.ImportFromOBJFile(temp, as_poly);
 
   return 1;
 }
@@ -85,20 +81,10 @@ int chiSurfaceMeshImportFromTriangleFiles(lua_State *L)
     as_poly = lua_toboolean(L,3);
   }
 
-  try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
-    std::stringstream outtext;
-    outtext << "chiSurfaceMeshImportFromTriangleFiles: "
-               "Loading Wavefront .obj file: ";
-    outtext << temp << std::endl;
-    chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
-    curItem->ImportFromTriangleFiles(temp,as_poly);
-  }
+  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, handle, __FUNCTION__);
 
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  surface_mesh.ImportFromTriangleFiles(temp,as_poly);
 
   return 1;
 }
@@ -120,20 +106,15 @@ int chiSurfaceMeshImportFromMshFiles(lua_State *L)
     as_poly = lua_toboolean(L,3);
   }
 
-  try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
-    std::stringstream outtext;
-    outtext << "chiSurfaceMeshImportFromMshFiles: "
-               "Loading a gmsh ascii file: ";
-    outtext << temp << std::endl;
-    chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
-    curItem->ImportFromMshFiles(temp,as_poly);
-  }
+  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, handle, __FUNCTION__);
 
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  std::stringstream outtext;
+  outtext << "chiSurfaceMeshImportFromMshFiles: "
+             "Loading a gmsh ascii file: ";
+  outtext << temp << std::endl;
+  chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
+  surface_mesh.ImportFromMshFiles(temp, as_poly);
 
   return 1;
 }

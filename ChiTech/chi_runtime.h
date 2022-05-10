@@ -10,6 +10,9 @@ namespace chi_mesh
 {
   class MeshHandler;
   typedef std::shared_ptr<MeshHandler> MeshHandlerPtr;
+
+  class SurfaceMesh;
+  typedef std::shared_ptr<SurfaceMesh> SurfaceMeshPtr;
 }
 
 
@@ -19,6 +22,8 @@ class chi
 public:
   static std::vector<chi_mesh::MeshHandlerPtr>  meshhandler_stack;
   static int         current_mesh_handler;
+
+  static std::vector<chi_mesh::SurfaceMeshPtr>  surface_mesh_stack;
 
   class run_time
   {
@@ -42,7 +47,16 @@ public:
 public:
   /**Attempts to retrieve an object of base-type `shared_ptr<T>` at the given
    * handle. It then attempts to cast it to type `shared_ptr<R>` and, if
-   * successful, will return a reference of type R&.*/
+   * successful, will return a reference of type R&.
+   * \n
+   * \n
+   * Example usage:
+   *
+   * \code
+   * const auto& surf_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+        chi::surface_mesh_stack, surface_hndl);
+   * \endcode
+   * */
   template<class R,class T>
   static R& GetStackItem(std::vector<std::shared_ptr<T>>& stack,
                         const size_t handle,
@@ -59,8 +73,37 @@ public:
     }
     catch (const std::out_of_range& oor)
     {
-      throw std::logic_error("chi::GetStackItem: Invalid handle used. "
+      throw std::out_of_range("chi::GetStackItem: Invalid handle used. "
                              "Calling function: " + calling_function_name);
+    }
+  }
+
+  /**Attempts to object of type `shared_ptr<T>` at the given
+   * handle.
+   * \n
+   * \n
+   * Example usage:
+   *
+   * \code
+   * auto surf_mesh_ptr = chi::GetStackItemPtr<chi_mesh::SurfaceMesh>(
+      chi::surface_mesh_stack, surf_mesh_hndle, fname);
+   * \endcode
+   * */
+  template<class T>
+  static std::shared_ptr<T>&
+    GetStackItemPtr(std::vector<std::shared_ptr<T>>& stack,
+                    const size_t handle,
+                    const std::string& calling_function_name="Unknown")
+  {
+    try
+    {
+      std::shared_ptr<T>& item = stack.at(handle);
+      return item;
+    }
+    catch (const std::out_of_range& oor)
+    {
+      throw std::out_of_range("chi::GetStackItem: Invalid handle used. "
+                              "Calling function: " + calling_function_name);
     }
   }
   chi() = delete;

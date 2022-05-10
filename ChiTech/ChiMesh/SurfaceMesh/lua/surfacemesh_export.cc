@@ -1,11 +1,12 @@
 #include"../../../ChiLua/chi_lua.h"
 
 #include <iostream>
-#include <sstream>
 #include "../chi_surfacemesh.h"
 #include "../../MeshHandler/chi_meshhandler.h"
-#include <chi_log.h>
 
+#include "chi_runtime.h"
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //############################################################################# Create
@@ -30,18 +31,11 @@ int chiSurfaceMeshExportToObj(lua_State* L)
   size_t length = 0;
   const char* temp = lua_tolstring(L, 2, &length);
 
+  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, handle, __FUNCTION__);
 
-
-  try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
-
-    curItem->ExportToOBJFile(temp);
-  }
-
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  surface_mesh.ExportToOBJFile(temp);
+  
   return 0;
 }
 
@@ -67,17 +61,9 @@ int chiSurfaceMeshExportPolyFile(lua_State* L)
   size_t length = 0;
   const char* temp = lua_tolstring(L, 2, &length);
 
+  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, handle, __FUNCTION__);
 
-
-  try{
-    chi_mesh::SurfaceMesh* curItem = cur_hndlr.surface_mesh_stack.at(handle);
-
-    curItem->ExportToPolyFile(temp);
-  }
-
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  surface_mesh.ExportToPolyFile(temp);
   return 0;
 }

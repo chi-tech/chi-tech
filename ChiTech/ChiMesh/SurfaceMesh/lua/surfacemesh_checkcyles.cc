@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "../chi_surfacemesh.h"
 #include "../../MeshHandler/chi_meshhandler.h"
+#include "chi_runtime.h"
 
 #include <chi_log.h>
 
@@ -30,17 +31,10 @@ int chiSurfaceMeshCheckCycles(lua_State *L)
   int surf_handle = lua_tonumber(L,1);
   int num_angles  = lua_tonumber(L,2);
 
-  try{
-    chi_mesh::SurfaceMesh* curItem =
-      cur_hndlr.surface_mesh_stack.at(surf_handle);
+  auto& surf_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, surf_handle, __FUNCTION__);
 
-    curItem->CheckCyclicDependencies(num_angles);
-  }
-
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  surf_mesh.CheckCyclicDependencies(num_angles);
   return 0;
 }
 
@@ -62,15 +56,9 @@ int chiComputeLoadBalancing(lua_State *L)
 
   //======================================== Get reference surface mesh
   int surf_handle = lua_tonumber(L,1);
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-  chi_mesh::SurfaceMesh* cur_surf;
-  try{
-    cur_surf = cur_hndlr.surface_mesh_stack.at(surf_handle);
-  }
-  catch(const std::out_of_range& o){
-    std::cerr << "chiComputeLoadBalancing: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+
+  auto& cur_surf = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, surf_handle, __FUNCTION__);
 
   //======================================== Extract x-cuts
   if (!lua_istable(L,2))
@@ -115,7 +103,7 @@ int chiComputeLoadBalancing(lua_State *L)
   //======================================== Call compute balance
   std::stable_sort(x_cuts.begin(),x_cuts.end());
   std::stable_sort(y_cuts.begin(),y_cuts.end());
-  cur_surf->ComputeLoadBalancing(x_cuts,y_cuts);
+  cur_surf.ComputeLoadBalancing(x_cuts,y_cuts);
 
 
   return 0;

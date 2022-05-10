@@ -1,12 +1,10 @@
-#include"../../../ChiLua/chi_lua.h"
+#include "ChiLua/chi_lua.h"
 
-#include <iostream>
-#include <sstream>
-#include "../chi_surfacemesh.h"
-#include "../../MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
 
-#include <chi_log.h>
+#include "chi_runtime.h"
 
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 
@@ -30,16 +28,9 @@ int chiSurfaceMeshExtractOpenEdgesToObj(lua_State *L)
   int         surf_handle = lua_tonumber(L,1);
   const char* file_name   = lua_tostring(L,2);
 
-  try{
-    chi_mesh::SurfaceMesh* curItem =
-      cur_hndlr.surface_mesh_stack.at(surf_handle);
+  auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, surf_handle, __FUNCTION__);
 
-    curItem->ExtractOpenEdgesToObj(file_name);
-  }
-
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  surface_mesh.ExtractOpenEdgesToObj(file_name);
   return 0;
 }

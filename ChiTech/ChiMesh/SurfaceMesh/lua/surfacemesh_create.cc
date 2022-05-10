@@ -3,6 +3,8 @@
 #include "../chi_surfacemesh.h"
 #include "../../MeshHandler/chi_meshhandler.h"
 
+#include "chi_runtime.h"
+
 #include <chi_log.h>
 
 extern ChiLog& chi_log;
@@ -19,13 +21,12 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiSurfaceMeshCreate(lua_State *L)
 {
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   auto new_mesh = new chi_mesh::SurfaceMesh;
 
-  cur_hndlr.surface_mesh_stack.push_back(new_mesh);
+  chi::surface_mesh_stack.emplace_back(new_mesh);
 
-  int index = cur_hndlr.surface_mesh_stack.size()-1;
-  lua_pushnumber(L,index);
+  size_t index = chi::surface_mesh_stack.size()-1;
+  lua_pushnumber(L,static_cast<lua_Number>(index));
 
   chi_log.Log(LOG_ALLVERBOSE_2) << "chiSurfaceMeshCreate: "
                                          "Empty SurfaceMesh object, "
@@ -74,7 +75,7 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
   }
 
   //============================================= Extract x-array
-  int xtable_len = lua_rawlen(L,1);
+  size_t xtable_len = lua_rawlen(L,1);
   std::vector<double> values_x(xtable_len,0.0);
 
   for (int g=0; g<xtable_len; g++)
@@ -87,7 +88,7 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
   }
 
   //============================================= Extract y-array
-  int ytable_len = lua_rawlen(L,2);
+  size_t ytable_len = lua_rawlen(L,2);
   std::vector<double> values_y(ytable_len,0.0);
 
   for (int g=0; g<ytable_len; g++)
@@ -104,11 +105,10 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
     chi_mesh::SurfaceMesh::CreateFromDivisions(values_x,values_y);
 
   //============================================= Push to stack
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-  cur_hndlr.surface_mesh_stack.push_back(surface_mesh);
+  chi::surface_mesh_stack.emplace_back(surface_mesh);
 
-  int index = cur_hndlr.surface_mesh_stack.size()-1;
-  lua_pushnumber(L,index);
+  size_t index = chi::surface_mesh_stack.size()-1;
+  lua_pushnumber(L,static_cast<lua_Number>(index));
 
   chi_log.Log(LOG_ALLVERBOSE_2)
     << "chiSurfaceMeshCreateFromArrays: Created surface mesh "

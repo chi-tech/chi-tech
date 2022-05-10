@@ -1,12 +1,14 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../Extruder/volmesher_extruder.h"
-#include "../PredefinedUnpartitioned/volmesher_predefunpart.h"
+#include "ChiLua/chi_lua.h"
+#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
+#include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
-#include "../../MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
 #include <iostream>
 
-#include <chi_log.h>
+#include "chi_runtime.h"
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 
@@ -77,19 +79,9 @@ int chiVolumeMesherCreate(lua_State *L)
 
     if      (template_type == (int)SURFACE_MESH_TEMPLATE)
     {
-      chi_mesh::SurfaceMesh* surfaceMesh;
-      try {
-        surfaceMesh = handler.surface_mesh_stack.at(template_handle);
-      }
-      catch (const std::out_of_range& o)
-      {
-        chi_log.Log(LOG_ALLERROR)
-          << "In call to " << __FUNCTION__ << ", with template type"
-          << " ExtruderTemplateType.SURFACE_MESH. Invalid handle "
-          << template_handle << " to surface mesh.";
-        exit(EXIT_FAILURE);
-      }
-      new_mesher = new chi_mesh::VolumeMesherExtruder(surfaceMesh);
+      auto surface_mesh_ptr = chi::GetStackItemPtr(
+        chi::surface_mesh_stack, template_handle, __FUNCTION__);
+      new_mesher = new chi_mesh::VolumeMesherExtruder(surface_mesh_ptr);
     }
     else if (template_type == (int)UNPART_MESH_TEMPLATE)
     {

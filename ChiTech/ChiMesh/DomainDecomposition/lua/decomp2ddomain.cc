@@ -1,6 +1,8 @@
 #include "ChiLua/chi_lua.h"
-#include<iostream>
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "chi_runtime.h"
+
+#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
+
 
 
 /** \defgroup LuaDomainDecomposition Domain decomposition
@@ -24,24 +26,13 @@ int chiDecomposeSurfaceMeshPxPy(lua_State *L)
   if (num_args != 3)
     LuaPostArgAmountError("chiDecomposeSurfaceMeshPxPy",3,num_args);
 
-  //================================================== Get current handler
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-
   //================================================== Extract arguments
   int surface_hndl = lua_tonumber(L,1);
   int px           = lua_tonumber(L,2);
   int py           = lua_tonumber(L,3);
 
-
-  chi_mesh::SurfaceMesh* surf_mesh;
-  try{
-    surf_mesh = cur_hndlr.surface_mesh_stack.at(surface_hndl);
-  }
-  catch(const std::invalid_argument& ia)
-  {
-    std::cerr << "ERROR: Invalid index to surface mesh.\n";
-    exit(EXIT_FAILURE);
-  }
+  auto& surf_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
+    chi::surface_mesh_stack, surface_hndl);
 
   chi_mesh::DecomposeSurfaceMeshPxPy(surf_mesh,px,py);
 

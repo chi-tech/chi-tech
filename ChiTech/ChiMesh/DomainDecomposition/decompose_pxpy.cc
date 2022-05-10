@@ -71,14 +71,14 @@ double chi_mesh::ComputeLBF(std::vector<Vector3>& points,
 
 //###################################################################
 /** Decomposes a 2D surface mesh using the centroids in a Px-Py fashion.*/
-void chi_mesh::DecomposeSurfaceMeshPxPy(chi_mesh::SurfaceMesh* smesh,
+void chi_mesh::DecomposeSurfaceMeshPxPy(const chi_mesh::SurfaceMesh& smesh,
                                         int px, int py)
 {
   //================================================== Collect centroids
-  int num_pfaces = smesh->poly_faces.size();
+  int num_pfaces = smesh.poly_faces.size();
   std::vector<chi_mesh::Vector3> centroids(num_pfaces);
   for (int pf=0; pf<num_pfaces; pf++)
-    centroids[pf] = smesh->poly_faces[pf]->face_centroid;
+    centroids[pf] = smesh.poly_faces[pf]->face_centroid;
 
 
   //================================================== Define sort operators

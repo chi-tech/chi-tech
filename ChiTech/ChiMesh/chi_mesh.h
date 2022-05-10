@@ -18,7 +18,6 @@ namespace chi_mesh
   struct Vector3;
   typedef Vector3 Normal;
   typedef Vector3 Vertex;
-  typedef Vector3 Node;
 
   struct Matrix3x3;
   struct TensorRank2Dim3;
@@ -26,7 +25,6 @@ namespace chi_mesh
   struct Face;
   struct Edge;
   struct PolyFace;
-  typedef std::vector<Edge>      EdgeList;
 
 
   struct SPDS;
@@ -78,7 +76,7 @@ namespace chi_mesh
   double ComputeLBF(std::vector<Vector3>& points,
                     std::vector<double>& x_cuts,
                     std::vector<double>& y_cuts);
-  void   DecomposeSurfaceMeshPxPy(SurfaceMesh* smesh, int Px, int Py);
+  void   DecomposeSurfaceMeshPxPy(const SurfaceMesh& smesh, int Px, int Py);
 
   void CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices_1d);
 
