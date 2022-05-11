@@ -1,11 +1,10 @@
 #include "ChiLua/chi_lua.h"
 
-#include "ChiPhysics/chi_physics.h"
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
-#include <chi_log.h>
+#include "chi_runtime.h"
 
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_log.h"
 extern ChiLog&     chi_log;
 
 
@@ -29,17 +28,7 @@ int chiExportFieldFunctionToVTK(lua_State *L)
   if (num_args == 3)
     field_name = lua_tostring(L,3);
 
-  //======================================================= Getting solver
-  std::shared_ptr<chi_physics::FieldFunction> ff;
-  try{
-    ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
-    exit(EXIT_FAILURE);
-  }
+  auto ff = chi::GetStackItemPtr(chi::fieldfunc_stack, ff_handle, __FUNCTION__);
 
   ff->ExportToVTKComponentOnly(base_name, field_name);
 
@@ -67,16 +56,7 @@ int chiExportFieldFunctionToVTKG(lua_State *L)
     field_name = lua_tostring(L,3);
 
   //======================================================= Getting solver
-  std::shared_ptr<chi_physics::FieldFunction> ff;
-  try{
-    ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
-    exit(EXIT_FAILURE);
-  }
+  auto ff = chi::GetStackItemPtr(chi::fieldfunc_stack, ff_handle, __FUNCTION__);
 
   ff->ExportToVTK(base_name, field_name);
 
@@ -97,12 +77,11 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
   if (num_args != 2)
     LuaPostArgAmountError(__FUNCTION__, 2, num_args);
 
-  int list = lua_tonumber(L,1);
   const char* base_name = lua_tostring(L,2);
 
   LuaCheckTableValue(__FUNCTION__,L,1);
 
-  int table_size = lua_rawlen(L,1);
+  const size_t table_size = lua_rawlen(L,1);
   std::vector<std::shared_ptr<chi_physics::FieldFunction>> ffs;
   ffs.reserve(table_size);
   for (int i=0; i<table_size; ++i)
@@ -113,18 +92,9 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
     int ff_handle = lua_tonumber(L,-1);
     lua_pop(L,1);
 
-    //======================================================= Getting solver
-    std::shared_ptr<chi_physics::FieldFunction> ff;
-    try{
-      ff = chi_physics_handler.fieldfunc_stack.at(ff_handle);
-      ffs.push_back(ff);
-    }
-    catch(const std::out_of_range& o)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Invalid field function handle in chiPhysicsExportFieldFunctionToVTK";
-      exit(EXIT_FAILURE);
-    }
+    auto ff = chi::GetStackItemPtr(chi::fieldfunc_stack, ff_handle, __FUNCTION__);
+
+    ffs.push_back(ff);
   }
 
   chi_physics::FieldFunction::ExportMultipleFFToVTK(base_name,ffs);

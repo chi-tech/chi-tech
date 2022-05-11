@@ -44,6 +44,11 @@ std::vector<chi_mesh::LogicalVolumePtr> chi::logicvolume_stack;
 std::vector<chi_mesh::FFInterpPtr>      chi::field_func_interpolation_stack;
 std::vector<chi_mesh::UnpartMeshPtr>    chi::unpartitionedmesh_stack;
 
+std::vector<chi_physics::SolverPtr>                 chi::solver_stack;
+std::vector<chi_physics::MaterialPtr>               chi::material_stack;
+std::vector<chi_physics::TransportCrossSectionsPtr> chi::trnsprt_xs_stack;
+std::vector<chi_physics::FieldFunctionPtr>          chi::fieldfunc_stack;
+
 bool        chi::run_time::termination_posted = false;
 std::string chi::run_time::input_file_name;
 bool        chi::run_time::sim_option_interactive = true;
@@ -156,6 +161,18 @@ int chi::run_time::Initialize(int argc, char** argv)
  * */
 void chi::run_time::Finalize()
 {
+  meshhandler_stack.clear();
+
+  surface_mesh_stack.clear();
+  logicvolume_stack.clear();
+  field_func_interpolation_stack.clear();
+  unpartitionedmesh_stack.clear();
+
+  solver_stack.clear();
+  material_stack.clear();
+  trnsprt_xs_stack.clear();
+  fieldfunc_stack.clear();
+
   PetscFinalize();
   MPI_Finalize();
 }
@@ -217,7 +234,7 @@ int chi::run_time::RunBatch(int argc, char** argv)
 
 #ifndef NDEBUG
   chi_log.Log(LOG_0) << "Waiting...";
-  if (chi_mpi.location_id == 1)
+  if (chi_mpi.location_id == 0)
     for (int k=0; k<100; ++k)
     {
       usleep(1000000);

@@ -1,11 +1,11 @@
-#include "chi_log.h"
 #include "ChiLua/chi_lua.h"
-#include "ChiPhysics/chi_physics.h"
 
 #include "LBSCurvilinear/lbs_curvilinear_solver.h"
 
+#include "chi_runtime.h"
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
-extern ChiPhysics& chi_physics_handler;
 
 
 /**Creates a Curvilinear Neutral Particle Transport solver.
@@ -41,11 +41,11 @@ int chiLBSCurvilinearCreateSolver(lua_State *L)
     solver_name = lua_tostring(L, 2);
   }
 
-  const auto new_solver =
-    new LBSCurvilinear::Solver(coord_system_type, solver_name);
+  auto new_solver =
+    std::make_shared<LBSCurvilinear::Solver>(coord_system_type, solver_name);
 
-  chi_physics_handler.solver_stack.push_back(new_solver);
-  const auto index = chi_physics_handler.solver_stack.size() - 1;
+  chi::solver_stack.push_back(new_solver);
+  const auto index = chi::solver_stack.size() - 1;
   lua_pushinteger(L,static_cast<lua_Integer>(index));
 
   return 1;

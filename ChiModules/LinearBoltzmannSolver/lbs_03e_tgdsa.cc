@@ -2,11 +2,10 @@
 
 #include "../DiffusionSolver/Solver/diffusion_solver.h"
 
+#include "chi_runtime.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
-
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
@@ -31,7 +30,7 @@ void lbs::SteadySolver::InitTGDSA(LBSGroupset& groupset)
       &delta_phi_local,                             //Data vector
       scalar_uk_man);                               //Unknown manager
 
-    chi_physics_handler.fieldfunc_stack.push_back(deltaphi_ff);
+    chi::fieldfunc_stack.push_back(deltaphi_ff);
     field_functions.push_back(deltaphi_ff);
 
     //================================= Set diffusion solver

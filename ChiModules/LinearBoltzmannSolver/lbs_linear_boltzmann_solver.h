@@ -104,6 +104,9 @@ public:
   std::vector<double> precursor_new_local;
 
  public:
+  SteadySolver (const SteadySolver&) = delete;
+  SteadySolver& operator= (const SteadySolver&) = delete;
+
   //00
   explicit SteadySolver(const std::string& in_text_name);
   ~SteadySolver() override =default;

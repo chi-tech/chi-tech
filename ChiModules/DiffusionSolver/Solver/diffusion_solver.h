@@ -79,6 +79,9 @@ public:
 
 public:
   //00
+  Solver (const Solver&) = delete;
+  Solver& operator= (const Solver&) = delete;
+
   explicit Solver(const std::string& in_solver_name);
   virtual ~Solver();
   //01 General

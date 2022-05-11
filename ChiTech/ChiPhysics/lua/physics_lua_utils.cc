@@ -9,16 +9,17 @@
         lua_setglobal(L, #x)
 
 #include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
-chi_physics::Solver* chi_physics::lua_utils::
+#include "chi_runtime.h"
+
+chi_physics::Solver& chi_physics::lua_utils::
   GetSolverByHandle(int handle, const std::string &calling_function_name)
 {
-  chi_physics::Solver* solver;
+  std::shared_ptr<chi_physics::Solver> solver;
   try{
 
-    solver = dynamic_cast<chi_physics::Solver*>(
-      chi_physics_handler.solver_stack.at(handle));
+    solver = std::dynamic_pointer_cast<chi_physics::Solver>(
+      chi::solver_stack.at(handle));
 
     if (not solver)
       throw std::logic_error(calling_function_name +
@@ -31,7 +32,7 @@ chi_physics::Solver* chi_physics::lua_utils::
                            std::to_string(handle) + ").");
   }
 
-  return solver;
+  return *solver;
 }
 
 void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)

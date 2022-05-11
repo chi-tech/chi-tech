@@ -1,11 +1,6 @@
 #include "ChiLua/chi_lua.h"
 #include "physics_lua_utils.h"
 
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
-
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -31,9 +26,9 @@ int chiSolverInitialize(lua_State *L)
 
   int solver_handle = lua_tonumber(L, 1);
 
-  auto solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
+  auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
 
-  solver->Initialize();
+  solver.Initialize();
 
   return 0;
 }
@@ -57,9 +52,9 @@ int chiSolverExecute(lua_State *L)
 
   int solver_handle = lua_tonumber(L, 1);
 
-  auto solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
+  auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
 
-  solver->Execute();
+  solver.Execute();
 
   return 0;
 }
@@ -90,23 +85,23 @@ int chiSolverSetBasicOption(lua_State* L)
   const int         solver_handle = lua_tointeger(L,1);
   const std::string option_name   = lua_tostring(L,2);
 
-  auto solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle, fname);
+  auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle, fname);
 
   try
   {
-    auto& option = solver->basic_options[option_name];
+    auto& option = solver.basic_options[option_name];
 
     switch (option.Type())
     {
       case chi_data_types::VaryingDataType::VOID:
       case chi_data_types::VaryingDataType::ARBITRARY_BYTES:
-        throw std::logic_error("Solver:" + solver->TextName() +
+        throw std::logic_error("Solver:" + solver.TextName() +
                                " option:" + option_name + " is of invalid type."
                                " This indicates an implementation problem.");
       case chi_data_types::VaryingDataType::STRING:
         LuaCheckStringValue(fname, L, 3);
         option.SetStringValue(lua_tostring(L, 3));
-        chi_log.Log() << "Solver:" << solver->TextName()
+        chi_log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << option.StringValue()
         << ".";
@@ -114,7 +109,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::BOOL:
         LuaCheckBoolValue(fname, L, 3);
         option.SetBoolValue(lua_toboolean(L, 3));
-        chi_log.Log() << "Solver:" << solver->TextName()
+        chi_log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << ((option.BoolValue())? "true" : "false")
         << ".";
@@ -122,7 +117,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::INTEGER:
         LuaCheckIntegerValue(fname, L, 3);
         option.SetIntegerValue(lua_tointeger(L, 3));
-        chi_log.Log() << "Solver:" << solver->TextName()
+        chi_log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << option.IntegerValue()
         << ".";
@@ -130,7 +125,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::FLOAT:
         LuaCheckNumberValue(fname, L, 3);
         option.SetFloatValue(lua_tonumber(L, 3));
-        chi_log.Log() << "Solver:" << solver->TextName()
+        chi_log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << option.FloatValue()
         << ".";

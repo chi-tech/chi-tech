@@ -22,6 +22,9 @@ protected:
   std::vector<RespFuncAndSubs> response_functions;
 
 public:
+  AdjointSolver (const AdjointSolver&) = delete;
+  AdjointSolver& operator= (const AdjointSolver&) = delete;
+
   explicit AdjointSolver(const std::string& solver_name);
 
   void SetSource(LBSGroupset& groupset,

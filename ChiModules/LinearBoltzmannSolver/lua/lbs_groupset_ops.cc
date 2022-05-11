@@ -71,13 +71,13 @@ int chiLBSCreateGroupset(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Create groupset
-  lbs_solver->groupsets.emplace_back((int)lbs_solver->groupsets.size());
+  lbs_solver.groupsets.emplace_back((int)lbs_solver.groupsets.size());
 
-  lua_pushinteger(L, lbs_solver->groupsets.back().id);
+  lua_pushinteger(L, lbs_solver.groupsets.back().id);
   return 1;
 }
 
@@ -101,13 +101,13 @@ int chiLBSCreateGroup(lua_State *L)
 {
   //============================================= Get pointer to solver
   int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Create groupset
-  lbs_solver->groups.emplace_back((int)lbs_solver->groups.size());
+  lbs_solver.groups.emplace_back((int)lbs_solver.groups.size());
 
-  lua_pushnumber(L,lbs_solver->groups.back().id);
+  lua_pushnumber(L,lbs_solver.groups.back().id);
   return 1;
 }
 
@@ -151,13 +151,13 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -182,7 +182,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     LBSGroup* group;
     //================================= Check valid group
     try {
-      group = &lbs_solver->groups.at(k);
+      group = &lbs_solver.groups.at(k);
     }
     catch (const std::out_of_range& o)
     {
@@ -237,13 +237,13 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -340,13 +340,13 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -421,13 +421,13 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -487,13 +487,13 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -568,13 +568,13 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -655,13 +655,13 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -724,13 +724,13 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -790,13 +790,13 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -857,13 +857,13 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -939,13 +939,13 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -1027,13 +1027,13 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {

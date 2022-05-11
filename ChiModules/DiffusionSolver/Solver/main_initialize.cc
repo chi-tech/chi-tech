@@ -1,14 +1,16 @@
 #include "diffusion_solver.h"
 
-#include "ChiTimer/chi_timer.h"
-#include "chi_mpi.h"
-#include "chi_log.h"
-#include "ChiPhysics/chi_physics.h"
+#include "chi_runtime.h"
 
+
+#include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
@@ -76,7 +78,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
           unknown_manager);     //Unknown Manager
 
           field_functions.push_back(initial_field_function);
-          chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
+          chi::fieldfunc_stack.push_back(initial_field_function);
     }
     else if (sdm_string == "PWLD_MIP" or sdm_string == "PWLD_MIP_GAGG")
     {
@@ -91,7 +93,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
             unknown_manager);     //Unknown Manager
 
             field_functions.push_back(initial_field_function);
-            chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
+            chi::fieldfunc_stack.push_back(initial_field_function);
       }
     }
   }//if not ff set

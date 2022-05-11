@@ -21,7 +21,7 @@ int chiLBKESSetProperty(lua_State *L)
 
   LuaCheckNilValue(__FUNCTION__, L, 1);
   int solver_index = lua_tonumber(L, 1);
-  auto solver = lbs::k_eigenvalue_lua_utils::
+  auto& solver = lbs::k_eigenvalue_lua_utils::
   GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Get property index
@@ -41,11 +41,11 @@ int chiLBKESSetProperty(lua_State *L)
           << "Must be greater than 0.";
       exit(EXIT_FAILURE);
     }
-    solver->max_iterations = static_cast<size_t>(max_iters);
+    solver.max_iterations = static_cast<size_t>(max_iters);
 
     chi_log.Log(LOG_0)
         << "LinearBoltzmann::KEigenvalueSolver: "
-        << "max_iterations set to " << solver->max_iterations << ".";
+        << "max_iterations set to " << solver.max_iterations << ".";
   }
 
   else if (property == TOLERANCE)
@@ -60,7 +60,7 @@ int chiLBKESSetProperty(lua_State *L)
           << "Must be in the range (0.0, 1.0].";
       exit(EXIT_FAILURE);
     }
-    solver->tolerance = tol;
+    solver.tolerance = tol;
 
     char buff[100];
     sprintf(buff, "%.4e", tol);

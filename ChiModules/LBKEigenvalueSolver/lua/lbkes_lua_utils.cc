@@ -1,16 +1,15 @@
 #include "lbkes_lua_utils.h"
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
 
-lbs::KEigenvalueSolver* lbs::k_eigenvalue_lua_utils::
+lbs::KEigenvalueSolver& lbs::k_eigenvalue_lua_utils::
   GetSolverByHandle(int handle, const std::string& calling_function_name)
 {
-  lbs::KEigenvalueSolver* lbkes_solver;
+  std::shared_ptr<lbs::KEigenvalueSolver> lbkes_solver;
   try{
 
-    lbkes_solver = dynamic_cast<lbs::KEigenvalueSolver*>(
-      chi_physics_handler.solver_stack.at(handle));
+    lbkes_solver = std::dynamic_pointer_cast<lbs::KEigenvalueSolver>(
+      chi::solver_stack.at(handle));
 
     if (not lbkes_solver)
       throw std::logic_error(calling_function_name +
@@ -23,7 +22,7 @@ lbs::KEigenvalueSolver* lbs::k_eigenvalue_lua_utils::
                            std::to_string(handle) + ").");
   }
 
-  return lbkes_solver;
+  return *lbkes_solver;
 }
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)

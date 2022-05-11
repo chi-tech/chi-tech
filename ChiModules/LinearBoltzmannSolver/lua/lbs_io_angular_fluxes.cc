@@ -35,13 +35,13 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -51,7 +51,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  lbs_solver->WriteGroupsetAngularFluxes(*groupset, file_base);
+  lbs_solver.WriteGroupsetAngularFluxes(*groupset, file_base);
 
   return 0;
 }
@@ -85,13 +85,13 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
   LBSGroupset* groupset;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -101,7 +101,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
     exit(EXIT_FAILURE);
   }
 
-  lbs_solver->ReadGroupsetAngularFluxes(*groupset, file_base);
+  lbs_solver.ReadGroupsetAngularFluxes(*groupset, file_base);
 
   return 0;
 }

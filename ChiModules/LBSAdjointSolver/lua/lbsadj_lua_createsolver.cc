@@ -2,11 +2,9 @@
 
 #include "LBSAdjointSolver/lbsadj_solver.h"
 
-#include "ChiPhysics/chi_physics.h"
+#include "chi_runtime.h"
 
-namespace lbs_adjoint
-{
-namespace lua_utils
+namespace lbs_adjoint::lua_utils
 {
 
 //###################################################################
@@ -29,15 +27,13 @@ int chiAdjointSolverCreate(lua_State* L)
     solver_name = lua_tostring(L, 1);
   }
 
-  auto solver = new lbs_adjoint::AdjointSolver(solver_name);
+  auto solver = std::make_shared<lbs_adjoint::AdjointSolver>(solver_name);
 
-  auto& physics_handler = ChiPhysics::GetInstance();
-  physics_handler.solver_stack.push_back(solver);
-  size_t handle = physics_handler.solver_stack.size()-1;
+  chi::solver_stack.push_back(solver);
+  const size_t handle = chi::solver_stack.size()-1;
 
   lua_pushinteger(L,static_cast<lua_Integer>(handle));
   return 1;
 }
 
-} //namespace lua_utils
 } //namespace lbs_adjoint

@@ -25,9 +25,9 @@ int chiAdjointSolverExportImportanceMapBinary(lua_State* L)
   const int solver_index     = lua_tointeger(L,1);
   const std::string file_name = lua_tostring(L,2);
 
-  auto solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
+  auto& solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
 
-  solver->ExportImportanceMap(file_name);
+  solver.ExportImportanceMap(file_name);
 
   return 0;
 }

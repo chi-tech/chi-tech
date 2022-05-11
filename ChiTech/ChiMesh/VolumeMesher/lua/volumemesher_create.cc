@@ -57,7 +57,7 @@ int chiVolumeMesherCreate(lua_State *L)
   //============================================= Mesher type
   const int mesher_type = lua_tonumber(L, 1);
 
-  chi_mesh::VolumeMesher* new_mesher;
+  std::shared_ptr<chi_mesh::VolumeMesher> new_mesher = nullptr;
 
   if (mesher_type == chi_mesh::VolumeMesherType::EXTRUDER)
   {
@@ -88,14 +88,14 @@ int chiVolumeMesherCreate(lua_State *L)
       auto surface_mesh_ptr = chi::GetStackItemPtr(chi::surface_mesh_stack,
                                                    template_handle, fname);
 
-      new_mesher = new chi_mesh::VolumeMesherExtruder(surface_mesh_ptr);
+      new_mesher = std::make_shared<chi_mesh::VolumeMesherExtruder>(surface_mesh_ptr);
     }
     else if (template_type == (int)UNPART_MESH_TEMPLATE)
     {
       auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
                                           template_handle, fname);
 
-      new_mesher = new chi_mesh::VolumeMesherExtruder(p_umesh);
+      new_mesher = std::make_shared<chi_mesh::VolumeMesherExtruder>(p_umesh);
     }
     else
     {
@@ -123,7 +123,7 @@ int chiVolumeMesherCreate(lua_State *L)
     auto p_umesh = chi::GetStackItemPtr(chi::unpartitionedmesh_stack,
                                         template_handle, fname);
 
-    new_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
+    new_mesher = std::make_shared<chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
   }
   else
   {

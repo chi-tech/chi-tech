@@ -155,7 +155,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     if (typeid(*cur_hndlr.volume_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
     {
-      auto mesher = (chi_mesh::VolumeMesherExtruder*)cur_hndlr.volume_mesher;
+      auto& mesher = (chi_mesh::VolumeMesherExtruder&)*cur_hndlr.volume_mesher;
 
       double layer_height = lua_tonumber(L,2);
       int    subdivisions = 1;
@@ -172,7 +172,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         new_layer.name = std::string(lua_tostring(L,4));
       }
-      mesher->input_layers.push_back(new_layer);
+      mesher.input_layers.push_back(new_layer);
     }
     else
     {

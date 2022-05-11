@@ -2,11 +2,11 @@
 
 #include"../Solver/diffusion_solver.h"
 
+#include "chi_runtime.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
-#include"ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 //#############################################################################
 /** Sets a property of a Diffusion solver. Please also consult the whitepaper
@@ -69,16 +69,11 @@ int chiDiffusionSetProperty(lua_State *L)
 
   //============================================= Get solver
   LuaCheckNumberValue(fname, L, 1);
-  int solver_index = lua_tonumber(L,1);
-  chi_diffusion::Solver* solver;
+  const int solver_index = lua_tonumber(L,1);
 
-  try{
-    solver = (chi_diffusion::Solver*)chi_physics_handler.solver_stack.at(solver_index);
-  }
-  catch(const std::out_of_range& o){
-    chi_log.Log(LOG_0ERROR) << "ERROR: Invalid solver handle." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  auto& solver = chi::GetStackItem<chi_diffusion::Solver>(chi::solver_stack,
+                                                          solver_index,
+                                                          fname);
 
   //============================================= Get property index
   LuaCheckStringValue(fname, L, 2);
@@ -116,7 +111,7 @@ int chiDiffusionSetProperty(lua_State *L)
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Reflecting;
 
-      solver->boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
                          << "Reflecting.";
@@ -138,7 +133,7 @@ int chiDiffusionSetProperty(lua_State *L)
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Dirichlet;
       bndry_info.second = {b_value};
-      solver->boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
                          << "Dirichlet with value " << b_value;
@@ -160,7 +155,7 @@ int chiDiffusionSetProperty(lua_State *L)
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.0,1.0,f_value};
-      solver->boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
                          << "Neumann with f = ("
@@ -181,7 +176,7 @@ int chiDiffusionSetProperty(lua_State *L)
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Robin;
       bndry_info.second = {0.25,0.5,0.0};
-      solver->boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
                          << "Vacuum.";
@@ -208,7 +203,7 @@ int chiDiffusionSetProperty(lua_State *L)
       chi_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = chi_diffusion::BoundaryType::Robin;
       bndry_info.second = {a_value,b_value,f_value};
-      solver->boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
+      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
                          << "Robin with a,b,f = ("

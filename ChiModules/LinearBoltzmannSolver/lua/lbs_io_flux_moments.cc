@@ -34,10 +34,10 @@ int chiLBSWriteFluxMoments(lua_State *L)
   std::string file_base = lua_tostring(L,2);
 
   //============================================= Get pointer to solver
-  auto solver =
+  auto& solver =
     lbs::lua_utils::GetSolverByHandle(solver_index, __FUNCTION__);
 
-  solver->WriteFluxMoments(file_base, solver->phi_old_local);
+  solver.WriteFluxMoments(file_base, solver.phi_old_local);
 
   return 0;
 }
@@ -67,11 +67,11 @@ int chiLBSCreateAndWriteSourceMoments(lua_State *L)
   std::string file_base = lua_tostring(L,2);
 
   //============================================= Get pointer to solver
-  auto solver =
+  auto& solver =
     lbs::lua_utils::GetSolverByHandle(solver_index, __FUNCTION__);
 
-  auto source_moments = solver->MakeSourceMomentsFromPhi();
-  solver->WriteFluxMoments(file_base, source_moments);
+  auto source_moments = solver.MakeSourceMomentsFromPhi();
+  solver.WriteFluxMoments(file_base, source_moments);
 
   return 0;
 }
@@ -113,18 +113,18 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
- auto solver =
+ auto& solver =
    lbs::lua_utils::GetSolverByHandle(solver_index, __FUNCTION__);
 
-  solver->ReadFluxMoments(file_base,
-                          solver->ext_src_moments_local,
+  solver.ReadFluxMoments(file_base,
+                          solver.ext_src_moments_local,
                           single_file_flag);
 
   chi_log.Log() << "Making source moments from flux file.";
-  auto temp_phi = solver->phi_old_local;
-  solver->phi_old_local = solver->ext_src_moments_local;
-  solver->ext_src_moments_local = solver->MakeSourceMomentsFromPhi();
-  solver->phi_old_local = temp_phi;
+  auto temp_phi = solver.phi_old_local;
+  solver.phi_old_local = solver.ext_src_moments_local;
+  solver.ext_src_moments_local = solver.MakeSourceMomentsFromPhi();
+  solver.phi_old_local = temp_phi;
 
   return 0;
 }
@@ -165,11 +165,11 @@ int chiLBSReadSourceMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto solver =
+  auto& solver =
     lbs::lua_utils::GetSolverByHandle(solver_index, __FUNCTION__);
 
-  solver->ReadFluxMoments(file_base,
-                          solver->ext_src_moments_local,
+  solver.ReadFluxMoments(file_base,
+                          solver.ext_src_moments_local,
                           single_file_flag);
 
   return 0;
@@ -210,11 +210,11 @@ int chiLBSReadFluxMoments(lua_State *L)
   }
 
   //============================================= Get pointer to solver
-  auto solver =
+  auto& solver =
     lbs::lua_utils::GetSolverByHandle(solver_index, __FUNCTION__);
 
-  solver->ReadFluxMoments(file_base,
-                          solver->phi_old_local,
+  solver.ReadFluxMoments(file_base,
+                          solver.phi_old_local,
                           single_file_flag);
 
   return 0;

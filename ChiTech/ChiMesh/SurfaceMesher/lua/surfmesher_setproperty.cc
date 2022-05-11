@@ -22,7 +22,7 @@ int chiSurfaceMesherSetProperty(lua_State *L)
 {
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
-  chi_mesh::SurfaceMesher* surf_mesher = cur_hndlr.surface_mesher;
+  auto surf_mesher = cur_hndlr.surface_mesher;
 
   //================================================== Get property number
   int property_num = lua_tonumber(L,1);

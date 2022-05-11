@@ -11,8 +11,8 @@
 class chi_mesh::MeshHandler
 {
 public:
-  chi_mesh::SurfaceMesher* surface_mesher = nullptr;
-  chi_mesh::VolumeMesher*  volume_mesher = nullptr;
+  std::shared_ptr<chi_mesh::SurfaceMesher> surface_mesher = nullptr;
+  std::shared_ptr<chi_mesh::VolumeMesher>  volume_mesher = nullptr;
 
 
 public:

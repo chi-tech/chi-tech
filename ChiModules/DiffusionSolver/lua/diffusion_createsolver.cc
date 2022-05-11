@@ -2,12 +2,10 @@
 
 #include"../Solver/diffusion_solver.h"
 
-#include"ChiPhysics/chi_physics.h"
-#include <chi_log.h>
+#include "chi_runtime.h"
 
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_log.h"
 extern ChiLog& chi_log;
-
 
 //#############################################################################
 /** Creates a Diffusion solver.
@@ -28,12 +26,12 @@ int chiDiffusionCreateSolver(lua_State *L)
     solver_name = lua_tostring(L, 1);
   }
 
-  auto new_solver = new chi_diffusion::Solver(solver_name);
+  auto new_solver = std::make_shared<chi_diffusion::Solver>(solver_name);
 
-  chi_physics_handler.solver_stack.push_back(new_solver);
+  chi::solver_stack.push_back(new_solver);
 
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi_physics_handler.solver_stack.size()-1));
+      static_cast<lua_Integer>(chi::solver_stack.size()-1));
 
   chi_log.Log(LOG_ALLVERBOSE_1)
     << "chiDiffusionCreateSolver: Diffusion solver created"

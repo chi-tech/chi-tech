@@ -36,10 +36,10 @@ int chiSurfaceMesherCreate(lua_State *L)
   int type = lua_tonumber(L,1);
 
   //============================================= Create the surface mesher
-  chi_mesh::SurfaceMesher* new_mesher;
+  std::shared_ptr<chi_mesh::SurfaceMesher> new_mesher = nullptr;
   if (type==(int)chi_mesh::SurfaceMesherType::Predefined)
   {
-    new_mesher = new chi_mesh::SurfaceMesherPredefined;
+    new_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
   }
   else
   {

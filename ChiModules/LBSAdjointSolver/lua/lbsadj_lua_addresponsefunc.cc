@@ -35,12 +35,12 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
     lua_function = lua_tostring(L,4);
   }
 
-  auto solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
+  auto& solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
 
   auto p_logical_volume = chi::GetStackItemPtr(
     chi::logicvolume_stack, logvol_handle, fname);
 
-  size_t qoi_index = solver->AddResponseFunction(qoi_name,
+  size_t qoi_index = solver.AddResponseFunction(qoi_name,
                                                  p_logical_volume,
                                                  lua_function);
   lua_pushinteger(L, static_cast<lua_Integer>(qoi_index));

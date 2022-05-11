@@ -24,6 +24,9 @@ private:
 
 //  Methods
 public:
+  Solver (const Solver&) = delete;
+  Solver& operator= (const Solver&) = delete;
+
   /** Constructor. */
   Solver(const chi_math::CoordinateSystemType& coord_system_type,
          const std::string& in_text_name)

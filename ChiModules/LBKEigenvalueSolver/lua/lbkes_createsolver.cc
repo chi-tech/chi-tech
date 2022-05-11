@@ -1,11 +1,10 @@
+#include "ChiLua/chi_lua.h"
+
 #include "../lbkes_k_eigenvalue_solver.h"
 
-#include <chi_lua.h>
+#include "chi_runtime.h"
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics& chi_physics_handler;
-
-#include <chi_log.h>
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 using namespace lbs;
@@ -26,11 +25,11 @@ int chiLBKESCreateSolver(lua_State* L)
     solver_name = lua_tostring(L, 1);
   }
 
-  auto solver = new KEigenvalueSolver(solver_name);
+  auto solver = std::make_shared<KEigenvalueSolver>(solver_name);
 
-  chi_physics_handler.solver_stack.push_back(solver);
+  chi::solver_stack.push_back(solver);
 
-  auto n = static_cast<lua_Integer>(chi_physics_handler.solver_stack.size() - 1);
+  auto n = static_cast<lua_Integer>(chi::solver_stack.size() - 1);
   lua_pushinteger(L, n);
   return 1;
 }

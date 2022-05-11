@@ -78,9 +78,9 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = new chi_mesh::SurfaceMesherPredefined;
-  handler.volume_mesher =
-    new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
+  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
+  handler.volume_mesher = std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
 
   handler.surface_mesher->Execute();
 
@@ -172,9 +172,9 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = new chi_mesh::SurfaceMesherPredefined;
-  handler.volume_mesher =
-    new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
+  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
+  handler.volume_mesher = std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
 
   handler.surface_mesher->Execute();
 
@@ -343,9 +343,9 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler.surface_mesher = new chi_mesh::SurfaceMesherPredefined;
-  handler.volume_mesher =
-    new chi_mesh::VolumeMesherPredefinedUnpartitioned(p_umesh);
+  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
+  handler.volume_mesher = std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
 
   handler.surface_mesher->Execute();
 

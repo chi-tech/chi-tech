@@ -1,7 +1,6 @@
 #include "lbsadj_lua_utils.h"
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
 
 //###################################################################
 /** Obtains a pointer to a lbs_adjoint::AdjointSolver object or an object
@@ -13,14 +12,14 @@ extern ChiPhysics&  chi_physics_handler;
  *                              should uniquely identify the calling function.
  *
  */
-lbs_adjoint::AdjointSolver* lbs_adjoint::lua_utils::GetSolverByHandle(
+lbs_adjoint::AdjointSolver& lbs_adjoint::lua_utils::GetSolverByHandle(
   int handle, const std::string& calling_function_name)
 {
-  lbs_adjoint::AdjointSolver* adj_solver;
+  std::shared_ptr<lbs_adjoint::AdjointSolver> adj_solver;
   try{
 
-    adj_solver = dynamic_cast<lbs_adjoint::AdjointSolver*>(
-      chi_physics_handler.solver_stack.at(handle));
+    adj_solver = std::dynamic_pointer_cast<lbs_adjoint::AdjointSolver>(
+      chi::solver_stack.at(handle));
 
     if (not adj_solver)
       throw std::logic_error(calling_function_name +
@@ -33,7 +32,7 @@ lbs_adjoint::AdjointSolver* lbs_adjoint::lua_utils::GetSolverByHandle(
     std::to_string(handle) + ").");
   }
 
-  return adj_solver;
+  return *adj_solver;
 }
 
 void lbs_adjoint::lua_utils::RegisterLuaEntities(lua_State* L)

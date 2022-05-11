@@ -9,8 +9,6 @@
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 #define FFI_FIELD_FUNCTION 0
 
@@ -147,16 +145,9 @@ int chiFFInterpolationSetProperty(lua_State *L)
   if (property == FFI_FIELD_FUNCTION)                        //ADD FF
   {
     int ffhandle = lua_tonumber(L,3);
-    std::shared_ptr<chi_physics::FieldFunction> cur_ff;
-    try {
-      cur_ff = chi_physics_handler.fieldfunc_stack.at(ffhandle);
-    }
-    catch(const std::out_of_range& o)
-    {
-      chi_log.Log(LOG_ALLERROR)
-        << "Invalid field function handle in chiFFInterpolationSetProperty.";
-      exit(EXIT_FAILURE);
-    }
+    std::shared_ptr<chi_physics::FieldFunction> cur_ff = chi::GetStackItemPtr(
+      chi::fieldfunc_stack, ffhandle, __FUNCTION__);
+
 
     p_ffi->field_functions.push_back(cur_ff);
   }

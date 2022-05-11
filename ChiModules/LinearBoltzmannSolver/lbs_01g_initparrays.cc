@@ -1,13 +1,14 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiPhysics/chi_physics.h"
-#include "chi_log.h"
-#include "chi_mpi.h"
 
+#include "chi_runtime.h"
+
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes parallel arrays.*/
@@ -188,7 +189,7 @@ void lbs::SteadySolver::InitializeParrays()
           m,                      //Reference unknown
           g);                     //Reference component
 
-        chi_physics_handler.fieldfunc_stack.push_back(group_ff);
+        chi::fieldfunc_stack.push_back(group_ff);
         field_functions.push_back(group_ff);
       }//for m
     }//for g
