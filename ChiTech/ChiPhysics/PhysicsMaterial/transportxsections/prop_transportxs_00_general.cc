@@ -1,9 +1,7 @@
+#include "chi_runtime.h"
 #include "material_property_transportxsections.h"
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
-
-#include <chi_log.h>
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -120,7 +118,7 @@ void chi_physics::TransportCrossSections::
     std::shared_ptr<chi_physics::TransportCrossSections> xs;
     try
     {
-      xs = chi_physics_handler.trnsprt_xs_stack.at(combo.first);
+      xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first);
     }
     catch(const std::out_of_range& o)
     {

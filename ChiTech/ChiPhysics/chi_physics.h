@@ -16,9 +16,6 @@ class ChiPhysics
 public:
 	double    					physicsTimestep=16.66667;
 
-  std::vector<std::shared_ptr<chi_physics::Material>>      material_stack;
-  std::vector<std::shared_ptr<chi_physics::TransportCrossSections>> trnsprt_xs_stack;
-
 private:
   static ChiPhysics instance;
 

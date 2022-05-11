@@ -3,13 +3,13 @@
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
+
+#include "chi_runtime.h"
 
 #include "chi_log.h"
-#include "chi_mpi.h"
-
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
 //###################################################################
@@ -34,7 +34,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     exit(EXIT_FAILURE);
   }
 
-  if (mat_id>=chi_physics_handler.material_stack.size())
+  if (mat_id>=chi::material_stack.size())
   {
     chi_log.Log(LOG_0ERROR)
       << "Cell encountered with material id pointing to "
@@ -46,7 +46,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
   auto property_map_q     = basic_options("property_map_q").IntegerValue();
   auto property_map_sigma = basic_options("property_map_sigma").IntegerValue();
 
-  auto material = chi_physics_handler.material_stack[mat_id];
+  auto material = chi::GetStackItemPtr(chi::material_stack, mat_id, __FUNCTION__);
 
   //====================================== Process material properties
   diffCoeff.resize(cell_dofs,1.0);

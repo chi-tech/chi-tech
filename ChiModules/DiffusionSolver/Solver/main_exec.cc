@@ -1,15 +1,14 @@
 #include "diffusion_solver.h"
 
-#include "ChiTimer/chi_timer.h"
+#include "chi_runtime.h"
 
 #include "chi_mpi.h"
-#include "chi_log.h"
-#include "ChiPhysics/chi_physics.h"
-
 extern ChiMPI& chi_mpi;
-extern ChiLog& chi_log;
-extern ChiPhysics&  chi_physics_handler;
 
+#include "chi_log.h"
+extern ChiLog& chi_log;
+
+#include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
 
 //###################################################################
@@ -19,7 +18,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
 {
   t_assembly.Reset();
 
-  if (chi_physics_handler.material_stack.empty())
+  if (chi::material_stack.empty())
   {
     chi_log.Log(LOG_0ERROR)
       << "No materials added to simulation. Add materials.";

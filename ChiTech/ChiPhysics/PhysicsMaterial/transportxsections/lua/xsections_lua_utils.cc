@@ -1,12 +1,12 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
+
+#include "chi_runtime.h"
+
 #include "ChiPhysics/chi_physics.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
-extern ChiPhysics&  chi_physics_handler;
-
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -32,9 +32,9 @@ int chiPhysicsTransportXSCreate(lua_State* L)
 {
   auto xs = std::make_shared<chi_physics::TransportCrossSections>();
 
-  chi_physics_handler.trnsprt_xs_stack.push_back(xs);
+  chi::trnsprt_xs_stack.push_back(xs);
 
-  size_t index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+  const size_t index = chi::trnsprt_xs_stack.size()-1;
 
   lua_pushinteger(L,static_cast<lua_Integer>(index));
   return 1;
@@ -121,7 +121,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
     chi_log.Log(LOG_ALLERROR)
@@ -218,7 +218,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
     chi_log.Log(LOG_ALLERROR)
@@ -330,9 +330,9 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
   new_xs->MakeCombined(combinations);
 
-  chi_physics_handler.trnsprt_xs_stack.push_back(new_xs);
+  chi::trnsprt_xs_stack.push_back(new_xs);
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi_physics_handler.trnsprt_xs_stack.size())-1);
+      static_cast<lua_Integer>(chi::trnsprt_xs_stack.size())-1);
 
   return 1;
 }
@@ -388,7 +388,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(xs_handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle);
   }
   catch(const std::out_of_range& o){
     chi_log.Log(LOG_ALLERROR)
@@ -468,7 +468,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
     chi_log.Log(LOG_ALLERROR)

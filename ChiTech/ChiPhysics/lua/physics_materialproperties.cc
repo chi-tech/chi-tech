@@ -1,15 +1,16 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
-#include "ChiPhysics/chi_physics.h"
+#include "chi_runtime.h"
+
+#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
-extern ChiPhysics&  chi_physics_handler;
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
 
 
 //#############################################################################
@@ -59,7 +60,8 @@ chiPhysicsMaterialAddProperty(materials[i],TRANSPORT_XSECTIONS)
 \author Jan*/
 int chiPhysicsMaterialAddProperty(lua_State *L)
 {
-  int numArgs = lua_gettop(L);
+  const std::string fname = __FUNCTION__;
+  const int numArgs = lua_gettop(L);
 
   if (!((numArgs>=2) && (numArgs<=3)))
   {
@@ -78,14 +80,8 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   }
 
   //============================================= Get reference to material
-  std::shared_ptr<chi_physics::Material> cur_material;
-  try {
-    cur_material = chi_physics_handler.material_stack.at(material_index);
-  }
-  catch(const std::out_of_range& o){
-    chi_log.Log(LOG_0ERROR) << "ERROR: Invalid material handle." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  auto cur_material = chi::GetStackItemPtr(chi::material_stack,
+                                           material_index, fname);
 
   //============================================= Process property
   using MatProperty = chi_physics::PropertyType;
@@ -136,11 +132,11 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
     chi_log.Log(LOG_0VERBOSE_1) << "Transport cross-sections added to material"
                                  " at index " << material_index;
 
-    chi_physics_handler.trnsprt_xs_stack.push_back(prop);
+    chi::trnsprt_xs_stack.push_back(prop);
 
-    size_t index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+    const size_t index = chi::trnsprt_xs_stack.size()-1;
 
-    lua_pushnumber(L,index);
+    lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
   }
   else if (property_index == static_cast<int>(MatProperty::ISOTROPIC_MG_SOURCE))
@@ -300,7 +296,8 @@ Checklist for adding a new material property:
 \author Jan*/
 int chiPhysicsMaterialSetProperty(lua_State *L)
 {
-  int numArgs = lua_gettop(L);
+  const std::string fname = __FUNCTION__;
+  const int numArgs = lua_gettop(L);
 
   if (numArgs<3)
   {
@@ -323,14 +320,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   int operation_index = lua_tonumber(L,3);
 
   //============================================= Get reference to material
-  std::shared_ptr<chi_physics::Material> cur_material;
-  try {
-    cur_material = chi_physics_handler.material_stack.at(material_index);
-  }
-  catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR) << "ERROR: Invalid material handle." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  auto cur_material = chi::GetStackItemPtr(chi::material_stack,
+                                           material_index, fname);
 
   //============================================= If user supplied name then
   //                                              find property index
@@ -480,7 +471,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         std::shared_ptr<chi_physics::TransportCrossSections> xs;
         try {
-          xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+          xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle, fname);
         }
         catch(const std::out_of_range& o){
           chi_log.Log(LOG_ALLERROR)
@@ -574,7 +565,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
           exit(EXIT_FAILURE);
         }
 
-        int table_len = lua_rawlen(L,4);
+        const size_t table_len = lua_rawlen(L,4);
 
         std::vector<double> values(table_len,0.0);
         for (int g=0; g<table_len; g++)
@@ -631,7 +622,8 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 */
 int chiPhysicsMaterialGetProperty(lua_State* L)
 {
-  int num_args = lua_gettop(L);
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
   if (num_args != 2)
     LuaPostArgAmountError("chiPhysicsMaterialGetProperty",2,num_args);
 
@@ -647,14 +639,8 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
   }
 
   //============================================= Get reference to material
-  std::shared_ptr<chi_physics::Material> cur_material;
-  try {
-    cur_material = chi_physics_handler.material_stack.at(material_index);
-  }
-  catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR) << "ERROR: Invalid material handle." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  auto cur_material = chi::GetStackItemPtr(chi::material_stack,
+                                           material_index, fname);
 
   //============================================= If user supplied name then
   //                                              find property index
@@ -694,8 +680,10 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
 /**Set a cross section to a new value.
 \ingroup LuaPhysicsMaterials
  */
-int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L) {
-  int num_args = lua_gettop(L);
+int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
 
   if (num_args != 3)
     LuaPostArgAmountError(__FUNCTION__, 3, num_args);
@@ -707,15 +695,8 @@ int chiPhysicsMaterialModifyTotalCrossSection(lua_State* L) {
   int group_num = lua_tointeger(L, 2);
   double xs_val = lua_tonumber(L, 3);
 
-  std::shared_ptr<chi_physics::Material> cur_material;
-  try {
-    cur_material = chi_physics_handler.material_stack.at(material_index);
-  }
-  catch(const std::out_of_range& o) {
-    chi_log.Log(LOG_ALLERROR)
-      << "ERROR: Invalid material handle." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  auto cur_material = chi::GetStackItemPtr(chi::material_stack,
+                                           material_index, fname);
 
   using MatProperty = chi_physics::PropertyType;
   using XS = chi_physics::TransportCrossSections;

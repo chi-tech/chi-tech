@@ -1,16 +1,13 @@
 #include "chi_meshcontinuum.h"
 #include <fstream>
-#include <ChiPhysics/chi_physics.h>
-#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
 
+#include "chi_runtime.h"
 
-extern ChiPhysics&  chi_physics_handler;
-
-#include <chi_mpi.h>
-#include <chi_log.h>
-
-extern ChiMPI& chi_mpi;
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
+extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Export cells to python.
@@ -109,7 +106,7 @@ void chi_mesh::MeshContinuum::
     std::string file_base_name =
       str_file_name.substr(0,str_file_name.find('.'));
 
-    if (chi_physics_handler.material_stack.empty())
+    if (chi::material_stack.empty())
     {
       chi_log.Log(LOG_0WARNING)
         << "ExportCellsToObj: No mesh will be exported because there "
@@ -117,7 +114,7 @@ void chi_mesh::MeshContinuum::
     }
 
 
-    for (int mat=0; mat<chi_physics_handler.material_stack.size(); mat++)
+    for (int mat=0; mat<chi::material_stack.size(); mat++)
     {
       std::string mat_base_name = file_base_name +
                                   std::string("_m") +

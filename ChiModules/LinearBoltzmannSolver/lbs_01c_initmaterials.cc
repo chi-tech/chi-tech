@@ -1,15 +1,17 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include <ChiPhysics/chi_physics.h>
-#include <ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h>
+#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
+
+#include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
+
+#include "ChiPhysics/chi_physics.h"
+extern ChiPhysics&  chi_physics_handler;
 
 #include <algorithm>
 
@@ -22,11 +24,12 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
   std::stringstream materials_list;
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process materials found
-  size_t num_physics_mats = chi_physics_handler.material_stack.size();
+  const size_t num_physics_mats = chi::material_stack.size();
 
   for (const int& mat_id : material_ids)
   {
-    auto current_material = chi_physics_handler.material_stack[mat_id];
+    auto current_material = chi::GetStackItemPtr(chi::material_stack,
+                                                 mat_id, __FUNCTION__);
     materials_list << "Material id " << mat_id;
 
     //====================================== Check valid ids

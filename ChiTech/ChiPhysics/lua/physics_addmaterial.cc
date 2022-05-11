@@ -1,12 +1,10 @@
 #include "../../ChiLua/chi_lua.h"
 #include<iostream>
-#include "../chi_physics.h"
 #include "../PhysicsMaterial/chi_physicsmaterial.h"
 
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
 
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //#############################################################################
@@ -41,10 +39,10 @@ int chiPhysicsAddMaterial(lua_State *L)
     new_material->name = std::string(temp);
   }
 
-  chi_physics_handler.material_stack.push_back(new_material);
+  chi::material_stack.push_back(new_material);
 
-  size_t index = chi_physics_handler.material_stack.size()-1;
-  lua_pushnumber(L,index);
+  const size_t index = chi::material_stack.size()-1;
+  lua_pushnumber(L,static_cast<lua_Number>(index));
 
   chi_log.Log(LOG_0VERBOSE_1) << "New material added at index " << index
                             << " with name \"" << new_material->name << "\"";
