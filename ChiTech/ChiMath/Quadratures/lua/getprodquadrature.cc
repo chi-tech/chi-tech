@@ -1,11 +1,10 @@
 #include "ChiLua/chi_lua.h"
-#include "ChiMath//chi_math.h"
+
+#include "chi_runtime.h"
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
-#include <chi_log.h>
-
-extern ChiMath&     chi_math_handler;
+#include "chi_log.h"
 extern ChiLog&     chi_log;
 
 //########################################################## Get product quadrature
@@ -28,7 +27,7 @@ int chiGetProductQuadrature(lua_State *L)
 
   std::shared_ptr<chi_math::ProductQuadrature> quad;
   try{
-    auto ang_quad = chi_math_handler.angular_quadratures.at(handle);
+    auto ang_quad = chi::angular_quadrature_stack.at(handle);
     if (ang_quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
       quad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
     else

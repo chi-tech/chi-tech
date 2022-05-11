@@ -114,6 +114,22 @@ public:
     dof_storage_type(in_storage_type)
   {}
 
+  typedef std::pair<UnknownType, unsigned int> UnknownInfo;
+
+  UnknownManager(std::initializer_list<UnknownInfo> unknown_info_list,
+                 UnknownStorageType in_storage_type=
+                        UnknownStorageType::NODAL) noexcept :
+    dof_storage_type(in_storage_type)
+  {
+    for (const auto& uk_info : unknown_info_list)
+      AddUnknown(uk_info.first, uk_info.second);
+  }
+
+  static UnknownManager GetUnitaryUnknownManager()
+  {
+    return UnknownManager({{UnknownType::SCALAR,0}});
+  }
+
   void SetDOFStorageType(const UnknownStorageType in_storage_type)
   {dof_storage_type = in_storage_type;}
 
@@ -138,7 +154,7 @@ public:
                                    unsigned int component,
                                    const std::string& in_text_name);
 
-  ~UnknownManager() {};
+  ~UnknownManager() = default;
 };
 
 

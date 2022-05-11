@@ -1,12 +1,12 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../../chi_math.h"
+#include "ChiLua/chi_lua.h"
+
+#include "chi_runtime.h"
+
+#include "ChiMath/chi_math.h"
 #include "../quadrature_gausslegendre.h"
 #include "../quadrature_gausschebyshev.h"
 
-extern ChiMath&     chi_math_handler;
-
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //########################################################## Create empty system
@@ -28,7 +28,8 @@ extern ChiLog& chi_log;
 \author Jan*/
 int chiCreateQuadrature(lua_State *L)
 {
-  size_t num_args = lua_gettop(L);
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
 
   if (not ((num_args == 2) or (num_args == 3)))
     LuaPostArgAmountError("chiCreateQuadrature",2,num_args);
@@ -46,18 +47,18 @@ int chiCreateQuadrature(lua_State *L)
   if (ident == 1) //GAUSS_LEGENDRE
   {
     chi_log.Log(LOG_0) << "Creating Gauss-Legendre Quadrature\n";
-    auto new_quad = new chi_math::QuadratureGaussLegendre(N, verbose);
-    chi_math_handler.quadratures.push_back(new_quad);
-    int index = (int)chi_math_handler.quadratures.size()-1;
+    auto new_quad = std::make_shared<chi_math::QuadratureGaussLegendre>(N, verbose);
+    chi::quadrature_stack.push_back(new_quad);
+    int index = (int)chi::quadrature_stack.size()-1;
     lua_pushnumber(L,index);
     return 1;
   }
   else if (ident == 2) //GAUSS_CHEBYSHEV
   {
     chi_log.Log(LOG_0) << "Creating Gauss-Chebyshev Quadrature\n";
-    auto new_quad = new chi_math::QuadratureGaussChebyshev(N, verbose);
-    chi_math_handler.quadratures.push_back(new_quad);
-    int index = (int)chi_math_handler.quadratures.size()-1;
+    auto new_quad = std::make_shared<chi_math::QuadratureGaussChebyshev>(N, verbose);
+    chi::quadrature_stack.push_back(new_quad);
+    int index = (int)chi::quadrature_stack.size()-1;
     lua_pushnumber(L,index);
     return 1;
   }

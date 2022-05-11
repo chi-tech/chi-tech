@@ -7,8 +7,6 @@
 #include "chi_log.h"
 extern ChiLog&  chi_log;
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /** Export interpolation to python line,contour plot depending on the

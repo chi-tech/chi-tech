@@ -1,7 +1,6 @@
 #include "fieldfunction.h"
 
 #include "ChiMesh/Cell/cell.h"
-#include "ChiPhysics/chi_physics.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
@@ -10,7 +9,6 @@
 
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
-extern ChiPhysics&  chi_physics_handler;
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>

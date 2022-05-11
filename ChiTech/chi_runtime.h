@@ -39,6 +39,17 @@ namespace chi_physics
   typedef std::shared_ptr<FieldFunction>          FieldFunctionPtr;
 }//namespace chi_physics
 
+namespace chi_math
+{
+  class Quadrature;
+  class AngularQuadrature;
+
+  typedef std::shared_ptr<Quadrature> QuadraturePtr;
+  typedef std::shared_ptr<AngularQuadrature> AngularQuadraturePtr;
+
+  class UnknownManager;
+}//namespace chi_math
+
 
 /**General utilities in ChiTech*/
 class chi
@@ -57,6 +68,9 @@ public:
   static std::vector<chi_physics::TransportCrossSectionsPtr> trnsprt_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr>          fieldfunc_stack;
 
+  static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
+  static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
+
   class run_time
   {
   public:
@@ -72,6 +86,7 @@ public:
     static int  RunInteractive(int argc, char** argv);
     static int  RunBatch(int argc, char** argv);
     static int  Initialize(int argc, char** argv);
+    static int  InitPetSc(int argc, char** argv);
     static void Finalize();
   };
 

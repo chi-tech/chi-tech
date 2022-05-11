@@ -1,8 +1,5 @@
 #include "chi_console.h"
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&   		chi_physics_handler;
-
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer        chi_program_timer;
 

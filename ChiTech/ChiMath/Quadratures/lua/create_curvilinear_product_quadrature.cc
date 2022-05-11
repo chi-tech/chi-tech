@@ -1,5 +1,6 @@
 #include "ChiLua/chi_lua.h"
-#include "ChiMath/chi_math.h"
+
+#include "chi_runtime.h"
 
 #include "ChiMath/Quadratures/quadrature_gausschebyshev.h"
 #include "ChiMath/Quadratures/quadrature_gausslegendre.h"
@@ -7,8 +8,6 @@
 #include "ChiMath/Quadratures/spherical_angular_quadrature.h"
 
 #include "chi_log.h"
-
-extern ChiMath&     chi_math_handler;
 extern ChiLog&     chi_log;
 
 //#include <memory>
@@ -108,8 +107,8 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
       const auto new_quad =
         std::make_shared<chi_math::CylindricalAngularQuadrature>(quad_pol, quad_azi, verbose);
 
-      chi_math_handler.angular_quadratures.push_back(new_quad);
-      const int index = chi_math_handler.angular_quadratures.size() - 1;
+      chi::angular_quadrature_stack.push_back(new_quad);
+      const int index = chi::angular_quadrature_stack.size() - 1;
       lua_pushnumber(L,index);
 
       return 1;
@@ -127,9 +126,9 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
       const auto new_quad =
         std::make_shared<chi_math::CylindricalAngularQuadrature>(quad_pol, quad_azi, verbose);
 
-      chi_math_handler.angular_quadratures.push_back(new_quad);
-      const int index = chi_math_handler.angular_quadratures.size() - 1;
-      lua_pushnumber(L,index);
+      chi::angular_quadrature_stack.push_back(new_quad);
+      const size_t index = chi::angular_quadrature_stack.size() - 1;
+      lua_pushnumber(L,static_cast<lua_Number>(index));
 
       return 1;
     }
@@ -200,9 +199,9 @@ int chiCreateSphericalProductQuadrature(lua_State *L)
       const auto new_quad =
         std::make_shared<chi_math::SphericalAngularQuadrature>(quad_pol, verbose);
 
-      chi_math_handler.angular_quadratures.push_back(new_quad);
-      const int index = chi_math_handler.angular_quadratures.size() - 1;
-      lua_pushnumber(L,index);
+      chi::angular_quadrature_stack.push_back(new_quad);
+      const size_t index = chi::angular_quadrature_stack.size() - 1;
+      lua_pushnumber(L,static_cast<lua_Number>(index));
 
       return 1;
     }
@@ -216,9 +215,9 @@ int chiCreateSphericalProductQuadrature(lua_State *L)
       const auto new_quad =
         std::make_shared<chi_math::SphericalAngularQuadrature>(quad_pol, verbose);
 
-      chi_math_handler.angular_quadratures.push_back(new_quad);
-      const int index = chi_math_handler.angular_quadratures.size() - 1;
-      lua_pushnumber(L,index);
+      chi::angular_quadrature_stack.push_back(new_quad);
+      const size_t index = chi::angular_quadrature_stack.size() - 1;
+      lua_pushnumber(L,static_cast<lua_Number>(index));
 
       return 1;
     }

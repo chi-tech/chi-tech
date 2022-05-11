@@ -7,7 +7,6 @@ The major global variables are defined in "chi_runtime.cc"
 They are:
  - ChiConsole chi_console The link to the lua scripting engine.
  - ChiMath chi_math_handler A handler of math related entities
- - ChiPhysics chi_physics_handler A handler of physics related items
  - ChiMPI chi_mpi A handler for parallel related items.
  - ChiLog chi_log A handler for parallel logging events and verbosity.
 
@@ -46,33 +45,9 @@ with coding. They are:
 
 
 
-\subsection devman2_sec0_3 Connecting to the physics handler
+\subsection devman2_sec0_3 Connecting to the global data block
 
-The physics handler maintains a number of data structures, most notably
- are the following three:
- - ChiPhysics::solver_stack Solvers are pushed here
- - ChiPhysics::material_stack Materials are pushed here
- - ChiPhysics::fieldfunc_stack Field functions are pushed here
-
-To access chi_physics_handler include the following code at the top of your
- code
-
-\code
-#include <ChiPhysics/chi_physics.h>
-
-extern ChiPhysics& chi_physics_handler;
-\endcode
-
- or obtain an instance to it via
-
-\code
-// Include this at the top of the file
-#include <ChiPhysics/chi_physics.h>
-
-// Include this in the body of your code
-ChiPhysics& chi_physics_handler = ChiPhysics::GetInstance();
-\endcode
-
+To be completed...
 
 \subsection devman2_sec0_4 Connecting to MPI
 

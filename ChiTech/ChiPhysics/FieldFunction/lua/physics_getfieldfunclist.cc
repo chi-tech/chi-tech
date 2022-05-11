@@ -1,8 +1,8 @@
 #include <ChiLua/chi_lua.h>
 
-#include "ChiPhysics/chi_physics.h"
-
 #include "chi_runtime.h"
+
+#include "ChiPhysics/SolverBase/chi_solver.h"
 
 #include "chi_log.h"
 extern ChiLog&     chi_log;

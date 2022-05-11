@@ -1,11 +1,10 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "ChiMath/chi_math.h"
+#include "ChiLua/chi_lua.h"
+
+#include "chi_runtime.h"
+
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
 
-extern ChiMath&     chi_math_handler;
-
-#include <chi_log.h>
-
+#include "chi_log.h"
 extern ChiLog& chi_log;
 
 //########################################################## Create empty system
@@ -82,8 +81,8 @@ int chiCreateCustomAngularQuadrature(lua_State *L)
   auto angular_quadrature = std::make_shared<chi_math::AngularQuadrature>();
   angular_quadrature->InitializeWithCustom(azi_angles,pol_angles,weights);
 
-  chi_math_handler.angular_quadratures.push_back(angular_quadrature);
-  int index = chi_math_handler.angular_quadratures.size()-1;
+  chi::angular_quadrature_stack.push_back(angular_quadrature);
+  int index = chi::angular_quadrature_stack.size()-1;
   lua_pushnumber(L,index);
 
   return 1;

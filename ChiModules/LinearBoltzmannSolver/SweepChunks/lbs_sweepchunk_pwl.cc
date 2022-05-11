@@ -6,9 +6,6 @@ extern ChiLog& chi_log;
 #include "chi_mpi.h"
 extern ChiMPI& chi_mpi;
 
-#include "ChiMath/chi_math.h"
-extern ChiMath& chi_math_handler;
-
 //###################################################################
 /**Constructor.*/
 lbs::SweepChunkPWL::

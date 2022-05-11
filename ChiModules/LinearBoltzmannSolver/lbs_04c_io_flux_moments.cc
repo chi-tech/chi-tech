@@ -90,7 +90,7 @@ void lbs::SteadySolver::
   file << header_bytes;
 
   //============================================= Get relevant items
-  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
@@ -176,7 +176,7 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
 //  chi_log.Log(LOG_ALL) << "Checkpoint -A"; //TODO: Remove
 
   //============================================= Get relevant items
-  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);

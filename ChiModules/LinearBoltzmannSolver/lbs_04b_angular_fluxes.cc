@@ -59,7 +59,7 @@ void lbs::SteadySolver::
   file << header_bytes;
 
   //============================================= Get relevant items
-  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
   auto fe = std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
   if (not fe)
   {
@@ -133,7 +133,7 @@ void lbs::SteadySolver::
   }
 
   //============================================= Get relevant items
-  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
   auto fe = std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
   if (not fe)
   {

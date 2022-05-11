@@ -22,7 +22,7 @@ void lbs::SteadySolver::InitializeParrays()
   }
 
   //================================================== Compute local # of dof
-  auto& per_node = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto per_node = chi_math::UnknownManager::GetUnitaryUnknownManager();
   local_node_count = discretization->GetNumLocalDOFs(per_node);
   glob_node_count = discretization->GetNumGlobalDOFs(per_node);
 

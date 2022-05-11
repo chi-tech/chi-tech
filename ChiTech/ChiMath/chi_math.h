@@ -15,35 +15,6 @@
 typedef std::vector<double> VecDbl;
 typedef std::vector<VecDbl> MatDbl;
 
-//######################################################### Class definition
-/** This object handles the storage of math entities.
-
-More information of solvers can be obtained from:
-[HERE](http://www.maa.org/press/periodicals/loci/joma/iterative-methods-for-solving-iaxi-ibi-the-sor-method)
-*/
-class ChiMath
-{
-public:
-	std::vector<chi_math::Quadrature*> quadratures;
-	std::vector<std::shared_ptr<chi_math::AngularQuadrature>> angular_quadratures;
-
-  static chi_math::UnknownManager UNITARY_UNKNOWN_MANAGER;
-private:
-  static ChiMath instance;
-private:
-	//00 Constructor
-  ChiMath() noexcept
-  {
-    UNITARY_UNKNOWN_MANAGER.AddUnknown(chi_math::UnknownType::SCALAR);
-  }
-
-public:
-  static ChiMath& GetInstance() noexcept
-  {return instance;}
-	//01 Utility
-
-};
-
 namespace chi_math
 {
   /**Coordinate system type.*/

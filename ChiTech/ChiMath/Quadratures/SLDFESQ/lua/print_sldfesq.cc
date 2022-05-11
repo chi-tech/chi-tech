@@ -1,9 +1,8 @@
 #include "ChiLua/chi_lua.h"
 
-#include "../sldfe_sq.h"
+#include "chi_runtime.h"
 
-#include "ChiMath/chi_math.h"
-extern ChiMath&     chi_math_handler;
+#include "../sldfe_sq.h"
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -43,7 +42,7 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
   const char* file_name = lua_tostring(L,2);
 
   try{
-    auto ref_quadrature = chi_math_handler.angular_quadratures.at(handle);
+    auto ref_quadrature = chi::angular_quadrature_stack.at(handle);
     if (ref_quadrature->type == chi_math::AngularQuadratureType::SLDFESQ)
     {
       auto sldfesq = std::dynamic_pointer_cast<

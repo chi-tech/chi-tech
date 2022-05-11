@@ -6,8 +6,6 @@
 
 #include "DiffusionSolver/Solver/diffusion_solver.h"
 
-#include "ChiPhysics/chi_physics.h"
-
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
 #include "chi_log.h"

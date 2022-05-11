@@ -3,7 +3,7 @@
 
 #include "chi_runtime.h"
 
-#include "ChiPhysics/chi_physics.h"
+#include "ChiPhysics/chi_physics_namespace.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
 #include "chi_log.h"

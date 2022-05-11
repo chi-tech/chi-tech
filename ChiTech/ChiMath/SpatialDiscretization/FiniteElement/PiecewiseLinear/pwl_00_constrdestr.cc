@@ -1,5 +1,7 @@
 #include "pwl.h"
 
+#include "ChiMath/UnknownManager/unknown_manager.h"
+
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
@@ -16,6 +18,7 @@ SpatialDiscretization_PWLD::
   SpatialDiscretization_FE(0, in_grid, in_cs_type,
                            SDMType::PIECEWISE_LINEAR_DISCONTINUOUS,
                            setup_flags),
+  UNITARY_UNKNOWN_MANAGER({{chi_math::UnknownType::SCALAR,0}}),
   line_quad_order_arbitrary(qorder),
   tri_quad_order_arbitrary(qorder),
   quad_quad_order_arbitrary(qorder),

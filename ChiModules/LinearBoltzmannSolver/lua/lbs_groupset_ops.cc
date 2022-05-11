@@ -1,13 +1,12 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
+#include "chi_runtime.h"
+
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "chi_log.h"
 extern ChiLog&     chi_log;
-
-#include "ChiMath/chi_math.h"
-extern ChiMath&     chi_math_handler;
 
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 
@@ -255,7 +254,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   //============================================= Obtain pointer to quadrature
   std::shared_ptr<chi_math::AngularQuadrature> ang_quad;
   try{
-    ang_quad = chi_math_handler.angular_quadratures.at(prquad_index);
+    ang_quad = chi::GetStackItemPtr(chi::angular_quadrature_stack,prquad_index);
   }
   catch (const std::out_of_range& o)
   {

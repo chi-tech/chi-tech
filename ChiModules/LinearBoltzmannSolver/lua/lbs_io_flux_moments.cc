@@ -7,9 +7,6 @@
 #include "chi_log.h"
 extern ChiLog&     chi_log;
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
-
 //###################################################################
 /**Writes the flux-moments of a LBS solution to file (phi_old_local).
 

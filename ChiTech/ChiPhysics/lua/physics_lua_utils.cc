@@ -8,8 +8,6 @@
         lua_pushnumber(L, y); \
         lua_setglobal(L, #x)
 
-#include "ChiPhysics/chi_physics.h"
-
 #include "chi_runtime.h"
 
 chi_physics::Solver& chi_physics::lua_utils::

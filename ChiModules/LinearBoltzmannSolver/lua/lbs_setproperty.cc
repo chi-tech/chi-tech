@@ -1,11 +1,6 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
-#include "ChiMath/chi_math.h"
-
-extern ChiMath&     chi_math_handler;
-
 #define DISCRETIZATION_METHOD 1
   #define PWLD   3
 

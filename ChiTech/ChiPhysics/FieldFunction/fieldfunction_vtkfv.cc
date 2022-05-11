@@ -1,13 +1,10 @@
 #include "fieldfunction.h"
 
-#include "ChiPhysics/chi_physics.h"
-
 #include "chi_log.h"
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
 extern ChiMPI& chi_mpi;
-extern ChiPhysics&  chi_physics_handler;
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>

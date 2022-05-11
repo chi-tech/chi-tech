@@ -3,8 +3,6 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiPhysics/chi_physics.h"
-
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"

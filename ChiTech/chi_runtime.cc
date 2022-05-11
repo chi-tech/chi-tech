@@ -3,8 +3,9 @@
 
 #include "ChiConsole/chi_console.h"
 #include "ChiMath/chi_math.h"
-#include "ChiPhysics/chi_physics.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+
+#include "ChiPhysics/chi_physics_namespace.h"
 
 #include "chi_mpi.h"
 #include "chi_log.h"
@@ -17,21 +18,15 @@
 #endif
 
 //=============================================== Global variables
-chi_math::UnknownManager ChiMath::UNITARY_UNKNOWN_MANAGER;
-
 ChiConsole  ChiConsole::instance;
-ChiMath     ChiMath::instance;
 ChiMPI      ChiMPI::instance;
 ChiLog      ChiLog::instance;
-ChiPhysics  ChiPhysics::instance;
 
 
 
 ChiConsole&  chi_console = ChiConsole::GetInstance();
-ChiMath&     chi_math_handler = ChiMath::GetInstance();
 ChiMPI&      chi_mpi = ChiMPI::GetInstance();
 ChiLog&      chi_log = ChiLog::GetInstance();
-ChiPhysics&  chi_physics_handler = ChiPhysics::GetInstance();
 
 ChiTimer    chi_program_timer;
 
@@ -48,6 +43,9 @@ std::vector<chi_physics::SolverPtr>                 chi::solver_stack;
 std::vector<chi_physics::MaterialPtr>               chi::material_stack;
 std::vector<chi_physics::TransportCrossSectionsPtr> chi::trnsprt_xs_stack;
 std::vector<chi_physics::FieldFunctionPtr>          chi::fieldfunc_stack;
+
+std::vector<chi_math::QuadraturePtr>        chi::quadrature_stack;
+std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;
 
 bool        chi::run_time::termination_posted = false;
 std::string chi::run_time::input_file_name;
@@ -151,7 +149,27 @@ int chi::run_time::Initialize(int argc, char** argv)
 
   ParseArguments(argc, argv);
 
-  chi_physics_handler.InitPetSc(argc,argv);
+  InitPetSc(argc,argv);
+
+  return 0;
+}
+
+/**Initializes PetSc for use by all entities.*/
+int chi::run_time::InitPetSc(int argc, char** argv)
+{
+  PetscErrorCode ierr;
+  PetscMPIInt    size;
+
+  PetscOptionsInsertString(nullptr,"-error_output_stderr");
+  if (not chi::run_time::allow_petsc_error_handler)
+    PetscOptionsInsertString(nullptr,"-no_signal_handler");
+//  PetscOptionsInsertString(NULL,"-on_error_abort");
+//TODO: Investigate this, causes cfem methods to fail
+
+  ierr = PetscInitialize(&argc,&argv, nullptr, nullptr);
+  if (ierr) return ierr;
+
+  ierr = MPI_Comm_size(PETSC_COMM_WORLD,&size);CHKERRQ(ierr);
 
   return 0;
 }
