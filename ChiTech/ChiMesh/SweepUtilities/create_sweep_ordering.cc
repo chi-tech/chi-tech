@@ -12,9 +12,9 @@
 
 
 extern ChiLog& chi_log;
-extern ChiConsole&  chi_console;
 
 #include "ChiGraph/chi_directed_graph.h"
+
 
 
 //###################################################################

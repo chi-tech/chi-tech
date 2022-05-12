@@ -4,12 +4,12 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
+
 #include <chi_log.h>
 #include <chi_mpi.h>
 #include <ChiConsole/chi_console.h>
 
 extern ChiLog&     chi_log;
-extern ChiConsole&  chi_console;
 
 //###################################################################
 /**Builds message structure.

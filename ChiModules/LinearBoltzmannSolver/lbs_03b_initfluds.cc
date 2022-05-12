@@ -9,10 +9,10 @@
 
 #include <iomanip>
 
-extern ChiConsole&  chi_console;
 extern ChiLog&     chi_log;
 
 #include "ChiTimer/chi_timer.h"
+
 
 
 
@@ -62,7 +62,7 @@ void lbs::SteadySolver::InitFluxDataStructures(LBSGroupset& groupset)
       << chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "
       << "         Process memory = "
-      << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+      << std::setprecision(3) << chi::console.GetMemoryUsageInMB()
       << " MB.";
 
 

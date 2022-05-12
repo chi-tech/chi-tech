@@ -14,9 +14,6 @@ extern ChiLog& chi_log;
 
 #include "ChiConsole/chi_console.h"
 
-
-extern ChiConsole& chi_console;
-
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
@@ -84,7 +81,7 @@ void lbs::SteadySolver::InitAngleAggAzimuthal(LBSGroupset& groupset)
             << "Initializing FLUDS for omega="
             << groupset.sweep_orderings[angle_num]->omega.PrintS()
             << "         Process memory = "
-            << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+            << std::setprecision(3) << chi::console.GetMemoryUsageInMB()
             << " MB.";
 
           primary_fluds->InitializeAlphaElements(groupset.sweep_orderings[angle_num]);

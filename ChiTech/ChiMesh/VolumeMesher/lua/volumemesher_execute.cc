@@ -11,7 +11,6 @@ extern ChiLog& chi_log;
 
 
 #include "ChiConsole/chi_console.h"
-extern ChiConsole&        chi_console;
 
 #include <iomanip>
 #include <iostream>
@@ -27,7 +26,7 @@ int chiVolumeMesherExecute(lua_State *L)
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //Get memory before
-  CSTMemory mem_before = chi_console.GetMemoryUsage();
+  chi_objects::CSTMemory mem_before = chi::console.GetMemoryUsage();
 
   if (cur_hndlr.volume_mesher == nullptr)
   {
@@ -40,7 +39,7 @@ int chiVolumeMesherExecute(lua_State *L)
   cur_hndlr.volume_mesher->Execute();
 
   //Get memory usage
-  CSTMemory mem_after = chi_console.GetMemoryUsage();
+  chi_objects::CSTMemory mem_after = chi::console.GetMemoryUsage();
 
   std::stringstream mem_string;
   mem_string

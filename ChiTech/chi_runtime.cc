@@ -11,6 +11,7 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
+
 #include <iostream>
 
 #ifndef NDEBUG
@@ -18,10 +19,10 @@
 #endif
 
 //=============================================== Global variables
-ChiConsole  ChiConsole::instance;
-ChiLog      ChiLog::instance;
+chi_objects::ChiConsole  chi_objects::ChiConsole::instance;
+chi_objects::ChiConsole& chi::console = chi_objects::ChiConsole::GetInstance();
 
-ChiConsole&  chi_console = ChiConsole::GetInstance();
+ChiLog      ChiLog::instance;
 ChiLog&      chi_log = ChiLog::GetInstance();
 
 /** Global stack of handlers */
@@ -121,7 +122,7 @@ void chi::run_time::ParseArguments(int argc, char** argv)
     }//no =
     else if (argument.find('=') != std::string::npos)
     {
-      chi_console.command_buffer.push_back(argument);
+      chi::console.command_buffer.push_back(argument);
     }//=
 
   }//for argument
@@ -146,7 +147,7 @@ int chi::Initialize(int argc, char** argv)
   mpi.SetLocationID(location_id);
   mpi.SetProcessCount(number_processes);
 
-  chi_console.PostMPIInfo(location_id, number_processes);
+  chi::console.PostMPIInfo(location_id, number_processes);
 
   run_time::ParseArguments(argc, argv);
 
@@ -209,12 +210,12 @@ int chi::RunInteractive(int argc, char** argv)
     << "ChiTech number of arguments supplied: "
     << argc - 1;
 
-  chi_console.FlushConsole();
+  chi::console.FlushConsole();
 
   if ( not chi::run_time::input_file_name.empty() )
-    chi_console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
+    chi::console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
 
-  chi_console.RunConsoleLoop();
+  chi::console.RunConsoleLoop();
 
   chi_log.Log(LOG_0)
     << "Final program time " << program_timer.GetTimeString();
@@ -249,7 +250,7 @@ int chi::RunBatch(int argc, char** argv)
       << "     a=b                        Executes argument as a lua string. i.e. x=2 or y=[[\"string\"]]\n"
       << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
-  chi_console.FlushConsole();
+  chi::console.FlushConsole();
 
 #ifndef NDEBUG
   chi_log.Log(LOG_0) << "Waiting...";
@@ -265,7 +266,7 @@ int chi::RunBatch(int argc, char** argv)
 
   int error_code = 0;
   if ( not chi::run_time::input_file_name.empty() )
-    error_code = chi_console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
+    error_code = chi::console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
 
   chi_log.Log(LOG_0)
     << "Final program time " << program_timer.GetTimeString();

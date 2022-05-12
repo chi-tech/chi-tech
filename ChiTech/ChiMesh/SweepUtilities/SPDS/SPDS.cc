@@ -8,9 +8,8 @@
 #include "ChiTimer/chi_timer.h"
 
 
-extern ChiLog& chi_log;
 
-extern ChiConsole&  chi_console;
+extern ChiLog& chi_log;
 
 #include <algorithm>
 

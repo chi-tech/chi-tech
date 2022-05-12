@@ -1,11 +1,11 @@
-#include "chi_console.h"
+#include "ChiConsole/chi_console.h"
 
 #include <cstdio>
 
 //############################################################################# Execute file
 /** Executes the given file in the Lua engine.
 \author Jan*/
-int ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv) const
+int chi_objects::ChiConsole::ExecuteFile(const char* fileName, int argc, char** argv) const
 {
 	lua_State* L = this->consoleState;
 	if (fileName != nullptr)
@@ -35,7 +35,7 @@ int ChiConsole::ExecuteFile(const char* fileName,int argc, char** argv) const
 
 //################################################################### Parses MPI
 /**Pushes location id and number of processes to lua state.*/
-void ChiConsole::PostMPIInfo(int location_id, int number_of_processes) const
+void chi_objects::ChiConsole::PostMPIInfo(int location_id, int number_of_processes) const
 {
   lua_State* L = this->consoleState;
 

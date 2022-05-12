@@ -6,7 +6,7 @@
 extern ChiLog& chi_log;
 
 #include "ChiConsole/chi_console.h"
-extern ChiConsole&  chi_console;
+
 
 #include <iomanip>
 
@@ -23,5 +23,5 @@ void lbs::SteadySolver::InitializeSpatialDiscretization()
   chi_log.Log(LOG_0)
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
-    << chi_console.GetMemoryUsageInMB() << " MB";
+    << chi::console.GetMemoryUsageInMB() << " MB";
 }

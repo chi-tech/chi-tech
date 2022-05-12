@@ -4,8 +4,8 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
+
 #include <ChiConsole/chi_console.h>
-extern ChiConsole&  chi_console;
 
 #include <chi_log.h>
 extern ChiLog& chi_log;
@@ -47,7 +47,7 @@ InitializeLocalAndDownstreamBuffers()
     }
 
     //================================================ Make a memory query
-    double memory_mb = chi_console.GetMemoryUsageInMB();
+    double memory_mb = chi::console.GetMemoryUsageInMB();
 
     std::shared_ptr<ChiLog::EventInfo> memory_event_info =
       std::make_shared<ChiLog::EventInfo>(memory_mb);

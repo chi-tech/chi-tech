@@ -10,7 +10,6 @@ extern ChiLog& chi_log;
 #include <iomanip>
 #include "ChiConsole/chi_console.h"
 
-extern ChiConsole&  chi_console;
 
 
 
@@ -60,7 +59,7 @@ void lbs::SteadySolver::Initialize()
   chi_log.Log(LOG_0)
     << "Done with parallel arrays.                Process memory = "
     << std::setprecision(3)
-    << chi_console.GetMemoryUsageInMB() << " MB" << std::endl;
+    << chi::console.GetMemoryUsageInMB() << " MB" << std::endl;
 
   //================================================== Initialize boundaries
   InitializeBoundaries();//h

@@ -15,9 +15,6 @@ extern ChiLog& chi_log;
 
 #include "ChiConsole/chi_console.h"
 
-
-extern ChiConsole&   chi_console;
-
 #include <iostream>
 
 //###################################################################
@@ -27,7 +24,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi_log.Log(LOG_0)
     << chi::program_timer.GetTimeString()
     << " VolumeMesherExtruder executed. Memory in use = "
-    << chi_console.GetMemoryUsageInMB() << " MB"
+    << chi::console.GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //================================================== Get the current handler

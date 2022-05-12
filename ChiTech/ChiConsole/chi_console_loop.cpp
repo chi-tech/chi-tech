@@ -1,4 +1,4 @@
-#include "chi_console.h"
+#include "ChiConsole/chi_console.h"
 
 #include "chi_runtime.h"
 
@@ -11,7 +11,7 @@ extern ChiLog& chi_log;
 
 //############################################################################# Run Console loop
 /** Executes the loop for the console.*/
-void ChiConsole::RunConsoleLoop(char*)
+void chi_objects::ChiConsole::RunConsoleLoop(char*)
 {
 
   chi_log.Log(LOG_0) << "Console loop started. "

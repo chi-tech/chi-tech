@@ -19,7 +19,6 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 #include "ChiConsole/chi_console.h"
 
 
-extern ChiConsole&  chi_console;
 
 #include <iomanip>
 
@@ -74,7 +73,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
       << chi::program_timer.GetTimeString()
       << " Done computing sweep orderings.           Process memory = "
       << std::setprecision(3)
-      << chi_console.GetMemoryUsageInMB() << " MB";
+      << chi::console.GetMemoryUsageInMB() << " MB";
 
 }
 

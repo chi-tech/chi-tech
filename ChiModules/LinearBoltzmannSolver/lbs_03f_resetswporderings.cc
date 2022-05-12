@@ -1,12 +1,12 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include <ChiConsole/chi_console.h>
-extern ChiConsole&  chi_console;
 
 #include <chi_log.h>
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
+
 
 
 #include <iomanip>
@@ -39,7 +39,7 @@ void lbs::SteadySolver::ResetSweepOrderings(LBSGroupset& groupset)
     chi_log.Log(LOG_0)
       << "SPDS and FLUDS reset complete.            Process memory = "
       << std::setprecision(3)
-      << chi_console.GetMemoryUsageInMB() << " MB";
+      << chi::console.GetMemoryUsageInMB() << " MB";
 
   double local_app_memory =
     chi_log.ProcessEvent(ChiLog::StdTags::MAX_MEMORY_USAGE,

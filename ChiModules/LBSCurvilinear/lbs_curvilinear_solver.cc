@@ -11,11 +11,10 @@
 #include "LinearBoltzmannSolver/lbs_structs.h"
 #include "LBSCurvilinear/lbs_curvilinear_sweepchunk_pwl.h"
 
+
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 extern ChiLog& chi_log;
-
-extern ChiConsole& chi_console;
 
 
 void
@@ -336,7 +335,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
   chi_log.Log(LOG_0)
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
-    << chi_console.GetMemoryUsageInMB() << " MB";
+    << chi::console.GetMemoryUsageInMB() << " MB";
 }
 
 

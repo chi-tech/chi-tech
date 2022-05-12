@@ -17,9 +17,6 @@ extern ChiLog& chi_log;
 
 #include "ChiConsole/chi_console.h"
 
-
-extern ChiConsole&   chi_console;
-
 //###################################################################
 /**Executes the predefined3D mesher.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
@@ -27,7 +24,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   chi_log.Log(LOG_0)
     << chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
-    << chi_console.GetMemoryUsageInMB() << " MB"
+    << chi::console.GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //======================================== Check partitioning params
