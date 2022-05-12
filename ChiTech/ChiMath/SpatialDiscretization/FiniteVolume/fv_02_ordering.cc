@@ -6,7 +6,7 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
@@ -14,7 +14,7 @@ extern ChiLog& chi_log;
 void SpatialDiscretization_FV::
   OrderNodes()
 {
-  chi_log.Log(LOG_ALLVERBOSE_1) << "FV discretization - Reordering nodes.";
+  chi::log.LogAllVerbose1() << "FV discretization - Reordering nodes.";
 
   fv_local_block_address = 0;
 
@@ -60,7 +60,7 @@ void SpatialDiscretization_FV::
                 MPI_INT,                      //recv type
                 MPI_COMM_WORLD);              //communicator
 
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "Local dof count, start "
     << ref_grid->local_cells.size() << " "
     << fv_local_block_address;

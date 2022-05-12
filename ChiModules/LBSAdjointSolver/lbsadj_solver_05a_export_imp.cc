@@ -1,7 +1,8 @@
 #include "lbsadj_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -119,7 +120,7 @@ void lbs_adjoint::AdjointSolver::
   }
 
 
-  chi_log.Log() << "Exporting importance map to binary file " << file_name;
+  chi::log.Log() << "Exporting importance map to binary file " << file_name;
 
   const auto locJ_io_flags = std::ofstream::binary | std::ofstream::out;
   const auto loc0_io_flags = locJ_io_flags | std::ofstream::trunc;
@@ -154,11 +155,11 @@ void lbs_adjoint::AdjointSolver::
   uint64_t num_global_cells = grid->GetGlobalNumberOfCells();
   for (int locationJ=0; locationJ<chi::mpi.process_count; ++locationJ)
   {
-    chi_log.Log(LOG_ALL) << "  Barrier at " << locationJ;
+    chi::log.LogAll() << "  Barrier at " << locationJ;
     MPI_Barrier(MPI_COMM_WORLD);
     if (chi::mpi.location_id != locationJ) continue;
 
-    chi_log.Log(LOG_ALL) << "  Location " << locationJ << " appending data.";
+    chi::log.LogAll() << "  Location " << locationJ << " appending data.";
 
     std::ofstream file(file_name, is_home? loc0_io_flags : locJ_io_flags);
 
@@ -205,6 +206,6 @@ void lbs_adjoint::AdjointSolver::
     file.close();
   }//for location
 
-  chi_log.Log(LOG_ALL) << "Done exporting importance map to binary file " << file_name;
+  chi::log.LogAll() << "Done exporting importance map to binary file " << file_name;
   MPI_Barrier(MPI_COMM_WORLD);
 }

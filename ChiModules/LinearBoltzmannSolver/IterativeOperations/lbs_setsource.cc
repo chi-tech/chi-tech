@@ -6,7 +6,7 @@
 #include <chi_log.h>
 
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
@@ -24,7 +24,7 @@ void lbs::SteadySolver::
             std::vector<double>& destination_q,
             SourceFlags source_flags)
 {
-  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_BEGIN);
+  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   const bool apply_mat_src         = (source_flags & APPLY_MATERIAL_SOURCE);
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
@@ -224,5 +224,5 @@ void lbs::SteadySolver::
     }//for point source
   }//if apply mat src
 
-  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
+  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }

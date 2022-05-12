@@ -11,7 +11,6 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
-
 #include <iostream>
 
 #ifndef NDEBUG
@@ -22,8 +21,8 @@
 chi_objects::ChiConsole  chi_objects::ChiConsole::instance;
 chi_objects::ChiConsole& chi::console = chi_objects::ChiConsole::GetInstance();
 
-ChiLog      ChiLog::instance;
-ChiLog&      chi_log = ChiLog::GetInstance();
+chi_objects::ChiLog      chi_objects::ChiLog::instance;
+chi_objects::ChiLog&      chi::log = chi_objects::ChiLog::GetInstance();
 
 /** Global stack of handlers */
 std::vector<chi_mesh::MeshHandlerPtr>   chi::meshhandler_stack;
@@ -66,18 +65,18 @@ void chi::run_time::ParseArguments(int argc, char** argv)
   {
     std::string argument(argv[i]);
 
-    chi_log.Log(LOG_0) << "Parsing argument " << i << " " << argument;
+    chi::log.Log() << "Parsing argument " << i << " " << argument;
 
     if (argument.find("-h")!=std::string::npos)
     {
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "\nUsage: exe inputfile [options values]\n"
         << "\n"
         << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
         << "     a=b                        Executes argument as a lua string. i.e. x=2 or y=[[\"string\"]]\n"
         << "     -allow_petsc_error_handler Allow petsc error handler.\n\n\n";
 
-      chi_log.Log(LOG_0) << "PETSc options:";
+      chi::log.Log() << "PETSc options:";
       chi::run_time::termination_posted = true;
     }
     else if (argument.find("-allow_petsc_error_handler")!=std::string::npos)
@@ -103,7 +102,7 @@ void chi::run_time::ParseArguments(int argc, char** argv)
         std::string v_option(argv[i+1]);
         try {
           int level = std::stoi(v_option);
-          chi_log.SetVerbosity(level);
+          chi::log.SetVerbosity(level);
         }
         catch (const std::invalid_argument& e)
         {
@@ -201,12 +200,12 @@ void chi::Finalize()
 /**Runs the interactive chitech engine*/
 int chi::RunInteractive(int argc, char** argv)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in interactive-mode with "
     << chi::mpi.process_count << " processes.";
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "ChiTech number of arguments supplied: "
     << argc - 1;
 
@@ -217,10 +216,10 @@ int chi::RunInteractive(int argc, char** argv)
 
   chi::console.RunConsoleLoop();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Final program time " << program_timer.GetTimeString();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " ChiTech finished execution.";
 
@@ -233,17 +232,17 @@ int chi::RunInteractive(int argc, char** argv)
 /**Runs ChiTech in pure batch mode. Start then finish.*/
 int chi::RunBatch(int argc, char** argv)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in batch-mode with "
     << chi::mpi.process_count << " processes.";
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "ChiTech number of arguments supplied: "
     << argc - 1;
 
   if (argc<=1)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "\nUsage: exe inputfile [options values]\n"
       << "\n"
       << "     -v                         Level of verbosity. Default 0. Can be either 0, 1 or 2.\n"
@@ -253,12 +252,12 @@ int chi::RunBatch(int argc, char** argv)
   chi::console.FlushConsole();
 
 #ifndef NDEBUG
-  chi_log.Log(LOG_0) << "Waiting...";
+  chi::log.Log() << "Waiting...";
   if (chi::mpi.location_id == 0)
     for (int k=0; k<100; ++k)
     {
       usleep(1000000);
-      chi_log.Log(LOG_0) << k;
+      chi::log.Log() << k;
     }
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -268,10 +267,10 @@ int chi::RunBatch(int argc, char** argv)
   if ( not chi::run_time::input_file_name.empty() )
     error_code = chi::console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Final program time " << program_timer.GetTimeString();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " ChiTech finished execution of " << chi::run_time::input_file_name;
 

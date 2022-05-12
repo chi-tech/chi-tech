@@ -2,15 +2,16 @@
 
 #include "ChiTimer/chi_timer.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 void lbs_adjoint::AdjointSolver::
   SetSource(LBSGroupset &groupset,
             std::vector<double> &destination_q,
             lbs::SourceFlags source_flags)
 {
-  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_BEGIN);
+  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   const bool apply_mat_src         = (source_flags & lbs::SourceFlags::APPLY_MATERIAL_SOURCE);
   const bool apply_wgs_scatter_src = (source_flags & lbs::SourceFlags::APPLY_WGS_SCATTER_SOURCE);
@@ -204,5 +205,5 @@ void lbs_adjoint::AdjointSolver::
     }//for qoi
   }
 
-  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
+  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }

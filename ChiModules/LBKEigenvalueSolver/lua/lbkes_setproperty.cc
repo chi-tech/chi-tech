@@ -4,7 +4,7 @@
 #include "lbkes_lua_utils.h"
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 #define MAX_ITERATIONS  1
 #define TOLERANCE       2
@@ -36,14 +36,14 @@ int chiLBKESSetProperty(lua_State *L)
 
     if (max_iters <= 0)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << __FUNCTION__ << ": Invalid max_iterations value. "
           << "Must be greater than 0.";
       exit(EXIT_FAILURE);
     }
     solver.max_iterations = static_cast<size_t>(max_iters);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
         << "LinearBoltzmann::KEigenvalueSolver: "
         << "max_iterations set to " << solver.max_iterations << ".";
   }
@@ -55,7 +55,7 @@ int chiLBKESSetProperty(lua_State *L)
 
     if (tol < 0.0 or tol > 1.0)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << __FUNCTION__ << ": Invalid value for tolerance. "
           << "Must be in the range (0.0, 1.0].";
       exit(EXIT_FAILURE);
@@ -65,13 +65,13 @@ int chiLBKESSetProperty(lua_State *L)
     char buff[100];
     sprintf(buff, "%.4e", tol);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
         << "LinearBoltzmann::KEigenvalueSolver: "
         << "tolerance set to " << buff << ".";
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
         << __FUNCTION__ << ": Invalid property index.";
     exit(EXIT_FAILURE);
   }

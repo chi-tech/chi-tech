@@ -3,8 +3,9 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -21,7 +22,7 @@ void chi_physics::FieldFunction::
   ExportToVTKComponentOnly(const std::string& base_name,
                            const std::string& field_name)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Exporting field function " << text_name
     << " to files with base name " << base_name;
 
@@ -45,7 +46,7 @@ void chi_physics::FieldFunction::
 void chi_physics::FieldFunction::ExportToVTK(const std::string& base_name,
                                              const std::string& field_name)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Exporting field function " << text_name
     << " to files with base name " << base_name
     << " to field name " << field_name;

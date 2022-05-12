@@ -7,7 +7,7 @@
 
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /** Creates actual z-levels for the input layer specification.*/
@@ -17,7 +17,7 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
   //                                                   input layers are provided
   if (input_layers.empty())
   {
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
       << "VolumeMesherExtruder: No extrusion layers have been specified. "
       << "A default single layer will be used with height 1.0 and a single "
       << "subdivision.";
@@ -44,7 +44,7 @@ void chi_mesh::VolumeMesherExtruder::SetupLayers(int default_layer_count)
     }
   }
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "VolumeMesherExtruder: Total number of cell layers is "
     << vertex_layers.size()-1;
 }

@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -16,7 +17,7 @@ extern ChiLog& chi_log;
 /**Initializes default materials and physics materials.*/
 void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing Materials";
+  chi::log.Log0Verbose1() << "Initializing Materials";
 
   std::stringstream materials_list;
 
@@ -55,7 +56,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
 
         if (mg_source->source_value_g.size() < groups.size())
         {
-          chi_log.Log(LOG_ALLWARNING)
+          chi::log.LogAllWarning()
             << "LBS-InitMaterials: Isotropic Multigroup source specified in "
             << "material \"" << current_material->name << "\" has fewer "
             << "energy groups than called for in the simulation. "
@@ -71,7 +72,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
     //====================================== Check valid property
     if (!found_transport_xs)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "LBS-InitMaterials: Found no transport cross-section property for "
         << "material \"" << current_material->name << "\".";
       exit(EXIT_FAILURE);
@@ -79,7 +80,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
     //====================================== Check number of groups legal
     if (matid_to_xs_map[mat_id]->num_groups < groups.size())
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
         << matid_to_xs_map[mat_id]->num_groups << " groups and"
         << " the simulation has " << groups.size() << " groups."
@@ -90,7 +91,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
     //====================================== Check number of moments
     if (matid_to_xs_map[mat_id]->scattering_order < options.scattering_order)
     {
-      chi_log.Log(LOG_0WARNING)
+      chi::log.Log0Warning()
         << "LBS-InitMaterials: Found material \"" << current_material->name << "\" has "
         << "a scattering order of "
         << matid_to_xs_map[mat_id]->scattering_order << " and"
@@ -106,7 +107,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
 
   num_groups = groups.size();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Materials Initialized:\n" << materials_list.str() << "\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -136,7 +137,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
 
   if (develop_diffusion_properties)
   {
-    chi_log.Log(LOG_0) << "Computing diffusion parameters.";
+    chi::log.Log() << "Computing diffusion parameters.";
 
     for (const auto& mat_id_xs : matid_to_xs_map)
       mat_id_xs.second->ComputeDiffusionParameters();

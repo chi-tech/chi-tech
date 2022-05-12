@@ -1,8 +1,9 @@
 #include "ChiLua/chi_lua.h"
 #include "physics_lua_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
@@ -101,7 +102,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::STRING:
         LuaCheckStringValue(fname, L, 3);
         option.SetStringValue(lua_tostring(L, 3));
-        chi_log.Log() << "Solver:" << solver.TextName()
+        chi::log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << option.StringValue()
         << ".";
@@ -109,7 +110,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::BOOL:
         LuaCheckBoolValue(fname, L, 3);
         option.SetBoolValue(lua_toboolean(L, 3));
-        chi_log.Log() << "Solver:" << solver.TextName()
+        chi::log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << ((option.BoolValue())? "true" : "false")
         << ".";
@@ -117,7 +118,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::INTEGER:
         LuaCheckIntegerValue(fname, L, 3);
         option.SetIntegerValue(lua_tointeger(L, 3));
-        chi_log.Log() << "Solver:" << solver.TextName()
+        chi::log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << option.IntegerValue()
         << ".";
@@ -125,7 +126,7 @@ int chiSolverSetBasicOption(lua_State* L)
       case chi_data_types::VaryingDataType::FLOAT:
         LuaCheckNumberValue(fname, L, 3);
         option.SetFloatValue(lua_tonumber(L, 3));
-        chi_log.Log() << "Solver:" << solver.TextName()
+        chi::log.Log() << "Solver:" << solver.TextName()
         << " option:" << option_name
         << " set to " << option.FloatValue()
         << ".";
@@ -134,7 +135,7 @@ int chiSolverSetBasicOption(lua_State* L)
   }
   catch (const std::out_of_range& oor)
   {
-    chi_log.Log(LOG_0ERROR) << fname << ": " << oor.what();
+    chi::log.Log0Error() << fname << ": " << oor.what();
   }
 
   return 0;

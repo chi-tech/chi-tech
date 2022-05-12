@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -30,7 +31,7 @@ void lbs::SteadySolver::InitializeParrays()
   size_t num_grps = groups.size();
   size_t local_unknown_count = local_node_count * num_grps * num_moments;
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
+  chi::log.LogAllVerbose1() << "LBS Number of phi unknowns: "
                                 << local_unknown_count;
 
   //================================================== Size local vectors

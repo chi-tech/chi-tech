@@ -7,7 +7,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Performs Incident mapping for Polyhedron cell.*/
@@ -63,7 +63,7 @@ LocalIncidentMapping(chi_mesh::Cell *cell,
         }
         if (ass_f_counter<0)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Associated face counter not found"
             << ass_face << " " << face.neighbor_id;
           face.GetNeighborAssociatedFace(*grid);

@@ -55,6 +55,7 @@ namespace chi_objects
   class MPI_Info;
   class ChiTimer;
   class ChiConsole;
+  class ChiLog;
 }//namespace chi_objects
 
 //###################################################################
@@ -62,9 +63,10 @@ namespace chi_objects
 class chi
 {
 public:
-  static chi_objects::MPI_Info& mpi;
-  static chi_objects::ChiTimer program_timer;
+  static chi_objects::MPI_Info&   mpi;
+  static chi_objects::ChiTimer    program_timer;
   static chi_objects::ChiConsole& console;
+  static chi_objects::ChiLog&     log;
 
   static std::vector<chi_mesh::MeshHandlerPtr>   meshhandler_stack;
   static int         current_mesh_handler;

@@ -9,14 +9,14 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
 void SpatialDiscretization_FV::PreComputeCellSDValues()
 {
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "SpatialDiscretization_FV - Adding view of local continuum.";
 
   //================================================== Create empty view
@@ -69,7 +69,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues()
 void SpatialDiscretization_FV::
   PreComputeNeighborCellSDValues()
 {
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "SpatialDiscretization_FV - Adding view of neighbor continuums.";
 
   auto ghost_cells = ref_grid->GetGhostCells();
@@ -79,10 +79,10 @@ void SpatialDiscretization_FV::
     neighbor_cells.insert(
       std::make_pair(cell_ptr->global_id,std::move(cell_ptr)));
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Number neighbor cells: " << neighbor_cells.size();
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Adding neighbor views";
   //================================================== Populate cell fe views
   for (auto& cell_pair : neighbor_cells)
@@ -117,7 +117,7 @@ void SpatialDiscretization_FV::
   }//for num cells
 
 
-  chi_log.Log(LOG_ALLVERBOSE_1)
+  chi::log.LogAllVerbose1()
     << "Number of neighbor cells added: "
     << neighbor_cell_fv_views.size();
 }//AddViewOfNeighborContinuums
@@ -130,7 +130,7 @@ CellFVValues* SpatialDiscretization_FV::MapFeView(uint64_t cell_local_index)
   try { value = cell_fv_views.at(cell_local_index); }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SpatialDiscretization_FV::MapFeView "
          "Failure to map Finite Volume View. The view is either not"
          "available or the supplied local index is invalid.";

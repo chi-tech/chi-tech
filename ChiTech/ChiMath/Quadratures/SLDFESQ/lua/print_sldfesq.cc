@@ -5,7 +5,7 @@
 #include "../sldfe_sq.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -56,7 +56,7 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "chiPrintToPythonSLDFESQAngularQuadrature: "
            "Invalid angular quadrature type.";
       exit(EXIT_FAILURE);
@@ -64,14 +64,14 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiPrintToPythonSLDFESQAngularQuadrature: "
          "Invalid handle to angular quadrature.";
     exit(EXIT_FAILURE);
   }
   catch (...)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiPrintToPythonSLDFESQAngularQuadrature: "
          "Call failed with unknown error.";
     exit(EXIT_FAILURE);

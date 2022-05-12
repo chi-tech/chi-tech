@@ -6,10 +6,11 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
@@ -17,7 +18,7 @@ extern ChiLog& chi_log;
 std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   KBA(const chi_mesh::UnpartitionedMesh& umesh)
 {
-  chi_log.Log(LOG_0) << "Partitioning mesh KBA-style.";
+  chi::log.Log() << "Partitioning mesh KBA-style.";
 
   const size_t num_raw_cells = umesh.raw_cells.size();
 
@@ -59,7 +60,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
             MPI_LONG_LONG_INT,                //data type
             0,                                //root
             MPI_COMM_WORLD);                  //communicator
-  chi_log.Log(LOG_0) << "Done partitioning mesh.";
+  chi::log.Log() << "Done partitioning mesh.";
 
   return cell_pids;
 }

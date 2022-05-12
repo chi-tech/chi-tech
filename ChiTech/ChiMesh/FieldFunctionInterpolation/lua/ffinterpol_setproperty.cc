@@ -6,8 +6,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 #define FFI_FIELD_FUNCTION 0
@@ -113,12 +114,12 @@ int chiFFInterpolationSetProperty(lua_State *L)
     if (typeid(*p_ffi) !=
         typeid(chi_mesh::FieldFunctionInterpolationSlice))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Slice property" << property
         << " used in chiFFInterpolationSetProperty but "
            "FFI is not a slice.";
-      chi_log.Log(LOG_0) << typeid(*p_ffi).name();
-      chi_log.Log(LOG_0) << typeid(chi_mesh::FieldFunctionInterpolationSlice).name();
+      chi::log.Log() << typeid(*p_ffi).name();
+      chi::log.Log() << typeid(chi_mesh::FieldFunctionInterpolationSlice).name();
       exit(EXIT_FAILURE);
     }
 
@@ -130,12 +131,12 @@ int chiFFInterpolationSetProperty(lua_State *L)
     if (typeid(*p_ffi) !=
         typeid(chi_mesh::FieldFunctionInterpolationLine))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Line property" << property
         << " used in chiFFInterpolationSetProperty but "
            "FFI is not a line.";
-      chi_log.Log(LOG_0) << typeid(*p_ffi).name();
-      chi_log.Log(LOG_0) << typeid(chi_mesh::FieldFunctionInterpolationSlice).name();
+      chi::log.Log() << typeid(*p_ffi).name();
+      chi::log.Log() << typeid(chi_mesh::FieldFunctionInterpolationSlice).name();
       exit(EXIT_FAILURE);
     }
 
@@ -231,7 +232,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     if (num_points<2)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Line property FFI_LINE_NUMBEROFPOINTS"
         << " used in chiFFInterpolationSetProperty. Number of points must"
         << " be greater than or equal to 2.";
@@ -248,7 +249,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     if (not lua_istable(L, 3))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Line property FFI_LINE_CUSTOM_ARRAY"
         << " used in chiFFInterpolationSetProperty. Argument 3 is expected "
            "to be an array.";
@@ -275,7 +276,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     if (typeid(*p_ffi) != typeid(chi_mesh::FieldFunctionInterpolationVolume))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Volume property FFI_PROP_OPERATION"
         << " used in chiFFInterpolationSetProperty can only be used with "
         << "Volume type interpolations.";
@@ -288,7 +289,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     if (!((op_type>=OP_SUM) && (op_type<=OP_MAX_LUA)))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Volume property FFI_PROP_OPERATION"
         << " used in chiFFInterpolationSetProperty. Unsupported OPERATON."
         << " Supported types are OP_AVG and OP_SUM. " << op_type;
@@ -319,7 +320,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
 
     if (typeid(*p_ffi) != typeid(chi_mesh::FieldFunctionInterpolationVolume))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Volume property FFI_PROP_LOGICAL_VOLUME"
         << " used in chiFFInterpolationSetProperty can only be used with "
         << "Volume type interpolations.";
@@ -332,7 +333,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
   }
   else                                              //Fall back
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid PropertyIndex used in chiFFInterpolationSetProperty.";
     exit(EXIT_FAILURE);
   }

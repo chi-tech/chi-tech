@@ -8,8 +8,9 @@
 
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -30,12 +31,12 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   constexpr bool WITH_DELAYED_PSI = true;
   if (log_info)
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "\n\n";
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "********** Solving groupset " << groupset.id
       << " with GMRES.\n\n";
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "Quadrature number of angles: "
       << groupset.quadrature->abscissae.size() << "\n"
       << "Groups " << groupset.groups.front().id << " "
@@ -51,7 +52,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
                       num_delayed_ang_DOFs.second;
 
   if (log_info)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "Number of lagged angular unknowns: " << num_delayed_ang_DOFs.second;
 
   //================================================== Create PETSc vectors
@@ -98,7 +99,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   //================================================== Compute b
   if (log_info)
   {
-    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " Computing b";
+    chi::log.Log() << chi::program_timer.GetTimeString() << " Computing b";
   }
 
   //SetSource for RHS
@@ -145,14 +146,14 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   {
     VecCopy(phi_old,phi_new);
     if (log_info)
-      chi_log.Log(LOG_0) << "Using phi_old as initial guess.";
+      chi::log.Log() << "Using phi_old as initial guess.";
   }
 
 
   //**************** CALL GMRES SOLVE ******************
   if (log_info)
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString() << " Starting iterations";
   }
   KSPSolve(ksp,q_fixed,phi_new);
@@ -161,7 +162,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   KSPConvergedReason reason;
   KSPGetConvergedReason(ksp,&reason);
   if (reason != KSP_CONVERGED_RTOL)
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
       << "GMRES solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
@@ -197,8 +198,8 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
     double sweep_time = sweep_scheduler.GetAverageSweepTime();
     double chunk_overhead_ratio = 1.0 - sweep_scheduler.GetAngleSetTimings()[2];
     double source_time=
-      chi_log.ProcessEvent(source_event_tag,
-                           ChiLog::EventOperation::AVERAGE_DURATION);
+      chi::log.ProcessEvent(source_event_tag,
+                           chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
     size_t num_angles = groupset.quadrature->abscissae.size();
     size_t num_unknowns = glob_node_count *
                           num_angles *
@@ -206,24 +207,24 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
 
     if (log_info)
     {
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "\n\n";
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "        Set Src Time/sweep (s):        "
         << source_time;
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "        Average sweep time (s):        "
         << sweep_time;
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "        Chunk-Overhead-Ratio  :        "
         << chunk_overhead_ratio;
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "        Sweep Time/Unknown (ns):       "
         << sweep_time*1.0e9*chi::mpi.process_count/
            static_cast<double>(num_unknowns);
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "        Number of unknowns per sweep:  " << num_unknowns;
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "\n\n";
 
       std::string sweep_log_file_name =

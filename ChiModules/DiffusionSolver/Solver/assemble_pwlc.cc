@@ -1,7 +1,8 @@
 #include "diffusion_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/

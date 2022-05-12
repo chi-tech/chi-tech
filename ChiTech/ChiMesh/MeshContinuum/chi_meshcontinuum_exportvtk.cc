@@ -5,8 +5,9 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -27,7 +28,7 @@ extern ChiLog& chi_log;
 /**Exports just the mesh to VTK format.*/
 void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
 {
-  chi_log.Log() << "Exporting mesh to VTK. " << local_cells.size();
+  chi::log.Log() << "Exporting mesh to VTK. " << local_cells.size();
   std::vector<std::vector<double>> d_nodes;
 
   auto points = vtkSmartPointer<vtkPoints>::New();
@@ -182,5 +183,5 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
     ofile.close();
   }
 
-  chi_log.Log() << "Done exporting mesh to VTK.";
+  chi::log.Log() << "Done exporting mesh to VTK.";
 }

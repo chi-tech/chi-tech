@@ -3,10 +3,9 @@
 #include "ChiMesh/SweepUtilities/AngleSet/angleset.h"
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-
-extern ChiLog&     chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 //###################################################################
 /** Receives delayed data from successor locations. */
@@ -40,7 +39,7 @@ ReceiveDelayedData(int angle_set_num)
                    &msg_avail,&status0);
 
 //        if (msg_avail != 1)
-//          chi_log.Log(LOG_ALL)
+//          chi::log.LogAll()
 //            << "SweepBuffer: Delayed Data message was not available";
 
         if (msg_avail != 1)
@@ -83,7 +82,7 @@ ReceiveDelayedData(int angle_set_num)
           err_stream << error_string << "\n";
           MPI_Error_string(error_code, error_string, &length_of_error_string);
           err_stream << error_string << "\n";
-          chi_log.Log(LOG_ALLWARNING) << err_stream.str();
+          chi::log.LogAllWarning() << err_stream.str();
         }
 
       }//if not message already received

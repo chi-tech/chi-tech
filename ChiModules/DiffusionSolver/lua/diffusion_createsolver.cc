@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //#############################################################################
 /** Creates a Diffusion solver.
@@ -33,7 +34,7 @@ int chiDiffusionCreateSolver(lua_State *L)
   lua_pushinteger(L,
       static_cast<lua_Integer>(chi::solver_stack.size()-1));
 
-  chi_log.Log(LOG_ALLVERBOSE_1)
+  chi::log.LogAllVerbose1()
     << "chiDiffusionCreateSolver: Diffusion solver created"
     << std::endl;
   return 1;

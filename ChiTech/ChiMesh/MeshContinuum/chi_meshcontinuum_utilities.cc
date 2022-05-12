@@ -3,8 +3,8 @@
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog&  chi_log;
 
 #include "chi_mpi.h"
 
@@ -58,13 +58,13 @@ void chi_mesh::MeshContinuum::
   outstr << "\nTotal faces = " << face_size_histogram.size();
   outstr << "\nAverage dofs/face = " << average_dofs_per_face;
   outstr << "\nMax to avg ratio = " << largest_face/average_dofs_per_face;
-  chi_log.Log(LOG_ALLVERBOSE_1) << outstr.str();
+  chi::log.LogAllVerbose1() << outstr.str();
 
   //================================================== Determine number of bins
   size_t last_bin_num_faces = total_num_faces;
   if ((largest_face/average_dofs_per_face) > master_tolerance)
   {
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    chi::log.LogAllVerbose1()
     << "The ratio of max face dofs to average face dofs "
     << "is larger than " << master_tolerance
     << ", therefore a binned histogram "
@@ -109,7 +109,7 @@ void chi_mesh::MeshContinuum::
     << bins.second << " faces with max face dofs " << bins.first << "\n";
   }
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << outstr.str();
+  chi::log.LogAllVerbose1() << outstr.str();
 
   face_histogram_available = true;
 }
@@ -152,7 +152,7 @@ size_t chi_mesh::MeshContinuum::GetFaceHistogramBinDOFSize(size_t category)
     face_dof_size = face_categories.at(category).first;
   }
   catch (std::out_of_range& o){
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
     << "Fault detected in chi_mesh::MeshContinuum::"
     << "GetFaceHistogramBinDOFSize.";
     return 0;
@@ -204,7 +204,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
   //======================================== Check index validity
   if ((not cur_face.has_neighbor) || (not cur_face.IsNeighborLocal(*this)))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid cell index encountered in call to "
       << "MeshContinuum::FindAssociatedVertices. Index points to either a boundary"
       << "or a non-local cell.";
@@ -234,7 +234,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 
     if (!found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Face DOF mapping failed in call to "
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
@@ -253,7 +253,7 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::
 {
   if (list.empty())
   {
-    chi_log.Log(LOG_ALLERROR) << "ComputeCentroidFromListOfNodes, empty list";
+    chi::log.LogAllError() << "ComputeCentroidFromListOfNodes, empty list";
     exit(EXIT_FAILURE);
   }
   chi_mesh::Vector3 centroid;

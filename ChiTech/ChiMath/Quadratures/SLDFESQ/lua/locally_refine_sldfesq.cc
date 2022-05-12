@@ -5,7 +5,7 @@
 #include "../sldfe_sq.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /** Applies a local refinement of angles.
@@ -69,7 +69,7 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiLocallyRefineSLDFESQAngularQuadrature: "
          "Second argument expected to be table {a,b,c}.";
     exit(EXIT_FAILURE);
@@ -92,7 +92,7 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "chiLocallyRefineSLDFESQAngularQuadrature: "
            "Invalid angular quadrature type.";
       exit(EXIT_FAILURE);
@@ -100,14 +100,14 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiLocallyRefineSLDFESQAngularQuadrature: "
          "Invalid handle to angular quadrature.";
     exit(EXIT_FAILURE);
   }
   catch (...)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiLocallyRefineSLDFESQAngularQuadrature: "
          "Call failed with unknown error.";
     exit(EXIT_FAILURE);

@@ -6,12 +6,13 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 
 #include "chi_mpi.h"
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "ChiConsole/chi_console.h"
 #include "ChiTimer/chi_timer.h"
 
 
-extern ChiLog& chi_log;
+;
 
 #include "ChiGraph/chi_directed_graph.h"
 
@@ -34,13 +35,13 @@ chi_mesh::sweep_management::
   //============================================= Assign direction vector
   sweep_order->omega = omega;
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Building sweep ordering for Omega = "
     << omega.PrintS();
 
   //============================================= Populate Cell Relationships
-  chi_log.Log(LOG_0VERBOSE_1) << "Populating cell relationships";
+  chi::log.Log0Verbose1() << "Populating cell relationships";
   std::vector<std::set<std::pair<int,double>>> cell_successors(num_loc_cells);
   std::set<int> location_successors;
   std::set<int> location_dependencies;
@@ -75,21 +76,21 @@ chi_mesh::sweep_management::
   //============================================= Remove local cycles if allowed
   if (cycle_allowance_flag)
   {
-    chi_log.Log(LOG_0VERBOSE_1)
+    chi::log.Log0Verbose1()
       << chi::program_timer.GetTimeString()
       << " Removing inter-cell cycles.";
     RemoveLocalCyclicDependencies(sweep_order,local_DG);
   }
 
   //============================================= Generate topological sorting
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Generating topological sorting for local sweep ordering";
   sweep_order->spls.item_id = local_DG.GenerateTopologicalSort();
 
   if (sweep_order->spls.item_id.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Topological sorting for local sweep-ordering failed. "
       << "Cyclic dependencies detected. Cycles need to be allowed"
       << " by calling application.";
@@ -102,7 +103,7 @@ chi_mesh::sweep_management::
   //so that each location has the ability to build
   //the global task graph.
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Communicating sweep dependencies.";
 
@@ -118,7 +119,7 @@ chi_mesh::sweep_management::
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Done computing sweep ordering.\n\n";
 

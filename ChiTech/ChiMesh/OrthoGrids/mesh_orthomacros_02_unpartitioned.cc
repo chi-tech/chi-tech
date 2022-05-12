@@ -9,7 +9,7 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Creates a 1D slab mesh from a set of vertices.*/
@@ -18,7 +18,7 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   //======================================== Checks if vertices are empty
   if (vertices.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_mesh::CreateUnpartitioned1DOrthoMesh. Empty vertex list.";
     exit(EXIT_FAILURE);
   }
@@ -107,7 +107,7 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   //======================================== Checks if vertices are empty
   if (vertices_1d_x.empty() or vertices_1d_y.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_mesh::CreateUnpartitioned2DOrthoMesh. Empty vertex list.";
     exit(EXIT_FAILURE);
   }
@@ -205,7 +205,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
       vertices_1d_y.empty() or
       vertices_1d_z.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_mesh::CreateUnpartitioned3DOrthoMesh. Empty vertex list.";
     exit(EXIT_FAILURE);
   }

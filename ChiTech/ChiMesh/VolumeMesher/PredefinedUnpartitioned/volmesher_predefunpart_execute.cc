@@ -6,10 +6,11 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
+;
 
 
 #include "ChiTimer/chi_timer.h"
@@ -21,7 +22,7 @@ extern ChiLog& chi_log;
 /**Executes the predefined3D mesher.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
     << chi::console.GetMemoryUsageInMB() << " MB"
@@ -38,7 +39,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
     if (desired_process_count != chi::mpi.process_count)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "ERROR: Number of processors available ("
         << chi::mpi.process_count <<
         ") does not match amount of processors "
@@ -51,7 +52,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   //======================================== Get unpartitioned mesh
   auto umesh = m_umesh;
 
-  chi_log.Log(LOG_0) << "Computed centroids";
+  chi::log.Log() << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -85,7 +86,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
   grid->SetGlobalVertexCount(umesh->vertices.size());
 
-  chi_log.Log(LOG_0) << "Cells loaded.";
+  chi::log.Log() << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
 //  AddContinuumToRegion(grid, *mesh_handler.region_stack.back());
@@ -93,7 +94,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
 
   //======================================== Concluding messages
-  chi_log.Log(LOG_ALLVERBOSE_1)
+  chi::log.LogAllVerbose1()
     << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
     << grid->local_cell_glob_indices.size();
@@ -108,7 +109,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
                 MPI_SUM,
                 MPI_COMM_WORLD);
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "VolumeMesherPredefinedUnpartitioned: Cells created = "
     << total_global_cells
     << std::endl;

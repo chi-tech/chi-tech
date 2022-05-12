@@ -5,7 +5,7 @@
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -34,7 +34,7 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
 
   if (x_remainder != 0)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "When specifying x-partitioning, the number of grp_subsets in x "
          "needs to be divisible by the number of partitions in x.";
     exit(EXIT_FAILURE);
@@ -42,7 +42,7 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
 
   if (y_remainder != 0)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "When specifying y-partitioning, the number of grp_subsets in y "
          "needs to be divisible by the number of partitions in y.";
     exit(EXIT_FAILURE);
@@ -133,7 +133,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
       if ((num_sub_layers%vol_mesher->options.partition_z) != 0)
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
           << "Number of sub-layers in extruded mesh is not divisible "
           << "by the requested number of z-partitions.";
         exit(EXIT_FAILURE);
@@ -153,7 +153,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
         {
           vol_mesher->options.zcuts.push_back(extruder.vertex_layers[layer_index]);
 
-          if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
+          if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
           {
             printf("Z-Cut %lu, %g\n",vol_mesher->options.zcuts.size(),
                    extruder.vertex_layers[layer_index]);
@@ -171,7 +171,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
       double z = cell->centroid.z;
 
-      if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
+      if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_0VERBOSE_2)
       {
         printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
       }
@@ -209,7 +209,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
 
       double z = cell->centroid.z;
 
-      if (chi_log.GetVerbosity()==LOG_0VERBOSE_2)
+      if (chi::log.GetVerbosity() == chi_objects::ChiLog::LOG_0VERBOSE_2)
       {
         printf("zmax = %g, zmin = %g, cell_z = %g\n",zmax,zmin,z);
       }
@@ -231,7 +231,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
   //================================================== Report unallocated item_id
   if (!found_partition)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "A cell was encountered for which "
          "no zpartition id was found";
     exit(EXIT_FAILURE);

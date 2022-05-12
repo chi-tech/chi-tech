@@ -4,10 +4,8 @@
 
 #include "../../MeshHandler/chi_meshhandler.h"
 
-#include <chi_log.h>
-extern ChiLog& chi_log;
-
-
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //#############################################################################
 /** Executes the surface meshing pipeline.
@@ -22,11 +20,11 @@ int chiSurfaceMesherExecute(lua_State *L)
   int numArgs = lua_gettop(L);
 
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
-  chi_log.Log(LOG_ALLVERBOSE_2) << "Executing surface mesher\n";
+  chi::log.LogAllVerbose2() << "Executing surface mesher\n";
 
   if (cur_hndlr.surface_mesher == nullptr)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << __FUNCTION__ << ": called without a surface mesher set. Make a "
                          "call to chiSurfaceMesherCreate.";
     exit(EXIT_FAILURE);
@@ -34,7 +32,7 @@ int chiSurfaceMesherExecute(lua_State *L)
 
   cur_hndlr.surface_mesher->Execute();
 
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "chiSurfaceMesherExecute: Surface mesher execution completed."
     << std::endl;
 

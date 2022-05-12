@@ -9,7 +9,7 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Counts the number of cells with a logical volume.*/

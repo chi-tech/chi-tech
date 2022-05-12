@@ -2,9 +2,10 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-extern ChiLog& chi_log;
+;
 
 
 #include <sys/stat.h>
@@ -26,7 +27,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
       if ( (mkdir(folder_name.c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0) and
            (errno != EEXIST) )
       {
-        chi_log.Log(LOG_0WARNING)
+        chi::log.Log0Warning()
           << "Failed to create restart directory: " << folder_name;
         return;
       }
@@ -51,7 +52,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
 
   if (not ofile.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to create restart file: " << file_name;
     ofile.close();
     location_succeeded = false;
@@ -79,12 +80,12 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
 
   //======================================== Write status message
   if (global_succeeded)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "Successfully wrote restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
   else
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Failed to write restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
@@ -163,9 +164,9 @@ void lbs::SteadySolver::ReadRestartData(std::string folder_name,
 
   //======================================== Write status message
   if (global_succeeded)
-    chi_log.Log(LOG_0) << "Successfully read restart data";
+    chi::log.Log() << "Successfully read restart data";
   else
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Failed to read restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");

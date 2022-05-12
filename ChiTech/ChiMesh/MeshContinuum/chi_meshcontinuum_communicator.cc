@@ -1,12 +1,13 @@
 #include "chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "chi_runtime.h"
 #include "chi_mpi.h"
 
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /***/
@@ -17,7 +18,7 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
     return commicator_set;
 
   //================================================== Build the communicator
-  chi_log.Log(LOG_0VERBOSE_1) << "Building communicator.";
+  chi::log.Log0Verbose1() << "Building communicator.";
   std::set<int>    local_graph_edges;
   std::vector<int> local_connections;
 
@@ -45,7 +46,7 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
   }
 
   //============================================= Broadcast local connection size
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Communicating local connections.";
 
   std::vector<std::vector<int>> global_graph(chi::mpi.process_count,
@@ -82,7 +83,7 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
               MPI_INT,locI,MPI_COMM_WORLD);
   }
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Done communicating local connections.";
 
 
@@ -99,7 +100,7 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
   }
 
   //============================================= Build communicators
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Building communicators.";
   commicator_set.communicators.resize(chi::mpi.process_count,MPI_Comm());
 
@@ -112,12 +113,12 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 
     if (err != MPI_SUCCESS)
     {
-      chi_log.Log(LOG_0VERBOSE_1)
+      chi::log.Log0Verbose1()
         << "Communicator creation failed.";
     }
   }
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Done building communicators.";
 
   communicators_available = true;

@@ -4,12 +4,11 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
 #include <iomanip>
-
-extern ChiLog&     chi_log;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -58,7 +57,7 @@ void lbs::SteadySolver::InitFluxDataStructures(LBSGroupset& groupset)
     InitAngleAggSingle(groupset);
 
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "
       << "         Process memory = "

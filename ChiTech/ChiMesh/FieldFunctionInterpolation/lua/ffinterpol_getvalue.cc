@@ -5,8 +5,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //#############################################################################
@@ -71,7 +72,7 @@ int chiFFInterpolationGetValue(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
       << "chiFFInterpolationGetValue is currently only supported for "
       << " VOLUME interpolator types.";
   }

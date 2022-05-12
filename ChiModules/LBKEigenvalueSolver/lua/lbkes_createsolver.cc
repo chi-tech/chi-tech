@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 using namespace lbs;
 
@@ -16,7 +17,7 @@ int chiLBKESCreateSolver(lua_State* L)
   const std::string fname = __FUNCTION__;
   int num_args = lua_gettop(L);
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Creating k-eigenvalue solver.";
+  chi::log.LogAllVerbose1() << "Creating k-eigenvalue solver.";
 
   std::string solver_name = "KEigenvalueSolver";
   if (num_args == 1)

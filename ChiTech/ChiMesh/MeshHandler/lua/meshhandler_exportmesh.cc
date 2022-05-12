@@ -4,7 +4,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Exports the mesh to a wavefront.obj format.

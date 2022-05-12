@@ -2,8 +2,9 @@
 
 #include "ChiMesh/Cell/cell.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Initializes the data structures necessary for interpolation. This is
@@ -21,11 +22,11 @@ extern ChiLog& chi_log;
 void chi_mesh::FieldFunctionInterpolationLine::
 Initialize()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing line interpolator.";
+  chi::log.Log0Verbose1() << "Initializing line interpolator.";
   //================================================== Check grid available
   if (field_functions.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Unassigned field function in line field function interpolator.";
     exit(EXIT_FAILURE);
   }
@@ -106,7 +107,7 @@ Initialize()
             {
               interpolation_points_ass_cell[p] = cell_local_index;
               interpolation_points_has_ass_cell[p] = true;
-              chi_log.Log(LOG_ALLVERBOSE_2)
+              chi::log.LogAllVerbose2()
                 << "Cell inter section found  " << p
                 << " v0[" << v0_i << "]=" << v0.PrintS()
                 << " v1[" << v1_i << "]=" << v1.PrintS()
@@ -154,7 +155,7 @@ Initialize()
             {
               interpolation_points_ass_cell[p] = cell_local_index;
               interpolation_points_has_ass_cell[p] = true;
-              chi_log.Log(LOG_ALLVERBOSE_2)
+              chi::log.LogAllVerbose2()
                 << "Cell inter section found  " << p;
             }
 
@@ -198,7 +199,7 @@ Initialize()
             {
               interpolation_points_ass_cell[p] = cell_local_index;
               interpolation_points_has_ass_cell[p] = true;
-              chi_log.Log(LOG_ALLVERBOSE_2)
+              chi::log.LogAllVerbose2()
                 << "Cell inter section found  " << p;
             }
 
@@ -273,5 +274,5 @@ Initialize()
 
 
 
-  chi_log.Log(LOG_0VERBOSE_1) << "Finished initializing interpolator.";
+  chi::log.Log0Verbose1() << "Finished initializing interpolator.";
 }

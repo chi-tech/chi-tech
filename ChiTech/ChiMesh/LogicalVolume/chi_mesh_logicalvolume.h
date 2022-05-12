@@ -151,7 +151,6 @@ public:
   bool Inside(const chi_mesh::Vector3& point) const override
   {
     typedef chi_mesh::Vector3 Vec3;
-    auto& chi_log = ChiLog::GetInstance();
 
     const auto& pr = point;              //reference point
     const Vec3  p0(x0, y0, z0);          //cylinder root

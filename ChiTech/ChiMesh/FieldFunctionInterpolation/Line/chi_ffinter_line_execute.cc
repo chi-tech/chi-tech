@@ -3,14 +3,14 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
-#include <chi_log.h>
-extern ChiLog&  chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //###################################################################
 /**Executes the interpolation.*/
 void chi_mesh::FieldFunctionInterpolationLine::Execute()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Executing line interpolator.";
+  chi::log.Log0Verbose1() << "Executing line interpolator.";
   for (int ff=0; ff<field_functions.size(); ff++)
   {
     grid_view = field_functions[ff]->grid;

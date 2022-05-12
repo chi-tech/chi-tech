@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Performs general input checks before initialization continues.*/
@@ -12,13 +12,13 @@ void lbs::SteadySolver::PerformInputChecks()
 {
   if (groups.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No groups added to solver.";
     exit(EXIT_FAILURE);
   }
   if (groupsets.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No group-sets added to solver.";
     exit(EXIT_FAILURE);
   }
@@ -27,7 +27,7 @@ void lbs::SteadySolver::PerformInputChecks()
   {
     if (group_set.groups.empty())
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "LinearBoltzmann::Solver: No groups added to groupset "
         << grpset_counter << ".";
       exit(EXIT_FAILURE);
@@ -36,13 +36,13 @@ void lbs::SteadySolver::PerformInputChecks()
   }
   if (options.sd_type == chi_math::SpatialDiscretizationType::UNDEFINED)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No discretization method set.";
     exit(EXIT_FAILURE);
   }
 //  if (regions.empty())
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "LinearBoltzmann::Solver: No regions added to solver.";
 //    exit(EXIT_FAILURE);
 //  }
@@ -53,7 +53,7 @@ void lbs::SteadySolver::PerformInputChecks()
 
   if (grid == nullptr)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No grid available from region.";
     exit(EXIT_FAILURE);
   }

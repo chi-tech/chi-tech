@@ -8,7 +8,7 @@
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polygon_cylindrical.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -117,7 +117,7 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
 void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0VERBOSE_1) << chi::program_timer.GetTimeString()
+  chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
                               << " Add cell SD-values.";
 
   size_t num_local_cells = ref_grid->local_cells.size();
@@ -128,7 +128,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
     using namespace chi_math::finite_element;
     if (setup_flags & SetupFlags::COMPUTE_CELL_MAPPINGS)
     {
-      chi_log.Log(LOG_0VERBOSE_1) << chi::program_timer.GetTimeString()
+      chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
                                   << " Computing unit integrals.";
       if (!mapping_initialized)
       {
@@ -146,7 +146,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
     using namespace chi_math::finite_element;
     if (setup_flags & SetupFlags::COMPUTE_UNIT_INTEGRALS)
     {
-    chi_log.Log(LOG_0VERBOSE_1) << chi::program_timer.GetTimeString()
+    chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
                                 << " Computing unit integrals.";
       if (not integral_data_initialized)
       {
@@ -172,7 +172,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
     using namespace chi_math::finite_element;
     if (setup_flags & SetupFlags::COMPUTE_QP_DATA)
     {
-      chi_log.Log(LOG_0VERBOSE_1) << chi::program_timer.GetTimeString()
+      chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
                                   << " Computing quadrature data.";
       if (not qp_data_initialized)
       {
@@ -193,7 +193,7 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
     }//if init qp data
   }
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0VERBOSE_1) << chi::program_timer.GetTimeString()
+  chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
                               << " Done adding cell SD-values.";
 
 }//AddViewOfLocalContinuum
@@ -212,7 +212,7 @@ std::shared_ptr<CellMappingFE_PWL>
     }
     catch (const std::out_of_range& o)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "SpatialDiscretization_PWLC::MapFeView "
            "Failure to map Finite Element View. The view is either not"
            "available or the supplied local index is invalid.";

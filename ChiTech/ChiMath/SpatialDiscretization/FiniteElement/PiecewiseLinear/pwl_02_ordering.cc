@@ -1,7 +1,7 @@
 #include "pwl.h"
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 #include <chi_mpi.h>
 
@@ -18,7 +18,7 @@ extern ChiLog& chi_log;
 void SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi_log.Log() << chi::program_timer.GetTimeString()
+  chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Developing nodal ordering.";
   chi_objects::ChiTimer t_stage[6];
 
@@ -118,7 +118,7 @@ void SpatialDiscretization_PWLD::OrderNodes()
 
 
   //================================================== Print info
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "Local dof count, start, total "
     << local_node_count << " "
     << local_block_address << " "

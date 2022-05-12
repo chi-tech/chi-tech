@@ -1,7 +1,7 @@
 #include "chi_mesh.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Tensor product of two vectors.

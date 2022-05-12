@@ -9,16 +9,17 @@
 #include "chi_mpi.h"
 
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
 int chi_diffusion::Solver::Initialize(bool verbose)
 {
-  chi_log.Log(LOG_0) << "\n"
+  chi::log.Log() << "\n"
                      << chi::program_timer.GetTimeString() << " "
                      << TextName() << ": Initializing Diffusion solver ";
   this->verbose_info = verbose;
@@ -61,7 +62,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //============================================= Get DOF counts
   local_dof_count = sdm->GetNumLocalDOFs(unknown_manager);
   global_dof_count = sdm->GetNumGlobalDOFs(unknown_manager);
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << TextName() << ": Global number of DOFs="
     << global_dof_count;
 
@@ -102,14 +103,14 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
 
   //================================================== Determine nodal DOF
-  chi_log.Log(LOG_0) << "Building sparsity pattern.";
+  chi::log.Log() << "Building sparsity pattern.";
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
   sdm->BuildSparsityPattern(nodal_nnz_in_diag,
                             nodal_nnz_off_diag,
                             unknown_manager);
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString() << " "
     << TextName() << ": Diffusion Solver initialization time "
     << t_init.GetTime()/1000.0 << std::endl;
@@ -134,7 +135,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
-  chi_log.Log(LOG_0) << "Setting matrix preallocation.";
+  chi::log.Log() << "Setting matrix preallocation.";
   MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
                             0,nodal_nnz_off_diag.data());
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);

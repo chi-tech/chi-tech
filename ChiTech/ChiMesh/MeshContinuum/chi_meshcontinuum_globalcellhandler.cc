@@ -4,7 +4,7 @@
 #include <chi_log.h>
 
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Adds a new cell to grid registry.*/

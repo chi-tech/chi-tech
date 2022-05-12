@@ -5,7 +5,6 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
 #include "chi_log.h"
-extern ChiLog&     chi_log;
 
 //###################################################################
 /**Obtains a named list of the field functions associated with a solver.
@@ -92,7 +91,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
 
   if (num_handles == 0)
   {
-    chi_log.Log(LOG_0WARNING) << fname << ": No field-functions were found that "
+    chi::log.Log0Warning() << fname << ": No field-functions were found that "
                               << "matched the requested name. A null handle will "
                               << "be returned." << std::endl;
 
@@ -100,7 +99,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
   }
 
   if (num_handles > 1)
-    chi_log.Log(LOG_0WARNING) << fname << ": A total of " << num_handles
+    chi::log.Log0Warning() << fname << ": A total of " << num_handles
                               << " field-functions were found that matched the "
                               << " requested name. Only the first match will be "
                               << " returned.";

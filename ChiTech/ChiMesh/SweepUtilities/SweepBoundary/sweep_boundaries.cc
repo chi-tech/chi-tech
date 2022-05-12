@@ -2,7 +2,7 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-extern ChiLog& chi_log;
+;
 
 ////###################################################################
 ///**Returns a flag indicating whether this bndry is reflecting or not.*/
@@ -24,7 +24,7 @@ HeterogenousPsiIncoming(
                 int fi,
                 int gs_ss_begin)
 {
-  chi_log.Log(LOG_ALLERROR)
+  chi::log.LogAllError()
     << "HeterogenousPsiIncoming call made to boundary "
        "that has no such information.";
   exit(EXIT_FAILURE);
@@ -40,7 +40,7 @@ HeterogenousPsiOutgoing(
                 int fi,
                 int gs_ss_begin)
 {
-  chi_log.Log(LOG_ALLERROR)
+  chi::log.LogAllError()
     << "HeterogenousPsiOutgoing call made to boundary "
        "that has no such information.";
   exit(EXIT_FAILURE);

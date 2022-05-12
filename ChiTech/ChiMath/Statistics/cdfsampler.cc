@@ -2,9 +2,8 @@
 
 #include "cdfsampler.h"
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 #include <unistd.h>
 
@@ -47,7 +46,7 @@ chi_math::CDFSampler::SubIntvl::SubIntvl(std::string offset,
         if (i == (subdiv_factor-1))
           end = fbin;
 
-//        chi_log.Log(LOG_0)
+//        chi::log.Log()
 //          << offset
 //          << "Sub-interval " << beg
 //          << " " << end;
@@ -93,7 +92,7 @@ chi_math::CDFSampler::CDFSampler(std::vector<double> &in_cdf,
     this->final_res = 100;
   }
 
-//  chi_log.Log(LOG_0)
+//  chi::log.Log()
 //    << "Factors: " << this->subdiv_factor
 //    << " " << this->final_res;
 
@@ -118,7 +117,7 @@ chi_math::CDFSampler::CDFSampler(std::vector<double> &in_cdf,
       if (i == (this->subdiv_factor-1))
         end = cdf_size-1;
 
-//      chi_log.Log(LOG_0)
+//      chi::log.Log()
 //        << "Sub-interval " << beg
 //        << " " << end;
 
@@ -157,7 +156,7 @@ int chi_math::CDFSampler::Sample(double x)
     }
 
     //================================= Sample range
-//    chi_log.Log(LOG_0)
+//    chi::log.Log()
 //      << "Sampling " << x
 //      << " in range " << range.first << "-" << range.second;
     for (int k=range.first; k<=range.second; k++)
@@ -181,7 +180,7 @@ int chi_math::CDFSampler::Sample(double x)
 
   if (ret_val < 0)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_math::CDFSampler::Sample. Error in CDF sampling routine. "
       << "A bin was not found.";
     exit(EXIT_FAILURE);
@@ -288,7 +287,7 @@ int chi_math::SampleCDF(double x, std::vector<double> cdf_bin)
   if ((indB-indA) <= fine_limit)
     refine_limit_reached = true;
 
-//  chi_log.Log(LOG_0) << "************ new prob x=" << x
+//  chi::log.Log() << "************ new prob x=" << x
 //   << " " << indA << " " << indB << " " << indC;
 //  refine_limit_reached = true;
   //======================================== Recursively refine
@@ -315,7 +314,7 @@ int chi_math::SampleCDF(double x, std::vector<double> cdf_bin)
       indB = indA + std::ceil(intvl_size/2.0)-1;
     }
 
-//    chi_log.Log(LOG_0)
+//    chi::log.Log()
 //      << refine_count << " "
 //      << "newA=" << indA
 //      << "newB=" << indB
@@ -330,7 +329,7 @@ int chi_math::SampleCDF(double x, std::vector<double> cdf_bin)
     }
   }
 
-//  chi_log.Log(LOG_0)
+//  chi::log.Log()
 //    << "Final lookup range=" << lookup_i << "-" << lookup_f << " " << x;
 
 
@@ -365,7 +364,7 @@ int chi_math::SampleCDF(double x, std::vector<double> cdf_bin)
 
   if (ret_val < 0)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_math::SampleCDF. Error in CDF sampling routine. "
       << "A bin was not found."
       << " i=" << lookup_i
@@ -375,7 +374,7 @@ int chi_math::SampleCDF(double x, std::vector<double> cdf_bin)
   }
 
 
-//  chi_log.Log(LOG_0) << ret_val;
+//  chi::log.Log() << ret_val;
 //  usleep(100000);
 
   return ret_val;

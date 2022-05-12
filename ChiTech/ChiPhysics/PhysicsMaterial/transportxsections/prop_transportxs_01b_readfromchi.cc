@@ -1,7 +1,8 @@
 #include "material_property_transportxsections.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <string>
 
@@ -249,13 +250,13 @@ void chi_physics::TransportCrossSections::
   Reset();
 
   //======================================== Read file
-  chi_log.Log(LOG_0) << "Reading Chi cross-section file \"" << file_name << "\"\n";
+  chi::log.Log() << "Reading Chi cross-section file \"" << file_name << "\"\n";
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
   {
-      chi_log.Log(LOG_ALLERROR)<< "Failed to open chi cross-section file \""
+      chi::log.LogAllError()<< "Failed to open chi cross-section file \""
           << file_name << "\" in call to "
           << "TransportCrossSections::MakeFromChixsFile\n";
       exit(EXIT_FAILURE);
@@ -526,7 +527,7 @@ void chi_physics::TransportCrossSections::
     }//try
     catch (const std::runtime_error& err)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Error reading xs-file \"" + file_name + "\". "
         << "Line number " << line_number << ". "
         << err.what();
@@ -534,7 +535,7 @@ void chi_physics::TransportCrossSections::
     }
     catch (...)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Unknown error in " << std::string(__FUNCTION__);
       exit(EXIT_FAILURE);
     }

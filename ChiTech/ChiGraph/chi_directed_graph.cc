@@ -1,10 +1,8 @@
 #include "chi_directed_graph.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-
-extern ChiLog&  chi_log;
-
 
 #include <sstream>
 #include <algorithm>
@@ -30,7 +28,7 @@ void chi_graph::DirectedGraph::
   //=================================== Check "from" is in range
   if ((v<0) || (v>=vertices.size()))
   {
-    chi_log.Log(LOG_ALL)
+    chi::log.LogAll()
       << "chi_graph::DirectedGraph::VertexAccessor: "
       << "Error removing vertex " << v;
     exit(EXIT_FAILURE);
@@ -66,7 +64,7 @@ chi_graph::GraphVertex& chi_graph::DirectedGraph::
   VertexAccessor::operator[](int v)
 {
   if (not vertex_valid_flags[v])
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_graph::DirectedGraph::VertexAccessor: "
          "Invalid vertex accessed. Vertex may have been removed.";
   return vertices[v];
@@ -456,8 +454,8 @@ chi_graph::DirectedGraph::RemoveCyclicDependencies()
   int iter=0;
   while (not SCCs.empty())
   {
-    if (chi_log.GetVerbosity() >= LOG_0VERBOSE_2)
-      chi_log.Log(LOG_ALL)
+    if (chi::log.GetVerbosity() >= chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2)
+      chi::log.LogAll()
         << "Inter cell cyclic dependency removal. Iteration " << ++iter;
 
     //============================================= Remove bi-connected then

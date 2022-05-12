@@ -3,7 +3,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -27,7 +27,7 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
     // Check valid template cell
     if (raw_cell->type != chi_mesh::CellType::POLYGON)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "chi_mesh::VolumeMesher::CreatePolygonCells "
            "called with a cell not being of primary type"
            " chi_mesh::CellType::POLYGON.";

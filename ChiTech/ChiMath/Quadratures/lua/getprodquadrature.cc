@@ -5,7 +5,6 @@
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "chi_log.h"
-extern ChiLog&     chi_log;
 
 //########################################################## Get product quadrature
 /** Get the values of a product quadrature
@@ -32,14 +31,14 @@ int chiGetProductQuadrature(lua_State *L)
       quad = std::static_pointer_cast<chi_math::ProductQuadrature>(ang_quad);
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "chiGetProductQuadrature: Provided quadrature handle points to "
            "a quadrature that is not a product quadrature.";
       exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiGetProductQuadrature: Invalid quadrature handle.";
     exit(EXIT_FAILURE);
   }

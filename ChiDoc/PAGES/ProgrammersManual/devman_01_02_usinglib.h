@@ -72,16 +72,16 @@ include-files will be usable.
 
 \code
 #include "chi_runtime.h"
-#include "chi_log.h"
+#include "chi::log.h"
 
 int main(int argc, char* argv[])
 {
     ChiTech::Initialize(argc,argv);
     ChiTech::RunBatch(argc, argv);
 
-    ChiLog& chi_log = ChiLog::GetInstance();
+    ChiLog& chi::log = ChiLog::GetInstance();
 
-    chi_log.Log() << "Hello World!";
+    chi::log.Log() << "Hello World!";
 
     //We will add code here
 
@@ -147,13 +147,13 @@ make -j4
  *
  * \code
  * #include"ChiLua/chi_lua.h"
- * #include "chi_log.h"
+ * #include "chi::log.h"
  *
  * int chiPrintStatus(lua_State *L)
  * {
  *     ChiLog& log = ChiLog::GetInstance();
  *
- *     log.Log(LOG_0) << "Hello from here";
+ *     log.Log() << "Hello from here";
  *
  *     return 0;
  * }

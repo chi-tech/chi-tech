@@ -10,7 +10,7 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //#############################################################################
@@ -63,7 +63,7 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     if (num_args != 3)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << fname + ": "
            "When specifying VOLUMEMESHER_EXTRUDER, the template type and "
            "handle must also be supplied.";
@@ -99,7 +99,7 @@ int chiVolumeMesherCreate(lua_State *L)
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "In call to " << __FUNCTION__ << ". Invalid template type specified.";
       exit(EXIT_FAILURE);
     }
@@ -110,7 +110,7 @@ int chiVolumeMesherCreate(lua_State *L)
   {
     if (num_args != 2)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << fname + ": "
                    "When specifying VOLUMEMESHER_UNPARTITIONED, the "
                    "handle must also be supplied.";
@@ -127,7 +127,7 @@ int chiVolumeMesherCreate(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_0ERROR) << "Invalid Volume mesher type in function "
+    chi::log.Log0Error() << "Invalid Volume mesher type in function "
                                "chiVolumeMesherCreate. Allowed options are"
                                "VOLUMEMESHER_EXTRUDER or "
                                "VOLUMEMESHER_UNPARTITIONED";
@@ -137,7 +137,7 @@ int chiVolumeMesherCreate(lua_State *L)
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
   cur_hndlr.volume_mesher = new_mesher;
 
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "chiVolumeMesherCreate: Volume mesher created."
     << std::endl;
 

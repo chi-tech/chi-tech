@@ -7,7 +7,7 @@
 #include <chi_log.h>
 
 
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
@@ -190,7 +190,7 @@ ExportPython(std::string base_name)
 
   ofile.close();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Exported Python files for field func \""
     << field_functions[0]->text_name
     << "\" to base name \""

@@ -7,7 +7,7 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //############################################################################# Create Window
@@ -46,7 +46,7 @@ int chiSurfaceMeshImportFromOBJFile(lua_State *L)
   outtext << "chiSurfaceMeshImportFromOBJFile: "
              "Loading Wavefront .obj file: ";
   outtext << temp << std::endl;
-  chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
+  chi::log.LogAllVerbose2() << outtext.str();
   surface_mesh.ImportFromOBJFile(temp, as_poly);
 
   return 1;
@@ -113,7 +113,7 @@ int chiSurfaceMeshImportFromMshFiles(lua_State *L)
   outtext << "chiSurfaceMeshImportFromMshFiles: "
              "Loading a gmsh ascii file: ";
   outtext << temp << std::endl;
-  chi_log.Log(LOG_ALLVERBOSE_2) << outtext.str();
+  chi::log.LogAllVerbose2() << outtext.str();
   surface_mesh.ImportFromMshFiles(temp, as_poly);
 
   return 1;

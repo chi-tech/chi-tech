@@ -2,11 +2,11 @@
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 void lbs_adjoint::AdjointSolver::Initialize()
 {
-  auto& chi_log = ChiLog::GetInstance();
   lbs::SteadySolver::Initialize();
 
   //============================================= Transpose Scattering operators
@@ -49,7 +49,7 @@ void lbs_adjoint::AdjointSolver::Initialize()
         qoi_cell_subscription.push_back(cell.local_id);
 
     //TODO: Change the verbosity of next statement
-    chi_log.Log() << "LBAdjointSolver: Number of cells subscribed to "
+    chi::log.Log() << "LBAdjointSolver: Number of cells subscribed to "
                   << qoi_designation.name << " = "
                   << qoi_cell_subscription.size();
   }

@@ -2,9 +2,9 @@
 
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "chi_log.h"
 
-extern ChiLog&  chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 
 
@@ -42,7 +42,7 @@ int chiMeshCreateUnpartitioned1DOrthoMesh(lua_State* L)
   //=================================== Check args table
   if (not lua_istable(L,1))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << func_name << ": First argument found to not be an array.";
     exit(EXIT_FAILURE);
   }
@@ -112,13 +112,13 @@ int chiMeshCreateUnpartitioned2DOrthoMesh(lua_State* L)
   //=================================== Check args table
   if (not lua_istable(L,1))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << func_name << ": First argument found to not be an array.";
     exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,2))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << func_name << ": Second argument found to not be an array.";
     exit(EXIT_FAILURE);
   }
@@ -205,19 +205,19 @@ int chiMeshCreateUnpartitioned3DOrthoMesh(lua_State* L)
   //=================================== Check args table
   if (not lua_istable(L,1))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << func_name << ": First argument found to not be an array.";
     exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,2))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << func_name << ": Second argument found to not be an array.";
     exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,3))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << func_name << ": Third argument found to not be an array.";
     exit(EXIT_FAILURE);
   }

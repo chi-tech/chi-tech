@@ -2,8 +2,9 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <iomanip>
 
@@ -22,7 +23,7 @@ void lbs::SteadySolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 void lbs::SteadySolver::ComputeBalance()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log() << "\n********** Computing balance\n";
+  chi::log.Log() << "\n********** Computing balance\n";
 
   auto pwld =
     std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
@@ -157,7 +158,7 @@ void lbs::SteadySolver::ComputeBalance()
   double globl_balance    = globl_balance_table.at(4);
   double globl_gain       = globl_balance_table.at(5);
 
-  chi_log.Log() << "Balance table:\n"
+  chi::log.Log() << "Balance table:\n"
     << std::setprecision(5) << std::scientific
     << " Absorption rate          = " << globl_absorption               << "\n"
     << " Production rate          = " << globl_production               << "\n"
@@ -167,7 +168,7 @@ void lbs::SteadySolver::ComputeBalance()
     << " Net Gain/Loss            = " << globl_balance                  << "\n"
     << " Net Gain/Loss normalized = " << globl_balance/globl_gain       << "\n";
 
-  chi_log.Log() << "\n********** Done computing balance\n";
+  chi::log.Log() << "\n********** Done computing balance\n";
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

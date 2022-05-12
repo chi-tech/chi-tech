@@ -6,7 +6,7 @@
 
 //###################################################################
 /** Default constructor*/
-ChiLog::ChiLog() noexcept
+chi_objects::ChiLog::ChiLog() noexcept
 {
   verbosity = LOG_0VERBOSE_0;
   std::string memory_usage_event("Maximum Memory Usage");
@@ -22,7 +22,7 @@ ChiLog::ChiLog() noexcept
 
 //###################################################################
 /** Makes a log entry.*/
-chi_objects::LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
+chi_objects::LogStream chi_objects::ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 {
   switch (level)
   {
@@ -69,7 +69,7 @@ chi_objects::LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     }
     case LOG_0VERBOSE_0:
     case LOG_0VERBOSE_1:
-    case LOG_0VERBOSE_2:
+    case ChiLog::LOG_LVL::LOG_0VERBOSE_2:
     {
       if ((chi::mpi.location_id == 0) && (verbosity >= level))
       {
@@ -124,7 +124,7 @@ chi_objects::LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 
 //###################################################################
 /** Sets the verbosity level.*/
-void ChiLog::SetVerbosity(int int_level)
+void chi_objects::ChiLog::SetVerbosity(int int_level)
 {
   if (int_level == 0)
   {
@@ -136,20 +136,20 @@ void ChiLog::SetVerbosity(int int_level)
   }
   else if (int_level == 2)
   {
-    verbosity = LOG_0VERBOSE_2;
+    verbosity = ChiLog::LOG_LVL::LOG_0VERBOSE_2;
   }
 }
 
 //###################################################################
 /** Gets the current verbosity level.*/
-int ChiLog::GetVerbosity() const
+int chi_objects::ChiLog::GetVerbosity() const
 {
   return verbosity;
 }
 
 //###################################################################
 /** Returns a unique tag to a newly created repeating event.*/
-size_t ChiLog::GetRepeatingEventTag(std::string event_name)
+size_t chi_objects::ChiLog::GetRepeatingEventTag(std::string event_name)
 {
   repeating_events.emplace_back(event_name);
 
@@ -165,9 +165,9 @@ size_t ChiLog::GetRepeatingEventTag(std::string event_name)
 
 //###################################################################
 /**Logs an event with the supplied event information.*/
-void ChiLog::LogEvent(size_t ev_tag,
-                      EventType ev_type,
-                      const std::shared_ptr<EventInfo>& ev_info)
+void chi_objects::ChiLog::LogEvent(size_t ev_tag,
+                                   EventType ev_type,
+                                   const std::shared_ptr<EventInfo>& ev_info)
 {
   if (ev_tag >= repeating_events.size())
     return;
@@ -182,8 +182,8 @@ void ChiLog::LogEvent(size_t ev_tag,
 
 //###################################################################
 /**Logs an event without any event information.*/
-void ChiLog::LogEvent(size_t ev_tag,
-                      EventType ev_type)
+void chi_objects::ChiLog::LogEvent(size_t ev_tag,
+                                   EventType ev_type)
 {
   if (ev_tag >= repeating_events.size())
     return;
@@ -202,7 +202,7 @@ void ChiLog::LogEvent(size_t ev_tag,
  * the program timestamp in seconds. This method uses the
  * ChiLog::EventInfo::GetString method to append information. This allows
  * derived classes to implement more sophisticated outputs.*/
-std::string ChiLog::PrintEventHistory(size_t ev_tag)
+std::string chi_objects::ChiLog::PrintEventHistory(size_t ev_tag)
 {
   std::stringstream outstr;
   if (ev_tag >= repeating_events.size())
@@ -245,8 +245,8 @@ std::string ChiLog::PrintEventHistory(size_t ev_tag)
 //###################################################################
 /**Processes an event given an event operation. See ChiLog for further
  * reference.*/
-double ChiLog::ProcessEvent(size_t ev_tag,
-                            ChiLog::EventOperation ev_operation)
+double chi_objects::ChiLog::ProcessEvent(size_t ev_tag,
+                                         chi_objects::ChiLog::EventOperation ev_operation)
 {
   if (ev_tag >= repeating_events.size())
     return 0.0;

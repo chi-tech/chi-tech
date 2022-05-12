@@ -3,8 +3,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -22,7 +23,7 @@ void chi_mesh::MeshContinuum::
 
     if (of == nullptr)
     {
-      chi_log.Log(LOG_ALLERROR) << "Could not open file: "
+      chi::log.LogAllError() << "Could not open file: "
                                   << std::string(fileName);
       exit(EXIT_FAILURE);
     }
@@ -94,7 +95,7 @@ void chi_mesh::MeshContinuum::
 
     fclose(of);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
      << "Exported Volume mesh to "
      << str_file_name;
   }//Whole mesh
@@ -108,7 +109,7 @@ void chi_mesh::MeshContinuum::
 
     if (chi::material_stack.empty())
     {
-      chi_log.Log(LOG_0WARNING)
+      chi::log.Log0Warning()
         << "ExportCellsToObj: No mesh will be exported because there "
         << "are no physics materials present";
     }
@@ -125,7 +126,7 @@ void chi_mesh::MeshContinuum::
 
       if (of == nullptr)
       {
-        chi_log.Log(LOG_ALLERROR) << "Could not open file: "
+        chi::log.LogAllError() << "Could not open file: "
                                   << mat_file_name;
         exit(EXIT_FAILURE);
       }
@@ -210,7 +211,7 @@ void chi_mesh::MeshContinuum::
 
       fclose(of);
 
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "Exported Material Volume mesh to "
         << mat_file_name;
     }//for mat

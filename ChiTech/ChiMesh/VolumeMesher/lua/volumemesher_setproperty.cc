@@ -8,7 +8,7 @@
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <iostream>
 
@@ -101,21 +101,21 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     int pz = lua_tonumber(L,2);
     cur_hndlr.volume_mesher->options.partition_z = pz;
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    chi::log.LogAllVerbose1()
       << "Partition z set to " << pz;
   }
   else if (property_index == VMP::PARTITION_Y)
   {
     int p = lua_tonumber(L,2);
     cur_hndlr.volume_mesher->options.partition_y = p;
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    chi::log.LogAllVerbose1()
       << "Partition y set to " << p;
   }
   else if (property_index == VMP::PARTITION_X)
   {
     int p = lua_tonumber(L,2);
     cur_hndlr.volume_mesher->options.partition_x = p;
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    chi::log.LogAllVerbose1()
       << "Partition x set to " << p;
   }
   else if (property_index == VMP::CUTS_Z)
@@ -144,7 +144,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
         (chi_mesh::VolumeMesher::PartitionType)p;
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Unsupported partition type used in call to "
         << __FUNCTION__ << ".";
       exit(EXIT_FAILURE);
@@ -186,7 +186,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi_log.Log(LOG_ALLERROR) << "Invalid amount of arguments used for "
+      chi::log.LogAllError() << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "MATID_FROMLOGICAL...";
       exit(EXIT_FAILURE);
@@ -206,7 +206,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi_log.Log(LOG_ALLERROR) << "Invalid amount of arguments used for "
+      chi::log.LogAllError() << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "BNDRYID_FROMLOGICAL...";
       exit(EXIT_FAILURE);
@@ -223,7 +223,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR) << "Invalid property specified " << property_index
+    chi::log.LogAllError() << "Invalid property specified " << property_index
                               << " in call to chiVolumeMesherSetProperty().";
     exit(EXIT_FAILURE);
   }

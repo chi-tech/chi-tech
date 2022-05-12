@@ -2,8 +2,9 @@
 
 #include <iomanip>
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -34,7 +35,7 @@ PetscErrorCode chi_diffusion::KSPMonitorAChiTech(
       << std::scientific << std::setprecision(7) << rnorm / rhs_norm
       << std::endl;
 
-    chi_log.Log(LOG_0) << buff.str();
+    chi::log.Log() << buff.str();
   }
   return 0;
 }
@@ -60,7 +61,7 @@ PetscErrorCode chi_diffusion::DiffusionConvergenceTestNPT(
 
   double relative_residual = rnorm/rhs_norm;
 
-  chi_log.Log(LOG_0) << "Iteration " << n << " Residual " << rnorm/rhs_norm;
+  chi::log.Log() << "Iteration " << n << " Residual " << rnorm/rhs_norm;
 
   if (relative_residual < tol)
     *convergedReason = KSP_CONVERGED_RTOL;

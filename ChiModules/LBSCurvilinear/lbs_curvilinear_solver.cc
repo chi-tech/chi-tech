@@ -2,6 +2,7 @@
 
 #include <iomanip>
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 #include "ChiConsole/chi_console.h"
@@ -14,13 +15,13 @@
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
-extern ChiLog& chi_log;
+;
 
 
 void
 LBSCurvilinear::Solver::PerformInputChecks()
 {
-  chi_log.Log(LOG_0) << "LBSCurvilinear::Solver::PerformInputChecks : enter";
+  chi::log.Log() << "LBSCurvilinear::Solver::PerformInputChecks : enter";
 
   //  --------------------------------------------------------------------------
   //  perform all verifications of Cartesian LBS
@@ -36,7 +37,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
   if (coord_system_type != chi_math::CoordinateSystemType::CYLINDRICAL &&
       coord_system_type != chi_math::CoordinateSystemType::SPHERICAL)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "LBSCurvilinear::Solver::PerformInputChecks : "
       << "invalid coordinate system, static_cast<int>(type) = "
       << static_cast<int>(coord_system_type);
@@ -62,7 +63,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
       //}
         default:
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "invalid geometry, static_cast<int>(type) = "
             << static_cast<int>(options.geometry_type) << " "
@@ -84,7 +85,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
         }
         default:
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "invalid geometry, static_cast<int>(type) = "
             << static_cast<int>(options.geometry_type) << " "
@@ -97,7 +98,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
     }
     default:
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "LBSCurvilinear::Solver::PerformInputChecks : "
         << "invalid geometry, static_cast<int>(type) = "
         << static_cast<int>(options.geometry_type) << " "
@@ -118,7 +119,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
           std::dynamic_pointer_cast<chi_math::CylindricalAngularQuadrature>(angular_quad_ptr);
         if (!curvilinear_angular_quad_ptr)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "invalid angular quadrature, static_cast<int>(type) = "
             << static_cast<int>(angular_quad_ptr->type)
@@ -133,7 +134,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
           std::dynamic_pointer_cast<chi_math::SphericalAngularQuadrature>(angular_quad_ptr);
         if (!curvilinear_angular_quad_ptr)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "invalid angular quadrature, static_cast<int>(type) = "
             << static_cast<int>(angular_quad_ptr->type)
@@ -144,7 +145,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
       }
       default:
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
           << "LBSCurvilinear::Solver::PerformInputChecks : "
           << "invalid curvilinear coordinate system, static_cast<int>(type) = "
           << static_cast<int>(coord_system_type);
@@ -160,7 +161,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
       {
         if (angleagg_method != lbs::AngleAggregationType::AZIMUTHAL)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "invalid angle aggregation type, static_cast<int>(type) = "
             << static_cast<int>(angleagg_method)
@@ -173,7 +174,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
       {
         if (angleagg_method != lbs::AngleAggregationType::POLAR)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "invalid angle aggregation type, static_cast<int>(type) = "
             << static_cast<int>(angleagg_method)
@@ -184,7 +185,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
       }
       default:
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
           << "LBSCurvilinear::Solver::PerformInputChecks : "
           << "invalid curvilinear coordinate system, static_cast<int>(type) = "
           << static_cast<int>(coord_system_type);
@@ -220,7 +221,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
               const auto& vertex = grid->vertices[v_id];
               if (std::abs(vertex[d]) > 1.0e-12)
               {
-                chi_log.Log(LOG_ALLERROR)
+                chi::log.LogAllError()
                   << "LBSCurvilinear::Solver::PerformInputChecks : "
                   << "mesh contains boundary faces with outward-oriented unit "
                   << "normal vector " << (-1*unit_normal_vectors[d]).PrintS()
@@ -234,7 +235,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
         }
         if (!face_orthogonal)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "mesh contains boundary faces not orthogonal with respect to "
             << "Cartesian reference frame.";
@@ -244,14 +245,14 @@ LBSCurvilinear::Solver::PerformInputChecks()
     }
   }
 
-  chi_log.Log(LOG_0) << "LBSCurvilinear::Solver::PerformInputChecks : exit";
+  chi::log.Log() << "LBSCurvilinear::Solver::PerformInputChecks : exit";
 }
 
 
 void
 LBSCurvilinear::Solver::InitializeSpatialDiscretization()
 {
-  chi_log.Log(LOG_0) << "Initializing spatial discretization.\n";
+  chi::log.Log() << "Initializing spatial discretization.\n";
 
   const auto setup_flags =
     chi_math::finite_element::COMPUTE_CELL_MAPPINGS |
@@ -282,7 +283,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
     }
     default:
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "LBSCurvilinear::Solver::InitializeSpatialDiscretization : "
         << "invalid geometry, static_cast<int>(type) = "
         << static_cast<int>(options.geometry_type);
@@ -319,7 +320,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
     }
     default:
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "LBSCurvilinear::Solver::InitializeSpatialDiscretization : "
         << "invalid geometry, static_cast<int>(type) = "
         << static_cast<int>(options.geometry_type);
@@ -332,7 +333,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
 
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
     << chi::console.GetMemoryUsageInMB() << " MB";

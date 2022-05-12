@@ -5,7 +5,7 @@
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog& chi_log;
+;
 
 
 #include <fstream>
@@ -115,7 +115,7 @@ void LBSGroupset::BuildSubsets()
     grp_subsets.emplace_back(subset_ranki,subset_ranki+subset_size-1);
     grp_subset_sizes.push_back(subset_size);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
     << "Groupset subset " << ss << " "
     << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
@@ -150,7 +150,7 @@ void LBSGroupset::BuildSubsets()
       ang_subset_sizes_top.push_back(subset_size);
 
       if (angleagg_method != lbs::AngleAggregationType::SINGLE)
-        chi_log.Log(LOG_0)
+        chi::log.Log()
           << "Top-hemi Angle subset " << ss << " "
           << subset_ranki << "->" << subset_ranki+subset_size-1;
     }//for ss
@@ -169,7 +169,7 @@ void LBSGroupset::BuildSubsets()
       ang_subset_sizes_bot.push_back(subset_size);
 
       if (angleagg_method != lbs::AngleAggregationType::SINGLE)
-        chi_log.Log(LOG_0)
+        chi::log.Log()
           << "Bot-hemi Angle subset " << ss << " "
           << subset_ranki << "->" << subset_ranki+subset_size-1;
     }//for ss
@@ -218,7 +218,7 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
   }
 
   //======================================== Print event history
-  ofile << chi_log.PrintEventHistory(ev_tag);
+  ofile << chi::log.PrintEventHistory(ev_tag);
 
   ofile.close();
 }

@@ -1,7 +1,7 @@
 #include "pwl.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -56,7 +56,7 @@ MapDOF(const chi_mesh::Cell& cell,
 
     if (!found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell.global_id << " and partition-ID "
         << cell.partition_id;
@@ -133,7 +133,7 @@ MapDOFLocal(const chi_mesh::Cell& cell,
 
     if (!found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell.global_id << " and partition-ID "
         << cell.partition_id;

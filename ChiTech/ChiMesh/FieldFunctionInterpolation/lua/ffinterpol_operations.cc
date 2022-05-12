@@ -3,8 +3,9 @@
 #include "../chi_ffinterpolation.h"
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################

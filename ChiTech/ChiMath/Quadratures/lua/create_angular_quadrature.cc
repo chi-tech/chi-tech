@@ -5,7 +5,7 @@
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //########################################################## Create empty system
 /** Creates an angular quadrature.
@@ -42,7 +42,7 @@ int chiCreateCustomAngularQuadrature(lua_State *L)
 
   if ((Na-Np != 0) or (Na-Nw !=0))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiCreateCustomAngularQuadrature: Tables lengths supplied "
          "are not of equal lengths.";
     exit(EXIT_FAILURE);
@@ -76,7 +76,7 @@ int chiCreateCustomAngularQuadrature(lua_State *L)
     lua_pop(L,1);
   }
 
-  chi_log.Log(LOG_0) << "Creating Custom Angular Quadrature\n";
+  chi::log.Log() << "Creating Custom Angular Quadrature\n";
 
   auto angular_quadrature = std::make_shared<chi_math::AngularQuadrature>();
   angular_quadrature->InitializeWithCustom(azi_angles,pol_angles,weights);

@@ -6,7 +6,7 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
@@ -97,7 +97,7 @@ int64_t SpatialDiscretization_FV::
 {
 //  if (cell == nullptr)
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "SpatialDiscretization_FV::MapDOFLocal reference cell is nullptr.";
 //    exit(EXIT_FAILURE);
 //  }
@@ -132,7 +132,7 @@ int64_t SpatialDiscretization_FV::
 {
 //  if (cell == nullptr)
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "SpatialDiscretization_FV::MapDOFLocal reference cell is nullptr.";
 //    exit(EXIT_FAILURE);
 //  }

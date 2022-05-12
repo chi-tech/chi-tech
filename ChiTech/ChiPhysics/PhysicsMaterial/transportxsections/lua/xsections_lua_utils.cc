@@ -6,8 +6,9 @@
 #include "ChiPhysics/chi_physics_namespace.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Creates a stand-alone transport cross-section.
@@ -124,7 +125,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to chiPhysicsTransportXSSet."
       << std::endl;
@@ -178,7 +179,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Unsupported operation in "
       << "chiPhysicsTransportXSSet. " << operation_index
       << std::endl;
@@ -221,7 +222,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
@@ -277,7 +278,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
   if (!lua_istable(L,1))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chiPhysicsMakeCombinedTransportXS: "
       << "Argument must be a lua table.";
     exit(EXIT_FAILURE);
@@ -296,7 +297,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
     if (!lua_istable(L,-1))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "In call to chiPhysicsMakeCombinedTransportXS: "
         << "The elements of the supplied table must themselves also"
            "be lua tables of the xs handle and its scalar multiplier.";
@@ -320,9 +321,9 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
   }
 
   //======================================== Print out table
-  chi_log.Log(LOG_0) << "Generating XS with following combination:";
+  chi::log.Log() << "Generating XS with following combination:";
   for (auto& elem : combinations)
-    chi_log.Log(LOG_0) << "  Element handle: " << elem.first
+    chi::log.Log() << "  Element handle: " << elem.first
                        << " scalar value: " << elem.second;
 
   //======================================== Make the new cross-section
@@ -391,7 +392,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
@@ -411,7 +412,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 
     if (!lua_istable(L,-1))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "In call to " << __FUNCTION__ << ": "
         << "The elements of the supplied table must themselves also"
            "be lua tables of the xs handle and its scalar multiplier.";
@@ -435,9 +436,9 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   }
 
   //======================================== Print out table
-  chi_log.Log(LOG_0) << "Setting XS with following combination:";
+  chi::log.Log() << "Setting XS with following combination:";
   for (auto& elem : combinations)
-    chi_log.Log(LOG_0) << "  Element handle: " << elem.first
+    chi::log.Log() << "  Element handle: " << elem.first
                        << " scalar value: " << elem.second;
 
   xs->MakeCombined(combinations);
@@ -471,7 +472,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;

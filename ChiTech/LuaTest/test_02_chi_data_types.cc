@@ -3,8 +3,9 @@
 #include "ChiDataTypes/byte_array.h"
 #include "ChiMesh/Cell/cell.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -53,7 +54,7 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
     output << std::string("chi_data_types::ByteArray Write/Read ... Passed\n");
 
   if (verbose)
-    chi_log.Log() << output.str();
+    chi::log.Log() << output.str();
 
   output.str(""); //clear the stream
 
@@ -200,7 +201,7 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
 
 
   if (verbose)
-    chi_log.Log(LOG_ALL) << output.str();
+    chi::log.LogAll() << output.str();
 
   return passed;
 }

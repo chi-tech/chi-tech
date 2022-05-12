@@ -1,7 +1,7 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -18,7 +18,7 @@ extern ChiLog& chi_log;
  * Finite Element calculation.*/
 void SpatialDiscretization_PWLC::OrderNodes()
 {
-  chi_log.Log() << chi::program_timer.GetTimeString()
+  chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Developing nodal ordering.";
   chi_objects::ChiTimer t_stage[6];
 
@@ -37,7 +37,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
   for (auto& vid : exnonex_nodes_set)
     exnonex_nodes.push_back(vid);
 
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 0 time: "
+  chi::log.Log0Verbose1() << "*** Reordering stage 0 time: "
                               << t_stage[0].GetTime()/1000.0;
 
   t_stage[1].Reset();
@@ -71,7 +71,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
       }//if neighbor is not a boundary
     }//for cell face
   }
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 1 time: "
+  chi::log.Log0Verbose1() << "*** Reordering stage 1 time: "
                               << t_stage[1].GetTime()/1000.0;
 
   t_stage[2].Reset();
@@ -90,11 +90,11 @@ void SpatialDiscretization_PWLC::OrderNodes()
       exclusive_nodes.push_back(ind);
   }
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Number of exclusive nodes = "
+  chi::log.LogAllVerbose1() << "Number of exclusive nodes = "
                                 << exclusive_nodes.size()
                                 << " and ghost nodes = "
                                 << nonexclus_nodes.size();
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 2 time: "
+  chi::log.Log0Verbose1() << "*** Reordering stage 2 time: "
                               << t_stage[2].GetTime()/1000.0;
 
   t_stage[3].Reset();
@@ -146,7 +146,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
       // upstream_nonex back to all other locations
     else
     {
-      chi_log.Log(LOG_ALLVERBOSE_1)
+      chi::log.LogAllVerbose1()
         << "Total number of ghost nodes after collect: "
         << upstream_nonex.size();
       std::copy(upstream_nonex.begin(),
@@ -173,11 +173,11 @@ void SpatialDiscretization_PWLC::OrderNodes()
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
   }
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Total number of ghost nodes: "
+  chi::log.LogAllVerbose1() << "Total number of ghost nodes: "
                                 << global_ghost_nodes.size() << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
 
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 3 time: "
+  chi::log.Log0Verbose1() << "*** Reordering stage 3 time: "
                               << t_stage[3].GetTime()/1000.0;
 
   t_stage[3].Reset();
@@ -218,7 +218,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
     g_to   = (int)global_ghost_nodes.size()-1;
   }
   int num_g_loc = (g_to - g_from +1);
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Local ghost ownership: "
+  chi::log.LogAllVerbose1() << "Local ghost ownership: "
                                 << g_from << "->" << g_to
                                 << "(" << num_g_loc << ")" << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
@@ -259,12 +259,12 @@ void SpatialDiscretization_PWLC::OrderNodes()
 
   }
   int tot_local_nodes = local_to - local_from + 1;
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Local node ownership "
+  chi::log.LogAllVerbose1() << "Local node ownership "
                                 << local_from << "->" << local_to
                                 << "(" << tot_local_nodes << ")"
                                 << std::endl;
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 4 time: "
+  chi::log.Log0Verbose1() << "*** Reordering stage 4 time: "
                               << t_stage[4].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -358,12 +358,12 @@ void SpatialDiscretization_PWLC::OrderNodes()
     node_mapping[orig_index] = ghost_mapping[n];
   }
 
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stage 5 time: "
+  chi::log.Log0Verbose1() << "*** Reordering stage 5 time: "
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Compute block addresses
-  chi_log.Log(LOG_0VERBOSE_1) << "*** Reordering stages complete time: "
+  chi::log.Log0Verbose1() << "*** Reordering stages complete time: "
                               << t_stage[5].GetTime()/1000.0;
   MPI_Barrier(MPI_COMM_WORLD);
 

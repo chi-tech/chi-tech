@@ -5,7 +5,7 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //#############################################################################

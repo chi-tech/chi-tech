@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
@@ -62,14 +63,14 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
       {
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryReflecting());
-        chi_log.Log(LOG_0VERBOSE_1)
+        chi::log.Log0Verbose1()
           << "Reflecting boundary added (index "
           << dsolver->boundaries.size()-1 <<  ").";
       }
       else
       {
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryDirichlet());
-        chi_log.Log(LOG_0VERBOSE_1)
+        chi::log.Log0Verbose1()
           << "Dirichlet boundary added (index "
           << dsolver->boundaries.size()-1 <<  ").";
       }

@@ -6,9 +6,8 @@ typedef std::pair<int,int>  IntPair;
 typedef std::vector<double> DblVec;
 typedef std::vector<int>    IntVec;
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //================================================== Define LBF-Calc funtion
 /**Makes a centroid based load balance factor calculation.
@@ -141,7 +140,7 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(const chi_mesh::SurfaceMesh& smesh,
 
     x_cuts[x] = (b+a)/2.0;
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
      << "X-cut" << x << " " << x_cuts[x];
   }
 
@@ -179,13 +178,13 @@ void chi_mesh::DecomposeSurfaceMeshPxPy(const chi_mesh::SurfaceMesh& smesh,
       min_lbf = lbf;
       min_bin = x;
     }
-    chi_log.Log(LOG_0) << "Load balance factor: " << lbf;
+    chi::log.Log() << "Load balance factor: " << lbf;
   }//for x
 
   //================================================== Write y-cuts
   for (int y=0; y<(py-1); y++)
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "Y-cut" << y << " " << y_cuts_per_x_bin[min_bin][y];
   }
 

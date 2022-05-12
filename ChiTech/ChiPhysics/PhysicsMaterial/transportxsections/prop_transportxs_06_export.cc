@@ -1,19 +1,17 @@
 #include "material_property_transportxsections.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
-
 #include <iostream>
-#include <iomanip>
 
 //###################################################################
 /**Exports the cross-section information to ChiTech format.*/
 void chi_physics::TransportCrossSections::
   ExportToChiFormat(const std::string &file_name)
 {
-  ChiLog& chi_log = ChiLog::GetInstance();
-  chi_log.Log() << "Exporting transport cross section to file: " << file_name;
+  chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 
   //======================================== Lamdas
   /**Lambda to print a 1D-xs*/
@@ -117,6 +115,6 @@ void chi_physics::TransportCrossSections::
 
   ofile.close();
 
-  chi_log.Log(LOG_0VERBOSE_1) << "Done exporting transport "
+  chi::log.Log0Verbose1() << "Done exporting transport "
                                  "cross section to file: " << file_name;
 }

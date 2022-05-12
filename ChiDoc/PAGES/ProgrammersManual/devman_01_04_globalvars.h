@@ -8,7 +8,7 @@ They are:
  - ChiConsole chi_console The link to the lua scripting engine.
  - ChiMath chi_math_handler A handler of math related entities
  - ChiMPI chi_mpi A handler for parallel related items.
- - ChiLog chi_log A handler for parallel logging events and verbosity.
+ - ChiLog chi::log A handler for parallel logging events and verbosity.
 
 There are also a number of secondary global variables that assist developers
 with coding. They are:
@@ -87,21 +87,21 @@ the output to the log will be chaotic. For this reason we employ a common
  logging utility which return an output string stream using the function
  call ChiLog::Log.
 
-Connecting to chi_log is done as follows
+Connecting to chi::log is done as follows
 \code
-#include <chi_log.h>
+#include <chi::log.h>
 
-extern ChiLog& chi_log;
+extern ChiLog& chi::log;
 \endcode
 
  or obtain an instance to it via
 
 \code
 // Include this at the top of the file
-#include <chi_log.h>
+#include <chi::log.h>
 
 // Include this in the body of your code
-ChiLog&      chi_log = ChiLog::GetInstance();
+ChiLog&      chi::log = ChiLog::GetInstance();
 \endcode
 
 The logger needs to be supplied with an enumeration (LOG_LVL) indicating
@@ -111,7 +111,7 @@ The logger needs to be supplied with an enumeration (LOG_LVL) indicating
  - LOG_0ERROR,                 Error only for location 0
  - LOG_0VERBOSE_0,             Default verbosity level
  - LOG_0VERBOSE_1,             Used only if verbosity level equals 1
- - LOG_0VERBOSE_2,             Used only if verbosity level equals 2
+ - ChiLog::LOG_LVL::LOG_0VERBOSE_2,             Used only if verbosity level equals 2
  - LOG_ALL,                    Verbose level 0 all locations
  - LOG_ALLWARNING,             Warning for any location
  - LOG_ALLERROR,               Error for any location

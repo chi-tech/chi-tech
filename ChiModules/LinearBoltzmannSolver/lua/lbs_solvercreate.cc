@@ -3,8 +3,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Creates a Neutral Particle Transport solver.
@@ -36,7 +37,7 @@ int chiLBSCreateSolver(lua_State *L)
   const std::string fname = __FUNCTION__;
   int num_args = lua_gettop(L);
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Creating Linear Boltzman solver";
+  chi::log.LogAllVerbose1() << "Creating Linear Boltzman solver";
 
   std::string solver_name = "LBSolver";
   if (num_args == 1)

@@ -5,8 +5,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 
@@ -38,7 +39,7 @@ int chiFFInterpolationCreate(lua_State *L)
 
     chi::field_func_interpolation_stack.emplace_back(new_ffi);
     const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi_log.Log(LOG_ALLVERBOSE_2)
+    chi::log.LogAllVerbose2()
     << "Created slice Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
@@ -49,7 +50,7 @@ int chiFFInterpolationCreate(lua_State *L)
 
     chi::field_func_interpolation_stack.emplace_back(new_ffi);
     const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi_log.Log(LOG_ALLVERBOSE_2)
+    chi::log.LogAllVerbose2()
       << "Created line Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
@@ -60,14 +61,14 @@ int chiFFInterpolationCreate(lua_State *L)
 
     chi::field_func_interpolation_stack.emplace_back(new_ffi);
     const size_t index = chi::field_func_interpolation_stack.size()-1;
-    chi_log.Log(LOG_ALLVERBOSE_2)
+    chi::log.LogAllVerbose2()
       << "Created Volume Field Function Interpolation";
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
   }
   else                                              //Fall back
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
     << "Invalid FFITypeIndex used in chiFFInterpolationCreate.";
     exit(EXIT_FAILURE);
   }

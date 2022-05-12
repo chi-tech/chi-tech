@@ -2,8 +2,9 @@
 
 #include "ChiMesh/Cell/cell.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -15,7 +16,7 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 {
   const chi_mesh::Vector3 khat(0.0,0.0,1.0);
 
-  chi_log.Log() << "Computing cell-centroids.";
+  chi::log.Log() << "Computing cell-centroids.";
   for (auto cell : raw_cells)
   {
     cell->centroid = chi_mesh::Vertex(0.0,0.0,0.0);
@@ -24,9 +25,9 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
 
     cell->centroid = cell->centroid/static_cast<double>(cell->vertex_ids.size());
   }
-  chi_log.Log() << "Done computing cell-centroids.";
+  chi::log.Log() << "Done computing cell-centroids.";
 
-  chi_log.Log() << "Checking cell-center-to-face orientations";
+  chi::log.Log() << "Checking cell-center-to-face orientations";
   size_t num_negative_volume_elements=0;
   for (auto cell : raw_cells)
   {
@@ -85,10 +86,10 @@ void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()
   }//for cell in raw_cells
 
   if (num_negative_volume_elements > 0)
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
       << "Cell quality checks detected " << num_negative_volume_elements
       << " negative volume sub-elements (sub-triangle or sub-tetrahedron)."
       << " This issue could result in incorrect quantities"
       << " under some circumstances.";
-  chi_log.Log() << "Done checking cell-center-to-face orientations";
+  chi::log.Log() << "Done checking cell-center-to-face orientations";
 }

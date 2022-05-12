@@ -2,8 +2,9 @@
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -14,7 +15,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
 {
 //  if (regions.empty())
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "chi_diffusion::Solver::InitializeCommonItems: No region added to solver.";
 //    exit(EXIT_FAILURE);
 //  }
@@ -34,7 +35,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
   for (const auto& id : globl_unique_bndry_ids)
     max_boundary_id = std::max(id,max_boundary_id);
 
-  chi_log.Log() << "Max boundary id identified: " << max_boundary_id;
+  chi::log.Log() << "Max boundary id identified: " << max_boundary_id;
 
   for (int bndry=0; bndry<(max_boundary_id+1); bndry++)
   {
@@ -48,7 +49,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
         {
           boundaries.push_back(
             new chi_diffusion::BoundaryReflecting);
-          chi_log.Log() << "Boundary " << bndry << " set to reflecting.";
+          chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
         }
         case BoundaryType::Dirichlet:
@@ -56,7 +57,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
           if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
           boundaries.push_back(
             new chi_diffusion::BoundaryDirichlet(bndry_vals[0]));
-          chi_log.Log() << "Boundary " << bndry << " set to dirichlet.";
+          chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
           break;
         }
         case BoundaryType::Robin:
@@ -66,13 +67,13 @@ void chi_diffusion::Solver::InitializeCommonItems()
             new chi_diffusion::BoundaryRobin(bndry_vals[0],
                                              bndry_vals[1],
                                              bndry_vals[2]));
-          chi_log.Log() << "Boundary " << bndry << " set to robin.";
+          chi::log.Log() << "Boundary " << bndry << " set to robin.";
           break;
         }
         case BoundaryType::Vacuum:
         {
           boundaries.push_back(new chi_diffusion::BoundaryRobin(0.25,0.5,0.0));
-          chi_log.Log() << "Boundary " << bndry << " set to vacuum.";
+          chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
         case BoundaryType::Neumann:
@@ -82,7 +83,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
             new chi_diffusion::BoundaryRobin(bndry_vals[0],
                                              bndry_vals[1],
                                              bndry_vals[2]));
-          chi_log.Log() << "Boundary " << bndry << " set to neumann.";
+          chi::log.Log() << "Boundary " << bndry << " set to neumann.";
           break;
         }
       }//switch boundary type
@@ -90,7 +91,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
     else
     {
       boundaries.push_back(new chi_diffusion::BoundaryDirichlet);
-      chi_log.Log(LOG_0VERBOSE_1)
+      chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
         << "Dirichlet boundary added with zero boundary value.";
     }

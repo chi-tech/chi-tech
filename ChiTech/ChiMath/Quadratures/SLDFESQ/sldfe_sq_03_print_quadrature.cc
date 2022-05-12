@@ -1,13 +1,13 @@
 #include "sldfe_sq.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Prints the quadrature to file.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
 {
-  chi_log.Log() << "Printing SLDFE-Quadrature to file.";
+  chi::log.Log() << "Printing SLDFE-Quadrature to file.";
 
   std::ofstream vert_file,cell_file,points_file,python_file;
   vert_file.open(output_filename_prefix + "verts.txt");
@@ -159,5 +159,5 @@ void chi_math::SimplifiedLDFESQ::Quadrature::PrintQuadratureToFile()
    "plt.show()\n";
   python_file.close();
 
-  chi_log.Log() << "Done printing SLDFE-Quadrature to file.";
+  chi::log.Log() << "Done printing SLDFE-Quadrature to file.";
 }

@@ -4,7 +4,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -17,7 +17,7 @@ extern ChiLog& chi_log;
 void chi_mesh::VolumeMesher::
 SetupOrthogonalBoundaries()
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Setting orthogonal boundaries.";
 
@@ -49,7 +49,7 @@ SetupOrthogonalBoundaries()
       }//if bndry
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Done setting orthogonal boundaries.";
 }

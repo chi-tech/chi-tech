@@ -2,6 +2,7 @@
 
 #include "ChiGraph/chi_directed_graph.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 #include "ChiConsole/chi_console.h"
@@ -9,7 +10,7 @@
 
 
 
-extern ChiLog& chi_log;
+;
 
 #include <algorithm>
 
@@ -34,7 +35,7 @@ int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ)
     }
   }
 
-  chi_log.Log(LOG_ALLERROR)
+  chi::log.LogAllError()
     << "SPDS Invalid mapping encountered in MapLocJToPrelocI.";
   exit(EXIT_FAILURE);
 }
@@ -51,7 +52,7 @@ int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
     }
   }
 
-  chi_log.Log(LOG_ALLERROR)
+  chi::log.LogAllError()
     << "SPDS Invalid mapping encountered in MapLocJToDeplocI.";
   exit(EXIT_FAILURE);
   return -1;
@@ -105,7 +106,7 @@ int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
 /**Builds the task dependency graph.*/
 void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allowance_flag)
 {
-//  chi_log.Log(LOG_0VERBOSE_1)
+//  chi::log.Log0Verbose1()
 //    << chi::program_timer.GetTimeString()
 //    << " Building Task Dependency Graphs.";
 //  chi_graph::DirectedGraph TDG;
@@ -123,21 +124,21 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 //  //                                              for cycles
 //  if (cycle_allowance_flag)
 //  {
-//    chi_log.Log(LOG_0VERBOSE_1)
+//    chi::log.Log0Verbose1()
 //      << chi::program_timer.GetTimeString()
 //      << " Removing intra-cellset cycles.";
 //    RemoveGlobalCyclicDependencies(this,TDG);
 //  }
 //
 //  //============================================= Generate topological sort
-//  chi_log.Log(LOG_ALLVERBOSE_2)
+//  chi::log.LogAllVerbose2()
 //    << chi::program_timer.GetTimeString()
 //    << "   - Generating topological sort.";
 //  std::vector<int> glob_linear_sweep_order = TDG.GenerateTopologicalSort();
 //
 //  if (glob_linear_sweep_order.empty())
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "Topological sorting for global sweep-ordering failed. "
 //      << "Cyclic dependencies detected. Cycles need to be allowed"
 //      << " by calling application.";
@@ -157,7 +158,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 //  }
 //
 //  //============================================= Determine sweep order ranks
-//  chi_log.Log(LOG_0VERBOSE_1)
+//  chi::log.Log0Verbose1()
 //    << chi::program_timer.GetTimeString()
 //    << " Determining sweep order ranks.";
 //
@@ -187,7 +188,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 //  }
 //
 //  //============================================= Generate TDG structure
-//  chi_log.Log(LOG_0VERBOSE_1)
+//  chi::log.Log0Verbose1()
 //    << chi::program_timer.GetTimeString()
 //    << " Generating TDG structure.";
 //  for (int r=0; r<=abs_max_rank; r++)
@@ -209,7 +210,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   //============================================= Build graph on home location
   if (chi::mpi.location_id == 0)
   {
-    chi_log.Log(LOG_0VERBOSE_1)
+    chi::log.Log0Verbose1()
       << chi::program_timer.GetTimeString()
       << " Building Task Dependency Graphs.";
 
@@ -225,7 +226,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
     //====================================== Remove cyclic dependencies
     if (cycle_allowance_flag)
     {
-      chi_log.Log(LOG_0VERBOSE_1)
+      chi::log.Log0Verbose1()
         << chi::program_timer.GetTimeString()
         << " Removing intra-cellset cycles.";
       edges_to_remove = TDG.RemoveCyclicDependencies();
@@ -300,14 +301,14 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   std::vector<int> glob_linear_sweep_order;
   if (chi::mpi.location_id == 0)
   {
-    chi_log.Log(LOG_ALLVERBOSE_2)
+    chi::log.LogAllVerbose2()
       << chi::program_timer.GetTimeString()
       << "   - Generating topological sort.";
     glob_linear_sweep_order = TDG.GenerateTopologicalSort();
 
     if (glob_linear_sweep_order.empty())
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Topological sorting for global sweep-ordering failed. "
         << "Cyclic dependencies detected. Cycles need to be allowed"
         << " by calling application.";
@@ -348,7 +349,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   }
 
   //============================================= Determine sweep order ranks
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Determining sweep order ranks.";
 
@@ -378,7 +379,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   }
 
   //============================================= Generate TDG structure
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)

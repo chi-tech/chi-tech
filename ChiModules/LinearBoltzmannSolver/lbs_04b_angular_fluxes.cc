@@ -2,9 +2,10 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-extern ChiLog& chi_log;
+;
 
 
 #include <fstream>
@@ -28,7 +29,7 @@ void lbs::SteadySolver::
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -64,7 +65,7 @@ void lbs::SteadySolver::
   if (not fe)
   {
     file.close();
-    chi_log.Log(LOG_ALLWARNING) << "Angular flux file reading cancelled "
+    chi::log.LogAllWarning() << "Angular flux file reading cancelled "
                                    "because a spatial discretization has not "
                                    "been initialized.";
     return;
@@ -127,7 +128,7 @@ void lbs::SteadySolver::
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -138,7 +139,7 @@ void lbs::SteadySolver::
   if (not fe)
   {
     file.close();
-    chi_log.Log(LOG_ALLWARNING) << "Angular flux file reading cancelled "
+    chi::log.LogAllWarning() << "Angular flux file reading cancelled "
                                    "because a spatial discretization has not "
                                    "been initialized.";
     return;
@@ -158,7 +159,7 @@ void lbs::SteadySolver::
 
 
   //============================================= Read header
-  chi_log.Log() << "Reading angular flux file " << file_name;
+  chi::log.Log() << "Reading angular flux file " << file_name;
   char header_bytes[320]; header_bytes[319] = '\0';
   file.read(header_bytes,319);
 
@@ -178,7 +179,7 @@ void lbs::SteadySolver::
     outstr << "num_angles     : " << file_num_angles << "\n";
     outstr << "num_groups     : " << file_num_groups << "\n";
     outstr << "num_local_dofs : " << file_num_local_dofs << "\n";
-    chi_log.Log(LOG_ALL)
+    chi::log.LogAll()
       << "Incompatible DOF data found in file " << file_name << "\n"
       << outstr.str();
     file.close();
@@ -211,7 +212,7 @@ void lbs::SteadySolver::
     psi[imap] = psi_value;
   }
 
-  chi_log.Log(LOG_ALL) << "Number of cells read: " << cells_touched.size();
+  chi::log.LogAll() << "Number of cells read: " << cells_touched.size();
 
   //============================================= Clean-up
   file.close();

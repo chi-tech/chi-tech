@@ -1,7 +1,7 @@
 #include "chi_surfacemesh.h"
 
-#include <chi_log.h>
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 #include <set>
 #include <fstream>
@@ -27,7 +27,7 @@ void chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj(const char *fileName)
 
   if (!outfile.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chi_mesh::SurfaceMesh::ExtractOpenEdgesToObj. Failed"
       << " to open file: " << std::string(fileName);
     exit(EXIT_FAILURE);

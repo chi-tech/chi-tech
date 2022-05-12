@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 //#############################################################################
@@ -84,7 +85,7 @@ int chiDiffusionSetProperty(lua_State *L)
   {
     if (num_args < 4)
     {
-      chi_log.Log(LOG_0ERROR)
+      chi::log.Log0Error()
       << "Invalid amount of arguments used in"
       << " chiDiffusionSetProperty(...,\"boundary_type\".... "
       << " At least 4 arguments are expected.";
@@ -100,7 +101,7 @@ int chiDiffusionSetProperty(lua_State *L)
     {
       if (num_args != 4)
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"reflecting\". "
@@ -113,14 +114,14 @@ int chiDiffusionSetProperty(lua_State *L)
 
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
-      chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Reflecting.";
     }
     else if (type_name == "dirichlet")
     {
       if (num_args != 5)
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"dirichlet\". "
@@ -135,14 +136,14 @@ int chiDiffusionSetProperty(lua_State *L)
       bndry_info.second = {b_value};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
-      chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Dirichlet with value " << b_value;
     }
     else if (type_name == "neumann")
     {
       if (num_args != 5)
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"neumann\". "
@@ -157,7 +158,7 @@ int chiDiffusionSetProperty(lua_State *L)
       bndry_info.second = {0.0,1.0,f_value};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
-      chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Neumann with f = ("
                          << f_value << ") ";
     }
@@ -165,7 +166,7 @@ int chiDiffusionSetProperty(lua_State *L)
     {
       if (num_args != 4)
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"vacuum\". "
@@ -178,14 +179,14 @@ int chiDiffusionSetProperty(lua_State *L)
       bndry_info.second = {0.25,0.5,0.0};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
-      chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Vacuum.";
     }
     else if (type_name == "robin")
     {
       if (num_args != 7)
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Invalid amount of arguments used in"
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"robin\". "
@@ -205,7 +206,7 @@ int chiDiffusionSetProperty(lua_State *L)
       bndry_info.second = {a_value,b_value,f_value};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
-      chi_log.Log(LOG_0) << "Boundary " << bound_index << " set as "
+      chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Robin with a,b,f = ("
                          << a_value << ","
                          << b_value << ","
@@ -213,7 +214,7 @@ int chiDiffusionSetProperty(lua_State *L)
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Unsupported boundary type encountered in call to "
         << "chiDiffusionSetProperty(..,\"boundary_type\",.. :"
         << type_name;
@@ -222,7 +223,7 @@ int chiDiffusionSetProperty(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_0ERROR) << "Invalid property in chiDiffusionSetProperty.";
+    chi::log.Log0Error() << "Invalid property in chiDiffusionSetProperty.";
     exit(EXIT_FAILURE);
   }
   return 0;

@@ -3,7 +3,7 @@
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog& chi_log;
+;
 
 
 //###################################################################
@@ -117,7 +117,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0) << "Done building DFEM sparsity pattern";
+  chi::log.Log() << "Done building DFEM sparsity pattern";
 
 }
 

@@ -8,7 +8,7 @@
 #include <chi_log.h>
 
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Populates the local sub-grid connection information for sweep orderings.*/

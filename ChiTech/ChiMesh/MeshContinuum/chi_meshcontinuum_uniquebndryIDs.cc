@@ -1,7 +1,8 @@
 #include "chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -12,7 +13,7 @@ extern ChiLog& chi_log;
 std::vector<uint64_t> chi_mesh::MeshContinuum::GetDomainUniqueBoundaryIDs() const
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log() << "Identifying unique boundary-ids.";
+  chi::log.Log() << "Identifying unique boundary-ids.";
 
   //====================================== Develop local bndry-id set
   std::set<uint64_t> local_bndry_ids_set;

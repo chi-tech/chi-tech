@@ -5,7 +5,7 @@
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -17,7 +17,7 @@ extern ChiLog& chi_log;
 void chi_mesh::VolumeMesher::
 SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_id)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
@@ -44,7 +44,7 @@ SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_i
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Done setting material id from logical volume. "
     << "Number of cells modified = " << num_cells_modified << ".";
@@ -55,7 +55,7 @@ SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_i
 void chi_mesh::VolumeMesher::
 SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int bndry_id)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Setting boundary id from logical volume.";
   //============================================= Get current mesh handler
@@ -77,7 +77,7 @@ SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int bnd
     }
   }
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Done setting boundary id from logical volume. "
     << "Number of faces modified = " << num_faces_modified << ".";
@@ -88,7 +88,7 @@ SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int bnd
 void chi_mesh::VolumeMesher::
 SetMatIDToAll(int mat_id)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Setting material id " << mat_id << "to all cells.";
 
@@ -106,7 +106,7 @@ SetMatIDToAll(int mat_id)
     vol_cont->cells[ghost_id].material_id = mat_id;
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " Done setting material id " << mat_id << " to all cells";
 }

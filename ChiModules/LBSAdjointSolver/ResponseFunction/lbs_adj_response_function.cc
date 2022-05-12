@@ -6,10 +6,11 @@
 
 #include "ChiConsole/chi_console.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /** Calls the lua function associated with the response function and

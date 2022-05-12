@@ -3,9 +3,8 @@
 #include "../surfacemesher.h"
 
 #include "../../MeshHandler/chi_meshhandler.h"
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //#############################################################################
 /** Sets a property of a surface mesher.
@@ -30,7 +29,7 @@ int chiSurfaceMesherSetProperty(lua_State *L)
   //================================================== Area constraint
   if (property_num == 1)   //MAX_AREA
   {
-    chi_log.Log(LOG_0WARNING) << "Deprecated and removed feature"
+    chi::log.Log0Warning() << "Deprecated and removed feature"
                                  "property MAX_AREA in call"
                                  " to chiSurfaceMesherSetProperty";
   }

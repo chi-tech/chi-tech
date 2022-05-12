@@ -7,7 +7,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 /** \defgroup LuaSurfaceMesh Surface Meshes
  * \ingroup LuaMesh
@@ -28,7 +28,7 @@ int chiSurfaceMeshCreate(lua_State *L)
   size_t index = chi::surface_mesh_stack.size()-1;
   lua_pushnumber(L,static_cast<lua_Number>(index));
 
-  chi_log.Log(LOG_ALLVERBOSE_2) << "chiSurfaceMeshCreate: "
+  chi::log.LogAllVerbose2() << "chiSurfaceMeshCreate: "
                                          "Empty SurfaceMesh object, "
                                       << index << ", created" << std::endl;
 
@@ -61,14 +61,14 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
 
   if (not lua_istable(L,1))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chiSurfaceMeshCreateFromArrays: "
       << "The first argument was detected not to be a lua table.";
     exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,2))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chiSurfaceMeshCreateFromArrays: "
       << "The second argument was detected not to be a lua table.";
     exit(EXIT_FAILURE);
@@ -110,7 +110,7 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
   size_t index = chi::surface_mesh_stack.size()-1;
   lua_pushnumber(L,static_cast<lua_Number>(index));
 
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "chiSurfaceMeshCreateFromArrays: Created surface mesh "
     << index << std::endl;
 

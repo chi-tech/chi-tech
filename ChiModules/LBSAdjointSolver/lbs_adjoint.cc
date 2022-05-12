@@ -3,8 +3,9 @@
 #include "ChiMath/chi_math.h"
 #include "../ChiMath/SerialNewtonIteration/serial_newton_iteration.h"
 
+#include "chi_runtime.h"
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 void lbs_adjoint::TestFunction()
 {
@@ -99,7 +100,7 @@ std::array<double,2> lbs_adjoint::
     outstr << "P1 moments initial: " <<1.0<<" "<<J_x<<" "<<J_y<<" "<<J_z<<" |J|=";
     outstr << size_J_f << " ratio=" << ratio_f << "\n";
 
-    chi_log.Log() << outstr.str();
+    chi::log.Log() << outstr.str();
   }
 
   if (size_J_f < 1.0e-10)
@@ -107,7 +108,7 @@ std::array<double,2> lbs_adjoint::
     double a = log(phi/4.0/M_PI);
     double b = 0.0;
 
-    if (verbose) { chi_log.Log() << "Solution: " << a << " " << b; }
+    if (verbose) { chi::log.Log() << "Solution: " << a << " " << b; }
 
     return {a, b};
   }
@@ -124,7 +125,7 @@ std::array<double,2> lbs_adjoint::
     double a = solution[0];
     double b = solution[1];
 
-    if (verbose) { chi_log.Log() << "Solution: " << a << " " << b; }
+    if (verbose) { chi::log.Log() << "Solution: " << a << " " << b; }
 
     return {a, b};
   }

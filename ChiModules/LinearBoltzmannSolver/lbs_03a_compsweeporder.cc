@@ -6,11 +6,12 @@
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "chi_mpi.h"
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
 
-extern ChiLog& chi_log;
+;
 
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
@@ -27,7 +28,7 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering.\n";
 
@@ -48,7 +49,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
   //============================================= Check possibility of cycles
   if (no_cycles_parmetis_partitioning and not is_1D_geometry and chi::mpi.process_count>1)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "When using PARMETIS type partitioning then groupset iterative method"
          " must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES";
     exit(EXIT_FAILURE);
@@ -69,7 +70,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
   }//switch on method
 
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Done computing sweep orderings.           Process memory = "
       << std::setprecision(3)
@@ -81,7 +82,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
 void lbs::SteadySolver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Single";
 
@@ -100,7 +101,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupse
 void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Polar";
 
@@ -123,7 +124,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
       {
         if (num_azi != 1)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Incompatible number of azimuthal angles in quadrature set "
             << "for a 1D simulation.";
           std::exit(EXIT_FAILURE);
@@ -133,7 +134,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
       {
         if (num_azi < 4)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Incompatible number of azimuthal angles in quadrature set "
             << "for a 2D or 3D simulation.";
           std::exit(EXIT_FAILURE);
@@ -142,7 +143,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
 
       if ((num_pol < 2) || (num_pol % 2 != 0))
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
           << "Incompatible number of polar angles in quadrature set.";
         std::exit(EXIT_FAILURE);
       }
@@ -177,7 +178,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
     }//if product quadrature
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
            "and therefore only certain angular quadrature types are supported. "
            "i.e., for now just AngularQuadratureType::ProductQuadrature.";
@@ -186,7 +187,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
          "and therefore only certain geometry types are supported. i.e., "
          "GeometryType::ONED_SLAB, GeometryType::TWOD_CARTESIAN, "
@@ -199,7 +200,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
 void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Azimuthal";
 
@@ -224,7 +225,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& grou
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
            "and therefore only certain angular quadrature types are supported. "
            "i.e., for now just AngularQuadratureType::ProductQuadrature.";
@@ -233,7 +234,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& grou
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
          "and therefore only certain geometry types are supported. i.e., "
          "GeometryType::ONED_SPHERICAL, GeometryType::TWOD_CYLINDRICAL.";

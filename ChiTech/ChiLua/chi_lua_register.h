@@ -29,7 +29,7 @@
 //RegisterConstant(LOG_0ERROR,     3);
 //RegisterConstant(LOG_0VERBOSE_0, 4);
 //RegisterConstant(LOG_0VERBOSE_1, 5);
-//RegisterConstant(LOG_0VERBOSE_2, 6);
+//RegisterConstant(ChiLog::LOG_LVL::LOG_0VERBOSE_2, 6);
 //RegisterConstant(LOG_ALL,          7);
 //RegisterConstant(LOG_ALLWARNING,   8);
 //RegisterConstant(LOG_ALLERROR,     9);

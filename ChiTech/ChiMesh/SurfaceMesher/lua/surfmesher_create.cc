@@ -4,9 +4,8 @@
 
 #include "../../MeshHandler/chi_meshhandler.h"
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //#############################################################################
 /** Creates a surface preprocessor.
@@ -50,7 +49,7 @@ int chiSurfaceMesherCreate(lua_State *L)
 
   cur_hndlr.surface_mesher = new_mesher;
 
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "chiSurfaceMesherCreate: Surface remesher created."
     << std::endl;
 

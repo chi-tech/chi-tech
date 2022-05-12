@@ -3,8 +3,9 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_runtime.h"
 #include "ChiTimer/chi_timer.h"
@@ -30,7 +31,7 @@ int chiVolumeMesherExecute(lua_State *L)
 
   if (cur_hndlr.volume_mesher == nullptr)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << __FUNCTION__ << ": called without a volume mesher set. Make a "
                          "call to chiVolumeMesherCreate.";
     exit(EXIT_FAILURE);
@@ -50,7 +51,7 @@ int chiVolumeMesherExecute(lua_State *L)
   << mem_after.memory_mbytes
   << " MB";
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " chiVolumeMesherExecute: Volume meshing completed."
     << mem_string.str()

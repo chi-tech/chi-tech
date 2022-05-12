@@ -7,7 +7,7 @@ typedef std::vector<std::pair<int,short>> LockBox;
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Performs slot dynamics for Polyhedron cell.*/
@@ -94,7 +94,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
         }
         if (!found)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Lock-box location not found in call to "
             << "InitializeAlphaElements. Local Cell "
             << cell->local_id

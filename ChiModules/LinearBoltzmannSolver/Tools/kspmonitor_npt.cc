@@ -8,7 +8,6 @@
 #include <chi_log.h>
 #include <ChiTimer/chi_timer.h>
 
-extern ChiLog&     chi_log;
 
 //###################################################################
 /**Customized convergence test.*/
@@ -60,7 +59,7 @@ PetscErrorCode lbs::
   }
 
   if (context->solver.options.verbose_inner_iterations)
-    chi_log.Log(LOG_0) << iter_info.str() << std::endl;
+    chi::log.Log() << iter_info.str() << std::endl;
 
   const double SIXTY_SECOND_INTERVAL = 60000.0; //time in milliseconds
   if (context->groupset.iterative_method == IterativeMethod::GMRES or

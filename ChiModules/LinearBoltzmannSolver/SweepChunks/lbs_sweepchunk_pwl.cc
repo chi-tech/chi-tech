@@ -1,7 +1,8 @@
 #include "lbs_sweepchunk_pwl.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 

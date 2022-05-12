@@ -1,7 +1,7 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -66,7 +66,7 @@ int64_t SpatialDiscretization_PWLC::
   int localized_base_address = (mapping - local_block_address);
   if (localized_base_address >= local_base_block_size)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SpatialDiscretization_PWLC::MapDOFLocal. Mapping failed for cell "
       << "with global index " << cell.global_id << " because the node is "
       << "not local.";

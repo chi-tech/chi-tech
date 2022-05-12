@@ -3,8 +3,9 @@
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -28,13 +29,13 @@ void chi_physics::FieldFunction::
   ExportMultipleFFToVTK(const std::string& file_base_name,
                         const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list)
 {
-  chi_log.Log(LOG_0) << "Exporting field functions to VTK with file base \""
+  chi::log.Log() << "Exporting field functions to VTK with file base \""
                      << file_base_name << "\"";
 
   //============================================= Check ff_list populated
   if (ff_list.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ExportMultipleFFToVTK: Empty field-function list.";
     exit(EXIT_FAILURE);
   }
@@ -44,7 +45,7 @@ void chi_physics::FieldFunction::
   for (auto& ff : ff_list)
     if (ff->spatial_discretization->type != ff_type)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "ExportMultipleFFToVTK: Dissimilar field-function type encountered "
            "in the supplied field-function list. "
            "Currently this function requires "
@@ -59,7 +60,7 @@ void chi_physics::FieldFunction::
   for (auto& ff : ff_list)
     if (ff->spatial_discretization->ref_grid != grid)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "ExportMultipleFFToVTK: Differing grids encountered "
            "in the supplied field-function list. "
            "Currently this function requires "
@@ -143,7 +144,7 @@ void chi_physics::FieldFunction::
     }//polyhedron
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "ExportMultipleFFToVTK: Unsupported cell type encountered.";
       exit(EXIT_FAILURE);
     }
@@ -301,5 +302,5 @@ void chi_physics::FieldFunction::
 
   grid_writer->Write();
 
-  chi_log.Log(LOG_0) << "Done exporting field functions to VTK.";
+  chi::log.Log() << "Done exporting field functions to VTK.";
 }

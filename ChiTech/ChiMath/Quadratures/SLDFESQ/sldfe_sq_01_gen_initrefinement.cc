@@ -1,7 +1,7 @@
 #include "sldfe_sq.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -71,21 +71,21 @@ void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level
   double area_avg = total_area / initial_octant_SQs.size();
 
   if (negative_weights_found)
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
       << "SLDFESQ Quadrature detected negative weights.";
 
   //======================================== Print Statistics
   double time = timer.GetTime()/1000.0;
-  chi_log.Log(LOG_0VERBOSE_1) << "Number of dirs/octant: " << initial_octant_SQs.size();
-  chi_log.Log(LOG_0VERBOSE_1) << "Total weight         : " << total_area;
-  chi_log.Log(LOG_0VERBOSE_1) << "Total weight/(pi/2)  : " << total_area/M_PI_2;
-  chi_log.Log(LOG_0VERBOSE_1) << "Area Max/Min         : " << area_max/area_min;
-  chi_log.Log(LOG_0VERBOSE_1) << "Area Max/Avg         : " << area_max/area_avg;
+  chi::log.Log0Verbose1() << "Number of dirs/octant: " << initial_octant_SQs.size();
+  chi::log.Log0Verbose1() << "Total weight         : " << total_area;
+  chi::log.Log0Verbose1() << "Total weight/(pi/2)  : " << total_area/M_PI_2;
+  chi::log.Log0Verbose1() << "Area Max/Min         : " << area_max/area_min;
+  chi::log.Log0Verbose1() << "Area Max/Avg         : " << area_max/area_avg;
 
   CopyToAllOctants();
 
   //======================================== Populate quadriture points
   PopulateQuadratureAbscissae();
 
-  chi_log.Log(LOG_0VERBOSE_1) << "Time taken           : " << time;
+  chi::log.Log0Verbose1() << "Time taken           : " << time;
 }

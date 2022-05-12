@@ -5,7 +5,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Cuts a mesh.

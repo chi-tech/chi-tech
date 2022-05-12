@@ -3,7 +3,7 @@
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Obtains a pointer to the last created grid.*/

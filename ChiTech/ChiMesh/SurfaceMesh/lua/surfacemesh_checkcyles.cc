@@ -8,7 +8,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 
 //#############################################################################
@@ -63,7 +63,7 @@ int chiComputeLoadBalancing(lua_State *L)
   //======================================== Extract x-cuts
   if (!lua_istable(L,2))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chiComputeLoadBalancing: "
       << " expected table for argument 2. Incompatible value supplied.";
     exit(EXIT_FAILURE);
@@ -83,7 +83,7 @@ int chiComputeLoadBalancing(lua_State *L)
   //======================================== Extract y-cuts
   if (!lua_istable(L,3))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chiComputeLoadBalancing: "
       << " expected table for argument 3. Incompatible value supplied.";
     exit(EXIT_FAILURE);

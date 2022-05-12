@@ -7,7 +7,7 @@
 
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Extrude template cells into polygons.*/

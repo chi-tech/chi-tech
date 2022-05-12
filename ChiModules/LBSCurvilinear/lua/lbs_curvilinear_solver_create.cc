@@ -4,8 +4,9 @@
 
 #include "chi_runtime.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 
 /**Creates a Curvilinear Neutral Particle Transport solver.
@@ -31,7 +32,7 @@ int chiLBSCurvilinearCreateSolver(lua_State *L)
   const auto coord_system_type =
     static_cast<chi_math::CoordinateSystemType>(coord_system);
 
-  chi_log.Log(LOG_ALLVERBOSE_1)
+  chi::log.LogAllVerbose1()
     << "Creating Curvilinear Linear Boltzman solver";
 
   std::string solver_name = "LBCurvilinearSolver";

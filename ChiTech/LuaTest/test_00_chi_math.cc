@@ -3,8 +3,9 @@
 #include "ChiMath/dynamic_vector.h"
 #include "ChiMath/dynamic_matrix.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 bool chi_unit_tests::Test_chi_math(bool verbose)
 {
@@ -55,7 +56,7 @@ bool chi_unit_tests::Test_chi_math(bool verbose)
     output << std::string("chi_math::DynamicMatrix<double>.PrintStr() ... Passed\n");
 
   if (verbose)
-    chi_log.Log() << output.str();
+    chi::log.Log() << output.str();
 
   return passed;
 }

@@ -1,7 +1,7 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -25,7 +25,7 @@ SpatialDiscretization_PWLC::
   tet_quad_order_arbitrary(qorder),
   hex_quad_order_arbitrary(qorder)
 {
-  chi_log.Log() << chi::program_timer.GetTimeString()
+  chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
 
@@ -55,31 +55,31 @@ SpatialDiscretization_PWLC::
     }
 
     if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
+      chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(line_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
     if (static_cast<int>(tri_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
+      chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(tri_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
     if (static_cast<int>(quad_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
+      chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(quad_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
     if (static_cast<int>(tet_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
+      chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(tet_quad_order_arbitrary.order) < "
         << qorder_min << ".";
 
     if (static_cast<int>(hex_quad_order_arbitrary.order) < qorder_min)
-      chi_log.Log(LOG_ALLWARNING)
+      chi::log.LogAllWarning()
         << "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
         << "static_cast<int>(hex_quad_order_arbitrary.order) < "
         << qorder_min << ".";
@@ -89,7 +89,7 @@ SpatialDiscretization_PWLC::
     PreComputeCellSDValues();
 
   OrderNodes();
-  chi_log.Log() << chi::program_timer.GetTimeString()
+  chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Done creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
 }

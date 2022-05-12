@@ -1,8 +1,7 @@
 #include "material_property_transportxsections.h"
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //###################################################################
 /**This method populates a transport cross-section from
@@ -14,7 +13,7 @@ void chi_physics::TransportCrossSections::
   Reset();
 
   //======================================== Opening the file
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Reading PDT cross-section file \"" << file_name << "\"";
 
   std::string MT_SEARCH_VAL = MT_TRANSFER + std::string(",");
@@ -23,7 +22,7 @@ void chi_physics::TransportCrossSections::
   file.open(file_name);
   if (!file.is_open())
   {
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Failed to open PDT cross-section file \""
       << file_name << "\" in call to "
       << "TransportCrossSections::MakeFromPDTxsFile";
@@ -52,7 +51,7 @@ void chi_physics::TransportCrossSections::
 
   if ((mg_or_single_group != "multigroup") && (xs_type != "neutron"))
   {
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Currently only multigroup neutron cross-section can be"
       << " read from PDT cross-section files. The file \""
       << file_name << "\" has " << mg_or_single_group << " "
@@ -155,7 +154,7 @@ void chi_physics::TransportCrossSections::
 
         if (sink != g)
         {
-          chi_log.Log(LOG_0ERROR)
+          chi::log.Log0Error()
             << "Mismatched sink group with general group structure "
                "encountered during transfer moment processing. " << sink
             << " " << g;

@@ -1,8 +1,9 @@
 #include "chi_lua.h"
 #include "lbs_lua_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Adds a point source to an LBS solver.
@@ -45,7 +46,7 @@ int chiLBSAddPointSource(lua_State *L)
 
   lbs_solver.point_sources.emplace_back(location, strength);
 
-  chi_log.Log() << "LBS: Added point source at "
+  chi::log.Log() << "LBS: Added point source at "
                 << location.PrintStr();
 
   return 0;

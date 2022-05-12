@@ -3,7 +3,7 @@
 #include <ChiConsole/chi_console.h>
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -16,7 +16,7 @@ extern ChiLog& chi_log;
  * another.*/
 void lbs::SteadySolver::ResetSweepOrderings(LBSGroupset& groupset)
 {
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Resetting SPDS and FLUDS";
 
   groupset.sweep_orderings.clear();
@@ -36,14 +36,14 @@ void lbs::SteadySolver::ResetSweepOrderings(LBSGroupset& groupset)
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "SPDS and FLUDS reset complete.            Process memory = "
       << std::setprecision(3)
       << chi::console.GetMemoryUsageInMB() << " MB";
 
   double local_app_memory =
-    chi_log.ProcessEvent(ChiLog::StdTags::MAX_MEMORY_USAGE,
-                         ChiLog::EventOperation::MAX_VALUE);
+    chi::log.ProcessEvent(chi_objects::ChiLog::StdTags::MAX_MEMORY_USAGE,
+                         chi_objects::ChiLog::EventOperation::MAX_VALUE);
   double total_app_memory=0.0;
   MPI_Allreduce(&local_app_memory,&total_app_memory,
                 1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
@@ -52,7 +52,7 @@ void lbs::SteadySolver::ResetSweepOrderings(LBSGroupset& groupset)
                 1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
 
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "\n" << std::setprecision(3)
       << "           Total application memory (max): "
       << total_app_memory/1024.0 << " GB\n"

@@ -5,7 +5,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Computes mappings of cell-local id to unknown vector index.*/

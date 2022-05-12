@@ -2,8 +2,9 @@
 
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -26,7 +27,7 @@ using namespace lbs;
 */
 void KEigenvalueSolver::PowerIteration()
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
       << "\n********** Solving k-eigenvalue problem with "
       << "the Power Method.\n";
 
@@ -117,19 +118,19 @@ void KEigenvalueSolver::PowerIteration()
           << "  reactivity " << std::setw(10) << reactivity * 1e5;
       if (converged) k_iter_info << " CONVERGED\n";
 
-      chi_log.Log(LOG_0) << k_iter_info.str();
+      chi::log.Log() << k_iter_info.str();
     }
 
     if (converged) break;
   }//for k iterations
 
   //================================================== Print summary
-  chi_log.Log(LOG_0) << "\n";
-  chi_log.Log(LOG_0)
+  chi::log.Log() << "\n";
+  chi::log.Log()
       << "        Final k-eigenvalue    :        "
       << std::setprecision(6) << k_eff;
-  chi_log.Log(LOG_0)
+  chi::log.Log()
       << "        Final change          :        "
       << std::setprecision(6) << k_eff_change;
-  chi_log.Log(LOG_0) << "\n";
+  chi::log.Log() << "\n";
 }

@@ -3,7 +3,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Constructor for the Piecewise Linear Polyhedron cell finite elment
@@ -202,7 +202,7 @@ PolyhedronMappingFE_PWL::
       }//for cell i
       if (mapping<0)
       {
-        chi_log.Log(LOG_ALLERROR) << "Unknown face mapping encountered. "
+        chi::log.LogAllError() << "Unknown face mapping encountered. "
                                      "pwl_polyhedron.h";
         exit(EXIT_FAILURE);
       }

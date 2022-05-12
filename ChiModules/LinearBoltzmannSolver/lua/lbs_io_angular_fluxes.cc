@@ -3,8 +3,8 @@
 
 #include "../lbs_linear_boltzmann_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog&     chi_log;
 
 //###################################################################
 /**Writes the angular fluxes of a LBS groupset to file.
@@ -45,7 +45,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << __FUNCTION__;
     exit(EXIT_FAILURE);
@@ -95,7 +95,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << __FUNCTION__;
     exit(EXIT_FAILURE);

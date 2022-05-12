@@ -4,10 +4,8 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-
-extern ChiLog     chi_log;
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 //###################################################################
 /**Check if all upstream dependencies have been met and receives
@@ -93,7 +91,7 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
           err_stream << error_string << "\n";
           MPI_Error_string(error_code, error_string, &length_of_error_string);
           err_stream << error_string << "\n";
-          chi_log.Log(LOG_ALLWARNING) << err_stream.str();
+          chi::log.LogAllWarning() << err_stream.str();
         }
       }//if not message already received
     }//for message
@@ -206,7 +204,7 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
 //          err_stream << error_string << "\n";
 //          MPI_Error_string(error_code, error_string, &length_of_error_string);
 //          err_stream << error_string << "\n";
-//          chi_log.Log(LOG_ALLWARNING) << err_stream.str();
+//          chi::log.LogAllWarning() << err_stream.str();
 //        }
 //      }//for message
 //

@@ -1,7 +1,8 @@
 #include "diffusion_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 /**Still searching for a reference for this.
  *
@@ -87,7 +88,7 @@ double chi_diffusion::Solver::
   }//Polyhedron
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Unsupported cell type in call to HPerpendicular";
     exit(EXIT_FAILURE);
   }

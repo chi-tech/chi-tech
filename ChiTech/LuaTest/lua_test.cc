@@ -4,12 +4,13 @@
 
 #include "unit_tests.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "chi_runtime.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
+;
 
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 
@@ -20,9 +21,10 @@ extern ChiLog& chi_log;
  */
 int chiLuaTest(lua_State* L)
 {
-  chi_log.Log() << "Hello from chiLuaTest(). Process count: "
+  chi::log.Log() << "Hello from chiLuaTest(). Process count: "
                 << chi::mpi.process_count;
-  chi_log.Log(LOG_ALL) << "process-id: " << chi::mpi.location_id;
+  chi::log.LogAll() << "process-id: " << chi::mpi.location_id;
+
   return 0;
 }
 

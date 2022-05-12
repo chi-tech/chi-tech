@@ -1,11 +1,12 @@
 #include "surfmesher_passthrough.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Executes the pass-through surface mesher.*/
 void chi_mesh::SurfaceMesherPassthrough::Execute()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "SurfaceMesherPassthrough executed";
+  chi::log.Log0Verbose1() << "SurfaceMesherPassthrough executed";
 }

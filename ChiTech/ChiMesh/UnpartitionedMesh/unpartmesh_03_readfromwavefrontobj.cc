@@ -1,7 +1,8 @@
 #include "chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 #include "chi_mpi.h"
 
 #include <algorithm>
@@ -15,13 +16,13 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
   file.open(options.file_name);
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name<<" in call "
       << "to ImportFromOBJFile \n";
     exit(EXIT_FAILURE);
   }
 
-  chi_log.Log() << "Making Unpartitioned mesh from wavefront file "
+  chi::log.Log() << "Making Unpartitioned mesh from wavefront file "
                 << options.file_name;
   MPI_Barrier(MPI_COMM_WORLD);
 

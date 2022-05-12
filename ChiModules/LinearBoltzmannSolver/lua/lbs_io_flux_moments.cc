@@ -4,8 +4,8 @@
 
 #include "lbs_lua_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog&     chi_log;
 
 //###################################################################
 /**Writes the flux-moments of a LBS solution to file (phi_old_local).
@@ -117,7 +117,7 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
                           solver.ext_src_moments_local,
                           single_file_flag);
 
-  chi_log.Log() << "Making source moments from flux file.";
+  chi::log.Log() << "Making source moments from flux file.";
   auto temp_phi = solver.phi_old_local;
   solver.phi_old_local = solver.ext_src_moments_local;
   solver.ext_src_moments_local = solver.MakeSourceMomentsFromPhi();

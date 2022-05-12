@@ -1,8 +1,9 @@
 #include "chi_runtime.h"
 #include "material_property_transportxsections.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Default constructor.*/
@@ -122,7 +123,7 @@ void chi_physics::TransportCrossSections::
     }
     catch(const std::out_of_range& o)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "ERROR: Invalid cross-section handle"
         << " in call to chiPhysicsMaterialSetProperty."
         << std::endl;
@@ -147,7 +148,7 @@ void chi_physics::TransportCrossSections::
       num_grps_G = xs->num_groups;
     else if (xs->num_groups != num_grps_G)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "In call to " << __FUNCTION__ << ": "
         << "all cross-sections must have the same number of groups.";
       exit(EXIT_FAILURE);
@@ -156,7 +157,7 @@ void chi_physics::TransportCrossSections::
     //============================ Increment number of precursors
     if (not xs->is_fissile and xs->num_precursors > 0)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << "In call to " << __FUNCTION__ << ": "
           << "only fissile materials are allowed to have delayed "
           << "neutron precursors.";
@@ -236,7 +237,7 @@ void chi_physics::TransportCrossSections::
       if (x == 0)
         inv_velocity[g] = cross_secs[x]->inv_velocity[g];
       else if (inv_velocity[g] != cross_secs[x]->inv_velocity[g])
-        chi_log.Log(LOG_ALLWARNING)
+        chi::log.LogAllWarning()
             << "In call to " << __FUNCTION__
             << ": all materials must have the same inv_velocity "
             << "term per group. Invalid value encountered in "

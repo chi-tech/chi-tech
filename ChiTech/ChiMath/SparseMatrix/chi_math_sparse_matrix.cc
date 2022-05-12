@@ -1,7 +1,7 @@
 #include "chi_math_sparse_matrix.h"
 
-#include <chi_log.h>
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 #include <iomanip>
 #include <algorithm>
@@ -43,7 +43,7 @@ void chi_math::SparseMatrix::Insert(size_t i, size_t j, double value)
 
   if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SparseMatrix::Insert encountered out of bounds,"
       << " i=" << i << " j=" << j
       << " bounds(" << row_size << "," << col_size << ")";
@@ -74,7 +74,7 @@ void chi_math::SparseMatrix::InsertAdd(size_t i, size_t j, double value)
 
   if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SparseMatrix::Insert encountered out of bounds,"
       << " i=" << i << " j=" << j
       << " bounds(" << row_size << "," << col_size << ")";
@@ -107,7 +107,7 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
   //============================================= Check size
   if (diag.size() != rowI_values.size())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
     << "Incompatible matrix-vector size encountered "
     << "in call to SparseMatrix::SetDiagonal.";
     exit(EXIT_FAILURE);
@@ -142,7 +142,7 @@ double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
   double retval = 0.0;
   if ((i<0) || (i >= rowI_indices.size()))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Index i out of bounds"
       << " in call to SparseMatrix::ValueIJ"
       << " i=" << i;
@@ -253,7 +253,7 @@ void chi_math::SparseMatrix::CheckInitialized()
 {
   if (rowI_values.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Illegal call to unitialized SparseMatrix matrix.";
     exit(EXIT_FAILURE);
   }

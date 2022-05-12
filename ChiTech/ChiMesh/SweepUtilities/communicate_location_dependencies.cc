@@ -3,7 +3,7 @@
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Communicates location by location dependencies.*/
