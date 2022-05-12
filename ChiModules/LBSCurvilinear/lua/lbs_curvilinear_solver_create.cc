@@ -43,7 +43,7 @@ int chiLBSCurvilinearCreateSolver(lua_State *L)
   }
 
   auto new_solver =
-    std::make_shared<LBSCurvilinear::Solver>(coord_system_type, solver_name);
+    std::make_shared<lbs_curvilinear::Solver>(coord_system_type, solver_name);
 
   chi::solver_stack.push_back(new_solver);
   const auto index = chi::solver_stack.size() - 1;

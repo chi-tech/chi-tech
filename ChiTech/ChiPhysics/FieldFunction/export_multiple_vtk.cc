@@ -5,7 +5,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 
@@ -155,7 +154,7 @@ void chi_physics::FieldFunction::
 
   //=============================================
   typedef chi_math::SpatialDiscretizationType SDMType;
-  typedef SpatialDiscretization_FV SDMFV;
+  typedef chi_math::SpatialDiscretization_FV SDMFV;
 
   if (ff_type == SDMType::FINITE_VOLUME)
   {

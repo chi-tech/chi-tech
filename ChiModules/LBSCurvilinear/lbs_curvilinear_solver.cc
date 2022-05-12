@@ -11,6 +11,8 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include "LinearBoltzmannSolver/lbs_structs.h"
 #include "LBSCurvilinear/lbs_curvilinear_sweepchunk_pwl.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
+
 
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
@@ -19,7 +21,7 @@ typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
 
 void
-LBSCurvilinear::Solver::PerformInputChecks()
+lbs_curvilinear::Solver::PerformInputChecks()
 {
   chi::log.Log() << "LBSCurvilinear::Solver::PerformInputChecks : enter";
 
@@ -250,7 +252,7 @@ LBSCurvilinear::Solver::PerformInputChecks()
 
 
 void
-LBSCurvilinear::Solver::InitializeSpatialDiscretization()
+lbs_curvilinear::Solver::InitializeSpatialDiscretization()
 {
   chi::log.Log() << "Initializing spatial discretization.\n";
 
@@ -292,7 +294,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
   }
 
   discretization =
-    SpatialDiscretization_PWLD::New(grid, setup_flags, qorder, system);
+    chi_math::SpatialDiscretization_PWLD::New(grid, setup_flags, qorder, system);
 
   //  secondary discretisation
   //  system - manipulated such that the spatial discretisation returns
@@ -329,7 +331,7 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
   }
 
   discretization_secondary =
-    SpatialDiscretization_PWLD::New(grid, setup_flags, qorder, system);
+    chi_math::SpatialDiscretization_PWLD::New(grid, setup_flags, qorder, system);
 
 
   MPI_Barrier(MPI_COMM_WORLD);
@@ -341,12 +343,12 @@ LBSCurvilinear::Solver::InitializeSpatialDiscretization()
 
 
 std::shared_ptr<SweepChunk>
-LBSCurvilinear::Solver::SetSweepChunk(LBSGroupset& groupset)
+lbs_curvilinear::Solver::SetSweepChunk(lbs::LBSGroupset& groupset)
 {
   auto pwld_sdm_primary =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
   auto pwld_sdm_secondary =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization_secondary);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_secondary);
 
    auto sweep_chunk =
      std::make_shared<SweepChunkPWL>(grid,

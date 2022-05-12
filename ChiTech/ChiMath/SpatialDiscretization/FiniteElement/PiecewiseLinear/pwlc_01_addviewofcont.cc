@@ -8,16 +8,16 @@
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polygon_cylindrical.h"
 
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
 
 
 
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
-std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
+std::shared_ptr<chi_math::CellMappingFE_PWL> chi_math::SpatialDiscretization_PWLC::
   MakeCellMappingFE(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
@@ -28,29 +28,29 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
       {
         case chi_math::CoordinateSystemType::CARTESIAN:
         {
-          auto cell_fe_view = new SlabMappingFE_PWL(cell,
-                                                    ref_grid,
-                                                    line_quad_order_arbitrary);
+          auto cell_fe_view = new chi_math::SlabMappingFE_PWL(cell,
+                                                              ref_grid,
+                                                              line_quad_order_arbitrary);
 
-          std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
+          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
           return the_ptr;
         }
         case chi_math::CoordinateSystemType::CYLINDRICAL:
         {
-          auto cell_fe_view = new SlabMappingFE_PWL_Cylindrical(cell,
-                                                                ref_grid,
-                                                                line_quad_order_arbitrary);
+          auto cell_fe_view = new chi_math::SlabMappingFE_PWL_Cylindrical(cell,
+                                                                          ref_grid,
+                                                                          line_quad_order_arbitrary);
 
-          std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
+          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
           return the_ptr;
         }
         case chi_math::CoordinateSystemType::SPHERICAL:
         {
-          auto cell_fe_view = new SlabMappingFE_PWL_Spherical(cell,
-                                                              ref_grid,
-                                                              line_quad_order_arbitrary);
+          auto cell_fe_view = new chi_math::SlabMappingFE_PWL_Spherical(cell,
+                                                                        ref_grid,
+                                                                        line_quad_order_arbitrary);
 
-          std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
+          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
           return the_ptr;
         }
         default:
@@ -64,22 +64,22 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
       {
         case chi_math::CoordinateSystemType::CARTESIAN:
         {
-          auto cell_fe_view = new PolygonMappingFE_PWL(cell,
-                                                       ref_grid,
-                                                       tri_quad_order_arbitrary,
-                                                       line_quad_order_arbitrary);
+          auto cell_fe_view = new chi_math::PolygonMappingFE_PWL(cell,
+                                                                 ref_grid,
+                                                                 tri_quad_order_arbitrary,
+                                                                 line_quad_order_arbitrary);
 
-          std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
+          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
           return the_ptr;
         }
         case chi_math::CoordinateSystemType::CYLINDRICAL:
         {
-          auto cell_fe_view = new PolygonMappingFE_PWL_Cylindrical(cell,
-                                                                   ref_grid,
-                                                                   tri_quad_order_arbitrary,
-                                                                   line_quad_order_arbitrary);
+          auto cell_fe_view = new chi_math::PolygonMappingFE_PWL_Cylindrical(cell,
+                                                                             ref_grid,
+                                                                             tri_quad_order_arbitrary,
+                                                                             line_quad_order_arbitrary);
 
-          std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
+          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
           return the_ptr;
         }
         default:
@@ -93,12 +93,12 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
       {
         case chi_math::CoordinateSystemType::CARTESIAN:
         {
-          auto cell_fe_view = new PolyhedronMappingFE_PWL(cell,
-                                                          ref_grid,
-                                                          tet_quad_order_arbitrary,
-                                                          tri_quad_order_arbitrary);
+          auto cell_fe_view = new chi_math::PolyhedronMappingFE_PWL(cell,
+                                                                    ref_grid,
+                                                                    tet_quad_order_arbitrary,
+                                                                    tri_quad_order_arbitrary);
 
-          std::shared_ptr<CellMappingFE_PWL> the_ptr(cell_fe_view);
+          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
           return the_ptr;
         }
         default:
@@ -114,7 +114,7 @@ std::shared_ptr<CellMappingFE_PWL> SpatialDiscretization_PWLC::
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_PWLC::PreComputeCellSDValues()
+void chi_math::SpatialDiscretization_PWLC::PreComputeCellSDValues()
 {
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log0Verbose1() << chi::program_timer.GetTimeString()
@@ -200,8 +200,8 @@ void SpatialDiscretization_PWLC::PreComputeCellSDValues()
 
 //###################################################################
 /**Returns a locally stored finite element view.*/
-std::shared_ptr<CellMappingFE_PWL>
-  SpatialDiscretization_PWLC::GetCellMappingFE(uint64_t cell_local_index)
+std::shared_ptr<chi_math::CellMappingFE_PWL>
+  chi_math::SpatialDiscretization_PWLC::GetCellMappingFE(uint64_t cell_local_index)
 {
 
   if (mapping_initialized)

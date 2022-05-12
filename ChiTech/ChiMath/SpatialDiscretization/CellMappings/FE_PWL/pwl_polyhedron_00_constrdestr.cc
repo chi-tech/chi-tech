@@ -3,6 +3,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
+#include "pwl_cellbase.h"
 ;
 
 //###################################################################
@@ -10,7 +11,7 @@
  * view.
  *
  * */
-PolyhedronMappingFE_PWL::
+chi_math::PolyhedronMappingFE_PWL::
   PolyhedronMappingFE_PWL(
     const chi_mesh::Cell& polyh_cell,
     const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,

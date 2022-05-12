@@ -4,6 +4,8 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "Groupset/lbs_groupset.h"
+
 ;
 
 #include <iomanip>
@@ -26,10 +28,10 @@ void lbs::SteadySolver::ComputeBalance()
   chi::log.Log() << "\n********** Computing balance\n";
 
   auto pwld =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
   if (not pwld) throw std::logic_error("Trouble getting PWLD-SDM in " +
                                       std::string(__FUNCTION__));
-  SpatialDiscretization_PWLD& grid_fe_view = *pwld;
+  chi_math::SpatialDiscretization_PWLD& grid_fe_view = *pwld;
 
   //======================================== Get material source
   // This is done using the SetSource routine

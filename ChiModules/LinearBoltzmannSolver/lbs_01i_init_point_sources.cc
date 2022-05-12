@@ -4,6 +4,7 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
+
 ;
 
 void lbs::SteadySolver::InitializePointSources()
@@ -27,7 +28,7 @@ void lbs::SteadySolver::InitializePointSources()
       return false;
   };
 
-  typedef SpatialDiscretization_PWLD PWLD;
+  typedef chi_math::SpatialDiscretization_PWLD PWLD;
   const auto& pwld = std::dynamic_pointer_cast<PWLD>(discretization);
 
   for (auto& point_source : point_sources)

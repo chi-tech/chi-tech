@@ -11,6 +11,7 @@
 #include <iomanip>
 
 #include "ChiTimer/chi_timer.h"
+#include "Groupset/lbs_groupset.h"
 
 
 

@@ -4,10 +4,10 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 void lbs_adjoint::AdjointSolver::
-  SetSource(LBSGroupset &groupset,
+  SetSource(lbs::LBSGroupset &groupset,
             std::vector<double> &destination_q,
             lbs::SourceFlags source_flags)
 {

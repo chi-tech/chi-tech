@@ -9,6 +9,7 @@
 #include "ChiConsole/chi_console.h"
 
 
+
 #include <iomanip>
 
 void lbs::SteadySolver::InitializeSpatialDiscretization()
@@ -16,8 +17,8 @@ void lbs::SteadySolver::InitializeSpatialDiscretization()
   using namespace chi_math::finite_element;
   chi::log.Log() << "Initializing spatial discretization.\n";
   discretization =
-    SpatialDiscretization_PWLD::New(grid, COMPUTE_CELL_MAPPINGS |
-                                          COMPUTE_UNIT_INTEGRALS);
+    chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_CELL_MAPPINGS |
+                                                    COMPUTE_UNIT_INTEGRALS);
 
 
   MPI_Barrier(MPI_COMM_WORLD);

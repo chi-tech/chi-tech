@@ -49,7 +49,7 @@ public:
   std::vector<chi_diffusion::Boundary*>    boundaries;
   chi_mesh::MeshContinuumPtr                 grid = nullptr;
 
-  std::shared_ptr<SpatialDiscretization>   discretization;
+  std::shared_ptr<chi_math::SpatialDiscretization>   discretization;
 
   chi_math::UnknownManager                 unknown_manager;
 

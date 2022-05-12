@@ -1,17 +1,15 @@
 #include "lbs_sweepchunk_pwl.h"
 
 #include "chi_runtime.h"
-#include "chi_log.h"
-;
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
-#include "chi_mpi.h"
 
 
 //###################################################################
 /**Constructor.*/
 lbs::SweepChunkPWL::
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                SpatialDiscretization_PWLD& discretization,
+                chi_math::SpatialDiscretization_PWLD& discretization,
                 std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,

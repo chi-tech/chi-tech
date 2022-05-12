@@ -10,12 +10,9 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
-
-#include "chi_mpi.h"
-
 
 #include "ChiTimer/chi_timer.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 
 

@@ -83,7 +83,7 @@ void lbs::SteadySolver::InitializeParrays()
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   auto pwl =
-      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
 
   cell_transport_views.clear();
   cell_transport_views.reserve(grid->local_cells.size());

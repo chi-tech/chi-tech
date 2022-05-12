@@ -11,7 +11,7 @@
 
 //###################################################################
 /**Develops node ordering per location.*/
-void SpatialDiscretization_FV::
+void chi_math::SpatialDiscretization_FV::
   OrderNodes()
 {
   chi::log.LogAllVerbose1() << "FV discretization - Reordering nodes.";

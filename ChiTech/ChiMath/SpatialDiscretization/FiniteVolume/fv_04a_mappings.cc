@@ -12,7 +12,7 @@
 //###################################################################
 /**Maps a finite volume degree of freedom. The default behavior is to
  * assume a nodal DOF storage scheme.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOF(const chi_mesh::Cell& cell, const unsigned int) const
 {
   size_t num_local_cells = ref_grid->local_cells.size();
@@ -37,7 +37,7 @@ int64_t SpatialDiscretization_FV::
 
 //###################################################################
 /**Maps a finite volume degree of freedom using an unknown manager.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOF(const chi_mesh::Cell& cell,
          const unsigned int,
          const chi_math::UnknownManager& unknown_manager,
@@ -92,7 +92,7 @@ int64_t SpatialDiscretization_FV::
 //###################################################################
 /**Maps a finite volume degree of freedom to a local address.
  * The default behavior is to assume a nodal DOF storage scheme.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOFLocal(const chi_mesh::Cell& cell, unsigned int) const
 {
 //  if (cell == nullptr)
@@ -123,7 +123,7 @@ int64_t SpatialDiscretization_FV::
 //###################################################################
 /**Maps a finite volume degree of freedom to a local address using
  * an unknown manager.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOFLocal(const chi_mesh::Cell& cell,
               const unsigned int,
               const chi_math::UnknownManager& unknown_manager,

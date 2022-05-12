@@ -1,7 +1,6 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -10,7 +9,7 @@
 
 //###################################################################
 /**Constructor.*/
-SpatialDiscretization_PWLC::
+chi_math::SpatialDiscretization_PWLC::
   SpatialDiscretization_PWLC(chi_mesh::MeshContinuumPtr& in_grid,
                              chi_math::finite_element::SetupFlags setup_flags,
                              chi_math::QuadratureOrder qorder,

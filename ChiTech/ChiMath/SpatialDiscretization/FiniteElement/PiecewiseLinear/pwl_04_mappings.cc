@@ -1,14 +1,13 @@
 #include "pwl.h"
 
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 
 
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
-int64_t SpatialDiscretization_PWLD::
+int64_t chi_math::SpatialDiscretization_PWLD::
 MapDOF(const chi_mesh::Cell& cell,
        const unsigned int node,
        const chi_math::UnknownManager& unknown_manager,
@@ -87,7 +86,7 @@ MapDOF(const chi_mesh::Cell& cell,
 
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
-int64_t SpatialDiscretization_PWLD::
+int64_t chi_math::SpatialDiscretization_PWLD::
 MapDOFLocal(const chi_mesh::Cell& cell,
             const unsigned int node,
             const chi_math::UnknownManager& unknown_manager,

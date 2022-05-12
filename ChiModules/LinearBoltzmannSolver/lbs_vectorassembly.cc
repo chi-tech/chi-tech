@@ -1,4 +1,5 @@
 #include "lbs_linear_boltzmann_solver.h"
+#include "Groupset/lbs_groupset.h"
 
 //###################################################################
 /**Assembles a vector for a given groupset from a source vector.*/

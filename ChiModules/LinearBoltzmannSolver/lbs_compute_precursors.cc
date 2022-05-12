@@ -3,8 +3,6 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 #include "chi_runtime.h"
-#include "chi_log.h"
-;
 
 
 //###################################################################
@@ -12,7 +10,7 @@
 void lbs::SteadySolver::ComputePrecursors()
 {
   auto fe =
-      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
   const size_t J = max_precursors_per_material;
 
   precursor_new_local.assign(precursor_new_local.size(), 0.0);

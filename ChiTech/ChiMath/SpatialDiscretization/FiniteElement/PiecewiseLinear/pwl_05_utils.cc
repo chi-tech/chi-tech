@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
-size_t SpatialDiscretization_PWLD::
+size_t chi_math::SpatialDiscretization_PWLD::
   GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
@@ -14,7 +14,7 @@ size_t SpatialDiscretization_PWLD::
 
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
-size_t SpatialDiscretization_PWLD::
+size_t chi_math::SpatialDiscretization_PWLD::
   GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
@@ -24,7 +24,7 @@ size_t SpatialDiscretization_PWLD::
 
 //###################################################################
 /**Develops a localized view of a petsc vector.*/
-void SpatialDiscretization_PWLD::
+void chi_math::SpatialDiscretization_PWLD::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
                       chi_math::UnknownManager& unknown_manager)

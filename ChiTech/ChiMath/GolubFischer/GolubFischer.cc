@@ -7,7 +7,7 @@
 
 /**Master callable function that will return a reference to the abscissae and
  * weights of the discrete angles.*/
-Tvecdbl_vecdbl& GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
+Tvecdbl_vecdbl& chi_math::GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
 {
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Getting Discrete Scattering Angles" << '\n';
 
@@ -62,7 +62,7 @@ Tvecdbl_vecdbl& GolubFischer::GetDiscreteScatAngles(Tvecdbl& mell)
 
 /**Applies the Modified Chebyshev Algorithm contained in [1] to find the
  * recursion coefficients for the orthogonal polynomials.*/
-void GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecdbl& c)
+void chi_math::GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecdbl& c)
 {
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "MCA Start" << '\n';
 
@@ -120,7 +120,7 @@ void GolubFischer::MCA(Tvecdbl& in_mell, Tvecdbl& a, Tvecdbl& b, Tvecdbl& c)
 }
 
 /**Finds the roots of the orthogonal polynomial.*/
-void GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_beta)
+void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_beta)
 {
   chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "RootsOrtho Start" << '\n';
 
@@ -232,7 +232,7 @@ void GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_beta)
 }
 
 /**Computes the function evaluation of the orthogonal polynomials.*/
-double GolubFischer::Ortho(int ell, double x, Tvecdbl& in_alpha, Tvecdbl& in_beta)
+double chi_math::GolubFischer::Ortho(int ell, double x, Tvecdbl& in_alpha, Tvecdbl& in_beta)
 {
   if (ell==0)
   {
@@ -260,7 +260,7 @@ double GolubFischer::Ortho(int ell, double x, Tvecdbl& in_alpha, Tvecdbl& in_bet
 }
 
 /**Computes the derivative of the orthogonal polynomials.*/
-double GolubFischer::dOrtho(int ell, double x, Tvecdbl& in_alpha, Tvecdbl& in_beta)
+double chi_math::GolubFischer::dOrtho(int ell, double x, Tvecdbl& in_alpha, Tvecdbl& in_beta)
 {
 
   double eps = 0.000001;

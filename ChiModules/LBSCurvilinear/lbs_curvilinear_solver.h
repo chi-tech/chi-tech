@@ -2,9 +2,10 @@
 #define LBS_CURVILINEAR_SOLVER_H
 
 #include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 
-namespace LBSCurvilinear
+namespace lbs_curvilinear
 {
   class Solver;
 }
@@ -12,7 +13,7 @@ namespace LBSCurvilinear
 
 /** A neutral particle transport solver in point-symmetric and axial-symmetric
  *  curvilinear coordinates. */
-class LBSCurvilinear::Solver : public lbs::SteadySolver
+class lbs_curvilinear::Solver : public lbs::SteadySolver
 {
 //  Attributes
 private:
@@ -20,7 +21,7 @@ private:
   chi_math::CoordinateSystemType coord_system_type;
   /** Discretisation pointer to matrices of the secondary cell view
    *  (matrices of the primary cell view forwarded to the base class). */
-  std::shared_ptr<SpatialDiscretization> discretization_secondary;
+  std::shared_ptr<chi_math::SpatialDiscretization> discretization_secondary;
 
 //  Methods
 public:
@@ -38,7 +39,7 @@ public:
   void PerformInputChecks() override;
   void InitializeSpatialDiscretization() override;
 private:
-  std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset) override;
+  std::shared_ptr<SweepChunk> SetSweepChunk(lbs::LBSGroupset& groupset) override;
 };
 
 #endif // LBS_CURVILINEAR_SOLVER_H

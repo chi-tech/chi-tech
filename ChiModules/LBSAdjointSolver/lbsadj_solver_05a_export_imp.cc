@@ -40,7 +40,7 @@ void lbs_adjoint::AdjointSolver::
   VecOfMGVec4 cell_avg_p1_moments(num_cells, MGVec4(num_groups));
   {
     auto fe_sdm =
-      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
 
     if (not fe_sdm)
       throw std::logic_error(fname + ": Error getting finite element spatial"

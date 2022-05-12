@@ -1,6 +1,6 @@
 #include "pwl_polygon.h"
 
-void PolygonMappingFE_PWL::InitializeVolumeQuadraturePointData(
+void chi_math::PolygonMappingFE_PWL::InitializeVolumeQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data) const
 {
   //=================================== Determine number of internal qpoints
@@ -71,8 +71,8 @@ void PolygonMappingFE_PWL::InitializeVolumeQuadraturePointData(
                                V_num_nodes);
 }
 
-void PolygonMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int face,
-  chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const
+void chi_math::PolygonMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int face,
+                                                                       chi_math::finite_element::FaceQuadraturePointData& faces_qp_data) const
 {
   const bool ON_SURFACE = true;
 

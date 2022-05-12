@@ -3,6 +3,7 @@
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 //###################################################################

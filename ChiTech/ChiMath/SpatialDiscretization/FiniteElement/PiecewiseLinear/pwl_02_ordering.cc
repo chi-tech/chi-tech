@@ -1,7 +1,6 @@
 #include "pwl.h"
 
 #include <chi_log.h>
-;
 
 #include <chi_mpi.h>
 
@@ -15,7 +14,7 @@
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-void SpatialDiscretization_PWLD::OrderNodes()
+void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
   chi::log.Log() << chi::program_timer.GetTimeString()

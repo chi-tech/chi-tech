@@ -7,6 +7,7 @@
 #include "ChiMath/chi_math.h"
 
 #include "ResponseFunction/lbs_adj_response_function.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 namespace lbs_adjoint
 {
@@ -27,7 +28,7 @@ public:
 
   explicit AdjointSolver(const std::string& solver_name);
 
-  void SetSource(LBSGroupset& groupset,
+  void SetSource(lbs::LBSGroupset& groupset,
                  std::vector<double>&  destination_q,
                  lbs::SourceFlags source_flags) override;
 

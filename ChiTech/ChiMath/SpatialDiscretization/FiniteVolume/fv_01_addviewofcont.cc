@@ -8,13 +8,12 @@
 
 #include "chi_log.h"
 #include "chi_mpi.h"
-
-;
+#include "CellViews/fv_cellbase.h"
 
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_FV::PreComputeCellSDValues()
+void chi_math::SpatialDiscretization_FV::PreComputeCellSDValues()
 {
   chi::log.Log0Verbose1()
     << "SpatialDiscretization_FV - Adding view of local continuum.";
@@ -37,7 +36,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues()
       //######################################### SLAB
       if (cell.Type() == chi_mesh::CellType::SLAB)
       {
-        auto view = new SlabFVValues(cell, *ref_grid);
+        auto view = new chi_math::SlabFVValues(cell, *ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -46,7 +45,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues()
       //######################################### POLYGON
       if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
-        auto view = new PolygonFVValues(cell, *ref_grid);
+        auto view = new chi_math::PolygonFVValues(cell, *ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -55,7 +54,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues()
       //######################################### POLYHEDRON
       if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        auto view = new PolyhedronFVValues(cell, *ref_grid);
+        auto view = new chi_math::PolyhedronFVValues(cell, *ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -66,7 +65,7 @@ void SpatialDiscretization_FV::PreComputeCellSDValues()
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
-void SpatialDiscretization_FV::
+void chi_math::SpatialDiscretization_FV::
   PreComputeNeighborCellSDValues()
 {
   chi::log.Log0Verbose1()
@@ -91,27 +90,27 @@ void SpatialDiscretization_FV::
     //######################################### SLAB
     if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      auto view = new SlabFVValues(cell, *ref_grid);
+      auto view = new chi_math::SlabFVValues(cell, *ref_grid);
 
-      neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
+      neighbor_cell_fv_views.insert(std::pair<uint64_t, chi_math::CellFVValues*>(
         cell.global_id,view));
     }
 
     //######################################### POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto view = new PolygonFVValues(cell, *ref_grid);
+      auto view = new chi_math::PolygonFVValues(cell, *ref_grid);
 
-      neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
+      neighbor_cell_fv_views.insert(std::pair<uint64_t, chi_math::CellFVValues*>(
         cell.global_id,view));
     }
 
     //######################################### POLYHEDRON
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto view = new PolyhedronFVValues(cell, *ref_grid);
+      auto view = new chi_math::PolyhedronFVValues(cell, *ref_grid);
 
-      neighbor_cell_fv_views.insert(std::pair<uint64_t, CellFVValues*>(
+      neighbor_cell_fv_views.insert(std::pair<uint64_t, chi_math::CellFVValues*>(
         cell.global_id,view));
     }
   }//for num cells
@@ -124,9 +123,9 @@ void SpatialDiscretization_FV::
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVValues* SpatialDiscretization_FV::MapFeView(uint64_t cell_local_index)
+chi_math::CellFVValues* chi_math::SpatialDiscretization_FV::MapFeView(uint64_t cell_local_index)
 {
-  CellFVValues* value;
+  chi_math::CellFVValues* value;
   try { value = cell_fv_views.at(cell_local_index); }
   catch (const std::out_of_range& o)
   {
@@ -142,7 +141,7 @@ CellFVValues* SpatialDiscretization_FV::MapFeView(uint64_t cell_local_index)
 
 //###################################################################
 /**Maps the cell index to a position stored locally.*/
-CellFVValues* SpatialDiscretization_FV::MapNeighborFeView(uint64_t cell_global_index)
+chi_math::CellFVValues* chi_math::SpatialDiscretization_FV::MapNeighborFeView(uint64_t cell_global_index)
 {
   //=================================== First check locally
   if (ref_grid->IsCellLocal(cell_global_index))

@@ -6,6 +6,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+
+
 //###################################################################
 /**Executes the interpolation.*/
 void chi_mesh::FieldFunctionInterpolationLine::Execute()
@@ -107,7 +109,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
                   std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
-  auto& spatial_dm = static_cast<SpatialDiscretization_PWLC&>(
+  auto& spatial_dm = static_cast<chi_math::SpatialDiscretization_PWLC&>(
                      *ff_ctx->ref_ff->spatial_discretization);
 
   //================================================== Loop over node indices
@@ -152,7 +154,7 @@ void chi_mesh::FieldFunctionInterpolationLine::
   PWLDInterpolate(std::vector<uint64_t>& mapping,
                   FieldFunctionContext* ff_ctx)
 {
-  auto& spatial_dm = static_cast<SpatialDiscretization_PWLD&>(
+  auto& spatial_dm = static_cast<chi_math::SpatialDiscretization_PWLD&>(
                      *ff_ctx->ref_ff->spatial_discretization);
 
   std::vector<double>& field = *ff_ctx->ref_ff->field_vector_local;

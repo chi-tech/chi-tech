@@ -5,6 +5,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
+#include "Groupset/lbs_groupset.h"
+
 ;
 
 
@@ -61,7 +63,7 @@ void lbs::SteadySolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto fe = std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
   if (not fe)
   {
     file.close();
@@ -135,7 +137,7 @@ void lbs::SteadySolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto fe = std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
   if (not fe)
   {
     file.close();

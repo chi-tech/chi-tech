@@ -1,14 +1,13 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int64_t SpatialDiscretization_PWLC::
+int64_t chi_math::SpatialDiscretization_PWLC::
   MapDOF(const chi_mesh::Cell& cell,
          const unsigned int node,
          const chi_math::UnknownManager& unknown_manager,
@@ -47,7 +46,7 @@ int64_t SpatialDiscretization_PWLC::
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int64_t SpatialDiscretization_PWLC::
+int64_t chi_math::SpatialDiscretization_PWLC::
   MapDOFLocal(const chi_mesh::Cell& cell,
               const unsigned int node,
               const chi_math::UnknownManager& unknown_manager,

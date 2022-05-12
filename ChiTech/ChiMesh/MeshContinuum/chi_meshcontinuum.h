@@ -38,7 +38,7 @@ private:
   //is the number of faces in this category
   std::vector<std::pair<size_t,size_t>> face_categories;
 
-  ChiMPICommunicatorSet commicator_set;
+  chi_objects::ChiMPICommunicatorSet commicator_set;
 
 public:
   MeshContinuum() :
@@ -94,7 +94,7 @@ public:
 
   std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
 
-  ChiMPICommunicatorSet& GetCommunicator();
+  chi_objects::ChiMPICommunicatorSet& GetCommunicator();
 
   size_t GetGlobalNumberOfCells() const;
 

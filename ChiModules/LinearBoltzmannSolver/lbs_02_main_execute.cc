@@ -9,6 +9,7 @@
 #include "chi_mpi.h"
 
 #include "ChiConsole/chi_console.h"
+#include "Groupset/lbs_groupset.h"
 
 
 #include <iomanip>

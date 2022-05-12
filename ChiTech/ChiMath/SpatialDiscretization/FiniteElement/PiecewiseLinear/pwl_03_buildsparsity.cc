@@ -3,12 +3,10 @@
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-;
-
 
 //###################################################################
 /**Builds the sparsity pattern for a Discontinuous Finite Element Method.*/
-void SpatialDiscretization_PWLD::
+void chi_math::SpatialDiscretization_PWLD::
 BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                      std::vector<int64_t> &nodal_nnz_off_diag,
                      chi_math::UnknownManager& unknown_manager)

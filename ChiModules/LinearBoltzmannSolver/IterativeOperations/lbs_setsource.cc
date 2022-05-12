@@ -1,6 +1,7 @@
 #include "../lbs_linear_boltzmann_solver.h"
 
 #include "ChiTimer/chi_timer.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 #include <chi_mpi.h>
 #include <chi_log.h>

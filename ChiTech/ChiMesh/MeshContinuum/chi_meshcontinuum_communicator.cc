@@ -6,12 +6,9 @@
 #include "chi_runtime.h"
 #include "chi_mpi.h"
 
-
-;
-
 //###################################################################
 /***/
-ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
+chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 {
   //================================================== Check if already avail
   if (communicators_available)

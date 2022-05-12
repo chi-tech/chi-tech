@@ -20,7 +20,7 @@ AngleSet(int in_numgrps,
          std::vector<int>& angle_indices,
          std::vector<std::shared_ptr<SweepBndry>>& sim_boundaries,
          int sweep_eager_limit,
-         ChiMPICommunicatorSet* in_comm_set):
+         chi_objects::ChiMPICommunicatorSet* in_comm_set):
   spds(in_spds),
   sweep_buffer(this,sweep_eager_limit,in_comm_set),
   ref_boundaries(sim_boundaries)

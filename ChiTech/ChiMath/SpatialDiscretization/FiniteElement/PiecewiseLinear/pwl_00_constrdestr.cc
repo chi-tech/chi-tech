@@ -3,7 +3,6 @@
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
 
@@ -12,7 +11,7 @@
 
 //###################################################################
 /**Constructor.*/
-SpatialDiscretization_PWLD::
+chi_math::SpatialDiscretization_PWLD::
   SpatialDiscretization_PWLD(chi_mesh::MeshContinuumPtr& in_grid,
                              chi_math::finite_element::SetupFlags setup_flags,
                              chi_math::QuadratureOrder qorder,

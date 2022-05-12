@@ -1,10 +1,9 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 //###################################################################
 /**Writes the angular fluxes of a LBS groupset to file.
@@ -39,7 +38,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -89,7 +88,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }

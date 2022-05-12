@@ -9,12 +9,13 @@
 #include "chi_mpi.h"
 
 
+
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
                                                   int component)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLD>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();
@@ -293,7 +294,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b(const chi_mesh::Cell &cell,
 void chi_diffusion::Solver::PWLD_Assemble_b(const chi_mesh::Cell& cell,
                                             int component)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLD>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();

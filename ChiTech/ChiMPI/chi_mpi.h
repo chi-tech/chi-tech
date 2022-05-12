@@ -5,6 +5,9 @@
 #include "../ChiMesh/chi_mesh.h"
 #include "chi_runtime.h"
 
+namespace chi_objects
+{
+
 //################################################################### Class def
 /**Simple implementation a communicator set.*/
 class ChiMPICommunicatorSet
@@ -25,8 +28,6 @@ public:
   }
 };
 
-namespace chi_objects
-{
   //################################################################### Class def
   /**An object for storing various MPI states.*/
   class MPI_Info

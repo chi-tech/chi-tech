@@ -1,4 +1,5 @@
 #include "../lbs_linear_boltzmann_solver.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 #include <ChiMesh/Cell/cell.h>
 
 //###################################################################

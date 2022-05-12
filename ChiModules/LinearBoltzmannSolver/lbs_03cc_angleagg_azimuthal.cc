@@ -14,6 +14,7 @@
 
 
 #include "ChiConsole/chi_console.h"
+#include "Groupset/lbs_groupset.h"
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;

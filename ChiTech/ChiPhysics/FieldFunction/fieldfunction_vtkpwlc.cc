@@ -6,9 +6,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "chi_mpi.h"
-
-;
 
 
 #include <vtkUnstructuredGrid.h>
@@ -38,7 +35,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
                                 " is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  typedef SpatialDiscretization_PWLC SDMPWLC;
+  typedef chi_math::SpatialDiscretization_PWLC SDMPWLC;
 
   auto pwlc_sdm_ptr = std::dynamic_pointer_cast<SDMPWLC>(spatial_discretization);
   if (not pwlc_sdm_ptr) throw std::logic_error(std::string(__FUNCTION__) +

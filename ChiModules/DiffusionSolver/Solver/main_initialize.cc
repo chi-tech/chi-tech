@@ -35,19 +35,19 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     if      (sdm_string == "PWLC")
     {
       discretization =
-        SpatialDiscretization_PWLC::New(grid, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLC::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
     }
     else if (sdm_string == "PWLD_MIP")
     {
       discretization =
-        SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
     }
     else if (sdm_string == "PWLD_MIP_GAGG")
     {
       discretization =
-        SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
     }
     else

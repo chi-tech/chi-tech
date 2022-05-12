@@ -6,7 +6,7 @@
 ;
 
 #include "chi_mpi.h"
-
+#include "Groupset/lbs_groupset.h"
 
 
 #include <iomanip>

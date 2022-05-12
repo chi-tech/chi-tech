@@ -2,6 +2,7 @@
 #define LBS_KSP_DATA_CONTEXT_H
 
 #include "../lbs_linear_boltzmann_solver.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 namespace lbs
 {

@@ -1,4 +1,4 @@
-#include "lbs_groupset.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
@@ -12,7 +12,7 @@
 
 //##############################################
 /**Groupset constructor.*/
-LBSGroupset::LBSGroupset(int in_id) : id(in_id)
+lbs::LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 {
   quadrature = nullptr;
   iterative_method = lbs::IterativeMethod::CLASSICRICHARDSON;
@@ -44,7 +44,7 @@ LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 
 //###################################################################
 /**Computes the discrete to moment operator.*/
-void LBSGroupset::BuildDiscMomOperator(
+void lbs::LBSGroupset::BuildDiscMomOperator(
   unsigned int scattering_order,
   lbs::GeometryType geometry_type)
 {
@@ -67,7 +67,7 @@ void LBSGroupset::BuildDiscMomOperator(
 
 //###################################################################
 /**Computes the moment to discrete operator.*/
-void LBSGroupset::BuildMomDiscOperator(
+void lbs::LBSGroupset::BuildMomDiscOperator(
   unsigned int scattering_order,
   lbs::GeometryType geometry_type)
 {
@@ -91,7 +91,7 @@ void LBSGroupset::BuildMomDiscOperator(
 
 //###################################################################
 /**Constructs the groupset subsets.*/
-void LBSGroupset::BuildSubsets()
+void lbs::LBSGroupset::BuildSubsets()
 {
   grp_subsets.clear();
   grp_subset_sizes.clear();
@@ -179,7 +179,7 @@ void LBSGroupset::BuildSubsets()
 
 //###################################################################
 /**Constructs the groupset subsets.*/
-void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name)
+void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name)
 {
   if (not log_sweep_events) return;
 
