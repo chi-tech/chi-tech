@@ -4,7 +4,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog&  chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include <sstream>
 #include <algorithm>
@@ -376,7 +376,7 @@ std::vector<int> chi_graph::DirectedGraph::
 /**Prints the graph in Graphviz format.*/
 void chi_graph::DirectedGraph::PrintGraphviz(int location_mask)
 {
-  if (chi_mpi.location_id != location_mask) return;
+  if (chi::mpi.location_id != location_mask) return;
 
   std::stringstream o;
   std::string offset("    ");
@@ -407,7 +407,7 @@ void chi_graph::DirectedGraph::
   PrintSubGraphviz(const std::vector<int>& verts_to_print,
                    int location_mask)
 {
-  if (chi_mpi.location_id != location_mask) return;
+  if (chi::mpi.location_id != location_mask) return;
 
   std::stringstream o;
   std::string offset("    ");

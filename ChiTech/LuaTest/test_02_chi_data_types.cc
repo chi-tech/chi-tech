@@ -7,7 +7,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "chi_mpi_utils_map_all2all.h"
 
@@ -59,7 +59,7 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
 
   //======================================================= Testing Byte array serialization
   output << "Testing chi_data_types::ByteArray Serialization/DeSerialization\n";
-  if (chi_mpi.process_count < 2)
+  if (chi::mpi.process_count < 2)
     throw std::logic_error("chi_unit_tests::Test_chi_data_types requires at least"
                            " 2 MPI processes.");
 
@@ -139,7 +139,7 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
     }
   }
 
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     send_data[1].Append(poster_child_cell.Serialize());
     send_data[1].Append(poster_child_cell.Serialize());

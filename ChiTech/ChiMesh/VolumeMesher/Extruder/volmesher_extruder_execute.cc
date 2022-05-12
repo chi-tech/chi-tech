@@ -8,7 +8,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
@@ -111,11 +111,11 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   {
     int p_tot = options.partition_x*options.partition_y*options.partition_z;
 
-    if (chi_mpi.process_count != p_tot)
+    if (chi::mpi.process_count != p_tot)
     {
       chi_log.Log(LOG_ALLERROR)
         << "ERROR: Number of processors available ("
-        << chi_mpi.process_count << ") does not match amount of processors "
+        << chi::mpi.process_count << ") does not match amount of processors "
         << "required by surface mesher partitioning parameters ("
         << p_tot << ").";
       exit(EXIT_FAILURE);
@@ -126,7 +126,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
 
   //================================== Print info
   chi_log.Log(LOG_ALLVERBOSE_1)
-    << "### LOCATION[" << chi_mpi.location_id
+    << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
     << grid->local_cell_glob_indices.size();
 

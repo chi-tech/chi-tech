@@ -50,7 +50,12 @@ namespace chi_math
   class UnknownManager;
 }//namespace chi_math
 
+namespace chi_objects
+{
+  class MPI_Info;
+}//namespace chi_objects
 
+//###################################################################
 /**General utilities in ChiTech*/
 class chi
 {
@@ -71,6 +76,12 @@ public:
   static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
+  static chi_objects::MPI_Info& mpi;
+
+
+
+  //#######################################################
+  /**Data block for run-time quantities.*/
   class run_time
   {
   public:
@@ -80,16 +91,27 @@ public:
     static bool        allow_petsc_error_handler;
 
   private:
+    friend class chi;
     static void ParseArguments(int argc, char** argv);
+    static int  InitPetSc(int argc, char** argv);
+  public:
 
   public:
-    static int  RunInteractive(int argc, char** argv);
-    static int  RunBatch(int argc, char** argv);
-    static int  Initialize(int argc, char** argv);
-    static int  InitPetSc(int argc, char** argv);
-    static void Finalize();
+    run_time() = delete;                          //Deleted constructor
+    run_time(const run_time&) = delete;           //Deleted copy constructor
+    run_time operator=(const run_time&) = delete; //Deleted assigment operator
   };
 
+public:
+  chi() = delete;                     //Deleted constructor
+  chi(const chi&) = delete;           //Deleted copy constructor
+  chi operator=(const chi&) = delete; //Deleted assigment operator
+
+public:
+  static int  RunInteractive(int argc, char** argv);
+  static int  RunBatch(int argc, char** argv);
+  static int  Initialize(int argc, char** argv);
+  static void Finalize();
 
 public:
   /**Attempts to retrieve an object of base-type `shared_ptr<T>` at the given
@@ -153,7 +175,6 @@ public:
                               "Calling function: " + calling_function_name);
     }
   }
-  chi() = delete;
 };
 
 #endif

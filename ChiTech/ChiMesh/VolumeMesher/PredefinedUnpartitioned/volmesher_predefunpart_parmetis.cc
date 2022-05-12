@@ -7,7 +7,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include "petsc.h"
 
@@ -30,7 +30,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
 
   //================================================== Start building indices
   std::vector<int64_t> cell_pids(num_raw_cells, 0);
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     if (num_raw_cells > 1)
     {
@@ -87,7 +87,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
       MatPartitioningCreate(MPI_COMM_SELF,&part);
       MatPartitioningSetAdjacency(part,Adj);
       MatPartitioningSetType(part,"parmetis");
-      MatPartitioningSetNParts(part,chi_mpi.process_count);
+      MatPartitioningSetNParts(part,chi::mpi.process_count);
       MatPartitioningApply(part,&is);
       MatPartitioningDestroy(&part);
       MatDestroy(&Adj);

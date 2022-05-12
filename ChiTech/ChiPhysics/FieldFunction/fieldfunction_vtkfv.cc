@@ -4,7 +4,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
@@ -93,7 +93,7 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
   std::string base_filename     = std::string(base_name);
   std::string location_filename = base_filename +
                                   std::string("_") +
-                                  std::to_string(chi_mpi.location_id) +
+                                  std::to_string(chi::mpi.location_id) +
                                   std::string(".vtu");
 
   //============================================= Serial Output each piece
@@ -113,6 +113,6 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
   grid_writer->Write();
 
   //============================================= Parallel summary file
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
       WritePVTU(base_filename, field_name, component_names);
 }

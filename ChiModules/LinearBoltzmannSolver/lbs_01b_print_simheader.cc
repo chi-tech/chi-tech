@@ -6,13 +6,13 @@
 #include <chi_mpi.h>
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Prints header information of simulation.*/
 void lbs::SteadySolver::PrintSimHeader()
 {
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     chi_log.Log(LOG_0) << "\nInitializing LBS Solver with name: "
                        << TextName() << "\n\n";

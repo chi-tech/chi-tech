@@ -5,8 +5,8 @@
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
-#include "ChiMPI/chi_mpi.h"
-extern ChiMPI& chi_mpi;
+#include "chi_mpi.h"
+
 
 //###################################################################
 /**Creates 2D polygon cells for each face of an unpartitioned mesh.*/
@@ -40,7 +40,7 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
 
     cell->global_id = num_cells;
     cell->local_id  = num_cells;
-    cell->partition_id = chi_mpi.location_id;
+    cell->partition_id = chi::mpi.location_id;
 
     cell->centroid    = raw_cell->centroid;
     cell->material_id = raw_cell->material_id;

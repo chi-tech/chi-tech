@@ -6,7 +6,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /** Creates nodes that are owned locally from the 2D template grid.*/

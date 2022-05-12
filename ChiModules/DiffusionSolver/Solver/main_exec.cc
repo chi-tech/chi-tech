@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -170,7 +170,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
         << chi_physics::GetPETScConvergedReasonstring(reason);
 
     //=================================== Location wise view
-    if (chi_mpi.location_id == 0)
+    if (chi::mpi.location_id == 0)
     {
       int64_t its;
       ierr = KSPGetIterationNumber(ksp,&its);

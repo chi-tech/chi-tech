@@ -10,7 +10,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /** Applies KBA-style partitioning to the mesh.*/
@@ -45,7 +45,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   //======================================== Determine cell partition-IDs
   //                                         only on home location
   std::vector<int64_t> cell_pids(num_raw_cells, 0);
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     uint64_t cell_id = 0;
     for (auto& raw_cell : umesh.raw_cells)

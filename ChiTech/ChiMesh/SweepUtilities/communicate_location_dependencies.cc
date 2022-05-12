@@ -2,7 +2,7 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -12,7 +12,7 @@ void chi_mesh::sweep_management::
     const std::vector<int> &location_dependencies,
     std::vector<std::vector<int>> &global_dependencies)
 {
-  int P = chi_mpi.process_count;
+  int P = chi::mpi.process_count;
 
   //============================================= Communicate location dep counts
   std::vector<int> depcount_per_loc(P, 0);

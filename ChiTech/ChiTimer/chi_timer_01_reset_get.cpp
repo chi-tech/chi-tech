@@ -12,7 +12,7 @@ void ChiTimer::Reset()
 
 //################################################################### Get time
 /** Gets the current timer value in milliseconds.*/
-double ChiTimer::GetTime()
+double ChiTimer::GetTime() const
 {
   using namespace std::chrono;
 
@@ -27,7 +27,7 @@ double ChiTimer::GetTime()
 /**Obtains a string in the format of hh:mm::ss.
  *
  * */
-std::string ChiTimer::GetTimeString()
+std::string ChiTimer::GetTimeString() const
 {
   double time_sec = this->GetTime()/1000.0;
   int    hours    = std::floor(time_sec/60/60);
@@ -37,7 +37,7 @@ std::string ChiTimer::GetTimeString()
   char buff[100];
   sprintf(buff,"%02d:%02d:%02d",hours,minutes,seconds);
 
-  return std::string(buff);
+  return {buff};
 }
 
 //################################################################### Get date

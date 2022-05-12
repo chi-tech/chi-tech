@@ -2,6 +2,7 @@
 #define _chi_log_h
 
 #include "chi_logstream.h"
+#include <utility>
 #include <vector>
 #include <memory>
 
@@ -197,7 +198,7 @@ std::cout << chi_log.PrintEventHistory(tag);
 class ChiLog
 {
 private:
-  DummyStream dummy_stream;
+  chi_objects::DummyStream dummy_stream;
   int verbosity;
 
   static ChiLog instance;
@@ -211,9 +212,9 @@ private:
 
 public:
   //01
-  LogStream       Log(LOG_LVL level=LOG_0);
-  void            SetVerbosity(int int_level);
-  int             GetVerbosity() const;
+  chi_objects::LogStream Log(LOG_LVL level=LOG_0);
+  void                   SetVerbosity(int int_level);
+  int                    GetVerbosity() const;
 
 private:
   class RepeatingEvent;
@@ -262,11 +263,11 @@ struct ChiLog::EventInfo
   double      arb_value = 0.0;
            EventInfo() : arb_info(std::string()) {}
 
-  explicit EventInfo(std::string in_string) : arb_info(in_string) {}
+  explicit EventInfo(std::string in_string) : arb_info(std::move(in_string)) {}
   explicit EventInfo(double in_value) : arb_value(in_value) {}
   explicit EventInfo(std::string in_string,
                      double in_value) :
-                     arb_info(in_string),
+                     arb_info(std::move(in_string)),
                      arb_value(in_value){}
 
   virtual ~EventInfo() = default;
@@ -278,7 +279,7 @@ struct ChiLog::EventInfo
 };
 
 //###################################################################
-/** */
+/** Object used by repeating events.*/
 struct ChiLog::Event
 {
   const double     ev_time = 0.0;
@@ -290,7 +291,7 @@ struct ChiLog::Event
         std::shared_ptr<EventInfo> in_event_info) :
     ev_time(in_time),
     ev_type(in_ev_type),
-    ev_info(in_event_info)
+    ev_info(std::move(in_event_info))
   {}
 };
 

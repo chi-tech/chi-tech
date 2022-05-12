@@ -4,7 +4,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "chi_log.h"
 extern ChiLog& chi_log;

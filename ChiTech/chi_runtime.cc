@@ -19,13 +19,9 @@
 
 //=============================================== Global variables
 ChiConsole  ChiConsole::instance;
-ChiMPI      ChiMPI::instance;
 ChiLog      ChiLog::instance;
 
-
-
 ChiConsole&  chi_console = ChiConsole::GetInstance();
-ChiMPI&      chi_mpi = ChiMPI::GetInstance();
 ChiLog&      chi_log = ChiLog::GetInstance();
 
 ChiTimer    chi_program_timer;
@@ -47,12 +43,15 @@ std::vector<chi_physics::FieldFunctionPtr>          chi::fieldfunc_stack;
 std::vector<chi_math::QuadraturePtr>        chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;
 
+//================================ run_time quantities
 bool        chi::run_time::termination_posted = false;
 std::string chi::run_time::input_file_name;
 bool        chi::run_time::sim_option_interactive = true;
 bool        chi::run_time::allow_petsc_error_handler = false;
 
-
+//================================ mpi
+chi_objects::MPI_Info chi_objects::MPI_Info::instance;
+chi_objects::MPI_Info& chi::mpi = chi_objects::MPI_Info::GetInstance();
 
 
 //############################################### Argument parser
@@ -134,7 +133,7 @@ void chi::run_time::ParseArguments(int argc, char** argv)
 \param argc int    Number of arguments supplied.
 \param argv char** Array of strings representing each argument.
  */
-int chi::run_time::Initialize(int argc, char** argv)
+int chi::Initialize(int argc, char** argv)
 {
   int location_id = 0, number_processes = 1;
 
@@ -142,14 +141,17 @@ int chi::run_time::Initialize(int argc, char** argv)
   MPI_Comm_rank (MPI_COMM_WORLD, &location_id);      /* get current process id */
   MPI_Comm_size (MPI_COMM_WORLD, &number_processes); /* get number of processes */
 
-  chi_mpi.SetLocationID(location_id);
-  chi_mpi.SetProcessCount(number_processes);
+//  chi::mpi.SetLocationID(location_id);
+//  chi::mpi.SetProcessCount(number_processes);
+
+  mpi.SetLocationID(location_id);
+  mpi.SetProcessCount(number_processes);
 
   chi_console.PostMPIInfo(location_id, number_processes);
 
-  ParseArguments(argc, argv);
+  run_time::ParseArguments(argc, argv);
 
-  InitPetSc(argc,argv);
+  run_time::InitPetSc(argc,argv);
 
   return 0;
 }
@@ -177,7 +179,7 @@ int chi::run_time::InitPetSc(int argc, char** argv)
 //############################################### Finalize ChiTech
 /**Finalizes ChiTech.
  * */
-void chi::run_time::Finalize()
+void chi::Finalize()
 {
   meshhandler_stack.clear();
 
@@ -197,12 +199,12 @@ void chi::run_time::Finalize()
 
 //############################################### Interactive interface
 /**Runs the interactive chitech engine*/
-int chi::run_time::RunInteractive(int argc, char** argv)
+int chi::RunInteractive(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
     << ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in interactive-mode with "
-    << chi_mpi.process_count << " processes.";
+    << chi::mpi.process_count << " processes.";
 
   chi_log.Log(LOG_0)
     << "ChiTech number of arguments supplied: "
@@ -229,12 +231,12 @@ int chi::run_time::RunInteractive(int argc, char** argv)
 
 //############################################### Batch interface
 /**Runs ChiTech in pure batch mode. Start then finish.*/
-int chi::run_time::RunBatch(int argc, char** argv)
+int chi::RunBatch(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
     << ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in batch-mode with "
-    << chi_mpi.process_count << " processes.";
+    << chi::mpi.process_count << " processes.";
 
   chi_log.Log(LOG_0)
     << "ChiTech number of arguments supplied: "
@@ -252,7 +254,7 @@ int chi::run_time::RunBatch(int argc, char** argv)
 
 #ifndef NDEBUG
   chi_log.Log(LOG_0) << "Waiting...";
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
     for (int k=0; k<100; ++k)
     {
       usleep(1000000);

@@ -10,7 +10,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
@@ -37,11 +37,11 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
     int desired_process_count = Px*Py*Pz;
 
-    if (desired_process_count != chi_mpi.process_count)
+    if (desired_process_count != chi::mpi.process_count)
     {
       chi_log.Log(LOG_ALLERROR)
         << "ERROR: Number of processors available ("
-        << chi_mpi.process_count <<
+        << chi::mpi.process_count <<
         ") does not match amount of processors "
         "required by partitioning parameters ("
         << desired_process_count << ").";
@@ -95,7 +95,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
   //======================================== Concluding messages
   chi_log.Log(LOG_ALLVERBOSE_1)
-    << "### LOCATION[" << chi_mpi.location_id
+    << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
     << grid->local_cell_glob_indices.size();
 

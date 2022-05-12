@@ -3,7 +3,7 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 
 #include <fstream>
@@ -14,7 +14,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
   std::ofstream ofile;
 
   std::string fileName = base_name;
-  fileName = fileName + std::to_string(chi_mpi.location_id);
+  fileName = fileName + std::to_string(chi::mpi.location_id);
   fileName = fileName + std::string(".py");
   ofile.open(fileName);
 
@@ -40,12 +40,12 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
      "    self.c = []\n\n";
 
   std::string offset;
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     std::string submod_name = base_name;
-    submod_name = submod_name + std::to_string(chi_mpi.location_id+1);
+    submod_name = submod_name + std::to_string(chi::mpi.location_id+1);
 
-    if (chi_mpi.process_count>1)
+    if (chi::mpi.process_count>1)
     {
       ofile << "import " << submod_name << "\n\n";
     }
@@ -58,13 +58,13 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
 
     offset = std::string("    ");
   }
-  else if (chi_mpi.process_count>1)
+  else if (chi::mpi.process_count>1)
   {
 
-    if (chi_mpi.location_id != (chi_mpi.process_count-1))
+    if (chi::mpi.location_id != (chi::mpi.process_count-1))
     {
       std::string submod_name = base_name;
-      submod_name = submod_name + std::to_string(chi_mpi.location_id+1);
+      submod_name = submod_name + std::to_string(chi::mpi.location_id+1);
 
       ofile << "import " << submod_name << "\n\n";
     }
@@ -118,22 +118,22 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
     << offset << "data_object.append(new_cell_data)\n";
   }
 
-  if (chi_mpi.location_id != (chi_mpi.process_count-1))
+  if (chi::mpi.location_id != (chi::mpi.process_count-1))
   {
     std::string submod_name = base_name;
-    submod_name = submod_name + std::to_string(chi_mpi.location_id+1);
+    submod_name = submod_name + std::to_string(chi::mpi.location_id+1);
 
     ofile
     << offset << "data_object = "
     << submod_name << ".AddData(data_object)\n\n";
   }
-  if (chi_mpi.location_id>0)
+  if (chi::mpi.location_id>0)
   {
     ofile
     << offset << "return data_object\n";
   }
 
-  if (chi_mpi.location_id==0)
+  if (chi::mpi.location_id==0)
   {
     ofile
     << "data = BaseDataClass()\n"

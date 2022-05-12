@@ -6,7 +6,7 @@
 #include "chi_mpi.h"
 #include "chi_log.h"
 
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -70,7 +70,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           else
           {
             auto& adj_cell = cells[cell.faces[f].neighbor_id];
-            if (adj_cell.partition_id != chi_mpi.location_id)
+            if (adj_cell.partition_id != chi::mpi.location_id)
             {
               num_faces++;
             }
@@ -139,7 +139,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           else
           {
             auto& adj_cell = cells[cell.faces[s].neighbor_id];
-            if (adj_cell.partition_id != chi_mpi.location_id)
+            if (adj_cell.partition_id != chi::mpi.location_id)
             {
               export_face = true;
             }

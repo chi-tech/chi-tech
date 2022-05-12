@@ -10,7 +10,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Gets material properties various sources.*/
@@ -23,7 +23,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
                                                   int moment)
 {
   uint64_t cell_glob_index = cell.global_id;
-  bool cell_is_local = (cell.partition_id == chi_mpi.location_id);
+  bool cell_is_local = (cell.partition_id == chi::mpi.location_id);
   uint64_t cell_local_id = cell.local_id;
   int mat_id = cell.material_id;
 

@@ -10,7 +10,7 @@
 #include "ChiConsole/chi_console.h"
 #include "ChiTimer/chi_timer.h"
 
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 extern ChiConsole&  chi_console;
 extern ChiTimer   chi_program_timer;
@@ -107,7 +107,7 @@ chi_mesh::sweep_management::
     << " Communicating sweep dependencies.";
 
   auto& global_dependencies = sweep_order->global_dependencies;
-  global_dependencies.resize(chi_mpi.process_count);
+  global_dependencies.resize(chi::mpi.process_count);
 
   CommunicateLocationDependencies(sweep_order->location_dependencies,
                                   global_dependencies);

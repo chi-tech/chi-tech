@@ -6,7 +6,7 @@
 #include <chi_mpi.h>
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include <fstream>
 
@@ -188,7 +188,7 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
 
   ofile
     << "Groupset Sweep information "
-    << "location " << chi_mpi.location_id << "\n";
+    << "location " << chi::mpi.location_id << "\n";
 
 
   //======================================== Print all anglesets

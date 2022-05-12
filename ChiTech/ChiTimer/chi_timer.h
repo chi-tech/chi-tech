@@ -4,7 +4,8 @@
 #include <string>
 #include <chrono>
 
-//############################################################################# CLASS DEF
+
+//################################################################### CLASS DEF
 /** Timer object.*/
 class ChiTimer
 {
@@ -16,8 +17,8 @@ public:
 				      ChiTimer() noexcept;
 	//01
 	void   		  Reset();
-	double 		  GetTime();
-	std::string GetTimeString();
+	double 		  GetTime() const;
+	std::string GetTimeString() const;
 	static std::string GetLocalDateTimeString();
 };
 

@@ -9,7 +9,6 @@
 #include <ChiConsole/chi_console.h>
 
 extern ChiLog&     chi_log;
-extern ChiMPI&      chi_mpi;
 extern ChiConsole&  chi_console;
 
 //###################################################################

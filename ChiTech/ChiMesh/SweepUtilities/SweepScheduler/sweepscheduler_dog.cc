@@ -3,7 +3,7 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 
 #include <sstream>
@@ -35,7 +35,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       {
         for (size_t index=0; index<leveled_graph[level].item_id.size(); index++)
         {
-          if (leveled_graph[level].item_id[index] == chi_mpi.location_id)
+          if (leveled_graph[level].item_id[index] == chi::mpi.location_id)
           {
             loc_depth = leveled_graph.size()-level;
             break;
@@ -162,7 +162,7 @@ void chi_mesh::sweep_management::SweepScheduler::
         std::stringstream message_i;
         message_i
           << "Angleset " << angset_number
-          << " executed on location " << chi_mpi.location_id;
+          << " executed on location " << chi::mpi.location_id;
 
         auto ev_info_i = std::make_shared<ChiLog::EventInfo>(message_i.str());
 
@@ -178,7 +178,7 @@ void chi_mesh::sweep_management::SweepScheduler::
         std::stringstream message_f;
         message_f
           << "Angleset " << angset_number
-          << " finished on location " << chi_mpi.location_id;
+          << " finished on location " << chi::mpi.location_id;
 
         auto ev_info_f = std::make_shared<ChiLog::EventInfo>(message_f.str());
 

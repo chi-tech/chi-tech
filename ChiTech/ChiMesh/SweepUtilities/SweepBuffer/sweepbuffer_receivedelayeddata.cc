@@ -7,7 +7,6 @@
 #include <chi_mpi.h>
 
 extern ChiLog&     chi_log;
-extern ChiMPI&      chi_mpi;
 
 //###################################################################
 /** Receives delayed data from successor locations. */
@@ -35,9 +34,9 @@ ReceiveDelayedData(int angle_set_num)
         int msg_avail = 1;
 
         MPI_Status status0;
-        MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
+        MPI_Iprobe(comm_set->MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi_mpi.location_id],
+                   comm_set->communicators[chi::mpi.location_id],
                    &msg_avail,&status0);
 
 //        if (msg_avail != 1)
@@ -60,9 +59,9 @@ ReceiveDelayedData(int angle_set_num)
           MPI_Recv(&angleset->delayed_prelocI_outgoing_psi[prelocI].data()[block_addr],
                    message_size,
                    MPI_DOUBLE,
-                   comm_set->MapIonJ(locJ,chi_mpi.location_id),
+                   comm_set->MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi_mpi.location_id],
+                   comm_set->communicators[chi::mpi.location_id],
                    &status);
 
         int num = MPI_Get_count(&status,MPI_DOUBLE,&num);

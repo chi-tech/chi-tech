@@ -9,7 +9,7 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 extern ChiTimer chi_program_timer;
 
@@ -45,7 +45,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
   bool is_1D_geometry = options.geometry_type == GeometryType::ONED_SLAB;
 
   //============================================= Check possibility of cycles
-  if (no_cycles_parmetis_partitioning and not is_1D_geometry and chi_mpi.process_count>1)
+  if (no_cycles_parmetis_partitioning and not is_1D_geometry and chi::mpi.process_count>1)
   {
     chi_log.Log(LOG_ALLERROR)
       << "When using PARMETIS type partitioning then groupset iterative method"

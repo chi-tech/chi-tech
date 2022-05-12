@@ -5,7 +5,7 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI& chi_mpi;
+
 extern ChiLog& chi_log;
 
 //###################################################################

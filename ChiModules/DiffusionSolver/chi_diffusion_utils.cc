@@ -5,8 +5,8 @@
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
-#include "ChiMPI/chi_mpi.h"
-extern ChiMPI& chi_mpi;
+#include "chi_mpi.h"
+
 
 //###################################################################
 /**Customized monitor for PETSc Krylov sub-space solvers.*/
@@ -21,7 +21,7 @@ PetscErrorCode chi_diffusion::KSPMonitorAChiTech(
   if (rhs_norm < 1.0e-25)
     rhs_norm = 1.0;
 
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     const auto ksp_name = "Diffusion";
 

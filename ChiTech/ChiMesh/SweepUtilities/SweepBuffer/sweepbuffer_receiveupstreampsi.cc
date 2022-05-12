@@ -8,7 +8,6 @@
 #include <chi_mpi.h>
 
 extern ChiLog     chi_log;
-extern ChiMPI&      chi_mpi;
 
 //###################################################################
 /**Check if all upstream dependencies have been met and receives
@@ -51,9 +50,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
       {
         int msg_avail = 1;
 
-        MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
+        MPI_Iprobe(comm_set->MapIonJ(locJ,chi::mpi.location_id),
                    max_num_mess*angle_set_num + m, //tag
-                   comm_set->communicators[chi_mpi.location_id],
+                   comm_set->communicators[chi::mpi.location_id],
                    &msg_avail,MPI_STATUS_IGNORE);
 
         if (msg_avail != 1)
@@ -72,9 +71,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
         int error_code = MPI_Recv(&angleset->prelocI_outgoing_psi[prelocI].data()[block_addr],
                                   message_size,
                                   MPI_DOUBLE,
-                                  comm_set->MapIonJ(locJ,chi_mpi.location_id),
+                                  comm_set->MapIonJ(locJ,chi::mpi.location_id),
                                   max_num_mess*angle_set_num + m, //tag
-                                  comm_set->communicators[chi_mpi.location_id],
+                                  comm_set->communicators[chi::mpi.location_id],
                                   MPI_STATUS_IGNORE);
 
         if (error_code != MPI_SUCCESS)
@@ -149,9 +148,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
 //      {
 //        int msg_avail = 1;
 //
-//        MPI_Iprobe(comm_set->MapIonJ(locJ,chi_mpi.location_id),
+//        MPI_Iprobe(comm_set->MapIonJ(locJ,chi::mpi.location_id),
 //                   max_num_mess*angle_set_num + m, //tag
-//                   comm_set->communicators[chi_mpi.location_id],
+//                   comm_set->communicators[chi::mpi.location_id],
 //                   &msg_avail,MPI_STATUS_IGNORE);
 //
 //        if (msg_avail != 1)
@@ -185,9 +184,9 @@ chi_mesh::sweep_management::SweepBuffer::ReceiveUpstreamPsi(int angle_set_num)
 //        int error_code = MPI_Recv(&angleset->prelocI_outgoing_psi[prelocI].data()[block_addr],
 //                                  message_size,
 //                                  MPI_DOUBLE,
-//                                  comm_set->MapIonJ(locJ,chi_mpi.location_id),
+//                                  comm_set->MapIonJ(locJ,chi::mpi.location_id),
 //                                  max_num_mess*angle_set_num + m, //tag
-//                                  comm_set->communicators[chi_mpi.location_id],
+//                                  comm_set->communicators[chi::mpi.location_id],
 //                                  MPI_STATUS_IGNORE);
 //
 //        if (error_code != MPI_SUCCESS)

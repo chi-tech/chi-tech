@@ -2,7 +2,10 @@
 
 #include "chi_log.h"
 
-extern ChiMPI& chi_mpi;
+#include "chi_runtime.h"
+#include "chi_mpi.h"
+
+
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -20,7 +23,7 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 
   //================================================== Loop over local cells
   //Populate local_graph_edges
-  local_graph_edges.insert(chi_mpi.location_id); //add current location
+  local_graph_edges.insert(chi::mpi.location_id); //add current location
   for (auto& cell : local_cells)
   {
     for (auto& face : cell.faces)
@@ -45,18 +48,18 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
   chi_log.Log(LOG_0VERBOSE_1)
     << "Communicating local connections.";
 
-  std::vector<std::vector<int>> global_graph(chi_mpi.process_count,
+  std::vector<std::vector<int>> global_graph(chi::mpi.process_count,
                                              std::vector<int>());
-  for (int locI=0;locI<chi_mpi.process_count; locI++)
+  for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
     int locI_num_connections = local_connections.size();
 
-    //If chi_mpi.location_id == locI then this call will
+    //If chi::mpi.location_id == locI then this call will
     //act like a send instead of receive. Otherwise
     //It receives the count.
     MPI_Bcast(&locI_num_connections,1,MPI_INT,locI,MPI_COMM_WORLD);
 
-    if (chi_mpi.location_id != locI)
+    if (chi::mpi.location_id != locI)
     {global_graph[locI].resize(locI_num_connections,-1);}
     else
     {
@@ -69,9 +72,9 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 
 
   //============================================= Broadcast local connections
-  for (int locI=0;locI<chi_mpi.process_count; locI++)
+  for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
-    //If chi_mpi.location_id == locI then this call will
+    //If chi::mpi.location_id == locI then this call will
     //act like a send instead of receive. Otherwise
     //It receives the count.
     MPI_Bcast(global_graph[locI].data(),
@@ -85,9 +88,9 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 
   //============================================= Build groups
   MPI_Comm_group(MPI_COMM_WORLD,&commicator_set.world_group);
-  commicator_set.location_groups.resize(chi_mpi.process_count,MPI_Group());
+  commicator_set.location_groups.resize(chi::mpi.process_count,MPI_Group());
 
-  for (int locI=0;locI<chi_mpi.process_count; locI++)
+  for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
     MPI_Group_incl(commicator_set.world_group,
                    global_graph[locI].size(),
@@ -98,9 +101,9 @@ ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
   //============================================= Build communicators
   chi_log.Log(LOG_0VERBOSE_1)
     << "Building communicators.";
-  commicator_set.communicators.resize(chi_mpi.process_count,MPI_Comm());
+  commicator_set.communicators.resize(chi::mpi.process_count,MPI_Comm());
 
-  for (int locI=0;locI<chi_mpi.process_count; locI++)
+  for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
     int err = MPI_Comm_create_group(MPI_COMM_WORLD,
                                     commicator_set.location_groups[locI],

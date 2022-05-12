@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
@@ -27,7 +27,7 @@ int64_t SpatialDiscretization_PWLC::
   int address=-1;
   if (storage == chi_math::UnknownStorageType::BLOCK)
   {
-    for (int locJ=0; locJ<chi_mpi.process_count; ++locJ)
+    for (int locJ=0; locJ<chi::mpi.process_count; ++locJ)
     {
       int localized_base_address = mapping - locJ_block_address[locJ];
       if (localized_base_address < 0) continue;

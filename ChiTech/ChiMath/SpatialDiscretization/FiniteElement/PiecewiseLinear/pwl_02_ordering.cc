@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include <chi_mpi.h>
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
@@ -39,7 +39,7 @@ void SpatialDiscretization_PWLD::OrderNodes()
   }
 
   //================================================== Allgather node_counts
-  locJ_block_size.assign(chi_mpi.process_count, 0);
+  locJ_block_size.assign(chi::mpi.process_count, 0);
   MPI_Allgather(&local_node_count,           //sendbuf
                 1, MPI_UNSIGNED_LONG_LONG,   //sendcount, sendtype
                 locJ_block_size.data(),      //recvbuf
@@ -48,9 +48,9 @@ void SpatialDiscretization_PWLD::OrderNodes()
 
   //================================================== Assign local_block_address
   uint64_t running_block_address = 0;
-  for (int locI=0; locI<chi_mpi.process_count; ++locI)
+  for (int locI=0; locI<chi::mpi.process_count; ++locI)
   {
-    if (locI == chi_mpi.location_id)
+    if (locI == chi::mpi.location_id)
       local_block_address = static_cast<int64_t>(running_block_address);
 
     running_block_address += locJ_block_size[locI];

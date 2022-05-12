@@ -7,8 +7,8 @@
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
-#include "ChiMPI/chi_mpi.h"
-extern ChiMPI& chi_mpi;
+#include "chi_mpi.h"
+
 
 //###################################################################
 /**Obtains the xy partition IDs of a cell.
@@ -19,7 +19,7 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
 {
   std::pair<int,int> ij_id(0,0);
 
-  if (chi_mpi.process_count == 1){return ij_id;}
+  if (chi::mpi.process_count == 1){return ij_id;}
 
   //================================================== Get the current handler
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
@@ -106,7 +106,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
   std::tuple<int,int,int> ijk_id(0,0,0);
   bool found_partition = false;
 
-  if (chi_mpi.process_count == 1){return ijk_id;}
+  if (chi::mpi.process_count == 1){return ijk_id;}
 
   //================================================== Get ij indices
   std::pair<int,int> ij_id = GetCellXYPartitionID(cell);

@@ -7,7 +7,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Maps a finite volume degree of freedom. The default behavior is to
@@ -19,7 +19,7 @@ int64_t SpatialDiscretization_FV::
 
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     address = fv_local_block_address +
               cell.local_id;
@@ -56,7 +56,7 @@ int64_t SpatialDiscretization_FV::
 
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = fv_local_block_address*num_unknowns +
@@ -103,7 +103,7 @@ int64_t SpatialDiscretization_FV::
 //  }
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
     address = cell.local_id;
   else
   {
@@ -148,7 +148,7 @@ int64_t SpatialDiscretization_FV::
 
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = num_local_cells*block_id +

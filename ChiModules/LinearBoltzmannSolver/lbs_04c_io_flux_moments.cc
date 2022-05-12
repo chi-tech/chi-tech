@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <fstream>
 #include <cstring>
@@ -38,7 +38,7 @@ void lbs::SteadySolver::
                    const std::vector<double>& flux_moments)
 {
   std::string file_name =
-    file_base + std::to_string(chi_mpi.location_id) + ".data";
+    file_base + std::to_string(chi::mpi.location_id) + ".data";
 
   //============================================= Open file
   chi_log.Log() << "Writing flux-moments to files with base-name " << file_base
@@ -155,7 +155,7 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
                                         bool single_file/*=false*/)
 {
   std::string file_name =
-    file_base + std::to_string(chi_mpi.location_id) + ".data";
+    file_base + std::to_string(chi::mpi.location_id) + ".data";
   if (single_file)
     file_name = file_base + ".data";
 

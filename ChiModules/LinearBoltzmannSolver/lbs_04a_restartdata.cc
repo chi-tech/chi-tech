@@ -5,7 +5,7 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include <sys/stat.h>
 #include <fstream>
@@ -20,7 +20,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
   Stat st;
 
   //======================================== Make sure folder exists
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     if (stat(folder_name.c_str(),&st) != 0) //if not exist, make it
       if ( (mkdir(folder_name.c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0) and
@@ -41,7 +41,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  sprintf(location_cstr,"%d.r",chi_mpi.location_id);
+  sprintf(location_cstr,"%d.r",chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);
@@ -104,7 +104,7 @@ void lbs::SteadySolver::ReadRestartData(std::string folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  sprintf(location_cstr,"%d.r",chi_mpi.location_id);
+  sprintf(location_cstr,"%d.r",chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);

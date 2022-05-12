@@ -1,9 +1,8 @@
-#include "../../ChiLua/chi_lua.h"
-#include <iostream>
+#include "ChiLua/chi_lua.h"
 
-#include "../chi_mpi.h"
+#include "chi_mpi.h"
 
-extern ChiMPI& chi_mpi;
+
 
 //#############################################################################
 /** Blocks until all processes in the communicator have reached this routine.

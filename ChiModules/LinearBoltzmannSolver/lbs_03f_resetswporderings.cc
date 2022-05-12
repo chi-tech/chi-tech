@@ -7,7 +7,7 @@ extern ChiConsole&  chi_console;
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <iomanip>
 

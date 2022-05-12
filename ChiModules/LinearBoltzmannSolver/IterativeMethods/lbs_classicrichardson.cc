@@ -6,7 +6,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
@@ -142,7 +142,7 @@ ClassicRichardson(LBSGroupset& groupset,
         << sweep_time;
       chi_log.Log(LOG_0)
         << "        Sweep Time/Unknown (ns):       "
-        << sweep_time*1.0e9*chi_mpi.process_count/
+        << sweep_time*1.0e9*chi::mpi.process_count/
             static_cast<double>(num_unknowns);
       chi_log.Log(LOG_0)
         << "        Number of unknowns per sweep:  " << num_unknowns;
@@ -151,7 +151,7 @@ ClassicRichardson(LBSGroupset& groupset,
 
       std::string sweep_log_file_name =
           std::string("GS_") + std::to_string(groupset.id) +
-          std::string("_SweepLog_") + std::to_string(chi_mpi.location_id) +
+          std::string("_SweepLog_") + std::to_string(chi::mpi.location_id) +
           std::string(".log");
       groupset.PrintSweepInfoFile(sweep_scheduler.sweep_event_tag, sweep_log_file_name);
     }

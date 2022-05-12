@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiTimer/chi_timer.h"
 extern ChiTimer chi_program_timer;
@@ -102,7 +102,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
   std::vector<int> global_ghost_nodes;
 
   // Location 0 sends to location 1
-  if (chi_mpi.location_id==0)
+  if (chi::mpi.location_id==0)
   {
     MPI_Send(nonexclus_nodes.data(),
              nonexclus_nodes.size(),
@@ -114,12 +114,12 @@ void SpatialDiscretization_PWLC::OrderNodes()
     std::vector<int> upstream_nonex;
 
     MPI_Status status;
-    MPI_Probe(chi_mpi.location_id-1,123,MPI_COMM_WORLD,&status);
+    MPI_Probe(chi::mpi.location_id-1,123,MPI_COMM_WORLD,&status);
     int num_to_recv=0;
     MPI_Get_count(&status,MPI_INT,&num_to_recv);
     upstream_nonex.resize(num_to_recv,-1);
     MPI_Recv(upstream_nonex.data(),num_to_recv,
-             MPI_INT,chi_mpi.location_id-1,123,
+             MPI_INT,chi::mpi.location_id-1,123,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
     // Run through location n non-exclusive nodes
@@ -137,9 +137,9 @@ void SpatialDiscretization_PWLC::OrderNodes()
 
     // If this location is not the last location
     // send the updated upstream_nonex to location n+1
-    if (chi_mpi.location_id<(chi_mpi.process_count-1))
+    if (chi::mpi.location_id<(chi::mpi.process_count-1))
       MPI_Send(upstream_nonex.data(),upstream_nonex.size(),
-               MPI_INT,chi_mpi.location_id+1,123,MPI_COMM_WORLD);
+               MPI_INT,chi::mpi.location_id+1,123,MPI_COMM_WORLD);
       // On the last location send the completed
       // upstream_nonex back to all other locations
     else
@@ -151,7 +151,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
                 upstream_nonex.end(),
                 std::back_inserter(global_ghost_nodes));
 
-      for (int loc=0; loc<(chi_mpi.process_count-1); loc++)
+      for (int loc=0; loc<(chi::mpi.process_count-1); loc++)
         MPI_Send(global_ghost_nodes.data(),global_ghost_nodes.size(),
                  MPI_INT,loc,124,MPI_COMM_WORLD);
 
@@ -159,15 +159,15 @@ void SpatialDiscretization_PWLC::OrderNodes()
   }
 
   //================================================== Last location broadcasts
-  if (chi_mpi.location_id<(chi_mpi.process_count-1))
+  if (chi::mpi.location_id<(chi::mpi.process_count-1))
   {
     MPI_Status status;
-    MPI_Probe(chi_mpi.process_count-1,124,MPI_COMM_WORLD,&status);
+    MPI_Probe(chi::mpi.process_count-1,124,MPI_COMM_WORLD,&status);
     int num_to_recv=0;
     MPI_Get_count(&status,MPI_INT,&num_to_recv);
     global_ghost_nodes.resize(num_to_recv,-1);
     MPI_Recv(global_ghost_nodes.data(),num_to_recv,
-             MPI_INT,chi_mpi.process_count-1,124,
+             MPI_INT,chi::mpi.process_count-1,124,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
   }
 
@@ -194,25 +194,25 @@ void SpatialDiscretization_PWLC::OrderNodes()
   // With N amount of "cells" there would be N-1 interfaces and therefore
   // 2(N-1) halfs of the ghost nodes.
   int g_piece = 0;
-  if (chi_mpi.process_count>1)
+  if (chi::mpi.process_count>1)
     g_piece = (int)floor(global_ghost_nodes.size()/
-                         (2*(chi_mpi.process_count-1)));
+                         (2*(chi::mpi.process_count-1)));
 
   int g_from = 0;
   int g_to = 0;
-  if (chi_mpi.location_id==0)
+  if (chi::mpi.location_id==0)
   {
     g_from = 0;
     g_to = g_piece-1;
   }
-  else if (chi_mpi.location_id < (chi_mpi.process_count-1))
+  else if (chi::mpi.location_id < (chi::mpi.process_count-1))
   {
-    g_from = g_piece-1 + 2*g_piece*(chi_mpi.location_id-1)+1;
+    g_from = g_piece-1 + 2*g_piece*(chi::mpi.location_id-1)+1;
     g_to   = g_from + 2*g_piece-1;
   }
   else
   {
-    g_from = g_piece-1 + 2*g_piece*(chi_mpi.location_id-1)+1;
+    g_from = g_piece-1 + 2*g_piece*(chi::mpi.location_id-1)+1;
     g_to   = (int)global_ghost_nodes.size()-1;
   }
   int num_g_loc = (g_to - g_from +1);
@@ -234,26 +234,26 @@ void SpatialDiscretization_PWLC::OrderNodes()
   // n took ownership of as determined by the previous step.
   int local_from = 0;
   int local_to = 0;
-  if (chi_mpi.location_id==0)
+  if (chi::mpi.location_id==0)
   {
     local_from = 0;
     local_to = (int)exclusive_nodes.size() - 1 + num_g_loc;
     MPI_Send(&local_to,1,
-             MPI_INT,chi_mpi.location_id+1,125,MPI_COMM_WORLD);
+             MPI_INT,chi::mpi.location_id+1,125,MPI_COMM_WORLD);
   }
   else
   {
     int upstream_loc_end = 0;
     MPI_Recv(&upstream_loc_end,1,
-             MPI_INT,chi_mpi.location_id-1,125,
+             MPI_INT,chi::mpi.location_id-1,125,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
     local_from = upstream_loc_end + 1;
     local_to = local_from + (int)exclusive_nodes.size() - 1 + num_g_loc;
 
-    if (chi_mpi.location_id<(chi_mpi.process_count-1))
+    if (chi::mpi.location_id<(chi::mpi.process_count-1))
       MPI_Send(&local_to,1,
-               MPI_INT,chi_mpi.location_id+1,125,MPI_COMM_WORLD);
+               MPI_INT,chi::mpi.location_id+1,125,MPI_COMM_WORLD);
 
   }
   int tot_local_nodes = local_to - local_from + 1;
@@ -278,7 +278,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
   // global_ghost_nodes.
   std::vector<int> ghost_mapping;
   ghost_mapping.resize(global_ghost_nodes.size(),-1);
-  if (chi_mpi.location_id==0)
+  if (chi::mpi.location_id==0)
   {
     for (int g=g_from; g<= g_to; g++)
     {
@@ -286,18 +286,18 @@ void SpatialDiscretization_PWLC::OrderNodes()
       ghost_mapping[g] = ghost_index;
     }
     MPI_Send(ghost_mapping.data(),ghost_mapping.size(),
-             MPI_INT,chi_mpi.location_id+1,126,MPI_COMM_WORLD);
+             MPI_INT,chi::mpi.location_id+1,126,MPI_COMM_WORLD);
   }
   else
   {
     std::vector<int> upstream_ghost_mapping;
     MPI_Status status;
-    MPI_Probe(chi_mpi.location_id-1,126,MPI_COMM_WORLD,&status);
+    MPI_Probe(chi::mpi.location_id-1,126,MPI_COMM_WORLD,&status);
     int num_to_recv=0;
     MPI_Get_count(&status,MPI_INT,&num_to_recv);
     upstream_ghost_mapping.resize(num_to_recv,-1);
     MPI_Recv(upstream_ghost_mapping.data(),num_to_recv,
-             MPI_INT,chi_mpi.location_id-1,126,
+             MPI_INT,chi::mpi.location_id-1,126,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
     std::copy(upstream_ghost_mapping.begin(),
@@ -309,26 +309,26 @@ void SpatialDiscretization_PWLC::OrderNodes()
       ghost_mapping[g] = ghost_index;
     }
 
-    if (chi_mpi.location_id<(chi_mpi.process_count-1))
+    if (chi::mpi.location_id<(chi::mpi.process_count-1))
       MPI_Send(ghost_mapping.data(),ghost_mapping.size(),
-               MPI_INT,chi_mpi.location_id+1,126,MPI_COMM_WORLD);
+               MPI_INT,chi::mpi.location_id+1,126,MPI_COMM_WORLD);
     else
-      for (int loc=0; loc<(chi_mpi.process_count-1); loc++)
+      for (int loc=0; loc<(chi::mpi.process_count-1); loc++)
         MPI_Send(ghost_mapping.data(),ghost_mapping.size(),
                  MPI_INT,loc,127,MPI_COMM_WORLD);
   }
 
   //================================================== Collect ghost mapping
   //                                                   from last location
-  if (chi_mpi.location_id<(chi_mpi.process_count-1))
+  if (chi::mpi.location_id<(chi::mpi.process_count-1))
   {
     MPI_Status status;
-    MPI_Probe(chi_mpi.process_count-1,127,MPI_COMM_WORLD,&status);
+    MPI_Probe(chi::mpi.process_count-1,127,MPI_COMM_WORLD,&status);
     int num_to_recv=0;
     MPI_Get_count(&status,MPI_INT,&num_to_recv);
     ghost_mapping.resize(num_to_recv,-1);
     MPI_Recv(ghost_mapping.data(),num_to_recv,
-             MPI_INT,chi_mpi.process_count-1,127,
+             MPI_INT,chi::mpi.process_count-1,127,
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
   }
 
@@ -372,7 +372,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
 
   //======================================== Collect block addresses
   locJ_block_address.clear();
-  locJ_block_address.resize(chi_mpi.process_count, 0);
+  locJ_block_address.resize(chi::mpi.process_count, 0);
   MPI_Allgather(&local_block_address,    //send buf
                 1,                            //send count
                 MPI_INT,                      //send type
@@ -383,7 +383,7 @@ void SpatialDiscretization_PWLC::OrderNodes()
 
   //======================================== Collect block sizes
   locJ_block_size.clear();
-  locJ_block_size.resize(chi_mpi.process_count, 0);
+  locJ_block_size.resize(chi::mpi.process_count, 0);
   MPI_Allgather(&local_base_block_size,       //send buf
                 1,                            //send count
                 MPI_INT,                      //send type

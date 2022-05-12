@@ -9,7 +9,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/

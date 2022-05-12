@@ -4,7 +4,7 @@
 #include <chi_mpi.h>
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Builds the sparsity pattern for a Discontinuous Finite Element Method.*/

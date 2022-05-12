@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <algorithm>
 
@@ -16,12 +16,12 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                      chi_math::UnknownManager& unknown_manager)
 {
   //======================================== Determine global domain ownership
-  std::vector<int> locI_block_addr(chi_mpi.process_count, 0);
+  std::vector<int> locI_block_addr(chi::mpi.process_count, 0);
   MPI_Allgather(&local_block_address, 1, MPI_INT,
                 locI_block_addr.data()   , 1, MPI_INT,
                 MPI_COMM_WORLD);
 
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
     for (auto locI : locI_block_addr)
       chi_log.Log(LOG_ALLVERBOSE_1) << "Block address = " << locI;
   MPI_Barrier(MPI_COMM_WORLD);
@@ -187,7 +187,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   //=================================== Step 1
   // We now serialize the non-local data
-  std::vector<std::vector<int>> locI_serialized(chi_mpi.process_count);
+  std::vector<std::vector<int>> locI_serialized(chi::mpi.process_count);
 
   for (const auto& ir_linkage : ir_links)
   {
@@ -203,14 +203,14 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   // Establish the size of the serialized data
   // to send to each location and communicate
   // to get receive count.
-  std::vector<int> sendcount(chi_mpi.process_count, 0);
-  std::vector<int> recvcount(chi_mpi.process_count, 0);
+  std::vector<int> sendcount(chi::mpi.process_count, 0);
+  std::vector<int> recvcount(chi::mpi.process_count, 0);
   int locI=0;
   for (const auto& locI_data : locI_serialized)
   {
     sendcount[locI] = locI_data.size();
 
-    if (chi_mpi.location_id == 0)
+    if (chi::mpi.location_id == 0)
       chi_log.Log(LOG_ALLVERBOSE_1)
         << "To send to " << locI
         << " = " << sendcount[locI];
@@ -225,8 +225,8 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   //=================================== Step 3
   // We now establish send displacements and
   // receive displacements.
-  std::vector<int> send_displs(chi_mpi.process_count,0);
-  std::vector<int> recv_displs(chi_mpi.process_count,0);
+  std::vector<int> send_displs(chi::mpi.process_count,0);
+  std::vector<int> recv_displs(chi::mpi.process_count,0);
 
   int send_displ_c = 0;
   int recv_displ_c = 0;

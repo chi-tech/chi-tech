@@ -5,7 +5,7 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 #include <fstream>
 #include <cstring>
@@ -17,7 +17,7 @@ void lbs::SteadySolver::
                              const std::string& file_base)
 {
   std::string file_name =
-    file_base + std::to_string(chi_mpi.location_id) + ".data";
+    file_base + std::to_string(chi::mpi.location_id) + ".data";
 
   //============================================= Open file
   std::ofstream file(file_name,
@@ -117,7 +117,7 @@ void lbs::SteadySolver::
                             const std::string& file_base)
 {
   std::string file_name =
-    file_base + std::to_string(chi_mpi.location_id) + ".data";
+    file_base + std::to_string(chi::mpi.location_id) + ".data";
 
   //============================================= Open file
   std::ifstream file(file_name,

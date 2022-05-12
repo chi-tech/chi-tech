@@ -9,7 +9,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
@@ -119,7 +119,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
   std::string base_filename     = std::string(baseName);
   std::string location_filename = base_filename +
                                   std::string("_") +
-                                  std::to_string(chi_mpi.location_id) +
+                                  std::to_string(chi::mpi.location_id) +
                                   std::string(".vtu");
 
   //============================================= Serial Output each piece
@@ -134,7 +134,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
   grid_writer->Write();
 
   //============================================= Parallel summary file
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     std::string summary_file_name = base_filename + std::string(".pvtu");
     std::ofstream ofile;
@@ -164,7 +164,7 @@ void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
     // Cut off path to base_filename
     std::string filename_short = base_filename.substr(base_filename.find_last_of("/\\")+1);
 
-    for (int p=0; p<chi_mpi.process_count; ++p)
+    for (int p=0; p<chi::mpi.process_count; ++p)
     {
       if (is_global_mesh and p!=0) continue;
 

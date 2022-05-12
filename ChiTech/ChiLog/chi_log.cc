@@ -2,7 +2,6 @@
 #include "chi_mpi.h"
 #include "ChiTimer/chi_timer.h"
 
-extern ChiMPI&     chi_mpi;
 extern ChiTimer  chi_program_timer;
 
 #include <sstream>
@@ -25,82 +24,82 @@ ChiLog::ChiLog() noexcept
 
 //###################################################################
 /** Makes a log entry.*/
-LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
+chi_objects::LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
 {
   switch (level)
   {
     case LOG_0:
     {
-      if (chi_mpi.location_id == 0)
+      if (chi::mpi.location_id == 0)
       {
-        std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-        return LogStream(&std::cout, header);
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        return {&std::cout, header};
       }
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header, true);
+        return {&dummy_stream, header, true};
       }
     }
     case LOG_0WARNING:
     {
-      if (chi_mpi.location_id == 0)
+      if (chi::mpi.location_id == 0)
       {
-        std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
         header += "**WARNING** ";
-        return LogStream(&std::cout, header);
+        return {&std::cout, header};
       }
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header, true);
+        return {&dummy_stream, header, true};
       }
     }
     case LOG_0ERROR:
     {
-      if (chi_mpi.location_id == 0)
+      if (chi::mpi.location_id == 0)
       {
-        std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
         header += "**!**ERROR**!** ";
-        return LogStream(&std::cerr, header);
+        return {&std::cerr, header};
       }
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header, true);
+        return {&dummy_stream, header, true};
       }
     }
     case LOG_0VERBOSE_0:
     case LOG_0VERBOSE_1:
     case LOG_0VERBOSE_2:
     {
-      if ((chi_mpi.location_id == 0) && (verbosity >= level))
+      if ((chi::mpi.location_id == 0) && (verbosity >= level))
       {
-        std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-        return LogStream(&std::cout, header);
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        return {&std::cout, header};
       }
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header, true);
+        return {&dummy_stream, header, true};
       }
     }
     case LOG_ALL:
     {
-      std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-      return LogStream(&std::cout, header);
+      std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+      return {&std::cout, header};
     }
     case LOG_ALLWARNING:
     {
-      std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
+      std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
       header += "**WARNING** ";
-      return LogStream(&std::cout, header);
+      return {&std::cout, header};
     }
     case LOG_ALLERROR:
     {
-      std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
+      std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
       header += "**!**ERROR**!** ";
-      return LogStream(&std::cerr, header);
+      return {&std::cerr, header};
     }
 
     case LOG_ALLVERBOSE_0:
@@ -109,18 +108,18 @@ LogStream ChiLog::Log(LOG_LVL level/*=LOG_0*/)
     {
       if (verbosity >= (level-6))
       {
-        std::string header = "[" + std::to_string(chi_mpi.location_id) + "]  ";
-        return LogStream(&std::cout, header);
+        std::string header = "[" + std::to_string(chi::mpi.location_id) + "]  ";
+        return {&std::cout, header};
       }
       else
       {
         std::string header = " ";
-        return LogStream(&dummy_stream, header, true);
+        return {&dummy_stream, header, true};
       }
     }
     default:
       std::string header = " ";
-      return LogStream(&dummy_stream, header);
+      return {&dummy_stream, header};
   }
 }
 
@@ -215,7 +214,7 @@ std::string ChiLog::PrintEventHistory(size_t ev_tag)
 
   for (auto& event : ref_rep_event.events)
   {
-    outstr << "[" << chi_mpi.location_id << "] ";
+    outstr << "[" << chi::mpi.location_id << "] ";
 
     char buf[100];
     sprintf(buf,"%16.9f",event.ev_time/1000.0);

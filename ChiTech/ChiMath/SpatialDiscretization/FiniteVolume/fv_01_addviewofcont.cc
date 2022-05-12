@@ -10,7 +10,7 @@
 #include "chi_mpi.h"
 
 extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Adds a PWL Finite Element for each cell of the local problem.*/
@@ -163,7 +163,7 @@ CellFVValues* SpatialDiscretization_FV::MapNeighborFeView(uint64_t cell_global_i
 
 //  auto& cell = ref_grid->cells[cell_global_index];
 //
-//  if (cell.partition_id == chi_mpi.location_id)
+//  if (cell.partition_id == chi::mpi.location_id)
 //    return MapFeView(cell.local_id);
 //  else
 //  {

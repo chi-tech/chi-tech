@@ -4,7 +4,7 @@
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "chi_log.h"
 extern ChiLog& chi_log;
@@ -99,7 +99,7 @@ bool chi_mesh::VolumeMesherExtruder::
     auto& centroid = template_cell.centroid;
     auto projected_centroid = ProjectCentroidToLevel(centroid, z_level);
     int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
-    if (pid == chi_mpi.location_id)
+    if (pid == chi::mpi.location_id)
       return true;
   }
 
@@ -132,7 +132,7 @@ bool chi_mesh::VolumeMesherExtruder::
       {
         auto projected_centroid = ProjectCentroidToLevel(cc_centroid, z);
         int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
-        if (pid == chi_mpi.location_id)
+        if (pid == chi::mpi.location_id)
           return true;
       }
     }//for cid
@@ -145,7 +145,7 @@ bool chi_mesh::VolumeMesherExtruder::
 
     auto projected_centroid = ProjectCentroidToLevel(template_cell.centroid, z);
     int pid = GetCellKBAPartitionIDFromCentroid(projected_centroid);
-    if (pid == chi_mpi.location_id)
+    if (pid == chi::mpi.location_id)
       return true;
   }//for z
 

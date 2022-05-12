@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
@@ -23,7 +23,7 @@ MapDOF(const chi_mesh::Cell& cell,
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
   size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
 
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
@@ -102,7 +102,7 @@ MapDOFLocal(const chi_mesh::Cell& cell,
   size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
   size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
 
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {

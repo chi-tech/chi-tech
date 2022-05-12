@@ -4,7 +4,7 @@
 extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiMath/chi_math_vectorNX.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
@@ -123,7 +123,7 @@ void lbs_adjoint::AdjointSolver::
 
   const auto locJ_io_flags = std::ofstream::binary | std::ofstream::out;
   const auto loc0_io_flags = locJ_io_flags | std::ofstream::trunc;
-  const bool is_home = (chi_mpi.location_id == 0);
+  const bool is_home = (chi::mpi.location_id == 0);
 
   //======================================== Build header
   std::string header_info =
@@ -152,11 +152,11 @@ void lbs_adjoint::AdjointSolver::
 
   //================================================== Process each location
   uint64_t num_global_cells = grid->GetGlobalNumberOfCells();
-  for (int locationJ=0; locationJ<chi_mpi.process_count; ++locationJ)
+  for (int locationJ=0; locationJ<chi::mpi.process_count; ++locationJ)
   {
     chi_log.Log(LOG_ALL) << "  Barrier at " << locationJ;
     MPI_Barrier(MPI_COMM_WORLD);
-    if (chi_mpi.location_id != locationJ) continue;
+    if (chi::mpi.location_id != locationJ) continue;
 
     chi_log.Log(LOG_ALL) << "  Location " << locationJ << " appending data.";
 
@@ -166,7 +166,7 @@ void lbs_adjoint::AdjointSolver::
     {
       std::stringstream outstr;
 
-      outstr << fname << ": Location " << chi_mpi.location_id
+      outstr << fname << ": Location " << chi::mpi.location_id
              << ", failed to open file " << file_name;
       throw std::logic_error(outstr.str());
     }
