@@ -9,7 +9,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Executes the diffusion solver using the PETSc library.*/
@@ -29,7 +31,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   VecSet(b,0.0);
 
   if (!suppress_assembly)
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " "
                        << TextName() << ": Assembling A locally";
 
   //================================================== Loop over locally owned
@@ -69,19 +71,19 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   }
 
   if (!suppress_assembly)
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " "
                        << TextName() << ": Done Assembling A locally";
   MPI_Barrier(MPI_COMM_WORLD);
 
   //=================================== Call matrix assembly
   if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString() << " "
+      << chi::program_timer.GetTimeString() << " "
       << TextName() << ": Communicating matrix assembly";
 
   if (!suppress_assembly)
   {
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " "
                        << TextName() << ": Assembling A globally";
     MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);
     MatAssemblyEnd(A,MAT_FINAL_ASSEMBLY);
@@ -96,13 +98,13 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
 //    }
 
     //================================= Matrix diagonal check
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " "
                        << TextName() << ": Diagonal check";
     PetscBool missing_diagonal;
     PetscInt  row;
     MatMissingDiagonal(A,&missing_diagonal,&row);
     if (missing_diagonal)
-      chi_log.Log(LOG_ALLERROR) << chi_program_timer.GetTimeString() << " "
+      chi_log.Log(LOG_ALLERROR) << chi::program_timer.GetTimeString() << " "
                                 << TextName() << ": Missing diagonal detected";
 
     //================================= Matrix sparsity info
@@ -118,7 +120,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
                        << info.nz_unneeded;
   }
   if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " "
+    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " "
                        << TextName() << ": Assembling x and b";
   VecAssemblyBegin(x);
   VecAssemblyEnd(x);
@@ -131,7 +133,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   if (suppress_solve)
   {
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString() << " "
+      << chi::program_timer.GetTimeString() << " "
       << TextName()
       << ": Setting up solver and preconditioner\n";
     PCSetUp(pc);
@@ -141,7 +143,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
   {
     if (verbose_info || chi_log.GetVerbosity() >= LOG_0VERBOSE_1)
       chi_log.Log(LOG_0)
-        << chi_program_timer.GetTimeString() << " "
+        << chi::program_timer.GetTimeString() << " "
         << TextName() << ": Solving system\n";
     t_solve.Reset();
     PCSetUp(pc);
@@ -175,7 +177,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
       int64_t its;
       ierr = KSPGetIterationNumber(ksp,&its);
       chi_log.Log(LOG_0)
-        << chi_program_timer.GetTimeString() << " "
+        << chi::program_timer.GetTimeString() << " "
         << TextName() << "[g=" << gi << "-" << gi+G-1
         << "]: Number of iterations =" << its;
 

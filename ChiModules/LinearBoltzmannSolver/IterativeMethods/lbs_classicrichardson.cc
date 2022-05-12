@@ -9,7 +9,9 @@ extern ChiLog& chi_log;
 
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 #include <iomanip>
 
@@ -86,7 +88,7 @@ ClassicRichardson(LBSGroupset& groupset,
 
     std::stringstream iter_info;
     iter_info
-      << chi_program_timer.GetTimeString() << " "
+      << chi::program_timer.GetTimeString() << " "
       << offset
       << "WGS groups ["
       << groupset.groups.front().id
@@ -107,10 +109,10 @@ ClassicRichardson(LBSGroupset& groupset,
 
       if (options.write_restart_data)
       {
-        if ((chi_program_timer.GetTime()/60000.0) >
+        if ((chi::program_timer.GetTime()/60000.0) >
             last_restart_write+options.write_restart_interval)
         {
-          last_restart_write = chi_program_timer.GetTime()/60000.0;
+          last_restart_write = chi::program_timer.GetTime()/60000.0;
           WriteRestartData(options.write_restart_folder_name,
                            options.write_restart_file_base);
         }

@@ -1,7 +1,6 @@
 #include "chi_console.h"
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer        chi_program_timer;
 
 //###################################################################
 /** This function sends the commands contained in the command_buffer to

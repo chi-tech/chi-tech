@@ -13,9 +13,9 @@
 
 extern ChiLog& chi_log;
 extern ChiConsole&  chi_console;
-extern ChiTimer   chi_program_timer;
 
 #include "ChiGraph/chi_directed_graph.h"
+
 
 //###################################################################
 /**Develops a sweep ordering for a given angle for locally owned
@@ -35,7 +35,7 @@ chi_mesh::sweep_management::
   sweep_order->omega = omega;
 
   chi_log.Log(LOG_0VERBOSE_1)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Building sweep ordering for Omega = "
     << omega.PrintS();
 
@@ -76,14 +76,14 @@ chi_mesh::sweep_management::
   if (cycle_allowance_flag)
   {
     chi_log.Log(LOG_0VERBOSE_1)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Removing inter-cell cycles.";
     RemoveLocalCyclicDependencies(sweep_order,local_DG);
   }
 
   //============================================= Generate topological sorting
   chi_log.Log(LOG_0VERBOSE_1)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Generating topological sorting for local sweep ordering";
   sweep_order->spls.item_id = local_DG.GenerateTopologicalSort();
 
@@ -103,7 +103,7 @@ chi_mesh::sweep_management::
   //the global task graph.
 
   chi_log.Log(LOG_0VERBOSE_1)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Communicating sweep dependencies.";
 
   auto& global_dependencies = sweep_order->global_dependencies;
@@ -119,7 +119,7 @@ chi_mesh::sweep_management::
   MPI_Barrier(MPI_COMM_WORLD);
 
   chi_log.Log(LOG_0VERBOSE_1)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Done computing sweep ordering.\n\n";
 
   return sweep_order;

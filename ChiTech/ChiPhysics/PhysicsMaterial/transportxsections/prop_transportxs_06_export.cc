@@ -3,6 +3,7 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
+
 #include <iostream>
 #include <iomanip>
 
@@ -45,7 +46,7 @@ void chi_physics::TransportCrossSections::
 
   //======================================== Writing header info
   ofile << "# Exported cross section from ChiTech\n";
-  ofile << "# Date: " << ChiTimer::GetLocalDateTimeString() << "\n";
+  ofile << "# Date: " << chi_objects::ChiTimer::GetLocalDateTimeString() << "\n";
   ofile << "NUM_GROUPS " << num_groups << "\n";
   ofile << "NUM_MOMENTS " << scattering_order+1 << "\n";
   if (num_precursors>0)

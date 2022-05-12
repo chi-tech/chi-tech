@@ -6,8 +6,9 @@
 #include "chi_log.h"
 extern ChiLog& chi_log;
 
+#include "chi_runtime.h"
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
 
 #include "ChiConsole/chi_console.h"
 extern ChiConsole&        chi_console;
@@ -51,7 +52,7 @@ int chiVolumeMesherExecute(lua_State *L)
   << " MB";
 
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " chiVolumeMesherExecute: Volume meshing completed."
     << mem_string.str()
     << std::endl;

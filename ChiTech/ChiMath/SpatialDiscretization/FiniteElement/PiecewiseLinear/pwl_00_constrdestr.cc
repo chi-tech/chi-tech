@@ -6,7 +6,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Constructor.*/
@@ -25,11 +27,11 @@ SpatialDiscretization_PWLD::
   tet_quad_order_arbitrary(qorder),
   hex_quad_order_arbitrary(qorder)
 {
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi_log.Log() << chi::program_timer.GetTimeString()
                 << " Creating Piecewise Linear Discontinuous "
                    "Finite Element spatial discretizaiton.";
 
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi_log.Log() << chi::program_timer.GetTimeString()
                 << " Communicating partition neighbors.";
   auto ghost_cells = ref_grid->GetGhostCells();
 
@@ -101,7 +103,7 @@ SpatialDiscretization_PWLD::
   }
 
   OrderNodes();
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi_log.Log() << chi::program_timer.GetTimeString()
                 << " Done creating Piecewise Linear Discontinuous "
                    "Finite Element spatial discretizaiton.";
 }

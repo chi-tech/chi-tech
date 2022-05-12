@@ -15,7 +15,9 @@ extern ChiLog& chi_log;
 
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Solves a groupset using GMRES.*/
@@ -96,7 +98,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   //================================================== Compute b
   if (log_info)
   {
-    chi_log.Log(LOG_0) << chi_program_timer.GetTimeString() << " Computing b";
+    chi_log.Log(LOG_0) << chi::program_timer.GetTimeString() << " Computing b";
   }
 
   //SetSource for RHS
@@ -151,7 +153,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   if (log_info)
   {
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString() << " Starting iterations";
+      << chi::program_timer.GetTimeString() << " Starting iterations";
   }
   KSPSolve(ksp,q_fixed,phi_new);
   //****************************************************

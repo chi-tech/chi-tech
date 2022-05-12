@@ -7,10 +7,10 @@
 #include "ChiConsole/chi_console.h"
 #include "ChiTimer/chi_timer.h"
 
+
 extern ChiLog& chi_log;
 
 extern ChiConsole&  chi_console;
-extern ChiTimer   chi_program_timer;
 
 #include <algorithm>
 
@@ -107,7 +107,7 @@ int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
 void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allowance_flag)
 {
 //  chi_log.Log(LOG_0VERBOSE_1)
-//    << chi_program_timer.GetTimeString()
+//    << chi::program_timer.GetTimeString()
 //    << " Building Task Dependency Graphs.";
 //  chi_graph::DirectedGraph TDG;
 //
@@ -125,14 +125,14 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 //  if (cycle_allowance_flag)
 //  {
 //    chi_log.Log(LOG_0VERBOSE_1)
-//      << chi_program_timer.GetTimeString()
+//      << chi::program_timer.GetTimeString()
 //      << " Removing intra-cellset cycles.";
 //    RemoveGlobalCyclicDependencies(this,TDG);
 //  }
 //
 //  //============================================= Generate topological sort
 //  chi_log.Log(LOG_ALLVERBOSE_2)
-//    << chi_program_timer.GetTimeString()
+//    << chi::program_timer.GetTimeString()
 //    << "   - Generating topological sort.";
 //  std::vector<int> glob_linear_sweep_order = TDG.GenerateTopologicalSort();
 //
@@ -159,7 +159,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 //
 //  //============================================= Determine sweep order ranks
 //  chi_log.Log(LOG_0VERBOSE_1)
-//    << chi_program_timer.GetTimeString()
+//    << chi::program_timer.GetTimeString()
 //    << " Determining sweep order ranks.";
 //
 //  std::vector<int> glob_sweep_order_rank(chi::mpi.process_count,-1);
@@ -189,7 +189,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 //
 //  //============================================= Generate TDG structure
 //  chi_log.Log(LOG_0VERBOSE_1)
-//    << chi_program_timer.GetTimeString()
+//    << chi::program_timer.GetTimeString()
 //    << " Generating TDG structure.";
 //  for (int r=0; r<=abs_max_rank; r++)
 //  {
@@ -211,7 +211,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   if (chi::mpi.location_id == 0)
   {
     chi_log.Log(LOG_0VERBOSE_1)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Building Task Dependency Graphs.";
 
     //====================================== Add vertices to the graph
@@ -227,7 +227,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
     if (cycle_allowance_flag)
     {
       chi_log.Log(LOG_0VERBOSE_1)
-        << chi_program_timer.GetTimeString()
+        << chi::program_timer.GetTimeString()
         << " Removing intra-cellset cycles.";
       edges_to_remove = TDG.RemoveCyclicDependencies();
     }
@@ -302,7 +302,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
   if (chi::mpi.location_id == 0)
   {
     chi_log.Log(LOG_ALLVERBOSE_2)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << "   - Generating topological sort.";
     glob_linear_sweep_order = TDG.GenerateTopologicalSort();
 
@@ -350,7 +350,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 
   //============================================= Determine sweep order ranks
   chi_log.Log(LOG_0VERBOSE_1)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Determining sweep order ranks.";
 
   std::vector<int> glob_sweep_order_rank(chi::mpi.process_count,-1);
@@ -380,7 +380,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
 
   //============================================= Generate TDG structure
   chi_log.Log(LOG_0VERBOSE_1)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Generating TDG structure.";
   for (int r=0; r<=abs_max_rank; r++)
   {

@@ -6,7 +6,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 /**Compute centroids for all cells.*/
 void chi_mesh::UnpartitionedMesh::ComputeCentroidsAndCheckQuality()

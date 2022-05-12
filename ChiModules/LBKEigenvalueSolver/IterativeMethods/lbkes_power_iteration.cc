@@ -6,7 +6,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 #include <iomanip>
 
@@ -108,7 +110,7 @@ void KEigenvalueSolver::PowerIteration()
     {
       std::stringstream k_iter_info;
       k_iter_info
-          << chi_program_timer.GetTimeString() << " "
+          << chi::program_timer.GetTimeString() << " "
           << "  Iteration " << std::setw(5) << nit
           << "  k_eff " << std::setw(10) << k_eff
           << "  k_eff change " << std::setw(10) << k_eff_change

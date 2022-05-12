@@ -5,12 +5,13 @@ extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
 
+
 //###################################################################
 /**Generates uniform spherical quadrilaterals from the
  * subdivision of an inscribed cube.*/
 void chi_math::SimplifiedLDFESQ::Quadrature::GenerateInitialRefinement(int level)
 {
-  ChiTimer timer;
+  chi_objects::ChiTimer timer;
   timer.Reset();
   initial_level = level;
 

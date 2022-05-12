@@ -13,9 +13,11 @@ extern ChiLog& chi_log;
 
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
 
 #include "ChiConsole/chi_console.h"
+
+
 extern ChiConsole&   chi_console;
 
 //###################################################################
@@ -23,7 +25,7 @@ extern ChiConsole&   chi_console;
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
     << chi_console.GetMemoryUsageInMB() << " MB"
     << std::endl;

@@ -6,21 +6,24 @@
 
 
 //################################################################### CLASS DEF
-/** Timer object.*/
-class ChiTimer
+namespace chi_objects
 {
-public:
-  std::chrono::steady_clock::time_point startTime;
+  /** Timer object.*/
+  class ChiTimer
+  {
+  public:
+    std::chrono::steady_clock::time_point startTime;
 
-public:
-	//00
-				      ChiTimer() noexcept;
-	//01
-	void   		  Reset();
-	double 		  GetTime() const;
-	std::string GetTimeString() const;
-	static std::string GetLocalDateTimeString();
-};
+  public:
+    //00
+                ChiTimer() noexcept;
+    //01
+    void   		  Reset();
+    double 		  GetTime() const;
+    std::string GetTimeString() const;
+    static std::string GetLocalDateTimeString();
+  };
+}
 
 #endif
 

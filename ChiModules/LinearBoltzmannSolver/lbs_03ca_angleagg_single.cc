@@ -12,9 +12,10 @@ extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
 
-extern ChiTimer chi_program_timer;
+
 
 #include "ChiConsole/chi_console.h"
+
 
 extern ChiConsole& chi_console;
 
@@ -29,7 +30,7 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Initializing angle aggregation: Single";
 
   if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)

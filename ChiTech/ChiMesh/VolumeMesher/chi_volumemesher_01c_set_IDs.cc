@@ -8,7 +8,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Sets material id's using a logical volume.*/
@@ -16,7 +18,7 @@ void chi_mesh::VolumeMesher::
 SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_id)
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -43,7 +45,7 @@ SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_i
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Done setting material id from logical volume. "
     << "Number of cells modified = " << num_cells_modified << ".";
 }
@@ -54,7 +56,7 @@ void chi_mesh::VolumeMesher::
 SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int bndry_id)
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Setting boundary id from logical volume.";
   //============================================= Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -76,7 +78,7 @@ SetBndryIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int bnd
   }
 
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Done setting boundary id from logical volume. "
     << "Number of faces modified = " << num_faces_modified << ".";
 }
@@ -87,7 +89,7 @@ void chi_mesh::VolumeMesher::
 SetMatIDToAll(int mat_id)
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Setting material id " << mat_id << "to all cells.";
 
   //============================================= Get current mesh handler
@@ -105,6 +107,6 @@ SetMatIDToAll(int mat_id)
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Done setting material id " << mat_id << " to all cells";
 }

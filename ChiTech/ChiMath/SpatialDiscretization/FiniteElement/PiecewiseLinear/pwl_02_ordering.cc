@@ -7,9 +7,10 @@ extern ChiLog& chi_log;
 
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
 
 #include "chi_mpi_utils.h"
+
 
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
@@ -17,9 +18,9 @@ extern ChiTimer chi_program_timer;
 void SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi_log.Log() << chi::program_timer.GetTimeString()
                 << " Developing nodal ordering.";
-  ChiTimer t_stage[6];
+  chi_objects::ChiTimer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Check cell views avail

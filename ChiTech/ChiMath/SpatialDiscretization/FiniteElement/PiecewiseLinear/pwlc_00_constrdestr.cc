@@ -4,7 +4,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Constructor.*/
@@ -23,7 +25,7 @@ SpatialDiscretization_PWLC::
   tet_quad_order_arbitrary(qorder),
   hex_quad_order_arbitrary(qorder)
 {
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi_log.Log() << chi::program_timer.GetTimeString()
                 << " Creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
 
@@ -87,7 +89,7 @@ SpatialDiscretization_PWLC::
     PreComputeCellSDValues();
 
   OrderNodes();
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi_log.Log() << chi::program_timer.GetTimeString()
                 << " Done creating Piecewise Linear Continuous "
                    "Finite Element spatial discretizaiton.";
 }

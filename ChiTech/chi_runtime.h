@@ -53,6 +53,7 @@ namespace chi_math
 namespace chi_objects
 {
   class MPI_Info;
+  class ChiTimer;
 }//namespace chi_objects
 
 //###################################################################
@@ -77,6 +78,8 @@ public:
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
   static chi_objects::MPI_Info& mpi;
+
+  static chi_objects::ChiTimer program_timer;
 
 
 

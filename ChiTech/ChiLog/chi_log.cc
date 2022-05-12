@@ -2,8 +2,6 @@
 #include "chi_mpi.h"
 #include "ChiTimer/chi_timer.h"
 
-extern ChiTimer  chi_program_timer;
-
 #include <sstream>
 
 //###################################################################
@@ -17,7 +15,7 @@ ChiLog::ChiLog() noexcept
   RepeatingEvent& ref_rep_event = repeating_events.back();
 
   ref_rep_event.events.emplace_back(
-    chi_program_timer.GetTime(),
+    chi::program_timer.GetTime(),
     EventType::EVENT_CREATED,
     std::make_shared<EventInfo>());
 }
@@ -158,7 +156,7 @@ size_t ChiLog::GetRepeatingEventTag(std::string event_name)
   RepeatingEvent& ref_rep_event = repeating_events.back();
 
   ref_rep_event.events.emplace_back(
-    chi_program_timer.GetTime(),
+    chi::program_timer.GetTime(),
     EventType::EVENT_CREATED,
     std::make_shared<EventInfo>());
 
@@ -177,7 +175,7 @@ void ChiLog::LogEvent(size_t ev_tag,
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
   ref_rep_event.events.emplace_back(
-    chi_program_timer.GetTime(),
+    chi::program_timer.GetTime(),
     ev_type,
     ev_info);
 }
@@ -193,7 +191,7 @@ void ChiLog::LogEvent(size_t ev_tag,
   RepeatingEvent& ref_rep_event = repeating_events[ev_tag];
 
   ref_rep_event.events.emplace_back(
-    chi_program_timer.GetTime(),
+    chi::program_timer.GetTime(),
     ev_type,
     nullptr);
 }

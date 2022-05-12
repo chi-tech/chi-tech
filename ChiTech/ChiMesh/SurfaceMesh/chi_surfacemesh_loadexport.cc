@@ -1,4 +1,5 @@
 #include"chi_surfacemesh.h"
+
 #include<iostream>
 #include<fstream>
 #include <algorithm>
@@ -7,7 +8,6 @@
 extern ChiLog& chi_log;
 
 #include <ChiTimer/chi_timer.h>
-extern ChiTimer    chi_program_timer;
 
 //#########################################################
 /** Loads a surface mesh from a wavefront .obj file.*/

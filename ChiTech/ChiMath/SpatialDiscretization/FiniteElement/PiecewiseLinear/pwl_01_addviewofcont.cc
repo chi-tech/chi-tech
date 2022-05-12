@@ -11,7 +11,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
@@ -124,7 +126,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
     {
       if (!mapping_initialized)
       {
-        chi_log.Log() << chi_program_timer.GetTimeString()
+        chi_log.Log() << chi::program_timer.GetTimeString()
                       << " Computing cell views";
         for (const auto& cell : ref_grid->local_cells)
           cell_mappings.push_back(MakeCellMappingFE(cell));
@@ -142,7 +144,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
     {
       if (not integral_data_initialized)
       {
-        chi_log.Log() << chi_program_timer.GetTimeString()
+        chi_log.Log() << chi::program_timer.GetTimeString()
                       << " Computing unit integrals.";
         fe_unit_integrals.reserve(num_local_cells);
         for (size_t lc=0; lc<num_local_cells; ++lc)
@@ -169,7 +171,7 @@ void SpatialDiscretization_PWLD::PreComputeCellSDValues()
     {
       if (not qp_data_initialized)
       {
-        chi_log.Log() << chi_program_timer.GetTimeString()
+        chi_log.Log() << chi::program_timer.GetTimeString()
                       << " Computing quadrature data.";
         fe_vol_qp_data.reserve(num_local_cells);
         fe_srf_qp_data.reserve(num_local_cells);
@@ -200,7 +202,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
     {
       if (not nb_mapping_initialized)
       {
-        chi_log.Log() << chi_program_timer.GetTimeString()
+        chi_log.Log() << chi::program_timer.GetTimeString()
                       << " Computing neighbor cell views.";
         for (auto& cell_map : neighbor_cells)
         {
@@ -223,7 +225,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
     {
       if (not nb_integral_data_initialized)
       {
-        chi_log.Log() << chi_program_timer.GetTimeString()
+        chi_log.Log() << chi::program_timer.GetTimeString()
                       << " Computing neighbor unit integrals.";
         for (auto& nb_cell : neighbor_cells)
         {
@@ -249,7 +251,7 @@ void SpatialDiscretization_PWLD::PreComputeNeighborCellSDValues()
     {
       if (not nb_qp_data_initialized)
       {
-        chi_log.Log() << chi_program_timer.GetTimeString()
+        chi_log.Log() << chi::program_timer.GetTimeString()
                       << " Computing neighbor quadrature data.";
         for (auto& nb_cell : neighbor_cells)
         {

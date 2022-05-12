@@ -4,12 +4,14 @@
 
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
 
 #include "chi_mpi.h"
 
 
 #include "chi_log.h"
+
+
 extern ChiLog& chi_log;
 
 //###################################################################
@@ -17,14 +19,14 @@ extern ChiLog& chi_log;
 int chi_diffusion::Solver::Initialize(bool verbose)
 {
   chi_log.Log(LOG_0) << "\n"
-                     << chi_program_timer.GetTimeString() << " "
+                     << chi::program_timer.GetTimeString() << " "
                      << TextName() << ": Initializing Diffusion solver ";
   this->verbose_info = verbose;
 
   if (not common_items_initialized)
     InitializeCommonItems(); //Mostly boundaries
 
-  ChiTimer t_init; t_init.Reset();
+  chi_objects::ChiTimer t_init; t_init.Reset();
 
   auto sdm_string = basic_options("discretization_method").StringValue();
   {
@@ -108,7 +110,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
                             unknown_manager);
 
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString() << " "
+    << chi::program_timer.GetTimeString() << " "
     << TextName() << ": Diffusion Solver initialization time "
     << t_init.GetTime()/1000.0 << std::endl;
 

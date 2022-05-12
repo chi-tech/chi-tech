@@ -11,12 +11,14 @@
 
 
 extern ChiLog& chi_log;
-extern ChiTimer chi_program_timer;
+
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
 #include "ChiConsole/chi_console.h"
+
+
 extern ChiConsole&  chi_console;
 
 #include <iomanip>
@@ -27,7 +29,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering.\n";
 
   //============================================= Clear sweep ordering
@@ -69,7 +71,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
 
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Done computing sweep orderings.           Process memory = "
       << std::setprecision(3)
       << chi_console.GetMemoryUsageInMB() << " MB";
@@ -81,7 +83,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupse
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Single";
 
   for (const auto& omega : groupset.quadrature->omegas)
@@ -100,7 +102,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Polar";
 
   const auto mesher = chi_mesh::GetCurrentHandler().volume_mesher;
@@ -199,7 +201,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& grou
 {
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering - Angle aggregation: Azimuthal";
 
   if (options.geometry_type == GeometryType::ONED_SPHERICAL ||

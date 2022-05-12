@@ -24,8 +24,6 @@ ChiLog      ChiLog::instance;
 ChiConsole&  chi_console = ChiConsole::GetInstance();
 ChiLog&      chi_log = ChiLog::GetInstance();
 
-ChiTimer    chi_program_timer;
-
 /** Global stack of handlers */
 std::vector<chi_mesh::MeshHandlerPtr>   chi::meshhandler_stack;
 int                                     chi::current_mesh_handler=-1;
@@ -53,6 +51,7 @@ bool        chi::run_time::allow_petsc_error_handler = false;
 chi_objects::MPI_Info chi_objects::MPI_Info::instance;
 chi_objects::MPI_Info& chi::mpi = chi_objects::MPI_Info::GetInstance();
 
+chi_objects::ChiTimer chi::program_timer;
 
 //############################################### Argument parser
 /**Parses input arguments.
@@ -202,7 +201,7 @@ void chi::Finalize()
 int chi::RunInteractive(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
-    << ChiTimer::GetLocalDateTimeString()
+    << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in interactive-mode with "
     << chi::mpi.process_count << " processes.";
 
@@ -218,10 +217,10 @@ int chi::RunInteractive(int argc, char** argv)
   chi_console.RunConsoleLoop();
 
   chi_log.Log(LOG_0)
-    << "Final program time " << chi_program_timer.GetTimeString();
+    << "Final program time " << program_timer.GetTimeString();
 
   chi_log.Log(LOG_0)
-    << ChiTimer::GetLocalDateTimeString()
+    << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " ChiTech finished execution.";
 
   return 0;
@@ -234,7 +233,7 @@ int chi::RunInteractive(int argc, char** argv)
 int chi::RunBatch(int argc, char** argv)
 {
   chi_log.Log(LOG_0)
-    << ChiTimer::GetLocalDateTimeString()
+    << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in batch-mode with "
     << chi::mpi.process_count << " processes.";
 
@@ -269,10 +268,10 @@ int chi::RunBatch(int argc, char** argv)
     error_code = chi_console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
 
   chi_log.Log(LOG_0)
-    << "Final program time " << chi_program_timer.GetTimeString();
+    << "Final program time " << program_timer.GetTimeString();
 
   chi_log.Log(LOG_0)
-    << ChiTimer::GetLocalDateTimeString()
+    << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " ChiTech finished execution of " << chi::run_time::input_file_name;
 
   return error_code;

@@ -16,6 +16,7 @@
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiTimer/chi_timer.h"
 
+
 #include <petscksp.h>
 
 #define DIFFUSION_MATERIALS_REGULAR                       10
@@ -32,8 +33,8 @@
 class chi_diffusion::Solver : public chi_physics::Solver
 {
 private:
-  ChiTimer t_assembly;
-  ChiTimer t_solve;
+  chi_objects::ChiTimer t_assembly;
+  chi_objects::ChiTimer t_solve;
 
   double time_assembly=0.0, time_solve=0.0;
   bool verbose_info=true;

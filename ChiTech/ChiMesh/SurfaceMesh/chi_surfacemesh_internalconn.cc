@@ -1,10 +1,10 @@
 #include "chi_surfacemesh.h"
 
+
 #include <chi_log.h>
 extern ChiLog& chi_log;
 
 #include <ChiTimer/chi_timer.h>
-extern ChiTimer    chi_program_timer;
 
 #include <algorithm>
 

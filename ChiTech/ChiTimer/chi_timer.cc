@@ -3,16 +3,23 @@
 #include <cmath>
 #include <ctime>
 
+//################################################################### Default constr
+/** Default constructor.*/
+chi_objects::ChiTimer::ChiTimer() noexcept
+{
+  startTime = std::chrono::steady_clock::now();
+}
+
 //################################################################### Reset
 /** Resets the timer to zero.*/
-void ChiTimer::Reset()
+void chi_objects::ChiTimer::Reset()
 {
   startTime = std::chrono::steady_clock::now();
 }
 
 //################################################################### Get time
 /** Gets the current timer value in milliseconds.*/
-double ChiTimer::GetTime() const
+double chi_objects::ChiTimer::GetTime() const
 {
   using namespace std::chrono;
 
@@ -20,14 +27,14 @@ double ChiTimer::GetTime() const
   duration<double> time_span =
     duration_cast<duration<double>>(newTime - startTime);
 
-	return time_span.count()*1000.0;
+  return time_span.count()*1000.0;
 }
 
 //################################################################### Get string
 /**Obtains a string in the format of hh:mm::ss.
  *
  * */
-std::string ChiTimer::GetTimeString() const
+std::string chi_objects::ChiTimer::GetTimeString() const
 {
   double time_sec = this->GetTime()/1000.0;
   int    hours    = std::floor(time_sec/60/60);
@@ -44,7 +51,7 @@ std::string ChiTimer::GetTimeString() const
 /**Obtains a string in the format YYYY-MM-DD hh:mm:ss
  *
  * */
-std::string ChiTimer::GetLocalDateTimeString()
+std::string chi_objects::ChiTimer::GetLocalDateTimeString()
 {
   using namespace std::chrono;
   std::time_t now = system_clock::to_time_t(system_clock::now());
@@ -55,4 +62,3 @@ std::string ChiTimer::GetLocalDateTimeString()
   if (end < 30)  s[end]='\0';
   return s;
 }
-

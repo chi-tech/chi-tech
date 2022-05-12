@@ -7,7 +7,9 @@
 extern ChiLog& chi_log;
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
+
+
 
 //###################################################################
 /**Sets boundary numbers on boundaries orthogonal to the cardinal directions
@@ -16,7 +18,7 @@ void chi_mesh::VolumeMesher::
 SetupOrthogonalBoundaries()
 {
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Setting orthogonal boundaries.";
 
   //============================================= Get current mesh handler
@@ -48,6 +50,6 @@ SetupOrthogonalBoundaries()
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+    << chi::program_timer.GetTimeString()
     << " Done setting orthogonal boundaries.";
 }

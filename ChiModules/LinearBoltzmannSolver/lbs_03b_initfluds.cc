@@ -14,7 +14,8 @@ extern ChiLog&     chi_log;
 
 #include "ChiTimer/chi_timer.h"
 
-extern ChiTimer chi_program_timer;
+
+
 
 //###################################################################
 /**Initializes fluds data structures.*/
@@ -58,7 +59,7 @@ void lbs::SteadySolver::InitFluxDataStructures(LBSGroupset& groupset)
 
   if (options.verbose_inner_iterations)
     chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+      << chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "
       << "         Process memory = "
       << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
