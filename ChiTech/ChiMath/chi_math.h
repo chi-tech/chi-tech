@@ -17,6 +17,16 @@ typedef std::vector<VecDbl> MatDbl;
 
 namespace chi_math
 {
+  class SparseMatrix;
+
+  class UnknownManager;
+  class CDFSampler;
+
+  class SpatialDiscretization;
+  class SpatialDiscretization_FV;
+  class SpatialDiscretization_PWLD;
+  class SpatialDiscretization_PWLC;
+
   /**Coordinate system type.*/
   enum class CoordinateSystemType
   {
@@ -35,9 +45,7 @@ namespace chi_math
     LAGRANGE_CONTINUOUS            = 4,
     LAGRANGE_DISCONTINUOUS         = 5
   };
-  class SparseMatrix;
 
-  class CDFSampler;
   int SampleCDF(double x, std::vector<double> cdf_bin);
 
   //01 Utility
@@ -77,8 +85,7 @@ namespace chi_math
   double PowerIteration(const MatDbl& A,
                         VecDbl& e_vec, int max_it = 2000, double tol = 1.0e-13);
 
-  //04 Unknown Managers
-  class UnknownManager;
+
 }//namespace chi_math
 
 

@@ -118,8 +118,8 @@ namespace chi_math
     { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
     //05
-    size_t GetNumLocalDOFs(UnknownManager& unknown_manager) override;
-    size_t GetNumGlobalDOFs(UnknownManager& unknown_manager) override;
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) override;
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) override;
   //  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
   //                               chi_math::UnknownManager* unknown_manager);
   //

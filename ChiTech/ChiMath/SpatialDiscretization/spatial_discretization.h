@@ -68,10 +68,10 @@ namespace chi_math
     int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
 
     virtual
-    size_t GetNumLocalDOFs(UnknownManager& unknown_manager)
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager)
                            {return 0;}
     virtual
-    size_t GetNumGlobalDOFs(UnknownManager& unknown_manager)
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager)
                             {return 0;}
 
     virtual

@@ -79,8 +79,8 @@ namespace chi_math
     int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override;
 
     //04b utils
-    size_t GetNumLocalDOFs(UnknownManager& unknown_manager) override;
-    size_t GetNumGlobalDOFs(UnknownManager& unknown_manager) override;
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) override;
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) override;
     size_t GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                            UnknownManager& unknown_manager);
 

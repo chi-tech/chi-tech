@@ -14,7 +14,7 @@
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_FV::
-  GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)
+  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -24,7 +24,7 @@ size_t chi_math::SpatialDiscretization_FV::
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_FV::
-  GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager)
+  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
