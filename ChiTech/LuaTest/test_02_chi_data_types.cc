@@ -5,16 +5,14 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
-
 
 #include "chi_mpi_utils_map_all2all.h"
 
 #include <map>
 
-bool chi_unit_tests::Test_chi_data_types(bool verbose)
+void chi_unit_tests::Test_chi_data_types(bool verbose)
 {
   bool passed = true;
   std::stringstream output;
@@ -203,5 +201,5 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
   if (verbose)
     chi::log.LogAll() << output.str();
 
-  return passed;
+  ChiUnitTestMessageAll(passed)
 }

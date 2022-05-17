@@ -4,10 +4,8 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
-
-bool chi_unit_tests::Test_chi_misc_utils(bool verbose)
+void chi_unit_tests::Test_chi_misc_utils(bool verbose)
 {
   bool passed = true;
   std::stringstream output;
@@ -37,5 +35,5 @@ bool chi_unit_tests::Test_chi_misc_utils(bool verbose)
   if (verbose)
     chi::log.Log() << output.str();
 
-  return passed;
+  ChiUnitTestMessageHome(passed)
 }

@@ -19,11 +19,10 @@ chi_math::SparseMatrix::SparseMatrix(size_t num_rows, size_t num_cols) :
 //###################################################################
 /**Copy constructor.*/
 chi_math::SparseMatrix::
-  SparseMatrix(const chi_math::SparseMatrix& in_matrix)
+  SparseMatrix(const chi_math::SparseMatrix& in_matrix) :
+  row_size(in_matrix.NumRows()),
+  col_size(in_matrix.NumCols())
 {
-  row_size = in_matrix.NumRows();
-  col_size = in_matrix.NumCols();
-
   rowI_values.resize(row_size, std::vector<double>());
   rowI_indices.resize(row_size, std::vector<size_t>());
 
@@ -32,7 +31,6 @@ chi_math::SparseMatrix::
     rowI_values[i] = (in_matrix.rowI_values[i]);
     rowI_indices[i] = (in_matrix.rowI_indices[i]);
   }
-
 }
 
 //###################################################################
@@ -210,7 +208,7 @@ void chi_math::SparseMatrix::Compress()
 
 //###################################################################
 /**Prints the sparse matrix to string.*/
-std::string chi_math::SparseMatrix::PrintS()
+std::string chi_math::SparseMatrix::PrintStr() const
 {
   std::stringstream out;
 
@@ -249,7 +247,7 @@ std::string chi_math::SparseMatrix::PrintS()
 
 //###################################################################
 /**Constructor with number of rows constructor.*/
-void chi_math::SparseMatrix::CheckInitialized()
+void chi_math::SparseMatrix::CheckInitialized() const
 {
   if (rowI_values.empty())
   {
@@ -258,3 +256,31 @@ void chi_math::SparseMatrix::CheckInitialized()
     exit(EXIT_FAILURE);
   }
 }
+
+//###################################################################
+// Iterator routines
+namespace chi_math
+{
+  SparseMatrix::RowIteratorContext SparseMatrix::Row(size_t row_id)
+  {return {*this, row_id};}
+
+  SparseMatrix::ConstRowIteratorContext SparseMatrix::Row(size_t row_id) const
+  {return {*this, row_id};}
+
+  SparseMatrix::EntriesIterator SparseMatrix::begin()
+  {
+    //Find first non-empty row
+    size_t nerow = row_size; //nerow = non-empty row
+    for (size_t r=0; r<row_size; ++r)
+      if (not rowI_indices[r].empty())
+      { nerow = r;break;}
+
+    return EntriesIterator(*this, nerow);
+  }
+
+  SparseMatrix::EntriesIterator SparseMatrix::end()
+  {return EntriesIterator(*this, row_size);}
+}
+
+
+

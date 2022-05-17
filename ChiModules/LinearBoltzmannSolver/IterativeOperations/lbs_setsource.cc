@@ -6,9 +6,6 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-
-;
-
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
  *
@@ -89,43 +86,17 @@ void lbs::SteadySolver::
 
           //====================== Apply across-groupset scattering
           if (moment_avail and apply_ags_scatter_src)
-          {
-            size_t num_transfers =
-                S[ell].rowI_indices[g].size();
-
-            //=============== Loop over transfers
-            for (size_t t = 0; t < num_transfers; ++t)
-            {
-              size_t gprime =
-                  S[ell].rowI_indices[g][t];
-
+            for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
               if ((gprime < gs_i) or (gprime > gs_f))
-              {
-                double sigma_sm = S[ell].rowI_values[g][t];
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
-              }
-            }
-          }//if moment_avail
 
           //====================== Apply within-groupset scattering
           if (moment_avail and apply_wgs_scatter_src)
-          {
-            size_t num_transfers =
-                S[ell].rowI_indices[g].size();
-
-            //=============== Loop over transfers
-            for (size_t t = 0; t < num_transfers; ++t)
-            {
-              size_t gprime = S[ell].rowI_indices[g][t];
+            for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
               if ((gprime >= gs_i) and (gprime <= gs_f))
-              {
-                double sigma_sm = S[ell].rowI_values[g][t];
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
-              }
-            }
-          }
-          destination_q[uk_map + g] += inscatter_g;
 
+          destination_q[uk_map + g] += inscatter_g;
 
           double infission_g = 0.0;
           const bool fission_avail = (xs.is_fissile and ell == 0);
