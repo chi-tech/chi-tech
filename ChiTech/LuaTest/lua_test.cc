@@ -2,17 +2,9 @@
 
 #include "lua_test.h"
 
-#include "unit_tests.h"
-
-#include "chi_runtime.h"
-#include "chi_log.h"
-
-#include "chi_runtime.h"
-#include "chi_mpi.h"
-
-;
-
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
+
+#include "unit_tests.h"
 
 //###################################################################
 /**This is a lua test function.
@@ -21,9 +13,14 @@
  */
 int chiLuaTest(lua_State* L)
 {
-  chi::log.Log() << "Hello from chiLuaTest(). Process count: "
-                << chi::mpi.process_count;
-  chi::log.LogAll() << "process-id: " << chi::mpi.location_id;
+  const int num_args = lua_gettop(L);
+  bool verbose = false;
+  if (num_args >= 1)
+    verbose = lua_toboolean(L,1);
+
+  chi_unit_tests::Test_chi_math(verbose);
+  chi_unit_tests::Test_chi_misc_utils(verbose);
+  chi_unit_tests::Test_chi_data_types(verbose);
 
   return 0;
 }
