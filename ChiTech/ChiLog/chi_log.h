@@ -2,6 +2,8 @@
 #define _chi_log_h
 
 #include "chi_logstream.h"
+#include "chi_log_exceptions.h"
+
 #include <utility>
 #include <vector>
 #include <memory>

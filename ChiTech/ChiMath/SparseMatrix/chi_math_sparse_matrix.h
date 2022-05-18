@@ -12,8 +12,8 @@
 class chi_math::SparseMatrix
 {
 private:
-  const size_t row_size;   ///< Maximum number of rows for this matrix
-  const size_t col_size;   ///< Maximum number of columns for this matrix
+  size_t row_size;   ///< Maximum number of rows for this matrix
+  size_t col_size;   ///< Maximum number of columns for this matrix
 
 public:
   /**rowI_indices[i] is a vector indices j for the

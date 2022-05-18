@@ -212,7 +212,13 @@ int chi::RunInteractive(int argc, char** argv)
   chi::console.FlushConsole();
 
   if ( not chi::run_time::input_file_name.empty() )
-    chi::console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
+  {
+    try{
+      chi::console.ExecuteFile(
+        chi::run_time::input_file_name.c_str(),argc, argv);}
+    catch (const std::exception& excp){
+      chi::log.LogAllError() << "\n" << excp.what();}
+  }
 
   chi::console.RunConsoleLoop();
 
@@ -265,10 +271,16 @@ int chi::RunBatch(int argc, char** argv)
 
   int error_code = 0;
   if ( not chi::run_time::input_file_name.empty() )
-    error_code = chi::console.ExecuteFile(chi::run_time::input_file_name.c_str(), argc, argv);
+  {
+    try{
+      error_code = chi::console.ExecuteFile(
+        chi::run_time::input_file_name.c_str(),argc, argv);}
+    catch (const std::exception& excp){
+      chi::log.LogAllError() << "\n" << excp.what();}
+  }
 
   chi::log.Log()
-    << "Final program time " << program_timer.GetTimeString();
+    << "\nFinal program time " << program_timer.GetTimeString();
 
   chi::log.Log()
     << chi_objects::ChiTimer::GetLocalDateTimeString()
