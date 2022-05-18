@@ -24,7 +24,7 @@
 std::shared_ptr<chi_mesh::sweep_management::SPDS>
 chi_mesh::sweep_management::
   CreateSweepOrder(const chi_mesh::Vector3& omega,
-                   chi_mesh::MeshContinuumPtr grid,
+                   const chi_mesh::MeshContinuumPtr& grid,
                    bool cycle_allowance_flag)
 {
   auto sweep_order  = std::make_shared<chi_mesh::sweep_management::SPDS>();
@@ -86,7 +86,10 @@ chi_mesh::sweep_management::
   chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Generating topological sorting for local sweep ordering";
-  sweep_order->spls.item_id = local_DG.GenerateTopologicalSort();
+  auto so_temp = local_DG.GenerateTopologicalSort();
+  sweep_order->spls.item_id.clear();
+  for (auto v : so_temp)
+    sweep_order->spls.item_id.emplace_back(v);
 
   if (sweep_order->spls.item_id.empty())
   {
