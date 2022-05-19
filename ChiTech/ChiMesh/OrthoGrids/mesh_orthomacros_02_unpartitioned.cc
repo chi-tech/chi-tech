@@ -7,21 +7,13 @@
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include "chi_runtime.h"
-
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Creates a 1D slab mesh from a set of vertices.*/
 size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 {
-  //======================================== Checks if vertices are empty
-  if (vertices.empty())
-  {
-    chi::log.LogAllError()
-      << "chi_mesh::CreateUnpartitioned1DOrthoMesh. Empty vertex list.";
-    exit(EXIT_FAILURE);
-  }
+  ChiLogicalError(vertices.empty(), "Empty vertex list.")
 
   //======================================== Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
@@ -45,6 +37,8 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
+
+  umesh->attributes = DIMENSION_1 | ORTHOGONAL;
 
   //======================================== Create vertices
   umesh->vertices.reserve(zverts.size());
@@ -104,19 +98,16 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   std::vector<double>& vertices_1d_x,
   std::vector<double>& vertices_1d_y)
 {
-  //======================================== Checks if vertices are empty
-  if (vertices_1d_x.empty() or vertices_1d_y.empty())
-  {
-    chi::log.LogAllError()
-      << "chi_mesh::CreateUnpartitioned2DOrthoMesh. Empty vertex list.";
-    exit(EXIT_FAILURE);
-  }
+  ChiLogicalError(vertices_1d_x.empty() or vertices_1d_y.empty(),
+                  "Empty vertex list.")
 
   //======================================== Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
+
+  umesh->attributes = DIMENSION_2 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
@@ -200,21 +191,17 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   std::vector<double>& vertices_1d_y,
   std::vector<double>& vertices_1d_z)
 {
-  //======================================== Checks if vertices are empty
-  if (vertices_1d_x.empty() or
-      vertices_1d_y.empty() or
-      vertices_1d_z.empty())
-  {
-    chi::log.LogAllError()
-      << "chi_mesh::CreateUnpartitioned3DOrthoMesh. Empty vertex list.";
-    exit(EXIT_FAILURE);
-  }
+  ChiLogicalError(vertices_1d_x.empty() or
+                  vertices_1d_y.empty() or
+                  vertices_1d_z.empty(), "Empty vertex list.")
 
   //======================================== Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
+
+  umesh->attributes = DIMENSION_3 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();

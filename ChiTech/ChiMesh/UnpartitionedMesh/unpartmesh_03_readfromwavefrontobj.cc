@@ -2,7 +2,7 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
+
 #include "chi_mpi.h"
 
 #include <algorithm>
@@ -132,6 +132,8 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
   file.close();
 
   //======================================== Always do this
+  attributes = DIMENSION_2 | UNSTRUCTURED;
+
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 }

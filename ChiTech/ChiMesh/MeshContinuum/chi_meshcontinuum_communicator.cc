@@ -12,7 +12,7 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 {
   //================================================== Check if already avail
   if (communicators_available)
-    return commicator_set;
+    return communicator_set;
 
   //================================================== Build the communicator
   chi::log.Log0Verbose1() << "Building communicator.";
@@ -85,28 +85,28 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
 
 
   //============================================= Build groups
-  MPI_Comm_group(MPI_COMM_WORLD,&commicator_set.world_group);
-  commicator_set.location_groups.resize(chi::mpi.process_count,MPI_Group());
+  MPI_Comm_group(MPI_COMM_WORLD,&communicator_set.world_group);
+  communicator_set.location_groups.resize(chi::mpi.process_count, MPI_Group());
 
   for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
-    MPI_Group_incl(commicator_set.world_group,
+    MPI_Group_incl(communicator_set.world_group,
                    global_graph[locI].size(),
                    global_graph[locI].data(),
-                   &commicator_set.location_groups[locI]);
+                   &communicator_set.location_groups[locI]);
   }
 
   //============================================= Build communicators
   chi::log.Log0Verbose1()
     << "Building communicators.";
-  commicator_set.communicators.resize(chi::mpi.process_count,MPI_Comm());
+  communicator_set.communicators.resize(chi::mpi.process_count, MPI_Comm());
 
   for (int locI=0;locI<chi::mpi.process_count; locI++)
   {
     int err = MPI_Comm_create_group(MPI_COMM_WORLD,
-                                    commicator_set.location_groups[locI],
+                                    communicator_set.location_groups[locI],
                                     0, //tag
-                                    &commicator_set.communicators[locI]);
+                                    &communicator_set.communicators[locI]);
 
     if (err != MPI_SUCCESS)
     {
@@ -119,5 +119,5 @@ chi_objects::ChiMPICommunicatorSet& chi_mesh::MeshContinuum::GetCommunicator()
     << "Done building communicators.";
 
   communicators_available = true;
-  return commicator_set;
+  return communicator_set;
 }

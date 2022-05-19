@@ -10,12 +10,7 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-;
-
-
 #include "ChiTimer/chi_timer.h"
-
-
 #include "ChiConsole/chi_console.h"
 
 //###################################################################
@@ -25,7 +20,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
-    << chi::console.GetMemoryUsageInMB() << " MB"
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //======================================== Check partitioning params
@@ -89,9 +84,8 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   chi::log.Log() << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
-//  AddContinuumToRegion(grid, *mesh_handler.region_stack.back());
   SetContinuum(grid);
-
+  SetGridAttributes(umesh->attributes);
 
   //======================================== Concluding messages
   chi::log.LogAllVerbose1()

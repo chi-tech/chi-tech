@@ -65,8 +65,23 @@ namespace chi_mesh
   class VolumeMesherExtruder;
   class VolumeMesherPredefinedUnpartitioned;
 
+  enum MeshAttributes : int
+  {
+    NONE        = 0,
+    DIMENSION_1 =  (1 << 0),
+    DIMENSION_2 =  (1 << 1),
+    DIMENSION_3 =  (1 << 2),
+    ORTHOGONAL  =  (1 << 3),
+    EXTRUDED    =  (1 << 4),
+    UNSTRUCTURED = (1 << 5)
+  };
 
-
+  inline MeshAttributes operator|(const MeshAttributes f1,
+                                  const MeshAttributes f2)
+  {
+    return static_cast<MeshAttributes>(static_cast<int>(f1) |
+                                    static_cast<int>(f2));
+  }
 
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ROUTINES
   MeshHandler&           GetCurrentHandler();

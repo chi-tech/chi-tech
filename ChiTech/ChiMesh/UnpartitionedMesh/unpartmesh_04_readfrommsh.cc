@@ -379,6 +379,11 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     cell->material_id = boundary_mapping[cell->material_id];
 
   //======================================== Always do this
+  chi_mesh::MeshAttributes dimension = DIMENSION_2;
+  if (not mesh_is_2D_assumption) dimension = DIMENSION_3;
+
+  attributes = dimension | UNSTRUCTURED;
+
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 

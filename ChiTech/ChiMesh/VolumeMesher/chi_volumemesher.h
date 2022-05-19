@@ -81,7 +81,9 @@ public:
   void                SetupOrthogonalBoundaries();
   //02
   virtual void Execute();
-  
+
+  //
+  void SetGridAttributes(MeshAttributes new_attribs);
 
 };
 

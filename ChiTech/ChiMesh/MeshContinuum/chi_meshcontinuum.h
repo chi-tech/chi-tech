@@ -38,7 +38,9 @@ private:
   //is the number of faces in this category
   std::vector<std::pair<size_t,size_t>> face_categories;
 
-  chi_objects::ChiMPICommunicatorSet commicator_set;
+  chi_objects::ChiMPICommunicatorSet communicator_set;
+
+  MeshAttributes attributes = NONE;
 
 public:
   MeshContinuum() :
@@ -68,7 +70,6 @@ public:
     global_cell_id_to_foreign_id_map.clear();
   }
 
-  //01
   void ExportCellsToPython(const char* fileName,
                            bool surface_only=true,
                            std::vector<int>* cell_flags = nullptr,
@@ -78,7 +79,6 @@ public:
                            int options = 0) const;
   void ExportCellsToVTK(const char* baseName) const;
 
-  //02
   void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
   size_t NumberOfFaceHistogramBins();
   size_t MapFaceHistogramBins(size_t num_face_dofs);
@@ -101,6 +101,15 @@ public:
   std::vector<uint64_t> GetDomainUniqueBoundaryIDs() const;
 
   size_t CountCellsInLogicalVolume(const chi_mesh::LogicalVolume& log_vol) const;
+
+  MeshAttributes Attributes() const {return attributes;}
+
+private:
+  friend class chi_mesh::VolumeMesher;
+  void SetAttributes(MeshAttributes new_attribs)
+  {
+    attributes = attributes | new_attribs;
+  }
 };
 
 #endif //CHI_MESHCONTINUUM_H_

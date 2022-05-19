@@ -45,6 +45,8 @@ public:
   std::vector<LightWeightCell*>    raw_boundary_cells;
   std::vector<std::set<uint64_t>>  vertex_cell_subscriptions;
 
+  MeshAttributes attributes = NONE;
+
 public:
   enum class ParallelMethod
   {

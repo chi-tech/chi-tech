@@ -5,7 +5,6 @@
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 
@@ -24,7 +23,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   chi::log.Log()
     << chi::program_timer.GetTimeString()
     << " VolumeMesherExtruder executed. Memory in use = "
-    << chi::console.GetMemoryUsageInMB() << " MB"
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB"
     << std::endl;
 
   //================================================== Get the current handler
@@ -38,8 +37,9 @@ void chi_mesh::VolumeMesherExtruder::Execute()
   //=========================================== Create new continuum
   auto grid = chi_mesh::MeshContinuum::New();
   auto temp_grid = chi_mesh::MeshContinuum::New();
-//  AddContinuumToRegion(grid, *region);
+
   SetContinuum(grid);
+  SetGridAttributes(DIMENSION_3 | EXTRUDED);
 
   //================================== Setup layers
   // populates vertex-layers
@@ -134,12 +134,6 @@ void chi_mesh::VolumeMesherExtruder::Execute()
     << "VolumeMesherExtruder: Number of cells in region = "
     << total_global_cells
     << std::endl;
-
-//  chi::log.Log()
-//    << "VolumeMesherExtruder: Number of nodes in region = "
-//    << grid->vertices.size()
-//    << std::endl;
-//  grid->vertices.shrink_to_fit();
 
   MPI_Barrier(MPI_COMM_WORLD);
 }

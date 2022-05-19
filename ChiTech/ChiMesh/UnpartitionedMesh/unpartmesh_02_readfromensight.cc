@@ -4,9 +4,6 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-;
-
-
 #include <sstream>
 
 #include <vtkSmartPointer.h>
@@ -216,6 +213,10 @@ void chi_mesh::UnpartitionedMesh::
   }
 
   //======================================== Always do this
+  chi_mesh::MeshAttributes dimension = DIMENSION_2;
+  if (mesh_is_3D)          dimension = DIMENSION_3;
+
+  attributes = dimension | UNSTRUCTURED;
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 }
