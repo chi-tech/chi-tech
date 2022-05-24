@@ -90,7 +90,7 @@ SetMatIDToAll(int mat_id)
 {
   chi::log.Log()
     << chi::program_timer.GetTimeString()
-    << " Setting material id " << mat_id << "to all cells.";
+    << " Setting material id " << mat_id << " to all cells.";
 
   //============================================= Get current mesh handler
   auto& handler = chi_mesh::GetCurrentHandler();
