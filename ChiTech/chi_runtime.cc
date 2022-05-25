@@ -260,7 +260,7 @@ int chi::RunBatch(int argc, char** argv)
 #ifndef NDEBUG
   chi::log.Log() << "Waiting...";
   if (chi::mpi.location_id == 0)
-    for (int k=0; k<100; ++k)
+    for (int k=0; k<30; ++k)
     {
       usleep(1000000);
       chi::log.Log() << k;

@@ -20,7 +20,6 @@ namespace chi_objects
   {
   public:
     lua_State*							consoleState;    ///< Pointer to lua console state
-    bool                    exit_loop=false; ///< Console loop termination flag
 
     std::vector<std::string> command_buffer; ///< Buffer of commands to execute
 
@@ -33,7 +32,7 @@ namespace chi_objects
     {return instance;}
 
     //01 Loop
-    void        RunConsoleLoop(char* fileName=nullptr);
+    void        RunConsoleLoop(char* fileName=nullptr) const;
     //02 Utilities
     int         ExecuteFile(const char* fileName,int argc, char** argv) const;
     void        PostMPIInfo(int location_id, int number_of_processes) const;
