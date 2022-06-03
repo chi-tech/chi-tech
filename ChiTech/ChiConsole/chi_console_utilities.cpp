@@ -1,14 +1,16 @@
 #include "ChiConsole/chi_console.h"
 
-#include <cstdio>
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //############################################################################# Execute file
 /** Executes the given file in the Lua engine.
 \author Jan*/
-int chi_objects::ChiConsole::ExecuteFile(const char* fileName, int argc, char** argv) const
+int chi_objects::ChiConsole::
+  ExecuteFile(const std::string& fileName, int argc, char** argv) const
 {
 	lua_State* L = this->consoleState;
-	if (fileName != nullptr)
+	if (not fileName.empty())
 	{
 		if (argc>0)
 		{
@@ -21,11 +23,11 @@ int chi_objects::ChiConsole::ExecuteFile(const char* fileName, int argc, char** 
 			lua_setglobal(L,"chiArgs");
 
 		}
-		int error = luaL_dofile(this->consoleState,fileName);
+		int error = luaL_dofile(this->consoleState,fileName.c_str());
 
 		if (error > 0)
 		{
-			printf("%s\n", lua_tostring(this->consoleState, -1));
+			chi::log.LogAll() << lua_tostring(this->consoleState, -1);
 			return EXIT_FAILURE;
 		}
 	}

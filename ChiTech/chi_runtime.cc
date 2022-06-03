@@ -211,13 +211,16 @@ int chi::RunInteractive(int argc, char** argv)
 
   chi::console.FlushConsole();
 
-  if ( not chi::run_time::input_file_name.empty() )
+  const auto& input_fname = chi::run_time::input_file_name;
+
+  if ( not input_fname.empty() )
   {
-    try{
-      chi::console.ExecuteFile(
-        chi::run_time::input_file_name.c_str(),argc, argv);}
-    catch (const std::exception& excp){
-      chi::log.LogAllError() << "\n" << excp.what();}
+    try{chi::console.ExecuteFile(input_fname,argc, argv);}
+    catch (const std::exception& excp)
+    {
+      chi::log.LogAllError() << "\n" << excp.what();
+      //No quitting if file execution fails
+    }
   }
 
   chi::console.RunConsoleLoop();
@@ -269,14 +272,17 @@ int chi::RunBatch(int argc, char** argv)
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
+  const auto& input_fname = chi::run_time::input_file_name;
   int error_code = 0;
-  if ( not chi::run_time::input_file_name.empty() )
+
+  if ( not input_fname.empty() )
   {
-    try{
-      error_code = chi::console.ExecuteFile(
-        chi::run_time::input_file_name.c_str(),argc, argv);}
-    catch (const std::exception& excp){
-      chi::log.LogAllError() << "\n" << excp.what();}
+    try{error_code = chi::console.ExecuteFile(input_fname,argc, argv);}
+    catch (const std::exception& excp)
+    {
+      chi::log.LogAllError() << "\n" << excp.what();
+      chi::Exit(EXIT_FAILURE);
+    }
   }
 
   chi::log.Log()
@@ -289,4 +295,11 @@ int chi::RunBatch(int argc, char** argv)
   return error_code;
 }
 
+
+//###################################################################
+/** Exits the program appropriately.*/
+void chi::Exit(int error_code)
+{
+  MPI_Abort(MPI_COMM_WORLD, error_code);
+}
 

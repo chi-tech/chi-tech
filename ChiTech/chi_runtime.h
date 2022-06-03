@@ -1,6 +1,7 @@
 #ifndef chi_runtime_h
 #define chi_runtime_h
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -108,6 +109,24 @@ public:
     run_time operator=(const run_time&) = delete; //Deleted assigment operator
   };
 
+  //#######################################################
+  /**Customized exceptions.*/
+  class RecoverableException : public std::runtime_error
+  {
+  public:
+    explicit RecoverableException(const char* message) :
+      std::runtime_error(std::string("RecoverableException: ") +
+                         std::string(message)){}
+    explicit RecoverableException(const std::string& message) :
+      std::runtime_error(std::string("RecoverableException: ") +
+                         message){}
+     RecoverableException(const std::string& prefix,
+                          const std::string& message) :
+      std::runtime_error(prefix + message){}
+
+    ~RecoverableException() noexcept override = default;
+  };
+
 public:
   chi() = delete;                     //Deleted constructor
   chi(const chi&) = delete;           //Deleted copy constructor
@@ -118,6 +137,7 @@ public:
   static int  RunBatch(int argc, char** argv);
   static int  Initialize(int argc, char** argv);
   static void Finalize();
+  static void Exit(int error_code);
 
 public:
   /**Attempts to retrieve an object of base-type `shared_ptr<T>` at the given

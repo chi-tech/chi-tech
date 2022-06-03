@@ -34,7 +34,7 @@ namespace chi_objects
     //01 Loop
     void        RunConsoleLoop(char* fileName=nullptr) const;
     //02 Utilities
-    int         ExecuteFile(const char* fileName,int argc, char** argv) const;
+    int         ExecuteFile(const std::string& fileName,int argc, char** argv) const;
     void        PostMPIInfo(int location_id, int number_of_processes) const;
     //03
     void        FlushConsole();
