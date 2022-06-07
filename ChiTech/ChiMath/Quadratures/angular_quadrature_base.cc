@@ -24,7 +24,7 @@ void chi_math::AngularQuadrature::
     chi::log.LogAllError()
       << "chi_math::AngularQuadrature::InitializeWithCustom: supplied"
          " vectors need to be of equal length.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //================================================== Create angle pairs

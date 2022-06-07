@@ -292,13 +292,14 @@ std::shared_ptr<chi_math::CellMappingFE_PWL>
         << "SpatialDiscretization_PWL::MapFeView "
            "Failure to map Finite Element View. The view is either not"
            "available or the supplied local index is invalid.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
   else
   {
     return MakeCellMappingFE(ref_grid->local_cells[cell_local_index]);
   }
+  return nullptr;
 }
 
 //###################################################################

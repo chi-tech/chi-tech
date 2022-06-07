@@ -81,7 +81,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
           chi::log.LogAllError()
             << __FUNCTION__ << ": Precursor family " << j
             << "does not have a non-zero fission spectrum.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
       has_chi_d = true;
@@ -97,14 +97,14 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
           chi::log.LogAllError()
             << __FUNCTION__ << ": Precursor family " << j << "'s decay "
             << "constant must be non-zero.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
         if (precursor_yield[j] < eps)
         {
           chi::log.LogAllError()
               << __FUNCTION__ << ": Precursor family " << j << "'s yield "
               << "must be non-zero.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
     }
@@ -173,21 +173,21 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       chi::log.LogAllError()
         << __FUNCTION__ << ": If prompt nu or chi are provided, the other "
         << "must be as well.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     if ((has_nu_d and not has_chi_d) or (not has_nu_d and has_chi_d))
     {
       chi::log.LogAllError()
           << __FUNCTION__ << ": If prompt nu or chi are provided, the other "
           << "must be as well.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     if ((has_nu and not has_chi) or (not has_nu and has_chi))
     {
       chi::log.LogAllError()
           << __FUNCTION__ << ": If total nu or chi are provided, the other "
           << "must be as well.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //============================== Compute total from prompt and delayed
@@ -219,14 +219,14 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
         chi::log.LogAllError()
           << __FUNCTION__ << ": Both prompt and delayed nu must be provided "
           << "when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       if (not has_chi_p or not has_chi_d)
       {
         chi::log.LogAllError()
             << __FUNCTION__ << ": Both prompt and delayed chi must be "
             << "provided when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
     else
@@ -236,14 +236,14 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
         chi::log.LogAllError()
             << __FUNCTION__ << ": Total nu must be provided "
             << "when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       if (not has_chi)
       {
         chi::log.LogAllError()
             << __FUNCTION__ << ": Total chi must be "
             << "provided when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
 

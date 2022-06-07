@@ -39,7 +39,7 @@ int chiLBKESSetProperty(lua_State *L)
       chi::log.LogAllError()
           << __FUNCTION__ << ": Invalid max_iterations value. "
           << "Must be greater than 0.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     solver.max_iterations = static_cast<size_t>(max_iters);
 
@@ -58,7 +58,7 @@ int chiLBKESSetProperty(lua_State *L)
       chi::log.LogAllError()
           << __FUNCTION__ << ": Invalid value for tolerance. "
           << "Must be in the range (0.0, 1.0].";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     solver.tolerance = tol;
 
@@ -73,7 +73,7 @@ int chiLBKESSetProperty(lua_State *L)
   {
     chi::log.LogAllError()
         << __FUNCTION__ << ": Invalid property index.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }

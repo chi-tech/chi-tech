@@ -19,7 +19,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromWavefrontOBJ(const Options &options)
     chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name<<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   chi::log.Log() << "Making Unpartitioned mesh from wavefront file "

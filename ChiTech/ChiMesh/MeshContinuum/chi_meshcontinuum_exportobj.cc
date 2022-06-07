@@ -25,7 +25,7 @@ void chi_mesh::MeshContinuum::
     {
       chi::log.LogAllError() << "Could not open file: "
                                   << std::string(fileName);
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Develop list of faces and nodes
@@ -128,7 +128,7 @@ void chi_mesh::MeshContinuum::
       {
         chi::log.LogAllError() << "Could not open file: "
                                   << mat_file_name;
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       //====================================== Develop list of faces and nodes

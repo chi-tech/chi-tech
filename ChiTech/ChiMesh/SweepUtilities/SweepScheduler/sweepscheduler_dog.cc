@@ -60,7 +60,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       {
         chi::log.LogAllError()
           << "Location depth not found in Depth-Of-Graph algorithm.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
     }//for anglesets

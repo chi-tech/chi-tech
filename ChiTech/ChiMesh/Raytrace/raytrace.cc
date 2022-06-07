@@ -156,7 +156,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
     chi::log.LogAllError()
       << "Unsupported cell type encountered in call to "
       << "chi_mesh::RayTrace.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   if (!intersection_found)
@@ -221,7 +221,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
 
 
     chi::log.LogAllError() << outstr.str();
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   return dest_info;

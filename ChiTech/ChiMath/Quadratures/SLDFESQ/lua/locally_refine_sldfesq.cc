@@ -72,7 +72,7 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
     chi::log.LogAllError()
       << "chiLocallyRefineSLDFESQAngularQuadrature: "
          "Second argument expected to be table {a,b,c}.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   double cone_size = lua_tonumber(L,3);
@@ -95,7 +95,7 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
       chi::log.LogAllError()
         << "chiLocallyRefineSLDFESQAngularQuadrature: "
            "Invalid angular quadrature type.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
@@ -103,14 +103,14 @@ int chiLocallyRefineSLDFESQAngularQuadrature(lua_State* L)
     chi::log.LogAllError()
       << "chiLocallyRefineSLDFESQAngularQuadrature: "
          "Invalid handle to angular quadrature.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   catch (...)
   {
     chi::log.LogAllError()
       << "chiLocallyRefineSLDFESQAngularQuadrature: "
          "Call failed with unknown error.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
 

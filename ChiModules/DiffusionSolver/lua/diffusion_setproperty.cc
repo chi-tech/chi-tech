@@ -89,7 +89,7 @@ int chiDiffusionSetProperty(lua_State *L)
       << "Invalid amount of arguments used in"
       << " chiDiffusionSetProperty(...,\"boundary_type\".... "
       << " At least 4 arguments are expected.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     LuaCheckNumberValue(fname, L, 3);
     const int bound_index = lua_tonumber(L,3);
@@ -106,7 +106,7 @@ int chiDiffusionSetProperty(lua_State *L)
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"reflecting\". "
           << " 4 arguments are expected.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       chi_diffusion::Solver::BoundaryInfo bndry_info;
@@ -126,7 +126,7 @@ int chiDiffusionSetProperty(lua_State *L)
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"dirichlet\". "
           << " 5 arguments are expected.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       LuaCheckNumberValue(fname, L, 5);
       double b_value = lua_tonumber(L,5);
@@ -148,7 +148,7 @@ int chiDiffusionSetProperty(lua_State *L)
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"neumann\". "
           << " 5 arguments are expected.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       LuaCheckNumberValue(fname, L, 5);
       double f_value = lua_tonumber(L,5);
@@ -171,7 +171,7 @@ int chiDiffusionSetProperty(lua_State *L)
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"vacuum\". "
           << " 4 arguments are expected.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       chi_diffusion::Solver::BoundaryInfo bndry_info;
@@ -191,7 +191,7 @@ int chiDiffusionSetProperty(lua_State *L)
           << " chiDiffusionSetProperty(...,\"boundary_type\","
           << bound_index << ",\"robin\". "
           << " 7 arguments are expected.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       LuaCheckNumberValue(fname, L, 5);
       LuaCheckNumberValue(fname, L, 6);
@@ -218,13 +218,13 @@ int chiDiffusionSetProperty(lua_State *L)
         << "Unsupported boundary type encountered in call to "
         << "chiDiffusionSetProperty(..,\"boundary_type\",.. :"
         << type_name;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
   else
   {
     chi::log.Log0Error() << "Invalid property in chiDiffusionSetProperty.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }

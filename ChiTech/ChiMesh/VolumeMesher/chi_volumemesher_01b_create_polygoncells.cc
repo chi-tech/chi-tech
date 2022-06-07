@@ -31,7 +31,7 @@ CreatePolygonCells(const chi_mesh::UnpartitionedMesh& umesh,
         << "chi_mesh::VolumeMesher::CreatePolygonCells "
            "called with a cell not being of primary type"
            " chi_mesh::CellType::POLYGON.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Make cell

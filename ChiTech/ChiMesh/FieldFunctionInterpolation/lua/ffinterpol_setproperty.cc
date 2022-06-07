@@ -120,7 +120,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
            "FFI is not a slice.";
       chi::log.Log() << typeid(*p_ffi).name();
       chi::log.Log() << typeid(chi_mesh::FieldFunctionInterpolationSlice).name();
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
   }
@@ -137,7 +137,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
            "FFI is not a line.";
       chi::log.Log() << typeid(*p_ffi).name();
       chi::log.Log() << typeid(chi_mesh::FieldFunctionInterpolationSlice).name();
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
   }
@@ -236,7 +236,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << "Line property FFI_LINE_NUMBEROFPOINTS"
         << " used in chiFFInterpolationSetProperty. Number of points must"
         << " be greater than or equal to 2.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     cur_ffi_line.number_of_points = num_points;
   }
@@ -253,7 +253,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << "Line property FFI_LINE_CUSTOM_ARRAY"
         << " used in chiFFInterpolationSetProperty. Argument 3 is expected "
            "to be an array.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     const size_t table_len = lua_rawlen(L,3);
@@ -280,7 +280,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << "Volume property FFI_PROP_OPERATION"
         << " used in chiFFInterpolationSetProperty can only be used with "
         << "Volume type interpolations.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     auto& cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume&)*p_ffi;
@@ -293,7 +293,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << "Volume property FFI_PROP_OPERATION"
         << " used in chiFFInterpolationSetProperty. Unsupported OPERATON."
         << " Supported types are OP_AVG and OP_SUM. " << op_type;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
@@ -324,7 +324,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
         << "Volume property FFI_PROP_LOGICAL_VOLUME"
         << " used in chiFFInterpolationSetProperty can only be used with "
         << "Volume type interpolations.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     auto& cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume&)*p_ffi;
@@ -335,7 +335,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
   {
     chi::log.LogAllError()
       << "Invalid PropertyIndex used in chiFFInterpolationSetProperty.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   return 0;

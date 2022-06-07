@@ -36,7 +36,7 @@ void chi_physics::FieldFunction::
   {
     chi::log.LogAllError()
       << "ExportMultipleFFToVTK: Empty field-function list.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Check spatial discretization
@@ -50,7 +50,7 @@ void chi_physics::FieldFunction::
            "Currently this function requires "
            "all field-functions used in this call to have the same "
            "spatial discretization.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   auto ff_spatial_discretization = ff_list.front()->spatial_discretization;
 
@@ -65,7 +65,7 @@ void chi_physics::FieldFunction::
            "Currently this function requires "
            "all field-functions used in this call to refer to the same"
            "grid/mesh.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
   //============================================= Instantiate VTK grid
@@ -145,7 +145,7 @@ void chi_physics::FieldFunction::
     {
       chi::log.LogAllError()
         << "ExportMultipleFFToVTK: Unsupported cell type encountered.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//for cell
 

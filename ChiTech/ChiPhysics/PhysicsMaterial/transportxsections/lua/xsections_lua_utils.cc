@@ -111,7 +111,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   if (num_args < 3)
   {
     LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   LuaCheckNilValue("chiPhysicsTransportXSSet",L,1);
@@ -129,7 +129,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
       << "ERROR: Invalid cross-section handle"
       << " in call to chiPhysicsTransportXSSet."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //========================== Process operation
@@ -183,7 +183,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
       << "Unsupported operation in "
       << "chiPhysicsTransportXSSet. " << operation_index
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }
@@ -210,7 +210,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
   if (num_args < 1)
   {
     LuaPostArgAmountError(__FUNCTION__,1,num_args);
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   LuaCheckNilValue(__FUNCTION__,L,1);
@@ -226,7 +226,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   xs->PushLuaTable(L);
@@ -281,7 +281,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
     chi::log.LogAllError()
       << "In call to chiPhysicsMakeCombinedTransportXS: "
       << "Argument must be a lua table.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   size_t table_len = lua_rawlen(L,1);
@@ -301,7 +301,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
         << "In call to chiPhysicsMakeCombinedTransportXS: "
         << "The elements of the supplied table must themselves also"
            "be lua tables of the xs handle and its scalar multiplier.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     lua_pushinteger(L,1);
@@ -377,7 +377,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   if (num_args < 2)
   {
     LuaPostArgAmountError(__FUNCTION__,2,num_args);
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   LuaCheckNilValue(__FUNCTION__,L,1);
@@ -396,7 +396,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Process table
@@ -416,7 +416,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
         << "In call to " << __FUNCTION__ << ": "
         << "The elements of the supplied table must themselves also"
            "be lua tables of the xs handle and its scalar multiplier.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     lua_pushinteger(L,1);
@@ -476,7 +476,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   std::string file_name = lua_tostring(L,2);

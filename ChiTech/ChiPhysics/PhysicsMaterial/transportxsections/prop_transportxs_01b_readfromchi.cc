@@ -259,7 +259,7 @@ void chi_physics::TransportCrossSections::
       chi::log.LogAllError()<< "Failed to open chi cross-section file \""
           << file_name << "\" in call to "
           << "TransportCrossSections::MakeFromChixsFile\n";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
   }
 
   //line is used to get rid of lines and word is used to get rid of words
@@ -531,13 +531,13 @@ void chi_physics::TransportCrossSections::
         << "Error reading xs-file \"" + file_name + "\". "
         << "Line number " << line_number << ". "
         << err.what();
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     catch (...)
     {
       chi::log.LogAllError()
         << "Unknown error in " << std::string(__FUNCTION__);
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     first_word = "";

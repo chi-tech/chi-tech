@@ -206,7 +206,7 @@ int chiLBSSetProperty(lua_State *L)
       chi::log.LogAllError()
         << "Unknown boundary identifier encountered "
            "in call to chiLBSSetProperty";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     int bid = bident - 31;
@@ -228,7 +228,7 @@ int chiLBSSetProperty(lua_State *L)
           << "incident isotropic flux boundary type: Number of solver groups"
           << " is zero. Boundary fluxes can only be set after group structure"
           << " has been defined.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       if (!lua_istable(L,5))
@@ -238,7 +238,7 @@ int chiLBSSetProperty(lua_State *L)
           << "incident isotropic flux boundary type,"
           << " argument 5 should be a lua table and was detected as"
              " not being one.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       size_t table_len = lua_rawlen(L,5);
@@ -260,7 +260,7 @@ int chiLBSSetProperty(lua_State *L)
           << "Number of groups in boundary flux specification is "
           << table_len << " but solver has a total of "
           << lbs_solver.groups.size() << " groups. These two must be equal.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       lbs_solver.incident_P0_mg_boundaries.push_back(values);
@@ -286,7 +286,7 @@ int chiLBSSetProperty(lua_State *L)
       chi::log.LogAllError()
         << "Unsupported boundary type encountered "
            "in call to " << LuaSourceInfo(L,"chiLBSSetProperty");
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
   }
@@ -302,7 +302,7 @@ int chiLBSSetProperty(lua_State *L)
         << "Invalid scattering order in call to "
         << "chiLBSSetProperty:SCATTERING_ORDER. "
            "Value must be > 0.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     lbs_solver.options.scattering_order = scattering_order;
@@ -421,7 +421,7 @@ int chiLBSSetProperty(lua_State *L)
   else
   {
     std::cerr << "Invalid property in chiLBSSetProperty.\n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   return 0;

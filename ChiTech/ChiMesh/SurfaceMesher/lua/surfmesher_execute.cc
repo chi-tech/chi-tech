@@ -27,7 +27,7 @@ int chiSurfaceMesherExecute(lua_State *L)
     chi::log.LogAllError()
       << __FUNCTION__ << ": called without a surface mesher set. Make a "
                          "call to chiSurfaceMesherCreate.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   cur_hndlr.surface_mesher->Execute();

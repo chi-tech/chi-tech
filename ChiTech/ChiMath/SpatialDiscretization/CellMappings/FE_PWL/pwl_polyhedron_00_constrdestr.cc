@@ -205,7 +205,7 @@ chi_math::PolyhedronMappingFE_PWL::
       {
         chi::log.LogAllError() << "Unknown face mapping encountered. "
                                      "pwl_polyhedron.h";
-        exit(EXIT_FAILURE);
+       chi::Exit(EXIT_FAILURE);
       }
       face_dof_mapping.push_back(mapping);
     }//for face i

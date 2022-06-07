@@ -44,7 +44,7 @@ int chiSurfaceMesherCreate(lua_State *L)
   {
     std::cerr << "ERROR: Illegal surface mesher specified"
                  "in chiSurfaceMesherCreate" << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   cur_hndlr.surface_mesher = new_mesher;

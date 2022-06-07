@@ -34,13 +34,13 @@ int chiGetProductQuadrature(lua_State *L)
       chi::log.LogAllError()
         << "chiGetProductQuadrature: Provided quadrature handle points to "
            "a quadrature that is not a product quadrature.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o){
     chi::log.LogAllError()
       << "chiGetProductQuadrature: Invalid quadrature handle.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   lua_newtable(L);

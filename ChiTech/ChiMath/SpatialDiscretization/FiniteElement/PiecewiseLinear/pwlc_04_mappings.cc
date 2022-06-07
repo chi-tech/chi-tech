@@ -69,7 +69,7 @@ int64_t chi_math::SpatialDiscretization_PWLC::
       << "SpatialDiscretization_PWLC::MapDOFLocal. Mapping failed for cell "
       << "with global index " << cell.global_id << " because the node is "
       << "not local.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   int address=-1;

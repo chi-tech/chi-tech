@@ -27,7 +27,8 @@ HeterogenousPsiIncoming(
   chi::log.LogAllError()
     << "HeterogenousPsiIncoming call made to boundary "
        "that has no such information.";
-  exit(EXIT_FAILURE);
+  chi::Exit(EXIT_FAILURE);
+  return nullptr;
 }
 
 //###################################################################
@@ -43,7 +44,8 @@ HeterogenousPsiOutgoing(
   chi::log.LogAllError()
     << "HeterogenousPsiOutgoing call made to boundary "
        "that has no such information.";
-  exit(EXIT_FAILURE);
+  chi::Exit(EXIT_FAILURE);
+  return nullptr;
 }
 
 //###################################################################

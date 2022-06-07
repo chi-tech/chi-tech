@@ -174,7 +174,7 @@ void chi_math::GolubFischer::RootsOrtho(int& N, Tvecdbl& in_alpha, Tvecdbl& in_b
       if (std::isnan(xnew))
       {
         chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "xnew " << i << " " << xnew << " y=" << a << std::endl;
-        exit(EXIT_FAILURE);
+       chi::Exit(EXIT_FAILURE);
       }
 
       double res = std::fabs(xnew-xold);

@@ -64,14 +64,14 @@ int chiSurfaceMeshCreateFromArrays(lua_State *L)
     chi::log.LogAllError()
       << "In call to chiSurfaceMeshCreateFromArrays: "
       << "The first argument was detected not to be a lua table.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,2))
   {
     chi::log.LogAllError()
       << "In call to chiSurfaceMeshCreateFromArrays: "
       << "The second argument was detected not to be a lua table.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Extract x-array

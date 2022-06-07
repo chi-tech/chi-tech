@@ -22,7 +22,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name<<" in call "
       << "to ReadFromMsh \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   chi::log.Log() << "Making Unpartitioned mesh from msh format file "

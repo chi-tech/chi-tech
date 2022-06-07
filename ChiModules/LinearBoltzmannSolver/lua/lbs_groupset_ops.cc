@@ -164,7 +164,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   {
     chi::log.LogAllError()
       << "chiLBSGroupsetAddGroups: Invalid handle to groupset\n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Add the groups
@@ -174,7 +174,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     << "No groups added to groupset in chiLBSGroupsetAddGroups. "
        "This is triggered when groups are added with the \"to\" "
        "field being less than the \"from\" field.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
 
@@ -189,7 +189,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     {
       chi::log.LogAllError()
         <<"chiLBSGroupsetAddGroups: Invalid group added to groupset\n";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     groupset->groups.push_back(*group);
@@ -250,7 +250,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   {
     chi::log.LogAllError() << "Invalid handle to groupset"
                                  "in chiLBSGroupsetSetQuadrature.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Obtain pointer to quadrature
@@ -263,7 +263,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
     chi::log.LogAllError() << "Invalid handle to Product Quadrature"
                    "in chiLBSGroupsetSetQuadrature. Handle provided: "
                    << prquad_index;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   groupset->quadrature = ang_quad;
@@ -345,7 +345,7 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -354,7 +354,7 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetAngleAggregationType";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Setting aggregation type
@@ -369,7 +369,7 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
     chi::log.LogAllError()
       << "Invalid aggregation type to groupset " << grpset_index
       << " in call to chiLBSGroupsetSetAngleAggregationType";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   chi::log.Log()
@@ -426,7 +426,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -435,7 +435,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetAngleAggDiv";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Bounds checking
@@ -492,7 +492,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -501,7 +501,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetGroupSubsets";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Bounds checking
@@ -573,7 +573,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -582,7 +582,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetGroupSubsets";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   {
@@ -611,7 +611,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
       chi::log.LogAllError()
         << "Unsupported iterative method specified in call to "
         << "chiLBSGroupsetSetIterativeMethod.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -660,7 +660,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -669,7 +669,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetGroupSubsets";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Bounds checking
@@ -677,7 +677,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   {
     chi::log.LogAllError()
       << "Invalid residual tolerance specified. Must be greater >= 0.0";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   groupset->residual_tolerance = resid_tol;
@@ -729,7 +729,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -738,7 +738,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetMaxIterations";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Bounds checking
@@ -795,7 +795,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -804,7 +804,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetGMRESRestartIntvl";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Bounds checking
@@ -862,7 +862,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -871,7 +871,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetEnableSweepLog";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   groupset->log_sweep_events = log_flag;
@@ -944,7 +944,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -953,7 +953,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetWGDSA";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   groupset->apply_wgdsa     = true;
@@ -1032,7 +1032,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -1041,7 +1041,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to chiLBSGroupsetSetTGDSA";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   groupset->apply_tgdsa     = true;

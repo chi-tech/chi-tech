@@ -45,7 +45,7 @@ void chi_math::SparseMatrix::Insert(size_t i, size_t j, double value)
       << "SparseMatrix::Insert encountered out of bounds,"
       << " i=" << i << " j=" << j
       << " bounds(" << row_size << "," << col_size << ")";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   auto relative_location = std::find(rowI_indices[i].begin(),
@@ -76,7 +76,7 @@ void chi_math::SparseMatrix::InsertAdd(size_t i, size_t j, double value)
       << "SparseMatrix::Insert encountered out of bounds,"
       << " i=" << i << " j=" << j
       << " bounds(" << row_size << "," << col_size << ")";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   auto relative_location = std::find(rowI_indices[i].begin(),
@@ -108,7 +108,7 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
     chi::log.LogAllError()
     << "Incompatible matrix-vector size encountered "
     << "in call to SparseMatrix::SetDiagonal.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Assign values
@@ -144,7 +144,7 @@ double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
       << "Index i out of bounds"
       << " in call to SparseMatrix::ValueIJ"
       << " i=" << i;
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   if (not rowI_indices[i].empty())
@@ -253,7 +253,7 @@ void chi_math::SparseMatrix::CheckInitialized() const
   {
     chi::log.LogAllError()
       << "Illegal call to unitialized SparseMatrix matrix.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 }
 

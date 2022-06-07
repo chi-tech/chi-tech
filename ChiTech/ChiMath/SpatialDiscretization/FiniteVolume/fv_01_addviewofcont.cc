@@ -125,7 +125,7 @@ void chi_math::SpatialDiscretization_FV::
 /**Maps the cell index to a position stored locally.*/
 chi_math::CellFVValues* chi_math::SpatialDiscretization_FV::MapFeView(uint64_t cell_local_index)
 {
-  chi_math::CellFVValues* value;
+  chi_math::CellFVValues* value = nullptr;
   try { value = cell_fv_views.at(cell_local_index); }
   catch (const std::out_of_range& o)
   {
@@ -133,7 +133,7 @@ chi_math::CellFVValues* chi_math::SpatialDiscretization_FV::MapFeView(uint64_t c
       << "SpatialDiscretization_FV::MapFeView "
          "Failure to map Finite Volume View. The view is either not"
          "available or the supplied local index is invalid.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   return value;

@@ -44,7 +44,7 @@ int chiMeshCreateUnpartitioned1DOrthoMesh(lua_State* L)
   {
     chi::log.LogAllError()
       << func_name << ": First argument found to not be an array.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //=================================== Decl vars
@@ -114,13 +114,13 @@ int chiMeshCreateUnpartitioned2DOrthoMesh(lua_State* L)
   {
     chi::log.LogAllError()
       << func_name << ": First argument found to not be an array.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,2))
   {
     chi::log.LogAllError()
       << func_name << ": Second argument found to not be an array.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //=================================== Decl vars
@@ -207,19 +207,19 @@ int chiMeshCreateUnpartitioned3DOrthoMesh(lua_State* L)
   {
     chi::log.LogAllError()
       << func_name << ": First argument found to not be an array.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,2))
   {
     chi::log.LogAllError()
       << func_name << ": Second argument found to not be an array.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (not lua_istable(L,3))
   {
     chi::log.LogAllError()
       << func_name << ": Third argument found to not be an array.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //=================================== Decl vars

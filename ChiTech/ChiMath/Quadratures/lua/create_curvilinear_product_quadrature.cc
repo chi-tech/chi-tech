@@ -66,7 +66,7 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
       chi::log.LogAllError()
         << "chiCreateCylindricalProductQuadrature : third argument, "
         << ", if a lua table, must be of length equal to second argument.";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     vNa.resize(Np, 0);
     for (int n=1; n <= lNa; ++n)
@@ -82,7 +82,7 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
     chi::log.LogAllError()
       << "chiCreateCylindricalProductQuadrature : third argument "
       << "must be a number or a lua table.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   bool verbose = false;
@@ -136,7 +136,7 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
       chi::log.LogAllError()
         << "chiCreateCylindricalProductQuadrature : "
         << "Unsupported quadrature type supplied, type=" << ident;
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -225,7 +225,7 @@ int chiCreateSphericalProductQuadrature(lua_State *L)
       chi::log.LogAllError()
         << "chiCreateSphericalProductQuadrature : "
         << "Unsupported quadrature type supplied, type=" << ident;
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 

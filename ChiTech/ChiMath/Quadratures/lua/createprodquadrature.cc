@@ -157,21 +157,21 @@ int chiCreateProductQuadrature(lua_State *L)
       chi::log.LogAllError()
         << "chiCreateProductQuadrature:CUSTOM_QUADRATURE, second argument must "
         << "be a lua table.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
     if (not lua_istable(L,3))
     {
       chi::log.LogAllError()
         << "chiCreateProductQuadrature:CUSTOM_QUADRATURE, third argument must "
         << "be a lua table.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
     if (not lua_istable(L,4))
     {
       chi::log.LogAllError()
         << "chiCreateProductQuadrature:CUSTOM_QUADRATURE, fourth argument must "
         << "be a lua table.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
     if (num_args == 5)
       verbose = lua_toboolean(L,4);
@@ -234,7 +234,7 @@ int chiCreateProductQuadrature(lua_State *L)
     chi::log.LogAllError()
       << "In call to chiCreateProductQuadrature. Unsupported quadrature type"
          " supplied. Given: " << ident;
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }

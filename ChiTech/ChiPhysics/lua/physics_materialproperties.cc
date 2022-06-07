@@ -68,7 +68,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   {
     chi::log.Log0Error() << "Incorrect amount of arguments "
                                "in chiPhysicsMaterialAddProperty";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   int material_index = lua_tonumber(L,1);
@@ -117,7 +117,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
                                    << " already has property "
                                       "TRANSPORT_XSECTIONS"
                                    << std::endl;
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
 
@@ -154,7 +154,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
                                       "ISOTROPIC_MG_SOURCE "
                                    << property_index
                                    << std::endl;
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
 
@@ -174,7 +174,7 @@ int chiPhysicsMaterialAddProperty(lua_State *L)
   {
     chi::log.Log0Error()
       << "Unsupported property type in call to chiPhysicsMaterialAddProperty.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
 
@@ -304,7 +304,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
   {
     chi::log.Log0Error() << "Incorrect amount of arguments "
                                "in chiPhysicsMaterialSetProperty";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   int material_index = lua_tonumber(L,1);
@@ -374,7 +374,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
       {
         chi::log.Log0Error() << "ERROR: Unsupported operation for "
                                    "SCALAR_VALUE." << std::endl;
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
     }
@@ -382,7 +382,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     {
       chi::log.Log0Error() << "ERROR: Material has no property "
                                  "SCALAR_VALUE." << std::endl;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//if scalar value
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSPORT_XSECTIONS
@@ -479,7 +479,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
             << "ERROR: Invalid cross-section handle"
             << " in call to chiPhysicsMaterialSetProperty."
             << std::endl;
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 //        auto old_prop = prop;
         prop = xs;
@@ -492,7 +492,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
       {
         chi::log.LogAllError() << "Unsupported operation for "
                                    "TRANSPORT_XSECTIONS." << std::endl;
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
     }
@@ -500,7 +500,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
     {
       chi::log.LogAllError() << "Material has no property "
                                  "TRANSPORT_XSECTIONS." << std::endl;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//if thermal conductivity
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ISOTROPIC_MG_SOURCE
@@ -563,7 +563,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
             << "\", when setting "
             << "ISOTROPIC_MG_SOURCE using operation FROM_ARRAY, the fourth "
                "argument was detected not to be a lua table.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
         const size_t table_len = lua_rawlen(L,4);
@@ -586,7 +586,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
       {
         chi::log.LogAllError() << "Unsupported operation for "
                                      "ISOTROPIC_MG_SOURCE." << std::endl;
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
     else
@@ -594,7 +594,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
       chi::log.LogAllError() << "Material \"" << cur_material->name
                                 << "\" has no property "
                                    "ISOTROPIC_MG_SOURCE." << std::endl;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
   else
@@ -603,7 +603,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
                                "call to chiPhysicsMaterialSetProperty."
                                << property_index
                                << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
 
@@ -670,7 +670,7 @@ int chiPhysicsMaterialGetProperty(lua_State* L)
                                  "call to chiPhysicsMaterialGetProperty."
                               << property_index
                               << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   return 1;

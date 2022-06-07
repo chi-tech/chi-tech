@@ -47,7 +47,7 @@ int chiMeshHandlerSetCurrent(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to mesh handler specified "
       << "in call to chiMeshHandlerSetCurrent";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   chi::current_mesh_handler = handle;

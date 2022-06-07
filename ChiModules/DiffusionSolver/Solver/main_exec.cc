@@ -68,7 +68,7 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
     chi::log.Log()
       << "Diffusion Solver: Finite Element Discretization "
          "method not specified.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   if (!suppress_assembly)

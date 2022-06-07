@@ -33,7 +33,7 @@ void chi_mesh::UnpartitionedMesh::
     chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name <<" in call "
       << "to ReadFromEnsightGold \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   file.close();
 

@@ -37,7 +37,7 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
     chi::log.LogAllError()
       << "When specifying x-partitioning, the number of grp_subsets in x "
          "needs to be divisible by the number of partitions in x.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   if (y_remainder != 0)
@@ -45,7 +45,7 @@ GetCellXYPartitionID(chi_mesh::Cell *cell)
     chi::log.LogAllError()
       << "When specifying y-partitioning, the number of grp_subsets in y "
          "needs to be divisible by the number of partitions in y.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   size_t subsets_per_partitionx = num_x_subsets/vol_mesher->options.partition_x;
@@ -136,7 +136,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
         chi::log.LogAllError()
           << "Number of sub-layers in extruded mesh is not divisible "
           << "by the requested number of z-partitions.";
-        exit(EXIT_FAILURE);
+       chi::Exit(EXIT_FAILURE);
       }
 
       int delta_zk = num_sub_layers/
@@ -234,7 +234,7 @@ GetCellXYZPartitionID(chi_mesh::Cell *cell)
     chi::log.LogAllError()
       << "A cell was encountered for which "
          "no zpartition id was found";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   return ijk_id;

@@ -23,7 +23,7 @@ int chi_mesh::SurfaceMesh::
     chi::log.LogAllError()
       << "Failed to open file: "<< fileName<<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //===================================================== Reading every line and determining size
@@ -390,7 +390,7 @@ int chi_mesh::SurfaceMesh::
   << "Surface mesh loaded with "
   << this->faces.size() << " triangle faces and "
   << this->poly_faces.size() << " polygon faces.";
-  //exit(EXIT_FAILURE);
+  //chi::Exit(EXIT_FAILURE);
 
   return 0;
 }
@@ -413,7 +413,7 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
     chi::log.LogAllError()
       << "Failed to open file: "<< node_filename <<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   int num_verts;
@@ -439,7 +439,7 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
     chi::log.LogAllError()
       << "Failed to open file: "<< tria_filename <<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   int num_tris;
@@ -544,7 +544,7 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
     << "Surface mesh loaded with "
     << this->faces.size() << " triangle faces and "
     << this->poly_faces.size() << " polygon faces.";
-  //exit(EXIT_FAILURE);
+  //chi::Exit(EXIT_FAILURE);
 
   return 0;
 }
@@ -570,13 +570,13 @@ chi_mesh::SurfaceMesh* chi_mesh::SurfaceMesh::
   {
     chi::log.LogAllError()
       << "chi_mesh::SurfaceMesh::CreateFromDivisions. Empty vertex_x list.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (vertices_1d_y.empty())
   {
     chi::log.LogAllError()
       << "chi_mesh::SurfaceMesh::CreateFromDivisions. Empty vertex_y list.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Populate 2D vertices
@@ -686,7 +686,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
     chi::log.LogAllError()
       << "Failed to open file: "<< fileName <<" in call "
       << "to ImportFromMshFiles \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //=================================================== Find section with node information
@@ -703,7 +703,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
   if ( !(iss >> num_nodes) )
   {
     chi::log.LogAllError()<<"Failed while trying to read the number of nodes.\n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   vertices.resize(num_nodes);
@@ -718,13 +718,13 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
     if ( !(iss >> vert_index) )
     {
       chi::log.LogAllError()<<"Failed to read vertex index.\n";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     if (!(iss >> vertex.x >> vertex.y >> vertex.z))
     {
       chi::log.LogAllError()<<"Failed while reading the vertex coordinates.\n";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     vertices[vert_index-1] = vertex;
@@ -746,7 +746,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
   if (!(iss >> num_elems))
   {
     chi::log.LogAllError()<<"Failed to read number of elements.\n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   for (int n=0; n<num_elems; n++)
@@ -759,20 +759,20 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
     if ( !(iss >> element_index >> elem_type >> num_tags) )
     {
       chi::log.LogAllError()<<"Failed while reading element index, element type, and number of tags.\n";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     if( !(iss>>physical_reg) )
     {
       chi::log.LogAllError()<<"Failed while reading physical region.\n";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     for (int i=1; i<num_tags; i++)
       if( !(iss >> tag) )
       {
         chi::log.LogAllError()<<"Failed when reading tags.\n";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
     if (elem_type == 2)
@@ -784,7 +784,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
         if ( !(iss >> nodes[i]) )
         {
           chi::log.LogAllError()<<"Failed when reading element node index.\n";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
       newFace->v_indices.resize(num_nodes);
@@ -800,7 +800,7 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
         if ( !(iss >> node) )
         {
           chi::log.LogAllError()<<"Failed when reading element node index.\n";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
       newFace->v_indices.resize(num_nodes);

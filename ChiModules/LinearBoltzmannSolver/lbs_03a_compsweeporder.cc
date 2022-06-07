@@ -52,7 +52,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
     chi::log.LogAllError()
       << "When using PARMETIS type partitioning then groupset iterative method"
          " must be NPT_CLASSICRICHARDSON_CYCLES or NPT_GMRES_CYCLES";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //================================================== Compute sweep ordering
@@ -127,7 +127,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
           chi::log.LogAllError()
             << "Incompatible number of azimuthal angles in quadrature set "
             << "for a 1D simulation.";
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
       else
@@ -137,7 +137,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
           chi::log.LogAllError()
             << "Incompatible number of azimuthal angles in quadrature set "
             << "for a 2D or 3D simulation.";
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
 
@@ -145,7 +145,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
       {
         chi::log.LogAllError()
           << "Incompatible number of polar angles in quadrature set.";
-        std::exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
       //============================================= Create sweep ordering
@@ -182,7 +182,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
         << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
            "and therefore only certain angular quadrature types are supported. "
            "i.e., for now just AngularQuadratureType::ProductQuadrature.";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
   else
@@ -192,7 +192,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset
          "and therefore only certain geometry types are supported. i.e., "
          "GeometryType::ONED_SLAB, GeometryType::TWOD_CARTESIAN, "
          "GeometryType::THREED_CARTESIAN.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 }
 
@@ -229,7 +229,7 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& grou
         << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
            "and therefore only certain angular quadrature types are supported. "
            "i.e., for now just AngularQuadratureType::ProductQuadrature.";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
   else
@@ -238,6 +238,6 @@ void lbs::SteadySolver::ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& grou
       << "The simulation is not using \"LBSGroupset.ANGLE_AGG_SINGLE\", "
          "and therefore only certain geometry types are supported. i.e., "
          "GeometryType::ONED_SPHERICAL, GeometryType::TWOD_CYLINDRICAL.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 }

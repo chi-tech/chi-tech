@@ -127,7 +127,7 @@ void chi_physics::TransportCrossSections::
         << "ERROR: Invalid cross-section handle"
         << " in call to chiPhysicsMaterialSetProperty."
         << std::endl;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     
     cross_secs.push_back(xs);
@@ -151,7 +151,7 @@ void chi_physics::TransportCrossSections::
       chi::log.LogAllError()
         << "In call to " << __FUNCTION__ << ": "
         << "all cross-sections must have the same number of groups.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //============================ Increment number of precursors
@@ -161,7 +161,7 @@ void chi_physics::TransportCrossSections::
           << "In call to " << __FUNCTION__ << ": "
           << "only fissile materials are allowed to have delayed "
           << "neutron precursors.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     num_precursors_J += xs->num_precursors;
   }//for cross-section

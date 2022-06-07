@@ -43,7 +43,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
       << "LBSCurvilinear::Solver::PerformInputChecks : "
       << "invalid coordinate system, static_cast<int>(type) = "
       << static_cast<int>(coord_system_type);
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //  re-interpret geometry type to curvilinear
@@ -71,7 +71,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << static_cast<int>(options.geometry_type) << " "
             << "for curvilinear coordinate system, static_cast<int>(type) = "
             << static_cast<int>(coord_system_type);
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
       break;
@@ -93,7 +93,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << static_cast<int>(options.geometry_type) << " "
             << "for curvilinear coordinate system, static_cast<int>(type) = "
             << static_cast<int>(coord_system_type);
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
       break;
@@ -105,7 +105,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
         << "invalid geometry, static_cast<int>(type) = "
         << static_cast<int>(options.geometry_type) << " "
         << "for curvilinear coordinate system";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -126,7 +126,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << "invalid angular quadrature, static_cast<int>(type) = "
             << static_cast<int>(angular_quad_ptr->type)
             << ", for groupset = " << gs;
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
         break;
       }
@@ -141,7 +141,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << "invalid angular quadrature, static_cast<int>(type) = "
             << static_cast<int>(angular_quad_ptr->type)
             << ", for groupset = " << gs;
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
         break;
       }
@@ -151,7 +151,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
           << "LBSCurvilinear::Solver::PerformInputChecks : "
           << "invalid curvilinear coordinate system, static_cast<int>(type) = "
           << static_cast<int>(coord_system_type);
-        std::exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
 
@@ -168,7 +168,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << "invalid angle aggregation type, static_cast<int>(type) = "
             << static_cast<int>(angleagg_method)
             << ", for groupset = " << gs;
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
         break;
       }
@@ -181,7 +181,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << "invalid angle aggregation type, static_cast<int>(type) = "
             << static_cast<int>(angleagg_method)
             << ", for groupset = " << gs;
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
         break;
       }
@@ -191,7 +191,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
           << "LBSCurvilinear::Solver::PerformInputChecks : "
           << "invalid curvilinear coordinate system, static_cast<int>(type) = "
           << static_cast<int>(coord_system_type);
-        std::exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
   }
@@ -228,7 +228,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
                   << "mesh contains boundary faces with outward-oriented unit "
                   << "normal vector " << (-1*unit_normal_vectors[d]).PrintS()
                   << "with vertices characterised by v(" << d << ") != 0.";
-                std::exit(EXIT_FAILURE);
+                chi::Exit(EXIT_FAILURE);
               }
             }
             face_orthogonal = true;
@@ -241,7 +241,7 @@ lbs_curvilinear::Solver::PerformInputChecks()
             << "LBSCurvilinear::Solver::PerformInputChecks : "
             << "mesh contains boundary faces not orthogonal with respect to "
             << "Cartesian reference frame.";
-          std::exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
     }
@@ -289,7 +289,7 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
         << "LBSCurvilinear::Solver::InitializeSpatialDiscretization : "
         << "invalid geometry, static_cast<int>(type) = "
         << static_cast<int>(options.geometry_type);
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -326,7 +326,7 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
         << "LBSCurvilinear::Solver::InitializeSpatialDiscretization : "
         << "invalid geometry, static_cast<int>(type) = "
         << static_cast<int>(options.geometry_type);
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 

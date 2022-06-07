@@ -26,7 +26,7 @@ void chi_physics::TransportCrossSections::
       << "Failed to open PDT cross-section file \""
       << file_name << "\" in call to "
       << "TransportCrossSections::MakeFromPDTxsFile";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   char line[250];
@@ -57,7 +57,7 @@ void chi_physics::TransportCrossSections::
       << file_name << "\" has " << mg_or_single_group << " "
       << xs_type << " cross-sections.";
     file.close();
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //1 temperatures, 1 densities, and "168" groups.
@@ -158,7 +158,7 @@ void chi_physics::TransportCrossSections::
             << "Mismatched sink group with general group structure "
                "encountered during transfer moment processing. " << sink
             << " " << g;
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
         for (int gprime=gprime_first; gprime<=gprime_last; gprime++)

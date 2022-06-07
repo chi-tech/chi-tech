@@ -61,7 +61,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   {
     chi::log.LogAllError()
       << "PWL-MapCFEMDOF: ir Mapping error node ";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   };
 
   // Writes a message on jr error
@@ -69,7 +69,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   {
     chi::log.LogAllError()
       << "PWL-MapCFEMDOF: jr Mapping error node ";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   };
 
   // Checks whether an integer is already in a vector

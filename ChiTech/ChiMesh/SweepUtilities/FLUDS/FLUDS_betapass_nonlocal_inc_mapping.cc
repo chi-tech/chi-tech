@@ -52,7 +52,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                 << " InitializeBetaElements. locJ=" << locJ
                 << " prelocI=" << prelocI
                 << " cell=" << face.neighbor_id;
-            exit(EXIT_FAILURE);
+            chi::Exit(EXIT_FAILURE);
           }
 
           //============================== Find associated face
@@ -77,7 +77,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           {
             chi::log.LogAll()
                 << "Associated face not found in call to InitializeBetaElements";
-            exit(EXIT_FAILURE);
+            chi::Exit(EXIT_FAILURE);
           }
 
           //============================== Map dofs
@@ -103,7 +103,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             {
               chi::log.LogAll()
                   << "Associated vertex not found in call to InitializeBetaElements";
-              exit(EXIT_FAILURE);
+              chi::Exit(EXIT_FAILURE);
             }
           }
 
@@ -140,7 +140,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
                 << " InitializeBetaElements. locJ=" << locJ
                 << " delayed prelocI=" << delayed_preLocI
                 << " cell=" << face.neighbor_id;
-            exit(EXIT_FAILURE);
+            chi::Exit(EXIT_FAILURE);
           }
 
           //============================== Find associated face
@@ -172,7 +172,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
           {
             chi::log.LogAll()
                 << "Associated face not found in call to InitializeBetaElements";
-            exit(EXIT_FAILURE);
+            chi::Exit(EXIT_FAILURE);
           }
 
           //============================== Map dofs
@@ -198,7 +198,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             {
               chi::log.LogAll()
                   << "Associated vertex not found in call to InitializeBetaElements";
-              exit(EXIT_FAILURE);
+              chi::Exit(EXIT_FAILURE);
             }
           }
 

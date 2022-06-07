@@ -19,7 +19,7 @@ double chi_diffusion::Solver::
                  const chi_math::finite_element::UnitIntegralData& fe_intgrl_values,
                  unsigned int f)
 {
-  double hp;
+  double hp=1.0;
 
   size_t Nf = cell.faces.size();
   size_t Nv = cell.vertex_ids.size();
@@ -90,7 +90,7 @@ double chi_diffusion::Solver::
   {
     chi::log.LogAllError()
       << "Unsupported cell type in call to HPerpendicular";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
 

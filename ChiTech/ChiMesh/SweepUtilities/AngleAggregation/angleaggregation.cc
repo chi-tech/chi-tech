@@ -120,7 +120,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
                " that is not symmetric about the axis associated with the "
                "reflected boundary, or ii) the reflecting boundary is not "
                "aligned with any reflecting axis of the quadrature.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
 

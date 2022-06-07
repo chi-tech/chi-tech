@@ -15,7 +15,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
   {
     chi::log.LogAllError()
       << "Unassigned field function in volume field function interpolator.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   } else
   {
     this->grid_view = field_functions[0]->grid;

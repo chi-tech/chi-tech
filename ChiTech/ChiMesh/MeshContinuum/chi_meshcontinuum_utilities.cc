@@ -208,7 +208,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
       << "Invalid cell index encountered in call to "
       << "MeshContinuum::FindAssociatedVertices. Index points to either a boundary"
       << "or a non-local cell.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   auto& adj_cell = local_cells[cur_face.GetNeighborLocalID(*this)];
@@ -239,7 +239,7 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
         << "MeshContinuum::FindAssociatedVertices. Could not find a matching"
            "node."
         << cur_face.neighbor_id << " " << cur_face.centroid.PrintS();
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -254,7 +254,7 @@ chi_mesh::Vector3 chi_mesh::MeshContinuum::
   if (list.empty())
   {
     chi::log.LogAllError() << "ComputeCentroidFromListOfNodes, empty list";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   chi_mesh::Vector3 centroid;
   for (auto node_id : list)

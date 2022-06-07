@@ -37,7 +37,7 @@ void lbs::SteadySolver::InitAngleAggPolar(LBSGroupset& groupset)
       << "Failed to initialize angle aggregation. "
          "Polar angle aggregation cannot be used by the current "
          "angular quadrature.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   auto product_quadrature =

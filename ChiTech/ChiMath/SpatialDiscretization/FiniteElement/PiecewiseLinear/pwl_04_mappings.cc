@@ -59,7 +59,7 @@ MapDOF(const chi_mesh::Cell& cell,
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell.global_id << " and partition-ID "
         << cell.partition_id;
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
@@ -136,7 +136,7 @@ MapDOFLocal(const chi_mesh::Cell& cell,
         << "SpatialDiscretization_PWL::MapDFEMDOF. Mapping failed for cell "
         << "with global index " << cell.global_id << " and partition-ID "
         << cell.partition_id;
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     if (storage == chi_math::UnknownStorageType::BLOCK)

@@ -73,7 +73,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
 //    {
 //      chi::log.LogAllError()
 //        << "Function CheckCyclicDependencies. Detected cyclic depency.";
-//      exit(EXIT_FAILURE);
+//     chi::Exit(EXIT_FAILURE);
 //    }
 
     auto topological_order = G.GenerateTopologicalSort();
@@ -81,7 +81,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
     {
       chi::log.LogAllError()
         << "Function CheckCyclicDependencies. Detected cyclic depency.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     //================================= Cleanup

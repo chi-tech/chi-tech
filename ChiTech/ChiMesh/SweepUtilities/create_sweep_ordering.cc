@@ -97,7 +97,7 @@ chi_mesh::sweep_management::
       << "Topological sorting for local sweep-ordering failed. "
       << "Cyclic dependencies detected. Cycles need to be allowed"
       << " by calling application.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Create Task

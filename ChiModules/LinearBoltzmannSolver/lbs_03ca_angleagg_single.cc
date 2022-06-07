@@ -237,7 +237,7 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
               chi::log.LogAllError()
                 << "Unknown error in PRIMARY_FLUDS::\n"
                    "InitializeAlphaElements. " << exc.what();
-              exit(EXIT_FAILURE);
+              chi::Exit(EXIT_FAILURE);
             }
             try{primary_fluds->InitializeBetaElements(groupset.sweep_orderings[n]);}
             catch (const std::exception& exc)
@@ -245,7 +245,7 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
               chi::log.LogAllError()
                 << "Unknown error in PRIMARY_FLUDS::\n"
                    "InitializeBetaElements. " << exc.what();
-              exit(EXIT_FAILURE);
+              chi::Exit(EXIT_FAILURE);
             }
 
             fluds = primary_fluds;
@@ -279,6 +279,6 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
     chi::log.LogAllError()
       << "Failed to initialize angle aggregation. "
          "Unsupported angular quadrature.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 }

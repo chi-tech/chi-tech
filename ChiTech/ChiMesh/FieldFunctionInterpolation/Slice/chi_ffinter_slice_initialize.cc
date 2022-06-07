@@ -25,7 +25,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
   {
     chi::log.LogAllError()
     << "Unassigned field function in slice field function interpolator.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   } else
   {
     this->grid_view = field_functions[0]->grid;
@@ -43,7 +43,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     {
       chi::log.Log()
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
@@ -88,7 +88,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     {
       chi::log.LogAllError()
         << "Unsupported cell type in call to Slice Initialize.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//for local cell
 
@@ -105,7 +105,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     {
       chi::log.Log()
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON

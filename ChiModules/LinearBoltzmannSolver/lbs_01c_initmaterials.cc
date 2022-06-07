@@ -75,7 +75,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
       chi::log.LogAllError()
         << "LBS-InitMaterials: Found no transport cross-section property for "
         << "material \"" << current_material->name << "\".";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     //====================================== Check number of groups legal
     if (matid_to_xs_map[mat_id]->num_groups < groups.size())
@@ -85,7 +85,7 @@ void lbs::SteadySolver::InitMaterials(std::set<int>& material_ids)
         << matid_to_xs_map[mat_id]->num_groups << " groups and"
         << " the simulation has " << groups.size() << " groups."
         << " The material must have a greater or equal amount of groups.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Check number of moments

@@ -336,7 +336,7 @@ void chi_mesh::UnpartitionedMesh::
     chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name <<" in call "
       << "to ReadFromVTU \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   file.close();
 
@@ -374,7 +374,7 @@ void chi_mesh::UnpartitionedMesh::
     chi::log.LogAllError()
       << "The VTU reader expects material identifiers and boundary identifiers "
       << "to be defined in the same field.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   vtkDataArray* cell_id_array_ptr = nullptr;
@@ -400,7 +400,7 @@ void chi_mesh::UnpartitionedMesh::
         << "The VTU file : \"" << options.file_name << "\" "
         << "does not contain a vtkCellData field of name : \""
         << options.material_id_fieldname << "\".";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     cell_id_array_ptr = vtkArrayDownCast<vtkDataArray>(vtk_abstract_array_ptr);
@@ -411,7 +411,7 @@ void chi_mesh::UnpartitionedMesh::
         << "with vtkCellData field of name : \""
         << options.material_id_fieldname << "\" "
         << "cannot be downcast to vtkDataArray";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     const auto cell_id_n_tup = cell_id_array_ptr->GetNumberOfTuples();
@@ -423,7 +423,7 @@ void chi_mesh::UnpartitionedMesh::
         << options.material_id_fieldname << "\" has n. tuples : "
         << cell_id_n_tup << ", but differs from the value expected : "
         << total_cell_count << ".";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     const auto cell_id_n_val = cell_id_array_ptr->GetNumberOfValues();
@@ -435,7 +435,7 @@ void chi_mesh::UnpartitionedMesh::
         << options.material_id_fieldname << "\" has n. values : "
         << cell_id_n_val << ", but differs from the value expected : "
         << total_cell_count << ".";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -453,7 +453,7 @@ void chi_mesh::UnpartitionedMesh::
     chi::log.LogAllError()
       << "The VTU file : \"" << options.file_name << "\" "
       << "does not identify a mesh of valid dimension.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Push cells

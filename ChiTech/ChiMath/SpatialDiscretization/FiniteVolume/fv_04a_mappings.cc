@@ -99,7 +99,7 @@ int64_t chi_math::SpatialDiscretization_FV::
 //  {
 //    chi::log.LogAllError()
 //      << "SpatialDiscretization_FV::MapDOFLocal reference cell is nullptr.";
-//    exit(EXIT_FAILURE);
+//   chi::Exit(EXIT_FAILURE);
 //  }
 
   int address=-1;
@@ -134,7 +134,7 @@ int64_t chi_math::SpatialDiscretization_FV::
 //  {
 //    chi::log.LogAllError()
 //      << "SpatialDiscretization_FV::MapDOFLocal reference cell is nullptr.";
-//    exit(EXIT_FAILURE);
+//   chi::Exit(EXIT_FAILURE);
 //  }
   if (component < 0) return -1;
 

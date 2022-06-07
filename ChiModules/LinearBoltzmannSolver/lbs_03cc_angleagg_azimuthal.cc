@@ -37,7 +37,7 @@ void lbs::SteadySolver::InitAngleAggAzimuthal(LBSGroupset& groupset)
       << "Failed to initialize angle aggregation. "
          "Azimuthal angle aggregation cannot be used by the current "
          "angular quadrature.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   auto product_quadrature =

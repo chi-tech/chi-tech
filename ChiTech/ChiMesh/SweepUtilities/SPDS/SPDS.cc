@@ -33,7 +33,8 @@ int chi_mesh::sweep_management::SPDS::MapLocJToPrelocI(int locJ)
 
   chi::log.LogAllError()
     << "SPDS Invalid mapping encountered in MapLocJToPrelocI.";
-  exit(EXIT_FAILURE);
+  chi::Exit(EXIT_FAILURE);
+  return 0;
 }
 
 //###################################################################
@@ -50,7 +51,8 @@ int chi_mesh::sweep_management::SPDS::MapLocJToDeplocI(int locJ)
 
   chi::log.LogAllError()
     << "SPDS Invalid mapping encountered in MapLocJToDeplocI.";
-  exit(EXIT_FAILURE);
+  chi::Exit(EXIT_FAILURE);
+  return 0;
 }
 
 
@@ -173,7 +175,7 @@ void chi_mesh::sweep_management::SPDS::BuildTaskDependencyGraph(bool cycle_allow
         << "Topological sorting for global sweep-ordering failed. "
         << "Cyclic dependencies detected. Cycles need to be allowed"
         << " by calling application.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 

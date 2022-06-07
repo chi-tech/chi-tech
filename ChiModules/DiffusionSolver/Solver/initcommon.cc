@@ -17,7 +17,7 @@ void chi_diffusion::Solver::InitializeCommonItems()
 //  {
 //    chi::log.LogAllError()
 //      << "chi_diffusion::Solver::InitializeCommonItems: No region added to solver.";
-//    exit(EXIT_FAILURE);
+//    chi::Exit(EXIT_FAILURE);
 //  }
 //
 //  auto& region = regions.back();

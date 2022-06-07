@@ -26,7 +26,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
     chi::log.LogAllError()
       << "A call to SweepBuffer::BuildMessageStructure() has been made without"
          " an initialized angleset.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   auto spds =  angleset->GetSPDS();

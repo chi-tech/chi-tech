@@ -28,7 +28,7 @@ Initialize()
   {
     chi::log.LogAllError()
       << "Unassigned field function in line field function interpolator.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   grid_view = nullptr;
 

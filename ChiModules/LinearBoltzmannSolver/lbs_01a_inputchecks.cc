@@ -14,13 +14,13 @@ void lbs::SteadySolver::PerformInputChecks()
   {
     chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No groups added to solver.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   if (groupsets.empty())
   {
     chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No group-sets added to solver.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   int grpset_counter=0;
   for (auto& group_set : groupsets)
@@ -30,7 +30,7 @@ void lbs::SteadySolver::PerformInputChecks()
       chi::log.LogAllError()
         << "LinearBoltzmann::Solver: No groups added to groupset "
         << grpset_counter << ".";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     ++grpset_counter;
   }
@@ -38,13 +38,13 @@ void lbs::SteadySolver::PerformInputChecks()
   {
     chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No discretization method set.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 //  if (regions.empty())
 //  {
 //    chi::log.LogAllError()
 //      << "LinearBoltzmann::Solver: No regions added to solver.";
-//    exit(EXIT_FAILURE);
+//    chi::Exit(EXIT_FAILURE);
 //  }
 //  chi_mesh::Region*  aregion = regions.back();
 //  grid                       = aregion->GetGrid();
@@ -55,7 +55,7 @@ void lbs::SteadySolver::PerformInputChecks()
   {
     chi::log.LogAllError()
       << "LinearBoltzmann::Solver: No grid available from region.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Determine geometry type

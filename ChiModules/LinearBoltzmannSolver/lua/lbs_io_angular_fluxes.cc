@@ -38,7 +38,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -47,7 +47,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << __FUNCTION__;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   lbs_solver.WriteGroupsetAngularFluxes(*groupset, file_base);
@@ -88,7 +88,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -97,7 +97,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
     chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << __FUNCTION__;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   lbs_solver.ReadGroupsetAngularFluxes(*groupset, file_base);

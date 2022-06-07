@@ -95,7 +95,7 @@ void chi::run_time::ParseArguments(int argc, char** argv)
       {
         std::cerr << "Invalid option used with command line argument "
                      "-v. Options are 0,1 or 2." << std::endl;
-        exit(EXIT_FAILURE);
+       chi::Exit(EXIT_FAILURE);
       }
       else
       {
@@ -108,7 +108,7 @@ void chi::run_time::ParseArguments(int argc, char** argv)
         {
           std::cerr << "Invalid option used with command line argument "
                        "-v. Options are 0,1 or 2." << std::endl;
-          exit(EXIT_FAILURE);
+         chi::Exit(EXIT_FAILURE);
         }
       }
 

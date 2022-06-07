@@ -34,7 +34,7 @@ int chiVolumeMesherExecute(lua_State *L)
     chi::log.LogAllError()
       << __FUNCTION__ << ": called without a volume mesher set. Make a "
                          "call to chiVolumeMesherCreate.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   cur_hndlr.volume_mesher->Execute();

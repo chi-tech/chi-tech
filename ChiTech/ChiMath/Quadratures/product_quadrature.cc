@@ -104,7 +104,7 @@ void chi_math::ProductQuadrature::
       << "Product Quadrature, InitializeWithCustom: mismatch in the amount "
          "angles and weights. Number of azimuthal angles times number "
          "polar angles must equal the amount of weights.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   azimu_ang = azimuthal;

@@ -70,6 +70,7 @@ int chiFFInterpolationCreate(lua_State *L)
   {
     chi::log.LogAllError()
     << "Invalid FFITypeIndex used in chiFFInterpolationCreate.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
+  return 0;
 }

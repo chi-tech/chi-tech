@@ -104,7 +104,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
       << "Any partitioning scheme other than KBA_STYLE_XYZ is currently not"
          " supported by VolumeMesherExtruder. No worries. There are plans"
          " to develop this support.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (!options.mesh_global)
   {
@@ -117,7 +117,7 @@ void chi_mesh::VolumeMesherExtruder::Execute()
         << chi::mpi.process_count << ") does not match amount of processors "
         << "required by surface mesher partitioning parameters ("
         << p_tot << ").";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }//if mesh-global
 

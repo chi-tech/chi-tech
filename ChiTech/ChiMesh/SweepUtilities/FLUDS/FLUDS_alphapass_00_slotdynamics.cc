@@ -105,7 +105,7 @@ void chi_mesh::sweep_management::PRIMARY_FLUDS::
             << " cat: " << face_categ
             << " omg=" << spds->omega.PrintS()
             << " lbsize=" << lock_box.size();
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
       }//if local

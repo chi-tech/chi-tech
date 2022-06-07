@@ -45,7 +45,7 @@ int chiCreateCustomAngularQuadrature(lua_State *L)
     chi::log.LogAllError()
       << "chiCreateCustomAngularQuadrature: Tables lengths supplied "
          "are not of equal lengths.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   std::vector<double> azi_angles(Na,0.0);
