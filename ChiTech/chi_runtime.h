@@ -85,8 +85,6 @@ public:
   static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
 
-
-
   //#######################################################
   /**Data block for run-time quantities.*/
   class run_time

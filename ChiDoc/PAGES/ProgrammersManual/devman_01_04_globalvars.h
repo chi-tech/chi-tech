@@ -2,13 +2,17 @@
 
 \section devman2_sec0 Global variables available
 
-The major global variables are defined in "chi_runtime.cc"
+All global entities for the ChiTech library are contained within the
+static `chi` class. This class has the name `chi` and an instance of it
+cannot be created. Within this class, all of its members are statically
+declared. Several singleton objects are defined in `chi`, they are:
+ - chi::mpi A handler for parallel related items.
+ - chi::program_timer The primary program timer.
+ - chi::console The link to the lua scripting engine.
+ - chi::log A handler for parallel logging events and verbosity.
 
-They are:
- - ChiConsole chi_console The link to the lua scripting engine.
- - ChiMath chi_math_handler A handler of math related entities
- - ChiMPI chi_mpi A handler for parallel related items.
- - ChiLog chi::log A handler for parallel logging events and verbosity.
+A number of stacks are also declared. They are basically arrays of
+shared pointers (i.e., `std::shared_ptr`)
 
 There are also a number of secondary global variables that assist developers
 with coding. They are:
