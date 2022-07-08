@@ -3,6 +3,7 @@
 
 #include "../chi_mesh.h"
 #include <chi_log.h>
+#include <array>
 
 #define SPHERE        1
 #define SPHERE_ORIGIN 2

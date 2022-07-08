@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <vector>
 #include <stdexcept>
+#include <string>
 
 namespace chi_data_types
 {
