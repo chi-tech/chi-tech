@@ -180,7 +180,7 @@ add_subdirectory("${CHI_TECH_MOD}")
 
 #================================================ Define targets
 add_library(ChiLib STATIC ${SOURCES})
-target_link_libraries(ChiLib ${CHI_LIBS} $<TARGET_FILE:ThirdParty>)
+target_link_libraries(ChiLib ${CHI_LIBS} ThirdParty)
 target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
 
 add_executable(${TARGET} "${CHI_TECH_DIR}/ChiTech/chi_tech_main.cc")
@@ -190,4 +190,3 @@ target_compile_options(${TARGET} PUBLIC ${CHI_CXX_FLAGS})
 # |------------ Write Makefile to root directory
 file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
         "clean:\n\t$(MAKE) -C chi_build clean\n")
-
