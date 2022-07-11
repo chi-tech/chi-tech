@@ -109,12 +109,12 @@ public:
   std::vector<Unknown> unknowns;
   UnknownStorageType dof_storage_type;
 
+  typedef std::pair<UnknownType, unsigned int> UnknownInfo;
+  //Constructors
   explicit UnknownManager(UnknownStorageType in_storage_type=
                                   UnknownStorageType::NODAL) noexcept :
     dof_storage_type(in_storage_type)
   {}
-
-  typedef std::pair<UnknownType, unsigned int> UnknownInfo;
 
   UnknownManager(std::initializer_list<UnknownInfo> unknown_info_list,
                  UnknownStorageType in_storage_type=
@@ -125,6 +125,10 @@ public:
       AddUnknown(uk_info.first, uk_info.second);
   }
 
+  UnknownManager(const UnknownManager& other) = default;
+  UnknownManager& operator=(const UnknownManager& other) = default;
+
+  //Utilities
   static UnknownManager GetUnitaryUnknownManager()
   {
     return UnknownManager({{UnknownType::SCALAR,0}});

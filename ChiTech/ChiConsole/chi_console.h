@@ -36,6 +36,8 @@ namespace chi_objects
     //02 Utilities
     int         ExecuteFile(const std::string& fileName,int argc, char** argv) const;
     void        PostMPIInfo(int location_id, int number_of_processes) const;
+    void        RegisterFunction(const std::string& string_name,
+                                 lua_CFunction function);
     //03
     void        FlushConsole();
     //05 Memory

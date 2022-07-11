@@ -47,3 +47,11 @@ void chi_objects::ChiConsole::PostMPIInfo(int location_id, int number_of_process
   lua_pushnumber(L,number_of_processes);
   lua_setglobal(L,"chi_number_of_processes");
 }
+
+//###################################################################
+/**Registers a lua function pointing to a c-function.*/
+void chi_objects::ChiConsole::
+  RegisterFunction(const std::string &string_name, lua_CFunction function)
+{
+  lua_register(this->consoleState,string_name.c_str(), function);
+}
