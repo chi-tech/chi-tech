@@ -3,14 +3,15 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
+#include "chi_runtime.h"
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
 
 #include "ChiConsole/chi_console.h"
-extern ChiConsole&        chi_console;
 
 #include <iomanip>
 #include <iostream>
@@ -23,23 +24,23 @@ extern ChiConsole&        chi_console;
 \author Jan*/
 int chiVolumeMesherExecute(lua_State *L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //Get memory before
-  CSTMemory mem_before = chi_console.GetMemoryUsage();
+  chi_objects::CSTMemory mem_before = chi::console.GetMemoryUsage();
 
-  if (cur_hndlr->volume_mesher == nullptr)
+  if (cur_hndlr.volume_mesher == nullptr)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << __FUNCTION__ << ": called without a volume mesher set. Make a "
                          "call to chiVolumeMesherCreate.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
-  cur_hndlr->volume_mesher->Execute();
+  cur_hndlr.volume_mesher->Execute();
 
   //Get memory usage
-  CSTMemory mem_after = chi_console.GetMemoryUsage();
+  chi_objects::CSTMemory mem_after = chi::console.GetMemoryUsage();
 
   std::stringstream mem_string;
   mem_string
@@ -50,8 +51,8 @@ int chiVolumeMesherExecute(lua_State *L)
   << mem_after.memory_mbytes
   << " MB";
 
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+  chi::log.Log()
+    << chi::program_timer.GetTimeString()
     << " chiVolumeMesherExecute: Volume meshing completed."
     << mem_string.str()
     << std::endl;

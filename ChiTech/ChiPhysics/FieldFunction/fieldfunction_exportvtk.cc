@@ -3,11 +3,12 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <vtkCellType.h>
 
@@ -21,7 +22,7 @@ void chi_physics::FieldFunction::
   ExportToVTKComponentOnly(const std::string& base_name,
                            const std::string& field_name)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Exporting field function " << text_name
     << " to files with base name " << base_name;
 
@@ -45,7 +46,7 @@ void chi_physics::FieldFunction::
 void chi_physics::FieldFunction::ExportToVTK(const std::string& base_name,
                                              const std::string& field_name)
 {
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Exporting field function " << text_name
     << " to files with base name " << base_name
     << " to field name " << field_name;
@@ -116,12 +117,12 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
   ofile << "    </PPoints>" << std::endl;
 
   bool is_global_mesh =
-    chi_mesh::GetCurrentHandler()->volume_mesher->options.mesh_global;
+    chi_mesh::GetCurrentHandler().volume_mesher->options.mesh_global;
   
   // Cut off path to base_filename
   std::string filename_short = base_filename.substr(base_filename.find_last_of("/\\")+1);
 
-  for (int p=0; p<chi_mpi.process_count; ++p)
+  for (int p=0; p<chi::mpi.process_count; ++p)
   {
     if (is_global_mesh and p!=0) continue;
 

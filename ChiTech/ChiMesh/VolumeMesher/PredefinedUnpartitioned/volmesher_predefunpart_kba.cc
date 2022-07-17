@@ -6,18 +6,19 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 //###################################################################
 /** Applies KBA-style partitioning to the mesh.*/
 std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   KBA(const chi_mesh::UnpartitionedMesh& umesh)
 {
-  chi_log.Log(LOG_0) << "Partitioning mesh KBA-style.";
+  chi::log.Log() << "Partitioning mesh KBA-style.";
 
   const size_t num_raw_cells = umesh.raw_cells.size();
 
@@ -25,10 +26,10 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   //                                         from centroid
   auto GetPIDFromCentroid = [](const chi_mesh::Vertex& centroid)
   {
-    auto handler = chi_mesh::GetCurrentHandler();
+    auto& handler = chi_mesh::GetCurrentHandler();
 
-    int Px = handler->volume_mesher->options.partition_x;
-    int Py = handler->volume_mesher->options.partition_y;
+    int Px = handler.volume_mesher->options.partition_x;
+    int Py = handler.volume_mesher->options.partition_y;
 
     chi_mesh::Cell temp_cell(CellType::GHOST, CellType::GHOST);
     temp_cell.centroid = centroid;
@@ -45,7 +46,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   //======================================== Determine cell partition-IDs
   //                                         only on home location
   std::vector<int64_t> cell_pids(num_raw_cells, 0);
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     uint64_t cell_id = 0;
     for (auto& raw_cell : umesh.raw_cells)
@@ -59,7 +60,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
             MPI_LONG_LONG_INT,                //data type
             0,                                //root
             MPI_COMM_WORLD);                  //communicator
-  chi_log.Log(LOG_0) << "Done partitioning mesh.";
+  chi::log.Log() << "Done partitioning mesh.";
 
   return cell_pids;
 }

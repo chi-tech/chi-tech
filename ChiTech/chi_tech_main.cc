@@ -9,15 +9,15 @@
 */
 int main(int argc, char** argv)
 {
-  ChiTech::Initialize(argc, argv);
+  chi::Initialize(argc, argv);
 
-  int error_code = 0;
-  if (ChiTech::sim_option_interactive)
-    error_code = ChiTech::RunInteractive(argc, argv);
+  int error_code;
+  if (chi::run_time::sim_option_interactive)
+    error_code = chi::RunInteractive(argc, argv);
   else
-    error_code = ChiTech::RunBatch(argc, argv);
+    error_code = chi::RunBatch(argc, argv);
 
-  ChiTech::Finalize();
+  chi::Finalize();
 
   return error_code;
 }

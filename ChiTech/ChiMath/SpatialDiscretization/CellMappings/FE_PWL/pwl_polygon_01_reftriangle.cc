@@ -1,8 +1,8 @@
 #include "pwl_polygon.h"
 
-double PolygonMappingFE_PWL::TriShape(int index,
-                                      const chi_mesh::Vector3& qpoint,
-                                      bool on_surface/*false*/)
+double chi_math::PolygonMappingFE_PWL::TriShape(int index,
+                                                const chi_mesh::Vector3& qpoint,
+                                                bool on_surface/*false*/)
 {
   double xi ;
   double eta;
@@ -30,10 +30,10 @@ double PolygonMappingFE_PWL::TriShape(int index,
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Varphi_x
 /**Precomputation of the shape function at a quadrature point.*/
-double PolygonMappingFE_PWL::SideShape(unsigned int side,
-                                       unsigned int i,
-                                       const chi_mesh::Vector3& qpoint,
-                                       bool on_surface/*=false*/) const
+double chi_math::PolygonMappingFE_PWL::SideShape(unsigned int side,
+                                                 unsigned int i,
+                                                 const chi_mesh::Vector3& qpoint,
+                                                 bool on_surface/*=false*/) const
 {
   int index = node_to_side_map[i][side];
   double value = 0.0;
@@ -48,7 +48,7 @@ double PolygonMappingFE_PWL::SideShape(unsigned int side,
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_x
 /**Precomputation of the partial derivative along x of the
  * shape function at a quadrature point.*/
-double PolygonMappingFE_PWL::SideGradShape_x(unsigned int side, int i) const
+double chi_math::PolygonMappingFE_PWL::SideGradShape_x(unsigned int side, int i) const
 {
   int index = node_to_side_map[i][side];
   double value = 0;
@@ -75,7 +75,7 @@ double PolygonMappingFE_PWL::SideGradShape_x(unsigned int side, int i) const
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GradVarphi_y
 /**Precomputation of the partial derivative along y of the
  * shape function at a quadrature point.*/
-double PolygonMappingFE_PWL::SideGradShape_y(unsigned int side, int i) const
+double chi_math::PolygonMappingFE_PWL::SideGradShape_y(unsigned int side, int i) const
 {
   int index = node_to_side_map[i][side];
   double value = 0;

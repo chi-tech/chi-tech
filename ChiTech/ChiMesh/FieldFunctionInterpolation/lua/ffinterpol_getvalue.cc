@@ -1,15 +1,14 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
-#include "../../FieldFunctionInterpolation/Line/chi_ffinter_line.h"
-#include "../../FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
-#include <ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h>
-#include "../../../ChiPhysics/chi_physics.h"
+#include "ChiLua/chi_lua.h"
+#include "ChiMesh/FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
+#include "ChiMesh/FieldFunctionInterpolation/Line/chi_ffinter_line.h"
+#include "ChiMesh/FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
 
-#include <chi_log.h>
+#include "chi_runtime.h"
 
-extern ChiLog& chi_log;
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
+#include "chi_log.h"
+;
+
 
 //#############################################################################
 /** Gets the value(s) associated with an interpolation provided the
@@ -24,48 +23,42 @@ Currently only the Volume interpolation supports obtaining a value.
 \author Jan*/
 int chiFFInterpolationGetValue(lua_State *L)
 {
-  double value = 0.0;
+  const std::string fname = __FUNCTION__;
 
   int num_args = lua_gettop(L);
   if (num_args != 1)
     LuaPostArgAmountError("chiFFInterpolationGetValue",1,num_args);
 
-  //================================================== Get handle to field function
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
-  int ffihandle = lua_tonumber(L,1);
-  chi_mesh::FieldFunctionInterpolation* cur_ffi;
-  try {
-    cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid ffi handle in chiFFInterpolationGetValue.";
-    exit(EXIT_FAILURE);
-  }
+  double value = 0.0;
 
-  if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationVolume))
+  //================================================== Get handle to field function
+  const size_t ffihandle = lua_tonumber(L,1);
+
+  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+                                    ffihandle, fname);
+
+  if (typeid(*p_ffi) == typeid(chi_mesh::FieldFunctionInterpolationVolume))
   {
-    auto cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume*)cur_ffi;
-    value = cur_ffi_volume->op_value;
+    auto& cur_ffi_volume = (chi_mesh::FieldFunctionInterpolationVolume&)*p_ffi;
+    value = cur_ffi_volume.op_value;
 
     lua_pushnumber(L,value);
     return 1;
   }
-  else if (typeid(*cur_ffi) == typeid(chi_mesh::FieldFunctionInterpolationLine))
+  else if (typeid(*p_ffi) == typeid(chi_mesh::FieldFunctionInterpolationLine))
   {
-    auto cur_ffi_line = (chi_mesh::FieldFunctionInterpolationLine*)cur_ffi;
+    auto& cur_ffi_line = (chi_mesh::FieldFunctionInterpolationLine&)*p_ffi;
 
     lua_newtable(L);
 
-    for (int ff=0; ff<cur_ffi_line->field_functions.size(); ff++)
+    for (int ff=0; ff<cur_ffi_line.field_functions.size(); ff++)
     {
       lua_pushnumber(L,ff+1);
 
       lua_newtable(L);
-      auto ff_ctx = cur_ffi_line->ff_contexts[ff];
+      auto ff_ctx = cur_ffi_line.ff_contexts[ff];
 
-      for (int p=0; p<cur_ffi_line->interpolation_points.size(); p++)
+      for (int p=0; p<cur_ffi_line.interpolation_points.size(); p++)
       {
         lua_pushnumber(L,p+1);
         lua_pushnumber(L,ff_ctx->interpolation_points_values[p]);
@@ -79,7 +72,7 @@ int chiFFInterpolationGetValue(lua_State *L)
   }
   else
   {
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
       << "chiFFInterpolationGetValue is currently only supported for "
       << " VOLUME interpolator types.";
   }

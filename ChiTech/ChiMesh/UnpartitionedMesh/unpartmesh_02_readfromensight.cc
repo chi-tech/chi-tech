@@ -1,10 +1,8 @@
 #include "chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
 
 #include <sstream>
 
@@ -32,10 +30,10 @@ void chi_mesh::UnpartitionedMesh::
 
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name <<" in call "
       << "to ReadFromEnsightGold \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   file.close();
 
@@ -43,20 +41,20 @@ void chi_mesh::UnpartitionedMesh::
   mesh_options = options;
   auto reader = vtkSmartPointer<vtkEnSightGoldBinaryReader>::New();
   reader->SetCaseFileName(options.file_name.c_str());
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Reading Ensight-Gold file     : \""
     << options.file_name << "\".";
 
   reader->Update();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Done reading Ensight-Gold file: \""
     << options.file_name << "\".";
 
   //======================================== Separate the blocks
   auto multiblock = reader->GetOutput();
   size_t num_blocks = multiblock->GetNumberOfBlocks();
-  chi_log.Log(LOG_0) << "Number of blocks in file: " << num_blocks;
+  chi::log.Log() << "Number of blocks in file: " << num_blocks;
 
   std::vector<vtkSmartPointer<vtkUnstructuredGrid>> grid_blocks;
   grid_blocks.reserve(num_blocks);
@@ -137,15 +135,15 @@ void chi_mesh::UnpartitionedMesh::
       }
     }//2D mesh
 
-   chi_log.Log(LOG_0VERBOSE_1) << outstr.str();
+   chi::log.Log0Verbose1() << outstr.str();
   }
-  chi_log.Log(LOG_0VERBOSE_1) << "Updating appended filter.";
+  chi::log.Log0Verbose1() << "Updating appended filter.";
 //  append->Update();
-  chi_log.Log(LOG_0VERBOSE_1) << "Getting dirty grid.";
+  chi::log.Log0Verbose1() << "Getting dirty grid.";
   auto dirty_ugrid = vtkSmartPointer<vtkUnstructuredGrid>(
     vtkUnstructuredGrid::SafeDownCast(append->GetOutput()));
 
-  chi_log.Log(LOG_0VERBOSE_1)
+  chi::log.Log0Verbose1()
     << "Dirty grid num cells and points: "
     << dirty_ugrid->GetNumberOfCells() << " "
     << dirty_ugrid->GetNumberOfPoints();
@@ -158,7 +156,7 @@ void chi_mesh::UnpartitionedMesh::
   uint64_t total_cell_count  = ugrid->GetNumberOfCells();
   uint64_t total_point_count = ugrid->GetNumberOfPoints();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Clean grid num cells and points: "
     << total_cell_count << " "
     << total_point_count;
@@ -215,6 +213,10 @@ void chi_mesh::UnpartitionedMesh::
   }
 
   //======================================== Always do this
+  chi_mesh::MeshAttributes dimension = DIMENSION_2;
+  if (mesh_is_3D)          dimension = DIMENSION_3;
+
+  attributes = dimension | UNSTRUCTURED;
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 }

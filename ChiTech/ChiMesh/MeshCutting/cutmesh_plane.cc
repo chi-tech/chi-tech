@@ -4,7 +4,7 @@
 #include "ChiMesh/Raytrace/raytracing.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <algorithm>
 
@@ -22,7 +22,7 @@ void chi_mesh::mesh_cutting::
   const auto& p = plane_point;
   const auto& n = plane_normal.Normalized();
 
-  chi_log.Log() << "Cutting mesh with plane. "
+  chi::log.Log() << "Cutting mesh with plane. "
                 << "Ref. Point: " << p.PrintS()
                 << " Normal: " << n.PrintS();
 
@@ -44,7 +44,7 @@ void chi_mesh::mesh_cutting::
     }
   }
 
-  chi_log.Log() << "Number of vertices snapped to plane: "
+  chi::log.Log() << "Number of vertices snapped to plane: "
                 << num_verts_snapped;
 
   //============================================= Perform quality checks
@@ -97,7 +97,7 @@ void chi_mesh::mesh_cutting::
       }
     }//for vid
   }//for cell
-  chi_log.Log() << "Number of cells to cut: " << cells_to_cut.size();
+  chi::log.Log() << "Number of cells to cut: " << cells_to_cut.size();
 
   //============================================= Two-D algorithm
   if (mesh.local_cells[0].Type() == CellType::POLYGON)
@@ -115,7 +115,7 @@ void chi_mesh::mesh_cutting::
         }//for vid
     }//populate cut_vertices
 
-    chi_log.Log() << "Number of cut vertices: " << cut_vertices.size();
+    chi::log.Log() << "Number of cut vertices: " << cut_vertices.size();
 
     //====================================== Build unique edges
     size_t num_edges_cut=0;
@@ -159,7 +159,7 @@ void chi_mesh::mesh_cutting::
       }//for edge - determine cut
     }//populate edges cut
 
-    chi_log.Log() << "Number of cut edges: " << num_edges_cut;
+    chi::log.Log() << "Number of cut edges: " << num_edges_cut;
 
     //====================================== Process cells that are cut
     for (auto& cell_ptr : cells_to_cut)
@@ -232,7 +232,7 @@ void chi_mesh::mesh_cutting::
       }//for edge - determine cut
     }//populate edges cut
 
-    chi_log.Log() << "Number of cut edges: " << num_edges_cut;
+    chi::log.Log() << "Number of cut edges: " << num_edges_cut;
 
     //====================================== Process cells that are cut
     for (auto& cell_ptr : cells_to_cut)
@@ -244,6 +244,6 @@ void chi_mesh::mesh_cutting::
     }//for cell_ptr
   }
 
-  chi_log.Log() << "Done cutting mesh with plane. Num cells = "
+  chi::log.Log() << "Done cutting mesh with plane. Num cells = "
                 << mesh.local_cells.size();
 }

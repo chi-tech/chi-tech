@@ -2,8 +2,8 @@
 
 #include <iomanip>
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Creates a common Krylov-solver setup.
@@ -128,7 +128,7 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
     << std::scientific << std::setprecision(7) << rnorm / rhs_norm
     << std::endl;
 
-  chi_log.Log(LOG_0) << buff.str();
+  chi::log.Log() << buff.str();
 
   return 0;
 }

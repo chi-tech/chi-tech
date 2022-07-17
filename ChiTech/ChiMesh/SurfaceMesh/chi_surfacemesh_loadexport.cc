@@ -1,13 +1,12 @@
 #include"chi_surfacemesh.h"
+
 #include<iostream>
 #include<fstream>
 #include <algorithm>
 
-#include <chi_log.h>
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
-#include <ChiTimer/chi_timer.h>
-extern ChiTimer    chi_program_timer;
 
 //#########################################################
 /** Loads a surface mesh from a wavefront .obj file.*/
@@ -21,10 +20,10 @@ int chi_mesh::SurfaceMesh::
   file.open(fileName);
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< fileName<<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //===================================================== Reading every line and determining size
@@ -387,11 +386,11 @@ int chi_mesh::SurfaceMesh::
   UpdateInternalConnectivity();
 
   //============================================= Check each vertex is accounted
-  chi_log.Log(LOG_0)
+  chi::log.Log()
   << "Surface mesh loaded with "
   << this->faces.size() << " triangle faces and "
   << this->poly_faces.size() << " polygon faces.";
-  //exit(EXIT_FAILURE);
+  //chi::Exit(EXIT_FAILURE);
 
   return 0;
 }
@@ -411,10 +410,10 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
   file.open(node_filename);
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< node_filename <<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   int num_verts;
@@ -437,10 +436,10 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
   file.open(tria_filename);
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< tria_filename <<" in call "
       << "to ImportFromOBJFile \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   int num_tris;
@@ -541,11 +540,11 @@ ImportFromTriangleFiles(const char* fileName, bool as_poly=false)
   UpdateInternalConnectivity();
 
   //============================================= Check each vertex is accounted
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Surface mesh loaded with "
     << this->faces.size() << " triangle faces and "
     << this->poly_faces.size() << " polygon faces.";
-  //exit(EXIT_FAILURE);
+  //chi::Exit(EXIT_FAILURE);
 
   return 0;
 }
@@ -569,15 +568,15 @@ chi_mesh::SurfaceMesh* chi_mesh::SurfaceMesh::
   //======================================== Checks if vertices are empty
   if (vertices_1d_x.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_mesh::SurfaceMesh::CreateFromDivisions. Empty vertex_x list.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   if (vertices_1d_y.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_mesh::SurfaceMesh::CreateFromDivisions. Empty vertex_y list.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Populate 2D vertices
@@ -684,10 +683,10 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
 
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< fileName <<" in call "
       << "to ImportFromMshFiles \n";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //=================================================== Find section with node information
@@ -703,8 +702,8 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
   int num_nodes;
   if ( !(iss >> num_nodes) )
   {
-    chi_log.Log(LOG_ALLERROR)<<"Failed while trying to read the number of nodes.\n";
-    exit(EXIT_FAILURE);
+    chi::log.LogAllError()<<"Failed while trying to read the number of nodes.\n";
+   chi::Exit(EXIT_FAILURE);
   }
 
   vertices.resize(num_nodes);
@@ -718,14 +717,14 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
     int vert_index;
     if ( !(iss >> vert_index) )
     {
-      chi_log.Log(LOG_ALLERROR)<<"Failed to read vertex index.\n";
-      exit(EXIT_FAILURE);
+      chi::log.LogAllError()<<"Failed to read vertex index.\n";
+     chi::Exit(EXIT_FAILURE);
     }
 
     if (!(iss >> vertex.x >> vertex.y >> vertex.z))
     {
-      chi_log.Log(LOG_ALLERROR)<<"Failed while reading the vertex coordinates.\n";
-      exit(EXIT_FAILURE);
+      chi::log.LogAllError()<<"Failed while reading the vertex coordinates.\n";
+     chi::Exit(EXIT_FAILURE);
     }
 
     vertices[vert_index-1] = vertex;
@@ -746,8 +745,8 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
   int num_elems;
   if (!(iss >> num_elems))
   {
-    chi_log.Log(LOG_ALLERROR)<<"Failed to read number of elements.\n";
-    exit(EXIT_FAILURE);
+    chi::log.LogAllError()<<"Failed to read number of elements.\n";
+   chi::Exit(EXIT_FAILURE);
   }
 
   for (int n=0; n<num_elems; n++)
@@ -759,21 +758,21 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
 
     if ( !(iss >> element_index >> elem_type >> num_tags) )
     {
-      chi_log.Log(LOG_ALLERROR)<<"Failed while reading element index, element type, and number of tags.\n";
-      exit(EXIT_FAILURE);
+      chi::log.LogAllError()<<"Failed while reading element index, element type, and number of tags.\n";
+     chi::Exit(EXIT_FAILURE);
     }
 
     if( !(iss>>physical_reg) )
     {
-      chi_log.Log(LOG_ALLERROR)<<"Failed while reading physical region.\n";
-      exit(EXIT_FAILURE);
+      chi::log.LogAllError()<<"Failed while reading physical region.\n";
+     chi::Exit(EXIT_FAILURE);
     }
 
     for (int i=1; i<num_tags; i++)
       if( !(iss >> tag) )
       {
-        chi_log.Log(LOG_ALLERROR)<<"Failed when reading tags.\n";
-        exit(EXIT_FAILURE);
+        chi::log.LogAllError()<<"Failed when reading tags.\n";
+        chi::Exit(EXIT_FAILURE);
       }
 
     if (elem_type == 2)
@@ -784,8 +783,8 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
       for (int i=0; i<num_nodes; i++)
         if ( !(iss >> nodes[i]) )
         {
-          chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
-          exit(EXIT_FAILURE);
+          chi::log.LogAllError()<<"Failed when reading element node index.\n";
+          chi::Exit(EXIT_FAILURE);
         }
 
       newFace->v_indices.resize(num_nodes);
@@ -797,11 +796,11 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
       const int num_nodes = 4;
 
       int nodes[num_nodes];
-      for (int i=0; i<num_nodes; i++)
-        if ( !(iss >> nodes[i]) )
+      for (int & node : nodes)
+        if ( !(iss >> node) )
         {
-          chi_log.Log(LOG_ALLERROR)<<"Failed when reading element node index.\n";
-          exit(EXIT_FAILURE);
+          chi::log.LogAllError()<<"Failed when reading element node index.\n";
+          chi::Exit(EXIT_FAILURE);
         }
 
       newFace->v_indices.resize(num_nodes);
@@ -813,9 +812,9 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
       continue;
     }
 
-    const int total_nodes = newFace->v_indices.size();
+    const size_t total_nodes = newFace->v_indices.size();
 
-    for (int e=0; e<total_nodes; e++)
+    for (size_t e=0; e<total_nodes; e++)
     {
       int* side_indices = new int[total_nodes];
       side_indices[0] = newFace->v_indices[e];
@@ -838,29 +837,25 @@ ImportFromMshFiles(const char* fileName, bool as_poly=false)
   file.close();
 
   //======================================================= Calculate face properties
-  std::vector<chi_mesh::Face>::iterator curFace;
-  std::vector<chi_mesh::PolyFace*>::iterator curPFace;
-  for (curPFace = this->poly_faces.begin();
-       curPFace!=this->poly_faces.end();
-       curPFace++)
+  for (const auto& poly_face : poly_faces)
   {
     chi_mesh::Vector3 centroid;
-    int num_verts = (*curPFace)->v_indices.size();
+    size_t num_verts = poly_face->v_indices.size();
 
-    for (int v=0; v<num_verts; v++)
-      centroid = centroid + vertices[(*curPFace)->v_indices[v]];
+    for (size_t v=0; v<num_verts; v++)
+      centroid = centroid + vertices[poly_face->v_indices[v]];
 
-    centroid = centroid/num_verts;
+    centroid = centroid/static_cast<double>(num_verts);
 
-    (*curPFace)->face_centroid = centroid;
+    poly_face->face_centroid = centroid;
 
-    chi_mesh::Vector3 n = (vertices[(*curPFace)->v_indices[1]] -
-                          vertices[(*curPFace)->v_indices[0]]).Cross(
-                          centroid - vertices[(*curPFace)->v_indices[1]]);
+    chi_mesh::Vector3 n = (vertices[poly_face->v_indices[1]] -
+                          vertices[poly_face->v_indices[0]]).Cross(
+                          centroid - vertices[poly_face->v_indices[1]]);
 
     n = n/n.Norm();
 
-    (*curPFace)->geometric_normal = n;
+    poly_face->geometric_normal = n;
   }
 
   UpdateInternalConnectivity();
@@ -880,7 +875,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
 //    return;
 //  }
   FILE* outputFile = fopen(fileName,"w");
-  if (outputFile==NULL)
+  if (outputFile==nullptr)
   {
     printf("Error creating file %s!\n",fileName);
     return;
@@ -903,7 +898,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
                                     lines[ell].v_index[1]+1);
   }
 
-  if (faces.size()>0)
+  if (!faces.empty())
   {
     chi_mesh::Face first_face = this->faces.front();
     fprintf(outputFile,"vn %.4f %.4f %.4f\n", first_face.geometric_normal.x,
@@ -921,7 +916,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
               cur_face->v_index[2]+1);
     }
   }
-  if (poly_faces.size()>0)
+  if (!poly_faces.empty())
   {
     chi_mesh::PolyFace* first_face = this->poly_faces.front();
     fprintf(outputFile,"vn %.4f %.4f %.4f\n", first_face->geometric_normal.x,
@@ -929,12 +924,12 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
             first_face->geometric_normal.z);
     fprintf(outputFile,"s off\n");
 
-    for (int f=0; f<poly_faces.size(); f++)
+    for (auto & poly_face : poly_faces)
     {
       fprintf(outputFile,"f ");
-      for (int v=0; v<poly_faces[f]->v_indices.size(); v++)
+      for (int v_indice : poly_face->v_indices)
       {
-        fprintf(outputFile,"%d//1 ",poly_faces[f]->v_indices[v]+1);
+        fprintf(outputFile,"%d//1 ",v_indice+1);
       }
       fprintf(outputFile,"\n");
     }
@@ -949,7 +944,7 @@ void chi_mesh::SurfaceMesh::ExportToOBJFile(const char *fileName)
 void chi_mesh::SurfaceMesh::ExportToPolyFile(const char *fileName)
 {
   FILE* outputFile = fopen(fileName,"w");
-  if (outputFile==NULL)
+  if (outputFile==nullptr)
   {
     printf("Error creating file %s!\n",fileName);
     return;

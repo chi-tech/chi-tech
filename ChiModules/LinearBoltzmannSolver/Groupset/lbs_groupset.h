@@ -23,14 +23,7 @@ namespace lbs
     POLAR = 2,
     AZIMUTHAL = 3,
   };
-}
 
-typedef std::pair<int,int> GsSubSet;
-typedef std::pair<int,int> AngSubSet;
-
-#include <vector>
-
-//################################################################### Class def
 /**Group set functioning as a collection of groups*/
 class LBSGroupset
 {
@@ -44,15 +37,15 @@ public:
   std::vector<SPDS_ptr>                        sweep_orderings;
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
-  std::vector<GsSubSet>                        grp_subsets;
+  std::vector<std::pair<int, int>>                        grp_subsets;
   std::vector<int>                             grp_subset_sizes;
-  std::vector<AngSubSet>                       ang_subsets_top;
+  std::vector<std::pair<int, int>>                       ang_subsets_top;
   std::vector<int>                             ang_subset_sizes_top;
-  std::vector<AngSubSet>                       ang_subsets_bot;
+  std::vector<std::pair<int, int>>                       ang_subsets_bot;
   std::vector<int>                             ang_subset_sizes_bot;
 
-  lbs::IterativeMethod             iterative_method;
-  lbs::AngleAggregationType        angleagg_method;
+  IterativeMethod             iterative_method;
+  AngleAggregationType        angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;
   int                                          gmres_restart_intvl;
@@ -80,12 +73,20 @@ public:
   explicit LBSGroupset(int in_id);
   LBSGroupset() : LBSGroupset(-1) {};
   void BuildDiscMomOperator(unsigned int scattering_order,
-                            lbs::GeometryType geometry_type);
+                            GeometryType geometry_type);
   void BuildMomDiscOperator(unsigned int scattering_order,
-                            lbs::GeometryType geometry_type);
+                            GeometryType geometry_type);
   void BuildSubsets();
 public:
   void PrintSweepInfoFile(size_t ev_tag,const std::string& file_name);
 };
+}
+
+typedef std::pair<int,int> GsSubSet;
+typedef std::pair<int,int> AngSubSet;
+
+#include <vector>
+
+//################################################################### Class def
 
 #endif

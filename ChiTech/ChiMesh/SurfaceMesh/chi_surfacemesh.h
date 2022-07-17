@@ -46,12 +46,6 @@ public:
   //checksense.cc
   bool  CheckNegativeSense(double x, double y, double z);
 
-  //maingetedgeloops.cc
-  EdgeLoopCollection*  GetEdgeLoops();
-  EdgeLoopCollection*  GetCoLinearEdges(EdgeLoopCollection* in_loop);
-  //getedgeloopspoly.cc
-  EdgeLoopCollection*  GetEdgeLoopsPoly();
-
   //splitbypatch.cc
   void  SplitByPatch(std::vector<chi_mesh::SurfaceMesh*>& patches);
 

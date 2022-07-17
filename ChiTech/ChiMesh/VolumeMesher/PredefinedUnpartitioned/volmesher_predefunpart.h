@@ -10,7 +10,14 @@
 class chi_mesh::VolumeMesherPredefinedUnpartitioned :
                             public chi_mesh::VolumeMesher
 {
+private:
+  std::shared_ptr<chi_mesh::UnpartitionedMesh> m_umesh = nullptr;
 public:
+  explicit
+  VolumeMesherPredefinedUnpartitioned(
+    std::shared_ptr<chi_mesh::UnpartitionedMesh> in_umesh) :
+    m_umesh(std::move(in_umesh)) {}
+
   void Execute() override;
 
   static

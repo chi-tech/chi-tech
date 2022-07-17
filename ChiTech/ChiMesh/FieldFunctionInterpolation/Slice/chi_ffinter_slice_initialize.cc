@@ -5,7 +5,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 /**Initializes the data structures necessary for interpolation. This is
  * independent of the physics and hence is a routine on its own.
@@ -19,13 +19,13 @@ extern ChiLog& chi_log;
 void chi_mesh::FieldFunctionInterpolationSlice::
   Initialize()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing slice interpolator.";
+  chi::log.Log0Verbose1() << "Initializing slice interpolator.";
   //================================================== Check grid available
   if (field_functions.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
     << "Unassigned field function in slice field function interpolator.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   } else
   {
     this->grid_view = field_functions[0]->grid;
@@ -41,9 +41,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
@@ -86,9 +86,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Unsupported cell type in call to Slice Initialize.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//for local cell
 
@@ -103,9 +103,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
     if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "FieldFunctionInterpolationSlice does not support 1D cells.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
@@ -262,7 +262,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
       }
       else
       {
-        chi_log.Log(LOG_ALLWARNING) << "No face intersections encountered "
+        chi::log.LogAllWarning() << "No face intersections encountered "
                                        "for a cell that is indicated as being "
                                        "intersected. Slice FF interp.";
       }
@@ -349,5 +349,5 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     }//polyhedron
   }//for intersected cell
 
-  //chi_log.Log(LOG_0) << "Finished initializing interpolator.";
+  //chi::log.Log() << "Finished initializing interpolator.";
 }

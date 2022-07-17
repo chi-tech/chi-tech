@@ -3,7 +3,6 @@ chiMeshHandlerCreate()
 chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
 
 region1 = chiRegionCreate()
-chiRegionAddEmptyBoundary(region1)
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
 chiVolumeMesherCreate(VOLUMEMESHER_PREDEFINED3D)

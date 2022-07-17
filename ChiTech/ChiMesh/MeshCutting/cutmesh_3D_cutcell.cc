@@ -3,7 +3,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <queue>
 #include <algorithm>
@@ -87,7 +87,7 @@ void chi_mesh::mesh_cutting::
     }
   };
 
-  if (verbose) chi_log.Log() << "Checkpoint 1";
+  if (verbose) chi::log.Log() << "Checkpoint 1";
 
   //============================================= Determine cut-edges relevant
   //                                              to this cell
@@ -110,7 +110,7 @@ void chi_mesh::mesh_cutting::
              << "cut at vertex " << eci.cut_point_id << " "
              << mesh.vertices[eci.cut_point_id].PrintStr()
              << "\n";
-    chi_log.Log() << outstr.str();
+    chi::log.Log() << outstr.str();
   }
 
   //============================================= Determine cut- and uncut-faces
@@ -148,7 +148,7 @@ void chi_mesh::mesh_cutting::
 
   if (verbose)
   {
-    chi_log.Log() << "Checkpoint 2";
+    chi::log.Log() << "Checkpoint 2";
     std::stringstream outstr;
     outstr << "Cut faces:\n";
     for (const auto& f : cut_faces_indices)
@@ -164,7 +164,7 @@ void chi_mesh::mesh_cutting::
       outstr << f << " ";
     outstr << "\n";
 
-    chi_log.Log() << outstr.str();
+    chi::log.Log() << outstr.str();
   }
 
   //============================================= Split cut-faces into fragments
@@ -177,7 +177,7 @@ void chi_mesh::mesh_cutting::
   {
     const auto& cut_face = cell.faces[cut_face_id];
 
-    if (verbose)  chi_log.Log() << "cut face " << cut_face_id;
+    if (verbose)  chi::log.Log() << "cut face " << cut_face_id;
 
     // First extract the edges that form the fragments
     std::vector<Edge> fragment_edges_A;
@@ -209,7 +209,7 @@ void chi_mesh::mesh_cutting::
         std::stringstream outstr;
         for (const auto& eedge : extracted_edges)
           outstr << eedge.first << "->" << eedge.second << " ";
-        chi_log.Log() << "edge " << e << " "
+        chi::log.Log() << "edge " << e << " "
                       << edge.first << "->" << edge.second
                       << " cut? " << ((edge_is_cut)? "yes" : "no")
                       << " " << outstr.str();
@@ -242,7 +242,7 @@ void chi_mesh::mesh_cutting::
 
   if (verbose)
   {
-    chi_log.Log() << "Checkpoint 3";
+    chi::log.Log() << "Checkpoint 3";
     std::stringstream outstr;
     outstr << "Cut faces fragments A:\n";
     for (const auto& f_fragment : cut_faces_fragments_A)
@@ -262,7 +262,7 @@ void chi_mesh::mesh_cutting::
       outstr << "\n";
     }
 
-    chi_log.Log() << outstr.str();
+    chi::log.Log() << outstr.str();
   }
 
   //============================================= Make proxy-faces from data
@@ -339,8 +339,8 @@ void chi_mesh::mesh_cutting::
     for (uint64_t vid : cell.vertex_ids)
       verts.insert(vid);
     for (uint64_t vid : verts)
-      chi_log.Log() << vid << " " << mesh.vertices[vid].PrintStr();
-    chi_log.Log() << "Checkpoint 4:\n"
+      chi::log.Log() << vid << " " << mesh.vertices[vid].PrintStr();
+    chi::log.Log() << "Checkpoint 4:\n"
                   << cell.ToString()
                   << cell_A_ptr->ToString()
                   << cell_B_ptr->ToString();

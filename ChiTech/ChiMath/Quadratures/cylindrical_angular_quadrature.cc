@@ -4,9 +4,8 @@
 #include <limits>
 #include <numeric>
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-
-extern ChiLog& chi_log;
 
 
 chi_math::CylindricalAngularQuadrature::
@@ -201,17 +200,17 @@ chi_math::CylindricalAngularQuadrature::
   //  --------------------------------------------------------------------------
   if (verbose)
   {
-    chi_log.Log(LOG_0) << "map_directions" << std::endl;
+    chi::log.Log() << "map_directions" << std::endl;
     for (const auto& dir : map_directions)
     {
-      chi_log.Log(LOG_0) << "polar level " << dir.first << " : ";
+      chi::log.Log() << "polar level " << dir.first << " : ";
       for (const auto& q : dir.second)
-        chi_log.Log(LOG_0) << q << ", ";
-      chi_log.Log(LOG_0) << std::endl;
+        chi::log.Log() << q << ", ";
+      chi::log.Log() << std::endl;
     }
-    chi_log.Log(LOG_0) << "curvilinear product quadrature : cylindrical" << std::endl;
+    chi::log.Log() << "curvilinear product quadrature : cylindrical" << std::endl;
     for (size_t k = 0; k < weights.size(); ++k)
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "angle index " << k << ": weight = " << weights[k]
         << ", (phi, theta) = (" << abscissae[k].phi << ", " << abscissae[k].theta << ")"
         << ", omega = " << omegas[k].PrintStr()
@@ -219,7 +218,7 @@ chi_math::CylindricalAngularQuadrature::
         << ", fac_streaming_operator = " << fac_streaming_operator[k] << std::endl;
     const auto sum_weights =
       std::accumulate(weights.begin(), weights.end(), 0.0);
-    chi_log.Log(LOG_0) << "sum(weights) = " << sum_weights << std::endl;
+    chi::log.Log() << "sum(weights) = " << sum_weights << std::endl;
   }
 }
 

@@ -4,8 +4,11 @@
 #include "ChiMesh/SurfaceMesher/surfacemesher.h"
 #include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
 
+#include "chi_runtime.h"
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
+
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <iostream>
 
@@ -67,7 +70,7 @@ Can be any of the following:
 int chiVolumeMesherSetProperty(lua_State *L)
 {
   //============================================= Get current mesh handler
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get property index
   int num_args = lua_gettop(L);
@@ -85,76 +88,74 @@ int chiVolumeMesherSetProperty(lua_State *L)
   if (property_index == VMP::FORCE_POLYGONS)
   {
     bool force_condition = lua_toboolean(L,2);
-    cur_hndlr->volume_mesher->options.force_polygons = force_condition;
+    cur_hndlr.volume_mesher->options.force_polygons = force_condition;
   }
 
   else if (property_index == VMP::MESH_GLOBAL)
   {
     bool mesh_global = lua_toboolean(L,2);
-    cur_hndlr->volume_mesher->options.mesh_global = mesh_global;
+    cur_hndlr.volume_mesher->options.mesh_global = mesh_global;
   }
 
   else if (property_index == VMP::PARTITION_Z)
   {
     int pz = lua_tonumber(L,2);
-    cur_hndlr->volume_mesher->options.partition_z = pz;
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    cur_hndlr.volume_mesher->options.partition_z = pz;
+    chi::log.LogAllVerbose1()
       << "Partition z set to " << pz;
   }
   else if (property_index == VMP::PARTITION_Y)
   {
     int p = lua_tonumber(L,2);
-    cur_hndlr->surface_mesher->partitioning_y = p;
-    cur_hndlr->volume_mesher->options.partition_y = p;
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    cur_hndlr.volume_mesher->options.partition_y = p;
+    chi::log.LogAllVerbose1()
       << "Partition y set to " << p;
   }
   else if (property_index == VMP::PARTITION_X)
   {
     int p = lua_tonumber(L,2);
-    cur_hndlr->surface_mesher->partitioning_x = p;
-    cur_hndlr->volume_mesher->options.partition_x = p;
-    chi_log.Log(LOG_ALLVERBOSE_1)
+    cur_hndlr.volume_mesher->options.partition_x = p;
+    chi::log.LogAllVerbose1()
       << "Partition x set to " << p;
   }
   else if (property_index == VMP::CUTS_Z)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr->volume_mesher->options.zcuts.push_back(p);
+    cur_hndlr.volume_mesher->options.zcuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_Y)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr->surface_mesher->ycuts.push_back(p);
-    cur_hndlr->volume_mesher->options.ycuts.push_back(p);
+    cur_hndlr.surface_mesher->ycuts.push_back(p);
+    cur_hndlr.volume_mesher->options.ycuts.push_back(p);
   }
   else if (property_index == VMP::CUTS_X)
   {
     double p = lua_tonumber(L,2);
-    cur_hndlr->surface_mesher->xcuts.push_back(p);
-    cur_hndlr->volume_mesher->options.xcuts.push_back(p);
+    cur_hndlr.surface_mesher->xcuts.push_back(p);
+    cur_hndlr.volume_mesher->options.xcuts.push_back(p);
   }
   else if (property_index == VMP::PARTITION_TYPE)
   {
     int p = lua_tonumber(L,2);
     if (p >= chi_mesh::VolumeMesher::PartitionType::KBA_STYLE_XYZ and
         p <= chi_mesh::VolumeMesher::PartitionType::PARMETIS)
-      cur_hndlr->volume_mesher->options.partition_type =
+      cur_hndlr.volume_mesher->options.partition_type =
         (chi_mesh::VolumeMesher::PartitionType)p;
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Unsupported partition type used in call to "
         << __FUNCTION__ << ".";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
 
   else if (property_index == VMP::EXTRUSION_LAYER)
   {
-    if (typeid(*cur_hndlr->volume_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+    if (typeid(*cur_hndlr.volume_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
     {
-      auto mesher = (chi_mesh::VolumeMesherExtruder*)cur_hndlr->volume_mesher;
+      auto& mesher = (chi_mesh::VolumeMesherExtruder&)*cur_hndlr.volume_mesher;
 
       double layer_height = lua_tonumber(L,2);
       int    subdivisions = 1;
@@ -171,7 +172,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
       {
         new_layer.name = std::string(lua_tostring(L,4));
       }
-      mesher->input_layers.push_back(new_layer);
+      mesher.input_layers.push_back(new_layer);
     }
     else
     {
@@ -185,60 +186,46 @@ int chiVolumeMesherSetProperty(lua_State *L)
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi_log.Log(LOG_ALLERROR) << "Invalid amount of arguments used for "
+      chi::log.LogAllError() << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "MATID_FROMLOGICAL...";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
     int volume_hndl = lua_tonumber(L,2);
     int mat_id = lua_tonumber(L,3);
     int sense = true;
     if (num_args==4) sense = lua_toboolean(L,4);
 
-    if (volume_hndl >= cur_hndlr->logicvolume_stack.size())
-    {
-      chi_log.Log(LOG_ALLERROR) << "Invalid logical volume specified in "
-                                 "chiVolumeMesherSetProperty("
-                                 "MATID_FROMLOGICAL...";
-      exit(EXIT_FAILURE);
-    }
+    const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
+      chi::logicvolume_stack, volume_hndl, __FUNCTION__);
 
-    chi_mesh::LogicalVolume* volume_ptr =
-      cur_hndlr->logicvolume_stack[volume_hndl];
-    cur_hndlr->volume_mesher->SetMatIDFromLogical(volume_ptr,sense,mat_id);
+    chi_mesh::VolumeMesher::SetMatIDFromLogical(log_vol,sense,mat_id);
   }
 
   else if (property_index == VMP::BNDRYID_FROMLOGICAL)
   {
     if (!((num_args == 3) || (num_args == 4)))
     {
-      chi_log.Log(LOG_ALLERROR) << "Invalid amount of arguments used for "
+      chi::log.LogAllError() << "Invalid amount of arguments used for "
                                  "chiVolumeMesherSetProperty("
                                  "BNDRYID_FROMLOGICAL...";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
     int volume_hndl = lua_tonumber(L,2);
     int bndry_id = lua_tonumber(L,3);
     int sense = true;
     if (num_args==4) sense = lua_toboolean(L,4);
 
-    if (volume_hndl >= cur_hndlr->logicvolume_stack.size())
-    {
-      chi_log.Log(LOG_ALLERROR) << "Invalid logical volume specified in "
-                                 "chiVolumeMesherSetProperty("
-                                 "BNDRYID_FROMLOGICAL...";
-      exit(EXIT_FAILURE);
-    }
+    const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
+      chi::logicvolume_stack, volume_hndl, __FUNCTION__);
 
-    chi_mesh::LogicalVolume* volume_ptr =
-      cur_hndlr->logicvolume_stack[volume_hndl];
-    cur_hndlr->volume_mesher->SetBndryIDFromLogical(volume_ptr,sense,bndry_id);
+    chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_id);
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR) << "Invalid property specified " << property_index
+    chi::log.LogAllError() << "Invalid property specified " << property_index
                               << " in call to chiVolumeMesherSetProperty().";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   return 0;
@@ -252,7 +239,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
 \param Px int Number partitions in x.
 \param Py int Number partitions in y.
 \param Pz int Number partitions in z.
-
+\ingroup LuaVolumeMesher
  */
 int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
 {
@@ -265,8 +252,8 @@ int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
   LuaCheckNilValue(__FUNCTION__,L,3);
 
   //============================================= Get current mesh handler
-  auto cur_hndlr = chi_mesh::GetCurrentHandler();
-  auto vol_mesher= cur_hndlr->volume_mesher;
+  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+  auto vol_mesher= cur_hndlr.volume_mesher;
 
   int px = lua_tonumber(L,1);
   int py = lua_tonumber(L,2);
@@ -280,7 +267,9 @@ int chiVolumeMesherSetKBAPartitioningPxPyPz(lua_State *L)
 }
 
 //###################################################################
-/**Sets the x-cuts for KBA type partitioning with a lua array.*/
+/**Sets the x-cuts for KBA type partitioning with a lua array.
+\ingroup LuaVolumeMesher
+ */
 int chiVolumeMesherSetKBACutsX(lua_State *L)
 {
   int num_args = lua_gettop(L);
@@ -292,14 +281,16 @@ int chiVolumeMesherSetKBACutsX(lua_State *L)
   std::vector<double> cuts;
   LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
 
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-  mesh_handler->volume_mesher->options.xcuts = cuts;
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler.volume_mesher->options.xcuts = cuts;
 
   return 0;
 }
 
 //###################################################################
-/**Sets the y-cuts for KBA type partitioning with a lua array.*/
+/**Sets the y-cuts for KBA type partitioning with a lua array.
+\ingroup LuaVolumeMesher
+ */
 int chiVolumeMesherSetKBACutsY(lua_State *L)
 {
   int num_args = lua_gettop(L);
@@ -311,14 +302,16 @@ int chiVolumeMesherSetKBACutsY(lua_State *L)
   std::vector<double> cuts;
   LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
 
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-  mesh_handler->volume_mesher->options.ycuts = cuts;
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler.volume_mesher->options.ycuts = cuts;
 
   return 0;
 }
 
 //###################################################################
-/**Sets the z-cuts for KBA type partitioning with a lua array.*/
+/**Sets the z-cuts for KBA type partitioning with a lua array.
+\ingroup LuaVolumeMesher
+ */
 int chiVolumeMesherSetKBACutsZ(lua_State *L)
 {
   int num_args = lua_gettop(L);
@@ -330,8 +323,8 @@ int chiVolumeMesherSetKBACutsZ(lua_State *L)
   std::vector<double> cuts;
   LuaPopulateVectorFrom1DArray(__FUNCTION__,L,1,cuts);
 
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-  mesh_handler->volume_mesher->options.zcuts = cuts;
+  auto& mesh_handler = chi_mesh::GetCurrentHandler();
+  mesh_handler.volume_mesher->options.zcuts = cuts;
 
   return 0;
 }

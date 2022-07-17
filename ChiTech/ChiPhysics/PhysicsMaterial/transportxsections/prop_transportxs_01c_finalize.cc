@@ -1,7 +1,8 @@
 #include "material_property_transportxsections.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include <string>
 
@@ -20,7 +21,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
   {
     sigma_a = ComputeAbsorptionXSFromTransfer();
 
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
         << __FUNCTION__
         << ": sigma_a was estimated from the transfer matrix.";
   }
@@ -38,7 +39,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
     precursor_yield.clear();
     chi_delayed.clear();
 
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
         << __FUNCTION__
         << ": Precursors found in a non-fissile material. "
         << "Setting the number of precursors to zero for consistency.";
@@ -77,10 +78,10 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
 
         if (chi_dj_sum < eps)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << __FUNCTION__ << ": Precursor family " << j
             << "does not have a non-zero fission spectrum.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
       has_chi_d = true;
@@ -93,17 +94,17 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       {
         if (precursor_lambda[j] < eps)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << __FUNCTION__ << ": Precursor family " << j << "'s decay "
             << "constant must be non-zero.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
         if (precursor_yield[j] < eps)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
               << __FUNCTION__ << ": Precursor family " << j << "'s yield "
               << "must be non-zero.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
     }
@@ -115,7 +116,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       for (auto& v : chi) chi_sum += v;
       if (fabs(chi_sum - 1.0) > eps and chi_sum > eps)
       {
-        chi_log.Log(LOG_ALLWARNING)
+        chi::log.LogAllWarning()
           << __FUNCTION__ << ": Total fission spectrum does "
           << "not sum to unity. Normalizing.";
         for (auto& v : chi) v /= chi_sum;
@@ -128,7 +129,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       for (auto& v : chi_prompt) chi_p_sum += v;
       if (fabs(chi_p_sum - 1.0) > eps and chi_p_sum > eps)
       {
-        chi_log.Log(LOG_ALLWARNING)
+        chi::log.LogAllWarning()
             << __FUNCTION__ << ": Prompt fission spectrum does "
             << "not sum to unity. Normalizing.";
         for (auto& v : chi_prompt) v /= chi_p_sum;
@@ -144,7 +145,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
           chi_dj_sum += chi_delayed[g][j];
         if (fabs(chi_dj_sum - 1.0) > eps and chi_dj_sum > eps)
         {
-          chi_log.Log(LOG_ALLWARNING)
+          chi::log.LogAllWarning()
               << __FUNCTION__ << ": Delayed fission spectrum for precursor "
               << "family " << j << " does not sum to unity. Normalizing.";
           for (int g = 0; g < num_groups; ++g)
@@ -159,7 +160,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       for (auto& v : precursor_yield) yield_sum += v;
       if (fabs(yield_sum - 1.0) > eps and yield_sum > eps)
       {
-        chi_log.Log(LOG_ALLWARNING)
+        chi::log.LogAllWarning()
             << __FUNCTION__ << ": Precursor yield sum does not sum  "
             << "to unity. Normalizing.";
         for (auto& v : precursor_yield) v /= yield_sum;
@@ -169,24 +170,24 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
     //======================================== Check for input compatibility
     if ((has_nu_p and not has_chi_p) or (not has_nu_p and has_chi_p))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << __FUNCTION__ << ": If prompt nu or chi are provided, the other "
         << "must be as well.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     if ((has_nu_d and not has_chi_d) or (not has_nu_d and has_chi_d))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << __FUNCTION__ << ": If prompt nu or chi are provided, the other "
           << "must be as well.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
     if ((has_nu and not has_chi) or (not has_nu and has_chi))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << __FUNCTION__ << ": If total nu or chi are provided, the other "
           << "must be as well.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //============================== Compute total from prompt and delayed
@@ -215,34 +216,34 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
     {
       if (not has_nu_p or not has_nu_d)
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
           << __FUNCTION__ << ": Both prompt and delayed nu must be provided "
           << "when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       if (not has_chi_p or not has_chi_d)
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
             << __FUNCTION__ << ": Both prompt and delayed chi must be "
             << "provided when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
     else
     {
       if (not has_nu)
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
             << __FUNCTION__ << ": Total nu must be provided "
             << "when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
       if (not has_chi)
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
             << __FUNCTION__ << ": Total chi must be "
             << "provided when precursors are present.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
 

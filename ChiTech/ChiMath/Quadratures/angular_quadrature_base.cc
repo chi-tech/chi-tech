@@ -2,8 +2,8 @@
 
 #include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 #include <iomanip>
 #include <numeric>
@@ -21,10 +21,10 @@ void chi_math::AngularQuadrature::
 
   if ((Na-Np != 0) or (Na-Nw != 0))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chi_math::AngularQuadrature::InitializeWithCustom: supplied"
          " vectors need to be of equal length.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //================================================== Create angle pairs
@@ -66,7 +66,7 @@ void chi_math::AngularQuadrature::
 
   if (verbose)
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << ostr.str() << "\n"
       << "Weight sum=" << weight_sum;
   }
@@ -152,7 +152,7 @@ void chi_math::AngularQuadrature::
     outs << "\n";
   }
 
-  chi_log.Log(LOG_0VERBOSE_1) << outs.str();
+  chi::log.Log0Verbose1() << outs.str();
 }
 
 //###################################################################
@@ -207,5 +207,5 @@ void chi_math::AngularQuadrature::
     outs << "\n";
   }
 
-  chi_log.Log(LOG_0VERBOSE_1) << outs.str();
+  chi::log.Log0Verbose1() << outs.str();
 }

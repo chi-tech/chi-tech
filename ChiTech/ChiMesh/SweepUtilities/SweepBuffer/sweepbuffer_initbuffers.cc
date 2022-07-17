@@ -4,11 +4,11 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
+
 #include <ChiConsole/chi_console.h>
-extern ChiConsole&  chi_console;
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /** This is the final level of initialization before a sweep-chunk executes.
@@ -47,13 +47,13 @@ InitializeLocalAndDownstreamBuffers()
     }
 
     //================================================ Make a memory query
-    double memory_mb = chi_console.GetMemoryUsageInMB();
+    double memory_mb = chi::console.GetMemoryUsageInMB();
 
-    std::shared_ptr<ChiLog::EventInfo> memory_event_info =
-      std::make_shared<ChiLog::EventInfo>(memory_mb);
+    std::shared_ptr<chi_objects::ChiLog::EventInfo> memory_event_info =
+      std::make_shared<chi_objects::ChiLog::EventInfo>(memory_mb);
 
-    chi_log.LogEvent(ChiLog::StdTags::MAX_MEMORY_USAGE,
-                     ChiLog::EventType::SINGLE_OCCURRENCE,
+    chi::log.LogEvent(chi_objects::ChiLog::StdTags::MAX_MEMORY_USAGE,
+                     chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE,
                      memory_event_info);
 
     data_initialized = true;

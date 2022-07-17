@@ -1,10 +1,11 @@
 #include "ChiLua/chi_lua.h"
 #include "../lbs_linear_boltzmann_solver.h"
-#include "ChiPhysics/chi_physics.h"
-#include <chi_log.h>
 
-extern ChiPhysics&  chi_physics_handler;
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+
+#include "chi_runtime.h"
+#include "chi_log.h"
+;
 
 //###################################################################
 /**Creates a Neutral Particle Transport solver.
@@ -36,7 +37,7 @@ int chiLBSCreateSolver(lua_State *L)
   const std::string fname = __FUNCTION__;
   int num_args = lua_gettop(L);
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "Creating Linear Boltzman solver";
+  chi::log.LogAllVerbose1() << "Creating Linear Boltzman solver";
 
   std::string solver_name = "LBSolver";
   if (num_args == 1)
@@ -45,11 +46,11 @@ int chiLBSCreateSolver(lua_State *L)
     solver_name = lua_tostring(L, 1);
   }
 
-  auto new_solver = new lbs::SteadySolver(solver_name);
+  auto new_solver = std::make_shared<lbs::SteadySolver>(solver_name);
 
-  chi_physics_handler.solver_stack.push_back(new_solver);
+  chi::solver_stack.push_back(new_solver);
 
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi_physics_handler.solver_stack.size()-1));
+      static_cast<lua_Integer>(chi::solver_stack.size()-1));
   return 1;
 }

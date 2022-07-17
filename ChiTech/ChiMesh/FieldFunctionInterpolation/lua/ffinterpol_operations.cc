@@ -1,12 +1,12 @@
-#include "../../../ChiLua/chi_lua.h"
-#include "../../MeshHandler/chi_meshhandler.h"
-#include "../../../ChiPhysics/chi_physics.h"
+#include "ChiLua/chi_lua.h"
+
 #include "../chi_ffinterpolation.h"
+#include "chi_runtime.h"
 
-#include <chi_log.h>
+#include "chi_runtime.h"
+#include "chi_log.h"
+;
 
-extern ChiLog& chi_log;
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /** Initialize interpolator.
@@ -17,22 +17,18 @@ extern ChiPhysics&  chi_physics_handler;
 \author Jan*/
 int chiFFInterpolationInitialize(lua_State* L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
 
   //================================================== Get handle to field function
-  int ffihandle = lua_tonumber(L,1);
-  chi_mesh::FieldFunctionInterpolation* cur_ffi;
-  try {
-    cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid ffi handle in chiFFInterpolationSetProperty.";
-    exit(EXIT_FAILURE);
-  }
+  const size_t ffihandle = lua_tonumber(L,1);
 
-  cur_ffi->Initialize();
+  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+                                    ffihandle, fname);
+
+  p_ffi->Initialize();
   return 0;
 }
 
@@ -45,22 +41,18 @@ int chiFFInterpolationInitialize(lua_State* L)
 \author Jan*/
 int chiFFInterpolationExecute(lua_State* L)
 {
-  chi_mesh::MeshHandler* cur_hndlr = chi_mesh::GetCurrentHandler();
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
 
   //================================================== Get handle to field function
-  int ffihandle = lua_tonumber(L,1);
-  chi_mesh::FieldFunctionInterpolation* cur_ffi;
-  try {
-    cur_ffi = cur_hndlr->ffinterpolation_stack.at(ffihandle);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid ffi handle in chiFFInterpolationSetProperty.";
-    exit(EXIT_FAILURE);
-  }
+  const size_t ffihandle = lua_tonumber(L,1);
 
-  cur_ffi->Execute();
+  auto p_ffi = chi::GetStackItemPtr(chi::field_func_interpolation_stack,
+                                    ffihandle, fname);
+
+  p_ffi->Execute();
   return 0;
 }
 

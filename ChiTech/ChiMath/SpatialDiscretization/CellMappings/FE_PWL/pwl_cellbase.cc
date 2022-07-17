@@ -2,7 +2,7 @@
 
 
 void
-CellMappingFE_PWL::
+chi_math::CellMappingFE_PWL::
   InitializeAllQuadraturePointData(
     chi_math::finite_element::InternalQuadraturePointData& internal_data,
     std::vector<chi_math::finite_element::FaceQuadraturePointData>& faces_qp_data) const
@@ -15,7 +15,7 @@ CellMappingFE_PWL::
 
 
 void
-CellMappingFE_PWL::
+chi_math::CellMappingFE_PWL::
   ComputeUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const
 {
   //  quadrature point data
@@ -126,7 +126,7 @@ CellMappingFE_PWL::
 
 
 void
-CellMappingFE_PWL::
+chi_math::CellMappingFE_PWL::
   ComputeWeightedUnitIntegrals(chi_math::finite_element::UnitIntegralData& ui_data) const
 {
   //  quadrature point data

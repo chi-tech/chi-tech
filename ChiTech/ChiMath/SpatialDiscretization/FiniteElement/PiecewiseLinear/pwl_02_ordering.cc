@@ -1,25 +1,25 @@
 #include "pwl.h"
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
 
 #include <chi_mpi.h>
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
+
 
 #include "chi_mpi_utils.h"
+
 
 //###################################################################
 /**Reorders the nodes for parallel computation in a Continuous
  * Finite Element calculation.*/
-void SpatialDiscretization_PWLD::OrderNodes()
+void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi_log.Log() << chi_program_timer.GetTimeString()
+  chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Developing nodal ordering.";
-  ChiTimer t_stage[6];
+  chi_objects::ChiTimer t_stage[6];
 
   t_stage[0].Reset();
   //================================================== Check cell views avail
@@ -39,7 +39,7 @@ void SpatialDiscretization_PWLD::OrderNodes()
   }
 
   //================================================== Allgather node_counts
-  locJ_block_size.assign(chi_mpi.process_count, 0);
+  locJ_block_size.assign(chi::mpi.process_count, 0);
   MPI_Allgather(&local_node_count,           //sendbuf
                 1, MPI_UNSIGNED_LONG_LONG,   //sendcount, sendtype
                 locJ_block_size.data(),      //recvbuf
@@ -48,9 +48,9 @@ void SpatialDiscretization_PWLD::OrderNodes()
 
   //================================================== Assign local_block_address
   uint64_t running_block_address = 0;
-  for (int locI=0; locI<chi_mpi.process_count; ++locI)
+  for (int locI=0; locI<chi::mpi.process_count; ++locI)
   {
-    if (locI == chi_mpi.location_id)
+    if (locI == chi::mpi.location_id)
       local_block_address = static_cast<int64_t>(running_block_address);
 
     running_block_address += locJ_block_size[locI];
@@ -117,7 +117,7 @@ void SpatialDiscretization_PWLD::OrderNodes()
 
 
   //================================================== Print info
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "Local dof count, start, total "
     << local_node_count << " "
     << local_block_address << " "

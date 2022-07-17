@@ -17,9 +17,9 @@ int chiAdjointSolverComputeInnerProduct(lua_State* L)
 
   const int solver_index     = lua_tointeger(L,1);
 
-  auto solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
+  auto& solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
 
-  const double ip_Q_phi_star = solver->ComputeInnerProduct();
+  const double ip_Q_phi_star = solver.ComputeInnerProduct();
 
   lua_pushnumber(L, ip_Q_phi_star);
   return 1;

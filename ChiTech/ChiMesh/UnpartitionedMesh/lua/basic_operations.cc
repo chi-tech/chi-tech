@@ -1,8 +1,9 @@
 #include "ChiLua/chi_lua.h"
 #include "unpartition_mesh_lua_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Uploads a vertex.
@@ -160,10 +161,10 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
 
   if (verbose)
   {
-    chi_log.Log() << "Cell type       : " << cell_type_str;
-    chi_log.Log() << "Cell sub-type   : " << cell_sub_type_str;
-    chi_log.Log() << "Cell num_faces  : " << cell_num_faces;
-    chi_log.Log() << "Cell material_id: " << cell_material_id;
+    chi::log.Log() << "Cell type       : " << cell_type_str;
+    chi::log.Log() << "Cell sub-type   : " << cell_sub_type_str;
+    chi::log.Log() << "Cell num_faces  : " << cell_num_faces;
+    chi::log.Log() << "Cell material_id: " << cell_material_id;
   }
 
   std::vector<std::vector<uint64_t>> proxy_faces(cell_num_faces);
@@ -183,7 +184,7 @@ int chiUnpartitionedMeshUploadCell(lua_State* L)
       std::stringstream outstr;
       outstr << "face" << f << " ";
       for (auto val : vals) outstr << val << " ";
-      chi_log.Log() << outstr.str();
+      chi::log.Log() << outstr.str();
     }
 
     std::vector<uint64_t> proxy_face;

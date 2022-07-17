@@ -4,22 +4,26 @@
 #include <string>
 #include <chrono>
 
-//############################################################################# CLASS DEF
-/** Timer object.*/
-class ChiTimer
-{
-public:
-  std::chrono::steady_clock::time_point startTime;
 
-public:
-	//00
-				      ChiTimer() noexcept;
-	//01
-	void   		  Reset();
-	double 		  GetTime();
-	std::string GetTimeString();
-	static std::string GetLocalDateTimeString();
-};
+//################################################################### CLASS DEF
+namespace chi_objects
+{
+  /** Timer object.*/
+  class ChiTimer
+  {
+  public:
+    std::chrono::steady_clock::time_point startTime;
+
+  public:
+    //00
+                ChiTimer() noexcept;
+    //01
+    void   		  Reset();
+    double 		  GetTime() const;
+    std::string GetTimeString() const;
+    static std::string GetLocalDateTimeString();
+  };
+}
 
 #endif
 

@@ -3,7 +3,7 @@
  *
  *
  * Please consult the whitepaper for this solver (<a
- * href="../../whitepages/DiffusionSolver/DiffusionSolver.pdf">
+ * href="whitepages/DiffusionSolver/DiffusionSolver.pdf">
  * Diffusion Whitepaper</a>). This solver solves the general diffusion equation
  * of the form
  *

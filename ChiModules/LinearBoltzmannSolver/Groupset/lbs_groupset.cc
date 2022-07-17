@@ -1,18 +1,18 @@
-#include "lbs_groupset.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 #include <fstream>
 
 //##############################################
 /**Groupset constructor.*/
-LBSGroupset::LBSGroupset(int in_id) : id(in_id)
+lbs::LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 {
   quadrature = nullptr;
   iterative_method = lbs::IterativeMethod::CLASSICRICHARDSON;
@@ -44,7 +44,7 @@ LBSGroupset::LBSGroupset(int in_id) : id(in_id)
 
 //###################################################################
 /**Computes the discrete to moment operator.*/
-void LBSGroupset::BuildDiscMomOperator(
+void lbs::LBSGroupset::BuildDiscMomOperator(
   unsigned int scattering_order,
   lbs::GeometryType geometry_type)
 {
@@ -67,7 +67,7 @@ void LBSGroupset::BuildDiscMomOperator(
 
 //###################################################################
 /**Computes the moment to discrete operator.*/
-void LBSGroupset::BuildMomDiscOperator(
+void lbs::LBSGroupset::BuildMomDiscOperator(
   unsigned int scattering_order,
   lbs::GeometryType geometry_type)
 {
@@ -91,7 +91,7 @@ void LBSGroupset::BuildMomDiscOperator(
 
 //###################################################################
 /**Constructs the groupset subsets.*/
-void LBSGroupset::BuildSubsets()
+void lbs::LBSGroupset::BuildSubsets()
 {
   grp_subsets.clear();
   grp_subset_sizes.clear();
@@ -115,7 +115,7 @@ void LBSGroupset::BuildSubsets()
     grp_subsets.emplace_back(subset_ranki,subset_ranki+subset_size-1);
     grp_subset_sizes.push_back(subset_size);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
     << "Groupset subset " << ss << " "
     << subset_ranki << "->" << subset_ranki+subset_size-1;
   }//for ss
@@ -150,7 +150,7 @@ void LBSGroupset::BuildSubsets()
       ang_subset_sizes_top.push_back(subset_size);
 
       if (angleagg_method != lbs::AngleAggregationType::SINGLE)
-        chi_log.Log(LOG_0)
+        chi::log.Log()
           << "Top-hemi Angle subset " << ss << " "
           << subset_ranki << "->" << subset_ranki+subset_size-1;
     }//for ss
@@ -169,7 +169,7 @@ void LBSGroupset::BuildSubsets()
       ang_subset_sizes_bot.push_back(subset_size);
 
       if (angleagg_method != lbs::AngleAggregationType::SINGLE)
-        chi_log.Log(LOG_0)
+        chi::log.Log()
           << "Bot-hemi Angle subset " << ss << " "
           << subset_ranki << "->" << subset_ranki+subset_size-1;
     }//for ss
@@ -179,7 +179,7 @@ void LBSGroupset::BuildSubsets()
 
 //###################################################################
 /**Constructs the groupset subsets.*/
-void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name)
+void lbs::LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name)
 {
   if (not log_sweep_events) return;
 
@@ -188,7 +188,7 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
 
   ofile
     << "Groupset Sweep information "
-    << "location " << chi_mpi.location_id << "\n";
+    << "location " << chi::mpi.location_id << "\n";
 
 
   //======================================== Print all anglesets
@@ -218,7 +218,7 @@ void LBSGroupset::PrintSweepInfoFile(size_t ev_tag, const std::string& file_name
   }
 
   //======================================== Print event history
-  ofile << chi_log.PrintEventHistory(ev_tag);
+  ofile << chi::log.PrintEventHistory(ev_tag);
 
   ofile.close();
 }

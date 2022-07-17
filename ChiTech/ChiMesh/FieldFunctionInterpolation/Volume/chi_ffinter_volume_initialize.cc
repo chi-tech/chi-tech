@@ -1,20 +1,21 @@
 #include "chi_ffinter_volume.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Initializes the volume field function interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
 {
-  chi_log.Log(LOG_0VERBOSE_1) << "Initializing volume interpolator.";
+  chi::log.Log0Verbose1() << "Initializing volume interpolator.";
   //================================================== Check grid available
   if (field_functions.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Unassigned field function in volume field function interpolator.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   } else
   {
     this->grid_view = field_functions[0]->grid;

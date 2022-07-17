@@ -1,13 +1,15 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiPhysics/chi_physics.h"
+
+#include "chi_runtime.h"
+
+#include "chi_runtime.h"
 #include "chi_log.h"
+;
+
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes parallel arrays.*/
@@ -21,7 +23,7 @@ void lbs::SteadySolver::InitializeParrays()
   }
 
   //================================================== Compute local # of dof
-  auto& per_node = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto per_node = chi_math::UnknownManager::GetUnitaryUnknownManager();
   local_node_count = discretization->GetNumLocalDOFs(per_node);
   glob_node_count = discretization->GetNumGlobalDOFs(per_node);
 
@@ -29,7 +31,7 @@ void lbs::SteadySolver::InitializeParrays()
   size_t num_grps = groups.size();
   size_t local_unknown_count = local_node_count * num_grps * num_moments;
 
-  chi_log.Log(LOG_ALLVERBOSE_1) << "LBS Number of phi unknowns: "
+  chi::log.LogAllVerbose1() << "LBS Number of phi unknowns: "
                                 << local_unknown_count;
 
   //================================================== Size local vectors
@@ -81,7 +83,7 @@ void lbs::SteadySolver::InitializeParrays()
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   auto pwl =
-      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
 
   cell_transport_views.clear();
   cell_transport_views.reserve(grid->local_cells.size());
@@ -188,7 +190,7 @@ void lbs::SteadySolver::InitializeParrays()
           m,                      //Reference unknown
           g);                     //Reference component
 
-        chi_physics_handler.fieldfunc_stack.push_back(group_ff);
+        chi::fieldfunc_stack.push_back(group_ff);
         field_functions.push_back(group_ff);
       }//for m
     }//for g

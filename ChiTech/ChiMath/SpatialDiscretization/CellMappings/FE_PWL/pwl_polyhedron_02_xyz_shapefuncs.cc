@@ -4,7 +4,7 @@
 
 //###################################################################
 /**Returns the evaluation of shape function i at the supplied point.*/
-double PolyhedronMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
+double chi_math::PolyhedronMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
 {
   for (size_t f=0; f < face_data.size(); f++)
   {
@@ -53,8 +53,8 @@ double PolyhedronMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3&
 //###################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void PolyhedronMappingFE_PWL::ShapeValues(const chi_mesh::Vector3& xyz,
-                                          std::vector<double>& shape_values)
+void chi_math::PolyhedronMappingFE_PWL::ShapeValues(const chi_mesh::Vector3& xyz,
+                                                    std::vector<double>& shape_values)
 {
   shape_values.resize(num_nodes, 0.0);
   for (size_t f=0; f < face_data.size(); f++)
@@ -101,8 +101,8 @@ void PolyhedronMappingFE_PWL::ShapeValues(const chi_mesh::Vector3& xyz,
 
 //###################################################################
 /**Returns the evaluation of grad-shape function i at the supplied point.*/
-chi_mesh::Vector3 PolyhedronMappingFE_PWL::GradShapeValue(const int i,
-                                                          const chi_mesh::Vector3& xyz)
+chi_mesh::Vector3 chi_math::PolyhedronMappingFE_PWL::GradShapeValue(const int i,
+                                                                    const chi_mesh::Vector3& xyz)
 {
   chi_mesh::Vector3 grad,gradr;
   for (size_t f=0; f < face_data.size(); f++)
@@ -165,7 +165,7 @@ chi_mesh::Vector3 PolyhedronMappingFE_PWL::GradShapeValue(const int i,
 //###################################################################
 /**Populates gradshape_values with the value of each shape function's
  * gradient evaluated at the supplied point.*/
-void PolyhedronMappingFE_PWL::GradShapeValues(
+void chi_math::PolyhedronMappingFE_PWL::GradShapeValues(
   const chi_mesh::Vector3 &xyz,
   std::vector<chi_mesh::Vector3> &gradshape_values)
 {

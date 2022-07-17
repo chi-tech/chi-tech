@@ -3,15 +3,15 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI& chi_mpi;
-extern ChiLog& chi_log;
+
+;
 
 //###################################################################
 /**Adds a new cell to grid registry.*/
 void chi_mesh::GlobalCellHandler::
   push_back(std::unique_ptr<chi_mesh::Cell> new_cell)
 {
-  if (new_cell->partition_id == static_cast<uint64_t>(chi_mpi.location_id))
+  if (new_cell->partition_id == static_cast<uint64_t>(chi::mpi.location_id))
   {
     local_cell_glob_indices.push_back(new_cell->global_id);
     size_t local_cell_index = local_cell_glob_indices.size() - 1;

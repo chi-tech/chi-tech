@@ -2,7 +2,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Sweep scheduler constructor*/
@@ -13,9 +13,9 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   scheduler_type(in_scheduler_type),
   angle_agg(in_angle_agg),
   sweep_chunk(in_sweep_chunk),
-  sweep_event_tag(chi_log.GetRepeatingEventTag("Sweep Timing")),
+  sweep_event_tag(chi::log.GetRepeatingEventTag("Sweep Timing")),
   sweep_timing_events_tag({
-    chi_log.GetRepeatingEventTag("Sweep Chunk Only Timing")
+    chi::log.GetRepeatingEventTag("Sweep Chunk Only Timing")
   })
 {
   angle_agg.InitializeReflectingBCs();

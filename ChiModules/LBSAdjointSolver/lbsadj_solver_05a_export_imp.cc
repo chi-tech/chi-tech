@@ -1,10 +1,11 @@
 #include "lbsadj_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include "ChiMath/chi_math_vectorNX.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
@@ -39,7 +40,7 @@ void lbs_adjoint::AdjointSolver::
   VecOfMGVec4 cell_avg_p1_moments(num_cells, MGVec4(num_groups));
   {
     auto fe_sdm =
-      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
 
     if (not fe_sdm)
       throw std::logic_error(fname + ": Error getting finite element spatial"
@@ -119,11 +120,11 @@ void lbs_adjoint::AdjointSolver::
   }
 
 
-  chi_log.Log() << "Exporting importance map to binary file " << file_name;
+  chi::log.Log() << "Exporting importance map to binary file " << file_name;
 
   const auto locJ_io_flags = std::ofstream::binary | std::ofstream::out;
   const auto loc0_io_flags = locJ_io_flags | std::ofstream::trunc;
-  const bool is_home = (chi_mpi.location_id == 0);
+  const bool is_home = (chi::mpi.location_id == 0);
 
   //======================================== Build header
   std::string header_info =
@@ -152,13 +153,13 @@ void lbs_adjoint::AdjointSolver::
 
   //================================================== Process each location
   uint64_t num_global_cells = grid->GetGlobalNumberOfCells();
-  for (int locationJ=0; locationJ<chi_mpi.process_count; ++locationJ)
+  for (int locationJ=0; locationJ<chi::mpi.process_count; ++locationJ)
   {
-    chi_log.Log(LOG_ALL) << "  Barrier at " << locationJ;
+    chi::log.LogAll() << "  Barrier at " << locationJ;
     MPI_Barrier(MPI_COMM_WORLD);
-    if (chi_mpi.location_id != locationJ) continue;
+    if (chi::mpi.location_id != locationJ) continue;
 
-    chi_log.Log(LOG_ALL) << "  Location " << locationJ << " appending data.";
+    chi::log.LogAll() << "  Location " << locationJ << " appending data.";
 
     std::ofstream file(file_name, is_home? loc0_io_flags : locJ_io_flags);
 
@@ -166,7 +167,7 @@ void lbs_adjoint::AdjointSolver::
     {
       std::stringstream outstr;
 
-      outstr << fname << ": Location " << chi_mpi.location_id
+      outstr << fname << ": Location " << chi::mpi.location_id
              << ", failed to open file " << file_name;
       throw std::logic_error(outstr.str());
     }
@@ -205,6 +206,6 @@ void lbs_adjoint::AdjointSolver::
     file.close();
   }//for location
 
-  chi_log.Log(LOG_ALL) << "Done exporting importance map to binary file " << file_name;
+  chi::log.LogAll() << "Done exporting importance map to binary file " << file_name;
   MPI_Barrier(MPI_COMM_WORLD);
 }

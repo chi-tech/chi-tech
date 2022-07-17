@@ -1,8 +1,7 @@
 #include "material_property_transportxsections.h"
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 
 //###################################################################
@@ -108,10 +107,10 @@ void chi_physics::TransportCrossSections::
   }
 
   //======================================== Verbose output the spectrum
-  chi_log.Log(LOG_0VERBOSE_1) << "Fundamental eigen-value: " << rho;
+  chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
   std::stringstream outstr;
   for (auto& xi : ref_xi)
     outstr << xi << '\n';
-  chi_log.Log(LOG_0VERBOSE_1) << outstr.str();
+  chi::log.Log0Verbose1() << outstr.str();
 
 }

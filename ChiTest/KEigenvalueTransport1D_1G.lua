@@ -71,8 +71,6 @@ chiPhysicsMaterialSetProperty(materials[1], TRANSPORT_XSECTIONS,
 -- Define solver
 phys = chiLBKESCreateSolver()
 
--- Add region and discretization
-chiSolverAddRegion(phys, region)
 chiLBSSetProperty(phys, DISCRETIZATION_METHOD, PWLD)
 
 -- Create quadrature and define scattering order

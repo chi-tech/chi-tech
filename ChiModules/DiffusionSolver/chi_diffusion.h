@@ -3,6 +3,9 @@
 
 #include <petscksp.h>
 
+/**\defgroup LuaDiffusion Diffusion Solver
+ * \ingroup LuaModules*/
+
 //######################################################### Namespace def
 namespace chi_diffusion
 {

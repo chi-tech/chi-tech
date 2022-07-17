@@ -21,10 +21,11 @@ public:
     std::vector<GraphVertex> vertices;
     std::vector<bool>        vertex_valid_flags;
   public:
-    void AddVertex(void* context, int id=-1);
-    void RemoveVertex(int v);
+    void AddVertex(size_t id, void* context);
+    void AddVertex(void* context);
+    void RemoveVertex(size_t v);
 
-    GraphVertex& operator[](int v);
+    GraphVertex& operator[](size_t v);
 
     //############################ iterator Class Definition
     /**Internal iterator class for vertex accessor.*/
@@ -59,9 +60,9 @@ public:
       { return ref_block.vertices[ref_element]; }
       GraphVertex* operator->()
       { return &(ref_block.vertices[ref_element]); }
-      bool operator==(const iterator& rhs)
+      bool operator==(const iterator& rhs) const
       { return ref_element == rhs.ref_element; }
-      bool operator!=(const iterator& rhs)
+      bool operator!=(const iterator& rhs) const
       { return ref_element != rhs.ref_element; }
     };
     //############################ End of iterator Class Definition
@@ -79,9 +80,9 @@ public:
 
     size_t size() {return vertices.size();}
 
-    int GetNumValid()
+    size_t GetNumValid()
     {
-      int count=0;
+      size_t count=0;
       for (bool val : vertex_valid_flags)
         if (val) ++count;
 
@@ -94,23 +95,24 @@ public:
 
   VertexAccessor vertices;
 
-  void AddVertex(void* context = nullptr, int id=-1);
-  void RemoveVertex(int v);
-  bool AddEdge(int from, int to, double weight=1.0);
-  void RemoveEdge(int from, int to);
+  void AddVertex(size_t id, void* context = nullptr);
+  void AddVertex(void* context = nullptr);
+  void RemoveVertex(size_t v);
+  bool AddEdge(size_t from, size_t to, double weight=1.0);
+  void RemoveEdge(size_t from, size_t to);
 
-  int GetNumSinks()
+  size_t GetNumSinks()
   {
-    int count=0;
+    size_t count=0;
     for (auto& v : vertices)
       if (v.ds_edge.empty() and not v.us_edge.empty())
         ++count;
     return count;
   }
 
-  int GetNumSources()
+  size_t GetNumSources()
   {
-    int count=0;
+    size_t count=0;
     for (auto& v : vertices)
       if (v.us_edge.empty() and not v.ds_edge.empty())
         ++count;
@@ -118,32 +120,31 @@ public:
   }
 
 private:
-  void DFSAlgorithm(std::vector<int>& traversal,
+  void DFSAlgorithm(std::vector<size_t>& traversal,
                     std::vector<bool>& visited,
-                    int cur_vid);
+                    size_t cur_vid);
 
-  void SCCAlgorithm(int u, int& time,
+  void SCCAlgorithm(size_t u, int& time,
                     std::vector<int>& disc,
                     std::vector<int>& low,
                     std::vector<bool>& on_stack,
-                    std::stack<int>& stack,
-                    std::vector<std::vector<int>>& SCCs);
+                    std::stack<size_t>& stack,
+                    std::vector<std::vector<size_t>>& SCCs);
 
 public:
-  std::vector<int> DepthFirstSearch(int vertex_id);
-  std::vector<std::vector<int>>
+  std::vector<std::vector<size_t>>
     FindStronglyConnectedComponents();
 
-  std::vector<int> GenerateTopologicalSort();
+  std::vector<size_t> GenerateTopologicalSort();
 
-  std::vector<int> FindApproxMinimumFAS();
+  std::vector<size_t> FindApproxMinimumFAS();
 
   void PrintGraphviz(int location_mask=0);
 
   void PrintSubGraphviz(const std::vector<int>& verts_to_print,
                         int location_mask=0);
 
-  std::vector<std::pair<int,int>> RemoveCyclicDependencies();
+  std::vector<std::pair<size_t,size_t>> RemoveCyclicDependencies();
 
   void Clear();
 

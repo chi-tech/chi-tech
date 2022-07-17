@@ -2,11 +2,10 @@
 
 #include "chi_misc_utils.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
-
-bool chi_unit_tests::Test_chi_misc_utils(bool verbose)
+void chi_unit_tests::Test_chi_misc_utils(bool verbose)
 {
   bool passed = true;
   std::stringstream output;
@@ -34,7 +33,7 @@ bool chi_unit_tests::Test_chi_misc_utils(bool verbose)
     output << std::string("chi_misc_utils::PrintIterationProgress(.,39,4) ... Passed\n");
 
   if (verbose)
-    chi_log.Log() << output.str();
+    chi::log.Log() << output.str();
 
-  return passed;
+  ChiUnitTestMessageHome(passed)
 }

@@ -54,7 +54,7 @@ add_subdirectory("${CHI_TECH_DIR}/CHI_TIMER")
 add_subdirectory("${CHI_TECH_DIR}/CHI_TOOLS")
 add_subdirectory("${CHI_TECH_DIR}/CHI_MESH")
 add_subdirectory("${CHI_TECH_DIR}/CHI_MPI")
-add_subdirectory("${CHI_TECH_DIR}/CHI_LOG")
+add_subdirectory("${CHI_TECH_DIR}/chi::log")
 
 add_subdirectory("${CHI_TECH_MOD}/CHI_MONTECARLON")
 add_subdirectory("${CHI_TECH_MOD}/CHI_DIFFUSION")

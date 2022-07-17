@@ -3,11 +3,12 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 #include "petsc.h"
 
@@ -16,7 +17,7 @@ extern ChiMPI& chi_mpi;
 std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
   PARMETIS(const UnpartitionedMesh &umesh)
 {
-  chi_log.Log(LOG_0) << "Partitioning mesh with ParMETIS.";
+  chi::log.Log() << "Partitioning mesh with ParMETIS.";
 
   //================================================== Determine avg num faces
   //                                                   per cell
@@ -30,7 +31,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
 
   //================================================== Start building indices
   std::vector<int64_t> cell_pids(num_raw_cells, 0);
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     if (num_raw_cells > 1)
     {
@@ -56,7 +57,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
         i_indices[i] = icount;
       }
 
-      chi_log.Log(LOG_0VERBOSE_1) << "Done building indices.";
+      chi::log.Log0Verbose1() << "Done building indices.";
 
       //======================================== Copy to raw arrays
       int64_t* i_indices_raw;
@@ -70,7 +71,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
       for (int64_t j=0; j<static_cast<int64_t>(j_indices.size()); ++j)
         j_indices_raw[j] = j_indices[j];
 
-      chi_log.Log(LOG_0VERBOSE_1) << "Done copying to raw indices.";
+      chi::log.Log0Verbose1() << "Done copying to raw indices.";
 
       //========================================= Create adjacency matrix
       Mat Adj; //Adjacency matrix
@@ -79,7 +80,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
                       (int64_t)num_raw_cells,
                       i_indices_raw, j_indices_raw, nullptr, &Adj);
 
-      chi_log.Log(LOG_0VERBOSE_1) << "Done creating adjacency matrix.";
+      chi::log.Log0Verbose1() << "Done creating adjacency matrix.";
 
       //========================================= Create partitioning
       MatPartitioning part;
@@ -87,12 +88,12 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
       MatPartitioningCreate(MPI_COMM_SELF,&part);
       MatPartitioningSetAdjacency(part,Adj);
       MatPartitioningSetType(part,"parmetis");
-      MatPartitioningSetNParts(part,chi_mpi.process_count);
+      MatPartitioningSetNParts(part,chi::mpi.process_count);
       MatPartitioningApply(part,&is);
       MatPartitioningDestroy(&part);
       MatDestroy(&Adj);
       ISPartitioningToNumbering(is,&isg);
-      chi_log.Log(LOG_0VERBOSE_1) << "Done building paritioned index set.";
+      chi::log.Log0Verbose1() << "Done building paritioned index set.";
 
       //========================================= Get cell global indices
       const int64_t* cell_pids_raw;
@@ -101,7 +102,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
         cell_pids[i] = cell_pids_raw[i];
       ISRestoreIndices(is,&cell_pids_raw);
 
-      chi_log.Log(LOG_0VERBOSE_1) << "Done retrieving cell global indices.";
+      chi::log.Log0Verbose1() << "Done retrieving cell global indices.";
     }//if more than 1 cell
   }//if home location
 
@@ -112,7 +113,7 @@ std::vector<int64_t> chi_mesh::VolumeMesherPredefinedUnpartitioned::
             MPI_LONG_LONG_INT,                //data type
             0,                                //root
             MPI_COMM_WORLD);                  //communicator
-  chi_log.Log(LOG_0) << "Done partitioning mesh.";
+  chi::log.Log() << "Done partitioning mesh.";
 
   return cell_pids;
 }

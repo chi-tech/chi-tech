@@ -2,11 +2,15 @@
 
 #include "ChiLua/chi_lua.h"
 
-#include "ChiConsole/chi_console.h"
-extern ChiConsole&  chi_console;
+#include "chi_runtime.h"
 
+#include "ChiConsole/chi_console.h"
+
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+
+
+;
 
 //###################################################################
 /** Calls the lua function associated with the response function and
@@ -45,7 +49,7 @@ std::vector<double> lbs_adjoint::ResponseFunctionDesignation::
   }
 
   //============================================= Load lua function
-  lua_State* L = chi_console.consoleState;
+  lua_State* L = chi::console.consoleState;
   lua_getglobal(L, lua_functional.c_str());
 
 

@@ -1,7 +1,7 @@
 #include "serial_newton_iteration.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 #include <iomanip>
 
@@ -29,7 +29,7 @@ VecDbl chi_math::
              << value << " ";
     output << "L2_norm_F_x_i=" << L2_norm_F_x_i;
 
-    chi_log.Log() << output.str();
+    chi::log.Log() << output.str();
   };
 
   //=================================== Declare and init variables

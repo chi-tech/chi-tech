@@ -10,15 +10,11 @@ to elements.*/
 class chi_mesh::SurfaceMesherPassthrough : public chi_mesh::SurfaceMesher
 {
 public:
-  SurfaceMesherPassthrough() : SurfaceMesher(SurfaceMesherType::Passthrough)
+  SurfaceMesherPassthrough() : SurfaceMesher(SurfaceMesherType::Predefined)
   {
-    partitioning_x = 1;
-    partitioning_y = 1;
-
-    export_loadbalance=false;
   }
   //02 Execute
-  void Execute();
+  void Execute() override;
 };
 
 #endif

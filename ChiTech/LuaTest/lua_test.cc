@@ -1,16 +1,13 @@
-#include <ChiLua/chi_lua.h>
+#include "chi_lua.h"
+#include "chi_runtime.h"
 
 #include "lua_test.h"
 
+#define LUA_FMACRO1(x) lua_register(L, #x, x)
+
 #include "unit_tests.h"
 
-#include "chi_log.h"
-#include "chi_mpi.h"
-
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
-
-#define LUA_FMACRO1(x) lua_register(L, #x, x)
+#include <stdexcept>
 
 //###################################################################
 /**This is a lua test function.
@@ -24,18 +21,47 @@ int chiLuaTest(lua_State* L)
   if (num_args >= 1)
     verbose = lua_toboolean(L,1);
 
-  if (not chi_unit_tests::Test_chi_math(verbose))
-    chi_log.Log(LOG_ALL) << "chi_unit_tests::Test_chi_math Failed";
-  if (not chi_unit_tests::Test_chi_misc_utils(verbose))
-    chi_log.Log(LOG_ALL) << "chi_unit_tests::Test_chi_misc_utils Failed";
-  if (not chi_unit_tests::Test_chi_data_types(verbose))
-    chi_log.Log(LOG_ALL) << "chi_unit_tests::Test_chi_data_types Failed";
+  chi_unit_tests::Test_chi_math(verbose);
+  chi_unit_tests::Test_chi_misc_utils(verbose);
+  chi_unit_tests::Test_chi_data_types(verbose);
 
   return 0;
+}
+
+
+int chiThrowException(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+
+  std::string message = "Unknown exception thrown by " + fname;
+  if (num_args == 1)
+  {
+    LuaCheckStringValue(fname, L, 1);
+    message = lua_tostring(L,1);
+  }
+
+  throw std::logic_error(message);
+}
+int chiThrowRecoverableException(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+
+  std::string message = "Unknown exception thrown by " + fname;
+  if (num_args == 1)
+  {
+    LuaCheckStringValue(fname, L, 1);
+    message = lua_tostring(L,1);
+  }
+
+  throw chi::RecoverableException(message);
 }
 
 void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   LUA_FMACRO1(chiLuaTest);
+  LUA_FMACRO1(chiThrowException);
+  LUA_FMACRO1(chiThrowRecoverableException);
 }
 

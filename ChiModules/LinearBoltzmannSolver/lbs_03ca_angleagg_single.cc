@@ -6,17 +6,18 @@
 
 #include "ChiMath/Quadratures/product_quadrature.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
-extern ChiLog& chi_log;
+;
 
 #include "ChiTimer/chi_timer.h"
 
-extern ChiTimer chi_program_timer;
+
 
 #include "ChiConsole/chi_console.h"
+#include "Groupset/lbs_groupset.h"
 
-extern ChiConsole& chi_console;
 
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
@@ -28,8 +29,8 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
 {
   if (options.verbose_inner_iterations)
-    chi_log.Log(LOG_0)
-      << chi_program_timer.GetTimeString()
+    chi::log.Log()
+      << chi::program_timer.GetTimeString()
       << " Initializing angle aggregation: Single";
 
   if (groupset.quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
@@ -85,11 +86,11 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
               PRIMARY_FLUDS(groupset.grp_subset_sizes[gs_ss],
                             grid_nodal_mappings);
 
-              chi_log.Log(LOG_0VERBOSE_1)
+              chi::log.Log0Verbose1()
                 << "Initializing FLUDS for omega="
                 << groupset.sweep_orderings[angle_num]->omega.PrintS()
                 << "         Process memory = "
-                << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+                << std::setprecision(3) << chi::console.GetMemoryUsageInMB()
                 << " MB.";
 
               primary_fluds->InitializeAlphaElements(groupset.sweep_orderings[angle_num]);
@@ -151,11 +152,11 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
               PRIMARY_FLUDS(groupset.grp_subset_sizes[gs_ss],
                             grid_nodal_mappings);
 
-              chi_log.Log(LOG_0VERBOSE_1)
+              chi::log.Log0Verbose1()
                 << "Initializing FLUDS for omega="
                 << groupset.sweep_orderings[angle_num]->omega.PrintS()
                 << "         Process memory = "
-                << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+                << std::setprecision(3) << chi::console.GetMemoryUsageInMB()
                 << " MB.";
 
               primary_fluds->InitializeAlphaElements(groupset.sweep_orderings[angle_num]);
@@ -223,28 +224,28 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
             PRIMARY_FLUDS(groupset.grp_subset_sizes[gs_ss],
                           grid_nodal_mappings);
 
-            chi_log.Log(LOG_0VERBOSE_1)
+            chi::log.Log0Verbose1()
               << "Initializing FLUDS for omega="
               << groupset.sweep_orderings[n]->omega.PrintS()
               << "         Process memory = "
-              << std::setprecision(3) << chi_console.GetMemoryUsageInMB()
+              << std::setprecision(3) << chi::console.GetMemoryUsageInMB()
               << " MB.";
 
             try{primary_fluds->InitializeAlphaElements(groupset.sweep_orderings[n]);}
             catch (const std::exception& exc)
             {
-              chi_log.Log(LOG_ALLERROR)
+              chi::log.LogAllError()
                 << "Unknown error in PRIMARY_FLUDS::\n"
                    "InitializeAlphaElements. " << exc.what();
-              exit(EXIT_FAILURE);
+              chi::Exit(EXIT_FAILURE);
             }
             try{primary_fluds->InitializeBetaElements(groupset.sweep_orderings[n]);}
             catch (const std::exception& exc)
             {
-              chi_log.Log(LOG_ALLERROR)
+              chi::log.LogAllError()
                 << "Unknown error in PRIMARY_FLUDS::\n"
                    "InitializeBetaElements. " << exc.what();
-              exit(EXIT_FAILURE);
+              chi::Exit(EXIT_FAILURE);
             }
 
             fluds = primary_fluds;
@@ -275,9 +276,9 @@ void lbs::SteadySolver::InitAngleAggSingle(LBSGroupset& groupset)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to initialize angle aggregation. "
          "Unsupported angular quadrature.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 }

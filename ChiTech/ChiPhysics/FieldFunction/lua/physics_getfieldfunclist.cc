@@ -1,37 +1,28 @@
 #include <ChiLua/chi_lua.h>
 
-#include "ChiPhysics/chi_physics.h"
+#include "chi_runtime.h"
 
-#include <chi_log.h>
+#include "ChiPhysics/SolverBase/chi_solver.h"
 
-extern ChiPhysics&  chi_physics_handler;
-extern ChiLog     chi_log;
+#include "chi_log.h"
 
 //###################################################################
 /**Obtains a named list of the field functions associated with a solver.
 
 \param SolverHandle int A handle to the reference solver.
 
- \ingroup LuaSolver */
+\ingroup LuaSolver */
 int chiGetFieldFunctionList(lua_State* L)
 {
-  int num_args = lua_gettop(L);
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
   if (num_args != 1)
     LuaPostArgAmountError("chiGetFieldFunctionList",1,num_args);
 
-
   //======================================================= Getting solver
-  int solver_index = lua_tonumber(L,1);
-  chi_physics::Solver* solver;
-  try{
-    solver = chi_physics_handler.solver_stack.at(solver_index);
-  }
-  catch(const std::out_of_range& o)
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "Invalid solver handle in chiGetFieldFunctionList";
-    exit(EXIT_FAILURE);
-  }
+  const int solver_index = lua_tonumber(L,1);
+
+  auto solver = chi::GetStackItemPtr(chi::solver_stack, solver_index, fname);
 
   //============================================= Push up new table
   lua_newtable(L);
@@ -39,15 +30,22 @@ int chiGetFieldFunctionList(lua_State* L)
   {
     lua_pushinteger(L,static_cast<lua_Integer>(ff)+1);
     int pff_count = -1;
-    for (auto& pff : chi_physics_handler.fieldfunc_stack)
+    bool found = false;
+    for (auto& pff : chi::fieldfunc_stack)
     {
       ++pff_count;
       if (pff == solver->field_functions[ff])
       {
         lua_pushnumber(L,pff_count);
+        found = true;
         break;
       }
     }
+
+    if (not found)
+      throw std::logic_error(fname + ": The solver specified has no "
+                                     "field functions that match the global"
+                                     " stack.");
     lua_settable(L,-3);
   }
 
@@ -64,7 +62,10 @@ int chiGetFieldFunctionList(lua_State* L)
 \return handle If the field-function was found and a handle identified the valid
                handle will be returned (i.e., a natural number >= 0). If the
                field-function by the given name was not found then the function
-               will return null.*/
+               will return null.
+
+\ingroup LuaFieldFunc
+ */
 int chiGetFieldFunctionHandleByName(lua_State* L)
 {
   const std::string fname = __FUNCTION__;
@@ -79,7 +80,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
 
   size_t ff_handle_counter = 0;
   std::vector<size_t> handles_that_matched;
-  for (const auto& pff : chi_physics_handler.fieldfunc_stack)
+  for (const auto& pff : chi::fieldfunc_stack)
   {
     if (pff->text_name == ff_name)
       handles_that_matched.emplace_back(ff_handle_counter);
@@ -90,7 +91,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
 
   if (num_handles == 0)
   {
-    chi_log.Log(LOG_0WARNING) << fname << ": No field-functions were found that "
+    chi::log.Log0Warning() << fname << ": No field-functions were found that "
                               << "matched the requested name. A null handle will "
                               << "be returned." << std::endl;
 
@@ -98,7 +99,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
   }
 
   if (num_handles > 1)
-    chi_log.Log(LOG_0WARNING) << fname << ": A total of " << num_handles
+    chi::log.Log0Warning() << fname << ": A total of " << num_handles
                               << " field-functions were found that matched the "
                               << " requested name. Only the first match will be "
                               << " returned.";
