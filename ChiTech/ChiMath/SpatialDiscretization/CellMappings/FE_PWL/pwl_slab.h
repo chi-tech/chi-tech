@@ -5,6 +5,8 @@
 #include "ChiMath/Quadratures/quadrature_line.h"
 #include "ChiMesh/Cell/cell.h"
 #include "pwl_cellbase.h"
+#include <array>
+
 
 //###################################################################
 namespace chi_math
