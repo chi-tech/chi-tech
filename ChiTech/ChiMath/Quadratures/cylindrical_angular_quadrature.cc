@@ -214,7 +214,7 @@ chi_math::CylindricalAngularQuadrature::
       chi_log.Log(LOG_0)
         << "angle index " << k << ": weight = " << weights[k]
         << ", (phi, theta) = (" << abscissae[k].phi << ", " << abscissae[k].theta << ")"
-        << ", omega = " << omegas[k]
+        << ", omega = " << omegas[k].PrintS()
         << ", fac_diamond_difference = " << fac_diamond_difference[k]
         << ", fac_streaming_operator = " << fac_streaming_operator[k] << std::endl;
     const auto sum_weights =
