@@ -1,29 +1,28 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <algorithm>
 
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/
-void SpatialDiscretization_PWLC::
+void chi_math::SpatialDiscretization_PWLC::
 BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                      std::vector<int64_t> &nodal_nnz_off_diag,
                      chi_math::UnknownManager& unknown_manager)
 {
   //======================================== Determine global domain ownership
-  std::vector<int> locI_block_addr(chi_mpi.process_count, 0);
+  std::vector<int> locI_block_addr(chi::mpi.process_count, 0);
   MPI_Allgather(&local_block_address, 1, MPI_INT,
                 locI_block_addr.data()   , 1, MPI_INT,
                 MPI_COMM_WORLD);
 
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
     for (auto locI : locI_block_addr)
-      chi_log.Log(LOG_ALLVERBOSE_1) << "Block address = " << locI;
+      chi::log.LogAllVerbose1() << "Block address = " << locI;
   MPI_Barrier(MPI_COMM_WORLD);
 
   //**************************************** DEFINE UTILITIES
@@ -60,17 +59,17 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   // Writes a message on ir error
   auto IR_MAP_ERROR = [] ()
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "PWL-MapCFEMDOF: ir Mapping error node ";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   };
 
   // Writes a message on jr error
   auto JR_MAP_ERROR = [] ()
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "PWL-MapCFEMDOF: jr Mapping error node ";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   };
 
   // Checks whether an integer is already in a vector
@@ -87,7 +86,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
 
   //======================================== Build local sparsity pattern
-  chi_log.Log(LOG_0VERBOSE_1) << "Building local sparsity pattern.";
+  chi::log.Log0Verbose1() << "Building local sparsity pattern.";
   int local_node_count = local_base_block_size;
   std::vector<std::vector<int>> nodal_connections(local_node_count);
 
@@ -129,7 +128,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
 
   //======================================== Build non-local sparsity pattern
-  chi_log.Log(LOG_0VERBOSE_1) << "Building non-local sparsity pattern.";
+  chi::log.Log0Verbose1() << "Building non-local sparsity pattern.";
 
   // In this process we build a list
   // of ir-nodes that are not local. Each ir-node needs to
@@ -183,11 +182,11 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   }//for cell
 
   //======================================== Build communication structure
-  chi_log.Log(LOG_0VERBOSE_1) << "Building communication structure.";
+  chi::log.Log0Verbose1() << "Building communication structure.";
 
   //=================================== Step 1
   // We now serialize the non-local data
-  std::vector<std::vector<int>> locI_serialized(chi_mpi.process_count);
+  std::vector<std::vector<int>> locI_serialized(chi::mpi.process_count);
 
   for (const auto& ir_linkage : ir_links)
   {
@@ -203,15 +202,15 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   // Establish the size of the serialized data
   // to send to each location and communicate
   // to get receive count.
-  std::vector<int> sendcount(chi_mpi.process_count, 0);
-  std::vector<int> recvcount(chi_mpi.process_count, 0);
+  std::vector<int> sendcount(chi::mpi.process_count, 0);
+  std::vector<int> recvcount(chi::mpi.process_count, 0);
   int locI=0;
   for (const auto& locI_data : locI_serialized)
   {
     sendcount[locI] = locI_data.size();
 
-    if (chi_mpi.location_id == 0)
-      chi_log.Log(LOG_ALLVERBOSE_1)
+    if (chi::mpi.location_id == 0)
+      chi::log.LogAllVerbose1()
         << "To send to " << locI
         << " = " << sendcount[locI];
 
@@ -225,8 +224,8 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   //=================================== Step 3
   // We now establish send displacements and
   // receive displacements.
-  std::vector<int> send_displs(chi_mpi.process_count,0);
-  std::vector<int> recv_displs(chi_mpi.process_count,0);
+  std::vector<int> send_displs(chi::mpi.process_count,0);
+  std::vector<int> recv_displs(chi::mpi.process_count,0);
 
   int send_displ_c = 0;
   int recv_displ_c = 0;
@@ -245,7 +244,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   }
 
   //======================================== Communicate data
-  chi_log.Log(LOG_0VERBOSE_1) << "Communicating non-local rows.";
+  chi::log.Log0Verbose1() << "Communicating non-local rows.";
 
   // We now initialize the buffers and
   // communicate the data
@@ -270,7 +269,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                 MPI_COMM_WORLD);
 
   //======================================== Deserialze data
-  chi_log.Log(LOG_0VERBOSE_1) << "Deserialize data.";
+  chi::log.Log0Verbose1() << "Deserialize data.";
 
   std::vector<ROWJLINKS> foreign_ir_links;
 

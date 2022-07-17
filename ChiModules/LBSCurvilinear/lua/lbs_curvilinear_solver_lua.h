@@ -5,7 +5,7 @@
 
 int chiLBSCurvilinearCreateSolver(lua_State *L);
 
-namespace LBSCurvilinear
+namespace lbs_curvilinear
 {
   namespace lua_utils
   {

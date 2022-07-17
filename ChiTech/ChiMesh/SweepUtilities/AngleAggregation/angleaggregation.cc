@@ -1,10 +1,10 @@
 #include "angleaggregation.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /** Sets up the angle-aggregation object. */
@@ -113,14 +113,14 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 
         if (rbndry.reflected_anglenum[n]<0)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Reflected angle not found for angle " << n
             << " with direction " << quadrature->omegas[n].PrintS()
             << ". This can happen for two reasons: i) A quadrature is used"
                " that is not symmetric about the axis associated with the "
                "reflected boundary, or ii) the reflecting boundary is not "
                "aligned with any reflecting axis of the quadrature.";
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
       }
 
@@ -192,7 +192,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
   }//for bndry
 
   if (reflecting_bcs_initialized)
-    chi_log.Log(LOG_0) << "Reflecting boundary conditions initialized.";
+    chi::log.Log() << "Reflecting boundary conditions initialized.";
 
 }
 

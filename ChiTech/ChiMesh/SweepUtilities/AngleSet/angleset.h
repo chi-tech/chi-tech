@@ -49,7 +49,7 @@ public:
            std::vector<int>& angle_indices,
            std::vector<std::shared_ptr<SweepBndry>>& sim_boundaries,
            int sweep_eager_limit,
-           ChiMPICommunicatorSet* in_comm_set);
+           chi_objects::ChiMPICommunicatorSet* in_comm_set);
 
   void InitializeDelayedUpstreamData();
 

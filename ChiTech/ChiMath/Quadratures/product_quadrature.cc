@@ -5,8 +5,8 @@
 #include <cmath>
 #include <sstream>
 
-#include "ChiLog/chi_log.h"
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //#########################################################
 /**Initializes the quadrature with Gauss-Legendre for
@@ -100,11 +100,11 @@ void chi_math::ProductQuadrature::
 
   if (Nw != Na*Np)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Product Quadrature, InitializeWithCustom: mismatch in the amount "
          "angles and weights. Number of azimuthal angles times number "
          "polar angles must equal the amount of weights.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   azimu_ang = azimuthal;
@@ -112,13 +112,13 @@ void chi_math::ProductQuadrature::
 
   if (verbose)
   {
-    chi_log.Log(LOG_0) << "Azimuthal angles:";
+    chi::log.Log() << "Azimuthal angles:";
     for (const auto& ang : azimu_ang)
-      chi_log.Log(LOG_0) << ang;
+      chi::log.Log() << ang;
 
-    chi_log.Log(LOG_0) << "Polar angles:";
+    chi::log.Log() << "Polar angles:";
     for (const auto& ang : polar_ang)
-      chi_log.Log(LOG_0) << ang;
+      chi::log.Log() << ang;
   }
 
   //================================================== Create angle pairs
@@ -169,12 +169,12 @@ void chi_math::ProductQuadrature::
     omegas.emplace_back(new_omega);
 
     if (verbose)
-      chi_log.Log(LOG_0) << "Quadrature angle=" << new_omega.PrintS();
+      chi::log.Log() << "Quadrature angle=" << new_omega.PrintS();
   }
 
   if (verbose)
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << ostr.str() << "\n"
       << "Weight sum=" << weight_sum;
   }

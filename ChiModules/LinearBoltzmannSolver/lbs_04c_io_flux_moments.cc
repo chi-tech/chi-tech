@@ -1,10 +1,11 @@
 #include "lbs_linear_boltzmann_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 #include <fstream>
 #include <cstring>
@@ -38,10 +39,10 @@ void lbs::SteadySolver::
                    const std::vector<double>& flux_moments)
 {
   std::string file_name =
-    file_base + std::to_string(chi_mpi.location_id) + ".data";
+    file_base + std::to_string(chi::mpi.location_id) + ".data";
 
   //============================================= Open file
-  chi_log.Log() << "Writing flux-moments to files with base-name " << file_base
+  chi::log.Log() << "Writing flux-moments to files with base-name " << file_base
                 << " and extension .data";
   std::ofstream file(file_name,
                      std::ofstream::binary | //binary file
@@ -51,7 +52,7 @@ void lbs::SteadySolver::
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
@@ -90,7 +91,7 @@ void lbs::SteadySolver::
   file << header_bytes;
 
   //============================================= Get relevant items
-  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
@@ -155,12 +156,12 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
                                         bool single_file/*=false*/)
 {
   std::string file_name =
-    file_base + std::to_string(chi_mpi.location_id) + ".data";
+    file_base + std::to_string(chi::mpi.location_id) + ".data";
   if (single_file)
     file_name = file_base + ".data";
 
   //============================================= Open file
-  chi_log.Log() << "Reading flux-moments file " << file_name;
+  chi::log.Log() << "Reading flux-moments file " << file_name;
   std::ifstream file(file_name,
                      std::ofstream::binary | //binary file
                      std::ofstream::in);     //no accidental writing
@@ -168,15 +169,15 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
   //============================================= Check file is open
   if (not file.is_open())
   {
-    chi_log.Log(LOG_ALLWARNING)
+    chi::log.LogAllWarning()
       << __FUNCTION__ << "Failed to open " << file_name;
     return;
   }
 
-//  chi_log.Log(LOG_ALL) << "Checkpoint -A"; //TODO: Remove
+//  chi::log.LogAll() << "Checkpoint -A"; //TODO: Remove
 
   //============================================= Get relevant items
-  auto NODES_ONLY = ChiMath::UNITARY_UNKNOWN_MANAGER;
+  auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
   auto& sdm = discretization;
   uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
   uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
@@ -192,7 +193,7 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
 
   flux_moments.assign(num_local_dofs,0.0);
 
-//  chi_log.Log(LOG_ALL) << "Checkpoint A"; //TODO: Remove
+//  chi::log.LogAll() << "Checkpoint A"; //TODO: Remove
 
   //============================================= Read header
   char header_bytes[500]; header_bytes[499] = '\0';
@@ -204,7 +205,7 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
   file.read((char*)&file_num_local_dofs , sizeof(uint64_t));
   file.read((char*)&file_num_local_cells, sizeof(uint64_t));
 
-//  chi_log.Log(LOG_ALL) << "Checkpoint B"; //TODO: Remove
+//  chi::log.LogAll() << "Checkpoint B"; //TODO: Remove
 
   //============================================= Check compatibility
   if (not single_file)
@@ -225,14 +226,14 @@ void lbs::SteadySolver::ReadFluxMoments(const std::string &file_base,
                                     << num_local_dofs << "\n";
       outstr << "num_local_cells: " << file_num_local_cells << " vs "
                                     << num_local_cells << "\n";
-      chi_log.Log(LOG_ALL)
+      chi::log.LogAll()
         << "Incompatible DOF data found in file " << file_name << "\n"
         << "File data vs system:\n" << outstr.str();
       file.close();
       return;
     }
 
-//  chi_log.Log(LOG_ALL) << "Checkpoint C"; //TODO: Remove
+//  chi::log.LogAll() << "Checkpoint C"; //TODO: Remove
 
   //============================================= Read cell nodal locations
   std::map<uint64_t, std::map<uint64_t,uint64_t>> file_cell_nodal_mapping;

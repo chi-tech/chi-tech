@@ -4,11 +4,12 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiGraph/chi_directed_graph.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Removes local cyclic dependencies.*/

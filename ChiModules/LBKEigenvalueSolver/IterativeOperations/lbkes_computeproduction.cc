@@ -2,11 +2,10 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
-#include <chi_log.h>
 #include <chi_mpi.h>
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 using namespace lbs;
 
@@ -14,7 +13,7 @@ using namespace lbs;
 /**Compute the total fission production in the problem.*/
 double KEigenvalueSolver::ComputeFissionProduction()
 {
-  typedef SpatialDiscretization_FE  FE;
+  typedef chi_math::SpatialDiscretization_FE  FE;
   const auto grid_fe_view = std::dynamic_pointer_cast<FE>(discretization);
 
   int first_grp = groups.front().id;

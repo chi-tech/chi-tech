@@ -4,9 +4,8 @@
 
 #include <ChiMesh/Cell/cell.h>
 
-#include <chi_log.h>
-
-extern ChiLog&     chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 typedef std::vector<std::pair<int,short>> LockBox;
 
@@ -65,7 +64,7 @@ InitializeAlphaElements(SPDS_ptr spds)
 
   }//for csoi
 
-  chi_log.Log(LOG_0VERBOSE_2) << "Done with Slot Dynamics.";
+  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done with Slot Dynamics.";
   MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -101,7 +100,7 @@ InitializeAlphaElements(SPDS_ptr spds)
   delayed_local_psi_Gn_block_stride  = largest_face*delayed_lock_box.size();
   delayed_local_psi_Gn_block_strideG = delayed_local_psi_Gn_block_stride*G;
 
-  chi_log.Log(LOG_0VERBOSE_2) << "Done with Local Incidence mapping.";
+  chi::log.Log(chi_objects::ChiLog::LOG_LVL::LOG_0VERBOSE_2) << "Done with Local Incidence mapping.";
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Clean up

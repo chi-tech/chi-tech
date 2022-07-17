@@ -1,9 +1,8 @@
 #include "quadrature_gausschebyshev.h"
 #include <cmath>
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Populates the abscissae and weights for a Gauss-Chebyshev
@@ -40,7 +39,7 @@ void
 chi_math::QuadratureGaussChebyshev::Initialize(unsigned int N, bool verbose)
 {
   if (verbose)
-    chi_log.Log() << "Initializing Gauss-Chebyshev Quadrature "
+    chi::log.Log() << "Initializing Gauss-Chebyshev Quadrature "
                      "with " << N << " q-points";
 
   const double pi_N = M_PI/N;
@@ -53,7 +52,7 @@ chi_math::QuadratureGaussChebyshev::Initialize(unsigned int N, bool verbose)
     weights.emplace_back(wn);
 
     if (verbose)
-      chi_log.Log(LOG_0)
+      chi::log.Log()
         << "root[" << n << "]=" << qpoints[n][0]
         << ", weight=" << weights[n];
   }

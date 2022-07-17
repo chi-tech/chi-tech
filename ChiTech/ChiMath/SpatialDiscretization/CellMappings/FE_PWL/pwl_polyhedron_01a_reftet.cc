@@ -1,8 +1,8 @@
 #include "pwl_polyhedron.h"
 
-double PolyhedronMappingFE_PWL::TetShape(unsigned int index,
-                                         const chi_mesh::Vector3& qpoint,
-                                         bool on_surface/*=false*/)
+double chi_math::PolyhedronMappingFE_PWL::TetShape(unsigned int index,
+                                                   const chi_mesh::Vector3& qpoint,
+                                                   bool on_surface/*=false*/)
 {
   double value = 0.0;
 
@@ -15,7 +15,7 @@ double PolyhedronMappingFE_PWL::TetShape(unsigned int index,
   return value;
 }
 
-double PolyhedronMappingFE_PWL::TetGradShape_x(const unsigned int index)
+double chi_math::PolyhedronMappingFE_PWL::TetGradShape_x(const unsigned int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -26,7 +26,7 @@ double PolyhedronMappingFE_PWL::TetGradShape_x(const unsigned int index)
   return value;
 }
 
-double PolyhedronMappingFE_PWL::TetGradShape_y(const unsigned int index)
+double chi_math::PolyhedronMappingFE_PWL::TetGradShape_y(const unsigned int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}
@@ -37,7 +37,7 @@ double PolyhedronMappingFE_PWL::TetGradShape_y(const unsigned int index)
   return value;
 }
 
-double PolyhedronMappingFE_PWL::TetGradShape_z(const unsigned int index)
+double chi_math::PolyhedronMappingFE_PWL::TetGradShape_z(const unsigned int index)
 {
   double value = 0.0;
   if (index == 0){value = -1.0;}

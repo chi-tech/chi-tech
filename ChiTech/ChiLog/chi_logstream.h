@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace chi_objects
+{
 //###################################################################
 /** Log stream for adding header information to a string stream.*/
 class LogStream : public std::stringstream
@@ -44,5 +46,5 @@ struct DummyStream: public std::ostream
 
   ~DummyStream() {}
 };
-
+}//namespace chi_objects
 #endif

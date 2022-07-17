@@ -1,17 +1,28 @@
-#include "chi_console.h"
-
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&   		chi_physics_handler;
-
-#include "ChiTimer/chi_timer.h"
-extern ChiTimer        chi_program_timer;
+#include "ChiConsole/chi_console.h"
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //###################################################################
 /** This function sends the commands contained in the command_buffer to
 the lua state from where it is executed. These could be commands passed
  via the command line or loaded elsewhere.*/
-void ChiConsole::FlushConsole()
+void chi_objects::ChiConsole::FlushConsole()
 {
-  for (auto& command : command_buffer)
-    luaL_dostring(consoleState, command.c_str());
+  try
+  {
+    for (auto& command : command_buffer)
+    {
+      bool error = luaL_dostring(consoleState,command.c_str());
+      if (error)
+      {
+        chi::log.LogAll() << lua_tostring(consoleState,-1);
+        lua_pop(consoleState,1);
+      }
+    }
+  }
+  catch(const std::exception& e)
+  {
+    chi::log.LogAllError() << e.what();
+    chi::Exit(EXIT_FAILURE);
+  }
 }

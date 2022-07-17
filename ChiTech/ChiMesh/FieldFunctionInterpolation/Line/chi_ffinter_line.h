@@ -11,17 +11,20 @@
 #define FFI_LINE_NUMBEROFPOINTS 13
 #define FFI_LINE_CUSTOM_ARRAY 14
 
-struct FieldFunctionContext
+namespace chi_mesh
 {
-  std::shared_ptr<chi_physics::FieldFunction>    ref_ff;
-  std::vector<double>            interpolation_points_values;
-  std::vector<int>               cfem_local_nodes_needed_unmapped;
-  std::vector<int>               cfem_local_cells_needed_unmapped;
-  std::vector<int>               pwld_local_nodes_needed_unmapped;
-  std::vector<int>               pwld_local_cells_needed_unmapped;
-  std::vector<uint64_t>          interpolation_points_ass_cell;
-  std::vector<bool>              interpolation_points_has_ass_cell;
-};
+  struct FieldFunctionContext
+  {
+    std::shared_ptr<chi_physics::FieldFunction>    ref_ff;
+    std::vector<double>            interpolation_points_values;
+    std::vector<int>               cfem_local_nodes_needed_unmapped;
+    std::vector<int>               cfem_local_cells_needed_unmapped;
+    std::vector<int>               pwld_local_nodes_needed_unmapped;
+    std::vector<int>               pwld_local_cells_needed_unmapped;
+    std::vector<uint64_t>          interpolation_points_ass_cell;
+    std::vector<bool>              interpolation_points_has_ass_cell;
+  };
+}
 
 //###################################################################
 /** A line based interpolation function.*/
@@ -59,7 +62,9 @@ private:
   void FVInterpolate(std::vector<uint64_t>& mapping,
                      FieldFunctionContext* ff_ctx);
 public:
-  void ExportPython(std::string base_name);
+  std::string GetDefaultFileBaseName() const override
+  {return "ZLFFI";}
+  void ExportPython(std::string base_name) override;
 };
 
 #endif

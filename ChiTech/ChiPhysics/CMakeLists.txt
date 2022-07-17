@@ -8,9 +8,9 @@ FOREACH(item ${MORE_SOURCES2})
 ENDFOREACH(item)
 
 FOREACH(item ${MORE_SOURCES2})
-    IF(${item} MATCHES "lua/physics_maindoc_page.cc")
+    IF(${item} MATCHES "physics_doc.cc")
         LIST(REMOVE_ITEM MORE_SOURCES2 ${item})
-    ENDIF(${item} MATCHES "lua/physics_maindoc_page.cc")
+    ENDIF(${item} MATCHES "physics_doc.cc")
 ENDFOREACH(item)
 
 set(SOURCES ${SOURCES} ${MORE_SOURCES} ${MORE_SOURCES2} PARENT_SCOPE)

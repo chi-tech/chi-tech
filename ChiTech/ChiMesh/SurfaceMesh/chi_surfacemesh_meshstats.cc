@@ -2,9 +2,8 @@
 
 #include "ChiGraph/chi_directed_graph.h"
 
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 #include <algorithm>
 
@@ -72,17 +71,17 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
 //    }
 //    catch (const boost::bad_graph& exc)
 //    {
-//      chi_log.Log(LOG_ALLERROR)
+//      chi::log.LogAllError()
 //        << "Function CheckCyclicDependencies. Detected cyclic depency.";
-//      exit(EXIT_FAILURE);
+//     chi::Exit(EXIT_FAILURE);
 //    }
 
     auto topological_order = G.GenerateTopologicalSort();
     if (topological_order.empty())
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Function CheckCyclicDependencies. Detected cyclic depency.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
 
     //================================= Cleanup
@@ -91,7 +90,7 @@ void chi_mesh::SurfaceMesh::CheckCyclicDependencies(int num_angles)
 
   GetMeshStats();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Cyclic dependency check complete. No cycles or "
     << "bad mesh elements were detected";
 }
@@ -176,7 +175,7 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
   }
   output << "Number of negative or zero faces = " << num_negative_areas;
 
-  chi_log.Log(LOG_0) << output.str();
+  chi::log.Log() << output.str();
 
 }
 
@@ -188,13 +187,13 @@ void chi_mesh::SurfaceMesh::ComputeLoadBalancing(
   std::vector<double> &x_cuts,
   std::vector<double> &y_cuts)
 {
-  chi_log.Log(LOG_0) << "X-cuts to be logged: " << x_cuts.size();
+  chi::log.Log() << "X-cuts to be logged: " << x_cuts.size();
 //  for (auto& val : x_cuts)
-//    chi_log.Log(LOG_0) << val;
+//    chi::log.Log() << val;
 //
-  chi_log.Log(LOG_0) << "Y-cuts to be logged: " << y_cuts.size();
+  chi::log.Log() << "Y-cuts to be logged: " << y_cuts.size();
 //  for (auto& val : y_cuts)
-//    chi_log.Log(LOG_0) << val;
+//    chi::log.Log() << val;
 
   //======================================== Sort faces into bins
   size_t I = x_cuts.size();
@@ -241,30 +240,30 @@ void chi_mesh::SurfaceMesh::ComputeLoadBalancing(
 
   double average = tot_bin_size/((double)(I+1)*(J+1));
 
-  chi_log.Log(LOG_0) << "Average faces per set: " << average;
-  chi_log.Log(LOG_0)
+  chi::log.Log() << "Average faces per set: " << average;
+  chi::log.Log()
     << "Maximum faces per set: " << max_bin_size
     << " at (i,j)= ( " << i_max << " , " << j_max << " )";
 
   if      (i_max == I)
-    chi_log.Log(LOG_0)  << "X greater than " << x_cuts[i_max-1];
+    chi::log.Log()  << "X greater than " << x_cuts[i_max-1];
   else if (i_max == 0)
-    chi_log.Log(LOG_0)  << "X less than " << x_cuts[0];
+    chi::log.Log()  << "X less than " << x_cuts[0];
   else
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "X greater than " << x_cuts[i_max-1]
       << " and less than " << x_cuts[i_max];
 
   if      (j_max == J)
-    chi_log.Log(LOG_0)  << "Y greater than " << y_cuts[j_max-1];
+    chi::log.Log()  << "Y greater than " << y_cuts[j_max-1];
   else if (j_max == 0)
-    chi_log.Log(LOG_0)  << "Y less than " << y_cuts[0];
+    chi::log.Log()  << "Y less than " << y_cuts[0];
   else
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "Y greater than " << y_cuts[j_max-1]
       << " and less than " << y_cuts[j_max];
 
-                        chi_log.Log(LOG_0)
+                        chi::log.Log()
     << "Max-to-average ratio: " << max_bin_size/average;
 
 

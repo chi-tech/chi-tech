@@ -3,8 +3,8 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI& chi_mpi;
-extern ChiLog& chi_log;
+
+;
 
 #include <sstream>
 #include <algorithm>
@@ -35,7 +35,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       {
         for (size_t index=0; index<leveled_graph[level].item_id.size(); index++)
         {
-          if (leveled_graph[level].item_id[index] == chi_mpi.location_id)
+          if (leveled_graph[level].item_id[index] == chi::mpi.location_id)
           {
             loc_depth = leveled_graph.size()-level;
             break;
@@ -58,9 +58,9 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       }
       else
       {
-        chi_log.Log(LOG_ALLERROR)
+        chi::log.LogAllError()
           << "Location depth not found in Depth-Of-Graph algorithm.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
 
     }//for anglesets
@@ -121,13 +121,13 @@ void chi_mesh::sweep_management::SweepScheduler::
   typedef ExecutionPermission ExePerm;
   typedef AngleSetStatus Status;
 
-  chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_BEGIN);
+  chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   auto ev_info =
-    std::make_shared<ChiLog::EventInfo>(std::string("Sweep initiated"));
+    std::make_shared<chi_objects::ChiLog::EventInfo>(std::string("Sweep initiated"));
 
-  chi_log.LogEvent(sweep_event_tag,
-                   ChiLog::EventType::SINGLE_OCCURRENCE,ev_info);
+  chi::log.LogEvent(sweep_event_tag,
+                   chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info);
 
   //==================================================== Loop till done
   bool finished = false;
@@ -162,12 +162,12 @@ void chi_mesh::sweep_management::SweepScheduler::
         std::stringstream message_i;
         message_i
           << "Angleset " << angset_number
-          << " executed on location " << chi_mpi.location_id;
+          << " executed on location " << chi::mpi.location_id;
 
-        auto ev_info_i = std::make_shared<ChiLog::EventInfo>(message_i.str());
+        auto ev_info_i = std::make_shared<chi_objects::ChiLog::EventInfo>(message_i.str());
 
-        chi_log.LogEvent(sweep_event_tag,
-                         ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_i);
+        chi::log.LogEvent(sweep_event_tag,
+                         chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
 
         status = angleset->
           AngleSetAdvance(sweep_chunk,
@@ -178,12 +178,12 @@ void chi_mesh::sweep_management::SweepScheduler::
         std::stringstream message_f;
         message_f
           << "Angleset " << angset_number
-          << " finished on location " << chi_mpi.location_id;
+          << " finished on location " << chi::mpi.location_id;
 
-        auto ev_info_f = std::make_shared<ChiLog::EventInfo>(message_f.str());
+        auto ev_info_f = std::make_shared<chi_objects::ChiLog::EventInfo>(message_f.str());
 
-        chi_log.LogEvent(sweep_event_tag,
-                         ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_f);
+        chi::log.LogEvent(sweep_event_tag,
+                         chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_f);
 
         scheduled_angleset++; //Schedule the next angleset
       }
@@ -224,5 +224,5 @@ void chi_mesh::sweep_management::SweepScheduler::
     }
   }
 
-  chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_END);
+  chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }

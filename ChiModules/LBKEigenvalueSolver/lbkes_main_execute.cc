@@ -1,7 +1,7 @@
 #include "lbkes_k_eigenvalue_solver.h"
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 #include <iomanip>
 
@@ -21,6 +21,6 @@ void KEigenvalueSolver::Execute()
     for (auto& v : precursor_new_local) v /= k_eff;
   }
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
       << "LinearBoltzmann::KEigenvalueSolver execution completed\n\n";
 }

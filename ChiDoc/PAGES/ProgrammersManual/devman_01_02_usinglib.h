@@ -30,31 +30,45 @@
  * ## _
  * \subsection devman01_02_03 Step 3 - Edit the cmake file to connect to Chi-Tech
  *
- * There are 3 custom values to be included in the `CMakeLists.txt` file.
+ * We need to specify a few values to be included in the `CMakeLists.txt` file.
  *  - The desired application/executable name, for now we will call that <B>test</B>.
  *  - The Chi-Tech "downstream" cmake include, `Downstream.cmake`.
- *  - The source file names. For now we will only have `test.cc`
  *
 \code
 cmake_minimum_required(VERSION 3.2)
 
 set(TARGET test_app)
-project(${TARGET} C CXX)
-set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")
+project(test CXX)
+
+#------------------------------------------------ DEPENDENCIES
+if (NOT DEFINED CHI_TECH_DIR)
+    if (NOT (DEFINED ENV{CHI_TECH_DIR}))
+        message(FATAL_ERROR "***** CHI_TECH_DIR is not set *****")
+    else()
+        set(CHI_TECH_DIR "$ENV{CHI_TECH_DIR}")
+    endif()
+endif()
+message(STATUS "CHI_TECH_DIR set to ${CHI_TECH_DIR}")
+
 include("${CHI_TECH_DIR}/ChiResources/Macros/Downstream.cmake")
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 file (GLOB_RECURSE SOURCES "*.cc")
 add_executable(${TARGET} "${SOURCES}")
 target_link_libraries(${TARGET} ${CHI_LIBS})
+
+file(WRITE ${PROJECT_SOURCE_DIR}/Makefile "subsystem:\n" "\t$(MAKE) -C chi_build \n\n"
+        "clean:\n\t$(MAKE) -C chi_build clean\n")
 \endcode
 
 The `set(TARGET test_app)` line sets the name of the eventual executable
 to be used. You can use any name other than `test`.
-The `set(CHI_TECH_DIR "~/Desktop/ChiTech/chi-tech")` line sets the directory
-of an installed chi-tech. Change this line to point to the appropriate
-directory.
 The `include` statement allows you to connect to all the resources connected
 to Chi-Tech, including lua, PETSc, etc.
+Make sure that this environment variable is set.
 You will have to find the location where you compiled Chi-Tech in order to
 properly specify the location of `Downstream.cmake`. Once this is properly
 specified, the cmake-variable `CHI_LIBS` will be defined and the necessary
@@ -76,16 +90,14 @@ include-files will be usable.
 
 int main(int argc, char* argv[])
 {
-    ChiTech::Initialize(argc,argv);
-    ChiTech::RunBatch(argc, argv);
+    chi::Initialize(argc,argv);
+    chi::RunBatch(argc, argv);
 
-    ChiLog& chi_log = ChiLog::GetInstance();
-
-    chi_log.Log() << "Hello World!";
+    chi::log.Log() << "Hello World!";
 
     //We will add code here
 
-    ChiTech::Finalize();
+    chi::Finalize();
     return 0;
 }
 \endcode
@@ -94,10 +106,10 @@ This code is the minimum needed to have everything available in Chi-Tech.
 The basic namespace access is provided via `#include "chi_runtime.h"`
 
 MPI initialization and PETSc initialization is handled via the call to
-`ChiTech::Initialize()`.
+`chi::Initialize()`.
 
 Finally all MPI and PETSc related items are destroyed via the call to
-`ChiTech::Finalize()`.
+`chi::Finalize()`.
 
 ## _
 
@@ -147,13 +159,13 @@ make -j4
  *
  * \code
  * #include"ChiLua/chi_lua.h"
- * #include "chi_log.h"
+ * #include "chi::log.h"
  *
  * int chiPrintStatus(lua_State *L)
  * {
  *     ChiLog& log = ChiLog::GetInstance();
  *
- *     log.Log(LOG_0) << "Hello from here";
+ *     log.Log() << "Hello from here";
  *
  *     return 0;
  * }

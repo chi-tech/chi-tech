@@ -6,20 +6,20 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 //###################################################################
 /**Maps a finite volume degree of freedom. The default behavior is to
  * assume a nodal DOF storage scheme.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOF(const chi_mesh::Cell& cell, const unsigned int) const
 {
   size_t num_local_cells = ref_grid->local_cells.size();
 
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     address = fv_local_block_address +
               cell.local_id;
@@ -37,7 +37,7 @@ int64_t SpatialDiscretization_FV::
 
 //###################################################################
 /**Maps a finite volume degree of freedom using an unknown manager.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOF(const chi_mesh::Cell& cell,
          const unsigned int,
          const chi_math::UnknownManager& unknown_manager,
@@ -56,7 +56,7 @@ int64_t SpatialDiscretization_FV::
 
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = fv_local_block_address*num_unknowns +
@@ -92,18 +92,18 @@ int64_t SpatialDiscretization_FV::
 //###################################################################
 /**Maps a finite volume degree of freedom to a local address.
  * The default behavior is to assume a nodal DOF storage scheme.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOFLocal(const chi_mesh::Cell& cell, unsigned int) const
 {
 //  if (cell == nullptr)
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "SpatialDiscretization_FV::MapDOFLocal reference cell is nullptr.";
-//    exit(EXIT_FAILURE);
+//   chi::Exit(EXIT_FAILURE);
 //  }
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
     address = cell.local_id;
   else
   {
@@ -123,7 +123,7 @@ int64_t SpatialDiscretization_FV::
 //###################################################################
 /**Maps a finite volume degree of freedom to a local address using
  * an unknown manager.*/
-int64_t SpatialDiscretization_FV::
+int64_t chi_math::SpatialDiscretization_FV::
   MapDOFLocal(const chi_mesh::Cell& cell,
               const unsigned int,
               const chi_math::UnknownManager& unknown_manager,
@@ -132,9 +132,9 @@ int64_t SpatialDiscretization_FV::
 {
 //  if (cell == nullptr)
 //  {
-//    chi_log.Log(LOG_ALLERROR)
+//    chi::log.LogAllError()
 //      << "SpatialDiscretization_FV::MapDOFLocal reference cell is nullptr.";
-//    exit(EXIT_FAILURE);
+//   chi::Exit(EXIT_FAILURE);
 //  }
   if (component < 0) return -1;
 
@@ -148,7 +148,7 @@ int64_t SpatialDiscretization_FV::
 
 
   int address=-1;
-  if (cell.partition_id == chi_mpi.location_id)
+  if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = num_local_cells*block_id +

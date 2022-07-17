@@ -1,6 +1,8 @@
 #ifndef CHI_MESHCONTINUUM_H_
 #define CHI_MESHCONTINUUM_H_
 
+#include <memory>
+
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
 #include "chi_meshcontinuum_globalcellhandler.h"
@@ -26,8 +28,6 @@ public:
   VertexHandler                  vertices;
   LocalCellHandler               local_cells;
   GlobalCellHandler              cells;
-  chi_mesh::SurfaceMesh*         surface_mesh;
-  chi_mesh::LineMesh*            line_mesh;
   std::vector<uint64_t>          local_cell_glob_indices;
 
 private:
@@ -38,7 +38,9 @@ private:
   //is the number of faces in this category
   std::vector<std::pair<size_t,size_t>> face_categories;
 
-  ChiMPICommunicatorSet commicator_set;
+  chi_objects::ChiMPICommunicatorSet communicator_set;
+
+  MeshAttributes attributes = NONE;
 
 public:
   MeshContinuum() :
@@ -49,8 +51,6 @@ public:
           global_cell_id_to_native_id_map,
           global_cell_id_to_foreign_id_map)
   {
-    surface_mesh = nullptr;
-    line_mesh    = nullptr;
   }
 
   void SetGlobalVertexCount(const uint64_t count) {global_vertex_count = count;}
@@ -58,7 +58,7 @@ public:
 
   static
   std::shared_ptr<MeshContinuum> New()
-  { return std::shared_ptr<MeshContinuum>(new MeshContinuum());}
+  { return std::make_shared<MeshContinuum>();}
 
   /**Method to be called if cells and nodes have been transferred
    * to another grid.*/
@@ -70,7 +70,6 @@ public:
     global_cell_id_to_foreign_id_map.clear();
   }
 
-  //01
   void ExportCellsToPython(const char* fileName,
                            bool surface_only=true,
                            std::vector<int>* cell_flags = nullptr,
@@ -80,7 +79,6 @@ public:
                            int options = 0) const;
   void ExportCellsToVTK(const char* baseName) const;
 
-  //02
   void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
   size_t NumberOfFaceHistogramBins();
   size_t MapFaceHistogramBins(size_t num_face_dofs);
@@ -96,13 +94,22 @@ public:
 
   std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
 
-  ChiMPICommunicatorSet& GetCommunicator();
+  chi_objects::ChiMPICommunicatorSet& GetCommunicator();
 
   size_t GetGlobalNumberOfCells() const;
 
   std::vector<uint64_t> GetDomainUniqueBoundaryIDs() const;
 
-  size_t CountCellsInLogicalVolume(chi_mesh::LogicalVolume& log_vol) const;
+  size_t CountCellsInLogicalVolume(const chi_mesh::LogicalVolume& log_vol) const;
+
+  MeshAttributes Attributes() const {return attributes;}
+
+private:
+  friend class chi_mesh::VolumeMesher;
+  void SetAttributes(MeshAttributes new_attribs)
+  {
+    attributes = attributes | new_attribs;
+  }
 };
 
 #endif //CHI_MESHCONTINUUM_H_

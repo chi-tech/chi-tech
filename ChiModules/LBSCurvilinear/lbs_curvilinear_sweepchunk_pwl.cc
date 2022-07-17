@@ -1,17 +1,19 @@
 #include "LBSCurvilinear/lbs_curvilinear_sweepchunk_pwl.h"
 
 #include "ChiMath/Quadratures/curvilinear_angular_quadrature.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 
-LBSCurvilinear::SweepChunkPWL::
+
+lbs_curvilinear::SweepChunkPWL::
   SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                SpatialDiscretization_PWLD& discretization_primary,
-                SpatialDiscretization_PWLD& discretization_secondary,
+                chi_math::SpatialDiscretization_PWLD& discretization_primary,
+                chi_math::SpatialDiscretization_PWLD& discretization_secondary,
                 std::vector<lbs::CellLBSView>& cell_transport_views,
                 std::vector<double>& destination_phi,
                 std::vector<double>& destination_psi,
                 const std::vector<double>& source_moments,
-                LBSGroupset& in_groupset,
+                lbs::LBSGroupset& in_groupset,
                 const TCrossSections& in_xsections,
                 const int in_num_moms,
                 const int in_max_num_cell_dofs)
@@ -70,7 +72,7 @@ LBSCurvilinear::SweepChunkPWL::
 
 
 void
-LBSCurvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
+lbs_curvilinear::SweepChunkPWL::Sweep(chi_mesh::sweep_management::AngleSet* angle_set)
 {
   if (!a_and_b_initialized)
   {

@@ -6,40 +6,40 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 //###################################################################
 /**Develops node ordering per location.*/
-void SpatialDiscretization_FV::
+void chi_math::SpatialDiscretization_FV::
   OrderNodes()
 {
-  chi_log.Log(LOG_ALLVERBOSE_1) << "FV discretization - Reordering nodes.";
+  chi::log.LogAllVerbose1() << "FV discretization - Reordering nodes.";
 
   fv_local_block_address = 0;
 
-  if (chi_mpi.location_id != 0)
+  if (chi::mpi.location_id != 0)
   {
     MPI_Recv(&fv_local_block_address,
              1,MPI_INT,              //Count and type
-             chi_mpi.location_id-1,  //Source
+             chi::mpi.location_id-1,  //Source
              111,                    //Tag
              MPI_COMM_WORLD,MPI_STATUS_IGNORE);
   }
 
-  if (chi_mpi.location_id != (chi_mpi.process_count-1))
+  if (chi::mpi.location_id != (chi::mpi.process_count-1))
   {
     int next_loc_start = fv_local_block_address + ref_grid->local_cells.size();
     MPI_Send(&next_loc_start,
              1,MPI_INT,
-             chi_mpi.location_id+1,
+             chi::mpi.location_id+1,
              111,
              MPI_COMM_WORLD);
   }
 
   //======================================== Collect block addresses
   locJ_block_address.clear();
-  locJ_block_address.resize(chi_mpi.process_count, 0);
+  locJ_block_address.resize(chi::mpi.process_count, 0);
   MPI_Allgather(&fv_local_block_address,      //send buf
                 1,                            //send count
                 MPI_INT,                      //send type
@@ -50,7 +50,7 @@ void SpatialDiscretization_FV::
 
   //======================================== Collect block sizes
   locJ_block_size.clear();
-  locJ_block_size.resize(chi_mpi.process_count, 0);
+  locJ_block_size.resize(chi::mpi.process_count, 0);
   int num_local_cells =  ref_grid->local_cells.size();
   MPI_Allgather(&num_local_cells,             //send buf
                 1,                            //send count
@@ -60,7 +60,7 @@ void SpatialDiscretization_FV::
                 MPI_INT,                      //recv type
                 MPI_COMM_WORLD);              //communicator
 
-  chi_log.Log(LOG_ALLVERBOSE_2)
+  chi::log.LogAllVerbose2()
     << "Local dof count, start "
     << ref_grid->local_cells.size() << " "
     << fv_local_block_address;

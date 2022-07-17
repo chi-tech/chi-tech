@@ -45,6 +45,8 @@ public:
   std::vector<LightWeightCell*>    raw_boundary_cells;
   std::vector<std::set<uint64_t>>  vertex_cell_subscriptions;
 
+  MeshAttributes attributes = NONE;
+
 public:
   enum class ParallelMethod
   {
@@ -98,6 +100,15 @@ public:
   {
     for (auto& cell : raw_cells)          delete cell;
     for (auto& cell : raw_boundary_cells) delete cell;
+  }
+  void CleanUp()
+  {
+    for (auto& cell : raw_cells)          delete cell;
+    for (auto& cell : raw_boundary_cells) delete cell;
+    vertices.clear();
+    raw_cells.clear();
+    raw_boundary_cells.clear();
+    vertex_cell_subscriptions.clear();
   }
 };
 

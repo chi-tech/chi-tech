@@ -1,14 +1,13 @@
 #include "pwlc.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int64_t SpatialDiscretization_PWLC::
+int64_t chi_math::SpatialDiscretization_PWLC::
   MapDOF(const chi_mesh::Cell& cell,
          const unsigned int node,
          const chi_math::UnknownManager& unknown_manager,
@@ -27,7 +26,7 @@ int64_t SpatialDiscretization_PWLC::
   int address=-1;
   if (storage == chi_math::UnknownStorageType::BLOCK)
   {
-    for (int locJ=0; locJ<chi_mpi.process_count; ++locJ)
+    for (int locJ=0; locJ<chi::mpi.process_count; ++locJ)
     {
       int localized_base_address = mapping - locJ_block_address[locJ];
       if (localized_base_address < 0) continue;
@@ -47,7 +46,7 @@ int64_t SpatialDiscretization_PWLC::
 
 //###################################################################
 /**Maps a vertex id according to a developed node ordering.*/
-int64_t SpatialDiscretization_PWLC::
+int64_t chi_math::SpatialDiscretization_PWLC::
   MapDOFLocal(const chi_mesh::Cell& cell,
               const unsigned int node,
               const chi_math::UnknownManager& unknown_manager,
@@ -66,11 +65,11 @@ int64_t SpatialDiscretization_PWLC::
   int localized_base_address = (mapping - local_block_address);
   if (localized_base_address >= local_base_block_size)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SpatialDiscretization_PWLC::MapDOFLocal. Mapping failed for cell "
       << "with global index " << cell.global_id << " because the node is "
       << "not local.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   int address=-1;

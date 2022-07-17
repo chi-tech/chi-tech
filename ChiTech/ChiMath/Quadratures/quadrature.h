@@ -5,6 +5,9 @@
 
 #include <vector>
 
+/**\defgroup LuaQuadrature Quadrature rules
+ * \ingroup LuaMath*/
+
 namespace chi_math
 {
   enum class QuadratureOrder : int {

@@ -1,7 +1,7 @@
 #include "FLUDS.h"
 
-#include <chi_log.h>
-extern ChiLog&     chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 //###################################################################
 /**Given a sweep ordering index, the outgoing face counter,
@@ -46,10 +46,10 @@ NLOutgoingPsi(int outb_face_counter,
 {
   if (outb_face_counter>nonlocal_outb_face_deplocI_slot.size())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid number of outb_face_counter " << outb_face_counter
       << " max allowed " << nonlocal_outb_face_deplocI_slot.size();
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   int depLocI = nonlocal_outb_face_deplocI_slot[outb_face_counter].first;
@@ -63,11 +63,11 @@ NLOutgoingPsi(int outb_face_counter,
   if ((index<0) ||
       (index>ref_deplocI_outgoing_psi->operator[](depLocI).size()))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid index " << index
       << " encountered in non-local outgoing Psi"
       << " max allowed " << ref_deplocI_outgoing_psi->operator[](depLocI).size();
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   return &ref_deplocI_outgoing_psi->operator[](depLocI)[index];

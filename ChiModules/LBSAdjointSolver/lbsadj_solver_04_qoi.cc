@@ -6,7 +6,7 @@
 /**Subscribes cells to QOIs.*/
 size_t lbs_adjoint::AdjointSolver::
   AddResponseFunction(const std::string& qoi_name,
-                      const chi_mesh::LogicalVolume& logical_volume,
+                      std::shared_ptr<chi_mesh::LogicalVolume> logical_volume,
                       const std::string& lua_function_name)
 {
   // Make the designation

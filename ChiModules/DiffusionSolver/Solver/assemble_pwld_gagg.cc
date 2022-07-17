@@ -2,14 +2,16 @@
 
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+
+;
 
 //###################################################################
 /**Assembles PWLC matrix for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cell)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLD>(this->discretization);
 //  auto fe_view = (CellPWLFEValues*)pwl_sdm->MapFeViewL(cell.local_id);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
@@ -290,7 +292,7 @@ void chi_diffusion::Solver::PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cel
 /**Assembles b PWLD for polygon cells.*/
 void chi_diffusion::Solver::PWLD_Assemble_b_GAGG(const chi_mesh::Cell& cell)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLD>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLD>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();

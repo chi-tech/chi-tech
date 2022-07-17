@@ -6,47 +6,50 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //################################################################### Class def
-/**Finite Volume implementation for a polygon.
- *
- * - face_area[f] gives the area of the face.
- * - side_s_v[f][v] gives the vector for each leg of the
- *   triangle forming a side (face).*/
-class PolygonFVValues : public CellFVValues
+namespace chi_math
 {
-public:
-  std::vector<std::vector<chi_mesh::Vector3>> side_legs;
-
-  PolygonFVValues(const chi_mesh::Cell& poly_cell,
-                  const chi_mesh::MeshContinuum& grid) :
-    CellFVValues(poly_cell.vertex_ids.size())
+  /**Finite Volume implementation for a polygon.
+     *
+     * - face_area[f] gives the area of the face.
+     * - side_s_v[f][v] gives the vector for each leg of the
+     *   triangle forming a side (face).*/
+  class PolygonFVValues : public chi_math::CellFVValues
   {
-    volume = 0.0;
+  public:
+    std::vector<std::vector<chi_mesh::Vector3>> side_legs;
 
-    size_t num_faces = poly_cell.faces.size();
-    side_legs.resize(num_faces);
-    for (size_t f=0; f<num_faces; f++)
+    PolygonFVValues(const chi_mesh::Cell& poly_cell,
+                    const chi_mesh::MeshContinuum& grid) :
+      CellFVValues(poly_cell.vertex_ids.size())
     {
-      uint64_t v0i = poly_cell.faces[f].vertex_ids[0];
-      uint64_t v1i = poly_cell.faces[f].vertex_ids[1];
+      volume = 0.0;
 
-      const auto& v0 = grid.vertices[v0i];
-      const auto& v1 = grid.vertices[v1i];
-      chi_mesh::Vector3 v2 = poly_cell.centroid;
+      size_t num_faces = poly_cell.faces.size();
+      side_legs.resize(num_faces);
+      for (size_t f=0; f<num_faces; f++)
+      {
+        uint64_t v0i = poly_cell.faces[f].vertex_ids[0];
+        uint64_t v1i = poly_cell.faces[f].vertex_ids[1];
 
-      face_area.push_back((v1-v0).Norm());
+        const auto& v0 = grid.vertices[v0i];
+        const auto& v1 = grid.vertices[v1i];
+        chi_mesh::Vector3 v2 = poly_cell.centroid;
 
-      chi_mesh::Vector3 sidev01 = v1 - v0;
-      chi_mesh::Vector3 sidev02 = v2 - v0;
+        face_area.push_back((v1-v0).Norm());
 
-      side_legs[f].push_back(sidev01);
-      side_legs[f].push_back(sidev02);
+        chi_mesh::Vector3 sidev01 = v1 - v0;
+        chi_mesh::Vector3 sidev02 = v2 - v0;
 
-      double sidedetJ = ((sidev01.x)*(sidev02.y) - (sidev02.x)*(sidev01.y));
+        side_legs[f].push_back(sidev01);
+        side_legs[f].push_back(sidev02);
 
-      volume += sidedetJ/2.0;
+        double sidedetJ = ((sidev01.x)*(sidev02.y) - (sidev02.x)*(sidev01.y));
+
+        volume += sidedetJ/2.0;
+      }
+
     }
-
-  }
-};
+  };
+}
 
 #endif

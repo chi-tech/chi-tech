@@ -3,17 +3,16 @@
 #include "ChiDataTypes/byte_array.h"
 #include "ChiMesh/Cell/cell.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
 
 #include "chi_mpi_utils_map_all2all.h"
 
 #include <map>
 
-bool chi_unit_tests::Test_chi_data_types(bool verbose)
+void chi_unit_tests::Test_chi_data_types(bool verbose)
 {
   bool passed = true;
   std::stringstream output;
@@ -53,13 +52,13 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
     output << std::string("chi_data_types::ByteArray Write/Read ... Passed\n");
 
   if (verbose)
-    chi_log.Log() << output.str();
+    chi::log.Log() << output.str();
 
   output.str(""); //clear the stream
 
   //======================================================= Testing Byte array serialization
   output << "Testing chi_data_types::ByteArray Serialization/DeSerialization\n";
-  if (chi_mpi.process_count < 2)
+  if (chi::mpi.process_count < 2)
     throw std::logic_error("chi_unit_tests::Test_chi_data_types requires at least"
                            " 2 MPI processes.");
 
@@ -139,7 +138,7 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
     }
   }
 
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     send_data[1].Append(poster_child_cell.Serialize());
     send_data[1].Append(poster_child_cell.Serialize());
@@ -200,7 +199,7 @@ bool chi_unit_tests::Test_chi_data_types(bool verbose)
 
 
   if (verbose)
-    chi_log.Log(LOG_ALL) << output.str();
+    chi::log.LogAll() << output.str();
 
-  return passed;
+  ChiUnitTestMessageAll(passed)
 }

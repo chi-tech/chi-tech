@@ -17,7 +17,9 @@ material = chiPhysicsAddMaterial("Test Material");
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,material)
 
-chiRegionExportMeshToVTK(region1,"Mesh")
+chiVolumeMesherSetupOrthogonalBoundaries()
+
+chiMeshHandlerExportMeshToVTK("Mesh")
 --############################################### Add material properties
 
 
@@ -30,10 +32,11 @@ chiPhysicsMaterialSetProperty(material,"q",SINGLE_VALUE,1.0)
 
 
 --############################################### Setup Physics
-phys1 = chiDiffusionCreateSolver();
-chiSolverAddRegion(phys1,region1)
+phys1 = chiDiffusionCreateSolver()
 chiSolverSetBasicOption(phys1,"discretization_method","PWLC");
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-6)
+chiDiffusionSetProperty(phys1,"boundary_type",4,"reflecting")
+chiDiffusionSetProperty(phys1,"boundary_type",5,"reflecting")
 
 --############################################### Initialize and
 --                                                Execute Solver

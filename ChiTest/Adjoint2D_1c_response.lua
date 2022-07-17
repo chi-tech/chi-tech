@@ -26,7 +26,7 @@ xmin=0.0
 for i=0,N do
     nodes[i+1] = xmin + i*ds
 end
-mesh,region0 = chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes)
+mesh = chiMeshCreateUnpartitioned2DOrthoMesh(nodes,nodes)
 chiVolumeMesherExecute();
 
 ----############################################### Set Material IDs
@@ -90,8 +90,6 @@ chiPhysicsMaterialSetProperty(materials[3],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 --############################################### Setup Physics
 solver_name = "LBAdjointResponse"
 phys1 = chiAdjointSolverCreate(solver_name)
-
-chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}

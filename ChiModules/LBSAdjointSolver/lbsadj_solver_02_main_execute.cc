@@ -1,5 +1,6 @@
 #include "lbsadj_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 
@@ -7,11 +8,10 @@
 void lbs_adjoint::AdjointSolver::Execute()
 {
   const std::string fname = __FUNCTION__;
-  auto& chi_log = ChiLog::GetInstance();
   lbs::SteadySolver::Execute();
 
   //============================================= Apply post processing
-  chi_log.Log() << "LBAdjointSolver: post-processing.";
+  chi::log.Log() << "LBAdjointSolver: post-processing.";
   std::set<int> set_group_numbers;
   for (const auto& groupset : groupsets)
     for (const auto& group : groupset.groups)

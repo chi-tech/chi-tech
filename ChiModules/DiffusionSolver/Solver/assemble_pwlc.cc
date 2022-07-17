@@ -1,14 +1,16 @@
 #include "diffusion_solver.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+
+;
 
 //###################################################################
 /**Assembles PWLC matrix for general cells.*/
 void chi_diffusion::Solver::CFEM_Assemble_A_and_b(chi_mesh::Cell& cell,
                                                   int group)
 {
-  auto pwl_sdm = std::static_pointer_cast<SpatialDiscretization_PWLC>(this->discretization);
+  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLC>(this->discretization);
   const auto& fe_intgrl_values = pwl_sdm->GetUnitIntegrals(cell);
 
   size_t num_nodes = fe_intgrl_values.NumNodes();

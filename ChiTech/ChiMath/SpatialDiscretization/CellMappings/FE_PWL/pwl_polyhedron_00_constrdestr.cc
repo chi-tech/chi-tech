@@ -3,14 +3,15 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+#include "pwl_cellbase.h"
+;
 
 //###################################################################
 /**Constructor for the Piecewise Linear Polyhedron cell finite elment
  * view.
  *
  * */
-PolyhedronMappingFE_PWL::
+chi_math::PolyhedronMappingFE_PWL::
   PolyhedronMappingFE_PWL(
     const chi_mesh::Cell& polyh_cell,
     const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
@@ -202,9 +203,9 @@ PolyhedronMappingFE_PWL::
       }//for cell i
       if (mapping<0)
       {
-        chi_log.Log(LOG_ALLERROR) << "Unknown face mapping encountered. "
+        chi::log.LogAllError() << "Unknown face mapping encountered. "
                                      "pwl_polyhedron.h";
-        exit(EXIT_FAILURE);
+       chi::Exit(EXIT_FAILURE);
       }
       face_dof_mapping.push_back(mapping);
     }//for face i

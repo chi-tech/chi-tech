@@ -2,11 +2,11 @@
 
 /**Precomputes the shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronMappingFE_PWL::FaceSideShape(unsigned int face_index,
-                                              unsigned int side_index,
-                                              unsigned int i,
-                                              const chi_mesh::Vector3& qpoint,
-                                              bool on_surface/*=false*/) const
+double chi_math::PolyhedronMappingFE_PWL::FaceSideShape(unsigned int face_index,
+                                                        unsigned int side_index,
+                                                        unsigned int i,
+                                                        const chi_mesh::Vector3& qpoint,
+                                                        bool on_surface/*=false*/) const
 {
   double value = 0.0;
   int    index = node_side_maps[i].face_map[face_index].
@@ -23,9 +23,9 @@ double PolyhedronMappingFE_PWL::FaceSideShape(unsigned int face_index,
 
 /**Precomputes the gradx-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronMappingFE_PWL::FaceSideGradShape_x(unsigned int face_index,
-                                                    unsigned int side_index,
-                                                    unsigned int i) const
+double chi_math::PolyhedronMappingFE_PWL::FaceSideGradShape_x(unsigned int face_index,
+                                                              unsigned int side_index,
+                                                              unsigned int i) const
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -59,9 +59,9 @@ double PolyhedronMappingFE_PWL::FaceSideGradShape_x(unsigned int face_index,
 
 /**Precomputes the grady-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronMappingFE_PWL::FaceSideGradShape_y(unsigned int face_index,
-                                                    unsigned int side_index,
-                                                    unsigned int i) const
+double chi_math::PolyhedronMappingFE_PWL::FaceSideGradShape_y(unsigned int face_index,
+                                                              unsigned int side_index,
+                                                              unsigned int i) const
 {
   double value = 0.0;
   double tetdfdx = 0.0;
@@ -95,9 +95,9 @@ double PolyhedronMappingFE_PWL::FaceSideGradShape_y(unsigned int face_index,
 
 /**Precomputes the gradz-shape function values of a face-side pair
  * at a quadrature point*/
-double PolyhedronMappingFE_PWL::FaceSideGradShape_z(unsigned int face_index,
-                                                    unsigned int side_index,
-                                                    unsigned int i) const
+double chi_math::PolyhedronMappingFE_PWL::FaceSideGradShape_z(unsigned int face_index,
+                                                              unsigned int side_index,
+                                                              unsigned int i) const
 {
   double value = 0.0;
   double tetdfdx = 0.0;

@@ -2,14 +2,17 @@
 
 \section devman2_sec0 Global variables available
 
-The major global variables are defined in "chi_runtime.cc"
+All global entities for the ChiTech library are contained within the
+static `chi` class. This class has the name `chi` and an instance of it
+cannot be created. Within this class, all of its members are statically
+declared. Several singleton objects are defined in `chi`, they are:
+ - chi::mpi A handler for parallel related items.
+ - chi::program_timer The primary program timer.
+ - chi::console The link to the lua scripting engine.
+ - chi::log A handler for parallel logging events and verbosity.
 
-They are:
- - ChiConsole chi_console The link to the lua scripting engine.
- - ChiMath chi_math_handler A handler of math related entities
- - ChiPhysics chi_physics_handler A handler of physics related items
- - ChiMPI chi_mpi A handler for parallel related items.
- - ChiLog chi_log A handler for parallel logging events and verbosity.
+A number of stacks are also declared. They are basically arrays of
+shared pointers (i.e., `std::shared_ptr`)
 
 There are also a number of secondary global variables that assist developers
 with coding. They are:
@@ -46,33 +49,9 @@ with coding. They are:
 
 
 
-\subsection devman2_sec0_3 Connecting to the physics handler
+\subsection devman2_sec0_3 Connecting to the global data block
 
-The physics handler maintains a number of data structures, most notably
- are the following three:
- - ChiPhysics::solver_stack Solvers are pushed here
- - ChiPhysics::material_stack Materials are pushed here
- - ChiPhysics::fieldfunc_stack Field functions are pushed here
-
-To access chi_physics_handler include the following code at the top of your
- code
-
-\code
-#include <ChiPhysics/chi_physics.h>
-
-extern ChiPhysics& chi_physics_handler;
-\endcode
-
- or obtain an instance to it via
-
-\code
-// Include this at the top of the file
-#include <ChiPhysics/chi_physics.h>
-
-// Include this in the body of your code
-ChiPhysics& chi_physics_handler = ChiPhysics::GetInstance();
-\endcode
-
+To be completed...
 
 \subsection devman2_sec0_4 Connecting to MPI
 
@@ -112,21 +91,21 @@ the output to the log will be chaotic. For this reason we employ a common
  logging utility which return an output string stream using the function
  call ChiLog::Log.
 
-Connecting to chi_log is done as follows
+Connecting to chi::log is done as follows
 \code
-#include <chi_log.h>
+#include <chi::log.h>
 
-extern ChiLog& chi_log;
+extern ChiLog& chi::log;
 \endcode
 
  or obtain an instance to it via
 
 \code
 // Include this at the top of the file
-#include <chi_log.h>
+#include <chi::log.h>
 
 // Include this in the body of your code
-ChiLog&      chi_log = ChiLog::GetInstance();
+ChiLog&      chi::log = ChiLog::GetInstance();
 \endcode
 
 The logger needs to be supplied with an enumeration (LOG_LVL) indicating
@@ -136,7 +115,7 @@ The logger needs to be supplied with an enumeration (LOG_LVL) indicating
  - LOG_0ERROR,                 Error only for location 0
  - LOG_0VERBOSE_0,             Default verbosity level
  - LOG_0VERBOSE_1,             Used only if verbosity level equals 1
- - LOG_0VERBOSE_2,             Used only if verbosity level equals 2
+ - ChiLog::LOG_LVL::LOG_0VERBOSE_2,             Used only if verbosity level equals 2
  - LOG_ALL,                    Verbose level 0 all locations
  - LOG_ALLWARNING,             Warning for any location
  - LOG_ALLERROR,               Error for any location

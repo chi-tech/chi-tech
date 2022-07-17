@@ -1,9 +1,9 @@
 #include "ChiLua/chi_lua.h"
 
+#include "chi_runtime.h"
+
 #include "../sldfe_sq.h"
 
-#include "ChiMath/chi_math.h"
-extern ChiMath&     chi_math_handler;
 
 //###################################################################
 /** Creates a Simplified Linear Discontinuous Finite Element (SLDFE)
@@ -39,9 +39,9 @@ int chiCreateSLDFESQAngularQuadrature(lua_State* L)
   std::shared_ptr<chi_math::AngularQuadrature> new_ang_quad =
     std::shared_ptr<chi_math::SimplifiedLDFESQ::Quadrature>(sldfesq);
 
-  chi_math_handler.angular_quadratures.push_back(new_ang_quad);
-  int index = chi_math_handler.angular_quadratures.size() - 1;
-  lua_pushnumber(L,index);
+  chi::angular_quadrature_stack.push_back(new_ang_quad);
+  const size_t index = chi::angular_quadrature_stack.size() - 1;
+  lua_pushnumber(L,static_cast<lua_Number>(index));
 
   return 1;
 }

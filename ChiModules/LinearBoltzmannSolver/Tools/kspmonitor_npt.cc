@@ -3,12 +3,11 @@
 
 #include "ksp_data_context.h"
 
+
 #include <iomanip>
 #include <chi_log.h>
 #include <ChiTimer/chi_timer.h>
 
-extern ChiLog&     chi_log;
-extern ChiTimer   chi_program_timer;
 
 //###################################################################
 /**Customized convergence test.*/
@@ -43,7 +42,7 @@ PetscErrorCode lbs::
 
   std::stringstream iter_info;
   iter_info
-    << chi_program_timer.GetTimeString() << " "
+    << chi::program_timer.GetTimeString() << " "
     << offset
     << "WGS groups ["
     << context->groupset.groups.front().id
@@ -60,7 +59,7 @@ PetscErrorCode lbs::
   }
 
   if (context->solver.options.verbose_inner_iterations)
-    chi_log.Log(LOG_0) << iter_info.str() << std::endl;
+    chi::log.Log() << iter_info.str() << std::endl;
 
   const double SIXTY_SECOND_INTERVAL = 60000.0; //time in milliseconds
   if (context->groupset.iterative_method == IterativeMethod::GMRES or
@@ -70,7 +69,7 @@ PetscErrorCode lbs::
     {
       if (context->solver.options.write_restart_data)
       {
-        if ((chi_program_timer.GetTime()/SIXTY_SECOND_INTERVAL) >
+        if ((chi::program_timer.GetTime()/SIXTY_SECOND_INTERVAL) >
           context->solver.last_restart_write +
           context->solver.options.write_restart_interval)
         {
@@ -83,7 +82,7 @@ PetscErrorCode lbs::
                                      WITH_DELAYED_PSI);
 
           context->solver.last_restart_write =
-            chi_program_timer.GetTime()/SIXTY_SECOND_INTERVAL;
+            chi::program_timer.GetTime()/SIXTY_SECOND_INTERVAL;
           context->solver.WriteRestartData(
             context->solver.options.write_restart_folder_name,
             context->solver.options.write_restart_file_base);

@@ -1,9 +1,9 @@
 #include "pwl_slab.h"
 
-double SlabMappingFE_PWL::SlabShape(int index,
-                                    const chi_mesh::Vector3& qpoint,
-                                    bool on_surface,
-                                    const int edge) const
+double chi_math::SlabMappingFE_PWL::SlabShape(int index,
+                                              const chi_mesh::Vector3& qpoint,
+                                              bool on_surface,
+                                              const int edge) const
 {
   double xi=0.0;
   if (!on_surface)
@@ -20,7 +20,7 @@ double SlabMappingFE_PWL::SlabShape(int index,
   return value;
 }
 
-double SlabMappingFE_PWL::SlabGradShape(int index) const
+double chi_math::SlabMappingFE_PWL::SlabGradShape(int index) const
 {
   double value = 0.0;
 

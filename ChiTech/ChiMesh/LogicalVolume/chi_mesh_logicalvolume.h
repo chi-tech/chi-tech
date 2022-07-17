@@ -151,7 +151,6 @@ public:
   bool Inside(const chi_mesh::Vector3& point) const override
   {
     typedef chi_mesh::Vector3 Vec3;
-    auto& chi_log = ChiLog::GetInstance();
 
     const auto& pr = point;              //reference point
     const Vec3  p0(x0, y0, z0);          //cylinder root
@@ -204,14 +203,15 @@ public:
 class chi_mesh::SurfaceMeshLogicalVolume : public LogicalVolume
 {
 private:
+  typedef std::shared_ptr<chi_mesh::SurfaceMesh> SurfaceMeshPtr;
   std::array<double,2> xbounds;
   std::array<double,2> ybounds;
   std::array<double,2> zbounds;
 public:
-  chi_mesh::SurfaceMesh* surf_mesh = nullptr;
+  const SurfaceMeshPtr surf_mesh = nullptr;
 
   explicit
-  SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh* in_surf_mesh);
+  SurfaceMeshLogicalVolume(SurfaceMeshPtr in_surf_mesh);
 
   bool Inside(const chi_mesh::Vector3& point) const override;
 };
@@ -222,13 +222,13 @@ public:
 class chi_mesh::BooleanLogicalVolume : public LogicalVolume
 {
 public:
-  std::vector<std::pair<bool,LogicalVolume*>> parts;
+  std::vector<std::pair<bool,std::shared_ptr<LogicalVolume>>> parts;
 
   bool Inside(const chi_mesh::Vector3& point) const override
   {
-    for (size_t p=0; p<parts.size();p++)
+    for (const auto & part : parts)
     {
-      if (not (parts[p].first && parts[p].second->Inside(point)))
+      if (not (part.first && part.second->Inside(point)))
         return false;
     }
     return true;

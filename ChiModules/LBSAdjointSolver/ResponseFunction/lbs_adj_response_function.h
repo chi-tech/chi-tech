@@ -1,6 +1,8 @@
 #ifndef CHITECH_LBS_ADJ_RESPONSE_FUNCTION_H
 #define CHITECH_LBS_ADJ_RESPONSE_FUNCTION_H
 
+#include <utility>
+
 #include "ChiMesh/Cell/cell.h"
 
 namespace lbs_adjoint
@@ -9,14 +11,15 @@ namespace lbs_adjoint
 struct ResponseFunctionDesignation
 {
   const std::string              name;
-  const chi_mesh::LogicalVolume& logical_volume;
+  const std::shared_ptr<chi_mesh::LogicalVolume> logical_volume;
   const std::string              lua_functional;
 
-  explicit ResponseFunctionDesignation(std::string in_name,
-                                       const chi_mesh::LogicalVolume& in_logical_volume,
-                                       std::string  in_lua_function_name) :
+  explicit ResponseFunctionDesignation(
+    std::string in_name,
+    std::shared_ptr<chi_mesh::LogicalVolume> in_logical_volume,
+    std::string  in_lua_function_name) :
     name(std::move(in_name)),
-    logical_volume(in_logical_volume),
+    logical_volume(std::move(in_logical_volume)),
     lua_functional(std::move(in_lua_function_name))
   {}
 
