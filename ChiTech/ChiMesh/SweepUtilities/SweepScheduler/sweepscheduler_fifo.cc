@@ -3,8 +3,8 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-extern ChiMPI& chi_mpi;
-extern ChiLog& chi_log;
+
+;
 
 
 //###################################################################
@@ -12,13 +12,13 @@ extern ChiLog& chi_log;
 void chi_mesh::sweep_management::SweepScheduler::
   ScheduleAlgoFIFO(SweepChunk& sweep_chunk)
 {
-  chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_BEGIN);
+  chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   auto ev_info_i =
-    std::make_shared<ChiLog::EventInfo>(std::string("Sweep initiated"));
+    std::make_shared<chi_objects::ChiLog::EventInfo>(std::string("Sweep initiated"));
 
-  chi_log.LogEvent(sweep_event_tag,
-                   ChiLog::EventType::SINGLE_OCCURRENCE,ev_info_i);
+  chi::log.LogEvent(sweep_event_tag,
+                   chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
 
   //================================================== Loop over AngleSetGroups
   // For 3D geometry this will be 8, one for each octant.
@@ -57,6 +57,6 @@ void chi_mesh::sweep_management::SweepScheduler::
     angleset->ReceiveDelayedData(sorted_angleset.set_index);
   }
 
-  chi_log.LogEvent(sweep_event_tag, ChiLog::EventType::EVENT_END);
+  chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 
 }

@@ -9,21 +9,21 @@
 /**General implementation of a directed-graph vertex.*/
 struct chi_graph::GraphVertex
 {
-  int id;
+  size_t id;
   void* context;
 
-  std::set<int> us_edge;
-  std::set<int> ds_edge;
+  std::set<size_t> us_edge;
+  std::set<size_t> ds_edge;
 
-  std::map<int,double> us_weights;
-  std::map<int,double> ds_weights;
+  std::map<size_t,double> us_weights;
+  std::map<size_t,double> ds_weights;
 
-  GraphVertex(int in_id, void* in_context) :
+  GraphVertex(size_t in_id, void* in_context) :
     id(in_id),
     context(in_context)
   {}
 
-  GraphVertex(int in_id) :
+  explicit GraphVertex(size_t in_id) :
     id(in_id),
     context(nullptr)
   {}
@@ -37,7 +37,7 @@ struct chi_graph::GraphVertex
     ds_edge = in_v.ds_edge;
   }
 
-  GraphVertex(GraphVertex&& in_v)
+  GraphVertex(GraphVertex&& in_v) noexcept
   {
     this->id = in_v.id;
     this->context = in_v.context;
@@ -50,6 +50,8 @@ struct chi_graph::GraphVertex
 
   GraphVertex& operator=(const GraphVertex& in_v)
   {
+    if (this == &in_v) return *this;
+
     this->id = in_v.id;
     this->context = in_v.context;
 
@@ -59,7 +61,7 @@ struct chi_graph::GraphVertex
     return *this;
   }
 
-  GraphVertex& operator=(GraphVertex&& in_v)
+  GraphVertex& operator=(GraphVertex&& in_v) noexcept
   {
     this->id = in_v.id;
     this->context = in_v.context;
@@ -72,7 +74,7 @@ struct chi_graph::GraphVertex
     return *this;
   }
 
-  bool operator==(const GraphVertex& other)
+  bool operator==(const GraphVertex& other) const
   {
     return other.id == this->id;
   }

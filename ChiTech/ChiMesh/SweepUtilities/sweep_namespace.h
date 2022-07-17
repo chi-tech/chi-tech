@@ -51,7 +51,7 @@ namespace sweep_management
     chi_graph::DirectedGraph& local_DG);
 
   std::shared_ptr<SPDS> CreateSweepOrder(const chi_mesh::Vector3& omega,
-                                         chi_mesh::MeshContinuumPtr grid,
+                                         const chi_mesh::MeshContinuumPtr& grid,
                                          bool cycle_allowance_flag=false);
 
   void PrintSweepOrdering(SPDS* sweep_order,

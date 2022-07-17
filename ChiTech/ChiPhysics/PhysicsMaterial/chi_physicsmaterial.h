@@ -5,6 +5,7 @@
 #include "material_property_base.h"
 
 #include <vector>
+#include <memory>
 
 namespace chi_physics
 {

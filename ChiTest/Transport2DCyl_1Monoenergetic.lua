@@ -58,7 +58,6 @@ chiPhysicsMaterialSetProperty(material0, ISOTROPIC_MG_SOURCE,
 --  physics
 --------------------------------------------------------------------------------
 phys0 = chiLBSCurvilinearCreateSolver(LBSCurvilinear.CYLINDRICAL)
-chiSolverAddRegion(phys0, region0)
 
 --  angular quadrature
 pquad = chiCreateCylindricalProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV, 4, 8)

@@ -1,8 +1,8 @@
 #include "sldfe_sq.h"
 
 #include <map>
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Split a SQ.*/
@@ -120,5 +120,5 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
 
   PopulateQuadratureAbscissae();
 
-  chi_log.Log(LOG_0) << "SLDFESQ refined " << num_refined << " SQs.";
+  chi::log.Log() << "SLDFESQ refined " << num_refined << " SQs.";
 }

@@ -18,13 +18,10 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
-
-region1 = chiRegionCreate()
---chiRegionAddEmptyBoundary(region1)
+umesh = chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
-chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED)
+chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh)
 
 chiVolumeMesherSetProperty(VOLUMEPARTITION_X,2)
 chiVolumeMesherSetProperty(VOLUMEPARTITION_Y,2)
@@ -63,7 +60,6 @@ chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 --############################################### Setup Physics
 
 phys1 = chiLBSCreateSolver()
-chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}

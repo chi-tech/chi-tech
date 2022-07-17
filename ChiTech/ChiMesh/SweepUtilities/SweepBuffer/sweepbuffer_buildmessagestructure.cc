@@ -4,13 +4,10 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
-#include <ChiConsole/chi_console.h>
-
-extern ChiLog&     chi_log;
-extern ChiMPI&      chi_mpi;
-extern ChiConsole&  chi_console;
+#include "chi_runtime.h"
+#include "chi_log.h"
+#include "chi_mpi.h"
+#include "ChiConsole/chi_console.h"
 
 //###################################################################
 /**Builds message structure.
@@ -26,10 +23,10 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
 //============================================= Check angleset is complete
   if (angleset->angles.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "A call to SweepBuffer::BuildMessageStructure() has been made without"
          " an initialized angleset.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   auto spds =  angleset->GetSPDS();

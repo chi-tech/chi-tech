@@ -13,7 +13,7 @@
         lua_settable(L,-3); \
         lua_pop(L,1)
 
-void LBSCurvilinear::lua_utils::RegisterLuaEntities(lua_State *L)
+void lbs_curvilinear::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   LUA_FMACRO1(chiLBSCurvilinearCreateSolver);
 

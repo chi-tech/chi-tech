@@ -1,7 +1,8 @@
 #include "chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
 
@@ -18,13 +19,13 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
   file.open(options.file_name);
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name<<" in call "
       << "to ReadFromMsh \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
-  chi_log.Log() << "Making Unpartitioned mesh from msh format file "
+  chi::log.Log() << "Making Unpartitioned mesh from msh format file "
                 << options.file_name;
   MPI_Barrier(MPI_COMM_WORLD);
 
@@ -189,7 +190,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if (IsElementType3D(elem_type))
     {
       mesh_is_2D_assumption = false;
-      chi_log.Log() << "Mesh identified as 3D.";
+      chi::log.Log() << "Mesh identified as 3D.";
       break; //have the answer now leave loop
     }
 
@@ -236,7 +237,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if (not IsElementSupported(elem_type))
       throw std::logic_error(fname + ": Unsupported element encountered.");
 
-    chi_log.Log(LOG_0VERBOSE_1) << "Reading element: " << file_line
+    chi::log.Log0Verbose1() << "Reading element: " << file_line
                                 << " type: " << elem_type;
 
     int num_cell_nodes;
@@ -260,14 +261,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       {
         raw_cell = new LightWeightCell(CellType::SLAB, CellType::SLAB);
         raw_boundary_cells.push_back(raw_cell);
-        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_boundary_cells.";
+        chi::log.Log0Verbose1() << "Added to raw_boundary_cells.";
       }
       else if (IsElementType2D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYGON,
                                        CellTypeFromMSHTypeID(elem_type));
         raw_cells.push_back(raw_cell);
-        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_cells.";
+        chi::log.Log0Verbose1() << "Added to raw_cells.";
       }
     }
     else
@@ -277,14 +278,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
         raw_cell = new LightWeightCell(CellType::POLYGON,
                                        CellTypeFromMSHTypeID(elem_type));
         raw_boundary_cells.push_back(raw_cell);
-        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_boundary_cells.";
+        chi::log.Log0Verbose1() << "Added to raw_boundary_cells.";
       }
       else if (IsElementType3D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYHEDRON,
                                        CellTypeFromMSHTypeID(elem_type));
         raw_cells.push_back(raw_cell);
-        chi_log.Log(LOG_0VERBOSE_1) << "Added to raw_cells.";
+        chi::log.Log0Verbose1() << "Added to raw_cells.";
       }
     }
 
@@ -378,10 +379,15 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     cell->material_id = boundary_mapping[cell->material_id];
 
   //======================================== Always do this
+  chi_mesh::MeshAttributes dimension = DIMENSION_2;
+  if (not mesh_is_2D_assumption) dimension = DIMENSION_3;
+
+  attributes = dimension | UNSTRUCTURED;
+
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 
-  chi_log.Log() << "Done processing " << options.file_name << ".\n"
+  chi::log.Log() << "Done processing " << options.file_name << ".\n"
                 << "Number of nodes read: " << vertices.size() << "\n"
                 << "Number of cells read: " << raw_cells.size();
 }

@@ -3,14 +3,15 @@
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
+#include "chi_runtime.h"
+
+#include "chi_runtime.h"
 #include "chi_log.h"
+;
+
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
 
 //###################################################################
 /**Gets material properties various sources.*/
@@ -23,30 +24,30 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
                                                   int moment)
 {
   uint64_t cell_glob_index = cell.global_id;
-  bool cell_is_local = (cell.partition_id == chi_mpi.location_id);
+  bool cell_is_local = (cell.partition_id == chi::mpi.location_id);
   uint64_t cell_local_id = cell.local_id;
   int mat_id = cell.material_id;
 
   if (mat_id<0)
   {
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Cell encountered with no material id. ";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
-  if (mat_id>=chi_physics_handler.material_stack.size())
+  if (mat_id>=chi::material_stack.size())
   {
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Cell encountered with material id pointing to "
          "non-existing material.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   auto property_map_D     = basic_options("property_map_D").IntegerValue();
   auto property_map_q     = basic_options("property_map_q").IntegerValue();
   auto property_map_sigma = basic_options("property_map_sigma").IntegerValue();
 
-  auto material = chi_physics_handler.material_stack[mat_id];
+  auto material = chi::GetStackItemPtr(chi::material_stack, mat_id, __FUNCTION__);
 
   //====================================== Process material properties
   diffCoeff.resize(cell_dofs,1.0);
@@ -59,11 +60,11 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     //We absolutely need the diffusion coefficient so process error
     if ((property_map_D < 0) || (property_map_D >= material->properties.size()))
     {
-      chi_log.Log(LOG_0ERROR)
+      chi::log.Log0Error()
         << "Solver diffusion coefficient mapped to property index "
         << property_map_D << " is not a valid index for material \""
         << material->name <<"\" id " << mat_id;
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //For now we can only support scalar values so lets check that
@@ -75,14 +76,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     }
     else
     {
-      chi_log.Log(LOG_0ERROR)
+      chi::log.Log0Error()
         << "Solver diffusion coefficient mapped to property index "
         << property_map_D << " is not a valid property type"
         << " for material \""
         << material->name <<"\" id " << mat_id
         << ". Currently SCALAR_VALUE and THERMAL_CONDUCTIVITY are the "
         << "only supported types.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
 
@@ -97,14 +98,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
       }
       else
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Source value mapped to property index "
           << property_map_q << " is not a valid property type"
           << " for material \""
           << material->name <<"\" id " << mat_id
           << ". Currently SCALAR_VALUE is the "
           << "only supported type.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
 
@@ -142,10 +143,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
 
     if (!transportxs_found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material encountered with no tranport xs"
            " yet material mode is DIFFUSION_MATERIALS_FROM_TRANSPORTXS.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Setting Q
@@ -160,14 +161,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
       }
       else
       {
-        chi_log.Log(LOG_0ERROR)
+        chi::log.Log0Error()
           << "Source value mapped to property index "
           << property_map_q << " is not a valid property type"
           << " for material \""
           << material->name <<"\" id " << mat_id
           << ". Currently SCALAR_VALUE is the "
           << "only supported type.";
-        exit(EXIT_FAILURE);
+        chi::Exit(EXIT_FAILURE);
       }
     }
   }//transport xs TTR
@@ -197,10 +198,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
 
     if (!transportxs_found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material encountered with no tranport xs"
            " yet material mode is DIFFUSION_MATERIALS_FROM_TRANSPORTXS.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Setting Q
@@ -237,14 +238,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         try { sourceQ[i] = q_field->field_vector_local->at(mapping[i]); }
         catch (const std::out_of_range& o)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Mapping error i=" << i
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
             << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index].partition_id;
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
       }
@@ -253,10 +254,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     }
     else if (q_field == nullptr)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material source set to field function however"
            " the field is empty or not set.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//transport xs TTF
   //####################################################### TRANSPORT XS D
@@ -285,10 +286,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
 
     if (!transportxs_found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material encountered with no tranport xs"
            " yet material mode is DIFFUSION_MATERIALS_FROM_TRANSPORTXS.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Setting Q
@@ -328,14 +329,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         }
         catch (const std::out_of_range& o)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Mapping error i=" << i
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
             << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index].partition_id;
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
       }
@@ -344,10 +345,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     }
     else if (q_field == nullptr)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material source set to field function however"
            " the field is empty or not set.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//transport xs TTF
   //####################################################### TRANSPORT XS D
@@ -376,10 +377,10 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
 
     if (!transportxs_found)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material encountered with no tranport xs"
            " yet material mode is DIFFUSION_MATERIALS_FROM_TRANSPORTXS.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     //====================================== Setting Q
@@ -419,14 +420,14 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
         }
         catch (const std::out_of_range& o)
         {
-          chi_log.Log(LOG_ALLERROR)
+          chi::log.LogAllError()
             << "Mapping error i=" << i
             << " mapping[i]=" << mapping[i]
             << " g=" << group << "(" << G << ")"
             << " ffsize=" << q_field->field_vector_local->size()
             << " dof_count=" << local_dof_count
             << " cell_loc=" << grid->cells[cell_glob_index].partition_id;
-          exit(EXIT_FAILURE);
+          chi::Exit(EXIT_FAILURE);
         }
 
       }
@@ -435,17 +436,17 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
     }
     else if (q_field == nullptr)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "Diffusion Solver: Material source set to field function however"
            " the field is empty or not set.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }//transport xs TTF
   else
   {
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Diffusion Solver: Invalid material mode.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
 

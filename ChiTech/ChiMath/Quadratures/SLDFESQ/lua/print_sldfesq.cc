@@ -1,15 +1,14 @@
 #include "ChiLua/chi_lua.h"
 
+#include "chi_runtime.h"
+
 #include "../sldfe_sq.h"
 
-#include "ChiMath/chi_math.h"
-extern ChiMath&     chi_math_handler;
-
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 #include "chi_mpi.h"
-extern ChiMPI& chi_mpi;
+
 
 //###################################################################
 /** Outputs the quadrature information to python format.
@@ -43,13 +42,13 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
   const char* file_name = lua_tostring(L,2);
 
   try{
-    auto ref_quadrature = chi_math_handler.angular_quadratures.at(handle);
+    auto ref_quadrature = chi::angular_quadrature_stack.at(handle);
     if (ref_quadrature->type == chi_math::AngularQuadratureType::SLDFESQ)
     {
       auto sldfesq = std::dynamic_pointer_cast<
         chi_math::SimplifiedLDFESQ::Quadrature>(ref_quadrature);
 
-      if (chi_mpi.location_id == 0)
+      if (chi::mpi.location_id == 0)
       {
         sldfesq->output_filename_prefix = file_name;
         sldfesq->PrintQuadratureToFile();
@@ -57,25 +56,25 @@ int chiPrintToPythonSLDFESQAngularQuadrature(lua_State* L)
     }
     else
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "chiPrintToPythonSLDFESQAngularQuadrature: "
            "Invalid angular quadrature type.";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiPrintToPythonSLDFESQAngularQuadrature: "
          "Invalid handle to angular quadrature.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
   catch (...)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "chiPrintToPythonSLDFESQAngularQuadrature: "
          "Call failed with unknown error.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
 

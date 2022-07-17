@@ -1,28 +1,33 @@
 #include "diffusion_solver.h"
 
-#include "ChiTimer/chi_timer.h"
-#include "chi_mpi.h"
-#include "chi_log.h"
-#include "ChiPhysics/chi_physics.h"
+#include "chi_runtime.h"
 
-extern ChiTimer chi_program_timer;
-extern ChiMPI& chi_mpi;
-extern ChiLog& chi_log;
-extern ChiPhysics&  chi_physics_handler;
+
+#include "ChiTimer/chi_timer.h"
+
+
+#include "chi_mpi.h"
+
+
+#include "chi_runtime.h"
+#include "chi_log.h"
+
+
+;
 
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
 int chi_diffusion::Solver::Initialize(bool verbose)
 {
-  chi_log.Log(LOG_0) << "\n"
-                     << chi_program_timer.GetTimeString() << " "
+  chi::log.Log() << "\n"
+                     << chi::program_timer.GetTimeString() << " "
                      << TextName() << ": Initializing Diffusion solver ";
   this->verbose_info = verbose;
 
   if (not common_items_initialized)
     InitializeCommonItems(); //Mostly boundaries
 
-  ChiTimer t_init; t_init.Reset();
+  chi_objects::ChiTimer t_init; t_init.Reset();
 
   auto sdm_string = basic_options("discretization_method").StringValue();
   {
@@ -30,19 +35,19 @@ int chi_diffusion::Solver::Initialize(bool verbose)
     if      (sdm_string == "PWLC")
     {
       discretization =
-        SpatialDiscretization_PWLC::New(grid, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLC::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
     }
     else if (sdm_string == "PWLD_MIP")
     {
       discretization =
-        SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
     }
     else if (sdm_string == "PWLD_MIP_GAGG")
     {
       discretization =
-        SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
+        chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
     }
     else
@@ -57,7 +62,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   //============================================= Get DOF counts
   local_dof_count = sdm->GetNumLocalDOFs(unknown_manager);
   global_dof_count = sdm->GetNumGlobalDOFs(unknown_manager);
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << TextName() << ": Global number of DOFs="
     << global_dof_count;
 
@@ -76,7 +81,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
           unknown_manager);     //Unknown Manager
 
           field_functions.push_back(initial_field_function);
-          chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
+          chi::fieldfunc_stack.push_back(initial_field_function);
     }
     else if (sdm_string == "PWLD_MIP" or sdm_string == "PWLD_MIP_GAGG")
     {
@@ -91,22 +96,22 @@ int chi_diffusion::Solver::Initialize(bool verbose)
             unknown_manager);     //Unknown Manager
 
             field_functions.push_back(initial_field_function);
-            chi_physics_handler.fieldfunc_stack.push_back(initial_field_function);
+            chi::fieldfunc_stack.push_back(initial_field_function);
       }
     }
   }//if not ff set
 
 
   //================================================== Determine nodal DOF
-  chi_log.Log(LOG_0) << "Building sparsity pattern.";
+  chi::log.Log() << "Building sparsity pattern.";
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
   sdm->BuildSparsityPattern(nodal_nnz_in_diag,
                             nodal_nnz_off_diag,
                             unknown_manager);
 
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString() << " "
+  chi::log.Log()
+    << chi::program_timer.GetTimeString() << " "
     << TextName() << ": Diffusion Solver initialization time "
     << t_init.GetTime()/1000.0 << std::endl;
 
@@ -130,7 +135,7 @@ int chi_diffusion::Solver::Initialize(bool verbose)
   ierr = MatSetType(A,MATMPIAIJ);CHKERRQ(ierr);
 
   //================================================== Allocate matrix memory
-  chi_log.Log(LOG_0) << "Setting matrix preallocation.";
+  chi::log.Log() << "Setting matrix preallocation.";
   MatMPIAIJSetPreallocation(A,0,nodal_nnz_in_diag.data(),
                             0,nodal_nnz_off_diag.data());
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);

@@ -8,13 +8,13 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
-size_t SpatialDiscretization_FV::
-  GetNumLocalDOFs(chi_math::UnknownManager& unknown_manager)
+size_t chi_math::SpatialDiscretization_FV::
+  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -23,8 +23,8 @@ size_t SpatialDiscretization_FV::
 
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
-size_t SpatialDiscretization_FV::
-  GetNumGlobalDOFs(chi_math::UnknownManager& unknown_manager)
+size_t chi_math::SpatialDiscretization_FV::
+  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager)
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -35,7 +35,7 @@ size_t SpatialDiscretization_FV::
 
 //###################################################################
 /**Get the number of ghost degrees-of-freedom.*/
-size_t SpatialDiscretization_FV::
+size_t chi_math::SpatialDiscretization_FV::
   GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                   chi_math::UnknownManager& unknown_manager)
 {
@@ -46,7 +46,7 @@ size_t SpatialDiscretization_FV::
 
 //###################################################################
 /**Returns the ghost DOF indices.*/
-std::vector<int> SpatialDiscretization_FV::
+std::vector<int> chi_math::SpatialDiscretization_FV::
   GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
                      chi_math::UnknownManager& unknown_manager,
                      unsigned int unknown_id)
@@ -69,7 +69,7 @@ std::vector<int> SpatialDiscretization_FV::
 
 //###################################################################
 /**Develops a localized view of a petsc vector.*/
-void SpatialDiscretization_FV::
+void chi_math::SpatialDiscretization_FV::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
                       chi_math::UnknownManager& unknown_manager)

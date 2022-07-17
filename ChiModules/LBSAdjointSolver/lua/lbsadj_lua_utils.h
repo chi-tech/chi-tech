@@ -5,9 +5,7 @@
 
 #include "chi_lua.h"
 
-namespace lbs_adjoint
-{
-  namespace lua_utils
+namespace lbs_adjoint::lua_utils
   {
     //###################################################################
     /** Obtains a pointer to a lbs_adjoint::AdjointSolver object or an object
@@ -19,7 +17,7 @@ namespace lbs_adjoint
      *                              should uniquely identify the calling function.
      *
      */
-    lbs_adjoint::AdjointSolver* GetSolverByHandle(
+    lbs_adjoint::AdjointSolver& GetSolverByHandle(
       int handle, const std::string& calling_function_name);
 
     int chiAdjointSolverCreate(lua_State* L);
@@ -29,7 +27,6 @@ namespace lbs_adjoint
     int chiAdjointSolverComputeInnerProduct(lua_State* L);
 
     void RegisterLuaEntities(lua_State* L);
-  }//namespace lua_utils
-}//namespace lbs_adjoint
+  }//namespace lbs_adjoint
 
 #endif //LBSADJOINTSOLVER_LUA_UTILS_H

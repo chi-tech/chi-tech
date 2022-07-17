@@ -2,8 +2,10 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+
+;
 
 void lbs::SteadySolver::InitializePointSources()
 {
@@ -26,7 +28,7 @@ void lbs::SteadySolver::InitializePointSources()
       return false;
   };
 
-  typedef SpatialDiscretization_PWLD PWLD;
+  typedef chi_math::SpatialDiscretization_PWLD PWLD;
   const auto& pwld = std::dynamic_pointer_cast<PWLD>(discretization);
 
   for (auto& point_source : point_sources)
@@ -137,7 +139,7 @@ void lbs::SteadySolver::InitializePointSources()
         for (double val : shape_values)
           output << val << " ";
 
-        chi_log.Log(LOG_ALL) << output.str();
+        chi::log.LogAll() << output.str();
 
         point_source.SetOwningCellData(cell.local_id, shape_values, q_p_weights);
         break;

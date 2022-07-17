@@ -1,10 +1,8 @@
 #include "chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
 
 #include <fstream>
 
@@ -335,23 +333,23 @@ void chi_mesh::UnpartitionedMesh::
 
   if (!file.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to open file: "<< options.file_name <<" in call "
       << "to ReadFromVTU \n";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   file.close();
 
   //======================================== Read the file
   auto reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
   reader->SetFileName(options.file_name.c_str());
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Reading VTU file     : \""
     << options.file_name << "\".";
 
   reader->Update();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Done reading VTU file: \""
     << options.file_name << "\".";
 
@@ -364,7 +362,7 @@ void chi_mesh::UnpartitionedMesh::
   auto total_cell_count  = ugrid->GetNumberOfCells();
   auto total_point_count = ugrid->GetNumberOfPoints();
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "Clean grid num cells and points: "
     << total_cell_count << " "
     << total_point_count;
@@ -373,22 +371,22 @@ void chi_mesh::UnpartitionedMesh::
   //                                         cell identifiers
   if (options.material_id_fieldname != options.boundary_id_fieldname)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "The VTU reader expects material identifiers and boundary identifiers "
       << "to be defined in the same field.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   vtkDataArray* cell_id_array_ptr = nullptr;
   if (options.material_id_fieldname.empty())
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "A user-supplied field name from which to recover cell identifiers "
       << "has not been provided. Only the mesh will be read.";
   }
   else
   {
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "A user-supplied field name from which to recover cell identifiers "
       << "has been provided. The mesh will be read and both material ID and "
       << "boundary ID will be read from the vtkCellData field with name : \""
@@ -398,46 +396,46 @@ void chi_mesh::UnpartitionedMesh::
       ugrid->GetCellData()->GetAbstractArray(options.material_id_fieldname.c_str());
     if (!vtk_abstract_array_ptr)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "The VTU file : \"" << options.file_name << "\" "
         << "does not contain a vtkCellData field of name : \""
         << options.material_id_fieldname << "\".";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     cell_id_array_ptr = vtkArrayDownCast<vtkDataArray>(vtk_abstract_array_ptr);
     if (!cell_id_array_ptr)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "The VTU file : \"" << options.file_name << "\" "
         << "with vtkCellData field of name : \""
         << options.material_id_fieldname << "\" "
         << "cannot be downcast to vtkDataArray";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     const auto cell_id_n_tup = cell_id_array_ptr->GetNumberOfTuples();
     if (cell_id_n_tup != total_cell_count)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "The VTU file : \"" << options.file_name << "\" "
         << "with vtkCellData field of name : \""
         << options.material_id_fieldname << "\" has n. tuples : "
         << cell_id_n_tup << ", but differs from the value expected : "
         << total_cell_count << ".";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     const auto cell_id_n_val = cell_id_array_ptr->GetNumberOfValues();
     if (cell_id_n_val != total_cell_count)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "The VTU file : \"" << options.file_name << "\" "
         << "with vtkCellData field of name : \""
         << options.material_id_fieldname << "\" has n. values : "
         << cell_id_n_val << ", but differs from the value expected : "
         << total_cell_count << ".";
-      std::exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
   }
 
@@ -452,10 +450,10 @@ void chi_mesh::UnpartitionedMesh::
 
   if (mesh_dim < 1 || mesh_dim > 3)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "The VTU file : \"" << options.file_name << "\" "
       << "does not identify a mesh of valid dimension.";
-    std::exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Push cells
@@ -538,7 +536,7 @@ void chi_mesh::UnpartitionedMesh::
         raw_boundary_cells.back()->material_id = cell_id;
     }
   }//for c
-  chi_log.Log() << "Number cells read: " << total_cell_count << "\n"
+  chi::log.Log() << "Number cells read: " << total_cell_count << "\n"
     << "polyhedrons  : " << num_polyhedrons  << "\n"
     << "hexahedrons  : " << num_hexahedrons  << "\n"
     << "tetrahedrons : " << num_tetrahedrons << "\n"
@@ -563,6 +561,13 @@ void chi_mesh::UnpartitionedMesh::
   }
 
   //======================================== Always do this
+  chi_mesh::MeshAttributes dimension = NONE;
+  if (mesh_dim == 1) dimension = DIMENSION_1;
+  if (mesh_dim == 2) dimension = DIMENSION_2;
+  if (mesh_dim == 3) dimension = DIMENSION_3;
+
+  attributes = dimension | UNSTRUCTURED;
+
   ComputeCentroidsAndCheckQuality();
   BuildMeshConnectivity();
 }

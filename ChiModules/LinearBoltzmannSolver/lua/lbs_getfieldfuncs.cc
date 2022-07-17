@@ -1,10 +1,7 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
-
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
 
 //###################################################################
 /**Obtains a list of field functions from the transport solver.
@@ -17,31 +14,38 @@ extern ChiPhysics&  chi_physics_handler;
 \author Jan*/
 int chiLBSGetFieldFunctionList(lua_State *L)
 {
+  const std::string fname = __FUNCTION__;
+
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = lbs::lua_utils::
+  const int solver_index = lua_tonumber(L,1);
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Push up new table
   lua_newtable(L);
-  for (int ff=0; ff<lbs_solver->field_functions.size(); ff++)
+  for (int ff=0; ff<lbs_solver.field_functions.size(); ff++)
   {
     lua_pushnumber(L,ff+1);
     int pff_count = -1;
-    for (auto& pff : chi_physics_handler.fieldfunc_stack)
+    bool found = false;
+    for (auto& pff : chi::fieldfunc_stack)
     {
       ++pff_count;
-      if (pff == lbs_solver->field_functions[ff])
+      if (pff == lbs_solver.field_functions[ff])
       {
         lua_pushnumber(L,pff_count);
+        found = true;
         break;
       }
     }
+    if (not found)
+      throw std::logic_error(fname + ": Solver field functions not found "
+                                     "in global stack.");
 
     lua_settable(L,-3);
   }
 
-  lua_pushnumber(L,lbs_solver->field_functions.size());
+  lua_pushnumber(L,static_cast<lua_Number>(lbs_solver.field_functions.size()));
 
 return 2;
 }
@@ -58,18 +62,19 @@ from the transport solver.
 \author Jan*/
 int chiLBSGetScalarFieldFunctionList(lua_State *L)
 {
+  const std::string fname = __FUNCTION__;
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto lbs_solver = lbs::lua_utils::GetSolverByHandle(solver_index, "chiLBSGetScalarFieldFunctionList");
+  const int solver_index = lua_tonumber(L,1);
+  auto& lbs_solver = lbs::lua_utils::GetSolverByHandle(solver_index, "chiLBSGetScalarFieldFunctionList");
 
   //============================================= Push up new table
   lua_newtable(L);
   int ff=-1;
   int count=0;
 
-  for (int g=0; g<lbs_solver->groups.size(); g++)
+  for (int g=0; g<lbs_solver.groups.size(); g++)
   {
-    for (int m=0; m<lbs_solver->num_moments; m++)
+    for (int m=0; m<lbs_solver.num_moments; m++)
     {
       ff++;
       if (m==0)
@@ -77,15 +82,21 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
         count++;
         lua_pushnumber(L,count);
         int pff_count = -1;
-        for (auto& pff : chi_physics_handler.fieldfunc_stack)
+        bool found = false;
+        for (auto& pff : chi::fieldfunc_stack)
         {
           ++pff_count;
-          if (pff == lbs_solver->field_functions[ff])
+          if (pff == lbs_solver.field_functions[ff])
           {
             lua_pushnumber(L,pff_count);
+            found = true;
             break;
           }
         }
+
+        if (not found)
+          throw std::logic_error(fname + ": Solver field functions not found "
+                                         "in global stack.");
         lua_settable(L,-3);
       }
     }

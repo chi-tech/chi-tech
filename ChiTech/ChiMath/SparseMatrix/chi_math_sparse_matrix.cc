@@ -1,7 +1,7 @@
 #include "chi_math_sparse_matrix.h"
 
-#include <chi_log.h>
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 #include <iomanip>
 #include <algorithm>
@@ -19,11 +19,10 @@ chi_math::SparseMatrix::SparseMatrix(size_t num_rows, size_t num_cols) :
 //###################################################################
 /**Copy constructor.*/
 chi_math::SparseMatrix::
-  SparseMatrix(const chi_math::SparseMatrix& in_matrix)
+  SparseMatrix(const chi_math::SparseMatrix& in_matrix) :
+  row_size(in_matrix.NumRows()),
+  col_size(in_matrix.NumCols())
 {
-  row_size = in_matrix.NumRows();
-  col_size = in_matrix.NumCols();
-
   rowI_values.resize(row_size, std::vector<double>());
   rowI_indices.resize(row_size, std::vector<size_t>());
 
@@ -32,7 +31,6 @@ chi_math::SparseMatrix::
     rowI_values[i] = (in_matrix.rowI_values[i]);
     rowI_indices[i] = (in_matrix.rowI_indices[i]);
   }
-
 }
 
 //###################################################################
@@ -43,11 +41,11 @@ void chi_math::SparseMatrix::Insert(size_t i, size_t j, double value)
 
   if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SparseMatrix::Insert encountered out of bounds,"
       << " i=" << i << " j=" << j
       << " bounds(" << row_size << "," << col_size << ")";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   auto relative_location = std::find(rowI_indices[i].begin(),
@@ -74,11 +72,11 @@ void chi_math::SparseMatrix::InsertAdd(size_t i, size_t j, double value)
 
   if ((i<0) || (i>=row_size) || (j<0) || (j>=col_size))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "SparseMatrix::Insert encountered out of bounds,"
       << " i=" << i << " j=" << j
       << " bounds(" << row_size << "," << col_size << ")";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   auto relative_location = std::find(rowI_indices[i].begin(),
@@ -107,10 +105,10 @@ void chi_math::SparseMatrix::SetDiagonal(const std::vector<double>& diag)
   //============================================= Check size
   if (diag.size() != rowI_values.size())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
     << "Incompatible matrix-vector size encountered "
     << "in call to SparseMatrix::SetDiagonal.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   //============================================= Assign values
@@ -142,11 +140,11 @@ double chi_math::SparseMatrix::ValueIJ(size_t i, size_t j) const
   double retval = 0.0;
   if ((i<0) || (i >= rowI_indices.size()))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Index i out of bounds"
       << " in call to SparseMatrix::ValueIJ"
       << " i=" << i;
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   if (not rowI_indices[i].empty())
@@ -210,7 +208,7 @@ void chi_math::SparseMatrix::Compress()
 
 //###################################################################
 /**Prints the sparse matrix to string.*/
-std::string chi_math::SparseMatrix::PrintS()
+std::string chi_math::SparseMatrix::PrintStr() const
 {
   std::stringstream out;
 
@@ -249,12 +247,40 @@ std::string chi_math::SparseMatrix::PrintS()
 
 //###################################################################
 /**Constructor with number of rows constructor.*/
-void chi_math::SparseMatrix::CheckInitialized()
+void chi_math::SparseMatrix::CheckInitialized() const
 {
   if (rowI_values.empty())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Illegal call to unitialized SparseMatrix matrix.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 }
+
+//###################################################################
+// Iterator routines
+namespace chi_math
+{
+  SparseMatrix::RowIteratorContext SparseMatrix::Row(size_t row_id)
+  {return {*this, row_id};}
+
+  SparseMatrix::ConstRowIteratorContext SparseMatrix::Row(size_t row_id) const
+  {return {*this, row_id};}
+
+  SparseMatrix::EntriesIterator SparseMatrix::begin()
+  {
+    //Find first non-empty row
+    size_t nerow = row_size; //nerow = non-empty row
+    for (size_t r=0; r<row_size; ++r)
+      if (not rowI_indices[r].empty())
+      { nerow = r;break;}
+
+    return EntriesIterator(*this, nerow);
+  }
+
+  SparseMatrix::EntriesIterator SparseMatrix::end()
+  {return EntriesIterator(*this, row_size);}
+}
+
+
+

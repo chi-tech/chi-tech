@@ -14,6 +14,8 @@
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "PointSource/lbs_point_source.h"
+#include "Groupset/lbs_group.h"
+#include "Groupset/lbs_groupset.h"
 
 #include <petscksp.h>
 
@@ -77,7 +79,7 @@ public:
   std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> matid_to_xs_map;
   std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> matid_to_src_map;
 
-  std::shared_ptr<SpatialDiscretization> discretization = nullptr;
+  std::shared_ptr<chi_math::SpatialDiscretization> discretization = nullptr;
   chi_mesh::MeshContinuumPtr grid;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings;
   std::vector<lbs::CellLBSView> cell_transport_views;
@@ -104,6 +106,9 @@ public:
   std::vector<double> precursor_new_local;
 
  public:
+  SteadySolver (const SteadySolver&) = delete;
+  SteadySolver& operator= (const SteadySolver&) = delete;
+
   //00
   explicit SteadySolver(const std::string& in_text_name);
   ~SteadySolver() override =default;

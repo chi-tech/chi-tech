@@ -4,7 +4,7 @@
 #include "lbkes_lua_utils.h"
 
 #include <chi_log.h>
-extern ChiLog& chi_log;
+;
 
 #define MAX_ITERATIONS  1
 #define TOLERANCE       2
@@ -21,7 +21,7 @@ int chiLBKESSetProperty(lua_State *L)
 
   LuaCheckNilValue(__FUNCTION__, L, 1);
   int solver_index = lua_tonumber(L, 1);
-  auto solver = lbs::k_eigenvalue_lua_utils::
+  auto& solver = lbs::k_eigenvalue_lua_utils::
   GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Get property index
@@ -36,16 +36,16 @@ int chiLBKESSetProperty(lua_State *L)
 
     if (max_iters <= 0)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << __FUNCTION__ << ": Invalid max_iterations value. "
           << "Must be greater than 0.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
-    solver->max_iterations = static_cast<size_t>(max_iters);
+    solver.max_iterations = static_cast<size_t>(max_iters);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
         << "LinearBoltzmann::KEigenvalueSolver: "
-        << "max_iterations set to " << solver->max_iterations << ".";
+        << "max_iterations set to " << solver.max_iterations << ".";
   }
 
   else if (property == TOLERANCE)
@@ -55,25 +55,25 @@ int chiLBKESSetProperty(lua_State *L)
 
     if (tol < 0.0 or tol > 1.0)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
           << __FUNCTION__ << ": Invalid value for tolerance. "
           << "Must be in the range (0.0, 1.0].";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
-    solver->tolerance = tol;
+    solver.tolerance = tol;
 
     char buff[100];
     sprintf(buff, "%.4e", tol);
 
-    chi_log.Log(LOG_0)
+    chi::log.Log()
         << "LinearBoltzmann::KEigenvalueSolver: "
         << "tolerance set to " << buff << ".";
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
         << __FUNCTION__ << ": Invalid property index.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }

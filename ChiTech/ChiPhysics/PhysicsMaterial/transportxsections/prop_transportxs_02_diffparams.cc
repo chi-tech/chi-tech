@@ -1,8 +1,10 @@
 #include "material_property_transportxsections.h"
+#include "chi_runtime.h"
+#include "chi_log.h"
 
 #include <ChiLog/chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 {
@@ -36,7 +38,7 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     if (sigs_g_1 >= sigma_t[g])
     {
       sigs_g_1 = 0.0;
-      chi_log.Log(LOG_0WARNING)
+      chi::log.Log0Warning()
         << "Transport corrected diffusion coefficient failed for group "
         << g << " in call to "
         << "chi_physics::TransportCrossSections::ComputeDiffusionParameters."
@@ -61,7 +63,7 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
   }//for g
 
   //======================================== Compute two grid energy collapse
-  chi_log.Log(LOG_0) << "Performing Energy collapse.";
+  chi::log.Log() << "Performing Energy collapse.";
   EnergyCollapse(xi_Jfull, D_jfull, sigma_a_jfull, E_COLLAPSE_JACOBI);
   EnergyCollapse(xi_Jpart, D_jpart, sigma_a_jpart, E_COLLAPSE_PARTIAL_JACOBI);
 

@@ -2,9 +2,7 @@
 
 #include"../Solver/diffusion_solver.h"
 
-#include"ChiPhysics/chi_physics.h"
-
-extern ChiPhysics&  chi_physics_handler;
+#include "chi_runtime.h"
 
 
 //#############################################################################
@@ -18,18 +16,12 @@ extern ChiPhysics&  chi_physics_handler;
 int chiDiffusionInitialize(lua_State *L)
 {
   int solver_index = lua_tonumber(L,1);
-  chi_diffusion::Solver* solver;
 
-  try{
-    solver = (chi_diffusion::Solver*)chi_physics_handler.solver_stack.at(solver_index);
-  }
-  catch(const std::out_of_range& o){
-    std::cerr << "ERROR: Invalid solver handle." << std::endl;
-    exit(EXIT_FAILURE);
-  }
+  auto& solver = chi::GetStackItem<chi_diffusion::Solver>(chi::solver_stack,
+                                                          solver_index,
+                                                          __FUNCTION__);
 
-  bool success=false;
-  success = solver->Initialize(true);
+  bool success = solver.Initialize(true);
 
   lua_pushnumber(L,success);
   return 1;

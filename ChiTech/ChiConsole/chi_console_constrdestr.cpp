@@ -1,4 +1,5 @@
-#include "chi_console.h"
+
+#include "ChiConsole/chi_console.h"
 
 #include "ChiMath/lua/chi_math_lua.h"
 #include "ChiMesh/lua/chi_mesh_lua.h"
@@ -11,7 +12,7 @@
 
 //############################################################################# Default constructor
 /** Default constructor for the console*/
-ChiConsole::ChiConsole() noexcept
+chi_objects::ChiConsole::ChiConsole() noexcept
 {
 	//========================================== Initializing console
 	consoleState = luaL_newstate();

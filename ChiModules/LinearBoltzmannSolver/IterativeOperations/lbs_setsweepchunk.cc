@@ -1,5 +1,7 @@
 #include "../lbs_linear_boltzmann_solver.h"
 #include "../SweepChunks/lbs_sweepchunk_pwl.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
+
 
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
 
@@ -9,7 +11,7 @@ std::shared_ptr<SweepChunk> lbs::SteadySolver::
   SetSweepChunk(LBSGroupset& groupset)
 {
   auto pwl_sdm =
-    std::dynamic_pointer_cast<SpatialDiscretization_PWLD>(discretization);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
 
   //================================================== Setting up required
   //                                                   sweep chunks

@@ -2,10 +2,11 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
+;
+
 
 #include <sys/stat.h>
 #include <fstream>
@@ -20,13 +21,13 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
   Stat st;
 
   //======================================== Make sure folder exists
-  if (chi_mpi.location_id == 0)
+  if (chi::mpi.location_id == 0)
   {
     if (stat(folder_name.c_str(),&st) != 0) //if not exist, make it
       if ( (mkdir(folder_name.c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0) and
            (errno != EEXIST) )
       {
-        chi_log.Log(LOG_0WARNING)
+        chi::log.Log0Warning()
           << "Failed to create restart directory: " << folder_name;
         return;
       }
@@ -41,7 +42,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  sprintf(location_cstr,"%d.r",chi_mpi.location_id);
+  sprintf(location_cstr,"%d.r",chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);
@@ -51,7 +52,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
 
   if (not ofile.is_open())
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Failed to create restart file: " << file_name;
     ofile.close();
     location_succeeded = false;
@@ -79,12 +80,12 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
 
   //======================================== Write status message
   if (global_succeeded)
-    chi_log.Log(LOG_0)
+    chi::log.Log()
       << "Successfully wrote restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
   else
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Failed to write restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");
@@ -104,7 +105,7 @@ void lbs::SteadySolver::ReadRestartData(std::string folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  sprintf(location_cstr,"%d.r",chi_mpi.location_id);
+  sprintf(location_cstr,"%d.r",chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);
@@ -163,9 +164,9 @@ void lbs::SteadySolver::ReadRestartData(std::string folder_name,
 
   //======================================== Write status message
   if (global_succeeded)
-    chi_log.Log(LOG_0) << "Successfully read restart data";
+    chi::log.Log() << "Successfully read restart data";
   else
-    chi_log.Log(LOG_0ERROR)
+    chi::log.Log0Error()
       << "Failed to read restart data: "
       << folder_name + std::string("/") +
          file_base + std::string("X.r");

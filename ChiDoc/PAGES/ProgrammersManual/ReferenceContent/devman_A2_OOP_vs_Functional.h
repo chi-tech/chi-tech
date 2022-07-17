@@ -6,7 +6,7 @@
 ### <CENTER>Chi-Tech uses a healthy balance between OOP and FP</CENTER>
 
 The fundamental language with which a human provides instructions to a
- computer has always been <B>assembly language</B>. This language,
+ computer has always been **assembly language**. This language,
  which was pioneered halfway through the 20th century, is specific to
  a computer architecture and became the lowest level of programming that
  rose above simply supplying bytes of binary code to the computer.
@@ -18,15 +18,14 @@ Assembly language comprises combinations of keywords and/or numbers to
  stringing together numerous instructions the complexity of a human
  thought-process could be made repeatable by a computer, however, the
  process of generating assembly language programs quickly became tedious.
- It did not take long before mankind comprehended the need for ``packaging"
- multiple instructions into <B>macros</B>, which could be reused and
+ It did not take long before mankind comprehended the need for "packaging"
+ multiple instructions into **macros**, which could be reused and
  hence the modern programming language was born where macros are
  standardized and collected into higher level languages
  (i.e., FORTRAN, C, etc).
 
-
-In the 1950s scientific programming revolved around
- <B>block programming</B>, a programming paradigm where
+In the 1950s scientific programming revolved around **block programming**,
+ a programming paradigm where
  thought-processes are arranged as blocks that creates-,
  transforms- or uses data. This era of programming also included
  the use of the famous "GOTO" statement which led to the concept
@@ -38,13 +37,13 @@ In the 1950s scientific programming revolved around
  human mind to maintain scope and in many cases programmers would find
  themselves having trouble comprehending programs that they wrote a
  few weeks or months ago. These problems were greatly reduced with
- the advent of <B>structured programming</B> where the flow of the
+ the advent of **structured programming** where the flow of the
  program is controlled by means of control blocks like if/then/else
  statements within which blocks of code, called "functions", could
  be executed. This aligned well with the industrial era where procedures
  could be regarded as stand-alone parts and the overall flow of the program
  could be visualized by a process diagram. The general term used
- today is <B>functional programming</B> (FP) and is very effective
+ today is **functional programming** (FP) and is very effective
  for certain algorithms.
 
 
@@ -56,14 +55,14 @@ The general motivation for functional programming stemmed from a
  difficult task, especially when "GOTO" statements constantly interrupted
  the linear flow of a program. Functional programming overcame this
  difficulty by defining stand-alone procedures that had predefined inputs
- and outputs along with a concept called <B>local scope</B>, which is
+ and outputs along with a concept called **local scope**, which is
  a tremendous improvement that allowed much flexibility with variable
  names and allowed the programmer to remove the dependence on global data.
  This paradigm is still very much valid today and greatly improved the
  process of code development.
 
 
-Another programming paradigm, called <B>object oriented programming</B>
+Another programming paradigm, called **object oriented programming**
  (OOP), was created in the 1960s to allow programmers to structure
  their code as objects that interact with each other. It ushered-in
  an era where the complexity of a computer programming could be limitless
@@ -80,12 +79,12 @@ Another programming paradigm, called <B>object oriented programming</B>
  modifications became near impossible.
 
 OOP allows for the implementation of advanced concepts some of them
- plagued with tremendously detrimental risk. Concepts such as inheritance
- and encapsulation offered many rewards whilst simultaneously introducing
- problems.
+plagued with tremendously risk. Concepts such as inheritance
+and encapsulation offered many rewards whilst simultaneously introducing
+problems.
 
-<B>Inheritance</B> allows one to define a parent class of objects,
- with associated procedures called methods, that provide basic
+<b>Inheritance</b> allows one to define a parent class of objects,
+with associated procedures called methods, that provide basic
  functionality that can be used or specialized by child classes.
  A typical example is a parent class "solver" specialized
  into "diffusion-solver" or "transport-solver". The concept is
@@ -95,7 +94,7 @@ OOP allows for the implementation of advanced concepts some of them
  to "program" their code into a corner, from which there is no escape
  other than to refactor large portions of
  architecture (if not the whole architecture). In scientific programs,
- that need to solve a multitude of different kinds of problems,
+ where we need to solve a multitude of different kinds of problems,
  inheritance can create such a large hierarchical depth that the
  program becomes very dependent on the programmer's knowledge of
  the underlying architecture and less on the actual knowledge of
@@ -108,8 +107,8 @@ OOP allows for the implementation of advanced concepts some of them
  inheritance in order to minimize the hierarchical depth of the
  architecture.
 
-<B>Encapsulation</B> allows certain data items of an object to
- be <B>private</B> and therefore protected from incorrect
+<b>Encapsulation</b> allows certain data items of an object to
+ be **private** and therefore protected from incorrect
  manipulation. It has provided great utility and will be a key
  feature for many applications but unfortunately the concept also
  fuels the over-engineering of data structures. This is because

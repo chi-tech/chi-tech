@@ -1,4 +1,5 @@
 #include "chi_ffinter_volume.h"
+
 #include <ChiMesh/Cell/cell.h>
 #include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h>
 
@@ -59,7 +60,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 void chi_mesh::FieldFunctionInterpolationVolume::
   CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping)
 {
-  auto& discretization = static_cast<SpatialDiscretization_PWLD&>(
+  auto& discretization = static_cast<chi_math::SpatialDiscretization_PWLD&>(
                          *field_functions[0]->spatial_discretization);
 
   int counter=-1;
@@ -131,7 +132,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::
 void chi_mesh::FieldFunctionInterpolationVolume::
   PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping)
 {
-  auto& discretization = static_cast<SpatialDiscretization_PWLD&>(
+  auto& discretization = static_cast<chi_math::SpatialDiscretization_PWLD&>(
                          *field_functions[0]->spatial_discretization);
 
   int counter=-1;

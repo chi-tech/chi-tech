@@ -1,31 +1,22 @@
 #include "ChiMesh/chi_mesh.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/LineMesh/chi_linemesh.h"
-#include "ChiMesh/Boundary/chi_boundary.h"
-#include "ChiMesh/Region/chi_region.h"
-#include "ChiMesh/SurfaceMesher/PassThrough/surfmesher_passthrough.h"
+#include "ChiMesh/SurfaceMesher/Predefined/surfmesher_predefined.h"
 #include "ChiMesh/VolumeMesher/PredefinedUnpartitioned/volmesher_predefunpart.h"
 
 #include "ChiMesh/UnpartitionedMesh/chi_unpartitioned_mesh.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Creates a 1D slab mesh from a set of vertices.*/
-void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
+size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 {
-  //======================================== Checks if vertices are empty
-  if (vertices.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chi_mesh::CreateUnpartitioned1DOrthoMesh. Empty vertex list.";
-    exit(EXIT_FAILURE);
-  }
+  ChiLogicalError(vertices.empty(), "Empty vertex list.")
 
   //======================================== Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Reorient 1D verts along z
   std::vector<double> distances;
@@ -46,6 +37,8 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
+
+  umesh->attributes = DIMENSION_1 | ORTHOGONAL;
 
   //======================================== Create vertices
   umesh->vertices.reserve(zverts.size());
@@ -74,18 +67,18 @@ void chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler->unpartitionedmesh_stack.push_back(umesh);
 
-  //======================================== Create region
-  auto region = new chi_mesh::Region;
-
-  handler->region_stack.push_back(region);
+  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
+  chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler->surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler->volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
+  handler.volume_mesher = std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
 
-  handler->surface_mesher->Execute();
+  handler.surface_mesher->Execute();
+
+  return chi::unpartitionedmesh_stack.size()-1;
 }
 
 //###################################################################
@@ -101,23 +94,20 @@ chi_mesh::CreateUnpartitioned2DOrthoMesh(vertices_x,vertices_y);
 This code will create a 2x2 mesh with \f$ \vec{x} \in [0,2]^2 \f$.
 
  */
-void chi_mesh::CreateUnpartitioned2DOrthoMesh(
+size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   std::vector<double>& vertices_1d_x,
   std::vector<double>& vertices_1d_y)
 {
-  //======================================== Checks if vertices are empty
-  if (vertices_1d_x.empty() or vertices_1d_y.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chi_mesh::CreateUnpartitioned2DOrthoMesh. Empty vertex list.";
-    exit(EXIT_FAILURE);
-  }
+  ChiLogicalError(vertices_1d_x.empty() or vertices_1d_y.empty(),
+                  "Empty vertex list.")
 
   //======================================== Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
+
+  umesh->attributes = DIMENSION_2 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
@@ -168,18 +158,18 @@ void chi_mesh::CreateUnpartitioned2DOrthoMesh(
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler->unpartitionedmesh_stack.push_back(umesh);
 
-  //======================================== Create region
-  auto region = new chi_mesh::Region;
-
-  handler->region_stack.push_back(region);
+  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
+  chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler->surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler->volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
+  handler.volume_mesher = std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
 
-  handler->surface_mesher->Execute();
+  handler.surface_mesher->Execute();
+
+  return chi::unpartitionedmesh_stack.size()-1;
 }
 
 //###################################################################
@@ -196,26 +186,22 @@ chi_mesh::CreateUnpartitioned3DOrthoMesh(vertices_x,vertices_y,vertices_z);
 This code will create a 2x2 mesh with \f$ \vec{x} \in [0,2]^2 \f$.
 
  */
-void chi_mesh::CreateUnpartitioned3DOrthoMesh(
+size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   std::vector<double>& vertices_1d_x,
   std::vector<double>& vertices_1d_y,
   std::vector<double>& vertices_1d_z)
 {
-  //======================================== Checks if vertices are empty
-  if (vertices_1d_x.empty() or
-      vertices_1d_y.empty() or
-      vertices_1d_z.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "chi_mesh::CreateUnpartitioned3DOrthoMesh. Empty vertex list.";
-    exit(EXIT_FAILURE);
-  }
+  ChiLogicalError(vertices_1d_x.empty() or
+                  vertices_1d_y.empty() or
+                  vertices_1d_z.empty(), "Empty vertex list.")
 
   //======================================== Get current mesh handler
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
   auto umesh = new chi_mesh::UnpartitionedMesh();
+
+  umesh->attributes = DIMENSION_3 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
@@ -339,16 +325,16 @@ void chi_mesh::CreateUnpartitioned3DOrthoMesh(
 
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
-  handler->unpartitionedmesh_stack.push_back(umesh);
 
-  //======================================== Create region
-  auto region = new chi_mesh::Region;
-
-  handler->region_stack.push_back(region);
+  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
+  chi::unpartitionedmesh_stack.push_back(p_umesh);
 
   //======================================== Create meshers
-  handler->surface_mesher = new chi_mesh::SurfaceMesherPassthrough;
-  handler->volume_mesher = new chi_mesh::VolumeMesherPredefinedUnpartitioned;
+  handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
+  handler.volume_mesher = std::make_shared<
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
 
-  handler->surface_mesher->Execute();
+  handler.surface_mesher->Execute();
+
+  return chi::unpartitionedmesh_stack.size()-1;
 }

@@ -2,8 +2,8 @@
 
 #include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /**Performs a simple Riemann integral of a base functor.*/
@@ -114,7 +114,7 @@ TestIntegration(int test_case, double ref_solution, int RiemannN)
   sprintf(buff2,"Error_RQ%05d_%06d: %2d %f %e\n",Nd,Nd*8,
          initial_level,h,std::fabs((I_riemann - I_quadrature)/ref_solution));
 
-  chi_log.Log(LOG_0) << buff0;
-  chi_log.Log(LOG_0) << buff1;
-  chi_log.Log(LOG_0) << buff2;
+  chi::log.Log() << buff0;
+  chi::log.Log() << buff1;
+  chi::log.Log() << buff2;
 }

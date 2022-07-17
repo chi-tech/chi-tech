@@ -1,10 +1,9 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "../lbs_linear_boltzmann_solver.h"
-
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog&     chi_log;
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 //###################################################################
 /**Writes the angular fluxes of a LBS groupset to file.
@@ -35,23 +34,23 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << __FUNCTION__;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
-  lbs_solver->WriteGroupsetAngularFluxes(*groupset, file_base);
+  lbs_solver.WriteGroupsetAngularFluxes(*groupset, file_base);
 
   return 0;
 }
@@ -85,23 +84,23 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   std::string file_base = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_index, __FUNCTION__);
 
   //============================================= Obtain pointer to groupset
-  LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver->groupsets.at(grpset_index);
+    groupset = &lbs_solver.groupsets.at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Invalid handle to groupset "
       << "in call to " << __FUNCTION__;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
-  lbs_solver->ReadGroupsetAngularFluxes(*groupset, file_base);
+  lbs_solver.ReadGroupsetAngularFluxes(*groupset, file_base);
 
   return 0;
 }

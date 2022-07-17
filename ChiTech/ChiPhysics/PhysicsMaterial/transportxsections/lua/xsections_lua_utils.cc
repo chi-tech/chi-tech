@@ -1,19 +1,20 @@
 #include "ChiLua/chi_lua.h"
 #include<iostream>
-#include "ChiPhysics/chi_physics.h"
+
+#include "chi_runtime.h"
+
+#include "ChiPhysics/chi_physics_namespace.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
-extern ChiPhysics&  chi_physics_handler;
-
-#include <chi_log.h>
-
-extern ChiLog& chi_log;
+#include "chi_runtime.h"
+#include "chi_log.h"
+;
 
 //###################################################################
 /**Creates a stand-alone transport cross-section.
  *
  *
-\ingroup LuaPhysicsMaterials
+
 
 \code
 xs_grph_clean = chiPhysicsTransportXSCreate()
@@ -26,14 +27,15 @@ chiPhysicsMaterialSetProperty(materials[2],
 \endcode
  * \return Returns a handle to the cross-section.
  *
- * */
+\ingroup LuaTransportXSs
+ */
 int chiPhysicsTransportXSCreate(lua_State* L)
 {
   auto xs = std::make_shared<chi_physics::TransportCrossSections>();
 
-  chi_physics_handler.trnsprt_xs_stack.push_back(xs);
+  chi::trnsprt_xs_stack.push_back(xs);
 
-  size_t index = chi_physics_handler.trnsprt_xs_stack.size()-1;
+  const size_t index = chi::trnsprt_xs_stack.size()-1;
 
   lua_pushinteger(L,static_cast<lua_Integer>(index));
   return 1;
@@ -100,7 +102,7 @@ chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
 \endcode
  *
  *
-\ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  * \return */
 int chiPhysicsTransportXSSet(lua_State* L)
 {
@@ -109,7 +111,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   if (num_args < 3)
   {
     LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   LuaCheckNilValue("chiPhysicsTransportXSSet",L,1);
@@ -120,14 +122,14 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to chiPhysicsTransportXSSet."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //========================== Process operation
@@ -177,11 +179,11 @@ int chiPhysicsTransportXSSet(lua_State* L)
   }
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Unsupported operation in "
       << "chiPhysicsTransportXSSet. " << operation_index
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
   return 0;
 }
@@ -200,7 +202,7 @@ for i,v in pairs(xs) do
     print(i,v)
 end
 \endcode
- * */
+\ingroup LuaTransportXSs*/
 int chiPhysicsTransportXSGet(lua_State* L)
 {
   int num_args = lua_gettop(L);
@@ -208,7 +210,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
   if (num_args < 1)
   {
     LuaPostArgAmountError(__FUNCTION__,1,num_args);
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   LuaCheckNilValue(__FUNCTION__,L,1);
@@ -217,14 +219,14 @@ int chiPhysicsTransportXSGet(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   xs->PushLuaTable(L);
@@ -266,7 +268,7 @@ chiPhysicsMaterialSetProperty(materials[1],
  \return Returns a handle to another cross-section object that contains the
          desired combination.
 
- \ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  */
 int chiPhysicsTransportXSMakeCombined(lua_State* L)
 {
@@ -276,10 +278,10 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
   if (!lua_istable(L,1))
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "In call to chiPhysicsMakeCombinedTransportXS: "
       << "Argument must be a lua table.";
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   size_t table_len = lua_rawlen(L,1);
@@ -295,11 +297,11 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
     if (!lua_istable(L,-1))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "In call to chiPhysicsMakeCombinedTransportXS: "
         << "The elements of the supplied table must themselves also"
            "be lua tables of the xs handle and its scalar multiplier.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     lua_pushinteger(L,1);
@@ -319,9 +321,9 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
   }
 
   //======================================== Print out table
-  chi_log.Log(LOG_0) << "Generating XS with following combination:";
+  chi::log.Log() << "Generating XS with following combination:";
   for (auto& elem : combinations)
-    chi_log.Log(LOG_0) << "  Element handle: " << elem.first
+    chi::log.Log() << "  Element handle: " << elem.first
                        << " scalar value: " << elem.second;
 
   //======================================== Make the new cross-section
@@ -329,9 +331,9 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 
   new_xs->MakeCombined(combinations);
 
-  chi_physics_handler.trnsprt_xs_stack.push_back(new_xs);
+  chi::trnsprt_xs_stack.push_back(new_xs);
   lua_pushinteger(L,
-      static_cast<lua_Integer>(chi_physics_handler.trnsprt_xs_stack.size())-1);
+      static_cast<lua_Integer>(chi::trnsprt_xs_stack.size())-1);
 
   return 1;
 }
@@ -366,7 +368,7 @@ chiPhysicsTransportXSSetCombined(xs_4,combo)
 
 \endcode
  *
- * \ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  * */
 int chiPhysicsTransportXSSetCombined(lua_State* L)
 {
@@ -375,7 +377,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   if (num_args < 2)
   {
     LuaPostArgAmountError(__FUNCTION__,2,num_args);
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   LuaCheckNilValue(__FUNCTION__,L,1);
@@ -387,14 +389,14 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(xs_handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, xs_handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Process table
@@ -410,11 +412,11 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 
     if (!lua_istable(L,-1))
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "In call to " << __FUNCTION__ << ": "
         << "The elements of the supplied table must themselves also"
            "be lua tables of the xs handle and its scalar multiplier.";
-      exit(EXIT_FAILURE);
+      chi::Exit(EXIT_FAILURE);
     }
 
     lua_pushinteger(L,1);
@@ -434,9 +436,9 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   }
 
   //======================================== Print out table
-  chi_log.Log(LOG_0) << "Setting XS with following combination:";
+  chi::log.Log() << "Setting XS with following combination:";
   for (auto& elem : combinations)
-    chi_log.Log(LOG_0) << "  Element handle: " << elem.first
+    chi::log.Log() << "  Element handle: " << elem.first
                        << " scalar value: " << elem.second;
 
   xs->MakeCombined(combinations);
@@ -450,7 +452,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 \param XS_handle int Handle to the cross-section to be exported.
 \param file_name string The name of the file to which the XS is to be exported.
 
-* \ingroup LuaPhysicsMaterials
+\ingroup LuaTransportXSs
  */
 int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 {
@@ -467,14 +469,14 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 
   std::shared_ptr<chi_physics::TransportCrossSections> xs;
   try {
-    xs = chi_physics_handler.trnsprt_xs_stack.at(handle);
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, handle);
   }
   catch(const std::out_of_range& o){
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "ERROR: Invalid cross-section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
-    exit(EXIT_FAILURE);
+    chi::Exit(EXIT_FAILURE);
   }
 
   std::string file_name = lua_tostring(L,2);

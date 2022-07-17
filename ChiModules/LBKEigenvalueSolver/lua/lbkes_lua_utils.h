@@ -24,7 +24,7 @@ namespace lbs
      *                              should uniquely identify the calling function.
      *
      */
-    lbs::KEigenvalueSolver* GetSolverByHandle(
+    lbs::KEigenvalueSolver& GetSolverByHandle(
         int handle, const std::string& calling_function_name);
 
     void RegisterLuaEntities(lua_State *L);

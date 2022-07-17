@@ -5,75 +5,49 @@
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Region//chi_region.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-extern ChiLog& chi_log;
-extern ChiMPI& chi_mpi;
-
 #include "ChiTimer/chi_timer.h"
-extern ChiTimer chi_program_timer;
-
 #include "ChiConsole/chi_console.h"
-extern ChiConsole&   chi_console;
 
 //###################################################################
 /**Executes the predefined3D mesher.*/
 void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 {
-  chi_log.Log(LOG_0)
-    << chi_program_timer.GetTimeString()
+  chi::log.Log()
+    << chi::program_timer.GetTimeString()
     << " VolumeMesherPredefinedUnpartitioned executing. Memory in use = "
-    << chi_console.GetMemoryUsageInMB() << " MB"
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB"
     << std::endl;
-
-  //======================================== Get the current handler
-  auto mesh_handler = chi_mesh::GetCurrentHandler();
-
-  //======================================== Check empty region list
-  if (mesh_handler->region_stack.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "VolumeMesherPredefinedUnpartitioned: No region added.";
-    exit(EXIT_FAILURE);
-  }
-
-  //======================================== Check unpartitioned mesh available
-  if (mesh_handler->unpartitionedmesh_stack.empty())
-  {
-    chi_log.Log(LOG_ALLERROR)
-      << "VolumeMesherPredefinedUnpartitioned: "
-         "No unpartitioned mesh to operate on.";
-    exit(EXIT_FAILURE);
-  }
 
   //======================================== Check partitioning params
   if (options.partition_type == KBA_STYLE_XYZ)
   {
-    int Px = mesh_handler->volume_mesher->options.partition_x;
-    int Py = mesh_handler->volume_mesher->options.partition_y;
-    int Pz = mesh_handler->volume_mesher->options.partition_z;
+    int Px = this->options.partition_x;
+    int Py = this->options.partition_y;
+    int Pz = this->options.partition_z;
 
     int desired_process_count = Px*Py*Pz;
 
-    if (desired_process_count != chi_mpi.process_count)
+    if (desired_process_count != chi::mpi.process_count)
     {
-      chi_log.Log(LOG_ALLERROR)
+      chi::log.LogAllError()
         << "ERROR: Number of processors available ("
-        << chi_mpi.process_count <<
+        << chi::mpi.process_count <<
         ") does not match amount of processors "
         "required by partitioning parameters ("
         << desired_process_count << ").";
-      exit(EXIT_FAILURE);
+     chi::Exit(EXIT_FAILURE);
     }
   }
 
   //======================================== Get unpartitioned mesh
-  auto umesh = mesh_handler->unpartitionedmesh_stack.back();
+  auto umesh = m_umesh;
 
-  chi_log.Log(LOG_0) << "Computed centroids";
+  chi::log.Log() << "Computed centroids";
   MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -107,21 +81,15 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
 
   grid->SetGlobalVertexCount(umesh->vertices.size());
 
-  chi_log.Log(LOG_0) << "Cells loaded.";
+  chi::log.Log() << "Cells loaded.";
   MPI_Barrier(MPI_COMM_WORLD);
 
-  AddContinuumToRegion(grid, *mesh_handler->region_stack.back());
-
+  SetContinuum(grid);
+  SetGridAttributes(umesh->attributes);
 
   //======================================== Concluding messages
-//  chi_log.Log(LOG_0)
-//    << "VolumeMesherPredefinedUnpartitioned: Number of nodes in region = "
-//    << grid->vertices.size()
-//    << std::endl;
-//  grid->vertices.shrink_to_fit();
-
-  chi_log.Log(LOG_ALLVERBOSE_1)
-    << "### LOCATION[" << chi_mpi.location_id
+  chi::log.LogAllVerbose1()
+    << "### LOCATION[" << chi::mpi.location_id
     << "] amount of local cells="
     << grid->local_cell_glob_indices.size();
 
@@ -135,7 +103,7 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
                 MPI_SUM,
                 MPI_COMM_WORLD);
 
-  chi_log.Log(LOG_0)
+  chi::log.Log()
     << "VolumeMesherPredefinedUnpartitioned: Cells created = "
     << total_global_cells
     << std::endl;

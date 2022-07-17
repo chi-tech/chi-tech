@@ -2,9 +2,8 @@
 #include "LegendrePoly/legendrepoly.h"
 #include <cmath>
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-
-extern ChiLog& chi_log;
 
 #include <algorithm>
 
@@ -52,7 +51,7 @@ chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
     default:
     {
       if (verbose)
-        chi_log.Log() << "Initializing Gauss-Legendre Quadrature "
+        chi::log.Log() << "Initializing Gauss-Legendre Quadrature "
                          "with " << N << " q-points";
 
       //========================= Compute the roots
@@ -69,7 +68,7 @@ chi_math::QuadratureGaussLegendre::Initialize(unsigned int N, bool verbose,
            Legendre(N+1, qpoints[k][0]) * Legendre(N + 1, qpoints[k][0]) );
 
         if (verbose)
-          chi_log.Log(LOG_0)
+          chi::log.Log()
             << "root[" << k << "]=" << qpoints[k][0]
             << ", weight=" << weights[k];
       }//for abscissae
@@ -117,7 +116,7 @@ std::vector<double> chi_math::QuadratureGaussLegendre::FindRoots(
   if (N>2056)
   {
     num_search_intvls *= 10;
-    chi_log.Log(LOG_0WARNING)
+    chi::log.Log0Warning()
       << "chi_math::QuadratureGaussLegendre::FindRoots: "
       << "The order of the polynomial for which to find the roots is "
       << "greater than 2056. Accuracy of the root finder will be diminished "

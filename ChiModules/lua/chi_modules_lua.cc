@@ -10,7 +10,7 @@ void chi_modules::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   lbs::lua_utils::RegisterLuaEntities(L);
   diffusion_solver::lua_utils::RegisterLuaEntities(L);
-  LBSCurvilinear::lua_utils::RegisterLuaEntities(L);
+  lbs_curvilinear::lua_utils::RegisterLuaEntities(L);
   lbs::k_eigenvalue_lua_utils::RegisterLuaEntities(L);
   lbs_adjoint::lua_utils::RegisterLuaEntities(L);
 }

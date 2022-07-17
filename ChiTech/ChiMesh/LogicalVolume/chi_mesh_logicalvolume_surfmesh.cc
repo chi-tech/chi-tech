@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "chi_mesh_logicalvolume.h"
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
@@ -6,17 +8,17 @@
 //###################################################################
 /**Constructor to compute bound box information.*/
 chi_mesh::SurfaceMeshLogicalVolume::
-  SurfaceMeshLogicalVolume(chi_mesh::SurfaceMesh *in_surf_mesh) :
+  SurfaceMeshLogicalVolume(SurfaceMeshPtr in_surf_mesh) :
   xbounds({1.0e6,-1.0e6}),
   ybounds({1.0e6,-1.0e6}),
   zbounds({1.0e6,-1.0e6}),
-  surf_mesh(in_surf_mesh)
+  surf_mesh(std::move(in_surf_mesh))
 {
-  for (size_t v=0; v<surf_mesh->vertices.size(); v++)
+  for (auto & vertice : surf_mesh->vertices)
   {
-    double x = surf_mesh->vertices[v].x;
-    double y = surf_mesh->vertices[v].y;
-    double z = surf_mesh->vertices[v].z;
+    double x = vertice.x;
+    double y = vertice.y;
+    double z = vertice.z;
 
     if (x < xbounds[0]) xbounds[0] = x;
     if (y < ybounds[0]) ybounds[0] = y;
@@ -53,14 +55,14 @@ bool chi_mesh::SurfaceMeshLogicalVolume::
   // If it does then .. bonus .. we don't need to do
   // anything more because the surface is probably convex.
   bool cheap_pass = true; // now try to disprove
-  for (size_t f=0; f<surf_mesh->faces.size(); f++)
+  for (auto & face : surf_mesh->faces)
   {
-    chi_mesh::Vector3 fc      = surf_mesh->faces[f].face_centroid;
+    chi_mesh::Vector3 fc      = face.face_centroid;
     chi_mesh::Vector3 p_to_fc = fc - point;
 
     p_to_fc = p_to_fc/p_to_fc.Norm();
 
-    double sense = p_to_fc.Dot(surf_mesh->faces[f].geometric_normal);
+    double sense = p_to_fc.Dot(face.geometric_normal);
 
     if (sense < (0.0-tolerance))
     {

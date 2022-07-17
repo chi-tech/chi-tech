@@ -4,10 +4,11 @@
 #include "ChiMesh/Cell/cell.h"
 
 #include "chi_mpi.h"
+#include "chi_runtime.h"
 #include "chi_log.h"
 
-extern ChiMPI& chi_mpi;
-extern ChiLog& chi_log;
+
+;
 
 //###################################################################
 /**Export cells to python.*/
@@ -21,7 +22,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
   if (of==NULL)
   {
     fprintf(stdout,"Could not open file %s\n",fileName);
-    chi_log.Log(LOG_ALLWARNING) << "Could not open file: "
+    chi::log.LogAllWarning() << "Could not open file: "
                                 << std::string(fileName);
     return;
   }
@@ -70,7 +71,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           else
           {
             auto& adj_cell = cells[cell.faces[f].neighbor_id];
-            if (adj_cell.partition_id != chi_mpi.location_id)
+            if (adj_cell.partition_id != chi::mpi.location_id)
             {
               num_faces++;
             }
@@ -83,7 +84,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
     }
   }
 
-  chi_log.Log(LOG_ALL) << "Number of faces to be exported = "
+  chi::log.LogAll() << "Number of faces to be exported = "
                             << num_faces;
 
   //============================================= Parse faces
@@ -139,7 +140,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
           else
           {
             auto& adj_cell = cells[cell.faces[s].neighbor_id];
-            if (adj_cell.partition_id != chi_mpi.location_id)
+            if (adj_cell.partition_id != chi::mpi.location_id)
             {
               export_face = true;
             }

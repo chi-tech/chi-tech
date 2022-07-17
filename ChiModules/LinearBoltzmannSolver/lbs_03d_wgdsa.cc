@@ -1,12 +1,14 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include "../DiffusionSolver/Solver/diffusion_solver.h"
+#include "DiffusionSolver/Solver/diffusion_solver.h"
 
+#include "chi_runtime.h"
+
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+#include "Groupset/lbs_groupset.h"
+;
 
-#include "ChiPhysics/chi_physics.h"
-extern ChiPhysics&  chi_physics_handler;
 
 //###################################################################
 /**Initializes the Within-Group DSA solver. */
@@ -33,7 +35,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
       &delta_phi_local,                             //Data vector
       scalar_uk_man);                               //Unknown manager
 
-    chi_physics_handler.fieldfunc_stack.push_back(deltaphi_ff);
+    chi::fieldfunc_stack.push_back(deltaphi_ff);
     field_functions.push_back(deltaphi_ff);
 
     //================================= Set diffusion solver
@@ -41,7 +43,6 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
     auto dsolver = new chi_diffusion::Solver(solver_name);
     groupset.wgdsa_solver = dsolver;
 
-    dsolver->regions.push_back(this->regions.back());
     dsolver->discretization = discretization;
 
     dsolver->basic_options["discretization_method"].SetStringValue("PWLD_MIP_GAGG");
@@ -63,14 +64,14 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
       {
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryReflecting());
-        chi_log.Log(LOG_0VERBOSE_1)
+        chi::log.Log0Verbose1()
           << "Reflecting boundary added (index "
           << dsolver->boundaries.size()-1 <<  ").";
       }
       else
       {
         dsolver->boundaries.push_back(new chi_diffusion::BoundaryDirichlet());
-        chi_log.Log(LOG_0VERBOSE_1)
+        chi::log.Log0Verbose1()
           << "Dirichlet boundary added (index "
           << dsolver->boundaries.size()-1 <<  ").";
       }

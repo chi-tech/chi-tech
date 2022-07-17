@@ -4,7 +4,7 @@
 
 #include <chi_log.h>
 
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Performs raytracing on chi_mesh type cells. This algorithm essentially
@@ -153,17 +153,17 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
   }//polyhedron
   else
   {
-    chi_log.Log(LOG_ALLERROR)
+    chi::log.LogAllError()
       << "Unsupported cell type encountered in call to "
       << "chi_mesh::RayTrace.";
-    exit(EXIT_FAILURE);
+   chi::Exit(EXIT_FAILURE);
   }
 
   if (!intersection_found)
   {
     if (func_depth < 5)
     {
-      //chi_log.Log(LOG_ALLERROR) << "Particle nudged";
+      //chi::log.LogAllError() << "Particle nudged";
       //Vector from position to cell-centroid
       chi_mesh::Vector3 v_p_i_cc = (cell.centroid - pos_i);
       chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge;
@@ -180,7 +180,7 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
 
     if (func_depth < 7)
     {
-      //chi_log.Log(LOG_ALLERROR) << "Particle nudged";
+      //chi::log.LogAllError() << "Particle nudged";
       //Vector from position to cell-centroid
       chi_mesh::Vector3 v_p_i_cc = (cell.centroid - pos_i).Cross(omega_i);
       chi_mesh::Vector3 pos_i_nudged = pos_i + v_p_i_cc * epsilon_nudge;
@@ -220,8 +220,8 @@ chi_mesh::RayDestinationInfo chi_mesh::RayTrace(
 
 
 
-    chi_log.Log(LOG_ALLERROR) << outstr.str();
-    exit(EXIT_FAILURE);
+    chi::log.LogAllError() << outstr.str();
+   chi::Exit(EXIT_FAILURE);
   }
 
   return dest_info;

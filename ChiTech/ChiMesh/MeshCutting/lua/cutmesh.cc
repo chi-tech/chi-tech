@@ -5,7 +5,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
 #include "chi_log.h"
-extern ChiLog& chi_log;
+;
 
 //###################################################################
 /**Cuts a mesh.
@@ -42,9 +42,9 @@ int chiCutMesh(lua_State* L)
   if (num_args >= 3) merge_tolerance = lua_tonumber(L,3);
   if (num_args == 4) float_compare = lua_tonumber(L,4);
 
-  auto handler = chi_mesh::GetCurrentHandler();
+  auto& handler = chi_mesh::GetCurrentHandler();
 
-  auto grid = handler->GetGrid();
+  auto& grid = handler.GetGrid();
 
   chi_mesh::Vector3 p(p_raw[0],p_raw[1],p_raw[2]);
   chi_mesh::Vector3 n(n_raw[0],n_raw[1],n_raw[2]);

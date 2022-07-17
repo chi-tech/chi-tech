@@ -1,4 +1,4 @@
-#include "chi_physics.h"
+#include "chi_physics_namespace.h"
 
 #include <sstream>
 

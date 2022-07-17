@@ -1,7 +1,7 @@
 #include "sldfe_sq.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
 
 //###################################################################
 /***/
@@ -29,7 +29,7 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
   auto weights = ComputeWeights(rho);
 
   //============================================= Apply algorithm
-  chi_log.Log(LOG_0) << "=================================================== ";
+  chi::log.Log() << "=================================================== ";
   for (int k=0; k<150; ++k) //iteration
   {
 //    constexpr int N = 4;
@@ -68,29 +68,29 @@ void chi_math::SimplifiedLDFESQ::Quadrature::
     for (int i=0; i<4; ++i)
       change = std::fabs((weights[i] - SA_i[i])/weights[i]);
 
-    chi_log.Log(LOG_0) << "Weights: "
+    chi::log.Log() << "Weights: "
                        << weights[0] << " "
                        << weights[1] << " "
                        << weights[2] << " "
                        << weights[3] << " ";
-    chi_log.Log(LOG_0) << "Areas: "
+    chi::log.Log() << "Areas: "
                        << SA_i[0] << " "
                        << SA_i[1] << " "
                        << SA_i[2] << " "
                        << SA_i[3] << "\n";
-    chi_log.Log(LOG_0) << "rhos: "
+    chi::log.Log() << "rhos: "
                        << rho[0] << " "
                        << rho[1] << " "
                        << rho[2] << " "
                        << rho[3] << "\n";
-    chi_log.Log(LOG_0) << k<<" "<<std::fabs(change);
-    chi_log.Log(LOG_0) << "  ";
+    chi::log.Log() << k<<" "<<std::fabs(change);
+    chi::log.Log() << "  ";
 
 
     if (rho_change_total < 1.0e-2) break;
 //    if (std::fabs(change) < 1.0e-2) break;
   }
-//  chi_log.Log(LOG_0) << "rhos: "
+//  chi::log.Log() << "rhos: "
 //                     << rho[0]/(1.0/sqrt(3.0)) << " "
 //                     << rho[1]/(1.0/sqrt(3.0)) << " "
 //                     << rho[2]/(1.0/sqrt(3.0)) << " "

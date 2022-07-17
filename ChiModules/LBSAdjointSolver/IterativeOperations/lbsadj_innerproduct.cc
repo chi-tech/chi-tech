@@ -9,7 +9,7 @@ double lbs_adjoint::AdjointSolver::ComputeInnerProduct()
   double local_integral = 0.0;
 
   auto pwl =
-      std::dynamic_pointer_cast<SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
 
   //============================================= Material sources
   for (const auto& cell : grid->local_cells)

@@ -67,8 +67,7 @@ if ((prop.is_empty ~=nil) and (not prop.is_empty)) then
 end
 
 --############################################### Setup Physics
-phys1 = chiDiffusionCreateSolver();
-chiSolverAddRegion(phys1,region1)
+phys1 = chiDiffusionCreateSolver()
 chiSolverSetBasicOption(phys1,"discretization_method","PWLD_MIP")
 chiSolverSetBasicOption(phys1,"residual_tolerance",1.0e-8)
 

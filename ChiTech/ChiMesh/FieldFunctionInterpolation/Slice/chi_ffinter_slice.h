@@ -12,15 +12,16 @@
 #define FFI_PROP_SLICEBINORM 4
 #define FFI_PROP_OPERATION 5
 #define FFI_PROP_LOGICAL_VOLUME 8
-
+namespace chi_mesh
+{
 struct FFIFaceEdgeIntersection
 {
-  int v0_g_index=0, v1_g_index=0;
-  int v0_dofindex_cell=0, v1_dofindex_cell=0;
+  int v0_g_index = 0, v1_g_index = 0;
+  int v0_dofindex_cell = 0, v1_dofindex_cell = 0;
   chi_mesh::Vector3 point;
   chi_mesh::Vector3 point2d;
-  std::pair<double,double> weights;
-  double point_value=0.0;
+  std::pair<double, double> weights;
+  double point_value = 0.0;
 
   FFIFaceEdgeIntersection()
   {
@@ -30,17 +31,19 @@ struct FFIFaceEdgeIntersection
 
 struct FFICellIntersection
 {
-  int cell_local_index=0;
+  int cell_local_index = 0;
   std::vector<FFIFaceEdgeIntersection> intersections;
   chi_mesh::Vector3 intersection_centre;
   chi_mesh::Vector3 intersection_2d_centre;
-  double cell_avg_value=0.0;
+  double cell_avg_value = 0.0;
 
   FFICellIntersection()
   {
     cell_avg_value = 0.0;
   }
 };
+
+}//namespace chi_mesh
 
 //###################################################################
 /** A slice based interpolation function.
@@ -79,8 +82,12 @@ private:
   void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t>& mapping);
 public:
   //03
-  void ExportPython(std::string base_name);
+  std::string GetDefaultFileBaseName() const override
+  {return "ZPFFI";}
+  void ExportPython(std::string base_name) override;
 };
+
+
 
 
 #endif

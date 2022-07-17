@@ -2,21 +2,23 @@
 
 #include "ChiTimer/chi_timer.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
-extern ChiLog& chi_log;
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 void lbs_adjoint::AdjointSolver::
-  SetSource(LBSGroupset &groupset,
+  SetSource(lbs::LBSGroupset &groupset,
             std::vector<double> &destination_q,
             lbs::SourceFlags source_flags)
 {
-  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_BEGIN);
+  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_mat_src         = (source_flags & lbs::SourceFlags::APPLY_MATERIAL_SOURCE);
-  const bool apply_wgs_scatter_src = (source_flags & lbs::SourceFlags::APPLY_WGS_SCATTER_SOURCE);
-  const bool apply_ags_scatter_src = (source_flags & lbs::SourceFlags::APPLY_AGS_SCATTER_SOURCE);
-  const bool apply_wgs_fission_src = (source_flags & lbs::SourceFlags::APPLY_WGS_FISSION_SOURCE);
-  const bool apply_ags_fission_src = (source_flags & lbs::SourceFlags::APPLY_AGS_FISSION_SOURCE);
+  using Flag = lbs::SourceFlags;
+  const bool apply_mat_src         = (source_flags & Flag::APPLY_MATERIAL_SOURCE);
+  const bool apply_wgs_scatter_src = (source_flags & Flag::APPLY_WGS_SCATTER_SOURCE);
+  const bool apply_ags_scatter_src = (source_flags & Flag::APPLY_AGS_SCATTER_SOURCE);
+  const bool apply_wgs_fission_src = (source_flags & Flag::APPLY_WGS_FISSION_SOURCE);
+  const bool apply_ags_fission_src = (source_flags & Flag::APPLY_AGS_FISSION_SOURCE);
 
   //================================================== Get group setup
   auto gs_i = static_cast<size_t>(groupset.groups[0].id);
@@ -61,41 +63,16 @@ void lbs_adjoint::AdjointSolver::
 
           //====================== Apply across-groupset scattering
           if (moment_avail and apply_ags_scatter_src)
-          {
-            size_t num_transfers =
-              S[ell].rowI_indices[g].size();
-
-            //=============== Loop over transfers
-            for (size_t t = 0; t < num_transfers; ++t)
-            {
-              size_t gprime =
-                S[ell].rowI_indices[g][t];
-
+            for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
               if ((gprime < gs_i) or (gprime > gs_f))
-              {
-                double sigma_sm = S[ell].rowI_values[g][t];
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
-              }
-            }
-          }//if moment_avail
 
           //====================== Apply within-groupset scattering
           if (moment_avail and apply_wgs_scatter_src)
-          {
-            size_t num_transfers =
-              S[ell].rowI_indices[g].size();
-
-            //=============== Loop over transfers
-            for (size_t t = 0; t < num_transfers; ++t)
-            {
-              size_t gprime = S[ell].rowI_indices[g][t];
+            for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
               if ((gprime >= gs_i) and (gprime <= gs_f))
-              {
-                double sigma_sm = S[ell].rowI_values[g][t];
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
-              }
-            }
-          }
+
           destination_q[uk_map + g] += inscatter_g;
 
 
@@ -204,5 +181,5 @@ void lbs_adjoint::AdjointSolver::
     }//for qoi
   }
 
-  chi_log.LogEvent(source_event_tag, ChiLog::EventType::EVENT_END);
+  chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }

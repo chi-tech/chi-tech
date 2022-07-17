@@ -21,10 +21,10 @@ int chiLBSComputeBalance(lua_State *L)
 
   //============================================= Get pointer to solver
   int solver_handle = lua_tonumber(L, 1);
-  auto lbs_solver = lbs::lua_utils::
+  auto& lbs_solver = lbs::lua_utils::
     GetSolverByHandle(solver_handle, __FUNCTION__);
 
-  lbs_solver->ComputeBalance();
+  lbs_solver.ComputeBalance();
 
   return 0;
 }
