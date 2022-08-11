@@ -148,4 +148,6 @@ void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
 
   //=================================== Point source
   LUA_FMACRO1(chiLBSAddPointSource);
+  LUA_FMACRO1(chiLBSClearPointSources);
+  LUA_FMACRO1(chiLBSInitializePointSources);
 }

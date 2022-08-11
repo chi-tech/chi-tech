@@ -11,7 +11,8 @@
 //#########################################################
 /** Loads a surface mesh from a wavefront .obj file.*/
 int chi_mesh::SurfaceMesh::
-    ImportFromOBJFile(const char* fileName, bool as_poly=false)
+    ImportFromOBJFile(const std::string& fileName, bool as_poly/*=false*/,
+                      const chi_mesh::Vector3& transform/*={0,0,0}*/)
 {
 
 
@@ -25,6 +26,7 @@ int chi_mesh::SurfaceMesh::
       << "to ImportFromOBJFile \n";
    chi::Exit(EXIT_FAILURE);
   }
+  chi::log.Log() << "Loading surface mesh with transform " << transform.PrintStr();
 
   //===================================================== Reading every line and determining size
   std::string file_line;
@@ -41,8 +43,9 @@ int chi_mesh::SurfaceMesh::
     std::string sub_word;
 
     //===================================================== Keyword "v" for Vertex
-    if (first_word.compare("v")==0) {
-      chi_mesh::Vertex* newVertex = new chi_mesh::Vertex;
+    if (first_word == "v")
+    {
+      chi_mesh::Vertex newVertex;
       for (int k=1;k<=3;k++)
       {
         //================================== Extract sub word
@@ -51,38 +54,30 @@ int chi_mesh::SurfaceMesh::
         sub_word = file_line.substr(beg_of_word, end_of_word-beg_of_word);
 
         //============================= Convert word to number
-        try{ double numValue = std::stod(sub_word);
-          //*newVertex->value[k-1] = numValue;
-          if (k==1)
-          {
-            newVertex->x = numValue;
-          }
-          else if (k==2)
-          {
-            newVertex->y = numValue;
-          }
-          else if (k==3)
-          {
-            newVertex->z = numValue;
-          }
+        try
+        {
+          double numValue = std::stod(sub_word);
+
+          if (k==1)      newVertex.x = numValue + transform.x;
+          else if (k==2) newVertex.y = numValue + transform.y;
+          else if (k==3) newVertex.z = numValue + transform.z;
         }
 
         //============================= Catch conversion error
         catch(const std::invalid_argument& ia)
         {
-          //*newVertex->value[k-1] = 0.0;
           std::cout<<"Exception caught!"<<std::endl;
         }
 
         //============================= Stop word extraction on line end
         if (end_of_word==std::string::npos) {break;}
       }
-      this->vertices.push_back(*newVertex);
+      this->vertices.push_back(newVertex);
     }
 
     //===================================================== Keyword "vt" for Vertex
     if (first_word.compare("vt")==0) {
-      chi_mesh::Vertex* newVertex = new chi_mesh::Vertex;
+      chi_mesh::Vertex newVertex;
       for (int k=1;k<=2;k++)
       {
         //================================== Extract sub word
@@ -95,15 +90,15 @@ int chi_mesh::SurfaceMesh::
           //*newVertex->value[k-1] = numValue;
           if (k==1)
           {
-            newVertex->x = numValue;
+            newVertex.x = numValue;
           }
           else if (k==2)
           {
-            newVertex->y = numValue;
+            newVertex.y = numValue;
           }
           else if (k==3)
           {
-            newVertex->z = numValue;
+            newVertex.z = numValue;
           }
         }
 
@@ -117,12 +112,12 @@ int chi_mesh::SurfaceMesh::
         //============================= Stop word extraction on line end
         if (end_of_word==std::string::npos) {break;}
       }
-      this->tex_vertices.push_back(*newVertex);
+      this->tex_vertices.push_back(newVertex);
     }
 
     //===================================================== Keyword "vn" for normal
     if (first_word.compare("vn")==0) {
-      chi_mesh::Normal* newNormal = new chi_mesh::Normal;
+      chi_mesh::Normal newNormal;
       for (int k=1;k<=3;k++)
       {
         //================================== Extract sub word
@@ -135,15 +130,15 @@ int chi_mesh::SurfaceMesh::
           //*newNormal->value[k-1] = numValue;
           if (k==1)
           {
-            newNormal->x = numValue;
+            newNormal.x = numValue;
           }
           else if (k==2)
           {
-            newNormal->y = numValue;
+            newNormal.y = numValue;
           }
           else if (k==3)
           {
-            newNormal->z = numValue;
+            newNormal.z = numValue;
           }
         }
 
@@ -157,7 +152,7 @@ int chi_mesh::SurfaceMesh::
         //============================= Stop word extraction on line end
         if (end_of_word==std::string::npos) {break;}
       }
-      this->normals.push_back(*newNormal);
+      this->normals.push_back(newNormal);
     }
 
     //===================================================== Keyword "f" for face

@@ -55,9 +55,11 @@ namespace chi_math
     CellFVValues* MapNeighborFeView(uint64_t cell_global_index);
 
     //02 node ordering
+  private:
     void OrderNodes();
 
     //03 sparsity
+  public:
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
                               std::vector<int64_t>& nodal_nnz_off_diag,
                               UnknownManager& unknown_manager) override;

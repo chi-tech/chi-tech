@@ -31,7 +31,8 @@ public:
        ~SurfaceMesh();
   friend std::ostream& operator<<(std::ostream& os,  SurfaceMesh& dt);
   //loadexport.cc
-  int   ImportFromOBJFile(const char* fileName,bool as_poly);
+  int   ImportFromOBJFile(const std::string& fileName,bool as_poly=false,
+                          const chi_mesh::Vector3& transform=Vector3(0,0,0));
   int   ImportFromTriangleFiles(const char* fileName, bool as_poly);
   int   ImportFromMshFiles(const char* fileName, bool as_poly);
   void  ExportToOBJFile(const char* fileName);

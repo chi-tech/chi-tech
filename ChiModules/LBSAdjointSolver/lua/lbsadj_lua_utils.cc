@@ -47,4 +47,8 @@ void lbs_adjoint::lua_utils::RegisterLuaEntities(lua_State* L)
                lbs_adjoint::lua_utils::chiAdjointSolverExportImportanceMapBinary);
   lua_register(L, "chiAdjointSolverComputeInnerProduct",
                lbs_adjoint::lua_utils::chiAdjointSolverComputeInnerProduct);
+  lua_register(L, "chiAdjointSolverReadFluxMomentsToBuffer",
+               lbs_adjoint::lua_utils::chiAdjointSolverReadFluxMomentsToBuffer);
+  lua_register(L, "chiAdjointSolverApplyFluxMomentBuffer",
+               lbs_adjoint::lua_utils::chiAdjointSolverApplyFluxMomentBuffer);
 }

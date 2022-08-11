@@ -46,7 +46,7 @@ public:
   int  GetNeighborAssociatedFace(const chi_mesh::MeshContinuum& grid) const;
 
 public:
-  double ComputeFaceArea(chi_mesh::MeshContinuum& grid) const;
+  double ComputeFaceArea(const chi_mesh::MeshContinuum& grid) const;
 
   chi_data_types::ByteArray Serialize() const;
   static CellFace DeSerialize(const chi_data_types::ByteArray& raw,
