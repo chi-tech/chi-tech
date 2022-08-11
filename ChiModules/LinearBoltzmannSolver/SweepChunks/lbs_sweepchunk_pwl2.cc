@@ -3,37 +3,46 @@
 #include "chi_runtime.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
+#ifdef WITH_READABLE_CHUNK
 
+double* lbs::SweepChunkPWL::Upwinder::
+  GetUpwindPsi(int fj, bool local, bool boundary) const
+{
+  double* psi;
+  if (local)             psi = fluds->UpwindPsi(spls_index,
+                                                in_face_counter,
+                                                fj,0,angle_set_index);
+  else if (not boundary) psi = fluds->NLUpwindPsi(preloc_face_counter,
+                                                  fj,0,angle_set_index);
+  else                   psi = angle_set->PsiBndry(bndry_id,
+                                                   angle_num,
+                                                   cell_local_id,
+                                                   f, fj, gs_gi, gs_ss_begin,
+                                                   surface_source_active);
+  return psi;
+}
 
-//###################################################################
-/**Constructor.*/
-lbs::SweepChunkPWL::
-  SweepChunkPWL(std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
-                chi_math::SpatialDiscretization_PWLD& discretization,
-                std::vector<lbs::CellLBSView>& cell_transport_views,
-                std::vector<double>& destination_phi,
-                std::vector<double>& destination_psi,
-                const std::vector<double>& source_moments,
-                LBSGroupset& in_groupset,
-                const TCrossSections& in_xsections,
-                const int in_num_moms,
-                const int in_max_num_cell_dofs)
-                    : SweepChunk(destination_phi, destination_psi,
-                                 in_groupset.angle_agg, false),
-                      grid_view(std::move(grid_ptr)),
-                      grid_fe_view(discretization),
-                      grid_transport_view(cell_transport_views),
-                      q_moments(source_moments),
-                      groupset(in_groupset),
-                      xsections(in_xsections),
-                      num_moms(in_num_moms),
-                      num_grps(in_groupset.groups.size()),
-                      max_num_cell_dofs(in_max_num_cell_dofs),
-                      save_angular_flux(!destination_psi.empty()),
-                      a_and_b_initialized(false)
-{}
+double* lbs::SweepChunkPWL::Upwinder::
+  GetDownwindPsi(int fi, bool local, bool boundary, bool reflecting_bndry) const
+{
+  double* psi;
+  if (local)                 psi = fluds->
+    OutgoingPsi(spls_index,
+                out_face_counter,
+                fi, angle_set_index);
+  else if (not boundary)     psi = fluds->
+    NLOutgoingPsi(deploc_face_counter,
+                  fi, angle_set_index);
+  else if (reflecting_bndry) psi = angle_set->
+    ReflectingPsiOutBoundBndry(bndry_id, angle_num,
+                               cell_local_id, f,
+                               fi, gs_ss_begin);
+  else
+    psi = nullptr;
 
-#ifndef WITH_READABLE_CHUNK
+  return psi;
+}
+
 //###################################################################
 /**Actual sweep function*/
 void lbs::SweepChunkPWL::
@@ -105,6 +114,16 @@ void lbs::SweepChunkPWL::
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
         b[gsg].assign(num_nodes, 0.0);
 
+      // ============================================ Upwinding structure
+      Upwinder upwind{fluds, angle_set, spls_index, angle_set_index,
+                      /*in_face_counter*/0,
+                      /*preloc_face_counter*/0,
+                      /*out_face_counter*/0,
+                      /*deploc_face_counter*/0,
+                      /*bndry_id*/0, angle_num, cell.local_id,
+                      /*f*/0,gs_gi, gs_ss_begin,
+                      surface_source_active};
+
       // ============================================ Surface integrals
       int in_face_counter = -1;
       for (int f = 0; f < num_faces; ++f)
@@ -113,74 +132,38 @@ void lbs::SweepChunkPWL::
         const double mu = omega.Dot(face.normal);
         face_mu_values[f] = mu;
 
-        if (mu < 0.0) // Upwind
+        if (mu >= 0.0) continue;
+
+        face_incident_flags[f] = true;
+        const bool local = transport_view.IsFaceLocal(f);
+        const bool boundary = not face.has_neighbor;
+        const uint64_t bndry_id = face.neighbor_id;
+
+        if (local)             ++in_face_counter;
+        else if (not boundary) ++preloc_face_counter;
+
+        upwind.in_face_counter = in_face_counter;
+        upwind.preloc_face_counter = preloc_face_counter;
+        upwind.bndry_id = bndry_id;
+        upwind.f = f;
+
+        const size_t num_face_indices = face.vertex_ids.size();
+        for (int fi = 0; fi < num_face_indices; ++fi)
         {
-          face_incident_flags[f] = true;
-          const bool local = transport_view.IsFaceLocal(f);
-          const bool boundary = not face.has_neighbor;
-          const size_t num_face_indices = face.vertex_ids.size();
-          if (local)
+          const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+          for (int fj = 0; fj < num_face_indices; ++fj)
           {
-            in_face_counter++;
-            for (int fi = 0; fi < num_face_indices; ++fi)
-            {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-              for (int fj = 0; fj < num_face_indices; ++fj)
-              {
-                const int j = fe_intgrl_values.FaceDofMapping(f,fj);
-                const double *psi = fluds->UpwindPsi(spls_index,in_face_counter,fj,0,angle_set_index);
-                const double mu_Nij = -mu * M_surf[f][i][j];
-                Amat[i][j] += mu_Nij;
-                for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                  b[gsg][i] += psi[gsg]*mu_Nij;
-              }
-            }
-          }
-          else if (not boundary)
-          {
-            preloc_face_counter++;
-            for (int fi = 0; fi < num_face_indices; ++fi)
-            {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-              for (int fj = 0; fj < num_face_indices; ++fj)
-              {
-                const int j = fe_intgrl_values.FaceDofMapping(f,fj);
-                const double *psi = fluds->NLUpwindPsi(preloc_face_counter,fj,0,angle_set_index);
-                const double mu_Nij = -mu * M_surf[f][i][j];
-                Amat[i][j] += mu_Nij;
-                for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                  b[gsg][i] += psi[gsg]*mu_Nij;
-              }
-            }
-          }
-          else
-          {
-            // This counter update-logic is for mapping an incident boundary
-            // condition. Because it is cheap, the cell faces was mapped to a
-            // corresponding boundary during initialization and is
-            // independent of angle. Accessing things like reflective boundary
-            // angular fluxes (and complex boundary conditions), requires the
-            // more general bndry_face_counter.
-            const uint64_t bndry_index = face.neighbor_id;
-            for (int fi = 0; fi < num_face_indices; ++fi)
-            {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-              for (int fj = 0; fj < num_face_indices; ++fj)
-              {
-                const int j = fe_intgrl_values.FaceDofMapping(f,fj);
-                const double *psi = angle_set->PsiBndry(bndry_index,
-                                                        angle_num,
-                                                        cell.local_id,
-                                                        f, fj, gs_gi, gs_ss_begin,
-                                                        surface_source_active);
-                const double mu_Nij = -mu * M_surf[f][i][j];
-                Amat[i][j] += mu_Nij;
-                for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                  b[gsg][i] += psi[gsg]*mu_Nij;
-              }
-            }
-          }
-        } // if upwind
+            const int j = fe_intgrl_values.FaceDofMapping(f,fj);
+
+            double* psi = upwind.GetUpwindPsi(fj, local, boundary);
+
+            const double mu_Nij = -mu * M_surf[f][i][j];
+            Amat[i][j] += mu_Nij;
+            for (int gsg = 0; gsg < gs_ss_size; ++gsg)
+              b[gsg][i] += psi[gsg]*mu_Nij;
+
+          }//for face j
+        }//for face i
       } // for f
 
       // ========================================== Looping over groups
@@ -189,6 +172,7 @@ void lbs::SweepChunkPWL::
         const int g = gs_gi+gsg;
 
         // ============================= Contribute source moments
+        // q = M_n^T * q_moms
         for (int i = 0; i < num_nodes; ++i)
         {
           double temp_src = 0.0;
@@ -196,11 +180,13 @@ void lbs::SweepChunkPWL::
           {
             const size_t ir = transport_view.MapDOF(i, m, g);
             temp_src += m2d_op[m][angle_num]*q_moments[ir];
-          }
+          }//for m
           source[i] = temp_src;
-        }
+        }//for i
 
         // ============================= Mass Matrix and Source
+        // Atemp  = Amat + sigma_tgr * M
+        // b     += M * q
         const double sigma_tgr = sigma_tg[g];
         for (int i = 0; i < num_nodes; ++i)
         {
@@ -210,9 +196,9 @@ void lbs::SweepChunkPWL::
             const double Mij = M[i][j];
             Atemp[i][j] = Amat[i][j] + Mij*sigma_tgr;
             temp += Mij*source[j];
-          }
+          }//for j
           b[gsg][i] += temp;
-        }
+        }//for i
 
         // ============================= Solve system
         chi_math::GaussElimination(Atemp, b[gsg], num_nodes);
@@ -258,58 +244,37 @@ void lbs::SweepChunkPWL::
         const bool boundary = not face.has_neighbor;
         const size_t num_face_indices = face.vertex_ids.size();
         const std::vector<double>& IntF_shapeI = IntS_shapeI[f];
+        const uint64_t bndry_id = face.neighbor_id;
 
-        if (local)
+        bool reflecting_bndry = false;
+        if (boundary)
+          if (angle_set->ref_boundaries[bndry_id]->IsReflecting())
+            reflecting_bndry = true;
+
+        if (not boundary and not local) ++deploc_face_counter;
+
+        upwind.out_face_counter = out_face_counter;
+        upwind.deploc_face_counter = deploc_face_counter;
+        upwind.bndry_id = bndry_id;
+        upwind.f = f;
+
+        for (int fi = 0; fi < num_face_indices; ++fi)
         {
-          for (int fi = 0; fi < num_face_indices; ++fi)
-          {
-            const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-            double *psi = fluds->OutgoingPsi(spls_index, out_face_counter, fi, angle_set_index);
+          const int i = fe_intgrl_values.FaceDofMapping(f,fi);
+
+          double* psi = upwind.GetDownwindPsi(fi, local, boundary, reflecting_bndry);
+
+          if (not boundary or reflecting_bndry)
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
               psi[gsg] = b[gsg][i];
-          }
-        }
-        else if (not boundary)
-        {
-          deploc_face_counter++;
-          for (int fi = 0; fi < num_face_indices; ++fi)
-          {
-            const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-            double *psi = fluds->NLOutgoingPsi(deploc_face_counter, fi, angle_set_index);
+          if (boundary and not reflecting_bndry)
             for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-              psi[gsg] = b[gsg][i];
-          }
-        }
-        else // Store outgoing reflecting Psi
-        {
-          const uint64_t bndry_index = face.neighbor_id;
-          if (angle_set->ref_boundaries[bndry_index]->IsReflecting())
-          {
-            for (int fi = 0; fi < num_face_indices; ++fi)
-            {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-              double *psi = angle_set->ReflectingPsiOutBoundBndry(bndry_index, angle_num,
-                                                                  cell.local_id, f,
-                                                                  fi, gs_ss_begin);
-              for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                psi[gsg] = b[gsg][i];
-            }
-          }
-          else
-          {
-            for (int fi = 0; fi < num_face_indices; ++fi)
-            {
-              const int i = fe_intgrl_values.FaceDofMapping(f,fi);
-
-              for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-                transport_view.AddOutflow(gs_gi + gsg,
-                                          wt*mu*b[gsg][i]*IntF_shapeI[i]);
-            }
-          }
-        }//bndry
+              transport_view.AddOutflow(gs_gi + gsg,
+                                        wt*mu*b[gsg][i]*IntF_shapeI[i]);
+        }//for fi
       }//for face
     } // for n
   } // for cell
 }//Sweep
 
-#endif //WITH_READABLE_CHUNK
+#endif

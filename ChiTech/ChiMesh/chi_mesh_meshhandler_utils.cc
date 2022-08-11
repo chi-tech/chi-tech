@@ -6,10 +6,15 @@
 
 
 //###################################################################
-/**Obtains a pointer to the current mesh handler from the global stack.
+/**Obtains a reference to the current mesh handler from the global stack.
+ *
+ * If the stack is empty this routine will through `std::logic_error`.
 \author Jan*/
 chi_mesh::MeshHandler& chi_mesh::GetCurrentHandler()
 {
+  if (chi::meshhandler_stack.empty())
+    throw std::logic_error("chi_mesh::GetCurrentHandler: No handlers on stack");
+
   return chi::GetStackItem<chi_mesh::MeshHandler>(chi::meshhandler_stack,
                                                   chi::current_mesh_handler);
 }

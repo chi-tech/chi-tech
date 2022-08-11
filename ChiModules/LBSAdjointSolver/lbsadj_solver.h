@@ -23,6 +23,9 @@ protected:
   std::vector<RespFuncAndSubs> response_functions;
 
 public:
+  std::vector<std::vector<double>> m_moment_buffers;
+
+public:
   AdjointSolver (const AdjointSolver&) = delete;
   AdjointSolver& operator= (const AdjointSolver&) = delete;
 

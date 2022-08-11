@@ -62,7 +62,7 @@ void lbs::SteadySolver::Initialize()
     << chi::console.GetMemoryUsageInMB() << " MB" << std::endl;
 
   //================================================== Initialize boundaries
-  InitializeBoundaries();//h
+  InitializeBoundaries();
 
   //================================================== Initialize sources
   InitializePointSources();

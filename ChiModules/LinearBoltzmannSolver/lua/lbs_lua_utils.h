@@ -36,6 +36,8 @@ int chiLBSGroupsetSetWGDSA(lua_State *L);
 int chiLBSGroupsetSetTGDSA(lua_State *L);
 
 int chiLBSAddPointSource(lua_State *L);
+int chiLBSClearPointSources(lua_State *L);
+int chiLBSInitializePointSources(lua_State *L);
 
 namespace lbs::lua_utils
   {

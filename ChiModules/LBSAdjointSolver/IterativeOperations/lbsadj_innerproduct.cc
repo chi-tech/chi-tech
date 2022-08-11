@@ -43,34 +43,35 @@ double lbs_adjoint::AdjointSolver::ComputeInnerProduct()
   //============================================= Point sources
   for (const auto& point_source : point_sources)
   {
-    if (not point_source.LocallyOwned()) continue;
-    const uint64_t cell_local_id = point_source.OwningCellLocalID();
-
-    const auto& cell = grid->local_cells[cell_local_id];
-    const auto& transport_view = cell_transport_views[cell.local_id];
-    const auto& source_strength = point_source.Strength();
-    const auto& shape_values = point_source.ShapeValues();
-    const auto& fe_values = pwl->GetUnitIntegrals(cell);
-
-    for (const auto& group : groups)
+    const auto& info_list = point_source.ContainingCellsInfo();
+    for (const auto& info : info_list)
     {
-      const int g = group.id;
-      const double S = source_strength[g];
+      const auto& cell = grid->local_cells[info.cell_local_id];
+      const auto& transport_view = cell_transport_views[cell.local_id];
+      const auto& source_strength = point_source.Strength();
+      const auto& shape_values = info.shape_values;
+      const auto& fe_values = pwl->GetUnitIntegrals(cell);
 
-      if (S > 0.0)
+      for (const auto& group : groups)
       {
-        const int num_nodes = transport_view.NumNodes();
-        for (int i = 0; i < num_nodes; ++i)
+        const int g = group.id;
+        const double S = source_strength[g] * info.volume_weight;
+
+        if (S > 0.0)
         {
-          const size_t dof_map = transport_view.MapDOF(i, 0, g); //unknown map
+          const int num_nodes = transport_view.NumNodes();
+          for (int i = 0; i < num_nodes; ++i)
+          {
+            const size_t dof_map = transport_view.MapDOF(i, 0, g); //unknown map
 
-          const double phi_i = phi_old_local[dof_map];
+            const double phi_i = phi_old_local[dof_map];
 
-          local_integral += S * phi_i * shape_values[i];
-        }//for node
-      }//check source value >0
-    }//for group
-  }
+            local_integral += S * phi_i * shape_values[i];
+          }//for node
+        }//check source value >0
+      }//for group
+    }//for cell
+  }//for point source
 
   double global_integral = 0.0;
 

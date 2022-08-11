@@ -16,7 +16,9 @@
 \param SurfaceHandle int Handle to the surface on which the operation is to be performed.
 \param FileName char* Path to the file to be imported.
 \param polyflag bool (Optional)Flag indicating whether triangles
- are to be read as polygons. [Default: true)
+                               are to be read as polygons. [Default: true].
+\param transform table3 (Optional) Translation vector to move all the vertices.
+                                   [Default: none].
 
 \return success bool Return true if file was successfully loaded and false
  otherwise.
@@ -24,30 +26,41 @@
 \author Jan*/
 int chiSurfaceMeshImportFromOBJFile(lua_State *L)
 {
-  auto& cur_hndlr = chi_mesh::GetCurrentHandler();
+  const std::string fname = __FUNCTION__;
 
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
+  if (num_args < 2)
+    LuaPostArgAmountError(fname, 2, num_args);
+
   int handle = lua_tonumber(L,1);
 
   size_t length = 0;
-  const char* temp = lua_tolstring(L, 2, &length);
+  const std::string file_name = lua_tolstring(L, 2, &length);
 
   bool as_poly = true;
-  if (num_args==3)
-  {
-    as_poly = lua_toboolean(L,3);
-  }
+  if (num_args>=3) as_poly = lua_toboolean(L,3);
+
 
   auto& surface_mesh = chi::GetStackItem<chi_mesh::SurfaceMesh>(
     chi::surface_mesh_stack, handle, __FUNCTION__);
 
-  std::stringstream outtext;
-  outtext << "chiSurfaceMeshImportFromOBJFile: "
-             "Loading Wavefront .obj file: ";
-  outtext << temp << std::endl;
-  chi::log.LogAllVerbose2() << outtext.str();
-  surface_mesh.ImportFromOBJFile(temp, as_poly);
+  chi::log.Log0Verbose2()
+    << fname  << ": Loading Wavefront .obj file: " << std::endl;
+
+  //Transform if necessary
+  chi_mesh::Vector3 Tvec(0.0,0.0,0.0);
+  if (num_args == 4)
+  {
+    std::vector<double> T;
+    LuaPopulateVectorFrom1DArray(fname, L, 4, T);
+    if (T.size() != 3)
+      throw std::invalid_argument(fname + ": Argument 4. Table length not 3.");
+    Tvec = chi_mesh::Vector3(T[0],T[1],T[2]);
+    chi::log.Log0Verbose2() << "Transform vector: " << Tvec.PrintStr();
+  }
+
+  surface_mesh.ImportFromOBJFile(file_name, as_poly, Tvec);
 
   return 1;
 }

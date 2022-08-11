@@ -48,10 +48,18 @@ void lbs_adjoint::AdjointSolver::Initialize()
       if (qoi_designation.logical_volume->Inside(cell.centroid))
         qoi_cell_subscription.push_back(cell.local_id);
 
-    //TODO: Change the verbosity of next statement
+    size_t num_local_subs = qoi_cell_subscription.size();
+    size_t num_globl_subs = 0;
+
+    MPI_Allreduce(&num_local_subs,           //sendbuf
+                  &num_globl_subs,           //recvbuf
+                  1, MPI_UNSIGNED_LONG_LONG, //count + datatype
+                  MPI_SUM,                   //operation
+                  MPI_COMM_WORLD );          //communicator
+
     chi::log.Log() << "LBAdjointSolver: Number of cells subscribed to "
                   << qoi_designation.name << " = "
-                  << qoi_cell_subscription.size();
+                  << num_globl_subs;
   }
 
 }
