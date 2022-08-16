@@ -24,6 +24,7 @@ namespace chi_unit_tests
   void Test_chi_math(bool verbose);
   void Test_chi_misc_utils(bool verbose);
   void Test_chi_data_types(bool verbose);
+  void Test_WDD_IJK_Sweep(bool verbose);
 }
 
 #endif //CHITECH_UNIT_TESTS_H
