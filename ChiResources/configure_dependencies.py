@@ -5,6 +5,11 @@ import errno
 
 print("########## Chi-Tech Dependency installer ##########")
 
+verbose : bool = False
+
+if not verbose:
+    exit()
+
 ####################################### Setting install dir
 cwd = os.getcwd()
 install_dir = f"{cwd}/chi-dependencies"
