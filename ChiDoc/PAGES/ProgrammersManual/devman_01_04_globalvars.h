@@ -16,112 +16,101 @@ shared pointers (i.e., `std::shared_ptr`)
 
 There are also a number of secondary global variables that assist developers
 with coding. They are:
- - ChiTimer chi_program_timer Holds a timer which initiates at program
-   start. To access the timer from another piece of source code, include at the
-   top of the file the ```extern``` command:
-   \code
-   #include "ChiTimer/chi_timer.h"
-   extern ChiTimer& chi_program_timer;
-   \endcode
-   Current program time can then be obtained using:
-   \code
-   double time_in_ms = chi_program_timer.GetTime();
-   \endcode
- - ```std::string chi_input_file_name``` Holds the input file name if supplied.
- - ```bool chi_termination_posted``` A flag used during interactive mode.
- - ```bool chi_sim_option_interactive``` A flag indicating whether the code is
+ - ```chi::run_time::input_file_name``` Holds the input file name if supplied.
+ - ```chi::run_time::termination_posted``` A flag used during interactive mode.
+ - ```chi::run_time::sim_option_interactive``` A flag indicating whether the code is
    run in interactive mode.
- - ```std::vector<chi_mesh::MeshHandler*> chi_meshhandler_stack``` and
-   ```int chi_current_mesh_handler```. Holds various mesh handlers. When not using
-   the lua code to create a chi_mesh::MeshHandler be sure to set it to current
-   in order to ensure that the method chi_mesh::GetCurrentHandler() works:
-   \code
-   chi_meshhandler_stack.push_back(new chi_mesh::MeshHandler);
-   int index = chi_meshhandler_stack.size()-1;
-
-   chi_current_mesh_handler = index;
-   \endcode
-   And using it:
-   \code
-   auto& handler = *chi_mesh::GetCurrentHandler();
-   \endcode
-
+ - ```chi::run_time::allow_petsc_error_handler``` A flag indicating whether the allow
+ the native PETSC error handler.
 
 
 
 \subsection devman2_sec0_3 Connecting to the global data block
 
-To be completed...
+The stack items stored within `chi` can be accessed either by reference or as a
+ `std::shared_ptr`. The two functions that facilitate this are as follows:
+
+\code
+#include "chi_runtime.h"
+#include "ChiMesh/SurfaceMesh/chi_surfacemesh.h" //Just an example
+
+void SomeFunction()
+{
+  int handle = 2;
+  auto& chi::GetStackItem<chi_mesh::SurfaceMeshPtr>(chi::surface_mesh_stack,
+                                                    handle);
+  //or
+  auto chi::GetStackItemPtr<chi_mesh::SurfaceMeshPtr>(chi::surface_mesh_stack,
+                                                      handle);
+}
+\endcode
+
+There are multiple stacks, currently (which might not be still accurate):
+\code
+chi::meshhandler_stack;
+chi::surface_mesh_stack;
+chi::logicvolume_stack;
+chi::field_func_interpolation_stack;
+chi::unpartitionedmesh_stack;
+chi::solver_stack;
+chi::material_stack;
+chi::trnsprt_xs_stack;
+chi::fieldfunc_stack;
+chi::quadrature_stack;
+chi::angular_quadrature_stack;
+\endcode
 
 \subsection devman2_sec0_4 Connecting to MPI
 
 General MPI information like the current location id and the total amount
  of parallel processes is contained in CHI_MPI:
- - ChiMPI::location_id
- - ChiMPI::process_count
+ - chi_objects::MPI_Info::location_id
+ - chi_objects::MPI_Info::process_count
 
 Additionally, by including the headers for chi_mpi, developers have access to
  all the classic mpi headers.
 
 \code
-#include <chi_mpi.h>
+#include "chi_runtime.h"
+#include "chi_mpi.h"
 
-extern ChiMPI& chi_mpi;
-
-if (chi_mpi.location_id == 1)
+if (chi::mpi.location_id == 1)
  printf("This is process 1, Dab!");
 \endcode
-
- or obtain an instance to it via
-
-\code
-// Include this at the top of the file
-#include <chi_mpi.h>
-
-// Include this in the body of your code
-ChiMPI&      chi_mpi = ChiMPI::GetInstance();
-\endcode
-
 
 \subsection devman2_sec0_5 Connecting to the parallel logging utility
 
 Printing information in a parallel environment can be a very involved
-process. One can't simply use "std::cout <<" on every process otherwise
+process. One can't simply use `std::cout <<` on every process otherwise
 the output to the log will be chaotic. For this reason we employ a common
- logging utility which return an output string stream using the function
+ logging utility which returns an output string-stream using the function
  call ChiLog::Log.
 
 Connecting to chi::log is done as follows
 \code
-#include <chi::log.h>
+#include "chi_runtime.h"
+#include "chi_log.h"
 
-extern ChiLog& chi::log;
+void Function()
+{
+    chi::log.Log() << "Hello from location 0";
+    chi::log.LogAll() << "Hello from all locations";
+}
 \endcode
 
- or obtain an instance to it via
-
-\code
-// Include this at the top of the file
-#include <chi::log.h>
-
-// Include this in the body of your code
-ChiLog&      chi::log = ChiLog::GetInstance();
-\endcode
-
-The logger needs to be supplied with an enumeration (LOG_LVL) indicating
- the type of output. The following enumerations are supported:
- - LOG_0,                      Used only for location 0
- - LOG_0WARNING,               Warning only for location 0
- - LOG_0ERROR,                 Error only for location 0
- - LOG_0VERBOSE_0,             Default verbosity level
- - LOG_0VERBOSE_1,             Used only if verbosity level equals 1
- - ChiLog::LOG_LVL::LOG_0VERBOSE_2,             Used only if verbosity level equals 2
- - LOG_ALL,                    Verbose level 0 all locations
- - LOG_ALLWARNING,             Warning for any location
- - LOG_ALLERROR,               Error for any location
- - LOG_ALLVERBOSE_0,     Default verbosity level
- - LOG_ALLVERBOSE_1,     Used only if verbosity level equals 1
- - LOG_ALLVERBOSE_2,     Used only if verbosity level equals 2
+The logger has calls of differing verbosity:
+ - `chi_objects::ChiLog::Log0()`,                      Used only for location 0
+ - `chi_objects::ChiLog::Log0Warning()`,               Warning only for location 0
+ - `chi_objects::ChiLog::Log0Error()`,                 Error only for location 0
+ - `chi_objects::ChiLog::Log0Verbose0()`,             Default verbosity level
+ - `chi_objects::ChiLog::Log0Verbose1()`,             Used only if verbosity level equals 1
+ - `chi_objects::ChiLog::Log0Verbose2()`,             Used only if verbosity level equals 2
+ - `chi_objects::ChiLog::LogAll()`,                    Verbose level 0 all locations
+ - `chi_objects::ChiLog::LogAllWarning()`,             Warning for any location
+ - `chi_objects::ChiLog::LogAllError()`,               Error for any location
+ - `chi_objects::ChiLog::LogAllVerbose0()`,     Default verbosity level
+ - `chi_objects::ChiLog::LogAllVerbose1()`,     Used only if verbosity level equals 1
+ - `chi_objects::ChiLog::LogAllVerbose2()`,     Used only if verbosity level equals 2
 
 
 

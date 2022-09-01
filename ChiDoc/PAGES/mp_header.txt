@@ -22,5 +22,15 @@ now we have only a couple of tutorials.\n
 \n
 
 
+ ## Variables defined in lua
+Variable Name        | Description                            | Variable Name        | Description
+---------------------|------------------                      |--------------------- |---------------------
+ `chi_version`       | Version string, e.g., "1.2.3"          | `chi_minor_version`  | Minor version, e.g., 2, as an integer
+ `chi_major_version` | Major version, e.g., 1, as an integer  | `chi_patch_version`  | Patch version, e.g., 3, as an integer
+ `chi_location_id`   | Current process rank in MPI-context    | `chi_number_of_processes` | Number of MPI processes
+
+\n
+
+
  ## Input Functions
 

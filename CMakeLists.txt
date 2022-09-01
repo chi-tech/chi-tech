@@ -41,11 +41,14 @@ message(STATUS "VTK_DIR set to ${VTK_DIR}")
 
 #================================================ Set project targets
 SET(TARGET ChiTech)
-project(${TARGET} C CXX)
+project(${TARGET} LANGUAGES C CXX VERSION 1.0.2)
 
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}")
 set(CHI_TECH_MOD "ChiModules")
+
+configure_file("ChiResources/chi_configuration.h.in"
+               "${CHI_TECH_DIR}/ChiTech/chi_configuration.h")
 
 #================================================ Set cmake variables
 find_package(MPI)
