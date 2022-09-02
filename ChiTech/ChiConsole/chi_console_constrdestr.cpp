@@ -10,6 +10,8 @@
 
 #include "lua/chi_modules_lua.h"
 
+#include "chi_configuration.h"
+
 //############################################################################# Default constructor
 /** Default constructor for the console*/
 chi_objects::ChiConsole::ChiConsole() noexcept
@@ -19,6 +21,12 @@ chi_objects::ChiConsole::ChiConsole() noexcept
   auto& L = this->consoleState;
 
 	luaL_openlibs(L);
+
+  //========================================== Register version
+  lua_pushstring(L,  PROJECT_VERSION);       lua_setglobal(L,"chi_version");
+  lua_pushinteger(L, PROJECT_MAJOR_VERSION); lua_setglobal(L, "chi_major_version");
+  lua_pushinteger(L, PROJECT_MINOR_VERSION); lua_setglobal(L, "chi_minor_version");
+  lua_pushinteger(L, PROJECT_PATCH_VERSION); lua_setglobal(L, "chi_patch_version");
 
 	//========================================== Registering functions
 //	#include"../ChiLua/chi_lua_register.h"
