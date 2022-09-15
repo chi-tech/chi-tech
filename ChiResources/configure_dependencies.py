@@ -5,6 +5,13 @@ import errno
 
 print("########## Chi-Tech Dependency installer ##########")
 
+verbose : bool = False
+
+for arg in sys.argv:
+    if arg=="verbose":
+        verbose = True
+
+
 ####################################### Setting install dir
 cwd = os.getcwd()
 install_dir = f"{cwd}/chi-dependencies"
@@ -26,6 +33,7 @@ else:
         sys.exit(1)
 if not os.path.exists(install_dir):
     os.mkdir(install_dir)
+
 
 ####################################### Parsing versions
 versions = {"readline": "8.0", "ncurses": "6.1", "lua": "5.3.5",
@@ -68,15 +76,26 @@ for arg in sys.argv:
 
             versions[package] = version
 
+print("Versions:")
+for key in versions:
+    print(f"{key}={versions[key]}")
+print("")
+
 readline_install = f"{install_dir}/READLINE/readline-{versions['ncurses']}/build"
 ncurses_install = f"{install_dir}/NCURSES/ncurses-{versions['ncurses']}/build"
 lua_install = f"{install_dir}/LUA/lua-{versions['lua']}/install"
 petsc_install = f"{install_dir}/PETSC/petsc-{versions['petsc']}-install"
-vtk_install = f"{install_dir}/VTK/VTK-{versions['VTK']}-install"
+vtk_install = f"{install_dir}/VTK/vtk-{versions['VTK']}-install"
+
+print("Install directories:")
+print(readline_install)
+print(ncurses_install)
+print(lua_install)
+print(petsc_install)
+print(vtk_install)
 
 log_file = open(f"{install_dir}/log.txt", "w+")
 roots_file = open(f"{install_dir}/configure_deproots.sh", "w+")
-
 
 #######################################
 # Prints a value to cout using system
@@ -97,6 +116,9 @@ def ExecSub(command, log, env_vars=None):
     success = True
     output = ""
     error = b"No Error"
+
+    if verbose:
+        print(f"command: {command}")
 
     result = subprocess.Popen(command,
                               stdout=log,
@@ -178,8 +200,12 @@ def DownloadPackage(url, pkg, ver, upper=False):
 
     pkg_ = pkg.upper() if upper else pkg
     if not os.path.exists(f"{os.getcwd()}/{pkg_}-{ver}.tar.gz"):
-        print(f"Downloading {pkg_.upper()} {ver} to \"{os.getcwd()}\"")
+        print(f"Downloading {pkg_.upper()} {ver} to \"{os.getcwd()}\" with command wget {url}")
         success, err = ExecSub(f"wget {url}", log_file)
+
+        if not success:
+            print(err)
+            exit(1)
 
         if upper:
             item = f"{pkg_}-{ver}.tar.gz"
@@ -188,7 +214,22 @@ def DownloadPackage(url, pkg, ver, upper=False):
 
 ####################################### Get package
 def ExtractPackage(pkg, ver):
-    success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz --one-top-level={pkg}-{ver}/ --strip-components=1", log_file)
+    ##success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz --one-top-level={pkg}-{ver}/ --strip-components=1", log_file)
+    print(f"Extracting package with command tar -zxf {pkg}-{ver}.tar.gz")
+
+    success, err = ExecSub(f"tar -zxf {pkg}-{ver}.tar.gz", log_file)
+
+    if not success:
+        print(err)
+        exit(1)
+
+    # Check if folder defaulted to upper
+    if os.path.exists(f"{pkg.upper()}-{ver}") and not os.path.exists(f"{pkg}-{ver}"):
+        success, err = ExecSub(f"mv {pkg.upper()}-{ver}/ {pkg}-{ver}/", log_file)
+
+        if not success:
+            print(err)
+            exit(1)
 
     os.chdir(f"{pkg}-{ver}")
 

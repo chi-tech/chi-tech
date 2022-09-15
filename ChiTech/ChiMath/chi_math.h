@@ -49,7 +49,7 @@ namespace chi_math
   int SampleCDF(double x, std::vector<double> cdf_bin);
 
   //01 Utility
-  double Factorial(const int x);
+  double Factorial(int x);
 
   //02 Vector operations
   void   PrintVector(const VecDbl& x);

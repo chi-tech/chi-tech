@@ -137,6 +137,8 @@ public:
   static void Finalize();
   static void Exit(int error_code);
 
+  static std::string GetVersionStr();
+
 public:
   /**Attempts to retrieve an object of base-type `shared_ptr<T>` at the given
    * handle. It then attempts to cast it to type `shared_ptr<R>` and, if

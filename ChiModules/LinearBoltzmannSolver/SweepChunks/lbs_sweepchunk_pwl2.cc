@@ -155,7 +155,7 @@ void lbs::SweepChunkPWL::
           {
             const int j = fe_intgrl_values.FaceDofMapping(f,fj);
 
-            double* psi = upwind.GetUpwindPsi(fj, local, boundary);
+            const double* psi = upwind.GetUpwindPsi(fj, local, boundary);
 
             const double mu_Nij = -mu * M_surf[f][i][j];
             Amat[i][j] += mu_Nij;

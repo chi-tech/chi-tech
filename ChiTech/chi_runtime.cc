@@ -1,5 +1,6 @@
 /** @file Runtime file*/
 #include "chi_runtime.h"
+#include "chi_configuration.h"
 
 #include "ChiConsole/chi_console.h"
 #include "ChiMath/chi_math.h"
@@ -140,9 +141,6 @@ int chi::Initialize(int argc, char** argv)
   MPI_Comm_rank (MPI_COMM_WORLD, &location_id);      /* get current process id */
   MPI_Comm_size (MPI_COMM_WORLD, &number_processes); /* get number of processes */
 
-//  chi::mpi.SetLocationID(location_id);
-//  chi::mpi.SetProcessCount(number_processes);
-
   mpi.SetLocationID(location_id);
   mpi.SetProcessCount(number_processes);
 
@@ -206,8 +204,13 @@ int chi::RunInteractive(int argc, char** argv)
     << chi::mpi.process_count << " processes.";
 
   chi::log.Log()
+    << "ChiTech version " << GetVersionStr();
+
+  chi::log.Log()
     << "ChiTech number of arguments supplied: "
     << argc - 1;
+
+  chi::log.LogAll();
 
   chi::console.FlushConsole();
 
@@ -245,6 +248,9 @@ int chi::RunBatch(int argc, char** argv)
     << chi_objects::ChiTimer::GetLocalDateTimeString()
     << " Running ChiTech in batch-mode with "
     << chi::mpi.process_count << " processes.";
+
+  chi::log.Log()
+    << "ChiTech version " << GetVersionStr();
 
   chi::log.Log()
     << "ChiTech number of arguments supplied: "
@@ -301,5 +307,13 @@ int chi::RunBatch(int argc, char** argv)
 void chi::Exit(int error_code)
 {
   MPI_Abort(MPI_COMM_WORLD, error_code);
+}
+
+
+//###################################################################
+/** Gets the ChiTech-version string.*/
+std::string chi::GetVersionStr()
+{
+  return PROJECT_VERSION;
 }
 

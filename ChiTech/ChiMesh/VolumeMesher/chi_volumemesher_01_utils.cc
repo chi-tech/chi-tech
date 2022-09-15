@@ -18,7 +18,9 @@ chi_mesh::MeshContinuumPtr& chi_mesh::VolumeMesher::GetContinuum()
 //###################################################################
 /**Sets grid attributes. This is normally a private member of the grid
  * but this class is a friend.*/
-void chi_mesh::VolumeMesher::SetGridAttributes(MeshAttributes new_attribs)
+void chi_mesh::VolumeMesher::
+  SetGridAttributes(MeshAttributes new_attribs,
+                    std::array<size_t,3> ortho_Nis/*={0,0,0}*/)
 {
-  m_grid->SetAttributes(new_attribs);
+  m_grid->SetAttributes(new_attribs, ortho_Nis);
 }

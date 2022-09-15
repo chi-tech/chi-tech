@@ -85,7 +85,9 @@ void chi_mesh::VolumeMesherPredefinedUnpartitioned::Execute()
   MPI_Barrier(MPI_COMM_WORLD);
 
   SetContinuum(grid);
-  SetGridAttributes(umesh->attributes);
+  SetGridAttributes(umesh->attributes, {umesh->mesh_options.ortho_Nx,
+                                        umesh->mesh_options.ortho_Ny,
+                                        umesh->mesh_options.ortho_Nz});
 
   //======================================== Concluding messages
   chi::log.LogAllVerbose1()
