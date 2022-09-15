@@ -121,7 +121,9 @@ public:
                         const std::string& field_name,
                         const std::vector<std::string>& component_names);
 
-  void UploadCellGeometry(const chi_mesh::Cell& cell,
+  static
+  void UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
+                          const chi_mesh::Cell& cell,
                           int64_t& node_counter,
                           vtkNew<vtkPoints>& points,
                           vtkNew<vtkUnstructuredGrid>& ugrid);

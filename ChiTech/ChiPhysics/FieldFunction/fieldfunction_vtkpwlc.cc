@@ -99,7 +99,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   int64_t mapping_counter=0;
   for (const auto& cell : grid->local_cells)
   {
-    UploadCellGeometry(cell, node_count, points, ugrid);
+    UploadCellGeometry(*grid, cell, node_count, points, ugrid);
 
     material_array->InsertNextValue(cell.material_id);
     partition_id_array->InsertNextValue(cell.partition_id);

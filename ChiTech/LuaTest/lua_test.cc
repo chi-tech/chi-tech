@@ -24,6 +24,7 @@ int chiLuaTest(lua_State* L)
   chi_unit_tests::Test_chi_math(verbose);
   chi_unit_tests::Test_chi_misc_utils(verbose);
   chi_unit_tests::Test_chi_data_types(verbose);
+  chi_unit_tests::Test_WDD_IJK_Sweep(verbose);
 
   return 0;
 }

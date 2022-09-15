@@ -2,6 +2,7 @@
 #define CHI_MESHCONTINUUM_H_
 
 #include <memory>
+#include <array>
 
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
@@ -41,6 +42,13 @@ private:
   chi_objects::ChiMPICommunicatorSet communicator_set;
 
   MeshAttributes attributes = NONE;
+
+  struct
+  {
+    size_t Nx = 0;
+    size_t Ny = 0;
+    size_t Nz = 0;
+  }ortho_attributes;
 
 public:
   MeshContinuum() :
@@ -104,11 +112,15 @@ public:
 
   MeshAttributes Attributes() const {return attributes;}
 
+  std::array<size_t,3> GetIJKInfo() const;
+
 private:
   friend class chi_mesh::VolumeMesher;
-  void SetAttributes(MeshAttributes new_attribs)
+  void SetAttributes(MeshAttributes new_attribs,
+                     std::array<size_t,3> ortho_Nis={0,0,0})
   {
     attributes = attributes | new_attribs;
+    ortho_attributes = {ortho_Nis[0],ortho_Nis[1],ortho_Nis[2]};
   }
 };
 

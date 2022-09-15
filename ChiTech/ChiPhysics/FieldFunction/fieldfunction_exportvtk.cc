@@ -144,7 +144,8 @@ void chi_physics::FieldFunction::WritePVTU(const std::string& base_filename,
 //###################################################################
 /**Uploads just the geometry portion of a cell to VTK.*/
 void chi_physics::FieldFunction::
-  UploadCellGeometry(const chi_mesh::Cell &cell,
+  UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
+                     const chi_mesh::Cell &cell,
                      int64_t& node_counter,
                      vtkNew<vtkPoints>& points,
                      vtkNew<vtkUnstructuredGrid> &ugrid)
@@ -156,9 +157,9 @@ void chi_physics::FieldFunction::
   {
     uint64_t vgi = cell.vertex_ids[v];
     std::vector<double> d_node(3);
-    d_node[0] = grid->vertices[vgi].x;
-    d_node[1] = grid->vertices[vgi].y;
-    d_node[2] = grid->vertices[vgi].z;
+    d_node[0] = grid.vertices[vgi].x;
+    d_node[1] = grid.vertices[vgi].y;
+    d_node[2] = grid.vertices[vgi].z;
 
     points->InsertPoint(node_counter,d_node.data());
     cell_vids[v] = node_counter++;

@@ -285,3 +285,12 @@ size_t chi_mesh::MeshContinuum::
 
   return global_count;
 }
+
+//###################################################################
+/**Gets and orthogonal mesh interface object.*/
+std::array<size_t,3> chi_mesh::MeshContinuum::GetIJKInfo() const
+{
+  return {ortho_attributes.Nx,
+          ortho_attributes.Ny,
+          ortho_attributes.Nz};
+}
