@@ -1,33 +1,32 @@
 #include "fieldfunction.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "chi_mpi.h"
 
-
-#include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkXMLPUnstructuredGridWriter.h>
 
 #include <vtkCellData.h>
-#include <vtkPointData.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
+#include <vtkUnsignedIntArray.h>
 
 #include <vtkInformation.h>
 
 //###################################################################
 /**Exports multiple field functions to a VTK file collection.*/
 void chi_physics::FieldFunction::
-  ExportMultipleFFToVTK(const std::string& file_base_name,
-                        const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list)
+  ExportMultipleFFToVTK(
+    const std::string& file_base_name,
+    const std::vector<std::shared_ptr<chi_physics::FieldFunction>>& ff_list)
 {
+  const std::string fname = __FUNCTION__;
   chi::log.Log() << "Exporting field functions to VTK with file base \""
                      << file_base_name << "\"";
 
@@ -39,7 +38,9 @@ void chi_physics::FieldFunction::
     chi::Exit(EXIT_FAILURE);
   }
 
-  //============================================= Check spatial discretization
+  //============================================= Check spatial discretizations
+  // All the spatial discretizations need to be
+  // the same
   auto ff_type = ff_list.front()->spatial_discretization->type;
   for (auto& ff : ff_list)
     if (ff->spatial_discretization->type != ff_type)
@@ -52,9 +53,12 @@ void chi_physics::FieldFunction::
            "spatial discretization.";
       chi::Exit(EXIT_FAILURE);
     }
-  auto ff_spatial_discretization = ff_list.front()->spatial_discretization;
+  auto ff_sdm = ff_list.front()->spatial_discretization;
+  const auto ff_sdm_type = ff_sdm->type;
 
   //============================================= Check grid
+  // All of the field-functions need to refer
+  // to the same grid
   auto grid = ff_list.front()->spatial_discretization->ref_grid;
   for (auto& ff : ff_list)
     if (ff->spatial_discretization->ref_grid != grid)
@@ -68,205 +72,89 @@ void chi_physics::FieldFunction::
       chi::Exit(EXIT_FAILURE);
     }
 
-  //============================================= Instantiate VTK grid
-  auto ugrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  //============================================= Determine cell/point data
+  typedef chi_math::SpatialDiscretizationType SDMType;
 
-  //============================================= Populate VTK points
-  auto points = vtkSmartPointer<vtkPoints>::New();
-  int64_t vertex_counter=0;
+  enum class CellDataScope
+  {
+    CELLDATA = 0,
+    POINTDATA = 1
+  };
+
+  CellDataScope ff_data_scope;
+  switch (ff_sdm_type)
+  {
+    case SDMType::FINITE_VOLUME:
+      ff_data_scope = CellDataScope::CELLDATA;
+      break;
+    case SDMType::PIECEWISE_LINEAR_CONTINUOUS:
+    case SDMType::PIECEWISE_LINEAR_DISCONTINUOUS:
+      ff_data_scope = CellDataScope::POINTDATA;
+      break;
+    default:
+      throw std::logic_error(fname + ": Unsupported spatial discretization "
+                                     "method encountered.");
+  }
+
+  //============================================= Instantiate VTK items
+  vtkNew<vtkUnstructuredGrid>         ugrid;
+  vtkNew<vtkPoints>                   points;
+  vtkNew<vtkIntArray>                 material_array;
+  vtkNew<vtkUnsignedIntArray>         partition_id_array;
+
+  //============================================= Set names
+  material_array->SetName("Material");
+  partition_id_array->SetName("Partition");
+
+  //############################################# Populate cell information
+  int64_t node_count=0;
   for (const auto& cell : grid->local_cells)
-    for (uint64_t vid : cell.vertex_ids)
-    {
-      auto vertex = grid->vertices[vid];
+  {
+    UploadCellGeometry(*grid, cell, node_count, points, ugrid);
 
-      points->InsertPoint(vertex_counter++, vertex.x, vertex.y, vertex.z);
-    }
+    material_array->InsertNextValue(cell.material_id);
+    partition_id_array->InsertNextValue(cell.partition_id);
+  }//for local cells
   ugrid->SetPoints(points);
 
-  //============================================= Populate VTK cells
-  auto material_array         = vtkSmartPointer<vtkIntArray>::New();
-  auto partition_number_array = vtkSmartPointer<vtkIntArray>::New();
-
-  material_array->SetName("Material");
-  partition_number_array->SetName("Partition");
-  vertex_counter=0;
-  for (const auto& cell : grid->local_cells)
-  {
-    material_array->InsertNextValue(cell.material_id);
-    partition_number_array->InsertNextValue(static_cast<int>(cell.partition_id));
-
-    //================================= Build cell vertices
-    size_t num_verts = cell.vertex_ids.size();
-    std::vector<vtkIdType> vertex_ids;
-    vertex_ids.reserve(num_verts);
-    for (auto& vid : cell.vertex_ids)
-      vertex_ids.push_back(vertex_counter++);
-
-    //================================= Handle cell specific items
-    if (cell.Type() == chi_mesh::CellType::SLAB)
-      ugrid->
-        InsertNextCell(VTK_LINE,
-                       static_cast<vtkIdType>(num_verts),
-                       vertex_ids.data());
-    else if (cell.Type() == chi_mesh::CellType::POLYGON)
-      ugrid->
-        InsertNextCell(VTK_POLYGON,
-                       static_cast<vtkIdType>(num_verts),
-                       vertex_ids.data());
-    else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-    {
-      vtkNew<vtkIdList> faces;
-
-      size_t num_faces = cell.faces.size();
-      for (const auto& face : cell.faces)
-      {
-        size_t num_fverts = face.vertex_ids.size();
-        std::vector<vtkIdType> fvertex_ids;
-        fvertex_ids.reserve(num_fverts);
-
-        for (size_t fv=0; fv<num_fverts; fv++)
-          for (size_t v=0; v<cell.vertex_ids.size(); ++v)
-            if (face.vertex_ids[fv] == cell.vertex_ids[v])
-              fvertex_ids.push_back(vertex_ids[v]);
-
-        faces->InsertNextId(static_cast<vtkIdType>(num_fverts));
-        for (auto vid : fvertex_ids)
-          faces->InsertNextId(vid);
-      }//for faces
-
-      ugrid->
-        InsertNextCell(VTK_POLYHEDRON,
-                       static_cast<vtkIdType>(num_verts),
-                       vertex_ids.data(),
-                       static_cast<vtkIdType>(num_faces),
-                       faces->GetPointer(0));
-    }//polyhedron
-    else
-    {
-      chi::log.LogAllError()
-        << "ExportMultipleFFToVTK: Unsupported cell type encountered.";
-      chi::Exit(EXIT_FAILURE);
-    }
-  }//for cell
-
   ugrid->GetCellData()->AddArray(material_array);
-  ugrid->GetCellData()->AddArray(partition_number_array);
+  ugrid->GetCellData()->AddArray(partition_id_array);
 
-  //=============================================
-  typedef chi_math::SpatialDiscretizationType SDMType;
-  typedef chi_math::SpatialDiscretization_FV SDMFV;
-
-  if (ff_type == SDMType::FINITE_VOLUME)
+  //============================================= Upload cell/point data
+  auto cell_data = ugrid->GetCellData();
+  auto point_data = ugrid->GetPointData();
+  for (const auto &ff: ff_list)
   {
-    auto fv_ptr = std::dynamic_pointer_cast<SDMFV>(ff_spatial_discretization);
-    if (not fv_ptr) throw std::logic_error(std::string(__FUNCTION__) +
-                                       ": Failed to obtain fv-sdm.");
-    auto& fv = *fv_ptr;
-    for (auto& ff : ff_list)
+    unsigned int ref_unknown_id = ff->ref_variable;
+    const auto &unknown = ff->unknown_manager.unknowns[ref_unknown_id];
+
+    for (unsigned int comp=0; comp<unknown.num_components; ++comp)
     {
-      unsigned int ref_unknown = ff->ref_variable;
-      const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
+      vtkNew<vtkDoubleArray> unk_arr;
+      unk_arr->SetName((ff->text_name +
+                        unknown.text_name+
+                        unknown.component_text_names[comp]).c_str());
 
-      if (unknown.type == chi_math::UnknownType::SCALAR)
+      //Populate the array here
+      for (const auto& cell : grid->local_cells)
       {
-        auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        unk_arr->SetName(unknown.text_name.c_str());
-
-        for (auto& cell : grid->local_cells)
+        size_t num_nodes = ff_sdm->GetCellNumNodes(cell);
+        for (int n=0; n<num_nodes; ++n)
         {
-          int64_t local_mapping =
-            fv.MapDOFLocal(cell,0,ff->unknown_manager,ref_unknown,0);
+          const int64_t nmap = ff_sdm->MapDOFLocal(cell,n,ff->unknown_manager,
+                                                   ref_unknown_id,
+                                                   comp);
+          unk_arr->InsertNextValue((*ff->field_vector_local)[nmap]);
+        }//for node
+      }//for cell
 
-          double value = (*ff->field_vector_local)[local_mapping];
-
-          unk_arr->InsertNextValue(value);
-        }
-
-        ugrid->GetCellData()->AddArray(unk_arr);
-      }//scalar
-    }
-  }
-
-  //=============================================
-  if (ff_type == SDMType::PIECEWISE_LINEAR_CONTINUOUS or
-      ff_type == SDMType::PIECEWISE_LINEAR_DISCONTINUOUS)
-  {
-    int ff_number = -1;
-    for (auto& ff : ff_list)
-    {
-      unsigned int ref_unknown = ff->ref_variable;
-      const auto& unknown = ff->unknown_manager.unknowns[ref_unknown];
-      ff_number++;
-
-      unsigned int N = ff->unknown_manager.GetTotalUnknownStructureSize();
-
-      if (unknown.type == chi_math::UnknownType::SCALAR)
+      switch (ff_data_scope)
       {
-        unsigned int component = ff->unknown_manager.MapUnknown(ref_unknown, 0);
-
-        auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-        if (unknown.text_name.empty())
-          unk_arr->SetName((std::string("FF_")+
-                            std::to_string(ff_number)).c_str());
-        else
-          unk_arr->SetName((std::string("FF_") +
-                            std::to_string(ff_number) +
-                            unknown.text_name).c_str());
-
-        uint64_t c=0;
-        for (auto& cell : grid->local_cells)
-        {
-          for (size_t v=0; v < cell.vertex_ids.size(); ++v)
-          {
-            uint64_t local_mapping = c*N + component;
-            ++c;
-
-            double value = (*ff->field_vector_local)[local_mapping];
-
-            unk_arr->InsertNextValue(value);
-          }//for vid
-        }//for cell
-
-        ugrid->GetPointData()->AddArray(unk_arr);
-      }//scalar
-      if (unknown.type == chi_math::UnknownType::VECTOR_2 or
-          unknown.type == chi_math::UnknownType::VECTOR_3 or
-          unknown.type == chi_math::UnknownType::VECTOR_N)
-      {
-        for (unsigned int comp=0; comp<unknown.num_components; ++comp)
-        {
-          unsigned int component = ff->unknown_manager.MapUnknown(ref_unknown, comp);
-
-          auto unk_arr = vtkSmartPointer<vtkDoubleArray>::New();
-          if (unknown.component_text_names[comp].empty())
-            unk_arr->SetName((std::string("FF_") +
-                              std::to_string(ff_number) +
-                              std::string("Component_") +
-                              std::to_string(comp)).c_str());
-          else
-            unk_arr->SetName((std::string("FF_") +
-                              std::to_string(ff_number) +
-                              unknown.component_text_names[comp]).c_str());
-
-          uint64_t c=0;
-          for (auto& cell : grid->local_cells)
-          {
-            for (size_t v=0; v < cell.vertex_ids.size(); ++v)
-            {
-              uint64_t local_mapping = c*N + component;
-              ++c;
-
-              double value = (*ff->field_vector_local)[local_mapping];
-
-              unk_arr->InsertNextValue(value);
-            }//for vid
-          }//for cell
-
-          ugrid->GetPointData()->AddArray(unk_arr);
-        }//for c
-      }//scalar
-    }
-  }
+        case CellDataScope::CELLDATA:  cell_data->AddArray(unk_arr); break;
+        case CellDataScope::POINTDATA: point_data->AddArray(unk_arr);break;
+      }
+    }//for component
+  }//for ff
 
   //============================================= Construct file name
   std::string base_filename     = std::string(file_base_name);

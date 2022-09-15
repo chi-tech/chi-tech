@@ -561,6 +561,38 @@ public:
     return *(address);
   }
 
+  /** Returns a linear index to the specified element with safety checks.
+   *
+   *  \param args The indices of the desired element.
+   *  \throw std::invalid_argument if the number of arguments are incorrect and
+   *  std::out_of_range if one of the dimension-indices are out of range.
+   *  \return Linear index to the specified element.
+   */
+  template<typename... Args>
+  size_t MapNDtoLin(Args... args)
+  {
+    static_assert(AllIntegral<Args...>::value,
+                  "NDArray::at(): All parameters must be of integral type");
+
+    if (sizeof...(args) != m_rank)
+      throw std::invalid_argument("NDArray::at(): Number of arguments " +
+                                  std::to_string(sizeof...(args)) + " not equal to rank " +
+                                  std::to_string(m_rank));
+
+    const size_t N = m_rank;
+    size_t indices[] { static_cast<size_t>(args)... };
+    for (size_t i=0; i<N; ++i)
+      if (indices[i] >= m_dimensions[i])
+        throw std::out_of_range("NDArray::at(): Index " + std::to_string(i) +
+                                " out of range " + std::to_string(indices[i]) +
+                                " must be <" + std::to_string(m_dimensions[i]));
+
+    size_t index = indices[N-1];
+    for(size_t i = 0;i < N-1;++i)
+      index += m_strides[i] * indices[i];
+    return index;
+  }
+
   /** Deletes the array.
    *
    *  The destructor deletes the underlying array data.

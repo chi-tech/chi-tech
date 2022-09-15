@@ -83,7 +83,8 @@ public:
   virtual void Execute();
 
   //
-  void SetGridAttributes(MeshAttributes new_attribs);
+  void SetGridAttributes(MeshAttributes new_attribs,
+                         std::array<size_t,3> ortho_Nis={0,0,0});
 
 };
 
