@@ -37,8 +37,7 @@ public:
     AngularQuadrature(chi_math::AngularQuadratureType::ProductQuadrature)
   {}
 
-  virtual ~ProductQuadrature()
-  {} 
+  ~ProductQuadrature() override = default;
  
   void InitializeWithGL(int Np, bool verbose=false);
   void InitializeWithGLL(int Na, int Np, bool verbose=false);
@@ -46,7 +45,7 @@ public:
   void InitializeWithCustom(std::vector<double>& azimuthal,
                             std::vector<double>& polar,
                             std::vector<double>& in_weights,
-                            bool verbose=false) override;
+                            bool verbose) override;
   /**Obtains the abscissae index given the indices of the
    * polar angle index and the azimuthal angle index.*/
   unsigned int GetAngleNum(const unsigned int polar_angle_index,

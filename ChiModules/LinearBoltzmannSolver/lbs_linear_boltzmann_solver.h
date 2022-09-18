@@ -152,6 +152,13 @@ public:
   void ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const;
   void ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const;
   void ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const;
+  //03aa
+  static
+  std::pair<UniqueSOGroupings, DirIDToSOMap>
+  AssociateSOsAndDirections(const chi_mesh::MeshContinuum& grid,
+                                 const chi_math::AngularQuadrature& quadrature,
+                                 AngleAggregationType agg_type,
+                                 lbs::GeometryType lbs_geo_type);
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
   //03c

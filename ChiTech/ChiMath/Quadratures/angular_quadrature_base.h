@@ -47,9 +47,9 @@ public:
     HarmonicIndices(unsigned int in_ell, int in_m) : ell(in_ell),m(in_m){}
 
     bool operator==(const HarmonicIndices& other) const
-      {
-        return (ell == other.ell and m == other.m);
-      }
+    {
+      return (ell == other.ell and m == other.m);
+    }
   };
 
 protected:
@@ -64,19 +64,22 @@ public:
   type(chi_math::AngularQuadratureType::Arbitrary)
   {}
 
+  explicit
   AngularQuadrature(chi_math::AngularQuadratureType in_type) :
     type(in_type)
   {}
 
-  virtual ~AngularQuadrature()
-  {} 
+  virtual ~AngularQuadrature() = default;
 
   virtual void
   InitializeWithCustom(std::vector<double>& azimuthal,
                        std::vector<double>& polar,
-                       std::vector<double>& in_weights, bool verbose=false);
+                       std::vector<double>& in_weights, bool verbose);
 
+protected:
   virtual void MakeHarmonicIndices(unsigned int scattering_order, int dimension);
+
+public:
   virtual void BuildDiscreteToMomentOperator(unsigned int scattering_order, int dimension);
   virtual void BuildMomentToDiscreteOperator(unsigned int scattering_order, int dimension);
 

@@ -87,10 +87,7 @@ MakeHarmonicIndices(unsigned int scattering_order, int dimension)
     else if (dimension == 2)
       for (int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m+=2)
-        {
-          if (ell == 0 or m != 0)
             m_to_ell_em_map.emplace_back(ell,m);
-        }
     else if (dimension == 3)
       for (int ell=0; ell<=scattering_order; ell++)
         for (int m=-ell; m<=ell; m++)
@@ -108,8 +105,8 @@ void chi_math::AngularQuadrature::
   d2m_op.clear();
   MakeHarmonicIndices(scattering_order,dimension);
 
-  int num_angles = abscissae.size();
-  int num_moms = m_to_ell_em_map.size();
+  const size_t num_angles = abscissae.size();
+  const size_t num_moms = m_to_ell_em_map.size();
 
   for (const auto& ell_em : m_to_ell_em_map)
   {
@@ -129,12 +126,6 @@ void chi_math::AngularQuadrature::
     d2m_op.push_back(cur_mom);
   }
   d2m_op_built = true;
-
-
-
-
-
-
 
   //=================================== Verbose printout
   std::stringstream outs;
@@ -165,8 +156,8 @@ void chi_math::AngularQuadrature::
   m2d_op.clear();
   MakeHarmonicIndices(scattering_order,dimension);
 
-  int num_angles = abscissae.size();
-  int num_moms = m_to_ell_em_map.size();
+  const size_t num_angles = abscissae.size();
+  const size_t num_moms = m_to_ell_em_map.size();
 
   const auto normalization =
     std::accumulate(weights.begin(), weights.end(), 0.0);

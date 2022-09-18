@@ -7,6 +7,10 @@
 namespace lbs
 {
 
+typedef std::vector<size_t> DirIDs; ///< Direction-IDs
+typedef std::vector<DirIDs> UniqueSOGroupings;
+typedef std::map<size_t, size_t> DirIDToSOMap;
+
 enum class GeometryType
 {
   NO_GEOMETRY_SET  = 0,
@@ -16,6 +20,14 @@ enum class GeometryType
   TWOD_CARTESIAN   = 4,
   TWOD_CYLINDRICAL = 5,
   THREED_CARTESIAN = 6
+};
+
+enum class AngleAggregationType
+{
+  UNDEFINED = 0,
+  SINGLE = 1,
+  POLAR = 2,
+  AZIMUTHAL = 3,
 };
 
 /**Struct for storing LBS options.*/

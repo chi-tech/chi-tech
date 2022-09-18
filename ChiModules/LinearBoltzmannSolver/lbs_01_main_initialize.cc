@@ -4,9 +4,6 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-
-;
-
 #include <iomanip>
 #include "ChiConsole/chi_console.h"
 

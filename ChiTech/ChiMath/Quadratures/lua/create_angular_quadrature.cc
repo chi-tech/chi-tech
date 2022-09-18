@@ -5,7 +5,6 @@
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
 
 #include "chi_log.h"
-;
 
 //########################################################## Create empty system
 /** Creates an angular quadrature.
@@ -23,27 +22,28 @@
 \author Jan*/
 int chiCreateCustomAngularQuadrature(lua_State *L)
 {
-  size_t num_args = lua_gettop(L);
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
 
   if (num_args != 3)
-    LuaPostArgAmountError("chiCreateCustomAngularQuadrature",3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue("chiCreateCustomAngularQuadrature",L,1);
-  LuaCheckNilValue("chiCreateCustomAngularQuadrature",L,2);
-  LuaCheckNilValue("chiCreateCustomAngularQuadrature",L,3);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
 
-  LuaCheckTableValue("chiCreateCustomAngularQuadrature",L,1);
-  LuaCheckTableValue("chiCreateCustomAngularQuadrature",L,2);
-  LuaCheckTableValue("chiCreateCustomAngularQuadrature",L,3);
+  LuaCheckTableValue(fname,L,1);
+  LuaCheckTableValue(fname,L,2);
+  LuaCheckTableValue(fname,L,3);
 
-  int Na = lua_rawlen(L,1);
-  int Np = lua_rawlen(L,2);
-  int Nw = lua_rawlen(L,3);
+  size_t Na = lua_rawlen(L,1);
+  size_t Np = lua_rawlen(L,2);
+  size_t Nw = lua_rawlen(L,3);
 
   if ((Na-Np != 0) or (Na-Nw !=0))
   {
     chi::log.LogAllError()
-      << "chiCreateCustomAngularQuadrature: Tables lengths supplied "
+      << fname +": Tables lengths supplied "
          "are not of equal lengths.";
    chi::Exit(EXIT_FAILURE);
   }
@@ -79,11 +79,12 @@ int chiCreateCustomAngularQuadrature(lua_State *L)
   chi::log.Log() << "Creating Custom Angular Quadrature\n";
 
   auto angular_quadrature = std::make_shared<chi_math::AngularQuadrature>();
-  angular_quadrature->InitializeWithCustom(azi_angles,pol_angles,weights);
+  angular_quadrature->InitializeWithCustom(azi_angles,pol_angles,weights,
+                                           /*verbose=*/false);
 
   chi::angular_quadrature_stack.push_back(angular_quadrature);
-  int index = chi::angular_quadrature_stack.size()-1;
-  lua_pushnumber(L,index);
+  size_t index = chi::angular_quadrature_stack.size()-1;
+  lua_pushnumber(L,static_cast<lua_Number>(index));
 
   return 1;
 }

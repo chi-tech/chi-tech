@@ -10,10 +10,6 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
-
-;
-
-
 typedef chi_mesh::sweep_management::AngleSet TAngleSet;
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 
@@ -31,6 +27,14 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
     chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering.\n";
+
+  const auto unq_groupings_and_mapping =
+    AssociateSOsAndDirections(*grid,
+                              *groupset.quadrature,
+                              groupset.angleagg_method,
+                              options.geometry_type);
+  const auto& unique_so_groupings = unq_groupings_and_mapping.first;
+  const auto& dir_id_to_so_map = unq_groupings_and_mapping.second;
 
   //============================================= Clear sweep ordering
   groupset.sweep_orderings.clear();
@@ -74,7 +78,7 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
       << chi::program_timer.GetTimeString()
       << " Done computing sweep orderings.           Process memory = "
       << std::setprecision(3)
-      << chi::console.GetMemoryUsageInMB() << " MB";
+      << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
 
 }
 

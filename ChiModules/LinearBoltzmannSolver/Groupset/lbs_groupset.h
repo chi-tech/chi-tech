@@ -16,13 +16,6 @@
 
 namespace lbs
 {
-  enum class AngleAggregationType
-  {
-    UNDEFINED = 0,
-    SINGLE = 1,
-    POLAR = 2,
-    AZIMUTHAL = 3,
-  };
 
 /**Group set functioning as a collection of groups*/
 class LBSGroupset

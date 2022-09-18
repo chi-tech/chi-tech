@@ -41,7 +41,9 @@
 //RegisterFunction(chiLegendre)
 //RegisterFunction(chiLegendreDerivative)
 //RegisterFunction(chiYlm)
-//RegisterFunction(chiCreateQuadrature)
+
+//module:Quadratures
+//RegisterFunction(chiCreateLineQuadrature)
 //RegisterFunction(chiCreateProductQuadrature)
 //RegisterFunction(chiCreateCylindricalProductQuadrature)
 //RegisterFunction(chiCreateSphericalProductQuadrature)
