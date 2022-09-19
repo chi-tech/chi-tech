@@ -4,8 +4,6 @@
 
 #include <chi_log.h>
 
-;
-
 //###################################################################
 /**Performs general input checks before initialization continues.*/
 void lbs::SteadySolver::PerformInputChecks()
@@ -40,14 +38,6 @@ void lbs::SteadySolver::PerformInputChecks()
       << "LinearBoltzmann::Solver: No discretization method set.";
     chi::Exit(EXIT_FAILURE);
   }
-//  if (regions.empty())
-//  {
-//    chi::log.LogAllError()
-//      << "LinearBoltzmann::Solver: No regions added to solver.";
-//    chi::Exit(EXIT_FAILURE);
-//  }
-//  chi_mesh::Region*  aregion = regions.back();
-//  grid                       = aregion->GetGrid();
 
   grid = chi_mesh::GetCurrentHandler().GetGrid();
 
@@ -59,16 +49,13 @@ void lbs::SteadySolver::PerformInputChecks()
   }
 
   //======================================== Determine geometry type
-  if (grid->local_cells[0].Type() == chi_mesh::CellType::SLAB)
-  {
+  using namespace chi_mesh;
+  const auto grid_attribs = grid->Attributes();
+  if (grid_attribs & DIMENSION_1)
     options.geometry_type = GeometryType::ONED_SLAB;
-  }
-  else if (grid->local_cells[0].Type() == chi_mesh::CellType::POLYGON)
-  {
+  if (grid_attribs & DIMENSION_2)
     options.geometry_type = GeometryType::TWOD_CARTESIAN;
-  }
-  else if (grid->local_cells[0].Type() == chi_mesh::CellType::POLYHEDRON)
-  {
+  if (grid_attribs & DIMENSION_3)
     options.geometry_type = GeometryType::THREED_CARTESIAN;
-  }
+
 }

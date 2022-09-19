@@ -3,40 +3,30 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
-#include <chi_mpi.h>
-
-
-#include <chi_log.h>
-;
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 
 //###################################################################
 /**AngleSet constructor.*/
 chi_mesh::sweep_management::AngleSet::
-AngleSet(int in_numgrps,
-         int in_ref_subset,
+AngleSet(size_t in_numgrps,
+         size_t in_ref_subset,
          std::shared_ptr<SPDS>& in_spds,
          FLUDS* in_fluds,
-         std::vector<int>& angle_indices,
+         std::vector<size_t>& angle_indices,
          std::vector<std::shared_ptr<SweepBndry>>& sim_boundaries,
          int sweep_eager_limit,
          chi_objects::ChiMPICommunicatorSet* in_comm_set):
+  num_grps(in_numgrps),
   spds(in_spds),
   sweep_buffer(this,sweep_eager_limit,in_comm_set),
-  ref_boundaries(sim_boundaries)
+  fluds(in_fluds),
+  angles(angle_indices),
+  ref_boundaries(sim_boundaries),
+  ref_subset(in_ref_subset)
 {
-  num_grps = in_numgrps;
-  executed = false;
-  ref_subset = in_ref_subset;
-  std::copy(angle_indices.begin(),
-            angle_indices.end(),
-            std::back_inserter(angles));
-
-  fluds = in_fluds;
-
   sweep_buffer.BuildMessageStructure();
-
-  delayed_local_norm = 0.0;
 }
 
 //###################################################################
@@ -137,7 +127,7 @@ void chi_mesh::sweep_management::AngleSet::SetMaxBufferMessages(int new_max)
 
 //###################################################################
 /**Returns the number of groups associated with the angleset.*/
-int chi_mesh::sweep_management::AngleSet::GetNumGrps() const
+size_t chi_mesh::sweep_management::AngleSet::GetNumGrps() const
 {
   return num_grps;
 }

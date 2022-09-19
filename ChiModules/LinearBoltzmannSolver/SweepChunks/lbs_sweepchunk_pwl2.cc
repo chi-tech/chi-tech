@@ -63,10 +63,10 @@ void lbs::SweepChunkPWL::
   std::vector<double>& output_phi = GetDestinationPhi();
   std::vector<double>& output_psi = GetDestinationPsi();
 
-  const GsSubSet& subset = groupset.grp_subsets[angle_set->ref_subset];
-  const int gs_ss_size  = groupset.grp_subset_sizes[angle_set->ref_subset];
-  const int gs_ss_begin = subset.first;
-  const int gs_gi = groupset.groups[gs_ss_begin].id; // Groupset subset first group number
+  const SubSetInfo& grp_ss_info = groupset.grp_subset_infos[angle_set->ref_subset];
+  const size_t gs_ss_size  = grp_ss_info.ss_size;
+  const size_t gs_ss_begin = grp_ss_info.ss_begin;
+  const size_t gs_gi = groupset.groups[gs_ss_begin].id; // Groupset subset first group number
 
   int deploc_face_counter = -1;
   int preloc_face_counter = -1;

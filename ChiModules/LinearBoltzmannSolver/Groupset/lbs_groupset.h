@@ -11,19 +11,14 @@
 #include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 
 #include "../lbs_structs.h"
+#include "../lbs_make_subset.h"
 
 #include "ChiPhysics/chi_physics_namespace.h"
 
 namespace lbs
 {
-  enum class AngleAggregationType
-  {
-    UNDEFINED = 0,
-    SINGLE = 1,
-    POLAR = 2,
-    AZIMUTHAL = 3,
-  };
 
+//################################################################### Class def
 /**Group set functioning as a collection of groups*/
 class LBSGroupset
 {
@@ -35,17 +30,16 @@ public:
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
   std::vector<SPDS_ptr>                        sweep_orderings;
+  UniqueSOGroupings                            unique_so_groupings;
+  DirIDToSOMap                                 dir_id_to_so_map;
+
   int                                          master_num_grp_subsets;
   int                                          master_num_ang_subsets;
-  std::vector<std::pair<int, int>>                        grp_subsets;
-  std::vector<int>                             grp_subset_sizes;
-  std::vector<std::pair<int, int>>                       ang_subsets_top;
-  std::vector<int>                             ang_subset_sizes_top;
-  std::vector<std::pair<int, int>>                       ang_subsets_bot;
-  std::vector<int>                             ang_subset_sizes_bot;
 
-  IterativeMethod             iterative_method;
-  AngleAggregationType        angleagg_method;
+  std::vector<SubSetInfo>                      grp_subset_infos;
+
+  IterativeMethod                              iterative_method;
+  AngleAggregationType                         angleagg_method;
   double                                       residual_tolerance;
   int                                          max_iterations;
   int                                          gmres_restart_intvl;
@@ -82,11 +76,7 @@ public:
 };
 }
 
-typedef std::pair<int,int> GsSubSet;
-typedef std::pair<int,int> AngSubSet;
 
-#include <vector>
 
-//################################################################### Class def
 
 #endif

@@ -1,12 +1,11 @@
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
+#include "../lbs_make_subset.h"
+
 #include "ChiMath/Quadratures/product_quadrature.h"
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-
-;
-
 
 #include <fstream>
 
@@ -93,88 +92,17 @@ void lbs::LBSGroupset::BuildMomDiscOperator(
 /**Constructs the groupset subsets.*/
 void lbs::LBSGroupset::BuildSubsets()
 {
-  grp_subsets.clear();
-  grp_subset_sizes.clear();
-
-  //=================================== Groupset subsets
-  int num_gs_subsets = 1;
-  if (master_num_grp_subsets <= groups.size())
-    num_gs_subsets = master_num_grp_subsets;
-
-  int gs_subset_size = floor(groups.size()/num_gs_subsets);
-
-  for (int ss=0; ss<num_gs_subsets; ss++)
+  grp_subset_infos = lbs::MakeSubSets(groups.size(), master_num_grp_subsets);
   {
-    int subset_ranki = ss*gs_subset_size;
-    int subset_size  = gs_subset_size;
-
-    if (ss == (num_gs_subsets-1))
-      subset_size = (int)groups.size() - ss*gs_subset_size;
-
-//    grp_subsets.push_back(GsSubSet(subset_ranki,subset_ranki+subset_size-1));
-    grp_subsets.emplace_back(subset_ranki,subset_ranki+subset_size-1);
-    grp_subset_sizes.push_back(subset_size);
-
-    chi::log.Log()
-    << "Groupset subset " << ss << " "
-    << subset_ranki << "->" << subset_ranki+subset_size-1;
-  }//for ss
-
-  //=================================== Angle subsets
-  ang_subsets_top.clear();
-  ang_subsets_bot.clear();
-  ang_subset_sizes_top.clear();
-  ang_subset_sizes_bot.clear();
-  if (quadrature->type == chi_math::AngularQuadratureType::ProductQuadrature)
-  {
-    auto prodquadrature =
-      std::static_pointer_cast<chi_math::ProductQuadrature>(quadrature);
-    int num_pol_angls_hemi = (int)prodquadrature->polar_ang.size()/2;
-    int num_an_subsets = 1;
-    if (master_num_ang_subsets <= num_pol_angls_hemi)
-      num_an_subsets = master_num_ang_subsets;
-
-    int an_subset_size = floor(num_pol_angls_hemi/num_an_subsets);
-
-    //==================== Top hemishpere
-    for (int ss=0; ss<num_an_subsets; ss++)
+    size_t ss=0;
+    for (const auto& info : grp_subset_infos)
     {
-      int subset_ranki = ss*an_subset_size;
-      int subset_size  = an_subset_size;
-
-      if (ss == (num_an_subsets-1))
-        subset_size = num_pol_angls_hemi - ss*an_subset_size;
-
-//      ang_subsets_top.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
-      ang_subsets_top.emplace_back(subset_ranki,subset_ranki+subset_size-1);
-      ang_subset_sizes_top.push_back(subset_size);
-
-      if (angleagg_method != lbs::AngleAggregationType::SINGLE)
-        chi::log.Log()
-          << "Top-hemi Angle subset " << ss << " "
-          << subset_ranki << "->" << subset_ranki+subset_size-1;
-    }//for ss
-
-    //==================== Bottom hemisphere
-    for (int ss=0; ss<num_an_subsets; ss++)
-    {
-      int subset_ranki = ss*an_subset_size + num_pol_angls_hemi;
-      int subset_size  = an_subset_size;
-
-      if (ss == (num_an_subsets-1))
-        subset_size = num_pol_angls_hemi - ss*an_subset_size;
-
-//      ang_subsets_bot.push_back(AngSubSet(subset_ranki,subset_ranki+subset_size-1));
-      ang_subsets_bot.emplace_back(subset_ranki,subset_ranki+subset_size-1);
-      ang_subset_sizes_bot.push_back(subset_size);
-
-      if (angleagg_method != lbs::AngleAggregationType::SINGLE)
-        chi::log.Log()
-          << "Bot-hemi Angle subset " << ss << " "
-          << subset_ranki << "->" << subset_ranki+subset_size-1;
-    }//for ss
+      chi::log.Log()
+        << "Groupset subset " << ss << " "
+      << info.ss_begin << "->" << info.ss_end;
+      ++ss;
+    }
   }
-
 }
 
 //###################################################################

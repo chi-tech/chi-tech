@@ -12,7 +12,7 @@ typedef std::pair<int,std::vector<uint64_t>>             CompactFaceView;
 //cell_global_id, faces
 typedef std::pair<int,std::vector<CompactFaceView>> CompactCellView;
 
-namespace chi_mesh { namespace sweep_management
+namespace chi_mesh::sweep_management
 {
   struct FaceNodalMapping
   {
@@ -96,7 +96,7 @@ namespace chi_mesh { namespace sweep_management
       delete [] upwind_dof_mapping;
     }
   };
-} }
+}
 
 //###################################################################
 /**Improved Flux Data Structure (FLUDS).*/
@@ -132,7 +132,7 @@ class chi_mesh::sweep_management::PRIMARY_FLUDS :
 
 private:
   int largest_face=0;
-  int G=0;
+  size_t G=0;
 
   //local_psi_n_block_stride[fc]. Given face category fc, the value is
   //total number of faces that store information in this category's buffer
@@ -235,7 +235,7 @@ private:
   std::vector<CellFaceNodalMapping>& grid_nodal_mappings;
 
 public:
-  PRIMARY_FLUDS(int in_G,
+  PRIMARY_FLUDS(size_t in_G,
                 std::vector<CellFaceNodalMapping>& in_grid_nodal_mappings) :
                 G(in_G),
                 grid_nodal_mappings(in_grid_nodal_mappings)
