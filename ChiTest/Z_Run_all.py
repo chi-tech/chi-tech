@@ -244,6 +244,12 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 0.51187, 1.0e-4],
                               ["[0]  Max-value2=", 1.42458e-03, 1.0e-4]])
+run_test(
+    file_name="Transport2D_3Poly_quad_mod",
+    comment="2D LinearBSolver Test Polar-Optimized quadrature - PWLD",
+    num_procs=4,
+    search_strings_vals_tols=[["[0]  Max-value1=", 0.50758, 1.0e-4],
+                              ["[0]  Max-value2=", 2.52527e-04, 1.0e-4]])
 
 run_test(
     file_name="Transport3D_1a_Extruder",

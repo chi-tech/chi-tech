@@ -46,6 +46,8 @@ public:
                             std::vector<double>& polar,
                             std::vector<double>& in_weights,
                             bool verbose) override;
+
+  void OptimizeForPolarSymmetry(double normalization) override;
   /**Obtains the abscissae index given the indices of the
    * polar angle index and the azimuthal angle index.*/
   unsigned int GetAngleNum(const unsigned int polar_angle_index,

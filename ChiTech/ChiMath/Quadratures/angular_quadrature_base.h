@@ -76,21 +76,25 @@ public:
                        std::vector<double>& polar,
                        std::vector<double>& in_weights, bool verbose);
 
+  virtual void OptimizeForPolarSymmetry(double normalization);
+
 protected:
   virtual void MakeHarmonicIndices(unsigned int scattering_order, int dimension);
 
 public:
-  virtual void BuildDiscreteToMomentOperator(unsigned int scattering_order, int dimension);
-  virtual void BuildMomentToDiscreteOperator(unsigned int scattering_order, int dimension);
+  virtual void BuildDiscreteToMomentOperator(unsigned int scattering_order,
+                                             int dimension);
+  virtual void BuildMomentToDiscreteOperator(unsigned int scattering_order,
+                                             int dimension);
 
   std::vector<std::vector<double>> const&
-  GetDiscreteToMomentOperator() const {return d2m_op;}
+  GetDiscreteToMomentOperator() const;
 
   std::vector<std::vector<double>> const&
-  GetMomentToDiscreteOperator() const {return m2d_op;}
+  GetMomentToDiscreteOperator() const;
 
   const std::vector<HarmonicIndices>&
-  GetMomentToHarmonicsIndexMap() const {return m_to_ell_em_map;}
+  GetMomentToHarmonicsIndexMap() const;
 };
 
 #endif

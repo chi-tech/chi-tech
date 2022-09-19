@@ -6,9 +6,7 @@
 #include <vector>
 #include <limits>
 
-namespace chi_mesh
-{
-namespace sweep_management
+namespace chi_mesh::sweep_management
 {
 
 enum class BoundaryType
@@ -55,8 +53,11 @@ public:
                                   int face_num,
                                   int fi,
                                   int gs_ss_begin);
-  virtual void UpdateAnglesReadyStatus(std::vector<int> angles, int gs_ss){}
-  virtual bool CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss)
+  virtual void UpdateAnglesReadyStatus(const std::vector<size_t>& angles,
+                                       size_t gs_ss)
+  {}
+  virtual bool CheckAnglesReadyStatus(const std::vector<size_t>& angles,
+                                      size_t gs_ss)
   {return true;}
 
 };
@@ -66,6 +67,7 @@ public:
 class BoundaryVacuum : public BoundaryBase
 {
 public:
+  explicit
   BoundaryVacuum(std::vector<double>& ref_boundary_flux) :
   BoundaryBase(BoundaryType::VACUUM,ref_boundary_flux)
   {}
@@ -76,6 +78,7 @@ public:
 class BoundaryIncidentHomogenous : public BoundaryBase
 {
 public:
+  explicit
   BoundaryIncidentHomogenous(std::vector<double>& ref_boundary_flux) :
     BoundaryBase(BoundaryType::INCIDENT_HOMOGENOUS,ref_boundary_flux)
   {}
@@ -86,6 +89,7 @@ public:
 class BoundaryIncidentHeterogenous : public BoundaryBase
 {
 public:
+  explicit
   BoundaryIncidentHeterogenous(std::vector<double>& ref_boundary_flux) :
     BoundaryBase(BoundaryType::INCIDENT_HETEROGENOUS,ref_boundary_flux)
   {}
@@ -115,7 +119,7 @@ public:
 
 public:
   BoundaryReflecting(std::vector<double>& ref_boundary_flux,
-                     chi_mesh::Normal in_normal) :
+                     const chi_mesh::Normal& in_normal) :
   BoundaryBase(BoundaryType::REFLECTING,ref_boundary_flux),
   normal(in_normal)
   {}
@@ -133,11 +137,12 @@ public:
                           int fi,
                           int gs_ss_begin) override;
 
-  void UpdateAnglesReadyStatus(std::vector<int> angles, int gs_ss) override;
-  bool CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss) override;
+  void UpdateAnglesReadyStatus(const std::vector<size_t>& angles,
+                               size_t gs_ss) override;
+  bool CheckAnglesReadyStatus(const std::vector<size_t>& angles,
+                              size_t gs_ss) override;
   void ResetAnglesReadyStatus();
 };
-}//namespace chi_mesh
 }//namespace sweep_management
 
 #endif //CHI_SWEEP_BOUNDARY_BASE_H

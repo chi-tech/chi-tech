@@ -1,9 +1,6 @@
 #include "lbs_linear_boltzmann_solver.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
-#include "ChiMesh/VolumeMesher/Extruder/volmesher_extruder.h"
-
-#include "ChiMath/Quadratures/product_quadrature.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -45,16 +42,17 @@ void lbs::SteadySolver::ComputeSweepOrderings(LBSGroupset& groupset) const
   auto& mesh_handler = chi_mesh::GetCurrentHandler();
   auto mesher = mesh_handler.volume_mesher;
 
-  const auto parmetis_partitioning =
-    chi_mesh::VolumeMesher::PartitionType::PARMETIS;
-
   bool no_cycles_parmetis_partitioning =
-    (mesher->options.partition_type == parmetis_partitioning and
-                                       (not groupset.allow_cycles));
+    (mesher->options.partition_type ==
+     chi_mesh::VolumeMesher::PartitionType::PARMETIS
+     and (not groupset.allow_cycles));
+
   bool is_1D_geometry = options.geometry_type == GeometryType::ONED_SLAB;
 
   //============================================= Check possibility of cycles
-  if (no_cycles_parmetis_partitioning and not is_1D_geometry and chi::mpi.process_count>1)
+  if (no_cycles_parmetis_partitioning and
+      not is_1D_geometry and
+      chi::mpi.process_count>1)
   {
     chi::log.LogAllError()
       << "When using PARMETIS type partitioning then groupset iterative method"

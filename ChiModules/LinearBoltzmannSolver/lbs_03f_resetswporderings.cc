@@ -39,11 +39,11 @@ void lbs::SteadySolver::ResetSweepOrderings(LBSGroupset& groupset)
     chi::log.Log()
       << "SPDS and FLUDS reset complete.            Process memory = "
       << std::setprecision(3)
-      << chi::console.GetMemoryUsageInMB() << " MB";
+      << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
 
   double local_app_memory =
     chi::log.ProcessEvent(chi_objects::ChiLog::StdTags::MAX_MEMORY_USAGE,
-                         chi_objects::ChiLog::EventOperation::MAX_VALUE);
+                          chi_objects::ChiLog::EventOperation::MAX_VALUE);
   double total_app_memory=0.0;
   MPI_Allreduce(&local_app_memory,&total_app_memory,
                 1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);

@@ -48,7 +48,7 @@ void lbs::SteadySolver::
     const size_t so_id = dir_id_to_so_map.at(master_dir_id);
     auto& sweep_ordering = groupset.sweep_orderings[so_id];
 
-    //Compute angular subsets
+    //Compute direction subsets
     const auto dir_subsets = lbs::MakeSubSets(so_grouping.size(),
                                               groupset.master_num_ang_subsets);
 
@@ -61,7 +61,7 @@ void lbs::SteadySolver::
         const auto& dir_ss_end   = dir_ss_info.ss_end;
         const auto& dir_ss_size   = dir_ss_info.ss_size;
 
-        std::vector<int> angle_indices(dir_ss_size, 0);
+        std::vector<size_t> angle_indices(dir_ss_size, 0);
         for (size_t n=dir_ss_begin; n<=dir_ss_end; ++n)
           angle_indices[n] = so_grouping[n];
 
