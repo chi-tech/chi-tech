@@ -10,8 +10,8 @@
 /** Sets up the angle-aggregation object. */
 void chi_mesh::sweep_management::AngleAggregation::
   Setup(const std::vector<std::shared_ptr<SweepBndry>>& in_sim_boundaries,
-        int in_number_of_groups,
-        int in_number_of_group_subsets,
+        size_t in_number_of_groups,
+        size_t in_number_of_group_subsets,
         std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
         chi_mesh::MeshContinuumPtr& in_grid)
 {

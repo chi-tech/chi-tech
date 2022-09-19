@@ -180,3 +180,53 @@ void chi_math::ProductQuadrature::
   }
 
 }
+
+//###################################################################
+/**Optimizes the angular quadrature for polar symmetry by removing
+ * all the direction with downward pointing polar angles.
+ *
+ * \param normalization float. (Optional) The default is a negative number
+ *                             which does not apply any normalization. If a
+ *                             positive number is provided, the weights will be
+ *                             normalized to sum to this number.*/
+void chi_math::ProductQuadrature::
+  OptimizeForPolarSymmetry(const double normalization)
+{
+  std::vector<chi_math::QuadraturePointPhiTheta> new_abscissae;
+  std::vector<double>                            new_weights;
+  std::vector<chi_mesh::Vector3>                 new_omegas;
+  std::vector<double>                            new_polar_ang;
+  std::vector<double>                            new_azimu_ang;
+
+  const size_t num_pol = polar_ang.size();
+  const size_t num_azi = azimu_ang.size();
+
+  std::vector<unsigned int> new_polar_map;
+  for (size_t p=0; p<num_pol; ++p)
+    if (polar_ang[p] < M_PI_2)
+    {
+      new_polar_ang.push_back(polar_ang[p]);
+      new_polar_map.push_back(p);
+    }
+  new_azimu_ang = azimu_ang;
+
+  const size_t new_num_pol = new_polar_ang.size();
+  double weight_sum = 0.0;
+  for (size_t a=0; a<num_azi; ++a)
+    for (size_t p=0; p<new_num_pol; ++p)
+    {
+      const auto pmap = new_polar_map[p];
+      const auto dmap = GetAngleNum(pmap,a);
+      new_weights.push_back(weights[dmap]);
+      weight_sum += weights[dmap];
+    }
+
+  if (normalization > 0.0)
+    for (double& w : new_weights)
+      w *= normalization/weight_sum;
+
+
+  InitializeWithCustom(new_azimu_ang, new_polar_ang,new_weights,false);
+  polar_ang = new_polar_ang;
+  azimu_ang = new_azimu_ang;
+}

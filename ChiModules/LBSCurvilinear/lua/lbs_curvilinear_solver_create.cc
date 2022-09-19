@@ -3,10 +3,7 @@
 #include "LBSCurvilinear/lbs_curvilinear_solver.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 
 /**Creates a Curvilinear Neutral Particle Transport solver.

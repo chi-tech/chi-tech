@@ -1,4 +1,9 @@
 #include "lbs_linear_boltzmann_solver.h"
+
+#include "lbs_make_subset.h"
+
+#include "ChiMesh/SweepUtilities/FLUDS/AUX_FLUDS.h"
+
 #include "ChiConsole/chi_console.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
@@ -13,56 +18,101 @@
 #include "ChiTimer/chi_timer.h"
 #include "Groupset/lbs_groupset.h"
 
-
-
-
-
 //###################################################################
 /**Initializes fluds data structures.*/
-void lbs::SteadySolver::InitFluxDataStructures(LBSGroupset& groupset)
-{
-  //================================================== Angle Aggregation
-  auto& handler = chi_mesh::GetCurrentHandler();
-  chi_mesh::VolumeMesher& mesher = *handler.volume_mesher;
 
-  if ( options.geometry_type == GeometryType::ONED_SLAB or
-       options.geometry_type == GeometryType::TWOD_CARTESIAN or
-       (typeid(mesher) == typeid(chi_mesh::VolumeMesherExtruder)))
+void lbs::SteadySolver::
+  InitFluxDataStructures(LBSGroupset& groupset)
+{
+  const auto& unique_so_groupings = groupset.unique_so_groupings;
+  const auto& dir_id_to_so_map    = groupset.dir_id_to_so_map;
+
+  const size_t gs_num_grps = groupset.groups.size();
+  const size_t gs_num_ss = groupset.grp_subset_infos.size();
+
+  //=========================================== Passing the sweep boundaries
+  //                                            to the angle aggregation
+  groupset.angle_agg.Setup(sweep_boundaries,
+                           gs_num_grps,
+                           gs_num_ss,
+                           groupset.quadrature,
+                           grid);
+
+  TAngleSetGroup angle_set_group;
+  for (const auto& so_grouping : unique_so_groupings)
   {
-    switch (groupset.angleagg_method)
+    bool make_primary = true;
+    chi_mesh::sweep_management::PRIMARY_FLUDS* primary_fluds;
+
+    const size_t master_dir_id = so_grouping.front();
+    const size_t so_id = dir_id_to_so_map.at(master_dir_id);
+    auto& sweep_ordering = groupset.sweep_orderings[so_id];
+
+    //Compute direction subsets
+    const auto dir_subsets = lbs::MakeSubSets(so_grouping.size(),
+                                              groupset.master_num_ang_subsets);
+
+    for (size_t gs_ss=0; gs_ss<gs_num_ss; gs_ss++)
     {
-      case AngleAggregationType::SINGLE:
-        InitAngleAggSingle(groupset); break;
-      case AngleAggregationType::POLAR:
-        InitAngleAggPolar(groupset); break;
-      default:
-        throw std::logic_error(std::string(__FUNCTION__) +
-                               " Invalid angle aggregation type.");
-    }//switch on method
-  }//if aggregatable
-  else if (options.geometry_type == GeometryType::ONED_SPHERICAL ||
-           options.geometry_type == GeometryType::TWOD_CYLINDRICAL)
-  {
-    switch (groupset.angleagg_method)
-    {
-      case AngleAggregationType::SINGLE:
-        InitAngleAggSingle(groupset); break;
-      case AngleAggregationType::AZIMUTHAL:
-        InitAngleAggAzimuthal(groupset); break;
-      default:
-        throw std::logic_error(std::string(__FUNCTION__) +
-                               " Invalid angle aggregation type.");
-    }//switch on method
-  }//if aggregatable
-  else
-    InitAngleAggSingle(groupset);
+      const size_t gs_ss_size = groupset.grp_subset_infos[gs_ss].ss_size;
+      for (const auto & dir_ss_info : dir_subsets)
+      {
+        const auto& dir_ss_begin = dir_ss_info.ss_begin;
+        const auto& dir_ss_end   = dir_ss_info.ss_end;
+        const auto& dir_ss_size   = dir_ss_info.ss_size;
+
+        std::vector<size_t> angle_indices(dir_ss_size, 0);
+        for (size_t n=dir_ss_begin; n<=dir_ss_end; ++n)
+          angle_indices[n] = so_grouping[n];
+
+        chi_mesh::sweep_management::FLUDS* fluds;
+        if (make_primary)
+        {
+          make_primary = false;
+          primary_fluds = new chi_mesh::sweep_management::
+          PRIMARY_FLUDS(groupset.grp_subset_infos[gs_ss].ss_size,
+                        grid_nodal_mappings);
+
+          chi::log.Log0Verbose1()
+            << "Initializing FLUDS for omega="
+            << sweep_ordering->omega.PrintS()
+            << "         Process memory = "
+            << std::setprecision(3)
+            <<chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB.";
+
+          primary_fluds->InitializeAlphaElements(sweep_ordering);
+          primary_fluds->InitializeBetaElements(sweep_ordering);
+
+          fluds = primary_fluds;
+        } else
+        {
+          fluds = new chi_mesh::sweep_management::
+          AUX_FLUDS(*primary_fluds,gs_ss_size);
+        }
+
+        auto angleSet = std::make_shared<TAngleSet>(
+          gs_ss_size,
+          gs_ss,
+          sweep_ordering,
+          fluds,
+          angle_indices,
+          sweep_boundaries,
+          options.sweep_eager_limit,
+          &grid->GetCommunicator());
+
+        angle_set_group.angle_sets.push_back(angleSet);
+      }//for an_ss
+    }//for gs_ss
+  }//for so_grouping
+
+  groupset.angle_agg.angle_set_groups.push_back(std::move(angle_set_group));
 
   if (options.verbose_inner_iterations)
     chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "
       << "         Process memory = "
-      << std::setprecision(3) << chi::console.GetMemoryUsageInMB()
+      << std::setprecision(3) << chi_objects::ChiConsole::GetMemoryUsageInMB()
       << " MB.";
 
 

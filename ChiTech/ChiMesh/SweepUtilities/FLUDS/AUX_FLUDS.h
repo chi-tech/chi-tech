@@ -9,7 +9,7 @@ class chi_mesh::sweep_management::AUX_FLUDS :
   public chi_mesh::sweep_management::FLUDS
 {
 public:
-  AUX_FLUDS(PRIMARY_FLUDS& set_primary, int in_G);
+  AUX_FLUDS(PRIMARY_FLUDS& set_primary, size_t in_G);
 
   //Inherited from base FLUDS
 //public:
@@ -35,7 +35,7 @@ public:
 //  std::vector<int>    delayed_prelocI_face_dof_count;
 
 private:
-  const int G;
+  const size_t G;
 
   //local_psi_n_block_stride[fc]. Given face category fc, the value is
   //total number of faces that store information in this category's buffer
@@ -55,15 +55,15 @@ private:
   //  its own interface vector
   //ref_delayed_prelocI_outgoing_psi[prelocI]. Each delayed predecessor
   //  location I has its own interface vector
-  std::vector<std::vector<double>>*  ref_local_psi;
-  std::vector<double>*               ref_delayed_local_psi;
-  std::vector<double>*               ref_delayed_local_psi_old;
-  std::vector<std::vector<double>>*  ref_deplocI_outgoing_psi;
-  std::vector<std::vector<double>>*  ref_prelocI_outgoing_psi;
-  std::vector<std::vector<double>>*  ref_boundryI_incoming_psi;
+  std::vector<std::vector<double>>*  ref_local_psi            = nullptr;
+  std::vector<double>*               ref_delayed_local_psi    = nullptr;
+  std::vector<double>*               ref_delayed_local_psi_old= nullptr;
+  std::vector<std::vector<double>>*  ref_deplocI_outgoing_psi = nullptr;
+  std::vector<std::vector<double>>*  ref_prelocI_outgoing_psi = nullptr;
+  std::vector<std::vector<double>>*  ref_boundryI_incoming_psi= nullptr;
 
-  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi;
-  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi_old;
+  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi    = nullptr;
+  std::vector<std::vector<double>>*  ref_delayed_prelocI_outgoing_psi_old= nullptr;
 private:
   //======================================== Alpha elements
 

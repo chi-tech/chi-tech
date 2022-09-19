@@ -2,7 +2,6 @@
 
 #include <chi_log.h>
 #include <chi_mpi.h>
-;
 
 ////###################################################################
 ///**Returns a flag indicating whether this bndry is reflecting or not.*/
@@ -93,14 +92,14 @@ HeterogenousPsiOutgoing(
   return &hetero_boundary_flux[angle_num]
                               [cell_local_id]
                               [face_num]
-                              [fi][gs_ss_begin];;
+                              [fi][gs_ss_begin];
 }
 
 
 //###################################################################
 /**Sets flags indicating reflected angles are ready to execute.*/
 void chi_mesh::sweep_management::BoundaryReflecting::
-  UpdateAnglesReadyStatus(std::vector<int> angles, int gs_ss)
+  UpdateAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
 {
   for (auto& n : angles)
     angle_readyflags[reflected_anglenum[n]][gs_ss] = true;
@@ -109,12 +108,12 @@ void chi_mesh::sweep_management::BoundaryReflecting::
 //###################################################################
 /**Checks to see if angles are ready to execute.*/
 bool chi_mesh::sweep_management::BoundaryReflecting::
-  CheckAnglesReadyStatus(std::vector<int> angles, int gs_ss)
+  CheckAnglesReadyStatus(const std::vector<size_t>& angles, size_t gs_ss)
 {
   if (opposing_reflected) return true;
   bool ready_flag = true;
   for (auto& n : angles)
-    if (hetero_boundary_flux[reflected_anglenum[n]].size()>0)
+    if (!hetero_boundary_flux[reflected_anglenum[n]].empty())
       if (not angle_readyflags[n][gs_ss]) return false;
 
   return ready_flag;

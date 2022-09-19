@@ -26,16 +26,16 @@
 
 \ingroup LuaQuadrature
 \author Jan*/
-int chiCreateQuadrature(lua_State *L)
+int chiCreateLineQuadrature(lua_State *L)
 {
   const std::string fname = __FUNCTION__;
   const int num_args = lua_gettop(L);
 
   if (not ((num_args == 2) or (num_args == 3)))
-    LuaPostArgAmountError("chiCreateQuadrature",2,num_args);
+    LuaPostArgAmountError(fname,2,num_args);
 
-  LuaCheckNilValue("chiCreateQuadrature",L,1);
-  LuaCheckNilValue("chiCreateQuadrature",L,2);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
 
   //============================================= Parse argument
   int ident = lua_tonumber(L,1);

@@ -37,7 +37,7 @@ public:
   /** Creates an array with the specified number of elements in each dimension,
    *  from a vector-list.
    *
-   *  \param args `std::vector` list of the number of elements in each
+   *  \param dims `std::vector` list of the number of elements in each
    *              dimension.
    *  \throw std::bad_alloc if memory allocation fails.
    *
@@ -79,7 +79,7 @@ public:
   /** Creates an array with the specified number of elements in each dimension,
    *  from an array.
    *
-   *  \param args `std::array` list of the number of elements in each
+   *  \param dims `std::array` list of the number of elements in each
    *              dimension.
    *  \throw std::bad_alloc if memory allocation fails.
    *
@@ -119,7 +119,7 @@ public:
   /** Creates an array with the specified number of elements in each dimension,
    *  from an initializer-list.
    *
-   *  \param args `std::vector` list of the number of elements in each
+   *  \param dims `std::vector` list of the number of elements in each
    *              dimension.
    *  \throw std::bad_alloc if memory allocation fails.
    *
@@ -166,7 +166,7 @@ public:
   /** Creates an array with the specified number of elements in each dimension,
    *  from a vector. Each entry in the array is assigned the designated value.
    *
-   *  \param args `std::vector` list of the number of elements in each
+   *  \param dims `std::vector` list of the number of elements in each
    *              dimension.
    *  \param value The value to assing to each element.
    *  \throw std::bad_alloc if memory allocation fails.
@@ -211,7 +211,7 @@ public:
   /** Creates an array with the specified number of elements in each dimension,
    *  from an array. Each entry in the array is assigned the designated value.
    *
-   *  \param args `std::array` list of the number of elements in each
+   *  \param dims `std::array` list of the number of elements in each
    *              dimension.
    *  \param value The value to assing to each element.
    *  \throw std::bad_alloc if memory allocation fails.
@@ -255,7 +255,7 @@ public:
    *  from an initializer-list. Each entry in the array is assigned the
    *  designated value.
    *
-   *  \param args `std::initializer` list of the number of elements in each
+   *  \param dims `std::initializer` list of the number of elements in each
    *              dimension.
    *  \param value The value to assing to each element.
    *  \throw std::bad_alloc if memory allocation fails.
@@ -416,7 +416,7 @@ public:
 
   /** Resizes the array with a vector.
    *
-   *  \param args std::vector of the number of elements in each
+   *  \param dims std::vector of the number of elements in each
    *              dimension.
    *  \throw std::bad_alloc if memory allocation fails.
    *
@@ -441,7 +441,7 @@ public:
 
   /** Resizes the array with an array.
    *
-   *  \param args std::array of the number of elements in each
+   *  \param dims std::array of the number of elements in each
    *              dimension.
    *  \throw std::bad_alloc if memory allocation fails.
    *
@@ -466,7 +466,7 @@ public:
 
   /** Resizes the array with an initializer_list.
    *
-   *  \param args std::initializer_list of the number of elements in each
+   *  \param dims std::initializer_list of the number of elements in each
    *              dimension.
    *  \throw std::bad_alloc if memory allocation fails.
    *

@@ -11,7 +11,6 @@
 #include "ChiConsole/chi_console.h"
 #include "Groupset/lbs_groupset.h"
 
-
 #include <iomanip>
 
 //###################################################################
@@ -87,6 +86,6 @@ void lbs::SteadySolver::SolveGroupset(LBSGroupset& groupset)
   chi::log.Log()
     << "Groupset solve complete.                  Process memory = "
     << std::setprecision(3)
-    << chi::console.GetMemoryUsageInMB() << " MB";
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
 }
 

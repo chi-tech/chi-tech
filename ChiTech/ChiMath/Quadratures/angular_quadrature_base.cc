@@ -74,28 +74,59 @@ void chi_math::AngularQuadrature::
 }
 
 //###################################################################
+/**Optimizes the angular quadrature for polar symmetry by removing
+ * all the direction with downward pointing polar angles.
+ *
+ * \param normalization float. (Optional) The default is a negative number
+ *                             which does not apply any normalization. If a
+ *                             positive number is provided, the weights will be
+ *                             normalized to sum to this number.*/
+void chi_math::AngularQuadrature::
+  OptimizeForPolarSymmetry(const double normalization)
+{
+  std::vector<chi_math::QuadraturePointPhiTheta> new_abscissae;
+  std::vector<double>                            new_weights;
+  std::vector<chi_mesh::Vector3>                 new_omegas;
+
+  const size_t num_dirs = omegas.size();
+  double weight_sum = 0.0;
+  for (size_t d=0; d<num_dirs; ++d)
+    if (omegas[d].z > 0.0)
+    {
+      new_abscissae.emplace_back(abscissae[d]);
+      new_weights.emplace_back(weights[d]);
+      new_omegas.emplace_back(omegas[d]);
+      weight_sum += weights[d];
+    }
+
+  if (normalization > 0.0)
+    for (double& w : new_weights)
+      w *= normalization/weight_sum;
+
+  abscissae = std::move(new_abscissae);
+  weights   = std::move(new_weights);
+  omegas    = std::move(new_omegas);
+}
+
+//###################################################################
 /**Populates a map of moment m to the Spherical Harmonic indices
  * required.*/
 void chi_math::AngularQuadrature::
-MakeHarmonicIndices(unsigned int scattering_order, int dimension)
+  MakeHarmonicIndices(unsigned int scattering_order, int dimension)
 {
-  if (m_to_ell_em_map.empty())
-  {
-    if (dimension == 1)
-      for (int ell=0; ell<=scattering_order; ell++)
-        m_to_ell_em_map.emplace_back(ell,0);
-    else if (dimension == 2)
-      for (int ell=0; ell<=scattering_order; ell++)
-        for (int m=-ell; m<=ell; m+=2)
-        {
-          if (ell == 0 or m != 0)
-            m_to_ell_em_map.emplace_back(ell,m);
-        }
-    else if (dimension == 3)
-      for (int ell=0; ell<=scattering_order; ell++)
-        for (int m=-ell; m<=ell; m++)
-          m_to_ell_em_map.emplace_back(ell,m);
-  }
+  m_to_ell_em_map.clear();
+
+  if (dimension == 1)
+    for (int ell=0; ell<=scattering_order; ell++)
+      m_to_ell_em_map.emplace_back(ell,0);
+  else if (dimension == 2)
+    for (int ell=0; ell<=scattering_order; ell++)
+      for (int m=-ell; m<=ell; m+=2)
+        m_to_ell_em_map.emplace_back(ell,m);
+  else if (dimension == 3)
+    for (int ell=0; ell<=scattering_order; ell++)
+      for (int m=-ell; m<=ell; m++)
+        m_to_ell_em_map.emplace_back(ell,m);
 }
 
 //###################################################################
@@ -108,8 +139,8 @@ void chi_math::AngularQuadrature::
   d2m_op.clear();
   MakeHarmonicIndices(scattering_order,dimension);
 
-  int num_angles = abscissae.size();
-  int num_moms = m_to_ell_em_map.size();
+  const size_t num_angles = abscissae.size();
+  const size_t num_moms = m_to_ell_em_map.size();
 
   for (const auto& ell_em : m_to_ell_em_map)
   {
@@ -129,12 +160,6 @@ void chi_math::AngularQuadrature::
     d2m_op.push_back(cur_mom);
   }
   d2m_op_built = true;
-
-
-
-
-
-
 
   //=================================== Verbose printout
   std::stringstream outs;
@@ -165,8 +190,8 @@ void chi_math::AngularQuadrature::
   m2d_op.clear();
   MakeHarmonicIndices(scattering_order,dimension);
 
-  int num_angles = abscissae.size();
-  int num_moms = m_to_ell_em_map.size();
+  const size_t num_angles = abscissae.size();
+  const size_t num_moms = m_to_ell_em_map.size();
 
   const auto normalization =
     std::accumulate(weights.begin(), weights.end(), 0.0);
@@ -208,4 +233,48 @@ void chi_math::AngularQuadrature::
   }
 
   chi::log.Log0Verbose1() << outs.str();
+}
+
+//###################################################################
+/**Returns a reference to the precomputed d2m operator. This will
+ * throw a std::logic_error if the operator has not been built yet.
+ * The operator is accessed as [m][d], where m is the moment index
+ * and d is the direction index.*/
+std::vector<std::vector<double>> const&
+  chi_math::AngularQuadrature::GetDiscreteToMomentOperator() const
+{
+  const std::string fname = __FUNCTION__;
+  if (not d2m_op_built)
+    throw std::logic_error(fname + ": Called but D2M operator not yet built. "
+           "Make a call to BuildDiscreteToMomentOperator before using this.");
+  return d2m_op;
+}
+
+//###################################################################
+/**Returns a reference to the precomputed m2d operator. This will
+ * throw a std::logic_error if the operator has not been built yet.
+ * The operator is accessed as [m][d], where m is the moment index
+ * and d is the direction index.*/
+std::vector<std::vector<double>> const&
+  chi_math::AngularQuadrature::GetMomentToDiscreteOperator() const
+{
+  const std::string fname = __FUNCTION__;
+  if (not m2d_op_built)
+    throw std::logic_error(fname + ": Called but M2D operator not yet built. "
+           "Make a call to BuildMomentToDiscreteOperator before using this.");
+  return m2d_op;
+}
+
+//###################################################################
+/**Returns a reference to the precomputed harmonic index map. This will
+ * throw a std::logic_error if the map has not been built yet.*/
+const std::vector<chi_math::AngularQuadrature::HarmonicIndices>&
+  chi_math::AngularQuadrature::GetMomentToHarmonicsIndexMap() const
+{
+  const std::string fname = __FUNCTION__;
+  if (not (d2m_op_built or m2d_op_built))
+    throw std::logic_error(fname + ": Called but map not yet built. "
+           "Make a call to either BuildDiscreteToMomentOperator or"
+           "BuildMomentToDiscreteOperator before using this.");
+  return m_to_ell_em_map;
 }
