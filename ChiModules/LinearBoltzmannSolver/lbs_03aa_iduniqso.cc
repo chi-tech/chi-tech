@@ -61,10 +61,8 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> SteadySolver::
     case AngleAggregationType::SINGLE:
     {
       const size_t num_dirs = quadrature.omegas.size();
-      DirIDs dir_ids(num_dirs, 0);
       for (size_t n=0; n<num_dirs; ++n)
-        dir_ids[n];
-      unq_so_grps.push_back(std::move(dir_ids));
+        unq_so_grps.push_back({n});
       break;
     }//case agg_type SINGLE
 
@@ -153,12 +151,21 @@ std::pair<UniqueSOGroupings, DirIDToSOMap> SteadySolver::
         typedef chi_math::ProductQuadrature ProdQuadType;
         const auto& product_quad = dynamic_cast<const ProdQuadType&>(quadrature);
 
-        for (const auto& polar_level : product_quad.GetDirectionMap())
+        for (const auto& dir_set : product_quad.GetDirectionMap())
         {
-          const std::vector<unsigned int> dir_ids_uint = polar_level.second;
-          DirIDs dir_ids(dir_ids_uint.begin(),dir_ids_uint.end());
+          std::vector<unsigned int> group1;
+          std::vector<unsigned int> group2;
+          for (const auto& dir_id : dir_set.second)
+            if (quadrature.abscissae[dir_id].phi > M_PI_2)
+              group1.push_back(dir_id);
+            else
+              group2.push_back(dir_id);
 
-          unq_so_grps.push_back(std::move(dir_ids));
+          DirIDs group1_ids(group1.begin(),group1.end());
+          DirIDs group2_ids(group2.begin(),group2.end());
+
+          unq_so_grps.push_back(std::move(group1_ids));
+          unq_so_grps.push_back(std::move(group2_ids));
         }
       }//try product quadrature
       catch (const std::bad_cast& bc)

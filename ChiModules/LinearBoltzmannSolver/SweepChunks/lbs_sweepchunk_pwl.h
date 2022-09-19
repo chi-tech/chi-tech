@@ -67,8 +67,8 @@ public:
     int angle_num;
     uint64_t cell_local_id;
     int f;
-    int gs_gi;
-    int gs_ss_begin;
+    size_t gs_gi;
+    size_t gs_ss_begin;
     bool surface_source_active;
 
     double* GetUpwindPsi(int fj, bool local, bool boundary) const;
