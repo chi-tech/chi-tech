@@ -13,6 +13,15 @@
                      modified quadrature. Any negative number will inhibit
                      renormalization.
 
+ ## _
+
+ ###Example:
+ Example:
+\code
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+\endcode
+
 \ingroup LuaQuadrature
 \author Jan */
 int chiOptimizeAngularQuadratureForPolarSymmetry(lua_State* L)

@@ -57,6 +57,7 @@
 //RegisterFunction(chiCreateSLDFESQAngularQuadrature)
 //RegisterFunction(chiLocallyRefineSLDFESQAngularQuadrature)
 //RegisterFunction(chiPrintToPythonSLDFESQAngularQuadrature)
+//RegisterFunction(chiOptimizeAngularQuadratureForPolarSymmetry)
 
 //module:Orthogonal Meshes
 //RegisterFunction(chiMeshCreateUnpartitioned1DOrthoMesh)
