@@ -19,7 +19,7 @@ chi_math::SpatialDiscretization_PWLD::
   SpatialDiscretization_FE(0, in_grid, in_cs_type,
                            SDMType::PIECEWISE_LINEAR_DISCONTINUOUS,
                            setup_flags),
-  UNITARY_UNKNOWN_MANAGER({{chi_math::UnknownType::SCALAR,0}}),
+  UNITARY_UNKNOWN_MANAGER({std::make_pair(chi_math::UnknownType::SCALAR,0)}),
   line_quad_order_arbitrary(qorder),
   tri_quad_order_arbitrary(qorder),
   quad_quad_order_arbitrary(qorder),

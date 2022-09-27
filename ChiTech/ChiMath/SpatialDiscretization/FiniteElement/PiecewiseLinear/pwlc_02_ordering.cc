@@ -32,9 +32,8 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
       exnonex_nodes_set.insert(vid);
 
   // Copy set into vector
-  std::vector<int> exnonex_nodes;
-  for (auto& vid : exnonex_nodes_set)
-    exnonex_nodes.push_back(vid);
+  std::vector<int> exnonex_nodes(exnonex_nodes_set.begin(),
+                                 exnonex_nodes_set.end());
 
   chi::log.Log0Verbose1() << "*** Reordering stage 0 time: "
                               << t_stage[0].GetTime()/1000.0;
