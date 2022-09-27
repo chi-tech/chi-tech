@@ -118,7 +118,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       {
         chi::log.LogAllWarning()
           << __FUNCTION__ << ": Total fission spectrum does "
-          << "not sum to unity. Normalizing.";
+          << "not sum to unity. Normalizing. " << chi_sum-1.0;
         for (auto& v : chi) v /= chi_sum;
       }
     }
