@@ -99,7 +99,7 @@ namespace chi_math
 
   public:
 
-    void PreComputeCellSDValues() override;
+    void PreComputeCellSDValues();
     void PreComputeNeighborCellSDValues();
     std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
     chi_mesh::Cell&  GetNeighborCell(uint64_t cell_glob_index);

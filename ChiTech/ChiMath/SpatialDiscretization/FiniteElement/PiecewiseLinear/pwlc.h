@@ -35,17 +35,17 @@ namespace chi_math
     QuadratureTetrahedron   tet_quad_order_arbitrary;
     QuadratureHexahedron    hex_quad_order_arbitrary;
 
-    std::map<int,int> node_mapping;
+    std::map<uint64_t, int64_t> node_mapping;
 
-    int local_block_address = 0;
+    uint64_t local_block_address = 0;
   //  std::vector<int> cell_local_block_address;
   //  std::vector<std::pair<int,int>> neighbor_cell_block_address;
 
-    std::vector<int> locJ_block_address;
-    std::vector<int> locJ_block_size;
+    std::vector<uint64_t> locJ_block_address;
+    std::vector<uint64_t> locJ_block_size;
 
-    unsigned int local_base_block_size=0;
-    unsigned int globl_base_block_size=0;
+    uint64_t local_base_block_size=0;
+    uint64_t globl_base_block_size=0;
 
   private:
   //  std::vector<chi_mesh::Cell*> neighbor_cells;
@@ -86,7 +86,7 @@ namespace chi_math
 
   public:
 
-    void PreComputeCellSDValues() override;
+    void PreComputeCellSDValues();
   //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
     std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
 

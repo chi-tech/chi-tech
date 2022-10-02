@@ -37,10 +37,6 @@ namespace chi_math
     {
     }
 
-  protected:
-    //01
-    virtual void PreComputeCellSDValues() {}
-
   public:
     virtual
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,

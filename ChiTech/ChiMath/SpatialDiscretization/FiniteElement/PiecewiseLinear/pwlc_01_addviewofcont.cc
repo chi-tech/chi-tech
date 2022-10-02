@@ -12,103 +12,77 @@
 #include "ChiTimer/chi_timer.h"
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
-
-
-
 //###################################################################
 /**Makes a shared_ptr CellPWLView for a cell based on its type.*/
-std::shared_ptr<chi_math::CellMappingFE_PWL> chi_math::SpatialDiscretization_PWLC::
+std::shared_ptr<chi_math::CellMappingFE_PWL>
+  chi_math::SpatialDiscretization_PWLC::
   MakeCellMappingFE(const chi_mesh::Cell& cell) const
 {
   switch (cell.Type())
   {
     case chi_mesh::CellType::SLAB:
     {
+      const auto& vol_quad = line_quad_order_arbitrary;
+      using namespace chi_math;
+      using namespace std;
+      typedef SlabMappingFE_PWL             SlabSlab;
+      typedef SlabMappingFE_PWL_Cylindrical SlabCyli;
+      typedef SlabMappingFE_PWL_Spherical   SlabSphr;
       switch (cs_type)
       {
-        case chi_math::CoordinateSystemType::CARTESIAN:
-        {
-          auto cell_fe_view = new chi_math::SlabMappingFE_PWL(cell,
-                                                              ref_grid,
-                                                              line_quad_order_arbitrary);
-
-          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
-          return the_ptr;
-        }
-        case chi_math::CoordinateSystemType::CYLINDRICAL:
-        {
-          auto cell_fe_view = new chi_math::SlabMappingFE_PWL_Cylindrical(cell,
-                                                                          ref_grid,
-                                                                          line_quad_order_arbitrary);
-
-          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
-          return the_ptr;
-        }
-        case chi_math::CoordinateSystemType::SPHERICAL:
-        {
-          auto cell_fe_view = new chi_math::SlabMappingFE_PWL_Spherical(cell,
-                                                                        ref_grid,
-                                                                        line_quad_order_arbitrary);
-
-          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
-          return the_ptr;
-        }
+        case CoordinateSystemType::CARTESIAN:
+          return make_shared<SlabSlab>(cell, ref_grid, vol_quad);
+        case CoordinateSystemType::CYLINDRICAL:
+          return make_shared<SlabCyli>(cell, ref_grid, vol_quad);
+        case CoordinateSystemType::SPHERICAL:
+          return make_shared<SlabSphr>(cell, ref_grid, vol_quad);
         default:
-          throw std::invalid_argument("SpatialDiscretization_PWLC::MakeCellMappingFE: "
-                                      "Unsupported coordinate system type encountered.");
+          throw std::invalid_argument(
+            "SpatialDiscretization_PWLC::MakeCellMappingFE: "
+            "Unsupported coordinate system type encountered.");
       }
     }
     case chi_mesh::CellType::POLYGON:
     {
+      const auto& vol_quad = tri_quad_order_arbitrary;
+      const auto& area_quad = line_quad_order_arbitrary;
+      using namespace chi_math;
+      using namespace std;
+      typedef PolygonMappingFE_PWL Polygon;
+      typedef PolygonMappingFE_PWL_Cylindrical PolygonCyli;
       switch (cs_type)
       {
-        case chi_math::CoordinateSystemType::CARTESIAN:
-        {
-          auto cell_fe_view = new chi_math::PolygonMappingFE_PWL(cell,
-                                                                 ref_grid,
-                                                                 tri_quad_order_arbitrary,
-                                                                 line_quad_order_arbitrary);
-
-          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
-          return the_ptr;
-        }
-        case chi_math::CoordinateSystemType::CYLINDRICAL:
-        {
-          auto cell_fe_view = new chi_math::PolygonMappingFE_PWL_Cylindrical(cell,
-                                                                             ref_grid,
-                                                                             tri_quad_order_arbitrary,
-                                                                             line_quad_order_arbitrary);
-
-          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
-          return the_ptr;
-        }
+        case CoordinateSystemType::CARTESIAN:
+          return make_shared<Polygon>(cell, ref_grid, vol_quad, area_quad);
+        case CoordinateSystemType::CYLINDRICAL:
+          return make_shared<PolygonCyli>(cell, ref_grid, vol_quad,area_quad);
         default:
-          throw std::invalid_argument("SpatialDiscretization_PWLC::MakeCellMappingFE: "
-                                      "Unsupported coordinate system type encountered.");
+          throw std::invalid_argument(
+            "SpatialDiscretization_PWLC::MakeCellMappingFE: "
+            "Unsupported coordinate system type encountered.");
       }
     }
     case chi_mesh::CellType::POLYHEDRON:
     {
+      const auto& vol_quad = tet_quad_order_arbitrary;
+      const auto& area_quad = tri_quad_order_arbitrary;
+      using namespace chi_math;
+      using namespace std;
+      typedef PolyhedronMappingFE_PWL Polyhedron;
       switch (cs_type)
       {
-        case chi_math::CoordinateSystemType::CARTESIAN:
-        {
-          auto cell_fe_view = new chi_math::PolyhedronMappingFE_PWL(cell,
-                                                                    ref_grid,
-                                                                    tet_quad_order_arbitrary,
-                                                                    tri_quad_order_arbitrary);
-
-          std::shared_ptr<chi_math::CellMappingFE_PWL> the_ptr(cell_fe_view);
-          return the_ptr;
-        }
+        case CoordinateSystemType::CARTESIAN:
+          return make_shared<Polyhedron>(cell,ref_grid,vol_quad,area_quad);
         default:
-          throw std::invalid_argument("SpatialDiscretization_PWLC::MakeCellMappingFE: "
-                                      "Unsupported coordinate system type encountered.");
+          throw std::invalid_argument(
+            "SpatialDiscretization_PWLC::MakeCellMappingFE: "
+            "Unsupported coordinate system type encountered.");
       }
     }
     default:
-      throw std::invalid_argument("SpatialDiscretization_PWLC::MakeCellPWLRawView: "
-                                  "Unsupported cell type encountered.");
+      throw std::invalid_argument(
+        "SpatialDiscretization_PWLC::MakeCellMappingFE: "
+        "Unsupported cell type encountered.");
   }
 }
 

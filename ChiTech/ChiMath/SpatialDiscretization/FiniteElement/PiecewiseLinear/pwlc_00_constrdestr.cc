@@ -49,8 +49,9 @@ chi_math::SpatialDiscretization_PWLC::
         break;
       }
       default:
-        throw std::invalid_argument("SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
-                                    "Unsupported coordinate system type encountered.");
+        throw std::invalid_argument(
+          "SpatialDiscretization_PWLC::SpatialDiscretization_PWLC : "
+          "Unsupported coordinate system type encountered.");
     }
 
     if (static_cast<int>(line_quad_order_arbitrary.order) < qorder_min)

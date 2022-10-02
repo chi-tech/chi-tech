@@ -48,7 +48,7 @@ namespace chi_math
       new SpatialDiscretization_FV(in_grid, in_cs_type));}
 
     //01
-    void PreComputeCellSDValues() override;
+    void PreComputeCellSDValues();
     void PreComputeNeighborCellSDValues();
 
     CellFVValues* MapFeView(uint64_t cell_local_index);
