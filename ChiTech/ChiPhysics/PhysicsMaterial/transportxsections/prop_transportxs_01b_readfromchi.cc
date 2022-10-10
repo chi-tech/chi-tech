@@ -2,7 +2,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include <string>
 
@@ -333,8 +332,8 @@ void chi_physics::TransportCrossSections::
 
       line_stream >> value_str;
 
-      int group    = StrToI(first_word);
-      double value = StrToD(value_str);
+      long int group = StrToI(first_word);
+      double value   = StrToD(value_str);
 
       xs[group] = value;
 
@@ -373,9 +372,9 @@ void chi_physics::TransportCrossSections::
           throw std::runtime_error("Invalid amount of arguments. "
                                    "Requires 4 numbers.");
 
-        int group     = StrToI(value_str0);
-        int precursor = StrToI(value_str1);
-        double value  = StrToD(value_str2);
+        long int group     = StrToI(value_str0);
+        long int precursor = StrToI(value_str1);
+        double value       = StrToD(value_str2);
 
         spectra[group][precursor] = value;
       }
@@ -419,13 +418,14 @@ void chi_physics::TransportCrossSections::
           throw std::runtime_error("Invalid amount of arguments. "
                                    "Requires 4 numbers.\nLine:" + line_stream.str());
 
-        int m        = StrToI(value_str0);
-        int gprime   = StrToI(value_str1);
-        int g        = StrToI(value_str2);
-        double value = StrToD(value_str3);
+        long int m        = StrToI(value_str0);
+        long int gprime   = StrToI(value_str1);
+        long int g        = StrToI(value_str2);
+        double value      = StrToD(value_str3);
 
         if (m<matrix.size())
           matrix[m].Insert(g,gprime,value);
+        first_word[0] = '\0';
       }
 
       file.getline(line,250); ++line_number;
@@ -541,7 +541,7 @@ void chi_physics::TransportCrossSections::
     }
 
     first_word = "";
-    not_eof = bool(std::getline(file,line)); ++line_number;
+    not_eof = not std::getline(file, line).eof();
   }//while not EOF, read each lines
   scattering_order = M-1;
 
