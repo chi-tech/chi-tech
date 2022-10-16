@@ -7,7 +7,6 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-;
 
 //###################################################################
 /** Creates a logical volume.
@@ -114,15 +113,18 @@ int chiLogicalVolumeCreate(lua_State *L)
     double vx = lua_tonumber(L,5);
     double vy = lua_tonumber(L,6);
     double vz = lua_tonumber(L,7);
-    double r    = lua_tonumber(L,7);
+    double r  = lua_tonumber(L,8);
     auto log_vol = new chi_mesh::RCCLogicalVolume(x0,y0,z0,vx,vy,vz,r);
 
     chi::logicvolume_stack.emplace_back(log_vol);
     const size_t index = chi::logicvolume_stack.size()-1;
     lua_pushnumber(L,static_cast<lua_Number>(index));
 
-    chi_mesh::Vector3 point(-0.5, 0.0, 0.1);
-    printf("MATRIX %d\n", log_vol->Inside(point));
+    chi::log.Log0Verbose1()
+      << "Created RCC Logical volume with x0,y0,z0,vx,vy,vz,r = "
+      << x0 << " " << y0 << " " << z0 << " "
+      << vx << " " << vy << " " << vz << " "
+      << r;
   }
   else if (type_index == SURFACE)
   {

@@ -21,8 +21,8 @@ namespace chi_math
     std::vector<std::vector<std::vector<chi_mesh::Vector3>>> face_side_vectors;
 
     PolyhedronFVValues(const chi_mesh::Cell& polyh_cell,
-                       const chi_mesh::MeshContinuum& grid) :
-      CellFVValues(polyh_cell.vertex_ids.size())
+                       const chi_mesh::MeshContinuumPtr& grid) :
+      CellFVValues(grid, 1)
     {
       volume = 0.0;
       auto& vcc = polyh_cell.centroid;
@@ -42,9 +42,9 @@ namespace chi_math
           uint64_t v0i = face.vertex_ids[e  ];
           uint64_t v1i = face.vertex_ids[ep1];
 
-          const auto& v0 = grid.vertices[v0i];
+          const auto& v0 = grid->vertices[v0i];
           const auto& v1 = polyh_cell.faces[f].centroid;
-          const auto& v2 = grid.vertices[v1i];
+          const auto& v2 = grid->vertices[v1i];
           const auto& v3 = vcc;
 
           std::vector<chi_mesh::Vector3> side_legs(3);

@@ -36,7 +36,7 @@ void chi_math::SpatialDiscretization_FV::PreComputeCellSDValues()
       //######################################### SLAB
       if (cell.Type() == chi_mesh::CellType::SLAB)
       {
-        auto view = new chi_math::SlabFVValues(cell, *ref_grid);
+        auto view = new chi_math::SlabFVValues(cell, ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -45,7 +45,7 @@ void chi_math::SpatialDiscretization_FV::PreComputeCellSDValues()
       //######################################### POLYGON
       if (cell.Type() == chi_mesh::CellType::POLYGON)
       {
-        auto view = new chi_math::PolygonFVValues(cell, *ref_grid);
+        auto view = new chi_math::PolygonFVValues(cell, ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -54,7 +54,7 @@ void chi_math::SpatialDiscretization_FV::PreComputeCellSDValues()
       //######################################### POLYHEDRON
       if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
       {
-        auto view = new chi_math::PolyhedronFVValues(cell, *ref_grid);
+        auto view = new chi_math::PolyhedronFVValues(cell, ref_grid);
 
         cell_fv_views.push_back(view);
         cell_view_added_flags[cell.local_id] = true;
@@ -90,7 +90,7 @@ void chi_math::SpatialDiscretization_FV::
     //######################################### SLAB
     if (cell.Type() == chi_mesh::CellType::SLAB)
     {
-      auto view = new chi_math::SlabFVValues(cell, *ref_grid);
+      auto view = new chi_math::SlabFVValues(cell, ref_grid);
 
       neighbor_cell_fv_views.insert(std::pair<uint64_t, chi_math::CellFVValues*>(
         cell.global_id,view));
@@ -99,7 +99,7 @@ void chi_math::SpatialDiscretization_FV::
     //######################################### POLYGON
     if (cell.Type() == chi_mesh::CellType::POLYGON)
     {
-      auto view = new chi_math::PolygonFVValues(cell, *ref_grid);
+      auto view = new chi_math::PolygonFVValues(cell, ref_grid);
 
       neighbor_cell_fv_views.insert(std::pair<uint64_t, chi_math::CellFVValues*>(
         cell.global_id,view));
@@ -108,7 +108,7 @@ void chi_math::SpatialDiscretization_FV::
     //######################################### POLYHEDRON
     if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
     {
-      auto view = new chi_math::PolyhedronFVValues(cell, *ref_grid);
+      auto view = new chi_math::PolyhedronFVValues(cell, ref_grid);
 
       neighbor_cell_fv_views.insert(std::pair<uint64_t, chi_math::CellFVValues*>(
         cell.global_id,view));

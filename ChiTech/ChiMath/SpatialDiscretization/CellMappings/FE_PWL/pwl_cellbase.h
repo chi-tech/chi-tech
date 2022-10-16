@@ -1,19 +1,19 @@
 #ifndef CELL_MAPPING_FE_PWL_BASE_H
 #define CELL_MAPPING_FE_PWL_BASE_H
 
+#include <utility>
+
 #include "ChiMesh/chi_mesh.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/cell_mapping_base.h"
 
 //###################################################################
 namespace chi_math
 {
   /** Base class for all cell FE views.*/
-  class CellMappingFE_PWL
+  class CellMappingFE_PWL : public CellMapping
   {
-  protected:
-    /** Mesh. */
-    chi_mesh::MeshContinuumPtr grid;
   public:
     typedef std::vector<double> VecDbl;
     typedef std::vector<chi_mesh::Vector3> VecVec3;
@@ -27,9 +27,9 @@ namespace chi_math
 
   public:
     /** Constructor. */
-    explicit CellMappingFE_PWL(int num_dofs,
+    explicit CellMappingFE_PWL(size_t num_dofs,
                                chi_mesh::MeshContinuumPtr ref_grid) :
-      grid(std::move(ref_grid)),
+      CellMapping(std::move(ref_grid), num_dofs),
       num_nodes(num_dofs)
     {}
 
@@ -56,33 +56,7 @@ namespace chi_math
       finite_element::FaceQuadraturePointData& faces_qp_data) const = 0;
 
   public:
-    /** Virtual function evaluation of the shape function. */
-    virtual double ShapeValue(const int i, const chi_mesh::Vector3& xyz)
-    {
-      return 0.0;
-    }
 
-    /** Virtual function returning the all the shape function evaluations
-     * at the point.*/
-    virtual void ShapeValues(const chi_mesh::Vector3& xyz,
-                             std::vector<double>& shape_values)
-    {
-      shape_values.resize(num_nodes, 0.0);
-    }
-
-    /** Virtual function evaluation of the grad-shape function. */
-    virtual chi_mesh::Vector3 GradShapeValue(const int i,
-                                             const chi_mesh::Vector3& xyz)
-    {
-      return chi_mesh::Vector3(0.0, 0.0, 0.0);
-    }
-
-    /** Virtual function evaluation of the grad-shape function. */
-    virtual void GradShapeValues(const chi_mesh::Vector3& xyz,
-                                 std::vector<chi_mesh::Vector3>& gradshape_values)
-    {
-      gradshape_values.resize(num_nodes, chi_mesh::Vector3());
-    }
 
     /** Destructor. */
     virtual ~CellMappingFE_PWL() = default;

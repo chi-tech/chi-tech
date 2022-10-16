@@ -1,13 +1,9 @@
 #include "fv.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Cell/cell.h"
 
 #include "chi_log.h"
 #include "chi_mpi.h"
-
-;
-
 
 //###################################################################
 /**Develops node ordering per location.*/
@@ -16,53 +12,33 @@ void chi_math::SpatialDiscretization_FV::
 {
   chi::log.LogAllVerbose1() << "FV discretization - Reordering nodes.";
 
-  fv_local_block_address = 0;
+  //============================================= Communicate node counts
+  const uint64_t local_num_nodes = ref_grid->local_cells.size();
+  locJ_block_size.assign(chi::mpi.process_count,0);
+  MPI_Allgather(&local_num_nodes,       // sendbuf
+                1, MPI_UINT64_T,        // sendcount, sendtype
+                locJ_block_size.data(), // recvbuf
+                1, MPI_UINT64_T,        // recvcount, recvtype
+                MPI_COMM_WORLD);        // comm
 
-  if (chi::mpi.location_id != 0)
+  //============================================= Build block addresses
+  locJ_block_address.assign(chi::mpi.process_count,0);
+  uint64_t global_num_nodes = 0;
+  for (int j=0; j<chi::mpi.process_count; ++j)
   {
-    MPI_Recv(&fv_local_block_address,
-             1,MPI_INT,              //Count and type
-             chi::mpi.location_id-1,  //Source
-             111,                    //Tag
-             MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    locJ_block_address[j] = global_num_nodes;
+    global_num_nodes += locJ_block_size[j];
   }
 
-  if (chi::mpi.location_id != (chi::mpi.process_count-1))
-  {
-    int next_loc_start = fv_local_block_address + ref_grid->local_cells.size();
-    MPI_Send(&next_loc_start,
-             1,MPI_INT,
-             chi::mpi.location_id+1,
-             111,
-             MPI_COMM_WORLD);
-  }
+  local_block_address = locJ_block_address[chi::mpi.location_id];
 
-  //======================================== Collect block addresses
-  locJ_block_address.clear();
-  locJ_block_address.resize(chi::mpi.process_count, 0);
-  MPI_Allgather(&fv_local_block_address,      //send buf
-                1,                            //send count
-                MPI_INT,                      //send type
-                locJ_block_address.data(), //recv buf
-                1,                            //recv count
-                MPI_INT,                      //recv type
-                MPI_COMM_WORLD);              //communicator
+  local_base_block_size = local_num_nodes;
+  globl_base_block_size = global_num_nodes;
 
-  //======================================== Collect block sizes
-  locJ_block_size.clear();
-  locJ_block_size.resize(chi::mpi.process_count, 0);
-  int num_local_cells =  ref_grid->local_cells.size();
-  MPI_Allgather(&num_local_cells,             //send buf
-                1,                            //send count
-                MPI_INT,                      //send type
-                locJ_block_size.data(),    //recv buf
-                1,                            //recv count
-                MPI_INT,                      //recv type
-                MPI_COMM_WORLD);              //communicator
 
   chi::log.LogAllVerbose2()
     << "Local dof count, start "
     << ref_grid->local_cells.size() << " "
-    << fv_local_block_address;
+    << local_block_address;
 }
 

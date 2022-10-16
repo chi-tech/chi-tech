@@ -25,9 +25,6 @@ namespace chi_math
   public:
     std::vector<std::shared_ptr<CellMappingFE_PWL>> cell_mappings;
 
-  private:
-    bool                     mapping_initialized=false;
-    UnknownManager UNITARY_UNKNOWN_MANAGER;
   public:
     QuadratureLine          line_quad_order_arbitrary;
     QuadratureTriangle      tri_quad_order_arbitrary;
@@ -37,24 +34,12 @@ namespace chi_math
 
     std::map<uint64_t, int64_t> node_mapping;
 
-    uint64_t local_block_address = 0;
   //  std::vector<int> cell_local_block_address;
   //  std::vector<std::pair<int,int>> neighbor_cell_block_address;
-
-    std::vector<uint64_t> locJ_block_address;
-    std::vector<uint64_t> locJ_block_size;
-
-    uint64_t local_base_block_size=0;
-    uint64_t globl_base_block_size=0;
 
   private:
   //  std::vector<chi_mesh::Cell*> neighbor_cells;
   //  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
-
-  private:
-    finite_element::UnitIntegralData            scratch_intgl_data;
-    finite_element::InternalQuadraturePointData scratch_vol_qp_data;
-    finite_element::FaceQuadraturePointData     scratch_face_qp_data;
 
   private:
     //00

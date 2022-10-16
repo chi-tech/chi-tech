@@ -21,21 +21,34 @@ namespace chi_math
     std::vector<QPDataVol>               fe_vol_qp_data;
     std::vector<std::vector<QPDataFace>> fe_srf_qp_data;
 
+    std::map<uint64_t, UIData>                  nb_fe_unit_integrals;
+    std::map<uint64_t, QPDataVol>               nb_fe_vol_qp_data;
+    std::map<uint64_t, std::vector<QPDataFace>> nb_fe_srf_qp_data;
+
     bool integral_data_initialized=false;
     bool qp_data_initialized=false;
 
+    bool nb_integral_data_initialized=false;
+    bool nb_qp_data_initialized=false;
+
+    UIData     scratch_intgl_data;
+    QPDataVol  scratch_vol_qp_data;
+    QPDataFace scratch_face_qp_data;
+
+
     const finite_element::SetupFlags setup_flags;
 
+
   protected:
-    SpatialDiscretization_FE(int dim,
-                             chi_mesh::MeshContinuumPtr& in_grid,
+    explicit
+    SpatialDiscretization_FE(chi_mesh::MeshContinuumPtr& in_grid,
                              CoordinateSystemType in_cs_type =
                              CoordinateSystemType::CARTESIAN,
                              SDMType in_type =
                              SDMType::UNDEFINED,
                              finite_element::SetupFlags in_setup_flags=
                              finite_element::NO_FLAGS_SET) :
-      SpatialDiscretization(dim, in_grid, in_cs_type, in_type),
+      SpatialDiscretization(in_grid, in_cs_type, in_type),
       setup_flags(in_setup_flags)
     {}
 

@@ -14,10 +14,9 @@ chi_math::SpatialDiscretization_PWLC::
                              chi_math::finite_element::SetupFlags setup_flags,
                              chi_math::QuadratureOrder qorder,
                              chi_math::CoordinateSystemType in_cs_type) :
-  SpatialDiscretization_FE(0, in_grid, in_cs_type,
+  SpatialDiscretization_FE(in_grid, in_cs_type,
                            SDMType::PIECEWISE_LINEAR_CONTINUOUS,
                            setup_flags),
-  UNITARY_UNKNOWN_MANAGER({std::make_pair(chi_math::UnknownType::SCALAR,0)}),
   line_quad_order_arbitrary(qorder),
   tri_quad_order_arbitrary(qorder),
   quad_quad_order_arbitrary(qorder),

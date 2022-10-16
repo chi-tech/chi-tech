@@ -19,17 +19,11 @@ namespace chi_math
     std::vector<CellFVValues*> cell_fv_views;
 
   private:
-    bool               mapping_initialized;
     std::vector<bool>  cell_view_added_flags;
 
   private:
     std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>> neighbor_cells;
     std::map<uint64_t, CellFVValues*> neighbor_cell_fv_views;
-
-  public:
-    int              fv_local_block_address = 0;
-    std::vector<int> locJ_block_address;
-    std::vector<int> locJ_block_size;
 
   private:
     explicit
@@ -77,14 +71,19 @@ namespace chi_math
                     unsigned int unknown_id,
                     unsigned int component) const override;
 
-    int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const override;
-    int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override;
+    int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const override
+    { return MapDOF(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
+    int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const override
+    { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
-    //04b utils
+    //05 utils
     size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) override;
     size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) override;
     size_t GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
                            UnknownManager& unknown_manager);
+    std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
+                                        UnknownManager& unknown_manager,
+                                        unsigned int unknown_id=0);
 
     size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override
     {return 1;}
@@ -97,9 +96,6 @@ namespace chi_math
       return node_locations;
     }
 
-    std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-                                        UnknownManager& unknown_manager,
-                                        unsigned int unknown_id=0);
     void LocalizePETScVector(Vec petsc_vector,
                              std::vector<double>& local_vector,
                              UnknownManager& unknown_manager)

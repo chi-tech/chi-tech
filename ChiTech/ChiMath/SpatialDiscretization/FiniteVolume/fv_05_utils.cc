@@ -5,10 +5,7 @@
 #include "ChiMath/UnknownManager/unknown_manager.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "chi_log.h"
 #include "chi_mpi.h"
-
-;
 
 
 //###################################################################

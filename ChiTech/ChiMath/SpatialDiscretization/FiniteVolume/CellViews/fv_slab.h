@@ -19,13 +19,13 @@ namespace chi_math
   public:
 
     SlabFVValues(const chi_mesh::Cell& slab_cell,
-                 const chi_mesh::MeshContinuum& grid) :
-      CellFVValues(2)
+                 const chi_mesh::MeshContinuumPtr& grid) :
+      CellFVValues(grid, 1)
     {
       v0i = slab_cell.vertex_ids[0];
       v1i = slab_cell.vertex_ids[1];
-      const auto& v0 = grid.vertices[v0i];
-      const auto& v1 = grid.vertices[v1i];
+      const auto& v0 = grid->vertices[v0i];
+      const auto& v1 = grid->vertices[v1i];
 
       chi_mesh::Vector3 v01 = v1 - v0;
       volume = v01.Norm();

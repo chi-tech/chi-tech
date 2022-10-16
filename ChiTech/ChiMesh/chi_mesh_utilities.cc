@@ -1,8 +1,5 @@
 #include "chi_mesh.h"
 
-#include "chi_log.h"
-;
-
 //###################################################################
 /**Tensor product of two vectors.
  * \f$ \vec{\vec{T}} = \vec{x} \otimes \vec{y} \f$*/

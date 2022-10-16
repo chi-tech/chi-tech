@@ -25,10 +25,6 @@ namespace chi_math
   public:
     std::vector<std::shared_ptr<CellMappingFE_PWL>> cell_mappings;
 
-  private:
-    bool                     mapping_initialized=false;
-    bool                     nb_mapping_initialized=false;
-    UnknownManager UNITARY_UNKNOWN_MANAGER;
   public:
     QuadratureLine          line_quad_order_arbitrary;
     QuadratureTriangle      tri_quad_order_arbitrary;
@@ -38,36 +34,12 @@ namespace chi_math
 
   //  std::map<int,int> node_mapping;
 
-    int64_t              local_block_address = 0;
     std::vector<int64_t> cell_local_block_address;
     std::vector<std::pair<uint64_t, int64_t>> neighbor_cell_block_address;
-
-  //  std::vector<int> locJ_block_address;
-    std::vector<uint64_t> locJ_block_size;
-
-    unsigned int local_base_block_size=0;
-    unsigned int globl_base_block_size=0;
 
   private:
     std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>>  neighbor_cells;
     std::map<uint64_t, std::shared_ptr<CellMappingFE_PWL>> neighbor_cell_fe_views;
-
-  private:
-    typedef finite_element::UnitIntegralData UIData;
-    typedef finite_element::InternalQuadraturePointData QPDataVol;
-    typedef finite_element::FaceQuadraturePointData QPDataFace;
-
-    std::map<uint64_t, UIData>                  nb_fe_unit_integrals;
-    std::map<uint64_t, QPDataVol>               nb_fe_vol_qp_data;
-    std::map<uint64_t, std::vector<QPDataFace>> nb_fe_srf_qp_data;
-
-    bool nb_integral_data_initialized=false;
-    bool nb_qp_data_initialized=false;
-
-  private:
-    finite_element::UnitIntegralData            scratch_intgl_data;
-    finite_element::InternalQuadraturePointData scratch_vol_qp_data;
-    finite_element::FaceQuadraturePointData     scratch_face_qp_data;
 
   private:
     //00
