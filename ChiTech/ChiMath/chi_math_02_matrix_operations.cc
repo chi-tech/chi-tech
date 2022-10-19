@@ -311,7 +311,7 @@ MatDbl chi_math::InverseGEPivoting(const MatDbl &A)
   assert(A.size());
   assert(A.size() == A[0].size());
 
-  unsigned int R = A.size();
+  const unsigned int R = A.size();
 
   std::vector<std::vector<double> > M(R,std::vector<double>(R,0.));
 
@@ -322,14 +322,16 @@ MatDbl chi_math::InverseGEPivoting(const MatDbl &A)
 
   for (unsigned int c = 0; c < R; c++)
   {
-    // Find a row which is nonzero on diagonal
-    unsigned int nonzerorow;
-    for (nonzerorow = c; nonzerorow < R && B[nonzerorow][c] == 0; ++nonzerorow) {}
+    // Find a row with the largest pivot value
+    unsigned int max_row=c; //nzr = non-zero row
+    for (unsigned int r = c; r < R; ++r)
+      if (std::fabs(B[r][c]) > std::fabs(B[max_row][c]))
+        max_row = r;
 
-    if ( nonzerorow != c )
+    if (max_row != c )
     {
-      SwapRow( nonzerorow , c, B );
-      SwapRow( nonzerorow , c, M );
+      SwapRow(max_row , c, B );
+      SwapRow(max_row , c, M );
     }
 
     // Eliminate non-zero values
