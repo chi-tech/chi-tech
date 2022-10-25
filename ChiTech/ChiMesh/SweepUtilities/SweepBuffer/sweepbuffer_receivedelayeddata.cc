@@ -41,14 +41,6 @@ void chi_mesh::sweep_management::SweepBuffer::
       u_ll_int message_size = delayed_prelocI_message_size[prelocI][m];
 
       MPI_Status status;
-//      int error_code =
-//        MPI_Recv(&angleset->delayed_prelocI_outgoing_psi[prelocI].data()[block_addr],
-//                 message_size,
-//                 MPI_DOUBLE,
-//                 comm_set->MapIonJ(locJ,chi::mpi.location_id),
-//                 max_num_mess*angle_set_num + m, //tag
-//                 comm_set->communicators[chi::mpi.location_id],
-//                 &status);
       int error_code =
         MPI_Recv(&outgoing_psi[block_addr],
                  static_cast<int>(message_size),
