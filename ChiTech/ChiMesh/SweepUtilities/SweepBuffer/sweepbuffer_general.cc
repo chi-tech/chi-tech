@@ -6,9 +6,9 @@
 //###################################################################
 /**Constructor.*/
 chi_mesh::sweep_management::SweepBuffer::
-SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
-            int sweep_eager_limit,
-            chi_objects::ChiMPICommunicatorSet* in_comm_set):
+  SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
+              int sweep_eager_limit,
+              chi_objects::ChiMPICommunicatorSet* in_comm_set) :
   angleset(ref_angleset),
   comm_set(in_comm_set)
 {
@@ -22,7 +22,7 @@ SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
 
 //###################################################################
 /**Returns the private flag done_sending.*/
-bool chi_mesh::sweep_management::SweepBuffer::DoneSending()
+bool chi_mesh::sweep_management::SweepBuffer::DoneSending() const
 {
   return done_sending;
 }
@@ -31,7 +31,7 @@ bool chi_mesh::sweep_management::SweepBuffer::DoneSending()
 /**Receive all upstream Psi. This method is called from within
  * an advancement of an angleset, right after execution.*/
 void chi_mesh::sweep_management::SweepBuffer::
-ClearLocalAndReceiveBuffers()
+  ClearLocalAndReceiveBuffers()
 {
   auto empty_vector = std::vector<std::vector<double>>(0);
   angleset->local_psi.swap(empty_vector);
@@ -43,7 +43,7 @@ ClearLocalAndReceiveBuffers()
 //###################################################################
 /**Sends downstream psi.*/
 void chi_mesh::sweep_management::SweepBuffer::
-ClearDownstreamBuffers()
+  ClearDownstreamBuffers()
 {
   if (done_sending) return;
 
@@ -81,12 +81,7 @@ void chi_mesh::sweep_management::SweepBuffer::Reset()
   data_initialized = false;
   upstream_data_initialized = false;
 
-  for (int prelocI=0; prelocI<prelocI_message_available.size(); prelocI++)
-    for (int m=0; m<prelocI_message_available[prelocI].size(); m++)
-      prelocI_message_available[prelocI][m] = false;
-
-  for (int prelocI=0; prelocI<delayed_prelocI_message_available.size(); prelocI++)
-    for (int m=0; m<delayed_prelocI_message_available[prelocI].size(); m++)
-      delayed_prelocI_message_available[prelocI][m] = false;
-
+  for (auto & prelocI : prelocI_message_available)
+    for (auto && m : prelocI)
+      m = false;
 }

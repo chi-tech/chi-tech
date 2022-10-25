@@ -4,12 +4,8 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
-
-
-
 
 #include <iomanip>
 
@@ -18,7 +14,6 @@ typedef sweep_namespace::SweepScheduler MainSweepScheduler;
 typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 using namespace lbs;
-
 
 //###################################################################
 /**Power iterative scheme for k-eigenvalue calculations.
@@ -34,6 +29,7 @@ void KEigenvalueSolver::PowerIteration()
   phi_old_local.assign(phi_old_local.size(), 1.0);
 
   double F_prev = 1.0;
+  k_eff = 1.0;
   double k_eff_prev = 1.0;
   double k_eff_change = 1.0;
 
@@ -42,8 +38,11 @@ void KEigenvalueSolver::PowerIteration()
   bool converged = false;
   while (nit < max_iterations)
   {
-    //============================================= Loop over groupsets
     MPI_Barrier(MPI_COMM_WORLD);
+    // Divide phi_old by k_eff (phi_old gives better init-quess for GMRES)
+    for (auto& phi : phi_old_local) phi /= k_eff;
+
+    //============================================= Loop over groupsets
     for (auto& groupset : groupsets)
     {
       ComputeSweepOrderings(groupset);
@@ -63,9 +62,6 @@ void KEigenvalueSolver::PowerIteration()
       SetSource(groupset, q_moments_local,
                 APPLY_AGS_FISSION_SOURCE |
                 APPLY_WGS_FISSION_SOURCE);
-
-      //normalize q by k_eff
-      for (auto& q : q_moments_local) q /= k_eff;
 
       //======================================== Converge the scattering source
       //                                         with a fixed fission source
