@@ -39,8 +39,6 @@ public:
 
   std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi;
   std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi_old;
-  std::vector<double>               delayed_prelocI_norm;
-  double                            delayed_local_norm = 0.0;
 
   AngleSet(size_t in_numgrps,
            size_t in_ref_subset,

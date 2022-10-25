@@ -4,28 +4,26 @@
 #include "ChiMesh/SweepUtilities/SPDS/SPDS.h"
 #include "ChiMesh/SweepUtilities/FLUDS/FLUDS.h"
 
-
 #include <ChiConsole/chi_console.h>
-
 #include <chi_log.h>
-;
 
 //###################################################################
 /** This is the final level of initialization before a sweep-chunk executes.
  * Once all upstream dependencies are met and if the sweep scheduler places
  * this angleset as "ready-to-execute", then the angle-set will call this
  * method. It is also fairly important in terms of memory to only allocate
- * these chunks of memory since they form the majority of memory requirements.*/
+ * these chunks of memory when actually ready to use them since they form the
+ * majority of memory usage.*/
 void chi_mesh::sweep_management::SweepBuffer::
-InitializeLocalAndDownstreamBuffers()
+  InitializeLocalAndDownstreamBuffers()
 {
   if (!data_initialized)
   {
     auto spds =  angleset->GetSPDS();
     auto fluds=  angleset->fluds;
 
-    int num_grps   = angleset->GetNumGrps();
-    int num_angles = angleset->angles.size();
+    const auto num_grps   = angleset->GetNumGrps();
+    const auto num_angles = angleset->angles.size();
 
     //============================ Resize FLUDS local outgoing Data
     angleset->local_psi.resize(fluds->num_face_categories);
@@ -47,7 +45,7 @@ InitializeLocalAndDownstreamBuffers()
     }
 
     //================================================ Make a memory query
-    double memory_mb = chi::console.GetMemoryUsageInMB();
+    double memory_mb = chi_objects::ChiConsole::GetMemoryUsageInMB();
 
     std::shared_ptr<chi_objects::ChiLog::EventInfo> memory_event_info =
       std::make_shared<chi_objects::ChiLog::EventInfo>(memory_mb);

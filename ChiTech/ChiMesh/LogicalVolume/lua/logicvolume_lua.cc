@@ -104,8 +104,8 @@ int chiLogicalVolumeCreate(lua_State *L)
     if (num_args!=8)
     {
       chi::log.Log0Error() << "Incorrect amount of arguments provided "
-                                 "for chiMeshCreateLogicalVolume(RCC...";
-     chi::Exit(EXIT_FAILURE);
+                              "for chiMeshCreateLogicalVolume(RCC...";
+      chi::Exit(EXIT_FAILURE);
     }
     double x0 = lua_tonumber(L,2);
     double y0 = lua_tonumber(L,3);

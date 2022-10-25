@@ -313,7 +313,7 @@ std::vector<chi_physics::TransportCrossSections::GrpVal>
   std::vector<GrpVal> temp_sigma_a(num_groups, 0.0);
   if (not transfer_matrices.empty())
     for (size_t g = 0; g < num_groups; ++g)
-      temp_sigma_a[g] = sigma_t[g] -
+      temp_sigma_a[g] = sigma_t[g] - sigma_f[g] -
         GetMatrixColumnSum(transfer_matrices[0], g);
 
   return temp_sigma_a;
