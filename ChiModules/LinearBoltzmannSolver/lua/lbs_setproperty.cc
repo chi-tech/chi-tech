@@ -316,10 +316,7 @@ int chiLBSSetProperty(lua_State *L)
     LuaCheckNilValue(__FUNCTION__, L, 3);
 
     int limit = lua_tonumber(L,3);
-    if (limit<=64000)
-    {
-      lbs_solver.options.sweep_eager_limit = limit;
-    }
+    lbs_solver.options.sweep_eager_limit = limit;
   }
   else if (property == READ_RESTART_DATA)
   {
