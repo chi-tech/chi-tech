@@ -47,7 +47,7 @@ void chi_mesh::sweep_management::SweepBuffer::
 {
   if (done_sending) return;
 
-  auto spds =  angleset->GetSPDS();
+  const auto& spds =  angleset->GetSPDS();
 
   done_sending = true;
   for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
@@ -55,13 +55,13 @@ void chi_mesh::sweep_management::SweepBuffer::
     int num_mess = deplocI_message_count[deplocI];
     for (int m=0; m<num_mess; m++)
     {
-      int  send_request_status = 1;
+      int message_sent = false;
       MPI_Test(&deplocI_message_request[deplocI][m],
-               &send_request_status,MPI_STATUS_IGNORE);
-      if (send_request_status == 0) done_sending = false;
+               &message_sent, MPI_STATUS_IGNORE);
+      if (not message_sent)
+        done_sending = false;
     }
-
-  }
+  }//for deplocI
 
   if (done_sending)
   {
@@ -81,7 +81,13 @@ void chi_mesh::sweep_management::SweepBuffer::Reset()
   data_initialized = false;
   upstream_data_initialized = false;
 
-  for (auto & prelocI : prelocI_message_available)
-    for (auto && m : prelocI)
-      m = false;
+//  for (auto & prelocI : prelocI_message_received)
+//    for (auto && m : prelocI)
+//      m = false;
+
+  for (auto& message_flags : prelocI_message_received)
+    message_flags.assign(message_flags.size(), false);
+
+  for (auto& message_flags : delayed_prelocI_message_received)
+    message_flags.assign(message_flags.size(), false);
 }

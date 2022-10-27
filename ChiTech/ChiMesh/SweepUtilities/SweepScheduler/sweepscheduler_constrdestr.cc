@@ -1,8 +1,6 @@
 #include "sweepscheduler.h"
 
-#include <chi_log.h>
-
-;
+#include "chi_log.h"
 
 //###################################################################
 /**Sweep scheduler constructor*/
@@ -12,11 +10,11 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
     SweepChunk& in_sweep_chunk) :
   scheduler_type(in_scheduler_type),
   angle_agg(in_angle_agg),
-  sweep_chunk(in_sweep_chunk),
-  sweep_event_tag(chi::log.GetRepeatingEventTag("Sweep Timing")),
+  m_sweep_chunk(in_sweep_chunk),
   sweep_timing_events_tag({
     chi::log.GetRepeatingEventTag("Sweep Chunk Only Timing")
-  })
+  }),
+  sweep_event_tag(chi::log.GetRepeatingEventTag("Sweep Timing"))
 {
   angle_agg.InitializeReflectingBCs();
 
@@ -47,4 +45,12 @@ chi_mesh::sweep_management::SweepScheduler::SweepScheduler(
   for (auto& angsetgrp : in_angle_agg.angle_set_groups)
     for (auto& angset : angsetgrp.angle_sets)
       angset->SetMaxBufferMessages(global_max_num_messages);
+}
+
+//###################################################################
+/**Returns the referenced sweep chunk.*/
+chi_mesh::sweep_management::SweepChunk&
+  chi_mesh::sweep_management::SweepScheduler::GetSweepChunk()
+{
+  return m_sweep_chunk;
 }
