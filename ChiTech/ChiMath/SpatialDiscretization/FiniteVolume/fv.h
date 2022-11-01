@@ -48,6 +48,8 @@ namespace chi_math
     CellFVValues* MapFeView(uint64_t cell_local_index);
     CellFVValues* MapNeighborFeView(uint64_t cell_global_index);
 
+    void CreateCellMappings();
+
     //02 node ordering
   private:
     void OrderNodes();

@@ -17,6 +17,7 @@ chi_math::SpatialDiscretization_FV::
 
   PreComputeCellSDValues();
   PreComputeNeighborCellSDValues();
+  CreateCellMappings();
   OrderNodes();
   chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Done creating Finite Volume spatial discretizaiton.";

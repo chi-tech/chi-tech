@@ -77,6 +77,8 @@ namespace chi_math
     chi_mesh::Cell&  GetNeighborCell(uint64_t cell_glob_index);
     std::shared_ptr<CellMappingFE_PWL> GetNeighborCellMappingFE(uint64_t cell_glob_index);
 
+    void CreateCellMappings();
+
   private:
     //02
     void OrderNodes();

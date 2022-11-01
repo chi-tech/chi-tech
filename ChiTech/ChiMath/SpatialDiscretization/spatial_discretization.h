@@ -54,6 +54,9 @@ namespace chi_math
     }
 
     //01 AddViewOfContinuum
+  public:
+    const CellMapping& GetCellMapping(const chi_mesh::Cell& cell) const;
+
     //02 OrderNodes
 
   public:

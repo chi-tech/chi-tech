@@ -75,6 +75,8 @@ namespace chi_math
   //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
     std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
 
+    void CreateCellMappings();
+
   private:
     //02
     void OrderNodes();

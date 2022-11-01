@@ -97,7 +97,7 @@ chi_math::SpatialDiscretization_PWLD::
     PreComputeCellSDValues();
     PreComputeNeighborCellSDValues();
   }
-
+  CreateCellMappings();
   OrderNodes();
   chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Done creating Piecewise Linear Discontinuous "
