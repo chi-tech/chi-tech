@@ -5,7 +5,8 @@
 //###################################################################
 /**Returns the value of the shape function given cartesian
  * coordinates.*/
-double chi_math::PolygonMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
+double chi_math::PolygonMappingFE_PWL::
+  ShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
   for (int s=0; s<num_of_subtris; s++)
   {
@@ -45,8 +46,9 @@ double chi_math::PolygonMappingFE_PWL::ShapeValue(const int i, const chi_mesh::V
 //###################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void chi_math::PolygonMappingFE_PWL::ShapeValues(const chi_mesh::Vector3 &xyz,
-                                                 std::vector<double> &shape_values)
+void chi_math::PolygonMappingFE_PWL::
+  ShapeValues(const chi_mesh::Vector3 &xyz,
+              std::vector<double> &shape_values) const
 {
   shape_values.resize(num_nodes, 0.0);
   for (int s=0; s<num_of_subtris; s++)
@@ -86,8 +88,9 @@ void chi_math::PolygonMappingFE_PWL::ShapeValues(const chi_mesh::Vector3 &xyz,
 
 //###################################################################
 /**Returns the evaluation of grad-shape function i at the supplied point.*/
-chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::GradShapeValue(const int i,
-                                                                 const chi_mesh::Vector3& xyz)
+chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::
+  GradShapeValue(const int i,
+                 const chi_mesh::Vector3& xyz) const
 {
   chi_mesh::Vector3 grad_r;
   chi_mesh::Vector3 grad;
@@ -134,7 +137,7 @@ chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::GradShapeValue(const int i,
  * gradient evaluated at the supplied point.*/
 void chi_math::PolygonMappingFE_PWL::GradShapeValues(
   const chi_mesh::Vector3 &xyz,
-  std::vector<chi_mesh::Vector3> &gradshape_values)
+  std::vector<chi_mesh::Vector3> &gradshape_values) const
 {
   gradshape_values.clear();
   for (int i=0; i < num_nodes; ++i)

@@ -29,23 +29,23 @@ public:
 
 public:
   //02 Shapefuncs
-  double ShapeValue(int i, const chi_mesh::Vector3& xyz)  override
+  double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override
   {
     return 1.0;
   }
   void ShapeValues(const chi_mesh::Vector3& xyz,
-                   std::vector<double>& shape_values)  override
+                   std::vector<double>& shape_values) const override
   {
     shape_values.assign(num_nodes, 0.0);
   }
   chi_mesh::Vector3 GradShapeValue(int i,
-                                   const chi_mesh::Vector3& xyz)  override
+                                   const chi_mesh::Vector3& xyz) const override
   {
     return chi_mesh::Vector3(0.0, 0.0, 0.0);
   }
   void GradShapeValues(const chi_mesh::Vector3& xyz,
                        std::vector<chi_mesh::Vector3>& gradshape_values)
-                        override
+                       const override
   {
     gradshape_values.assign(num_nodes, chi_mesh::Vector3(0,0,0));
   }

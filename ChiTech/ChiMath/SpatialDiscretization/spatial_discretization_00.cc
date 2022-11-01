@@ -2,7 +2,7 @@
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-chi_math::CellMapping& chi_math::SpatialDiscretization::
+const chi_math::CellMapping& chi_math::SpatialDiscretization::
   GetCellMapping(const chi_mesh::Cell& cell) const
 {
   constexpr std::string_view fname = "chi_math::SpatialDiscretization::"

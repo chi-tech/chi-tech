@@ -135,15 +135,18 @@ namespace chi_math
     //                                                as function of cartesian
     //                                                coordinates
   public:
-    double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
-    chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
+    double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override;
+    chi_mesh::Vector3 GradShapeValue(
+      int i,
+      const chi_mesh::Vector3& xyz) const override;
 
 
     void ShapeValues(const chi_mesh::Vector3& xyz,
-                     std::vector<double>& shape_values) override;
+                     std::vector<double>& shape_values) const override;
 
-    void GradShapeValues(const chi_mesh::Vector3& xyz,
-                         std::vector<chi_mesh::Vector3>& gradshape_values) override;
+    void GradShapeValues(
+      const chi_mesh::Vector3& xyz,
+      std::vector<chi_mesh::Vector3>& gradshape_values) const override;
 
   };
 }

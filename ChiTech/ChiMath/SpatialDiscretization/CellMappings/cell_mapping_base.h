@@ -51,16 +51,17 @@ public:
 
   //02 ShapeFuncs
   virtual
-  double ShapeValue(int i, const chi_mesh::Vector3& xyz) = 0;
+  double ShapeValue(int i, const chi_mesh::Vector3& xyz) const = 0;
   virtual
   void ShapeValues(const chi_mesh::Vector3& xyz,
-                   std::vector<double>& shape_values) = 0;
+                   std::vector<double>& shape_values) const = 0;
   virtual
   chi_mesh::Vector3 GradShapeValue(int i,
-                                   const chi_mesh::Vector3& xyz) = 0;
+                                   const chi_mesh::Vector3& xyz) const = 0;
   virtual
-  void GradShapeValues(const chi_mesh::Vector3& xyz,
-                       std::vector<chi_mesh::Vector3>& gradshape_values) = 0;
+  void GradShapeValues(
+    const chi_mesh::Vector3& xyz,
+    std::vector<chi_mesh::Vector3>& gradshape_values) const = 0;
   virtual
   std::vector<chi_mesh::Vector3> GetNodeLocations() const = 0;
 
