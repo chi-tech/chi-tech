@@ -1,5 +1,7 @@
 #include "pwl_slab.h"
 
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+
 //###################################################################
 /**Computes cell volume and surface integrals.*/
 void chi_math::SlabMappingFE_PWL::
@@ -114,7 +116,7 @@ void chi_math::SlabMappingFE_PWL::
                      IntS_shapeI_shapeJ    ,
                      IntS_shapeI           ,
                      IntS_shapeI_gradshapeJ,
-                     face_dof_mappings,
+                     face_node_mappings,
                      num_nodes);
 
 }

@@ -3,10 +3,7 @@
 
 #include "ChiMath/chi_math.h"
 
-namespace chi_math
-{
-
-namespace finite_element
+namespace chi_math::finite_element
 {
   typedef std::vector<chi_mesh::Vector3> VecVec3;
 
@@ -165,8 +162,6 @@ namespace finite_element
     chi_mesh::Vector3
       Normal(unsigned int qp) const;
   };
-}
-
 }
 
 #endif //CHI_MATH_FINITE_ELEMENT_H

@@ -38,7 +38,7 @@ LocalizePETScVector(Vec petsc_vector,
     {
       auto cell_mapping = GetCellMappingFE(cell.local_id);
 
-      for (unsigned int i=0; i < cell_mapping->num_nodes; ++i)
+      for (unsigned int i=0; i < cell_mapping->NumNodes(); ++i)
       {
         int uk=-1;
         for (const auto& unknown : unknown_manager.unknowns)

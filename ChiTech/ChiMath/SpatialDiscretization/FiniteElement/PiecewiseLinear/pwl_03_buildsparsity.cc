@@ -24,7 +24,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   for (auto& cell : ref_grid->local_cells)
   {
     auto cell_fe_view = GetCellMappingFE(lc);
-    size_t num_nodes = cell_fe_view->num_nodes;
+    size_t num_nodes = cell_fe_view->NumNodes();
 
     //==================================== Self connection
     for (int i=0; i<num_nodes; ++i)
@@ -44,7 +44,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
         for (int i=0; i<num_nodes; ++i)
         {
           int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_in_diag[ir] += adj_cell_fe_view->num_nodes;
+          nodal_nnz_in_diag[ir] += adj_cell_fe_view->NumNodes();
         }
       }
     }//for face
@@ -64,10 +64,10 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
       {
         auto adj_cell_fe_view = GetNeighborCellMappingFE(face.neighbor_id);
 
-        for (int i=0; i<cell_fe_view->num_nodes; ++i)
+        for (int i=0; i<cell_fe_view->NumNodes(); ++i)
         {
           int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_off_diag[ir] += adj_cell_fe_view->num_nodes;
+          nodal_nnz_off_diag[ir] += adj_cell_fe_view->NumNodes();
         }
       }
     }

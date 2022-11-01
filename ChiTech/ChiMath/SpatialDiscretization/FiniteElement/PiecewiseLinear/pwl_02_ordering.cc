@@ -35,7 +35,7 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   {
     auto cell_fe_view = GetCellMappingFE(lc);
     cell_local_block_address[lc] = static_cast<int64_t>(local_node_count);
-    local_node_count += cell_fe_view->num_nodes;
+    local_node_count += cell_fe_view->NumNodes();
   }
 
   //================================================== Allgather node_counts

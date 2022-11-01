@@ -35,7 +35,7 @@ namespace chi_math
     {
       double detJ;
       double detJ_surf;
-      std::array<int,2> v_index;
+      std::array<uint64_t,2> v_index;
       chi_mesh::Vector3   v0;
       chi_mesh::Matrix3x3 J;
       chi_mesh::Matrix3x3 Jinv;
@@ -59,7 +59,7 @@ namespace chi_math
   public:
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
     PolygonMappingFE_PWL(const chi_mesh::Cell& poly_cell,
-                         const chi_mesh::MeshContinuumPtr& ref_grid,
+                         const chi_mesh::MeshContinuumConstPtr& ref_grid,
                          const QuadratureTriangle& volume_quadrature,
                          const QuadratureLine&     surface_quadrature);
 

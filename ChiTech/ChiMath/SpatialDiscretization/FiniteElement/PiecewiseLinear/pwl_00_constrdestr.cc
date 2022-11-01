@@ -7,8 +7,6 @@
 #include "ChiTimer/chi_timer.h"
 
 
-
-
 //###################################################################
 /**Constructor.*/
 chi_math::SpatialDiscretization_PWLD::

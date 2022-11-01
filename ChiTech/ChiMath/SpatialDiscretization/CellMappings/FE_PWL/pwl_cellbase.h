@@ -5,7 +5,6 @@
 
 #include "ChiMesh/chi_mesh.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 #include "ChiMath/SpatialDiscretization/CellMappings/cell_mapping_base.h"
 
 //###################################################################
@@ -14,52 +13,24 @@ namespace chi_math
   /** Base class for all cell FE views.*/
   class CellMappingFE_PWL : public CellMapping
   {
+  protected:
+    const std::vector<chi_mesh::Vector3> m_node_locations;
   public:
     typedef std::vector<double> VecDbl;
     typedef std::vector<chi_mesh::Vector3> VecVec3;
-    /** Number of nodes of the cell. */
-    const int num_nodes;
-    /** For each cell face, map from the face node index to the corresponding
-     *  cell node index. More specifically, \p face_dof_mappings[f][fi], with
-     *  \p fi the face node index of the face identified by face index \p f,
-     *  contains the corresponding cell node index. */
-    std::vector<std::vector<int>> face_dof_mappings;
 
   public:
     /** Constructor. */
-    explicit CellMappingFE_PWL(size_t num_dofs,
-                               chi_mesh::MeshContinuumPtr ref_grid) :
-      CellMapping(std::move(ref_grid), num_dofs),
-      num_nodes(num_dofs)
+    explicit CellMappingFE_PWL(size_t num_nodes,
+                               chi_mesh::MeshContinuumConstPtr ref_grid,
+                               std::vector<chi_mesh::Vector3> vertices,
+                               std::vector<std::vector<int>> face_node_mappings) :
+      CellMapping(std::move(ref_grid), num_nodes, std::move(face_node_mappings)),
+      m_node_locations(std::move(vertices))
     {}
 
-    /** Compute unit integrals. */
-    virtual void
-    ComputeUnitIntegrals(finite_element::UnitIntegralData& ui_data) const;
-
-    /** Initialize volume quadrature point data and
-     *  surface quadrature point data for all faces. */
-    virtual void
-    InitializeAllQuadraturePointData(
-      finite_element::InternalQuadraturePointData& internal_data,
-      std::vector<finite_element::FaceQuadraturePointData>& faces_qp_data) const;
-
-    /** Initialize volume quadrature point data. */
-    virtual void
-    InitializeVolumeQuadraturePointData(
-      finite_element::InternalQuadraturePointData& internal_data) const = 0;
-
-    /** Initialize surface quadrature point data for face index \p face. */
-    virtual void
-    InitializeFaceQuadraturePointData(
-      unsigned int face,
-      finite_element::FaceQuadraturePointData& faces_qp_data) const = 0;
-
-  public:
-
-
-    /** Destructor. */
-    virtual ~CellMappingFE_PWL() = default;
+    //02 ShapeFuncs
+    std::vector<chi_mesh::Vector3> GetNodeLocations() const override;
 
   protected:
     /** Spatial weight function. See also ComputeWeightedUnitIntegrals. */
@@ -70,6 +41,15 @@ namespace chi_math
      *  the real quadrature points. */
     void
     ComputeWeightedUnitIntegrals(finite_element::UnitIntegralData& ui_data) const;
+
+  protected:
+    static
+    std::vector<chi_mesh::Vector3>
+      GetVertexLocations(const chi_mesh::MeshContinuum& grid,
+                         const chi_mesh::Cell& cell);
+    static
+    std::vector<std::vector<int>>
+      MakeFaceNodeMapping(const chi_mesh::Cell& cell);
   };
 }
 

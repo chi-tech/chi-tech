@@ -2,9 +2,6 @@
 #define SLAB_FV_VALUES_H
 
 #include "fv_cellbase.h"
-#include "ChiMesh/Cell/cell.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-
 
 //######################################################### Class def
 namespace chi_math
@@ -18,20 +15,8 @@ namespace chi_math
 
   public:
 
-    SlabFVValues(const chi_mesh::Cell& slab_cell,
-                 const chi_mesh::MeshContinuumPtr& grid) :
-      CellFVValues(grid, 1)
-    {
-      v0i = slab_cell.vertex_ids[0];
-      v1i = slab_cell.vertex_ids[1];
-      const auto& v0 = grid->vertices[v0i];
-      const auto& v1 = grid->vertices[v1i];
-
-      chi_mesh::Vector3 v01 = v1 - v0;
-      volume = v01.Norm();
-      face_area.push_back(1.0);
-      face_area.push_back(1.0);
-    }
+    SlabFVValues(const chi_mesh::Cell &slab_cell,
+                 const chi_mesh::MeshContinuumConstPtr &grid);
   };
 }
 

@@ -1,5 +1,7 @@
 #include "pwl_slab.h"
 
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+
 void chi_math::SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data) const
 {
@@ -60,7 +62,7 @@ void chi_math::SlabMappingFE_PWL::InitializeVolumeQuadraturePointData(
                                V_shape_value,
                                V_shape_grad,
                                V_JxW,
-                               face_dof_mappings,
+                               face_node_mappings,
                                V_num_nodes);
 }
 
@@ -132,7 +134,7 @@ void chi_math::SlabMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned int
                                  F_shape_grad,
                                  F_JxW,
                                  F_normals,
-                                 face_dof_mappings,
+                                 face_node_mappings,
                                  F_num_nodes);
   }//face
 }

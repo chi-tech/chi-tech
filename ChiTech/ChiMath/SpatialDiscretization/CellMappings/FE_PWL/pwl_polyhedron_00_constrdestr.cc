@@ -4,7 +4,6 @@
 
 #include "chi_log.h"
 #include "pwl_cellbase.h"
-;
 
 //###################################################################
 /**Constructor for the Piecewise Linear Polyhedron cell finite elment
@@ -14,16 +13,19 @@
 chi_math::PolyhedronMappingFE_PWL::
   PolyhedronMappingFE_PWL(
     const chi_mesh::Cell& polyh_cell,
-    const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
+    const chi_mesh::MeshContinuumConstPtr& ref_grid,
     const chi_math::QuadratureTetrahedron& volume_quadrature,
     const chi_math::QuadratureTriangle&    surface_quadrature):
-  CellMappingFE_PWL(polyh_cell.vertex_ids.size(), ref_grid),
+  CellMappingFE_PWL(polyh_cell.vertex_ids.size(), //num_nodes
+                    ref_grid,
+                    GetVertexLocations(*ref_grid, polyh_cell),
+                    MakeFaceNodeMapping(polyh_cell)),
   volume_quadrature(volume_quadrature),
   surface_quadrature(surface_quadrature)
 {
   //=========================================== Assign cell centre
   const chi_mesh::Vertex& vcc = polyh_cell.centroid;
-  alphac = 1.0/polyh_cell.vertex_ids.size();
+  alphac = 1.0/static_cast<double>(polyh_cell.vertex_ids.size());
 
   //=========================================== For each face
   size_t num_faces = polyh_cell.faces.size();
@@ -36,7 +38,7 @@ chi_math::PolyhedronMappingFE_PWL::
 
     face_f_data.normal = face.normal;
 
-    face_betaf.push_back(1.0/face.vertex_ids.size());
+    face_betaf.push_back(1.0/static_cast<double>(face.vertex_ids.size()));
 
     const chi_mesh::Vertex& vfc = face.centroid;
 
@@ -142,8 +144,8 @@ chi_math::PolyhedronMappingFE_PWL::
       {
         FEnodeSideMap newSideMap;
         newSideMap.part_of_face = false;
-        int s0 = face_data[f].sides[s].v_index[0];
-        int s1 = face_data[f].sides[s].v_index[1];
+        const uint64_t s0 = face_data[f].sides[s].v_index[0];
+        const uint64_t s1 = face_data[f].sides[s].v_index[1];
         if      (polyh_cell.vertex_ids[i] == s0)
         {
           newSideMap.index = 0;
@@ -185,31 +187,31 @@ chi_math::PolyhedronMappingFE_PWL::
   // This mapping is not used by any of the methods in
   // this class but is used by methods requiring the
   // surface integrals of the shape functions.
-  face_dof_mappings.reserve(num_faces);
-  for (auto& face : polyh_cell.faces)
-  {
-    std::vector<int> face_dof_mapping;
-    face_dof_mapping.reserve(face.vertex_ids.size());
-    for (uint64_t fvid : face.vertex_ids)
-    {
-      int mapping = -1;
-      for (size_t ci=0; ci<polyh_cell.vertex_ids.size(); ci++)
-      {
-        if (fvid == polyh_cell.vertex_ids[ci])
-        {
-          mapping = ci;
-          break;
-        }
-      }//for cell i
-      if (mapping<0)
-      {
-        chi::log.LogAllError() << "Unknown face mapping encountered. "
-                                     "pwl_polyhedron.h";
-       chi::Exit(EXIT_FAILURE);
-      }
-      face_dof_mapping.push_back(mapping);
-    }//for face i
-
-    face_dof_mappings.push_back(face_dof_mapping);
-  }
+//  face_node_mappings.reserve(num_faces);
+//  for (auto& face : polyh_cell.faces)
+//  {
+//    std::vector<int> face_dof_mapping;
+//    face_dof_mapping.reserve(face.vertex_ids.size());
+//    for (uint64_t fvid : face.vertex_ids)
+//    {
+//      int mapping = -1;
+//      for (size_t ci=0; ci<polyh_cell.vertex_ids.size(); ci++)
+//      {
+//        if (fvid == polyh_cell.vertex_ids[ci])
+//        {
+//          mapping = static_cast<int>(ci);
+//          break;
+//        }
+//      }//for cell i
+//      if (mapping<0)
+//      {
+//        chi::log.LogAllError() << "Unknown face mapping encountered. "
+//                                     "pwl_polyhedron.h";
+//       chi::Exit(EXIT_FAILURE);
+//      }
+//      face_dof_mapping.push_back(mapping);
+//    }//for face i
+//
+//    face_node_mappings.push_back(face_dof_mapping);
+//  }
 }

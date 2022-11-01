@@ -4,6 +4,11 @@
 #include<cmath>
 #include <sstream>
 
+namespace chi_mesh
+{
+  struct TensorRank2Dim3;
+}
+
 //namespace chi_mesh
 //{
 //=============================================== General 3D vector structure

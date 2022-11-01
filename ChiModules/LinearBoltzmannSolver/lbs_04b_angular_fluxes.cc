@@ -91,7 +91,7 @@ void lbs::SteadySolver::
   {
     const auto cell_fe_mapping = fe->GetCellMappingFE(cell.local_id);
 
-    for (unsigned int i=0; i<cell_fe_mapping->num_nodes; ++i)
+    for (unsigned int i=0; i<cell_fe_mapping->NumNodes(); ++i)
       for (unsigned int n=0; n<num_angles; ++n)
         for (unsigned int g=0; g<num_groups; ++g)
         {

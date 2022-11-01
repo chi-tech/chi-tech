@@ -8,14 +8,17 @@
 chi_math::PolygonMappingFE_PWL::
   PolygonMappingFE_PWL(
     const chi_mesh::Cell& poly_cell,
-    const std::shared_ptr<chi_mesh::MeshContinuum>& ref_grid,
+    const chi_mesh::MeshContinuumConstPtr& ref_grid,
     const chi_math::QuadratureTriangle& volume_quadrature,
     const chi_math::QuadratureLine&     surface_quadrature) :
-  chi_math::CellMappingFE_PWL(poly_cell.vertex_ids.size(), ref_grid),
+  chi_math::CellMappingFE_PWL(poly_cell.vertex_ids.size(), //num_nodes
+                              ref_grid,
+                              GetVertexLocations(*ref_grid, poly_cell),
+                              MakeFaceNodeMapping(poly_cell)),
   volume_quadrature(volume_quadrature),
   surface_quadrature(surface_quadrature)
 {
-  num_of_subtris = poly_cell.faces.size();
+  num_of_subtris = static_cast<int>(poly_cell.faces.size());
   beta = 1.0/num_of_subtris;
 
   //=========================================== Get raw vertices
@@ -74,7 +77,7 @@ chi_math::PolygonMappingFE_PWL::
   //=========================================== Compute node to side mapping
   for (int v=0; v<poly_cell.vertex_ids.size(); v++)
   {
-    int vindex = poly_cell.vertex_ids[v];
+    const uint64_t vindex = poly_cell.vertex_ids[v];
     std::vector<int> side_mapping(num_of_subtris);
     for (int side=0;side<num_of_subtris;side++)
     {
@@ -93,21 +96,21 @@ chi_math::PolygonMappingFE_PWL::
     node_to_side_map.push_back(side_mapping);
   }
 
-  //============================================= Compute edge dof mappings
-  face_dof_mappings.resize(poly_cell.faces.size());
-  for (int e=0; e<poly_cell.faces.size(); e++)
-  {
-    face_dof_mappings[e].resize(2);
-    for (int fv=0; fv<2; fv++)
-    {
-      for (int v=0; v<poly_cell.vertex_ids.size(); v++)
-      {
-        if (poly_cell.faces[e].vertex_ids[fv] == poly_cell.vertex_ids[v])
-        {
-          face_dof_mappings[e][fv] = v;
-          break;
-        }
-      }//for v
-    }//for fv
-  }//for e
+//  //============================================= Compute edge dof mappings
+//  face_node_mappings.resize(poly_cell.faces.size());
+//  for (int e=0; e<poly_cell.faces.size(); e++)
+//  {
+//    face_node_mappings[e].resize(2);
+//    for (int fv=0; fv<2; fv++)
+//    {
+//      for (int v=0; v<poly_cell.vertex_ids.size(); v++)
+//      {
+//        if (poly_cell.faces[e].vertex_ids[fv] == poly_cell.vertex_ids[v])
+//        {
+//          face_node_mappings[e][fv] = v;
+//          break;
+//        }
+//      }//for v
+//    }//for fv
+//  }//for e
 }
