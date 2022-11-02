@@ -40,7 +40,7 @@ int64_t chi_math::SpatialDiscretization_FV::
   }
   else
   {
-    uint64_t ghost_local_id = neighbor_cells.at(cell.global_id)->local_id;
+    uint64_t ghost_local_id = ref_grid->cells.GetGhostLocalID(cell.global_id);
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = sc_int64(locJ_block_address[cell.partition_id]) * num_unknowns +
@@ -84,7 +84,7 @@ int64_t chi_math::SpatialDiscretization_FV::
   }
   else
   {
-    uint64_t ghost_local_id = neighbor_cells.at(cell.global_id)->local_id;
+    uint64_t ghost_local_id = ref_grid->cells.GetGhostLocalID(cell.global_id);
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = sc_int64(locJ_block_size[cell.partition_id]) * block_id +

@@ -45,7 +45,7 @@ public:
 
   std::vector<uint64_t> GetGhostGlobalIDs();
 
-  uint64_t GetGhostLocalID(int cell_global_index);
+  uint64_t GetGhostLocalID(uint64_t cell_global_index);
 };
 
 }//namespace chi_mesh

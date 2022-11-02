@@ -84,10 +84,10 @@ chi_math::SpatialDiscretization_PWLC::
         << qorder_min << ".";
   }
 
+  CreateCellMappings();
   if (setup_flags != chi_math::finite_element::NO_FLAGS_SET)
     PreComputeCellSDValues();
 
-  CreateCellMappings();
   OrderNodes();
   chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Done creating Piecewise Linear Continuous "

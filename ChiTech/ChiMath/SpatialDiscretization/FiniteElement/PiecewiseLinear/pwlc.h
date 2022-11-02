@@ -22,10 +22,7 @@ namespace chi_math
      * or a Discontinuous Finite Element Method (DFEM). */
   class SpatialDiscretization_PWLC : public chi_math::SpatialDiscretization_FE
   {
-  public:
-    std::vector<std::shared_ptr<CellMappingFE_PWL>> cell_mappings;
-
-  public:
+  protected:
     QuadratureLine          line_quad_order_arbitrary;
     QuadratureTriangle      tri_quad_order_arbitrary;
     QuadratureQuadrilateral quad_quad_order_arbitrary;
@@ -36,10 +33,6 @@ namespace chi_math
 
   //  std::vector<int> cell_local_block_address;
   //  std::vector<std::pair<int,int>> neighbor_cell_block_address;
-
-  private:
-  //  std::vector<chi_mesh::Cell*> neighbor_cells;
-  //  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
 
   private:
     //00
@@ -66,14 +59,9 @@ namespace chi_math
       new SpatialDiscretization_PWLC(in_grid, setup_flags, qorder, in_cs_type));}
 
     //01
-  private:
-    std::shared_ptr<CellMappingFE_PWL> MakeCellMappingFE(const chi_mesh::Cell& cell) const;
-
   public:
-
     void PreComputeCellSDValues();
   //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
-    std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
 
     void CreateCellMappings();
 
@@ -142,9 +130,9 @@ namespace chi_math
         return fe_unit_integrals.at(cell.local_id);
       else
       {
-        auto cell_fe_view = GetCellMappingFE(cell.local_id);
+        const auto& cell_mapping = GetCellMapping(cell);
         scratch_intgl_data.Reset();
-        cell_fe_view->ComputeUnitIntegrals(scratch_intgl_data);
+        cell_mapping.ComputeUnitIntegrals(scratch_intgl_data);
         return scratch_intgl_data;
       }
     }
@@ -156,8 +144,8 @@ namespace chi_math
         return fe_vol_qp_data.at(cell.local_id);
       else
       {
-        auto cell_fe_view = GetCellMappingFE(cell.local_id);
-        cell_fe_view->InitializeVolumeQuadraturePointData(scratch_vol_qp_data);
+        const auto& cell_mapping = GetCellMapping(cell);
+        cell_mapping.InitializeVolumeQuadraturePointData(scratch_vol_qp_data);
         return scratch_vol_qp_data;
       }
     }
@@ -174,8 +162,8 @@ namespace chi_math
       }
       else
       {
-        auto cell_fe_view = GetCellMappingFE(cell.local_id);
-        cell_fe_view->InitializeFaceQuadraturePointData(face, scratch_face_qp_data);
+        const auto& cell_mapping = GetCellMapping(cell);
+        cell_mapping.InitializeFaceQuadraturePointData(face, scratch_face_qp_data);
         return scratch_face_qp_data;
       }
 

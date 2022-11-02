@@ -121,21 +121,22 @@ void chi_mesh::FieldFunctionInterpolationLine::
   {
     if (not ff_ctx->interpolation_points_has_ass_cell[c]) continue;
 
-    int cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
-    auto cell_fe_view = spatial_dm.GetCellMappingFE(cell_local_index);
+    uint64_t cell_local_index = ff_ctx->interpolation_points_ass_cell[c];
+    const auto& cell = grid_view->local_cells[cell_local_index];
+    const auto& cell_mapping = spatial_dm.GetCellMapping(cell);
 
     double weighted_value = 0.0;
-    for (int i=0; i<cell_fe_view->NumNodes(); i++)
+    for (int i=0; i < cell_mapping.NumNodes(); i++)
     {
       double node_value=0.0;
       counter++;
-      int64_t ir = mapping[counter];
+      const auto ir = static_cast<int64_t>(mapping[counter]);
       VecGetValues(field,1,&ir,&node_value);
 
       double weight=0.0;
       //Here I use c in interpolation_points because the vector should
       //be one-to-one with it.
-      weight = cell_fe_view->ShapeValue(i, interpolation_points[c]);
+      weight = cell_mapping.ShapeValue(i, interpolation_points[c]);
 
       node_value *= weight;
 

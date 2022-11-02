@@ -31,11 +31,12 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   cell_local_block_address.resize(num_loc_cells, 0);
 
   uint64_t local_node_count=0;
-  for (size_t lc=0; lc<num_loc_cells; lc++)
+  for (const auto& cell : ref_grid->local_cells)
   {
-    auto cell_fe_view = GetCellMappingFE(lc);
-    cell_local_block_address[lc] = static_cast<int64_t>(local_node_count);
-    local_node_count += cell_fe_view->NumNodes();
+    const auto& cell_mapping = GetCellMapping(cell);
+    cell_local_block_address[cell.local_id] =
+      static_cast<int64_t>(local_node_count);
+    local_node_count += cell_mapping.NumNodes();
   }
 
   //================================================== Allgather node_counts

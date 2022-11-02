@@ -36,9 +36,9 @@ LocalizePETScVector(Vec petsc_vector,
     std::vector<int64_t> global_indices;
     for (auto& cell : grid->local_cells)
     {
-      auto cell_mapping = GetCellMappingFE(cell.local_id);
+      const auto& cell_mapping = GetCellMapping(cell);
 
-      for (unsigned int i=0; i < cell_mapping->NumNodes(); ++i)
+      for (unsigned int i=0; i < cell_mapping.NumNodes(); ++i)
       {
         int uk=-1;
         for (const auto& unknown : unknown_manager.unknowns)
@@ -46,7 +46,7 @@ LocalizePETScVector(Vec petsc_vector,
           ++uk;
           for (int c=0; c<unknown.num_components; ++c)
           {
-            int ir = MapDOF(cell, i, unknown_manager, uk, c);
+            int64_t ir = MapDOF(cell, i, unknown_manager, uk, c);
 
             global_indices.push_back(ir);
           }//for component

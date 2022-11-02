@@ -123,9 +123,10 @@ std::vector<uint64_t> chi_mesh::GlobalCellHandler::
  * therefore the user of this function should implement code
  * to prevent it.*/
 uint64_t chi_mesh::GlobalCellHandler::
-  GetGhostLocalID(int cell_global_index)
+  GetGhostLocalID(uint64_t cell_global_index)
 {
-  auto foreign_location = global_cell_id_to_foreign_id_map.find(cell_global_index);
+  auto foreign_location =
+    global_cell_id_to_foreign_id_map.find(cell_global_index);
 
   if (foreign_location != global_cell_id_to_foreign_id_map.end())
     return foreign_location->second;

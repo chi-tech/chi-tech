@@ -82,8 +82,8 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   for (size_t c=0; c < num_components; ++c)
     for (const auto& cell : grid->local_cells)
     {
-      auto cell_mapping = pwlc_sdm.GetCellMappingFE(cell.local_id);
-      for (int i=0; i<cell_mapping->NumNodes(); ++i)
+      const auto& cell_mapping = pwlc_sdm.GetCellMapping(cell);
+      for (int i=0; i<cell_mapping.NumNodes(); ++i)
         cell_node_component_tuples.emplace_back(cell.local_id,i,
                                                 (num_components==1)?
                                                 ref_component : c);

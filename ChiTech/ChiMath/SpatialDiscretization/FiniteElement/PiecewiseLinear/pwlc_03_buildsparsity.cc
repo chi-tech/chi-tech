@@ -90,8 +90,8 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   for (auto& cell : ref_grid->local_cells)
   {
-    auto cell_mapping = GetCellMappingFE(cell.local_id);
-    for (unsigned int i=0; i<cell_mapping->NumNodes(); ++i)
+    const auto& cell_mapping = GetCellMapping(cell);
+    for (unsigned int i=0; i<cell_mapping.NumNodes(); ++i)
     {
       const int64_t ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
 
@@ -100,7 +100,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
         const int64_t il = dof_handler.MapIRLocal(ir);
         std::vector<int64_t>& node_links = nodal_connections[il];
 
-        for (unsigned int j=0; j<cell_mapping->NumNodes(); ++j)
+        for (unsigned int j=0; j<cell_mapping.NumNodes(); ++j)
         {
           const int64_t jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
 
@@ -116,9 +116,6 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
     }//for i
   }//for cell
 
-
-
-
   //======================================== Build non-local sparsity pattern
   chi::log.Log0Verbose1() << "Building non-local sparsity pattern.";
 
@@ -131,9 +128,9 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   for (auto& cell : ref_grid->local_cells)
   {
-    auto cell_mapping = GetCellMappingFE(cell.local_id);
+    const auto& cell_mapping = GetCellMapping(cell);
 
-    for (unsigned int i=0; i<cell_mapping->NumNodes(); ++i)
+    for (unsigned int i=0; i<cell_mapping.NumNodes(); ++i)
     {
       const int64_t ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
 
@@ -154,7 +151,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
         //============================= Now add links
         auto& node_links = cur_ir_link->second;
-        for (unsigned int j=0; j<cell_mapping->NumNodes(); ++j)
+        for (unsigned int j=0; j<cell_mapping.NumNodes(); ++j)
         {
           const int64_t jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
 

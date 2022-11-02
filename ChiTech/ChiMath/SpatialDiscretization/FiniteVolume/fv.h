@@ -16,16 +16,6 @@ namespace chi_math
   class SpatialDiscretization_FV : public chi_math::SpatialDiscretization
   {
   private:
-    std::vector<CellFVValues*> cell_fv_views;
-
-  private:
-    std::vector<bool>  cell_view_added_flags;
-
-  private:
-    std::map<uint64_t, std::unique_ptr<chi_mesh::Cell>> neighbor_cells;
-    std::map<uint64_t, CellFVValues*> neighbor_cell_fv_views;
-
-  private:
     explicit
     SpatialDiscretization_FV(chi_mesh::MeshContinuumPtr& in_grid,
                              CoordinateSystemType in_cs_type);
@@ -42,12 +32,6 @@ namespace chi_math
       new SpatialDiscretization_FV(in_grid, in_cs_type));}
 
     //01
-    void PreComputeCellSDValues();
-    void PreComputeNeighborCellSDValues();
-
-    CellFVValues* MapFeView(uint64_t cell_local_index);
-    CellFVValues* MapNeighborFeView(uint64_t cell_global_index);
-
     void CreateCellMappings();
 
     //02 node ordering
