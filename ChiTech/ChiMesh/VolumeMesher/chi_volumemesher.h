@@ -4,6 +4,8 @@
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/Cell/cell.h"
 
+#include <array>
+
 namespace chi_mesh
 {
   enum VolumeMesherType

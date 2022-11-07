@@ -8,8 +8,6 @@
 #include "chi_log.h"
 
 
-;
-
 //###################################################################
 /**Export cells to python.*/
 void chi_mesh::MeshContinuum::
