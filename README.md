@@ -10,7 +10,7 @@ Chat with us on <a href="https://discord.gg/AJHHeAA">Discord<img src="ChiDoc/HTM
 ## Installation instructions
 
 We have a set of easy instructions for users running Ubuntu 18.04+ (including WSL
-with Ubuntu 18.04 and newer LTS)
+with Ubuntu 18.04, as well as newer Ubuntu LTS)
 
 Easy scripts - [Easy Linux instructions](ChiDoc/Install_ubuntu_easy.md)
 

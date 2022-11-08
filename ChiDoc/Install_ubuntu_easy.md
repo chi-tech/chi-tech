@@ -1,19 +1,20 @@
 # Easy install on Ubuntu Machines
 
-The following instructions were tested on Ubuntu 18.04 LTS; other Linux
+The following instructions were tested on Ubuntu 18.04 LTS and newer LTS (22.04 currently); other Linux
 distributions might require some minor tweaking.
 
 Some portions of this document indicate the use of `sudo`. If you do not have 
-administrative privileges then have you system administrator assist you in 
+administrative privileges then have your system administrator assist you in 
 these steps.
 
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
-GCC is used to build and install ChiTech.
-GFortran and Python are used during the installation of PETSc
-(which ChiTech uses as a linear algebra backend) and
-OpenGL is required by VTK (used by ChiTech for visualization).
-These packages will therefore also need to be installed.
+- GCC is used to build and install ChiTech.
+- GFortran and Python are used during the installation of PETSc
+(which ChiTech uses as a linear algebra backend) 
+- OpenGL has become optional and VTK can be used, through ViSiT and Paraview, for visualization.
+
+The above packages will therefore need to be installed.
 
 Check to see if gcc is installed
 
@@ -38,21 +39,27 @@ sudo apt-get install build-essential gfortran
 If you still do not get the appropriate version when running either ``gcc --version``
 or ``gfortran --version`` then there are many online resources which may be able to
 assist you. One issue commonly seen is that the repositories on your system are not
-updated in which case just run ```sudo apt update``` followed by 
+updated in which case just run ```sudo apt update```, possibly followed by 
 ```sudo apt upgrade```.
 
 Now, install the remaining packages needed to build ChiTech and its dependencies:
 
 ```bash
-sudo apt-get install cmake python git zlib1g-dev libx11-dev unzip
-sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+sudo apt-get install cmake python3 git zlib1g-dev libx11-dev unzip
 ```
+(note the use of python3)
 
+
+
+***TODO: this needs to be fixed @JANV ***
 <u>NOTE</u>: *The recommended version of PETSc requires Python 2.6+; Python 3.x, typically
 pre-installed on modern Linux systems, will not work (Step 4 below provides more
 details if you need to use `python3`) .*
 
-<u>NOTE</u>: *The second line is to install OpenGL for VTK.*
+<u>NOTE</u>: If you want to install the *optional* OpenGL package for VTK, do this
+```bash
+sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+```
 
 ### Step 2 - An MPI flavor
 
@@ -80,15 +87,33 @@ Which should display the same message the gcc call did, i.e.,
 
 ### Step 3 - Clone ChiTech
 
+**Important:**  If you want to contribute to **ChiTech**, it is strongly recommended to first fork the **ChiTech** repository into your own Git account and then to clone your fork. 
+
 Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech relevant stuff:
 ```bash
     $ git clone https://github.com/chi-tech/chi-tech
 ```
+or
+```bash
+    $ git clone https://github.com/YOUR-NAME/chi-tech
+```
 
-Go to the chi-tech folder and type:
+**Important:** We recommend building all the dependencies into a separate folder. For instance,
+```bash
+    $ mkdir dependencies
+```
+
+Before building the dependencies, you need to export a few variables for the PETSc install:
+```bash
+    $ export CC=mpicc
+    $ export CXX=mpicxx
+    $ export FC=mpifort
+```
+
+Go to the chi-tech folder you have just cloned and type:
 ```bash
     $ cd chi-tech
-    $ python3 ChiResources/configure_dependencies.py
+    $ python3 ChiResources/configure_dependencies.py ../dependencies
 ```
 The configure script will attempt to download and install all the necessary 
 dependencies **and may take a long time**
@@ -101,7 +126,7 @@ ChiTech.
 ```bash
     $. ./chi-dependencies/configure_deproots.sh
 ```
-
+**Note:** You can replace ```$. ``` in the above with ```$source ```
 
 ### Step 5 - Build ChiTech
 
@@ -132,7 +157,7 @@ you can run
 To check if the code compiled correctly execute the test scripts:
 
 ```bash
-    $ python3 CHI_TEST/Z_Run_all.py
+    $ python3 ChiTest/Z_Run_all.py
 ```
 
 ### Step 7 - ChiTech documentation
