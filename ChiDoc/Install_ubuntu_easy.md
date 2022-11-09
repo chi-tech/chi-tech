@@ -165,10 +165,13 @@ To check if the code compiled correctly execute the test scripts:
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
 To generate the documentation from your local working copy, first make sure
-Doxygen and LaTeX are installed:
+Doxygen, LaTeX, and lua (currently, lua is at version 5.4) are installed:
 
 ```bash
-sudo apt-get install doxygen texlive
+sudo apt-get install doxygen 
+sudo apt-get install texlive
+sudo apt install texlive-font-utils
+sudo apt-get install lua5.4
 ```
 
 The documentation is contained in the *CHI_DOC* folder and can be generated
