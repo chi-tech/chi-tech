@@ -5,7 +5,7 @@
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_PWLD::
-  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -15,7 +15,7 @@ size_t chi_math::SpatialDiscretization_PWLD::
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_PWLD::
-  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -27,24 +27,49 @@ size_t chi_math::SpatialDiscretization_PWLD::
 void chi_math::SpatialDiscretization_PWLD::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
-                      chi_math::UnknownManager& unknown_manager)
+                      const chi_math::UnknownManager& unknown_manager) const
 {
-  auto grid = ref_grid;
-
-//  if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS)
+//  auto grid = ref_grid;
+//
+////  if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS)
+////  {
+////    std::vector<int> global_indices;
+////    for (auto& cell : grid->local_cells)
+////    {
+////      for (int vid : cell.vertex_ids)
+////      {
+////        int uk=-1;
+////        for (const auto& unknown : unknown_manager->unknowns)
+////        {
+////          ++uk;
+////          for (int c=0; c<unknown.num_components; ++c)
+////          {
+////            int ir = MapCFEMDOF(vid,unknown_manager,uk,c);
+////
+////            global_indices.push_back(ir);
+////          }//for component
+////        }//for unknown
+////      }//for node
+////    }//for cell
+////
+////    chi_math::PETScUtils::CopyGlobalVecToSTLvector(petsc_vector,
+////                                                   global_indices,
+////                                                   local_vector);
+////  }//if PWLC
+////  else if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS)
 //  {
-//    std::vector<int> global_indices;
+//    std::vector<int64_t> global_indices;
 //    for (auto& cell : grid->local_cells)
 //    {
-//      for (int vid : cell.vertex_ids)
+//      for (int i=0; i<cell.vertex_ids.size(); ++i)
 //      {
 //        int uk=-1;
-//        for (const auto& unknown : unknown_manager->unknowns)
+//        for (const auto& unknown : unknown_manager.unknowns)
 //        {
 //          ++uk;
 //          for (int c=0; c<unknown.num_components; ++c)
 //          {
-//            int ir = MapCFEMDOF(vid,unknown_manager,uk,c);
+//            int ir = MapDOF(cell, i, unknown_manager, uk, c);
 //
 //            global_indices.push_back(ir);
 //          }//for component
@@ -55,31 +80,10 @@ void chi_math::SpatialDiscretization_PWLD::
 //    chi_math::PETScUtils::CopyGlobalVecToSTLvector(petsc_vector,
 //                                                   global_indices,
 //                                                   local_vector);
-//  }//if PWLC
-//  else if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS)
-  {
-    std::vector<int64_t> global_indices;
-    for (auto& cell : grid->local_cells)
-    {
-      for (int i=0; i<cell.vertex_ids.size(); ++i)
-      {
-        int uk=-1;
-        for (const auto& unknown : unknown_manager.unknowns)
-        {
-          ++uk;
-          for (int c=0; c<unknown.num_components; ++c)
-          {
-            int ir = MapDOF(cell, i, unknown_manager, uk, c);
+//  }
+  size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
 
-            global_indices.push_back(ir);
-          }//for component
-        }//for unknown
-      }//for node
-    }//for cell
-
-    chi_math::PETScUtils::CopyGlobalVecToSTLvector(petsc_vector,
-                                                   global_indices,
-                                                   local_vector);
-  }
-
+  chi_math::PETScUtils::CopyVecToSTLvector(petsc_vector,
+                                           local_vector,
+                                           num_local_dofs);
 }

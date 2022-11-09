@@ -20,17 +20,14 @@ namespace chi_math
   public:
     const SpatialDiscretizationType type;
 
-    const chi_mesh::MeshContinuumPtr ref_grid;
+    const chi_mesh::MeshContinuumConstPtr ref_grid;
     const CoordinateSystemType cs_type;
 
     const UnknownManager UNITARY_UNKNOWN_MANAGER;
 
   protected:
-    std::vector<std::unique_ptr<CellMapping>> a_cell_mappings;
-    std::map<uint64_t, std::shared_ptr<CellMapping>> a_nb_cell_mappings;
-
-    bool mapping_initialized = false;
-    bool nb_mapping_initialized = false;
+    std::vector<std::unique_ptr<CellMapping>> cell_mappings;
+    std::map<uint64_t, std::shared_ptr<CellMapping>> nb_cell_mappings;
 
     uint64_t              local_block_address = 0;
     std::vector<uint64_t> locJ_block_address;
@@ -64,7 +61,7 @@ namespace chi_math
     virtual
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
                               std::vector<int64_t>& nodal_nnz_off_diag,
-                              UnknownManager& unknown_manager) = 0;
+                              const UnknownManager& unknown_manager) const = 0;
 
     //04 Mappings
     virtual
@@ -88,9 +85,21 @@ namespace chi_math
 
     //05 Utils
     virtual
-    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) = 0;
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) const = 0;
     virtual
-    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) = 0;
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const = 0;
+
+    virtual
+    size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const
+    {
+      return 0; //TODO: Remove
+    }
+    virtual
+    std::vector<int64_t>
+    GetGhostDOFIndices(const UnknownManager& unknown_manager) const
+    {
+      return {}; //TODO: Remove
+    }
 
     virtual
     size_t GetCellNumNodes(const chi_mesh::Cell& cell) const = 0;
@@ -99,13 +108,13 @@ namespace chi_math
     std::vector<chi_mesh::Vector3>
       GetCellNodeLocations(const chi_mesh::Cell& cell) const = 0;
 
-  protected:
+  public:
     /**Develops a localized view of a petsc vector.
      * Each spatial discretization has a specialization of this
      * method.*/
     virtual void LocalizePETScVector(Vec petsc_vector,
                                      std::vector<double>& local_vector,
-                                     UnknownManager& unknown_manager) = 0;
+                                     const UnknownManager& unknown_manager) const = 0;
 
   };
 }

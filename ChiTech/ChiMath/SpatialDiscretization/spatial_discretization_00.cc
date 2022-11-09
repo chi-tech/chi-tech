@@ -11,11 +11,11 @@ const chi_math::CellMapping& chi_math::SpatialDiscretization::
   {
     if (ref_grid->IsCellLocal(cell.global_id))
     {
-      return *a_cell_mappings.at(cell.local_id);
+      return *cell_mappings.at(cell.local_id);
     }
     else
     {
-      return *a_nb_cell_mappings.at(cell.global_id);
+      return *nb_cell_mappings.at(cell.global_id);
     }
   }
   catch (const std::out_of_range& oor)

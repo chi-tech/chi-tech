@@ -9,7 +9,7 @@
 void chi_math::SpatialDiscretization_PWLD::
 BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                      std::vector<int64_t> &nodal_nnz_off_diag,
-                     chi_math::UnknownManager& unknown_manager)
+                     const chi_math::UnknownManager& unknown_manager) const
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
   size_t local_dof_count = local_base_block_size;

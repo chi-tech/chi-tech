@@ -61,22 +61,40 @@ int64_t chi_math::SpatialDiscretization_PWLC::
   auto   storage      = unknown_manager.dof_storage_type;
 
   const int64_t local_id = global_id - sc_int64(local_block_address);
-  if (local_id < 0 or local_id >= local_base_block_size)
-  {
-    chi::log.LogAllError()
-      << "SpatialDiscretization_PWLC::MapDOFLocal. Mapping failed for cell "
-      << "with global index " << cell.global_id << " because the node is "
-      << "not local.";
-   chi::Exit(EXIT_FAILURE);
-  }
+  const bool is_local = not (local_id < 0 or local_id >= local_base_block_size);
+
 
   int64_t address=-1;
-  if (storage == chi_math::UnknownStorageType::BLOCK)
+  if (is_local)
   {
-    address = sc_int64(local_base_block_size*block_id) + local_id;
+    if (storage == chi_math::UnknownStorageType::BLOCK)
+    {
+      address = sc_int64(local_base_block_size*block_id) + local_id;
+    }
+    else if (storage == chi_math::UnknownStorageType::NODAL)
+      address = global_id*sc_int64(num_unknowns) + sc_int64(block_id);
+  }//if is_local
+  else
+  {
+    int64_t ghost_local_node_id = -1;
+    int64_t counter = 0;
+    for (const auto& vid_gnid : m_ghost_node_mapping)
+    {
+      if (global_id == vid_gnid.second)
+      {
+        ghost_local_node_id = counter;
+        break;
+      }
+      ++counter;
+    }
+    if (storage == chi_math::UnknownStorageType::BLOCK)
+    {
+      address = sc_int64(m_ghost_node_mapping.size()*block_id) +
+                ghost_local_node_id;
+    }
+    else if (storage == chi_math::UnknownStorageType::NODAL)
+      address = ghost_local_node_id*sc_int64(num_unknowns) + sc_int64(block_id);
   }
-  else if (storage == chi_math::UnknownStorageType::NODAL)
-    address = global_id*sc_int64(num_unknowns) + sc_int64(block_id);
 
   return address;
 }

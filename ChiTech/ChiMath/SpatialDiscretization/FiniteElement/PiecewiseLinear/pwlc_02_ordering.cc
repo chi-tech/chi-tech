@@ -118,6 +118,7 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
 
   //============================================= Processing the mapping for
   //                                              non-local nodes
+  m_ghost_node_mapping.clear();
   try
   {
     for (const auto& pid_node_ids : nonlocal_node_ids_map)
@@ -131,7 +132,10 @@ void chi_math::SpatialDiscretization_PWLC::OrderNodes()
 
       const size_t num_nodes = node_list.size();
       for (size_t i=0; i<num_nodes; ++i)
+      {
         node_mapping[node_list[i]] = mappings[i];
+        m_ghost_node_mapping[node_list[i]] = mappings[i];
+      }
     }//for pid and non-local id
   }
   catch (const std::out_of_range& oor)

@@ -15,7 +15,7 @@ void chi_mesh::FieldFunctionInterpolationLine::Execute()
   chi::log.Log0Verbose1() << "Executing line interpolator.";
   for (int ff=0; ff<field_functions.size(); ff++)
   {
-    grid_view = field_functions[ff]->grid;
+    grid_view = field_functions[ff]->spatial_discretization->ref_grid;
     FieldFunctionContext* ff_ctx = ff_contexts[ff];
 
     typedef chi_math::SpatialDiscretizationType SDMType;

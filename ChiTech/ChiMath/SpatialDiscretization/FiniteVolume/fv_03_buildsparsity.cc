@@ -8,7 +8,7 @@
 void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
   std::vector<int64_t> &nodal_nnz_in_diag,
   std::vector<int64_t> &nodal_nnz_off_diag,
-  chi_math::UnknownManager& unknown_manager)
+  const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int num_uk = unknown_manager.unknowns.size(); //Number of unknowns
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize(); //Total number of unknowns

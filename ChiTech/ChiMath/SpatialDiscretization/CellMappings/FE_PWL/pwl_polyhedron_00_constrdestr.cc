@@ -16,8 +16,9 @@ chi_math::PolyhedronMappingFE_PWL::
     const chi_mesh::MeshContinuumConstPtr& ref_grid,
     const chi_math::QuadratureTetrahedron& volume_quadrature,
     const chi_math::QuadratureTriangle&    surface_quadrature):
-  CellMappingFE_PWL(polyh_cell.vertex_ids.size(), //num_nodes
-                    ref_grid,
+  CellMappingFE_PWL(ref_grid,
+                    polyh_cell,
+                    polyh_cell.vertex_ids.size(), //num_nodes
                     GetVertexLocations(*ref_grid, polyh_cell),
                     MakeFaceNodeMapping(polyh_cell)),
   volume_quadrature(volume_quadrature),
@@ -57,9 +58,9 @@ chi_math::PolyhedronMappingFE_PWL::
       side_data.v_index[0] = v0index;
       side_data.v_index[1] = v1index;
 
-      const auto& v0 = ref_grid->vertices[v0index];
+      const auto& v0 = m_grid_ptr->vertices[v0index];
       const auto& v1 = vfc;
-      const auto& v2 = ref_grid->vertices[v1index];
+      const auto& v2 = m_grid_ptr->vertices[v1index];
       const auto& v3 = vcc;
 
       side_data.v0 = v0;
@@ -134,7 +135,7 @@ chi_math::PolyhedronMappingFE_PWL::
   // which the side belongs and consequently allows
   // the determination of Nf. Nc is always evaluated
   // so no mapping is needed.
-  for (int i=0; i < num_nodes; i++)
+  for (int i=0; i < m_num_nodes; i++)
   {
     FEnodeMap newNodeMap;
     for (size_t f=0; f < face_data.size(); f++)
@@ -176,42 +177,4 @@ chi_math::PolyhedronMappingFE_PWL::
     }//for f
     node_side_maps.push_back(newNodeMap);
   }//for i
-
-  //================================================ Compute Face DOF mapping
-  // This section just determines a mapping of face dofs
-  // to cell dofs. This is pretty simple since we can
-  // just loop over each face dof then subsequently
-  // loop over cell dofs, if the face dof node index equals
-  // the cell dof node index then the mapping is assigned.
-  //
-  // This mapping is not used by any of the methods in
-  // this class but is used by methods requiring the
-  // surface integrals of the shape functions.
-//  face_node_mappings.reserve(num_faces);
-//  for (auto& face : polyh_cell.faces)
-//  {
-//    std::vector<int> face_dof_mapping;
-//    face_dof_mapping.reserve(face.vertex_ids.size());
-//    for (uint64_t fvid : face.vertex_ids)
-//    {
-//      int mapping = -1;
-//      for (size_t ci=0; ci<polyh_cell.vertex_ids.size(); ci++)
-//      {
-//        if (fvid == polyh_cell.vertex_ids[ci])
-//        {
-//          mapping = static_cast<int>(ci);
-//          break;
-//        }
-//      }//for cell i
-//      if (mapping<0)
-//      {
-//        chi::log.LogAllError() << "Unknown face mapping encountered. "
-//                                     "pwl_polyhedron.h";
-//       chi::Exit(EXIT_FAILURE);
-//      }
-//      face_dof_mapping.push_back(mapping);
-//    }//for face i
-//
-//    face_node_mappings.push_back(face_dof_mapping);
-//  }
 }

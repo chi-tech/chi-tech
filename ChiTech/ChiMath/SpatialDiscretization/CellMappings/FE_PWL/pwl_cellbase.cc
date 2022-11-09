@@ -183,7 +183,7 @@ chi_math::CellMappingFE_PWL::
                      IntS_shapeI,
                      IntS_shapeI_gradshapeJ,
                      face_node_mappings,
-                     num_nodes);
+                     m_num_nodes);
 }
 
 std::vector<chi_mesh::Vector3>

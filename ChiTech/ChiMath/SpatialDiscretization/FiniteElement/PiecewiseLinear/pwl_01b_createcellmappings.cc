@@ -7,6 +7,9 @@
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_slab_spherical.h"
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_polygon_cylindrical.h"
 
+#include "chi_runtime.h" //TODO: Remove
+#include "chi_log.h" //TODO: Remove
+
 #define InvalidCoordinateSystem(fname) \
 std::invalid_argument((fname) + \
 ": Unsupported coordinate system type encountered.");
@@ -94,13 +97,15 @@ void chi_math::SpatialDiscretization_PWLD::CreateCellMappings()
     return mapping;
   };
 
+  chi::log.LogAll() << "Miff2" << std::endl; //TODO: Remove
   for (const auto& cell : ref_grid->local_cells)
-    a_cell_mappings.push_back(MakeCellMapping(cell));
+    cell_mappings.push_back(MakeCellMapping(cell));
+  chi::log.LogAll() << "Miff3" << std::endl; //TODO: Remove
 
   const auto ghost_ids = ref_grid->cells.GetGhostGlobalIDs();
   for (uint64_t ghost_id : ghost_ids)
   {
     auto ghost_mapping = MakeCellMapping(ref_grid->cells[ghost_id]);
-    a_nb_cell_mappings.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
+    nb_cell_mappings.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
   }
 }

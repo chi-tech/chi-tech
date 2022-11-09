@@ -1,10 +1,7 @@
 #include "chi_meshcontinuum.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-
-
-;
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 //###################################################################
 /**Adds a new cell to grid registry.*/
@@ -106,7 +103,7 @@ size_t chi_mesh::MeshContinuum::GetGlobalNumberOfCells() const
  * neighbors to this partition's cells but are on a different
  * partition.*/
 std::vector<uint64_t> chi_mesh::GlobalCellHandler::
-  GetGhostGlobalIDs()
+  GetGhostGlobalIDs() const
 {
   std::vector<uint64_t> ids;
   ids.reserve(GetNumGhosts());
@@ -123,7 +120,7 @@ std::vector<uint64_t> chi_mesh::GlobalCellHandler::
  * therefore the user of this function should implement code
  * to prevent it.*/
 uint64_t chi_mesh::GlobalCellHandler::
-  GetGhostLocalID(uint64_t cell_global_index)
+  GetGhostLocalID(uint64_t cell_global_index) const
 {
   auto foreign_location =
     global_cell_id_to_foreign_id_map.find(cell_global_index);

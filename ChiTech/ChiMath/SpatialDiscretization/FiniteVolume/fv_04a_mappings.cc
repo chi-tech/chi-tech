@@ -19,9 +19,9 @@ int64_t chi_math::SpatialDiscretization_FV::
 {
   auto storage = unknown_manager.dof_storage_type;
 
-  size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
-  size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
-  size_t num_local_cells = ref_grid->local_cells.size();
+  const size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
+  const size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
+  const size_t num_local_cells = ref_grid->local_cells.size();
 
   if (component >= num_unknowns) return -1;
 
@@ -40,7 +40,7 @@ int64_t chi_math::SpatialDiscretization_FV::
   }
   else
   {
-    uint64_t ghost_local_id = ref_grid->cells.GetGhostLocalID(cell.global_id);
+    const uint64_t ghost_local_id = neighbor_cell_local_ids.at(cell.global_id);
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
       address = sc_int64(locJ_block_address[cell.partition_id]) * num_unknowns +
@@ -67,14 +67,14 @@ int64_t chi_math::SpatialDiscretization_FV::
 {
   auto storage = unknown_manager.dof_storage_type;
 
-  size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
-  size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
-  size_t num_local_cells = ref_grid->local_cells.size();
+  const size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
+  const size_t block_id     = unknown_manager.MapUnknown(unknown_id, component);
+  const size_t num_local_cells = ref_grid->local_cells.size();
 
   if (component >= num_unknowns) return -1;
 
 
-  int address=-1;
+  int64_t address=-1;
   if (cell.partition_id == chi::mpi.location_id)
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
@@ -84,14 +84,19 @@ int64_t chi_math::SpatialDiscretization_FV::
   }
   else
   {
-    uint64_t ghost_local_id = ref_grid->cells.GetGhostLocalID(cell.global_id);
+    const size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
+    const size_t num_ghost_nodes = GetNumGhostDOFs(UNITARY_UNKNOWN_MANAGER);
+    const uint64_t ghost_local_id =
+      ref_grid->cells.GetGhostLocalID(cell.global_id);
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
-      address = sc_int64(locJ_block_size[cell.partition_id]) * block_id +
+      address = sc_int64(num_local_dofs) +
+                sc_int64(num_ghost_nodes) * block_id +
                 ghost_local_id;
     else if (storage == chi_math::UnknownStorageType::NODAL)
-      address = sc_int64(ghost_local_id)*num_unknowns + block_id;
-
+      address = sc_int64(num_local_dofs) +
+                num_unknowns*sc_int64(ghost_local_id) +
+                block_id;
   }
 
   return address;

@@ -12,7 +12,7 @@ double chi_math::PolyhedronMappingFE_PWL::
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      const auto& p0 = grid->vertices[face_data[f].sides[s].v_index[0]];
+      const auto& p0 = m_grid_ptr->vertices[face_data[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
       chi_mesh::Vector3 xi_eta_zeta   = face_data[f].sides[s].Jinv * xyz_ref;
@@ -58,14 +58,14 @@ void chi_math::PolyhedronMappingFE_PWL::
   ShapeValues(const chi_mesh::Vector3& xyz,
               std::vector<double>& shape_values) const
 {
-  shape_values.resize(num_nodes, 0.0);
+  shape_values.resize(m_num_nodes, 0.0);
   for (size_t f=0; f < face_data.size(); f++)
   {
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       auto& side_fe_info = face_data[f].sides[s];
       //Map xyz to xi_eta_zeta
-      const auto& p0 = grid->vertices[side_fe_info.v_index[0]];
+      const auto& p0 = m_grid_ptr->vertices[side_fe_info.v_index[0]];
       chi_mesh::Vector3 xi_eta_zeta   = side_fe_info.Jinv * (xyz - p0);
 
       double xi  = xi_eta_zeta.x;
@@ -77,7 +77,7 @@ void chi_math::PolyhedronMappingFE_PWL::
       if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and (zeta>=-1.0e-12) and
           ((xi + eta + zeta)<=(1.0+1.0e-12)))
       {
-        for (int i=0; i < num_nodes; i++)
+        for (int i=0; i < m_num_nodes; i++)
         {
           auto side_map = node_side_maps[i].face_map[f].side_map[s];
 
@@ -113,7 +113,7 @@ chi_mesh::Vector3 chi_math::PolyhedronMappingFE_PWL::
     for (size_t s=0; s < face_data[f].sides.size(); s++)
     {
       //Map xyz to xi_eta_zeta
-      const auto& p0 = grid->vertices[face_data[f].sides[s].v_index[0]];
+      const auto& p0 = m_grid_ptr->vertices[face_data[f].sides[s].v_index[0]];
       chi_mesh::Vector3 xyz_ref = xyz - p0;
 
       chi_mesh::Vector3 xi_eta_zeta = face_data[f].sides[s].Jinv * xyz_ref;
@@ -173,6 +173,6 @@ void chi_math::PolyhedronMappingFE_PWL::GradShapeValues(
   std::vector<chi_mesh::Vector3> &gradshape_values) const
 {
   gradshape_values.clear();
-  for (int i=0; i < num_nodes; ++i)
+  for (int i=0; i < m_num_nodes; ++i)
     gradshape_values.emplace_back(GradShapeValue(i,xyz));
 }

@@ -1,11 +1,12 @@
 #include "pwlc.h"
 
 #include "ChiMath/PETScUtils/petsc_utils.h"
+#define sc_int64 static_cast<int64_t>
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_PWLC::
-  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -15,7 +16,7 @@ size_t chi_math::SpatialDiscretization_PWLC::
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_PWLC::
-  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -23,39 +24,73 @@ size_t chi_math::SpatialDiscretization_PWLC::
 }
 
 //###################################################################
+/**Get the number of ghost degrees-of-freedom.*/
+size_t chi_math::SpatialDiscretization_PWLC::
+  GetNumGhostDOFs(const chi_math::UnknownManager& unknown_manager) const
+{
+  unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
+
+  return m_ghost_node_mapping.size()*N; //TODO: Fix
+}
+
+//###################################################################
+/**Returns the ghost DOF indices.*/
+std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::
+  GetGhostDOFIndices(const chi_math::UnknownManager& unknown_manager) const
+{
+  std::vector<int64_t> dof_ids;
+  dof_ids.reserve(GetNumGhostDOFs(unknown_manager));
+
+  size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
+  auto   storage      = unknown_manager.dof_storage_type;
+
+  for (const auto& vid_gnid : m_ghost_node_mapping)
+  {
+    const int64_t global_id = vid_gnid.second;
+
+    for (size_t u=0; u<num_unknowns; ++u)
+    {
+      const auto& unkn = unknown_manager.unknowns[u];
+      const size_t num_comps = unkn.num_components;
+      for (size_t c=0; c<num_comps; ++c)
+      {
+        size_t block_id     = unknown_manager.MapUnknown(u, c);
+        int64_t address=-1;
+        if (storage == chi_math::UnknownStorageType::BLOCK)
+        {
+          for (int locJ=0; locJ<chi::mpi.process_count; ++locJ)
+          {
+            const int64_t local_id = global_id - sc_int64(locJ_block_address[locJ]);
+
+            if (local_id < 0 or local_id >= locJ_block_size[locJ]) continue;
+
+            address = sc_int64(locJ_block_address[locJ]*num_unknowns) +
+                      sc_int64(locJ_block_size[locJ]*block_id) +
+                      local_id;
+            break;
+          }
+        }
+        else if (storage == chi_math::UnknownStorageType::NODAL)
+          address = global_id * sc_int64(num_unknowns) + sc_int64(block_id);
+
+        dof_ids.push_back(address);
+      }//for c
+    }//for u
+  }
+
+  return dof_ids;
+}
+
+//###################################################################
 /**Develops a localized view of a petsc vector.*/
 void chi_math::SpatialDiscretization_PWLC::
 LocalizePETScVector(Vec petsc_vector,
                     std::vector<double>& local_vector,
-                    chi_math::UnknownManager& unknown_manager)
+                    const chi_math::UnknownManager& unknown_manager) const
 {
-  auto grid = ref_grid;
+  size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
 
-  if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS)
-  {
-    std::vector<int64_t> global_indices;
-    for (auto& cell : grid->local_cells)
-    {
-      const auto& cell_mapping = GetCellMapping(cell);
-
-      for (unsigned int i=0; i < cell_mapping.NumNodes(); ++i)
-      {
-        int uk=-1;
-        for (const auto& unknown : unknown_manager.unknowns)
-        {
-          ++uk;
-          for (int c=0; c<unknown.num_components; ++c)
-          {
-            int64_t ir = MapDOF(cell, i, unknown_manager, uk, c);
-
-            global_indices.push_back(ir);
-          }//for component
-        }//for unknown
-      }//for node
-    }//for cell
-
-    chi_math::PETScUtils::CopyGlobalVecToSTLvector(petsc_vector,
-                                                   global_indices,
-                                                   local_vector);
-  }//if PWLC
+  chi_math::PETScUtils::CopyVecToSTLvector(petsc_vector,
+                                           local_vector,
+                                           num_local_dofs);
 }

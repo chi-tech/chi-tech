@@ -41,11 +41,12 @@ public:
   chi_mesh::Cell& operator[](uint64_t cell_global_index);
   const chi_mesh::Cell& operator[](uint64_t cell_global_index) const;
 
-  size_t GetNumGhosts() {return global_cell_id_to_foreign_id_map.size();}
+  size_t GetNumGhosts() const
+  {return global_cell_id_to_foreign_id_map.size();}
 
-  std::vector<uint64_t> GetGhostGlobalIDs();
+  std::vector<uint64_t> GetGhostGlobalIDs() const;
 
-  uint64_t GetGhostLocalID(uint64_t cell_global_index);
+  uint64_t GetGhostLocalID(uint64_t cell_global_index) const;
 };
 
 }//namespace chi_mesh

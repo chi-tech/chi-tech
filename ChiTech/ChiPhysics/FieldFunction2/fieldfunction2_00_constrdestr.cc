@@ -9,11 +9,9 @@ namespace chi_physics
 {
 
 FieldFunction2::FieldFunction2(std::string text_name,
-                               chi_mesh::MeshContinuumPtr &grid_ptr,
                                chi_math::SMDPtr &sdm_ptr,
                                chi_math::Unknown unknown) :
                                m_text_name(std::move(text_name)),
-                               m_grid(grid_ptr),
                                m_sdm(sdm_ptr),
                                m_unknown(std::move(unknown)),
                                m_unknown_manager({unknown})
@@ -23,12 +21,10 @@ FieldFunction2::FieldFunction2(std::string text_name,
 }
 
 FieldFunction2::FieldFunction2(std::string text_name,
-                               chi_mesh::MeshContinuumPtr &grid_ptr,
                                chi_math::SMDPtr &sdm_ptr,
                                chi_math::Unknown unknown,
                                std::vector<double>  field_vector) :
   m_text_name(std::move(text_name)),
-  m_grid(grid_ptr),
   m_sdm(sdm_ptr),
   m_unknown(std::move(unknown)),
   m_field_vector(std::move(field_vector)),
@@ -44,12 +40,10 @@ FieldFunction2::FieldFunction2(std::string text_name,
 }
 
 FieldFunction2::FieldFunction2(std::string text_name,
-                               chi_mesh::MeshContinuumPtr &grid_ptr,
                                chi_math::SMDPtr &sdm_ptr,
                                chi_math::Unknown unknown,
                                double field_value) :
   m_text_name(std::move(text_name)),
-  m_grid(grid_ptr),
   m_sdm(sdm_ptr),
   m_unknown(std::move(unknown)),
   m_unknown_manager({unknown})
@@ -59,12 +53,10 @@ FieldFunction2::FieldFunction2(std::string text_name,
 }
 
 FieldFunction2::FieldFunction2(std::string text_name,
-                               chi_mesh::MeshContinuumPtr &grid_ptr,
                                chi_math::SMDPtr &sdm_ptr,
                                chi_math::Unknown unknown,
                                const std::vector<double>&  field_component_value) :
   m_text_name(std::move(text_name)),
-  m_grid(grid_ptr),
   m_sdm(sdm_ptr),
   m_unknown(std::move(unknown)),
   m_unknown_manager({unknown})
@@ -77,7 +69,8 @@ FieldFunction2::FieldFunction2(std::string text_name,
   const size_t num_local_dofs = m_sdm->GetNumLocalDOFs(m_unknown_manager);
   m_field_vector.assign(num_local_dofs, 0.0);
 
-  for (const auto& cell : m_grid->local_cells)
+  const auto& grid = *sdm_ptr->ref_grid;
+  for (const auto& cell : grid.local_cells)
   {
     const size_t num_nodes = m_sdm->GetCellNumNodes(cell);
     for (size_t n=0; n<num_nodes; ++n)

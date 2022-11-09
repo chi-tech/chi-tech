@@ -5,7 +5,7 @@
 
 #include "ChiMath/SpatialDiscretization/CellMappings/cell_mapping_base.h"
 
-#include "ChiMesh/chi_meshvector.h"
+#include "ChiMesh/Cell/cell.h"
 
 //######################################################### Class def
 namespace chi_math
@@ -14,17 +14,13 @@ namespace chi_math
 /**Base cell class for Finite Volume Method.*/
 class CellFVValues : public CellMapping
 {
-protected:
-  const chi_mesh::Vector3 m_cell_centroid;
 public:
-  double                volume=0.0;
-  std::vector<double>   face_area; ///< Actually areas
-
   explicit CellFVValues(chi_mesh::MeshContinuumConstPtr grid,
+                        const chi_mesh::Cell& cell,
                         const chi_mesh::Vector3& cc,
                         std::vector<std::vector<int>> face_node_mappings) :
-    CellMapping(std::move(grid), 1, std::move(face_node_mappings)),
-    m_cell_centroid(cc)
+    CellMapping(std::move(grid), cell, 1, std::move(face_node_mappings),
+                &CellMapping::ComputeCellVolumeAndAreas)
     {}
 
 public:
@@ -36,7 +32,7 @@ public:
   void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) const override
   {
-    shape_values.assign(num_nodes, 0.0);
+    shape_values.assign(m_num_nodes, 0.0);
   }
   chi_mesh::Vector3 GradShapeValue(int i,
                                    const chi_mesh::Vector3& xyz) const override
@@ -47,11 +43,11 @@ public:
                        std::vector<chi_mesh::Vector3>& gradshape_values)
                        const override
   {
-    gradshape_values.assign(num_nodes, chi_mesh::Vector3(0,0,0));
+    gradshape_values.assign(m_num_nodes, chi_mesh::Vector3(0, 0, 0));
   }
   std::vector<chi_mesh::Vector3> GetNodeLocations() const override
   {
-    return {m_cell_centroid};
+    return {m_cell.centroid};
   }
 
   //03 Quadrature

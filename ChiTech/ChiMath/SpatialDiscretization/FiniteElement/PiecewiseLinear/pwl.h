@@ -29,7 +29,7 @@ namespace chi_math
     QuadratureTetrahedron   tet_quad_order_arbitrary;
     QuadratureHexahedron    hex_quad_order_arbitrary;
 
-    std::map<uint64_t, int64_t> node_mapping;
+//    std::map<uint64_t, int64_t> node_mapping;
 
     std::vector<int64_t> cell_local_block_address;
     std::vector<std::pair<uint64_t, int64_t>> neighbor_cell_block_address;
@@ -73,7 +73,7 @@ namespace chi_math
     //03
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
                               std::vector<int64_t>& nodal_nnz_off_diag,
-                              UnknownManager& unknown_manager) override;
+                              const UnknownManager& unknown_manager) const override;
 
     //04
     int64_t MapDOF(const chi_mesh::Cell& cell,
@@ -93,8 +93,8 @@ namespace chi_math
     { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
     //05
-    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) override;
-    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) override;
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) const override;
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const override;
   //  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
   //                               chi_math::UnknownManager* unknown_manager);
   //
@@ -119,8 +119,8 @@ namespace chi_math
 
     void LocalizePETScVector(Vec petsc_vector,
                              std::vector<double>& local_vector,
-                             UnknownManager& unknown_manager)
-                             override;
+                             const UnknownManager& unknown_manager)
+                             const override;
 
     //FE-utils
     const finite_element::UnitIntegralData&

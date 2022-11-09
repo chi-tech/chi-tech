@@ -4,6 +4,7 @@
 
 #include "chi_mpi.h"
 
+#define sc_int64 static_cast<int64_t>
 
 //###################################################################
 /**Provides a mapping of cell's DOF from a DFEM perspective.*/
@@ -26,18 +27,18 @@ MapDOF(const chi_mesh::Cell& cell,
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
-      int address = local_block_address * num_unknowns +
-                    cell_local_block_address[cell.local_id] +
-                    local_base_block_size*block_id +
-                    node;
+      int64_t address = sc_int64(local_block_address * num_unknowns) +
+                        cell_local_block_address[cell.local_id] +
+                        local_base_block_size*block_id +
+                        node;
       return address;
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
     {
-      int address = local_block_address * num_unknowns +
-                    cell_local_block_address[cell.local_id] * num_unknowns +
-                    node*num_unknowns +
-                    block_id;
+      int64_t address = sc_int64(local_block_address * num_unknowns) +
+                        cell_local_block_address[cell.local_id] * num_unknowns +
+                        node*num_unknowns +
+                        block_id;
       return address;
     }
   }
@@ -64,18 +65,17 @@ MapDOF(const chi_mesh::Cell& cell,
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
-      int address = //locJ_block_address[cell->partition_id]*num_unknowns +
-                    neighbor_cell_block_address[index].second +
-                    locJ_block_size[cell.partition_id]*block_id +
-                    node;
+      int64_t address = sc_int64(neighbor_cell_block_address[index].second) +
+                        locJ_block_size[cell.partition_id]*block_id +
+                        node;
       return address;
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
     {
-      int address = //locJ_block_address[cell->partition_id]*num_unknowns +
-                    neighbor_cell_block_address[index].second*num_unknowns +
-                    node*num_unknowns +
-                    block_id;
+      int64_t address = sc_int64(neighbor_cell_block_address[index].second*
+                                 num_unknowns) +
+                        node*num_unknowns +
+                        block_id;
       return address;
     }
 
@@ -105,16 +105,17 @@ MapDOFLocal(const chi_mesh::Cell& cell,
   {
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
-      int address = cell_local_block_address[cell.local_id] +
-                    local_base_block_size*block_id +
-                    node;
+      int64_t address = sc_int64(cell_local_block_address[cell.local_id]) +
+                        local_base_block_size*block_id +
+                        node;
       return address;
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
     {
-      int address = cell_local_block_address[cell.local_id] * num_unknowns +
-                    node*num_unknowns +
-                    block_id;
+      int64_t address = sc_int64(cell_local_block_address[cell.local_id] *
+                                 num_unknowns) +
+                        node*num_unknowns +
+                        block_id;
       return address;
     }
   }
@@ -141,14 +142,15 @@ MapDOFLocal(const chi_mesh::Cell& cell,
 
     if (storage == chi_math::UnknownStorageType::BLOCK)
     {
-      int address = neighbor_cell_block_address[index].second +
-                    locJ_block_size[cell.partition_id]*block_id +
-                    node;
+      int64_t address = sc_int64(neighbor_cell_block_address[index].second) +
+                        locJ_block_size[cell.partition_id]*block_id +
+                        node;
       return address;
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
     {
-      int address = neighbor_cell_block_address[index].second*num_unknowns +
+      int64_t address = sc_int64(neighbor_cell_block_address[index].second*
+                                 num_unknowns) +
                     node*num_unknowns +
                     block_id;
       return address;

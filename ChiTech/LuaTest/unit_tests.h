@@ -1,6 +1,8 @@
 #ifndef CHITECH_UNIT_TESTS_H
 #define CHITECH_UNIT_TESTS_H
 
+#include "chi_lua.h"
+
 #define ChiUnitTestMessageHome(cond)                              \
 {                                                            \
   if (not cond)                                              \
@@ -27,4 +29,11 @@ namespace chi_unit_tests
   void Test_WDD_IJK_Sweep(bool verbose);
 }
 
+/**Declare unit tests here that are meant to run from the lua console.*/
+namespace chi_unit_sim_tests
+{
+  int chiSimTest01_FV(lua_State* L);
+  int chiSimTest02_FV(lua_State* L);
+  int chiSimTest03_PWLC(lua_State* L);
+}
 #endif //CHITECH_UNIT_TESTS_H

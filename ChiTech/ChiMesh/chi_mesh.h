@@ -43,6 +43,7 @@ namespace chi_mesh
   class UnpartitionedMesh;
   class MeshContinuum;
   typedef std::shared_ptr<MeshContinuum> MeshContinuumPtr;
+  typedef std::shared_ptr<const MeshContinuum> MeshContinuumConstPtr;
 
   //=================================== Logical Volumes
   class LogicalVolume;

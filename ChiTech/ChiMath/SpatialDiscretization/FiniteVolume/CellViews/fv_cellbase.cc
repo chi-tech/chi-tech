@@ -6,12 +6,12 @@ void chi_math::CellFVValues::InitializeVolumeQuadraturePointData(
   finite_element::InternalQuadraturePointData &internal_data) const
 {
   internal_data.InitializeData({0},
-                               {{m_cell_centroid}},
+                               {{m_cell.centroid}},
                                {{1.0}},
                                {{chi_mesh::Vector3(0, 0, 0)}},
-                               {volume},
+                               {m_volume},
                                face_node_mappings,
-                               num_nodes);
+                               m_num_nodes);
 }
 
 void chi_math::CellFVValues::
@@ -23,7 +23,7 @@ void chi_math::CellFVValues::
                                {{chi_mesh::Vector3(0, 0, 0)}},
                                {{1.0}},
                                {{chi_mesh::Vector3(0, 0, 0)}},
-                               {face_area[face]},
+                               {m_areas[face]},
                                {{chi_mesh::Vector3(0, 0, 0)}},
                                face_node_mappings,
                                1);

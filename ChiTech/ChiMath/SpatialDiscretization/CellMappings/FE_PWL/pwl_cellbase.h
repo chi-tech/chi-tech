@@ -21,11 +21,14 @@ namespace chi_math
 
   public:
     /** Constructor. */
-    explicit CellMappingFE_PWL(size_t num_nodes,
-                               chi_mesh::MeshContinuumConstPtr ref_grid,
+    explicit CellMappingFE_PWL(const chi_mesh::MeshContinuumConstPtr& ref_grid,
+                               const chi_mesh::Cell& cell,
+                               size_t num_nodes,
                                std::vector<chi_mesh::Vector3> vertices,
                                std::vector<std::vector<int>> face_node_mappings) :
-      CellMapping(std::move(ref_grid), num_nodes, std::move(face_node_mappings)),
+      CellMapping(ref_grid, cell, num_nodes,
+                  std::move(face_node_mappings),
+                  &CellMapping::ComputeCellVolumeAndAreas),
       m_node_locations(std::move(vertices))
     {}
 

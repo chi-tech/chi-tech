@@ -11,8 +11,9 @@ chi_math::PolygonMappingFE_PWL::
     const chi_mesh::MeshContinuumConstPtr& ref_grid,
     const chi_math::QuadratureTriangle& volume_quadrature,
     const chi_math::QuadratureLine&     surface_quadrature) :
-  chi_math::CellMappingFE_PWL(poly_cell.vertex_ids.size(), //num_nodes
-                              ref_grid,
+  chi_math::CellMappingFE_PWL(ref_grid,
+                              poly_cell,
+                              poly_cell.vertex_ids.size(), //num_nodes
                               GetVertexLocations(*ref_grid, poly_cell),
                               MakeFaceNodeMapping(poly_cell)),
   volume_quadrature(volume_quadrature),
@@ -29,8 +30,8 @@ chi_math::PolygonMappingFE_PWL::
   {
     const chi_mesh::CellFace& face = poly_cell.faces[side];
 
-    const auto& v0 = ref_grid->vertices[face.vertex_ids[0]];
-    const auto& v1 = ref_grid->vertices[face.vertex_ids[1]];
+    const auto& v0 = m_grid_ptr->vertices[face.vertex_ids[0]];
+    const auto& v1 = m_grid_ptr->vertices[face.vertex_ids[1]];
     chi_mesh::Vertex v2 = vc;
 
     chi_mesh::Vector3 sidev01 = v1 - v0;

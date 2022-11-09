@@ -100,8 +100,6 @@ public:
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
 
-  std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
-
   chi_objects::ChiMPICommunicatorSet& GetCommunicator();
 
   size_t GetGlobalNumberOfCells() const;

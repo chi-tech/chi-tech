@@ -1,8 +1,7 @@
 #include "fv.h"
 
-#include "CellViews/fv_slab.h"
-#include "CellViews/fv_polygon.h"
-#include "CellViews/fv_polyhedron.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "CellViews/fv_cellbase.h"
 
 void chi_math::SpatialDiscretization_FV::CreateCellMappings()
 {
@@ -18,14 +17,15 @@ void chi_math::SpatialDiscretization_FV::CreateCellMappings()
     switch (cell.Type())
     {
       case chi_mesh::CellType::SLAB:
-        mapping = make_unique<SlabFVValues>(cell, ref_grid);
-        break;
       case chi_mesh::CellType::POLYGON:
-        mapping = make_unique<PolygonFVValues>(cell, ref_grid);
-        break;
       case chi_mesh::CellType::POLYHEDRON:
-        mapping = make_unique<PolyhedronFVValues>(cell, ref_grid);
+      {
+        typedef std::vector<std::vector<int>> FaceDofMapping;
+        mapping = make_unique<CellFVValues>(
+          ref_grid,cell,cell.centroid,
+          FaceDofMapping(cell.faces.size(),{-1}));
         break;
+      }
       default:
         throw std::logic_error(std::string(fname) +
         std::string(": Invalid cell type encountered."));
@@ -34,12 +34,12 @@ void chi_math::SpatialDiscretization_FV::CreateCellMappings()
   };
 
   for (const auto& cell : ref_grid->local_cells)
-    a_cell_mappings.push_back(MakeCellMapping(cell));
+    cell_mappings.push_back(MakeCellMapping(cell));
 
   const auto ghost_ids = ref_grid->cells.GetGhostGlobalIDs();
   for (uint64_t ghost_id : ghost_ids)
   {
     auto ghost_mapping = MakeCellMapping(ref_grid->cells[ghost_id]);
-    a_nb_cell_mappings.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
+    nb_cell_mappings.insert(std::make_pair(ghost_id, std::move(ghost_mapping)));
   }
 }

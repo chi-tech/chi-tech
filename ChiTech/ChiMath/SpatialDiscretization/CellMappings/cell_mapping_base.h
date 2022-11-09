@@ -4,12 +4,13 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <functional>
 
 //################################################################### Fwd Decls.
 namespace chi_mesh
 {
   class MeshContinuum;
-  typedef std::shared_ptr<MeshContinuum const> MeshContinuumConstPtr;
+  typedef std::shared_ptr<const MeshContinuum> MeshContinuumConstPtr;
   struct Vector3;
   class Cell;
 }
@@ -28,8 +29,22 @@ namespace chi_math
 class CellMapping
 {
 protected:
-  chi_mesh::MeshContinuumConstPtr grid;
-  const size_t num_nodes;
+  /**This function gets called to compute the cell-volume and
+   * face-areas. If simple linear cells are used then the
+   * default CellMapping::ComputeCellVolumeAndAreas can be
+   * used as this function. Otherwise (i.e. for higher order
+   * elements, the child-class should
+   * bind a different function to this.*/
+  typedef std::function<void(const chi_mesh::MeshContinuum&,
+                             const chi_mesh::Cell&,
+                             double&,
+                             std::vector<double>&)> VandAFunction;
+protected:
+  chi_mesh::MeshContinuumConstPtr m_grid_ptr;
+  const chi_mesh::Cell& m_cell;
+  const size_t m_num_nodes;
+  double m_volume = 0.0;
+  std::vector<double> m_areas;
 
   /** For each cell face, map from the face node index to the corresponding
      *  cell node index. More specifically, \p face_dof_mappings[f][fi], with
@@ -37,17 +52,27 @@ protected:
      *  contains the corresponding cell node index. */
   const std::vector<std::vector<int>> face_node_mappings;
 
-  CellMapping(chi_mesh::MeshContinuumConstPtr  in_grid,
+  CellMapping(chi_mesh::MeshContinuumConstPtr   in_grid,
+              const chi_mesh::Cell& in_cell,
               size_t in_num_nodes,
-              std::vector<std::vector<int>> in_face_node_mappings) :
-              grid(std::move(in_grid)),
-              num_nodes(in_num_nodes),
-              face_node_mappings(std::move(in_face_node_mappings))
-              {}
+              std::vector<std::vector<int>> in_face_node_mappings,
+              const VandAFunction& volume_area_function);
 
 public:
   //00
-  size_t NumNodes() const {return num_nodes;}
+  size_t NumNodes() const {return m_num_nodes;}
+
+  static void ComputeCellVolumeAndAreas(
+    const chi_mesh::MeshContinuum& grid,
+    const chi_mesh::Cell& cell,
+    double& volume,
+    std::vector<double>& areas);
+
+  double CellVolume() const {return m_volume;}
+  double FaceArea(size_t face_index) const {return m_areas[face_index];}
+
+  int MapFaceNode(size_t face_index,
+                  size_t face_node_index) const;
 
   //02 ShapeFuncs
   virtual
@@ -87,6 +112,9 @@ public:
   InitializeFaceQuadraturePointData(
     unsigned int face,
     finite_element::FaceQuadraturePointData& faces_qp_data) const = 0;
+
+  finite_element::InternalQuadraturePointData
+    MakeVolumeQuadraturePointData() const;
 
 public:
   virtual ~CellMapping() = default;

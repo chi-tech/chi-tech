@@ -30,6 +30,7 @@ namespace chi_math
     QuadratureHexahedron    hex_quad_order_arbitrary;
 
     std::map<uint64_t, int64_t> node_mapping;
+    std::map<uint64_t, int64_t> m_ghost_node_mapping;
 
   //  std::vector<int> cell_local_block_address;
   //  std::vector<std::pair<int,int>> neighbor_cell_block_address;
@@ -73,7 +74,7 @@ namespace chi_math
     //03
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
                               std::vector<int64_t>& nodal_nnz_off_diag,
-                              UnknownManager& unknown_manager) override;
+                              const UnknownManager& unknown_manager) const override;
 
     //04 Mappings
     int64_t MapDOF(const chi_mesh::Cell& cell,
@@ -93,14 +94,11 @@ namespace chi_math
     { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
     //05
-    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) override;
-    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) override;
-  //  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
-  //                               chi_math::UnknownManager* unknown_manager);
-  //
-  //  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-  //                                      chi_math::UnknownManager* unknown_manager,
-  //                                      unsigned int unknown_id=0);
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) const override;
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const override;
+    size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const override;
+    std::vector<int64_t>
+    GetGhostDOFIndices(const UnknownManager& unknown_manager) const override;
 
     size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override
     {return cell.vertex_ids.size();}
@@ -119,8 +117,8 @@ namespace chi_math
 
     void LocalizePETScVector(Vec petsc_vector,
                              std::vector<double>& local_vector,
-                             UnknownManager& unknown_manager)
-                             override;
+                             const UnknownManager& unknown_manager)
+                             const override;
 
     //FE-utils
     const finite_element::UnitIntegralData&
