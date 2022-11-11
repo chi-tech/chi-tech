@@ -4,7 +4,6 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
@@ -13,11 +12,6 @@
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
-
-#include <unistd.h>
-
-//#define Sleep(x) usleep(x)
-#define Sleep(x)
 
 namespace chi_unit_sim_tests
 {
@@ -28,7 +22,6 @@ int chiSimTest03_PWLC(lua_State* L)
 {
   const int num_args = lua_gettop(L);
   chi::log.Log() << "chiSimTest03_PWLC num_args = " << num_args;
-//  Sleep(5'000'000);
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -48,7 +41,6 @@ int chiSimTest03_PWLC(lua_State* L)
 
   chi::log.Log() << "Num local DOFs: " << num_local_dofs;
   chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
-//  Sleep(5'000'000);
 
   //============================================= Initializes Mats and Vecs
   const auto n = static_cast<int64_t>(num_local_dofs);
@@ -68,7 +60,6 @@ int chiSimTest03_PWLC(lua_State* L)
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
-//  Sleep(5'000'000);
 
   //============================================= Assemble the system
   chi::log.Log() << "Assembling system: ";
@@ -149,7 +140,6 @@ int chiSimTest03_PWLC(lua_State* L)
   VecAssemblyEnd(b);
 
   chi::log.Log() << "Done global assembly";
-//  Sleep(5'000'000);
 
   //============================================= Create Krylov Solver
   chi::log.Log() << "Solving: ";
@@ -166,7 +156,6 @@ int chiSimTest03_PWLC(lua_State* L)
   KSPSolve(petsc_solver.ksp,b,x);
 
   chi::log.Log() << "Done solving";
-//  Sleep(5'000'000);
 
   //============================================= Create Field Function
   auto ff = std::make_shared<chi_physics::FieldFunction2>(
@@ -186,13 +175,12 @@ int chiSimTest03_PWLC(lua_State* L)
 
   auto ff2 = std::make_shared<chi_physics::FieldFunction>(
     std::string("phi"),   //Text name
-    sdm_ptr,       //Spatial Discretization
+    sdm_ptr,              //Spatial Discretization
     &x,                   //Data vector
     uum);
 
   ff2->ExportToVTK("SimTest_03_PWLC2","phi");
-
-
+  
   //============================================= Clean up
   KSPDestroy(&petsc_solver.ksp);
 
@@ -201,10 +189,6 @@ int chiSimTest03_PWLC(lua_State* L)
   MatDestroy(&A);
 
   chi::log.Log() << "Done cleanup";
-//  Sleep(5'000'000);
-
-
-
 
   return 0;
 }
