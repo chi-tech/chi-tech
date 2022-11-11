@@ -49,13 +49,6 @@ sudo apt-get install cmake python3 git zlib1g-dev libx11-dev unzip
 ```
 (note the use of python3)
 
-
-
-***TODO: this needs to be fixed @JANV ***
-<u>NOTE</u>: *The recommended version of PETSc requires Python 2.6+; Python 3.x, typically
-pre-installed on modern Linux systems, will not work (Step 4 below provides more
-details if you need to use `python3`) .*
-
 <u>NOTE</u>: If you want to install the *optional* OpenGL package for VTK, do this
 ```bash
 sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
