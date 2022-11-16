@@ -13,11 +13,6 @@
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 
-#include <unistd.h>
-
-//#define Sleep(x) usleep(x)
-#define Sleep(x)
-
 namespace chi_unit_sim_tests
 {
 
@@ -27,7 +22,6 @@ int chiSimTest02_FV(lua_State* L)
 {
   const int num_args = lua_gettop(L);
   chi::log.Log() << "chiSimTest02_FV num_args = " << num_args;
-//  Sleep(5'000'000);
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -47,7 +41,6 @@ int chiSimTest02_FV(lua_State* L)
 
   chi::log.Log() << "Num local DOFs: " << num_local_dofs;
   chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
-//  Sleep(5'000'000);
 
   //============================================= Initializes Mats and Vecs
   const auto n = static_cast<int64_t>(num_local_dofs);
@@ -61,13 +54,11 @@ int chiSimTest02_FV(lua_State* L)
 
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
-  sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag,
-                           sdm.UNITARY_UNKNOWN_MANAGER);
+  sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag,OneDofPerNode);
 
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
-//  Sleep(5'000'000);
 
   //============================================= Assemble the system
   chi::log.Log() << "Assembling system: ";
@@ -122,7 +113,6 @@ int chiSimTest02_FV(lua_State* L)
   VecAssemblyEnd(b);
 
   chi::log.Log() << "Done global assembly";
-//  Sleep(5'000'000);
 
   //============================================= Create Krylov Solver
   chi::log.Log() << "Solving: ";
@@ -139,7 +129,6 @@ int chiSimTest02_FV(lua_State* L)
   KSPSolve(petsc_solver.ksp,b,x);
 
   chi::log.Log() << "Done solving";
-//  Sleep(5'000'000);
 
   //============================================= Create Field Function
   auto ff = std::make_shared<chi_physics::FieldFunction2>(
@@ -223,10 +212,6 @@ int chiSimTest02_FV(lua_State* L)
   MatDestroy(&A);
 
   chi::log.Log() << "Done cleanup";
-//  Sleep(5'000'000);
-
-
-
 
   return 0;
 }

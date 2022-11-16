@@ -197,7 +197,7 @@ bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index) const
 //###################################################################
 /**General map vertices*/
 void chi_mesh::MeshContinuum::
-FindAssociatedVertices(chi_mesh::CellFace& cur_face,
+FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                        std::vector<short>& dof_mapping) const
 {
   int associated_face = cur_face.GetNeighborAssociatedFace(*this);

@@ -9,71 +9,6 @@
 #include <numeric>
 
 //###################################################################
-/**Initializes the quadrature with custom angles and weights.*/
-void chi_math::AngularQuadrature::
-  InitializeWithCustom(std::vector<double> &azimuthal,
-                       std::vector<double> &polar,
-                       std::vector<double> &in_weights, bool verbose)
-{
-  size_t Na = azimuthal.size();
-  size_t Np = polar.size();
-  size_t Nw = in_weights.size();
-
-  if ((Na-Np != 0) or (Na-Nw != 0))
-  {
-    chi::log.LogAllError()
-      << "chi_math::AngularQuadrature::InitializeWithCustom: supplied"
-         " vectors need to be of equal length.";
-   chi::Exit(EXIT_FAILURE);
-  }
-
-  //================================================== Create angle pairs
-  std::stringstream ostr;
-  double weight_sum = 0.0;
-
-  for (unsigned int i=0; i<Na; i++)
-  {
-    const auto abscissa =
-      chi_math::QuadraturePointPhiTheta(azimuthal[i], polar[i]);
-
-    abscissae.push_back(abscissa);
-
-    const double weight = in_weights[i];
-    weights.push_back(weight);
-    weight_sum += weight;
-
-    if (verbose)
-    {
-      char buf[200];
-      sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
-              abscissa.phi*180.0/M_PI,
-              abscissa.theta*180.0/M_PI,
-              weight);
-      ostr << buf;
-    }
-  }
-
-  //================================================== Create omega list
-  for (const auto& qpoint : abscissae)
-  {
-    chi_mesh::Vector3 new_omega;
-    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
-    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
-    new_omega.z = cos(qpoint.theta);
-
-    omegas.push_back(new_omega);
-  }
-
-  if (verbose)
-  {
-    chi::log.Log()
-      << ostr.str() << "\n"
-      << "Weight sum=" << weight_sum;
-  }
-
-}
-
-//###################################################################
 /**Optimizes the angular quadrature for polar symmetry by removing
  * all the direction with downward pointing polar angles.
  *
@@ -277,4 +212,68 @@ const std::vector<chi_math::AngularQuadrature::HarmonicIndices>&
            "Make a call to either BuildDiscreteToMomentOperator or"
            "BuildMomentToDiscreteOperator before using this.");
   return m_to_ell_em_map;
+}
+
+//###################################################################
+/**Constructor using custom directions.*/
+chi_math::AngularQuadratureCustom::
+  AngularQuadratureCustom(std::vector<double> &azimuthal,
+                          std::vector<double> &polar,
+                          std::vector<double> &in_weights, bool verbose)
+{
+  size_t Na = azimuthal.size();
+  size_t Np = polar.size();
+  size_t Nw = in_weights.size();
+
+  if ((Na-Np != 0) or (Na-Nw != 0))
+  {
+    chi::log.LogAllError()
+      << "chi_math::AngularQuadrature::InitializeWithCustom: supplied"
+         " vectors need to be of equal length.";
+    chi::Exit(EXIT_FAILURE);
+  }
+
+  //================================================== Create angle pairs
+  std::stringstream ostr;
+  double weight_sum = 0.0;
+
+  for (unsigned int i=0; i<Na; i++)
+  {
+    const auto abscissa =
+      chi_math::QuadraturePointPhiTheta(azimuthal[i], polar[i]);
+
+    abscissae.push_back(abscissa);
+
+    const double weight = in_weights[i];
+    weights.push_back(weight);
+    weight_sum += weight;
+
+    if (verbose)
+    {
+      char buf[200];
+      sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
+              abscissa.phi*180.0/M_PI,
+              abscissa.theta*180.0/M_PI,
+              weight);
+      ostr << buf;
+    }
+  }
+
+  //================================================== Create omega list
+  for (const auto& qpoint : abscissae)
+  {
+    chi_mesh::Vector3 new_omega;
+    new_omega.x = sin(qpoint.theta)*cos(qpoint.phi);
+    new_omega.y = sin(qpoint.theta)*sin(qpoint.phi);
+    new_omega.z = cos(qpoint.theta);
+
+    omegas.push_back(new_omega);
+  }
+
+  if (verbose)
+  {
+    chi::log.Log()
+      << ostr.str() << "\n"
+      << "Weight sum=" << weight_sum;
+  }
 }

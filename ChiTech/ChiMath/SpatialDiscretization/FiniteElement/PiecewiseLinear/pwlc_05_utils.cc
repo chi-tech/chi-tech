@@ -30,7 +30,7 @@ size_t chi_math::SpatialDiscretization_PWLC::
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return m_ghost_node_mapping.size()*N; //TODO: Fix
+  return m_ghost_node_mapping.size()*N;
 }
 
 //###################################################################

@@ -61,6 +61,10 @@ protected:
 public:
   //00
   size_t NumNodes() const {return m_num_nodes;}
+  size_t NumFaceNodes(size_t face_index) const
+  {
+    return face_node_mappings.at(face_index).size();
+  }
 
   static void ComputeCellVolumeAndAreas(
     const chi_mesh::MeshContinuum& grid,
@@ -115,6 +119,9 @@ public:
 
   finite_element::InternalQuadraturePointData
     MakeVolumeQuadraturePointData() const;
+
+  finite_element::FaceQuadraturePointData
+  MakeFaceQuadraturePointData(size_t face_index) const;
 
 public:
   virtual ~CellMapping() = default;

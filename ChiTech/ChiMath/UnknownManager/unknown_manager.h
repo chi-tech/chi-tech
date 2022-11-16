@@ -43,17 +43,19 @@ public:
                    unsigned int in_num_components=1,
                    unsigned int in_map_begin=0) :
     type(in_type),
-    num_components(in_num_components),
+    num_components((type == UnknownType::SCALAR  )? 1 :
+                   (type == UnknownType::VECTOR_2)? 2 :
+                   (type == UnknownType::VECTOR_3)? 3 : in_num_components),
     map_begin(in_map_begin)
   {
-    component_text_names.resize(in_num_components,std::string());
+    component_text_names.resize(num_components,std::string());
     for (unsigned int c=0; c<num_components; ++c)
     {
 
       char buffer[100]; snprintf(buffer,100," %03d",c);
       component_text_names[c] = buffer;
     }
-    num_off_block_connections.resize(in_num_components, 0);
+    num_off_block_connections.resize(num_components, 0);
   }
 
   unsigned int GetMap(unsigned int component_number=0) const
@@ -125,6 +127,16 @@ public:
   {
     for (const auto& uk_info : unknown_info_list)
       AddUnknown(uk_info.first, uk_info.second);
+  }
+
+  explicit
+  UnknownManager(const std::vector<Unknown>& unknown_info_list,
+                 UnknownStorageType in_storage_type=
+                 UnknownStorageType::NODAL) noexcept :
+    dof_storage_type(in_storage_type)
+  {
+    for (const auto& uk : unknown_info_list)
+      AddUnknown(uk.type, uk.num_components);
   }
 
   UnknownManager(std::initializer_list<Unknown> unknowns,

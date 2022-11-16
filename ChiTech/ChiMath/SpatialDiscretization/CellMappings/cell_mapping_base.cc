@@ -249,3 +249,11 @@ chi_math::finite_element::InternalQuadraturePointData
   InitializeVolumeQuadraturePointData(qp_data);
   return qp_data;
 }
+
+chi_math::finite_element::FaceQuadraturePointData
+chi_math::CellMapping::MakeFaceQuadraturePointData(size_t face_index) const
+{
+  chi_math::finite_element::FaceQuadraturePointData qp_data;
+  InitializeFaceQuadraturePointData(face_index, qp_data);
+  return qp_data;
+}

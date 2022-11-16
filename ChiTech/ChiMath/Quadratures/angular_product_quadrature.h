@@ -19,6 +19,10 @@ namespace chi_math
   };
 
   class ProductQuadrature;
+  class AngularQuadratureProdGL;
+  class AngularQuadratureProdGLL;
+  class AngularQuadratureProdGLC;
+  class AngularQuadratureProdCustom;
 }
 
 //######################################################### Class def
@@ -32,20 +36,18 @@ protected:
   /** Linear indices of ordered directions mapped to polar level. */
   std::map<unsigned int, std::vector<unsigned int>> map_directions;
 
-public:
+protected:
   ProductQuadrature() :
     AngularQuadrature(chi_math::AngularQuadratureType::ProductQuadrature)
   {}
 
+public:
   ~ProductQuadrature() override = default;
- 
-  void InitializeWithGL(int Np, bool verbose=false);
-  void InitializeWithGLL(int Na, int Np, bool verbose=false);
-  void InitializeWithGLC(int Na, int Np, bool verbose=false);
-  void InitializeWithCustom(std::vector<double>& azimuthal,
-                            std::vector<double>& polar,
-                            std::vector<double>& in_weights,
-                            bool verbose) override;
+
+  void AssembleCosines(const std::vector<double>& azimuthal,
+                       const std::vector<double>& polar,
+                       const std::vector<double>& in_weights,
+                       bool verbose);
 
   void OptimizeForPolarSymmetry(double normalization) override;
   /**Obtains the abscissae index given the indices of the
@@ -57,6 +59,38 @@ public:
   const std::map<unsigned int,
                  std::vector<unsigned int>>& GetDirectionMap() const
   { return map_directions; }
+};
+
+//######################################################### Class def
+class chi_math::AngularQuadratureProdGL : public chi_math::ProductQuadrature
+{
+public:
+  explicit AngularQuadratureProdGL(int Np, bool verbose=false);
+};
+
+//######################################################### Class def
+class chi_math::AngularQuadratureProdGLL : public chi_math::ProductQuadrature
+{
+public:
+  explicit
+  AngularQuadratureProdGLL(int Na, int Np, bool verbose=false);
+};
+
+//######################################################### Class def
+class chi_math::AngularQuadratureProdGLC : public chi_math::ProductQuadrature
+{
+public:
+  explicit
+  AngularQuadratureProdGLC(int Na, int Np, bool verbose=false);
+};
+
+//######################################################### Class def
+class chi_math::AngularQuadratureProdCustom : public chi_math::ProductQuadrature
+{
+public:
+  AngularQuadratureProdCustom(const std::vector<double>& azimuthal,
+                              const std::vector<double>& polar,
+                              const std::vector<double>& in_weights, bool verbose);
 };
 
 #endif

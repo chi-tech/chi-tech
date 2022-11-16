@@ -8,10 +8,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
-
-#include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 
 namespace chi_unit_sim_tests
 {
@@ -54,8 +51,7 @@ int chiSimTest03_PWLC(lua_State* L)
 
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
-  sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag,
-                           sdm.UNITARY_UNKNOWN_MANAGER);
+  sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag, OneDofPerNode);
 
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
@@ -146,7 +142,7 @@ int chiSimTest03_PWLC(lua_State* L)
   auto petsc_solver =
   chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
     A,               //Matrix
-    "FVDiffSolver",  //Solver name
+    "PWLCDiffSolver",  //Solver name
     KSPCG,           //Solver type
     PCGAMG,          //Preconditioner type
     1.0e-6,          //Relative residual tolerance
@@ -159,27 +155,17 @@ int chiSimTest03_PWLC(lua_State* L)
 
   //============================================= Create Field Function
   auto ff = std::make_shared<chi_physics::FieldFunction2>(
-    "Phi",
-    sdm_ptr,
-    chi_math::Unknown(chi_math::UnknownType::SCALAR)
+    "Phi",                                           //Text name
+    sdm_ptr,                                         //Spatial Discr.
+    chi_math::Unknown(chi_math::UnknownType::SCALAR) //Unknown
   );
 
   //============================================= Update field function
   std::vector<double> field;
-  sdm.LocalizePETScVector(x,field,sdm.UNITARY_UNKNOWN_MANAGER);
+  sdm.LocalizePETScVector(x,field,OneDofPerNode);
 
   ff->UpdateFieldVector(field);
   ff->ExportToVTK("SimTest_03_PWLC");
-
-  auto uum = sdm.UNITARY_UNKNOWN_MANAGER;
-
-  auto ff2 = std::make_shared<chi_physics::FieldFunction>(
-    std::string("phi"),   //Text name
-    sdm_ptr,              //Spatial Discretization
-    &x,                   //Data vector
-    uum);
-
-  ff2->ExportToVTK("SimTest_03_PWLC2","phi");
   
   //============================================= Clean up
   KSPDestroy(&petsc_solver.ksp);

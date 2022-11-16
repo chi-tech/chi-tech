@@ -89,7 +89,6 @@ void chi_physics::FieldFunction2::
       }
       else
       {
-        std::cout << "Nope\n";
         double node_average = 0.0;
         for (int n=0; n<num_nodes; ++n)
         {

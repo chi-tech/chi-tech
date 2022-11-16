@@ -94,7 +94,7 @@ public:
   bool IsCellLocal(uint64_t cell_global_index) const;
   bool IsCellBndry(uint64_t cell_global_index) const;
 
-  void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
+  void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping) const;
 
   chi_mesh::Vector3

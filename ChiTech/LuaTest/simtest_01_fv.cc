@@ -11,11 +11,6 @@
 
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
-#include <unistd.h>
-
-//#define Sleep(x) usleep(x)
-#define Sleep(x)
-
 namespace chi_unit_sim_tests
 {
 
@@ -25,7 +20,6 @@ int chiSimTest01_FV(lua_State* L)
 {
   const int num_args = lua_gettop(L);
   chi::log.Log() << "chiSimTest01_FV num_args = " << num_args;
-  Sleep(5'000'000);
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -45,7 +39,6 @@ int chiSimTest01_FV(lua_State* L)
 
   chi::log.Log() << "Num local DOFs: " << num_local_dofs;
   chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
-  Sleep(5'000'000);
 
   //============================================= Initializes Mats and Vecs
   const auto n = static_cast<int64_t>(num_local_dofs);
@@ -65,7 +58,6 @@ int chiSimTest01_FV(lua_State* L)
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
-  Sleep(5'000'000);
 
   //============================================= Assemble the system
   chi::log.Log() << "Assembling system: ";
@@ -92,19 +84,19 @@ int chiSimTest01_FV(lua_State* L)
 
         const auto xpn = xn - xp;
 
-        const auto c = Af.Dot(xpn)/xpn.NormSquare();
+        const auto cf = Af.Dot(xpn) / xpn.NormSquare();
 
-        MatSetValue(A, imap, jpmap,  c, ADD_VALUES);
-        MatSetValue(A, imap, jnmap, -c, ADD_VALUES);
+        MatSetValue(A, imap, jpmap,  cf, ADD_VALUES);
+        MatSetValue(A, imap, jnmap, -cf, ADD_VALUES);
       }
       else
       {
         const auto& xn = xp + 2.0*(face.centroid - xp);
         const auto xpn = xn - xp;
 
-        const auto c = Af.Dot(xpn)/xpn.NormSquare();
+        const auto cf = Af.Dot(xpn) / xpn.NormSquare();
 
-        MatSetValue(A, imap, jpmap,  c, ADD_VALUES);
+        MatSetValue(A, imap, jpmap, cf, ADD_VALUES);
       }
       ++f;
     }//for face
@@ -120,7 +112,6 @@ int chiSimTest01_FV(lua_State* L)
   VecAssemblyEnd(b);
 
   chi::log.Log() << "Done global assembly";
-  Sleep(5'000'000);
 
   //============================================= Create Krylov Solver
   chi::log.Log() << "Solving: ";
@@ -137,7 +128,6 @@ int chiSimTest01_FV(lua_State* L)
   KSPSolve(petsc_solver.ksp,b,x);
 
   chi::log.Log() << "Done solving";
-  Sleep(5'000'000);
 
   //============================================= Create Field Function
   auto ff = new chi_physics::FieldFunction2(
@@ -153,6 +143,7 @@ int chiSimTest01_FV(lua_State* L)
   for (size_t i=0; i<num_local_dofs; ++i)
     field[i] = x_raw[i];
   VecRestoreArrayRead(x, &x_raw);
+  sdm.LocalizePETScVector(x, field, OneDofPerNode);
 
   ff->UpdateFieldVector(field);
 
@@ -166,10 +157,6 @@ int chiSimTest01_FV(lua_State* L)
   MatDestroy(&A);
 
   chi::log.Log() << "Done cleanup";
-  Sleep(5'000'000);
-
-
-
 
   return 0;
 }

@@ -2,7 +2,7 @@
 
 #include "chi_runtime.h"
 
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_product_quadrature.h"
 
 #include "chi_log.h"
 
@@ -66,8 +66,8 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::log.Log() << "Creating Gauss-Legendre Quadrature\n";
 
-    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
-    new_quad->InitializeWithGL(Np,verbose);
+    auto new_quad =
+      std::make_shared<chi_math::AngularQuadratureProdGL>(Np, verbose);
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
@@ -97,8 +97,8 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::log.Log() << "Creating Gauss-Legendre-Legendre Quadrature\n";
 
-    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
-    new_quad->InitializeWithGLL(Np,Na,verbose);
+    auto new_quad =
+      std::make_shared<chi_math::AngularQuadratureProdGLL>(Np,Na,verbose);
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
@@ -128,8 +128,8 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::log.Log() << "Creating Gauss-Legendre-ChebyShev Quadrature\n";
 
-    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
-    new_quad->InitializeWithGLC(Np,Na,verbose);
+    auto new_quad =
+      std::make_shared<chi_math::AngularQuadratureProdGLC>(Np,Na,verbose);
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
@@ -210,8 +210,8 @@ int chiCreateProductQuadrature(lua_State *L)
 
     chi::log.Log() << Na << " " << Np << " " << Nw;
 
-    auto new_quad = std::make_shared<chi_math::ProductQuadrature>();
-    new_quad->InitializeWithCustom(azimuthal,polar,weights,verbose);
+    auto new_quad = std::make_shared<chi_math::AngularQuadratureProdCustom>(
+      azimuthal, polar, weights, verbose);
 
     chi::angular_quadrature_stack.push_back(new_quad);
     const size_t index = chi::angular_quadrature_stack.size() - 1;
