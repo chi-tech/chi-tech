@@ -18,8 +18,7 @@ namespace chi_unit_sim_tests
  * to Laplace's problem. */
 int chiSimTest01_FV(lua_State* L)
 {
-  const int num_args = lua_gettop(L);
-  chi::log.Log() << "chiSimTest01_FV num_args = " << num_args;
+  chi::log.Log() << "Coding Tutorial 1";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -52,8 +51,7 @@ int chiSimTest01_FV(lua_State* L)
 
   std::vector<int64_t> nodal_nnz_in_diag;
   std::vector<int64_t> nodal_nnz_off_diag;
-  sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag,
-                           sdm.UNITARY_UNKNOWN_MANAGER);
+  sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag,OneDofPerNode);
 
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
@@ -64,10 +62,9 @@ int chiSimTest01_FV(lua_State* L)
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto& xp = cell.centroid;
     const int64_t imap = sdm.MapDOF(cell,0);
-    const int64_t jpmap = imap;
 
+    const auto& xp = cell.centroid;
     const double V = cell_mapping.CellVolume();
 
     size_t f=0;
@@ -86,7 +83,7 @@ int chiSimTest01_FV(lua_State* L)
 
         const auto cf = Af.Dot(xpn) / xpn.NormSquare();
 
-        MatSetValue(A, imap, jpmap,  cf, ADD_VALUES);
+        MatSetValue(A, imap, imap ,  cf, ADD_VALUES);
         MatSetValue(A, imap, jnmap, -cf, ADD_VALUES);
       }
       else
@@ -96,7 +93,7 @@ int chiSimTest01_FV(lua_State* L)
 
         const auto cf = Af.Dot(xpn) / xpn.NormSquare();
 
-        MatSetValue(A, imap, jpmap, cf, ADD_VALUES);
+        MatSetValue(A, imap, imap , cf, ADD_VALUES);
       }
       ++f;
     }//for face
@@ -116,38 +113,22 @@ int chiSimTest01_FV(lua_State* L)
   //============================================= Create Krylov Solver
   chi::log.Log() << "Solving: ";
   auto petsc_solver =
-  chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
-    A,               //Matrix
-    "FVDiffSolver",  //Solver name
-    KSPCG,           //Solver type
-    PCGAMG,          //Preconditioner type
-    1.0e-6,          //Relative residual tolerance
-    1000);            //Max iterations
+    chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
+      A,               //Matrix
+      "FVDiffSolver",  //Solver name
+      KSPCG,           //Solver type
+      PCGAMG,          //Preconditioner type
+      1.0e-6,          //Relative residual tolerance
+      1000);            //Max iterations
 
   //============================================= Solve
   KSPSolve(petsc_solver.ksp,b,x);
 
   chi::log.Log() << "Done solving";
 
-  //============================================= Create Field Function
-  auto ff = new chi_physics::FieldFunction2(
-    "Phi",
-    sdm_ptr,
-    chi_math::Unknown(chi_math::UnknownType::SCALAR)
-  );
-
-  //============================================= Update field function
+  //============================================= Extract PETSc vector
   std::vector<double> field(num_local_dofs, 0.0);
-  const double* x_raw;
-  VecGetArrayRead(x, &x_raw);
-  for (size_t i=0; i<num_local_dofs; ++i)
-    field[i] = x_raw[i];
-  VecRestoreArrayRead(x, &x_raw);
-  sdm.LocalizePETScVector(x, field, OneDofPerNode);
-
-  ff->UpdateFieldVector(field);
-
-  ff->ExportToVTK("SimTest_01_FV");
+  sdm.LocalizePETScVector(x,field,OneDofPerNode);
 
   //============================================= Clean up
   KSPDestroy(&petsc_solver.ksp);
@@ -157,6 +138,17 @@ int chiSimTest01_FV(lua_State* L)
   MatDestroy(&A);
 
   chi::log.Log() << "Done cleanup";
+
+  //============================================= Create Field Function
+  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+    "Phi",
+    sdm_ptr,
+    chi_math::Unknown(chi_math::UnknownType::SCALAR)
+  );
+
+  ff->UpdateFieldVector(field);
+
+  ff->ExportToVTK("CodeTut1_FV");
 
   return 0;
 }

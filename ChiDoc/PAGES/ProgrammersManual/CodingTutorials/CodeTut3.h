@@ -1,4 +1,4 @@
-/**\page CodeTut3 Coding Tutorial 3 - Poisson's problem with Finite Volume
+/**\page CodeTut3 Coding Tutorial 3 - Poisson's problem with PWLC
 
 ## Table of contents
 - \ref CodeTut3Sec1
@@ -8,6 +8,10 @@
 - \ref CodeTut3Sec2
 - \ref CodeTut3Sec3
 - \ref CodeTut3Sec4
+- \ref CodeTut3Sec5
+- \ref CodeTut3Sec6
+- \ref CodeTut3Sec7
+
 
 \section CodeTut3Sec1 1 Poisson's equation
 <a href="https://en.wikipedia.org/wiki/Poisson%27s_equation">The Poisson's equation</a> states the following, for

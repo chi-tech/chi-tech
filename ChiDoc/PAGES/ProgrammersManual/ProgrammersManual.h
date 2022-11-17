@@ -13,6 +13,7 @@
 -# \subpage CodeTut1 \n
 -# \subpage CodeTut2 \n
 -# \subpage CodeTut3 \n
+-# \subpage CodeTut4 \n
 
 ##--
 

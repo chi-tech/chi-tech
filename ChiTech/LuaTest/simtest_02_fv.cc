@@ -20,8 +20,7 @@ namespace chi_unit_sim_tests
  * to Laplace's problem. */
 int chiSimTest02_FV(lua_State* L)
 {
-  const int num_args = lua_gettop(L);
-  chi::log.Log() << "chiSimTest02_FV num_args = " << num_args;
+  chi::log.Log() << "Coding Tutorial 2";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -65,10 +64,9 @@ int chiSimTest02_FV(lua_State* L)
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const auto& xp = cell.centroid;
     const int64_t imap = sdm.MapDOF(cell,0);
-    const int64_t jpmap = imap;
 
+    const auto& xp = cell.centroid;
     const double V = cell_mapping.CellVolume();
 
     size_t f=0;
@@ -85,19 +83,19 @@ int chiSimTest02_FV(lua_State* L)
 
         const auto xpn = xn - xp;
 
-        const auto c = Af.Dot(xpn)/xpn.NormSquare();
+        const auto cf = Af.Dot(xpn) / xpn.NormSquare();
 
-        MatSetValue(A, imap, jpmap,  c, ADD_VALUES);
-        MatSetValue(A, imap, jnmap, -c, ADD_VALUES);
+        MatSetValue(A, imap, imap ,  cf, ADD_VALUES);
+        MatSetValue(A, imap, jnmap, -cf, ADD_VALUES);
       }
       else
       {
         const auto& xn = xp + 2.0*(face.centroid - xp);
         const auto xpn = xn - xp;
 
-        const auto c = Af.Dot(xpn)/xpn.NormSquare();
+        const auto cf = Af.Dot(xpn) / xpn.NormSquare();
 
-        MatSetValue(A, imap, jpmap,  c, ADD_VALUES);
+        MatSetValue(A, imap, imap , cf, ADD_VALUES);
       }
       ++f;
     }//for face
@@ -117,18 +115,31 @@ int chiSimTest02_FV(lua_State* L)
   //============================================= Create Krylov Solver
   chi::log.Log() << "Solving: ";
   auto petsc_solver =
-  chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
-    A,               //Matrix
-    "FVDiffSolver",  //Solver name
-    KSPCG,           //Solver type
-    PCGAMG,          //Preconditioner type
-    1.0e-6,          //Relative residual tolerance
-    1000);            //Max iterations
+    chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
+      A,               //Matrix
+      "FVDiffSolver",  //Solver name
+      KSPCG,           //Solver type
+      PCGAMG,          //Preconditioner type
+      1.0e-6,          //Relative residual tolerance
+      1000);            //Max iterations
 
   //============================================= Solve
   KSPSolve(petsc_solver.ksp,b,x);
 
   chi::log.Log() << "Done solving";
+
+  //============================================= Extract PETSc vector
+  std::vector<double> field(num_local_dofs, 0.0);
+  sdm.LocalizePETScVector(x,field,OneDofPerNode);
+
+  //============================================= Clean up
+  KSPDestroy(&petsc_solver.ksp);
+
+  VecDestroy(&x);
+  VecDestroy(&b);
+  MatDestroy(&A);
+
+  chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
   auto ff = std::make_shared<chi_physics::FieldFunction2>(
@@ -137,16 +148,12 @@ int chiSimTest02_FV(lua_State* L)
     chi_math::Unknown(chi_math::UnknownType::SCALAR)
   );
 
-  //============================================= Update field function
-  std::vector<double> field;
-  sdm.LocalizePETScVector(x,field,sdm.UNITARY_UNKNOWN_MANAGER);
-
   ff->UpdateFieldVector(field);
-  ff->ExportToVTK("SimTest_02_FV");
+
+  ff->ExportToVTK("CodeTut2_FV");
 
   //============================================= Make ghosted vectors
-  std::vector<int64_t> ghost_ids =
-    sdm.GetGhostDOFIndices(sdm.UNITARY_UNKNOWN_MANAGER);
+  std::vector<int64_t> ghost_ids = sdm.GetGhostDOFIndices(OneDofPerNode);
 
   chi_math::VectorGhostCommunicator vgc(num_local_dofs,
                                         num_globl_dofs,
@@ -156,31 +163,46 @@ int chiSimTest02_FV(lua_State* L)
 
   vgc.CommunicateGhostEntries(field_wg);
 
-  //============================================= Compute the gradient
-  chi_math::UnknownManager grad_uk_man({
-    chi_math::Unknown{chi_math::UnknownType::VECTOR_3,3}});
+  //============================================= Setup gradient unknown structure
+  chi_math::UnknownManager grad_uk_man(
+    {chi_math::Unknown(chi_math::UnknownType::VECTOR_3)});
 
   const size_t num_grad_dofs = sdm.GetNumLocalDOFs(grad_uk_man);
 
   std::vector<double> grad_phi(num_grad_dofs, 0.0);
+
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const int64_t pmap = sdm.MapDOFLocal(cell, 0);
-    const double  phi_P = field_wg[pmap];
 
-    chi_mesh::Vector3 grad_phi_P(0,0,0);
+    const int64_t imap = sdm.MapDOFLocal(cell, 0);
+    const double  phi_P = field_wg[imap];
 
+    const auto& xp = cell.centroid;
+
+    auto grad_phi_P = chi_mesh::Vector3(0,0,0);
+
+    size_t f=0;
     for (const auto& face : cell.faces)
     {
+      const auto& xf = face.centroid;
+      const auto  Af = cell_mapping.FaceArea(f) * face.normal;
+
       double phi_N = 0.0;
+      auto xn = xp + 2*(xf-xp);
+
       if (face.has_neighbor)
       {
         const auto& adj_cell = grid.cells[face.neighbor_id];
         const int64_t nmap = sdm.MapDOFLocal(adj_cell, 0);
         phi_N = field_wg[nmap];
+
+        xn = adj_cell.centroid;
       }
-      grad_phi_P += 0.5*(phi_N + phi_P)*face.normal;
+
+      grad_phi_P += Af * ((xn-xf).Norm()*phi_P + (xf-xp).Norm()*phi_N)/
+                    (xn-xp).Norm();
+      ++f;
     }//for face
     grad_phi_P /= cell_mapping.CellVolume();
 
@@ -194,24 +216,15 @@ int chiSimTest02_FV(lua_State* L)
   }//for cell
 
   //============================================= Create Field Function
-  auto grad_ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff_grad = std::make_shared<chi_physics::FieldFunction2>(
     "GradPhi",
     sdm_ptr,
-    chi_math::Unknown(chi_math::UnknownType::VECTOR_3,3)
+    chi_math::Unknown(chi_math::UnknownType::VECTOR_3)
   );
 
-  grad_ff->UpdateFieldVector(grad_phi);
+  ff_grad->UpdateFieldVector(grad_phi);
 
-  grad_ff->ExportToVTK("SimTest_02_FV_grad");
-
-  //============================================= Clean up
-  KSPDestroy(&petsc_solver.ksp);
-
-  VecDestroy(&x);
-  VecDestroy(&b);
-  MatDestroy(&A);
-
-  chi::log.Log() << "Done cleanup";
+  ff_grad->ExportToVTK("CodeTut2_FV_grad");
 
   return 0;
 }

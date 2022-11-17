@@ -35,6 +35,7 @@ namespace chi_unit_sim_tests
   int chiSimTest01_FV(lua_State* L);
   int chiSimTest02_FV(lua_State* L);
   int chiSimTest03_PWLC(lua_State* L);
+  int chiSimTest04_PWLC(lua_State* L);
 
   int chiSimTest91_PWLD(lua_State* L);
 }

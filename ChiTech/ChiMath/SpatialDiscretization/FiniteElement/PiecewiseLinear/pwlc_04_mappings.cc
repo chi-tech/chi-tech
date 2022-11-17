@@ -72,10 +72,11 @@ int64_t chi_math::SpatialDiscretization_PWLC::
       address = sc_int64(local_base_block_size*block_id) + local_id;
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
-      address = global_id*sc_int64(num_unknowns) + sc_int64(block_id);
+      address = local_id*sc_int64(num_unknowns) + sc_int64(block_id);
   }//if is_local
   else
   {
+    const size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
     int64_t ghost_local_node_id = -1;
     int64_t counter = 0;
     for (const auto& vid_gnid : m_ghost_node_mapping)
@@ -94,6 +95,8 @@ int64_t chi_math::SpatialDiscretization_PWLC::
     }
     else if (storage == chi_math::UnknownStorageType::NODAL)
       address = ghost_local_node_id*sc_int64(num_unknowns) + sc_int64(block_id);
+
+    address += sc_int64(num_local_dofs);
   }
 
   return address;

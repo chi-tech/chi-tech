@@ -53,8 +53,7 @@ void chi_physics::FieldFunction2::
   ugrid->GetCellData()->AddArray(partition_id_array);
 
   //============================================= Upload cell/point data
-//  const auto field_vector = GetGhostedFieldVector();
-  const auto& field_vector = m_field_vector;
+  const auto field_vector = GetGhostedFieldVector();
   auto cell_data = ugrid->GetCellData();
   auto point_data = ugrid->GetPointData();
   for (uint c=0; c<m_unknown.num_components; ++c)
