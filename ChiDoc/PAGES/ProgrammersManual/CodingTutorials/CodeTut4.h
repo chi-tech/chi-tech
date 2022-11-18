@@ -8,7 +8,8 @@
 - \ref CodeTut4SecX
 
 \section CodeTut4Sec1 1 Defining a wrapper to call a lua function
-For our manufactured solution we are required to call a lua function
+To implement a manufactured solution in our PWLC solver from \ref CodeTut3
+we are required to call a lua-function
 with spatial coordinates x,y,z. In order to use the lua-console, specifically
 the lua state, we have to include the headers
 \code
@@ -17,16 +18,19 @@ the lua state, we have to include the headers
 \endcode
 
 When then have to grab the console state from the runtime environment. To do this
-we add code just below `chi::RunBatch`
+we add the following code, in the beginning of the program,
+just below `chi::RunBatch`
 \code
 auto L = chi::console.consoleState;
 \endcode
 
-We define a wrapper using a c++ lambda:
+Next we have to tell the c++ code exactly how to call a lua-function. To this
+end we define a wrapper using a c++ lambda as shown below. You can define this
+function where ever you like as long as it can capture the lua state, `L`.
+For this tutorial we defined it just before the matrix assembly.
 \code
-auto CallLuaXYZFunction = [](const chi_mesh::Vector3& xyz,
-                             const std::string& lua_func_name,
-                             lua_State* L)
+auto CallLuaXYZFunction = [&L](const std::string& lua_func_name,
+                               const chi_mesh::Vector3& xyz)
 {
   //============= Load lua function
   lua_getglobal(L, lua_func_name.c_str());
@@ -60,16 +64,20 @@ auto CallLuaXYZFunction = [](const chi_mesh::Vector3& xyz,
   return lua_return;
 };
 \endcode
+Notice this function takes 2 arguments: a string value representing the lua
+function's name, and a `chi_mesh::Vector3` indicating the real-word XYZ
+coordinates at which to evaluate the function.
 
-\section CodeTut4Sec2 2 Getting guadrature-point real world XYZ
-\code
-for (size_t qp : qp_data.QuadraturePointIndices())
-  cell_rhs[i] += CallLuaXYZFunction(qp_data.QPointXYZ(qp),"MMS_q", L) *
-                 qp_data.ShapeValue(i, qp) * qp_data.JxW(qp);
-\endcode
+In order to implement a manufactures solution we need a right-hand-side (RHS)
+function and an actual manufactured solution (MS) function. The RHS function will essentially
+steer the entire solution towards the manufactured solution. The evaluation of
+the actual manufactured solution is required in two places, i.e., in the
+implementation of Dirichlet boundary conditions, and when we compute the L2-norm
+of the error between our FEM-solution and the manufactured one.
 
-\section CodeTut4Sec3 3 Lua functions
-Add the following to `mesh.lua`
+\section CodeTut4Sec2 2 Lua functions
+The RHS function and the MS function both need to exist within the lua state.
+We therefore ad the following to the `mesh.lua` input file.
 \code
 function MMS_phi(x,y,z)
     return math.cos(math.pi*x) + math.cos(math.pi*y)
@@ -78,33 +86,111 @@ function MMS_q(x,y,z)
     return math.pi*math.pi * (math.cos(math.pi*x)+math.cos(math.pi*y))
 end
 \endcode
+The function `MMS_phi` is the MS function and the function `MMS_q` is the RHS
+function. These functions can be defined anywhere in the input file as long as
+they are available in the state when solver needs them.
+
+\section CodeTut4Sec3 3 Getting guadrature-point real world XYZ
+Quadrautre-point real-world positions are stored when the `qp_data` structure
+is created. They are accessed with the call
+`chi_math::finite_element::InternalQuadraturePointData::QPointXYZ`, taking the
+quadrature point index as a parameter.
+\code
+for (size_t qp : qp_data.QuadraturePointIndices())
+  cell_rhs[i] += CallLuaXYZFunction(qp_data.QPointXYZ(qp),"MMS_q", L) *
+                 qp_data.ShapeValue(i, qp) * qp_data.JxW(qp);
+\endcode
 
 \section CodeTut4Sec4 4 Convergence study
+The Method of Manufactured Solution (MMS) is often used to verify the rate of
+convergence of computational methods. In order to determine magnitude of the
+error of the FEM solution, \f$ \phi_{FEM} \f$, compared to the MS,
+\f$ \phi_{MMS} \f$, we need to evaluate the following
+\f[
+\int_V |e| dV = \int_V \biggr| \phi_{MMS}(\mathbf{x}) - \phi_{FEM}(\mathbf{x})\biggr| dV
+\f]
+We again here use the quadrature rules to obtain this integral as
+\f[
+\int_V |e| dV = \sum_c \sum_n^{N_V}
+w_n \biggr| \phi_{MMS}(\mathbf{x}_n) - \phi_{FEM}(\tilde{\mathbf{x}}_n)\biggr| \ | J(\tilde{\mathbf{x}}_n |
+\f]
+for which we use the code
+\code
+//============================================= Compute error
+//First get ghosted values
+const auto field_wg = ff->GetGhostedFieldVector();
+
+double local_error = 0.0;
+for (const auto& cell : grid.local_cells)
+{
+  const auto& cell_mapping = sdm.GetCellMapping(cell);
+  const size_t num_nodes = cell_mapping.NumNodes();
+  const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+
+  //======================= Grab nodal phi values
+  std::vector<double> nodal_phi(num_nodes,0.0);
+  for (size_t j=0; j < num_nodes; ++j)
+  {
+    const int64_t imap = sdm.MapDOFLocal(cell, j);
+    nodal_phi[j] = field_wg[imap];
+  }//for j
+
+  //======================= Quadrature loop
+  for (size_t qp : qp_data.QuadraturePointIndices())
+  {
+    double phi_fem = 0.0;
+    for (size_t j=0; j < num_nodes; ++j)
+      phi_fem += nodal_phi[j] * qp_data.ShapeValue(j, qp);
+
+    double phi_true = CallLuaXYZFunction("MMS_phi",qp_data.QPointXYZ(qp));
+
+    local_error += std::fabs(phi_true - phi_fem) * qp_data.JxW(qp);
+  }
+}//for cell
+
+double global_error = 0.0;
+MPI_Allreduce(&local_error,     //sendbuf
+              &global_error,    //recvbuf
+              1, MPI_DOUBLE,    //count+datatype
+              MPI_SUM,          //operation
+              MPI_COMM_WORLD);  //communicator
+
+chi::log.Log() << "Error: " << std::scientific << global_error
+               << " Num-cells: " << grid.GetGlobalNumberOfCells();
+\endcode
+Notice that we grab the nodal values of \f$ \phi_{FEM} \f$ before we loop over
+quadrature points. We then use these nodal values within the quadrature-point
+loop to construct \f$ \phi_{FEM}(\tilde{\mathbf{x}}_n) \f$ as
+\f[
+\phi_{FEM}(\tilde{\mathbf{x}}_n) = \sum_j  \phi_j b_j(\tilde{\mathbf{x}}_n)
+\f]
+with the code
+\code
+for (size_t j=0; j < num_nodes; ++j)
+  phi_fem += nodal_phi[j] * qp_data.ShapeValue(j, qp);
+\endcode
+
+Notice also that we first have to compute a local error, from the cells that are
+on the local partition. This is then followed by an `MPI_Allreduce`, with the
+`MPI_SUM` operation, to gather all the local error values into a single global
+error value. This is done via the code
+\code
+double global_error = 0.0;
+MPI_Allreduce(&local_error,     //sendbuf
+              &global_error,    //recvbuf
+              1, MPI_DOUBLE,    //count+datatype
+              MPI_SUM,          //operation
+              MPI_COMM_WORLD);  //communicator
+\endcode
+
+With this code in-place we can run the program several times with different amount
+cells, which provides us with the data below:
+
 \image html CodingTutorials/Tut4_OrderOfConv.png width=700px
 
 \section CodeTut4SecX The complete program
 \code
-#include "chi_runtime.h"
-#include "chi_log.h"
-
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "ChiMath/PETScUtils/petsc_utils.h"
-
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
-
-#include "ChiConsole/chi_console.h"
-#include "ChiLua/chi_lua.h"
-
-int main(int argc, char* argv[])
-{
-  chi::Initialize(argc,argv);
-  chi::RunBatch(argc, argv);
-
-  auto L = chi::console.consoleState;
-
-  chi::log.Log() << "Coding Tutorial 4";
+chi::log.Log() << "Coding Tutorial 4";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -144,9 +230,8 @@ int main(int argc, char* argv[])
                                            nodal_nnz_off_diag);
 
   //============================================= Source lambda
-  auto CallLuaXYZFunction = [](const chi_mesh::Vector3& xyz,
-                               const std::string& lua_func_name,
-                               lua_State* L)
+  auto CallLuaXYZFunction = [&L](const std::string& lua_func_name,
+                                 const chi_mesh::Vector3& xyz)
   {
     //============= Load lua function
     lua_getglobal(L, lua_func_name.c_str());
@@ -206,7 +291,7 @@ int main(int argc, char* argv[])
         Acell[i][j] = entry_aij;
       }//for j
       for (size_t qp : qp_data.QuadraturePointIndices())
-        cell_rhs[i] += CallLuaXYZFunction(qp_data.QPointXYZ(qp),"MMS_q", L) *
+        cell_rhs[i] += CallLuaXYZFunction("MMS_q",qp_data.QPointXYZ(qp)) *
                        qp_data.ShapeValue(i, qp) * qp_data.JxW(qp);
     }//for i
 
@@ -237,7 +322,7 @@ int main(int argc, char* argv[])
       if (node_boundary_flag[i]) //if dirichlet node
       {
         MatSetValue(A, imap[i], imap[i], 1.0, ADD_VALUES);
-        double bval = CallLuaXYZFunction(cell_node_xyzs[i],"MMS_phi",L);
+        double bval = CallLuaXYZFunction("MMS_phi",cell_node_xyzs[i]);
         VecSetValue(b, imap[i], bval, ADD_VALUES);
       }
       else
@@ -248,7 +333,7 @@ int main(int argc, char* argv[])
             MatSetValue(A, imap[i], imap[j], Acell[i][j], ADD_VALUES);
           else
           {
-            double bval = CallLuaXYZFunction(cell_node_xyzs[j],"MMS_phi",L);
+            double bval = CallLuaXYZFunction("MMS_phi",cell_node_xyzs[j]);
             VecSetValue(b, imap[i], -Acell[i][j]*bval, ADD_VALUES);
           }
         }//for j
@@ -310,44 +395,42 @@ int main(int argc, char* argv[])
   //First get ghosted values
   const auto field_wg = ff->GetGhostedFieldVector();
 
-  double local_l2_error = 0.0;
+  double local_error = 0.0;
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
+    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
 
     //======================= Grab nodal phi values
     std::vector<double> nodal_phi(num_nodes,0.0);
-    for (size_t i=0; i<num_nodes; ++i)
+    for (size_t j=0; j < num_nodes; ++j)
     {
-      const int64_t imap = sdm.MapDOFLocal(cell,i);
-      nodal_phi[i] = field_wg[imap];
-    }//for i
+      const int64_t imap = sdm.MapDOFLocal(cell, j);
+      nodal_phi[j] = field_wg[imap];
+    }//for j
 
-    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
-
+    //======================= Quadrature loop
     for (size_t qp : qp_data.QuadraturePointIndices())
     {
       double phi_fem = 0.0;
-      for (size_t i=0; i<num_nodes; ++i)
-        phi_fem += nodal_phi[i] * qp_data.ShapeValue(i, qp);
+      for (size_t j=0; j < num_nodes; ++j)
+        phi_fem += nodal_phi[j] * qp_data.ShapeValue(j, qp);
 
-      double phi_true = CallLuaXYZFunction(qp_data.QPointXYZ(qp),"MMS_phi",L);
+      double phi_true = CallLuaXYZFunction("MMS_phi",qp_data.QPointXYZ(qp));
 
-      const double error = phi_true - phi_fem;
-
-      local_l2_error += error * error * qp_data.JxW(qp);
+      local_error += std::fabs(phi_true - phi_fem) * qp_data.JxW(qp);
     }
   }//for cell
 
-  double global_l2_error = 0.0;
-  MPI_Allreduce(&local_l2_error,  //sendbuf
-                &global_l2_error, //recvbuf
+  double global_error = 0.0;
+  MPI_Allreduce(&local_error,     //sendbuf
+                &global_error,    //recvbuf
                 1, MPI_DOUBLE,    //count+datatype
                 MPI_SUM,          //operation
                 MPI_COMM_WORLD);  //communicator
 
-  chi::log.Log() << "Error L2-norm: " << std::scientific << global_l2_error
+  chi::log.Log() << "Error: " << std::scientific << global_error
                  << " Num-cells: " << grid.GetGlobalNumberOfCells();
 
   chi::Finalize();

@@ -58,9 +58,8 @@ int chiSimTest04_PWLC(lua_State* L)
                                            nodal_nnz_off_diag);
 
   //============================================= Source lambda
-  auto CallLuaXYZFunction = [](const chi_mesh::Vector3& xyz,
-                               const std::string& lua_func_name,
-                               lua_State* L)
+  auto CallLuaXYZFunction = [&L](const std::string& lua_func_name,
+                                 const chi_mesh::Vector3& xyz)
   {
     //============= Load lua function
     lua_getglobal(L, lua_func_name.c_str());
@@ -120,7 +119,7 @@ int chiSimTest04_PWLC(lua_State* L)
         Acell[i][j] = entry_aij;
       }//for j
       for (size_t qp : qp_data.QuadraturePointIndices())
-        cell_rhs[i] += CallLuaXYZFunction(qp_data.QPointXYZ(qp),"MMS_q", L) *
+        cell_rhs[i] += CallLuaXYZFunction("MMS_q",qp_data.QPointXYZ(qp)) *
                        qp_data.ShapeValue(i, qp) * qp_data.JxW(qp);
     }//for i
 
@@ -151,7 +150,7 @@ int chiSimTest04_PWLC(lua_State* L)
       if (node_boundary_flag[i]) //if dirichlet node
       {
         MatSetValue(A, imap[i], imap[i], 1.0, ADD_VALUES);
-        double bval = CallLuaXYZFunction(cell_node_xyzs[i],"MMS_phi",L);
+        double bval = CallLuaXYZFunction("MMS_phi",cell_node_xyzs[i]);
         VecSetValue(b, imap[i], bval, ADD_VALUES);
       }
       else
@@ -162,7 +161,7 @@ int chiSimTest04_PWLC(lua_State* L)
             MatSetValue(A, imap[i], imap[j], Acell[i][j], ADD_VALUES);
           else
           {
-            double bval = CallLuaXYZFunction(cell_node_xyzs[j],"MMS_phi",L);
+            double bval = CallLuaXYZFunction("MMS_phi",cell_node_xyzs[j]);
             VecSetValue(b, imap[i], -Acell[i][j]*bval, ADD_VALUES);
           }
         }//for j
@@ -224,44 +223,42 @@ int chiSimTest04_PWLC(lua_State* L)
   //First get ghosted values
   const auto field_wg = ff->GetGhostedFieldVector();
 
-  double local_l2_error = 0.0;
+  double local_error = 0.0;
   for (const auto& cell : grid.local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
+    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
 
     //======================= Grab nodal phi values
     std::vector<double> nodal_phi(num_nodes,0.0);
-    for (size_t i=0; i<num_nodes; ++i)
+    for (size_t j=0; j < num_nodes; ++j)
     {
-      const int64_t imap = sdm.MapDOFLocal(cell,i);
-      nodal_phi[i] = field_wg[imap];
-    }//for i
+      const int64_t imap = sdm.MapDOFLocal(cell, j);
+      nodal_phi[j] = field_wg[imap];
+    }//for j
 
-    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
-
+    //======================= Quadrature loop
     for (size_t qp : qp_data.QuadraturePointIndices())
     {
       double phi_fem = 0.0;
-      for (size_t i=0; i<num_nodes; ++i)
-        phi_fem += nodal_phi[i] * qp_data.ShapeValue(i, qp);
+      for (size_t j=0; j < num_nodes; ++j)
+        phi_fem += nodal_phi[j] * qp_data.ShapeValue(j, qp);
 
-      double phi_true = CallLuaXYZFunction(qp_data.QPointXYZ(qp),"MMS_phi",L);
+      double phi_true = CallLuaXYZFunction("MMS_phi",qp_data.QPointXYZ(qp));
 
-      const double error = phi_true - phi_fem;
-
-      local_l2_error += error * error * qp_data.JxW(qp);
+      local_error += std::fabs(phi_true - phi_fem) * qp_data.JxW(qp);
     }
   }//for cell
 
-  double global_l2_error = 0.0;
-  MPI_Allreduce(&local_l2_error,  //sendbuf
-                &global_l2_error, //recvbuf
+  double global_error = 0.0;
+  MPI_Allreduce(&local_error,     //sendbuf
+                &global_error,    //recvbuf
                 1, MPI_DOUBLE,    //count+datatype
                 MPI_SUM,          //operation
                 MPI_COMM_WORLD);  //communicator
 
-  chi::log.Log() << "Error L2-norm: " << std::scientific << global_l2_error
+  chi::log.Log() << "Error: " << std::scientific << global_error
                  << " Num-cells: " << grid.GetGlobalNumberOfCells();
 
   return 0;

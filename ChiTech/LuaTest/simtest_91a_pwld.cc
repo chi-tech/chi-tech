@@ -132,8 +132,8 @@ int chiSimTest91_PWLD(lua_State* L)
   std::vector<double> phi_old(num_local_phi_dofs,0.0);
   std::vector<double> psi_old(num_local_psi_dofs, 0.0);
   auto source_moments = phi_old;
-  auto phi_new = phi_old;
-  auto q_source = phi_old;
+  auto phi_new        = phi_old;
+  auto q_source       = phi_old;
 
   chi::log.Log() << "End vectors." << std::endl;
 
@@ -170,9 +170,9 @@ int chiSimTest91_PWLD(lua_State* L)
 
   for (const auto& cell : grid.local_cells)
   {
-    const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const size_t num_nodes = cell_mapping.NumNodes();
-    const auto vol_qp_data = cell_mapping.MakeVolumeQuadraturePointData();
+    const auto&  cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes    = cell_mapping.NumNodes();
+    const auto   vol_qp_data  = cell_mapping.MakeVolumeQuadraturePointData();
 
     MatVec3 IntV_shapeI_gradshapeJ(num_nodes, VecVec3(num_nodes,Vec3(0,0,0)));
     MatDbl  IntV_shapeI_shapeJ(num_nodes, VecDbl(num_nodes,0.0));
@@ -411,31 +411,6 @@ int chiSimTest91_PWLD(lua_State* L)
       if (omega.z > 0.0) korder = chi_math::Range<int64_t>(0, Nz);
       else               korder = chi_math::Range<int64_t>(Nz - 1, -1, -1);
 
-//      if ((omega.x >0 and omega.y>0) or
-//          (omega.x <0 and omega.y<0)) continue;
-
-//      {
-//        std::stringstream outstr;
-//        outstr << omega.PrintStr() << " " << weight << "\n";
-//        for (auto i : iorder)
-//          outstr << i << " ";
-//        outstr << "\n";
-//        for (auto i : jorder)
-//          outstr << i << " ";
-//        outstr << "\n";
-//        for (auto i : korder)
-//          outstr << i << " ";
-//
-//        outstr << "\n";
-//        for (auto i: iorder)
-//          for (auto j: jorder)
-//            for (auto k: korder)
-//              outstr
-//              << "[" << i << "," << j << "," << k << "]"
-//              << m_ijk_to_i.MapNDtoLin(i,j,k) << " ";
-//        chi::log.Log() << outstr.str();
-//      }
-
       for (auto i: iorder)
         for (auto j: jorder)
           for (auto k: korder)
@@ -539,6 +514,8 @@ int chiSimTest91_PWLD(lua_State* L)
   );
 
   //============================================= Localize zeroth moment
+  //This routine extracts a single moment vector
+  //from the vector that contains multiple moments
   const chi_math::UnknownManager m0_uk_man(
     {chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups)});
   const size_t num_m0_dofs = sdm.GetNumLocalDOFs(m0_uk_man);

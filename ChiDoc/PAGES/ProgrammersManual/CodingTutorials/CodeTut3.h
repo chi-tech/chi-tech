@@ -170,7 +170,7 @@ With these mathematical formulations defined we can write
  |J(\tilde{\mathbf{x}}_n)|
 \biggr]
  &=
-\sum_c \sum_n^{N_V} b_i(\tilde{\mathbf{x}}_n) q(\tilde{\mathbf{x}}_n \to \mathbf{x}) |J(\tilde{\mathbf{x}}_n)|
+\sum_c \sum_n^{N_V} w_n b_i(\tilde{\mathbf{x}}_n) q(\tilde{\mathbf{x}}_n \to \mathbf{x}) |J(\tilde{\mathbf{x}}_n)|
 \f}
 
 
@@ -262,7 +262,7 @@ equation
  |J(\tilde{\mathbf{x}}_n)|
 \biggr]
  &=
-\sum_c \sum_n^{N_V} b_i(\tilde{\mathbf{x}}_n) q(\tilde{\mathbf{x}}_n \to \mathbf{x}) |J(\tilde{\mathbf{x}}_n)|
+\sum_c \sum_n^{N_V} w_n b_i(\tilde{\mathbf{x}}_n) q(\tilde{\mathbf{x}}_n \to \mathbf{x}) |J(\tilde{\mathbf{x}}_n)|
 \f}
 For which the first portion of the code is
 \code
