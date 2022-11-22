@@ -3,11 +3,12 @@
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "ChiDataTypes/ndarray.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "chi_mpi.h"
-
 
 #include <algorithm>
 
@@ -290,7 +291,34 @@ size_t chi_mesh::MeshContinuum::
 /**Gets and orthogonal mesh interface object.*/
 std::array<size_t,3> chi_mesh::MeshContinuum::GetIJKInfo() const
 {
+  const std::string fname = "GetIJKInfo";
+  if (not (this->Attributes() & MeshAttributes::ORTHOGONAL))
+    throw std::logic_error(fname + " can only be run on orthogonal meshes.");
+
   return {ortho_attributes.Nx,
           ortho_attributes.Ny,
           ortho_attributes.Nz};
+}
+
+//###################################################################
+/**Provides a mapping from cell ijk indices to global ids.*/
+chi_data_types::NDArray<uint64_t> chi_mesh::MeshContinuum::
+  MakeIJKToGlobalIDMapping() const
+{
+  const std::string fname = "MakeIJKToGlobalIDMapping";
+  if (not (this->Attributes() & MeshAttributes::ORTHOGONAL))
+    throw std::logic_error(fname + " can only be run on orthogonal meshes.");
+
+  const auto ijk_info = this->GetIJKInfo();
+  const auto Nx = static_cast<int64_t>(ijk_info[0]);
+  const auto Ny = static_cast<int64_t>(ijk_info[1]);
+  const auto Nz = static_cast<int64_t>(ijk_info[2]);
+
+  chi_data_types::NDArray<uint64_t> m_ijk_to_i({Nx,Ny,Nz});
+  for (int i=0; i<Nx; ++i)
+    for (int j=0; j<Ny; ++j)
+      for (int k=0; k<Nz; ++k)
+        m_ijk_to_i(i,j,k) = static_cast<uint64_t>(m_ijk_to_i.MapNDtoLin(i,j,k));
+
+  return m_ijk_to_i;
 }

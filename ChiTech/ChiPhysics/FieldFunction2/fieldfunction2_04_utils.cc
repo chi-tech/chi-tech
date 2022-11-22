@@ -87,7 +87,7 @@ std::vector<double> chi_physics::FieldFunction2::GetGhostedFieldVector() const
                                         num_globl_dofs,
                                         ghost_ids,
                                         MPI_COMM_WORLD);
-  std::vector<double> field_wg = vgc.MakeGhostedVector(m_field_vector);
+  std::vector<double> field_wg = vgc.MakeGhostedVector(this->FieldVector());
 
   vgc.CommunicateGhostEntries(field_wg);
 

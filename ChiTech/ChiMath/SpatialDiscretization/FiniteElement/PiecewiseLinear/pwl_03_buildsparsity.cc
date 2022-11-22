@@ -1,7 +1,9 @@
 #include "pwl.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 
 //###################################################################

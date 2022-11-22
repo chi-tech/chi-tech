@@ -90,16 +90,10 @@ namespace chi_math
     size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const = 0;
 
     virtual
-    size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const
-    {
-      return 0; //TODO: Remove
-    }
+    size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const = 0;
     virtual
     std::vector<int64_t>
-    GetGhostDOFIndices(const UnknownManager& unknown_manager) const
-    {
-      return {}; //TODO: Remove
-    }
+    GetGhostDOFIndices(const UnknownManager& unknown_manager) const=0;
 
     virtual
     size_t GetCellNumNodes(const chi_mesh::Cell& cell) const = 0;
@@ -107,6 +101,16 @@ namespace chi_math
     virtual
     std::vector<chi_mesh::Vector3>
       GetCellNodeLocations(const chi_mesh::Cell& cell) const = 0;
+
+    std::vector<std::vector<std::vector<int>>>
+    MakeInternalFaceNodeMappings(double tolerance=1.0e-12) const;
+
+    void CopyVectorWithUnknownScope(const std::vector<double>& from_vector,
+                                          std::vector<double>& to_vector,
+                                    const UnknownManager& from_vec_uk_structure,
+                                    unsigned int from_vec_uk_id,
+                                    const UnknownManager& to_vec_uk_structure,
+                                    unsigned int to_vec_uk_id) const;
 
   public:
     /**Develops a localized view of a petsc vector.

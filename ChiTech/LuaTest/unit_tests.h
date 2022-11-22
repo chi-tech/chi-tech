@@ -37,6 +37,8 @@ namespace chi_unit_sim_tests
   int chiSimTest03_PWLC(lua_State* L);
   int chiSimTest04_PWLC(lua_State* L);
 
-  int chiSimTest91_PWLD(lua_State* L);
+  int chiSimTest06_WDD(lua_State* L);
+
+  int chiSimTest91_PWLD(lua_State* in_phi_new);
 }
 #endif //CHITECH_UNIT_TESTS_H

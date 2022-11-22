@@ -4,6 +4,7 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
@@ -234,8 +235,8 @@ int chiSimTest04_PWLC(lua_State* L)
     std::vector<double> nodal_phi(num_nodes,0.0);
     for (size_t j=0; j < num_nodes; ++j)
     {
-      const int64_t imap = sdm.MapDOFLocal(cell, j);
-      nodal_phi[j] = field_wg[imap];
+      const int64_t jmap = sdm.MapDOFLocal(cell, j);
+      nodal_phi[j] = field_wg[jmap];
     }//for j
 
     //======================= Quadrature loop
@@ -247,7 +248,7 @@ int chiSimTest04_PWLC(lua_State* L)
 
       double phi_true = CallLuaXYZFunction("MMS_phi",qp_data.QPointXYZ(qp));
 
-      local_error += std::fabs(phi_true - phi_fem) * qp_data.JxW(qp);
+      local_error += std::pow(phi_true - phi_fem,2.0) * qp_data.JxW(qp);
     }
   }//for cell
 
@@ -257,6 +258,8 @@ int chiSimTest04_PWLC(lua_State* L)
                 1, MPI_DOUBLE,    //count+datatype
                 MPI_SUM,          //operation
                 MPI_COMM_WORLD);  //communicator
+
+  global_error = std::sqrt(global_error);
 
   chi::log.Log() << "Error: " << std::scientific << global_error
                  << " Num-cells: " << grid.GetGlobalNumberOfCells();

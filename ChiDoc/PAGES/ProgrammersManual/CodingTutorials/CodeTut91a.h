@@ -1,33 +1,30 @@
-#include "chi_lua.h"
+/**\page CodeTut91a Coding Tutorial 91a - Discrete Ordinates with PWLD
 
+## Table of contents
+- \ref CodeTut91aSecX
+
+
+\section CodeTut91aSecX The complete program
+\code
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiMath/Quadratures/angular_quadrature_base.h"
-#include "ChiMath/Quadratures/angular_product_quadrature.h"
-#include "ChiMath/chi_math_range.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "ChiMath/PETScUtils/petsc_utils.h"
 
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
-#include "ChiDataTypes/ndarray.h"
+#include "ChiConsole/chi_console.h"
+#include "ChiLua/chi_lua.h"
 
-namespace chi_unit_sim_tests
+int main(int argc, char* argv[])
 {
+  chi::Initialize(argc,argv);
+  chi::RunBatch(argc, argv);
 
-/**PWLD Sweep. */
-int chiSimTest91_PWLD(lua_State* L)
-{
-  const std::string fname = "chiSimTest91_PWLD";
-  const int num_args = lua_gettop(L);
-  chi::log.Log() << "chiSimTest91_PWLD num_args = " << num_args;
-
-  if (chi::mpi.process_count != 1)
-    throw std::logic_error(fname + ": Is serial only.");
+  chi::log.Log() << "Coding Tutorial 91";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -77,7 +74,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
   //============================================= Set/Get params
   const size_t scat_order = 1;
-  const size_t num_groups = 20;
+  const size_t num_groups = 10;
   const int    dimension = (grid.Attributes() & Dim1)? 1 :
                            (grid.Attributes() & Dim2)? 2 :
                            (grid.Attributes() & Dim3)? 3 : 0;
@@ -93,14 +90,15 @@ int chiSimTest91_PWLD(lua_State* L)
   const size_t num_dirs = quadrature->omegas.size();
 
   chi::log.Log() << "End Set/Get params." << std::endl;
-  chi::log.Log() << "Num Moments: " << num_moments << std::endl;
 
   //============================================= Make Unknown Managers
-  const auto VecN = chi_math::UnknownType::VECTOR_N;
-  using Unknown = chi_math::Unknown;
+  std::vector<chi_math::Unknown> phi_uks;
+  for (size_t m=0; m<num_moments; ++m)
+    phi_uks.emplace_back(chi_math::UnknownType::VECTOR_N, num_groups);
 
-  std::vector<Unknown> phi_uks(num_moments, Unknown(VecN, num_groups));
-  std::vector<Unknown> psi_uks(num_dirs,    Unknown(VecN, num_groups));
+  std::vector<chi_math::Unknown> psi_uks;
+  for (size_t d=0; d<num_dirs; ++d)
+    psi_uks.emplace_back(chi_math::UnknownType::VECTOR_N, num_groups);
 
   const chi_math::UnknownManager phi_uk_man(phi_uks);
   const chi_math::UnknownManager psi_uk_man(psi_uks);
@@ -112,7 +110,8 @@ int chiSimTest91_PWLD(lua_State* L)
 
   //============================================= Make XSs
   chi_physics::TransportCrossSections xs;
-  xs.MakeFromCHIxsFile("ChiTest/xs_graphite_pure.cxs");
+  xs.MakeSimple1(num_groups, 0.1, 0.8);
+
 
   //============================================= Initializes vectors
   std::vector<double> phi_old(num_local_phi_dofs,0.0);
@@ -334,7 +333,7 @@ int chiSimTest91_PWLD(lua_State* L)
   };
 
 
-  //============================================= Define sweep for all dirs
+  //============================================= Define sweep
   auto Sweep = [&num_dirs,&quadrature,Nx,Ny,Nz,&SweepChunk,&xs]()
   {
     for (size_t d=0; d<num_dirs; ++d)
@@ -396,51 +395,24 @@ int chiSimTest91_PWLD(lua_State* L)
   };
 
   //============================================= Define L-infinite-norm
-  auto ComputeRelativePWChange = [&grid,&sdm,
-                                  &num_moments,&num_groups,
-                                  &phi_uk_man]
-    (const std::vector<double>& in_phi_new,
-     const std::vector<double>& in_phi_old)
+  auto ComputeLinfNorm = [](const std::vector<double>& new_vec,
+                            const std::vector<double>& old_vec)
   {
     double pw_change = 0.0;
-
-    for (const auto& cell : grid.local_cells)
+    const size_t num_vals = new_vec.size();
+    for (size_t k=0; k<num_vals; ++k)
     {
-      const auto& cell_mapping = sdm.GetCellMapping(cell);
-      const size_t num_nodes = cell_mapping.NumNodes();
+      const double val_new = new_vec[k];
+      const double val_old = old_vec[k];
 
-      for (size_t i=0; i<num_nodes; ++i)
-      {
-        //Get scalar moments
-        const int64_t m0_map = sdm.MapDOFLocal(cell,i,phi_uk_man,0,0);
+      const double delta_val = std::fabs(val_new - val_old);
+      const double max_val = std::max(val_old, val_new);
 
-        const double* phi_new_m0 = &in_phi_new[m0_map];
-        const double* phi_old_m0 = &in_phi_old[m0_map];
-        for (size_t m=0; m<num_moments; ++m)
-        {
-          const int64_t m_map = sdm.MapDOFLocal(cell,i,phi_uk_man,m,0);
-
-          const double* phi_new_m = &in_phi_new[m_map];
-          const double* phi_old_m = &in_phi_old[m_map];
-
-          for (size_t g=0; g<num_groups; ++g)
-          {
-            const double abs_phi_new_g_m0 = std::fabs(phi_new_m0[g]);
-            const double abs_phi_old_g_m0 = std::fabs(phi_old_m0[g]);
-
-            const double max_denominator = std::max(abs_phi_new_g_m0,
-                                                    abs_phi_old_g_m0);
-
-            const double delta_phi = std::fabs(phi_new_m[g] - phi_old_m[g]);
-
-            if (max_denominator >= std::numeric_limits<double>::min())
-              pw_change = std::max(delta_phi/max_denominator,pw_change);
-            else
-              pw_change = std::max(delta_phi,pw_change);
-          }//for g
-        }//for m
-      }//for i
-    }//for cell
+      if (max_val >= std::numeric_limits<double>::min())
+        pw_change = std::max(delta_val/max_val,pw_change);
+      else
+        pw_change = std::max(delta_val,pw_change);
+    }
 
     return pw_change;
   };
@@ -454,7 +426,7 @@ int chiSimTest91_PWLD(lua_State* L)
     SetSource();
     Sweep();
 
-    const double rel_change = ComputeRelativePWChange(phi_new, phi_old);
+    const double rel_change = ComputeLinfNorm(phi_new, phi_old);
 
     std::stringstream outstr;
     outstr << "Iteration " << std::setw(5) << iter << " ";
@@ -472,22 +444,12 @@ int chiSimTest91_PWLD(lua_State* L)
       break;
   }//for iteration
 
-  //============================================= Create Field Functions
-  std::vector<std::shared_ptr<chi_physics::FieldFunction2>> ff_list;
-
-  ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
+  //============================================= Create Field Function
+  auto ff = std::make_shared<chi_physics::FieldFunction2>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
-  ));
-
-  const std::vector<std::string> dim_strings = {"x","y","z"};
-  for (const std::string& dim : dim_strings)
-    ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
-      "J-"+dim,                                        //Text name
-      sdm_ptr,                                         //Spatial Discr.
-      chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
-    ));
+  );
 
   //============================================= Localize zeroth moment
   //This routine extracts a single moment vector
@@ -497,91 +459,28 @@ int chiSimTest91_PWLD(lua_State* L)
   const size_t num_m0_dofs = sdm.GetNumLocalDOFs(m0_uk_man);
 
   std::vector<double> m0_phi(num_m0_dofs, 0.0);
-  std::vector<double> mx_phi(num_m0_dofs, 0.0); //Y(1,1)  - X-component
-  std::vector<double> my_phi(num_m0_dofs, 0.0); //Y(1,-1) - Y-component
-  std::vector<double> mz_phi(num_m0_dofs, 0.0); //Y(1,0)  - Z-component
-
-  sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                 m0_phi,      //to vector
-                                 phi_uk_man,  //from dof-structure
-                                 0,           //from unknown-id
-                                 m0_uk_man,   //to dof-structure
-                                 0);          //to unknown-id
-
-  ff_list[0]->UpdateFieldVector(m0_phi);
-
-  switch (dimension)
+  for (const auto& cell : grid.local_cells)
   {
-    case 1:
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes = cell_mapping.NumNodes();
+
+    for (size_t i=0; i<num_nodes; ++i)
     {
-      if (num_moments >= 2)
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mz_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       1,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-      break;
+      const int64_t m0_map  = sdm.MapDOFLocal(cell,i,m0_uk_man,0,0);
+      const int64_t phi_map = sdm.MapDOFLocal(cell,i,phi_uk_man,0,0);
+
+      for (size_t g=0; g<num_groups; ++g)
+        m0_phi[m0_map + g] = phi_old[phi_map + g];
     }
-    case 2:
-    {
-      if (num_moments >= 3)
-      {
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       my_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       1,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mx_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       2,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-      }
-      chi::log.Log() << "Transferring 2D scoped vectors";
-      break;
-    }
-    case 3:
-    {
-      if (num_moments >= 4)
-      {
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       my_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       1,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mz_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       2,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mx_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       3,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-      }
-      break;
-    }
-    default: throw std::logic_error(fname + ": Dimension error.");
-  }
-  ff_list[1]->UpdateFieldVector(mx_phi);
-  ff_list[2]->UpdateFieldVector(my_phi);
-  ff_list[3]->UpdateFieldVector(mz_phi);
+  }//for cell
 
   //============================================= Update field function
-  chi_physics::FieldFunction2::FFList const_ff_list;
-  for (const auto& ff_ptr : ff_list)
-    const_ff_list.push_back(ff_ptr);
-  chi_physics::FieldFunction2::ExportMultipleToVTK("SimTest_91a_PWLD",
-                                                   const_ff_list);
+  ff->UpdateFieldVector(m0_phi);
+  ff->ExportToVTK("SimTest_91a_PWLD");
 
+  chi::Finalize();
   return 0;
 }
+\endcode
 
-}//namespace chi_unit_tests
+*/

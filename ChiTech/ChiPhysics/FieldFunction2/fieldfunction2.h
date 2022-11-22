@@ -69,8 +69,13 @@ public:
 
   //03 Export VTK
   void ExportToVTK(const std::string& file_base_name) const;
+  typedef std::vector<std::shared_ptr<const FieldFunction2>> FFList;
+  static
+  void ExportMultipleToVTK(const std::string& file_base_name,
+                           const FFList& ff_list);
 
-private:
+protected:
+  //04 Utils
   static void UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
                           const chi_mesh::Cell &cell,
                           int64_t& node_counter,

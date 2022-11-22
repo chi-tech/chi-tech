@@ -6,7 +6,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 #include "ChiMath/chi_math_range.h"
@@ -20,7 +20,7 @@ namespace chi_unit_sim_tests
 {
 
 /**PWLD Sweep. */
-int chiSimTest91_PWLD(lua_State* L)
+int chiSimTest06_WDD(lua_State* L)
 {
   const std::string fname = "chiSimTest91_PWLD";
   const int num_args = lua_gettop(L);
@@ -44,7 +44,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid_ptr);
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_FV::New(grid_ptr);
   const auto& sdm = *sdm_ptr;
 
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
@@ -154,53 +154,53 @@ int chiSimTest91_PWLD(lua_State* L)
   std::vector<MatDbl>    cell_Mmatrices;
   std::vector<VecMatDbl> cell_faceMmatrices;
 
-  for (const auto& cell : grid.local_cells)
-  {
-    const auto&  cell_mapping = sdm.GetCellMapping(cell);
-    const size_t num_nodes    = cell_mapping.NumNodes();
-    const auto   vol_qp_data  = cell_mapping.MakeVolumeQuadraturePointData();
-
-    MatVec3 IntV_shapeI_gradshapeJ(num_nodes, VecVec3(num_nodes,Vec3(0,0,0)));
-    MatDbl  IntV_shapeI_shapeJ(num_nodes, VecDbl(num_nodes,0.0));
-
-    for (unsigned int i = 0; i < num_nodes; ++i)
-      for (unsigned int j = 0; j < num_nodes; ++j)
-        for (const auto& qp : vol_qp_data.QuadraturePointIndices())
-        {
-          IntV_shapeI_gradshapeJ[i][j]
-            += vol_qp_data.ShapeValue(i, qp) *
-               vol_qp_data.ShapeGrad(j, qp) *
-               vol_qp_data.JxW(qp);
-
-          IntV_shapeI_shapeJ[i][j]
-            += vol_qp_data.ShapeValue(i, qp) *
-               vol_qp_data.ShapeValue(j, qp) *
-               vol_qp_data.JxW(qp);
-        }// for qp
-
-    cell_Gmatrices.push_back(std::move(IntV_shapeI_gradshapeJ));
-    cell_Mmatrices.push_back(std::move(IntV_shapeI_shapeJ));
-
-    const size_t num_faces = cell.faces.size();
-    VecMatDbl faces_Mmatrices;
-    for (size_t f=0; f<num_faces; ++f)
-    {
-      const auto face_qp_data = cell_mapping.MakeFaceQuadraturePointData(f);
-      MatDbl IntS_shapeI_shapeJ(num_nodes,VecDbl(num_nodes,0.0));
-      for (unsigned int i = 0; i < num_nodes; ++i)
-        for (unsigned int j = 0; j < num_nodes; ++j)
-          for (const auto& qp : face_qp_data.QuadraturePointIndices())
-            IntS_shapeI_shapeJ[i][j]
-              += face_qp_data.ShapeValue(i, qp) *
-                 face_qp_data.ShapeValue(j, qp) *
-                 face_qp_data.JxW(qp);
-
-      faces_Mmatrices.push_back(std::move(IntS_shapeI_shapeJ));
-    }//for face f
-
-    cell_faceMmatrices.push_back(std::move(faces_Mmatrices));
-
-  }//for cell
+//  for (const auto& cell : grid.local_cells)
+//  {
+//    const auto&  cell_mapping = sdm.GetCellMapping(cell);
+//    const size_t num_nodes    = cell_mapping.NumNodes();
+//    const auto   vol_qp_data  = cell_mapping.MakeVolumeQuadraturePointData();
+//
+//    MatVec3 IntV_shapeI_gradshapeJ(num_nodes, VecVec3(num_nodes,Vec3(0,0,0)));
+//    MatDbl  IntV_shapeI_shapeJ(num_nodes, VecDbl(num_nodes,0.0));
+//
+//    for (unsigned int i = 0; i < num_nodes; ++i)
+//      for (unsigned int j = 0; j < num_nodes; ++j)
+//        for (const auto& qp : vol_qp_data.QuadraturePointIndices())
+//        {
+//          IntV_shapeI_gradshapeJ[i][j]
+//            += vol_qp_data.ShapeValue(i, qp) *
+//               vol_qp_data.ShapeGrad(j, qp) *
+//               vol_qp_data.JxW(qp);
+//
+//          IntV_shapeI_shapeJ[i][j]
+//            += vol_qp_data.ShapeValue(i, qp) *
+//               vol_qp_data.ShapeValue(j, qp) *
+//               vol_qp_data.JxW(qp);
+//        }// for qp
+//
+//    cell_Gmatrices.push_back(std::move(IntV_shapeI_gradshapeJ));
+//    cell_Mmatrices.push_back(std::move(IntV_shapeI_shapeJ));
+//
+//    const size_t num_faces = cell.faces.size();
+//    VecMatDbl faces_Mmatrices;
+//    for (size_t f=0; f<num_faces; ++f)
+//    {
+//      const auto face_qp_data = cell_mapping.MakeFaceQuadraturePointData(f);
+//      MatDbl IntS_shapeI_shapeJ(num_nodes,VecDbl(num_nodes,0.0));
+//      for (unsigned int i = 0; i < num_nodes; ++i)
+//        for (unsigned int j = 0; j < num_nodes; ++j)
+//          for (const auto& qp : face_qp_data.QuadraturePointIndices())
+//            IntS_shapeI_shapeJ[i][j]
+//              += face_qp_data.ShapeValue(i, qp) *
+//                 face_qp_data.ShapeValue(j, qp) *
+//                 face_qp_data.JxW(qp);
+//
+//      faces_Mmatrices.push_back(std::move(IntS_shapeI_shapeJ));
+//    }//for face f
+//
+//    cell_faceMmatrices.push_back(std::move(faces_Mmatrices));
+//
+//  }//for cell
 
   chi::log.Log() << "End cell matrices." << std::endl;
 

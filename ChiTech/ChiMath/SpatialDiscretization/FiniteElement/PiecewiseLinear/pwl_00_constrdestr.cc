@@ -2,6 +2,7 @@
 
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "ChiTimer/chi_timer.h"
@@ -14,14 +15,9 @@ chi_math::SpatialDiscretization_PWLD::
                              chi_math::finite_element::SetupFlags setup_flags,
                              chi_math::QuadratureOrder qorder,
                              chi_math::CoordinateSystemType in_cs_type) :
-  SpatialDiscretization_FE(in_grid, in_cs_type,
-                           SDMType::PIECEWISE_LINEAR_DISCONTINUOUS,
-                           setup_flags),
-  line_quad_order_arbitrary(qorder),
-  tri_quad_order_arbitrary(qorder),
-  quad_quad_order_arbitrary(qorder),
-  tet_quad_order_arbitrary(qorder),
-  hex_quad_order_arbitrary(qorder)
+  SpatialDiscretization_PWLBase(in_grid, setup_flags, qorder,
+                                SDMType::PIECEWISE_LINEAR_DISCONTINUOUS,
+                                in_cs_type)
 {
   chi::log.Log() << chi::program_timer.GetTimeString()
                 << " Creating Piecewise Linear Discontinuous "
@@ -32,7 +28,7 @@ chi_math::SpatialDiscretization_PWLD::
 
   if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
   {
-    int qorder_min = static_cast<int>(chi_math::QuadratureOrder::INVALID_ORDER);
+    int qorder_min;
     switch (cs_type)
     {
       case chi_math::CoordinateSystemType::CARTESIAN:
@@ -78,12 +74,6 @@ chi_math::SpatialDiscretization_PWLD::
         << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
         << "static_cast<int>(tet_quad_order_arbitrary.order) < "
         << qorder_min << ".";
-
-    if (static_cast<int>(hex_quad_order_arbitrary.order) < qorder_min)
-      chi::log.LogAllWarning()
-        << "SpatialDiscretization_PWLD::SpatialDiscretization_PWLD : "
-        << "static_cast<int>(hex_quad_order_arbitrary.order) < "
-        << qorder_min << ".";
   }
 
   CreateCellMappings();
@@ -98,3 +88,20 @@ chi_math::SpatialDiscretization_PWLD::
                    "Finite Element spatial discretizaiton.";
 }
 
+
+//###################################################################
+/**Construct a shared object using the protected constructor.*/
+std::shared_ptr<chi_math::SpatialDiscretization_PWLD>
+chi_math::SpatialDiscretization_PWLD::
+  New(chi_mesh::MeshContinuumPtr& in_grid,
+      finite_element::SetupFlags setup_flags/*=finite_element::NO_FLAGS_SET*/,
+      QuadratureOrder qorder/*=QuadratureOrder::SECOND*/,
+      CoordinateSystemType in_cs_type/*=CoordinateSystemType::CARTESIAN*/)
+
+{
+  if (in_grid == nullptr)
+    throw std::invalid_argument(
+      "Null supplied as grid to SpatialDiscretization_PWLD.");
+  return std::shared_ptr<SpatialDiscretization_PWLD>(
+    new SpatialDiscretization_PWLD(in_grid, setup_flags, qorder, in_cs_type));
+}

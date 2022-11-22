@@ -105,14 +105,14 @@ for (size_t qp : qp_data.QuadraturePointIndices())
 The Method of Manufactured Solution (MMS) is often used to verify the rate of
 convergence of computational methods. In order to determine magnitude of the
 error of the FEM solution, \f$ \phi_{FEM} \f$, compared to the MS,
-\f$ \phi_{MMS} \f$, we need to evaluate the following
+\f$ \phi_{MMS} \f$, we need to evaluate the following norm
 \f[
-\int_V |e| dV = \int_V \biggr| \phi_{MMS}(\mathbf{x}) - \phi_{FEM}(\mathbf{x})\biggr| dV
+||e||_2 = \sqrt{\int_V \biggr( \phi_{MMS}(\mathbf{x}) - \phi_{FEM}(\mathbf{x})\biggr)^2 dV}
 \f]
 We again here use the quadrature rules to obtain this integral as
 \f[
-\int_V |e| dV = \sum_c \sum_n^{N_V}
-w_n \biggr| \phi_{MMS}(\mathbf{x}_n) - \phi_{FEM}(\tilde{\mathbf{x}}_n)\biggr| \ | J(\tilde{\mathbf{x}}_n |
+\int_V \biggr( \phi_{MMS}(\mathbf{x}) - \phi_{FEM}(\mathbf{x})\biggr)^2 dV = \sum_c \sum_n^{N_V}
+w_n \biggr( \phi_{MMS}(\mathbf{x}_n) - \phi_{FEM}(\tilde{\mathbf{x}}_n)\biggr)^2 \ | J(\tilde{\mathbf{x}}_n |
 \f]
 for which we use the code
 \code
@@ -144,7 +144,7 @@ for (const auto& cell : grid.local_cells)
 
     double phi_true = CallLuaXYZFunction("MMS_phi",qp_data.QPointXYZ(qp));
 
-    local_error += std::fabs(phi_true - phi_fem) * qp_data.JxW(qp);
+    local_error += std::pow(phi_true - phi_fem,2.0) * qp_data.JxW(qp);
   }
 }//for cell
 
@@ -154,6 +154,8 @@ MPI_Allreduce(&local_error,     //sendbuf
               1, MPI_DOUBLE,    //count+datatype
               MPI_SUM,          //operation
               MPI_COMM_WORLD);  //communicator
+
+global_error = std::sqrt(global_error);
 
 chi::log.Log() << "Error: " << std::scientific << global_error
                << " Num-cells: " << grid.GetGlobalNumberOfCells();
@@ -181,16 +183,36 @@ MPI_Allreduce(&local_error,     //sendbuf
               1, MPI_DOUBLE,    //count+datatype
               MPI_SUM,          //operation
               MPI_COMM_WORLD);  //communicator
+
+global_error = std::sqrt(global_error);
 \endcode
 
-With this code in-place we can run the program several times with different amount
-cells, which provides us with the data below:
+With this code in-place we can run the program several times with a different
+amount of cells, which provides us with the data below:
 
 \image html CodingTutorials/Tut4_OrderOfConv.png width=700px
 
 \section CodeTut4SecX The complete program
 \code
-chi::log.Log() << "Coding Tutorial 4";
+#include "chi_runtime.h"
+#include "chi_log.h"
+
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+
+#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "ChiMath/PETScUtils/petsc_utils.h"
+
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+
+#include "ChiConsole/chi_console.h"
+#include "ChiLua/chi_lua.h"
+
+int main(int argc, char* argv[])
+{
+  chi::Initialize(argc,argv);
+  chi::RunBatch(argc, argv);
+
+  chi::log.Log() << "Coding Tutorial 4";
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -406,8 +428,8 @@ chi::log.Log() << "Coding Tutorial 4";
     std::vector<double> nodal_phi(num_nodes,0.0);
     for (size_t j=0; j < num_nodes; ++j)
     {
-      const int64_t imap = sdm.MapDOFLocal(cell, j);
-      nodal_phi[j] = field_wg[imap];
+      const int64_t jmap = sdm.MapDOFLocal(cell, j);
+      nodal_phi[j] = field_wg[jmap];
     }//for j
 
     //======================= Quadrature loop
@@ -419,7 +441,7 @@ chi::log.Log() << "Coding Tutorial 4";
 
       double phi_true = CallLuaXYZFunction("MMS_phi",qp_data.QPointXYZ(qp));
 
-      local_error += std::fabs(phi_true - phi_fem) * qp_data.JxW(qp);
+      local_error += std::pow(phi_true - phi_fem,2.0) * qp_data.JxW(qp);
     }
   }//for cell
 
@@ -429,6 +451,8 @@ chi::log.Log() << "Coding Tutorial 4";
                 1, MPI_DOUBLE,    //count+datatype
                 MPI_SUM,          //operation
                 MPI_COMM_WORLD);  //communicator
+
+  global_error = std::sqrt(global_error);
 
   chi::log.Log() << "Error: " << std::scientific << global_error
                  << " Num-cells: " << grid.GetGlobalNumberOfCells();

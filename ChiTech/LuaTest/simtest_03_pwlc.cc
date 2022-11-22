@@ -4,6 +4,7 @@
 #include "chi_log.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"

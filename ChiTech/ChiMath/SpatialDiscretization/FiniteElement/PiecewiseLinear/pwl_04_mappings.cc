@@ -1,7 +1,6 @@
 #include "pwl.h"
 
 #include "chi_log.h"
-
 #include "chi_mpi.h"
 
 #define sc_int64 static_cast<int64_t>

@@ -35,7 +35,6 @@ namespace chi_math
     QPDataVol  scratch_vol_qp_data;
     QPDataFace scratch_face_qp_data;
 
-
     const finite_element::SetupFlags setup_flags;
 
 

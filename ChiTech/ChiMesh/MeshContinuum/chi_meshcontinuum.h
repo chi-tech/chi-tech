@@ -11,6 +11,12 @@
 
 #include "chi_mpi.h"
 
+namespace chi_data_types
+{
+  template<typename T>
+  class NDArray;
+}//namespace chi_data_types
+
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
@@ -111,6 +117,7 @@ public:
   MeshAttributes Attributes() const {return attributes;}
 
   std::array<size_t,3> GetIJKInfo() const;
+  chi_data_types::NDArray<uint64_t> MakeIJKToGlobalIDMapping() const;
 
 private:
   friend class chi_mesh::VolumeMesher;
