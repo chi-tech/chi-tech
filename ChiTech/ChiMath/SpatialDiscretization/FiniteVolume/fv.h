@@ -37,7 +37,7 @@ public:
   void CreateCellMappings();
 
   //02 node ordering
-private:
+protected:
   void OrderNodes();
 
   //03 sparsity

@@ -33,6 +33,49 @@ namespace chi_math
     void PreComputeNeighborCellSDValues();
 
     void CreateCellMappings();
+
+    //02
+    //Child specialized:
+    //OrderNodes
+
+    //03
+    //Child specialized:
+    //BuildSparsityPattern
+
+    //04
+    //Child specialized:
+    //MapDOF
+    //MapDOFLocal
+
+    //05
+  public:
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) const override;
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const override;
+
+    //Child Specialized:
+    //GetNumGhostDOFs
+    //GetGhostDOFIndices
+
+    size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override;
+
+    std::vector<chi_mesh::Vector3>
+    GetCellNodeLocations(const chi_mesh::Cell& cell) const override;
+
+    void LocalizePETScVector(Vec petsc_vector,
+                             std::vector<double>& local_vector,
+                             const UnknownManager& unknown_manager)
+    const override;
+
+    //FE-utils
+    const finite_element::UnitIntegralData&
+    GetUnitIntegrals(const chi_mesh::Cell& cell) override;
+
+    const finite_element::InternalQuadraturePointData&
+    GetQPData_Volumetric(const chi_mesh::Cell& cell) override;
+
+    const finite_element::FaceQuadraturePointData&
+    GetQPData_Surface(const chi_mesh::Cell& cell,
+                      unsigned int face_index) override;
   };
 
 }//namespace chi_math

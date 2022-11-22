@@ -1,15 +1,8 @@
 #ifndef SPATIAL_DISCRETIZATION_PWLC_H
 #define SPATIAL_DISCRETIZATION_PWLC_H
 
-//#include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
 #include "pwl_base.h"
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
-
-#include "ChiMath/Quadratures/quadrature_line.h"
-#include "ChiMath/Quadratures/quadrature_triangle.h"
-#include "ChiMath/Quadratures/quadrature_quadrilateral.h"
-#include "ChiMath/Quadratures/quadrature_tetrahedron.h"
-#include "ChiMath/Quadratures/quadrature_hexahedron.h"
 
 //######################################################### Class def
 namespace chi_math
@@ -23,9 +16,6 @@ namespace chi_math
   protected:
     std::map<uint64_t, int64_t> node_mapping;
     std::map<uint64_t, int64_t> m_ghost_node_mapping;
-
-  //  std::vector<int> cell_local_block_address;
-  //  std::vector<std::pair<int,int>> neighbor_cell_block_address;
 
   private:
     //00
@@ -44,14 +34,13 @@ namespace chi_math
         QuadratureOrder qorder = QuadratureOrder::SECOND,
         CoordinateSystemType in_cs_type = CoordinateSystemType::CARTESIAN);
 
-//    //01
-//  public:
-//    void PreComputeCellSDValues();
-//    void PreComputeNeighborCellSDValues();
-//
-//    void CreateCellMappings();
+    //01
+    //Inherited from PWLBase:
+    //PreComputeCellSDValues
+    //PreComputeNeighborCellSDValues
+    //CreateCellMappings
 
-  private:
+  protected:
     //02
     void OrderNodes();
 
@@ -79,32 +68,21 @@ namespace chi_math
     { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
     //05
-    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) const override;
-    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const override;
+    //Inherited from PWLBase:
+    //GetNumLocalDOFs
+    //GetNumGlobalDOFs
+
     size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const override;
     std::vector<int64_t>
     GetGhostDOFIndices(const UnknownManager& unknown_manager) const override;
 
-    size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override;
-
-    std::vector<chi_mesh::Vector3>
-    GetCellNodeLocations(const chi_mesh::Cell& cell) const override;
-
-    void LocalizePETScVector(Vec petsc_vector,
-                             std::vector<double>& local_vector,
-                             const UnknownManager& unknown_manager)
-                             const override;
-
-    //FE-utils
-    const finite_element::UnitIntegralData&
-    GetUnitIntegrals(const chi_mesh::Cell& cell) override;
-
-    const finite_element::InternalQuadraturePointData&
-    GetQPData_Volumetric(const chi_mesh::Cell& cell) override;
-
-    const finite_element::FaceQuadraturePointData&
-    GetQPData_Surface(const chi_mesh::Cell& cell,
-                      unsigned int face_index) override;
+    //Inherited from PWLBase:
+    //GetCellNumNodes
+    //GetCellNodeLocations
+    //LocalizePETScVector
+    //GetUnitIntegrals
+    //GetQPData_Volumetric
+    //GetQPData_Surface
   };
 }
 
