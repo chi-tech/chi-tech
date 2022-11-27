@@ -24,7 +24,10 @@ int main(int argc, char* argv[])
   chi::Initialize(argc,argv);
   chi::RunBatch(argc, argv);
 
-  chi::log.Log() << "Coding Tutorial 91";
+  const std::string fname = "Tutorial_07";
+
+  if (chi::mpi.process_count != 1)
+    throw std::logic_error(fname + ": Is serial only.");
 
   //============================================= Get grid
   auto grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
@@ -34,10 +37,21 @@ int main(int argc, char* argv[])
 
   //============================================= Make Orthogonal mapping
   const auto ijk_info = grid.GetIJKInfo();
+  const auto& ijk_mapping = grid.MakeIJKToGlobalIDMapping();
+
+
   const auto Nx = static_cast<int64_t>(ijk_info[0]);
   const auto Ny = static_cast<int64_t>(ijk_info[1]);
   const auto Nz = static_cast<int64_t>(ijk_info[2]);
-  const auto& ijk_mapping = grid.MakeIJKToGlobalIDMapping();
+
+  const auto Dim1 = chi_mesh::DIMENSION_1;
+  const auto Dim2 = chi_mesh::DIMENSION_2;
+  const auto Dim3 = chi_mesh::DIMENSION_3;
+
+  int    dimension = 0;
+  if (grid.Attributes() & Dim1) dimension = 1;
+  if (grid.Attributes() & Dim2) dimension = 2;
+  if (grid.Attributes() & Dim3) dimension = 3;
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
@@ -53,19 +67,15 @@ int main(int argc, char* argv[])
   chi::log.Log() << "Num globl nodes: " << num_globl_nodes;
 
   //============================================= Make an angular quadrature
-  const auto Dim1 = chi_mesh::DIMENSION_1;
-  const auto Dim2 = chi_mesh::DIMENSION_2;
-  const auto Dim3 = chi_mesh::DIMENSION_3;
-
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
-  if (grid.Attributes() & Dim1)
+  if (dimension == 1)
     quadrature = std::make_shared<chi_math::AngularQuadratureProdGL>(8);
-  else if (grid.Attributes() & Dim2)
+  else if (dimension == 2)
   {
     quadrature = std::make_shared<chi_math::AngularQuadratureProdGLC>(8,8);
     quadrature->OptimizeForPolarSymmetry(4.0*M_PI);
   }
-  else if (grid.Attributes() & Dim3)
+  else if (dimension == 3)
     quadrature = std::make_shared<chi_math::AngularQuadratureProdGLC>(8,8);
   else
     throw std::logic_error(fname + "Error with the dimensionality "
@@ -74,10 +84,7 @@ int main(int argc, char* argv[])
 
   //============================================= Set/Get params
   const size_t scat_order = 1;
-  const size_t num_groups = 10;
-  const int    dimension = (grid.Attributes() & Dim1)? 1 :
-                           (grid.Attributes() & Dim2)? 2 :
-                           (grid.Attributes() & Dim3)? 3 : 0;
+  const size_t num_groups = 20;
 
   quadrature->BuildMomentToDiscreteOperator(scat_order,dimension);
   quadrature->BuildDiscreteToMomentOperator(scat_order,dimension);
@@ -90,15 +97,14 @@ int main(int argc, char* argv[])
   const size_t num_dirs = quadrature->omegas.size();
 
   chi::log.Log() << "End Set/Get params." << std::endl;
+  chi::log.Log() << "Num Moments: " << num_moments << std::endl;
 
   //============================================= Make Unknown Managers
-  std::vector<chi_math::Unknown> phi_uks;
-  for (size_t m=0; m<num_moments; ++m)
-    phi_uks.emplace_back(chi_math::UnknownType::VECTOR_N, num_groups);
+  const auto VecN = chi_math::UnknownType::VECTOR_N;
+  using Unknown = chi_math::Unknown;
 
-  std::vector<chi_math::Unknown> psi_uks;
-  for (size_t d=0; d<num_dirs; ++d)
-    psi_uks.emplace_back(chi_math::UnknownType::VECTOR_N, num_groups);
+  std::vector<Unknown> phi_uks(num_moments, Unknown(VecN, num_groups));
+  std::vector<Unknown> psi_uks(num_dirs,    Unknown(VecN, num_groups));
 
   const chi_math::UnknownManager phi_uk_man(phi_uks);
   const chi_math::UnknownManager psi_uk_man(psi_uks);
@@ -110,8 +116,7 @@ int main(int argc, char* argv[])
 
   //============================================= Make XSs
   chi_physics::TransportCrossSections xs;
-  xs.MakeSimple1(num_groups, 0.1, 0.8);
-
+  xs.MakeFromCHIxsFile("ChiTest/xs_graphite_pure.cxs");
 
   //============================================= Initializes vectors
   std::vector<double> phi_old(num_local_phi_dofs,0.0);
@@ -122,7 +127,7 @@ int main(int argc, char* argv[])
 
   chi::log.Log() << "End vectors." << std::endl;
 
-  //============================================= Make source term
+  //============================================= Make material source term
   for (const auto& cell : grid.local_cells)
   {
     const auto& cc = cell.centroid;
@@ -333,7 +338,7 @@ int main(int argc, char* argv[])
   };
 
 
-  //============================================= Define sweep
+  //============================================= Define sweep for all dirs
   auto Sweep = [&num_dirs,&quadrature,Nx,Ny,Nz,&SweepChunk,&xs]()
   {
     for (size_t d=0; d<num_dirs; ++d)
@@ -395,24 +400,51 @@ int main(int argc, char* argv[])
   };
 
   //============================================= Define L-infinite-norm
-  auto ComputeLinfNorm = [](const std::vector<double>& new_vec,
-                            const std::vector<double>& old_vec)
+  auto ComputeRelativePWChange = [&grid,&sdm,
+                                  &num_moments,
+                                  &phi_uk_man]
+    (const std::vector<double>& in_phi_new,
+     const std::vector<double>& in_phi_old)
   {
     double pw_change = 0.0;
-    const size_t num_vals = new_vec.size();
-    for (size_t k=0; k<num_vals; ++k)
+
+    for (const auto& cell : grid.local_cells)
     {
-      const double val_new = new_vec[k];
-      const double val_old = old_vec[k];
+      const auto& cell_mapping = sdm.GetCellMapping(cell);
+      const size_t num_nodes = cell_mapping.NumNodes();
 
-      const double delta_val = std::fabs(val_new - val_old);
-      const double max_val = std::max(val_old, val_new);
+      for (size_t i=0; i<num_nodes; ++i)
+      {
+        //Get scalar moments
+        const int64_t m0_map = sdm.MapDOFLocal(cell,i,phi_uk_man,0,0);
 
-      if (max_val >= std::numeric_limits<double>::min())
-        pw_change = std::max(delta_val/max_val,pw_change);
-      else
-        pw_change = std::max(delta_val,pw_change);
-    }
+        const double* phi_new_m0 = &in_phi_new[m0_map];
+        const double* phi_old_m0 = &in_phi_old[m0_map];
+        for (size_t m=0; m<num_moments; ++m)
+        {
+          const int64_t m_map = sdm.MapDOFLocal(cell,i,phi_uk_man,m,0);
+
+          const double* phi_new_m = &in_phi_new[m_map];
+          const double* phi_old_m = &in_phi_old[m_map];
+
+          for (size_t g=0; g<num_groups; ++g)
+          {
+            const double abs_phi_new_g_m0 = std::fabs(phi_new_m0[g]);
+            const double abs_phi_old_g_m0 = std::fabs(phi_old_m0[g]);
+
+            const double max_denominator = std::max(abs_phi_new_g_m0,
+                                                    abs_phi_old_g_m0);
+
+            const double delta_phi = std::fabs(phi_new_m[g] - phi_old_m[g]);
+
+            if (max_denominator >= std::numeric_limits<double>::min())
+              pw_change = std::max(delta_phi/max_denominator,pw_change);
+            else
+              pw_change = std::max(delta_phi,pw_change);
+          }//for g
+        }//for m
+      }//for i
+    }//for cell
 
     return pw_change;
   };
@@ -426,7 +458,7 @@ int main(int argc, char* argv[])
     SetSource();
     Sweep();
 
-    const double rel_change = ComputeLinfNorm(phi_new, phi_old);
+    const double rel_change = ComputeRelativePWChange(phi_new, phi_old);
 
     std::stringstream outstr;
     outstr << "Iteration " << std::setw(5) << iter << " ";
@@ -444,12 +476,22 @@ int main(int argc, char* argv[])
       break;
   }//for iteration
 
-  //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+  //============================================= Create Field Functions
+  std::vector<std::shared_ptr<chi_physics::FieldFunction2>> ff_list;
+
+  ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
-  );
+  ));
+
+  const std::vector<std::string> dim_strings = {"x","y","z"};
+  for (const std::string& dim : dim_strings)
+    ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
+      "J-"+dim,                                        //Text name
+      sdm_ptr,                                         //Spatial Discr.
+      chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
+    ));
 
   //============================================= Localize zeroth moment
   //This routine extracts a single moment vector
@@ -459,24 +501,42 @@ int main(int argc, char* argv[])
   const size_t num_m0_dofs = sdm.GetNumLocalDOFs(m0_uk_man);
 
   std::vector<double> m0_phi(num_m0_dofs, 0.0);
-  for (const auto& cell : grid.local_cells)
-  {
-    const auto& cell_mapping = sdm.GetCellMapping(cell);
-    const size_t num_nodes = cell_mapping.NumNodes();
+  std::vector<double> mx_phi(num_m0_dofs, 0.0); //Y(1,1)  - X-component
+  std::vector<double> my_phi(num_m0_dofs, 0.0); //Y(1,-1) - Y-component
+  std::vector<double> mz_phi(num_m0_dofs, 0.0); //Y(1,0)  - Z-component
 
-    for (size_t i=0; i<num_nodes; ++i)
-    {
-      const int64_t m0_map  = sdm.MapDOFLocal(cell,i,m0_uk_man,0,0);
-      const int64_t phi_map = sdm.MapDOFLocal(cell,i,phi_uk_man,0,0);
+  sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
+                                 m0_phi,      //to vector
+                                 phi_uk_man,  //from dof-structure
+                                 0,           //from unknown-id
+                                 m0_uk_man,   //to dof-structure
+                                 0);          //to unknown-id
 
-      for (size_t g=0; g<num_groups; ++g)
-        m0_phi[m0_map + g] = phi_old[phi_map + g];
-    }
-  }//for cell
+  ff_list[0]->UpdateFieldVector(m0_phi);
+
+  std::array<unsigned int,3> j_map = {0,0,0};
+  if (dimension == 1 and num_moments >= 2) j_map = {0,0,1};
+  if (dimension == 2 and num_moments >= 3) j_map = {2,1,0};
+  if (dimension == 3 and num_moments >= 4) j_map = {3,1,2};
+
+  sdm.CopyVectorWithUnknownScope(
+    phi_old, mx_phi, phi_uk_man, j_map[0], m0_uk_man, 0);
+  sdm.CopyVectorWithUnknownScope(
+    phi_old, my_phi, phi_uk_man, j_map[1], m0_uk_man, 0);
+  sdm.CopyVectorWithUnknownScope(
+    phi_old, mz_phi, phi_uk_man, j_map[2], m0_uk_man, 0);
+
+  ff_list[1]->UpdateFieldVector(mx_phi);
+  ff_list[2]->UpdateFieldVector(my_phi);
+  ff_list[3]->UpdateFieldVector(mz_phi);
+
 
   //============================================= Update field function
-  ff->UpdateFieldVector(m0_phi);
-  ff->ExportToVTK("SimTest_91a_PWLD");
+  chi_physics::FieldFunction2::FFList const_ff_list;
+  for (const auto& ff_ptr : ff_list)
+    const_ff_list.push_back(ff_ptr);
+  chi_physics::FieldFunction2::ExportMultipleToVTK("SimTest_91a_PWLD",
+                                                   const_ff_list);
 
   chi::Finalize();
   return 0;

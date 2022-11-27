@@ -37,10 +37,21 @@ int chiSimTest91_PWLD(lua_State* L)
 
   //============================================= Make Orthogonal mapping
   const auto ijk_info = grid.GetIJKInfo();
+  const auto& ijk_mapping = grid.MakeIJKToGlobalIDMapping();
+
+
   const auto Nx = static_cast<int64_t>(ijk_info[0]);
   const auto Ny = static_cast<int64_t>(ijk_info[1]);
   const auto Nz = static_cast<int64_t>(ijk_info[2]);
-  const auto& ijk_mapping = grid.MakeIJKToGlobalIDMapping();
+
+  const auto Dim1 = chi_mesh::DIMENSION_1;
+  const auto Dim2 = chi_mesh::DIMENSION_2;
+  const auto Dim3 = chi_mesh::DIMENSION_3;
+
+  int    dimension = 0;
+  if (grid.Attributes() & Dim1) dimension = 1;
+  if (grid.Attributes() & Dim2) dimension = 2;
+  if (grid.Attributes() & Dim3) dimension = 3;
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
@@ -56,19 +67,15 @@ int chiSimTest91_PWLD(lua_State* L)
   chi::log.Log() << "Num globl nodes: " << num_globl_nodes;
 
   //============================================= Make an angular quadrature
-  const auto Dim1 = chi_mesh::DIMENSION_1;
-  const auto Dim2 = chi_mesh::DIMENSION_2;
-  const auto Dim3 = chi_mesh::DIMENSION_3;
-
   std::shared_ptr<chi_math::AngularQuadrature> quadrature;
-  if (grid.Attributes() & Dim1)
+  if (dimension == 1)
     quadrature = std::make_shared<chi_math::AngularQuadratureProdGL>(8);
-  else if (grid.Attributes() & Dim2)
+  else if (dimension == 2)
   {
     quadrature = std::make_shared<chi_math::AngularQuadratureProdGLC>(8,8);
     quadrature->OptimizeForPolarSymmetry(4.0*M_PI);
   }
-  else if (grid.Attributes() & Dim3)
+  else if (dimension == 3)
     quadrature = std::make_shared<chi_math::AngularQuadratureProdGLC>(8,8);
   else
     throw std::logic_error(fname + "Error with the dimensionality "
@@ -78,9 +85,6 @@ int chiSimTest91_PWLD(lua_State* L)
   //============================================= Set/Get params
   const size_t scat_order = 1;
   const size_t num_groups = 20;
-  const int    dimension = (grid.Attributes() & Dim1)? 1 :
-                           (grid.Attributes() & Dim2)? 2 :
-                           (grid.Attributes() & Dim3)? 3 : 0;
 
   quadrature->BuildMomentToDiscreteOperator(scat_order,dimension);
   quadrature->BuildDiscreteToMomentOperator(scat_order,dimension);
@@ -123,7 +127,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
   chi::log.Log() << "End vectors." << std::endl;
 
-  //============================================= Make source term
+  //============================================= Make material source term
   for (const auto& cell : grid.local_cells)
   {
     const auto& cc = cell.centroid;
@@ -397,7 +401,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
   //============================================= Define L-infinite-norm
   auto ComputeRelativePWChange = [&grid,&sdm,
-                                  &num_moments,&num_groups,
+                                  &num_moments,
                                   &phi_uk_man]
     (const std::vector<double>& in_phi_new,
      const std::vector<double>& in_phi_old)
@@ -510,69 +514,22 @@ int chiSimTest91_PWLD(lua_State* L)
 
   ff_list[0]->UpdateFieldVector(m0_phi);
 
-  switch (dimension)
-  {
-    case 1:
-    {
-      if (num_moments >= 2)
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mz_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       1,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-      break;
-    }
-    case 2:
-    {
-      if (num_moments >= 3)
-      {
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       my_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       1,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mx_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       2,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-      }
-      chi::log.Log() << "Transferring 2D scoped vectors";
-      break;
-    }
-    case 3:
-    {
-      if (num_moments >= 4)
-      {
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       my_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       1,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mz_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       2,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-        sdm.CopyVectorWithUnknownScope(phi_old,     //from vector
-                                       mx_phi,      //to vector
-                                       phi_uk_man,  //from dof-structure
-                                       3,           //from unknown-id
-                                       m0_uk_man,   //to dof-structure
-                                       0);          //to unknown-id
-      }
-      break;
-    }
-    default: throw std::logic_error(fname + ": Dimension error.");
-  }
+  std::array<unsigned int,3> j_map = {0,0,0};
+  if (dimension == 1 and num_moments >= 2) j_map = {0,0,1};
+  if (dimension == 2 and num_moments >= 3) j_map = {2,1,0};
+  if (dimension == 3 and num_moments >= 4) j_map = {3,1,2};
+
+  sdm.CopyVectorWithUnknownScope(
+    phi_old, mx_phi, phi_uk_man, j_map[0], m0_uk_man, 0);
+  sdm.CopyVectorWithUnknownScope(
+    phi_old, my_phi, phi_uk_man, j_map[1], m0_uk_man, 0);
+  sdm.CopyVectorWithUnknownScope(
+    phi_old, mz_phi, phi_uk_man, j_map[2], m0_uk_man, 0);
+
   ff_list[1]->UpdateFieldVector(mx_phi);
   ff_list[2]->UpdateFieldVector(my_phi);
   ff_list[3]->UpdateFieldVector(mz_phi);
+
 
   //============================================= Update field function
   chi_physics::FieldFunction2::FFList const_ff_list;

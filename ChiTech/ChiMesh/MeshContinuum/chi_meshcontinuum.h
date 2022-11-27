@@ -118,6 +118,7 @@ public:
 
   std::array<size_t,3> GetIJKInfo() const;
   chi_data_types::NDArray<uint64_t> MakeIJKToGlobalIDMapping() const;
+  std::vector<chi_mesh::Vector3> MakeCellOrthoSizes() const;
 
 private:
   friend class chi_mesh::VolumeMesher;

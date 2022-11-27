@@ -322,3 +322,33 @@ chi_data_types::NDArray<uint64_t> chi_mesh::MeshContinuum::
 
   return m_ijk_to_i;
 }
+
+//###################################################################
+/**Determines the bounding box size of each cell and returns it as
+ * a list of 3-component vectors, one Vec3 for each cell.*/
+std::vector<chi_mesh::Vector3> chi_mesh::MeshContinuum::
+  MakeCellOrthoSizes() const
+{
+  std::vector<chi_mesh::Vector3> cell_ortho_sizes(local_cells.size());
+  for (const auto& cell : local_cells)
+  {
+    chi_mesh::Vector3 vmin = vertices[cell.vertex_ids.front()];
+    chi_mesh::Vector3 vmax = vmin;
+
+    for (const auto vid : cell.vertex_ids)
+    {
+      const auto& vertex = vertices[vid];
+      vmin.x = std::min(vertex.x,vmin.x);
+      vmin.y = std::min(vertex.y,vmin.y);
+      vmin.z = std::min(vertex.z,vmin.z);
+
+      vmax.x = std::max(vertex.x,vmax.x);
+      vmax.y = std::max(vertex.y,vmax.y);
+      vmax.z = std::max(vertex.z,vmax.z);
+    }
+
+    cell_ortho_sizes[cell.local_id] = vmax-vmin;
+  }//for cell
+
+  return cell_ortho_sizes;
+}
