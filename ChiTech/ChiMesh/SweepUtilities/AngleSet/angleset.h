@@ -66,7 +66,7 @@ public:
              ExecutionPermission permission = ExecutionPermission::EXECUTE);
   AngleSetStatus FlushSendBuffers();
   void ResetSweepBuffers();
-  void ReceiveDelayedData(int angle_set_num);
+  bool ReceiveDelayedData(size_t angle_set_num);
 
   double* PsiBndry(uint64_t bndry_map,
                    int angle_num,

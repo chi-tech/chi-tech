@@ -135,14 +135,15 @@ void lbs::SteadySolver::InitializePointSources()
     {
       if (CheckPointInsideCell(cell, *grid, p))
       {
-        const auto& cell_view = pwld->GetCellMappingFE(cell.local_id);
+//        const auto& cell_view = pwld->GetCellMappingFE(cell.local_id);
+        const auto& cell_view = pwld->GetCellMapping(cell);
         const auto& fe_values = pwld->GetUnitIntegrals(cell);
         const auto& M = fe_values.GetIntV_shapeI_shapeJ();
         const auto& I = fe_values.GetIntV_shapeI();
 
         std::vector<double> shape_values;
-        cell_view->ShapeValues(point_source.Location(),
-                               shape_values/**ByRef*/);
+        cell_view.ShapeValues(point_source.Location(),
+                              shape_values/**ByRef*/);
 
         const auto M_inv = chi_math::Inverse(M);
 

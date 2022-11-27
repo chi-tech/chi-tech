@@ -34,7 +34,7 @@ ClassicRichardson(LBSGroupset& groupset,
   std::vector<double> init_q_moments_local = q_moments_local;
 
   //================================================== Sweep chunk settings
-  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+  auto& sweep_chunk = sweep_scheduler.GetSweepChunk();
   bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);

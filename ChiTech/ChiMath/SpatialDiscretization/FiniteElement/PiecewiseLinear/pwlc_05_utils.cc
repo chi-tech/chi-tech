@@ -1,61 +1,63 @@
 #include "pwlc.h"
 
-#include "ChiMath/PETScUtils/petsc_utils.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
+#define sc_int64 static_cast<int64_t>
 
 //###################################################################
-/**Get the number of local degrees-of-freedom.*/
+/**Get the number of ghost degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_PWLC::
-  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumGhostDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return local_base_block_size*N;
+  return m_ghost_node_mapping.size()*N;
 }
 
 //###################################################################
-/**Get the number of global degrees-of-freedom.*/
-size_t chi_math::SpatialDiscretization_PWLC::
-  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager)
+/**Returns the ghost DOF indices.*/
+std::vector<int64_t> chi_math::SpatialDiscretization_PWLC::
+  GetGhostDOFIndices(const chi_math::UnknownManager& unknown_manager) const
 {
-  unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
+  std::vector<int64_t> dof_ids;
+  dof_ids.reserve(GetNumGhostDOFs(unknown_manager));
 
-  return globl_base_block_size*N;
-}
+  size_t num_unknowns = unknown_manager.GetTotalUnknownStructureSize();
+  auto   storage      = unknown_manager.dof_storage_type;
 
-//###################################################################
-/**Develops a localized view of a petsc vector.*/
-void chi_math::SpatialDiscretization_PWLC::
-LocalizePETScVector(Vec petsc_vector,
-                    std::vector<double>& local_vector,
-                    chi_math::UnknownManager& unknown_manager)
-{
-  auto grid = ref_grid;
-
-  if (type == chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS)
+  for (const auto& vid_gnid : m_ghost_node_mapping)
   {
-    std::vector<int64_t> global_indices;
-    for (auto& cell : grid->local_cells)
+    const int64_t global_id = vid_gnid.second;
+
+    for (size_t u=0; u<num_unknowns; ++u)
     {
-      auto cell_mapping = GetCellMappingFE(cell.local_id);
-
-      for (unsigned int i=0; i < cell_mapping->num_nodes; ++i)
+      const auto& unkn = unknown_manager.unknowns[u];
+      const size_t num_comps = unkn.num_components;
+      for (size_t c=0; c<num_comps; ++c)
       {
-        int uk=-1;
-        for (const auto& unknown : unknown_manager.unknowns)
+        size_t block_id     = unknown_manager.MapUnknown(u, c);
+        int64_t address=-1;
+        if (storage == chi_math::UnknownStorageType::BLOCK)
         {
-          ++uk;
-          for (int c=0; c<unknown.num_components; ++c)
+          for (int locJ=0; locJ<chi::mpi.process_count; ++locJ)
           {
-            int ir = MapDOF(cell, i, unknown_manager, uk, c);
+            const int64_t local_id = global_id - sc_int64(locJ_block_address[locJ]);
 
-            global_indices.push_back(ir);
-          }//for component
-        }//for unknown
-      }//for node
-    }//for cell
+            if (local_id < 0 or local_id >= locJ_block_size[locJ]) continue;
 
-    chi_math::PETScUtils::CopyGlobalVecToSTLvector(petsc_vector,
-                                                   global_indices,
-                                                   local_vector);
-  }//if PWLC
+            address = sc_int64(locJ_block_address[locJ]*num_unknowns) +
+                      sc_int64(locJ_block_size[locJ]*block_id) +
+                      local_id;
+            break;
+          }
+        }
+        else if (storage == chi_math::UnknownStorageType::NODAL)
+          address = global_id * sc_int64(num_unknowns) + sc_int64(block_id);
+
+        dof_ids.push_back(address);
+      }//for c
+    }//for u
+  }
+
+  return dof_ids;
 }

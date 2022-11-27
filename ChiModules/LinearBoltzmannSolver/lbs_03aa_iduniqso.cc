@@ -5,7 +5,7 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 #include "ChiMath/Quadratures/angular_quadrature_base.h"
 
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_product_quadrature.h"
 
 #define POLAR_ILLEGAL_GEOTYPE fname + \
   ": The simulation is using polar angle aggregation for which only " \

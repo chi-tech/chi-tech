@@ -1,7 +1,7 @@
 #ifndef CURVILINEAR_ANGULAR_QUADRATURE_H
 #define CURVILINEAR_ANGULAR_QUADRATURE_H
 
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_product_quadrature.h"
 
 namespace chi_math
 {

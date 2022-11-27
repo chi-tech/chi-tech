@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "ChiDataTypes/ndarray.h"
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_product_quadrature.h"
 #include "ChiMath/chi_math_range.h"
 
 #include "chi_runtime.h"
@@ -114,8 +114,7 @@ void Test_WDD_IJK_Sweep(bool verbose)
 //  sigma_t.Set(0.2);
 //  q.Set(0.0);
 
-  auto pquad = std::make_shared<chi_math::ProductQuadrature>();
-  pquad->InitializeWithGL(1,verbose);
+  auto pquad = std::make_shared<chi_math::AngularQuadratureProdGL>(1, verbose);
 
   pquad->BuildDiscreteToMomentOperator(/*scattering_order=*/0,
                                        /*dimension=*/1);

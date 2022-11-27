@@ -22,6 +22,10 @@ kpath_to_exe = kchi_src_pth + '/bin/ChiTech'
 tests_to_run = []
 print_only   = False
 
+# Get the correct mpiexec executable for the local machine
+# This can be overwritten
+mpiexec = shutil.which("mpiexec")
+
 print("")
 if len(sys.argv) >= 2:
     exec(sys.argv[1])
@@ -37,8 +41,6 @@ tacc = False
 if "tacc.utexas.edu" in hostname:
     tacc = True
 
-# Get the correct mpiexec executable for the local machine
-mpiexec = shutil.which("mpiexec")
 print("Using mpiexec at: ", mpiexec)
 
 def format3(number):

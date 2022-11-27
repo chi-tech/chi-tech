@@ -64,5 +64,14 @@ void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiLuaTest);
   LUA_FMACRO1(chiThrowException);
   LUA_FMACRO1(chiThrowRecoverableException);
+
+  lua_register(L, "chiSimTest01_FV"  , chi_unit_sim_tests::chiSimTest01_FV);
+  lua_register(L, "chiSimTest02_FV"  , chi_unit_sim_tests::chiSimTest02_FV);
+  lua_register(L, "chiSimTest03_PWLC", chi_unit_sim_tests::chiSimTest03_PWLC);
+  lua_register(L, "chiSimTest04_PWLC", chi_unit_sim_tests::chiSimTest04_PWLC);
+
+  lua_register(L, "chiSimTest06_WDD", chi_unit_sim_tests::chiSimTest06_WDD);
+
+  lua_register(L, "chiSimTest91_PWLD", chi_unit_sim_tests::chiSimTest91_PWLD);
 }
 

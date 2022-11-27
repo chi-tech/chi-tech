@@ -7,7 +7,6 @@
 #include "chi_runtime.h"
 
 #include "chi_log.h"
-;
 
 //###################################################################
 /** Creates a logical volume.

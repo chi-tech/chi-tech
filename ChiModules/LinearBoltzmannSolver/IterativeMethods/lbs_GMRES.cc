@@ -14,9 +14,6 @@
 #include "ChiTimer/chi_timer.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
-
-
-
 //###################################################################
 /**Solves a groupset using GMRES.*/
 bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
@@ -104,7 +101,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   SetSource(groupset, q_moments_local, rhs_src_scope);
 
   //Tool the sweep chunk
-  auto& sweep_chunk = sweep_scheduler.sweep_chunk;
+  auto& sweep_chunk = sweep_scheduler.GetSweepChunk();
   bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);

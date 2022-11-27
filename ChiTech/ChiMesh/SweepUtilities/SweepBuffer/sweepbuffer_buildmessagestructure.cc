@@ -41,7 +41,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   prelocI_message_count.resize(num_dependencies,0);
   prelocI_message_size.resize(num_dependencies);
   prelocI_message_blockpos.resize(num_dependencies);
-  prelocI_message_available.clear();
+  prelocI_message_received.clear();
 
   for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
   {
@@ -77,7 +77,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       prelocI_message_size[prelocI].push_back(num_unknowns);
     }
 
-    prelocI_message_available.emplace_back(message_count,false);
+    prelocI_message_received.emplace_back(message_count, false);
   }//for prelocI
 
   //============================================= Delayed Predecessor locations
@@ -86,6 +86,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   delayed_prelocI_message_count.resize(num_delayed_dependencies,0);
   delayed_prelocI_message_size.resize(num_delayed_dependencies);
   delayed_prelocI_message_blockpos.resize(num_delayed_dependencies);
+  delayed_prelocI_message_received.clear();
 
   for (size_t prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
   {
@@ -120,6 +121,8 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       delayed_prelocI_message_blockpos[prelocI].push_back(pre_block_pos);
       delayed_prelocI_message_size[prelocI].push_back(num_unknowns);
     }
+
+    delayed_prelocI_message_received.emplace_back(message_count, false);
   }
 
 
@@ -130,7 +133,6 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   deplocI_message_size.resize(num_successors);
   deplocI_message_blockpos.resize(num_successors);
 
-  deplocI_message_sent.clear();
   deplocI_message_request.clear();
 
   for (size_t deplocI=0; deplocI<num_successors; deplocI++)
@@ -167,7 +169,6 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       deplocI_message_size[deplocI].push_back(num_unknowns);
     }
 
-    deplocI_message_sent.emplace_back(message_count,false);
     deplocI_message_request.emplace_back(message_count,MPI_Request());
   }
 

@@ -7,11 +7,9 @@
 double lbs::SteadySolver::ComputePiecewiseChange(LBSGroupset& groupset)
 {
   double pw_change = 0.0;
-  double sum_m0 = 0.0;
 
   int gsi = groupset.groups[0].id;
-  int gsf = groupset.groups.back().id;
-  int deltag = groupset.groups.size();
+  size_t deltag = groupset.groups.size();
 
   for (const auto& cell : grid->local_cells)
   {
@@ -22,8 +20,8 @@ double lbs::SteadySolver::ComputePiecewiseChange(LBSGroupset& groupset)
       for (int m=0; m<num_moments; m++)
       {
         size_t mapping = transport_view.MapDOF(i,m,gsi);
-        double* phi_new_m = &phi_new_local.data()[mapping];
-        double* phi_old_m = &phi_old_local.data()[mapping];
+        double* phi_new_m = &phi_new_local[mapping];
+        double* phi_old_m = &phi_old_local[mapping];
 
         for (int g=0; g<deltag; g++)
         {
@@ -45,6 +43,7 @@ double lbs::SteadySolver::ComputePiecewiseChange(LBSGroupset& groupset)
     }//for i
   }//for c
 
+// Old PDT code:
 //  const real8 abs_phi_0 = fabs(phi_0);
 //  const real8 abs_old_phi_0 = fabs(old_phi_0);
 //  const real8 maxv = std::max(abs_phi_0, abs_old_phi_0);

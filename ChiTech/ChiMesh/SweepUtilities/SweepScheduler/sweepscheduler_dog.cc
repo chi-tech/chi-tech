@@ -1,10 +1,7 @@
 #include "sweepscheduler.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-
-
-;
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 #include <sstream>
 #include <algorithm>
@@ -30,14 +27,14 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
       TLEVELED_GRAPH& leveled_graph = spds->global_sweep_planes;
 
       //========================== Find location depth
-      size_t loc_depth = -1;
+      int loc_depth = -1;
       for (size_t level=0; level<leveled_graph.size(); level++)
       {
         for (size_t index=0; index<leveled_graph[level].item_id.size(); index++)
         {
           if (leveled_graph[level].item_id[index] == chi::mpi.location_id)
           {
-            loc_depth = leveled_graph.size()-level;
+            loc_depth = static_cast<int>(leveled_graph.size()-level);
             break;
           }
         }//for locations in plane
@@ -69,7 +66,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
   //================================================== Init sort functions
   struct
   {
-    bool operator()(RULE_VALUES a, RULE_VALUES b)
+    bool operator()(const RULE_VALUES& a, const RULE_VALUES& b)
     {
       return a.depth_of_graph > b.depth_of_graph;
     }
@@ -77,7 +74,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
 
   struct
   {
-    bool operator()(RULE_VALUES a, RULE_VALUES b)
+    bool operator()(const RULE_VALUES& a, const RULE_VALUES& b)
     {
       return (a.depth_of_graph == b.depth_of_graph) and
              (a.sign_of_omegax > b.sign_of_omegax);
@@ -86,7 +83,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
 
   struct
   {
-    bool operator()(RULE_VALUES a, RULE_VALUES b)
+    bool operator()(const RULE_VALUES& a, const RULE_VALUES& b)
     {
       return (a.depth_of_graph == b.depth_of_graph) and
              (a.sign_of_omegax == b.sign_of_omegax) and
@@ -96,7 +93,7 @@ void chi_mesh::sweep_management::SweepScheduler::InitializeAlgoDOG()
 
   struct
   {
-    bool operator()(RULE_VALUES a, RULE_VALUES b)
+    bool operator()(const RULE_VALUES& a, const RULE_VALUES& b)
     {
       return (a.depth_of_graph == b.depth_of_graph) and
              (a.sign_of_omegax == b.sign_of_omegax) and
@@ -135,10 +132,10 @@ void chi_mesh::sweep_management::SweepScheduler::
   while (!finished)
   {
     finished = true;
-    for (size_t as=0; as<rule_values.size(); as++)
+    for (auto & rule_value : rule_values)
     {
-      auto angleset = rule_values[as].angle_set;
-      int angset_number = rule_values[as].set_index;
+      auto angleset = rule_value.angle_set;
+      const int angset_number = static_cast<int>(rule_value.set_index);
 
       //=============================== Query angleset status
       // Status will here be one of the following:
@@ -157,7 +154,7 @@ void chi_mesh::sweep_management::SweepScheduler::
       //=============================== Execute if ready and allowed
       // If this angleset is the one scheduled to run
       // and it is ready then it will be given permission
-      if (status == Status::READY_TO_EXECUTE /*and as == scheduled_angleset*/)
+      if (status == Status::READY_TO_EXECUTE)
       {
         std::stringstream message_i;
         message_i
@@ -192,7 +189,6 @@ void chi_mesh::sweep_management::SweepScheduler::
         finished = false;
     }//for each angleset rule
   }//while not finished
-//  }
 
   //================================================== Receive delayed data
   MPI_Barrier(MPI_COMM_WORLD);
@@ -202,11 +198,13 @@ void chi_mesh::sweep_management::SweepScheduler::
     received_delayed_data = true;
     for (auto& sorted_angleset : rule_values)
     {
-      auto angleset = sorted_angleset.angle_set;
+      auto& as = sorted_angleset.angle_set;
 
-      if (angleset->FlushSendBuffers() == Status::MESSAGES_PENDING)
+      if (as->FlushSendBuffers() == Status::MESSAGES_PENDING)
         received_delayed_data = false;
-      angleset->ReceiveDelayedData(static_cast<int>(sorted_angleset.set_index));
+
+      if (not as->ReceiveDelayedData(sorted_angleset.set_index))
+        received_delayed_data = false;
     }
   }
 

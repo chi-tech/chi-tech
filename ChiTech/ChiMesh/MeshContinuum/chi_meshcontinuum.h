@@ -11,6 +11,12 @@
 
 #include "chi_mpi.h"
 
+namespace chi_data_types
+{
+  template<typename T>
+  class NDArray;
+}//namespace chi_data_types
+
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
  * domain. */
@@ -94,13 +100,11 @@ public:
   bool IsCellLocal(uint64_t cell_global_index) const;
   bool IsCellBndry(uint64_t cell_global_index) const;
 
-  void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
+  void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping) const;
 
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
-
-  std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
 
   chi_objects::ChiMPICommunicatorSet& GetCommunicator();
 
@@ -113,6 +117,8 @@ public:
   MeshAttributes Attributes() const {return attributes;}
 
   std::array<size_t,3> GetIJKInfo() const;
+  chi_data_types::NDArray<uint64_t> MakeIJKToGlobalIDMapping() const;
+  std::vector<chi_mesh::Vector3> MakeCellOrthoSizes() const;
 
 private:
   friend class chi_mesh::VolumeMesher;

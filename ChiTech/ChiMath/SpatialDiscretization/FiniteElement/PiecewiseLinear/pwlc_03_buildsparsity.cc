@@ -1,60 +1,56 @@
 #include "pwlc.h"
 
-#include "chi_log.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
+#include "chi_runtime.h"
+#include "chi_log.h"
 #include "chi_mpi.h"
 
-
 #include <algorithm>
+
+#define sc_int64 static_cast<int64_t>
 
 //###################################################################
 /**Builds the sparsity pattern for a Continuous Finite Element Method.*/
 void chi_math::SpatialDiscretization_PWLC::
 BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                      std::vector<int64_t> &nodal_nnz_off_diag,
-                     chi_math::UnknownManager& unknown_manager)
+                     const chi_math::UnknownManager& unknown_manager) const
 {
-  //======================================== Determine global domain ownership
-  std::vector<int> locI_block_addr(chi::mpi.process_count, 0);
-  MPI_Allgather(&local_block_address, 1, MPI_INT,
-                locI_block_addr.data()   , 1, MPI_INT,
-                MPI_COMM_WORLD);
-
-  if (chi::mpi.location_id == 0)
-    for (auto locI : locI_block_addr)
-      chi::log.LogAllVerbose1() << "Block address = " << locI;
-  MPI_Barrier(MPI_COMM_WORLD);
-
   //**************************************** DEFINE UTILITIES
 
   //=================================== Dof-handler
+  /**Utility mappings*/
   struct DOFHandler
   {
-    int local_block_start = 0;
-    int local_block_end = 0;
-    std::vector<int> locI_block_addr;
+    const int64_t local_block_start = 0;
+    const int64_t local_block_end = 0;
+    const std::vector<uint64_t>& locI_block_addr;
 
-    bool IsMapLocal(int ir)
+    DOFHandler(int64_t block_start, int64_t block_end,
+               const std::vector<uint64_t>& in_locJ_block_address) :
+               local_block_start(block_start),
+               local_block_end(block_end),
+               locI_block_addr(in_locJ_block_address)
+    {}
+
+    bool IsMapLocal(int64_t ir) const
     {return ( ir>=local_block_start and ir<local_block_end);}
 
-    int MapIRLocal(int ir)
+    int64_t MapIRLocal(int64_t ir) const
     {return ir - local_block_start;}
 
-    int GetLocFromIR(int ir)
+    int64_t GetLocFromIR(int64_t ir)
     {
-      int locI = std::upper_bound(locI_block_addr.begin(),
+      int64_t locI = std::upper_bound(locI_block_addr.begin(),
                                   locI_block_addr.end(),
                                   ir) - locI_block_addr.begin() - 1;
       return locI;
     }
 
-  } dof_handler;
-
-  //=================================== Set dof handler values
-  dof_handler.local_block_start = local_block_address;
-  dof_handler.local_block_end   = local_block_address +
-                                  local_base_block_size;
-  dof_handler.locI_block_addr = locI_block_addr;
+  } dof_handler(sc_int64(local_block_address),
+                sc_int64(local_block_address + local_base_block_size),
+                locJ_block_address);
 
   // Writes a message on ir error
   auto IR_MAP_ERROR = [] ()
@@ -73,7 +69,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   };
 
   // Checks whether an integer is already in a vector
-  auto IS_VALUE_IN_VECTOR = [](const std::vector<int>& vec, int val)
+  auto IS_VALUE_IN_VECTOR = [](const std::vector<int64_t>& vec, int64_t val)
   {
     bool already_there = false;
     for (auto check_val : vec)
@@ -87,30 +83,29 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   //======================================== Build local sparsity pattern
   chi::log.Log0Verbose1() << "Building local sparsity pattern.";
-  int local_node_count = local_base_block_size;
-  std::vector<std::vector<int>> nodal_connections(local_node_count);
+  std::vector<std::vector<int64_t>> nodal_connections(local_base_block_size);
 
   nodal_nnz_in_diag.clear();
   nodal_nnz_off_diag.clear();
 
-  nodal_nnz_in_diag .resize(local_node_count, 0);
-  nodal_nnz_off_diag.resize(local_node_count, 0);
+  nodal_nnz_in_diag .resize(local_base_block_size, 0);
+  nodal_nnz_off_diag.resize(local_base_block_size, 0);
 
   for (auto& cell : ref_grid->local_cells)
   {
-    auto cell_mapping = GetCellMappingFE(cell.local_id);
-    for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
+    const auto& cell_mapping = GetCellMapping(cell);
+    for (unsigned int i=0; i<cell_mapping.NumNodes(); ++i)
     {
-      int ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
+      const int64_t ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
 
       if (dof_handler.IsMapLocal(ir))
       {
-        int il = dof_handler.MapIRLocal(ir);
-        std::vector<int>& node_links = nodal_connections[il];
+        const int64_t il = dof_handler.MapIRLocal(ir);
+        std::vector<int64_t>& node_links = nodal_connections[il];
 
-        for (unsigned int j=0; j<cell_mapping->num_nodes; ++j)
+        for (unsigned int j=0; j<cell_mapping.NumNodes(); ++j)
         {
-          int jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
+          const int64_t jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
 
           if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
 
@@ -124,9 +119,6 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
     }//for i
   }//for cell
 
-
-
-
   //======================================== Build non-local sparsity pattern
   chi::log.Log0Verbose1() << "Building non-local sparsity pattern.";
 
@@ -134,16 +126,16 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   // of ir-nodes that are not local. Each ir-node needs to
   // be furnished with the jr-nodes it links to.
 
-  typedef std::pair<int,std::vector<int>> ROWJLINKS;
+  typedef std::pair<int64_t,std::vector<int64_t>> ROWJLINKS;
   std::vector<ROWJLINKS> ir_links;
 
   for (auto& cell : ref_grid->local_cells)
   {
-    auto cell_mapping = GetCellMappingFE(cell.local_id);
+    const auto& cell_mapping = GetCellMapping(cell);
 
-    for (unsigned int i=0; i<cell_mapping->num_nodes; ++i)
+    for (unsigned int i=0; i<cell_mapping.NumNodes(); ++i)
     {
-      int ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
+      const int64_t ir = MapDOF(cell,i); if (ir < 0) IR_MAP_ERROR();
 
       if (not dof_handler.IsMapLocal(ir))
       {
@@ -153,7 +145,8 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
         //============================= Check if ir already there
         bool ir_already_there = false;
         for (auto& ir_link : ir_links)
-          if (ir == ir_link.first){
+          if (ir == ir_link.first)
+          {
             ir_already_there = true;
             cur_ir_link = &ir_link;
             break;
@@ -161,9 +154,9 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
         //============================= Now add links
         auto& node_links = cur_ir_link->second;
-        for (unsigned int j=0; j<cell_mapping->num_nodes; ++j)
+        for (unsigned int j=0; j<cell_mapping.NumNodes(); ++j)
         {
-          int jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
+          const int64_t jr = MapDOF(cell,j); if (jr < 0) JR_MAP_ERROR();
 
           if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
           else
@@ -186,15 +179,15 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   //=================================== Step 1
   // We now serialize the non-local data
-  std::vector<std::vector<int>> locI_serialized(chi::mpi.process_count);
+  std::vector<std::vector<int64_t>> locI_serialized(chi::mpi.process_count);
 
   for (const auto& ir_linkage : ir_links)
   {
-    int locI = dof_handler.GetLocFromIR(ir_linkage.first);
+    const int64_t locI = dof_handler.GetLocFromIR(ir_linkage.first);
 
-    locI_serialized[locI].push_back(ir_linkage.second.size()); //row cols amount
-    locI_serialized[locI].push_back(ir_linkage.first);         //row num
-    for (int jr : ir_linkage.second)
+    locI_serialized[locI].push_back(sc_int64(ir_linkage.second.size())); //row cols amount
+    locI_serialized[locI].push_back(sc_int64(ir_linkage.first));         //row num
+    for (int64_t jr : ir_linkage.second)
       locI_serialized[locI].push_back(jr);                     //col num
   }
 
@@ -207,7 +200,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   int locI=0;
   for (const auto& locI_data : locI_serialized)
   {
-    sendcount[locI] = locI_data.size();
+    sendcount[locI] = static_cast<int>(locI_data.size());
 
     if (chi::mpi.location_id == 0)
       chi::log.LogAllVerbose1()
@@ -248,24 +241,24 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   // We now initialize the buffers and
   // communicate the data
-  std::vector<int> sendbuf;
-  std::vector<int> recvbuf;
+  std::vector<int64_t> sendbuf;
+  std::vector<int64_t> recvbuf;
 
   sendbuf.reserve(send_displ_c);
   recvbuf.resize(recv_displ_c,0);
 
   for (const auto& serial_block : locI_serialized)
-    for (int data_val : serial_block)
+    for (int64_t data_val : serial_block)
       sendbuf.push_back(data_val);
 
   MPI_Alltoallv(sendbuf.data(),
                 sendcount.data(),
                 send_displs.data(),
-                MPI_INT,
+                MPI_INT64_T,
                 recvbuf.data(),
                 recvcount.data(),
                 recv_displs.data(),
-                MPI_INT,
+                MPI_INT64_T,
                 MPI_COMM_WORLD);
 
   //======================================== Deserialze data
@@ -275,8 +268,8 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
 
   for (size_t k=0; k<recvbuf.size(); )
   {
-    int num_values = recvbuf[k++];
-    int ir         = recvbuf[k++];
+    const int64_t num_values = recvbuf[k++];
+    const int64_t ir         = recvbuf[k++];
 
     ROWJLINKS new_links;
     new_links.first = ir;
@@ -290,14 +283,14 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   //======================================== Adding to sparsity pattern
   for (const auto& ir_linkage : foreign_ir_links)
   {
-    int ir = ir_linkage.first;
+    const int64_t ir = ir_linkage.first;
 
     if (not dof_handler.IsMapLocal(ir)) IR_MAP_ERROR();
 
-    int il = dof_handler.MapIRLocal(ir);
-    std::vector<int>& node_links = nodal_connections[il];
+    int64_t il = dof_handler.MapIRLocal(ir);
+    std::vector<int64_t>& node_links = nodal_connections[il];
 
-    for (int jr : ir_linkage.second)
+    for (int64_t jr : ir_linkage.second)
     {
       if (IS_VALUE_IN_VECTOR(node_links,jr)) continue;
 

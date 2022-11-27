@@ -89,9 +89,9 @@ void lbs::SteadySolver::
   size_t dof_count=0;
   for (const auto& cell : grid->local_cells)
   {
-    const auto cell_fe_mapping = fe->GetCellMappingFE(cell.local_id);
+    const auto& cell_mapping = fe->GetCellMapping(cell);
 
-    for (unsigned int i=0; i<cell_fe_mapping->num_nodes; ++i)
+    for (unsigned int i=0; i < cell_mapping.NumNodes(); ++i)
       for (unsigned int n=0; n<num_angles; ++n)
         for (unsigned int g=0; g<num_groups; ++g)
         {
