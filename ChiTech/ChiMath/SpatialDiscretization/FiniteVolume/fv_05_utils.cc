@@ -5,16 +5,13 @@
 #include "ChiMath/UnknownManager/unknown_manager.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "chi_log.h"
 #include "chi_mpi.h"
-
-;
 
 
 //###################################################################
 /**Get the number of local degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_FV::
-  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumLocalDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -24,7 +21,7 @@ size_t chi_math::SpatialDiscretization_FV::
 //###################################################################
 /**Get the number of global degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_FV::
-  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager)
+  GetNumGlobalDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
@@ -36,33 +33,39 @@ size_t chi_math::SpatialDiscretization_FV::
 //###################################################################
 /**Get the number of ghost degrees-of-freedom.*/
 size_t chi_math::SpatialDiscretization_FV::
-  GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
-                  chi_math::UnknownManager& unknown_manager)
+  GetNumGhostDOFs(const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
 
-  return grid->cells.GetNumGhosts()*N;
+  return ref_grid->cells.GetNumGhosts()*N;
 }
 
 //###################################################################
 /**Returns the ghost DOF indices.*/
-std::vector<int> chi_math::SpatialDiscretization_FV::
-  GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-                     chi_math::UnknownManager& unknown_manager,
-                     unsigned int unknown_id)
+std::vector<int64_t> chi_math::SpatialDiscretization_FV::
+  GetGhostDOFIndices(const chi_math::UnknownManager& unknown_manager) const
 {
-  std::vector<int> dof_ids;
-  std::vector<uint64_t> ghost_cell_ids = grid->cells.GetGhostGlobalIDs();
+  std::vector<int64_t> dof_ids;
+  dof_ids.reserve(GetNumGhostDOFs(unknown_manager));
 
-  unsigned int N = unknown_manager.GetTotalUnknownStructureSize();
+  std::vector<uint64_t> ghost_cell_ids = ref_grid->cells.GetGhostGlobalIDs();
 
-  dof_ids.reserve(GetNumGhostDOFs(grid,unknown_manager));
-  for (int cell_id : ghost_cell_ids)
-    for (int comp=0; comp<N; ++comp)
+  const size_t num_uks = unknown_manager.unknowns.size();
+
+  for (const auto cell_id : ghost_cell_ids)
+  {
+    const auto& cell = ref_grid->cells[cell_id];
+    for (size_t u=0; u<num_uks; ++u)
     {
-      dof_ids.push_back(
-        MapDOF(grid->cells[cell_id],0,unknown_manager,unknown_id,comp) );
-    }
+      const auto& unkn = unknown_manager.unknowns[u];
+      const size_t num_comps = unkn.num_components;
+      for (size_t c=0; c<num_comps; ++c)
+      {
+        const int64_t dofmap = MapDOF(cell, 0, unknown_manager, u, c);
+        dof_ids.push_back(dofmap);
+      }//for c
+    }//for u
+  }
 
   return dof_ids;
 }
@@ -72,7 +75,7 @@ std::vector<int> chi_math::SpatialDiscretization_FV::
 void chi_math::SpatialDiscretization_FV::
   LocalizePETScVector(Vec petsc_vector,
                       std::vector<double>& local_vector,
-                      chi_math::UnknownManager& unknown_manager)
+                      const chi_math::UnknownManager& unknown_manager) const
 {
   size_t num_local_dofs = GetNumLocalDOFs(unknown_manager);
 

@@ -16,6 +16,7 @@ namespace chi_math
     SLDFESQ           = 3
   };
   class AngularQuadrature;
+  class AngularQuadratureCustom;
 }
 
 /**Simple structure to add names to the angle components.*/
@@ -71,11 +72,6 @@ public:
 
   virtual ~AngularQuadrature() = default;
 
-  virtual void
-  InitializeWithCustom(std::vector<double>& azimuthal,
-                       std::vector<double>& polar,
-                       std::vector<double>& in_weights, bool verbose);
-
   virtual void OptimizeForPolarSymmetry(double normalization);
 
 protected:
@@ -95,6 +91,14 @@ public:
 
   const std::vector<HarmonicIndices>&
   GetMomentToHarmonicsIndexMap() const;
+};
+
+class chi_math::AngularQuadratureCustom : public chi_math::AngularQuadrature
+{
+public:
+  AngularQuadratureCustom(std::vector<double>& azimuthal,
+                          std::vector<double>& polar,
+                          std::vector<double>& in_weights, bool verbose);
 };
 
 #endif

@@ -9,6 +9,16 @@
 
 ##--
 
+### Coding Tutorials:
+-# \subpage CodeTut1 \n
+-# \subpage CodeTut2 \n
+-# \subpage CodeTut3 \n
+-# \subpage CodeTut4 \n
+-# \subpage CodeTut6 \n
+-# \subpage CodeTut91a \n
+
+##--
+
 ### Reference Content:
 -# \subpage DevManMeshes \n
 -# \subpage DevManDevCycle \n

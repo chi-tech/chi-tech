@@ -4,6 +4,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include "ChiMesh/chi_meshvector.h"
+
 //###################################################################
 /**Split a SQ.*/
 std::array<chi_math::SimplifiedLDFESQ::SphericalQuadrilateral,4>

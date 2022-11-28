@@ -17,7 +17,7 @@
 void chi_mesh::VolumeMesher::
 SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_id)
 {
-  chi::log.Log()
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Setting material id from logical volume.";
   //============================================= Get current mesh handler
@@ -44,7 +44,7 @@ SetMatIDFromLogical(const chi_mesh::LogicalVolume& log_vol,bool sense, int mat_i
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log()
+  chi::log.Log0Verbose1()
     << chi::program_timer.GetTimeString()
     << " Done setting material id from logical volume. "
     << "Number of cells modified = " << num_cells_modified << ".";

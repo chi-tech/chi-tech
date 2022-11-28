@@ -25,6 +25,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
                                                  const std::string& field_name,
                                                  bool all_components/*=false*/)
 {
+  const auto& ref_grid = spatial_discretization->ref_grid;
   if (spatial_discretization->type !=
       chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS)
     throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) +
@@ -69,9 +70,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLD(const std::string& base_name,
 
   //############################################# Populate cell information
   int64_t node_count=0;
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : ref_grid->local_cells)
   {
-    UploadCellGeometry(*grid, cell, node_count, points, ugrid);
+    UploadCellGeometry(*ref_grid, cell, node_count, points, ugrid);
 
     material_array->InsertNextValue(cell.material_id);
     partition_id_array->InsertNextValue(cell.partition_id);

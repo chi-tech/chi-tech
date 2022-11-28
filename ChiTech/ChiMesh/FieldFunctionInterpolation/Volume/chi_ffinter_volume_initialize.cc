@@ -18,7 +18,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
     chi::Exit(EXIT_FAILURE);
   } else
   {
-    this->grid_view = field_functions[0]->grid;
+    this->grid_view = field_functions[0]->spatial_discretization->ref_grid;
   }
 
   //================================================== Find cell inside volume

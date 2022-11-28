@@ -569,7 +569,7 @@ public:
    *  \return Linear index to the specified element.
    */
   template<typename... Args>
-  size_t MapNDtoLin(Args... args)
+  size_t MapNDtoLin(Args... args) const
   {
     static_assert(AllIntegral<Args...>::value,
                   "NDArray::at(): All parameters must be of integral type");

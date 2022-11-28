@@ -3,9 +3,7 @@
 
 #include "ChiMesh/Raytrace/raytracing.h"
 
-#include <chi_log.h>
-
-;
+#include "chi_log.h"
 
 /**Initializes the data structures necessary for interpolation. This is
  * independent of the physics and hence is a routine on its own.
@@ -28,7 +26,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     chi::Exit(EXIT_FAILURE);
   } else
   {
-    this->grid_view = field_functions[0]->grid;
+    this->grid_view = field_functions[0]->spatial_discretization->ref_grid;
   }
 
   //================================================== Find cells intersecting plane

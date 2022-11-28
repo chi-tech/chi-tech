@@ -35,7 +35,7 @@
  *  - The Chi-Tech "downstream" cmake include, `Downstream.cmake`.
  *
 \code
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.12)
 
 set(TARGET test_app)
 project(test CXX)

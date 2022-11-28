@@ -42,7 +42,7 @@ The computational grid is contained in a chi_mesh::MeshContinuum object which
 you can obtain with:
 
 \code
-auto grid = cur_handler->GetGrid();
+auto grid_ptr = cur_handler->GetGrid();
 \endcode
 
 If there is no existing grid then one can be created as detailed in 
@@ -67,24 +67,6 @@ Even though we already showed how to obtain the handler, the "current"
  \code
     auto cur_handler = chi_mesh::GetCurrentHandler();
  \endcode
-
-## _
-
-\subsection devman_meshes_sec1_1 chi_mesh::Region
-
-When loading mesh related entities, all mesh operations are pushed onto stacks
-contained in the current handler. This is used free-form and the user can
-upload as many mesh-related items as he/she desires. When specific mesh items
-are specific to a computational grid another grouping element is applied called
-a region (chi_mesh::Region). Boundaries are normally attached to regions to
-assist in meshing operations, although an empty boundary can also be added.
-
-To create and access grids at least one region must be present on a mesh-handler.
-
-\code
-auto cur_region = new chi_mesh::Region();
-cur_handler->region_stack.push_back(cur_region);
-\endcode
 
 ## _
 

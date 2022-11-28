@@ -78,11 +78,10 @@ int chiCreateCustomAngularQuadrature(lua_State *L)
 
   chi::log.Log() << "Creating Custom Angular Quadrature\n";
 
-  auto angular_quadrature = std::make_shared<chi_math::AngularQuadrature>();
-  angular_quadrature->InitializeWithCustom(azi_angles,pol_angles,weights,
-                                           /*verbose=*/false);
+  auto new_quad = std::make_shared<chi_math::AngularQuadratureCustom>(
+    azi_angles, pol_angles, weights,false);
 
-  chi::angular_quadrature_stack.push_back(angular_quadrature);
+  chi::angular_quadrature_stack.push_back(new_quad);
   size_t index = chi::angular_quadrature_stack.size()-1;
   lua_pushnumber(L,static_cast<lua_Number>(index));
 

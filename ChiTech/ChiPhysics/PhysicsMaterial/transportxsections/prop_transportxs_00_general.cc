@@ -1,9 +1,7 @@
-#include "chi_runtime.h"
 #include "material_property_transportxsections.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Default constructor.*/

@@ -1,5 +1,7 @@
 #include "pwl_polygon.h"
 
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+
 void chi_math::PolygonMappingFE_PWL::InitializeVolumeQuadraturePointData(
   chi_math::finite_element::InternalQuadraturePointData& internal_data) const
 {
@@ -21,9 +23,9 @@ void chi_math::PolygonMappingFE_PWL::InitializeVolumeQuadraturePointData(
   for (unsigned int qp=0; qp<ttl_num_vol_qpoints; ++qp)
     V_quadrature_point_indices.push_back(qp);
 
-  V_shape_value.reserve(num_nodes);
-  V_shape_grad.reserve(num_nodes);
-  for (size_t i=0; i < num_nodes; i++)
+  V_shape_value.reserve(m_num_nodes);
+  V_shape_grad.reserve(m_num_nodes);
+  for (size_t i=0; i < m_num_nodes; i++)
   {
     VecDbl  node_shape_value;
     VecVec3 node_shape_grad;
@@ -60,14 +62,14 @@ void chi_math::PolygonMappingFE_PWL::InitializeVolumeQuadraturePointData(
     }//for qp
   } //for side
 
-  V_num_nodes = num_nodes;
+  V_num_nodes = m_num_nodes;
 
   internal_data.InitializeData(V_quadrature_point_indices,
                                V_qpoints_xyz,
                                V_shape_value,
                                V_shape_grad,
                                V_JxW,
-                               face_dof_mappings,
+                               face_node_mappings,
                                V_num_nodes);
 }
 
@@ -100,9 +102,9 @@ void chi_math::PolygonMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned 
     for (size_t qp=0; qp<ttl_num_face_qpoints; ++qp)
       F_normals.push_back(sides[s].normal);
 
-    F_shape_value.reserve(num_nodes);
-    F_shape_grad.reserve(num_nodes);
-    for (size_t i=0; i < num_nodes; i++)
+    F_shape_value.reserve(m_num_nodes);
+    F_shape_grad.reserve(m_num_nodes);
+    for (size_t i=0; i < m_num_nodes; i++)
     {
       VecDbl  node_shape_value;
       VecVec3 node_shape_grad;
@@ -140,7 +142,7 @@ void chi_math::PolygonMappingFE_PWL::InitializeFaceQuadraturePointData(unsigned 
                                  F_shape_grad,
                                  F_JxW,
                                  F_normals,
-                                 face_dof_mappings,
+                                 face_node_mappings,
                                  F_num_nodes);
   }//face
 }

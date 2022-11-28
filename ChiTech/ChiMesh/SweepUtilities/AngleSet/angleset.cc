@@ -142,9 +142,9 @@ void chi_mesh::sweep_management::AngleSet::ResetSweepBuffers()
 
 //###################################################################
 /**Instructs the sweep buffer to receive delayed data.*/
-void chi_mesh::sweep_management::AngleSet::ReceiveDelayedData(int angle_set_num)
+bool chi_mesh::sweep_management::AngleSet::ReceiveDelayedData(size_t angle_set_num)
 {
-  sweep_buffer.ReceiveDelayedData(angle_set_num);
+  return sweep_buffer.ReceiveDelayedData(static_cast<int>(angle_set_num));
 }
 
 //###################################################################

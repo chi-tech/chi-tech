@@ -15,7 +15,7 @@ namespace chi_math
   public:
     PolygonMappingFE_PWL_Cylindrical(
       const chi_mesh::Cell& poly_cell,
-      const chi_mesh::MeshContinuumPtr& ref_grid,
+      const chi_mesh::MeshContinuumConstPtr& ref_grid,
       const QuadratureTriangle& volume_quadrature,
       const QuadratureLine&     surface_quadrature)
     : PolygonMappingFE_PWL(poly_cell, ref_grid,

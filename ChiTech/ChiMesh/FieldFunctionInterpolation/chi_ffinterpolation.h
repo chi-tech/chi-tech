@@ -25,7 +25,7 @@
 class chi_mesh::FieldFunctionInterpolation
 {
 public:
-  chi_mesh::MeshContinuumPtr grid_view;
+  chi_mesh::MeshContinuumConstPtr grid_view;
 
   std::vector<std::shared_ptr<chi_physics::FieldFunction>> field_functions;
 

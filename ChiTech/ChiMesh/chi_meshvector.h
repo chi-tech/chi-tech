@@ -4,6 +4,13 @@
 #include<cmath>
 #include <sstream>
 
+namespace chi_mesh
+{
+  struct TensorRank2Dim3;
+}
+
+//namespace chi_mesh
+//{
 //=============================================== General 3D vector structure
 /**General 3 element vector structure. 
  * \author Jan
@@ -414,6 +421,8 @@ struct chi_mesh::Vector3
 
 //The following functions are defined in chi_mesh_utilities.cc
 //Left multiplcation by scalar
-chi_mesh::Vector3 operator*(const double value,const chi_mesh::Vector3& that);
+chi_mesh::Vector3 operator*(double value,const chi_mesh::Vector3& that);
+
+//}//namespace chi_mesh
 
 #endif

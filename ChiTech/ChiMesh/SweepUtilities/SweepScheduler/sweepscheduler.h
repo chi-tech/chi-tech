@@ -5,13 +5,14 @@
 #include "ChiMesh/SweepUtilities/sweepchunk_base.h"
 
 
-namespace chi_mesh { namespace sweep_management
+namespace chi_mesh::sweep_management
 {
-  enum class SchedulingAlgorithm {
-    FIRST_IN_FIRST_OUT = 1,
-    DEPTH_OF_GRAPH = 2
+  enum class SchedulingAlgorithm
+  {
+    FIRST_IN_FIRST_OUT = 1, ///< FIFO
+    DEPTH_OF_GRAPH = 2      ///< DOG
   };
-} }
+}
 
 typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 typedef chi_mesh::sweep_management::AngleSet      TAngleSet;
@@ -45,10 +46,13 @@ private:
     }
   };
   std::vector<RULE_VALUES> rule_values;
-public:
-  SweepChunk& sweep_chunk;
-  const size_t sweep_event_tag;
+
+  SweepChunk& m_sweep_chunk;
   const std::vector<size_t> sweep_timing_events_tag;
+
+public:
+  const size_t sweep_event_tag;
+
 public:
   SweepScheduler(SchedulingAlgorithm in_scheduler_type,
                  AngleAggregation& in_angle_agg,
@@ -57,6 +61,7 @@ public:
   void Sweep();
   double GetAverageSweepTime() const;
   std::vector<double> GetAngleSetTimings();
+  SweepChunk& GetSweepChunk();
 
 private:
   void ScheduleAlgoFIFO(SweepChunk& sweep_chunk);

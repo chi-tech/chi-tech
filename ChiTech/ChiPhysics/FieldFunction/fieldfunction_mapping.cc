@@ -28,7 +28,7 @@ void chi_physics::FieldFunction::
     uint64_t cell_local_index = cell_index_component_pair.first;
     unsigned int component    = cell_index_component_pair.second;
 
-    auto& cell = grid->local_cells[cell_local_index];
+    auto& cell = sdm->ref_grid->local_cells[cell_local_index];
     int64_t address = sdm_fv->MapDOFLocal(cell,
                                           0,
                                           unknown_manager,
@@ -47,6 +47,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
                        std::vector<std::tuple<uint64_t,uint,uint>>& cell_node_component_tuples,
                        std::vector<uint64_t>& mapping)
 {
+  auto& sdm    = spatial_discretization;
   if (spatial_discretization->type !=
       chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_CONTINUOUS)
     throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) +
@@ -54,7 +55,8 @@ CreateCFEMMappingLocal(Vec& x_mapped,
                                 " discretization is not of type "
                                 " PIECEWISE_LINEAR_CONTINUOUS.");
 
-  auto pwl_sdm = std::static_pointer_cast<chi_math::SpatialDiscretization_PWLC>(spatial_discretization);
+  auto pwl_sdm =
+    std::static_pointer_cast<chi_math::SpatialDiscretization_PWLC>(sdm);
 
   size_t num_nodes_to_map = cell_node_component_tuples.size();
   std::vector<int64_t> mapped_nodes;
@@ -65,7 +67,7 @@ CreateCFEMMappingLocal(Vec& x_mapped,
     uint     node_number      = std::get<1>(data);
     uint     component_number = std::get<2>(data);
 
-    int64_t address = pwl_sdm->MapDOF(grid->local_cells[cell_local_index],
+    int64_t address = pwl_sdm->MapDOF(sdm->ref_grid->local_cells[cell_local_index],
                                       node_number,
                                       unknown_manager,
                                       ref_variable,
@@ -114,6 +116,7 @@ CreatePWLDMappingLocal(
   std::vector<std::tuple<uint64_t,uint,uint>>& cell_node_component_tuples,
   std::vector<uint64_t>& mapping)
 {
+  auto& sdm = spatial_discretization;
   if (spatial_discretization->type !=
       chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS)
     throw std::invalid_argument(std::string(__PRETTY_FUNCTION__) +
@@ -129,7 +132,7 @@ CreatePWLDMappingLocal(
     uint     node_number      = std::get<1>(data);
     uint     component_number = std::get<2>(data);
 
-    auto& cell = grid->local_cells[cell_local_index];
+    auto& cell = sdm->ref_grid->local_cells[cell_local_index];
 
     int64_t address = pwl_sdm->MapDOFLocal(cell,
                                            node_number,
