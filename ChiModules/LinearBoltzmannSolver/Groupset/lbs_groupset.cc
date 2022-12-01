@@ -11,34 +11,9 @@
 
 //##############################################
 /**Groupset constructor.*/
-lbs::LBSGroupset::LBSGroupset(int in_id) : id(in_id)
+lbs::LBSGroupset::LBSGroupset(int in_id) :
+  id(in_id)
 {
-  quadrature = nullptr;
-  iterative_method = lbs::IterativeMethod::CLASSICRICHARDSON;
-  angleagg_method  = lbs::AngleAggregationType::POLAR;
-  master_num_grp_subsets = 1;
-  master_num_ang_subsets = 1;
-  residual_tolerance = 1.0e-6;
-  max_iterations = 200;
-  gmres_restart_intvl = 30;
-  apply_wgdsa = false;
-  apply_tgdsa = false;
-
-  wgdsa_solver = nullptr;
-  tgdsa_solver = nullptr;
-
-  wgdsa_max_iters = 30;
-  tgdsa_max_iters = 30;
-
-  wgdsa_tol = 1.0e-4;
-  tgdsa_tol = 1.0e-4;
-
-  wgdsa_verbose = false;
-  tgdsa_verbose = false;
-
-  allow_cycles = false;
-
-  log_sweep_events = false;
 }
 
 //###################################################################

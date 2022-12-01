@@ -120,8 +120,6 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << "Done building DFEM sparsity pattern";
-
 }
 
 

@@ -246,6 +246,44 @@ FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
 
 }
 
+//###################################################################
+/**Given the current cell, cell A, and its adjacent cell, cell B, with
+ * cell B adjacent to A at the `f`-th face of cell A. Will determine the
+ * `af`-th index of the face on cell B that interface with the `f`-th face
+ * of cell A.*/
+size_t chi_mesh::MeshContinuum::
+  MapCellFace(const chi_mesh::Cell &cur_cell,
+              const chi_mesh::Cell &adj_cell,
+              unsigned int f)
+{
+  const auto& ccface = cur_cell.faces[f]; //current cell face
+  std::set<uint64_t> ccface_vids;
+  for (auto vid : ccface.vertex_ids) ccface_vids.insert(vid);
+
+  size_t fmap;
+  bool map_found = false;
+  for (size_t af=0; af < adj_cell.faces.size(); af++)
+  {
+    const auto& acface = adj_cell.faces[af]; //adjacent cell face
+
+    std::set<uint64_t> acface_vids;
+    for (auto vid : acface.vertex_ids) acface_vids.insert(vid);
+
+    if (acface_vids == ccface_vids)
+    {
+      fmap = af;
+      map_found = true;
+      break;
+    }
+  }//for adj faces
+
+  if (not map_found)
+    throw std::logic_error(
+      "chi_mesh::MeshContinuum::MapCellFace: Mapping failure.");
+
+  return fmap;
+}
+
 
 //###################################################################
 /**Computes the centroid from nodes specified by the given list.*/

@@ -102,6 +102,9 @@ public:
 
   void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping) const;
+  static size_t MapCellFace(const chi_mesh::Cell& cur_cell,
+                     const chi_mesh::Cell& adj_cell,
+                     unsigned int f) ;
 
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;

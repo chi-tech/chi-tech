@@ -16,10 +16,6 @@ chi_math::SpatialDiscretization_PWLC::
                                 SDMType::PIECEWISE_LINEAR_CONTINUOUS,
                                 in_cs_type)
 {
-  chi::log.Log() << chi::program_timer.GetTimeString()
-                << " Creating Piecewise Linear Continuous "
-                   "Finite Element spatial discretizaiton.";
-
   if (setup_flags == chi_math::finite_element::COMPUTE_UNIT_INTEGRALS)
   {
     int qorder_min;
@@ -79,9 +75,6 @@ chi_math::SpatialDiscretization_PWLC::
   }
 
   OrderNodes();
-  chi::log.Log() << chi::program_timer.GetTimeString()
-                << " Done creating Piecewise Linear Continuous "
-                   "Finite Element spatial discretizaiton.";
 }
 
 //###################################################################

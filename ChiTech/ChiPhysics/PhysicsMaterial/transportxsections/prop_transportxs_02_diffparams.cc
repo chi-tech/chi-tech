@@ -59,7 +59,6 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
   }//for g
 
   //======================================== Compute two grid energy collapse
-  chi::log.Log() << "Performing Energy collapse.";
   EnergyCollapse(xi_Jfull, D_jfull, sigma_a_jfull, E_COLLAPSE_JACOBI);
   EnergyCollapse(xi_Jpart, D_jpart, sigma_a_jpart, E_COLLAPSE_PARTIAL_JACOBI);
 
