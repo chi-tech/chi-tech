@@ -54,15 +54,15 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
       for (auto& cell : grid->local_cells)
         PWLD_Assemble_b(cell,gi);
   }
-  else if (fem_method == "PWLD_MIP_GAGG")
-  {
-    if (!suppress_assembly)
-      for (auto& cell : grid->local_cells)
-        PWLD_Assemble_A_and_b_GAGG(cell);
-    else
-      for (auto& cell : grid->local_cells)
-        PWLD_Assemble_b_GAGG(cell);
-  }
+//  else if (fem_method == "PWLD_MIP_GAGG")
+//  {
+//    if (!suppress_assembly)
+//      for (auto& cell : grid->local_cells)
+//        PWLD_Assemble_A_and_b_GAGG(cell);
+//    else
+//      for (auto& cell : grid->local_cells)
+//        PWLD_Assemble_b_GAGG(cell);
+//  }
   else
   {
     chi::log.Log()

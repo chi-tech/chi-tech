@@ -2,18 +2,10 @@
 
 #include "chi_runtime.h"
 
-
-#include "ChiTimer/chi_timer.h"
-
-
+#include "chi_log.h"
 #include "chi_mpi.h"
 
-
-#include "chi_runtime.h"
-#include "chi_log.h"
-
-
-;
+#include "ChiTimer/chi_timer.h"
 
 //###################################################################
 /**Initializes the diffusion solver using the PETSc library.*/
@@ -44,12 +36,12 @@ int chi_diffusion::Solver::Initialize(bool verbose)
         chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
       unknown_manager.AddUnknown(chi_math::UnknownType::SCALAR);
     }
-    else if (sdm_string == "PWLD_MIP_GAGG")
-    {
-      discretization =
-        chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
-      unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
-    }
+//    else if (sdm_string == "PWLD_MIP_GAGG")
+//    {
+//      discretization =
+//        chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_UNIT_INTEGRALS);
+//      unknown_manager.AddUnknown(chi_math::UnknownType::VECTOR_N, G);
+//    }
     else
       throw std::invalid_argument(
         TextName() + ": Invalid spatial discretization method, " +

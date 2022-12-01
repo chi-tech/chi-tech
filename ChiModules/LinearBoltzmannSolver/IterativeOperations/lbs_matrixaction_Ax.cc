@@ -3,6 +3,7 @@
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "../../DiffusionSolver/Solver/diffusion_solver.h"
+#include "LinearBoltzmannSolver/Acceleration/diffusion_mip.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
@@ -37,14 +38,8 @@ int lbs::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
 
   //=================================================== Apply WGDSA
   if (groupset.apply_wgdsa)
-  {
-    solver.AssembleWGDSADeltaPhiVector(groupset,
-                                       solver.phi_old_local.data(),
-                                       solver.phi_new_local.data());
-    ((chi_diffusion::Solver*)groupset.wgdsa_solver)->ExecuteS(true,false);
-    solver.DisAssembleWGDSADeltaPhiVector(groupset,
-                                          solver.phi_new_local.data());
-  }
+    solver.ExecuteWGDSA(groupset,solver.phi_old_local,solver.phi_new_local);
+
   if (groupset.apply_tgdsa)
   {
     solver.AssembleTGDSADeltaPhiVector(groupset,

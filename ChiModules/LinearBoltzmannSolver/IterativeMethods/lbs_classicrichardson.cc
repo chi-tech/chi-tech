@@ -52,11 +52,8 @@ ClassicRichardson(LBSGroupset& groupset,
     sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)
-    {
-      AssembleWGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
-      ((chi_diffusion::Solver*)groupset.wgdsa_solver)->ExecuteS(true,false);
-      DisAssembleWGDSADeltaPhiVector(groupset, phi_new_local.data());
-    }
+      ExecuteWGDSA(groupset,phi_old_local,phi_new_local);
+
     if (groupset.apply_tgdsa)
     {
       AssembleTGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());

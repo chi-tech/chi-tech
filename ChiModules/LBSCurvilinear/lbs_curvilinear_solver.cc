@@ -278,6 +278,8 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
   typedef chi_math::SpatialDiscretization_PWLD SDM_PWLD;
   discretization = SDM_PWLD::New(grid, setup_flags, qorder, system);
 
+  ComputeUnitIntegrals();
+
   //  secondary discretisation
   //  system - manipulated such that the spatial discretisation returns
   //  a cell view of the same type but with weighting of degree one less
