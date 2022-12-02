@@ -117,9 +117,9 @@ The next step in this process is to setup the environment variables for compilin
 ChiTech.
 
 ```bash
-    $. ./chi-dependencies/configure_deproots.sh
+    $source ./dependencies/configure_deproots.sh
 ```
-**Note:** You can replace ```$. ``` in the above with ```$source ```
+**Note:** You can replace ```$source ``` in the above with ```$. ```
 
 ### Step 5 - Build ChiTech
 
@@ -167,7 +167,7 @@ sudo apt install texlive-font-utils
 sudo apt-get install lua5.4
 ```
 
-The documentation is contained in the *CHI_DOC* folder and can be generated
+The documentation is contained in the *ChiDoc* folder and can be generated
 using a script provided in that folder:
 
 ```bash
