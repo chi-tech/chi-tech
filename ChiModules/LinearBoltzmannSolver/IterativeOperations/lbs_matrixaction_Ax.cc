@@ -41,14 +41,7 @@ int lbs::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
     solver.ExecuteWGDSA(groupset,solver.phi_old_local,solver.phi_new_local);
 
   if (groupset.apply_tgdsa)
-  {
-    solver.AssembleTGDSADeltaPhiVector(groupset,
-                                       solver.phi_old_local.data(),
-                                       solver.phi_new_local.data());
-    ((chi_diffusion::Solver*)groupset.tgdsa_solver)->ExecuteS(true,false);
-    solver.DisAssembleTGDSADeltaPhiVector(groupset,
-                                          solver.phi_new_local.data());
-  }
+    solver.ExecuteTGDSA(groupset,solver.phi_old_local,solver.phi_new_local);
 
   solver.SetPETScVecFromSTLvector(groupset,
                                   context->operating_vector,

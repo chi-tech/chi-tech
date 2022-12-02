@@ -174,11 +174,15 @@ public:
 
   //03e
   void InitTGDSA(LBSGroupset& groupset);
-  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset, double *ref_phi_old,
-                                   double *ref_phi_new);
+  void ExecuteTGDSA(LBSGroupset& groupset,
+                    const std::vector<double>& ref_phi_old,
+                    std::vector<double>& ref_phi_new);
+  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const double *ref_phi_old,
+                                   const double *ref_phi_new);
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                       double *ref_phi_new);
-  void CleanUpTGDSA(LBSGroupset& groupset);
+  static void CleanUpTGDSA(LBSGroupset& groupset);
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 

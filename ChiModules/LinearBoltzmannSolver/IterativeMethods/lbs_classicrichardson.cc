@@ -55,11 +55,7 @@ ClassicRichardson(LBSGroupset& groupset,
       ExecuteWGDSA(groupset,phi_old_local,phi_new_local);
 
     if (groupset.apply_tgdsa)
-    {
-      AssembleTGDSADeltaPhiVector(groupset, phi_old_local.data(), phi_new_local.data());
-      ((chi_diffusion::Solver*)groupset.tgdsa_solver)->ExecuteS(true,false);
-      DisAssembleTGDSADeltaPhiVector(groupset, phi_new_local.data());
-    }
+      ExecuteTGDSA(groupset,phi_old_local,phi_new_local);
 
     double pw_change = ComputePiecewiseChange(groupset);
 

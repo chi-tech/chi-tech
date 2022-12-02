@@ -136,11 +136,6 @@ public:
 
   int MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
                       const chi_mesh::Cell& adj_cell,
-                      size_t f,
-                      size_t fi,
-                      double epsilon=1.0e-12);
-  int MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
-                      const chi_mesh::Cell& adj_cell,
                       const std::vector<chi_mesh::Vector3>& cc_node_locs,
                       const std::vector<chi_mesh::Vector3>& ac_node_locs,
                       size_t ccf, size_t acf,
