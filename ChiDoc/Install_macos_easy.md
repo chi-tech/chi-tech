@@ -167,7 +167,7 @@ sudo apt install texlive-font-utils
 sudo apt-get install lua5.4
 ```
 
-The documentation is contained in the *ChiDoc* folder and can be generated
+The documentation is contained in the *CHI_DOC* folder and can be generated
 using a script provided in that folder:
 
 ```bash
