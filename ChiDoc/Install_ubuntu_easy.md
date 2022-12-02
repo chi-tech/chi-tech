@@ -117,9 +117,9 @@ The next step in this process is to setup the environment variables for compilin
 ChiTech.
 
 ```bash
-    $. ./chi-dependencies/configure_deproots.sh
+    $source ./dependencies/configure_deproots.sh
 ```
-**Note:** You can replace ```$. ``` in the above with ```$source ```
+**Note:** You can replace ```$source ``` in the above with ```$. ```
 
 ### Step 5 - Build ChiTech
 
