@@ -60,7 +60,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
 
     auto solver =
       std::make_shared<acceleration::DiffusionMIPSolver>(
-        std::string(TextName()+"_wgdsa"),
+        std::string(TextName()+"_WGDSA"),
         *grid,sdm,
         uk_man,
         bcs,
@@ -70,7 +70,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
 
     solver->options.residual_tolerance        = groupset.wgdsa_tol;
     solver->options.max_iters                 = groupset.wgdsa_max_iters;
-    solver->options.verbose                   = groupset.wgdsa_verbose;
+//    solver->options.verbose                   = groupset.wgdsa_verbose;
     solver->options.additional_options_string = groupset.wgdsa_string;
 
     solver->Initialize();
@@ -82,7 +82,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
     delta_phi_local.resize(0);
     delta_phi_local.shrink_to_fit();
 
-    groupset.wgdsa_solver2 = solver;
+    groupset.wgdsa_solver = solver;
   }
 }
 
@@ -90,7 +90,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
 /**Cleans up memory consuming items. */
 void lbs::SteadySolver::CleanUpWGDSA(LBSGroupset& groupset)
 {
-  if (groupset.apply_wgdsa) groupset.wgdsa_solver2 = nullptr;
+  if (groupset.apply_wgdsa) groupset.wgdsa_solver = nullptr;
 }
 
 //###################################################################
@@ -100,7 +100,7 @@ void lbs::SteadySolver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
                                                     const double *ref_phi_new)
 {
   const auto& sdm = *discretization;
-  const auto& dphi_uk_man = groupset.wgdsa_solver2->UnknownStructure();
+  const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man;
 
   const int    gsi = groupset.groups.front().id;
@@ -129,7 +129,7 @@ void lbs::SteadySolver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
         delta_phi_mapped[g] =
           sigma_s[gsi+g]*(phi_new_mapped[g] - phi_old_mapped[g]);
       }//for g
-    }//for dof
+    }//for node
   }//for cell
 }
 
@@ -139,7 +139,7 @@ void lbs::SteadySolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
                                                        double *ref_phi_new)
 {
   const auto& sdm = *discretization;
-  const auto& dphi_uk_man = groupset.wgdsa_solver2->UnknownStructure();
+  const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man;
 
   const int    gsi = groupset.groups.front().id;
@@ -179,7 +179,7 @@ void lbs::SteadySolver::
   AssembleWGDSADeltaPhiVector(groupset,
                               ref_phi_old.data(),
                               ref_phi_new.data());
-  groupset.wgdsa_solver2->Assemble_b2(delta_phi_local);
-  groupset.wgdsa_solver2->Solve(delta_phi_local);
+  groupset.wgdsa_solver->Assemble_b2(delta_phi_local);
+  groupset.wgdsa_solver->Solve(delta_phi_local);
   DisAssembleWGDSADeltaPhiVector(groupset, ref_phi_new.data());
 }

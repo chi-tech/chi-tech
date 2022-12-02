@@ -85,35 +85,6 @@ double lbs::acceleration::DiffusionMIPSolver::
   return hp;
 }
 
-int lbs::acceleration::DiffusionMIPSolver::
-  MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
-                  const chi_mesh::Cell& adj_cell,
-                  const size_t f,
-                  const size_t fi,
-                  const double epsilon/*=1.0e-12*/)
-{
-  const auto& cur_cell_mapping = m_sdm.GetCellMapping(cur_cell);
-  const auto& adj_cell_mapping = m_sdm.GetCellMapping(adj_cell);
-
-  const auto cur_cell_node_locs = cur_cell_mapping.GetNodeLocations();
-  const auto adj_cell_node_locs = adj_cell_mapping.GetNodeLocations();
-
-  const int i = cur_cell_mapping.MapFaceNode(f, fi);
-  const auto& node_i_loc = cur_cell_node_locs[i];
-
-  const size_t af = chi_mesh::MeshContinuum::MapCellFace(cur_cell,adj_cell,f);
-  const size_t adj_face_num_nodes = adj_cell_mapping.NumFaceNodes(af);
-
-  for (size_t fj=0; fj<adj_face_num_nodes; ++fj)
-  {
-    const int j = adj_cell_mapping.MapFaceNode(af,fj);
-    if ((node_i_loc - adj_cell_node_locs[j]).NormSquare() < epsilon)
-      return j;
-  }
-
-  throw std::logic_error(
-    "lbs::acceleration::DiffusionMIPSolver::MapFaceNodeDisc: Mapping failure.");
-}
 
 int lbs::acceleration::DiffusionMIPSolver::
   MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,

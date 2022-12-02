@@ -63,9 +63,8 @@ public:
   std::string          wgdsa_string;
   std::string          tgdsa_string;
 
-  chi_physics::Solver*                         tgdsa_solver = nullptr;
-  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> wgdsa_solver2;
-  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> tgdsa_solver2;
+  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> wgdsa_solver;
+  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> tgdsa_solver;
 
   chi_math::UnknownManager psi_uk_man;
 
