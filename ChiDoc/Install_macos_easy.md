@@ -1,84 +1,82 @@
-# Easy install on Ubuntu Machines
+# Easy install on MacOS Machines
 
-The following instructions were tested on Ubuntu 18.04 LTS and newer LTS (22.04 currently); other Linux
-distributions might require some minor tweaking.
+The following instructions were tested on MacOS Monterey (= version 12).
 
-Some portions of this document indicate the use of `sudo`. If you do not have 
-administrative privileges then have your system administrator assist you in 
-these steps.
+### Step 0
+
+Install ```Homebrew``` (Mac ports could be an alternative).
 
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
-- GCC is used to build and install ChiTech.
-- GFortran and Python are used during the installation of PETSc
-(which ChiTech uses as a linear algebra backend) 
-- OpenGL has become optional and VTK can be used, through ViSiT and Paraview, for visualization.
+Then, you may need to install, using brew, the following:
+- make
+- cmake
+- gcc
+- wget
 
-The above packages will therefore need to be installed.
-
-Check to see if gcc is installed
-
-```bash
-gcc --version
+Each time, use: 
+```bash 
+brew install *package_name*
 ```
 
-This should display something like this:
-
-    $ gcc --version
-    gcc (Ubuntu 7.3.0-30ubuntu1~18.04.york0) 7.3.0
-    Copyright (C) 2017 Free Software Foundation, Inc.
-    This is free software; see the source for copying conditions.  There is NO
-    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-If this is not displayed then install gcc using the following command:
-
+I created a ```/Users/USERNAME/local/bin/``` directory where I symbolically linked 
+```gcc```, ```g++```, ```gfortran```
 ```bash
-sudo apt-get install build-essential gfortran
+cd /Users/USERNAME/local/bin/
+ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/gcc-12 gcc
+ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/gfortran-12 gfortran
+ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/g++-12 g++
 ```
 
-If you still do not get the appropriate version when running either ``gcc --version``
-or ``gfortran --version`` then there are many online resources which may be able to
-assist you. One issue commonly seen is that the repositories on your system are not
-updated in which case just run ```sudo apt update```, possibly followed by 
-```sudo apt upgrade```.
-
-Now, install the remaining packages needed to build ChiTech and its dependencies:
-
+In your ```.bashrc``` file, add these lines
 ```bash
-sudo apt-get install cmake python3 git zlib1g-dev libx11-dev unzip
-```
-(note the use of python3)
+export PATH=/Users/jean.ragusa/local/bin/:$PATH
 
-<u>NOTE</u>: If you want to install the *optional* OpenGL package for VTK, do this
+export CC=/Users/USERNAME/local/local/bin/gcc
+export CXX=/Users/USERNAME/local/local/bin/g++
+export FC=/Users/USERNAME/local/local/bin/gfortran
+```
+Source your ```.bashrc``` to take into accounts those updates:
 ```bash
-sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+source ~/.bashrc
 ```
-
-### Step 2 - An MPI flavor
-
-Install either OpenMPI or MPICH. If you have MOOSE or deal.ii installed then you
-are probably already set to go. **MPICH** is recommended for better performance.
-
+Make sure the following environment variables have been properly set
 ```bash
-sudo apt-get install mpich
+$CC --version
+$CXX --version
+$FC --version
+```
+### Step 2 - MPICH
+
+Download ```MPICH``` from the web locally to your drive. Untar the ball. 
+
+Configure and install as follows:
+```bash
+./configure --prefix=$PWD/build FFLAGS=-fallow-argument-mismatch FCFLAGS=-fallow-argument-mismatch
+make
+make install
 ```
 
-To check if this is working properly, simply do the mpi version of checking for
-a C++ compiler:
-
+Check that everything went fine:
 ```bash
 mpicc --version
 ```
+Now, update your ```.bashrc``` file
+```bash
+export PATH=/Users/USERNAME/local/MPICH/mpich-4.0.3/build/bin:$PATH
+ 
+export CC=/Users/USERNAME/local/MPICH/mpich-4.0.3/build/bin/mpicc
+export CXX=/Users/USERNAME/local/MPICH/mpich-4.0.3/build/bin/mpicxx
+export FC=/Users/USERNAME/local/MPICH/mpich-4.0.3/build/bin/mpifort
+```
+which means that, from now on, the C, C++, and Fortran compilers are the ones from MPICH.
 
-Which should display the same message the gcc call did, i.e.,
-
-    $ mpicc --version
-    gcc (Ubuntu 7.3.0-30ubuntu1~18.04.york0) 7.3.0
-    Copyright (C) 2017 Free Software Foundation, Inc.
-    This is free software; see the source for copying conditions.  There is NO
-    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Make sure to ```source ~/.bashrc``` to take into accounts those updates.
 
 ### Step 3 - Clone ChiTech
+
+**Note:** From now on, the rest of the instructions are identical to the ones from the 
+[Easy Linux instructions](./Install_ubuntu_easy.md)
 
 **Important:**  If you want to contribute to **ChiTech**, it is strongly recommended to first fork the **ChiTech** repository into your own Git account and then to clone your fork. 
 
@@ -147,7 +145,7 @@ you can run
 
 ### Step 6 - Run regression tests
 
-To check if the code compiled correctly execute the test scripts:
+To check if the code compiled correctly, execute the test scripts:
 
 ```bash
     $ python3 ChiTest/Z_Run_all.py
@@ -158,16 +156,9 @@ To check if the code compiled correctly execute the test scripts:
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
 To generate the documentation from your local working copy, first make sure
-Doxygen, LaTeX, and lua (currently, lua is at version 5.4) are installed:
+Doxygen and LaTeX (texlive) are installed (otherwise, get them from ```brew``).
 
-```bash
-sudo apt-get install doxygen 
-sudo apt-get install texlive
-sudo apt install texlive-font-utils
-sudo apt-get install lua5.4
-```
-
-The documentation is contained in the *CHI_DOC* folder and can be generated
+The documentation is contained in the *ChiDoc* folder and can be generated
 using a script provided in that folder:
 
 ```bash
