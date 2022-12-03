@@ -2,11 +2,11 @@
 #define CFEM_DIFFUSION_LUA_UTILS_H
 
 #include"ChiLua/chi_lua.h"
+#include "../cfem_diffusion_solver.h"
 
 int chiCFEMDiffusionSolverCreate(lua_State *L);
 int chiCFEMDiffusionSetBCProperty(lua_State *L);
 
-#include "../cfem_diffusion_solver.h"
 
 namespace cfem_diffusion
 {
