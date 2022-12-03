@@ -40,11 +40,14 @@ double lbs::acceleration::DiffusionMIPSolver::
     const auto& v0 = m_grid.vertices[v0i];
     const auto& v1 = m_grid.vertices[v1i];
 
-    double perimeter = (v1 - v0).Norm();
+//    double perimeter = (v1 - v0).Norm();
+    double perimeter = 0.0;
+    for (size_t fr=0; fr<Nf; ++fr)
+      perimeter += cell_mapping.FaceArea(fr);
 
     double area  = cell_mapping.CellVolume();
 
-    hp = area/perimeter;
+    hp = 4.0*area/perimeter;
 
 //    if (Nv == 3)
 //      hp = 2*area/perimeter;

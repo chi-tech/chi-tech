@@ -142,7 +142,7 @@ public:
 
   //03
   void EnergyCollapse(std::vector<double>& ref_xi,
-                      double& D, double& sigma_a,
+                      double& D, double& ref_sigma_a,
                       int collapse_type = E_COLLAPSE_JACOBI);
 
   //05

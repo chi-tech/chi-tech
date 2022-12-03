@@ -15,10 +15,13 @@
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 
 void lbs::acceleration::DiffusionMIPSolver::
-  AssembleAand_b(const std::vector<double>& q_vector)
+  AssembleAand_b_wQpoints(const std::vector<double>& q_vector)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
-                            "AssembleAand_b";
+                            "AssembleAand_b_wQpoints";
+  if (m_A == nullptr or m_rhs == nullptr or m_ksp == nullptr)
+    throw std::logic_error(fname + ": Some or all PETSc elements are null. "
+                                   "Check that Initialize has been called.");
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 

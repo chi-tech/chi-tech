@@ -17,10 +17,13 @@
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 
 void lbs::acceleration::DiffusionMIPSolver::
-  Assemble_b2(const std::vector<double>& q_vector)
+  Assemble_b(const std::vector<double>& q_vector)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
                             "Assemble_b";
+  if (m_A == nullptr or m_rhs == nullptr or m_ksp == nullptr)
+    throw std::logic_error(fname + ": Some or all PETSc elements are null. "
+                                   "Check that Initialize has been called.");
   if (options.verbose)
     chi::log.Log() << chi::program_timer.GetTimeString() << " Starting assembly";
 

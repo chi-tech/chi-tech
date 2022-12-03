@@ -77,7 +77,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
 
     delta_phi_local.assign(sdm.GetNumLocalDOFs(uk_man),0.0);
 
-    solver->AssembleAand_b2(delta_phi_local);
+    solver->AssembleAand_b(delta_phi_local);
 
     delta_phi_local.resize(0);
     delta_phi_local.shrink_to_fit();
@@ -179,7 +179,7 @@ void lbs::SteadySolver::
   AssembleWGDSADeltaPhiVector(groupset,
                               ref_phi_old.data(),
                               ref_phi_new.data());
-  groupset.wgdsa_solver->Assemble_b2(delta_phi_local);
+  groupset.wgdsa_solver->Assemble_b(delta_phi_local);
   groupset.wgdsa_solver->Solve(delta_phi_local);
   DisAssembleWGDSADeltaPhiVector(groupset, ref_phi_new.data());
 }

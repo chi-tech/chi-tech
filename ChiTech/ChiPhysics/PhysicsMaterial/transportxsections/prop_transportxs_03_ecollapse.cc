@@ -8,7 +8,7 @@
 /**Partial Jacobi energy collapse.*/
 void chi_physics::TransportCrossSections::
   EnergyCollapse(std::vector<double>& ref_xi,
-                 double& D, double& sigma_a,
+                 double& D, double& ref_sigma_a,
                  int collapse_type)
 {
   //============================================= Make a Dense matrix from
@@ -17,11 +17,11 @@ void chi_physics::TransportCrossSections::
   S.resize(num_groups, std::vector<double>(num_groups, 0.0));
   for (int g=0; g < num_groups; g++)
   {
-    S[g][g] = 1.0;
-    int num_transfer = transfer_matrices[0].rowI_indices[g].size();
-    for (int j=0; j<num_transfer; j++)
+    S[g][g] = 0.0;
+    size_t num_transfer = transfer_matrices[0].rowI_indices[g].size();
+    for (size_t j=0; j<num_transfer; j++)
     {
-      int gprime   = transfer_matrices[0].rowI_indices[g][j];
+      size_t gprime   = transfer_matrices[0].rowI_indices[g][j];
       S[g][gprime] = transfer_matrices[0].rowI_values[g][j];
     }//for j
   }//for g
@@ -34,12 +34,15 @@ void chi_physics::TransportCrossSections::
   {
     if      (collapse_type == E_COLLAPSE_JACOBI)
     {
-      A[g][g] = sigma_t[g] - S[g][g];
-      for (int gp=0; gp<g; gp++)
-        B[g][gp] = S[g][gp];
+//      A[g][g] = sigma_t[g] - S[g][g];
+//      for (int gp=0; gp<g; gp++)
+//        B[g][gp] = S[g][gp];
+//
+//      for (int gp=g+1; gp < num_groups; gp++)
+//        B[g][gp] = S[g][gp];
 
-      for (int gp=g+1; gp < num_groups; gp++)
-        B[g][gp] = S[g][gp];
+      A[g][g] = sigma_t[g];
+      B = S;
     }
     else if (collapse_type == E_COLLAPSE_PARTIAL_JACOBI)
     {
@@ -95,22 +98,21 @@ void chi_physics::TransportCrossSections::
 
   //======================================== Compute two-grid diffusion quantities
   D = 0.0;
-  sigma_a = 0.0;
-  for (int g=0; g < num_groups; g++)
+  ref_sigma_a = 0.0;
+  for (int g=0; g < num_groups; ++g)
   {
     D += diffusion_coeff[g] * ref_xi[g];
 
-    sigma_a += sigma_t[g] * ref_xi[g];
+    ref_sigma_a += sigma_t[g] * ref_xi[g];
 
-    for (int gp=0; gp < num_groups; gp++)
-      sigma_a -= S[g][gp]*ref_xi[gp];
+    for (int gp=0; gp < num_groups; ++gp)
+      ref_sigma_a -= S[g][gp] * ref_xi[gp];
   }
 
   //======================================== Verbose output the spectrum
-  chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
+  chi::log.Log() << "Fundamental eigen-value: " << rho;
   std::stringstream outstr;
   for (auto& xi : ref_xi)
     outstr << xi << '\n';
-  chi::log.Log0Verbose1() << outstr.str();
-
+  chi::log.Log() << outstr.str();
 }

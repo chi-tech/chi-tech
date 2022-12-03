@@ -39,8 +39,16 @@ void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
     KSPMonitorSet(m_ksp, &GeneralKSPMonitor, nullptr, nullptr);
   }
 
+  double rhs_norm;
+  VecNorm(m_rhs, NORM_2, &rhs_norm);
+  chi::log.Log() << "RHS-norm " << rhs_norm;
+
   //============================================= Solve
   KSPSolve(m_ksp,m_rhs,x);
+
+  double sol_norm;
+  VecNorm(x, NORM_2, &sol_norm);
+  chi::log.Log() << "Solution-norm " << sol_norm;
 
   //============================================= Print convergence info
   if (options.verbose)
