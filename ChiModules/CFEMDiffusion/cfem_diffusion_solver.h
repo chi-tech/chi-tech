@@ -29,10 +29,10 @@ namespace cfem_diffusion
 class Solver : public chi_physics::Solver
 {
 private:
-  chi_objects::ChiTimer t_assembly;
-  chi_objects::ChiTimer t_solve;
-
-  double time_assembly=0.0, time_solve=0.0;
+//  chi_objects::ChiTimer t_assembly;
+//  chi_objects::ChiTimer t_solve;
+//
+//  double time_assembly=0.0, time_solve=0.0;
   bool verbose_info=true;
 
 public:
