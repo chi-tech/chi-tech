@@ -87,9 +87,9 @@ protected:
   const int64_t m_num_local_dofs;
   const int64_t m_num_global_dofs;
 
-  Mat m_A;
-  Vec m_rhs;
-  KSP m_ksp;
+  Mat m_A = nullptr;
+  Vec m_rhs = nullptr;
+  KSP m_ksp = nullptr;
 
 public:
   struct Options
@@ -120,14 +120,14 @@ public:
   void Initialize();
 
   //01a
-  void AssembleAand_b(const std::vector<double>& q_vector);
+  void AssembleAand_b_wQpoints(const std::vector<double>& q_vector);
   //01b
-  void Assemble_b(const std::vector<double>& q_vector);
+  void Assemble_b_wQpoints(const std::vector<double>& q_vector);
 
   //01c
-  void AssembleAand_b2(const std::vector<double>& q_vector);
+  void AssembleAand_b(const std::vector<double>& q_vector);
   //01d
-  void Assemble_b2(const std::vector<double>& q_vector);
+  void Assemble_b(const std::vector<double>& q_vector);
 
   //02
   void Solve(std::vector<double>& solution);

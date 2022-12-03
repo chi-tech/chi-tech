@@ -69,7 +69,7 @@ void lbs::SteadySolver::InitTGDSA(LBSGroupset& groupset)
 
     delta_phi_local.assign(sdm.GetNumLocalDOFs(uk_man),0.0);
 
-    solver->AssembleAand_b2(delta_phi_local);
+    solver->AssembleAand_b(delta_phi_local);
 
     delta_phi_local.resize(0);
     delta_phi_local.shrink_to_fit();
@@ -92,7 +92,6 @@ void lbs::SteadySolver::AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                                     const double *ref_phi_new)
 {
   const auto& sdm = *discretization;
-  const auto& dphi_uk_man = groupset.tgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man;
 
   const int    gsi = groupset.groups.front().id;
@@ -106,22 +105,23 @@ void lbs::SteadySolver::AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
     const size_t num_nodes = cell_mapping.NumNodes();
     const auto& S = matid_to_xs_map[cell.material_id]->transfer_matrices[0];
 
-    for (size_t i=0; i < num_nodes; i++)
+    for (size_t i=0; i < num_nodes; ++i)
     {
-      const int64_t dphi_map = sdm.MapDOFLocal(cell, i, dphi_uk_man, 0, 0);
-      const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, gsi);
+      const int64_t dphi_map = sdm.MapDOFLocal(cell, i);
+      const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, 0);
 
+            double& delta_phi_mapped = delta_phi_local[dphi_map];
       const double* phi_old_mapped   = &ref_phi_old[phi_map];
       const double* phi_new_mapped   = &ref_phi_new[phi_map];
 
-      for (size_t g=0; g<gss; g++)
+      for (size_t g=0; g<gss; ++g)
       {
-        delta_phi_local[dphi_map] = 0.0;
         double R_g = 0.0;
-        for (const auto& [row_g, gprime, sigma_sm] : S.Row(g))
-          R_g += sigma_sm * (phi_new_mapped[gprime] - phi_old_mapped[gprime]);
+        for (const auto& [row_g, gprime, sigma_sm] : S.Row(gsi+g))
+          if (gprime >= gsi + g)
+            R_g += sigma_sm * (phi_new_mapped[gprime] - phi_old_mapped[gprime]);
 
-        delta_phi_local[dphi_map] += R_g;
+        delta_phi_mapped += R_g;
       }//for g
     }//for node
   }//for cell
@@ -133,7 +133,6 @@ void lbs::SteadySolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
                                                        double *ref_phi_new)
 {
   const auto& sdm = *discretization;
-  const auto& dphi_uk_man = groupset.tgdsa_solver->UnknownStructure();
   const auto& phi_uk_man  = flux_moments_uk_man;
 
   const int    gsi = groupset.groups.front().id;
@@ -143,19 +142,18 @@ void lbs::SteadySolver::DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    auto& transport_view = cell_transport_views[cell.local_id];
 
     const auto& xi_g = matid_to_xs_map[cell.material_id]->xi_Jfull;
 
-    for (size_t i=0; i < num_nodes; i++)
+    for (size_t i=0; i < num_nodes; ++i)
     {
-      const int64_t dphi_map = sdm.MapDOFLocal(cell, i, dphi_uk_man, 0, 0);
+      const int64_t dphi_map = sdm.MapDOFLocal(cell, i);
       const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, gsi);
 
       const double delta_phi_mapped = delta_phi_local[dphi_map];
       double* phi_new_mapped   = &ref_phi_new[phi_map];
 
-      for (int g=0; g<gss; g++)
+      for (int g=0; g<gss; ++g)
         phi_new_mapped[g] += delta_phi_mapped*xi_g[gsi+g];
     }//for dof
   }//for cell
@@ -175,7 +173,9 @@ void lbs::SteadySolver::
   AssembleTGDSADeltaPhiVector(groupset,
                               ref_phi_old.data(),
                               ref_phi_new.data());
-  groupset.tgdsa_solver->Assemble_b2(delta_phi_local);
+  auto source = delta_phi_local;
+  groupset.tgdsa_solver->Assemble_b(delta_phi_local);
   groupset.tgdsa_solver->Solve(delta_phi_local);
+
   DisAssembleTGDSADeltaPhiVector(groupset, ref_phi_new.data());
 }
