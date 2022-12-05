@@ -1,13 +1,10 @@
 #include "../lbs_linear_boltzmann_solver.h"
 
-#include "DiffusionSolver/Solver/diffusion_solver.h"
-
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "ChiTimer/chi_timer.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
-
 
 #include <iomanip>
 

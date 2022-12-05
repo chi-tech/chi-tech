@@ -1,9 +1,7 @@
 #include "lbs_matrixaction_Ax.h"
-#include "../Tools/ksp_data_context.h"
+#include "LinearBoltzmannSolver/Tools/ksp_data_context.h"
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
-#include "../../DiffusionSolver/Solver/diffusion_solver.h"
-#include "LinearBoltzmannSolver/Acceleration/diffusion_mip.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
