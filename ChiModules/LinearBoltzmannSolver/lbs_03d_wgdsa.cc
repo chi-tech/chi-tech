@@ -149,7 +149,6 @@ void lbs::SteadySolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    auto& transport_view = cell_transport_views[cell.local_id];
 
     for (size_t i=0; i < num_nodes; i++)
     {
