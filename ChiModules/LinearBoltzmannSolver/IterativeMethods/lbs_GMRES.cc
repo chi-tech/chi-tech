@@ -4,9 +4,6 @@
 #include "../Tools/ksp_data_context.h"
 #include "../IterativeOperations/lbs_matrixaction_Ax.h"
 
-#include "DiffusionSolver/Solver/diffusion_solver.h"
-#include "LinearBoltzmannSolver/Acceleration/diffusion_mip.h"
-
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
 #include "chi_runtime.h"
