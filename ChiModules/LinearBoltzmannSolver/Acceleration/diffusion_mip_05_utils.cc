@@ -6,6 +6,7 @@
 
 #include "ChiMesh/chi_mesh.h"
 
+//###################################################################
 /**Still searching for a reference for this.
  *
  * For Polygons:
@@ -88,7 +89,8 @@ double lbs::acceleration::DiffusionMIPSolver::
   return hp;
 }
 
-
+//###################################################################
+/**Maps a face, in a discontinuous sense, using the spatial discretization.*/
 int lbs::acceleration::DiffusionMIPSolver::
   MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
                   const chi_mesh::Cell& adj_cell,
@@ -117,6 +119,14 @@ int lbs::acceleration::DiffusionMIPSolver::
     "lbs::acceleration::DiffusionMIPSolver::MapFaceNodeDisc: Mapping failure.");
 }
 
+//###################################################################
+/**Calls a lua function with xyz coordinates.
+ * \param L The lua state.
+ * \param lua_func_name The name used to define this lua function in the lua
+ *                      state.
+ * \param xyz The xyz coordinates of the point where the function is called.
+ *
+ * \return The function evaluation.*/
 double lbs::acceleration::DiffusionMIPSolver::
   CallLuaXYZFunction(lua_State* L, const std::string& lua_func_name,
                      const chi_mesh::Vector3& xyz)

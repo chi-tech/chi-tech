@@ -5,7 +5,7 @@
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 //###################################################################
-/**Constructor.*/
+/**Default constructor.*/
 lbs::acceleration::DiffusionMIPSolver::
   DiffusionMIPSolver(std::string text_name,
                      const chi_mesh::MeshContinuum &grid,
@@ -38,6 +38,8 @@ lbs::acceleration::DiffusionMIPSolver::
                            " used with PWLD.");
 }
 
+//###################################################################
+/**Default destructor.*/
 lbs::acceleration::DiffusionMIPSolver::~DiffusionMIPSolver()
 {
   MatDestroy(&m_A);
