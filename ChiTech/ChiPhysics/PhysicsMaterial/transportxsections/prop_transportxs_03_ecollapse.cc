@@ -110,9 +110,9 @@ void chi_physics::TransportCrossSections::
   }
 
   //======================================== Verbose output the spectrum
-  chi::log.Log() << "Fundamental eigen-value: " << rho;
+  chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
   std::stringstream outstr;
   for (auto& xi : ref_xi)
     outstr << xi << '\n';
-  chi::log.Log() << outstr.str();
+  chi::log.Log0Verbose1() << outstr.str();
 }
