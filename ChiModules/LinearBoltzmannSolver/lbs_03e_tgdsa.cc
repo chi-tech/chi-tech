@@ -173,7 +173,6 @@ void lbs::SteadySolver::
   AssembleTGDSADeltaPhiVector(groupset,
                               ref_phi_old.data(),
                               ref_phi_new.data());
-  auto source = delta_phi_local;
   groupset.tgdsa_solver->Assemble_b(delta_phi_local);
   groupset.tgdsa_solver->Solve(delta_phi_local);
 
