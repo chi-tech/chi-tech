@@ -9,7 +9,9 @@
 #include "chi_log.h"
 
 //###################################################################
-/**Solves the system.*/
+/**Solves the system and stores the local solution in the vector provide.
+ *
+ * \param solution Vector in to which the solution will be parsed.*/
 void lbs::acceleration::DiffusionMIPSolver::Solve(std::vector<double>& solution)
 {
   const std::string fname = "lbs::acceleration::DiffusionMIPSolver::Solve";

@@ -16,6 +16,9 @@
 
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 
+//###################################################################
+/**Assembles both the matrix and the RHS using unit cell-matrices. These are
+ * the routines used in the production versions.*/
 void lbs::acceleration::DiffusionMIPSolver::
   AssembleAand_b(const std::vector<double>& q_vector)
 {

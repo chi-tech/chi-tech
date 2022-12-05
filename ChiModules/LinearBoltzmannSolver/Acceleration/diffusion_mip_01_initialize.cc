@@ -8,6 +8,13 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+//###################################################################
+/**Initializes the diffusion solver. This involves creating the
+ * sparse matrix with the appropriate sparsity pattern. Creating the
+ * RHS vector. Creating the KSP solver. Setting the very specialized parameters
+ * for Hypre's BooomerAMG. Note: `PCSetFromOptions` and
+ * `KSPSetFromOptions` are called at the end. Therefore, any number of
+ * additional PETSc options can be passed via the commandline.*/
 void lbs::acceleration::DiffusionMIPSolver::Initialize()
 {
   if (options.verbose)

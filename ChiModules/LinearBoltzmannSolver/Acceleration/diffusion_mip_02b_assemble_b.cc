@@ -14,6 +14,9 @@
 
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 
+//###################################################################
+/**Assembles just the RHS using quadrature points. These
+ * routines exist for implementing MMS.*/
 void lbs::acceleration::DiffusionMIPSolver::
   Assemble_b_wQpoints(const std::vector<double>& q_vector)
 {
