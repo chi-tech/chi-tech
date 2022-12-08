@@ -24,62 +24,56 @@ double lbs::acceleration::DiffusionMIPSolver::
   const auto& cell_mapping = m_sdm.GetCellMapping(cell);
   double hp;
 
-  size_t Nf = cell.faces.size();
-  size_t Nv = cell.vertex_ids.size();
+  const size_t num_faces = cell.faces.size();
+  const size_t num_vertices = cell.vertex_ids.size();
+
+  const double volume = cell_mapping.CellVolume();
+  const double face_area = cell_mapping.FaceArea(f);
+
+  /**Lambda to compute surface area.*/
+  auto ComputeSurfaceArea = [&cell_mapping,&num_faces]()
+  {
+    double surface_area = 0.0;
+    for (size_t fr=0; fr<num_faces; ++fr)
+      surface_area += cell_mapping.FaceArea(fr);
+
+    return surface_area;
+  };
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SLAB
   if (cell.Type() == chi_mesh::CellType::SLAB)
-    hp = cell_mapping.CellVolume()/2.0;
+    hp = volume/2.0;
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYGON
   else if (cell.Type() == chi_mesh::CellType::POLYGON)
   {
-    const chi_mesh::CellFace& face = cell.faces[f];
+    if (num_faces == 3)
+      hp = 2.0*volume/face_area;
+    else if (num_faces == 4)
+      hp = volume/face_area;
+    else //Nv > 4
+    {
+      const double surface_area = ComputeSurfaceArea();
 
-    uint64_t v0i = face.vertex_ids[0];
-    uint64_t v1i = face.vertex_ids[1];
-
-    const auto& v0 = m_grid.vertices[v0i];
-    const auto& v1 = m_grid.vertices[v1i];
-
-//    double perimeter = (v1 - v0).Norm();
-    double perimeter = 0.0;
-    for (size_t fr=0; fr<Nf; ++fr)
-      perimeter += cell_mapping.FaceArea(fr);
-
-    double area  = cell_mapping.CellVolume();
-
-    hp = 4.0*area/perimeter;
-
-//    if (Nv == 3)
-//      hp = 2*area/perimeter;
-//    else if (Nv == 4)
-//      hp = area/perimeter;
-//    else //Nv > 4
-//    {
-//      if (Nv%2 == 0)
-//        hp = 4*area/perimeter;
-//      else
-//      {
-//        hp = 2*area/perimeter;
-//        hp += sqrt(2*area / Nv*sin(2*M_PI/Nv));
-//      }
-//    }
+      if (num_faces % 2 == 0)
+        hp = 4.0*volume/surface_area;
+      else
+      {
+        hp = 2.0*volume/surface_area;
+        hp += sqrt(2.0 * volume / (num_faces * sin(2.0 * M_PI / num_faces)));
+      }
+    }
   }
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POLYHEDRON
   else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
   {
-    double volume  = cell_mapping.CellVolume();
+    const double surface_area = ComputeSurfaceArea();
 
-    double area = 0.0;
-    for (size_t fr=0; fr<Nf; ++fr)
-      area += cell_mapping.FaceArea(fr);
-
-    if (Nf == 4)                  //Tet
-      hp = 3*volume/area;
-    else if (Nf == 6 && Nv == 8)  //Hex
-      hp = volume/area;
+    if (num_faces == 4)                  //Tet
+      hp = 3 * volume / surface_area;
+    else if (num_faces == 6 && num_vertices == 8)  //Hex
+      hp = volume / surface_area;
     else                          //Polyhedron
-      hp = 6*volume/area;
+      hp = 6 * volume / surface_area;
   }//Polyhedron
   else
     throw std::logic_error(

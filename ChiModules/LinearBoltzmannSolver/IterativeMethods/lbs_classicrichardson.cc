@@ -8,6 +8,8 @@
 
 #include <iomanip>
 
+#define sc_double static_cast<double>
+
 //###################################################################
 /**Solves a groupset using classic richardson.*/
 bool lbs::SteadySolver::
@@ -16,6 +18,7 @@ ClassicRichardson(LBSGroupset& groupset,
                   SourceFlags source_flags,
                   bool log_info /* = true*/)
 {
+  constexpr bool WITH_DELAYED_PSI = true;
   if (log_info)
   {
     chi::log.Log() << "\n\n";
@@ -26,6 +29,25 @@ ClassicRichardson(LBSGroupset& groupset,
       << groupset.quadrature->abscissae.size() << "\n"
       << "Groups " << groupset.groups.front().id << " "
       << groupset.groups.back().id << "\n\n";
+  }
+
+  const auto num_delayed_psi_info = groupset.angle_agg.GetNumDelayedAngularDOFs();
+  const size_t num_angles = groupset.quadrature->abscissae.size();
+  const size_t num_psi_global = glob_node_count *
+                                num_angles *
+                                groupset.groups.size();
+  const size_t num_delayed_psi_globl = num_delayed_psi_info.second;
+
+  if (log_info)
+  {
+    chi::log.Log()
+      << "Total number of angular unknowns: "
+      << num_psi_global
+      << "\n"
+      << "Number of lagged angular unknowns: "
+      << num_delayed_psi_globl << "("
+      << sc_double(num_delayed_psi_globl) / sc_double(num_psi_global)
+      << "%)";
   }
 
   std::vector<double> init_q_moments_local = q_moments_local;
@@ -56,7 +78,7 @@ ClassicRichardson(LBSGroupset& groupset,
 
     double pw_change = ComputePiecewiseChange(groupset);
 
-    ScopedCopySTLvectors(groupset, phi_new_local, phi_old_local);
+    ScopedCopySTLvectors(groupset,phi_new_local,phi_old_local);
 
     double rho = sqrt(pw_change / pw_change_prev);
     pw_change_prev = pw_change;
@@ -113,10 +135,6 @@ ClassicRichardson(LBSGroupset& groupset,
     double source_time=
       chi::log.ProcessEvent(source_event_tag,
                            chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
-    size_t num_angles = groupset.quadrature->abscissae.size();
-    size_t num_unknowns = glob_node_count *
-                          num_angles *
-                          groupset.groups.size();
 
     if (log_info)
     {
@@ -131,9 +149,9 @@ ClassicRichardson(LBSGroupset& groupset,
       chi::log.Log()
         << "        Sweep Time/Unknown (ns):       "
         << sweep_time*1.0e9*chi::mpi.process_count/
-            static_cast<double>(num_unknowns);
+            sc_double(num_psi_global);
       chi::log.Log()
-        << "        Number of unknowns per sweep:  " << num_unknowns;
+        << "        Number of unknowns per sweep:  " << num_psi_global;
       chi::log.Log()
         << "\n\n";
 

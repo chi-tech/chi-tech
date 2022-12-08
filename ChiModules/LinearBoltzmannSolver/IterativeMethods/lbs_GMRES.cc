@@ -12,6 +12,8 @@
 #include "ChiTimer/chi_timer.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
+#define sc_double static_cast<double>
+
 //###################################################################
 /**Solves a groupset using GMRES.*/
 bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
@@ -36,16 +38,30 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   }
 
   //================================================== Get groupset dof sizes
-  size_t groupset_numgrps = groupset.groups.size();
-  auto num_delayed_ang_DOFs = groupset.angle_agg.GetNumDelayedAngularDOFs();
-  size_t local_size = local_node_count * num_moments * groupset_numgrps +
-                      num_delayed_ang_DOFs.first;
-  size_t globl_size = glob_node_count * num_moments * groupset_numgrps +
-                      num_delayed_ang_DOFs.second;
+  const size_t groupset_numgrps = groupset.groups.size();
+  const auto num_delayed_psi_info = groupset.angle_agg.GetNumDelayedAngularDOFs();
+  const size_t local_size = local_node_count * num_moments * groupset_numgrps +
+                            num_delayed_psi_info.first;
+  const size_t globl_size = glob_node_count * num_moments * groupset_numgrps +
+                            num_delayed_psi_info.second;
+  const size_t num_angles = groupset.quadrature->abscissae.size();
+  const size_t num_psi_global = glob_node_count *
+                                num_angles *
+                                groupset.groups.size();
+  const size_t num_delayed_psi_globl = num_delayed_psi_info.second;
 
   if (log_info)
+  {
     chi::log.Log()
-      << "Number of lagged angular unknowns: " << num_delayed_ang_DOFs.second;
+      << "Total number of angular unknowns: "
+      << num_psi_global
+      << "\n"
+      << "Number of lagged angular unknowns: "
+      << num_delayed_psi_globl << "("
+      << sc_double(num_delayed_psi_globl) / sc_double(num_psi_global)
+      << "%)";
+  }
+
 
   //================================================== Create PETSc vectors
   phi_new = chi_math::PETScUtils::CreateVector(static_cast<int64_t>(local_size),
@@ -185,10 +201,6 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
     double source_time=
       chi::log.ProcessEvent(source_event_tag,
                            chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
-    size_t num_angles = groupset.quadrature->abscissae.size();
-    size_t num_unknowns = glob_node_count *
-                          num_angles *
-                          groupset.groups.size();
 
     if (log_info)
     {
@@ -206,9 +218,9 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
       chi::log.Log()
         << "        Sweep Time/Unknown (ns):       "
         << sweep_time*1.0e9*chi::mpi.process_count/
-           static_cast<double>(num_unknowns);
+           sc_double(num_psi_global);
       chi::log.Log()
-        << "        Number of unknowns per sweep:  " << num_unknowns;
+        << "        Number of unknowns per sweep:  " << num_psi_global;
       chi::log.Log()
         << "\n\n";
 

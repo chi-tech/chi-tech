@@ -30,6 +30,8 @@ namespace lbs
 namespace lbs::acceleration
 {
 
+struct Multigroup_D_and_sigR;
+
 /**Boundary condition type. We essentially only support two
  * types: Dirichlet and Reflecting, the latter is covered under
  * the ROBIN-type boundary condition.*/
@@ -53,17 +55,6 @@ struct BoundaryCondition
 {
   BCType type = BCType::DIRICHLET;
   std::array<double,3> values = {0,0,0};
-};
-
-/**Since the solver below double for both WGDSA and TGDSA we define this
- * simplified data structure to hold multigroup diffusion coefficients and
- * removal cross sections only for the relevant groups. E.g., for WGDSA it
- * will only hold the cross sections for the groupset, and for TGDSA there will
- * only be one group (All groups collapsed into 1).*/
-struct Multigroup_D_and_sigR
-{
-  std::vector<double> Dg;
-  std::vector<double> sigR;
 };
 
 /**Generalized diffusion solver for both WGDSA and TGDSA based on the MIP-method

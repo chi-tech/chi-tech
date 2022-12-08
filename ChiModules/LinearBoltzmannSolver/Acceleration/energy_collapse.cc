@@ -1,30 +1,33 @@
-#include "material_property_transportxsections.h"
+#include "acceleration.h"
+
+#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-
 //###################################################################
-/**Partial Jacobi energy collapse.*/
-void chi_physics::TransportCrossSections::
-  EnergyCollapse(std::vector<double>& ref_xi,
-                 double& D, double& ref_sigma_a,
-                 int collapse_type)
+/***/
+lbs::acceleration::TwoGridCollapsedInfo lbs::acceleration::
+  MakeTwoGridCollapsedInfo(const chi_physics::TransportCrossSections &xs,
+                           EnergyCollapseScheme scheme)
 {
+  const std::string fname = "lbs::acceleration::MakeTwoGridCollapsedInfo";
+
+  const size_t num_groups               = xs.num_groups;
+  const auto& sigma_t                   = xs.sigma_t;
+  const auto& diffusion_coeff           = xs.diffusion_coeff;
+
   //============================================= Make a Dense matrix from
   //                                              sparse transfer matrix
-  std::vector<std::vector<double>> S;
-  S.resize(num_groups, std::vector<double>(num_groups, 0.0));
+  if (xs.transfer_matrices.empty())
+    throw std::logic_error(fname + ": list of scattering matrices empty.");
+
+  const auto& isotropic_transfer_matrix = xs.transfer_matrices[0];
+
+  MatDbl S(num_groups, VecDbl(num_groups, 0.0));
   for (int g=0; g < num_groups; g++)
-  {
-    S[g][g] = 0.0;
-    size_t num_transfer = transfer_matrices[0].rowI_indices[g].size();
-    for (size_t j=0; j<num_transfer; j++)
-    {
-      size_t gprime   = transfer_matrices[0].rowI_indices[g][j];
-      S[g][gprime] = transfer_matrices[0].rowI_values[g][j];
-    }//for j
-  }//for g
+    for (const auto& [row_g, gprime, sigma] : isotropic_transfer_matrix.Row(g))
+      S[g][gprime] = sigma;
 
   //============================================= Compiling the A and B matrices
   //                                              for different methods
@@ -32,40 +35,19 @@ void chi_physics::TransportCrossSections::
   MatDbl B(num_groups, VecDbl(num_groups, 0.0));
   for (int g=0; g < num_groups; g++)
   {
-    if      (collapse_type == E_COLLAPSE_JACOBI)
-    {
-//      A[g][g] = sigma_t[g] - S[g][g];
-//      for (int gp=0; gp<g; gp++)
-//        B[g][gp] = S[g][gp];
-//
-//      for (int gp=g+1; gp < num_groups; gp++)
-//        B[g][gp] = S[g][gp];
-
-      A[g][g] = sigma_t[g];
-      B = S;
-    }
-    else if (collapse_type == E_COLLAPSE_PARTIAL_JACOBI)
-    {
-      A[g][g] = sigma_t[g];
-      for (int gp=0; gp < num_groups; gp++)
-        B[g][gp] = S[g][gp];
-    }
-    else if (collapse_type == E_COLLAPSE_GAUSS)
+    if      (scheme == EnergyCollapseScheme::JFULL)
     {
       A[g][g] = sigma_t[g] - S[g][g];
       for (int gp=0; gp<g; gp++)
-        A[g][gp] = -S[g][gp];
+        B[g][gp] = S[g][gp];
 
       for (int gp=g+1; gp < num_groups; gp++)
         B[g][gp] = S[g][gp];
     }
-    else if (collapse_type == E_COLLAPSE_PARTIAL_GAUSS)
+    else if (scheme == EnergyCollapseScheme::JPARTIAL)
     {
       A[g][g] = sigma_t[g];
-      for (int gp=0; gp<g; gp++)
-        A[g][gp] = -S[g][gp];
-
-      for (int gp=g; gp < num_groups; gp++)
+      for (int gp=0; gp < num_groups; gp++)
         B[g][gp] = S[g][gp];
     }
   }//for g
@@ -84,35 +66,37 @@ void chi_physics::TransportCrossSections::
   MatDbl C    = chi_math::MatMul(Ainv,B);
   VecDbl E(num_groups, 1.0);
 
+  double collapsed_D = 0.0;
+  double collapsed_sig_a = 0.0;
+  std::vector<double> spectrum(num_groups, 1.0);
+
   //============================================= Perform power iteration
   double rho = chi_math::PowerIteration(C, E, 1000, 1.0e-12);
 
-  ref_xi.resize(num_groups, 0.0);
+  //======================================== Compute two-grid diffusion quantities
   double sum = 0.0;
   for (int g=0; g < num_groups; g++)
     sum += std::fabs(E[g]);
 
   for (int g=0; g < num_groups; g++)
-    ref_xi[g] = std::fabs(E[g])/sum;
+    spectrum[g] = std::fabs(E[g]) / sum;
 
-
-  //======================================== Compute two-grid diffusion quantities
-  D = 0.0;
-  ref_sigma_a = 0.0;
   for (int g=0; g < num_groups; ++g)
   {
-    D += diffusion_coeff[g] * ref_xi[g];
+    collapsed_D += diffusion_coeff[g] * spectrum[g];
 
-    ref_sigma_a += sigma_t[g] * ref_xi[g];
+    collapsed_sig_a += sigma_t[g] * spectrum[g];
 
     for (int gp=0; gp < num_groups; ++gp)
-      ref_sigma_a -= S[g][gp] * ref_xi[gp];
+      collapsed_sig_a -= S[g][gp] * spectrum[gp];
   }
 
   //======================================== Verbose output the spectrum
   chi::log.Log0Verbose1() << "Fundamental eigen-value: " << rho;
   std::stringstream outstr;
-  for (auto& xi : ref_xi)
+  for (auto& xi : spectrum)
     outstr << xi << '\n';
   chi::log.Log0Verbose1() << outstr.str();
+
+  return {collapsed_D, collapsed_sig_a, spectrum};
 }
