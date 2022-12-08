@@ -70,7 +70,7 @@ void lbs::SteadySolver::InitWGDSA(LBSGroupset& groupset)
 
     solver->options.residual_tolerance        = groupset.wgdsa_tol;
     solver->options.max_iters                 = groupset.wgdsa_max_iters;
-//    solver->options.verbose                   = groupset.wgdsa_verbose;
+    solver->options.verbose                   = groupset.wgdsa_verbose;
     solver->options.additional_options_string = groupset.wgdsa_string;
 
     solver->Initialize();

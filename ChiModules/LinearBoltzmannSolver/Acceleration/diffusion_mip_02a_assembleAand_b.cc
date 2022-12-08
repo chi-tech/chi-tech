@@ -1,4 +1,5 @@
 #include "diffusion_mip.h"
+#include "acceleration.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 

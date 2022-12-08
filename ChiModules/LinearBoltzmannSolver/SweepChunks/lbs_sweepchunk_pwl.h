@@ -67,7 +67,7 @@ public:
     int angle_num;
     uint64_t cell_local_id;
     int f;
-    size_t gs_gi;
+    int gs_gi;
     size_t gs_ss_begin;
     bool surface_source_active;
 

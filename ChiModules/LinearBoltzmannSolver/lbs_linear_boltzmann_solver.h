@@ -224,13 +224,14 @@ public:
   //Vector assembly
   void SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
                                 const std::vector<double>& y,
-                                bool with_delayed_psi= false);
+                                bool with_delayed_psi=false);
   void SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
                                 std::vector<double>& y,
-                                bool with_delayed_psi= false);
+                                bool with_delayed_psi=false);
   void ScopedCopySTLvectors(LBSGroupset& groupset,
                             const std::vector<double>& x_src,
-                            std::vector<double>& y);
+                            std::vector<double>& y,
+                            bool with_delayed_psi=false);
 
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);

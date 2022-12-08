@@ -1,5 +1,6 @@
 #include <utility>
 
+#include "acceleration.h"
 #include "diffusion_mip.h"
 
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"

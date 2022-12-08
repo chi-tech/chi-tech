@@ -15,6 +15,8 @@
 
 #include "ChiPhysics/chi_physics_namespace.h"
 
+#include "LinearBoltzmannSolver/Acceleration/acceleration.h"
+
 namespace lbs::acceleration
 {
   class DiffusionMIPSolver;
@@ -65,6 +67,14 @@ public:
 
   std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> wgdsa_solver;
   std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> tgdsa_solver;
+
+  struct TwoGridAccelerationInfo
+  {
+    std::map<int, acceleration::TwoGridCollapsedInfo> map_mat_id_2_tginfo;
+    acceleration::EnergyCollapseScheme scheme =
+      acceleration::EnergyCollapseScheme::JFULL;
+  }tg_acceleration_info;
+
 
   chi_math::UnknownManager psi_uk_man;
 
