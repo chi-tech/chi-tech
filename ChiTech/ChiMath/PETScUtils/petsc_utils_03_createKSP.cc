@@ -117,9 +117,17 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
   if (rhs_norm < 1.0e-12)
     rhs_norm = 1.0;
 
+  //Get solver name
   const char* ksp_name;
   KSPGetOptionsPrefix(ksp,&ksp_name);
 
+  //Default to this if ksp_name is NULL
+  const char NONAME_SOLVER[] = "NoName-Solver\0";
+
+  if (ksp_name == nullptr)
+    ksp_name = NONAME_SOLVER;
+
+  //Print message
   std::stringstream buff;
   buff
     << ksp_name

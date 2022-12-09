@@ -38,6 +38,8 @@ void chi_physics::TransportCrossSections::
   inv_velocity.resize(in_G, 0.0);
 
   transfer_matrices.emplace_back(in_G, in_G);
+
+  ComputeDiffusionParameters();
 }
 
 //###################################################################
@@ -92,6 +94,8 @@ void chi_physics::TransportCrossSections::
   }//for g
 
   sigma_a = ComputeAbsorptionXSFromTransfer();
+
+  ComputeDiffusionParameters();
 }
 
 //###################################################################

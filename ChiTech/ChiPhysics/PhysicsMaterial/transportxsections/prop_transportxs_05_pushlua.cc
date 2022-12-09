@@ -144,22 +144,4 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   Push1DXS(diffusion_coeff, "diffusion_coeff");
   Push1DXS(sigma_removal, "sigma_removal");
   Push1DXS(sigma_s_gtog,"sigma_s_gtog");
-  Push1DXS(xi_Jfull, "xi_Jfull");
-  Push1DXS(xi_Jpart, "xi_Jpart");
-
-  lua_pushstring(L,"D_jfull");
-  lua_pushnumber(L,D_jfull);
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"D_jpart");
-  lua_pushnumber(L,D_jpart);
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"sigma_a_jfull");
-  lua_pushnumber(L,sigma_a_jfull);
-  lua_settable(L,-3);
-
-  lua_pushstring(L,"sigma_a_jpart");
-  lua_pushnumber(L,sigma_a_jpart);
-  lua_settable(L,-3);
 }

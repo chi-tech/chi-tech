@@ -73,5 +73,6 @@ void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
   lua_register(L, "chiSimTest06_WDD", chi_unit_sim_tests::chiSimTest06_WDD);
 
   lua_register(L, "chiSimTest91_PWLD", chi_unit_sim_tests::chiSimTest91_PWLD);
+  lua_register(L, "chiSimTest92_DSA", chi_unit_sim_tests::chiSimTest92_DSA);
 }
 
