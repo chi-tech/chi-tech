@@ -3,10 +3,7 @@
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 

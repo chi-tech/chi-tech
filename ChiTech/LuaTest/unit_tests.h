@@ -39,6 +39,7 @@ namespace chi_unit_sim_tests
 
   int chiSimTest06_WDD(lua_State* L);
 
-  int chiSimTest91_PWLD(lua_State* in_phi_new);
+  int chiSimTest91_PWLD(lua_State* L);
+  int chiSimTest92_DSA(lua_State* L);
 }
 #endif //CHITECH_UNIT_TESTS_H

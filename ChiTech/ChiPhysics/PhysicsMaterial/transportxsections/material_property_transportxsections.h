@@ -4,11 +4,6 @@
 #include "ChiPhysics/PhysicsMaterial/material_property_base.h"
 #include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
 
-#define E_COLLAPSE_PARTIAL_JACOBI 1
-#define E_COLLAPSE_JACOBI         2
-#define E_COLLAPSE_PARTIAL_GAUSS  3
-#define E_COLLAPSE_GAUSS          4
-
 typedef std::vector<std::pair<double,double>> Tvecdbl_vecdbl;
 
 /**\defgroup LuaTransportXSs Transport Cross Sections
@@ -57,16 +52,6 @@ public:
   std::vector<GrpVal> sigma_removal;   ///< Removal cross section
   std::vector<GrpVal> sigma_s_gtog;    ///< Within-group scattering xs
 
-  //Two-grid acceleration quantities
-  std::vector<GrpVal> xi_Jfull;        ///< Infinite medium spectrum full Jacobi-Splitting
-  std::vector<GrpVal> xi_Jpart;        ///< Infinite medium spectrum partial Jacobi-Splitting
-
-  double D_jfull = 0.0;                ///< Collapsed Diffusion coeff full Jacobi-Splitting
-  double D_jpart = 0.0;                ///< Collapsed Diffusion coeff partial Jacobi-Splitting
-
-  double sigma_a_jfull = 0.0;          ///< Collapsed absorption full Jacobi-Splitting
-  double sigma_a_jpart = 0.0;          ///< Collapsed absorption partial Jacobi-Splitting
-
   //Monte-Carlo quantities
 public:
   bool scattering_initialized = false;
@@ -106,16 +91,6 @@ private:
     sigma_removal.clear();
     sigma_s_gtog.clear();
 
-    //Two-grid acceleration quantities
-    xi_Jfull.clear();
-    xi_Jpart.clear();
-
-    D_jfull = 0.0;
-    D_jpart = 0.0;
-
-    sigma_a_jfull = 0.0;
-    sigma_a_jpart = 0.0;
-
     //Monte-Carlo quantities
     scattering_initialized = false;
     cdf_gprime_g.clear();
@@ -139,11 +114,6 @@ public:
 
   //02
   void ComputeDiffusionParameters();
-
-  //03
-  void EnergyCollapse(std::vector<double>& ref_xi,
-                      double& D, double& sigma_a,
-                      int collapse_type = E_COLLAPSE_JACOBI);
 
   //05
   void PushLuaTable(lua_State* L) override;

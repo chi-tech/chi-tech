@@ -90,6 +90,7 @@ void chi_math::PETScUtils::InitMatrixSparsity(
                               0,nodal_nnz_off_diag.data());
   MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
   MatSetOption(A, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE);
+  MatSetUp(A);
 }
 
 //###################################################################

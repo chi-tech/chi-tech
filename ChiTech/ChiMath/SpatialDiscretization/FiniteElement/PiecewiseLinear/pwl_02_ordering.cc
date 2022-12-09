@@ -16,8 +16,6 @@
 void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi::log.Log() << chi::program_timer.GetTimeString()
-                << " Developing nodal ordering.";
   chi_objects::ChiTimer t_stage[6];
 
   t_stage[0].Reset();

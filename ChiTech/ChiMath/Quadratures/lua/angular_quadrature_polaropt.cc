@@ -11,7 +11,7 @@
 \param handle        int. Handle to the quadrature to be optimized.
 \param normalization double. (Optional) The normalization to be applied to the
                      modified quadrature. Any negative number will inhibit
-                     renormalization.
+                     renormalization. [Default=-1.0]
 
  ## _
 
