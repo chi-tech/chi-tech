@@ -78,7 +78,7 @@ end
 
 --========== ProdQuad
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
-
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0

@@ -236,6 +236,14 @@ run_test(
                               ["[0]  Max-value2=", 7.18243e-4, 1.0e-4]])
 
 run_test(
+    file_name="Transport1D_3a_DSA_ortho",
+    comment="1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    num_procs=4,
+    search_strings_vals_tols=[["WGS groups [0-62] Iteration    28 Residual 6.74851e-07 CONVERGED"],
+                              ["WGS groups [63-167] Iteration    55 Residual 5.68143e-07 CONVERGED"]])
+
+
+run_test(
     file_name="Transport2D_1Poly",
     comment="2D LinearBSolver Test - PWLD",
     num_procs=4,
@@ -254,6 +262,13 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 0.50758, 1.0e-4],
                               ["[0]  Max-value2=", 2.52527e-04, 1.0e-4]])
+
+run_test(
+    file_name="Transport2D_4a_DSA_ortho",
+    comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    num_procs=4,
+    search_strings_vals_tols=[["WGS groups [0-62] Iteration    52 Residual 8.24287e-07 CONVERGED"],
+                              ["WGS groups [63-167] Iteration    57 Residual 9.69379e-07 CONVERGED"]])
 
 run_test(
     file_name="Transport3D_1a_Extruder",
@@ -302,10 +317,12 @@ run_test(
                               ["[0]  Max-value2=", 3.78243e-04, 1.0e-4]])
 
 run_test(
-    file_name="Transport3D_3BlockPoly_DSA",
-    comment="3D LinearBSolver Test WGDSA+TGDSA test - PWLD",
+    file_name="Transport3D_3a_DSA_ortho",
+    comment="3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["[0]  Final program time"]])
+    search_strings_vals_tols=[["WGS groups [0-62] Iteration    54 Residual 7.40763e-07 CONVERGED"],
+                              ["WGS groups [63-167] Iteration    69 Residual 9.23791e-07 CONVERGED"]])
+
 
 run_test(
     file_name="Transport3D_4Cycles1",

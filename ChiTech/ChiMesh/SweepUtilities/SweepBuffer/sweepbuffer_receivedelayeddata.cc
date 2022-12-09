@@ -83,18 +83,5 @@ bool chi_mesh::sweep_management::SweepBuffer::
   if (not all_messages_received)
     return false;
 
-  //================================================== Copy non-local delayed Psi
-  //                                                   to Psi_old
-  for (size_t prelocI=0; prelocI<num_delayed_loc_deps; prelocI++)
-  {
-    auto& psi_new = angleset->delayed_prelocI_outgoing_psi[prelocI];
-    auto& psi_old = angleset->delayed_prelocI_outgoing_psi_old[prelocI];
-    psi_old = psi_new;
-  }
-
-  //================================================== Copy local delayed Psi
-  //                                                   to Psi_old
-  angleset->delayed_local_psi_old = angleset->delayed_local_psi;
-
   return true;
 }
