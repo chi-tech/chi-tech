@@ -1,7 +1,7 @@
--- 2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG
+-- 3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG
 -- SDM: PWLD
--- Test: WGS groups [0-62] Iteration    52 Residual 8.24287e-07 CONVERGED
--- and   WGS groups [63-167] Iteration    57 Residual 9.69379e-07 CONVERGED
+-- Test: WGS groups [0-62] Iteration    54 Residual 7.40763e-07 CONVERGED
+-- and   WGS groups [63-167] Iteration    69 Residual 9.23791e-07 CONVERGED
 num_procs = 4
 
 
@@ -32,7 +32,8 @@ for i=1,(N+1) do
     mesh[i] = xmin + k*dx
 end
 
-chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
+chiMeshCreateUnpartitioned3DOrthoMesh(mesh,mesh,{0.0,10.0,20.0,30.0,40.0})
+--chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 --chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 chiVolumeMesherExecute();
 
@@ -86,9 +87,7 @@ end
 
 --========== ProdQuad
 pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2,false)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 pquad1 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8,false)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud1, 4.0*math.pi)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)

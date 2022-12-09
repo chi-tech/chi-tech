@@ -1,7 +1,7 @@
--- 2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG
+-- 1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG
 -- SDM: PWLD
--- Test: WGS groups [0-62] Iteration    52 Residual 8.24287e-07 CONVERGED
--- and   WGS groups [63-167] Iteration    57 Residual 9.69379e-07 CONVERGED
+-- Test: WGS groups [0-62] Iteration    28 Residual 6.74851e-07 CONVERGED
+-- and   WGS groups [63-167] Iteration    55 Residual 5.68143e-07 CONVERGED
 num_procs = 4
 
 
@@ -20,7 +20,7 @@ end
 chiMeshHandlerCreate()
 
 mesh={}
-N=20
+N=1000
 L=100
 --N=10
 --L=200e6
@@ -32,14 +32,14 @@ for i=1,(N+1) do
     mesh[i] = xmin + k*dx
 end
 
-chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
---chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
+--chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
+chiMeshCreateUnpartitioned1DOrthoMesh(mesh)
 chiVolumeMesherExecute();
 
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 
-vol1 = chiLogicalVolumeCreate(RPP,-10.0,10.0,-10.0,10.0,-1000,1000)
+vol1 = chiLogicalVolumeCreate(RPP,-10.0,10.0,-10.0,10.0,-10.0,10.0)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 --############################################### Add materials
@@ -86,9 +86,7 @@ end
 
 --========== ProdQuad
 pquad0 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 2,false)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 pquad1 = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 8,false)
-chiOptimizeAngularQuadratureForPolarSymmetry(pqaud1, 4.0*math.pi)
 
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)

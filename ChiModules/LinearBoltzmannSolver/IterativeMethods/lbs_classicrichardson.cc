@@ -78,7 +78,7 @@ ClassicRichardson(LBSGroupset& groupset,
 
     double pw_change = ComputePiecewiseChange(groupset);
 
-    ScopedCopySTLvectors(groupset,phi_new_local,phi_old_local);
+    ScopedCopySTLvectors(groupset,phi_new_local,phi_old_local, WITH_DELAYED_PSI);
 
     double rho = sqrt(pw_change / pw_change_prev);
     pw_change_prev = pw_change;

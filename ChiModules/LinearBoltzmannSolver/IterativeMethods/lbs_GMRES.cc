@@ -101,7 +101,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   KSPGMRESSetRestart(ksp, groupset.gmres_restart_intvl);
   KSPSetApplicationContext(ksp, &data_context);
   KSPSetConvergenceTest(ksp, &KSPConvergenceTestNPT, nullptr, nullptr);
-  KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
+  KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
   KSPSetUp(ksp);
 
   //================================================== Compute b
@@ -134,7 +134,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
 
   //=================================================== Assemble vectors
   SetPETScVecFromSTLvector(groupset, q_fixed, phi_new_local, WITH_DELAYED_PSI);
-  SetPETScVecFromSTLvector(groupset, phi_old, phi_old_local, WITH_DELAYED_PSI);
+  SetPETScVecFromSTLvector(groupset, phi_old, phi_old_local);
 
   //=================================================== Retool for GMRES
   sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
@@ -145,6 +145,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
 
   if (phi_old_norm > 1.0e-10)
   {
+    KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
     VecCopy(phi_old,phi_new);
     if (log_info)
       chi::log.Log() << "Using phi_old as initial guess.";
