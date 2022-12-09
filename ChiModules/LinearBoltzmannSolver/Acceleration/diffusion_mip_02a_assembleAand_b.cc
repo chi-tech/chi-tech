@@ -62,7 +62,7 @@ void lbs::acceleration::DiffusionMIPSolver::
       for (size_t i=0; i<num_nodes; i++)
       {
         const int64_t imap = m_sdm.MapDOF(cell,i,m_uk_man,0,g);
-        double entry_rhs_i = 0.0;
+        double entry_rhs_i = 0.0; //entry may accumulate over j
         for (size_t j=0; j<num_nodes; j++)
         {
           const int64_t jmap = m_sdm.MapDOF(cell,j,m_uk_man,0,g);
@@ -82,16 +82,18 @@ void lbs::acceleration::DiffusionMIPSolver::
                 qg[j] *
                 qp_data.ShapeValue(i, qp) * qp_data.ShapeValue(j, qp) *
                 qp_data.JxW(qp);
-            else
-            {
-              entry_rhs_i +=
-                CallLuaXYZFunction(L, source_function, qp_data.QPointXYZ(qp)) *
-                qp_data.ShapeValue(i, qp) * qp_data.ShapeValue(j, qp) *
-                qp_data.JxW(qp);
-            }
           }//for qp
           MatSetValue(m_A, imap, jmap, entry_aij, ADD_VALUES);
         }//for j
+
+        if (not source_function.empty())
+        {
+          for (size_t qp : qp_data.QuadraturePointIndices())
+            entry_rhs_i +=
+              CallLuaXYZFunction(L, source_function, qp_data.QPointXYZ(qp)) *
+              qp_data.ShapeValue(i, qp) *
+              qp_data.JxW(qp);
+        }
 
         VecSetValue(m_rhs, imap, entry_rhs_i, ADD_VALUES);
       }//for i
@@ -122,11 +124,11 @@ void lbs::acceleration::DiffusionMIPSolver::
           //========================= Compute kappa
           double kappa = 1.0;
           if (cell.Type() == chi_mesh::CellType::SLAB)
-            kappa = fmax(2.0*(adj_Dg/hp + Dg/hm),0.25);
+            kappa = fmax(options.penalty_factor*(adj_Dg/hp + Dg/hm)*0.5,0.25);
           if (cell.Type() == chi_mesh::CellType::POLYGON)
-            kappa = fmax(2.0*(adj_Dg/hp + Dg/hm),0.25);
+            kappa = fmax(options.penalty_factor*(adj_Dg/hp + Dg/hm)*0.5,0.25);
           if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-            kappa = fmax(4.0*(adj_Dg/hp + Dg/hm),0.25);
+            kappa = fmax(options.penalty_factor*2.0*(adj_Dg/hp + Dg/hm)*0.5,0.25);
 
           //========================= Assembly penalty terms
           for (size_t fi=0; fi<num_face_nodes; ++fi)
@@ -222,11 +224,11 @@ void lbs::acceleration::DiffusionMIPSolver::
             //========================= Compute kappa
             double kappa = 1.0;
             if (cell.Type() == chi_mesh::CellType::SLAB)
-              kappa = fmax(4.0*Dg/hm,0.25);
+              kappa = fmax(options.penalty_factor*Dg/hm,0.25);
             if (cell.Type() == chi_mesh::CellType::POLYGON)
-              kappa = fmax(4.0*Dg/hm,0.25);
+              kappa = fmax(options.penalty_factor*Dg/hm,0.25);
             if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-              kappa = fmax(8.0*Dg/hm,0.25);
+              kappa = fmax(options.penalty_factor*2.0*Dg/hm,0.25);
 
             //========================= Assembly penalty terms
             for (size_t fi=0; fi<num_face_nodes; ++fi)

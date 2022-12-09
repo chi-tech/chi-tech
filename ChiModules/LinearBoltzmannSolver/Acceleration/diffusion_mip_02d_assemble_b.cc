@@ -93,11 +93,11 @@ void lbs::acceleration::DiffusionMIPSolver::
             //========================= Compute kappa
             double kappa = 1.0;
             if (cell.Type() == chi_mesh::CellType::SLAB)
-              kappa = fmax(4.0*Dg/hm,0.25);
+              kappa = fmax(options.penalty_factor*Dg/hm,0.25);
             if (cell.Type() == chi_mesh::CellType::POLYGON)
-              kappa = fmax(4.0*Dg/hm,0.25);
+              kappa = fmax(options.penalty_factor*Dg/hm,0.25);
             if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
-              kappa = fmax(8.0*Dg/hm,0.25);
+              kappa = fmax(options.penalty_factor*2.0*Dg/hm,0.25);
 
             //========================= Assembly penalty terms
             for (size_t fi=0; fi<num_face_nodes; ++fi)

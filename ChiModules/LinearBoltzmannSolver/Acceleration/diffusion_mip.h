@@ -92,6 +92,7 @@ public:
     std::string source_lua_function;       ///<for mms
     std::string ref_solution_lua_function; ///<for mms
     std::string additional_options_string;
+    double      penalty_factor = 4.0;
   }options;
 public:
   const chi_math::UnknownManager& UnknownStructure() const
