@@ -2,7 +2,7 @@
 
 #include "../Tools/kspmonitor_npt.h"
 #include "../Tools/ksp_data_context.h"
-#include "../IterativeOperations/lbs_matrixaction_Ax.h"
+#include "../IterativeOperations/lbs_shell_operations.h"
 
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
@@ -13,23 +13,36 @@
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 #define sc_double static_cast<double>
+#define PCShellPtr PetscErrorCode (*)(PC, Vec, Vec)
 
 //###################################################################
-/**Solves a groupset using GMRES.*/
-bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
-                              MainSweepScheduler& sweep_scheduler,
-                              SourceFlags lhs_src_scope,
-                              SourceFlags rhs_src_scope,
-                              bool log_info /* = true*/)
+/**Solves a groupset using a general Krylov method.*/
+bool lbs::SteadySolver::Krylov(LBSGroupset& groupset,
+                               MainSweepScheduler& sweep_scheduler,
+                               SourceFlags lhs_src_scope,
+                               SourceFlags rhs_src_scope,
+                               bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
+
   if (log_info)
   {
+    std::string method_name;
+    switch (groupset.iterative_method)
+    {
+      case IterativeMethod::KRYLOV_RICHARDSON:
+        method_name = "KRYLOV_RICHARDSON"; break;
+      case IterativeMethod::KRYLOV_GMRES:
+        method_name = "KRYLOV_GMRES"; break;
+      case IterativeMethod::KRYLOV_BICGSTAB:
+        method_name = "KRYLOV_BICGSTAB"; break;
+      default: method_name = "KRYLOV_GMRES";
+    }
     chi::log.Log()
       << "\n\n";
     chi::log.Log()
       << "********** Solving groupset " << groupset.id
-      << " with GMRES.\n\n";
+      << " with " << method_name << ".\n\n";
     chi::log.Log()
       << "Quadrature number of angles: "
       << groupset.quadrature->abscissae.size() << "\n"
@@ -88,21 +101,44 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
                                   &data_context,&A);
 
   //================================================== Set the action-operator
-  MatShellSetOperation(A, MATOP_MULT, (void (*)()) LBSMatrixAction_Ax);
+  MatShellSetOperation(A, MATOP_MULT, (void (*)()) MatrixAction_Ax);
 
   //================================================== Create Krylov Solver
   KSP ksp;
   KSPCreate(PETSC_COMM_WORLD, &ksp);
-  KSPSetType(ksp,KSPGMRES);
+  switch (groupset.iterative_method)
+  {
+    case IterativeMethod::KRYLOV_RICHARDSON: KSPSetType(ksp,KSPRICHARDSON); break;
+    case IterativeMethod::KRYLOV_GMRES:      KSPSetType(ksp,KSPGMRES); break;
+    case IterativeMethod::KRYLOV_BICGSTAB:   KSPSetType(ksp,KSPBCGS); break;
+    default: KSPSetType(ksp,KSPGMRES); break;
+  }
   KSPSetOperators(ksp,A,A);
 
   KSPSetTolerances(ksp,1.e-50,
                    groupset.residual_tolerance,1.0e50,
                    groupset.max_iterations);
-  KSPGMRESSetRestart(ksp, groupset.gmres_restart_intvl);
   KSPSetApplicationContext(ksp, &data_context);
-  KSPSetConvergenceTest(ksp, &KSPConvergenceTestNPT, nullptr, nullptr);
+  KSPSetConvergenceTest(ksp, &KSPConvergenceTest, nullptr, nullptr);
   KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
+
+  if (groupset.iterative_method == IterativeMethod::KRYLOV_GMRES)
+  {
+    KSPGMRESSetRestart(ksp, groupset.gmres_restart_intvl);
+    KSPGMRESSetBreakdownTolerance(ksp, 1.0e6);
+  }
+
+  PC pc;
+  KSPGetPC(ksp, &pc);
+
+  if (groupset.apply_wgdsa or groupset.apply_tgdsa)
+  {
+    PCSetType(pc, PCSHELL);
+    PCShellSetApply(pc, (PCShellPtr) WGDSA_TGDSA_PreConditionerMult);
+    PCShellSetContext(pc, &data_context);
+  }
+
+  KSPSetPCSide(ksp,PC_LEFT);
   KSPSetUp(ksp);
 
   //================================================== Compute b
@@ -126,16 +162,12 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   sweep_chunk.ZeroFluxDataStructures();
   sweep_scheduler.Sweep();
 
-  //=================================================== Apply DSA
-  if (groupset.apply_wgdsa)
-    ExecuteWGDSA(groupset,phi_old_local,phi_new_local);
-
-  if (groupset.apply_tgdsa)
-    ExecuteTGDSA(groupset,phi_old_local,phi_new_local);
-
   //=================================================== Assemble vectors
   SetPETScVecFromSTLvector(groupset, q_fixed, phi_new_local, WITH_DELAYED_PSI);
   SetPETScVecFromSTLvector(groupset, phi_old, phi_old_local);
+
+  PCApply(pc, q_fixed, x_temp);
+  VecNorm(x_temp, NORM_2, &data_context.rhs_preconditioned_norm);
 
   //=================================================== Retool for GMRES
   sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
@@ -166,7 +198,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   KSPGetConvergedReason(ksp,&reason);
   if (reason != KSP_CONVERGED_RTOL)
     chi::log.Log0Warning()
-      << "GMRES solver failed. "
+      << "Krylov solver failed. "
       << "Reason: " << chi_physics::GetPETScConvergedReasonstring(reason);
 
   SetSTLvectorFromPETScVec(groupset, phi_new, phi_new_local, WITH_DELAYED_PSI);

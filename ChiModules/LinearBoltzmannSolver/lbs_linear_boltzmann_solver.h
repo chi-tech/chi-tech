@@ -166,10 +166,15 @@ public:
                     const std::vector<double>& ref_phi_old,
                     std::vector<double>& ref_phi_new);
   void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                   const double *ref_phi_old,
-                                   const double *ref_phi_new);
+                                   const std::vector<double>& ref_phi_old,
+                                   const std::vector<double>& ref_phi_new);
+
+  void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& phi_in);
+
   void DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                      double *ref_phi_new);
+                                      std::vector<double>& ref_phi_new);
+
   static void CleanUpWGDSA(LBSGroupset& groupset);
 
   //03e
@@ -178,10 +183,12 @@ public:
                     const std::vector<double>& ref_phi_old,
                     std::vector<double>& ref_phi_new);
   void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
-                                   const double *ref_phi_old,
-                                   const double *ref_phi_new);
+                                   const std::vector<double>& ref_phi_old,
+                                   const std::vector<double>& ref_phi_new);
+  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& phi_in);
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
-                                      double *ref_phi_new);
+                                      std::vector<double>& ref_phi_new);
   static void CleanUpTGDSA(LBSGroupset& groupset);
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
@@ -220,6 +227,11 @@ public:
              SourceFlags lhs_src_scope,
              SourceFlags rhs_src_scope,
              bool log_info = true);
+  bool Krylov(LBSGroupset& groupset,
+              MainSweepScheduler& sweep_scheduler,
+              SourceFlags lhs_src_scope,
+              SourceFlags rhs_src_scope,
+              bool log_info = true);
 
   //Vector assembly
   void SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,

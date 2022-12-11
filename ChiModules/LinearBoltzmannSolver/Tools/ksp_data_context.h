@@ -18,6 +18,7 @@ struct KSPDataContext
   chi_mesh::sweep_management::SweepScheduler& sweep_scheduler;
   SourceFlags    lhs_scope;
   int64_t last_iteration = -1;
+  double rhs_preconditioned_norm = 0.0;
 
   KSPDataContext(lbs::SteadySolver& in_solver,
                  LBSGroupset& in_groupset,
