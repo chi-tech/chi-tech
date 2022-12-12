@@ -7,6 +7,7 @@
 
 #include <map>
 #include <memory>
+#include <array>
 
 //############################################### Forward declarations
 namespace chi_mesh
