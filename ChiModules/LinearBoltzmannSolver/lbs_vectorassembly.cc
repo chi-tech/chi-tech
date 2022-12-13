@@ -111,10 +111,6 @@ void lbs::SteadySolver::
   }//for cell
 
   if (with_delayed_psi)
-  {
-    auto& angle_agg = groupset.angle_agg;
-    const auto delayed_psi = angle_agg.GetDelayedAngularDOFsAsSTLVector();
-    angle_agg.SetDelayedAngularDOFsFromSTLVector(delayed_psi);
-  }
+    groupset.angle_agg.SetDelayedPsiNew2Old();
 
 }

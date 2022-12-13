@@ -10,6 +10,8 @@
 #include "LinearBoltzmannSolver/Groupset/lbs_group.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
+#define sc_int static_cast<int>
+
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 
 The code below is an example of a complete specification of a groupset.
@@ -534,17 +536,78 @@ is to be created.
 
 ### IterativeMethod
 NPT_CLASSICRICHARDSON\n
-Standard source iteration.\n\n
+Standard source iteration, without using PETSc.\n\n
 
 NPT_CLASSICRICHARDSON_CYCLES\n
-Standard source iteration with cyclic dependency convergence.\n\n
+Standard source iteration, without using PETSc,
+with cyclic dependency convergence.\n\n
 
 NPT_GMRES\n
-Generalized Minimal Residual formulation for iterations.\n\n
+Legacy Generalized Minimal Residual formulation for iterations.\n\n
 
 NPT_GMRES_CYCLES\n
-Generalized Minimal Residual formulation for iterations with cyclic dependency
-convergence.\n\n
+Legacy Generalized Minimal Residual formulation for iterations with cyclic
+dependency convergence.\n\n
+
+
+KRYLOV_RICHARDSON\n
+Richardson iteration.\n\n
+
+KRYLOV_RICHARDSON_CYCLES\n
+Richardson iteration with cyclic dependency convergence.\n\n
+
+KRYLOV_GMRES\n
+Generalized Minimal Residual method.\n\n
+
+KRYLOV_GMRES_CYCLES\n
+Generalized Minimal Residual method with cyclic dependency convergence.\n\n
+
+KRYLOV_BICGSTAB\n
+Biconjugate Gradient Stabilized method.\n\n
+
+KRYLOV_BICGSTAB_CYCLES\n
+Biconjugate Gradient Stabilized method with cyclic dependency convergence.\n\n
+
+
+##_
+
+### Notes on selecting iterative methods
+The iterative methods NPT_CLASSICRICHARDSON, NPT_CLASSICRICHARDSON_CYCLES,
+NPT_GMRES and NPT_GMRES_CYCLES are considered legacy. The NPT_GMRES and
+NPT_GMRES_CYCLES are now considered deprecated with the inclusion of the
+generalized Krylov iteration method-class (which supports all the options
+prepended with KRYLOV_).
+
+RICHARDSON is probably the least memory consuming but has the poorest
+convergence rate.
+
+GMRES generally has the best convergence rate but it builds a basis
+comprising multiple solutions vectors, the amount of which is controlled via
+the gmres-restart parameter, which can dramatically increase memory consumption.
+GMRES restarts, i.e. the amount of iterations before the basis is destroyed and
+restarted, influences both memory consumptions and convergence behavior, e.g.,
+lower restart numbers generally lowers memory consumption but increases the
+amount of iteration required to convergence.
+
+The required memory and the computational time for one iteration with BiCGStab
+is constant, i.e., the time and memory requirements do not increase with the
+number of iterations as they do for restarted GMRES. BiCGStab uses approximately
+the same amount of memory as GMRES uses for two iterations. Therefore, BiCGStab
+typically uses less memory than GMRES. The convergence behavior of BiCGStab is
+often more irregular than that of GMRES. Intermediate residuals can even be
+orders of magnitude larger than the initial residual, which can affect the
+numerical accuracy as well as the rate of convergence. If the algorithm detects
+poor accuracy in the residual or the risk of stagnation, it restarts the
+iterations with the current solution as the initial guess. In contrast to GMRES,
+BiCGStab uses two matrix-vector multiplications each iteration (requiring two
+transport sweeps). Also, when using the left-preconditioned BiCGStab, an
+additional preconditioning step is required each iteration. That is,
+left-preconditioned BiCGStab requires a total of three preconditioning steps in
+each iteration. We generally apply Within-group Diffusion Synthetic Acceleration
+(WGDSA) and Two-Grid Acceleration (TGDSA) as left-preconditioners and therefore
+the total cost of these pre-conditioners will increase when using BiCGStab. Use
+BiCGStab when you are running problem with a high scattering order (i.e., L is
+large) because this will dramatically increase the GMRES basis.
 
 Example:
 \code
@@ -587,24 +650,51 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 
   {
     using lbs::IterativeMethod;
-    if (iter_method == static_cast<int>(IterativeMethod::CLASSICRICHARDSON))
+    if (iter_method == sc_int(IterativeMethod::CLASSICRICHARDSON))
     {
       groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
     }
     else if (iter_method ==
-                static_cast<int>(IterativeMethod::CLASSICRICHARDSON_CYCLES))
+                sc_int(IterativeMethod::CLASSICRICHARDSON_CYCLES))
     {
       groupset->allow_cycles = true;
       groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
     }
-    else if (iter_method == static_cast<int>(IterativeMethod::GMRES))
+    else if (iter_method == sc_int(IterativeMethod::GMRES))
     {
       groupset->iterative_method = IterativeMethod::GMRES;
     }
-    else if (iter_method == static_cast<int>(IterativeMethod::GMRES_CYCLES))
+    else if (iter_method == sc_int(IterativeMethod::GMRES_CYCLES))
     {
       groupset->allow_cycles = true;
       groupset->iterative_method = IterativeMethod::GMRES;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON))
+    {
+      groupset->iterative_method = IterativeMethod::KRYLOV_RICHARDSON;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::KRYLOV_RICHARDSON;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_GMRES))
+    {
+      groupset->iterative_method = IterativeMethod::KRYLOV_GMRES;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_GMRES_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::KRYLOV_GMRES;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_BICGSTAB))
+    {
+      groupset->iterative_method = IterativeMethod::KRYLOV_BICGSTAB;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_BICGSTAB_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::KRYLOV_BICGSTAB;
     }
     else
     {

@@ -78,6 +78,16 @@ void lbs::SteadySolver::SolveGroupset(LBSGroupset& groupset)
           APPLY_AGS_FISSION_SOURCE,                             //rhs_scope
           options.verbose_inner_iterations);
   }
+  else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
+           groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
+           groupset.iterative_method == IterativeMethod::KRYLOV_BICGSTAB)
+  {
+    Krylov(groupset, sweep_scheduler,
+           APPLY_WGS_SCATTER_SOURCE | APPLY_WGS_FISSION_SOURCE,  //lhs_scope
+           APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE |
+           APPLY_AGS_FISSION_SOURCE,                             //rhs_scope
+           options.verbose_inner_iterations);
+  }
 
   if (options.write_restart_data)
     WriteRestartData(options.write_restart_folder_name,

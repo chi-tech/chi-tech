@@ -59,7 +59,8 @@ public:
   void SetDelayedAngularDOFsFromArray(int& index, const double* x_ref);
   std::vector<double> GetDelayedAngularDOFsAsSTLVector();
   void SetDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
-
+  void SetDelayedPsiOld2New();
+  void SetDelayedPsiNew2Old();
 };
 
 
