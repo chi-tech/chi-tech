@@ -41,7 +41,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
       if (face.has_neighbor and face.IsNeighborLocal(*ref_grid))
       {
         const auto& adj_cell = ref_grid->cells[face.neighbor_id];
-        const auto& adj_cell_mapping = GetCellMapping(cell);
+        const auto& adj_cell_mapping = GetCellMapping(adj_cell);
 
         for (int i=0; i<num_nodes; ++i)
         {
@@ -66,7 +66,7 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
       if (face.has_neighbor and (not face.IsNeighborLocal(*ref_grid)))
       {
         const auto& adj_cell = ref_grid->cells[face.neighbor_id];
-        const auto& adj_cell_mapping = GetCellMapping(cell);
+        const auto& adj_cell_mapping = GetCellMapping(adj_cell);
 
         for (int i=0; i < cell_mapping.NumNodes(); ++i)
         {
