@@ -95,9 +95,10 @@ void lbs::SteadySolver::CleanUpWGDSA(LBSGroupset& groupset)
 
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
-void lbs::SteadySolver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                                    const double *ref_phi_old,
-                                                    const double *ref_phi_new)
+void lbs::SteadySolver::
+  AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                              const std::vector<double>&ref_phi_old,
+                              const std::vector<double>&ref_phi_new)
 {
   const auto& sdm = *discretization;
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
@@ -134,9 +135,48 @@ void lbs::SteadySolver::AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
 }
 
 //###################################################################
+/**Assembles a delta-phi vector on the first moment.*/
+void lbs::SteadySolver::
+  AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                              const std::vector<double>& phi_in)
+{
+  const auto& sdm = *discretization;
+  const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
+  const auto& phi_uk_man  = flux_moments_uk_man;
+
+  const int    gsi = groupset.groups.front().id;
+  const size_t gss = groupset.groups.size();
+
+  delta_phi_local.clear();
+  delta_phi_local.assign(sdm.GetNumLocalDOFs(dphi_uk_man), 0.0);
+
+  for (const auto& cell : grid->local_cells)
+  {
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes = cell_mapping.NumNodes();
+    const auto& sigma_s = matid_to_xs_map[cell.material_id]->sigma_s_gtog;
+
+    for (size_t i=0; i < num_nodes; i++)
+    {
+      const int64_t dphi_map = sdm.MapDOFLocal(cell, i, dphi_uk_man, 0, 0);
+      const int64_t  phi_map = sdm.MapDOFLocal(cell, i,  phi_uk_man, 0, gsi);
+
+      double* delta_phi_mapped    = &delta_phi_local[dphi_map];
+      const double* phi_in_mapped = &phi_in[phi_map];
+
+      for (size_t g=0; g<gss; g++)
+      {
+        delta_phi_mapped[g] = sigma_s[gsi+g] * phi_in_mapped[g];
+      }//for g
+    }//for node
+  }//for cell
+}
+
+//###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
-void lbs::SteadySolver::DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                                       double *ref_phi_new)
+void lbs::SteadySolver::
+  DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                                 std::vector<double>& ref_phi_new)
 {
   const auto& sdm = *discretization;
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
@@ -175,10 +215,8 @@ void lbs::SteadySolver::
                const std::vector<double>& ref_phi_old,
                std::vector<double>& ref_phi_new)
 {
-  AssembleWGDSADeltaPhiVector(groupset,
-                              ref_phi_old.data(),
-                              ref_phi_new.data());
+  AssembleWGDSADeltaPhiVector(groupset, ref_phi_old, ref_phi_new);
   groupset.wgdsa_solver->Assemble_b(delta_phi_local);
   groupset.wgdsa_solver->Solve(delta_phi_local);
-  DisAssembleWGDSADeltaPhiVector(groupset, ref_phi_new.data());
+  DisAssembleWGDSADeltaPhiVector(groupset, ref_phi_new);
 }

@@ -271,6 +271,13 @@ run_test(
                               ["WGS groups [63-167] Iteration    57 Residual 9.69379e-07 CONVERGED"]])
 
 run_test(
+    file_name="Transport2D_4b_DSA_ortho",
+    comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    num_procs=4,
+    search_strings_vals_tols=[["WGS groups [0-62] Iteration    53 Residual 5.52837e-07 CONVERGED"],
+                              ["WGS groups [63-167] Iteration    56 Residual 9.96675e-07 CONVERGED"]])
+
+run_test(
     file_name="Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
     num_procs=4,

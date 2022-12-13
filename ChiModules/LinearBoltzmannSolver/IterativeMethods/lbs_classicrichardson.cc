@@ -46,7 +46,8 @@ ClassicRichardson(LBSGroupset& groupset,
       << "\n"
       << "Number of lagged angular unknowns: "
       << num_delayed_psi_globl << "("
-      << sc_double(num_delayed_psi_globl) / sc_double(num_psi_global)
+      << std::setprecision(2)
+      << sc_double(num_delayed_psi_globl)*100 / sc_double(num_psi_global)
       << "%)";
   }
 
