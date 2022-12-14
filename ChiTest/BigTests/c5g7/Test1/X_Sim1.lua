@@ -1,7 +1,7 @@
 dofile("mesh/gmesh_refined.lua")
 
--- chiMeshHandlerExportMeshToVTK("ZMesh")
--- os.exit()
+--chiMeshHandlerExportMeshToVTK("ZMesh")
+--os.exit()
 
 dofile("materials/materials.lua")
 
@@ -24,7 +24,7 @@ gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
 chiLBSGroupsetAddGroups(phys1,cur_gs,0,num_groups-1)
 chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,5)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
@@ -36,7 +36,7 @@ chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false)
 
 --############################################### Set boundary conditions
 chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,LBSBoundaryTypes.REFLECTING);
-chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMAX,LBSBoundaryTypes.REFLECTING);
+chiLBSSetProperty(phys1,BOUNDARY_CONDITION,YMIN,LBSBoundaryTypes.REFLECTING);
 
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
