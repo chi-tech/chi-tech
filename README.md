@@ -68,6 +68,10 @@ Closeup of the ParMETIS partitioning with the mesh visible.
 ## 2. Real world simulations
 Center for Exascale Radiation Transport (CERT) simulated, and
 compared to experiment, a graphite pile with a high energy neutron
-source.
+source. This simulation used:
+- ~172 energy groups. 
+- over 3000 directions. 
+- ~500k cells.
+- Over 100k processors for some simulations.
 
 ![yes](ChiDoc/HTMLimages/CoolPics/CERTSim.png)
