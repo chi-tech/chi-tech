@@ -1,6 +1,6 @@
 -- 3D Transport test with Vacuum BCs and a material source reading source moments
 -- SDM: PWLD
--- Test: Max-value=1.08197e-01 and 9.14681e-06
+-- Test: Max-value=1.01701e-04 and 9.14681e-06
 num_procs = 4
 
 
