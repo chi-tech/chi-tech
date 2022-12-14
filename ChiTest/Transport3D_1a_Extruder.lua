@@ -114,8 +114,8 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTRO
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
-chiLBSExecute(phys1)
+chiSolverInitialize(phys1)
+chiSolverExecute(phys1)
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)

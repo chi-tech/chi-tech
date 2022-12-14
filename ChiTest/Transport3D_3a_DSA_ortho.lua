@@ -138,8 +138,8 @@ bsrc[1] = 1.0/4.0/math.pi;
 --chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMAX,INCIDENT_ISOTROPIC,bsrc);
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
-chiLBSExecute(phys1)
+chiSolverInitialize(phys1)
+chiSolverExecute(phys1)
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)

@@ -4,9 +4,7 @@
 
 #include <stdexcept>
 
-namespace lbs_adjoint
-{
-namespace lua_utils
+namespace lbs_adjoint::lua_utils
 {
 int chiAdjointSolverMakeExpRepFromP1Moments(lua_State* L)
 {
@@ -42,5 +40,4 @@ int chiAdjointSolverMakeExpRepFromP1Moments(lua_State* L)
   lua_pushnumber(L, solution[1]);
   return 2;
 }
-}//namespace lua_utils
 }//namespace lbs_adjoint

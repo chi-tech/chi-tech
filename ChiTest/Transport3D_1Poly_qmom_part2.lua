@@ -112,10 +112,10 @@ bsrc[1] = 1.0/4.0/math.pi;
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
+chiSolverInitialize(phys1)
 chiLBSReadSourceMoments(phys1,"Qmoms")
 chiLBSSetProperty(phys1,USE_SOURCE_MOMENTS,true)
-chiLBSExecute(phys1)
+chiSolverExecute(phys1)
 
 
 

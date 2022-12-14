@@ -2,10 +2,7 @@
 #include "../lbs_linear_boltzmann_solver.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 //###################################################################
 /**Creates a Neutral Particle Transport solver.

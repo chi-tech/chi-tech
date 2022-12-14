@@ -284,6 +284,20 @@ void lbs::acceleration::DiffusionMIPSolver::
   VecAssemblyBegin(m_rhs);
   VecAssemblyEnd(m_rhs);
 
+  if (options.verbose)
+  {
+    MatInfo info;
+    MatGetInfo(m_A,MAT_GLOBAL_SUM,&info);
+
+    chi::log.Log() << "Number of mallocs used = " << info.mallocs
+                   << "\nNumber of non-zeros allocated = "
+                   << info.nz_allocated
+                   << "\nNumber of non-zeros used = "
+                   << info.nz_used
+                   << "\nNumber of unneeded non-zeros = "
+                   << info.nz_unneeded;
+  }
+
   if (options.perform_symmetry_check)
   {
     PetscBool symmetry = PETSC_FALSE;

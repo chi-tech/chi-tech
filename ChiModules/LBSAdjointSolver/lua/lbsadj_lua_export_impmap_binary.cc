@@ -4,9 +4,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-namespace lbs_adjoint
-{
-namespace lua_utils
+namespace lbs_adjoint::lua_utils
 {
 
 int chiAdjointSolverExportImportanceMapBinary(lua_State* L)
@@ -22,16 +20,16 @@ int chiAdjointSolverExportImportanceMapBinary(lua_State* L)
   LuaCheckIntegerValue(fname, L, 1);
   LuaCheckStringValue(fname, L, 2);
 
-  const int solver_index     = lua_tointeger(L,1);
+  const int solver_handle     = lua_tointeger(L, 1);
   const std::string file_name = lua_tostring(L,2);
 
-  auto& solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
+  auto& solver = chi::GetStackItem<lbs_adjoint::AdjointSolver>(
+    chi::solver_stack, solver_handle, fname);
 
   solver.ExportImportanceMap(file_name);
 
   return 0;
 }
 
-}//namespace lua_utils
 }//namespace lbs_adjoint
 

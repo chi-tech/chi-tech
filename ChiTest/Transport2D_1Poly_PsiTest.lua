@@ -119,11 +119,11 @@ chiLBSSetProperty(phys1,LBSProperty.SAVE_ANGULAR_FLUX,true)
 
 --############################################### Initialize and Execute Solver
 -- chiLBSWriteGroupsetAngularFlux(phys1,gs0,"ZPsi")
-chiLBSInitialize(phys1)
+chiSolverInitialize(phys1)
 if (chi_location_id == 0) then
     chiLBSReadGroupsetAngularFlux(phys1,gs0,"ZPsi")
 end
-chiLBSExecute(phys1)
+chiSolverExecute(phys1)
 
 --############################################### Get field functions
 -- chiLBSWriteGroupsetAngularFlux(phys1,gs0,"ZPsi")

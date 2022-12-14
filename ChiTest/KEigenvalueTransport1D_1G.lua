@@ -95,15 +95,15 @@ chiLBSGroupsetSetAngleAggregationType(phys, gs, LBSGroupset.ANGLE_AGG_SINGLE)
 -- Additional parameters
 chiLBSSetProperty(phys, USE_PRECURSORS, use_precursors)
 
-chiLBKESSetProperty(phys, MAX_ITERATIONS, kes_max_iterations)
-chiLBKESSetProperty(phys, TOLERANCE, kes_tolerance)
+chiLBKESSetProperty(phys, "MAX_ITERATIONS", kes_max_iterations)
+chiLBKESSetProperty(phys, "TOLERANCE", kes_tolerance)
 
 chiLBSSetProperty(phys, VERBOSE_INNER_ITERATIONS, false)
 chiLBSSetProperty(phys, VERBOSE_OUTER_ITERATIONS, false)
 
 --############################################### Initialize and Execute Solver
-chiLBKESInitialize(phys)
-chiLBKESExecute(phys)
+chiSolverInitialize(phys)
+chiSolverExecute(phys)
 
 --############################################### Get field functions
 --############################################### Line plot

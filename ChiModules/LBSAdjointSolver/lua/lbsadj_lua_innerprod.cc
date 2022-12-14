@@ -1,9 +1,7 @@
 #include "LBSAdjointSolver/lbsadj_solver.h"
 #include "lbsadj_lua_utils.h"
 
-namespace lbs_adjoint
-{
-namespace lua_utils
+namespace lbs_adjoint::lua_utils
 {
 
 int chiAdjointSolverComputeInnerProduct(lua_State* L)
@@ -15,9 +13,10 @@ int chiAdjointSolverComputeInnerProduct(lua_State* L)
 
   LuaCheckNilValue(fname, L, 1);
 
-  const int solver_index     = lua_tointeger(L,1);
+  const int solver_handle     = lua_tointeger(L, 1);
 
-  auto& solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
+  auto& solver = chi::GetStackItem<lbs_adjoint::AdjointSolver>(
+    chi::solver_stack, solver_handle, fname);
 
   const double ip_Q_phi_star = solver.ComputeInnerProduct();
 
@@ -25,5 +24,4 @@ int chiAdjointSolverComputeInnerProduct(lua_State* L)
   return 1;
 }
 
-}//namespace lua_utils
 }//namespace lbs_adjoint
