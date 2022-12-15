@@ -22,8 +22,8 @@ chiVolumeMesherSetMatIDToAll(0)
 -- this automatically gives:
 --    boundary = zero-Dirichlet on all 4 sides
 --    volumetric source term: q(,x) = 2*pi*pi * sin(pi.x) * sin(pi.y)
+-- the factor 2 is the dim of the problem
 
-square_an_coef2-- this gives
 function D_coef(i,x,y,z)
     return 1.0
 end
