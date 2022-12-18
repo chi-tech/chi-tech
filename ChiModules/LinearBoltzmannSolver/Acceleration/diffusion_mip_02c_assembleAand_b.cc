@@ -220,9 +220,9 @@ void lbs::acceleration::DiffusionMIPSolver::
 
             //========================= Assemble gradient terms
             // For the following comments we use the notation:
-            // Dk = 0.5* n dot nabla bk
+            // Dk = n dot nabla bk
 
-            // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
+            // D* n dot (b_j^+ - b_j^-)*nabla b_i^-
             for (size_t i=0; i<num_nodes; i++)
             {
               const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
@@ -231,7 +231,7 @@ void lbs::acceleration::DiffusionMIPSolver::
               {
                 const int64_t jmap = m_sdm.MapDOF(cell, j, m_uk_man, 0, g);
 
-                const double aij = -0.5*Dg*n_f.Dot(face_G[j][i] + face_G[i][j]);
+                const double aij = -Dg*n_f.Dot(face_G[j][i] + face_G[i][j]);
                 const double aij_bc_value = aij*bc_value;
 
 
@@ -270,7 +270,7 @@ void lbs::acceleration::DiffusionMIPSolver::
               {
                 const double rhs_val = (fval/bval) * face_Si[i];
 
-                VecSetValue(m_rhs,ir, -rhs_val, ADD_VALUES);
+                VecSetValue(m_rhs,ir, rhs_val, ADD_VALUES);
               }//if f nonzero
             }//for fi
           }//Robin BC
