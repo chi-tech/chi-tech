@@ -7,9 +7,9 @@
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 void lbs_adjoint::AdjointSolver::
-  SetSource(lbs::LBSGroupset &groupset,
-            std::vector<double> &destination_q,
-            lbs::SourceFlags source_flags)
+  SetAdjointSource(lbs::LBSGroupset &groupset,
+                   std::vector<double> &destination_q,
+                   lbs::SourceFlags source_flags)
 {
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 

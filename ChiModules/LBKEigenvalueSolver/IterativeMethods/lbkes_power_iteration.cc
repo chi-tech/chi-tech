@@ -68,11 +68,13 @@ void KEigenvalueSolver::PowerIteration()
 
       //======================================== Converge the scattering source
       //                                         with a fixed fission source
+      using namespace std::placeholders;
       if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
       {
         ClassicRichardson(groupset, sweep_scheduler,
                           APPLY_WGS_SCATTER_SOURCE |
                           APPLY_AGS_SCATTER_SOURCE,
+                          active_set_source_function,
                           options.verbose_inner_iterations);
       }
       else if (groupset.iterative_method == IterativeMethod::GMRES)
@@ -80,6 +82,7 @@ void KEigenvalueSolver::PowerIteration()
         GMRES(groupset, sweep_scheduler,
               APPLY_WGS_SCATTER_SOURCE,
               APPLY_AGS_SCATTER_SOURCE,
+              active_set_source_function,
               options.verbose_inner_iterations);
       }
       else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
@@ -89,6 +92,7 @@ void KEigenvalueSolver::PowerIteration()
         Krylov(groupset, sweep_scheduler,
                APPLY_WGS_SCATTER_SOURCE,
                APPLY_AGS_SCATTER_SOURCE,
+               active_set_source_function,
                options.verbose_inner_iterations);
       }
 
@@ -96,7 +100,7 @@ void KEigenvalueSolver::PowerIteration()
     }//for groupset
 
     //======================================== Recompute k-eigenvalue
-    double F_new = ComputeFissionProduction();
+    double F_new = ComputeFissionProduction(phi_new_local);
     k_eff = F_new / F_prev * k_eff;
     double reactivity = (k_eff - 1.0) / k_eff;
 
