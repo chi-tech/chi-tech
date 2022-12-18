@@ -163,7 +163,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                     fqp_data.JxW(qp) +
                     fqp_data.ShapeValue(i, qp) * fqp_data.ShapeGrad(j, qp) *
                     fqp_data.JxW(qp);
-                const double aij = -0.5*Dg*n_f.Dot(vec_aij);
+                const double aij = -Dg*n_f.Dot(vec_aij);
 
                 double aij_bc_value = aij*bc_value;
 
@@ -178,7 +178,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                       fqp_data.JxW(qp) +
                       fqp_data.ShapeValue(i, qp) * fqp_data.ShapeGrad(j, qp) *
                       fqp_data.JxW(qp));
-                  aij_bc_value = -0.5*Dg*n_f.Dot(vec_aij_mms);
+                  aij_bc_value = -Dg*n_f.Dot(vec_aij_mms);
                 }
 
                 VecSetValue(m_rhs, imap, aij_bc_value, ADD_VALUES);
@@ -204,7 +204,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                   rhs_val += fqp_data.ShapeValue(i,qp) * fqp_data.JxW(qp);
                 rhs_val *= (fval/bval);
 
-                VecSetValue(m_rhs,ir, -rhs_val, ADD_VALUES);
+                VecSetValue(m_rhs,ir, rhs_val, ADD_VALUES);
               }//if f nonzero
             }//for fi
           }//Robin BC
