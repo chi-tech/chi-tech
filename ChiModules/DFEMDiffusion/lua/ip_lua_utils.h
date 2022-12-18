@@ -2,7 +2,7 @@
 #define DFEM_DIFFUSION_LUA_UTILS_H
 
 #include"ChiLua/chi_lua.h"
-// #include "../dfem_diffusion_solver.h"
+#include "../dfem_diffusion_solver.h"
 
 int chiDFEMDiffusionSolverCreate(lua_State *L);
 int chiDFEMDiffusionSetBCProperty(lua_State *L);
