@@ -41,5 +41,7 @@ namespace chi_unit_sim_tests
 
   int chiSimTest91_PWLD(lua_State* L);
   int chiSimTest92_DSA(lua_State* L);
+
+  int chiSimTest_IP_MMS_L2error(lua_State* L);
 }
 #endif //CHITECH_UNIT_TESTS_H
