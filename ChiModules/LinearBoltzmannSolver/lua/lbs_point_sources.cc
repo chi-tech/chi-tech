@@ -16,7 +16,7 @@
  */
 int chiLBSAddPointSource(lua_State *L)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chiLBSAddPointSource";
   const int num_args = lua_gettop(L);
   if (num_args != 5)
     LuaPostArgAmountError(fname, 5, num_args);
@@ -28,8 +28,10 @@ int chiLBSAddPointSource(lua_State *L)
   LuaCheckNilValue(fname, L, 5);
 
   //============================================= Get pointer to solver
-  const int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::GetSolverByHandle(solver_index, fname);
+  const int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Get other arguments
   const double x = lua_tonumber(L, 2);
@@ -60,7 +62,7 @@ int chiLBSAddPointSource(lua_State *L)
  */
 int chiLBSClearPointSources(lua_State *L)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chiLBSClearPointSources";
   const int num_args = lua_gettop(L);
   if (num_args != 1)
     LuaPostArgAmountError(fname, 1, num_args);
@@ -68,8 +70,10 @@ int chiLBSClearPointSources(lua_State *L)
   LuaCheckNilValue(fname, L, 1);
 
   //============================================= Get pointer to solver
-  const int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::GetSolverByHandle(solver_index, fname);
+  const int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   lbs_solver.point_sources.clear();
 
@@ -87,7 +91,7 @@ int chiLBSClearPointSources(lua_State *L)
  */
 int chiLBSInitializePointSources(lua_State *L)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chiLBSInitializePointSources";
   const int num_args = lua_gettop(L);
   if (num_args != 1)
     LuaPostArgAmountError(fname, 1, num_args);
@@ -95,8 +99,10 @@ int chiLBSInitializePointSources(lua_State *L)
   LuaCheckNilValue(fname, L, 1);
 
   //============================================= Get pointer to solver
-  const int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::GetSolverByHandle(solver_index, fname);
+  const int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   lbs_solver.InitializePointSources();
 

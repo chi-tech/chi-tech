@@ -126,8 +126,8 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
-chiLBSExecute(phys1)
+chiSolverInitialize(phys1)
+chiSolverExecute(phys1)
 
 chiLBSComputeBalance(phys1)
 

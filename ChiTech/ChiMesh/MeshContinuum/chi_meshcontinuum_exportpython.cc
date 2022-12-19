@@ -38,7 +38,7 @@ ExportCellsToPython(const char* fileName, bool surface_only,
              "import scipy as sp\n");
 
   //============================================= Parse nodes
-  fprintf(of, "xyz=np.zeros((%llu,%d))\n", GetGlobalVertexCount(), 3);
+  fprintf(of, "xyz=np.zeros((%lu,%d))\n", GetGlobalVertexCount(), 3);
   for (int n=0; n < GetGlobalVertexCount(); n++)
   {
     fprintf(of, "xyz[%d][%d]=%f;  ", n, 0, vertices[n].x);

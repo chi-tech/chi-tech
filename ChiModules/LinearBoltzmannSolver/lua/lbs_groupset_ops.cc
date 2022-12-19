@@ -72,10 +72,12 @@ gs0 = chiLBSCreateGroupset(phys1)
 */
 int chiLBSCreateGroupset(lua_State *L)
 {
+  const std::string fname = "chiLBSCreateGroupset";
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  const int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Create groupset
   lbs_solver.groupsets.emplace_back((int)lbs_solver.groupsets.size());
@@ -102,10 +104,12 @@ grp[g] = chiLBSCreateGroup(phys1)
 */
 int chiLBSCreateGroup(lua_State *L)
 {
+  const std::string fname = "chiLBSCreateGroup";
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Create groupset
   lbs_solver.groups.emplace_back((int)lbs_solver.groups.size());
@@ -144,18 +148,20 @@ chiLBSGroupsetAddGroups(phys1,cur_gs,0,15)
 */
 int chiLBSGroupsetAddGroups(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetAddGroups";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 4)
-    LuaPostArgAmountError(__FUNCTION__,4,num_args);
-  int solver_index = lua_tonumber(L,1);
+    LuaPostArgAmountError(fname,4,num_args);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int from = lua_tonumber(L,3);
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset;
@@ -225,23 +231,25 @@ chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 */
 int chiLBSGroupsetSetQuadrature(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetQuadrature";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
 
 
-  int solver_index = lua_tonumber(L,1);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset;
@@ -330,21 +338,23 @@ chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_POLAR)
 */
 int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetAngleAggregationType";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -411,21 +421,23 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 */
 int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetAngleAggDiv";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -477,21 +489,23 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 */
 int chiLBSGroupsetSetGroupSubsets(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetGroupSubsets";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -619,21 +633,23 @@ chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 */
 int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetIterativeMethod";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -733,21 +749,23 @@ chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 */
 int chiLBSGroupsetSetResidualTolerance(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetResidualTolerance";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -802,21 +820,23 @@ chiLBSGroupsetSetMaxIterations(phys1,cur_gs,200)
 */
 int chiLBSGroupsetSetMaxIterations(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetMaxIterations";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -868,21 +888,23 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
 */
 int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetGMRESRestartIntvl";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -935,21 +957,23 @@ chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 */
 int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetEnableSweepLog";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -1007,16 +1031,17 @@ chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 */
 int chiLBSGroupsetSetWGDSA(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetWGDSA";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError(__FUNCTION__,4,num_args);
+    LuaPostArgAmountError(fname,4,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  LuaCheckNilValue(__FUNCTION__,L,4);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  LuaCheckNilValue(fname,L,4);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
   double resid_tol = lua_tonumber(L,4);
@@ -1030,8 +1055,9 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -1095,16 +1121,17 @@ chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 */
 int chiLBSGroupsetSetTGDSA(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetTGDSA";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError(__FUNCTION__,4,num_args);
+    LuaPostArgAmountError(fname,4,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  LuaCheckNilValue(__FUNCTION__,L,4);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  LuaCheckNilValue(fname,L,4);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
   double resid_tol = lua_tonumber(L,4);
@@ -1118,8 +1145,9 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;

@@ -10,7 +10,7 @@ namespace lbs_adjoint::lua_utils
 
 int chiAdjointSolverAddResponseFunction(lua_State* L)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chiAdjointSolverAddResponseFunction";
   const int num_args = lua_gettop(L);
   if (num_args < 3)
     LuaPostArgAmountError(fname, 3, num_args);
@@ -23,7 +23,7 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
   LuaCheckStringValue(fname, L, 2);
   LuaCheckNumberValue(fname, L, 3);
 
-  const int solver_index     = lua_tointeger(L,1);
+  const int solver_handle     = lua_tointeger(L, 1);
   const std::string qoi_name = lua_tostring(L,2);
   const int logvol_handle    = lua_tointeger(L,3);
 
@@ -35,7 +35,8 @@ int chiAdjointSolverAddResponseFunction(lua_State* L)
     lua_function = lua_tostring(L,4);
   }
 
-  auto& solver = lbs_adjoint::lua_utils::GetSolverByHandle(solver_index,fname);
+  auto& solver = chi::GetStackItem<lbs_adjoint::AdjointSolver>(
+    chi::solver_stack, solver_handle, fname);
 
   auto p_logical_volume = chi::GetStackItemPtr(
     chi::logicvolume_stack, logvol_handle, fname);

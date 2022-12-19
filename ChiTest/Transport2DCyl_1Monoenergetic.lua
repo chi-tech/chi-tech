@@ -103,8 +103,8 @@ chiLBSSetProperty(phys0, BOUNDARY_CONDITION,
 --------------------------------------------------------------------------------
 --  solvers
 --------------------------------------------------------------------------------
-chiLBSInitialize(phys0)
-chiLBSExecute(phys0)
+chiSolverInitialize(phys0)
+chiSolverExecute(phys0)
 
 --------------------------------------------------------------------------------
 --  output
