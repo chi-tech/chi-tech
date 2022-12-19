@@ -266,9 +266,9 @@ void lbs::acceleration::DiffusionMIPSolver::
 
             //========================= Assemble gradient terms
             // For the following comments we use the notation:
-            // Dk = 0.5* n dot nabla bk
+            // Dk = n dot nabla bk
 
-            // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
+            // D* n dot (b_j^+ - b_j^-)*nabla b_i^-
             for (size_t i=0; i<num_nodes; i++)
             {
               const int64_t imap = m_sdm.MapDOF(cell, i, m_uk_man, 0, g);
@@ -284,7 +284,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                     fqp_data.JxW(qp) +
                     fqp_data.ShapeValue(i, qp) * fqp_data.ShapeGrad(j, qp) *
                     fqp_data.JxW(qp);
-                const double aij = -0.5*Dg*n_f.Dot(vec_aij);
+                const double aij = -Dg*n_f.Dot(vec_aij);
 
                 double aij_bc_value = aij*bc_value;
 
@@ -299,7 +299,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                       fqp_data.JxW(qp) +
                       fqp_data.ShapeValue(i, qp) * fqp_data.ShapeGrad(j, qp) *
                       fqp_data.JxW(qp));
-                  aij_bc_value = -0.5*Dg*n_f.Dot(vec_aij_mms);
+                  aij_bc_value = -Dg*n_f.Dot(vec_aij_mms);
                 }
 
                 MatSetValue(m_A, imap, jmap, aij, ADD_VALUES);
@@ -344,7 +344,7 @@ void lbs::acceleration::DiffusionMIPSolver::
                   rhs_val += fqp_data.ShapeValue(i,qp) * fqp_data.JxW(qp);
                 rhs_val *= (fval/bval);
 
-                VecSetValue(m_rhs,ir, -rhs_val, ADD_VALUES);
+                VecSetValue(m_rhs,ir, rhs_val, ADD_VALUES);
               }//if f nonzero
             }//for fi
           }//Robin BC
