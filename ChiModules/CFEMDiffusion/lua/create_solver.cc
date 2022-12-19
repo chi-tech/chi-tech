@@ -5,6 +5,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+namespace cfem_diffusion::cfem_diffusion_lua_utils
+{
 
 //#############################################################################
 /** Creates a CFEM Diffusion solver.
@@ -37,3 +39,5 @@ int chiCFEMDiffusionSolverCreate(lua_State *L)
     << std::endl;
   return 1;
 }
+
+}//namespace cfem_diffusion::cfem_diffusion_lua_utils

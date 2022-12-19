@@ -15,8 +15,7 @@
 //============================================= constructor
 cfem_diffusion::Solver::Solver(const std::string& in_solver_name):
   chi_physics::Solver(in_solver_name, { {"max_iters", int64_t(500)   },
-                                        {"residual_tolerance", 1.0e-2}}
-                   )
+                                        {"residual_tolerance", 1.0e-2}})
 {}
 
 //============================================= destructor
@@ -28,12 +27,12 @@ cfem_diffusion::Solver::~Solver()
 }
 
 //============================================= Initialize
-void cfem_diffusion::Solver::Initialize(bool verbose)
+void cfem_diffusion::Solver::Initialize()
 {
   chi::log.Log() << "\n"
                      << chi::program_timer.GetTimeString() << " "
                      << TextName() << ": Initializing CFEM Diffusion solver ";
-  this->verbose_info = verbose;
+
   //============================================= Get grid
   grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;

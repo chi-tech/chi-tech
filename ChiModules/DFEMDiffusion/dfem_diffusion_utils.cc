@@ -1,14 +1,8 @@
-//
-// Created by Ragusa, Jean C on 12/2/22.
-//
-
 #include "ChiConsole/chi_console.h"
 #include "ChiLua/chi_lua.h"
 #include "dfem_diffusion_solver.h"
 
-//#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-//#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-//#include "ChiMesh/chi_mesh.h"
+#define scdouble static_cast<double>
 
 //###################################################################
 /**Still searching for a reference for this.
@@ -24,7 +18,7 @@
 double dfem_diffusion::Solver::HPerpendicular(const chi_mesh::Cell& cell,
                unsigned int f)
 {
-  const auto& sdm = *sdm_ptr; //jcr adding this because the way the my .h/object is built
+  const auto& sdm = *sdm_ptr;
 
   const auto& cell_mapping = sdm.GetCellMapping(cell);
   double hp;
@@ -64,7 +58,8 @@ double dfem_diffusion::Solver::HPerpendicular(const chi_mesh::Cell& cell,
       else
       {
         hp = 2.0*volume/surface_area;
-        hp += sqrt(2.0 * volume / (num_faces * sin(2.0 * M_PI / num_faces)));
+        hp += sqrt(2.0 * volume /
+              (scdouble(num_faces) * sin(2.0 * M_PI / scdouble(num_faces))));
       }
     }
   }
@@ -98,7 +93,7 @@ int dfem_diffusion::Solver::MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
                 size_t ccfi,
                 double epsilon/*=1.0e-12*/)
 {
-  const auto& sdm = *sdm_ptr; //jcr adding this because the way the my .h/object is built
+  const auto& sdm = *sdm_ptr;
 
   const auto& cur_cell_mapping = sdm.GetCellMapping(cur_cell);
   const auto& adj_cell_mapping = sdm.GetCellMapping(adj_cell);
@@ -151,7 +146,7 @@ double dfem_diffusion::Solver::CallLua_iXYZFunction(
 
   //============= Call lua function
   //4 arguments, 1 result (double), 0=original error object
-  double lua_return = 0.0;
+  double lua_return;
   if (lua_pcall(L,4,1,0) == 0)
   {
     LuaCheckNumberValue("CallLua_iXYZFunction", L, -1);
@@ -165,4 +160,4 @@ double dfem_diffusion::Solver::CallLua_iXYZFunction(
   lua_pop(L,1); //pop the double, or error code
 
   return lua_return;
-};
+}

@@ -417,6 +417,11 @@ struct chi_mesh::Vector3
 
     return out.str();
   }
+
+  static size_t Size()
+  {
+    return 3;
+  }
 };
 
 //The following functions are defined in chi_mesh_utilities.cc

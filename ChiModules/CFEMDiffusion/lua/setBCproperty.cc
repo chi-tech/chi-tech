@@ -5,6 +5,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+namespace cfem_diffusion::cfem_diffusion_lua_utils
+{
 
 //#############################################################################
 /** Sets a property of a Diffusion solver. Please also consult the whitepaper
@@ -225,3 +227,5 @@ int chiCFEMDiffusionSetBCProperty(lua_State *L)
   }
   return 0;
 }
+
+}//namespace cfem_diffusion::cfem_diffusion_lua_utils

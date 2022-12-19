@@ -14,12 +14,12 @@ namespace chi_mesh
 {
 class MeshContinuum; 
 typedef std::shared_ptr<MeshContinuum> MeshContinuumPtr;
-};
+}
 namespace chi_math
 {
 class SpatialDiscretization; 
 typedef std::shared_ptr<SpatialDiscretization> SDMPtr ;
-};
+}
 
 namespace cfem_diffusion
 {
@@ -28,13 +28,6 @@ namespace cfem_diffusion
 */
 class Solver : public chi_physics::Solver
 {
-private:
-//  chi_objects::ChiTimer t_assembly;
-//  chi_objects::ChiTimer t_solve;
-//
-//  double time_assembly=0.0, time_solve=0.0;
-  bool verbose_info=true;
-
 public:
   chi_mesh::MeshContinuumPtr grid_ptr=nullptr;
 
@@ -56,8 +49,7 @@ public:
   virtual ~Solver();
 
   // void Initialize() override;
-  void Initialize() override {Initialize(true);}
-  void Initialize(bool verbose);
+  void Initialize() override;
 
   void Execute() override;
 
@@ -69,7 +61,7 @@ public:
 
 };
 
-}; // namespace cfem_diffusion
+} // namespace cfem_diffusion
 
 
 #endif //CFEM_DIFFUSION_SOLVER_H

@@ -32,11 +32,10 @@ namespace chi_unit_sim_tests
     //First get ghosted values
     const auto& field = solver.field;
 
-    const int i_dummy = -99; // for LUA function call
-
     double local_error = 0.0;
     for (const auto& cell : sdm.ref_grid->local_cells)
     {
+      const int mat_id = cell.material_id;
       const auto& cell_mapping = sdm.GetCellMapping(cell);
       const size_t num_nodes = cell_mapping.NumNodes();
       const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
@@ -57,7 +56,7 @@ namespace chi_unit_sim_tests
           phi_fem += nodal_phi[j] * qp_data.ShapeValue(j, qp);
 
         double phi_true = dfem_diffusion::Solver::
-          CallLua_iXYZFunction(L,"MMS_phi",i_dummy, qp_data.QPointXYZ(qp));
+          CallLua_iXYZFunction(L,"MMS_phi",mat_id, qp_data.QPointXYZ(qp));
 
         local_error += std::pow(phi_true - phi_fem,2.0) * qp_data.JxW(qp);
       }

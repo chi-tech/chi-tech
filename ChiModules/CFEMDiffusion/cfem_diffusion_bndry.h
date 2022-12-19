@@ -3,11 +3,7 @@
 
 namespace cfem_diffusion
 {
-  // class Solver;
   class Boundary;
-  class BoundaryDirichlet;
-  class BoundaryReflecting;
-  class BoundaryRobin;
   
   enum class BoundaryType : int
   {

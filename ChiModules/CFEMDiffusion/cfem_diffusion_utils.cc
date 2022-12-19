@@ -1,11 +1,16 @@
-//
-// Created by Ragusa, Jean C on 12/2/22.
-//
-
 #include "ChiConsole/chi_console.h"
 #include "ChiLua/chi_lua.h"
 #include "cfem_diffusion_solver.h"
 
+//###################################################################
+/**Calls a lua function with xyz coordinates.
+ * \param L The lua state.
+ * \param lua_func_name The name used to define this lua function in the lua
+ *                      state.
+ * \param imat The material ID of the cell
+ * \param xyz The xyz coordinates of the point where the function is called.
+ *
+ * \return The function evaluation.*/
 double cfem_diffusion::Solver::CallLua_iXYZFunction(
   lua_State* L,
   const std::string& lua_func_name,
@@ -29,7 +34,7 @@ double cfem_diffusion::Solver::CallLua_iXYZFunction(
 
   //============= Call lua function
   //4 arguments, 1 result (double), 0=original error object
-  double lua_return = 0.0;
+  double lua_return;
   if (lua_pcall(L,4,1,0) == 0)
   {
     LuaCheckNumberValue("CallLua_iXYZFunction", L, -1);
@@ -43,4 +48,4 @@ double cfem_diffusion::Solver::CallLua_iXYZFunction(
   lua_pop(L,1); //pop the double, or error code
 
   return lua_return;
-};
+}

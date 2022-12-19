@@ -12,19 +12,12 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
-// jcr: which ones? mesh? meshhandler? meshcontinuum?unk_man?
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMesh/chi_mesh.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
-
 #define DefaultBCDirichlet BoundaryCondition{BCType::DIRICHLET,{0,0,0}}
 
 //============================================= constructor
 dfem_diffusion::Solver::Solver(const std::string& in_solver_name):
   chi_physics::Solver(in_solver_name, { {"max_iters", int64_t(500)   },
-                                        {"residual_tolerance", 1.0e-2}}
-                   )
+                                        {"residual_tolerance", 1.0e-2}})
 {}
 
 //============================================= destructor
@@ -36,12 +29,12 @@ dfem_diffusion::Solver::~Solver()
 }
 
 //============================================= Initialize
-void dfem_diffusion::Solver::Initialize(bool verbose)
+void dfem_diffusion::Solver::Initialize()
 {
   chi::log.Log() << "\n"
                  << chi::program_timer.GetTimeString() << " "
                  << TextName() << ": Initializing DFEM Diffusion solver ";
-  this->verbose_info = verbose;
+
   //============================================= Get grid
   grid_ptr = chi_mesh::GetCurrentHandler().GetGrid();
   const auto& grid = *grid_ptr;
@@ -125,7 +118,7 @@ void dfem_diffusion::Solver::Initialize(bool verbose)
   const auto& sdm = *sdm_ptr;
  
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
-  // jcr: do I need static_cast<int64_t>?
+
   num_local_dofs = sdm.GetNumLocalDOFs(OneDofPerNode);
   num_globl_dofs = sdm.GetNumGlobalDOFs(OneDofPerNode);
  
@@ -133,7 +126,6 @@ void dfem_diffusion::Solver::Initialize(bool verbose)
   chi::log.Log() << "Num globl DOFs: " << num_globl_dofs;
 
   //============================================= Initializes Mats and Vecs
-
   const auto n = static_cast<int64_t>(num_local_dofs);
   const auto N = static_cast<int64_t>(num_globl_dofs);
  
@@ -188,15 +180,6 @@ void dfem_diffusion::Solver::Execute()
     const auto   cc_nodes    = cell_mapping.GetNodeLocations();
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
 
-//    cout << std::endl;
-//    chi::log.Log() << "cell/node layout : " << icell;
-//    for (int i = 0; i < cc_nodes.size(); ++i){
-//      for (int j = 0; j < 3; ++j) { // jcr: hardcoded 3, ask Jan about .size for vec3
-//        cout << cc_nodes[i][j] << ", ";
-//      }
-//      cout << std::endl;
-//    }
-
     const auto imat  = cell.material_id;
     MatDbl Acell(num_nodes, VecDbl(num_nodes, 0.0));
     VecDbl cell_rhs(num_nodes, 0.0);
@@ -204,11 +187,11 @@ void dfem_diffusion::Solver::Execute()
     //==================================== Assemble volumetric terms
     for (size_t i=0; i<num_nodes; ++i)
     {
-      size_t imap = sdm.MapDOF(cell, i);
+      const int64_t imap = sdm.MapDOF(cell, i);
 
       for (size_t j=0; j<num_nodes; ++j)
       {
-        size_t jmap = sdm.MapDOF(cell, j);
+        const int64_t jmap = sdm.MapDOF(cell, j);
         double entry_aij = 0.0;
         for (size_t qp : qp_data.QuadraturePointIndices())
         {
@@ -245,7 +228,8 @@ void dfem_diffusion::Solver::Execute()
       typedef chi_mesh::MeshContinuum Grid;
 
       // interior face
-      if (face.has_neighbor) {
+      if (face.has_neighbor)
+      {
         const auto &adj_cell = grid.cells[face.neighbor_id];
         const auto &adj_cell_mapping = sdm.GetCellMapping(adj_cell);
         const auto ac_nodes = adj_cell_mapping.GetNodeLocations();
@@ -266,15 +250,15 @@ void dfem_diffusion::Solver::Execute()
         //========================= Assembly penalty terms
         for (size_t fi = 0; fi < num_face_nodes; ++fi) {
           const int i = cell_mapping.MapFaceNode(f, fi);
-          const size_t imap = sdm.MapDOF(cell, i);
+          const int64_t imap = sdm.MapDOF(cell, i);
 
           for (size_t fj = 0; fj < num_face_nodes; ++fj) {
             const int jm = cell_mapping.MapFaceNode(f, fj);      //j-minus
-            const size_t jmmap = sdm.MapDOF(cell, jm);
+            const int64_t jmmap = sdm.MapDOF(cell, jm);
 
             const int jp = MapFaceNodeDisc(cell, adj_cell, cc_nodes, ac_nodes,
                                            f, acf, fj);         //j-plus
-            const size_t jpmap = sdm.MapDOF(adj_cell, jp);
+            const int64_t jpmap = sdm.MapDOF(adj_cell, jp);
 
             double aij = 0.0;
             for (size_t qp: fqp_data.QuadraturePointIndices())
@@ -299,15 +283,15 @@ void dfem_diffusion::Solver::Execute()
 
         // loop over node of current cell (gradient of b_i)
         for (int i = 0; i < num_nodes; ++i) {
-          const size_t imap = sdm.MapDOF(cell, i);
+          const int64_t imap = sdm.MapDOF(cell, i);
 
           // loop over faces
           for (int fj = 0; fj < num_face_nodes; ++fj) {
             const int jm = cell_mapping.MapFaceNode(f, fj);      //j-minus
-            const size_t jmmap = sdm.MapDOF(cell, jm);
+            const int64_t jmmap = sdm.MapDOF(cell, jm);
             const int jp = MapFaceNodeDisc(cell, adj_cell, cc_nodes, ac_nodes,
                                            f, acf, fj);         //j-plus
-            const size_t jpmap = sdm.MapDOF(adj_cell, jp);
+            const int64_t jpmap = sdm.MapDOF(adj_cell, jp);
 
             chi_mesh::Vector3 vec_aij;
             for (size_t qp: fqp_data.QuadraturePointIndices())
@@ -315,7 +299,7 @@ void dfem_diffusion::Solver::Execute()
                 CallLua_iXYZFunction(L, "D_coef", imat, fqp_data.QPointXYZ(qp)) *
                 fqp_data.ShapeValue(jm, qp) * fqp_data.ShapeGrad(i, qp) *
                 fqp_data.JxW(qp);
-            const double aij = -0.5 * n_f.Dot(vec_aij);  // jcr where is this minus from??
+            const double aij = -0.5 * n_f.Dot(vec_aij);
 
             MatSetValue(A, imap, jmmap, aij, ADD_VALUES);
             MatSetValue(A, imap, jpmap, -aij, ADD_VALUES);
@@ -326,14 +310,14 @@ void dfem_diffusion::Solver::Execute()
         // 0.5*D* n dot (b_i^+ - b_i^-)*nabla b_j^-
         for (int fi = 0; fi < num_face_nodes; ++fi) {
           const int im = cell_mapping.MapFaceNode(f, fi);       //i-minus
-          const size_t immap = sdm.MapDOF(cell, im);
+          const int64_t immap = sdm.MapDOF(cell, im);
 
           const int ip = MapFaceNodeDisc(cell, adj_cell, cc_nodes, ac_nodes,
                                          f, acf, fi);            //i-plus
-          const size_t ipmap = sdm.MapDOF(adj_cell, ip);
+          const int64_t ipmap = sdm.MapDOF(adj_cell, ip);
 
           for (int j = 0; j < num_nodes; ++j) {
-            const size_t jmap = sdm.MapDOF(cell, j);
+            const int64_t jmap = sdm.MapDOF(cell, j);
 
             chi_mesh::Vector3 vec_aij;
             for (size_t qp: fqp_data.QuadraturePointIndices())
@@ -341,7 +325,7 @@ void dfem_diffusion::Solver::Execute()
                 CallLua_iXYZFunction(L, "D_coef", imat, fqp_data.QPointXYZ(qp)) *
                 fqp_data.ShapeValue(im, qp) * fqp_data.ShapeGrad(j, qp) *
                 fqp_data.JxW(qp);
-            const double aij = -0.5 * n_f.Dot(vec_aij); // jcr where is this minus from??
+            const double aij = -0.5 * n_f.Dot(vec_aij);
 
             MatSetValue(A, immap, jmap, aij, ADD_VALUES);
             MatSetValue(A, ipmap, jmap, -aij, ADD_VALUES);
@@ -349,12 +333,13 @@ void dfem_diffusion::Solver::Execute()
         }//for fi
 
       }//internal face
-      else { // boundary face
+      else
+      { // boundary face
         const auto &bndry = boundaries[face.neighbor_id];
         // Robin boundary
-        if (bndry.type == BoundaryType::Robin) {
+        if (bndry.type == BoundaryType::Robin)
+        {
           const auto qp_face_data = cell_mapping.MakeFaceQuadraturePointData(f);
-          const size_t num_face_nodes = face.vertex_ids.size();
 
           const auto &aval = bndry.values[0];
           const auto &bval = bndry.values[1];
@@ -371,12 +356,12 @@ void dfem_diffusion::Solver::Execute()
 
           for (size_t fi = 0; fi < num_face_nodes; fi++) {
             const uint i = cell_mapping.MapFaceNode(f, fi);
-            const size_t ir = sdm.MapDOF(cell, i);
+            const int64_t ir = sdm.MapDOF(cell, i);
 
             if (std::fabs(aval) >= 1.0e-12) {
               for (size_t fj = 0; fj < num_face_nodes; fj++) {
                 const uint j = cell_mapping.MapFaceNode(f, fj);
-                const size_t jr = sdm.MapDOF(cell, j);
+                const int64_t jr = sdm.MapDOF(cell, j);
 
                 double aij = 0.0;
                 for (size_t qp: fqp_data.QuadraturePointIndices())
@@ -411,13 +396,12 @@ void dfem_diffusion::Solver::Execute()
 
           //========================= Assembly penalty terms
           for (size_t fi = 0; fi < num_face_nodes; ++fi) {
-            // jcr int, uint, size_t ?
             const uint i = cell_mapping.MapFaceNode(f, fi);
-            const size_t imap = sdm.MapDOF(cell, i);
+            const int64_t imap = sdm.MapDOF(cell, i);
 
             for (size_t fj = 0; fj < num_face_nodes; ++fj) {
               const uint jm = cell_mapping.MapFaceNode(f, fj);
-              const size_t jmmap = sdm.MapDOF(cell, jm);
+              const int64_t jmmap = sdm.MapDOF(cell, jm);
 
               double aij = 0.0;
               for (size_t qp: fqp_data.QuadraturePointIndices())
@@ -438,11 +422,10 @@ void dfem_diffusion::Solver::Execute()
 
           // 0.5*D* n dot (b_j^+ - b_j^-)*nabla b_i^-
           for (size_t i = 0; i < num_nodes; i++) {
-            // jcr: ask size_t versus int64_t
-            const size_t imap = sdm.MapDOF(cell, i);
+            const int64_t imap = sdm.MapDOF(cell, i);
 
             for (size_t j = 0; j < num_nodes; j++) {
-              const size_t jmap = sdm.MapDOF(cell, j);
+              const int64_t jmap = sdm.MapDOF(cell, j);
 
               chi_mesh::Vector3 vec_aij;
               for (size_t qp: fqp_data.QuadraturePointIndices())

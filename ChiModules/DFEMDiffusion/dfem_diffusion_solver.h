@@ -28,13 +28,6 @@ namespace dfem_diffusion
 */
 class Solver : public chi_physics::Solver
 {
-private:
-  chi_objects::ChiTimer t_assembly;
-  chi_objects::ChiTimer t_solve;
-
-  double time_assembly=0.0, time_solve = 0.0;
-  bool verbose_info=true;
-
 public:
   chi_mesh::MeshContinuumPtr grid_ptr = nullptr;
 
@@ -59,8 +52,7 @@ public:
   virtual ~Solver();
 
   // void Initialize() override;
-  void Initialize() override {Initialize(true);}
-  void Initialize(bool verbose);
+  void Initialize() override;
 
   void Execute() override;
 

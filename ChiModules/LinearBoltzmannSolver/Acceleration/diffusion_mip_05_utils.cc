@@ -6,6 +6,8 @@
 
 #include "ChiMesh/chi_mesh.h"
 
+#define scdouble static_cast<double>
+
 //###################################################################
 /**Still searching for a reference for this.
  *
@@ -59,7 +61,8 @@ double lbs::acceleration::DiffusionMIPSolver::
       else
       {
         hp = 2.0*volume/surface_area;
-        hp += sqrt(2.0 * volume / (num_faces * sin(2.0 * M_PI / num_faces)));
+        hp += sqrt(2.0 * volume /
+              (scdouble(num_faces) * sin(2.0 * M_PI / scdouble(num_faces))));
       }
     }
   }
