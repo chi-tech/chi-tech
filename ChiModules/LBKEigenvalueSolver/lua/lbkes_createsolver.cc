@@ -3,15 +3,16 @@
 #include "../lbkes_k_eigenvalue_solver.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 using namespace lbs;
 
 //###################################################################
-/**Create the solver.*/
+/**Create the solver.
+\param SolverName string Optional. A string name to use for the solver.
+                         [Default="KEigenvalueSolver"].
+ *
+\return A handle to the created solver.*/
 int chiLBKESCreateSolver(lua_State* L)
 {
   const std::string fname = __FUNCTION__;

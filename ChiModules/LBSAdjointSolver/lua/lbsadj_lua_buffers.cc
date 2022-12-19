@@ -23,10 +23,10 @@ int chiAdjointSolverReadFluxMomentsToBuffer(lua_State* L)
   LuaCheckNilValue(fname, L, 1);
   LuaCheckNilValue(fname, L, 2);
 
-  const int solver_index     = lua_tointeger(L,1);
+  const int solver_handle     = lua_tointeger(L, 1);
 
-  auto& solver = lbs_adjoint::lua_utils::
-    GetSolverByHandle(solver_index,fname);
+  auto& solver = chi::GetStackItem<lbs_adjoint::AdjointSolver>(
+    chi::solver_stack, solver_handle, fname);
 
   const std::string file_basename = lua_tostring(L,2);
 
@@ -56,10 +56,10 @@ int chiAdjointSolverApplyFluxMomentBuffer(lua_State* L)
   LuaCheckNilValue(fname, L, 1);
   LuaCheckNilValue(fname, L, 2);
 
-  const int solver_index     = lua_tointeger(L,1);
+  const int solver_handle     = lua_tointeger(L, 1);
 
-  auto& solver = lbs_adjoint::lua_utils::
-  GetSolverByHandle(solver_index,fname);
+  auto& solver = chi::GetStackItem<lbs_adjoint::AdjointSolver>(
+    chi::solver_stack, solver_handle, fname);
 
   const int buffer_handle = lua_tointeger(L,2);
 

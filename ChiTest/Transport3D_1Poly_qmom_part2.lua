@@ -1,6 +1,6 @@
 -- 3D Transport test with Vacuum BCs and a material source reading source moments
 -- SDM: PWLD
--- Test: Max-value=1.08197e-01 and 9.14681e-06
+-- Test: Max-value=1.01701e-04 and 9.14681e-06
 num_procs = 4
 
 
@@ -112,10 +112,10 @@ bsrc[1] = 1.0/4.0/math.pi;
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
+chiSolverInitialize(phys1)
 chiLBSReadSourceMoments(phys1,"Qmoms")
 chiLBSSetProperty(phys1,USE_SOURCE_MOMENTS,true)
-chiLBSExecute(phys1)
+chiSolverExecute(phys1)
 
 
 

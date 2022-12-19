@@ -62,8 +62,11 @@ void lbs::SteadySolver::
         const auto& dir_ss_size   = dir_ss_info.ss_size;
 
         std::vector<size_t> angle_indices(dir_ss_size, 0);
-        for (size_t n=dir_ss_begin; n<=dir_ss_end; ++n)
-          angle_indices[n] = so_grouping[n];
+        {
+          size_t k = 0;
+          for (size_t n=dir_ss_begin; n<=dir_ss_end; ++n)
+            angle_indices[k++] = so_grouping[n];
+        }
 
         chi_mesh::sweep_management::FLUDS* fluds;
         if (make_primary)

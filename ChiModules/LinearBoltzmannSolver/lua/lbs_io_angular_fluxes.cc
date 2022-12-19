@@ -20,22 +20,24 @@ is to be created.
 */
 int chiLBSWriteGroupsetAngularFlux(lua_State *L)
 {
+  const std::string fname = "chiLBSWriteGroupsetAngularFlux";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
 
-  int      solver_index = lua_tonumber(L,1);
-  int      grpset_index = lua_tonumber(L,2);
-  std::string file_base = lua_tostring(L,3);
+  const int      solver_handle = lua_tonumber(L, 1);
+  const int      grpset_index  = lua_tonumber(L,2);
+  const std::string file_base  = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -46,7 +48,7 @@ int chiLBSWriteGroupsetAngularFlux(lua_State *L)
   {
     chi::log.LogAllError()
       << "Invalid handle to groupset "
-      << "in call to " << __FUNCTION__;
+      << "in call to " << fname;
     chi::Exit(EXIT_FAILURE);
   }
 
@@ -70,22 +72,24 @@ is to be created.
 */
 int chiLBSReadGroupsetAngularFlux(lua_State *L)
 {
+  const std::string fname = "chiLBSReadGroupsetAngularFlux";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
 
-  int      solver_index = lua_tonumber(L,1);
-  int      grpset_index = lua_tonumber(L,2);
-  std::string file_base = lua_tostring(L,3);
+  const int      solver_handle = lua_tonumber(L, 1);
+  const int      grpset_index  = lua_tonumber(L,2);
+  const std::string file_base  = lua_tostring(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -96,7 +100,7 @@ int chiLBSReadGroupsetAngularFlux(lua_State *L)
   {
     chi::log.LogAllError()
       << "Invalid handle to groupset "
-      << "in call to " << __FUNCTION__;
+      << "in call to " << fname;
     chi::Exit(EXIT_FAILURE);
   }
 
