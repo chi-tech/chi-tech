@@ -143,9 +143,11 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
         UnpartitionedMesh::LightWeightFace face;
 
         if (v<3)
-          face.vertex_ids = {cell->vertex_ids[v],cell->vertex_ids[v+1]};
+          face.vertex_ids = std::vector<uint64_t>{cell->vertex_ids[v],
+                                                  cell->vertex_ids[v+1]};
         else
-          face.vertex_ids = {cell->vertex_ids[v],cell->vertex_ids[0]};
+          face.vertex_ids = std::vector<uint64_t>{cell->vertex_ids[v],
+                                                  cell->vertex_ids[0]};
 
         cell->faces.push_back(face);
       }
@@ -248,7 +250,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
           new UnpartitionedMesh::LightWeightCell(CellType::POLYHEDRON,
                                                  CellType::HEXAHEDRON);
 
-        cell->vertex_ids = {vmap[i  ][j  ][k],
+        cell->vertex_ids = std::vector<uint64_t>
+                           {vmap[i  ][j  ][k],
                             vmap[i  ][j+1][k],
                             vmap[i+1][j+1][k],
                             vmap[i+1][j  ][k],
@@ -262,7 +265,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
         {
           UnpartitionedMesh::LightWeightFace face;
 
-          face.vertex_ids = {vmap[i  ][j+1][k],
+          face.vertex_ids = std::vector<uint64_t>
+                            {vmap[i  ][j+1][k],
                              vmap[i+1][j+1][k],
                              vmap[i+1][j+1][k+1],
                              vmap[i  ][j+1][k+1]};
@@ -272,7 +276,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
         {
           UnpartitionedMesh::LightWeightFace face;
 
-          face.vertex_ids = {vmap[i  ][j  ][k],
+          face.vertex_ids = std::vector<uint64_t>
+                            {vmap[i  ][j  ][k],
                              vmap[i  ][j  ][k+1],
                              vmap[i+1][j  ][k+1],
                              vmap[i+1][j  ][k]};
@@ -282,7 +287,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
         {
           UnpartitionedMesh::LightWeightFace face;
 
-          face.vertex_ids = {vmap[i+1][j  ][k],
+          face.vertex_ids = std::vector<uint64_t>
+                            {vmap[i+1][j  ][k],
                              vmap[i+1][j  ][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j+1][k]};
@@ -292,7 +298,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
         {
           UnpartitionedMesh::LightWeightFace face;
 
-          face.vertex_ids = {vmap[i  ][j  ][k],
+          face.vertex_ids = std::vector<uint64_t>
+                            {vmap[i  ][j  ][k],
                              vmap[i  ][j+1][k],
                              vmap[i  ][j+1][k+1],
                              vmap[i  ][j  ][k+1]};
@@ -302,7 +309,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
         {
           UnpartitionedMesh::LightWeightFace face;
 
-          face.vertex_ids = {vmap[i  ][j  ][k+1],
+          face.vertex_ids = std::vector<uint64_t>
+                            {vmap[i  ][j  ][k+1],
                              vmap[i  ][j+1][k+1],
                              vmap[i+1][j+1][k+1],
                              vmap[i+1][j  ][k+1]};
@@ -312,7 +320,8 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
         {
           UnpartitionedMesh::LightWeightFace face;
 
-          face.vertex_ids = {vmap[i  ][j  ][k],
+          face.vertex_ids = std::vector<uint64_t>
+                            {vmap[i  ][j  ][k],
                              vmap[i+1][j  ][k],
                              vmap[i+1][j+1][k],
                              vmap[i  ][j+1][k]};
