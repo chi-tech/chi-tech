@@ -156,7 +156,15 @@ To check if the code compiled correctly, execute the test scripts:
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
 To generate the documentation from your local working copy, first make sure
-Doxygen and LaTeX (texlive) are installed (otherwise, get them from ```brew``).
+Doxygen, Lua, and LaTeX (texlive) are installed (otherwise, get them from ```brew```).
+
+*Note:* Given that Lua was installed already as a ChiTech dependencies, you may elect not to 
+intall Lua again, but rather add its location to your PATH. I have chosen to add a symbolic link in
+```/Users/USERNAME/local/bin/``` as follows:
+```bash
+ln -s /Users/USERNAME/repo/dependencies/LUA/lua-5.3.5/install/bin/lua lua
+```
+
 
 The documentation is contained in the *ChiDoc* folder and can be generated
 using a script provided in that folder:
