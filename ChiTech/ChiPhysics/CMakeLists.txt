@@ -13,6 +13,12 @@ FOREACH(item ${MORE_SOURCES2})
     ENDIF(${item} MATCHES "physics_doc.cc")
 ENDFOREACH(item)
 
+FOREACH(item ${MORE_SOURCES2})
+    IF(${item} MATCHES "doc.cc")
+        LIST(REMOVE_ITEM MORE_SOURCES2 ${item})
+    ENDIF(${item} MATCHES "doc.cc")
+ENDFOREACH(item)
+
 set(SOURCES ${SOURCES} ${MORE_SOURCES} ${MORE_SOURCES2} PARENT_SCOPE)
 #set_source_files_properties(chi_console_00_constrdestr.cc PROPERTIES COMPILE_FLAGS -Wno-effc++)
 
