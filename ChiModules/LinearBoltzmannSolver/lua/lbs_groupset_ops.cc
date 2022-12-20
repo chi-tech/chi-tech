@@ -1,14 +1,13 @@
 #include "ChiLua/chi_lua.h"
 #include "lbs_lua_utils.h"
 
-#include "chi_runtime.h"
-
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
+
+#include "LinearBoltzmannSolver/Groupset/lbs_group.h"
+#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "LinearBoltzmannSolver/Groupset/lbs_group.h"
-#include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
 #define sc_int static_cast<int>
 
@@ -164,7 +163,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
                                                           fname);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -174,6 +173,9 @@ int chiLBSGroupsetAddGroups(lua_State *L)
       << "chiLBSGroupsetAddGroups: Invalid handle to groupset\n";
     chi::Exit(EXIT_FAILURE);
   }
+  if (groupset == nullptr)
+    throw std::runtime_error("chiLBSGroupsetAddGroups: Bad trouble.");
+
 
   //============================================= Add the groups
   if (to<from)
@@ -188,7 +190,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
 
   for (unsigned k=from; k<=to; k++)
   {
-    lbs::LBSGroup* group;
+    lbs::LBSGroup* group = nullptr;
     //================================= Check valid group
     try {
       group = &lbs_solver.groups.at(k);
@@ -199,6 +201,8 @@ int chiLBSGroupsetAddGroups(lua_State *L)
         <<"chiLBSGroupsetAddGroups: Invalid group added to groupset\n";
       chi::Exit(EXIT_FAILURE);
     }
+    if (group == nullptr)
+      throw std::runtime_error("chiLBSGroupsetAddGroups: Bad trouble.");
 
     groupset->groups.push_back(*group);
   }
@@ -252,7 +256,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
                                                           fname);
 
   //============================================= Obtain pointer to groupset
-  lbs::LBSGroupset* groupset;
+  lbs::LBSGroupset* groupset = nullptr;
   try{
     groupset = &lbs_solver.groupsets.at(grpset_index);
   }
@@ -262,6 +266,8 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
                                  "in chiLBSGroupsetSetQuadrature.";
     chi::Exit(EXIT_FAILURE);
   }
+  if (groupset == nullptr)
+    throw std::logic_error("chiLBSGroupsetSetQuadrature: Bad trouble");
 
   //============================================= Obtain pointer to quadrature
   std::shared_ptr<chi_math::AngularQuadrature> ang_quad;

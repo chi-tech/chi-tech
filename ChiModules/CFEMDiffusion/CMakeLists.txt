@@ -1,9 +1,9 @@
 file (GLOB_RECURSE MORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cc")
 
 FOREACH(item ${MORE_SOURCES})
-    IF(${item} MATCHES "doc.cc")
+    IF(${item} MATCHES "lua/diffusion_maindoc_page.cc")
         LIST(REMOVE_ITEM MORE_SOURCES ${item})
-    ENDIF(${item} MATCHES "doc.cc")
+    ENDIF(${item} MATCHES "lua/diffusion_maindoc_page.cc")
 ENDFOREACH(item)
 
 set(SOURCES ${SOURCES} ${MORE_SOURCES} PARENT_SCOPE)
