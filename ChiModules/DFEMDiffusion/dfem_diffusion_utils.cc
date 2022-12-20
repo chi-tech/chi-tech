@@ -1,10 +1,6 @@
-#include "diffusion_mip.h"
-
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-
-#include "ChiMesh/chi_mesh.h"
+#include "ChiConsole/chi_console.h"
+#include "ChiLua/chi_lua.h"
+#include "dfem_diffusion_solver.h"
 
 #define scdouble static_cast<double>
 
@@ -19,11 +15,12 @@
  * \n
  * Nv = Number of vertices. If Nv <= 4 then the perimeter parameter
  * should be replaced by edge length.*/
-double lbs::acceleration::DiffusionMIPSolver::
-  HPerpendicular(const chi_mesh::Cell& cell,
-                 unsigned int f)
+double dfem_diffusion::Solver::HPerpendicular(const chi_mesh::Cell& cell,
+               unsigned int f)
 {
-  const auto& cell_mapping = m_sdm.GetCellMapping(cell);
+  const auto& sdm = *sdm_ptr;
+
+  const auto& cell_mapping = sdm.GetCellMapping(cell);
   double hp;
 
   const size_t num_faces = cell.faces.size();
@@ -80,7 +77,7 @@ double lbs::acceleration::DiffusionMIPSolver::
   }//Polyhedron
   else
     throw std::logic_error(
-      "lbs::acceleration::DiffusionMIPSolver::HPerpendicular: "
+      "dfem_diffusion::Solver::HPerpendicular: "
       "Unsupported cell type in call to HPerpendicular");
 
   return hp;
@@ -88,17 +85,18 @@ double lbs::acceleration::DiffusionMIPSolver::
 
 //###################################################################
 /**Maps a face, in a discontinuous sense, using the spatial discretization.*/
-int lbs::acceleration::DiffusionMIPSolver::
-  MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
-                  const chi_mesh::Cell& adj_cell,
-                  const std::vector<chi_mesh::Vector3>& cc_node_locs,
-                  const std::vector<chi_mesh::Vector3>& ac_node_locs,
-                  size_t ccf, size_t acf,
-                  size_t ccfi,
-                  double epsilon/*=1.0e-12*/)
+int dfem_diffusion::Solver::MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
+                const chi_mesh::Cell& adj_cell,
+                const std::vector<chi_mesh::Vector3>& cc_node_locs,
+                const std::vector<chi_mesh::Vector3>& ac_node_locs,
+                size_t ccf, size_t acf,
+                size_t ccfi,
+                double epsilon/*=1.0e-12*/)
 {
-  const auto& cur_cell_mapping = m_sdm.GetCellMapping(cur_cell);
-  const auto& adj_cell_mapping = m_sdm.GetCellMapping(adj_cell);
+  const auto& sdm = *sdm_ptr;
+
+  const auto& cur_cell_mapping = sdm.GetCellMapping(cur_cell);
+  const auto& adj_cell_mapping = sdm.GetCellMapping(adj_cell);
 
   const int i = cur_cell_mapping.MapFaceNode(ccf, ccfi);
   const auto& node_i_loc = cc_node_locs[i];
@@ -113,7 +111,7 @@ int lbs::acceleration::DiffusionMIPSolver::
   }
 
   throw std::logic_error(
-    "lbs::acceleration::DiffusionMIPSolver::MapFaceNodeDisc: Mapping failure.");
+    "dfem_diffusion::Solver::MapFaceNodeDisc: Mapping failure.");
 }
 
 //###################################################################
@@ -121,39 +119,41 @@ int lbs::acceleration::DiffusionMIPSolver::
  * \param L The lua state.
  * \param lua_func_name The name used to define this lua function in the lua
  *                      state.
+ * \param imat The material ID of the cell
  * \param xyz The xyz coordinates of the point where the function is called.
  *
  * \return The function evaluation.*/
-double lbs::acceleration::DiffusionMIPSolver::
-  CallLuaXYZFunction(lua_State* L, const std::string& lua_func_name,
-                     const chi_mesh::Vector3& xyz)
+double dfem_diffusion::Solver::CallLua_iXYZFunction(
+  lua_State* L,
+  const std::string& lua_func_name,
+  const int imat,
+  const chi_mesh::Vector3& xyz)
 {
-  const std::string fname = "lbs::acceleration::DiffusionMIPSolver::"
-                            "CallLuaXYZFunction";
   //============= Load lua function
   lua_getglobal(L, lua_func_name.c_str());
 
   //============= Error check lua function
   if (not lua_isfunction(L, -1))
-    throw std::logic_error(fname + " attempted to access lua-function, " +
+    throw std::logic_error("CallLua_iXYZFunction attempted to access lua-function, " +
                            lua_func_name + ", but it seems the function"
                                            " could not be retrieved.");
 
   //============= Push arguments
+  lua_pushinteger(L, imat);
   lua_pushnumber(L, xyz.x);
   lua_pushnumber(L, xyz.y);
   lua_pushnumber(L, xyz.z);
 
   //============= Call lua function
-  //3 arguments, 1 result (double), 0=original error object
+  //4 arguments, 1 result (double), 0=original error object
   double lua_return;
-  if (lua_pcall(L,3,1,0) == 0)
+  if (lua_pcall(L,4,1,0) == 0)
   {
-    LuaCheckNumberValue(fname, L, -1);
+    LuaCheckNumberValue("CallLua_iXYZFunction", L, -1);
     lua_return = lua_tonumber(L,-1);
   }
   else
-    throw std::logic_error(fname + " attempted to call lua-function, " +
+    throw std::logic_error("dfem_diffusion::CallLua_iXYZFunction attempted to call lua-function, " +
                            lua_func_name + ", but the call failed." +
                            xyz.PrintStr());
 

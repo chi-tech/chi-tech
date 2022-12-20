@@ -3,6 +3,8 @@ add_subdirectory("LinearBoltzmannSolver")
 add_subdirectory("LBSCurvilinear")
 add_subdirectory("LBKEigenvalueSolver")
 add_subdirectory("LBSAdjointSolver")
+add_subdirectory("CFEMDiffusion")
+add_subdirectory("DFEMDiffusion")
 
 set(MORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lua/chi_modules_lua.cc")
 
