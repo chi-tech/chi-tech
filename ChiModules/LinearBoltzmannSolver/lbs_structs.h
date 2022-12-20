@@ -74,7 +74,7 @@ private:
   int num_nodes;
   int num_grps;
   int num_grps_moms;
-  const chi_physics::TransportCrossSections& xs;
+  const chi_physics::TransportCrossSections* xs;
   double volume;
   std::vector<bool> face_local_flags = {};
   std::vector<double> outflow;
@@ -92,7 +92,7 @@ public:
     num_nodes(in_num_nodes),
     num_grps(in_num_grps),
     num_grps_moms(in_num_grps*in_num_moms),
-    xs(in_xs_mapping),
+    xs(&in_xs_mapping),
     volume(in_volume),
     face_local_flags(in_face_local_flags)
   {
@@ -106,7 +106,7 @@ public:
   }
 
    const chi_physics::TransportCrossSections& XS() const
-  {return xs;}
+  {return *xs;}
 
   bool IsFaceLocal(int f) const {return face_local_flags[f];}
 
@@ -124,6 +124,11 @@ public:
   {
     if (g<outflow.size()) return outflow[g];
     else return 0.0;
+  }
+
+  void ReassingXS(const chi_physics::TransportCrossSections& xs_mapped)
+  {
+    xs = &xs_mapped;
   }
 };
 

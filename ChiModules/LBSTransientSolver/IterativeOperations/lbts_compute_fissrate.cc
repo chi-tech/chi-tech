@@ -1,16 +1,25 @@
-#include "../lbkes_k_eigenvalue_solver.h"
+#include "../lbts_transient_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
 using namespace lbs;
 
 //###################################################################
-/**Compute the total fission production in the problem.
+/**Computes the total fission rate in the problem.
+
+\param previous bool Optional. If true and the solver is a transient solver
+                     then the rate will be based on the previous timestep's
+                     fluxes.
+
+\return the_rate The fission rate as a double.
+
 \author Zachary Hardy.*/
-double KEigenvalueSolver::ComputeFissionProduction()
+double TransientSolver::ComputeFissionRate(const bool previous)
 {
   const int first_grp = groups.front().id;
   const int last_grp = groups.back().id;
+
+  const auto& phi = (previous)? phi_prev_local : phi_new_local;
 
   //============================================= Loop over local cells
   double local_production = 0.0;
@@ -31,8 +40,8 @@ double KEigenvalueSolver::ComputeFissionProduction()
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.nu_sigma_f[g] *
-                            phi_new_local[uk_map + g] *
+        local_production += xs.sigma_f[g] *
+                            phi[uk_map + g] *
                             IntV_ShapeI;
     }//for node
   }//for cell

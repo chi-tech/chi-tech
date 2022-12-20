@@ -1,10 +1,9 @@
 #include "../lbs_linear_boltzmann_solver.h"
 
-#include "ChiTimer/chi_timer.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "chi_log.h"
+#include "ChiTimer/chi_timer.h"
 
 //###################################################################
 /**Sets the source moments for the groups in the current group set.
@@ -24,11 +23,11 @@ void lbs::SteadySolver::
 {
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_mat_src         = (source_flags & APPLY_MATERIAL_SOURCE);
-  const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCE);
-  const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCE);
-  const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCE);
-  const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCE);
+  const bool apply_mat_src         = (source_flags & APPLY_FIXED_SOURCES);
+  const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCES);
+  const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCES);
+  const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCES);
+  const bool apply_ags_fission_src = (source_flags & APPLY_AGS_FISSION_SOURCES);
 
   //================================================== Get group setup
   auto gs_i = static_cast<size_t>(groupset.groups[0].id);
@@ -109,13 +108,10 @@ void lbs::SteadySolver::
             {
               if ((gprime < gs_i) or (gprime > gs_f))
               {
-                //without delayed neutron precursors
                 if (not options.use_precursors)
                   infission_g += xs.chi[g] *
                                  xs.nu_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
-
-                //with delayed neutron precursors
                 else
                 {
                   //Prompt fission
@@ -142,13 +138,10 @@ void lbs::SteadySolver::
             {
               if ((gprime >= gs_i) and (gprime <= gs_f))
               {
-                //without delayed neutron precursors
                 if (not options.use_precursors)
                   infission_g += xs.chi[g] *
                                  xs.nu_sigma_f[gprime] *
                                  phi_old_local[uk_map + gprime];
-
-                //with delayed neutron precursors
                 else
                 {
                   //Prompt fission

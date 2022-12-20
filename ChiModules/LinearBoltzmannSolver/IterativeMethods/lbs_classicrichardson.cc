@@ -16,6 +16,7 @@ bool lbs::SteadySolver::
 ClassicRichardson(LBSGroupset& groupset,
                   MainSweepScheduler& sweep_scheduler,
                   SourceFlags source_flags,
+                  const SetSourceFunction& set_source_function,
                   bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
@@ -55,7 +56,7 @@ ClassicRichardson(LBSGroupset& groupset,
 
   //================================================== Sweep chunk settings
   auto& sweep_chunk = sweep_scheduler.GetSweepChunk();
-  bool use_surface_source_flag = (source_flags & APPLY_MATERIAL_SOURCE) and
+  bool use_surface_source_flag = (source_flags & APPLY_FIXED_SOURCES) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
   sweep_chunk.ZeroIncomingDelayedPsi();
@@ -66,7 +67,7 @@ ClassicRichardson(LBSGroupset& groupset,
   for (int k = 0; k < groupset.max_iterations; ++k)
   {
     q_moments_local = init_q_moments_local;
-    SetSource(groupset, q_moments_local, source_flags);
+    set_source_function(groupset, q_moments_local, source_flags);
 
     sweep_chunk.ZeroFluxDataStructures();
     sweep_scheduler.Sweep();

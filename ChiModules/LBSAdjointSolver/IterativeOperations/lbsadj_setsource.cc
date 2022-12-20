@@ -14,11 +14,11 @@ void lbs_adjoint::AdjointSolver::
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   using Flag = lbs::SourceFlags;
-  const bool apply_mat_src         = (source_flags & Flag::APPLY_MATERIAL_SOURCE);
-  const bool apply_wgs_scatter_src = (source_flags & Flag::APPLY_WGS_SCATTER_SOURCE);
-  const bool apply_ags_scatter_src = (source_flags & Flag::APPLY_AGS_SCATTER_SOURCE);
-  const bool apply_wgs_fission_src = (source_flags & Flag::APPLY_WGS_FISSION_SOURCE);
-  const bool apply_ags_fission_src = (source_flags & Flag::APPLY_AGS_FISSION_SOURCE);
+  const bool apply_mat_src         = (source_flags & Flag::APPLY_FIXED_SOURCES);
+  const bool apply_wgs_scatter_src = (source_flags & Flag::APPLY_WGS_SCATTER_SOURCES);
+  const bool apply_ags_scatter_src = (source_flags & Flag::APPLY_AGS_SCATTER_SOURCES);
+  const bool apply_wgs_fission_src = (source_flags & Flag::APPLY_WGS_FISSION_SOURCES);
+  const bool apply_ags_fission_src = (source_flags & Flag::APPLY_AGS_FISSION_SOURCES);
 
   //================================================== Get group setup
   auto gs_i = static_cast<size_t>(groupset.groups[0].id);
