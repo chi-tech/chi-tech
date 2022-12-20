@@ -4,6 +4,7 @@ cmake-build-debug
 .idea
 bin
 chi_build
+build
 ChiDoc/documentation
 ChiDoc/HTMLdocs
 ChiDoc/whitepages

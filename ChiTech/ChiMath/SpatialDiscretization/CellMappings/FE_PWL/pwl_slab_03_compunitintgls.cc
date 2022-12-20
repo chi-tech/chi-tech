@@ -1,5 +1,7 @@
 #include "pwl_slab.h"
 
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+
 //###################################################################
 /**Computes cell volume and surface integrals.*/
 void chi_math::SlabMappingFE_PWL::
@@ -22,20 +24,20 @@ void chi_math::SlabMappingFE_PWL::
   IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
   IntV_gradShapeI_gradShapeJ.emplace_back(2, 0.0);
 
-  IntV_gradShapeI_gradShapeJ[0][0] = 1 / h;
-  IntV_gradShapeI_gradShapeJ[0][1] = -1 / h;
-  IntV_gradShapeI_gradShapeJ[1][0] = -1 / h;
-  IntV_gradShapeI_gradShapeJ[1][1] = 1 / h;
+  IntV_gradShapeI_gradShapeJ[0][0] =  1.0 / h;
+  IntV_gradShapeI_gradShapeJ[0][1] = -1.0 / h;
+  IntV_gradShapeI_gradShapeJ[1][0] = -1.0 / h;
+  IntV_gradShapeI_gradShapeJ[1][1] =  1.0 / h;
 
   //shapeI_gradShapeJ
   IntV_shapeI_gradshapeJ.resize(2);
   IntV_shapeI_gradshapeJ[0].resize(2);
   IntV_shapeI_gradshapeJ[1].resize(2);
 
-  IntV_shapeI_gradshapeJ[0][0] = chi_mesh::Vector3(0.0, 0.0, -1 / 2.0);
-  IntV_shapeI_gradshapeJ[0][1] = chi_mesh::Vector3(0.0, 0.0, 1 / 2.0);
-  IntV_shapeI_gradshapeJ[1][0] = chi_mesh::Vector3(0.0, 0.0, -1 / 2.0);
-  IntV_shapeI_gradshapeJ[1][1] = chi_mesh::Vector3(0.0, 0.0, 1 / 2.0);
+  IntV_shapeI_gradshapeJ[0][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / 2.0);
+  IntV_shapeI_gradshapeJ[0][1] = chi_mesh::Vector3(0.0, 0.0,  1.0 / 2.0);
+  IntV_shapeI_gradshapeJ[1][0] = chi_mesh::Vector3(0.0, 0.0, -1.0 / 2.0);
+  IntV_shapeI_gradshapeJ[1][1] = chi_mesh::Vector3(0.0, 0.0,  1.0 / 2.0);
 
   //shapeI_shapeJ
   IntV_shapeI_shapeJ.emplace_back(2, 0.0);
@@ -49,6 +51,10 @@ void chi_math::SlabMappingFE_PWL::
   //shapeI
   IntV_shapeI.push_back(h / 2);
   IntV_shapeI.push_back(h / 2);
+
+  //gradShapeI
+  IntV_gradshapeI.push_back(chi_mesh::Vector3(0.0, 0.0,-1.0));
+  IntV_gradshapeI.push_back(chi_mesh::Vector3(0.0, 0.0, 1.0));
 
   //IntS_shapeI_shapeJ
   typedef std::vector<VecDbl> VecVecDbl;
@@ -110,7 +116,7 @@ void chi_math::SlabMappingFE_PWL::
                      IntS_shapeI_shapeJ    ,
                      IntS_shapeI           ,
                      IntS_shapeI_gradshapeJ,
-                     face_dof_mappings,
-                     num_nodes);
+                     face_node_mappings,
+                     m_num_nodes);
 
 }

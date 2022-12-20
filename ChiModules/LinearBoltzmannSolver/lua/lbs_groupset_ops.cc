@@ -3,12 +3,14 @@
 
 #include "chi_runtime.h"
 
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_product_quadrature.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_group.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
+
+#define sc_int static_cast<int>
 
 /** \defgroup LuaLBSGroupsets LBS Groupsets
 
@@ -70,10 +72,12 @@ gs0 = chiLBSCreateGroupset(phys1)
 */
 int chiLBSCreateGroupset(lua_State *L)
 {
+  const std::string fname = "chiLBSCreateGroupset";
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  const int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Create groupset
   lbs_solver.groupsets.emplace_back((int)lbs_solver.groupsets.size());
@@ -100,10 +104,12 @@ grp[g] = chiLBSCreateGroup(phys1)
 */
 int chiLBSCreateGroup(lua_State *L)
 {
+  const std::string fname = "chiLBSCreateGroup";
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  int solver_handle = lua_tonumber(L,1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Create groupset
   lbs_solver.groups.emplace_back((int)lbs_solver.groups.size());
@@ -142,18 +148,20 @@ chiLBSGroupsetAddGroups(phys1,cur_gs,0,15)
 */
 int chiLBSGroupsetAddGroups(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetAddGroups";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 4)
-    LuaPostArgAmountError(__FUNCTION__,4,num_args);
-  int solver_index = lua_tonumber(L,1);
+    LuaPostArgAmountError(fname,4,num_args);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int from = lua_tonumber(L,3);
   int to   = lua_tonumber(L,4);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset;
@@ -223,23 +231,25 @@ chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 */
 int chiLBSGroupsetSetQuadrature(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetQuadrature";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
 
 
-  int solver_index = lua_tonumber(L,1);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int prquad_index = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset;
@@ -328,21 +338,23 @@ chiLBSGroupsetSetAngleAggregationType(phys1,cur_gs,LBSGroupset.ANGLE_AGG_POLAR)
 */
 int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetAngleAggregationType";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int agg_type = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -409,21 +421,23 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 */
 int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetAngleAggDiv";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -475,21 +489,23 @@ chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 */
 int chiLBSGroupsetSetGroupSubsets(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetGroupSubsets";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_div = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -534,17 +550,78 @@ is to be created.
 
 ### IterativeMethod
 NPT_CLASSICRICHARDSON\n
-Standard source iteration.\n\n
+Standard source iteration, without using PETSc.\n\n
 
 NPT_CLASSICRICHARDSON_CYCLES\n
-Standard source iteration with cyclic dependency convergence.\n\n
+Standard source iteration, without using PETSc,
+with cyclic dependency convergence.\n\n
 
 NPT_GMRES\n
-Generalized Minimal Residual formulation for iterations.\n\n
+Legacy Generalized Minimal Residual formulation for iterations.\n\n
 
 NPT_GMRES_CYCLES\n
-Generalized Minimal Residual formulation for iterations with cyclic dependency
-convergence.\n\n
+Legacy Generalized Minimal Residual formulation for iterations with cyclic
+dependency convergence.\n\n
+
+
+KRYLOV_RICHARDSON\n
+Richardson iteration.\n\n
+
+KRYLOV_RICHARDSON_CYCLES\n
+Richardson iteration with cyclic dependency convergence.\n\n
+
+KRYLOV_GMRES\n
+Generalized Minimal Residual method.\n\n
+
+KRYLOV_GMRES_CYCLES\n
+Generalized Minimal Residual method with cyclic dependency convergence.\n\n
+
+KRYLOV_BICGSTAB\n
+Biconjugate Gradient Stabilized method.\n\n
+
+KRYLOV_BICGSTAB_CYCLES\n
+Biconjugate Gradient Stabilized method with cyclic dependency convergence.\n\n
+
+
+##_
+
+### Notes on selecting iterative methods
+The iterative methods NPT_CLASSICRICHARDSON, NPT_CLASSICRICHARDSON_CYCLES,
+NPT_GMRES and NPT_GMRES_CYCLES are considered legacy. The NPT_GMRES and
+NPT_GMRES_CYCLES are now considered deprecated with the inclusion of the
+generalized Krylov iteration method-class (which supports all the options
+prepended with KRYLOV_).
+
+RICHARDSON is probably the least memory consuming but has the poorest
+convergence rate.
+
+GMRES generally has the best convergence rate but it builds a basis
+comprising multiple solutions vectors, the amount of which is controlled via
+the gmres-restart parameter, which can dramatically increase memory consumption.
+GMRES restarts, i.e. the amount of iterations before the basis is destroyed and
+restarted, influences both memory consumptions and convergence behavior, e.g.,
+lower restart numbers generally lowers memory consumption but increases the
+amount of iteration required to convergence.
+
+The required memory and the computational time for one iteration with BiCGStab
+is constant, i.e., the time and memory requirements do not increase with the
+number of iterations as they do for restarted GMRES. BiCGStab uses approximately
+the same amount of memory as GMRES uses for two iterations. Therefore, BiCGStab
+typically uses less memory than GMRES. The convergence behavior of BiCGStab is
+often more irregular than that of GMRES. Intermediate residuals can even be
+orders of magnitude larger than the initial residual, which can affect the
+numerical accuracy as well as the rate of convergence. If the algorithm detects
+poor accuracy in the residual or the risk of stagnation, it restarts the
+iterations with the current solution as the initial guess. In contrast to GMRES,
+BiCGStab uses two matrix-vector multiplications each iteration (requiring two
+transport sweeps). Also, when using the left-preconditioned BiCGStab, an
+additional preconditioning step is required each iteration. That is,
+left-preconditioned BiCGStab requires a total of three preconditioning steps in
+each iteration. We generally apply Within-group Diffusion Synthetic Acceleration
+(WGDSA) and Two-Grid Acceleration (TGDSA) as left-preconditioners and therefore
+the total cost of these pre-conditioners will increase when using BiCGStab. Use
+BiCGStab when you are running problem with a high scattering order (i.e., L is
+large) because this will dramatically increase the GMRES basis.
 
 Example:
 \code
@@ -556,21 +633,23 @@ chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES)
 */
 int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetIterativeMethod";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int iter_method  = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -587,24 +666,51 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
 
   {
     using lbs::IterativeMethod;
-    if (iter_method == static_cast<int>(IterativeMethod::CLASSICRICHARDSON))
+    if (iter_method == sc_int(IterativeMethod::CLASSICRICHARDSON))
     {
       groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
     }
     else if (iter_method ==
-                static_cast<int>(IterativeMethod::CLASSICRICHARDSON_CYCLES))
+                sc_int(IterativeMethod::CLASSICRICHARDSON_CYCLES))
     {
       groupset->allow_cycles = true;
       groupset->iterative_method = IterativeMethod::CLASSICRICHARDSON;
     }
-    else if (iter_method == static_cast<int>(IterativeMethod::GMRES))
+    else if (iter_method == sc_int(IterativeMethod::GMRES))
     {
       groupset->iterative_method = IterativeMethod::GMRES;
     }
-    else if (iter_method == static_cast<int>(IterativeMethod::GMRES_CYCLES))
+    else if (iter_method == sc_int(IterativeMethod::GMRES_CYCLES))
     {
       groupset->allow_cycles = true;
       groupset->iterative_method = IterativeMethod::GMRES;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON))
+    {
+      groupset->iterative_method = IterativeMethod::KRYLOV_RICHARDSON;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::KRYLOV_RICHARDSON;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_GMRES))
+    {
+      groupset->iterative_method = IterativeMethod::KRYLOV_GMRES;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_GMRES_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::KRYLOV_GMRES;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_BICGSTAB))
+    {
+      groupset->iterative_method = IterativeMethod::KRYLOV_BICGSTAB;
+    }
+    else if (iter_method == sc_int(IterativeMethod::KRYLOV_BICGSTAB_CYCLES))
+    {
+      groupset->allow_cycles = true;
+      groupset->iterative_method = IterativeMethod::KRYLOV_BICGSTAB;
     }
     else
     {
@@ -643,21 +749,23 @@ chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-4)
 */
 int chiLBSGroupsetSetResidualTolerance(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetResidualTolerance";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   double resid_tol = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -712,21 +820,23 @@ chiLBSGroupsetSetMaxIterations(phys1,cur_gs,200)
 */
 int chiLBSGroupsetSetMaxIterations(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetMaxIterations";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int num_iter = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -778,21 +888,23 @@ chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,15)
 */
 int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetGMRESRestartIntvl";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int restart_intvl = lua_tonumber(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -845,21 +957,23 @@ chiLBSGroupsetSetEnableSweepLog(phys1,cur_gs,true)
 */
 int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetEnableSweepLog";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args != 3)
-    LuaPostArgAmountError(__FUNCTION__,3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   bool log_flag = lua_toboolean(L,3);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -917,16 +1031,17 @@ chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 */
 int chiLBSGroupsetSetWGDSA(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetWGDSA";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError(__FUNCTION__,4,num_args);
+    LuaPostArgAmountError(fname,4,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  LuaCheckNilValue(__FUNCTION__,L,4);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  LuaCheckNilValue(fname,L,4);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
   double resid_tol = lua_tonumber(L,4);
@@ -940,8 +1055,9 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
@@ -1005,16 +1121,17 @@ chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false,petsc_options)
 */
 int chiLBSGroupsetSetTGDSA(lua_State *L)
 {
+  const std::string fname = "chiLBSGroupsetSetTGDSA";
   //============================================= Get arguments
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args < 4)
-    LuaPostArgAmountError(__FUNCTION__,4,num_args);
+    LuaPostArgAmountError(fname,4,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
-  LuaCheckNilValue(__FUNCTION__,L,3);
-  LuaCheckNilValue(__FUNCTION__,L,4);
-  int solver_index = lua_tonumber(L,1);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
+  LuaCheckNilValue(fname,L,3);
+  LuaCheckNilValue(fname,L,4);
+  int solver_handle = lua_tonumber(L,1);
   int grpset_index = lua_tonumber(L,2);
   int max_iters = lua_tonumber(L,3);
   double resid_tol = lua_tonumber(L,4);
@@ -1028,8 +1145,9 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
     petsc_string = lua_tostring(L,6);
 
   //============================================= Get pointer to solver
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;

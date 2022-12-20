@@ -32,7 +32,6 @@ class chi_physics::FieldFunction
 {
 public:
   std::string               text_name;
-  chi_mesh::MeshContinuumPtr  grid;
   std::shared_ptr<chi_math::SpatialDiscretization> spatial_discretization;
   chi_math::UnknownManager  unknown_manager;
   const unsigned int        ref_component;
@@ -51,7 +50,6 @@ public:
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
-    grid(ff_sdm->ref_grid),
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),
     ref_component(ff_unknown_component_number),
@@ -69,7 +67,6 @@ public:
                 int ff_unknown_id=0,
                 int ff_unknown_component_number=0) :
     text_name(std::move(ff_tex_name)),
-    grid(ff_sdm->ref_grid),
     spatial_discretization(ff_sdm),
     unknown_manager(ff_unknown_manager),
     ref_component(ff_unknown_component_number),
@@ -121,7 +118,9 @@ public:
                         const std::string& field_name,
                         const std::vector<std::string>& component_names);
 
-  void UploadCellGeometry(const chi_mesh::Cell& cell,
+  static
+  void UploadCellGeometry(const chi_mesh::MeshContinuum& grid,
+                          const chi_mesh::Cell& cell,
                           int64_t& node_counter,
                           vtkNew<vtkPoints>& points,
                           vtkNew<vtkUnstructuredGrid>& ugrid);

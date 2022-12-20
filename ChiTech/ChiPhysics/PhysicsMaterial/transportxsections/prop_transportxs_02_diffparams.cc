@@ -2,10 +2,6 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-#include <ChiLog/chi_log.h>
-
-;
-
 void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
 {
   if (diffusion_initialized)
@@ -59,13 +55,8 @@ void chi_physics::TransportCrossSections::ComputeDiffusionParameters()
     }
 
     //====================================== Determine removal cross-section
-    sigma_removal[g] = std::max(0.0, sigma_t[g] - sigma_s_gtog[g]);
+    sigma_removal[g] = std::max(0.0, sigma_t[g] - sigma_s_gtog[g] - sigma_f[g]);
   }//for g
-
-  //======================================== Compute two grid energy collapse
-  chi::log.Log() << "Performing Energy collapse.";
-  EnergyCollapse(xi_Jfull, D_jfull, sigma_a_jfull, E_COLLAPSE_JACOBI);
-  EnergyCollapse(xi_Jpart, D_jpart, sigma_a_jpart, E_COLLAPSE_PARTIAL_JACOBI);
 
   diffusion_initialized = true;
 }

@@ -14,12 +14,13 @@
 \author Jan*/
 int chiLBSGetFieldFunctionList(lua_State *L)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chiLBSGetFieldFunctionList";
 
   //============================================= Get pointer to solver
-  const int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  const int solver_handle = lua_tonumber(L, 1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Push up new table
   lua_newtable(L);
@@ -62,10 +63,12 @@ from the transport solver.
 \author Jan*/
 int chiLBSGetScalarFieldFunctionList(lua_State *L)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chiLBSGetScalarFieldFunctionList";
   //============================================= Get pointer to solver
-  const int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::GetSolverByHandle(solver_index, "chiLBSGetScalarFieldFunctionList");
+  const int solver_handle = lua_tonumber(L, 1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Push up new table
   lua_newtable(L);

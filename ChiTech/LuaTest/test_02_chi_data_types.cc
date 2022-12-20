@@ -1,6 +1,7 @@
 #include "unit_tests.h"
 
 #include "ChiDataTypes/byte_array.h"
+#include "ChiDataTypes/ndarray.h"
 #include "ChiMesh/Cell/cell.h"
 
 #include "chi_runtime.h"
@@ -58,137 +59,218 @@ void chi_unit_tests::Test_chi_data_types(bool verbose)
 
   //======================================================= Testing Byte array serialization
   output << "Testing chi_data_types::ByteArray Serialization/DeSerialization\n";
-  if (chi::mpi.process_count < 2)
-    throw std::logic_error("chi_unit_tests::Test_chi_data_types requires at least"
-                           " 2 MPI processes.");
-
-  std::map<int/*pid*/, chi_data_types::ByteArray> send_data;
-
-  chi_mesh::Cell poster_child_cell(chi_mesh::CellType::POLYHEDRON,
-                                   chi_mesh::CellType::HEXAHEDRON);
+  if (chi::mpi.process_count == 2)
   {
-    poster_child_cell.global_id    = 321;
-    poster_child_cell.local_id     = 123;
-    poster_child_cell.partition_id = 0;
-    poster_child_cell.centroid     = chi_mesh::Vector3(0.5, 0.5, 0.5);
-    poster_child_cell.material_id  = -2;
+    chi::log.Log0Warning() << "chi_unit_tests::Test_chi_data_types requires"
+                              " at least 2 MPI processes.";
 
-    poster_child_cell.vertex_ids = {0, 1, 2, 3,
-                                    4, 5, 6, 7};
+    std::map<int/*pid*/, chi_data_types::ByteArray> send_data;
 
-    //Bottom face
+    chi_mesh::Cell poster_child_cell(chi_mesh::CellType::POLYHEDRON,
+                                     chi_mesh::CellType::HEXAHEDRON);
     {
-      chi_mesh::CellFace face;
-      face.vertex_ids   = {0,3,2,1};
-      face.normal       = {0,0,-1};
-      face.centroid     = {0.5,0.5,0.0};
-      face.has_neighbor = false;
-      face.neighbor_id  = 0;
-      poster_child_cell.faces.push_back(std::move(face));
-    }
-    //Top face
-    {
-      chi_mesh::CellFace face;
-      face.vertex_ids   = {4,5,6,7};
-      face.normal       = {0,0,1};
-      face.centroid     = {0.5,0.5,1.0};
-      face.has_neighbor = false;
-      face.neighbor_id  = 1;
-      poster_child_cell.faces.push_back(std::move(face));
-    }
-    //Left face
-    {
-      chi_mesh::CellFace face;
-      face.vertex_ids   = {0,4,7,3};
-      face.normal       = {-1,0,0};
-      face.centroid     = {0.0,0.5,0.5};
-      face.has_neighbor = false;
-      face.neighbor_id  = 2;
-      poster_child_cell.faces.push_back(std::move(face));
-    }
-    //Right face
-    {
-      chi_mesh::CellFace face;
-      face.vertex_ids   = {1,2,6,5};
-      face.normal       = {1,0,0};
-      face.centroid     = {1.0,0.5,0.5};
-      face.has_neighbor = false;
-      face.neighbor_id  = 3;
-      poster_child_cell.faces.push_back(std::move(face));
-    }
-    //Front face
-    {
-      chi_mesh::CellFace face;
-      face.vertex_ids   = {0,1,5,4};
-      face.normal       = {0,-1,0};
-      face.centroid     = {0.5,0.0,0.5};
-      face.has_neighbor = false;
-      face.neighbor_id  = 4;
-      poster_child_cell.faces.push_back(std::move(face));
-    }
-    //Back face
-    {
-      chi_mesh::CellFace face;
-      face.vertex_ids   = {3,7,6,2};
-      face.normal       = {0,1,0};
-      face.centroid     = {0.5,1.0,0.5};
-      face.has_neighbor = false;
-      face.neighbor_id  = 5;
-      poster_child_cell.faces.push_back(std::move(face));
-    }
-  }
+      poster_child_cell.global_id    = 321;
+      poster_child_cell.local_id     = 123;
+      poster_child_cell.partition_id = 0;
+      poster_child_cell.centroid     = chi_mesh::Vector3(0.5, 0.5, 0.5);
+      poster_child_cell.material_id  = -2;
 
-  if (chi::mpi.location_id == 0)
-  {
-    send_data[1].Append(poster_child_cell.Serialize());
-    send_data[1].Append(poster_child_cell.Serialize());
-  }
+      poster_child_cell.vertex_ids = {0, 1, 2, 3,
+                                      4, 5, 6, 7};
 
-  std::map<int/*pid*/, std::vector<std::byte>> send_data_bytes;
-
-  for (const auto& pid_byte_array : send_data)
-    send_data_bytes[pid_byte_array.first] = pid_byte_array.second.Data();
-
-  std::map<int/*pid*/, std::vector<std::byte>> recv_data_bytes =
-    chi_mpi_utils::MapAllToAll(send_data_bytes, MPI_BYTE);
-
-  for (const auto& pid_vec_bytes : recv_data_bytes)
-  {
-    auto& pid = pid_vec_bytes.first;
-    auto& vec_bytes = pid_vec_bytes.second;
-
-    chi_data_types::ByteArray byte_array(vec_bytes);
-
-    size_t address = 0;
-    while (address < byte_array.Size())
-    {
-      const chi_mesh::Cell read_cell = chi_mesh::Cell::DeSerialize(byte_array,address);
-
-      auto& rcell = read_cell;
-      auto& pcell = poster_child_cell;
-
-      if (rcell.Type()       != pcell.Type()      ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-      if (rcell.SubType()    != pcell.SubType()   ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-      if (rcell.global_id    != pcell.global_id   ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-      if (rcell.local_id     != pcell.local_id    ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-      if (rcell.partition_id != pcell.partition_id) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-      if (rcell.material_id  != pcell.material_id ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-      if (rcell.vertex_ids   != pcell.vertex_ids  ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-
-      if (rcell.faces.size() != pcell.faces.size()) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-
-      size_t f = 0;
-      for (const auto& rface : rcell.faces)
+      //Bottom face
       {
-        const auto& pface = pcell.faces[f];
-
-        if (rface.vertex_ids   != pface.vertex_ids)   {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rface.has_neighbor != pface.has_neighbor) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        if (rface.neighbor_id  != pface.neighbor_id)  {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
-        ++f;
+        chi_mesh::CellFace face;
+        face.vertex_ids   = {0,3,2,1};
+        face.normal       = {0,0,-1};
+        face.centroid     = {0.5,0.5,0.0};
+        face.has_neighbor = false;
+        face.neighbor_id  = 0;
+        poster_child_cell.faces.push_back(std::move(face));
+      }
+      //Top face
+      {
+        chi_mesh::CellFace face;
+        face.vertex_ids   = {4,5,6,7};
+        face.normal       = {0,0,1};
+        face.centroid     = {0.5,0.5,1.0};
+        face.has_neighbor = false;
+        face.neighbor_id  = 1;
+        poster_child_cell.faces.push_back(std::move(face));
+      }
+      //Left face
+      {
+        chi_mesh::CellFace face;
+        face.vertex_ids   = {0,4,7,3};
+        face.normal       = {-1,0,0};
+        face.centroid     = {0.0,0.5,0.5};
+        face.has_neighbor = false;
+        face.neighbor_id  = 2;
+        poster_child_cell.faces.push_back(std::move(face));
+      }
+      //Right face
+      {
+        chi_mesh::CellFace face;
+        face.vertex_ids   = {1,2,6,5};
+        face.normal       = {1,0,0};
+        face.centroid     = {1.0,0.5,0.5};
+        face.has_neighbor = false;
+        face.neighbor_id  = 3;
+        poster_child_cell.faces.push_back(std::move(face));
+      }
+      //Front face
+      {
+        chi_mesh::CellFace face;
+        face.vertex_ids   = {0,1,5,4};
+        face.normal       = {0,-1,0};
+        face.centroid     = {0.5,0.0,0.5};
+        face.has_neighbor = false;
+        face.neighbor_id  = 4;
+        poster_child_cell.faces.push_back(std::move(face));
+      }
+      //Back face
+      {
+        chi_mesh::CellFace face;
+        face.vertex_ids   = {3,7,6,2};
+        face.normal       = {0,1,0};
+        face.centroid     = {0.5,1.0,0.5};
+        face.has_neighbor = false;
+        face.neighbor_id  = 5;
+        poster_child_cell.faces.push_back(std::move(face));
       }
     }
+
+    if (chi::mpi.location_id == 0)
+    {
+      send_data[1].Append(poster_child_cell.Serialize());
+      send_data[1].Append(poster_child_cell.Serialize());
+    }
+
+    std::map<int/*pid*/, std::vector<std::byte>> send_data_bytes;
+
+    for (const auto& pid_byte_array : send_data)
+      send_data_bytes[pid_byte_array.first] = pid_byte_array.second.Data();
+
+    std::map<int/*pid*/, std::vector<std::byte>> recv_data_bytes =
+      chi_mpi_utils::MapAllToAll(send_data_bytes, MPI_BYTE);
+
+    for (const auto& pid_vec_bytes : recv_data_bytes)
+    {
+      auto& pid = pid_vec_bytes.first;
+      auto& vec_bytes = pid_vec_bytes.second;
+
+      chi_data_types::ByteArray byte_array(vec_bytes);
+
+      size_t address = 0;
+      while (address < byte_array.Size())
+      {
+        const chi_mesh::Cell read_cell = chi_mesh::Cell::DeSerialize(byte_array,address);
+
+        auto& rcell = read_cell;
+        auto& pcell = poster_child_cell;
+
+        if (rcell.Type()       != pcell.Type()      ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.SubType()    != pcell.SubType()   ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.global_id    != pcell.global_id   ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.local_id     != pcell.local_id    ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.partition_id != pcell.partition_id) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.material_id  != pcell.material_id ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+        if (rcell.vertex_ids   != pcell.vertex_ids  ) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+
+        if (rcell.faces.size() != pcell.faces.size()) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+
+        size_t f = 0;
+        for (const auto& rface : rcell.faces)
+        {
+          const auto& pface = pcell.faces[f];
+
+          if (rface.vertex_ids   != pface.vertex_ids)   {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+          if (rface.has_neighbor != pface.has_neighbor) {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+          if (rface.neighbor_id  != pface.neighbor_id)  {passed = false; output << "Line: " << __LINE__ << "\n"; break;}
+          ++f;
+        }
+      }
+    }
+  }//if #procs=2
+
+
+  //======================================================= Testing NDArray
+  //
+  std::stringstream dummy;
+  //Constructor vector
+  //rank()
+  {
+    chi_data_types::NDArray<double> nd_array1(std::vector<size_t>{2, 2, 2});
+    dummy << nd_array1.rank();
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
   }
+
+  //Constructor array
+  {
+    chi_data_types::NDArray<double> nd_array1(std::array<size_t,3>{2, 2, 2});
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
+  }
+
+  //Constructor initializer_list
+  {
+    chi_data_types::NDArray<double> nd_array1({2, 2, 2});
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
+  }
+
+  //Constructor vector value
+  {
+    chi_data_types::NDArray<double> nd_array1(std::vector<size_t>{2, 2, 2}, 0.0);
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
+  }
+
+  //Constructor array value
+  {
+    chi_data_types::NDArray<double> nd_array1(std::array<size_t, 3>{2, 2, 2}, 0.0);
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
+  }
+
+  //Constructor initializer_list value
+  {
+    chi_data_types::NDArray<double> nd_array1({2, 2, 2}, 0.0);
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
+  }
+
+  //Constructor none
+  {
+    chi_data_types::NDArray<double> nd_array1;
+    for (auto val : nd_array1) {dummy << val << " "; dummy << "\n";}
+  }
+
+  //method set
+  //iterators
+  //const iterators
+  {
+    chi_data_types::NDArray<double> nd_array2(std::vector<size_t>{2, 2, 2});
+    nd_array2.set(1.0);
+
+    for (auto val: nd_array2) dummy << val << " ";
+    dummy << "\n";
+
+    const auto& nd_array3 = nd_array2;
+    for (auto i=nd_array3.cbegin(); i != nd_array3.cend(); ++i)
+      dummy << *i << " ";
+    dummy << "\n";
+  }
+
+  //size and empty
+  {
+    chi_data_types::NDArray<double> nd_array4(std::array<size_t, 3>{2, 2, 2});
+    nd_array4.set(1.0);
+
+    dummy << nd_array4.size();
+    dummy << nd_array4.empty();
+
+    for (auto val: nd_array4) dummy << val << " ";
+    dummy << "\n";
+  }
+
+  output << dummy.str();
+
 
   if (not passed)
   {

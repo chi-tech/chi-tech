@@ -2,77 +2,98 @@
 #define SPATIAL_DISCRETIZATION_H
 
 #include "ChiMesh/chi_mesh.h"
-#include "../Quadratures/quadrature.h"
+#include "ChiMath/Quadratures/quadrature.h"
 #include "ChiMath/chi_math.h"
 #include "ChiMath/UnknownManager/unknown_manager.h"
 #include "ChiMesh/Cell/cell.h"
+#include "ChiMath/SpatialDiscretization/CellMappings/cell_mapping_base.h"
 
 #include <petscksp.h>
+
+#include <vector>
+#include <map>
 
 namespace chi_math
 {
   class SpatialDiscretization
   {
   public:
-    const int dim;
     const SpatialDiscretizationType type;
 
-    const chi_mesh::MeshContinuumPtr ref_grid;
+    const chi_mesh::MeshContinuumConstPtr ref_grid;
     const CoordinateSystemType cs_type;
+
+    const UnknownManager UNITARY_UNKNOWN_MANAGER;
+
+  protected:
+    std::vector<std::unique_ptr<CellMapping>> cell_mappings;
+    std::map<uint64_t, std::shared_ptr<CellMapping>> nb_cell_mappings;
+
+    uint64_t              local_block_address = 0;
+    std::vector<uint64_t> locJ_block_address;
+    std::vector<uint64_t> locJ_block_size;
+
+    uint64_t local_base_block_size=0;
+    uint64_t globl_base_block_size=0;
 
   protected:
     typedef SpatialDiscretizationType SDMType;
-
-  protected:
     //00
     explicit
-    SpatialDiscretization(int in_dim,
-                          chi_mesh::MeshContinuumPtr& in_grid,
+    SpatialDiscretization(chi_mesh::MeshContinuumPtr& in_grid,
                           CoordinateSystemType in_cs_type,
                           SDMType in_type = SDMType::UNDEFINED) :
-      dim(in_dim),
       type(in_type),
       ref_grid(in_grid),
-      cs_type(in_cs_type)
+      cs_type(in_cs_type),
+      UNITARY_UNKNOWN_MANAGER({std::make_pair(chi_math::UnknownType::SCALAR,0)})
     {
     }
 
-  protected:
-    //01
-    virtual void PreComputeCellSDValues() {}
+    //01 AddViewOfContinuum
+  public:
+    const CellMapping& GetCellMapping(const chi_mesh::Cell& cell) const;
+
+    //02 OrderNodes
 
   public:
+    //03
     virtual
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
                               std::vector<int64_t>& nodal_nnz_off_diag,
-                              UnknownManager& unknown_manager)
-                              {}
+                              const UnknownManager& unknown_manager) const = 0;
 
+    //04 Mappings
     virtual
     int64_t MapDOF(const chi_mesh::Cell& cell,
                    unsigned int node,
                    const UnknownManager& unknown_manager,
                    unsigned int unknown_id,
-                   unsigned int component) const {return 0;}
+                   unsigned int component) const =0;
 
     virtual
     int64_t MapDOFLocal(const chi_mesh::Cell& cell,
                         unsigned int node,
                         const UnknownManager& unknown_manager,
                         unsigned int unknown_id,
-                        unsigned int component) const {return 0;}
+                        unsigned int component) const =0;
 
     virtual
-    int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+    int64_t MapDOF(const chi_mesh::Cell& cell, unsigned int node) const =0;
     virtual
-    int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const {return 0;}
+    int64_t MapDOFLocal(const chi_mesh::Cell& cell, unsigned int node) const =0;
+
+    //05 Utils
+    virtual
+    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) const = 0;
+    virtual
+    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) const = 0;
 
     virtual
-    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager)
-                           {return 0;}
+    size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const = 0;
     virtual
-    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager)
-                            {return 0;}
+    std::vector<int64_t>
+    GetGhostDOFIndices(const UnknownManager& unknown_manager) const=0;
 
     virtual
     size_t GetCellNumNodes(const chi_mesh::Cell& cell) const = 0;
@@ -81,15 +102,23 @@ namespace chi_math
     std::vector<chi_mesh::Vector3>
       GetCellNodeLocations(const chi_mesh::Cell& cell) const = 0;
 
-  protected:
-    //02
+    std::vector<std::vector<std::vector<int>>>
+    MakeInternalFaceNodeMappings(double tolerance=1.0e-12) const;
+
+    void CopyVectorWithUnknownScope(const std::vector<double>& from_vector,
+                                          std::vector<double>& to_vector,
+                                    const UnknownManager& from_vec_uk_structure,
+                                    unsigned int from_vec_uk_id,
+                                    const UnknownManager& to_vec_uk_structure,
+                                    unsigned int to_vec_uk_id) const;
+
+  public:
     /**Develops a localized view of a petsc vector.
      * Each spatial discretization has a specialization of this
      * method.*/
     virtual void LocalizePETScVector(Vec petsc_vector,
                                      std::vector<double>& local_vector,
-                                     UnknownManager& unknown_manager)
-    {}
+                                     const UnknownManager& unknown_manager) const = 0;
 
   };
 }

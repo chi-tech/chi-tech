@@ -1,16 +1,7 @@
 #ifndef SPATIAL_DISCRETIZATION_PWLC_H
 #define SPATIAL_DISCRETIZATION_PWLC_H
 
-#include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
-
-#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-
-#include "ChiMath/SpatialDiscretization/FiniteElement/spatial_discretization_FE.h"
-#include "ChiMath/Quadratures/quadrature_line.h"
-#include "ChiMath/Quadratures/quadrature_triangle.h"
-#include "ChiMath/Quadratures/quadrature_quadrilateral.h"
-#include "ChiMath/Quadratures/quadrature_tetrahedron.h"
-#include "ChiMath/Quadratures/quadrature_hexahedron.h"
+#include "pwl_base.h"
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
 
 //######################################################### Class def
@@ -20,41 +11,11 @@ namespace chi_math
      * with piecewise linear basis functions
      * for use by either a Continues Finite Element Method (CFEM)
      * or a Discontinuous Finite Element Method (DFEM). */
-  class SpatialDiscretization_PWLC : public chi_math::SpatialDiscretization_FE
+  class SpatialDiscretization_PWLC : public SpatialDiscretization_PWLBase
   {
-  public:
-    std::vector<std::shared_ptr<CellMappingFE_PWL>> cell_mappings;
-
-  private:
-    bool                     mapping_initialized=false;
-    UnknownManager UNITARY_UNKNOWN_MANAGER;
-  public:
-    QuadratureLine          line_quad_order_arbitrary;
-    QuadratureTriangle      tri_quad_order_arbitrary;
-    QuadratureQuadrilateral quad_quad_order_arbitrary;
-    QuadratureTetrahedron   tet_quad_order_arbitrary;
-    QuadratureHexahedron    hex_quad_order_arbitrary;
-
-    std::map<int,int> node_mapping;
-
-    int local_block_address = 0;
-  //  std::vector<int> cell_local_block_address;
-  //  std::vector<std::pair<int,int>> neighbor_cell_block_address;
-
-    std::vector<int> locJ_block_address;
-    std::vector<int> locJ_block_size;
-
-    unsigned int local_base_block_size=0;
-    unsigned int globl_base_block_size=0;
-
-  private:
-  //  std::vector<chi_mesh::Cell*> neighbor_cells;
-  //  std::vector<CellPWLFEValues*> neighbor_cell_fe_views;
-
-  private:
-    finite_element::UnitIntegralData            scratch_intgl_data;
-    finite_element::InternalQuadraturePointData scratch_vol_qp_data;
-    finite_element::FaceQuadraturePointData     scratch_face_qp_data;
+  protected:
+    std::map<uint64_t, int64_t> node_mapping;
+    std::map<uint64_t, int64_t> m_ghost_node_mapping;
 
   private:
     //00
@@ -69,28 +30,17 @@ namespace chi_math
     static
     std::shared_ptr<SpatialDiscretization_PWLC>
     New(chi_mesh::MeshContinuumPtr& in_grid,
-        finite_element::SetupFlags setup_flags=
-        finite_element::NO_FLAGS_SET,
-        QuadratureOrder qorder =
-        QuadratureOrder::SECOND,
-        CoordinateSystemType in_cs_type =
-        CoordinateSystemType::CARTESIAN)
-    { if (in_grid == nullptr) throw std::invalid_argument(
-        "Null supplied as grid to SpatialDiscretization_PWLC.");
-      return std::shared_ptr<SpatialDiscretization_PWLC>(
-      new SpatialDiscretization_PWLC(in_grid, setup_flags, qorder, in_cs_type));}
+        finite_element::SetupFlags setup_flags = finite_element::NO_FLAGS_SET,
+        QuadratureOrder qorder = QuadratureOrder::SECOND,
+        CoordinateSystemType in_cs_type = CoordinateSystemType::CARTESIAN);
 
     //01
-  private:
-    std::shared_ptr<CellMappingFE_PWL> MakeCellMappingFE(const chi_mesh::Cell& cell) const;
+    //Inherited from PWLBase:
+    //PreComputeCellSDValues
+    //PreComputeNeighborCellSDValues
+    //CreateCellMappings
 
-  public:
-
-    void PreComputeCellSDValues() override;
-  //  void PreComputeNeighborCellSDValues(chi_mesh::MeshContinuumPtr grid);
-    std::shared_ptr<CellMappingFE_PWL> GetCellMappingFE(uint64_t cell_local_index);
-
-  private:
+  protected:
     //02
     void OrderNodes();
 
@@ -98,7 +48,7 @@ namespace chi_math
     //03
     void BuildSparsityPattern(std::vector<int64_t>& nodal_nnz_in_diag,
                               std::vector<int64_t>& nodal_nnz_off_diag,
-                              UnknownManager& unknown_manager) override;
+                              const UnknownManager& unknown_manager) const override;
 
     //04 Mappings
     int64_t MapDOF(const chi_mesh::Cell& cell,
@@ -118,81 +68,21 @@ namespace chi_math
     { return MapDOFLocal(cell,node,UNITARY_UNKNOWN_MANAGER,0,0); }
 
     //05
-    size_t GetNumLocalDOFs(const UnknownManager& unknown_manager) override;
-    size_t GetNumGlobalDOFs(const UnknownManager& unknown_manager) override;
-  //  unsigned int GetNumGhostDOFs(chi_mesh::MeshContinuumPtr grid,
-  //                               chi_math::UnknownManager* unknown_manager);
-  //
-  //  std::vector<int> GetGhostDOFIndices(chi_mesh::MeshContinuumPtr grid,
-  //                                      chi_math::UnknownManager* unknown_manager,
-  //                                      unsigned int unknown_id=0);
+    //Inherited from PWLBase:
+    //GetNumLocalDOFs
+    //GetNumGlobalDOFs
 
-    size_t GetCellNumNodes(const chi_mesh::Cell& cell) const override
-    {return cell.vertex_ids.size();}
+    size_t GetNumGhostDOFs(const UnknownManager& unknown_manager) const override;
+    std::vector<int64_t>
+    GetGhostDOFIndices(const UnknownManager& unknown_manager) const override;
 
-    std::vector<chi_mesh::Vector3>
-    GetCellNodeLocations(const chi_mesh::Cell& cell) const override
-    {
-      std::vector<chi_mesh::Vector3> node_locations;
-      node_locations.reserve(cell.vertex_ids.size());
-
-      for (auto& vid : cell.vertex_ids)
-        node_locations.emplace_back(ref_grid->vertices[vid]);
-
-      return node_locations;
-    }
-
-    void LocalizePETScVector(Vec petsc_vector,
-                             std::vector<double>& local_vector,
-                             UnknownManager& unknown_manager)
-                             override;
-
-    //FE-utils
-    const finite_element::UnitIntegralData&
-    GetUnitIntegrals(const chi_mesh::Cell& cell) override
-    {
-      if (integral_data_initialized)
-        return fe_unit_integrals.at(cell.local_id);
-      else
-      {
-        auto cell_fe_view = GetCellMappingFE(cell.local_id);
-        scratch_intgl_data.Reset();
-        cell_fe_view->ComputeUnitIntegrals(scratch_intgl_data);
-        return scratch_intgl_data;
-      }
-    }
-
-    const finite_element::InternalQuadraturePointData&
-    GetQPData_Volumetric(const chi_mesh::Cell& cell) override
-    {
-      if (qp_data_initialized)
-        return fe_vol_qp_data.at(cell.local_id);
-      else
-      {
-        auto cell_fe_view = GetCellMappingFE(cell.local_id);
-        cell_fe_view->InitializeVolumeQuadraturePointData(scratch_vol_qp_data);
-        return scratch_vol_qp_data;
-      }
-    }
-
-    const finite_element::FaceQuadraturePointData&
-    GetQPData_Surface(const chi_mesh::Cell& cell,
-                      const unsigned int face) override
-    {
-      if (qp_data_initialized)
-      {
-        const auto& face_data = fe_srf_qp_data.at(cell.local_id);
-
-        return face_data.at(face);
-      }
-      else
-      {
-        auto cell_fe_view = GetCellMappingFE(cell.local_id);
-        cell_fe_view->InitializeFaceQuadraturePointData(face, scratch_face_qp_data);
-        return scratch_face_qp_data;
-      }
-
-    }
+    //Inherited from PWLBase:
+    //GetCellNumNodes
+    //GetCellNodeLocations
+    //LocalizePETScVector
+    //GetUnitIntegrals
+    //GetQPData_Volumetric
+    //GetQPData_Surface
   };
 }
 

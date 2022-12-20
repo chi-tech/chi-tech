@@ -13,12 +13,7 @@
 #include "LBSCurvilinear/lbs_curvilinear_sweepchunk_pwl.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
-
-
 typedef chi_mesh::sweep_management::SweepChunk SweepChunk;
-
-;
-
 
 void
 lbs_curvilinear::Solver::PerformInputChecks()
@@ -53,16 +48,6 @@ lbs_curvilinear::Solver::PerformInputChecks()
     {
       switch (coord_system_type)
       {
-      //case chi_math::CoordinateSystemType::CYLINDRICAL:
-      //{
-      //  options.geometry_type = LinearBoltzmann::GeometryType::ONED_CYLINDRICAL;
-      //  break;
-      //}
-      //case chi_math::CoordinateSystemType::SPHERICAL:
-      //{
-      //  options.geometry_type = LinearBoltzmann::GeometryType::ONED_SPHERICAL;
-      //  break;
-      //}
         default:
         {
           chi::log.LogAllError()
@@ -117,8 +102,9 @@ lbs_curvilinear::Solver::PerformInputChecks()
     {
       case chi_math::CoordinateSystemType::CYLINDRICAL:
       {
+        typedef chi_math::CylindricalAngularQuadrature CylAngQuad;
         const auto curvilinear_angular_quad_ptr =
-          std::dynamic_pointer_cast<chi_math::CylindricalAngularQuadrature>(angular_quad_ptr);
+          std::dynamic_pointer_cast<CylAngQuad>(angular_quad_ptr);
         if (!curvilinear_angular_quad_ptr)
         {
           chi::log.LogAllError()
@@ -132,8 +118,9 @@ lbs_curvilinear::Solver::PerformInputChecks()
       }
       case chi_math::CoordinateSystemType::SPHERICAL:
       {
+        typedef chi_math::SphericalAngularQuadrature SphAngQuad;
         const auto curvilinear_angular_quad_ptr =
-          std::dynamic_pointer_cast<chi_math::SphericalAngularQuadrature>(angular_quad_ptr);
+          std::dynamic_pointer_cast<SphAngQuad>(angular_quad_ptr);
         if (!curvilinear_angular_quad_ptr)
         {
           chi::log.LogAllError()
@@ -272,11 +259,6 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
       break;
     }
     case lbs::GeometryType::ONED_CYLINDRICAL:
-    {
-      qorder = chi_math::QuadratureOrder::THIRD;
-      system = chi_math::CoordinateSystemType::CYLINDRICAL;
-      break;
-    }
     case lbs::GeometryType::TWOD_CYLINDRICAL:
     {
       qorder = chi_math::QuadratureOrder::THIRD;
@@ -293,8 +275,10 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
     }
   }
 
-  discretization =
-    chi_math::SpatialDiscretization_PWLD::New(grid, setup_flags, qorder, system);
+  typedef chi_math::SpatialDiscretization_PWLD SDM_PWLD;
+  discretization = SDM_PWLD::New(grid, setup_flags, qorder, system);
+
+  ComputeUnitIntegrals();
 
   //  secondary discretisation
   //  system - manipulated such that the spatial discretisation returns
@@ -309,11 +293,6 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
       break;
     }
     case lbs::GeometryType::ONED_CYLINDRICAL:
-    {
-      qorder = chi_math::QuadratureOrder::SECOND;
-      system = chi_math::CoordinateSystemType::CARTESIAN;
-      break;
-    }
     case lbs::GeometryType::TWOD_CYLINDRICAL:
     {
       qorder = chi_math::QuadratureOrder::SECOND;
@@ -330,15 +309,14 @@ lbs_curvilinear::Solver::InitializeSpatialDiscretization()
     }
   }
 
-  discretization_secondary =
-    chi_math::SpatialDiscretization_PWLD::New(grid, setup_flags, qorder, system);
+  discretization_secondary = SDM_PWLD::New(grid, setup_flags, qorder, system);
 
 
   MPI_Barrier(MPI_COMM_WORLD);
   chi::log.Log()
     << "Cell matrices computed.                   Process memory = "
     << std::setprecision(3)
-    << chi::console.GetMemoryUsageInMB() << " MB";
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB";
 }
 
 

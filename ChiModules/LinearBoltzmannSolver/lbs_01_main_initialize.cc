@@ -4,9 +4,6 @@
 #include <chi_mpi.h>
 #include <chi_log.h>
 
-
-;
-
 #include <iomanip>
 #include "ChiConsole/chi_console.h"
 
@@ -26,6 +23,14 @@ void lbs::SteadySolver::Initialize()
   int invalid_mat_cell_count = 0;
   for (auto& cell : grid->local_cells)
   {
+    unique_material_ids.insert(cell.material_id);
+    if (cell.material_id<0)
+      ++invalid_mat_cell_count;
+  }
+  const auto& ghost_cell_ids = grid->cells.GetGhostGlobalIDs();
+  for (uint64_t cell_id : ghost_cell_ids)
+  {
+    const auto& cell = grid->cells[cell_id];
     unique_material_ids.insert(cell.material_id);
     if (cell.material_id<0)
       ++invalid_mat_cell_count;
@@ -59,10 +64,10 @@ void lbs::SteadySolver::Initialize()
   chi::log.Log()
     << "Done with parallel arrays.                Process memory = "
     << std::setprecision(3)
-    << chi::console.GetMemoryUsageInMB() << " MB" << std::endl;
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB" << std::endl;
 
   //================================================== Initialize boundaries
-  InitializeBoundaries();//h
+  InitializeBoundaries();
 
   //================================================== Initialize sources
   InitializePointSources();

@@ -1,17 +1,15 @@
 #include "sweepscheduler.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
-
-
-;
-
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 //###################################################################
 /**Applies a First-In-First-Out sweep scheduling.*/
 void chi_mesh::sweep_management::SweepScheduler::
   ScheduleAlgoFIFO(SweepChunk& sweep_chunk)
 {
+  typedef AngleSetStatus Status;
+
   chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   auto ev_info_i =
@@ -21,9 +19,6 @@ void chi_mesh::sweep_management::SweepScheduler::
                    chi_objects::ChiLog::EventType::SINGLE_OCCURRENCE, ev_info_i);
 
   //================================================== Loop over AngleSetGroups
-  // For 3D geometry this will be 8, one for each octant.
-  // For 2D geometry this will be 4, one for each quadrant.
-  // For 1D geometry this will be 2, one for left and one for right
   AngleSetStatus completion_status = AngleSetStatus::NOT_FINISHED;
   while (completion_status == AngleSetStatus::NOT_FINISHED)
   {
@@ -32,6 +27,24 @@ void chi_mesh::sweep_management::SweepScheduler::
     {
       completion_status = angle_agg.angle_set_groups[q].
         AngleSetGroupAdvance(sweep_chunk, q, sweep_timing_events_tag);
+    }
+  }
+
+  //================================================== Receive delayed data
+  MPI_Barrier(MPI_COMM_WORLD);
+  bool received_delayed_data = false;
+  while (not received_delayed_data)
+  {
+    received_delayed_data = true;
+    for (auto& sorted_angleset : rule_values)
+    {
+      auto& as = sorted_angleset.angle_set;
+
+      if (as->FlushSendBuffers() == Status::MESSAGES_PENDING)
+        received_delayed_data = false;
+
+      if (not as->ReceiveDelayedData(sorted_angleset.set_index))
+        received_delayed_data = false;
     }
   }
 
@@ -49,13 +62,13 @@ void chi_mesh::sweep_management::SweepScheduler::
     }
   }
 
-  //================================================== Receive delayed data
-  MPI_Barrier(MPI_COMM_WORLD);
-  for (auto& sorted_angleset : rule_values)
-  {
-    auto angleset = sorted_angleset.angle_set;
-    angleset->ReceiveDelayedData(sorted_angleset.set_index);
-  }
+//  //================================================== Receive delayed data
+//  MPI_Barrier(MPI_COMM_WORLD);
+//  for (auto& sorted_angleset : rule_values)
+//  {
+//    auto angleset = sorted_angleset.angle_set;
+//    angleset->ReceiveDelayedData(sorted_angleset.set_index);
+//  }
 
   chi::log.LogEvent(sweep_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 

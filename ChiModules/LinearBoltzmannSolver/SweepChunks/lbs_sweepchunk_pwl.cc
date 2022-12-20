@@ -33,6 +33,7 @@ lbs::SweepChunkPWL::
                       a_and_b_initialized(false)
 {}
 
+#ifndef WITH_READABLE_CHUNK
 //###################################################################
 /**Actual sweep function*/
 void lbs::SweepChunkPWL::
@@ -310,3 +311,5 @@ void lbs::SweepChunkPWL::
     } // for n
   } // for cell
 }//Sweep
+
+#endif //WITH_READABLE_CHUNK

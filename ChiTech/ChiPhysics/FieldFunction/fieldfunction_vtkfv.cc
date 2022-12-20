@@ -4,9 +4,6 @@
 #include "chi_log.h"
 #include "chi_mpi.h"
 
-;
-
-
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -63,9 +60,10 @@ void chi_physics::FieldFunction::ExportToVTKFV(const std::string& base_name,
 
   //############################################# Populate cell information
   int64_t node_count=0;
-  for (const auto& cell : grid->local_cells)
+  const auto& ref_grid = spatial_discretization->ref_grid;
+  for (const auto& cell : ref_grid->local_cells)
   {
-    UploadCellGeometry(cell, node_count, points, ugrid);
+    UploadCellGeometry(*ref_grid, cell, node_count, points, ugrid);
 
     material_array->InsertNextValue(cell.material_id);
     partition_id_array->InsertNextValue(cell.partition_id);

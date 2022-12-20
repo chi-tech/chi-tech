@@ -8,7 +8,7 @@
  * auxiliary FLUDS has the exact same sweep ordering as the
  * primary FLUDS.*/
 chi_mesh::sweep_management::AUX_FLUDS::
-  AUX_FLUDS(PRIMARY_FLUDS &primary, int in_G) :
+  AUX_FLUDS(PRIMARY_FLUDS &primary, size_t in_G) :
   //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Initializing references
   G( in_G ),
 

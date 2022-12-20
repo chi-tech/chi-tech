@@ -35,7 +35,7 @@ namespace chi_math
     {
       double detJ;
       double detJ_surf;
-      std::array<int,2> v_index;
+      std::array<uint64_t,2> v_index;
       chi_mesh::Vector3   v0;
       chi_mesh::Matrix3x3 J;
       chi_mesh::Matrix3x3 Jinv;
@@ -59,7 +59,7 @@ namespace chi_math
   public:
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constructor
     PolygonMappingFE_PWL(const chi_mesh::Cell& poly_cell,
-                         const chi_mesh::MeshContinuumPtr& ref_grid,
+                         const chi_mesh::MeshContinuumConstPtr& ref_grid,
                          const QuadratureTriangle& volume_quadrature,
                          const QuadratureLine&     surface_quadrature);
 
@@ -86,15 +86,18 @@ namespace chi_math
     double SideGradShape_x(unsigned int side, int i) const;
     double SideGradShape_y(unsigned int side, int i) const;
 
-    double ShapeValue(int i, const chi_mesh::Vector3& xyz) override;
-    chi_mesh::Vector3 GradShapeValue(int i, const chi_mesh::Vector3& xyz) override;
+    double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override;
+    chi_mesh::Vector3 GradShapeValue(
+      int i,
+      const chi_mesh::Vector3& xyz) const override;
 
 
     void ShapeValues(const chi_mesh::Vector3& xyz,
-                     std::vector<double>& shape_values) override;
+                     std::vector<double>& shape_values) const override;
 
-    void GradShapeValues(const chi_mesh::Vector3& xyz,
-                         std::vector<chi_mesh::Vector3>& gradshape_values) override;
+    void GradShapeValues(
+      const chi_mesh::Vector3& xyz,
+      std::vector<chi_mesh::Vector3>& gradshape_values) const override;
   };
 }
 

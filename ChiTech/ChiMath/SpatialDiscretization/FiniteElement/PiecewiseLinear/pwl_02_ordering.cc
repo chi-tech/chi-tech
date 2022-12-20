@@ -1,12 +1,11 @@
 #include "pwl.h"
 
-#include <chi_log.h>
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
-#include <chi_mpi.h>
-
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 #include "ChiTimer/chi_timer.h"
-
 
 #include "chi_mpi_utils.h"
 
@@ -17,8 +16,6 @@
 void chi_math::SpatialDiscretization_PWLD::OrderNodes()
 {
   const std::string fname = __FUNCTION__;
-  chi::log.Log() << chi::program_timer.GetTimeString()
-                << " Developing nodal ordering.";
   chi_objects::ChiTimer t_stage[6];
 
   t_stage[0].Reset();
@@ -31,11 +28,12 @@ void chi_math::SpatialDiscretization_PWLD::OrderNodes()
   cell_local_block_address.resize(num_loc_cells, 0);
 
   uint64_t local_node_count=0;
-  for (size_t lc=0; lc<num_loc_cells; lc++)
+  for (const auto& cell : ref_grid->local_cells)
   {
-    auto cell_fe_view = GetCellMappingFE(lc);
-    cell_local_block_address[lc] = static_cast<int64_t>(local_node_count);
-    local_node_count += cell_fe_view->num_nodes;
+    const auto& cell_mapping = GetCellMapping(cell);
+    cell_local_block_address[cell.local_id] =
+      static_cast<int64_t>(local_node_count);
+    local_node_count += cell_mapping.NumNodes();
   }
 
   //================================================== Allgather node_counts

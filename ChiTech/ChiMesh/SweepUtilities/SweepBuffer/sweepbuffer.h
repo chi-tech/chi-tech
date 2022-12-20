@@ -36,11 +36,8 @@ private:
   std::vector<std::vector<u_ll_int>> deplocI_message_blockpos;
   std::vector<std::vector<u_ll_int>> delayed_prelocI_message_blockpos;
 
-  std::vector<std::vector<bool>> prelocI_message_available;
-  std::vector<std::vector<bool>> deplocI_message_sent; //Might be redundant
-
-  std::vector<std::vector<bool>> delayed_prelocI_message_available;
-
+  std::vector<std::vector<bool>> prelocI_message_received;
+  std::vector<std::vector<bool>> delayed_prelocI_message_received;
 
   std::vector<std::vector<MPI_Request>> deplocI_message_request;
 
@@ -52,12 +49,12 @@ public:
   SweepBuffer(chi_mesh::sweep_management::AngleSet* ref_angleset,
               int sweep_eager_limit,
               chi_objects::ChiMPICommunicatorSet* in_comm_set);
-  bool DoneSending();
+  bool DoneSending() const;
   void BuildMessageStructure();
   void InitializeDelayedUpstreamData();
   void InitializeLocalAndDownstreamBuffers();
   void SendDownstreamPsi(int angle_set_num);
-  void ReceiveDelayedData(int angle_set_num);
+  bool ReceiveDelayedData(int angle_set_num);
   void ClearDownstreamBuffers();
   AngleSetStatus ReceiveUpstreamPsi(int angle_set_num);
   void ClearLocalAndReceiveBuffers();

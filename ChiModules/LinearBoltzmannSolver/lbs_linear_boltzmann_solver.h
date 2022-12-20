@@ -75,13 +75,13 @@ public:
 
   std::vector<PointSource> point_sources;
 
-
   std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> matid_to_xs_map;
   std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> matid_to_src_map;
 
   std::shared_ptr<chi_math::SpatialDiscretization> discretization = nullptr;
   chi_mesh::MeshContinuumPtr grid;
   std::vector<CellFaceNodalMapping> grid_nodal_mappings;
+  std::vector<UnitCellMatrices> unit_cell_matrices;
   std::vector<lbs::CellLBSView> cell_transport_views;
 
   //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeLocalAndDownstreamBuffers
@@ -123,6 +123,7 @@ public:
   void InitMaterials(std::set<int> &material_ids);
   //01d
   virtual void InitializeSpatialDiscretization();
+  void ComputeUnitIntegrals();
   //01e
   void InitializeGroupsets();
   //01f
@@ -132,6 +133,10 @@ public:
   //01h
   void InitializeBoundaries();
   //01i
+  static
+  bool CheckPointInsideCell(const chi_mesh::Cell& cell,
+                            const chi_mesh::MeshContinuum& grid_ref,
+                            const chi_mesh::Vector3& point);
   void InitializePointSources();
 
 
@@ -145,29 +150,46 @@ public:
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
-  void ComputeSweepOrderingsAngleAggSingle(LBSGroupset& groupset) const;
-  void ComputeSweepOrderingsAngleAggPolar(LBSGroupset& groupset) const;
-  void ComputeSweepOrderingsAngleAggAzimuthal(LBSGroupset& groupset) const;
+  //03aa
+  static
+  std::pair<UniqueSOGroupings, DirIDToSOMap>
+  AssociateSOsAndDirections(const chi_mesh::MeshContinuum& grid,
+                                 const chi_math::AngularQuadrature& quadrature,
+                                 AngleAggregationType agg_type,
+                                 lbs::GeometryType lbs_geo_type);
   //03b
   void InitFluxDataStructures(LBSGroupset& groupset);
-  //03c
-  void InitAngleAggPolar(LBSGroupset& groupset);
-  void InitAngleAggSingle(LBSGroupset& groupset);
-  void InitAngleAggAzimuthal(LBSGroupset& groupset);
+
   //03d
   void InitWGDSA(LBSGroupset& groupset);
-  void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset, double *ref_phi_old,
-                                   double *ref_phi_new);
+  void ExecuteWGDSA(LBSGroupset& groupset,
+                    const std::vector<double>& ref_phi_old,
+                    std::vector<double>& ref_phi_new);
+  void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& ref_phi_old,
+                                   const std::vector<double>& ref_phi_new);
+
+  void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& phi_in);
+
   void DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                      double *ref_phi_new);
-  void CleanUpWGDSA(LBSGroupset& groupset);
+                                      std::vector<double>& ref_phi_new);
+
+  static void CleanUpWGDSA(LBSGroupset& groupset);
+
   //03e
   void InitTGDSA(LBSGroupset& groupset);
-  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset, double *ref_phi_old,
-                                   double *ref_phi_new);
+  void ExecuteTGDSA(LBSGroupset& groupset,
+                    const std::vector<double>& ref_phi_old,
+                    std::vector<double>& ref_phi_new);
+  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& ref_phi_old,
+                                   const std::vector<double>& ref_phi_new);
+  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& phi_in);
   void DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
-                                      double *ref_phi_new);
-  void CleanUpTGDSA(LBSGroupset& groupset);
+                                      std::vector<double>& ref_phi_new);
+  static void CleanUpTGDSA(LBSGroupset& groupset);
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
@@ -205,17 +227,23 @@ public:
              SourceFlags lhs_src_scope,
              SourceFlags rhs_src_scope,
              bool log_info = true);
+  bool Krylov(LBSGroupset& groupset,
+              MainSweepScheduler& sweep_scheduler,
+              SourceFlags lhs_src_scope,
+              SourceFlags rhs_src_scope,
+              bool log_info = true);
 
   //Vector assembly
   void SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
                                 const std::vector<double>& y,
-                                bool with_delayed_psi= false);
+                                bool with_delayed_psi=false);
   void SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
                                 std::vector<double>& y,
-                                bool with_delayed_psi= false);
+                                bool with_delayed_psi=false);
   void ScopedCopySTLvectors(LBSGroupset& groupset,
                             const std::vector<double>& x_src,
-                            std::vector<double>& y);
+                            std::vector<double>& y,
+                            bool with_delayed_psi=false);
 
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);

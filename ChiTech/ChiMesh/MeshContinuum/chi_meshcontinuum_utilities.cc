@@ -3,11 +3,12 @@
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
+#include "ChiDataTypes/ndarray.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
 #include "chi_mpi.h"
-
 
 #include <algorithm>
 
@@ -197,7 +198,7 @@ bool chi_mesh::MeshContinuum::IsCellBndry(uint64_t cell_global_index) const
 //###################################################################
 /**General map vertices*/
 void chi_mesh::MeshContinuum::
-FindAssociatedVertices(chi_mesh::CellFace& cur_face,
+FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                        std::vector<short>& dof_mapping) const
 {
   int associated_face = cur_face.GetNeighborAssociatedFace(*this);
@@ -245,6 +246,44 @@ FindAssociatedVertices(chi_mesh::CellFace& cur_face,
 
 }
 
+//###################################################################
+/**Given the current cell, cell A, and its adjacent cell, cell B, with
+ * cell B adjacent to A at the `f`-th face of cell A. Will determine the
+ * `af`-th index of the face on cell B that interface with the `f`-th face
+ * of cell A.*/
+size_t chi_mesh::MeshContinuum::
+  MapCellFace(const chi_mesh::Cell &cur_cell,
+              const chi_mesh::Cell &adj_cell,
+              unsigned int f)
+{
+  const auto& ccface = cur_cell.faces[f]; //current cell face
+  std::set<uint64_t> ccface_vids;
+  for (auto vid : ccface.vertex_ids) ccface_vids.insert(vid);
+
+  size_t fmap;
+  bool map_found = false;
+  for (size_t af=0; af < adj_cell.faces.size(); af++)
+  {
+    const auto& acface = adj_cell.faces[af]; //adjacent cell face
+
+    std::set<uint64_t> acface_vids;
+    for (auto vid : acface.vertex_ids) acface_vids.insert(vid);
+
+    if (acface_vids == ccface_vids)
+    {
+      fmap = af;
+      map_found = true;
+      break;
+    }
+  }//for adj faces
+
+  if (not map_found)
+    throw std::logic_error(
+      "chi_mesh::MeshContinuum::MapCellFace: Mapping failure.");
+
+  return fmap;
+}
+
 
 //###################################################################
 /**Computes the centroid from nodes specified by the given list.*/
@@ -284,4 +323,70 @@ size_t chi_mesh::MeshContinuum::
                 MPI_COMM_WORLD);        //communicator
 
   return global_count;
+}
+
+//###################################################################
+/**Gets and orthogonal mesh interface object.*/
+std::array<size_t,3> chi_mesh::MeshContinuum::GetIJKInfo() const
+{
+  const std::string fname = "GetIJKInfo";
+  if (not (this->Attributes() & MeshAttributes::ORTHOGONAL))
+    throw std::logic_error(fname + " can only be run on orthogonal meshes.");
+
+  return {ortho_attributes.Nx,
+          ortho_attributes.Ny,
+          ortho_attributes.Nz};
+}
+
+//###################################################################
+/**Provides a mapping from cell ijk indices to global ids.*/
+chi_data_types::NDArray<uint64_t> chi_mesh::MeshContinuum::
+  MakeIJKToGlobalIDMapping() const
+{
+  const std::string fname = "MakeIJKToGlobalIDMapping";
+  if (not (this->Attributes() & MeshAttributes::ORTHOGONAL))
+    throw std::logic_error(fname + " can only be run on orthogonal meshes.");
+
+  const auto ijk_info = this->GetIJKInfo();
+  const auto Nx = static_cast<int64_t>(ijk_info[0]);
+  const auto Ny = static_cast<int64_t>(ijk_info[1]);
+  const auto Nz = static_cast<int64_t>(ijk_info[2]);
+
+  chi_data_types::NDArray<uint64_t> m_ijk_to_i({Nx,Ny,Nz});
+  for (int i=0; i<Nx; ++i)
+    for (int j=0; j<Ny; ++j)
+      for (int k=0; k<Nz; ++k)
+        m_ijk_to_i(i,j,k) = static_cast<uint64_t>(m_ijk_to_i.MapNDtoLin(i,j,k));
+
+  return m_ijk_to_i;
+}
+
+//###################################################################
+/**Determines the bounding box size of each cell and returns it as
+ * a list of 3-component vectors, one Vec3 for each cell.*/
+std::vector<chi_mesh::Vector3> chi_mesh::MeshContinuum::
+  MakeCellOrthoSizes() const
+{
+  std::vector<chi_mesh::Vector3> cell_ortho_sizes(local_cells.size());
+  for (const auto& cell : local_cells)
+  {
+    chi_mesh::Vector3 vmin = vertices[cell.vertex_ids.front()];
+    chi_mesh::Vector3 vmax = vmin;
+
+    for (const auto vid : cell.vertex_ids)
+    {
+      const auto& vertex = vertices[vid];
+      vmin.x = std::min(vertex.x,vmin.x);
+      vmin.y = std::min(vertex.y,vmin.y);
+      vmin.z = std::min(vertex.z,vmin.z);
+
+      vmax.x = std::max(vertex.x,vmax.x);
+      vmax.y = std::max(vertex.y,vmax.y);
+      vmax.z = std::max(vertex.z,vmax.z);
+    }
+
+    cell_ortho_sizes[cell.local_id] = vmax-vmin;
+  }//for cell
+
+  return cell_ortho_sizes;
 }

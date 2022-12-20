@@ -5,11 +5,12 @@
 //###################################################################
 /**Returns the value of the shape function given cartesian
  * coordinates.*/
-double chi_math::PolygonMappingFE_PWL::ShapeValue(const int i, const chi_mesh::Vector3& xyz)
+double chi_math::PolygonMappingFE_PWL::
+  ShapeValue(const int i, const chi_mesh::Vector3& xyz) const
 {
   for (int s=0; s<num_of_subtris; s++)
   {
-    const auto& p0 = grid->vertices[sides[s].v_index[0]];
+    const auto& p0 = m_grid_ptr->vertices[sides[s].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
     chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * xyz_ref;
@@ -45,13 +46,14 @@ double chi_math::PolygonMappingFE_PWL::ShapeValue(const int i, const chi_mesh::V
 //###################################################################
 /**Populates shape_values with the value of each shape function's
  * value evaluate at the supplied point.*/
-void chi_math::PolygonMappingFE_PWL::ShapeValues(const chi_mesh::Vector3 &xyz,
-                                                 std::vector<double> &shape_values)
+void chi_math::PolygonMappingFE_PWL::
+  ShapeValues(const chi_mesh::Vector3 &xyz,
+              std::vector<double> &shape_values) const
 {
-  shape_values.resize(num_nodes, 0.0);
+  shape_values.resize(m_num_nodes, 0.0);
   for (int s=0; s<num_of_subtris; s++)
   {
-    const auto& p0 = grid->vertices[sides[s].v_index[0]];
+    const auto& p0 = m_grid_ptr->vertices[sides[s].v_index[0]];
     chi_mesh::Vector3 xi_eta_zeta   = sides[s].Jinv * (xyz - p0);
 
     double xi  = xi_eta_zeta.x;
@@ -61,7 +63,7 @@ void chi_math::PolygonMappingFE_PWL::ShapeValues(const chi_mesh::Vector3 &xyz,
     if ((xi>=-1.0e-12) and (eta>=-1.0e-12) and
         ((xi + eta)<=(1.0+1.0e-12)))
     {
-      for (int i=0; i < num_nodes; i++)
+      for (int i=0; i < m_num_nodes; i++)
       {
         int index = node_to_side_map[i][s];
         double value = 0.0;
@@ -86,15 +88,16 @@ void chi_math::PolygonMappingFE_PWL::ShapeValues(const chi_mesh::Vector3 &xyz,
 
 //###################################################################
 /**Returns the evaluation of grad-shape function i at the supplied point.*/
-chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::GradShapeValue(const int i,
-                                                                 const chi_mesh::Vector3& xyz)
+chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::
+  GradShapeValue(const int i,
+                 const chi_mesh::Vector3& xyz) const
 {
   chi_mesh::Vector3 grad_r;
   chi_mesh::Vector3 grad;
 
   for (int e=0; e<num_of_subtris; e++)
   {
-    const auto& p0 = grid->vertices[sides[e].v_index[0]];
+    const auto& p0 = m_grid_ptr->vertices[sides[e].v_index[0]];
     chi_mesh::Vector3 xyz_ref = xyz - p0;
 
     chi_mesh::Vector3 xi_eta_zeta = sides[e].Jinv * xyz_ref;
@@ -134,9 +137,9 @@ chi_mesh::Vector3 chi_math::PolygonMappingFE_PWL::GradShapeValue(const int i,
  * gradient evaluated at the supplied point.*/
 void chi_math::PolygonMappingFE_PWL::GradShapeValues(
   const chi_mesh::Vector3 &xyz,
-  std::vector<chi_mesh::Vector3> &gradshape_values)
+  std::vector<chi_mesh::Vector3> &gradshape_values) const
 {
   gradshape_values.clear();
-  for (int i=0; i < num_nodes; ++i)
+  for (int i=0; i < m_num_nodes; ++i)
     gradshape_values.emplace_back(GradShapeValue(i,xyz));
 }

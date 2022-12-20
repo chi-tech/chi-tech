@@ -34,9 +34,9 @@ return setup;
 chi_math::PETScUtils::PETScSolverSetup
 chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
   Mat ref_matrix,
-  std::string in_solver_name,
-  std::string in_solver_type,
-  std::string in_preconditioner_type,
+  const std::string& in_solver_name,
+  const std::string& in_solver_type,
+  const std::string& in_preconditioner_type,
   double in_relative_residual_tolerance,
   int64_t in_maximum_iterations)
 {
@@ -56,11 +56,12 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
                    in_maximum_iterations);
   KSPSetInitialGuessNonzero(setup.ksp,PETSC_TRUE);
 
-//  KSPMonitorSet(setup.ksp,&GeneralKSPMonitor,NULL,NULL);
-  KSPSetConvergenceTest(setup.ksp,&RelativeResidualConvergenceTest,NULL,NULL);
+  KSPSetConvergenceTest(setup.ksp,&RelativeResidualConvergenceTest,
+                        nullptr, nullptr);
   KSPSetFromOptions(setup.ksp);
 
-  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,NULL,NULL);
+  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,
+                nullptr, nullptr);
 
   return setup;
 }
@@ -78,10 +79,10 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
  * */
 PetscErrorCode
 chi_math::PETScUtils::RelativeResidualConvergenceTest(
-  KSP ksp, PetscInt n,
+  KSP ksp, PetscInt,
   PetscReal rnorm,
   KSPConvergedReason* convergedReason,
-  void *monitordestroy)
+  void* )
 {
   //============================== Compute rhs norm
   Vec Rhs;
@@ -94,7 +95,7 @@ chi_math::PETScUtils::RelativeResidualConvergenceTest(
   //============================== Compute test criterion
   double tol;
   int64_t maxIts;
-  KSPGetTolerances(ksp,NULL,&tol,NULL,&maxIts);
+  KSPGetTolerances(ksp, nullptr, &tol, nullptr, &maxIts);
 
   double relative_residual = rnorm/rhs_norm;
 
@@ -107,7 +108,7 @@ chi_math::PETScUtils::RelativeResidualConvergenceTest(
 //###################################################################
 /**General monitor.*/
 PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
-  KSP ksp, PetscInt n, PetscReal rnorm, void *monitordestroy)
+  KSP ksp, PetscInt n, PetscReal rnorm, void*)
 {
   Vec Rhs;
   KSPGetRhs(ksp,&Rhs);
@@ -116,9 +117,17 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
   if (rhs_norm < 1.0e-12)
     rhs_norm = 1.0;
 
+  //Get solver name
   const char* ksp_name;
   KSPGetOptionsPrefix(ksp,&ksp_name);
 
+  //Default to this if ksp_name is NULL
+  const char NONAME_SOLVER[] = "NoName-Solver\0";
+
+  if (ksp_name == nullptr)
+    ksp_name = NONAME_SOLVER;
+
+  //Print message
   std::stringstream buff;
   buff
     << ksp_name

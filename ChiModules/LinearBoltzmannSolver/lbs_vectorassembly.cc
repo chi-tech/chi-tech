@@ -85,7 +85,8 @@ void lbs::SteadySolver::
 void lbs::SteadySolver::
   ScopedCopySTLvectors(LBSGroupset& groupset,
                        const std::vector<double>& x_src,
-                       std::vector<double>& y)
+                       std::vector<double>& y,
+                       bool with_delayed_psi/*=false*/)
 {
   int gsi = groupset.groups[0].id;
   size_t gss = groupset.groups.size();
@@ -108,5 +109,8 @@ void lbs::SteadySolver::
       }//for moment
     }//for dof
   }//for cell
+
+  if (with_delayed_psi)
+    groupset.angle_agg.SetDelayedPsiNew2Old();
 
 }

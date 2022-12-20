@@ -111,8 +111,8 @@ chiLBSSetProperty(phys1,BOUNDARY_CONDITION,ZMIN,LBSBoundaryTypes.INCIDENT_ISOTRO
 chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
-chiLBSExecute(phys1)
+chiSolverInitialize(phys1)
+chiSolverExecute(phys1)
 
 lbs_ff_g0_m0 = chiGetFieldFunctionHandleByName("Flux_g0_m0")
 lbs_ff_g0_m1 = chiGetFieldFunctionHandleByName("Flux_g0_m1")

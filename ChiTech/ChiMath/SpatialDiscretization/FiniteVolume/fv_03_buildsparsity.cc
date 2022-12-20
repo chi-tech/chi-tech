@@ -8,7 +8,7 @@
 void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
   std::vector<int64_t> &nodal_nnz_in_diag,
   std::vector<int64_t> &nodal_nnz_off_diag,
-  chi_math::UnknownManager& unknown_manager)
+  const chi_math::UnknownManager& unknown_manager) const
 {
   unsigned int num_uk = unknown_manager.unknowns.size(); //Number of unknowns
   unsigned int N = unknown_manager.GetTotalUnknownStructureSize(); //Total number of unknowns
@@ -23,12 +23,12 @@ void chi_math::SpatialDiscretization_FV::BuildSparsityPattern(
 
   for (int uk=0; uk<num_uk; ++uk)
   {
-    int num_comps = unknown_manager.unknowns[uk].num_components;
+    const unsigned int num_comps = unknown_manager.unknowns[uk].num_components;
     for (int comp=0; comp<num_comps; ++comp)
     {
       for (auto& cell : ref_grid->local_cells)
       {
-        int i = MapDOFLocal(cell,0,unknown_manager,uk,comp);
+        const int64_t i = MapDOFLocal(cell,0,unknown_manager,uk,comp);
 
         nodal_nnz_in_diag[i]   += 1;
 

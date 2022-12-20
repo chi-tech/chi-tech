@@ -19,29 +19,24 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Reorient 1D verts along z
-  std::vector<double> distances;
-  distances.reserve(vertices.size()-1);
-
-  for (size_t v=0; v<(vertices.size()-1); ++v)
-    distances.push_back(vertices[v+1]-vertices[v]);
-
   std::vector<Vertex> zverts;
   zverts.reserve(vertices.size());
-  zverts.emplace_back(0.0,0.0,0.0);
-  double last_distance = 0.0;
-  for (auto& d : distances)
-  {
-    zverts.emplace_back(0.0,0.0,last_distance+d);
-    last_distance += d;
-  }
+  for (double z_coord : vertices)
+    zverts.emplace_back(0.0,0.0,z_coord);
 
   //======================================== Create unpartitioned mesh
-  auto umesh = new chi_mesh::UnpartitionedMesh();
+  auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
   umesh->attributes = DIMENSION_1 | ORTHOGONAL;
 
   //======================================== Create vertices
-  umesh->vertices.reserve(zverts.size());
+  size_t Nz = vertices.size();
+
+  umesh->mesh_options.ortho_Nx = 1;
+  umesh->mesh_options.ortho_Ny = 1;
+  umesh->mesh_options.ortho_Nz = Nz-1;
+
+  umesh->vertices.reserve(Nz);
   for (auto& vertex : zverts)
     umesh->vertices.push_back(vertex);
 
@@ -68,13 +63,12 @@ size_t chi_mesh::CreateUnpartitioned1DOrthoMesh(std::vector<double>& vertices)
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
 
-  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
-  chi::unpartitionedmesh_stack.push_back(p_umesh);
+  chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
   handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
   handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
 
   handler.surface_mesher->Execute();
 
@@ -105,13 +99,17 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
-  auto umesh = new chi_mesh::UnpartitionedMesh();
+  auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
   umesh->attributes = DIMENSION_2 | ORTHOGONAL;
 
   //======================================== Create vertices
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
+
+  umesh->mesh_options.ortho_Nx = Nx-1;
+  umesh->mesh_options.ortho_Ny = Ny-1;
+  umesh->mesh_options.ortho_Nz = 1;
 
   typedef std::vector<uint64_t> VecIDs;
   std::vector<VecIDs> vertex_ij_to_i_map(Ny,VecIDs(Nx));
@@ -159,13 +157,12 @@ size_t chi_mesh::CreateUnpartitioned2DOrthoMesh(
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
 
-  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
-  chi::unpartitionedmesh_stack.push_back(p_umesh);
+  chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
   handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
   handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
 
   handler.surface_mesher->Execute();
 
@@ -199,7 +196,7 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   auto& handler = chi_mesh::GetCurrentHandler();
 
   //======================================== Create unpartitioned mesh
-  auto umesh = new chi_mesh::UnpartitionedMesh();
+  auto umesh = std::make_shared<chi_mesh::UnpartitionedMesh>();
 
   umesh->attributes = DIMENSION_3 | ORTHOGONAL;
 
@@ -207,6 +204,10 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   size_t Nx = vertices_1d_x.size();
   size_t Ny = vertices_1d_y.size();
   size_t Nz = vertices_1d_z.size();
+
+  umesh->mesh_options.ortho_Nx = Nx-1;
+  umesh->mesh_options.ortho_Ny = Ny-1;
+  umesh->mesh_options.ortho_Nz = Nz-1;
 
   // i is j, and j is i, MADNESS explanation:
   // In math convention the i-index refers to the ith row
@@ -326,13 +327,12 @@ size_t chi_mesh::CreateUnpartitioned3DOrthoMesh(
   umesh->ComputeCentroidsAndCheckQuality();
   umesh->BuildMeshConnectivity();
 
-  auto p_umesh = std::shared_ptr<chi_mesh::UnpartitionedMesh>(umesh);
-  chi::unpartitionedmesh_stack.push_back(p_umesh);
+  chi::unpartitionedmesh_stack.push_back(umesh);
 
   //======================================== Create meshers
   handler.surface_mesher = std::make_shared<chi_mesh::SurfaceMesherPredefined>();
   handler.volume_mesher = std::make_shared<
-    chi_mesh::VolumeMesherPredefinedUnpartitioned>(p_umesh);
+    chi_mesh::VolumeMesherPredefinedUnpartitioned>(umesh);
 
   handler.surface_mesher->Execute();
 

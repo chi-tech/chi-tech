@@ -30,8 +30,8 @@ class chi_mesh::sweep_management::AngleAggregation
 public:
   std::vector<AngleSetGroup>                   angle_set_groups;
   std::vector<std::shared_ptr<SweepBndry>>     sim_boundaries;
-  int                                          number_of_groups=0;
-  int                                          number_of_group_subsets=0;
+  size_t                                       number_of_groups=0;
+  size_t                                       number_of_group_subsets=0;
   std::shared_ptr<chi_math::AngularQuadrature> quadrature=nullptr;
 
 private:
@@ -43,8 +43,8 @@ public:
   chi_mesh::MeshContinuumPtr grid = nullptr;
 
   void Setup(const std::vector<std::shared_ptr<SweepBndry>>& in_sim_boundaries,
-             int in_number_of_groups,
-             int in_number_of_group_subsets,
+             size_t in_number_of_groups,
+             size_t in_number_of_group_subsets,
              std::shared_ptr<chi_math::AngularQuadrature>& in_quadrature,
              chi_mesh::MeshContinuumPtr& in_grid);
 
@@ -59,7 +59,8 @@ public:
   void SetDelayedAngularDOFsFromArray(int& index, const double* x_ref);
   std::vector<double> GetDelayedAngularDOFsAsSTLVector();
   void SetDelayedAngularDOFsFromSTLVector(const std::vector<double>& stl_vector);
-
+  void SetDelayedPsiOld2New();
+  void SetDelayedPsiNew2Old();
 };
 
 

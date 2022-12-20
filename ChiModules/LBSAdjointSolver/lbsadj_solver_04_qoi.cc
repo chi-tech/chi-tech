@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "lbsadj_solver.h"
 
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
@@ -10,7 +12,9 @@ size_t lbs_adjoint::AdjointSolver::
                       const std::string& lua_function_name)
 {
   // Make the designation
-  ResponseFunctionDesignation qoi_designation(qoi_name, logical_volume, lua_function_name);
+  ResponseFunctionDesignation qoi_designation(qoi_name,
+                                              std::move(logical_volume),
+                                              lua_function_name);
   // Make empty subscriber list (will be populated during initialize)
   std::vector<size_t> cell_rf_subscriptions;
 

@@ -114,8 +114,8 @@ public:
                        int component=0);
 
   //02e_c
-  void PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cell);
-  void PWLD_Assemble_b_GAGG(const chi_mesh::Cell& cell);
+//  void PWLD_Assemble_A_and_b_GAGG(const chi_mesh::Cell& cell);
+//  void PWLD_Assemble_b_GAGG(const chi_mesh::Cell& cell);
 
 
   //03b

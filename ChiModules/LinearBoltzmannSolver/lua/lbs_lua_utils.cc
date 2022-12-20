@@ -2,29 +2,6 @@
 
 #include "chi_runtime.h"
 
-lbs::SteadySolver& lbs::lua_utils::
-  GetSolverByHandle(int handle, const std::string& calling_function_name)
-{
-  std::shared_ptr<lbs::SteadySolver> lbs_solver;
-  try{
-
-    lbs_solver = std::dynamic_pointer_cast<lbs::SteadySolver>(
-      chi::solver_stack.at(handle));
-
-    if (not lbs_solver)
-      throw std::logic_error(calling_function_name +
-      ": Invalid solver at given handle (" +
-      std::to_string(handle) + "). "
-      "The solver is not of type LinearBoltzmann::Solver.");
-  }//try
-  catch(const std::out_of_range& o) {
-    throw std::logic_error(calling_function_name + ": Invalid solver-handle (" +
-                           std::to_string(handle) + ").");
-  }
-
-  return *lbs_solver;
-}
-
 #define LUA_FMACRO1(x) lua_register(L, #x, x)
 #define LUA_CMACRO1(x,y) \
         lua_pushnumber(L, y); \
@@ -102,6 +79,14 @@ void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_CMACRO1(NPT_CLASSICRICHARDSON_CYCLES, 2);
   LUA_CMACRO1(NPT_GMRES                   , 3);
   LUA_CMACRO1(NPT_GMRES_CYCLES            , 4);
+
+  LUA_CMACRO1(KRYLOV_RICHARDSON           , 5);
+  LUA_CMACRO1(KRYLOV_RICHARDSON_CYCLES    , 6);
+  LUA_CMACRO1(KRYLOV_GMRES                , 7);
+  LUA_CMACRO1(KRYLOV_GMRES_CYCLES         , 8);
+  LUA_CMACRO1(KRYLOV_BICGSTAB             , 9);
+  LUA_CMACRO1(KRYLOV_BICGSTAB_CYCLES      , 10);
+
   LUA_CMACRO1(GROUPSET_TOLERANCE          , 102);
   LUA_CMACRO1(GROUPSET_MAXITERATIONS      , 103);
   LUA_CMACRO1(GROUPSET_GMRESRESTART_INTVL , 104);
@@ -113,8 +98,6 @@ void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_CMACRO1(GROUPSET_WGDSA_TOLERANCE    , 110);
   LUA_CMACRO1(GROUPSET_TGDSA_TOLERANCE    , 111);
 
-  LUA_FMACRO1(chiLBSInitialize);
-  LUA_FMACRO1(chiLBSExecute);
   LUA_FMACRO1(chiLBSGetFieldFunctionList);
   LUA_FMACRO1(chiLBSGetScalarFieldFunctionList);
   LUA_FMACRO1(chiLBSWriteGroupsetAngularFlux);
@@ -148,4 +131,6 @@ void lbs::lua_utils::RegisterLuaEntities(lua_State *L)
 
   //=================================== Point source
   LUA_FMACRO1(chiLBSAddPointSource);
+  LUA_FMACRO1(chiLBSClearPointSources);
+  LUA_FMACRO1(chiLBSInitializePointSources);
 }

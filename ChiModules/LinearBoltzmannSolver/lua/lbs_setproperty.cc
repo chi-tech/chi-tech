@@ -152,54 +152,50 @@ the parallel efficiency will actually get worse so use with caution.
 \ingroup LuaLBS*/
 int chiLBSSetProperty(lua_State *L)
 {
-  int numArgs = lua_gettop(L);
+  const std::string fname = "chiLBSSetProperty";
+  const int numArgs = lua_gettop(L);
   if (numArgs < 2)
-    LuaPostArgAmountError(__FUNCTION__, 2, numArgs);
+    LuaPostArgAmountError(fname, 2, numArgs);
 
-  LuaCheckNilValue(__FUNCTION__, L, 1);
+  LuaCheckNilValue(fname, L, 1);
 
   //============================================= Get pointer to solver
-  int solver_index = lua_tonumber(L,1);
-  auto& lbs_solver = lbs::lua_utils::
-    GetSolverByHandle(solver_index, __FUNCTION__);
+  const int solver_handle = lua_tonumber(L, 1);
+  auto& lbs_solver = chi::GetStackItem<lbs::SteadySolver>(chi::solver_stack,
+                                                          solver_handle,
+                                                          fname);
 
   //============================================= Get property index
-  LuaCheckNilValue(__FUNCTION__, L, 2);
+  LuaCheckNilValue(fname, L, 2);
 
-  int property = lua_tonumber(L,2);
+  const int property = lua_tonumber(L,2);
 
 
   //============================================= Handle properties
   if (property == DISCRETIZATION_METHOD)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    int method = lua_tonumber(L,3);
+    const int method = lua_tonumber(L,3);
 
     typedef chi_math::SpatialDiscretizationType SDMType;
 
-    switch (method)
-    {
-      case PWLD:
-      {
-    	lbs_solver.options.sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
-        break;
-      }
-      default:
-        throw std::invalid_argument(
-          "Invalid option for Discretization method in chiLBSSetProperty.\n");
-    }//case method
+    if (method == PWLD)
+      lbs_solver.options.sd_type = SDMType::PIECEWISE_LINEAR_DISCONTINUOUS;
+    else
+      throw std::invalid_argument(
+        "Invalid option for Discretization method in chiLBSSetProperty.\n");
   }
   else if (property == BOUNDARY_CONDITION)
   {
     if (numArgs<4)
       LuaPostArgAmountError("chiLBSSetProperty",4,numArgs);
 
-    LuaCheckNilValue(__FUNCTION__, L, 3);
-    LuaCheckNilValue(__FUNCTION__, L, 4);
+    LuaCheckNilValue(fname, L, 3);
+    LuaCheckNilValue(fname, L, 4);
 
-    int bident = lua_tonumber(L,3);
-    int btype  = lua_tonumber(L,4);
+    const int bident = lua_tonumber(L,3);
+    const int btype  = lua_tonumber(L,4);
 
     if (!((bident>=XMAX) && (bident<=ZMIN)))
     {
@@ -209,7 +205,7 @@ int chiLBSSetProperty(lua_State *L)
       chi::Exit(EXIT_FAILURE);
     }
 
-    int bid = bident - 31;
+    const int bid = bident - 31;
 
     if (btype == (int)lbs::BoundaryType::VACUUM)
     {
@@ -241,7 +237,7 @@ int chiLBSSetProperty(lua_State *L)
         chi::Exit(EXIT_FAILURE);
       }
 
-      size_t table_len = lua_rawlen(L,5);
+      const size_t table_len = lua_rawlen(L,5);
       std::vector<double> values(table_len,0.0);
       for (int g=0; g<table_len; g++)
       {
@@ -249,7 +245,6 @@ int chiLBSSetProperty(lua_State *L)
         lua_gettable(L,5);
         values[g] = lua_tonumber(L,-1);
         lua_pop(L,1);
-//        chi::log.Log() << g << " " << values[g];
       }
 
       if (table_len != lbs_solver.groups.size())
@@ -264,7 +259,7 @@ int chiLBSSetProperty(lua_State *L)
       }
 
       lbs_solver.incident_P0_mg_boundaries.push_back(values);
-      size_t index = lbs_solver.incident_P0_mg_boundaries.size()-1;
+      const size_t index = lbs_solver.incident_P0_mg_boundaries.size()-1;
 
       //bid = XMIN or XMAX or YMIN ... etc
       //index is where it is on the incident_P0_mg_boundaries stack
@@ -292,9 +287,9 @@ int chiLBSSetProperty(lua_State *L)
   }
   else if (property == SCATTERING_ORDER)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    int scattering_order = lua_tonumber(L,3);
+    const int scattering_order = lua_tonumber(L,3);
 
     if (scattering_order<0)
     {
@@ -313,29 +308,26 @@ int chiLBSSetProperty(lua_State *L)
       LuaPostArgAmountError("chiLBSSetProperty:SWEEP_EAGER_LIMIT",
                             3,numArgs);
 
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    int limit = lua_tonumber(L,3);
-    if (limit<=64000)
-    {
-      lbs_solver.options.sweep_eager_limit = limit;
-    }
+    const int limit = lua_tonumber(L,3);
+    lbs_solver.options.sweep_eager_limit = limit;
   }
   else if (property == READ_RESTART_DATA)
   {
     if (numArgs >= 3)
     {
-      LuaCheckNilValue(__FUNCTION__, L, 3);
+      LuaCheckNilValue(fname, L, 3);
 
-      const char* folder = lua_tostring(L,3);
+      const std::string folder = lua_tostring(L,3);
       lbs_solver.options.read_restart_folder_name = std::string(folder);
       chi::log.Log() << "Restart input folder set to " << folder;
     }
     if (numArgs >= 4)
     {
-      LuaCheckNilValue(__FUNCTION__, L, 4);
+      LuaCheckNilValue(fname, L, 4);
 
-      const char* filebase = lua_tostring(L,4);
+      const std::string filebase = lua_tostring(L,4);
       lbs_solver.options.read_restart_file_base = std::string(filebase);
       chi::log.Log() << "Restart input filebase set to " << filebase;
     }
@@ -345,34 +337,34 @@ int chiLBSSetProperty(lua_State *L)
   {
     if (numArgs >= 3)
     {
-      LuaCheckNilValue(__FUNCTION__, L, 3);
+      LuaCheckNilValue(fname, L, 3);
 
-      const char* folder = lua_tostring(L,3);
+      const std::string folder = lua_tostring(L,3);
       lbs_solver.options.write_restart_folder_name = std::string(folder);
       chi::log.Log() << "Restart output folder set to " << folder;
     }
     if (numArgs >= 4)
     {
-      LuaCheckNilValue(__FUNCTION__, L, 4);
+      LuaCheckNilValue(fname, L, 4);
 
-      const char* filebase = lua_tostring(L,4);
+      const std::string filebase = lua_tostring(L,4);
       lbs_solver.options.write_restart_file_base = std::string(filebase);
       chi::log.Log() << "Restart output filebase set to " << filebase;
     }
     if (numArgs == 5)
     {
-      LuaCheckNilValue(__FUNCTION__, L, 5);
+      LuaCheckNilValue(fname, L, 5);
 
-      double interval = lua_tonumber(L,5);
+      const double interval = lua_tonumber(L,5);
       lbs_solver.options.write_restart_interval = interval;
     }
     lbs_solver.options.write_restart_data = true;
   }
   else if (property == SAVE_ANGULAR_FLUX)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    bool save_flag = lua_toboolean(L, 3);
+    const bool save_flag = lua_toboolean(L, 3);
 
     lbs_solver.options.save_angular_flux = save_flag;
 
@@ -380,9 +372,9 @@ int chiLBSSetProperty(lua_State *L)
   }
   else if (property == USE_SOURCE_MOMENTS)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    bool use_flag = lua_toboolean(L, 3);
+    const bool use_flag = lua_toboolean(L, 3);
 
     lbs_solver.options.use_src_moments = use_flag;
 
@@ -390,9 +382,9 @@ int chiLBSSetProperty(lua_State *L)
   }
   else if (property == VERBOSE_INNER_ITERATIONS)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    bool flag = lua_toboolean(L, 3);
+    const bool flag = lua_toboolean(L, 3);
 
     lbs_solver.options.verbose_inner_iterations = flag;
 
@@ -400,9 +392,9 @@ int chiLBSSetProperty(lua_State *L)
   }
   else if (property == VERBOSE_OUTER_ITERATIONS)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    bool flag = lua_toboolean(L, 3);
+    const bool flag = lua_toboolean(L, 3);
 
     lbs_solver.options.verbose_outer_iterations = flag;
 
@@ -410,19 +402,16 @@ int chiLBSSetProperty(lua_State *L)
   }
   else if (property == USE_PRECURSORS)
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
+    LuaCheckNilValue(fname, L, 3);
 
-    bool flag = lua_toboolean(L, 3);
+    const bool flag = lua_toboolean(L, 3);
 
     lbs_solver.options.use_precursors = flag;
 
     chi::log.Log() << "LBS option: use_precursors set to " << flag;
   }
   else
-  {
-    std::cerr << "Invalid property in chiLBSSetProperty.\n";
-    chi::Exit(EXIT_FAILURE);
-  }
+    throw std::logic_error(fname+": Invalid property in chiLBSSetProperty.\n");
 
   return 0;
 }

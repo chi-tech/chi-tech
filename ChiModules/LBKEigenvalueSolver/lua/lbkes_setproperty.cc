@@ -1,43 +1,54 @@
 #include "../lbkes_k_eigenvalue_solver.h"
 
-#include <chi_lua.h>
+#include "chi_lua.h"
 #include "lbkes_lua_utils.h"
 
-#include <chi_log.h>
-;
-
-#define MAX_ITERATIONS  1
-#define TOLERANCE       2
+#include "chi_log.h"
 
 using namespace lbs;
 
 //############################################################
-/**Set properties for the solver.*/
+/**Set properties for the solver.
+\param SolverIndex int Handle to the solver.
+\param Property string Property name for a specific property.
+\param PropertyValue varying Value to set to the property
+
+##_
+
+###Property
+"MAX_ITERATIONS" Sets the maximum k-iterations.[Default=1000]\n\n
+"TOLERANCE" Sets the tolerance on k-eff for convergence.[Default=1.0e-8]\n\n
+
+*/
 int chiLBKESSetProperty(lua_State *L)
 {
-  int num_args = lua_gettop(L);
-  if (num_args < 2)
-    LuaPostArgAmountError(__FUNCTION__, 2, num_args);
+  const std::string fname = "chiLBKESSetProperty";
+  const int num_args = lua_gettop(L);
+  if (num_args < 3)
+    LuaPostArgAmountError(fname, 3, num_args);
 
-  LuaCheckNilValue(__FUNCTION__, L, 1);
-  int solver_index = lua_tonumber(L, 1);
-  auto& solver = lbs::k_eigenvalue_lua_utils::
-  GetSolverByHandle(solver_index, __FUNCTION__);
+  //============================================= Get the solver
+  LuaCheckNilValue(fname, L, 1);
+  const int solver_handle = lua_tonumber(L, 1);
 
-  //============================================= Get property index
-  LuaCheckNilValue(__FUNCTION__, L, 2);
-  int property = lua_tonumber(L,2);
+  auto& solver = chi::GetStackItem<lbs::KEigenvalueSolver>(chi::solver_stack,
+                                                           solver_handle,
+                                                           fname);
+
+  //============================================= Get property name
+  LuaCheckNilValue(fname, L, 2);
+  const std::string property = lua_tostring(L,2);
 
   //============================================= Handle properties
-  if (property == MAX_ITERATIONS)
+  if (property == "MAX_ITERATIONS")
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
-    int max_iters = lua_tointeger(L, 3);
+    LuaCheckNilValue(fname, L, 3);
+    const int max_iters = lua_tointeger(L, 3);
 
     if (max_iters <= 0)
     {
       chi::log.LogAllError()
-          << __FUNCTION__ << ": Invalid max_iterations value. "
+          << fname << ": Invalid max_iterations value. "
           << "Must be greater than 0.";
       chi::Exit(EXIT_FAILURE);
     }
@@ -48,15 +59,15 @@ int chiLBKESSetProperty(lua_State *L)
         << "max_iterations set to " << solver.max_iterations << ".";
   }
 
-  else if (property == TOLERANCE)
+  else if (property == "TOLERANCE")
   {
-    LuaCheckNilValue(__FUNCTION__, L, 3);
-    double tol = lua_tonumber(L, 3);
+    LuaCheckNilValue(fname, L, 3);
+    const double tol = lua_tonumber(L, 3);
 
     if (tol < 0.0 or tol > 1.0)
     {
       chi::log.LogAllError()
-          << __FUNCTION__ << ": Invalid value for tolerance. "
+          << fname << ": Invalid value for tolerance. "
           << "Must be in the range (0.0, 1.0].";
       chi::Exit(EXIT_FAILURE);
     }
@@ -71,8 +82,7 @@ int chiLBKESSetProperty(lua_State *L)
   }
   else
   {
-    chi::log.LogAllError()
-        << __FUNCTION__ << ": Invalid property index.";
+    chi::log.LogAllError() << fname << ": Invalid property index.";
     chi::Exit(EXIT_FAILURE);
   }
   return 0;

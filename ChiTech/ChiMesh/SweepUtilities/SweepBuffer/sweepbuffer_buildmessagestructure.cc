@@ -32,8 +32,8 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   auto spds =  angleset->GetSPDS();
   auto fluds=  angleset->fluds;
 
-  int num_grps   = angleset->GetNumGrps();
-  int num_angles = angleset->angles.size();
+  const auto num_grps   = angleset->GetNumGrps();
+  const auto num_angles = angleset->angles.size();
 
   //============================================= Predecessor locations
   size_t num_dependencies = spds->location_dependencies.size();
@@ -41,18 +41,18 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   prelocI_message_count.resize(num_dependencies,0);
   prelocI_message_size.resize(num_dependencies);
   prelocI_message_blockpos.resize(num_dependencies);
-  prelocI_message_available.clear();
+  prelocI_message_received.clear();
 
   for (size_t prelocI=0; prelocI<num_dependencies; prelocI++)
   {
     u_ll_int num_unknowns =
       fluds->prelocI_face_dof_count[prelocI]*num_grps*num_angles;
 
-    u_ll_int message_size  = num_unknowns;
-    int      message_count = 1;
+    u_ll_int message_size;
+    int      message_count;
     if ((num_unknowns*8)<=EAGER_LIMIT)
     {
-      message_count = num_angles;
+      message_count = static_cast<int>(num_angles);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
     else
@@ -77,8 +77,8 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       prelocI_message_size[prelocI].push_back(num_unknowns);
     }
 
-    prelocI_message_available.emplace_back(message_count,false);
-  }
+    prelocI_message_received.emplace_back(message_count, false);
+  }//for prelocI
 
   //============================================= Delayed Predecessor locations
   size_t num_delayed_dependencies = spds->delayed_location_dependencies.size();
@@ -86,20 +86,18 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   delayed_prelocI_message_count.resize(num_delayed_dependencies,0);
   delayed_prelocI_message_size.resize(num_delayed_dependencies);
   delayed_prelocI_message_blockpos.resize(num_delayed_dependencies);
-  delayed_prelocI_message_available.clear();
+  delayed_prelocI_message_received.clear();
 
   for (size_t prelocI=0; prelocI<num_delayed_dependencies; prelocI++)
   {
-    angleset->delayed_prelocI_norm.push_back(0.0);
-
     u_ll_int num_unknowns =
       fluds->delayed_prelocI_face_dof_count[prelocI]*num_grps*num_angles;
 
-    u_ll_int message_size  = num_unknowns;
-    int      message_count = 1;
+    u_ll_int message_size;
+    int      message_count;
     if ((num_unknowns*8)<=EAGER_LIMIT)
     {
-      message_count = num_angles;
+      message_count = static_cast<int>(num_angles);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
     else
@@ -124,7 +122,7 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       delayed_prelocI_message_size[prelocI].push_back(num_unknowns);
     }
 
-    delayed_prelocI_message_available.emplace_back(message_count,false);
+    delayed_prelocI_message_received.emplace_back(message_count, false);
   }
 
 
@@ -135,7 +133,6 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
   deplocI_message_size.resize(num_successors);
   deplocI_message_blockpos.resize(num_successors);
 
-  deplocI_message_sent.clear();
   deplocI_message_request.clear();
 
   for (size_t deplocI=0; deplocI<num_successors; deplocI++)
@@ -143,11 +140,11 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
     u_ll_int num_unknowns =
       fluds->deplocI_face_dof_count[deplocI]*num_grps*num_angles;
 
-    u_ll_int message_size  = num_unknowns;
-    int      message_count = 1;
+    u_ll_int message_size;
+    int      message_count;
     if ((num_unknowns*8)<=EAGER_LIMIT)
     {
-      message_count = num_angles;
+      message_count = static_cast<int>(num_angles);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
     else
@@ -155,11 +152,6 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       message_count = ceil((double)num_unknowns*8/(double)(double)EAGER_LIMIT);
       message_size  = ceil((double)num_unknowns/(double)message_count);
     }
-
-//    chi_global_timings[12] += num_unknowns;
-//    chi_global_timings[13] += 1.0;
-//    chi_global_timings[14] += message_count;
-//    chi_global_timings[15] += 1.0;
 
     deplocI_message_count[deplocI] = message_count;
 
@@ -177,7 +169,6 @@ void chi_mesh::sweep_management::SweepBuffer::BuildMessageStructure()
       deplocI_message_size[deplocI].push_back(num_unknowns);
     }
 
-    deplocI_message_sent.emplace_back(message_count,false);
     deplocI_message_request.emplace_back(message_count,MPI_Request());
   }
 

@@ -11,7 +11,8 @@ SendDownstreamPsi(int angle_set_num)
 {
   auto spds =  angleset->GetSPDS();
 
-  for (size_t deplocI=0; deplocI<spds->location_successors.size(); deplocI++)
+  const size_t num_successors = spds->location_successors.size();
+  for (size_t deplocI=0; deplocI<num_successors; deplocI++)
   {
     int locJ = spds->location_successors[deplocI];
 
@@ -21,8 +22,10 @@ SendDownstreamPsi(int angle_set_num)
       u_ll_int block_addr   = deplocI_message_blockpos[deplocI][m];
       u_ll_int message_size = deplocI_message_size[deplocI][m];
 
-      MPI_Isend(&angleset->deplocI_outgoing_psi[deplocI].data()[block_addr],
-                message_size,
+      const auto& outgoing_psi = angleset->deplocI_outgoing_psi[deplocI];
+
+      MPI_Isend(&outgoing_psi[block_addr],
+                static_cast<int>(message_size),
                 MPI_DOUBLE,
                 comm_set->MapIonJ(locJ,locJ),
                 max_num_mess*angle_set_num + m, //tag

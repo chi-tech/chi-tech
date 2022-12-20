@@ -1,7 +1,6 @@
 #include "sweepscheduler.h"
 
-#include <chi_log.h>
-;
+#include "chi_log.h"
 
 //###################################################################
 /**This is the entry point for sweeping.*/
@@ -9,17 +8,18 @@ void chi_mesh::sweep_management::SweepScheduler::
      Sweep()
 {
   if (scheduler_type == SchedulingAlgorithm::FIRST_IN_FIRST_OUT)
-    ScheduleAlgoFIFO(sweep_chunk);
+    ScheduleAlgoFIFO(m_sweep_chunk);
   else if (scheduler_type == SchedulingAlgorithm::DEPTH_OF_GRAPH)
-    ScheduleAlgoDOG(sweep_chunk);
+    ScheduleAlgoDOG(m_sweep_chunk);
 }
 
 //###################################################################
 /**Get average sweep time from logging system.*/
 double chi_mesh::sweep_management::SweepScheduler::GetAverageSweepTime() const
 {
-  return chi::log.ProcessEvent(sweep_event_tag,
-                              chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
+  return chi::log.ProcessEvent(
+    sweep_event_tag,
+    chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
 }
 
 //###################################################################

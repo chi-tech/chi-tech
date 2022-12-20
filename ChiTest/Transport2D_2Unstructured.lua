@@ -77,7 +77,7 @@ end
 
 --========== ProdQuad
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,8, 4)
-
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 --========== Groupset def
 gs0 = chiLBSCreateGroupset(phys1)
 cur_gs = gs0
@@ -116,8 +116,8 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
 --############################################### Initialize and Execute Solver
-chiLBSInitialize(phys1)
-chiLBSExecute(phys1)
+chiSolverInitialize(phys1)
+chiSolverExecute(phys1)
 
 --############################################### Get field functions
 fflist,count = chiLBSGetScalarFieldFunctionList(phys1)

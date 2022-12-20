@@ -85,6 +85,10 @@
 //RegisterFunction(chiLBSReadSourceMoments)
 //RegisterFunction(chiLBSReadFluxMoments)
 //RegisterFunction(chiLBSComputeBalance)
+
+//RegisterFunction(chiLBSAddPointSource)
+//RegisterFunction(chiLBSClearPointSources)
+//RegisterFunction(chiLBSInitializePointSources)
 //
 ////module:Linear Boltzmann Solver - Groupset manipulation
 ////\ref LuaLBSGroupsets Main page

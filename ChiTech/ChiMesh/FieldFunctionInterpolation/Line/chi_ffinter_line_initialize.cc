@@ -59,9 +59,9 @@ Initialize()
 
     ff_context->ref_ff = field_functions[ff];
 
-    if (grid_view != field_functions[ff]->grid)
+    if (grid_view != field_functions[ff]->spatial_discretization->ref_grid)
     {
-      grid_view = field_functions[ff]->grid;
+      grid_view = field_functions[ff]->spatial_discretization->ref_grid;
       interpolation_points_ass_cell.resize(number_of_points,0);
       interpolation_points_ass_cell.assign(number_of_points,0);
 

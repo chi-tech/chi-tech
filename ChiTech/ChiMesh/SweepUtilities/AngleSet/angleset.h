@@ -17,17 +17,17 @@ typedef chi_mesh::sweep_management::BoundaryBase SweepBndry;
 class chi_mesh::sweep_management::AngleSet
 {
 private:
-  int                               num_grps;
+  size_t                            num_grps;
   std::shared_ptr<SPDS>             spds;
-  bool                              executed;
+  bool                              executed = false;
 
   chi_mesh::sweep_management::SweepBuffer sweep_buffer;
 
 public:
   FLUDS*                            fluds;
-  std::vector<int>                  angles;
+  std::vector<size_t>               angles;
   std::vector<std::shared_ptr<SweepBndry>>&         ref_boundaries;
-  int                               ref_subset;
+  size_t                            ref_subset;
 
   //FLUDS
   std::vector<std::vector<double>>  local_psi;
@@ -39,14 +39,12 @@ public:
 
   std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi;
   std::vector<std::vector<double>>  delayed_prelocI_outgoing_psi_old;
-  std::vector<double>               delayed_prelocI_norm;
-  double                            delayed_local_norm;
 
-  AngleSet(int in_numgrps,
-           int in_ref_subset,
+  AngleSet(size_t in_numgrps,
+           size_t in_ref_subset,
            std::shared_ptr<SPDS>& in_spds,
            FLUDS* in_fluds,
-           std::vector<int>& angle_indices,
+           std::vector<size_t>& angle_indices,
            std::vector<std::shared_ptr<SweepBndry>>& sim_boundaries,
            int sweep_eager_limit,
            chi_objects::ChiMPICommunicatorSet* in_comm_set);
@@ -59,7 +57,7 @@ public:
 
   void SetMaxBufferMessages(int new_max);
 
-  int GetNumGrps() const;
+  size_t GetNumGrps() const;
 
   AngleSetStatus AngleSetAdvance(
              SweepChunk& sweep_chunk,
@@ -68,7 +66,7 @@ public:
              ExecutionPermission permission = ExecutionPermission::EXECUTE);
   AngleSetStatus FlushSendBuffers();
   void ResetSweepBuffers();
-  void ReceiveDelayedData(int angle_set_num);
+  bool ReceiveDelayedData(size_t angle_set_num);
 
   double* PsiBndry(uint64_t bndry_map,
                    int angle_num,

@@ -16,8 +16,8 @@ namespace chi_math
   {
   private:
     chi_mesh::Vector3 v0;
-    int v0i;
-    int v1i;
+    uint64_t v0i;
+    uint64_t v1i;
     std::array<chi_mesh::Normal,2> normals;
     const QuadratureLine& volume_quadrature;
     double h;
@@ -25,7 +25,7 @@ namespace chi_math
 
     /**Constructor for a slab view.*/
     SlabMappingFE_PWL(const chi_mesh::Cell& slab_cell,
-                      const chi_mesh::MeshContinuumPtr& ref_grid,
+                      const chi_mesh::MeshContinuumConstPtr& ref_grid,
                       const QuadratureLine& volume_quadrature);
 
     void ComputeUnitIntegrals(
@@ -52,13 +52,16 @@ namespace chi_math
     //                                                as function of cartesian
     //                                                coordinates
   public:
-    double ShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
-    chi_mesh::Vector3 GradShapeValue(const int i, const chi_mesh::Vector3& xyz) override;
+    double ShapeValue(const int i, const chi_mesh::Vector3& xyz) const override;
+    chi_mesh::Vector3 GradShapeValue(
+      const int i,
+      const chi_mesh::Vector3& xyz) const override;
 
     void ShapeValues(const chi_mesh::Vector3& xyz,
-                     std::vector<double>& shape_values) override;
-    void GradShapeValues(const chi_mesh::Vector3& xyz,
-                         std::vector<chi_mesh::Vector3>& gradshape_values) override;
+                     std::vector<double>& shape_values) const override;
+    void GradShapeValues(
+      const chi_mesh::Vector3& xyz,
+      std::vector<chi_mesh::Vector3>& gradshape_values) const override;
 
 
   };

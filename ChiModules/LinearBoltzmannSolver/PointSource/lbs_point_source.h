@@ -1,6 +1,8 @@
 #ifndef CHITECH_LBS_POINT_SOURCE_H
 #define CHITECH_LBS_POINT_SOURCE_H
 
+#include <utility>
+
 #include "ChiMesh/chi_mesh.h"
 
 namespace lbs
@@ -10,35 +12,38 @@ class PointSource
 {
 private:
   const chi_mesh::Vector3 m_location;
-  const std::vector<double> m_strength;
+  const std::vector<double> m_groupwise_strength;
 
-  bool m_owning_cell_set = false;
-  uint64_t m_owning_cell_local_id = 0;
-
-  std::vector<double> m_owning_cell_shape_values;
-  std::vector<double> m_owning_cell_node_weights;
+public:
+  struct ContainingCellInfo
+  {
+    double volume_weight;
+    uint64_t cell_local_id;
+    std::vector<double> shape_values;
+    std::vector<double> node_weights;
+  };
+private:
+  std::vector<ContainingCellInfo> m_containing_cells;
 
 public:
   PointSource(const chi_mesh::Vector3& location,
-              const std::vector<double>& strength) :
+              std::vector<double>  strength) :
               m_location(location),
-              m_strength(strength)
+              m_groupwise_strength(std::move(strength))
   {}
 
   const chi_mesh::Vector3& Location() const;
 
   const std::vector<double>& Strength() const;
 
-  void SetOwningCellData(uint64_t owning_cell_local_id,
-                         const std::vector<double>& shape_values,
-                         const std::vector<double>& node_weights);
+  void AddContainingCellInfo(double volume_weight,
+                             uint64_t cell_local_id,
+                             std::vector<double> shape_values,
+                             std::vector<double> node_weights);
 
-  const std::vector<double>& ShapeValues() const;
-  const std::vector<double>& NodeWeights() const;
+  const std::vector<ContainingCellInfo>& ContainingCellsInfo() const;
 
-  uint64_t OwningCellLocalID() const;
-
-  bool LocallyOwned() const;
+  void ClearInitializedInfo();
 };
 
 }//namespace lbs

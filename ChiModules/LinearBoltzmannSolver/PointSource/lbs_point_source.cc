@@ -2,56 +2,41 @@
 
 #include "chi_log.h"
 
+/**Returns the location of the source.*/
 const chi_mesh::Vector3& lbs::PointSource::Location() const
 {
   return m_location;
 }
 
+/**Returns the groupwise strength of the source.*/
 const std::vector<double>& lbs::PointSource::Strength() const
 {
-  return m_strength;
+  return m_groupwise_strength;
 }
 
+/**Adds the given information as `ContainingCellInfo` structure.
+ * This info is necessary to properly normalize a source.*/
 void lbs::PointSource::
-  SetOwningCellData(uint64_t owning_cell_local_id,
-                    const std::vector<double>& shape_values,
-                    const std::vector<double>& node_weights)
+  AddContainingCellInfo(double volume_weight,
+                        uint64_t cell_local_id,
+                        std::vector<double> shape_values,
+                        std::vector<double> node_weights)
 {
-  m_owning_cell_local_id = owning_cell_local_id;
-  m_owning_cell_shape_values = shape_values;
-  m_owning_cell_node_weights = node_weights;
-  m_owning_cell_set = true;
+  m_containing_cells.push_back(ContainingCellInfo{volume_weight,
+                                                  cell_local_id,
+                                                  std::move(shape_values),
+                                                  std::move(node_weights)});
 }
 
-const std::vector<double>& lbs::PointSource::ShapeValues() const
+/**Get a list of cell-information for cells containing/sharing this source.*/
+const std::vector<lbs::PointSource::ContainingCellInfo>&
+  lbs::PointSource::ContainingCellsInfo() const
 {
-  if (not m_owning_cell_set)
-    throw std::logic_error("lbs::PointSource::ShapeValues failed because the "
-                           "owning cell weights have not been initialized.");
-
-  return m_owning_cell_shape_values;
+  return m_containing_cells;
 }
 
-const std::vector<double>& lbs::PointSource::NodeWeights() const
+/**Clears all initialization info so that the source can be reinitialized.*/
+void lbs::PointSource::ClearInitializedInfo()
 {
-  if (not m_owning_cell_set)
-    throw std::logic_error("lbs::PointSource::NodeWeights failed because the "
-                           "owning cell weights have not been initialized.");
-
-  return m_owning_cell_node_weights;
+  m_containing_cells.clear();
 }
-
-
-uint64_t lbs::PointSource::OwningCellLocalID() const
-{
-  if (not m_owning_cell_set)
-    throw std::logic_error("lbs::PointSource::OwningCellLocalID failed because the "
-                           "owning cell-id has not been initialized.");
-  return m_owning_cell_local_id;
-}
-
-bool lbs::PointSource::LocallyOwned() const
-{
-  return m_owning_cell_set;
-}
-

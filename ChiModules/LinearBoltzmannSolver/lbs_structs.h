@@ -7,6 +7,15 @@
 namespace lbs
 {
 
+typedef std::vector<size_t> DirIDs; ///< Direction-IDs
+typedef std::vector<DirIDs> UniqueSOGroupings;
+typedef std::map<size_t, size_t> DirIDToSOMap;
+
+typedef std::vector<double> VecDbl;
+typedef std::vector<VecDbl> MatDbl;
+typedef std::vector<chi_mesh::Vector3> VecVec3;
+typedef std::vector<VecVec3> MatVec3;
+
 enum class GeometryType
 {
   NO_GEOMETRY_SET  = 0,
@@ -16,6 +25,14 @@ enum class GeometryType
   TWOD_CARTESIAN   = 4,
   TWOD_CYLINDRICAL = 5,
   THREED_CARTESIAN = 6
+};
+
+enum class AngleAggregationType
+{
+  UNDEFINED = 0,
+  SINGLE = 1,
+  POLAR = 2,
+  AZIMUTHAL = 3,
 };
 
 /**Struct for storing LBS options.*/
@@ -110,6 +127,19 @@ public:
   }
 };
 
-}
+
+struct UnitCellMatrices
+{
+  MatDbl  K_matrix;
+  MatVec3 G_matrix;
+  MatDbl  M_matrix;
+  VecDbl  Vi_vectors;
+
+  std::vector<MatDbl>  face_M_matrices;
+  std::vector<MatVec3> face_G_matrices;
+  std::vector<VecDbl>  face_Si_vectors;
+};
+
+}//namespace lbs
 
 #endif

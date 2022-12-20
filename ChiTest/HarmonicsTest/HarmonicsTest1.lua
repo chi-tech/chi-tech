@@ -1,4 +1,4 @@
-HarmonicsTest1.luaprint("############### Test of orthogonality")
+print("############### Test of orthogonality")
 
 N = 1000
 Nt = N
@@ -28,7 +28,7 @@ print("Integral = "..tostring(intgl))
 check = 4.0*math.pi/(2*ell+1)
 print("Check = "..tostring(check))
 
-print("############### Test of legendre ")
+print("############### Test of legendre addition theorem")
 value = 0.0
 theta = math.pi/3
 vaphi = math.pi/3

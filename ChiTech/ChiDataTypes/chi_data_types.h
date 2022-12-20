@@ -21,6 +21,9 @@ namespace chi_data_types
 
   class Varying;
   class ByteArray;
+
+  template<typename T>
+  class NDArray;
 }//namespace chi_data_types
 
 #endif //CHI_DATA_TYPES_CHI_DATA_TYPES_H

@@ -42,6 +42,7 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
                                                ": Trouble obtaing pwl-sdm.");
 
   auto& pwlc_sdm = *pwlc_sdm_ptr;
+  const auto& ref_grid = spatial_discretization->ref_grid;
 
   //============================================= Init vtk items
   const auto& ff_uk = this->unknown_manager.unknowns[ref_variable];
@@ -80,10 +81,10 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
 
   for (size_t c=0; c < num_components; ++c)
-    for (const auto& cell : grid->local_cells)
+    for (const auto& cell : ref_grid->local_cells)
     {
-      auto cell_mapping = pwlc_sdm.GetCellMappingFE(cell.local_id);
-      for (int i=0; i<cell_mapping->num_nodes; ++i)
+      const auto& cell_mapping = pwlc_sdm.GetCellMapping(cell);
+      for (int i=0; i<cell_mapping.NumNodes(); ++i)
         cell_node_component_tuples.emplace_back(cell.local_id,i,
                                                 (num_components==1)?
                                                 ref_component : c);
@@ -97,9 +98,9 @@ void chi_physics::FieldFunction::ExportToVTKPWLC(const std::string& base_name,
   //======================================== Populate cell information
   int64_t node_count=0;
   int64_t mapping_counter=0;
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : ref_grid->local_cells)
   {
-    UploadCellGeometry(cell, node_count, points, ugrid);
+    UploadCellGeometry(*ref_grid, cell, node_count, points, ugrid);
 
     material_array->InsertNextValue(cell.material_id);
     partition_id_array->InsertNextValue(cell.partition_id);

@@ -11,19 +11,21 @@
 #include "ChiMesh/SweepUtilities/AngleAggregation/angleaggregation.h"
 
 #include "../lbs_structs.h"
+#include "../lbs_make_subset.h"
 
 #include "ChiPhysics/chi_physics_namespace.h"
 
+#include "LinearBoltzmannSolver/Acceleration/acceleration.h"
+
+namespace lbs::acceleration
+{
+  class DiffusionMIPSolver;
+}
+
 namespace lbs
 {
-  enum class AngleAggregationType
-  {
-    UNDEFINED = 0,
-    SINGLE = 1,
-    POLAR = 2,
-    AZIMUTHAL = 3,
-  };
 
+//################################################################### Class def
 /**Group set functioning as a collection of groups*/
 class LBSGroupset
 {
@@ -32,42 +34,49 @@ protected:
 public:
   int                                          id;
   std::vector<LBSGroup>                        groups;
-  std::shared_ptr<chi_math::AngularQuadrature> quadrature;
+  std::shared_ptr<chi_math::AngularQuadrature> quadrature = nullptr;
   chi_mesh::sweep_management::AngleAggregation angle_agg;
   std::vector<SPDS_ptr>                        sweep_orderings;
-  int                                          master_num_grp_subsets;
-  int                                          master_num_ang_subsets;
-  std::vector<std::pair<int, int>>                        grp_subsets;
-  std::vector<int>                             grp_subset_sizes;
-  std::vector<std::pair<int, int>>                       ang_subsets_top;
-  std::vector<int>                             ang_subset_sizes_top;
-  std::vector<std::pair<int, int>>                       ang_subsets_bot;
-  std::vector<int>                             ang_subset_sizes_bot;
+  UniqueSOGroupings                            unique_so_groupings;
+  DirIDToSOMap                                 dir_id_to_so_map;
 
-  IterativeMethod             iterative_method;
-  AngleAggregationType        angleagg_method;
-  double                                       residual_tolerance;
-  int                                          max_iterations;
-  int                                          gmres_restart_intvl;
-  bool                                         apply_wgdsa;
-  bool                                         apply_tgdsa;
-  int                                          wgdsa_max_iters;
-  int                                          tgdsa_max_iters;
-  double                                       wgdsa_tol;
-  double                                       tgdsa_tol;
-  bool                                         wgdsa_verbose;
-  bool                                         tgdsa_verbose;
-  std::string                                  wgdsa_string;
-  std::string                                  tgdsa_string;
+  int                                          master_num_grp_subsets = 1;
+  int                                          master_num_ang_subsets = 1;
 
-  bool                                         allow_cycles;
+  std::vector<SubSetInfo>                      grp_subset_infos;
 
-  chi_physics::Solver*                         wgdsa_solver;
-  chi_physics::Solver*                         tgdsa_solver;
+  IterativeMethod      iterative_method = IterativeMethod::CLASSICRICHARDSON;
+  AngleAggregationType angleagg_method = AngleAggregationType::POLAR;
+  double               residual_tolerance = 1.0e-6;
+  int                  max_iterations = 200;
+  int                  gmres_restart_intvl = 30;
 
-  bool                                         log_sweep_events;
+  bool                 allow_cycles = false;
+  bool                 log_sweep_events = false;
 
-  chi_math::UnknownManager                     psi_uk_man;
+  bool                 apply_wgdsa = false;
+  bool                 apply_tgdsa = false;
+  int                  wgdsa_max_iters = 30;
+  int                  tgdsa_max_iters = 30;
+  double               wgdsa_tol = 1.0e-4;
+  double               tgdsa_tol = 1.0e-4;
+  bool                 wgdsa_verbose = false;
+  bool                 tgdsa_verbose = false;
+  std::string          wgdsa_string;
+  std::string          tgdsa_string;
+
+  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> wgdsa_solver;
+  std::shared_ptr<lbs::acceleration::DiffusionMIPSolver> tgdsa_solver;
+
+  struct TwoGridAccelerationInfo
+  {
+    std::map<int, acceleration::TwoGridCollapsedInfo> map_mat_id_2_tginfo;
+    acceleration::EnergyCollapseScheme scheme =
+      acceleration::EnergyCollapseScheme::JFULL;
+  }tg_acceleration_info;
+
+
+  chi_math::UnknownManager psi_uk_man;
 
   //lbs_groupset.cc
   explicit LBSGroupset(int in_id);
@@ -82,11 +91,7 @@ public:
 };
 }
 
-typedef std::pair<int,int> GsSubSet;
-typedef std::pair<int,int> AngSubSet;
 
-#include <vector>
 
-//################################################################### Class def
 
 #endif

@@ -1,7 +1,9 @@
 #include "pwl.h"
 
-#include <chi_log.h>
-#include <chi_mpi.h>
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include "chi_log.h"
+#include "chi_mpi.h"
 
 
 //###################################################################
@@ -9,7 +11,7 @@
 void chi_math::SpatialDiscretization_PWLD::
 BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
                      std::vector<int64_t> &nodal_nnz_off_diag,
-                     chi_math::UnknownManager& unknown_manager)
+                     const chi_math::UnknownManager& unknown_manager) const
 {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOCAL CONNECTIVITY
   size_t local_dof_count = local_base_block_size;
@@ -21,16 +23,16 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   nodal_nnz_off_diag.resize(local_dof_count,0);
 
   int lc=0;
-  for (auto& cell : ref_grid->local_cells)
+  for (const auto& cell : ref_grid->local_cells)
   {
-    auto cell_fe_view = GetCellMappingFE(lc);
-    size_t num_nodes = cell_fe_view->num_nodes;
+    const auto& cell_mapping = GetCellMapping(cell);
+    size_t num_nodes = cell_mapping.NumNodes();
 
     //==================================== Self connection
     for (int i=0; i<num_nodes; ++i)
     {
-      int ir = cell_local_block_address[lc] + i;
-      nodal_nnz_in_diag[ir] += num_nodes;
+      int64_t ir = cell_local_block_address[lc] + i;
+      nodal_nnz_in_diag[ir] += static_cast<int64_t>(num_nodes);
     }
 
     //==================================== Local adjacent cell connections
@@ -38,13 +40,14 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
     {
       if (face.has_neighbor and face.IsNeighborLocal(*ref_grid))
       {
-        auto& adj_cell = ref_grid->cells[face.neighbor_id];
-        auto adj_cell_fe_view = GetCellMappingFE(adj_cell.local_id);
+        const auto& adj_cell = ref_grid->cells[face.neighbor_id];
+        const auto& adj_cell_mapping = GetCellMapping(adj_cell);
 
         for (int i=0; i<num_nodes; ++i)
         {
-          int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_in_diag[ir] += adj_cell_fe_view->num_nodes;
+          int64_t ir = cell_local_block_address[lc] + i;
+          nodal_nnz_in_diag[ir] +=
+            static_cast<int64_t>(adj_cell_mapping.NumNodes());
         }
       }
     }//for face
@@ -55,19 +58,21 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   lc=0;
   for (auto& cell : ref_grid->local_cells)
   {
-    auto cell_fe_view = GetCellMappingFE(lc);
+    const auto& cell_mapping = GetCellMapping(cell);
 
     //==================================== Local adjacent cell connections
     for (auto& face : cell.faces)
     {
       if (face.has_neighbor and (not face.IsNeighborLocal(*ref_grid)))
       {
-        auto adj_cell_fe_view = GetNeighborCellMappingFE(face.neighbor_id);
+        const auto& adj_cell = ref_grid->cells[face.neighbor_id];
+        const auto& adj_cell_mapping = GetCellMapping(adj_cell);
 
-        for (int i=0; i<cell_fe_view->num_nodes; ++i)
+        for (int i=0; i < cell_mapping.NumNodes(); ++i)
         {
-          int ir = cell_local_block_address[lc] + i;
-          nodal_nnz_off_diag[ir] += adj_cell_fe_view->num_nodes;
+          int64_t ir = cell_local_block_address[lc] + i;
+          nodal_nnz_off_diag[ir] +=
+            static_cast<int64_t>(adj_cell_mapping.NumNodes());
         }
       }
     }
@@ -115,8 +120,6 @@ BuildSparsityPattern(std::vector<int64_t> &nodal_nnz_in_diag,
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-  chi::log.Log() << "Done building DFEM sparsity pattern";
-
 }
 
 

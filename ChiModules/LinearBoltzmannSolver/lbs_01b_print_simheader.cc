@@ -1,6 +1,6 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include "ChiMath/Quadratures/product_quadrature.h"
+#include "ChiMath/Quadratures/angular_product_quadrature.h"
 
 #include <chi_log.h>
 #include <chi_mpi.h>

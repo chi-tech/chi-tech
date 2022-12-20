@@ -10,8 +10,8 @@
 /** Sets up the angle-aggregation object. */
 void chi_mesh::sweep_management::AngleAggregation::
   Setup(const std::vector<std::shared_ptr<SweepBndry>>& in_sim_boundaries,
-        int in_number_of_groups,
-        int in_number_of_group_subsets,
+        size_t in_number_of_groups,
+        size_t in_number_of_group_subsets,
         std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
         chi_mesh::MeshContinuumPtr& in_grid)
 {
@@ -192,7 +192,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
   }//for bndry
 
   if (reflecting_bcs_initialized)
-    chi::log.Log() << "Reflecting boundary conditions initialized.";
+    chi::log.Log0Verbose1() << "Reflecting boundary conditions initialized.";
 
 }
 
@@ -345,7 +345,7 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
       auto& rbndry = (BoundaryReflecting&)(*bndry);
 
       if (rbndry.opposing_reflected)
-        for (auto& angle : rbndry.hetero_boundary_flux_old)
+        for (auto& angle : rbndry.hetero_boundary_flux)
           for (auto& cellvec : angle)
             for (auto& facevec : cellvec)
               for (auto& dofvec : facevec)
@@ -358,13 +358,13 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
   //======================================== Intra-cell cycles
   for (auto& as_group : angle_set_groups)
     for (auto& angle_set : as_group.angle_sets)
-      for (auto val : angle_set->delayed_local_psi_old)
+      for (auto val : angle_set->delayed_local_psi)
         psi_vector.push_back(val);
 
   //======================================== Inter location cycles
   for (auto& as_group : angle_set_groups)
     for (auto& angle_set : as_group.angle_sets)
-      for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
+      for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi)
         for (auto val : loc_vector)
           psi_vector.push_back(val);
 
@@ -414,4 +414,64 @@ void chi_mesh::sweep_management::AngleAggregation::
       for (auto& loc_vector : angle_set->delayed_prelocI_outgoing_psi_old)
         for (auto& val : loc_vector)
           val = stl_vector[index++];
+}
+
+//###################################################################
+/**Copies the old delayed angular fluxes to the new.*/
+void chi_mesh::sweep_management::AngleAggregation::
+  SetDelayedPsiOld2New()
+{
+  //======================================== Opposing reflecting bndries
+  for (auto& bndry : sim_boundaries)
+  {
+    if (bndry->IsReflecting())
+    {
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
+
+      if (rbndry.opposing_reflected)
+        rbndry.hetero_boundary_flux = rbndry.hetero_boundary_flux_old;
+
+    }//if reflecting
+  }//for bndry
+
+  //======================================== Intra-cell cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      angle_set->delayed_local_psi = angle_set->delayed_local_psi_old;
+
+  //======================================== Inter location cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      angle_set->delayed_prelocI_outgoing_psi =
+        angle_set->delayed_prelocI_outgoing_psi_old;
+}
+
+//###################################################################
+/**Copies the new delayed angular fluxes to the old.*/
+void chi_mesh::sweep_management::AngleAggregation::
+  SetDelayedPsiNew2Old()
+{
+  //======================================== Opposing reflecting bndries
+  for (auto& bndry : sim_boundaries)
+  {
+    if (bndry->IsReflecting())
+    {
+      auto& rbndry = (BoundaryReflecting&)(*bndry);
+
+      if (rbndry.opposing_reflected)
+        rbndry.hetero_boundary_flux_old = rbndry.hetero_boundary_flux;
+
+    }//if reflecting
+  }//for bndry
+
+  //======================================== Intra-cell cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      angle_set->delayed_local_psi_old = angle_set->delayed_local_psi;
+
+  //======================================== Inter location cycles
+  for (auto& as_group : angle_set_groups)
+    for (auto& angle_set : as_group.angle_sets)
+      angle_set->delayed_prelocI_outgoing_psi_old =
+        angle_set->delayed_prelocI_outgoing_psi;
 }

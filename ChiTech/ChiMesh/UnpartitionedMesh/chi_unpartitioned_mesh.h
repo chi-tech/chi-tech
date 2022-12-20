@@ -48,18 +48,15 @@ public:
   MeshAttributes attributes = NONE;
 
 public:
-  enum class ParallelMethod
-  {
-    ALL_FROM_HOME = 0,
-    DIVIDE_WORK   = 1
-  };
   struct Options
   {
     std::string file_name;
     std::string material_id_fieldname;
     std::string boundary_id_fieldname;
     double scale=1.0;
-    ParallelMethod parallel_method = ParallelMethod::ALL_FROM_HOME;
+    size_t ortho_Nx = 0;
+    size_t ortho_Ny = 0;
+    size_t ortho_Nz = 0;
   }mesh_options;
 
   struct BoundBox

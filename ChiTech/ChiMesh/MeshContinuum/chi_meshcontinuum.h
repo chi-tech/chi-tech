@@ -2,6 +2,7 @@
 #define CHI_MESHCONTINUUM_H_
 
 #include <memory>
+#include <array>
 
 #include "../chi_mesh.h"
 #include "chi_meshcontinuum_localcellhandler.h"
@@ -9,6 +10,12 @@
 #include "chi_meshcontinuum_vertexhandler.h"
 
 #include "chi_mpi.h"
+
+namespace chi_data_types
+{
+  template<typename T>
+  class NDArray;
+}//namespace chi_data_types
 
 //######################################################### Class Definition
 /**Stores the relevant information for completely defining a computational
@@ -41,6 +48,13 @@ private:
   chi_objects::ChiMPICommunicatorSet communicator_set;
 
   MeshAttributes attributes = NONE;
+
+  struct
+  {
+    size_t Nx = 0;
+    size_t Ny = 0;
+    size_t Nz = 0;
+  }ortho_attributes;
 
 public:
   MeshContinuum() :
@@ -86,13 +100,14 @@ public:
   bool IsCellLocal(uint64_t cell_global_index) const;
   bool IsCellBndry(uint64_t cell_global_index) const;
 
-  void FindAssociatedVertices(chi_mesh::CellFace& cur_face,
+  void FindAssociatedVertices(const chi_mesh::CellFace& cur_face,
                               std::vector<short>& dof_mapping) const;
+  static size_t MapCellFace(const chi_mesh::Cell& cur_cell,
+                     const chi_mesh::Cell& adj_cell,
+                     unsigned int f) ;
 
   chi_mesh::Vector3
   ComputeCentroidFromListOfNodes(const std::vector<uint64_t>& list) const;
-
-  std::vector<std::unique_ptr<chi_mesh::Cell>> GetGhostCells();
 
   chi_objects::ChiMPICommunicatorSet& GetCommunicator();
 
@@ -104,11 +119,17 @@ public:
 
   MeshAttributes Attributes() const {return attributes;}
 
+  std::array<size_t,3> GetIJKInfo() const;
+  chi_data_types::NDArray<uint64_t> MakeIJKToGlobalIDMapping() const;
+  std::vector<chi_mesh::Vector3> MakeCellOrthoSizes() const;
+
 private:
   friend class chi_mesh::VolumeMesher;
-  void SetAttributes(MeshAttributes new_attribs)
+  void SetAttributes(MeshAttributes new_attribs,
+                     std::array<size_t,3> ortho_Nis={0,0,0})
   {
     attributes = attributes | new_attribs;
+    ortho_attributes = {ortho_Nis[0],ortho_Nis[1],ortho_Nis[2]};
   }
 };
 

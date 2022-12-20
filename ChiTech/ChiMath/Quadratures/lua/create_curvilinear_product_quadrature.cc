@@ -9,8 +9,6 @@
 
 #include "chi_log.h"
 
-//#include <memory>
-
 /** Creates a curvilinear product quadrature suitable for cylindrical geometries.
 
  \param QuadratureType int Quadrature identifier.
@@ -45,9 +43,10 @@
  */
 int chiCreateCylindricalProductQuadrature(lua_State *L)
 {
+  const std::string fname = __FUNCTION__;
   const int num_args = lua_gettop(L);
   if (num_args < 3)
-    LuaPostArgAmountError("chiCreateCylindricalProductQuadrature",3,num_args);
+    LuaPostArgAmountError(fname,3,num_args);
 
   const int ident = lua_tonumber(L,1);
   const int Np = lua_tonumber(L,2);
@@ -60,7 +59,7 @@ int chiCreateCylindricalProductQuadrature(lua_State *L)
   }
   else if (lua_istable(L, 3))
   {
-    const int lNa = lua_rawlen(L,3);
+    const size_t lNa = lua_rawlen(L,3);
     if (lNa != Np)
     {
       chi::log.LogAllError()

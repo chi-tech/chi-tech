@@ -178,21 +178,23 @@ void lbs::SteadySolver::
   {
     for (const auto& point_source : point_sources)
     {
-      if (not point_source.LocallyOwned()) continue;
-      const uint64_t cell_local_id = point_source.OwningCellLocalID();
-
-      auto& transport_view = cell_transport_views[cell_local_id];
-
-      const auto& strength = point_source.Strength();
-      const auto& node_weights = point_source.NodeWeights();
-
-      const int num_nodes = transport_view.NumNodes();
-      for (int i = 0; i < num_nodes; ++i)
+      const auto& info_list = point_source.ContainingCellsInfo();
+      for (const auto& info : info_list)
       {
-        const size_t uk_map = transport_view.MapDOF(i, /*moment=*/0, /*grp=*/0);
-        for (size_t g = gs_i; g <= gs_f; ++g)
-          destination_q[uk_map + g] += strength[g] * node_weights[i];
-      }//for node i
+        auto& transport_view = cell_transport_views[info.cell_local_id];
+
+        const auto& strength = point_source.Strength();
+        const auto& node_weights = info.node_weights;
+        const double vol_w = info.volume_weight;
+
+        const int num_nodes = transport_view.NumNodes();
+        for (int i = 0; i < num_nodes; ++i)
+        {
+          const size_t uk_map = transport_view.MapDOF(i, /*moment=*/0, /*grp=*/0);
+          for (size_t g = gs_i; g <= gs_f; ++g)
+            destination_q[uk_map + g] += strength[g] * node_weights[i] * vol_w;
+        }//for node i
+      }//for cell
     }//for point source
   }//if apply mat src
 
