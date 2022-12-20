@@ -2,7 +2,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 
@@ -12,7 +11,7 @@
 /**Reads an unpartitioned mesh from a gmesh .msh legacy ASCII format 2 file.*/
 void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
 {
-  const std::string fname = __FUNCTION__;
+  const std::string fname = "chi_mesh::UnpartitionedMesh::ReadFromMsh";
 
   //===================================================== Opening the file
   std::ifstream file;
@@ -237,7 +236,7 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
     if (not IsElementSupported(elem_type))
       throw std::logic_error(fname + ": Unsupported element encountered.");
 
-    chi::log.Log0Verbose1() << "Reading element: " << file_line
+    chi::log.Log0Verbose2() << "Reading element: " << file_line
                                 << " type: " << elem_type;
 
     int num_cell_nodes;
@@ -261,14 +260,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
       {
         raw_cell = new LightWeightCell(CellType::SLAB, CellType::SLAB);
         raw_boundary_cells.push_back(raw_cell);
-        chi::log.Log0Verbose1() << "Added to raw_boundary_cells.";
+        chi::log.Log0Verbose2() << "Added to raw_boundary_cells.";
       }
       else if (IsElementType2D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYGON,
                                        CellTypeFromMSHTypeID(elem_type));
         raw_cells.push_back(raw_cell);
-        chi::log.Log0Verbose1() << "Added to raw_cells.";
+        chi::log.Log0Verbose2() << "Added to raw_cells.";
       }
     }
     else
@@ -278,14 +277,14 @@ void chi_mesh::UnpartitionedMesh::ReadFromMsh(const Options &options)
         raw_cell = new LightWeightCell(CellType::POLYGON,
                                        CellTypeFromMSHTypeID(elem_type));
         raw_boundary_cells.push_back(raw_cell);
-        chi::log.Log0Verbose1() << "Added to raw_boundary_cells.";
+        chi::log.Log0Verbose2() << "Added to raw_boundary_cells.";
       }
       else if (IsElementType3D(elem_type))
       {
         raw_cell = new LightWeightCell(CellType::POLYHEDRON,
                                        CellTypeFromMSHTypeID(elem_type));
         raw_cells.push_back(raw_cell);
-        chi::log.Log0Verbose1() << "Added to raw_cells.";
+        chi::log.Log0Verbose2() << "Added to raw_cells.";
       }
     }
 

@@ -9,7 +9,8 @@
 namespace lbs
 {
 
-/**A k-eigenvalue linear boltzmann transport solver.*/
+/**A k-eigenvalue solver based on the linear boltzmann transport solver.
+\author Zachary Hardy.*/
 class KEigenvalueSolver : public lbs::SteadySolver
 {
 public:

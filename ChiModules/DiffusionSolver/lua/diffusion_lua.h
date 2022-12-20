@@ -8,12 +8,9 @@ int chiDiffusionInitialize(lua_State *L);
 int chiDiffusionExecute(lua_State *L);
 int chiDiffusionSetProperty(lua_State *L);
 
-namespace diffusion_solver
+namespace diffusion_solver::lua_utils
 {
-  namespace lua_utils
-  {
-    void RegisterLuaEntities(lua_State *L);
-  }//namespace lua_utils
+  void RegisterLuaEntities(lua_State *L);
 }//namespace diffusion_solver
 
 #endif //CHITECH_DIFFUSION_LUA_H
