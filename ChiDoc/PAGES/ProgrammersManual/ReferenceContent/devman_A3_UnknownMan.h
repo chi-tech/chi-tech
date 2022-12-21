@@ -12,7 +12,7 @@ As a developer you might come across code such as
 \code
 imap[i] = sdm.MapDOF(cell, i);
 \endcode
-or it's more elaborate cousin
+or its more elaborate cousin
 \code
 const int64_t imap = m_sdm.MapDOF(cell,i,m_uk_man,0,g);
 \endcode
