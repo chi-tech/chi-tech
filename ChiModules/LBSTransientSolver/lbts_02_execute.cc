@@ -9,8 +9,22 @@ void lbs::TransientSolver::Execute()
 {
   chi::log.Log() << "Executing " << TextName() << ".";
 
+  const int max_t = transient_options.max_time_steps;
+  int t = 0;
+  while (((max_t > 0 and t < max_t) or (max_t < 0)) and
+         (time < transient_options.t_final))
+  {
+    Step();
 
+    PostStepCallBackFunction();
 
+    if (not transient_options.inhibit_advance)
+    {
+      AdvanceTimeValues();
+      ++t;
+      transient_options.inhibit_advance = false;
+    }
+  }
 
   chi::log.Log() << "Done Executing " << TextName() << ".";
 }

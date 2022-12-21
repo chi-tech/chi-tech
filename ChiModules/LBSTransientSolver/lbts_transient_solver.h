@@ -21,11 +21,12 @@ public:
   {
     int verbosity_level = 1;
     bool inhibit_advance = false;
+    double t_final = 0.1;
+    int max_time_steps = 10;
+    std::string console_call_back_function;
   }transient_options;
 
   /**Temporal domain and discretization information.*/
-  double t_start = 0.0;
-  double t_final = 0.1;
   double dt = 2.0e-3;
   double time = 0.0;
 
@@ -55,6 +56,7 @@ public:
                           SourceFlags source_flags);
   double ComputeFissionRate(bool previous) override;
   double ComputeBeta();
+  void   PostStepCallBackFunction() const;
 
   //precursors
   void StepPrecursors();

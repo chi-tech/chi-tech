@@ -24,9 +24,6 @@ namespace lbs::lbts_lua_utils
 "TIMESTEP"\n
 Returns the current timestep.\n\n
 
-"TIMESTART"\n
-Returns the start time.\n\n
-
 "TIMESTOP"\n
 Returns the stop time.\n\n
 
@@ -62,14 +59,9 @@ int chiLBTSGetProperty(lua_State* L)
     lua_pushnumber(L, solver.dt);
     return 1;
   }
-  else if (property == "TIMESTART")
-  {
-    lua_pushnumber(L, solver.t_start);
-    return 1;
-  }
   else if (property == "TIMESTOP")
   {
-    lua_pushnumber(L, solver.t_final);
+    lua_pushnumber(L, solver.transient_options.t_final);
     return 1;
   }
   else if (property == "INHIBIT_ADVANCE")

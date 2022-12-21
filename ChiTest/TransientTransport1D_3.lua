@@ -129,7 +129,10 @@ chiLBSSetProperty(phys1, VERBOSE_OUTER_ITERATIONS, true)
 chiSolverInitialize(phys1)
 
 chiLBTSSetProperty(phys1, "TIMESTEP", 1e-3*100)
+chiLBTSSetProperty(phys1, "TIMESTOP", 1.0*100)
+chiLBTSSetProperty(phys1, "MAX_TIMESTEPS", -1)
 chiLBTSSetProperty(phys1, "VERBOSITY_LEVEL", 0)
+chiLBTSSetProperty(phys1, "TIMESTEP_METHOD", "CRANK_NICHOLSON")
 
 phys1name = chiSolverGetName(phys1);
 initial_FR = chiLBSComputeFissionRate(phys1,"OLD")
@@ -156,15 +159,37 @@ initial_FR = chiLBSComputeFissionRate(phys1,"OLD")
 --    chiLBTSAdvanceTimeData(phys1)
 --end
 
-time = 0.0
-time_stop = 1.0*100
-k=0
-swapped = false
-timestep_rejected = false
-
-tolA = 10.0
-while (time < time_stop) do
-    chiSolverStep(phys1)
+--time = 0.0
+--time_stop = 1.0*100
+--k=0
+--swapped = false
+--timestep_rejected = false
+--
+--tolA = 10.0
+--while (time < time_stop) do
+--    chiSolverStep(phys1)
+--    FRf = chiLBSComputeFissionRate(phys1,"NEW")
+--    FRi = chiLBSComputeFissionRate(phys1,"OLD")
+--    dt = chiLBTSGetProperty(phys1, "TIMESTEP")
+--    time = chiLBTSGetProperty(phys1, "TIME")
+--    period = dt/math.log(FRf/FRi)
+--
+--    if (time >= 0.2 and not swapped) then
+--        SwapXS(phys1, xs_weak_fuelB)
+--        swapped = true
+--    end
+--
+--    if (not timestep_rejected) then
+--        chiLBTSAdvanceTimeData(phys1)
+--        k = k + 1
+--        chiLog(LOG_0, string.format("%s %4d time=%10.3g dt=%10.4g period=%10.3g FR=%10.3e",
+--                phys1name,k,time,dt,period,FRf/initial_FR))
+--    else
+--        timestep_rejected = false
+--    end
+--end
+swapped=false
+function MyCallBack()
     FRf = chiLBSComputeFissionRate(phys1,"NEW")
     FRi = chiLBSComputeFissionRate(phys1,"OLD")
     dt = chiLBTSGetProperty(phys1, "TIMESTEP")
@@ -175,13 +200,8 @@ while (time < time_stop) do
         SwapXS(phys1, xs_weak_fuelB)
         swapped = true
     end
-
-    if (not timestep_rejected) then
-        chiLBTSAdvanceTimeData(phys1)
-        k = k + 1
-        chiLog(LOG_0, string.format("%s %4d time=%10.3g dt=%10.4g period=%10.3g FR=%10.3e",
-                phys1name,k,time,dt,period,FRf/initial_FR))
-    else
-        timestep_rejected = false
-    end
+    chiLog(LOG_0,string.format("%s time=%10.3g dt=%10.4g period=%10.3g FR=%10.3e",
+                phys1name,time,dt,period,FRf/initial_FR))
 end
+chiLBTSSetProperty(phys1, "CALLBACK", "MyCallBack")
+chiSolverExecute(phys1)
