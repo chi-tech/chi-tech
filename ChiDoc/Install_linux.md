@@ -96,7 +96,7 @@ into the directory containing the "configure" script and execute the following:
 
 ```bash
 ./configure  \
---prefix=$PWD/install  \
+--prefix=</path/to/install>  \
 --download-hypre=1  \
 --with-ssl=0  \
 --with-debugging=0  \
@@ -107,6 +107,7 @@ into the directory containing the "configure" script and execute the following:
 --download-parmetis=1  \
 --download-superlu_dist=1  \
 --with-cxx-dialect=C++11  \
+--with-64-bit-indices \
 CFLAGS='-fPIC -fopenmp'  \
 CXXFLAGS='-fPIC -fopenmp'  \
 FFLAGS='-fPIC -fopenmp'  \
@@ -118,6 +119,9 @@ CXXOPTFLAGS='-O3 -march=native -mtune=native'  \
 FOPTFLAGS='-O3 -march=native -mtune=native'  \
 PETSC_DIR=$PWD
 ```
+
+The installation prefix ```</path/to/install>``` must be replaced with
+the desired installation directory for this script to execute properly.
 
 If the configuration fails then consult PETSc's user documentation.
 
