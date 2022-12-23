@@ -109,6 +109,8 @@ void mg_diffusion::Solver::Initialize()
                                              nodal_nnz_in_diag,
                                              nodal_nnz_off_diag);
   }
+  // may need to have
+  // VecDuplicate(bext.front(), &b);
 
   //============================================= Create Mats and ExtVecs
   mg_diffusion::Solver::Assemble_A_bext();
@@ -122,9 +124,9 @@ void mg_diffusion::Solver::Initialize()
     {
       auto initial_field_function =
         std::make_shared<chi_physics::FieldFunction>(
-          std::string("mg_phi"),//Text name
+          std::string("mg_phi"),//Text name //jcr name
           sdm_ptr,              //Spatial Discretization
-          &x[g],                   //Data vector
+          &x[g],                //Data vector
           unk_man);             //Unknown Manager
 
       field_functions.push_back(initial_field_function);

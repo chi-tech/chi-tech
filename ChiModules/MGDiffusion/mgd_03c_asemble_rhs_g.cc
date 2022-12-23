@@ -4,11 +4,13 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //========================================================== Solve 1g problem
-void mg_diffusion::Solver::Assemble_RHS(unsigned int g)
+void mg_diffusion::Solver::Assemble_RHS(const unsigned int g)
 {
   // copy the external source vector for group g into b
   VecSet(b, 0.0);
   VecCopy(bext[g], b);
+  const double* xlocal;
+  VecGetArrayRead(x[g], &xlocal);
 
   const auto& sdm  = *mg_diffusion::Solver::sdm_ptr;
   // compute inscattering term
@@ -19,8 +21,8 @@ void mg_diffusion::Solver::Assemble_RHS(unsigned int g)
     const size_t num_nodes = cell_mapping.NumNodes();
 
     const auto& xs = matid_to_xs_map.at(cell.material_id);
-    const auto& S = xs->transfer_matrices;
-    const unsigned int ell = 0;
+    const auto& S = xs->transfer_matrices[0];
+    // const unsigned int ell = 0;
 
     for (size_t i=0; i<num_nodes; ++i)
     {
@@ -28,25 +30,25 @@ void mg_diffusion::Solver::Assemble_RHS(unsigned int g)
       double inscatter_g = 0.0;
 
       for (size_t j = 0; j < num_nodes; ++j) {
-        const int64_t jmap = sdm.MapDOF(cell, j);
-        for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
+        const int64_t jmap = sdm.MapDOFLocal(cell, j); //only serial
+        for (const auto& [row_g, gprime, sigma_sm] : S.Row(g))
         {
           if (gprime != g) // jcr row_g ??
           {
             // get flux at node j
-            const double flxj_gp = x[gprime][jmap];
+            const double flxj_gp = xlocal[jmap];
             for (size_t qp: qp_data.QuadraturePointIndices())
               inscatter_g += sigma_sm * flxj_gp *
                          qp_data.ShapeValue(i, qp) * qp_data.ShapeValue(j, qp) *
                          qp_data.JxW(qp);
-          }
-        }
+          }//if gp!=g
+        }// for gprime
       }//for j
       // add inscattering value to vector
       VecSetValue(b, imap, inscatter_g, ADD_VALUES);
-      // jcr why imap[i] in CFEMDiffusion code? same in simtest_03 and 04
     }//for i
   }//for cell
+  VecRestoreArrayRead(x[g], &xlocal);
 
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);

@@ -24,7 +24,7 @@ class mg_diffusion::Boundary
   public :
   BoundaryType type = BoundaryType::Dirichlet;
 
-  //  std::vector<std::array<double, 3> > mg_values;
+  // std::array<std::vector<double>, 3> mg_values2;
   std::array<double, 3> mg_values = {0.,0.,0.};
 
 };

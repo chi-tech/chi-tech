@@ -52,7 +52,7 @@ public:
   std::vector<Mat> A;  // linear system matrix for each group
   std::vector<Vec> bext;  // external source vector for each group
   std::vector<Vec> x;  // solution vector for each group
-  std::vector<Vec> x_old_th; // vector of old thermal fluxes
+  std::vector<Vec> x_old; // vector of old fluxes
 
   Vec thermal_dphi; // error vector for thermal fluxes
   Vec b; // actual rhs vector for the linear system A[g] x[g] = b
@@ -75,8 +75,8 @@ public:
 
   void Execute() override;
 
-  void Assemble_RHS(const unsigned int g);
-  void SolveOneGroupProblem(const unsigned int g);
+  void Assemble_RHS(unsigned int g);
+  void SolveOneGroupProblem(unsigned int g);
 
 protected:
 //  typedef std::map<int,Multigroup_D_and_sigR> MapMatID2XS;
