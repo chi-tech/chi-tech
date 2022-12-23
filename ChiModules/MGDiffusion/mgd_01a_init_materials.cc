@@ -24,6 +24,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Process materials found
   const size_t num_physics_mats = chi::material_stack.size();
+  bool first_material_read = true;
 
   for (const int& mat_id : material_ids)
   {
@@ -49,6 +50,9 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
           std::static_pointer_cast<chi_physics::TransportCrossSections>(property);
         matid_to_xs_map[mat_id] = transp_xs;
         found_transport_xs = true;
+        if (first_material_read)
+          mg_diffusion::Solver::num_groups = transp_xs->num_groups;
+
       }//transport xs
       if (property->Type() == MatProperty::ISOTROPIC_MG_SOURCE)
       {
@@ -103,9 +107,10 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     materials_list
       << " number of moments "
       << matid_to_xs_map[mat_id]->transfer_matrices.size() << "\n";
+
+    first_material_read = false;
   }//for material id
 
-  // num_groups = groups.size(); // jcr is this how NG is determined ??
 
   chi::log.Log()
     << "Materials Initialized:\n" << materials_list.str() << "\n";

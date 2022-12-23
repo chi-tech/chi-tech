@@ -109,8 +109,8 @@ void mg_diffusion::Solver::Initialize()
                                              nodal_nnz_in_diag,
                                              nodal_nnz_off_diag);
   }
-  // may need to have
-  // VecDuplicate(bext.front(), &b);
+  // also initalize b
+  VecDuplicate(bext.front(), &b);
 
   //============================================= Create Mats and ExtVecs
   mg_diffusion::Solver::Assemble_A_bext();

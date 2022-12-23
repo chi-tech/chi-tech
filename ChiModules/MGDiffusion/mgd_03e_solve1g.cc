@@ -11,5 +11,5 @@ void mg_diffusion::Solver::SolveOneGroupProblem(const unsigned int g)
 
   KSPSolve(petsc_solver.ksp,b,x[g]);
  
-  chi::log.Log() << "Done solving group" << g;
+  chi::log.Log() << "Done solving group " << g;
 }
