@@ -24,8 +24,10 @@ void mg_diffusion::Solver::Execute()
     );
 
   // shortcuts
-  unsigned int lfg = mg_diffusion::Solver::last_fast_group;
+  unsigned int lfg = mg_diffusion::Solver::num_groups; // FIXME
   unsigned int ng = mg_diffusion::Solver::num_groups;
+  int i_=0;
+  cout << i_<<std::endl; i_++;
 
   //============================================= Solve fast groups:
   for (unsigned int g=0; g<lfg; ++g)

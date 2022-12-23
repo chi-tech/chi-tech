@@ -6,6 +6,8 @@
 //========================================================== Solve 1g problem
 void mg_diffusion::Solver::Assemble_RHS(const unsigned int g)
 {
+  chi::log.Log() << "Finalizing assembly for group " + std::to_string(g) ;
+
   // copy the external source vector for group g into b
   VecSet(b, 0.0);
   VecCopy(bext[g], b);
