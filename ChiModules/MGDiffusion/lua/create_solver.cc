@@ -1,25 +1,25 @@
 #include"ChiLua/chi_lua.h"
 
-#include"../cfem_diffusion_solver.h"
+#include"../mg_diffusion_solver.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-namespace cfem_diffusion::cfem_diffusion_lua_utils
+namespace mg_diffusion::mgd_lua_utils
 {
 
 //#############################################################################
-/** Creates a CFEM Diffusion solver.
+/** Creates a Multigroup CFEM Diffusion solver.
 
 \return Handle int Handle to the created solver.
 \ingroup LuaDiffusion
 */
-int chiCFEMDiffusionSolverCreate(lua_State *L)
+int chiCFEMMGDiffusionSolverCreate(lua_State *L)
 {
   const std::string fname = __FUNCTION__;
   int num_args = lua_gettop(L);
 
-  std::string solver_name = "CFEMDiffusionSolver";
+  std::string solver_name = "MGDiffusionSolver";
 
   if (num_args == 1)
   {
@@ -27,7 +27,7 @@ int chiCFEMDiffusionSolverCreate(lua_State *L)
     solver_name = lua_tostring(L, 1);
   }
 
-  auto new_solver = std::make_shared<cfem_diffusion::Solver>(solver_name);
+  auto new_solver = std::make_shared<mg_diffusion::Solver>(solver_name);
 
   chi::solver_stack.push_back(new_solver);
 
@@ -35,9 +35,9 @@ int chiCFEMDiffusionSolverCreate(lua_State *L)
       static_cast<lua_Integer>(chi::solver_stack.size()-1));
 
   chi::log.LogAllVerbose1()
-    << "\nCFEMDiffusionSolverCreate: CFEM Diffusion solver created"
+    << "\nchiCFEMMGDiffusionSolverCreate: CFEM Multigroup Diffusion solver created"
     << std::endl;
   return 1;
 }
 
-}//namespace cfem_diffusion::cfem_diffusion_lua_utils
+}//namespace mg_diffusion::mgd_lua_utils
