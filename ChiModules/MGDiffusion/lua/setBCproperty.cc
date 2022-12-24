@@ -158,8 +158,8 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
-                         << "Neumann with D grad(u) dot n = ("
-                         << f_value << ") ";
+                     << "Neumann with D grad(u) dot n = ("
+                     << f_value << ") ";
     }
     else if (type_name == "vacuum")
     {
@@ -179,7 +179,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
-                         << "Vacuum.";
+                     << "Vacuum.";
     }
     else if (type_name == "robin")
     {
@@ -210,10 +210,10 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
-                         << "Robin with a,b,f = ("
-                         << a_value << ","
-                         << b_value << ","
-                         << f_value << ") ";
+                     << "Robin with a,b,f = ("
+                     << a_value << ","
+                     << b_value << ","
+                     << f_value << ") ";
     }
     else
     {

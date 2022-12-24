@@ -10,6 +10,11 @@ void mg_diffusion::Solver::SolveOneGroupProblem(const unsigned int g)
   KSPSetOperators(petsc_solver.ksp, A[g], A[g]);
 
   KSPSolve(petsc_solver.ksp,b,x[g]);
- 
+
+//  cout << "FLUX ###################################################### FLUX\n";
+//  cout << "FLUX ###################################################### FLUX\n";
+//  VecView(x[g], PETSC_VIEWER_STDERR_WORLD);
+
+
   chi::log.Log() << "Done solving group " << g;
 }

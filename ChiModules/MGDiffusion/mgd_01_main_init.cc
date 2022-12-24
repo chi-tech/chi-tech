@@ -124,7 +124,7 @@ void mg_diffusion::Solver::Initialize()
     {
       auto initial_field_function =
         std::make_shared<chi_physics::FieldFunction>(
-          std::string("mg_phi"),//Text name //jcr name
+          std::string("mg_phi_"+std::to_string(g)),//Text name
           sdm_ptr,              //Spatial Discretization
           &x[g],                //Data vector
           unk_man);             //Unknown Manager

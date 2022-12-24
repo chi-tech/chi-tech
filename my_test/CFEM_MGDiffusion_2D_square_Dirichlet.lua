@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
  
 mesh={}
-N=2
+N=20
 L=2
 xmin = -L/2
 dx = L/N
@@ -15,13 +15,13 @@ chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
  
 --############################################### Set Material IDs
-chiVolumeMesherSetMatIDToAll(0)
+-- chiVolumeMesherSetMatIDToAll(0)
 
--- vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
--- chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
---
--- vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
--- chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+
+vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
+chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
 -- Setboundary IDs
 -- xmin,xmax,ymin,ymax,zmin,zmax
@@ -44,27 +44,27 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 --############################################### Add materials
 materials = {}
 materials[1] = chiPhysicsAddMaterial("Test Material1");
--- materials[2] = chiPhysicsAddMaterial("Test Material2");
+materials[2] = chiPhysicsAddMaterial("Test Material2");
 
 chiPhysicsMaterialAddProperty(materials[1],TRANSPORT_XSECTIONS)
--- chiPhysicsMaterialAddProperty(materials[2],TRANSPORT_XSECTIONS)
+chiPhysicsMaterialAddProperty(materials[2],TRANSPORT_XSECTIONS)
 
 chiPhysicsMaterialAddProperty(materials[1],ISOTROPIC_MG_SOURCE)
--- chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
+chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 2
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
         CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
--- chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
---         CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
+chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
+        CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
 
 src={}
 for g=1,num_groups do
-    src[g] = 1.0
+    src[g] = 0.0
 end
+src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
--- src[1] = 1.0
--- chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
+chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Add material properties
 --#### CFEM stuff
@@ -72,14 +72,15 @@ phys1 = chiCFEMMGDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
 
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"dirichlet",0.0)
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"dirichlet",0.0)
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"dirichlet",0.0)
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"dirichlet",0.0)
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"vacuum")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"vacuum")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"vacuum")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"vacuum")
 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 ----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"square_dir","Flux_Diff")
+chiExportFieldFunctionToVTK(fflist[1],"square_dir1","Flux_Diff01")
+chiExportFieldFunctionToVTK(fflist[2],"square_dir2","Flux_Diff02")
