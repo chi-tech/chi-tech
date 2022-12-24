@@ -54,9 +54,11 @@ chiPhysicsMaterialAddProperty(materials[2],ISOTROPIC_MG_SOURCE)
 
 num_groups = 2
 chiPhysicsMaterialSetProperty(materials[1],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
+        CHI_XSFILE,"../my_test/xs_2g_mat1.cxs")
+--         CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
 chiPhysicsMaterialSetProperty(materials[2],TRANSPORT_XSECTIONS,
-        CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
+        CHI_XSFILE,"../my_test/xs_2g_mat2.cxs")
+--         CHI_XSFILE,"../my_test/xs_2g_downonly.cxs")
 
 src={}
 for g=1,num_groups do
