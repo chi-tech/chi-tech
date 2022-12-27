@@ -109,8 +109,16 @@ void mg_diffusion::Solver::Initialize()
                                              nodal_nnz_in_diag,
                                              nodal_nnz_off_diag);
   }
-  // also initalize b
+  // also initialize b
   VecDuplicate(bext.front(), &b);
+  // also initialize old flux for thermal groups
+  if (mg_diffusion::Solver::last_fast_group<mg_diffusion::Solver::num_groups)
+  {
+    VecDuplicate(x.front(), &thermal_dphi);
+    x_old.resize(mg_diffusion::Solver::num_groups, nullptr);
+    for (uint g=mg_diffusion::Solver::last_fast_group; g<mg_diffusion::Solver::num_groups; ++g)
+      VecDuplicate(bext.front(), &x_old[g]);
+  }
 
   //============================================= Create Mats and ExtVecs
   mg_diffusion::Solver::Assemble_A_bext();
