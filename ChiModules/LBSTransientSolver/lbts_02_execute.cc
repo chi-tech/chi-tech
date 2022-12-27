@@ -4,15 +4,16 @@
 #include "chi_log.h"
 
 //###################################################################
-/**Transient solver initialize routine.*/
+/**Transient solver execute routine.*/
 void lbs::TransientSolver::Execute()
 {
   chi::log.Log() << "Executing " << TextName() << ".";
 
-  const int max_t = transient_options.max_time_steps;
-  int t = 0;
-  while (((max_t > 0 and t < max_t) or (max_t < 0)) and
-         (time < transient_options.t_final))
+  const int max_num_steps = transient_options.max_time_steps;
+  const double max_time = transient_options.t_final;
+  int step_number = 0;
+  while (((max_num_steps > 0 and step_number < max_num_steps) or
+         (max_num_steps < 0)) and (time < max_time))
   {
     Step();
 
@@ -20,8 +21,8 @@ void lbs::TransientSolver::Execute()
 
     if (not transient_options.inhibit_advance)
     {
-      AdvanceTimeValues();
-      ++t;
+      AdvanceTimeValues(); //new copied to prev + time+=dt
+      ++step_number;
       transient_options.inhibit_advance = false;
     }
   }
