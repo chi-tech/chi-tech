@@ -96,10 +96,10 @@ void mg_diffusion::Solver::Assemble_A_bext()
         const auto& bval = bndry.mg_values[1];
         const auto& fval = bndry.mg_values[2];
 
-        chi::log.Log() << "Boundary  set as Robin with a,b,f = ("
-                    << aval << ","
-                    << bval << ","
-                    << fval << ") ";
+//        chi::log.Log() << "Boundary  set as Robin with a,b,f = ("
+//                    << aval << ","
+//                    << bval << ","
+//                    << fval << ") ";
         // true Robin when a!=0, otherwise, it is a Neumann:
         // Assert if b=0
         if (std::fabs(bval) < 1e-8)

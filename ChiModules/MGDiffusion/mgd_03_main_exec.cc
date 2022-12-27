@@ -24,7 +24,7 @@ void mg_diffusion::Solver::Execute()
     );
 
   // shortcuts
-  unsigned int lfg = mg_diffusion::Solver::num_groups; // FIXME
+  unsigned int lfg = mg_diffusion::Solver::last_fast_group;
   unsigned int ng = mg_diffusion::Solver::num_groups;
   int i_=0;
   cout << i_<<std::endl; i_++;
@@ -41,7 +41,7 @@ void mg_diffusion::Solver::Execute()
   double thermal_error = 0.0;
 
   bool verbose = true;
-
+  int counter=0;
   do
   {
     thermal_error = 0.0;
@@ -56,6 +56,8 @@ void mg_diffusion::Solver::Execute()
       VecAXPY(thermal_dphi, -1.0, x_old[g]);
       // compute the L2 norm
       VecNorm(thermal_dphi,NORM_2,&thermal_error);
+      // copy solution
+      VecCopy(x[g], x_old[g]);
     }
     if ( verbose && (ng != lfg) )
       std::cout << " --thermal iteration = " << std::setw(6)  << std::right << thermal_iteration
