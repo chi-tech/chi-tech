@@ -1,4 +1,4 @@
-#include "raytracing.h"
+#include "raytracing_old.h"
 #include "ChiMesh/Cell/cell.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
@@ -252,10 +252,10 @@ CheckPlaneTetIntersect(const chi_mesh::Normal& plane_normal,
 void chi_mesh::PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum& grid,
   const Cell& cell,
-  std::vector<double> &segment_lengths,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,
-  const chi_mesh::Vector3& omega)
+  const chi_mesh::Vector3& omega,
+  std::vector<double> &segment_lengths)
 {
   const chi_mesh::Vector3 khat(0,0,1);
   std::set<double> distance_set;
