@@ -41,6 +41,21 @@ struct chi_mesh::Vector3
     x=a; y=b; z=c;
   }
 
+  /**Constructor where \f$ \vec{x}=\{a,b,c\} \f$.*/
+  Vector3(std::initializer_list<double> list)
+  {
+    if (not empty(list))
+    {
+      std::vector<double> vec = list;
+      for (size_t i=0; ( (i<3) and ( i<vec.size() ) ); ++i)
+      {
+        if (i==0) x = vec[i];
+        if (i==1) y = vec[i];
+        if (i==2) z = vec[i];
+      }
+    }
+  }
+
   /**Copy constructor.*/
   Vector3(const Vector3& that)
   {
