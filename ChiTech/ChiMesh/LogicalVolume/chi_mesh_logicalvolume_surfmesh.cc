@@ -3,7 +3,7 @@
 #include "chi_mesh_logicalvolume.h"
 #include "ChiMesh/chi_mesh.h"
 #include "ChiMesh/SurfaceMesh/chi_surfacemesh.h"
-#include "ChiMesh/Raytrace/raytracing.h"
+#include "ChiMesh/Raytrace/raytracing_old.h"
 
 //###################################################################
 /**Constructor to compute bound box information.*/

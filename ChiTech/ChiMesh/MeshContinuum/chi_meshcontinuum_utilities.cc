@@ -326,6 +326,113 @@ size_t chi_mesh::MeshContinuum::
 }
 
 //###################################################################
+/**Checks whether a point is within a cell.*/
+bool chi_mesh::MeshContinuum::
+  CheckPointInsideCell(const chi_mesh::Cell& cell,
+                       const chi_mesh::Vector3& point) const
+{
+  const auto& grid_ref = *this;
+  typedef chi_mesh::Vector3 Vec3;
+  auto InsideTet = [](const Vec3& point,
+                      const Vec3& v0, const Vec3& v1, const Vec3& v2)
+  {
+    const auto& v01 = v1-v0;
+    const auto& v02 = v2-v0;
+
+    const auto n = v01.Cross(v02).Normalized();
+    const auto c = (v0 + v1 + v2)/3.0;
+
+    const auto pc = point - c;
+
+    if (pc.Dot(n) > 0.0)
+      return true;
+    else
+      return false;
+  };
+
+  bool inside = true;
+  if (cell.Type() == chi_mesh::CellType::SLAB)
+  {
+    const auto& v0 = grid_ref.vertices[cell.vertex_ids[0]];
+    const auto& v1 = grid_ref.vertices[cell.vertex_ids[1]];
+
+    const auto v01 = v1-v0;
+    const auto v0p = point-v0;
+
+    const double v0p_dot_v01 = v0p.Dot(v01);
+
+    if (not (v0p_dot_v01 >= 0 and v0p_dot_v01 < v01.Norm()))
+      inside = false;
+  }//slab
+
+  else if (cell.Type() == chi_mesh::CellType::POLYGON)
+  {
+    for (const auto& face : cell.faces)
+    {
+      const auto& vcp = point - face.centroid;
+
+      if (vcp.Dot(face.normal) > 0)
+      {
+        inside = false;
+        break;
+      }
+    }//for face
+  }//polygon
+
+  else if (cell.Type() == chi_mesh::CellType::POLYHEDRON)
+  {
+    inside = false;
+    //form tetra hedrons
+    const auto& vcc = cell.centroid;
+    for (const auto& face : cell.faces)
+    {
+      const auto& vfc = face.centroid;
+
+      const size_t num_sides = face.vertex_ids.size();
+      for (size_t s=0; s<num_sides; ++s)
+      {
+        const size_t sp1 = (s<(num_sides-1))? s+1 : 0;
+        const auto& v0 = grid_ref.vertices[face.vertex_ids[s]];
+        const auto& v1 = vfc;
+        const auto& v2 = grid_ref.vertices[face.vertex_ids[sp1]];
+        const auto& v3 = vcc;
+
+        typedef std::tuple<Vec3, Vec3, Vec3> TetFace;
+
+        std::vector<TetFace> tet_faces;
+        tet_faces.emplace_back(v0, v1, v2);
+        tet_faces.emplace_back(v0, v2, v3);
+        tet_faces.emplace_back(v1, v3, v2);
+        tet_faces.emplace_back(v0, v3, v1);
+
+        bool inside_tet = true;
+        for (const auto& tet_face : tet_faces)
+        {
+          if (not InsideTet(point, std::get<0>(tet_face),
+                            std::get<1>(tet_face),
+                            std::get<2>(tet_face)))
+          {
+            inside_tet = false;
+            break;
+          }
+        }//for triangular tet_face
+        if (inside_tet)
+        {
+          inside = true;
+          break;
+        }
+      }//for side
+      if (inside) break;
+    }//for face
+  }//polyhedron
+  else
+    throw std::logic_error("chi_mesh::MeshContinuum::CheckPointInsideCell: "
+                           "Unsupported cell-type encountered.");
+
+  return inside;
+}
+
+//###################################################################
 /**Gets and orthogonal mesh interface object.*/
 std::array<size_t,3> chi_mesh::MeshContinuum::GetIJKInfo() const
 {
