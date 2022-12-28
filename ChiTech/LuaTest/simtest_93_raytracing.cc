@@ -2,7 +2,7 @@
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiMesh/Raytrace/raytracer.h"
+#include "ChiMesh/Raytrace/raytracing.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include "ChiMath/RandomNumberGeneration/random_number_generator.h"
