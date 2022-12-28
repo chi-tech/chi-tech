@@ -63,8 +63,8 @@ chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 phys1 = chiCFEMMGDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
-chiSolverSetBasicOption(phys1, "thermal_flux_error", 1E-5)
-chiSolverSetBasicOption(phys1, "max_thermal_iters", 1120)
+chiSolverSetBasicOption(phys1, "thermal_flux_error", 1E-7)
+chiSolverSetBasicOption(phys1, "max_thermal_iters", 2000)
 chiSolverSetBasicOption(phys1, "verbose_level", 1)
 
 chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"reflecting")
@@ -78,5 +78,10 @@ chiSolverExecute(phys1)
 ----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
 -- export to 2 different VTK files. should be changed when new FF are in place
-chiExportFieldFunctionToVTK(fflist[1],"square_up_flx01","Flux_Diff01")
-chiExportFieldFunctionToVTK(fflist[2],"square_up_flx02","Flux_Diff02")
+--chiExportFieldFunctionToVTK(fflist[1],"square_up_flx01","Flux_Diff01")
+--chiExportFieldFunctionToVTK(fflist[2],"square_up_flx02","Flux_Diff02")
+
+for g=1,num_groups do
+    g_string=string.format("%03d",g)
+    chiExportFieldFunctionToVTK(fflist[g],"square_up_flx"..g_string,"Flux_Diff"..g_string)
+end
