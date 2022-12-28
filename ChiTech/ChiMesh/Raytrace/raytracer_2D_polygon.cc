@@ -1,4 +1,4 @@
-#include "raytracer.h"
+#include "raytracing.h"
 
 #include "ChiMesh/Cell/cell.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"

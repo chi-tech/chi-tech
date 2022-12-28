@@ -1,7 +1,7 @@
 #include "chi_ffinter_slice.h"
 #include "ChiMesh/Cell/cell.h"
 
-#include "ChiMesh/Raytrace/raytracing_old.h"
+#include "ChiMesh/Raytrace/raytracing.h"
 
 #include "chi_log.h"
 
