@@ -158,7 +158,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       if (fabs(yield_sum - 1.0) > eps and yield_sum > eps)
       {
         chi::log.Log0Warning()
-            << __FUNCTION__ << ": Precursor yield sum does not sum  "
+            << __FUNCTION__ << ": Precursor yield sum does not sum "
             << "to unity. Normalizing.";
         for (auto& v : precursor_yield) v /= yield_sum;
       }

@@ -62,4 +62,9 @@ void lbs_adjoint::AdjointSolver::Initialize()
                   << num_globl_subs;
   }
 
+  //================================================== Initialize source func
+  using namespace std::placeholders;
+  active_set_source_function =
+    std::bind(&AdjointSolver::SetAdjointSource, this, _1, _2, _3);
+
 }

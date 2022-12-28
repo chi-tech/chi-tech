@@ -5,12 +5,15 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "chi_mpi.h"
+#include "ChiConsole/chi_console.h"
 
 
 //###################################################################
 /**Initializes parallel arrays.*/
 void lbs::SteadySolver::InitializeParrays()
 {
+  chi::log.Log() << "Initializing parallel arrays. " << std::endl;
+
   //================================================== Initialize unknown structure
   for (size_t m=0; m<num_moments; m++)
   {
@@ -192,4 +195,9 @@ void lbs::SteadySolver::InitializeParrays()
     }//for g
   }//if empty
 
+  MPI_Barrier(MPI_COMM_WORLD);
+  chi::log.Log()
+    << "Done with parallel arrays.                Process memory = "
+    << std::setprecision(3)
+    << chi_objects::ChiConsole::GetMemoryUsageInMB() << " MB" << std::endl;
 }

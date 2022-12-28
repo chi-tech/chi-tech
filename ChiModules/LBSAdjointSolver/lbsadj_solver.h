@@ -31,9 +31,9 @@ public:
 
   explicit AdjointSolver(const std::string& solver_name);
 
-  void SetSource(lbs::LBSGroupset& groupset,
-                 std::vector<double>&  destination_q,
-                 lbs::SourceFlags source_flags) override;
+  void SetAdjointSource(lbs::LBSGroupset& groupset,
+                        std::vector<double>&  destination_q,
+                        lbs::SourceFlags source_flags);
 
   double ComputeInnerProduct();
 

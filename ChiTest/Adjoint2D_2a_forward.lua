@@ -1,6 +1,6 @@
--- 2D Transport test with localized material source
+-- 2D Transport test with point source FWD
 -- SDM: PWLD
--- Test: QOI-value=5.04171e-08
+-- Test: QOI-value=2.90386e-05
 num_procs = 4
 
 

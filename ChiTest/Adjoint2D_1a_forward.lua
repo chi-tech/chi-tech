@@ -91,8 +91,6 @@ chiPhysicsMaterialSetProperty(materials[3],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 solver_name = "LBS"
 phys1 = chiLBSCreateSolver(solver_name)
 
-chiSolverAddRegion(phys1,region1)
-
 --========== Groups
 grp = {}
 for g=1,num_groups do
