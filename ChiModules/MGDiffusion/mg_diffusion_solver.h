@@ -49,9 +49,9 @@ public:
   size_t num_local_dofs = 0;
   size_t num_globl_dofs = 0;
 
-  std::vector<Mat> A;  // linear system matrix for each group
+  std::vector<Mat> A;     // linear system matrix for each group
   std::vector<Vec> bext;  // external source vector for each group
-  std::vector<Vec> x;  // solution vector for each group
+  std::vector<Vec> x;     // solution vector for each group
   std::vector<Vec> x_old; // vector of old fluxes
 
   Vec thermal_dphi; // error vector for thermal fluxes
@@ -75,8 +75,8 @@ public:
 
   void Execute() override;
 
-  void Assemble_RHS(unsigned int g);
-  void SolveOneGroupProblem(unsigned int g);
+  void Assemble_RHS(unsigned int g, int64_t verbose);
+  void SolveOneGroupProblem(unsigned int g, int64_t verbose);
 
 protected:
 //  typedef std::map<int,Multigroup_D_and_sigR> MapMatID2XS;

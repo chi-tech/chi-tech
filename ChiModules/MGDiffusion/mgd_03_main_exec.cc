@@ -20,35 +20,38 @@ void mg_diffusion::Solver::Execute()
       KSPCG,           //Solver type
       PCGAMG,          //Preconditioner type
       basic_options("residual_tolerance").FloatValue(),  //Relative residual tolerance
-      basic_options("max_iters").IntegerValue()          //Max iterations
+      basic_options("max_inner_iters").IntegerValue()    //Max # of inner iterations
     );
 
   // shortcuts
   unsigned int lfg = mg_diffusion::Solver::last_fast_group;
   unsigned int ng = mg_diffusion::Solver::num_groups;
-  int i_=0;
-  cout << i_<<std::endl; i_++;
+
+  int64_t verbose = basic_options("verbose_level").IntegerValue();
 
   //============================================= Solve fast groups:
   for (unsigned int g=0; g<lfg; ++g)
   {
-    mg_diffusion::Solver::Assemble_RHS(g);
-    mg_diffusion::Solver::SolveOneGroupProblem(g);
+    mg_diffusion::Solver::Assemble_RHS(g, verbose);
+    mg_diffusion::Solver::SolveOneGroupProblem(g, verbose);
   }
 
   //============================================= Solve thermal groups:
   unsigned int thermal_iteration = 0;
+  // max # of thermal iterations
+  int64_t max_thermal_iters = basic_options("max_thermal_iters").IntegerValue();
+  // max thermal error between two successive iterates
+  double  thermal_tol = basic_options("thermal_flux_error").FloatValue();
+  // computed error
   double thermal_error = 0.0;
 
-  bool verbose = true;
-  int counter=0;
   do
   {
     thermal_error = 0.0;
     for (unsigned int g=lfg; g<ng; ++g)
     {
-      mg_diffusion::Solver::Assemble_RHS(g);
-      mg_diffusion::Solver::SolveOneGroupProblem(g);
+      mg_diffusion::Solver::Assemble_RHS(g, verbose);
+      mg_diffusion::Solver::SolveOneGroupProblem(g, verbose);
 
       // copy solution
       VecCopy(x[g], thermal_dphi);
@@ -59,19 +62,23 @@ void mg_diffusion::Solver::Execute()
       // copy solution
       VecCopy(x[g], x_old[g]);
     }
-    if ( verbose && (ng != lfg) )
+    if ( (verbose>0) && (ng != lfg) )
       std::cout << " --thermal iteration = " << std::setw(6)  << std::right << thermal_iteration
-                << "Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(5)
+                << ", Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(5)
                 << thermal_error << std::endl;
 
     ++thermal_iteration;
   }
-  while ((ng!=lfg) && (thermal_error > 1e-6) && (thermal_iteration < 100) );
+  while ( (ng != lfg) && (thermal_error > thermal_tol) && (thermal_iteration < max_thermal_iters) );
 
-  if (  verbose && (ng != lfg) )
+  if ( (verbose>0) && (ng != lfg) )
+  {
+    if (thermal_error < thermal_tol)
       std::cout << "Thermal iterations converged for fixed-source problem" << std::endl;
+    else
+      std::cout << "Thermal iterations NOT converged for fixed-source problem" << std::endl;
+  }
 
-
-  chi::log.Log() << "Done solving";
+  chi::log.Log() << "Done solving multi-group diffusion";
 
 }

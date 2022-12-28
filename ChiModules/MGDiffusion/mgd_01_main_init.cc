@@ -14,8 +14,12 @@
 
 //============================================= constructor
 mg_diffusion::Solver::Solver(const std::string& in_solver_name):
-  chi_physics::Solver(in_solver_name, { {"max_iters", int64_t(500)   },
-                                        {"residual_tolerance", 1.0e-2}})
+  chi_physics::Solver(in_solver_name, { {"max_inner_iters"   , int64_t(500)},
+                                        {"residual_tolerance", 1.0e-2},
+                                        {"verbose_level"     , int64_t (0) },
+                                        {"thermal_flux_error", 1.0e-2},
+                                        {"max_thermal_iters" , int64_t(500)}
+  })
 {}
 
 //============================================= destructor

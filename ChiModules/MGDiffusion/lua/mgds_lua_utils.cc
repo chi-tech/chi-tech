@@ -10,6 +10,6 @@ void mg_diffusion::mgd_lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiCFEMMGDiffusionSolverCreate);
   LUA_FMACRO1(chiCFEMMGDiffusionSetBCProperty);
 
-  LUA_CMACRO1(MAX_ITERATIONS, 1);
-  LUA_CMACRO1(TOLERANCE     , 2);
+//  LUA_CMACRO1(MAX_ITERATIONS, 1);
+//  LUA_CMACRO1(TOLERANCE     , 2);
 }
