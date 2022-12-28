@@ -20,6 +20,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
                               MainSweepScheduler& sweep_scheduler,
                               SourceFlags lhs_src_scope,
                               SourceFlags rhs_src_scope,
+                              const SetSourceFunction& set_source_function,
                               bool log_info /* = true*/)
 {
   constexpr bool WITH_DELAYED_PSI = true;
@@ -77,7 +78,8 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   //                                                    available inside
   //                                                    Action
   KSPDataContext data_context(*this, groupset, x_temp,
-                              sweep_scheduler, lhs_src_scope);
+                              sweep_scheduler, lhs_src_scope,
+                              set_source_function);
 
   //=================================================== Create the matrix-shell
   Mat A;
@@ -113,11 +115,11 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
 
   //SetSource for RHS
   auto init_q_moments_local = q_moments_local;
-  SetSource(groupset, q_moments_local, rhs_src_scope);
+  set_source_function(groupset, q_moments_local, rhs_src_scope);
 
   //Tool the sweep chunk
   auto& sweep_chunk = sweep_scheduler.GetSweepChunk();
-  bool use_surface_source_flag = (rhs_src_scope & APPLY_MATERIAL_SOURCE) and
+  bool use_surface_source_flag = (rhs_src_scope & APPLY_FIXED_SOURCES) and
                                  (not options.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
   sweep_chunk.ZeroIncomingDelayedPsi();
@@ -138,7 +140,7 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   SetPETScVecFromSTLvector(groupset, phi_old, phi_old_local);
 
   //=================================================== Retool for GMRES
-  sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_FIXED_SOURCES);
   sweep_chunk.SetDestinationPhi(phi_new_local);
 
   double phi_old_norm=0.0;
@@ -178,10 +180,10 @@ bool lbs::SteadySolver::GMRES(LBSGroupset& groupset,
   ZeroOutflowBalanceVars(groupset);
 
   sweep_chunk.SetDestinationPhi(phi_new_local);
-  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_MATERIAL_SOURCE);
+  sweep_chunk.SetSurfaceSourceActiveFlag(rhs_src_scope & APPLY_FIXED_SOURCES);
 
   q_moments_local = init_q_moments_local;
-  SetSource(groupset, q_moments_local, lhs_src_scope | rhs_src_scope);
+  set_source_function(groupset, q_moments_local, lhs_src_scope | rhs_src_scope);
 
   sweep_chunk.ZeroDestinationPhi();
   sweep_scheduler.Sweep();

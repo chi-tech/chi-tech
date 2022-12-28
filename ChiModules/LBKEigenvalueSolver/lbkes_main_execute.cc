@@ -1,7 +1,6 @@
 #include "lbkes_k_eigenvalue_solver.h"
 
-#include <chi_log.h>
-;
+#include "chi_log.h"
 
 #include <iomanip>
 

@@ -19,6 +19,7 @@ int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   MainSweepScheduler& sweep_scheduler = context->sweep_scheduler;
   auto& sweep_chunk = context->sweep_scheduler.GetSweepChunk();
   SourceFlags& lhs_source_scope = context->lhs_scope;
+  auto& set_source_function = context->set_source_function;
 
   //============================================= Copy krylov vector into local
   solver.SetSTLvectorFromPETScVec(groupset,
@@ -28,7 +29,7 @@ int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   //============================================= Setting the source using
   //                                              updated phi_old
   solver.q_moments_local.assign(solver.q_moments_local.size(), 0.0);
-  solver.SetSource(groupset, solver.q_moments_local, lhs_source_scope);
+  set_source_function(groupset, solver.q_moments_local, lhs_source_scope);
 
   //============================================= Sweeping the new source
   sweep_chunk.ZeroFluxDataStructures();

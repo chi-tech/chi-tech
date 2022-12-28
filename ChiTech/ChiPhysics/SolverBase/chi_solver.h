@@ -32,8 +32,9 @@ public:
 
   std::string TextName() const {return text_name;}
 
-  virtual void Initialize() = 0;
-  virtual void Execute() = 0;
+  virtual void Initialize();
+  virtual void Execute();
+  virtual void Step();
 };
 
 

@@ -1,12 +1,49 @@
-#include "lbs_sweepchunk_pwl.h"
+#include "lbts_sweepchunk_pwl.h"
 
 #include "chi_runtime.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
-#ifdef WITH_READABLE_CHUNK
+#include "chi_log.h"
 
-double* lbs::SweepChunkPWL::Upwinder::
-  GetUpwindPsi(int fj, bool local, bool boundary) const
+//###################################################################
+/**Constructor.*/
+lbs::SweepChunkPWLTransientTheta::
+SweepChunkPWLTransientTheta(
+  std::shared_ptr<chi_mesh::MeshContinuum> grid_ptr,
+  chi_math::SpatialDiscretization_PWLD& discretization,
+  std::vector<lbs::CellLBSView>& cell_transport_views,
+  std::vector<double>& destination_phi,
+  std::vector<double>& destination_psi,
+  const std::vector<double>& psi_prev_ref,
+  const double input_theta,
+  const double time_step,
+  const std::vector<double>& source_moments,
+  LBSGroupset& in_groupset,
+  const TCrossSections& in_xsections,
+  const int in_num_moms,
+  const int in_max_num_cell_dofs)
+                    : SweepChunk(destination_phi, destination_psi,
+                                 in_groupset.angle_agg, false),
+                      grid_view(std::move(grid_ptr)),
+                      grid_fe_view(discretization),
+                      grid_transport_view(cell_transport_views),
+                      q_moments(source_moments),
+                      groupset(in_groupset),
+                      xsections(in_xsections),
+                      num_moms(in_num_moms),
+                      num_grps(in_groupset.groups.size()),
+                      max_num_cell_dofs(in_max_num_cell_dofs),
+                      save_angular_flux(!destination_psi.empty()),
+                      psi_prev(psi_prev_ref),
+                      theta(input_theta),
+                      dt(time_step),
+                      a_and_b_initialized(false)
+{
+
+}
+
+double* lbs::SweepChunkPWLTransientTheta::Upwinder::
+GetUpwindPsi(int fj, bool local, bool boundary) const
 {
   double* psi;
   if (local)             psi = fluds->UpwindPsi(spls_index,
@@ -22,21 +59,21 @@ double* lbs::SweepChunkPWL::Upwinder::
   return psi;
 }
 
-double* lbs::SweepChunkPWL::Upwinder::
-  GetDownwindPsi(int fi, bool local, bool boundary, bool reflecting_bndry) const
+double* lbs::SweepChunkPWLTransientTheta::Upwinder::
+GetDownwindPsi(int fi, bool local, bool boundary, bool reflecting_bndry) const
 {
   double* psi;
   if (local)                 psi = fluds->
-    OutgoingPsi(spls_index,
-                out_face_counter,
-                fi, angle_set_index);
-  else if (not boundary)     psi = fluds->
-    NLOutgoingPsi(deploc_face_counter,
+      OutgoingPsi(spls_index,
+                  out_face_counter,
                   fi, angle_set_index);
+  else if (not boundary)     psi = fluds->
+      NLOutgoingPsi(deploc_face_counter,
+                    fi, angle_set_index);
   else if (reflecting_bndry) psi = angle_set->
-    ReflectingPsiOutBoundBndry(bndry_id, angle_num,
-                               cell_local_id, f,
-                               fi, gs_ss_begin);
+      ReflectingPsiOutBoundBndry(bndry_id, angle_num,
+                                 cell_local_id, f,
+                                 fi, gs_ss_begin);
   else
     psi = nullptr;
 
@@ -45,7 +82,7 @@ double* lbs::SweepChunkPWL::Upwinder::
 
 //###################################################################
 /**Actual sweep function*/
-void lbs::SweepChunkPWL::
+void lbs::SweepChunkPWLTransientTheta::
   Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
 {
   if (!a_and_b_initialized)
@@ -74,6 +111,12 @@ void lbs::SweepChunkPWL::
   auto const& d2m_op = groupset.quadrature->GetDiscreteToMomentOperator();
   auto const& m2d_op = groupset.quadrature->GetMomentToDiscreteOperator();
 
+  const auto& psi_uk_man = groupset.psi_uk_man;
+  typedef const int64_t cint64_t;
+
+  const bool fixed_src_active = surface_source_active;
+//  const bool fixed_src_active = true;
+
   // ========================================================== Loop over each cell
   size_t num_loc_cells = spds->spls.item_id.size();
   for (size_t spls_index = 0; spls_index < num_loc_cells; ++spls_index)
@@ -87,6 +130,14 @@ void lbs::SweepChunkPWL::
     const auto& sigma_tg = transport_view.XS().sigma_t;
     std::vector<bool> face_incident_flags(num_faces, false);
     std::vector<double> face_mu_values(num_faces, 0.0);
+
+    //Transient parameters
+    const auto& inv_velg = transport_view.XS().inv_velocity;
+    const double inv_theta = 1.0/theta;
+    const double inv_dt    = 1.0/dt;
+    std::vector<double> tau_gsg(gs_ss_size, 0.0);
+    for (size_t gsg = 0; gsg < gs_ss_size; ++gsg)
+      tau_gsg[gsg] = inv_velg[gs_gi+gsg]*inv_theta*inv_dt;
 
     // =================================================== Get Cell matrices
     const auto& G           = fe_intgrl_values.GetIntV_shapeI_gradshapeJ();
@@ -116,12 +167,12 @@ void lbs::SweepChunkPWL::
 
       // ============================================ Upwinding structure
       Upwinder upwind{fluds, angle_set, spls_index, angle_set_index,
-                      /*in_face_counter*/0,
-                      /*preloc_face_counter*/0,
-                      /*out_face_counter*/0,
-                      /*deploc_face_counter*/0,
-                      /*bndry_id*/0, angle_num, cell.local_id,
-                      /*f*/0,gs_gi, gs_ss_begin,
+        /*in_face_counter*/0,
+        /*preloc_face_counter*/0,
+        /*out_face_counter*/0,
+        /*deploc_face_counter*/0,
+        /*bndry_id*/0, angle_num, cell.local_id,
+        /*f*/0,gs_gi, gs_ss_begin,
                       surface_source_active};
 
       // ============================================ Surface integrals
@@ -181,13 +232,16 @@ void lbs::SweepChunkPWL::
             const size_t ir = transport_view.MapDOF(i, m, g);
             temp_src += m2d_op[m][angle_num]*q_moments[ir];
           }//for m
+          cint64_t imap = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+          if (fixed_src_active)
+            temp_src += tau_gsg[gsg] * psi_prev[imap + gsg];
           source[i] = temp_src;
         }//for i
 
         // ============================= Mass Matrix and Source
         // Atemp  = Amat + sigma_tgr * M
         // b     += M * q
-        const double sigma_tgr = sigma_tg[g];
+        const double sigma_tgr = sigma_tg[g] + tau_gsg[gsg];
         for (int i = 0; i < num_nodes; ++i)
         {
           double temp = 0.0;
@@ -222,12 +276,12 @@ void lbs::SweepChunkPWL::
       // ============================= Save angular fluxes if needed
       if (save_angular_flux)
       {
-        const auto& psi_uk_man = groupset.psi_uk_man;
         for (int i = 0; i < num_nodes; ++i)
         {
-          int64_t ir = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
+          cint64_t imap = grid_fe_view.MapDOFLocal(cell,i,psi_uk_man,angle_num,0);
           for (int gsg = 0; gsg < gs_ss_size; ++gsg)
-            output_psi[ir + gsg] = b[gsg][i];
+            output_psi[imap + gsg] =
+              inv_theta*(b[gsg][i] + (theta-1.0) * psi_prev[imap + gsg]);
         }//for i
       }//if save psi
 
@@ -276,5 +330,3 @@ void lbs::SweepChunkPWL::
     } // for n
   } // for cell
 }//Sweep
-
-#endif

@@ -65,17 +65,19 @@ void lbs::SteadySolver::SolveGroupset(LBSGroupset& groupset)
   if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
   {
     ClassicRichardson(groupset, sweep_scheduler,
-                      APPLY_MATERIAL_SOURCE |
-                      APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
-                      APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE,
+                      APPLY_FIXED_SOURCES |
+                      APPLY_AGS_SCATTER_SOURCES | APPLY_WGS_SCATTER_SOURCES |
+                      APPLY_AGS_FISSION_SOURCES | APPLY_WGS_FISSION_SOURCES,
+                      active_set_source_function,
                       options.verbose_inner_iterations);
   }
   else if (groupset.iterative_method == IterativeMethod::GMRES)
   {
     GMRES(groupset, sweep_scheduler,
-          APPLY_WGS_SCATTER_SOURCE | APPLY_WGS_FISSION_SOURCE,  //lhs_scope
-          APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE |
-          APPLY_AGS_FISSION_SOURCE,                             //rhs_scope
+          APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
+          APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
+          APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
+          active_set_source_function,
           options.verbose_inner_iterations);
   }
   else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
@@ -83,9 +85,10 @@ void lbs::SteadySolver::SolveGroupset(LBSGroupset& groupset)
            groupset.iterative_method == IterativeMethod::KRYLOV_BICGSTAB)
   {
     Krylov(groupset, sweep_scheduler,
-           APPLY_WGS_SCATTER_SOURCE | APPLY_WGS_FISSION_SOURCE,  //lhs_scope
-           APPLY_MATERIAL_SOURCE | APPLY_AGS_SCATTER_SOURCE |
-           APPLY_AGS_FISSION_SOURCE,                             //rhs_scope
+           APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
+           APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
+           APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
+           active_set_source_function,
            options.verbose_inner_iterations);
   }
 

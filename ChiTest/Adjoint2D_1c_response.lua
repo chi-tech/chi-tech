@@ -1,4 +1,4 @@
--- 2D Transport test with localized material source adjoint response
+-- 2D Transport test with localized material source Adjoint response
 -- SDM: PWLD
 -- Test: Inner-product=1.38405e-05
 num_procs = 4

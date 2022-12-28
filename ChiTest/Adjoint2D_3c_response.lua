@@ -1,6 +1,6 @@
--- 2D Transport test with localized material source adjoint response
+-- 2D Transport test with point source Multigroup Adjoint Response
 -- SDM: PWLD
--- Test: Inner-product=5.04415e-08
+-- Test: Inner-product=3.30607e-06
 num_procs = 4
 
 
@@ -79,8 +79,6 @@ src[1] = 1.0
 --############################################### Setup Physics
 solver_name = "LBAdjointResponse"
 phys1 = chiAdjointSolverCreate(solver_name)
-
-chiSolverAddRegion(phys1,region1)
 
 --========== Groups
 grp = {}

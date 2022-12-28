@@ -25,7 +25,7 @@ int chiSolverInitialize(lua_State *L)
   LuaCheckNilValue(fname, L, 1);
   LuaCheckIntegerValue(fname, L, 1);
 
-  int solver_handle = lua_tonumber(L, 1);
+  const int solver_handle = lua_tonumber(L, 1);
 
   auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
 
@@ -51,11 +51,37 @@ int chiSolverExecute(lua_State *L)
   LuaCheckNilValue(fname, L, 1);
   LuaCheckIntegerValue(fname, L, 1);
 
-  int solver_handle = lua_tonumber(L, 1);
+  const int solver_handle = lua_tonumber(L, 1);
 
   auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
 
   solver.Execute();
+
+  return 0;
+}
+
+//#############################################################################
+/** Performs a single timestep for the solver at the given handle.
+
+\param solver_handle int Handle to the solver.
+
+\ingroup LuaSolver
+\author Jan*/
+int chiSolverStep(lua_State *L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckIntegerValue(fname, L, 1);
+
+  const int solver_handle = lua_tonumber(L, 1);
+
+  auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,fname);
+
+  solver.Step();
 
   return 0;
 }
@@ -139,4 +165,31 @@ int chiSolverSetBasicOption(lua_State* L)
   }
 
   return 0;
+}
+
+//#############################################################################
+/** Returns the text name of the solver.
+
+\param solver_handle int Handle to the solver.
+
+\ingroup LuaSolver
+\author Jan*/
+int chiSolverGetName(lua_State *L)
+{
+  const std::string fname = "chiSolverGetName";
+  const int num_args = lua_gettop(L);
+
+  if (num_args != 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+  LuaCheckNilValue(fname, L, 1);
+  LuaCheckIntegerValue(fname, L, 1);
+
+  const int solver_handle = lua_tonumber(L, 1);
+
+  const auto& solver = chi_physics::lua_utils::GetSolverByHandle(solver_handle,
+                                                                 fname);
+
+  lua_pushstring(L, solver.TextName().c_str());
+
+  return 1;
 }
