@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
 
 mesh={}
-N=10
+N=2
 L=2
 xmin = -L/2
 dx = L/N
@@ -63,6 +63,9 @@ chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 phys1 = chiCFEMMGDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
+chiSolverSetBasicOption(phys1, "thermal_flux_error", 1E-5)
+chiSolverSetBasicOption(phys1, "max_thermal_iters", 1120)
+chiSolverSetBasicOption(phys1, "verbose_level", 1)
 
 chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"reflecting")
 chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"reflecting")

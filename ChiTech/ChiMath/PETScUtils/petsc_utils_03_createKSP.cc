@@ -60,8 +60,8 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
                         nullptr, nullptr);
   KSPSetFromOptions(setup.ksp);
 
-  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,
-                nullptr, nullptr);
+//  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,
+//                nullptr, nullptr);
 
   return setup;
 }

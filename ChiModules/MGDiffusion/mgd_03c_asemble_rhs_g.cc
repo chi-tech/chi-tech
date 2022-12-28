@@ -4,19 +4,14 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //========================================================== Solve 1g problem
-void mg_diffusion::Solver::Assemble_RHS(const unsigned int g)
+void mg_diffusion::Solver::Assemble_RHS(const unsigned int g, const int64_t verbose)
 {
-  chi::log.Log() << "\n\nFinalizing assembly for group " + std::to_string(g) ;
+  if (verbose>2)
+    chi::log.Log() << "\nFinalizing assembly for group " + std::to_string(g);
 
   // copy the external source vector for group g into b
   VecSet(b, 0.0);
-//  cout << "\n\n----------------------------------flx[0]\n";
-//  VecView(x[0], PETSC_VIEWER_STDERR_WORLD);
   VecCopy(bext[g], b);
-//  cout << "bext["<<g<<"]\n";
-//  VecView(bext[g], PETSC_VIEWER_STDERR_WORLD);
-//  cout << "b=bext["<<g<<"]\n";
-//  VecView(b, PETSC_VIEWER_STDERR_WORLD);
 
   const auto& sdm  = *mg_diffusion::Solver::sdm_ptr;
   // compute inscattering term
@@ -31,11 +26,8 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g)
 
     for (const auto& [row_g, gprime, sigma_sm] : S.Row(g))
     {
-      if (gprime != g) // jcr row_g ??
+      if (gprime != g) // g and row_g are the same, maybe different int types
       {
-//        chi::log.Log() << "g,row_g,gprime,sigma_sm: "
-//                       << g << "," << row_g << "," << gprime  << "," << sigma_sm << std::endl;
-
         const double* xlocal;
         VecGetArrayRead(x[gprime], &xlocal);
 
@@ -56,7 +48,6 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g)
                          qp_data.JxW(qp);
           }//for j
           // add inscattering value to vector
-//          cout << "==========" << i <<", "<< inscatter_g << std::endl;
           VecSetValue(b, imap, inscatter_g, ADD_VALUES);
         }//for i
         VecRestoreArrayRead(x[gprime], &xlocal);
