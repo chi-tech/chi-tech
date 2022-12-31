@@ -23,11 +23,17 @@ void mg_diffusion::Solver::Execute()
       basic_options("max_inner_iters").IntegerValue()    //Max # of inner iterations
     );
 
+
   // shortcuts
   unsigned int lfg = mg_diffusion::Solver::last_fast_group;
   unsigned int ng = mg_diffusion::Solver::num_groups;
 
   int64_t verbose = basic_options("verbose_level").IntegerValue();
+  my_app_context.verbose = verbose > 0 ? PETSC_TRUE : PETSC_FALSE;
+  if (my_app_context.verbose == PETSC_TRUE)
+    cout << "--context TRUE" << endl;
+  if (my_app_context.verbose == PETSC_FALSE)
+    cout << "--context FALSE" << endl;
 
   //============================================= Solve fast groups:
   for (unsigned int g=0; g<lfg; ++g)

@@ -21,6 +21,11 @@ namespace chi_math::PETScUtils
     int    maximum_iterations = 100;
   };
 
+  struct KSPAppContext
+  {
+    PetscBool verbose;
+  };
+
   //01
   Vec CreateVector(int64_t local_size, int64_t global_size);
   void CreateVector(Vec& x, int64_t local_size, int64_t global_size);

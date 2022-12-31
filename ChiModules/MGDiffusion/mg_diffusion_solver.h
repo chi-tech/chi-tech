@@ -58,6 +58,7 @@ public:
   Vec b; // actual rhs vector for the linear system A[g] x[g] = b
 
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
+  chi_math::PETScUtils::KSPAppContext my_app_context;
 
   typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
