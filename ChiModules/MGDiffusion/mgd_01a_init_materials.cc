@@ -133,24 +133,24 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
     // loop over all materials
     for (const auto &mat_id_xs: matid_to_xs_map)
     {
-      bool found_upscattering = false;
-      cout << "+++++ mat ID = " << mat_id_xs.first << endl;
+//      bool found_upscattering = false;
+//      cout << "+++++ mat ID = " << mat_id_xs.first << endl;
       // get the P0 transfer matrix
       const auto &S = mat_id_xs.second->transfer_matrices[0];
       // loop over all row of the transfer matrix
-      int counter=-1;
+//      int counter=-1;
       for (int g = mg_diffusion::Solver::num_groups-1; g >=0 ; --g)
       {
-        counter++;
-        cout<<"counter="<<counter<<endl;
-        cout << "g = " << g << endl;
+//        counter++;
+//        cout<<"counter="<<counter<<endl;
+//        cout << "g = " << g << endl;
         for (const auto &[row_g, gp, sigma_sm]: S.Row(g))
         {
-          cout << "g, row_g, gp, xs: " << g<<", "<<row_g << ", " << gp << ", " << sigma_sm << endl;
+//          cout << "g, row_g, gp, xs: " << g<<", "<<row_g << ", " << gp << ", " << sigma_sm << endl;
           if ((std::fabs(sigma_sm) > 1e-10) && (gp > row_g))
             lfg = std::min(lfg, static_cast<unsigned int>(row_g));
         }
-        cout << "LFG = " << lfg << endl;
+//        cout << "LFG = " << lfg << endl;
       }
     }// loop on materials
   }//if num_groups>1

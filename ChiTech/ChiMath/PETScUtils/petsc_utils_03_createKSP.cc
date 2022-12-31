@@ -31,6 +31,8 @@ KSPSetConvergenceTest(setup.ksp,&RelativeResidualConvergenceTest,NULL,NULL);
 
 return setup;
 \endcode*/
+chi_math::PETScUtils::KSPAppContext my_app_context;
+
 chi_math::PETScUtils::PETScSolverSetup
 chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
   Mat ref_matrix,
@@ -60,8 +62,10 @@ chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
                         nullptr, nullptr);
   KSPSetFromOptions(setup.ksp);
 
-//  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,
-//                nullptr, nullptr);
+  KSPSetApplicationContext(setup.ksp,(void*)&my_app_context);
+
+  KSPMonitorSet(setup.ksp,&chi_math::PETScUtils::GeneralKSPMonitor,
+                nullptr, nullptr);
 
   return setup;
 }
@@ -127,17 +131,21 @@ PetscErrorCode chi_math::PETScUtils::GeneralKSPMonitor(
   if (ksp_name == nullptr)
     ksp_name = NONAME_SOLVER;
 
+  KSPGetApplicationContext(ksp, &my_app_context);
   //Print message
-  std::stringstream buff;
-  buff
-    << ksp_name
-    << " iteration "
-    << std::setw(4) << n
-    << " - Residual "
-    << std::scientific << std::setprecision(7) << rnorm / rhs_norm
-    << std::endl;
+  if (my_app_context.verbose == PETSC_TRUE)
+  {
+    std::stringstream buff;
+    buff
+      << ksp_name
+      << " iteration "
+      << std::setw(4) << n
+      << " - Residual "
+      << std::scientific << std::setprecision(7) << rnorm / rhs_norm
+      << std::endl;
 
-  chi::log.Log() << buff.str();
+    chi::log.Log() << buff.str();
+  }
 
   return 0;
 }
