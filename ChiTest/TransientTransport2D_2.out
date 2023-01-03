@@ -1,0 +1,408 @@
+[0]  Parsing argument 1 ChiTest/TransientTransport2D_2.lua
+[0]  Parsing argument 2 master_export=false
+[0]  2022-12-19 20:22:13 Running ChiTech in batch-mode with 2 processes.
+[0]  ChiTech version 1.0.2
+[0]  ChiTech number of arguments supplied: 2
+[0]  Computing cell-centroids.
+[0]  Done computing cell-centroids.
+[0]  Checking cell-center-to-face orientations
+[0]  Done checking cell-center-to-face orientations
+[0]  00:00:00 Establishing cell connectivity.
+[0]  00:00:00 Vertex cell subscriptions complete.
+[0]  00:00:00 Surpassing cell 2 of 16 (10%)
+[0]  00:00:00 Surpassing cell 4 of 16 (20%)
+[0]  00:00:00 Surpassing cell 5 of 16 (30%)
+[0]  00:00:00 Surpassing cell 7 of 16 (40%)
+[0]  00:00:00 Surpassing cell 8 of 16 (50%)
+[0]  00:00:00 Surpassing cell 10 of 16 (60%)
+[0]  00:00:00 Surpassing cell 12 of 16 (70%)
+[0]  00:00:00 Surpassing cell 13 of 16 (80%)
+[0]  00:00:00 Surpassing cell 15 of 16 (90%)
+[0]  00:00:00 Surpassing cell 16 of 16 (100%)
+[0]  00:00:00 Establishing cell boundary connectivity.
+[0]  00:00:00 Done establishing cell connectivity.
+[0]  00:00:00 VolumeMesherPredefinedUnpartitioned executing. Memory in use = 23.4062 MB
+[0]  Computed centroids
+[0]  Partitioning mesh with ParMETIS.
+[0]  Done partitioning mesh.
+[0]  Cells loaded.
+[0]  VolumeMesherPredefinedUnpartitioned: Cells created = 16
+[0]  00:00:00 chiVolumeMesherExecute: Volume meshing completed. Memory used = 1.28 MB
+[0]  Total process memory used after meshing 24.7 MB
+[0]  00:00:00 Setting material id 0 to all cells.
+[0]  00:00:00 Done setting material id 0 to all cells
+[0]  Reading Chi cross-section file "ChiTest/xs_inf_critical_1g.cxs"
+[0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
+[0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
+[0]  Reading Chi cross-section file "ChiTest/xs_inf_21cent_1g.cxs"
+[0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
+[0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
+[0]  LBSTransientSolver created.
+[0]  Creating Gauss-Legendre-ChebyShev Quadrature
+[0]  Optimizing angular quadrature for polar symmetry. using normalization factor 12.5664.
+[0]  Groupset 0 quadrature set to quadrature with 16 azimuthal angles and 3 polar angles. 
+[0]  Groupset 0 angle aggregation divisions set to 1
+[0]  Groupset 0 subset divisions set to 8
+[0]  Groupset 0 residual tolerance set to 1.0000e-06
+[0]  Groupset 0 max # iterations set to 1000
+[0]  Groupset 0 GMRES restart interval set to set to 100
+[0]  Boundary 1 set to Reflecting.
+[0]  Boundary 0 set to Reflecting.
+[0]  Boundary 3 set to Reflecting.
+[0]  Boundary 2 set to Reflecting.
+[0]  LinearBoltzmann::KEigenvalueSolver: max_iterations set to 100.
+[0]  LinearBoltzmann::KEigenvalueSolver: tolerance set to 1.0000e-08.
+[0]  LBS option: use_precursors set to 1
+[0]  LBS option: verbose_inner_iterations set to 0
+[0]  LBS option: verbose_outer_iterations set to 1
+[0]  Initializing LBSTransientSolver.
+[0]  
+[0]  Initializing LBS Solver with name: LBSTransientSolver
+[0]  
+[0]  Scattering order    : 1
+[0]  Number of Groups    : 1
+[0]  Number of Group sets: 1
+[0]  
+[0]  ***** Groupset 0 *****
+[0]  Groups: 
+[0]      0 
+[0]  
+[0]  **WARNING** lbs::SteadySolver::InitMaterials: Found material "Test Material" has a scattering order of 0 and the simulation has a scattering order of 1. The higher moments will therefore not be used.
+[0]  Initializing spatial discretization.
+[0]  00:00:00 Computing unit integrals.
+[0]  00:00:00 Computing neighbor unit integrals.
+[0]  Computing unit integrals.
+[0]  Cell matrices computed.                   Process memory = 25.7 MB
+[0]  Groupset subset 0 0->0
+[0]  Initializing parallel arrays. 
+[0]  Done with parallel arrays.                Process memory = 25.8 MB
+[0]  
+[0]  ********** Solving k-eigenvalue problem with the Power Method.
+[0]  00:00:00   Iteration     1  k_eff       2979  k_eff change   0.999664  reactivity    99966.4
+[0]  00:00:00   Iteration     2  k_eff          1  k_eff change       2978  reactivity 0.00572226
+[0]  00:00:00   Iteration     3  k_eff          1  k_eff change 2.62013e-13  reactivity 0.00572224 CONVERGED
+[0]  
+[0]          Final k-eigenvalue    :        1
+[0]          Final change          :        2.62013e-13
+[0]  
+[0]  LinearBoltzmann::KEigenvalueSolver execution completed
+[0]  
+[0]  LBSTransientSolver Initial Fission Rate FR=    0.503525
+[0]  LBSTransientSolver Beta=700.00 [pcm] reactivity=0.000 [$]
+[0]  Initializing groupset sweeping dataLBSTransientSolver.
+[0]  Done initializing LBSTransientSolver.
+[0]  LBSTransientSolver: dt set to 0.001000
+[0]  LBSTransientSolver: verbosity_level set to 0
+[0]  LBSTransientSolver    1 time=     0.001 dt=     0.001 period= -1.75e+04 FR= 1.000e+00
+[0]  LBSTransientSolver    2 time=     0.002 dt=     0.001 period=  -5.4e+04 FR= 1.000e+00
+[0]  LBSTransientSolver    3 time=     0.003 dt=     0.001 period= -1.67e+05 FR= 1.000e+00
+[0]  LBSTransientSolver    4 time=     0.004 dt=     0.001 period= -5.09e+05 FR= 1.000e+00
+[0]  LBSTransientSolver    5 time=     0.005 dt=     0.001 period= -1.51e+06 FR= 1.000e+00
+[0]  LBSTransientSolver    6 time=     0.006 dt=     0.001 period= -4.16e+06 FR= 1.000e+00
+[0]  LBSTransientSolver    7 time=     0.007 dt=     0.001 period= -9.96e+06 FR= 1.000e+00
+[0]  LBSTransientSolver    8 time=     0.008 dt=     0.001 period= -2.76e+07 FR= 1.000e+00
+[0]  LBSTransientSolver    9 time=     0.009 dt=     0.001 period= -2.39e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   10 time=      0.01 dt=     0.001 period=    -2e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   11 time=     0.011 dt=     0.001 period=  -4.4e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   12 time=     0.012 dt=     0.001 period= -2.65e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   13 time=     0.013 dt=     0.001 period= -2.91e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   14 time=     0.014 dt=     0.001 period=  -3.7e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   15 time=     0.015 dt=     0.001 period= -2.96e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   16 time=     0.016 dt=     0.001 period=  -3.1e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   17 time=     0.017 dt=     0.001 period= -2.69e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   18 time=     0.018 dt=     0.001 period= -3.22e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   19 time=     0.019 dt=     0.001 period= -3.67e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   20 time=      0.02 dt=     0.001 period= -2.94e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   21 time=     0.021 dt=     0.001 period= -3.17e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   22 time=     0.022 dt=     0.001 period= -2.13e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   23 time=     0.023 dt=     0.001 period= -3.78e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   24 time=     0.024 dt=     0.001 period= -3.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   25 time=     0.025 dt=     0.001 period= -3.27e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   26 time=     0.026 dt=     0.001 period= -2.84e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   27 time=     0.027 dt=     0.001 period= -3.86e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   28 time=     0.028 dt=     0.001 period= -2.58e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   29 time=     0.029 dt=     0.001 period= -3.13e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   30 time=      0.03 dt=     0.001 period= -2.57e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   31 time=     0.031 dt=     0.001 period= -4.02e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   32 time=     0.032 dt=     0.001 period= -2.97e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   33 time=     0.033 dt=     0.001 period= -3.09e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   34 time=     0.034 dt=     0.001 period= -1.91e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   35 time=     0.035 dt=     0.001 period= -3.86e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   36 time=     0.036 dt=     0.001 period= -3.17e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   37 time=     0.037 dt=     0.001 period= -2.11e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   38 time=     0.038 dt=     0.001 period= -4.18e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   39 time=     0.039 dt=     0.001 period= -3.24e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   40 time=      0.04 dt=     0.001 period= -2.75e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   41 time=     0.041 dt=     0.001 period= -2.97e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   42 time=     0.042 dt=     0.001 period= -3.85e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   43 time=     0.043 dt=     0.001 period= -3.09e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   44 time=     0.044 dt=     0.001 period= -3.73e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   45 time=     0.045 dt=     0.001 period= -1.91e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   46 time=     0.046 dt=     0.001 period= -3.49e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   47 time=     0.047 dt=     0.001 period= -3.16e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   48 time=     0.048 dt=     0.001 period= -3.09e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   49 time=     0.049 dt=     0.001 period= -6.33e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   50 time=      0.05 dt=     0.001 period= -2.39e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   51 time=     0.051 dt=     0.001 period= -3.56e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   52 time=     0.052 dt=     0.001 period= -2.52e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   53 time=     0.053 dt=     0.001 period= -3.17e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   54 time=     0.054 dt=     0.001 period= -2.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   55 time=     0.055 dt=     0.001 period= -3.47e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   56 time=     0.056 dt=     0.001 period= -4.96e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   57 time=     0.057 dt=     0.001 period= -4.99e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   58 time=     0.058 dt=     0.001 period= -2.12e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   59 time=     0.059 dt=     0.001 period= -3.46e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   60 time=      0.06 dt=     0.001 period= -2.25e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   61 time=     0.061 dt=     0.001 period= -6.36e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   62 time=     0.062 dt=     0.001 period= -2.23e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   63 time=     0.063 dt=     0.001 period= -3.74e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   64 time=     0.064 dt=     0.001 period= -3.22e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   65 time=     0.065 dt=     0.001 period= -3.57e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   66 time=     0.066 dt=     0.001 period= -3.22e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   67 time=     0.067 dt=     0.001 period= -4.28e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   68 time=     0.068 dt=     0.001 period=  -2.5e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   69 time=     0.069 dt=     0.001 period= -2.75e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   70 time=      0.07 dt=     0.001 period= -2.91e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   71 time=     0.071 dt=     0.001 period= -2.42e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   72 time=     0.072 dt=     0.001 period= -1.42e+08 FR= 1.000e+00
+[0]  LBSTransientSolver   73 time=     0.073 dt=     0.001 period= -2.83e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   74 time=     0.074 dt=     0.001 period= -1.77e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   75 time=     0.075 dt=     0.001 period= -3.89e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   76 time=     0.076 dt=     0.001 period= -3.58e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   77 time=     0.077 dt=     0.001 period= -3.51e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   78 time=     0.078 dt=     0.001 period= -2.64e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   79 time=     0.079 dt=     0.001 period= -3.19e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   80 time=      0.08 dt=     0.001 period= -3.48e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   81 time=     0.081 dt=     0.001 period= -2.47e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   82 time=     0.082 dt=     0.001 period= -5.26e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   83 time=     0.083 dt=     0.001 period= -2.19e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   84 time=     0.084 dt=     0.001 period= -3.39e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   85 time=     0.085 dt=     0.001 period= -3.88e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   86 time=     0.086 dt=     0.001 period= -3.26e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   87 time=     0.087 dt=     0.001 period= -5.56e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   88 time=     0.088 dt=     0.001 period= -1.84e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   89 time=     0.089 dt=     0.001 period= -6.87e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   90 time=      0.09 dt=     0.001 period= -3.94e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   91 time=     0.091 dt=     0.001 period= -2.03e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   92 time=     0.092 dt=     0.001 period= -2.62e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   93 time=     0.093 dt=     0.001 period= -8.91e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   94 time=     0.094 dt=     0.001 period= -2.78e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   95 time=     0.095 dt=     0.001 period= -2.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   96 time=     0.096 dt=     0.001 period= -4.98e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   97 time=     0.097 dt=     0.001 period= -4.16e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   98 time=     0.098 dt=     0.001 period= -3.23e+07 FR= 1.000e+00
+[0]  LBSTransientSolver   99 time=     0.099 dt=     0.001 period=  -3.5e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  100 time=       0.1 dt=     0.001 period= -3.95e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  101 time=     0.101 dt=     0.001 period= -2.21e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  102 time=     0.102 dt=     0.001 period= -3.74e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  103 time=     0.103 dt=     0.001 period=  -2.4e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  104 time=     0.104 dt=     0.001 period= -3.34e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  105 time=     0.105 dt=     0.001 period= -2.86e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  106 time=     0.106 dt=     0.001 period=  -5.5e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  107 time=     0.107 dt=     0.001 period= -3.03e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  108 time=     0.108 dt=     0.001 period= -3.39e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  109 time=     0.109 dt=     0.001 period= -3.94e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  110 time=      0.11 dt=     0.001 period= -2.83e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  111 time=     0.111 dt=     0.001 period= -3.95e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  112 time=     0.112 dt=     0.001 period= -1.79e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  113 time=     0.113 dt=     0.001 period= -4.38e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  114 time=     0.114 dt=     0.001 period= -3.58e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  115 time=     0.115 dt=     0.001 period= -3.11e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  116 time=     0.116 dt=     0.001 period= -3.02e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  117 time=     0.117 dt=     0.001 period= -3.16e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  118 time=     0.118 dt=     0.001 period= -5.32e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  119 time=     0.119 dt=     0.001 period= -3.42e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  120 time=      0.12 dt=     0.001 period= -3.59e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  121 time=     0.121 dt=     0.001 period= -4.25e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  122 time=     0.122 dt=     0.001 period= -2.55e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  123 time=     0.123 dt=     0.001 period= -3.81e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  124 time=     0.124 dt=     0.001 period= -3.44e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  125 time=     0.125 dt=     0.001 period= -4.73e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  126 time=     0.126 dt=     0.001 period= -2.37e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  127 time=     0.127 dt=     0.001 period= -2.54e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  128 time=     0.128 dt=     0.001 period= -2.41e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  129 time=     0.129 dt=     0.001 period= -2.95e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  130 time=      0.13 dt=     0.001 period= -6.85e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  131 time=     0.131 dt=     0.001 period=  -3.1e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  132 time=     0.132 dt=     0.001 period= -4.97e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  133 time=     0.133 dt=     0.001 period= -2.32e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  134 time=     0.134 dt=     0.001 period= -4.06e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  135 time=     0.135 dt=     0.001 period= -3.44e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  136 time=     0.136 dt=     0.001 period= -4.79e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  137 time=     0.137 dt=     0.001 period= -2.45e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  138 time=     0.138 dt=     0.001 period= -3.07e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  139 time=     0.139 dt=     0.001 period= -3.09e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  140 time=      0.14 dt=     0.001 period= -2.86e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  141 time=     0.141 dt=     0.001 period= -3.02e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  142 time=     0.142 dt=     0.001 period= -3.56e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  143 time=     0.143 dt=     0.001 period= -5.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  144 time=     0.144 dt=     0.001 period=  -3.6e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  145 time=     0.145 dt=     0.001 period= -3.49e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  146 time=     0.146 dt=     0.001 period= -2.61e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  147 time=     0.147 dt=     0.001 period= -4.25e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  148 time=     0.148 dt=     0.001 period= -3.36e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  149 time=     0.149 dt=     0.001 period= -2.98e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  150 time=      0.15 dt=     0.001 period= -2.68e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  151 time=     0.151 dt=     0.001 period= -3.48e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  152 time=     0.152 dt=     0.001 period= -3.01e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  153 time=     0.153 dt=     0.001 period= -5.86e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  154 time=     0.154 dt=     0.001 period= -3.15e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  155 time=     0.155 dt=     0.001 period= -2.49e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  156 time=     0.156 dt=     0.001 period= -4.22e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  157 time=     0.157 dt=     0.001 period= -3.12e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  158 time=     0.158 dt=     0.001 period= -4.12e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  159 time=     0.159 dt=     0.001 period= -4.17e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  160 time=      0.16 dt=     0.001 period= -2.48e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  161 time=     0.161 dt=     0.001 period= -3.39e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  162 time=     0.162 dt=     0.001 period=  -4.6e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  163 time=     0.163 dt=     0.001 period= -3.75e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  164 time=     0.164 dt=     0.001 period= -4.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  165 time=     0.165 dt=     0.001 period= -2.94e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  166 time=     0.166 dt=     0.001 period= -2.79e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  167 time=     0.167 dt=     0.001 period= -2.88e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  168 time=     0.168 dt=     0.001 period= -3.18e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  169 time=     0.169 dt=     0.001 period=    -7e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  170 time=      0.17 dt=     0.001 period= -2.17e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  171 time=     0.171 dt=     0.001 period= -1.08e+08 FR= 1.000e+00
+[0]  LBSTransientSolver  172 time=     0.172 dt=     0.001 period= -2.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  173 time=     0.173 dt=     0.001 period= -3.93e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  174 time=     0.174 dt=     0.001 period= -2.95e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  175 time=     0.175 dt=     0.001 period= -3.04e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  176 time=     0.176 dt=     0.001 period= -4.38e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  177 time=     0.177 dt=     0.001 period= -3.62e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  178 time=     0.178 dt=     0.001 period= -4.46e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  179 time=     0.179 dt=     0.001 period= -3.08e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  180 time=      0.18 dt=     0.001 period=  -3.7e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  181 time=     0.181 dt=     0.001 period= -3.68e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  182 time=     0.182 dt=     0.001 period= -3.65e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  183 time=     0.183 dt=     0.001 period= -4.15e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  184 time=     0.184 dt=     0.001 period= -2.73e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  185 time=     0.185 dt=     0.001 period= -3.04e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  186 time=     0.186 dt=     0.001 period= -3.42e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  187 time=     0.187 dt=     0.001 period= -2.56e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  188 time=     0.188 dt=     0.001 period= -4.81e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  189 time=     0.189 dt=     0.001 period= -3.42e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  190 time=      0.19 dt=     0.001 period=  -4.6e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  191 time=     0.191 dt=     0.001 period= -2.37e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  192 time=     0.192 dt=     0.001 period= -3.94e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  193 time=     0.193 dt=     0.001 period=  -3.2e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  194 time=     0.194 dt=     0.001 period= -4.74e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  195 time=     0.195 dt=     0.001 period= -2.83e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  196 time=     0.196 dt=     0.001 period=    -5e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  197 time=     0.197 dt=     0.001 period= -3.01e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  198 time=     0.198 dt=     0.001 period= -2.66e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  199 time=     0.199 dt=     0.001 period= -5.83e+07 FR= 1.000e+00
+[0]  LBSTransientSolver  200 time=       0.2 dt=     0.001 period= -6.53e+07 FR= 1.000e+00
+[0]  **WARNING** lbs::SteadySolver::InitMaterials: Found material "Test Material" has a scattering order of 0 and the simulation has a scattering order of 1. The higher moments will therefore not be used.
+[0]  LBSTransientSolver  201 time=     0.201 dt=     0.001 period=   0.00655 FR= 1.167e+00
+[0]  LBSTransientSolver  202 time=     0.202 dt=     0.001 period=    0.0193 FR= 1.229e+00
+[0]  LBSTransientSolver  203 time=     0.203 dt=     0.001 period=     0.053 FR= 1.252e+00
+[0]  LBSTransientSolver  204 time=     0.204 dt=     0.001 period=     0.141 FR= 1.261e+00
+[0]  LBSTransientSolver  205 time=     0.205 dt=     0.001 period=     0.369 FR= 1.264e+00
+[0]  LBSTransientSolver  206 time=     0.206 dt=     0.001 period=     0.924 FR= 1.266e+00
+[0]  LBSTransientSolver  207 time=     0.207 dt=     0.001 period=      2.11 FR= 1.266e+00
+[0]  LBSTransientSolver  208 time=     0.208 dt=     0.001 period=      4.09 FR= 1.267e+00
+[0]  LBSTransientSolver  209 time=     0.209 dt=     0.001 period=      6.31 FR= 1.267e+00
+[0]  LBSTransientSolver  210 time=      0.21 dt=     0.001 period=      7.93 FR= 1.267e+00
+[0]  LBSTransientSolver  211 time=     0.211 dt=     0.001 period=      8.79 FR= 1.267e+00
+[0]  LBSTransientSolver  212 time=     0.212 dt=     0.001 period=      9.16 FR= 1.267e+00
+[0]  LBSTransientSolver  213 time=     0.213 dt=     0.001 period=      9.31 FR= 1.267e+00
+[0]  LBSTransientSolver  214 time=     0.214 dt=     0.001 period=      9.38 FR= 1.268e+00
+[0]  LBSTransientSolver  215 time=     0.215 dt=     0.001 period=      9.41 FR= 1.268e+00
+[0]  LBSTransientSolver  216 time=     0.216 dt=     0.001 period=      9.43 FR= 1.268e+00
+[0]  LBSTransientSolver  217 time=     0.217 dt=     0.001 period=      9.44 FR= 1.268e+00
+[0]  LBSTransientSolver  218 time=     0.218 dt=     0.001 period=      9.45 FR= 1.268e+00
+[0]  LBSTransientSolver  219 time=     0.219 dt=     0.001 period=      9.46 FR= 1.268e+00
+[0]  LBSTransientSolver  220 time=      0.22 dt=     0.001 period=      9.47 FR= 1.268e+00
+[0]  LBSTransientSolver  221 time=     0.221 dt=     0.001 period=      9.48 FR= 1.268e+00
+[0]  LBSTransientSolver  222 time=     0.222 dt=     0.001 period=      9.49 FR= 1.269e+00
+[0]  LBSTransientSolver  223 time=     0.223 dt=     0.001 period=       9.5 FR= 1.269e+00
+[0]  LBSTransientSolver  224 time=     0.224 dt=     0.001 period=      9.51 FR= 1.269e+00
+[0]  LBSTransientSolver  225 time=     0.225 dt=     0.001 period=      9.51 FR= 1.269e+00
+[0]  LBSTransientSolver  226 time=     0.226 dt=     0.001 period=      9.52 FR= 1.269e+00
+[0]  LBSTransientSolver  227 time=     0.227 dt=     0.001 period=      9.53 FR= 1.269e+00
+[0]  LBSTransientSolver  228 time=     0.228 dt=     0.001 period=      9.54 FR= 1.269e+00
+[0]  LBSTransientSolver  229 time=     0.229 dt=     0.001 period=      9.55 FR= 1.270e+00
+[0]  LBSTransientSolver  230 time=      0.23 dt=     0.001 period=      9.56 FR= 1.270e+00
+[0]  LBSTransientSolver  231 time=     0.231 dt=     0.001 period=      9.57 FR= 1.270e+00
+[0]  LBSTransientSolver  232 time=     0.232 dt=     0.001 period=      9.58 FR= 1.270e+00
+[0]  LBSTransientSolver  233 time=     0.233 dt=     0.001 period=      9.59 FR= 1.270e+00
+[0]  LBSTransientSolver  234 time=     0.234 dt=     0.001 period=       9.6 FR= 1.270e+00
+[0]  LBSTransientSolver  235 time=     0.235 dt=     0.001 period=      9.61 FR= 1.270e+00
+[0]  LBSTransientSolver  236 time=     0.236 dt=     0.001 period=      9.61 FR= 1.270e+00
+[0]  LBSTransientSolver  237 time=     0.237 dt=     0.001 period=      9.62 FR= 1.271e+00
+[0]  LBSTransientSolver  238 time=     0.238 dt=     0.001 period=      9.63 FR= 1.271e+00
+[0]  LBSTransientSolver  239 time=     0.239 dt=     0.001 period=      9.64 FR= 1.271e+00
+[0]  LBSTransientSolver  240 time=      0.24 dt=     0.001 period=      9.65 FR= 1.271e+00
+[0]  LBSTransientSolver  241 time=     0.241 dt=     0.001 period=      9.66 FR= 1.271e+00
+[0]  LBSTransientSolver  242 time=     0.242 dt=     0.001 period=      9.67 FR= 1.271e+00
+[0]  LBSTransientSolver  243 time=     0.243 dt=     0.001 period=      9.68 FR= 1.271e+00
+[0]  LBSTransientSolver  244 time=     0.244 dt=     0.001 period=      9.69 FR= 1.272e+00
+[0]  LBSTransientSolver  245 time=     0.245 dt=     0.001 period=       9.7 FR= 1.272e+00
+[0]  LBSTransientSolver  246 time=     0.246 dt=     0.001 period=      9.71 FR= 1.272e+00
+[0]  LBSTransientSolver  247 time=     0.247 dt=     0.001 period=      9.71 FR= 1.272e+00
+[0]  LBSTransientSolver  248 time=     0.248 dt=     0.001 period=      9.72 FR= 1.272e+00
+[0]  LBSTransientSolver  249 time=     0.249 dt=     0.001 period=      9.73 FR= 1.272e+00
+[0]  LBSTransientSolver  250 time=      0.25 dt=     0.001 period=      9.74 FR= 1.272e+00
+[0]  LBSTransientSolver  251 time=     0.251 dt=     0.001 period=      9.75 FR= 1.272e+00
+[0]  LBSTransientSolver  252 time=     0.252 dt=     0.001 period=      9.76 FR= 1.273e+00
+[0]  LBSTransientSolver  253 time=     0.253 dt=     0.001 period=      9.77 FR= 1.273e+00
+[0]  LBSTransientSolver  254 time=     0.254 dt=     0.001 period=      9.78 FR= 1.273e+00
+[0]  LBSTransientSolver  255 time=     0.255 dt=     0.001 period=      9.79 FR= 1.273e+00
+[0]  LBSTransientSolver  256 time=     0.256 dt=     0.001 period=       9.8 FR= 1.273e+00
+[0]  LBSTransientSolver  257 time=     0.257 dt=     0.001 period=       9.8 FR= 1.273e+00
+[0]  LBSTransientSolver  258 time=     0.258 dt=     0.001 period=      9.81 FR= 1.273e+00
+[0]  LBSTransientSolver  259 time=     0.259 dt=     0.001 period=      9.82 FR= 1.273e+00
+[0]  LBSTransientSolver  260 time=      0.26 dt=     0.001 period=      9.83 FR= 1.274e+00
+[0]  LBSTransientSolver  261 time=     0.261 dt=     0.001 period=      9.84 FR= 1.274e+00
+[0]  LBSTransientSolver  262 time=     0.262 dt=     0.001 period=      9.85 FR= 1.274e+00
+[0]  LBSTransientSolver  263 time=     0.263 dt=     0.001 period=      9.86 FR= 1.274e+00
+[0]  LBSTransientSolver  264 time=     0.264 dt=     0.001 period=      9.87 FR= 1.274e+00
+[0]  LBSTransientSolver  265 time=     0.265 dt=     0.001 period=      9.88 FR= 1.274e+00
+[0]  LBSTransientSolver  266 time=     0.266 dt=     0.001 period=      9.89 FR= 1.274e+00
+[0]  LBSTransientSolver  267 time=     0.267 dt=     0.001 period=      9.89 FR= 1.275e+00
+[0]  LBSTransientSolver  268 time=     0.268 dt=     0.001 period=       9.9 FR= 1.275e+00
+[0]  LBSTransientSolver  269 time=     0.269 dt=     0.001 period=      9.91 FR= 1.275e+00
+[0]  LBSTransientSolver  270 time=      0.27 dt=     0.001 period=      9.92 FR= 1.275e+00
+[0]  LBSTransientSolver  271 time=     0.271 dt=     0.001 period=      9.93 FR= 1.275e+00
+[0]  LBSTransientSolver  272 time=     0.272 dt=     0.001 period=      9.94 FR= 1.275e+00
+[0]  LBSTransientSolver  273 time=     0.273 dt=     0.001 period=      9.95 FR= 1.275e+00
+[0]  LBSTransientSolver  274 time=     0.274 dt=     0.001 period=      9.96 FR= 1.275e+00
+[0]  LBSTransientSolver  275 time=     0.275 dt=     0.001 period=      9.97 FR= 1.276e+00
+[0]  LBSTransientSolver  276 time=     0.276 dt=     0.001 period=      9.97 FR= 1.276e+00
+[0]  LBSTransientSolver  277 time=     0.277 dt=     0.001 period=      9.98 FR= 1.276e+00
+[0]  LBSTransientSolver  278 time=     0.278 dt=     0.001 period=      9.99 FR= 1.276e+00
+[0]  LBSTransientSolver  279 time=     0.279 dt=     0.001 period=        10 FR= 1.276e+00
+[0]  LBSTransientSolver  280 time=      0.28 dt=     0.001 period=        10 FR= 1.276e+00
+[0]  LBSTransientSolver  281 time=     0.281 dt=     0.001 period=        10 FR= 1.276e+00
+[0]  LBSTransientSolver  282 time=     0.282 dt=     0.001 period=        10 FR= 1.276e+00
+[0]  LBSTransientSolver  283 time=     0.283 dt=     0.001 period=        10 FR= 1.277e+00
+[0]  LBSTransientSolver  284 time=     0.284 dt=     0.001 period=        10 FR= 1.277e+00
+[0]  LBSTransientSolver  285 time=     0.285 dt=     0.001 period=      10.1 FR= 1.277e+00
+[0]  LBSTransientSolver  286 time=     0.286 dt=     0.001 period=      10.1 FR= 1.277e+00
+[0]  LBSTransientSolver  287 time=     0.287 dt=     0.001 period=      10.1 FR= 1.277e+00
+[0]  LBSTransientSolver  288 time=     0.288 dt=     0.001 period=      10.1 FR= 1.277e+00
+[0]  LBSTransientSolver  289 time=     0.289 dt=     0.001 period=      10.1 FR= 1.277e+00
+[0]  LBSTransientSolver  290 time=      0.29 dt=     0.001 period=      10.1 FR= 1.277e+00
+[0]  LBSTransientSolver  291 time=     0.291 dt=     0.001 period=      10.1 FR= 1.278e+00
+[0]  LBSTransientSolver  292 time=     0.292 dt=     0.001 period=      10.1 FR= 1.278e+00
+[0]  LBSTransientSolver  293 time=     0.293 dt=     0.001 period=      10.1 FR= 1.278e+00
+[0]  LBSTransientSolver  294 time=     0.294 dt=     0.001 period=      10.1 FR= 1.278e+00
+[0]  LBSTransientSolver  295 time=     0.295 dt=     0.001 period=      10.1 FR= 1.278e+00
+[0]  LBSTransientSolver  296 time=     0.296 dt=     0.001 period=      10.2 FR= 1.278e+00
+[0]  LBSTransientSolver  297 time=     0.297 dt=     0.001 period=      10.2 FR= 1.278e+00
+[0]  LBSTransientSolver  298 time=     0.298 dt=     0.001 period=      10.2 FR= 1.278e+00
+[0]  LBSTransientSolver  299 time=     0.299 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  300 time=       0.3 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  301 time=     0.301 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  302 time=     0.302 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  303 time=     0.303 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  304 time=     0.304 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  305 time=     0.305 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  306 time=     0.306 dt=     0.001 period=      10.2 FR= 1.279e+00
+[0]  LBSTransientSolver  307 time=     0.307 dt=     0.001 period=      10.2 FR= 1.280e+00
+[0]  LBSTransientSolver  308 time=     0.308 dt=     0.001 period=      10.3 FR= 1.280e+00
+[0]  LBSTransientSolver  309 time=     0.309 dt=     0.001 period=      10.3 FR= 1.280e+00
+[0]  LBSTransientSolver  310 time=      0.31 dt=     0.001 period=      10.3 FR= 1.280e+00
+[0]  LBSTransientSolver  311 time=     0.311 dt=     0.001 period=      10.3 FR= 1.280e+00
+[0]  LBSTransientSolver  312 time=     0.312 dt=     0.001 period=      10.3 FR= 1.280e+00

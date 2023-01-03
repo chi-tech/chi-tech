@@ -42,8 +42,8 @@ void lbs::SteadySolver::ComputeBalance()
   {
     q_moments_local.assign(q_moments_local.size(), 0.0);
     SetSource(groupset, q_moments_local,
-              APPLY_MATERIAL_SOURCE | APPLY_AGS_FISSION_SOURCE |
-              APPLY_WGS_FISSION_SOURCE);
+              APPLY_FIXED_SOURCES | APPLY_AGS_FISSION_SOURCES |
+              APPLY_WGS_FISSION_SOURCES);
     ScopedCopySTLvectors(groupset, q_moments_local, mat_src);
   }
 

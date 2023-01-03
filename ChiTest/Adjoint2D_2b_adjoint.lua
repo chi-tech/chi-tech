@@ -1,4 +1,4 @@
--- 2D Transport test with localized material source adjoint formulation
+-- 2D Transport test with point source Adjoint generation
 -- SDM: PWLD
 -- Test: None
 num_procs = 4

@@ -33,8 +33,7 @@ public:
   // IterativeMethods
   void PowerIteration();
 
-  // Iterative operations
-  double ComputeFissionProduction();
+
 };
 
 }

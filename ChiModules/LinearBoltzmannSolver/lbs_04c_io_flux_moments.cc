@@ -24,8 +24,8 @@ std::vector<double> lbs::SteadySolver::
   {
     SetSource(groupset,
               source_moments,
-              APPLY_AGS_SCATTER_SOURCE | APPLY_WGS_SCATTER_SOURCE |
-              APPLY_AGS_FISSION_SOURCE | APPLY_WGS_FISSION_SOURCE);
+              APPLY_AGS_SCATTER_SOURCES | APPLY_WGS_SCATTER_SOURCES |
+              APPLY_AGS_FISSION_SOURCES | APPLY_WGS_FISSION_SOURCES);
   }
 
   return source_moments;

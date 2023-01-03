@@ -339,8 +339,8 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    28", 7, "CONVERGED"],
                               ["StrCompare", "WGS groups [63-167] Iteration    55", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    28", 6, "float", 6.74851e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    55", 6, "float", 5.68143e-07, 1.0e-9]])
+                              ["NumCompare", "WGS groups [0-62] Iteration    28", 6, "float", 6.7433e-07, 1.0e-9],
+                              ["NumCompare", "WGS groups [63-167] Iteration    55", 6, "float", 5.67431e-07, 1.0e-9]])
 
 #15
 run_test(
@@ -371,20 +371,20 @@ run_test(
     file_name="Transport2D_4a_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    52", 7, "CONVERGED"],
-                              ["StrCompare", "WGS groups [63-167] Iteration    57", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    52", 6, "float", 8.24287e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    57", 6, "float", 9.69379e-07, 1.0e-9]])
+    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    53", 7, "CONVERGED"],
+                              ["StrCompare", "WGS groups [63-167] Iteration    59", 7, "CONVERGED"],
+                              ["NumCompare", "WGS groups [0-62] Iteration    53", 6, "float", 6.01304e-07, 1.0e-9],
+                              ["NumCompare", "WGS groups [63-167] Iteration    59", 6, "float", 6.21411e-07, 1.0e-9]])
 
 #19
 run_test(
     file_name="Transport2D_4b_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    53", 7, "CONVERGED"],
-                              ["StrCompare", "WGS groups [63-167] Iteration    56", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    53", 6, "float", 5.52837e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    56", 6, "float", 9.96675e-07, 1.0e-9]])
+    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
+                              ["StrCompare", "WGS groups [63-167] Iteration    57", 7, "CONVERGED"],
+                              ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float", 4.97136e-07, 1.0e-9],
+                              ["NumCompare", "WGS groups [63-167] Iteration    57", 6, "float", 6.88134e-07, 1.0e-9]])
 
 #20
 run_test(
@@ -443,8 +443,8 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
                               ["StrCompare", "WGS groups [63-167] Iteration    69", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float", 7.40763e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    69", 6, "float", 9.23791e-07, 1.0e-9]])
+                              ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float", 7.88852e-07, 1.0e-9],
+                              ["NumCompare", "WGS groups [63-167] Iteration    69", 6, "float", 9.78723e-07, 1.0e-9]])
 
 #27
 run_test(
@@ -483,6 +483,92 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-valueG1=", 1.00000, 1.0e-09],
                               ["[0]  Max-valueG2=", 0.25000, 1.0e-09]])
+
+#------------------------------------------------ Adjoints
+#32
+run_test(
+    file_name="Adjoint2D_1a_forward",
+    comment="2D Transport test with localized material source FWD",
+    num_procs=4,
+    search_strings_vals_tols=[["QOI-value=", 1.38397e-05, 1.0e-08]])
+
+#33
+run_test(
+    file_name="Adjoint2D_1b_adjoint",
+    comment="2D Transport test with localized material source Adjoint generation",
+    num_procs=4,
+    search_strings_vals_tols=[])
+
+#34
+run_test(
+    file_name="Adjoint2D_1c_response",
+    comment="2D Transport test with localized material source Adjoint inner product",
+    num_procs=4,
+    search_strings_vals_tols=[["Inner-product=", 1.38405e-05, 1.0e-08]])
+
+
+
+
+
+
+
+
+#35
+run_test(
+    file_name="Adjoint2D_2a_forward",
+    comment="2D Transport test with point source FWD",
+    num_procs=4,
+    search_strings_vals_tols=[["QOI-value=", 2.90386e-05 , 1.0e-08]])
+
+#36
+run_test(
+    file_name="Adjoint2D_2b_adjoint",
+    comment="2D Transport test with point source Adjoint generation",
+    num_procs=4,
+    search_strings_vals_tols=[])
+
+#37
+run_test(
+    file_name="Adjoint2D_2c_response",
+    comment="2D Transport test with point source Adjoint response",
+    num_procs=4,
+    search_strings_vals_tols=[["Inner-product=", 2.90543e-05, 1.0e-08]])
+
+
+
+
+
+
+#38
+run_test(
+    file_name="Adjoint2D_3a_forward",
+    comment="2D Transport test with point source Multigroup FWD",
+    num_procs=4,
+    search_strings_vals_tols=[["QOI-value[0]=", 1.12687e-06, 1.0e-09],
+                              ["QOI-value[1]=", 2.95934e-06, 1.0e-09],
+                              ["QOI-value[2]=", 3.92975e-06, 1.0e-09],
+                              ["QOI-value[3]=", 4.18474e-06, 1.0e-09],
+                              ["QOI-value[4]=", 3.89649e-06, 1.0e-09],
+                              ["QOI-value[5]=", 3.30482e-06, 1.0e-09],
+                              ["QOI-value[6]=", 1.54506e-06, 1.0e-09],
+                              ["QOI-value[7]=", 6.74868e-07, 1.0e-09],
+                              ["QOI-value[8]=", 3.06178e-07, 1.0e-09],
+                              ["QOI-value[9]=", 2.07284e-07, 1.0e-09],
+                              ["QOI-value[sum]=", 2.21354e-05, 1.0e-08]])
+
+#39
+run_test(
+    file_name="Adjoint2D_3b_adjoint",
+    comment="2D Transport test with point source Multigroup Adjoint generation",
+    num_procs=4,
+    search_strings_vals_tols=[])
+
+#40
+run_test(
+    file_name="Adjoint2D_3c_response",
+    comment="2D Transport test with point source Multigroup Adjoint Response",
+    num_procs=4,
+    search_strings_vals_tols=[["Inner-product=", 3.30607e-06, 1.0e-09]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
 print("")

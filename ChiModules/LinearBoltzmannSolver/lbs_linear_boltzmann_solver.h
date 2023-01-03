@@ -34,12 +34,12 @@ enum class BoundaryType
 };
   enum SourceFlags : int
   {
-    NO_FLAGS_SET               = 0,
-    APPLY_MATERIAL_SOURCE      = (1 << 0),
-    APPLY_WGS_SCATTER_SOURCE   = (1 << 1),
-    APPLY_AGS_SCATTER_SOURCE   = (1 << 2),
-    APPLY_WGS_FISSION_SOURCE   = (1 << 3),
-    APPLY_AGS_FISSION_SOURCE   = (1 << 4)
+    NO_FLAGS_SET              = 0,
+    APPLY_FIXED_SOURCES       = (1 << 0),
+    APPLY_WGS_SCATTER_SOURCES = (1 << 1),
+    APPLY_AGS_SCATTER_SOURCES = (1 << 2),
+    APPLY_WGS_FISSION_SOURCES = (1 << 3),
+    APPLY_AGS_FISSION_SOURCES = (1 << 4)
   };
 
   inline SourceFlags operator|(const SourceFlags f1,
@@ -49,7 +49,10 @@ enum class BoundaryType
                                     static_cast<int>(f2));
   }
 
-
+typedef std::function<void(LBSGroupset&          groupset,
+                           std::vector<double>&  destination_q,
+                           SourceFlags           source_flags)>
+                           SetSourceFunction;
 
 
 
@@ -105,6 +108,9 @@ public:
   std::vector<std::vector<double>> psi_new_local;
   std::vector<double> precursor_new_local;
 
+protected:
+  SetSourceFunction active_set_source_function;
+
  public:
   SteadySolver (const SteadySolver&) = delete;
   SteadySolver& operator= (const SteadySolver&) = delete;
@@ -120,7 +126,7 @@ public:
   //01b
   void PrintSimHeader();
   //01c
-  void InitMaterials(std::set<int> &material_ids);
+  void InitMaterials();
   //01d
   virtual void InitializeSpatialDiscretization();
   void ComputeUnitIntegrals();
@@ -212,25 +218,31 @@ public:
                        std::vector<double>& flux_moments,
                        bool single_file=false);
 
-  //IterativeMethods
-  virtual void SetSource(LBSGroupset& groupset,
-                         std::vector<double>&  destination_q,
-                         SourceFlags source_flags);
+  //Iterative Operations
+  void SetSource(LBSGroupset& groupset,
+                 std::vector<double>&  destination_q,
+                 SourceFlags source_flags);
   double ComputePiecewiseChange(LBSGroupset& groupset);
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
+  double ComputeFissionProduction(const std::vector<double>& phi);
+  virtual double ComputeFissionRate(bool previous);
+  //Iterative Methods
   bool ClassicRichardson(LBSGroupset& groupset,
                          MainSweepScheduler& sweep_scheduler,
                          SourceFlags source_flags,
+                         const SetSourceFunction& set_source_function,
                          bool log_info = true);
   bool GMRES(LBSGroupset& groupset,
              MainSweepScheduler& sweep_scheduler,
              SourceFlags lhs_src_scope,
              SourceFlags rhs_src_scope,
+             const SetSourceFunction& set_source_function,
              bool log_info = true);
   bool Krylov(LBSGroupset& groupset,
               MainSweepScheduler& sweep_scheduler,
               SourceFlags lhs_src_scope,
               SourceFlags rhs_src_scope,
+              const SetSourceFunction& set_source_function,
               bool log_info = true);
 
   //Vector assembly

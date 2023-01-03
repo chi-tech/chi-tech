@@ -215,7 +215,8 @@ chi_math::CylindricalAngularQuadrature::
         << ", (phi, theta) = (" << abscissae[k].phi << ", " << abscissae[k].theta << ")"
         << ", omega = " << omegas[k].PrintStr()
         << ", fac_diamond_difference = " << fac_diamond_difference[k]
-        << ", fac_streaming_operator = " << fac_streaming_operator[k] << std::endl;
+        << ", fac_streaming_operator = " << fac_streaming_operator[k]
+        << std::endl;
     const auto sum_weights =
       std::accumulate(weights.begin(), weights.end(), 0.0);
     chi::log.Log() << "sum(weights) = " << sum_weights << std::endl;
@@ -226,12 +227,15 @@ chi_math::CylindricalAngularQuadrature::
 void
 chi_math::CylindricalAngularQuadrature::InitializeParameters()
 {
-  const auto pi_sum_q_weights = static_cast<double>(1);
-
   fac_diamond_difference.resize(weights.size(), 1);
   fac_streaming_operator.resize(weights.size(), 0);
   for (size_t p = 0; p < map_directions.size(); ++p)
   {
+    double sum_q_weights = 0;
+    for (size_t q = 0; q < map_directions[p].size(); ++q)
+      sum_q_weights += weights[map_directions[p][q]];
+    const auto pi_sum_q_weights = M_PI / sum_q_weights;
+
     //  interface quantities initialised to starting direction values
     double alpha_interface = 0;
     double phi_interface = abscissae[map_directions[p].front()].phi;

@@ -8,8 +8,6 @@
 #include "LinearBoltzmannSolver/lbs_linear_boltzmann_solver.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
-#define WITH_READABLE_CHUNK
-
 typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
 
 namespace lbs
@@ -52,7 +50,7 @@ public:
 
   void Sweep(chi_mesh::sweep_management::AngleSet* angle_set) override;
 
-#ifdef WITH_READABLE_CHUNK
+
   struct Upwinder
   {
     chi_mesh::sweep_management::FLUDS* fluds;
@@ -77,7 +75,7 @@ public:
                            bool boundary,
                            bool reflecting_bndry) const;
   };
-#endif
+
 };
 }
 
