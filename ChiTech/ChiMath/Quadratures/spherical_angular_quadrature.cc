@@ -144,7 +144,8 @@ chi_math::SphericalAngularQuadrature::
         << ", (phi, theta) = (" << abscissae[k].phi << ", " << abscissae[k].theta << ")"
         << ", omega = " << omegas[k].PrintStr()
         << ", fac_diamond_difference = " << fac_diamond_difference[k]
-        << ", fac_streaming_operator = " << fac_streaming_operator[k] << std::endl;
+        << ", fac_streaming_operator = " << fac_streaming_operator[k]
+        << std::endl;
     const auto sum_weights =
       std::accumulate(weights.begin(), weights.end(), 0.0);
     chi::log.Log() << "sum(weights) = " << sum_weights << std::endl;
@@ -155,15 +156,12 @@ chi_math::SphericalAngularQuadrature::
 void
 chi_math::SphericalAngularQuadrature::InitializeParameters()
 {
-  const auto pi_sum_p_weights = M_PI_2;
-
   fac_diamond_difference.resize(weights.size(), 1);
   fac_streaming_operator.resize(weights.size(), 0);
 
   //  interface quantities initialised to starting direction values
   double alpha_interface = 0;
-  double theta_interface = abscissae[map_directions[0].front()].theta;
-  std::vector<double> mu_interface(2, std::cos(theta_interface));
+  std::vector<double> mu_interface(2, omegas[map_directions[0].front()].z);
 
   //  initialisation permits to forego start direction and final direction
   for (size_t p = 1; p < map_directions.size()-1; ++p)
@@ -171,16 +169,13 @@ chi_math::SphericalAngularQuadrature::InitializeParameters()
     const auto k = map_directions[p][0];
     const auto w_p = weights[k];
     const auto mu_p = omegas[k].z;
-    const auto theta_p = abscissae[k].theta;
 
     alpha_interface -= w_p * mu_p;
 
-    theta_interface -= w_p * pi_sum_p_weights;
     mu_interface[0] = mu_interface[1];
-    mu_interface[1] = std::cos(theta_interface);
+    mu_interface[1] += w_p;
 
-    const auto mu = std::cos(theta_p);
-    const auto tau = (mu - mu_interface[0]) / (mu_interface[1] - mu_interface[0]);
+    const auto tau = (mu_p - mu_interface[0]) / (mu_interface[1] - mu_interface[0]);
 
     fac_diamond_difference[k] = tau;
     fac_streaming_operator[k] = alpha_interface / (w_p * tau) + mu_p;

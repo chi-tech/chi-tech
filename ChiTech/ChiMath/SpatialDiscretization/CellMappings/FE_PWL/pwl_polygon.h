@@ -6,7 +6,6 @@
 #include "ChiMath/Quadratures/quadrature_triangle.h"
 #include "ChiMesh/Cell/cell.h"
 
-#include "pwl_cellbase.h"
 #include <array>
 
 
