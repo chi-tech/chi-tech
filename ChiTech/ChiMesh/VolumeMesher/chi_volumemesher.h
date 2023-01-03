@@ -7,6 +7,8 @@
 
 #include <array>
 
+#include <array>
+
 namespace chi_mesh
 {
   enum VolumeMesherType
