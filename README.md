@@ -1,11 +1,16 @@
 ![GitHub branch checks state](https://img.shields.io/github/checks-status/chi-tech/chi-tech/development?label=Development)
 
+![yes](ChiDoc/HTMLimages/CoolPics/banner.png)
+<p align="center">
+  <img src="./ChiDoc/HTMLimages/CoolPics/banner.png" width="500">
+</p>
 # Chi-Tech #
 
-A large-scale scientific simulation engine being developed at Texas A&M University 
-as part of a research study.
-
-Chat with us on <a href="https://discord.gg/AJHHeAA">Discord<img src="ChiDoc/HTMLimages/DiscordLogo.png" width="24" title="Chi-Tech on Discord" align="center"></a>
+Chi-tech is a large-scale scientific simulation engine being developed at 
+Texas A&M University as part of a research study on massively parallel 
+algorithms for modeling and simulation. Currently, the main physics modules 
+of Chi-Tech deal with solving the linear Boltzmann equation and 
+diffusion-reaction physics.
 
 ## Installation instructions
 
