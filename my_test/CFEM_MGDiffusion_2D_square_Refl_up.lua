@@ -64,7 +64,7 @@ phys1 = chiCFEMMGDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
 chiSolverSetBasicOption(phys1, "thermal_flux_error", 1E-7)
-chiSolverSetBasicOption(phys1, "max_thermal_iters", 20)
+chiSolverSetBasicOption(phys1, "max_thermal_iters", 1200)
 chiSolverSetBasicOption(phys1, "verbose_level", 1)
 
 chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"reflecting")

@@ -28,7 +28,7 @@ namespace mg_diffusion::mgd_lua_utils
  then type value.\n\n
 
 \code
-chiDiffusionsetBCproperty(solver,"boundary_type",2,"dirichlet",1.0)
+chiCFEMMGDiffusionSetBCProperty(solver,"boundary_type",bdID,"vacuum")
 \endcode
 
 ### BoundaryTypeName
@@ -36,11 +36,6 @@ reflecting\n
  Reflecting boundary conditions. Synonymous with Neumann with a
  derivative of 0.0.
              \f[ -D \hat{n}\cdot \nabla \phi = 0 \f]\n\n
-
-dirichlet\n
- Constant value boundary condition.
- Expects to be followed by a value \f$ f \f$ associated with \f$ \phi \f$.
-            \f[ \phi = f \f]\n\n
 
 neumann\n
  Constant derivative boundary condition. Expects to be followed
@@ -96,7 +91,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
     LuaCheckStringValue(fname, L, 4);
     const std::string type_name = lua_tostring(L, 4);
 
-    if (type_name == "reflecting")
+    if (type_name == "reflecting") // ------------- REFLECTING
     {
       if (num_args != 4)
       {
@@ -116,29 +111,14 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       chi::log.Log() << "Boundary " << bound_index << " set as "
                          << "Reflecting.";
     }
-    else if (type_name == "dirichlet")
+    else if (type_name == "dirichlet") // ------------- DIRICHLET
     {
-      if (num_args != 5)
-      {
-        chi::log.Log0Error()
-          << "Invalid amount of arguments used in"
-          << " chiCFEMMGDiffusionsetBCproperty(...,\"boundary_type\","
-          << bound_index << ",\"dirichlet\". "
-          << " 5 arguments are expected.";
-        chi::Exit(EXIT_FAILURE);
-      }
-      LuaCheckNumberValue(fname, L, 5);
-      double boundary_value = lua_tonumber(L,5);
-
-      mg_diffusion::Solver::BoundaryInfo bndry_info;
-      bndry_info.first = mg_diffusion::BoundaryType::Dirichlet;
-      bndry_info.second = {boundary_value};
-      solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
-
-      chi::log.Log() << "Boundary " << bound_index << " set as "
-                         << "Dirichlet with value " << boundary_value;
+      chi::log.Log0Error()
+        << "Dirichlet BC is not supported in multigroup diffusion "
+        << "(chiCFEMMGDiffusionSetBCProperty).";
+      chi::Exit(EXIT_FAILURE);
     }
-    else if (type_name == "neumann")
+    else if (type_name == "neumann") // ------------- NEUMANN
     {
       if (num_args != 5)
       {
@@ -161,7 +141,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
                      << "Neumann with D grad(u) dot n = ("
                      << f_value << ") ";
     }
-    else if (type_name == "vacuum")
+    else if (type_name == "vacuum") // ------------- VACUUM
     {
       if (num_args != 4)
       {
@@ -181,13 +161,13 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       chi::log.Log() << "Boundary " << bound_index << " set as "
                      << "Vacuum.";
     }
-    else if (type_name == "robin")
+    else if (type_name == "robin") // ------------- ROBIN
     {
       if (num_args != 7)
       {
         chi::log.Log0Error()
           << "Invalid amount of arguments used in"
-          << " chiCFEMMGDiffusionsetBCproperty(...,\"boundary_type\","
+          << " chiCFEMMGDiffusionSetBCProperty(...,\"boundary_type\","
           << bound_index << ",\"robin\". "
           << " 7 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
@@ -219,17 +199,17 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
     {
       chi::log.LogAllError()
         << "Unsupported boundary type encountered in call to "
-        << "chiCFEMDiffusionSetBCProperty(..,\"boundary_type\",.. :"
+        << "chiCFEMMGDiffusionSetBCProperty(..,\"boundary_type\",.. :"
         << type_name;
       chi::Exit(EXIT_FAILURE);
     }
   }
-  else
+  else // wrong property_name
   {
-    chi::log.Log0Error() << "Invalid property in chiDiffusionsetBCproperty.";
+    chi::log.Log0Error() << "Invalid property in chiCFEMMGDiffusionSetBCProperty.";
     chi::Exit(EXIT_FAILURE);
   }
   return 0;
-}
+}//end of chiCFEMMGDiffusionSetBCProperty
 
 }//namespace mg_diffusion::mgd_lua_utils

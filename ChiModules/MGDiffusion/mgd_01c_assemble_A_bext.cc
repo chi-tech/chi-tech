@@ -74,8 +74,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
     }//for i
  
     //======================= Flag nodes for being on a boundary
-    std::vector<int> dirichlet_count(num_nodes, 0);
-    std::vector<double> dirichlet_value(num_nodes, 0.0);
+//    std::vector<int> dirichlet_count(num_nodes, 0);
+//    std::vector<double> dirichlet_value(num_nodes, 0.0);
 
     const size_t num_faces = cell.faces.size();
     for (size_t f=0; f<num_faces; ++f)
@@ -133,23 +133,6 @@ void mg_diffusion::Solver::Assemble_A_bext()
           }//end true Robin
         }//for fi
       }//if Robin
-	  
-	    // Dirichlet boundary
-	    if (bndry.type == BoundaryType::Dirichlet)
-      {
- 		    const size_t num_face_nodes = face.vertex_ids.size();
-
-        const auto& boundary_value = bndry.mg_values[0];
-
-        // loop over nodes of that face
-        for (size_t fi=0; fi<num_face_nodes; ++fi)
-        {
-          const uint i = cell_mapping.MapFaceNode(f,fi);
-          dirichlet_count[i] += 1;
-          dirichlet_value[i] += boundary_value;
-        }//for fi
-      }//if Dirichlet
-	  
     }//for face f
  
     //======================= Develop node mapping
@@ -158,35 +141,16 @@ void mg_diffusion::Solver::Assemble_A_bext()
       imap[i] = sdm.MapDOF(cell, i);
  
     //======================= Assembly into system
-    for (size_t i=0; i<num_nodes; ++i)
+    for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
     {
-      if (dirichlet_count[i]>0) //if Dirichlet boundary node
+      for (size_t i=0; i<num_nodes; ++i)
       {
-        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-          MatSetValue(A[g], imap[i], imap[i], 1.0, ADD_VALUES);
-		    // because we use CFEM, a given node is common to several faces
-		    const double aux = dirichlet_value[i]/dirichlet_count[i];
-        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-          VecSetValue(bext[g], imap[i], aux, ADD_VALUES);
-      }
-      else
-      {
+        VecSetValue(bext[g], imap[i], rhs_cell[g][i], ADD_VALUES);
         for (size_t j=0; j<num_nodes; ++j)
-        {
-          if (dirichlet_count[j]==0) // not related to a dirichlet node
-            for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-              MatSetValue(A[g], imap[i], imap[j], Acell[g][i][j], ADD_VALUES);
-		      else // related to a dirichlet node
-          {
-		        const double aux = dirichlet_value[j]/dirichlet_count[j];
-            for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-              rhs_cell[g][i] -= Acell[g][i][j]*aux;
-          }
-        }//for j
-        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-          VecSetValue(bext[g], imap[i], rhs_cell[g][i], ADD_VALUES);
-      }
-    }//for i
+          MatSetValue(A[g], imap[i], imap[j], Acell[g][i][j], ADD_VALUES);
+      }//for i
+    }
+
   }//for cell
  
   chi::log.Log() << "Global assembly";

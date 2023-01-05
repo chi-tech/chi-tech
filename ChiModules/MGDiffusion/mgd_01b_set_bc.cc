@@ -31,20 +31,13 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
       auto& bndry_vals = bndry_info.second;
       switch (bndry_info.first)
       {
-        case BoundaryType::Reflecting:
+        case BoundaryType::Reflecting: // ------------- REFLECTING
         {
           boundaries.push_back({BoundaryType::Reflecting, {0.,0.,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
         }
-        case BoundaryType::Dirichlet:
-        {
-          if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
-          boundaries.push_back({BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
-          chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
-          break;
-        }
-        case BoundaryType::Robin:
+        case BoundaryType::Robin: // ------------- ROBIN
         {
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
@@ -55,13 +48,13 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
           chi::log.Log() << "Boundary " << bndry << " set to robin." << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
           break;
         }
-        case BoundaryType::Vacuum:
+        case BoundaryType::Vacuum: // ------------- VACUUM
         {
           boundaries.push_back({BoundaryType::Robin, {0.25,0.5,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
-        case BoundaryType::Neumann:
+        case BoundaryType::Neumann: // ------------- NEUMANN
         {
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
@@ -75,10 +68,10 @@ void mg_diffusion::Solver::Set_BCs(const std::vector<uint64_t>& globl_unique_bnd
     }
     else
     {
-      boundaries.push_back({BoundaryType::Dirichlet, {0.,0.,0.}});
+      boundaries.push_back({BoundaryType::Vacuum, {0.,0.,0.}});
       chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
-        << "Dirichlet boundary added with zero boundary value.";
+        << "Vacuum boundary added as default.";
     }
   }//for bndry
 
