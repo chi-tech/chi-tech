@@ -1,7 +1,7 @@
 ![GitHub branch checks state](https://img.shields.io/github/checks-status/chi-tech/chi-tech/development?label=Development)
 
 <p align="center">
-  <img src="./ChiDoc/HTMLimages/CoolPics/banner.png" width="600">
+  <img src="./ChiDoc/HTMLimages/CoolPics/banner.png" width="700">
 </p>
 
 # Chi-Tech #
