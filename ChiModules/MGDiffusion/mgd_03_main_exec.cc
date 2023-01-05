@@ -25,17 +25,18 @@ void mg_diffusion::Solver::Execute()
     );
 
   KSPSetApplicationContext(petsc_solver.ksp, (void*)&my_app_context);
+  KSPMonitorCancel(petsc_solver.ksp);
   KSPMonitorSet(petsc_solver.ksp, &mg_diffusion::MGKSPMonitor,
                 nullptr, nullptr);
 
   int64_t verbose = basic_options("verbose_level").IntegerValue();
-  my_app_context.verbose = verbose > 0 ? PETSC_TRUE : PETSC_FALSE;
+  my_app_context.verbose = verbose > 1 ? PETSC_TRUE : PETSC_FALSE;
   if (my_app_context.verbose == PETSC_TRUE)
     cout << "--context TRUE" << endl;
   if (my_app_context.verbose == PETSC_FALSE)
     cout << "--context FALSE" << endl;
 
-  std::cout << "STOP" << std::endl; std::cin.get();
+//  std::cout << "STOP" << std::endl; std::cin.get();
 
   // shortcuts
   unsigned int lfg = mg_diffusion::Solver::last_fast_group;
