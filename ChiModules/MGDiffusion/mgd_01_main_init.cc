@@ -103,10 +103,14 @@ void mg_diffusion::Solver::Initialize()
   bext.resize(mg_diffusion::Solver::num_groups, nullptr);
   x.resize(mg_diffusion::Solver::num_groups, nullptr);
 
+  auto ghost_dof_indices = sdm.GetGhostDOFIndices(OneDofPerNode);
+
   for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
   {
     A[g] = chi_math::PETScUtils::CreateSquareMatrix(n,N);
-    x[g] = chi_math::PETScUtils::CreateVector(n,N);
+//    x[g] = chi_math::PETScUtils::CreateVector(n,N);
+    x[g] = chi_math::PETScUtils::CreateVectorWithGhosts(n,N,
+                  ghost_dof_indices.size(), ghost_dof_indices);
     bext[g] = chi_math::PETScUtils::CreateVector(n,N);
 
     chi_math::PETScUtils::InitMatrixSparsity(A[g],
