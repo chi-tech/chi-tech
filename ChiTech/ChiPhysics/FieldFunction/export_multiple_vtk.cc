@@ -128,6 +128,12 @@ void chi_physics::FieldFunction::
     unsigned int ref_unknown_id = ff->ref_variable;
     const auto &unknown = ff->unknown_manager.unknowns[ref_unknown_id];
 
+    const double* field_data;
+    if (ff->field_vector_local != nullptr)
+      field_data = ff->field_vector_local->data();
+    else
+      VecGetArrayRead(*ff->field_vector, &field_data);
+
     for (unsigned int comp=0; comp<unknown.num_components; ++comp)
     {
       vtkNew<vtkDoubleArray> unk_arr;
@@ -144,7 +150,8 @@ void chi_physics::FieldFunction::
           const int64_t nmap = ff_sdm->MapDOFLocal(cell,n,ff->unknown_manager,
                                                    ref_unknown_id,
                                                    comp);
-          unk_arr->InsertNextValue((*ff->field_vector_local)[nmap]);
+
+          unk_arr->InsertNextValue(field_data[nmap]);
         }//for node
       }//for cell
 
@@ -154,6 +161,9 @@ void chi_physics::FieldFunction::
         case CellDataScope::POINTDATA: point_data->AddArray(unk_arr);break;
       }
     }//for component
+
+    if (ff->field_vector_local == nullptr)
+      VecRestoreArrayRead(*ff->field_vector, &field_data);
   }//for ff
 
   //============================================= Construct file name
