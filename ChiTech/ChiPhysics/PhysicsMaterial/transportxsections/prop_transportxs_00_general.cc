@@ -3,7 +3,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
-//###################################################################
+
+//######################################################################
 /**Default constructor.*/
 chi_physics::TransportCrossSections::TransportCrossSections() :
   chi_physics::MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
@@ -15,10 +16,53 @@ chi_physics::TransportCrossSections::TransportCrossSections() :
   scattering_initialized = false;
 }
 
-//###################################################################
+
+//######################################################################
+void chi_physics::TransportCrossSections::Reset()
+{
+  num_groups = 0;
+  scattering_order = 0;
+  num_precursors = 0;
+  is_fissile = false;
+
+  sigma_t.clear();
+  sigma_f.clear();
+  sigma_a.clear();
+
+  chi.clear();
+  chi_prompt.clear();
+  chi_delayed.clear();
+
+  nu.clear();
+  nu_prompt.clear();
+  nu_delayed.clear();
+
+  nu_sigma_f.clear();
+  nu_prompt_sigma_f.clear();
+  nu_delayed_sigma_f.clear();
+
+  precursor_lambda.clear();
+  precursor_yield.clear();
+
+  inv_velocity.clear();
+
+  //Diffusion quantities
+  diffusion_initialized = false;
+  diffusion_coeff.clear();
+  sigma_removal.clear();
+  sigma_s_gtog.clear();
+
+  //Monte-Carlo quantities
+  scattering_initialized = false;
+  cdf_gprime_g.clear();
+  scat_angles_gprime_g.clear();
+}
+
+
+//######################################################################
 /**Makes a simple material with no transfer matrix just sigma_t.*/
 void chi_physics::TransportCrossSections::
-  MakeSimple0(int in_G, double in_sigmat)
+MakeSimple0(int in_G, double in_sigmat)
 {
   //======================================== Clear any previous data
   Reset();
@@ -42,12 +86,13 @@ void chi_physics::TransportCrossSections::
   ComputeDiffusionParameters();
 }
 
-//###################################################################
+
+//######################################################################
 /**Makes a simple material with isotropic transfer matrix (L=0)
  * and mostly down scattering but with a few of the last groups
  * subject to up-scattering.*/
 void chi_physics::TransportCrossSections::
-  MakeSimple1(int in_G, double in_sigmat, double c)
+MakeSimple1(int in_G, double in_sigmat, double c)
 {
   //======================================== Clear any previous data
   Reset();
@@ -98,10 +143,11 @@ void chi_physics::TransportCrossSections::
   ComputeDiffusionParameters();
 }
 
-//###################################################################
+
+//######################################################################
 /**Populates the cross-section from a combination of others.*/
 void chi_physics::TransportCrossSections::
-  MakeCombined(std::vector<std::pair<int, double> > &combinations)
+MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
   //======================================== Clear any previous data
   Reset();
@@ -295,8 +341,10 @@ void chi_physics::TransportCrossSections::
   }//for xs
 }
 
+
+//######################################################################
 std::vector<chi_physics::TransportCrossSections::GrpVal>
-  chi_physics::TransportCrossSections::ComputeAbsorptionXSFromTransfer()
+chi_physics::TransportCrossSections::ComputeAbsorptionXSFromTransfer()
 {
   auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, size_t col)
   {

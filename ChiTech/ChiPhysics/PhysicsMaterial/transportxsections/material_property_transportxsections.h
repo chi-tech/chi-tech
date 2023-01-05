@@ -59,50 +59,15 @@ private:
   std::vector<std::vector<double>>         cdf_gprime_g;
   std::vector<std::vector<Tvecdbl_vecdbl>> scat_angles_gprime_g;
 
-private:
-  void Reset()
-  {
-    num_groups = 0;
-    scattering_order = 0;
-    num_precursors = 0;
-    is_fissile = false;
-
-    sigma_t.clear();
-    sigma_f.clear();
-    sigma_a.clear();
-    chi.clear();
-    chi_prompt.clear();
-    nu.clear();
-    nu_prompt.clear();
-    nu_delayed.clear();
-    nu_sigma_f.clear();
-    nu_prompt_sigma_f.clear();
-    nu_delayed_sigma_f.clear();
-    inv_velocity.clear();
-    precursor_lambda.clear();
-    precursor_yield.clear();
-    chi_delayed.clear();
-
-    transfer_matrices.clear();
-
-    //Diffusion quantities
-    diffusion_initialized = false;
-    diffusion_coeff.clear();
-    sigma_removal.clear();
-    sigma_s_gtog.clear();
-
-    //Monte-Carlo quantities
-    scattering_initialized = false;
-    cdf_gprime_g.clear();
-    scat_angles_gprime_g.clear();
-  }
-
-  std::vector<GrpVal> ComputeAbsorptionXSFromTransfer();
-
 public:
   //00
   TransportCrossSections();
 
+private:
+  void Reset();
+  std::vector<GrpVal> ComputeAbsorptionXSFromTransfer();
+
+  public:
   void MakeSimple0(int in_G, double in_sigmat);
   void MakeSimple1(int in_G, double in_sigmat, double c);
   void MakeCombined(std::vector<std::pair<int,double>>& combinations);
