@@ -26,11 +26,10 @@ typedef std::shared_ptr<SpatialDiscretization> SDMPtr ;
 
 namespace mg_diffusion {
 
-//  struct Multigroup_D_and_sigR
-//  {
-//  std::vector<double> Dg;
-//  std::vector<double> sigR;
-//  };
+struct KSPAppContext
+{
+  PetscBool verbose = PETSC_FALSE;
+};
 
 
 /** Multi-group diffusion solver
@@ -58,7 +57,7 @@ public:
   Vec b; // actual rhs vector for the linear system A[g] x[g] = b
 
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
-  chi_math::PETScUtils::KSPAppContext my_app_context;
+  KSPAppContext my_app_context;
 
   typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;

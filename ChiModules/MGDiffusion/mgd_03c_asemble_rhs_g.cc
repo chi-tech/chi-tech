@@ -38,7 +38,7 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g, const int64_t verb
 
           for (size_t j = 0; j < num_nodes; ++j)
           {
-            const int64_t jmap = sdm.MapDOFLocal(cell, j); //only serial
+            const int64_t jmap = sdm.MapDOFLocal(cell, j);
 
            // get flux at node j
             const double flxj_gp = xlocal[jmap];
@@ -57,7 +57,8 @@ void mg_diffusion::Solver::Assemble_RHS(const unsigned int g, const int64_t verb
 
   VecAssemblyBegin(b);
   VecAssemblyEnd(b);
-//  cout << "b=bext["<<g<<"]+inscattering\n";
-//  VecView(b, PETSC_VIEWER_STDERR_WORLD);
 
 }
+
+//  cout << "b=bext["<<g<<"]+inscattering\n";
+//  VecView(b, PETSC_VIEWER_STDERR_WORLD);

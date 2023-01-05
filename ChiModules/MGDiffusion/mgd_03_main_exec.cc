@@ -1,4 +1,5 @@
 #include "mg_diffusion_solver.h"
+#include "tools/tools.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -23,10 +24,9 @@ void mg_diffusion::Solver::Execute()
       basic_options("max_inner_iters").IntegerValue()    //Max # of inner iterations
     );
 
-
-  // shortcuts
-  unsigned int lfg = mg_diffusion::Solver::last_fast_group;
-  unsigned int ng = mg_diffusion::Solver::num_groups;
+  KSPSetApplicationContext(petsc_solver.ksp, (void*)&my_app_context);
+  KSPMonitorSet(petsc_solver.ksp, &mg_diffusion::MGKSPMonitor,
+                nullptr, nullptr);
 
   int64_t verbose = basic_options("verbose_level").IntegerValue();
   my_app_context.verbose = verbose > 0 ? PETSC_TRUE : PETSC_FALSE;
@@ -34,6 +34,12 @@ void mg_diffusion::Solver::Execute()
     cout << "--context TRUE" << endl;
   if (my_app_context.verbose == PETSC_FALSE)
     cout << "--context FALSE" << endl;
+
+  std::cout << "STOP" << std::endl; std::cin.get();
+
+  // shortcuts
+  unsigned int lfg = mg_diffusion::Solver::last_fast_group;
+  unsigned int ng = mg_diffusion::Solver::num_groups;
 
   //============================================= Solve fast groups:
   for (unsigned int g=0; g<lfg; ++g)
