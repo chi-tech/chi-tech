@@ -138,8 +138,7 @@ MakeSimple1(int in_G, double in_sigmat, double c)
     }
   }//for g
 
-  sigma_a = ComputeAbsorptionXSFromTransfer();
-
+  ComputeAbsorption();
   ComputeDiffusionParameters();
 }
 
@@ -343,30 +342,39 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
 
 //######################################################################
-std::vector<chi_physics::TransportCrossSections::GrpVal>
-chi_physics::TransportCrossSections::ComputeAbsorptionXSFromTransfer()
+void chi_physics::TransportCrossSections::
+ComputeAbsorption()
 {
-  auto GetMatrixColumnSum = [](const chi_math::SparseMatrix& matrix, size_t col)
-  {
-    double sum = 0.0;
+  sigma_a.assign(num_groups, 0.0);
 
-    for (size_t row=0; row<matrix.NumRows(); ++row)
-    {
-      const auto& row_col_indices = matrix.rowI_indices[row];
-      const auto& row_values = matrix.rowI_values[row];
-      for (size_t j=0; j<row_col_indices.size(); ++j)
-        if (row_col_indices[j] == col)
-          sum += row_values[j];
-    }
-
-    return sum;
-  };
-
-  std::vector<GrpVal> temp_sigma_a(num_groups, 0.0);
-  if (not transfer_matrices.empty())
+  // compute for a pure absorber
+  if (transfer_matrices.empty())
     for (size_t g = 0; g < num_groups; ++g)
-      temp_sigma_a[g] = sigma_t[g] - sigma_f[g] -
-        GetMatrixColumnSum(transfer_matrices[0], g);
+      sigma_a[g] = sigma_t[g] - sigma_f[g];
 
-  return temp_sigma_a;
+  // estimate from a transfer matrix
+  else
+  {
+    chi::log.LogAllWarning()
+        << __FUNCTION__ << ": "
+        << "Estimating absorption from the transfer matrix.";
+
+    const auto& matrix = transfer_matrices[0];
+    for (size_t g = 0; g < num_groups; ++g)
+    {
+      // estimate the scattering cross-section
+      double sig_s = 0.0;
+      for (size_t row = 0; row < matrix.NumRows(); ++row)
+      {
+        const auto& cols = matrix.rowI_indices[row];
+        const auto& vals = matrix.rowI_values[row];
+        for (size_t t = 0; t < cols.size(); ++t)
+          if (cols[t] == g)
+            sig_s += vals[t];
+      }
+
+      sigma_a[g] = sigma_t[g] - sigma_f[g] - sig_s;
+    }//for g
+  }//if scattering present
+
 }

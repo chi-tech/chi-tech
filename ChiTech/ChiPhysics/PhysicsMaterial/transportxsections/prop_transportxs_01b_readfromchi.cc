@@ -389,7 +389,8 @@ void chi_physics::TransportCrossSections::
 
   //#############################################
   /**Lambda reading a transfer matrix.*/
-  auto ReadTransferMatrix = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
+  auto
+  ReadTransferMatrix = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
     (const std::string& keyword,std::vector<chi_math::SparseMatrix>& matrix,
      std::ifstream& file, size_t Gtot, int& line_number,
      std::istringstream& line_stream)

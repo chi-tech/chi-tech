@@ -65,7 +65,7 @@ public:
 
 private:
   void Reset();
-  std::vector<GrpVal> ComputeAbsorptionXSFromTransfer();
+  void ComputeAbsorption();
 
   public:
   void MakeSimple0(int in_G, double in_sigmat);

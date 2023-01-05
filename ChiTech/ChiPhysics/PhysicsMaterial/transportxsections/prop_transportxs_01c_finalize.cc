@@ -16,7 +16,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
 
   if (not transfer_matrices.empty() and (sigma_a_sum < 1.0e-28))
   {
-    sigma_a = ComputeAbsorptionXSFromTransfer();
+    ComputeAbsorption();
 
     chi::log.Log0Warning()
         << __FUNCTION__
