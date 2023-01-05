@@ -31,7 +31,6 @@ KSPSetConvergenceTest(setup.ksp,&RelativeResidualConvergenceTest,NULL,NULL);
 
 return setup;
 \endcode*/
-
 chi_math::PETScUtils::PETScSolverSetup
 chi_math::PETScUtils::CreateCommonKrylovSolverSetup(
   Mat ref_matrix,
