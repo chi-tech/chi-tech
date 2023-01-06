@@ -85,13 +85,20 @@ void mg_diffusion::Solver::Assemble_A_bext()
 
       // Robin boundary
       if (bndry.type == BoundaryType::Robin)
-      { 
+      {
         const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
         const size_t num_face_nodes = face.vertex_ids.size();
 
         const auto& aval = bndry.mg_values[0];
         const auto& bval = bndry.mg_values[1];
         const auto& fval = bndry.mg_values[2];
+
+//        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
+//        {
+//          std::cout << aval[g]<<","<<bval[g]<<","<<fval[g]<<std::endl;
+//        }
+//        chi::Exit(0);
+
 
         // sanity check, Assert if b=0
         for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
@@ -125,6 +132,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
                   entry_aij +=  qp_face_data.ShapeValue(i, qp)
                                 * qp_face_data.ShapeValue(j, qp)
                                 * qp_face_data.JxW(qp);
+//                if(g==0)
+//                  std::cout << entry_aij << "-------"<<aval[g] / bval[g] << std::endl;
                 Acell[g][i][j] += aval[g] / bval[g] * entry_aij;
               }//for fj
             }//for fi
@@ -140,14 +149,12 @@ void mg_diffusion::Solver::Assemble_A_bext()
  
     //======================= Assembly into system
     for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-    {
       for (size_t i=0; i<num_nodes; ++i)
       {
         VecSetValue(bext[g], imap[i], rhs_cell[g][i], ADD_VALUES);
         for (size_t j=0; j<num_nodes; ++j)
           MatSetValue(A[g], imap[i], imap[j], Acell[g][i][j], ADD_VALUES);
       }//for i
-    }
 
   }//for cell
  
