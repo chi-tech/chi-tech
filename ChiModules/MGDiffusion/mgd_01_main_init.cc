@@ -11,6 +11,7 @@
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+//#include <stdio.h>
 
 //============================================= constructor
 mg_diffusion::Solver::Solver(const std::string& in_solver_name):
@@ -110,7 +111,8 @@ void mg_diffusion::Solver::Initialize()
     A[g] = chi_math::PETScUtils::CreateSquareMatrix(n,N);
 //    x[g] = chi_math::PETScUtils::CreateVector(n,N);
     x[g] = chi_math::PETScUtils::CreateVectorWithGhosts(n,N,
-                  ghost_dof_indices.size(), ghost_dof_indices);
+                  static_cast<int64_t>(ghost_dof_indices.size()),
+                  ghost_dof_indices);
     bext[g] = chi_math::PETScUtils::CreateVector(n,N);
 
     chi_math::PETScUtils::InitMatrixSparsity(A[g],
@@ -138,9 +140,15 @@ void mg_diffusion::Solver::Initialize()
 
     for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
     {
+      unk_man.SetUnknownTextName(0,"");
+      unk_man.SetUnknownComponentTextName(0,0,"");
+
+      char buff[100];
+      int dummy = snprintf(buff,4,"%03d",g);
+
       auto initial_field_function =
         std::make_shared<chi_physics::FieldFunction>(
-          std::string("mg_phi_"+std::to_string(g)),//Text name
+          std::string("mg_phi_"+std::string(buff)),//Text name
           sdm_ptr,              //Spatial Discretization
           &x[g],                //Data vector
           unk_man);             //Unknown Manager
