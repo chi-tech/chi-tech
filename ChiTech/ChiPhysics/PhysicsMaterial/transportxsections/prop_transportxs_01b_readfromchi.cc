@@ -246,10 +246,13 @@ CHI_DELAYED_END
 void chi_physics::TransportCrossSections::
   MakeFromCHIxsFile(const std::string &file_name)
 {
-  //======================================== Clear any previous data
+  //clear any previous data
   Reset();
 
-  //======================================== Read file
+  //============================================================
+  // Open Chi XS file
+  //============================================================
+
   chi::log.Log() << "Reading Chi cross-section file \"" << file_name << "\"\n";
   //opens and checks if open
   std::ifstream file;
@@ -261,6 +264,10 @@ void chi_physics::TransportCrossSections::
                            << "TransportCrossSections::MakeFromChixsFile\n";
     chi::Exit(EXIT_FAILURE);
   }
+
+  //============================================================
+  // Define utility functions for parsing
+  //============================================================
 
   //########################################
   /// Lambda for reading group structure data.
@@ -401,16 +408,18 @@ void chi_physics::TransportCrossSections::
         }
       };
 
-  //================================================== Read file line by line
+  //============================================================
+  // Read the Chi XS file
+  //============================================================
+
   std::string word, line;
   unsigned int line_number = 0;
-  bool found_velocity = false;
-  bool found_inv_velocity = false;
   while (std::getline(file, line))
   {
     std::istringstream line_stream(line);
     line_stream >> word;
 
+    //parse number of groups
     if (word == "NUM_GROUPS")
     {
       line_stream >> num_groups;
@@ -431,6 +440,8 @@ void chi_physics::TransportCrossSections::
 
       inv_velocity.resize(num_groups, 0.0);
     }
+
+    //parse the number of scattering moments
     if (word == "NUM_MOMENTS")
     {
       if (num_groups == 0)
@@ -446,6 +457,8 @@ void chi_physics::TransportCrossSections::
       transfer_matrices.resize(M, TransferMatrix (num_groups, num_groups));
       scattering_order = M - 1;
     }
+
+    //parse the number of precursors species
     if (word == "NUM_PRECURSORS")
     {
       if (num_groups == 0)
@@ -464,12 +477,17 @@ void chi_physics::TransportCrossSections::
         chi_delayed[g].resize(num_precursors, 0.0);
     }
 
+    //parse nuclear data
     try
     {
       auto& ln = line_number;
       auto& ls = line_stream;
       auto& f  = file;
       auto& fw = word;
+
+      if (fw == "GROUP_STRUCTURE_BEGIN")
+        ReadGroupStructure("GROUP_STRUCTURE",
+                           e_bounds, num_groups, f, ls, ln);
 
       if (fw == "SIGMA_T_BEGIN")
         Read1DData("SIGMA_T", sigma_t, num_groups, f, ls, ln);
@@ -526,6 +544,7 @@ void chi_physics::TransportCrossSections::
           ReadEmissionSpectra("CHI_DELAYED", chi_delayed, f, ls, ln);
       }
     }//try
+
     catch (const std::runtime_error& err)
     {
       chi::log.LogAllError()
@@ -534,6 +553,7 @@ void chi_physics::TransportCrossSections::
         << err.what();
       chi::Exit(EXIT_FAILURE);
     }
+
     catch (...)
     {
       chi::log.LogAllError()
