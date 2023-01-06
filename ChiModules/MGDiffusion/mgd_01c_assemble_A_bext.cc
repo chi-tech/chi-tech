@@ -4,18 +4,7 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
-//#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-//
-//#include "mg_diffusion_bndry.h"
-//
-//#include "ChiPhysics/FieldFunction/fieldfunction.h"
-//
-
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-
-//#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
-//#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
-//#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Assemble_A_bext()
@@ -93,13 +82,6 @@ void mg_diffusion::Solver::Assemble_A_bext()
         const auto& bval = bndry.mg_values[1];
         const auto& fval = bndry.mg_values[2];
 
-//        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-//        {
-//          std::cout << aval[g]<<","<<bval[g]<<","<<fval[g]<<std::endl;
-//        }
-//        chi::Exit(0);
-
-
         // sanity check, Assert if b=0
         for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
         {
@@ -111,7 +93,6 @@ void mg_diffusion::Solver::Assemble_A_bext()
         // only do this part if true Robin (i.e., a!=0)
         for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
         {
-          //  std::cout << aval[g] << ", " << bval[g] << ", " << fval[g] << std::endl;
           if (std::fabs(aval[g]) > 1.0e-8)
           {
             // loop over nodes of that face
@@ -132,8 +113,6 @@ void mg_diffusion::Solver::Assemble_A_bext()
                   entry_aij +=  qp_face_data.ShapeValue(i, qp)
                                 * qp_face_data.ShapeValue(j, qp)
                                 * qp_face_data.JxW(qp);
-//                if(g==0)
-//                  std::cout << entry_aij << "-------"<<aval[g] / bval[g] << std::endl;
                 Acell[g][i][j] += aval[g] / bval[g] * entry_aij;
               }//for fj
             }//for fi
@@ -166,17 +145,18 @@ void mg_diffusion::Solver::Assemble_A_bext()
     VecAssemblyBegin(bext[g]);
     VecAssemblyEnd(bext[g]);
   }
-  PetscViewer viewer;
-  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"A2_before_bc.m",&viewer);
-  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
-  MatView(A[0],viewer);
-  PetscViewerPopFormat(viewer);
-  PetscViewerDestroy(&viewer);
-  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"bext2_before_bc.m",&viewer);
-  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
-  VecView(bext[0],viewer);
-  PetscViewerPopFormat(viewer);
-  PetscViewerDestroy(&viewer);
+
+//  PetscViewer viewer;
+//  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"A2_before_bc.m",&viewer);
+//  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+//  MatView(A[0],viewer);
+//  PetscViewerPopFormat(viewer);
+//  PetscViewerDestroy(&viewer);
+//  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"bext2_before_bc.m",&viewer);
+//  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+//  VecView(bext[0],viewer);
+//  PetscViewerPopFormat(viewer);
+//  PetscViewerDestroy(&viewer);
 
   chi::log.Log() << "Done global assembly";
 
