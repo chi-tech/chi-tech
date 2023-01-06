@@ -4,18 +4,7 @@
 #include "chi_log.h"
 #include "ChiTimer/chi_timer.h"
 
-//#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-//
-//#include "mg_diffusion_bndry.h"
-//
-//#include "ChiPhysics/FieldFunction/fieldfunction.h"
-//
-
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-
-//#include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
-//#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
-//#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Assemble_A_bext()
@@ -72,11 +61,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
       for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
         rhs_cell[g][i] = entry_rhsi * (qext->source_value_g[g]);
     }//for i
- 
-    //======================= Flag nodes for being on a boundary
-//    std::vector<int> dirichlet_count(num_nodes, 0);
-//    std::vector<double> dirichlet_value(num_nodes, 0.0);
 
+    //======================= Deal with BC (all based on variations of Robin)
     const size_t num_faces = cell.faces.size();
     for (size_t f=0; f<num_faces; ++f)
     {
@@ -88,7 +74,7 @@ void mg_diffusion::Solver::Assemble_A_bext()
 
       // Robin boundary
       if (bndry.type == BoundaryType::Robin)
-      { 
+      {
         const auto  qp_face_data = cell_mapping.MakeFaceQuadraturePointData( f );
         const size_t num_face_nodes = face.vertex_ids.size();
 
@@ -96,42 +82,42 @@ void mg_diffusion::Solver::Assemble_A_bext()
         const auto& bval = bndry.mg_values[1];
         const auto& fval = bndry.mg_values[2];
 
-//        chi::log.Log() << "Boundary  set as Robin with a,b,f = ("
-//                    << aval << ","
-//                    << bval << ","
-//                    << fval << ") ";
-        // true Robin when a!=0, otherwise, it is a Neumann:
-        // Assert if b=0
-        if (std::fabs(bval) < 1e-8)
-          throw std::logic_error("if b=0, this is a Dirichlet BC, not a Robin BC");
-        
-        // loop over nodes of that face
-        for (size_t fi=0; fi<num_face_nodes; ++fi)
+        // sanity check, Assert if b=0
+        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
         {
-          const uint i = cell_mapping.MapFaceNode(f,fi);
-            
-          double entry_rhsi = 0.0;
-          for (size_t qp : qp_face_data.QuadraturePointIndices() )
-            entry_rhsi +=  qp_face_data.ShapeValue(i, qp) * qp_face_data.JxW(qp);
-          for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-            rhs_cell[g][i] +=  fval / bval * entry_rhsi;
-            
-          // only do this part if true Robin (i.e., a!=0)
-          if (std::fabs(aval) > 1.0e-8)
+          if (std::fabs(bval[g]) < 1e-8)
+            throw std::logic_error("if b=0, this is a Dirichlet BC, not a Robin BC");
+        }
+
+        // true Robin when a!=0, otherwise, it is a Neumann:
+        // only do this part if true Robin (i.e., a!=0)
+        for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
+        {
+          if (std::fabs(aval[g]) > 1.0e-8)
           {
-            for (size_t fj=0; fj<num_face_nodes; ++fj)
+            // loop over nodes of that face
+            for (size_t fi=0; fi<num_face_nodes; ++fi)
             {
-              const uint j = cell_mapping.MapFaceNode(f,fj);
-          
-              double entry_aij = 0.0;
-              for (size_t qp : qp_face_data.QuadraturePointIndices())
-                entry_aij +=  qp_face_data.ShapeValue(i, qp) *qp_face_data.ShapeValue(j, qp)
+              const uint i = cell_mapping.MapFaceNode(f,fi);
+
+              double entry_rhsi = 0.0;
+              for (size_t qp : qp_face_data.QuadraturePointIndices() )
+                entry_rhsi +=  qp_face_data.ShapeValue(i, qp) * qp_face_data.JxW(qp);
+              rhs_cell[g][i] +=  fval[g] / bval[g] * entry_rhsi;
+
+              for (size_t fj=0; fj<num_face_nodes; ++fj)
+              {
+                const uint j = cell_mapping.MapFaceNode(f,fj);
+                double entry_aij = 0.0;
+                for (size_t qp : qp_face_data.QuadraturePointIndices())
+                  entry_aij +=  qp_face_data.ShapeValue(i, qp)
+                                * qp_face_data.ShapeValue(j, qp)
                                 * qp_face_data.JxW(qp);
-              for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-                Acell[g][i][j] += aval / bval * entry_aij;
-            }//for fj
+                Acell[g][i][j] += aval[g] / bval[g] * entry_aij;
+              }//for fj
+            }//for fi
           }//end true Robin
-        }//for fi
+        }//for g
       }//if Robin
     }//for face f
  
@@ -142,14 +128,12 @@ void mg_diffusion::Solver::Assemble_A_bext()
  
     //======================= Assembly into system
     for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
-    {
       for (size_t i=0; i<num_nodes; ++i)
       {
         VecSetValue(bext[g], imap[i], rhs_cell[g][i], ADD_VALUES);
         for (size_t j=0; j<num_nodes; ++j)
           MatSetValue(A[g], imap[i], imap[j], Acell[g][i][j], ADD_VALUES);
       }//for i
-    }
 
   }//for cell
  
@@ -161,17 +145,18 @@ void mg_diffusion::Solver::Assemble_A_bext()
     VecAssemblyBegin(bext[g]);
     VecAssemblyEnd(bext[g]);
   }
-  PetscViewer viewer;
-  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"A1_before_bc.m",&viewer);
-  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
-  MatView(A[0],viewer);
-  PetscViewerPopFormat(viewer);
-  PetscViewerDestroy(&viewer);
-  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"bext1_before_bc.m",&viewer);
-  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
-  VecView(bext[0],viewer);
-  PetscViewerPopFormat(viewer);
-  PetscViewerDestroy(&viewer);
+
+//  PetscViewer viewer;
+//  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"A2_before_bc.m",&viewer);
+//  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+//  MatView(A[0],viewer);
+//  PetscViewerPopFormat(viewer);
+//  PetscViewerDestroy(&viewer);
+//  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"bext2_before_bc.m",&viewer);
+//  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+//  VecView(bext[0],viewer);
+//  PetscViewerPopFormat(viewer);
+//  PetscViewerDestroy(&viewer);
 
   chi::log.Log() << "Done global assembly";
 

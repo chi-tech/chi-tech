@@ -59,9 +59,12 @@ public:
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
   KSPAppContext my_app_context;
 
-  typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
+//  typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
+  typedef std::pair<BoundaryType,std::array<std::vector<double>, 3>>
+                                                  BoundaryInfo;
+
   typedef std::map<uint, BoundaryInfo> BoundaryPreferences;
-  BoundaryPreferences      boundary_preferences;
+  BoundaryPreferences     boundary_preferences;
   std::vector<Boundary>   boundaries;
 
   explicit Solver(const std::string& in_solver_name);
