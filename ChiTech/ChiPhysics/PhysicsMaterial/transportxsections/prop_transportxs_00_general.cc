@@ -5,7 +5,7 @@
 
 
 //######################################################################
-/**Default constructor.*/
+/** Default constructor. */
 chi_physics::TransportCrossSections::TransportCrossSections() :
   chi_physics::MaterialProperty(PropertyType::TRANSPORT_XSECTIONS)
 {
@@ -18,123 +18,83 @@ chi_physics::TransportCrossSections::TransportCrossSections() :
 
 
 //######################################################################
-void chi_physics::TransportCrossSections::Reset()
-{
-  num_groups = 0;
-  scattering_order = 0;
-  num_precursors = 0;
-  is_fissionable = false;
-
-  sigma_t.clear();
-  sigma_f.clear();
-  sigma_a.clear();
-
-  chi.clear();
-  chi_prompt.clear();
-  chi_delayed.clear();
-
-  nu.clear();
-  nu_prompt.clear();
-  nu_delayed.clear();
-
-  nu_sigma_f.clear();
-  nu_prompt_sigma_f.clear();
-  nu_delayed_sigma_f.clear();
-
-  precursor_lambda.clear();
-  precursor_yield.clear();
-
-  inv_velocity.clear();
-
-  //Diffusion quantities
-  diffusion_initialized = false;
-  diffusion_coeff.clear();
-  sigma_removal.clear();
-  sigma_s_gtog.clear();
-
-  //Monte-Carlo quantities
-  scattering_initialized = false;
-  cdf_gprime_g.clear();
-  scat_angles_gprime_g.clear();
-}
-
-
-//######################################################################
-/**Makes a simple material with no transfer matrix just sigma_t.*/
+/** Makes a simple material with no transfer matrix just sigma_t. */
 void chi_physics::TransportCrossSections::
-MakeSimple0(int in_G, double in_sigmat)
+MakeSimple0(int n_grps, double sigma)
 {
   //======================================== Clear any previous data
   Reset();
 
-  num_groups = in_G;
+  num_groups = n_grps;
   scattering_order = 0;
 
   sigma_t.clear();
-  sigma_t.resize(in_G, in_sigmat);
-  sigma_f.resize(in_G, 0.0);
-  sigma_a.resize(in_G, 0.0);
-  chi.resize(in_G, 0.0);
-  chi_prompt.resize(in_G, 0.0);
-  nu_sigma_f.resize(in_G, 0.0);
-  nu_prompt_sigma_f.resize(in_G, 0.0);
-  nu_delayed_sigma_f.resize(in_G, 0.0);
-  inv_velocity.resize(in_G, 0.0);
+  sigma_t.resize(n_grps, sigma);
+  sigma_f.resize(n_grps, 0.0);
+  sigma_a.resize(n_grps, 0.0);
+  chi.resize(n_grps, 0.0);
+  chi_prompt.resize(n_grps, 0.0);
+  nu_sigma_f.resize(n_grps, 0.0);
+  nu_prompt_sigma_f.resize(n_grps, 0.0);
+  nu_delayed_sigma_f.resize(n_grps, 0.0);
+  inv_velocity.resize(n_grps, 0.0);
 
-  transfer_matrices.emplace_back(in_G, in_G);
+  transfer_matrices.emplace_back(n_grps, n_grps);
 
   ComputeDiffusionParameters();
 }
 
 
 //######################################################################
-/**Makes a simple material with isotropic transfer matrix (L=0)
+/**
+ * Makes a simple material with isotropic transfer matrix (L=0)
  * and mostly down scattering but with a few of the last groups
- * subject to up-scattering.*/
+ * subject to up-scattering.
+ */
 void chi_physics::TransportCrossSections::
-MakeSimple1(int in_G, double in_sigmat, double c)
+MakeSimple1(int n_grps, double sigma, double c)
 {
   //======================================== Clear any previous data
   Reset();
 
-  num_groups = in_G;
+  num_groups = n_grps;
   scattering_order = 0;
 
-  sigma_t.resize(in_G, in_sigmat);
-  sigma_f.resize(in_G, 0.0);
-  sigma_a.resize(in_G, 0.0);
-  chi.resize(in_G, 0.0);
-  chi_prompt.resize(in_G, 0.0);
-  nu_sigma_f.resize(in_G, 0.0);
-  nu_prompt_sigma_f.resize(in_G, 0.0);
-  nu_delayed_sigma_f.resize(in_G, 0.0);
-  inv_velocity.resize(in_G, 0.0);
+  sigma_t.resize(n_grps, sigma);
+  sigma_f.resize(n_grps, 0.0);
+  sigma_a.resize(n_grps, 0.0);
+  chi.resize(n_grps, 0.0);
+  chi_prompt.resize(n_grps, 0.0);
+  nu_sigma_f.resize(n_grps, 0.0);
+  nu_prompt_sigma_f.resize(n_grps, 0.0);
+  nu_delayed_sigma_f.resize(n_grps, 0.0);
+  inv_velocity.resize(n_grps, 0.0);
 
-  transfer_matrices.emplace_back(in_G, in_G);
+  transfer_matrices.emplace_back(n_grps, n_grps);
 
   auto& ref_matrix = transfer_matrices.back();
 
   if (num_groups == 1)
-    ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c));
+    ref_matrix.SetDiagonal(std::vector<double>(n_grps, sigma * c));
   else
-    ref_matrix.SetDiagonal(std::vector<double>(in_G,in_sigmat*c*2.0/4.0));
+    ref_matrix.SetDiagonal(std::vector<double>(n_grps, sigma * c * 2.0 / 4.0));
 
-  for (int g=0; g<in_G; g++)
+  for (int g=0; g < n_grps; g++)
   {
     //Downscattering
     if (g>0)
-      ref_matrix.Insert(g,g-1,in_sigmat*c*2.0/4.0);
+      ref_matrix.Insert(g,g-1, sigma * c * 2.0 / 4.0);
 
     //Upscattering
-    if (g>(in_G/2))
+    if (g>(n_grps / 2))
     {
-      if (g<(in_G-1))
+      if (g<(n_grps - 1))
       {
-        ref_matrix.Insert(g,g-1,in_sigmat*c*1.0/4.0);
-        ref_matrix.Insert(g,g+1,in_sigmat*c*1.0/4.0);
+        ref_matrix.Insert(g,g-1, sigma * c * 1.0 / 4.0);
+        ref_matrix.Insert(g,g+1, sigma * c * 1.0 / 4.0);
       }
       else
-        ref_matrix.Insert(g,g-1,in_sigmat*c*2.0/4.0);
+        ref_matrix.Insert(g,g-1, sigma * c * 2.0 / 4.0);
     }
   }//for g
 
@@ -144,7 +104,7 @@ MakeSimple1(int in_G, double in_sigmat, double c)
 
 
 //######################################################################
-/**Populates the cross-section from a combination of others.*/
+/** Populates the cross-section from a combination of others. */
 void chi_physics::TransportCrossSections::
 MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
@@ -338,6 +298,49 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       }//for i
     }//for m
   }//for xs
+}
+
+
+//######################################################################
+void chi_physics::TransportCrossSections::
+Reset()
+{
+  num_groups = 0;
+  scattering_order = 0;
+  num_precursors = 0;
+  is_fissionable = false;
+
+  sigma_t.clear();
+  sigma_f.clear();
+  sigma_a.clear();
+
+  chi.clear();
+  chi_prompt.clear();
+  chi_delayed.clear();
+
+  nu.clear();
+  nu_prompt.clear();
+  nu_delayed.clear();
+
+  nu_sigma_f.clear();
+  nu_prompt_sigma_f.clear();
+  nu_delayed_sigma_f.clear();
+
+  precursor_lambda.clear();
+  precursor_yield.clear();
+
+  inv_velocity.clear();
+
+  //Diffusion quantities
+  diffusion_initialized = false;
+  diffusion_coeff.clear();
+  sigma_removal.clear();
+  sigma_s_gtog.clear();
+
+  //Monte-Carlo quantities
+  scattering_initialized = false;
+  cdf_gprime_g.clear();
+  scat_angles_gprime_g.clear();
 }
 
 

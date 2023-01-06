@@ -16,6 +16,10 @@ namespace chi_physics
 /** Class for handling Transport-Theory related cross sections.*/
 class TransportCrossSections : public chi_physics::MaterialProperty
 {
+protected:
+  using TransferMatrix = chi_math::SparseMatrix;
+  using EmissionSpectra = std::vector<std::vector<double>>;
+
 public:
   unsigned int num_groups=0;       ///< Total number of Groups
   unsigned int scattering_order=0; ///< Legendre scattering order
@@ -30,9 +34,9 @@ public:
   std::vector<double> sigma_a;  ///< Absorption cross section
   std::vector<double> sigma_f;  ///< Fission cross section
 
-  std::vector<double> chi;                      ///< Fission spectrum
-  std::vector<double> chi_prompt;               ///< Prompt fission spectrum
-  std::vector<std::vector<double>> chi_delayed; ///< Delayed emission spectra
+  std::vector<double> chi;         ///< Fission spectrum
+  std::vector<double> chi_prompt;  ///< Prompt fission spectrum
+  EmissionSpectra chi_delayed;     ///< Delayed emission spectra
 
   std::vector<double> nu;         ///< Total neutrons per fission
   std::vector<double> nu_prompt;  ///< Prompt neutrons per fission
@@ -44,7 +48,7 @@ public:
 
   std::vector<double> inv_velocity;
 
-  std::vector<chi_math::SparseMatrix> transfer_matrices;
+  std::vector<TransferMatrix> transfer_matrices;
 
   std::vector<double> precursor_lambda; ///< Precursor decay constants
   std::vector<double> precursor_yield;  ///< Precursor yield fractions
@@ -68,14 +72,14 @@ public:
   //00
   TransportCrossSections();
 
+  public:
+  void MakeSimple0(int n_grps, double sigma);
+  void MakeSimple1(int n_grps, double sigma, double c);
+  void MakeCombined(std::vector<std::pair<int,double>>& combinations);
+
 private:
   void Reset();
   void ComputeAbsorption();
-
-  public:
-  void MakeSimple0(int in_G, double in_sigmat);
-  void MakeSimple1(int in_G, double in_sigmat, double c);
-  void MakeCombined(std::vector<std::pair<int,double>>& combinations);
 
   //01
   void MakeFromPDTxsFile(const std::string &file_name,const std::string& MT_TRANSFER);
