@@ -59,7 +59,6 @@ void lbs::SteadySolver::ComputeBalance()
 
   //======================================== Compute absorption, material-source
   //                                         and in-flow
-  size_t num_groups=groups.size();
   double local_out_flow   = 0.0;
   double local_in_flow    = 0.0;
   double local_absorption = 0.0;

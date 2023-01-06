@@ -353,7 +353,7 @@ ComputeAbsorption()
   // compute for a pure absorber
   if (transfer_matrices.empty())
     for (size_t g = 0; g < num_groups; ++g)
-      sigma_a[g] = sigma_t[g] - sigma_f[g];
+      sigma_a[g] = sigma_t[g];
 
   // estimate from a transfer matrix
   else
@@ -376,7 +376,7 @@ ComputeAbsorption()
             sig_s += vals[t];
       }
 
-      sigma_a[g] = sigma_t[g] - sigma_f[g] - sig_s;
+      sigma_a[g] = sigma_t[g] - sig_s;
     }//for g
   }//if scattering present
 
