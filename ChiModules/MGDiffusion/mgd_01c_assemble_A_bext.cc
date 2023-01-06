@@ -72,9 +72,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
       for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
         rhs_cell[g][i] = entry_rhsi * (qext->source_value_g[g]);
     }//for i
- 
-    //======================= Deal with BC (all based on variations of Robin)
 
+    //======================= Deal with BC (all based on variations of Robin)
     const size_t num_faces = cell.faces.size();
     for (size_t f=0; f<num_faces; ++f)
     {
@@ -160,7 +159,18 @@ void mg_diffusion::Solver::Assemble_A_bext()
     VecAssemblyBegin(bext[g]);
     VecAssemblyEnd(bext[g]);
   }
- 
+  PetscViewer viewer;
+  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"A2_before_bc.m",&viewer);
+  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+  MatView(A[0],viewer);
+  PetscViewerPopFormat(viewer);
+  PetscViewerDestroy(&viewer);
+  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"bext2_before_bc.m",&viewer);
+  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+  VecView(bext[0],viewer);
+  PetscViewerPopFormat(viewer);
+  PetscViewerDestroy(&viewer);
+
   chi::log.Log() << "Done global assembly";
 
 }
