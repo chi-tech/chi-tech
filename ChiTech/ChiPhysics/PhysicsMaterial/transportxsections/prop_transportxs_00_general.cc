@@ -121,7 +121,6 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   unsigned int n_grps = 0;
   unsigned int n_precs = 0;
 
-  double N_total  = 0.0; //total density
   double Nf_total = 0.0; //total density of fissile materials
   double Np_total = 0.0; //total density of materials with precursors
 
@@ -145,7 +144,6 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     xsecs.push_back(xs);
 
     //increment densities
-    N_total += combo.second;
     if (xs->is_fissionable)
     {
       this->is_fissionable = true;
@@ -236,8 +234,8 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     for (unsigned int g = 0; g < n_grps; ++g)
     {
       sigma_t[g] += xsecs[x]->sigma_t[g] * N_i;
-      sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
       sigma_a[g] += xsecs[x]->sigma_a[g] * N_i;
+      sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
 
       chi[g] += xsecs[x]->chi[g] * ff_i;
       chi_prompt[g] += xsecs[x]->chi_prompt[g] * ff_i;
@@ -310,6 +308,8 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       }//for i
     }//for m
   }//for xs
+
+  FinalizeCrossSections();
 }
 
 
@@ -371,21 +371,23 @@ ComputeAbsorption()
   else
   {
     chi::log.LogAllWarning()
-        << __FUNCTION__ << ": "
-        << "Estimating absorption from the transfer matrix.";
+        << "Estimating absorption from the transfer S0.";
 
-    const auto& matrix = transfer_matrices[0];
+    const auto& S0 = transfer_matrices[0];
     for (size_t g = 0; g < num_groups; ++g)
     {
       // estimate the scattering cross-section
       double sig_s = 0.0;
-      for (size_t row = 0; row < matrix.NumRows(); ++row)
+      for (size_t row = 0; row < S0.NumRows(); ++row)
       {
-        const auto& cols = matrix.rowI_indices[row];
-        const auto& vals = matrix.rowI_values[row];
+        const auto& cols = S0.rowI_indices[row];
+        const auto& vals = S0.rowI_values[row];
         for (size_t t = 0; t < cols.size(); ++t)
           if (cols[t] == g)
+          {
             sig_s += vals[t];
+            break;
+          }
       }
 
       sigma_a[g] = sigma_t[g] - sig_s;

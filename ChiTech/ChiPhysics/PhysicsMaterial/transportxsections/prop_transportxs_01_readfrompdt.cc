@@ -9,10 +9,13 @@
 void chi_physics::TransportCrossSections::
   MakeFromPDTxsFile(const std::string &file_name,const std::string& MT_TRANSFER)
 {
-  //======================================== Clear any previous data
+  //clear any previous data
   Reset();
 
-  //======================================== Opening the file
+  //============================================================
+  // Open the file
+  //============================================================
+
   chi::log.Log()
     << "Reading PDT cross-section file \"" << file_name << "\"";
 
@@ -38,7 +41,10 @@ void chi_physics::TransportCrossSections::
   int         num_transfer=0;
   int         scat_order  =0;
 
-  //======================================== Read header information
+  //============================================================
+  // Read header information
+  //============================================================
+
   //The first two lines are comments
   file.getline(line,250);
   file.getline(line,250);
@@ -65,7 +71,6 @@ void chi_physics::TransportCrossSections::
   file.getline(line,250);
   file.getline(line,250);
 
-
   //"6" neutron processes and "1" transfer process.
   file >> num_process >> word >> word >> word >> num_transfer;
   file.getline(line,250);
@@ -74,7 +79,10 @@ void chi_physics::TransportCrossSections::
   file >> word >> word >> scat_order;
   file.getline(line,250);
 
-  //====================================== Resizing cross-sections
+  //============================================================
+  // Resizing cross-sections
+  //============================================================
+
   num_groups = num_grps_G;
   scattering_order = scat_order;
   sigma_t.clear();
@@ -89,7 +97,8 @@ void chi_physics::TransportCrossSections::
   transfer_matrices.resize(scat_order + 1,
                            chi_math::SparseMatrix(num_grps_G,num_grps_G));
 
-  //======================================== Lambda for advancing to MT
+  //##################################################
+  /// Lambda for advancing to MT
   auto AdvanceToNextMT = [](std::ifstream& file,
                             const std::string& file_name)
   {
@@ -111,7 +120,8 @@ void chi_physics::TransportCrossSections::
     return 0;
   };
 
-  //======================================== Lambda for reading 1D xs
+  //##################################################
+  /// Lambda for reading 1D xs
   auto Read1DXS = [](std::vector<double>& xs, std::ifstream& file, size_t G)
   {
     for (int g=0; g<G; g++)
@@ -123,7 +133,10 @@ void chi_physics::TransportCrossSections::
     }
   };
 
-  //======================================== Find MT-by-MT
+  //============================================================
+  // Find MT-by-MT
+  //============================================================
+
   std::string word0,word1;
   std::stringstream linestring;
   int mt_transfer = std::stoi(MT_SEARCH_VAL, nullptr);

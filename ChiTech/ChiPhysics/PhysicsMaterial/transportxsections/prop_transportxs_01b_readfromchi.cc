@@ -53,26 +53,26 @@ Linear Boltzmann Equation of the form:
 \f]
 
 The two most prominent items required here includes \f$ \sigma_{tg} \f$ and
- \f$ \sigma_{s\ell,g'{\to}g} \f$. The latter is an entry in a structure we
- call a generic transfer matrix for moment \f$ \ell \f$ with rows \f$g=0..G-1\f$
- and columns \f$g'=0..G-1\f$. These two items are often the only items required
- in a transport simulation.
+\f$ \sigma_{s\ell,g'{\to}g} \f$. The latter is an entry in a structure we
+call a generic transfer matrix for moment \f$ \ell \f$ with rows \f$g=0..G-1\f$
+and columns \f$g'=0..G-1\f$. These two items are often the only items required
+in a transport simulation.
 
- In simulations with fission-sources, cross sections
- support two formats, the simple combined cross sections without delayed
- neutrons
+In simulations with fission-sources, cross sections support two formats,
+the simple combined cross sections without delayed neutrons
 
 \f[
 q_{fission,ng} = \frac{\chi_g}{4\pi}
  \sum_{g'=0}^{G-1} \nu_{g'} \sigma_{fg'} \phi_{00g'}
 \f]
 
-and those with delayed neutrons, the latter which are currently only used in the
-KEigen solver.
+and those with delayed neutrons, the latter which are currently only used in
+the k-eigenvalue solver.
 
-## KEigen-value related items
-As stated before, the cross section file supports two formats, the simple combined cross sections without delayed
-neutrons which are depicted above and those with delayed neutrons shown below
+## k-eigenvalue related items
+As stated before, the cross section file supports two formats, the simple
+combined cross sections without delayed neutrons which are depicted above
+and those with delayed neutrons shown below
 
 \f[
 q_{fission,ng} = \frac{\chi_g}{4\pi}
@@ -94,67 +94,67 @@ constants, \f$ \lambda_j \f$ are required.
 - NUM_PRECURSORS num_precursors Optional. Indicates how many precursors are used
   in this cross section. Symbol \f$ J \f$
 - Optional key words per line:
-  - SIGMA_T_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_T_END.
-    Each line in the block processes the first two words as [Group, sigma_t].
-    Populates the sigma_tg field. Symbol \f$ \sigma_{tg} \f$.
-  - SIGMA_F_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_F_END.
-    Each line in the block processes the first two words as [Group, sigma_f].
-    Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
-  - SIGMA_A_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_A_END.
-    Each line in the block processes the first two words as [Group, sigma_a].
-    Populates the sigma_ag field. Symbol \f$ \sigma_{ag} \f$. If this is
-    not supplied then sigma_a is estimated from the transfer matrix and
-    may erroneously estimate balance.
-  - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END. Each line in
-    the block processes the first two words as [Group, nu]. Populates the
-    nu field. Upon completing the file processing the nu_sigma_fg field
-    gets populated from the product of nu and sigma_fg. Symbol \f$ \nu_g \f$.
+  - SIGMA_T_BEGIN. Optional. Starts a block that is terminated by a line
+    SIGMA_T_END. Each line in the block processes the first two words as
+    [group, sigma_t]. Populates the sigma_tg field. Symbol \f$ \sigma_{tg} \f$.
+  - SIGMA_A_BEGIN. Optional. Starts a block that is terminated by a line
+    SIGMA_A_END. Each line in the block processes the first two words as
+    [group, sigma_a]. Populates the sigma_ag field. Symbol \f$ \sigma_{ag} \f$.
+    If this is not supplied then sigma_a is estimated from the transfer matrix
+    and may erroneously estimate balance.
+  - SIGMA_F_BEGIN. Optional. Starts a block that is terminated by a line
+    SIGMA_F_END. Each line in the block processes the first two words as
+    [group, sigma_f]. Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
+  - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END.
+    Each line in the block processes the first two words as [group, nu].
+    Populates the nu field. Upon completing the file processing the nu_sigma_fg
+    field gets populated from the product of nu and sigma_fg.
+    Symbol \f$ \nu_g \f$.
   - NU_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     NU_PROMPT_END. Each line in the block processes the first two words as
-    [Group, nu]. Populates the nu_prompt field. Upon completing the file
+    [group, nu_prompt]. Populates the nu_prompt field. Upon completing the file
     processing the nu_p_sigma_fg field gets populated from the product of
-    nu_prompt and sigma_fg.
-    Symbol \f$ \nu_{prompt,g} \f$.
+    nu_prompt and sigma_fg. Symbol \f$ \nu_{prompt,g} \f$.
   - NU_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
     NU_DELAYED_END. Each line in the block processes the first two words as
-    [Group, nu]. Populates the nu_delayed field. Upon completing the file
-    processing the nu_d_sigma_fg field gets populated from the product of
-    nu_delayed and sigma_fg.
-    Symbol \f$ \nu_{delayed,g} \f$.
+    [group, nu_delayed]. Populates the nu_delayed field. Upon completing the
+    file processing the nu_d_sigma_fg field gets populated from the product of
+    nu_delayed and sigma_fg. Symbol \f$ \nu_{delayed,g} \f$.
   - CHI_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_END. Each line in the block processes the first two words as
-    [Group, chi]. Populates the chi field. Symbol \f$ \chi_{g} \f$.
+    [group, chi]. Populates the chi field. Symbol \f$ \chi_{g} \f$.
   - CHI_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_PROMPT_END. Each line in the block processes the first two words as
-    [Group, chi]. Populates the chi_prompt field. Symbol \f$ \chi_{prompt, g} \f$.
+    [group, chi]. Populates the chi_prompt field.
+    Symbol \f$ \chi_{prompt, g} \f$.
   - VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
     VELOCITY_END. Each line in the block processes the first two words as
-    [Group, velocity]. Populates the inv_velocity field by inverting parsed values.
-    Symbol \f$ \frac{1}{v_g} \f$.
+    [group, velocity]. Populates the inv_velocity field by inverting parsed
+    values. Symbol \f$ \frac{1}{v_g} \f$.
   - INV_VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
     INV_VELOCITY_END. Each line in the block processes the first two words as
-    [Group, inv_velocity]. Populates the inv_velocity field.
+    [group, inv_velocity]. Populates the inv_velocity field. If this field and
+    VELOCITY are provided, this field will be used.
     Symbol \f$ \frac{1}{v_g} \f$.
-  - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a line
-    PRECURSOR_LAMBDA_END. Each line in the block processes the first two words as
-    [precursor, lambda]. Populates the lambda field (the precursor decay
-    constant). Symbol \f$ \lambda_j \f$.
-  - PRECURSOR_YIELD_BEGIN. Optional. Starts a block that is terminated by a line
-    PRECURSOR_YIELD_END. Each line in the block processes the first two words as
-    [precursor, gamma]. Populates the gamma field (the precursor production
-    fraction per fission). Symbol \f$ \gamma_j \f$.
-
+  - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a
+    line PRECURSOR_LAMBDA_END. Each line in the block processes the first two
+    words as [precursor, lambda]. Populates the lambda field (the precursor
+    decay constant). Symbol \f$ \lambda_j \f$.
+  - PRECURSOR_YIELD_BEGIN. Optional. Starts a block that is terminated by a
+    line PRECURSOR_YIELD_END. Each line in the block processes the first two
+    words as [precursor, gamma]. Populates the gamma field (the precursor
+    production fraction per fission). Symbol \f$ \gamma_j \f$.
   - CHI_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_DELAYED_END. Each line in the block processes the first word as the
     group index and the remaining NUM_PRECURSORS words as the the individual
     precursor's associated delayed spectrum (chi). Populates the chi_d field.
     Symbol \f$ \chi_{delayed,jg} \f$.
-
-  - TRANSFER_MOMENTS_BEGIN. Optional. Starts a block that is terminated by a line
-    TRANSFER_MOMENTS_END. Each line in the block processes a line only if it
-    starts with the keyword M_GPRIME_G_VAL which needs to be followed by four
+  - TRANSFER_MOMENTS_BEGIN. Optional. Starts a block that is terminated by a
+    line TRANSFER_MOMENTS_END. Each line in the block processes a line only if
+    it starts with the keyword M_GPRIME_G_VAL which needs to be followed by four
     values [moment,gprime,g,value]. Populates transfer-matrix for moment m,
     row g, column gprime, with value. Symbol \f$ \sigma_{s\ell,g'{\to}g} \f$.
+
 - Comments can be between individual blocks but only the TRANSFER_MOMENTS block
   may have comments between the _BEGIN and _END
 - Comments do not have to start with any specific character since the file
@@ -269,7 +269,7 @@ void chi_physics::TransportCrossSections::
   // Define utility functions for parsing
   //============================================================
 
-  //########################################
+  //##################################################
   /// Lambda for reading group structure data.
   auto ReadGroupStructure =
       [](const std::string& keyword,
@@ -305,7 +305,7 @@ void chi_physics::TransportCrossSections::
         }
       };
 
-  //########################################
+  //##################################################
   /// Lambda for reading vector data.
   auto Read1DData =
       [](const std::string& keyword,
@@ -340,7 +340,7 @@ void chi_physics::TransportCrossSections::
         }
       };
 
-  //########################################
+  //##################################################
   /// Lambda for reading transfer matrix data.
   auto ReadTransferMatrices =
       [](const std::string& keyword,
@@ -374,7 +374,7 @@ void chi_physics::TransportCrossSections::
         }
       };
 
-  //########################################
+  //##################################################
   /// Lambda for reading emission spectra data.
   auto ReadEmissionSpectra =
       [](const std::string& keyword,

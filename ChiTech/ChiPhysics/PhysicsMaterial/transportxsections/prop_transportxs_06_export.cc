@@ -13,7 +13,10 @@ void chi_physics::TransportCrossSections::
 {
   chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 
-  //======================================== Lamdas
+  //============================================================
+  // Define utility functions
+  //============================================================
+
   /**Lambda to print a 1D-xs*/
   auto Print1DXS = [](std::ofstream& ofile,
                       const std::string& prefix,
@@ -21,17 +24,23 @@ void chi_physics::TransportCrossSections::
                       double min_value=-1.0)
   {
     bool proceed = false;
-    if (min_value>=0.0)
+    if (min_value >= 0.0)
     {
-      for (auto val : xs) if (val > min_value) {proceed = true; break;}
+      for (auto val : xs)
+        if (val > min_value)
+        {
+          proceed = true;
+          break;
+        }
 
-      if (not proceed) return;
+      if (not proceed)
+        return;
     }
 
     ofile << "\n";
     ofile << prefix << "_BEGIN\n";
     {
-      int g=0;
+      unsigned int g = 0;
       for (auto val : xs)
         ofile << g++ << " "
               << val << "\n";
@@ -39,15 +48,21 @@ void chi_physics::TransportCrossSections::
     ofile << prefix << "_END\n";
   };
 
-  //======================================== Open file
+  //============================================================
+  // Open the output file
+  //============================================================
+
   std::ofstream ofile(file_name);
 
-  //======================================== Writing header info
+  //============================================================
+  // Write the header info
+  //============================================================
+
   ofile << "# Exported cross section from ChiTech\n";
   ofile << "# Date: " << chi_objects::ChiTimer::GetLocalDateTimeString() << "\n";
   ofile << "NUM_GROUPS " << num_groups << "\n";
   ofile << "NUM_MOMENTS " << scattering_order+1 << "\n";
-  if (num_precursors>0)
+  if (num_precursors > 0)
     ofile << "NUM_PRECURSORS " << num_precursors << "\n";
 
   Print1DXS(ofile, "SIGMA_T"     , sigma_t              );
@@ -65,18 +80,18 @@ void chi_physics::TransportCrossSections::
   {
     ofile << "\n";
     ofile << "CHI_DELAYED_BEGIN\n";
-    int g=0;
+    unsigned int g = 0;
     for (auto& chi_d_g : chi_delayed)
     {
-      int gval = g++;
-      int j=0;
+      unsigned int j = 0;
       for (double val : chi_d_g)
       {
-        ofile << "G_PRECURSORJ_VAL" << " " << gval
+        ofile << "G_PRECURSORJ_VAL" << " " << g
                                     << " " << j
                                     << " " << val << "\n";
         ++j;
       }
+      ++g;
     }
     ofile << "CHI_DELAYED_END\n";
   }
