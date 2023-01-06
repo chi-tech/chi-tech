@@ -23,8 +23,8 @@ class mg_diffusion::Boundary
   public :
   BoundaryType type = BoundaryType::Vacuum;
 
-  // std::array<std::vector<double>, 3> mg_values2;
-  std::array<double, 3> mg_values = {0.,0.,0.};
+  std::array<std::vector<double>, 3> mg_values;
+  // std::array<double, 3> mg_values = {0.25,0.5,0.};
 
 };
 

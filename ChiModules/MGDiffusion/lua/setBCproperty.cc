@@ -109,7 +109,7 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
-                         << "Reflecting.";
+                     << "Reflecting.";
     }
     else if (type_name == "dirichlet") // ------------- DIRICHLET
     {
@@ -129,17 +129,22 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
           << " 5 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
-      LuaCheckNumberValue(fname, L, 5);
-      double f_value = lua_tonumber(L,5);
+      // check lua tables
+      LuaCheckTableValue(fname, L, 5);
+      std::vector<double> f_values;
+      LuaPopulateVectorFrom1DArray(fname, L, 5, f_values);
+      // add the other multigroup vectors to finish the BC
+      unsigned int ng = f_values.size();
+      std::vector<double> a_values(ng, 0.0);
+      std::vector<double> b_values(ng, 1.0);
 
       mg_diffusion::Solver::BoundaryInfo bndry_info;
-      bndry_info.first = mg_diffusion::BoundaryType::Robin;
-      bndry_info.second = {0.0,1.0,f_value};
+      bndry_info.first = mg_diffusion::BoundaryType::Neumann;
+      bndry_info.second = {a_values,b_values,f_values};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
-                     << "Neumann with D grad(u) dot n = ("
-                     << f_value << ") ";
+                     << "Neumann with D_g grad(u_g) dot n = f_g";
     }
     else if (type_name == "vacuum") // ------------- VACUUM
     {
@@ -152,10 +157,14 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
           << " 4 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
+      // dummy-sized values until we now num_group later, after solver init
+      std::vector<double> a_values(1, 0.25);
+      std::vector<double> b_values(1, 0.5);
+      std::vector<double> f_values(1, 0.0);
 
       mg_diffusion::Solver::BoundaryInfo bndry_info;
-      bndry_info.first = mg_diffusion::BoundaryType::Robin;
-      bndry_info.second = {0.25,0.5,0.0};
+      bndry_info.first = mg_diffusion::BoundaryType::Vacuum;
+      bndry_info.second = {a_values,b_values,f_values};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
       chi::log.Log() << "Boundary " << bound_index << " set as "
@@ -172,28 +181,21 @@ int chiCFEMMGDiffusionSetBCProperty(lua_State *L)
           << " 7 arguments are expected.";
         chi::Exit(EXIT_FAILURE);
       }
-      LuaCheckNumberValue(fname, L, 5);
-      LuaCheckNumberValue(fname, L, 6);
-      LuaCheckNumberValue(fname, L, 7);
-
-      double a_value = lua_tonumber(L,5);
-      double b_value = lua_tonumber(L,6);
-      double f_value = lua_tonumber(L,7);
-
-//      std::vector<double> a_values;
-//      LuaCheckTableValue(fname, L, 5);
-//      LuaPopulateVectorFrom1DArray(fname, L, 5, a_values);
+      // check lua tables
+      LuaCheckTableValue(fname, L, 5);
+      LuaCheckTableValue(fname, L, 6);
+      LuaCheckTableValue(fname, L, 7);
+      std::vector<double> a_values, b_values, f_values;
+      LuaPopulateVectorFrom1DArray(fname, L, 5, a_values);
+      LuaPopulateVectorFrom1DArray(fname, L, 6, b_values);
+      LuaPopulateVectorFrom1DArray(fname, L, 7, f_values);
 
       mg_diffusion::Solver::BoundaryInfo bndry_info;
       bndry_info.first = mg_diffusion::BoundaryType::Robin;
-      bndry_info.second = {a_value,b_value,f_value};
+      bndry_info.second = {a_values,b_values,f_values};
       solver.boundary_preferences.insert(std::make_pair(bound_index,bndry_info));
 
-      chi::log.Log() << "Boundary " << bound_index << " set as "
-                     << "Robin with a,b,f = ("
-                     << a_value << ","
-                     << b_value << ","
-                     << f_value << ") ";
+      chi::log.Log() << "Boundary " << bound_index << " set as Robin";
     }
     else
     {
