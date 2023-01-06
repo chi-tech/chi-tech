@@ -161,7 +161,18 @@ void mg_diffusion::Solver::Assemble_A_bext()
     VecAssemblyBegin(bext[g]);
     VecAssemblyEnd(bext[g]);
   }
- 
+  PetscViewer viewer;
+  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"A1_before_bc.m",&viewer);
+  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+  MatView(A[0],viewer);
+  PetscViewerPopFormat(viewer);
+  PetscViewerDestroy(&viewer);
+  PetscViewerASCIIOpen(PETSC_COMM_WORLD,"bext1_before_bc.m",&viewer);
+  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+  VecView(bext[0],viewer);
+  PetscViewerPopFormat(viewer);
+  PetscViewerDestroy(&viewer);
+
   chi::log.Log() << "Done global assembly";
 
 }
