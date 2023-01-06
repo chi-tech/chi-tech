@@ -3,7 +3,7 @@ chiMeshHandlerCreate()
 
 mesh={}
 N=20
-L=2
+L=20
 xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
@@ -55,7 +55,7 @@ src={}
 for g=1,num_groups do
     src[g] = 0.0
 end
-src[1] = 1.0
+src[1] = 0.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Add material properties
@@ -64,25 +64,38 @@ phys1 = chiCFEMMGDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
 chiSolverSetBasicOption(phys1, "thermal_flux_error", 1E-7)
-chiSolverSetBasicOption(phys1, "max_thermal_iters", 12)
+chiSolverSetBasicOption(phys1, "max_thermal_iters", 120)
 chiSolverSetBasicOption(phys1, "verbose_level", 1)
 
 atab = {}
 btab = {}
 ftab = {}
 for g=1,num_groups do
-    atab[g] = 0.0
-    btab[g] = 0.0
+    atab[g] = 0.25
+    btab[g] = 0.5
     ftab[g] = 0.0
 end
+
 --chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"neumann",atab)
 --chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"neumann",atab)
 --chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"neumann",atab)
 --chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"neumann",atab)
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"vacuum")
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"vacuum")
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"vacuum")
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"vacuum")
+
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"vacuum")
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"vacuum")
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"vacuum")
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"vacuum")
+
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"reflecting")
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"reflecting")
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
+
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"robin",atab,btab,ftab)
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin",atab,btab,ftab)
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"robin",atab,btab,ftab)
+ftab[1] = 1.0
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"robin",atab,btab,ftab)
 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
@@ -92,7 +105,7 @@ fflist,count = chiGetFieldFunctionList(phys1)
 -- export to 2 different VTK files. should be changed when new FF are in place
 --chiExportFieldFunctionToVTK(fflist[1],"square_up_flx01","Flux_Diff01")
 --chiExportFieldFunctionToVTK(fflist[2],"square_up_flx02","Flux_Diff02")
-
+--
 for g=1,num_groups do
     g_string=string.format("%03d",g)
     chiExportFieldFunctionToVTK(fflist[g],"square_up_flx"..g_string,"Flux_Diff"..g_string)
