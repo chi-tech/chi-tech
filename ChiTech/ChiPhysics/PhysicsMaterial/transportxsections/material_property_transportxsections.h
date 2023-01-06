@@ -24,11 +24,11 @@ public:
   bool is_fissionable = false;
 
   /// Energy bin boundaries in MeV
-  std::vector<std::array<double, 2>> e_bounds;
+  std::vector<std::vector<double>> e_bounds;
 
   std::vector<double> sigma_t;  ///< Total cross section
-  std::vector<double> sigma_f;  ///< Fission cross section
   std::vector<double> sigma_a;  ///< Absorption cross section
+  std::vector<double> sigma_f;  ///< Fission cross section
 
   std::vector<double> chi;                      ///< Fission spectrum
   std::vector<double> chi_prompt;               ///< Prompt fission spectrum
