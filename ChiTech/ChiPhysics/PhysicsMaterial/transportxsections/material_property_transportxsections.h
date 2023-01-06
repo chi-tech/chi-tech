@@ -21,7 +21,7 @@ public:
   unsigned int scattering_order=0; ///< Legendre scattering order
   unsigned int num_precursors=0;   ///< Number of precursors
 
-  bool is_fissile = false;
+  bool is_fissionable = false;
 
   /// Energy bin boundaries in MeV
   std::vector<std::array<double, 2>> e_bounds;

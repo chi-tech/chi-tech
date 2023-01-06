@@ -23,7 +23,7 @@ void chi_physics::TransportCrossSections::Reset()
   num_groups = 0;
   scattering_order = 0;
   num_precursors = 0;
-  is_fissile = false;
+  is_fissionable = false;
 
   sigma_t.clear();
   sigma_f.clear();
@@ -181,9 +181,9 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
     // Increment combo factor totals
     N_total += combo.second;
-    if (xs->is_fissile)
+    if (xs->is_fissionable)
     {
-      this->is_fissile = true;
+      this->is_fissionable = true;
       Nf_total += combo.second;
 
       if (xs->num_precursors > 0)
@@ -202,7 +202,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
 
     //============================ Increment number of precursors
-    if (not xs->is_fissile and xs->num_precursors > 0)
+    if (not xs->is_fissionable and xs->num_precursors > 0)
     {
       chi::log.LogAllError()
           << "In call to " << __FUNCTION__ << ": "
@@ -218,7 +218,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   // to be either not fissile, have zero precursors, or both.
   double eps = std::numeric_limits<double>::epsilon(); //machine precision
   if (Nf_total < eps)
-    this->is_fissile = false;
+    this->is_fissionable = false;
   if (Np_total < eps)
     this->num_precursors = 0;
 
@@ -255,7 +255,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
     // Fraction of fissile density
     double ff_i = 0.0;
-    if (cross_secs[x]->is_fissile)
+    if (cross_secs[x]->is_fissionable)
       ff_i = N_i / Nf_total;
 
     // Fraction of precursor density

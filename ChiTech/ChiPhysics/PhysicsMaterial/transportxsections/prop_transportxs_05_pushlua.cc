@@ -22,8 +22,8 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushinteger(L,static_cast<lua_Integer>(num_precursors));
   lua_settable(L,-3);
 
-  lua_pushstring(L,"is_fissile");
-  lua_pushboolean(L,is_fissile);
+  lua_pushstring(L,"is_fissionable");
+  lua_pushboolean(L, is_fissionable);
   lua_settable(L,-3);
 
   auto Push1DXS = [L](const std::vector<double>& xs, const std::string& name)

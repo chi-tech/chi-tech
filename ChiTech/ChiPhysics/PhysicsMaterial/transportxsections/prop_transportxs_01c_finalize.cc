@@ -28,8 +28,8 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
   for (int g = 0; g < num_groups; ++g)
     sigma_f_sum += sigma_f[g];
 
-  if (sigma_f_sum > 1.0e-28) is_fissile = true;
-  if (not is_fissile and num_precursors > 0)
+  if (sigma_f_sum > 1.0e-28) is_fissionable = true;
+  if (not is_fissionable and num_precursors > 0)
   {
     num_precursors = 0;
     precursor_lambda.clear();
@@ -42,7 +42,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
         << "Setting the number of precursors to zero for consistency.";
   }
 
-  if (is_fissile)
+  if (is_fissionable)
   {
     //======================================== Determine present nu terms
     bool has_nu = false;
