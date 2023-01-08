@@ -1,8 +1,43 @@
+function printTable(t, f)
+    local function printTableHelper(obj, cnt)
+        local cnt = cnt or 0
+        if type(obj) == "table" then
+            io.write("\n", string.rep("\t", cnt), "{\n")
+            cnt = cnt + 1
+            for k,v in pairs(obj) do
+                if type(k) == "string" then
+                    io.write(string.rep("\t",cnt), '["'..k..'"]', ' = ')
+                end
+                if type(k) == "number" then
+                    io.write(string.rep("\t",cnt), "["..k.."]", " = ")
+                end
+                printTableHelper(v, cnt)
+                io.write(",\n")
+            end
+            cnt = cnt-1
+            io.write(string.rep("\t", cnt), "}")
+        elseif type(obj) == "string" then
+            io.write(string.format("%q", obj))
+        else
+            io.write(tostring(obj))
+        end
+    end
+
+    if f == nil then
+        printTableHelper(t)
+    else
+        io.output(f)
+        io.write("return")
+        printTableHelper(t)
+        io.output(io.stdout)
+    end
+end
+
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
 mesh={}
-N=20
+N=2
 L=20
 xmin = -L/2
 dx = L/N
@@ -13,6 +48,7 @@ end
 
 chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
 
 --############################################### Set Material IDs
  chiVolumeMesherSetMatIDToAll(0)
@@ -55,7 +91,7 @@ src={}
 for g=1,num_groups do
     src[g] = 0.0
 end
-src[1] = 0.0
+src[1] = 1.0
 chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Add material properties
@@ -64,7 +100,7 @@ phys1 = chiCFEMMGDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
 chiSolverSetBasicOption(phys1, "thermal_flux_error", 1E-7)
-chiSolverSetBasicOption(phys1, "max_thermal_iters", 120)
+chiSolverSetBasicOption(phys1, "max_thermal_iters", 1)
 chiSolverSetBasicOption(phys1, "verbose_level", 1)
 
 atab = {}
@@ -86,16 +122,16 @@ end
 --chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"vacuum")
 --chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"vacuum")
 
---chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"reflecting")
---chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"reflecting")
---chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
---chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"reflecting")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"reflecting")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
+chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
 
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"robin",atab,btab,ftab)
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin",atab,btab,ftab)
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"robin",atab,btab,ftab)
-ftab[1] = 1.0
-chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"robin",atab,btab,ftab)
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"robin",atab,btab,ftab)
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin",atab,btab,ftab)
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"robin",atab,btab,ftab)
+--ftab[1] = 1.0
+--chiCFEMMGDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"robin",atab,btab,ftab)
 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
@@ -107,3 +143,16 @@ chiExportMultiFieldFunctionToVTK(fflist,"square_dirG")
 --    g_string=string.format("%03d",g)
 --    chiExportFieldFunctionToVTK(fflist[g],"square_up_flx"..g_string,"Flux_Diff"..g_string)
 --end
+
+ffi1 = chiFFInterpolationCreate(VOLUME)
+curffi = ffi1
+chiFFInterpolationSetProperty(curffi,OPERATION,OP_AVG)
+chiFFInterpolationSetProperty(curffi,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[1])
+--chiFFInterpolationSetProperty(curffi,ADD_FIELDFUNCTION,fflist[2])
+
+chiFFInterpolationInitialize(curffi)
+chiFFInterpolationExecute(curffi)
+print(chiFFInterpolationGetValue(curffi))
+
+--printTable(fflist)
