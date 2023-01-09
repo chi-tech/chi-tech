@@ -229,7 +229,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   if (Np_total < eps)
     num_precursors = 0;
 
-  //======================================== Combine 1D cross-sections
+  //============================================================
+  // Initialize the data
+  //============================================================
+
   num_groups = n_grps;
   num_precursors = n_precs;
 
@@ -269,12 +272,16 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     if (xsecs[x]->num_precursors > 0)
       pf_i = N_i / Np_total;
 
-    //======================================== Combine cross-sections
+    //============================================================
+    // Combine cross-sections
+    //============================================================
+
     // Here, raw cross-sections are scaled by densities and
     // spectra by fractional densities. The latter is done to
     // preserve unit spectra. The inverse velocity term must be
     // the same across all cross-section sets, so a check is
     // performed to ensure this is the case.
+
     for (unsigned int g = 0; g < n_grps; ++g)
     {
       sigma_t[g] += xsecs[x]->sigma_t[g] * N_i;
@@ -307,7 +314,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       }
     }
 
-    //======================================== Compute precursors
+    //============================================================
+    // Compute precursors
+    //============================================================
+
     // Here, all precursors across all materials are stored.
     // The decay constants and delayed spectrum are what they are,
     // however, some special treatment must be given to the yields.
@@ -316,6 +326,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     // must yield unity. To achieve this end, we must scale all
     // precursor yields based on the fraction of the total density
     // of materials with precursors they make up.
+
     if (xsecs[x]->num_precursors > 0)
     {
       for (unsigned int j = 0; j < xsecs[x]->num_precursors; ++j)
@@ -330,11 +341,15 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
   }//for cross sections
 
-  //======================================== Combine transfer matrices
+  //============================================================
+  // Combine transfer matrices
+  //============================================================
+
   // This step is somewhat tricky. The cross-sections
   // aren't guaranteed to have the same sparsity patterns
   // and therefore simply adding them together has to take
   // the sparse matrix's protection mechanisms into account.
+
   transfer_matrices.clear();
   transfer_matrices.resize(scattering_order + 1,
                            chi_math::SparseMatrix(n_grps, n_grps));
