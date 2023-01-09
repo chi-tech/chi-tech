@@ -53,7 +53,7 @@ for g=1,num_groups do
 end
 
 --========== ProdQuad
-pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12*2*2, 12*2)
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,12*2*4, 12*4)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
 --========== Groupset def

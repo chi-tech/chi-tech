@@ -6,6 +6,7 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 #include "ChiMath/RandomNumberGeneration/random_number_generator.h"
+#include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
 
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
@@ -15,7 +16,7 @@
 namespace chi_unit_sim_tests
 {
 
-int chiSimTest93_RayTracing(lua_State* L)
+int chiSimTest93_RayTracing(lua_State* Lstate)
 {
   const std::string fname = "chiSimTest93_RayTracing";
   chi::log.Log() << "chiSimTest93_RayTracing";
@@ -26,28 +27,51 @@ int chiSimTest93_RayTracing(lua_State* L)
 
   chi::log.Log() << "Global num cells: " << grid.GetGlobalNumberOfCells();
 
+  const int dimension = (grid.Attributes() & chi_mesh::DIMENSION_1)? 1 :
+                        (grid.Attributes() & chi_mesh::DIMENSION_2)? 2 :
+                        (grid.Attributes() & chi_mesh::DIMENSION_3)? 3 : 0;
+
   //============================================= Set parameters
   const size_t num_groups = 1;
-  const size_t num_moments = 1;
+  const size_t scattering_order = 1;
+  const auto& L = scattering_order;
+  const size_t num_moments =
+    (dimension == 1)? L + 1 :
+    (dimension == 2)? (L+1)*(L+2)/2 :
+    (dimension == 3)? (L+1)*(L+1) : 0;
   const double sigma_t = 0.27;
+
+  // Build harmonic map
+  std::vector<std::pair<int,int>> m_to_ell_em_map;
+  if (dimension == 1)
+    for (int ell=0; ell<=scattering_order; ell++)
+      m_to_ell_em_map.emplace_back(ell,0);
+  else if (dimension == 2)
+    for (int ell=0; ell<=scattering_order; ell++)
+      for (int m=-ell; m<=ell; m+=2)
+        m_to_ell_em_map.emplace_back(ell,m);
+  else if (dimension == 3)
+    for (int ell=0; ell<=scattering_order; ell++)
+      for (int m=-ell; m<=ell; m++)
+        m_to_ell_em_map.emplace_back(ell,m);
 
   //============================================= Make SDM
   typedef std::shared_ptr<chi_math::SpatialDiscretization> SDMPtr;
-  SDMPtr fem_sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid_ptr);
-  const auto& fem_sdm = *fem_sdm_ptr;
+  SDMPtr sdm_ptr = chi_math::SpatialDiscretization_PWLD::New(grid_ptr);
+  const auto& sdm = *sdm_ptr;
 
   chi_math::UnknownManager phi_uk_man;
   for (size_t m=0; m<num_moments; ++m)
     phi_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, num_groups);
 
-  const size_t num_fem_local_dofs = fem_sdm.GetNumLocalDOFs(phi_uk_man);
-  const size_t num_fem_globl_dofs = fem_sdm.GetNumGlobalDOFs(phi_uk_man);
+  const size_t num_fem_local_dofs = sdm.GetNumLocalDOFs(phi_uk_man);
+  const size_t num_fem_globl_dofs = sdm.GetNumGlobalDOFs(phi_uk_man);
 
   chi::log.Log() << "Num local FEM DOFs: " << num_fem_local_dofs;
   chi::log.Log() << "Num globl FEM DOFs: " << num_fem_globl_dofs;
 
   //============================================= Define tallies
-  std::vector<double> fem_tally(num_fem_local_dofs,0.0);
+  std::vector<double> phi_tally(num_fem_local_dofs, 0.0);
 
   //============================================= Define particle
   //                                              data structure
@@ -94,8 +118,9 @@ int chiSimTest93_RayTracing(lua_State* L)
                              cos(theta)};
   };
 
-  /**PWLD Tally*/
-  auto ContributePWLDTally = [&fem_sdm,&grid,&fem_tally,&phi_uk_man,&sigma_t](
+
+  auto ContributePWLDTally = [&sdm,&grid,&phi_tally,&phi_uk_man,&sigma_t,
+                              &num_moments,&m_to_ell_em_map](
     const chi_mesh::Cell& cell,
     const Vec3& positionA,
     const Vec3& positionB,
@@ -103,57 +128,73 @@ int chiSimTest93_RayTracing(lua_State* L)
     const int g,
     double weight)
   {
-    const auto& cell_mapping = fem_sdm.GetCellMapping(cell);
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
 
+    const auto phi_theta = chi_math::OmegaToPhiThetaSafe(omega);
+    const double phi = phi_theta.first;
+    const double theta = phi_theta.second;
+
     std::vector<double> segment_lengths;
-    chi_mesh::PopulateRaySegmentLengths(/*input*/grid,
-                                        /*input*/cell,
-                                        /*input*/positionA,
-                                        /*input*/positionB,
-                                        /*input*/omega,
-                                        /*output*/segment_lengths);
+    chi_mesh::PopulateRaySegmentLengths(grid,             //input
+                                        cell,             //input
+                                        positionA,        //input
+                                        positionB,        //input
+                                        omega,            //input
+                                        segment_lengths); //output
 
-    std::vector<double> shape_values;
-    std::vector<double> shape_values_a;
-    std::vector<double> shape_values_b;
+    std::vector<double> shape_values_k;   //At s_k
+    std::vector<double> shape_values_kp1; //At s_{k+1}
 
-    cell_mapping.ShapeValues(positionA, shape_values_a);
+    cell_mapping.ShapeValues(positionA,       //input
+                             shape_values_k); //output
 
     double d_run_sum = 0.0;
-    for (const auto& segment_length : segment_lengths)
+    for (const auto& segment_length_k : segment_lengths)
     {
-      d_run_sum += segment_length;
+      d_run_sum += segment_length_k;
       const double& d = d_run_sum;
 
-      cell_mapping.ShapeValues(positionA+omega*d, shape_values_b);
+      cell_mapping.ShapeValues(positionA+omega*d, shape_values_kp1);
 
-      const auto& N_i = shape_values_a;
-      const auto& N_f = shape_values_b;
+      const auto&   b_ik   = shape_values_k;
+      const auto&   b_ikp1 = shape_values_kp1;
+      const double& ell_k  = segment_length_k;
 
       for (size_t i=0; i<num_nodes; ++i)
       {
+        const double C0 = b_ik[i] * ell_k;
+        const double C1 = b_ikp1[i] - b_ik[i];
+
         for (size_t m=0; m < num_moments; ++m)
         {
-          const int64_t dof_map = fem_sdm.MapDOFLocal(cell,i,phi_uk_man,m,g);
+          const int64_t dof_map = sdm.MapDOFLocal(cell, i, phi_uk_man, m, g);
 
-          const double& ell = segment_length;
+          //================= Apply harmonic weight
+          const auto& ell_em = m_to_ell_em_map.at(m);
+          const int ell = ell_em.first;
+          const int em = ell_em.second;
 
-          double w_avg  = (N_i[i] / sigma_t) * (1.0 - exp(-sigma_t * ell));
-          w_avg += ((N_f[i] - N_i[i]) / (sigma_t * sigma_t * ell)) *
-                   (1.0 - (1+sigma_t*ell)*exp(-sigma_t*ell));
-          w_avg *= weight/ell;
+          double w_harmonic = chi_math::Ylm(ell, em, phi, theta);
 
-          fem_tally[dof_map] += ell * w_avg ;
+          //================= Apply exponential attenuation weight
+          double w_exp  = (C0 / sigma_t) * (1.0 - exp(-sigma_t * ell_k)) +
+                          (C1 / (sigma_t * sigma_t)) *
+                          (1.0 - (1 + sigma_t * ell_k) * exp(-sigma_t * ell_k));
+                 w_exp *= weight / (ell_k * ell_k);
+
+          //================= Combine
+          double w_avg = w_harmonic * w_exp;
+
+          phi_tally[dof_map] += ell_k * w_avg ;
         }//for moment m
       }//for node i
 
-      shape_values_a = shape_values_b;
-      weight *= exp(-sigma_t*segment_length);
+      shape_values_k = shape_values_kp1;
+      weight *= exp(-sigma_t * segment_length_k);
     }//for d
   };
 
-  /**Lambda to get cell bounding box.*/
   auto GetCellApproximateSize = [&grid](const chi_mesh::Cell& cell)
   {
     const auto& v0 = grid.vertices[cell.vertex_ids[0]];
@@ -185,19 +226,19 @@ int chiSimTest93_RayTracing(lua_State* L)
   const auto PWLD =
     chi_math::SpatialDiscretizationType::PIECEWISE_LINEAR_DISCONTINUOUS;
 
-  const size_t num_particles = 10'000'000;
+  const size_t num_particles = 1'000'000;
   for (size_t n=0; n<num_particles; ++n)
   {
     if (n % size_t(num_particles/10.0) == 0)
       std::cout << "#particles = " << n << "\n";
     //====================================== Create the particle
     const auto omega = SampleRandomDirection();
-    Particle particle{/*position=*/  source_pos,
-                      /*direction=*/ omega,
-                      /*e_group=*/   0,
-                      /*weight=*/    1.0,
-                      /*cell_id=*/   source_cell_id,
-                      /*alive=*/     true};
+    Particle particle{source_pos,     //position
+                      omega,          //direction
+                      0,              //e_group
+                      1.0,            //weight
+                      source_cell_id, //cell_id
+                      true};          //alive
 
     while (particle.alive)
     {
@@ -213,14 +254,12 @@ int chiSimTest93_RayTracing(lua_State* L)
       const Vec3& end_of_track_position = destination_info.pos_f;
 
       //=============================== Make tally contribution
-      const int g = particle.energy_group;
-      if (fem_sdm.type == PWLD)
-        ContributePWLDTally(cell,
-                            particle.position,     //positionA
-                            end_of_track_position, //positionB
-                            particle.direction,    //omega
-                            g,                     //
-                            particle.weight);      //weight at A
+      ContributePWLDTally(cell,
+                          particle.position,     //positionA
+                          end_of_track_position, //positionB
+                          particle.direction,    //omega
+                          particle.energy_group, //g
+                          particle.weight);      //weight at A
 
       //=============================== Process cell transfer
       //                                or death
@@ -256,73 +295,75 @@ int chiSimTest93_RayTracing(lua_State* L)
   {
     //====================================== Compute mass matrix
     //                                       and its inverse
-    const auto& cell_mapping = fem_sdm.GetCellMapping(cell);
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
     const auto& qp_data = cell_mapping.MakeVolumeQuadraturePointData();
     const size_t num_nodes = cell_mapping.NumNodes();
 
-    const double normalization = num_particles*cell_mapping.CellVolume();
-
     MatDbl M(num_nodes, VecDbl(num_nodes, 0.0));
-    VecDbl Vi(num_nodes, 0.0);
     for (auto qp : qp_data.QuadraturePointIndices())
       for (size_t i=0; i<num_nodes; ++i)
-      {
         for (size_t j=0; j<num_nodes; ++j)
           M[i][j] += qp_data.ShapeValue(i,qp) * qp_data.ShapeValue(j, qp) *
                      qp_data.JxW(qp);
 
-        Vi[i] += qp_data.ShapeValue(i,qp) * qp_data.JxW(qp);
-      }
-
     auto M_inv = chi_math::Inverse(M);
 
     //====================================== Apply projection
-    VecDbl b(num_nodes, 0.0);
+    VecDbl T(num_nodes, 0.0);
     for (size_t m=0; m<num_moments; ++m)
       for (size_t g=0; g<num_groups; ++g)
       {
         for (size_t i=0; i<num_nodes; ++i)
         {
-          const int64_t imap = fem_sdm.MapDOFLocal(cell, i, phi_uk_man, m, g);
-          b[i] = fem_tally[imap]/num_particles;
+          const int64_t imap = sdm.MapDOFLocal(cell, i, phi_uk_man, m, g);
+          T[i] = phi_tally[imap] / num_particles;
         }
 
-        auto c = chi_math::MatMul(M_inv, b);
+        auto phi_uc = chi_math::MatMul(M_inv, T);
 
         for (size_t i=0; i<num_nodes; ++i)
         {
-          const int64_t imap = fem_sdm.MapDOFLocal(cell, i, phi_uk_man, m, g);
-          fem_tally[imap] = c[i];
+          const int64_t imap = sdm.MapDOFLocal(cell, i, phi_uk_man, m, g);
+          phi_tally[imap] = phi_uc[i];
         }
       }//for group g
 
   }//for cell
+
+  //============================================= Create Field Functions
+  std::vector<std::shared_ptr<chi_physics::FieldFunction2>> ff_list;
+
+  ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
+    "Phi",                                           //Text name
+    sdm_ptr,                                         //Spatial Discr.
+    chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
+  ));
 
   //============================================= Localize zeroth moment
   //This routine extracts a single moment vector
   //from the vector that contains multiple moments
   const chi_math::UnknownManager m0_uk_man(
     {chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups)});
-  const size_t num_m0_dofs = fem_sdm.GetNumLocalDOFs(m0_uk_man);
+  const size_t num_m0_dofs = sdm.GetNumLocalDOFs(m0_uk_man);
 
   std::vector<double> m0_phi(num_m0_dofs, 0.0);
 
-  fem_sdm.CopyVectorWithUnknownScope(fem_tally,   //from vector
-                                     m0_phi,      //to vector
-                                     phi_uk_man,  //from dof-structure
-                                     0,           //from unknown-id
-                                     m0_uk_man,   //to dof-structure
-                                     0);          //to unknown-id
+  sdm.CopyVectorWithUnknownScope(phi_tally,     //from vector
+                                 m0_phi,      //to vector
+                                 phi_uk_man,  //from dof-structure
+                                 0,           //from unknown-id
+                                 m0_uk_man,   //to dof-structure
+                                 0);          //to unknown-id
 
-  //============================================= Create field function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
-    "Phi",                                           //Text name
-    fem_sdm_ptr,                                         //Spatial Discr.
-    chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
-  );
+  ff_list[0]->UpdateFieldVector(m0_phi);
 
-  ff->UpdateFieldVector(m0_phi);
-  ff->ExportToVTK(fname);
+
+  //============================================= Update field function
+  chi_physics::FieldFunction2::FFList const_ff_list;
+  for (const auto& ff_ptr : ff_list)
+    const_ff_list.push_back(ff_ptr);
+  chi_physics::FieldFunction2::ExportMultipleToVTK(fname,
+                                                   const_ff_list);
 
   return 0;
 }

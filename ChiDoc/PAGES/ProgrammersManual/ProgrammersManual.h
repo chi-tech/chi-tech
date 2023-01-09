@@ -16,6 +16,7 @@
 -# \subpage CodeTut4 \n
 -# \subpage CodeTut6 \n
 -# \subpage CodeTut91a \n
+-# \subpage CodeTut93 \n
 
 ##--
 
