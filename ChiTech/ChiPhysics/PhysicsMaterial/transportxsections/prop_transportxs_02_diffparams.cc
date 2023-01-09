@@ -43,11 +43,10 @@ ComputeDiffusionParameters()
     // Compute diffusion coefficient
     //============================================================
 
-    //display warning if sig_1 is too large
     if (sig_1 >= sigma_t[g])
     {
       sig_1 = 0.0;
-      chi::log.Log0Warning()
+      chi::log.LogAllWarning()
           << "Transport corrected diffusion coefficient failed for group "
           << g << " in call to " << __FUNCTION__ << ". "
           << "sigma_t=" << sigma_t[g] << " sigs_g_(m=1)=" << sig_1
@@ -55,10 +54,9 @@ ComputeDiffusionParameters()
     }
 
     //compute the diffusion coefficient
-    diffusion_coeff[g] = 1.0 / 3.0 / (sigma_t[g] - sig_1);
-
-    //set max for when sig_t - sig_1 is near zero
-    diffusion_coeff[g] = std::fmin(1.0e12, diffusion_coeff[g]);
+    //cap the value for when sig_t - sig_1 is near zero
+    diffusion_coeff[g] = std::fmin(1.0e12,
+                                   1.0 / 3.0 / (sigma_t[g] - sig_1));
 
     //============================================================
     // Determine within group scattering

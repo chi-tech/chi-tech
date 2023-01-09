@@ -25,7 +25,7 @@ void chi_physics::TransportCrossSections::
   file.open(file_name);
   if (!file.is_open())
   {
-    chi::log.Log0Error()
+    chi::log.LogAllError()
       << "Failed to open PDT cross-section file \""
       << file_name << "\" in call to "
       << "TransportCrossSections::MakeFromPDTxsFile";
@@ -57,7 +57,7 @@ void chi_physics::TransportCrossSections::
 
   if ((mg_or_single_group != "multigroup") && (xs_type != "neutron"))
   {
-    chi::log.Log0Error()
+    chi::log.LogAllError()
       << "Currently only multigroup neutron cross-section can be"
       << " read from PDT cross-section files. The file \""
       << file_name << "\" has " << mg_or_single_group << " "
@@ -167,7 +167,7 @@ void chi_physics::TransportCrossSections::
 
         if (sink != g)
         {
-          chi::log.Log0Error()
+          chi::log.LogAllError()
             << "Mismatched sink group with general group structure "
                "encountered during transfer moment processing. " << sink
             << " " << g;

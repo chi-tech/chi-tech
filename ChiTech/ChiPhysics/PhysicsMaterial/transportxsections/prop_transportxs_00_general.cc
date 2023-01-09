@@ -387,7 +387,7 @@ ComputeAbsorption()
   // estimate from a transfer matrix
   else
   {
-    chi::log.Log0Warning()
+    chi::log.LogAllWarning()
         << "Estimating absorption from the transfer matrices.";
 
     const auto& S0 = transfer_matrices[0];
@@ -411,7 +411,7 @@ ComputeAbsorption()
 
       // TODO: Decide whether this should be a warning or an error.
       if (sigma_a[g] < 0.0)
-        chi::log.Log0Warning()
+        chi::log.LogAllWarning()
             << "Negative absorption cross-section encountered "
             << "in group " << g << " when estimating from the "
             << "transfer matrices";

@@ -124,7 +124,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
           } //if nu and beta specified
           else
             throw std::runtime_error(
-                "Invalid specification of fission data.");
+                "Invalid specification of fission neutron data.");
 
           //compute other quantities
           for (unsigned int g = 0; g < num_groups; ++g)
@@ -212,6 +212,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       //==================================================
       // Check total fission specification
       //==================================================
+
       else
       {
         //check that nu was specified correctly
