@@ -74,6 +74,7 @@ void chi_lua_test::lua_utils::RegisterLuaEntities(lua_State *L)
 
   lua_register(L, "chiSimTest91_PWLD", chi_unit_sim_tests::chiSimTest91_PWLD);
   lua_register(L, "chiSimTest92_DSA", chi_unit_sim_tests::chiSimTest92_DSA);
+  lua_register(L, "chiSimTest93_RayTracing", chi_unit_sim_tests::chiSimTest93_RayTracing);
 
   lua_register(L, "chiSimTest_IP_MMS_L2error", chi_unit_sim_tests::chiSimTest_IP_MMS_L2error);
 }

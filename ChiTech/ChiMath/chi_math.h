@@ -51,6 +51,8 @@ namespace chi_math
   //01 Utility
   double Factorial(int x);
 
+  std::pair<double,double> OmegaToPhiThetaSafe(const chi_mesh::Vector3 &omega);
+
   //02 Vector operations
   void   PrintVector(const VecDbl& x);
   void   Scale(VecDbl& x, const double& val);
