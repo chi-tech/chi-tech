@@ -248,14 +248,14 @@ CheckPlaneTetIntersect(const chi_mesh::Normal& plane_normal,
 
 
 //###################################################################
-/** Populates segment lengths along a ray.*/
+/** Populates segment lengths along a ray. Sorted along the direction.*/
 void chi_mesh::PopulateRaySegmentLengths(
   const chi_mesh::MeshContinuum& grid,
   const Cell& cell,
-  std::vector<double> &segment_lengths,
   const chi_mesh::Vector3& line_point0,
   const chi_mesh::Vector3& line_point1,
-  const chi_mesh::Vector3& omega)
+  const chi_mesh::Vector3& omega,
+  std::vector<double> &segment_lengths)
 {
   const chi_mesh::Vector3 khat(0,0,1);
   std::set<double> distance_set;

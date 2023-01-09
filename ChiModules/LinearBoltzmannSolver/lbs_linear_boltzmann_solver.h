@@ -139,10 +139,10 @@ protected:
   //01h
   void InitializeBoundaries();
   //01i
-  static
-  bool CheckPointInsideCell(const chi_mesh::Cell& cell,
-                            const chi_mesh::MeshContinuum& grid_ref,
-                            const chi_mesh::Vector3& point);
+//  static
+//  bool CheckPointInsideCell(const chi_mesh::Cell& cell,
+//                            const chi_mesh::MeshContinuum& grid_ref,
+//                            const chi_mesh::Vector3& point);
   void InitializePointSources();
 
 

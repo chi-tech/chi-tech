@@ -112,6 +112,8 @@ public:
   std::vector<uint64_t> GetDomainUniqueBoundaryIDs() const;
 
   size_t CountCellsInLogicalVolume(const chi_mesh::LogicalVolume& log_vol) const;
+  bool CheckPointInsideCell(const chi_mesh::Cell& cell,
+                            const chi_mesh::Vector3& point) const;
 
   MeshAttributes Attributes() const {return attributes;}
 
