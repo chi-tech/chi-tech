@@ -388,7 +388,7 @@ ComputeAbsorption()
   else
   {
     chi::log.Log0Warning()
-        << "Estimating absorption from the transfer S0.";
+        << "Estimating absorption from the transfer matrices.";
 
     const auto& S0 = transfer_matrices[0];
     for (size_t g = 0; g < num_groups; ++g)
@@ -408,6 +408,13 @@ ComputeAbsorption()
       }
 
       sigma_a[g] = sigma_t[g] - sig_s;
+
+      // TODO: Decide whether this should be a warning or an error.
+      if (sigma_a[g] < 0.0)
+        chi::log.Log0Warning()
+            << "Negative absorption cross-section encountered "
+            << "in group " << g << " when estimating from the "
+            << "transfer matrices";
     }//for g
   }//if scattering present
 
