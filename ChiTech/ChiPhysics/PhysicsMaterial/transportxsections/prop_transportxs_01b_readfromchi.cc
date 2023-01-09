@@ -4,6 +4,7 @@
 #include "chi_log.h"
 
 #include <string>
+#include <algorithm>
 
 
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
@@ -52,26 +53,26 @@ Linear Boltzmann Equation of the form:
 \f]
 
 The two most prominent items required here includes \f$ \sigma_{tg} \f$ and
- \f$ \sigma_{s\ell,g'{\to}g} \f$. The latter is an entry in a structure we
- call a generic transfer matrix for moment \f$ \ell \f$ with rows \f$g=0..G-1\f$
- and columns \f$g'=0..G-1\f$. These two items are often the only items required
- in a transport simulation.
+\f$ \sigma_{s\ell,g'{\to}g} \f$. The latter is an entry in a structure we
+call a generic transfer matrix for moment \f$ \ell \f$ with rows \f$g=0..G-1\f$
+and columns \f$g'=0..G-1\f$. These two items are often the only items required
+in a transport simulation.
 
- In simulations with fission-sources, cross sections
- support two formats, the simple combined cross sections without delayed
- neutrons
+In simulations with fission-sources, cross sections support two formats,
+the simple combined cross sections without delayed neutrons
 
 \f[
 q_{fission,ng} = \frac{\chi_g}{4\pi}
  \sum_{g'=0}^{G-1} \nu_{g'} \sigma_{fg'} \phi_{00g'}
 \f]
 
-and those with delayed neutrons, the latter which are currently only used in the
-KEigen solver.
+and those with delayed neutrons, the latter which are currently only used in
+the k-eigenvalue solver.
 
-## KEigen-value related items
-As stated before, the cross section file supports two formats, the simple combined cross sections without delayed
-neutrons which are depicted above and those with delayed neutrons shown below
+## k-eigenvalue related items
+As stated before, the cross section file supports two formats, the simple
+combined cross sections without delayed neutrons which are depicted above
+and those with delayed neutrons shown below
 
 \f[
 q_{fission,ng} = \frac{\chi_g}{4\pi}
@@ -93,67 +94,67 @@ constants, \f$ \lambda_j \f$ are required.
 - NUM_PRECURSORS num_precursors Optional. Indicates how many precursors are used
   in this cross section. Symbol \f$ J \f$
 - Optional key words per line:
-  - SIGMA_T_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_T_END.
-    Each line in the block processes the first two words as [Group, sigma_t].
-    Populates the sigma_tg field. Symbol \f$ \sigma_{tg} \f$.
-  - SIGMA_F_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_F_END.
-    Each line in the block processes the first two words as [Group, sigma_f].
-    Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
-  - SIGMA_A_BEGIN. Optional. Starts a block that is terminated by a line SIGMA_A_END.
-    Each line in the block processes the first two words as [Group, sigma_a].
-    Populates the sigma_ag field. Symbol \f$ \sigma_{ag} \f$. If this is
-    not supplied then sigma_a is estimated from the transfer matrix and
-    may erroneously estimate balance.
-  - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END. Each line in
-    the block processes the first two words as [Group, nu]. Populates the
-    nu field. Upon completing the file processing the nu_sigma_fg field
-    gets populated from the product of nu and sigma_fg. Symbol \f$ \nu_g \f$.
+  - SIGMA_T_BEGIN. Optional. Starts a block that is terminated by a line
+    SIGMA_T_END. Each line in the block processes the first two words as
+    [group, sigma_t]. Populates the sigma_tg field. Symbol \f$ \sigma_{tg} \f$.
+  - SIGMA_A_BEGIN. Optional. Starts a block that is terminated by a line
+    SIGMA_A_END. Each line in the block processes the first two words as
+    [group, sigma_a]. Populates the sigma_ag field. Symbol \f$ \sigma_{ag} \f$.
+    If this is not supplied then sigma_a is estimated from the transfer matrix
+    and may erroneously estimate balance.
+  - SIGMA_F_BEGIN. Optional. Starts a block that is terminated by a line
+    SIGMA_F_END. Each line in the block processes the first two words as
+    [group, sigma_f]. Populates the sigma_fg field. Symbol \f$ \sigma_{fg} \f$.
+  - NU_BEGIN. Optional. Starts a block that is terminated by a line NU_END.
+    Each line in the block processes the first two words as [group, nu].
+    Populates the nu field. Upon completing the file processing the nu_sigma_fg
+    field gets populated from the product of nu and sigma_fg.
+    Symbol \f$ \nu_g \f$.
   - NU_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     NU_PROMPT_END. Each line in the block processes the first two words as
-    [Group, nu]. Populates the nu_prompt field. Upon completing the file
+    [group, nu_prompt]. Populates the nu_prompt field. Upon completing the file
     processing the nu_p_sigma_fg field gets populated from the product of
-    nu_prompt and sigma_fg.
-    Symbol \f$ \nu_{prompt,g} \f$.
+    nu_prompt and sigma_fg. Symbol \f$ \nu_{prompt,g} \f$.
   - NU_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
     NU_DELAYED_END. Each line in the block processes the first two words as
-    [Group, nu]. Populates the nu_delayed field. Upon completing the file
-    processing the nu_d_sigma_fg field gets populated from the product of
-    nu_delayed and sigma_fg.
-    Symbol \f$ \nu_{delayed,g} \f$.
+    [group, nu_delayed]. Populates the nu_delayed field. Upon completing the
+    file processing the nu_d_sigma_fg field gets populated from the product of
+    nu_delayed and sigma_fg. Symbol \f$ \nu_{delayed,g} \f$.
   - CHI_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_END. Each line in the block processes the first two words as
-    [Group, chi]. Populates the chi field. Symbol \f$ \chi_{g} \f$.
+    [group, chi]. Populates the chi field. Symbol \f$ \chi_{g} \f$.
   - CHI_PROMPT_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_PROMPT_END. Each line in the block processes the first two words as
-    [Group, chi]. Populates the chi_prompt field. Symbol \f$ \chi_{prompt, g} \f$.
+    [group, chi]. Populates the chi_prompt field.
+    Symbol \f$ \chi_{prompt, g} \f$.
   - VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
     VELOCITY_END. Each line in the block processes the first two words as
-    [Group, velocity]. Populates the inv_velocity field by inverting parsed values.
-    Symbol \f$ \frac{1}{v_g} \f$.
+    [group, velocity]. Populates the inv_velocity field by inverting parsed
+    values. Symbol \f$ \frac{1}{v_g} \f$.
   - INV_VELOCITY_BEGIN. Optional. Starts a block that is terminated by a line
     INV_VELOCITY_END. Each line in the block processes the first two words as
-    [Group, inv_velocity]. Populates the inv_velocity field.
+    [group, inv_velocity]. Populates the inv_velocity field. If this field and
+    VELOCITY are provided, this field will be used.
     Symbol \f$ \frac{1}{v_g} \f$.
-  - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a line
-    PRECURSOR_LAMBDA_END. Each line in the block processes the first two words as
-    [precursor, lambda]. Populates the lambda field (the precursor decay
-    constant). Symbol \f$ \lambda_j \f$.
-  - PRECURSOR_YIELD_BEGIN. Optional. Starts a block that is terminated by a line
-    PRECURSOR_YIELD_END. Each line in the block processes the first two words as
-    [precursor, gamma]. Populates the gamma field (the precursor production
-    fraction per fission). Symbol \f$ \gamma_j \f$.
-
+  - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a
+    line PRECURSOR_LAMBDA_END. Each line in the block processes the first two
+    words as [precursor, lambda]. Populates the lambda field (the precursor
+    decay constant). Symbol \f$ \lambda_j \f$.
+  - PRECURSOR_YIELD_BEGIN. Optional. Starts a block that is terminated by a
+    line PRECURSOR_YIELD_END. Each line in the block processes the first two
+    words as [precursor, gamma]. Populates the gamma field (the precursor
+    production fraction per fission). Symbol \f$ \gamma_j \f$.
   - CHI_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
     CHI_DELAYED_END. Each line in the block processes the first word as the
     group index and the remaining NUM_PRECURSORS words as the the individual
     precursor's associated delayed spectrum (chi). Populates the chi_d field.
     Symbol \f$ \chi_{delayed,jg} \f$.
-
-  - TRANSFER_MOMENTS_BEGIN. Optional. Starts a block that is terminated by a line
-    TRANSFER_MOMENTS_END. Each line in the block processes a line only if it
-    starts with the keyword M_GPRIME_G_VAL which needs to be followed by four
+  - TRANSFER_MOMENTS_BEGIN. Optional. Starts a block that is terminated by a
+    line TRANSFER_MOMENTS_END. Each line in the block processes a line only if
+    it starts with the keyword M_GPRIME_G_VAL which needs to be followed by four
     values [moment,gprime,g,value]. Populates transfer-matrix for moment m,
     row g, column gprime, with value. Symbol \f$ \sigma_{s\ell,g'{\to}g} \f$.
+
 - Comments can be between individual blocks but only the TRANSFER_MOMENTS block
   may have comments between the _BEGIN and _END
 - Comments do not have to start with any specific character since the file
@@ -245,286 +246,308 @@ CHI_DELAYED_END
 void chi_physics::TransportCrossSections::
   MakeFromCHIxsFile(const std::string &file_name)
 {
-  //======================================== Clear any previous data
+  //clear any previous data
   Reset();
 
-  //======================================== Read file
+  //============================================================
+  // Open Chi XS file
+  //============================================================
+
   chi::log.Log() << "Reading Chi cross-section file \"" << file_name << "\"\n";
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
   {
-      chi::log.LogAllError()<< "Failed to open chi cross-section file \""
-          << file_name << "\" in call to "
-          << "TransportCrossSections::MakeFromChixsFile\n";
-      chi::Exit(EXIT_FAILURE);
+    chi::log.LogAllError() << "Failed to open chi cross-section file \""
+                           << file_name << "\" in call to "
+                           << "TransportCrossSections::MakeFromChixsFile\n";
+    chi::Exit(EXIT_FAILURE);
   }
 
-  //line is used to get rid of lines and word is used to get rid of words
-  std::string line;
-  std::string word, first_word;
-  std::string sectionChecker;
-  bool grabbed_G = false;
-  bool grabbed_M = false;
+  //============================================================
+  // Define utility functions for parsing
+  //============================================================
 
-  //num moments
-  size_t M = scattering_order+1; //just to init M
+  //##################################################
+  /// Lambda for reading group structure data.
+  auto ReadGroupStructure =
+      [](const std::string& keyword,
+         std::vector<std::vector<double>>& destination,
+         const unsigned int n,
+         std::ifstream& file,
+         std::istringstream& line_stream,
+         unsigned int& line_number) {
+        std::string line;
+        std::getline(file, line);
+        line_stream = std::istringstream(line);
+        ++line_number;
 
-  //#############################################
-  /**Lambda for converting strings to doubles.*/
-  auto StrToD = [](const char* str)
-  {
-    char* endptr;
-    double value = std::strtod(str, &endptr);
+        unsigned int count = 0;
+        int group;
+        double high, low;
+        while (line != keyword + "_END")
+        {
+          //get data from current line
+          line_stream >> group >> high >> low;
+          destination.at(group).at(0) = high;
+          destination.at(group).at(1) = low;
+          if (count++ >= n)
+            throw std::runtime_error(
+                "Too many entries encountered when parsing "
+                "group structure.\nThe expected number of entries "
+                "is " + std::to_string(n) + ".");
 
-    if (endptr[0] != 0)
-      throw std::runtime_error(
-        std::string("Invalid floating-point "
-                    "number conversion: \"")+str+"\".");
+          //go to next line
+          std::getline(file, line);
+          line_stream = std::istringstream(line);
+          ++line_number;
+        }
+      };
 
-    return value;
-  };
+  //##################################################
+  /// Lambda for reading vector data.
+  auto Read1DData =
+      [](const std::string& keyword,
+         std::vector<double>& destination,
+         const unsigned int n,
+         std::ifstream& file,
+         std::istringstream& line_stream,
+         unsigned int& line_number) {
+        std::string line;
+        std::getline(file, line);
+        line_stream = std::istringstream(line);
+        ++line_number;
 
-  //#############################################
-  /**Lambda for converting strings to integers.*/
-  auto StrToI = [](const char* str)
-  {
-    char* endptr;
-    long int value = std::strtol(str, &endptr,10);
+        unsigned int count = 0;
+        int i;
+        double value;
+        while (line != keyword + "_END")
+        {
+          //get data from current line
+          line_stream >> i >> value;
+          destination.at(i) = value;
+          if (count++ >= n)
+            throw std::runtime_error(
+                "To many entries encountered when parsing "
+                "1D data.\nThe expected number of entries is " +
+                std::to_string(n));
 
-    if (endptr[0] != 0)
-      throw std::runtime_error(
-        std::string("Invalid integer "
-                    "number conversion: \"")+str+"\".");
+          //go to next line
+          std::getline(file, line);
+          line_stream = std::istringstream(line);
+          ++line_number;
+        }
+      };
 
-    return value;
-  };
-
-  auto ThrowGandMError = [file_name]()
-  {
-    throw std::runtime_error("ChiTech format cross-section file "
-                             + file_name + "is trying to write data without "
-                             "first processing NUM_GROUPS and NUM_MOMENTS.");
-  };
-
-  //#############################################
-  /**Lambda function for reading in the 1d vectors.*/
-  auto Read1DXS = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
-    (const std::string& keyword,std::vector<double>& xs,
-     std::ifstream& file, size_t Gtot, int& line_number,
-     std::istringstream& line_stream)
-  {
-    if ((not grabbed_G) or (not grabbed_M)) ThrowGandMError();
-    int g=-1;
-    char first_word[250];
-    char line[250];
-    char value_str[250];
-
-    file.getline(line,250); ++g; ++line_number;
-    line_stream = std::istringstream(line);
-    line_stream >> first_word;
-
-    while (std::string(first_word) != (keyword + "_END"))
-    {
-      if (g>=Gtot) throw std::runtime_error(
-        "Too many lines in block " + keyword + ".");
-
-      line_stream >> value_str;
-
-      long int group = StrToI(first_word);
-      double value   = StrToD(value_str);
-
-      xs[group] = value;
-
-      file.getline(line,250); ++g; ++line_number;
-      line_stream = std::istringstream(line);
-      line_stream >> first_word;
-    }
-  };
-
-  //#############################################
-  /**Lambda reading the chi delayed matrix.*/
-  auto ReadChiDelayed = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
-    (const std::string& keyword,std::vector<std::vector<double>>& spectra,
-     std::ifstream& file, size_t Gtot, int& line_number,
-     std::istringstream& line_stream)
-  {
-    if ((not grabbed_G) or (not grabbed_M)) ThrowGandMError();
-    char first_word[250];
-    char line[250];
-    char value_str0[250],value_str1[250],value_str2[250];
-
-    file.getline(line,250); ++line_number;
-    line_stream = std::istringstream(line);
-    line_stream >> first_word;
-
-    while (std::string(first_word) != (keyword + "_END"))
-    {
-      if (std::string(first_word) == "G_PRECURSORJ_VAL")
+  //##################################################
+  /// Lambda for reading transfer matrix data.
+  auto ReadTransferMatrices =
+      [](const std::string& keyword,
+         std::vector<TransferMatrix>& destination,
+         std::ifstream& file,
+         std::istringstream& line_stream,
+         unsigned int& line_number)
       {
-        value_str0[0] = '\0';
-        value_str1[0] = '\0';
-        value_str2[0] = '\0';
-        line_stream >> value_str0 >> value_str1 >> value_str2;
+        std::string word, line;
+        std::getline(file, line);
+        line_stream = std::istringstream(line);
+        ++line_number;
 
-        if (value_str0[0]==0 or value_str1[0]==0 or value_str2[0]==0)
-          throw std::runtime_error("Invalid amount of arguments. "
-                                   "Requires 4 numbers.");
+        unsigned int ell, group, gprime;
+        double value;
+        while (line != keyword + "_END")
+        {
+          //check that this line contains an entry
+          line_stream >> word;
+          if (word == "M_GPRIME_G_VAL")
+          {
+            //get data from current line
+            line_stream >> ell >> gprime >> group >> value;
+            destination.at(ell).Insert(group, gprime, value);
+          }
 
-        long int group     = StrToI(value_str0);
-        long int precursor = StrToI(value_str1);
-        double value       = StrToD(value_str2);
+          //go to next line
+          std::getline(file, line);
+          line_stream = std::istringstream(line);
+          ++line_number;
+        }
+      };
 
-        spectra[group][precursor] = value;
-      }
-
-      file.getline(line,250); ++line_number;
-      line_stream = std::istringstream(line);
-      line_stream >> first_word;
-      if (line_stream.str().empty())
-        sprintf(first_word," ");
-    }
-  };
-
-  //#############################################
-  /**Lambda reading a transfer matrix.*/
-  auto ReadTransferMatrix = [StrToD,StrToI,&grabbed_G,&grabbed_M,ThrowGandMError]
-    (const std::string& keyword,std::vector<chi_math::SparseMatrix>& matrix,
-     std::ifstream& file, size_t Gtot, int& line_number,
-     std::istringstream& line_stream)
-  {
-    if ((not grabbed_G) or (not grabbed_M)) ThrowGandMError();
-    char first_word[250];
-    char line[250];
-    char value_str0[250],value_str1[250],value_str2[250],value_str3[250];
-
-    file.getline(line,250); ++line_number;
-    line_stream = std::istringstream(line);
-    line_stream >> first_word;
-
-    while (std::string(first_word) != (keyword + "_END") and !file.eof())
-    {
-      if (std::string(first_word) == "M_GPRIME_G_VAL")
+  //##################################################
+  /// Lambda for reading emission spectra data.
+  auto ReadEmissionSpectra =
+      [](const std::string& keyword,
+         EmissionSpectra& destination,
+         std::ifstream& file,
+         std::istringstream& line_stream,
+         unsigned int& line_number)
       {
-        value_str0[0] = '\0';
-        value_str1[0] = '\0';
-        value_str2[0] = '\0';
-        value_str3[0] = '\0';
-        line_stream >> value_str0 >> value_str1 >> value_str2 >> value_str3;
+        std::string word, line;
+        std::getline(file, line);
+        line_stream = std::istringstream(line);
+        ++line_number;
 
-        if (value_str0[0]==0 or value_str1[0]==0 or
-            value_str2[0]==0 or value_str3[0]==0)
-          throw std::runtime_error("Invalid amount of arguments. "
-                                   "Requires 4 numbers.\nLine:" + line_stream.str());
+        unsigned int group, precursor;
+        double value;
+        while (line != keyword + "_END")
+        {
+          //check that this line contains an entry
+          line_stream >> word;
+          if (word == "G_PRECURSORJ_VAL")
+          {
+            //get data from current line
+            line_stream >> group >> precursor >> value;
+            destination.at(group).at(precursor) = value;
+          }
 
-        long int m        = StrToI(value_str0);
-        long int gprime   = StrToI(value_str1);
-        long int g        = StrToI(value_str2);
-        double value      = StrToD(value_str3);
+          //go to next line
+          std::getline(file, line);
+          line_stream = std::istringstream(line);
+          ++line_number;
+        }
+      };
 
-        if (m<matrix.size())
-          matrix[m].Insert(g,gprime,value);
-        first_word[0] = '\0';
-      }
+  //============================================================
+  // Read the Chi XS file
+  //============================================================
 
-      file.getline(line,250); ++line_number;
-      line_stream = std::istringstream(line);
-      line_stream >> first_word;
-      if (line_stream.str().empty())
-        sprintf(first_word," ");
-    }
-  };
-
-  //================================================== Read file line by line
-  int line_number=0;
-  bool not_eof = bool(std::getline(file,line)); ++line_number;
-  bool found_velocity = false;
-  bool found_inv_velocity = false;
-  while (not_eof)
+  std::string word, line;
+  unsigned int line_number = 0;
+  while (std::getline(file, line))
   {
     std::istringstream line_stream(line);
-    line_stream >> first_word;
+    line_stream >> word;
 
-    if (first_word == "NUM_GROUPS")
+    //parse number of groups
+    if (word == "NUM_GROUPS")
     {
       line_stream >> num_groups;
-      grabbed_G = true;
-      sigma_t.assign(num_groups, 0.0);
-      sigma_f.assign(num_groups, 0.0);
-      sigma_a.assign(num_groups, 0.0);
-      chi.assign(num_groups, 0.0);
-      chi_prompt.assign(num_groups, 0.0);
-      nu.assign(num_groups, 0.0);
-      nu_prompt.assign(num_groups, 0.0);
-      nu_delayed.assign(num_groups, 0.0);
-      nu_sigma_f.assign(num_groups, 0.0);
-      nu_prompt_sigma_f.assign(num_groups, 0.0);
-      nu_delayed_sigma_f.assign(num_groups, 0.0);
-      inv_velocity.assign(num_groups, 0.0);
+      sigma_t.resize(num_groups, 0.0);
+      sigma_a.resize(num_groups, 0.0);
+
+      sigma_f.resize(num_groups, 0.0);
+      nu_sigma_f.resize(num_groups, 0.0);
+      nu_prompt_sigma_f.resize(num_groups, 0.0);
+      nu_delayed_sigma_f.resize(num_groups, 0.0);
+
+      chi.resize(num_groups, 0.0);
+      chi_prompt.resize(num_groups, 0.0);
+
+      nu.resize(num_groups, 0.0);
+      nu_prompt.resize(num_groups, 0.0);
+      nu_delayed.resize(num_groups, 0.0);
+      beta.resize(num_groups, 0.0);
+
+      inv_velocity.resize(num_groups, 0.0);
     }
-    if (first_word == "NUM_MOMENTS")
+
+    //parse the number of scattering moments
+    if (word == "NUM_MOMENTS")
     {
+      if (num_groups == 0)
+      {
+        chi::log.LogAllError()
+            << __FUNCTION__ << ": "
+            << "NUM_GROUPS must be encountered before NUM_MOMENTS.";
+        chi::Exit(EXIT_FAILURE);
+      }
+
+      unsigned int M;
       line_stream >> M;
-      grabbed_M = true;
-      if (grabbed_G)
-        transfer_matrices.resize(M, chi_math::SparseMatrix(num_groups, num_groups));
+      transfer_matrices.resize(M, TransferMatrix (num_groups, num_groups));
+      scattering_order = M - 1;
     }
-    if (first_word == "NUM_PRECURSORS")
+
+    //parse the number of precursors species
+    if (word == "NUM_PRECURSORS")
     {
+      if (num_groups == 0)
+      {
+        chi::log.LogAllError()
+            << __FUNCTION__ << ": "
+            << "NUM_GROUPS must be encountered before NUM_PRECURSORS.";
+        chi::Exit(EXIT_FAILURE);
+      }
+
       line_stream >> num_precursors;
       precursor_lambda.resize(num_precursors, 0.0);
       precursor_yield.resize(num_precursors, 0.0);
-
-      if (grabbed_G)
-      {
-        chi_delayed.resize(num_groups);
-        for (int g=0; g < num_groups; ++g)
-          chi_delayed[g].resize(num_precursors);
-      }
+      chi_delayed.resize(num_groups);
+      for (int g=0; g < num_groups; ++g)
+        chi_delayed[g].resize(num_precursors, 0.0);
     }
 
+    //parse nuclear data
     try
     {
       auto& ln = line_number;
       auto& ls = line_stream;
       auto& f  = file;
-      auto& fw = first_word;
+      auto& fw = word;
 
-      if (fw == "SIGMA_T_BEGIN")       Read1DXS ("SIGMA_T"    , sigma_t    , f, num_groups, ln, ls);
-      if (fw == "SIGMA_F_BEGIN")       Read1DXS("SIGMA_F"     , sigma_f    , f, num_groups, ln, ls);
-      if (fw == "SIGMA_A_BEGIN")       Read1DXS("SIGMA_A"     , sigma_a    , f, num_groups, ln, ls);
-      if (fw == "NU_BEGIN")            Read1DXS("NU"          , nu         , f, num_groups, ln, ls);
-      if (fw == "NU_PROMPT_BEGIN")     Read1DXS("NU_PROMPT"   , nu_prompt  , f, num_groups, ln, ls);
-      if (fw == "NU_DELAYED_BEGIN")    Read1DXS("NU_DELAYED"  , nu_delayed , f, num_groups, ln, ls);
-      if (fw == "CHI_BEGIN")           Read1DXS("CHI"         , chi        , f, num_groups, ln, ls);
-      if (fw == "CHI_PROMPT_BEGIN")    Read1DXS("CHI_PROMPT"  , chi_prompt , f, num_groups, ln, ls);
+      if (fw == "GROUP_STRUCTURE_BEGIN")
+        ReadGroupStructure("GROUP_STRUCTURE",
+                           e_bounds, num_groups, f, ls, ln);
 
-      if (fw == "VELOCITY_BEGIN" and not found_inv_velocity)
-      {
-        Read1DXS("VELOCITY", inv_velocity, f, num_groups, ln, ls);
-        found_velocity = true;
-      }
+      if (fw == "SIGMA_T_BEGIN")
+        Read1DData("SIGMA_T", sigma_t, num_groups, f, ls, ln);
+      if (fw == "SIGMA_A_BEGIN")
+        Read1DData("SIGMA_A", sigma_a, num_groups, f, ls, ln);
+      if (fw == "SIGMA_F_BEGIN")
+        Read1DData("SIGMA_F", sigma_f, num_groups, f, ls, ln);
+
+      if (fw == "NU_BEGIN")
+        Read1DData("NU", nu, num_groups, f, ls, ln);
+      if (fw == "NU_PROMPT_BEGIN")
+        Read1DData("NU_PROMPT", nu_prompt, num_groups, f, ls, ln);
+      if (fw == "NU_DELAYED_BEGIN")
+        Read1DData("NU_DELAYED", nu_delayed, num_groups, f, ls, ln);
+
+      if (fw == "NU_SIGMA_F_BEGIN")
+        Read1DData("NU_SIGMA_F", nu_sigma_f, num_groups, f, ls, ln);
+      if (fw == "NU_PROMPT_SIGMA_F_BEGIN")
+        Read1DData("NU_PROMPT_SIGMA_F",
+                   nu_prompt_sigma_f, num_groups, f, ls, ln);
+      if (fw == "NU_DELAYED_SIGMA_F_BEGIN")
+        Read1DData("NU_DELAYED_SIGMA_F",
+                   nu_delayed_sigma_f, num_groups, f, ls, ln);
+      if (fw == "BETA_BEGIN")
+        Read1DData("BETA", beta, num_groups, f, ls, ln);
+
+      if (fw == "CHI_BEGIN")
+        Read1DData("CHI", chi, num_groups, f, ls, ln);
+      if (fw == "CHI_PROMPT_BEGIN")
+        Read1DData("CHI_PROMPT", chi_prompt, num_groups, f, ls, ln);
+
       if (fw == "INV_VELOCITY_BEGIN")
+        Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
+      if (fw == "VELOCITY_BEGIN" &&
+          std::all_of(inv_velocity.begin(), inv_velocity.end(),
+                      [](double x) { return x == 0.0; }))
       {
-        Read1DXS("INV_VELOCITY", inv_velocity, f, num_groups, ln, ls);
-        found_inv_velocity = true;
+        Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
+        for (unsigned int g = 0; g < num_groups; ++g)
+          inv_velocity[g] = 1.0 / inv_velocity[g];
       }
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
-        ReadTransferMatrix("TRANSFER_MOMENTS",
-                           transfer_matrices, f, num_groups, ln, ls);
+        ReadTransferMatrices("TRANSFER_MOMENTS",
+                             transfer_matrices, f, ls, ln);
 
       if (num_precursors > 0)
       {
         if (fw == "PRECURSOR_LAMBDA_BEGIN")
-          Read1DXS("PRECURSOR_LAMBDA", precursor_lambda, f, num_precursors, ln, ls);
+          Read1DData("PRECURSOR_LAMBDA",
+                     precursor_lambda, num_precursors, f, ls, ln);
         if (fw == "PRECURSOR_YIELD_BEGIN")
-          Read1DXS("PRECURSOR_YIELD", precursor_yield, f, num_precursors, ln, ls);
+          Read1DData("PRECURSOR_YIELD",
+                     precursor_yield, num_precursors, f, ls, ln);
         if (fw == "CHI_DELAYED_BEGIN")
-          ReadChiDelayed("CHI_DELAYED", chi_delayed, f, num_groups, ln, ls);
+          ReadEmissionSpectra("CHI_DELAYED", chi_delayed, f, ls, ln);
       }
     }//try
+
     catch (const std::runtime_error& err)
     {
       chi::log.LogAllError()
@@ -533,6 +556,7 @@ void chi_physics::TransportCrossSections::
         << err.what();
       chi::Exit(EXIT_FAILURE);
     }
+
     catch (...)
     {
       chi::log.LogAllError()
@@ -540,14 +564,8 @@ void chi_physics::TransportCrossSections::
       chi::Exit(EXIT_FAILURE);
     }
 
-    first_word = "";
-    not_eof = not std::getline(file, line).eof();
+    word = "";
   }//while not EOF, read each lines
-  scattering_order = M-1;
-
-  //compute inv_velocity if necessary
-  if (found_velocity)
-    for (auto& v : inv_velocity) v = 1.0 / v;
 
   //perform checks and enforce physical relationships
   FinalizeCrossSections();

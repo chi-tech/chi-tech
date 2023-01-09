@@ -16,41 +16,51 @@ namespace chi_physics
 /** Class for handling Transport-Theory related cross sections.*/
 class TransportCrossSections : public chi_physics::MaterialProperty
 {
+protected:
+  using TransferMatrix = chi_math::SparseMatrix;
+  using EmissionSpectra = std::vector<std::vector<double>>;
+
 public:
-  size_t num_groups=0;                          ///< Total number of Groups
-  size_t scattering_order=0;                    ///< Legendre scattering order
-  size_t num_precursors=0;                      ///< Number of precursors
-  bool is_fissile = false;                      ///< Fissile or not
+  unsigned int num_groups=0;       ///< Total number of Groups
+  unsigned int scattering_order=0; ///< Legendre scattering order
+  unsigned int num_precursors=0;   ///< Number of precursors
 
-  typedef double GrpVal;                        ///< Denoting value per group
-  typedef double PrecursorVal;                  ///< Denoting value per precursor
+  bool is_fissionable = false;
 
-  std::vector<GrpVal> sigma_t;                  ///< Total cross section
-  std::vector<GrpVal> sigma_f;                  ///< Sigmaf cross section
-  std::vector<GrpVal> sigma_a;                  ///< Pure absorption
-  std::vector<GrpVal> chi;                      ///< Fission spectrum
-  std::vector<GrpVal> chi_prompt;               ///< Prompt fission spectrum
-  std::vector<GrpVal> nu;                       ///< Nubar
-  std::vector<GrpVal> nu_prompt;                ///< Nubar-prompt
-  std::vector<GrpVal> nu_delayed;               ///< Nubar-delayed
-  std::vector<GrpVal> nu_sigma_f;               ///< Nubar-Sigmaf cross section
-  std::vector<GrpVal> nu_prompt_sigma_f;        ///< Prompt-Nubar-Sigmaf cross section
-  std::vector<GrpVal> nu_delayed_sigma_f;       ///< Delayed-Nubar-Sigmaf cross section
-  std::vector<GrpVal> inv_velocity;             ///< Groupwise inverse velocities
+  /// Energy bin boundaries in MeV
+  std::vector<std::vector<double>> e_bounds;
 
-  std::vector<chi_math::SparseMatrix> transfer_matrices;
+  std::vector<double> sigma_t;  ///< Total cross section
+  std::vector<double> sigma_a;  ///< Absorption cross section
+  std::vector<double> sigma_f;  ///< Fission cross section
 
-  std::vector<PrecursorVal> precursor_lambda;         ///< Delayed neutron decay constants
-  std::vector<PrecursorVal> precursor_yield;          ///< Delayed neutron yields
-  std::vector<std::vector<PrecursorVal>> chi_delayed; ///< Delayed neutron fission spectrum
+  std::vector<double> chi;         ///< Fission spectrum
+  std::vector<double> chi_prompt;  ///< Prompt fission spectrum
+  EmissionSpectra chi_delayed;     ///< Delayed emission spectra
+
+  std::vector<double> nu;         ///< Total neutrons per fission
+  std::vector<double> nu_prompt;  ///< Prompt neutrons per fission
+  std::vector<double> nu_delayed; ///< Delayed neutrons per fission
+  std::vector<double> beta;       ///< Delayed neutron fraction
+
+  std::vector<double> nu_sigma_f;
+  std::vector<double> nu_prompt_sigma_f;
+  std::vector<double> nu_delayed_sigma_f;
+
+  std::vector<double> inv_velocity;
+
+  std::vector<TransferMatrix> transfer_matrices;
+
+  std::vector<double> precursor_lambda; ///< Precursor decay constants
+  std::vector<double> precursor_yield;  ///< Precursor yield fractions
 
   //Diffusion quantities
 public:
   bool diffusion_initialized = false;
 public:
-  std::vector<GrpVal> diffusion_coeff; ///< Transport corrected Diffusion coeff
-  std::vector<GrpVal> sigma_removal;   ///< Removal cross section
-  std::vector<GrpVal> sigma_s_gtog;    ///< Within-group scattering xs
+  std::vector<double> diffusion_coeff; ///< Transport corrected diffusion coeff
+  std::vector<double> sigma_removal;   ///< Removal cross section
+  std::vector<double> sigma_s_gtog;    ///< Within-group scattering xs
 
   //Monte-Carlo quantities
 public:
@@ -59,54 +69,20 @@ private:
   std::vector<std::vector<double>>         cdf_gprime_g;
   std::vector<std::vector<Tvecdbl_vecdbl>> scat_angles_gprime_g;
 
-private:
-  void Reset()
-  {
-    num_groups = 0;
-    scattering_order = 0;
-    num_precursors = 0;
-    is_fissile = false;
-
-    sigma_t.clear();
-    sigma_f.clear();
-    sigma_a.clear();
-    chi.clear();
-    chi_prompt.clear();
-    nu.clear();
-    nu_prompt.clear();
-    nu_delayed.clear();
-    nu_sigma_f.clear();
-    nu_prompt_sigma_f.clear();
-    nu_delayed_sigma_f.clear();
-    inv_velocity.clear();
-    precursor_lambda.clear();
-    precursor_yield.clear();
-    chi_delayed.clear();
-
-    transfer_matrices.clear();
-
-    //Diffusion quantities
-    diffusion_initialized = false;
-    diffusion_coeff.clear();
-    sigma_removal.clear();
-    sigma_s_gtog.clear();
-
-    //Monte-Carlo quantities
-    scattering_initialized = false;
-    cdf_gprime_g.clear();
-    scat_angles_gprime_g.clear();
-  }
-
-  std::vector<GrpVal> ComputeAbsorptionXSFromTransfer();
-
 public:
   //00
   TransportCrossSections();
 
-  void MakeSimple0(int in_G, double in_sigmat);
-  void MakeSimple1(int in_G, double in_sigmat, double c);
+  public:
+  void MakeSimple0(int n_grps, double sigma);
+  void MakeSimple1(int n_grps, double sigma, double c);
   void MakeCombined(std::vector<std::pair<int,double>>& combinations);
 
+private:
+  void Reset();
+  void ComputeAbsorption();
+
+public:
   //01
   void MakeFromPDTxsFile(const std::string &file_name,const std::string& MT_TRANSFER);
   void MakeFromCHIxsFile(const std::string &file_name);

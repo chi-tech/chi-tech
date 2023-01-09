@@ -98,7 +98,7 @@ void lbs::SteadySolver::
           destination_q[uk_map + g] += inscatter_g;
 
           double infission_g = 0.0;
-          const bool fission_avail = (xs.is_fissile and ell == 0);
+          const bool fission_avail = (xs.is_fissionable and ell == 0);
 
           //====================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
