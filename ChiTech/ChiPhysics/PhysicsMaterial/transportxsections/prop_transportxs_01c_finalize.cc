@@ -23,26 +23,19 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
   // Define utility functions
   //============================================================
 
-  auto was_xs_specified =
+  auto was_specified =
       [](const std::vector<double>& vec)
       {
-        return std::all_of(vec.begin(), vec.end(),
+        return std::any_of(vec.begin(), vec.end(),
                            [](double x) { return x > 0.0; });
-      };
-
-  auto was_spectrum_specified =
-      [](const std::vector<double>& vec)
-      {
-        return std::all_of(vec.begin(), vec.end(),
-                           [](double x) { return x >= 0.0; });
       };
 
   //============================================================
   // Determine if fissionable or not
   //============================================================
 
-  is_fissionable = was_xs_specified(sigma_f) ||
-                   was_xs_specified(nu_sigma_f);
+  is_fissionable = was_specified(sigma_f) ||
+                   was_specified(nu_sigma_f);
 
   //============================================================
   // Zero fission data if not fissionable
@@ -83,34 +76,69 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
 
       if (num_precursors > 0)
       {
-        //checks for cross-section specification
-        if (was_xs_specified(sigma_f) &&
-            was_xs_specified(nu_prompt) &&
-            was_xs_specified(nu_delayed))
+        // check nu specification
         {
-          if (!std::all_of(nu_prompt.begin(), nu_prompt.end(),
-                          [](double x) { return x > 1.0; }))
-            throw std::runtime_error(
-                "Prompt fission must yield more than one "
-                "neutron on average.");
+          if (was_specified(nu_prompt) &&
+              was_specified(nu_delayed))
+          {
+            if (!std::all_of(nu_prompt.begin(), nu_prompt.end(),
+                             [](double x) { return x == 0.0 || x > 1.0; }) &&
+                !std::all_of(nu_delayed.begin(), nu_delayed.end(),
+                             [](double x) { return x >= 0.0; }))
+              throw std::runtime_error(
+                  "Prompt and delayed fission neutron yields must be zero "
+                  "or positive. Zero values must be accounted allowed "
+                  "for photo-fission, which is a threshold reaction. Prompt "
+                  "fission neutron yields must be greater than 1 or 0.");
 
-          //compute other properties
+            //compute other quantities
+            for (unsigned int g = 0; g < num_groups; ++g)
+            {
+              nu[g] = nu_prompt[g] + nu_delayed[g];
+              beta[g] = nu_delayed[g] / nu[g];
+            }
+          }//if nu_prompt and nu_delayed specified
+          else if (was_specified(nu) &&
+                   was_specified(beta))
+          {
+            if (!std::all_of(nu.begin(), nu.end(),
+                             [](double x) { return x == 0.0 || x > 1.0; }))
+              throw std::runtime_error(
+                  "Fission neutron yield must be greater than 1 or 0.");
+            if (!std::all_of(beta.begin(), beta.end(),
+                             [](double x) { return x >= 0.0 && x <= 1.0; }))
+              throw std::runtime_error(
+                  "Delayed neutron fractions must be in the range [0.0, 1.0].");
+
+            //compute other quantities
+            for (unsigned int g = 0; g < num_groups; ++g)
+            {
+              nu_prompt[g] = (1.0 - beta[g]) * nu[g];
+              nu_delayed[g] = beta[g] * nu[g];
+            }
+
+            if (was_specified(nu_sigma_f))
+              for (unsigned int g = 0; g < num_groups; ++g)
+                if (nu[g] != 0.0)
+                  sigma_f[g] = nu_sigma_f[g] / nu[g];
+          } //if nu and beta specified
+          else
+            throw std::runtime_error(
+                "Invalid specification of fission data.");
+
+          //compute other quantities
           for (unsigned int g = 0; g < num_groups; ++g)
           {
-            nu[g] = nu_prompt[g] + nu_delayed[g];
             nu_sigma_f[g] = nu[g] * sigma_f[g];
             nu_prompt_sigma_f[g] = nu_prompt[g] * sigma_f[g];
             nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
           }
         }
-        else
-          throw std::runtime_error(
-              "Invalid specification of fission data.");
 
         //check and normalize prompt fission spectrum
         {
           //throw error if not specified
-          if (!was_spectrum_specified(chi_prompt))
+          if (!was_specified(chi_prompt))
             throw std::runtime_error(
                 "The prompt fission spectrum was not provided.");
 
@@ -133,7 +161,7 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
           for (unsigned int j = 0; j < num_precursors; ++j)
           {
             //throw error if emission spectrum j was not specified
-            if (!was_spectrum_specified(tmp[j]))
+            if (!was_specified(tmp[j]))
               throw std::runtime_error(
                   "The delayed emission spectrum for precursor "
                   "species " + std::to_string(j) + " was not provided.");
@@ -149,13 +177,13 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
         //check the precursor data
         {
           //throw error if decay constants were not specified
-          if (!was_xs_specified(precursor_lambda))
+          if (!was_specified(precursor_lambda))
             throw std::runtime_error(
                 "The delayed neutron precursor decay constants "
                 "was not provided.");
 
           //throw error if not specified
-          if (!was_spectrum_specified(precursor_yield))
+          if (!was_specified(precursor_yield))
             throw std::runtime_error(
                 "The delayed neutron precursor yields was not provided.");
 
@@ -170,10 +198,9 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
         for (unsigned int g = 0; g < num_groups; ++g)
         {
           //compute beta-averaged total fission spectrum
-          double beta = nu_delayed[g] / nu[g];
-          chi[g] = (1.0 - beta) * chi_prompt[g];
+          chi[g] = (1.0 - beta[g]) * chi_prompt[g];
           for (unsigned int j = 0; j < num_precursors; ++j)
-            chi[g] += beta * precursor_yield[j] * chi_delayed[g][j];
+            chi[g] += beta[g] * precursor_yield[j] * chi_delayed[g][j];
         }
 
         //normalize total chi just in case
@@ -188,28 +215,33 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
       else
       {
         //check that nu was specified correctly
-        if (!was_xs_specified(nu))
+        if (!was_specified(nu))
           throw std::runtime_error(
               "Total neutrons per fission was not provided.");
         if (!std::all_of(nu.begin(), nu.end(),
-                         [](double x) { return x > 1.0; }))
+                         [](double x) { return x == 0.0 || x > 1.0; }))
           throw std::runtime_error(
               "Total fission yield must be greater than unity.");
 
         //compute other quantities
-        if (was_xs_specified(sigma_f))
+        if (was_specified(nu_sigma_f))
+        {
           for (unsigned int g = 0; g < num_groups; ++g)
-            nu_sigma_f[g] = nu[g] * sigma_f[g];
-        else if (was_xs_specified(nu_sigma_f))
+            sigma_f[g] = nu[g] * sigma_f[g];
+        }
+        else if (was_specified(nu_sigma_f))
+        {
           for (unsigned int g = 0; g < num_groups; ++g)
-            sigma_f[g] = nu_sigma_f[g] / nu[g];
+            if (nu[g] != 0.0)
+              sigma_f[g] = nu_sigma_f[g] / nu[g];
+        }
         else
           throw std::runtime_error(
               "Neither the fission cross-section nor the "
               "fission multiplicity cross-section was specified.");
 
         //check that chi was specified
-        if (!was_spectrum_specified(chi))
+        if (!was_specified(chi))
           throw std::runtime_error(
               "Total fission spectrum was not provided.");
 

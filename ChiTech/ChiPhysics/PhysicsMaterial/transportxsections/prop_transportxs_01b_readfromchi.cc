@@ -511,6 +511,8 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_DELAYED_SIGMA_F_BEGIN")
         Read1DData("NU_DELAYED_SIGMA_F",
                    nu_delayed_sigma_f, num_groups, f, ls, ln);
+      if (fw == "BETA_BEGIN")
+        Read1DData("BETA", beta, num_groups, f, ls, ln);
 
       if (fw == "CHI_BEGIN")
         Read1DData("CHI", chi, num_groups, f, ls, ln);
