@@ -122,7 +122,7 @@ chiSolverSetBasicOption(phys1, "REFERENCE_RF", "QOI1")
 chiSolverInitialize(phys1)
 --chiSolverExecute(phys1)
 
-chiLBSReadFluxMoments(phys1, "Adjoint2D_2b_adjoint")
+chiLBSReadFluxMoments(phys1, "Adjoint2D_3b_adjoint")
 value = chiAdjointSolverComputeInnerProduct(phys1)
 chiLog(LOG_0,string.format("Inner-product=%.5e", value))
 
@@ -151,4 +151,10 @@ ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
 if master_export == nil then
     chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_"..solver_name)
     chiExportFieldFunctionToVTKG(ff_m0, "ZPhi_"..solver_name)
+end
+
+--############################################### Cleanup
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm Adjoint2D_3b_adjoint*")
 end
