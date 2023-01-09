@@ -34,7 +34,7 @@ double lbs::TransientSolver::ComputeBeta()
         //============================= Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
-          const bool fission_avail = (xs.is_fissile and ell == 0);
+          const bool fission_avail = (xs.is_fissionable and ell == 0);
 
           if (fission_avail)
           {

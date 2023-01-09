@@ -6,6 +6,7 @@ SIGMA_T_BEGIN
 0		1.0
 SIGMA_T_END
 
+### Normal fission specification
 SIGMA_F_BEGIN
 0		0.35
 SIGMA_F_END
@@ -17,6 +18,21 @@ NU_PROMPT_END
 NU_DELAYED_BEGIN
 0		0.01
 NU_DELAYED_END
+###
+
+### Alternative fission specification
+# NU_SIGMA_F_BEGIN
+# 0       0.7
+# NU_SIGMA_F_END
+#
+# NU_BEGIN
+# 0       2.0
+# NU_END
+#
+# BETA_BEGIN
+# 0       0.005
+# BETA_END
+###
 
 CHI_PROMPT_BEGIN
 0		1.0

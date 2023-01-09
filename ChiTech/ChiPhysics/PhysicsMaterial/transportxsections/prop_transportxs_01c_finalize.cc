@@ -3,256 +3,258 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include <numeric>
+#include <algorithm>
 #include <string>
+
 
 void chi_physics::TransportCrossSections::FinalizeCrossSections()
 {
-  const double eps = 1.0e-8;
 
-  //======================================== Estimates sigma_a group-by-group
-  double sigma_a_sum = 0.0;
-  for (size_t g = 0; g < num_groups; ++g)
-    sigma_a_sum += sigma_a[g];
+  //============================================================
+  // Set the absorption cross-section, if unset
+  //============================================================
 
-  if (not transfer_matrices.empty() and (sigma_a_sum < 1.0e-28))
-  {
-    sigma_a = ComputeAbsorptionXSFromTransfer();
+  if (std::all_of(sigma_a.begin(), sigma_a.end(),
+                  [](double x) { return x == 0.0; }))
+    ComputeAbsorption();
 
-    chi::log.Log0Warning()
-        << __FUNCTION__
-        << ": sigma_a was estimated from the transfer matrix.";
-  }
+  //============================================================
+  // Define utility functions
+  //============================================================
 
-  //======================================== Determine if fissile or not
-  double sigma_f_sum = 0.0;
-  for (int g = 0; g < num_groups; ++g)
-    sigma_f_sum += sigma_f[g];
+  auto was_specified =
+      [](const std::vector<double>& vec)
+      {
+        return std::any_of(vec.begin(), vec.end(),
+                           [](double x) { return x > 0.0; });
+      };
 
-  if (sigma_f_sum > 1.0e-28) is_fissile = true;
-  if (not is_fissile and num_precursors > 0)
+  //============================================================
+  // Determine if fissionable or not
+  //============================================================
+
+  is_fissionable = was_specified(sigma_f) ||
+                   was_specified(nu_sigma_f);
+
+  //============================================================
+  // Zero fission data if not fissionable
+  //============================================================
+
+  if (!is_fissionable)
   {
     num_precursors = 0;
-    precursor_lambda.clear();
-    precursor_yield.clear();
+
+    sigma_f.assign(num_groups, 0.0);
+    nu_sigma_f.assign(num_groups, 0.0);
+    nu_prompt_sigma_f.assign(num_groups, 0.0);
+    nu_delayed_sigma_f.assign(num_groups, 0.0);
+
+    nu.assign(num_groups, 0.0);
+    nu_prompt.assign(num_groups, 0.0);
+    nu_delayed.assign(num_groups, 0.0);
+
+    chi.assign(num_groups, 0.0);
+    chi_prompt.assign(num_groups, 0.0);
     chi_delayed.clear();
 
-    chi::log.Log0Warning()
-        << __FUNCTION__
-        << ": Precursors found in a non-fissile material. "
-        << "Setting the number of precursors to zero for consistency.";
+    precursor_lambda.clear();
+    precursor_yield.clear();
   }
 
-  if (is_fissile)
+  //============================================================
+  // Check specified fission data
+  //============================================================
+
+  else
   {
-    //======================================== Determine present nu terms
-    bool has_nu = false;
-    bool has_nu_p = false;
-    bool has_nu_d = false;
-    for (int g = 0; g < num_groups; ++g)
-    {
-      if (not has_nu and nu[g] > 0.0) has_nu = true;
-      if (not has_nu_p and nu_prompt[g] > 0.0) has_nu_p = true;
-      if (not has_nu_d and nu_delayed[g] > 0.0) has_nu_d = true;
-    }
-
-    //======================================== Determine present chi terms
-    bool has_chi = false;
-    bool has_chi_p = false;
-    for (int g = 0; g < num_groups; ++g)
-    {
-      if (not has_chi and chi[g] > 0.0) has_chi = true;
-      if (not has_chi_p and chi_prompt[g] > 0.0) has_chi_p = true;
-    }
-
-    bool has_chi_d = false;
-    if (num_precursors > 0)
-    {
-      for (int j = 0; j < num_precursors; ++j)
-      {
-        double chi_dj_sum = 0.0;
-        for (int g = 0; g < num_groups; ++g)
-          chi_dj_sum += chi_delayed[g][j];
-
-        if (chi_dj_sum < eps)
-        {
-          chi::log.Log0Error()
-            << __FUNCTION__ << ": Precursor family " << j
-            << "does not have a non-zero fission spectrum.";
-          chi::Exit(EXIT_FAILURE);
-        }
-      }
-      has_chi_d = true;
-    }//if num_precursors > 0
-
-    //======================================== Check precursor terms
-    if (num_precursors > 0)
-    {
-      for (int j = 0; j < num_precursors; ++j)
-      {
-        if (precursor_lambda[j] < eps)
-        {
-          chi::log.Log0Error()
-            << __FUNCTION__ << ": Precursor family " << j << "'s decay "
-            << "constant must be non-zero.";
-          chi::Exit(EXIT_FAILURE);
-        }
-        if (precursor_yield[j] < eps)
-        {
-          chi::log.Log0Error()
-              << __FUNCTION__ << ": Precursor family " << j << "'s yield "
-              << "must be non-zero.";
-          chi::Exit(EXIT_FAILURE);
-        }
-      }
-    }
-
-    //======================================== Normalization
-    if (has_chi)
-    {
-      double chi_sum = 0.0;
-      for (auto& v : chi) chi_sum += v;
-      if (fabs(chi_sum - 1.0) > eps and chi_sum > eps)
-      {
-        chi::log.Log0Warning()
-          << __FUNCTION__ << ": Total fission spectrum does "
-          << "not sum to unity. Normalizing. " << chi_sum-1.0;
-        for (auto& v : chi) v /= chi_sum;
-      }
-    }
-
-    if (has_chi_p)
-    {
-      double chi_p_sum = 0.0;
-      for (auto& v : chi_prompt) chi_p_sum += v;
-      if (fabs(chi_p_sum - 1.0) > eps and chi_p_sum > eps)
-      {
-        chi::log.Log0Warning()
-            << __FUNCTION__ << ": Prompt fission spectrum does "
-            << "not sum to unity. Normalizing.";
-        for (auto& v : chi_prompt) v /= chi_p_sum;
-      }
-    }
-
-    if (has_chi_d)
-    {
-      for (int j = 0; j < num_precursors; ++j)
-      {
-        double chi_dj_sum = 0.0;
-        for (int g = 0; g < num_groups; ++g)
-          chi_dj_sum += chi_delayed[g][j];
-        if (fabs(chi_dj_sum - 1.0) > eps and chi_dj_sum > eps)
-        {
-          chi::log.Log0Warning()
-              << __FUNCTION__ << ": Delayed fission spectrum for precursor "
-              << "family " << j << " does not sum to unity. Normalizing.";
-          for (int g = 0; g < num_groups; ++g)
-            chi_delayed[g][j] /= chi_dj_sum;
-        }
-      }
-    }
+    //==================================================
+    // Check prompt/delayed specification
+    //==================================================
 
     if (num_precursors > 0)
     {
-      double yield_sum = 0.0;
-      for (auto& v : precursor_yield) yield_sum += v;
-      if (fabs(yield_sum - 1.0) > eps and yield_sum > eps)
+      // check nu specification
       {
-        chi::log.Log0Warning()
-            << __FUNCTION__ << ": Precursor yield sum does not sum "
-            << "to unity. Normalizing.";
-        for (auto& v : precursor_yield) v /= yield_sum;
+        if (was_specified(nu_prompt) &&
+            was_specified(nu_delayed))
+        {
+          if (!std::all_of(nu_prompt.begin(), nu_prompt.end(),
+                           [](double x) { return x == 0.0 || x > 1.0; }) &&
+              !std::all_of(nu_delayed.begin(), nu_delayed.end(),
+                           [](double x) { return x >= 0.0; }))
+            throw std::logic_error(
+                "Prompt and delayed fission neutron yields must be zero "
+                "or positive. Zero values must be accounted allowed "
+                "for photo-fission, which is a threshold reaction. Prompt "
+                "fission neutron yields must be greater than 1 or 0.");
+
+          //compute other quantities
+          for (unsigned int g = 0; g < num_groups; ++g)
+          {
+            nu[g] = nu_prompt[g] + nu_delayed[g];
+            beta[g] = nu_delayed[g] / nu[g];
+          }
+        }//if nu_prompt and nu_delayed specified
+        else if (was_specified(nu) &&
+                 was_specified(beta))
+        {
+          if (!std::all_of(nu.begin(), nu.end(),
+                           [](double x) { return x == 0.0 || x > 1.0; }))
+            throw std::logic_error(
+                "Fission neutron yield must be greater than 1 or 0.");
+          if (!std::all_of(beta.begin(), beta.end(),
+                           [](double x) { return x >= 0.0 && x <= 1.0; }))
+            throw std::logic_error(
+                "Delayed neutron fractions must be in the range [0.0, 1.0].");
+
+          //compute other quantities
+          for (unsigned int g = 0; g < num_groups; ++g)
+          {
+            nu_prompt[g] = (1.0 - beta[g]) * nu[g];
+            nu_delayed[g] = beta[g] * nu[g];
+          }
+
+          if (was_specified(nu_sigma_f))
+            for (unsigned int g = 0; g < num_groups; ++g)
+              if (nu[g] != 0.0)
+                sigma_f[g] = nu_sigma_f[g] / nu[g];
+        } //if nu and beta specified
+        else
+          throw std::logic_error(
+              "Invalid specification of fission neutron yield data.");
+
+        //compute other quantities
+        for (unsigned int g = 0; g < num_groups; ++g)
+        {
+          nu_sigma_f[g] = nu[g] * sigma_f[g];
+          nu_prompt_sigma_f[g] = nu_prompt[g] * sigma_f[g];
+          nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
+        }
       }
-    }
 
-    //======================================== Check for input compatibility
-    if ((has_nu_p and not has_chi_p) or (not has_nu_p and has_chi_p))
-    {
-      chi::log.Log0Error()
-        << __FUNCTION__ << ": If prompt nu or chi are provided, the other "
-        << "must be as well.";
-      chi::Exit(EXIT_FAILURE);
-    }
-    if ((has_nu_d and not has_chi_d) or (not has_nu_d and has_chi_d))
-    {
-      chi::log.Log0Error()
-          << __FUNCTION__ << ": If prompt nu or chi are provided, the other "
-          << "must be as well.";
-      chi::Exit(EXIT_FAILURE);
-    }
-    if ((has_nu and not has_chi) or (not has_nu and has_chi))
-    {
-      chi::log.Log0Error()
-          << __FUNCTION__ << ": If total nu or chi are provided, the other "
-          << "must be as well.";
-      chi::Exit(EXIT_FAILURE);
-    }
-
-    //============================== Compute total from prompt and delayed
-    if (has_nu_p and has_nu_d)
-    {
-      for (int g = 0; g < num_groups; ++g)
-        nu[g] = nu_prompt[g] + nu_delayed[g];
-      has_nu = true;
-    }
-
-    if (has_chi_p and has_chi_d)
-    {
-      for (int g = 0; g < num_groups; ++g)
+      //check and normalize prompt fission spectrum
       {
-        double beta = nu_delayed[g] / nu[g];
-        chi[g] = (1.0 - beta) * chi_prompt[g];
-        for (int j = 0; j < num_precursors; ++j)
-          chi[g] += beta * precursor_yield[j] * chi_delayed[g][j];
-      }
-      has_chi = true;
-    }
+        //throw error if not specified
+        if (!was_specified(chi_prompt))
+          throw std::logic_error(
+              "The prompt fission spectrum was not provided.");
 
-    //======================================== Make sure appropriate quantities
-    //                                         were provided
-    if (num_precursors > 0)
-    {
-      if (not has_nu_p or not has_nu_d)
-      {
-        chi::log.Log0Error()
-          << __FUNCTION__ << ": Both prompt and delayed nu must be provided "
-          << "when precursors are present.";
-        chi::Exit(EXIT_FAILURE);
+        //normalize the prompt fission spectrum
+        double chip_sum = std::accumulate(chi_prompt.begin(),
+                                          chi_prompt.end(), 0.0);
+        for (unsigned int g = 0; g < num_groups; ++g)
+          chi_prompt[g] /= chip_sum;
       }
-      if (not has_chi_p or not has_chi_d)
+
+      //check and normalize delayed emission spectra
       {
-        chi::log.Log0Error()
-            << __FUNCTION__ << ": Both prompt and delayed chi must be "
-            << "provided when precursors are present.";
-        chi::Exit(EXIT_FAILURE);
+        //create chi_delayed transpose for easier checks
+        EmissionSpectra tmp;
+        tmp.resize(num_precursors, std::vector<double>(num_groups, 0.0));
+        for (unsigned int g = 0; g < num_groups; ++g)
+          for (unsigned int j = 0; j < num_precursors; ++j)
+            tmp[j][g] = chi_delayed[g][j];
+
+        for (unsigned int j = 0; j < num_precursors; ++j)
+        {
+          //throw error if emission spectrum j was not specified
+          if (!was_specified(tmp[j]))
+            throw std::logic_error(
+                "The delayed emission spectrum for precursor "
+                "species " + std::to_string(j) + " was not provided.");
+
+          //normalize each emission spectrum
+          double chidj_sum = std::accumulate(tmp[j].begin(),
+                                             tmp[j].end(), 0.0);
+          for (unsigned int g = 0; g < num_groups; ++g)
+            chi_delayed[g][j] /= chidj_sum;
+        }//for j
       }
-    }
+
+      //check the precursor data
+      {
+        //throw error if decay constants were not specified
+        if (!was_specified(precursor_lambda))
+          throw std::logic_error(
+              "The delayed neutron precursor decay constants "
+              "was not provided.");
+
+        //throw error if not specified
+        if (!was_specified(precursor_yield))
+          throw std::logic_error(
+              "The delayed neutron precursor yields was not provided.");
+
+        //normalize the precursor yields
+        double yield_sum = std::accumulate(precursor_yield.begin(),
+                                           precursor_yield.end(), 0.0);
+        for (unsigned int j = 0; j < num_precursors; ++j)
+          precursor_yield[j] /= yield_sum;
+      }
+
+      //compute beta-weighted total fission spectrum
+      for (unsigned int g = 0; g < num_groups; ++g)
+      {
+        //compute beta-averaged total fission spectrum
+        chi[g] = (1.0 - beta[g]) * chi_prompt[g];
+        for (unsigned int j = 0; j < num_precursors; ++j)
+          chi[g] += beta[g] * precursor_yield[j] * chi_delayed[g][j];
+      }
+
+      //normalize total chi just in case
+      double chi_sum = std::accumulate(chi.begin(), chi.end(), 0.0);
+      for (unsigned int g = 0; g < num_groups; ++g)
+        chi[g] /= chi_sum;
+    }//if prompt/delayed
+
+    //==================================================
+    // Check total fission specification
+    //==================================================
+
     else
     {
-      if (not has_nu)
-      {
-        chi::log.Log0Error()
-            << __FUNCTION__ << ": Total nu must be provided "
-            << "when precursors are present.";
-        chi::Exit(EXIT_FAILURE);
-      }
-      if (not has_chi)
-      {
-        chi::log.Log0Error()
-            << __FUNCTION__ << ": Total chi must be "
-            << "provided when precursors are present.";
-        chi::Exit(EXIT_FAILURE);
-      }
-    }
+      //check that nu was specified correctly
+      if (!was_specified(nu))
+        throw std::logic_error(
+            "Total neutrons per fission was not provided.");
+      if (!std::all_of(nu.begin(), nu.end(),
+                       [](double x) { return x == 0.0 || x > 1.0; }))
+        throw std::logic_error(
+            "Total fission yield must be greater than unity.");
 
-    //compute nu_sigma_f terms
-    for (size_t g = 0; g < num_groups; ++g)
-    {
-      nu_sigma_f        [g] = nu        [g] * sigma_f[g];
-      nu_prompt_sigma_f [g] = nu_prompt [g] * sigma_f[g];
-      nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
-    }
+      //compute other quantities
+      if (was_specified(nu_sigma_f))
+      {
+        for (unsigned int g = 0; g < num_groups; ++g)
+          sigma_f[g] = nu[g] * sigma_f[g];
+      }
+      else if (was_specified(nu_sigma_f))
+      {
+        for (unsigned int g = 0; g < num_groups; ++g)
+          if (nu[g] != 0.0)
+            sigma_f[g] = nu_sigma_f[g] / nu[g];
+      }
+      else
+        throw std::logic_error(
+            "Neither the fission cross-section nor the "
+            "fission multiplicity cross-section was specified.");
 
-  }//if fissile
+      //check that chi was specified
+      if (!was_specified(chi))
+        throw std::logic_error(
+            "Total fission spectrum was not provided.");
+
+      //normalize the total fission spectrum
+      double chi_sum = std::accumulate(chi.begin(), chi.end(), 0.0);
+      for (unsigned int g = 0; g < num_groups; ++g)
+        chi[g] /= chi_sum;
+    }
+    }
+  }
+
+  //============================================================
+  // Compute diffusion parameters
+  //============================================================
 
   ComputeDiffusionParameters();
 }
