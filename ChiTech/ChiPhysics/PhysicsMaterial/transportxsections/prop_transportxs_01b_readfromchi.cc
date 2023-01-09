@@ -437,6 +437,7 @@ void chi_physics::TransportCrossSections::
       nu.resize(num_groups, 0.0);
       nu_prompt.resize(num_groups, 0.0);
       nu_delayed.resize(num_groups, 0.0);
+      beta.resize(num_groups, 0.0);
 
       inv_velocity.resize(num_groups, 0.0);
     }

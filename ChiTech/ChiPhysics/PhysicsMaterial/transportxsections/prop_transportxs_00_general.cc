@@ -372,7 +372,7 @@ ComputeAbsorption()
   // estimate from a transfer matrix
   else
   {
-    chi::log.LogAllWarning()
+    chi::log.Log0Warning()
         << "Estimating absorption from the transfer S0.";
 
     const auto& S0 = transfer_matrices[0];
