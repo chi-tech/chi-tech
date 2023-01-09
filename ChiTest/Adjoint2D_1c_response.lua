@@ -159,3 +159,10 @@ ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
 if master_export == nil then
     chiExportMultiFieldFunctionToVTK({ff_m0, ff_m1, ff_m2},"ZPhi_"..solver_name)
 end
+
+
+--############################################### Cleanup
+chiMPIBarrier()
+if (chi_location_id == 0) then
+    os.execute("rm Adjoint2D_1b_adjoint*")
+end

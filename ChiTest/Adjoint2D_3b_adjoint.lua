@@ -132,7 +132,7 @@ chiSolverSetBasicOption(phys1, "REFERENCE_RF", "QOI1")
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-chiLBSWriteFluxMoments(phys1, "Adjoint2D_2b_adjoint")
+chiLBSWriteFluxMoments(phys1, "Adjoint2D_3b_adjoint")
 
 
 
