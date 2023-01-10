@@ -5,9 +5,9 @@ cmake-build-debug
 bin
 chi_build
 build
-ChiDoc/documentation
-ChiDoc/HTMLdocs
-ChiDoc/whitepages
+doc/documentation
+doc/HTMLdocs
+doc/whitepages
 .clang-format
 lib
 
@@ -48,11 +48,11 @@ resources/\.DS_Store
 chi-dependencies/
 
 #Documentation
-ChiDoc/LUA_DOCUMENTATION/lua_functions.c
-ChiDoc/LUA_DOCUMENTATION/lua_namespace.hpp
-ChiDoc/PAGES/MainPage.h
+doc/LUA_DOCUMENTATION/lua_functions.c
+doc/LUA_DOCUMENTATION/lua_namespace.hpp
+doc/PAGES/MainPage.h
 ChiTech/ChiLua/LUA_DOCUMENTATION/Z_GeneratedFileList.txt
-ChiDoc/LUA_DOCUMENTATION/lua_register.txt
+doc/LUA_DOCUMENTATION/lua_register.txt
 
 #visual studio code files
 .vscode/
