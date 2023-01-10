@@ -18,7 +18,7 @@ end
 --############################################### Setup mesh
 chiMeshHandlerCreate()
 
-umesh = chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
+umesh = chiUnpartitionedMeshFromEnsightGold("resources/TestMeshes/Sphere.case")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED)
 chiVolumeMesherCreate(VOLUMEMESHER_UNPARTITIONED, umesh)

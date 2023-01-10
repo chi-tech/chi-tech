@@ -47,12 +47,12 @@ project(${TARGET} LANGUAGES C CXX VERSION 1.0.2)
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}")
 set(CHI_TECH_MOD "modules")
 
-configure_file("ChiResources/chi_configuration.h.in"
+configure_file("resources/chi_configuration.h.in"
                "${CHI_TECH_DIR}/framework/chi_configuration.h")
 
 #================================================ Set cmake variables
 find_package(MPI)
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/ChiResources/Macros")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/resources/CMakeMacros")
 
 if (NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")

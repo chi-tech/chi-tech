@@ -19,7 +19,7 @@ end
 chiMeshHandlerCreate()
 
 unpart_mesh = chiUnpartitionedMeshFromWavefrontOBJ(
-                "ChiResources/TestObjects/TriangleMesh2x2.obj")
+                "resources/TestMeshes/TriangleMesh2x2.obj")
 
 chiSurfaceMesherCreate(SURFACEMESHER_PREDEFINED);
 chiVolumeMesherCreate(VOLUMEMESHER_EXTRUDER,

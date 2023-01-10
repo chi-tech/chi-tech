@@ -1,3 +1,6 @@
+
+## Manual installation of PETSc
+```shell
 ./configure  \
 --prefix=$PWD/../petsc-3.17.0-install  \
 --download-hypre=1  \
@@ -22,3 +25,5 @@ COPTFLAGS='-O3 -march=native -mtune=native'  \
 CXXOPTFLAGS='-O3 -march=native -mtune=native'  \
 FOPTFLAGS='-O3 -march=native -mtune=native'  \
 PETSC_DIR=$PWD
+```
+
