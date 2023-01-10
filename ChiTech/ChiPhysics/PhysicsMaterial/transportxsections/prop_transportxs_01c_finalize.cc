@@ -250,7 +250,6 @@ void chi_physics::TransportCrossSections::FinalizeCrossSections()
         chi[g] /= chi_sum;
     }
     }
-  }
 
   //============================================================
   // Compute diffusion parameters
