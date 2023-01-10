@@ -40,7 +40,7 @@ endif()
 message(STATUS "VTK_DIR set to ${VTK_DIR}")
 
 #================================================ Set project targets
-SET(TARGET ChiTech)
+SET(TARGET framework)
 project(${TARGET} LANGUAGES C CXX VERSION 1.0.2)
 
 #================================================ Set variables
@@ -48,7 +48,7 @@ set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}")
 set(CHI_TECH_MOD "ChiModules")
 
 configure_file("ChiResources/chi_configuration.h.in"
-               "${CHI_TECH_DIR}/ChiTech/chi_configuration.h")
+               "${CHI_TECH_DIR}/framework/chi_configuration.h")
 
 #================================================ Set cmake variables
 find_package(MPI)
@@ -84,11 +84,11 @@ include_directories(SYSTEM "${PETSC_ROOT}/include")
 
 include_directories(SYSTEM "${CHI_TECH_DIR}/ThirdParty/paraview")
 
-include_directories("${CHI_TECH_DIR}/ChiTech")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiMPI")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiMiscUtils")
+include_directories("${CHI_TECH_DIR}/framework")
+include_directories("${CHI_TECH_DIR}/framework/ChiLua")
+include_directories("${CHI_TECH_DIR}/framework/ChiMPI")
+include_directories("${CHI_TECH_DIR}/framework/ChiLog")
+include_directories("${CHI_TECH_DIR}/framework/ChiMiscUtils")
 include_directories("${CHI_TECH_DIR}/ChiResources")
 include_directories("${CHI_TECH_DIR}/ChiModules")
 
@@ -164,20 +164,20 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
 add_subdirectory("${CHI_TECH_DIR}/ThirdParty")
 
 #================================================ Define source directories
-set(SOURCES "${CHI_TECH_DIR}/ChiTech/chi_runtime.cc")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiConsole")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLua")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMath")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiPhysics")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiGraph")
+set(SOURCES "${CHI_TECH_DIR}/framework/chi_runtime.cc")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiConsole")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiLua")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiMath")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiPhysics")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiGraph")
 
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiTimer")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMesh")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMPI")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiLog")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiDataTypes")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/ChiMiscUtils")
-add_subdirectory("${CHI_TECH_DIR}/ChiTech/LuaTest")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiTimer")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiMesh")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiMPI")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiLog")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiDataTypes")
+add_subdirectory("${CHI_TECH_DIR}/framework/ChiMiscUtils")
+add_subdirectory("${CHI_TECH_DIR}/framework/LuaTest")
 
 add_subdirectory("${CHI_TECH_MOD}")
 
@@ -186,7 +186,7 @@ add_library(ChiLib STATIC ${SOURCES})
 target_link_libraries(ChiLib ${CHI_LIBS} ThirdParty)
 target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
 
-add_executable(${TARGET} "${CHI_TECH_DIR}/ChiTech/chi_tech_main.cc")
+add_executable(${TARGET} "${CHI_TECH_DIR}/framework/chi_tech_main.cc")
 target_link_libraries(${TARGET} ChiLib)
 target_compile_options(${TARGET} PUBLIC ${CHI_CXX_FLAGS})
 
