@@ -82,7 +82,7 @@ include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
 include_directories(SYSTEM "${LUA_ROOT}/include")
 include_directories(SYSTEM "${PETSC_ROOT}/include")
 
-include_directories(SYSTEM "${CHI_TECH_DIR}/ThirdParty/paraview")
+include_directories(SYSTEM "${CHI_TECH_DIR}/external/paraview")
 
 include_directories("${CHI_TECH_DIR}/framework")
 include_directories("${CHI_TECH_DIR}/framework/ChiLua")
@@ -161,7 +161,7 @@ endif()
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
 
 #================================================ Third-party library
-add_subdirectory("${CHI_TECH_DIR}/ThirdParty")
+add_subdirectory("${CHI_TECH_DIR}/external")
 
 #================================================ Define source directories
 set(SOURCES "${CHI_TECH_DIR}/framework/chi_runtime.cc")
@@ -183,7 +183,7 @@ add_subdirectory("${CHI_TECH_MOD}")
 
 #================================================ Define targets
 add_library(ChiLib STATIC ${SOURCES})
-target_link_libraries(ChiLib ${CHI_LIBS} ThirdParty)
+target_link_libraries(ChiLib ${CHI_LIBS} external)
 target_compile_options(ChiLib PUBLIC ${CHI_CXX_FLAGS})
 
 add_executable(${TARGET} "${CHI_TECH_DIR}/framework/chi_tech_main.cc")
