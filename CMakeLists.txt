@@ -45,7 +45,7 @@ project(${TARGET} LANGUAGES C CXX VERSION 1.0.2)
 
 #================================================ Set variables
 set(CHI_TECH_DIR "${PROJECT_SOURCE_DIR}")
-set(CHI_TECH_MOD "ChiModules")
+set(CHI_TECH_MOD "modules")
 
 configure_file("ChiResources/chi_configuration.h.in"
                "${CHI_TECH_DIR}/framework/chi_configuration.h")
@@ -90,7 +90,7 @@ include_directories("${CHI_TECH_DIR}/framework/ChiMPI")
 include_directories("${CHI_TECH_DIR}/framework/ChiLog")
 include_directories("${CHI_TECH_DIR}/framework/ChiMiscUtils")
 include_directories("${CHI_TECH_DIR}/ChiResources")
-include_directories("${CHI_TECH_DIR}/ChiModules")
+include_directories("${CHI_TECH_DIR}/modules")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
