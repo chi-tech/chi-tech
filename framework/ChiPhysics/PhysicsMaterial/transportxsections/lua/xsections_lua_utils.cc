@@ -103,7 +103,7 @@ chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
  *
  *
 \ingroup LuaTransportXSs
- * \return */
+*/
 int chiPhysicsTransportXSSet(lua_State* L)
 {
   int num_args = lua_gettop(L);
