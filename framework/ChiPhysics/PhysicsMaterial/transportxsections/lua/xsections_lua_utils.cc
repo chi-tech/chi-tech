@@ -155,7 +155,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     const char* file_name_c = lua_tostring(L,3);
 
-    xs->MakeFromCHIxsFile(std::string(file_name_c));
+    xs->MakeFromChiXSFile(std::string(file_name_c));
   }
   else
   {
@@ -461,7 +461,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 
   std::string file_name = lua_tostring(L,2);
 
-  xs->ExportToChiFormat(file_name);
+  xs->ExportToChiXSFile(file_name);
 
   return 0;
 }

@@ -369,7 +369,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }//for m
   }//for xs
 
-  FinalizeCrossSections();
+  Finalize();
 }
 
 

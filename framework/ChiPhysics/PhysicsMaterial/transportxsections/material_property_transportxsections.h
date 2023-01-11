@@ -84,9 +84,11 @@ private:
 
 public:
   //01
-  void MakeFromCHIxsFile(const std::string &file_name);
-  void FinalizeCrossSections();
+  void MakeFromChiXSFile(const std::string &file_name);
+private:
+  void Finalize();
 
+public:
   //02
   void ComputeDiffusionParameters();
 
@@ -94,7 +96,7 @@ public:
   void PushLuaTable(lua_State* L) override;
 
   //06
-  void ExportToChiFormat(const std::string& file_name);
+  void ExportToChiXSFile(const std::string& file_name);
 
 
 };

@@ -438,7 +438,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         const char* file_name_c = lua_tostring(L,4);
 
-        prop->MakeFromCHIxsFile(std::string(file_name_c));
+        prop->MakeFromChiXSFile(std::string(file_name_c));
       }
       else if (operation_index == static_cast<int>(OpType::EXISTING))
       {
