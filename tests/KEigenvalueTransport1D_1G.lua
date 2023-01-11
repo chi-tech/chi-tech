@@ -1,6 +1,6 @@
 -- 1D 1G KEigenvalue::Solver test with Vacuum BC.
 -- SDM: PWLD
--- Test: Final k-eigenvalue: 0.997501
+-- Test: Final k-eigenvalue: 0.999541
 num_procs = 4
 
 -- NOTE: For command line inputs, specify as:
