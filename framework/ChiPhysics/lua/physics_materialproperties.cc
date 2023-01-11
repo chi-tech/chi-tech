@@ -227,15 +227,6 @@ values: \n
 
 ####_
 
-PDT_XSFILE\n
-Loads transport cross-sections from PDT type cross-section files. Expects
-to be followed by a filepath specifying the xs-file. By default this routine
-will attempt to build a transfer matrix from reaction type MT2501, however,
-an additional text field can be supplied specifying the transfer matrix to
- use.
-
-####_
-
 CHI_XSFILE\n
 Loads transport cross-sections from CHI type cross-section files. Expects
 to be followed by a filepath specifying the xs-file. 
@@ -248,8 +239,8 @@ Supply handle to an existing cross-section and simply swap them out.
 \code
 chiPhysicsMaterialSetProperty(materials[1],
                               TRANSPORT_XSECTIONS,
-                              PDT_XSFILE,
-                              "xs_3_170.data",
+                              CHI_XSFILE,
+                              "xs_3_170.cxs",
                               "2518")
 \endcode
 
