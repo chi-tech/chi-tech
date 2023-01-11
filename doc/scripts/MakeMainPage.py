@@ -23,13 +23,7 @@ for line in lines:
 
 file.close()
 
-# ==================================================== Process tables
-file = open("doc/scripts/mainpage_tableinput.txt")
-
-# ===================================== Process includes first
-# temp_lines = file.readlines()
-# lines = temp_lines.copy()
-
+# ==================================================== Process quickref tables
 lines = []
 
 
@@ -48,7 +42,7 @@ def RecursiveIncludes(file_path):
                 RecursiveIncludes(file_path)
 
 
-RecursiveIncludes("doc/scripts/mainpage_tableinput.txt")
+RecursiveIncludes("doc/scripts/mainpage_quickref.txt")
 
 # ===================================== Function for writing a table
 def write_table(table_entries):
@@ -97,8 +91,6 @@ for line in lines:
     if first_word == "module_end":
         write_table(table_entries)
         table_entries = []
-
-file.close()
 
 
 output_file.write("\n*/")

@@ -131,7 +131,7 @@ function: chiPhysicsTransportXSExportToChiTechFormat
 module_end
 
 print: ## Modules
-include: modules/mainpage_tableinput.txt
+include: modules/mainpage_quickref.txt
 
 module: Test scripts
 function: chiSimTest01_FV

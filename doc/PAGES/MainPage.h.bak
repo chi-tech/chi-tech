@@ -1,0 +1,177 @@
+/** \mainpage
+
+ChiTech is an engineering development platform under development to support
+various scientific simulations. At the core of the platform is the **Lua**
+scripting engine which allows the user to interact with their C++ code using
+a script-environment.\n
+\n
+Please be patient as we add more capabilities and tutorials to the code. For
+now we have only a couple of tutorials.\n
+\n
+
+ # Index
+
+ \subpage Tutorial00 \n
+ \subpage MeshTutorials \n
+ \subpage ProgrammerManual \n
+ <a href="https://www.lua.org/manual/5.3/"><B>Lua 5.3 Reference</B></a>\n
+ <a href="https://www.mcs.anl.gov/petsc/documentation/index.html"><B>PETSc Documentation</B></a>\n
+ <a href="https://lorensen.github.io/VTKExamples/site/"><B>Visualization Tool Kit (VTK) documentation</B></a>\n
+
+
+\n
+
+
+ ## Variables defined in lua
+Variable Name        | Description                            | Variable Name        | Description
+---------------------|------------------                      |--------------------- |---------------------
+ `chi_version`       | Version string, e.g., "1.2.3"          | `chi_minor_version`  | Minor version, e.g., 2, as an integer
+ `chi_major_version` | Major version, e.g., 1, as an integer  | `chi_patch_version`  | Patch version, e.g., 3, as an integer
+ `chi_location_id`   | Current process rank in MPI-context    | `chi_number_of_processes` | Number of MPI processes
+
+\n
+
+
+ ## Input Functions
+
+### MPI Utilities
+ 
+<table>
+<tr><td width="33%">chiMPIBarrier()</td></tr>
+</table>
+### Logging Utilities
+ 
+<table>
+<tr><td width="33%">chiLogSetVerbosity()</td><td width="33%">chiLog()</td></tr>
+</table>
+### Math Utilities
+ 
+<table>
+<tr><td width="33%">chiLegendre()</td><td width="33%">chiLegendreDerivative()</td><td width="33%">chiYlm()</td></tr>
+</table>
+### Quadratures
+ 
+<table>
+<tr><td width="33%">chiCreateLineQuadrature()</td><td width="33%">chiCreateProductQuadrature()</td><td width="33%">chiCreateCylindricalProductQuadrature()</td></tr>
+<tr><td width="33%">chiCreateSphericalProductQuadrature()</td><td width="33%">chiCreateCustomAngularQuadrature()</td><td width="33%">chiGetProductQuadrature()</td></tr>
+<tr><td width="33%">chiCreateSLDFESQAngularQuadrature()</td><td width="33%">chiLocallyRefineSLDFESQAngularQuadrature()</td><td width="33%">chiPrintToPythonSLDFESQAngularQuadrature()</td></tr>
+<tr><td width="33%">chiOptimizeAngularQuadratureForPolarSymmetry()</td></tr>
+</table>
+### Orthogonal Meshes
+ 
+<table>
+<tr><td width="33%">chiMeshCreateUnpartitioned1DOrthoMesh()</td><td width="33%">chiMeshCreateUnpartitioned2DOrthoMesh()</td><td width="33%">chiMeshCreateUnpartitioned3DOrthoMesh()</td></tr>
+</table>
+### Loading a Mesh from File
+ 
+<table>
+<tr><td width="33%">chiUnpartitionedMeshFromVTU()</td><td width="33%">chiUnpartitionedMeshFromEnsightGold()</td><td width="33%">chiUnpartitionedMeshFromWavefrontOBJ()</td></tr>
+<tr><td width="33%">chiUnpartitionedMeshFromMshFormat()</td></tr>
+</table>
+### Manual Unpartitioned Mesh
+ 
+<table>
+<tr><td width="33%">chiCreateEmptyUnpartitionedMesh()</td><td width="33%">chiUnpartitionedMeshUploadVertex()</td><td width="33%">chiUnpartitionedMeshUploadCell()</td></tr>
+<tr><td width="33%">chiUnpartitionedMeshFinalizeEmpty()</td><td width="33%">chiDestroyUnpartitionedMesh()</td></tr>
+</table>
+### Logical Volumes
+ 
+<table>
+<tr><td width="33%">chiLogicalVolumeCreate()</td></tr>
+</table>
+### Mesh Handler
+ 
+<table>
+<tr><td width="33%">chiMeshHandlerCreate()</td><td width="33%">chiMeshHandlerSetCurrent()</td><td width="33%">chiMeshHandlerExportMeshToObj()</td></tr>
+<tr><td width="33%">chiMeshHandlerExportMeshToVTK()</td></tr>
+</table>
+### Surface Meshes
+ 
+<table>
+<tr><td width="33%">chiSurfaceMeshCreate()</td><td width="33%">chiSurfaceMeshImportFromOBJFile()</td><td width="33%">chiSurfaceMeshImportFromTriangleFiles()</td></tr>
+<tr><td width="33%">chiSurfaceMeshExportToObj()</td><td width="33%">chiSurfaceMeshExportPolyFile()</td><td width="33%">chiSurfaceMeshCheckCycles()</td></tr>
+<tr><td width="33%">chiComputeLoadBalancing()</td></tr>
+</table>
+### Meshers
+ 
+<table>
+<tr><td width="33%">chiSurfaceMesherCreate()</td><td width="33%">chiSurfaceMesherExecute()</td><td width="33%">chiSurfaceMesherSetProperty()</td></tr>
+<tr><td width="33%">chiVolumeMesherCreate()</td><td width="33%">chiVolumeMesherExecute()</td><td width="33%">chiVolumeMesherSetProperty()</td></tr>
+<tr><td width="33%">chiVolumeMesherSetKBAPartitioningPxPyPz()</td><td width="33%">chiVolumeMesherSetKBACutsX()</td><td width="33%">chiVolumeMesherSetKBACutsY()</td></tr>
+<tr><td width="33%">chiVolumeMesherSetKBACutsZ()</td><td width="33%">chiVolumeMesherSetMatIDToAll()</td><td width="33%">chiVolumeMesherSetupOrthogonalBoundaries()</td></tr>
+</table>
+### Experimental
+ 
+<table>
+<tr><td width="33%">chiDecomposeSurfaceMeshPxPy()</td><td width="33%">chiCutMesh()</td><td width="33%">chiCountMeshInLogicalVolume()</td></tr>
+</table>
+### Field-functions
+ 
+<table>
+<tr><td width="33%">chiGetFieldFunctionHandleByName()</td><td width="33%">chiGetFieldFunctionList()</td><td width="33%">chiExportFieldFunctionToVTK()</td></tr>
+<tr><td width="33%">chiExportFieldFunctionToVTKG()</td><td width="33%">chiExportMultiFieldFunctionToVTK()</td></tr>
+</table>
+### Field-function Manipulation
+ 
+<table>
+<tr><td width="33%">chiFFInterpolationCreate()</td><td width="33%">chiFFInterpolationSetProperty()</td><td width="33%">chiFFInterpolationInitialize()</td></tr>
+<tr><td width="33%">chiFFInterpolationExecute()</td><td width="33%">chiFFInterpolationExportPython()</td><td width="33%">chiFFInterpolationGetValue()</td></tr>
+</table>
+### Physics Utilities
+ 
+<table>
+<tr><td width="33%">chiSolverInitialize()</td><td width="33%">chiSolverExecute()</td><td width="33%">chiSolverSetBasicOption()</td></tr>
+<tr><td width="33%">chiPhysicsAddMaterial()</td><td width="33%">chiPhysicsMaterialAddProperty()</td><td width="33%">chiPhysicsMaterialSetProperty()</td></tr>
+<tr><td width="33%">chiPhysicsMaterialGetProperty()</td><td width="33%">chiPhysicsMaterialModifyTotalCrossSection()</td></tr>
+</table>
+### Transport interaction cross-sections
+\ref ChiXSFile Chi-Tech native cross-section file format
+<table>
+<tr><td width="33%">chiPhysicsTransportXSCreate()</td><td width="33%">chiPhysicsTransportXSSet()</td><td width="33%">chiPhysicsTransportXSMakeCombined()</td></tr>
+<tr><td width="33%">chiPhysicsTransportXSGet()</td><td width="33%">chiPhysicsTransportXSExportToChiTechFormat()</td></tr>
+</table>
+### Diffusion
+ 
+<table>
+<tr><td width="33%">chiDiffusionCreateSolver()</td><td width="33%">chiDiffusionInitialize()</td><td width="33%">chiDiffusionExecute()</td></tr>
+<tr><td width="33%">chiDiffusionSetProperty()</td></tr>
+</table>
+### Linear Boltzmann Solver
+\ref LuaLBS Documentation page
+<table>
+<tr><td width="33%">chiLBSCreateSolver()</td><td width="33%">chiLBSSetProperty()</td><td width="33%">chiLBSInitialize()</td></tr>
+<tr><td width="33%">chiLBSExecute()</td><td width="33%">chiLBSGetFieldFunctionList()</td><td width="33%">chiLBSGetScalarFieldFunctionList()</td></tr>
+<tr><td width="33%">chiLBSWriteGroupsetAngularFlux()</td><td width="33%">chiLBSReadGroupsetAngularFlux()</td><td width="33%">chiLBSWriteFluxMoments()</td></tr>
+<tr><td width="33%">chiLBSCreateAndWriteSourceMoments()</td><td width="33%">chiLBSReadFluxMomentsAndMakeSourceMoments()</td><td width="33%">chiLBSReadSourceMoments()</td></tr>
+<tr><td width="33%">chiLBSReadFluxMoments()</td><td width="33%">chiLBSComputeBalance()</td><td width="33%">chiLBSAddPointSource()</td></tr>
+<tr><td width="33%">chiLBSClearPointSources()</td><td width="33%">chiLBSInitializePointSources()</td></tr>
+</table>
+### Linear Boltzmann Solver - Groupset manipulation
+\ref LuaLBSGroupsets Main page
+<table>
+<tr><td width="33%">chiLBSCreateGroup()</td><td width="33%">chiLBSCreateGroupset()</td><td width="33%">chiLBSGroupsetAddGroups()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetQuadrature()</td><td width="33%">chiLBSGroupsetSetAngleAggregationType()</td><td width="33%">chiLBSGroupsetSetAngleAggDiv()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetGroupSubsets()</td><td width="33%">chiLBSGroupsetSetIterativeMethod()</td><td width="33%">chiLBSGroupsetSetResidualTolerance()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetMaxIterations()</td><td width="33%">chiLBSGroupsetSetGMRESRestartIntvl()</td><td width="33%">chiLBSGroupsetSetEnableSweepLog()</td></tr>
+<tr><td width="33%">chiLBSGroupsetSetWGDSA()</td><td width="33%">chiLBSGroupsetSetTGDSA()</td></tr>
+</table>
+### Curvilinear Linear Boltzmann Solver
+ 
+<table>
+<tr><td width="33%">chiLBSCurvilinearCreateSolver()</td></tr>
+</table>
+###  LinearBoltzmann - KEigenvalueSolver
+ 
+<table>
+<tr><td width="33%">chiLBKESCreateSolver()</td><td width="33%">chiLBKESInitialize()</td><td width="33%">chiLBKESExecute()</td></tr>
+<tr><td width="33%">chiLBKESSetProperty()</td></tr>
+</table>
+### Test scripts
+ 
+<table>
+<tr><td width="33%">chiLuaTest()</td></tr>
+</table>
+ This file was generated using the script: CHI_TECH/ChiLua/chi_lua_docbuild.lua
+
+
+*/

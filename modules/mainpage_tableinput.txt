@@ -1,4 +1,0 @@
-include: modules/DiffusionSolver/lua/mainpage_tableinput.txt
-include: modules/LinearBoltzmannSolver/lua/mainpage_tableinput.txt
-include: modules/LBSCurvilinear/lua/mainpage_tableinput.txt
-include: modules/LBKEigenvalueSolver/lua/mainpage_tableinput.txt

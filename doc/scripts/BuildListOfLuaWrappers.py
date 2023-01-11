@@ -16,7 +16,7 @@ for search_folder in folders_to_walk:
             for file_name in files:
                 base_name, extension = os.path.splitext(file_name)
                 if extension == ".cc":
-                    print(dir_path + "/" + file_name)
+                    # print(dir_path + "/" + file_name)
                     wrapper_sources.append(dir_path + "/" + file_name)
 
 """
@@ -79,7 +79,7 @@ for src_path in wrapper_sources:
         if line.find("int") >= 0 and line.find("chi") >= 0 and \
                 line.find("lua_State") >= 0:
             words = re.split(r"\(|\)|\s", line.strip())
-            print(src_path, words)
+            # print(src_path, words)
 
             function_name = words[1]
 
