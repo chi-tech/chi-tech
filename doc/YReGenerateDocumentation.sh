@@ -1,7 +1,5 @@
 cd ../
 
-LUA="lua"
-
 #============================== Transform lua wrappers for documentation
 # Lua wrapper functions are normally int chiFunction(lua_State* L)
 # The scipt below uses their doc-strings to transform to doxy style
