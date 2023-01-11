@@ -21,14 +21,14 @@ chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
 vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
 chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
-D = {1.0,0.01}
-Q = {1.0,10.0}
-XSa = {1.0,10.0}
+D = {1.0,5.0}
+Q = {0.0,1.0}
+XSa = {1.0,1.0}
 function D_coef(i,x,y,z)
-    return D[i+1]
+    return D[i+1] -- + x
 end
 function Q_ext(i,x,y,z)
-    return Q[i+1]
+    return Q[i+1] -- x*x
 end
 function Sigma_a(i,x,y,z)
     return XSa[i+1]
@@ -52,19 +52,19 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
 --############################################### Add material properties
---#### CFEM stuff
+--#### CFEM solver
 phys1 = chiCFEMDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
 
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"dirichlet",0.0)
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"dirichlet",0.0)
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"dirichlet",0.0)
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"dirichlet",0.0)
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"robin", 0.25, 0.5, 0.0)
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin", 0.25, 0.5, 0.0)
 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 ----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"square_dir","Flux_Diff")
+chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_RobinRefl","flux")
