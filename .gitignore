@@ -48,11 +48,6 @@ resources/\.DS_Store
 chi-dependencies/
 
 #Documentation
-doc/LUA_DOCUMENTATION/lua_functions.c
-doc/LUA_DOCUMENTATION/lua_namespace.hpp
-doc/PAGES/MainPage.h.bak
-ChiTech/ChiLua/LUA_DOCUMENTATION/Z_GeneratedFileList.txt
-doc/LUA_DOCUMENTATION/lua_register.txt
 doc/generated_files
 
 #visual studio code files
