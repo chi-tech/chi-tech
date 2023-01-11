@@ -84,7 +84,6 @@ private:
 
 public:
   //01
-  void MakeFromPDTxsFile(const std::string &file_name,const std::string& MT_TRANSFER);
   void MakeFromCHIxsFile(const std::string &file_name);
   void FinalizeCrossSections();
 

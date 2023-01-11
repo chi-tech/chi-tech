@@ -155,19 +155,6 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     xs->MakeSimple1(G,sigma_t,c);
   }
-  else if (operation_index == static_cast<int>(OpType::PDT_XSFILE))
-  {
-    if (!((num_args>=3) && (num_args<=4)))
-      LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
-
-    const char* file_name_c = lua_tostring(L,3);
-    std::string MT_TRANSFER("2501");
-
-    if (num_args == 4)
-      MT_TRANSFER = std::string(lua_tostring(L,4));
-
-    xs->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
-  }
   else if (operation_index == static_cast<int>(OpType::CHI_XSFILE))
   {
     if (num_args != 3)
