@@ -14,7 +14,7 @@ void lbs_adjoint::AdjointSolver::
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
   using Flag = lbs::SourceFlags;
-  const bool apply_mat_src         = (source_flags & Flag::APPLY_FIXED_SOURCES);
+  const bool apply_fixed_src       = (source_flags & Flag::APPLY_FIXED_SOURCES);
   const bool apply_wgs_scatter_src = (source_flags & Flag::APPLY_WGS_SCATTER_SOURCES);
   const bool apply_ags_scatter_src = (source_flags & Flag::APPLY_AGS_SCATTER_SOURCES);
   const bool apply_wgs_fission_src = (source_flags & Flag::APPLY_WGS_FISSION_SOURCES);
@@ -152,7 +152,7 @@ void lbs_adjoint::AdjointSolver::
   }//for cell
 
   //================================================== Apply reference QOI
-  if (apply_mat_src)
+  if (apply_fixed_src)
   {
     for (const auto& qoi_data : response_functions)
     {
