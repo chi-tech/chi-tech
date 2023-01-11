@@ -222,7 +222,7 @@
 //RegisterConstant(CHI_XSFILE,             23);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#include "../../ChiModules/module_lua_register.h"
+#include "../../modules/module_lua_register.h"
 
 #endif
 //module:Test scripts

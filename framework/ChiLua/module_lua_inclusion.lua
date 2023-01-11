@@ -37,7 +37,7 @@ Add_Folder("../ChiPhysics/PhysicsMaterial/transportxsections/lua")
 
 
 -- ==================================== Include modules
-MODULE_FOLDER = "../../ChiModules"
+MODULE_FOLDER = "../../modules"
 
 dofile(MODULE_FOLDER.."/module_lua_inclusion.lua")
 

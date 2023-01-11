@@ -12,7 +12,7 @@ namespace lbs_adjoint::lua_utils
 
 \param SolverName string (Optional) Name of the solver.
 
-\return Returns a handle to the solver.*/
+\return Handle Returns a handle to the solver.*/
 int chiAdjointSolverCreate(lua_State* L)
 {
   const std::string fname = __FUNCTION__;

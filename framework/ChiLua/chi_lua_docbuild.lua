@@ -213,9 +213,9 @@ containing all the function names.
 ]]--
 function GenerateFunctionList()
 	print("Generating function list for main page")
-	main_page_file = io.open("../../ChiDoc/PAGES/MainPage.h","w");
-	headFile = io.open("../../ChiDoc/PAGES/mp_header.txt","r")
-	reg = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_register.txt","r");
+	main_page_file = io.open("../../doc/PAGES/MainPage.h","w");
+	headFile = io.open("../../doc/PAGES/mp_header.txt","r")
+	reg = io.open("../../doc/LUA_DOCUMENTATION/lua_register.txt","r");
 
 	--=============================== Write header
 	line = headFile:read("L")
@@ -352,7 +352,7 @@ mostly because registers are c macro-fied files that link together with
 ]]--
 function ConsolidateRegisters()
 	print("Consolidating lua register")
-	consolidated_file_name = "../../ChiDoc/LUA_DOCUMENTATION/lua_register.txt"
+	consolidated_file_name = "../../doc/LUA_DOCUMENTATION/lua_register.txt"
 	consolidated_file = io.open(consolidated_file_name,"w+");
 
 	IncludeIntoMaster(consolidated_file,"chi_lua_register.h")
@@ -363,8 +363,8 @@ end
 
 dofile("module_lua_inclusion.lua") --Defines moduleFolders
 
-definition_file = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_functions.c","w");
-declaration_file = io.open("../../ChiDoc/LUA_DOCUMENTATION/lua_namespace.hpp","w");
+definition_file = io.open("../../doc/LUA_DOCUMENTATION/lua_functions.c","w");
+declaration_file = io.open("../../doc/LUA_DOCUMENTATION/lua_namespace.hpp","w");
 declaration_file:write("namespace chi_lua \n {\n");
 ProcessCXXFiles(moduleFolders)
 declaration_file:write("}\n");

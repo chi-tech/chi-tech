@@ -40,7 +40,7 @@ endif()
 message(STATUS "VTK_DIR set to ${VTK_DIR}")
 
 #================================================ Set project targets
-SET(TARGET framework)
+SET(TARGET ChiTech)
 project(${TARGET} LANGUAGES C CXX VERSION 1.0.2)
 
 #================================================ Set variables
