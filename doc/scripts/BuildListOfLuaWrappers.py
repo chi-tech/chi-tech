@@ -41,6 +41,9 @@ The function (declaration and definition) is then reformatted when written, such
 that the return type replaces the classical `int` return and the parameters
 replace the `lua_State* L` parameter.
 """
+if not os.path.exists("doc/generated_files"):
+    os.mkdir("doc/generated_files")
+
 definition_file = open("doc/generated_files/lua_functions.c", "w")
 declaration_file = open("doc/generated_files/lua_namespace.h", "w")
 declaration_file.write("namespace chi_lua\n{\n")
