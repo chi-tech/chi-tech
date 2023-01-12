@@ -157,18 +157,8 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   {
     //get the cross-section from the lua stack
     std::shared_ptr<chi_physics::TransportCrossSections> xs;
-    try
-    {
-      xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first);
-    }
-    catch(const std::out_of_range& o)
-    {
-      chi::log.LogAllError()
-        << "ERROR: Invalid cross-section handle"
-        << " in call to chiPhysicsMaterialSetProperty."
-        << std::endl;
-      chi::Exit(EXIT_FAILURE);
-    }
+    xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first,
+                              std::string(__FUNCTION__));
     xsecs.push_back(xs);
 
     //increment densities
