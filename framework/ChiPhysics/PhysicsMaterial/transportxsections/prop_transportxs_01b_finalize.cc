@@ -260,10 +260,15 @@ void chi_physics::TransportCrossSections::Finalize()
       // Compute the steady-state fission spectrum
       //==================================================
 
-      // This is computed via a beta-weighting
-      // NOTE: Generally, the computation of this quantity requires
-      //       a weight function. This estimate uses a unit weight
-      //       function and may not be completely accurate.
+      // NOTE: This is only exact when beta is energy-independent.
+      //       When it is not, this estimation may be incorrect.
+      //       The true definition of steady-state fission spectrum
+      //       is the rate at which prompt and delayed fission
+      //       yield neutrons within group `g` divided by the
+      //       total fission rate. When beta is energy-independent,
+      //       the fission rate can be eliminated . When it is not,
+      //       it requires the computation of the fission rate, which
+      //       requires a weight spectrum.
 
       chi.assign(num_groups, 0.0);
       for (unsigned int g = 0; g < num_groups; ++g)
