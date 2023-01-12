@@ -227,15 +227,6 @@ values: \n
 
 ####_
 
-PDT_XSFILE\n
-Loads transport cross-sections from PDT type cross-section files. Expects
-to be followed by a filepath specifying the xs-file. By default this routine
-will attempt to build a transfer matrix from reaction type MT2501, however,
-an additional text field can be supplied specifying the transfer matrix to
- use.
-
-####_
-
 CHI_XSFILE\n
 Loads transport cross-sections from CHI type cross-section files. Expects
 to be followed by a filepath specifying the xs-file. 
@@ -248,8 +239,8 @@ Supply handle to an existing cross-section and simply swap them out.
 \code
 chiPhysicsMaterialSetProperty(materials[1],
                               TRANSPORT_XSECTIONS,
-                              PDT_XSFILE,
-                              "xs_3_170.data",
+                              CHI_XSFILE,
+                              "xs_3_170.cxs",
                               "2518")
 \endcode
 
@@ -440,19 +431,6 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         prop->MakeSimple1(G,sigma_t,c);
       }
-      else if (operation_index == static_cast<int>(OpType::PDT_XSFILE))
-      {
-        if (!((numArgs>=4) && (numArgs<=5)))
-          LuaPostArgAmountError("chiPhysicsMaterialSetProperty",4,numArgs);
-
-        const char* file_name_c = lua_tostring(L,4);
-        std::string MT_TRANSFER("2501");
-
-        if (numArgs == 5)
-          MT_TRANSFER = std::string(lua_tostring(L,5));
-
-        prop->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
-      }
       else if (operation_index == static_cast<int>(OpType::CHI_XSFILE))
       {
         if (numArgs != 4)
@@ -460,7 +438,7 @@ int chiPhysicsMaterialSetProperty(lua_State *L)
 
         const char* file_name_c = lua_tostring(L,4);
 
-        prop->MakeFromCHIxsFile(std::string(file_name_c));
+        prop->MakeFromChiXSFile(std::string(file_name_c));
       }
       else if (operation_index == static_cast<int>(OpType::EXISTING))
       {

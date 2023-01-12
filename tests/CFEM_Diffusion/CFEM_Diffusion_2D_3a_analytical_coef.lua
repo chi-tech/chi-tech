@@ -3,8 +3,8 @@ chiMeshHandlerCreate()
  
 mesh={}
 N=100
-L=1
-xmin = 0
+L=2
+xmin = -L/2
 dx = L/N
 for i=1,(N+1) do
     k=i-1
@@ -17,29 +17,23 @@ chiVolumeMesherExecute();
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 
--- governing law: -(u_xx + u_yy) = q, on domain [0,1]x[0,1]
--- when the exact solution is chosen u(x,y) = sin(pi.x) * sin(pi.y)
--- this automatically gives:
---    boundary = zero-Dirichlet on all 4 sides
---    volumetric source term: q(,x) = 2*pi*pi * sin(pi.x) * sin(pi.y)
--- the factor 2 is the dim of the problem
 
 function D_coef(i,x,y,z)
-    return 1.0
+    return 3.0 + x + y
 end
 function Q_ext(i,x,y,z)
-    return 2.*math.pi*math.pi * math.sin(math.pi*x) * math.sin(math.pi*y)
+    return x*x
 end
 function Sigma_a(i,x,y,z)
-    return 0.0
+    return x*y*y
 end
 
 -- Setboundary IDs
 -- xmin,xmax,ymin,ymax,zmin,zmax
 e_vol = chiLogicalVolumeCreate(RPP,0.99999,1000,-1000,1000,-1000,1000)
-w_vol = chiLogicalVolumeCreate(RPP,-1000,0.00001,-1000,1000,-1000,1000)
+w_vol = chiLogicalVolumeCreate(RPP,-1000,-0.9999,-1000,1000,-1000,1000)
 n_vol = chiLogicalVolumeCreate(RPP,-1000,1000,0.99999,1000,-1000,1000)
-s_vol = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,0.00001,-1000,1000)
+s_vol = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,-0.99999,-1000,1000)
 
 e_bndry = 0
 w_bndry = 1
@@ -54,7 +48,7 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 --chiMeshHandlerExportMeshToVTK("Mesh")
 
 --############################################### Add material properties
---#### CFEM stuff
+--#### CFEM solver
 phys1 = chiCFEMDiffusionSolverCreate()
 
 chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"dirichlet",0.0)
@@ -67,4 +61,4 @@ chiSolverExecute(phys1)
 
 ----############################################### Visualize the field function
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"square_an_coef2","Flux_Diff")
+chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_analytic_coef","flux")

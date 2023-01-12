@@ -1,0 +1,4 @@
+module: CFEM Diffusion solver
+function: chiCFEMDiffusionSolverCreate
+function: chiCFEMDiffusionSetBCProperty
+module_end

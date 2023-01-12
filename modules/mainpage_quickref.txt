@@ -1,0 +1,14 @@
+include: modules/LinearBoltzmannSolver/lua/mainpage_quickref.txt
+include: modules/LBSCurvilinear/lua/mainpage_quickref.txt
+include: modules/LBKEigenvalueSolver/lua/mainpage_quickref.txt
+
+include: modules/LBSAdjointSolver/lua/mainpage_quickref.txt
+
+include: modules/LBSTransientSolver/lua/mainpage_quickref.txt
+
+include: modules/DiffusionSolver/lua/mainpage_quickref.txt
+
+include: modules/CFEMDiffusion/lua/mainpage_quickref.txt
+include: modules/DFEMDiffusion/lua/mainpage_quickref.txt
+
+include: modules/MGDiffusion/lua/mainpage_quickref.txt

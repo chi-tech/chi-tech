@@ -74,8 +74,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_CMACRO1(FROM_ARRAY,              1);
   LUA_CMACRO1(SIMPLEXS0,              20);
   LUA_CMACRO1(SIMPLEXS1,              21);
-  LUA_CMACRO1(PDT_XSFILE,             22);
-  LUA_CMACRO1(EXISTING,               23);
-  LUA_CMACRO1(CHI_XSFILE,             24);
+  LUA_CMACRO1(EXISTING,               22);
+  LUA_CMACRO1(CHI_XSFILE,             23);
 
 }
