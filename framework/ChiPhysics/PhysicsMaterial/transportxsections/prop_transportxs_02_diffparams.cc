@@ -46,7 +46,7 @@ ComputeDiffusionParameters()
     if (sig_1 >= sigma_t[g])
     {
       sig_1 = 0.0;
-      chi::log.LogAllWarning()
+      chi::log.Log0Warning()
           << "Transport corrected diffusion coefficient failed for group "
           << g << " in call to " << __FUNCTION__ << ". "
           << "sigma_t=" << sigma_t[g] << " sigs_g_(m=1)=" << sig_1

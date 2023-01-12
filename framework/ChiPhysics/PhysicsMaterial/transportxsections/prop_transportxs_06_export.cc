@@ -130,6 +130,6 @@ void chi_physics::TransportCrossSections::
 
   ofile.close();
 
-  chi::log.LogAllVerbose1() << "Done exporting transport "
-                                 "cross section to file: " << file_name;
+  chi::log.Log0Verbose1() << "Done exporting transport "
+                             "cross section to file: " << file_name;
 }

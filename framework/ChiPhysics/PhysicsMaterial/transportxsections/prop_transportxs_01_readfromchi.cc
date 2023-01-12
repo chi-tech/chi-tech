@@ -474,7 +474,7 @@ void chi_physics::TransportCrossSections::
         throw std::logic_error(
             "The specified number of scattering moments "
             "must be non-negative.");
-      scattering_order = std::min(0, M - 1);
+      scattering_order = std::max(0, M - 1);
     }
 
     //parse the number of precursors species
