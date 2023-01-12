@@ -12,12 +12,12 @@ void chi_physics::TransportCrossSections::Finalize()
 {
 
   //============================================================
-  // Set the absorption cross-section, if unset
+  // Set the absorption cross section, if unset
   //============================================================
 
   // The logic here is that if absorption is empty, it was not
   // specified, therefore, it should be computed. If a uniformly
-  // zero absorption cross-section was provided, assume that
+  // zero absorption cross section was provided, assume that
   // was intentional.
 
   if (sigma_a.empty())
@@ -46,12 +46,12 @@ void chi_physics::TransportCrossSections::Finalize()
   //============================================================
 
   // Use a little bit of overkill and clear all fission-related
-  // properties if the fission cross-section was not specified.
+  // properties if the fission cross section was not specified.
 
   if (!is_fissionable)
   {
     chi::log.Log0Verbose1()
-        << "No fission cross-sections specified... "
+        << "No fission cross sections specified... "
         << "Clearing all fission properties.";
 
 
@@ -82,7 +82,7 @@ void chi_physics::TransportCrossSections::Finalize()
   {
 
     chi::log.Log0Verbose1()
-        << "Fission cross-sections found.\n"
+        << "Fission cross sections found.\n"
         << "Checking fission data specification...";
 
     //==================================================
@@ -152,10 +152,10 @@ void chi_physics::TransportCrossSections::Finalize()
             "yield and delayed neutron fraction must be provided.");
 
       //==================================================
-      // Compute all production cross-sections
+      // Compute all production cross sections
       //==================================================
 
-      //ensure the fission cross-section is available
+      //ensure the fission cross section is available
       if (!is_valid(sigma_f))
       {
         sigma_f.assign(num_groups, 0.0);
@@ -309,7 +309,7 @@ void chi_physics::TransportCrossSections::Finalize()
               sigma_f[g] = nu_sigma_f[g] / nu[g];
         }
 
-        //compute the production cross-section
+        //compute the production cross section
         nu_sigma_f.assign(num_groups, 0.0);
         for (unsigned int g = 0; g < num_groups; ++g)
           nu_sigma_f[g] = nu[g] * sigma_f[g];

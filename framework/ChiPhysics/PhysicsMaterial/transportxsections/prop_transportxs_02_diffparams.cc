@@ -75,7 +75,7 @@ ComputeDiffusionParameters()
     }
 
     //============================================================
-    // Compute removal cross-section
+    // Compute removal cross section
     //============================================================
 
     sigma_removal[g] = std::max(0.0, sigma_t[g] - sigma_s_gtog[g]);

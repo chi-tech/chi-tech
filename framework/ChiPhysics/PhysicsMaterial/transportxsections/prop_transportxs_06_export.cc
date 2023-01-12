@@ -7,7 +7,7 @@
 #include <iostream>
 
 //###################################################################
-/**Exports the cross-section information to ChiTech format.*/
+/**Exports the cross section information to ChiTech format.*/
 void chi_physics::TransportCrossSections::
   ExportToChiXSFile(const std::string &file_name)
 {

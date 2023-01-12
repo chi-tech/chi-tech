@@ -10,7 +10,7 @@
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
  *\ingroup LuaPhysics
  *
- * An example Chi-Tech cross-section file is shown below. The bare-bones
+ * An example Chi-Tech cross section file is shown below. The bare-bones
  * format is shown below with more examples below:
 \code
 # This header can be as large as you please. The actual processing
@@ -87,9 +87,9 @@ constants, \f$ \lambda_j \f$ are required.
 ## Keyword definitions
 
 - NUM_GROUPS num_groups Required. Specifies the number of groups for this
-  cross-section. Symbol \f$ G \f$.
+  cross section. Symbol \f$ G \f$.
 - NUM_MOMENTS num_moments Required. The number of transfer matrices to allocate
-  for this cross-section (whether used or not). Typically this number is one
+  for this cross section (whether used or not). Typically this number is one
   greater than the scattering order (i.e., \f$ L+1 \f$)
 - NUM_PRECURSORS num_precursors Optional. Indicates how many precursors are used
   in this cross section. Symbol \f$ J \f$
@@ -241,8 +241,8 @@ CHI_DELAYED_END
  * */
 
 //###################################################################
-/**This method populates a transport cross-section from
- * a Chi cross-section file.*/
+/**This method populates a transport cross section from
+ * a Chi cross section file.*/
 void chi_physics::TransportCrossSections::
   MakeFromChiXSFile(const std::string &file_name)
 {
@@ -254,14 +254,14 @@ void chi_physics::TransportCrossSections::
   //============================================================
 
   chi::log.Log()
-      << "Reading Chi cross-section file \"" << file_name << "\"\n";
+      << "Reading Chi cross section file \"" << file_name << "\"\n";
 
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
     throw std::runtime_error(
-        "Failed to open Chi cross-section file "
+        "Failed to open Chi cross section file "
         "\"" + file_name + "\" in call to " +
         std::string(__FUNCTION__));
 
@@ -274,13 +274,13 @@ void chi_physics::TransportCrossSections::
   auto ReadGroupStructure =
       [](const std::string& keyword,
          std::vector<std::vector<double>>& destination,
-         const unsigned int n,
+         const unsigned int G,  //# of groups
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
         //init storage
-        destination.assign(n, std::vector<double>(2, 0.0));
+        destination.assign(G, std::vector<double>(2, 0.0));
 
         //book-keeping
         std::string line;
@@ -299,11 +299,11 @@ void chi_physics::TransportCrossSections::
           line_stream >> group >> high >> low;
           destination.at(group).at(0) = high;
           destination.at(group).at(1) = low;
-          if (count++ >= n)
+          if (count++ >= G)
             throw std::runtime_error(
                 "Too many entries encountered when parsing "
                 "group structure.\nThe expected number of entries "
-                "is " + std::to_string(n) + ".");
+                "is " + std::to_string(G) + ".");
 
           //go to next line
           std::getline(file, line);
@@ -411,7 +411,7 @@ void chi_physics::TransportCrossSections::
       {
         //init storage
         destination.clear();
-        for (unsigned int i = 0; i < G; ++i)
+        for (unsigned int g = 0; g < G; ++g)
           destination.emplace_back(J, 0.0);
 
         //book-keeping
@@ -461,7 +461,7 @@ void chi_physics::TransportCrossSections::
       if (G <= 0)
         throw std::logic_error(
             "The specified number of energy groups "
-            "must be positive.");
+            "must be strictly positive.");
       num_groups = G;
     }
 
@@ -507,9 +507,7 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "INV_VELOCITY_BEGIN")
         Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
-      if (fw == "VELOCITY_BEGIN" &&
-          std::all_of(inv_velocity.begin(), inv_velocity.end(),
-                      [](double x) { return x == 0.0; }))
+      if (fw == "VELOCITY_BEGIN" && inv_velocity.empty())
       {
         Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
         for (unsigned int g = 0; g < num_groups; ++g)
@@ -582,7 +580,7 @@ void chi_physics::TransportCrossSections::
     catch (const std::runtime_error& err)
     {
       throw std::runtime_error(
-          "Error reading Chi cross-section file "
+          "Error reading Chi cross section file "
           "\"" + file_name + "\".\n" +
           "Line number " + std::to_string(line_number) +
           "\n" + err.what());
@@ -591,7 +589,7 @@ void chi_physics::TransportCrossSections::
     catch (const std::out_of_range& err)
     {
       throw std::out_of_range(
-          "Error reading Chi cross-section file "
+          "Error reading Chi cross section file "
           "\"" + file_name + "\".\n" +
           "Line number " + std::to_string(line_number) +
           "\n" + err.what());

@@ -92,7 +92,7 @@ MakeSimple1(int n_grps, double sigma, double c)
   sigma_t.resize(n_grps, sigma);
   transfer_matrices.emplace_back(n_grps, n_grps);
 
-  // When multi-group, assign half the scattering cross-section
+  // When multi-group, assign half the scattering cross section
   // to within-group scattering. The other half will be used for
   // up/down-scattering.
 
@@ -100,7 +100,7 @@ MakeSimple1(int n_grps, double sigma, double c)
   double scale = (num_groups == 1)? 1.0 : 0.5;
   S.SetDiagonal(std::vector<double>(n_grps, sigma * c * scale));
 
-  // Set the up/down-scattering cross-sections.
+  // Set the up/down-scattering cross sections.
   // Summary:
   //     1) The half of groups with higher energies down-scatter to the next
   //        lowest energy group half the time and to the same group half the
@@ -136,7 +136,7 @@ MakeSimple1(int n_grps, double sigma, double c)
 
 
 //######################################################################
-/** Populates the cross-section from a combination of others. */
+/** Populates the cross section from a combination of others. */
 void chi_physics::TransportCrossSections::
 MakeCombined(std::vector<std::pair<int, double> > &combinations)
 {
@@ -150,10 +150,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   unsigned int n_precs = 0;
   double Nf_total = 0.0; //total density of fissile materials
 
-  //loop over cross-sections
+  //loop over cross sections
   for (auto combo : combinations)
   {
-    //get the cross-section from the lua stack
+    //get the cross section from the lua stack
     std::shared_ptr<chi_physics::TransportCrossSections> xs;
     xs = chi::GetStackItemPtr(chi::trnsprt_xs_stack, combo.first,
                               std::string(__FUNCTION__));
@@ -171,13 +171,13 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       n_grps = xs->num_groups;
     else if (xs->num_groups != n_grps)
       throw std::logic_error(
-          "Incompatible cross-sections encountered.\n"
-          "All cross-sections being combined must have the "
+          "Incompatible cross sections encountered.\n"
+          "All cross sections being combined must have the "
           "same number of energy groups.");
 
     //increment number of precursors
     n_precs += xs->num_precursors;
-  }//for cross-section
+  }//for cross section
 
   // Check that the fissile and precursor densities are greater than
   // machine precision. If this condition is not met, the material is assumed
@@ -185,14 +185,14 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   if (Nf_total < 1.0e-12)
     is_fissionable = false;
 
-  // Check to ensure that all fissionable cross-sections contain either
+  // Check to ensure that all fissionable cross sections contain either
   // prompt/delayed fission data or total fission data
   if (n_precs > 0)
     for (const auto& xs : xsecs)
       if (xs->is_fissionable && xs->num_precursors == 0)
         throw std::logic_error(
-            "Incompatible cross-sections encountered.\n"
-            "If any fissionable cross-sections specify prompt/delayed "
+            "Incompatible cross sections encountered.\n"
+            "If any fissionable cross sections specify prompt/delayed "
             "fission data, all must specify prompt/delayed data.");
 
   //============================================================
@@ -206,7 +206,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     scattering_order = std::max(scattering_order,
                                 xs->scattering_order);
 
-  //mandatory cross-sections
+  //mandatory cross sections
   sigma_t.assign(n_grps, 0.0);
   sigma_a.assign(n_grps, 0.0);
 
@@ -265,10 +265,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       ff_i = N_i / Nf_total;
 
     //============================================================
-    // Combine cross-sections
+    // Combine cross sections
     //============================================================
 
-    // Here, raw cross-sections are scaled by densities and spectra by
+    // Here, raw cross sections are scaled by densities and spectra by
     // fractional densities. The latter is done to preserve a unit spectra.
     for (unsigned int g = 0; g < n_grps; ++g)
     {
@@ -327,16 +327,16 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       inv_velocity = xsecs[x]->inv_velocity;
     else if (xsecs[x]->inv_velocity != inv_velocity)
       throw std::logic_error(
-          "Invalid cross-sections encountered.\n"
-          "All cross-sections being combined must share a group "
+          "Invalid cross sections encountered.\n"
+          "All cross sections being combined must share a group "
           "structure. This implies that the inverse speeds for "
-          "each of the cross-sections must be equivalent.");
+          "each of the cross sections must be equivalent.");
 
     //============================================================
     // Combine transfer matrices
     //============================================================
 
-    // This step is somewhat tricky. The cross-sections aren't guaranteed
+    // This step is somewhat tricky. The cross sections aren't guaranteed
     // to have the same sparsity patterns and therefore simply adding them
     // together has to take the sparse matrix's protection mechanisms into
     // account.
@@ -356,9 +356,9 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
         }
       }
     }
-  }//for cross-sections
+  }//for cross sections
 
-  //perform checks for the cross-sections
+  //perform checks for the cross sections
 
   Finalize();
 }
@@ -384,7 +384,7 @@ ComputeAbsorption()
     const auto& S0 = transfer_matrices[0];
     for (size_t g = 0; g < num_groups; ++g)
     {
-      // estimate the scattering cross-section
+      // estimate the scattering cross section
       double sig_s = 0.0;
       for (size_t row = 0; row < S0.NumRows(); ++row)
       {
@@ -403,7 +403,7 @@ ComputeAbsorption()
       // TODO: Should negative absorption be allowed?
       if (sigma_a[g] < 0.0)
         chi::log.Log0Warning()
-            << "Negative absorption cross-section encountered "
+            << "Negative absorption cross section encountered "
             << "in group " << g << " when estimating from the "
             << "transfer matrices";
     }//for g

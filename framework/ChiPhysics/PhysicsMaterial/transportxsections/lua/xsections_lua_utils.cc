@@ -11,7 +11,7 @@
 ;
 
 //###################################################################
-/**Creates a stand-alone transport cross-section.
+/**Creates a stand-alone transport cross section.
  *
  *
 
@@ -27,7 +27,7 @@ chiPhysicsMaterialSetProperty(materials[2],
                               EXISTING,
                               xs_graphite_clean)
 \endcode
- * \return Returns a handle to the cross-section.
+ * \return Returns a handle to the cross section.
  *
 \ingroup LuaTransportXSs
  */
@@ -44,9 +44,9 @@ int chiPhysicsTransportXSCreate(lua_State* L)
 }
 
 //###################################################################
-/**Sets the properties of a transport cross-section.
+/**Sets the properties of a transport cross section.
 
- \param XS_handle int Handle to the cross-section to be modified.
+ \param XS_handle int Handle to the cross section to be modified.
  \param OperationIndex int Method used for setting the xs property.
  \param Information varying Varying information depending on the operation.
 
@@ -59,8 +59,8 @@ information. As a simple example consider the case where the user would like
 to set a single constant thermal conductivity. This can be achieved with \n
 FROM_ARRAY\n
 Sets a property based on a Lua array indexed from 1 to N. Internally
-will be converted to 0 to N-1. This method can be used to set mutligroup
-cross-sections or sources.
+will be converted to 0 to N-1. This method can be used to set mutli-group
+cross sections or sources.
 \n
 SIMPLEXS0\n
 Makes a simple material with no transfer matrix just \f$\sigma_t \f$. Expects two
@@ -82,7 +82,7 @@ values: \n
 ####_
 
 CHI_XSFILE\n
-Loads transport cross-sections from CHI type cross-section files. Expects
+Loads transport cross sections from CHI type cross section files. Expects
 to be followed by a filepath specifying the xs-file.
 
 
@@ -119,7 +119,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to chiPhysicsTransportXSSet."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -169,9 +169,9 @@ int chiPhysicsTransportXSSet(lua_State* L)
 }
 
 //###################################################################
-/**Obtains a lua table of all the cross-section values.
+/**Obtains a lua table of all the cross section values.
 
- \param XS_handle int Handle to the cross-section to be modified.
+ \param XS_handle int Handle to the cross section to be modified.
 
  ## _
 
@@ -203,7 +203,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -215,7 +215,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
 }
 
 //###################################################################
-/**Makes a combined cross-section from multiple other cross-sections.
+/**Makes a combined cross section from multiple other cross sections.
 
  \param Combinations table A lua-table with each element another table
                            containing a handle to an existing xs and a
@@ -245,7 +245,7 @@ chiPhysicsMaterialSetProperty(materials[1],
                               aerated_graphite)
 \endcode
 
- \return Returns a handle to another cross-section object that contains the
+ \return Returns a handle to another cross section object that contains the
          desired combination.
 
 \ingroup LuaTransportXSs
@@ -306,7 +306,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
     chi::log.Log() << "  Element handle: " << elem.first
                        << " scalar value: " << elem.second;
 
-  //======================================== Make the new cross-section
+  //======================================== Make the new cross section
   auto new_xs = std::make_shared<chi_physics::TransportCrossSections>();
 
   new_xs->MakeCombined(combinations);
@@ -319,10 +319,10 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 }
 
 //###################################################################
-/**Sets a combined cross-section from multiple other cross-sections. This
- function can be called multiple times on the same cross-section handle.
+/**Sets a combined cross section from multiple other cross sections. This
+ function can be called multiple times on the same cross section handle.
 
- \param XS_handle int Handle to the cross-section to be modified.
+ \param XS_handle int Handle to the cross section to be modified.
  \param Combinations table A lua-table with each element another table
                            containing a handle to an existing xs and a
                            scalar multiplier.
@@ -373,7 +373,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -429,7 +429,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 //###################################################################
 /** Exports a cross section to ChiTech format.
  *
-\param XS_handle int Handle to the cross-section to be exported.
+\param XS_handle int Handle to the cross section to be exported.
 \param file_name string The name of the file to which the XS is to be exported.
 
 \ingroup LuaTransportXSs
@@ -453,7 +453,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
