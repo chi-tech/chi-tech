@@ -32,6 +32,6 @@ void mg_diffusion::Solver::Update_Flux_With_TwoGrid(const int64_t verbose)
     }//g
     counter++;
   }//for cell
-  
+
   VecRestoreArrayRead(x[num_groups], &xlocal_tg);
 }
