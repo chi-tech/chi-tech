@@ -218,6 +218,9 @@ protected:
                        std::vector<double>& flux_moments,
                        bool single_file=false);
 
+  //05a
+  void UpdateFieldFunctions();
+
   //Iterative Operations
   void SetSource(LBSGroupset& groupset,
                  std::vector<double>&  destination_q,

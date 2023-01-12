@@ -131,6 +131,8 @@ public:
   unsigned int MapCellFace(const chi_mesh::Cell& cur_cell,
                            const chi_mesh::Cell& adj_cell,
                            unsigned int f);
+
+  void UpdateFieldFunctions();
 };
 
 #endif

@@ -38,6 +38,7 @@ std::vector<chi_physics::SolverPtr>                 chi::solver_stack;
 std::vector<chi_physics::MaterialPtr>               chi::material_stack;
 std::vector<chi_physics::TransportCrossSectionsPtr> chi::trnsprt_xs_stack;
 std::vector<chi_physics::FieldFunctionPtr>          chi::fieldfunc_stack;
+std::vector<chi_physics::FieldFunction2Ptr>         chi::fieldfunc2_stack;
 
 std::vector<chi_math::QuadraturePtr>        chi::quadrature_stack;
 std::vector<chi_math::AngularQuadraturePtr> chi::angular_quadrature_stack;

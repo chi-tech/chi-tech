@@ -9,6 +9,7 @@
 #include "dfem_diffusion_bndry.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
@@ -153,6 +154,24 @@ void dfem_diffusion::Solver::Initialize()
 
       field_functions.push_back(initial_field_function);
       chi::fieldfunc_stack.push_back(initial_field_function);
+  }//if not ff set
+
+  if (field_functions2.empty())
+  {
+    std::string solver_name;
+    if (not TextName().empty()) solver_name = TextName() + "-";
+
+    std::string text_name = solver_name + "phi";
+
+    using namespace chi_math;
+    auto initial_field_function =
+      std::make_shared<chi_physics::FieldFunction2>(
+        text_name,                     //Text name
+        sdm_ptr,                       //Spatial Discretization
+        Unknown(UnknownType::SCALAR)); //Unknown/Variable
+
+    field_functions2.push_back(initial_field_function);
+    chi::fieldfunc2_stack.push_back(initial_field_function);
   }//if not ff set
 
 }//end initialize

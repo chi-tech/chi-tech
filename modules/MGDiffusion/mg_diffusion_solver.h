@@ -66,8 +66,8 @@ public:
   std::vector<Vec> x;     // solution vector for each group
   std::vector<Vec> x_old; // vector of old fluxes
 
-  Vec thermal_dphi; // error vector for thermal fluxes
-  Vec b; // actual rhs vector for the linear system A[g] x[g] = b
+  Vec thermal_dphi = nullptr; // error vector for thermal fluxes
+  Vec b = nullptr; // actual rhs vector for the linear system A[g] x[g] = b
 
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
   KSPAppContext my_app_context;
@@ -99,6 +99,9 @@ public:
   void Assemble_RHS_TwoGrid(int64_t iverbose);
   void SolveOneGroupProblem(unsigned int g, int64_t iverbose);
   void Update_Flux_With_TwoGrid(int64_t iverbose);
+
+  //04
+  void UpdateFieldFunctions();
 
 protected:
   std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>>
