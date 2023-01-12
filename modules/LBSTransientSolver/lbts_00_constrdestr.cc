@@ -8,6 +8,7 @@ lbs::TransientSolver::TransientSolver(const std::string &in_text_name) :
   lbs::KEigenvalueSolver(in_text_name)
 {
   chi::log.Log() << TextName() << " created.";
+  //Hello, I am asking a question here
 }
 
 /**Destructor*/
