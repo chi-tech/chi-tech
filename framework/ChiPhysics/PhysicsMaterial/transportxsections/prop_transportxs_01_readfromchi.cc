@@ -577,7 +577,6 @@ void chi_physics::TransportCrossSections::
         ReadTransferMatrices("TRANSFER_MOMENTS", transfer_matrices,
                              scattering_order + 1, num_groups,
                              f, ls, ln);
-
     }//try
 
     catch (const std::runtime_error& err)

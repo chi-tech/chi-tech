@@ -148,9 +148,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
 
   unsigned int n_grps = 0;
   unsigned int n_precs = 0;
-
   double Nf_total = 0.0; //total density of fissile materials
-  double Np_total = 0.0; //total density of materials with precursors
 
   //loop over cross-sections
   for (auto combo : combinations)
@@ -380,7 +378,7 @@ ComputeAbsorption()
   // estimate from a transfer matrix
   else
   {
-    chi::log.LogAllWarning()
+    chi::log.Log0Warning()
         << "Estimating absorption from the transfer matrices.";
 
     const auto& S0 = transfer_matrices[0];
@@ -404,11 +402,10 @@ ComputeAbsorption()
 
       // TODO: Should negative absorption be allowed?
       if (sigma_a[g] < 0.0)
-        chi::log.LogAllWarning()
+        chi::log.Log0Warning()
             << "Negative absorption cross-section encountered "
             << "in group " << g << " when estimating from the "
             << "transfer matrices";
     }//for g
   }//if scattering present
-
 }
