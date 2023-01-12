@@ -3,6 +3,7 @@
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "chi_runtime.h"
 
@@ -268,4 +269,18 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
   }
 
 
+}
+
+
+//###################################################################
+/**Update the field functions with the latest data.*/
+void chi_diffusion::Solver::UpdateFieldFunctions()
+{
+  auto& ff = *field_functions2.front();
+  const auto& OneDofPerNode = discretization->UNITARY_UNKNOWN_MANAGER;
+
+  std::vector<double> data_vector;
+  discretization->LocalizePETScVector(x, data_vector, OneDofPerNode);
+
+  ff.UpdateFieldVector(data_vector);
 }

@@ -1,6 +1,7 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -191,6 +192,36 @@ void lbs::SteadySolver::InitializeParrays()
 
         chi::fieldfunc_stack.push_back(group_ff);
         field_functions.push_back(group_ff);
+      }//for m
+    }//for g
+  }//if empty
+
+  if (field_functions2.empty())
+  {
+    for (size_t g = 0; g < groups.size(); ++g)
+    {
+      for (size_t ff = 0; ff < 4; ++ff)
+      {
+        std::string solver_name;
+        if (not TextName().empty()) solver_name = TextName() + "-";
+
+        char buff[100];
+        snprintf(buff, 4, "%03d", static_cast<int>(g));
+        std::string text_name = solver_name + "Flux_g" + std::string(buff);
+
+        if (ff == 0) text_name += "_m0";
+        if (ff == 1) text_name += "_Jx";
+        if (ff == 2) text_name += "_Jy";
+        if (ff == 3) text_name += "_Jz";
+
+        using namespace chi_math;
+        auto group_ff = std::make_shared<chi_physics::FieldFunction2>(
+          text_name,                     //Field name
+          discretization,                //Spatial discretization
+          Unknown(UnknownType::SCALAR)); //Unknown/Variable
+
+        chi::fieldfunc2_stack.push_back(group_ff);
+        field_functions2.push_back(group_ff);
       }//for m
     }//for g
   }//if empty

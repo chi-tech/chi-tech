@@ -72,6 +72,7 @@ public:
                               const int,
                               const chi_mesh::Vector3&);
 
+  void UpdateFieldFunctions();
 };
 
 }; // namespace dfem_diffusion

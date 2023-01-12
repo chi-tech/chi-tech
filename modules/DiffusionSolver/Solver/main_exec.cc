@@ -190,6 +190,8 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
       }
     }
 
+    UpdateFieldFunctions();
+
     if (verbose_info || chi::log.GetVerbosity() >= chi_objects::ChiLog::LOG_0VERBOSE_1)
       chi::log.Log() << "Diffusion Solver execution completed!\n";
   }//if not suppressed solve

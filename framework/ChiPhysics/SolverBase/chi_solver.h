@@ -8,6 +8,11 @@
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
+namespace chi_physics
+{
+  class FieldFunction2;
+}
+
 
 /**\defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
@@ -20,6 +25,7 @@ private:
 public:
   BasicOptions basic_options;
   std::vector<std::shared_ptr<FieldFunction>> field_functions;
+  std::vector<std::shared_ptr<FieldFunction2>> field_functions2;
 
 public:
   explicit

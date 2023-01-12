@@ -42,8 +42,8 @@ public:
 
   chi_math::SDMPtr sdm_ptr =nullptr;
 
-  uint num_groups;
-  uint last_fast_group;
+  uint num_groups = 0;
+  uint last_fast_group = 0;
 
   size_t num_local_dofs = 0;
   size_t num_globl_dofs = 0;
@@ -53,8 +53,8 @@ public:
   std::vector<Vec> x;     // solution vector for each group
   std::vector<Vec> x_old; // vector of old fluxes
 
-  Vec thermal_dphi; // error vector for thermal fluxes
-  Vec b; // actual rhs vector for the linear system A[g] x[g] = b
+  Vec thermal_dphi = nullptr; // error vector for thermal fluxes
+  Vec b = nullptr; // actual rhs vector for the linear system A[g] x[g] = b
 
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
   KSPAppContext my_app_context;
@@ -80,6 +80,9 @@ public:
 
   void Assemble_RHS(unsigned int g, int64_t verbose);
   void SolveOneGroupProblem(unsigned int g, int64_t verbose);
+
+  //04
+  void UpdateFieldFunctions();
 
 protected:
 //  typedef std::map<int,Multigroup_D_and_sigR> MapMatID2XS;

@@ -92,6 +92,7 @@ void mg_diffusion::Solver::Execute()
       std::cout << "Thermal iterations NOT converged for fixed-source problem" << std::endl;
   }
 
+  UpdateFieldFunctions();
   chi::log.Log() << "Done solving multi-group diffusion";
 
 }

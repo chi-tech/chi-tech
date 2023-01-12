@@ -1,5 +1,7 @@
 #include "diffusion_solver.h"
 
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+
 #include "chi_runtime.h"
 
 #include "chi_log.h"
@@ -91,6 +93,25 @@ int chi_diffusion::Solver::Initialize(bool verbose)
             chi::fieldfunc_stack.push_back(initial_field_function);
       }
     }
+  }//if not ff set
+
+  if (field_functions2.empty())
+  {
+    auto& sdm_ptr = discretization;
+    std::string solver_name;
+    if (not TextName().empty()) solver_name = TextName() + "-";
+
+    std::string text_name = solver_name + "phi";
+
+    using namespace chi_math;
+    auto initial_field_function =
+      std::make_shared<chi_physics::FieldFunction2>(
+        text_name,                     //Text name
+        sdm_ptr,                       //Spatial Discretization
+        Unknown(UnknownType::SCALAR)); //Unknown/Variable
+
+    field_functions2.push_back(initial_field_function);
+    chi::fieldfunc2_stack.push_back(initial_field_function);
   }//if not ff set
 
 

@@ -33,11 +33,13 @@ namespace chi_physics
   class Material;
   class TransportCrossSections;
   class FieldFunction;
+  class FieldFunction2;
 
   typedef std::shared_ptr<Solver>                 SolverPtr;
   typedef std::shared_ptr<Material>               MaterialPtr;
   typedef std::shared_ptr<TransportCrossSections> TransportCrossSectionsPtr;
   typedef std::shared_ptr<FieldFunction>          FieldFunctionPtr;
+  typedef std::shared_ptr<FieldFunction2>         FieldFunction2Ptr;
 }//namespace chi_physics
 
 namespace chi_math
@@ -81,6 +83,7 @@ public:
   static std::vector<chi_physics::MaterialPtr>               material_stack;
   static std::vector<chi_physics::TransportCrossSectionsPtr> trnsprt_xs_stack;
   static std::vector<chi_physics::FieldFunctionPtr>          fieldfunc_stack;
+  static std::vector<chi_physics::FieldFunction2Ptr>         fieldfunc2_stack;
 
   static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;

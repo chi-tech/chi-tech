@@ -6,12 +6,10 @@
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 
-#include "mg_diffusion_bndry.h"
-
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-//#include <stdio.h>
 
 //============================================= constructor
 mg_diffusion::Solver::Solver(const std::string& in_solver_name):
@@ -155,8 +153,31 @@ void mg_diffusion::Solver::Initialize()
 
       field_functions.push_back(initial_field_function);
       chi::fieldfunc_stack.push_back(initial_field_function);
-    }
+    }//for g
+  }//if not ff set
 
+  if (field_functions2.empty())
+  {
+    for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
+    {
+      std::string solver_name;
+      if (not TextName().empty()) solver_name = TextName() + "-";
+
+      char buff[100];
+      int dummy = snprintf(buff,4,"%03d",g);
+
+      std::string text_name = solver_name + "Flux_g" + std::string(buff);
+
+      using namespace chi_math;
+      auto initial_field_function =
+        std::make_shared<chi_physics::FieldFunction2>(
+          text_name,                     //Text name
+          sdm_ptr,                       //Spatial Discretization
+          Unknown(UnknownType::SCALAR)); //Unknown Manager
+
+      field_functions2.push_back(initial_field_function);
+      chi::fieldfunc2_stack.push_back(initial_field_function);
+    }//for g
   }//if not ff set
 
 }//end initialize
