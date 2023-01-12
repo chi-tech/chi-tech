@@ -8,7 +8,7 @@
 #include <string>
 
 
-void chi_physics::TransportCrossSections::FinalizeCrossSections()
+void chi_physics::TransportCrossSections::Finalize()
 {
 
   //============================================================

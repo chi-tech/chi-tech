@@ -244,7 +244,7 @@ CHI_DELAYED_END
 /**This method populates a transport cross-section from
  * a Chi cross-section file.*/
 void chi_physics::TransportCrossSections::
-  MakeFromCHIxsFile(const std::string &file_name)
+  MakeFromChiXSFile(const std::string &file_name)
 {
   //clear any previous data
   Reset();
@@ -568,7 +568,7 @@ void chi_physics::TransportCrossSections::
   }//while not EOF, read each lines
 
   //perform checks and enforce physical relationships
-  FinalizeCrossSections();
+  Finalize();
 
 
   file.close();

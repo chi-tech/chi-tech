@@ -218,9 +218,8 @@
 //RegisterConstant(FROM_ARRAY,              1);
 //RegisterConstant(SIMPLEXS0,              20);
 //RegisterConstant(SIMPLEXS1,              21);
-//RegisterConstant(PDT_XSFILE,             22);
-//RegisterConstant(EXISTING,               23);
-//RegisterConstant(CHI_XSFILE,             24);
+//RegisterConstant(EXISTING,               22);
+//RegisterConstant(CHI_XSFILE,             23);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 #include "../../ChiModules/module_lua_register.h"

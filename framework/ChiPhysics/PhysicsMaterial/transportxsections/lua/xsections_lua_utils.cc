@@ -17,13 +17,15 @@
 
 
 \code
-xs_grph_clean = chiPhysicsTransportXSCreate()
-chiPhysicsTransportXSSet(xs_grph_clean,PDT_XSFILE,"xs_graphite_pure_116.data")
+xs_graphite_clean = chiPhysicsTransportXSCreate()
+chiPhysicsTransportXSSet(xs_grph_clean,
+                         CHI_XSFILE,
+                         "test/xs_graphite_pure.cxs")
 
 chiPhysicsMaterialSetProperty(materials[2],
-                                    TRANSPORT_XSECTIONS,
-                                    EXISTING,
-                                    xs_grph_clean)
+                              TRANSPORT_XSECTIONS,
+                              EXISTING,
+                              xs_graphite_clean)
 \endcode
  * \return Returns a handle to the cross-section.
  *
@@ -76,15 +78,6 @@ values: \n
  - int number of groups (\f$G \f$),
  - float \f$\sigma_t \f$,
  - float scattering to total ratio (\f$c \f$)
-
-####_
-
-PDT_XSFILE\n
-Loads transport cross-sections from PDT type cross-section files. Expects
-to be followed by a filepath specifying the xs-file. By default this routine
-will attempt to build a transfer matrix from reaction type MT 2501, however,
-an additional text field can be supplied specifying the transfer matrix to
- use.
 
 ####_
 
@@ -155,19 +148,6 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     xs->MakeSimple1(G,sigma_t,c);
   }
-  else if (operation_index == static_cast<int>(OpType::PDT_XSFILE))
-  {
-    if (!((num_args>=3) && (num_args<=4)))
-      LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
-
-    const char* file_name_c = lua_tostring(L,3);
-    std::string MT_TRANSFER("2501");
-
-    if (num_args == 4)
-      MT_TRANSFER = std::string(lua_tostring(L,4));
-
-    xs->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
-  }
   else if (operation_index == static_cast<int>(OpType::CHI_XSFILE))
   {
     if (num_args != 3)
@@ -175,7 +155,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     const char* file_name_c = lua_tostring(L,3);
 
-    xs->MakeFromCHIxsFile(std::string(file_name_c));
+    xs->MakeFromChiXSFile(std::string(file_name_c));
   }
   else
   {
@@ -250,19 +230,19 @@ xs_1 = chiPhysicsTransportXSCreate()
 xs_2 = chiPhysicsTransportXSCreate()
 xs_3 = chiPhysicsTransportXSCreate()
 
-chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
-chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
-chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
+chiPhysicsTransportXSSet(xs_1,CHI_XSFILE,"test/xs_graphite_pure.cxs")
+chiPhysicsTransportXSSet(xs_2,CHI_XSFILE,"test/xs_3_170.cxs")
+chiPhysicsTransportXSSet(xs_3,CHI_XSFILE,"test/xs_air50RH.cxs")
 
 combo ={{xs_1, 0.5e5},
         {xs_2, 0.4e3},
         {xs_3, 0.3e2}}
 aerated_graphite = chiPhysicsTransportXSMakeCombined(combo)
 
-
 chiPhysicsMaterialSetProperty(materials[1],
                               TRANSPORT_XSECTIONS,
-                              EXISTING,aerated_graphite)
+                              EXISTING,
+                              aerated_graphite)
 \endcode
 
  \return Returns a handle to another cross-section object that contains the
@@ -356,16 +336,16 @@ xs_1 = chiPhysicsTransportXSCreate()
 xs_2 = chiPhysicsTransportXSCreate()
 xs_3 = chiPhysicsTransportXSCreate()
 
-chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
-chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
-chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
+chiPhysicsTransportXSSet(xs_1,CHI_XSFILE,"test/xs_graphite_pure.cxs")
+chiPhysicsTransportXSSet(xs_2,CHI_XSFILE,"test/xs_3_170.cxs")
+chiPhysicsTransportXSSet(xs_3,CHI_XSFILE,"test/xs_air50RH.cxs")
 
 combo ={{xs_1, 0.5e5},
         {xs_2, 0.4e3},
         {xs_3, 0.3e2}}
-xs_4 = chiPhysicsTransportXSCreate()
-chiPhysicsTransportXSSetCombined(xs_4,combo)
+aerated_graphite = chiPhysicsTransportXSMakeCombined(combo)
 
+chiPhysicsTransportXSSetCombined(aerated_graphite,combo)
 \endcode
  *
 \ingroup LuaTransportXSs
@@ -481,7 +461,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 
   std::string file_name = lua_tostring(L,2);
 
-  xs->ExportToChiFormat(file_name);
+  xs->ExportToChiXSFile(file_name);
 
   return 0;
 }
