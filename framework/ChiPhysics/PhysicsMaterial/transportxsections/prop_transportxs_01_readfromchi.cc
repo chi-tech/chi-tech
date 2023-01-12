@@ -317,13 +317,13 @@ void chi_physics::TransportCrossSections::
   auto Read1DData =
       [](const std::string& keyword,
          std::vector<double>& destination,
-         const unsigned int n,
+         const unsigned int N,
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
         //init storage
-        destination.assign(n, 0.0);
+        destination.assign(N, 0.0);
 
         //book-keeping
         std::string line;
@@ -340,11 +340,11 @@ void chi_physics::TransportCrossSections::
           //get data from current line
           line_stream >> i >> value;
           destination.at(i) = value;
-          if (count++ >= n)
+          if (count++ >= N)
             throw std::runtime_error(
                 "To many entries encountered when parsing "
                 "1D data.\nThe expected number of entries is " +
-                std::to_string(n));
+                std::to_string(N));
 
           //go to next line
           std::getline(file, line);
@@ -358,16 +358,16 @@ void chi_physics::TransportCrossSections::
   auto ReadTransferMatrices =
       [](const std::string& keyword,
          std::vector<TransferMatrix>& destination,
-         const unsigned int n,  //# of moments
-         const unsigned int m,  //# of groups
+         const unsigned int M,  //# of moments
+         const unsigned int G,  //# of groups
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
         //init storage
         destination.clear();
-        for (unsigned int i = 0; i < n; ++i)
-          destination.emplace_back(m, m);
+        for (unsigned int i = 0; i < M; ++i)
+          destination.emplace_back(G, G);
 
         //book-keeping
         std::string word, line;
@@ -403,16 +403,16 @@ void chi_physics::TransportCrossSections::
   auto ReadEmissionSpectra =
       [](const std::string& keyword,
          EmissionSpectra& destination,
-         const unsigned int m, //# of groups
-         const unsigned int n, //# of precursors
+         const unsigned int G, //# of groups
+         const unsigned int J, //# of precursors
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
         //init storage
         destination.clear();
-        for (unsigned int i = 0; i < m; ++i)
-          destination.emplace_back(n, 0.0);
+        for (unsigned int i = 0; i < G; ++i)
+          destination.emplace_back(J, 0.0);
 
         //book-keeping
         std::string word, line;
