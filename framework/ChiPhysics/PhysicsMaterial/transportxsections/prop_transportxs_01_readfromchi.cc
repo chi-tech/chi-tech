@@ -515,7 +515,7 @@ void chi_physics::TransportCrossSections::
       }
 
       //==================================================
-      // Cross-Section Data
+      // Cross Section Data
       //==================================================
 
       if (fw == "SIGMA_T_BEGIN")
