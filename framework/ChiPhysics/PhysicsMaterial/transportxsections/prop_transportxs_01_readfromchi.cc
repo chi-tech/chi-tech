@@ -455,19 +455,39 @@ void chi_physics::TransportCrossSections::
 
     //parse number of groups
     if (word == "NUM_GROUPS")
-      line_stream >> num_groups;
+    {
+      int G;
+      line_stream >> G;
+      if (G <= 0)
+        throw std::logic_error(
+            "The specified number of energy groups "
+            "must be positive.");
+      num_groups = G;
+    }
 
     //parse the number of scattering moments
     if (word == "NUM_MOMENTS")
     {
-      unsigned int M;
+      int M;
       line_stream >> M;
-      scattering_order = M - 1;
+      if (M < 0)
+        throw std::logic_error(
+            "The specified number of scattering moments "
+            "must be non-negative.");
+      scattering_order = std::min(0, M - 1);
     }
 
     //parse the number of precursors species
     if (word == "NUM_PRECURSORS")
-      line_stream >> num_precursors;
+    {
+      int J;
+      line_stream >> J;
+      if (J < 0)
+        throw std::logic_error(
+            "The specified number of delayed neutron "
+            "precursors must be non-negative.");
+      num_precursors = J;
+    }
 
     //parse nuclear data
     try
