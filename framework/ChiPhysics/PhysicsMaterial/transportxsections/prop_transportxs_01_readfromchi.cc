@@ -253,17 +253,17 @@ void chi_physics::TransportCrossSections::
   // Open Chi XS file
   //============================================================
 
-  chi::log.Log() << "Reading Chi cross-section file \"" << file_name << "\"\n";
+  chi::log.Log()
+      << "Reading Chi cross-section file \"" << file_name << "\"\n";
+
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
-  {
-    chi::log.LogAllError() << "Failed to open chi cross-section file \""
-                           << file_name << "\" in call to "
-                           << "TransportCrossSections::MakeFromChixsFile\n";
-    chi::Exit(EXIT_FAILURE);
-  }
+    throw std::runtime_error(
+        "Failed to open Chi cross-section file "
+        "\"" + file_name + "\" in call to " +
+        std::string(__FUNCTION__));
 
   //============================================================
   // Define utility functions for parsing
@@ -562,18 +562,27 @@ void chi_physics::TransportCrossSections::
 
     catch (const std::runtime_error& err)
     {
-      chi::log.LogAllError()
-        << "Error reading xs-file \"" + file_name + "\". "
-        << "Line number " << line_number << ". "
-        << err.what();
-      chi::Exit(EXIT_FAILURE);
+      throw std::runtime_error(
+          "Error reading Chi cross-section file "
+          "\"" + file_name + "\".\n" +
+          "Line number " + std::to_string(line_number) +
+          "\n" + err.what());
+    }
+
+    catch (const std::out_of_range& err)
+    {
+      throw std::out_of_range(
+          "Error reading Chi cross-section file "
+          "\"" + file_name + "\".\n" +
+          "Line number " + std::to_string(line_number) +
+          "\n" + err.what());
     }
 
     catch (...)
     {
-      chi::log.LogAllError()
-        << "Unknown error in " << std::string(__FUNCTION__);
-      chi::Exit(EXIT_FAILURE);
+      throw std::runtime_error(
+          "Unknown error encountered in " +
+          std::string (__FUNCTION__ ));
     }
 
     word = "";
