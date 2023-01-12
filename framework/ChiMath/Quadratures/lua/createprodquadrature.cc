@@ -16,7 +16,7 @@
 
 ##_
 
-###QuadratureType:\n
+###QuadratureType:
 GAUSS_LEGENDRE\n
  Gauss-Legendre quadrature for the polar angles and no quadrature rule
  for the azimuthal angle. Suitable only for 1D simulations. Expects

@@ -12,7 +12,7 @@ using namespace lbs;
 \param SolverName string Optional. A string name to use for the solver.
                          [Default="KEigenvalueSolver"].
  *
-\return A handle to the created solver.*/
+\return Handle A handle to the created solver.*/
 int chiLBKESCreateSolver(lua_State* L)
 {
   const std::string fname = __FUNCTION__;

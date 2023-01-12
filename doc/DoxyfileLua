@@ -16,8 +16,8 @@ DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Chi-Tech"
 PROJECT_NUMBER         =
 PROJECT_BRIEF          =
-PROJECT_LOGO           = "ChiDoc/HTMLimages/Logo2_Small.bmp"
-OUTPUT_DIRECTORY       = "ChiDoc/HTMLdocs"
+PROJECT_LOGO           = "doc/HTMLimages/Logo2_Small.bmp"
+OUTPUT_DIRECTORY       = "doc/HTMLdocs"
 CREATE_SUBDIRS         = YES
 ALLOW_UNICODE_NAMES    = NO
 OUTPUT_LANGUAGE        = English
@@ -95,7 +95,7 @@ SHOW_USED_FILES        = YES
 SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES
 FILE_VERSION_FILTER    =
-LAYOUT_FILE            = ChiDoc/DoxyLayout.xml
+LAYOUT_FILE            = doc/DoxyLayout.xml
 CITE_BIB_FILES         =
 
 #---------------------------------------------------------------------------
@@ -113,52 +113,51 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "ChiDoc/LUA_DOCUMENTATION" "ChiTech" "ChiDoc/PAGES"
-INPUT                 += "ChiModules"
+INPUT                  = "doc/generated_files" "framework" "doc/PAGES"
+INPUT                 += "modules"
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          =
 RECURSIVE              = YES
 
-EXCLUDE                = "ChiTech/ChiLua/"
-EXCLUDE               += "ChiTech/ChiMPI/lua"
-EXCLUDE               += "ChiTech/ChiLog/lua"
-EXCLUDE               += "ChiTech/LuaTest"
+EXCLUDE                = "framework/ChiLua/"
+EXCLUDE               += "framework/ChiMPI/lua"
+EXCLUDE               += "framework/ChiLog/lua"
+EXCLUDE               += "framework/LuaTest"
 
-EXCLUDE               += "ChiTech/ChiMath/Quadratures/lua"
-EXCLUDE               += "ChiTech/ChiMath/Quadratures/LegendrePoly/lua"
-EXCLUDE               += "ChiTech/ChiMath/Quadratures/SLDFESQ/lua"
+EXCLUDE               += "framework/ChiMath/Quadratures/lua"
+EXCLUDE               += "framework/ChiMath/Quadratures/LegendrePoly/lua"
+EXCLUDE               += "framework/ChiMath/Quadratures/SLDFESQ/lua"
 
-EXCLUDE               += "ChiTech/ChiMesh/DomainDecomposition/lua"
-EXCLUDE               += "ChiTech/ChiMesh/FieldFunctionInterpolation/lua"
-EXCLUDE               += "ChiTech/ChiMesh/LineMesh/lua"
-EXCLUDE               += "ChiTech/ChiMesh/LogicalVolume/lua"
-EXCLUDE               += "ChiTech/ChiMesh/lua"
-EXCLUDE               += "ChiTech/ChiMesh/MeshCutting/lua"
-EXCLUDE               += "ChiTech/ChiMesh/MeshHandler/lua"
-EXCLUDE               += "ChiTech/ChiMesh/OrthoGrids/lua"
-EXCLUDE               += "ChiTech/ChiMesh/Region/lua"
-EXCLUDE               += "ChiTech/ChiMesh/SurfaceMesh/lua"
-EXCLUDE               += "ChiTech/ChiMesh/SurfaceMesher/lua"
-EXCLUDE               += "ChiTech/ChiMesh/UnpartitionedMesh/lua"
-EXCLUDE               += "ChiTech/ChiMesh/VolumeMesher/lua"
+EXCLUDE               += "framework/ChiMesh/DomainDecomposition/lua"
+EXCLUDE               += "framework/ChiMesh/FieldFunctionInterpolation/lua"
+EXCLUDE               += "framework/ChiMesh/LineMesh/lua"
+EXCLUDE               += "framework/ChiMesh/LogicalVolume/lua"
+EXCLUDE               += "framework/ChiMesh/lua"
+EXCLUDE               += "framework/ChiMesh/MeshCutting/lua"
+EXCLUDE               += "framework/ChiMesh/MeshHandler/lua"
+EXCLUDE               += "framework/ChiMesh/OrthoGrids/lua"
+EXCLUDE               += "framework/ChiMesh/Region/lua"
+EXCLUDE               += "framework/ChiMesh/SurfaceMesh/lua"
+EXCLUDE               += "framework/ChiMesh/SurfaceMesher/lua"
+EXCLUDE               += "framework/ChiMesh/UnpartitionedMesh/lua"
+EXCLUDE               += "framework/ChiMesh/VolumeMesher/lua"
 
-EXCLUDE               += "ChiTech/ChiPhysics/lua"
-EXCLUDE               += "ChiTech/ChiPhysics/FieldFunction/lua"
-EXCLUDE               += "ChiTech/ChiPhysics/PhysicsMaterial/transportxsections/lua"
+EXCLUDE               += "framework/ChiPhysics/lua"
+EXCLUDE               += "framework/ChiPhysics/FieldFunction/lua"
+EXCLUDE               += "framework/ChiPhysics/PhysicsMaterial/transportxsections/lua"
 
-EXCLUDE               += "ChiModules/DiffusionSolver/lua"
-EXCLUDE               += "ChiModules/MonteCarlon/lua"
-EXCLUDE               += "ChiModules/LinearBoltzmannSolver/lua"
-EXCLUDE               += "ChiModules/LBKEigenvalueSolver/lua"
-EXCLUDE               += "ChiModules/LBSAdjointSolver/lua"
-EXCLUDE               += "ChiModules/ThermoAlpha/lua"
+EXCLUDE               += "modules/DiffusionSolver/lua"
+EXCLUDE               += "modules/MonteCarlon/lua"
+EXCLUDE               += "modules/LinearBoltzmannSolver/lua"
+EXCLUDE               += "modules/LBKEigenvalueSolver/lua"
+EXCLUDE               += "modules/LBSAdjointSolver/lua"
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = "*.py"
 EXCLUDE_SYMBOLS        =
-EXAMPLE_PATH           = "ChiDoc/PAGES"
+EXAMPLE_PATH           = "doc/PAGES"
 EXAMPLE_PATTERNS       =
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             = "ChiDoc/HTMLimages"
+IMAGE_PATH             = "doc/HTMLimages"
 INPUT_FILTER           =
 FILTER_PATTERNS        =
 FILTER_SOURCE_FILES    = NO
