@@ -4,10 +4,11 @@
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //========================================================== Solve 1g problem
-void mg_diffusion::Solver::Assemble_RHS(const unsigned int g, const int64_t verbose)
+void mg_diffusion::Solver::Assemble_RHS(const unsigned int g,
+                                        const int64_t verbose)
 {
-  if (verbose>2)
-    chi::log.Log() << "\nFinalizing assembly for group " + std::to_string(g);
+  if (verbose > 2)
+    chi::log.Log() << "\nAssemblying RHS for group " + std::to_string(g);
 
   // copy the external source vector for group g into b
   VecSet(b, 0.0);

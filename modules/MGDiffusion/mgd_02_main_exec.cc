@@ -29,24 +29,23 @@ void mg_diffusion::Solver::Execute()
   KSPMonitorSet(petsc_solver.ksp, &mg_diffusion::MGKSPMonitor,
                 nullptr, nullptr);
 
-  int64_t verbose = basic_options("verbose_level").IntegerValue();
-  my_app_context.verbose = verbose > 1 ? PETSC_TRUE : PETSC_FALSE;
-  if (my_app_context.verbose == PETSC_TRUE)
-    cout << "--context TRUE" << endl;
-  if (my_app_context.verbose == PETSC_FALSE)
-    cout << "--context FALSE" << endl;
-
+  int64_t iverbose = basic_options("verbose_level").IntegerValue();
+  my_app_context.verbose = iverbose > 1 ? PETSC_TRUE : PETSC_FALSE;
+//  if (my_app_context.verbose == PETSC_TRUE)
+//    cout << "--context TRUE" << endl;
+//  if (my_app_context.verbose == PETSC_FALSE)
+//    cout << "--context FALSE" << endl;
 //  std::cout << "STOP" << std::endl; std::cin.get();
 
   // shortcuts
-  unsigned int lfg = mg_diffusion::Solver::last_fast_group;
-  unsigned int ng = mg_diffusion::Solver::num_groups;
+  // unsigned int lfg = mg_diffusion::Solver::last_fast_group;
+  // unsigned int ng = mg_diffusion::Solver::num_groups;
 
   //============================================= Solve fast groups:
-  for (unsigned int g=0; g<lfg; ++g)
+  for (unsigned int g=0; g < last_fast_group; ++g)
   {
-    mg_diffusion::Solver::Assemble_RHS(g, verbose);
-    mg_diffusion::Solver::SolveOneGroupProblem(g, verbose);
+    mg_diffusion::Solver::Assemble_RHS(g, iverbose);
+    mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
   }
 
   //============================================= Solve thermal groups:
@@ -61,10 +60,10 @@ void mg_diffusion::Solver::Execute()
   do
   {
     thermal_error = 0.0;
-    for (unsigned int g=lfg; g<ng; ++g)
+    for (unsigned int g=last_fast_group; g < num_groups; ++g)
     {
-      mg_diffusion::Solver::Assemble_RHS(g, verbose);
-      mg_diffusion::Solver::SolveOneGroupProblem(g, verbose);
+      mg_diffusion::Solver::Assemble_RHS(g, iverbose);
+      mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
 
       // copy solution
       VecCopy(x[g], thermal_dphi);
@@ -75,16 +74,24 @@ void mg_diffusion::Solver::Execute()
       // copy solution
       VecCopy(x[g], x_old[g]);
     }
-    if ( (verbose>0) && (ng != lfg) )
+    // two-grid
+    if (do_two_grid)
+    {
+      mg_diffusion::Solver::Assemble_RHS_TwoGrid(iverbose);
+      mg_diffusion::Solver::SolveOneGroupProblem(num_groups, iverbose);
+    }
+    if ( (iverbose > 0) && (num_groups != last_fast_group) )
       std::cout << " --thermal iteration = " << std::setw(6)  << std::right << thermal_iteration
                 << ", Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(5)
                 << thermal_error << std::endl;
 
     ++thermal_iteration;
   }
-  while ( (ng != lfg) && (thermal_error > thermal_tol) && (thermal_iteration < max_thermal_iters) );
+  while ( (num_groups != last_fast_group)
+          && (thermal_error > thermal_tol)
+          && (thermal_iteration < max_thermal_iters) );
 
-  if ( (verbose>0) && (ng != lfg) )
+  if ( (iverbose > 0) && (num_groups != last_fast_group) )
   {
     if (thermal_error < thermal_tol)
       std::cout << "Thermal iterations converged for fixed-source problem" << std::endl;
