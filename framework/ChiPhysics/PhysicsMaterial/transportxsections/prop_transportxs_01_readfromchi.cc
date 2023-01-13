@@ -403,16 +403,16 @@ void chi_physics::TransportCrossSections::
   auto ReadEmissionSpectra =
       [](const std::string& keyword,
          EmissionSpectra& destination,
-         const unsigned int G, //# of groups
          const unsigned int J, //# of precursors
+         const unsigned int G, //# of groups
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
         //init storage
         destination.clear();
-        for (unsigned int g = 0; g < G; ++g)
-          destination.emplace_back(J, 0.0);
+        for (unsigned int j = 0; j < J; ++j)
+          destination.emplace_back(G, 0.0);
 
         //book-keeping
         std::string word, line;
@@ -432,7 +432,7 @@ void chi_physics::TransportCrossSections::
           {
             //get data from current line
             line_stream >> group >> precursor >> value;
-            destination.at(group).at(precursor) = value;
+            destination.at(precursor).at(group) = value;
           }
 
           //go to next line
@@ -448,6 +448,7 @@ void chi_physics::TransportCrossSections::
 
   std::vector<double> decay_constants;
   std::vector<double> fractional_yields;
+  std::vector<std::vector<double>> emission_spectra;
 
   std::string word, line;
   unsigned int line_number = 0;
@@ -553,8 +554,8 @@ void chi_physics::TransportCrossSections::
       if (fw == "CHI_PROMPT_BEGIN")
         Read1DData("CHI_PROMPT", chi_prompt, num_groups, f, ls, ln);
       if (num_precursors > 0 && fw == "CHI_DELAYED_BEGIN")
-        ReadEmissionSpectra("CHI_DELAYED", chi_delayed,
-                            num_groups, num_precursors, f, ls, ln);
+        ReadEmissionSpectra("CHI_DELAYED", emission_spectra,
+                            num_precursors, num_groups, f, ls, ln);
 
       //==================================================
       // Delayed Neutron Precursor Data
@@ -615,10 +616,7 @@ void chi_physics::TransportCrossSections::
     {
       precursors[j].decay_constant = decay_constants[j];
       precursors[j].fractional_yield = decay_constants[j];
-
-      precursors[j].emission_spectrum.resize(num_groups);
-      for (unsigned int g = 0; g < num_groups; ++g)
-        precursors[j].emission_spectrum[g] = chi_delayed[g][j];
+      precursors[j].emission_spectrum = emission_spectra[j];
     }
 
   //perform checks

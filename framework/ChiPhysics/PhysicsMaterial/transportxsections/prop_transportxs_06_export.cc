@@ -76,22 +76,18 @@ void chi_physics::TransportCrossSections::
   Print1DXS(ofile, "INV_VELOCITY", inv_velocity, 1.0e-20);
 
   //======================================== Chi-delayed
-  if (not chi_delayed.empty())
+  if (not precursors.empty())
   {
     ofile << "\n";
     ofile << "CHI_DELAYED_BEGIN\n";
     unsigned int g = 0;
-    for (auto& chi_d_g : chi_delayed)
+    for (const auto& precursor : precursors)
     {
       unsigned int j = 0;
-      for (double val : chi_d_g)
-      {
-        ofile << "G_PRECURSORJ_VAL" << " " << g
-                                    << " " << j
+      for (const auto& val : precursor.emission_spectrum)
+        ofile << "G_PRECURSORJ_VAL" << " " << g++
+                                    << " " << j++
                                     << " " << val << "\n";
-        ++j;
-      }
-      ++g;
     }
     ofile << "CHI_DELAYED_END\n";
   }

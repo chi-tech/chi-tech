@@ -45,7 +45,6 @@ public:
 
   std::vector<double> chi;         ///< Fission spectrum
   std::vector<double> chi_prompt;  ///< Prompt fission spectrum
-  EmissionSpectra chi_delayed;     ///< Delayed emission spectra
 
   std::vector<double> nu;         ///< Total neutrons per fission
   std::vector<double> nu_prompt;  ///< Prompt neutrons per fission
