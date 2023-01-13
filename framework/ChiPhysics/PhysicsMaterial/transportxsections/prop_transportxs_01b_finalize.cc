@@ -68,7 +68,6 @@ void chi_physics::TransportCrossSections::Finalize()
 
     chi.clear();
     chi_prompt.clear();
-    chi_delayed.clear();
 
     precursors.clear();
   }

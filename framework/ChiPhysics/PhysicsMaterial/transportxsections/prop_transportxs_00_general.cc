@@ -34,7 +34,6 @@ Reset()
 
   chi.clear();
   chi_prompt.clear();
-  chi_delayed.clear();
 
   nu.clear();
   nu_prompt.clear();
@@ -232,12 +231,8 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       nu_delayed.assign(n_grps, 0.0);
 
       chi_prompt.assign(n_grps, 0.0);
-      chi_delayed.clear();
-      for (unsigned int g = 0; g < num_groups; ++g)
-        chi_delayed.emplace_back(n_precs, 0.0);
 
-      precursor_lambda.assign(n_precs, 0.0);
-      precursor_yield.assign(n_precs, 0.0);
+      precursors.resize(n_precs);
     }
 
     //init total/steady-state
@@ -309,10 +304,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       for (unsigned int j = 0; j < xsecs[x]->num_precursors; ++j)
       {
         unsigned int count = precursor_count + j;
-        precursor_lambda[count] = xsecs[x]->precursor_lambda[j];
-        precursor_yield [count] = xsecs[x]->precursor_yield [j] * ff_i;
-        for (size_t g = 0; g < num_groups; ++g)
-          chi_delayed[g][count] = xsecs[x]->chi_delayed[g][j];
+        const auto& precursor = xsecs[x]->precursors[j];
+        precursors[count].decay_constant = precursor.decay_constant;
+        precursors[count].fractional_yield = precursor.fractional_yield * ff_i;
+        precursors[count].emission_spectrum = precursor.emission_spectrum;
       }//for j
 
       precursor_count += xsecs[x]->num_precursors;

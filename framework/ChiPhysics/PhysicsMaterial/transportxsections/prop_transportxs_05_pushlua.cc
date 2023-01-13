@@ -58,53 +58,56 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   Push1DXS(nu_delayed_sigma_f, "nu_delayed_sigma_f");
   Push1DXS(inv_velocity, "inv_velocity");
 
+  //TODO: Figure this out
   lua_pushstring(L, "chi_delayed");
   lua_newtable(L);
   {
-    unsigned int g = 0;
-    for (auto& row : chi_delayed)
-    {
-      ++g;
-      lua_pushinteger(L, g);
-      lua_newtable(L);
-        unsigned int j = 0;
-        for (auto val : row)
-        {
-          ++j;
-          lua_pushinteger(L, j);
-          lua_pushnumber(L, val);
-          lua_settable(L, -3);
-        }
-      lua_settable(L, -3);
-    }
+//    unsigned int g = 0;
+//    for (auto& row : chi_delayed)
+//    {
+//      ++g;
+//      lua_pushinteger(L, g);
+//      lua_newtable(L);
+//        unsigned int j = 0;
+//        for (auto val : row)
+//        {
+//          ++j;
+//          lua_pushinteger(L, j);
+//          lua_pushnumber(L, val);
+//          lua_settable(L, -3);
+//        }
+//      lua_settable(L, -3);
+//    }
   }
   lua_settable(L,-3);
 
+  //TODO: Figure this out
   lua_pushstring(L,"precursor_lambda");
   lua_newtable(L);
   {
-    unsigned int j = 0;
-    for (auto val : precursor_lambda)
-    {
-      ++j;
-      lua_pushinteger(L, j);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
+//    unsigned int j = 0;
+//    for (auto val : precursor_lambda)
+//    {
+//      ++j;
+//      lua_pushinteger(L, j);
+//      lua_pushnumber(L, val);
+//      lua_settable(L, -3);
+//    }
   }
   lua_settable(L, -3);
 
+  //TODO: Figure this out
   lua_pushstring(L, "precursor_yield");
   lua_newtable(L);
   {
-    unsigned int j = 0;
-    for (auto val : precursor_yield)
-    {
-      ++j;
-      lua_pushinteger(L, j);
-      lua_pushnumber(L, val);
-      lua_settable(L, -3);
-    }
+//    unsigned int j = 0;
+//    for (auto val : precursor_yield)
+//    {
+//      ++j;
+//      lua_pushinteger(L, j);
+//      lua_pushnumber(L, val);
+//      lua_settable(L, -3);
+//    }
   }
   lua_settable(L, -3);
 
