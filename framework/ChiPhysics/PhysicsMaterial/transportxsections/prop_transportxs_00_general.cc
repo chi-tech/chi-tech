@@ -35,10 +35,6 @@ Reset()
   chi.clear();
   chi_prompt.clear();
 
-  nu.clear();
-  nu_prompt.clear();
-  nu_delayed.clear();
-
   nu_sigma_f.clear();
   nu_prompt_sigma_f.clear();
   nu_delayed_sigma_f.clear();
@@ -223,24 +219,21 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   if (is_fissionable)
   {
     sigma_f.assign(n_grps, 0.0);
+    nu_sigma_f.assign(n_grps, 0.0);
 
-    //init prompt/delayed
+    //init prompt/delayed fission data
     if (n_precs > 0)
     {
-      nu_prompt.assign(n_grps, 0.0);
-      nu_delayed.assign(n_grps, 0.0);
+      nu_prompt_sigma_f.assign(n_grps, 0.0);
+      nu_delayed_sigma_f.assign(n_grps, 0.0);
 
       chi_prompt.assign(n_grps, 0.0);
-
       precursors.resize(n_precs);
     }
 
-    //init total/steady-state
+    //init steady-state fission data
     else
-    {
-      nu.assign(n_grps, 0.0);
       chi.assign(n_grps, 0.0);
-    }
   }
 
   //============================================================
@@ -272,17 +265,16 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       if (xsecs[x]->is_fissionable)
       {
         sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
+        nu_sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
+
         if (n_precs > 0)
         {
-          nu_prompt[g] += xsecs[g]->nu_prompt[g] * ff_i;
-          nu_delayed[g] += xsecs[g]->nu_delayed[g] * ff_i;
+          nu_prompt_sigma_f[g] += xsecs[g]->nu_prompt_sigma_f[g] * N_i;
+          nu_delayed_sigma_f[g] += xsecs[g]->nu_delayed_sigma_f[g] * N_i;
           chi_prompt[g] += xsecs[x]->chi_prompt[g] * ff_i;
         }
         else
-        {
-          nu[g] += xsecs[x]->nu[g] * ff_i;
           chi[g] += xsecs[x]->chi[g] * ff_i;
-        }
       }
     }//for g
 
@@ -352,9 +344,23 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
   }//for cross sections
 
-  //perform checks for the cross sections
+  //============================================================
+  // Set the absorption cross section, if unset
+  //============================================================
 
-  Finalize();
+  // The logic here is that if absorption is empty, it was not
+  // specified, therefore, it should be computed. If a uniformly
+  // zero absorption cross section was provided, assume that
+  // was intentional.
+
+  if (sigma_a.empty())
+    ComputeAbsorption();
+
+  //============================================================
+  // Compute diffusion parameters
+  //============================================================
+
+  ComputeDiffusionParameters();
 }
 
 
