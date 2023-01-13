@@ -344,9 +344,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
   }//for cross sections
 
-  //finalize
-  if (sigma_a.empty())
-    ComputeAbsorption();
+  //============================================================
+  // Compute auxiliary data
+  //============================================================
+
   ComputeDiffusionParameters();
 }
 

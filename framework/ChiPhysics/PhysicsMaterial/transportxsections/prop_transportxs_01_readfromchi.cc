@@ -873,8 +873,13 @@ void chi_physics::TransportCrossSections::
   }//while not EOF, read each lines
   file.close();
 
+  //============================================================
+  // Compute auxiliary data
+  //============================================================
+
   if (sigma_a.empty())
     ComputeAbsorption();
+
   ComputeDiffusionParameters();
 
   //============================================================
