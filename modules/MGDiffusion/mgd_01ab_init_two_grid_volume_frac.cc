@@ -1,8 +1,7 @@
 #include "mg_diffusion_solver.h"
 #include "ChiTimer/chi_timer.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-#include "chi_runtime.h"
-#include "chi_log.h"
+
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
 {

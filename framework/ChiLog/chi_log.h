@@ -34,7 +34,7 @@ namespace chi_objects
      - LOG_0ERROR,                 Error only for location 0
      - LOG_0VERBOSE_0,             Default verbosity level
      - LOG_0VERBOSE_1,             Used only if verbosity level equals 1
-     - ChiLog::LOG_LVL::LOG_0VERBOSE_2,             Used only if verbosity level equals 2
+     - LOG_0VERBOSE_2,             Used only if verbosity level equals 2
      - LOG_ALL,                    Verbose level 0 all locations
      - LOG_ALLWARNING,             Warning for any location
      - LOG_ALLERROR,               Error for any location

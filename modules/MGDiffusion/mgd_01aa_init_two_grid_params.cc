@@ -63,15 +63,15 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
     std::stringstream outstr;
     for (auto &xi: spectrum)
       outstr << xi << '\n';
-    chi::log.Log0Verbose0() << outstr.str();  // jcr verbose1
+    chi::log.Log0Verbose1() << outstr.str();  // jcr verbose1
 
-    std::stringstream outstr2;
-    for (auto &xi: diffusion_coeff)
-      outstr << xi << '\n';
-    chi::log.Log0Verbose0() << outstr.str();  // jcr verbose1
-
-    std::cout << "collapsed = " << collapsed_sig_a
-    <<", "<< collapsed_D << std::endl;
+//    std::stringstream outstr2;
+//    for (auto &xi: diffusion_coeff)
+//      outstr2 << xi << '\n';
+//    chi::log.Log0Verbose0() << outstr2.str();  // jcr verbose1
+//
+//    std::cout << "collapsed = " << collapsed_sig_a
+//    <<", "<< collapsed_D << std::endl;
 //    chi::Exit(12345);
 
     const auto mat_id = mat_id_xs.first;

@@ -53,57 +53,52 @@ void mg_diffusion::Solver::Execute()
   // max # of thermal iterations
   int64_t max_thermal_iters = basic_options("max_thermal_iters").IntegerValue();
   // max thermal error between two successive iterates
-  double  thermal_tol = basic_options("thermal_flux_error").FloatValue();
+  double  thermal_tol = basic_options("thermal_flux_tolerance").FloatValue();
   // computed error
-  double thermal_error = 0.0;
+  double thermal_error_all;
+  double thermal_error_g;
 
   do
   {
-    thermal_error = 0.0;
+    thermal_error_all = 0.0;
     for (unsigned int g=last_fast_group; g < num_groups; ++g)
     {
-      // rhs src
+      // conpute rhs src
       mg_diffusion::Solver::Assemble_RHS(g, iverbose);
-//      // copy solution
-//      VecCopy(x[g], x_old[g]);
-      // solve
-      mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
-
       // copy solution
+      VecCopy(x[g], x_old[g]);
+      // solve group g for new solution
+      mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
+      // compute L2 norm of thermal error for current g (requires one more copy)
       VecCopy(x[g], thermal_dphi);
-      // compute the difference
       VecAXPY(thermal_dphi, -1.0, x_old[g]);
-      // compute the L2 norm
-      VecNorm(thermal_dphi,NORM_2,&thermal_error);
-//      // copy solution
-//      VecCopy(x[g], x_old[g]);
+      VecNorm(thermal_dphi,NORM_2,&thermal_error_g);
+      thermal_error_all = std::max(thermal_error_all,thermal_error_g);
     }
-    // two-grid
+    // perform two-grid
     if (do_two_grid)
     {
       mg_diffusion::Solver::Assemble_RHS_TwoGrid(iverbose);
       mg_diffusion::Solver::SolveOneGroupProblem(num_groups, iverbose);
       mg_diffusion::Solver::Update_Flux_With_TwoGrid(iverbose);
     }
-    for (unsigned int g=last_fast_group; g < num_groups; ++g)
-      VecCopy(x[g], x_old[g]);
 
     if (iverbose > 0)
-      std::cout << " --thermal iteration = " << std::setw(6)  << std::right << thermal_iteration
-                << ", Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(5)
-                << thermal_error << std::endl;
+      std::cout << " --thermal iteration = " << std::setw(5)  << std::right << thermal_iteration
+                << ", Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(7)
+                << thermal_error_all << std::endl;
 
     ++thermal_iteration;
   }
-  while ( (thermal_error > thermal_tol) &&
+  while ( (thermal_error_all > thermal_tol) &&
           (thermal_iteration < max_thermal_iters) );
 
   if (iverbose > 0)
   {
-    if (thermal_error < thermal_tol)
-      std::cout << "Thermal iterations converged for fixed-source problem" << std::endl;
+    if (thermal_error_all < thermal_tol)
+      std::cout << "\nThermal iterations converged for fixed-source problem" << std::endl;
     else
-      std::cout << "Thermal iterations NOT converged for fixed-source problem" << std::endl;
+      std::cout << "\nThermal iterations NOT converged for fixed-source problem" << std::endl;
   }
 
   chi::log.Log() << "Done solving multi-group diffusion";

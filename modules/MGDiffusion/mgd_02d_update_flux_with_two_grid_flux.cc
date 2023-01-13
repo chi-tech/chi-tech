@@ -1,10 +1,14 @@
 #include "mg_diffusion_solver.h"
+#include "ChiLog/chi_log.h"
 #include "ChiTimer/chi_timer.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Update_Flux_With_TwoGrid(const int64_t verbose)
 {
+  if (verbose > 2)
+    chi::log.Log() << "\nUpdating Thermal fluxes from two-grid";
+
   const auto& grid = *grid_ptr;
   const auto& sdm  = *sdm_ptr;
 
@@ -38,6 +42,6 @@ void mg_diffusion::Solver::Update_Flux_With_TwoGrid(const int64_t verbose)
     VecAssemblyBegin(x[g]);
     VecAssemblyEnd(x[g]);
   }
-  // release two_grid flux
+  // release two-grid flux
   VecRestoreArrayRead(x[num_groups], &xlocal_tg);
 }
