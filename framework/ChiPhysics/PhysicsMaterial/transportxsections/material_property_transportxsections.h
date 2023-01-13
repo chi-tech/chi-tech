@@ -21,9 +21,18 @@ protected:
   using EmissionSpectra = std::vector<std::vector<double>>;
 
 public:
-  unsigned int num_groups=0;       ///< Total number of Groups
-  unsigned int scattering_order=0; ///< Legendre scattering order
-  unsigned int num_precursors=0;   ///< Number of precursors
+  /**A struct containing data for a delayed neutron precursor.*/
+  struct Precursor
+  {
+    double decay_constant = 0.0;
+    double fractional_yield = 0.0;
+    std::vector<double> emission_spectrum;
+  };
+
+public:
+  unsigned int num_groups = 0;       ///< Total number of Groups
+  unsigned int scattering_order = 0; ///< Legendre scattering order
+  unsigned int num_precursors = 0;   ///< Number of precursors
 
   bool is_fissionable = false;
 
@@ -51,8 +60,7 @@ public:
 
   std::vector<TransferMatrix> transfer_matrices;
 
-  std::vector<double> precursor_lambda; ///< Precursor decay constants
-  std::vector<double> precursor_yield;  ///< Precursor yield fractions
+  std::vector<Precursor> precursors;
 
   //Diffusion quantities
 public:
