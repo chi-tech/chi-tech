@@ -344,22 +344,9 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
   }//for cross sections
 
-  //============================================================
-  // Set the absorption cross section, if unset
-  //============================================================
-
-  // The logic here is that if absorption is empty, it was not
-  // specified, therefore, it should be computed. If a uniformly
-  // zero absorption cross section was provided, assume that
-  // was intentional.
-
+  //finalize
   if (sigma_a.empty())
     ComputeAbsorption();
-
-  //============================================================
-  // Compute diffusion parameters
-  //============================================================
-
   ComputeDiffusionParameters();
 }
 

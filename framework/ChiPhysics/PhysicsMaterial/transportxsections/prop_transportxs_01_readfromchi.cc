@@ -873,26 +873,12 @@ void chi_physics::TransportCrossSections::
   }//while not EOF, read each lines
   file.close();
 
-  //============================================================
-  // Set the absorption cross section, if unset
-  //============================================================
-
-  // The logic here is that if absorption is empty, it was not
-  // specified, therefore, it should be computed. If a uniformly
-  // zero absorption cross section was provided, assume that
-  // was intentional.
-
   if (sigma_a.empty())
     ComputeAbsorption();
-
-  //============================================================
-  // Compute diffusion parameters
-  //============================================================
-
   ComputeDiffusionParameters();
 
   //============================================================
-  // Compute fission data
+  // Compute and check fission data
   //============================================================
 
   //determine if the material is fissionable

@@ -92,10 +92,7 @@ private:
 public:
   //01
   void MakeFromChiXSFile(const std::string &file_name);
-private:
-  void Finalize();
 
-public:
   //02
   void ComputeDiffusionParameters();
 
