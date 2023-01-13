@@ -44,8 +44,7 @@ Reset()
   nu_prompt_sigma_f.clear();
   nu_delayed_sigma_f.clear();
 
-  precursor_lambda.clear();
-  precursor_yield.clear();
+  precursors.clear();
 
   inv_velocity.clear();
 

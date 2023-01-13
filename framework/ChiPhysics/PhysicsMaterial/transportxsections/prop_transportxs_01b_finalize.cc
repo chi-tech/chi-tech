@@ -70,8 +70,7 @@ void chi_physics::TransportCrossSections::Finalize()
     chi_prompt.clear();
     chi_delayed.clear();
 
-    precursor_lambda.clear();
-    precursor_yield.clear();
+    precursors.clear();
   }
 
   //============================================================
@@ -181,6 +180,7 @@ void chi_physics::TransportCrossSections::Finalize()
 
       if (chi_prompt.empty())
         throw std::logic_error("Prompt fission spectrum not found.");
+
       if (std::all_of(chi_prompt.begin(), chi_prompt.end(),
                       [](double x) { return x == 0.0; }))
         throw std::logic_error(
@@ -190,71 +190,70 @@ void chi_physics::TransportCrossSections::Finalize()
       //normalize the spectrum to a unit sum
       double chi_prompt_sum = std::accumulate(
           chi_prompt.begin(), chi_prompt.end(), 0.0);
+
       for (unsigned int g = 0; g < num_groups; ++g)
         chi_prompt[g] /= chi_prompt_sum;
 
       //==================================================
-      // Check delayed emission spectra
+      // Check precursor data
       //==================================================
 
-      if (chi_delayed.empty())
-        throw std::logic_error("Delayed emission spectra not found.");
+      if (precursors.empty())
+        throw std::logic_error("No precursors found.");
 
-      //create chi_delayed transpose for easier checks
-      EmissionSpectra tmp;
-      tmp.resize(num_precursors, std::vector<double>(num_groups, 0.0));
-      for (unsigned int g = 0; g < num_groups; ++g)
-        for (unsigned int j = 0; j < num_precursors; ++j)
-          tmp[j][g] = chi_delayed[g][j];
+      // check decay constants
+      if (!std::all_of(precursors.begin(), precursors.end(),
+                       [](const Precursor& p)
+                       { return p.decay_constant > 0.0; }))
+        throw std::logic_error(
+            "Invalid precursor decay constant encountered.\n"
+            "Decay constants must be strictly positive.");
+
+      // check fractional yields
+      if (std::all_of(precursors.begin(), precursors.end(),
+                      [](const Precursor& p)
+                      { return p.fractional_yield == 0.0; }))
+        throw std::logic_error(
+            "Invalid precursor yield fractions encountered.\n"
+            "There must be one or more nonzero yield fractions.");
+
+      if (!std::all_of(precursors.begin(), precursors.end(),
+                       [](const Precursor& p)
+                       { return p.fractional_yield >= 0.0 &&
+                                p.fractional_yield <= 1.0; }))
+        throw std::logic_error(
+            "Invalid delayed neutron precursor yield fraction "
+            "encountered.\n"
+            "Yield fractions must be in the range [0.0, 1.0]");
+
+      //normalize the fractional yields
+      double yield_sum = std::accumulate(
+          precursors.begin(), precursors.end(), 0.0,
+          [](double val, const Precursor& p)
+          { return val + p.fractional_yield; });
 
       for (unsigned int j = 0; j < num_precursors; ++j)
+        precursors[j].fractional_yield /= yield_sum;
+
+      //check the emission spectra
+      for (unsigned int j = 0; j < num_precursors; ++j)
       {
-        //throw error if emission spectrum j was not specified
-        if (std::all_of(tmp[j].begin(), tmp[j].end(),
+        auto& spectrum = precursors[j].emission_spectrum;
+
+        if (std::all_of(spectrum.begin(), spectrum.end(),
                         [](double x) { return x == 0.0; }))
           throw std::logic_error(
               "Invalid delayed emission spectra encountered for "
               "precursor species " + std::to_string(j) + ".\n" +
               "Spectra must have at least one nonzero value.");
 
-        //normalize each emission spectrum
-        double chi_delayed_j_sum =
-            std::accumulate(tmp[j].begin(), tmp[j].end(), 0.0);
+        //normalize the emission spectrum
+        double spectrum_sum = std::accumulate(
+            spectrum.begin(), spectrum.end(), 0.0);
 
         for (unsigned int g = 0; g < num_groups; ++g)
-          chi_delayed[g][j] /= chi_delayed_j_sum;
-      }//for j
-
-      //==================================================
-      // Check the precursor data
-      //==================================================
-
-      if (precursor_lambda.empty())
-        throw std::logic_error("Precursor decay constants not found.");
-      if (!std::all_of(precursor_lambda.begin(),
-                       precursor_lambda.end(),
-                      [](double x) { return x > 0.0;}))
-        throw std::logic_error(
-            "Invalid precursor decay constant encountered.\n"
-            "Decay constants must be greater than zero.");
-
-      if (precursor_yield.empty())
-        throw std::logic_error("Precursor yield fractions no found.");
-      if (!std::all_of(precursor_yield.begin(),
-                       precursor_yield.end(),
-                       [](double x) { return x >= 0.0 && x <= 1.0; }))
-        throw std::logic_error(
-            "Invalid delayed neutron precursor yield fraction "
-            "encountered.\n"
-            "Yield fractions must be in the range [0.0, 1.0]");
-
-      //normalize the precursor yields
-      double yield_sum = std::accumulate(precursor_yield.begin(),
-                                         precursor_yield.end(), 0.0);
-
-      for (unsigned int j = 0; j < num_precursors; ++j)
-        precursor_yield[j] /= yield_sum;
-
+          spectrum[g] /= spectrum_sum;
+      }
 
       //==================================================
       // Compute the steady-state fission spectrum
@@ -276,7 +275,8 @@ void chi_physics::TransportCrossSections::Finalize()
         //compute beta-averaged total fission spectrum
         chi[g] = (1.0 - beta[g]) * chi_prompt[g];
         for (unsigned int j = 0; j < num_precursors; ++j)
-          chi[g] += beta[g] * precursor_yield[j] * chi_delayed[g][j];
+          chi[g] += beta[g] * precursors[j].fractional_yield *
+                    precursors[j].emission_spectrum[g];
       }
 
       //normalize total chi just in case

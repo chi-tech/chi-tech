@@ -446,6 +446,9 @@ void chi_physics::TransportCrossSections::
   // Read the Chi XS file
   //============================================================
 
+  std::vector<double> decay_constants;
+  std::vector<double> fractional_yields;
+
   std::string word, line;
   unsigned int line_number = 0;
   while (std::getline(file, line))
@@ -487,6 +490,7 @@ void chi_physics::TransportCrossSections::
             "The specified number of delayed neutron "
             "precursors must be non-negative.");
       num_precursors = J;
+      precursors.resize(num_precursors);
     }
 
     //parse nuclear data
@@ -559,11 +563,11 @@ void chi_physics::TransportCrossSections::
       if (num_precursors > 0)
       {
         if (fw == "PRECURSOR_LAMBDA_BEGIN")
-          Read1DData("PRECURSOR_LAMBDA", precursor_lambda,
+          Read1DData("PRECURSOR_LAMBDA", decay_constants,
                      num_precursors, f, ls, ln);
 
         if (fw == "PRECURSOR_YIELD_BEGIN")
-          Read1DData("PRECURSOR_YIELD", precursor_yield,
+          Read1DData("PRECURSOR_YIELD", fractional_yields,
                      num_precursors, f, ls, ln);
       }
 
@@ -605,9 +609,20 @@ void chi_physics::TransportCrossSections::
     word = "";
   }//while not EOF, read each lines
 
-  //perform checks and enforce physical relationships
-  Finalize();
+  //add data to the precursor structs
+  if (num_precursors > 0)
+    for (unsigned int j = 0; j < num_precursors; ++j)
+    {
+      precursors[j].decay_constant = decay_constants[j];
+      precursors[j].fractional_yield = decay_constants[j];
 
+      precursors[j].emission_spectrum.resize(num_groups);
+      for (unsigned int g = 0; g < num_groups; ++g)
+        precursors[j].emission_spectrum[g] = chi_delayed[g][j];
+    }
+
+  //perform checks
+  Finalize();
 
   file.close();
 }
