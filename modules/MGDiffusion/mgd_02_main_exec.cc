@@ -62,7 +62,11 @@ void mg_diffusion::Solver::Execute()
     thermal_error = 0.0;
     for (unsigned int g=last_fast_group; g < num_groups; ++g)
     {
+      // rhs src
       mg_diffusion::Solver::Assemble_RHS(g, iverbose);
+//      // copy solution
+//      VecCopy(x[g], x_old[g]);
+      // solve
       mg_diffusion::Solver::SolveOneGroupProblem(g, iverbose);
 
       // copy solution
@@ -71,27 +75,30 @@ void mg_diffusion::Solver::Execute()
       VecAXPY(thermal_dphi, -1.0, x_old[g]);
       // compute the L2 norm
       VecNorm(thermal_dphi,NORM_2,&thermal_error);
-      // copy solution
-      VecCopy(x[g], x_old[g]);
+//      // copy solution
+//      VecCopy(x[g], x_old[g]);
     }
     // two-grid
     if (do_two_grid)
     {
       mg_diffusion::Solver::Assemble_RHS_TwoGrid(iverbose);
       mg_diffusion::Solver::SolveOneGroupProblem(num_groups, iverbose);
+      mg_diffusion::Solver::Update_Flux_With_TwoGrid(iverbose);
     }
-    if ( (iverbose > 0) && (num_groups != last_fast_group) )
+    for (unsigned int g=last_fast_group; g < num_groups; ++g)
+      VecCopy(x[g], x_old[g]);
+
+    if (iverbose > 0)
       std::cout << " --thermal iteration = " << std::setw(6)  << std::right << thermal_iteration
                 << ", Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(5)
                 << thermal_error << std::endl;
 
     ++thermal_iteration;
   }
-  while ( (num_groups != last_fast_group)
-          && (thermal_error > thermal_tol)
-          && (thermal_iteration < max_thermal_iters) );
+  while ( (thermal_error > thermal_tol) &&
+          (thermal_iteration < max_thermal_iters) );
 
-  if ( (iverbose > 0) && (num_groups != last_fast_group) )
+  if (iverbose > 0)
   {
     if (thermal_error < thermal_tol)
       std::cout << "Thermal iterations converged for fixed-source problem" << std::endl;

@@ -19,12 +19,17 @@ void mg_diffusion::Solver::Assemble_A_bext()
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const size_t num_nodes   = cell_mapping.NumNodes();
 
     const auto& xs   = matid_to_xs_map.at(cell.material_id);
     const auto& qext = matid_to_src_map.at(cell.material_id);
-    const auto& xstg = map_mat_id_2_tginfo.at(cell.material_id);
-
-    const size_t num_nodes = cell_mapping.NumNodes();
+    double collapsed_D=0.,collapsed_sig_a=0.;
+    if (do_two_grid)
+    {
+      const auto &xstg = map_mat_id_2_tginfo.at(cell.material_id);
+      collapsed_D = xstg.collapsed_D;
+      collapsed_sig_a = xstg.collapsed_sig_a;
+    }
 
     std::vector<VecDbl> rhs_cell;
     rhs_cell.resize(num_groups);
@@ -56,8 +61,8 @@ void mg_diffusion::Solver::Assemble_A_bext()
           Acell[g][i][j] = entry_mij * sigr_g + entry_kij * Dg;
         }
         if (do_two_grid)
-          Acell[num_groups][i][j] = entry_mij * xstg.collapsed_sig_a
-                                  + entry_kij * xstg.collapsed_D;
+          Acell[num_groups][i][j] = entry_mij * collapsed_sig_a
+                                  + entry_kij * collapsed_D;
       }//for j
       double entry_rhsi = 0.0;
       for (size_t qp : qp_data.QuadraturePointIndices())
@@ -138,7 +143,7 @@ void mg_diffusion::Solver::Assemble_A_bext()
     std::vector<int64_t> imap(num_nodes, 0); //node-mapping
     for (size_t i=0; i<num_nodes; ++i)
       imap[i] = sdm.MapDOF(cell, i);
- 
+
     //======================= Assembly into system
     for (uint g=0; g < num_groups; ++g)
       for (size_t i=0; i<num_nodes; ++i)

@@ -122,6 +122,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute last fast group
   // initialize last fast group
+  chi::log.Log() << "Computing last fast group.";
   unsigned int lfg = mg_diffusion::Solver::num_groups;
 
   if (mg_diffusion::Solver::num_groups>1)
@@ -156,8 +157,8 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
   }
   if (do_two_grid)
   {
+    chi::log.Log() << "Compute_TwoGrid_Params";
     mg_diffusion::Solver::Compute_TwoGrid_Params();
-    mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions();
   }
 
 }

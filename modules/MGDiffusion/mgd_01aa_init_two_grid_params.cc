@@ -38,7 +38,7 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
     MatDbl C_ = chi_math::MatMul(Ainv, B_);
     // Perform power iteration
     VecDbl E(num_groups, 1.0);
-    double rho = chi_math::PowerIteration(C_, E, 1000, 1.0e-12);
+    double rho = chi_math::PowerIteration(C_, E, 10000, 1.0e-12);
 
     // Compute two-grid diffusion quantities
     // normalize spectrum
@@ -51,11 +51,11 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
     // D ave and Sigma_a ave
     double collapsed_D = 0.0;
     double collapsed_sig_a = 0.0;
-    for (unsigned int g = 0; g < num_groups; ++g)
+    for (unsigned int g = last_fast_group; g < num_groups; ++g)
     {
       collapsed_D += diffusion_coeff[g] * spectrum[g];
       collapsed_sig_a += sigma_t[g] * spectrum[g];
-      for (unsigned int gp = 0; gp < num_groups; ++gp)
+      for (unsigned int gp = last_fast_group; gp < num_groups; ++gp)
         collapsed_sig_a -= S[g][gp] * spectrum[gp];
     }
     // Verbose output the spectrum
@@ -63,7 +63,16 @@ void mg_diffusion::Solver::Compute_TwoGrid_Params()
     std::stringstream outstr;
     for (auto &xi: spectrum)
       outstr << xi << '\n';
-    chi::log.Log0Verbose1() << outstr.str();
+    chi::log.Log0Verbose0() << outstr.str();  // jcr verbose1
+
+    std::stringstream outstr2;
+    for (auto &xi: diffusion_coeff)
+      outstr << xi << '\n';
+    chi::log.Log0Verbose0() << outstr.str();  // jcr verbose1
+
+    std::cout << "collapsed = " << collapsed_sig_a
+    <<", "<< collapsed_D << std::endl;
+//    chi::Exit(12345);
 
     const auto mat_id = mat_id_xs.first;
     map_mat_id_2_tginfo.insert(

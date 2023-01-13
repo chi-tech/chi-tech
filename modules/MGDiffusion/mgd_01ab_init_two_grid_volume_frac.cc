@@ -1,14 +1,15 @@
 #include "mg_diffusion_solver.h"
 #include "ChiTimer/chi_timer.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-
+#include "chi_runtime.h"
+#include "chi_log.h"
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
 {
   const auto& grid = *grid_ptr;
   const auto& sdm  = *sdm_ptr;
 
-  const int ncells = grid.local_cells.size();
+  const size_t ncells = grid.local_cells.size();
   VF.resize(ncells);
 
   int counter = 0;
@@ -16,11 +17,11 @@ void mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions()
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const auto  qp_data      = cell_mapping.MakeVolumeQuadraturePointData();
+    const size_t num_nodes   = cell_mapping.NumNodes();
 
-    const size_t num_nodes = cell_mapping.NumNodes();
     VF[counter].resize(num_nodes, 0.0);
 
-    for (size_t i=0; i<num_nodes; ++i)
+    for (size_t i=0; i < num_nodes; ++i)
     {
       double vol_frac_shape_i = 0.0;
       for (size_t qp : qp_data.QuadraturePointIndices())
