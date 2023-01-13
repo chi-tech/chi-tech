@@ -10,7 +10,7 @@
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
  *\ingroup LuaPhysics
  *
- * An example Chi-Tech cross-section file is shown below. The bare-bones
+ * An example Chi-Tech cross section file is shown below. The bare-bones
  * format is shown below with more examples below:
 \code
 # This header can be as large as you please. The actual processing
@@ -87,9 +87,9 @@ constants, \f$ \lambda_j \f$ are required.
 ## Keyword definitions
 
 - NUM_GROUPS num_groups Required. Specifies the number of groups for this
-  cross-section. Symbol \f$ G \f$.
+  cross section. Symbol \f$ G \f$.
 - NUM_MOMENTS num_moments Required. The number of transfer matrices to allocate
-  for this cross-section (whether used or not). Typically this number is one
+  for this cross section (whether used or not). Typically this number is one
   greater than the scattering order (i.e., \f$ L+1 \f$)
 - NUM_PRECURSORS num_precursors Optional. Indicates how many precursors are used
   in this cross section. Symbol \f$ J \f$
@@ -241,8 +241,8 @@ CHI_DELAYED_END
  * */
 
 //###################################################################
-/**This method populates a transport cross-section from
- * a Chi cross-section file.*/
+/**This method populates a transport cross section from
+ * a Chi cross section file.*/
 void chi_physics::TransportCrossSections::
   MakeFromChiXSFile(const std::string &file_name)
 {
@@ -253,17 +253,17 @@ void chi_physics::TransportCrossSections::
   // Open Chi XS file
   //============================================================
 
-  chi::log.Log() << "Reading Chi cross-section file \"" << file_name << "\"\n";
+  chi::log.Log()
+      << "Reading Chi cross section file \"" << file_name << "\"\n";
+
   //opens and checks if open
   std::ifstream file;
   file.open(file_name);
   if (!file.is_open())
-  {
-    chi::log.LogAllError() << "Failed to open chi cross-section file \""
-                           << file_name << "\" in call to "
-                           << "TransportCrossSections::MakeFromChixsFile\n";
-    chi::Exit(EXIT_FAILURE);
-  }
+    throw std::runtime_error(
+        "Failed to open Chi cross section file "
+        "\"" + file_name + "\" in call to " +
+        std::string(__FUNCTION__));
 
   //============================================================
   // Define utility functions for parsing
@@ -274,29 +274,36 @@ void chi_physics::TransportCrossSections::
   auto ReadGroupStructure =
       [](const std::string& keyword,
          std::vector<std::vector<double>>& destination,
-         const unsigned int n,
+         const unsigned int G,  //# of groups
          std::ifstream& file,
          std::istringstream& line_stream,
-         unsigned int& line_number) {
+         unsigned int& line_number)
+      {
+        //init storage
+        destination.assign(G, std::vector<double>(2, 0.0));
+
+        //book-keeping
         std::string line;
+        int group;
+        double high;
+        double low;
+        unsigned int count = 0;
+
+        //read the block
         std::getline(file, line);
         line_stream = std::istringstream(line);
         ++line_number;
-
-        unsigned int count = 0;
-        int group;
-        double high, low;
         while (line != keyword + "_END")
         {
           //get data from current line
           line_stream >> group >> high >> low;
           destination.at(group).at(0) = high;
           destination.at(group).at(1) = low;
-          if (count++ >= n)
+          if (count++ >= G)
             throw std::runtime_error(
                 "Too many entries encountered when parsing "
                 "group structure.\nThe expected number of entries "
-                "is " + std::to_string(n) + ".");
+                "is " + std::to_string(G) + ".");
 
           //go to next line
           std::getline(file, line);
@@ -310,28 +317,34 @@ void chi_physics::TransportCrossSections::
   auto Read1DData =
       [](const std::string& keyword,
          std::vector<double>& destination,
-         const unsigned int n,
+         const unsigned int N,
          std::ifstream& file,
          std::istringstream& line_stream,
-         unsigned int& line_number) {
+         unsigned int& line_number)
+      {
+        //init storage
+        destination.assign(N, 0.0);
+
+        //book-keeping
         std::string line;
+        int i;
+        double value;
+        unsigned int count = 0;
+
+        //read the bloc
         std::getline(file, line);
         line_stream = std::istringstream(line);
         ++line_number;
-
-        unsigned int count = 0;
-        int i;
-        double value;
         while (line != keyword + "_END")
         {
           //get data from current line
           line_stream >> i >> value;
           destination.at(i) = value;
-          if (count++ >= n)
+          if (count++ >= N)
             throw std::runtime_error(
                 "To many entries encountered when parsing "
                 "1D data.\nThe expected number of entries is " +
-                std::to_string(n));
+                std::to_string(N));
 
           //go to next line
           std::getline(file, line);
@@ -345,17 +358,28 @@ void chi_physics::TransportCrossSections::
   auto ReadTransferMatrices =
       [](const std::string& keyword,
          std::vector<TransferMatrix>& destination,
+         const unsigned int M,  //# of moments
+         const unsigned int G,  //# of groups
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
+        //init storage
+        destination.clear();
+        for (unsigned int i = 0; i < M; ++i)
+          destination.emplace_back(G, G);
+
+        //book-keeping
         std::string word, line;
+        double value;
+        unsigned int ell;
+        unsigned int group;
+        unsigned int gprime;
+
+        //read the block
         std::getline(file, line);
         line_stream = std::istringstream(line);
         ++line_number;
-
-        unsigned int ell, group, gprime;
-        double value;
         while (line != keyword + "_END")
         {
           //check that this line contains an entry
@@ -379,17 +403,27 @@ void chi_physics::TransportCrossSections::
   auto ReadEmissionSpectra =
       [](const std::string& keyword,
          EmissionSpectra& destination,
+         const unsigned int G, //# of groups
+         const unsigned int J, //# of precursors
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
+        //init storage
+        destination.clear();
+        for (unsigned int g = 0; g < G; ++g)
+          destination.emplace_back(J, 0.0);
+
+        //book-keeping
         std::string word, line;
+        double value;
+        unsigned int group;
+        unsigned int precursor;
+
+        //read the block
         std::getline(file, line);
         line_stream = std::istringstream(line);
         ++line_number;
-
-        unsigned int group, precursor;
-        double value;
         while (line != keyword + "_END")
         {
           //check that this line contains an entry
@@ -422,60 +456,37 @@ void chi_physics::TransportCrossSections::
     //parse number of groups
     if (word == "NUM_GROUPS")
     {
-      line_stream >> num_groups;
-      sigma_t.resize(num_groups, 0.0);
-      sigma_a.resize(num_groups, 0.0);
-
-      sigma_f.resize(num_groups, 0.0);
-      nu_sigma_f.resize(num_groups, 0.0);
-      nu_prompt_sigma_f.resize(num_groups, 0.0);
-      nu_delayed_sigma_f.resize(num_groups, 0.0);
-
-      chi.resize(num_groups, 0.0);
-      chi_prompt.resize(num_groups, 0.0);
-
-      nu.resize(num_groups, 0.0);
-      nu_prompt.resize(num_groups, 0.0);
-      nu_delayed.resize(num_groups, 0.0);
-      beta.resize(num_groups, 0.0);
-
-      inv_velocity.resize(num_groups, 0.0);
+      int G;
+      line_stream >> G;
+      if (G <= 0)
+        throw std::logic_error(
+            "The specified number of energy groups "
+            "must be strictly positive.");
+      num_groups = G;
     }
 
     //parse the number of scattering moments
     if (word == "NUM_MOMENTS")
     {
-      if (num_groups == 0)
-      {
-        chi::log.LogAllError()
-            << __FUNCTION__ << ": "
-            << "NUM_GROUPS must be encountered before NUM_MOMENTS.";
-        chi::Exit(EXIT_FAILURE);
-      }
-
-      unsigned int M;
+      int M;
       line_stream >> M;
-      transfer_matrices.resize(M, TransferMatrix (num_groups, num_groups));
-      scattering_order = M - 1;
+      if (M < 0)
+        throw std::logic_error(
+            "The specified number of scattering moments "
+            "must be non-negative.");
+      scattering_order = std::max(0, M - 1);
     }
 
     //parse the number of precursors species
     if (word == "NUM_PRECURSORS")
     {
-      if (num_groups == 0)
-      {
-        chi::log.LogAllError()
-            << __FUNCTION__ << ": "
-            << "NUM_GROUPS must be encountered before NUM_PRECURSORS.";
-        chi::Exit(EXIT_FAILURE);
-      }
-
-      line_stream >> num_precursors;
-      precursor_lambda.resize(num_precursors, 0.0);
-      precursor_yield.resize(num_precursors, 0.0);
-      chi_delayed.resize(num_groups);
-      for (int g=0; g < num_groups; ++g)
-        chi_delayed[g].resize(num_precursors, 0.0);
+      int J;
+      line_stream >> J;
+      if (J < 0)
+        throw std::logic_error(
+            "The specified number of delayed neutron "
+            "precursors must be non-negative.");
+      num_precursors = J;
     }
 
     //parse nuclear data
@@ -486,9 +497,26 @@ void chi_physics::TransportCrossSections::
       auto& f  = file;
       auto& fw = word;
 
+      //============================================================
+      // Group Structure Data
+      //============================================================
+
       if (fw == "GROUP_STRUCTURE_BEGIN")
         ReadGroupStructure("GROUP_STRUCTURE",
                            e_bounds, num_groups, f, ls, ln);
+
+      if (fw == "INV_VELOCITY_BEGIN")
+        Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
+      if (fw == "VELOCITY_BEGIN" && inv_velocity.empty())
+      {
+        Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
+        for (unsigned int g = 0; g < num_groups; ++g)
+          inv_velocity[g] = 1.0 / inv_velocity[g];
+      }
+
+      //==================================================
+      // Cross Section Data
+      //==================================================
 
       if (fw == "SIGMA_T_BEGIN")
         Read1DData("SIGMA_T", sigma_t, num_groups, f, ls, ln);
@@ -496,6 +524,12 @@ void chi_physics::TransportCrossSections::
         Read1DData("SIGMA_A", sigma_a, num_groups, f, ls, ln);
       if (fw == "SIGMA_F_BEGIN")
         Read1DData("SIGMA_F", sigma_f, num_groups, f, ls, ln);
+      if (fw == "NU_SIGMA_F_BEGIN")
+        Read1DData("NU_SIGMA_F", nu_sigma_f, num_groups, f, ls, ln);
+
+      //==================================================
+      // Neutrons Per Fission
+      //==================================================
 
       if (fw == "NU_BEGIN")
         Read1DData("NU", nu, num_groups, f, ls, ln);
@@ -503,65 +537,69 @@ void chi_physics::TransportCrossSections::
         Read1DData("NU_PROMPT", nu_prompt, num_groups, f, ls, ln);
       if (fw == "NU_DELAYED_BEGIN")
         Read1DData("NU_DELAYED", nu_delayed, num_groups, f, ls, ln);
-
-      if (fw == "NU_SIGMA_F_BEGIN")
-        Read1DData("NU_SIGMA_F", nu_sigma_f, num_groups, f, ls, ln);
-      if (fw == "NU_PROMPT_SIGMA_F_BEGIN")
-        Read1DData("NU_PROMPT_SIGMA_F",
-                   nu_prompt_sigma_f, num_groups, f, ls, ln);
-      if (fw == "NU_DELAYED_SIGMA_F_BEGIN")
-        Read1DData("NU_DELAYED_SIGMA_F",
-                   nu_delayed_sigma_f, num_groups, f, ls, ln);
       if (fw == "BETA_BEGIN")
         Read1DData("BETA", beta, num_groups, f, ls, ln);
+
+      //==================================================
+      // Fission/Emission Spectra
+      //==================================================
 
       if (fw == "CHI_BEGIN")
         Read1DData("CHI", chi, num_groups, f, ls, ln);
       if (fw == "CHI_PROMPT_BEGIN")
         Read1DData("CHI_PROMPT", chi_prompt, num_groups, f, ls, ln);
+      if (num_precursors > 0 && fw == "CHI_DELAYED_BEGIN")
+        ReadEmissionSpectra("CHI_DELAYED", chi_delayed,
+                            num_groups, num_precursors, f, ls, ln);
 
-      if (fw == "INV_VELOCITY_BEGIN")
-        Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
-      if (fw == "VELOCITY_BEGIN" &&
-          std::all_of(inv_velocity.begin(), inv_velocity.end(),
-                      [](double x) { return x == 0.0; }))
-      {
-        Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
-        for (unsigned int g = 0; g < num_groups; ++g)
-          inv_velocity[g] = 1.0 / inv_velocity[g];
-      }
-
-      if (fw == "TRANSFER_MOMENTS_BEGIN")
-        ReadTransferMatrices("TRANSFER_MOMENTS",
-                             transfer_matrices, f, ls, ln);
+      //==================================================
+      // Delayed Neutron Precursor Data
+      //==================================================
 
       if (num_precursors > 0)
       {
         if (fw == "PRECURSOR_LAMBDA_BEGIN")
-          Read1DData("PRECURSOR_LAMBDA",
-                     precursor_lambda, num_precursors, f, ls, ln);
+          Read1DData("PRECURSOR_LAMBDA", precursor_lambda,
+                     num_precursors, f, ls, ln);
+
         if (fw == "PRECURSOR_YIELD_BEGIN")
-          Read1DData("PRECURSOR_YIELD",
-                     precursor_yield, num_precursors, f, ls, ln);
-        if (fw == "CHI_DELAYED_BEGIN")
-          ReadEmissionSpectra("CHI_DELAYED", chi_delayed, f, ls, ln);
+          Read1DData("PRECURSOR_YIELD", precursor_yield,
+                     num_precursors, f, ls, ln);
       }
+
+      //==================================================
+      // Transfer Data
+      //==================================================
+
+      if (fw == "TRANSFER_MOMENTS_BEGIN")
+        ReadTransferMatrices("TRANSFER_MOMENTS", transfer_matrices,
+                             scattering_order + 1, num_groups,
+                             f, ls, ln);
     }//try
 
     catch (const std::runtime_error& err)
     {
-      chi::log.LogAllError()
-        << "Error reading xs-file \"" + file_name + "\". "
-        << "Line number " << line_number << ". "
-        << err.what();
-      chi::Exit(EXIT_FAILURE);
+      throw std::runtime_error(
+          "Error reading Chi cross section file "
+          "\"" + file_name + "\".\n" +
+          "Line number " + std::to_string(line_number) +
+          "\n" + err.what());
+    }
+
+    catch (const std::out_of_range& err)
+    {
+      throw std::out_of_range(
+          "Error reading Chi cross section file "
+          "\"" + file_name + "\".\n" +
+          "Line number " + std::to_string(line_number) +
+          "\n" + err.what());
     }
 
     catch (...)
     {
-      chi::log.LogAllError()
-        << "Unknown error in " << std::string(__FUNCTION__);
-      chi::Exit(EXIT_FAILURE);
+      throw std::runtime_error(
+          "Unknown error encountered in " +
+          std::string (__FUNCTION__ ));
     }
 
     word = "";

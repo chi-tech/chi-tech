@@ -23,7 +23,7 @@ void lbs::SteadySolver::
 {
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_BEGIN);
 
-  const bool apply_mat_src         = (source_flags & APPLY_FIXED_SOURCES);
+  const bool apply_fixed_src       = (source_flags & APPLY_FIXED_SOURCES);
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCES);
   const bool apply_ags_scatter_src = (source_flags & APPLY_AGS_SCATTER_SOURCES);
   const bool apply_wgs_fission_src = (source_flags & APPLY_WGS_FISSION_SOURCES);
@@ -55,7 +55,7 @@ void lbs::SteadySolver::
 
     //==================== Obtain src
     double* src = default_zero_src.data();
-    if (P0_src and apply_mat_src)
+    if (P0_src and apply_fixed_src)
       src = P0_src->source_value_g.data();
 
     //=========================================== Loop over nodes
@@ -74,10 +74,10 @@ void lbs::SteadySolver::
         {
           if (not options.use_src_moments) //using regular material src
           {
-            if (apply_mat_src and ell == 0)
+            if (apply_fixed_src and ell == 0)
               destination_q[uk_map + g] += src[g];
           }
-          else if (apply_mat_src)  //using ext_src_moments
+          else if (apply_fixed_src)  //using ext_src_moments
             destination_q[uk_map + g] += ext_src_moments_local[uk_map + g];
 
           double inscatter_g = 0.0;
@@ -167,7 +167,7 @@ void lbs::SteadySolver::
   }//for cell
 
   //================================================== Apply point sources
-  if ((not options.use_src_moments) and apply_mat_src)
+  if ((not options.use_src_moments) and apply_fixed_src)
   {
     for (const auto& point_source : point_sources)
     {
