@@ -43,18 +43,19 @@ void lbs::TransientSolver::StepPrecursors()
     }
 
     //========================================= Loop over precursors
-    const auto& J = max_precursors_per_material;
-    for (int j = 0; j < xs->num_precursors; ++j)
+    const auto& max_precursors = max_precursors_per_material;
+    for (unsigned int j = 0; j < xs->num_precursors; ++j)
     {
-      const size_t dof_map = cell.local_id * J + j;
-      const double coeff = 1.0 / (1.0 + eff_dt*xs->precursor_lambda[j]);
+      const size_t dof_map = cell.local_id * max_precursors + j;
+      const auto& precursor = xs->precursors[j];
+      const double coeff = 1.0 / (1.0 + eff_dt * precursor.decay_constant);
 
       //contribute last time step precursors
       precursor_new_local[dof_map] = coeff * precursor_prev_local[dof_map];
 
       //contribute delayed fission production
       precursor_new_local[dof_map] +=
-        coeff * eff_dt * xs->precursor_yield[j] * delayed_fission;
+        coeff * eff_dt * precursor.fractional_yield * delayed_fission;
     }
   }//for cell
 

@@ -129,18 +129,21 @@ void lbs::TransientSolver::
             //=================================== Delayed fission
             if (options.use_precursors)
             {
-              for (size_t j = 0; j < xs.num_precursors; ++j)
+              for (const auto& precursor : xs.precursors)
               {
-                double coeff = xs.chi_delayed[g][j] * xs.precursor_lambda[j] /
-                               (1.0 + eff_dt * xs.precursor_lambda[j]);
+                double coeff =
+                    precursor.emission_spectrum[g] *
+                    precursor.decay_constant /
+                    (1.0 + eff_dt * precursor.decay_constant);
 
                 for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
                 {
                   if ((gprime < gs_i) or (gprime > gs_f))
                     infission_g += coeff * eff_dt *
-                                   xs.precursor_yield[j] *
+                                   precursor.fractional_yield *
                                    xs.nu_delayed_sigma_f[gprime] *
-                                   phi_old_local[uk_map + gprime] / cell_volume;
+                                   phi_old_local[uk_map + gprime] /
+                                   cell_volume;
                 }//for gprime
               }//for precursors
             }//if use precursors
@@ -163,18 +166,19 @@ void lbs::TransientSolver::
             //=================================== Apply Delayed fission
             if (options.use_precursors)
             {
-              const auto& J = max_precursors_per_material;
-              for (size_t j = 0; j < xs.num_precursors; ++j)
+              for (const auto& precursor : xs.precursors)
               {
-                const double coeff = xs.chi_delayed[g][j]*xs.precursor_lambda[j] /
-                                    (1.0 + eff_dt * xs.precursor_lambda[j]);
+                const double coeff =
+                    precursor.emission_spectrum[g] *
+                    precursor.decay_constant /
+                    (1.0 + eff_dt * precursor.decay_constant);
 
                 //==================== Delayed fission rate contributions
                 for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
                 {
                   if ((gprime >= gs_i) and (gprime <= gs_f))
                     infission_g += coeff * eff_dt *
-                                   xs.precursor_yield[j] *
+                                   precursor.fractional_yield *
                                    xs.nu_delayed_sigma_f[gprime] *
                                    phi_old_local[uk_map + gprime];
                 }//for gprime
@@ -186,16 +190,20 @@ void lbs::TransientSolver::
           if (fission_avail and apply_fixed_src and options.use_precursors)
           {
             const auto& J = max_precursors_per_material;
-            for (size_t j = 0; j < xs.num_precursors; ++j)
+            for (unsigned int j = 0; j < xs.num_precursors; ++j)
             {
               const size_t dof_map = cell.local_id * J + j;
+              const auto& precursor = xs.precursors[j];
 
-              const double coeff = xs.chi_delayed[g][j]*xs.precursor_lambda[j] /
-                             (1.0 + eff_dt * xs.precursor_lambda[j]);
+              const double coeff =
+                  precursor.emission_spectrum[g] *
+                  precursor.decay_constant /
+                  (1.0 + eff_dt * precursor.decay_constant);
 
               infission_g += coeff * precursor_prev_local[dof_map];
             }//for precursors
           }//if fission_avail and apply_wgs_fission_src
+
           destination_q[uk_map + g] += infission_g;
 
         }//for g
