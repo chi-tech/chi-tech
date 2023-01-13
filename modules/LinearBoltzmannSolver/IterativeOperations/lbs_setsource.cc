@@ -120,9 +120,9 @@ void lbs::SteadySolver::
                                  phi_old_local[uk_map + gprime];
 
                   //Delayed fission
-                  for (size_t j = 0; j < xs.num_precursors; ++j)
-                    infission_g += xs.chi_delayed[g][j] *
-                                   xs.precursor_yield[j] *
+                  for (const auto& precursor : xs.precursors)
+                    infission_g += precursor.emission_spectrum[g] *
+                                   precursor.fractional_yield *
                                    xs.nu_delayed_sigma_f[gprime] *
                                    phi_old_local[uk_map + gprime];
                 }
@@ -150,9 +150,9 @@ void lbs::SteadySolver::
                                  phi_old_local[uk_map + gprime];
 
                   //Delayed fission
-                  for (size_t j = 0; j < xs.num_precursors; ++j)
-                    infission_g += xs.chi_delayed[g][j] *
-                                   xs.precursor_yield[j] *
+                  for (const auto& precursor : xs.precursors)
+                    infission_g += precursor.emission_spectrum[g] *
+                                   precursor.fractional_yield *
                                    xs.nu_delayed_sigma_f[gprime] *
                                    phi_old_local[uk_map + gprime];
                 }

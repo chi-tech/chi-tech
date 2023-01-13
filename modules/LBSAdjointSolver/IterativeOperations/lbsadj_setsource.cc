@@ -59,91 +59,90 @@ void lbs_adjoint::AdjointSolver::
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
           double inscatter_g = 0.0;
-          const bool moment_avail = (ell < S.size());
+          const bool moment_avail = ell < S.size();
 
           //====================== Apply across-groupset scattering
-          if (moment_avail and apply_ags_scatter_src)
+          if (moment_avail && apply_ags_scatter_src)
             for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
-              if ((gprime < gs_i) or (gprime > gs_f))
+              if ((gprime < gs_i) || (gprime > gs_f))
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
 
           //====================== Apply within-groupset scattering
-          if (moment_avail and apply_wgs_scatter_src)
+          if (moment_avail && apply_wgs_scatter_src)
             for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
-              if ((gprime >= gs_i) and (gprime <= gs_f))
+              if ((gprime >= gs_i) && (gprime <= gs_f))
                 inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
 
           destination_q[uk_map + g] += inscatter_g;
 
 
           double infission_g = 0.0;
-          const bool fission_avail = (xs.is_fissionable and ell == 0);
+          const bool fission_avail = (xs.is_fissionable && ell == 0);
 
           //====================== Apply accross-groupset fission
-          if (fission_avail and apply_ags_fission_src)
+          if (fission_avail && apply_ags_fission_src)
           {
             //=============== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
-              if ((gprime < gs_i) or (gprime > gs_f))
+              if ((gprime < gs_i) || (gprime > gs_f))
               {
                 //without delayed neutron precursors
-                if (not options.use_precursors)
+                if (!options.use_precursors)
                   infission_g += xs.chi[g] *
-                    xs.nu_sigma_f[gprime] *
-                    phi_old_local[uk_map + gprime];
+                                 xs.nu_sigma_f[gprime] *
+                                 phi_old_local[uk_map + gprime];
 
                 //with delayed neutron precursors
                 else
                 {
-                  //Prompt fission
                   infission_g += xs.chi_prompt[g] *
-                    xs.nu_prompt_sigma_f[gprime] *
-                    phi_old_local[uk_map + gprime];
+                                 xs.nu_prompt_sigma_f[gprime] *
+                                 phi_old_local[uk_map + gprime];
 
-                  //Delayed fission
-                  for (size_t j = 0; j < xs.num_precursors; ++j)
-                    infission_g += xs.chi_delayed[g][j] *
-                      xs.precursor_yield[j] *
-                      xs.nu_delayed_sigma_f[gprime] *
-                      phi_old_local[uk_map + gprime];
+                  for (const auto& precursor : xs.precursors)
+                    infission_g += precursor.emission_spectrum[g] *
+                                   precursor.fractional_yield *
+                                   xs.nu_delayed_sigma_f[gprime] *
+                                   phi_old_local[uk_map + gprime];
                 }
               }
             }//for gprime
           }//if zeroth moment
 
           //====================== Apply within-groupset fission
-          if (fission_avail and apply_wgs_fission_src)
+          if (fission_avail && apply_wgs_fission_src)
           {
             //=============== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
             {
-              if ((gprime >= gs_i) and (gprime <= gs_f))
+              if ((gprime >= gs_i) && (gprime <= gs_f))
               {
                 //without delayed neutron precursors
-                if (not options.use_precursors)
+                if (!options.use_precursors)
                   infission_g += xs.chi[g] *
-                    xs.nu_sigma_f[gprime] *
-                    phi_old_local[uk_map + gprime];
+                                 xs.nu_sigma_f[gprime] *
+                                 phi_old_local[uk_map + gprime];
 
                 //with delayed neutron precursors
                 else
                 {
                   //Prompt fission
                   infission_g += xs.chi_prompt[g] *
-                    xs.nu_prompt_sigma_f[gprime] *
-                    phi_old_local[uk_map + gprime];
+                                 xs.nu_prompt_sigma_f[gprime] *
+                                 phi_old_local[uk_map + gprime];
 
                   //Delayed fission
-                  for (size_t j = 0; j < xs.num_precursors; ++j)
-                    infission_g += xs.chi_delayed[g][j] *
-                      xs.precursor_yield[j] *
-                      xs.nu_delayed_sigma_f[gprime] *
-                      phi_old_local[uk_map + gprime];
+                  for (const auto& precursor : xs.precursors)
+                    infission_g += precursor.emission_spectrum[g] *
+                                   precursor.fractional_yield *
+                                   xs.nu_delayed_sigma_f[gprime] *
+                                   phi_old_local[uk_map + gprime];
                 }
               }
             }
           }
+
           destination_q[uk_map + g] += infission_g;
 
         }//for g
