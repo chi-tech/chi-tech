@@ -99,7 +99,7 @@ chiVolumeMesherExecute()
 \endcode
 
 
-\return A handle to the newly created UnpartitionedMesh*/
+\return Handle A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromVTU(lua_State* L)
 {
   const std::string func_name = __FUNCTION__;
@@ -158,7 +158,7 @@ chiSurfaceMesherExecute()
 chiVolumeMesherExecute()
 \endcode
 
-\return A handle to the newly created UnpartitionedMesh*/
+\return Handle A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromEnsightGold(lua_State* L)
 {
   const std::string func_name = __FUNCTION__;
@@ -214,7 +214,7 @@ chiSurfaceMesherExecute()
 chiVolumeMesherExecute()
 \endcode
 
-\return A handle to the newly created UnpartitionedMesh*/
+\return Handle A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromWavefrontOBJ(lua_State* L)
 {
   const std::string func_name = __FUNCTION__;
@@ -268,7 +268,7 @@ chiVolumeMesherExecute()
 \endcode
 
 
-\return A handle to the newly created UnpartitionedMesh*/
+\return Handle A handle to the newly created UnpartitionedMesh*/
 int chiUnpartitionedMeshFromMshFormat(lua_State* L)
 {
   const std::string func_name = __FUNCTION__;

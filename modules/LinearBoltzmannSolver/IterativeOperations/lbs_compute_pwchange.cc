@@ -43,14 +43,6 @@ double lbs::SteadySolver::ComputePiecewiseChange(LBSGroupset& groupset)
     }//for i
   }//for c
 
-// Old PDT code:
-//  const real8 abs_phi_0 = fabs(phi_0);
-//  const real8 abs_old_phi_0 = fabs(old_phi_0);
-//  const real8 maxv = std::max(abs_phi_0, abs_old_phi_0);
-//  const real8 diff = fabs(phi - old_phi);
-//  const real8 pw_change = (maxv >= std::numeric_limits<real8>::min()) ?
-//                          (diff / maxv) : diff;
-
   double global_pw_change = 0.0;
 
   MPI_Allreduce(&pw_change,&global_pw_change,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);

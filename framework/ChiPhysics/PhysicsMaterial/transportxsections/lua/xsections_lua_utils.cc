@@ -11,21 +11,23 @@
 ;
 
 //###################################################################
-/**Creates a stand-alone transport cross-section.
+/**Creates a stand-alone transport cross section.
  *
  *
 
 
 \code
-xs_grph_clean = chiPhysicsTransportXSCreate()
-chiPhysicsTransportXSSet(xs_grph_clean,PDT_XSFILE,"xs_graphite_pure_116.data")
+xs_graphite_clean = chiPhysicsTransportXSCreate()
+chiPhysicsTransportXSSet(xs_grph_clean,
+                         CHI_XSFILE,
+                         "test/xs_graphite_pure.cxs")
 
 chiPhysicsMaterialSetProperty(materials[2],
-                                    TRANSPORT_XSECTIONS,
-                                    EXISTING,
-                                    xs_grph_clean)
+                              TRANSPORT_XSECTIONS,
+                              EXISTING,
+                              xs_graphite_clean)
 \endcode
- * \return Returns a handle to the cross-section.
+ * \return Returns a handle to the cross section.
  *
 \ingroup LuaTransportXSs
  */
@@ -42,9 +44,9 @@ int chiPhysicsTransportXSCreate(lua_State* L)
 }
 
 //###################################################################
-/**Sets the properties of a transport cross-section.
+/**Sets the properties of a transport cross section.
 
- \param XS_handle int Handle to the cross-section to be modified.
+ \param XS_handle int Handle to the cross section to be modified.
  \param OperationIndex int Method used for setting the xs property.
  \param Information varying Varying information depending on the operation.
 
@@ -57,8 +59,8 @@ information. As a simple example consider the case where the user would like
 to set a single constant thermal conductivity. This can be achieved with \n
 FROM_ARRAY\n
 Sets a property based on a Lua array indexed from 1 to N. Internally
-will be converted to 0 to N-1. This method can be used to set mutligroup
-cross-sections or sources.
+will be converted to 0 to N-1. This method can be used to set mutli-group
+cross sections or sources.
 \n
 SIMPLEXS0\n
 Makes a simple material with no transfer matrix just \f$\sigma_t \f$. Expects two
@@ -79,17 +81,8 @@ values: \n
 
 ####_
 
-PDT_XSFILE\n
-Loads transport cross-sections from PDT type cross-section files. Expects
-to be followed by a filepath specifying the xs-file. By default this routine
-will attempt to build a transfer matrix from reaction type MT 2501, however,
-an additional text field can be supplied specifying the transfer matrix to
- use.
-
-####_
-
 CHI_XSFILE\n
-Loads transport cross-sections from CHI type cross-section files. Expects
+Loads transport cross sections from CHI type cross section files. Expects
 to be followed by a filepath specifying the xs-file.
 
 
@@ -103,7 +96,7 @@ chiPhysicsTransportXSSet(graphite,"xs_3_170.data","2518")
  *
  *
 \ingroup LuaTransportXSs
- * \return */
+*/
 int chiPhysicsTransportXSSet(lua_State* L)
 {
   int num_args = lua_gettop(L);
@@ -126,7 +119,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to chiPhysicsTransportXSSet."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -155,19 +148,6 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     xs->MakeSimple1(G,sigma_t,c);
   }
-  else if (operation_index == static_cast<int>(OpType::PDT_XSFILE))
-  {
-    if (!((num_args>=3) && (num_args<=4)))
-      LuaPostArgAmountError("chiPhysicsTransportXSSet",3,num_args);
-
-    const char* file_name_c = lua_tostring(L,3);
-    std::string MT_TRANSFER("2501");
-
-    if (num_args == 4)
-      MT_TRANSFER = std::string(lua_tostring(L,4));
-
-    xs->MakeFromPDTxsFile(std::string(file_name_c),MT_TRANSFER);
-  }
   else if (operation_index == static_cast<int>(OpType::CHI_XSFILE))
   {
     if (num_args != 3)
@@ -175,7 +155,7 @@ int chiPhysicsTransportXSSet(lua_State* L)
 
     const char* file_name_c = lua_tostring(L,3);
 
-    xs->MakeFromCHIxsFile(std::string(file_name_c));
+    xs->MakeFromChiXSFile(std::string(file_name_c));
   }
   else
   {
@@ -189,9 +169,9 @@ int chiPhysicsTransportXSSet(lua_State* L)
 }
 
 //###################################################################
-/**Obtains a lua table of all the cross-section values.
+/**Obtains a lua table of all the cross section values.
 
- \param XS_handle int Handle to the cross-section to be modified.
+ \param XS_handle int Handle to the cross section to be modified.
 
  ## _
 
@@ -223,7 +203,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -235,7 +215,7 @@ int chiPhysicsTransportXSGet(lua_State* L)
 }
 
 //###################################################################
-/**Makes a combined cross-section from multiple other cross-sections.
+/**Makes a combined cross section from multiple other cross sections.
 
  \param Combinations table A lua-table with each element another table
                            containing a handle to an existing xs and a
@@ -250,22 +230,22 @@ xs_1 = chiPhysicsTransportXSCreate()
 xs_2 = chiPhysicsTransportXSCreate()
 xs_3 = chiPhysicsTransportXSCreate()
 
-chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
-chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
-chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
+chiPhysicsTransportXSSet(xs_1,CHI_XSFILE,"test/xs_graphite_pure.cxs")
+chiPhysicsTransportXSSet(xs_2,CHI_XSFILE,"test/xs_3_170.cxs")
+chiPhysicsTransportXSSet(xs_3,CHI_XSFILE,"test/xs_air50RH.cxs")
 
 combo ={{xs_1, 0.5e5},
         {xs_2, 0.4e3},
         {xs_3, 0.3e2}}
 aerated_graphite = chiPhysicsTransportXSMakeCombined(combo)
 
-
 chiPhysicsMaterialSetProperty(materials[1],
                               TRANSPORT_XSECTIONS,
-                              EXISTING,aerated_graphite)
+                              EXISTING,
+                              aerated_graphite)
 \endcode
 
- \return Returns a handle to another cross-section object that contains the
+ \return Returns a handle to another cross section object that contains the
          desired combination.
 
 \ingroup LuaTransportXSs
@@ -326,7 +306,7 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
     chi::log.Log() << "  Element handle: " << elem.first
                        << " scalar value: " << elem.second;
 
-  //======================================== Make the new cross-section
+  //======================================== Make the new cross section
   auto new_xs = std::make_shared<chi_physics::TransportCrossSections>();
 
   new_xs->MakeCombined(combinations);
@@ -339,10 +319,10 @@ int chiPhysicsTransportXSMakeCombined(lua_State* L)
 }
 
 //###################################################################
-/**Sets a combined cross-section from multiple other cross-sections. This
- function can be called multiple times on the same cross-section handle.
+/**Sets a combined cross section from multiple other cross sections. This
+ function can be called multiple times on the same cross section handle.
 
- \param XS_handle int Handle to the cross-section to be modified.
+ \param XS_handle int Handle to the cross section to be modified.
  \param Combinations table A lua-table with each element another table
                            containing a handle to an existing xs and a
                            scalar multiplier.
@@ -356,16 +336,16 @@ xs_1 = chiPhysicsTransportXSCreate()
 xs_2 = chiPhysicsTransportXSCreate()
 xs_3 = chiPhysicsTransportXSCreate()
 
-chiPhysicsTransportXSSet(xs_1,PDT_XSFILE,"CHI_TEST/xs_graphite_pure.data")
-chiPhysicsTransportXSSet(xs_2,PDT_XSFILE,"CHI_TEST/xs_3_170.data")
-chiPhysicsTransportXSSet(xs_3,PDT_XSFILE,"CHI_TEST/xs_air50RH.data")
+chiPhysicsTransportXSSet(xs_1,CHI_XSFILE,"test/xs_graphite_pure.cxs")
+chiPhysicsTransportXSSet(xs_2,CHI_XSFILE,"test/xs_3_170.cxs")
+chiPhysicsTransportXSSet(xs_3,CHI_XSFILE,"test/xs_air50RH.cxs")
 
 combo ={{xs_1, 0.5e5},
         {xs_2, 0.4e3},
         {xs_3, 0.3e2}}
-xs_4 = chiPhysicsTransportXSCreate()
-chiPhysicsTransportXSSetCombined(xs_4,combo)
+aerated_graphite = chiPhysicsTransportXSMakeCombined(combo)
 
+chiPhysicsTransportXSSetCombined(aerated_graphite,combo)
 \endcode
  *
 \ingroup LuaTransportXSs
@@ -393,7 +373,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -449,7 +429,7 @@ int chiPhysicsTransportXSSetCombined(lua_State* L)
 //###################################################################
 /** Exports a cross section to ChiTech format.
  *
-\param XS_handle int Handle to the cross-section to be exported.
+\param XS_handle int Handle to the cross section to be exported.
 \param file_name string The name of the file to which the XS is to be exported.
 
 \ingroup LuaTransportXSs
@@ -473,7 +453,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
   }
   catch(const std::out_of_range& o){
     chi::log.LogAllError()
-      << "ERROR: Invalid cross-section handle"
+      << "ERROR: Invalid cross section handle"
       << " in call to " << __FUNCTION__ << "."
       << std::endl;
     chi::Exit(EXIT_FAILURE);
@@ -481,7 +461,7 @@ int chiPhysicsTransportXSExportToChiTechFormat(lua_State* L)
 
   std::string file_name = lua_tostring(L,2);
 
-  xs->ExportToChiFormat(file_name);
+  xs->ExportToChiXSFile(file_name);
 
   return 0;
 }

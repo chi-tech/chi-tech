@@ -7,9 +7,9 @@
 #include <iostream>
 
 //###################################################################
-/**Exports the cross-section information to ChiTech format.*/
+/**Exports the cross section information to ChiTech format.*/
 void chi_physics::TransportCrossSections::
-  ExportToChiFormat(const std::string &file_name)
+  ExportToChiXSFile(const std::string &file_name)
 {
   chi::log.Log() << "Exporting transport cross section to file: " << file_name;
 
@@ -130,6 +130,6 @@ void chi_physics::TransportCrossSections::
 
   ofile.close();
 
-  chi::log.LogAllVerbose1() << "Done exporting transport "
-                                 "cross section to file: " << file_name;
+  chi::log.Log0Verbose1() << "Done exporting transport "
+                             "cross section to file: " << file_name;
 }

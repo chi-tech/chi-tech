@@ -46,7 +46,7 @@ ComputeDiffusionParameters()
     if (sig_1 >= sigma_t[g])
     {
       sig_1 = 0.0;
-      chi::log.LogAllWarning()
+      chi::log.Log0Warning()
           << "Transport corrected diffusion coefficient failed for group "
           << g << " in call to " << __FUNCTION__ << ". "
           << "sigma_t=" << sigma_t[g] << " sigs_g_(m=1)=" << sig_1
@@ -75,7 +75,7 @@ ComputeDiffusionParameters()
     }
 
     //============================================================
-    // Compute removal cross-section
+    // Compute removal cross section
     //============================================================
 
     sigma_removal[g] = std::max(0.0, sigma_t[g] - sigma_s_gtog[g]);
