@@ -243,21 +243,33 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
 #
 run_test(
     file_name="CFEM_Diffusion/Diffusion_2D_1a_linear",
-    comment="2D Diffusion Test with linear solution",
+    comment="2D Diffusion with linear solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
 
 run_test(
     file_name="CFEM_Diffusion/Diffusion_2D_2a_DirBCs",
-    comment="2D Diffusion Test with Dirichlet BC",
+    comment="2D Diffusion with Dirichlet BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.295902, 1.0e-10]])
 
 run_test(
     file_name="CFEM_Diffusion/Diffusion_2D_2b_RobinBCs",
-    comment="2D Diffusion Test with Robin BC",
+    comment="2D Diffusion with Robin BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.241751, 1.0e-10]])
+
+run_test(
+    file_name="CFEM_Diffusion/Diffusion_2D_3a_analytical_coef",
+    comment="2D Diffusion with Analytical Coefficients",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Max-value=", 0.021921, 1.0e-10]])
+
+run_test(
+    file_name="CFEM_Diffusion/Diffusion_2D_3b_analytical_coef2",
+    comment="2D Diffusion with Manufactured Solution",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Max-value=", 1.000244, 1.0e-10]])
 
 #1
 run_test(
