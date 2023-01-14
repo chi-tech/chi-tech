@@ -48,7 +48,7 @@ def format3(number):
 
 
 def format_filename(filename):
-    return "{:38s}".format(filename)
+    return "{:38s}".format(filename[:38])
 
 # Numerical comparison:
 #search[0] = "NumCompare"
@@ -252,6 +252,12 @@ run_test(
     comment="2D Diffusion Test with Dirichlet BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.295902, 1.0e-10]])
+
+run_test(
+    file_name="CFEM_Diffusion/Diffusion_2D_2b_RobinBCs",
+    comment="2D Diffusion Test with Robin BC",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Avg-value=", 0.241751, 1.0e-10]])
 
 #1
 run_test(
