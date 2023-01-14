@@ -47,8 +47,6 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,w_vol,w_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
---chiMeshHandlerExportMeshToVTK("Mesh")
-
 --############################################### Add material properties
 --#### CFEM solver
 phys1 = chiCFEMDiffusionSolverCreate()

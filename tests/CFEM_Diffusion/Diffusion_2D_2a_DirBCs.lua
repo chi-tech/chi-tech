@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
  
 mesh={}
-N=100
+N=40
 L=2
 xmin = -L/2
 dx = L/N
@@ -65,6 +65,27 @@ chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"dirichlet",0.0)
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-----############################################### Visualize the field function
+--############################################### Get field functions
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_Dirichlet","flux")
+
+--############################################### Export VTU
+if (master_export == nil) then
+    chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_Dirichlet","flux")
+end
+
+--############################################### Volume integrations
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+
+ffvol = chiFFInterpolationCreate(VOLUME)
+chiFFInterpolationSetProperty(ffvol,OPERATION,OP_AVG)
+chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(ffvol)
+chiFFInterpolationExecute(ffvol)
+maxval = chiFFInterpolationGetValue(ffvol)
+
+chiLog(LOG_0,string.format("Avg-value=%.6f", maxval))
+
+
+

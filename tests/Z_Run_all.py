@@ -48,7 +48,7 @@ def format3(number):
 
 
 def format_filename(filename):
-    return "{:35s}".format(filename)
+    return "{:38s}".format(filename)
 
 # Numerical comparison:
 #search[0] = "NumCompare"
@@ -177,18 +177,18 @@ def parse_output(out, search_strings_vals_tols):
 
     return test_passed
 
-def run_test_tacc(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = format_filename(dir_name+file_name) + " " + comment + " " \
+def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
+    test_name = format_filename(file_name) + " " + comment + " " \
                 + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
-    with open(f"tests/{dir_name+file_name}.job", 'w') as job_file:
+    with open(f"tests/{file_name}.job", 'w') as job_file:
         job_file.write(textwrap.dedent(f"""
             #!/usr/bin/bash
             #
-            #SBATCH -J {dir_name+file_name} # Job name
-            #SBATCH -o tests/{dir_name+file_name}.o # output file
-            #SBATCH -e tests/{dir_name+file_name}.e # error file
+            #SBATCH -J {file_name} # Job name
+            #SBATCH -o tests/{file_name}.o # output file
+            #SBATCH -e tests/{file_name}.e # error file
             #SBATCH -p skx-normal # Queue (partition) name
             #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
             #SBATCH -n {num_procs} # Total # of mpi tasks
@@ -197,11 +197,11 @@ def run_test_tacc(dir_name, file_name, comment, num_procs, search_strings_vals_t
 
             export I_MPI_SHM=disable
 
-            ibrun {kpath_to_exe} tests/{dir_name+file_name}.lua master_export=false
+            ibrun {kpath_to_exe} tests/{file_name}.lua master_export=false
             """
         ).strip())
-    os.system(f"sbatch -W tests/{dir_name+file_name}.job > /dev/null")  # -W means wait for job to finish
-    with open(f"tests/{dir_name+file_name}.o", 'r') as outfile:
+    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")  # -W means wait for job to finish
+    with open(f"tests/{file_name}.o", 'r') as outfile:
         out = outfile.read()
 
     passed = parse_output(out, search_strings_vals_tols)
@@ -211,15 +211,15 @@ def run_test_tacc(dir_name, file_name, comment, num_procs, search_strings_vals_t
         os.system(f"rm tests/{file_name}.job tests/{file_name}.o tests/{file_name}.e")
 
 
-def run_test_local(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = format_filename(dir_name+file_name) \
-                + " - " + comment + " - " \
+def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
+    test_name = format_filename(file_name) \
+                + " - " + format_filename(comment) + " - " \
                 + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
 
     process = subprocess.Popen([mpiexec, "-np", str(num_procs), kpath_to_exe,
-                                "tests/" + dir_name + file_name + ".lua", "master_export=false"],
+                                "tests/" + file_name + ".lua", "master_export=false"],
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
                                universal_newlines=True)
@@ -229,28 +229,32 @@ def run_test_local(dir_name, file_name, comment, num_procs, search_strings_vals_
     parse_output(out, search_strings_vals_tols)
 
 
-def run_test(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
+def run_test(file_name, comment, num_procs, search_strings_vals_tols):
     global test_number
     test_number += 1
     if ((tests_to_run) and (test_number in tests_to_run)) or (not tests_to_run):
         if tacc:
-            run_test_tacc(dir_name, file_name, comment, num_procs, search_strings_vals_tols)
+            run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols)
         else:
-            run_test_local(dir_name, file_name, comment, num_procs, search_strings_vals_tols)
+            run_test_local(file_name, comment, num_procs, search_strings_vals_tols)
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
 #
 run_test(
-    dir_name="CFEM_Diffusion/",
-    file_name="Diffusion_2D_1a_linear",
+    file_name="CFEM_Diffusion/Diffusion_2D_1a_linear",
     comment="2D Diffusion Test with linear solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
 
+run_test(
+    file_name="CFEM_Diffusion/Diffusion_2D_2a_DirBCs",
+    comment="2D Diffusion Test with Dirichlet BC",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Avg-value=", 0.295902, 1.0e-10]])
+
 #1
 run_test(
-    dir_name="",
     file_name="Diffusion1D",
     comment="1D Diffusion Test - CFEM",
     num_procs=1,
@@ -259,7 +263,6 @@ sys.exit(123)
 
 #2
 run_test(
-    dir_name="",
     file_name="Diffusion1D_KBA",
     comment="1D Diffusion Test KBA partitioning - CFEM",
     num_procs=2,
@@ -267,7 +270,6 @@ run_test(
 
 #3
 run_test(
-    dir_name="",
     file_name="Diffusion1D_IP",
     comment="1D Diffusion Test - DFEM",
     num_procs=2,
@@ -275,7 +277,6 @@ run_test(
 
 #4
 run_test(
-    dir_name="",
     file_name="Diffusion2D_1Poly",
     comment="2D Diffusion Test - CFEM",
     num_procs=1,
@@ -283,7 +284,6 @@ run_test(
 
 #5
 run_test(
-    dir_name="",
     file_name="Diffusion2D_1Poly_IP",
     comment="2D Diffusion Test - DFEM",
     num_procs=4,
@@ -291,7 +291,6 @@ run_test(
 
 #6
 run_test(
-    dir_name="",
     file_name="Diffusion2D_2Unstructured",
     comment="2D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
@@ -299,7 +298,6 @@ run_test(
 
 #7
 run_test(
-    dir_name="",
     file_name="Diffusion2D_2Unstructured_IP",
     comment="2D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
@@ -307,7 +305,6 @@ run_test(
 
 #8
 run_test(
-    dir_name="",
     file_name="Diffusion3D_1Poly",
     comment="3D Diffusion Test - CFEM",
     num_procs=1,
@@ -315,7 +312,6 @@ run_test(
 
 #9
 run_test(
-    dir_name="",
     file_name="Diffusion3D_1Poly_IP",
     comment="3D Diffusion Test - DFEM",
     num_procs=4,
@@ -323,7 +319,6 @@ run_test(
 
 #10
 run_test(
-    dir_name="",
     file_name="Diffusion3D_2Ortho",
     comment="3D Diffusion Test Ortho Mesh - CFEM",
     num_procs=1,
@@ -331,7 +326,6 @@ run_test(
 
 #11
 run_test(
-    dir_name="",
     file_name="Diffusion3D_3Unstructured",
     comment="3D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
@@ -339,7 +333,6 @@ run_test(
 
 #12
 run_test(
-    dir_name="",
     file_name="Diffusion3D_3Unstructured_IP",
     comment="3D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
@@ -348,7 +341,6 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Transport cases
 #13
 run_test(
-    dir_name="",
     file_name="Transport1D_1",
     comment="1D LinearBSolver Test - PWLD",
     num_procs=3,
@@ -357,7 +349,6 @@ run_test(
 
 #14
 run_test(
-    dir_name="",
     file_name="Transport1D_3a_DSA_ortho",
     comment="1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -368,7 +359,6 @@ run_test(
 
 #15
 run_test(
-    dir_name="",
     file_name="Transport2D_1Poly",
     comment="2D LinearBSolver Test - PWLD",
     num_procs=4,
@@ -377,7 +367,6 @@ run_test(
 
 #16
 run_test(
-    dir_name="",
     file_name="Transport2D_2Unstructured",
     comment="2D LinearBSolver Test Unstructured grid - PWLD",
     num_procs=4,
@@ -386,7 +375,6 @@ run_test(
 
 #17
 run_test(
-    dir_name="",
     file_name="Transport2D_3Poly_quad_mod",
     comment="2D LinearBSolver Test Polar-Optimized quadrature - PWLD",
     num_procs=4,
@@ -395,7 +383,6 @@ run_test(
 
 #18
 run_test(
-    dir_name="",
     file_name="Transport2D_4a_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -406,7 +393,6 @@ run_test(
 
 #19
 run_test(
-    dir_name="",
     file_name="Transport2D_4b_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -417,7 +403,6 @@ run_test(
 
 #20
 run_test(
-    dir_name="",
     file_name="Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
     num_procs=4,
@@ -426,7 +411,6 @@ run_test(
 
 #21
 run_test(
-    dir_name="",
     file_name="Transport3D_1b_Ortho",
     comment="3D LinearBSolver Test - PWLD Reflecting BC",
     num_procs=4,
@@ -435,7 +419,6 @@ run_test(
 
 #22
 run_test(
-    dir_name="",
     file_name="Transport3D_1Poly_parmetis",
     comment="3D LinearBSolver Test Ortho Grid Parmetis - PWLD",
     num_procs=4,
@@ -445,7 +428,6 @@ run_test(
 #----------------------------------------------------
 #23
 run_test(
-    dir_name="",
     file_name="Transport3D_1Poly_qmom_part1",
     comment="3D LinearBSolver Test Source moment writing - PWLD",
     num_procs=4,
@@ -454,7 +436,6 @@ run_test(
 
 #24
 run_test(
-    dir_name="",
     file_name="Transport3D_1Poly_qmom_part2",
     comment="3D LinearBSolver Test Source moment reading - PWLD",
     num_procs=4,
@@ -464,7 +445,6 @@ run_test(
 #----------------------------------------------------
 #25
 run_test(
-    dir_name="",
     file_name="Transport3D_2Unstructured",
     comment="3D LinearBSolver Test Extruded Unstructured - PWLD",
     num_procs=4,
@@ -473,7 +453,6 @@ run_test(
 
 #26
 run_test(
-    dir_name="",
     file_name="Transport3D_3a_DSA_ortho",
     comment="3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -484,7 +463,6 @@ run_test(
 
 #27
 run_test(
-    dir_name="",
     file_name="Transport3D_4Cycles1",
     comment="3D LinearBSolver Test Extruded-Unstructured Mesh - PWLD",
     num_procs=4,
@@ -493,7 +471,6 @@ run_test(
 
 #28
 run_test(
-    dir_name="",
     file_name="Transport3D_5Cycles2",
     comment="3D LinearBSolver Test STAR-CCM+ mesh - PWLD",
     num_procs=4,
@@ -502,7 +479,6 @@ run_test(
 
 #29
 run_test(
-    dir_name="",
     file_name="KEigenvalueTransport1D_1G",
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
@@ -510,7 +486,6 @@ run_test(
 
 #30
 run_test(
-    dir_name="",
     file_name="Transport2DCyl_1Monoenergetic",
     comment="2D LinearBSolver Cylindrical Test mono-energetic - PWLD",
     num_procs=4,
@@ -518,7 +493,6 @@ run_test(
 
 #31
 run_test(
-    dir_name="",
     file_name="Transport2DCyl_2Multigroup",
     comment="2D LinearBSolver Cylindrical Test multi-group - PWLD",
     num_procs=4,
@@ -528,7 +502,6 @@ run_test(
 #------------------------------------------------ Adjoints
 #32
 run_test(
-    dir_name="",
     file_name="Adjoint2D_1a_forward",
     comment="2D Transport test with localized material source FWD",
     num_procs=4,
@@ -536,7 +509,6 @@ run_test(
 
 #33
 run_test(
-    dir_name="",
     file_name="Adjoint2D_1b_adjoint",
     comment="2D Transport test with localized material source Adjoint generation",
     num_procs=4,
@@ -544,7 +516,6 @@ run_test(
 
 #34
 run_test(
-    dir_name="",
     file_name="Adjoint2D_1c_response",
     comment="2D Transport test with localized material source Adjoint inner product",
     num_procs=4,
@@ -553,7 +524,6 @@ run_test(
 
 #35
 run_test(
-    dir_name="",
     file_name="Adjoint2D_2a_forward",
     comment="2D Transport test with point source FWD",
     num_procs=4,
@@ -561,7 +531,6 @@ run_test(
 
 #36
 run_test(
-    dir_name="",
     file_name="Adjoint2D_2b_adjoint",
     comment="2D Transport test with point source Adjoint generation",
     num_procs=4,
@@ -569,7 +538,6 @@ run_test(
 
 #37
 run_test(
-    dir_name="",
     file_name="Adjoint2D_2c_response",
     comment="2D Transport test with point source Adjoint response",
     num_procs=4,
@@ -578,7 +546,6 @@ run_test(
 
 #38
 run_test(
-    dir_name="",
     file_name="Adjoint2D_3a_forward",
     comment="2D Transport test with point source Multigroup FWD",
     num_procs=4,
@@ -596,7 +563,6 @@ run_test(
 
 #39
 run_test(
-    dir_name="",
     file_name="Adjoint2D_3b_adjoint",
     comment="2D Transport test with point source Multigroup Adjoint generation",
     num_procs=4,
@@ -604,7 +570,6 @@ run_test(
 
 #40
 run_test(
-    dir_name="",
     file_name="Adjoint2D_3c_response",
     comment="2D Transport test with point source Multigroup Adjoint Response",
     num_procs=4,
