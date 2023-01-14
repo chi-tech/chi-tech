@@ -177,18 +177,18 @@ def parse_output(out, search_strings_vals_tols):
 
     return test_passed
 
-def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = format_filename(file_name) + " " + comment + " " \
+def run_test_tacc(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
+    test_name = format_filename(dir_name+file_name) + " " + comment + " " \
                 + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
-    with open(f"tests/{file_name}.job", 'w') as job_file:
+    with open(f"tests/{dir_name+file_name}.job", 'w') as job_file:
         job_file.write(textwrap.dedent(f"""
             #!/usr/bin/bash
             #
-            #SBATCH -J {file_name} # Job name
-            #SBATCH -o tests/{file_name}.o # output file
-            #SBATCH -e tests/{file_name}.e # error file
+            #SBATCH -J {dir_name+file_name} # Job name
+            #SBATCH -o tests/{dir_name+file_name}.o # output file
+            #SBATCH -e tests/{dir_name+file_name}.e # error file
             #SBATCH -p skx-normal # Queue (partition) name
             #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
             #SBATCH -n {num_procs} # Total # of mpi tasks
@@ -197,11 +197,11 @@ def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
 
             export I_MPI_SHM=disable
 
-            ibrun {kpath_to_exe} tests/{file_name}.lua master_export=false
+            ibrun {kpath_to_exe} tests/{dir_name+file_name}.lua master_export=false
             """
         ).strip())
-    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")  # -W means wait for job to finish
-    with open(f"tests/{file_name}.o", 'r') as outfile:
+    os.system(f"sbatch -W tests/{dir_name+file_name}.job > /dev/null")  # -W means wait for job to finish
+    with open(f"tests/{dir_name+file_name}.o", 'r') as outfile:
         out = outfile.read()
 
     passed = parse_output(out, search_strings_vals_tols)
@@ -211,14 +211,15 @@ def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
         os.system(f"rm tests/{file_name}.job tests/{file_name}.o tests/{file_name}.e")
 
 
-def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = format_filename(file_name) + " " + comment + " " \
+def run_test_local(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
+    test_name = format_filename(dir_name+file_name) \
+                + " - " + comment + " - " \
                 + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
 
     process = subprocess.Popen([mpiexec, "-np", str(num_procs), kpath_to_exe,
-                                "tests/" + file_name + ".lua", "master_export=false"],
+                                "tests/" + dir_name + file_name + ".lua", "master_export=false"],
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
                                universal_newlines=True)
@@ -228,17 +229,26 @@ def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
     parse_output(out, search_strings_vals_tols)
 
 
-def run_test(file_name, comment, num_procs, search_strings_vals_tols):
+def run_test(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
     global test_number
     test_number += 1
     if ((tests_to_run) and (test_number in tests_to_run)) or (not tests_to_run):
         if tacc:
-            run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols)
+            run_test_tacc(dir_name, file_name, comment, num_procs, search_strings_vals_tols)
         else:
-            run_test_local(file_name, comment, num_procs, search_strings_vals_tols)
+            run_test_local(dir_name, file_name, comment, num_procs, search_strings_vals_tols)
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
+#
+run_test(
+    dir_name="CFEM_Diffusion/",
+    file_name="CFEM_Diffusion_2D_1a_linear",
+    comment="2D CFEM Diffusion Test with linear solution",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
+sys.exit(123)
+
 #1
 run_test(
     file_name="Diffusion1D",
@@ -581,6 +591,6 @@ print("")
 print("************* End of Regression Test *************")
 print("")
 if num_failed == 0:
-    sys.exit(0);
+    sys.exit(0)
 else:
-    sys.exit(1); 
+    sys.exit(1)

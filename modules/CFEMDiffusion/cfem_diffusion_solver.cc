@@ -221,7 +221,7 @@ void cfem_diffusion::Solver::Execute()
         const auto& bval = bndry.values[1];
         const auto& fval = bndry.values[2];
 
-        chi::log << "Boundary  set as Robin with a,b,f = ("
+        chi::log.Log0Verbose1() << "Boundary  set as Robin with a,b,f = ("
                     << aval << ","
                     << bval << ","
                     << fval << ") ";

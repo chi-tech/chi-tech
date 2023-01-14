@@ -97,4 +97,4 @@ chiFFInterpolationInitialize(ffvol)
 chiFFInterpolationExecute(ffvol)
 maxval = chiFFInterpolationGetValue(ffvol)
 
-chiLog(LOG_0,string.format("Max-value=%.5f", maxval))
+chiLog(LOG_0,string.format("Max-value=%.6f", maxval))
