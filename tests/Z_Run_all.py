@@ -243,21 +243,23 @@ def run_test(dir_name, file_name, comment, num_procs, search_strings_vals_tols):
 #
 run_test(
     dir_name="CFEM_Diffusion/",
-    file_name="CFEM_Diffusion_2D_1a_linear",
-    comment="2D CFEM Diffusion Test with linear solution",
+    file_name="Diffusion_2D_1a_linear",
+    comment="2D Diffusion Test with linear solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
-sys.exit(123)
 
 #1
 run_test(
+    dir_name="",
     file_name="Diffusion1D",
     comment="1D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
+sys.exit(123)
 
 #2
 run_test(
+    dir_name="",
     file_name="Diffusion1D_KBA",
     comment="1D Diffusion Test KBA partitioning - CFEM",
     num_procs=2,
@@ -265,6 +267,7 @@ run_test(
 
 #3
 run_test(
+    dir_name="",
     file_name="Diffusion1D_IP",
     comment="1D Diffusion Test - DFEM",
     num_procs=2,
@@ -272,6 +275,7 @@ run_test(
 
 #4
 run_test(
+    dir_name="",
     file_name="Diffusion2D_1Poly",
     comment="2D Diffusion Test - CFEM",
     num_procs=1,
@@ -279,6 +283,7 @@ run_test(
 
 #5
 run_test(
+    dir_name="",
     file_name="Diffusion2D_1Poly_IP",
     comment="2D Diffusion Test - DFEM",
     num_procs=4,
@@ -286,6 +291,7 @@ run_test(
 
 #6
 run_test(
+    dir_name="",
     file_name="Diffusion2D_2Unstructured",
     comment="2D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
@@ -293,6 +299,7 @@ run_test(
 
 #7
 run_test(
+    dir_name="",
     file_name="Diffusion2D_2Unstructured_IP",
     comment="2D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
@@ -300,6 +307,7 @@ run_test(
 
 #8
 run_test(
+    dir_name="",
     file_name="Diffusion3D_1Poly",
     comment="3D Diffusion Test - CFEM",
     num_procs=1,
@@ -307,6 +315,7 @@ run_test(
 
 #9
 run_test(
+    dir_name="",
     file_name="Diffusion3D_1Poly_IP",
     comment="3D Diffusion Test - DFEM",
     num_procs=4,
@@ -314,6 +323,7 @@ run_test(
 
 #10
 run_test(
+    dir_name="",
     file_name="Diffusion3D_2Ortho",
     comment="3D Diffusion Test Ortho Mesh - CFEM",
     num_procs=1,
@@ -321,6 +331,7 @@ run_test(
 
 #11
 run_test(
+    dir_name="",
     file_name="Diffusion3D_3Unstructured",
     comment="3D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
@@ -328,6 +339,7 @@ run_test(
 
 #12
 run_test(
+    dir_name="",
     file_name="Diffusion3D_3Unstructured_IP",
     comment="3D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
@@ -336,6 +348,7 @@ run_test(
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Transport cases
 #13
 run_test(
+    dir_name="",
     file_name="Transport1D_1",
     comment="1D LinearBSolver Test - PWLD",
     num_procs=3,
@@ -344,6 +357,7 @@ run_test(
 
 #14
 run_test(
+    dir_name="",
     file_name="Transport1D_3a_DSA_ortho",
     comment="1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -354,6 +368,7 @@ run_test(
 
 #15
 run_test(
+    dir_name="",
     file_name="Transport2D_1Poly",
     comment="2D LinearBSolver Test - PWLD",
     num_procs=4,
@@ -362,6 +377,7 @@ run_test(
 
 #16
 run_test(
+    dir_name="",
     file_name="Transport2D_2Unstructured",
     comment="2D LinearBSolver Test Unstructured grid - PWLD",
     num_procs=4,
@@ -370,6 +386,7 @@ run_test(
 
 #17
 run_test(
+    dir_name="",
     file_name="Transport2D_3Poly_quad_mod",
     comment="2D LinearBSolver Test Polar-Optimized quadrature - PWLD",
     num_procs=4,
@@ -378,6 +395,7 @@ run_test(
 
 #18
 run_test(
+    dir_name="",
     file_name="Transport2D_4a_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -388,6 +406,7 @@ run_test(
 
 #19
 run_test(
+    dir_name="",
     file_name="Transport2D_4b_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -398,6 +417,7 @@ run_test(
 
 #20
 run_test(
+    dir_name="",
     file_name="Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
     num_procs=4,
@@ -406,6 +426,7 @@ run_test(
 
 #21
 run_test(
+    dir_name="",
     file_name="Transport3D_1b_Ortho",
     comment="3D LinearBSolver Test - PWLD Reflecting BC",
     num_procs=4,
@@ -414,6 +435,7 @@ run_test(
 
 #22
 run_test(
+    dir_name="",
     file_name="Transport3D_1Poly_parmetis",
     comment="3D LinearBSolver Test Ortho Grid Parmetis - PWLD",
     num_procs=4,
@@ -423,6 +445,7 @@ run_test(
 #----------------------------------------------------
 #23
 run_test(
+    dir_name="",
     file_name="Transport3D_1Poly_qmom_part1",
     comment="3D LinearBSolver Test Source moment writing - PWLD",
     num_procs=4,
@@ -431,6 +454,7 @@ run_test(
 
 #24
 run_test(
+    dir_name="",
     file_name="Transport3D_1Poly_qmom_part2",
     comment="3D LinearBSolver Test Source moment reading - PWLD",
     num_procs=4,
@@ -440,6 +464,7 @@ run_test(
 #----------------------------------------------------
 #25
 run_test(
+    dir_name="",
     file_name="Transport3D_2Unstructured",
     comment="3D LinearBSolver Test Extruded Unstructured - PWLD",
     num_procs=4,
@@ -448,6 +473,7 @@ run_test(
 
 #26
 run_test(
+    dir_name="",
     file_name="Transport3D_3a_DSA_ortho",
     comment="3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
@@ -458,6 +484,7 @@ run_test(
 
 #27
 run_test(
+    dir_name="",
     file_name="Transport3D_4Cycles1",
     comment="3D LinearBSolver Test Extruded-Unstructured Mesh - PWLD",
     num_procs=4,
@@ -466,6 +493,7 @@ run_test(
 
 #28
 run_test(
+    dir_name="",
     file_name="Transport3D_5Cycles2",
     comment="3D LinearBSolver Test STAR-CCM+ mesh - PWLD",
     num_procs=4,
@@ -474,6 +502,7 @@ run_test(
 
 #29
 run_test(
+    dir_name="",
     file_name="KEigenvalueTransport1D_1G",
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
@@ -481,6 +510,7 @@ run_test(
 
 #30
 run_test(
+    dir_name="",
     file_name="Transport2DCyl_1Monoenergetic",
     comment="2D LinearBSolver Cylindrical Test mono-energetic - PWLD",
     num_procs=4,
@@ -488,6 +518,7 @@ run_test(
 
 #31
 run_test(
+    dir_name="",
     file_name="Transport2DCyl_2Multigroup",
     comment="2D LinearBSolver Cylindrical Test multi-group - PWLD",
     num_procs=4,
@@ -497,6 +528,7 @@ run_test(
 #------------------------------------------------ Adjoints
 #32
 run_test(
+    dir_name="",
     file_name="Adjoint2D_1a_forward",
     comment="2D Transport test with localized material source FWD",
     num_procs=4,
@@ -504,6 +536,7 @@ run_test(
 
 #33
 run_test(
+    dir_name="",
     file_name="Adjoint2D_1b_adjoint",
     comment="2D Transport test with localized material source Adjoint generation",
     num_procs=4,
@@ -511,20 +544,16 @@ run_test(
 
 #34
 run_test(
+    dir_name="",
     file_name="Adjoint2D_1c_response",
     comment="2D Transport test with localized material source Adjoint inner product",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 1.38405e-05, 1.0e-08]])
 
 
-
-
-
-
-
-
 #35
 run_test(
+    dir_name="",
     file_name="Adjoint2D_2a_forward",
     comment="2D Transport test with point source FWD",
     num_procs=4,
@@ -532,6 +561,7 @@ run_test(
 
 #36
 run_test(
+    dir_name="",
     file_name="Adjoint2D_2b_adjoint",
     comment="2D Transport test with point source Adjoint generation",
     num_procs=4,
@@ -539,18 +569,16 @@ run_test(
 
 #37
 run_test(
+    dir_name="",
     file_name="Adjoint2D_2c_response",
     comment="2D Transport test with point source Adjoint response",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 2.90543e-05, 1.0e-08]])
 
 
-
-
-
-
 #38
 run_test(
+    dir_name="",
     file_name="Adjoint2D_3a_forward",
     comment="2D Transport test with point source Multigroup FWD",
     num_procs=4,
@@ -568,6 +596,7 @@ run_test(
 
 #39
 run_test(
+    dir_name="",
     file_name="Adjoint2D_3b_adjoint",
     comment="2D Transport test with point source Multigroup Adjoint generation",
     num_procs=4,
@@ -575,6 +604,7 @@ run_test(
 
 #40
 run_test(
+    dir_name="",
     file_name="Adjoint2D_3c_response",
     comment="2D Transport test with point source Multigroup Adjoint Response",
     num_procs=4,
