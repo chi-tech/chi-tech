@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
  
 mesh={}
-N=20
+N=100
 L=2
 xmin = -L/2
 dx = L/N
@@ -17,17 +17,15 @@ chiVolumeMesherExecute();
 --############################################### Set Material IDs
 chiVolumeMesherSetMatIDToAll(0)
 
-D = {1.0}
-Q = {0.0}
-XSa = {0.0}
+
 function D_coef(i,x,y,z)
-    return D[i+1]
+    return 3.0 + x + y
 end
 function Q_ext(i,x,y,z)
-    return Q[i+1]
+    return x*x
 end
 function Sigma_a(i,x,y,z)
-    return XSa[i+1]
+    return x*y*y
 end
 
 -- Setboundary IDs
@@ -50,19 +48,36 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 --chiMeshHandlerExportMeshToVTK("Mesh")
 
 --############################################### Add material properties
---#### DFEM stuff
-phys1 = chiDFEMDiffusionSolverCreate()
+--#### CFEM solver
+phys1 = chiCFEMDiffusionSolverCreate()
 
-chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
-
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"robin", 0.25, 0.5, 0.0)
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin", 0.25, 0.5, 1.0)
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"dirichlet",0.0)
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"dirichlet",0.0)
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"dirichlet",0.0)
+chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"dirichlet",0.0)
 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-----############################################### Visualize the field function
+--############################################### Get field functions
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"square_linear","Flux_Diff")
+
+--############################################### Export VTU
+if (master_export == nil) then
+    chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_analytic_coef","flux")
+end
+
+--############################################### Volume integrations
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+
+ffvol = chiFFInterpolationCreate(VOLUME)
+chiFFInterpolationSetProperty(ffvol,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(ffvol)
+chiFFInterpolationExecute(ffvol)
+maxval = chiFFInterpolationGetValue(ffvol)
+
+chiLog(LOG_0,string.format("Max-value=%.6f", maxval))
+

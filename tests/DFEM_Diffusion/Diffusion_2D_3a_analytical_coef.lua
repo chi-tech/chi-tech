@@ -15,23 +15,17 @@ chiMeshCreateUnpartitioned2DOrthoMesh(mesh,mesh)
 chiVolumeMesherExecute();
  
 --############################################### Set Material IDs
-vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol0,0)
+chiVolumeMesherSetMatIDToAll(0)
 
-vol1 = chiLogicalVolumeCreate(RPP,-0.5,0.5,-0.5,0.5,-1000,1000)
-chiVolumeMesherSetProperty(MATID_FROMLOGICAL,vol1,1)
 
-D = {1.0,5.0}
-Q = {0.0,1.0}
-XSa = {1.0,1.0}
 function D_coef(i,x,y,z)
-    return D[i+1] -- + x
+    return 3.0 + x + y
 end
 function Q_ext(i,x,y,z)
-    return Q[i+1] -- x*x
+    return x*x
 end
 function Sigma_a(i,x,y,z)
-    return XSa[i+1]
+    return x*y*y
 end
 
 -- Setboundary IDs
@@ -52,19 +46,37 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
 --############################################### Add material properties
---#### DFEM stuff
+--#### DFEM solver
 phys1 = chiDFEMDiffusionSolverCreate()
 
-chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
-
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"robin", 0.25, 0.5, 0.0)
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"reflecting")
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"reflecting")
-chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin", 0.25, 0.5, 0.0)
+chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"dirichlet",0.0)
+chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"dirichlet",0.0)
+chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"dirichlet",0.0)
+chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"dirichlet",0.0)
 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-----############################################### Visualize the field function
+--############################################### Get field functions
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"square_robin_refl","Flux_Diff")
+
+--############################################### Export VTU
+if (master_export == nil) then
+    chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_analytic_coef","flux")
+end
+
+--############################################### Volume integrations
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+
+ffvol = chiFFInterpolationCreate(VOLUME)
+chiFFInterpolationSetProperty(ffvol,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(ffvol)
+chiFFInterpolationExecute(ffvol)
+maxval = chiFFInterpolationGetValue(ffvol)
+
+chiLog(LOG_0,string.format("Max-value=%.6f", maxval))
+
+

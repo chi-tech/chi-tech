@@ -2,6 +2,12 @@
 
 #include "DFEMDiffusion/dfem_diffusion_solver.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
+//#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+//#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+//#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -61,6 +67,26 @@ namespace chi_unit_sim_tests
         local_error += std::pow(phi_true - phi_fem,2.0) * qp_data.JxW(qp);
       }
     }//for cell
+
+    // add FF
+    auto stl_vector = new std::vector<double> ();
+    sdm.LocalizePETScVector(solver.x, *stl_vector, OneDofPerNode);
+    auto unk_man = OneDofPerNode;
+    auto ff =
+      std::make_shared<chi_physics::FieldFunction>(
+        std::string("phi"),   //Text name
+        solver.sdm_ptr,       //Spatial Discretization
+        stl_vector,               //Data vector
+//        &solver.x,               //Data vector
+        unk_man);             //Unknown Manager
+
+    chi::fieldfunc_stack.push_back(ff);
+
+    // pops the handle, sets the global variable (handles are numbered from 0, hence -1)
+    lua_Integer handle = static_cast<lua_Integer>(chi::fieldfunc_stack.size()-1);
+    lua_pushinteger(L, handle);
+    lua_setglobal(L, "simtest_IP_MMS_L2_handle");
+
 
     double global_error = 0.0;
     MPI_Allreduce(&local_error,     //sendbuf
