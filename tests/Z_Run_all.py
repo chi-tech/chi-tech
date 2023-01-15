@@ -241,6 +241,7 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
 #
+### CFEM diffusion tests
 run_test(
     file_name="CFEM_Diffusion/Diffusion_2D_1a_linear",
     comment="2D Diffusion with linear solution",
@@ -271,12 +272,44 @@ run_test(
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 1.000244, 1.0e-10]])
 
+### DFEM diffusion tests
+run_test(
+    file_name="DFEM_Diffusion/Diffusion_2D_1a_linear",
+    comment="2D Diffusion with linear solution",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
+
+run_test(
+    file_name="DFEM_Diffusion/Diffusion_2D_2a_DirBCs",
+    comment="2D Diffusion with Dirichlet BC",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Avg-value=", 0.295892, 1.0e-10]])
+
+run_test(
+    file_name="DFEM_Diffusion/Diffusion_2D_2b_RobinBCs",
+    comment="2D Diffusion with Robin BC",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Avg-value=", 0.241757, 1.0e-10]])
+
+run_test(
+    file_name="DFEM_Diffusion/Diffusion_2D_3a_analytical_coef",
+    comment="2D Diffusion with Analytical Coefficients",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Max-value=", 0.021923, 1.0e-10]])
+
+run_test(
+    file_name="DFEM_Diffusion/Diffusion_2D_3b_analytical_coef2",
+    comment="2D Diffusion with Manufactured Solution",
+    num_procs=1,
+    search_strings_vals_tols=[["[0]  Max-value=", 1.000586, 1.0e-10]])
+
 #1
 run_test(
     file_name="Diffusion1D",
     comment="1D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
+
 sys.exit(123)
 
 #2

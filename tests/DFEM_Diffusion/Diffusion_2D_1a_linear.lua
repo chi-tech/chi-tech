@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
  
 mesh={}
-N=20
+N=10
 L=2
 xmin = -L/2
 dx = L/N
@@ -47,10 +47,8 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,w_vol,w_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
---chiMeshHandlerExportMeshToVTK("Mesh")
-
 --############################################### Add material properties
---#### DFEM stuff
+--#### DFEM solver
 phys1 = chiDFEMDiffusionSolverCreate()
 
 chiSolverSetBasicOption(phys1, "residual_tolerance", 1E-8)
@@ -63,6 +61,39 @@ chiDFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"robin", 0.25, 0.5, 
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-----############################################### Visualize the field function
+
+--############################################### Get field functions
 fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"square_linear","Flux_Diff")
+
+--############################################### Export VTU
+if (master_export == nil) then
+    chiExportFieldFunctionToVTK(fflist[1],"DFEMDiff2D_linear","flux")
+end
+
+--############################################### Line plot
+cline = chiFFInterpolationCreate(LINE)
+chiFFInterpolationSetProperty(cline,LINE_FIRSTPOINT,-L/2, 0.0, 0.0)
+chiFFInterpolationSetProperty(cline,LINE_SECONDPOINT,L/2, 0.0, 0.0)
+chiFFInterpolationSetProperty(cline,LINE_NUMBEROFPOINTS, 50)
+chiFFInterpolationSetProperty(cline,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(cline)
+chiFFInterpolationExecute(cline)
+
+if (master_export == nil) then
+    chiFFInterpolationExportPython(cline)
+end
+
+--############################################### Volume integrations
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+
+ffvol = chiFFInterpolationCreate(VOLUME)
+chiFFInterpolationSetProperty(ffvol,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
+
+chiFFInterpolationInitialize(ffvol)
+chiFFInterpolationExecute(ffvol)
+maxval = chiFFInterpolationGetValue(ffvol)
+
+chiLog(LOG_0,string.format("Max-value=%.6f", maxval))
