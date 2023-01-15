@@ -49,7 +49,7 @@ endif()
 message(STATUS "VTK_DIR set to ${VTK_DIR}")
 
 find_package(MPI)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CHI_TECH_DIR}/ChiResources/Macros")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CHI_TECH_DIR}/resources/Macros")
 
 #================================================ Include macros
 include(GNUInstallDirs)
@@ -66,12 +66,12 @@ include_directories(SYSTEM "${PETSC_ROOT}/include")
 
 include_directories(SYSTEM "${CHI_TECH_DIR}/ThirdParty/paraview")
 
-include_directories("${CHI_TECH_DIR}/ChiTech")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiLua")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiMPI")
-include_directories("${CHI_TECH_DIR}/ChiTech/ChiLog")
-include_directories("${CHI_TECH_DIR}/ChiResources")
-include_directories("${CHI_TECH_DIR}/ChiModules")
+include_directories("${CHI_TECH_DIR}/framework")
+include_directories("${CHI_TECH_DIR}/framework/ChiLua")
+include_directories("${CHI_TECH_DIR}/framework/ChiMPI")
+include_directories("${CHI_TECH_DIR}/framework/ChiLog")
+include_directories("${CHI_TECH_DIR}/resources")
+include_directories("${CHI_TECH_DIR}/modules")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")
