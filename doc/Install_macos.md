@@ -45,7 +45,7 @@ To check that the install was successful, execute one of the compiler wrappers:
 #### Step 2 - Install PETSc
 
 The current supported version is
-[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz) .
+[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz).
 
 
 Return to your *projects* folder (or whatever you chose to place stuff). Run
@@ -172,9 +172,9 @@ Set the LUA_ROOT environment variable to the **Lua** install location:
     $export LUA_ROOT=/Path/to/Lua
 ```
 
-#### Step 5 - Configure and Build ChiTech
+#### Step 5 - Configure and Build Chi-Tech
 
-Clone the **ChiTech** repository:
+Clone the **Chi-Tech** repository:
 ```console
     $ git clone https://github.com/chi-tech/chi-tech
 ```
@@ -186,7 +186,7 @@ Run the configure script:
 ```
 The configure script will generate the CMake build scripts.
 
-Once configure.sh has completed, build **ChiTech** with:
+Once configure.sh has completed, build **Chi-Tech** with:
 ```console
     $ make
 ```
@@ -196,7 +196,7 @@ Once configure.sh has completed, build **ChiTech** with:
 To check if the code compiled correctly execute the test scripts:
 
 ```bash
-    $ python3 ChiTest/Z_Run_all.py
+    $ python3 tests/Z_Run_all.py
 ```
 
 
@@ -208,7 +208,7 @@ or generate it locally.
 To generate the documentation locally, Google and follow the online instructions
 for installing installing doxygen and lua then run:
 ```console
-    $ cd ChiDoc/
+    $ cd doc/
     $ ./YReGenerateDocumentation.sh
 ```
-Open the documentation index file at ChiDoc/HTMLdocs/html/index.html.
+Open the documentation index file at doc/HTMLdocs/html/index.html.

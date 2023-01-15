@@ -89,7 +89,7 @@ include_directories("${CHI_TECH_DIR}/framework/ChiLua")
 include_directories("${CHI_TECH_DIR}/framework/ChiMPI")
 include_directories("${CHI_TECH_DIR}/framework/ChiLog")
 include_directories("${CHI_TECH_DIR}/framework/ChiMiscUtils")
-include_directories("${CHI_TECH_DIR}/ChiResources")
+include_directories("${CHI_TECH_DIR}/resources")
 include_directories("${CHI_TECH_DIR}/modules")
 
 #================================================ Library directories

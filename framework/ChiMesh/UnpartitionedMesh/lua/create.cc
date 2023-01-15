@@ -146,7 +146,7 @@ An example mesh creation below:
 \code
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromEnsightGold("ChiResources/TestObjects/Sphere.case")
+chiUnpartitionedMeshFromEnsightGold("resources/TestObjects/Sphere.case")
 
 region1 = chiRegionCreate()
 chiRegionAddEmptyBoundary(region1)
@@ -202,7 +202,7 @@ An example mesh creation below:
 \code
 chiMeshHandlerCreate()
 
-chiUnpartitionedMeshFromWavefrontOBJ("ChiResources/TestObjects/TriangleMesh2x2.obj")
+chiUnpartitionedMeshFromWavefrontOBJ("resources/TestObjects/TriangleMesh2x2.obj")
 
 region1 = chiRegionCreate()
 chiRegionAddEmptyBoundary(region1)

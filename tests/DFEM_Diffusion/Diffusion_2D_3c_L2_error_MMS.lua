@@ -2,7 +2,7 @@
 chiMeshHandlerCreate()
  
 mesh={}
-N=100
+N=40
 L=1
 xmin = 0
 dx = L/N
@@ -23,7 +23,6 @@ chiVolumeMesherSetMatIDToAll(0)
 --    boundary = zero-Dirichlet on all 4 sides
 --    volumetric source term: q(,x) = 2*pi*pi * sin(pi.x) * sin(pi.y)
 -- the factor 2 is the dim of the problem
-
 function D_coef(i,x,y,z)
     return 1.0
 end
@@ -33,8 +32,11 @@ end
 function Sigma_a(i,x,y,z)
     return 0.0
 end
+function MMS_phi(i,x,y,z)
+    return math.sin(math.pi*x) * math.sin(math.pi*y)
+end
 
--- Setboundary IDs
+-- Set boundary IDs
 -- xmin,xmax,ymin,ymax,zmin,zmax
 e_vol = chiLogicalVolumeCreate(RPP,0.99999,1000,-1000,1000,-1000,1000)
 w_vol = chiLogicalVolumeCreate(RPP,-1000,0.00001,-1000,1000,-1000,1000)
@@ -51,20 +53,25 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,w_vol,w_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
---chiMeshHandlerExportMeshToVTK("Mesh")
+--############################################### Call Lua Sim Test
+chiSimTest_IP_MMS_L2error() --simtest_IP_MMS_L2_handle becomes available here
 
---############################################### Add material properties
---#### CFEM solver
-phys1 = chiCFEMDiffusionSolverCreate()
+--############################################### Export VTU
+if (master_export == nil) then
+    chiExportFieldFunctionToVTK(simtest_IP_MMS_L2_handle,"DFEMDiff2D_MMS","flux")
+end
 
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",e_bndry,"dirichlet",0.0)
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",w_bndry,"dirichlet",0.0)
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",n_bndry,"dirichlet",0.0)
-chiCFEMDiffusionSetBCProperty(phys1,"boundary_type",s_bndry,"dirichlet",0.0)
+----############################################### Volume integrations
+vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
+--
+ffvol = chiFFInterpolationCreate(VOLUME)
+chiFFInterpolationSetProperty(ffvol,OPERATION,OP_MAX)
+chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
+chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,simtest_IP_MMS_L2_handle)
+--
+chiFFInterpolationInitialize(ffvol)
+chiFFInterpolationExecute(ffvol)
+maxval = chiFFInterpolationGetValue(ffvol)
 
-chiSolverInitialize(phys1)
-chiSolverExecute(phys1)
+chiLog(LOG_0,string.format("Max-value=%.6f", maxval))
 
-----############################################### Visualize the field function
-fflist,count = chiGetFieldFunctionList(phys1)
-chiExportFieldFunctionToVTK(fflist[1],"CFEMDiff2D_analytic_coef2","flux")

@@ -58,6 +58,27 @@ void chi_physics::TransportCrossSections::
   // Write the header info
   //============================================================
 
+  std::vector<double> nu, nu_prompt, nu_delayed;
+  for (unsigned int g = 0; g < num_groups; ++g)
+  {
+    if (num_precursors > 0)
+    {
+      nu_prompt.push_back(nu_prompt_sigma_f[g] / sigma_f[g]);
+      nu_delayed.push_back(nu_delayed_sigma_f[g] / sigma_f[g]);
+    }
+    else
+      nu.push_back(nu_sigma_f[g] / sigma_f[g]);
+  }
+
+  std::vector<double> decay_constants, fractional_yields;
+  for (const auto& precursor : precursors)
+  {
+    decay_constants.push_back(precursor.decay_constant);
+    fractional_yields.push_back(precursor.fractional_yield);
+  }
+
+
+
   ofile << "# Exported cross section from ChiTech\n";
   ofile << "# Date: " << chi_objects::ChiTimer::GetLocalDateTimeString() << "\n";
   ofile << "NUM_GROUPS " << num_groups << "\n";
@@ -65,39 +86,49 @@ void chi_physics::TransportCrossSections::
   if (num_precursors > 0)
     ofile << "NUM_PRECURSORS " << num_precursors << "\n";
 
-  Print1DXS(ofile, "SIGMA_T"     , sigma_t              );
-  Print1DXS(ofile, "SIGMA_F"     , sigma_f     , 1.0e-20);
-  Print1DXS(ofile, "SIGMA_A"     , sigma_a     , 1.0e-20);
-  Print1DXS(ofile, "NU"          , nu          , 1.0e-20);
-  Print1DXS(ofile, "NU_PROMPT"   , nu_prompt   , 1.0e-20);
-  Print1DXS(ofile, "NU_DELAYED"  , nu_delayed  , 1.0e-20);
-  Print1DXS(ofile, "CHI"         , chi         , 1.0e-20);
-  Print1DXS(ofile, "CHI_PROMPT"  , chi_prompt  , 1.0e-20);
-  Print1DXS(ofile, "INV_VELOCITY", inv_velocity, 1.0e-20);
+  //basic cross section data
+  Print1DXS(ofile, "SIGMA_T", sigma_t, 1.0e-20);
+  Print1DXS(ofile, "SIGMA_A", sigma_a, 1.0e-20);
 
-  //======================================== Chi-delayed
-  if (not chi_delayed.empty())
+  //fission data
+  if (!sigma_f.empty())
   {
-    ofile << "\n";
-    ofile << "CHI_DELAYED_BEGIN\n";
-    unsigned int g = 0;
-    for (auto& chi_d_g : chi_delayed)
+    Print1DXS(ofile, "SIGMA_F", sigma_f, 1.0e-20);
+    if (num_precursors > 0)
     {
-      unsigned int j = 0;
-      for (double val : chi_d_g)
-      {
-        ofile << "G_PRECURSORJ_VAL" << " " << g
-                                    << " " << j
-                                    << " " << val << "\n";
-        ++j;
-      }
-      ++g;
+      Print1DXS(ofile, "NU_PROMPT", nu_prompt, 1.0e-20);
+      Print1DXS(ofile, "NU_DELAYED", nu_delayed, 1.0e-20);
+      Print1DXS(ofile, "CHI_PROMPT", chi_prompt, 1.0e-20);
+
+      ofile << "\nCHI_DELAYED_BEGIN\n";
+      for (unsigned int j = 0; j < num_precursors; ++j)
+        for (unsigned int g = 0; g < num_groups; ++g)
+          ofile << "G_PRECURSOR_VAL"
+                << " " << g
+                << " " << j
+                << " " << precursors[j].emission_spectrum[g]
+                << "\n";
+      ofile << "CHI_DELAYED_END\n";
+
+      Print1DXS(ofile, "PRECURSOR_DECAY_CONSTANTS",
+                decay_constants, 1.0e-20);
+      Print1DXS(ofile, "PRECURSOR_FRACTIONAL_YIELDS",
+                fractional_yields, 1.0e-20);
+
     }
-    ofile << "CHI_DELAYED_END\n";
+    else
+    {
+      Print1DXS(ofile, "NU", nu, 1.0e-20);
+      Print1DXS(ofile, "CHI", chi, 1.0e-20);
+    }
   }
 
-  //======================================== Transfer matrices
-  if (not transfer_matrices.empty())
+  //inverse speed data
+  if (!inv_velocity.empty())
+    Print1DXS(ofile, "INV_VELOCITY", inv_velocity, 1.0e-20);
+
+  //transfer matrices
+  if (!transfer_matrices.empty())
   {
     ofile << "\n";
     ofile << "TRANSFER_MOMENTS_BEGIN\n";

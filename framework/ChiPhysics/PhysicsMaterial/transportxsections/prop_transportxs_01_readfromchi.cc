@@ -5,6 +5,7 @@
 
 #include <string>
 #include <algorithm>
+#include <numeric>
 
 
 /**\defgroup ChiXSFile Chi-Tech Cross-section format 1
@@ -136,12 +137,12 @@ constants, \f$ \lambda_j \f$ are required.
     [group, inv_velocity]. Populates the inv_velocity field. If this field and
     VELOCITY are provided, this field will be used.
     Symbol \f$ \frac{1}{v_g} \f$.
-  - PRECURSOR_LAMBDA_BEGIN. Optional. Starts a block that is terminated by a
-    line PRECURSOR_LAMBDA_END. Each line in the block processes the first two
+  - PRECURSOR_DECAY_CONSTANTS_BEGIN. Optional. Starts a block that is terminated by a
+    line PRECURSOR_DECAY_CONSTANTS_END. Each line in the block processes the first two
     words as [precursor, lambda]. Populates the lambda field (the precursor
     decay constant). Symbol \f$ \lambda_j \f$.
-  - PRECURSOR_YIELD_BEGIN. Optional. Starts a block that is terminated by a
-    line PRECURSOR_YIELD_END. Each line in the block processes the first two
+  - PRECURSOR_FRACTIONAL_YIELDS_BEGIN. Optional. Starts a block that is terminated by a
+    line PRECURSOR_FRACTIONAL_YIELDS_END. Each line in the block processes the first two
     words as [precursor, gamma]. Populates the gamma field (the precursor
     production fraction per fission). Symbol \f$ \gamma_j \f$.
   - CHI_DELAYED_BEGIN. Optional. Starts a block that is terminated by a line
@@ -210,11 +211,11 @@ M_GPRIME_G_VAL 1 0 1 0.001
 M_GPRIME_G_VAL 1 1 1 0.001
 TRANSFER_MOMENTS_END
 
-PRECURSOR_LAMBDA_BEGIN
+PRECURSOR_DECAY_CONSTANTS_BEGIN
 0		0.1
 1   0.2
 2   0.3
-PRECURSOR_LAMBDA_END
+PRECURSOR_DECAY_CONSTANTS_END
 
 PRECURSOR_GAMMA_BEGIN
 0		0.25
@@ -229,13 +230,13 @@ NU_DELAYED_BEGIN
 NU_DELAYED_END
 
 CHI_DELAYED_BEGIN
-G_PRECURSORJ_VAL 0  0	1.0
-G_PRECURSORJ_VAL 0  1	1.0
-G_PRECURSORJ_VAL 0  2	1.0
+G_PRECURSOR_VAL 0  0	1.0
+G_PRECURSOR_VAL 0  1	1.0
+G_PRECURSOR_VAL 0  2	1.0
 
-G_PRECURSORJ_VAL 1  0	0.0
-G_PRECURSORJ_VAL 1  1	0.0
-G_PRECURSORJ_VAL 1  2	0.0
+G_PRECURSOR_VAL 1  0	0.0
+G_PRECURSOR_VAL 1  1	0.0
+G_PRECURSOR_VAL 1  2	0.0
 CHI_DELAYED_END
 \endcode
  * */
@@ -246,7 +247,6 @@ CHI_DELAYED_END
 void chi_physics::TransportCrossSections::
   MakeFromChiXSFile(const std::string &file_name)
 {
-  //clear any previous data
   Reset();
 
   //============================================================
@@ -403,16 +403,16 @@ void chi_physics::TransportCrossSections::
   auto ReadEmissionSpectra =
       [](const std::string& keyword,
          EmissionSpectra& destination,
-         const unsigned int G, //# of groups
          const unsigned int J, //# of precursors
+         const unsigned int G, //# of groups
          std::ifstream& file,
          std::istringstream& line_stream,
          unsigned int& line_number)
       {
         //init storage
         destination.clear();
-        for (unsigned int g = 0; g < G; ++g)
-          destination.emplace_back(J, 0.0);
+        for (unsigned int j = 0; j < J; ++j)
+          destination.emplace_back(G, 0.0);
 
         //book-keeping
         std::string word, line;
@@ -428,11 +428,11 @@ void chi_physics::TransportCrossSections::
         {
           //check that this line contains an entry
           line_stream >> word;
-          if (word == "G_PRECURSORJ_VAL")
+          if (word == "G_PRECURSOR_VAL")
           {
             //get data from current line
             line_stream >> group >> precursor >> value;
-            destination.at(group).at(precursor) = value;
+            destination.at(precursor).at(group) = value;
           }
 
           //go to next line
@@ -442,9 +442,44 @@ void chi_physics::TransportCrossSections::
         }
       };
 
+  //##################################################
+  /// Lambda for checking for all non-negative values.
+  auto is_nonnegative =
+      [](const std::vector<double>& vec)
+      {
+        return !vec.empty() &&
+               std::all_of(vec.begin(), vec.end(),
+                           [](double x) { return x >= 0.0; });
+      };
+
+  //##################################################
+  /// Lambda for checking for all strictly positive values.
+  auto is_positive =
+      [](const std::vector<double>& vec)
+      {
+        return !vec.empty() &&
+               std::all_of(vec.begin(), vec.end(),
+                           [](double x) { return x > 0.0; });
+      };
+
+  //##################################################
+  /// Lambda for checking for any non-zero values.
+  auto has_nonzero =
+      [](const std::vector<double> & vec)
+      {
+        return !vec.empty() &&
+               std::any_of(vec.begin(), vec.end(),
+                           [](double x) { return x > 0.0; });
+      };
+
   //============================================================
   // Read the Chi XS file
   //============================================================
+
+  std::vector<double> decay_constants;
+  std::vector<double> fractional_yields;
+  std::vector<std::vector<double>> emission_spectra;
+  std::vector<double> nu, nu_prompt, nu_delayed, beta;
 
   std::string word, line;
   unsigned int line_number = 0;
@@ -487,6 +522,7 @@ void chi_physics::TransportCrossSections::
             "The specified number of delayed neutron "
             "precursors must be non-negative.");
       num_precursors = J;
+      precursors.resize(num_precursors);
     }
 
     //parse nuclear data
@@ -506,10 +542,22 @@ void chi_physics::TransportCrossSections::
                            e_bounds, num_groups, f, ls, ln);
 
       if (fw == "INV_VELOCITY_BEGIN")
+      {
         Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
+        if (!is_positive(inv_velocity))
+          throw std::logic_error(
+              "Invalid inverse velocity value encountered.\n"
+              "Only strictly positive values are permitted.");
+      }
       if (fw == "VELOCITY_BEGIN" && inv_velocity.empty())
       {
         Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
+        if (!is_positive(inv_velocity))
+          throw std::logic_error(
+              "Invalid velocity value encountered.\n"
+              "Only strictly positive values are permitted.");
+
+        //compute inverse
         for (unsigned int g = 0; g < num_groups; ++g)
           inv_velocity[g] = 1.0 / inv_velocity[g];
       }
@@ -519,38 +567,232 @@ void chi_physics::TransportCrossSections::
       //==================================================
 
       if (fw == "SIGMA_T_BEGIN")
+      {
         Read1DData("SIGMA_T", sigma_t, num_groups, f, ls, ln);
+        if (!is_nonnegative(sigma_t))
+          throw std::logic_error(
+              "Invalid total cross section value encountered.\n"
+              "Negative values are not permitted.");
+      }//if sigma_t
+
       if (fw == "SIGMA_A_BEGIN")
+      {
         Read1DData("SIGMA_A", sigma_a, num_groups, f, ls, ln);
+        if (!is_nonnegative(sigma_a))
+          throw std::logic_error(
+              "Invalid absorption cross section value encountered.\n"
+              "Negative values are not permitted.");
+      }//if sigma_a
+
       if (fw == "SIGMA_F_BEGIN")
+      {
         Read1DData("SIGMA_F", sigma_f, num_groups, f, ls, ln);
+        if (!has_nonzero(sigma_f))
+        {
+          chi::log.Log0Warning()
+              << "The fission cross section specified in "
+              << "\"" << file_name << "\" is uniformly zero..."
+              << "Clearing it.";
+          sigma_f.clear();
+        }
+        if (!is_nonnegative(sigma_f))
+          throw std::logic_error(
+              "Invalid fission cross section value encountered.\n"
+              "Negative values are not permitted.");
+      }//if sigma_f
+
       if (fw == "NU_SIGMA_F_BEGIN")
+      {
         Read1DData("NU_SIGMA_F", nu_sigma_f, num_groups, f, ls, ln);
+        if (!has_nonzero(nu_sigma_f))
+        {
+          chi::log.Log0Warning()
+              << "The production cross-section specified in "
+              << "\"" << file_name << "\" is uniformly zero..."
+              << "Clearing it.";
+          nu_sigma_f.clear();
+        }
+        if (!is_nonnegative(nu_sigma_f))
+          throw std::logic_error(
+              "Invalid production cross section value encountered.\n"
+              "Negative values are not permitted.");
+      }//if nu_sigma_f
 
       //==================================================
       // Neutrons Per Fission
       //==================================================
 
       if (fw == "NU_BEGIN")
+      {
         Read1DData("NU", nu, num_groups, f, ls, ln);
+        if (!has_nonzero(nu))
+        {
+          chi::log.Log0Warning()
+              << "The total fission neutron yield specified in "
+              << "\"" << file_name << "\" is uniformly zero..."
+              << "Clearing it.";
+          nu.clear();
+        }
+        if (!std::all_of(nu.begin(), nu.end(),
+                         [](double x)
+                         { return x == 0.0 || x > 1.0; }))
+          throw std::logic_error(
+              "Invalid total fission neutron yield value encountered.\n"
+              "Only values strictly greater than one, or zero, are "
+              "permitted.");
+
+        //compute prompt/delayed nu, if needed
+        if (num_precursors > 0 &&
+            !nu.empty() && !beta.empty() &&
+            nu_prompt.empty() && nu_delayed.empty())
+        {
+          nu_prompt.assign(num_groups, 0.0);
+          nu_delayed.assign(num_groups, 0.0);
+          for (unsigned int g = 0; g < num_groups; ++g)
+          {
+            nu_prompt[g] = (1.0 - beta[g]) * nu[g];
+            nu_delayed[g] = beta[g] * nu[g];
+          }
+        }
+      }//if nu
+
       if (fw == "NU_PROMPT_BEGIN")
+      {
         Read1DData("NU_PROMPT", nu_prompt, num_groups, f, ls, ln);
+        if (!has_nonzero(nu_prompt))
+        {
+          chi::log.Log0Warning()
+              << "The prompt fission neutron yield specified in "
+              << "\"" << file_name << "\" is uniformly zero..."
+              << "Clearing it.";
+          nu_prompt.clear();
+        }
+        if (!std::all_of(nu_prompt.begin(), nu_prompt.end(),
+                         [](double x)
+                         { return x == 0.0 || x > 1.0; }))
+          throw std::logic_error(
+              "Invalid prompt fission neutron yield value encountered.\n"
+              "Only values strictly greater than one, or zero, are "
+              "permitted.");
+      }
+
       if (fw == "NU_DELAYED_BEGIN")
+      {
         Read1DData("NU_DELAYED", nu_delayed, num_groups, f, ls, ln);
+        if (!has_nonzero(nu_delayed))
+        {
+          chi::log.Log0Warning()
+              << "The delayed fission neutron yield specified in "
+              << "\"" << file_name << "\" is uniformly zero..."
+              << "Clearing it.";
+          nu_prompt.clear();
+        }
+        if (!is_nonnegative(nu_delayed))
+          throw std::logic_error(
+              "Invalid delayed fission neutron yield value encountered.\n"
+              "Only non-negative values are permitted.");
+      }
+
       if (fw == "BETA_BEGIN")
+      {
         Read1DData("BETA", beta, num_groups, f, ls, ln);
+        if (!has_nonzero(beta))
+        {
+          chi::log.Log0Warning()
+              << "The delayed neutron fraction specified in "
+              << "\"" << file_name << "\" is uniformly zero..."
+              << "Clearing it.";
+          beta.clear();
+        }
+        if (!std::all_of(beta.begin(), beta.end(),
+                         [](double x)
+                         { return x >= 0.0 && x <= 1.0; }))
+          throw std::logic_error(
+              "Invalid delayed neutron fraction value encountered.\n"
+              "Only values in the range [0.0, 1.0] are permitted.");
+
+        //compute prompt/delayed nu, if needed
+        if (num_precursors > 0 &&
+            !nu.empty() && !beta.empty() &&
+            nu_prompt.empty() && nu_delayed.empty())
+        {
+          nu_prompt.assign(num_groups, 0.0);
+          nu_delayed.assign(num_groups, 0.0);
+          for (unsigned int g = 0; g < num_groups; ++g)
+          {
+            nu_prompt[g] = (1.0 - beta[g]) * nu[g];
+            nu_delayed[g] = beta[g] * nu[g];
+          }
+        }
+      }//if beta
 
       //==================================================
       // Fission/Emission Spectra
       //==================================================
 
       if (fw == "CHI_BEGIN")
+      {
         Read1DData("CHI", chi, num_groups, f, ls, ln);
+        if (!has_nonzero(chi))
+          throw std::logic_error(
+              "Invalid steady-state fission spectrum encountered.\n"
+              "No non-zero values found.");
+        if (!is_nonnegative(chi))
+          throw std::logic_error(
+              "Invalid steady-state fission spectrum value encountered.\n"
+              "Only non-negative values are permitted.");
+
+        //normalizing
+        double sum = std::accumulate(chi.begin(), chi.end(), 0.0);
+        std::for_each(chi.begin(), chi.end(),
+                      [sum](double& x) { return x / sum; });
+      }//if chi
+
       if (fw == "CHI_PROMPT_BEGIN")
+      {
         Read1DData("CHI_PROMPT", chi_prompt, num_groups, f, ls, ln);
-      if (num_precursors > 0 && fw == "CHI_DELAYED_BEGIN")
-        ReadEmissionSpectra("CHI_DELAYED", chi_delayed,
-                            num_groups, num_precursors, f, ls, ln);
+        if (!has_nonzero(chi_prompt))
+          throw std::logic_error(
+              "Invalid prompt fission spectrum encountered.\n"
+              "No non-zero values found.");
+        if (!is_nonnegative(chi_prompt))
+          throw std::logic_error(
+              "Invalid prompt fission spectrum value encountered.\n"
+              "Only non-negative values are permitted.");
+
+        //normalizing
+        double sum = std::accumulate(chi_prompt.begin(), chi_prompt.end(), 0.0);
+        std::for_each(chi_prompt.begin(), chi_prompt.end(),
+                      [sum](double& x) { return x / sum; });
+
+      }//if prompt chi
+
+      if (num_precursors > 0 &&
+          fw == "CHI_DELAYED_BEGIN")
+      {
+        ReadEmissionSpectra("CHI_DELAYED", emission_spectra,
+                            num_precursors, num_groups, f, ls, ln);
+        for (unsigned int j = 0; j < num_precursors; ++j)
+        {
+          if (!has_nonzero(emission_spectra[j]))
+            throw std::logic_error(
+                "Invalid delayed emission spectrum encountered for "
+                "precursor species " + std::to_string(j) + ".\n" +
+                "No non-zero values found.");
+          if (!is_nonnegative(emission_spectra[j]))
+            throw std::logic_error(
+                "Invalid delayed emission spectrum value encountered "
+                "for precursor species " + std::to_string(j) + ".\n" +
+                "Only non-negative values are permitted.");
+
+          //normalizing
+          double sum = std::accumulate(emission_spectra[j].begin(),
+                                       emission_spectra[j].end(), 0.0);
+          std::for_each(emission_spectra[j].begin(),
+                        emission_spectra[j].end(),
+                        [sum](double& x) { return x / sum; });
+        }
+      }//if delayed chi
 
       //==================================================
       // Delayed Neutron Precursor Data
@@ -558,13 +800,38 @@ void chi_physics::TransportCrossSections::
 
       if (num_precursors > 0)
       {
-        if (fw == "PRECURSOR_LAMBDA_BEGIN")
-          Read1DData("PRECURSOR_LAMBDA", precursor_lambda,
-                     num_precursors, f, ls, ln);
+        if (fw == "PRECURSOR_DECAY_CONSTANTS_BEGIN")
+        {
+          Read1DData("PRECURSOR_DECAY_CONSTANTS",
+                     decay_constants, num_precursors, f, ls, ln);
+          if (!is_positive(decay_constants))
+            throw std::logic_error(
+                "Invalid precursor decay constant value encountered.\n"
+                "Only strictly positive values are permitted.");
+        }//if decay constants
 
-        if (fw == "PRECURSOR_YIELD_BEGIN")
-          Read1DData("PRECURSOR_YIELD", precursor_yield,
-                     num_precursors, f, ls, ln);
+        if (fw == "PRECURSOR_FRACTIONAL_YIELDS_BEGIN")
+        {
+          Read1DData("PRECURSOR_FRACTIONAL_YIELDS",
+                     fractional_yields, num_precursors, f, ls, ln);
+          if (!has_nonzero(fractional_yields))
+            throw std::logic_error(
+                "Invalid precursor fractional yields encountered.\n"
+                "No non-zero values found.");
+          if (!std::all_of(fractional_yields.begin(),
+                           fractional_yields.end(),
+                           [](double x) { return x >= 0.0 && x <= 1.0; }))
+            throw std::logic_error(
+                "Invalid precursor fractional yield value encountered.\n"
+                "Only values in the range [0.0, 1.0] are permitted.");
+
+          //normalizing
+          double sum = std::accumulate(fractional_yields.begin(),
+                                       fractional_yields.end(), 0.0);
+          std::for_each(fractional_yields.begin(),
+                        fractional_yields.end(),
+                        [sum](double& x) { return x / sum; });
+        }
       }
 
       //==================================================
@@ -586,9 +853,9 @@ void chi_physics::TransportCrossSections::
           "\n" + err.what());
     }
 
-    catch (const std::out_of_range& err)
+    catch (const std::logic_error& err)
     {
-      throw std::out_of_range(
+      throw std::logic_error(
           "Error reading Chi cross section file "
           "\"" + file_name + "\".\n" +
           "Line number " + std::to_string(line_number) +
@@ -604,10 +871,135 @@ void chi_physics::TransportCrossSections::
 
     word = "";
   }//while not EOF, read each lines
-
-  //perform checks and enforce physical relationships
-  Finalize();
-
-
   file.close();
+
+  //============================================================
+  // Compute auxiliary data
+  //============================================================
+
+  if (sigma_a.empty())
+    ComputeAbsorption();
+
+  ComputeDiffusionParameters();
+
+  //============================================================
+  // Compute and check fission data
+  //============================================================
+
+  //determine if the material is fissionable
+  is_fissionable = !sigma_f.empty() || !nu_sigma_f.empty();
+
+  //clear fission data if not fissionable
+  if (!is_fissionable)
+  {
+    sigma_f.clear();
+    nu_sigma_f.clear();
+    nu_prompt_sigma_f.clear();
+    nu_delayed_sigma_f.clear();
+    chi.clear();
+    chi_prompt.clear();
+    precursors.clear();
+  }//if not fissionable
+
+  //otherwise, set fission data based on inputs
+  else
+  {
+    //set prompt/delayed fission data
+    if (num_precursors > 0)
+    {
+      //check spectra
+      if (chi_prompt.empty() ||
+          std::any_of(emission_spectra.begin(),
+                      emission_spectra.end(),
+                      [](const std::vector<double>& x)
+                      { return x.empty(); }))
+        throw std::logic_error(
+            "Invalid fission/emission spectrum encountered.\n"
+            "Either the prompt fission spectrum or a delayed "
+            "emission spectrum was not found.");
+
+      //check fission neutron yields
+      if (nu_prompt.empty() && nu_delayed.empty())
+        throw std::logic_error(
+            "Invalid fission data specification encountered.\n"
+            "Either prompt and delay fission neutron yields or "
+            "the total fission neutron yield and delayed neutron "
+            "fraction must be specified.");
+
+      //compute the fission cross section
+      if (sigma_f.empty())
+      {
+        sigma_f.assign(num_groups, 0.0);
+        for (unsigned int g = 0; g < num_groups; ++g)
+          if (nu_sigma_f[g] > 0.0)
+          {
+            double nu_total = nu_prompt[g] + nu_delayed[g];
+            sigma_f[g] = nu_sigma_f[g] / nu_total;
+          }
+      }
+
+      //compute production cross sections
+      nu_sigma_f.assign(num_groups, 0.0);
+      nu_prompt_sigma_f.assign(num_groups, 0.0);
+      nu_delayed_sigma_f.assign(num_groups, 0.0);
+      for (unsigned int g = 0; g < num_groups; ++g)
+      {
+        double nu_total = nu_prompt[g] + nu_delayed[g];
+        nu_sigma_f[g] = nu_total * sigma_f[g];
+        nu_prompt_sigma_f[g] = nu_prompt[g] * sigma_f[g];
+        nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
+      }
+
+      chi::log.Log() << "num_precursors: " << precursors.size()
+                     << std::endl
+                     <<"# of decay constants: " << decay_constants.size()
+                     << std::endl
+                     << "# of fractional yields: " << fractional_yields.size()
+                     << std::endl
+                     << "# of emission spectra: " << emission_spectra.size()
+                     << std::endl;
+
+      //add data to the precursor structs
+      for (unsigned int j = 0; j < num_precursors; ++j)
+      {
+        precursors[j].decay_constant = decay_constants[j];
+        precursors[j].fractional_yield = fractional_yields[j];
+        precursors[j].emission_spectrum = emission_spectra[j];
+      }
+
+      chi::log.Log() << "HERE!";
+    }//prompt/delayed
+
+    //set steady-state fission data
+    else
+    {
+      //check spectra
+      if (chi.empty())
+        throw std::logic_error(
+            "Invalid steady-state fission spectrum encountered.\n"
+            "No steady-state fission spectrum found.");
+
+      //check nu
+      if (nu.empty())
+        throw std::logic_error(
+            "Invalid total fission neutron yield encountered.\n"
+            "No total fission neutron yield found.");
+
+      //compute fission/production cross section
+      if (!sigma_f.empty())
+      {
+        sigma_f.assign(num_groups, 0.0);
+        for (unsigned int g = 0; g < num_groups; ++g)
+          if (nu_sigma_f[g] > 0.0)
+            sigma_f[g] = nu_sigma_f[g] / nu[g];
+      }
+      else
+      {
+        nu_sigma_f.assign(num_groups, 0.0);
+        for (unsigned int g = 0; g < num_groups; ++g)
+          if (sigma_f[g] > 0.0)
+            nu_sigma_f[g] = nu[g] * sigma_f[g];
+      }
+    }//steady-state fission
+  }//if fissionable
 }

@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
   //============================================= Make XSs
   chi_physics::TransportCrossSections xs;
-  xs.MakeFromCHIxsFile("ChiTest/xs_graphite_pure.cxs");
+  xs.MakeFromCHIxsFile("tests/xs_graphite_pure.cxs");
 
   //============================================= Initializes vectors
   std::vector<double> phi_old(num_local_phi_dofs,0.0);

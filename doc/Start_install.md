@@ -6,6 +6,7 @@ We have a set of easy instructions for users running Ubuntu 18.04+ (including WS
 with Ubuntu 18.04, as well as newer Ubuntu LTS)
 
 Easy scripts - [Easy Linux instructions](./Install_ubuntu_easy.md)
+Easy scripts - [Easy MacOS instructions](./Install_macos_easy.md)
 
 If the automated installation of dependencies fails, or if you don't have a system
 supporting it, then follow the instructions below: 
@@ -17,20 +18,16 @@ For MacOS machines - [MacOS installation instructions](./Install_macos.md)
 ## Folder Layout
 Now that the code has been installed, let us comment on the subdirectory structure:
 
-- [ChiDoc](./ChiDoc) contains 
+- [doc](./doc) contains 
   - scripts to generate the code documentation (these scripts were actually used during the installation instructions, above),
   - the generated documentation;
-- [ChiTech](./ChiTech) contains the source code that is agnostic of the physics, such as math, mesh, MPI, ...
-- [ChiModules](./ChiModules) contains the source code for specialized physics modules,
-- [ChiTest](./ChiTest) contains tests for the regression suite,
-  - TODO: Jean to re-organize this folder.
-- [ChiResources](./ChiResources) contains ???
-  - TODO: clean-up needed. Decide where to place TestObjects
-- [ThirdParty](./ThirdParty) contains external library source code, such as VTK
-- [Tutorials](./Tutorials) contains some tutorials. 
-  - TODO: this seems sparse. I want to add more user tutorial examples and created more dedicated pages for that.
+- [external](./external) contains external library source code, such as VTK,
+- [framework](./framework) contains the source code that is agnostic of the physics, such as math, mesh, MPI, ...
+- [modules](./modules) contains the source code for specialized physics modules,
+- [resources](./resources) contains scripts, notes, data, and other misc. items,
+- [tests](./tests) contains tests for the regression suite (these can also serve as examples/tutorials),
+- [tutorials](./tutorials) contains tutorials. 
 
-TODO: At some point, rename folders to doc, modules, resources, src, tests, external
 
 ## Run Instructions
 
@@ -61,5 +58,14 @@ on using.
 
 For example, a slurm submission script may look like this:
 ```bash
-slurm example
+#!/usr/bin/bash
+#
+#SBATCH -J {file_name} # Job name
+#SBATCH -o tests/{file_name}.o # output file
+#SBATCH -e tests/{file_name}.e # error file
+#SBATCH -p skx-normal # Queue (partition) name
+#SBATCH -N {num_procs // 48 + 1} # Total # of nodes
+#SBATCH -n {num_procs} # Total # of mpi tasks
+#SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
+#SBATCH -A Massively-Parallel-R # Allocation name (req'd if you have more than 1)
 ```

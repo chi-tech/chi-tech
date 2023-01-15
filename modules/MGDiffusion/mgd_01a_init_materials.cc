@@ -2,13 +2,8 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-//#include "ChiTimer/chi_timer.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-
-//#include "mg_diffusion_bndry.h"
-
-//#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
@@ -127,6 +122,7 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute last fast group
   // initialize last fast group
+  chi::log.Log() << "Computing last fast group.";
   unsigned int lfg = mg_diffusion::Solver::num_groups;
 
   if (mg_diffusion::Solver::num_groups>1)
@@ -150,5 +146,19 @@ void mg_diffusion::Solver::Initialize_Materials(std::set<int>& material_ids)
   }//if num_groups>1
 
   mg_diffusion::Solver::last_fast_group = lfg;
+
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Compute two-grid params
+  do_two_grid = basic_options("do_two_grid").BoolValue();
+  if ( (lfg == num_groups) && do_two_grid)
+  {
+    chi::log.Log0Error() << "Two-grid is not possible with no upscattering.";
+    do_two_grid = false;
+    chi::Exit(EXIT_FAILURE);
+  }
+  if (do_two_grid)
+  {
+    chi::log.Log() << "Compute_TwoGrid_Params";
+    mg_diffusion::Solver::Compute_TwoGrid_Params();
+  }
 
 }
