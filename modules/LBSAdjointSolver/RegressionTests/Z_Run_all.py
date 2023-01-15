@@ -84,13 +84,13 @@ def run_test_tacc(file_name, comment, num_procs,
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
-    with open(f"ChiTest/{file_name}.job", 'w') as job_file:
+    with open(f"tests/{file_name}.job", 'w') as job_file:
         job_file.write(textwrap.dedent(f"""
             #!/usr/bin/bash
             #
             #SBATCH -J {file_name} # Job name
-            #SBATCH -o ChiTest/{file_name}.o # output file
-            #SBATCH -e ChiTest/{file_name}.e # error file
+            #SBATCH -o tests/{file_name}.o # output file
+            #SBATCH -e tests/{file_name}.e # error file
             #SBATCH -p skx-normal # Queue (partition) name
             #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
             #SBATCH -n {num_procs} # Total # of mpi tasks
@@ -99,49 +99,49 @@ def run_test_tacc(file_name, comment, num_procs,
 
             export I_MPI_SHM=disable
 
-            ibrun {kpath_to_exe} ChiTest/{file_name}.lua master_export=false
+            ibrun {kpath_to_exe} tests/{file_name}.lua master_export=false
             """
         ).strip())
-    os.system(f"sbatch -W ChiTest/{file_name}.job > /dev/null")  # -W means wait for job to finish
-    with open(f"ChiTest/{file_name}.o", 'r') as outfile:
+    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")  # -W means wait for job to finish
+    with open(f"tests/{file_name}.o", 'r') as outfile:
         out = outfile.read()
 
     passed = parse_output(out, search_strings_vals_tols)
 
     # Cleanup
     if passed:
-        os.system(f"rm ChiTest/{file_name}.job ChiTest/{file_name}.o ChiTest/{file_name}.e")
+        os.system(f"rm tests/{file_name}.job tests/{file_name}.o tests/{file_name}.e")
 
 def run_test_tamu(file_name, comment, num_procs,
 		search_strings_vals_tols):
     test_name = format_filename(file_name) + " " + comment + " " + str(num_procs) + " MPI Processes"
     print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
     if print_only: print(""); return
-    with open(f"ChiTest/{file_name}.job", 'w') as job_file:
+    with open(f"tests/{file_name}.job", 'w') as job_file:
         job_file.write(textwrap.dedent(f"""
             #!/usr/bin/bash
             #
             #SBATCH -J {file_name} # Job name
-            #SBATCH -o ChiTest/{file_name}.o # output file
-            #SBATCH -e ChiTest/{file_name}.e # error file
+            #SBATCH -o tests/{file_name}.o # output file
+            #SBATCH -e tests/{file_name}.e # error file
             #SBATCH -p class # Queue (partition) name
             #SBATCH -N {num_procs // 48 + 1} # Total # of nodes
             #SBATCH -n {num_procs} # Total # of mpi tasks
             #SBATCH -t 00:05:00 # Runtime (hh:mm:ss)
             #SBATCH -A class # Allocation name (req'd if you have more than 1)
 
-            mpiexec -n {num_procs} {kpath_to_exe} ChiTest/{file_name}.lua master_export=false
+            mpiexec -n {num_procs} {kpath_to_exe} tests/{file_name}.lua master_export=false
             """
         ).strip())
-    os.system(f"sbatch -W ChiTest/{file_name}.job > /dev/null")  # -W means wait for job to finish
-    with open(f"ChiTest/{file_name}.o", 'r') as outfile:
+    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")  # -W means wait for job to finish
+    with open(f"tests/{file_name}.o", 'r') as outfile:
         out = outfile.read()
 
     passed = parse_output(out, search_strings_vals_tols)
 
     # Cleanup
     if passed:
-        os.system(f"rm ChiTest/{file_name}.job ChiTest/{file_name}.o ChiTest/{file_name}.e")
+        os.system(f"rm tests/{file_name}.job tests/{file_name}.o tests/{file_name}.e")
 
 
 def run_test_local(file_name, comment, num_procs,

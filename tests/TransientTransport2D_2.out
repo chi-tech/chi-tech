@@ -1,4 +1,4 @@
-[0]  Parsing argument 1 ChiTest/TransientTransport2D_2.lua
+[0]  Parsing argument 1 tests/TransientTransport2D_2.lua
 [0]  Parsing argument 2 master_export=false
 [0]  2022-12-19 20:22:13 Running ChiTech in batch-mode with 2 processes.
 [0]  ChiTech version 1.0.2
@@ -31,10 +31,10 @@
 [0]  Total process memory used after meshing 24.7 MB
 [0]  00:00:00 Setting material id 0 to all cells.
 [0]  00:00:00 Done setting material id 0 to all cells
-[0]  Reading Chi cross-section file "ChiTest/xs_inf_critical_1g.cxs"
+[0]  Reading Chi cross-section file "tests/xs_inf_critical_1g.cxs"
 [0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
 [0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
-[0]  Reading Chi cross-section file "ChiTest/xs_inf_21cent_1g.cxs"
+[0]  Reading Chi cross-section file "tests/xs_inf_21cent_1g.cxs"
 [0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
 [0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
 [0]  LBSTransientSolver created.

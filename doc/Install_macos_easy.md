@@ -71,7 +71,7 @@ export FC=/Users/USERNAME/local/MPICH/mpich-4.0.3/build/bin/mpifort
 ```
 which means that, from now on, the C, C++, and Fortran compilers are the ones from MPICH.
 
-Make sure to ```source ~/.bashrc``` (or ```source ~/.bahs_profile```) to take into accounts those updates.
+Make sure to ```source ~/.bashrc``` (or ```source ~/.bash_profile```) to take into accounts those updates.
 
 ### Step 3 - Clone Chi-Tech
 

@@ -1,4 +1,4 @@
-[0]  Parsing argument 1 ChiTest/TransientTransport2D_3.lua
+[0]  Parsing argument 1 tests/TransientTransport2D_3.lua
 [0]  Parsing argument 2 master_export=false
 [0]  Parsing argument 3 check_num_procs=false
 [0]  2022-12-19 21:58:17 Running ChiTech in batch-mode with 8 processes.
@@ -34,13 +34,13 @@
 [0]  00:00:00 Done setting material id 0 to all cells
 [0]  Exporting mesh to VTK. 3200
 [0]  Done exporting mesh to VTK.
-[0]  Reading Chi cross-section file "ChiTest/xs_inf_k1_6_1g.cxs"
+[0]  Reading Chi cross-section file "tests/xs_inf_k1_6_1g.cxs"
 [0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
 [0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
-[0]  Reading Chi cross-section file "ChiTest/xs_inf_critical_1g.cxs"
+[0]  Reading Chi cross-section file "tests/xs_inf_critical_1g.cxs"
 [0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
 [0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
-[0]  Reading Chi cross-section file "ChiTest/xs_inf_weak2_1g.cxs"
+[0]  Reading Chi cross-section file "tests/xs_inf_weak2_1g.cxs"
 [0]  **WARNING** FinalizeCrossSections: sigma_a was estimated from the transfer matrix.
 [0]  **WARNING** FinalizeCrossSections: Precursor yield sum does not sum to unity. Normalizing.
 [0]  Generating XS with following combination:
@@ -1121,4 +1121,4 @@
 [0]  LBSTransientSolver 1000 time=         1 dt=     0.001 period=      14.9 FR= 1.349e+00
 [0]  
 [0]  Final program time 02:02:32
-[0]  2022-12-20 00:00:50 ChiTech finished execution of ChiTest/TransientTransport2D_3.lua
+[0]  2022-12-20 00:00:50 ChiTech finished execution of tests/TransientTransport2D_3.lua

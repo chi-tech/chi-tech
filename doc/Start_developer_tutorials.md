@@ -80,14 +80,14 @@ computation. This file is actually the lua wrapper, same functionality as above.
 When bringing the code into the main chi-tech repository,
 the following changes need to happen:
 - The folder ```DFEMDIffusionSolver``` gets placed in
-  ```ChiModules``` and the ```lua_utils.h``` in that subfolder
+  ```modules``` and the ```lua_utils.h``` in that subfolder
   receives an update: we add ```RegisterLuaEntities()``` inside a namespace
 - We add
     - this line ```#include "DFEMDiffusion/lua/ip_lua_utils.h" ```
     - and this line ```dfem_diffusion::dfem_diffusion_lua_utils::RegisterLuaEntities(L)```
 
-  in ```ChiModule\lua\chi_modules_lua.cc```
+  in ```modules\lua\chi_modules_lua.cc```
 - Add the proper subfolder in the ```CMakeLists.txt``` file
-  located in ```ChiModules``` (i.e., add this line ```add_subdirectory("DFEMDiffusion")```)
+  located in ```modules``` (i.e., add this line ```add_subdirectory("DFEMDiffusion")```)
 - Update ```lua_test.cc``` to register the sim test
 

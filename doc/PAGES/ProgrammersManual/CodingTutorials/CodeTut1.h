@@ -159,7 +159,7 @@ if (NOT DEFINED CHI_TECH_DIR)
 endif()
 message(STATUS "CHI_TECH_DIR set to ${CHI_TECH_DIR}")
 
-include("${CHI_TECH_DIR}/ChiResources/Macros/Downstream.cmake")
+include("${CHI_TECH_DIR}/resources/Macros/Downstream.cmake")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")

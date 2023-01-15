@@ -137,7 +137,7 @@ int chiSimTest06_WDD(lua_State* L)
 
   //============================================= Make XSs
   chi_physics::TransportCrossSections xs;
-  xs.MakeFromChiXSFile("ChiTest/xs_graphite_pure.cxs");
+  xs.MakeFromChiXSFile("tests/xs_graphite_pure.cxs");
 
   //============================================= Initializes vectors
   std::vector<double> phi_old(num_local_phi_dofs,0.0);
