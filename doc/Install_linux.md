@@ -9,10 +9,10 @@ these steps.
 
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
-GCC is used to build and install ChiTech.
+GCC is used to build and install Chi-Tech.
 GFortran and Python is used during the installation of PETSc
-(which ChiTech uses as a linear algebra backend) and
-OpenGL is required by VTK (used by ChiTech for visualization).
+(which Chi-Tech uses as a linear algebra backend) and
+OpenGL is required by VTK (used by Chi-Tech for visualization).
 These packages will therefore also need to be installed.
 
 Check to see if gcc is installed
@@ -39,7 +39,7 @@ If you still do not get the appropriate version when running either ``gcc --vers
 or ``gfortran --version`` then there are many online resources which may be able to
 assist you.
 
-Now, install the remaining packages needed to build ChiTech and its dependencies:
+Now, install the remaining packages needed to build Chi-Tech and its dependencies:
 
 ```bash
 sudo apt-get install cmake python git zlib1g-dev libx11-dev unzip
@@ -79,7 +79,7 @@ Which should display the same message the gcc call did, i.e.
 ### Step 3 - PETSc
 
 The current supported version is
-[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz) .
+[petsc version 3.12.5](http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.12.5.tar.gz).
 
 
 Return to your *projects* folder (or whatever you chose to place stuff). Run
@@ -210,9 +210,9 @@ Set the LUA_ROOT environment variable to the **Lua** install location:
 
 Add the export command to your bash profile.
 
-### Step 6 - Build ChiTech
+### Step 6 - Build Chi-Tech
 
-Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech relevant stuff:
+Clone the **Chi-Tech** repository.  Go the folder where you want to keep Chi-Tech relevant stuff:
 ```bash
     $ git clone https://github.com/chi-tech/chi-tech
 ```
@@ -237,11 +237,11 @@ will use threading where possible.
 To check if the code compiled correctly, execute the test scripts:
 
 ```bash
-    $ python3 ChiTest/Z_Run_all.py
+    $ python3 tests/Z_Run_all.py
 ```
 
 
-### Step 8 - ChiTech documentation
+### Step 8 - Chi-Tech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
@@ -252,18 +252,18 @@ Doxygen and LaTeX are installed:
 sudo apt-get install doxygen texlive
 ```
 
-The documentation is contained in the *CHI_DOC* folder and can be generated
+The documentation is contained in the *doc* folder and can be generated
 using a script provided in that folder:
 
 ```bash
-cd ChiDoc/
+cd doc/
 ./YReGenerateDocumentation.sh
 ```
 
 Once finished, you can view the generated documentation by opening
 
 ```bash
-ChiDoc/HTMLdocs/html/index.html
+doc/HTMLdocs/html/index.html
 ```
 
 in your favorite browser.

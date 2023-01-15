@@ -28,7 +28,7 @@ ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/gfortran-12 gfortran
 ln -s /Users/USERNAME/local/homebrew/Cellar/gcc/12.2.0/bin/g++-12 g++
 ```
 
-In your ```.bashrc``` file, add these lines
+In your ```.bashrc``` file (or ```.bash_profile```), add these lines
 ```bash
 export PATH=/Users/jean.ragusa/local/bin/:$PATH
 
@@ -71,16 +71,16 @@ export FC=/Users/USERNAME/local/MPICH/mpich-4.0.3/build/bin/mpifort
 ```
 which means that, from now on, the C, C++, and Fortran compilers are the ones from MPICH.
 
-Make sure to ```source ~/.bashrc``` to take into accounts those updates.
+Make sure to ```source ~/.bashrc``` (or ```source ~/.bahs_profile```) to take into accounts those updates.
 
-### Step 3 - Clone ChiTech
+### Step 3 - Clone Chi-Tech
 
 **Note:** From now on, the rest of the instructions are identical to the ones from the 
 [Easy Linux instructions](./Install_ubuntu_easy.md)
 
-**Important:**  If you want to contribute to **ChiTech**, it is strongly recommended to first fork the **ChiTech** repository into your own Git account and then to clone your fork. 
+**Important:**  If you want to contribute to **Chi-Tech**, it is strongly recommended to first fork the **Chi-Tech** repository into your own Git account and then to clone your fork. 
 
-Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech relevant stuff:
+Clone the **Chi-Tech** repository.  Go the folder where you want to keep Chi-Tech relevant stuff:
 ```bash
     $ git clone https://github.com/chi-tech/chi-tech
 ```
@@ -104,7 +104,7 @@ Before building the dependencies, you need to export a few variables for the PET
 Go to the chi-tech folder you have just cloned and type:
 ```bash
     $ cd chi-tech
-    $ python3 ChiResources/configure_dependencies.py ../dependencies
+    $ python3 resources/configure_dependencies.py ../dependencies
 ```
 The configure script will attempt to download and install all the necessary 
 dependencies **and may take a long time**
@@ -112,16 +112,16 @@ dependencies **and may take a long time**
 ### Step 4 - Configure environment
 
 The next step in this process is to setup the environment variables for compiling
-ChiTech.
+Chi-Tech.
 
 ```bash
     $source ./dependencies/configure_deproots.sh
 ```
 **Note:** You can replace ```$source ``` in the above with ```$. ```
 
-### Step 5 - Build ChiTech
+### Step 5 - Build Chi-Tech
 
-To compile ChiTech now just execute:
+To compile Chi-Tech now just execute:
 ```bash
     $ ./configure.sh
 ```
@@ -148,17 +148,17 @@ you can run
 To check if the code compiled correctly, execute the test scripts:
 
 ```bash
-    $ python3 ChiTest/Z_Run_all.py
+    $ python3 tests/Z_Run_all.py
 ```
 
-### Step 7 - ChiTech documentation
+### Step 7 - Chi-Tech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
 To generate the documentation from your local working copy, first make sure
 Doxygen, Lua, and LaTeX (texlive) are installed (otherwise, get them from ```brew```).
 
-*Note:* Given that Lua was installed already as a ChiTech dependencies, you may elect not to 
+*Note:* Given that Lua was installed already as a Chi-Tech dependencies, you may elect not to 
 intall Lua again, but rather add its location to your PATH. I have chosen to add a symbolic link in
 ```/Users/USERNAME/local/bin/``` as follows:
 ```bash
@@ -166,18 +166,18 @@ ln -s /Users/USERNAME/repo/dependencies/LUA/lua-5.3.5/install/bin/lua lua
 ```
 
 
-The documentation is contained in the *ChiDoc* folder and can be generated
+The documentation is contained in the `doc` folder and can be generated
 using a script provided in that folder:
 
 ```bash
-cd ChiDoc/
+cd doc/
 ./YReGenerateDocumentation.sh
 ```
 
 Once finished, you can view the generated documentation by opening
 
 ```bash
-ChiDoc/HTMLdocs/html/index.html
+doc/HTMLdocs/html/index.html
 ```
 
 in your favorite browser.

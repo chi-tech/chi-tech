@@ -2,7 +2,7 @@
 
 ## Lua for users
 
-ChiTech input filenames are written in Lua: 
+Chi-Tech input filenames are written in Lua: 
 - Some of the code objects are directly accessible in the Lua console,
 - Portion of the input can often be generated using Lua scripting.
 
@@ -22,8 +22,8 @@ help you locate the local versions of those pages.
 
 ## Meshing
 
-ChiTech handles many types of meshes, including arbitrary polyhedral meshes. 
-Complex meshes are often generated externally and loaded into ChiTech. 
+Chi-Tech handles many types of meshes, including arbitrary polyhedral meshes. 
+Complex meshes are often generated externally and loaded into Chi-Tech. 
 Hence, it is important for users to be familiar with CAD and mesh generators.
 
 We provide some [meshing tutorial here](https://chi-tech.github.io/d4/d25/_mesh_tutorials.html) 
@@ -34,5 +34,5 @@ A set of lua example files can be found:
 1. in the documentation: In the left column on the main documentation page, click
 on [Tutorials](https://chi-tech.github.io/d8/d2d/_tutorial00.html); 
 these are fully commented out input files. 
-2. in the ```ChiTest``` folder: these files are the regression suite input files but 
+2. in the ```tests``` folder: these files are the regression suite input files but 
 they cover quite a few situations.

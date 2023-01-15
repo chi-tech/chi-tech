@@ -9,9 +9,9 @@ these steps.
 
 ### Step 1 - Installing GCC, GFortran and the basic environment
 
-- GCC is used to build and install ChiTech.
+- GCC is used to build and install Chi-Tech.
 - GFortran and Python are used during the installation of PETSc
-(which ChiTech uses as a linear algebra backend) 
+(which Chi-Tech uses as a linear algebra backend) 
 - OpenGL has become optional and VTK can be used, through ViSiT and Paraview, for visualization.
 
 The above packages will therefore need to be installed.
@@ -42,7 +42,7 @@ assist you. One issue commonly seen is that the repositories on your system are 
 updated in which case just run ```sudo apt update```, possibly followed by 
 ```sudo apt upgrade```.
 
-Now, install the remaining packages needed to build ChiTech and its dependencies:
+Now, install the remaining packages needed to build Chi-Tech and its dependencies:
 
 ```bash
 sudo apt-get install cmake python3 git zlib1g-dev libx11-dev unzip
@@ -78,11 +78,11 @@ Which should display the same message the gcc call did, i.e.,
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-### Step 3 - Clone ChiTech
+### Step 3 - Clone Chi-Tech
 
-**Important:**  If you want to contribute to **ChiTech**, it is strongly recommended to first fork the **ChiTech** repository into your own Git account and then to clone your fork. 
+**Important:**  If you want to contribute to **Chi-Tech**, it is strongly recommended to first fork the **Chi-Tech** repository into your own Git account and then to clone your fork. 
 
-Clone the **ChiTech** repository.  Go the folder where you want to keep ChiTech relevant stuff:
+Clone the **Chi-Tech** repository.  Go the folder where you want to keep Chi-Tech relevant stuff:
 ```bash
     $ git clone https://github.com/chi-tech/chi-tech
 ```
@@ -114,16 +114,16 @@ dependencies **and may take a long time**
 ### Step 4 - Configure environment
 
 The next step in this process is to setup the environment variables for compiling
-ChiTech.
+Chi-Tech.
 
 ```bash
     $source ./dependencies/configure_deproots.sh
 ```
 **Note:** You can replace ```$source ``` in the above with ```$. ```
 
-### Step 5 - Build ChiTech
+### Step 5 - Build Chi-Tech
 
-To compile ChiTech now just execute:
+To compile Chi-Tech now just execute:
 ```bash
     $ ./configure.sh
 ```
@@ -150,10 +150,10 @@ you can run
 To check if the code compiled correctly execute the test scripts:
 
 ```bash
-    $ python3 ChiTest/Z_Run_all.py
+    $ python3 tests/Z_Run_all.py
 ```
 
-### Step 7 - ChiTech documentation
+### Step 7 - Chi-Tech documentation
 
 You can either access the documentation online [here](https://chi-tech.github.io), or generate it locally.
 
@@ -167,11 +167,11 @@ sudo apt install texlive-font-utils
 sudo apt-get install lua5.4
 ```
 
-The documentation is contained in the *ChiDoc* folder and can be generated
+The documentation is contained in the `doc` folder and can be generated
 using a script provided in that folder:
 
 ```bash
-cd ChiDoc/
+cd doc/
 ./YReGenerateDocumentation.sh
 ```
 
