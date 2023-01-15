@@ -54,26 +54,24 @@ chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,n_vol,n_bndry)
 chiVolumeMesherSetProperty(BNDRYID_FROMLOGICAL,s_vol,s_bndry)
 
 --############################################### Call Lua Sim Test
-chiSimTest_IP_MMS_L2error()
-
---############################################### Get field functions
-fflist,count = chiGetFieldFunctionList(phys1)
+chiSimTest_IP_MMS_L2error() --simtest_IP_MMS_L2_handle becomes available here
 
 --############################################### Export VTU
 if (master_export == nil) then
-    chiExportFieldFunctionToVTK(fflist[1],"DFEMDiff2D_MMS","flux")
+    chiExportFieldFunctionToVTK(simtest_IP_MMS_L2_handle,"DFEMDiff2D_MMS","flux")
 end
 
---############################################### Volume integrations
+----############################################### Volume integrations
 vol0 = chiLogicalVolumeCreate(RPP,-1000,1000,-1000,1000,-1000,1000)
-
+--
 ffvol = chiFFInterpolationCreate(VOLUME)
 chiFFInterpolationSetProperty(ffvol,OPERATION,OP_MAX)
 chiFFInterpolationSetProperty(ffvol,LOGICAL_VOLUME,vol0)
-chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,fflist[1])
-
+chiFFInterpolationSetProperty(ffvol,ADD_FIELDFUNCTION,simtest_IP_MMS_L2_handle)
+--
 chiFFInterpolationInitialize(ffvol)
 chiFFInterpolationExecute(ffvol)
 maxval = chiFFInterpolationGetValue(ffvol)
 
 chiLog(LOG_0,string.format("Max-value=%.6f", maxval))
+
