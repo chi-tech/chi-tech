@@ -48,6 +48,7 @@ class chi_mesh::FieldFunctionInterpolation
 {
 protected:
   ff_interpolation::Type m_type;
+  unsigned int m_ref_component = 0;
 public:
   std::vector<std::shared_ptr<chi_physics::FieldFunction>> field_functions;
 

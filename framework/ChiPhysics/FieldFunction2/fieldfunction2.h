@@ -7,7 +7,8 @@
 
 #include "ChiMath/UnknownManager/unknown_manager.h"
 
-#include <vtkUnstructuredGrid.h>
+#include "vtkUnstructuredGrid.h"
+#include <petscksp.h>
 
 namespace chi_mesh
 {
@@ -72,7 +73,7 @@ public:
 
   //01 Updates
   void UpdateFieldVector(const std::vector<double>& field_vector);
-  const std::vector<double>& FieldVector() const;
+  void UpdateFieldVector(const Vec& field_vector);
 
   //03 Export VTK
   void ExportToVTK(const std::string& file_base_name) const;

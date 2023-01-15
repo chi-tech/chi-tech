@@ -1,16 +1,32 @@
 #include "fieldfunction2.h"
 
+//###################################################################
+/**Updates the field data with a STL vector.*/
 void chi_physics::FieldFunction2::
   UpdateFieldVector(const std::vector<double> &field_vector)
 {
   if (field_vector.size() < m_field_vector.size())
     throw std::logic_error("chi_physics::FieldFunction2::UpdateFieldVector: "
-                           "Attempted update with vector of different size.");
+                           "Attempted update with a vector of insufficient size.");
 
   m_field_vector = field_vector;
 }
 
-const std::vector<double>& chi_physics::FieldFunction2::FieldVector() const
+//###################################################################
+/**Updates the field data with a PETSc vector.*/
+void chi_physics::FieldFunction2::
+  UpdateFieldVector(const Vec& field_vector)
 {
-  return m_field_vector;
+  PetscInt n;
+  VecGetLocalSize(field_vector, &n);
+
+  if (n < m_field_vector.size())
+    throw std::logic_error("chi_physics::FieldFunction2::UpdateFieldVector: "
+                           "Attempted update with a vector of insufficient size.");
+
+  const double* x;
+  VecGetArrayRead(field_vector, &x);
+  for (size_t i=0; i<n; ++i)
+    m_field_vector[i] = x[i];
+  VecRestoreArrayRead(field_vector, &x);
 }
