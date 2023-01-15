@@ -3,7 +3,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 /** \defgroup LuaSolver Solvers
  * \ingroup LuaPhysics*/
@@ -192,4 +191,52 @@ int chiSolverGetName(lua_State *L)
   lua_pushstring(L, solver.TextName().c_str());
 
   return 1;
+}
+
+//###################################################################
+/**Obtains a named list of the field functions associated with a solver.
+
+\param SolverHandle int A handle to the reference solver.
+
+\ingroup LuaSolver */
+int chiSolverGetFieldFunctionList(lua_State* L)
+{
+  const std::string fname = __FUNCTION__;
+  const int num_args = lua_gettop(L);
+  if (num_args != 1)
+    LuaPostArgAmountError("chiGetFieldFunctionList",1,num_args);
+
+  //======================================================= Getting solver
+  const int solver_index = lua_tonumber(L,1);
+
+  auto solver = chi::GetStackItemPtr(chi::solver_stack, solver_index, fname);
+
+  //============================================= Push up new table
+  lua_newtable(L);
+  for (size_t ff=0; ff<solver->field_functions2.size(); ff++)
+  {
+    lua_pushinteger(L,static_cast<lua_Integer>(ff)+1);
+    int pff_count = -1;
+    bool found = false;
+    for (auto& pff : chi::fieldfunc2_stack)
+    {
+      ++pff_count;
+      if (pff == solver->field_functions2[ff])
+      {
+        lua_pushnumber(L,pff_count);
+        found = true;
+        break;
+      }
+    }
+
+    if (not found)
+      throw std::logic_error(fname + ": The solver specified has no "
+                                     "field functions that match the global"
+                                     " stack.");
+    lua_settable(L,-3);
+  }
+
+  lua_pushinteger(L,static_cast<lua_Integer>(solver->field_functions2.size()));
+
+  return 2;
 }

@@ -9,6 +9,7 @@ int chiSolverExecute(lua_State* L);
 int chiSolverStep(lua_State* L);
 int chiSolverSetBasicOption(lua_State* L);
 int chiSolverGetName(lua_State* L);
+int chiSolverGetFieldFunctionList(lua_State* L);
 
 int chiPhysicsAddMaterial(lua_State* L);
 int chiPhysicsMaterialAddProperty(lua_State* L);

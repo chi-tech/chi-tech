@@ -4,6 +4,8 @@
 
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+
 #define scdouble static_cast<double>
 
 //###################################################################

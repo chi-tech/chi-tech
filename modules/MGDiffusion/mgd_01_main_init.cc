@@ -172,30 +172,6 @@ void mg_diffusion::Solver::Initialize()
   //                                              update
 
   //============================================= Field Function
-  if (field_functions.empty())
-  {
-    auto unk_man = OneDofPerNode;
-
-    for (uint g=0; g < num_groups; ++g)
-    {
-      unk_man.SetUnknownTextName(0,"");
-      unk_man.SetUnknownComponentTextName(0,0,"");
-
-      char buff[100];
-      int dummy = snprintf(buff,4,"%03d",g);
-
-      auto initial_field_function =
-        std::make_shared<chi_physics::FieldFunction>(
-          std::string("mg_phi_"+std::string(buff)),//Text name
-          sdm_ptr,              //Spatial Discretization
-          &x[g],                //Data vector
-          unk_man);             //Unknown Manager
-
-      field_functions.push_back(initial_field_function);
-      chi::fieldfunc_stack.push_back(initial_field_function);
-    }//for g
-  }//if not ff set
-
   if (field_functions2.empty())
   {
     for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)

@@ -3,6 +3,11 @@
 
 #include "ChiMesh/Raytrace/raytracing.h"
 
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
+#include "chi_runtime.h"
 #include "chi_log.h"
 
 /**Initializes the data structures necessary for interpolation. This is
@@ -23,7 +28,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::
     throw std::logic_error("Unassigned field function in slice "
                            "field function interpolator.");
 
-  const auto& grid = *field_functions.front()->spatial_discretization->ref_grid;
+  const auto& grid = *field_functions.front()->SDM().ref_grid;
 
   //================================================== Find cells intersecting
   //                                                   plane
@@ -78,7 +83,6 @@ void chi_mesh::FieldFunctionInterpolationSlice::
 
   //================================================== Computing cell
   //                                                   intersections
-  size_t num_cut_cells = intersecting_cell_indices.size();
   for (const uint64_t cell_local_index : intersecting_cell_indices)
   {
     const auto& cell = grid.local_cells[cell_local_index];

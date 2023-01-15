@@ -135,9 +135,9 @@ chiLBSWriteFluxMoments(phys1, "Adjoint2D_1b_adjoint")
 
 
 --############################################### Get field functions
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m0")
-ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m1")
-ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
+ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m0")
+ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m1")
+ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m2")
 
 
 --############################################### Slice plot

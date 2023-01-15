@@ -8,18 +8,23 @@
 #include "ChiTimer/chi_timer.h"
 
 #include "ChiConsole/chi_console.h"
+#include "ChiMath/UnknownManager/unknown_manager.h"
+
+#include "ChiMesh/chi_mesh.h"
+
+#include <map>
 
 // forward declaration
 namespace chi_mesh
 {
 class MeshContinuum; 
 typedef std::shared_ptr<MeshContinuum> MeshContinuumPtr;
-};
+}
 namespace chi_math
 {
 class SpatialDiscretization; 
 typedef std::shared_ptr<SpatialDiscretization> SDMPtr ;
-};
+}
 
 namespace dfem_diffusion
 {
@@ -35,7 +40,6 @@ public:
 
   size_t num_local_dofs = 0;
   size_t num_globl_dofs = 0;
-  chi_math::UnknownManager                 unknown_manager;
 
   std::vector<double> field;
 
@@ -49,7 +53,7 @@ public:
   std::vector<Boundary>   boundaries;
 
   explicit Solver(const std::string& in_solver_name);
-  virtual ~Solver();
+  ~Solver() override;
 
   // void Initialize() override;
   void Initialize() override;
@@ -69,13 +73,13 @@ public:
   static
   double CallLua_iXYZFunction(lua_State* L,
                               const std::string&,
-                              const int,
+                              int,
                               const chi_mesh::Vector3&);
 
   void UpdateFieldFunctions();
 };
 
-}; // namespace dfem_diffusion
+} // namespace dfem_diffusion
 
 
 #endif //DFEM_DIFFUSION_SOLVER_H

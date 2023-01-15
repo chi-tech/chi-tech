@@ -136,20 +136,7 @@ void cfem_diffusion::Solver::Initialize()
  
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
-                                           nodal_nnz_off_diag);  
-  if (field_functions.empty())
-  {
-    auto unk_man = OneDofPerNode;
-    auto initial_field_function =
-      std::make_shared<chi_physics::FieldFunction>(
-        std::string("phi"),   //Text name
-        sdm_ptr,              //Spatial Discretization
-        &x,                   //Data vector
-        unk_man);             //Unknown Manager
-
-      field_functions.push_back(initial_field_function);
-      chi::fieldfunc_stack.push_back(initial_field_function);
-  }//if not ff set
+                                           nodal_nnz_off_diag);
 
   if (field_functions2.empty())
   {

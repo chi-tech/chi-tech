@@ -276,6 +276,7 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
 /**Update the field functions with the latest data.*/
 void chi_diffusion::Solver::UpdateFieldFunctions()
 {
+  chi::log.LogAll() << "Updating field functions" << std::endl;
   auto& ff = *field_functions2.front();
   const auto& OneDofPerNode = discretization->UNITARY_UNKNOWN_MANAGER;
 

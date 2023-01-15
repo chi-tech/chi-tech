@@ -41,10 +41,7 @@ public:
   //02
   void Execute() override;
 
-  void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
-  void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping);
-
-  double CallLuaFunction(double ff_value, int mat_id);
+  double CallLuaFunction(double ff_value, int mat_id) const;
 
   std::string GetDefaultFileBaseName() const override
   {return "ZVFFI";}

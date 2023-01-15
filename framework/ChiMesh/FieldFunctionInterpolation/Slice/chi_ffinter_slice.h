@@ -3,6 +3,8 @@
 
 #include "../chi_ffinterpolation.h"
 
+#include "ChiMesh/chi_mesh.h"
+
 namespace chi_mesh
 {
 struct FFIFaceEdgeIntersection

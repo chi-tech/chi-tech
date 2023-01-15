@@ -63,38 +63,6 @@ int chi_diffusion::Solver::Initialize(bool verbose)
 
   //================================================== Initialize discretization
   //                                                   method
-  if (field_functions.empty())
-  {
-    if (sdm_string == "PWLC")
-    {
-      auto initial_field_function =
-        std::make_shared<chi_physics::FieldFunction>(
-          std::string("phi"),   //Text name
-          discretization,       //Spatial Discretization
-          &x,                   //Data vector
-          unknown_manager);     //Unknown Manager
-
-          field_functions.push_back(initial_field_function);
-          chi::fieldfunc_stack.push_back(initial_field_function);
-    }
-    else if (sdm_string == "PWLD_MIP" or sdm_string == "PWLD_MIP_GAGG")
-    {
-      pwld_phi_local.resize(local_dof_count);
-      if (field_functions.empty())
-      {
-        auto initial_field_function =
-          std::make_shared<chi_physics::FieldFunction>(
-            std::string("phi"),   //Text name
-            discretization,       //Spatial Discretization
-            &pwld_phi_local,      //Data vector
-            unknown_manager);     //Unknown Manager
-
-            field_functions.push_back(initial_field_function);
-            chi::fieldfunc_stack.push_back(initial_field_function);
-      }
-    }
-  }//if not ff set
-
   if (field_functions2.empty())
   {
     auto& sdm_ptr = discretization;

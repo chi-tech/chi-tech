@@ -3,6 +3,10 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 //###################################################################
 /**Initializes the volume field function interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
@@ -17,7 +21,7 @@ void chi_mesh::FieldFunctionInterpolationVolume::Initialize()
     throw std::logic_error("Unassigned logical volume in volume field function"
                            "interpolator.");
 
-  const auto& grid = *field_functions.front()->spatial_discretization->ref_grid;
+  const auto& grid = *field_functions.front()->SDM().ref_grid;
 
   //================================================== Find cells inside volume
   for (const auto& cell : grid.local_cells)

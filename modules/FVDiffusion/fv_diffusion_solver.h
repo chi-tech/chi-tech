@@ -9,6 +9,10 @@
 
 #include "ChiConsole/chi_console.h"
 
+#include "ChiMesh/chi_mesh.h"
+
+#include <map>
+
 // forward declaration
 namespace chi_mesh
 {
@@ -46,7 +50,7 @@ namespace fv_diffusion
     std::vector<Boundary>   boundaries;
 
     explicit Solver(const std::string& in_solver_name);
-    virtual ~Solver();
+    ~Solver() override;
 
     // void Initialize() override;
     void Initialize() override;
@@ -56,7 +60,7 @@ namespace fv_diffusion
     static
     double CallLua_iXYZFunction(lua_State* L,
                                 const std::string&,
-                                const int,
+                                int,
                                 const chi_mesh::Vector3&);
 
     void UpdateFieldFunctions();

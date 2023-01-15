@@ -1,6 +1,7 @@
 #include "mg_diffusion_solver.h"
 
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 //###################################################################
 /**Updates the field functions with the lates data.*/
