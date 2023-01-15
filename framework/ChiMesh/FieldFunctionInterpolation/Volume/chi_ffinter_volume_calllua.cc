@@ -2,10 +2,6 @@
 
 #include "ChiConsole/chi_console.h"
 
-
-#include <chi_log.h>
-;
-
 //###################################################################
 /**Calls the designated lua function*/
 double chi_mesh::FieldFunctionInterpolationVolume::

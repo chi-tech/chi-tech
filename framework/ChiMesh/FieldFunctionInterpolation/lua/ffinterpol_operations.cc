@@ -1,12 +1,6 @@
 #include "ChiLua/chi_lua.h"
 
-#include "../chi_ffinterpolation.h"
-#include "chi_runtime.h"
-
-#include "chi_runtime.h"
-#include "chi_log.h"
-;
-
+#include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 
 //###################################################################
 /** Initialize interpolator.

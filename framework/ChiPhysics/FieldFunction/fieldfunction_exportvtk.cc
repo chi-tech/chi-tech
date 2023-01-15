@@ -5,10 +5,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
-
-#include "chi_mpi.h"
-
 
 #include <vtkCellType.h>
 
@@ -23,7 +19,7 @@ void chi_physics::FieldFunction::
                            const std::string& field_name)
 {
   chi::log.Log()
-    << "Exporting field function " << text_name
+    << "Exporting field function " << TextName()
     << " to files with base name " << base_name;
 
   typedef chi_math::SpatialDiscretizationType SDMType;
@@ -47,7 +43,7 @@ void chi_physics::FieldFunction::ExportToVTK(const std::string& base_name,
                                              const std::string& field_name)
 {
   chi::log.Log()
-    << "Exporting field function " << text_name
+    << "Exporting field function " << TextName()
     << " to files with base name " << base_name
     << " to field name " << field_name;
 
