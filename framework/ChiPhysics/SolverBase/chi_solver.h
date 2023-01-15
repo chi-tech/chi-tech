@@ -8,7 +8,7 @@
 
 namespace chi_physics
 {
-  class FieldFunction2;
+  class FieldFunction;
 }
 
 
@@ -22,7 +22,7 @@ private:
   std::string text_name;
 public:
   BasicOptions basic_options;
-  std::vector<std::shared_ptr<FieldFunction2>> field_functions2;
+  std::vector<std::shared_ptr<FieldFunction>> field_functions2;
 
 public:
   explicit

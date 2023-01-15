@@ -5,9 +5,9 @@
 #include "ChiTimer/chi_timer.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
@@ -146,7 +146,7 @@ void mg_diffusion::Solver::Initialize()
 
       using namespace chi_math;
       auto initial_field_function =
-        std::make_shared<chi_physics::FieldFunction2>(
+        std::make_shared<chi_physics::FieldFunction>(
           text_name,                     //Text name
           sdm_ptr,                       //Spatial Discretization
           Unknown(UnknownType::SCALAR)); //Unknown Manager

@@ -13,7 +13,9 @@ void chi_mesh::ff_interpolation_lua_utils::RegisterLuaEntities(lua_State *L)
     LUA_CMACRO1(SLICE , 1);
     LUA_CMACRO1(LINE  , 2);
     LUA_CMACRO1(VOLUME, 3);
+    LUA_CMACRO1(POINT,  4);
   LUA_FMACRO1(chiFFInterpolationSetProperty);
+    LUA_CMACRO1(SLICE_POINT,   0);
     LUA_CMACRO1(SLICE_POINT,   1);
     LUA_CMACRO1(SLICE_NORMAL,   2);
     LUA_CMACRO1(SLICE_TANGENT,   3);

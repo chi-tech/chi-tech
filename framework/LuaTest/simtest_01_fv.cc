@@ -9,7 +9,7 @@
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 namespace chi_unit_sim_tests
 {
@@ -140,7 +140,7 @@ int chiSimTest01_FV(lua_State* L)
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::SCALAR)

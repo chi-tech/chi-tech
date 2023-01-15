@@ -3,7 +3,7 @@
 #include "chi_runtime.h"
 
 #include "ChiPhysics/SolverBase/chi_solver.h"
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_log.h"
 

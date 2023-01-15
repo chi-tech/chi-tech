@@ -461,7 +461,7 @@ MatDestroy(&A);
 chi::log.Log() << "Done cleanup";
 
 //============================================= Create Field Function
-auto ff = std::make_shared<chi_physics::FieldFunction2>(
+auto ff = std::make_shared<chi_physics::FieldFunction>(
   "Phi",                                           //Text name
   sdm_ptr,                                         //Spatial Discr.
   chi_math::Unknown(chi_math::UnknownType::SCALAR) //Unknown
@@ -488,7 +488,7 @@ ff->ExportToVTK("CodeTut3_PWLC");
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction2.h"
 
 int main(int argc, char* argv[])
 {
@@ -642,7 +642,7 @@ int main(int argc, char* argv[])
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::SCALAR) //Unknown

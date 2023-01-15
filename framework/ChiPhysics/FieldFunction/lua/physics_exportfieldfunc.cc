@@ -1,6 +1,6 @@
 #include "ChiLua/chi_lua.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -51,7 +51,7 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
   LuaCheckTableValue(fname,L,1);
 
   const size_t table_size = lua_rawlen(L,1);
-  std::vector<std::shared_ptr<const chi_physics::FieldFunction2>> ffs;
+  std::vector<std::shared_ptr<const chi_physics::FieldFunction>> ffs;
   ffs.reserve(table_size);
   for (int i=0; i<table_size; ++i)
   {
@@ -66,7 +66,7 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
     ffs.push_back(ff);
   }
 
-  chi_physics::FieldFunction2::ExportMultipleToVTK(base_name,ffs);
+  chi_physics::FieldFunction::ExportMultipleToVTK(base_name, ffs);
 
   return 0;
 }

@@ -1,6 +1,7 @@
 #include "diffusion_solver.h"
 
 #include "ChiMath/SpatialDiscretization/CellMappings/FE_PWL/pwl_cellbase.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 

@@ -264,7 +264,7 @@ field-function that will export all three the components of the gradient togethe
 Then we use paraview to make arrow glyphs for visualization.
 \code
 //============================================= Create Field Function
-auto ff_grad = std::make_shared<chi_physics::FieldFunction2>(
+auto ff_grad = std::make_shared<chi_physics::FieldFunction>(
   "GradPhi",
   sdm_ptr,
   chi_math::Unknown(chi_math::UnknownType::VECTOR_3)
@@ -298,7 +298,7 @@ visualization as shown below
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction2.h"
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 
@@ -429,7 +429,7 @@ int main(int argc, char* argv[])
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::SCALAR)
@@ -503,7 +503,7 @@ int main(int argc, char* argv[])
   }//for cell
 
   //============================================= Create Field Function
-  auto ff_grad = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff_grad = std::make_shared<chi_physics::FieldFunction>(
     "GradPhi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::VECTOR_3)

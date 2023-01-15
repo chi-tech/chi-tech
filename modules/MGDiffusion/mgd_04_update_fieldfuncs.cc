@@ -1,6 +1,6 @@
 #include "mg_diffusion_solver.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 
 //###################################################################

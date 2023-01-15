@@ -9,7 +9,7 @@
 #include "LinearBoltzmannSolver/Acceleration/diffusion_mip.h"
 #include "LinearBoltzmannSolver/lbs_structs.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -176,7 +176,7 @@ int chiSimTest92_DSA(lua_State* L)
   solver.Solve(x_vector);
 
   //============================================= Make Field-Function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",
     sdm_ptr,
     OneDofPerNode.unknowns.front()

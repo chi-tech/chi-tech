@@ -1,6 +1,6 @@
 #include "chi_ffinter_line.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_mpi.h"
 #include "chi_log.h"

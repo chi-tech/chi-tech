@@ -1,7 +1,7 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -185,7 +185,7 @@ void lbs::SteadySolver::InitializeParrays()
         const std::string text_name = std::string(buff);
 
         using namespace chi_math;
-        auto group_ff = std::make_shared<chi_physics::FieldFunction2>(
+        auto group_ff = std::make_shared<chi_physics::FieldFunction>(
           text_name,                     //Field name
           discretization,                //Spatial discretization
           Unknown(UnknownType::SCALAR)); //Unknown/Variable

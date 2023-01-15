@@ -1,5 +1,6 @@
 #include "ChiLua/chi_lua.h"
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/FieldFunctionInterpolation/Point/chi_ffinter_point.h"
 #include "ChiMesh/FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
 #include "ChiMesh/FieldFunctionInterpolation/Line/chi_ffinter_line.h"
 #include "ChiMesh/FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
@@ -7,6 +8,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#define dcastPoint(x) dynamic_cast<chi_mesh::FieldFunctionInterpolationPoint&>(x)
 #define dcastLine(x) dynamic_cast<chi_mesh::FieldFunctionInterpolationLine&>(x)
 #define dcastSlice(x) dynamic_cast<chi_mesh::FieldFunctionInterpolationSlice&>(x)
 #define dcastVolume(x) dynamic_cast<chi_mesh::FieldFunctionInterpolationVolume&>(x)
@@ -21,6 +23,8 @@
 
 ###PropertyIndex\n
 ADD_FIELDFUNCTION     = Add field function to interpolation.\n
+SET_FIELDFUNCTIONS    = Sets the field functions to interpolate using a lua table.\n
+PROBEPOINT            = Reference point for POINT type FFIs.\n
 SLICE_POINT           = Reference point for SLICE type FFIs.\n
 SLICE_NORMAL          = Normal of slice plane.\n
 SLICE_TANGENT         = Tangent vector of slice plane.\n
@@ -108,6 +112,13 @@ int chiFFInterpolationSetProperty(lua_State *L)
   //================================================== Process properties
   using namespace chi_mesh::ff_interpolation;
   auto property = static_cast<Property>(lua_tonumber(L,2));
+  //======================================== Check point properties
+  if (property == Property::PROBEPOINT)
+    if (p_ffi->Type() != chi_mesh::ff_interpolation::Type::POINT)
+      throw std::logic_error(
+        "Point property" + std::to_string(static_cast<int>(property)) +
+        " used in chiFFInterpolationSetProperty but FFI is not a point-probe.");
+
   //======================================== Check slice properties
   if ((property >= Property::SLICEPOINT) && (property <= Property::SLICEBINORM))
     if (p_ffi->Type() != chi_mesh::ff_interpolation::Type::SLICE)
@@ -129,6 +140,30 @@ int chiFFInterpolationSetProperty(lua_State *L)
     auto cur_ff = chi::GetStackItemPtr(chi::fieldfunc2_stack, ffhandle, fname);
 
     p_ffi->field_functions.push_back(cur_ff);
+  }
+  else if (property == Property::SET_FIELD_FUNCTIONS)
+  {
+    LuaCheckTableValue(fname, L, 3);
+    std::vector<double> handle_array;
+    LuaPopulateVectorFrom1DArray(fname, L, 3, handle_array);
+
+    for (double handle_d : handle_array)
+    {
+      const auto ffhandle = static_cast<int>(handle_d);
+      auto cur_ff = chi::GetStackItemPtr(chi::fieldfunc2_stack, ffhandle, fname);
+
+      p_ffi->field_functions.push_back(cur_ff);
+    }//for handle
+  }
+  else if (property == Property::PROBEPOINT)
+  {
+    auto& cur_ffi = dcastPoint(*p_ffi);
+
+    double x = lua_tonumber(L,3);
+    double y = lua_tonumber(L,4);
+    double z = lua_tonumber(L,5);
+
+    cur_ffi.m_point_of_interest = chi_mesh::Vector3(x, y, z);
   }
   else if (property == Property::SLICEPOINT)
   {
