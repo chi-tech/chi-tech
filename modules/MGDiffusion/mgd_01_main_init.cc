@@ -18,19 +18,34 @@ mg_diffusion::Solver::Solver(const std::string& in_solver_name):
   chi_physics::Solver(in_solver_name, { {"max_inner_iters"   , int64_t(500)},
                                         {"residual_tolerance", 1.0e-2},
                                         {"verbose_level"     , int64_t (0) },
-                                        {"thermal_flux_error", 1.0e-2},
-                                        {"max_thermal_iters" , int64_t(500)}
+                                        {"thermal_flux_tolerance", 1.0e-2},
+                                        {"max_thermal_iters" , int64_t(500)},
+                                        {"do_two_grid"       , false}
   })
 {}
 
 //============================================= destructor
 mg_diffusion::Solver::~Solver()
 {
-  for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
+  for (uint g=0; g<num_groups; ++g)
   {
     VecDestroy(&x[g]);
     VecDestroy(&bext[g]);
     MatDestroy(&A[g]);
+  }
+  VecDestroy(&b);
+
+  if (last_fast_group < num_groups)
+  {
+    VecDestroy(&thermal_dphi);
+    for (uint g=last_fast_group; g<num_groups; ++g)
+      VecDestroy(&x_old[g]);
+  }
+
+  if (do_two_grid)
+  {
+    VecDestroy(&x[num_groups]);
+    MatDestroy(&A[num_groups]);
   }
 }
 
@@ -100,45 +115,70 @@ void mg_diffusion::Solver::Initialize()
   std::vector<int64_t> nodal_nnz_off_diag;
   sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag, OneDofPerNode);
 
-  A.resize(mg_diffusion::Solver::num_groups, nullptr);
-  bext.resize(mg_diffusion::Solver::num_groups, nullptr);
-  x.resize(mg_diffusion::Solver::num_groups, nullptr);
+  unsigned int i_two_grid = do_two_grid ? 1 : 0;
+  std::cout << "i_two_grid = " << i_two_grid << std::endl;
+
+  A.resize(num_groups+i_two_grid, nullptr);
+  x.resize(num_groups+i_two_grid, nullptr);
+  bext.resize(num_groups, nullptr);
 
   auto ghost_dof_indices = sdm.GetGhostDOFIndices(OneDofPerNode);
 
-  for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
+  for (uint g=0; g < num_groups; ++g)
   {
-    A[g] = chi_math::PETScUtils::CreateSquareMatrix(n,N);
-//    x[g] = chi_math::PETScUtils::CreateVector(n,N);
+    // x[g] = chi_math::PETScUtils::CreateVector(n,N);
     x[g] = chi_math::PETScUtils::CreateVectorWithGhosts(n,N,
                   static_cast<int64_t>(ghost_dof_indices.size()),
                   ghost_dof_indices);
+    VecSet(x[g], 0.0);
     bext[g] = chi_math::PETScUtils::CreateVector(n,N);
 
+    A[g] = chi_math::PETScUtils::CreateSquareMatrix(n,N);
     chi_math::PETScUtils::InitMatrixSparsity(A[g],
                                              nodal_nnz_in_diag,
                                              nodal_nnz_off_diag);
   }
-  // also initialize b
+  // initialize b
   VecDuplicate(bext.front(), &b);
-  // also initialize old flux for thermal groups
-  if (mg_diffusion::Solver::last_fast_group<mg_diffusion::Solver::num_groups)
+  // initialize old flux for thermal groups
+  if (last_fast_group < num_groups)
   {
     VecDuplicate(x.front(), &thermal_dphi);
-    x_old.resize(mg_diffusion::Solver::num_groups, nullptr);
-    for (uint g=mg_diffusion::Solver::last_fast_group; g<mg_diffusion::Solver::num_groups; ++g)
-      VecDuplicate(bext.front(), &x_old[g]);
+    x_old.resize(num_groups, nullptr);
+    for (uint g=0; g < num_groups; ++g)
+    {
+      VecDuplicate(x.front(), &x_old[g]); //jcr is x_old like bext or like x?
+      VecSet(x_old[g], 0.0);
+    }
+    }
+  // add two-grid mat and vec, if needed
+  if (do_two_grid)
+  {
+    A[num_groups] = chi_math::PETScUtils::CreateSquareMatrix(n,N);
+    chi_math::PETScUtils::InitMatrixSparsity(A[num_groups],
+                                             nodal_nnz_in_diag,
+                                             nodal_nnz_off_diag);
+    VecDuplicate(x.front(), &x[num_groups]); // jcr needed?
+//    x[num_groups] = chi_math::PETScUtils::CreateVectorWithGhosts(n,N,
+//                                                        static_cast<int64_t>(ghost_dof_indices.size()),
+//                                                        ghost_dof_indices);
   }
+
+  if (do_two_grid)
+    mg_diffusion::Solver::Compute_TwoGrid_VolumeFractions();
 
   //============================================= Create Mats and ExtVecs
   mg_diffusion::Solver::Assemble_A_bext();
+
+  //============================================= Volume fraction for two-grid
+  //                                              update
 
   //============================================= Field Function
   if (field_functions.empty())
   {
     auto unk_man = OneDofPerNode;
 
-    for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
+    for (uint g=0; g < num_groups; ++g)
     {
       unk_man.SetUnknownTextName(0,"");
       unk_man.SetUnknownComponentTextName(0,0,"");

@@ -31,6 +31,18 @@ struct KSPAppContext
   PetscBool verbose = PETSC_FALSE;
 };
 
+struct TwoGridCollapsedInfo
+{
+  double collapsed_D = 0.0;
+  double collapsed_sig_a = 0.0;
+  std::vector<double> spectrum;
+};
+
+//struct Multigroup_D_and_sigR
+//{
+//  std::vector<double> Dg;
+//  std::vector<double> sigR;
+//};
 
 /** Multi-group diffusion solver
  * 
@@ -38,12 +50,13 @@ struct KSPAppContext
 class Solver : public chi_physics::Solver
 {
 public:
-  chi_mesh::MeshContinuumPtr grid_ptr=nullptr;
+  chi_mesh::MeshContinuumPtr grid_ptr = nullptr;
 
-  chi_math::SDMPtr sdm_ptr =nullptr;
+  chi_math::SDMPtr sdm_ptr = nullptr;
 
   uint num_groups;
   uint last_fast_group;
+  bool do_two_grid = false;
 
   size_t num_local_dofs = 0;
   size_t num_globl_dofs = 0;
@@ -58,6 +71,8 @@ public:
 
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
   KSPAppContext my_app_context;
+
+  std::vector< std::vector<double> > VF;
 
 //  typedef std::pair<BoundaryType,std::vector<double>> BoundaryInfo;
   typedef std::pair<BoundaryType,std::array<std::vector<double>, 3>>
@@ -75,17 +90,25 @@ public:
   void Initialize_Materials(std::set<int> &material_ids);
   void Set_BCs(const std::vector<uint64_t>& globl_unique_bndry_ids);
   void Assemble_A_bext();
+  void Compute_TwoGrid_Params();
+  void Compute_TwoGrid_VolumeFractions();
 
   void Execute() override;
 
-  void Assemble_RHS(unsigned int g, int64_t verbose);
-  void SolveOneGroupProblem(unsigned int g, int64_t verbose);
+  void Assemble_RHS(unsigned int g, int64_t iverbose);
+  void Assemble_RHS_TwoGrid(int64_t iverbose);
+  void SolveOneGroupProblem(unsigned int g, int64_t iverbose);
+  void Update_Flux_With_TwoGrid(int64_t iverbose);
 
 protected:
-//  typedef std::map<int,Multigroup_D_and_sigR> MapMatID2XS;
+  std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>>
+  matid_to_xs_map;
+  std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>>
+  matid_to_src_map;
 
-  std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> matid_to_xs_map;
-  std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> matid_to_src_map;
+  std::map<int, TwoGridCollapsedInfo> map_mat_id_2_tginfo;
+//  std::map<int, Multigroup_D_and_sigR> map_mat_id_2_tgXS;
+
 };
 
 } // namespace mg_diffusion
