@@ -30,8 +30,9 @@
  * will allow algorithms to to build accordingly.*/
 class chi_physics::FieldFunction
 {
-public:
+protected:
   std::string               text_name;
+public:
   std::shared_ptr<chi_math::SpatialDiscretization> spatial_discretization;
   chi_math::UnknownManager  unknown_manager;
   const unsigned int        ref_component;
@@ -39,7 +40,6 @@ public:
 
   Vec*                      field_vector;
   std::vector<double>*      field_vector_local;
-  bool                      using_petsc_field_vector;
 
 public:
   /**Non-PETSc type field vector*/
@@ -55,8 +55,7 @@ public:
     ref_component(ff_unknown_component_number),
     ref_variable(ff_unknown_id),
     field_vector(nullptr),
-    field_vector_local(ff_field_vector),
-    using_petsc_field_vector(false)
+    field_vector_local(ff_field_vector)
   {}
 
   /**PETSc type field vector*/
@@ -72,9 +71,11 @@ public:
     ref_component(ff_unknown_component_number),
     ref_variable(ff_unknown_id),
     field_vector(ff_field_vector),
-    field_vector_local(nullptr),
-    using_petsc_field_vector(true)
+    field_vector_local(nullptr)
   {}
+
+  //Getters
+  const std::string& TextName() const {return text_name;}
 
   //mapping
   void
@@ -124,6 +125,9 @@ public:
                           int64_t& node_counter,
                           vtkNew<vtkPoints>& points,
                           vtkNew<vtkUnstructuredGrid>& ugrid);
+
+public:
+  std::vector<double> GetGhostedFieldVector() const;
 };
 
 

@@ -82,7 +82,7 @@ int chiGetFieldFunctionHandleByName(lua_State* L)
   std::vector<size_t> handles_that_matched;
   for (const auto& pff : chi::fieldfunc_stack)
   {
-    if (pff->text_name == ff_name)
+    if (pff->TextName() == ff_name)
       handles_that_matched.emplace_back(ff_handle_counter);
     ++ff_handle_counter;
   }

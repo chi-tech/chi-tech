@@ -7,6 +7,7 @@ add_subdirectory("CFEMDiffusion")
 add_subdirectory("DFEMDiffusion")
 add_subdirectory("LBSTransientSolver")
 add_subdirectory("MGDiffusion")
+add_subdirectory("FVDiffusion")
 
 set(MORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/lua/chi_modules_lua.cc")
 

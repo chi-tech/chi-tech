@@ -63,6 +63,13 @@ public:
                  chi_math::Unknown                unknown,
                  const std::vector<double>&       field_component_value);
 
+  //Getters
+  const std::string& TextName() const {return m_text_name;}
+  const chi_math::SpatialDiscretization& SDM() const {return *m_sdm;}
+  const chi_math::Unknown& Unknown() const {return m_unknown;}
+  const std::vector<double>& FieldVectorRead() const {return m_field_vector;}
+  const chi_math::UnknownManager& UnkManager() const {return m_unknown_manager;}
+
   //01 Updates
   void UpdateFieldVector(const std::vector<double>& field_vector);
   const std::vector<double>& FieldVector() const;

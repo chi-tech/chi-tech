@@ -63,6 +63,8 @@ void lbs::SteadySolver::
     for (int i = 0; i < num_nodes; ++i)
     {
       //==================================== Loop over moments
+      // ell em
+      // m
       for (int m = 0; m < static_cast<int>(num_moments); ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;

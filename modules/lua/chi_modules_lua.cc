@@ -9,6 +9,7 @@
 #include "DFEMDiffusion/lua/ip_lua_utils.h"
 #include "LBSTransientSolver/lua/lbts_lua_utils.h"
 #include "MGDiffusion/lua/mgds_lua_utils.h"
+#include "FVDiffusion/lua/ds_lua_utils.h"
 
 void chi_modules::lua_utils::RegisterLuaEntities(lua_State *L)
 {
@@ -21,4 +22,5 @@ void chi_modules::lua_utils::RegisterLuaEntities(lua_State *L)
   dfem_diffusion::dfem_diffusion_lua_utils::RegisterLuaEntities(L);
   lbs::lbts_lua_utils::RegisterLuaEntities(L);
   mg_diffusion::mgd_lua_utils::RegisterLuaEntities(L);
+  fv_diffusion::fv_diffusion_lua_utils::RegisterLuaEntities(L);
 }

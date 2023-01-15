@@ -4,11 +4,7 @@
 #include "ChiMesh/FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-;
-
 
 //#############################################################################
 /** Gets the value(s) associated with an interpolation provided the
@@ -56,12 +52,12 @@ int chiFFInterpolationGetValue(lua_State *L)
       lua_pushnumber(L,ff+1);
 
       lua_newtable(L);
-      auto ff_ctx = cur_ffi_line.ff_contexts[ff];
+      const auto& ff_ctx = cur_ffi_line.ff_contexts[ff];
 
       for (int p=0; p<cur_ffi_line.interpolation_points.size(); p++)
       {
         lua_pushnumber(L,p+1);
-        lua_pushnumber(L,ff_ctx->interpolation_points_values[p]);
+        lua_pushnumber(L,ff_ctx.interpolation_points_values[p]);
         lua_settable(L,-3);
       }
 

@@ -74,6 +74,11 @@ namespace chi_unit_sim_tests
     chi::log.Log() << "Error: " << std::scientific << global_error
                    << " Num-cells: " << sdm.ref_grid->GetGlobalNumberOfCells();
 
+    auto stl_vector = new std::vector<double>();
+    sdm.LocalizePETScVector(solver.x, *stl_vector, OneDofPerNode);
+
+    //Create ff but use stl_vector instead of &solver.x
+
     return 0;
   }
 

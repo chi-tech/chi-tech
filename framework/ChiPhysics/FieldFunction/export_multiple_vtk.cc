@@ -137,7 +137,7 @@ void chi_physics::FieldFunction::
     for (unsigned int comp=0; comp<unknown.num_components; ++comp)
     {
       vtkNew<vtkDoubleArray> unk_arr;
-      unk_arr->SetName((ff->text_name +
+      unk_arr->SetName((ff->TextName() +
                         unknown.text_name+
                         unknown.component_text_names[comp]).c_str());
 
