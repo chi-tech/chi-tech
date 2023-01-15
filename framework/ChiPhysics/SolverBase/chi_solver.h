@@ -1,12 +1,10 @@
 #ifndef CHI_PHYSICS_SOLVER_H
 #define CHI_PHYSICS_SOLVER_H
-#include<iostream>
+#include <iostream>
 #include <utility>
 #include "ChiPhysics/chi_physics_namespace.h"
 
 #include "ChiPhysics/BasicOptions/basic_options.h"
-
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 namespace chi_physics
 {
@@ -24,7 +22,6 @@ private:
   std::string text_name;
 public:
   BasicOptions basic_options;
-  std::vector<std::shared_ptr<FieldFunction>> field_functions;
   std::vector<std::shared_ptr<FieldFunction2>> field_functions2;
 
 public:

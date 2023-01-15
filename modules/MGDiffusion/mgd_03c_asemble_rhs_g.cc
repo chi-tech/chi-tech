@@ -2,6 +2,7 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //========================================================== Solve 1g problem
 void mg_diffusion::Solver::Assemble_RHS(const unsigned int g, const int64_t verbose)

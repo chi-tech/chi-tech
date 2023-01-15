@@ -114,10 +114,12 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-lbs_ff_g0_m0 = chiGetFieldFunctionHandleByName("Flux_g0_m0")
-lbs_ff_g0_m1 = chiGetFieldFunctionHandleByName("Flux_g0_m1")
-lbs_ff_g0_m2 = chiGetFieldFunctionHandleByName("Flux_g0_m2")
-lbs_ff_g0_m3 = chiGetFieldFunctionHandleByName("Flux_g0_m3")
+solver_name = chiSolverGetName(phys1)
+
+lbs_ff_g0_m0 = chiGetFieldFunctionHandleByName(solver_name.."Flux_g0_m0")
+lbs_ff_g0_m1 = chiGetFieldFunctionHandleByName(solver_name.."Flux_g0_m1")
+lbs_ff_g0_m2 = chiGetFieldFunctionHandleByName(solver_name.."Flux_g0_m2")
+lbs_ff_g0_m3 = chiGetFieldFunctionHandleByName(solver_name.."Flux_g0_m3")
 
 chiExportMultiFieldFunctionToVTK({lbs_ff_g0_m0,
                                   lbs_ff_g0_m1,

@@ -70,5 +70,5 @@ chiSimTest_IP_MMS_L2error()
 -- chiSolverExecute(phys1)
 --
 -- ----############################################### Visualize the field function
--- fflist,count = chiGetFieldFunctionList(phys1)
+-- fflist,count = chiSolverGetFieldFunctionList(phys1)
 -- chiExportFieldFunctionToVTK(fflist[1],"square_an_coef2","Dfem_Flux_Diff")

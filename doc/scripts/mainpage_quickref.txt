@@ -94,9 +94,7 @@ module_end
 
 module: Field-functions
 function: chiGetFieldFunctionHandleByName
-function: chiGetFieldFunctionList
 function: chiExportFieldFunctionToVTK
-function: chiExportFieldFunctionToVTKG
 function: chiExportMultiFieldFunctionToVTK
 module_end
 
@@ -113,6 +111,9 @@ module: Physics Utilities
 function: chiSolverInitialize
 function: chiSolverExecute
 function: chiSolverSetBasicOption
+function: chiSolverStep
+function: chiSolverGetName
+function: chiSolverGetFieldFunctionList
 
 function: chiPhysicsAddMaterial
 function: chiPhysicsMaterialAddProperty

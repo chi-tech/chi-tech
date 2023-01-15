@@ -1,10 +1,9 @@
 #include "chi_ffinter_slice.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
-
-;
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 #include <fstream>
 

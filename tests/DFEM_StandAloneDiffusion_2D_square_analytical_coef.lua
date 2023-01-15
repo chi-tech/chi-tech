@@ -60,5 +60,5 @@ chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 ----############################################### Visualize the field function
-fflist,count = chiGetFieldFunctionList(phys1)
+fflist,count = chiSolverGetFieldFunctionList(phys1)
 chiExportFieldFunctionToVTK(fflist[1],"square_an_coef","Flux_Diff")

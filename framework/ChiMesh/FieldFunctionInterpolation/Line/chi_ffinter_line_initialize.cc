@@ -2,6 +2,10 @@
 
 #include "ChiMesh/Cell/cell.h"
 
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -35,8 +39,8 @@ void chi_mesh::FieldFunctionInterpolationLine::
     auto& ff_context = ff_contexts.back();
 
     ff_context.ref_ff = field_functions[ff];
-    const auto& sdm = ff_context.ref_ff->spatial_discretization;
-    const auto& grid = *sdm->ref_grid;
+    const auto& sdm = ff_context.ref_ff->SDM();
+    const auto& grid = *sdm.ref_grid;
 
     ff_context.interpolation_points_ass_cell.assign(number_of_points,0);
     ff_context.interpolation_points_has_ass_cell.assign(number_of_points,false);

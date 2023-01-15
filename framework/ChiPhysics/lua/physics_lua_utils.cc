@@ -41,6 +41,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiSolverStep);
   LUA_FMACRO1(chiSolverSetBasicOption);
   LUA_FMACRO1(chiSolverGetName);
+  LUA_FMACRO1(chiSolverGetFieldFunctionList);
 
   //=================================== Materials
   LUA_FMACRO1(chiPhysicsAddMaterial);
@@ -51,9 +52,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
 
   //=================================== Field functions
   LUA_FMACRO1(chiGetFieldFunctionHandleByName);
-  LUA_FMACRO1(chiGetFieldFunctionList);
   LUA_FMACRO1(chiExportFieldFunctionToVTK);
-  LUA_FMACRO1(chiExportFieldFunctionToVTKG);
   LUA_FMACRO1(chiExportMultiFieldFunctionToVTK);
 
   //=================================== Transport Cross-sections

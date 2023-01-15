@@ -2,6 +2,7 @@
 #define CHI_FFINTER_LINE_H
 
 #include "../chi_ffinterpolation.h"
+#include "ChiMesh/chi_mesh.h"
 
 #include <petscksp.h>
 
@@ -9,16 +10,18 @@ namespace chi_mesh
 {
   struct FieldFunctionContext
   {
-    std::shared_ptr<chi_physics::FieldFunction>    ref_ff;
+    std::shared_ptr<chi_physics::FieldFunction2>    ref_ff;
     std::vector<double>            interpolation_points_values;
     std::vector<uint64_t>          interpolation_points_ass_cell;
     std::vector<bool>              interpolation_points_has_ass_cell;
   };
 }
 
+namespace chi_mesh
+{
 //###################################################################
 /** A line based interpolation function.*/
-class chi_mesh::FieldFunctionInterpolationLine :
+class FieldFunctionInterpolationLine :
   public FieldFunctionInterpolation
 {
 public:
@@ -47,5 +50,8 @@ public:
   {return "ZLFFI";}
   void ExportPython(std::string base_name) override;
 };
+}//namespace chi_mesh
+
+
 
 #endif

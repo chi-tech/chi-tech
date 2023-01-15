@@ -6,6 +6,8 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Assemble_A_bext()
 {

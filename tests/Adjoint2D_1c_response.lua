@@ -135,9 +135,9 @@ value = chiAdjointSolverComputeInnerProduct(phys1)
 chiLog(LOG_0,string.format("Inner-product=%.5e", value))
 
 --############################################### Get field functions
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m0")
-ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m1")
-ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
+ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m0")
+ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m1")
+ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m2")
 
 
 --############################################### Slice plot

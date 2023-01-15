@@ -1,6 +1,8 @@
 #ifndef CFEM_DIFFUSION_BOUNDARY_H
 #define CFEM_DIFFUSION_BOUNDARY_H
 
+#include <array>
+
 namespace cfem_diffusion
 {
   class Boundary;

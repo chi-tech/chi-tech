@@ -2,21 +2,23 @@
 
 #include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################
 /**Executes the volume interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 {
   const auto& ref_ff = *field_functions.front();
-  const auto& sdm    = *ref_ff.spatial_discretization;
+  const auto& sdm    = ref_ff.SDM();
   const auto& grid   = *sdm.ref_grid;
 
-  const auto& uk_man = ref_ff.unknown_manager;
-  const auto uid = ref_ff.ref_variable;
-  const auto cid = ref_ff.ref_component;
+  const auto& uk_man = ref_ff.UnkManager();
+  const auto uid = 0;
+  const auto cid = m_ref_component;
 
   using namespace chi_mesh::ff_interpolation;
-
   const auto field_data = ref_ff.GetGhostedFieldVector();
 
   double local_volume = 0.0;

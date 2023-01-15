@@ -12,6 +12,8 @@
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
+#include <map>
+
 // forward declaration
 namespace chi_mesh
 {
@@ -68,7 +70,7 @@ public:
   std::vector<Boundary>   boundaries;
 
   explicit Solver(const std::string& in_solver_name);
-  virtual ~Solver();
+  ~Solver() override;
 
   void Initialize() override;
 

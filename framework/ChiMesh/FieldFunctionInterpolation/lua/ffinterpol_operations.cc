@@ -2,6 +2,8 @@
 
 #include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 
+#include "chi_runtime.h"
+
 //###################################################################
 /** Initialize interpolator.
  *

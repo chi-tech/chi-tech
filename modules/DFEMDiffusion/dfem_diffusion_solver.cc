@@ -5,10 +5,10 @@
 #include "ChiTimer/chi_timer.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "dfem_diffusion_bndry.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiPhysics/FieldFunction2/fieldfunction2.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
@@ -64,14 +64,15 @@ void dfem_diffusion::Solver::Initialize()
       {
         case BoundaryType::Reflecting:
         {
-          boundaries.push_back({BoundaryType::Reflecting, {0.,0.,0.}});
+          boundaries.push_back(Boundary{BoundaryType::Reflecting, {0.,0.,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
         }
         case BoundaryType::Dirichlet:
         {
           if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
-          boundaries.push_back({BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
+          boundaries.push_back(Boundary
+          {BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
           break;
         }
@@ -80,16 +81,17 @@ void dfem_diffusion::Solver::Initialize()
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " Robin needs 3 values in bndry vals.");
-          boundaries.push_back({BoundaryType::Robin, {bndry_vals[0],
-                                                      bndry_vals[1],
-                                                      bndry_vals[2]}});
-          chi::log.Log() << "Boundary " << bndry << " set to robin."
-                         << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
+          boundaries.push_back(Boundary
+          {BoundaryType::Robin, {bndry_vals[0],bndry_vals[1],bndry_vals[2]}});
+          chi::log.Log()
+          << "Boundary " << bndry << " set to robin."
+          << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
           break;
         }
         case BoundaryType::Vacuum:
         {
-          boundaries.push_back({BoundaryType::Robin, {0.25,0.5,0.}});
+          boundaries.push_back(Boundary
+          {BoundaryType::Robin, {0.25,0.5,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
@@ -98,16 +100,18 @@ void dfem_diffusion::Solver::Initialize()
           if (bndry_vals.size()!=3) 
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " Neumann needs 3 values in bndry vals.");
-          boundaries.push_back({BoundaryType::Robin, {0.,bndry_vals[0],
-                                                      bndry_vals[1]}});
-          chi::log.Log() << "Boundary " << bndry << " set to neumann." << bndry_vals[0];
+          boundaries.push_back(Boundary
+          {BoundaryType::Robin, {0.,bndry_vals[0],bndry_vals[1]}});
+          chi::log.Log()
+          << "Boundary " << bndry << " set to neumann." << bndry_vals[0];
           break;
         }
       }//switch boundary type
     }
     else
     {
-      boundaries.push_back({BoundaryType::Dirichlet, {0.,0.,0.}});
+      boundaries.push_back(Boundary
+      {BoundaryType::Dirichlet, {0.,0.,0.}});
       chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
         << "Dirichlet boundary added with zero boundary value.";
@@ -140,21 +144,7 @@ void dfem_diffusion::Solver::Initialize()
  
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
-                                           nodal_nnz_off_diag);  
-  if (field_functions.empty())
-  {
-    auto unk_man = OneDofPerNode;
-    field.resize(n);
-    auto initial_field_function =
-      std::make_shared<chi_physics::FieldFunction>(
-        std::string("phi"),   //Text name
-        sdm_ptr,              //Spatial Discretization
-        &field,               //Data vector
-        unk_man);             //Unknown Manager
-
-      field_functions.push_back(initial_field_function);
-      chi::fieldfunc_stack.push_back(initial_field_function);
-  }//if not ff set
+                                           nodal_nnz_off_diag);
 
   if (field_functions2.empty())
   {

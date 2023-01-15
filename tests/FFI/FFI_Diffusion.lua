@@ -87,7 +87,7 @@ chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 ----############################################### Visualize the field function
-fflist,count = chiGetFieldFunctionList(phys1)
+fflist,count = chiSolverGetFieldFunctionList(phys1)
 chiExportMultiFieldFunctionToVTK({fflist[1]},solver.."Diff2D_Dirichlet")
 
 --############################################### Slice plot

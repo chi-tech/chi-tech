@@ -4,6 +4,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include <iomanip>
+
 //#include "ChiMesh/MeshHandler/chi_meshhandler.h"
 //#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
@@ -31,12 +33,6 @@ void mg_diffusion::Solver::Execute()
 
   int64_t verbose = basic_options("verbose_level").IntegerValue();
   my_app_context.verbose = verbose > 1 ? PETSC_TRUE : PETSC_FALSE;
-  if (my_app_context.verbose == PETSC_TRUE)
-    cout << "--context TRUE" << endl;
-  if (my_app_context.verbose == PETSC_FALSE)
-    cout << "--context FALSE" << endl;
-
-//  std::cout << "STOP" << std::endl; std::cin.get();
 
   // shortcuts
   unsigned int lfg = mg_diffusion::Solver::last_fast_group;

@@ -1,7 +1,14 @@
 #ifndef CHI_FFINTERPOLATION_H
 #define CHI_FFINTERPOLATION_H
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include <memory>
+#include <vector>
+
+namespace chi_physics
+{
+  class FieldFunction2;
+  typedef std::shared_ptr<FieldFunction2> FieldFunction2CPtr;
+}
 
 namespace chi_mesh::ff_interpolation
 {
@@ -42,15 +49,18 @@ namespace chi_mesh::ff_interpolation
   };
 }
 
+namespace chi_mesh
+{
+
 //###################################################################
 /** Base class for field-function interpolation objects.*/
-class chi_mesh::FieldFunctionInterpolation
+class FieldFunctionInterpolation
 {
 protected:
   ff_interpolation::Type m_type;
   unsigned int m_ref_component = 0;
 public:
-  std::vector<std::shared_ptr<chi_physics::FieldFunction>> field_functions;
+  std::vector<chi_physics::FieldFunction2CPtr> field_functions;
 
 public:
   explicit
@@ -65,6 +75,9 @@ public:
   virtual std::string GetDefaultFileBaseName() const = 0;
   virtual void ExportPython(std::string base_name) = 0;
 };
+
+}//namespace chi_mesh
+
 
 
 

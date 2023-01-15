@@ -9,24 +9,13 @@ void lbs::SteadySolver::UpdateFieldFunctions()
   const auto& sdm = *discretization;
   const auto& phi_uk_man = flux_moments_uk_man;
 
-  int    dimension = 0;
-  if (grid->Attributes() & chi_mesh::DIMENSION_1) dimension = 1;
-  if (grid->Attributes() & chi_mesh::DIMENSION_2) dimension = 2;
-  if (grid->Attributes() & chi_mesh::DIMENSION_3) dimension = 3;
-
-  std::array<unsigned int,4> m_map = {0, 0, 0, 0};
-  if (dimension == 1 and num_moments >= 2) m_map = {0, 0, 0, 1};
-  if (dimension == 2 and num_moments >= 3) m_map = {0, 2, 1, 0};
-  if (dimension == 3 and num_moments >= 4) m_map = {0, 3, 1, 2};
-
   int ff_index = 0;
   for (size_t g=0; g<groups.size(); ++g)
   {
-    for (size_t ff=0; ff<4; ++ff)
+    for (size_t m=0; m<num_moments; ++m)
     {
       std::vector<double> data_vector_local(local_node_count, 0.0);
 
-      const auto m = m_map[ff];
       for (const auto& cell : grid->local_cells)
       {
         const auto& cell_mapping = sdm.GetCellMapping(cell);
