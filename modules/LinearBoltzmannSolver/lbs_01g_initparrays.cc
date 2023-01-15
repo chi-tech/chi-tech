@@ -200,19 +200,17 @@ void lbs::SteadySolver::InitializeParrays()
   {
     for (size_t g = 0; g < groups.size(); ++g)
     {
-      for (size_t ff = 0; ff < 4; ++ff)
+      for (size_t m=0; m<num_moments; m++)
       {
         std::string solver_name;
         if (not TextName().empty()) solver_name = TextName() + "-";
 
         char buff[100];
-        snprintf(buff, 4, "%03d", static_cast<int>(g));
-        std::string text_name = solver_name + "Flux_g" + std::string(buff);
-
-        if (ff == 0) text_name += "_m0";
-        if (ff == 1) text_name += "_Jx";
-        if (ff == 2) text_name += "_Jy";
-        if (ff == 3) text_name += "_Jz";
+        snprintf(buff, 4, "%s_Flux_g%03d_m%02d",
+                 solver_name.c_str(),
+                 static_cast<int>(g),
+                 static_cast<int>(m));
+        const std::string text_name = std::string(buff);
 
         using namespace chi_math;
         auto group_ff = std::make_shared<chi_physics::FieldFunction2>(
