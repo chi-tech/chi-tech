@@ -11,7 +11,7 @@
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 #include "ChiMath/chi_math_range.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
 #include "ChiDataTypes/ndarray.h"
@@ -477,9 +477,9 @@ int chiSimTest91_PWLD(lua_State* L)
   }//for iteration
 
   //============================================= Create Field Functions
-  std::vector<std::shared_ptr<chi_physics::FieldFunction2>> ff_list;
+  std::vector<std::shared_ptr<chi_physics::FieldFunction>> ff_list;
 
-  ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
+  ff_list.push_back(std::make_shared<chi_physics::FieldFunction>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
@@ -487,7 +487,7 @@ int chiSimTest91_PWLD(lua_State* L)
 
   const std::vector<std::string> dim_strings = {"x","y","z"};
   for (const std::string& dim : dim_strings)
-    ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
+    ff_list.push_back(std::make_shared<chi_physics::FieldFunction>(
       "J-"+dim,                                        //Text name
       sdm_ptr,                                         //Spatial Discr.
       chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
@@ -532,11 +532,11 @@ int chiSimTest91_PWLD(lua_State* L)
 
 
   //============================================= Update field function
-  chi_physics::FieldFunction2::FFList const_ff_list;
+  chi_physics::FieldFunction::FFList const_ff_list;
   for (const auto& ff_ptr : ff_list)
     const_ff_list.push_back(ff_ptr);
-  chi_physics::FieldFunction2::ExportMultipleToVTK("SimTest_91a_PWLD",
-                                                   const_ff_list);
+  chi_physics::FieldFunction::ExportMultipleToVTK("SimTest_91a_PWLD",
+                                                  const_ff_list);
 
   return 0;
 }

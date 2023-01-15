@@ -1,7 +1,6 @@
 #include "diffusion_solver.h"
 
-#include <chi_log.h>
-;
+#include "chi_log.h"
 
 /**\defgroup LuaDiffusionBasicOptions Basic Options
  * \ingroup LuaDiffusion

@@ -3,7 +3,7 @@
 
 #include "ChiMesh/Raytrace/raytracing.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 

@@ -1,5 +1,7 @@
 #include "diffusion_solver.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 

@@ -1,6 +1,6 @@
 #include "lbs_linear_boltzmann_solver.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 //###################################################################
 /**Copy relevant section of phi_old to the field functions.*/

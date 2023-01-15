@@ -1,4 +1,4 @@
-#include "fieldfunction2.h"
+#include "fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -20,7 +20,7 @@
 
 #include <vtkInformation.h>
 
-void chi_physics::FieldFunction2::
+void chi_physics::FieldFunction::
   ExportToVTK(const std::string &file_base_name) const
 {
   chi::log.Log() << "Exporting field function to VTK with file base \""

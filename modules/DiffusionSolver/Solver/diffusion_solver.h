@@ -13,7 +13,6 @@
 
 #include "ChiMesh/VolumeMesher/chi_volumemesher.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiTimer/chi_timer.h"
 
 
@@ -54,9 +53,6 @@ public:
   chi_math::UnknownManager                 unknown_manager;
 
   int   material_mode      = DIFFUSION_MATERIALS_REGULAR;
-  std::shared_ptr<chi_physics::FieldFunction> D_field     = nullptr;
-  std::shared_ptr<chi_physics::FieldFunction> q_field     = nullptr;
-  std::shared_ptr<chi_physics::FieldFunction> sigma_field = nullptr;
 
   bool common_items_initialized=false;
 

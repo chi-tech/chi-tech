@@ -1,4 +1,4 @@
-#include "fieldfunction2.h"
+#include "fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -22,12 +22,12 @@
 
 //###################################################################
 /**Export multiple field functions to VTK.*/
-void chi_physics::FieldFunction2::
+void chi_physics::FieldFunction::
   ExportMultipleToVTK(
     const std::string &file_base_name,
-    const std::vector<std::shared_ptr<const FieldFunction2>> &ff_list)
+    const std::vector<std::shared_ptr<const FieldFunction>> &ff_list)
 {
-  const std::string fname = "chi_physics::FieldFunction2::ExportMultipleToVTK";
+  const std::string fname = "chi_physics::FieldFunction::ExportMultipleToVTK";
   chi::log.Log() << "Exporting field functions to VTK with file base \""
                  << file_base_name << "\"";
 

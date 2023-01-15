@@ -6,8 +6,8 @@
 
 namespace chi_physics
 {
-  class FieldFunction2;
-  typedef std::shared_ptr<FieldFunction2> FieldFunction2CPtr;
+  class FieldFunction;
+  typedef std::shared_ptr<FieldFunction> FieldFunction2CPtr;
 }
 
 namespace chi_mesh::ff_interpolation
@@ -32,6 +32,7 @@ namespace chi_mesh::ff_interpolation
 
   enum class Property : int
   {
+    PROBEPOINT     = 0,
     SLICEPOINT     = 1,
     SLICENORMAL    = 2,
     SLICETANGENT   = 3,
