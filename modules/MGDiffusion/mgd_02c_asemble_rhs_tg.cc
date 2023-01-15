@@ -1,7 +1,11 @@
 #include "mg_diffusion_solver.h"
+
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //========================================================== Solve 1g problem
 void mg_diffusion::Solver::Assemble_RHS_TwoGrid(const int64_t verbose)

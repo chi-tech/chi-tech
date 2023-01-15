@@ -58,6 +58,7 @@ public:
 
   uint num_groups = 0;
   uint last_fast_group = 0;
+  bool do_two_grid = false;
 
   size_t num_local_dofs = 0;
   size_t num_globl_dofs = 0;
