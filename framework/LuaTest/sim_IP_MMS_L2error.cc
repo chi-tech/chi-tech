@@ -3,9 +3,7 @@
 #include "DFEMDiffusion/dfem_diffusion_solver.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
