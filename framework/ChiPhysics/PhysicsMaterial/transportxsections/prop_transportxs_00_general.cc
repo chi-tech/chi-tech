@@ -34,18 +34,12 @@ Reset()
 
   chi.clear();
   chi_prompt.clear();
-  chi_delayed.clear();
-
-  nu.clear();
-  nu_prompt.clear();
-  nu_delayed.clear();
 
   nu_sigma_f.clear();
   nu_prompt_sigma_f.clear();
   nu_delayed_sigma_f.clear();
 
-  precursor_lambda.clear();
-  precursor_yield.clear();
+  precursors.clear();
 
   inv_velocity.clear();
 
@@ -225,28 +219,21 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   if (is_fissionable)
   {
     sigma_f.assign(n_grps, 0.0);
+    nu_sigma_f.assign(n_grps, 0.0);
 
-    //init prompt/delayed
+    //init prompt/delayed fission data
     if (n_precs > 0)
     {
-      nu_prompt.assign(n_grps, 0.0);
-      nu_delayed.assign(n_grps, 0.0);
+      nu_prompt_sigma_f.assign(n_grps, 0.0);
+      nu_delayed_sigma_f.assign(n_grps, 0.0);
 
       chi_prompt.assign(n_grps, 0.0);
-      chi_delayed.clear();
-      for (unsigned int g = 0; g < num_groups; ++g)
-        chi_delayed.emplace_back(n_precs, 0.0);
-
-      precursor_lambda.assign(n_precs, 0.0);
-      precursor_yield.assign(n_precs, 0.0);
+      precursors.resize(n_precs);
     }
 
-    //init total/steady-state
+    //init steady-state fission data
     else
-    {
-      nu.assign(n_grps, 0.0);
       chi.assign(n_grps, 0.0);
-    }
   }
 
   //============================================================
@@ -278,17 +265,16 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       if (xsecs[x]->is_fissionable)
       {
         sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
+        nu_sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
+
         if (n_precs > 0)
         {
-          nu_prompt[g] += xsecs[g]->nu_prompt[g] * ff_i;
-          nu_delayed[g] += xsecs[g]->nu_delayed[g] * ff_i;
+          nu_prompt_sigma_f[g] += xsecs[g]->nu_prompt_sigma_f[g] * N_i;
+          nu_delayed_sigma_f[g] += xsecs[g]->nu_delayed_sigma_f[g] * N_i;
           chi_prompt[g] += xsecs[x]->chi_prompt[g] * ff_i;
         }
         else
-        {
-          nu[g] += xsecs[x]->nu[g] * ff_i;
           chi[g] += xsecs[x]->chi[g] * ff_i;
-        }
       }
     }//for g
 
@@ -310,10 +296,10 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       for (unsigned int j = 0; j < xsecs[x]->num_precursors; ++j)
       {
         unsigned int count = precursor_count + j;
-        precursor_lambda[count] = xsecs[x]->precursor_lambda[j];
-        precursor_yield [count] = xsecs[x]->precursor_yield [j] * ff_i;
-        for (size_t g = 0; g < num_groups; ++g)
-          chi_delayed[g][count] = xsecs[x]->chi_delayed[g][j];
+        const auto& precursor = xsecs[x]->precursors[j];
+        precursors[count].decay_constant = precursor.decay_constant;
+        precursors[count].fractional_yield = precursor.fractional_yield * ff_i;
+        precursors[count].emission_spectrum = precursor.emission_spectrum;
       }//for j
 
       precursor_count += xsecs[x]->num_precursors;
@@ -358,9 +344,11 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     }
   }//for cross sections
 
-  //perform checks for the cross sections
+  //============================================================
+  // Compute auxiliary data
+  //============================================================
 
-  Finalize();
+  ComputeDiffusionParameters();
 }
 
 

@@ -4,7 +4,6 @@
 /**Pushes all of the relevant items of the transport xs to a lua table.*/
 void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
 {
-
   lua_newtable(L);
   lua_pushstring(L, "is_empty");
   lua_pushboolean(L, false);
@@ -34,10 +33,9 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
     lua_newtable(L);
     {
       unsigned int g = 0;
-      for (auto val : xs)
+      for (const auto& val : xs)
       {
-        ++g;
-        lua_pushinteger(L, g);
+        lua_pushinteger(L, g++);
         lua_pushnumber(L ,val);
         lua_settable(L, -3);
       }
@@ -46,13 +44,10 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   };
 
   Push1DXS(sigma_t, "sigma_t");
-  Push1DXS(sigma_f, "sigma_f");
   Push1DXS(sigma_a, "sigma_a");
+  Push1DXS(sigma_f, "sigma_f");
   Push1DXS(chi, "chi");
   Push1DXS(chi_prompt, "chi_prompt");
-  Push1DXS(nu,"nu");
-  Push1DXS(nu_prompt,"nu_prompt");
-  Push1DXS(nu_delayed,"nu_delayed");
   Push1DXS(nu_sigma_f, "nu_sigma_f");
   Push1DXS(nu_prompt_sigma_f, "nu_prompt_sigma_f");
   Push1DXS(nu_delayed_sigma_f, "nu_delayed_sigma_f");
@@ -61,48 +56,42 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushstring(L, "chi_delayed");
   lua_newtable(L);
   {
-    unsigned int g = 0;
-    for (auto& row : chi_delayed)
+    for (unsigned int g = 0; g < num_groups; ++g)
     {
-      ++g;
       lua_pushinteger(L, g);
       lua_newtable(L);
-        unsigned int j = 0;
-        for (auto val : row)
-        {
-          ++j;
-          lua_pushinteger(L, j);
-          lua_pushnumber(L, val);
-          lua_settable(L, -3);
-        }
+      for (unsigned int j = 0; j < num_precursors; ++j)
+      {
+        lua_pushinteger(L, j);
+        lua_pushnumber(L, precursors[j].emission_spectrum[g]);
+        lua_settable(L, -3);
+      }
       lua_settable(L, -3);
     }
   }
   lua_settable(L,-3);
 
-  lua_pushstring(L,"precursor_lambda");
+  lua_pushstring(L,"precursor_decay_constants");
   lua_newtable(L);
   {
     unsigned int j = 0;
-    for (auto val : precursor_lambda)
+    for (const auto& precursor : precursors)
     {
-      ++j;
-      lua_pushinteger(L, j);
-      lua_pushnumber(L, val);
+      lua_pushinteger(L, j++);
+      lua_pushnumber(L, precursor.decay_constant);
       lua_settable(L, -3);
     }
   }
   lua_settable(L, -3);
 
-  lua_pushstring(L, "precursor_yield");
+  lua_pushstring(L, "precursor_fractional_yields");
   lua_newtable(L);
   {
     unsigned int j = 0;
-    for (auto val : precursor_yield)
+    for (const auto& precursor : precursors)
     {
-      ++j;
-      lua_pushinteger(L, j);
-      lua_pushnumber(L, val);
+      lua_pushinteger(L, j++);
+      lua_pushnumber(L, precursor.fractional_yield);
       lua_settable(L, -3);
     }
   }

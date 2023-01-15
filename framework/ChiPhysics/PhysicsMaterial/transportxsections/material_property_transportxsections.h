@@ -21,9 +21,18 @@ protected:
   using EmissionSpectra = std::vector<std::vector<double>>;
 
 public:
-  unsigned int num_groups=0;       ///< Total number of Groups
-  unsigned int scattering_order=0; ///< Legendre scattering order
-  unsigned int num_precursors=0;   ///< Number of precursors
+  /**A struct containing data for a delayed neutron precursor.*/
+  struct Precursor
+  {
+    double decay_constant = 0.0;
+    double fractional_yield = 0.0;
+    std::vector<double> emission_spectrum;
+  };
+
+public:
+  unsigned int num_groups = 0;       ///< Total number of Groups
+  unsigned int scattering_order = 0; ///< Legendre scattering order
+  unsigned int num_precursors = 0;   ///< Number of precursors
 
   bool is_fissionable = false;
 
@@ -36,12 +45,6 @@ public:
 
   std::vector<double> chi;         ///< Fission spectrum
   std::vector<double> chi_prompt;  ///< Prompt fission spectrum
-  EmissionSpectra chi_delayed;     ///< Delayed emission spectra
-
-  std::vector<double> nu;         ///< Total neutrons per fission
-  std::vector<double> nu_prompt;  ///< Prompt neutrons per fission
-  std::vector<double> nu_delayed; ///< Delayed neutrons per fission
-  std::vector<double> beta;       ///< Delayed neutron fraction
 
   std::vector<double> nu_sigma_f;
   std::vector<double> nu_prompt_sigma_f;
@@ -51,8 +54,7 @@ public:
 
   std::vector<TransferMatrix> transfer_matrices;
 
-  std::vector<double> precursor_lambda; ///< Precursor decay constants
-  std::vector<double> precursor_yield;  ///< Precursor yield fractions
+  std::vector<Precursor> precursors;
 
   //Diffusion quantities
 public:
@@ -85,10 +87,7 @@ private:
 public:
   //01
   void MakeFromChiXSFile(const std::string &file_name);
-private:
-  void Finalize();
 
-public:
   //02
   void ComputeDiffusionParameters();
 

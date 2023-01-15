@@ -25,22 +25,25 @@ void lbs::SteadySolver::ComputePrecursors()
     //==================== Obtain xs
     auto xs = transport_view.XS();
 
+
     //======================================== Loop over precursors
-    for (size_t j = 0; j < xs.num_precursors; ++j)
+    for (unsigned int j = 0; j < xs.num_precursors; ++j)
     {
       size_t dof = cell.local_id * J + j;
-      const double coeff = xs.precursor_yield[j] /
-                           xs.precursor_lambda[j];
+      const auto& precursor = xs.precursors[j];
+      const double coeff = precursor.fractional_yield /
+                           precursor.decay_constant;
 
       //=================================== Loop over nodes
       for (int i = 0; i < transport_view.NumNodes(); ++i)
       {
-        const size_t  uk_map = transport_view.MapDOF(i, 0, 0);
+        const size_t uk_map = transport_view.MapDOF(i, 0, 0);
         const double node_V_fraction = fe_values.Vi_vectors[i]/cell_volume;
 
         //============================== Loop over groups
-        for (int g = 0; g < groups.size(); ++g)
-          precursor_new_local[dof] += coeff * xs.nu_delayed_sigma_f[g] *
+        for (unsigned int g = 0; g < groups.size(); ++g)
+          precursor_new_local[dof] += coeff *
+                                      xs.nu_delayed_sigma_f[g] *
                                       phi_new_local[uk_map + g] *
                                       node_V_fraction;
       }//for node i
