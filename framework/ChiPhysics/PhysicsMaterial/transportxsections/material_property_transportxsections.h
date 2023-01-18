@@ -43,9 +43,6 @@ public:
   std::vector<double> sigma_a;  ///< Absorption cross section
   std::vector<double> sigma_f;  ///< Fission cross section
 
-  std::vector<double> chi;         ///< Fission spectrum
-  std::vector<double> chi_prompt;  ///< Prompt fission spectrum
-
   std::vector<double> nu_sigma_f;
   std::vector<double> nu_prompt_sigma_f;
   std::vector<double> nu_delayed_sigma_f;

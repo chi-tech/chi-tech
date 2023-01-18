@@ -523,6 +523,7 @@ void chi_physics::TransportCrossSections::
   std::vector<double> fractional_yields;
   std::vector<std::vector<double>> emission_spectra;
   std::vector<double> nu, nu_prompt, nu_delayed, beta;
+  std::vector<double> chi, chi_prompt;
 
   std::string word, line;
   unsigned int line_number = 0;
@@ -812,8 +813,7 @@ void chi_physics::TransportCrossSections::
 
       }//if prompt chi
 
-      if (num_precursors > 0 &&
-          fw == "CHI_DELAYED_BEGIN")
+      if (num_precursors > 0 && fw == "CHI_DELAYED_BEGIN")
       {
         ReadEmissionSpectra("CHI_DELAYED", emission_spectra,
                             num_precursors, num_groups, f, ls, ln);

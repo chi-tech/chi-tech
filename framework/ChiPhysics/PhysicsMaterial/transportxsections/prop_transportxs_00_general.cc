@@ -32,9 +32,6 @@ Reset()
   sigma_f.clear();
   sigma_a.clear();
 
-  chi.clear();
-  chi_prompt.clear();
-
   nu_sigma_f.clear();
   nu_prompt_sigma_f.clear();
   nu_delayed_sigma_f.clear();
@@ -228,14 +225,8 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
     {
       nu_prompt_sigma_f.assign(n_grps, 0.0);
       nu_delayed_sigma_f.assign(n_grps, 0.0);
-
-      chi_prompt.assign(n_grps, 0.0);
       precursors.resize(n_precs);
     }
-
-    //init steady-state fission data
-    else
-      chi.assign(n_grps, 0.0);
   }
 
   //============================================================
@@ -276,10 +267,7 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
         {
           nu_prompt_sigma_f[g] += xsecs[g]->nu_prompt_sigma_f[g] * N_i;
           nu_delayed_sigma_f[g] += xsecs[g]->nu_delayed_sigma_f[g] * N_i;
-          chi_prompt[g] += xsecs[x]->chi_prompt[g] * ff_i;
         }
-        else
-          chi[g] += xsecs[x]->chi[g] * ff_i;
       }
     }//for g
 
