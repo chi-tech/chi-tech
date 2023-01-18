@@ -996,7 +996,7 @@ void chi_physics::TransportCrossSections::
         chi::log.Log0Warning()
             << "Both the steady-state and prompt fission spectra "
                "were specified. The prompt fission spectra will "
-               "be used and the steady-state discarded."
+               "be used and the steady-state discarded.";
 
       //check for compatibility
       if ((!nu.empty() && chi.empty()) ||
