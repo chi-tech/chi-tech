@@ -588,6 +588,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "INV_VELOCITY_BEGIN")
       {
         Read1DData("INV_VELOCITY", inv_velocity, num_groups, f, ls, ln);
+
         if (!is_positive(inv_velocity))
           throw std::logic_error(
               "Invalid inverse velocity value encountered.\n"
@@ -596,6 +597,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "VELOCITY_BEGIN" && inv_velocity.empty())
       {
         Read1DData("VELOCITY", inv_velocity, num_groups, f, ls, ln);
+
         if (!is_positive(inv_velocity))
           throw std::logic_error(
               "Invalid velocity value encountered.\n"
@@ -613,6 +615,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "SIGMA_T_BEGIN")
       {
         Read1DData("SIGMA_T", sigma_t, num_groups, f, ls, ln);
+
         if (!is_nonnegative(sigma_t))
           throw std::logic_error(
               "Invalid total cross section value encountered.\n"
@@ -622,6 +625,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "SIGMA_A_BEGIN")
       {
         Read1DData("SIGMA_A", sigma_a, num_groups, f, ls, ln);
+
         if (!is_nonnegative(sigma_a))
           throw std::logic_error(
               "Invalid absorption cross section value encountered.\n"
@@ -631,6 +635,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "SIGMA_F_BEGIN")
       {
         Read1DData("SIGMA_F", sigma_f, num_groups, f, ls, ln);
+
         if (!has_nonzero(sigma_f))
         {
           chi::log.Log0Warning()
@@ -648,6 +653,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_SIGMA_F_BEGIN")
       {
         Read1DData("NU_SIGMA_F", nu_sigma_f, num_groups, f, ls, ln);
+
         if (!has_nonzero(nu_sigma_f))
         {
           chi::log.Log0Warning()
@@ -669,6 +675,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_BEGIN")
       {
         Read1DData("NU", nu, num_groups, f, ls, ln);
+
         if (!has_nonzero(nu))
         {
           chi::log.Log0Warning()
@@ -703,6 +710,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_PROMPT_BEGIN")
       {
         Read1DData("NU_PROMPT", nu_prompt, num_groups, f, ls, ln);
+
         if (!has_nonzero(nu_prompt))
         {
           chi::log.Log0Warning()
@@ -723,6 +731,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "NU_DELAYED_BEGIN")
       {
         Read1DData("NU_DELAYED", nu_delayed, num_groups, f, ls, ln);
+
         if (!has_nonzero(nu_delayed))
         {
           chi::log.Log0Warning()
@@ -740,6 +749,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "BETA_BEGIN")
       {
         Read1DData("BETA", beta, num_groups, f, ls, ln);
+
         if (!has_nonzero(beta))
         {
           chi::log.Log0Warning()
@@ -777,6 +787,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "CHI_BEGIN")
       {
         Read1DData("CHI", chi, num_groups, f, ls, ln);
+
         if (!has_nonzero(chi))
           throw std::logic_error(
               "Invalid steady-state fission spectrum encountered.\n"
@@ -817,6 +828,7 @@ void chi_physics::TransportCrossSections::
       {
         ReadEmissionSpectra("CHI_DELAYED", emission_spectra,
                             num_precursors, num_groups, f, ls, ln);
+
         for (unsigned int j = 0; j < num_precursors; ++j)
         {
           if (!has_nonzero(emission_spectra[j]))
@@ -850,6 +862,7 @@ void chi_physics::TransportCrossSections::
         {
           Read1DData("PRECURSOR_DECAY_CONSTANTS",
                      decay_constants, num_precursors, f, ls, ln);
+
           if (!is_positive(decay_constants))
             throw std::logic_error(
                 "Invalid precursor decay constant value encountered.\n"
@@ -860,6 +873,7 @@ void chi_physics::TransportCrossSections::
         {
           Read1DData("PRECURSOR_FRACTIONAL_YIELDS",
                      fractional_yields, num_precursors, f, ls, ln);
+
           if (!has_nonzero(fractional_yields))
             throw std::logic_error(
                 "Invalid precursor fractional yields encountered.\n"
@@ -939,7 +953,8 @@ void chi_physics::TransportCrossSections::
   //============================================================
 
   //determine if the material is fissionable
-  is_fissionable = !sigma_f.empty() || !nu_sigma_f.empty();
+  is_fissionable = !sigma_f.empty() || !nu_sigma_f.empty() ||
+                   !production_matrix.empty();
 
   //clear fission data if not fissionable
   if (!is_fissionable)
@@ -948,119 +963,130 @@ void chi_physics::TransportCrossSections::
     nu_sigma_f.clear();
     nu_prompt_sigma_f.clear();
     nu_delayed_sigma_f.clear();
-    chi.clear();
-    chi_prompt.clear();
     precursors.clear();
   }//if not fissionable
 
-  //otherwise, set fission data based on inputs
+  //otherwise, check and set the fission data
   else
   {
-    //set prompt/delayed fission data
-    if (num_precursors > 0)
+    //check vector data inputs
+    if (production_matrix.empty())
     {
-      //check spectra
-      if (chi_prompt.empty() ||
-          std::any_of(emission_spectra.begin(),
-                      emission_spectra.end(),
-                      [](const std::vector<double>& x)
-                      { return x.empty(); }))
+      //check that some form of non-delayed data was specified
+      if (nu.empty() && nu_prompt.empty())
         throw std::logic_error(
-            "Invalid fission/emission spectrum encountered.\n"
-            "Either the prompt fission spectrum or a delayed "
-            "emission spectrum was not found.");
+            "Invalid fission neutron yield specification encountered.\n"
+            "Either the total or prompt fission neutron yield must be "
+            "specified.");
 
-      //check fission neutron yields
-      if (nu_prompt.empty() && nu_delayed.empty())
+      //check that some form of the fission spectrum was specified
+      if (chi.empty() && chi_prompt.empty())
         throw std::logic_error(
-            "Invalid fission data specification encountered.\n"
-            "Either prompt and delay fission neutron yields or "
-            "the total fission neutron yield and delayed neutron "
-            "fraction must be specified.");
+            "Invalid fission spectrum specification encountered.\n"
+            "Either the steady-state or prompt fission spectrum must be "
+            "specified.");
 
-      //compute the fission cross section
-      if (sigma_f.empty())
+      //check for compatibility
+      if ((!nu.empty() && chi.empty()) ||
+          (nu.empty() && !chi.empty()) ||
+          (!nu_prompt.empty() && chi_prompt.empty()) ||
+          (nu_prompt.empty() && !chi_prompt.empty()))
+        throw std::logic_error(
+            "Ambiguous fission data specified.\n"
+            "Either the total fission neutron yield and steady-state "
+            "fission spectrum or the prompt fission neutron yield and "
+            "prompt fission spectrum must be specified.");
+
+      //initialize total fission neutron yield
+      //do this only when prompt is specified
+      if (!nu_prompt.empty())
       {
-        sigma_f.assign(num_groups, 0.0);
+        nu.assign(num_groups, 0.0);
         for (unsigned int g = 0; g < num_groups; ++g)
-          if (nu_sigma_f[g] > 0.0)
-          {
-            double nu_total = nu_prompt[g] + nu_delayed[g];
-            sigma_f[g] = nu_sigma_f[g] / nu_total;
-          }
+          nu[g] = nu_prompt[g];
       }
 
-      //compute production cross sections
-      nu_sigma_f.assign(num_groups, 0.0);
-      nu_prompt_sigma_f.assign(num_groups, 0.0);
-      nu_delayed_sigma_f.assign(num_groups, 0.0);
-      for (unsigned int g = 0; g < num_groups; ++g)
+      //check delayed neutron data
+      if (num_precursors > 0)
       {
-        double nu_total = nu_prompt[g] + nu_delayed[g];
-        nu_sigma_f[g] = nu_total * sigma_f[g];
-        nu_prompt_sigma_f[g] = nu_prompt[g] * sigma_f[g];
-        nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
-      }
+        //check that prompt data was specified
+        if (chi_prompt.empty() || nu_prompt.empty())
+          throw std::logic_error(
+              "Invalid fission data specification encountered.\n"
+              "When delayed neutron precursors are present, "
+              "prompt fission data must be specified.");
 
-      //add data to the precursor structs
-      for (unsigned int j = 0; j < num_precursors; ++j)
-      {
-        precursors[j].decay_constant = decay_constants[j];
-        precursors[j].fractional_yield = fractional_yields[j];
-        precursors[j].emission_spectrum = emission_spectra[j];
-      }
+        //check that delayed fission neutron yield was specified
+        if (nu_delayed.empty() ||
+            decay_constants.empty() ||
+            fractional_yields.empty() ||
+            std::any_of(emission_spectra.begin(),
+                        emission_spectra.end(),
+                        [](const std::vector<double>& x)
+                        { return x.empty(); }))
+          throw std::logic_error(
+              "Invalid fission data specification encountered.\n"
+              "When delayed neutron precursors are present, "
+              "the delayed fission neutron yield, delayed neutron "
+              "precursor decay constants, fractional yields, and "
+              "emission spectra must all be specified.");
 
-      //create production matrix, if empty
-      if (production_matrix.empty())
+        //add delayed fission neutron yield to total
         for (unsigned int g = 0; g < num_groups; ++g)
+          nu[g] += nu_delayed[g];
+
+        //add data to precursor structs
+        for (unsigned int j = 0; j < num_precursors; ++j)
         {
-          std::vector<double> vals;
-          for (unsigned int gp = 0; gp < num_groups; ++gp)
-            vals.push_back(chi_prompt[g] * nu_prompt_sigma_f[gp]);
-          production_matrix.push_back(vals);
+          precursors[j].decay_constant = decay_constants[j];
+          precursors[j].fractional_yield = fractional_yields[j];
+          precursors[j].emission_spectrum = emission_spectra[j];
         }
-    }//prompt/delayed
+      }
 
-    //set steady-state fission data
-    else
-    {
-      //check spectra
-      if (chi.empty())
-        throw std::logic_error(
-            "Invalid steady-state fission spectrum encountered.\n"
-            "No steady-state fission spectrum found.");
-
-      //check nu
-      if (nu.empty())
-        throw std::logic_error(
-            "Invalid total fission neutron yield encountered.\n"
-            "No total fission neutron yield found.");
-
-      //compute fission/production cross section
-      if (!sigma_f.empty())
+      //compute fission cross section
+      if (sigma_f.empty() && !nu_sigma_f.empty())
       {
         sigma_f.assign(num_groups, 0.0);
         for (unsigned int g = 0; g < num_groups; ++g)
           if (nu_sigma_f[g] > 0.0)
             sigma_f[g] = nu_sigma_f[g] / nu[g];
       }
-      else
+
+      //compute total production cross section
+      nu_sigma_f.assign(num_groups, 0.0);
+      for (unsigned int g = 0; g < num_groups; ++g)
+        nu_sigma_f[g] = nu[g] * sigma_f[g];
+
+      //compute prompt production cross section
+      if (!nu_prompt.empty())
       {
-        nu_sigma_f.assign(num_groups, 0.0);
+        nu_prompt_sigma_f.assign(num_groups, 0.0);
         for (unsigned int g = 0; g < num_groups; ++g)
-          if (sigma_f[g] > 0.0)
-            nu_sigma_f[g] = nu[g] * sigma_f[g];
+          nu_prompt_sigma_f[g] = nu_prompt[g] * sigma_f[g];
       }
 
-      //create production matrix, if empty
-      if (production_matrix.empty())
+      //compute delayed production cross section
+      if (!nu_delayed.empty())
+      {
+        nu_delayed_sigma_f.assign(num_groups, 0.0);
         for (unsigned int g = 0; g < num_groups; ++g)
-        {
-          std::vector<double> vals;
-          for (unsigned int gp = 0; gp < num_groups; ++gp)
-            vals.push_back(chi[g] * nu_sigma_f[gp]);
-          production_matrix.push_back(vals);
-        }
-    }//steady-state fission
+          nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
+      }
+
+      //compute production matrix
+      const auto chi_ = !chi_prompt.empty()? chi_prompt : chi;
+      const auto nu_sigma_f_ =
+          !nu_prompt.empty()? nu_prompt_sigma_f : nu_sigma_f;
+      for (unsigned int g = 0; g < num_groups; ++g)
+      {
+        std::vector<double> prod;
+        for (unsigned int gp = 0.0; gp < num_groups; ++gp)
+          prod.push_back(chi_[g] * nu_sigma_f_[gp]);
+        production_matrix.push_back(prod);
+      }
+    }//if production_matrix empty
+
+    //TODO: Implement production matrix checks
   }//if fissionable
 }
