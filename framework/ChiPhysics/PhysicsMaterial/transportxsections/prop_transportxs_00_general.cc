@@ -39,9 +39,12 @@ Reset()
   nu_prompt_sigma_f.clear();
   nu_delayed_sigma_f.clear();
 
-  precursors.clear();
-
   inv_velocity.clear();
+
+  transfer_matrices.clear();
+  production_matrix.clear();
+
+  precursors.clear();
 
   //Diffusion quantities
   diffusion_initialized = false;
@@ -209,17 +212,16 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   if (std::any_of(xsecs.begin(), xsecs.end(),
                   [](const XSPtr& x)
                   { return !x->transfer_matrices.empty(); }))
-  {
-    transfer_matrices.clear();
-    for (unsigned int m = 0; m < scattering_order + 1; ++m)
-      transfer_matrices.emplace_back(n_grps, n_grps);
-  }
+    transfer_matrices.assign(scattering_order + 1,
+                             TransferMatrix(num_groups, num_groups));
 
   //init fission data
   if (is_fissionable)
   {
     sigma_f.assign(n_grps, 0.0);
     nu_sigma_f.assign(n_grps, 0.0);
+    production_matrix.assign(
+        num_groups, std::vector<double>(num_groups, 0.0));
 
     //init prompt/delayed fission data
     if (n_precs > 0)
@@ -266,6 +268,9 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       {
         sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
         nu_sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
+        for (unsigned int gp = 0; gp < num_groups; ++gp)
+          production_matrix[g][gp] +=
+              xsecs[x]->production_matrix[g][gp] * N_i;
 
         if (n_precs > 0)
         {

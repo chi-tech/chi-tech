@@ -53,6 +53,7 @@ public:
   std::vector<double> inv_velocity;
 
   std::vector<TransferMatrix> transfer_matrices;
+  std::vector<std::vector<double>> production_matrix;
 
   std::vector<Precursor> precursors;
 

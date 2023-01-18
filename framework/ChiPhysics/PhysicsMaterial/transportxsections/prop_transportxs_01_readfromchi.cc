@@ -963,6 +963,16 @@ void chi_physics::TransportCrossSections::
         precursors[j].fractional_yield = fractional_yields[j];
         precursors[j].emission_spectrum = emission_spectra[j];
       }
+
+      //create production matrix, if empty
+      if (production_matrix.empty())
+        for (unsigned int g = 0; g < num_groups; ++g)
+        {
+          std::vector<double> vals;
+          for (unsigned int gp = 0; gp < num_groups; ++gp)
+            vals.push_back(chi_prompt[g] * nu_prompt_sigma_f[gp]);
+          production_matrix.push_back(vals);
+        }
     }//prompt/delayed
 
     //set steady-state fission data
@@ -995,6 +1005,16 @@ void chi_physics::TransportCrossSections::
           if (sigma_f[g] > 0.0)
             nu_sigma_f[g] = nu[g] * sigma_f[g];
       }
+
+      //create production matrix, if empty
+      if (production_matrix.empty())
+        for (unsigned int g = 0; g < num_groups; ++g)
+        {
+          std::vector<double> vals;
+          for (unsigned int gp = 0; gp < num_groups; ++gp)
+            vals.push_back(chi[g] * nu_sigma_f[gp]);
+          production_matrix.push_back(vals);
+        }
     }//steady-state fission
   }//if fissionable
 }
