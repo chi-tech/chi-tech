@@ -979,12 +979,24 @@ void chi_physics::TransportCrossSections::
             "Either the total or prompt fission neutron yield must be "
             "specified.");
 
+      if (!nu.empty() && !nu_prompt.empty())
+        chi::log.Log0Warning()
+            << "Both the total and prompt fission neutron yield "
+               "were specified. The prompt fission neutron yield "
+               "will be used and the total discarded.";
+
       //check that some form of the fission spectrum was specified
       if (chi.empty() && chi_prompt.empty())
         throw std::logic_error(
             "Invalid fission spectrum specification encountered.\n"
             "Either the steady-state or prompt fission spectrum must be "
             "specified.");
+
+      if (!chi.empty() && !chi_prompt.empty())
+        chi::log.Log0Warning()
+            << "Both the steady-state and prompt fission spectra "
+               "were specified. The prompt fission spectra will "
+               "be used and the steady-state discarded."
 
       //check for compatibility
       if ((!nu.empty() && chi.empty()) ||
@@ -1078,6 +1090,7 @@ void chi_physics::TransportCrossSections::
       const auto chi_ = !chi_prompt.empty()? chi_prompt : chi;
       const auto nu_sigma_f_ =
           !nu_prompt.empty()? nu_prompt_sigma_f : nu_sigma_f;
+
       for (unsigned int g = 0; g < num_groups; ++g)
       {
         std::vector<double> prod;
