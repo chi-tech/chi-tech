@@ -443,6 +443,49 @@ void chi_physics::TransportCrossSections::
       };
 
   //##################################################
+  /// Lambda for reading emission spectra data.
+  auto ReadProductionMatrix =
+      [](const std::string& keyword,
+         EmissionSpectra& destination,
+         const unsigned int G, //# of groups
+         std::ifstream& file,
+         std::istringstream& line_stream,
+         unsigned int& line_number)
+      {
+        //init storage
+        destination.clear();
+        for (unsigned int g = 0; g < G; ++g)
+          destination.emplace_back(G, 0.0);
+
+        //book-keeping
+        std::string word, line;
+        double value;
+        unsigned int group;
+        unsigned int gprime;
+
+        //read the block
+        std::getline(file, line);
+        line_stream = std::istringstream(line);
+        ++line_number;
+        while (line != keyword + "_END")
+        {
+          //check that this line contains an entry
+          line_stream >> word;
+          if (word == "G_GPRIME_VAL")
+          {
+            //get data from current line
+            line_stream >> group >> gprime >> value;
+            destination.at(group).at(gprime) = value;
+          }
+
+          //go to next line
+          std::getline(file, line);
+          line_stream = std::istringstream(line);
+          ++line_number;
+        }
+      };
+
+  //##################################################
   /// Lambda for checking for all non-negative values.
   auto is_nonnegative =
       [](const std::vector<double>& vec)
@@ -846,8 +889,11 @@ void chi_physics::TransportCrossSections::
 
       if (fw == "TRANSFER_MOMENTS_BEGIN")
         ReadTransferMatrices("TRANSFER_MOMENTS", transfer_matrices,
-                             scattering_order + 1, num_groups,
-                             f, ls, ln);
+                             scattering_order + 1, num_groups, f, ls, ln);
+
+      if (fw == "PRODUCTION_MATRIX_BEGIN")
+        ReadProductionMatrix("PRODUCTION_MATRIX",
+                             production_matrix, num_groups, f, ls, ln);
     }//try
 
     catch (const std::runtime_error& err)
