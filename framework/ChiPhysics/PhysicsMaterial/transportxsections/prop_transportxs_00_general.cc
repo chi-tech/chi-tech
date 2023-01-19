@@ -397,6 +397,14 @@ ComputeAbsorption()
 void chi_physics::TransportCrossSections::
 ScaleFissionData(const double k)
 {
+  if (is_fission_scaled)
+  {
+    chi::log.Log0Warning()
+        << "An attempt was made to scale fission data after "
+           "it had already been scaled... Nothing will be done.";
+    return;
+  }
+  
   for (unsigned int g = 0; g < num_groups; ++g)
   {
     nu_sigma_f[g] /= k;
