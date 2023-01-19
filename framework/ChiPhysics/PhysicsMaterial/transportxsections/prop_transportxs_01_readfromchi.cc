@@ -354,6 +354,55 @@ void chi_physics::TransportCrossSections::
       };
 
   //##################################################
+  /// Lambda for reading 2D data
+  auto Read2DData =
+      [](const std::string& keyword,
+         const std::string& entry_prefix,
+         std::vector<std::vector<double>>& destination,
+         const unsigned int n_rows,
+         const unsigned int n_cols,
+         std::ifstream& file,
+         std::istringstream& line_stream,
+         unsigned int& line_number)
+      {
+        //init storage
+        destination.clear();
+        for (unsigned int i = 0; i < n_rows; ++i)
+          destination.emplace_back(n_cols, 0.0);
+
+        //book-keeping
+        std::string word, line;
+        double value;
+        unsigned int i;
+        unsigned int j;
+
+        //read the block
+        std::getline(file, line);
+        line_stream = std::istringstream(line);
+        ++line_number;
+        while (line != keyword + "_END")
+        {
+          //check that this line contains an entry
+          line_stream >> word;
+          if (word == entry_prefix)
+          {
+            //get data from current line
+            line_stream >> i >> j >> value;
+            if (entry_prefix == "G_PRECURSOR_VAL")
+              destination.at(j).at(i) = value; //hack
+            else
+              destination.at(i).at(j) = value;
+          }
+
+          //go to next line
+          std::getline(file, line);
+          line_stream = std::istringstream(line);
+          ++line_number;
+        }
+      };
+
+
+  //##################################################
   /// Lambda for reading transfer matrix data.
   auto ReadTransferMatrices =
       [](const std::string& keyword,
@@ -389,93 +438,6 @@ void chi_physics::TransportCrossSections::
             //get data from current line
             line_stream >> ell >> gprime >> group >> value;
             destination.at(ell).Insert(group, gprime, value);
-          }
-
-          //go to next line
-          std::getline(file, line);
-          line_stream = std::istringstream(line);
-          ++line_number;
-        }
-      };
-
-  //##################################################
-  /// Lambda for reading emission spectra data.
-  auto ReadEmissionSpectra =
-      [](const std::string& keyword,
-         EmissionSpectra& destination,
-         const unsigned int J, //# of precursors
-         const unsigned int G, //# of groups
-         std::ifstream& file,
-         std::istringstream& line_stream,
-         unsigned int& line_number)
-      {
-        //init storage
-        destination.clear();
-        for (unsigned int j = 0; j < J; ++j)
-          destination.emplace_back(G, 0.0);
-
-        //book-keeping
-        std::string word, line;
-        double value;
-        unsigned int group;
-        unsigned int precursor;
-
-        //read the block
-        std::getline(file, line);
-        line_stream = std::istringstream(line);
-        ++line_number;
-        while (line != keyword + "_END")
-        {
-          //check that this line contains an entry
-          line_stream >> word;
-          if (word == "G_PRECURSOR_VAL")
-          {
-            //get data from current line
-            line_stream >> group >> precursor >> value;
-            destination.at(precursor).at(group) = value;
-          }
-
-          //go to next line
-          std::getline(file, line);
-          line_stream = std::istringstream(line);
-          ++line_number;
-        }
-      };
-
-  //##################################################
-  /// Lambda for reading emission spectra data.
-  auto ReadProductionMatrix =
-      [](const std::string& keyword,
-         EmissionSpectra& destination,
-         const unsigned int G, //# of groups
-         std::ifstream& file,
-         std::istringstream& line_stream,
-         unsigned int& line_number)
-      {
-        //init storage
-        destination.clear();
-        for (unsigned int g = 0; g < G; ++g)
-          destination.emplace_back(G, 0.0);
-
-        //book-keeping
-        std::string word, line;
-        double value;
-        unsigned int group;
-        unsigned int gprime;
-
-        //read the block
-        std::getline(file, line);
-        line_stream = std::istringstream(line);
-        ++line_number;
-        while (line != keyword + "_END")
-        {
-          //check that this line contains an entry
-          line_stream >> word;
-          if (word == "G_GPRIME_VAL")
-          {
-            //get data from current line
-            line_stream >> group >> gprime >> value;
-            destination.at(group).at(gprime) = value;
           }
 
           //go to next line
@@ -806,6 +768,7 @@ void chi_physics::TransportCrossSections::
       if (fw == "CHI_PROMPT_BEGIN")
       {
         Read1DData("CHI_PROMPT", chi_prompt, num_groups, f, ls, ln);
+
         if (!has_nonzero(chi_prompt))
           throw std::logic_error(
               "Invalid prompt fission spectrum encountered.\n"
@@ -826,8 +789,9 @@ void chi_physics::TransportCrossSections::
 
       if (num_precursors > 0 && fw == "CHI_DELAYED_BEGIN")
       {
-        ReadEmissionSpectra("CHI_DELAYED", emission_spectra,
-                            num_precursors, num_groups, f, ls, ln);
+        //TODO: Should the be flipped to PRECURSOR_G_VAL?
+        Read2DData("CHI_DELAYED", "G_PRECURSOR_VAL",
+                   emission_spectra, num_precursors, num_groups, f, ls, ln);
 
         for (unsigned int j = 0; j < num_precursors; ++j)
         {
@@ -906,8 +870,8 @@ void chi_physics::TransportCrossSections::
                              scattering_order + 1, num_groups, f, ls, ln);
 
       if (fw == "PRODUCTION_MATRIX_BEGIN")
-        ReadProductionMatrix("PRODUCTION_MATRIX",
-                             production_matrix, num_groups, f, ls, ln);
+        Read2DData("PRODUCTION_MATRIX", "GPRIME_G_VAL",
+                   production_matrix, num_groups, num_groups, f, ls, ln);
     }//try
 
     catch (const std::runtime_error& err)

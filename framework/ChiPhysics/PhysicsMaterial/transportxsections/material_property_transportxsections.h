@@ -21,7 +21,7 @@ protected:
   using EmissionSpectra = std::vector<std::vector<double>>;
 
 public:
-  /**A struct containing data for a delayed neutron precursor.*/
+  /// A struct containing data for a delayed neutron precursor.
   struct Precursor
   {
     double decay_constant = 0.0;
@@ -30,7 +30,7 @@ public:
   };
 
 public:
-  unsigned int num_groups = 0;       ///< Total number of Groups
+  unsigned int num_groups = 0;       ///< Total number of groups
   unsigned int scattering_order = 0; ///< Legendre scattering order
   unsigned int num_precursors = 0;   ///< Number of precursors
 
