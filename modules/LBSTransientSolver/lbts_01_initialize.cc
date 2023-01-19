@@ -13,15 +13,16 @@ void lbs::TransientSolver::Initialize()
   KEigenvalueSolver::Execute();
 
   //======================================== Scale fission data
-  // TODO: At present, all cross sections in global stack are scaled.
-  //       This is done due to the presence of cross section swapping
-  //       mid-simulation. In this scenario, if only the active cross
-  //       sections are normalized, then a potentially incorrect amount
-  //       of reactivity will be inserted. In the future, it could
-  //       be useful to develop a tagging mechanism for this normalization.
-  //       If no swaps are used and all defined cross sections are used in
-  //       the simulation, this is equivalent to looping over the cross
-  //       sections that are pointed to by the solver.
+  //TODO: Determine a better methodology to handle fission scaling.
+
+  // NOTE: This is done to ensure consistency between cross sections
+  //       that may be swapped mid-simulation. For example, if one
+  //       seeks to swap to cross sections with more or less absorption,
+  //       then if this loop is over material_xs instead of the global
+  //       stack, the two cross section sets will have different fission
+  //       cross sections despite that not being intended.
+  // NOTE: A potentially better way to handle this is to develop a
+  //       flagging mechanism to tag materials for fission scaling.
   if (transient_options.scale_fission_xs)
     for (const auto& xs : chi::trnsprt_xs_stack)
       if (!xs->is_fission_scaled)
