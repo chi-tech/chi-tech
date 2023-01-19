@@ -35,6 +35,7 @@ public:
   unsigned int num_precursors = 0;   ///< Number of precursors
 
   bool is_fissionable = false;
+  bool is_fission_scaled = false;
 
   /// Energy bin boundaries in MeV
   std::vector<std::vector<double>> e_bounds;
@@ -73,14 +74,19 @@ public:
   //00
   TransportCrossSections();
 
-  public:
+private:
+  void Reset();
+
+public:
   void MakeSimple0(int n_grps, double sigma);
   void MakeSimple1(int n_grps, double sigma, double c);
   void MakeCombined(std::vector<std::pair<int,double>>& combinations);
 
 private:
-  void Reset();
   void ComputeAbsorption();
+
+public:
+  void ScaleFissionData(double k);
 
 public:
   //01

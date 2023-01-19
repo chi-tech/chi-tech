@@ -390,3 +390,22 @@ ComputeAbsorption()
     }//for g
   }//if scattering present
 }
+
+
+//######################################################################
+/**Scale the fission data by a constant.*/
+void chi_physics::TransportCrossSections::
+ScaleFissionData(const double k)
+{
+  for (unsigned int g = 0; g < num_groups; ++g)
+  {
+    nu_sigma_f[g] /= k;
+    nu_prompt_sigma_f[g] /= k;
+    nu_delayed_sigma_f[g] /= k;
+
+    auto& prod = production_matrix[g];
+    for (auto& val : prod)
+      val /= k;
+  }
+  is_fission_scaled = true;
+}
