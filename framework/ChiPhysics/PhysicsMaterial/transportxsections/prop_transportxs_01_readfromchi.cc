@@ -980,10 +980,10 @@ void chi_physics::TransportCrossSections::
             "specified.");
 
       if (!nu.empty() && !nu_prompt.empty())
-        chi::log.Log0Warning()
-            << "Both the total and prompt fission neutron yield "
-               "were specified. The prompt fission neutron yield "
-               "will be used and the total discarded.";
+        throw std::logic_error(
+            "Ambiguous fission neutron yield data specified.\n"
+            "Either the total or prompt fission neutron yield "
+            "must be specified, not both.");
 
       //check that some form of the fission spectrum was specified
       if (chi.empty() && chi_prompt.empty())
@@ -993,10 +993,10 @@ void chi_physics::TransportCrossSections::
             "specified.");
 
       if (!chi.empty() && !chi_prompt.empty())
-        chi::log.Log0Warning()
-            << "Both the steady-state and prompt fission spectra "
-               "were specified. The prompt fission spectra will "
-               "be used and the steady-state discarded.";
+        throw std::logic_error(
+            "Ambiguous fission spectrum data specified.\n"
+            "Either the steady-state or prompt fission spectrum "
+            "must be specified, not both.");
 
       //check for compatibility
       if ((!nu.empty() && chi.empty()) ||
