@@ -12,10 +12,20 @@ void lbs::TransientSolver::Initialize()
   KEigenvalueSolver::Initialize();
   KEigenvalueSolver::Execute();
 
-  for (double& phi_value : phi_old_local)
-    phi_value /= k_eff;
-
-  ComputePrecursors();
+  //======================================== Scale fission data
+  // TODO: At present, all cross sections in global stack are scaled.
+  //       This is done due to the presence of cross section swapping
+  //       mid-simulation. In this scenario, if only the active cross
+  //       sections are normalized, then a potentially incorrect amount
+  //       of reactivity will be inserted. In the future, it could
+  //       be useful to develop a tagging mechanism for this normalization.
+  //       If no swaps are used and all defined cross sections are used in
+  //       the simulation, this is equivalent to looping over the cross
+  //       sections that are pointed to by the solver.
+  if (transient_options.scale_fission_xs)
+    for (const auto& xs : chi::trnsprt_xs_stack)
+      if (!xs->is_fission_scaled)
+        xs->ScaleFissionData(k_eff);
 
   if (transient_options.verbosity_level >= 1)
   {
