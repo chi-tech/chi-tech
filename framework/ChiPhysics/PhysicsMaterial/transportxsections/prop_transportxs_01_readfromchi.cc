@@ -936,7 +936,7 @@ void chi_physics::TransportCrossSections::
     //check vector data inputs
     if (production_matrix.empty())
     {
-      //check that some form of non-delayed data was specified
+      //check for non-delayed fission neutron yield data
       if (nu.empty() && nu_prompt.empty())
         throw std::logic_error(
             "Invalid fission neutron yield specification encountered.\n"
@@ -949,7 +949,7 @@ void chi_physics::TransportCrossSections::
             "Either the total or prompt fission neutron yield "
             "must be specified, not both.");
 
-      //check that some form of the fission spectrum was specified
+      //check for fission spectrum data
       if (chi.empty() && chi_prompt.empty())
         throw std::logic_error(
             "Invalid fission spectrum specification encountered.\n"
@@ -1064,6 +1064,45 @@ void chi_physics::TransportCrossSections::
       }
     }//if production_matrix empty
 
-    //TODO: Implement production matrix checks
+    //TODO: Determine final input format for production matrix
+    else
+    {
+      //TODO: Develop an implementation for multi-particle delayed
+      //      neutron data. The primary challenge in this is that
+      //      different precursor species exist for neutron-induced
+      //      fission than for photo-fission.
+      //throw error if precursors are present
+      if (num_precursors > 0)
+        throw std::runtime_error(
+            "This setup has not been implemented.\n"
+            "Currently, when a production matrix is specified, "
+            "no delayed neutron precursors are allowed.");
+
+      //check for non-delayed fission neutron yield data
+      if (nu.empty() && nu_prompt.empty())
+        throw std::logic_error(
+            "Invalid fission neutron yield specification encountered.\n"
+            "Either the total or prompt fission neutron yield must be "
+            "specified.");
+
+      if (!nu.empty() && !nu_prompt.empty())
+        throw std::logic_error(
+            "Ambiguous fission neutron yield data specified.\n"
+            "Either the total or prompt fission neutron yield "
+            "must be specified, not both.");
+
+      //compute production cross section
+      nu_sigma_f.assign(num_groups, 0.0);
+      for (unsigned int gp = 0; gp < num_groups; ++gp)
+        for (unsigned int g = 0; g < num_groups; ++g)
+          nu_sigma_f[g] += production_matrix[gp][g];
+
+      //compute fission cross section
+      sigma_f.assign(num_groups, 0.0);
+      const auto& nu_ = !nu_prompt.empty()? nu_prompt : nu;
+      for (unsigned int g = 0; g < num_groups; ++g)
+        if (nu_[g] > 0.0)
+          sigma_f[g] = nu_sigma_f[g] / nu[g];
+    }
   }//if fissionable
 }
