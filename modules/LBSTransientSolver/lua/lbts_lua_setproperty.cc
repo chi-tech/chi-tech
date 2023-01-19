@@ -50,6 +50,14 @@ Sets the time-stepping method. Can be "CRANK_NICHOLSON" or "BACKWARD_EULER".
 "CALLBACK"\n
 Sets the timestep callback function. [Default=Nothing]\n\n
 
+"SCALE_FISSION_XS"\n
+Sets a boolean flag to normalize the fission cross-sections by the
+k-eigenvalue. [Default=false]\n\n
+
+"NORMALIZATION_METHOD"\n
+Sets the initial data normalization data. Can be "TOTAL_POWER",
+"POWER_DENSITY", or "NONE". [Default="TOTAL_POWER"]\n\n
+
 \author Zachary Hardy*/
 int chiLBTSSetProperty(lua_State* L)
 {
@@ -178,6 +186,43 @@ int chiLBTSSetProperty(lua_State* L)
     solver.transient_options.console_call_back_function = cbfname;
     chi::log.Log() << solver.TextName() << ": console_call_back_function set to "
                    << cbfname;
+  }
+  else if (property == "SCALE_FISSION_XS")
+  {
+    if (num_args != 3) PropertyArgCntErr("SCALE_FISSION_XS");
+
+    LuaCheckNilValue(fname, L, 3);
+
+    const bool scale_fission_xs = lua_toboolean(L, 3);
+    solver.transient_options.scale_fission_xs = scale_fission_xs;
+
+    chi::log.Log() << solver.TextName() << ": scale_fission_xs set to "
+                   << std::to_string(scale_fission_xs);
+  }
+  else if (property == "NORMALIZATION_METHOD")
+  {
+    if (num_args != 3) PropertyArgCntErr("NORMALIZATION_METHOD");
+
+    LuaCheckNilValue(fname, L, 3);
+
+    const std::string option = lua_tostring(L, 3);
+
+    if (option == "TOTAL_POWER")
+      solver.transient_options.normalization_method =
+          lbs::TransientSolver::NormalizationMethod::TOTAL_POWER;
+    else if (option == "POWER_DENSITY")
+      solver.transient_options.normalization_method =
+          lbs::TransientSolver::NormalizationMethod::POWER_DENSITY;
+    else if (option == "NONE")
+      solver.transient_options.normalization_method =
+          lbs::TransientSolver::NormalizationMethod::NONE;
+    else
+      throw std::invalid_argument(
+          fname + ": Only the following normalization methods are " +
+          "supported: \"TOTAL_POWER\", \"POWER_DENSITY\", \"NONE\"");
+
+    chi::log.Log() << solver.TextName() << ": normalization_method set to "
+                   << option;
   }
   else
     throw std::logic_error(fname + ": unsupported property name \"" +
