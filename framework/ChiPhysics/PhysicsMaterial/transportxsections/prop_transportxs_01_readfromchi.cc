@@ -1085,12 +1085,17 @@ void chi_physics::TransportCrossSections::
             "When a production matrix is specified, the fission "
             "cross sections must also be specified.");
 
-      //check for compatibility
-      nu.assign(num_groups, 0.0);
+      //compute production cross section
+      nu_sigma_f.assign(num_groups, 0.0);
       for (unsigned int g = 0; g < num_groups; ++g)
         for (unsigned int gp = 0; gp < num_groups; ++gp)
-          if (sigma_f[gp] > 0)
-            nu[gp] = production_matrix[g][gp] / sigma_f[gp];
+          nu_sigma_f[gp] += production_matrix[g][gp];
+
+      //check for reasonable fission neutron yield
+      nu.assign(num_groups, 0.0);
+      for (unsigned int g = 0; g < num_groups; ++g)
+        if (sigma_f[g] > 0.0)
+          nu[g] = nu_sigma_f[g] / sigma_f[g];
 
       if (!std::all_of(nu.begin(), nu.end(),
                       [](double x)
