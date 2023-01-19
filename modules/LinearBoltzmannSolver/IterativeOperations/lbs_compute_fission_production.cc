@@ -30,9 +30,8 @@ double SteadySolver::ComputeFissionProduction(const std::vector<double>& phi)
       const double IntV_ShapeI = cell_matrices.Vi_vectors[i];
 
       //=============================== Loop over groups
-      //TODO: This should be nu
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.nu_prompt_sigma_f[g] *
+        local_production += xs.nu_sigma_f[g] *
                             phi[uk_map + g] *
                             IntV_ShapeI;
     }//for node
