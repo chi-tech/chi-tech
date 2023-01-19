@@ -1078,31 +1078,27 @@ void chi_physics::TransportCrossSections::
             "Currently, when a production matrix is specified, "
             "no delayed neutron precursors are allowed.");
 
-      //check for non-delayed fission neutron yield data
-      if (nu.empty() && nu_prompt.empty())
+      //check for fission cross sections
+      if (sigma_f.empty())
         throw std::logic_error(
-            "Invalid fission neutron yield specification encountered.\n"
-            "Either the total or prompt fission neutron yield must be "
-            "specified.");
+            "Invalid fission data specification encountered.\n"
+            "When a production matrix is specified, the fission "
+            "cross sections must also be specified.");
 
-      if (!nu.empty() && !nu_prompt.empty())
-        throw std::logic_error(
-            "Ambiguous fission neutron yield data specified.\n"
-            "Either the total or prompt fission neutron yield "
-            "must be specified, not both.");
-
-      //compute production cross section
-      nu_sigma_f.assign(num_groups, 0.0);
-      for (unsigned int gp = 0; gp < num_groups; ++gp)
-        for (unsigned int g = 0; g < num_groups; ++g)
-          nu_sigma_f[g] += production_matrix[gp][g];
-
-      //compute fission cross section
-      sigma_f.assign(num_groups, 0.0);
-      const auto& nu_ = !nu_prompt.empty()? nu_prompt : nu;
+      //check for compatibility
+      nu.assign(num_groups, 0.0);
       for (unsigned int g = 0; g < num_groups; ++g)
-        if (nu_[g] > 0.0)
-          sigma_f[g] = nu_sigma_f[g] / nu[g];
+        for (unsigned int gp = 0; gp < num_groups; ++gp)
+          if (sigma_f[gp] > 0)
+            nu[gp] = production_matrix[g][gp] / sigma_f[gp];
+
+      if (!std::all_of(nu.begin(), nu.end(),
+                      [](double x)
+                      { return x == 0.0 || (x > 1.0 && x < 10.0);}))
+        throw std::logic_error(
+            "Incompatible fission data encountered.\n"
+            "The estimated fission neutron yield must be either zero "
+            "or in the range (1.0, 10.0).");
     }
   }//if fissionable
 }
