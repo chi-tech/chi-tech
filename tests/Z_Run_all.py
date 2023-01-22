@@ -310,8 +310,6 @@ run_test(
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
 
-sys.exit(123)
-
 #2
 run_test(
     file_name="Diffusion1D_KBA",

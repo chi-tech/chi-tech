@@ -58,7 +58,7 @@ chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 --############################################### Get field functions
-fflist,count = chiGetFieldFunctionList(phys1)
+fflist,count = chiSolverGetFieldFunctionList(phys1)
 
 --############################################### Export VTU
 if (master_export == nil) then

@@ -498,5 +498,5 @@ void dfem_diffusion::Solver::Execute()
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
   sdm.LocalizePETScVector(x,field,OneDofPerNode);
 
-
+  field_functions2.front()->UpdateFieldVector(field);
 }
