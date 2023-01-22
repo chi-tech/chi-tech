@@ -168,7 +168,7 @@ void lbs::SteadySolver::InitializeParrays()
   }//for local cell
 
   //================================================== Initialize Field Functions
-  if (field_functions2.empty())
+  if (field_functions.empty())
   {
     for (size_t g = 0; g < groups.size(); ++g)
     {
@@ -190,8 +190,8 @@ void lbs::SteadySolver::InitializeParrays()
           discretization,                //Spatial discretization
           Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-        chi::fieldfunc2_stack.push_back(group_ff);
-        field_functions2.push_back(group_ff);
+        chi::field_function_stack.push_back(group_ff);
+        field_functions.push_back(group_ff);
       }//for m
     }//for g
   }//if empty

@@ -24,15 +24,15 @@ int chiLBSGetFieldFunctionList(lua_State *L)
 
   //============================================= Push up new table
   lua_newtable(L);
-  for (int ff=0; ff<lbs_solver.field_functions2.size(); ff++)
+  for (int ff=0; ff<lbs_solver.field_functions.size(); ff++)
   {
     lua_pushnumber(L,ff+1);
     int pff_count = -1;
     bool found = false;
-    for (auto& pff : chi::fieldfunc2_stack)
+    for (auto& pff : chi::field_function_stack)
     {
       ++pff_count;
-      if (pff == lbs_solver.field_functions2[ff])
+      if (pff == lbs_solver.field_functions[ff])
       {
         lua_pushnumber(L,pff_count);
         found = true;
@@ -46,7 +46,7 @@ int chiLBSGetFieldFunctionList(lua_State *L)
     lua_settable(L,-3);
   }
 
-  lua_pushnumber(L,static_cast<lua_Number>(lbs_solver.field_functions2.size()));
+  lua_pushnumber(L,static_cast<lua_Number>(lbs_solver.field_functions.size()));
 
 return 2;
 }
@@ -86,10 +86,10 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
         lua_pushnumber(L,count);
         int pff_count = -1;
         bool found = false;
-        for (auto& pff : chi::fieldfunc2_stack)
+        for (auto& pff : chi::field_function_stack)
         {
           ++pff_count;
-          if (pff == lbs_solver.field_functions2[ff])
+          if (pff == lbs_solver.field_functions[ff])
           {
             lua_pushnumber(L,pff_count);
             found = true;

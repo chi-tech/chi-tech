@@ -24,7 +24,7 @@ int chiExportFieldFunctionToVTK(lua_State *L)
   int ff_handle = lua_tonumber(L,1);
   const char* base_name = lua_tostring(L,2);
 
-  auto ff = chi::GetStackItemPtr(chi::fieldfunc2_stack, ff_handle, fname);
+  auto ff = chi::GetStackItemPtr(chi::field_function_stack, ff_handle, fname);
 
   ff->ExportToVTK(base_name);
 
@@ -61,7 +61,7 @@ int chiExportMultiFieldFunctionToVTK(lua_State *L)
     int ff_handle = lua_tonumber(L,-1);
     lua_pop(L,1);
 
-    auto ff = chi::GetStackItemPtr(chi::fieldfunc2_stack, ff_handle, fname);
+    auto ff = chi::GetStackItemPtr(chi::field_function_stack, ff_handle, fname);
 
     ffs.push_back(ff);
   }

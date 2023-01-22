@@ -8,31 +8,6 @@
         lua_pushnumber(L, y); \
         lua_setglobal(L, #x)
 
-#include "chi_runtime.h"
-
-chi_physics::Solver& chi_physics::lua_utils::
-  GetSolverByHandle(int handle, const std::string &calling_function_name)
-{
-  std::shared_ptr<chi_physics::Solver> solver;
-  try{
-
-    solver = std::dynamic_pointer_cast<chi_physics::Solver>(
-      chi::solver_stack.at(handle));
-
-    if (not solver)
-      throw std::logic_error(calling_function_name +
-      ": Invalid solver at given handle (" +
-      std::to_string(handle) + "). "
-      "The solver is not of type chi_physics::Solver.");
-  }//try
-  catch(const std::out_of_range& o) {
-    throw std::logic_error(calling_function_name + ": Invalid solver-handle (" +
-                           std::to_string(handle) + ").");
-  }
-
-  return *solver;
-}
-
 void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
 {
   //=================================== Solver
@@ -51,9 +26,7 @@ void chi_physics::lua_utils::RegisterLuaEntities(lua_State *L)
   LUA_FMACRO1(chiPhysicsMaterialModifyTotalCrossSection);
 
   //=================================== Field functions
-  LUA_FMACRO1(chiGetFieldFunctionHandleByName);
-  LUA_FMACRO1(chiExportFieldFunctionToVTK);
-  LUA_FMACRO1(chiExportMultiFieldFunctionToVTK);
+  chi_physics::field_function_lua_utils::RegisterLuaEntities(L);
 
   //=================================== Transport Cross-sections
   LUA_FMACRO1(chiPhysicsTransportXSCreate);

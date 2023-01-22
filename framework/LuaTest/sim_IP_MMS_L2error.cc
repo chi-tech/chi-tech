@@ -74,10 +74,10 @@ namespace chi_unit_sim_tests
         solver.sdm_ptr,            //Spatial Discretization
         unk_man.unknowns.front()); //Unknown Manager
 
-    chi::fieldfunc2_stack.push_back(ff);
+    chi::field_function_stack.push_back(ff);
 
     // pops the handle, sets the global variable (handles are numbered from 0, hence -1)
-    auto handle = static_cast<lua_Integer>(chi::fieldfunc2_stack.size()-1);
+    auto handle = static_cast<lua_Integer>(chi::field_function_stack.size() - 1);
     lua_pushinteger(L, handle);
     lua_setglobal(L, "simtest_IP_MMS_L2_handle");
 

@@ -30,7 +30,7 @@ void lbs::SteadySolver::UpdateFieldFunctions()
         }//for node
       }//for cell
 
-      auto& ff_ptr = field_functions2.at(ff_index);
+      auto& ff_ptr = field_functions.at(ff_index);
       ff_ptr->UpdateFieldVector(data_vector_local);
       ++ff_index;
     }//for ff

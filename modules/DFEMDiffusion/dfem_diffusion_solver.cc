@@ -146,7 +146,7 @@ void dfem_diffusion::Solver::Initialize()
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
 
-  if (field_functions2.empty())
+  if (field_functions.empty())
   {
     std::string solver_name;
     if (not TextName().empty()) solver_name = TextName() + "-";
@@ -160,8 +160,8 @@ void dfem_diffusion::Solver::Initialize()
         sdm_ptr,                       //Spatial Discretization
         Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-    field_functions2.push_back(initial_field_function);
-    chi::fieldfunc2_stack.push_back(initial_field_function);
+    field_functions.push_back(initial_field_function);
+    chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
 }//end initialize
@@ -498,5 +498,5 @@ void dfem_diffusion::Solver::Execute()
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
   sdm.LocalizePETScVector(x,field,OneDofPerNode);
 
-  field_functions2.front()->UpdateFieldVector(field);
+  field_functions.front()->UpdateFieldVector(field);
 }

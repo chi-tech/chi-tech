@@ -137,7 +137,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
   if (property == Property::ADD_FIELD_FUNCTION)
   {
     int ffhandle = lua_tonumber(L,3);
-    auto cur_ff = chi::GetStackItemPtr(chi::fieldfunc2_stack, ffhandle, fname);
+    auto cur_ff = chi::GetStackItemPtr(chi::field_function_stack, ffhandle, fname);
 
     p_ffi->field_functions.push_back(cur_ff);
   }
@@ -150,7 +150,7 @@ int chiFFInterpolationSetProperty(lua_State *L)
     for (double handle_d : handle_array)
     {
       const auto ffhandle = static_cast<int>(handle_d);
-      auto cur_ff = chi::GetStackItemPtr(chi::fieldfunc2_stack, ffhandle, fname);
+      auto cur_ff = chi::GetStackItemPtr(chi::field_function_stack, ffhandle, fname);
 
       p_ffi->field_functions.push_back(cur_ff);
     }//for handle

@@ -170,6 +170,6 @@ double dfem_diffusion::Solver::CallLua_iXYZFunction(
 /**Updates the field functions with the latest data.*/
 void dfem_diffusion::Solver::UpdateFieldFunctions()
 {
-  auto& ff = *field_functions2.front();
+  auto& ff = *field_functions.front();
   ff.UpdateFieldVector(x);
 }

@@ -137,7 +137,7 @@ void fv_diffusion::Solver::Initialize()
                                            nodal_nnz_in_diag,
                                            nodal_nnz_off_diag);
 
-  if (field_functions2.empty())
+  if (field_functions.empty())
   {
     std::string solver_name;
     if (not TextName().empty()) solver_name = TextName() + "-";
@@ -151,8 +151,8 @@ void fv_diffusion::Solver::Initialize()
         sdm_ptr,                       //Spatial Discretization
         Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-    field_functions2.push_back(initial_field_function);
-    chi::fieldfunc2_stack.push_back(initial_field_function);
+    field_functions.push_back(initial_field_function);
+    chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
 }//end initialize

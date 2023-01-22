@@ -22,7 +22,7 @@ private:
   std::string text_name;
 public:
   BasicOptions basic_options;
-  std::vector<std::shared_ptr<FieldFunction>> field_functions2;
+  std::vector<std::shared_ptr<FieldFunction>> field_functions;
 
 public:
   explicit
