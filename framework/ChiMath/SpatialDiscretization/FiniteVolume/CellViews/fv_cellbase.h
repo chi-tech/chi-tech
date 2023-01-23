@@ -7,6 +7,8 @@
 
 #include "ChiMesh/Cell/cell.h"
 
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+
 //######################################################### Class def
 namespace chi_math
 {
@@ -27,12 +29,18 @@ public:
   //02 Shapefuncs
   double ShapeValue(int i, const chi_mesh::Vector3& xyz) const override
   {
-    return 1.0;
+    if (m_grid_ptr->CheckPointInsideCell(m_cell, xyz))
+      return 1.0;
+    else
+      return 0.0;
   }
   void ShapeValues(const chi_mesh::Vector3& xyz,
                    std::vector<double>& shape_values) const override
   {
-    shape_values.assign(m_num_nodes, 0.0);
+    if (m_grid_ptr->CheckPointInsideCell(m_cell, xyz))
+      shape_values.assign(m_num_nodes, 1.0);
+    else
+      shape_values.assign(m_num_nodes, 0.0);
   }
   chi_mesh::Vector3 GradShapeValue(int i,
                                    const chi_mesh::Vector3& xyz) const override

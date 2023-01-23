@@ -2,12 +2,9 @@
 
 #include "DFEMDiffusion/dfem_diffusion_solver.h"
 #include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
-//#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-//#include "ChiMesh/MeshHandler/chi_meshhandler.h"
-//#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
-#include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -69,21 +66,18 @@ namespace chi_unit_sim_tests
     }//for cell
 
     // add FF
-    auto stl_vector = new std::vector<double> ();
-    sdm.LocalizePETScVector(solver.x, *stl_vector, OneDofPerNode);
+
     auto unk_man = OneDofPerNode;
     auto ff =
       std::make_shared<chi_physics::FieldFunction>(
-        std::string("phi"),   //Text name
-        solver.sdm_ptr,       //Spatial Discretization
-        stl_vector,               //Data vector
-//        &solver.x,               //Data vector
-        unk_man);             //Unknown Manager
+        std::string("phi"),        //Text name
+        solver.sdm_ptr,            //Spatial Discretization
+        unk_man.unknowns.front()); //Unknown Manager
 
-    chi::fieldfunc_stack.push_back(ff);
+    chi::field_function_stack.push_back(ff);
 
     // pops the handle, sets the global variable (handles are numbered from 0, hence -1)
-    lua_Integer handle = static_cast<lua_Integer>(chi::fieldfunc_stack.size()-1);
+    auto handle = static_cast<lua_Integer>(chi::field_function_stack.size() - 1);
     lua_pushinteger(L, handle);
     lua_setglobal(L, "simtest_IP_MMS_L2_handle");
 
@@ -99,6 +93,11 @@ namespace chi_unit_sim_tests
 
     chi::log.Log() << "Error: " << std::scientific << global_error
                    << " Num-cells: " << sdm.ref_grid->GetGlobalNumberOfCells();
+
+    auto stl_vector = new std::vector<double>();
+    sdm.LocalizePETScVector(solver.x, *stl_vector, OneDofPerNode);
+
+    //Create ff but use stl_vector instead of &solver.x
 
     return 0;
   }

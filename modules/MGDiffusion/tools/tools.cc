@@ -2,6 +2,10 @@
 #include "chi_log.h"
 #include "../mg_diffusion_solver.h"
 
+#include <iomanip>
+
+#include "chi_runtime.h"
+
 //###################################################################
 /**My personal monitor monitor.*/
 PetscErrorCode mg_diffusion::MGKSPMonitor(

@@ -5,6 +5,7 @@
 #include "ChiTimer/chi_timer.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "dfem_diffusion_bndry.h"
 
@@ -63,14 +64,15 @@ void dfem_diffusion::Solver::Initialize()
       {
         case BoundaryType::Reflecting:
         {
-          boundaries.push_back({BoundaryType::Reflecting, {0.,0.,0.}});
+          boundaries.push_back(Boundary{BoundaryType::Reflecting, {0.,0.,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to reflecting.";
           break;
         }
         case BoundaryType::Dirichlet:
         {
           if (bndry_vals.empty()) bndry_vals.resize(1,0.0);
-          boundaries.push_back({BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
+          boundaries.push_back(Boundary
+          {BoundaryType::Dirichlet, {bndry_vals[0],0.,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to dirichlet.";
           break;
         }
@@ -79,16 +81,17 @@ void dfem_diffusion::Solver::Initialize()
           if (bndry_vals.size()!=3)
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " Robin needs 3 values in bndry vals.");
-          boundaries.push_back({BoundaryType::Robin, {bndry_vals[0],
-                                                      bndry_vals[1],
-                                                      bndry_vals[2]}});
-          chi::log.Log() << "Boundary " << bndry << " set to robin."
-                         << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
+          boundaries.push_back(Boundary
+          {BoundaryType::Robin, {bndry_vals[0],bndry_vals[1],bndry_vals[2]}});
+          chi::log.Log()
+          << "Boundary " << bndry << " set to robin."
+          << bndry_vals[0]<<","<<bndry_vals[1]<<","<<bndry_vals[2];
           break;
         }
         case BoundaryType::Vacuum:
         {
-          boundaries.push_back({BoundaryType::Robin, {0.25,0.5,0.}});
+          boundaries.push_back(Boundary
+          {BoundaryType::Robin, {0.25,0.5,0.}});
           chi::log.Log() << "Boundary " << bndry << " set to vacuum.";
           break;
         }
@@ -97,16 +100,18 @@ void dfem_diffusion::Solver::Initialize()
           if (bndry_vals.size()!=3) 
             throw std::logic_error(std::string(__PRETTY_FUNCTION__) +
                            " Neumann needs 3 values in bndry vals.");
-          boundaries.push_back({BoundaryType::Robin, {0.,bndry_vals[0],
-                                                      bndry_vals[1]}});
-          chi::log.Log() << "Boundary " << bndry << " set to neumann." << bndry_vals[0];
+          boundaries.push_back(Boundary
+          {BoundaryType::Robin, {0.,bndry_vals[0],bndry_vals[1]}});
+          chi::log.Log()
+          << "Boundary " << bndry << " set to neumann." << bndry_vals[0];
           break;
         }
       }//switch boundary type
     }
     else
     {
-      boundaries.push_back({BoundaryType::Dirichlet, {0.,0.,0.}});
+      boundaries.push_back(Boundary
+      {BoundaryType::Dirichlet, {0.,0.,0.}});
       chi::log.Log0Verbose1()
         << "No boundary preference found for boundary index " << bndry
         << "Dirichlet boundary added with zero boundary value.";
@@ -139,20 +144,24 @@ void dfem_diffusion::Solver::Initialize()
  
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
-                                           nodal_nnz_off_diag);  
+                                           nodal_nnz_off_diag);
+
   if (field_functions.empty())
   {
-    auto unk_man = OneDofPerNode;
-    field.resize(n);
+    std::string solver_name;
+    if (not TextName().empty()) solver_name = TextName() + "-";
+
+    std::string text_name = solver_name + "phi";
+
+    using namespace chi_math;
     auto initial_field_function =
       std::make_shared<chi_physics::FieldFunction>(
-        std::string("phi"),   //Text name
-        sdm_ptr,              //Spatial Discretization
-        &field,               //Data vector
-        unk_man);             //Unknown Manager
+        text_name,                     //Text name
+        sdm_ptr,                       //Spatial Discretization
+        Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-      field_functions.push_back(initial_field_function);
-      chi::fieldfunc_stack.push_back(initial_field_function);
+    field_functions.push_back(initial_field_function);
+    chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
 }//end initialize
@@ -489,5 +498,5 @@ void dfem_diffusion::Solver::Execute()
   const auto& OneDofPerNode = sdm.UNITARY_UNKNOWN_MANAGER;
   sdm.LocalizePETScVector(x,field,OneDofPerNode);
 
-
+  field_functions.front()->UpdateFieldVector(field);
 }

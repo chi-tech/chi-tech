@@ -5,13 +5,11 @@
 #include "ChiTimer/chi_timer.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
-
-#include "mg_diffusion_bndry.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
-//#include <stdio.h>
 
 //============================================= constructor
 mg_diffusion::Solver::Solver(const std::string& in_solver_name):
@@ -176,27 +174,26 @@ void mg_diffusion::Solver::Initialize()
   //============================================= Field Function
   if (field_functions.empty())
   {
-    auto unk_man = OneDofPerNode;
-
-    for (uint g=0; g < num_groups; ++g)
+    for (uint g=0; g<mg_diffusion::Solver::num_groups; ++g)
     {
-      unk_man.SetUnknownTextName(0,"");
-      unk_man.SetUnknownComponentTextName(0,0,"");
+      std::string solver_name;
+      if (not TextName().empty()) solver_name = TextName() + "-";
 
       char buff[100];
       int dummy = snprintf(buff,4,"%03d",g);
 
+      std::string text_name = solver_name + "Flux_g" + std::string(buff);
+
+      using namespace chi_math;
       auto initial_field_function =
         std::make_shared<chi_physics::FieldFunction>(
-          std::string("mg_phi_"+std::string(buff)),//Text name
-          sdm_ptr,              //Spatial Discretization
-          &x[g],                //Data vector
-          unk_man);             //Unknown Manager
+          text_name,                     //Text name
+          sdm_ptr,                       //Spatial Discretization
+          Unknown(UnknownType::SCALAR)); //Unknown Manager
 
       field_functions.push_back(initial_field_function);
-      chi::fieldfunc_stack.push_back(initial_field_function);
-    }
-
+      chi::field_function_stack.push_back(initial_field_function);
+    }//for g
   }//if not ff set
 
 }//end initialize

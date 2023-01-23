@@ -8,7 +8,7 @@
 #include "ChiMath/RandomNumberGeneration/random_number_generator.h"
 #include "ChiMath/Quadratures/LegendrePoly/legendrepoly.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -331,9 +331,9 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
   }//for cell
 
   //============================================= Create Field Functions
-  std::vector<std::shared_ptr<chi_physics::FieldFunction2>> ff_list;
+  std::vector<std::shared_ptr<chi_physics::FieldFunction>> ff_list;
 
-  ff_list.push_back(std::make_shared<chi_physics::FieldFunction2>(
+  ff_list.push_back(std::make_shared<chi_physics::FieldFunction>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown
@@ -359,11 +359,11 @@ int chiSimTest93_RayTracing(lua_State* Lstate)
 
 
   //============================================= Update field function
-  chi_physics::FieldFunction2::FFList const_ff_list;
+  chi_physics::FieldFunction::FFList const_ff_list;
   for (const auto& ff_ptr : ff_list)
     const_ff_list.push_back(ff_ptr);
-  chi_physics::FieldFunction2::ExportMultipleToVTK(fname,
-                                                   const_ff_list);
+  chi_physics::FieldFunction::ExportMultipleToVTK(fname,
+                                                  const_ff_list);
 
   return 0;
 }

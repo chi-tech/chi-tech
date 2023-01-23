@@ -1,200 +1,94 @@
 #include "chi_ffinter_volume.h"
 
-#include <ChiMesh/Cell/cell.h>
-#include <ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h>
-
-#include <chi_mpi.h>
+#include "ChiMath/VectorGhostCommunicator/vector_ghost_communicator.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################
 /**Executes the volume interpolation.*/
 void chi_mesh::FieldFunctionInterpolationVolume::Execute()
 {
-  auto& ref_ff = *field_functions.back();
-  const auto& field_sdm_type = ref_ff.spatial_discretization->type;
+  const auto& ref_ff = *field_functions.front();
+  const auto& sdm    = ref_ff.SDM();
+  const auto& grid   = *sdm.ref_grid;
 
-  typedef chi_math::SpatialDiscretizationType SMDType;
+  const auto& uk_man = ref_ff.UnkManager();
+  const auto uid = 0;
+  const auto cid = m_ref_component;
 
-  if (field_sdm_type == SMDType::PIECEWISE_LINEAR_CONTINUOUS)
+  using namespace chi_mesh::ff_interpolation;
+  const auto field_data = ref_ff.GetGhostedFieldVector();
+
+  double local_volume = 0.0;
+  double local_sum = 0.0;
+  double local_max = 0.0;
+  double local_min = 0.0;
+  for (const uint64_t cell_local_id : cell_local_ids_inside_logvol)
   {
-    std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
+    const auto& cell = grid.local_cells[cell_local_id];
+    const auto& cell_mapping = sdm.GetCellMapping(cell);
+    const size_t num_nodes = cell_mapping.NumNodes();
+    const auto qp_data = cell_mapping.MakeVolumeQuadraturePointData();
 
-    size_t num_mappings = pwld_local_cells_needed_unmapped.size();
-    for (size_t m=0; m<num_mappings; ++m)
-      cell_node_component_tuples.emplace_back(
-        cfem_local_cells_needed_unmapped[m],
-        cfem_local_nodes_needed_unmapped[m],
-        ref_ff.ref_component);
-
-    Vec x_mapped;
-    std::vector<uint64_t> mapping;
-
-    ref_ff.CreateCFEMMappingLocal(x_mapped,
-                                  cell_node_component_tuples,
-                                  mapping);
-
-    CFEMInterpolate(x_mapped,mapping);
-
-  }
-  else if (field_sdm_type == SMDType::PIECEWISE_LINEAR_DISCONTINUOUS)
-  {
-    std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
-
-    size_t num_mappings = pwld_local_cells_needed_unmapped.size();
-    for (size_t m=0; m<num_mappings; ++m)
-      cell_node_component_tuples.emplace_back(
-        pwld_local_cells_needed_unmapped[m],
-        pwld_local_nodes_needed_unmapped[m],
-        ref_ff.ref_component);
-
-    std::vector<uint64_t> mapping;
-
-    ref_ff.CreatePWLDMappingLocal(cell_node_component_tuples,
-                                  mapping);
-
-    PWLDInterpolate(*field_functions[0]->field_vector_local,mapping);
-  }
-}
-
-//###################################################################
-/**Computes the cell average of each cell that was cut.*/
-void chi_mesh::FieldFunctionInterpolationVolume::
-  CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping)
-{
-  auto& discretization = static_cast<chi_math::SpatialDiscretization_PWLD&>(
-                         *field_functions[0]->spatial_discretization);
-
-  int counter=-1;
-  double total_volume = 0.0;
-  op_value = 0.0;
-  double max_value = 0.0;
-  bool max_set = false;
-
-  for (auto& cell : grid_view->local_cells)
-  {
-    bool inside_logvolume=true;
-
-    if (logical_volume != nullptr)
-      inside_logvolume = logical_volume->Inside(cell.centroid);
-
-    if (inside_logvolume)
+    std::vector<double> node_dof_values(num_nodes, 0.0);
+    for (size_t i=0; i<num_nodes; ++i)
     {
-      const auto& fe_intgrl_values = discretization.GetUnitIntegrals(cell);
+      const int64_t imap = sdm.MapDOFLocal(cell,i,uk_man,uid,cid);
+      node_dof_values[i] = field_data[imap];
+    }//for i
 
-      for (int i=0; i<cell.vertex_ids.size(); i++)
-      {
-        double value = 0.0;
-        int64_t ir = -1;
-
-        counter++;
-        ir = mapping[counter];
-        VecGetValues(field,1,&ir,&value);
-
-        if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
-          value = CallLuaFunction(value,cell.material_id);
-
-        op_value += value* fe_intgrl_values.IntV_shapeI(i);
-        total_volume += fe_intgrl_values.IntV_shapeI(i);
-
-        if (!max_set)
-        {
-          max_value = value;
-          max_set = true;
-        }
-        else
-        {
-          if (value > max_value)
-            max_value = value;
-        }
-      }//for dof
-    }//if inside logicalVol
-
-  }//for local cell
-
-  double all_value=0.0;
-  double all_total_volume = 0.0;
-  double all_max_value=0.0;
-
-  MPI_Allreduce(&op_value,&all_value,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-  MPI_Allreduce(&total_volume,&all_total_volume,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-  MPI_Allreduce(&max_value,&all_max_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
-
-  if (op_type == OP_AVG)
-    op_value = all_value/total_volume;
-
-  if (op_type == OP_MAX)
-    op_value = all_max_value;
-}
-
-
-
-//###################################################################
-/**Computes the cell average of each cell that was cut.*/
-void chi_mesh::FieldFunctionInterpolationVolume::
-  PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping)
-{
-  auto& discretization = static_cast<chi_math::SpatialDiscretization_PWLD&>(
-                         *field_functions[0]->spatial_discretization);
-
-  int counter=-1;
-  op_value = 0.0;
-  double max_value = 0.0;
-  bool max_set = false;
-  double total_volume = 0.0;
-
-  for (auto& cell : grid_view->local_cells)
-  {
-    bool inside_logvolume=true;
-
-    if (logical_volume != nullptr)
-      inside_logvolume = logical_volume->Inside(cell.centroid);
-
-    if (inside_logvolume)
+    if (cell_local_id == cell_local_ids_inside_logvol.front())
     {
-      const auto& fe_intgrl_values = discretization.GetUnitIntegrals(cell);
+      local_max = node_dof_values.front();
+      local_min = node_dof_values.front();
+    }
 
-      for (int i=0; i < cell.vertex_ids.size(); i++)
-      {
-        double value = 0.0;
-        int ir = -1;
+    for (size_t i=0; i<num_nodes; ++i)
+    {
+      local_max = std::fmax(node_dof_values[i], local_max);
+      local_min = std::fmin(node_dof_values[i], local_min);
+    }
 
-        counter++;
-        ir = mapping[counter];
-        value = field[ir];
+    for (const size_t qp : qp_data.QuadraturePointIndices())
+    {
+      double ff_value = 0.0;
+      for (size_t j=0; j<num_nodes; ++j)
+        ff_value += qp_data.ShapeValue(j,qp) * node_dof_values[j];
 
-        if ((op_type >= OP_SUM_LUA) and (op_type <= OP_MAX_LUA))
-          value = CallLuaFunction(value,cell.material_id);
+      double function_value = ff_value;
+      if (op_type >= Operation::OP_SUM_LUA and
+          op_type <= Operation::OP_MAX_LUA)
+        function_value = CallLuaFunction(ff_value, cell.material_id);
 
-        op_value += value* fe_intgrl_values.IntV_shapeI(i);
-        total_volume += fe_intgrl_values.IntV_shapeI(i);
+      local_volume += qp_data.JxW(qp);
+      local_sum += function_value * qp_data.JxW(qp);
+      local_max = std::fmax(ff_value, local_max);
+      local_min = std::fmin(ff_value, local_min);
+    }//for qp
+  }//for cell-id
 
-        if (!max_set)
-        {
-          max_value = value;
-          max_set = true;
-        }
-        else
-        {
-          if (value > max_value)
-            max_value = value;
-        }
-      }//for dof
-    }//if inside logicalVol
+  if (op_type == Operation::OP_SUM or op_type == Operation::OP_SUM_LUA)
+  {
+    double global_sum;
+    MPI_Allreduce(&local_sum,&global_sum,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    op_value = global_sum;
+  }
+  if (op_type == Operation::OP_AVG or op_type == Operation::OP_AVG_LUA)
+  {
+    double local_data[] = {local_volume, local_sum};
+    double global_data[] = {0.0,0.0};
 
-  }//for local cell
-
-  double all_value=0.0;
-  double all_total_volume = 0.0;
-  double all_max_value;
-
-  MPI_Allreduce(&op_value,&all_value,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-  MPI_Allreduce(&total_volume,&all_total_volume,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-  MPI_Allreduce(&max_value,&all_max_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
-
-  if (op_type == OP_AVG)
-    op_value = all_value/total_volume;
-  else
-    op_value = all_value;
-
-  if (op_type == OP_MAX)
-    op_value = all_max_value;
+    MPI_Allreduce(&local_data,&global_data,2,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    double global_volume = global_data[0];
+    double global_sum = global_data[1];
+    op_value = global_sum/global_volume;
+  }
+  if (op_type == Operation::OP_MAX or op_type == Operation::OP_MAX_LUA)
+  {
+    double global_value;
+    MPI_Allreduce(&local_max,&global_value,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
+    op_value = global_value;
+  }
 }

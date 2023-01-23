@@ -1,15 +1,12 @@
 #include "chi_ffinter_volume.h"
 
+#include "chi_runtime.h"
 #include "ChiConsole/chi_console.h"
-
-
-#include <chi_log.h>
-;
 
 //###################################################################
 /**Calls the designated lua function*/
 double chi_mesh::FieldFunctionInterpolationVolume::
-  CallLuaFunction(double ff_value, int mat_id)
+  CallLuaFunction(double ff_value, int mat_id) const
 {
   lua_State* L  = chi::console.consoleState;
   double ret_val = 0.0;

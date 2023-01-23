@@ -3,12 +3,12 @@
 #include "ChiPhysics/PhysicsMaterial/chi_physicsmaterial.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_scalarvalue.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "chi_mpi.h"
 
@@ -172,94 +172,6 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
       }
     }
   }//transport xs TTR
-  //####################################################### TRANSPORT XS D
-  //                                                        TRANSPORT XS SIGA
-  //                                                        FIELDFUNC    Q
-  else if (material_mode == DIFFUSION_MATERIALS_FROM_TRANSPORTXS_TTF)
-  {
-    //====================================== Setting D and Sigma_a
-    bool transportxs_found = false;
-    for (int p=0; p<material->properties.size(); p++)
-    {
-      if (std::dynamic_pointer_cast<chi_physics::TransportCrossSections>
-          (material->properties[p]))
-      {
-        auto xs = std::static_pointer_cast<chi_physics::TransportCrossSections>(
-          material->properties[p]);
-
-        if (!xs->diffusion_initialized)
-          xs->ComputeDiffusionParameters();
-
-        diffCoeff.assign(cell_dofs,xs->diffusion_coeff[group]);
-        sigmaa.assign(cell_dofs,xs->sigma_removal[group]);
-        transportxs_found = true;
-      }
-    }//for properties
-
-    if (!transportxs_found)
-    {
-      chi::log.LogAllError()
-        << "Diffusion Solver: Material encountered with no tranport xs"
-           " yet material mode is DIFFUSION_MATERIALS_FROM_TRANSPORTXS.";
-      chi::Exit(EXIT_FAILURE);
-    }
-
-    //====================================== Setting Q
-    if ((q_field != nullptr) and (cell_is_local))
-    {
-      std::vector<uint64_t> mapping;
-//      std::vector<int> pwld_nodes;
-//      std::vector<int> pwld_cells;
-//
-//      for (int i=0; i<cell_dofs; i++)
-//      {
-//        pwld_nodes.push_back(i);
-//        pwld_cells.push_back(cell_local_id);
-//      }
-//
-//      chi_mesh::FieldFunctionInterpolation ffinterp;
-//      ffinterp.grid_view = grid;
-//      ffinterp.CreatePWLDMapping(q_field->num_components,
-//                                 q_field->num_sets,
-//                                 group-gi,moment,
-//                                 pwld_nodes,pwld_cells,
-//                                 pwl_sdm->cell_dfem_block_address,
-//                                 mapping);
-
-      std::vector<std::tuple<uint64_t,uint,uint>> cell_node_component_tuples;
-
-      for (int i=0; i<cell_dofs; i++)
-        cell_node_component_tuples.emplace_back(cell_local_id,i,group-gi);
-
-      q_field->CreatePWLDMappingLocal(cell_node_component_tuples, mapping);
-
-      for (int i=0; i<cell_dofs; i++)
-      {
-        try { sourceQ[i] = q_field->field_vector_local->at(mapping[i]); }
-        catch (const std::out_of_range& o)
-        {
-          chi::log.LogAllError()
-            << "Mapping error i=" << i
-            << " mapping[i]=" << mapping[i]
-            << " g=" << group << "(" << G << ")"
-            << " ffsize=" << q_field->field_vector_local->size()
-            << " dof_count=" << local_dof_count
-            << " cell_loc=" << grid->cells[cell_glob_index].partition_id;
-          chi::Exit(EXIT_FAILURE);
-        }
-
-      }
-
-
-    }
-    else if (q_field == nullptr)
-    {
-      chi::log.LogAllError()
-        << "Diffusion Solver: Material source set to field function however"
-           " the field is empty or not set.";
-      chi::Exit(EXIT_FAILURE);
-    }
-  }//transport xs TTF
   else
   {
     chi::log.Log0Error()
@@ -268,4 +180,19 @@ void chi_diffusion::Solver::GetMaterialProperties(const chi_mesh::Cell& cell,
   }
 
 
+}
+
+
+//###################################################################
+/**Update the field functions with the latest data.*/
+void chi_diffusion::Solver::UpdateFieldFunctions()
+{
+  chi::log.LogAll() << "Updating field functions" << std::endl;
+  auto& ff = *field_functions.front();
+  const auto& OneDofPerNode = discretization->UNITARY_UNKNOWN_MANAGER;
+
+  std::vector<double> data_vector;
+  discretization->LocalizePETScVector(x, data_vector, OneDofPerNode);
+
+  ff.UpdateFieldVector(data_vector);
 }

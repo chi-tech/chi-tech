@@ -20,6 +20,8 @@ void KEigenvalueSolver::Execute()
     for (auto& v : precursor_new_local) v /= k_eff;
   }
 
+  UpdateFieldFunctions();
+
   chi::log.Log()
       << "LinearBoltzmann::KEigenvalueSolver execution completed\n\n";
 }

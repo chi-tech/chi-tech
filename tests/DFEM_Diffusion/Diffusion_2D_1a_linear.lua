@@ -63,11 +63,11 @@ chiSolverExecute(phys1)
 
 
 --############################################### Get field functions
-fflist,count = chiGetFieldFunctionList(phys1)
+fflist,count = chiSolverGetFieldFunctionList(phys1)
 
 --############################################### Export VTU
 if (master_export == nil) then
-    chiExportFieldFunctionToVTK(fflist[1],"DFEMDiff2D_linear","flux")
+    chiExportFieldFunctionToVTK(fflist[1],"DFEMDiff2D_linear")
 end
 
 --############################################### Line plot

@@ -1,15 +1,13 @@
 #include "ChiLua/chi_lua.h"
+#include "ChiMesh/FieldFunctionInterpolation/Point/chi_ffinter_point.h"
 #include "ChiMesh/FieldFunctionInterpolation/Slice/chi_ffinter_slice.h"
 #include "ChiMesh/FieldFunctionInterpolation/Line/chi_ffinter_line.h"
 #include "ChiMesh/FieldFunctionInterpolation/Volume/chi_ffinter_volume.h"
 
 #include "chi_runtime.h"
-
-#include "chi_runtime.h"
 #include "chi_log.h"
-;
 
-
+#define scint(x) static_cast<int>(x)
 
 //#############################################################################
 /** Creates a new field function interpolation.
@@ -19,6 +17,7 @@
 ##_
 
 ###FFITypeIndex\n
+POINT           = A point probe. \n
 SLICE           = Two dimensional slice of the mesh. \n
 LINE            = Line defined by two points.\n
 VOLUME          = Volume either referring to the entire volume or that of a
@@ -33,7 +32,18 @@ int chiFFInterpolationCreate(lua_State *L)
 
   //================================================== Process types
   int ffitype = lua_tonumber(L,1);
-  if (ffitype == FFI_SLICE)                         //SLICE
+  if (ffitype == scint(chi_mesh::ff_interpolation::Type::POINT))
+  {
+    auto new_ffi = new chi_mesh::FieldFunctionInterpolationPoint;
+
+    chi::field_func_interpolation_stack.emplace_back(new_ffi);
+    const size_t index = chi::field_func_interpolation_stack.size()-1;
+    chi::log.LogAllVerbose2()
+      << "Created point Field Function Interpolation";
+    lua_pushnumber(L,static_cast<lua_Number>(index));
+    return 1;
+  }
+  else if (ffitype == scint(chi_mesh::ff_interpolation::Type::SLICE))
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationSlice;
 
@@ -44,7 +54,7 @@ int chiFFInterpolationCreate(lua_State *L)
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
   }
-  else if (ffitype == FFI_LINE)
+  else if (ffitype == scint(chi_mesh::ff_interpolation::Type::LINE))
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationLine;
 
@@ -55,7 +65,7 @@ int chiFFInterpolationCreate(lua_State *L)
     lua_pushnumber(L,static_cast<lua_Number>(index));
     return 1;
   }
-  else if (ffitype == FFI_VOLUME)
+  else if (ffitype == scint(chi_mesh::ff_interpolation::Type::VOLUME))
   {
     auto new_ffi = new chi_mesh::FieldFunctionInterpolationVolume;
 

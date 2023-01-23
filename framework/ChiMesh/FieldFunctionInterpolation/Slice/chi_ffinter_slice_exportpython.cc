@@ -1,10 +1,9 @@
 #include "chi_ffinter_slice.h"
 
-#include <chi_mpi.h>
-#include <chi_log.h>
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
-
-;
+#include "chi_mpi.h"
+#include "chi_log.h"
 
 #include <fstream>
 
@@ -182,7 +181,9 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
        "cNorm = colors.Normalize(vmin=0,vmax=maxavg)\n"
        "scalarMap = cm.ScalarMappable(norm=cNorm, cmap=cmapjet)\n"
        "\n"
-       "cntr1 = plt.tricontourf(x,y,z,124,cmap=cmapjet)\n"
+       "cb_scale = np.linspace(zmin,zmax*1.00001, 124, endpoint=True)\n"
+       "\n"
+       "cntr1 = plt.tricontourf(x,y,z,cb_scale,cmap=cmapjet)\n"
        "\n"
        "for c in range(0,N):\n"
        "    col = scalarMap.to_rgba(data.data_object[c].avg)\n"
@@ -197,7 +198,8 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
        "\n"
        "    ax.add_collection(coll)\n"
        "\n"
-       "fig.colorbar(cntr1,ax=ax)\n"
+       "cb = fig.colorbar(cntr1,ax=ax)\n"
+       "cb.set_ticks(np.linspace(zmin,zmax, 11, endpoint=True))\n"
        "ax.set_xlim([xmin,xmax])\n"
        "ax.set_ylim([ymin,ymax])\n"
        "plt.show()\n";
@@ -207,7 +209,7 @@ void chi_mesh::FieldFunctionInterpolationSlice::ExportPython(std::string base_na
 
   chi::log.Log()
     << "Exported Python files for field func \""
-    << field_functions[0]->text_name
+    << field_functions[0]->TextName()
     << "\" to base name \""
     << base_name << "\" Successfully";
 

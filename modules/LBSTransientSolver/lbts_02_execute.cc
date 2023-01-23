@@ -27,6 +27,8 @@ void lbs::TransientSolver::Execute()
     }
   }
 
+  UpdateFieldFunctions();
+
   chi::log.Log() << "Done Executing " << TextName() << ".";
 }
 
@@ -115,6 +117,8 @@ void lbs::TransientSolver::Step()
     sprintf(buff, " dt=%.1e time=%10.4g FR=%12.6g", dt, time + dt, FR_new);
     chi::log.Log() << TextName() << buff;
   }
+
+  UpdateFieldFunctions();
 }
 
 

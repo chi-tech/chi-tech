@@ -12,6 +12,8 @@
 #include "ChiTimer/chi_timer.h"
 #include "LinearBoltzmannSolver/Groupset/lbs_groupset.h"
 
+#include <iomanip>
+
 #define sc_double static_cast<double>
 #define PCShellPtr PetscErrorCode (*)(PC, Vec, Vec)
 

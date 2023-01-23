@@ -688,13 +688,13 @@ ChiTech uses the notion of `FieldFunctions` and the visualization toolkit, `VTK`
 to visual solutions. In order to gain access to `chi_physics::FieldFunction` we
 need to include the header
 \code
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction2.h"
 \endcode
 
 Next we create the field function using the code
 \code
 //============================================= Create Field Function
-auto ff = std::make_shared<chi_physics::FieldFunction2>(
+auto ff = std::make_shared<chi_physics::FieldFunction>(
   "Phi",
   sdm_ptr,
   chi_math::Unknown(chi_math::UnknownType::SCALAR)
@@ -747,7 +747,7 @@ And on a finer mesh, with the 3D case being 1 million cells:
 #include "ChiMath/SpatialDiscretization/FiniteVolume/fv.h"
 #include "ChiMath/PETScUtils/petsc_utils.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction2.h"
 
 int main(int argc, char* argv[])
 {
@@ -876,7 +876,7 @@ int main(int argc, char* argv[])
   chi::log.Log() << "Done cleanup";
 
   //============================================= Create Field Function
-  auto ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",
     sdm_ptr,
     chi_math::Unknown(chi_math::UnknownType::SCALAR)

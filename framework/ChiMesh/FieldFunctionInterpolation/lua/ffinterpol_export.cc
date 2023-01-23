@@ -1,8 +1,6 @@
 #include "ChiLua/chi_lua.h"
 
-#include "../chi_ffinterpolation.h"
-
-#include "chi_runtime.h"
+#include "ChiMesh/FieldFunctionInterpolation/chi_ffinterpolation.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"

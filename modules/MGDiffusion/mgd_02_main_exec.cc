@@ -4,6 +4,8 @@
 #include "chi_runtime.h"
 #include "chi_log.h"
 
+#include <iomanip>
+
 //#include "ChiMesh/MeshHandler/chi_meshhandler.h"
 //#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
@@ -101,6 +103,7 @@ void mg_diffusion::Solver::Execute()
       std::cout << "\nThermal iterations NOT converged for fixed-source problem" << std::endl;
   }
 
+  UpdateFieldFunctions();
   chi::log.Log() << "Done solving multi-group diffusion";
 
 }

@@ -29,7 +29,7 @@ int chiLBSGetFieldFunctionList(lua_State *L)
     lua_pushnumber(L,ff+1);
     int pff_count = -1;
     bool found = false;
-    for (auto& pff : chi::fieldfunc_stack)
+    for (auto& pff : chi::field_function_stack)
     {
       ++pff_count;
       if (pff == lbs_solver.field_functions[ff])
@@ -86,7 +86,7 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
         lua_pushnumber(L,count);
         int pff_count = -1;
         bool found = false;
-        for (auto& pff : chi::fieldfunc_stack)
+        for (auto& pff : chi::field_function_stack)
         {
           ++pff_count;
           if (pff == lbs_solver.field_functions[ff])

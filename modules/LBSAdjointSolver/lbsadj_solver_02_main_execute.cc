@@ -41,4 +41,6 @@ void lbs_adjoint::AdjointSolver::Execute()
     }//node i
   }//for cell
 
+  UpdateFieldFunctions();
+
 }

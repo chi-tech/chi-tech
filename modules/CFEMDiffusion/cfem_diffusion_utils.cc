@@ -2,6 +2,8 @@
 #include "ChiLua/chi_lua.h"
 #include "cfem_diffusion_solver.h"
 
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
+
 //###################################################################
 /**Calls a lua function with xyz coordinates.
  * \param L The lua state.
@@ -48,4 +50,14 @@ double cfem_diffusion::Solver::CallLua_iXYZFunction(
   lua_pop(L,1); //pop the double, or error code
 
   return lua_return;
+}
+
+
+//###################################################################
+/**Updates the field functions with the latest data.*/
+void cfem_diffusion::Solver::UpdateFieldFunctions()
+{
+  auto& ff = *field_functions.front();
+
+  ff.UpdateFieldVector(x);
 }

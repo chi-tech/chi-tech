@@ -5,6 +5,7 @@
 #include "ChiTimer/chi_timer.h"
 
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "cfem_diffusion_bndry.h"
 
@@ -135,19 +136,24 @@ void cfem_diffusion::Solver::Initialize()
  
   chi_math::PETScUtils::InitMatrixSparsity(A,
                                            nodal_nnz_in_diag,
-                                           nodal_nnz_off_diag);  
+                                           nodal_nnz_off_diag);
+
   if (field_functions.empty())
   {
-    auto unk_man = OneDofPerNode;
+    std::string solver_name;
+    if (not TextName().empty()) solver_name = TextName() + "-";
+
+    std::string text_name = solver_name + "phi";
+
+    using namespace chi_math;
     auto initial_field_function =
       std::make_shared<chi_physics::FieldFunction>(
-        std::string("phi"),   //Text name
-        sdm_ptr,              //Spatial Discretization
-        &x,                   //Data vector
-        unk_man);             //Unknown Manager
+        text_name,                     //Text name
+        sdm_ptr,                       //Spatial Discretization
+        Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-      field_functions.push_back(initial_field_function);
-      chi::fieldfunc_stack.push_back(initial_field_function);
+    field_functions.push_back(initial_field_function);
+    chi::field_function_stack.push_back(initial_field_function);
   }//if not ff set
 
 }//end initialize
@@ -296,7 +302,7 @@ void cfem_diffusion::Solver::Execute()
         {
           if (dirichlet_count[j]==0) // not related to a dirichlet node
             MatSetValue(A, imap[i], imap[j], Acell[i][j], ADD_VALUES);
-		      else // related to a dirichlet node
+		      else
           {
 		        const double aux = dirichlet_value[j]/dirichlet_count[j];
 			      cell_rhs[i] -= Acell[i][j]*aux;
@@ -330,6 +336,8 @@ void cfem_diffusion::Solver::Execute()
  
   //============================================= Solve
   KSPSolve(petsc_solver.ksp,b,x);
+
+  UpdateFieldFunctions();
  
   chi::log.Log() << "Done solving";
 

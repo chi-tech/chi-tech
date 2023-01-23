@@ -1,7 +1,12 @@
 #include "mg_diffusion_solver.h"
+
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
+#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include "ChiMath/SpatialDiscretization/FiniteElement/finite_element.h"
+
+#include "chi_runtime.h"
 #include "ChiLog/chi_log.h"
 #include "ChiTimer/chi_timer.h"
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwlc.h"
 
 //============================================= assemble matrix A
 void mg_diffusion::Solver::Update_Flux_With_TwoGrid(const int64_t verbose)

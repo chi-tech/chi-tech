@@ -138,9 +138,9 @@ chiSolverExecute(phys1)
 
 
 --############################################### Get field functions
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m0")
-ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m1")
-ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
+ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m00")
+ff_m1 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m01")
+ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g000_m02")
 
 
 --############################################### Slice plot
@@ -148,7 +148,8 @@ ff_m2 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m2")
 --############################################### Volume integrations
 QOI_value_sum = 0.0
 for g=0,num_groups-1 do
-    ff = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g"..tostring(g).."_m0")
+    ff = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g"..
+            string.format("%03d",g).."_m"..string.format("%02d",0))
     ffi1 = chiFFInterpolationCreate(VOLUME)
     curffi = ffi1
     chiFFInterpolationSetProperty(curffi,OPERATION,OP_SUM)

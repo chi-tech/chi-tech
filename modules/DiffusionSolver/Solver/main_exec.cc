@@ -1,18 +1,11 @@
 #include "diffusion_solver.h"
 
-#include "chi_runtime.h"
-
-#include "chi_mpi.h"
-
+#include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
 
 #include "ChiTimer/chi_timer.h"
-
-
-
 
 //###################################################################
 /**Executes the diffusion solver using the PETSc library.*/
@@ -54,15 +47,6 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
       for (auto& cell : grid->local_cells)
         PWLD_Assemble_b(cell,gi);
   }
-//  else if (fem_method == "PWLD_MIP_GAGG")
-//  {
-//    if (!suppress_assembly)
-//      for (auto& cell : grid->local_cells)
-//        PWLD_Assemble_A_and_b_GAGG(cell);
-//    else
-//      for (auto& cell : grid->local_cells)
-//        PWLD_Assemble_b_GAGG(cell);
-//  }
   else
   {
     chi::log.Log()
@@ -153,16 +137,16 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
     time_solve = t_solve.GetTime()/1000.0;
 
     //=================================== Populate field vector
-    if (fem_method == "PWLD_MIP" or fem_method == "PWLD_MIP_GAGG")
-    {
-      const double* x_ref;
-      VecGetArrayRead(x,&x_ref);
-
-      for (int i=0; i < local_dof_count; i++)
-        pwld_phi_local[i] = x_ref[i];
-
-      VecRestoreArrayRead(x,&x_ref);
-    }
+//    if (fem_method == "PWLD_MIP" or fem_method == "PWLD_MIP_GAGG")
+//    {
+//      const double* x_ref;
+//      VecGetArrayRead(x,&x_ref);
+//
+//      for (int i=0; i < local_dof_count; i++)
+//        pwld_phi_local[i] = x_ref[i];
+//
+//      VecRestoreArrayRead(x,&x_ref);
+//    }
 
     //=================================== Get convergence reason
     KSPConvergedReason reason;
@@ -189,6 +173,8 @@ int chi_diffusion::Solver::ExecuteS(bool suppress_assembly,
         chi::log.Log() << "Solving the system   : " << time_solve;
       }
     }
+
+    UpdateFieldFunctions();
 
     if (verbose_info || chi::log.GetVerbosity() >= chi_objects::ChiLog::LOG_0VERBOSE_1)
       chi::log.Log() << "Diffusion Solver execution completed!\n";

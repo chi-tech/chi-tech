@@ -11,7 +11,7 @@
 #include "ChiMath/Quadratures/angular_product_quadrature.h"
 #include "ChiMath/chi_math_range.h"
 
-#include "ChiPhysics/FieldFunction2/fieldfunction2.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 
 #include "ChiDataTypes/ndarray.h"
@@ -321,7 +321,7 @@ int chiSimTest06_WDD(lua_State* L)
                                  0);          //to unknown-id
 
   //============================================= Create Field Function
-  auto phi_ff = std::make_shared<chi_physics::FieldFunction2>(
+  auto phi_ff = std::make_shared<chi_physics::FieldFunction>(
     "Phi",                                           //Text name
     sdm_ptr,                                         //Spatial Discr.
     chi_math::Unknown(chi_math::UnknownType::VECTOR_N,num_groups) //Unknown

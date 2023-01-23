@@ -1,6 +1,7 @@
 #include "lbs_linear_boltzmann_solver.h"
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
 
 #include "chi_runtime.h"
 #include "chi_log.h"
@@ -169,27 +170,27 @@ void lbs::SteadySolver::InitializeParrays()
   //================================================== Initialize Field Functions
   if (field_functions.empty())
   {
-    for (size_t g=0; g<groups.size(); g++)
+    for (size_t g = 0; g < groups.size(); ++g)
     {
       for (size_t m=0; m<num_moments; m++)
       {
         std::string solver_name;
-        if (not TextName().empty()) solver_name = TextName() + "-";
+        if (not TextName().empty()) solver_name = TextName();
 
-        const std::string text_name = solver_name +
-                                      std::string("Flux_g") +
-                                      std::to_string(g) +
-                                      std::string("_m") + std::to_string(m);
+        char buff[100];
+        snprintf(buff, 99, "%s_Flux_g%03d_m%02d",
+                 solver_name.c_str(),
+                 static_cast<int>(g),
+                 static_cast<int>(m));
+        const std::string text_name = std::string(buff);
 
+        using namespace chi_math;
         auto group_ff = std::make_shared<chi_physics::FieldFunction>(
-          text_name,              //Field name
-          discretization,         //Spatial discretization
-          &phi_old_local,         //Data vector
-          flux_moments_uk_man,    //Unknown manager
-          m,                      //Reference unknown
-          g);                     //Reference component
+          text_name,                     //Field name
+          discretization,                //Spatial discretization
+          Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
-        chi::fieldfunc_stack.push_back(group_ff);
+        chi::field_function_stack.push_back(group_ff);
         field_functions.push_back(group_ff);
       }//for m
     }//for g
