@@ -169,7 +169,7 @@ void chi_mesh::SurfaceMesh::GetMeshStats()
   for (int i=0;i<10; i++)
   {
     char buff[100];
-    sprintf(buff,"%11.3e",histo_bins[i]);
+    snprintf(buff,100,"%11.3e",histo_bins[i]);
 
     output << "Areas < " << buff << " = " << histo[i] << "\n";
   }
