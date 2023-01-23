@@ -797,7 +797,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   groupset->residual_tolerance = resid_tol;
 
   char buff[100];
-  sprintf(buff,"%.4e",resid_tol);
+  snprintf(buff,100,"%.4e",resid_tol);
 
   chi::log.Log()
     << "Groupset " << grpset_index << " residual tolerance "

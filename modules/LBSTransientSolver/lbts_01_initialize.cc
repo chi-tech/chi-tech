@@ -32,7 +32,7 @@ void lbs::TransientSolver::Initialize()
   {
     const double FR = ComputeFissionRate(false);
     char buff[200];
-    sprintf(buff, " Initial Fission Rate FR=%12.6g", FR);
+    snprintf(buff,200, " Initial Fission Rate FR=%12.6g", FR);
     chi::log.Log() << TextName() << buff;
   }
 
@@ -46,7 +46,7 @@ void lbs::TransientSolver::Initialize()
   {
     const double beta = ComputeBeta();
     char buff[200];
-    sprintf(buff, " Beta=%.2f [pcm] reactivity=%.3f [$]",
+    snprintf(buff,200, " Beta=%.2f [pcm] reactivity=%.3f [$]",
             beta*1e5, (1.0-1.0/k_eff)/beta);
     chi::log.Log() << TextName() << buff;
   }
