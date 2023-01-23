@@ -981,7 +981,7 @@ void chi_physics::TransportCrossSections::
             "No total fission neutron yield found.");
 
       //compute fission/production cross section
-      if (!sigma_f.empty())
+      if (!nu_sigma_f.empty())
       {
         sigma_f.assign(num_groups, 0.0);
         for (unsigned int g = 0; g < num_groups; ++g)
