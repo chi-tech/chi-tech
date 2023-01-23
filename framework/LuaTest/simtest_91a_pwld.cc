@@ -464,7 +464,7 @@ int chiSimTest91_PWLD(lua_State* L)
     outstr << "Iteration " << std::setw(5) << iter << " ";
     {
       char buffer[100];
-      sprintf(buffer, "%11.3e\n", rel_change);
+      snprintf(buffer,100, "%11.3e\n", rel_change);
       outstr << buffer;
     }
 

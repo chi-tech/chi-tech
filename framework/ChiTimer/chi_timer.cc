@@ -42,7 +42,7 @@ std::string chi_objects::ChiTimer::GetTimeString() const
   int    seconds  = (int)time_sec - 3600*hours - 60*minutes;
 
   char buff[100];
-  sprintf(buff,"%02d:%02d:%02d",hours,minutes,seconds);
+  snprintf(buff,100,"%02d:%02d:%02d",hours,minutes,seconds);
 
   return {buff};
 }
