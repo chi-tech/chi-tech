@@ -33,7 +33,7 @@ void lbs::SteadySolver::UpdateFieldFunctions()
       auto& ff_ptr = field_functions.at(ff_index);
       ff_ptr->UpdateFieldVector(data_vector_local);
       ++ff_index;
-    }//for ff
+    }//for m
   }//for g
 
 }
