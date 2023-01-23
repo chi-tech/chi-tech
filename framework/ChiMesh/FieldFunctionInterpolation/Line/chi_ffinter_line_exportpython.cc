@@ -1,14 +1,11 @@
 #include "chi_ffinter_line.h"
 
-#include <iostream>
+#include "ChiPhysics/FieldFunction/fieldfunction.h"
+
+#include "chi_mpi.h"
+#include "chi_log.h"
+
 #include <fstream>
-
-#include <chi_mpi.h>
-#include <chi_log.h>
-
-
-;
-
 
 //###################################################################
 /***/
@@ -71,8 +68,7 @@ ExportPython(std::string base_name)
 
   for (int ff=0; ff<field_functions.size(); ff++)
   {
-    FieldFunctionContext* ff_ctx =
-      ff_contexts[ff];
+    const auto& ff_ctx = ff_contexts[ff];
 
     if (chi::mpi.process_count>1 and chi::mpi.location_id!=0)
     {
@@ -83,7 +79,7 @@ ExportPython(std::string base_name)
     }
     for (int p=0; p<interpolation_points.size(); p++)
     {
-      if ((not ff_ctx->interpolation_points_has_ass_cell[p])  &&
+      if ((not ff_ctx.interpolation_points_has_ass_cell[p])  &&
           (chi::mpi.location_id != 0))
       {
         continue;
@@ -101,7 +97,7 @@ ExportPython(std::string base_name)
       ofile << offset << "data" << ff << "[" << p << ",3] = "
             << d << "\n";
       ofile << offset << "data" << ff << "[" << p << ",4] = "
-            << ff_ctx->interpolation_points_values[p] << "\n";
+            << ff_ctx.interpolation_points_values[p] << "\n";
 
 
     }
@@ -171,7 +167,7 @@ ExportPython(std::string base_name)
     {
       ofile << "plt.plot(data" << ff << "[:,3],data"
       << ff << "[:,4]"
-      << ",label=\"" << field_functions[ff]->text_name << "\""
+      << ",label=\"" << field_functions[ff]->TextName() << "\""
       << ")\n";
     }
     for (int ca=0; ca<custom_arrays.size(); ca++)
@@ -192,7 +188,7 @@ ExportPython(std::string base_name)
 
   chi::log.Log()
     << "Exported Python files for field func \""
-    << field_functions[0]->text_name
+    << field_functions[0]->TextName()
     << "\" to base name \""
     << base_name << "\" Successfully";
 

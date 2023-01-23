@@ -55,7 +55,7 @@ chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
 
 --############################################### Get field functions
-fftemp,count = chiGetFieldFunctionList(phys1)
+fftemp,count = chiSolverGetFieldFunctionList(phys1)
 
 --############################################### Line plot
 line0 = chiFFInterpolationCreate(LINE)

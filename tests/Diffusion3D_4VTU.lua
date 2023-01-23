@@ -52,7 +52,7 @@ chiDiffusionInitialize(phys1)
 chiDiffusionExecute(phys1)
 --
 --############################################### Get field functions
-fflist,count = chiGetFieldFunctionList(phys1)
+fflist,count = chiSolverGetFieldFunctionList(phys1)
 
 --############################################### Slice plot
 slice1 = chiFFInterpolationCreate(SLICE)

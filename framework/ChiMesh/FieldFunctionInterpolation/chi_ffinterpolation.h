@@ -1,36 +1,74 @@
 #ifndef CHI_FFINTERPOLATION_H
 #define CHI_FFINTERPOLATION_H
 
-#include "../MeshContinuum/chi_meshcontinuum.h"
-#include "../chi_mesh.h"
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
-#include "ChiMath/SpatialDiscretization/spatial_discretization.h"
+#include <memory>
+#include <vector>
 
-#define FFI_SLICE 1
-#define FFI_LINE 2
-#define FFI_VOLUME 3
+namespace chi_physics
+{
+  class FieldFunction;
+  typedef std::shared_ptr<FieldFunction> FieldFunction2CPtr;
+}
 
-#define FFI_SDM_CFEM    1
-#define FFI_SDM_PWLD_GM 2   //PWLD with groups and moments
+namespace chi_mesh::ff_interpolation
+{
+  enum class Type : int
+  {
+    SLICE = 1,
+    LINE  = 2,
+    VOLUME = 3,
+    POINT = 4
+  };
 
-#define OP_SUM 10
-#define OP_AVG 11
-#define OP_MAX 12
-#define OP_SUM_LUA 13
-#define OP_AVG_LUA 14
-#define OP_MAX_LUA 15
+  enum class Operation : int
+  {
+    OP_SUM     = 10,
+    OP_AVG     = 11,
+    OP_MAX     = 12,
+    OP_SUM_LUA = 13,
+    OP_AVG_LUA = 14,
+    OP_MAX_LUA = 15,
+  };
+
+  enum class Property : int
+  {
+    PROBEPOINT     = 0,
+    SLICEPOINT     = 1,
+    SLICENORMAL    = 2,
+    SLICETANGENT   = 3,
+    SLICEBINORM    = 4,
+    OPERATION      = 5,
+    LOGICAL_VOLUME = 8,
+
+    ADD_FIELD_FUNCTION = 9,
+    SET_FIELD_FUNCTIONS = 10,
+
+    FIRSTPOINT     = 11,
+    SECONDPOINT    = 12,
+    NUMBEROFPOINTS = 13,
+    CUSTOM_ARRAY   = 14,
+  };
+}
+
+namespace chi_mesh
+{
 
 //###################################################################
 /** Base class for field-function interpolation objects.*/
-class chi_mesh::FieldFunctionInterpolation
+class FieldFunctionInterpolation
 {
+protected:
+  ff_interpolation::Type m_type;
+  unsigned int m_ref_component = 0;
 public:
-  chi_mesh::MeshContinuumConstPtr grid_view;
-
-  std::vector<std::shared_ptr<chi_physics::FieldFunction>> field_functions;
+  std::vector<chi_physics::FieldFunction2CPtr> field_functions;
 
 public:
-  FieldFunctionInterpolation() : grid_view(nullptr) {}
+  explicit
+  FieldFunctionInterpolation(ff_interpolation::Type type) :
+    m_type(type) {}
+
+  ff_interpolation::Type Type() const {return m_type;}
 
   virtual void Initialize(){};
   virtual void Execute(){};
@@ -38,6 +76,9 @@ public:
   virtual std::string GetDefaultFileBaseName() const = 0;
   virtual void ExportPython(std::string base_name) = 0;
 };
+
+}//namespace chi_mesh
+
 
 
 

@@ -1,12 +1,15 @@
 #ifndef CHI_PHYSICS_SOLVER_H
 #define CHI_PHYSICS_SOLVER_H
-#include<iostream>
+#include <iostream>
 #include <utility>
 #include "ChiPhysics/chi_physics_namespace.h"
 
 #include "ChiPhysics/BasicOptions/basic_options.h"
 
-#include "ChiPhysics/FieldFunction/fieldfunction.h"
+namespace chi_physics
+{
+  class FieldFunction;
+}
 
 
 /**\defgroup LuaSolver Solvers

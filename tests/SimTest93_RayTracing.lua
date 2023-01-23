@@ -86,6 +86,6 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,0)
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
-ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."-Flux_g0_m0")
+ff_m0 = chiGetFieldFunctionHandleByName(solver_name.."_Flux_g0_m0")
 
 chiExportMultiFieldFunctionToVTK({ff_m0},"ZPhi_"..solver_name)

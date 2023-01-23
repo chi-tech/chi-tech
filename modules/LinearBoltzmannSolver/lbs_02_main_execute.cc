@@ -43,6 +43,8 @@ void lbs::SteadySolver::Execute()
   if (options.use_precursors)
     ComputePrecursors();
 
+  UpdateFieldFunctions();
+
   chi::log.Log() << "LB solver " << TextName() << " execution completed\n";
 }
 

@@ -1,13 +1,8 @@
 #include "volmesher_extruder.h"
-#include "ChiMesh/Cell/cell.h"
 
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 #include "chi_mpi.h"
-
-
-#include "chi_log.h"
-;
 
 //###################################################################
 /**Extrude template cells into polygons.*/
@@ -56,6 +51,8 @@ void chi_mesh::VolumeMesherExtruder::
                                      num_global_cells,
                                      pid,
                                      template_grid.local_cells.size());
+
+        cell->material_id = template_cell.material_id;
 
         grid.cells.push_back(std::move(cell));
       }

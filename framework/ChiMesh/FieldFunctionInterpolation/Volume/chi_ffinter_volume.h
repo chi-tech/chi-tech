@@ -2,7 +2,7 @@
 #define CHI_FFINTER_VOLUME_H
 
 #include "../chi_ffinterpolation.h"
-#include <ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h>
+#include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 #include <petscksp.h>
 
@@ -23,19 +23,17 @@ class chi_mesh::FieldFunctionInterpolationVolume :
 {
 public:
   std::shared_ptr<chi_mesh::LogicalVolume> logical_volume = nullptr;
-  int op_type = OP_SUM;
+  ff_interpolation::Operation op_type = ff_interpolation::Operation::OP_SUM;
   std::string op_lua_func;
   double op_value = 0.0;
 
 private:
-  std::vector<int>                    cfem_local_nodes_needed_unmapped;
-  std::vector<int>                    cfem_local_cells_needed_unmapped;
-
-  std::vector<int>                    pwld_local_nodes_needed_unmapped;
-  std::vector<int>                    pwld_local_cells_needed_unmapped;
+  std::vector<uint64_t> cell_local_ids_inside_logvol;
 
 public:
-  FieldFunctionInterpolationVolume() = default;
+  FieldFunctionInterpolationVolume() :
+    FieldFunctionInterpolation(ff_interpolation::Type::VOLUME)
+  {  }
 
   //01
   void Initialize() override;
@@ -43,10 +41,7 @@ public:
   //02
   void Execute() override;
 
-  void CFEMInterpolate(Vec field, std::vector<uint64_t> &mapping);
-  void PWLDInterpolate(std::vector<double>& field, std::vector<uint64_t> &mapping);
-
-  double CallLuaFunction(double ff_value, int mat_id);
+  double CallLuaFunction(double ff_value, int mat_id) const;
 
   std::string GetDefaultFileBaseName() const override
   {return "ZVFFI";}

@@ -17,6 +17,7 @@ namespace chi_physics
   };
 
   class FieldFunction;
+  class FieldFunction;
   class Solver;
 
   //03 Utils

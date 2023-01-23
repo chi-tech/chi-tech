@@ -12,6 +12,8 @@
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
 #include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
+#include <map>
+
 // forward declaration
 namespace chi_mesh
 {
@@ -54,8 +56,8 @@ public:
 
   chi_math::SDMPtr sdm_ptr = nullptr;
 
-  uint num_groups;
-  uint last_fast_group;
+  uint num_groups = 0;
+  uint last_fast_group = 0;
   bool do_two_grid = false;
 
   size_t num_local_dofs = 0;
@@ -66,8 +68,8 @@ public:
   std::vector<Vec> x;     // solution vector for each group
   std::vector<Vec> x_old; // vector of old fluxes
 
-  Vec thermal_dphi; // error vector for thermal fluxes
-  Vec b; // actual rhs vector for the linear system A[g] x[g] = b
+  Vec thermal_dphi = nullptr; // error vector for thermal fluxes
+  Vec b = nullptr; // actual rhs vector for the linear system A[g] x[g] = b
 
   chi_math::PETScUtils::PETScSolverSetup petsc_solver;
   KSPAppContext my_app_context;
@@ -83,7 +85,7 @@ public:
   std::vector<Boundary>   boundaries;
 
   explicit Solver(const std::string& in_solver_name);
-  virtual ~Solver();
+  ~Solver() override;
 
   void Initialize() override;
 
@@ -99,6 +101,9 @@ public:
   void Assemble_RHS_TwoGrid(int64_t iverbose);
   void SolveOneGroupProblem(unsigned int g, int64_t iverbose);
   void Update_Flux_With_TwoGrid(int64_t iverbose);
+
+  //04
+  void UpdateFieldFunctions();
 
 protected:
   std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>>

@@ -80,7 +80,7 @@ public:
   static std::vector<chi_physics::SolverPtr>                 solver_stack;
   static std::vector<chi_physics::MaterialPtr>               material_stack;
   static std::vector<chi_physics::TransportCrossSectionsPtr> trnsprt_xs_stack;
-  static std::vector<chi_physics::FieldFunctionPtr>          fieldfunc_stack;
+  static std::vector<chi_physics::FieldFunctionPtr>         field_function_stack;
 
   static std::vector<chi_math::QuadraturePtr>        quadrature_stack;
   static std::vector<chi_math::AngularQuadraturePtr> angular_quadrature_stack;
