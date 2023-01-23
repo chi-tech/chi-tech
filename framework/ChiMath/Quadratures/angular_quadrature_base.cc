@@ -251,7 +251,7 @@ chi_math::AngularQuadratureCustom::
     if (verbose)
     {
       char buf[200];
-      sprintf(buf,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
+      snprintf(buf,200,"Varphi=%.2f Theta=%.2f Weight=%.3e\n",
               abscissa.phi*180.0/M_PI,
               abscissa.theta*180.0/M_PI,
               weight);

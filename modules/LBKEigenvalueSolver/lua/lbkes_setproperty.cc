@@ -74,7 +74,7 @@ int chiLBKESSetProperty(lua_State *L)
     solver.tolerance = tol;
 
     char buff[100];
-    sprintf(buff, "%.4e", tol);
+    snprintf(buff,100, "%.4e", tol);
 
     chi::log.Log()
         << "LinearBoltzmann::KEigenvalueSolver: "

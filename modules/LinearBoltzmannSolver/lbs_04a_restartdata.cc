@@ -42,7 +42,7 @@ void lbs::SteadySolver::WriteRestartData(std::string folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  sprintf(location_cstr,"%d.r",chi::mpi.location_id);
+  snprintf(location_cstr,20,"%d.r",chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);
@@ -105,7 +105,7 @@ void lbs::SteadySolver::ReadRestartData(std::string folder_name,
   //the process as whole succeeded.
   bool location_succeeded = true;
   char location_cstr[20];
-  sprintf(location_cstr,"%d.r",chi::mpi.location_id);
+  snprintf(location_cstr,20,"%d.r",chi::mpi.location_id);
 
   std::string file_name = folder_name + std::string("/") +
                           file_base + std::string(location_cstr);

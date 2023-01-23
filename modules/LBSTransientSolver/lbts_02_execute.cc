@@ -114,7 +114,7 @@ void lbs::TransientSolver::Step()
   if (transient_options.verbosity_level >= 1)
   {
     char buff[200];
-    sprintf(buff, " dt=%.1e time=%10.4g FR=%12.6g", dt, time + dt, FR_new);
+    snprintf(buff,200, " dt=%.1e time=%10.4g FR=%12.6g", dt, time + dt, FR_new);
     chi::log.Log() << TextName() << buff;
   }
 

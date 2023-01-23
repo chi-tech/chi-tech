@@ -215,7 +215,7 @@ std::string chi_objects::ChiLog::PrintEventHistory(size_t ev_tag)
     outstr << "[" << chi::mpi.location_id << "] ";
 
     char buf[100];
-    sprintf(buf,"%16.9f",event.ev_time/1000.0);
+    snprintf(buf,100,"%16.9f",event.ev_time/1000.0);
     outstr << buf << " ";
 
     switch (event.ev_type)

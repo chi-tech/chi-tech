@@ -109,9 +109,9 @@ TestIntegration(int test_case, double ref_solution, int RiemannN)
   double I_quadrature = std::fabs(QuadratureSSIntegral(F));
 
   char buff0[200],buff1[200],buff2[200];
-  sprintf(buff0,"Riemann integral: %.20e\n",I_riemann);
-  sprintf(buff1,"Quadrature integral: %.10e\n",I_quadrature);
-  sprintf(buff2,"Error_RQ%05d_%06d: %2d %f %e\n",Nd,Nd*8,
+  snprintf(buff0,200,"Riemann integral: %.20e\n",I_riemann);
+  snprintf(buff1,200,"Quadrature integral: %.10e\n",I_quadrature);
+  snprintf(buff2,200,"Error_RQ%05d_%06d: %2d %f %e\n",Nd,Nd*8,
          initial_level,h,std::fabs((I_riemann - I_quadrature)/ref_solution));
 
   chi::log.Log() << buff0;
