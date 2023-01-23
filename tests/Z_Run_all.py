@@ -239,158 +239,163 @@ def run_test(file_name, comment, num_procs, search_strings_vals_tols):
             run_test_local(file_name, comment, num_procs, search_strings_vals_tols)
 
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Diffusion tests
-#
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                  Diffusion tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 ### CFEM diffusion tests
 run_test(
-    file_name="CFEM_Diffusion/Diffusion_2D_1a_linear",
+    file_name="CFEM_Diffusion/cDiffusion_2D_1a_linear",
     comment="2D Diffusion with linear solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
 
 run_test(
-    file_name="CFEM_Diffusion/Diffusion_2D_2a_DirBCs",
+    file_name="CFEM_Diffusion/cDiffusion_2D_2a_DirBCs",
     comment="2D Diffusion with Dirichlet BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.295902, 1.0e-10]])
 
 run_test(
-    file_name="CFEM_Diffusion/Diffusion_2D_2b_RobinBCs",
+    file_name="CFEM_Diffusion/cDiffusion_2D_2b_RobinBCs",
     comment="2D Diffusion with Robin BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.241751, 1.0e-10]])
 
 run_test(
-    file_name="CFEM_Diffusion/Diffusion_2D_3a_analytical_coef",
+    file_name="CFEM_Diffusion/cDiffusion_2D_3a_analytical_coef",
     comment="2D Diffusion with Analytical Coefficients",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.021921, 1.0e-10]])
 
 run_test(
-    file_name="CFEM_Diffusion/Diffusion_2D_3b_analytical_coef2",
+    file_name="CFEM_Diffusion/cDiffusion_2D_3b_analytical_coef2",
     comment="2D Diffusion with Manufactured Solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 1.000244, 1.0e-10]])
 
 ### DFEM diffusion tests
 run_test(
-    file_name="DFEM_Diffusion/Diffusion_2D_1a_linear",
+    file_name="DFEM_Diffusion/dDiffusion_2D_1a_linear",
     comment="2D Diffusion with linear solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.666667, 1.0e-10]])
 
 run_test(
-    file_name="DFEM_Diffusion/Diffusion_2D_2a_DirBCs",
+    file_name="DFEM_Diffusion/dDiffusion_2D_2a_DirBCs",
     comment="2D Diffusion with Dirichlet BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.295892, 1.0e-10]])
 
 run_test(
-    file_name="DFEM_Diffusion/Diffusion_2D_2b_RobinBCs",
+    file_name="DFEM_Diffusion/dDiffusion_2D_2b_RobinBCs",
     comment="2D Diffusion with Robin BC",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Avg-value=", 0.241757, 1.0e-10]])
 
 run_test(
-    file_name="DFEM_Diffusion/Diffusion_2D_3a_analytical_coef",
+    file_name="DFEM_Diffusion/dDiffusion_2D_3a_analytical_coef",
     comment="2D Diffusion with Analytical Coefficients",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.021923, 1.0e-10]])
 
 run_test(
-    file_name="DFEM_Diffusion/Diffusion_2D_3b_analytical_coef2",
+    file_name="DFEM_Diffusion/dDiffusion_2D_3b_analytical_coef2",
     comment="2D Diffusion with Manufactured Solution",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 1.000586, 1.0e-10]])
 
+###  Diffusion tests
 #1
 run_test(
-    file_name="Diffusion1D",
+    file_name="Diffusion/Diffusion1D",
     comment="1D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
 
 #2
 run_test(
-    file_name="Diffusion1D_KBA",
+    file_name="Diffusion/Diffusion1D_KBA",
     comment="1D Diffusion Test KBA partitioning - CFEM",
     num_procs=2,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
 
 #3
 run_test(
-    file_name="Diffusion1D_IP",
+    file_name="Diffusion/Diffusion1D_IP",
     comment="1D Diffusion Test - DFEM",
     num_procs=2,
     search_strings_vals_tols=[["[0]  Max-value=", 0.5006523128, 1.0e-4]])
 
 #4
 run_test(
-    file_name="Diffusion2D_1Poly",
+    file_name="Diffusion/Diffusion2D_1Poly",
     comment="2D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29480, 1.0e-4]])
 
 #5
 run_test(
-    file_name="Diffusion2D_1Poly_IP",
+    file_name="Diffusion/Diffusion2D_1Poly_IP",
     comment="2D Diffusion Test - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-4]])
 
 #6
 run_test(
-    file_name="Diffusion2D_2Unstructured",
+    file_name="Diffusion/Diffusion2D_2Unstructured",
     comment="2D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.30384, 1.0e-4]])
 
 #7
 run_test(
-    file_name="Diffusion2D_2Unstructured_IP",
+    file_name="Diffusion/Diffusion2D_2Unstructured_IP",
     comment="2D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29685, 1.0e-4]])
 
 #8
 run_test(
-    file_name="Diffusion3D_1Poly",
+    file_name="Diffusion/Diffusion3D_1Poly",
     comment="3D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29480, 1.0e-4]])
 
 #9
 run_test(
-    file_name="Diffusion3D_1Poly_IP",
+    file_name="Diffusion/Diffusion3D_1Poly_IP",
     comment="3D Diffusion Test - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29492, 1.0e-4]])
 
 #10
 run_test(
-    file_name="Diffusion3D_2Ortho",
+    file_name="Diffusion/Diffusion3D_2Ortho",
     comment="3D Diffusion Test Ortho Mesh - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29480, 1.0e-4]])
 
 #11
 run_test(
-    file_name="Diffusion3D_3Unstructured",
+    file_name="Diffusion/Diffusion3D_3Unstructured",
     comment="3D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29499, 1.0e-4]])
 
 #12
 run_test(
-    file_name="Diffusion3D_3Unstructured_IP",
+    file_name="Diffusion/Diffusion3D_3Unstructured_IP",
     comment="3D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29632, 1.0e-4]])
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ Transport cases
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                    Transport tests, Steady State
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #13
 run_test(
-    file_name="Transport1D_1",
+    file_name="Transport_Steady/Transport1D_1",
     comment="1D LinearBSolver Test - PWLD",
     num_procs=3,
     search_strings_vals_tols=[["[0]  Max-value1=", 0.49903, 1.0e-4],
@@ -398,7 +403,7 @@ run_test(
 
 #14
 run_test(
-    file_name="Transport1D_3a_DSA_ortho",
+    file_name="Transport_Steady/Transport1D_3a_DSA_ortho",
     comment="1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
     search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    28", 7, "CONVERGED"],
@@ -408,7 +413,7 @@ run_test(
 
 #15
 run_test(
-    file_name="Transport2D_1Poly",
+    file_name="Transport_Steady/Transport2D_1Poly",
     comment="2D LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 0.50758, 1.0e-4],
@@ -416,7 +421,7 @@ run_test(
 
 #16
 run_test(
-    file_name="Transport2D_2Unstructured",
+    file_name="Transport_Steady/Transport2D_2Unstructured",
     comment="2D LinearBSolver Test Unstructured grid - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 0.51187, 1.0e-4],
@@ -424,7 +429,7 @@ run_test(
 
 #17
 run_test(
-    file_name="Transport2D_3Poly_quad_mod",
+    file_name="Transport_Steady/Transport2D_3Poly_quad_mod",
     comment="2D LinearBSolver Test Polar-Optimized quadrature - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 0.50758, 1.0e-4],
@@ -432,7 +437,7 @@ run_test(
 
 #18
 run_test(
-    file_name="Transport2D_4a_DSA_ortho",
+    file_name="Transport_Steady/Transport2D_4a_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
     search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    53", 7, "CONVERGED"],
@@ -442,7 +447,7 @@ run_test(
 
 #19
 run_test(
-    file_name="Transport2D_4b_DSA_ortho",
+    file_name="Transport_Steady/Transport2D_4b_DSA_ortho",
     comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
     search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
@@ -452,7 +457,7 @@ run_test(
 
 #20
 run_test(
-    file_name="Transport3D_1a_Extruder",
+    file_name="Transport_Steady/Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.27450e-01, 1.0e-4],
@@ -460,7 +465,7 @@ run_test(
 
 #21
 run_test(
-    file_name="Transport3D_1b_Ortho",
+    file_name="Transport_Steady/Transport3D_1b_Ortho",
     comment="3D LinearBSolver Test - PWLD Reflecting BC",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.28310e-01, 1.0e-4],
@@ -468,16 +473,15 @@ run_test(
 
 #22
 run_test(
-    file_name="Transport3D_1Poly_parmetis",
+    file_name="Transport_Steady/Transport3D_1Poly_parmetis",
     comment="3D LinearBSolver Test Ortho Grid Parmetis - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.27450e-01, 1.0e-4],
                               ["[0]  Max-value2=", 3.76339e-04, 1.0e-4]])
 
-#----------------------------------------------------
 #23
 run_test(
-    file_name="Transport3D_1Poly_qmom_part1",
+    file_name="Transport_Steady/Transport3D_1Poly_qmom_part1",
     comment="3D LinearBSolver Test Source moment writing - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 1.08320e-01, 1.0e-6],
@@ -485,7 +489,7 @@ run_test(
 
 #24
 run_test(
-    file_name="Transport3D_1Poly_qmom_part2",
+    file_name="Transport_Steady/Transport3D_1Poly_qmom_part2",
     comment="3D LinearBSolver Test Source moment reading - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 1.01701e-04, 1.0e-6],
@@ -494,7 +498,7 @@ run_test(
 #----------------------------------------------------
 #25
 run_test(
-    file_name="Transport3D_2Unstructured",
+    file_name="Transport_Steady/Transport3D_2Unstructured",
     comment="3D LinearBSolver Test Extruded Unstructured - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.41465e-01, 1.0e-4],
@@ -502,7 +506,7 @@ run_test(
 
 #26
 run_test(
-    file_name="Transport3D_3a_DSA_ortho",
+    file_name="Transport_Steady/Transport3D_3a_DSA_ortho",
     comment="3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
     num_procs=4,
     search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
@@ -512,7 +516,7 @@ run_test(
 
 #27
 run_test(
-    file_name="Transport3D_4Cycles1",
+    file_name="Transport_Steady/Transport3D_4Cycles1",
     comment="3D LinearBSolver Test Extruded-Unstructured Mesh - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 5.55349e-01, 1.0e-4],
@@ -520,52 +524,60 @@ run_test(
 
 #28
 run_test(
-    file_name="Transport3D_5Cycles2",
+    file_name="Transport_Steady/Transport3D_5Cycles2",
     comment="3D LinearBSolver Test STAR-CCM+ mesh - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value1=", 6.55396, 1.0e-4],
                               ["[0]  Max-value2=", 1.02943, 1.0e-4]])
 
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                    Transport tests, K-eigenvalue
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #29
 run_test(
-    file_name="KEigenvalueTransport1D_1G",
+    file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5]])
 
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#       Transport tests, Steady State, Cylindrical
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #30
 run_test(
-    file_name="Transport2DCyl_1Monoenergetic",
+    file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
     comment="2D LinearBSolver Cylindrical Test mono-energetic - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 1.00000, 1.0e-09]])
 
 #31
 run_test(
-    file_name="Transport2DCyl_2Multigroup",
+    file_name="Transport_Steady_Cyl/Transport2DCyl_2Multigroup",
     comment="2D LinearBSolver Cylindrical Test multi-group - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-valueG1=", 1.00000, 1.0e-09],
                               ["[0]  Max-valueG2=", 0.25000, 1.0e-09]])
 
-#------------------------------------------------ Adjoints
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#           Transport tests, Steady State, Adjoint
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #32
 run_test(
-    file_name="Adjoint2D_1a_forward",
+    file_name="Transport_Adjoint/Adjoint2D_1a_forward",
     comment="2D Transport test with localized material source FWD",
     num_procs=4,
     search_strings_vals_tols=[["QOI-value=", 1.38397e-05, 1.0e-08]])
 
 #33
 run_test(
-    file_name="Adjoint2D_1b_adjoint",
+    file_name="Transport_Adjoint/Adjoint2D_1b_adjoint",
     comment="2D Transport test with localized material source Adjoint generation",
     num_procs=4,
     search_strings_vals_tols=[])
 
 #34
 run_test(
-    file_name="Adjoint2D_1c_response",
+    file_name="Transport_Adjoint/Adjoint2D_1c_response",
     comment="2D Transport test with localized material source Adjoint inner product",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 1.38405e-05, 1.0e-08]])
@@ -573,21 +585,21 @@ run_test(
 
 #35
 run_test(
-    file_name="Adjoint2D_2a_forward",
+    file_name="Transport_Adjoint/Adjoint2D_2a_forward",
     comment="2D Transport test with point source FWD",
     num_procs=4,
     search_strings_vals_tols=[["QOI-value=", 2.90386e-05 , 1.0e-08]])
 
 #36
 run_test(
-    file_name="Adjoint2D_2b_adjoint",
+    file_name="Transport_Adjoint/Adjoint2D_2b_adjoint",
     comment="2D Transport test with point source Adjoint generation",
     num_procs=4,
     search_strings_vals_tols=[])
 
 #37
 run_test(
-    file_name="Adjoint2D_2c_response",
+    file_name="Transport_Adjoint/Adjoint2D_2c_response",
     comment="2D Transport test with point source Adjoint response",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 2.90543e-05, 1.0e-08]])
@@ -595,7 +607,7 @@ run_test(
 
 #38
 run_test(
-    file_name="Adjoint2D_3a_forward",
+    file_name="Transport_Adjoint/Adjoint2D_3a_forward",
     comment="2D Transport test with point source Multigroup FWD",
     num_procs=4,
     search_strings_vals_tols=[["QOI-value[0]=", 1.12687e-06, 1.0e-09],
@@ -612,17 +624,23 @@ run_test(
 
 #39
 run_test(
-    file_name="Adjoint2D_3b_adjoint",
+    file_name="Transport_Adjoint/Adjoint2D_3b_adjoint",
     comment="2D Transport test with point source Multigroup Adjoint generation",
     num_procs=4,
     search_strings_vals_tols=[])
 
 #40
 run_test(
-    file_name="Adjoint2D_3c_response",
+    file_name="Transport_Adjoint/Adjoint2D_3c_response",
     comment="2D Transport test with point source Multigroup Adjoint Response",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 3.30607e-06, 1.0e-09]])
+
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                      Transport tests, Transients
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
 print("")
