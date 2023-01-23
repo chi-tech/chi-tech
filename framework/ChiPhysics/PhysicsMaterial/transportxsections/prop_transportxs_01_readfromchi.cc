@@ -744,7 +744,7 @@ void chi_physics::TransportCrossSections::
 
         //normalizing
         double sum = std::accumulate(chi.begin(), chi.end(), 0.0);
-        std::for_each(chi.begin(), chi.end(),
+        std::transform(chi.begin(), chi.end(), chi.begin(),
                       [sum](double& x) { return x / sum; });
       }//if chi
 
@@ -762,8 +762,10 @@ void chi_physics::TransportCrossSections::
 
         //normalizing
         double sum = std::accumulate(chi_prompt.begin(), chi_prompt.end(), 0.0);
-        std::for_each(chi_prompt.begin(), chi_prompt.end(),
-                      [sum](double& x) { return x / sum; });
+        std::transform(chi_prompt.begin(),
+                       chi_prompt.end(),
+                       chi_prompt.begin(),
+                       [sum](double& x) { return x / sum; });
 
       }//if prompt chi
 
@@ -788,9 +790,10 @@ void chi_physics::TransportCrossSections::
           //normalizing
           double sum = std::accumulate(emission_spectra[j].begin(),
                                        emission_spectra[j].end(), 0.0);
-          std::for_each(emission_spectra[j].begin(),
-                        emission_spectra[j].end(),
-                        [sum](double& x) { return x / sum; });
+          std::transform(emission_spectra[j].begin(),
+                         emission_spectra[j].end(),
+                         emission_spectra[j].begin(),
+                         [sum](double& x) { return x / sum; });
         }
       }//if delayed chi
 
@@ -828,9 +831,12 @@ void chi_physics::TransportCrossSections::
           //normalizing
           double sum = std::accumulate(fractional_yields.begin(),
                                        fractional_yields.end(), 0.0);
-          std::for_each(fractional_yields.begin(),
-                        fractional_yields.end(),
-                        [sum](double& x) { return x / sum; });
+          std::transform(fractional_yields.begin(),
+                         fractional_yields.end(),
+                         fractional_yields.begin(),
+                         [sum](double& x) { return x / sum; });
+
+
         }
       }
 
@@ -950,15 +956,6 @@ void chi_physics::TransportCrossSections::
         nu_delayed_sigma_f[g] = nu_delayed[g] * sigma_f[g];
       }
 
-      chi::log.Log() << "num_precursors: " << precursors.size()
-                     << std::endl
-                     <<"# of decay constants: " << decay_constants.size()
-                     << std::endl
-                     << "# of fractional yields: " << fractional_yields.size()
-                     << std::endl
-                     << "# of emission spectra: " << emission_spectra.size()
-                     << std::endl;
-
       //add data to the precursor structs
       for (unsigned int j = 0; j < num_precursors; ++j)
       {
@@ -966,8 +963,6 @@ void chi_physics::TransportCrossSections::
         precursors[j].fractional_yield = fractional_yields[j];
         precursors[j].emission_spectrum = emission_spectra[j];
       }
-
-      chi::log.Log() << "HERE!";
     }//prompt/delayed
 
     //set steady-state fission data

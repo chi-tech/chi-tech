@@ -31,7 +31,7 @@ void lbs::TransientSolver::
   else if (method == CrankNicolson) theta = 0.5;
   else                              theta = 0.7;
 
-  const double eff_dt = theta*dt;
+  const double eff_dt = theta * dt;
 
   const bool apply_fixed_src       = (source_flags & APPLY_FIXED_SOURCES);
   const bool apply_wgs_scatter_src = (source_flags & APPLY_WGS_SCATTER_SOURCES);
@@ -115,6 +115,9 @@ void lbs::TransientSolver::
           //====================== Apply accross-groupset fission
           if (fission_avail and apply_ags_fission_src)
           {
+            const double spec = options.use_precursors?
+                xs.chi_prompt[g] : xs.chi[g];
+
             //=============== Loop over groups
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
               if ((gprime < gs_i) or (gprime > gs_f))
@@ -122,7 +125,7 @@ void lbs::TransientSolver::
                 const double nu_sigma_f = (options.use_precursors)?
                   xs.nu_prompt_sigma_f[gprime] : xs.nu_sigma_f[gprime];
 
-                  infission_g += xs.chi[g] * nu_sigma_f *
+                  infission_g += spec * nu_sigma_f *
                                  phi_old_local[uk_map + gprime];
               }//if gprime outside current groupset
 
@@ -152,6 +155,9 @@ void lbs::TransientSolver::
           //====================== Apply within-groupset fission
           if (fission_avail and apply_wgs_fission_src)
           {
+            const double spec = options.use_precursors?
+                xs.chi_prompt[g] : xs.chi[g];
+
             //=============== Loop over groups apply promp fission
             for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
               if ((gprime >= gs_i) and (gprime <= gs_f))
@@ -159,7 +165,7 @@ void lbs::TransientSolver::
                 const double nu_sigma_f = (options.use_precursors)?
                   xs.nu_prompt_sigma_f[gprime] : xs.nu_sigma_f[gprime];
 
-                infission_g += xs.chi[g] * nu_sigma_f *
+                infission_g += spec * nu_sigma_f *
                                phi_old_local[uk_map + gprime];
               }//if gprime inside current groupset
 
@@ -180,7 +186,8 @@ void lbs::TransientSolver::
                     infission_g += coeff * eff_dt *
                                    precursor.fractional_yield *
                                    xs.nu_delayed_sigma_f[gprime] *
-                                   phi_old_local[uk_map + gprime];
+                                   phi_old_local[uk_map + gprime] /
+                                   cell_volume;
                 }//for gprime
               }//for precursors
             }//if use precursors
