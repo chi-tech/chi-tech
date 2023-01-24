@@ -31,9 +31,18 @@ double SteadySolver::ComputeFissionProduction(const std::vector<double>& phi)
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.nu_sigma_f[g] *
-                            phi[uk_map + g] *
-                            IntV_ShapeI;
+      {
+        for (size_t gp = 0; gp <= last_grp; ++gp)
+          local_production += xs.production_matrix[g][gp] *
+                              phi[uk_map + gp] *
+                              IntV_ShapeI;
+
+        if (options.use_precursors)
+          for (unsigned int j = 0; j < xs.num_precursors; ++j)
+            local_production += xs.nu_delayed_sigma_f[g] *
+                                phi[uk_map + g] *
+                                IntV_ShapeI;
+      }
     }//for node
   }//for cell
 

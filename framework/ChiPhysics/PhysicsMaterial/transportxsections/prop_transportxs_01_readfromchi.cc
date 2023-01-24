@@ -1064,7 +1064,6 @@ void chi_physics::TransportCrossSections::
       }
     }//if production_matrix empty
 
-    //TODO: Determine final input format for production matrix
     else
     {
       //TODO: Develop an implementation for multi-particle delayed
