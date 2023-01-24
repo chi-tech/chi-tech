@@ -32,8 +32,9 @@ double SteadySolver::ComputeFissionProduction(const std::vector<double>& phi)
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
       {
+        const auto& prod = xs.production_matrix[g];
         for (size_t gp = 0; gp <= last_grp; ++gp)
-          local_production += xs.production_matrix[g][gp] *
+          local_production += prod[gp] *
                               phi[uk_map + gp] *
                               IntV_ShapeI;
 

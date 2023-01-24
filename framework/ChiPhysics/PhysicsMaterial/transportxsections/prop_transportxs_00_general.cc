@@ -186,8 +186,9 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       if (xs->is_fissionable && xs->num_precursors == 0)
         throw std::logic_error(
             "Incompatible cross sections encountered.\n"
-            "If any fissionable cross sections specify prompt/delayed "
-            "fission data, all must specify prompt/delayed data.");
+            "If any fissionable cross sections specify delayed neutron "
+            "data, all fissionable cross sections must specify delayed "
+            "neutron data.");
 
   //============================================================
   // Initialize the data
