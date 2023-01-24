@@ -5,16 +5,40 @@ import shutil
 import textwrap
 import argparse
 
+
+class CustomFormatter(argparse.RawTextHelpFormatter,
+                      argparse.MetavarTypeHelpFormatter,
+                      argparse.ArgumentDefaultsHelpFormatter):
+    pass
+
+
 parser = argparse.ArgumentParser(
-    description="The regression tests.",
-    formatter_class=argparse.RawTextHelpFormatter
+    description="A script to run the regression test suite.",
+    formatter_class=CustomFormatter,
+    epilog=textwrap.dedent('''\
+    Run the regression suite, or optionally, a series of individual
+    tests or a range of tests. 
+    
+    To run all tests, use
+    python test/Z_Run_all.py
+    
+    To run a list of individual tests, use 
+    python test/Z_Run_all.py --test-list test1 test2 ... testN
+    
+    To run a range of tests, use
+    python test/Z_Run_all.py --test-range test_start test_end
+    
+    In each of the above examples, all arguments are separated by spaces 
+    and each of the arguments are integers.
+    ''')
 )
 
 parser.add_argument(
     '--test-list',
     nargs='*',
     type=int,
-    required=False
+    required=False,
+    help="A list of test IDs to run."
 )
 
 parser.add_argument(
@@ -22,7 +46,8 @@ parser.add_argument(
     nargs=2,
     default=None,
     type=int,
-    required=False
+    required=False,
+    help="The first and last test ID of a range of tests to run."
 )
 
 argv = parser.parse_args()
