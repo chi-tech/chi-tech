@@ -7,9 +7,6 @@
 #include "chi_runtime.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-#include "chi_log.h"
-;
-
 #include <iostream>
 
 //#############################################################################
@@ -57,7 +54,20 @@
                      boundary id to the specified value for cells
                      that meet the sense requirement for the given
                      logical volume.\n
-
+ MATID_FROM_LUA_FUNCTION = <B>LuaFunctionName:[string]</B>. For each cell, will
+                           call a lua function that can change the material id.
+                           The lua function must have 4 parameters,
+                           the cell's centroid x,y,z values (doubles) and the
+                           current cell-material id (int). The function must
+                           return a material id.
+ BNDRYID_FROM_LUA_FUNCTION = <B>LuaFunctionName:[string]</B>. For each boundary
+                           face, will call a lua function that can change the
+                           boundary id.
+                           The lua function must have 7 parameters,
+                           the face's centroid x,y,z values (doubles), the
+                           face's normal x,y,z values (double), and the
+                           current face-boundary id (int). The function must
+                           return a boundary id.
 ## _
 
 ### PartitionType
@@ -75,8 +85,8 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
   //============================================= Get property index
   const int num_args = lua_gettop(L);
-  if (num_args < 1)
-    LuaPostArgAmountError(fname,1,num_args);
+  if (num_args < 2)
+    LuaPostArgAmountError(fname,2,num_args);
 
   LuaCheckNilValue(fname,L,1);
   LuaCheckNilValue(fname,L,2);
@@ -154,8 +164,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
 
   else if (property_index == VMP::EXTRUSION_LAYER)
   {
-    if (typeid(*cur_hndlr.volume_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
-    if (cur_hndlr.volume_mesher->ty)
+    if (cur_hndlr.volume_mesher->Type() == chi_mesh::VolumeMesherType::EXTRUDER)
     {
       auto& mesher = (chi_mesh::VolumeMesherExtruder&)*cur_hndlr.volume_mesher;
 
@@ -222,6 +231,22 @@ int chiVolumeMesherSetProperty(lua_State *L)
       chi::logicvolume_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_id);
+  }
+  else if (property_index == VMP::MATID_FROM_LUA_FUNCTION)
+  {
+    LuaCheckStringValue(fname,L,2);
+
+    const std::string lua_fname = lua_tostring(L,2);
+
+    chi_mesh::VolumeMesher::SetMatIDFromLuaFunction(lua_fname);
+  }
+  else if (property_index == VMP::BNDRYID_FROM_LUA_FUNCTION)
+  {
+    LuaCheckStringValue(fname,L,2);
+
+    const std::string lua_fname = lua_tostring(L,2);
+
+    chi_mesh::VolumeMesher::SetBndryIDFromLuaFunction(lua_fname);
   }
   else
   {

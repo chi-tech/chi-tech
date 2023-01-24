@@ -7,10 +7,6 @@
 
 #include "chi_runtime.h"
 #include "chi_log.h"
-;
-
-#include "chi_mpi.h"
-
 
 #include <vtkCellType.h>
 #include <vtkUnstructuredGrid.h>
@@ -26,9 +22,9 @@
 
 //###################################################################
 /**Exports just the mesh to VTK format.*/
-void chi_mesh::MeshContinuum::ExportCellsToVTK(const char* baseName) const
+void chi_mesh::MeshContinuum::ExportCellsToVTK(const std::string& baseName) const
 {
-  chi::log.Log() << "Exporting mesh to VTK. " << local_cells.size();
+  chi::log.Log() << "Exporting mesh to VTK files with base " << baseName;
   std::vector<std::vector<double>> d_nodes;
 
   auto points = vtkSmartPointer<vtkPoints>::New();
