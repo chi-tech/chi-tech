@@ -3,9 +3,35 @@ import os
 import sys
 import shutil
 import textwrap
+import argparse
 
-# To run a range of tests pass a text string via the command line.
-# i.e., "tests_to_run=[*range(14,16)]"
+parser = argparse.ArgumentParser(
+    description="The regression tests.",
+    formatter_class=argparse.RawTextHelpFormatter
+)
+
+parser.add_argument(
+    '--test-list',
+    nargs='*',
+    type=int,
+    required=False
+)
+
+parser.add_argument(
+    '--test-range',
+    nargs=2,
+    default=None,
+    type=int,
+    required=False
+)
+
+argv = parser.parse_args()
+
+# To run a particular set of tests, pass "--test-list" followed by space
+# separated integers corresponding to the test numbers to run.
+
+# To run a particular range of tests, pass "--test-range" followed by
+# the first test desired and the last test desired.
 
 # This python script executes the regression test suite.
 # In order to add your own test, copy one of the test blocks
@@ -17,20 +43,33 @@ import textwrap
 # iteration count but still produce the same answer
 
 kscript_path = os.path.dirname(os.path.abspath(__file__))
-kchi_src_pth = kscript_path + '/../'
-kpath_to_exe = kchi_src_pth + '/bin/ChiTech'
-tests_to_run = []
-print_only   = False
+kchi_src_pth = os.path.join(kscript_path, "..")
+kpath_to_exe = os.path.join(kchi_src_pth, "bin/ChiTech")
+print_only = False
 
 # Get the correct mpiexec executable for the local machine
 # This can be overwritten
 mpiexec = shutil.which("mpiexec")
 
-print("")
-if len(sys.argv) >= 2:
-    exec(sys.argv[1])
+# Create the list of tests to run
+if argv.test_list and argv.test_range:
+    raise ValueError(
+        "Either a list of individual tests or the bounds "
+        "of the range of tests can be provided, not both."
+    )
+
+if argv.test_list:
+    tests_to_run = argv.test_list
+elif argv.test_range:
+    first, last = argv.test_range
+    tests_to_run = list(range(first, last + 1))
+else:
+    tests_to_run = list()
+
+print()
 print("************* ChiTech Regression Test *************")
-print("")
+print()
+
 test_number = 0
 num_failed = 0
 
@@ -43,26 +82,28 @@ if "tacc.utexas.edu" in hostname:
 
 print("Using mpiexec at: ", mpiexec)
 
+
 def format3(number):
-    return "{:3d}".format(number)
+    return f"{number:3d}"
 
 
 def format_filename(filename):
-    return "{:38s}".format(filename[:38])
+    return f"{filename[:38]:38s}"
+
 
 # Numerical comparison:
-#search[0] = "NumCompare"
-#search[1] = string used to identify a line
-#search[2] = Which word
-#search[3] = numerical format ("float" or "int")
-#search[4] = value it should be
-#search[5] = tolerance (floats only)
+# search[0] = "NumCompare"
+# search[1] = string used to identify a line
+# search[2] = Which word
+# search[3] = numerical format ("float" or "int")
+# search[4] = value it should be
+# search[5] = tolerance (floats only)
 
 # String comparison:
-#search[0] = "StrCompare"
-#search[1] = string used to identify a line
-#search[2] = Which word
-#search[3] = value it should be
+# search[0] = "StrCompare"
+# search[1] = string used to identify a line
+# search[2] = Which word
+# search[3] = value it should be
 
 def parse_output(out, search_strings_vals_tols):
     global num_failed
@@ -129,7 +170,7 @@ def parse_output(out, search_strings_vals_tols):
             break
 
         if search[0] == "NumCompare":
-            numerical_format   = search[3]
+            numerical_format = search[3]
             value_it_should_be = search[4]
 
             trial_value_str = words[word_number]
@@ -138,7 +179,7 @@ def parse_output(out, search_strings_vals_tols):
                 trial_value = float(trial_value_str)
                 tolerance = search[5]
 
-                if abs(trial_value-value_it_should_be) > tolerance:
+                if abs(trial_value - value_it_should_be) > tolerance:
                     test_passed = False
                     print("\nTest failed:\nLine:" +
                           line + "\n" +
@@ -167,7 +208,6 @@ def parse_output(out, search_strings_vals_tols):
                       "Test:", search)
                 break
 
-
     if test_passed:
         print(" - Passed")
     else:
@@ -177,11 +217,18 @@ def parse_output(out, search_strings_vals_tols):
 
     return test_passed
 
+
 def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = format_filename(file_name) + " " + comment + " " \
-                + str(num_procs) + " MPI Processes"
-    print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
-    if print_only: print(""); return
+    test_name = f"{format_filename(file_name)} {comment} " \
+                f"{num_procs} MPI Processes"
+
+    msg = f"Running Test {format3(test_number)} {test_name}"
+    print(msg, end='', flush=True)
+
+    if print_only:
+        print()
+        return
+
     with open(f"tests/{file_name}.job", 'w') as job_file:
         job_file.write(textwrap.dedent(f"""
             #!/usr/bin/bash
@@ -199,8 +246,10 @@ def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
 
             ibrun {kpath_to_exe} tests/{file_name}.lua master_export=false
             """
-        ).strip())
-    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")  # -W means wait for job to finish
+                                       ).strip())
+
+    # -W means wait for job to finish
+    os.system(f"sbatch -W tests/{file_name}.job > /dev/null")
     with open(f"tests/{file_name}.o", 'r') as outfile:
         out = outfile.read()
 
@@ -208,18 +257,23 @@ def run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols):
 
     # Cleanup
     if passed:
-        os.system(f"rm tests/{file_name}.job tests/{file_name}.o tests/{file_name}.e")
+        os.system(f"rm tests/{file_name}.job "
+                  f"tests/{file_name}.o tests/{file_name}.e")
 
 
 def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
-    test_name = format_filename(file_name) \
-                + " - " + format_filename(comment) + " - " \
-                + str(num_procs) + " MPI Processes"
-    print("Running Test " + format3(test_number) + " " + test_name, end='', flush=True)
-    if print_only: print(""); return
+    test_name = f"{format_filename(file_name)} - {comment} - " \
+                f"{num_procs} MPI Processes"
 
-    process = subprocess.Popen([mpiexec, "-np", str(num_procs), kpath_to_exe,
-                                "tests/" + file_name + ".lua", "master_export=false"],
+    msg = f"Running Test {format3(test_number)} {test_name}"
+    print(msg, end='', flush=True)
+    if print_only:
+        print()
+        return
+
+    cmd = f"{mpiexec} -np {num_procs} {kpath_to_exe} " \
+          f"tests/{file_name}.lua master_export=false"
+    process = subprocess.Popen(cmd.split(),
                                cwd=kchi_src_pth,
                                stdout=subprocess.PIPE,
                                universal_newlines=True)
@@ -231,19 +285,22 @@ def run_test_local(file_name, comment, num_procs, search_strings_vals_tols):
 
 def run_test(file_name, comment, num_procs, search_strings_vals_tols):
     global test_number
+
     test_number += 1
-    if ((tests_to_run) and (test_number in tests_to_run)) or (not tests_to_run):
+    if (tests_to_run and test_number in tests_to_run) or (not tests_to_run):
         if tacc:
-            run_test_tacc(file_name, comment, num_procs, search_strings_vals_tols)
+            run_test_tacc(file_name, comment, num_procs,
+                          search_strings_vals_tols)
         else:
-            run_test_local(file_name, comment, num_procs, search_strings_vals_tols)
+            run_test_local(file_name, comment, num_procs,
+                           search_strings_vals_tols)
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                                  Diffusion tests
+#                             CFEM Diffusion Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Tests 1 - 5
 
-### CFEM diffusion tests
 run_test(
     file_name="CFEM_Diffusion/cDiffusion_2D_1a_linear",
     comment="2D Diffusion with linear solution",
@@ -274,7 +331,11 @@ run_test(
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 1.000244, 1.0e-10]])
 
-### DFEM diffusion tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                             CFEM Diffusion Tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Tests 6 - 10
+
 run_test(
     file_name="DFEM_Diffusion/dDiffusion_2D_1a_linear",
     comment="2D Diffusion with linear solution",
@@ -305,85 +366,78 @@ run_test(
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 1.000586, 1.0e-10]])
 
-###  Diffusion tests
-#1
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                  Diffusion Tests
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# Tests 11 - 22
+
+
 run_test(
     file_name="Diffusion/Diffusion1D",
     comment="1D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
 
-#2
 run_test(
     file_name="Diffusion/Diffusion1D_KBA",
     comment="1D Diffusion Test KBA partitioning - CFEM",
     num_procs=2,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-10]])
 
-#3
 run_test(
     file_name="Diffusion/Diffusion1D_IP",
     comment="1D Diffusion Test - DFEM",
     num_procs=2,
     search_strings_vals_tols=[["[0]  Max-value=", 0.5006523128, 1.0e-4]])
 
-#4
 run_test(
     file_name="Diffusion/Diffusion2D_1Poly",
     comment="2D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29480, 1.0e-4]])
 
-#5
 run_test(
     file_name="Diffusion/Diffusion2D_1Poly_IP",
     comment="2D Diffusion Test - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 2.5, 1.0e-4]])
 
-#6
 run_test(
     file_name="Diffusion/Diffusion2D_2Unstructured",
     comment="2D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.30384, 1.0e-4]])
 
-#7
 run_test(
     file_name="Diffusion/Diffusion2D_2Unstructured_IP",
     comment="2D Diffusion Test Unstr. Mesh - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29685, 1.0e-4]])
 
-#8
 run_test(
     file_name="Diffusion/Diffusion3D_1Poly",
     comment="3D Diffusion Test - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29480, 1.0e-4]])
 
-#9
 run_test(
     file_name="Diffusion/Diffusion3D_1Poly_IP",
     comment="3D Diffusion Test - DFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29492, 1.0e-4]])
 
-#10
 run_test(
     file_name="Diffusion/Diffusion3D_2Ortho",
     comment="3D Diffusion Test Ortho Mesh - CFEM",
     num_procs=1,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29480, 1.0e-4]])
 
-#11
 run_test(
     file_name="Diffusion/Diffusion3D_3Unstructured",
     comment="3D Diffusion Test Unstr. Mesh - CFEM",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 0.29499, 1.0e-4]])
 
-#12
 run_test(
     file_name="Diffusion/Diffusion3D_3Unstructured_IP",
     comment="3D Diffusion Test Unstr. Mesh - DFEM",
@@ -391,9 +445,10 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value=", 0.29632, 1.0e-4]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                    Transport tests, Steady State
+#                     Steady State Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#13
+# Tests 23 - 38
+
 run_test(
     file_name="Transport_Steady/Transport1D_1",
     comment="1D LinearBSolver Test - PWLD",
@@ -401,17 +456,19 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 0.49903, 1.0e-4],
                               ["[0]  Max-value2=", 7.18243e-4, 1.0e-4]])
 
-#14
 run_test(
     file_name="Transport_Steady/Transport1D_3a_DSA_ortho",
-    comment="1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    comment="1D LinearBSolver test of a block of graphite "
+            "with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    28", 7, "CONVERGED"],
-                              ["StrCompare", "WGS groups [63-167] Iteration    55", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    28", 6, "float", 6.7433e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    55", 6, "float", 5.67431e-07, 1.0e-9]])
+    search_strings_vals_tols=[
+        ["StrCompare", "WGS groups [0-62] Iteration    28", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    55", 7, "CONVERGED"],
+        ["NumCompare", "WGS groups [0-62] Iteration    28", 6, "float",
+         6.7433e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    55", 6, "float",
+         5.67431e-07, 1.0e-9]])
 
-#15
 run_test(
     file_name="Transport_Steady/Transport2D_1Poly",
     comment="2D LinearBSolver Test - PWLD",
@@ -419,7 +476,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 0.50758, 1.0e-4],
                               ["[0]  Max-value2=", 2.52527e-04, 1.0e-4]])
 
-#16
 run_test(
     file_name="Transport_Steady/Transport2D_2Unstructured",
     comment="2D LinearBSolver Test Unstructured grid - PWLD",
@@ -427,7 +483,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 0.51187, 1.0e-4],
                               ["[0]  Max-value2=", 1.42458e-03, 1.0e-4]])
 
-#17
 run_test(
     file_name="Transport_Steady/Transport2D_3Poly_quad_mod",
     comment="2D LinearBSolver Test Polar-Optimized quadrature - PWLD",
@@ -435,27 +490,32 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 0.50758, 1.0e-4],
                               ["[0]  Max-value2=", 2.52527e-04, 1.0e-4]])
 
-#18
 run_test(
     file_name="Transport_Steady/Transport2D_4a_DSA_ortho",
-    comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    comment="2D LinearBSolver test of a block of graphite "
+            "with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    53", 7, "CONVERGED"],
-                              ["StrCompare", "WGS groups [63-167] Iteration    59", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    53", 6, "float", 6.01304e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    59", 6, "float", 6.21411e-07, 1.0e-9]])
+    search_strings_vals_tols=[
+        ["StrCompare", "WGS groups [0-62] Iteration    53", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    59", 7, "CONVERGED"],
+        ["NumCompare", "WGS groups [0-62] Iteration    53", 6, "float",
+         6.01304e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    59", 6, "float",
+         6.21411e-07, 1.0e-9]])
 
-#19
 run_test(
     file_name="Transport_Steady/Transport2D_4b_DSA_ortho",
-    comment="2D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    comment="2D LinearBSolver test of a block of graphite "
+            "with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
-                              ["StrCompare", "WGS groups [63-167] Iteration    57", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float", 4.97136e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    57", 6, "float", 6.88134e-07, 1.0e-9]])
+    search_strings_vals_tols=[
+        ["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    57", 7, "CONVERGED"],
+        ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float",
+         4.97136e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    57", 6, "float",
+         6.88134e-07, 1.0e-9]])
 
-#20
 run_test(
     file_name="Transport_Steady/Transport3D_1a_Extruder",
     comment="3D LinearBSolver Test - PWLD",
@@ -463,7 +523,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 5.27450e-01, 1.0e-4],
                               ["[0]  Max-value2=", 3.76339e-04, 1.0e-4]])
 
-#21
 run_test(
     file_name="Transport_Steady/Transport3D_1b_Ortho",
     comment="3D LinearBSolver Test - PWLD Reflecting BC",
@@ -471,7 +530,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 5.28310e-01, 1.0e-4],
                               ["[0]  Max-value2=", 8.04576e-04, 1.0e-4]])
 
-#22
 run_test(
     file_name="Transport_Steady/Transport3D_1Poly_parmetis",
     comment="3D LinearBSolver Test Ortho Grid Parmetis - PWLD",
@@ -479,7 +537,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 5.27450e-01, 1.0e-4],
                               ["[0]  Max-value2=", 3.76339e-04, 1.0e-4]])
 
-#23
 run_test(
     file_name="Transport_Steady/Transport3D_1Poly_qmom_part1",
     comment="3D LinearBSolver Test Source moment writing - PWLD",
@@ -487,7 +544,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 1.08320e-01, 1.0e-6],
                               ["[0]  Max-value2=", 0.000000000, 1.0e-10]])
 
-#24
 run_test(
     file_name="Transport_Steady/Transport3D_1Poly_qmom_part2",
     comment="3D LinearBSolver Test Source moment reading - PWLD",
@@ -495,8 +551,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 1.01701e-04, 1.0e-6],
                               ["[0]  Max-value2=", 9.14681e-06, 1.0e-10]])
 
-#----------------------------------------------------
-#25
 run_test(
     file_name="Transport_Steady/Transport3D_2Unstructured",
     comment="3D LinearBSolver Test Extruded Unstructured - PWLD",
@@ -504,17 +558,19 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 5.41465e-01, 1.0e-4],
                               ["[0]  Max-value2=", 3.78243e-04, 1.0e-4]])
 
-#26
 run_test(
     file_name="Transport_Steady/Transport3D_3a_DSA_ortho",
-    comment="3D LinearBSolver test of a block of graphite with an air cavity. DSA and TG",
+    comment="3D LinearBSolver test of a block of graphite "
+            "with an air cavity. DSA and TG",
     num_procs=4,
-    search_strings_vals_tols=[["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
-                              ["StrCompare", "WGS groups [63-167] Iteration    69", 7, "CONVERGED"],
-                              ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float", 7.88852e-07, 1.0e-9],
-                              ["NumCompare", "WGS groups [63-167] Iteration    69", 6, "float", 9.78723e-07, 1.0e-9]])
+    search_strings_vals_tols=[
+        ["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    69", 7, "CONVERGED"],
+        ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float",
+         7.88852e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    69", 6, "float",
+         9.78723e-07, 1.0e-9]])
 
-#27
 run_test(
     file_name="Transport_Steady/Transport3D_4Cycles1",
     comment="3D LinearBSolver Test Extruded-Unstructured Mesh - PWLD",
@@ -522,7 +578,6 @@ run_test(
     search_strings_vals_tols=[["[0]  Max-value1=", 5.55349e-01, 1.0e-4],
                               ["[0]  Max-value2=", 3.74343e-04, 1.0e-4]])
 
-#28
 run_test(
     file_name="Transport_Steady/Transport3D_5Cycles2",
     comment="3D LinearBSolver Test STAR-CCM+ mesh - PWLD",
@@ -531,26 +586,28 @@ run_test(
                               ["[0]  Max-value2=", 1.02943, 1.0e-4]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                    Transport tests, K-eigenvalue
+#                     k-Eigenvalue Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#29
+# Tests 39
+
 run_test(
     file_name="Transport_Keigen/KEigenvalueTransport1D_1G",
     comment="1D KSolver LinearBSolver Test - PWLD",
     num_procs=4,
-    search_strings_vals_tols=[["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5]])
+    search_strings_vals_tols=[
+        ["[0]          Final k-eigenvalue    :", 0.99954, 1.0e-5]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#       Transport tests, Steady State, Cylindrical
+#         Steady-State Cylindrical Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#30
+# Tests 40 - 41
+
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_1Monoenergetic",
     comment="2D LinearBSolver Cylindrical Test mono-energetic - PWLD",
     num_procs=4,
     search_strings_vals_tols=[["[0]  Max-value=", 1.00000, 1.0e-09]])
 
-#31
 run_test(
     file_name="Transport_Steady_Cyl/Transport2DCyl_2Multigroup",
     comment="2D LinearBSolver Cylindrical Test multi-group - PWLD",
@@ -559,53 +616,48 @@ run_test(
                               ["[0]  Max-valueG2=", 0.25000, 1.0e-09]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#           Transport tests, Steady State, Adjoint
+#             Steady-State Adjoint Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#32
+# Tests 42 - 50
+
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1a_forward",
     comment="2D Transport test with localized material source FWD",
     num_procs=4,
     search_strings_vals_tols=[["QOI-value=", 1.38397e-05, 1.0e-08]])
 
-#33
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1b_adjoint",
-    comment="2D Transport test with localized material source Adjoint generation",
+    comment="2D Transport test with localized material source "
+            "Adjoint generation",
     num_procs=4,
     search_strings_vals_tols=[])
 
-#34
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_1c_response",
-    comment="2D Transport test with localized material source Adjoint inner product",
+    comment="2D Transport test with localized material source "
+            "Adjoint inner product",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 1.38405e-05, 1.0e-08]])
 
-
-#35
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_2a_forward",
     comment="2D Transport test with point source FWD",
     num_procs=4,
-    search_strings_vals_tols=[["QOI-value=", 2.90386e-05 , 1.0e-08]])
+    search_strings_vals_tols=[["QOI-value=", 2.90386e-05, 1.0e-08]])
 
-#36
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_2b_adjoint",
     comment="2D Transport test with point source Adjoint generation",
     num_procs=4,
     search_strings_vals_tols=[])
 
-#37
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_2c_response",
     comment="2D Transport test with point source Adjoint response",
     num_procs=4,
     search_strings_vals_tols=[["Inner-product=", 2.90543e-05, 1.0e-08]])
 
-
-#38
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_3a_forward",
     comment="2D Transport test with point source Multigroup FWD",
@@ -622,14 +674,12 @@ run_test(
                               ["QOI-value[9]=", 2.07284e-07, 1.0e-09],
                               ["QOI-value[sum]=", 2.21354e-05, 1.0e-08]])
 
-#39
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_3b_adjoint",
     comment="2D Transport test with point source Multigroup Adjoint generation",
     num_procs=4,
     search_strings_vals_tols=[])
 
-#40
 run_test(
     file_name="Transport_Adjoint/Adjoint2D_3c_response",
     comment="2D Transport test with point source Multigroup Adjoint Response",
@@ -637,13 +687,13 @@ run_test(
     search_strings_vals_tols=[["Inner-product=", 3.30607e-06, 1.0e-09]])
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                      Transport tests, Transients
+#                        Transient Transport Tests
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
 
-# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF TESTS
-print("")
+print()
 if num_failed == 0:
     print("All regression tests passed!")
 else:
