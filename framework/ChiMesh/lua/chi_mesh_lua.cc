@@ -54,6 +54,7 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
     LUA_CMACRO1(RCC          , 4);
     LUA_CMACRO1(SURFACE      , 9);
     LUA_CMACRO1(BOOLEAN      , 10);
+  LUA_FMACRO1(chiLogicalVolumePointSense);
 
   //=================================== Mesh handler
   LUA_FMACRO1(chiMeshHandlerCreate);

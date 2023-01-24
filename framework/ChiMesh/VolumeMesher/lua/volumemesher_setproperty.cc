@@ -69,16 +69,17 @@ Can be any of the following:
 \author Jan*/
 int chiVolumeMesherSetProperty(lua_State *L)
 {
+  const std::string fname = "chiVolumeMesherSetProperty";
   //============================================= Get current mesh handler
   auto& cur_hndlr = chi_mesh::GetCurrentHandler();
 
   //============================================= Get property index
-  int num_args = lua_gettop(L);
+  const int num_args = lua_gettop(L);
   if (num_args < 1)
-    LuaPostArgAmountError(__FUNCTION__,1,num_args);
+    LuaPostArgAmountError(fname,1,num_args);
 
-  LuaCheckNilValue(__FUNCTION__,L,1);
-  LuaCheckNilValue(__FUNCTION__,L,2);
+  LuaCheckNilValue(fname,L,1);
+  LuaCheckNilValue(fname,L,2);
 
   int property_index = lua_tonumber(L,1);
 
@@ -146,7 +147,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
     {
       chi::log.LogAllError()
         << "Unsupported partition type used in call to "
-        << __FUNCTION__ << ".";
+        << fname << ".";
      chi::Exit(EXIT_FAILURE);
     }
   }
@@ -154,6 +155,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
   else if (property_index == VMP::EXTRUSION_LAYER)
   {
     if (typeid(*cur_hndlr.volume_mesher) == typeid(chi_mesh::VolumeMesherExtruder))
+    if (cur_hndlr.volume_mesher->ty)
     {
       auto& mesher = (chi_mesh::VolumeMesherExtruder&)*cur_hndlr.volume_mesher;
 
@@ -197,7 +199,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
     if (num_args==4) sense = lua_toboolean(L,4);
 
     const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-      chi::logicvolume_stack, volume_hndl, __FUNCTION__);
+      chi::logicvolume_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetMatIDFromLogical(log_vol,sense,mat_id);
   }
@@ -217,7 +219,7 @@ int chiVolumeMesherSetProperty(lua_State *L)
     if (num_args==4) sense = lua_toboolean(L,4);
 
     const auto& log_vol = chi::GetStackItem<chi_mesh::LogicalVolume>(
-      chi::logicvolume_stack, volume_hndl, __FUNCTION__);
+      chi::logicvolume_stack, volume_hndl, fname);
 
     chi_mesh::VolumeMesher::SetBndryIDFromLogical(log_vol,sense,bndry_id);
   }
