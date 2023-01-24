@@ -76,7 +76,7 @@ void lbs::SteadySolver::
 
           //============================== Apply fixed sources
           if (not options.use_src_moments) //using regular material src
-            rhs += apply_fixed_src and ell == 0? src[g] : 0.0;
+            rhs += (apply_fixed_src and ell == 0)? src[g] : 0.0;
           else if (apply_fixed_src)  //using ext_src_moments
             rhs += ext_src_moments_local[uk_map + g];
 
