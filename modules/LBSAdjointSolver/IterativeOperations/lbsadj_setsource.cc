@@ -64,26 +64,26 @@ void lbs_adjoint::AdjointSolver::
           const bool moment_avail = ell < S.size();
 
           //==================== Across groupset
-          if (moment_avail && apply_ags_scatter_src)
+          if (moment_avail and apply_ags_scatter_src)
             for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
-              if (gp < gs_i || gp > gs_f)
+              if (gp < gs_i or gp > gs_f)
                 rhs += sigma_sm * phi_old_local[uk_map + gp];
 
           //==================== Within groupset
-          if (moment_avail && apply_wgs_scatter_src)
+          if (moment_avail and apply_wgs_scatter_src)
             for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
-              if (gp >= gs_i && gp <= gs_f)
+              if (gp >= gs_i and gp <= gs_f)
                 rhs += sigma_sm * phi_old_local[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable && ell == 0;
+          const bool fission_avail = xs.is_fissionable and ell == 0;
 
           //==================== Across groupset
-          if (fission_avail && apply_ags_fission_src)
+          if (fission_avail and apply_ags_fission_src)
           {
             const auto& prod = xs.production_matrix[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
-              if (gp < gs_i || gp > gs_f)
+              if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi_old_local[uk_map + gp];
 
@@ -97,7 +97,7 @@ void lbs_adjoint::AdjointSolver::
           }
 
           //==================== Within groupset
-          if (fission_avail && apply_wgs_fission_src)
+          if (fission_avail and apply_wgs_fission_src)
           {
             const auto& prod = xs.production_matrix[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)

@@ -55,7 +55,7 @@ void lbs::SteadySolver::
 
     //==================== Obtain src
     double* src = default_zero_src.data();
-    if (P0_src && apply_fixed_src)
+    if (P0_src and apply_fixed_src)
       src = P0_src->source_value_g.data();
 
     //======================================== Loop over nodes
@@ -75,8 +75,8 @@ void lbs::SteadySolver::
           double rhs = 0.0;
 
           //============================== Apply fixed sources
-          if (!options.use_src_moments) //using regular material src
-            rhs += apply_fixed_src && ell == 0? src[g] : 0.0;
+          if (not options.use_src_moments) //using regular material src
+            rhs += apply_fixed_src and ell == 0? src[g] : 0.0;
           else if (apply_fixed_src)  //using ext_src_moments
             rhs += ext_src_moments_local[uk_map + g];
 
@@ -84,26 +84,26 @@ void lbs::SteadySolver::
           const bool moment_avail = ell < S.size();
 
           //==================== Across groupset
-          if (moment_avail && apply_ags_scatter_src)
+          if (moment_avail and apply_ags_scatter_src)
             for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
-              if (gp < gs_i || gp > gs_f)
+              if (gp < gs_i or gp > gs_f)
                 rhs += sigma_sm * phi_old_local[uk_map + gp];
 
           //==================== Within groupset
-          if (moment_avail && apply_wgs_scatter_src)
+          if (moment_avail and apply_wgs_scatter_src)
             for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
-              if (gp >= gs_i && gp <= gs_f)
+              if (gp >= gs_i and gp <= gs_f)
                 rhs += sigma_sm * phi_old_local[uk_map + gp];
 
           //============================== Apply fission sources
-          const bool fission_avail = xs.is_fissionable && ell == 0;
+          const bool fission_avail = xs.is_fissionable and ell == 0;
 
           //==================== Across groupset
-          if (fission_avail && apply_ags_fission_src)
+          if (fission_avail and apply_ags_fission_src)
           {
             const auto& prod = xs.production_matrix[g];
             for (size_t gp = first_grp; gp <= last_grp; ++gp)
-              if (gp < gs_i || gp > gs_f)
+              if (gp < gs_i or gp > gs_f)
               {
                 rhs += prod[gp] * phi_old_local[uk_map + gp];
 
@@ -117,7 +117,7 @@ void lbs::SteadySolver::
           }
 
           //==================== Within groupset
-          if (fission_avail && apply_wgs_fission_src)
+          if (fission_avail and apply_wgs_fission_src)
           {
             const auto& prod = xs.production_matrix[g];
             for (size_t gp = gs_i; gp <= gs_f; ++gp)
@@ -142,7 +142,7 @@ void lbs::SteadySolver::
   }//for cell
 
   //================================================== Apply point sources
-  if (!options.use_src_moments && apply_fixed_src)
+  if (not options.use_src_moments and apply_fixed_src)
     for (const auto& point_source : point_sources)
     {
       const auto& info_list = point_source.ContainingCellsInfo();
