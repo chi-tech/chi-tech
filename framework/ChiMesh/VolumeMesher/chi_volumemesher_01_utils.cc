@@ -4,9 +4,7 @@
 //###################################################################
 chi_mesh::VolumeMesher::VolumeMesher(VolumeMesherType type) :
  m_type(type)
-{
-
-}
+{}
 
 //###################################################################
 /** Sets the grid member of the volume mesher.*/
