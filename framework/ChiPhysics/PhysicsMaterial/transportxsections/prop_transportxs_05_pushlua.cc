@@ -1,5 +1,7 @@
 #include "material_property_transportxsections.h"
 
+#include "chi_log.h"
+
 //###################################################################
 /**Pushes all of the relevant items of the transport xs to a lua table.*/
 void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
@@ -35,7 +37,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
       unsigned int g = 0;
       for (const auto& val : xs)
       {
-        lua_pushinteger(L, g++);
+        lua_pushinteger(L, ++g);
         lua_pushnumber(L ,val);
         lua_settable(L, -3);
       }
@@ -54,22 +56,24 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushstring(L, "chi_delayed");
   lua_newtable(L);
   {
-    for (unsigned int g = 0; g < num_groups; ++g)
+    unsigned int j = 0;
+    for (const auto& precursor: precursors)
     {
-      lua_pushinteger(L, g + 1);
+      lua_pushinteger(L, ++j);
       lua_newtable(L);
       {
-        for (unsigned int j = 0; j < num_precursors; ++j)
+        unsigned int g = 0;
+        for (const auto& val: precursor.emission_spectrum)
         {
-          lua_pushinteger(L, j + 1);
-          lua_pushnumber(L, precursors[j].emission_spectrum[g]);
+          lua_pushinteger(L, ++g);
+          lua_pushnumber(L, val);
           lua_settable(L, -3);
         }
       }
       lua_settable(L, -3);
-    }//for g
+    }
   }
-  lua_settable(L,-3);
+  lua_settable(L, -3);
 
   lua_pushstring(L,"precursor_decay_constants");
   lua_newtable(L);
@@ -77,7 +81,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
     unsigned int j = 0;
     for (const auto& precursor : precursors)
     {
-      lua_pushinteger(L, j++);
+      lua_pushinteger(L, ++j);
       lua_pushnumber(L, precursor.decay_constant);
       lua_settable(L, -3);
     }
@@ -90,7 +94,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
     unsigned int j = 0;
     for (const auto& precursor : precursors)
     {
-      lua_pushinteger(L, j++);
+      lua_pushinteger(L, ++j);
       lua_pushnumber(L, precursor.fractional_yield);
       lua_settable(L, -3);
     }
@@ -104,11 +108,10 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
     unsigned int ell = 0;
     for (const auto& matrix : transfer_matrices)
     {
-      ++ell;
-      lua_pushinteger(L, ell);
+      lua_pushinteger(L, ++ell);
       lua_newtable(L);
       {
-        for (unsigned int g=0; g < matrix.NumRows(); ++g)
+        for (unsigned int g = 0; g < matrix.NumRows(); ++g)
         {
           const auto& col_indices = matrix.rowI_indices[g];
           const auto& col_values  = matrix.rowI_values[g];
@@ -136,16 +139,16 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushstring(L, "production_matrix");
   lua_newtable(L);
   {
-    for (unsigned int g = 0; g < num_groups; ++g)
+    unsigned int g = 0;
+    for (const auto& prod : production_matrix)
     {
-      const auto& prod = production_matrix[g];
-
-      lua_pushinteger(L, g + 1);
+      lua_pushinteger(L, ++g);
       lua_newtable(L);
       {
-        for (unsigned int gp = 0; gp < num_groups; ++gp)
+        unsigned int gp = 0;
+        for (const auto& val : prod)
         {
-          lua_pushinteger(L, gp + 1);
+          lua_pushinteger(L, ++gp);
           lua_pushnumber(L, prod[gp]);
           lua_settable(L, -3);
         }
