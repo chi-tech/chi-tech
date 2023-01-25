@@ -6,6 +6,7 @@
 /**Pushes all of the relevant items of the transport xs to a lua table.*/
 void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
 {
+  //================================================== General data
   lua_newtable(L);
   lua_pushstring(L, "is_empty");
   lua_pushboolean(L, false);
@@ -27,6 +28,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   lua_pushboolean(L, is_fissionable);
   lua_settable(L, -3);
 
+  //================================================== 1D cross sections
   auto Push1DXS =
       [L](const std::vector<double>& xs,
           const std::string& name)
@@ -53,19 +55,29 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   Push1DXS(nu_delayed_sigma_f, "nu_delayed_sigma_f");
   Push1DXS(inv_velocity, "inv_velocity");
 
+  //================================================== Emission spectra
+  std::vector<std::vector<double>> chi_delayed;
+  for (unsigned int g = 0; g < num_groups; ++g)
+  {
+    std::vector<double> vals;
+    for (const auto& precursor : precursors)
+      vals.push_back(precursor.emission_spectrum[g]);
+    chi_delayed.push_back(vals);
+  }
+
   lua_pushstring(L, "chi_delayed");
   lua_newtable(L);
   {
-    unsigned int j = 0;
-    for (const auto& precursor: precursors)
+    unsigned int g = 0;
+    for (const auto& emission_g: chi_delayed)
     {
-      lua_pushinteger(L, ++j);
+      lua_pushinteger(L, ++g);
       lua_newtable(L);
       {
-        unsigned int g = 0;
-        for (const auto& val: precursor.emission_spectrum)
+        unsigned int j = 0;
+        for (const auto& val: emission_g)
         {
-          lua_pushinteger(L, ++g);
+          lua_pushinteger(L, ++j);
           lua_pushnumber(L, val);
           lua_settable(L, -3);
         }
@@ -75,6 +87,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   }
   lua_settable(L, -3);
 
+  //================================================== Precursor data
   lua_pushstring(L,"precursor_decay_constants");
   lua_newtable(L);
   {
@@ -101,7 +114,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   }
   lua_settable(L, -3);
 
-  //============================================= Transfer matrices
+  //================================================== Transfer matrices
   lua_pushstring(L, "transfer_matrix");
   lua_newtable(L);
   {
@@ -128,14 +141,14 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
             }
             lua_settable(L, -3);
           }
-        }//for g
+        }
       }
       lua_settable(L, -3);
     }
   }
   lua_settable(L, -3);
 
-
+  //================================================== Production matrix
   lua_pushstring(L, "production_matrix");
   lua_newtable(L);
   {
@@ -158,7 +171,7 @@ void chi_physics::TransportCrossSections::PushLuaTable(lua_State *L)
   }
   lua_settable(L, -3);
 
-  //============================================= Diffusion quantities
+  //================================================== Push diffusion quantities
   Push1DXS(diffusion_coeff, "diffusion_coeff");
   Push1DXS(sigma_removal, "sigma_removal");
   Push1DXS(sigma_s_gtog, "sigma_s_gtog");
