@@ -54,6 +54,7 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
     LUA_CMACRO1(RCC          , 4);
     LUA_CMACRO1(SURFACE      , 9);
     LUA_CMACRO1(BOOLEAN      , 10);
+  LUA_FMACRO1(chiLogicalVolumePointSense);
 
   //=================================== Mesh handler
   LUA_FMACRO1(chiMeshHandlerCreate);
@@ -92,6 +93,8 @@ void chi_mesh::lua_utils::RegisterLuaEntities(lua_State *L)
     LUA_CMACRO1(EXTRUSION_LAYER    , 10);
     LUA_CMACRO1(MATID_FROMLOGICAL  , 11);
     LUA_CMACRO1(BNDRYID_FROMLOGICAL, 12);
+    LUA_CMACRO1(MATID_FROM_LUA_FUNCTION  , 13);
+    LUA_CMACRO1(BNDRYID_FROM_LUA_FUNCTION, 14);
 
   LUA_FMACRO1(chiVolumeMesherSetKBAPartitioningPxPyPz);
   LUA_FMACRO1(chiVolumeMesherSetKBACutsX);

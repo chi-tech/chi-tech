@@ -8,9 +8,7 @@
 #include <iostream>
 
 #include "chi_runtime.h"
-
 #include "chi_log.h"
-;
 
 
 //#############################################################################
@@ -55,7 +53,8 @@ int chiVolumeMesherCreate(lua_State *L)
   LuaCheckNilValue(fname, L, 1);
 
   //============================================= Mesher type
-  const int mesher_type = lua_tonumber(L, 1);
+  const auto mesher_type =
+    static_cast<chi_mesh::VolumeMesherType>(lua_tointeger(L, 1));
 
   std::shared_ptr<chi_mesh::VolumeMesher> new_mesher = nullptr;
 

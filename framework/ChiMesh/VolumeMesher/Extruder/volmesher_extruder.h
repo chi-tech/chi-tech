@@ -36,11 +36,13 @@ public:
 public:
   explicit
   VolumeMesherExtruder(std::shared_ptr<chi_mesh::SurfaceMesh> in_surface_mesh) :
+    VolumeMesher(VolumeMesherType::EXTRUDER),
     template_type(TemplateType::SURFACE_MESH),
     template_surface_mesh(std::move(in_surface_mesh))
   {}
   explicit
   VolumeMesherExtruder(std::shared_ptr<chi_mesh::UnpartitionedMesh> in_unpartitioned_mesh) :
+    VolumeMesher(VolumeMesherType::EXTRUDER),
     template_type(TemplateType::UNPARTITIONED_MESH),
     template_unpartitioned_mesh(std::move(in_unpartitioned_mesh))
   {}
