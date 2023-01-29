@@ -87,7 +87,7 @@ public:
   void ExportCellsToObj(const char* fileName,
                            bool per_material=false,
                            int options = 0) const;
-  void ExportCellsToVTK(const char* baseName) const;
+  void ExportCellsToVTK(const std::string& baseName) const;
 
   void BuildFaceHistogramInfo(double master_tolerance=100.0, double slave_tolerance=1.1);
   size_t NumberOfFaceHistogramBins();

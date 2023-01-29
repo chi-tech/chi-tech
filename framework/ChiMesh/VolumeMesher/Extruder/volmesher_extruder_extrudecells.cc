@@ -54,6 +54,8 @@ void chi_mesh::VolumeMesherExtruder::
 
         cell->material_id = template_cell.material_id;
 
+        cell->material_id = template_cell.material_id;
+
         grid.cells.push_back(std::move(cell));
       }
       ++num_global_cells;

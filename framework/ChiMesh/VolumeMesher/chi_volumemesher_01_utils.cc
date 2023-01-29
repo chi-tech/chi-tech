@@ -2,6 +2,11 @@
 #include "ChiMesh/MeshContinuum/chi_meshcontinuum.h"
 
 //###################################################################
+chi_mesh::VolumeMesher::VolumeMesher(VolumeMesherType type) :
+ m_type(type)
+{}
+
+//###################################################################
 /** Sets the grid member of the volume mesher.*/
 void chi_mesh::VolumeMesher::SetContinuum(MeshContinuumPtr &grid)
 {
@@ -24,3 +29,12 @@ void chi_mesh::VolumeMesher::
 {
   m_grid->SetAttributes(new_attribs, ortho_Nis);
 }
+
+
+//###################################################################
+/**Gets the volume mesher's type.*/
+chi_mesh::VolumeMesherType chi_mesh::VolumeMesher::Type() const
+{
+  return m_type;
+}
+

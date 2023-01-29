@@ -16,6 +16,7 @@ public:
   explicit
   VolumeMesherPredefinedUnpartitioned(
     std::shared_ptr<chi_mesh::UnpartitionedMesh> in_umesh) :
+    VolumeMesher(VolumeMesherType::UNPARTITIONED),
     m_umesh(std::move(in_umesh)) {}
 
   void Execute() override;

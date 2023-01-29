@@ -37,7 +37,7 @@ int chiMeshHandlerExportMeshToObj(lua_State* L)
 
 
 //###################################################################
-/**Exports the mesh to a wavefront.obj format.
+/**Exports the mesh to vtu format.
 \param FileName char Name of the file to be used.
 \ingroup LuaMeshHandler
 */
