@@ -17,13 +17,26 @@ class TransientSolver : public KEigenvalueSolver
 {
 public:
   chi_math::SteppingMethod method = chi_math::SteppingMethod::CRANK_NICHOLSON;
+
+  /// Options for initial condition normalization
+  enum class NormalizationMethod
+  {
+    TOTAL_POWER = 0,    ///< Total reactor power
+    POWER_DENSITY = 1,  ///< Power density
+    NONE = 2            ///< No normalization
+  };
+
   struct Options
   {
     int verbosity_level = 1;
+
     bool inhibit_advance = false;
     double t_final = 0.1;
     int max_time_steps = 10;
     std::string console_call_back_function;
+
+    bool scale_fission_xs = false;
+    NormalizationMethod normalization_method = NormalizationMethod::TOTAL_POWER;
   }transient_options;
 
   /**Temporal domain and discretization information.*/

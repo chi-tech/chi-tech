@@ -98,7 +98,7 @@ void chi_physics::TransportCrossSections::
     {
       Print1DXS(ofile, "NU_PROMPT", nu_prompt, 1.0e-20);
       Print1DXS(ofile, "NU_DELAYED", nu_delayed, 1.0e-20);
-      Print1DXS(ofile, "CHI_PROMPT", chi_prompt, 1.0e-20);
+//      Print1DXS(ofile, "CHI_PROMPT", chi_prompt, 1.0e-20);
 
       ofile << "\nCHI_DELAYED_BEGIN\n";
       for (unsigned int j = 0; j < num_precursors; ++j)
@@ -119,7 +119,7 @@ void chi_physics::TransportCrossSections::
     else
     {
       Print1DXS(ofile, "NU", nu, 1.0e-20);
-      Print1DXS(ofile, "CHI", chi, 1.0e-20);
+//      Print1DXS(ofile, "CHI", chi, 1.0e-20);
     }
   }
 
@@ -145,19 +145,32 @@ void chi_physics::TransportCrossSections::
         const auto& col_values  = matrix.rowI_values[g];
 
         for (size_t k=0; k<col_indices.size(); ++k)
-        {
-          size_t gprime = col_indices[k];
-          ofile << "M_GPRIME_G_VAL " << ell << " "
-                                     << gprime << " "
-                                     << g << " "
-                                     << col_values[k] << "\n";
-        }
+          ofile << "M_GPRIME_G_VAL "
+                << ell << " "
+                << col_indices[k] << " "
+                << g << " "
+                << col_values[k] << "\n";
       }//for g
 
       ofile << "\n";
     }//for ell
     ofile << "TRANSFER_MOMENTS_END\n";
   }//if has transfer matrices
+
+  if (!production_matrix.empty())
+  {
+    ofile << "\n";
+    ofile << "PRODUCTION_MATRIX_BEGIN\n";
+    for (unsigned int g = 0; g < num_groups; ++g)
+    {
+      const auto& prod = production_matrix[g];
+      for (unsigned int gp = 0; gp < num_groups; ++gp)
+        ofile << "G_GPRIME_VAL "
+              << g << " "
+              << gp << " "
+              << prod[gp] << "\n";
+    }
+  }
 
   ofile.close();
 

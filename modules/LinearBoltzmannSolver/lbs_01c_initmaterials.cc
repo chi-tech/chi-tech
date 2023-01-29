@@ -138,6 +138,7 @@ void lbs::SteadySolver::InitMaterials()
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize precursor
   //                                                   properties
+
   num_precursors = 0;
   max_precursors_per_material = 0;
   for (const auto& mat_id_xs : matid_to_xs_map)
@@ -147,8 +148,26 @@ void lbs::SteadySolver::InitMaterials()
     if (xs->num_precursors > max_precursors_per_material)
       max_precursors_per_material = xs->num_precursors;
   }
+
+  //if no precursors, turn off precursors
   if (num_precursors == 0)
     options.use_precursors = false;
+
+  //check compatibility when precursors are on
+  if (options.use_precursors)
+  {
+    for (const auto& mat_id_xs: matid_to_xs_map)
+    {
+      const auto& xs = mat_id_xs.second;
+      if (xs->is_fissionable && num_precursors == 0)
+        throw std::logic_error(
+            "Incompatible cross section data encountered."
+            "When delayed neutron data is present for one "
+            "fissionable material, it must be present for "
+            "all fissionable materials.");
+    }
+  }
+
 
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Initialize Diffusion
   //                                                   properties

@@ -32,16 +32,16 @@ Reset()
   sigma_f.clear();
   sigma_a.clear();
 
-  chi.clear();
-  chi_prompt.clear();
-
   nu_sigma_f.clear();
   nu_prompt_sigma_f.clear();
   nu_delayed_sigma_f.clear();
 
-  precursors.clear();
-
   inv_velocity.clear();
+
+  transfer_matrices.clear();
+  production_matrix.clear();
+
+  precursors.clear();
 
   //Diffusion quantities
   diffusion_initialized = false;
@@ -186,8 +186,9 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       if (xs->is_fissionable && xs->num_precursors == 0)
         throw std::logic_error(
             "Incompatible cross sections encountered.\n"
-            "If any fissionable cross sections specify prompt/delayed "
-            "fission data, all must specify prompt/delayed data.");
+            "If any fissionable cross sections specify delayed neutron "
+            "data, all fissionable cross sections must specify delayed "
+            "neutron data.");
 
   //============================================================
   // Initialize the data
@@ -209,31 +210,24 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
   if (std::any_of(xsecs.begin(), xsecs.end(),
                   [](const XSPtr& x)
                   { return !x->transfer_matrices.empty(); }))
-  {
-    transfer_matrices.clear();
-    for (unsigned int m = 0; m < scattering_order + 1; ++m)
-      transfer_matrices.emplace_back(n_grps, n_grps);
-  }
+    transfer_matrices.assign(scattering_order + 1,
+                             TransferMatrix(num_groups, num_groups));
 
   //init fission data
   if (is_fissionable)
   {
     sigma_f.assign(n_grps, 0.0);
     nu_sigma_f.assign(n_grps, 0.0);
+    production_matrix.assign(
+        num_groups, std::vector<double>(num_groups, 0.0));
 
     //init prompt/delayed fission data
     if (n_precs > 0)
     {
       nu_prompt_sigma_f.assign(n_grps, 0.0);
       nu_delayed_sigma_f.assign(n_grps, 0.0);
-
-      chi_prompt.assign(n_grps, 0.0);
       precursors.resize(n_precs);
     }
-
-    //init steady-state fission data
-    else
-      chi.assign(n_grps, 0.0);
   }
 
   //============================================================
@@ -266,15 +260,15 @@ MakeCombined(std::vector<std::pair<int, double> > &combinations)
       {
         sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
         nu_sigma_f[g] += xsecs[x]->sigma_f[g] * N_i;
+        for (unsigned int gp = 0; gp < num_groups; ++gp)
+          production_matrix[g][gp] +=
+              xsecs[x]->production_matrix[g][gp] * N_i;
 
         if (n_precs > 0)
         {
           nu_prompt_sigma_f[g] += xsecs[g]->nu_prompt_sigma_f[g] * N_i;
           nu_delayed_sigma_f[g] += xsecs[g]->nu_delayed_sigma_f[g] * N_i;
-          chi_prompt[g] += xsecs[x]->chi_prompt[g] * ff_i;
         }
-        else
-          chi[g] += xsecs[x]->chi[g] * ff_i;
       }
     }//for g
 
@@ -396,4 +390,31 @@ ComputeAbsorption()
             << "transfer matrices";
     }//for g
   }//if scattering present
+}
+
+
+//######################################################################
+/**Scale the fission data by a constant.*/
+void chi_physics::TransportCrossSections::
+ScaleFissionData(const double k)
+{
+  if (is_fission_scaled)
+  {
+    chi::log.Log0Warning()
+        << "An attempt was made to scale fission data after "
+           "it had already been scaled... Nothing will be done.";
+    return;
+  }
+  
+  for (unsigned int g = 0; g < num_groups; ++g)
+  {
+    nu_sigma_f[g] /= k;
+    nu_prompt_sigma_f[g] /= k;
+    nu_delayed_sigma_f[g] /= k;
+
+    auto& prod = production_matrix[g];
+    for (auto& val : prod)
+      val /= k;
+  }
+  is_fission_scaled = true;
 }
