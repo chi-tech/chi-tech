@@ -1,7 +1,5 @@
 #include "../lbs_linear_boltzmann_solver.h"
 
-#include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
-
 using namespace lbs;
 
 //###################################################################
@@ -21,6 +19,7 @@ double SteadySolver::ComputeFissionProduction(const std::vector<double>& phi)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
+    if (not xs.is_fissionable) continue;
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -30,18 +29,30 @@ double SteadySolver::ComputeFissionProduction(const std::vector<double>& phi)
       const double IntV_ShapeI = cell_matrices.Vi_vectors[i];
 
       //=============================== Loop over groups
-      //TODO: This should be nu
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.nu_prompt_sigma_f[g] *
-                            phi[uk_map + g] *
-                            IntV_ShapeI;
+      {
+        const auto& prod = xs.production_matrix[g];
+        for (size_t gp = 0; gp <= last_grp; ++gp)
+          local_production += prod[gp] *
+                              phi[uk_map + gp] *
+                              IntV_ShapeI;
+
+        if (options.use_precursors)
+          for (unsigned int j = 0; j < xs.num_precursors; ++j)
+            local_production += xs.nu_delayed_sigma_f[g] *
+                                phi[uk_map + g] *
+                                IntV_ShapeI;
+      }
     }//for node
   }//for cell
 
   //============================================= Allreduce global production
   double global_production = 0.0;
-  MPI_Allreduce(&local_production, &global_production, 1,
-                MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&local_production,  //sendbuf
+                &global_production, //recvbuf
+                1, MPI_DOUBLE,      //count+datatype
+                MPI_SUM,            //operation
+                MPI_COMM_WORLD);    //communicator
 
   return global_production;
 }
@@ -64,7 +75,7 @@ double SteadySolver::ComputeFissionRate(const bool previous)
   const auto& phi = phi_old_local;
 
   //============================================= Loop over local cells
-  double local_production = 0.0;
+  double local_fission_rate = 0.0;
   for (auto& cell : grid->local_cells)
   {
     const auto& transport_view = cell_transport_views[cell.local_id];
@@ -72,6 +83,7 @@ double SteadySolver::ComputeFissionRate(const bool previous)
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
+    if (not xs.is_fissionable) continue;
 
     //====================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
@@ -82,16 +94,19 @@ double SteadySolver::ComputeFissionRate(const bool previous)
 
       //=============================== Loop over groups
       for (size_t g = first_grp; g <= last_grp; ++g)
-        local_production += xs.sigma_f[g] *
-                            phi[uk_map + g] *
-                            IntV_ShapeI;
+        local_fission_rate += xs.sigma_f[g] *
+                              phi[uk_map + g] *
+                              IntV_ShapeI;
     }//for node
   }//for cell
 
   //============================================= Allreduce global production
-  double global_production = 0.0;
-  MPI_Allreduce(&local_production, &global_production, 1,
-                MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+  double global_fission_rate = 0.0;
+  MPI_Allreduce(&local_fission_rate,  //sendbuf
+                &global_fission_rate, //recvbuf
+                1, MPI_DOUBLE,        //count+datatype
+                MPI_SUM,              //operation
+                MPI_COMM_WORLD);      //communicator
 
-  return global_production;
+  return global_fission_rate;
 }

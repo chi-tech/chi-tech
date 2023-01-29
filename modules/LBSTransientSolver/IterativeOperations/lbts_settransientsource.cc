@@ -70,136 +70,104 @@ void lbs::TransientSolver::
     if (P0_src and apply_fixed_src)
       src = P0_src->source_value_g.data();
 
-    //=========================================== Loop over nodes
+    //======================================== Loop over nodes
     const int num_nodes = transport_view.NumNodes();
     for (int i = 0; i < num_nodes; ++i)
     {
-      //==================================== Loop over moments
+      //======================================== Loop over moments
       for (int m = 0; m < static_cast<int>(num_moments); ++m)
       {
         unsigned int ell = m_to_ell_em_map[m].ell;
 
         size_t uk_map = transport_view.MapDOF(i, m, 0); //unknown map
 
-        //============================= Loop over groupset groups
+        //=================================== Loop over groupset groups
         for (size_t g = gs_i; g <= gs_f; ++g)
         {
-          if (not options.use_src_moments) //using regular material src
-          {
-            if (apply_fixed_src and ell == 0)
-              destination_q[uk_map + g] += src[g];
-          }
-          else if (apply_fixed_src)  //using ext_src_moments
-            destination_q[uk_map + g] += ext_src_moments_local[uk_map + g];
+          double rhs = 0.0;
 
-          double inscatter_g = 0.0;
+          //============================== Apply fixed sources
+          if (not options.use_src_moments) //using regular material src
+            rhs += (apply_fixed_src and ell == 0)? src[g] : 0.0;
+          else if (apply_fixed_src)  //using ext_src_moments
+           rhs += ext_src_moments_local[uk_map + g];
+
+          //============================== Apply scattering sources
           const bool moment_avail = (ell < S.size());
 
-          //====================== Apply across-groupset scattering
+          //==================== Across groupset
           if (moment_avail and apply_ags_scatter_src)
-            for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
-              if ((gprime < gs_i) or (gprime > gs_f))
-                inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
+            for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
+              if (gp < gs_i or gp > gs_f)
+                rhs += sigma_sm * phi_old_local[uk_map + gp];
 
-          //====================== Apply within-groupset scattering
+          //==================== Within groupset
           if (moment_avail and apply_wgs_scatter_src)
-            for (const auto& [row_g, gprime, sigma_sm] : S[ell].Row(g))
-              if ((gprime >= gs_i) and (gprime <= gs_f))
-                inscatter_g += sigma_sm * phi_old_local[uk_map + gprime];
+            for (const auto& [_, gp, sigma_sm] : S[ell].Row(g))
+              if (gp >= gs_i and gp <= gs_f)
+                rhs += sigma_sm * phi_old_local[uk_map + gp];
 
-          destination_q[uk_map + g] += inscatter_g;
+          //============================== Apply fission sources
+          const bool fission_avail = xs.is_fissionable and ell == 0;
 
-          double infission_g = 0.0;
-          const bool fission_avail = (xs.is_fissionable and ell == 0);
-
-          //====================== Apply accross-groupset fission
+          //==================== Across groupset
           if (fission_avail and apply_ags_fission_src)
           {
-            const double spec = options.use_precursors?
-                xs.chi_prompt[g] : xs.chi[g];
-
-            //=============== Loop over groups
-            for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
-              if ((gprime < gs_i) or (gprime > gs_f))
+            const auto& prod = xs.production_matrix[g];
+            for (size_t gp = first_grp; gp <= last_grp; ++gp)
+              if (gp < gs_i or gp > gs_f)
               {
-                const double nu_sigma_f = (options.use_precursors)?
-                  xs.nu_prompt_sigma_f[gprime] : xs.nu_sigma_f[gprime];
+                rhs += prod[gp] * phi_old_local[uk_map + gp];
 
-                  infission_g += spec * nu_sigma_f *
-                                 phi_old_local[uk_map + gprime];
-              }//if gprime outside current groupset
+                if (options.use_precursors)
+                  for (const auto& precursor : xs.precursors)
+                  {
+                    const double coeff =
+                        precursor.emission_spectrum[g] *
+                        precursor.decay_constant /
+                        (1.0 + eff_dt * precursor.decay_constant);
 
-            //=================================== Delayed fission
-            if (options.use_precursors)
-            {
-              for (const auto& precursor : xs.precursors)
-              {
-                double coeff =
-                    precursor.emission_spectrum[g] *
-                    precursor.decay_constant /
-                    (1.0 + eff_dt * precursor.decay_constant);
+                    rhs += coeff * eff_dt *
+                           precursor.fractional_yield *
+                           xs.nu_delayed_sigma_f[gp] *
+                           phi_old_local[uk_map + gp] /
+                           cell_volume;
+                  }
+              }
+          }
 
-                for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
-                {
-                  if ((gprime < gs_i) or (gprime > gs_f))
-                    infission_g += coeff * eff_dt *
-                                   precursor.fractional_yield *
-                                   xs.nu_delayed_sigma_f[gprime] *
-                                   phi_old_local[uk_map + gprime] /
-                                   cell_volume;
-                }//for gprime
-              }//for precursors
-            }//if use precursors
-          }//if fission_avail and apply_ags_fission_src
-
-          //====================== Apply within-groupset fission
+          //==================== Within groupset
           if (fission_avail and apply_wgs_fission_src)
           {
-            const double spec = options.use_precursors?
-                xs.chi_prompt[g] : xs.chi[g];
-
-            //=============== Loop over groups apply promp fission
-            for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
-              if ((gprime >= gs_i) and (gprime <= gs_f))
-              {
-                const double nu_sigma_f = (options.use_precursors)?
-                  xs.nu_prompt_sigma_f[gprime] : xs.nu_sigma_f[gprime];
-
-                infission_g += spec * nu_sigma_f *
-                               phi_old_local[uk_map + gprime];
-              }//if gprime inside current groupset
-
-            //=================================== Apply Delayed fission
-            if (options.use_precursors)
+            const auto& prod = xs.production_matrix[g];
+            for (size_t gp = gs_i; gp <= gs_f; ++gp)
             {
-              for (const auto& precursor : xs.precursors)
-              {
-                const double coeff =
-                    precursor.emission_spectrum[g] *
-                    precursor.decay_constant /
-                    (1.0 + eff_dt * precursor.decay_constant);
+              rhs += prod[gp] * phi_old_local[uk_map + gp];
 
-                //==================== Delayed fission rate contributions
-                for (size_t gprime = first_grp; gprime <= last_grp; ++gprime)
+              if (options.use_precursors)
+                for (const auto& precursor : xs.precursors)
                 {
-                  if ((gprime >= gs_i) and (gprime <= gs_f))
-                    infission_g += coeff * eff_dt *
-                                   precursor.fractional_yield *
-                                   xs.nu_delayed_sigma_f[gprime] *
-                                   phi_old_local[uk_map + gprime] /
-                                   cell_volume;
-                }//for gprime
-              }//for precursors
-            }//if use precursors
-          }//if fission_avail and apply_wgs_fission_src
+                  const double coeff =
+                      precursor.emission_spectrum[g] *
+                      precursor.decay_constant /
+                      (1.0 + eff_dt * precursor.decay_constant);
 
-          //====================== Apply precursors
+                  rhs += coeff * eff_dt *
+                         precursor.fractional_yield *
+                         xs.nu_delayed_sigma_f[gp] *
+                         phi_old_local[uk_map + gp] /
+                         cell_volume;
+                }
+            }
+          }
+
+          //============================== Apply previous precursors
           if (fission_avail and apply_fixed_src and options.use_precursors)
           {
             const auto& J = max_precursors_per_material;
+            const size_t dof_map = cell.local_id * J;
             for (unsigned int j = 0; j < xs.num_precursors; ++j)
             {
-              const size_t dof_map = cell.local_id * J + j;
               const auto& precursor = xs.precursors[j];
 
               const double coeff =
@@ -207,11 +175,12 @@ void lbs::TransientSolver::
                   precursor.decay_constant /
                   (1.0 + eff_dt * precursor.decay_constant);
 
-              infission_g += coeff * precursor_prev_local[dof_map];
-            }//for precursors
-          }//if fission_avail and apply_wgs_fission_src
+              rhs += coeff * precursor_prev_local[dof_map + j];
+            }
+          }
 
-          destination_q[uk_map + g] += infission_g;
+          //============================== Add to destination vector
+          destination_q[uk_map + g] += rhs;
 
         }//for g
       }//for m
@@ -219,8 +188,7 @@ void lbs::TransientSolver::
   }//for cell
 
   //================================================== Apply point sources
-  if ((not options.use_src_moments) and apply_fixed_src)
-  {
+  if (not options.use_src_moments and apply_fixed_src)
     for (const auto& point_source : point_sources)
     {
       const auto& info_list = point_source.ContainingCellsInfo();
@@ -241,7 +209,6 @@ void lbs::TransientSolver::
         }//for node i
       }//for cell
     }//for point source
-  }//if apply mat src
 
   chi::log.LogEvent(source_event_tag, chi_objects::ChiLog::EventType::EVENT_END);
 }

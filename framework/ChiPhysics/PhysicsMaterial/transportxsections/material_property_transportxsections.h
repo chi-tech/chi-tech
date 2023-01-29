@@ -21,7 +21,7 @@ protected:
   using EmissionSpectra = std::vector<std::vector<double>>;
 
 public:
-  /**A struct containing data for a delayed neutron precursor.*/
+  /// A struct containing data for a delayed neutron precursor.
   struct Precursor
   {
     double decay_constant = 0.0;
@@ -30,11 +30,12 @@ public:
   };
 
 public:
-  unsigned int num_groups = 0;       ///< Total number of Groups
+  unsigned int num_groups = 0;       ///< Total number of groups
   unsigned int scattering_order = 0; ///< Legendre scattering order
   unsigned int num_precursors = 0;   ///< Number of precursors
 
   bool is_fissionable = false;
+  bool is_fission_scaled = false;
 
   /// Energy bin boundaries in MeV
   std::vector<std::vector<double>> e_bounds;
@@ -43,9 +44,6 @@ public:
   std::vector<double> sigma_a;  ///< Absorption cross section
   std::vector<double> sigma_f;  ///< Fission cross section
 
-  std::vector<double> chi;         ///< Fission spectrum
-  std::vector<double> chi_prompt;  ///< Prompt fission spectrum
-
   std::vector<double> nu_sigma_f;
   std::vector<double> nu_prompt_sigma_f;
   std::vector<double> nu_delayed_sigma_f;
@@ -53,6 +51,7 @@ public:
   std::vector<double> inv_velocity;
 
   std::vector<TransferMatrix> transfer_matrices;
+  std::vector<std::vector<double>> production_matrix;
 
   std::vector<Precursor> precursors;
 
@@ -75,14 +74,19 @@ public:
   //00
   TransportCrossSections();
 
-  public:
+private:
+  void Reset();
+
+public:
   void MakeSimple0(int n_grps, double sigma);
   void MakeSimple1(int n_grps, double sigma, double c);
   void MakeCombined(std::vector<std::pair<int,double>>& combinations);
 
 private:
-  void Reset();
   void ComputeAbsorption();
+
+public:
+  void ScaleFissionData(double k);
 
 public:
   //01
