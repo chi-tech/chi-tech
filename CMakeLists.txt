@@ -91,6 +91,7 @@ include_directories("${CHI_TECH_DIR}/framework/ChiLog")
 include_directories("${CHI_TECH_DIR}/framework/ChiMiscUtils")
 include_directories("${CHI_TECH_DIR}/resources")
 include_directories("${CHI_TECH_DIR}/modules")
+include_directories("${CHI_TECH_DIR}/modules/LinearBoltzmannSolvers")
 
 #================================================ Library directories
 link_directories("${LUA_ROOT}/lib")

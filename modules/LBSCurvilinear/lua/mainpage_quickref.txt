@@ -1,3 +1,0 @@
-module: Curvilinear Linear Boltzmann Solver
-function: chiLBSCurvilinearCreateSolver
-module_end

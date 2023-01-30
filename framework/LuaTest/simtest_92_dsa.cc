@@ -5,9 +5,9 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
-#include "LinearBoltzmannSolver/Acceleration/acceleration.h"
-#include "LinearBoltzmannSolver/Acceleration/diffusion_mip.h"
-#include "LinearBoltzmannSolver/lbs_structs.h"
+#include "LBSSteadyState/Acceleration/acceleration.h"
+#include "LBSSteadyState/Acceleration/diffusion_mip.h"
+#include "LBSSteadyState/lbs_structs.h"
 
 #include "ChiPhysics/FieldFunction/fieldfunction.h"
 
