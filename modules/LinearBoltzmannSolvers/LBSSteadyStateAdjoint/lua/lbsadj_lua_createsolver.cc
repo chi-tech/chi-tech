@@ -4,7 +4,7 @@
 
 #include "chi_runtime.h"
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
 
 //###################################################################

@@ -2,7 +2,7 @@
 
 #include "lbsadj_lua_utils.h"
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
 
 /**Reads flux-moments file to a buffer and returns a handle to that buffer.

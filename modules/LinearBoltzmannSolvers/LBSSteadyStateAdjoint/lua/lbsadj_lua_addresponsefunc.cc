@@ -5,7 +5,7 @@
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
 
 int chiAdjointSolverAddResponseFunction(lua_State* L)

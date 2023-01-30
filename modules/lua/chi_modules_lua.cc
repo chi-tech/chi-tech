@@ -17,7 +17,7 @@ void chi_modules::lua_utils::RegisterLuaEntities(lua_State *L)
   diffusion_solver::lua_utils::RegisterLuaEntities(L);
   lbs_curvilinear::lua_utils::RegisterLuaEntities(L);
   lbs::k_eigenvalue_lua_utils::RegisterLuaEntities(L);
-  lbs::lua_utils::RegisterLuaEntities(L);
+  lbs::adjoint_lua_utils::RegisterLuaEntities(L);
   cfem_diffusion::cfem_diffusion_lua_utils::RegisterLuaEntities(L);
   dfem_diffusion::dfem_diffusion_lua_utils::RegisterLuaEntities(L);
   lbs::lbts_lua_utils::RegisterLuaEntities(L);

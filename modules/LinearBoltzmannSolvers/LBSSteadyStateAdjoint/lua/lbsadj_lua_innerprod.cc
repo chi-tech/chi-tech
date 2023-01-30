@@ -1,7 +1,7 @@
 #include "LBSSteadyStateAdjoint/lbsadj_solver.h"
 #include "lbsadj_lua_utils.h"
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
 
 int chiAdjointSolverComputeInnerProduct(lua_State* L)

@@ -4,7 +4,7 @@
 #include "ChiMesh/MeshHandler/chi_meshhandler.h"
 #include "ChiMesh/LogicalVolume/chi_mesh_logicalvolume.h"
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
 
 int chiAdjointSolverExportImportanceMapBinary(lua_State* L)

@@ -5,7 +5,7 @@
 
 #include "chi_lua.h"
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
   int chiAdjointSolverCreate(lua_State* L);
   int chiAdjointSolverAddResponseFunction(lua_State* L);

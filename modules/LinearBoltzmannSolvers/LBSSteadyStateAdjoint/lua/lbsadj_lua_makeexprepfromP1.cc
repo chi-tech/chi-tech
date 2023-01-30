@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-namespace lbs::lua_utils
+namespace lbs::adjoint_lua_utils
 {
 int chiAdjointSolverMakeExpRepFromP1Moments(lua_State* L)
 {
