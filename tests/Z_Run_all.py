@@ -492,7 +492,7 @@ run_test(
         ["NumCompare", "WGS groups [0-62] Iteration    28", 6, "float",
          6.7433e-07, 1.0e-9],
         ["NumCompare", "WGS groups [63-167] Iteration    55", 6, "float",
-         5.67431e-07, 1.0e-9]])
+         5.7165e-07, 1.0e-9]])
 
 run_test(
     file_name="Transport_Steady/Transport2D_1Poly",
@@ -590,11 +590,11 @@ run_test(
     num_procs=4,
     search_strings_vals_tols=[
         ["StrCompare", "WGS groups [0-62] Iteration    54", 7, "CONVERGED"],
-        ["StrCompare", "WGS groups [63-167] Iteration    69", 7, "CONVERGED"],
+        ["StrCompare", "WGS groups [63-167] Iteration    66", 7, "CONVERGED"],
         ["NumCompare", "WGS groups [0-62] Iteration    54", 6, "float",
-         7.88852e-07, 1.0e-9],
-        ["NumCompare", "WGS groups [63-167] Iteration    69", 6, "float",
-         9.78723e-07, 1.0e-9]])
+         7.88832e-07, 1.0e-9],
+        ["NumCompare", "WGS groups [63-167] Iteration    66", 6, "float",
+         8.8466e-07, 1.0e-9]])
 
 run_test(
     file_name="Transport_Steady/Transport3D_4Cycles1",

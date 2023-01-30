@@ -77,14 +77,6 @@ void KEigenvalueSolver::PowerIteration()
                           active_set_source_function,
                           options.verbose_inner_iterations);
       }
-      else if (groupset.iterative_method == IterativeMethod::GMRES)
-      {
-        GMRES(groupset, sweep_scheduler,
-              APPLY_WGS_SCATTER_SOURCES,
-              APPLY_AGS_SCATTER_SOURCES,
-              active_set_source_function,
-              options.verbose_inner_iterations);
-      }
       else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
                groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
                groupset.iterative_method == IterativeMethod::KRYLOV_BICGSTAB)

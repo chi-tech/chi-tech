@@ -89,7 +89,7 @@ chiLBSGroupsetAddGroups(phys, gs, 0, num_groups-1)
 chiLBSGroupsetSetQuadrature(phys, gs, pquad)
 chiLBSGroupsetSetMaxIterations(phys, gs, si_max_iterations)
 chiLBSGroupsetSetResidualTolerance(phys, gs, si_tolerance)
-chiLBSGroupsetSetIterativeMethod(phys, gs, NPT_GMRES_CYCLES)
+chiLBSGroupsetSetIterativeMethod(phys, gs, KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetAngleAggregationType(phys, gs, LBSGroupset.ANGLE_AGG_SINGLE)
 
 -- Additional parameters
