@@ -235,12 +235,6 @@ protected:
                          SourceFlags source_flags,
                          const SetSourceFunction& set_source_function,
                          bool log_info = true);
-  bool GMRES(LBSGroupset& groupset,
-             MainSweepScheduler& sweep_scheduler,
-             SourceFlags lhs_src_scope,
-             SourceFlags rhs_src_scope,
-             const SetSourceFunction& set_source_function,
-             bool log_info = true);
   bool Krylov(LBSGroupset& groupset,
               MainSweepScheduler& sweep_scheduler,
               SourceFlags lhs_src_scope,
