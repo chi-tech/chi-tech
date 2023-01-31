@@ -684,12 +684,13 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
     }
     else if (iter_method == sc_int(IterativeMethod::GMRES))
     {
-      groupset->iterative_method = IterativeMethod::GMRES;
+      throw std::invalid_argument(fname + "Deprecated iterative method GMRES, "
+                                          "use KRYLOV_GMRES.");
     }
     else if (iter_method == sc_int(IterativeMethod::GMRES_CYCLES))
     {
-      groupset->allow_cycles = true;
-      groupset->iterative_method = IterativeMethod::GMRES;
+      throw std::invalid_argument(fname + "Deprecated iterative method GMRES_CYCLES, "
+                                          "use KRYLOV_GMRES_CYCLES.");
     }
     else if (iter_method == sc_int(IterativeMethod::KRYLOV_RICHARDSON))
     {

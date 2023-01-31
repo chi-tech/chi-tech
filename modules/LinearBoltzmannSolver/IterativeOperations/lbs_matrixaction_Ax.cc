@@ -1,4 +1,4 @@
-#include "lbs_matrixaction_Ax.h"
+#include "lbs_shell_operations.h"
 #include "LinearBoltzmannSolver/Tools/ksp_data_context.h"
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
@@ -7,7 +7,7 @@
 typedef chi_mesh::sweep_management::SweepScheduler MainSweepScheduler;
 //###################################################################
 /**Computes the action of the transport matrix on a vector.*/
-int lbs::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
+int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
 {
   constexpr bool WITH_DELAYED_PSI = true;
   KSPDataContext* context;
@@ -35,20 +35,20 @@ int lbs::LBSMatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Ax)
   sweep_chunk.ZeroFluxDataStructures();
   sweep_scheduler.Sweep();
 
-  //=================================================== Apply WGDSA
-  if (groupset.apply_wgdsa)
-    solver.ExecuteWGDSA(groupset,solver.phi_old_local,solver.phi_new_local);
-
-  if (groupset.apply_tgdsa)
-    solver.ExecuteTGDSA(groupset,solver.phi_old_local,solver.phi_new_local);
-
+  //=================================================== Copy local into
+  //                                                    operating vector
+  // We copy the STL data to the operating vector
+  // petsc_phi_delta first because its already sized.
+  // pc_output is not necessarily initialized yet.
   solver.SetPETScVecFromSTLvector(groupset,
                                   context->operating_vector,
                                   solver.phi_new_local, WITH_DELAYED_PSI);
 
-
   //============================================= Computing action
-  VecWAXPY(Ax,-1.0,context->operating_vector,krylov_vector);
+  // A  = [I - DLinvMS]
+  // Av = [I - DLinvMS]v
+  //    = v - DLinvMSv
+  VecWAXPY(Av, -1.0, context->operating_vector, krylov_vector);
 
   return 0;
 }

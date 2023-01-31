@@ -1,7 +1,7 @@
 -- 1D LinearBSolver test of a block of graphite with an air cavity. DSA and TG
 -- SDM: PWLD
--- Test: WGS groups [0-62] Iteration    22 Residual 9.6079e-08 CONVERGED
--- and   WGS groups [63-167] Iteration    59 Residual 4.73732e-07 CONVERGED
+-- Test: WGS groups [0-62] Iteration    28 Residual 6.7433e-07 CONVERGED
+-- and   WGS groups [63-167] Iteration    55 Residual 5.7165e-07 CONVERGED
 num_procs = 4
 
 
@@ -97,7 +97,7 @@ chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON_CYCLES)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES_CYCLES)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1000)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
@@ -114,7 +114,7 @@ chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad0)
 chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_CLASSICRICHARDSON_CYCLES)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,NPT_GMRES_CYCLES)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
 chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
 chiLBSGroupsetSetMaxIterations(phys1,cur_gs,1000)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,30)
