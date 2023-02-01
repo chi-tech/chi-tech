@@ -7,16 +7,18 @@ void lbs::SteadyStateSolver::ComputeNumberOfMoments()
   for (size_t gs = 1; gs < groupsets.size(); ++gs)
     if (groupsets[gs].quadrature->GetMomentToHarmonicsIndexMap()
         != groupsets[0].quadrature->GetMomentToHarmonicsIndexMap())
-      throw std::logic_error("LinearBoltzmann::SteadyStateSolver::ComputeNumberOfMoments : "
-                             "Moment-to-Harmonics mapping differs between "
-                             "groupsets, which is not allowed.");
+      throw std::logic_error(
+        "LinearBoltzmann::SteadyStateSolver::ComputeNumberOfMoments : "
+        "Moment-to-Harmonics mapping differs between "
+        "groupsets, which is not allowed.");
 
   num_moments =
     (int)groupsets.front().quadrature->GetMomentToHarmonicsIndexMap().size();
 
   if (num_moments == 0)
-    throw std::logic_error("LinearBoltzmann::SteadyStateSolver::ComputeNumberOfMoments : "
-                           "unable to infer number of moments from angular "
-                           "quadrature.");
+    throw std::logic_error(
+      "LinearBoltzmann::SteadyStateSolver::ComputeNumberOfMoments : "
+      "unable to infer number of moments from angular "
+      "quadrature.");
 }
 
