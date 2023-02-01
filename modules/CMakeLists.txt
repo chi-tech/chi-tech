@@ -1,11 +1,9 @@
+include_directories("LinearBoltzmannSolvers")
+
 add_subdirectory("DiffusionSolver")
-add_subdirectory("LinearBoltzmannSolver")
-add_subdirectory("LBSCurvilinear")
-add_subdirectory("LBKEigenvalueSolver")
-add_subdirectory("LBSAdjointSolver")
+add_subdirectory("LinearBoltzmannSolvers")
 add_subdirectory("CFEMDiffusion")
 add_subdirectory("DFEMDiffusion")
-add_subdirectory("LBSTransientSolver")
 add_subdirectory("MGDiffusion")
 add_subdirectory("FVDiffusion")
 
