@@ -35,7 +35,7 @@ void lbs::SteadyStateSolver::ResetSweepOrderings(LBSGroupset& groupset)
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  if (options.verbose_inner_iterations)
+  if (options_.verbose_inner_iterations)
     chi::log.Log()
       << "SPDS and FLUDS reset complete.            Process memory = "
       << std::setprecision(3)
@@ -51,7 +51,7 @@ void lbs::SteadyStateSolver::ResetSweepOrderings(LBSGroupset& groupset)
   MPI_Allreduce(&local_app_memory,&max_proc_memory,
                 1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
 
-  if (options.verbose_inner_iterations)
+  if (options_.verbose_inner_iterations)
     chi::log.Log()
       << "\n" << std::setprecision(3)
       << "           Total application memory (max): "

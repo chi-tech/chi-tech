@@ -14,10 +14,10 @@ void KEigenvalueSolver::Execute()
   PowerIteration();
 
   //======================================== Initialize the precursors
-  if (options.use_precursors)
+  if (options_.use_precursors)
   {
     ComputePrecursors();
-    for (auto& v : precursor_new_local) v /= k_eff;
+    for (auto& v : precursor_new_local_) v /= k_eff;
   }
 
   UpdateFieldFunctions();

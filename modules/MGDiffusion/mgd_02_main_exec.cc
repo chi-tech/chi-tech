@@ -86,7 +86,7 @@ void mg_diffusion::Solver::Execute()
     }
 
     if (iverbose > 0)
-      std::cout << " --thermal iteration = " << std::setw(5)  << std::right << thermal_iteration
+      chi::log.Log() << " --thermal iteration = " << std::setw(5)  << std::right << thermal_iteration
                 << ", Error=" << std::setw(11) << std::right << std::scientific << std::setprecision(7)
                 << thermal_error_all << std::endl;
 

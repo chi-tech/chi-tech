@@ -13,56 +13,58 @@
 /**Initializes parallel arrays.*/
 void lbs::SteadyStateSolver::InitializeParrays()
 {
-  chi::log.Log() << "Initializing parallel arrays. " << std::endl;
+  chi::log.Log() << "Initializing parallel arrays."
+                 << " G=" << num_groups_
+                 << " M=" << num_moments_ << std::endl;
 
   //================================================== Initialize unknown structure
-  for (size_t m=0; m<num_moments; m++)
+  for (size_t m=0; m < num_moments_; m++)
   {
-    flux_moments_uk_man.AddUnknown(chi_math::UnknownType::VECTOR_N, groups.size());
-    flux_moments_uk_man.unknowns.back().text_name = "m"+std::to_string(m);
+    flux_moments_uk_man_.AddUnknown(chi_math::UnknownType::VECTOR_N, groups_.size());
+    flux_moments_uk_man_.unknowns.back().text_name = "m" + std::to_string(m);
   }
 
   //================================================== Compute local # of dof
   auto per_node = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  local_node_count = discretization->GetNumLocalDOFs(per_node);
-  glob_node_count = discretization->GetNumGlobalDOFs(per_node);
+  local_node_count_ = discretization_->GetNumLocalDOFs(per_node);
+  glob_node_count_ = discretization_->GetNumGlobalDOFs(per_node);
 
   //================================================== Compute num of unknowns
-  size_t num_grps = groups.size();
-  size_t local_unknown_count = local_node_count * num_grps * num_moments;
+  size_t num_grps = groups_.size();
+  size_t local_unknown_count = local_node_count_ * num_grps * num_moments_;
 
   chi::log.LogAllVerbose1() << "LBS Number of phi unknowns: "
                                 << local_unknown_count;
 
   //================================================== Size local vectors
-  q_moments_local.assign(local_unknown_count,0.0);
-  phi_old_local.assign(local_unknown_count,0.0);
-  phi_new_local.assign(local_unknown_count,0.0);
+  q_moments_local_.assign(local_unknown_count, 0.0);
+  phi_old_local_.assign(local_unknown_count, 0.0);
+  phi_new_local_.assign(local_unknown_count, 0.0);
 
   //============================================= Setup groupset psi vectors
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
-    psi_new_local.emplace_back();
-    if (options.save_angular_flux)
+    psi_new_local_.emplace_back();
+    if (options_.save_angular_flux)
     {
       size_t num_ang_unknowns =
-          discretization->GetNumLocalDOFs(groupset.psi_uk_man);
-      psi_new_local.back().assign(num_ang_unknowns, 0.0);
+          discretization_->GetNumLocalDOFs(groupset.psi_uk_man);
+      psi_new_local_.back().assign(num_ang_unknowns, 0.0);
     }
   }
 
   //============================================= Setup precursor vector
-  if (options.use_precursors)
+  if (options_.use_precursors)
   {
     size_t num_precursor_dofs =
-        grid->local_cells.size() * max_precursors_per_material;
-    precursor_new_local.assign(num_precursor_dofs, 0.0);
+      grid_ptr_->local_cells.size() * max_precursors_per_material_;
+    precursor_new_local_.assign(num_precursor_dofs, 0.0);
   }
 
   //================================================== Read Restart data
-  if (options.read_restart_data)
-    ReadRestartData(options.read_restart_folder_name,
-                    options.read_restart_file_base);
+  if (options_.read_restart_data)
+    ReadRestartData(options_.read_restart_folder_name,
+                    options_.read_restart_file_base);
   MPI_Barrier(MPI_COMM_WORLD);
 
   //================================================== Initialize transport views
@@ -73,7 +75,7 @@ void lbs::SteadyStateSolver::InitializeParrays()
   //
   // Also, for a given cell, within a given sweep chunk,
   // we need to solve a matrix which square size is the
-  // amount of nodes on the cell. max_cell_dof_count is
+  // amount of nodes on the cell. max_cell_dof_count_ is
   // initialized here.
   //
   size_t block_MG_counter = 0;       //Counts the strides of moment and group
@@ -83,13 +85,13 @@ void lbs::SteadyStateSolver::InitializeParrays()
   const chi_mesh::Vector3 khat(0.0, 0.0, 1.0);
 
   auto pwl =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
 
-  cell_transport_views.clear();
-  cell_transport_views.reserve(grid->local_cells.size());
-  for (auto& cell : grid->local_cells)
+  cell_transport_views_.clear();
+  cell_transport_views_.reserve(grid_ptr_->local_cells.size());
+  for (auto& cell : grid_ptr_->local_cells)
   {
-    size_t num_nodes  = discretization->GetCellNumNodes(cell);
+    size_t num_nodes  = discretization_->GetCellNumNodes(cell);
     int    mat_id     = cell.material_id;
 
     //compute cell volumes
@@ -122,30 +124,30 @@ void lbs::SteadyStateSolver::InitializeParrays()
         cell_on_boundary = true;
       }//if bndry
 
-      if (not face.IsNeighborLocal(*grid))
+      if (not face.IsNeighborLocal(*grid_ptr_))
         face_local_flags[f] = false;
       ++f;
     }//for f
 
-    if (num_nodes > max_cell_dof_count)
-      max_cell_dof_count = num_nodes;
+    if (num_nodes > max_cell_dof_count_)
+      max_cell_dof_count_ = num_nodes;
 
-    cell_transport_views.emplace_back(cell_phi_address,
-                                      num_nodes,
-                                      num_grps,
-                                      num_moments,
-                                      *matid_to_xs_map[mat_id],
-                                      cell_volume,
-                                      face_local_flags,
-                                      cell_on_boundary);
-    block_MG_counter += num_nodes * num_grps * num_moments;
+    cell_transport_views_.emplace_back(cell_phi_address,
+                                       num_nodes,
+                                       num_grps,
+                                       num_moments_,
+                                       *matid_to_xs_map_[mat_id],
+                                       cell_volume,
+                                       face_local_flags,
+                                       cell_on_boundary);
+    block_MG_counter += num_nodes * num_grps * num_moments_;
   }//for local cell
 
-  //================================================== Populate grid nodal mappings
+  //================================================== Populate grid_ptr_ nodal mappings
   // This is used in the Flux Data Structures (FLUDS)
-  grid_nodal_mappings.clear();
-  grid_nodal_mappings.reserve(grid->local_cells.size());
-  for (auto& cell : grid->local_cells)
+  grid_nodal_mappings_.clear();
+  grid_nodal_mappings_.reserve(grid_ptr_->local_cells.size());
+  for (auto& cell : grid_ptr_->local_cells)
   {
     chi_mesh::sweep_management::CellFaceNodalMapping cell_nodal_mapping;
     cell_nodal_mapping.reserve(cell.faces.size());
@@ -155,24 +157,24 @@ void lbs::SteadyStateSolver::InitializeParrays()
       std::vector<short> face_nodal_mapping;
       int ass_face = -1;
 
-      if (face.has_neighbor and face.IsNeighborLocal(*grid))
+      if (face.has_neighbor and face.IsNeighborLocal(*grid_ptr_))
       {
-        grid->FindAssociatedVertices(face,face_nodal_mapping);
-        ass_face = face.GetNeighborAssociatedFace(*grid);
+        grid_ptr_->FindAssociatedVertices(face, face_nodal_mapping);
+        ass_face = face.GetNeighborAssociatedFace(*grid_ptr_);
       }
 
       cell_nodal_mapping.emplace_back(ass_face,face_nodal_mapping);
     }//for f
 
-    grid_nodal_mappings.push_back(cell_nodal_mapping);
+    grid_nodal_mappings_.push_back(cell_nodal_mapping);
   }//for local cell
 
   //================================================== Initialize Field Functions
   if (field_functions.empty())
   {
-    for (size_t g = 0; g < groups.size(); ++g)
+    for (size_t g = 0; g < groups_.size(); ++g)
     {
-      for (size_t m=0; m<num_moments; m++)
+      for (size_t m=0; m < num_moments_; m++)
       {
         std::string solver_name;
         if (not TextName().empty()) solver_name = TextName();
@@ -187,7 +189,7 @@ void lbs::SteadyStateSolver::InitializeParrays()
         using namespace chi_math;
         auto group_ff = std::make_shared<chi_physics::FieldFunction>(
           text_name,                     //Field name
-          discretization,                //Spatial discretization
+          discretization_,                //Spatial discretization_
           Unknown(UnknownType::SCALAR)); //Unknown/Variable
 
         chi::field_function_stack.push_back(group_ff);

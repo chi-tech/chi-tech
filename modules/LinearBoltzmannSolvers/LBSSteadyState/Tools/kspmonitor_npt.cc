@@ -53,7 +53,7 @@ PetscErrorCode lbs::
     iter_info << " CONVERGED\n";
   }
 
-  if (context->solver.options.verbose_inner_iterations)
+  if (context->solver.Options().verbose_inner_iterations)
     chi::log.Log() << iter_info.str() << std::endl;
 
   const double SIXTY_SECOND_INTERVAL = 60000.0; //time in milliseconds
@@ -62,25 +62,25 @@ PetscErrorCode lbs::
   {
     if (context->last_iteration == n)
     {
-      if (context->solver.options.write_restart_data)
+      if (context->solver.Options().write_restart_data)
       {
         if ((chi::program_timer.GetTime()/SIXTY_SECOND_INTERVAL) >
-          context->solver.last_restart_write +
-          context->solver.options.write_restart_interval)
+          context->solver.LastRestartWrite() +
+          context->solver.Options().write_restart_interval)
         {
           Vec phi_new;
           KSPBuildSolution(ksp, nullptr,&phi_new);
 
           context->solver.
-            SetSTLvectorFromPETScVec(context->groupset, phi_new,
-                                     context->solver.phi_old_local,
-                                     WITH_DELAYED_PSI);
+            SetPrimarySTLvectorFromGSPETScVec(context->groupset, phi_new,
+                                              context->phi_old_local,
+                                              WITH_DELAYED_PSI);
 
-          context->solver.last_restart_write =
+          context->solver.LastRestartWrite() =
             chi::program_timer.GetTime()/SIXTY_SECOND_INTERVAL;
           context->solver.WriteRestartData(
-            context->solver.options.write_restart_folder_name,
-            context->solver.options.write_restart_file_base);
+            context->solver.Options().write_restart_folder_name,
+            context->solver.Options().write_restart_file_base);
         }
       }
     }

@@ -8,12 +8,14 @@
 #include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "LBSSteadyState/Groupset/lbs_groupset.h"
 
+#include "ChiMesh/SweepUtilities/sweepchunk_base.h"
+
 typedef std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> TCrossSections;
 
 namespace lbs
 {
 //###################################################################
-/**Sweep chunk for cartesian PWLD discretization.*/
+/**Sweep chunk for cartesian PWLD discretization_.*/
 class SweepChunkPWL : public chi_mesh::sweep_management::SweepChunk
 {
 protected:
@@ -69,7 +71,7 @@ public:
     size_t gs_ss_begin;
     bool surface_source_active;
 
-    double* GetUpwindPsi(int fj, bool local, bool boundary) const;
+    const double* GetUpwindPsi(int fj, bool local, bool boundary) const;
     double* GetDownwindPsi(int fi,
                            bool local,
                            bool boundary,

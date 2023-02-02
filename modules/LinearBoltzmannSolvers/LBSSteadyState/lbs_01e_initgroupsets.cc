@@ -4,7 +4,7 @@
 /**Initializes common groupset items.*/
 void lbs::SteadyStateSolver::InitializeGroupsets()
 {
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
     //================================================== Build groupset angular
     //                                                   flux unknown manager
@@ -17,10 +17,10 @@ void lbs::SteadyStateSolver::InitializeGroupsets()
     for (unsigned int n=0; n<num_angles; ++n)
       grpset_psi_uk_man.AddUnknown(VarVecN, gs_num_groups);
 
-    groupset.BuildDiscMomOperator(options.scattering_order,
-                                  options.geometry_type);
-    groupset.BuildMomDiscOperator(options.scattering_order,
-                                  options.geometry_type);
+    groupset.BuildDiscMomOperator(options_.scattering_order,
+                                  options_.geometry_type);
+    groupset.BuildMomDiscOperator(options_.scattering_order,
+                                  options_.geometry_type);
     groupset.BuildSubsets();
   }//for groupset
 }

@@ -147,10 +147,18 @@ EXCLUDE               += "framework/ChiPhysics/FieldFunction/lua"
 EXCLUDE               += "framework/ChiPhysics/PhysicsMaterial/transportxsections/lua"
 
 EXCLUDE               += "modules/DiffusionSolver/lua"
-EXCLUDE               += "modules/MonteCarlon/lua"
-EXCLUDE               += "modules/LinearBoltzmannSolver/lua"
-EXCLUDE               += "modules/LBKEigenvalueSolver/lua"
-EXCLUDE               += "modules/LBSAdjointSolver/lua"
+EXCLUDE               += "modules/CFEMDiffusion/lua"
+EXCLUDE               += "modules/DFEMDiffusion/lua"
+EXCLUDE               += "modules/FVDiffusion/lua"
+EXCLUDE               += "modules/MGDiffusion/lua"
+
+EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSCurvilinearSteadyState/lua"
+EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSKEigenvalue/lua"
+EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSMIPSteadyState/lua"
+EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSSteadyState/lua"
+EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSSteadyStateAdjoint/lua"
+EXCLUDE               += "modules/LinearBoltzmannSolvers/LBSTransient/lua"
+
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = "*.py"
 EXCLUDE_SYMBOLS        =

@@ -4,14 +4,10 @@
 #include "ChiPhysics/SolverBase/chi_solver.h"
 
 #include "LBSSteadyState/Groupset/lbs_groupset.h"
-#include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
-#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 #include "ChiMath/SpatialDiscretization/spatial_discretization.h"
 #include "lbs_structs.h"
 #include "ChiMesh/SweepUtilities/sweep_namespace.h"
 #include "ChiMesh/SweepUtilities/SweepBoundary/sweep_boundaries.h"
-#include "ChiMath/SparseMatrix/chi_math_sparse_matrix.h"
-#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "LBSSteadyState/PointSource/lbs_point_source.h"
 #include "LBSSteadyState/Groupset/lbs_group.h"
@@ -22,7 +18,6 @@
 namespace sweep_namespace = chi_mesh::sweep_management;
 typedef sweep_namespace::SweepChunk SweepChunk;
 typedef sweep_namespace::SweepScheduler MainSweepScheduler;
-typedef sweep_namespace::SchedulingAlgorithm SchedulingAlgorithm;
 
 namespace lbs
 {
@@ -30,73 +25,97 @@ namespace lbs
 /**A neutral particle transport solver.*/
 class SteadyStateSolver : public chi_physics::Solver
 {
+protected:
   typedef chi_mesh::sweep_management::CellFaceNodalMapping CellFaceNodalMapping;
-protected:
-  size_t source_event_tag=0;
+  size_t source_event_tag_=0;
+  double last_restart_write_=0.0;
 
-public:
-  double last_restart_write=0.0;
-  lbs::Options options;
+  lbs::Options options_;
+  size_t num_moments_ = 0;
+  size_t num_groups_ = 0;
+  size_t num_precursors_ = 0;
+  size_t max_precursors_per_material_ = 0;
 
-  size_t num_moments;
-  size_t num_groups;
-  size_t num_precursors;
-  size_t max_precursors_per_material;
+  std::vector<LBSGroup> groups_;
+  std::vector<LBSGroupset> groupsets_;
+  std::vector<PointSource> point_sources_;
 
-  std::vector<LBSGroup> groups;
-  std::vector<LBSGroupset> groupsets;
+  std::map<int,XSPtr>           matid_to_xs_map_;
+  std::map<int,IsotropicSrcPtr> matid_to_src_map_;
 
-  std::vector<PointSource> point_sources;
+  std::shared_ptr<chi_math::SpatialDiscretization> discretization_ = nullptr;
+  chi_mesh::MeshContinuumPtr grid_ptr_;
+  std::vector<CellFaceNodalMapping> grid_nodal_mappings_;
+  std::vector<UnitCellMatrices> unit_cell_matrices_;
+  std::vector<lbs::CellLBSView> cell_transport_views_;
 
-  std::map<int,std::shared_ptr<chi_physics::TransportCrossSections>> matid_to_xs_map;
-  std::map<int,std::shared_ptr<chi_physics::IsotropicMultiGrpSource>> matid_to_src_map;
+  std::map<uint64_t, BoundaryPreference>           boundary_preferences_;
+  std::map<uint64_t, std::shared_ptr<SweepBndry>>  sweep_boundaries_;
 
-  std::shared_ptr<chi_math::SpatialDiscretization> discretization = nullptr;
-  chi_mesh::MeshContinuumPtr grid;
-  std::vector<CellFaceNodalMapping> grid_nodal_mappings;
-  std::vector<UnitCellMatrices> unit_cell_matrices;
-  std::vector<lbs::CellLBSView> cell_transport_views;
+  chi_math::UnknownManager flux_moments_uk_man_;
 
-  //Boundaries are manipulated in chi_sweepbuffer.cc:InitializeLocalAndDownstreamBuffers
-  //A default 0.0 incident boundary is loaded at the back of
-  //the stack to use as default. This is loaded during initparrays
-  std::vector<std::pair<BoundaryType, int>>         boundary_types;
-  std::vector<std::vector<double>>                  incident_P0_mg_boundaries;
-  std::vector<double>                               zero_boundary;
-  std::vector<std::shared_ptr<SweepBndry>>          sweep_boundaries;
+  size_t max_cell_dof_count_ = 0;
+  uint64_t local_node_count_ = 0;
+  uint64_t glob_node_count_ = 0;
 
-  chi_math::UnknownManager flux_moments_uk_man;
+  std::vector<double> q_moments_local_, ext_src_moments_local_;
+  std::vector<double> phi_new_local_, phi_old_local_;
+  std::vector<std::vector<double>> psi_new_local_;
+  std::vector<double> precursor_new_local_;
 
-  size_t max_cell_dof_count = 0;
-  uint64_t local_node_count = 0;
-  uint64_t glob_node_count = 0;
-
-  Vec phi_new = nullptr, phi_old = nullptr, q_fixed = nullptr;
-  std::vector<double> q_moments_local, ext_src_moments_local;
-  std::vector<double> phi_new_local, phi_old_local;
-  std::vector<double> delta_phi_local;
-  std::vector<std::vector<double>> psi_new_local;
-  std::vector<double> precursor_new_local;
-
-protected:
-  SetSourceFunction active_set_source_function;
+  SetSourceFunction active_set_source_function_;
 
  public:
-  SteadyStateSolver (const SteadyStateSolver&) = delete;
-  SteadyStateSolver& operator= (const SteadyStateSolver&) = delete;
-
   //00
   explicit SteadyStateSolver(const std::string& in_text_name);
   ~SteadyStateSolver() override =default;
 
+  SteadyStateSolver (const SteadyStateSolver&) = delete;
+  SteadyStateSolver& operator= (const SteadyStateSolver&) = delete;
+
+  double LastRestartWrite() const;
+  double& LastRestartWrite();
+
+  lbs::Options& Options();
+
+  size_t NumMoments() const;
+  size_t NumGroups() const;
+
+  void AddGroup(int id);
+  const std::vector<LBSGroup>& Groups() const;
+
+  void AddGroupset();
+  std::vector<LBSGroupset>& Groupsets();
+  const std::vector<LBSGroupset>& Groupsets() const;
+
+  const chi_math::SpatialDiscretization& SpatialDiscretization() const;
+
+  void AddPointSource(PointSource psrc);
+  void ClearPointSources();
+  const std::vector<PointSource>& PointSources() const;
+
+  std::map<uint64_t, BoundaryPreference>& BoundaryPreferences();
+
+  const chi_math::UnknownManager& UnknownManager() const;
+
+  size_t LocalNodeCount() const;
+  size_t GlobalNodeCount() const;
+
+  std::vector<double>& QMomentsLocal();
+  std::vector<double>& ExtSrcMomentsLocal();
+  std::vector<double>& PhiOldLocal();
+
   //01
   void Initialize() override;
+protected:
   //01a
   virtual void PerformInputChecks();
   //01b
   void PrintSimHeader();
+public:
   //01c
   void InitMaterials();
+protected:
   //01d
   virtual void InitializeSpatialDiscretization();
   void ComputeUnitIntegrals();
@@ -108,6 +127,7 @@ protected:
   virtual void InitializeParrays();
   //01h
   void InitializeBoundaries();
+public:
   //01i
   void InitializePointSources();
 
@@ -115,10 +135,11 @@ protected:
 
 
 
-
+public:
   //02
   void Execute() override;
-  void SolveGroupset(LBSGroupset& groupset);
+protected:
+  virtual void SolveGroupset(LBSGroupset& groupset);
 
   //03a
   void ComputeSweepOrderings(LBSGroupset& groupset) const;
@@ -134,42 +155,53 @@ protected:
 
   //03d
   void InitWGDSA(LBSGroupset& groupset);
+public:
   void ExecuteWGDSA(LBSGroupset& groupset,
                     const std::vector<double>& ref_phi_old,
                     std::vector<double>& ref_phi_new);
-  void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+  void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
                                    const std::vector<double>& ref_phi_old,
-                                   const std::vector<double>& ref_phi_new);
+                                   const std::vector<double>& ref_phi_new,
+                                   std::vector<double>& delta_phi_local);
 
-  void AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                                   const std::vector<double>& phi_in);
+  void AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
+                                   const std::vector<double>& phi_in,
+                                   std::vector<double>& delta_phi_local);
 
-  void DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+  void DisAssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
+                                      const std::vector<double>& delta_phi_local,
                                       std::vector<double>& ref_phi_new);
-
+protected:
   static void CleanUpWGDSA(LBSGroupset& groupset);
 
   //03e
   void InitTGDSA(LBSGroupset& groupset);
+public:
   void ExecuteTGDSA(LBSGroupset& groupset,
                     const std::vector<double>& ref_phi_old,
                     std::vector<double>& ref_phi_new);
-  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
+  void AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
                                    const std::vector<double>& ref_phi_old,
-                                   const std::vector<double>& ref_phi_new);
-  void AssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
-                                   const std::vector<double>& phi_in);
-  void DisAssembleTGDSADeltaPhiVector(LBSGroupset& groupset,
+                                   const std::vector<double>& ref_phi_new,
+                                   std::vector<double>& delta_phi_local);
+  void AssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
+                                   const std::vector<double>& phi_in,
+                                   std::vector<double>& delta_phi_local);
+  void DisAssembleTGDSADeltaPhiVector(const LBSGroupset& groupset,
+                                      const std::vector<double>& delta_phi_local,
                                       std::vector<double>& ref_phi_new);
+protected:
   static void CleanUpTGDSA(LBSGroupset& groupset);
   //03f
   void ResetSweepOrderings(LBSGroupset& groupset);
 
   //04 File IO
   //04a
+public:
   void WriteRestartData(std::string folder_name, std::string file_base);
   void ReadRestartData(std::string folder_name, std::string file_base);
 
+public:
   //05
   void WriteGroupsetAngularFluxes(const LBSGroupset& groupset,
                                   const std::string& file_base);
@@ -191,10 +223,13 @@ protected:
   void SetSource(LBSGroupset& groupset,
                  std::vector<double>&  destination_q,
                  SourceFlags source_flags);
+protected:
   double ComputePiecewiseChange(LBSGroupset& groupset);
   virtual std::shared_ptr<SweepChunk> SetSweepChunk(LBSGroupset& groupset);
   double ComputeFissionProduction(const std::vector<double>& phi);
+public:
   virtual double ComputeFissionRate(bool previous);
+protected:
   //Iterative Methods
   bool ClassicRichardson(LBSGroupset& groupset,
                          MainSweepScheduler& sweep_scheduler,
@@ -209,21 +244,32 @@ protected:
               bool log_info = true);
 
   //Vector assembly
-  void SetPETScVecFromSTLvector(LBSGroupset& groupset, Vec x,
-                                const std::vector<double>& y,
-                                bool with_delayed_psi=false);
-  void SetSTLvectorFromPETScVec(LBSGroupset& groupset, Vec x_src,
-                                std::vector<double>& y,
-                                bool with_delayed_psi=false);
-  void ScopedCopySTLvectors(LBSGroupset& groupset,
-                            const std::vector<double>& x_src,
-                            std::vector<double>& y,
-                            bool with_delayed_psi=false);
-
+public:
+  void SetGSPETScVecFromPrimarySTLvector(LBSGroupset& groupset, Vec x,
+                                         const std::vector<double>& y,
+                                         bool with_delayed_psi=false);
+  void SetGSSTLvectorFromPrimarySTLvector(LBSGroupset& groupset,
+                                          std::vector<double>& x,
+                                          const std::vector<double>& y,
+                                          bool with_delayed_psi=false);
+  void SetPrimarySTLvectorFromGSPETScVec(LBSGroupset& groupset, Vec x_src,
+                                         std::vector<double>& y,
+                                         bool with_delayed_psi=false);
+  void SetPrimarySTLvectorFromGSSTLvector(LBSGroupset& groupset,
+                                          const std::vector<double>& x_src,
+                                          std::vector<double>& y,
+                                          bool with_delayed_psi=false);
+  void GSScopedCopyPrimarySTLvectors(LBSGroupset& groupset,
+                                     const std::vector<double>& x_src,
+                                     std::vector<double>& y,
+                                     bool with_delayed_psi=false);
+protected:
   //compute_balance
   void ZeroOutflowBalanceVars(LBSGroupset& groupset);
+public:
   void ComputeBalance();
 
+protected:
   //precursors
   void ComputePrecursors();
 };

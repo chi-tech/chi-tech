@@ -1,5 +1,7 @@
 #include "lbts_transient_solver.h"
 
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
+
 #include "chi_runtime.h"
 #include "chi_log.h"
 
@@ -39,18 +41,19 @@ void lbs::TransientSolver::Step()
   if (transient_options.verbosity_level >= 2)
     chi::log.Log() << TextName() << " Stepping with dt " << dt;
 
-  phi_old_local = phi_prev_local;
+  phi_old_local_ = phi_prev_local;
 
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
     //======================================== Setup sweep chunk
     auto sweep_chunk = SetTransientSweepChunk(groupset);
-    MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                       groupset.angle_agg,
-                                       *sweep_chunk);
+    MainSweepScheduler sweep_scheduler(
+      sweep_namespace::SchedulingAlgorithm::DEPTH_OF_GRAPH,
+      groupset.angle_agg,
+      *sweep_chunk);
 
     //======================================== Zero the source moments
-    q_moments_local.assign(q_moments_local.size(), 0.0);
+    q_moments_local_.assign(q_moments_local_.size(), 0.0);
 
     //======================================== Converge the scattering source
     //                                         with a fixed fission source
@@ -61,8 +64,8 @@ void lbs::TransientSolver::Step()
                         APPLY_FIXED_SOURCES |
                         APPLY_AGS_SCATTER_SOURCES | APPLY_WGS_SCATTER_SOURCES |
                         APPLY_WGS_FISSION_SOURCES | APPLY_AGS_FISSION_SOURCES,
-                        active_set_source_function,
-                        options.verbose_inner_iterations);
+                        active_set_source_function_,
+                        options_.verbose_inner_iterations);
     }
     else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
              groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
@@ -72,8 +75,8 @@ void lbs::TransientSolver::Step()
              APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
              APPLY_FIXED_SOURCES |
              APPLY_AGS_SCATTER_SOURCES | APPLY_AGS_FISSION_SOURCES,  //rhs_scope
-             active_set_source_function,
-             options.verbose_inner_iterations);
+             active_set_source_function_,
+             options_.verbose_inner_iterations);
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
@@ -90,16 +93,16 @@ void lbs::TransientSolver::Step()
     else                              theta = 0.7;
     const double inv_theta = 1.0/theta;
 
-    auto& phi = phi_new_local;
+    auto& phi = phi_new_local_;
     const auto& phi_prev = phi_prev_local;
     for (size_t i = 0; i < phi.size(); ++i)
       phi[i] = inv_theta*(phi[i] + (theta-1.0) * phi_prev[i]);
 
-    if (options.use_precursors)
+    if (options_.use_precursors)
       StepPrecursors();
   }
 
-  const double FR_new = ComputeFissionProduction(phi_new_local);
+  const double FR_new = ComputeFissionProduction(phi_new_local_);
 
   //============================================= Print end of timestep
   if (transient_options.verbosity_level >= 1)
@@ -118,8 +121,8 @@ void lbs::TransientSolver::Step()
 void lbs::TransientSolver::AdvanceTimeValues()
 {
   time += dt;
-  phi_prev_local = phi_new_local;
-  psi_prev_local = psi_new_local;
-  if (options.use_precursors)
-    precursor_prev_local = precursor_new_local;
+  phi_prev_local = phi_new_local_;
+  psi_prev_local = psi_new_local_;
+  if (options_.use_precursors)
+    precursor_prev_local = precursor_new_local_;
 }

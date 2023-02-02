@@ -7,15 +7,15 @@ using namespace lbs;
 \author Zachary Hardy.*/
 double SteadyStateSolver::ComputeFissionProduction(const std::vector<double>& phi)
 {
-  const int first_grp = groups.front().id;
-  const int last_grp = groups.back().id;
+  const int first_grp = groups_.front().id;
+  const int last_grp = groups_.back().id;
 
   //============================================= Loop over local cells
   double local_production = 0.0;
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& transport_view = cell_transport_views[cell.local_id];
-    const auto& cell_matrices = unit_cell_matrices[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
@@ -28,7 +28,7 @@ double SteadyStateSolver::ComputeFissionProduction(const std::vector<double>& ph
       const size_t uk_map = transport_view.MapDOF(i, 0, 0);
       const double IntV_ShapeI = cell_matrices.Vi_vectors[i];
 
-      //=============================== Loop over groups
+      //=============================== Loop over groups_
       for (size_t g = first_grp; g <= last_grp; ++g)
       {
         const auto& prod = xs.production_matrix[g];
@@ -37,7 +37,7 @@ double SteadyStateSolver::ComputeFissionProduction(const std::vector<double>& ph
                               phi[uk_map + gp] *
                               IntV_ShapeI;
 
-        if (options.use_precursors)
+        if (options_.use_precursors)
           for (unsigned int j = 0; j < xs.num_precursors; ++j)
             local_production += xs.nu_delayed_sigma_f[g] *
                                 phi[uk_map + g] *
@@ -69,17 +69,17 @@ double SteadyStateSolver::ComputeFissionProduction(const std::vector<double>& ph
 \author Zachary Hardy.*/
 double SteadyStateSolver::ComputeFissionRate(const bool previous)
 {
-  const int first_grp = groups.front().id;
-  const int last_grp = groups.back().id;
+  const int first_grp = groups_.front().id;
+  const int last_grp = groups_.back().id;
 
-  const auto& phi = phi_old_local;
+  const auto& phi = phi_old_local_;
 
   //============================================= Loop over local cells
   double local_fission_rate = 0.0;
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& transport_view = cell_transport_views[cell.local_id];
-    const auto& cell_matrices = unit_cell_matrices[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
@@ -92,7 +92,7 @@ double SteadyStateSolver::ComputeFissionRate(const bool previous)
       const size_t uk_map = transport_view.MapDOF(i, 0, 0);
       const double IntV_ShapeI = cell_matrices.Vi_vectors[i];
 
-      //=============================== Loop over groups
+      //=============================== Loop over groups_
       for (size_t g = first_grp; g <= last_grp; ++g)
         local_fission_rate += xs.sigma_f[g] *
                               phi[uk_map + g] *

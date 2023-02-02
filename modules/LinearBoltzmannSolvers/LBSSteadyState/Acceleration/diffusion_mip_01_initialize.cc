@@ -14,7 +14,7 @@
  * RHS vector. Creating the KSP solver. Setting the very specialized parameters
  * for Hypre's BooomerAMG. Note: `PCSetFromOptions` and
  * `KSPSetFromOptions` are called at the end. Therefore, any number of
- * additional PETSc options can be passed via the commandline.*/
+ * additional PETSc options_ can be passed via the commandline.*/
 void lbs::acceleration::DiffusionMIPSolver::Initialize()
 {
   if (options.verbose)

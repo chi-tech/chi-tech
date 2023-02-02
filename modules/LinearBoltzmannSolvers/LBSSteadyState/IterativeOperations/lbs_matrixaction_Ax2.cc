@@ -22,14 +22,14 @@ int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   auto& set_source_function = context->set_source_function;
 
   //============================================= Copy krylov vector into local
-  solver.SetSTLvectorFromPETScVec(groupset,
-                                  krylov_vector,
-                                  solver.phi_old_local, WITH_DELAYED_PSI);
+  solver.SetPrimarySTLvectorFromGSPETScVec(groupset,
+                                           krylov_vector,
+                                           context->phi_old_local, WITH_DELAYED_PSI);
 
   //============================================= Setting the source using
   //                                              updated phi_old
-  solver.q_moments_local.assign(solver.q_moments_local.size(), 0.0);
-  set_source_function(groupset, solver.q_moments_local, lhs_source_scope);
+  context->q_moments_local.assign(context->q_moments_local.size(), 0.0);
+  set_source_function(groupset, context->q_moments_local, lhs_source_scope);
 
   //============================================= Sweeping the new source
   sweep_chunk.ZeroFluxDataStructures();
@@ -40,9 +40,9 @@ int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   // We copy the STL data to the operating vector
   // petsc_phi_delta first because its already sized.
   // pc_output is not necessarily initialized yet.
-  solver.SetPETScVecFromSTLvector(groupset,
-                                  context->operating_vector,
-                                  solver.phi_new_local, WITH_DELAYED_PSI);
+  solver.SetGSPETScVecFromPrimarySTLvector(groupset,
+                                           context->operating_vector,
+                                           context->phi_new_local, WITH_DELAYED_PSI);
 
   //============================================= Computing action
   // A  = [I - DLinvMS]

@@ -10,7 +10,7 @@ void lbs::SteadyStateAdjointSolver::Initialize()
   lbs::SteadyStateSolver::Initialize();
 
   //============================================= Transpose Scattering operators
-  for (const auto& matid_xs_pair : matid_to_xs_map)
+  for (const auto& matid_xs_pair : matid_to_xs_map_)
   {
     const auto  matid = matid_xs_pair.first;
     const auto& S = matid_xs_pair.second->transfer_matrices;
@@ -44,7 +44,7 @@ void lbs::SteadyStateAdjointSolver::Initialize()
     const auto& qoi_designation = qoi_pair.first;
     auto& qoi_cell_subscription = qoi_pair.second;
 
-    for (const auto& cell : grid->local_cells)
+    for (const auto& cell : grid_ptr_->local_cells)
       if (qoi_designation.logical_volume->Inside(cell.centroid))
         qoi_cell_subscription.push_back(cell.local_id);
 
@@ -64,7 +64,7 @@ void lbs::SteadyStateAdjointSolver::Initialize()
 
   //================================================== Initialize source func
   using namespace std::placeholders;
-  active_set_source_function =
+  active_set_source_function_ =
     std::bind(&SteadyStateAdjointSolver::SetAdjointSource, this, _1, _2, _3);
 
 }

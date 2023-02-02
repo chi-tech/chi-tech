@@ -3,6 +3,7 @@
 
 #include "ChiMath/chi_math.h"
 #include "ChiPhysics/PhysicsMaterial/transportxsections/material_property_transportxsections.h"
+#include "ChiPhysics/PhysicsMaterial/material_property_isotropic_mg_src.h"
 
 #include <functional>
 
@@ -17,6 +18,9 @@ typedef std::vector<double> VecDbl;
 typedef std::vector<VecDbl> MatDbl;
 typedef std::vector<chi_mesh::Vector3> VecVec3;
 typedef std::vector<VecVec3> MatVec3;
+
+typedef std::shared_ptr<chi_physics::TransportCrossSections> XSPtr;
+typedef std::shared_ptr<chi_physics::IsotropicMultiGrpSource> IsotropicSrcPtr;
 
 enum class GeometryType
 {
@@ -43,6 +47,14 @@ enum class BoundaryType
   INCIDENT_ISOTROPIC = 2,
   REFLECTING = 3
 };
+
+struct BoundaryPreference
+{
+  BoundaryType type;
+  std::vector<double> isotropic_mg_source;
+  std::string source_function;
+};
+
 enum SourceFlags : int
 {
   NO_FLAGS_SET              = 0,
@@ -50,7 +62,8 @@ enum SourceFlags : int
   APPLY_WGS_SCATTER_SOURCES = (1 << 1),
   APPLY_AGS_SCATTER_SOURCES = (1 << 2),
   APPLY_WGS_FISSION_SOURCES = (1 << 3),
-  APPLY_AGS_FISSION_SOURCES = (1 << 4)
+  APPLY_AGS_FISSION_SOURCES = (1 << 4),
+  SUPPRESS_WG_SCATTER       = (1 << 5)
 };
 
 inline SourceFlags operator|(const SourceFlags f1,
@@ -66,7 +79,7 @@ typedef std::function<void(LBSGroupset&          groupset,
                            SourceFlags           source_flags)>
                       SetSourceFunction;
 
-/**Struct for storing LBS options.*/
+/**Struct for storing LBS options_.*/
 struct Options
 {
   typedef chi_math::SpatialDiscretizationType SDMType;

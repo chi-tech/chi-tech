@@ -25,15 +25,15 @@ void KEigenvalueSolver::PowerIteration()
       << "\n********** Solving k-eigenvalue problem with "
       << "the Power Method.\n";
 
-  phi_old_local.assign(phi_old_local.size(), 1.0);
+  phi_old_local_.assign(phi_old_local_.size(), 1.0);
 
   double F_prev = 1.0;
   k_eff = 1.0;
   double k_eff_prev = 1.0;
   double k_eff_change = 1.0;
 
-  //================================================== Initialize groupsets
-  for (auto& groupset : groupsets)
+  //================================================== Initialize groupsets_
+  for (auto& groupset : groupsets_)
   {
     ComputeSweepOrderings(groupset);
     InitFluxDataStructures(groupset);
@@ -49,10 +49,10 @@ void KEigenvalueSolver::PowerIteration()
   {
     MPI_Barrier(MPI_COMM_WORLD);
     // Divide phi_old by k_eff (phi_old gives better init-quess for GMRES)
-    for (auto& phi : phi_old_local) phi /= k_eff;
+    for (auto& phi : phi_old_local_) phi /= k_eff;
 
-    //============================================= Loop over groupsets
-    for (auto& groupset : groupsets)
+    //============================================= Loop over groupsets_
+    for (auto& groupset : groupsets_)
     {
       //======================================== Setup sweep chunk
       auto sweep_chunk_ptr = SetSweepChunk(groupset);
@@ -61,8 +61,8 @@ void KEigenvalueSolver::PowerIteration()
                                          *sweep_chunk_ptr);
 
       //======================================== Precompute the fission source
-      q_moments_local.assign(q_moments_local.size(), 0.0);
-      SetSource(groupset, q_moments_local,
+      q_moments_local_.assign(q_moments_local_.size(), 0.0);
+      SetSource(groupset, q_moments_local_,
                 APPLY_AGS_FISSION_SOURCES |
                 APPLY_WGS_FISSION_SOURCES);
 
@@ -74,8 +74,8 @@ void KEigenvalueSolver::PowerIteration()
         ClassicRichardson(groupset, sweep_scheduler,
                           APPLY_WGS_SCATTER_SOURCES |
                           APPLY_AGS_SCATTER_SOURCES,
-                          active_set_source_function,
-                          options.verbose_inner_iterations);
+                          active_set_source_function_,
+                          options_.verbose_inner_iterations);
       }
       else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
                groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
@@ -84,19 +84,19 @@ void KEigenvalueSolver::PowerIteration()
         Krylov(groupset, sweep_scheduler,
                APPLY_WGS_SCATTER_SOURCES,
                APPLY_AGS_SCATTER_SOURCES,
-               active_set_source_function,
-               options.verbose_inner_iterations);
+               active_set_source_function_,
+               options_.verbose_inner_iterations);
       }
 
       MPI_Barrier(MPI_COMM_WORLD);
     }//for groupset
 
     //======================================== Recompute k-eigenvalue
-    double F_new = ComputeFissionProduction(phi_new_local);
+    double F_new = ComputeFissionProduction(phi_new_local_);
     k_eff = F_new / F_prev * k_eff;
     double reactivity = (k_eff - 1.0) / k_eff;
 
-    //======================================== Check convergence, book-keeping
+    //======================================== Check convergence, bookkeeping
     k_eff_change = fabs(k_eff - k_eff_prev) / k_eff;
     k_eff_prev = k_eff;
     F_prev = F_new;
@@ -106,7 +106,7 @@ void KEigenvalueSolver::PowerIteration()
       converged = true;
 
     //======================================== Print iteration summary
-    if (options.verbose_outer_iterations)
+    if (options_.verbose_outer_iterations)
     {
       std::stringstream k_iter_info;
       k_iter_info
@@ -123,8 +123,8 @@ void KEigenvalueSolver::PowerIteration()
     if (converged) break;
   }//for k iterations
 
-  //================================================== Cleanup groupsets
-  for (auto& groupset : groupsets)
+  //================================================== Cleanup groupsets_
+  for (auto& groupset : groupsets_)
   {
     CleanUpWGDSA(groupset);
     CleanUpTGDSA(groupset);

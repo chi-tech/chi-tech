@@ -17,10 +17,10 @@
 std::vector<double> lbs::SteadyStateSolver::
   MakeSourceMomentsFromPhi()
 {
-  size_t num_local_dofs = discretization->GetNumLocalDOFs(flux_moments_uk_man);
+  size_t num_local_dofs = discretization_->GetNumLocalDOFs(flux_moments_uk_man_);
 
   std::vector<double> source_moments(num_local_dofs,0.0);
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
     SetSource(groupset,
               source_moments,
@@ -63,8 +63,8 @@ void lbs::SteadyStateSolver::
     "Header size: 500 bytes\n"
     "Structure(type-info):\n"
     "uint64_t num_local_nodes\n"
-    "uint64_t num_moments\n"
-    "uint64_t num_groups\n"
+    "uint64_t num_moments_\n"
+    "uint64_t num_groups_\n"
     "uint64_t num_records\n"
     "uint64_t num_cells\n"
     "Each cell:\n"
@@ -92,12 +92,12 @@ void lbs::SteadyStateSolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto& sdm = discretization;
-  uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
-  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
-  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups);
-  uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
-  uint64_t num_local_cells = grid->local_cells.size();
+  auto& sdm = discretization_;
+  uint64_t num_local_nodes = discretization_->GetNumLocalDOFs(NODES_ONLY);
+  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments_);
+  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups_);
+  uint64_t num_local_dofs  = discretization_->GetNumLocalDOFs(flux_moments_uk_man_);
+  uint64_t num_local_cells = grid_ptr_->local_cells.size();
 
   //============================================= Write num_ quantities
   file.write((char*)&num_local_nodes,sizeof(uint64_t));
@@ -108,15 +108,15 @@ void lbs::SteadyStateSolver::
 
   //============================================= Write nodal positions for
   //                                              each cell
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
     uint64_t cell_global_id = static_cast<uint64_t>(cell.global_id);
     file.write((char *) &cell_global_id, sizeof(uint64_t));
 
-    uint64_t num_nodes = discretization->GetCellNumNodes(cell);
+    uint64_t num_nodes = discretization_->GetCellNumNodes(cell);
     file.write((char *) &num_nodes, sizeof(uint64_t));
 
-    auto   node_locations = discretization->GetCellNodeLocations(cell);
+    auto   node_locations = discretization_->GetCellNodeLocations(cell);
     for (const auto& node : node_locations)
     {
       file.write((char *) &node.x, sizeof(double));
@@ -126,13 +126,13 @@ void lbs::SteadyStateSolver::
   }//for cell
 
   //============================================= Write per dof data
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
     for (unsigned int i=0; i<sdm->GetCellNumNodes(cell); ++i)
       for (unsigned int m=0; m<num_moments_t; ++m)
-        for (unsigned int g=0; g<num_groups; ++g)
+        for (unsigned int g=0; g < num_groups_; ++g)
         {
           uint64_t cell_global_id = cell.global_id;
-          uint64_t dof_map = sdm->MapDOFLocal(cell,i,flux_moments_uk_man,m,g);
+          uint64_t dof_map = sdm->MapDOFLocal(cell, i, flux_moments_uk_man_, m, g);
 
           assert(dof_map < flux_moments.size());
           double value = flux_moments[dof_map];
@@ -176,12 +176,12 @@ void lbs::SteadyStateSolver::ReadFluxMoments(const std::string &file_base,
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto& sdm = discretization;
-  uint64_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
-  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments);
-  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups);
-  uint64_t num_local_dofs  = discretization->GetNumLocalDOFs(flux_moments_uk_man);
-  uint64_t num_local_cells = grid->local_cells.size();
+  auto& sdm = discretization_;
+  uint64_t num_local_nodes = discretization_->GetNumLocalDOFs(NODES_ONLY);
+  uint64_t num_moments_t   = static_cast<uint64_t>(num_moments_);
+  uint64_t num_groups_t    = static_cast<uint64_t>(num_groups_);
+  uint64_t num_local_dofs  = discretization_->GetNumLocalDOFs(flux_moments_uk_man_);
+  uint64_t num_local_cells = grid_ptr_->local_cells.size();
 
   uint64_t file_num_local_nodes;
   uint64_t file_num_moments    ;
@@ -212,10 +212,10 @@ void lbs::SteadyStateSolver::ReadFluxMoments(const std::string &file_base,
       std::stringstream outstr;
       outstr << "num_local_nodes: " << file_num_local_nodes << " vs "
                                     << num_local_nodes << "\n";
-      outstr << "num_moments    : " << file_num_moments << " vs "
+      outstr << "num_moments_    : " << file_num_moments << " vs "
                                     << num_moments_t << "\n";
-      outstr << "num_groups     : " << file_num_groups << " vs "
-                                    << num_groups << "\n";
+      outstr << "num_groups_     : " << file_num_groups << " vs "
+             << num_groups_ << "\n";
       outstr << "num_local_dofs : " << file_num_local_dofs << " vs "
                                     << num_local_dofs << "\n";
       outstr << "num_local_cells: " << file_num_local_cells << " vs "
@@ -251,12 +251,12 @@ void lbs::SteadyStateSolver::ReadFluxMoments(const std::string &file_base,
       file_node_locations.emplace_back(x,y,z);
     }//for file node n
 
-    if (not grid->IsCellLocal(cell_global_id)) continue;
+    if (not grid_ptr_->IsCellLocal(cell_global_id)) continue;
 
-    const auto& cell = grid->cells[cell_global_id];
+    const auto& cell = grid_ptr_->cells[cell_global_id];
 
     //================ Now map file nodes to system nodes
-    auto system_node_locations = discretization->GetCellNodeLocations(cell);
+    auto system_node_locations = discretization_->GetCellNodeLocations(cell);
     std::map<uint64_t,uint64_t> mapping;
 
     //Check num_nodes equal
@@ -305,16 +305,16 @@ void lbs::SteadyStateSolver::ReadFluxMoments(const std::string &file_base,
     file.read((char*)&group         ,sizeof(unsigned int));
     file.read((char*)&flux_value    ,sizeof(double));
 
-    if (grid->IsCellLocal(cell_global_id))
+    if (grid_ptr_->IsCellLocal(cell_global_id))
     {
-      const auto& cell         = grid->cells[cell_global_id];
+      const auto& cell         = grid_ptr_->cells[cell_global_id];
       const auto& node_mapping = file_cell_nodal_mapping.at(cell_global_id);
 
       size_t node_mapped = node_mapping.at(node);
 
       size_t dof_map = sdm->MapDOFLocal(cell,
                                         node_mapped,
-                                        flux_moments_uk_man,
+                                        flux_moments_uk_man_,
                                         moment,
                                         group);
 

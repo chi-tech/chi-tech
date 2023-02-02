@@ -15,7 +15,7 @@
  * balance.*/
 void lbs::SteadyStateSolver::ZeroOutflowBalanceVars(LBSGroupset& groupset)
 {
-  for (auto& cell_transport_view : cell_transport_views)
+  for (auto& cell_transport_view : cell_transport_views_)
     for (auto& group : groupset.groups)
       cell_transport_view.ZeroOutflow(group.id);
 }
@@ -28,7 +28,7 @@ void lbs::SteadyStateSolver::ComputeBalance()
   chi::log.Log() << "\n********** Computing balance\n";
 
   auto pwld =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
   if (not pwld) throw std::logic_error("Trouble getting PWLD-SDM in " +
                                       std::string(__FUNCTION__));
   chi_math::SpatialDiscretization_PWLD& grid_fe_view = *pwld;
@@ -36,21 +36,21 @@ void lbs::SteadyStateSolver::ComputeBalance()
   //======================================== Get material source
   // This is done using the SetSource routine
   // because it allows a lot of flexibility.
-  auto mat_src = phi_old_local;
+  auto mat_src = phi_old_local_;
   mat_src.assign(mat_src.size(),0.0);
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
-    q_moments_local.assign(q_moments_local.size(), 0.0);
-    SetSource(groupset, q_moments_local,
+    q_moments_local_.assign(q_moments_local_.size(), 0.0);
+    SetSource(groupset, q_moments_local_,
               APPLY_FIXED_SOURCES | APPLY_AGS_FISSION_SOURCES |
               APPLY_WGS_FISSION_SOURCES);
-    ScopedCopySTLvectors(groupset, q_moments_local, mat_src);
+    GSScopedCopyPrimarySTLvectors(groupset, q_moments_local_, mat_src);
   }
 
   //======================================== Initialize diffusion params
   //                                         for xs
   // This populates sigma_a
-  for (const auto& mat_id_xs : matid_to_xs_map)
+  for (const auto& mat_id_xs : matid_to_xs_map_)
   {
     const auto& xs = mat_id_xs.second;
     if (not xs->diffusion_initialized)
@@ -63,9 +63,9 @@ void lbs::SteadyStateSolver::ComputeBalance()
   double local_in_flow    = 0.0;
   double local_absorption = 0.0;
   double local_production = 0.0;
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
-    const auto&  transport_view   = cell_transport_views[cell.local_id];
+    const auto&  transport_view   = cell_transport_views_[cell.local_id];
     const auto&  fe_intgrl_values = grid_fe_view.GetUnitIntegrals(cell);
     const size_t num_nodes        = transport_view.NumNodes();
     const auto&  IntV_shapeI      = fe_intgrl_values.GetIntV_shapeI();
@@ -73,14 +73,14 @@ void lbs::SteadyStateSolver::ComputeBalance()
 
     //====================================== Inflow
     // This is essentially an integration over
-    // all faces, all angles, and all groups.
+    // all faces, all angles, and all groups_.
     // Only the cosines that are negative are
     // added to the integral.
     for (int f=0; f<cell.faces.size(); ++f)
     {
       const auto& face  = cell.faces[f];
 
-      for (const auto& groupset : groupsets)
+      for (const auto& groupset : groupsets_)
       {
         for (int n = 0; n < groupset.quadrature->omegas.size(); ++n)
         {
@@ -90,7 +90,7 @@ void lbs::SteadyStateSolver::ComputeBalance()
 
           if (mu < 0.0 and (not face.has_neighbor)) //mu<0 and bndry
           {
-            const auto &bndry = sweep_boundaries[face.neighbor_id];
+            const auto &bndry = sweep_boundaries_[face.neighbor_id];
             for (int fi = 0; fi < face.vertex_ids.size(); ++fi)
             {
               const int i = fe_intgrl_values.FaceDofMapping(f, fi);
@@ -113,17 +113,17 @@ void lbs::SteadyStateSolver::ComputeBalance()
     //The group-wise outflow was determined
     //during a solve so here we just
     //consolidate it.
-    for (int g=0; g<num_groups; ++g)
+    for (int g=0; g < num_groups_; ++g)
       local_out_flow += transport_view.GetOutflow(g);
 
     //====================================== Absorption and Src
     //Isotropic flux based absorption and source
     auto& xs = transport_view.XS();
     for (int i=0; i<num_nodes; ++i)
-      for (int g=0; g<num_groups; ++g)
+      for (int g=0; g < num_groups_; ++g)
       {
         size_t imap   = transport_view.MapDOF(i,0,g);
-        double phi_0g = phi_old_local[imap];
+        double phi_0g = phi_old_local_[imap];
         double q_0g   = mat_src[imap];
 
         local_absorption += xs.sigma_a[g] * phi_0g * IntV_shapeI[i];

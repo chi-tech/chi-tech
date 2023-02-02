@@ -24,6 +24,9 @@
 void lbs::SteadyStateSolver::
   InitFluxDataStructures(LBSGroupset& groupset)
 {
+  namespace sweep_namespace = chi_mesh::sweep_management;
+  typedef sweep_namespace::AngleSetGroup TAngleSetGroup;
+  typedef sweep_namespace::AngleSet TAngleSet;
   const auto& unique_so_groupings = groupset.unique_so_groupings;
   const auto& dir_id_to_so_map    = groupset.dir_id_to_so_map;
 
@@ -32,11 +35,11 @@ void lbs::SteadyStateSolver::
 
   //=========================================== Passing the sweep boundaries
   //                                            to the angle aggregation
-  groupset.angle_agg.Setup(sweep_boundaries,
+  groupset.angle_agg.Setup(sweep_boundaries_,
                            gs_num_grps,
                            gs_num_ss,
                            groupset.quadrature,
-                           grid);
+                           grid_ptr_);
 
   TAngleSetGroup angle_set_group;
   for (const auto& so_grouping : unique_so_groupings)
@@ -74,7 +77,7 @@ void lbs::SteadyStateSolver::
           make_primary = false;
           primary_fluds = new chi_mesh::sweep_management::
           PRIMARY_FLUDS(groupset.grp_subset_infos[gs_ss].ss_size,
-                        grid_nodal_mappings);
+                        grid_nodal_mappings_);
 
           chi::log.Log0Verbose1()
             << "Initializing FLUDS for omega="
@@ -99,9 +102,9 @@ void lbs::SteadyStateSolver::
           sweep_ordering,
           fluds,
           angle_indices,
-          sweep_boundaries,
-          options.sweep_eager_limit,
-          &grid->GetCommunicator());
+          sweep_boundaries_,
+          options_.sweep_eager_limit,
+          &grid_ptr_->GetCommunicator());
 
         angle_set_group.angle_sets.push_back(angleSet);
       }//for an_ss
@@ -110,7 +113,7 @@ void lbs::SteadyStateSolver::
 
   groupset.angle_agg.angle_set_groups.push_back(std::move(angle_set_group));
 
-  if (options.verbose_inner_iterations)
+  if (options_.verbose_inner_iterations)
     chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Initialized Angle Aggregation.   "

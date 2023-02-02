@@ -33,10 +33,10 @@ lbs::SweepChunkPWL::
                       a_and_b_initialized(false)
 {}
 
-double* lbs::SweepChunkPWL::Upwinder::
+const double* lbs::SweepChunkPWL::Upwinder::
 GetUpwindPsi(int fj, bool local, bool boundary) const
 {
-  double* psi;
+  const double* psi;
   if (local)             psi = fluds->UpwindPsi(spls_index,
                                                 in_face_counter,
                                                 fj,0,angle_set_index);
@@ -197,7 +197,7 @@ Sweep(chi_mesh::sweep_management::AngleSet *angle_set)
         }//for face i
       } // for f
 
-      // ========================================== Looping over groups
+      // ========================================== Looping over groups_
       for (int gsg = 0; gsg < gs_ss_size; ++gsg)
       {
         const int g = gs_gi+gsg;

@@ -15,9 +15,9 @@ void lbs::SteadyStateSolver::InitializeSpatialDiscretization()
 {
   using namespace chi_math::finite_element;
   chi::log.Log() << "Initializing spatial discretization.\n";
-  discretization =
-    chi_math::SpatialDiscretization_PWLD::New(grid, COMPUTE_CELL_MAPPINGS |
-                                                    COMPUTE_UNIT_INTEGRALS);
+  discretization_ =
+    chi_math::SpatialDiscretization_PWLD::New(grid_ptr_, COMPUTE_CELL_MAPPINGS |
+                                                         COMPUTE_UNIT_INTEGRALS);
 
   ComputeUnitIntegrals();
 }
@@ -25,12 +25,12 @@ void lbs::SteadyStateSolver::InitializeSpatialDiscretization()
 void lbs::SteadyStateSolver::ComputeUnitIntegrals()
 {
   chi::log.Log() << "Computing unit integrals.\n";
-  const auto& sdm = *discretization;
+  const auto& sdm = *discretization_;
 
-  const size_t num_local_cells = grid->local_cells.size();
-  unit_cell_matrices.resize(num_local_cells);
+  const size_t num_local_cells = grid_ptr_->local_cells.size();
+  unit_cell_matrices_.resize(num_local_cells);
 
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t cell_num_faces = cell.faces.size();
@@ -110,7 +110,7 @@ void lbs::SteadyStateSolver::ComputeUnitIntegrals()
       }//for i
     }//for f
 
-    unit_cell_matrices[cell.local_id] =
+    unit_cell_matrices_[cell.local_id] =
       UnitCellMatrices{IntV_gradshapeI_gradshapeJ, //K-matrix
                        IntV_shapeI_gradshapeJ,     //G-matrix
                        IntV_shapeI_shapeJ,         //M-matrix

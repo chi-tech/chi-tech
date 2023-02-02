@@ -1,6 +1,7 @@
 #include "lbs_linear_boltzmann_solver.h"
 #include "LBSSteadyState/IterativeMethods/lbs_iterativemethods.h"
 
+#include "LBSSteadyState/Groupset/lbs_groupset.h"
 #include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include "chi_runtime.h"
@@ -9,7 +10,6 @@
 #include "chi_mpi.h"
 
 #include "ChiConsole/chi_console.h"
-#include "LBSSteadyState/Groupset/lbs_groupset.h"
 
 #include <iomanip>
 
@@ -18,7 +18,7 @@
 void lbs::SteadyStateSolver::Execute()
 {
   MPI_Barrier(MPI_COMM_WORLD);
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
     chi::log.Log()
       << "\n********* Initializing Groupset " << groupset.id
@@ -40,7 +40,7 @@ void lbs::SteadyStateSolver::Execute()
     MPI_Barrier(MPI_COMM_WORLD);
   }
 
-  if (options.use_precursors)
+  if (options_.use_precursors)
     ComputePrecursors();
 
   UpdateFieldFunctions();
@@ -53,16 +53,17 @@ void lbs::SteadyStateSolver::Execute()
 /**Solves a single groupset.*/
 void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
 {
-  source_event_tag = chi::log.GetRepeatingEventTag("Set Source");
+  source_event_tag_ = chi::log.GetRepeatingEventTag("Set Source");
 
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = SetSweepChunk(groupset);
-  MainSweepScheduler sweep_scheduler(SchedulingAlgorithm::DEPTH_OF_GRAPH,
-                                     groupset.angle_agg,
-                                     *sweep_chunk);
+  MainSweepScheduler sweep_scheduler(
+    sweep_namespace::SchedulingAlgorithm::DEPTH_OF_GRAPH,
+    groupset.angle_agg,
+    *sweep_chunk);
 
-  q_moments_local.assign(q_moments_local.size(), 0.0);
+  q_moments_local_.assign(q_moments_local_.size(), 0.0);
 
   if (groupset.iterative_method == IterativeMethod::CLASSICRICHARDSON)
   {
@@ -70,8 +71,8 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
                       APPLY_FIXED_SOURCES |
                       APPLY_AGS_SCATTER_SOURCES | APPLY_WGS_SCATTER_SOURCES |
                       APPLY_AGS_FISSION_SOURCES | APPLY_WGS_FISSION_SOURCES,
-                      active_set_source_function,
-                      options.verbose_inner_iterations);
+                      active_set_source_function_,
+                      options_.verbose_inner_iterations);
   }
   else if (groupset.iterative_method == IterativeMethod::KRYLOV_RICHARDSON or
            groupset.iterative_method == IterativeMethod::KRYLOV_GMRES or
@@ -81,13 +82,13 @@ void lbs::SteadyStateSolver::SolveGroupset(LBSGroupset& groupset)
            APPLY_WGS_SCATTER_SOURCES | APPLY_WGS_FISSION_SOURCES,  //lhs_scope
            APPLY_FIXED_SOURCES | APPLY_AGS_SCATTER_SOURCES |
            APPLY_AGS_FISSION_SOURCES,                             //rhs_scope
-           active_set_source_function,
-           options.verbose_inner_iterations);
+           active_set_source_function_,
+           options_.verbose_inner_iterations);
   }
 
-  if (options.write_restart_data)
-    WriteRestartData(options.write_restart_folder_name,
-                     options.write_restart_file_base);
+  if (options_.write_restart_data)
+    WriteRestartData(options_.write_restart_folder_name,
+                     options_.write_restart_file_base);
 
   chi::log.Log()
     << "Groupset solve complete.                  Process memory = "

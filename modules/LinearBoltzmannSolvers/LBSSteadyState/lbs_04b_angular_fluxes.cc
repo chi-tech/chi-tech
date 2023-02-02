@@ -43,7 +43,7 @@ void lbs::SteadyStateSolver::
     "Structure(type-info):\n"
     "size_t-num_local_nodes\n"
     "size_t-num_angles\n"
-    "size_t-num_groups\n"
+    "size_t-num_groups_\n"
     "size_t-num_records\n"
     "Each record:\n"
     "size_t-cell_global_id\n"
@@ -63,20 +63,20 @@ void lbs::SteadyStateSolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
+  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
   if (not fe)
   {
     file.close();
     chi::log.LogAllWarning() << "Angular flux file reading cancelled "
-                                   "because a spatial discretization has not "
+                                   "because a spatial discretization_ has not "
                                    "been initialized.";
     return;
   }
 
-  size_t num_local_nodes = discretization->GetNumLocalDOFs(NODES_ONLY);
+  size_t num_local_nodes = discretization_->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles      = groupset.quadrature->abscissae.size();
   size_t num_groups      = groupset.groups.size();
-  size_t num_local_dofs  = psi_new_local[groupset.id].size();
+  size_t num_local_dofs  = psi_new_local_[groupset.id].size();
   auto   dof_handler     = groupset.psi_uk_man;
 
   //============================================= Write num_ quantities
@@ -87,7 +87,7 @@ void lbs::SteadyStateSolver::
 
   //============================================= Write per dof data
   size_t dof_count=0;
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
     const auto& cell_mapping = fe->GetCellMapping(cell);
 
@@ -98,7 +98,7 @@ void lbs::SteadyStateSolver::
           if (++dof_count > num_local_dofs) goto close_file;
 
           uint64_t dof_map = fe->MapDOFLocal(cell,i,dof_handler,n,g);
-          double value = psi_new_local[groupset.id][dof_map];
+          double value = psi_new_local_[groupset.id][dof_map];
 
           file.write((char*)&cell.global_id,sizeof(size_t));
           file.write((char*)&i             ,sizeof(unsigned int));
@@ -137,21 +137,21 @@ void lbs::SteadyStateSolver::
 
   //============================================= Get relevant items
   auto NODES_ONLY = chi_math::UnknownManager::GetUnitaryUnknownManager();
-  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
+  auto fe = std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
   if (not fe)
   {
     file.close();
     chi::log.LogAllWarning() << "Angular flux file reading cancelled "
-                                   "because a spatial discretization has not "
+                                   "because a spatial discretization_ has not "
                                    "been initialized.";
     return;
   }
 
-  size_t num_local_nodes   = discretization->GetNumLocalDOFs(NODES_ONLY);
+  size_t num_local_nodes   = discretization_->GetNumLocalDOFs(NODES_ONLY);
   size_t num_angles        = groupset.quadrature->abscissae.size();
   size_t num_groups        = groupset.groups.size();
-  size_t num_local_dofs    = psi_new_local[groupset.id].size();
-  std::vector<double>& psi = psi_new_local[groupset.id];
+  size_t num_local_dofs    = psi_new_local_[groupset.id].size();
+  std::vector<double>& psi = psi_new_local_[groupset.id];
   auto   dof_handler       = groupset.psi_uk_man;
 
   size_t file_num_local_nodes;
@@ -179,7 +179,7 @@ void lbs::SteadyStateSolver::
     std::stringstream outstr;
     outstr << "num_local_nodes: " << file_num_local_nodes << "\n";
     outstr << "num_angles     : " << file_num_angles << "\n";
-    outstr << "num_groups     : " << file_num_groups << "\n";
+    outstr << "num_groups_     : " << file_num_groups << "\n";
     outstr << "num_local_dofs : " << file_num_local_dofs << "\n";
     chi::log.LogAll()
       << "Incompatible DOF data found in file " << file_name << "\n"
@@ -207,7 +207,7 @@ void lbs::SteadyStateSolver::
 
     cells_touched.insert(cell_global_id);
 
-    const auto& cell = grid->cells[cell_global_id];
+    const auto& cell = grid_ptr_->cells[cell_global_id];
 
     size_t imap = fe->MapDOFLocal(cell,node,dof_handler,angle_num,group);
 

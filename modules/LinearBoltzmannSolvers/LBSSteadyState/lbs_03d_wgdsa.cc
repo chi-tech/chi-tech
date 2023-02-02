@@ -20,22 +20,20 @@ void lbs::SteadyStateSolver::InitWGDSA(LBSGroupset& groupset)
     typedef lbs::acceleration::BoundaryCondition BC;
     typedef lbs::acceleration::BCType BCType;
 
-    std::vector<BC> bcs;
-    size_t bid = 0;
-    for (auto& lbs_bndry : sweep_boundaries)
+    std::map<uint64_t, BC> bcs;
+    for (auto& [bid,lbs_bndry] : sweep_boundaries_)
     {
       if (lbs_bndry->Type() == SwpBndryType::REFLECTING)
-        bcs.push_back({BCType::ROBIN,{0.0,1.0,0.0}});
+        bcs[bid] = {BCType::ROBIN,{0.0,1.0,0.0}};
       else//dirichlet
-        bcs.push_back({BCType::DIRICHLET,{0.0,0.0,0.0}});
-      ++bid;
+        bcs[bid] = {BCType::DIRICHLET,{0.0,0.0,0.0}};
     }
 
     //=========================================== Make xs map
     typedef lbs::acceleration::Multigroup_D_and_sigR MGXs;
     typedef std::map<int, lbs::acceleration::Multigroup_D_and_sigR> MapMatID2XS;
     MapMatID2XS map_mat_id_2_mgxs;
-    for (const auto& mat_id_xs_pair : matid_to_xs_map)
+    for (const auto& mat_id_xs_pair : matid_to_xs_map_)
     {
       const auto& mat_id = mat_id_xs_pair.first;
       const auto& xs     = mat_id_xs_pair.second;
@@ -56,16 +54,16 @@ void lbs::SteadyStateSolver::InitWGDSA(LBSGroupset& groupset)
     }
 
     //=========================================== Create solver
-    const auto& sdm = *discretization;
+    const auto& sdm = *discretization_;
 
     auto solver =
       std::make_shared<acceleration::DiffusionMIPSolver>(
         std::string(TextName()+"_WGDSA"),
-        *grid,sdm,
+        *grid_ptr_, sdm,
         uk_man,
         bcs,
         map_mat_id_2_mgxs,
-        unit_cell_matrices,
+        unit_cell_matrices_,
         true); //verbosity
 
     solver->options.residual_tolerance        = groupset.wgdsa_tol;
@@ -75,12 +73,9 @@ void lbs::SteadyStateSolver::InitWGDSA(LBSGroupset& groupset)
 
     solver->Initialize();
 
-    delta_phi_local.assign(sdm.GetNumLocalDOFs(uk_man),0.0);
+    std::vector<double> dummy_rhs(sdm.GetNumLocalDOFs(uk_man),0.0);
 
-    solver->AssembleAand_b(delta_phi_local);
-
-    delta_phi_local.resize(0);
-    delta_phi_local.shrink_to_fit();
+    solver->AssembleAand_b(dummy_rhs);
 
     groupset.wgdsa_solver = solver;
   }
@@ -96,13 +91,14 @@ void lbs::SteadyStateSolver::CleanUpWGDSA(LBSGroupset& groupset)
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
 void lbs::SteadyStateSolver::
-  AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+  AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
                               const std::vector<double>&ref_phi_old,
-                              const std::vector<double>&ref_phi_new)
+                              const std::vector<double>&ref_phi_new,
+                              std::vector<double>& delta_phi_local)
 {
-  const auto& sdm = *discretization;
+  const auto& sdm = *discretization_;
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
-  const auto& phi_uk_man  = flux_moments_uk_man;
+  const auto& phi_uk_man  = flux_moments_uk_man_;
 
   const int    gsi = groupset.groups.front().id;
   const size_t gss = groupset.groups.size();
@@ -110,11 +106,11 @@ void lbs::SteadyStateSolver::
   delta_phi_local.clear();
   delta_phi_local.assign(sdm.GetNumLocalDOFs(dphi_uk_man), 0.0);
 
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& sigma_s = matid_to_xs_map[cell.material_id]->sigma_s_gtog;
+    const auto& sigma_s = matid_to_xs_map_[cell.material_id]->sigma_s_gtog;
 
     for (size_t i=0; i < num_nodes; i++)
     {
@@ -137,12 +133,13 @@ void lbs::SteadyStateSolver::
 //###################################################################
 /**Assembles a delta-phi vector on the first moment.*/
 void lbs::SteadyStateSolver::
-  AssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
-                              const std::vector<double>& phi_in)
+  AssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
+                              const std::vector<double>& phi_in,
+                              std::vector<double>& delta_phi_local)
 {
-  const auto& sdm = *discretization;
+  const auto& sdm = *discretization_;
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
-  const auto& phi_uk_man  = flux_moments_uk_man;
+  const auto& phi_uk_man  = flux_moments_uk_man_;
 
   const int    gsi = groupset.groups.front().id;
   const size_t gss = groupset.groups.size();
@@ -150,11 +147,11 @@ void lbs::SteadyStateSolver::
   delta_phi_local.clear();
   delta_phi_local.assign(sdm.GetNumLocalDOFs(dphi_uk_man), 0.0);
 
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
-    const auto& sigma_s = matid_to_xs_map[cell.material_id]->sigma_s_gtog;
+    const auto& sigma_s = matid_to_xs_map_[cell.material_id]->sigma_s_gtog;
 
     for (size_t i=0; i < num_nodes; i++)
     {
@@ -175,17 +172,18 @@ void lbs::SteadyStateSolver::
 //###################################################################
 /**DAssembles a delta-phi vector on the first moment.*/
 void lbs::SteadyStateSolver::
-  DisAssembleWGDSADeltaPhiVector(LBSGroupset& groupset,
+  DisAssembleWGDSADeltaPhiVector(const LBSGroupset& groupset,
+                                 const std::vector<double>& delta_phi_local,
                                  std::vector<double>& ref_phi_new)
 {
-  const auto& sdm = *discretization;
+  const auto& sdm = *discretization_;
   const auto& dphi_uk_man = groupset.wgdsa_solver->UnknownStructure();
-  const auto& phi_uk_man  = flux_moments_uk_man;
+  const auto& phi_uk_man  = flux_moments_uk_man_;
 
   const int    gsi = groupset.groups.front().id;
   const size_t gss = groupset.groups.size();
 
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
     const auto& cell_mapping = sdm.GetCellMapping(cell);
     const size_t num_nodes = cell_mapping.NumNodes();
@@ -202,9 +200,6 @@ void lbs::SteadyStateSolver::
         phi_new_mapped[g] += delta_phi_mapped[g];
     }//for dof
   }//for cell
-
-  delta_phi_local.resize(0);
-  delta_phi_local.shrink_to_fit();
 }
 
 //###################################################################
@@ -215,8 +210,11 @@ void lbs::SteadyStateSolver::
                const std::vector<double>& ref_phi_old,
                std::vector<double>& ref_phi_new)
 {
-  AssembleWGDSADeltaPhiVector(groupset, ref_phi_old, ref_phi_new);
+  std::vector<double> delta_phi_local;
+  AssembleWGDSADeltaPhiVector(groupset, ref_phi_old, ref_phi_new, //inputs
+                              delta_phi_local);                   //output
   groupset.wgdsa_solver->Assemble_b(delta_phi_local);
   groupset.wgdsa_solver->Solve(delta_phi_local);
-  DisAssembleWGDSADeltaPhiVector(groupset, ref_phi_new);
+  DisAssembleWGDSADeltaPhiVector(groupset, delta_phi_local, //inputs
+                                 ref_phi_new);              //output
 }

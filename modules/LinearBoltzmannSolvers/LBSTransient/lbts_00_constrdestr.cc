@@ -13,7 +13,7 @@ lbs::TransientSolver::TransientSolver(const std::string &in_text_name) :
 /**Destructor*/
 lbs::TransientSolver::~TransientSolver()
 {
-  for (auto& groupset : groupsets)
+  for (auto& groupset : groupsets_)
   {
     CleanUpWGDSA(groupset);
     CleanUpTGDSA(groupset);

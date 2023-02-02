@@ -15,19 +15,19 @@ void lbs::TransientSolver::StepPrecursors()
   const double eff_dt = theta*dt;
 
   //============================================= Clear destination vector
-  precursor_new_local.assign(precursor_new_local.size(), 0.0);
+  precursor_new_local_.assign(precursor_new_local_.size(), 0.0);
 
   //================================================== Loop over local cells
   // Uses phi_new and precursor_prev_local to compute
   // precursor_new_local(theta-flavor)
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& fe_values = unit_cell_matrices[cell.local_id];
-    const auto& transport_view = cell_transport_views[cell.local_id];
+    const auto& fe_values = unit_cell_matrices_[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id];
     const double cell_volume = transport_view.Volume();
 
     //==================== Obtain xs
-    const auto& xs = matid_to_xs_map.at(cell.material_id);
+    const auto& xs = matid_to_xs_map_.at(cell.material_id);
 
     //======================================== Compute delayed fission rate
     double delayed_fission = 0.0;
@@ -36,14 +36,14 @@ void lbs::TransientSolver::StepPrecursors()
       const size_t uk_map = transport_view.MapDOF(i, 0, 0);
       const double node_V_fraction = fe_values.Vi_vectors[i]/cell_volume;
 
-      for (int g = 0; g < groups.size(); ++g)
+      for (int g = 0; g < groups_.size(); ++g)
         delayed_fission += xs->nu_delayed_sigma_f[g] *
-                           phi_new_local[uk_map + g] *
+                           phi_new_local_[uk_map + g] *
                            node_V_fraction;
     }
 
     //========================================= Loop over precursors
-    const auto& max_precursors = max_precursors_per_material;
+    const auto& max_precursors = max_precursors_per_material_;
     for (unsigned int j = 0; j < xs->num_precursors; ++j)
     {
       const size_t dof_map = cell.local_id * max_precursors + j;
@@ -51,17 +51,17 @@ void lbs::TransientSolver::StepPrecursors()
       const double coeff = 1.0 / (1.0 + eff_dt * precursor.decay_constant);
 
       //contribute last time step precursors
-      precursor_new_local[dof_map] = coeff * precursor_prev_local[dof_map];
+      precursor_new_local_[dof_map] = coeff * precursor_prev_local[dof_map];
 
       //contribute delayed fission production
-      precursor_new_local[dof_map] +=
+      precursor_new_local_[dof_map] +=
         coeff * eff_dt * precursor.fractional_yield * delayed_fission;
     }
   }//for cell
 
   //======================================== Compute t^{n+1} value
   {
-    auto& Cj = precursor_new_local;
+    auto& Cj = precursor_new_local_;
     const auto& Cj_prev = precursor_prev_local;
 
     const double inv_theta = 1.0/theta;

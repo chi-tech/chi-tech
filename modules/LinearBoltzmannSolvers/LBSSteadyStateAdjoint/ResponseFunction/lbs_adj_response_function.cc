@@ -90,7 +90,7 @@ std::vector<double> lbs::ResponseFunctionDesignation::
     throw std::logic_error(fname + " Call lua-function, " +
                            lua_functional + ", returned a vector of size " +
                              std::to_string(response.size()) +
-                             " which is greater than the number of groups " +
+                             " which is greater than the number of groups_ " +
                              std::to_string(num_groups) + ".");
 
   for (size_t g=0; g<num_groups; ++g)

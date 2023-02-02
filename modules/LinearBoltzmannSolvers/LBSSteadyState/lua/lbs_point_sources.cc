@@ -42,10 +42,10 @@ int chiLBSAddPointSource(lua_State *L)
 
   LuaCheckTableValue(fname, L, 5);
 
-  std::vector<double> strength;
-  LuaPopulateVectorFrom1DArray(fname,L, 5, strength);
+  std::vector<double> groupwise_strength;
+  LuaPopulateVectorFrom1DArray(fname, L, 5, groupwise_strength);
 
-  lbs_solver.point_sources.emplace_back(location, strength);
+  lbs_solver.AddPointSource(lbs::PointSource(location, groupwise_strength));
 
   chi::log.Log() << "LBS: Added point source at "
                 << location.PrintStr();
@@ -75,7 +75,7 @@ int chiLBSClearPointSources(lua_State *L)
                                                                solver_handle,
                                                                fname);
 
-  lbs_solver.point_sources.clear();
+  lbs_solver.ClearPointSources();
 
   chi::log.Log() << "LBS: Cleared all point sources";
 

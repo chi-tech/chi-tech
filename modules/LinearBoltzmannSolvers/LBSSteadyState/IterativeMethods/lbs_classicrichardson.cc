@@ -5,6 +5,7 @@
 
 #include "ChiTimer/chi_timer.h"
 #include "LBSSteadyState/Groupset/lbs_groupset.h"
+#include "ChiMesh/SweepUtilities/SweepScheduler/sweepscheduler.h"
 
 #include <iomanip>
 
@@ -34,7 +35,7 @@ ClassicRichardson(LBSGroupset& groupset,
 
   const auto num_delayed_psi_info = groupset.angle_agg.GetNumDelayedAngularDOFs();
   const size_t num_angles = groupset.quadrature->abscissae.size();
-  const size_t num_psi_global = glob_node_count *
+  const size_t num_psi_global = glob_node_count_ *
                                 num_angles *
                                 groupset.groups.size();
   const size_t num_delayed_psi_globl = num_delayed_psi_info.second;
@@ -52,12 +53,12 @@ ClassicRichardson(LBSGroupset& groupset,
       << "%)";
   }
 
-  std::vector<double> init_q_moments_local = q_moments_local;
+  std::vector<double> init_q_moments_local = q_moments_local_;
 
   //================================================== Sweep chunk settings
   auto& sweep_chunk = sweep_scheduler.GetSweepChunk();
   bool use_surface_source_flag = (source_flags & APPLY_FIXED_SOURCES) and
-                                 (not options.use_src_moments);
+                                 (not options_.use_src_moments);
   sweep_chunk.SetSurfaceSourceActiveFlag(use_surface_source_flag);
   sweep_chunk.ZeroIncomingDelayedPsi();
 
@@ -66,21 +67,21 @@ ClassicRichardson(LBSGroupset& groupset,
   bool converged = false;
   for (int k = 0; k < groupset.max_iterations; ++k)
   {
-    q_moments_local = init_q_moments_local;
-    set_source_function(groupset, q_moments_local, source_flags);
+    q_moments_local_ = init_q_moments_local;
+    set_source_function(groupset, q_moments_local_, source_flags);
 
     sweep_chunk.ZeroFluxDataStructures();
     sweep_scheduler.Sweep();
 
     if (groupset.apply_wgdsa)
-      ExecuteWGDSA(groupset,phi_old_local,phi_new_local);
+      ExecuteWGDSA(groupset, phi_old_local_, phi_new_local_);
 
     if (groupset.apply_tgdsa)
-      ExecuteTGDSA(groupset,phi_old_local,phi_new_local);
+      ExecuteTGDSA(groupset, phi_old_local_, phi_new_local_);
 
     double pw_change = ComputePiecewiseChange(groupset);
 
-    ScopedCopySTLvectors(groupset,phi_new_local,phi_old_local, WITH_DELAYED_PSI);
+    GSScopedCopyPrimarySTLvectors(groupset, phi_new_local_, phi_old_local_, WITH_DELAYED_PSI);
 
     double rho = sqrt(pw_change / pw_change_prev);
     pw_change_prev = pw_change;
@@ -100,7 +101,7 @@ ClassicRichardson(LBSGroupset& groupset,
     iter_info
       << chi::program_timer.GetTimeString() << " "
       << offset
-      << "WGS groups ["
+      << "WGS groups_ ["
       << groupset.groups.front().id
       << "-"
       << groupset.groups.back().id
@@ -117,14 +118,14 @@ ClassicRichardson(LBSGroupset& groupset,
 
       if (converged) break;
 
-      if (options.write_restart_data)
+      if (options_.write_restart_data)
       {
         if ((chi::program_timer.GetTime()/60000.0) >
-            last_restart_write+options.write_restart_interval)
+            last_restart_write_ + options_.write_restart_interval)
         {
-          last_restart_write = chi::program_timer.GetTime()/60000.0;
-          WriteRestartData(options.write_restart_folder_name,
-                           options.write_restart_file_base);
+          last_restart_write_ = chi::program_timer.GetTime() / 60000.0;
+          WriteRestartData(options_.write_restart_folder_name,
+                           options_.write_restart_file_base);
         }
       }//if write restart data
     }//print iterative info
@@ -135,8 +136,8 @@ ClassicRichardson(LBSGroupset& groupset,
   {
     double sweep_time = sweep_scheduler.GetAverageSweepTime();
     double source_time=
-      chi::log.ProcessEvent(source_event_tag,
-                           chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
+      chi::log.ProcessEvent(source_event_tag_,
+                            chi_objects::ChiLog::EventOperation::AVERAGE_DURATION);
 
     if (log_info)
     {

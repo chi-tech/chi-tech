@@ -21,19 +21,29 @@ struct KSPDataContext
   double rhs_preconditioned_norm = 0.0;
 
   const lbs::SetSourceFunction& set_source_function;
+  std::vector<double>& phi_old_local;
+  std::vector<double>& q_moments_local;
+  std::vector<double>& phi_new_local;
 
   KSPDataContext(lbs::SteadyStateSolver& in_solver,
                  LBSGroupset& in_groupset,
                  Vec& in_operating_vector,
                  chi_mesh::sweep_management::SweepScheduler& in_sweep_scheduler,
                  SourceFlags in_lhs_scope,
-                 const lbs::SetSourceFunction& in_set_source_function) :
+                 const lbs::SetSourceFunction& in_set_source_function,
+                 std::vector<double>& in_phi_old_local,
+                 std::vector<double>& in_q_moments_local,
+                 std::vector<double>& in_phi_new_local) :
     solver(in_solver),
     groupset(in_groupset),
     operating_vector(in_operating_vector),
     sweep_scheduler(in_sweep_scheduler),
     lhs_scope(in_lhs_scope),
-    set_source_function(in_set_source_function){}
+    set_source_function(in_set_source_function),
+    phi_old_local(in_phi_old_local),
+    q_moments_local(in_q_moments_local),
+    phi_new_local(in_phi_new_local)
+    {}
 };
 
 }

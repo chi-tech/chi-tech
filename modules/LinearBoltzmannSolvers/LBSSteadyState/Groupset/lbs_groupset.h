@@ -26,7 +26,7 @@ namespace lbs
 {
 
 //################################################################### Class def
-/**Group set functioning as a collection of groups*/
+/**Group set functioning as a collection of groups_*/
 class LBSGroupset
 {
 protected:

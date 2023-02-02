@@ -9,7 +9,7 @@
                            option would give the fission rate at the previous
                            timestep. [Default="NEW"]
 
-\return The fission rate.
+\return double The fission rate.
 
 \ingroup LuaLBS
 \author Jan*/

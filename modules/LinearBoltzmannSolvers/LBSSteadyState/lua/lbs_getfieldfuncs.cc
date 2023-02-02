@@ -8,7 +8,7 @@
  *
 \param SolverIndex int Handle to the solver for which the list is to be obtained.
 
-\return table,count Returns an array of handles and the amount of elements in
+\return Pair Table and count. Returns an array of handles and the amount of elements in
         it (indexed from 1).
 \ingroup LuaLBS
 \author Jan*/
@@ -57,7 +57,7 @@ from the transport solver.
 
 \param SolverIndex int Handle to the solver for which the list is to be obtained.
 
-\return table,count Returns an array of handles and the amount of elements in
+\return Pair Table and count. Returns an array of handles and the amount of elements in
         it (indexed from 1).
 \ingroup LuaLBS
 \author Jan*/
@@ -75,9 +75,9 @@ int chiLBSGetScalarFieldFunctionList(lua_State *L)
   int ff=-1;
   int count=0;
 
-  for (int g=0; g<lbs_solver.groups.size(); g++)
+  for (int g=0; g<lbs_solver.NumGroups(); g++)
   {
-    for (int m=0; m<lbs_solver.num_moments; m++)
+    for (int m=0; m<lbs_solver.NumMoments(); m++)
     {
       ff++;
       if (m==0)

@@ -9,18 +9,18 @@ double lbs::SteadyStateAdjointSolver::ComputeInnerProduct()
   double local_integral = 0.0;
 
   auto pwl =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
 
   //============================================= Material sources
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
-    if (matid_to_src_map.count(cell.material_id) == 0) continue; //Skip if no src
+    if (matid_to_src_map_.count(cell.material_id) == 0) continue; //Skip if no src
 
-    const auto& transport_view = cell_transport_views[cell.local_id];
-    const auto& source = matid_to_src_map[cell.material_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& source = matid_to_src_map_[cell.material_id];
     const auto& fe_values = pwl->GetUnitIntegrals(cell);
 
-    for (const auto& group : groups)
+    for (const auto& group : groups_)
     {
       const int g = group.id;
       const double Q = source->source_value_g[g];
@@ -32,7 +32,7 @@ double lbs::SteadyStateAdjointSolver::ComputeInnerProduct()
         {
           const size_t dof_map = transport_view.MapDOF(i, 0, g); //unknown map
 
-          const double phi = phi_old_local[dof_map];
+          const double phi = phi_old_local_[dof_map];
 
           local_integral += Q * phi * fe_values.IntV_shapeI(i);
         }//for node
@@ -41,18 +41,18 @@ double lbs::SteadyStateAdjointSolver::ComputeInnerProduct()
   }//for cell
 
   //============================================= Point sources
-  for (const auto& point_source : point_sources)
+  for (const auto& point_source : point_sources_)
   {
     const auto& info_list = point_source.ContainingCellsInfo();
     for (const auto& info : info_list)
     {
-      const auto& cell = grid->local_cells[info.cell_local_id];
-      const auto& transport_view = cell_transport_views[cell.local_id];
+      const auto& cell = grid_ptr_->local_cells[info.cell_local_id];
+      const auto& transport_view = cell_transport_views_[cell.local_id];
       const auto& source_strength = point_source.Strength();
       const auto& shape_values = info.shape_values;
       const auto& fe_values = pwl->GetUnitIntegrals(cell);
 
-      for (const auto& group : groups)
+      for (const auto& group : groups_)
       {
         const int g = group.id;
         const double S = source_strength[g] * info.volume_weight;
@@ -64,7 +64,7 @@ double lbs::SteadyStateAdjointSolver::ComputeInnerProduct()
           {
             const size_t dof_map = transport_view.MapDOF(i, 0, g); //unknown map
 
-            const double phi_i = phi_old_local[dof_map];
+            const double phi_i = phi_old_local_[dof_map];
 
             local_integral += S * phi_i * shape_values[i];
           }//for node

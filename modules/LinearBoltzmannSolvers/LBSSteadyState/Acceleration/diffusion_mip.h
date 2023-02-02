@@ -70,7 +70,7 @@ protected:
   const chi_math::SpatialDiscretization& m_sdm;
   const chi_math::UnknownManager m_uk_man;
 
-  const std::vector<BoundaryCondition> m_bcs;
+  const std::map<uint64_t, BoundaryCondition> m_bcs;
 
   const MapMatID2XS m_map_mat_id_2_xs;
 
@@ -105,7 +105,7 @@ public:
                      const chi_mesh::MeshContinuum& grid,
                      const chi_math::SpatialDiscretization& sdm,
                      const chi_math::UnknownManager& uk_man,
-                     std::vector<BoundaryCondition> bcs,
+                     std::map<uint64_t, BoundaryCondition> bcs,
                      MapMatID2XS map_mat_id_2_xs,
                      const std::vector<UnitCellMatrices>& unit_cell_matrices,
                      bool verbose=false);

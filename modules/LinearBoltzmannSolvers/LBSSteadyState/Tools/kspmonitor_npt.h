@@ -5,9 +5,6 @@
 
 namespace lbs
 {
-PetscErrorCode KSPConvergenceTestNPT(
-                KSP ksp, PetscInt n, PetscReal rnorm,
-                KSPConvergedReason* convergedReason, void* monitordestroy);
 PetscErrorCode KSPConvergenceTest(
   KSP ksp, PetscInt n, PetscReal rnorm,
   KSPConvergedReason* convergedReason, void* monitordestroy);

@@ -59,9 +59,9 @@ void lbs::SteadyStateSolver::WriteRestartData(std::string folder_name,
   }
   else
   {
-    size_t phi_old_size = phi_old_local.size();
+    size_t phi_old_size = phi_old_local_.size();
     ofile.write((char*)&phi_old_size, sizeof(size_t));
-    for (auto val : phi_old_local)
+    for (auto val : phi_old_local_)
       ofile.write((char*)&val, sizeof(double));
 
     ofile.close();
@@ -123,14 +123,14 @@ void lbs::SteadyStateSolver::ReadRestartData(std::string folder_name,
     size_t number_of_unknowns;
     ifile.read((char*)&number_of_unknowns, sizeof(size_t));
 
-    if (number_of_unknowns != phi_old_local.size())
+    if (number_of_unknowns != phi_old_local_.size())
     {
       location_succeeded = false;
       ifile.close();
     }
     else
     {
-      std::vector<double> temp_phi_old(phi_old_local.size(),0.0);
+      std::vector<double> temp_phi_old(phi_old_local_.size(), 0.0);
 
       size_t v=0;
       while (not ifile.eof())
@@ -145,7 +145,7 @@ void lbs::SteadyStateSolver::ReadRestartData(std::string folder_name,
         ifile.close();
       }
       else
-        phi_old_local = std::move(temp_phi_old);
+        phi_old_local_ = std::move(temp_phi_old);
 
       ifile.close();
     }

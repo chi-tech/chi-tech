@@ -1,15 +1,13 @@
 #include "angleaggregation.h"
 
 #include "chi_log.h"
-;
-
 #include "chi_mpi.h"
 
 
 //###################################################################
 /** Sets up the angle-aggregation object. */
 void chi_mesh::sweep_management::AngleAggregation::
-  Setup(const std::vector<std::shared_ptr<SweepBndry>>& in_sim_boundaries,
+  Setup(const std::map<uint64_t, std::shared_ptr<SweepBndry>>& in_sim_boundaries,
         size_t in_number_of_groups,
         size_t in_number_of_group_subsets,
         std::shared_ptr<chi_math::AngularQuadrature> &in_quadrature,
@@ -45,7 +43,7 @@ void chi_mesh::sweep_management::AngleAggregation::ZeroOutgoingDelayedPsi()
 void chi_mesh::sweep_management::AngleAggregation::ZeroIncomingDelayedPsi()
 {
   //======================================== Opposing reflecting bndries
-  for (const auto& bndry : sim_boundaries)
+  for (const auto& [bid,bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -82,14 +80,10 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 {
   const double epsilon = 1.0e-8;
 
-  int total_reflect_cells = 0;
-  int total_reflect_faces = 0;
-  int total_reflect_size = 0;
-
   bool reflecting_bcs_initialized=false;
 
   int bndry_id=0;
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -139,7 +133,7 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
         cell_vec.resize(num_local_cells);
         for (const auto& cell : grid->local_cells)
         {
-          int c = cell.local_id;
+          const uint64_t c = cell.local_id;
 
           //=========================== Check cell on ref bndry
           bool on_ref_bndry = false;
@@ -152,7 +146,6 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
             }
           }
           if (not on_ref_bndry) continue;
-          total_reflect_cells += 1;
 
           //=========================== If cell on ref bndry
           cell_vec[c].resize(cell.faces.size());
@@ -165,8 +158,6 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
               cell_vec[c][f].clear();
               cell_vec[c][f].resize(face.vertex_ids.size(),
                                     std::vector<double>(number_of_groups,0.0));
-              total_reflect_faces += 1;
-              total_reflect_size  += face.vertex_ids.size()*number_of_groups;
             }
             ++f;
           }
@@ -175,12 +166,21 @@ void chi_mesh::sweep_management::AngleAggregation::InitializeReflectingBCs()
 
       //========================================= Determine if boundary is
       //                                          opposing reflecting
-      if ((bndry_id == 1) and (sim_boundaries[0]->IsReflecting()))
-        rbndry.opposing_reflected = true;
-      if ((bndry_id == 3) and (sim_boundaries[2]->IsReflecting()))
-        rbndry.opposing_reflected = true;
-      if ((bndry_id == 5) and (sim_boundaries[4]->IsReflecting()))
-        rbndry.opposing_reflected = true;
+      const double sqrt_1div3 = 1.0/sqrt(3.0);
+      const Vector3 median = Vector3(sqrt_1div3,sqrt_1div3,sqrt_1div3);
+
+      if (rbndry.normal.Dot(median) >= 0.0)
+        for (const auto& [otherbid, otherbndry] : sim_boundaries)
+        {
+          if (otherbid == bndry_id) continue;
+          if (not otherbndry->IsReflecting()) continue;
+
+          const auto& otherRbndry =
+            dynamic_cast<const BoundaryReflecting&>(*otherbndry);
+
+          if (rbndry.normal.Dot(otherRbndry.normal) < (0.0-epsilon))
+            rbndry.opposing_reflected = true;
+        }
 
       if (rbndry.opposing_reflected)
         rbndry.hetero_boundary_flux_old = rbndry.hetero_boundary_flux;
@@ -210,7 +210,7 @@ std::pair<size_t,size_t> chi_mesh::sweep_management::AngleAggregation::
   size_t local_ang_unknowns = 0;
 
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -259,7 +259,7 @@ void chi_mesh::sweep_management::AngleAggregation::
   AppendDelayedAngularDOFsToArray(int &index, double* x_ref)
 {
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -296,7 +296,7 @@ void chi_mesh::sweep_management::AngleAggregation::
   SetDelayedAngularDOFsFromArray(int &index, const double* x_ref)
 {
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -338,7 +338,7 @@ std::vector<double> chi_mesh::sweep_management::AngleAggregation::
   psi_vector.reserve(psi_size.first);
 
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -385,7 +385,7 @@ void chi_mesh::sweep_management::AngleAggregation::
 
   size_t index = 0;
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -422,7 +422,7 @@ void chi_mesh::sweep_management::AngleAggregation::
   SetDelayedPsiOld2New()
 {
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {
@@ -452,7 +452,7 @@ void chi_mesh::sweep_management::AngleAggregation::
   SetDelayedPsiNew2Old()
 {
   //======================================== Opposing reflecting bndries
-  for (auto& bndry : sim_boundaries)
+  for (auto& [bid, bndry] : sim_boundaries)
   {
     if (bndry->IsReflecting())
     {

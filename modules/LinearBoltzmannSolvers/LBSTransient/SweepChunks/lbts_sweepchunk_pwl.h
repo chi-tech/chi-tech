@@ -5,6 +5,8 @@
 
 #include "ChiMath/SpatialDiscretization/FiniteElement/PiecewiseLinear/pwl.h"
 
+#include "ChiMesh/SweepUtilities/sweepchunk_base.h"
+
 #include "LBSSteadyState/lbs_linear_boltzmann_solver.h"
 #include "LBSSteadyState/Groupset/lbs_groupset.h"
 
@@ -78,7 +80,7 @@ public:
     size_t gs_ss_begin;
     bool surface_source_active;
 
-    double* GetUpwindPsi(int fj, bool local, bool boundary) const;
+    const double* GetUpwindPsi(int fj, bool local, bool boundary) const;
     double* GetDownwindPsi(int fi,
                            bool local,
                            bool boundary,

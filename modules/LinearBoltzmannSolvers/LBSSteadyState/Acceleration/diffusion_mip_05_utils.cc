@@ -87,7 +87,7 @@ double lbs::acceleration::DiffusionMIPSolver::
 }
 
 //###################################################################
-/**Maps a face, in a discontinuous sense, using the spatial discretization.*/
+/**Maps a face, in a discontinuous sense, using the spatial discretization_.*/
 int lbs::acceleration::DiffusionMIPSolver::
   MapFaceNodeDisc(const chi_mesh::Cell& cur_cell,
                   const chi_mesh::Cell& adj_cell,

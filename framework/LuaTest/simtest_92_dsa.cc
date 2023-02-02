@@ -43,12 +43,13 @@ int chiSimTest92_DSA(lua_State* L)
 
   //============================================= Make Boundary conditions
   typedef lbs::acceleration::BoundaryCondition BC;
-  std::vector<BC> bcs = {{lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
-                         {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
-                         {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
-                         {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
-                         {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
-                         {lbs::acceleration::BCType::DIRICHLET,{2,0,0}}};
+  std::map<uint64_t, BC> bcs;
+  bcs[0] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
+  bcs[1] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
+  bcs[2] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
+  bcs[3] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
+  bcs[4] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}},
+  bcs[5] = {lbs::acceleration::BCType::DIRICHLET,{2,0,0}};
 
   MapMatID2XS map_mat_id_2_xs;
   map_mat_id_2_xs.insert(

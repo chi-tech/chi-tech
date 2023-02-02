@@ -114,7 +114,7 @@ void mg_diffusion::Solver::Initialize()
   sdm.BuildSparsityPattern(nodal_nnz_in_diag,nodal_nnz_off_diag, OneDofPerNode);
 
   unsigned int i_two_grid = do_two_grid ? 1 : 0;
-  std::cout << "i_two_grid = " << i_two_grid << std::endl;
+//  std::cout << "i_two_grid = " << i_two_grid << std::endl;
 
   A.resize(num_groups+i_two_grid, nullptr);
   x.resize(num_groups+i_two_grid, nullptr);

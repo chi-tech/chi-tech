@@ -8,7 +8,7 @@
 #include "chi_log.h"
 
 //###################################################################
-/**Writes the flux-moments of a LBS solution to file (phi_old_local).
+/**Writes the flux-moments of a LBS solution to file (phi_old_local_).
 
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
@@ -36,7 +36,7 @@ int chiLBSWriteFluxMoments(lua_State *L)
                                                                solver_handle,
                                                                fname);
 
-  lbs_solver.WriteFluxMoments(file_base, lbs_solver.phi_old_local);
+  lbs_solver.WriteFluxMoments(file_base, lbs_solver.PhiOldLocal());
 
   return 0;
 }
@@ -120,20 +120,20 @@ int chiLBSReadFluxMomentsAndMakeSourceMoments(lua_State *L)
                                                                fname);
 
   lbs_solver.ReadFluxMoments(file_base,
-                          lbs_solver.ext_src_moments_local,
+                          lbs_solver.ExtSrcMomentsLocal(),
                           single_file_flag);
 
   chi::log.Log() << "Making source moments from flux file.";
-  auto temp_phi = lbs_solver.phi_old_local;
-  lbs_solver.phi_old_local = lbs_solver.ext_src_moments_local;
-  lbs_solver.ext_src_moments_local = lbs_solver.MakeSourceMomentsFromPhi();
-  lbs_solver.phi_old_local = temp_phi;
+  auto temp_phi = lbs_solver.PhiOldLocal();
+  lbs_solver.PhiOldLocal() = lbs_solver.ExtSrcMomentsLocal();
+  lbs_solver.ExtSrcMomentsLocal() = lbs_solver.MakeSourceMomentsFromPhi();
+  lbs_solver.PhiOldLocal() = temp_phi;
 
   return 0;
 }
 
 //###################################################################
-/**Reads the source-moments from a file to a specific ext_src_moments_local-vector
+/**Reads the source-moments from a file to a specific ext_src_moments_local_-vector
  * to be used instead of a regular material/boundary source.
 
 \param SolverIndex int Handle to the solver for which the group
@@ -174,14 +174,14 @@ int chiLBSReadSourceMoments(lua_State *L)
                                                                fname);
 
   lbs_solver.ReadFluxMoments(file_base,
-                             lbs_solver.ext_src_moments_local,
+                             lbs_solver.ExtSrcMomentsLocal(),
                              single_file_flag);
 
   return 0;
 }
 
 //###################################################################
-/**Reads flux-moments from a file to phi_old_local (the initial flux solution).
+/**Reads flux-moments from a file to phi_old_local_ (the initial flux solution).
 
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
@@ -221,7 +221,7 @@ int chiLBSReadFluxMoments(lua_State *L)
                                                                fname);
 
   lbs_solver.ReadFluxMoments(file_base,
-                             lbs_solver.phi_old_local,
+                             lbs_solver.PhiOldLocal(),
                              single_file_flag);
 
   return 0;

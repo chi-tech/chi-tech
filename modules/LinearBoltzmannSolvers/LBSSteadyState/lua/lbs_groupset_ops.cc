@@ -25,7 +25,7 @@ chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
 
 --========== Groups
 grp = {}
-for g=1,num_groups do
+for g=1,num_groups_ do
     grp[g] = chiLBSCreateGroup(phys1)
 end
 
@@ -49,9 +49,9 @@ chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
 \endcode
 
-Groupsets segregate the code into pieces arranged by the number of groups
+Groupsets segregate the code into pieces arranged by the number of groups_
 it contains. A great deal of care must be taken with intergroupset transfer
-since the order in which the groupsets are executed determine what information
+since the order in which the groupsets_ are executed determine what information
 will be available to them.
 
 \ingroup LuaLBS*/
@@ -79,9 +79,9 @@ int chiLBSCreateGroupset(lua_State *L)
                                                                fname);
 
   //============================================= Create groupset
-  lbs_solver.groupsets.emplace_back((int)lbs_solver.groupsets.size());
+  lbs_solver.AddGroupset();
 
-  lua_pushinteger(L, lbs_solver.groupsets.back().id);
+  lua_pushinteger(L, lbs_solver.Groupsets().back().id);
   return 1;
 }
 
@@ -91,12 +91,18 @@ int chiLBSCreateGroupset(lua_State *L)
 /**Create a group.
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
+\param GroupId int Optional. If not supplied the next logical number
+                             is assigned.
 
 ##_
 
 Example:
 \code
-grp[g] = chiLBSCreateGroup(phys1)
+--========== Groups
+grp = {}
+for g=1,num_groups_ do
+    grp[g] = chiLBSCreateGroup(phys1)
+end
 \endcode
 
 \ingroup LuaLBSGroupsets
@@ -104,16 +110,30 @@ grp[g] = chiLBSCreateGroup(phys1)
 int chiLBSCreateGroup(lua_State *L)
 {
   const std::string fname = "chiLBSCreateGroup";
-  //============================================= Get pointer to solver
-  int solver_handle = lua_tonumber(L,1);
+  const int num_args = lua_gettop(L);
+  if (num_args < 1)
+    LuaPostArgAmountError(fname, 1, num_args);
+
+  //============================================= Get solver
+  LuaCheckNumberValue(fname, L, 1);
+  const int solver_handle = lua_tointeger(L,1);
+
   auto& lbs_solver = chi::GetStackItem<lbs::SteadyStateSolver>(chi::solver_stack,
                                                                solver_handle,
                                                                fname);
 
-  //============================================= Create groupset
-  lbs_solver.groups.emplace_back((int)lbs_solver.groups.size());
+  //============================================= Set Id
+  int group_id = -1;
+  if (num_args == 2)
+  {
+    LuaCheckNumberValue(fname, L, 2);
+    group_id = lua_tointeger(L, 2);
+  }
 
-  lua_pushnumber(L,lbs_solver.groups.back().id);
+  //============================================= Create groupset
+  lbs_solver.AddGroup(group_id);
+
+  lua_pushinteger(L,lbs_solver.Groups().back().id);
   return 1;
 }
 
@@ -122,7 +142,7 @@ int chiLBSCreateGroup(lua_State *L)
 
 
 //###################################################################
-/**Adds a block of groups to a groupset.
+/**Adds a block of groups_ to a groupset.
 \param SolverIndex int Handle to the solver for which the group
 is to be created.
 \param GroupsetIndex int Handle to the groupset to which the group is
@@ -135,7 +155,7 @@ is to be created.
 Example:
 \code
 grp = {}
-for g=1,num_groups do
+for g=1,num_groups_ do
     grp[g] = chiLBSCreateGroup(phys1)
 end
 
@@ -165,7 +185,7 @@ int chiLBSGroupsetAddGroups(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -177,12 +197,12 @@ int chiLBSGroupsetAddGroups(lua_State *L)
     throw std::runtime_error("chiLBSGroupsetAddGroups: Bad trouble.");
 
 
-  //============================================= Add the groups
+  //============================================= Add the groups_
   if (to<from)
   {
     chi::log.LogAllError()
-    << "No groups added to groupset in chiLBSGroupsetAddGroups. "
-       "This is triggered when groups are added with the \"to\" "
+    << "No groups_ added to groupset in chiLBSGroupsetAddGroups. "
+       "This is triggered when groups_ are added with the \"to\" "
        "field being less than the \"from\" field.";
     chi::Exit(EXIT_FAILURE);
   }
@@ -190,10 +210,10 @@ int chiLBSGroupsetAddGroups(lua_State *L)
 
   for (unsigned k=from; k<=to; k++)
   {
-    lbs::LBSGroup* group = nullptr;
+    lbs::LBSGroup const* group = nullptr;
     //================================= Check valid group
     try {
-      group = &lbs_solver.groups.at(k);
+      group = &lbs_solver.Groups().at(k);
     }
     catch (const std::out_of_range& o)
     {
@@ -258,7 +278,7 @@ int chiLBSGroupsetSetQuadrature(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -365,7 +385,7 @@ int chiLBSGroupsetSetAngleAggregationType(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -448,7 +468,7 @@ int chiLBSGroupsetSetAngleAggDiv(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -516,7 +536,7 @@ int chiLBSGroupsetSetGroupSubsets(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -595,7 +615,7 @@ Biconjugate Gradient Stabilized method with cyclic dependency convergence.\n\n
 The iterative methods NPT_CLASSICRICHARDSON, NPT_CLASSICRICHARDSON_CYCLES,
 NPT_GMRES and NPT_GMRES_CYCLES are considered legacy. The NPT_GMRES and
 NPT_GMRES_CYCLES are now considered deprecated with the inclusion of the
-generalized Krylov iteration method-class (which supports all the options
+generalized Krylov iteration method-class (which supports all the options_
 prepended with KRYLOV_).
 
 RICHARDSON is probably the least memory consuming but has the poorest
@@ -660,7 +680,7 @@ int chiLBSGroupsetSetIterativeMethod(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -777,7 +797,7 @@ int chiLBSGroupsetSetResidualTolerance(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -848,7 +868,7 @@ int chiLBSGroupsetSetMaxIterations(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -916,7 +936,7 @@ int chiLBSGroupsetSetGMRESRestartIntvl(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -985,7 +1005,7 @@ int chiLBSGroupsetSetEnableSweepLog(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -1069,7 +1089,7 @@ int chiLBSGroupsetSetWGDSA(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {
@@ -1159,7 +1179,7 @@ int chiLBSGroupsetSetTGDSA(lua_State *L)
   //============================================= Obtain pointer to groupset
   lbs::LBSGroupset* groupset = nullptr;
   try{
-    groupset = &lbs_solver.groupsets.at(grpset_index);
+    groupset = &lbs_solver.Groupsets().at(grpset_index);
   }
   catch (const std::out_of_range& o)
   {

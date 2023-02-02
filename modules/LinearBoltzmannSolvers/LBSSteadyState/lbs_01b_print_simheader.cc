@@ -17,14 +17,14 @@ void lbs::SteadyStateSolver::PrintSimHeader()
     chi::log.Log() << "\nInitializing LBS SteadyStateSolver with name: "
                        << TextName() << "\n\n";
     chi::log.Log() << "Scattering order    : "
-                       << options.scattering_order << std::endl;
+                   << options_.scattering_order << std::endl;
     chi::log.Log() << "Number of Groups    : "
-                       << groups.size() << std::endl;
+                   << groups_.size() << std::endl;
     chi::log.Log() << "Number of Group sets: "
-                       << groupsets.size() << std::endl;
+                   << groupsets_.size() << std::endl;
 
     //================================================== Output Groupsets
-    for (int gs=0; gs < groupsets.size(); gs++)
+    for (int gs=0; gs < groupsets_.size(); gs++)
     {
       char buf_pol[20];
       std::string outstr;
@@ -34,7 +34,7 @@ void lbs::SteadyStateSolver::PrintSimHeader()
       chi::log.Log() << "Groups: ";
       outstr = std::string("");
       counter = 0;
-      for (auto group : groupsets[gs].groups)
+      for (auto group : groupsets_[gs].groups)
       {
         snprintf(buf_pol,20,"%5d ",group.id);
         outstr += std::string(buf_pol);
@@ -50,7 +50,7 @@ void lbs::SteadyStateSolver::PrintSimHeader()
       chi::log.Log() << outstr << "\n\n";
 
 
-      auto quad = groupsets[gs].quadrature;
+      auto quad = groupsets_[gs].quadrature;
 
       if (quad->type == chi_math::AngularQuadratureType::ProductQuadrature)
       {

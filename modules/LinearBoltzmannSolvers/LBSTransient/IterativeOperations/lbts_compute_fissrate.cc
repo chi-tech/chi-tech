@@ -16,17 +16,17 @@ using namespace lbs;
 \author Zachary Hardy.*/
 double TransientSolver::ComputeFissionRate(const bool previous)
 {
-  const int first_grp = groups.front().id;
-  const int last_grp = groups.back().id;
+  const int first_grp = groups_.front().id;
+  const int last_grp = groups_.back().id;
 
-  const auto& phi = (previous)? phi_prev_local : phi_new_local;
+  const auto& phi = (previous)? phi_prev_local : phi_new_local_;
 
   //============================================= Loop over local cells
   double local_production = 0.0;
-  for (auto& cell : grid->local_cells)
+  for (auto& cell : grid_ptr_->local_cells)
   {
-    const auto& transport_view = cell_transport_views[cell.local_id];
-    const auto& cell_matrices = unit_cell_matrices[cell.local_id];
+    const auto& transport_view = cell_transport_views_[cell.local_id];
+    const auto& cell_matrices = unit_cell_matrices_[cell.local_id];
 
     //====================================== Obtain xs
     const auto& xs = transport_view.XS();
@@ -38,7 +38,7 @@ double TransientSolver::ComputeFissionRate(const bool previous)
       const size_t uk_map = transport_view.MapDOF(i, 0, 0);
       const double IntV_ShapeI = cell_matrices.Vi_vectors[i];
 
-      //=============================== Loop over groups
+      //=============================== Loop over groups_
       for (size_t g = first_grp; g <= last_grp; ++g)
         local_production += xs.sigma_f[g] *
                             phi[uk_map + g] *

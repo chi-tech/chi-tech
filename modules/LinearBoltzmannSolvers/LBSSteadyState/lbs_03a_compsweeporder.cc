@@ -19,16 +19,16 @@ typedef chi_mesh::sweep_management::AngleSetGroup TAngleSetGroup;
 /**Initializes the sweep ordering for the given groupset.*/
 void lbs::SteadyStateSolver::ComputeSweepOrderings(LBSGroupset& groupset) const
 {
-  if (options.verbose_inner_iterations)
+  if (options_.verbose_inner_iterations)
     chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Computing Sweep ordering.\n";
 
   const auto unq_groupings_and_mapping =
-    AssociateSOsAndDirections(*grid,
+    AssociateSOsAndDirections(*grid_ptr_,
                               *groupset.quadrature,
                               groupset.angleagg_method,
-                              options.geometry_type);
+                              options_.geometry_type);
   const auto& unique_so_groupings = unq_groupings_and_mapping.first;
   const auto& dir_id_to_so_map = unq_groupings_and_mapping.second;
 
@@ -47,7 +47,7 @@ void lbs::SteadyStateSolver::ComputeSweepOrderings(LBSGroupset& groupset) const
      chi_mesh::VolumeMesher::PartitionType::PARMETIS
      and (not groupset.allow_cycles));
 
-  bool is_1D_geometry = options.geometry_type == GeometryType::ONED_SLAB;
+  bool is_1D_geometry = options_.geometry_type == GeometryType::ONED_SLAB;
 
   //============================================= Check possibility of cycles
   if (no_cycles_parmetis_partitioning and
@@ -70,12 +70,12 @@ void lbs::SteadyStateSolver::ComputeSweepOrderings(LBSGroupset& groupset) const
     const auto new_swp_order =
       chi_mesh::sweep_management::
       CreateSweepOrder(omega,
-                       this->grid,
+                       this->grid_ptr_,
                        groupset.allow_cycles);
     groupset.sweep_orderings.emplace_back(new_swp_order);
   }
 
-  if (options.verbose_inner_iterations)
+  if (options_.verbose_inner_iterations)
     chi::log.Log()
       << chi::program_timer.GetTimeString()
       << " Done computing sweep orderings.           Process memory = "

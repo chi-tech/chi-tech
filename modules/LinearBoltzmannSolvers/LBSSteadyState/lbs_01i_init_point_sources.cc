@@ -11,26 +11,26 @@ void lbs::SteadyStateSolver::InitializePointSources()
   const std::string fname = "InitializePointSources";
 
   typedef chi_math::SpatialDiscretization_PWLD PWLD;
-  const auto& pwld = std::dynamic_pointer_cast<PWLD>(discretization);
+  const auto& pwld = std::dynamic_pointer_cast<PWLD>(discretization_);
 
   //============================================= Loop over point sources
-  for (auto& point_source : point_sources)
+  for (auto& point_source : point_sources_)
   {
-    if (point_source.Strength().size() != num_groups)
+    if (point_source.Strength().size() != num_groups_)
       throw std::logic_error(
         fname + ": Point source multigroup strength vector "
                 "is not compatible with the number of "
-                "groups in the simulaation. Expected " +
-                std::to_string(num_groups) + " found " +
-                std::to_string(point_source.Strength().size()));
+                "groups_ in the simulaation. Expected " +
+        std::to_string(num_groups_) + " found " +
+        std::to_string(point_source.Strength().size()));
 
     const auto& p = point_source.Location();
     double v_total = 0.0; //Total volume of all cells sharing
                           // this source
     std::vector<PointSource::ContainingCellInfo> temp_list;
-    for (const auto& cell : grid->local_cells)
+    for (const auto& cell : grid_ptr_->local_cells)
     {
-      if (grid->CheckPointInsideCell(cell, p))
+      if (grid_ptr_->CheckPointInsideCell(cell, p))
       {
         const auto& cell_view = pwld->GetCellMapping(cell);
         const auto& fe_values = pwld->GetUnitIntegrals(cell);
@@ -57,11 +57,11 @@ void lbs::SteadyStateSolver::InitializePointSources()
       }//if inside
     }//for local cell
 
-    auto ghost_global_ids = grid->cells.GetGhostGlobalIDs();
+    auto ghost_global_ids = grid_ptr_->cells.GetGhostGlobalIDs();
     for (uint64_t ghost_global_id : ghost_global_ids)
     {
-      const auto& neighbor_cell = grid->cells[ghost_global_id];
-      if (grid->CheckPointInsideCell(neighbor_cell, p))
+      const auto& neighbor_cell = grid_ptr_->cells[ghost_global_id];
+      if (grid_ptr_->CheckPointInsideCell(neighbor_cell, p))
       {
         const auto& neighbor_fe_values =
           pwld->GetUnitIntegrals(neighbor_cell);
@@ -77,7 +77,7 @@ void lbs::SteadyStateSolver::InitializePointSources()
                                          info.cell_local_id,
                                          info.shape_values,
                                          info.node_weights);
-      const auto& cell = grid->local_cells[info.cell_local_id];
+      const auto& cell = grid_ptr_->local_cells[info.cell_local_id];
       //Output message
       {
         std::stringstream output;

@@ -182,9 +182,8 @@ void lbs::acceleration::DiffusionMIPSolver::
         else
         {
           auto bc = DefaultBCDirichlet;
-          try {bc = m_bcs.at(face.neighbor_id);}
-          catch (const std::out_of_range& oor)
-          {throw std::logic_error(fname + ": unmapped boundary id.");}
+          if (m_bcs.count(face.neighbor_id) > 0)
+            bc = m_bcs.at(face.neighbor_id);
 
           if (bc.type == BCType::DIRICHLET)
           {

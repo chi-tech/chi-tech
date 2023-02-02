@@ -11,24 +11,24 @@ double lbs::SteadyStateSolver::ComputePiecewiseChange(LBSGroupset& groupset)
   int gsi = groupset.groups[0].id;
   size_t deltag = groupset.groups.size();
 
-  for (const auto& cell : grid->local_cells)
+  for (const auto& cell : grid_ptr_->local_cells)
   {
-    auto& transport_view = cell_transport_views[cell.local_id];
+    auto& transport_view = cell_transport_views_[cell.local_id];
 
     for (int i=0; i < cell.vertex_ids.size(); i++)
     {
-      for (int m=0; m<num_moments; m++)
+      for (int m=0; m < num_moments_; m++)
       {
         size_t mapping = transport_view.MapDOF(i,m,gsi);
-        double* phi_new_m = &phi_new_local[mapping];
-        double* phi_old_m = &phi_old_local[mapping];
+        double* phi_new_m = &phi_new_local_[mapping];
+        double* phi_old_m = &phi_old_local_[mapping];
 
         for (int g=0; g<deltag; g++)
         {
           size_t map0 = transport_view.MapDOF(i,0,gsi+g);
 
-          double abs_phi_m0     = fabs(phi_new_local[map0]);
-          double abs_phi_old_m0 = fabs(phi_old_local[map0]);
+          double abs_phi_m0     = fabs(phi_new_local_[map0]);
+          double abs_phi_old_m0 = fabs(phi_old_local_[map0]);
           double max_phi = std::max(abs_phi_m0,abs_phi_old_m0);
 
           double delta_phi = std::fabs(phi_new_m[g] - phi_old_m[g]);

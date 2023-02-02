@@ -24,31 +24,31 @@ void lbs::SteadyStateAdjointSolver::
   //============================================= Determine cell averaged
   //                                              importance map
   std::set<int> set_group_numbers;
-  for (const auto& groupset : groupsets)
+  for (const auto& groupset : groupsets_)
     for (const auto& group : groupset.groups)
       set_group_numbers.insert(group.id);
 
   const auto& m_to_ell_em_map =
-    groupsets.front().quadrature->GetMomentToHarmonicsIndexMap();
+    groupsets_.front().quadrature->GetMomentToHarmonicsIndexMap();
 
   typedef chi_math::VectorN<4> Arr4; //phi, J_x, J_y, J_z
   typedef std::vector<Arr4> MGVec4;
   typedef std::vector<MGVec4> VecOfMGVec4;
   const size_t num_groups = set_group_numbers.size();
-  const size_t num_cells = grid->local_cells.size();
+  const size_t num_cells = grid_ptr_->local_cells.size();
 
   VecOfMGVec4 cell_avg_p1_moments(num_cells, MGVec4(num_groups));
   {
     auto fe_sdm =
-      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization);
+      std::dynamic_pointer_cast<chi_math::SpatialDiscretization_FE>(discretization_);
 
     if (not fe_sdm)
       throw std::logic_error(fname + ": Error getting finite element spatial"
-                                     " discretization.");
+                                     " discretization_.");
 
-    for (const auto& cell : grid->local_cells)
+    for (const auto& cell : grid_ptr_->local_cells)
     {
-      const auto& cell_view = cell_transport_views[cell.local_id];
+      const auto& cell_view = cell_transport_views_[cell.local_id];
       const int num_nodes = cell_view.NumNodes();
       const auto& fe_values = fe_sdm->GetUnitIntegrals(cell);
 
@@ -57,7 +57,7 @@ void lbs::SteadyStateAdjointSolver::
       {
         //==================================== Get multigroup p1_moments
         MGVec4 p1_moments(set_group_numbers.size(), VecDbl{0.0,0.0,0.0,0.0});
-        for (int m=0; m < std::max(static_cast<int>(num_moments), 4); ++m)
+        for (int m=0; m < std::max(static_cast<int>(num_moments_), 4); ++m)
         {
           const auto& ell = m_to_ell_em_map[m].ell;
           const auto& em  = m_to_ell_em_map[m].m;
@@ -66,10 +66,10 @@ void lbs::SteadyStateAdjointSolver::
 
           for (int g : set_group_numbers)
           {
-            if (ell==0 and em== 0) p1_moments[g](0) = std::fabs(phi_old_local[dof_map_g0+g]);
-            if (ell==1 and em== 1) p1_moments[g](1) = phi_old_local[dof_map_g0+g];
-            if (ell==1 and em==-1) p1_moments[g](2) = phi_old_local[dof_map_g0+g];
-            if (ell==1 and em== 0) p1_moments[g](3) = phi_old_local[dof_map_g0+g];
+            if (ell==0 and em== 0) p1_moments[g](0) = std::fabs(phi_old_local_[dof_map_g0 + g]);
+            if (ell==1 and em== 1) p1_moments[g](1) = phi_old_local_[dof_map_g0 + g];
+            if (ell==1 and em==-1) p1_moments[g](2) = phi_old_local_[dof_map_g0 + g];
+            if (ell==1 and em== 0) p1_moments[g](3) = phi_old_local_[dof_map_g0 + g];
           }//for g
         }//for m
 
@@ -103,7 +103,7 @@ void lbs::SteadyStateAdjointSolver::
   typedef std::vector<VecOfABCoeffsPair> ExpReps;
   ExpReps cell_exp_reps(num_cells,VecOfABCoeffsPair(num_groups, {0.0,0.0}));
   {
-    for (const auto& cell : grid->local_cells)
+    for (const auto& cell : grid_ptr_->local_cells)
     {
       for (int g : set_group_numbers)
       {
@@ -132,7 +132,7 @@ void lbs::SteadyStateAdjointSolver::
     "Header size: 500 bytes\n"
     "Structure(type-info):\n"
     "uint64_t num_global_cells\n"
-    "uint64_t num_groups\n"
+    "uint64_t num_groups_\n"
     "uint64_t num_records\n"
     "Each record:\n"
     "  uint64_t     cell_global_id\n"
@@ -152,7 +152,7 @@ void lbs::SteadyStateAdjointSolver::
   header_bytes[399]='\0';
 
   //================================================== Process each location
-  uint64_t num_global_cells = grid->GetGlobalNumberOfCells();
+  uint64_t num_global_cells = grid_ptr_->GetGlobalNumberOfCells();
   for (int locationJ=0; locationJ<chi::mpi.process_count; ++locationJ)
   {
     chi::log.LogAll() << "  Barrier at " << locationJ;
@@ -175,7 +175,7 @@ void lbs::SteadyStateAdjointSolver::
     if (is_home)
     {
       file << header_bytes;
-      uint64_t num_groups_t  = groups.size();
+      uint64_t num_groups_t  = groups_.size();
       uint64_t num_records = num_global_cells * num_groups;
 
       file.write((char*)&num_global_cells ,sizeof(uint64_t));
@@ -183,7 +183,7 @@ void lbs::SteadyStateAdjointSolver::
       file.write((char*)&num_records      ,sizeof(uint64_t));
     }
 
-    for (const auto& cell : grid->local_cells)
+    for (const auto& cell : grid_ptr_->local_cells)
     {
       MGVec4            p1_moments = cell_avg_p1_moments[cell.local_id];
       VecOfABCoeffsPair exp_rep    = cell_exp_reps[cell.local_id];

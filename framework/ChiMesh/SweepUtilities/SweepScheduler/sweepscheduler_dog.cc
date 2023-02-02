@@ -212,7 +212,7 @@ void chi_mesh::sweep_management::SweepScheduler::
   for (auto& angset_group : angle_agg.angle_set_groups)
     angset_group.ResetSweep();
 
-  for (auto& bndry : angle_agg.sim_boundaries)
+  for (auto& [bid, bndry] : angle_agg.sim_boundaries)
   {
     if (bndry->Type() == chi_mesh::sweep_management::BoundaryType::REFLECTING)
     {

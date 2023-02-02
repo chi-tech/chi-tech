@@ -2,12 +2,12 @@
 #include "LBSTransient/SweepChunks/lbts_sweepchunk_pwl.h"
 
 //###################################################################
-/**Sets up the sweek chunk for the given discretization method.*/
+/**Sets up the sweek chunk for the given discretization_ method.*/
 std::shared_ptr<SweepChunk> lbs::TransientSolver::
   SetTransientSweepChunk(LBSGroupset& groupset)
 {
   auto pwl_sdm =
-    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization);
+    std::dynamic_pointer_cast<chi_math::SpatialDiscretization_PWLD>(discretization_);
 
   double theta;
   if (method == chi_math::SteppingMethod::BACKWARD_EULER)
@@ -18,21 +18,21 @@ std::shared_ptr<SweepChunk> lbs::TransientSolver::
   //================================================== Setting up required
   //                                                   sweep chunks
   auto sweep_chunk = std::make_shared<SweepChunkPWLTransientTheta>(
-    grid,                                    //Spatial grid of cells
-    *pwl_sdm,                                //Spatial discretization
-    cell_transport_views,                    //Cell transport views
-    phi_new_local,                           //Destination phi
-    psi_new_local[groupset.id],              //Destination psi
+    grid_ptr_,                                    //Spatial grid_ptr_ of cells
+    *pwl_sdm,                                //Spatial discretization_
+    cell_transport_views_,                    //Cell transport views
+    phi_new_local_,                           //Destination phi
+    psi_new_local_[groupset.id],              //Destination psi
 
     psi_prev_local[groupset.id],
     theta,
     dt,
 
-    q_moments_local,                         //Source moments
+    q_moments_local_,                         //Source moments
     groupset,                                //Reference groupset
-    matid_to_xs_map,                             //Material cross-sections
-    num_moments,
-    max_cell_dof_count);
+    matid_to_xs_map_,                             //Material cross-sections
+    num_moments_,
+    max_cell_dof_count_);
 
   return sweep_chunk;
 }

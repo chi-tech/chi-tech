@@ -42,10 +42,10 @@ SweepChunkPWLTransientTheta(
 
 }
 
-double* lbs::SweepChunkPWLTransientTheta::Upwinder::
+const double* lbs::SweepChunkPWLTransientTheta::Upwinder::
 GetUpwindPsi(int fj, bool local, bool boundary) const
 {
-  double* psi;
+  const double* psi;
   if (local)             psi = fluds->UpwindPsi(spls_index,
                                                 in_face_counter,
                                                 fj,0,angle_set_index);

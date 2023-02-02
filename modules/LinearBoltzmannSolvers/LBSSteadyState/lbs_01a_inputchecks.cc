@@ -8,54 +8,57 @@
 /**Performs general input checks before initialization continues.*/
 void lbs::SteadyStateSolver::PerformInputChecks()
 {
-  if (groups.empty())
+  if (groups_.empty())
   {
     chi::log.LogAllError()
-      << "LinearBoltzmann::SteadyStateSolver: No groups added to solver.";
+      << "LinearBoltzmann::SteadyStateSolver: No groups_ added to solver.";
     chi::Exit(EXIT_FAILURE);
   }
-  if (groupsets.empty())
+
+  num_groups_ = groups_.size();
+
+  if (groupsets_.empty())
   {
     chi::log.LogAllError()
       << "LinearBoltzmann::SteadyStateSolver: No group-sets added to solver.";
     chi::Exit(EXIT_FAILURE);
   }
   int grpset_counter=0;
-  for (auto& group_set : groupsets)
+  for (auto& group_set : groupsets_)
   {
     if (group_set.groups.empty())
     {
       chi::log.LogAllError()
-        << "LinearBoltzmann::SteadyStateSolver: No groups added to groupset "
+        << "LinearBoltzmann::SteadyStateSolver: No groups_ added to groupset "
         << grpset_counter << ".";
       chi::Exit(EXIT_FAILURE);
     }
     ++grpset_counter;
   }
-  if (options.sd_type == chi_math::SpatialDiscretizationType::UNDEFINED)
+  if (options_.sd_type == chi_math::SpatialDiscretizationType::UNDEFINED)
   {
     chi::log.LogAllError()
-      << "LinearBoltzmann::SteadyStateSolver: No discretization method set.";
+      << "LinearBoltzmann::SteadyStateSolver: No discretization_ method set.";
     chi::Exit(EXIT_FAILURE);
   }
 
-  grid = chi_mesh::GetCurrentHandler().GetGrid();
+  grid_ptr_ = chi_mesh::GetCurrentHandler().GetGrid();
 
-  if (grid == nullptr)
+  if (grid_ptr_ == nullptr)
   {
     chi::log.LogAllError()
-      << "LinearBoltzmann::SteadyStateSolver: No grid available from region.";
+      << "LinearBoltzmann::SteadyStateSolver: No grid_ptr_ available from region.";
     chi::Exit(EXIT_FAILURE);
   }
 
   //======================================== Determine geometry type
   using namespace chi_mesh;
-  const auto grid_attribs = grid->Attributes();
+  const auto grid_attribs = grid_ptr_->Attributes();
   if (grid_attribs & DIMENSION_1)
-    options.geometry_type = GeometryType::ONED_SLAB;
+    options_.geometry_type = GeometryType::ONED_SLAB;
   if (grid_attribs & DIMENSION_2)
-    options.geometry_type = GeometryType::TWOD_CARTESIAN;
+    options_.geometry_type = GeometryType::TWOD_CARTESIAN;
   if (grid_attribs & DIMENSION_3)
-    options.geometry_type = GeometryType::THREED_CARTESIAN;
+    options_.geometry_type = GeometryType::THREED_CARTESIAN;
 
 }

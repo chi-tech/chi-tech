@@ -67,7 +67,7 @@ int chiAdjointSolverApplyFluxMomentBuffer(lua_State* L)
       buffer_handle >= solver.m_moment_buffers.size())
     throw std::invalid_argument(fname + ": Invalid buffer handle.");
 
-  solver.phi_old_local = solver.m_moment_buffers[buffer_handle];
+  solver.PhiOldLocal() = solver.m_moment_buffers[buffer_handle];
 
   return 0;
 }
