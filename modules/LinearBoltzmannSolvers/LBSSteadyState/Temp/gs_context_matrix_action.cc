@@ -1,0 +1,60 @@
+#include "gs_context.h"
+
+#include "LinearBoltzmannSolvers/LBSSteadyState/lbs_linear_boltzmann_solver.h"
+
+#include <petscksp.h>
+
+#define WITH_DELAYED_PSI true
+
+namespace lbs
+{
+
+template<>
+int GSContext<Mat, Vec>::MatrixAction(Mat& matrix,
+                                      Vec& action_vector,
+                                      Vec& action)
+{
+  GSContext* gs_context_ptr;
+  MatShellGetContext(matrix, &gs_context_ptr);
+
+  //Shorten some names
+  lbs::SteadyStateSolver& lbs_solver = gs_context_ptr->lbs_solver_;
+  LBSGroupset& groupset              = gs_context_ptr->groupset_;
+  const int& lhs_source_scope        = gs_context_ptr->lhs_src_scope_;
+
+  //============================================= Copy krylov action_vector into local
+  lbs_solver.SetPrimarySTLvectorFromGSPETScVec(groupset,
+                                               action_vector,
+                                               lbs_solver.PhiOldLocal(),
+                                               WITH_DELAYED_PSI);
+
+  //============================================= Setting the source using
+  //                                              updated phi_old
+  auto& q_moments_local = lbs_solver_.QMomentsLocal();
+  q_moments_local.assign(q_moments_local.size(), 0.0);
+  set_source_function_(groupset, q_moments_local, lhs_source_scope);
+
+  //============================================= Apply transport operator
+  gs_context_ptr->ApplyInverseTransportOperator();
+
+  //============================================= Copy local into
+  //                                              operating vector
+  // We copy the STL data to the operating vector
+  // petsc_phi_delta first because its already sized.
+  // pc_output is not necessarily initialized yet.
+  lbs_solver.SetGSPETScVecFromPrimarySTLvector(groupset,
+                                               action,
+                                               lbs_solver_.PhiNewLocal(),
+                                               WITH_DELAYED_PSI);
+
+  //============================================= Computing action
+  // A  = [I - DLinvMS]
+  // Av = [I - DLinvMS]v
+  //    = v - DLinvMSv
+  VecAYPX(action, -1.0, action_vector);
+
+  return 0;
+}
+
+}
+
