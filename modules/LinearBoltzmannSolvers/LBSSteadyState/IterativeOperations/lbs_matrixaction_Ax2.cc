@@ -41,14 +41,14 @@ int lbs::MatrixAction_Ax(Mat matrix, Vec krylov_vector, Vec Av)
   // petsc_phi_delta first because its already sized.
   // pc_output is not necessarily initialized yet.
   solver.SetGSPETScVecFromPrimarySTLvector(groupset,
-                                           context->operating_vector,
+                                           Av,
                                            context->phi_new_local, WITH_DELAYED_PSI);
 
   //============================================= Computing action
   // A  = [I - DLinvMS]
   // Av = [I - DLinvMS]v
   //    = v - DLinvMSv
-  VecWAXPY(Av, -1.0, context->operating_vector, krylov_vector);
+  VecAYPX(Av, -1.0, krylov_vector);
 
   return 0;
 }

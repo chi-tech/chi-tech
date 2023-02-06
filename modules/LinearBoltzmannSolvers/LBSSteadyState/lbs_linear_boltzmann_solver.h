@@ -104,6 +104,7 @@ protected:
   std::vector<double>& QMomentsLocal();
   std::vector<double>& ExtSrcMomentsLocal();
   std::vector<double>& PhiOldLocal();
+  std::vector<double>& PhiNewLocal();
 
   //01
   void Initialize() override;

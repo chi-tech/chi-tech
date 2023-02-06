@@ -16,7 +16,7 @@ int lbs::WGDSA_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
   //Shorten some names
   lbs::SteadyStateSolver& solver = context->solver;
   LBSGroupset& groupset  = context->groupset;
-  auto& petsc_phi_delta = context->operating_vector;
+  auto& petsc_phi_delta = pc_output;
 
   //============================================= Copy PETSc vector to STL
   auto& phi_delta = context->phi_new_local;
@@ -54,8 +54,8 @@ int lbs::WGDSA_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
   solver.SetGSPETScVecFromPrimarySTLvector(groupset, petsc_phi_delta, phi_delta,
                                            WITH_DELAYED_PSI);
 
-  //============================================= Return result
-  VecCopy(petsc_phi_delta, pc_output);
+//  //============================================= Return result
+//  VecCopy(petsc_phi_delta, pc_output);
 
   return 0;
 }

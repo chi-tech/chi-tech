@@ -123,6 +123,12 @@ std::vector<double>& lbs::SteadyStateSolver::PhiOldLocal()
   return phi_old_local_;
 }
 
+/**Read/write access to newest updated flux vector.*/
+std::vector<double>& lbs::SteadyStateSolver::PhiNewLocal()
+{
+  return phi_new_local_;
+}
+
 /**Read/Write access to the boundary preferences.*/
 std::map<uint64_t, lbs::BoundaryPreference>& lbs::SteadyStateSolver::
   BoundaryPreferences()

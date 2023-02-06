@@ -14,7 +14,6 @@ struct KSPDataContext
 {
   lbs::SteadyStateSolver& solver;
   LBSGroupset&             groupset;
-  Vec&                     operating_vector;
   chi_mesh::sweep_management::SweepScheduler& sweep_scheduler;
   SourceFlags    lhs_scope;
   int64_t last_iteration = -1;
@@ -27,7 +26,6 @@ struct KSPDataContext
 
   KSPDataContext(lbs::SteadyStateSolver& in_solver,
                  LBSGroupset& in_groupset,
-                 Vec& in_operating_vector,
                  chi_mesh::sweep_management::SweepScheduler& in_sweep_scheduler,
                  SourceFlags in_lhs_scope,
                  const lbs::SetSourceFunction& in_set_source_function,
@@ -36,7 +34,6 @@ struct KSPDataContext
                  std::vector<double>& in_phi_new_local) :
     solver(in_solver),
     groupset(in_groupset),
-    operating_vector(in_operating_vector),
     sweep_scheduler(in_sweep_scheduler),
     lhs_scope(in_lhs_scope),
     set_source_function(in_set_source_function),

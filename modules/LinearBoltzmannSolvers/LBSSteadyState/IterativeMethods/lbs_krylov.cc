@@ -87,16 +87,14 @@ bool lbs::SteadyStateSolver::Krylov(LBSGroupset& groupset,
     CreateVector(static_cast<int64_t>(local_size),
                  static_cast<int64_t>(globl_size));
 
-  Vec phi_old, q_fixed, x_temp;
+  Vec q_fixed;
   VecSet(phi_new,0.0);
-  VecDuplicate(phi_new,&phi_old);
   VecDuplicate(phi_new,&q_fixed);
-  VecDuplicate(phi_new,&x_temp);
 
   //=================================================== Create Data context
   //                                                    available inside
   //                                                    Action
-  KSPDataContext data_context(*this, groupset, x_temp,
+  KSPDataContext data_context(*this, groupset,
                               sweep_scheduler, lhs_src_scope,
                               set_source_function,
                               phi_old_local_,
@@ -175,22 +173,24 @@ bool lbs::SteadyStateSolver::Krylov(LBSGroupset& groupset,
 
   //=================================================== Assemble vectors
   SetGSPETScVecFromPrimarySTLvector(groupset, q_fixed, phi_new_local_, WITH_DELAYED_PSI);
-  SetGSPETScVecFromPrimarySTLvector(groupset, phi_old, phi_old_local_);
+  SetGSPETScVecFromPrimarySTLvector(groupset, phi_new, phi_old_local_);
 
+  Vec x_temp;
+  VecDuplicate(q_fixed, &x_temp);
   PCApply(pc, q_fixed, x_temp);
   VecNorm(x_temp, NORM_2, &data_context.rhs_preconditioned_norm);
+  VecDestroy(&x_temp);
 
   //=================================================== Retool for GMRES
   sweep_chunk.SetSurfaceSourceActiveFlag(lhs_src_scope & APPLY_FIXED_SOURCES);
   sweep_chunk.SetDestinationPhi(phi_new_local_);
 
   double phi_old_norm=0.0;
-  VecNorm(phi_old,NORM_2,&phi_old_norm);
+  VecNorm(phi_new,NORM_2,&phi_old_norm);
 
   if (phi_old_norm > 1.0e-10)
   {
     KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
-    VecCopy(phi_old,phi_new);
     if (log_info)
       chi::log.Log() << "Using phi_old as initial guess.";
   }
@@ -234,7 +234,6 @@ bool lbs::SteadyStateSolver::Krylov(LBSGroupset& groupset,
   //==================================================== Clean up
   KSPDestroy(&ksp);
   VecDestroy(&phi_new);
-  VecDestroy(&phi_old);
   VecDestroy(&q_fixed);
   VecDestroy(&x_temp);
   MatDestroy(&A);
