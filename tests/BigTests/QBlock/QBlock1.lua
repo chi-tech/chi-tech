@@ -24,11 +24,11 @@ chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
 chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
 --chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_RICHARDSON_CYCLES)
 chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,50)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-8)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,100)
 chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
---chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-2,false)
---chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false)
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,30,1.0e-8,false)
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-8,false)
 
 
 --############################################### Set boundary conditions
@@ -39,7 +39,7 @@ chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
 chiLBSSetProperty(phys1,SCATTERING_ORDER,2)
 
 chiLBKESSetProperty(phys1, "MAX_ITERATIONS", 50)
-chiLBKESSetProperty(phys1, "TOLERANCE", 1.0e-8)
+chiLBKESSetProperty(phys1, "TOLERANCE", 1.0e-10)
 
 chiLBSSetProperty(phys1, USE_PRECURSORS, false)
 
