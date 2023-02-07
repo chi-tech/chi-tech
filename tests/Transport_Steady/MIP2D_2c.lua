@@ -78,18 +78,27 @@ end
 pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
 chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
 
---========== Groupset def
-gs0 = chiLBSCreateGroupset(phys1)
-cur_gs = gs0
-chiLBSGroupsetAddGroups(phys1,cur_gs,0,62)
-chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
-chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
-chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
-chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
-chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
-chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
-chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
-chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
+function MakeGroupset(from, to)
+    gs = chiLBSCreateGroupset(phys1)
+    cur_gs = gs
+    chiLBSGroupsetAddGroups(phys1,cur_gs,from,to)
+    chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+    chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+    chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+    chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
+    chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+    chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+    chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+    chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
+end
+
+function MakeGauseSeidelGroupSets(from, to)
+    for g=from,to do
+       MakeGroupset(g,g)
+    end
+end
+
+MakeGauseSeidelGroupSets(0,62)
 
 gs1 = chiLBSCreateGroupset(phys1)
 cur_gs = gs1

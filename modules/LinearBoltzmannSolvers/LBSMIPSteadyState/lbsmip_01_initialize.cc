@@ -5,32 +5,11 @@
 /**Initializing.*/
 void lbs::MIPSteadyStateSolver::Initialize()
 {
-  PerformInputChecks();                //a
-
-  options_.scattering_order = 0; //overwrite any option set for this
-
-  PrintSimHeader();                    //b
-
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  InitMaterials();                     //c
-  InitializeSpatialDiscretization();   //d
-
-  InitializeGroupsets();           //e
-  gs_mip_solvers_.assign(groupsets_.size(), nullptr);
-
-//  ComputeNumberOfMoments(); is not called           //f
-  num_moments_ = 1;
-  InitializeParrays();                       //g
-  InitializeBoundaries();                    //h
-  InitializePointSources();                  //i
-
-  // Initialize source func
-  using namespace std::placeholders;
-  active_set_source_function_ =
-    std::bind(&SteadyStateSolver::SetSource, this, _1, _2, _3, _4);
+  options_.scattering_order = 0; //overwrite any setting otherwise
+  SteadyStateSolver::Initialize();
 
   //============================================= Initialize groupset solvers
+  gs_mip_solvers_.assign(groupsets_.size(), nullptr);
   const size_t num_groupsets = groupsets_.size();
   for (size_t gs=0; gs<num_groupsets; ++gs)
   {
@@ -84,7 +63,7 @@ void lbs::MIPSteadyStateSolver::Initialize()
 
     auto solver =
       std::make_shared<acceleration::DiffusionMIPSolver>(
-        std::string(TextName()+"_WGDSA"),
+        std::string(TextName()+"_WGSolver"),
         *grid_ptr_, sdm,
         uk_man,
         bcs,
@@ -92,10 +71,10 @@ void lbs::MIPSteadyStateSolver::Initialize()
         unit_cell_matrices_,
         true); //verbosity
 
-    solver->options.residual_tolerance        = groupset.residual_tolerance;
-    solver->options.max_iters                 = groupset.max_iterations;
-    solver->options.verbose                   = false;
-//    solver->options_.additional_options_string = groupset.wgdsa_string;
+    solver->options.residual_tolerance        = groupset.wgdsa_tol;
+    solver->options.max_iters                 = groupset.wgdsa_max_iters;
+    solver->options.verbose                   = groupset.wgdsa_verbose;
+    solver->options.additional_options_string = groupset.wgdsa_string;
 
     solver->Initialize();
 

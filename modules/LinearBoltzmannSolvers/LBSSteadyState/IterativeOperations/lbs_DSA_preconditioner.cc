@@ -66,7 +66,7 @@ int lbs::WGDSA_TGDSA_PreConditionerMult(PC pc, Vec phi_input, Vec pc_output)
 int lbs::WGDSA_TGDSA_PreConditionerMult2(PC pc, Vec phi_input, Vec pc_output)
 {
   constexpr bool WITH_DELAYED_PSI = true;
-  KSPDataContext* context;
+  void* context;
   PCShellGetContext(pc,&context);
 
   auto gs_context_ptr = (lbs::WGSContext<Mat,Vec,KSP>*)(context);

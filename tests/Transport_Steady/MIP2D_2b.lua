@@ -66,17 +66,73 @@ chiPhysicsMaterialSetProperty(materials[1],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 chiPhysicsMaterialSetProperty(materials[2],ISOTROPIC_MG_SOURCE,FROM_ARRAY,src)
 
 --############################################### Setup Physics
-phys1 = chiCFEMMGDiffusionSolverCreate()
-chiSolverSetBasicOption(phys1, "residual_tolerance", 1.0e-6)
-chiSolverSetBasicOption(phys1, "verbose_level", 1)
-chiSolverSetBasicOption(phys1, "do_two_grid", false)
+phys1 = chiLBSMIPCreateSolver()
+
+--========== Groups
+grp = {}
+for g=1,num_groups do
+    grp[g] = chiLBSCreateGroup(phys1)
+end
+
+--========== ProdQuad
+pquad = chiCreateProductQuadrature(GAUSS_LEGENDRE_CHEBYSHEV,2, 1)
+chiOptimizeAngularQuadratureForPolarSymmetry(pqaud, 4.0*math.pi)
+
+function MakeGroupset(from, to)
+    gs = chiLBSCreateGroupset(phys1)
+    cur_gs = gs
+    chiLBSGroupsetAddGroups(phys1,cur_gs,from,to)
+    chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+    chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+    chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,1)
+    chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
+    chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+    chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+    chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+    chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
+end
+
+MakeGroupset(0,9)
+MakeGroupset(10,19)
+MakeGroupset(20,29)
+MakeGroupset(30,39)
+MakeGroupset(40,49)
+MakeGroupset(50,59)
+MakeGroupset(60,62)
+
+gs1 = chiLBSCreateGroupset(phys1)
+cur_gs = gs1
+chiLBSGroupsetAddGroups(phys1,cur_gs,63,167)
+chiLBSGroupsetSetQuadrature(phys1,cur_gs,pquad)
+chiLBSGroupsetSetAngleAggDiv(phys1,cur_gs,1)
+chiLBSGroupsetSetGroupSubsets(phys1,cur_gs,2)
+chiLBSGroupsetSetIterativeMethod(phys1,cur_gs,KRYLOV_GMRES_CYCLES)
+chiLBSGroupsetSetResidualTolerance(phys1,cur_gs,1.0e-6)
+chiLBSGroupsetSetMaxIterations(phys1,cur_gs,300)
+chiLBSGroupsetSetGMRESRestartIntvl(phys1,cur_gs,100)
+chiLBSGroupsetSetWGDSA(phys1,cur_gs,1000,1.0e-8,false," ")
+chiLBSGroupsetSetTGDSA(phys1,cur_gs,30,1.0e-4,false," ")
+
+--############################################### Set boundary conditions
+bsrc={}
+for g=1,num_groups do
+    bsrc[g] = 0.0
+end
+bsrc[1] = 1.0/4.0/math.pi
+--chiLBSSetProperty(phys1,BOUNDARY_CONDITION,XMIN,
+--                        LBSBoundaryTypes.INCIDENT_ISOTROPIC,bsrc);
+
+chiLBSSetProperty(phys1,DISCRETIZATION_METHOD,PWLD)
+chiLBSSetProperty(phys1,SCATTERING_ORDER,1)
+
+--chiLBSSetProperty(phys1, VERBOSE_INNER_ITERATIONS, false)
 
 --############################################### Initialize and Execute Solver
 chiSolverInitialize(phys1)
 chiSolverExecute(phys1)
 
 --############################################### Get field functions
-fflist,count = chiSolverGetFieldFunctionList(phys1)
+fflist,count = chiLBSGetScalarFieldFunctionList(phys1)
 
 --############################################### Slice plot
 slice2 = chiFFInterpolationCreate(SLICE)
@@ -115,7 +171,7 @@ chiLog(LOG_0,string.format("Max-value2=%.5e", maxval))
 --############################################### Exports
 if master_export == nil then
     chiFFInterpolationExportPython(slice2)
-    chiExportMultiFieldFunctionToVTK(fflist, "MGPhi")
+    chiExportMultiFieldFunctionToVTK(fflist, "MIPPhi")
 end
 
 --############################################### Plots

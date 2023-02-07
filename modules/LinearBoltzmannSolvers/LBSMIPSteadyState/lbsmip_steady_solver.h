@@ -19,17 +19,6 @@ public:
   //02
   void Execute() override;
   void SolveGroupset(LBSGroupset& groupset) override;
-
-protected:
-  //Iterative Methods
-  bool Krylov(LBSGroupset& groupset,
-              SourceFlags lhs_src_scope,
-              SourceFlags rhs_src_scope,
-              const SetSourceFunction& set_source_function,
-              bool log_info = true);
-
-  //Iterative Operations
-
 };
 }//namespace lbs
 
